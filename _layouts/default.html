@@ -11,12 +11,13 @@
 
   <header class="site-header">
   <a href="{{ '/' | relative_url }}" class="site-title-link">
-    <h1 class="highlighted">
-      <div class="logo-header">
-        {% include heading_with_highlighter.html %}
-        {{ site.title }}
+    <div class="site-logo">
+      <div class="site-logo-top">HELEN TRIAGES</div>
+      <div class="site-logo-tape">
+        <span class="tape-bg" aria-hidden="true"></span>
+        <span class="site-logo-food"><span class="site-logo-bracket">[ </span>FOOD<span class="site-logo-bracket"> ]</span></span>
       </div>
-    </h1>
+    </div>
   </a>
   </header>
 
@@ -72,6 +73,22 @@
         .then(function(t) { brushCache[url] = t; doInject(slot, t); })
         .catch(function() {});
     });
+
+    // ── Tape background ───────────────────────────────────────────────────
+    var tapeSlot = document.querySelector('.tape-bg');
+    if (tapeSlot) {
+      var tapeN   = Math.floor(Math.random() * 2) + 1;
+      var tapeUrl = BASE + '/assets/img/tape/tape-food-' + tapeN + '.svg';
+      fetch(tapeUrl)
+        .then(function(r) { return r.text(); })
+        .then(function(t) {
+          var fixed = t
+            .replace(/<svg /, '<svg preserveAspectRatio="none" height="100%" ')
+            .replace(/width="100%"/, 'width="100%"');
+          tapeSlot.innerHTML = fixed;
+        })
+        .catch(function() {});
+    }
 
     // ── Site footer hearts ──────────────────────────────────────────────────
     var heartEl = document.querySelector('.site-footer-hearts');
