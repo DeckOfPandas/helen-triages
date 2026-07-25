@@ -98,7 +98,10 @@ title: Home
       {% unless recipe.meta.proofread %}{% assign _needs_proofread = true %}{% endunless %}
       {% assign _has_short = false %}
       {% for step in recipe.method_short %}
-        {% unless step == "QQ" or step == "none" %}{% assign _has_short = true %}{% endunless %}
+        {% assign _s = step | strip %}
+        {% unless _s == "" or _s == "QQ" or _s == "none" %}
+          {% assign _has_short = true %}
+        {% endunless %}
       {% endfor %}
       <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}">
         <a href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
