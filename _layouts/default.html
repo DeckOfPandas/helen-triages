@@ -77,7 +77,7 @@
     // ── Tape background ───────────────────────────────────────────────────
     var tapeSlot = document.querySelector('.tape-bg');
     if (tapeSlot) {
-      var tapeN   = Math.floor(Math.random() * 2) + 1;
+      var tapeN   = Math.floor(Math.random() * 4) + 1;
       var tapeUrl = BASE + '/assets/img/tape/tape-food-' + tapeN + '.svg';
       fetch(tapeUrl)
         .then(function(r) { return r.text(); })
