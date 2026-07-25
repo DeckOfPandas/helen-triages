@@ -5,7 +5,7 @@ tagline: "Doesn't really keep, but very easy and quick."
 source: QQ source
 makes: about 300 ml
 prep_time: Estimated 5 mins
-cook_time:
+cook_time: "None"
 main_ingredients: [mayonnaise, parmesan, "lemon juice", "anchovy paste", garlic]
 star_ingredient:
 tags: [extras, "no-cook"]
@@ -37,5 +37,5 @@ meta:
   rewritten: false
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

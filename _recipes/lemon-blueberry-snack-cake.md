@@ -3,7 +3,7 @@ title: Lemon Blueberry Snack Cake
 short_name: Lemon Blueberry Snack Cake
 tagline: QQ
 source: Adapted from eatingwell.com
-serves: "12 pieces"
+makes: "12 pieces"
 prep_time: QQ
 cook_time: "45–50 mins, plus cooling"
 main_ingredients: [blueberries, lemon, "olive oil", yoghurt, flour]
@@ -51,5 +51,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

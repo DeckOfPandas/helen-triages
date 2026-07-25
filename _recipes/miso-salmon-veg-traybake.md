@@ -1,5 +1,5 @@
 ---
-title: "Miso Salmon & Veg Traybake"
+title: "Miso Salmon and Veg Traybake"
 short_name: Miso Salmon Veg Traybake
 tagline: "One-tray cooking is so quick and simple."
 source: "Adapted from Good Food 2026 wall calendar"
@@ -10,7 +10,8 @@ main_ingredients: [salmon, "sweet potatoes", broccoli, "pak choi", miso]
 star_ingredient: oily fish
 tags: ["one-pot"]
 ingredient_groups:
-  - items:
+  - name: traybake
+    items:
     - amount: "2 x 140 g"
       item: salmon or trout fillets
     - amount: "350 g"
@@ -22,7 +23,7 @@ ingredient_groups:
     - amount: "1 tbsp"
       item: sesame seeds
     - item: "spring onions, finely sliced, to serve"
-  - name: for the miso marinade
+  - name: miso marinade
     items:
     - amount: "1 tsp"
       item: white miso paste
@@ -48,5 +49,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

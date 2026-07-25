@@ -3,7 +3,7 @@ title: "Grandma's Lemon Curd"
 short_name: "Grandma's Lemon Curd"
 tagline: "Good for jarring or for lemon meringue pie."
 source: Grandma Kath
-makes:
+makes: QQ
 prep_time: "10 mins"
 cook_time: "20 mins"
 main_ingredients: [lemon, butter, "golden caster sugar", eggs, cornflour]
@@ -36,5 +36,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

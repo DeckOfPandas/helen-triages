@@ -10,7 +10,8 @@ main_ingredients: ["pork belly", "barley miso", ginger, mirin, "spring onions"]
 star_ingredient: pork
 tags: ["make-ahead", "one-handed food", "one-pot"]
 ingredient_groups:
-  - items:
+  - name: pork
+    items:
     - amount: "800 g"
       item: "skin-on boneless pork belly"
     - amount: "2 inches"
@@ -43,5 +44,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

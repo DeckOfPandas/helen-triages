@@ -6,7 +6,7 @@ source: Adapted from Riverford
 serves: 2
 prep_time: "5 mins"
 cook_time: "30 mins"
-main_ingredients: ["chicken leg", "salad potatoes", sorrel, "French beans", "white wine"]
+main_ingredients: ["chicken leg", "salad potatoes", sorrel, "French beans", "white wine", "wholegrain mustard"]
 star_ingredient: poultry
 tags: ["one-handed food", "one-pot"]
 ingredient_groups:
@@ -53,5 +53,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

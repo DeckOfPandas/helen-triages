@@ -6,7 +6,7 @@ source: Experience
 serves: "6–8 as a condiment"
 prep_time: "2 mins"
 cook_time: "10 mins"
-main_ingredients: [cranberries, "orange juice", "brown sugar", "orange zest"]
+main_ingredients: [cranberries, orange, "brown sugar"]
 star_ingredient: fruit
 tags: [extras, festive, "make-ahead", freezable]
 ingredient_groups:
@@ -30,5 +30,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

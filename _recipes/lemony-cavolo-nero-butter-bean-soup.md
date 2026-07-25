@@ -1,6 +1,7 @@
 ---
-title: "Lemony Cavolo Nero & Butter Bean Soup"
+title: "Lemony Cavolo Nero and Butter Bean Soup"
 short_name: Lemony Cavolo Nero and Butter Bean Soup
+tagline: "It's fun to have a one-pot stew that is bright and acidic without relying on tomatoes."
 source: "Adapted from Good Food, January 2026, page 41"
 serves: 4
 prep_time: "15 mins"
@@ -39,10 +40,10 @@ method_short:
   - ""
 notes:
   - "Any greens are fine here."
-  - "Mash some of the beans with a fork before adding them if you want a thicker broth."
+  - "Mash some of the beans with a fork before adding them if you want a thicker soup."
 meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

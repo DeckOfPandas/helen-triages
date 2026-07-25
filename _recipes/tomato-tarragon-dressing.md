@@ -5,7 +5,7 @@ tagline: "A punchy, herb-heavy dressing that works brilliantly with beef, but ho
 source: "Adapted from GoodtoKnow, recipe Gordon Ramsay"
 serves: 6
 prep_time: "15 mins plus 20 mins chilling"
-cook_time:
+cook_time: "None"
 main_ingredients: ["plum tomatoes", tarragon, "Worcestershire sauce", "balsamic vinegar", "Dijon mustard"]
 star_ingredient:
 tags: [extras, "no-cook", "make-ahead"]
@@ -19,7 +19,7 @@ ingredient_groups:
       item: Worcestershire sauce
     - amount: "1 tbsp"
       item: Dijon mustard
-    - item: "few dashes of Tabasco sauce"
+    - item: "few dashes of Tabasco sauce to taste"
     - item: "juice of 1 lemon"
     - amount: "2 tbsp"
       item: balsamic vinegar
@@ -29,16 +29,16 @@ ingredient_groups:
       item: "shallots, peeled and finely chopped"
     - item: "large handful each of tarragon and flat-leaf parsley, chopped"
 method:
-  - "PLACEHOLDER - rewrite: Cut each tomato in half and squeeze out the seeds. Finely chop the flesh and place in a large bowl."
-  - "PLACEHOLDER - rewrite: Add all remaining ingredients except the herbs. Mix well and season generously. Cover and chill for at least 20 minutes."
-  - "PLACEHOLDER - rewrite: Stir through the chopped herbs just before serving."
+  - "Cut each tomato in half and squeeze out the seeds. Finely chop the flesh and place in a large bowl."
+  - "Add all remaining ingredients except the herbs. Mix well and season generously. Cover and chill for at least 20 minutes."
+  - "Stir the chopped herbs through just before serving."
 method_short:
   - ""
 notes:
-  - "Made to go with roast beef fillet — see the companion recipe. But genuinely works with almost anything."
+  - "Made to go with [roast beef fillet](/recipes/roast-beef-fillet/). But it works with almost anything."
 meta:
-  rewritten: false
+  rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

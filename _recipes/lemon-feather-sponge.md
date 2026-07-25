@@ -5,7 +5,7 @@ tagline: "From Delia's Book of Cakes. So light and moist — genuinely delightfu
 source: "Adapted from Delia Smith's Book of Cakes"
 makes: "one 7-inch round cake"
 prep_time:
-cook_time: "about 40 mins"
+cook_time: "40 mins"
 main_ingredients: [flour, cornflour, eggs, lemon, oil]
 star_ingredient:
 tags: [bakes]
@@ -44,5 +44,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

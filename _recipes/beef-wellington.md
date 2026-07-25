@@ -6,17 +6,19 @@ source: "Adapted from Gordon Ramsay's Ultimate Cookery Course (Hodder & Stoughto
 serves: 4
 prep_time: "1 hr 30 mins, plus overnight chilling"
 cook_time: "15–20 mins"
-main_ingredients: ["beef fillet", "puff pastry", "wild mushrooms", "Parma ham", "egg yolks"]
+main_ingredients: ["beef fillet", "puff pastry", "wild mushrooms", "Parma ham", "Dijon mustard", "egg yolks"]
 star_ingredient: beef
 tags: [showstopper, "make-ahead"]
 ingredient_groups:
-  - items:
+  - name: wellington
+    items:
     - amount: "2 x 400 g"
       item: beef fillets
     - amount: "500 g"
       item: "mixture of wild mushrooms, cleaned"
     - amount: "1"
       item: "thyme sprig, leaves only"
+    - item: "Dijon mustard, to brush"
     - amount: "500 g"
       item: puff pastry
     - amount: "8"
@@ -50,7 +52,8 @@ method_groups:
       - "Wrap each beef fillet tightly in a triple layer of cling film to set its shape. Chill overnight."
   - name: "On the day: sear and cool"
     steps:
-      - "Remove the cling film and quickly sear the beef fillets in a very hot pan for 30–60 seconds until browned all over and still rare in the middle. Remove and leave to cool completely."
+      - "Remove the cling film and quickly sear the beef fillets in a very hot pan for 30–60 seconds until browned all over and still rare in the middle."
+      - "Remove, brush lightly with the Dijon mustard, and leave to cool completely."
   - name: Make the duxelle
     steps:
       - "Chop the mushrooms very finely and fry in a hot pan with the thyme leaves and some seasoning. Keep frying over high heat for 10 mins after the juices are released, until all excess moisture has evaporated and you have a dry mushroom paste. Leave to cool."
@@ -77,5 +80,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

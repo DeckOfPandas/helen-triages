@@ -5,7 +5,7 @@ tagline: "Finely sliced raw sprouts with apple, walnuts, red onion, and pomegran
 source: Henry
 serves: "4–6"
 prep_time: "20 mins"
-cook_time:
+cook_time: "None"
 main_ingredients: ["brussels sprouts", "pomegranate seeds", walnuts, apple, "red onion", tahini, honey]
 star_ingredient: greens
 tags: [salad, "no-cook", "make-ahead"]
@@ -24,7 +24,8 @@ ingredient_groups:
       item: natural yoghurt
     - amount: "2 tbsp"
       item: extra virgin olive oil
-  - items:
+  - name: salad
+    items:
     - amount: "350 g"
       item: brussels sprouts
     - amount: "½"
@@ -50,5 +51,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

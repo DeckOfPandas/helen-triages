@@ -6,7 +6,7 @@ source: Adapted from Jamie Oliver
 serves: 4
 prep_time: "10 mins"
 cook_time: "40 mins"
-main_ingredients: [sausages, "plain flour", eggs, milk, "red onions", "balsamic vinegar"]
+main_ingredients: [sausages, "plain flour", eggs, milk, "red onions", "balsamic vinegar", rosemary]
 star_ingredient: pork
 tags: ["carbs party", "one-pot"]
 ingredient_groups:
@@ -55,5 +55,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

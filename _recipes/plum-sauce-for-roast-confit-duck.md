@@ -28,11 +28,11 @@ method:
   - "Stir in a pat of butter just before serving."
 method_short:
   - ""
-# notes:
-#   -
+notes:
+  - "Made for [slow cooker confit duck legs](/recipes/slow-cooker-confit-duck-legs/)."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

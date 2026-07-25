@@ -6,11 +6,12 @@ source: "Adapted from Good Food, February 2025"
 serves: 4
 prep_time: "30 mins plus at least 2 hrs marinating"
 cook_time: "2 hrs 30 mins"
-main_ingredients: ["beef shin", potato, "red wine", carrots, onion]
+main_ingredients: ["beef shin", potato, "red wine", carrots, onion, swede]
 star_ingredient: beef
 tags: ["make-ahead", "one-handed food", "one-pot"]
 ingredient_groups:
-  - items:
+  - name: filling
+    items:
     - amount: "1 kg"
       item: "beef shin, cut into large chunks (about 4–5 cm)"
     - amount: "300 ml"
@@ -55,5 +56,5 @@ meta:
   rewritten: false
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

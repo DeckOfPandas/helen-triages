@@ -1,5 +1,5 @@
 ---
-title: "Pork Loin Roast with Caramelised Onion & Garlic Potatoes"
+title: "Pork Loin Roast with Caramelised Onion and Garlic Potatoes"
 short_name: Pork Loin Roast Onion Potatoes
 tagline: "A one-pan roast where the meat, potatoes and gravy all cook together."
 source: "Adapted from Good Food, March 2026"
@@ -48,5 +48,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

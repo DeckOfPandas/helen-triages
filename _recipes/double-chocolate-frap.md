@@ -3,10 +3,10 @@ title: Double Chocolate Frap
 short_name: Double Chocolate Frap
 tagline: "Nearly as good as Starbucks, but you can still have dinner."
 source: Helen
-serves: "2"
+serves: 2
 prep_time: "5 mins"
 cook_time: None
-main_ingredients: [ice, milk, "Hershey's chocolate syrup", "cocoa powder", "xanthan gum", "vanilla essence"]
+main_ingredients: [ice, milk, "Hershey's chocolate syrup", "cocoa powder", "xanthan gum", "vanilla essence", sugar]
 star_ingredient: chocolate
 tags: ["ice cream", "no-cook"]
 ingredient_groups:
@@ -36,5 +36,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

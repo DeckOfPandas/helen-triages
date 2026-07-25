@@ -3,14 +3,15 @@ title: Baked Desserts with Salted Caramel Centres
 short_name: Baked Desserts with Salted Caramel Centres
 tagline: QQ
 source: Tom Kerridge
-serves: "6"
+serves: 6
 prep_time: QQ
 cook_time: "45–50 mins"
 main_ingredients: ["dark chocolate", butter, eggs, "caster sugar", "salted caramel chocolates", mascarpone, "double cream"]
 star_ingredient: chocolate
 tags: [dessert, showstopper]
 ingredient_groups:
-  - items:
+  - name: puddings
+    items:
     - amount: "125 g"
       item: butter
     - amount: "190 g"
@@ -31,7 +32,7 @@ ingredient_groups:
       item: Camp Coffee or espresso
     - amount: "50 g"
       item: caster sugar
-    - item: "Cocoa powder, to serve"
+    - item: "cocoa powder, to serve"
 method:
   - "Preheat the oven to 120°C (140°C non-fan). Put the butter and dark chocolate in a large bowl and place on top of a pan of simmering water to melt together. In a separate bowl, whisk together the eggs and sugar."
   - Remove the chocolate from the heat and whisk in the egg-and-sugar mixture. Arrange six moulds (ovenproof bowls or ramekins) on a baking tray and put one caramel chocolate into the bottom of each.
@@ -43,5 +44,5 @@ meta:
   rewritten: false
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

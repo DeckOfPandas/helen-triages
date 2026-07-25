@@ -3,9 +3,9 @@ title: Vietnamese-Spiced Braised Muntjac Haunch
 short_name: Vietnamese-Spiced Braised Muntjac
 tagline: QQ
 source: Helen
-serves: "4"
+serves: 4
 prep_time: "20 mins"
-cook_time: About 2 hours
+cook_time: "2 hrs"
 main_ingredients: ["muntjac haunch", lemongrass, ginger, "star anise", "fish sauce", "coconut palm sugar"]
 star_ingredient: game
 tags: ["one-pot", fakeaway, "make-ahead"]
@@ -56,5 +56,5 @@ meta:
   rewritten: false
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

@@ -3,7 +3,7 @@ title: Peach Clafoutis with Amaretto and crème fraîche
 short_name: Peach Clafoutis with Amaretto
 tagline: Serve while it sits all puffed up and proud.
 source: Adapted from Tom Kerridge
-serves: "6"
+serves: 6
 prep_time: "5 mins"
 cook_time: "12 mins"
 main_ingredients: [peaches, "double cream", eggs, amaretto, "crème fraîche", "plain flour"]
@@ -40,5 +40,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

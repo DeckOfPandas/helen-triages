@@ -10,7 +10,7 @@ main_ingredients: [courgette, orange, sultanas, "cream cheese", "self-raising fl
 star_ingredient:
 tags: [bakes, freezable]
 ingredient_groups:
-  - name: for the cake
+  - name: cake
     items:
     - amount: "350 g"
       item: courgettes
@@ -30,7 +30,7 @@ ingredient_groups:
       item: self-raising flour
     - amount: "1 tsp"
       item: baking powder
-  - name: for the frosting
+  - name: frosting
     items:
     - amount: "200 g"
       item: full-fat cream cheese
@@ -52,5 +52,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

@@ -3,7 +3,7 @@ title: Slow Cooker Confit Duck Legs
 short_name: Slow Cooker Confit Duck Legs
 tagline: "Duck legs cured overnight with salt, garlic and thyme, slow-cooked in their own fat, then finished in a cast iron pan."
 source: Adapted from Pinch and Swirl
-serves: "however many you make"
+makes: "however many you make"
 prep_time: "10 mins"
 cook_time: "6 hrs"
 main_ingredients: ["duck legs", "coarse sea salt", thyme, garlic, "duck fat"]
@@ -35,5 +35,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

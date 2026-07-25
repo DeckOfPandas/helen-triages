@@ -22,7 +22,7 @@ ingredient_groups:
       item: large egg yolk
   - name: filling
     items:
-    - item: "[[grandmas-lemon-curd]], made with less egg yolk"
+    - item: "[lemon curd](/recipes/grandmas-lemon-curd/), made with less egg yolk"
   - name: meringue
     items:
     - amount: "4"
@@ -49,5 +49,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

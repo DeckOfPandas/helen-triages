@@ -10,14 +10,15 @@ main_ingredients: ["soft brown sugar", "salted butter", "double cream", "condens
 star_ingredient:
 tags: [extras]
 ingredient_groups:
-  - items:
+  - name: caramel
+    items:
     - amount: "3 oz"
       item: soft brown sugar
     - amount: "2 oz"
       item: salted butter
     - amount: "3 tbsp"
       item: double cream
-  - name: "for millionaire's filling"
+  - name: "millionaire's filling"
     items:
     - amount: "200 ml"
       item: condensed milk
@@ -33,5 +34,5 @@ meta:
   rewritten: false
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

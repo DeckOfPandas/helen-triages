@@ -1,16 +1,17 @@
 ---
-title: "Cumin & Mint Lamb Skewers"
-short_name: "Cumin & Mint Lamb Skewers"
+title: "Cumin and Mint Lamb Skewers"
+short_name: "Cumin and Mint Lamb Skewers"
 tagline: "Much better than takeaway."
 source: Adapted from Good Food
 serves: 6
-prep_time: "40 mins plus at least 2 hours chilling"
+prep_time: "40 mins plus at least 2 hrs chilling"
 cook_time: "30 mins"
 main_ingredients: ["lamb shoulder", "Greek yoghurt", hummus, "pomegranate seeds", herbs]
 star_ingredient: lamb
 tags: [fakeaway, "make-ahead", "one-handed food"]
 ingredient_groups:
-  - items:
+  - name: skewers
+    items:
     - amount: "150 g"
       item: full-fat Greek yoghurt
     - amount: "2"
@@ -50,5 +51,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

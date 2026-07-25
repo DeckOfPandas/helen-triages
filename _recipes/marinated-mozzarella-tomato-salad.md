@@ -6,9 +6,9 @@ source: Vickie from Malta
 serves: QQ
 prep_time: "5 mins plus 1 hr marinating"
 cook_time: None
-main_ingredients: ["cherry tomatoes", mozzarella, "extra-virgin olive oil", "white wine vinegar", basil]
+main_ingredients: ["cherry tomatoes", mozzarella, "extra-virgin olive oil", "white wine vinegar", basil, garlic]
 star_ingredient:
-tags: [salad, "no-cook"]
+tags: [salad, starter, "no-cook"]
 ingredient_groups:
   - items:
     - amount: "300 g"
@@ -35,5 +35,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

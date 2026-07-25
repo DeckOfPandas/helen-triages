@@ -6,7 +6,7 @@ source: "Adapted from Gordon Ramsay's Ultimate Cookery Course"
 serves: 4
 prep_time: "20 mins"
 cook_time: "3 hrs 30 mins"
-main_ingredients: ["beef short ribs", "red wine", "beef stock"]
+main_ingredients: ["beef short ribs", "red wine", "beef stock", garlic, "tomato purée"]
 star_ingredient: beef
 tags: ["make-ahead", "one-handed food", "one-pot"]
 ingredient_groups:
@@ -37,5 +37,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

@@ -3,7 +3,7 @@ title: Cherry Glaze
 short_name: Cherry Glaze
 tagline: "Great over (Five-spice roast duck legs)[QQ LINK] or many other things."
 source: Adapted from Gordon Ramsay
-serves: Depends
+makes: Depends
 prep_time: "5 mins"
 cook_time: "20 mins"
 main_ingredients: [honey, "soy sauce", "red wine vinegar", "chicken stock", cherries]
@@ -31,9 +31,10 @@ method_short:
   - ""
 notes:
   - "If using frozen cherries, thaw and strain ahead as they hold more water."
+  - "Made for [five-spice crispy duck legs](/recipes/five-spice-crispy-duck-legs/)."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

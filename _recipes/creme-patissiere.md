@@ -3,7 +3,7 @@ title: "Mrs Nicholson's Crème Pâtissière"
 short_name: Crème Pâtissière
 tagline: QQ
 source: Mrs Nicholson
-serves: Makes about 600 ml
+makes: "about 600 ml"
 prep_time: QQ
 cook_time: QQ
 main_ingredients: [milk, eggs, "caster sugar", "plain flour", vanilla]
@@ -38,5 +38,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

@@ -1,5 +1,5 @@
 ---
-title: "Citrus & Soy Salmon with Sticky Rice, Cucumber Salad & Edamame"
+title: "Citrus and Soy Salmon with Sticky Rice, Cucumber Salad and Edamame"
 short_name: Citrus Soy Salmon
 tagline: "Very easy, very quick."
 source: "Adapted from Good Food, May 2026"
@@ -55,5 +55,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

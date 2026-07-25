@@ -10,7 +10,8 @@ main_ingredients: ["dark chocolate", butter, eggs, "caster sugar", raspberries, 
 star_ingredient: chocolate
 tags: [bakes, dessert, "make-ahead"]
 ingredient_groups:
-  - items:
+  - name: cake
+    items:
     - amount: "250 g"
       item: "butter, diced, plus extra for greasing"
     - amount: "375 g"
@@ -21,10 +22,10 @@ ingredient_groups:
       item: caster sugar
   - name: to serve
     items:
-    - item: Whipped cream or crème fraîche
-    - item: Raspberries
-    - item: Toasted nuts
-    - item: Grated chocolate (optional)
+    - item: whipped cream or crème fraîche
+    - item: raspberries
+    - item: toasted nuts
+    - item: grated chocolate (optional)
 method:
   - Preheat the oven to 140°C / gas 1. Lightly grease a 23cm springform cake tin with butter and line the base and sides with non-stick baking parchment.
   - "Put the butter and chocolate into a large heatproof bowl and place over a saucepan of barely simmering water, making sure the bottom of the bowl is not touching the water. Allow to melt, then stir until smooth. Remove from the heat and cool slightly."
@@ -41,5 +42,5 @@ meta:
   rewritten: false
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

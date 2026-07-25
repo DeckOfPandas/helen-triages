@@ -1,5 +1,5 @@
 ---
-title: "Pancetta & White Bean Stew"
+title: "Pancetta and White Bean Stew"
 short_name: Pancetta and White Bean Stew
 tagline: "Uses up any veg in the fridge."
 source: Unknown
@@ -47,5 +47,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

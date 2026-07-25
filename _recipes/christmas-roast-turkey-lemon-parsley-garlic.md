@@ -10,7 +10,8 @@ main_ingredients: [turkey, butter, lemon, parsley, garlic]
 star_ingredient: poultry
 tags: [festive, showstopper, "make-ahead"]
 ingredient_groups:
-  - items:
+  - name: turkey
+    items:
     - amount: "1"
       item: "free-range turkey (ideally Norfolk Black or Bronze), about 5–5.5 kg"
     - item: sea salt and freshly ground black pepper
@@ -54,5 +55,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

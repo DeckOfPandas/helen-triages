@@ -6,7 +6,7 @@ source: Adapted from Jamie Oliver
 serves: 4
 prep_time: "10 mins"
 cook_time: "15 mins"
-main_ingredients: [venison, blueberries, shallots, "red wine", thyme]
+main_ingredients: [venison, blueberries, shallots, "red wine", thyme, "juniper berries"]
 star_ingredient: game
 tags: [showstopper]
 ingredient_groups:
@@ -42,5 +42,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

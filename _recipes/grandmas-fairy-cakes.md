@@ -5,7 +5,7 @@ tagline: "The ones Grandma used to make."
 source: Grandma Kath
 makes: "12 fairy cakes"
 prep_time:
-cook_time:
+cook_time: "Until done"
 main_ingredients: [butter, sugar, eggs, flour, sultanas]
 star_ingredient:
 tags: [bakes]
@@ -35,5 +35,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---
