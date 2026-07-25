@@ -19,13 +19,11 @@ defaults:
       type: recipes
     values:
       layout: recipe
-      rewritten: false
   - scope:
       path: ""
       type: drafts
     values:
       layout: recipe
-      rewritten: false
 
 sass:
   sass_dir: _sass
