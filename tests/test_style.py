@@ -1,0 +1,134 @@
+"""House style: time words, typography, spelling.
+
+The rule that catches the most is the split convention agreed 2026-07-25:
+tighter for metadata than for prose.
+
+    prep_time / cook_time  ->  mins, hrs
+    prose                  ->  mins, hours, seconds
+
+Only numeric quantities are abbreviated. "a minute", "at the last minute" and
+"ten minutes of glory" are English, not inconsistency, and are left alone.
+"""
+from __future__ import annotations
+
+import re
+
+import pytest
+
+from conftest import where
+
+TIME_FIELDS = ("prep_time", "cook_time")
+
+# Word forms that stay spelled out because a number does not precede them.
+IDIOM = re.compile(r"(?<![0-9])\s*(minutes?|hours?|seconds?)\b", re.I)
+
+
+def test_no_estimated_timings(recipe):
+    """`Estimated N mins` values were invented by an earlier Claude.
+
+    They are fine in _drafts/ but must never reach _recipes/ — an estimate that
+    survives to publication is indistinguishable from a measured time.
+    """
+    offenders = {f: recipe.fm[f] for f in TIME_FIELDS
+                 if isinstance(recipe.fm.get(f), str)
+                 and "estimated" in recipe.fm[f].lower()}
+    assert not offenders, (
+        f"{where(recipe)} has estimated timing(s): "
+        + "; ".join(f"{f}: {v!r}" for f, v in offenders.items())
+        + ".\nReplace with a real time before this recipe is published. "
+          "Estimates are a drafting aid, not a published value."
+    )
+
+
+@pytest.mark.parametrize("field", TIME_FIELDS)
+def test_metadata_time_format(recipe, field):
+    """Metadata uses the terse forms: `20 mins`, `1 hr 30 mins`, `2 hrs`."""
+    value = recipe.fm.get(field)
+    if not isinstance(value, str) or not value.strip():
+        return
+    if value.strip() in ("QQ", "None", "Until done"):
+        return
+    bad_units = re.findall(r"(?<=[0-9])\s*(minutes?|hours?|h)\b", value)
+    assert not bad_units, (
+        f"{where(recipe)} `{field}: {value!r}` uses {sorted(set(bad_units))}. "
+        f"Metadata fields use the terse forms `mins` and `hrs` "
+        f"(e.g. '20 mins', '1 hr 30 mins', '2 hrs'). "
+        f"The spelled-out forms belong in prose, not here."
+    )
+
+
+def test_prose_abbreviates_minutes_only(recipe):
+    """Prose uses `mins`, but `hours` and `seconds` spelled out."""
+    problems = []
+    for location, text in recipe.prose:
+        for match in re.finditer(r"(?<=[0-9])\s*(minutes?|hrs?|secs?)\b", text):
+            word = match.group(1)
+            wanted = {"minute": "min", "minutes": "mins",
+                      "hr": "hour", "hrs": "hours",
+                      "sec": "second", "secs": "seconds"}[word.lower()]
+            snippet = text[max(0, match.start() - 25):match.end() + 10]
+            problems.append(f"{location}: …{snippet}… — use '{wanted}'")
+    assert not problems, (
+        f"{where(recipe)} breaks the prose time convention "
+        f"(mins abbreviated; hours and seconds spelled out):\n  "
+        + "\n  ".join(problems)
+    )
+
+
+TYPOGRAPHY = [
+    ("slash fractions", r"(?<![\d/])(1/2|1/4|3/4|1/3|2/3|1/8|3/8|5/8|7/8)(?![\d/])",
+     "use Unicode fractions: ½ ¼ ¾ ⅓ ⅔ ⅛ ⅜ ⅝ ⅞"),
+    ("double hyphen", r"(?<!-)--(?!-)", "use an em dash —"),
+    ("ASCII arrow", r"->", "use →"),
+    ("wikilink", r"\[\[[^\]]+\]\]",
+     "cross-recipe links are markdown: [display text](/recipes/slug/)"),
+    ("ampersand in title", None, None),  # handled separately below
+]
+
+
+@pytest.mark.parametrize("name,pattern,fix",
+                         [(n, p, f) for n, p, f in TYPOGRAPHY if p])
+def test_typography(recipe, name, pattern, fix):
+    hits = re.findall(pattern, recipe.raw)
+    assert not hits, (
+        f"{where(recipe)} contains {len(hits)} instance(s) of {name}: "
+        f"{sorted(set(h if isinstance(h, str) else h[0] for h in hits))[:5]}. "
+        f"Fix: {fix}."
+    )
+
+
+def test_no_ampersand_in_title(recipe):
+    for field in ("title", "short_name"):
+        value = str(recipe.fm.get(field, ""))
+        assert "&" not in value, (
+            f"{where(recipe)} `{field}: {value!r}` contains an ampersand. "
+            f"Titles use the word 'and'."
+        )
+
+
+SPELLINGS = {
+    r"\bdemarara\b": "demerara",
+    r"\byogurt\b": "yoghurt",
+    r"\bcreme fraiche\b": "crème fraîche",
+    r"\bgruyere\b": "gruyère",
+    r"\bpuree\b": "purée",
+    r"\bsaute\b": "sauté",
+}
+
+
+def test_spellings(recipe):
+    problems = []
+    for pattern, correct in SPELLINGS.items():
+        if re.search(pattern, recipe.raw, re.I):
+            problems.append(f"{pattern.strip(chr(92) + 'b')} -> {correct}")
+    assert not problems, (
+        f"{where(recipe)} uses non-house spellings: " + "; ".join(problems)
+    )
+
+
+def test_temperatures_use_degree_c(recipe):
+    bad = re.findall(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)", recipe.raw)
+    assert not bad, (
+        f"{where(recipe)} writes temperature(s) {bad} without the degree sign. "
+        f"Always °C, e.g. 200°C."
+    )
