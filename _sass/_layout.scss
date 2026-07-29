@@ -3,11 +3,16 @@
 // =============================================================================
 
 main {
-  max-width: 900px;
+  max-width: $width-content;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: $space-xxl $space-xl;
   position: relative;
 }
+
+// ============================================================================
+// SITE CHROME
+// ============================================================================
+// Header, footer, logo. Everything outside <main>.
 
 .site-header {
   -webkit-text-stroke: 1px;
@@ -36,7 +41,7 @@ article.recipe .method-short {
 }
 
 .site-header {
-  padding: 1.5rem;
+  padding: $space-xl;
   border-bottom: 1px solid $color-border;
   background: $color-surface;
 
@@ -51,7 +56,7 @@ article.recipe .method-short {
 }
 
 .site-footer {
-  max-width: 900px;
+  max-width: $width-content;
   margin: 0 auto;
   padding: 1.5rem 1.5rem calc(1.5rem * 2) 1.5rem;
   border-top: 1px dashed $color-border;
@@ -63,13 +68,13 @@ article.recipe .method-short {
 }
 
 // Heart doodle above the footer copyright line.
-// SVG is injected by default.html inline script.
+// SVG is injected by js/decorations.js.
 // Width set here; height auto to preserve natural proportions.
 .site-footer-hearts {
   display: flex;
   justify-content: center;
   line-height: 0;
-  margin-bottom: 0.75rem;
+  margin-bottom: $space-md;
 
   svg {
     display: block;
@@ -105,7 +110,7 @@ article.recipe .method-short {
   transform-origin: center center;
   width: 425px;
   height: 70px;
-  margin-top: -1rem;  // pull it up toward HELEN TRIAGES
+  margin-top: -$space-lg;  // pull it up toward HELEN TRIAGES
 
 
   .tape-bg {
@@ -128,7 +133,7 @@ article.recipe .method-short {
   font-size: 2.5rem;
   font-weight: 1000;
   letter-spacing: 0.18em;
-  color: #ffffff;
+  color: $color-white;
   -webkit-text-stroke: 0.8px rgba(230, 230, 230, 0.9);
   text-transform: uppercase;
   text-align: center;
@@ -140,12 +145,15 @@ article.recipe .method-short {
   }
 }
 
-
+// ============================================================================
+// INDEX — CONTROLS AND RECIPE LIST
+// ============================================================================
+// The filter matrix and the list it filters.
 
 .controls {
   position: relative;
   width: 100%;
-  padding-top: 1rem;
+  padding-top: $space-lg;
 }
 
 .recipe-list {
@@ -194,7 +202,7 @@ article.recipe .method-short {
 
 .ingredient-sep {
   color: lighten($color-clear-text, 25%);
-  margin-right: 0.3rem;
+  margin-right: $space-xs;
 }
 
 .ingredient-pill {
@@ -216,10 +224,18 @@ article.recipe .method-short {
 }
 
 .badge-group,
+
+// ============================================================================
+// BADGES
+// ============================================================================
+// Star, mood and practicality badges on each recipe entry.
+// Note: the clip-path SHAPES for .btn-star and .badge live here, deliberately
+// grouped with the badges. Their appearance is under BUTTONS below.
+
 .recipe-badges {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: $space-sm;
   flex-shrink: 0;
 }
 
@@ -229,13 +245,13 @@ article.recipe .method-short {
   align-items: flex-start;
   flex-wrap: nowrap;
   width: 100%;
-  gap: 0.75rem;
+  gap: $space-md;
 
   &__content {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    gap: $space-sm;
     flex: 1;
   }
 
@@ -244,14 +260,14 @@ article.recipe .method-short {
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.5rem;
+    gap: $space-sm;
     flex-shrink: 0;
   }
 }
 
 .recipe-badges {
   justify-content: flex-start;
-  margin: 2rem 0;
+  margin: $space-xxl 0;
 }
 
 // Shared clip-path shape for badges and filter buttons
@@ -279,7 +295,7 @@ article.recipe .method-short {
   font-weight: 700;
   text-transform: lowercase;
   letter-spacing: 0.02em;
-  padding: 0.15rem 0.65rem 0.15rem 0.5rem;
+  padding: $space-xxs 0.65rem $space-xxs $space-sm;
   transition: all 0.1s ease-in-out;
 
   &-draft {
@@ -315,6 +331,11 @@ article.recipe .method-short {
 
 // .recipe-draft-stamp is defined in _recipe.scss
 
+// ============================================================================
+// BUTTONS
+// ============================================================================
+// Filter button appearance and states. Shapes are under BADGES above.
+
 // --- Button Base Controls -----------------------------------------------------
 // Defined before .category so active-state compound selectors
 // (two classes) correctly win over these single-class rules by specificity.
@@ -326,7 +347,7 @@ article.recipe .method-short {
   border: none;
   background-color: rgba($color-text, 0.06);
   color: lighten($color-text, 22%);
-  padding: 0.3rem 0.75rem;
+  padding: $space-xs $space-md;
   cursor: pointer;
   font-size: 0.75rem;
   margin: 0.2rem 0.45rem 0.2rem 0;
@@ -345,13 +366,18 @@ article.recipe .method-short {
   }
 }
 
+// ============================================================================
+// FILTER LABELS AND CATEGORIES
+// ============================================================================
+// Category wrappers, labels, and the highlighter backgrounds behind them.
+
 // --- Filter Label Bases & Background Highlighters ---------------------------------
 .category {
-  margin: 1.5rem 0;
+  margin: $space-xl 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: $space-md;
 
   // practicalities spacing matches all other categories
 
@@ -359,7 +385,7 @@ article.recipe .method-short {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0.75rem;
+    gap: $space-md;
   }
 
   .category-label {
@@ -436,7 +462,7 @@ article.recipe .method-short {
 
   // Meta filter buttons — darkened grey, matching the meta badges
   &.category--meta {
-    margin-top: 0.75rem;
+    margin-top: $space-md;
     align-items: center;
     width: 100%;
 
@@ -470,7 +496,7 @@ article.recipe .method-short {
   font-weight: 700;
   text-transform: lowercase;
   letter-spacing: 0.02em;
-  padding: 0.15rem 0.65rem 0.15rem 0.5rem;
+  padding: $space-xxs 0.65rem $space-xxs $space-sm;
   transition: all 0.1s ease-in-out;
   background-color: rgba($color-text, 0.05);
   color: lighten($color-clear-text, 12%);
@@ -483,9 +509,14 @@ article.recipe .method-short {
   }
 }
 
+// ============================================================================
+// SEARCH
+// ============================================================================
+// Ingredient search and name search, and their result pools.
+
 // --- Search Section -----------------------------------------------------------
 .search {
-  margin: 1.5rem 0;
+  margin: $space-xl 0;
   width: 100%;
   flex-direction: column;
   align-items: flex-start;
@@ -494,7 +525,7 @@ article.recipe .method-short {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0.75rem;
+    gap: $space-md;
     width: 100%;
     max-width: 550px;
     position: relative;
@@ -539,7 +570,7 @@ article.recipe .method-short {
     cursor: pointer;
     text-decoration: underline;
     color: $color-ingredient-active;
-    margin-left: 0.75rem;
+    margin-left: $space-md;
     white-space: nowrap;
     transition: opacity 0.1s ease-in-out;
 
@@ -549,7 +580,7 @@ article.recipe .method-short {
   }
 
   .search-results {
-    margin-top: 1rem;
+    margin-top: $space-lg;
     min-height: 0;
     width: 100%;
     display: flex;
@@ -561,7 +592,7 @@ article.recipe .method-short {
 // --- Name search ------------------------------------------------------------
 // More specific than .search { margin: 1.5rem 0 } — no !important needed.
 .controls .search--name {
-  margin-top: 0.5rem;
+  margin-top: $space-sm;
 
   #name-search-box {
     font-family: $font-headings;
@@ -600,7 +631,7 @@ article.recipe .method-short {
     cursor: pointer;
     text-decoration: underline;
     color: $color-name-search-active;
-    margin-left: 0.75rem;
+    margin-left: $space-md;
     white-space: nowrap;
     transition: opacity 0.1s ease-in-out;
 
@@ -617,13 +648,18 @@ article.recipe .method-short {
   -webkit-text-stroke: 0.5px $color-ingredient-active;
 }
 
+// ============================================================================
+// ACTIVE-FILTER STATES
+// ============================================================================
+// How badges and the clear-all button behave once a filter is on.
+
 // --- Matched state badges (when a filter is active) --------------------------
 .recipe-list .badge.badge--matched {
   text-transform: uppercase;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.04em;
-  padding: 0.15rem 0.65rem 0.15rem 0.5rem;
+  padding: $space-xxs 0.65rem $space-xxs $space-sm;
 
   &.badge-star           { -webkit-text-stroke: 0.5px $color-star-active; }
   &.badge-mood           { -webkit-text-stroke: 0.5px $color-mood-active; }
@@ -677,12 +713,17 @@ article.recipe .method-short {
   letter-spacing: 0.04em;
   color: $color-clear-text;
   text-align: center;
-  padding: 2rem 0;
+  padding: $space-xxl 0;
 
   background: none;
   border: none;
   box-shadow: none;
 }
+
+// ============================================================================
+// CATEGORY LABEL DOODLES
+// ============================================================================
+// Hand-drawn marks beside the filter labels.
 
 // --- Category label doodles --------------------------------------------------
 // Matches the recipe page section-heading-sparkle pattern.
