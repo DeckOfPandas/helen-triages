@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: QQ
 main_ingredients: ["sweet cream base", "peanut butter", "roasted peanuts"]
 star_ingredient: something unusual
-tags: [dessert, freezable, "ice cream", "make-ahead"]
+tags: [dessert, "ice cream", "make-ahead"]
 ingredient_groups:
   - items:
     - item: "Sweet Cream Base No. 1"
@@ -32,5 +32,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-07-29"
 ---
