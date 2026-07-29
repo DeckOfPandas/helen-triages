@@ -15,7 +15,9 @@ title: Home
   {% endif %}
   {% assign all_recipes = all_recipes | sort: "title" %}
   
-  {% assign all_stars = all_recipes | map: "star_ingredient" | compact | uniq | sort %}
+  {% comment %} Stars are DECLARED in _data/taxonomy.yml, not derived from front
+     matter. Deriving meant a typo silently minted a new star ingredient. {% endcomment %}
+  {% assign all_stars = site.data.taxonomy.star_ingredients %}
 
   {% if all_stars.size > 0 %}
     {% include filter_group.html
@@ -30,12 +32,21 @@ title: Home
   {% endif %}
 
   {% for group in tag_groups %}
+    {% comment %} Look the group's tags up in _data/taxonomy.yml by iterating the
+       hash rather than using tags[group.name]. Iterating yields [key, value]
+       pairs and always works; the bracket form with a variable key is not
+       reliable in Liquid. {% endcomment %}
+    {% assign group_tags = "" | split: "" %}
+    {% for pair in site.data.taxonomy.tags %}
+      {% if pair[0] == group.name %}{% assign group_tags = pair[1] %}{% endif %}
+    {% endfor %}
+
     {% include filter_group.html
       group_class=group.class
       label=group.label
       color=group.color
       brush_colour=group.brush_colour
-      items=group.tags
+      items=group_tags
       btn_class="btn-tag"
       data_attr="data-tag"
     %}

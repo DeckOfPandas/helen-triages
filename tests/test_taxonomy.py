@@ -17,19 +17,6 @@ import pytest
 
 from conftest import ALL_RECIPES, where
 
-# Co-tag rules from HANDOVER section 5.
-CO_TAGS = {
-    "soup": ["one-handed food"],
-    "ice cream": ["dessert", "freezable", "make-ahead"],
-}
-
-# Recipes that are legitimately exempt, with the reason recorded so the
-# exemption is a decision rather than a mystery.
-CO_TAG_EXEMPT = {
-    ("double-chocolate-frap", "ice cream"): "blended frozen drink, not a scoopable ice cream",
-}
-
-
 def test_star_ingredient_is_declared(recipe, taxonomy):
     star = recipe.fm.get("star_ingredient")
     if star in (None, ""):
@@ -57,20 +44,26 @@ def test_tags_are_declared(recipe, taxonomy):
     )
 
 
-@pytest.mark.parametrize("trigger,required", sorted(CO_TAGS.items()))
-def test_co_tag_rules(recipe, trigger, required):
+def test_co_tag_rules(recipe, taxonomy):
+    """Tags that imply other tags, declared in _data/taxonomy.yml.
+
+    The rules live in the data layer rather than in this file so that changing
+    one is a YAML edit, not a code edit. The reasoning for each — and for the
+    two that were removed — is recorded in taxonomy.yml alongside them.
+    """
     tags = recipe.fm.get("tags") or []
-    if trigger not in tags:
-        return
-    reason = CO_TAG_EXEMPT.get((recipe.slug, trigger))
-    if reason:
-        pytest.skip(f"exempt: {reason}")
-    missing = [t for t in required if t not in tags]
-    assert not missing, (
-        f"{where(recipe)} is tagged `{trigger}` but is missing {missing}.\n"
-        f"Anything tagged `{trigger}` must also carry {required}. If this recipe "
-        f"is a genuine exception, add it to CO_TAG_EXEMPT in this file with the "
-        f"reason, so the exemption is recorded rather than silently tolerated."
+    problems = []
+    for trigger, required in (taxonomy.get("co_tags") or {}).items():
+        if trigger not in tags:
+            continue
+        missing = [t for t in required if t not in tags]
+        if missing:
+            problems.append(f"tagged `{trigger}` but missing {missing}")
+    assert not problems, (
+        f"{where(recipe)} breaks co-tag rule(s):\n  " + "\n  ".join(problems)
+        + "\n\nEither add the missing tag(s), or — if this recipe is a real "
+          "exception — the rule itself may be unsound. See the test for adding "
+          "a co-tag at the top of the co_tags section in _data/taxonomy.yml."
     )
 
 

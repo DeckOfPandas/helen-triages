@@ -2,22 +2,19 @@
   <span class="badge badge-star">{{ include.recipe.star_ingredient }}</span>
 {% endif %}
 
+{% comment %} Group membership comes from _data/taxonomy.yml; the badge class is
+   derived from the group name, so adding a tag group needs no change here.
+   The tags hash is iterated as [key, value] pairs rather than looked up with
+   tags[group.name] — the bracket form with a variable key is not reliable. {% endcomment %}
 {% for group in site.data.index_tags_sections.groups %}
-  {% if group.class == "category--mood" %}
-    {% for tag in include.recipe.tags %}
-      {% if group.tags contains tag %}
-        <span class="badge badge-mood">{{ tag }}</span>
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-{% endfor %}
+  {% assign group_tags = "" | split: "" %}
+  {% for pair in site.data.taxonomy.tags %}
+    {% if pair[0] == group.name %}{% assign group_tags = pair[1] %}{% endif %}
+  {% endfor %}
 
-{% for group in site.data.index_tags_sections.groups %}
-  {% if group.class == "category--practicalities" %}
-    {% for tag in include.recipe.tags %}
-      {% if group.tags contains tag %}
-        <span class="badge badge-practicalities">{{ tag }}</span>
-      {% endif %}
-    {% endfor %}
-  {% endif %}
+  {% for tag in include.recipe.tags %}
+    {% if group_tags contains tag %}
+      <span class="badge badge-{{ group.name }}">{{ tag }}</span>
+    {% endif %}
+  {% endfor %}
 {% endfor %}
