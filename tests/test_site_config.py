@@ -362,3 +362,57 @@ def test_index_has_a_heading():
         "tech and search engines something to anchor to without changing the "
         "design."
     )
+
+
+# --- one word per concept ----------------------------------------------------
+
+def test_the_method_is_called_method_everywhere():
+    """It used to be `instructions` in CSS, `method` in the data, and
+    `method-full` in JS — one concept, two words, three places.
+
+    `recipe.html` also carried a `page.method | default: page.instructions`
+    fallback to a front matter field that no file has used since June.
+    """
+    offenders = []
+    for relpath in ("_layouts/recipe.html", "_sass/_recipe.scss", "js/method-toggle.js"):
+        path = ROOT / relpath
+        if not path.exists():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            # comments may mention the old name to explain the history
+            if stripped.startswith(("//", "/*", "*", "#", "{%- comment", "{% comment")):
+                continue
+            if "instructions" in line:
+                offenders.append(f"{relpath}: {stripped[:70]}")
+    assert not offenders, (
+        "The retired word `instructions` is still in use:\n  " + "\n  ".join(offenders)
+        + "\n\nThe data field is `method`, so the class is .method-full and the "
+          "JS looks for .method-full. One word per concept."
+    )
+
+
+def test_no_recipe_uses_the_retired_instructions_field():
+    """The template fallback is gone, so a file using it would render no method."""
+    from conftest import ALL_RECIPES, ALL_DRAFTS
+    offenders = [r.slug for r in ALL_RECIPES + ALL_DRAFTS if "instructions" in r.fm]
+    assert not offenders, (
+        f"These files still use an `instructions:` field: {offenders}.\n"
+        f"recipe.html no longer falls back to it, so their method would render "
+        f"empty. Rename the field to `method:`."
+    )
+
+
+def test_no_orphaned_data_file_references():
+    """_data/index_tags_sections.yml was renamed to filter_sections.yml."""
+    offenders = []
+    for path in list((ROOT / "_layouts").glob("*.html")) + \
+                list((ROOT / "_includes").glob("*.html")) + \
+                [ROOT / "index.html"]:
+        if path.exists() and "index_tags_sections" in path.read_text(encoding="utf-8"):
+            offenders.append(path.name)
+    assert not offenders, (
+        f"{offenders} still reference site.data.index_tags_sections, which no "
+        f"longer exists. Jekyll resolves a missing data file to nil silently, so "
+        f"the symptom is empty filter groups rather than an error."
+    )

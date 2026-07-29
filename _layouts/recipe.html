@@ -118,7 +118,7 @@ layout: default
         <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="hot-orange"></span>Method</span>
       <span class="section-heading-sparkle section-heading-sparkle--right" aria-hidden="true"></span>
       {% if has_short %}
-        <button class="btn-method-toggle" id="method-toggle-btn">click for short method</button>
+        <button type="button" class="btn-method-toggle">click for short method</button>
       {% endif %}
     </h2>
   </div>
@@ -129,7 +129,7 @@ layout: default
     {% else %}
       {% assign multiple_method_groups = false %}
     {% endif %}
-    <ol class="instructions" id="method-full">
+    <ol class="method-full">
       {% for group in page.method_groups %}
         {% if multiple_method_groups and group.name %}
           <li class="method-group-heading-item">
@@ -155,8 +155,8 @@ layout: default
       {% endfor %}
     </ol>
   {% else %}
-    <ol class="instructions" id="method-full">
-      {% assign steps = page.method | default: page.instructions %}
+    <ol class="method-full">
+      {% assign steps = page.method %}
       {% for step in steps %}
         {% if step.step %}
           <li class="step step--annotated">
@@ -172,7 +172,7 @@ layout: default
   {% endif %}
 
   {% if has_short %}
-    <div class="method-short" id="method-short" hidden>
+    <div class="method-short" hidden>
       {% for step in page.method_short %}
         {{ step | markdownify }}
       {% endfor %}
