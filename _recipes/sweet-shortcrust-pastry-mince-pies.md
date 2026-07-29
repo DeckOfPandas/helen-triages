@@ -26,7 +26,7 @@ ingredient_groups:
     - item: "milk, to glaze"
 method:
   - "Blend the flour, sugar, almonds and butter in a food processor until the mixture resembles breadcrumbs, then slowly add the egg. Or, if you're feeling keen, rub the butter into the dry ingredients with your fingertips then stir in the egg."
-  - "Wrap in cling film and chill for 1 hr."
+  - "Wrap in cling film and chill for 1 hour."
   - "Cut out circles and stars, assemble the pies, then chill for another 30 mins."
   - "Brush lightly with milk, then bake for 20 mins at 200°C."
   - "Cool on a wire rack."
@@ -40,5 +40,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

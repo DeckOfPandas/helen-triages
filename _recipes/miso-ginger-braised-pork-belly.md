@@ -30,7 +30,7 @@ ingredient_groups:
     - item: "ginger, julienned"
     - item: "white pepper, freshly ground"
 method:
-  - "Cut the pork belly into 2.5-cm chunks. Blanch in boiling water for about 2 minutes to clean, then drain and rinse well."
+  - "Cut the pork belly into 2.5-cm chunks. Blanch in boiling water for about 2 mins to clean, then drain and rinse well."
   - "Slice the ginger coarsely, skin included. Reserve a thumb-sized portion to peel and julienne for garnish, along with the finely chopped green spring onion tops."
   - "In a large heavy-based saucepan, fry the ginger pieces until golden and fragrant. Move aside and add the pork belly, frying until lightly browned."
   - "Combine the barley miso, light soy sauce, mirin and a splash of water in a separate bowl and stir well."

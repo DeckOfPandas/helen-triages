@@ -31,8 +31,8 @@ ingredient_groups:
       item: "large pats of butter"
 method:
   - "Crush the thyme and juniper berries in a pestle and mortar with generous salt and pepper. Loosen with olive oil. Pat the venison dry with kitchen paper and rub the oil mixture all over it."
-  - "Sear the meat in a hot pan on all sides — roughly 6 minutes for medium rare, 7–8 minutes for medium. Cover and rest on a plate for 4 minutes."
-  - "Reduce the heat under the pan and add a little olive oil. Add the shallots and garlic and fry gently for around 3 minutes until translucent and tender. Turn up the heat, add the wine and let it reduce by half. Add the blueberries and simmer slowly for 4 minutes, then remove from the heat, add the butter and swirl the pan so the sauce turns slightly opaque and shiny. Season to taste."
+  - "Sear the meat in a hot pan on all sides — roughly 6 mins for medium rare, 7–8 mins for medium. Cover and rest on a plate for 4 mins."
+  - "Reduce the heat under the pan and add a little olive oil. Add the shallots and garlic and fry gently for around 3 mins until translucent and tender. Turn up the heat, add the wine and let it reduce by half. Add the blueberries and simmer slowly for 4 mins, then remove from the heat, add the butter and swirl the pan so the sauce turns slightly opaque and shiny. Season to taste."
   - "Slice the venison into 2-cm slices and serve with greens such as steamed purple sprouting broccoli. Add the meat's resting juices to the sauce and spoon over."
 method_short:
   - ""

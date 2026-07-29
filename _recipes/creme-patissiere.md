@@ -28,7 +28,7 @@ method:
   - Return everything to the rinsed out pan and stir/whisk gently over a moderate heat.
   - "When boiling, whisk more vigorously to stop the mixture sticking to the bottom of the pan."
   - It should become thick and smooth.
-  - Continue cooking for about 2–3 minutes to cook out the flour.
+  - Continue cooking for about 2–3 mins to cook out the flour.
   - Taste to check.
   - Cover with buttered paper to cool.
   - "It may need a quick whisk before using as it could look a little lumpy, but generally nobody notices."

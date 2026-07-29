@@ -27,17 +27,17 @@ ingredient_groups:
     - item: toasted nuts
     - item: grated chocolate (optional)
 method:
-  - Preheat the oven to 140°C / gas 1. Lightly grease a 23cm springform cake tin with butter and line the base and sides with non-stick baking parchment.
+  - Preheat the oven to 120°C. Lightly grease a 23cm springform cake tin with butter and line the base and sides with non-stick baking parchment.
   - "Put the butter and chocolate into a large heatproof bowl and place over a saucepan of barely simmering water, making sure the bottom of the bowl is not touching the water. Allow to melt, then stir until smooth. Remove from the heat and cool slightly."
   - "Using a freestanding mixer fitted with the whisk, or an electric hand mixer, whisk the eggs, egg yolk and sugar together until the mixture is light, fluffy and increased in volume. Carefully pour in the melted chocolate mixture and fold gently with a spatula to combine, trying not to knock out any air."
-  - Pour the cake mixture into the prepared tin. Bake for about 40–45 minutes until set. It will soufflé up a little and a crust will form on the top. Remove from the oven and leave to cool in the tin — the cake will settle and sink down in the centre.
+  - Pour the cake mixture into the prepared tin. Bake for about 40–45 mins until set. It will soufflé up a little and a crust will form on the top. Remove from the oven and leave to cool in the tin — the cake will settle and sink down in the centre.
   - "Once cooled, press down and flatten the surface a little with a palette knife — this helps to give it a lovely soft and gooey texture. Release the sides of the tin and peel away the parchment from the sides of the cake."
   - Invert a serving plate over the top of the cake and turn both over to release the cake onto the plate. Remove the tin base and the baking parchment.
   - "Serve just as it is with cream or crème fraîche, or finish with any combination of whipped cream, raspberries, toasted nuts and grated chocolate."
 method_short:
   - ""
 notes:
-  - "Bake the batter straight after you've whipped it up — too much exposure to air can make the cake collapse after it cools. Up to 20–25 minutes resting is fine, but avoid leaving it for over an hour."
+  - "Bake the batter straight after you've whipped it up — too much exposure to air can make the cake collapse after it cools. Up to 20–25 mins resting is fine, but avoid leaving it for over an hour."
 meta:
   rewritten: false
   proofread: false

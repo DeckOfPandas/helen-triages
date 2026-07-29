@@ -39,7 +39,7 @@ ingredient_groups:
     - amount: "200 ml"
       item: crème fraîche or single cream
 method:
-  - Pat the chicken dry and season. Fry for 3 mins each side. Remove from heat and rest for 10 minutes.
+  - Pat the chicken dry and season. Fry for 3 mins each side. Remove from heat and rest for 10 mins.
   - "Sweat the onions, carrots and celery until soft and golden, then increase the heat to brown them. Add the minced garlic 2 mins before you're done."
   - step: "Deglaze with a splash of white wine, scraping all the bits off the bottom of the pan, then reduce the heat to medium. Sprinkle in the flour and stir to combine."
     tip: "Don't panic if the flour goes clumpy, all will be well, just don't stop stirring until it boils."

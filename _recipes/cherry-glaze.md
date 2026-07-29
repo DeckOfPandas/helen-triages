@@ -23,10 +23,10 @@ ingredient_groups:
     - amount: "1 cup"
       item: "cherries, pitted and halved"
 method:
-  - "Caramelise the honey over medium heat for 2 minutes until it thickens and begins to darken. Deglaze with the red wine vinegar, until almost evaporated and syrupy."
-  - Add the chicken stock and cook down for 3–5 minutes until most has reduced.
+  - "Caramelise the honey over medium heat for 2 mins until it thickens and begins to darken. Deglaze with the red wine vinegar, until almost evaporated and syrupy."
+  - Add the chicken stock and cook down for 3–5 mins until most has reduced.
   - Add the soy sauce and reduce again to a syrupy consistency. Taste and adjust seasoning.
-  - "Add the cherries and cook for 1–2 minutes, then remove from heat and let them finish cooking in the cooling pan."
+  - "Add the cherries and cook for 1–2 mins, then remove from heat and let them finish cooking in the cooling pan."
 method_short:
   - ""
 notes:

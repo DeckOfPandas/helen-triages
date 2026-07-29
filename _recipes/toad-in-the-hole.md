@@ -42,10 +42,10 @@ method_groups:
     - "Put 2 tbsp sunflower oil in a thin-walled baking tin, and heat in the oven at 240–250°C until sizzling."
     - "When up to temperature, roast the sausages in the tin until slightly golden, turning once or twice."
     - "Pour the batter over the sausages (carefully), and add the rosemary sprigs."
-    - "Don't open the oven for at least 20 minutes. Remove when golden and crisp."
+    - "Don't open the oven for at least 20 mins. Remove when golden and crisp."
   - name: onion gravy
     steps:
-    - Fry the finely sliced onions in the butter on a medium heat for about 5 minutes until translucent.
+    - Fry the finely sliced onions in the butter on a medium heat for about 5 mins until translucent.
     - "Add the garlic a minute before they're done."
     - Deglaze with balsamic vinegar and allow to cook down by half.
     - Add the stock and a little water then simmer.
