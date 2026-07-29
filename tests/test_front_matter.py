@@ -5,6 +5,8 @@ failure tells you exactly which rule broke, on which file.
 """
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from conftest import where
@@ -128,15 +130,22 @@ def test_ingredient_groups_named_when_there_is_more_than_one(recipe):
     )
 
 
-def test_group_names_omit_for_the(recipe):
+def test_group_names_omit_leading_article(recipe):
+    """Group names are bare nouns: `buttercream`, not `for the buttercream`.
+
+    The recipe template renders ingredient group headings as "For the {name}:",
+    so a name that already carries the article comes out as "For the for the
+    dressing:" or "For the the icing:". Method groups render the name bare, so
+    a leading article reads oddly there too.
+    """
     offenders = []
     for key in ("ingredient_groups", "method_groups"):
         for group in recipe.fm.get(key) or []:
             name = group.get("name") if isinstance(group, dict) else None
-            if name and name.lower().startswith(("for the ", "for ")):
+            if name and re.match(r"^(for the |for |the )", name, re.I):
                 offenders.append(f"{key}: {name!r}")
     assert not offenders, (
-        f"{where(recipe)} has group name(s) beginning with 'for': {offenders}. "
-        f'The template supplies "For the " itself, so this renders as '
-        f'"For the for the …".'
+        f"{where(recipe)} has group name(s) with a leading article: {offenders}.\n"
+        f'The template supplies "For the " itself, so `for the dressing` renders '
+        f'as "For the for the dressing:". Strip the article — `dressing`.'
     )

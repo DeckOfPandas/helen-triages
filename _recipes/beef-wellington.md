@@ -47,7 +47,7 @@ ingredient_groups:
       item: beef stock
       tip: "Preferably home-made. QQ link to beef bone stock recipe."
 method_groups:
-  - name: "The day before: prepare the beef"
+  - name: "day before: prepare the beef"
     steps:
       - "Wrap each beef fillet tightly in a triple layer of cling film to set its shape. Chill overnight."
   - name: "On the day: sear and cool"
@@ -79,5 +79,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-07-29"
 ---

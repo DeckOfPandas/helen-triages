@@ -129,9 +129,29 @@ title: Home
         </div>
 
         {% if recipe.main_ingredients and recipe.main_ingredients.size > 0 %}
+        {% comment %} Order is a PRESENTATION concern — main_ingredients stays an
+           unordered set in the front matter. Pantry staples listed in
+           _data/common_ingredients.yml sink to the end so the eye meets the
+           distinctive ingredients first: identify, then warn, then trail off.
+           Authored order is preserved within each half, and the data-ingredients
+           attribute above is left untouched because filters.js reads it as a set.
+        {% endcomment %}
+        {% assign _pantry = site.data.common_ingredients.pantry %}
+        {% assign _lead = "" %}
+        {% assign _tail = "" %}
+        {% for ing in recipe.main_ingredients %}
+          {% assign _key = ing | downcase %}
+          {% if _pantry contains _key %}
+            {% assign _tail = _tail | append: ing | append: "|" %}
+          {% else %}
+            {% assign _lead = _lead | append: ing | append: "|" %}
+          {% endif %}
+        {% endfor %}
+        {% assign _lead_count = _lead | split: "|" | size %}
+        {% assign _ordered = _lead | append: _tail | split: "|" %}
         <div class="ingredient-list">
-          {% for ing in recipe.main_ingredients %}
-            <span class="ingredient-pill">{{ ing }}</span>{% unless forloop.last %}<span class="ingredient-sep">,</span>{% endunless %}
+          {% for ing in _ordered %}
+            {% if forloop.index0 < _lead_count %}<span class="ingredient-pill">{{ ing }}</span>{% else %}<span class="ingredient-pill ingredient-pill--pantry">{{ ing }}</span>{% endif %}{% unless forloop.last %}<span class="ingredient-sep">,</span>{% endunless %}
           {% endfor %}
         </div>
         {% endif %}

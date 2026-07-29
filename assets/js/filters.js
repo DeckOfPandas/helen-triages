@@ -201,29 +201,28 @@ function renderResultsPool() {
     var candidates = []; // { ing, normWords, normKey }
     var familyWords = new Set(); // words that earn an (all) button
 
-    // Check if the query exactly matches a synonym group.
-    // If so, synonymWords is the expanded set of ingredient words to match against,
-    // and the query word itself becomes a forced (all) family.
-    var synonymWords = getSynonymWords(query);
-    if (synonymWords) familyWords.add(query);
+    // TYPING NARROWS, NEVER WIDENS.
+    //
+    // The synonym families in _data/ingredient_words.yml are deliberately NOT
+    // used to expand these suggestions. They used to be: an exact query match
+    // swapped substring matching for the whole curated family, so "chees"
+    // offered seven buttons and "cheese" offered twenty-one. One keystroke
+    // exploded the result set, which is the opposite of what a search box
+    // should do.
+    //
+    // The family is now reachable only through its "(all)" button, which the
+    // click handler expands using the same synonym list. Naming a declared
+    // family always earns that button, whether or not the word happens to
+    // appear literally in any ingredient.
+    if (getSynonymWords(query)) familyWords.add(query);
 
     masterIngredientsList.forEach(function(ing) {
       var ingWords = getWords(ing);
       var normWords = ingWords.map(normaliseIngredientWord).map(fold);
-      var ingLower = fold(ing.toLowerCase());
 
-      var matchedAnyWord;
-      if (synonymWords) {
-        // Match if any ingredient word substring-matches any synonym word,
-        // or if the ingredient text contains any synonym word as a substring.
-        matchedAnyWord = synonymWords.some(function(syn) {
-          return ingLower.indexOf(syn) !== -1;
-        });
-      } else {
-        matchedAnyWord = ingWords.some(function(word) {
-          return fold(word).indexOf(query) !== -1;
-        });
-      }
+      var matchedAnyWord = ingWords.some(function(word) {
+        return fold(word).indexOf(query) !== -1;
+      });
       if (!matchedAnyWord) return;
 
       var normKey = normWords.join(' ');
@@ -231,7 +230,7 @@ function renderResultsPool() {
 
       // Check each matched word for family membership (only for queries at or
       // above FAMILY_BUTTON_MIN_CHARS — see _data/ingredient_words.yml)
-      if (enableFamilyButtons && !synonymWords) {
+      if (enableFamilyButtons) {
         ingWords.forEach(function(word, idx) {
           if (fold(word).indexOf(query) === -1) return;
           var normWord = normWords[idx];

@@ -41,7 +41,7 @@ method_groups:
   - name: Herb butter
     steps:
       - "Put the butter into a large bowl and season with salt and pepper. Add the olive oil and mix well. Add the lemon zest and juice, crushed garlic and chopped parsley. Mix well to combine."
-  - name: The turkey
+  - name: turkey
     steps:
       - "Remove the giblets from the turkey cavity. Season the cavity well with salt and pepper, then stuff with the onions, lemon, garlic halves and 2 bay leaves."
       - "Loosen the skin on the breasts from both ends of the bird, keeping the skin intact, then do the same on the legs."
@@ -55,5 +55,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-07-29"
 ---

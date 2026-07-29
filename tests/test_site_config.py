@@ -142,3 +142,33 @@ def test_palette_is_the_only_place_hex_colours_are_written():
         "It should call getComputedStyle on :root and read --colour-* values "
         "defined in _sass/_palette.scss, not keep its own hardcoded copies."
     )
+
+
+# --- the pantry list stays honest -------------------------------------------
+
+def test_pantry_entries_are_actually_used():
+    """Every pantry staple should appear somewhere in the collection.
+
+    An entry that matches nothing is either a typo or a leftover, and either way
+    it is dead weight in a list whose whole job is to be short and deliberate.
+    Matching is exact and lowercase, exactly as index.html does it.
+    """
+    from conftest import ALL_RECIPES, ALL_DRAFTS
+    path = DATA / "common_ingredients.yml"
+    if not path.exists():
+        pytest.skip("_data/common_ingredients.yml does not exist yet")
+    pantry = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("pantry") or []
+
+    used = set()
+    for r in ALL_RECIPES + ALL_DRAFTS:
+        for entry in (r.fm.get("main_ingredients") or []):
+            used.add(str(entry).lower())
+
+    unused = [p for p in pantry if p.lower() not in used]
+    assert not unused, (
+        f"_data/common_ingredients.yml lists {unused}, which match no "
+        f"main_ingredients entry anywhere.\n"
+        f"Matching is exact — 'onion' does not demote 'red onions'. Either the "
+        f"entry is a typo, or it is aspirational and should come out until "
+        f"something actually uses it."
+    )
