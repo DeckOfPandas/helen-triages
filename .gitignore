@@ -1,5 +1,6 @@
 # Standard
 _site/
+_site_prod
 .sass-cache/
 .jekyll-cache/
 .jekyll-metadata

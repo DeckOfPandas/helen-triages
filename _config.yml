@@ -38,6 +38,26 @@ defaults:
       layout: recipe
       sitemap: false   # belt and braces: excluded even if output is ever flipped
 
+# Keep non-site files out of the build. Setting `exclude` REPLACES Jekyll's
+# defaults, so the standard entries are repeated here.
+exclude:
+  - .jekyll-cache/
+  - .sass-cache/
+  - Gemfile
+  - Gemfile.lock
+  - gemfiles/
+  - node_modules/
+  - vendor/
+  # Python test suite — not part of the site
+  - tests/
+  - pytest.ini
+  - requirements-test.txt
+  # Build output. `_site` is auto-excluded when it is the destination, but the
+  # production preview builds to _site_prod, so each server would otherwise
+  # watch the other's output and rebuild in a loop.
+  - _site/
+  - _site_prod/
+
 sass:
   sass_dir: _sass
 
