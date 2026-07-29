@@ -1,18 +1,26 @@
-# Standard
+# Jekyll build output
 _site/
-_site_prod
-.sass-cache/
+_site_prod/
 .jekyll-cache/
 .jekyll-metadata
-vendor/
-.bundle/
+.sass-cache/
 
 # Unpublished 
 _drafts/
 
-# Local faffing and workflow
+# Ruby
+vendor/
+.bundle/
+
+# Python (test suite)
+__pycache__/
+.pytest_cache/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local workflow
 *Zone.Identifier
 model_instructions/
-
-# Previous data models
-_recipes_old

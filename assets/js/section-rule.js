@@ -12,30 +12,13 @@
     sectionHeading: { fill: C.vividRose },
   };
 
-  // ── Base URL ──────────────────────────────────────────────────────────────
-  var baseMeta = document.querySelector('meta[name="base-url"]');
-  var BASE = baseMeta ? baseMeta.getAttribute('content').replace(/\/$/, '') : '';
-
-  // ── SVG fetch cache ───────────────────────────────────────────────────────
-  var cache = {};
-  function fetchSvg(url, cb) {
-    if (cache[url]) { cb(cache[url]); return; }
-    fetch(url)
-      .then(function(r) { return r.text(); })
-      .then(function(t) { cache[url] = t; cb(t); })
-      .catch(function() {});
-  }
-
   // ── Helpers ───────────────────────────────────────────────────────────────
+  // Base URL, fetching, caching, shuffling and error reporting all live in
+  // js/assets.js.
   function makePicker(names, pathPrefix) {
-    var shuffled = names
-      .map(function(n) { return { n: n, r: Math.random() }; })
-      .sort(function(a, b) { return a.r - b.r; })
-      .map(function(o) { return o.n; });
-    var idx = 0;
+    var nextName = window.HTF.makeShuffledPicker(names);
     return function(cb) {
-      var name = shuffled[idx++ % shuffled.length];
-      fetchSvg(BASE + pathPrefix + name + '.svg', cb);
+      window.HTF.fetchSvg(window.HTF.asset(pathPrefix + nextName() + '.svg'), cb);
     };
   }
 
@@ -150,7 +133,7 @@
   }
 
   // ── Ingredient bullets ────────────────────────────────────────────────────
-  fetchSvg(BASE + '/assets/img/doodles/doodle-asterisk.svg', function(svgText) {
+  window.HTF.fetchSvg(window.HTF.asset('/assets/img/doodles/doodle-asterisk.svg'), function(svgText) {
     var d = injectDoodle(svgText, C.vibrantViolet);
     var steps = [-157.5,-135,-112.5,-90,-67.5,-45,-22.5,0,22.5,45,67.5,90,112.5,135,157.5];
     for (var j = steps.length - 1; j > 0; j--) {
@@ -179,7 +162,7 @@
     var left  = h2.querySelector('.section-heading-sparkle--left');
     var right = h2.querySelector('.section-heading-sparkle--right');
     if (!left && !right) return;
-    fetchSvg(BASE + '/assets/img/doodles/' + def.file, function(svg) {
+    window.HTF.fetchSvg(window.HTF.asset('/assets/img/doodles/' + def.file), function(svg) {
       var d = injectDoodle(svg, def.colour);
       var out = '<svg viewBox="' + d.vb + '" xmlns="http://www.w3.org/2000/svg" '
               + 'preserveAspectRatio="xMidYMid meet" aria-hidden="true" '
