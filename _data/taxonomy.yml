@@ -3,7 +3,7 @@
 #
 # What exists, and how the terms relate to each other. Nothing about how any of
 # it LOOKS: no colours, no labels, no CSS classes. Those live in
-# _data/index_tags_sections.yml (labels, classes, order) and _sass (colour).
+# _data/filter_sections.yml (labels, classes, order) and _sass (colour).
 #
 # Everything downstream reads this file:
 #   index.html            builds the filter buttons from it

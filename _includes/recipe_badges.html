@@ -6,7 +6,7 @@
    derived from the group name, so adding a tag group needs no change here.
    The tags hash is iterated as [key, value] pairs rather than looked up with
    tags[group.name] — the bracket form with a variable key is not reliable. {% endcomment %}
-{% for group in site.data.index_tags_sections.groups %}
+{% for group in site.data.filter_sections.tag_groups %}
   {% assign group_tags = "" | split: "" %}
   {% for pair in site.data.taxonomy.tags %}
     {% if pair[0] == group.name %}{% assign group_tags = pair[1] %}{% endif %}
