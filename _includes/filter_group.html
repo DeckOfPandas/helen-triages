@@ -1,6 +1,10 @@
 {% comment %} Colour comes from the .category--* class on the wrapper below,
    defined in _sass/_palette.scss. The custom property inherits down to the
-   label, so nothing here needs to know what colour it is. {% endcomment %}
+   label, so nothing here needs to know what colour it is.
+
+   The filter buttons carry aria-pressed so assistive tech knows they are
+   toggles. filters.js keeps the value in step with the .active class.
+{% endcomment %}
 {% if include.brush_colour %}
   {% assign _brush_colour = include.brush_colour %}
 {% endif %}
@@ -13,11 +17,11 @@
       {% endif %}
       {{ include.label }}
     </span>
-    <span class="btn-clear-inline" style="display:none;">× clear</span>
+    <button type="button" class="btn-clear-inline" style="display:none;">&times; clear</button>
   </div>
   <div class="category-buttons">
     {% for item in include.items %}
-      <button type="button" class="{{ include.btn_class }}" {{ include.data_attr }}="{{ item }}">{{ item }}</button>
+      <button type="button" class="{{ include.btn_class }}" aria-pressed="false" {{ include.data_attr }}="{{ item }}">{{ item }}</button>
     {% endfor %}
   </div>
 </div>
