@@ -335,6 +335,18 @@ function renderResultsPool() {
     });
   }
 
+  // Keep aria-pressed in step with the .active class.
+  //
+  // .active is toggled in fifteen places; aria-pressed is set in one. Syncing
+  // from update() rather than at each toggle site means there is a single place
+  // to be right, and no way for the visual state and the announced state to
+  // disagree.
+  function syncAriaPressed() {
+    matrix.querySelectorAll('.btn-star, .btn-tag, .btn-meta').forEach(function(btn) {
+      btn.setAttribute('aria-pressed', btn.classList.contains('active') ? 'true' : 'false');
+    });
+  }
+
   function update() {
     var visibleCount = 0;
     var suppressList = isSearching && !hasActiveFilters();
@@ -436,6 +448,7 @@ function renderResultsPool() {
 
     updateInlineLabels();
     updateIngredientClear();
+    syncAriaPressed();
   }
 
   function updateInlineLabels() {

@@ -377,6 +377,14 @@ article.recipe .method-short {
   }
 
   .btn-clear-inline {
+    // A real <button> since 2026-07-29 — it was a <span> with a click handler,
+    // so it was unreachable by keyboard. These four lines strip the browser
+    // chrome so it looks exactly as it did.
+    border: 0;
+    background: none;
+    padding: 0;
+    color: inherit;
+
     font-family: $font-headings;
     font-size: 0.75rem;
     font-weight: $weight-clear-font;

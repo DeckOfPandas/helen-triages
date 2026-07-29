@@ -3,6 +3,8 @@ layout: default
 title: Home
 ---
 
+<h1 class="visually-hidden">{{ site.title }} — {{ site.description }}</h1>
+
 <div class="controls">
   {% assign star_data = site.data.index_tags_sections.star %}
   {% assign ingredients_data = site.data.index_tags_sections.ingredients %}
@@ -54,28 +56,30 @@ title: Home
 
   <div class="category search search--ingredients">
     <div class="search-input">
-      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
+      <label class="category-label" for="ingredient-search-box" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
         {% if ingredients_data.brush_colour %}
           <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ ingredients_data.brush_colour }}"></span>
         {% endif %}
         {{ ingredients_data.label }}
-      </span>
+      </label>
       <input type="text" id="ingredient-search-box" autocomplete="off" placeholder="ingredient name..." />
-      <span class="btn-clear-inline" id="ingredient-search-clear" style="display: none;">× clear</span>
+      <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="display: none;">&times; clear</button>
     </div>
-    <div class="category-buttons search-results" id="ingredient-results-pool"></div>
+    {% comment %} Populated by filters.js as you type; aria-live announces the
+       change so it is not a silent update. {% endcomment %}
+    <div class="category-buttons search-results" id="ingredient-results-pool" aria-live="polite"></div>
   </div>
 
   <div class="category search search--name">
     <div class="search-input">
-      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
+      <label class="category-label" for="name-search-box" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
         {% if name_search_data.brush_colour %}
           <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ name_search_data.brush_colour }}"></span>
         {% endif %}
         {{ name_search_data.label }}
-      </span>
+      </label>
       <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
-      <span class="btn-clear-inline" id="name-search-clear" style="display: none;">× clear</span>
+      <button type="button" class="btn-clear-inline" id="name-search-clear" style="display: none;">&times; clear</button>
     </div>
   </div>
 
@@ -85,10 +89,10 @@ title: Home
       <span class="category-label">[ META FILTERS ]</span>
     </div>
     <div class="category-buttons">
-      <button type="button" class="btn-meta" data-meta="rewrite">needs rewrite</button>
-      <button type="button" class="btn-meta" data-meta="proofread">needs proofread</button>
-      <button type="button" class="btn-meta" data-meta="no-short">no short method</button>
-      <button type="button" class="btn-meta" data-meta="has-short">has short method</button>
+      <button type="button" class="btn-meta" aria-pressed="false" data-meta="rewrite">needs rewrite</button>
+      <button type="button" class="btn-meta" aria-pressed="false" data-meta="proofread">needs proofread</button>
+      <button type="button" class="btn-meta" aria-pressed="false" data-meta="no-short">no short method</button>
+      <button type="button" class="btn-meta" aria-pressed="false" data-meta="has-short">has short method</button>
     </div>
   </div>
   {% endif %}

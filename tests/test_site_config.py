@@ -294,3 +294,71 @@ def test_page_has_a_description_and_link_preview():
         + "\n\nWithout these, pasting a recipe link into a chat shows the URL "
           "and nothing else."
     )
+
+
+# --- accessibility of the interactive layer ----------------------------------
+# The decorative layer is already sound: every ornamental SVG carries
+# aria-hidden. These guard the controls, which is where the gaps were.
+
+def test_search_inputs_have_a_label():
+    """A <span> beside an input is not a label.
+
+    Without <label for>, a screen reader announces these as "edit text, blank".
+    Placeholder text is not an accessible name and vanishes as soon as you type.
+    """
+    html = read("index.html")
+    for input_id in ("ingredient-search-box", "name-search-box"):
+        assert f'for="{input_id}"' in html, (
+            f'#{input_id} has no <label for="{input_id}">. The visible '
+            f'[ SEARCH … ] text should BE the label rather than sitting next to '
+            f"one — same styling, same position, `span` becomes `label`."
+        )
+
+
+def test_clear_controls_are_buttons():
+    """They were <span>s with click handlers: not focusable, not announced."""
+    html = read("index.html") + read("_includes", "filter_group.html")
+    offenders = re.findall(r'<span[^>]*class="[^"]*btn-clear-inline', html)
+    assert not offenders, (
+        f"Found {len(offenders)} clear control(s) rendered as <span>. "
+        f"A control with a click handler must be a <button type=\"button\"> or "
+        f"it cannot be reached by keyboard. The class is already named btn-*."
+    )
+
+
+def test_filter_buttons_announce_their_state():
+    """The filter buttons are toggles, so they need aria-pressed.
+
+    filters.js syncs the value from the .active class inside update(), in one
+    place rather than at each of the fifteen toggle sites.
+    """
+    assert 'aria-pressed="false"' in read("_includes", "filter_group.html"), (
+        "Filter buttons in filter_group.html have no aria-pressed attribute. "
+        "Visually the active state is obvious; programmatically it is invisible."
+    )
+    assert "syncAriaPressed" in read("js", "filters.js"), (
+        "filters.js no longer syncs aria-pressed. The attribute would then be "
+        "stuck at its initial value and would lie about the filter state."
+    )
+
+
+def test_search_results_are_announced():
+    """The results pool is populated as you type, so the change needs announcing."""
+    html = read("index.html")
+    match = re.search(r'id="ingredient-results-pool"[^>]*', html)
+    assert match, "#ingredient-results-pool is missing from index.html."
+    assert "aria-live" in match.group(0), (
+        "#ingredient-results-pool has no aria-live attribute, so a screen "
+        'reader user gets no indication that anything happened. aria-live="polite".'
+    )
+
+
+def test_index_has_a_heading():
+    """Every recipe page has an h1. The index had none of any level."""
+    html = read("index.html")
+    assert re.search(r"<h1[^>]*>", html), (
+        "index.html has no <h1>. The logo is the visible title, so a "
+        '<h1 class="visually-hidden"> is the right shape — it gives assistive '
+        "tech and search engines something to anchor to without changing the "
+        "design."
+    )
