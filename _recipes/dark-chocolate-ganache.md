@@ -22,7 +22,7 @@ ingredient_groups:
 method:
   - "Grate the chocolate (coarse chopping = bad) into a perfectly dry stainless steel bowl (water = bad, hotspots = bad)."
   - "Heat the cream gently in a pan to 88–90°C — it should look active, but DO NOT LET IT BOIL (over-heating = bad)."
-  - Pour the heated cream over the grated chocolate. Wait 2–3 minutes. The temperature will drop fast.
+  - Pour the heated cream over the grated chocolate. Wait 2–3 mins. The temperature will drop fast.
   - "Stir gently from the centre using a perfectly dry silicone spatula (water = bad, accidental whipping = bad) until the temperature reaches 40–45°C. You'll see a visible change from muddy to glossy and thick — this is the emulsion forming."
   - Add the butter (and optional icing sugar) and stir until just incorporated. Add any other flavourings here too.
   - Stop stirring as soon as you can (over-stirring = bad).
@@ -40,7 +40,7 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---
 
 ## Tips

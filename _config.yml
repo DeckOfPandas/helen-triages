@@ -1,8 +1,19 @@
+# =============================================================================
+# PRODUCTION CONFIG — this is what deploys.
+# Anything that should only ever be visible on your own machine belongs in
+# _config_local.yml, not here.
+# =============================================================================
+
 title: Helen Triages Food
 description: What to cook, not how to cook
-url: ""
-baseurl: "/food"
 
+# GitHub Pages project site. Repo is helen-triages-food, so the published URL is
+#   https://<your-github-username>.github.io/helen-triages-food/
+# baseurl must match the repo name exactly: leading slash, no trailing slash.
+url: "https://deckofpandas.github.io"
+baseurl: "/helen-triages-food"
+
+# Drafts and unrewritten recipes are never shown in production.
 show_unrewritten: false
 
 collections:
@@ -10,8 +21,9 @@ collections:
     output: true
     permalink: /recipes/:path/
   drafts:
-    output: true
-    permalink: /drafts/:path/
+    # output: false means drafts get NO public URL and are NOT in the sitemap.
+    # _config_local.yml flips this back to true so you can still read them locally.
+    output: false
 
 defaults:
   - scope:
@@ -19,13 +31,32 @@ defaults:
       type: recipes
     values:
       layout: recipe
-      rewritten: false
   - scope:
       path: ""
       type: drafts
     values:
       layout: recipe
-      rewritten: false
+      sitemap: false   # belt and braces: excluded even if output is ever flipped
+
+# Keep non-site files out of the build. Setting `exclude` REPLACES Jekyll's
+# defaults, so the standard entries are repeated here.
+exclude:
+  - .jekyll-cache/
+  - .sass-cache/
+  - Gemfile
+  - Gemfile.lock
+  - gemfiles/
+  - node_modules/
+  - vendor/
+  # Python test suite — not part of the site
+  - tests/
+  - pytest.ini
+  - requirements-test.txt
+  # Build output. `_site` is auto-excluded when it is the destination, but the
+  # production preview builds to _site_prod, so each server would otherwise
+  # watch the other's output and rebuild in a loop.
+  - _site/
+  - _site_prod/
 
 sass:
   sass_dir: _sass

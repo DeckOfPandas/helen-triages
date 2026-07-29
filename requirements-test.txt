@@ -1,0 +1,3 @@
+# Test dependencies only. The site itself needs nothing from Python.
+pytest>=8.0
+PyYAML>=6.0

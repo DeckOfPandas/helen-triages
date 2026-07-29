@@ -1,0 +1,117 @@
+# =============================================================================
+# THE VOCABULARY LAYER — single source of truth for the taxonomy.
+#
+# What exists, and how the terms relate to each other. Nothing about how any of
+# it LOOKS: no colours, no labels, no CSS classes. Those live in
+# _data/index_tags_sections.yml (labels, classes, order) and _sass (colour).
+#
+# Everything downstream reads this file:
+#   index.html            builds the filter buttons from it
+#   recipe_badges.html    decides which badge class a tag gets
+#   tests/test_taxonomy.py enforces it against every recipe
+#
+# Adding a term here is all that is needed to make it real. A tag not listed
+# here will render on a recipe page but will have no filter button, so nobody
+# browsing the index can ever find it.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Star ingredients
+#
+# The one thing a recipe is ABOUT. Declared, not derived: before this file
+# existed the list was built by mapping over front matter, which meant a typo
+# silently created a brand new star ingredient with one recipe under it.
+#
+# `star_ingredient` is OPTIONAL. Roughly a quarter of the collection leaves it
+# blank, and that is correct — a plain sponge, a spice blend or a dressing has
+# no hero ingredient, and inventing one for them would be worse than nothing.
+# -----------------------------------------------------------------------------
+star_ingredients:
+  - beef
+  - chocolate
+  - duck
+  - eggs
+  - fruit
+  - game
+  - greens
+  - lamb
+  - oily fish
+  - pork
+  - poultry
+  - root veg
+  - shellfish
+  - something unusual
+  - white fish
+
+# -----------------------------------------------------------------------------
+# Tags
+#
+# Two groups, deliberately different in kind:
+#
+#   mood            what you feel like eating
+#   practicalities  what the recipe demands of you
+#
+# A recipe may carry any number from either group.
+# -----------------------------------------------------------------------------
+tags:
+  mood:
+    - bakes
+    - breakfast
+    - carbs party
+    - cheese-tastic
+    - dessert
+    - drinks
+    - extras
+    - fakeaway
+    - festive
+    - hot snack
+    - ice cream
+    - nibbles
+    - one-handed food
+    - salad
+    - showstopper
+    - soup
+    - starter
+    - sweets
+
+  practicalities:
+    - freezable
+    - make-ahead
+    - no-cook
+    - one-pot
+    - scalable
+
+# -----------------------------------------------------------------------------
+# Co-tags — tags that imply other tags.
+#
+# THE TEST FOR ADDING ONE: an implied tag is sound when it is either a ROLLUP
+# (a broader category someone might browse, where you want this to appear) or a
+# GENUINE AFFORDANCE (it tells you something you could not have guessed). It is
+# unsound when it is DEFINITIONAL — true by the meaning of the words, and
+# therefore carrying no information while quietly polluting the filter it
+# belongs to.
+#
+# Two rules were removed in July 2026 on exactly that test:
+#
+#   ice cream -> freezable
+#       Definitional. Ice cream lives in the freezer; that is not a property,
+#       it is the definition. `freezable` should mean "you can make this and
+#       stash it for later", which is a discovery. Filling that filter with
+#       things that are trivially freezable makes it useless for the case it
+#       exists to serve.
+#
+#   soup -> one-handed food
+#       Unsound because it is only sometimes true. `one-handed food` means food
+#       you can eat curled on the sofa, so anything that rolls, spills or has to
+#       be chased or picked out disqualifies itself. Thick spoonable soups still
+#       carry the tag; noodle soups, pho, wontons and tom kha gai no longer do.
+#       Tagged by hand now, on the eating mechanics rather than the category.
+# -----------------------------------------------------------------------------
+# `drinks` covers anything you make to drink that is not a cocktail — the frappé,
+# a cordial, a hot chocolate. Cocktails proper belong to the sibling cocktails
+# site; a frappuccino has no place in a cocktail book but certainly does in a
+# recipe book.
+co_tags:
+  ice cream:
+    - dessert
+    - make-ahead

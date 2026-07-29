@@ -47,10 +47,10 @@ method:
   - "Add the wine, scrape the bottom of the pan, and simmer until reduced by half."
   - "Add the stock and bouquet garni."
   - "Add the duck legs."
-  - "Cover and simmer for about 6 hrs, checking occasionally. Add more stock if needed."
+  - "Cover and simmer for about 6 hours, checking occasionally. Add more stock if needed."
   - "Check the seasoning."
   - "Add the pearl barley."
-  - "Cover and simmer again for about 2 hrs."
+  - "Cover and simmer again for about 2 hours."
   - step: "Add the mushrooms 20 mins before the end."
     tip: "Add them too early and they'll turn to mush."
 method_short:
@@ -62,5 +62,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

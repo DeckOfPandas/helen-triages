@@ -1,0 +1,151 @@
+"""Structural rules: what a recipe file must contain, and what it must not.
+
+These come from HANDOVER section 7. Each one asserts a single rule so that a
+failure tells you exactly which rule broke, on which file.
+"""
+from __future__ import annotations
+
+import re
+
+import pytest
+
+from conftest import where
+
+REQUIRED = ["title", "short_name", "tagline", "source", "main_ingredients",
+            "tags", "ingredient_groups", "method_short", "meta"]
+
+RETIRED = {
+    "published": "removed from the schema",
+    "date_added": "renamed to meta.date_last_edited",
+    "difficulty": "removed from the schema",
+    "nutrition": "removed from the schema",
+    "filling_note": "folded into notes:",
+    "headline_ingredient": "renamed to star_ingredient",
+}
+
+MISPLACED_META = ["rewritten", "proofread", "cooked_before", "date_last_edited"]
+
+
+@pytest.mark.parametrize("field", REQUIRED)
+def test_required_field_present(recipe, field):
+    assert field in recipe.fm, (
+        f"{where(recipe)} is missing the required field `{field}:`.\n"
+        f"Every recipe needs all of: {', '.join(REQUIRED)}."
+    )
+
+
+def test_no_retired_fields(recipe):
+    found = {f: why for f, why in RETIRED.items() if f in recipe.fm}
+    assert not found, (
+        f"{where(recipe)} still has retired field(s): "
+        + "; ".join(f"`{f}` ({why})" for f, why in found.items())
+    )
+
+
+def test_meta_fields_are_nested_not_top_level(recipe):
+    stray = [f for f in MISPLACED_META if f in recipe.fm]
+    assert not stray, (
+        f"{where(recipe)} has {stray} at the top level. "
+        f"These belong inside the `meta:` block — nothing in the templates "
+        f"reads them from the top level, so they are silently ignored."
+    )
+
+
+def test_meta_block_complete(recipe):
+    meta = recipe.fm.get("meta")
+    assert isinstance(meta, dict), (
+        f"{where(recipe)} has no `meta:` block, or it is not a mapping."
+    )
+    missing = [f for f in ("rewritten", "proofread", "cooked_before") if f not in meta]
+    assert not missing, (
+        f"{where(recipe)} `meta:` is missing {missing}. "
+        f"All three are booleans and all three must be present — a missing one "
+        f"reads as false, which is indistinguishable from a deliberate false."
+    )
+
+
+def test_serves_xor_makes(recipe):
+    has_serves = "serves" in recipe.fm
+    has_makes = "makes" in recipe.fm
+    assert has_serves != has_makes, (
+        f"{where(recipe)} has "
+        + ("neither `serves:` nor `makes:`" if not (has_serves or has_makes)
+           else "both `serves:` and `makes:`")
+        + ".\nUse `makes:` for anything you produce a quantity of (bakes, "
+          "confectionery, sauces, base recipes) and `serves:` for dishes you "
+          "portion out to people. Exactly one, never both."
+    )
+
+
+def test_method_xor_method_groups(recipe):
+    has_flat = "method" in recipe.fm
+    has_groups = "method_groups" in recipe.fm
+    assert has_flat != has_groups, (
+        f"{where(recipe)} has "
+        + ("neither `method:` nor `method_groups:`" if not (has_flat or has_groups)
+           else "both `method:` and `method_groups:`")
+        + ".\nThey are mutually exclusive; the recipe layout renders one or the "
+          "other, and having both means the second is silently dropped."
+    )
+
+
+def test_notes_is_a_list(recipe):
+    if "notes" not in recipe.fm:
+        return
+    assert isinstance(recipe.fm["notes"], list), (
+        f"{where(recipe)} has `notes:` as a "
+        f"{type(recipe.fm['notes']).__name__}, not a list. "
+        f"Notes are always a list of separate strings, never one blob — the "
+        f"renderer styles each note individually."
+    )
+
+
+def test_method_short_is_a_list(recipe):
+    ms = recipe.fm.get("method_short")
+    assert isinstance(ms, list), (
+        f"{where(recipe)} has `method_short:` as a "
+        f"{type(ms).__name__}, not a list. The `has_short` check in index.html "
+        f"iterates it, and iterating a bare string yields nothing."
+    )
+
+
+def test_method_short_uses_current_placeholder(recipe):
+    ms = recipe.fm.get("method_short") or []
+    retired = [s for s in ms if s in ("QQ", "none")]
+    assert not retired, (
+        f"{where(recipe)} uses retired method_short placeholder(s) {retired}. "
+        f'The current convention is a single empty string: method_short: [""]'
+    )
+
+
+def test_ingredient_groups_named_when_there_is_more_than_one(recipe):
+    groups = recipe.fm.get("ingredient_groups") or []
+    if len(groups) < 2:
+        return
+    unnamed = [i for i, g in enumerate(groups) if not (isinstance(g, dict) and g.get("name"))]
+    assert not unnamed, (
+        f"{where(recipe)} has {len(groups)} ingredient groups but group(s) "
+        f"{unnamed} have no `name:`. With more than one group every group needs "
+        f"a name, or the reader gets an unlabelled block followed by labelled ones."
+    )
+
+
+def test_group_names_omit_leading_article(recipe):
+    """Group names are bare nouns: `buttercream`, not `for the buttercream`.
+
+    The recipe template renders ingredient group headings as "For the {name}:",
+    so a name that already carries the article comes out as "For the for the
+    dressing:" or "For the the icing:". Method groups render the name bare, so
+    a leading article reads oddly there too.
+    """
+    offenders = []
+    for key in ("ingredient_groups", "method_groups"):
+        for group in recipe.fm.get(key) or []:
+            name = group.get("name") if isinstance(group, dict) else None
+            if name and re.match(r"^(for the |for |the )", name, re.I):
+                offenders.append(f"{key}: {name!r}")
+    assert not offenders, (
+        f"{where(recipe)} has group name(s) with a leading article: {offenders}.\n"
+        f'The template supplies "For the " itself, so `for the dressing` renders '
+        f'as "For the for the dressing:". Strip the article — `dressing`.'
+    )

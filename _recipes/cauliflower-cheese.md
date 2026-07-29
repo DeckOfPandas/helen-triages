@@ -6,7 +6,7 @@ source: Adapted from Gordon Ramsay Restaurants
 serves: 5
 prep_time: Estimated 15 mins
 cook_time: "25 mins"
-main_ingredients: [cauliflower, "cheddar cheese", "lancashire cheese", "cheshire cheese", breadcrumbs, milk, "english mustard"]
+main_ingredients: [cauliflower, cheddar, lancashire, cheshire, breadcrumbs, milk, "English mustard"]
 star_ingredient:
 tags: ["cheese-tastic", "one-handed food"]
 ingredient_groups:
@@ -33,12 +33,12 @@ ingredient_groups:
     - amount: "1 tbsp"
       item: thyme leaves
 method:
-  - "Boil the cauliflower florets 4–5 minutes until just tender. Drain and refresh in iced water, then drain again  and lay out in an oven dish."
+  - "Boil the cauliflower florets 4–5 mins until just tender. Drain and refresh in iced water, then drain again  and lay out in an oven dish."
   - "Make a roux: melt the butter gently, then stir in the flour and mustard powder until it's a smooth paste. Then add the milk a little at a time, stirring/whisking continuously until completely smooth and almost shiny."
   - "Bring to the boil, then simmer for a few minutes, stirring continuously, until it thickens. Remove from the heat and mix any other flavours and seasoning."
   - Grate the three cheeses together. Add half to the pan and stir until fully melted into the hot sauce. Pour the cheese over the cauliflower.
   - "Add the breadcrumbs and thyme to the other half of the cheese, then tip evenly over the cauliflower dish."
-  - Bake at 180°C for 15–20 minutes until the topping is crisp and the sauce is bubbling.
+  - Bake at 180°C for 15–20 mins until the topping is crisp and the sauce is bubbling.
 method_short:
   - |
     * Boil cauliflower 1 4–5 mins, iced water
@@ -52,5 +52,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-07-29"
 ---

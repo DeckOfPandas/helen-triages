@@ -34,9 +34,9 @@ ingredient_groups:
       item: caster sugar
     - item: "cocoa powder, to serve"
 method:
-  - "Preheat the oven to 120°C (140°C non-fan). Put the butter and dark chocolate in a large bowl and place on top of a pan of simmering water to melt together. In a separate bowl, whisk together the eggs and sugar."
+  - "Preheat the oven to 120°C. Put the butter and dark chocolate in a large bowl and place on top of a pan of simmering water to melt together. In a separate bowl, whisk together the eggs and sugar."
   - Remove the chocolate from the heat and whisk in the egg-and-sugar mixture. Arrange six moulds (ovenproof bowls or ramekins) on a baking tray and put one caramel chocolate into the bottom of each.
-  - "Divide the cake mixture equally between each mould and bake for 45–50 minutes, until just cooked and the cake mix still has a wobble to it. Remove from the oven and leave to cool a little."
+  - "Divide the cake mixture equally between each mould and bake for 45–50 mins, until just cooked and the cake mix still has a wobble to it. Remove from the oven and leave to cool a little."
   - "While resting, whisk together the mascarpone, double cream, coffee and sugar until nice and thick. Spoon a big dollop on top of the warm cakes, dust with sieved cocoa powder and serve straight away."
 method_short:
   - ""

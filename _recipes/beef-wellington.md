@@ -47,13 +47,12 @@ ingredient_groups:
       item: beef stock
       tip: "Preferably home-made. QQ link to beef bone stock recipe."
 method_groups:
-  - name: "The day before: prepare the beef"
+  - name: "day before: prepare the beef"
     steps:
       - "Wrap each beef fillet tightly in a triple layer of cling film to set its shape. Chill overnight."
   - name: "On the day: sear and cool"
     steps:
-      - "Remove the cling film and quickly sear the beef fillets in a very hot pan for 30–60 seconds until browned all over and still rare in the middle."
-      - "Remove, brush lightly with the Dijon mustard, and leave to cool completely."
+      - "Remove the cling film and quickly sear the beef fillets in a very hot pan for 30–60 seconds until browned all over and still rare in the middle. Remove and leave to cool completely."
   - name: Make the duxelle
     steps:
       - "Chop the mushrooms very finely and fry in a hot pan with the thyme leaves and some seasoning. Keep frying over high heat for 10 mins after the juices are released, until all excess moisture has evaporated and you have a dry mushroom paste. Leave to cool."
@@ -61,15 +60,15 @@ method_groups:
     steps:
       - "Roll each piece of pastry on a lightly floured surface into a rectangle large enough to envelop one fillet. Chill."
       - "Overlap 4 slices of Parma ham on cling film to form a rectangle slightly smaller than the pastry. Spread half the duxelle evenly over the ham."
-      - "Season the beef generously, place it on the duxelle and use the cling film to roll the ham tightly around the beef into an even log. Twist the ends to seal. Repeat with the second fillet. Chill for at least 30 minutes."
-      - "Brush the pastry with egg wash. Remove the cling film from each beef log and wrap the pastry around it. Trim, seal, and brush all over with egg wash. Chill for at least 30 minutes."
+      - "Season the beef generously, place it on the duxelle and use the cling film to roll the ham tightly around the beef into an even log. Twist the ends to seal. Repeat with the second fillet. Chill for at least 30 mins."
+      - "Brush the pastry with egg wash. Remove the cling film from each beef log and wrap the pastry around it. Trim, seal, and brush all over with egg wash. Chill for at least 30 mins."
   - name: Red wine sauce
     steps:
-      - "Fry the beef trimmings until browned all over. Add the shallots, peppercorns, bay and thyme and cook for about 5 minutes until the shallots are golden."
+      - "Fry the beef trimmings until browned all over. Add the shallots, peppercorns, bay and thyme and cook for about 5 mins until the shallots are golden."
       - "Deglaze with vinegar and bubble until almost dry. Add the wine and boil until almost completely reduced. Add the stock, bring to the boil, then simmer gently for 1 hour, skimming any scum, until you have the consistency you want. Strain through a fine sieve. Check seasoning and set aside."
   - name: Cook and serve
     steps:
-      - "Score the pastry lightly, making sure not to cut through, and brush again with egg wash. Bake at 200°C for 15–20 minutes until the pastry is golden brown. Rest for 10 minutes before carving."
+      - "Score the pastry lightly, making sure not to cut through, and brush again with egg wash. Bake at 200°C for 15–20 mins until the pastry is golden brown. Rest for 10 mins before carving."
       - "Reheat the sauce and serve alongside the sliced Wellington."
 method_short:
   - "Wrap and chill, sear, duxelle, assemble, sauce, cook."
@@ -80,5 +79,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-07-29"
 ---

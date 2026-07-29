@@ -1,7 +1,6 @@
 ---
 layout: default
 ---
-{% assign rs = site.data.recipe_sections %}
 
 <article class="recipe">
   {% if page.collection == "drafts" %}
@@ -30,7 +29,7 @@ layout: default
   {% endif %}
 
   <div class="recipe-title">
-    <h1 class="recipe-main-title" style="--highlighter-fill: {{ site.data.colors.vivid_rose_rgb | prepend: 'rgb(' | append: ')' }};">
+    <h1 class="recipe-main-title">
       <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="vivid-rose"></span>
       <span class="recipe-title-text">{{ page.title }}</span>
     </h1>
@@ -90,7 +89,7 @@ layout: default
           <li class="ingredient ingredient--annotated">
             <span class="ingredient-bullet" aria-hidden="true"></span>
             {% if item.amount %}
-              <span class="ingredient-amount highlighted" style="--highlighter-fill: rgb({{ site.data.colors.aureolin_rgb }}); --highlighter-opacity: 0.9;">
+              <span class="ingredient-amount highlighted">
                 <span class="highlighter-slot" aria-hidden="true"></span>{{ item.amount }}</span>
             {% endif %}
             {{ item.item | markdownify | remove: '<p>' | remove: '</p>' }}

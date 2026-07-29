@@ -42,7 +42,7 @@ method:
   - "Add the yoghurt, eggs, olive oil, and 3 tbsp lemon juice to the sugar mixture; whisk until smooth."
   - "Add both flours, the baking powder, bicarbonate of soda, and salt; gently whisk until just combined."
   - Fold in the blueberries. Spread the batter evenly in the prepared pan.
-  - "Bake at 180°C for 45–50 minutes, then cool in the pan for 15 minutes."
+  - "Bake at 180°C for 45–50 mins, then cool in the pan for 15 mins."
   - "Turn out and leave to cool completely on a wire rack, about an hour."
   - "If icing: whisk the icing sugar with the remaining ½ tbsp lemon juice until smooth, then drizzle over the cooled cake."
 method_short:

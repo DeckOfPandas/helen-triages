@@ -15,7 +15,9 @@ title: Home
   {% endif %}
   {% assign all_recipes = all_recipes | sort: "title" %}
   
-  {% assign all_stars = all_recipes | map: "star_ingredient" | compact | uniq | sort %}
+  {% comment %} Stars are DECLARED in _data/taxonomy.yml, not derived from front
+     matter. Deriving meant a typo silently minted a new star ingredient. {% endcomment %}
+  {% assign all_stars = site.data.taxonomy.star_ingredients %}
 
   {% if all_stars.size > 0 %}
     {% include filter_group.html
@@ -30,12 +32,21 @@ title: Home
   {% endif %}
 
   {% for group in tag_groups %}
+    {% comment %} Look the group's tags up in _data/taxonomy.yml by iterating the
+       hash rather than using tags[group.name]. Iterating yields [key, value]
+       pairs and always works; the bracket form with a variable key is not
+       reliable in Liquid. {% endcomment %}
+    {% assign group_tags = "" | split: "" %}
+    {% for pair in site.data.taxonomy.tags %}
+      {% if pair[0] == group.name %}{% assign group_tags = pair[1] %}{% endif %}
+    {% endfor %}
+
     {% include filter_group.html
       group_class=group.class
       label=group.label
       color=group.color
       brush_colour=group.brush_colour
-      items=group.tags
+      items=group_tags
       btn_class="btn-tag"
       data_attr="data-tag"
     %}
@@ -43,8 +54,7 @@ title: Home
 
   <div class="category search search--ingredients">
     <div class="search-input">
-      {% assign _ingredients_color_rgb = site.data.colors[ingredients_data.color] %}
-      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;{% if _ingredients_color_rgb %} --highlighter-fill: rgb({{ _ingredients_color_rgb }});{% endif %}">
+      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
         {% if ingredients_data.brush_colour %}
           <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ ingredients_data.brush_colour }}"></span>
         {% endif %}
@@ -58,8 +68,7 @@ title: Home
 
   <div class="category search search--name">
     <div class="search-input">
-      {% assign _name_color_rgb = site.data.colors[name_search_data.color] %}
-      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;{% if _name_color_rgb %} --highlighter-fill: rgb({{ _name_color_rgb }});{% endif %}">
+      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
         {% if name_search_data.brush_colour %}
           <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ name_search_data.brush_colour }}"></span>
         {% endif %}
@@ -98,7 +107,10 @@ title: Home
       {% unless recipe.meta.proofread %}{% assign _needs_proofread = true %}{% endunless %}
       {% assign _has_short = false %}
       {% for step in recipe.method_short %}
-        {% unless step == "QQ" or step == "none" %}{% assign _has_short = true %}{% endunless %}
+        {% assign _s = step | strip %}
+        {% unless _s == "" or _s == "QQ" or _s == "none" %}
+          {% assign _has_short = true %}
+        {% endunless %}
       {% endfor %}
       <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}">
         <a href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
@@ -117,9 +129,29 @@ title: Home
         </div>
 
         {% if recipe.main_ingredients and recipe.main_ingredients.size > 0 %}
+        {% comment %} Order is a PRESENTATION concern — main_ingredients stays an
+           unordered set in the front matter. Pantry staples listed in
+           _data/common_ingredients.yml sink to the end so the eye meets the
+           distinctive ingredients first: identify, then warn, then trail off.
+           Authored order is preserved within each half, and the data-ingredients
+           attribute above is left untouched because filters.js reads it as a set.
+        {% endcomment %}
+        {% assign _pantry = site.data.common_ingredients.pantry %}
+        {% assign _lead = "" %}
+        {% assign _tail = "" %}
+        {% for ing in recipe.main_ingredients %}
+          {% assign _key = ing | downcase %}
+          {% if _pantry contains _key %}
+            {% assign _tail = _tail | append: ing | append: "|" %}
+          {% else %}
+            {% assign _lead = _lead | append: ing | append: "|" %}
+          {% endif %}
+        {% endfor %}
+        {% assign _lead_count = _lead | split: "|" | size %}
+        {% assign _ordered = _lead | append: _tail | split: "|" %}
         <div class="ingredient-list">
-          {% for ing in recipe.main_ingredients %}
-            <span class="ingredient-pill">{{ ing }}</span>{% unless forloop.last %}<span class="ingredient-sep">,</span>{% endunless %}
+          {% for ing in _ordered %}
+            {% if forloop.index0 < _lead_count %}<span class="ingredient-pill">{{ ing }}</span>{% else %}<span class="ingredient-pill ingredient-pill--pantry">{{ ing }}</span>{% endif %}{% unless forloop.last %}<span class="ingredient-sep">,</span>{% endunless %}
           {% endfor %}
         </div>
         {% endif %}
@@ -135,5 +167,12 @@ title: Home
 <div class="recipe-list-searching" style="display: none;">
   Select something to see a list.
 </div>
+
+{% comment %} The ingredient search vocabulary — singulars, synonyms and the
+   family-button threshold — comes from _data/ingredient_words.yml. filters.js
+   reads it from here rather than hardcoding any of it. {% endcomment %}
+<script type="application/json" id="ingredient-vocabulary">
+  {{ site.data.ingredient_words | jsonify }}
+</script>
 
 <script src="{{ '/assets/js/filters.js' | relative_url }}"></script>

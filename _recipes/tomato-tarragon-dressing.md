@@ -30,7 +30,7 @@ ingredient_groups:
     - item: "large handful each of tarragon and flat-leaf parsley, chopped"
 method:
   - "Cut each tomato in half and squeeze out the seeds. Finely chop the flesh and place in a large bowl."
-  - "Add all remaining ingredients except the herbs. Mix well and season generously. Cover and chill for at least 20 minutes."
+  - "Add all remaining ingredients except the herbs. Mix well and season generously. Cover and chill for at least 20 mins."
   - "Stir the chopped herbs through just before serving."
 method_short:
   - ""

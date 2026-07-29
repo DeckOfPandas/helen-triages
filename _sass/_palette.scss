@@ -97,6 +97,23 @@ $color-step-number:   mix($color-hot-orange, $color-clear-text, 45%);
   --highlighter-fill: #{$color-ingredient-root};
   --highlighter-opacity: #{$highlighter-opacity-ingredient};
 }
+// Must come after .search — equal specificity, so source order decides.
+.search--ingredients {
+  --highlighter-fill: #{$color-ingredient-root};
+}
+.search--name {
+  --highlighter-fill: #{$color-name-search-root};
+}
+
+// Recipe page contexts (previously set inline from _data/colors.yml)
+.recipe-main-title {
+  --highlighter-fill: #{$color-vivid-rose};
+  --highlighter-opacity: 1;
+}
+.ingredient-amount {
+  --highlighter-fill: #{$color-aureolin};
+  --highlighter-opacity: 0.9;
+}
 .logo-header {
   --highlighter-fill: #{$color-logo};
   --highlighter-opacity: #{$highlighter-opacity-logo};
@@ -105,4 +122,18 @@ $color-step-number:   mix($color-hot-orange, $color-clear-text, 45%);
 .highlighted svg path {
   fill: var(--highlighter-fill, #{$color-text});
   fill-opacity: var(--highlighter-opacity, 1);
+}
+
+// --- Palette exposed to JavaScript -------------------------------------------
+// js/colours.js reads these at runtime instead of keeping its own hardcoded
+// copy. Add a colour here the moment JS needs it; never mirror one by hand.
+:root {
+  --colour-vivid-rose:      #{$color-vivid-rose};
+  --colour-vivid-rose-dark: #{$color-vivid-rose-dark};
+  --colour-vibrant-violet:  #{$color-vibrant-violet};
+  --colour-pencil-grey:     #{$color-pencil-grey};
+  --colour-spring-green:    #{$color-medium-spring-green};
+  --colour-aureolin:        #{$color-aureolin};
+  --colour-vivid-cerulean:  #{$color-vivid-cerulean};
+  --colour-hot-orange:      #{$color-hot-orange};
 }

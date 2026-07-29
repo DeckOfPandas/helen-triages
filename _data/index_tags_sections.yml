@@ -1,51 +1,27 @@
+# Presentation only: label text, CSS class, brush texture, and
+# the order groups appear in. WHICH tags exist is _data/taxonomy.yml — the
+# `name:` of each group keys straight into taxonomy.tags.
+
 star: 
   label: "[ STAR INGREDIENT ]"
   class: category--star
-  color: bright_magenta_rgb
   brush_colour: "bright-magenta"
 
 ingredients:
   label: "[ SEARCH INGREDIENTS ]"
-  color: aureolin_rgb
   brush_colour: "aureolin"
 
 groups:
   - name: mood
     label: "[ MOOD ]"
     class: category--mood
-    color: pure_lime_green_rgb
     brush_colour: "pure-lime-green"
-    tags:
-      - bakes
-      - breakfast
-      - carbs party
-      - cheese-tastic
-      - dessert
-      - extras
-      - fakeaway
-      - festive
-      - hot snack
-      - ice cream
-      - nibbles
-      - one-handed food
-      - salad
-      - showstopper
-      - soup
-      - sweets
 
   - name: practicalities
     label: "[ PRACTICALITIES ]"
     class: category--practicalities
-    color: vibrant_violet_rgb
     brush_colour: "vibrant-violet"
-    tags:
-      - freezable
-      - make-ahead
-      - no-cook
-      - one-pot
-      - scalable
 
 name_search:
   label: "[ I KNOW WHAT I WANT ]"
-  color: electric_cobalt_rgb
   brush_colour: "electric-cobalt"

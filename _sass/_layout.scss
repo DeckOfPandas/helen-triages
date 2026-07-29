@@ -200,6 +200,14 @@ article.recipe .method-short {
 .ingredient-pill {
   transition: color 0.12s ease-in-out, font-weight 0.12s ease-in-out;
 
+  // Pantry staples (see _data/common_ingredients.yml) sink to the end of the
+  // line and recede, so the eye meets the distinctive ingredients first.
+  // Declared BEFORE .ingredient--matched: equal specificity, source order wins,
+  // and a matched pantry staple should still light up.
+  &.ingredient-pill--pantry {
+    color: lighten($color-clear-text, 22%);
+  }
+
   &.ingredient--matched {
     color: $color-ingredient-active;
     font-weight: 700;

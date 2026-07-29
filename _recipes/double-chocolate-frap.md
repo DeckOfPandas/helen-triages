@@ -8,7 +8,7 @@ prep_time: "5 mins"
 cook_time: None
 main_ingredients: [ice, milk, "Hershey's chocolate syrup", "cocoa powder", "xanthan gum", "vanilla essence", sugar]
 star_ingredient: chocolate
-tags: ["ice cream", "no-cook"]
+tags: [drinks, "no-cook"]
 ingredient_groups:
   - items:
     - amount: "250 g"
@@ -36,5 +36,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-07-29"
 ---
