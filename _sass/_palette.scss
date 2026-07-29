@@ -124,6 +124,12 @@ $color-step-number:   mix($color-hot-orange, $color-clear-text, 45%);
   fill-opacity: var(--highlighter-opacity, 1);
 }
 
+// Footer hearts take their colour from currentColor, so the SVG asset itself
+// contains no colour. See assets/img/hearts/site-footer-hearts.svg.
+.site-footer-hearts {
+  color: $color-vivid-rose;
+}
+
 // --- Palette exposed to JavaScript -------------------------------------------
 // js/colours.js reads these at runtime instead of keeping its own hardcoded
 // copy. Add a colour here the moment JS needs it; never mirror one by hand.

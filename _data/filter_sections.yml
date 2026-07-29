@@ -1,0 +1,37 @@
+# =============================================================================
+# FILTER SECTION PRESENTATION
+#
+# Label text, CSS class, brush texture, and the order sections appear in on the
+# index. Presentation only.
+#
+# WHICH tags exist is _data/taxonomy.yml. Each entry under `tag_groups:` has a
+# `name:` that keys straight into taxonomy.tags — so adding a tag is a taxonomy
+# edit and never needs touching this file.
+#
+# Renamed from index_tags_sections.yml on 2026-07-29: it stopped holding tags
+# when the taxonomy moved out, and the old name had become actively misleading.
+# =============================================================================
+
+star: 
+  label: "[ STAR INGREDIENT ]"
+  class: category--star
+  brush_colour: "bright-magenta"
+
+ingredients:
+  label: "[ SEARCH INGREDIENTS ]"
+  brush_colour: "aureolin"
+
+tag_groups:
+  - name: mood
+    label: "[ MOOD ]"
+    class: category--mood
+    brush_colour: "pure-lime-green"
+
+  - name: practicalities
+    label: "[ PRACTICALITIES ]"
+    class: category--practicalities
+    brush_colour: "vibrant-violet"
+
+name_search:
+  label: "[ I KNOW WHAT I WANT ]"
+  brush_colour: "electric-cobalt"

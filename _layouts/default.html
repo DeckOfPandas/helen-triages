@@ -64,83 +64,11 @@
 
 
   {% comment %} assets.js must load first — it resolves the base URL and owns all
-     SVG fetching. Everything below depends on window.HTF. {% endcomment %}
+     SVG fetching. decorations.js injects every hand-drawn SVG on the page.
+     colours.js exposes the palette to JS for section-rule.js. {% endcomment %}
   <script src="{{ '/assets/js/assets.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/colours.js' | relative_url }}"></script>
-  <script src="{{ '/assets/js/highlighter.js' | relative_url }}"></script>
-  <script>
-  (function () {
-    // Base URL, SVG fetching, caching and shuffling all live in js/assets.js.
-
-    // ── Watercolour brush backgrounds ────────────────────────────────────────
-    var brushShapes = [0,1,2,3,4,5,6,7,8,9];
-    var brushPickers = {};
-    function nextBrushShape(colour) {
-      if (!brushPickers[colour]) {
-        brushPickers[colour] = window.HTF.makeShuffledPicker(brushShapes);
-      }
-      return brushPickers[colour]();
-    }
-    function doInject(slot, svg) {
-      var clean = svg
-        .replace(/<\?xml[^?]*\?>/g, '')
-        .replace(/<!--[\s\S]*?-->/g, '')
-        .replace(/<svg\s+/g, '<svg ');
-      var sized = clean
-        .replace(/(<svg [^>]*?)width="[^"]*mm"/, '$1')
-        .replace(/(<svg [^>]*?)height="[^"]*mm"/, '$1')
-        .replace(/preserveAspectRatio="[^"]*"/, '')
-        .replace('<svg ', '<svg preserveAspectRatio="none" style="position:absolute;top:-4px;left:-6px;width:calc(100% + 12px);height:calc(100% + 8px);z-index:-1;overflow:visible;pointer-events:none;" ');
-      slot.innerHTML = sized;
-    }
-    document.querySelectorAll('.watercolour-brush-slot').forEach(function(slot) {
-      var colour = slot.getAttribute('data-brush-colour');
-      var url = window.HTF.asset(
-        '/assets/img/backgrounds-headers/background-watercolour-brush-'
-        + colour + '-' + nextBrushShape(colour) + '.svg');
-      window.HTF.fetchSvg(url, function(t) { doInject(slot, t); });
-    });
-
-    // ── Tape background ───────────────────────────────────────────────────
-    var tapeSlot = document.querySelector('.tape-bg');
-    if (tapeSlot) {
-      var tapeN = Math.floor(Math.random() * 4) + 1;
-      window.HTF.fetchSvg(
-        window.HTF.asset('/assets/img/tape/tape-food-' + tapeN + '.svg'),
-        function(t) {
-          tapeSlot.innerHTML = t
-            .replace(/<svg /, '<svg preserveAspectRatio="none" height="100%" ')
-            .replace(/width="100%"/, 'width="100%"');
-        });
-    }
-
-    // ── Site footer hearts ──────────────────────────────────────────────────
-    var heartEl = document.querySelector('.site-footer-hearts');
-    if (heartEl) {
-      var C = window.SITE_COLOURS;
-      heartEl.innerHTML = '<svg viewBox="0 0 721.93781 183.80363" xmlns="http://www.w3.org/2000/svg" '
-        + 'preserveAspectRatio="xMidYMid meet" aria-hidden="true">'
-        + '<g transform="translate(212.46042,-165.36457)" fill="' + C.vividRose + '">'
-        + '<path id="path15" d="m 341.60117,285.1743 c 12.39308,-7.03437 25.33295,-16.73225 28.59968,-31.38662 2.87515,-15.35641 -13.18683,-26.76173 -27.29089,-25.73866 -11.45469,1.00187 -23.04696,8.39962 -26.90284,19.5227 -5.39395,17.28258 11.48292,31.24906 25.59405,37.60258 z m -262.000999,8.62542 c 0.282231,-0.007 0.560917,-0.014 0.839602,-0.0212 0.243417,-0.0246 0.486834,-0.0529 0.73025,-0.0811 l 0.08115,0.0459 c 4.639019,-1.25589 1.379352,-7.85635 0.250481,-10.87614 -6.431147,-11.557 -19.939,-16.19602 -31.848795,-19.97779 6.741583,12.47068 15.363481,28.25043 30.522333,30.94918 0,-0.003 -0.575019,-0.0388 -0.575019,-0.0388 z m 17.504833,47.27924 c 0.567981,-0.0565 1.132417,-0.15171 1.143,-0.17637 15.903236,-6.08542 29.414606,-17.25083 42.837816,-27.48841 -13.41967,-0.39158 -26.8605,2.85033 -37.95538,10.59035 -3.813519,2.94915 -7.993936,6.12068 -9.821333,10.73147 -1.414622,3.23151 -0.05996,6.83329 3.795897,6.34296 z m 0.02823,8.08924 c -9.355666,-0.20119 -13.606647,-10.10362 -9.020545,-17.75187 3.429,-6.20173 9.567333,-10.38575 15.455211,-14.06166 13.9065,-8.55837 30.36358,-11.36647 46.49258,-11.35589 26.19021,-24.257 67.03481,-61.35158 74.98289,-96.56939 5.73617,-25.80217 -16.59466,-35.72934 -38.41395,-28.67729 -16.79223,5.2705 -30.07783,18.19627 -39.5464,32.58254 -6.4911,9.46504 -11.80041,19.61798 -17.04975,29.79915 -2.04962,3.30906 -3.84879,7.34483 -7.35187,9.32391 -7.26016,1.91207 -6.04308,-9.652 -7.64823,-14.01585 -1.97908,-8.89 -3.43958,-17.94933 -6.40292,-26.58533 -6.6816,-20.79273 -27.096849,-42.98598 -50.743561,-34.39232 -28.631435,12.05794 -23.396204,51.13867 -13.264435,74.5631 19.117019,5.78205 43.673897,14.94722 46.587833,37.59555 1.319397,16.8557 -18.157481,14.19577 -27.202686,6.26885 -12.251981,-8.85473 -19.138211,-22.8741 -25.537583,-36.16325 -74.365563,-16.99331 -171.121918,6.88623 -241.991428,32.46967 -9.47915,5.25991 -11.23247,-3.84527 -6.1454,-5.62682 2.45885,-1.14652 4.90715,-2.33185 7.40481,-3.40428 66.58679,-26.96988 165.463353,-49.48415 236.294056,-33.95488 -4.677833,-12.96104 -7.898685,-26.82521 -6.646333,-40.66821 2.003795,-27.74598 22.549564,-48.23177 51.184545,-42.08285 11.01725,2.29304 19.896666,10.15294 26.888702,18.60902 13.45497,16.04433 15.79034,37.64492 17.907,57.70033 12.19555,-21.42066 22.00275,-45.76233 42.40035,-60.93531 17.58599,-13.69835 46.94415,-19.60737 63.5635,-1.48167 28.99482,40.47419 -36.1315,99.8714 -63.50703,126.18157 56.64903,3.302 117.08693,8.07143 169.46385,-17.92817 -17.63184,-8.41023 -34.66394,-29.60513 -22.7965,-49.0855 6.52639,-10.668 18.5561,-17.86467 31.00916,-18.77131 15.50459,-1.08302 32.55434,8.54075 36.19148,24.30285 4.55788,18.45029 -9.06287,35.41538 -23.46679,45.26139 16.04433,4.21217 33.42217,4.22982 49.74873,3.02684 31.60183,-1.7639 62.45931,-8.91823 92.1385,-19.7485 2.62466,-0.3034 10.20233,-4.89302 11.21481,-1.88032 0.41627,0.98073 -0.0565,2.13784 -1.03365,2.55413 -24.95901,11.81804 -51.7031,19.61444 -79.12806,22.92702 -26.36308,3.27377 -53.92912,5.94783 -79.60077,-2.54706 -58.05664,34.15236 -128.42875,26.68764 -192.55316,19.60028 -15.74094,12.42134 -39.60987,33.19994 -59.876956,34.92153" />'
-        + '</g></svg>';
-    }
-
-    // ── Index page category label doodles ───────────────────────────────────
-    // Each [data-index-doodle] span gets an SVG fetched from assets/img/doodles/
-    // and recoloured to the value in data-doodle-color.
-    function injectDoodle(span, svgText) {
-      var colour = span.getAttribute('data-doodle-color');
-      span.innerHTML = svgText.replace(/fill="black"/g, 'fill="' + colour + '"');
-    }
-
-    document.querySelectorAll('[data-index-doodle]').forEach(function(el) {
-      var name = el.getAttribute('data-index-doodle');
-      window.HTF.fetchSvg(
-        window.HTF.asset('/assets/img/doodles/' + name + '.svg'),
-        function(svgText) { injectDoodle(el, svgText); });
-    });
-  })();
-  </script>
+  <script src="{{ '/assets/js/decorations.js' | relative_url }}"></script>
 
 </body>
 </html>

@@ -6,10 +6,10 @@ title: Home
 <h1 class="visually-hidden">{{ site.title }} — {{ site.description }}</h1>
 
 <div class="controls">
-  {% assign star_data = site.data.index_tags_sections.star %}
-  {% assign ingredients_data = site.data.index_tags_sections.ingredients %}
-  {% assign tag_groups = site.data.index_tags_sections.groups %}
-  {% assign name_search_data = site.data.index_tags_sections.name_search %}
+  {% assign star_data = site.data.filter_sections.star %}
+  {% assign ingredients_data = site.data.filter_sections.ingredients %}
+  {% assign tag_groups = site.data.filter_sections.tag_groups %}
+  {% assign name_search_data = site.data.filter_sections.name_search %}
 
   {% assign all_recipes = site.recipes %}
   {% if site.drafts %}
