@@ -3,7 +3,7 @@ title: "Grandma's Spice Cake"
 short_name: "Grandma's Spice Cake"
 tagline: "How can you beat this! Change the spices if you like, but this is the original recipe."
 source: ""
-serves: One 7-inch round cake
+makes: "one 7-inch round cake"
 prep_time: "10 mins"
 cook_time: "35 mins"
 main_ingredients: [butter, "demerara sugar", "golden syrup", flour, ginger, "mixed spice"]
@@ -44,5 +44,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

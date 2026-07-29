@@ -6,7 +6,7 @@ source: Mum
 serves: However many people want to eat 150 g rice
 prep_time: "10 mins"
 cook_time: "20 mins"
-main_ingredients: ["brown rice", cashews, sultanas, "soy sauce", ginger]
+main_ingredients: ["brown rice", cashews, sultanas, "soy sauce", ginger, lemon, garlic]
 star_ingredient:
 tags: [salad]
 ingredient_groups:
@@ -14,9 +14,9 @@ ingredient_groups:
     - amount: "150 g"
       item: brown rice
     - amount: "2"
-      item: "handfuls cashews, toasted"
+      item: "handfuls of cashews, toasted"
     - amount: "2"
-      item: handfuls sultanas
+      item: handfuls of sultanas
     - amount: "2 tbsp"
       item: olive oil
     - amount: "3 tbsp"
@@ -26,7 +26,7 @@ ingredient_groups:
     - amount: "1 tsp"
       item: ginger paste
     - amount: "1 tsp"
-      item: garlic puree
+      item: garlic purée
     - item: Salt and plenty of pepper
 method:
   - Use common sense.
@@ -38,5 +38,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

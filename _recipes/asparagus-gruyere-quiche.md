@@ -6,7 +6,7 @@ source: Good friend Daniel
 serves: "4–6"
 prep_time: "30 mins plus 30 mins resting"
 cook_time: "1 hr"
-main_ingredients: [asparagus, gruyère, eggs, "double cream", parmesan]
+main_ingredients: [asparagus, gruyère, eggs, "double cream", parmesan, onion]
 star_ingredient: eggs
 tags: ["cheese-tastic", "make-ahead", "one-handed food", scalable]
 ingredient_groups:
@@ -70,5 +70,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

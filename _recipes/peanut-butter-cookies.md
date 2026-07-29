@@ -21,7 +21,7 @@ ingredient_groups:
       item: "dark brown soft sugar, lightly packed"
     - amount: "100 g"
       item: golden caster sugar
-    - item: Extra demarara sugar to coat
+    - item: Extra demerara sugar to coat
     - amount: "1 tsp"
       item: vanilla extract
     - amount: "1"
@@ -33,7 +33,7 @@ method:
   - Sift the flour and baking powder.
   - "Cream the butter with the sugars, then mix in the peanut butter, then the egg and vanilla extract."
   - Stir in the flour mixture.
-  - "Roll into one-inch balls, coat in demarara sugar, place on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."
+  - "Roll into one-inch balls, coat in demerara sugar, place on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."
   - Bake at 180°C for about 10 minutes.
   - Allow to cool completely on the baking sheet — they need to set before being transferred to a cooling rack.
 method_short:
@@ -42,5 +42,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

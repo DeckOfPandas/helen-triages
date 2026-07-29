@@ -6,7 +6,7 @@ source: Adapted from Gordon Ramsay Restaurants
 serves: 5
 prep_time: Estimated 15 mins
 cook_time: "25 mins"
-main_ingredients: [cauliflower, "cheddar cheese", "lancashire cheese", "cheshire cheese", breadcrumbs]
+main_ingredients: [cauliflower, "cheddar cheese", "lancashire cheese", "cheshire cheese", breadcrumbs, milk, "english mustard"]
 star_ingredient:
 tags: ["cheese-tastic", "one-handed food"]
 ingredient_groups:
@@ -52,5 +52,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: false
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

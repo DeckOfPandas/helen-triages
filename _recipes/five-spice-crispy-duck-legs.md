@@ -4,9 +4,9 @@ short_name: Five-Spice Duck Legs
 tagline: "Scored duck legs crusted in five-spice. Good with [cherry glaze](/recipes/cherry-glaze/)."
 source:
 serves: 4
-prep_time: "15 mins plus >=8h curing and >=2h flavouring"
-cook_time: "90 mins plus 15 mins resting"
-main_ingredients: ["duck leg", "five-spice", "coarse salt", "bay leaves", thyme]
+prep_time: "15 mins plus at least 8 hrs curing and 2 hrs flavouring"
+cook_time: "1 hr 30 mins plus 15 mins resting"
+main_ingredients: ["duck leg", "five-spice", "bay leaves", thyme]
 star_ingredient: duck
 tags: ["make-ahead", showstopper]
 ingredient_groups:
@@ -34,5 +34,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

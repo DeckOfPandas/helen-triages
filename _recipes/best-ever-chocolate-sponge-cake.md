@@ -3,7 +3,7 @@ title: Best-Ever Chocolate Sponge Cake
 short_name: Best-Ever Chocolate Sponge Cake
 tagline: Needs no introduction.
 source: "Adapted from Green and Black's Chocolate Recipes"
-serves: One double-layer 8-inch cake
+makes: "one double-layer 8-inch cake"
 prep_time: Estimated 30 mins
 cook_time: "20–25 mins"
 main_ingredients: ["cocoa powder", "dark chocolate", butter, eggs, flour]
@@ -78,5 +78,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

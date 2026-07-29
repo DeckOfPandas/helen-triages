@@ -5,8 +5,8 @@ tagline: This freezes brilliantly
 source: "Adapted from Good Food, August 2024"
 serves: 4
 prep_time: "20 mins plus marinating"
-cook_time: "60 mins"
-main_ingredients: ["chicken thighs", "coconut cream", lemongrass, lime, cinnamon, cardamom, galangal, tamarind, candlenuts]
+cook_time: "1 hr"
+main_ingredients: ["chicken thighs", "coconut cream", lemongrass, lime, cinnamon, cardamom, galangal, tamarind, "macadamia nuts"]
 star_ingredient: poultry
 tags: [fakeaway, freezable, "make-ahead", "one-handed food"]
 ingredient_groups:
@@ -76,5 +76,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

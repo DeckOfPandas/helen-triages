@@ -19,9 +19,9 @@ ingredient_groups:
       item: large egg whites
     - amount: "60 g"
       item: caster sugar
-    - item: demarara sugar and cocoa powder for the ramekins
+    - item: demerara sugar and cocoa powder for the ramekins
 method:
-  - step: "Prepare the ramekins by wiping with butter, then swirling around a mix of demarara sugar and cocoa."
+  - step: "Prepare the ramekins by wiping with butter, then swirling around a mix of demerara sugar and cocoa."
     tip: Wipe the butter upwards in the ramekins to help the soufflés rise. Hold each ramekin sideways over another one and rotate it until all the sides are coated with the sugar and cocoa mixture.
   - Melt the chocolate over a bain-marie.
   - "Mix the cocoa with 150 ml cold water in a saucepan, then bring to the boil while stirring continuously, boil for 10 seconds, then stir into the melted chocolate."
@@ -37,5 +37,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---

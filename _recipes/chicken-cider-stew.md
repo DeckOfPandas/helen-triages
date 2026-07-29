@@ -35,7 +35,7 @@ ingredient_groups:
       item: green beans
     - amount: "150 g"
       item: crème fraîche
-    - item: handful fresh chives and/or parsley
+    - item: "handful of fresh chives and/or parsley"
     - item: seasoning and flavourings — see note
 method:
   - Toss the chicken in olive oil then season.
@@ -62,5 +62,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-07-25"
 ---
