@@ -1,13 +1,13 @@
-{% if include.color %}
-  {% assign _color_rgb = site.data.colors[include.color] %}
-{% endif %}
+{% comment %} Colour comes from the .category--* class on the wrapper below,
+   defined in _sass/_palette.scss. The custom property inherits down to the
+   label, so nothing here needs to know what colour it is. {% endcomment %}
 {% if include.brush_colour %}
   {% assign _brush_colour = include.brush_colour %}
 {% endif %}
 
 <div class="category {{ include.group_class }}">
   <div class="category-label-row">
-    <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 1rem;{% if _color_rgb %} --highlighter-fill: rgb({{ _color_rgb }});{% endif %}">
+    <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 1rem;">
       {% if _brush_colour %}
         <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ _brush_colour }}"></span>
       {% endif %}

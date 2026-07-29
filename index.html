@@ -54,8 +54,7 @@ title: Home
 
   <div class="category search search--ingredients">
     <div class="search-input">
-      {% assign _ingredients_color_rgb = site.data.colors[ingredients_data.color] %}
-      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;{% if _ingredients_color_rgb %} --highlighter-fill: rgb({{ _ingredients_color_rgb }});{% endif %}">
+      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
         {% if ingredients_data.brush_colour %}
           <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ ingredients_data.brush_colour }}"></span>
         {% endif %}
@@ -69,8 +68,7 @@ title: Home
 
   <div class="category search search--name">
     <div class="search-input">
-      {% assign _name_color_rgb = site.data.colors[name_search_data.color] %}
-      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;{% if _name_color_rgb %} --highlighter-fill: rgb({{ _name_color_rgb }});{% endif %}">
+      <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
         {% if name_search_data.brush_colour %}
           <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ name_search_data.brush_colour }}"></span>
         {% endif %}
