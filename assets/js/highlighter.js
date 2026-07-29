@@ -6,10 +6,6 @@
 
 (function () {
 
-  // ── Base URL ──────────────────────────────────────────────────────────────
-  var baseMeta = document.querySelector('meta[name="base-url"]');
-  var BASE = baseMeta ? baseMeta.getAttribute('content').replace(/\/$/, '') : '';
-
   // ── Pool: 22 shapes (11 originals + 11 flips, shapes 2–12) ───────────────
   var POOL = [];
   for (var n = 2; n <= 12; n++) {
@@ -18,12 +14,7 @@
   }
 
   // ── Shuffle once per page load ────────────────────────────────────────────
-  var shuffled = POOL
-    .map(function(s) { return { s: s, r: Math.random() }; })
-    .sort(function(a, b) { return a.r - b.r; })
-    .map(function(o) { return o.s; });
-  var idx = 0;
-  function nextName() { return shuffled[idx++ % shuffled.length]; }
+  var nextName = window.HTF.makeShuffledPicker(POOL);
 
   // ── Texture randomisation ─────────────────────────────────────────────────
   var textureVariants = [
@@ -40,21 +31,11 @@
       .replace(/0\.4 0\.4 0\.4 0 0\.25|0\.3 0\.3 0\.3 0 0\.45/, tex.alphaRow);
   }
 
-  // ── SVG cache ─────────────────────────────────────────────────────────────
-  var cache = {};
-  function fetchSvg(name, cb) {
-    var url = BASE + '/assets/img/highlighters/' + name + '.svg';
-    if (cache[url]) { cb(cache[url]); return; }
-    fetch(url)
-      .then(function(r) { return r.text(); })
-      .then(function(t) { cache[url] = t; cb(t); })
-      .catch(function() {});
-  }
-
   // ── Inject into all slots ─────────────────────────────────────────────────
+  // Fetching, caching and error reporting all live in js/assets.js.
   document.querySelectorAll('.highlighter-slot').forEach(function(slot) {
-    var name = nextName();
-    fetchSvg(name, function(svg) {
+    var url = window.HTF.asset('/assets/img/highlighters/' + nextName() + '.svg');
+    window.HTF.fetchSvg(url, function(svg) {
       slot.innerHTML = applyTexture(svg);
     });
   });

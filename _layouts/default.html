@@ -31,25 +31,23 @@
   </footer>
 
 
+  {% comment %} assets.js must load first — it resolves the base URL and owns all
+     SVG fetching. Everything below depends on window.HTF. {% endcomment %}
+  <script src="{{ '/assets/js/assets.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/colours.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/highlighter.js' | relative_url }}"></script>
   <script>
   (function () {
-    var BASE = (document.querySelector('meta[name="base-url"]') || {getAttribute: function(){return '';}})
-               .getAttribute('content').replace(/\/$/, '');
+    // Base URL, SVG fetching, caching and shuffling all live in js/assets.js.
 
     // ── Watercolour brush backgrounds ────────────────────────────────────────
-    var brushCache = {};
     var brushShapes = [0,1,2,3,4,5,6,7,8,9];
-    function shuffleArr(arr) {
-      return arr.map(function(s){return{s:s,r:Math.random()};})
-               .sort(function(a,b){return a.r-b.r;})
-               .map(function(o){return o.s;});
-    }
-    var brushPicks = {}, brushOrders = {};
+    var brushPickers = {};
     function nextBrushShape(colour) {
-      if (!brushOrders[colour]) { brushOrders[colour] = shuffleArr(brushShapes); brushPicks[colour] = 0; }
-      return brushOrders[colour][brushPicks[colour]++ % 10];
+      if (!brushPickers[colour]) {
+        brushPickers[colour] = window.HTF.makeShuffledPicker(brushShapes);
+      }
+      return brushPickers[colour]();
     }
     function doInject(slot, svg) {
       var clean = svg
@@ -65,29 +63,23 @@
     }
     document.querySelectorAll('.watercolour-brush-slot').forEach(function(slot) {
       var colour = slot.getAttribute('data-brush-colour');
-      var shape  = nextBrushShape(colour);
-      var url    = BASE + '/assets/img/backgrounds-headers/background-watercolour-brush-' + colour + '-' + shape + '.svg';
-      if (brushCache[url]) { doInject(slot, brushCache[url]); return; }
-      fetch(url)
-        .then(function(r) { return r.text(); })
-        .then(function(t) { brushCache[url] = t; doInject(slot, t); })
-        .catch(function() {});
+      var url = window.HTF.asset(
+        '/assets/img/backgrounds-headers/background-watercolour-brush-'
+        + colour + '-' + nextBrushShape(colour) + '.svg');
+      window.HTF.fetchSvg(url, function(t) { doInject(slot, t); });
     });
 
     // ── Tape background ───────────────────────────────────────────────────
     var tapeSlot = document.querySelector('.tape-bg');
     if (tapeSlot) {
-      var tapeN   = Math.floor(Math.random() * 4) + 1;
-      var tapeUrl = BASE + '/assets/img/tape/tape-food-' + tapeN + '.svg';
-      fetch(tapeUrl)
-        .then(function(r) { return r.text(); })
-        .then(function(t) {
-          var fixed = t
+      var tapeN = Math.floor(Math.random() * 4) + 1;
+      window.HTF.fetchSvg(
+        window.HTF.asset('/assets/img/tape/tape-food-' + tapeN + '.svg'),
+        function(t) {
+          tapeSlot.innerHTML = t
             .replace(/<svg /, '<svg preserveAspectRatio="none" height="100%" ')
             .replace(/width="100%"/, 'width="100%"');
-          tapeSlot.innerHTML = fixed;
-        })
-        .catch(function() {});
+        });
     }
 
     // ── Site footer hearts ──────────────────────────────────────────────────
@@ -104,33 +96,16 @@
     // ── Index page category label doodles ───────────────────────────────────
     // Each [data-index-doodle] span gets an SVG fetched from assets/img/doodles/
     // and recoloured to the value in data-doodle-color.
-    var baseUrl = document.querySelector('meta[name="base-url"]');
-    var base = baseUrl ? baseUrl.getAttribute('content').replace(/\/$/, '') : '';
+    function injectDoodle(span, svgText) {
+      var colour = span.getAttribute('data-doodle-color');
+      span.innerHTML = svgText.replace(/fill="black"/g, 'fill="' + colour + '"');
+    }
 
-    var cache = {};
     document.querySelectorAll('[data-index-doodle]').forEach(function(el) {
-      var name  = el.getAttribute('data-index-doodle');
-      var color = el.getAttribute('data-doodle-color');
-      var url   = base + '/assets/img/doodles/' + name + '.svg';
-
-      function injectInto(span, svgText) {
-        var c = span.getAttribute('data-doodle-color');
-        var coloured = svgText.replace(/fill="black"/g, 'fill="' + c + '"');
-        span.innerHTML = coloured;
-      }
-
-      if (cache[name]) {
-        injectInto(el, cache[name]);
-      } else {
-        fetch(url)
-          .then(function(r) { return r.text(); })
-          .then(function(text) {
-            cache[name] = text;
-            document.querySelectorAll('[data-index-doodle="' + name + '"]').forEach(function(span) {
-              injectInto(span, text);
-            });
-          });
-      }
+      var name = el.getAttribute('data-index-doodle');
+      window.HTF.fetchSvg(
+        window.HTF.asset('/assets/img/doodles/' + name + '.svg'),
+        function(svgText) { injectDoodle(el, svgText); });
     });
   })();
   </script>

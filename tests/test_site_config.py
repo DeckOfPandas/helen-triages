@@ -172,3 +172,74 @@ def test_pantry_entries_are_actually_used():
         f"entry is a typo, or it is aspirational and should come out until "
         f"something actually uses it."
     )
+
+
+# --- one base URL, one fetch path -------------------------------------------
+
+JS_DIR = ROOT / "js"
+
+
+def test_base_url_is_derived_in_exactly_one_place():
+    """The base URL used to be copy-pasted four times, and the copies drifted.
+
+    Every decorative asset URL is built from this value, and the value changes
+    when `baseurl` changes — so a second copy is a second chance to be subtly
+    wrong on the day you deploy.
+    """
+    pattern = re.compile(r"""meta\[name=["']base-url["']\]""")
+    offenders = []
+    for path in sorted(JS_DIR.glob("*.js")) + [ROOT / "_layouts" / "default.html",
+                                               ROOT / "_layouts" / "recipe.html",
+                                               ROOT / "index.html"]:
+        if not path.exists():
+            continue
+        hits = len(pattern.findall(path.read_text(encoding="utf-8")))
+        # default.html legitimately EMITS the meta tag once; that is not a read.
+        if path.name == "default.html":
+            hits = max(0, hits)
+        if hits and path.name != "assets.js":
+            offenders.append(f"{path.name} ({hits})")
+    assert not offenders, (
+        f"base-url is read outside js/assets.js: {offenders}.\n"
+        f"Use window.HTF.base or window.HTF.asset(path) instead. assets.js is "
+        f"loaded first in default.html precisely so that it can be."
+    )
+
+
+def test_no_silently_swallowed_fetch_errors():
+    """An empty catch on an asset fetch is worse than no catch.
+
+    All five decorative SVG fetches used to end in `.catch(function() {})`, so a
+    wrong baseurl produced a site with no decoration and a completely clean
+    console. Fetching now goes through HTF.fetchSvg, which warns with the URL
+    and names the likely cause.
+    """
+    empty_catch = re.compile(r"\.catch\(\s*function\s*\(\s*\)\s*\{\s*\}\s*\)")
+    offenders = []
+    for path in sorted(JS_DIR.glob("*.js")) + list((ROOT / "_layouts").glob("*.html")):
+        text = path.read_text(encoding="utf-8")
+        if empty_catch.search(text):
+            offenders.append(path.name)
+    assert not offenders, (
+        f"Empty catch block(s) found in {offenders}. Report the failure — an "
+        f"asset that silently does not load is indistinguishable from an asset "
+        f"that was never meant to be there."
+    )
+
+
+def test_svg_fetching_goes_through_the_shared_helper():
+    """No direct fetch() for assets outside assets.js."""
+    offenders = []
+    for path in sorted(JS_DIR.glob("*.js")) + list((ROOT / "_layouts").glob("*.html")):
+        if path.name == "assets.js":
+            continue
+        text = path.read_text(encoding="utf-8")
+        for match in re.finditer(r"(?<!HTF\.)\bfetch\(", text):
+            snippet = text[max(0, match.start() - 30):match.end() + 30].replace("\n", " ")
+            offenders.append(f"{path.name}: …{snippet}…")
+    assert not offenders, (
+        "Direct fetch() call(s) found outside js/assets.js:\n  "
+        + "\n  ".join(offenders)
+        + "\n\nUse window.HTF.fetchSvg(url, cb) so the call gets caching and a "
+          "diagnostic warning on failure."
+    )
