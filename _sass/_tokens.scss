@@ -4,9 +4,33 @@
 // Non-colour design decisions: spacing, sizing, typography scale, stroke weights.
 // Import after _palette.scss (tokens may reference palette variables).
 
-// --- Spacing -----------------------------------------------------------------
+// --- Spacing scale -----------------------------------------------------------
+// These six values already accounted for 75 of the ~227 numeric literals in
+// _layout.scss and _recipe.scss before they were named. The scale existed in
+// fact; it just was not written down, which made "tighten everything slightly"
+// a forty-edit job instead of a one-edit job.
+//
+// Use these for margin, padding, gap and offsets. Do NOT use them for
+// font-size — a padding and a type size that happen to share a value are not
+// the same decision, and tying them together means changing one changes the
+// other.
+$space-xxs: 0.15rem;
+$space-xs:  0.3rem;
+$space-sm:  0.5rem;
+$space-md:  0.75rem;
+$space-lg:  1rem;
+$space-xl:  1.5rem;
+$space-xxl: 2rem;
+
+// --- Named spacing (specific jobs, not scale steps) --------------------------
 $spacing-section-gap: 1.75rem;   // bottom margin after tagline, badges, meta — before sections
 $spacing-section-top: 3rem;      // top margin on section headings
+
+// --- Widths ------------------------------------------------------------------
+// NOT a breakpoint — it is the max content width of the page and the recipe
+// column, and was hardcoded as 900px in three places. Named $width- rather than
+// $breakpoint- deliberately: nothing here responds to viewport size.
+$width-content: 900px;
 
 // --- Typography Scale --------------------------------------------------------
 $font-size-body-sm:  0.92rem;    // notes, method-short, body content prose

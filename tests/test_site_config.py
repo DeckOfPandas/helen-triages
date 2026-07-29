@@ -416,3 +416,78 @@ def test_no_orphaned_data_file_references():
         f"longer exists. Jekyll resolves a missing data file to nil silently, so "
         f"the symptom is empty filter groups rather than an error."
     )
+
+
+# --- SCSS structure ----------------------------------------------------------
+
+SASS_DIR = ROOT / "_sass"
+
+
+def _top_level_blocks(text: str):
+    """Yield (selector, [declared properties]) for every zero-indent rule."""
+    depth = 0
+    current = None
+    props: list[str] = []
+    for line in text.split("\n"):
+        code = line.split("//")[0]
+        if depth == 0:
+            match = re.match(r"^([.#%&][^{}/]*?)\s*\{", line)
+            if match:
+                current = " ".join(match.group(1).split())
+                props = []
+        elif depth == 1 and current:
+            decl = re.match(r"^\s{2}([a-z-]+)\s*:", line)
+            if decl:
+                props.append(decl.group(1))
+        depth += code.count("{") - code.count("}")
+        if depth == 0 and current and "}" in code:
+            yield current, props
+            current = None
+
+
+def test_no_selector_declares_the_same_property_twice():
+    """A selector may legitimately appear more than once.
+
+    `_layout.scss` groups by concern — the clip-path SHAPES for .btn-star sit
+    with the badges, its appearance sits with the buttons. That is a deliberate
+    structure and merging the blocks would flatten it.
+
+    What is never safe is the same PROPERTY declared for the same selector in
+    two blocks, because then the later one silently wins and editing the earlier
+    one appears to do nothing. That is the actual hazard, so that is what this
+    tests — not mere repetition.
+    """
+    from collections import defaultdict
+    problems = []
+    for path in sorted(SASS_DIR.glob("*.scss")):
+        seen = defaultdict(lambda: defaultdict(int))
+        for selector, props in _top_level_blocks(path.read_text(encoding="utf-8")):
+            for prop in set(props):
+                seen[selector][prop] += 1
+        for selector, counts in seen.items():
+            clashes = sorted(p for p, n in counts.items() if n > 1)
+            if clashes:
+                problems.append(f"{path.name}: `{selector}` declares {clashes} in more than one block")
+    assert not problems, (
+        "The same property is declared for one selector in two separate blocks:\n  "
+        + "\n  ".join(problems)
+        + "\n\nThe later block wins, so editing the earlier one does nothing. "
+          "Merge them, or move the property to whichever block owns that concern."
+    )
+
+
+def test_spacing_tokens_are_not_used_for_type():
+    """$space-* is for margin, padding and gaps — never font-size.
+
+    A padding and a type size that happen to share a value are not the same
+    decision. Tying them together means changing one changes the other.
+    """
+    offenders = []
+    for path in sorted(SASS_DIR.glob("*.scss")):
+        for i, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+            if re.search(r"(font-size|line-height|letter-spacing)\s*:.*\$space-", line):
+                offenders.append(f"{path.name}:{i} {line.strip()[:60]}")
+    assert not offenders, (
+        "A spacing token is being used for typography:\n  " + "\n  ".join(offenders)
+        + "\n\nUse the $font-size-* scale, or a literal if the value is a one-off."
+    )
