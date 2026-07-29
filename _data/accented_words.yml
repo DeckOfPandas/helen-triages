@@ -1,0 +1,81 @@
+# =============================================================================
+# ACCENTED WORDS
+#
+# A curated list of culinary words whose correct spelling carries an accent.
+# `tests/test_style.py` checks prose against it — title, tagline, notes, method
+# steps, tips and ingredient items.
+#
+# WHY A LIST RATHER THAN A DETECTOR
+# A general "does this word look like it's missing an accent" check cannot tell
+# a typo from a word that never had one, and it trips over every brand name and
+# source citation. A curated list is honest about being incomplete, and adding
+# to it is a YAML edit.
+#
+# WHAT IS DELIBERATELY NOT CHECKED
+#   - slugs and filenames — URLs must stay ASCII, so `comte-gougeres.md` is
+#     correct even though the dish is Comté Gougères
+#   - the `source:` field — citations are reproduced as the publication writes
+#     them. "Cafe Delites" is a real name spelled that way; correcting it would
+#     be a misquote
+#
+# NOT EVERY FRENCH-LOOKING WORD TAKES AN ACCENT. `echalion` is a UK trade name
+# for banana shallots and is written without one in British usage — it is
+# listed under `no_accent` below so nobody "fixes" it back.
+# =============================================================================
+
+words:
+  acai: açaí
+  aioli: aïoli
+  bearnaise: béarnaise
+  bechamel: béchamel
+  brulee: brûlée
+  canape: canapé
+  canapes: canapés
+  chevre: chèvre
+  comte: comté
+  consomme: consommé
+  creme: crème
+  cremeux: crémeux
+  crepe: crêpe
+  crepes: crêpes
+  eclair: éclair
+  eclairs: éclairs
+  entrecote: entrecôte
+  flambe: flambé
+  fraiche: fraîche
+  frisee: frisée
+  gateau: gâteau
+  gougere: gougère
+  gougeres: gougères
+  gruyere: gruyère
+  jalapeno: jalapeño
+  jalapenos: jalapeños
+  mariniere: marinière
+  nicoise: niçoise
+  pate: pâté
+  patisserie: pâtisserie
+  patissiere: pâtissière
+  pina: piña
+  puree: purée
+  pureed: puréed
+  purees: purées
+  ragu: ragù
+  rosti: rösti
+  saute: sauté
+  sautes: sautés
+  sauteed: sautéed
+  souffle: soufflé
+  souffles: soufflés
+  veloute: velouté
+
+# Words that LOOK as though they want an accent and do not. Listed so the rule
+# is recorded rather than rediscovered.
+no_accent:
+  - echalion    # UK trade name for banana shallots; unaccented in British usage
+  - chorizo
+  - gratin
+  - julienne
+  - vinaigrette
+  - dauphinoise
+  - mornay
+  - confit

@@ -1,0 +1,130 @@
+# =============================================================================
+# INGREDIENT SEARCH VOCABULARY
+#
+# Everything filters.js needs to know about ingredient WORDS. Lifted out of the
+# JavaScript so that changing how search behaves is a YAML edit, not a code edit.
+#
+# index.html emits this as JSON in a <script type="application/json"> block and
+# filters.js reads it at startup. No build tooling, no bundler — plain Jekyll.
+# =============================================================================
+
+search:
+  # A query must be at least this long before "(all)" family buttons appear.
+  #
+  # THIS NUMBER LIVES HERE AND NOWHERE ELSE. It used to be a bare `>= 3` inside
+  # filters.js with no definition behind it, which meant every rewrite of that
+  # file re-derived it from scratch and landed on 2 — the intuitive default for
+  # a substring search. It was not a bug, it was an absence of a definition.
+  #
+  # Two shows too much: with a two-character query, nearly every ingredient
+  # matches something and the family buttons become noise rather than a
+  # shortcut. Three is where the suggestions start being useful.
+  family_button_min_chars: 3
+
+# -----------------------------------------------------------------------------
+# Singulars — plural form on the left, the form to match on, on the right.
+#
+# Used to normalise ingredient words before comparison, so that "chicken legs"
+# and "chicken leg" collapse to the same entry rather than both appearing.
+# Only irregular or non-obvious plurals need listing.
+# -----------------------------------------------------------------------------
+singulars:
+  anchovies: anchovy
+  apples: apple
+  beans: bean
+  berries: berry
+  breasts: breast
+  cashews: cashew
+  cheeks: cheek
+  cherries: cherry
+  chips: chip
+  chops: chop
+  cloves: clove
+  eggs: egg
+  fillets: fillet
+  leaves: leaf
+  legs: leg
+  mussels: mussel
+  noodles: noodle
+  olives: olive
+  oranges: orange
+  peaches: peach
+  potatoes: potato
+  prawns: prawn
+  ribs: rib
+  sardines: sardine
+  scallops: scallop
+  steaks: steak
+  thighs: thigh
+  tomatoes: tomato
+
+# -----------------------------------------------------------------------------
+# Synonyms — the collapse behaviour.
+#
+# When a query exactly matches a key, any ingredient containing any of the
+# listed words counts as a match, and the key earns a forced "(all)" button.
+# This is what makes searching "cheese" return Cheshire, cheddar and mozzarella.
+#
+# The key should always appear in its own list, so that a literal match still
+# works.
+#
+# DO NOT add unaccented variants here. `comte` and `gruyere` used to be listed
+# as accent workarounds, which had the unwanted effect of making those queries
+# return the ENTIRE cheese family rather than the one cheese. filters.js now
+# strips diacritics when matching, so the accented spelling is the only entry
+# needed and typing without accents still works.
+# -----------------------------------------------------------------------------
+synonyms:
+  pasta:
+    - pasta
+    - spaghetti
+    - tagliatelle
+    - linguine
+    - pappardelle
+    - fettuccine
+    - farfalle
+    - fusilli
+    - penne
+    - rigatoni
+    - conchiglie
+    - orecchiette
+    - orzo
+    - macaroni
+    - lasagne
+    - lasagna
+    - gnocchi
+    - tortellini
+    - ravioli
+    - cannelloni
+
+  cheese:
+    - cheese
+    - cheddar
+    - parmesan
+    - parmigiano
+    - gruyère
+    - mozzarella
+    - ricotta
+    - feta
+    - brie
+    - camembert
+    - gouda
+    - stilton
+    - gorgonzola
+    - manchego
+    - pecorino
+    - halloumi
+    - burrata
+    - mascarpone
+    - cream cheese
+    - cottage cheese
+    # Named cheeses that no longer carry the word "cheese" in main_ingredients,
+    # so they need listing explicitly to stay findable under a "cheese" search.
+    - cheshire
+    - lancashire
+    - comté
+    - swiss
+
+  stock:
+    - stock
+    - broth

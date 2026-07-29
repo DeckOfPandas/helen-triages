@@ -132,3 +132,43 @@ def test_temperatures_use_degree_c(recipe):
         f"{where(recipe)} writes temperature(s) {bad} without the degree sign. "
         f"Always °C, e.g. 200°C."
     )
+
+
+# --- accents ----------------------------------------------------------------
+
+def _accented_words() -> dict:
+    import yaml
+    from conftest import DATA_DIR
+    path = DATA_DIR / "accented_words.yml"
+    if not path.exists():
+        pytest.skip(
+            "_data/accented_words.yml is missing. It is the curated list of "
+            "culinary words whose correct spelling carries an accent."
+        )
+    return (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("words") or {}
+
+
+def test_accents_in_prose(recipe):
+    """Culinary words that take an accent should have one.
+
+    Checked against the curated list in _data/accented_words.yml rather than by
+    detection, because no detector can tell a missing accent from a word that
+    never had one.
+
+    Scope is prose only — never slugs or filenames, which must stay ASCII, and
+    never `source:`, where a citation is reproduced as the publication spells it.
+    """
+    words = _accented_words()
+    if not words:
+        return
+    problems = []
+    for location, text in recipe.prose:
+        for plain, accented in words.items():
+            if re.search(rf"\b{re.escape(plain)}\b", text, re.I):
+                problems.append(f"{location}: '{plain}' should be '{accented}'")
+    assert not problems, (
+        f"{where(recipe)} uses unaccented spelling(s):\n  " + "\n  ".join(problems)
+        + "\n\nIf the word genuinely takes no accent in British usage, add it to "
+          "the `no_accent` list in _data/accented_words.yml so nobody 'fixes' it "
+          "back."
+    )

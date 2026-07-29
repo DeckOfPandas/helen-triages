@@ -148,4 +148,11 @@ title: Home
   Select something to see a list.
 </div>
 
+{% comment %} The ingredient search vocabulary — singulars, synonyms and the
+   family-button threshold — comes from _data/ingredient_words.yml. filters.js
+   reads it from here rather than hardcoding any of it. {% endcomment %}
+<script type="application/json" id="ingredient-vocabulary">
+  {{ site.data.ingredient_words | jsonify }}
+</script>
+
 <script src="{{ '/assets/js/filters.js' | relative_url }}"></script>

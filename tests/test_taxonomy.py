@@ -135,3 +135,47 @@ def test_no_claude_markers_left(recipe):
         f"These are instructions left for a future session and should be "
         f"actioned and removed before publication."
     )
+
+
+# --- ingredient spelling collisions -----------------------------------------
+
+def _fold(text: str) -> str:
+    """Strip diacritics and case — the form the search layer compares on."""
+    import unicodedata
+    stripped = "".join(
+        c for c in unicodedata.normalize("NFD", text) if not unicodedata.combining(c)
+    )
+    return stripped.lower()
+
+
+def test_no_main_ingredient_spelling_collisions():
+    """No two ingredient entries anywhere differing only by accent or case.
+
+    Two spellings of one ingredient means two filter buttons for one thing —
+    a `comté` button and a `comte` button, each holding half the recipes. The
+    search layer folds accents when matching, so the collision is invisible
+    until someone browses the buttons.
+
+    This test covers drafts as well as published recipes: a draft carries its
+    spelling with it when it is promoted.
+    """
+    from collections import defaultdict
+    from conftest import ALL_RECIPES, ALL_DRAFTS
+
+    forms = defaultdict(set)
+    sources = defaultdict(set)
+    for r in ALL_RECIPES + ALL_DRAFTS:
+        for entry in (r.fm.get("main_ingredients") or []):
+            entry = str(entry)
+            forms[_fold(entry)].add(entry)
+            sources[_fold(entry)].add(r.slug)
+
+    collisions = {k: v for k, v in forms.items() if len(v) > 1}
+    assert not collisions, (
+        "main_ingredients contains the same ingredient spelled more than one way:\n  "
+        + "\n  ".join(
+            f"{sorted(v)} — in {sorted(sources[k])[:4]}" for k, v in sorted(collisions.items())
+        )
+        + "\n\nPick one spelling and use it everywhere. Proper nouns keep their "
+          "capital (Parma ham, Dijon mustard); everything else is lowercase."
+    )

@@ -35,58 +35,72 @@ document.addEventListener('DOMContentLoaded', function () {
   var nameSearchBox = document.getElementById('name-search-box');
   var nameSearchClear = document.getElementById('name-search-clear');
 
-  var singularMap = {
-    'eggs':     'egg',
-    'legs':     'leg',
-    'breasts':  'breast',
-    'thighs':   'thigh',
-    'fillets':  'fillet',
-    'cheeks':   'cheek',
-    'beans':    'bean',
-    'chips':    'chip',
-    'leaves':   'leaf',
-    'cloves':   'clove',
-    'peaches':  'peach',
-    'cherries': 'cherry',
-    'tomatoes': 'tomato',
-    'potatoes': 'potato',
-    'berries':  'berry',
-    'olives':   'olive',
-    'noodles':  'noodle',
-    'chops':    'chop',
-    'steaks':   'steak',
-    'prawns':   'prawn',
-    'mussels':  'mussel',
-    'scallops': 'scallop',
-    'anchovies':'anchovy',
-    'sardines': 'sardine',
-    'ribs':     'rib',
-    'apples':   'apple',
-    'oranges':  'orange',
-    'cashews':  'cashew'
-  };
+  // ---------------------------------------------------------------------------
+  // Ingredient vocabulary — read from _data/ingredient_words.yml, emitted as
+  // JSON by index.html. Nothing about ingredient words is written down in this
+  // file; to change search behaviour, edit the YAML.
+  // ---------------------------------------------------------------------------
+  var VOCABULARY = (function () {
+    var fallback = { search: { family_button_min_chars: 3 }, singulars: {}, synonyms: {} };
+    var node = document.getElementById('ingredient-vocabulary');
+    if (!node) {
+      console.warn(
+        'filters.js: no #ingredient-vocabulary block found. index.html should ' +
+        'emit _data/ingredient_words.yml as JSON before loading this script. ' +
+        'Ingredient search will run without singulars or synonyms.'
+      );
+      return fallback;
+    }
+    try {
+      var parsed = JSON.parse(node.textContent);
+      parsed.search = parsed.search || fallback.search;
+      parsed.singulars = parsed.singulars || {};
+      parsed.synonyms = parsed.synonyms || {};
+      return parsed;
+    } catch (e) {
+      console.warn('filters.js: could not parse #ingredient-vocabulary — ' + e.message);
+      return fallback;
+    }
+  })();
+
+  // The minimum query length before "(all)" family buttons appear.
+  // DO NOT replace this with a literal. The value is defined once, in
+  // _data/ingredient_words.yml, precisely so that it cannot drift.
+  var FAMILY_BUTTON_MIN_CHARS = VOCABULARY.search.family_button_min_chars;
+
+  var singularMap = VOCABULARY.singulars;
 
   function normaliseIngredientWord(word) {
     return singularMap[word] || word;
   }
 
-  // synonymMap: maps a query word to a set of ingredient words that count as matches.
-  // When the query exactly equals a key, any ingredient containing any of the
-  // listed words is treated as a candidate, and the key earns a forced (all) button.
-  var synonymMap = {
-    'pasta':  ['pasta', 'spaghetti', 'tagliatelle', 'linguine', 'pappardelle',
-               'fettuccine', 'farfalle', 'fusilli', 'penne', 'rigatoni',
-               'conchiglie', 'orecchiette', 'orzo', 'macaroni', 'lasagne',
-               'lasagna', 'gnocchi', 'tortellini', 'ravioli', 'cannelloni'],
-    'cheese': ['cheese', 'cheddar', 'parmesan', 'parmigiano', 'gruyère', 'gruyere',
-               'mozzarella', 'ricotta', 'feta', 'brie', 'camembert', 'gouda',
-               'stilton', 'gorgonzola', 'manchego', 'pecorino', 'halloumi',
-               'burrata', 'mascarpone', 'cream cheese', 'cottage cheese'],
-    'stock':  ['stock', 'broth']
-  };
+  // synonymMap: maps a query word to a set of ingredient words that count as
+  // matches. When the query exactly equals a key, any ingredient containing any
+  // of the listed words is treated as a candidate, and the key earns a forced
+  // (all) button.
+  var synonymMap = VOCABULARY.synonyms;
+
+  // Strip diacritics for MATCHING ONLY. Nobody types "comté" into a search box,
+  // so folding both sides lets `comte`, `comté` and `mte` all find the same
+  // ingredient. Display is never folded — buttons render the ingredient's real
+  // text, accents intact.
+  function fold(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  // Synonym keys are folded once at startup so a folded query still finds them.
+  var foldedSynonymMap = (function () {
+    var out = {};
+    Object.keys(synonymMap).forEach(function (key) {
+      out[fold(key.toLowerCase())] = synonymMap[key].map(function (w) {
+        return fold(String(w).toLowerCase());
+      });
+    });
+    return out;
+  })();
 
   function getSynonymWords(query) {
-    return synonymMap[query] || null;
+    return foldedSynonymMap[query] || null;
   }
 
   function hasActiveFilters() {
@@ -96,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function getWords(str) {
     return str.toLowerCase().trim().split(/\s+/).filter(Boolean);
   }
+
 
   function makeIngredientButton(key, label) {
     var btn = document.createElement('button');
@@ -120,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function renderResultsPool() {
   if (!searchBox || !resultsPool) return;
-  var query = searchBox.value.trim().toLowerCase();
+  var query = fold(searchBox.value.trim().toLowerCase());
   resultsPool.innerHTML = '';
   activeIngredient = null;
   isSearching = !!query;
@@ -128,22 +143,31 @@ function renderResultsPool() {
     update();
     return;
   }
-  var enableFamilyButtons = query.length >= 3;
+  var enableFamilyButtons = query.length >= FAMILY_BUTTON_MIN_CHARS;
   var renderedKeys = new Set();
   var queryWords = query.split(/\s+/).filter(Boolean);
   var multiWord = queryWords.length > 1;
 
   // Count how many DISTINCT ingredient entries each normalised word appears in.
   // A word shared by 2+ entries is a "family" and earns an umbrella "(all)" button.
+  //
+  // Entries are counted by their NORMALISED key, not their raw text. Two entries
+  // that differ only by pluralisation are the same entry as far as the reader is
+  // concerned, and should not conjure a family between them: "peach" and
+  // "peaches" both normalise to "peach", so they count once and no spurious
+  // "peach (all)" button appears. Genuine families — "cheese" spanning "blue
+  // cheese", "cheddar cheese", "cream cheese" — have distinct normalised keys
+  // and are unaffected.
   var wordToEntries = {};
   masterIngredientsList.forEach(function(ing) {
-    var normWords = getWords(ing).map(normaliseIngredientWord);
+    var normWords = getWords(ing).map(normaliseIngredientWord).map(fold);
+    var entryKey = normWords.join(' ');
     var seenInThisEntry = new Set();
     normWords.forEach(function(w) {
       if (seenInThisEntry.has(w)) return;
       seenInThisEntry.add(w);
       if (!wordToEntries[w]) wordToEntries[w] = new Set();
-      wordToEntries[w].add(ing.toLowerCase());
+      wordToEntries[w].add(entryKey);
     });
   });
 
@@ -185,8 +209,8 @@ function renderResultsPool() {
 
     masterIngredientsList.forEach(function(ing) {
       var ingWords = getWords(ing);
-      var normWords = ingWords.map(normaliseIngredientWord);
-      var ingLower = ing.toLowerCase();
+      var normWords = ingWords.map(normaliseIngredientWord).map(fold);
+      var ingLower = fold(ing.toLowerCase());
 
       var matchedAnyWord;
       if (synonymWords) {
@@ -197,7 +221,7 @@ function renderResultsPool() {
         });
       } else {
         matchedAnyWord = ingWords.some(function(word) {
-          return word.indexOf(query) !== -1;
+          return fold(word).indexOf(query) !== -1;
         });
       }
       if (!matchedAnyWord) return;
@@ -205,10 +229,11 @@ function renderResultsPool() {
       var normKey = normWords.join(' ');
       candidates.push({ ing: ing, normWords: normWords, normKey: normKey });
 
-      // Check each matched word for family membership (only for queries >= 3 chars)
+      // Check each matched word for family membership (only for queries at or
+      // above FAMILY_BUTTON_MIN_CHARS — see _data/ingredient_words.yml)
       if (enableFamilyButtons && !synonymWords) {
         ingWords.forEach(function(word, idx) {
-          if (word.indexOf(query) === -1) return;
+          if (fold(word).indexOf(query) === -1) return;
           var normWord = normWords[idx];
           var entries = wordToEntries[normWord];
           if (entries && entries.size > 1) {
