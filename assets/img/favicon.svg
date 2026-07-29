@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Helen Triages Food">
+  <!-- Aureolin highlighter block with a vivid rose H. Colours match
+       _sass/_palette.scss: $color-aureolin #FAF100, $color-vivid-rose #FF0061.
+       Deliberately plain — at 16px anything finer turns to mud. Replace freely. -->
+  <rect width="64" height="64" rx="10" fill="#FAF100"/>
+  <path d="M18 14h7v14h14V14h7v36h-7V35H25v15h-7z" fill="#FF0061"/>
+</svg>

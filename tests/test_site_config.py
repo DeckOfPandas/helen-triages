@@ -243,3 +243,54 @@ def test_svg_fetching_goes_through_the_shared_helper():
         + "\n\nUse window.HTF.fetchSvg(url, cb) so the call gets caching and a "
           "diagnostic warning on failure."
     )
+
+
+# --- repo and deployment hygiene --------------------------------------------
+
+def test_gemfile_does_not_pin_jekyll_backwards():
+    """The `github-pages` gem would silently downgrade Jekyll 4.3 to 3.9.
+
+    It is only needed for GitHub Pages' classic branch-based build. Deployment
+    here runs `bundle exec jekyll build` in an Actions workflow, so the version
+    in the Gemfile is the one actually used.
+    """
+    lines = read("Gemfile").splitlines()
+    active = [l for l in lines if l.strip() and not l.strip().startswith("#")]
+    offenders = [l.strip() for l in active if "github-pages" in l]
+    assert not offenders, (
+        f"Gemfile has an active github-pages gem: {offenders}.\n"
+        f"This pins Jekyll to 3.9. Remove it — the Actions workflow builds with "
+        f"whatever `gem \"jekyll\"` says, and that should stay at ~> 4.3."
+    )
+
+
+def test_gitignore_covers_build_output():
+    """Both build directories, or one of them ends up committed."""
+    path = ROOT / ".gitignore"
+    assert path.exists(), ".gitignore is missing from the repo root."
+    text = path.read_text(encoding="utf-8")
+    required = ["_site/", "_site_prod/", ".jekyll-cache/"]
+    missing = [r for r in required if r not in text]
+    assert not missing, (
+        f".gitignore does not cover {missing}.\n"
+        f"`_site_prod/` is the newer one — it is where the production preview "
+        f"server builds, and it is easy to forget because it postdates the "
+        f"original .gitignore."
+    )
+
+
+def test_page_has_a_description_and_link_preview():
+    """A pasted recipe URL should show a title and a description, not a bare link."""
+    html = read("_layouts", "default.html")
+    required = {
+        'name="description"': "search engines and link previews",
+        'property="og:title"': "the title on a shared link",
+        'property="og:description"': "the description on a shared link",
+        'property="og:url"': "the canonical URL on a shared link",
+    }
+    missing = [f"{tag} ({why})" for tag, why in required.items() if tag not in html]
+    assert not missing, (
+        "_layouts/default.html is missing meta tag(s):\n  " + "\n  ".join(missing)
+        + "\n\nWithout these, pasting a recipe link into a chat shows the URL "
+          "and nothing else."
+    )
