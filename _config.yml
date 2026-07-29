@@ -1,8 +1,19 @@
+# =============================================================================
+# PRODUCTION CONFIG — this is what deploys.
+# Anything that should only ever be visible on your own machine belongs in
+# _config_local.yml, not here.
+# =============================================================================
+
 title: Helen Triages Food
 description: What to cook, not how to cook
-url: ""
-baseurl: "/food"
 
+# GitHub Pages project site. Repo is helen-triages-food, so the published URL is
+#   https://<your-github-username>.github.io/helen-triages-food/
+# baseurl must match the repo name exactly: leading slash, no trailing slash.
+url: "https://deckofpandas.github.io"
+baseurl: "/helen-triages-food"
+
+# Drafts and unrewritten recipes are never shown in production.
 show_unrewritten: false
 
 collections:
@@ -10,8 +21,9 @@ collections:
     output: true
     permalink: /recipes/:path/
   drafts:
-    output: true
-    permalink: /drafts/:path/
+    # output: false means drafts get NO public URL and are NOT in the sitemap.
+    # _config_local.yml flips this back to true so you can still read them locally.
+    output: false
 
 defaults:
   - scope:
@@ -24,6 +36,7 @@ defaults:
       type: drafts
     values:
       layout: recipe
+      sitemap: false   # belt and braces: excluded even if output is ever flipped
 
 sass:
   sass_dir: _sass
