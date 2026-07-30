@@ -15,7 +15,13 @@ document.addEventListener('DOMContentLoaded', function () {
       allIngredientsSet.add(ing);
     });
   });
-  var masterIngredientsList = Array.from(allIngredientsSet).sort();
+  // A plain .sort() is case-sensitive — every capital letter sorts before
+  // every lowercase one, so "Chinese five spice" would jump ahead of "chai",
+  // "cheddar" and "cheese" instead of sitting between "chestnuts" and
+  // "chives" where it belongs.
+  var masterIngredientsList = Array.from(allIngredientsSet).sort(function(a, b) {
+    return a.toLowerCase().localeCompare(b.toLowerCase());
+  });
 
   var matrix = document.querySelector('.controls');
   var recipeList = document.querySelector('.recipe-list');
@@ -172,15 +178,27 @@ function renderResultsPool() {
   });
 
   if (multiWord) {
+    var multiMatches = [];
     masterIngredientsList.forEach(function(ing) {
       var ingWords = getWords(ing);
       var ingKey = ingWords.map(normaliseIngredientWord).join(' ');
       var allMatch = queryWords.every(function(qw) {
         return ingWords.some(function(iw) { return iw.indexOf(qw) !== -1; });
       });
-      if (allMatch && !renderedKeys.has(ingKey)) {
-        renderedKeys.add(ingKey);
-        resultsPool.appendChild(makeIngredientButton(ing, ing));
+      if (!allMatch) return;
+      // Same "start of word beats mid-word" rule as the single-word path:
+      // ranked higher only if EVERY query word is a prefix of its match.
+      var allPrefixMatch = queryWords.every(function(qw) {
+        return ingWords.some(function(iw) { return iw.indexOf(qw) === 0; });
+      });
+      multiMatches.push({ ing: ing, ingKey: ingKey, isPrefixMatch: allPrefixMatch });
+    });
+    var multiPrefix = multiMatches.filter(function(c) { return c.isPrefixMatch; });
+    var multiRest = multiMatches.filter(function(c) { return !c.isPrefixMatch; });
+    multiPrefix.concat(multiRest).forEach(function(c) {
+      if (!renderedKeys.has(c.ingKey)) {
+        renderedKeys.add(c.ingKey);
+        resultsPool.appendChild(makeIngredientButton(c.ing, c.ing));
       }
     });
   } else {
@@ -198,38 +216,66 @@ function renderResultsPool() {
     //    — i.e. single-word entries like bare "chicken" when "chicken (all)" exists.
 
     // Step 1: collect all matching entries with their normalised word sets.
-    var candidates = []; // { ing, normWords, normKey }
+    var candidates = []; // { ing, normWords, normKey, isFamilyMember, isPrefixMatch }
     var familyWords = new Set(); // words that earn an (all) button
+    var engagedFamilyWords = new Set(); // folded synonym words for families the query is heading towards
 
-    // TYPING NARROWS, NEVER WIDENS.
+    // A curated family (declared in _data/ingredient_words.yml `synonyms`) is
+    // ENGAGED once the query is a recognisable prefix of its name — "chees" is
+    // clearly heading towards "cheese". A curated family has a known, finite
+    // membership list, so its members are surfaced inline rather than gated
+    // behind the "(all)" button, which stays as a one-click way to select the
+    // whole family as a single filter.
     //
-    // The synonym families in _data/ingredient_words.yml are deliberately NOT
-    // used to expand these suggestions. They used to be: an exact query match
-    // swapped substring matching for the whole curated family, so "chees"
-    // offered seven buttons and "cheese" offered twenty-one. One keystroke
-    // exploded the result set, which is the opposite of what a search box
-    // should do.
-    //
-    // The family is now reachable only through its "(all)" button, which the
-    // click handler expands using the same synonym list. Naming a declared
-    // family always earns that button, whether or not the word happens to
-    // appear literally in any ingredient.
-    if (getSynonymWords(query)) familyWords.add(query);
+    // This replaces the old "typing narrows, never widens" rule, which existed
+    // to stop one keystroke exploding into twenty buttons — but it also meant
+    // even typing "cheese" in full only ever showed entries literally
+    // containing the word "cheese", never cheddar, feta or gouda. Reversed at
+    // Helen's request: a curated family is a known list, not an open-ended
+    // one, so widening to it is safe.
+    if (enableFamilyButtons) {
+      Object.keys(foldedSynonymMap).forEach(function (key) {
+        if (key.indexOf(query) === 0) {
+          familyWords.add(key);
+          foldedSynonymMap[key].forEach(function (w) { engagedFamilyWords.add(w); });
+        }
+      });
+    }
 
     masterIngredientsList.forEach(function(ing) {
       var ingWords = getWords(ing);
       var normWords = ingWords.map(normaliseIngredientWord).map(fold);
+      var normKey = normWords.join(' ');
 
       var matchedAnyWord = ingWords.some(function(word) {
         return fold(word).indexOf(query) !== -1;
       });
-      if (!matchedAnyWord) return;
 
-      var normKey = normWords.join(' ');
-      candidates.push({ ing: ing, normWords: normWords, normKey: normKey });
+      // Membership check mirrors how the (all) button itself filters recipes
+      // in update() — a substring match against the whole ingredient text —
+      // so "cream cheese" and "goat's cheese" are recognised as cheeses even
+      // though "cheese" is only one of their two words.
+      var foldedIng = fold(ing.toLowerCase());
+      var isFamilyMember = false;
+      engagedFamilyWords.forEach(function(syn) {
+        if (foldedIng.indexOf(syn) !== -1) isFamilyMember = true;
+      });
 
-      // Check each matched word for family membership (only for queries at or
-      // above FAMILY_BUTTON_MIN_CHARS — see _data/ingredient_words.yml)
+      if (!matchedAnyWord && !isFamilyMember) return;
+
+      var isPrefixMatch = ingWords.some(function(word) {
+        return fold(word).indexOf(query) === 0;
+      });
+
+      candidates.push({
+        ing: ing, normWords: normWords, normKey: normKey,
+        isFamilyMember: isFamilyMember, isPrefixMatch: isPrefixMatch
+      });
+
+      // Check each matched word for STRUCTURAL family membership — a word
+      // with no curated synonym list that nonetheless spans 2+ distinct
+      // entries (only for queries at or above FAMILY_BUTTON_MIN_CHARS — see
+      // _data/ingredient_words.yml). Curated families are handled above.
       if (enableFamilyButtons) {
         ingWords.forEach(function(word, idx) {
           if (fold(word).indexOf(query) === -1) return;
@@ -293,8 +339,18 @@ function renderResultsPool() {
       }
     });
 
-    candidates.forEach(function(c, i) {
-      if (suppress[i]) return;
+    // Render order: family members first (masterIngredientsList is already
+    // alphabetical, and filtering preserves that order), then everything
+    // else — split so a match at the START of a word outranks one buried
+    // mid-word, since a query reads as the start of what you're typing, not
+    // a fragment that could be anywhere.
+    var survivors = candidates.filter(function(c, i) { return !suppress[i]; });
+    var familyMembers = survivors.filter(function(c) { return c.isFamilyMember; });
+    var others = survivors.filter(function(c) { return !c.isFamilyMember; });
+    var othersPrefix = others.filter(function(c) { return c.isPrefixMatch; });
+    var othersRest = others.filter(function(c) { return !c.isPrefixMatch; });
+
+    familyMembers.concat(othersPrefix, othersRest).forEach(function(c) {
       if (!renderedKeys.has(c.normKey)) {
         renderedKeys.add(c.normKey);
         resultsPool.appendChild(makeIngredientButton(c.ing, c.ing));
