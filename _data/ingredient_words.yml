@@ -59,13 +59,24 @@ modifiers:
 # paste, which have nothing in common but the word "red". Nobody searching
 # thinks "what can I cook with some kind of red".
 #
-# Every word here was checked against the real data first — each one heads
-# at least two main_ingredients entries that are otherwise unrelated foods,
-# purely coincidentally sharing a colour or variety word. A word belongs here
-# only if it is NEVER itself a standalone ingredient — "cherry" and "oyster"
-# don't qualify (bare "cherries" and oyster as a shellfish are real
-# ingredients that happen to also head an unrelated entry), so they need
-# their own handling rather than a place on this list.
+# Every word here was checked against the real data first. Most head at
+# least two main_ingredients entries that are otherwise unrelated foods,
+# purely coincidentally sharing a colour or variety word, and are never
+# themselves a standalone ingredient — "cherry" and "oyster" don't qualify
+# on that test (bare "cherries" and oyster as a shellfish are real
+# ingredients), so they get their own handling in `family_exceptions` below
+# instead.
+#
+# "tomato" is the exception to the "never standalone" test — it IS a real
+# ingredient — but earns a place here anyway: once "tomato ketchup" is
+# correctly excluded (see family_exceptions), the only other member is
+# "tomato purée", and a purée is a background flavour-builder used by the
+# tablespoon, not something you'd reach for the way you'd reach for a
+# tomato. A two-member family whose members don't actually substitute for
+# each other isn't a useful "(all)" any more than a coincidental one is —
+# the real test throughout this list is "would a user think of these as
+# some kind of the same thing", and word-sharing is only the most common way
+# to fail it.
 never_family:
   - mixed
   - red
@@ -85,28 +96,28 @@ never_family:
   - spring
   - thai
   - whole
+  - tomato
 
 # -----------------------------------------------------------------------------
 # Family exceptions — specific entries excluded from counting towards their
 # own head word's family, because they aren't really a kind of that word at
 # all, just a coincidental compound name. "cherry tomatoes" isn't a cherry;
-# "tomato ketchup" isn't a type of tomato any more than a manufactured
-# condiment is; "oyster mushrooms" aren't related to oysters, they're named
-# for their shape.
+# "oyster mushrooms" aren't related to oysters, they're named for their shape.
 #
 # Different from `never_family`: the WORD still heads a family if a genuine
-# member justifies one — "tomato" still forms "tomato (all)" from "tomatoes"
-# and "tomato purée" once "tomato ketchup" is taken out of the count. Only
-# "cherry" and "oyster" lose their (all) button entirely here, because once
-# the impostor is excluded, nothing legitimate is left to group (bare
-# "cherries" and "oyster sauce" are the only real members, one each).
+# member justifies one. Here, neither word does — "cherry" and "oyster" both
+# lose their (all) button entirely, because once the impostor is excluded,
+# nothing legitimate is left to group (bare "cherries" and "oyster sauce"
+# are the only real members, one each). ("tomato ketchup" isn't listed here
+# any more — "tomato" moved to never_family outright, once its only other
+# member, "tomato purée", turned out not to be a good enough reason to keep
+# the family either.)
 #
 # These entries still show up as normal individual search results — this
 # only stops them being swept into an (all) button under a word they don't
 # actually belong to.
 family_exceptions:
   - cherry tomatoes
-  - tomato ketchup
   - oyster mushrooms
 
 # -----------------------------------------------------------------------------
