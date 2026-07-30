@@ -47,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
       parsed.search = parsed.search || fallback.search;
       parsed.singulars = parsed.singulars || {};
       parsed.synonyms = parsed.synonyms || {};
+      parsed.modifiers = parsed.modifiers || [];
+      parsed.never_family = parsed.never_family || [];
       return parsed;
     } catch (e) {
       console.warn('filters.js: could not parse #ingredient-vocabulary — ' + e.message);
@@ -111,6 +113,16 @@ document.addEventListener('DOMContentLoaded', function () {
   // so only words with no product distinction riding on them belong in
   // _data/ingredient_words.yml's `modifiers` list.
   var modifierSet = new Set((VOCABULARY.modifiers || []).map(function(w) {
+    return fold(String(w).toLowerCase());
+  }));
+
+  // Colour/variety words ("red", "white", "mixed") that head 2+ entries but
+  // are never themselves a standalone ingredient — "red" isn't stripped like
+  // a modifier (red onion is genuinely different from onion), it just never
+  // earns an "(all)" button, because the entries sharing it ("red wine",
+  // "red onion", "red Thai curry paste") aren't a real family, only a
+  // coincidence. See _data/ingredient_words.yml for the reasoning per word.
+  var neverFamilySet = new Set((VOCABULARY.never_family || []).map(function(w) {
     return fold(String(w).toLowerCase());
   }));
 
@@ -228,14 +240,11 @@ function renderResultsPool() {
     //    match or membership of an engaged curated family (see below).
     // 2. A word heading 2+ distinct entries earns a "word (all)" umbrella
     //    button (see the wordToEntries build above).
-    // 3. Suppress an entry if some OTHER, multi-word entry's normalised word
-    //    set is a strict subset of its own — a genuine near-duplicate, like
-    //    "chicken thighs and drumsticks" when "chicken thigh" is present.
-    //    Single-word entries never suppress or get suppressed — see Step 3
-    //    below for why.
+    // No suppression step — see Step 2 below for why one used to exist here
+    // and doesn't any more.
 
     // Step 1: collect all matching entries with their normalised word sets.
-    var candidates = []; // { ing, normWords, normKey, isFamilyMember, isPrefixMatch }
+    var candidates = []; // { ing, normKey, isPrefixMatch }
     var familyWords = new Set(); // words that earn an (all) button
     var engagedFamilyWords = new Set(); // folded synonym words for families the query is heading towards
 
@@ -287,10 +296,7 @@ function renderResultsPool() {
       // the query, which reads as arbitrary rather than relevant.
       var isPrefixMatch = foldedIng.indexOf(query) === 0;
 
-      candidates.push({
-        ing: ing, normWords: normWords, normKey: normKey,
-        isFamilyMember: isFamilyMember, isPrefixMatch: isPrefixMatch
-      });
+      candidates.push({ ing: ing, normKey: normKey, isPrefixMatch: isPrefixMatch });
 
       // Check for STRUCTURAL family membership — a FIRST word with no curated
       // synonym list that nonetheless heads 2+ distinct entries (only for
@@ -302,53 +308,37 @@ function renderResultsPool() {
       // no relation to what was typed, and earned a nonsensical "pistachios
       // (all)" button; checking every word, not just the first, is what
       // produced "chop (all)" from "lamb chops"/"pork chops".
+      //
+      // Excludes _data/ingredient_words.yml's `never_family` list — "red",
+      // "white", "mixed" and the like genuinely head 2+ entries, but those
+      // entries are unrelated foods that merely share a colour or variety
+      // word ("red wine", "red onion"), not a real family.
       if (enableFamilyButtons && fold(ingWords[0]).indexOf(query) === 0) {
         var headWord = normWords[0];
-        var entries = wordToEntries[headWord];
-        if (entries && entries.size > 1) {
-          familyWords.add(headWord);
+        if (!neverFamilySet.has(headWord)) {
+          var entries = wordToEntries[headWord];
+          if (entries && entries.size > 1) {
+            familyWords.add(headWord);
+          }
         }
       }
     });
 
-    // Step 2: build normalised word sets for subset check.
-    // For each candidate, compute its Set of normalised words.
-    var candidateSets = candidates.map(function(c) {
-      return new Set(c.normWords);
-    });
-
-    // Step 3: suppress candidate i if some OTHER candidate j's normalised
-    // word set is a strict subset of it — i.e. i is a plural/variant of a
-    // shorter form j that is also in the results (e.g. "chicken thighs and
-    // drumsticks" suppressed when "chicken thigh" is present).
+    // Step 2: render — (all) buttons first, then every candidate, in original
+    // order.
     //
-    // A single-word candidate is NEVER used as a suppressor. Bare "garlic"
-    // sharing its one word with "ginger and garlic paste" doesn't make the
-    // paste redundant — it's a different, more specific product, the same
-    // way "cream cheese" isn't a redundant variant of bare "cheese". Without
-    // this, a generic single-word match would swallow every longer entry
-    // that happens to contain it.
-    //
-    // Bare "garlic"/"cheese" themselves are never suppressed either — a
-    // single-word candidate has no possible smaller, non-empty subset — so
-    // they show up as their own button even when an "(all)" exists for the
-    // same word. The "(all)" button stays as a one-click way to select the
-    // whole family; it doesn't hide the individual members.
-    var suppress = candidates.map(function() { return false; });
-
-    candidates.forEach(function(c, i) {
-      for (var j = 0; j < candidates.length; j++) {
-        if (i === j || candidateSets[j].size < 2) continue;
-        var otherSet = candidateSets[j];
-        var thisSet = candidateSets[i];
-        if (otherSet.size >= thisSet.size) continue; // j must be strictly smaller than i
-        var jSubsetOfI = true;
-        otherSet.forEach(function(w) { if (!thisSet.has(w)) jSubsetOfI = false; });
-        if (jSubsetOfI) { suppress[i] = true; break; }
-      }
-    });
-
-    // Step 4: render — (all) buttons first, then survivors in original order.
+    // There used to be a Step 3 here that suppressed a candidate whenever
+    // some other candidate's word set was a strict subset of it — meant to
+    // catch "chicken legs" as a redundant variant of "chicken leg". Checked
+    // against the real data: every one of the 31 cases it actually fired on
+    // turned out to hide a genuinely different product behind a
+    // similar-sounding one — "red wine" hid "red wine vinegar", "brown
+    // sugar" hid both "dark brown sugar" and "soft brown sugar", "tomato
+    // purée" hid "sundried tomato purée". Its one stated justification
+    // ("chicken legs"/"chicken leg") is handled elsewhere anyway — identical
+    // entries after normalisation are deduplicated below by normKey, before
+    // this step would even run. No confirmed benefit, multiple confirmed
+    // harms — removed rather than patched further.
     var renderedAllKeys = new Set();
     familyWords.forEach(function(fw) {
       var label = fw + ' (all)';
@@ -360,12 +350,11 @@ function renderResultsPool() {
 
     // Render order: entries starting with the query outrank everything else,
     // full stop — family membership affects whether an entry is INCLUDED
-    // (see isFamilyMember above), not where it ranks. Within each tier,
-    // alphabetical — masterIngredientsList is already sorted, and filtering
-    // preserves that order.
-    var survivors = candidates.filter(function(c, i) { return !suppress[i]; });
-    var prefixMatches = survivors.filter(function(c) { return c.isPrefixMatch; });
-    var rest = survivors.filter(function(c) { return !c.isPrefixMatch; });
+    // (matchedAnyWord / isFamilyMember above), not where it ranks. Within
+    // each tier, alphabetical — masterIngredientsList is already sorted,
+    // and filtering preserves that order.
+    var prefixMatches = candidates.filter(function(c) { return c.isPrefixMatch; });
+    var rest = candidates.filter(function(c) { return !c.isPrefixMatch; });
 
     prefixMatches.concat(rest).forEach(function(c) {
       if (!renderedKeys.has(c.normKey)) {

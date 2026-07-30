@@ -34,15 +34,57 @@ search:
 # product distinction riding on it. Checked against every multi-word
 # main_ingredients entry in the collection before being added — words that
 # looked like candidates but were rejected because they mark a genuinely
-# different product: "smoked" (smoked haddock vs haddock), "dried" (dried
-# porcini), "roasted" (roasted red peppers), "whole" (whole milk vs milk —
-# note "ground" has no such collision: nothing else in the collection is
-# just "almonds" or "ginger" with a different qualifier, so stripping it
-# loses no distinction the way stripping "whole" or "smoked" would).
+# different product: "smoked" (smoked haddock vs haddock), "roasted"
+# (roasted red peppers), "whole" (whole milk vs milk — note "ground" and
+# "dried" have no such collision: nothing else in the collection is just
+# "almonds"/"ginger"/"pasta"/"porcini" with a different qualifier, so
+# stripping them loses no distinction the way stripping "whole" or "smoked"
+# would).
 modifiers:
   - chopped
   - crispy
   - ground
+  - dried
+  - leftover
+
+# -----------------------------------------------------------------------------
+# Never-family words — first words that head 2+ entries but should never earn
+# an "(all)" button, because the entries sharing them aren't a real family.
+#
+# Different from `modifiers` above: these words are NOT stripped. "red onion"
+# stays "red onion" — "red" is a genuine, meaningful variety, the same way
+# "smoked" and "whole" are (see the modifiers comment). The problem isn't the
+# word, it's treating everything that happens to start with it as one group:
+# "red (all)" would lump together red wine, red onion and red Thai curry
+# paste, which have nothing in common but the word "red". Nobody searching
+# thinks "what can I cook with some kind of red".
+#
+# Every word here was checked against the real data first — each one heads
+# at least two main_ingredients entries that are otherwise unrelated foods,
+# purely coincidentally sharing a colour or variety word. A word belongs here
+# only if it is NEVER itself a standalone ingredient — "cherry" and "oyster"
+# don't qualify (bare "cherries" and oyster as a shellfish are real
+# ingredients that happen to also head an unrelated entry), so they need
+# their own handling rather than a place on this list.
+never_family:
+  - mixed
+  - red
+  - white
+  - brown
+  - dark
+  - golden
+  - green
+  - soft
+  - sweet
+  - baby
+  - hot
+  - light
+  - pearl
+  - plum
+  - salted
+  - spring
+  - thai
+  - whole
 
 # -----------------------------------------------------------------------------
 # Singulars — plural form on the left, the form to match on, on the right.
