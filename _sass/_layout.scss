@@ -108,7 +108,12 @@ article.recipe .method-short {
   justify-content: center;
   transform: rotate(-1.75deg);
   transform-origin: center center;
-  width: 425px;
+  // min() rather than a plain 425px: on a phone this was the one element on the
+  // site wide enough to force horizontal scroll. 92vw rather than 100vw because
+  // the rotation makes the rendered bounding box slightly wider than the
+  // declared width, and horizontal scroll is the most visible mobile failure
+  // there is. No media query needed.
+  width: min(425px, 92vw);
   height: 70px;
   margin-top: -$space-lg;  // pull it up toward HELEN TRIAGES
 

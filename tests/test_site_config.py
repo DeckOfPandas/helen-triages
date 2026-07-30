@@ -491,3 +491,33 @@ def test_spacing_tokens_are_not_used_for_type():
         "A spacing token is being used for typography:\n  " + "\n  ".join(offenders)
         + "\n\nUse the $font-size-* scale, or a literal if the value is a one-off."
     )
+
+
+def test_no_element_can_force_horizontal_scroll():
+    """A fixed width wider than a phone viewport, with nothing clamping it.
+
+    Horizontal scroll is the most visible mobile failure there is, and it takes
+    exactly one unclamped element to cause it. The site has no media queries and
+    does not need any — everything else is fluid or wraps — so this one check
+    stands in for a responsive test suite.
+
+    A `width: Npx` above 320 is fine as long as a max-width, min() or clamp()
+    sits with it.
+    """
+    offenders = []
+    for path in sorted(SASS_DIR.glob("*.scss")):
+        lines = path.read_text(encoding="utf-8").split("\n")
+        for i, line in enumerate(lines):
+            match = re.match(r"^\s*width:\s*(\d+)px", line)
+            if not match or int(match.group(1)) <= 320:
+                continue
+            context = "\n".join(lines[max(0, i - 4):i + 5])
+            if not re.search(r"max-width|min\(|clamp\(", context):
+                offenders.append(f"{path.name}:{i + 1} {line.strip()}")
+    assert not offenders, (
+        "Fixed width(s) wider than a small phone with nothing clamping them:\n  "
+        + "\n  ".join(offenders)
+        + "\n\nUse `width: min(Npx, 92vw)` or add a max-width. 92 rather than 100 "
+          "if the element is rotated, since the rendered box is wider than the "
+          "declared width."
+    )
