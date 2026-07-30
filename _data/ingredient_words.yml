@@ -22,6 +22,29 @@ search:
   family_button_min_chars: 3
 
 # -----------------------------------------------------------------------------
+# Modifiers — leading words the search UI strips before matching, so
+# "chopped pistachios" and "pistachios" are treated as the one ingredient.
+#
+# Recipe files are NOT touched — main_ingredients keeps the word, because
+# it's an accurate instruction there. This list only governs how the search
+# box matches and labels things.
+#
+# Deliberately short, and deliberately NOT a general "strip adjectives" list.
+# A word belongs here only if it describes a preparation state with no
+# product distinction riding on it. Checked against every multi-word
+# main_ingredients entry in the collection before being added — words that
+# looked like candidates but were rejected because they mark a genuinely
+# different product: "smoked" (smoked haddock vs haddock), "dried" (dried
+# porcini), "roasted" (roasted red peppers), "whole" (whole milk vs milk —
+# note "ground" has no such collision: nothing else in the collection is
+# just "almonds" or "ginger" with a different qualifier, so stripping it
+# loses no distinction the way stripping "whole" or "smoked" would).
+modifiers:
+  - chopped
+  - crispy
+  - ground
+
+# -----------------------------------------------------------------------------
 # Singulars — plural form on the left, the form to match on, on the right.
 #
 # Used to normalise ingredient words before comparison, so that "chicken legs"

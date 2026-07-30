@@ -6,22 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var nameQuery = ''; // 'rewrite' and/or 'proofread'
   var isSearching = false;
 
-  var allIngredientsSet = new Set();
   var items = document.querySelectorAll('.recipe-list li');
-
-  items.forEach(function(li) {
-    var rawIng = li.dataset.ingredients || '';
-    rawIng.split(',').map(function(s) { return s.trim(); }).filter(Boolean).forEach(function(ing) {
-      allIngredientsSet.add(ing);
-    });
-  });
-  // A plain .sort() is case-sensitive — every capital letter sorts before
-  // every lowercase one, so "Chinese five spice" would jump ahead of "chai",
-  // "cheddar" and "cheese" instead of sitting between "chestnuts" and
-  // "chives" where it belongs.
-  var masterIngredientsList = Array.from(allIngredientsSet).sort(function(a, b) {
-    return a.toLowerCase().localeCompare(b.toLowerCase());
-  });
 
   var matrix = document.querySelector('.controls');
   var recipeList = document.querySelector('.recipe-list');
@@ -117,6 +102,42 @@ document.addEventListener('DOMContentLoaded', function () {
     return str.toLowerCase().trim().split(/\s+/).filter(Boolean);
   }
 
+  // Preparation-state words ("chopped", "crispy") describe what was done to
+  // an ingredient, not what it is — recipe files keep them (they're accurate
+  // instructions), but the search UI strips them so "chopped pistachios" and
+  // "pistachios" are treated as the one ingredient rather than two. Deliberately
+  // NOT a general "strip adjectives" list: "ground almonds" vs "flaked almonds",
+  // "whole milk" vs milk, and "smoked haddock" are genuinely different products,
+  // so only words with no product distinction riding on them belong in
+  // _data/ingredient_words.yml's `modifiers` list.
+  var modifierSet = new Set((VOCABULARY.modifiers || []).map(function(w) {
+    return fold(String(w).toLowerCase());
+  }));
+
+  function stripModifiers(ing) {
+    var words = ing.split(/\s+/);
+    while (words.length > 1 && modifierSet.has(fold(words[0].toLowerCase()))) {
+      words.shift();
+    }
+    return words.join(' ');
+  }
+
+  // Built here, not at the top of the file, because stripping modifiers needs
+  // VOCABULARY and fold() to already exist.
+  var allIngredientsSet = new Set();
+  items.forEach(function(li) {
+    var rawIng = li.dataset.ingredients || '';
+    rawIng.split(',').map(function(s) { return s.trim(); }).filter(Boolean).forEach(function(ing) {
+      allIngredientsSet.add(stripModifiers(ing));
+    });
+  });
+  // A plain .sort() is case-sensitive — every capital letter sorts before
+  // every lowercase one, so "Chinese five spice" would jump ahead of "chai",
+  // "cheddar" and "cheese" instead of sitting between "chestnuts" and
+  // "chives" where it belongs.
+  var masterIngredientsList = Array.from(allIngredientsSet).sort(function(a, b) {
+    return a.toLowerCase().localeCompare(b.toLowerCase());
+  });
 
   function makeIngredientButton(key, label) {
     var btn = document.createElement('button');
@@ -154,27 +175,28 @@ function renderResultsPool() {
   var queryWords = query.split(/\s+/).filter(Boolean);
   var multiWord = queryWords.length > 1;
 
-  // Count how many DISTINCT ingredient entries each normalised word appears in.
-  // A word shared by 2+ entries is a "family" and earns an umbrella "(all)" button.
+  // Count how many DISTINCT ingredient entries share each FIRST word. A word
+  // shared as the head of 2+ entries is a "family" and earns an umbrella
+  // "(all)" button — "chicken" heads chicken breast/leg/thigh/mince/stock.
   //
-  // Entries are counted by their NORMALISED key, not their raw text. Two entries
-  // that differ only by pluralisation are the same entry as far as the reader is
-  // concerned, and should not conjure a family between them: "peach" and
-  // "peaches" both normalise to "peach", so they count once and no spurious
-  // "peach (all)" button appears. Genuine families — "cheese" spanning "blue
-  // cheese", "cheddar cheese", "cream cheese" — have distinct normalised keys
-  // and are unaffected.
+  // Only the first word counts, not every word in the phrase. "chop" is the
+  // SECOND word of both "lamb chops" and "pork chops" — those are cuts of
+  // lamb and of pork respectively, not members of a "chop" family, so a
+  // "chop (all)" button that lumps them together is nonsense: nobody thinks
+  // "what can I cook with some kind of chop". Likewise "paste" trails a
+  // dozen unrelated things (curry paste, anchovy paste, tamarind paste) that
+  // share nothing but their form.
+  //
+  // Entries are counted by their NORMALISED key, not their raw text, so
+  // "peach" and "peaches" (same entry after normalisation) count once and
+  // don't conjure a spurious "peach (all)" from nothing.
   var wordToEntries = {};
   masterIngredientsList.forEach(function(ing) {
     var normWords = getWords(ing).map(normaliseIngredientWord).map(fold);
     var entryKey = normWords.join(' ');
-    var seenInThisEntry = new Set();
-    normWords.forEach(function(w) {
-      if (seenInThisEntry.has(w)) return;
-      seenInThisEntry.add(w);
-      if (!wordToEntries[w]) wordToEntries[w] = new Set();
-      wordToEntries[w].add(entryKey);
-    });
+    var headWord = normWords[0];
+    if (!wordToEntries[headWord]) wordToEntries[headWord] = new Set();
+    wordToEntries[headWord].add(entryKey);
   });
 
   if (multiWord) {
@@ -186,12 +208,9 @@ function renderResultsPool() {
         return ingWords.some(function(iw) { return iw.indexOf(qw) !== -1; });
       });
       if (!allMatch) return;
-      // Same "start of word beats mid-word" rule as the single-word path:
-      // ranked higher only if EVERY query word is a prefix of its match.
-      var allPrefixMatch = queryWords.every(function(qw) {
-        return ingWords.some(function(iw) { return iw.indexOf(qw) === 0; });
-      });
-      multiMatches.push({ ing: ing, ingKey: ingKey, isPrefixMatch: allPrefixMatch });
+      // Same "start of the string" rule as the single-word path.
+      var isPrefixMatch = fold(ing.toLowerCase()).indexOf(query) === 0;
+      multiMatches.push({ ing: ing, ingKey: ingKey, isPrefixMatch: isPrefixMatch });
     });
     var multiPrefix = multiMatches.filter(function(c) { return c.isPrefixMatch; });
     var multiRest = multiMatches.filter(function(c) { return !c.isPrefixMatch; });
@@ -205,15 +224,15 @@ function renderResultsPool() {
     // --- Single-word query ---
     //
     // Rules:
-    // 1. Collect all matching ingredients.
-    // 2. For any word shared by 2+ entries, emit a "word (all)" umbrella button.
-    // 3. Suppress an entry if another matching entry's normalised word set is a
-    //    strict subset of its own — i.e. it's a plural/variant of a shorter form
-    //    that is also in the results. e.g. "chicken legs" is suppressed when
-    //    "chicken leg" is present, because {chicken, leg} ⊂ {chicken, legs}.
-    // 4. Always suppress entries that are pure members of an (all) family AND
-    //    have no additional distinguishing words beyond the family word itself
-    //    — i.e. single-word entries like bare "chicken" when "chicken (all)" exists.
+    // 1. Collect all matching ingredients, whether via a literal substring
+    //    match or membership of an engaged curated family (see below).
+    // 2. A word heading 2+ distinct entries earns a "word (all)" umbrella
+    //    button (see the wordToEntries build above).
+    // 3. Suppress an entry if some OTHER, multi-word entry's normalised word
+    //    set is a strict subset of its own — a genuine near-duplicate, like
+    //    "chicken thighs and drumsticks" when "chicken thigh" is present.
+    //    Single-word entries never suppress or get suppressed — see Step 3
+    //    below for why.
 
     // Step 1: collect all matching entries with their normalised word sets.
     var candidates = []; // { ing, normWords, normKey, isFamilyMember, isPrefixMatch }
@@ -263,28 +282,32 @@ function renderResultsPool() {
 
       if (!matchedAnyWord && !isFamilyMember) return;
 
-      var isPrefixMatch = ingWords.some(function(word) {
-        return fold(word).indexOf(query) === 0;
-      });
+      // "Start of the string", not "start of any word" — "chocolate chips"
+      // matching on "chips" put it ahead of things that actually start with
+      // the query, which reads as arbitrary rather than relevant.
+      var isPrefixMatch = foldedIng.indexOf(query) === 0;
 
       candidates.push({
         ing: ing, normWords: normWords, normKey: normKey,
         isFamilyMember: isFamilyMember, isPrefixMatch: isPrefixMatch
       });
 
-      // Check each matched word for STRUCTURAL family membership — a word
-      // with no curated synonym list that nonetheless spans 2+ distinct
-      // entries (only for queries at or above FAMILY_BUTTON_MIN_CHARS — see
+      // Check for STRUCTURAL family membership — a FIRST word with no curated
+      // synonym list that nonetheless heads 2+ distinct entries (only for
+      // queries at or above FAMILY_BUTTON_MIN_CHARS — see
       // _data/ingredient_words.yml). Curated families are handled above.
-      if (enableFamilyButtons) {
-        ingWords.forEach(function(word, idx) {
-          if (fold(word).indexOf(query) === -1) return;
-          var normWord = normWords[idx];
-          var entries = wordToEntries[normWord];
-          if (entries && entries.size > 1) {
-            familyWords.add(normWord);
-          }
-        });
+      //
+      // Only the head word, and only as a PREFIX of it — not contained
+      // anywhere in it. "chi" sits inside "pistachios" (pis-TA-CHI-os) with
+      // no relation to what was typed, and earned a nonsensical "pistachios
+      // (all)" button; checking every word, not just the first, is what
+      // produced "chop (all)" from "lamb chops"/"pork chops".
+      if (enableFamilyButtons && fold(ingWords[0]).indexOf(query) === 0) {
+        var headWord = normWords[0];
+        var entries = wordToEntries[headWord];
+        if (entries && entries.size > 1) {
+          familyWords.add(headWord);
+        }
       }
     });
 
@@ -294,32 +317,28 @@ function renderResultsPool() {
       return new Set(c.normWords);
     });
 
-    // Step 3 & 4: decide which candidates to suppress.
-    // Suppress candidate i if:
-    //   (a) candidate i's normalised word set is a strict superset of another
-    //       candidate j's word set — i.e. i is a plural/variant of a shorter
-    //       form j that is also in the results.
-    //       e.g. "chicken legs" {chicken,leg} is suppressed when "chicken leg"
-    //       {chicken,leg} is present (same after normalisation), OR
-    //       more generally when j's words are all contained in i's words and
-    //       j is shorter.
-    //   (b) candidate i is a single-word entry whose word is a family word
-    //       (bare "chicken" suppressed in favour of "chicken (all)")
-    // Two-pass suppression:
-    // Pass 1 — rule (b): suppress bare single-word family members.
-    // Pass 2 — rule (a): suppress entries that are strict supersets of a
-    //           non-suppressed entry (catches plurals and redundant variants).
-    //           Must be a second pass so we don't use suppressed entries as
-    //           suppressors (e.g. bare "chicken" must not cause "chicken leg"
-    //           to be suppressed).
-    var suppress = candidates.map(function(c) {
-      return c.normWords.length === 1 && familyWords.has(c.normWords[0]);
-    });
+    // Step 3: suppress candidate i if some OTHER candidate j's normalised
+    // word set is a strict subset of it — i.e. i is a plural/variant of a
+    // shorter form j that is also in the results (e.g. "chicken thighs and
+    // drumsticks" suppressed when "chicken thigh" is present).
+    //
+    // A single-word candidate is NEVER used as a suppressor. Bare "garlic"
+    // sharing its one word with "ginger and garlic paste" doesn't make the
+    // paste redundant — it's a different, more specific product, the same
+    // way "cream cheese" isn't a redundant variant of bare "cheese". Without
+    // this, a generic single-word match would swallow every longer entry
+    // that happens to contain it.
+    //
+    // Bare "garlic"/"cheese" themselves are never suppressed either — a
+    // single-word candidate has no possible smaller, non-empty subset — so
+    // they show up as their own button even when an "(all)" exists for the
+    // same word. The "(all)" button stays as a one-click way to select the
+    // whole family; it doesn't hide the individual members.
+    var suppress = candidates.map(function() { return false; });
 
     candidates.forEach(function(c, i) {
-      if (suppress[i]) return; // already suppressed
       for (var j = 0; j < candidates.length; j++) {
-        if (i === j || suppress[j]) continue; // skip self and suppressed candidates
+        if (i === j || candidateSets[j].size < 2) continue;
         var otherSet = candidateSets[j];
         var thisSet = candidateSets[i];
         if (otherSet.size >= thisSet.size) continue; // j must be strictly smaller than i
@@ -329,7 +348,7 @@ function renderResultsPool() {
       }
     });
 
-    // Step 5: render — (all) buttons first, then survivors in original order.
+    // Step 4: render — (all) buttons first, then survivors in original order.
     var renderedAllKeys = new Set();
     familyWords.forEach(function(fw) {
       var label = fw + ' (all)';
@@ -339,18 +358,16 @@ function renderResultsPool() {
       }
     });
 
-    // Render order: family members first (masterIngredientsList is already
-    // alphabetical, and filtering preserves that order), then everything
-    // else — split so a match at the START of a word outranks one buried
-    // mid-word, since a query reads as the start of what you're typing, not
-    // a fragment that could be anywhere.
+    // Render order: entries starting with the query outrank everything else,
+    // full stop — family membership affects whether an entry is INCLUDED
+    // (see isFamilyMember above), not where it ranks. Within each tier,
+    // alphabetical — masterIngredientsList is already sorted, and filtering
+    // preserves that order.
     var survivors = candidates.filter(function(c, i) { return !suppress[i]; });
-    var familyMembers = survivors.filter(function(c) { return c.isFamilyMember; });
-    var others = survivors.filter(function(c) { return !c.isFamilyMember; });
-    var othersPrefix = others.filter(function(c) { return c.isPrefixMatch; });
-    var othersRest = others.filter(function(c) { return !c.isPrefixMatch; });
+    var prefixMatches = survivors.filter(function(c) { return c.isPrefixMatch; });
+    var rest = survivors.filter(function(c) { return !c.isPrefixMatch; });
 
-    familyMembers.concat(othersPrefix, othersRest).forEach(function(c) {
+    prefixMatches.concat(rest).forEach(function(c) {
       if (!renderedKeys.has(c.normKey)) {
         renderedKeys.add(c.normKey);
         resultsPool.appendChild(makeIngredientButton(c.ing, c.ing));
