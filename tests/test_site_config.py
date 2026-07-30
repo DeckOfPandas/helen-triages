@@ -50,7 +50,7 @@ def test_filters_js_holds_no_literal_threshold():
     scratch and landed on 2. It now lives in _data/ingredient_words.yml and
     filters.js reads it by name. If a literal ever reappears, this fails.
     """
-    js = read("js", "filters.js")
+    js = read("assets", "js", "filters.js")
     literals = re.findall(r"query\.length\s*[<>]=?\s*\d+", js)
     assert not literals, (
         f"js/filters.js contains hardcoded query-length comparison(s): {literals}.\n"
@@ -86,7 +86,7 @@ def test_vocabulary_is_emitted_to_the_page():
 
 def test_filters_js_holds_no_ingredient_vocabulary():
     """Singulars and synonyms belong in YAML, not in the JavaScript."""
-    js = read("js", "filters.js")
+    js = read("assets", "js", "filters.js")
     for name in ("var singularMap = {", "var synonymMap = {"):
         assert name not in js, (
             f"js/filters.js declares `{name}...` inline. The ingredient "
@@ -136,7 +136,7 @@ def test_deleted_data_files_stay_deleted(relpath):
 
 def test_palette_is_the_only_place_hex_colours_are_written():
     """JS reads the palette from CSS custom properties rather than mirroring it."""
-    js = read("js", "colours.js")
+    js = read("assets", "js", "colours.js")
     assert "getPropertyValue" in js, (
         "js/colours.js is no longer reading colours from CSS custom properties. "
         "It should call getComputedStyle on :root and read --colour-* values "
@@ -176,7 +176,7 @@ def test_pantry_entries_are_actually_used():
 
 # --- one base URL, one fetch path -------------------------------------------
 
-JS_DIR = ROOT / "js"
+JS_DIR = ROOT / "assets" / "js"
 
 
 def test_base_url_is_derived_in_exactly_one_place():
@@ -336,7 +336,7 @@ def test_filter_buttons_announce_their_state():
         "Filter buttons in filter_group.html have no aria-pressed attribute. "
         "Visually the active state is obvious; programmatically it is invisible."
     )
-    assert "syncAriaPressed" in read("js", "filters.js"), (
+    assert "syncAriaPressed" in read("assets", "js", "filters.js"), (
         "filters.js no longer syncs aria-pressed. The attribute would then be "
         "stuck at its initial value and would lie about the filter state."
     )
@@ -374,7 +374,7 @@ def test_the_method_is_called_method_everywhere():
     fallback to a front matter field that no file has used since June.
     """
     offenders = []
-    for relpath in ("_layouts/recipe.html", "_sass/_recipe.scss", "js/method-toggle.js"):
+    for relpath in ("_layouts/recipe.html", "_sass/_recipe.scss", "assets/js/method-toggle.js"):
         path = ROOT / relpath
         if not path.exists():
             continue
