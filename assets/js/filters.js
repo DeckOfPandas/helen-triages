@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
       parsed.synonyms = parsed.synonyms || {};
       parsed.modifiers = parsed.modifiers || [];
       parsed.never_family = parsed.never_family || [];
+      parsed.family_exceptions = parsed.family_exceptions || [];
       return parsed;
     } catch (e) {
       console.warn('filters.js: could not parse #ingredient-vocabulary — ' + e.message);
@@ -123,6 +124,16 @@ document.addEventListener('DOMContentLoaded', function () {
   // "red onion", "red Thai curry paste") aren't a real family, only a
   // coincidence. See _data/ingredient_words.yml for the reasoning per word.
   var neverFamilySet = new Set((VOCABULARY.never_family || []).map(function(w) {
+    return fold(String(w).toLowerCase());
+  }));
+
+  // Specific entries excluded from counting towards their own head word's
+  // family — "cherry tomatoes" isn't a cherry, "tomato ketchup" isn't a type
+  // of tomato. Unlike never_family, the WORD can still head a family if a
+  // genuine member justifies one ("tomato" still forms from "tomatoes" and
+  // "tomato purée" once ketchup is excluded) — this only removes the
+  // impostor from the count, not the whole word from ever grouping.
+  var familyExceptionSet = new Set((VOCABULARY.family_exceptions || []).map(function(w) {
     return fold(String(w).toLowerCase());
   }));
 
@@ -202,8 +213,13 @@ function renderResultsPool() {
   // Entries are counted by their NORMALISED key, not their raw text, so
   // "peach" and "peaches" (same entry after normalisation) count once and
   // don't conjure a spurious "peach (all)" from nothing.
+  //
+  // _data/ingredient_words.yml's `family_exceptions` are skipped entirely —
+  // "cherry tomatoes" doesn't count towards "cherry"'s family, the same way
+  // "tomato ketchup" doesn't count towards "tomato"'s.
   var wordToEntries = {};
   masterIngredientsList.forEach(function(ing) {
+    if (familyExceptionSet.has(fold(ing.toLowerCase()))) return;
     var normWords = getWords(ing).map(normaliseIngredientWord).map(fold);
     var entryKey = normWords.join(' ');
     var headWord = normWords[0];

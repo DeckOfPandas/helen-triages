@@ -87,6 +87,29 @@ never_family:
   - whole
 
 # -----------------------------------------------------------------------------
+# Family exceptions — specific entries excluded from counting towards their
+# own head word's family, because they aren't really a kind of that word at
+# all, just a coincidental compound name. "cherry tomatoes" isn't a cherry;
+# "tomato ketchup" isn't a type of tomato any more than a manufactured
+# condiment is; "oyster mushrooms" aren't related to oysters, they're named
+# for their shape.
+#
+# Different from `never_family`: the WORD still heads a family if a genuine
+# member justifies one — "tomato" still forms "tomato (all)" from "tomatoes"
+# and "tomato purée" once "tomato ketchup" is taken out of the count. Only
+# "cherry" and "oyster" lose their (all) button entirely here, because once
+# the impostor is excluded, nothing legitimate is left to group (bare
+# "cherries" and "oyster sauce" are the only real members, one each).
+#
+# These entries still show up as normal individual search results — this
+# only stops them being swept into an (all) button under a word they don't
+# actually belong to.
+family_exceptions:
+  - cherry tomatoes
+  - tomato ketchup
+  - oyster mushrooms
+
+# -----------------------------------------------------------------------------
 # Singulars — plural form on the left, the form to match on, on the right.
 #
 # Used to normalise ingredient words before comparison, so that "chicken legs"
