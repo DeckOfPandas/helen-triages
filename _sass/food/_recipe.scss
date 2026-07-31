@@ -42,14 +42,22 @@
 // its box and cannot overhang:
 //   - the LEFT indent is $rule-indent, shifting the gradient right
 //   - the RIGHT overhang is $rule-overhang as padding, growing the box
-$rule-thickness: 0.34em;   // bar depth. Thicker than the 6px underline, since
-                           // the top of it is now hidden behind the letters
+$rule-thickness: 0.38em;   // bar depth — magenta under the title, spring green
+                           // under section headings. Thicker than the 6px
+                           // underline, since the top of it is now hidden
+                           // behind the letters
 $rule-drop:      0.70em;   // top of the bar, measured down from the top of the
                            // text box. Larger = lower = less overlap. At 1.8rem
                            // Courier the baseline is at ~0.83em, so this cuts
                            // into the bottom quarter of the capitals
-$rule-indent:    0.35em;   // how far INTO the text the bar starts, from the left
-$rule-overhang:  0.55em;   // how far PAST the text the bar runs, on the right
+$rule-indent:    0.15em;   // how far INTO the text the bar starts, from the left
+$rule-overhang:  0.20em;   // how far PAST the text the bar runs, on the right
+$rule-front-opacity: 0.8;  // violet is always the bar rendered in FRONT (the
+                           // lower one, under the title's magenta and under
+                           // each section heading's spring green), painted
+                           // this see-through so where it now overlaps the
+                           // colour behind it, that colour shows through
+                           // rather than being hidden
 
 // --- The section headings' second rule ---------------------------------------
 // A violet rule directly beneath the spring green one, sharing its right edge
@@ -67,9 +75,15 @@ $rule-overhang:  0.55em;   // how far PAST the text the bar runs, on the right
 $rule-under-thickness: 0.20em;                       // thinner, so the pair
                                                      // reads as one mark with
                                                      // a hierarchy
-$rule-under-drop:      $rule-drop + $rule-thickness; // exactly where the green
-                                                     // stops — derived, so the
-                                                     // two cannot drift apart
+$rule-overlap:         0.10em;                       // how far the violet rises
+                                                     // into the bar above it
+$rule-under-drop:      $rule-drop + $rule-thickness - $rule-overlap; // still
+                                                     // derived from $rule-drop
+                                                     // and $rule-thickness, so
+                                                     // the two bars move together
+                                                     // — just pulled up by
+                                                     // $rule-overlap instead of
+                                                     // landing flush
 // The violet is trimmed to the INK, not to the box, so it measures the word
 // while the green escapes it. Two insets rather than one, because the two ends
 // are not the same distance from their letterforms:
@@ -82,7 +96,7 @@ $rule-under-drop:      $rule-drop + $rule-thickness; // exactly where the green
 //          final letter than it does before the first one. Trimming both ends
 //          by the same amount would look symmetric in the code and be visibly
 //          off to the right on the page.
-$rule-under-inset-left:  0.08em;
+$rule-under-inset-left:  0.05em;
 $rule-under-inset-right: 0.16em;   // 0.08 side bearing + 0.08 letter-spacing
 $rule-under-indent:    $rule-under-inset-left;
 
@@ -107,21 +121,37 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   // the line height, so nothing moves.
   padding-bottom: 0.45em;
 
-  // First layer paints on top: green over violet.
+  // First layer paints in front: violet over green/magenta, at $rule-front-opacity
+  // rather than solid, so where the two bars now overlap, the colour behind
+  // shows through instead of being fully hidden.
   background-image:
-    linear-gradient($top-colour,   $top-colour),
-    linear-gradient($under-colour, $under-colour);
+    linear-gradient(rgba($under-colour, $rule-front-opacity), rgba($under-colour, $rule-front-opacity)),
+    linear-gradient($top-colour, $top-colour);
   background-repeat: no-repeat, no-repeat;
   // The green is sized to make up its own indent, so it runs to the box's right
   // edge and keeps the full $rule-overhang. The violet gives back the whole
   // overhang plus both insets, so it stops inside the lettering at both ends.
   background-size:
-    calc(100% - #{$rule-indent}) #{$rule-thickness},
-    calc(100% - #{$rule-overhang + $rule-under-inset-left + $inset-right}) #{$rule-under-thickness};
+    calc(100% - #{$rule-overhang + $rule-under-inset-left + $inset-right}) #{$rule-under-thickness},
+    calc(100% - #{$rule-indent}) #{$rule-thickness};
   background-position:
-    #{$rule-indent}       #{$rule-drop},
-    #{$rule-under-indent} #{$rule-under-drop};
+    #{$rule-under-indent} #{$rule-under-drop},
+    #{$rule-indent}       #{$rule-drop};
 }
+
+// --- Box tint (metadata grid only, for now) -----------------------------------
+// Was tinted off $color-border mixed with $color-surface — a neutral with no
+// relation to the page's actual accent colours. Re-based on the rule's own
+// violet instead, so the box stops being a fifth, unrelated colour and reads as
+// a quiet echo of the mark the page already spends violet on.
+//
+// The note box was matched to this too on 2026-07-31 and then split back off
+// the same day — it wants a different treatment, not just a fainter version of
+// this one. See `DEV_JOBS_v24.md` §1.8. Kept named generically in case it ends
+// up shared again once notes have their own answer.
+$color-box-tint: $color-vibrant-violet;   // reuse, not a new hue
+$box-tint-opacity: 0.03;   // TRANSPARENCY DIAL — turn up for a stronger wash,
+                           // down for a fainter one.
 
 // --- Body text base ----------------------------------------------------------
 // Set once on the recipe article so children inherit and only override exceptions.
@@ -245,7 +275,7 @@ article.recipe {
   gap: 0;
   padding: $space-lg 0;
   margin: $spacing-section-gap 0 $spacing-block-gap 0;
-  background-color: mix($color-border, $color-surface, 25%);
+  background-color: rgba($color-box-tint, $box-tint-opacity);
   border-radius: $radius-sm;
 
   li {
@@ -513,7 +543,8 @@ article.recipe {
   // font-family, font-weight, color, font-size, line-height inherited from article.recipe
   margin: $spacing-block-gap 0;
   padding: 1.1rem 1.4rem;
-  background-color: mix($color-border, $color-surface, 35%);
+  background-color: mix($color-border, $color-surface, 35%);   // left as it
+  // was pending a proper answer for this box — see DEV_JOBS_v24.md §1.8
   border-radius: $radius-sm;
 
   &::before {
@@ -602,7 +633,7 @@ article.recipe .recipe-body-content {
   display: block;
   margin-top: $spacing-block-gap;
   margin-bottom: $space-md;
-  font-size: 0.85rem;
+  font-size: 1rem;
   letter-spacing: $letter-spacing-label;
   color: $color-text;
   -webkit-text-stroke: $stroke-light;
