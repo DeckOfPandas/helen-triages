@@ -109,3 +109,91 @@ test('search widens a curated synonym family beyond literal substring matches', 
   assert.ok(found.includes('cream cheese'), 'cream cheese should match literally');
   assert.ok(result.familyButtons.includes('cheese'), 'cheese (all) should be offered');
 });
+
+test('stopwords are never a match target, wherever they fall in the phrase', () => {
+  const master = matcher().buildMasterList(RAW_INGREDIENTS);
+  const result = matcher().search('a', master);
+  const found = result.results.map((r) => r.ing);
+  // "and" is the only word in "chicken thighs and drumsticks" that starts
+  // with "a" — chicken/thighs/drumsticks don't. Without stopword
+  // filtering, this entry only ever matched because "and" happened to.
+  assert.ok(!found.includes('chicken thighs and drumsticks'),
+    'should not match solely via the connector "and"');
+});
+
+test('an irregular plural is findable by its singular form', () => {
+  const master = matcher().buildMasterList(['cherries']);
+  const result = matcher().search('cherry', master);
+  // "cherries" is declared in `singulars` as the plural of "cherry", but
+  // the raw text "cherries" never literally contains "cherry" as a
+  // substring — "y" becomes "ies", the ending changes rather than just
+  // extending — so matching has to consult the normalised form, not just
+  // raw text, or this returns nothing at all.
+  const cherries = result.results.find((r) => r.ing === 'cherries');
+  assert.ok(cherries, 'cherries should be found');
+  assert.ok(cherries.isPrefixMatch, 'cherries should rank as a prefix match, not fall to the bottom tier');
+});
+
+test('never_family words never earn an (all) button, even when they head 2+ entries', () => {
+  const vocab = Object.assign({}, VOCAB, { never_family: ['red'] });
+  const ingredients = ['red wine', 'red onion', 'red pepper'];
+  const master = IS.create(vocab).buildMasterList(ingredients);
+  const result = IS.create(vocab).search('red', master);
+  // All three genuinely match "red" and should still be individually
+  // findable...
+  assert.deepStrictEqual(
+    result.results.map((r) => r.ing).sort(),
+    ['red onion', 'red pepper', 'red wine']
+  );
+  // ...but "red" heads all three, which — without never_family — would be
+  // enough to form "red (all)". They're unrelated foods that merely share
+  // a colour word, not a real family.
+  assert.ok(!result.familyButtons.includes('red'), 'red (all) should not form');
+});
+
+test("family_exceptions are excluded from their own head word's family count", () => {
+  const vocab = Object.assign({}, VOCAB, { family_exceptions: ['cherry tomatoes'] });
+  const ingredients = ['cherries', 'cherry tomatoes'];
+  const master = IS.create(vocab).buildMasterList(ingredients);
+  const result = IS.create(vocab).search('cherr', master);
+  // Both still show up as individual results...
+  const found = result.results.map((r) => r.ing);
+  assert.ok(found.includes('cherries'));
+  assert.ok(found.includes('cherry tomatoes'));
+  // ...but "cherry tomatoes" doesn't count towards "cherry"'s family, so
+  // with only one genuine member left (cherries), no (all) button forms.
+  assert.ok(!result.familyButtons.includes('cherry'),
+    'cherry (all) should not form once the impostor is excluded from the count');
+});
+
+test('a longer entry is never hidden behind a similar shorter one', () => {
+  const master = matcher().buildMasterList(['brown sugar', 'soft brown sugar']);
+  const result = matcher().search('sugar', master);
+  // There used to be a rule that suppressed "soft brown sugar" as a
+  // supposed redundant variant of "brown sugar". Checked against the real
+  // site data, every one of the 31 cases it actually fired on hid a
+  // genuinely different product — this is that case. Removed entirely
+  // rather than patched further.
+  const found = result.results.map((r) => r.ing);
+  assert.ok(found.includes('brown sugar'));
+  assert.ok(found.includes('soft brown sugar'));
+});
+
+test('within the non-prefix results, a real word match ranks above a family-only member', () => {
+  const ingredients = ['cheese', 'cream cheese', 'feta'];
+  const master = matcher().buildMasterList(ingredients);
+  const result = matcher().search('chees', master);
+  const order = result.results.map((r) => r.ing);
+  // "cheese" is a prefix match (band 1). "cream cheese" is a real word
+  // match — it literally contains "cheese" — but not a prefix match
+  // (band 2). "feta" is included only because the curated family says
+  // it's a cheese, with no textual relation to "chees" at all (band 3).
+  // Merging bands 2 and 3 is the exact mistake that let "chocolate chips"
+  // rank alongside "chicken breast" for "chi" — see the ranking test above.
+  const cheeseIdx = order.indexOf('cheese');
+  const creamCheeseIdx = order.indexOf('cream cheese');
+  const fetaIdx = order.indexOf('feta');
+  assert.ok(cheeseIdx > -1 && creamCheeseIdx > -1 && fetaIdx > -1, 'all three should be found');
+  assert.ok(cheeseIdx < creamCheeseIdx, 'a prefix match should rank before a word-only match');
+  assert.ok(creamCheeseIdx < fetaIdx, 'a real word match should rank before a family-only member');
+});
