@@ -74,6 +74,11 @@ $color-name-search-root:     $color-electric-cobalt;
 $color-name-search-active:   darken($color-electric-cobalt, $darken-active);
 $color-white:                #ffffff;
 $color-logo-stroke:          #bbbbbb;   // -webkit-text-stroke on logo header
+// The soft edge on the index filter labels. Derived from the text it outlines
+// rather than a standalone grey, so it stays related to it: the wordmark's
+// rgba(230,230,230,0.9) against white letters and this against dark ones are
+// the same idea, and were two unrelated magic numbers.
+$color-label-stroke:         lighten($color-text, 20%);
 
 // --- Reusable Structural Accents ---------------------------------------------
 // Nested bullets in the short method. Was cerulean-mixed; re-based on spring

@@ -5,17 +5,19 @@
    The filter buttons carry aria-pressed so assistive tech knows they are
    toggles. filters.js keeps the value in step with the .active class.
 {% endcomment %}
-{% if include.brush_colour %}
-  {% assign _brush_colour = include.brush_colour %}
-{% endif %}
-
 <div class="category {{ include.group_class }}">
   <div class="category-label-row">
-    <span class="category-label" style="position:relative;padding:0.22rem 1rem 0.22rem 1rem;">
-      {% if _brush_colour %}
-        <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ _brush_colour }}"></span>
-      {% endif %}
-      {{ include.label }}
+    {% comment %} The label text is wrapped rather than bare because the blocky
+       rule is a per-line background on an INLINE box, and .category-label is a
+       flex item — flex items are blockified, so `display: inline` on it would
+       be ignored. The inner span is not a flex item and can stay inline.
+
+       No square brackets. They were tried and cut: light-weight punctuation
+       beside heavy stroked caps is two type systems in one line, and brackets
+       are the WORDMARK's device, where [ FOOD ] really is a variable in a slot.
+       That is why the labels in _data/food/filter_sections.yml have none. {% endcomment %}
+    <span class="category-label">
+      <span class="category-label-text">{{ include.label }}</span>
     </span>
     <button type="button" class="btn-clear-inline" style="display:none;">&times; clear</button>
   </div>

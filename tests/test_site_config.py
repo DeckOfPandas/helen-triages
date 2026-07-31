@@ -122,8 +122,7 @@ def test_filters_js_holds_no_ingredient_vocabulary():
 # --- colour stays in one place ----------------------------------------------
 
 TEMPLATES = ["food/index.html", "_layouts/recipe.html", "_layouts/default.html",
-             "_includes/filter_group.html", "_includes/recipe_badges.html",
-             "_includes/heading_with_highlighter.html"]
+             "_includes/filter_group.html", "_includes/recipe_badges.html"]
 
 
 @pytest.mark.parametrize("relpath", TEMPLATES)

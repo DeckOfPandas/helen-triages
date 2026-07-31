@@ -32,8 +32,6 @@ permalink: /food/
     {% include filter_group.html
       group_class=star_data.class
       label=star_data.label
-      color=star_data.color
-      brush_colour=star_data.brush_colour
       items=all_stars
       btn_class="btn-star"
       data_attr="data-star"
@@ -53,8 +51,6 @@ permalink: /food/
     {% include filter_group.html
       group_class=group.class
       label=group.label
-      color=group.color
-      brush_colour=group.brush_colour
       items=group_tags
       btn_class="btn-tag"
       data_attr="data-tag"
@@ -63,11 +59,8 @@ permalink: /food/
 
   <div class="category search search--ingredients">
     <div class="search-input">
-      <label class="category-label" for="ingredient-search-box" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
-        {% if ingredients_data.brush_colour %}
-          <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ ingredients_data.brush_colour }}"></span>
-        {% endif %}
-        {{ ingredients_data.label }}
+      <label class="category-label" for="ingredient-search-box">
+        <span class="category-label-text">{{ ingredients_data.label }}</span>
       </label>
       <input type="text" id="ingredient-search-box" autocomplete="off" placeholder="ingredient name..." />
       <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="display: none;">&times; clear</button>
@@ -79,11 +72,8 @@ permalink: /food/
 
   <div class="category search search--name">
     <div class="search-input">
-      <label class="category-label" for="name-search-box" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
-        {% if name_search_data.brush_colour %}
-          <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ name_search_data.brush_colour }}"></span>
-        {% endif %}
-        {{ name_search_data.label }}
+      <label class="category-label" for="name-search-box">
+        <span class="category-label-text">{{ name_search_data.label }}</span>
       </label>
       <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
       <button type="button" class="btn-clear-inline" id="name-search-clear" style="display: none;">&times; clear</button>
@@ -93,7 +83,7 @@ permalink: /food/
   {% if site.show_unrewritten %}
   <div class="category category--meta">
     <div class="category-label-row">
-      <span class="category-label">[ META FILTERS ]</span>
+      <span class="category-label"><span class="category-label-text">META FILTERS</span></span>
     </div>
     <div class="category-buttons">
       <button type="button" class="btn-meta" aria-pressed="false" data-meta="rewrite">needs rewrite</button>

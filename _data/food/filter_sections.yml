@@ -1,8 +1,14 @@
 # =============================================================================
 # FILTER SECTION PRESENTATION
 #
-# Label text, CSS class, brush texture, and the order sections appear in on the
-# index. Presentation only.
+# Label text, CSS class, and the order sections appear in on the index.
+# Presentation only.
+#
+# `brush_colour:` was removed on 2026-08-01 with the watercolour washes. Each
+# section's hue now lives in _sass/food/_layout.scss beside the rule, the active
+# button text and the clear link it also drives — one value, three uses, and it
+# is a colour rather than an asset-name slug, so the palette is the right home
+# for it. It only sat here because a wash had to pick a FILE.
 #
 # WHICH tags exist is _data/taxonomy.yml. Each entry under `tag_groups:` has a
 # `name:` that keys straight into taxonomy.tags — so adding a tag is a taxonomy
@@ -10,28 +16,30 @@
 #
 # Renamed from index_tags_sections.yml on 2026-07-29: it stopped holding tags
 # when the taxonomy moved out, and the old name had become actively misleading.
+#
+# The square brackets that used to wrap these strings were removed on
+# 2026-07-31 and are not coming back here. They read as a second type system
+# beside the heavy stroked caps, and they are the WORDMARK's device — [ FOOD ]
+# in the site header, where the bracketed word genuinely is a variable read
+# from _data/sites.yml. Presentation like that belongs in a template anyway,
+# never baked into a label string.
 # =============================================================================
 
 star: 
-  label: "[ STAR INGREDIENT ]"
+  label: "STAR INGREDIENT"
   class: category--star
-  brush_colour: "bright-magenta"
 
 ingredients:
-  label: "[ SEARCH INGREDIENTS ]"
-  brush_colour: "aureolin"
+  label: "SEARCH INGREDIENTS"
 
 tag_groups:
   - name: mood
-    label: "[ MOOD ]"
+    label: "MOOD"
     class: category--mood
-    brush_colour: "pure-lime-green"
 
   - name: practicalities
-    label: "[ PRACTICALITIES ]"
+    label: "PRACTICALITIES"
     class: category--practicalities
-    brush_colour: "vibrant-violet"
 
 name_search:
-  label: "[ I KNOW WHAT I WANT ]"
-  brush_colour: "electric-cobalt"
+  label: "I KNOW WHAT I WANT"
