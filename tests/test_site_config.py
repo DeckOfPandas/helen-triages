@@ -47,21 +47,26 @@ def test_filters_js_holds_no_literal_threshold():
 
     For months this value lived as a bare `query.length >= 3` in filters.js with
     nothing defining it, so every rewrite of that file re-derived it from
-    scratch and landed on 2. It now lives in _data/ingredient_words.yml and
-    filters.js reads it by name. If a literal ever reappears, this fails.
+    scratch and landed on 2. It now lives in _data/ingredient_words.yml, read
+    into FAMILY_BUTTON_MIN_CHARS in assets/js/ingredient-search.js (the
+    matching algorithm moved there so it could be tested directly with
+    Node — see tests/js/ingredient-search.test.js — filters.js is DOM wiring
+    only now). If a literal ever reappears in either file, this fails.
     """
-    js = read("js", "filters.js")
-    literals = re.findall(r"query\.length\s*[<>]=?\s*\d+", js)
+    js = read("assets", "js", "filters.js")
+    search_js = read("assets", "js", "ingredient-search.js")
+    literals = re.findall(r"query\.length\s*[<>]=?\s*\d+", js + search_js)
     assert not literals, (
-        f"js/filters.js contains hardcoded query-length comparison(s): {literals}.\n"
+        f"Hardcoded query-length comparison(s) found: {literals}.\n"
         f"This threshold is defined in _data/ingredient_words.yml as "
-        f"`search.family_button_min_chars` and read into FAMILY_BUTTON_MIN_CHARS. "
-        f"Use that constant instead of a literal — the literal is exactly the "
-        f"thing that kept resetting to 2."
+        f"`search.family_button_min_chars` and read into FAMILY_BUTTON_MIN_CHARS "
+        f"in ingredient-search.js. Use that constant instead of a literal — the "
+        f"literal is exactly the thing that kept resetting to 2."
     )
-    assert "FAMILY_BUTTON_MIN_CHARS" in js, (
-        "js/filters.js no longer references FAMILY_BUTTON_MIN_CHARS. The "
-        "threshold should be read from the vocabulary, not inlined."
+    assert "FAMILY_BUTTON_MIN_CHARS" in search_js, (
+        "assets/js/ingredient-search.js no longer references "
+        "FAMILY_BUTTON_MIN_CHARS. The threshold should be read from the "
+        "vocabulary, not inlined."
     )
 
 
@@ -84,9 +89,28 @@ def test_vocabulary_is_emitted_to_the_page():
     )
 
 
+def test_ingredient_search_js_loads_before_filters_js():
+    """filters.js calls HTF.ingredientSearch at startup -- it must already exist.
+
+    Same shape as assets.js needing to load before everything else: the
+    matching algorithm lives in ingredient-search.js (see
+    model_instructions/DEV_JOBS_v22.md §3.4), and filters.js wires it up
+    with `HTF.ingredientSearch.create(...)` in its very first few lines.
+    """
+    html = read("index.html")
+    search_tag = re.search(r"<script src=[^>]*ingredient-search\.js", html)
+    filters_tag = re.search(r"<script src=[^>]*filters\.js", html)
+    assert search_tag, "index.html no longer loads assets/js/ingredient-search.js."
+    assert filters_tag, "index.html no longer loads assets/js/filters.js."
+    assert search_tag.start() < filters_tag.start(), (
+        "ingredient-search.js must load BEFORE filters.js, or "
+        "HTF.ingredientSearch won't exist yet when filters.js runs."
+    )
+
+
 def test_filters_js_holds_no_ingredient_vocabulary():
     """Singulars and synonyms belong in YAML, not in the JavaScript."""
-    js = read("js", "filters.js")
+    js = read("assets", "js", "filters.js")
     for name in ("var singularMap = {", "var synonymMap = {"):
         assert name not in js, (
             f"js/filters.js declares `{name}...` inline. The ingredient "
@@ -136,7 +160,7 @@ def test_deleted_data_files_stay_deleted(relpath):
 
 def test_palette_is_the_only_place_hex_colours_are_written():
     """JS reads the palette from CSS custom properties rather than mirroring it."""
-    js = read("js", "colours.js")
+    js = read("assets", "js", "colours.js")
     assert "getPropertyValue" in js, (
         "js/colours.js is no longer reading colours from CSS custom properties. "
         "It should call getComputedStyle on :root and read --colour-* values "
@@ -176,7 +200,7 @@ def test_pantry_entries_are_actually_used():
 
 # --- one base URL, one fetch path -------------------------------------------
 
-JS_DIR = ROOT / "js"
+JS_DIR = ROOT / "assets" / "js"
 
 
 def test_base_url_is_derived_in_exactly_one_place():
@@ -336,7 +360,7 @@ def test_filter_buttons_announce_their_state():
         "Filter buttons in filter_group.html have no aria-pressed attribute. "
         "Visually the active state is obvious; programmatically it is invisible."
     )
-    assert "syncAriaPressed" in read("js", "filters.js"), (
+    assert "syncAriaPressed" in read("assets", "js", "filters.js"), (
         "filters.js no longer syncs aria-pressed. The attribute would then be "
         "stuck at its initial value and would lie about the filter state."
     )
@@ -374,7 +398,7 @@ def test_the_method_is_called_method_everywhere():
     fallback to a front matter field that no file has used since June.
     """
     offenders = []
-    for relpath in ("_layouts/recipe.html", "_sass/_recipe.scss", "js/method-toggle.js"):
+    for relpath in ("_layouts/recipe.html", "_sass/_recipe.scss", "assets/js/method-toggle.js"):
         path = ROOT / relpath
         if not path.exists():
             continue

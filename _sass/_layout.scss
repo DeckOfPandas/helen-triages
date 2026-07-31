@@ -371,6 +371,16 @@ article.recipe .method-short {
   }
 }
 
+// A search-result tag where some word genuinely starts with what was typed
+// (not just a family member pulled in alongside it — see hasWordMatch in
+// filters.js). Reuses the same aureolin-at-badge-strength tint already used
+// for .badge-ingredient-hit, rather than inventing a new colour: a subtle
+// wash of the search section's own colour, still reading as part of the
+// grey palette rather than a loud highlight.
+.btn-ingredient--word-match {
+  background-color: rgba($color-ingredient-root, $saturation-badge-bg);
+}
+
 // ============================================================================
 // FILTER LABELS AND CATEGORIES
 // ============================================================================

@@ -22,6 +22,139 @@ search:
   family_button_min_chars: 3
 
 # -----------------------------------------------------------------------------
+# Modifiers — leading words the search UI strips before matching, so
+# "chopped pistachios" and "pistachios" are treated as the one ingredient.
+#
+# Recipe files are NOT touched — main_ingredients keeps the word, because
+# it's an accurate instruction there. This list only governs how the search
+# box matches and labels things.
+#
+# Deliberately short, and deliberately NOT a general "strip adjectives" list.
+# A word belongs here only if it describes a preparation state with no
+# product distinction riding on it. Checked against every multi-word
+# main_ingredients entry in the collection before being added — words that
+# looked like candidates but were rejected because they mark a genuinely
+# different product: "smoked" (smoked haddock vs haddock), "roasted"
+# (roasted red peppers), "whole" (whole milk vs milk — note "ground" and
+# "dried" have no such collision: nothing else in the collection is just
+# "almonds"/"ginger"/"pasta"/"porcini" with a different qualifier, so
+# stripping them loses no distinction the way stripping "whole" or "smoked"
+# would).
+modifiers:
+  - chopped
+  - crispy
+  - ground
+  - dried
+  - leftover
+  # "gressingham" is a different KIND of exception to the rest of this list —
+  # it's a breed/brand qualifier, not a preparation state, so it doesn't pass
+  # the "no product distinction" test the others do. It's here anyway, at
+  # Helen's explicit call: "duck leg" and "Gressingham duck legs" aren't
+  # meaningfully distinct results for a decision-support search, even though
+  # they're genuinely different products on a shelf. Not a precedent for
+  # stripping other brand names without asking first.
+  - gressingham
+
+# -----------------------------------------------------------------------------
+# Stopwords — connector words that never count as a match target, wherever
+# they fall in an entry. "chicken thighs and drumsticks" contains "and", so
+# typing "a" matched it; "pork or turkey mince" contains "or", so typing "o"
+# matched that and "leg of lamb" too. Neither is a real ingredient word.
+#
+# Different from `modifiers`: modifiers are stripped from the FRONT and
+# change the canonical entry ("chopped pistachios" becomes "pistachios"
+# everywhere, including the button label). Stopwords are invisible to
+# MATCHING ONLY, wherever they sit in the phrase — the display text keeps
+# "and"/"or"/"of" exactly as written, because dropping them would leave a
+# broken sentence ("chicken thighs drumsticks"), not a cleaner ingredient
+# name.
+#
+# Checked against every multi-word main_ingredients entry: these four are
+# the only connector words that actually appear as their own word anywhere
+# in the collection.
+stopwords:
+  - and
+  - or
+  - of
+  - with
+
+# -----------------------------------------------------------------------------
+# Never-family words — first words that head 2+ entries but should never earn
+# an "(all)" button, because the entries sharing them aren't a real family.
+#
+# Different from `modifiers` above: these words are NOT stripped. "red onion"
+# stays "red onion" — "red" is a genuine, meaningful variety, the same way
+# "smoked" and "whole" are (see the modifiers comment). The problem isn't the
+# word, it's treating everything that happens to start with it as one group:
+# "red (all)" would lump together red wine, red onion and red Thai curry
+# paste, which have nothing in common but the word "red". Nobody searching
+# thinks "what can I cook with some kind of red".
+#
+# Every word here was checked against the real data first. Most head at
+# least two main_ingredients entries that are otherwise unrelated foods,
+# purely coincidentally sharing a colour or variety word, and are never
+# themselves a standalone ingredient — "cherry" and "oyster" don't qualify
+# on that test (bare "cherries" and oyster as a shellfish are real
+# ingredients), so they get their own handling in `family_exceptions` below
+# instead.
+#
+# "tomato" and "fennel" are exceptions to the "never standalone" test — both
+# ARE real ingredients — but earn a place here anyway: once "tomato ketchup"
+# is correctly excluded (see family_exceptions), the only other tomato
+# member is "tomato purée", and once "fennel seed"/"fennel seeds" correctly
+# collapse into one entry (see `singulars`), the only other fennel member is
+# "fennel seed" itself. A purée and a spice are both background
+# flavour-builders used by the tablespoon or teaspoon, not something you'd
+# reach for the way you'd reach for a tomato or a fennel bulb. A two-member
+# family whose members don't actually substitute for each other isn't a
+# useful "(all)" any more than a coincidental one is — the real test
+# throughout this list is "would a user think of these as some kind of the
+# same thing", and word-sharing is only the most common way to fail it.
+never_family:
+  - mixed
+  - red
+  - white
+  - brown
+  - dark
+  - golden
+  - green
+  - soft
+  - sweet
+  - baby
+  - hot
+  - light
+  - pearl
+  - plum
+  - salted
+  - spring
+  - thai
+  - whole
+  - tomato
+  - fennel
+
+# -----------------------------------------------------------------------------
+# Family exceptions — specific entries excluded from counting towards their
+# own head word's family, because they aren't really a kind of that word at
+# all, just a coincidental compound name. "cherry tomatoes" isn't a cherry;
+# "oyster mushrooms" aren't related to oysters, they're named for their shape.
+#
+# Different from `never_family`: the WORD still heads a family if a genuine
+# member justifies one. Here, neither word does — "cherry" and "oyster" both
+# lose their (all) button entirely, because once the impostor is excluded,
+# nothing legitimate is left to group (bare "cherries" and "oyster sauce"
+# are the only real members, one each). ("tomato ketchup" isn't listed here
+# any more — "tomato" moved to never_family outright, once its only other
+# member, "tomato purée", turned out not to be a good enough reason to keep
+# the family either.)
+#
+# These entries still show up as normal individual search results — this
+# only stops them being swept into an (all) button under a word they don't
+# actually belong to.
+family_exceptions:
+  - cherry tomatoes
+  - oyster mushrooms
+
+# -----------------------------------------------------------------------------
 # Singulars — plural form on the left, the form to match on, on the right.
 #
 # Used to normalise ingredient words before comparison, so that "chicken legs"
@@ -54,6 +187,7 @@ singulars:
   ribs: rib
   sardines: sardine
   scallops: scallop
+  seeds: seed
   steaks: steak
   thighs: thigh
   tomatoes: tomato
