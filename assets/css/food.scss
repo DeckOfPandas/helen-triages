@@ -1,0 +1,16 @@
+---
+---
+// Helen Triages FOOD — compiled stylesheet. Linked only by pages whose
+// site_key is `food` (see _data/sites.yml → food.css).
+//
+// Import order matters: palette first, then tokens and base (which reference
+// palette variables), then layout, then the recipe page.
+//
+// shared/ is imported by both sites and may not name either. food/ may assume
+// anything it likes. Nothing in shared/ imports anything from food/.
+@import "food/palette";
+@import "shared/tokens";
+@import "shared/base";
+@import "shared/layout";
+@import "food/layout";
+@import "food/recipe";

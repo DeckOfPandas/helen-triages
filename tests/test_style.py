@@ -26,7 +26,7 @@ IDIOM = re.compile(r"(?<![0-9])\s*(minutes?|hours?|seconds?)\b", re.I)
 def test_no_estimated_timings(recipe):
     """`Estimated N mins` values were invented by an earlier Claude.
 
-    They are fine in _drafts/ but must never reach _recipes/ — an estimate that
+    They are fine in _food_drafts/ but must never reach _food_recipes/ — an estimate that
     survives to publication is indistinguishable from a measured time.
     """
     offenders = {f: recipe.fm[f] for f in TIME_FIELDS
@@ -138,8 +138,8 @@ def test_temperatures_use_degree_c(recipe):
 
 def _accented_words() -> dict:
     import yaml
-    from conftest import DATA_DIR
-    path = DATA_DIR / "accented_words.yml"
+    from conftest import SHARED_DATA_DIR
+    path = SHARED_DATA_DIR / "accented_words.yml"
     if not path.exists():
         pytest.skip(
             "_data/accented_words.yml is missing. It is the curated list of "

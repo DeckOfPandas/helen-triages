@@ -1,0 +1,159 @@
+// =============================================================================
+// SHARED LAYOUT — the page shell every site in the mono-repo renders
+// =============================================================================
+// This is the CSS for _layouts/default.html and nothing else: the content
+// column, the header, the wordmark and the footer. If default.html emits a
+// class, its rule belongs here — otherwise a site with its own palette but no
+// copy of these rules gets an unstyled header, which is exactly what happened
+// when cocktails was first stood up.
+//
+// PALETTE CONTRACT
+// The shared partials use palette variables by NAME and never define them.
+// Every site palette (_sass/<site>/_palette.scss) must declare all nine that
+// _base.scss and this file between them consume:
+//
+//   $color-bg     $color-border   $color-clear-text  $color-mood-root
+//   $color-surface  $color-text   $color-white
+//   $font-body    $font-headings
+//
+// tests/test_site_config.py enforces the list, because a missing variable is a
+// Sass compile error on the deploy build rather than something you notice
+// locally — and the error names a line in a shared file, not the palette that
+// actually forgot it.
+//
+// No class in this file may name one site. `.site-logo-food` used to live here
+// and was renamed `.site-logo-word` when the layout became shared — the word in
+// the brackets comes from _data/sites.yml, so the class cannot assume it.
+main {
+  max-width: $width-content;
+  margin: 0 auto;
+  padding: $space-xxl $space-xl;
+  position: relative;
+}
+
+// ============================================================================
+// SITE CHROME
+// ============================================================================
+// Header, footer, logo. Everything outside <main>.
+
+.site-header {
+  -webkit-text-stroke: 1px;
+  letter-spacing: 0.5em;
+  text-align: center;
+}
+
+.site-title-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+
+.site-header {
+  padding: $space-xl;
+  border-bottom: 1px solid $color-border;
+  background: $color-surface;
+
+  .site-title {
+    font-family: $font-headings;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: $color-text;
+  }
+}
+
+.site-footer {
+  max-width: $width-content;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem calc(1.5rem * 2) 1.5rem;
+  border-top: 1px dashed $color-border;
+  text-align: center;
+  font-family: $font-headings;
+  font-size: 0.75rem;
+  color: $color-clear-text;
+  letter-spacing: 0.01em;
+}
+
+// Heart doodle above the footer copyright line.
+// SVG is injected by js/decorations.js.
+// Width set here; height auto to preserve natural proportions.
+.site-footer-hearts {
+  display: flex;
+  justify-content: center;
+  line-height: 0;
+  margin-bottom: $space-md;
+
+  svg {
+    display: block;
+    width: 240px;   // ~60% of natural rendered size
+    height: auto;
+  }
+}
+
+.site-logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0rem;
+}
+
+.site-logo-top {
+  font-family: $font-headings;
+  font-size: 2rem;
+  font-weight: 1000;
+  letter-spacing: 0.18em;
+  color: $color-text;
+  -webkit-text-stroke: 1.2px rgba(50,50,50,0.9);
+  text-transform: uppercase;
+  padding-right: 0.18em;
+}
+
+.site-logo-tape {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-1.75deg);
+  transform-origin: center center;
+  // min() rather than a plain 425px: on a phone this was the one element on the
+  // site wide enough to force horizontal scroll. 92vw rather than 100vw because
+  // the rotation makes the rendered bounding box slightly wider than the
+  // declared width, and horizontal scroll is the most visible mobile failure
+  // there is. No media query needed.
+  width: min(425px, 92vw);
+  height: 70px;
+  margin-top: -$space-lg;  // pull it up toward HELEN TRIAGES
+
+
+  .tape-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  }
+}
+
+.site-logo-word {
+  position: relative;
+  z-index: 1;
+  font-family: $font-headings;
+  font-size: 2.5rem;
+  font-weight: 1000;
+  letter-spacing: 0.18em;
+  color: $color-white;
+  -webkit-text-stroke: 0.8px rgba(230, 230, 230, 0.9);
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1;
+  padding: 0 13%;
+
+  .site-logo-bracket {
+    letter-spacing: 0;
+  }
+}

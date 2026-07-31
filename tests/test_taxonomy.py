@@ -1,7 +1,7 @@
 """Taxonomy and links.
 
 Everything in this file that touches `taxonomy` skips until
-`_data/taxonomy.yml` exists. That is deliberate: these tests are the written
+`_data/food/taxonomy.yml` exists. That is deliberate: these tests are the written
 specification for a file that has not been created yet (ARCHITECTURE_v22.md,
 Phase 2.1). Create the file and they start enforcing it with no further work.
 
@@ -24,7 +24,7 @@ def test_star_ingredient_is_declared(recipe, taxonomy):
     declared = taxonomy.get("star_ingredients") or []
     assert star in declared, (
         f"{where(recipe)} has `star_ingredient: {star!r}`, which is not declared "
-        f"in _data/taxonomy.yml.\n"
+        f"in _data/food/taxonomy.yml.\n"
         f"Declared stars are: {', '.join(declared)}.\n"
         f"Either this is a typo, or the star is real and needs adding to the "
         f"taxonomy — it will not get a filter button until it is."
@@ -38,14 +38,14 @@ def test_tags_are_declared(recipe, taxonomy):
     unknown = [t for t in (recipe.fm.get("tags") or []) if t not in declared]
     assert not unknown, (
         f"{where(recipe)} uses undeclared tag(s) {unknown}.\n"
-        f"A tag that is not in _data/taxonomy.yml renders on the recipe page but "
+        f"A tag that is not in _data/food/taxonomy.yml renders on the recipe page but "
         f"has no filter button on the index, so it is invisible to anyone "
         f"browsing. Declared tags: {', '.join(sorted(declared))}."
     )
 
 
 def test_co_tag_rules(recipe, taxonomy):
-    """Tags that imply other tags, declared in _data/taxonomy.yml.
+    """Tags that imply other tags, declared in _data/food/taxonomy.yml.
 
     The rules live in the data layer rather than in this file so that changing
     one is a YAML edit, not a code edit. The reasoning for each — and for the
@@ -63,7 +63,7 @@ def test_co_tag_rules(recipe, taxonomy):
         f"{where(recipe)} breaks co-tag rule(s):\n  " + "\n  ".join(problems)
         + "\n\nEither add the missing tag(s), or — if this recipe is a real "
           "exception — the rule itself may be unsound. See the test for adding "
-          "a co-tag at the top of the co_tags section in _data/taxonomy.yml."
+          "a co-tag at the top of the co_tags section in _data/food/taxonomy.yml."
     )
 
 
@@ -120,8 +120,8 @@ def test_internal_recipe_links_resolve(recipe):
     broken = [slug for slug in LINK.findall(recipe.raw) if slug not in PUBLISHED]
     assert not broken, (
         f"{where(recipe)} links to recipe slug(s) {broken}, which are not in "
-        f"_recipes/.\n"
-        f"Either the target is still in _drafts/ (in which case the link 404s "
+        f"_food_recipes/.\n"
+        f"Either the target is still in _food_drafts/ (in which case the link 404s "
         f"until it is promoted) or the slug has been renamed and this link was "
         f"not updated."
     )

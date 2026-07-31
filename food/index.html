@@ -1,25 +1,32 @@
 ---
 layout: default
 title: Home
+permalink: /food/
 ---
 
-<h1 class="visually-hidden">{{ site.title }} — {{ site.description }}</h1>
+{% comment %} site_key is set to `food` for everything in this directory by
+   _config.yml's `defaults:`, so the identity here comes from _data/sites.yml
+   rather than from site.title — which is now the repo-level name, not this
+   site's. {% endcomment %}
+{% assign this_site = site.data.sites[page.site_key] %}
+
+<h1 class="visually-hidden">{{ this_site.title }} — {{ this_site.description }}</h1>
 
 <div class="controls">
-  {% assign star_data = site.data.filter_sections.star %}
-  {% assign ingredients_data = site.data.filter_sections.ingredients %}
-  {% assign tag_groups = site.data.filter_sections.tag_groups %}
-  {% assign name_search_data = site.data.filter_sections.name_search %}
+  {% assign star_data = site.data.food.filter_sections.star %}
+  {% assign ingredients_data = site.data.food.filter_sections.ingredients %}
+  {% assign tag_groups = site.data.food.filter_sections.tag_groups %}
+  {% assign name_search_data = site.data.food.filter_sections.name_search %}
 
-  {% assign all_recipes = site.recipes %}
-  {% if site.drafts %}
-    {% assign all_recipes = all_recipes | concat: site.drafts %}
+  {% assign all_recipes = site.food_recipes %}
+  {% if site.food_drafts %}
+    {% assign all_recipes = all_recipes | concat: site.food_drafts %}
   {% endif %}
   {% assign all_recipes = all_recipes | sort: "title" %}
   
   {% comment %} Stars are DECLARED in _data/taxonomy.yml, not derived from front
      matter. Deriving meant a typo silently minted a new star ingredient. {% endcomment %}
-  {% assign all_stars = site.data.taxonomy.star_ingredients %}
+  {% assign all_stars = site.data.food.taxonomy.star_ingredients %}
 
   {% if all_stars.size > 0 %}
     {% include filter_group.html
@@ -39,7 +46,7 @@ title: Home
        pairs and always works; the bracket form with a variable key is not
        reliable in Liquid. {% endcomment %}
     {% assign group_tags = "" | split: "" %}
-    {% for pair in site.data.taxonomy.tags %}
+    {% for pair in site.data.food.taxonomy.tags %}
       {% if pair[0] == group.name %}{% assign group_tags = pair[1] %}{% endif %}
     {% endfor %}
 
@@ -103,7 +110,7 @@ title: Home
   {% for recipe in all_recipes %}
     {% if recipe.meta.rewritten or site.show_unrewritten %}
       {% assign is_draft = false %}
-      {% if recipe.collection == "drafts" %}{% assign is_draft = true %}{% endif %}
+      {% if recipe.collection == "food_drafts" %}{% assign is_draft = true %}{% endif %}
 
       {% assign _needs_rewrite = false %}
       {% assign _needs_proofread = false %}
@@ -140,7 +147,7 @@ title: Home
            Authored order is preserved within each half, and the data-ingredients
            attribute above is left untouched because filters.js reads it as a set.
         {% endcomment %}
-        {% assign _pantry = site.data.common_ingredients.pantry %}
+        {% assign _pantry = site.data.food.common_ingredients.pantry %}
         {% assign _lead = "" %}
         {% assign _tail = "" %}
         {% for ing in recipe.main_ingredients %}
@@ -176,7 +183,7 @@ title: Home
    family-button threshold — comes from _data/ingredient_words.yml. filters.js
    reads it from here rather than hardcoding any of it. {% endcomment %}
 <script type="application/json" id="ingredient-vocabulary">
-  {{ site.data.ingredient_words | jsonify }}
+  {{ site.data.food.ingredient_words | jsonify }}
 </script>
 
 <script src="{{ '/assets/js/ingredient-search.js' | relative_url }}"></script>

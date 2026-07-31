@@ -1,5 +1,6 @@
 // section-rule.js
-// All SVG assets loaded from files in assets/img/. No paths inlined here.
+// All SVG assets loaded from this site's set under assets/img/<site>/, resolved
+// by HTF.siteAsset. No paths inlined here.
 // To change a colour, update colours.js only.
 
 (function () {
@@ -18,7 +19,8 @@
   function makePicker(names, pathPrefix) {
     var nextName = window.HTF.makeShuffledPicker(names);
     return function(cb) {
-      window.HTF.fetchSvg(window.HTF.asset(pathPrefix + nextName() + '.svg'), cb);
+      var url = window.HTF.siteAsset(pathPrefix + nextName() + '.svg');
+      if (url) window.HTF.fetchSvg(url, cb);
     };
   }
 
@@ -42,14 +44,14 @@
   }
 
   // ── Section rules ─────────────────────────────────────────────────────────
-  // SVGs in assets/img/section-rules/ use SECTION_COLOUR + SECTION_OPACITY placeholders.
+  // SVGs in assets/img/<site>/section-rules/ use SECTION_COLOUR + SECTION_OPACITY placeholders.
   var sectionRuleNames = [
     'section-rule-line-1',      'section-rule-line-1-flip',
     'section-rule-line-2',      'section-rule-line-2-flip',
     'section-rule-line-3',      'section-rule-line-3-flip',
     'section-rule-line-4',      'section-rule-line-4-flip',
   ];
-  var pickSection = makePicker(sectionRuleNames, '/assets/img/section-rules/');
+  var pickSection = makePicker(sectionRuleNames, '/section-rules/');
 
   function sectionRule(cb) {
     pickSection(function(svg) {
@@ -73,7 +75,7 @@
 
   // ── Title box ─────────────────────────────────────────────────────────────
   // Title underline removed from recipe page.
-  // SVG files retained in assets/img/title-box/ for future use.
+  // SVG files retained in assets/img/<site>/title-box/ for future use.
 
 
   // ── Group heading underlines ──────────────────────────────────────────────
@@ -83,7 +85,7 @@
     'underline-multiple-7',      'underline-multiple-7-flip',
     'underline-multiple-8',      'underline-multiple-8-flip',
   ];
-  var pickHeading = makePicker(underlineNames, '/assets/img/underlines/');
+  var pickHeading = makePicker(underlineNames, '/underlines/');
 
   document.querySelectorAll('[data-group-heading]').forEach(function(h3) {
     var textEl = h3.querySelector('.group-heading-text');
@@ -102,7 +104,7 @@
   });
 
   // ── Meta label underlines ─────────────────────────────────────────────────
-  var pickMetaLabel = makePicker(underlineNames, '/assets/img/underlines/');
+  var pickMetaLabel = makePicker(underlineNames, '/underlines/');
 
   document.querySelectorAll('[data-meta-label]').forEach(function(label) {
     var slot = label.nextElementSibling;
@@ -133,7 +135,10 @@
   }
 
   // ── Ingredient bullets ────────────────────────────────────────────────────
-  window.HTF.fetchSvg(window.HTF.asset('/assets/img/doodles/doodle-asterisk.svg'), function(svgText) {
+  // siteAsset returns null on a page belonging to no site, so the URL is
+  // checked before fetching rather than requesting a path with a hole in it.
+  var bulletUrl = window.HTF.siteAsset('/doodles/doodle-asterisk.svg');
+  if (bulletUrl) window.HTF.fetchSvg(bulletUrl, function(svgText) {
     var d = injectDoodle(svgText, C.vibrantViolet);
     var steps = [-157.5,-135,-112.5,-90,-67.5,-45,-22.5,0,22.5,45,67.5,90,112.5,135,157.5];
     for (var j = steps.length - 1; j > 0; j--) {
@@ -162,7 +167,9 @@
     var left  = h2.querySelector('.section-heading-sparkle--left');
     var right = h2.querySelector('.section-heading-sparkle--right');
     if (!left && !right) return;
-    window.HTF.fetchSvg(window.HTF.asset('/assets/img/doodles/' + def.file), function(svg) {
+    var doodleUrl = window.HTF.siteAsset('/doodles/' + def.file);
+    if (!doodleUrl) return;
+    window.HTF.fetchSvg(doodleUrl, function(svg) {
       var d = injectDoodle(svg, def.colour);
       var out = '<svg viewBox="' + d.vb + '" xmlns="http://www.w3.org/2000/svg" '
               + 'preserveAspectRatio="xMidYMid meet" aria-hidden="true" '

@@ -3,40 +3,91 @@
 # Anything that should only ever be visible on your own machine belongs in
 # _config_local.yml, not here.
 # =============================================================================
+#
+# THIS IS A MONO-REPO. One Jekyll build serves two sites:
+#
+#   /helen-triages/food/       Helen Triages Food
+#   /helen-triages/cocktails/  Helen Triages Cocktails
+#
+# They share an outer layout, a spacing/type scale and a base stylesheet, and
+# fork everything below that — palette, decoration, page anatomy, taxonomy.
+# Per-site identity (wordmark, title, stylesheet) lives in _data/sites.yml and
+# is selected by `site_key`, set in `defaults:` at the bottom of this file.
+# =============================================================================
 
-title: Helen Triages Food
-description: What to cook, not how to cook
+# The repo-level identity. Each site overrides this with its own entry in
+# _data/sites.yml — this is only what the root landing page shows.
+title: Helen Triages
+description: Two decision-support tools. What to cook, and what to drink.
 
-# GitHub Pages project site. Repo is helen-triages-food, so the published URL is
-#   https://<your-github-username>.github.io/helen-triages-food/
+# GitHub Pages project site. Repo is helen-triages, so the published URL is
+#   https://<your-github-username>.github.io/helen-triages/
 # baseurl must match the repo name exactly: leading slash, no trailing slash.
 url: "https://deckofpandas.github.io"
-baseurl: "/helen-triages-food"
+baseurl: "/helen-triages"
 
 # Drafts and unrewritten recipes are never shown in production.
 show_unrewritten: false
 
+# --- Collections -------------------------------------------------------------
+# WHY THE SOURCE DIRECTORIES ARE AT THE REPO ROOT AND NOT INSIDE food/
+#
+# Jekyll only discovers a collection at `_<name>` directly under the source
+# root (or under a single shared `collections_dir`). A collection source at
+# `food/_recipes/` is not found — and it fails SILENTLY: the build succeeds and
+# emits nothing at all. That was tested rather than assumed before this config
+# was written.
+#
+# So the site each collection belongs to is carried in its NAME, and `permalink`
+# is what puts the output under /food/ or /cocktails/. The URLs are exactly the
+# ones agreed; only the on-disk location differs from the original sketch.
 collections:
-  recipes:
+  food_recipes:
     output: true
-    permalink: /recipes/:path/
-  drafts:
+    permalink: /food/recipes/:path/
+  food_drafts:
     # output: false means drafts get NO public URL and are NOT in the sitemap.
     # _config_local.yml flips this back to true so you can still read them locally.
     output: false
+  cocktail_recipes:
+    output: true
+    permalink: /cocktails/recipes/:path/
 
+# --- Defaults ----------------------------------------------------------------
+# `site_key` is the one value that makes the shared layout site-aware. It keys
+# into _data/sites.yml for the wordmark, page title, stylesheet and footer
+# decoration, and into _data/<key>/ for that site's vocabulary. A page with no
+# site_key (the root landing page) falls back to the repo-level identity above.
 defaults:
   - scope:
       path: ""
-      type: recipes
+      type: food_recipes
     values:
       layout: recipe
+      site_key: food
   - scope:
       path: ""
-      type: drafts
+      type: food_drafts
     values:
       layout: recipe
+      site_key: food
       sitemap: false   # belt and braces: excluded even if output is ever flipped
+  - scope:
+      path: ""
+      type: cocktail_recipes
+    values:
+      layout: cocktail
+      site_key: cocktails
+  # Pages, by directory. These are ordinary pages rather than collection
+  # documents, so they are scoped by path instead of by type.
+  - scope:
+      path: "food"
+    values:
+      site_key: food
+  - scope:
+      path: "cocktails"
+    values:
+      site_key: cocktails
 
 # Keep non-site files out of the build. Setting `exclude` REPLACES Jekyll's
 # defaults, so the standard entries are repeated here.
@@ -52,6 +103,11 @@ exclude:
   - tests/
   - pytest.ini
   - requirements-test.txt
+  # Project-local Node install for the JS tests. Dev-only, and large.
+  - .node-runtime/
+  # Working notes and agent instructions — never published
+  - model_instructions/
+  - CLAUDE.md
   # Build output. `_site` is auto-excluded when it is the destination, but the
   # production preview builds to _site_prod, so each server would otherwise
   # watch the other's output and rebuild in a loop.

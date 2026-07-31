@@ -1,9 +1,0 @@
----
----
-// Import order matters: palette first, then tokens (which may reference palette),
-// then base (global resets/typography), then layout, then recipe.
-@import "palette";
-@import "tokens";
-@import "base";
-@import "layout";
-@import "recipe";

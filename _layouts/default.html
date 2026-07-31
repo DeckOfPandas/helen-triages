@@ -3,13 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% comment %} ── Which site is this? ─────────────────────────────────────────
+     One build serves Helen Triages Food and Helen Triages Cocktails. `site_key`
+     is set by _config.yml's `defaults:` — per collection for recipe pages, per
+     directory for ordinary pages — and keys into _data/sites.yml for everything
+     that differs between them.
+
+     A page with no site_key belongs to neither: the root landing page. It falls
+     back to the repo-level title and description in _config.yml and links no
+     site stylesheet, which is why every lookup below goes through `default:`
+     rather than assuming `this_site` exists.
+
+     This is the only place the two sites are told apart. Adding a third should
+     be an entry in _data/sites.yml and a palette, not an edit here.
+  {% endcomment %}
+  {% assign this_site = site.data.sites[page.site_key] %}
+  {% assign site_title = this_site.title | default: site.title %}
+  {% assign site_desc = this_site.description | default: site.description %}
+
   {% comment %} ── Page identity ───────────────────────────────────────────────
      A recipe page describes itself with its own tagline; everything else falls
      back to the site description. Set once here, reused by every meta tag below.
   {% endcomment %}
-  {% assign page_title = site.title %}
-  {% if page.title %}{% assign page_title = page.title | append: " | " | append: site.title %}{% endif %}
-  {% assign page_description = page.tagline | default: site.description | strip_newlines %}
+  {% assign page_title = site_title %}
+  {% if page.title %}{% assign page_title = page.title | append: " | " | append: site_title %}{% endif %}
+  {% assign page_description = page.tagline | default: site_desc | strip_newlines %}
 
   <title>{{ page_title }}</title>
   <meta name="description" content="{{ page_description | escape }}">
@@ -23,9 +41,9 @@
      to _config.yml when you have artwork you want on the card; until then the
      preview is text-only, which is correct rather than broken.
   {% endcomment %}
-  <meta property="og:type" content="{% if page.collection == 'recipes' %}article{% else %}website{% endif %}">
-  <meta property="og:site_name" content="{{ site.title | escape }}">
-  <meta property="og:title" content="{{ page.title | default: site.title | escape }}">
+  <meta property="og:type" content="{% if page.collection %}article{% else %}website{% endif %}">
+  <meta property="og:site_name" content="{{ site_title | escape }}">
+  <meta property="og:title" content="{{ page.title | default: site_title | escape }}">
   <meta property="og:description" content="{{ page_description | escape }}">
   <meta property="og:url" content="{{ page.url | absolute_url }}">
   {% if site.social_image %}
@@ -36,19 +54,43 @@
   {% endif %}
 
   <link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+  {% comment %} Each site links only its own compiled stylesheet, so the two
+     never share a class name they could fight over. assets/css/food.scss and
+     assets/css/cocktails.scss import the same shared partials and their own
+     palette. The root landing page has no site, so it links the shared base
+     only — see assets/css/root.scss. {% endcomment %}
+  {% if this_site %}
+  <link rel="stylesheet" href="{{ '/assets/css/' | append: this_site.css | append: '.css' | relative_url }}">
+  {% else %}
+  <link rel="stylesheet" href="{{ '/assets/css/root.css' | relative_url }}">
+  {% endif %}
   <meta name="base-url" content="{{ '/' | relative_url }}">
+  {% comment %} Read by assets.js only, which exposes it as HTF.site and builds
+     every artwork URL from it. Food and cocktails have separate SVG sets under
+     assets/img/<key>/, so a decorative fetch cannot be written without it.
+     Empty on the landing page, and assets.js treats empty as "draw nothing".
+  {% endcomment %}
+  <meta name="site-key" content="{{ page.site_key }}">
 </head>
 <body>
 
   <header class="site-header">
-  <a href="{{ '/' | relative_url }}" class="site-title-link">
+  <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">
     <div class="site-logo">
       <div class="site-logo-top">HELEN TRIAGES</div>
+      {% comment %} The bracketed word is the site's, from _data/sites.yml. On
+         the landing page there is no site, so the wordmark is just HELEN
+         TRIAGES with nothing taped underneath it. {% endcomment %}
+      {% if this_site %}
       <div class="site-logo-tape">
-        <span class="tape-bg" aria-hidden="true"></span>
-        <span class="site-logo-food"><span class="site-logo-bracket">[ </span>FOOD<span class="site-logo-bracket"> ]</span></span>
+        {% if this_site.tape %}
+        <span class="tape-bg" aria-hidden="true"
+              data-tape-dir="{{ this_site.tape }}"
+              data-tape-count="{{ this_site.tape_count }}"></span>
+        {% endif %}
+        <span class="site-logo-word"><span class="site-logo-bracket">[ </span>{{ this_site.word }}<span class="site-logo-bracket"> ]</span></span>
       </div>
+      {% endif %}
     </div>
   </a>
   </header>
@@ -58,16 +100,26 @@
   </main>
 
   <footer class="site-footer">
-    <div class="site-footer-hearts" aria-hidden="true"></div>
-    <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
+    {% if this_site.footer_svg %}
+    <div class="site-footer-hearts" aria-hidden="true" data-footer-svg="{{ this_site.footer_svg }}"></div>
+    {% endif %}
+    <p>&copy; {{ site.time | date: "%Y" }} {{ site_title }}</p>
   </footer>
 
 
-  {% comment %} assets.js must load first — it resolves the base URL and owns all
-     SVG fetching. decorations.js injects every hand-drawn SVG on the page.
-     colours.js exposes the palette to JS for section-rule.js. {% endcomment %}
+  {% comment %} assets.js must load first — it resolves the base URL and the
+     site key, and owns all SVG fetching. decorations.js injects every
+     hand-drawn SVG on the page.
+
+     colours.js is deliberately NOT loaded here. It reads food's --colour-*
+     custom properties off :root, and its only consumer is section-rule.js,
+     which _layouts/recipe.html loads along with its own copy of colours.js. A
+     copy here was doing nothing on the index and would warn eight times on
+     every page whose palette does not define those properties — which is every
+     cocktails page and the landing page. A shared layout must not reach for one
+     site's palette.
+  {% endcomment %}
   <script src="{{ '/assets/js/assets.js' | relative_url }}"></script>
-  <script src="{{ '/assets/js/colours.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/decorations.js' | relative_url }}"></script>
 
 </body>

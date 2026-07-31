@@ -5,8 +5,13 @@ _site_prod/
 .jekyll-metadata
 .sass-cache/
 
-# Unpublished 
-_drafts/
+# Unpublished. One entry per site's drafts collection — the pattern is the
+# collection's source directory name, so RENAMING A COLLECTION SILENTLY
+# UN-IGNORES IT. That happened once: `_drafts/` became `_food_drafts/` in the
+# mono-repo migration and 221 unpublished recipes stopped being ignored without
+# a word. tests/test_site_config.py now checks this against _config.yml.
+_food_drafts/
+_cocktail_drafts/
 
 # Ruby
 vendor/
