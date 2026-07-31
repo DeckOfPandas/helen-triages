@@ -180,11 +180,12 @@ document.addEventListener('DOMContentLoaded', function () {
     return a.toLowerCase().localeCompare(b.toLowerCase());
   });
 
-  function makeIngredientButton(key, label) {
+  function makeIngredientButton(key, label, wordMatch) {
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'btn-tag btn-ingredient';
     if (key === activeIngredient) btn.classList.add('active');
+    if (wordMatch) btn.classList.add('btn-ingredient--word-match');
     btn.dataset.ingredient = key;
     btn.textContent = label;
     return btn;
@@ -256,14 +257,24 @@ function renderResultsPool() {
       if (!allMatch) return;
       // Same "start of the string" rule as the single-word path.
       var isPrefixMatch = fold(ing.toLowerCase()).indexOf(query) === 0;
-      multiMatches.push({ ing: ing, ingKey: ingKey, isPrefixMatch: isPrefixMatch });
+      // Same "any word" rule as the single-word path's hasWordMatch, applied
+      // per query word: does every word you typed start some word in this
+      // entry (not necessarily the same one, not necessarily in order)?
+      var hasWordMatch = queryWords.every(function(qw) {
+        return ingWords.some(function(iw) { return iw.indexOf(qw) === 0; });
+      });
+      multiMatches.push({ ing: ing, ingKey: ingKey, isPrefixMatch: isPrefixMatch, hasWordMatch: hasWordMatch });
     });
+    // Same three-band order as the single-word path — see the comment
+    // there for why word-matches are ranked above, but not as high as,
+    // strict prefix matches.
     var multiPrefix = multiMatches.filter(function(c) { return c.isPrefixMatch; });
-    var multiRest = multiMatches.filter(function(c) { return !c.isPrefixMatch; });
-    multiPrefix.concat(multiRest).forEach(function(c) {
+    var multiRestMatched = multiMatches.filter(function(c) { return !c.isPrefixMatch && c.hasWordMatch; });
+    var multiRestOther = multiMatches.filter(function(c) { return !c.isPrefixMatch && !c.hasWordMatch; });
+    multiPrefix.concat(multiRestMatched, multiRestOther).forEach(function(c) {
       if (!renderedKeys.has(c.ingKey)) {
         renderedKeys.add(c.ingKey);
-        resultsPool.appendChild(makeIngredientButton(c.ing, c.ing));
+        resultsPool.appendChild(makeIngredientButton(c.ing, c.ing, c.hasWordMatch));
       }
     });
   } else {
@@ -341,7 +352,18 @@ function renderResultsPool() {
       // reasons that have nothing to do with relevance.
       var isPrefixMatch = foldedIng.indexOf(query) === 0 || normWords[0].indexOf(query) === 0;
 
-      candidates.push({ ing: ing, normKey: normKey, isPrefixMatch: isPrefixMatch });
+      // For the background tint (see .btn-ingredient--word-match): does ANY
+      // word — not just the first — start with the query? Deliberately
+      // looser than isPrefixMatch above, which only ever looks at the start
+      // of the whole string. "cream cheese" isn't ranked as a top match for
+      // "chees" (it doesn't start with "chees"), but it's still worth
+      // marking as a real textual hit rather than a family-only one like
+      // "cheddar", which doesn't contain "chees" anywhere at all.
+      var hasWordMatch = ingWords.some(function(word, idx) {
+        return fold(word).indexOf(query) === 0 || normWords[idx].indexOf(query) === 0;
+      });
+
+      candidates.push({ ing: ing, normKey: normKey, isPrefixMatch: isPrefixMatch, hasWordMatch: hasWordMatch });
 
       // Check for STRUCTURAL family membership — a FIRST word with no curated
       // synonym list that nonetheless heads 2+ distinct entries (only for
@@ -394,22 +416,32 @@ function renderResultsPool() {
       var label = fw + ' (all)';
       if (!renderedAllKeys.has(fw)) {
         renderedAllKeys.add(fw);
-        resultsPool.appendChild(makeIngredientButton(label, label));
+        // Always a word match by construction — a family only ever forms
+        // (curated or structural) when its word already starts with the
+        // query, so this is never in doubt for an (all) button.
+        resultsPool.appendChild(makeIngredientButton(label, label, true));
       }
     });
 
-    // Render order: entries starting with the query outrank everything else,
-    // full stop — family membership affects whether an entry is INCLUDED
-    // (matchedAnyWord / isFamilyMember above), not where it ranks. Within
-    // each tier, alphabetical — masterIngredientsList is already sorted,
-    // and filtering preserves that order.
+    // Render order, three bands: entries starting with the query outrank
+    // everything else, full stop — family membership affects whether an
+    // entry is INCLUDED (matchedAnyWord / isFamilyMember above), not where
+    // it ranks. Within the rest, a genuine word match ("cream cheese",
+    // matched on its own text) outranks a family-only member ("cheddar",
+    // included purely because the curated list says it's a cheese) —
+    // deliberately NOT promoted as far as the prefix tier, or "chocolate
+    // chips" (tinted for "chi" via "chips") would rank alongside "chicken
+    // breast" again, the exact confusion the prefix-tier rule exists to
+    // avoid. Alphabetical within each band — masterIngredientsList is
+    // already sorted, and filtering preserves that order.
     var prefixMatches = candidates.filter(function(c) { return c.isPrefixMatch; });
-    var rest = candidates.filter(function(c) { return !c.isPrefixMatch; });
+    var restMatched = candidates.filter(function(c) { return !c.isPrefixMatch && c.hasWordMatch; });
+    var restFamilyOnly = candidates.filter(function(c) { return !c.isPrefixMatch && !c.hasWordMatch; });
 
-    prefixMatches.concat(rest).forEach(function(c) {
+    prefixMatches.concat(restMatched, restFamilyOnly).forEach(function(c) {
       if (!renderedKeys.has(c.normKey)) {
         renderedKeys.add(c.normKey);
-        resultsPool.appendChild(makeIngredientButton(c.ing, c.ing));
+        resultsPool.appendChild(makeIngredientButton(c.ing, c.ing, c.hasWordMatch));
       }
     });
   }
