@@ -230,6 +230,50 @@ def test_base_url_is_derived_in_exactly_one_place():
     )
 
 
+def test_assets_js_loads_before_any_other_script():
+    """assets.js defines window.HTF, which every other script calls at parse time.
+
+    It has to load first, and "end of <body>" is NOT first here. A page
+    layout's own scripts are emitted inside `{{ content }}`, which default.html
+    renders into <main> — ABOVE its own closing scripts. So recipe.html's
+    section-rule.js ran before assets.js and threw
+    `Cannot read properties of undefined (reading 'makeShuffledPicker')` on its
+    first line, silently removing the section rules, the ingredient bullets and
+    the section-heading doodles. They were missing for weeks.
+
+    The fix is assets.js at the end of <head>, above `{{ content }}`. It reads
+    only the two meta tags above it and touches no body element at parse time.
+    """
+    # Strip Liquid comments FIRST. The comment above assets.js explains the
+    # rule by quoting `{{ content }}`, and a naive find() locates that mention
+    # rather than the real render — which is the same read-a-comment-as-code
+    # mistake this file's other guards were bitten by.
+    html = re.sub(r"\{%-?\s*comment\s*-?%\}.*?\{%-?\s*endcomment\s*-?%\}", "",
+                  read("_layouts", "default.html"), flags=re.S)
+
+    tags = list(re.finditer(r"<script\s[^>]*src=[^>]*>", html))
+    assert tags, "_layouts/default.html loads no scripts at all."
+
+    first = tags[0]
+    assert "assets.js" in first.group(0), (
+        f"The first script in _layouts/default.html is {first.group(0)!r}, not "
+        f"assets.js.\nEverything else calls window.HTF at parse time, so "
+        f"assets.js must come first or the page throws before it draws."
+    )
+
+    content = html.find("{{ content }}")
+    assert content != -1, (
+        "_layouts/default.html no longer renders {{ content }}. If the marker "
+        "was renamed, this check needs updating — it exists to prove assets.js "
+        "sits ABOVE the point where a page layout injects its own scripts."
+    )
+    assert first.start() < content, (
+        "assets.js is emitted BELOW {{ content }} in _layouts/default.html.\n"
+        "A page layout's scripts land inside content, so they would run first "
+        "and find window.HTF undefined. Move assets.js into <head>."
+    )
+
+
 def test_site_key_is_derived_in_exactly_one_place():
     """Same discipline as the base URL, for the same reason.
 

@@ -5,6 +5,28 @@
 
 (function () {
 
+  // --- Dependency check --------------------------------------------------
+  // This file calls window.HTF at parse time. If assets.js has not run, the
+  // very first call throws a TypeError and every decoration below it — section
+  // rules, ingredient bullets, section-heading doodles — silently vanishes,
+  // with nothing in the console but one unexplained error.
+  //
+  // That is exactly what happened between the assets.js refactor and
+  // 2026-07-31: assets.js was at the end of <body>, this file is emitted
+  // inside <main> above it, and three decorations were missing for weeks
+  // before anyone traced the cause. Say plainly what is wrong instead.
+  if (!window.HTF || !window.HTF.makeShuffledPicker) {
+    console.error(
+      'section-rule.js: window.HTF is not defined yet, so section rules, ' +
+      'ingredient bullets and section-heading doodles will not render.\n' +
+      'assets.js must load BEFORE this file. It belongs at the end of <head> ' +
+      'in _layouts/default.html — a layout\'s own scripts are emitted inside ' +
+      '{{ content }}, which sits above default.html\'s closing scripts, so a ' +
+      'script at the end of <body> is NOT first.'
+    );
+    return;
+  }
+
   var C = window.SITE_COLOURS;
   var COLOURS = {
     sectionRule:    { fill: C.pencilGrey, opacity: 0.4  },

@@ -108,6 +108,17 @@ exclude:
   # Working notes and agent instructions — never published
   - model_instructions/
   - CLAUDE.md
+  # WSL writes a "<name>:Zone.Identifier" sidecar beside every file dragged in
+  # from Windows. The colon makes Jekyll read the name as a URI scheme, and
+  # jekyll-sitemap then crashes the ENTIRE build — no output, a raw Ruby
+  # backtrace, no mention of the offending file's real location.
+  #
+  # It only crashes for names that are not legal schemes. Hyphens are legal, so
+  # chai-spice.md:Zone.Identifier slipped through for weeks; underscores are
+  # not, so RECIPES_SEEN_v23.md:Zone.Identifier killed the build the moment it
+  # appeared. .gitignore already covers these, but that only stops them being
+  # committed — Jekyll still reads the working directory.
+  - "*Zone.Identifier"
   # Build output. `_site` is auto-excluded when it is the destination, but the
   # production preview builds to _site_prod, so each server would otherwise
   # watch the other's output and rebuild in a loop.
