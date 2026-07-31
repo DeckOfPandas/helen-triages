@@ -5,6 +5,7 @@
 // --- Raw palette (the swatches everything else is chosen from) ---------------
 $color-vivid-rose:          #FF0061;
 $color-vivid-rose-dark:     darken(#FF0061, 12);   // ~#c4004b — for toggle buttons etc.
+$color-bright-magenta-dark: darken(#FF00C8, 12);   // ~#c4009a — the same job, in magenta
 $color-pure-lime-green:     #8AE800;
 $color-vibrant-violet:      #7734EA;
 $color-vivid-cerulean:      #00A7EA;
@@ -77,8 +78,52 @@ $color-white:                #ffffff;
 $color-logo-stroke:          #bbbbbb;   // -webkit-text-stroke on logo header
 
 // --- Reusable Structural Accents ---------------------------------------------
-$color-marker-accent: mix($color-vivid-cerulean, $color-bg, 35%);
-$color-step-number:   mix($color-hot-orange, $color-clear-text, 45%);
+// Nested bullets in the short method. Was cerulean-mixed; re-based on spring
+// green when cerulean left the recipe page entirely, so it stays a pale echo of
+// the section rule rather than becoming an orphan hue.
+$color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
+
+// --- The recipe page's colour budget -----------------------------------------
+// After the 2026-07-31 redesign the recipe page spends FOUR colours, and the
+// count is the design. It was seven — rose, cerulean, orange, spring green,
+// violet, aureolin and pencil grey — which is where "two design languages at
+// once" came from.
+//
+//   1. $color-bright-magenta       the blocky rule under the title, the footer
+//                                  hearts, the method toggle
+//   2. $color-section-underline    the upper rule under the section names
+//   3. $color-section-underline-2  the lower rule under them
+//   4. $color-aureolin             the highlighter on ingredient amounts
+//
+// Everything else is text, $color-clear-text or $color-border — the whole of
+// the method, the notes, the tips and the boxes are monochrome. The colour is
+// on what you NAVIGATE by and off what you READ, which is what "colour, but
+// more sparing" turned out to mean.
+//
+// Two things to know before spending a fifth. Magenta is also $color-star-root,
+// so the star-ingredient badge matches the title: accepted as a rhyme, since
+// the star is the hero and the title names the dish. And 2 and 3 only ever
+// appear TOGETHER, inside one composite mark, so neither has to be read as
+// meaning anything on its own — which is why four here is not the same as four
+// scattered around the page. If violet starts appearing anywhere else, the
+// count begins to matter again.
+
+// The two colours of the blocky rule under INGREDIENTS / METHOD / NOTES. Both
+// live here rather than in the template, which is the point: the brush wash
+// needed an asset-name slug in the markup because it picked a FILE, so the
+// section colour used to sit in _layouts/recipe.html against the three-layer
+// rule. A background needs no asset, so the colour came home.
+$color-section-underline: $color-medium-spring-green;
+$color-section-underline-2: $color-vibrant-violet;   // the second, lower rule
+
+// Step numerals in the method, and the top-level bullets in the short method.
+// Body text colour, not a hue of their own. They were violet, then a darkened
+// cerulean; both spent colour on something that is already unmistakable by
+// other means — 1.2rem bold Courier with a text stroke, against 0.92rem light
+// sans. Face, size, weight and stroke all differ, which is more than enough to
+// find your place with, and it keeps the page's colour on the marks that need
+// it. See $stroke-light in _sass/shared/_tokens.scss for the stroke itself.
+$color-step-number: $color-text;
 
 // --- Highlighter wiring ------------------------------------------------------
 .category--star {
@@ -106,10 +151,6 @@ $color-step-number:   mix($color-hot-orange, $color-clear-text, 45%);
 }
 
 // Recipe page contexts (previously set inline from _data/colors.yml)
-.recipe-main-title {
-  --highlighter-fill: #{$color-vivid-rose};
-  --highlighter-opacity: 1;
-}
 .ingredient-amount {
   --highlighter-fill: #{$color-aureolin};
   --highlighter-opacity: 0.9;
@@ -126,20 +167,10 @@ $color-step-number:   mix($color-hot-orange, $color-clear-text, 45%);
 
 // Footer hearts take their colour from currentColor, so the SVG asset itself
 // contains no colour. See assets/img/hearts/site-footer-hearts.svg.
+//
+// Magenta, to follow the recipe title. The footer is in the SHARED layout, so
+// this is the one change from the recipe-page redesign that reaches the index
+// as well — deliberately: one heart colour for the site.
 .site-footer-hearts {
-  color: $color-vivid-rose;
-}
-
-// --- Palette exposed to JavaScript -------------------------------------------
-// js/colours.js reads these at runtime instead of keeping its own hardcoded
-// copy. Add a colour here the moment JS needs it; never mirror one by hand.
-:root {
-  --colour-vivid-rose:      #{$color-vivid-rose};
-  --colour-vivid-rose-dark: #{$color-vivid-rose-dark};
-  --colour-vibrant-violet:  #{$color-vibrant-violet};
-  --colour-pencil-grey:     #{$color-pencil-grey};
-  --colour-spring-green:    #{$color-medium-spring-green};
-  --colour-aureolin:        #{$color-aureolin};
-  --colour-vivid-cerulean:  #{$color-vivid-cerulean};
-  --colour-hot-orange:      #{$color-hot-orange};
+  color: $color-bright-magenta;
 }
