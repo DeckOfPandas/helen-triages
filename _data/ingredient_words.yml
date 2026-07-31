@@ -67,16 +67,18 @@ modifiers:
 # ingredients), so they get their own handling in `family_exceptions` below
 # instead.
 #
-# "tomato" is the exception to the "never standalone" test — it IS a real
-# ingredient — but earns a place here anyway: once "tomato ketchup" is
-# correctly excluded (see family_exceptions), the only other member is
-# "tomato purée", and a purée is a background flavour-builder used by the
-# tablespoon, not something you'd reach for the way you'd reach for a
-# tomato. A two-member family whose members don't actually substitute for
-# each other isn't a useful "(all)" any more than a coincidental one is —
-# the real test throughout this list is "would a user think of these as
-# some kind of the same thing", and word-sharing is only the most common way
-# to fail it.
+# "tomato" and "fennel" are exceptions to the "never standalone" test — both
+# ARE real ingredients — but earn a place here anyway: once "tomato ketchup"
+# is correctly excluded (see family_exceptions), the only other tomato
+# member is "tomato purée", and once "fennel seed"/"fennel seeds" correctly
+# collapse into one entry (see `singulars`), the only other fennel member is
+# "fennel seed" itself. A purée and a spice are both background
+# flavour-builders used by the tablespoon or teaspoon, not something you'd
+# reach for the way you'd reach for a tomato or a fennel bulb. A two-member
+# family whose members don't actually substitute for each other isn't a
+# useful "(all)" any more than a coincidental one is — the real test
+# throughout this list is "would a user think of these as some kind of the
+# same thing", and word-sharing is only the most common way to fail it.
 never_family:
   - mixed
   - red
@@ -97,6 +99,7 @@ never_family:
   - thai
   - whole
   - tomato
+  - fennel
 
 # -----------------------------------------------------------------------------
 # Family exceptions — specific entries excluded from counting towards their
