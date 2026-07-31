@@ -274,6 +274,73 @@ def test_assets_js_loads_before_any_other_script():
     )
 
 
+IMG_DIR = ROOT / "assets" / "img"
+
+
+def _strip_js_comments(text: str) -> str:
+    """Drop // and /* */ comments so a guard cannot match its own explanation."""
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    return re.sub(r"^\s*//.*$", "", text, flags=re.M)
+
+
+def test_svg_injection_does_not_assume_a_space_after_the_svg_tag():
+    """`'<svg '` with a trailing space is a trap, and it cost weeks.
+
+    decorations.js rewrites each decorative SVG as it injects it — stripping the
+    mm dimensions and adding `position:absolute` so the wash sits BEHIND its
+    label. Every one of those rewrites matched the literal `'<svg '`.
+
+    Inkscape puts each attribute on its own line, so all 100 files under
+    backgrounds-headers/ open with `<svg\\n   width="…mm"`. Not one replace
+    matched. String.replace returns the input unchanged when it does not match,
+    so there was no error anywhere — the wash simply rendered at its natural
+    14mm × 4mm, inline, to the left of the label text.
+
+    Match `<svg` plus whitespace instead. Comments are stripped first, because
+    the comment in decorations.js explaining this rule quotes the bad literal.
+    """
+    # Only the SEARCH argument of a replace, never the replacement. The
+    # replacement legitimately contains `<svg ` — it is what gets written back
+    # — so a bare search for the literal flags every correct call as a fault.
+    # First version of this test did exactly that and failed on the fix.
+    search_arg = re.compile(
+        r"""\.replace\(\s*(?:(['"])<svg |/[^/\n]*<svg )"""
+    )
+    offenders = []
+    for path in sorted(JS_DIR.glob("*.js")):
+        code = _strip_js_comments(path.read_text(encoding="utf-8"))
+        for match in re.finditer(search_arg, code):
+            line = code[:match.start()].count("\n") + 1
+            offenders.append(f"{path.name}:{line} {match.group(0).strip()!r}")
+    assert not offenders, (
+        "SVG rewriting assumes a space after `<svg`:\n  " + "\n  ".join(offenders)
+        + "\n\nUse /<svg(?=[\\s>])/ or /(<svg\\s[^>]*?)…/. Inkscape-exported "
+          "files put every attribute on its own line, and a replace that does "
+          "not match fails silently."
+    )
+
+
+def test_every_shipped_svg_is_matched_by_the_injection_pattern():
+    """The other half: assets must be matchable, not just the code tolerant.
+
+    Guards the actual files rather than the regex, so dropping in artwork
+    exported by something with yet another convention fails here — loudly, once
+    — instead of rendering wrong on a page nobody reloads for a fortnight.
+    """
+    pattern = re.compile(r"<svg(?=[\s>])")
+    svgs = sorted(IMG_DIR.rglob("*.svg"))
+    assert svgs, f"No SVGs found under {IMG_DIR} — has the artwork moved?"
+    offenders = [
+        str(p.relative_to(ROOT)) for p in svgs
+        if not pattern.search(p.read_text(encoding="utf-8", errors="replace"))
+    ]
+    assert not offenders, (
+        f"{len(offenders)} SVG(s) have an opening tag the injection cannot "
+        f"match:\n  " + "\n  ".join(offenders[:10])
+        + "\n\nThe rewrite would leave them at their natural size and position."
+    )
+
+
 def test_site_key_is_derived_in_exactly_one_place():
     """Same discipline as the base URL, for the same reason.
 

@@ -82,16 +82,31 @@
     // The source files are drawn at mm dimensions with their own aspect ratio.
     // Strip both, then stretch slightly past the element on every side so the
     // wash reads as a hand-made mark rather than a rectangle.
+    //
+    // MATCH `<svg` FOLLOWED BY ANY WHITESPACE, NOT THE LITERAL `"<svg "`.
+    // Inkscape writes each attribute on its own line, so these files open with
+    // `<svg\n   width="14.111145mm"`. Every replace below used to require a
+    // SPACE after `<svg`, so on all 100 brush files not one of them matched:
+    // the mm dimensions survived, no absolute positioning was added, and the
+    // wash rendered as a 14mm × 4mm blob sitting inline to the LEFT of the
+    // label instead of stretched behind it. Silently — a failed String.replace
+    // returns the original string rather than throwing.
+    //
+    // Every other asset directory is space-style, which is why only the brush
+    // washes were affected and why it survived so long. Do not assume the
+    // formatting of a file you did not export.
     function inject(slot, svg) {
       slot.innerHTML = svg
         .replace(/<\?xml[^?]*\?>/g, '')
         .replace(/<!--[\s\S]*?-->/g, '')
-        .replace(/(<svg [^>]*?)width="[^"]*mm"/, '$1')
-        .replace(/(<svg [^>]*?)height="[^"]*mm"/, '$1')
+        .replace(/(<svg\s[^>]*?)\s*width="[^"]*mm"/, '$1')
+        .replace(/(<svg\s[^>]*?)\s*height="[^"]*mm"/, '$1')
         .replace(/preserveAspectRatio="[^"]*"/, '')
-        .replace('<svg ', '<svg preserveAspectRatio="none" style="position:absolute;'
+        // Insert straight after `<svg`, leaving the following whitespace alone,
+        // so the tag stays well-formed whichever style the file uses.
+        .replace(/<svg(?=[\s>])/, '<svg preserveAspectRatio="none" style="position:absolute;'
           + 'top:-4px;left:-6px;width:calc(100% + 12px);height:calc(100% + 8px);'
-          + 'z-index:-1;overflow:visible;pointer-events:none;" ');
+          + 'z-index:-1;overflow:visible;pointer-events:none;"');
     }
 
     slots.forEach(function (slot) {
@@ -122,7 +137,10 @@
     var url = HTF.siteAsset('/' + dir + '/tape-' + n + '.svg');
     if (!url) return;
     HTF.fetchSvg(url, function (svg) {
-      slot.innerHTML = svg.replace(/<svg /, '<svg preserveAspectRatio="none" height="100%" ');
+      // `<svg` + any whitespace, for the reason spelled out in brushes() above.
+      // Today's tape files are space-style so the old literal worked, but
+      // cocktails' artwork does not exist yet and may well come out of Inkscape.
+      slot.innerHTML = svg.replace(/<svg(?=[\s>])/, '<svg preserveAspectRatio="none" height="100%"');
     });
   }
 
