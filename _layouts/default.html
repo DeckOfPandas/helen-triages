@@ -71,6 +71,24 @@
      Empty on the landing page, and assets.js treats empty as "draw nothing".
   {% endcomment %}
   <meta name="site-key" content="{{ page.site_key }}">
+
+  {% comment %} ── assets.js loads HERE, in the head, and this is load-bearing ──
+     It defines window.HTF — the base URL, the site key, fetchSvg and the
+     shuffled picker — which every other script on the site calls at parse time.
+
+     It used to sit at the end of <body>. That is the usual right answer for a
+     script, and here it was wrong: a page layout's own scripts are emitted
+     inside {{ content }}, which lands in <main> — ABOVE this file's closing
+     scripts. So recipe.html's section-rule.js ran BEFORE assets.js and died on
+     `window.HTF.makeShuffledPicker` of undefined, taking the section rules,
+     the ingredient bullets and the section-heading doodles with it.
+
+     It must stay above {{ content }}. It only reads the two meta tags directly
+     above, so the head is safe — it touches no body element at parse time.
+     tests/test_site_config.py::test_assets_js_loads_before_any_other_script
+     guards the order.
+  {% endcomment %}
+  <script src="{{ '/assets/js/assets.js' | relative_url }}"></script>
 </head>
 <body>
 
@@ -107,9 +125,10 @@
   </footer>
 
 
-  {% comment %} assets.js must load first — it resolves the base URL and the
-     site key, and owns all SVG fetching. decorations.js injects every
-     hand-drawn SVG on the page.
+  {% comment %} decorations.js injects every hand-drawn SVG in the page shell —
+     highlighters, brush washes, the tape behind the wordmark, the footer. It
+     runs last because it reads elements from all over the page, and it can:
+     assets.js has already defined window.HTF up in the head.
 
      colours.js is deliberately NOT loaded here. It reads food's --colour-*
      custom properties off :root, and its only consumer is section-rule.js,
@@ -119,7 +138,6 @@
      cocktails page and the landing page. A shared layout must not reach for one
      site's palette.
   {% endcomment %}
-  <script src="{{ '/assets/js/assets.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/decorations.js' | relative_url }}"></script>
 
 </body>

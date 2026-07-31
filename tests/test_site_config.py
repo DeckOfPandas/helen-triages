@@ -230,6 +230,117 @@ def test_base_url_is_derived_in_exactly_one_place():
     )
 
 
+def test_assets_js_loads_before_any_other_script():
+    """assets.js defines window.HTF, which every other script calls at parse time.
+
+    It has to load first, and "end of <body>" is NOT first here. A page
+    layout's own scripts are emitted inside `{{ content }}`, which default.html
+    renders into <main> — ABOVE its own closing scripts. So recipe.html's
+    section-rule.js ran before assets.js and threw
+    `Cannot read properties of undefined (reading 'makeShuffledPicker')` on its
+    first line, silently removing the section rules, the ingredient bullets and
+    the section-heading doodles. They were missing for weeks.
+
+    The fix is assets.js at the end of <head>, above `{{ content }}`. It reads
+    only the two meta tags above it and touches no body element at parse time.
+    """
+    # Strip Liquid comments FIRST. The comment above assets.js explains the
+    # rule by quoting `{{ content }}`, and a naive find() locates that mention
+    # rather than the real render — which is the same read-a-comment-as-code
+    # mistake this file's other guards were bitten by.
+    html = re.sub(r"\{%-?\s*comment\s*-?%\}.*?\{%-?\s*endcomment\s*-?%\}", "",
+                  read("_layouts", "default.html"), flags=re.S)
+
+    tags = list(re.finditer(r"<script\s[^>]*src=[^>]*>", html))
+    assert tags, "_layouts/default.html loads no scripts at all."
+
+    first = tags[0]
+    assert "assets.js" in first.group(0), (
+        f"The first script in _layouts/default.html is {first.group(0)!r}, not "
+        f"assets.js.\nEverything else calls window.HTF at parse time, so "
+        f"assets.js must come first or the page throws before it draws."
+    )
+
+    content = html.find("{{ content }}")
+    assert content != -1, (
+        "_layouts/default.html no longer renders {{ content }}. If the marker "
+        "was renamed, this check needs updating — it exists to prove assets.js "
+        "sits ABOVE the point where a page layout injects its own scripts."
+    )
+    assert first.start() < content, (
+        "assets.js is emitted BELOW {{ content }} in _layouts/default.html.\n"
+        "A page layout's scripts land inside content, so they would run first "
+        "and find window.HTF undefined. Move assets.js into <head>."
+    )
+
+
+IMG_DIR = ROOT / "assets" / "img"
+
+
+def _strip_js_comments(text: str) -> str:
+    """Drop // and /* */ comments so a guard cannot match its own explanation."""
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    return re.sub(r"^\s*//.*$", "", text, flags=re.M)
+
+
+def test_svg_injection_does_not_assume_a_space_after_the_svg_tag():
+    """`'<svg '` with a trailing space is a trap, and it cost weeks.
+
+    decorations.js rewrites each decorative SVG as it injects it — stripping the
+    mm dimensions and adding `position:absolute` so the wash sits BEHIND its
+    label. Every one of those rewrites matched the literal `'<svg '`.
+
+    Inkscape puts each attribute on its own line, so all 100 files under
+    backgrounds-headers/ open with `<svg\\n   width="…mm"`. Not one replace
+    matched. String.replace returns the input unchanged when it does not match,
+    so there was no error anywhere — the wash simply rendered at its natural
+    14mm × 4mm, inline, to the left of the label text.
+
+    Match `<svg` plus whitespace instead. Comments are stripped first, because
+    the comment in decorations.js explaining this rule quotes the bad literal.
+    """
+    # Only the SEARCH argument of a replace, never the replacement. The
+    # replacement legitimately contains `<svg ` — it is what gets written back
+    # — so a bare search for the literal flags every correct call as a fault.
+    # First version of this test did exactly that and failed on the fix.
+    search_arg = re.compile(
+        r"""\.replace\(\s*(?:(['"])<svg |/[^/\n]*<svg )"""
+    )
+    offenders = []
+    for path in sorted(JS_DIR.glob("*.js")):
+        code = _strip_js_comments(path.read_text(encoding="utf-8"))
+        for match in re.finditer(search_arg, code):
+            line = code[:match.start()].count("\n") + 1
+            offenders.append(f"{path.name}:{line} {match.group(0).strip()!r}")
+    assert not offenders, (
+        "SVG rewriting assumes a space after `<svg`:\n  " + "\n  ".join(offenders)
+        + "\n\nUse /<svg(?=[\\s>])/ or /(<svg\\s[^>]*?)…/. Inkscape-exported "
+          "files put every attribute on its own line, and a replace that does "
+          "not match fails silently."
+    )
+
+
+def test_every_shipped_svg_is_matched_by_the_injection_pattern():
+    """The other half: assets must be matchable, not just the code tolerant.
+
+    Guards the actual files rather than the regex, so dropping in artwork
+    exported by something with yet another convention fails here — loudly, once
+    — instead of rendering wrong on a page nobody reloads for a fortnight.
+    """
+    pattern = re.compile(r"<svg(?=[\s>])")
+    svgs = sorted(IMG_DIR.rglob("*.svg"))
+    assert svgs, f"No SVGs found under {IMG_DIR} — has the artwork moved?"
+    offenders = [
+        str(p.relative_to(ROOT)) for p in svgs
+        if not pattern.search(p.read_text(encoding="utf-8", errors="replace"))
+    ]
+    assert not offenders, (
+        f"{len(offenders)} SVG(s) have an opening tag the injection cannot "
+        f"match:\n  " + "\n  ".join(offenders[:10])
+        + "\n\nThe rewrite would leave them at their natural size and position."
+    )
+
+
 def test_site_key_is_derived_in_exactly_one_place():
     """Same discipline as the base URL, for the same reason.
 
