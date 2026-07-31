@@ -7,11 +7,14 @@
 // same shape — find slots, pick an asset, fetch it, inject it — expressed five
 // different ways, in two different files, one of which was a template.
 //
-//   .highlighter-slot          scratchy highlighter behind headings and amounts
-//   .watercolour-brush-slot    brush wash behind filter labels
+//   .highlighter-slot          scratchy highlighter behind ingredient amounts
 //   .tape-bg                   masking tape behind the site logo
 //   .site-footer-hearts        footer hearts
-//   [data-index-doodle]        doodles beside index filter labels
+//
+// Two more lived here until 2026-08-01. `.watercolour-brush-slot` drew the
+// brush washes, which the blocky rule replaced on both pages; `[data-index-doodle]`
+// drew doodles beside the index filter labels and had been dead far longer —
+// no template has emitted that attribute for as long as git remembers.
 //
 // Base URL, fetching, caching and error reporting all live in js/assets.js.
 // Nothing here knows a URL prefix and nothing here swallows an error.
@@ -59,61 +62,6 @@
     slots.forEach(function (slot) {
       var url = HTF.siteAsset('/highlighters/' + nextName() + '.svg');
       if (url) HTF.fetchSvg(url, function (svg) { slot.innerHTML = applyTexture(svg); });
-    });
-  }
-
-  // ---------------------------------------------------------------------------
-  // Watercolour brush washes
-  //
-  // Ten shapes per colour, shuffled independently for each colour so two
-  // sections in the same colour do not land on the same shape.
-  // ---------------------------------------------------------------------------
-  function brushes() {
-    var slots = document.querySelectorAll('.watercolour-brush-slot');
-    if (!slots.length) return;
-
-    var shapes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    var pickers = {};
-    function nextShape(colour) {
-      if (!pickers[colour]) pickers[colour] = HTF.makeShuffledPicker(shapes);
-      return pickers[colour]();
-    }
-
-    // The source files are drawn at mm dimensions with their own aspect ratio.
-    // Strip both, then stretch slightly past the element on every side so the
-    // wash reads as a hand-made mark rather than a rectangle.
-    //
-    // MATCH `<svg` FOLLOWED BY ANY WHITESPACE, NOT THE LITERAL `"<svg "`.
-    // Inkscape writes each attribute on its own line, so these files open with
-    // `<svg\n   width="14.111145mm"`. Every replace below used to require a
-    // SPACE after `<svg`, so on all 100 brush files not one of them matched:
-    // the mm dimensions survived, no absolute positioning was added, and the
-    // wash rendered as a 14mm × 4mm blob sitting inline to the LEFT of the
-    // label instead of stretched behind it. Silently — a failed String.replace
-    // returns the original string rather than throwing.
-    //
-    // Every other asset directory is space-style, which is why only the brush
-    // washes were affected and why it survived so long. Do not assume the
-    // formatting of a file you did not export.
-    function inject(slot, svg) {
-      slot.innerHTML = svg
-        .replace(/<\?xml[^?]*\?>/g, '')
-        .replace(/<!--[\s\S]*?-->/g, '')
-        .replace(/(<svg\s[^>]*?)\s*width="[^"]*mm"/, '$1')
-        .replace(/(<svg\s[^>]*?)\s*height="[^"]*mm"/, '$1')
-        .replace(/preserveAspectRatio="[^"]*"/, '')
-        // Insert straight after `<svg`, leaving the following whitespace alone,
-        // so the tag stays well-formed whichever style the file uses.
-        .replace(/<svg(?=[\s>])/, '<svg preserveAspectRatio="none" style="position:absolute;'
-          + 'top:-4px;left:-6px;width:calc(100% + 12px);height:calc(100% + 8px);'
-          + 'z-index:-1;overflow:visible;pointer-events:none;"');
-    }
-
-    slots.forEach(function (slot) {
-      var colour = slot.getAttribute('data-brush-colour');
-      var file = 'background-watercolour-brush-' + colour + '-' + nextShape(colour) + '.svg';
-      var url = HTF.siteAsset('/backgrounds-headers/' + file);
-      if (url) HTF.fetchSvg(url, function (svg) { inject(slot, svg); });
     });
   }
 
@@ -168,33 +116,8 @@
     if (url) HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
   }
 
-  // ---------------------------------------------------------------------------
-  // Index filter-label doodles
-  //
-  // Recoloured by string replacement, which is load-bearing: it only works
-  // because the source files consistently use fill="black". A `currentColor`
-  // fill in the sources plus a CSS `color` would remove the mechanism — worth
-  // doing next time these assets are touched.
-  // ---------------------------------------------------------------------------
-  function doodles() {
-    var slots = document.querySelectorAll('[data-index-doodle]');
-    if (!slots.length) return;
-
-    slots.forEach(function (slot) {
-      var name = slot.getAttribute('data-index-doodle');
-      var url = HTF.siteAsset('/doodles/' + name + '.svg');
-      if (!url) return;
-      HTF.fetchSvg(url, function (svg) {
-        var colour = slot.getAttribute('data-doodle-color');
-        slot.innerHTML = svg.replace(/fill="black"/g, 'fill="' + colour + '"');
-      });
-    });
-  }
-
   highlighters();
-  brushes();
   tape();
   footerDecoration();
-  doodles();
 
 })();
