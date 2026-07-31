@@ -46,6 +46,14 @@ modifiers:
   - ground
   - dried
   - leftover
+  # "gressingham" is a different KIND of exception to the rest of this list —
+  # it's a breed/brand qualifier, not a preparation state, so it doesn't pass
+  # the "no product distinction" test the others do. It's here anyway, at
+  # Helen's explicit call: "duck leg" and "Gressingham duck legs" aren't
+  # meaningfully distinct results for a decision-support search, even though
+  # they're genuinely different products on a shelf. Not a precedent for
+  # stripping other brand names without asking first.
+  - gressingham
 
 # -----------------------------------------------------------------------------
 # Never-family words — first words that head 2+ entries but should never earn
