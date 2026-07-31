@@ -3,9 +3,10 @@
 // =============================================================================
 
 // --- Raw palette (the swatches everything else is chosen from) ---------------
-$color-vivid-rose:          #FF0061;
-$color-vivid-rose-dark:     darken(#FF0061, 12);   // ~#c4004b — for toggle buttons etc.
-$color-bright-magenta-dark: darken(#FF00C8, 12);   // ~#c4009a — the same job, in magenta
+// Five swatches left this file on 2026-08-01 with the decorations that were the
+// only things reading them — vivid rose, pencil grey, and the near-blacks the
+// logo and highlighter labels used. A swatch nothing chooses from is not a
+// palette, it is a paint chart.
 $color-pure-lime-green:     #8AE800;
 $color-vibrant-violet:      #7734EA;
 $color-vivid-cerulean:      #00A7EA;
@@ -14,37 +15,32 @@ $color-hot-orange:          #FF6B00;
 $color-bright-magenta:      #FF00C8;
 $color-medium-spring-green: #00FF9F;
 $color-electric-cobalt:     #0047FF;
-$color-pencil-grey:         #6b6965;   // hand-drawn scribble lines, group heading underlines
+$color-bright-magenta-dark: darken($color-bright-magenta, 12);   // ~#c4009a
 
 // --- Core Application Canvas -------------------------------------------------
 $color-bg:      #faf7f8;  // Soft chalk white with a minute pink/cool undertone
 $color-text:    #211f20;  // Deep plum-tinted charcoal (maximises text legibility)
 $color-border:  #ebdbe0;  // Quiet, crisp structural lines that respect the canvas
 
-// Surface Layering
 $color-surface:   #fdfbfe; // Ultra-soft milk white component surface fill
-$color-button-bg: #fdfbfe; // Base fill for unselected filter/scaler controls
 
 // --- Typography Stacks -------------------------------------------------------
 $font-headings: "Courier New", "Courier", "Lucida Sans Typewriter", monospace;
 $font-body:     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-// --- Category colours & highlighter opacities --------------------------------
-// ONE source per category. Buttons, badges, hovers AND the SVG highlighter all
-// derive from the colour. The highlighter additionally has its own opacity,
-// kept separate because the most flattering value depends on the colour.
+// --- Category colours --------------------------------------------------------
+// ONE source per category, driving its buttons, badges and hovers. There used
+// to be a per-category highlighter opacity beside each of these; the SVG
+// highlighter now runs on ingredient amounts only, which need one value.
+//
+// NOTE, and it is the next real decision on the index: these are the hues the
+// recipe-row BADGES use, and they no longer agree with the five section colours
+// in _sass/food/_layout.scss. Star matches; mood has a cerulean rule over
+// lime-green badges, practicalities an aureolin rule over violet ones.
 $color-star-root:           $color-bright-magenta;
 $color-mood-root:           $color-pure-lime-green;
 $color-practicalities-root: $color-vibrant-violet;
 $color-ingredient-root:     $color-aureolin;
-$color-logo:                #060606;   // near-black highlighter behind the site title
-$color-highlighter-label:   #1a1a1a;   // text sitting on top of a highlighter
-
-$highlighter-opacity-star:           1;
-$highlighter-opacity-mood:           1;
-$highlighter-opacity-practicalities: 1;
-$highlighter-opacity-ingredient:     1;
-$highlighter-opacity-logo:           1;
 
 // Derived active tones (darkened from the roots for legibility on white)
 // Tweak $darken-active / $darken-active-extra to shift all active tones at once.
@@ -55,25 +51,17 @@ $color-mood-active:           darken($color-mood-root,           $darken-active)
 $color-practicalities-active: darken($color-practicalities-root, $darken-active);
 $color-ingredient-active:     darken($color-ingredient-root,     $darken-active-extra);
 
-// Clear filters button
-$color-clear-bg:     #fff;
+// Clear filters button — the background and border went with the wash-era
+// styling; what is left is the text.
 $color-clear-text:   #4f4e4a;
-$color-clear-border: $color-border;
 $weight-clear-font:  800;
 
 // Badge bgs
 $saturation-badge-bg:     0.1;
-$color-badge-cooked-bg:   #e2ede4;
-$color-badge-cooked-text: #3b523e;
 
 // --- Recipe Page Utilities ---------------------------------------------------
-$color-interactive-blue:     #1864ab;
-$color-method-toggle:        $color-hot-orange;
-$color-method-toggle-active: darken($color-hot-orange, $darken-active);
-$color-name-search-root:     $color-electric-cobalt;
 $color-name-search-active:   darken($color-electric-cobalt, $darken-active);
 $color-white:                #ffffff;
-$color-logo-stroke:          #bbbbbb;   // -webkit-text-stroke on logo header
 // The soft edge on the index filter labels. Derived from the text it outlines
 // rather than a standalone grey, so it stays related to it: the wordmark's
 // rgba(230,230,230,0.9) against white letters and this against dark ones are
@@ -129,40 +117,12 @@ $color-section-underline-2: $color-vibrant-violet;   // the second, lower rule
 $color-step-number: $color-text;
 
 // --- Highlighter wiring ------------------------------------------------------
-.category--star {
-  --highlighter-fill: #{$color-star-root};
-  --highlighter-opacity: #{$highlighter-opacity-star};
-}
-.category--mood {
-  --highlighter-fill: #{$color-mood-root};
-  --highlighter-opacity: #{$highlighter-opacity-mood};
-}
-.category--practicalities {
-  --highlighter-fill: #{$color-practicalities-root};
-  --highlighter-opacity: #{$highlighter-opacity-practicalities};
-}
-.search {
-  --highlighter-fill: #{$color-ingredient-root};
-  --highlighter-opacity: #{$highlighter-opacity-ingredient};
-}
-// Must come after .search — equal specificity, so source order decides.
-.search--ingredients {
-  --highlighter-fill: #{$color-ingredient-root};
-}
-.search--name {
-  --highlighter-fill: #{$color-name-search-root};
-}
-
-// Recipe page contexts (previously set inline from _data/colors.yml)
-.ingredient-amount {
-  --highlighter-fill: #{$color-aureolin};
-  --highlighter-opacity: 0.9;
-}
-.logo-header {
-  --highlighter-fill: #{$color-logo};
-  --highlighter-opacity: #{$highlighter-opacity-logo};
-}
-
+// ONE element on the site carries a highlighter slot: the amount at the start
+// of an ingredient line. Seven other selectors used to set --highlighter-fill
+// here — .category--star, --mood, --practicalities, .search, .search--ingredients,
+// .search--name and .logo-header — and none of them has contained a slot since
+// the index moved to the blocky rule (.logo-header had not existed for far
+// longer than that). A custom property nothing reads is not wiring.
 .highlighted svg path {
   fill: var(--highlighter-fill, #{$color-text});
   fill-opacity: var(--highlighter-opacity, 1);
