@@ -89,6 +89,25 @@ def test_vocabulary_is_emitted_to_the_page():
     )
 
 
+def test_ingredient_search_js_loads_before_filters_js():
+    """filters.js calls HTF.ingredientSearch at startup -- it must already exist.
+
+    Same shape as assets.js needing to load before everything else: the
+    matching algorithm lives in ingredient-search.js (see
+    model_instructions/DEV_JOBS_v22.md §3.4), and filters.js wires it up
+    with `HTF.ingredientSearch.create(...)` in its very first few lines.
+    """
+    html = read("index.html")
+    search_tag = re.search(r"<script src=[^>]*ingredient-search\.js", html)
+    filters_tag = re.search(r"<script src=[^>]*filters\.js", html)
+    assert search_tag, "index.html no longer loads assets/js/ingredient-search.js."
+    assert filters_tag, "index.html no longer loads assets/js/filters.js."
+    assert search_tag.start() < filters_tag.start(), (
+        "ingredient-search.js must load BEFORE filters.js, or "
+        "HTF.ingredientSearch won't exist yet when filters.js runs."
+    )
+
+
 def test_filters_js_holds_no_ingredient_vocabulary():
     """Singulars and synonyms belong in YAML, not in the JavaScript."""
     js = read("assets", "js", "filters.js")
