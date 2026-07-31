@@ -291,8 +291,16 @@ function renderResultsPool() {
       var normWords = ingWords.map(normaliseIngredientWord).map(fold);
       var normKey = normWords.join(' ');
 
-      var matchedAnyWord = ingWords.some(function(word) {
-        return fold(word).indexOf(query) !== -1;
+      // Checks each word's normalised form as well as its raw text. Most
+      // plurals in _data/ingredient_words.yml's `singulars` are a plain
+      // "+s"/"+es", so the singular is already a literal prefix of the
+      // plural and matches without this. A handful are genuinely irregular
+      // ("cherries"→cherry, "leaves"→leaf) — the ending changes rather than
+      // just extending, so "cherries" never contains "cherry" as a raw
+      // substring at all, and typing "cherry" found nothing despite the
+      // singular being correctly declared.
+      var matchedAnyWord = ingWords.some(function(word, idx) {
+        return fold(word).indexOf(query) !== -1 || normWords[idx].indexOf(query) !== -1;
       });
 
       // Membership check mirrors how the (all) button itself filters recipes
@@ -309,8 +317,11 @@ function renderResultsPool() {
 
       // "Start of the string", not "start of any word" — "chocolate chips"
       // matching on "chips" put it ahead of things that actually start with
-      // the query, which reads as arbitrary rather than relevant.
-      var isPrefixMatch = foldedIng.indexOf(query) === 0;
+      // the query, which reads as arbitrary rather than relevant. Also
+      // checks the normalised first word, so "cherries" ranks as a prefix
+      // match for "cherry" rather than falling to the bottom tier for
+      // reasons that have nothing to do with relevance.
+      var isPrefixMatch = foldedIng.indexOf(query) === 0 || normWords[0].indexOf(query) === 0;
 
       candidates.push({ ing: ing, normKey: normKey, isPrefixMatch: isPrefixMatch });
 
@@ -329,7 +340,12 @@ function renderResultsPool() {
       // "white", "mixed" and the like genuinely head 2+ entries, but those
       // entries are unrelated foods that merely share a colour or variety
       // word ("red wine", "red onion"), not a real family.
-      if (enableFamilyButtons && fold(ingWords[0]).indexOf(query) === 0) {
+      //
+      // Checks the normalised first word too, same reasoning as
+      // matchedAnyWord above — "berries" should be able to head a "berry"
+      // family the same way "chicken" heads one, not be silently excluded
+      // because the plural is irregular.
+      if (enableFamilyButtons && (fold(ingWords[0]).indexOf(query) === 0 || normWords[0].indexOf(query) === 0)) {
         var headWord = normWords[0];
         if (!neverFamilySet.has(headWord)) {
           var entries = wordToEntries[headWord];
