@@ -14,7 +14,6 @@ $color-aureolin:            #FAF100;
 $color-hot-orange:          #FF6B00;
 $color-bright-magenta:      #FF00C8;
 $color-medium-spring-green: #00FF9F;
-$color-electric-cobalt:     #0047FF;
 $color-bright-magenta-dark: darken($color-bright-magenta, 12);   // ~#c4009a
 
 // --- Core Application Canvas -------------------------------------------------
@@ -29,27 +28,56 @@ $font-headings: "Courier New", "Courier", "Lucida Sans Typewriter", monospace;
 $font-body:     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
 // --- Category colours --------------------------------------------------------
-// ONE source per category, driving its buttons, badges and hovers. There used
-// to be a per-category highlighter opacity beside each of these; the SVG
-// highlighter now runs on ingredient amounts only, which need one value.
+// ONE source per category, and it really is one: each of these drives its
+// section's blocky rule on the index, its filter buttons, its active states,
+// its inline clear link, and its badges on every recipe row. Change the value
+// here and all five follow.
 //
-// NOTE, and it is the next real decision on the index: these are the hues the
-// recipe-row BADGES use, and they no longer agree with the five section colours
-// in _sass/food/_layout.scss. Star matches; mood has a cerulean rule over
-// lime-green badges, practicalities an aureolin rule over violet ones.
-$color-star-root:           $color-bright-magenta;
-$color-mood-root:           $color-pure-lime-green;
-$color-practicalities-root: $color-vibrant-violet;
-$color-ingredient-root:     $color-aureolin;
+// THE ORDER IS THE ORDER THEY APPEAR DOWN THE INDEX, and it is deliberate —
+// Helen chose these five, in this sequence, on 2026-08-01. It is not the order
+// they appear in _data/food/filter_sections.yml, where the two tag_groups
+// render between star and the two searches.
+//
+// _sass/food/_layout.scss used to carry a duplicate set of these under
+// $index-rule-* and $index-text-*, from when the rule colours were an
+// experiment that did not yet agree with the badges. They agree now, so the
+// duplicates are gone: there is no second place to change a section's colour.
+$color-star-root:           $color-bright-magenta;      // 1. STAR INGREDIENT
+$color-mood-root:           $color-vivid-cerulean;      // 2. MOOD
+$color-practicalities-root: $color-aureolin;            // 3. PRACTICALITIES
+$color-ingredient-root:     $color-pure-lime-green;     // 4. SEARCH INGREDIENTS
+$color-name-search-root:    $color-hot-orange;          // 5. I KNOW WHAT I WANT
 
-// Derived active tones (darkened from the roots for legibility on white)
+// Derived active tones (darkened from the roots for legibility on white).
+// A bar only has to be seen; a word has to be read.
 // Tweak $darken-active / $darken-active-extra to shift all active tones at once.
+//
+// HOW FAR TO DARKEN IS A PROPERTY OF THE HUE, NOT OF THE SECTION. The two
+// exceptions below are both yellow-greens, and both are here because of where
+// they sit on the spectrum, not because of what they label.
+//
+// $darken-active-extra used to sit on the INGREDIENT line, which read as a
+// property of that section — it was not; that section simply happened to be the
+// yellow one. When the colours were reordered on 2026-08-01, aureolin moved
+// from ingredient to practicalities, and the deeper cut had to move with it.
+// Leaving it behind would have given practicalities near-invisible yellow text
+// and made ingredient needlessly dark, in a change that otherwise looks like a
+// straight swap of five values.
+//
+// Lime green then needed its own step: at $darken-active it lands on 4.37:1
+// against $color-bg, and these are button labels at 0.72rem, so 4.5:1 is the
+// line. -22 clears it at 4.99:1 and is the smallest value that does, which
+// keeps the button as green as it can be while staying readable. Measured, not
+// guessed. The other three clear it comfortably at $darken-active: magenta
+// 7.5:1, cerulean 5.3:1, orange 6.4:1, and aureolin 6.4:1 with the extra.
 $darken-active:       20;
 $darken-active-extra: 30;
+$darken-active-lime:  22;
 $color-star-active:           darken($color-star-root,           $darken-active);
 $color-mood-active:           darken($color-mood-root,           $darken-active);
-$color-practicalities-active: darken($color-practicalities-root, $darken-active);
-$color-ingredient-active:     darken($color-ingredient-root,     $darken-active-extra);
+$color-practicalities-active: darken($color-practicalities-root, $darken-active-extra);
+$color-ingredient-active:     darken($color-ingredient-root,     $darken-active-lime);
+$color-name-search-active:    darken($color-name-search-root,    $darken-active);
 
 // Clear filters button — the background and border went with the wash-era
 // styling; what is left is the text.
@@ -60,7 +88,6 @@ $weight-clear-font:  800;
 $saturation-badge-bg:     0.1;
 
 // --- Recipe Page Utilities ---------------------------------------------------
-$color-name-search-active:   darken($color-electric-cobalt, $darken-active);
 $color-white:                #ffffff;
 // The soft edge on the index filter labels. Derived from the text it outlines
 // rather than a standalone grey, so it stays related to it: the wordmark's

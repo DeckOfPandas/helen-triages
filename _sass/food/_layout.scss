@@ -358,6 +358,10 @@ article.recipe .method-short {
   &.category--star      { .btn-clear-inline { color: $color-star-active; } }
   &.category--mood      { .btn-clear-inline { color: $color-mood-active; } }
   &.category--practicalities { .btn-clear-inline { color: $color-practicalities-active; } }
+  // The two searches never had one. They do now, for the same reason the other
+  // three do: the clear link belongs to its section and should say so.
+  &.search--ingredients { .btn-clear-inline { color: $color-ingredient-active; } }
+  &.search--name        { .btn-clear-inline { color: $color-name-search-active; } }
 
   // Active states -- compound selectors (.category--star .btn-star.active)
   // have higher specificity than the base .btn-tag/.btn-star rule above,
@@ -687,72 +691,21 @@ article.recipe .method-short {
 // The order is the order they appear down the page, which is not the order they
 // appear in _data/food/filter_sections.yml — the two tag_groups (mood,
 // practicalities) render between star and the two searches.
-// Each section's hue, defined ONCE and used for its rule, its active button
-// text and its inline clear link — so they cannot drift apart.
-$index-rule-star:           $color-bright-magenta;
-$index-rule-mood:           $color-vivid-cerulean;
-$index-rule-practicalities: $color-aureolin;
-$index-rule-ingredients:    $color-pure-lime-green;
-$index-rule-name:           $color-hot-orange;
-$index-rule-under:          $color-vibrant-violet;   // the front rule, all five
-
-// The same hues as TEXT rather than as a bar, which is a different job: a bar
-// only has to be seen, a word has to be read. Darkened by the palette's own
-// $darken-active, so these track any future change to it.
+// Each section's colour comes from _sass/food/_palette.scss — $color-star-root
+// and its four siblings, which also drive that section's filter buttons, its
+// active states, its clear link and its badges on every recipe row. Nothing
+// about a section's colour is written here.
 //
-// Aureolin takes $darken-active-extra instead. Yellow at full chroma is the one
-// hue in the palette that is nearly invisible as text on a light page — it is
-// already the exception for exactly this reason where $color-ingredient-active
-// is derived. It is a limitation of yellow, not of the value.
-$index-text-star:           darken($index-rule-star,           $darken-active);
-$index-text-mood:           darken($index-rule-mood,           $darken-active);
-$index-text-practicalities: darken($index-rule-practicalities, $darken-active-extra);
-$index-text-ingredients:    darken($index-rule-ingredients,    $darken-active);
-$index-text-name:           darken($index-rule-name,           $darken-active);
-
+// The violet is $color-section-underline-2, shared with the recipe page: it is
+// the same second rule on both, so there is one value for it, not two that have
+// to be kept in step by hand.
 .category .category-label-text {
   display: inline;
 }
 
 
-.category--star            .category-label-text { @include overlapping-rule-double($index-rule-star,           $index-rule-under); }
-.category--mood            .category-label-text { @include overlapping-rule-double($index-rule-mood,           $index-rule-under); }
-.category--practicalities  .category-label-text { @include overlapping-rule-double($index-rule-practicalities, $index-rule-under); }
-.search--ingredients       .category-label-text { @include overlapping-rule-double($index-rule-ingredients,    $index-rule-under); }
-.search--name              .category-label-text { @include overlapping-rule-double($index-rule-name,           $index-rule-under); }
-
-
-// --- The rest of each section, brought into line with its rule ---------------
-// Selectors deliberately mirror the specificity of the originals higher up the
-// file (.category.category--star .btn-star.active and friends), so source order
-// decides and no !important is needed. The originals are left in place: they are
-// still the fallback if these five colours are abandoned.
-//
-// STILL UNRECONCILED, and visible: the badges on every recipe row take
-// $color-star-root / $color-mood-root / $color-practicalities-root, which are
-// magenta / lime green / violet. Only star agrees with its new rule. Mood now
-// has a cerulean rule over lime-green badges, and practicalities an aureolin
-// rule over violet ones. Deciding that is deciding whether these five colours
-// are the real palette or an experiment, which is not settled yet.
-.category.category--star .btn-clear-inline           { color: $index-text-star; }
-.category.category--mood .btn-clear-inline           { color: $index-text-mood; }
-.category.category--practicalities .btn-clear-inline { color: $index-text-practicalities; }
-.category.search--ingredients .btn-clear-inline      { color: $index-text-ingredients; }
-.category.search--name .btn-clear-inline             { color: $index-text-name; }
-
-.category.category--star .btn-star.active {
-  color: $index-text-star;
-  -webkit-text-stroke: 0.5px $index-text-star;
-}
-.category.category--mood .btn-tag.active {
-  color: $index-text-mood;
-  -webkit-text-stroke: 0.5px $index-text-mood;
-}
-.category.category--practicalities .btn-tag.active {
-  color: $index-text-practicalities;
-  -webkit-text-stroke: 0.5px $index-text-practicalities;
-}
-.search--ingredients .btn-tag.btn-ingredient.active {
-  color: $index-text-ingredients;
-  -webkit-text-stroke: 0.5px $index-text-ingredients;
-}
+.category--star            .category-label-text { @include overlapping-rule-double($color-star-root,           $color-section-underline-2); }
+.category--mood            .category-label-text { @include overlapping-rule-double($color-mood-root,           $color-section-underline-2); }
+.category--practicalities  .category-label-text { @include overlapping-rule-double($color-practicalities-root, $color-section-underline-2); }
+.search--ingredients       .category-label-text { @include overlapping-rule-double($color-ingredient-root,     $color-section-underline-2); }
+.search--name              .category-label-text { @include overlapping-rule-double($color-name-search-root,    $color-section-underline-2); }
