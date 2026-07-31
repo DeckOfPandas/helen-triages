@@ -1,0 +1,39 @@
+---
+layout: default
+title: Home
+permalink: /cocktails/
+---
+
+{% assign this_site = site.data.sites[page.site_key] %}
+
+<h1 class="visually-hidden">{{ this_site.title }} — {{ this_site.description }}</h1>
+
+{% comment %} ─────────────────────────────────────────────────────────────────
+  COCKTAILS INDEX — SKELETON.
+
+  Food's index is a filter matrix: star ingredient, mood, practicalities,
+  ingredient search, name search. That shape came out of a real question —
+  "I want something cheesy and one-handed for the sofa tonight" — and it should
+  NOT be copied here on the assumption cocktails asks the same kind of question.
+  What a cocktails index is for is still open.
+
+  So this lists what exists and nothing more. The filter vocabulary in
+  _data/cocktails/taxonomy.yml is empty on purpose; when it fills up, the
+  controls that read it get built here.
+────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+{% if site.cocktail_recipes.size > 0 %}
+  <ul class="recipe-list">
+    {% assign all_cocktails = site.cocktail_recipes | sort: "title" %}
+    {% for cocktail in all_cocktails %}
+      <li>
+        <a href="{{ cocktail.url | relative_url }}">{{ cocktail.title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="cocktails-empty">
+    Nothing here yet. Add a file to <code>_cocktail_recipes/</code> and it will
+    appear at <code>/cocktails/recipes/&lt;slug&gt;/</code>.
+  </p>
+{% endif %}

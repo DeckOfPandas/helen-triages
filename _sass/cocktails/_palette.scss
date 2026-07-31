@@ -1,0 +1,41 @@
+// =============================================================================
+// HELEN TRIAGES COCKTAILS — PALETTE. PLACEHOLDER VALUES, REAL STRUCTURE.
+// =============================================================================
+// Cocktails is a separate visual language from food, not a reskin. Nothing here
+// is a design decision yet — these are NEUTRALS, chosen so the scaffold renders
+// legibly and obviously unfinished rather than quietly borrowing food's look.
+//
+// The nine variables below are the contract every site palette owes the shared
+// partials (_sass/shared/_base.scss and _sass/shared/_layout.scss). Leaving one
+// out is a Sass compile error whose message points at the shared file rather
+// than at this one, so tests/test_site_config.py checks for them by name.
+//
+// When the real palette arrives, replace the values. Do not remove the names.
+// =============================================================================
+
+// --- Raw palette -------------------------------------------------------------
+// Deliberately monochrome. Food's palette leads with ten saturated brights; the
+// cocktails equivalent should be argued from real drinks, the way food's was.
+$color-ink:          #1b1b1f;
+$color-paper:        #fbfbfa;
+$color-grey-mid:     #6b6b70;
+$color-grey-light:   #e4e4e6;
+
+// --- The nine shared partials require ----------------------------------------
+$color-bg:         $color-paper;
+$color-text:       $color-ink;
+$color-border:     $color-grey-light;
+$color-surface:    #ffffff;
+$color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
+$color-white:      #ffffff;           // the wordmark sitting on its tape
+$color-mood-root:  $color-grey-mid;   // link hover; food uses its mood colour
+
+$font-headings: "Courier New", "Courier", "Lucida Sans Typewriter", monospace;
+$font-body:     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+// NOTE ON THE TWO FONT STACKS
+// These match food's exactly, and that is the one borrowing done on purpose:
+// the typographic voice is the family resemblance between the two sites, while
+// colour and decoration are what separate them. If cocktails should not sound
+// like food either, this is the place to change it — but change it as a
+// decision, not by drift.

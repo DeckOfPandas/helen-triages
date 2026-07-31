@@ -596,9 +596,9 @@ SHARED_PALETTE_CONTRACT = [
     "font-body", "font-headings",
 ]
 
-# Directories holding a _palette.scss. Extended as sites are added — cocktails
-# and the landing page arrive in the next commit.
-PALETTE_OWNERS = ["food"]
+# Directories holding a _palette.scss: the two sites plus the landing page,
+# which belongs to neither but renders the same shared chrome.
+PALETTE_OWNERS = ["food", "cocktails", "root"]
 
 
 @pytest.mark.parametrize("owner", PALETTE_OWNERS)

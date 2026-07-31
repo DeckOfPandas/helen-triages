@@ -1,0 +1,18 @@
+// =============================================================================
+// HELEN TRIAGES COCKTAILS — DECORATION. EMPTY ON PURPOSE.
+// =============================================================================
+// Food's decorative layer is watercolour brush washes, torn tape, scribbled
+// underlines and doodles, injected as SVG by assets/js/decorations.js and
+// assets/js/section-rule.js from assets/img/food/.
+//
+// Cocktails has none of that drawn yet, and the scaffold does not fake it:
+//   - _data/sites.yml omits `tape` and `footer_svg` for cocktails, so no fetch
+//     is attempted and the console stays clean. An absent key means "nothing to
+//     draw"; a present key pointing at a missing file means a 404 and a warning.
+//   - assets/img/cocktails/ exists and is empty.
+//
+// When artwork arrives it goes in assets/img/cocktails/, the keys go back into
+// _data/sites.yml, and the styling for it goes here. Colour comes from
+// _sass/cocktails/_palette.scss and nowhere else — the same rule food follows,
+// and the reason SVGs use currentColor rather than baked-in fills.
+// =============================================================================

@@ -1,0 +1,29 @@
+---
+layout: default
+permalink: /
+---
+
+{% comment %} ─────────────────────────────────────────────────────────────────
+  THE LANDING PAGE at /helen-triages/.
+
+  No `site_key`: this page belongs to neither site. default.html falls back to
+  the repo-level title and description, renders the wordmark with nothing taped
+  under it, and links assets/css/root.css instead of a site stylesheet.
+
+  The two doors are deliberately identical in weight. Food is the older and
+  larger site, and making it look primary here would be a decision nobody asked
+  for — this page's only job is to offer both.
+────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+<h1 class="visually-hidden">{{ site.title }} — {{ site.description }}</h1>
+
+<div class="landing">
+  {% for entry in site.data.sites %}
+    {% assign key = entry[0] %}
+    {% assign s = entry[1] %}
+    <a class="landing-door" href="{{ s.home | relative_url }}">
+      <span class="landing-door-word"><span class="landing-door-bracket">[ </span>{{ s.word }}<span class="landing-door-bracket"> ]</span></span>
+      <span class="landing-door-line">{{ s.description }}</span>
+    </a>
+  {% endfor %}
+</div>

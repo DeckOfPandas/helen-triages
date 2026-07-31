@@ -1,0 +1,37 @@
+# =============================================================================
+# COCKTAILS TAXONOMY — the vocabulary layer. DELIBERATELY EMPTY.
+# =============================================================================
+# The food taxonomy in _data/food/taxonomy.yml was not designed up front. It
+# came out of arguing over real recipes — which is why `one-handed food` means
+# something you would not guess, and why `no-cook` is one-directional.
+#
+# The cocktails schema is meant to arrive the same way, from the real recipes
+# rather than from general knowledge about cocktails. So the keys below are the
+# SHAPE this file will take, left empty on purpose. Filling them in with
+# plausible-looking guesses now would mean arguing later against a structure
+# nobody chose.
+#
+# The two things already known, from the architecture handover:
+#   - the ingredients list is FULL, not triaged the way food's
+#     `main_ingredients` is (no completeness/substitution split)
+#   - `glass` and `garnish` are real fields; prep/cook time are not
+#
+# Nothing reads this file yet. cocktails/index.html renders whatever is here,
+# so adding a term is all that will be needed to make it real — the same
+# contract the food taxonomy has.
+# =============================================================================
+
+# The hero spirit or ingredient, if there is one. Food's equivalent
+# (star_ingredient) is blank on about a quarter of recipes, and that is correct
+# — expect the same here.
+star_ingredients: []
+
+# Grouped filter vocabulary. Food uses star / mood / practicalities; whether
+# cocktails wants the same three axes is exactly the question the real recipes
+# should answer.
+tags: {}
+
+# Tags that imply other tags. Food kept only one rule, on the test that an
+# implied tag is sound when it is a rollup or a genuine affordance, and unsound
+# when it is merely definitional. Same test should apply here.
+co_tags: {}
