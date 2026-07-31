@@ -57,8 +57,8 @@
     }
 
     slots.forEach(function (slot) {
-      HTF.fetchSvg(HTF.asset('/assets/img/highlighters/' + nextName() + '.svg'),
-        function (svg) { slot.innerHTML = applyTexture(svg); });
+      var url = HTF.siteAsset('/highlighters/' + nextName() + '.svg');
+      if (url) HTF.fetchSvg(url, function (svg) { slot.innerHTML = applyTexture(svg); });
     });
   }
 
@@ -97,38 +97,57 @@
     slots.forEach(function (slot) {
       var colour = slot.getAttribute('data-brush-colour');
       var file = 'background-watercolour-brush-' + colour + '-' + nextShape(colour) + '.svg';
-      HTF.fetchSvg(HTF.asset('/assets/img/backgrounds-headers/' + file),
-        function (svg) { inject(slot, svg); });
+      var url = HTF.siteAsset('/backgrounds-headers/' + file);
+      if (url) HTF.fetchSvg(url, function (svg) { inject(slot, svg); });
     });
   }
 
   // ---------------------------------------------------------------------------
-  // Masking tape behind the logo — one of four, at random.
+  // Masking tape behind the wordmark — one of N, at random.
+  //
+  // Which directory and how many files both come from _data/sites.yml, via
+  // attributes on the slot. A site with no `tape:` key gets no .tape-bg element
+  // at all, so this returns at the guard below and attempts no fetch — an
+  // absent decoration must be silent, not a 404 with a console warning.
   // ---------------------------------------------------------------------------
   function tape() {
     var slot = document.querySelector('.tape-bg');
     if (!slot) return;
 
-    var n = Math.floor(Math.random() * 4) + 1;
-    HTF.fetchSvg(HTF.asset('/assets/img/tape/tape-food-' + n + '.svg'), function (svg) {
+    var dir   = slot.getAttribute('data-tape-dir');
+    var count = parseInt(slot.getAttribute('data-tape-count'), 10);
+    if (!dir || !count) return;
+
+    var n = Math.floor(Math.random() * count) + 1;
+    var url = HTF.siteAsset('/' + dir + '/tape-' + n + '.svg');
+    if (!url) return;
+    HTF.fetchSvg(url, function (svg) {
       slot.innerHTML = svg.replace(/<svg /, '<svg preserveAspectRatio="none" height="100%" ');
     });
   }
 
   // ---------------------------------------------------------------------------
-  // Footer hearts
+  // Footer decoration
   //
   // The artwork used to be a 2,500-character path string concatenated inside
-  // this file's predecessor. It is now assets/img/hearts/site-footer-hearts.svg
-  // and takes its colour from `currentColor`, set on .site-footer-hearts in
-  // _sass/_palette.scss — so no colour is written down here.
+  // this file's predecessor. It is now a file under assets/img/<site>/ — for
+  // food, hearts/site-footer-hearts.svg — and takes its colour from
+  // `currentColor`, set on .site-footer-hearts in the site's palette, so no
+  // colour is written down here.
+  //
+  // WHICH file is a per-site decision, so it comes from _data/sites.yml
+  // (`footer_svg`) via a data attribute rather than being named here. A site
+  // with no footer_svg gets no element, and nothing is fetched.
   // ---------------------------------------------------------------------------
-  function hearts() {
+  function footerDecoration() {
     var slot = document.querySelector('.site-footer-hearts');
     if (!slot) return;
 
-    HTF.fetchSvg(HTF.asset('/assets/img/hearts/site-footer-hearts.svg'),
-      function (svg) { slot.innerHTML = svg; });
+    var file = slot.getAttribute('data-footer-svg');
+    if (!file) return;
+
+    var url = HTF.siteAsset('/' + file);
+    if (url) HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
   }
 
   // ---------------------------------------------------------------------------
@@ -145,7 +164,9 @@
 
     slots.forEach(function (slot) {
       var name = slot.getAttribute('data-index-doodle');
-      HTF.fetchSvg(HTF.asset('/assets/img/doodles/' + name + '.svg'), function (svg) {
+      var url = HTF.siteAsset('/doodles/' + name + '.svg');
+      if (!url) return;
+      HTF.fetchSvg(url, function (svg) {
         var colour = slot.getAttribute('data-doodle-color');
         slot.innerHTML = svg.replace(/fill="black"/g, 'fill="' + colour + '"');
       });
@@ -155,7 +176,7 @@
   highlighters();
   brushes();
   tape();
-  hearts();
+  footerDecoration();
   doodles();
 
 })();

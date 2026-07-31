@@ -39,10 +39,41 @@ window.HTF = window.HTF || {};
 
   /**
    * Build a URL for a file under the site root.
-   * @param {string} path - root-relative path, e.g. '/assets/img/doodles/x.svg'
+   * @param {string} path - root-relative path, e.g. '/assets/img/favicon.svg'
    */
   HTF.asset = function (path) {
     return HTF.base + path;
+  };
+
+  // --- Site key --------------------------------------------------------------
+  // This repo serves two sites from one build. Artwork is not shared between
+  // them — assets/img/food/ and assets/img/cocktails/ are separate sets — so
+  // every decorative fetch needs to know which site it is on.
+  //
+  // Derived here for the same reason the base URL is: it is read from the page
+  // by several scripts, it changes per page rather than per deployment, and a
+  // second copy is a second thing to get wrong. _layouts/default.html emits
+  // <meta name="site-key" content="{{ page.site_key }}">.
+  //
+  // Empty is legitimate — the root landing page belongs to neither site and
+  // draws no site artwork — so an absent value is not warned about. A wrong
+  // one announces itself through fetchSvg below.
+  var siteMeta = document.querySelector('meta[name="site-key"]');
+  HTF.site = siteMeta ? (siteMeta.getAttribute('content') || '').trim() : '';
+
+  /**
+   * Build a URL for a file in THIS site's artwork set.
+   * siteAsset('/tape/tape-3.svg') -> '<base>/assets/img/food/tape/tape-3.svg'
+   *
+   * Returns null when the page has no site key, so callers can skip the fetch
+   * rather than request a path with a hole in it.
+   *
+   * @param {string} path - path under the site's image directory, leading slash
+   * @returns {string|null}
+   */
+  HTF.siteAsset = function (path) {
+    if (!HTF.site) { return null; }
+    return HTF.base + '/assets/img/' + HTF.site + path;
   };
 
   // --- SVG loading -----------------------------------------------------------

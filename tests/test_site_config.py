@@ -15,7 +15,7 @@ import pytest
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA = ROOT / "_data"
+DATA = ROOT / "_data" / "food"
 
 
 def read(*parts) -> str:
@@ -28,7 +28,7 @@ def test_family_button_min_chars_is_three():
     """The value itself, asserted once, in the one place it lives."""
     path = DATA / "ingredient_words.yml"
     assert path.exists(), (
-        "_data/ingredient_words.yml is missing. It holds the ingredient search "
+        "_data/food/ingredient_words.yml is missing. It holds the ingredient search "
         "vocabulary and the family-button threshold; without it, filters.js "
         "falls back to defaults and search loses its synonyms."
     )
@@ -47,7 +47,7 @@ def test_filters_js_holds_no_literal_threshold():
 
     For months this value lived as a bare `query.length >= 3` in filters.js with
     nothing defining it, so every rewrite of that file re-derived it from
-    scratch and landed on 2. It now lives in _data/ingredient_words.yml, read
+    scratch and landed on 2. It now lives in _data/food/ingredient_words.yml, read
     into FAMILY_BUTTON_MIN_CHARS in assets/js/ingredient-search.js (the
     matching algorithm moved there so it could be tested directly with
     Node — see tests/js/ingredient-search.test.js — filters.js is DOM wiring
@@ -58,7 +58,7 @@ def test_filters_js_holds_no_literal_threshold():
     literals = re.findall(r"query\.length\s*[<>]=?\s*\d+", js + search_js)
     assert not literals, (
         f"Hardcoded query-length comparison(s) found: {literals}.\n"
-        f"This threshold is defined in _data/ingredient_words.yml as "
+        f"This threshold is defined in _data/food/ingredient_words.yml as "
         f"`search.family_button_min_chars` and read into FAMILY_BUTTON_MIN_CHARS "
         f"in ingredient-search.js. Use that constant instead of a literal — the "
         f"literal is exactly the thing that kept resetting to 2."
@@ -72,9 +72,9 @@ def test_filters_js_holds_no_literal_threshold():
 
 def test_vocabulary_is_emitted_to_the_page():
     """filters.js can only read the vocabulary if index.html emits it."""
-    html = read("index.html")
+    html = read("food", "index.html")
     assert 'id="ingredient-vocabulary"' in html, (
-        'index.html no longer emits the <script type="application/json" '
+        'food/index.html no longer emits the <script type="application/json" '
         'id="ingredient-vocabulary"> block. Without it filters.js falls back to '
         "empty singulars and synonyms — ingredient search still works, but "
         '"cheese" stops returning cheddar and the collapse behaviour is lost.'
@@ -82,7 +82,7 @@ def test_vocabulary_is_emitted_to_the_page():
     # Match the <script src> tag specifically — the word "filters.js" also
     # appears in a comment above the block, which would give a false failure.
     tag = re.search(r"<script src=[^>]*filters\.js", html)
-    assert tag, "index.html no longer loads js/filters.js at all."
+    assert tag, "food/index.html no longer loads js/filters.js at all."
     assert html.index('id="ingredient-vocabulary"') < tag.start(), (
         "The ingredient-vocabulary block must appear BEFORE the filters.js "
         "script tag, or the script will run before the data exists."
@@ -97,11 +97,11 @@ def test_ingredient_search_js_loads_before_filters_js():
     model_instructions/DEV_JOBS_v22.md §3.4), and filters.js wires it up
     with `HTF.ingredientSearch.create(...)` in its very first few lines.
     """
-    html = read("index.html")
+    html = read("food", "index.html")
     search_tag = re.search(r"<script src=[^>]*ingredient-search\.js", html)
     filters_tag = re.search(r"<script src=[^>]*filters\.js", html)
-    assert search_tag, "index.html no longer loads assets/js/ingredient-search.js."
-    assert filters_tag, "index.html no longer loads assets/js/filters.js."
+    assert search_tag, "food/index.html no longer loads assets/js/ingredient-search.js."
+    assert filters_tag, "food/index.html no longer loads assets/js/filters.js."
     assert search_tag.start() < filters_tag.start(), (
         "ingredient-search.js must load BEFORE filters.js, or "
         "HTF.ingredientSearch won't exist yet when filters.js runs."
@@ -114,21 +114,21 @@ def test_filters_js_holds_no_ingredient_vocabulary():
     for name in ("var singularMap = {", "var synonymMap = {"):
         assert name not in js, (
             f"js/filters.js declares `{name}...` inline. The ingredient "
-            f"vocabulary lives in _data/ingredient_words.yml and is read from "
+            f"vocabulary lives in _data/food/ingredient_words.yml and is read from "
             f"the page; adding a word should be a YAML edit, not a code edit."
         )
 
 
 # --- colour stays in one place ----------------------------------------------
 
-TEMPLATES = ["index.html", "_layouts/recipe.html", "_layouts/default.html",
+TEMPLATES = ["food/index.html", "_layouts/recipe.html", "_layouts/default.html",
              "_includes/filter_group.html", "_includes/recipe_badges.html",
              "_includes/heading_with_highlighter.html"]
 
 
 @pytest.mark.parametrize("relpath", TEMPLATES)
 def test_no_inline_highlighter_fill(relpath):
-    """Colour is set by class, in _sass/_palette.scss, and nowhere else.
+    """Colour is set by class, in _sass/food/_palette.scss, and nowhere else.
 
     Inline styles beat stylesheet rules, so a single inline fill silently
     overrides the palette and makes editing the palette appear to do nothing.
@@ -140,7 +140,7 @@ def test_no_inline_highlighter_fill(relpath):
     assert "--highlighter-fill" not in text, (
         f"{relpath} sets --highlighter-fill inline.\n"
         f"Inline styles win over the stylesheet, so this overrides the "
-        f"`.category--*` / `.search--*` rules in _sass/_palette.scss and makes "
+        f"`.category--*` / `.search--*` rules in _sass/food/_palette.scss and makes "
         f"the palette look broken when you edit it. Add a class instead."
     )
 
@@ -153,7 +153,7 @@ def test_deleted_data_files_stay_deleted(relpath):
     assigned in recipe.html and never used.
     """
     assert not (ROOT / relpath).exists(), (
-        f"{relpath} has reappeared. Colour belongs in _sass/_palette.scss only; "
+        f"{relpath} has reappeared. Colour belongs in _sass/food/_palette.scss only; "
         f"section shape and texture are chosen in js/highlighter.js."
     )
 
@@ -164,7 +164,7 @@ def test_palette_is_the_only_place_hex_colours_are_written():
     assert "getPropertyValue" in js, (
         "js/colours.js is no longer reading colours from CSS custom properties. "
         "It should call getComputedStyle on :root and read --colour-* values "
-        "defined in _sass/_palette.scss, not keep its own hardcoded copies."
+        "defined in _sass/food/_palette.scss, not keep its own hardcoded copies."
     )
 
 
@@ -180,7 +180,7 @@ def test_pantry_entries_are_actually_used():
     from conftest import ALL_RECIPES, ALL_DRAFTS
     path = DATA / "common_ingredients.yml"
     if not path.exists():
-        pytest.skip("_data/common_ingredients.yml does not exist yet")
+        pytest.skip("_data/food/common_ingredients.yml does not exist yet")
     pantry = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("pantry") or []
 
     used = set()
@@ -190,7 +190,7 @@ def test_pantry_entries_are_actually_used():
 
     unused = [p for p in pantry if p.lower() not in used]
     assert not unused, (
-        f"_data/common_ingredients.yml lists {unused}, which match no "
+        f"_data/food/common_ingredients.yml lists {unused}, which match no "
         f"main_ingredients entry anywhere.\n"
         f"Matching is exact — 'onion' does not demote 'red onions'. Either the "
         f"entry is a typo, or it is aspirational and should come out until "
@@ -214,7 +214,7 @@ def test_base_url_is_derived_in_exactly_one_place():
     offenders = []
     for path in sorted(JS_DIR.glob("*.js")) + [ROOT / "_layouts" / "default.html",
                                                ROOT / "_layouts" / "recipe.html",
-                                               ROOT / "index.html"]:
+                                               ROOT / "food" / "index.html"]:
         if not path.exists():
             continue
         hits = len(pattern.findall(path.read_text(encoding="utf-8")))
@@ -227,6 +227,54 @@ def test_base_url_is_derived_in_exactly_one_place():
         f"base-url is read outside js/assets.js: {offenders}.\n"
         f"Use window.HTF.base or window.HTF.asset(path) instead. assets.js is "
         f"loaded first in default.html precisely so that it can be."
+    )
+
+
+def test_site_key_is_derived_in_exactly_one_place():
+    """Same discipline as the base URL, for the same reason.
+
+    Food and cocktails keep separate artwork under assets/img/<site>/, so every
+    decorative fetch needs the site key. It is emitted once by default.html and
+    read once by assets.js, which exposes HTF.site and HTF.siteAsset(). A second
+    reader is a second thing to forget when a third site appears — and unlike
+    the base URL, a wrong site key fails only on the site nobody was looking at.
+    """
+    pattern = re.compile(r"""meta\[name=["']site-key["']\]""")
+    offenders = []
+    for path in sorted(JS_DIR.glob("*.js")):
+        if path.name == "assets.js":
+            continue
+        if pattern.search(path.read_text(encoding="utf-8")):
+            offenders.append(path.name)
+    assert not offenders, (
+        f"site-key is read outside assets.js: {offenders}.\n"
+        f"Use window.HTF.site, or window.HTF.siteAsset(path) to build an "
+        f"artwork URL. assets.js loads first in default.html so that it can be."
+    )
+
+
+def test_artwork_fetches_go_through_site_asset():
+    """No script may hardcode which site's artwork it is loading.
+
+    `HTF.asset('/assets/img/…')` reaches into a specific site's set from code
+    that should not know which site it is on — it is how tape-food-N.svg came to
+    be named in decorations.js. Artwork goes through HTF.siteAsset(), which
+    builds the path from the page's site key.
+
+    assets/img/favicon.svg is the one genuinely shared image and is referenced
+    from the template, not from JS, so nothing here needs an exception.
+    """
+    pattern = re.compile(r"""HTF\.asset\(\s*['"]/assets/img/""")
+    offenders = []
+    for path in sorted(JS_DIR.glob("*.js")):
+        for match in pattern.finditer(path.read_text(encoding="utf-8")):
+            offenders.append(f"{path.name}: {match.group(0)}…")
+    assert not offenders, (
+        "Artwork fetched through HTF.asset() rather than HTF.siteAsset():\n  "
+        + "\n  ".join(offenders)
+        + "\n\nHTF.asset() is for genuinely shared files. Anything under a "
+          "site's own image directory must go through HTF.siteAsset(path), "
+          "which returns null on a page with no site so the caller can skip it."
     )
 
 
@@ -303,6 +351,39 @@ def test_gitignore_covers_build_output():
     )
 
 
+def test_every_drafts_collection_is_gitignored():
+    """Unpublished drafts must not reach a public repo.
+
+    .gitignore matches by directory NAME, so renaming a drafts collection
+    silently stops ignoring it — no error, no warning, just 221 unpublished
+    recipes newly stageable. That is exactly what happened when `_drafts/`
+    became `_food_drafts/` in the mono-repo migration.
+
+    Derived from _config.yml rather than hardcoded, so a drafts collection added
+    later is covered the day it is declared.
+    """
+    config = yaml.safe_load(read("_config.yml"))
+    drafts = [name for name in (config.get("collections") or {}) if "draft" in name]
+    assert drafts, (
+        "_config.yml declares no drafts collection. If drafts were deliberately "
+        "removed, delete this test; otherwise the collection name has changed "
+        "shape and this check is no longer finding it."
+    )
+    # Active patterns only. A substring match over the whole file would count a
+    # commented-out `# _food_drafts/` as coverage — and the explanatory comment
+    # directly above the entries names them, so a naive check passes even with
+    # every pattern deleted.
+    active = {line.strip() for line in read(".gitignore").splitlines()
+              if line.strip() and not line.strip().startswith("#")}
+    missing = [f"_{name}/" for name in drafts if f"_{name}/" not in active]
+    assert not missing, (
+        f".gitignore does not cover {missing}.\n"
+        f"These are unpublished drafts and the repo is public. `output: false` "
+        f"in _config.yml stops them PUBLISHING; it does nothing to stop the "
+        f"source markdown being committed."
+    )
+
+
 def test_page_has_a_description_and_link_preview():
     """A pasted recipe URL should show a title and a description, not a bare link."""
     html = read("_layouts", "default.html")
@@ -330,7 +411,7 @@ def test_search_inputs_have_a_label():
     Without <label for>, a screen reader announces these as "edit text, blank".
     Placeholder text is not an accessible name and vanishes as soon as you type.
     """
-    html = read("index.html")
+    html = read("food", "index.html")
     for input_id in ("ingredient-search-box", "name-search-box"):
         assert f'for="{input_id}"' in html, (
             f'#{input_id} has no <label for="{input_id}">. The visible '
@@ -341,7 +422,7 @@ def test_search_inputs_have_a_label():
 
 def test_clear_controls_are_buttons():
     """They were <span>s with click handlers: not focusable, not announced."""
-    html = read("index.html") + read("_includes", "filter_group.html")
+    html = read("food", "index.html") + read("_includes", "filter_group.html")
     offenders = re.findall(r'<span[^>]*class="[^"]*btn-clear-inline', html)
     assert not offenders, (
         f"Found {len(offenders)} clear control(s) rendered as <span>. "
@@ -368,9 +449,9 @@ def test_filter_buttons_announce_their_state():
 
 def test_search_results_are_announced():
     """The results pool is populated as you type, so the change needs announcing."""
-    html = read("index.html")
+    html = read("food", "index.html")
     match = re.search(r'id="ingredient-results-pool"[^>]*', html)
-    assert match, "#ingredient-results-pool is missing from index.html."
+    assert match, "#ingredient-results-pool is missing from food/index.html."
     assert "aria-live" in match.group(0), (
         "#ingredient-results-pool has no aria-live attribute, so a screen "
         'reader user gets no indication that anything happened. aria-live="polite".'
@@ -379,9 +460,9 @@ def test_search_results_are_announced():
 
 def test_index_has_a_heading():
     """Every recipe page has an h1. The index had none of any level."""
-    html = read("index.html")
+    html = read("food", "index.html")
     assert re.search(r"<h1[^>]*>", html), (
-        "index.html has no <h1>. The logo is the visible title, so a "
+        "food/index.html has no <h1>. The logo is the visible title, so a "
         '<h1 class="visually-hidden"> is the right shape — it gives assistive '
         "tech and search engines something to anchor to without changing the "
         "design."
@@ -398,7 +479,7 @@ def test_the_method_is_called_method_everywhere():
     fallback to a front matter field that no file has used since June.
     """
     offenders = []
-    for relpath in ("_layouts/recipe.html", "_sass/_recipe.scss", "assets/js/method-toggle.js"):
+    for relpath in ("_layouts/recipe.html", "_sass/food/_recipe.scss", "assets/js/method-toggle.js"):
         path = ROOT / relpath
         if not path.exists():
             continue
@@ -432,7 +513,7 @@ def test_no_orphaned_data_file_references():
     offenders = []
     for path in list((ROOT / "_layouts").glob("*.html")) + \
                 list((ROOT / "_includes").glob("*.html")) + \
-                [ROOT / "index.html"]:
+                [ROOT / "food" / "index.html"]:
         if path.exists() and "index_tags_sections" in path.read_text(encoding="utf-8"):
             offenders.append(path.name)
     assert not offenders, (
@@ -445,6 +526,42 @@ def test_no_orphaned_data_file_references():
 # --- SCSS structure ----------------------------------------------------------
 
 SASS_DIR = ROOT / "_sass"
+
+
+def sass_files() -> list[Path]:
+    """Every partial, at any depth under _sass/.
+
+    rglob, NOT glob. The partials used to sit flat in _sass/ and the three
+    structural tests below globbed "*.scss"; the mono-repo split moved every one
+    of them into _sass/shared/, _sass/food/, _sass/cocktails/ and _sass/root/,
+    which would have left that pattern matching an empty set. The tests would
+    have gone on PASSING while checking nothing at all.
+
+    That is not hypothetical. The same failure had already happened once in this
+    file: JS_DIR pointed at _sass's sibling `js/` after the scripts moved to
+    `assets/js/`, and three guards silently passed over an empty directory until
+    it was noticed. A test that cannot fail is worse than no test, because it
+    reads as coverage.
+
+    test_sass_files_are_actually_found below asserts this returns something.
+    """
+    return sorted(SASS_DIR.rglob("*.scss"))
+
+
+def test_sass_files_are_actually_found():
+    """The guard on the guards — see sass_files() above.
+
+    If a future reorganisation moves the partials somewhere this does not reach,
+    this fails loudly instead of the three structural tests quietly passing on
+    an empty list.
+    """
+    found = sass_files()
+    assert len(found) >= 5, (
+        f"sass_files() found {len(found)} .scss file(s) under {SASS_DIR}. "
+        f"The structural SCSS tests iterate this list, so an empty or truncated "
+        f"result means they are checking nothing while still reporting green. "
+        f"Check whether the partials have moved."
+    )
 
 
 def _top_level_blocks(text: str):
@@ -469,6 +586,94 @@ def _top_level_blocks(text: str):
             current = None
 
 
+# --- the shared/forked SCSS boundary -----------------------------------------
+
+# Every variable _sass/shared/_base.scss and _sass/shared/_layout.scss use but
+# do not define. Each site palette owes all of them.
+SHARED_PALETTE_CONTRACT = [
+    "color-bg", "color-border", "color-clear-text", "color-mood-root",
+    "color-surface", "color-text", "color-white",
+    "font-body", "font-headings",
+]
+
+# Directories holding a _palette.scss: the two sites plus the landing page,
+# which belongs to neither but renders the same shared chrome.
+PALETTE_OWNERS = ["food", "cocktails", "root"]
+
+
+@pytest.mark.parametrize("owner", PALETTE_OWNERS)
+def test_every_palette_satisfies_the_shared_contract(owner):
+    """A shared partial names palette variables it does not define.
+
+    That is what makes it shareable — but it means a palette that omits one
+    fails at BUILD time, with an "Undefined variable" pointing at a line in
+    _sass/shared/, not at the palette that actually forgot it. Worse, it only
+    breaks the site whose palette is short, so food can be perfectly fine while
+    cocktails will not compile.
+
+    Checked here so the failure names the file and the variable instead.
+    """
+    path = SASS_DIR / owner / "_palette.scss"
+    assert path.exists(), (
+        f"_sass/{owner}/_palette.scss is missing. assets/css/{owner}.scss "
+        f"imports it before the shared partials, which need the variables it "
+        f"declares."
+    )
+    text = path.read_text(encoding="utf-8")
+    missing = [v for v in SHARED_PALETTE_CONTRACT
+               if not re.search(rf"^\${re.escape(v)}\s*:", text, re.M)]
+    assert not missing, (
+        f"_sass/{owner}/_palette.scss does not declare {missing}.\n"
+        f"_sass/shared/_base.scss and _sass/shared/_layout.scss use these by "
+        f"name. Without them the build fails with an error pointing at the "
+        f"shared file rather than at this one."
+    )
+
+
+def test_shared_scss_never_imports_a_site_partial():
+    """The dependency arrow points one way: sites import shared, never back.
+
+    A shared partial reaching into _sass/food/ would compile perfectly well on
+    the food stylesheet and fail on the cocktails one, which is the most
+    annoying possible version of this bug — it looks fine everywhere you tend
+    to look.
+    """
+    offenders = []
+    for path in sorted((SASS_DIR / "shared").glob("*.scss")):
+        for i, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+            code = line.split("//")[0]
+            match = re.search(r"""@(?:import|use)\s+['"]([^'"]+)""", code)
+            if match and not match.group(1).startswith("shared/"):
+                offenders.append(f"shared/{path.name}:{i} imports {match.group(1)}")
+    assert not offenders, (
+        "A shared partial imports something outside shared/:\n  "
+        + "\n  ".join(offenders)
+        + "\n\nshared/ may not depend on any one site. Move the shared thing "
+          "into shared/, or the site-specific thing out of it."
+    )
+
+
+def test_shared_scss_names_no_site():
+    """No selector or variable in shared/ may name one site.
+
+    `.site-logo-food` lived in the layout that both sites now render. The word
+    in the brackets comes from _data/sites.yml, so the class cannot assume it —
+    it is `.site-logo-word`. Comments are exempt: they explain the history.
+    """
+    offenders = []
+    for path in sorted((SASS_DIR / "shared").glob("*.scss")):
+        for i, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+            code = line.split("//")[0]
+            if re.search(r"[.$%#-](food|cocktail)s?\b", code, re.I):
+                offenders.append(f"shared/{path.name}:{i} {code.strip()[:60]}")
+    assert not offenders, (
+        "A shared SCSS partial names a specific site:\n  " + "\n  ".join(offenders)
+        + "\n\nshared/ is rendered by both sites. If the rule is genuinely "
+          "site-specific it belongs in _sass/<site>/; if it is not, the name "
+          "should not say so."
+    )
+
+
 def test_no_selector_declares_the_same_property_twice():
     """A selector may legitimately appear more than once.
 
@@ -483,7 +688,7 @@ def test_no_selector_declares_the_same_property_twice():
     """
     from collections import defaultdict
     problems = []
-    for path in sorted(SASS_DIR.glob("*.scss")):
+    for path in sass_files():
         seen = defaultdict(lambda: defaultdict(int))
         for selector, props in _top_level_blocks(path.read_text(encoding="utf-8")):
             for prop in set(props):
@@ -507,7 +712,7 @@ def test_spacing_tokens_are_not_used_for_type():
     decision. Tying them together means changing one changes the other.
     """
     offenders = []
-    for path in sorted(SASS_DIR.glob("*.scss")):
+    for path in sass_files():
         for i, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
             if re.search(r"(font-size|line-height|letter-spacing)\s*:.*\$space-", line):
                 offenders.append(f"{path.name}:{i} {line.strip()[:60]}")
@@ -529,7 +734,7 @@ def test_no_element_can_force_horizontal_scroll():
     sits with it.
     """
     offenders = []
-    for path in sorted(SASS_DIR.glob("*.scss")):
+    for path in sass_files():
         lines = path.read_text(encoding="utf-8").split("\n")
         for i, line in enumerate(lines):
             match = re.match(r"^\s*width:\s*(\d+)px", line)

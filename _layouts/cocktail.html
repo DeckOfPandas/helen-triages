@@ -1,0 +1,88 @@
+---
+layout: default
+---
+
+{% comment %} ─────────────────────────────────────────────────────────────────
+  COCKTAIL PAGE — SKELETON. Deliberately not modelled on recipe.html.
+
+  A food recipe is a PROCEDURE: ordered steps, prep and cook time split, a
+  short-method toggle, main_ingredients triaged by the substitution test. A
+  cocktail is closer to a FORMULA — ratio, glass, garnish, one line of method —
+  and forcing it into food's decision-support shape is the specific mistake the
+  architecture handover warns against.
+
+  So this renders the two fields already known to be real (glass, garnish), the
+  full untriaged ingredient list, and the body. It invents no schema beyond
+  that. `title` is the only field it assumes.
+
+  When the real recipes land, this is where their anatomy gets built — and the
+  argument about what a cocktail page should show belongs there, over real
+  drinks, the way main_ingredients was argued out over real recipes.
+────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+<article class="cocktail">
+
+  <h1 class="cocktail-title">{{ page.title }}</h1>
+
+  {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline }}</p>{% endif %}
+
+  {% comment %} Glass and garnish are stated in the handover as real fields.
+     Rendered only when present, so a file that omits them is not broken.
+  {% endcomment %}
+  {% if page.glass or page.garnish %}
+    <ul class="cocktail-meta">
+      {% if page.glass %}<li><strong>Glass</strong> <span>{{ page.glass }}</span></li>{% endif %}
+      {% if page.garnish %}<li><strong>Garnish</strong> <span>{{ page.garnish }}</span></li>{% endif %}
+    </ul>
+  {% endif %}
+
+  {% comment %} The ingredient list is FULL, not triaged the way food's
+     main_ingredients is — no completeness/substitution split, no pantry
+     demotion. Both the flat `ingredients:` shape and food's grouped
+     `ingredient_groups:` shape are accepted for now, because which one real
+     cocktails need has not been settled.
+  {% endcomment %}
+  {% if page.ingredients %}
+    <h2 class="cocktail-section-heading">Ingredients</h2>
+    <ul class="cocktail-ingredients">
+      {% for item in page.ingredients %}
+        {% if item.item %}
+          <li>{% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span> {% endif %}{{ item.item }}</li>
+        {% else %}
+          <li>{{ item }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% comment %} A cocktail method is usually one line, so `method:` is rendered
+     as prose when it is a string and as a list when it is a list. Which of the
+     two the schema settles on is a question for the real recipes.
+  {% endcomment %}
+  {% if page.method %}
+    <h2 class="cocktail-section-heading">Method</h2>
+    {% if page.method.first %}
+      <ol class="cocktail-method">
+        {% for step in page.method %}<li>{{ step }}</li>{% endfor %}
+      </ol>
+    {% else %}
+      <p class="cocktail-method">{{ page.method }}</p>
+    {% endif %}
+  {% endif %}
+
+  {% if page.notes %}
+    <h2 class="cocktail-section-heading">Notes</h2>
+    {% for note in page.notes %}<p class="note">{{ note | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endfor %}
+  {% endif %}
+
+  {% if content != '' %}
+    <div class="cocktail-body-content">{{ content }}</div>
+  {% endif %}
+
+  {% if page.source %}
+    <div class="cocktail-footer">
+      <p class="cocktail-source">Source: {{ page.source }}</p>
+    </div>
+  {% endif %}
+
+</article>

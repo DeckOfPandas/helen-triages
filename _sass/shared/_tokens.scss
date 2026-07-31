@@ -1,8 +1,17 @@
 // =============================================================================
-// HELEN TRIAGES FOOD - DESIGN TOKENS
+// SHARED DESIGN TOKENS — every site in the mono-repo
 // =============================================================================
 // Non-colour design decisions: spacing, sizing, typography scale, stroke weights.
-// Import after _palette.scss (tokens may reference palette variables).
+// Structural, not aesthetic — this is the layer food and cocktails agree on.
+//
+// NOTHING IN THIS FILE MAY REFERENCE A PALETTE VARIABLE. That is what makes it
+// shareable. `%btn-active-base` used to live here and did reference two
+// ($color-text, $saturation-badge-bg), which quietly made the "shared" token
+// file depend on food's palette; it now sits in _sass/food/_layout.scss beside
+// the buttons that extend it.
+//
+// Imported after the site's palette, because a later partial may reference
+// both.
 
 // --- Spacing scale -----------------------------------------------------------
 // These six values already accounted for 75 of the ~227 numeric literals in
@@ -51,14 +60,3 @@ $radius-sm: 2px;   // note boxes, method-short box, meta wash, section-rule
 
 // --- Hand-drawn SVG annotations ----------------------------------------------
 $opacity-group-underline: 1;   // opacity of scribble underlines on group headings
-
-// --- Active filter button base -----------------------------------------------
-// All active filter states share these four properties. Each rule then adds
-// its colour-specific properties (color, -webkit-text-stroke) on top.
-%btn-active-base {
-  text-transform: uppercase;
-  font-size: 0.74rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  background-color: rgba($color-text, $saturation-badge-bg);
-}

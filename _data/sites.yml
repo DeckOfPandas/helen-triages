@@ -1,0 +1,51 @@
+# =============================================================================
+# SITE IDENTITY — what distinguishes one site in the mono-repo from the other.
+# =============================================================================
+# Selected by `site_key`, which _config.yml's `defaults:` sets per collection
+# and per page directory. _layouts/default.html reads this and nothing else to
+# decide what the page calls itself and what it links.
+#
+# This is the VOCABULARY layer for the mono-repo, in exactly the sense the
+# three-layer rule means it: the shared layout knows a site has a wordmark and
+# a stylesheet, and knows nothing about which sites exist or what they say.
+# Adding a third site should be an edit here plus a palette, not a template
+# change.
+#
+# KEYS
+#   title       <title>, og:site_name, the footer, and the second half of the
+#               wordmark's accessible name
+#   word        the bracketed word on the taped strip: [ FOOD ]
+#   description fallback meta description for pages with no tagline of their own
+#   css         basename under assets/css/ — `food` means assets/css/food.scss
+#   home        where the wordmark links, relative to baseurl
+#   tape        subdirectory under assets/img/<key>/ holding the torn strips
+#               behind the wordmark, named tape-1.svg … tape-N.svg; omit for no
+#               tape. tape_count is N — it lives here rather than in the JS so
+#               a site can have a different number of them
+#   tape_count  how many tape-N.svg files that directory holds
+#   footer_svg  path under assets/img/<key>/ for the footer decoration; omit
+#               entirely for none. Absent means NO fetch is attempted, rather
+#               than a fetch that 404s and warns — which is what a site with no
+#               artwork yet needs.
+# =============================================================================
+
+food:
+  title: Helen Triages Food
+  word: FOOD
+  description: What to cook, not how to cook
+  css: food
+  home: /food/
+  tape: tape
+  tape_count: 4
+  footer_svg: hearts/site-footer-hearts.svg
+
+cocktails:
+  title: Helen Triages Cocktails
+  word: COCKTAILS
+  description: What to drink, not how to mix it
+  css: cocktails
+  home: /cocktails/
+  # No tape and no footer_svg yet: the cocktails visual language is deliberately
+  # its own, and nothing has been drawn for it. Both are omitted rather than
+  # pointed at food's artwork, so the page renders undecorated and silent
+  # instead of borrowing a look it has not chosen.

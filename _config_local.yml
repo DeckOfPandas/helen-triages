@@ -5,13 +5,13 @@
 # baseurl is deliberately NOT overridden here. Local and production now use the
 # same path, so what you see at localhost is what you get when you deploy.
 # Your local URL becomes:
-#   http://localhost:4001/helen-triages-food/
+#   http://localhost:4001/helen-triages/
 # =============================================================================
 
 # Show drafts and unrewritten recipes in the index, with their meta filters.
 show_unrewritten: true
 
 collections:
-  drafts:
+  food_drafts:
     output: true
-    permalink: /drafts/:path/
+    permalink: /food/drafts/:path/

@@ -1,0 +1,16 @@
+---
+---
+// The landing page at /helen-triages/ — belongs to neither site.
+//
+// Shared structure only, and a neutral palette of its own. It deliberately does
+// NOT import food's or cocktails' palette: the page's job is to offer both
+// without looking like either, so borrowing one of them would quietly make that
+// site the default.
+//
+// The nine variables the shared partials require are declared in
+// _sass/root/_palette.scss — the same contract every site palette owes.
+@import "root/palette";
+@import "shared/tokens";
+@import "shared/base";
+@import "shared/layout";
+@import "root/landing";

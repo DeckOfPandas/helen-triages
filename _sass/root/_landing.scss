@@ -1,0 +1,59 @@
+// =============================================================================
+// LANDING PAGE — the two doors
+// =============================================================================
+// Everything inside <main> at /helen-triages/. The wordmark, header and footer
+// around it come from _sass/shared/_layout.scss, the same as both sites.
+//
+// The two links are styled as one pair with no visual hierarchy between them:
+// same size, same weight, same treatment. That is the whole design brief for
+// this page — anything that made one look primary would be a decision nobody
+// asked for.
+
+.landing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xl;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: $space-xxl;
+}
+
+.landing-door {
+  flex: 1 1 260px;
+  // Caps the pair at a sensible reading width on a wide screen while still
+  // letting them wrap to one column on a phone. No media query needed.
+  max-width: 340px;
+  padding: $space-xxl $space-xl;
+  border: 1px dashed $color-border;
+  border-radius: $radius-sm;
+  background: $color-surface;
+  text-align: center;
+  transition: border-color 0.12s ease, transform 0.12s ease;
+
+  &:hover {
+    border-color: $color-text;
+    transform: translateY(-2px);
+  }
+}
+
+.landing-door-word {
+  display: block;
+  font-family: $font-headings;
+  font-size: 1.6rem;
+  font-weight: 1000;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $color-text;
+
+  .landing-door-bracket {
+    letter-spacing: 0;
+  }
+}
+
+.landing-door-line {
+  display: block;
+  margin-top: $space-md;
+  font-size: $font-size-body-sm;
+  line-height: $line-height-body;
+  color: $color-clear-text;
+}

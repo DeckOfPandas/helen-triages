@@ -1,0 +1,190 @@
+---
+layout: default
+title: Home
+permalink: /food/
+---
+
+{% comment %} site_key is set to `food` for everything in this directory by
+   _config.yml's `defaults:`, so the identity here comes from _data/sites.yml
+   rather than from site.title — which is now the repo-level name, not this
+   site's. {% endcomment %}
+{% assign this_site = site.data.sites[page.site_key] %}
+
+<h1 class="visually-hidden">{{ this_site.title }} — {{ this_site.description }}</h1>
+
+<div class="controls">
+  {% assign star_data = site.data.food.filter_sections.star %}
+  {% assign ingredients_data = site.data.food.filter_sections.ingredients %}
+  {% assign tag_groups = site.data.food.filter_sections.tag_groups %}
+  {% assign name_search_data = site.data.food.filter_sections.name_search %}
+
+  {% assign all_recipes = site.food_recipes %}
+  {% if site.food_drafts %}
+    {% assign all_recipes = all_recipes | concat: site.food_drafts %}
+  {% endif %}
+  {% assign all_recipes = all_recipes | sort: "title" %}
+  
+  {% comment %} Stars are DECLARED in _data/taxonomy.yml, not derived from front
+     matter. Deriving meant a typo silently minted a new star ingredient. {% endcomment %}
+  {% assign all_stars = site.data.food.taxonomy.star_ingredients %}
+
+  {% if all_stars.size > 0 %}
+    {% include filter_group.html
+      group_class=star_data.class
+      label=star_data.label
+      color=star_data.color
+      brush_colour=star_data.brush_colour
+      items=all_stars
+      btn_class="btn-star"
+      data_attr="data-star"
+    %}
+  {% endif %}
+
+  {% for group in tag_groups %}
+    {% comment %} Look the group's tags up in _data/taxonomy.yml by iterating the
+       hash rather than using tags[group.name]. Iterating yields [key, value]
+       pairs and always works; the bracket form with a variable key is not
+       reliable in Liquid. {% endcomment %}
+    {% assign group_tags = "" | split: "" %}
+    {% for pair in site.data.food.taxonomy.tags %}
+      {% if pair[0] == group.name %}{% assign group_tags = pair[1] %}{% endif %}
+    {% endfor %}
+
+    {% include filter_group.html
+      group_class=group.class
+      label=group.label
+      color=group.color
+      brush_colour=group.brush_colour
+      items=group_tags
+      btn_class="btn-tag"
+      data_attr="data-tag"
+    %}
+  {% endfor %}
+
+  <div class="category search search--ingredients">
+    <div class="search-input">
+      <label class="category-label" for="ingredient-search-box" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
+        {% if ingredients_data.brush_colour %}
+          <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ ingredients_data.brush_colour }}"></span>
+        {% endif %}
+        {{ ingredients_data.label }}
+      </label>
+      <input type="text" id="ingredient-search-box" autocomplete="off" placeholder="ingredient name..." />
+      <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="display: none;">&times; clear</button>
+    </div>
+    {% comment %} Populated by filters.js as you type; aria-live announces the
+       change so it is not a silent update. {% endcomment %}
+    <div class="category-buttons search-results" id="ingredient-results-pool" aria-live="polite"></div>
+  </div>
+
+  <div class="category search search--name">
+    <div class="search-input">
+      <label class="category-label" for="name-search-box" style="position:relative;padding:0.22rem 1rem 0.22rem 0.6rem;">
+        {% if name_search_data.brush_colour %}
+          <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="{{ name_search_data.brush_colour }}"></span>
+        {% endif %}
+        {{ name_search_data.label }}
+      </label>
+      <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
+      <button type="button" class="btn-clear-inline" id="name-search-clear" style="display: none;">&times; clear</button>
+    </div>
+  </div>
+
+  {% if site.show_unrewritten %}
+  <div class="category category--meta">
+    <div class="category-label-row">
+      <span class="category-label">[ META FILTERS ]</span>
+    </div>
+    <div class="category-buttons">
+      <button type="button" class="btn-meta" aria-pressed="false" data-meta="rewrite">needs rewrite</button>
+      <button type="button" class="btn-meta" aria-pressed="false" data-meta="proofread">needs proofread</button>
+      <button type="button" class="btn-meta" aria-pressed="false" data-meta="no-short">no short method</button>
+      <button type="button" class="btn-meta" aria-pressed="false" data-meta="has-short">has short method</button>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<ul class="recipe-list">
+  {% for recipe in all_recipes %}
+    {% if recipe.meta.rewritten or site.show_unrewritten %}
+      {% assign is_draft = false %}
+      {% if recipe.collection == "food_drafts" %}{% assign is_draft = true %}{% endif %}
+
+      {% assign _needs_rewrite = false %}
+      {% assign _needs_proofread = false %}
+      {% unless recipe.meta.rewritten %}{% assign _needs_rewrite = true %}{% endunless %}
+      {% unless recipe.meta.proofread %}{% assign _needs_proofread = true %}{% endunless %}
+      {% assign _has_short = false %}
+      {% for step in recipe.method_short %}
+        {% assign _s = step | strip %}
+        {% unless _s == "" or _s == "QQ" or _s == "none" %}
+          {% assign _has_short = true %}
+        {% endunless %}
+      {% endfor %}
+      <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}">
+        <a href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
+
+        <div class="badge-group">
+          <div class="badge-group__content">
+            {% include recipe_badges.html recipe=recipe %}
+          </div>
+          <div class="badge-group__meta">
+            {% if site.show_unrewritten %}
+              {% unless recipe.meta.rewritten %}<span class="badge badge-meta-rewrite">needs rewrite</span>{% endunless %}
+              {% unless recipe.meta.proofread %}<span class="badge badge-meta-proofread">needs proofread</span>{% endunless %}
+            {% endif %}
+            {% if is_draft %}<span class="badge badge-draft">draft</span>{% endif %}
+          </div>
+        </div>
+
+        {% if recipe.main_ingredients and recipe.main_ingredients.size > 0 %}
+        {% comment %} Order is a PRESENTATION concern — main_ingredients stays an
+           unordered set in the front matter. Pantry staples listed in
+           _data/common_ingredients.yml sink to the end so the eye meets the
+           distinctive ingredients first: identify, then warn, then trail off.
+           Authored order is preserved within each half, and the data-ingredients
+           attribute above is left untouched because filters.js reads it as a set.
+        {% endcomment %}
+        {% assign _pantry = site.data.food.common_ingredients.pantry %}
+        {% assign _lead = "" %}
+        {% assign _tail = "" %}
+        {% for ing in recipe.main_ingredients %}
+          {% assign _key = ing | downcase %}
+          {% if _pantry contains _key %}
+            {% assign _tail = _tail | append: ing | append: "|" %}
+          {% else %}
+            {% assign _lead = _lead | append: ing | append: "|" %}
+          {% endif %}
+        {% endfor %}
+        {% assign _lead_count = _lead | split: "|" | size %}
+        {% assign _ordered = _lead | append: _tail | split: "|" %}
+        <div class="ingredient-list">
+          {% for ing in _ordered %}
+            {% if forloop.index0 < _lead_count %}<span class="ingredient-pill">{{ ing }}</span>{% else %}<span class="ingredient-pill ingredient-pill--pantry">{{ ing }}</span>{% endif %}{% unless forloop.last %}<span class="ingredient-sep">,</span>{% endunless %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+<div class="recipe-list-empty" style="display: none;">
+  Nothing to see here.
+</div>
+
+<div class="recipe-list-searching" style="display: none;">
+  Select something to see a list.
+</div>
+
+{% comment %} The ingredient search vocabulary — singulars, synonyms and the
+   family-button threshold — comes from _data/ingredient_words.yml. filters.js
+   reads it from here rather than hardcoding any of it. {% endcomment %}
+<script type="application/json" id="ingredient-vocabulary">
+  {{ site.data.food.ingredient_words | jsonify }}
+</script>
+
+<script src="{{ '/assets/js/ingredient-search.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/filters.js' | relative_url }}"></script>
