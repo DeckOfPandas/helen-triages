@@ -3,30 +3,6 @@ layout: default
 ---
 
 <article class="recipe">
-  {% if page.collection == "food_drafts" %}
-    <div class="recipe-draft-stamp">
-      <svg aria-hidden="true" viewBox="0 0 120 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-        <rect x="2" y="2" width="116" height="28" rx="2"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          pathLength="100"
-          stroke-dasharray="100"
-          stroke-dashoffset="0"
-          transform="translate(0.3,-0.5) rotate(-0.4,60,16)"
-        />
-        <rect x="3" y="3" width="114" height="26" rx="1"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="0.4"
-          opacity="0.4"
-          transform="translate(-0.5,0.8) rotate(0.6,60,16)"
-        />
-      </svg>
-      DRAFT
-    </div>
-  {% endif %}
-
   <div class="recipe-title">
     <h1 class="recipe-main-title">
       <span class="recipe-title-text">{{ page.title }}</span>
