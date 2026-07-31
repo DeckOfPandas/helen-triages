@@ -32,8 +32,17 @@ $space-xl:  1.5rem;
 $space-xxl: 2rem;
 
 // --- Named spacing (specific jobs, not scale steps) --------------------------
-$spacing-section-gap: 1.75rem;   // bottom margin after tagline, badges, meta — before sections
-$spacing-section-top: 3rem;      // top margin on section headings
+// The spacing scale above stops at 2rem, so every gap bigger than that was a
+// literal: 2.25, 2.5, 3, 3.5, 4.5 and 5rem all appeared in _recipe.scss with
+// nothing relating them. These three are the large steps, named, and they are
+// deliberately far apart — a big gap only reads as a level of hierarchy if it
+// is obviously bigger than the one below it, not 15% bigger.
+$spacing-block-gap:   1.75rem;   // between the blocks inside one section
+$spacing-section-gap: 3rem;      // below a section's last content
+$spacing-section-top: 4.5rem;    // above a section heading. Was 3rem, when a
+                                 // scribbled rule sat in the gap as well; with
+                                 // the rule gone the space carries the whole
+                                 // separation on its own
 
 // --- Widths ------------------------------------------------------------------
 // NOT a breakpoint — it is the max content width of the page and the recipe
@@ -56,7 +65,4 @@ $stroke-medium: 0.6px;   // section headings, method toggle
 $stroke-light:  0.5px;   // meta labels, group headings
 
 // --- Borders & Radii ---------------------------------------------------------
-$radius-sm: 2px;   // note boxes, method-short box, meta wash, section-rule
-
-// --- Hand-drawn SVG annotations ----------------------------------------------
-$opacity-group-underline: 1;   // opacity of scribble underlines on group headings
+$radius-sm: 2px;   // note boxes, method-short box, meta wash

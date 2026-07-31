@@ -29,7 +29,6 @@ layout: default
 
   <div class="recipe-title">
     <h1 class="recipe-main-title">
-      <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="vivid-rose"></span>
       <span class="recipe-title-text">{{ page.title }}</span>
     </h1>
   </div>
@@ -37,10 +36,10 @@ layout: default
   {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline }}</p>{% endif %}
 
   <ul class="recipe-meta">
-    {% if page.serves %}<li><strong data-meta-label>Serves</strong><span class="meta-label-underline" aria-hidden="true"></span><span>{{ page.serves }}</span></li>{% endif %}
-    {% if page.makes %}<li><strong data-meta-label>Makes</strong><span class="meta-label-underline" aria-hidden="true"></span><span>{{ page.makes }}</span></li>{% endif %}
-    {% if page.prep_time %}<li><strong data-meta-label>Prep</strong><span class="meta-label-underline" aria-hidden="true"></span><span>{{ page.prep_time }}</span></li>{% endif %}
-    {% if page.cook_time %}<li><strong data-meta-label>Cook</strong><span class="meta-label-underline" aria-hidden="true"></span><span>{{ page.cook_time }}</span></li>{% endif %}
+    {% if page.serves %}<li><strong>Serves</strong><span>{{ page.serves }}</span></li>{% endif %}
+    {% if page.makes %}<li><strong>Makes</strong><span>{{ page.makes }}</span></li>{% endif %}
+    {% if page.prep_time %}<li><strong>Prep</strong><span>{{ page.prep_time }}</span></li>{% endif %}
+    {% if page.cook_time %}<li><strong>Cook</strong><span>{{ page.cook_time }}</span></li>{% endif %}
   </ul>
 
   <div class="recipe-badges">
@@ -49,11 +48,8 @@ layout: default
 
   {% if page.ingredient_groups %}
     <div class="recipe-section--ingredients">
-      <h2 class="recipe-section-heading" data-section-heading="ingredients">
-        <span class="section-heading-sparkle section-heading-sparkle--left" aria-hidden="true"></span>
-        <span class="section-heading-text" style="position:relative;">
-          <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="vivid-cerulean"></span>Ingredients</span>
-        <span class="section-heading-sparkle section-heading-sparkle--right" aria-hidden="true"></span>
+      <h2 class="recipe-section-heading">
+        <span class="section-heading-text">Ingredients</span>
       </h2>
     </div>
   {% endif %}
@@ -67,26 +63,15 @@ layout: default
   {% for group in page.ingredient_groups %}
     {% if multiple_ingredient_groups and group.name %}
       {% if group.name == "to serve" %}
-        <h3 class="recipe-group-heading" data-group-heading>
-          <span class="group-heading-inner">
-            <span class="group-heading-text">To serve:</span>
-            <span class="group-heading-underline" aria-hidden="true"></span>
-          </span>
-        </h3>
+        <h3 class="recipe-group-heading">To serve:</h3>
       {% else %}
-        <h3 class="recipe-group-heading" data-group-heading>
-          <span class="group-heading-inner">
-            <span class="group-heading-text">For the {{ group.name | downcase }}:</span>
-            <span class="group-heading-underline" aria-hidden="true"></span>
-          </span>
-        </h3>
+        <h3 class="recipe-group-heading">For the {{ group.name | downcase }}:</h3>
       {% endif %}
     {% endif %}
     <ul class="ingredients">
       {% for item in group.items %}
         {% if item.item %}
           <li class="ingredient ingredient--annotated">
-            <span class="ingredient-bullet" aria-hidden="true"></span>
             {% if item.amount %}
               <span class="ingredient-amount highlighted">
                 <span class="highlighter-slot" aria-hidden="true"></span>{{ item.amount }}</span>
@@ -96,12 +81,11 @@ layout: default
             {% if item.note %}<span class="ingredient-annotation ingredient-annotation--note">{{ item.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
           </li>
         {% else %}
-          <li class="ingredient"><span class="ingredient-bullet" aria-hidden="true"></span>{{ item | markdownify | remove: '<p>' | remove: '</p>' }}</li>
+          <li class="ingredient">{{ item | markdownify | remove: '<p>' | remove: '</p>' }}</li>
         {% endif %}
       {% endfor %}
     </ul>
   {% endfor %}
-  <div class="ingredients-end"></div>
 
   {% if page.filling_note %}<p class="note">{{ page.filling_note }}</p>{% endif %}
 
@@ -111,11 +95,8 @@ layout: default
   {% endfor %}
 
   <div class="recipe-section--method">
-    <h2 class="recipe-section-heading" data-section-heading="method">
-      <span class="section-heading-sparkle section-heading-sparkle--left" aria-hidden="true"></span>
-      <span class="section-heading-text" style="position:relative;">
-        <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="hot-orange"></span>Method</span>
-      <span class="section-heading-sparkle section-heading-sparkle--right" aria-hidden="true"></span>
+    <h2 class="recipe-section-heading">
+      <span class="section-heading-text">Method</span>
       {% if has_short %}
         <button type="button" class="btn-method-toggle">click for short method</button>
       {% endif %}
@@ -132,12 +113,7 @@ layout: default
       {% for group in page.method_groups %}
         {% if multiple_method_groups and group.name %}
           <li class="method-group-heading-item">
-            <h3 class="recipe-group-heading" data-group-heading>
-              <span class="group-heading-inner">
-                <span class="group-heading-text">{{ group.name }}</span>
-                <span class="group-heading-underline" aria-hidden="true"></span>
-              </span>
-            </h3>
+            <h3 class="recipe-group-heading">{{ group.name }}</h3>
           </li>
         {% endif %}
         {% for step in group.steps %}
@@ -180,11 +156,8 @@ layout: default
 
   {% if page.notes %}
     <div class="recipe-section--notes" id="recipe-section-notes">
-      <h2 class="recipe-section-heading" data-section-heading="notes">
-        <span class="section-heading-sparkle section-heading-sparkle--left" aria-hidden="true"></span>
-        <span class="section-heading-text" style="position:relative;">
-          <span class="watercolour-brush-slot" aria-hidden="true" data-brush-colour="medium-spring-green"></span>Notes</span>
-        <span class="section-heading-sparkle section-heading-sparkle--right" aria-hidden="true"></span>
+      <h2 class="recipe-section-heading">
+        <span class="section-heading-text">Notes</span>
       </h2>
     </div>
     {% for note in page.notes %}<p class="note">{{ note | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endfor %}
@@ -205,6 +178,4 @@ layout: default
 
 </article>
 
-<script src="{{ '/assets/js/colours.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/method-toggle.js' | relative_url }}"></script>
-<script src="{{ '/assets/js/section-rule.js' | relative_url }}"></script>

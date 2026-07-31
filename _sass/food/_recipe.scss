@@ -11,6 +11,118 @@
   text-transform: uppercase;
 }
 
+// =============================================================================
+// THE BLOCKY RULE — the recipe page's one decorative device
+// =============================================================================
+// A saturated bar overlapping the base of a heading with the lettering in front
+// of it: under the title, and under every section name. It replaced watercolour
+// brush washes on 2026-07-31. A wash picked a different random shape on every
+// page load, so the eye had to re-identify it on each recipe; an identical
+// repeated mark becomes something you recognise rather than something you read,
+// and that turned out to matter more than sheer area for the glance test.
+//
+// THE DIALS ARE THE FIRST THING TO REACH FOR. All em, so the title and the
+// section names stay in proportion to each other whatever the font size.
+//
+// HOW IT IS DRAWN, AND WHY NOT `text-decoration`. The rule has to sit BEHIND
+// the lettering, and an underline does not: at a negative offset it crosses the
+// glyphs rather than passing under them, which is the whole reason
+// `text-decoration-skip-ink` exists. A background does paint behind text, by
+// definition — so the rule is a `linear-gradient` background, sized and
+// positioned by hand.
+//
+// The catch a background brings is that it draws on the BOX, so on a two-line
+// title it would be one bar for the whole block. `display: inline` plus
+// `box-decoration-break: clone` fixes exactly that: the box is broken into one
+// fragment per line and the background is drawn on each, so every line gets its
+// own bar at its own width. That is the same per-line property the underline
+// had, kept.
+//
+// The asymmetry is two separate mechanisms, because a background is clipped to
+// its box and cannot overhang:
+//   - the LEFT indent is $rule-indent, shifting the gradient right
+//   - the RIGHT overhang is $rule-overhang as padding, growing the box
+$rule-thickness: 0.34em;   // bar depth. Thicker than the 6px underline, since
+                           // the top of it is now hidden behind the letters
+$rule-drop:      0.70em;   // top of the bar, measured down from the top of the
+                           // text box. Larger = lower = less overlap. At 1.8rem
+                           // Courier the baseline is at ~0.83em, so this cuts
+                           // into the bottom quarter of the capitals
+$rule-indent:    0.35em;   // how far INTO the text the bar starts, from the left
+$rule-overhang:  0.55em;   // how far PAST the text the bar runs, on the right
+
+// --- The section headings' second rule ---------------------------------------
+// A violet rule directly beneath the spring green one, sharing its right edge
+// and starting further left — two-colour printing very slightly out of
+// register. With no gap between them the pair reads as ONE bar of two colours
+// with a stepped left edge, rather than as two separate underlines.
+//
+// THE VIOLET IS FLUSH WITH THE LETTERING AND THE GREEN IS INSET, rather than
+// the violet hanging out into the left margin. Everything on the page starts at
+// x=0 — section headings, ingredient lines, step numbers — and a bar to the
+// left of that axis reads as a broken alignment rather than as a design. The
+// misregistration only looks deliberate because ONE of the two marks is on the
+// grid: with both off it, there is no reference and it reads as wobble.
+// To try the radical version anyway, give $rule-under-indent a negative value.
+$rule-under-thickness: 0.20em;                       // thinner, so the pair
+                                                     // reads as one mark with
+                                                     // a hierarchy
+$rule-under-drop:      $rule-drop + $rule-thickness; // exactly where the green
+                                                     // stops — derived, so the
+                                                     // two cannot drift apart
+// The violet is trimmed to the INK, not to the box, so it measures the word
+// while the green escapes it. Two insets rather than one, because the two ends
+// are not the same distance from their letterforms:
+//
+//   LEFT   just the glyph's side bearing. Courier New's capitals sit roughly
+//          0.08em inside their advance width on each side.
+//   RIGHT  the side bearing PLUS the trailing letter-space. `letter-spacing`
+//          is added after every character including the last, and this heading
+//          carries 0.08em of it — so the box extends 0.08em further past the
+//          final letter than it does before the first one. Trimming both ends
+//          by the same amount would look symmetric in the code and be visibly
+//          off to the right on the page.
+$rule-under-inset-left:  0.08em;
+$rule-under-inset-right: 0.16em;   // 0.08 side bearing + 0.08 letter-spacing
+$rule-under-indent:    $rule-under-inset-left;
+
+// The title needs its OWN right inset, and the reason is a trap. It carries
+// `letter-spacing: 0.04em` declared on .recipe-main-title at 1.4rem, which
+// computes to an absolute 0.896px and is then INHERITED as that length by
+// .recipe-title-text at 1.8rem — where it is 0.031em, not 0.04em. So the
+// trailing dead space after the last letter is about a third of what the
+// section headings carry, and reusing their 0.16em would trim the title's
+// violet rule visibly short at the right.
+$rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
+
+@mixin overlapping-rule-double($top-colour, $under-colour, $inset-right: $rule-under-inset-right) {
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+
+  padding-right: $rule-overhang;
+  // Vertical room for the second rule. Courier's content box is only ~1.13em
+  // tall, and the violet runs to 1.24em, so without this it would be clipped.
+  // Vertical padding on an inline box grows the background without touching
+  // the line height, so nothing moves.
+  padding-bottom: 0.45em;
+
+  // First layer paints on top: green over violet.
+  background-image:
+    linear-gradient($top-colour,   $top-colour),
+    linear-gradient($under-colour, $under-colour);
+  background-repeat: no-repeat, no-repeat;
+  // The green is sized to make up its own indent, so it runs to the box's right
+  // edge and keeps the full $rule-overhang. The violet gives back the whole
+  // overhang plus both insets, so it stops inside the lettering at both ends.
+  background-size:
+    calc(100% - #{$rule-indent}) #{$rule-thickness},
+    calc(100% - #{$rule-overhang + $rule-under-inset-left + $inset-right}) #{$rule-under-thickness};
+  background-position:
+    #{$rule-indent}       #{$rule-drop},
+    #{$rule-under-indent} #{$rule-under-drop};
+}
+
 // --- Body text base ----------------------------------------------------------
 // Set once on the recipe article so children inherit and only override exceptions.
 article.recipe {
@@ -22,9 +134,21 @@ article.recipe {
 }
 
 // --- Title -------------------------------------------------------------------
+// Left-aligned, was centred.
+// Centring is what made a two-line title read as two separate headings: two
+// rules of different widths, sharing no edge, look like two objects. Left
+// alignment gives every line the same left edge, so the block reads as one
+// thing however many lines it runs to. The width cap is what forces the wrap in
+// the first place — without it the long titles simply run to the full 900px.
+// The 5rem that used to sit below the title was set when the title was CENTRED
+// and the tagline was centred under it — two separate centred objects needed a
+// canyon between them to stop reading as one paragraph. Now that both are left
+// aligned at the same width they already read as one block, and the canyon just
+// pushed the meta off the first screen. The gap that matters moved down: it is
+// now below the tagline, where the title block ends.
 .recipe-title {
-  margin: 3.5rem 0 5rem 0;
-  text-align: center;
+  margin: $spacing-section-gap 0 1.25rem 0;
+  text-align: left;
   position: relative;
 }
 
@@ -36,25 +160,36 @@ article.recipe {
   margin: 0;
   font-size: 1.4rem;
   letter-spacing: 0.04em;
-  max-width: 100%;
+  // 60% of the 900px column is 540px, which wraps the longest titles to three
+  // lines. `text-wrap: balance` then keeps
+  // those lines a similar length, so no line ends up carrying a stub of a rule.
+  max-width: 60%;
   text-wrap: balance;
 }
 
 
+// WHY THE RULE IS A BACKGROUND AND NOT `border-bottom`. A border draws on the
+// BOX. The title is an inline-block with `text-wrap: balance`, so its box is as
+// wide as its LONGEST line — a border under a two-line title would run the full
+// width of line one and sit under line two, overhanging it at both ends. That
+// is the ragged-edge problem the wash had, rebuilt in a straight line. The
+// per-line background in the mixin above is what avoids it.
+//
+// The 4em horizontal padding went with the wash. It existed only to give the
+// ragged brush shape room to cover the lettering, and at that size it was also
+// forcing titles onto more lines than they needed.
 .recipe-title-text {
   display: inline-block;
   position: relative;
   color: $color-text;
   font-size: 1.8rem;
   -webkit-text-stroke: $stroke-heavy;
-  padding: 0.35em 4em;
-
-  .highlighter-slot svg {
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
+  padding: 0;
+  @include overlapping-rule-double(
+    $color-bright-magenta,
+    $color-section-underline-2,
+    $rule-under-inset-right-title
+  );
 }
 
 // --- Hand-drawn Draft Stamp --------------------------------------------------
@@ -90,10 +225,16 @@ article.recipe {
   font-size: 0.95rem;
   font-style: italic;
   color: lighten($color-text, 20%);
-  margin: 3rem auto $spacing-section-gap auto;
+  // Left, and matched to the title's 60% so the two share a right edge. A
+  // left-aligned title above a centred tagline reads as a mistake.
+  // No margins of its own. The gap above comes from .recipe-title and the gap
+  // below from .recipe-meta, so a recipe with no tagline gets the same
+  // title-to-meta distance as one with a tagline — margin collapsing does the
+  // work instead of a rule that has to know whether the tagline exists.
+  margin: 0;
   line-height: 1.5;
-  max-width: 55ch;
-  text-align: center;
+  max-width: 60%;
+  text-align: left;
 }
 
 // --- Meta Grid ---------------------------------------------------------------
@@ -103,7 +244,7 @@ article.recipe {
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));  // equal-width columns
   gap: 0;
   padding: $space-lg 0;
-  margin: 0 0 $spacing-section-gap 0;
+  margin: $spacing-section-gap 0 $spacing-block-gap 0;
   background-color: mix($color-border, $color-surface, 25%);
   border-radius: $radius-sm;
 
@@ -116,26 +257,19 @@ article.recipe {
 
     &:last-child { border-right: none; }
 
+    // The scribbled underline that used to sit beneath each label was cut in
+    // the 2026-07-31 redesign: three of them stacked in a row were the fussiest
+    // marks on the page, and this block reads faster without them. The label no
+    // longer needs `display: inline` — that was there so Range.getClientRects()
+    // could measure the text width to size the underline SVG.
     strong {
       @extend %heading-base;
-      display: inline;         // must be inline so Range.getClientRects() measures text width
+      display: block;
       font-size: 0.85rem;
       letter-spacing: $letter-spacing-label;
       color: $color-text;
       -webkit-text-stroke: $stroke-light;
-    }
-
-    .meta-label-underline {
-      display: block;
-      line-height: 0;
-      margin-top: 2px;
-      margin-bottom: $space-sm;
-
-      svg {
-        display: block;
-        height: 8px;
-        // width and fill set in section-rule.js
-      }
+      margin-bottom: $space-xs;
     }
 
     span {
@@ -147,32 +281,42 @@ article.recipe {
 }
 
 // --- Section Headings --------------------------------------------------------
+// INGREDIENTS / METHOD / NOTES, each on a single brush wash. These are the
+// page's landmarks: the whole point is that a cook glancing at a propped-up
+// iPad mid-task lands on the right one without reading. So the separation
+// between sections is carried entirely by this heading and the space above it —
+// there is no longer a rule drawn between them.
+//
+// $spacing-section-top was the gap when a scribbled section rule also sat in
+// it. With the rule gone the gap has to do that work alone, hence the larger
+// value here rather than a change to the shared token, which other pages use.
 .recipe-section-heading {
   @extend %heading-base;
-  display: flex;
-  align-items: center;
-  gap: $space-md;
-  margin: $spacing-section-top 0 1.25rem 0;
+  display: block;
+  // 4.5rem above, 2rem below — but the gap below LOOKS like 1.5rem, because the
+  // violet rule hangs about 0.5rem past the bottom of the lettering. Three to
+  // one is what makes a heading belong to what follows it rather than float
+  // between two blocks; measuring it off the letters rather than off the ink is
+  // what keeps it at three to one.
+  margin: $spacing-section-top 0 $space-xxl 0;
   font-size: 1.8rem;
   letter-spacing: 0.08em;
   color: $color-text;
   -webkit-text-stroke: $stroke-medium;
   position: relative;  // anchor for absolute-positioned method toggle
 
-  .section-heading-sparkle {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-
-  // Highlighter wraps text only — must be inline so the blob sizes to text width.
-  // Generous padding ensures all letters are covered even with ragged-edged shapes.
-  // Negative left margin pulls the highlight into the gutter.
+  // The horizontal padding that used to give the ragged brush shape room to
+  // cover every letter, and the negative left margin that cancelled it, are
+  // both zero: a rule has no bleed, so it starts and stops on the letters and
+  // the word sits flush on the page's left axis.
   .section-heading-text {
     position: relative;
     display: inline-block;
-    padding: 0.1em 0.6em;   // equal horizontal padding so sparkles sit symmetrically
+    padding: 0;
+    margin-left: 0;
+    @include overlapping-rule-double($color-section-underline, $color-section-underline-2);
   }
+
 }
 
 
@@ -187,7 +331,7 @@ article.recipe {
   -webkit-text-stroke: $stroke-medium;
   background: none;
   border: none;
-  color: $color-vivid-rose-dark;
+  color: $color-bright-magenta-dark;
   padding: 0;
   cursor: pointer;
   transition: opacity 0.1s ease-in-out;
@@ -204,53 +348,67 @@ article.recipe {
 }
 
 // --- Recipe Badges on recipe page --------------------------------------------
+// NOTE: _sass/food/_layout.scss also sets `.recipe-badges { margin: $space-xxl 0 }`
+// for the index listing. food/recipe is imported after food/layout, so this one
+// wins on the recipe page — but the two rules are 550 lines apart in different
+// files and nothing says so. Worth splitting the selectors one day.
 .recipe-badges {
-  margin: 0 0 $spacing-section-gap 0;
-  padding-bottom: $space-xl;  // breathing room before section divider line
+  margin: 0 0 $spacing-block-gap 0;
 }
 
 // --- Lists & Content Typography ----------------------------------------------
+// Both lists sit flush at the page's left edge, on the same axis as the section
+// headings above them. The 2.5rem indent they used to carry existed to clear
+// the doodle that flanked each heading; with the doodles gone it only pushed
+// the content off the alignment it was meant to match.
 .ingredients,
 .method-full {
-  padding-left: 2.5rem;  // aligns content under section heading text (after left doodle + gap)
+  padding-left: 0;
   list-style: none;
   // font-family, font-weight, color inherited from article.recipe
 }
 
-.ingredients-end {
-  margin-top: 3.5rem;  // breathing room after last ingredient, before section divider
-}
-
+// The violet asterisk bullets are gone, and nothing replaced them. Almost every
+// line opens with its yellow-highlighted amount, so the highlights themselves
+// form the column your eye runs down — a marker that carries information rather
+// than one that only marks the start of a line.
 .ingredients li {
-  margin-bottom: 0.65rem;
+  margin-bottom: $space-md;
   line-height: 1.5;
   position: relative;
+}
+
+// --- Group indent ------------------------------------------------------------
+// Replaces the scribbled underline that used to sit under "For the dressing:".
+// The underline marked where a group STARTED; the indent shows how far it
+// EXTENDS, which is the thing you need when you are checking whether you have
+// everything for one component of the dish.
+//
+// A hanging label: the heading stays flush at zero and only its content moves,
+// so the heading sits in its own gutter and the group reads as a block.
+//
+// Adjacent-sibling selectors, so no markup changed. Safe because the template
+// only emits a group heading when there is more than one group, and all 18
+// multi-group recipes name every group — so there is no case where one group
+// indents and the next does not.
+.recipe-group-heading + .ingredients {
   padding-left: $space-xxl;
 }
 
-.ingredient-bullet {
-  position: absolute;
-  left: 0;
-  top: 0.2em;
-  width: 0.9rem;
-  height: 0.9rem;
-  display: block;
-
-  svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
+// Method groups all live in one <ol>, so this is "every step after the first
+// group heading" — which is every step in a grouped method. The heading items
+// themselves are excluded and stay flush.
+.method-full li.method-group-heading-item ~ li.step {
+  padding-left: $space-xxl;
 }
 
 .method-full {
   counter-reset: step-counter;
   margin-top: $space-sm;
-  padding-bottom: $space-xxl;
 
   li {
     counter-increment: step-counter;
-    margin-bottom: 1.4rem;
+    margin-bottom: $space-xl;
     line-height: $line-height-body;
     display: flex;
     align-items: baseline;
@@ -260,7 +418,12 @@ article.recipe {
       content: counter(step-counter) ".";
       font-family: $font-headings;
       font-weight: 700;
-      color: $color-vibrant-violet;
+      color: $color-step-number;
+      // The scratchy typewriter treatment the headings use, at the lightest of
+      // the three weights — $stroke-light is the token for small Courier marks
+      // (it already carries the meta labels and group headings). Medium is
+      // tuned for 1.8rem and reads as a blob at 1.2rem.
+      -webkit-text-stroke: $stroke-light;
       font-size: 1.2rem;
       display: inline-block;
       min-width: 2.4rem;   // wide enough for two digits at 1.4rem
@@ -275,7 +438,6 @@ article.recipe {
     counter-increment: none;
     display: block;
     margin-bottom: $space-sm;
-    margin-left: -2.5rem;  // pull back to left edge, matching ingredient group headings
 
     &::before { content: none; }
   }
@@ -287,7 +449,7 @@ article.recipe {
   // font-family, font-weight, color, font-size, line-height inherited from article.recipe
   margin: $space-sm 0 $space-xxl 0;
   background-color: rgba($color-border, 0.12);
-  padding: 1.25rem $space-xl 1.25rem 2.5rem;  // left matches ingredients indent
+  padding: 1.25rem $space-xl;
   border-radius: $radius-sm;
 
   p, ul, ol { margin: 0.4rem 0; }
@@ -306,7 +468,7 @@ article.recipe {
         position: absolute;
         left: -$space-xxl;
         top: 0.1rem;
-        color: $color-vibrant-violet;
+        color: $color-step-number;
         font-family: $font-headings;
         font-weight: 700;
         font-size: 1.4rem;
@@ -341,12 +503,17 @@ article.recipe {
 }
 
 // --- Note --------------------------------------------------------------------
+// Neutral, deliberately. This box used to be tinted spring green, with a green
+// rule and a green label — a fourth hue spent on a box that already announces
+// itself by being a box with the word "note" on it. The shape does the work;
+// the colour was only decoration, and the redesign is spending its colour on
+// the three section headings and the ingredient amounts instead.
 .note {
   position: relative;
   // font-family, font-weight, color, font-size, line-height inherited from article.recipe
-  margin: 2.25rem 0 3rem 0;
+  margin: $spacing-block-gap 0;
   padding: 1.1rem 1.4rem;
-  background-color: rgba($color-medium-spring-green, 0.07);
+  background-color: mix($color-border, $color-surface, 35%);
   border-radius: $radius-sm;
 
   &::before {
@@ -354,7 +521,7 @@ article.recipe {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
-    background: mix($color-medium-spring-green, $color-bg, 45%);
+    background: $color-border;
     border-radius: 1px;
   }
 
@@ -368,7 +535,7 @@ article.recipe {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: $letter-spacing-label;
-    color: mix($color-medium-spring-green, $color-clear-text, 55%);
+    color: $color-clear-text;
     background: $color-bg;
     padding: 0 $space-xs;
   }
@@ -422,65 +589,29 @@ article.recipe .recipe-body-content {
   }
 }
 
-// --- Section Rule (hand-drawn scribble divider) ------------------------------
-.section-rule {
-  width: 100%;
-  margin: 0 0 2.5rem 0;
-  line-height: 0;
-  display: flex;
-  justify-content: center;
-
-  svg {
-    display: block;
-    width: 600px;
-    max-width: 100%;
-    height: 8px;     // lines normalised to viewBox h=100; 8px = consistent weight
-    // opacity and fill set in section-rule.js via COLOURS config
-  }
-}
-
-// --- Group Heading Underlines ------------------------------------------------
-// Structure: h3.recipe-group-heading > span.group-heading-inner (inline-block)
-//   > span.group-heading-text + span.group-heading-underline
-// The inline-block inner span shrinks to text width.
-// The underline SVG is sized to match via JS (getBoundingClientRect on the text).
+// --- Group Headings ----------------------------------------------------------
+// "For the dressing:" in the ingredients, and the phase names in a grouped
+// method. A bare h3 — it carried two nested spans until 2026-07-31, purely so
+// heading-underline.js could measure the text width and hang a scribbled SVG
+// underneath it. The scribble was cut and the content below the heading indents
+// by $space-xxl instead (see the group indent block above): the underline
+// marked where a group STARTED, the indent shows how far it EXTENDS, which is
+// what you actually need when checking you have everything for one component.
 .recipe-group-heading {
+  @extend %heading-base;
   display: block;
-  margin-top: 1.75rem;
+  margin-top: $spacing-block-gap;
   margin-bottom: $space-md;
-
-  .group-heading-inner {
-    display: inline-block;  // shrinks to text width
-  }
-
-  .group-heading-text {
-    @extend %heading-base;
-    display: block;
-    font-size: 0.85rem;
-    letter-spacing: $letter-spacing-label;
-    color: $color-text;
-    -webkit-text-stroke: $stroke-light;
-    line-height: 1.4;
-    white-space: nowrap;
-    width: fit-content;  // prevents block child stretching the inline-block parent
-  }
-
-  .group-heading-underline {
-    display: block;
-    line-height: 0;
-    margin-top: 2px;
-    opacity: $opacity-group-underline;
-
-    svg {
-      display: block;
-      // width and height set in section-rule.js
-    }
-  }
+  font-size: 0.85rem;
+  letter-spacing: $letter-spacing-label;
+  color: $color-text;
+  -webkit-text-stroke: $stroke-light;
+  line-height: 1.4;
 }
 
 // --- Footer ------------------------------------------------------------------
 .recipe-footer {
-  margin-top: 3.5rem;
+  margin-top: $spacing-section-gap;
   padding-top: 1.25rem;
   // Break out to match site-footer border width
   position: relative;
@@ -514,6 +645,12 @@ article.recipe .recipe-body-content {
 // --- Ingredient and step annotations ----------------------------------------
 // tip: active technique advice. note: contextual information.
 // Both display on a new line, smaller and lighter than the ingredient text.
+//
+// Both are now the same colour. Tips were cerulean, which spent a whole hue on
+// a distinction that barely occurs: across the published recipes there are 14
+// tips and 2 notes, so a page carrying both at once is close to hypothetical.
+// If the distinction ever needs to be visible, make it typographic — the colour
+// budget is committed elsewhere.
 .ingredient-annotation,
 .step-annotation {
   display: block;
@@ -522,6 +659,6 @@ article.recipe .recipe-body-content {
   font-style: italic;
   line-height: 1.45;
 
-  &--tip  { color: $color-vivid-cerulean; }
+  &--tip  { color: $color-clear-text; }
   &--note { color: $color-clear-text; }
 }

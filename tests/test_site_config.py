@@ -159,12 +159,36 @@ def test_deleted_data_files_stay_deleted(relpath):
 
 
 def test_palette_is_the_only_place_hex_colours_are_written():
-    """JS reads the palette from CSS custom properties rather than mirroring it."""
-    js = read("assets", "js", "colours.js")
-    assert "getPropertyValue" in js, (
-        "js/colours.js is no longer reading colours from CSS custom properties. "
-        "It should call getComputedStyle on :root and read --colour-* values "
-        "defined in _sass/food/_palette.scss, not keep its own hardcoded copies."
+    """No script writes a colour down. The palette is the only source.
+
+    This used to assert that assets/js/colours.js called getPropertyValue — it
+    read food's --colour-* custom properties off :root so JS-injected SVG could
+    be recoloured without a second copy of the palette. The 2026-07-31 recipe
+    redesign removed the last decoration that needed a colour in JavaScript, so
+    colours.js and the :root block both went, and that assertion had nothing
+    left to read.
+
+    Checking every script for a hex literal is what the old test was reaching
+    for anyway, and it is stronger: it covers files colours.js never did, and it
+    keeps biting now that the bridge it guarded no longer exists. If a script
+    ever needs a colour again, the answer is a CSS custom property read at
+    runtime, not a literal here.
+    """
+    js_files = sorted((ROOT / "assets" / "js").glob("*.js"))
+    assert js_files, "No scripts found — this test would pass while checking nothing."
+
+    offenders = []
+    for path in js_files:
+        for i, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+            code = line.split("//")[0]
+            for match in re.finditer(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b", code):
+                offenders.append(f"{path.name}:{i} {match.group(0)}")
+
+    assert not offenders, (
+        "Hex colour(s) written into JavaScript:\n  " + "\n  ".join(offenders)
+        + "\n\nColour lives in _sass/food/_palette.scss and nowhere else. A "
+          "script that needs one should read a CSS custom property at runtime, "
+          "so editing the palette actually changes the page."
     )
 
 
@@ -236,7 +260,8 @@ def test_assets_js_loads_before_any_other_script():
     It has to load first, and "end of <body>" is NOT first here. A page
     layout's own scripts are emitted inside `{{ content }}`, which default.html
     renders into <main> — ABOVE its own closing scripts. So recipe.html's
-    section-rule.js ran before assets.js and threw
+    section-rule.js (now heading-underline.js, renamed when the redesign cut
+    four of its five jobs) ran before assets.js and threw
     `Cannot read properties of undefined (reading 'makeShuffledPicker')` on its
     first line, silently removing the section rules, the ingredient bullets and
     the section-heading doodles. They were missing for weeks.
@@ -860,4 +885,75 @@ def test_no_element_can_force_horizontal_scroll():
         + "\n\nUse `width: min(Npx, 92vw)` or add a max-width. 92 rather than 100 "
           "if the element is rotated, since the rendered box is wider than the "
           "declared width."
+    )
+
+
+def test_no_decoration_slot_is_orphaned():
+    """Every empty aria-hidden slot in a template is filled by some script.
+
+    A decoration slot is an empty `<span class="…-slot" aria-hidden="true">`
+    that exists only for JavaScript to inject an SVG into. If the injection is
+    deleted and the slot is not, the slot stays in the markup forever, drawing
+    nothing, looking load-bearing to whoever reads the template next. That is
+    exactly how `--annotation-gutter: 200px` became a declaration nobody dared
+    remove — see DEV_JOBS_v23.md §4.
+
+    It nearly happened again in the 2026-07-31 recipe-page redesign, which cut
+    four of the five decorations `section-rule.js` drew (the section rules, the
+    violet asterisk bullets, the pink section-heading doodles and the meta-label
+    underlines) and left six `.section-heading-sparkle` spans, four
+    `.meta-label-underline` spans and every `.ingredient-bullet` in the layout
+    to be removed by hand.
+
+    Derived, not listed: the slots come from the markup and the injectors from
+    the scripts, so a new slot is covered the day it is written.
+
+    The reverse direction — a script querying a slot no template emits — is NOT
+    checked here, because several classes filters.js queries are ones it creates
+    itself and no template ever contains. It is worth knowing that
+    `decorations.js`'s `doodles()` is dead by that measure: nothing emits
+    `data-index-doodle`. That predates this branch (it is dead on origin/main
+    too) and is recorded rather than fixed.
+    """
+    html_files = (
+        sorted(ROOT.glob("_layouts/*.html"))
+        + sorted(ROOT.glob("_includes/*.html"))
+        + sorted(ROOT.glob("food/*.html"))
+        + sorted(ROOT.glob("cocktails/*.html"))
+        + [ROOT / "index.html"]
+    )
+    assert html_files, "No templates found — this test would pass while checking nothing."
+
+    js_files = sorted((ROOT / "assets" / "js").glob("*.js"))
+    assert js_files, "No scripts found — this test would pass while checking nothing."
+    js_blob = "\n".join(p.read_text(encoding="utf-8") for p in js_files)
+
+    # An empty span/div carrying a class and aria-hidden="true" is this repo's
+    # decoration-slot idiom. `[^>]*` spans newlines, so a slot whose attributes
+    # are split across lines (.tape-bg) is still matched.
+    slot_pattern = re.compile(
+        r'<(span|div)\s+class="([^"]*)"[^>]*aria-hidden="true"[^>]*>\s*</\1>'
+    )
+
+    orphans = []
+    found_any = False
+    for path in html_files:
+        for match in slot_pattern.finditer(path.read_text(encoding="utf-8")):
+            for cls in match.group(2).split():
+                if "{{" in cls or "{%" in cls:
+                    continue   # a Liquid-built class name is not checkable here
+                found_any = True
+                if f"'.{cls}'" not in js_blob and f'".{cls}"' not in js_blob:
+                    orphans.append(f"{path.relative_to(ROOT)}: .{cls}")
+
+    assert found_any, (
+        "No decoration slots were matched at all. Either the idiom changed or "
+        "the pattern above stopped matching — and an empty check passes."
+    )
+    assert not orphans, (
+        "Decoration slot(s) with nothing to fill them:\n  "
+        + "\n  ".join(sorted(set(orphans)))
+        + "\n\nEither a script should inject into it, or the slot should come "
+          "out of the template. An empty aria-hidden span that no script names "
+          "renders nothing and misleads the next person to read the file."
     )
