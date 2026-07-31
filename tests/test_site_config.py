@@ -159,12 +159,36 @@ def test_deleted_data_files_stay_deleted(relpath):
 
 
 def test_palette_is_the_only_place_hex_colours_are_written():
-    """JS reads the palette from CSS custom properties rather than mirroring it."""
-    js = read("assets", "js", "colours.js")
-    assert "getPropertyValue" in js, (
-        "js/colours.js is no longer reading colours from CSS custom properties. "
-        "It should call getComputedStyle on :root and read --colour-* values "
-        "defined in _sass/food/_palette.scss, not keep its own hardcoded copies."
+    """No script writes a colour down. The palette is the only source.
+
+    This used to assert that assets/js/colours.js called getPropertyValue — it
+    read food's --colour-* custom properties off :root so JS-injected SVG could
+    be recoloured without a second copy of the palette. The 2026-07-31 recipe
+    redesign removed the last decoration that needed a colour in JavaScript, so
+    colours.js and the :root block both went, and that assertion had nothing
+    left to read.
+
+    Checking every script for a hex literal is what the old test was reaching
+    for anyway, and it is stronger: it covers files colours.js never did, and it
+    keeps biting now that the bridge it guarded no longer exists. If a script
+    ever needs a colour again, the answer is a CSS custom property read at
+    runtime, not a literal here.
+    """
+    js_files = sorted((ROOT / "assets" / "js").glob("*.js"))
+    assert js_files, "No scripts found — this test would pass while checking nothing."
+
+    offenders = []
+    for path in js_files:
+        for i, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+            code = line.split("//")[0]
+            for match in re.finditer(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b", code):
+                offenders.append(f"{path.name}:{i} {match.group(0)}")
+
+    assert not offenders, (
+        "Hex colour(s) written into JavaScript:\n  " + "\n  ".join(offenders)
+        + "\n\nColour lives in _sass/food/_palette.scss and nowhere else. A "
+          "script that needs one should read a CSS custom property at runtime, "
+          "so editing the palette actually changes the page."
     )
 
 
@@ -236,7 +260,8 @@ def test_assets_js_loads_before_any_other_script():
     It has to load first, and "end of <body>" is NOT first here. A page
     layout's own scripts are emitted inside `{{ content }}`, which default.html
     renders into <main> — ABOVE its own closing scripts. So recipe.html's
-    section-rule.js ran before assets.js and threw
+    section-rule.js (now heading-underline.js, renamed when the redesign cut
+    four of its five jobs) ran before assets.js and threw
     `Cannot read properties of undefined (reading 'makeShuffledPicker')` on its
     first line, silently removing the section rules, the ingredient bullets and
     the section-heading doodles. They were missing for weeks.

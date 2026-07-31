@@ -81,7 +81,10 @@
      inside {{ content }}, which lands in <main> — ABOVE this file's closing
      scripts. So recipe.html's section-rule.js ran BEFORE assets.js and died on
      `window.HTF.makeShuffledPicker` of undefined, taking the section rules,
-     the ingredient bullets and the section-heading doodles with it.
+     the ingredient bullets and the section-heading doodles with it. (All three
+     of those decorations, and that script, were removed in the 2026-07-31
+     redesign — but the load-order rule is about {{ content }}, not about them,
+     and it bites the next script that reaches for window.HTF.)
 
      It must stay above {{ content }}. It only reads the two meta tags directly
      above, so the head is safe — it touches no body element at parse time.
@@ -130,13 +133,12 @@
      runs last because it reads elements from all over the page, and it can:
      assets.js has already defined window.HTF up in the head.
 
-     colours.js is deliberately NOT loaded here. It reads food's --colour-*
-     custom properties off :root, and its only consumer is section-rule.js,
-     which _layouts/recipe.html loads along with its own copy of colours.js. A
-     copy here was doing nothing on the index and would warn eight times on
-     every page whose palette does not define those properties — which is every
-     cocktails page and the landing page. A shared layout must not reach for one
-     site's palette.
+     There is no longer any JS colour bridge to load. colours.js read food's
+     --colour-* custom properties off :root so that JS-injected SVG could be
+     recoloured; the 2026-07-31 recipe-page redesign removed the last thing that
+     needed it, and both it and the :root block are gone. decorations.js needs
+     no palette: highlighter and brush colour come from CSS, and the footer
+     artwork takes currentColor.
   {% endcomment %}
   <script src="{{ '/assets/js/decorations.js' | relative_url }}"></script>
 
