@@ -18,6 +18,11 @@ __pycache__/
 .venv/
 *.pyc
 
+# Node (local runtime only, for `node --test` -- not part of the site or its
+# build; downloaded from nodejs.org, extracted here rather than installed
+# system-wide, so it stays out of version control)
+.node-runtime/
+
 # OS
 .DS_Store
 Thumbs.db

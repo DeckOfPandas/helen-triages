@@ -47,21 +47,26 @@ def test_filters_js_holds_no_literal_threshold():
 
     For months this value lived as a bare `query.length >= 3` in filters.js with
     nothing defining it, so every rewrite of that file re-derived it from
-    scratch and landed on 2. It now lives in _data/ingredient_words.yml and
-    filters.js reads it by name. If a literal ever reappears, this fails.
+    scratch and landed on 2. It now lives in _data/ingredient_words.yml, read
+    into FAMILY_BUTTON_MIN_CHARS in assets/js/ingredient-search.js (the
+    matching algorithm moved there so it could be tested directly with
+    Node — see tests/js/ingredient-search.test.js — filters.js is DOM wiring
+    only now). If a literal ever reappears in either file, this fails.
     """
     js = read("assets", "js", "filters.js")
-    literals = re.findall(r"query\.length\s*[<>]=?\s*\d+", js)
+    search_js = read("assets", "js", "ingredient-search.js")
+    literals = re.findall(r"query\.length\s*[<>]=?\s*\d+", js + search_js)
     assert not literals, (
-        f"js/filters.js contains hardcoded query-length comparison(s): {literals}.\n"
+        f"Hardcoded query-length comparison(s) found: {literals}.\n"
         f"This threshold is defined in _data/ingredient_words.yml as "
-        f"`search.family_button_min_chars` and read into FAMILY_BUTTON_MIN_CHARS. "
-        f"Use that constant instead of a literal — the literal is exactly the "
-        f"thing that kept resetting to 2."
+        f"`search.family_button_min_chars` and read into FAMILY_BUTTON_MIN_CHARS "
+        f"in ingredient-search.js. Use that constant instead of a literal — the "
+        f"literal is exactly the thing that kept resetting to 2."
     )
-    assert "FAMILY_BUTTON_MIN_CHARS" in js, (
-        "js/filters.js no longer references FAMILY_BUTTON_MIN_CHARS. The "
-        "threshold should be read from the vocabulary, not inlined."
+    assert "FAMILY_BUTTON_MIN_CHARS" in search_js, (
+        "assets/js/ingredient-search.js no longer references "
+        "FAMILY_BUTTON_MIN_CHARS. The threshold should be read from the "
+        "vocabulary, not inlined."
     )
 
 
