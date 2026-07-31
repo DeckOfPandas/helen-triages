@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
       parsed.modifiers = parsed.modifiers || [];
       parsed.never_family = parsed.never_family || [];
       parsed.family_exceptions = parsed.family_exceptions || [];
+      parsed.stopwords = parsed.stopwords || [];
       return parsed;
     } catch (e) {
       console.warn('filters.js: could not parse #ingredient-vocabulary — ' + e.message);
@@ -145,6 +146,23 @@ document.addEventListener('DOMContentLoaded', function () {
     return words.join(' ');
   }
 
+  // Connector words ("and", "or", "of", "with") that never count as a match
+  // target, wherever they fall in the phrase — "chicken thighs AND
+  // drumsticks" meant typing "a" matched on "and". Unlike stripModifiers
+  // above, this only affects internal matching: getWords(ing) is used for
+  // computation, never for the displayed label (that's always the original
+  // `ing` string), so removing a connector here never breaks the sentence
+  // the way stripping it from the front would.
+  var stopwordSet = new Set((VOCABULARY.stopwords || []).map(function(w) {
+    return fold(String(w).toLowerCase());
+  }));
+
+  function getMatchWords(ing) {
+    return getWords(ing).filter(function(word) {
+      return !stopwordSet.has(fold(word));
+    });
+  }
+
   // Built here, not at the top of the file, because stripping modifiers needs
   // VOCABULARY and fold() to already exist.
   var allIngredientsSet = new Set();
@@ -220,7 +238,7 @@ function renderResultsPool() {
   var wordToEntries = {};
   masterIngredientsList.forEach(function(ing) {
     if (familyExceptionSet.has(fold(ing.toLowerCase()))) return;
-    var normWords = getWords(ing).map(normaliseIngredientWord).map(fold);
+    var normWords = getMatchWords(ing).map(normaliseIngredientWord).map(fold);
     var entryKey = normWords.join(' ');
     var headWord = normWords[0];
     if (!wordToEntries[headWord]) wordToEntries[headWord] = new Set();
@@ -230,7 +248,7 @@ function renderResultsPool() {
   if (multiWord) {
     var multiMatches = [];
     masterIngredientsList.forEach(function(ing) {
-      var ingWords = getWords(ing);
+      var ingWords = getMatchWords(ing);
       var ingKey = ingWords.map(normaliseIngredientWord).join(' ');
       var allMatch = queryWords.every(function(qw) {
         return ingWords.some(function(iw) { return iw.indexOf(qw) !== -1; });
@@ -287,7 +305,7 @@ function renderResultsPool() {
     }
 
     masterIngredientsList.forEach(function(ing) {
-      var ingWords = getWords(ing);
+      var ingWords = getMatchWords(ing);
       var normWords = ingWords.map(normaliseIngredientWord).map(fold);
       var normKey = normWords.join(' ');
 

@@ -56,6 +56,29 @@ modifiers:
   - gressingham
 
 # -----------------------------------------------------------------------------
+# Stopwords — connector words that never count as a match target, wherever
+# they fall in an entry. "chicken thighs and drumsticks" contains "and", so
+# typing "a" matched it; "pork or turkey mince" contains "or", so typing "o"
+# matched that and "leg of lamb" too. Neither is a real ingredient word.
+#
+# Different from `modifiers`: modifiers are stripped from the FRONT and
+# change the canonical entry ("chopped pistachios" becomes "pistachios"
+# everywhere, including the button label). Stopwords are invisible to
+# MATCHING ONLY, wherever they sit in the phrase — the display text keeps
+# "and"/"or"/"of" exactly as written, because dropping them would leave a
+# broken sentence ("chicken thighs drumsticks"), not a cleaner ingredient
+# name.
+#
+# Checked against every multi-word main_ingredients entry: these four are
+# the only connector words that actually appear as their own word anywhere
+# in the collection.
+stopwords:
+  - and
+  - or
+  - of
+  - with
+
+# -----------------------------------------------------------------------------
 # Never-family words — first words that head 2+ entries but should never earn
 # an "(all)" button, because the entries sharing them aren't a real family.
 #
