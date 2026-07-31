@@ -886,3 +886,74 @@ def test_no_element_can_force_horizontal_scroll():
           "if the element is rotated, since the rendered box is wider than the "
           "declared width."
     )
+
+
+def test_no_decoration_slot_is_orphaned():
+    """Every empty aria-hidden slot in a template is filled by some script.
+
+    A decoration slot is an empty `<span class="…-slot" aria-hidden="true">`
+    that exists only for JavaScript to inject an SVG into. If the injection is
+    deleted and the slot is not, the slot stays in the markup forever, drawing
+    nothing, looking load-bearing to whoever reads the template next. That is
+    exactly how `--annotation-gutter: 200px` became a declaration nobody dared
+    remove — see DEV_JOBS_v23.md §4.
+
+    It nearly happened again in the 2026-07-31 recipe-page redesign, which cut
+    four of the five decorations `section-rule.js` drew (the section rules, the
+    violet asterisk bullets, the pink section-heading doodles and the meta-label
+    underlines) and left six `.section-heading-sparkle` spans, four
+    `.meta-label-underline` spans and every `.ingredient-bullet` in the layout
+    to be removed by hand.
+
+    Derived, not listed: the slots come from the markup and the injectors from
+    the scripts, so a new slot is covered the day it is written.
+
+    The reverse direction — a script querying a slot no template emits — is NOT
+    checked here, because several classes filters.js queries are ones it creates
+    itself and no template ever contains. It is worth knowing that
+    `decorations.js`'s `doodles()` is dead by that measure: nothing emits
+    `data-index-doodle`. That predates this branch (it is dead on origin/main
+    too) and is recorded rather than fixed.
+    """
+    html_files = (
+        sorted(ROOT.glob("_layouts/*.html"))
+        + sorted(ROOT.glob("_includes/*.html"))
+        + sorted(ROOT.glob("food/*.html"))
+        + sorted(ROOT.glob("cocktails/*.html"))
+        + [ROOT / "index.html"]
+    )
+    assert html_files, "No templates found — this test would pass while checking nothing."
+
+    js_files = sorted((ROOT / "assets" / "js").glob("*.js"))
+    assert js_files, "No scripts found — this test would pass while checking nothing."
+    js_blob = "\n".join(p.read_text(encoding="utf-8") for p in js_files)
+
+    # An empty span/div carrying a class and aria-hidden="true" is this repo's
+    # decoration-slot idiom. `[^>]*` spans newlines, so a slot whose attributes
+    # are split across lines (.tape-bg) is still matched.
+    slot_pattern = re.compile(
+        r'<(span|div)\s+class="([^"]*)"[^>]*aria-hidden="true"[^>]*>\s*</\1>'
+    )
+
+    orphans = []
+    found_any = False
+    for path in html_files:
+        for match in slot_pattern.finditer(path.read_text(encoding="utf-8")):
+            for cls in match.group(2).split():
+                if "{{" in cls or "{%" in cls:
+                    continue   # a Liquid-built class name is not checkable here
+                found_any = True
+                if f"'.{cls}'" not in js_blob and f'".{cls}"' not in js_blob:
+                    orphans.append(f"{path.relative_to(ROOT)}: .{cls}")
+
+    assert found_any, (
+        "No decoration slots were matched at all. Either the idiom changed or "
+        "the pattern above stopped matching — and an empty check passes."
+    )
+    assert not orphans, (
+        "Decoration slot(s) with nothing to fill them:\n  "
+        + "\n  ".join(sorted(set(orphans)))
+        + "\n\nEither a script should inject into it, or the slot should come "
+          "out of the template. An empty aria-hidden span that no script names "
+          "renders nothing and misleads the next person to read the file."
+    )
