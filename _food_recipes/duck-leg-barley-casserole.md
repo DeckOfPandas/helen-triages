@@ -8,7 +8,7 @@ prep_time: "30 mins"
 cook_time: "8 hrs"
 main_ingredients: ["Gressingham duck legs", "pearl barley", "red wine", pancetta, mushrooms]
 star_ingredient: duck
-tags: [freezable, "make-ahead", "one-handed food", scalable]
+tags: [freezable, "make-ahead", "one-handed food"]
 ingredient_groups:
   - items:
     - amount: "12"

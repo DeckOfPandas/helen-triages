@@ -8,7 +8,7 @@ prep_time: Estimated 15 mins
 cook_time: "1 hr"
 main_ingredients: ["chicken thighs and drumsticks", cider, carrots, "cooking apples", "crème fraîche"]
 star_ingredient: poultry
-tags: ["one-handed food", "one-pot"]
+tags: ["one-handed food"]
 ingredient_groups:
   - items:
     - amount: "1.5 kg"

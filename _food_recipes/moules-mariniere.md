@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: "10 mins"
 main_ingredients: [mussels, "white wine", shallots, butter, parsley]
 star_ingredient: shellfish
-tags: ["one-pot", starter]
+tags: [starter]
 ingredient_groups:
   - items:
     - amount: "2 kg"

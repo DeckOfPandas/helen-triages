@@ -48,22 +48,25 @@ star_ingredients:
 #
 # Two groups, deliberately different in kind:
 #
-#   mood            what you feel like eating
-#   practicalities  what the recipe demands of you
+#   mood            what you feel like eating -- a craving
+#   practicalities  what the occasion or the recipe demands of you, regardless
+#                   of what you feel like -- breakfast happens at breakfast
+#                   time whether or not you crave it
 #
-# A recipe may carry any number from either group.
+# A recipe may carry any number from either group. Reclassified 2026-08-01:
+# breakfast, extras, festive and starter moved out of mood on this test --
+# nobody wakes up craving a starter, they're cooking for a dinner party and
+# need one. showstopper stayed in mood on the same test: it IS a craving, for
+# Helen specifically -- "let's make something unnecessarily complicated".
 # -----------------------------------------------------------------------------
 tags:
   mood:
     - bakes
-    - breakfast
     - carbs party
     - cheese-tastic
     - dessert
     - drinks
-    - extras
     - fakeaway
-    - festive
     - hot snack
     - ice cream
     - nibbles
@@ -71,15 +74,16 @@ tags:
     - salad
     - showstopper
     - soup
-    - starter
     - sweets
 
   practicalities:
+    - breakfast
+    - extras
+    - festive
     - freezable
     - make-ahead
     - no-cook
-    - one-pot
-    - scalable
+    - starter
 
 # -----------------------------------------------------------------------------
 # Co-tags — tags that imply other tags.

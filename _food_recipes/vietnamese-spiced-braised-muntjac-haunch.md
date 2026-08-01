@@ -8,7 +8,7 @@ prep_time: "20 mins"
 cook_time: "2 hrs"
 main_ingredients: ["muntjac haunch", lemongrass, ginger, "star anise", "fish sauce", "coconut palm sugar"]
 star_ingredient: game
-tags: ["one-pot", fakeaway, "make-ahead"]
+tags: [fakeaway, "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "1 kg"

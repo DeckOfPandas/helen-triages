@@ -8,7 +8,7 @@ prep_time: "10 mins"
 cook_time: "35 mins"
 main_ingredients: [salmon, "sweet potatoes", broccoli, "pak choi", miso]
 star_ingredient: oily fish
-tags: ["one-pot"]
+tags: []
 ingredient_groups:
   - name: traybake
     items:
