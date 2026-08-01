@@ -42,18 +42,15 @@ article.recipe .method-short {
 .controls {
   position: relative;
   width: 100%;
-  // The page's first content, so it takes the same opening gap the recipe page
-  // gives its title.
-  padding-top: $spacing-section-gap;
+  padding-top: $space-lg;
 }
 
 .recipe-list {
   list-style: none;
   padding: 0;
-  // Filters above, results below: the largest boundary on the page, so it gets
-  // the largest step. Collapses with the last category's bottom margin to 4.5rem
-  // rather than stacking.
-  margin: $spacing-section-top 0 $spacing-section-gap 0;
+  // Filters above, results below — the one boundary on this page that should be
+  // bigger than the gap between two filter sections, and not by much.
+  margin: $space-xxl 0;
 
   li {
     display: flex;
@@ -264,23 +261,31 @@ article.recipe .method-short {
 // Category wrappers, labels, and the highlighter backgrounds behind them.
 
 // --- Filter Label Bases & Background Highlighters ---------------------------------
-// A .category IS a section, in exactly the sense the recipe page means it: the
-// label is its heading, the buttons are its content. So it takes the recipe
-// page's heading rhythm, token for token -- $spacing-section-top above the
-// heading, $space-xxl below it. It was $space-xl and $space-md, which is a
-// third and a half of those, and predates the labels tripling in size.
+// --- Index density ----------------------------------------------------------
+// THE INDEX IS A CONTROL PANEL, NOT A DOCUMENT, and its own two spacing values
+// say so. These are deliberately NOT $spacing-section-top / $space-xxl.
 //
-// The gap BELOW reads slightly tighter than its 2rem, because the blocky rule
-// hangs about 0.35rem past the bottom of the lettering. On the recipe page the
-// same 2rem reads as about 1.4rem for the same reason, the mark there being
-// larger. Both land near the 3:1 above-to-below that makes a heading belong to
-// what follows it rather than float between two blocks.
+// Its job is to be taken in at a glance: every filter section visible in one
+// eye pass, so nothing is missed on a first look. That is a DENSITY
+// requirement, and it is the exact opposite of the recipe page's, where a cook
+// mid-task needs to land on one section and space is what isolates it. The same
+// numbers cannot serve both.
+//
+// Matching the recipe page token for token was tried on 2026-08-01 and rejected
+// on sight — it pushed the five sections about 340px apart and you could no
+// longer see them together, which is the one thing this page has to do.
+//
+// Tune density here. Keep the ratio near 2:1 or the structure blurs: the gap
+// BETWEEN sections has to read as clearly larger than the gap WITHIN one.
+$index-section-gap: $space-xl;   // between one filter section and the next
+$index-label-gap:   $space-md;   // a label to its own buttons
+
 .category {
-  margin: $spacing-section-top 0;
+  margin: $index-section-gap 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: $space-xxl;
+  gap: $index-label-gap;
 
   .category-label-row {
     display: flex;
@@ -394,6 +399,27 @@ article.recipe .method-short {
     flex-wrap: wrap;
     align-items: center;
     width: 100%;
+  }
+
+  // THE GAP AFTER THE INGREDIENT SEARCH THAT NOTHING ELSE HAS.
+  // .search--ingredients holds two flex children: the input, and the results
+  // pool that filters.js fills as you type. The pool is EMPTY on load — but a
+  // flex `gap` applies between items regardless of their size, so an empty div
+  // still buys a full gap of dead air. .search--name has one child and no such
+  // gap, which is why the space below SEARCH INGREDIENTS has always looked
+  // bigger than the space below PRACTICALITIES. It is not an illusion; it was a
+  // real $space-md of extra space, and briefly a real $space-xxl.
+  //
+  // The gap is moved onto the pool itself, conditional on it having content.
+  // `:not(:empty)` rather than hiding the empty pool with `display: none`,
+  // because the pool carries aria-live and a region announces more reliably if
+  // it stays in the tree rather than appearing at the moment it is filled.
+  &.search {
+    gap: 0;
+
+    .search-results:not(:empty) {
+      margin-top: $index-label-gap;
+    }
   }
 
   // Meta filter buttons — darkened grey, matching the meta badges
@@ -528,10 +554,10 @@ article.recipe .method-short {
 }
 
 // --- Name search ------------------------------------------------------------
-// More specific than .search { margin: 1.5rem 0 } — no !important needed.
+// `margin-top: $space-sm` used to sit here. It never did anything: adjacent
+// .category siblings collapse their margins and the larger wins, so
+// $index-section-gap always beat it.
 .controls .search--name {
-  margin-top: $space-sm;
-
   #name-search-box {
     font-family: $font-headings;
     font-size: 0.78rem;
