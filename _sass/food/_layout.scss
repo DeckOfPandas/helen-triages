@@ -42,20 +42,25 @@ article.recipe .method-short {
 .controls {
   position: relative;
   width: 100%;
-  padding-top: $space-lg;
+  // The page's first content, so it takes the same opening gap the recipe page
+  // gives its title.
+  padding-top: $spacing-section-gap;
 }
 
 .recipe-list {
   list-style: none;
   padding: 0;
-  margin: 2.5rem 0;
+  // Filters above, results below: the largest boundary on the page, so it gets
+  // the largest step. Collapses with the last category's bottom margin to 4.5rem
+  // rather than stacking.
+  margin: $spacing-section-top 0 $spacing-section-gap 0;
 
   li {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.6rem;
-    padding: 1.4rem 0;
+    gap: $space-sm;        // was 0.6rem
+    padding: $space-xl 0;  // was 1.4rem
     border-bottom: 1px solid $color-border;
 
     a {
@@ -121,12 +126,6 @@ article.recipe .method-short {
 // Note: the clip-path SHAPES for .btn-star and .badge live here, deliberately
 // grouped with the badges. Their appearance is under BUTTONS below.
 
-.recipe-badges {
-  display: flex;
-  align-items: center;
-  gap: $space-sm;
-  flex-shrink: 0;
-}
 
 .badge-group {
   display: flex;
@@ -154,10 +153,6 @@ article.recipe .method-short {
   }
 }
 
-.recipe-badges {
-  justify-content: flex-start;
-  margin: $space-xxl 0;
-}
 
 // Shared clip-path shape for badges and filter buttons
 .badge,
@@ -269,20 +264,29 @@ article.recipe .method-short {
 // Category wrappers, labels, and the highlighter backgrounds behind them.
 
 // --- Filter Label Bases & Background Highlighters ---------------------------------
+// A .category IS a section, in exactly the sense the recipe page means it: the
+// label is its heading, the buttons are its content. So it takes the recipe
+// page's heading rhythm, token for token -- $spacing-section-top above the
+// heading, $space-xxl below it. It was $space-xl and $space-md, which is a
+// third and a half of those, and predates the labels tripling in size.
+//
+// The gap BELOW reads slightly tighter than its 2rem, because the blocky rule
+// hangs about 0.35rem past the bottom of the lettering. On the recipe page the
+// same 2rem reads as about 1.4rem for the same reason, the mark there being
+// larger. Both land near the 3:1 above-to-below that makes a heading belong to
+// what follows it rather than float between two blocks.
 .category {
-  margin: $space-xl 0;
+  margin: $spacing-section-top 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: $space-md;
-
-  // practicalities spacing matches all other categories
+  gap: $space-xxl;
 
   .category-label-row {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: $space-md;
+    gap: $space-lg;   // horizontal, label to its inline clear link
   }
 
   // TYPOGRAPHY MATCHED TO THE RECIPE PAGE'S SECTION HEADINGS, ONE STEP DOWN.
@@ -394,7 +398,9 @@ article.recipe .method-short {
 
   // Meta filter buttons — darkened grey, matching the meta badges
   &.category--meta {
-    margin-top: $space-md;
+    // No margin override. It was $space-md, tuned when every category sat
+    // $space-xl apart; against $spacing-section-top it made the meta row hug
+    // the section above it. A local-only appendix is still a section.
     align-items: center;
     width: 100%;
 

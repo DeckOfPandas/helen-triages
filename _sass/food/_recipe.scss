@@ -222,11 +222,18 @@ article.recipe {
 }
 
 // --- Recipe Badges on recipe page --------------------------------------------
-// NOTE: _sass/food/_layout.scss also sets `.recipe-badges { margin: $space-xxl 0 }`
-// for the index listing. food/recipe is imported after food/layout, so this one
-// wins on the recipe page — but the two rules are 550 lines apart in different
-// files and nothing says so. Worth splitting the selectors one day.
+// Was split across two files: _layout.scss held the flex properties and a
+// `margin: $space-xxl 0`, this held the margin that overrode it. The comment
+// here used to say the index listing needed the _layout.scss copy — it did not.
+// The index emits no .recipe-badges at all, so that rule only ever applied on
+// this page, 550 lines away in a file about a different one, with its margin
+// permanently overridden. All of it is here now.
 .recipe-badges {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: $space-sm;
+  flex-shrink: 0;
   margin: 0 0 $spacing-block-gap 0;
 }
 
