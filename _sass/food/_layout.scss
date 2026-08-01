@@ -45,50 +45,243 @@ article.recipe .method-short {
   padding-top: $space-lg;
 }
 
+// The boundary between filters and results, previously just a margin on
+// .recipe-list, now belongs to this heading instead -- the same three-to-one
+// rhythm the recipe page uses for its own section headings (§13.6): a large
+// gap above (it's leaving the filters behind) and a small one below (it
+// belongs to the list it's introducing, not floating between the two).
+// $spacing-section-top is the recipe page's own token, reused rather than
+// inventing a second "gap above a heading" value.
+.results-heading {
+  margin: $spacing-section-top 0 $space-lg;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .recipe-list {
   list-style: none;
   padding: 0;
-  // Filters above, results below — the one boundary on this page that should be
-  // bigger than the gap between two filter sections, and not by much.
-  margin: $space-xxl 0;
+  margin: 0 0 $space-xxl;
+  // Hidden until filters.js has shuffled and revealed it (removes this
+  // inline via style.visibility) -- the alternative is painting the list in
+  // its server-rendered alphabetical order first and visibly flipping to the
+  // shuffled order a moment later, which reads as a bug rather than a
+  // feature. This trades that visible flip for a brief blank instant instead;
+  // layout height is unaffected since visibility:hidden isn't display:none.
+  visibility: hidden;
 
   li {
+    position: relative;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $space-sm;        // was 0.6rem
-    padding: $space-xl 0;  // was 1.4rem
+    flex-direction: row;
+    align-items: stretch;
+    padding: $space-xl 0;
     border-bottom: 1px solid $color-border;
+  }
+}
 
-    a {
-      font-family: $font-body;
-      font-size: 0.94rem;
-      font-weight: 300;
-      text-transform: lowercase;
-      letter-spacing: 0.05em;
-      color: $color-text;
-      text-decoration: none;
-      line-height: 1.4;
-      transition: color 0.12s ease-in-out;
+.recipe-row-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-sm;        // was 0.6rem
+  flex: 1;
+  min-width: 0;          // otherwise a flex child won't shrink below its content's
+                          // natural width, and the ingredient line's clamp/fade
+                          // has nothing to clip against
 
-      &:hover {
-        color: $color-star-root;
-      }
+  a {
+    font-family: $font-headings;
+    font-size: 1rem;
+    font-weight: 600;     // 400 and 500 render identically -- Courier New only
+                           // ships Regular and Bold, so anything <=500 resolves
+                           // to Regular and anything >500 jumps straight to Bold
+    text-transform: lowercase;
+    letter-spacing: 0.05em;
+    color: $color-text;
+    text-decoration: none;
+    line-height: 1.4;
+    transition: color 0.12s ease-in-out;
+
+    &:hover {
+      color: $color-star-root;
     }
   }
 }
 
+// --- The category-code bar ----------------------------------------------------
+// Fourth attempt, back to stacked -- Helen's call: five squares stacked top to
+// bottom, filling the row's full height between them, rather than five
+// stripes running side by side. All five always render; only is-lit varies,
+// same as before.
+//
+// EACH SEGMENT IS flex: 1 IN A COLUMN, not a fixed height, so the five split
+// whatever height the row actually has -- a tall row (two-line title, wrapped
+// badges) gets slightly bigger squares than a short one, always exactly
+// filling the row rather than under- or over-running it.
+//
+// WIDTH TRACKS HEIGHT VIA aspect-ratio: 1, not a fixed px, because each
+// segment's height is only known once flex has resolved it -- there's no
+// number to hand-write here that would stay right across every row's
+// different height. align-items: flex-start on the container is what makes
+// this take effect: the default flex stretch would otherwise force each
+// segment to the CONTAINER's width and override the ratio.
+.recipe-row-code {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+  // Unconditional now that every row always shows all five segments -- the
+  // :has() guard existed only to avoid paying for a gap next to an empty,
+  // all-hidden bar, and an always-populated bar is never empty.
+  margin-right: $space-xxl;
+
+  &__seg {
+    display: block;
+    flex: 1;
+    aspect-ratio: 1;
+    // Definition for the lightest hues (aureolin, lime) against $color-bg,
+    // without touching the fill itself -- see the note this replaced on why
+    // that distinction (edge vs hue) matters.
+    box-shadow: inset 0 0 0 1px rgba($color-text, 0.15);
+  }
+}
+
+// UNLIT: darken a little, then make it somewhat transparent -- NOT the
+// -active tokens (tuned for text-on-fill, not a bare swatch -- see the
+// previous version of this comment in git history for why that went wrong)
+// and NOT the raw root at low alpha either (reads as a washed-out pastel with
+// no relationship to the actual paintbox). A small darken plus a moderate
+// alpha keeps the hue recognisably itself while sitting back from the lit
+// state. Alphas dropped again on Helen's feedback that the hues themselves
+// were right but all five read as too solid together.
+//
+// LIT: the true root colour, barely touched -- "so they don't shout too
+// loud" was the brief, not "so they read as a different, muted colour".
+//
+// SEPARATE DIALS PER HUE, not one number applied to all five: the same darken
+// or alpha reads differently depending on where a hue starts (this is the
+// same lesson $darken-active-extra already taught this codebase once, for
+// aureolin specifically -- see _palette.scss). Tune each independently here
+// rather than solving for one value that's wrong for all of them.
+$bar-unlit-darken-star:           8%;
+$bar-unlit-alpha-star:            0.45;
+$bar-unlit-darken-mood:           8%;
+$bar-unlit-alpha-mood:            0.45;
+$bar-unlit-darken-practicalities: 12%;
+$bar-unlit-alpha-practicalities:  0.5;
+$bar-unlit-darken-ingredient:     10%;
+$bar-unlit-alpha-ingredient:      0.45;
+$bar-unlit-darken-name-search:    8%;
+$bar-unlit-alpha-name-search:     0.45;
+
+$bar-lit-alpha: 0.88;
+
+.recipe-row-code__seg {
+  &--star            { background-color: rgba(darken($color-star-root, $bar-unlit-darken-star), $bar-unlit-alpha-star); }
+  &--mood            { background-color: rgba(darken($color-mood-root, $bar-unlit-darken-mood), $bar-unlit-alpha-mood); }
+  &--practicalities  { background-color: rgba(darken($color-practicalities-root, $bar-unlit-darken-practicalities), $bar-unlit-alpha-practicalities); }
+  &--ingredient      { background-color: rgba(darken($color-ingredient-root, $bar-unlit-darken-ingredient), $bar-unlit-alpha-ingredient); }
+  &--name-search     { background-color: rgba(darken($color-name-search-root, $bar-unlit-darken-name-search), $bar-unlit-alpha-name-search); }
+
+  // Lit overrides unlit -- declared after, wins at equal specificity.
+  &--star.is-lit            { background-color: rgba($color-star-root, $bar-lit-alpha); }
+  &--mood.is-lit            { background-color: rgba($color-mood-root, $bar-lit-alpha); }
+  &--practicalities.is-lit  { background-color: rgba($color-practicalities-root, $bar-lit-alpha); }
+  &--ingredient.is-lit      { background-color: rgba($color-ingredient-root, $bar-lit-alpha); }
+  &--name-search.is-lit     { background-color: rgba($color-name-search-root, $bar-lit-alpha); }
+}
+
 // --- Ingredient list below each recipe entry ---------------------------------
+// Clamped rather than left to wrap freely, so every row keeps a predictable
+// height instead of stacking to however many lines that recipe's ingredient
+// count happens to need. One line on wide screens; two on narrow ones, where a
+// single line holds too little to be useful for the recall-lookup case ("the
+// one with the sorrel") this list exists to serve. Faded rather than an
+// ellipsis, in the same spirit as the metadata tint: a soft edge rather than a
+// hard stop, so a clipped line doesn't read as an error.
+//
+// The fade ONLY applies with .is-clamped, which filters.js sets by actually
+// measuring scrollHeight against clientHeight. A fixed always-on feather was
+// tried first and was visibly wrong: it faded the bottom of every row a
+// little whether or not that row was truncated, so a short, complete
+// ingredient list looked like it was fading out for no reason. CSS alone
+// can't tell "genuinely overflowing" from "short and done" -- there's no
+// selector for it -- so the measurement has to happen in JS.
 .ingredient-list {
   font-family: $font-body;
-  font-size: 0.78rem;
-  font-weight: 300;
+  font-size: 0.86rem;
+  font-weight: 350;
   color: lighten($color-clear-text, 18%);
   line-height: 1.5;
+  max-width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+
+  &.is-clamped {
+    mask-image: linear-gradient(to bottom, black calc(100% - 7px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 7px), transparent 100%);
+  }
+
+  @media (max-width: 600px) {
+    -webkit-line-clamp: 2;
+  }
+}
+
+// --- Pagination -----------------------------------------------------------
+// Deliberately plain -- text and an arrow, nothing borrowed from the badge or
+// button vocabulary. It's page furniture, not a taxonomy control, and giving
+// it clip-path chips or a section colour would claim a sixth meaning the
+// colour code doesn't have room for.
+// Three columns rather than one flex row with justify-content: center --
+// centring prev/status/next AND pinning "(see all)" to the far right at the
+// same time needs the nav cluster genuinely centred in the row, not just
+// pushed left by an auto-margin sibling claiming the free space. A grid with
+// an equal spacer column on each side does that directly.
+.recipe-pagination {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin: $space-xl 0;
+  font-family: $font-headings;
+  font-size: 0.85rem;
+  color: lighten($color-clear-text, 10%);
+}
+
+.recipe-pagination-nav {
+  grid-column: 2;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0;
+  align-items: center;
+  gap: $space-lg;
+  justify-self: center;
+}
+
+.btn-page-see-all {
+  grid-column: 3;
+  justify-self: end;
+}
+
+.btn-page {
+  font-family: $font-headings;
+  text-transform: lowercase;
+  background: none;
+  border: none;
+  color: $color-text;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: $space-xs $space-sm;
+  transition: color 0.12s ease-in-out;
+
+  &:hover:not(:disabled) {
+    color: $color-star-root;
+  }
+
+  &:disabled {
+    color: lighten($color-clear-text, 30%);
+    cursor: default;
+  }
 }
 
 .ingredient-sep {

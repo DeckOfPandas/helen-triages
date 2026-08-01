@@ -23,7 +23,8 @@ permalink: /food/
     {% assign all_recipes = all_recipes | concat: site.food_drafts %}
   {% endif %}
   {% assign all_recipes = all_recipes | sort: "title" %}
-  
+  {% assign _rendered_recipes = all_recipes | where_exp: "r", "r.meta.rewritten or site.show_unrewritten" %}
+
   {% comment %} Stars are DECLARED in _data/taxonomy.yml, not derived from front
      matter. Deriving meant a typo silently minted a new star ingredient. {% endcomment %}
   {% assign all_stars = site.data.food.taxonomy.star_ingredients %}
@@ -96,6 +97,16 @@ permalink: /food/
 
 </div>
 
+{% comment %} Reuses the exact filter-heading treatment (punched label +
+   stroke) rather than inventing a new decoration -- it just carries no
+   colour rule underneath, the same way META FILTERS above carries none: it
+   isn't one of the five filter categories, so it doesn't borrow one of their
+   hues. The count is the server-rendered resting value; filters.js keeps it
+   live as filters change. {% endcomment %}
+<div class="results-heading">
+  <span class="category-label"><span class="category-label-text" id="recipe-count">{{ _rendered_recipes.size }} recipe{% unless _rendered_recipes.size == 1 %}s{% endunless %}</span></span>
+</div>
+
 <ul class="recipe-list">
   {% for recipe in all_recipes %}
     {% if recipe.meta.rewritten or site.show_unrewritten %}
@@ -113,21 +124,24 @@ permalink: /food/
           {% assign _has_short = true %}
         {% endunless %}
       {% endfor %}
+      {% comment %} All five always render, regardless of whether this recipe
+         actually has anything in that category -- a fixed five-slot legend
+         in a fixed order, rather than a bar whose length and colour order
+         both varied by row. filters.js is the only thing that ever changes
+         one: it adds is-lit when an active filter currently matches this row
+         in that category. See _layout.scss's .recipe-row-code for the
+         unlit/lit colour treatment. {% endcomment %}
       <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}">
-        <a href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
-
-        <div class="badge-group">
-          <div class="badge-group__content">
-            {% include recipe_badges.html recipe=recipe %}
-          </div>
-          <div class="badge-group__meta">
-            {% if site.show_unrewritten %}
-              {% unless recipe.meta.rewritten %}<span class="badge badge-meta-rewrite">needs rewrite</span>{% endunless %}
-              {% unless recipe.meta.proofread %}<span class="badge badge-meta-proofread">needs proofread</span>{% endunless %}
-            {% endif %}
-            {% if is_draft %}<span class="badge badge-draft">draft</span>{% endif %}
-          </div>
+        <div class="recipe-row-code" aria-hidden="true">
+          <span class="recipe-row-code__seg recipe-row-code__seg--star" data-category="star"></span>
+          <span class="recipe-row-code__seg recipe-row-code__seg--mood" data-category="mood"></span>
+          <span class="recipe-row-code__seg recipe-row-code__seg--practicalities" data-category="practicalities"></span>
+          <span class="recipe-row-code__seg recipe-row-code__seg--ingredient" data-category="ingredient"></span>
+          <span class="recipe-row-code__seg recipe-row-code__seg--name-search" data-category="name-search"></span>
         </div>
+
+        <div class="recipe-row-content">
+        <a href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
 
         {% if recipe.main_ingredients and recipe.main_ingredients.size > 0 %}
         {% comment %} Order is a PRESENTATION concern — main_ingredients stays an
@@ -156,10 +170,33 @@ permalink: /food/
           {% endfor %}
         </div>
         {% endif %}
+
+        <div class="badge-group">
+          <div class="badge-group__content">
+            {% include recipe_badges.html recipe=recipe %}
+          </div>
+          <div class="badge-group__meta">
+            {% if site.show_unrewritten %}
+              {% unless recipe.meta.rewritten %}<span class="badge badge-meta-rewrite">needs rewrite</span>{% endunless %}
+              {% unless recipe.meta.proofread %}<span class="badge badge-meta-proofread">needs proofread</span>{% endunless %}
+            {% endif %}
+            {% if is_draft %}<span class="badge badge-draft">draft</span>{% endif %}
+          </div>
+        </div>
+        </div>
       </li>
     {% endif %}
   {% endfor %}
 </ul>
+
+<div class="recipe-pagination" style="display: none;">
+  <div class="recipe-pagination-nav">
+    <button type="button" class="btn-page" id="recipe-page-prev">&larr; prev</button>
+    <span id="recipe-page-status"></span>
+    <button type="button" class="btn-page" id="recipe-page-next">next &rarr;</button>
+  </div>
+  <button type="button" class="btn-page btn-page-see-all" id="recipe-page-see-all">(see all)</button>
+</div>
 
 <div class="recipe-list-empty" style="display: none;">
   Nothing to see here.
