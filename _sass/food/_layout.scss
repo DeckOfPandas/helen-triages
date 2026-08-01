@@ -247,12 +247,36 @@ article.recipe .method-short {
 
 // A search-result tag where some word genuinely starts with what was typed
 // (not just a family member pulled in alongside it — see hasWordMatch in
-// filters.js). Reuses the same aureolin-at-badge-strength tint already used
-// for .badge-ingredient-hit, rather than inventing a new colour: a subtle
-// wash of the search section's own colour, still reading as part of the
-// grey palette rather than a loud highlight.
+// filters.js).
+//
+// NEUTRAL, NOT THE SECTION'S COLOUR, and the reason generalises. This was
+// `rgba($color-ingredient-root, $saturation-badge-bg)` — the search section's
+// own hue at badge strength — and it was chosen while that hue was AUREOLIN.
+// Yellow at 10% over the page is #FAF6DF, a warm cream that reads as neutral.
+// When the section became lime green on 2026-08-01 the same 10% became #EFF6DF,
+// which reads as green. Identical number, completely different result, because
+// how coloured a tint looks at a given alpha is a property of the hue.
+//
+// The same trap as $darken-active-extra being left on the ingredient line when
+// aureolin moved off it: a value tuned for a colour, stranded when the colour
+// moved. Worth checking for every time these five are reordered.
+//
+// It matters here and not on the badges because the count is UNBOUNDED — one
+// tinted badge per recipe row is an accent, forty tinted results appearing as
+// you type is a swarm. Colour cannot carry emphasis when you do not control how
+// much of it lands at once. A darker grey says "these ones matter more" without
+// colouring anything, and the section's hue still appears where selection
+// actually happens: the label's rule, and the active state.
+//
+// TWO CHANNELS, NOT ONE. 0.06 -> 0.12 on the background alone was not enough:
+// these chips are mostly text on a pale fill, so a slightly darker fill behind
+// the same grey letters barely registers across a wrapped grid of forty. The
+// text colour is the channel that actually carries here — the base is
+// lighten($color-text, 22%), so going to full $color-text is a visible step,
+// and the darker fill then reinforces it instead of doing the work alone.
 .btn-ingredient--word-match {
-  background-color: rgba($color-ingredient-root, $saturation-badge-bg);
+  background-color: rgba($color-text, 0.14);
+  color: $color-text;
 }
 
 // ============================================================================
