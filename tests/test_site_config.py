@@ -108,6 +108,21 @@ def test_ingredient_search_js_loads_before_filters_js():
     )
 
 
+def test_recipe_list_js_loads_before_filters_js():
+    """filters.js calls HTF.recipeList at startup (shuffleRecipeList, update's
+    pagination) -- it must already exist, same trap as ingredient-search.js.
+    """
+    html = read("food", "index.html")
+    recipe_list_tag = re.search(r"<script src=[^>]*recipe-list\.js", html)
+    filters_tag = re.search(r"<script src=[^>]*filters\.js", html)
+    assert recipe_list_tag, "food/index.html no longer loads assets/js/recipe-list.js."
+    assert filters_tag, "food/index.html no longer loads assets/js/filters.js."
+    assert recipe_list_tag.start() < filters_tag.start(), (
+        "recipe-list.js must load BEFORE filters.js, or "
+        "HTF.recipeList won't exist yet when filters.js runs."
+    )
+
+
 def test_filters_js_holds_no_ingredient_vocabulary():
     """Singulars and synonyms belong in YAML, not in the JavaScript."""
     js = read("assets", "js", "filters.js")
