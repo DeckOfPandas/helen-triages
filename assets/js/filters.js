@@ -6,7 +6,15 @@ document.addEventListener('DOMContentLoaded', function () {
   var nameQuery = ''; // 'rewrite' and/or 'proofread'
   var isSearching = false;
 
-  var items = document.querySelectorAll('.recipe-list li');
+  var PAGE_SIZE = 20;
+  var currentPage = 1;
+  var showAll = false;
+
+  // An array, not a live NodeList: shuffleRecipeList() reorders it in place
+  // and re-appends in that order, so every later pass over `items` — matching,
+  // pagination, the code bars — walks in whatever order is currently on
+  // screen rather than the page's original load-time order.
+  var items = Array.from(document.querySelectorAll('.recipe-list li'));
 
   var matrix = document.querySelector('.controls');
   var recipeList = document.querySelector('.recipe-list');
@@ -68,6 +76,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function hasActiveFilters() {
     return activeTags.size > 0 || activeStar !== null || activeMetaFilters.size > 0;
+  }
+
+  // Fisher-Yates, then re-append in the shuffled order — appendChild on a node
+  // already in the document MOVES it rather than duplicating it, so this
+  // reorders the real DOM, not a detached copy of it.
+  function shuffleRecipeList() {
+    if (!recipeList) return;
+    for (var i = items.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = items[i]; items[i] = items[j]; items[j] = tmp;
+    }
+    items.forEach(function(li) { recipeList.appendChild(li); });
+  }
+
+  // Whether a row's ingredient line is ACTUALLY truncated by its line-clamp,
+  // not just short. CSS has no selector for "this box's content overflowed
+  // it" — mask-image can't conditionally apply itself — so this measures
+  // scrollHeight against clientHeight directly and flags the ones that really
+  // are cut off. Hidden rows (display:none, offsetParent null) are skipped:
+  // they measure 0/0 either way, and get measured again once a filter or
+  // page change makes them visible, because this runs at the end of update().
+  function updateIngredientClamp() {
+    document.querySelectorAll('.recipe-list .ingredient-list').forEach(function(el) {
+      if (el.offsetParent === null) return;
+      el.classList.toggle('is-clamped', el.scrollHeight > el.clientHeight + 1);
+    });
   }
 
   var rawIngredientStrings = [];
@@ -169,12 +203,16 @@ function renderResultsPool() {
     });
   }
 
-  function update() {
+  function update(preservePage) {
+    if (!preservePage) { currentPage = 1; showAll = false; }
     var visibleCount = 0;
+    var totalPages = 1;
     var suppressList = isSearching && !hasActiveFilters();
     if (recipeList) recipeList.style.display = suppressList ? 'none' : '';
 
     if (!suppressList) {
+      var matchingLis = [];
+
       items.forEach(function(li) {
         var tags = (li.dataset.tags || '').split(',').filter(Boolean);
         var star = li.dataset.star || '';
@@ -222,9 +260,24 @@ function renderResultsPool() {
           if (!hasMatch) visible = false;
         }
 
-        li.style.display = visible ? '' : 'none';
-        if (visible) visibleCount++;
+        if (visible) matchingLis.push(li);
+        else li.style.display = 'none';
       });
+
+      visibleCount = matchingLis.length;
+      totalPages = Math.max(1, Math.ceil(visibleCount / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      if (showAll) {
+        matchingLis.forEach(function(li) { li.style.display = ''; });
+      } else {
+        var pageStart = (currentPage - 1) * PAGE_SIZE;
+        var pageEnd = pageStart + PAGE_SIZE;
+        matchingLis.forEach(function(li, idx) {
+          li.style.display = (idx >= pageStart && idx < pageEnd) ? '' : 'none';
+        });
+      }
     }
 
     document.querySelectorAll('.recipe-list .badge').forEach(function(badge) {
@@ -257,6 +310,29 @@ function renderResultsPool() {
       if (matches) pill.classList.add('ingredient--matched');
     });
 
+    // Category-code bars: lit only when this row is currently MATCHED in
+    // that category, not merely tagged. Runs after both matching passes
+    // above so their DOM state (badge--matched, ingredient--matched) is
+    // fresh to read off rather than re-deriving the same matching logic a
+    // third time. star/mood/practicalities read badges; ingredient and
+    // name-search have no badge to read (main_ingredients and the title
+    // aren't rendered as badges), so those two are worked out directly.
+    items.forEach(function(li) {
+      li.querySelectorAll('.recipe-row-code__seg').forEach(function(seg) {
+        var cat = seg.dataset.category;
+        var hit;
+        if (cat === 'ingredient') {
+          hit = !!activeIngredient && li.querySelector('.ingredient-pill.ingredient--matched') !== null;
+        } else if (cat === 'name-search') {
+          var rowTitle = (li.querySelector('a') || {}).textContent || '';
+          hit = !!nameQuery && rowTitle.toLowerCase().indexOf(nameQuery) !== -1;
+        } else {
+          hit = li.querySelector('.badge-' + cat + '.badge--matched') !== null;
+        }
+        seg.classList.toggle('is-lit', hit);
+      });
+    });
+
     var emptyMessage = document.querySelector('.recipe-list-empty');
     emptyMessage.style.display = (!suppressList && visibleCount === 0) ? 'block' : 'none';
 
@@ -268,9 +344,28 @@ function renderResultsPool() {
       if (nameSearchClear) nameSearchClear.style.display = nameQuery ? 'inline' : 'none';
     }
 
+    var recipeCountEl = document.getElementById('recipe-count');
+    if (recipeCountEl && !suppressList) {
+      recipeCountEl.textContent = visibleCount + (visibleCount === 1 ? ' recipe' : ' recipes');
+    }
+
+    // Hidden entirely once showAll is set, not just its prev/next disabled --
+    // there's nothing left in it to do once every matching row is on screen.
+    var pagination = document.querySelector('.recipe-pagination');
+    if (pagination) {
+      pagination.style.display = (!suppressList && totalPages > 1 && !showAll) ? 'grid' : 'none';
+      var pagePrevBtn = document.getElementById('recipe-page-prev');
+      var pageNextBtn = document.getElementById('recipe-page-next');
+      var pageStatusEl = document.getElementById('recipe-page-status');
+      if (pagePrevBtn) pagePrevBtn.disabled = currentPage <= 1;
+      if (pageNextBtn) pageNextBtn.disabled = currentPage >= totalPages;
+      if (pageStatusEl) pageStatusEl.textContent = 'page ' + currentPage + ' of ' + totalPages;
+    }
+
     updateInlineLabels();
     updateIngredientClear();
     syncAriaPressed();
+    updateIngredientClamp();
   }
 
   function updateInlineLabels() {
@@ -404,9 +499,57 @@ function renderResultsPool() {
           btn.classList.remove('active');
         });
       }
+      // Reshuffles only here, on the deliberate "clear everything at once"
+      // action — not on every incidental path back to zero active filters
+      // (e.g. toggling the last individual tag off), which reads as an
+      // unrelated action reordering the page underneath you.
+      shuffleRecipeList();
       update();
     });
   }
 
+  var pagePrevBtn = document.getElementById('recipe-page-prev');
+  var pageNextBtn = document.getElementById('recipe-page-next');
+  if (pagePrevBtn) {
+    pagePrevBtn.addEventListener('click', function() {
+      currentPage -= 1;
+      update(true);
+      if (recipeList) recipeList.scrollIntoView({ block: 'start' });
+    });
+  }
+  if (pageNextBtn) {
+    pageNextBtn.addEventListener('click', function() {
+      currentPage += 1;
+      update(true);
+      if (recipeList) recipeList.scrollIntoView({ block: 'start' });
+    });
+  }
+
+  var seeAllBtn = document.getElementById('recipe-page-see-all');
+  if (seeAllBtn) {
+    seeAllBtn.addEventListener('click', function() {
+      showAll = true;
+      update(true);
+    });
+  }
+
+  // Line-clamp changes from 1 line to 2 at the 600px breakpoint, so a resize
+  // can flip whether a row is genuinely overflowing. Debounced: resize fires
+  // continuously while dragging, and re-measuring every .ingredient-list on
+  // every one of those events is wasted work for a value that only matters
+  // once the drag settles.
+  var resizeTimer = null;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(updateIngredientClamp, 120);
+  });
+
+  // A fresh page load starts at "no filters active" too — the same state
+  // "clear all" produces — so it gets the same shuffle for the same reason.
+  // .recipe-list starts visibility:hidden in CSS specifically so this can run
+  // before anything is shown — revealing it only now means the shuffled order
+  // is what paints, not the server-rendered alphabetical order flashing first.
+  shuffleRecipeList();
   update();
+  if (recipeList) recipeList.style.visibility = 'visible';
 });

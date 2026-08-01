@@ -11,134 +11,6 @@
   text-transform: uppercase;
 }
 
-// =============================================================================
-// THE BLOCKY RULE — the recipe page's one decorative device
-// =============================================================================
-// A saturated bar overlapping the base of a heading with the lettering in front
-// of it: under the title, and under every section name. It replaced watercolour
-// brush washes on 2026-07-31. A wash picked a different random shape on every
-// page load, so the eye had to re-identify it on each recipe; an identical
-// repeated mark becomes something you recognise rather than something you read,
-// and that turned out to matter more than sheer area for the glance test.
-//
-// THE DIALS ARE THE FIRST THING TO REACH FOR. All em, so the title and the
-// section names stay in proportion to each other whatever the font size.
-//
-// HOW IT IS DRAWN, AND WHY NOT `text-decoration`. The rule has to sit BEHIND
-// the lettering, and an underline does not: at a negative offset it crosses the
-// glyphs rather than passing under them, which is the whole reason
-// `text-decoration-skip-ink` exists. A background does paint behind text, by
-// definition — so the rule is a `linear-gradient` background, sized and
-// positioned by hand.
-//
-// The catch a background brings is that it draws on the BOX, so on a two-line
-// title it would be one bar for the whole block. `display: inline` plus
-// `box-decoration-break: clone` fixes exactly that: the box is broken into one
-// fragment per line and the background is drawn on each, so every line gets its
-// own bar at its own width. That is the same per-line property the underline
-// had, kept.
-//
-// The asymmetry is two separate mechanisms, because a background is clipped to
-// its box and cannot overhang:
-//   - the LEFT indent is $rule-indent, shifting the gradient right
-//   - the RIGHT overhang is $rule-overhang as padding, growing the box
-$rule-thickness: 0.38em;   // bar depth — magenta under the title, spring green
-                           // under section headings. Thicker than the 6px
-                           // underline, since the top of it is now hidden
-                           // behind the letters
-$rule-drop:      0.70em;   // top of the bar, measured down from the top of the
-                           // text box. Larger = lower = less overlap. At 1.8rem
-                           // Courier the baseline is at ~0.83em, so this cuts
-                           // into the bottom quarter of the capitals
-$rule-indent:    0.15em;   // how far INTO the text the bar starts, from the left
-$rule-overhang:  0.20em;   // how far PAST the text the bar runs, on the right
-$rule-front-opacity: 0.8;  // violet is always the bar rendered in FRONT (the
-                           // lower one, under the title's magenta and under
-                           // each section heading's spring green), painted
-                           // this see-through so where it now overlaps the
-                           // colour behind it, that colour shows through
-                           // rather than being hidden
-
-// --- The section headings' second rule ---------------------------------------
-// A violet rule directly beneath the spring green one, sharing its right edge
-// and starting further left — two-colour printing very slightly out of
-// register. With no gap between them the pair reads as ONE bar of two colours
-// with a stepped left edge, rather than as two separate underlines.
-//
-// THE VIOLET IS FLUSH WITH THE LETTERING AND THE GREEN IS INSET, rather than
-// the violet hanging out into the left margin. Everything on the page starts at
-// x=0 — section headings, ingredient lines, step numbers — and a bar to the
-// left of that axis reads as a broken alignment rather than as a design. The
-// misregistration only looks deliberate because ONE of the two marks is on the
-// grid: with both off it, there is no reference and it reads as wobble.
-// To try the radical version anyway, give $rule-under-indent a negative value.
-$rule-under-thickness: 0.20em;                       // thinner, so the pair
-                                                     // reads as one mark with
-                                                     // a hierarchy
-$rule-overlap:         0.10em;                       // how far the violet rises
-                                                     // into the bar above it
-$rule-under-drop:      $rule-drop + $rule-thickness - $rule-overlap; // still
-                                                     // derived from $rule-drop
-                                                     // and $rule-thickness, so
-                                                     // the two bars move together
-                                                     // — just pulled up by
-                                                     // $rule-overlap instead of
-                                                     // landing flush
-// The violet is trimmed to the INK, not to the box, so it measures the word
-// while the green escapes it. Two insets rather than one, because the two ends
-// are not the same distance from their letterforms:
-//
-//   LEFT   just the glyph's side bearing. Courier New's capitals sit roughly
-//          0.08em inside their advance width on each side.
-//   RIGHT  the side bearing PLUS the trailing letter-space. `letter-spacing`
-//          is added after every character including the last, and this heading
-//          carries 0.08em of it — so the box extends 0.08em further past the
-//          final letter than it does before the first one. Trimming both ends
-//          by the same amount would look symmetric in the code and be visibly
-//          off to the right on the page.
-$rule-under-inset-left:  0.05em;
-$rule-under-inset-right: 0.16em;   // 0.08 side bearing + 0.08 letter-spacing
-$rule-under-indent:    $rule-under-inset-left;
-
-// The title needs its OWN right inset, and the reason is a trap. It carries
-// `letter-spacing: 0.04em` declared on .recipe-main-title at 1.4rem, which
-// computes to an absolute 0.896px and is then INHERITED as that length by
-// .recipe-title-text at 1.8rem — where it is 0.031em, not 0.04em. So the
-// trailing dead space after the last letter is about a third of what the
-// section headings carry, and reusing their 0.16em would trim the title's
-// violet rule visibly short at the right.
-$rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
-
-@mixin overlapping-rule-double($top-colour, $under-colour, $inset-right: $rule-under-inset-right) {
-  display: inline;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-
-  padding-right: $rule-overhang;
-  // Vertical room for the second rule. Courier's content box is only ~1.13em
-  // tall, and the violet runs to 1.24em, so without this it would be clipped.
-  // Vertical padding on an inline box grows the background without touching
-  // the line height, so nothing moves.
-  padding-bottom: 0.45em;
-
-  // First layer paints in front: violet over green/magenta, at $rule-front-opacity
-  // rather than solid, so where the two bars now overlap, the colour behind
-  // shows through instead of being fully hidden.
-  background-image:
-    linear-gradient(rgba($under-colour, $rule-front-opacity), rgba($under-colour, $rule-front-opacity)),
-    linear-gradient($top-colour, $top-colour);
-  background-repeat: no-repeat, no-repeat;
-  // The green is sized to make up its own indent, so it runs to the box's right
-  // edge and keeps the full $rule-overhang. The violet gives back the whole
-  // overhang plus both insets, so it stops inside the lettering at both ends.
-  background-size:
-    calc(100% - #{$rule-overhang + $rule-under-inset-left + $inset-right}) #{$rule-under-thickness},
-    calc(100% - #{$rule-indent}) #{$rule-thickness};
-  background-position:
-    #{$rule-under-indent} #{$rule-under-drop},
-    #{$rule-indent}       #{$rule-drop};
-}
-
 // --- Box tint (metadata grid only, for now) -----------------------------------
 // Was tinted off $color-border mixed with $color-surface — a neutral with no
 // relation to the page's actual accent colours. Re-based on the rule's own
@@ -350,11 +222,18 @@ article.recipe {
 }
 
 // --- Recipe Badges on recipe page --------------------------------------------
-// NOTE: _sass/food/_layout.scss also sets `.recipe-badges { margin: $space-xxl 0 }`
-// for the index listing. food/recipe is imported after food/layout, so this one
-// wins on the recipe page — but the two rules are 550 lines apart in different
-// files and nothing says so. Worth splitting the selectors one day.
+// Was split across two files: _layout.scss held the flex properties and a
+// `margin: $space-xxl 0`, this held the margin that overrode it. The comment
+// here used to say the index listing needed the _layout.scss copy — it did not.
+// The index emits no .recipe-badges at all, so that rule only ever applied on
+// this page, 550 lines away in a file about a different one, with its margin
+// permanently overridden. All of it is here now.
 .recipe-badges {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: $space-sm;
+  flex-shrink: 0;
   margin: 0 0 $spacing-block-gap 0;
 }
 

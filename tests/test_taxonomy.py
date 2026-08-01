@@ -38,9 +38,13 @@ def test_tags_are_declared(recipe, taxonomy):
     unknown = [t for t in (recipe.fm.get("tags") or []) if t not in declared]
     assert not unknown, (
         f"{where(recipe)} uses undeclared tag(s) {unknown}.\n"
-        f"A tag that is not in _data/food/taxonomy.yml renders on the recipe page but "
-        f"has no filter button on the index, so it is invisible to anyone "
-        f"browsing. Declared tags: {', '.join(sorted(declared))}."
+        f"A tag that is not in _data/food/taxonomy.yml renders NOWHERE — not as a "
+        f"badge on the recipe page and not as a filter button on the index. "
+        f"_includes/recipe_badges.html builds badges by iterating "
+        f"_data/food/filter_sections.yml's tag_groups and looking each one up "
+        f"here, so both come from the same place. This message used to claim the "
+        f"tag still showed on the recipe page; it does not. "
+        f"Declared tags: {', '.join(sorted(declared))}."
     )
 
 
