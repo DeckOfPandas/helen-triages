@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: "1 hr 30 mins"
 main_ingredients: ["pork loin", "Maris Piper potatoes", gruyère, onions, rosemary, "chicken stock", "Dijon mustard"]
 star_ingredient: pork
-tags: ["one-pot", scalable]
+tags: [showstopper]
 ingredient_groups:
   - items:
     - amount: "3"

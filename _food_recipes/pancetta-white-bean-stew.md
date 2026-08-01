@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: "40 mins"
 main_ingredients: [pancetta, "white beans", "cavolo nero", carrot, celery, onion, "chicken stock", "parmesan rind"]
 star_ingredient: pork
-tags: ["one-handed food", "one-pot"]
+tags: ["one-handed food"]
 ingredient_groups:
   - items:
     - amount: "150 g"

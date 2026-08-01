@@ -8,7 +8,7 @@ prep_time: "10 mins"
 cook_time: "40 mins"
 main_ingredients: [sausages, "plain flour", eggs, milk, "red onions", "balsamic vinegar", rosemary]
 star_ingredient: pork
-tags: ["carbs party", "one-pot"]
+tags: ["carbs party"]
 ingredient_groups:
   - name: sausages
     items:

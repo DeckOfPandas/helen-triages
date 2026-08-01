@@ -8,7 +8,7 @@ prep_time: "30 mins plus at least 2 hrs marinating"
 cook_time: "2 hrs 30 mins"
 main_ingredients: ["beef shin", potato, "red wine", carrots, onion, swede]
 star_ingredient: beef
-tags: ["make-ahead", "one-handed food", "one-pot"]
+tags: ["make-ahead", "one-handed food"]
 ingredient_groups:
   - name: filling
     items:

@@ -8,7 +8,7 @@ prep_time: "20 mins"
 cook_time: "2 hrs 45 mins"
 main_ingredients: ["pork belly", "barley miso", ginger, mirin, "spring onions"]
 star_ingredient: pork
-tags: ["make-ahead", "one-handed food", "one-pot"]
+tags: ["make-ahead", "one-handed food"]
 ingredient_groups:
   - name: pork
     items:
