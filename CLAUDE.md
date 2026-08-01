@@ -12,4 +12,14 @@
 - Do not run commands using the `--dangerously-skip-permissions` flag.
 
 ## Build Commands
-- Dev Server: `jekyll-local`
+- Dev Server: `jekyll-local`, deploying to localhost:4001
+- Prod Server: `jekyll-prod`, deploying to localhost:4002
+
+## Git workflow
+- Before creating a new branch, checkout main and `git pull origin main` first.
+- Ask for confirmation before creating a new branch — wait for my go-ahead.
+- Commit freely without asking.
+- Never `git push` without my explicit confirmation first.
+
+## Normal workflow
+- Please do not try to write to /tmp. If you need a scratch temporary folder, create one here and add it to .gitignore
