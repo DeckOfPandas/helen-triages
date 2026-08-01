@@ -8,7 +8,7 @@ prep_time: "20 mins"
 cook_time: "30 mins"
 main_ingredients: [salmon, "sticky rice", edamame, "soy sauce", lime, ginger, sesame]
 star_ingredient: oily fish
-tags: [salad]
+tags: [salad, virtuous]
 ingredient_groups:
   - items:
     - amount: "350 g"

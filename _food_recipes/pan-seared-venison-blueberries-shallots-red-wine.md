@@ -8,7 +8,7 @@ prep_time: "10 mins"
 cook_time: "15 mins"
 main_ingredients: [venison, blueberries, shallots, "red wine", thyme, "juniper berries"]
 star_ingredient: game
-tags: [showstopper]
+tags: [showstopper, virtuous]
 ingredient_groups:
   - items:
     - amount: "1"
