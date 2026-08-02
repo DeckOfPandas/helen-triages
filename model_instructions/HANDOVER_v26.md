@@ -487,8 +487,16 @@ from here.
 across `ingredient-search.test.js` (11) and `recipe-list.test.js` (9). Node
 tests, not pytest, because they test JS modules directly.
 
-**Known failures, stable:** nine `Estimated` timings (§5) and one link to a
-recipe still in drafts (`peanut-butter-ice-cream` → `sweet-cream-base-1`).
+**Known failures, stable:** nine `Estimated` timings (§5), one link to a
+recipe still in drafts (`peanut-butter-ice-cream` → `sweet-cream-base-1`),
+17 recipes with a leftover `QQ` placeholder (`test_no_qq_placeholder`,
+added 2026-08-02 — fine in `_food_drafts/`, not fine once published, and
+nobody had gone through the backlog yet as of this writing), and one
+reversed-bracket malformed link in `cherry-glaze.md`'s tagline
+(`test_typography`'s "reversed link brackets" case, same date — `(text)[...]`
+instead of `[text](...)`, spotted by Helen, deliberately left unfixed
+pending her own pass). All of these are Helen's to work through case by
+case, same as the `Estimated` timings — don't fix them unprompted.
 
 **Exactly three checks read `_food_drafts/`** — everything else is
 `_food_recipes/` only:
