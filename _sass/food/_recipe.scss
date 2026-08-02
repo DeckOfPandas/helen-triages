@@ -385,18 +385,17 @@ article.recipe {
 }
 
 // --- Note --------------------------------------------------------------------
-// Neutral, deliberately. This box used to be tinted spring green, with a green
-// rule and a green label — a fourth hue spent on a box that already announces
-// itself by being a box with the word "note" on it. The shape does the work;
-// the colour was only decoration, and the redesign is spending its colour on
-// the three section headings and the ingredient amounts instead.
+// Was a flat neutral mix (mix($color-border, $color-surface, 35%)), left that
+// way pending a proper answer — see DEV_JOBS_v24.md §1.8. Now shares the
+// metadata grid's own tint ($color-box-tint / $box-tint-opacity, both defined
+// above), so the two boxes read as the same device rather than the note being
+// an unrelated fainter grey next to the meta grid's violet.
 .note {
   position: relative;
   // font-family, font-weight, color, font-size, line-height inherited from article.recipe
   margin: $spacing-block-gap 0;
   padding: 1.1rem 1.4rem;
-  background-color: mix($color-border, $color-surface, 35%);   // left as it
-  // was pending a proper answer for this box — see DEV_JOBS_v24.md §1.8
+  background-color: rgba($color-box-tint, $box-tint-opacity);
   border-radius: $radius-sm;
 
   &::before {
