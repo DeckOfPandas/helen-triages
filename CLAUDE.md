@@ -23,3 +23,4 @@
 
 ## Normal workflow
 - Please do not try to write to /tmp. If you need a scratch temporary folder, create one here and add it to .gitignore
+- Don't delete handover or jobs list documents. I move these out myself to store elsewhere just in case, because they're not under version control.
