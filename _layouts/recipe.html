@@ -23,7 +23,7 @@ layout: default
   </div>
 
   {% if page.ingredient_groups %}
-    <div class="recipe-section--ingredients">
+    <div class="recipe-section-ingredients">
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">Ingredients</span>
       </h2>
@@ -74,7 +74,7 @@ layout: default
     {% unless step == "QQ" or step == "" or step == blank %}{% assign has_short = true %}{% endunless %}
   {% endfor %}
 
-  <div class="recipe-section--method">
+  <div class="recipe-section-method">
     <h2 class="recipe-section-heading">
       <span class="section-heading-text">Method</span>
       {% if has_short %}
@@ -135,7 +135,7 @@ layout: default
   {% endif %}
 
   {% if page.notes %}
-    <div class="recipe-section--notes" id="recipe-section-notes">
+    <div class="recipe-section-notes">
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">Notes</span>
       </h2>
