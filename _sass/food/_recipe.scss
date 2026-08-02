@@ -283,7 +283,13 @@ article.recipe a {
 // it.
 .btn-method-toggle {
   font-family: $font-body;
-  font-size: 0.75rem;
+  // Was 0.75rem with an underline -- Helen: "match the look of the short
+  // method link exactly to body links like Philosophy of Yum." A body link
+  // has no font-size of its own; it inherits article.recipe's own
+  // $font-size-body-sm. Using that token directly here, rather than a
+  // number picked to look close, is what makes this an exact match instead
+  // of an approximation.
+  font-size: $font-size-body-sm;
   font-weight: 600;
   text-transform: lowercase;
   letter-spacing: 0;
@@ -293,8 +299,6 @@ article.recipe a {
   padding: 0;
   cursor: pointer;
   transition: opacity 0.1s ease-in-out;
-  text-decoration: underline;
-  text-underline-offset: 2px;
   white-space: nowrap;
   position: absolute;
   right: 0;
