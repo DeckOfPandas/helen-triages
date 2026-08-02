@@ -323,6 +323,58 @@ generalises further (more recipes writing body content this way) is still
 open, but the pattern itself — raw HTML for peer headings, Method's reading
 width — is the decided shape, not provisional.
 
+### 4.2 A bullet list inside one method step
+
+Every `method:` step is markdownified (`_layouts/recipe.html`, same as
+tagline/tips/notes) — a multi-line YAML block scalar can embed a genuine
+markdown list inside a single step, not just one line of prose. Write it as
+`|`, blank-line-separated around the list so kramdown parses it as an actual
+list rather than folding it into the surrounding paragraph:
+
+```yaml
+method:
+  - |
+    Leave to cool at room temperature to your working temperature:
+
+    - Pouring/glazing: 32–35°C
+    - Drip cakes: 29–32°C
+    - Piping/filling: 20–24°C
+
+    Cool completely, then beat until light and fluffy.
+```
+
+This needed a real fix, not just a content change, to work at all:
+`.method-full li` was `display: flex` (number and step text as two flex
+items, side by side) — flex turns each run of inline content *and* a nested
+block-level `<ul>` into separate items laid out in a row, so a list inside a
+step would have rendered beside the step number instead of underneath the
+step's own text. `.method-full li` now uses `position: relative` +
+`position: absolute` on the `::before` number instead (`_recipe.scss`), the
+same technique `.recipe-body-content`'s numbered list and `.method-short`'s
+bullets already used — whatever a step contains, one line or a paragraph
+plus a list plus another paragraph, stacks normally underneath the number.
+
+**Nested `<li>`s must not increment the step counter.** `.method-full li`'s
+`counter-increment: step-counter` is a descendant selector — it matches a
+bullet nested inside a step too, unless overridden. `.method-full ul li`
+explicitly resets `counter-increment: none` (and the number-column
+padding/`::before`) for exactly this reason; break it and every step number
+after the first list-containing one goes wrong silently, since nothing
+fails loudly when a counter just increments an extra few times.
+
+Grouped methods add a second wrinkle: `.method-full li.method-group-
+heading-item ~ li.step` indents grouped steps by `$space-xxl`, and now has
+to compose that with the number column (`$method-step-number-column`)
+rather than replace it — `calc($space-xxl + $method-step-number-column)`
+for the padding, and the `::before`'s own `left` shifted to `$space-xxl` too
+(`position: absolute`'s `left` is relative to the li's padding *edge*, fixed
+at the border, so padding-left alone only moves where the text starts, never
+the number). Verified against `beef-wellington.md` (one of six recipes using
+`method_groups`) after this change, not assumed safe by inspection alone.
+
+`dark-chocolate-ganache.md`'s own cooling step is the first (only, as of
+2026-08-02) real example.
+
 ---
 
 ## 5. House style
@@ -743,6 +795,31 @@ Stylelint, a bundler, a CSS framework, schema.org/Recipe. Each was considered
 and declined for a stated reason — see `DEV_JOBS_v26.md` §3 if you want to
 reopen one, and argue against the recorded reason rather than proposing it
 fresh.
+
+**You will use `display: flex` for a simple two-part row, then break it the
+day one part needs more than one line of content.** `.method-full li` was
+flex (number, then step text) for exactly as long as every step was a single
+line — the day one needed a nested list (§4.2), flex turned the list into a
+third item laid out beside the number instead of underneath the text it
+belonged to. `position: relative` on the container + `position: absolute` on
+the generated number, the technique `.recipe-body-content`'s numbered list
+and `.method-short`'s bullets already used, doesn't have this failure mode:
+the number sits outside the element's own flow, so anything else inside —
+one line or several block-level children — stacks normally. Prefer this over
+flex for "a label plus arbitrary content" from the start, not just once
+something breaks it.
+
+**You will forget an element inherits from its parent when nesting inside a
+styled heading.** `.btn-method-toggle` sits inside `.recipe-section-heading`,
+which sets both `-webkit-text-stroke` and `text-shadow` (`punched()`) — both
+inherit by default, and neither was ever reset on the button, so it was
+picking up the parent's emboss effect on top of its own styling. Invisible
+in a casual look (dev tools shows inherited values in the same grey as
+irrelevant defaults) until Helen compared it side by side with a plain link
+and could tell something was different without being able to say what.
+Any interactive element nested inside a punched-tape heading needs explicit
+`-webkit-text-stroke: 0` and `text-shadow: none` unless it's actually meant
+to carry the effect too.
 
 ---
 
