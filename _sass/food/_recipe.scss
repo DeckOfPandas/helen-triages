@@ -394,11 +394,26 @@ article.recipe a {
   padding-left: $space-xxl;
 }
 
+// Number column (2.4rem, wide enough for two digits at 1.2rem) plus the gap
+// the old flex layout gave the number and the text (0.9rem) -- named so the
+// grouped-step rule below can compose with it instead of guessing the same
+// two numbers again.
+$method-step-number-column: 2.4rem + 0.9rem;
+
 // Method groups all live in one <ol>, so this is "every step after the first
 // group heading" — which is every step in a grouped method. The heading items
 // themselves are excluded and stay flush.
+//
+// Composes with the number column below rather than replacing it: a grouped
+// step needs BOTH the group indent and room for its own number. ::before's
+// own `left` has to move by the same amount too -- position: absolute's
+// `left` is relative to the li's padding edge (fixed at the border, not
+// wherever the content box happens to start), so padding-left alone only
+// moves where the TEXT starts, never the number.
 .method-full li.method-group-heading-item ~ li.step {
-  padding-left: $space-xxl;
+  padding-left: calc(#{$space-xxl} + #{$method-step-number-column});
+
+  &::before { left: $space-xxl; }
 }
 
 .method-full {
@@ -407,14 +422,27 @@ article.recipe a {
 
   li {
     counter-increment: step-counter;
+    position: relative;
+    // Was display: flex + gap -- couldn't survive a step containing a
+    // nested block-level list. Flex turns each run of inline content AND a
+    // nested <ul> into separate flex items laid out in a ROW, so a bullet
+    // sub-list within one step would render beside the number instead of
+    // underneath the step's own text. Helen: "there's a note for you in
+    // the ganache about bullet points [in a method step] -- work out
+    // formatting we can use on other pages." position: absolute (the same
+    // technique .recipe-body-content's numbered list and .method-short's
+    // bullets already use) keeps the number out of the li's own flow
+    // entirely, so whatever the step contains -- one line, or a paragraph
+    // plus a nested list plus another paragraph -- stacks normally.
+    padding-left: $method-step-number-column;
     margin-bottom: $space-xl;
     line-height: $line-height-body;
-    display: flex;
-    align-items: baseline;
-    gap: 0.9rem;
 
     &::before {
       content: counter(step-counter) ".";
+      position: absolute;
+      left: 0;
+      top: $space-xxs;  // nudge down to align with first line of body text
       font-family: $font-headings;
       font-weight: 700;
       color: $color-step-number;
@@ -424,21 +452,45 @@ article.recipe a {
       // tuned for 1.8rem and reads as a blob at 1.2rem.
       -webkit-text-stroke: $stroke-light;
       font-size: 1.2rem;
-      display: inline-block;
-      min-width: 2.4rem;   // wide enough for two digits at 1.4rem
-      flex-shrink: 0;
       line-height: 1.2;
-      margin-top: $space-xxs;  // nudge down to align with first line of body text
-      align-self: flex-start;
     }
   }
 
   li.method-group-heading-item {
     counter-increment: none;
-    display: block;
+    padding-left: 0;
     margin-bottom: $space-sm;
 
     &::before { content: none; }
+  }
+
+  // A step's text is markdownified (recipe.html), same as tips/notes/tagline
+  // -- so a multi-line YAML block scalar can embed a genuine markdown bullet
+  // list inside one step, the formatting Helen asked for. Undoes everything
+  // the outer li rule sets for any <li> that ends up nested inside one of
+  // these: no counter (it would otherwise increment the SAME step-counter
+  // and throw off every step number after it -- .method-full li's own
+  // counter-increment is a descendant selector, matching these too, unless
+  // overridden here), no number column, no absolutely-positioned ::before.
+  // A native bullet is exactly what a sub-item within a step needs.
+  //
+  // list-style: none is set on .method-full itself (".ingredients,
+  // .method-full { list-style: none; }" above) and inherits into any nested
+  // list by default -- list-style: disc here is a real override, not
+  // decoration.
+  ul {
+    list-style: disc;
+    padding-left: $space-lg;
+    margin: $space-sm 0;
+
+    li {
+      counter-increment: none;
+      position: static;
+      padding-left: 0;
+      margin-bottom: 0.3rem;
+
+      &::before { content: none; }
+    }
   }
 }
 
