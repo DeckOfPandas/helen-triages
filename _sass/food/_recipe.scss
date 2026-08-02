@@ -876,7 +876,9 @@ article.recipe .recipe-body-content {
 .ingredient-annotation,
 .step-annotation {
   display: block;
+  position: relative;
   margin-top: 0.25rem;
+  padding-left: 2.1rem;
   font-size: 0.82rem;
   font-style: italic;
   line-height: 1.45;
@@ -885,17 +887,21 @@ article.recipe .recipe-body-content {
   &--note { color: $color-clear-text; }
 }
 
-// A small hand-drawn sparkle before the annotation text — the same "here's an
-// aside" signal a paper recipe book gets from a felt-pen mark in the margin.
+// A hand-drawn sparkle in the gutter, sized to be unignorable rather than a
+// polite little bullet — the same "here's an aside" signal a paper recipe
+// book gets from a felt-pen mark in the margin, not a footnote asterisk.
+// Positioned absolutely (the site's established mark-in-a-gutter technique,
+// also used for step numbers) rather than inline, so padding-left indents
+// every wrapped line of the annotation text evenly, not just the first.
 // Magenta like the title rule and footer hearts: it's a decoration, not body
 // text, so it takes the raw hue rather than the darkened link/text variant.
 .annotation-mark {
-  display: inline-block;
-  width: 0.9em;
-  height: 0.9em;
-  margin-right: 0.3em;
+  position: absolute;
+  left: 0;
+  top: -0.15rem;
+  width: 1.6rem;
+  height: 1.6rem;
   color: $color-bright-magenta;
-  vertical-align: -0.1em;
 
   svg {
     display: block;
