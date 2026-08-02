@@ -132,9 +132,14 @@
     var slots = document.querySelectorAll('.annotation-mark');
     if (!slots.length) return;
 
-    var candidates = ['/doodles/arrow-indent-1.svg', '/doodles/arrow-indent-2.svg'];
+    var candidates = [
+      { file: '/doodles/arrow-indent-1.svg', modifier: 'annotation-mark--arrow-1' },
+      { file: '/doodles/arrow-indent-2.svg', modifier: 'annotation-mark--arrow-2' }
+    ];
     slots.forEach(function (slot, i) {
-      var url = HTF.siteAsset(candidates[i % candidates.length]);
+      var candidate = candidates[i % candidates.length];
+      slot.classList.add(candidate.modifier);
+      var url = HTF.siteAsset(candidate.file);
       if (!url) return;
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
     });

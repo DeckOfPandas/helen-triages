@@ -907,6 +907,14 @@ article.recipe .recipe-body-content {
   height: 1.2rem;
   color: $color-vibrant-violet;
 
+  // TEMPORARY, per the two-candidate comparison in decorations.js: arrow 2
+  // pulled an extra 1rem right, closer to the text, per Helen's request.
+  // Arrow 1 stays put — she's happy with its position as is. Fold back to a
+  // single unmodified rule once one candidate wins.
+  &--arrow-2 {
+    left: 1rem;
+  }
+
   svg {
     display: block;
     width: 100%;
