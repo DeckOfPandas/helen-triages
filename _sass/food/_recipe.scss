@@ -269,9 +269,10 @@ article.recipe {
 // so the heading sits in its own gutter and the group reads as a block.
 //
 // Adjacent-sibling selectors, so no markup changed. Safe because the template
-// only emits a group heading when there is more than one group, and all 18
-// multi-group recipes name every group — so there is no case where one group
-// indents and the next does not.
+// emits a group heading for every group once there is more than one — an
+// unnamed group falls back to "For the base:" (_layouts/recipe.html) rather
+// than rendering no heading, so there is no case where one group indents and
+// the next does not.
 .recipe-group-heading + .ingredients {
   padding-left: $space-xxl;
 }

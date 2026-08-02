@@ -37,11 +37,13 @@ layout: default
   {% endif %}
 
   {% for group in page.ingredient_groups %}
-    {% if multiple_ingredient_groups and group.name %}
+    {% if multiple_ingredient_groups %}
       {% if group.name == "to serve" %}
         <h3 class="recipe-group-heading">To serve:</h3>
-      {% else %}
+      {% elsif group.name %}
         <h3 class="recipe-group-heading">For the {{ group.name | downcase }}:</h3>
+      {% else %}
+        <h3 class="recipe-group-heading">For the base:</h3>
       {% endif %}
     {% endif %}
     <ul class="ingredients">
