@@ -37,12 +37,12 @@ article.recipe {
 
 // --- Cross-recipe links -------------------------------------------------
 // Covers every prose field a link can appear in: tagline, ingredient items/
-// tips/notes, method steps/tips/notes. Deliberately more specific than the
-// shared `a { color: $color-text }` (_sass/shared/_base.scss) so it wins
+// tips/notes, method steps/tips/notes, and (as of the .recipe-body-content
+// MVP pass below) long-form body content too -- one link style for the whole
+// page, no separate override left anywhere. Deliberately more specific than
+// the shared `a { color: $color-text }` (_sass/shared/_base.scss) so it wins
 // without needing !important — article.recipe + a beats a plain a on
-// specificity. Does NOT touch .recipe-body-content a (a separate, more
-// specific rule below, its own not-yet-designed area — see DEV_JOBS_v26.md
-// §1.2b), and re-declares :hover, because the base a:hover (-> $color-
+// specificity. Re-declares :hover, because the base a:hover (-> $color-
 // mood-root, the MOOD filter's cerulean) would otherwise win here on hover
 // even though it has lower specificity for everything else — a link that
 // changed to a completely unrelated hue on hover would be worse than the
@@ -111,7 +111,16 @@ article.recipe a {
   position: relative;
   color: $color-text;
   font-size: 1.8rem;
-  -webkit-text-stroke: $stroke-heavy;
+  // Raised label-tape lettering, matching the index's .category-label and the
+  // shared wordmark (HANDOVER_v26.md §13.4.1) -- was plain stroke, the same
+  // "scratched" look every other recipe-page heading below carries too, until
+  // now. Stroke width unchanged (still $stroke-heavy, this is still the
+  // heaviest text on the page); only the colour and the emboss shadow are new.
+  // Independent of overlapping-rule-double below: that mixin paints
+  // background-image only, so there's no property collision with the
+  // text-shadow punched() sets.
+  -webkit-text-stroke: $stroke-heavy $color-label-stroke;
+  @include punched(raised);
   padding: 0;
   @include overlapping-rule-double(
     $color-bright-magenta,
@@ -168,7 +177,10 @@ article.recipe a {
       font-size: 0.85rem;
       letter-spacing: $letter-spacing-label;
       color: $color-text;
-      -webkit-text-stroke: $stroke-light;
+      // Raised label-tape lettering (HANDOVER_v26.md §13.4.1) -- stroke width
+      // unchanged, colour and emboss shadow are new.
+      -webkit-text-stroke: $stroke-light $color-label-stroke;
+      @include punched(raised);
       margin-bottom: $space-xs;
     }
 
@@ -202,7 +214,13 @@ article.recipe a {
   font-size: 1.8rem;
   letter-spacing: 0.08em;
   color: $color-text;
-  -webkit-text-stroke: $stroke-medium;
+  // Raised label-tape lettering (HANDOVER_v26.md §13.4.1), same treatment as
+  // .category-label on the index and the shared wordmark. Stroke width
+  // unchanged ($stroke-medium was already the calibrated proportion for
+  // 1.8rem type, see §13.4.1's worked example); only the stroke colour and
+  // the emboss shadow are new.
+  -webkit-text-stroke: $stroke-medium $color-label-stroke;
+  @include punched(raised);
   position: relative;  // anchor for absolute-positioned method toggle
 
   // The horizontal padding that used to give the ragged brush shape room to
@@ -449,21 +467,40 @@ article.recipe a {
   }
 }
 
-// --- Body Content (long-form prose via {{ content }}) ----------------------
+// --- Body Content (long-form prose via {{ content }}) -----------------------
+// A recipe's Markdown body below its front matter -- rare (one file as of
+// 2026-08-02, dark-chocolate-ganache.md, see HANDOVER_v26.md §4.1) but real,
+// and never had a deliberate pass. This MVP treatment gives it the page's
+// established voice instead of reading like a generic content block bolted
+// on after Notes.
 article.recipe .recipe-body-content {
   margin-top: 0;
-  padding-top: $space-xl;
+  // Same gap as between any two major sections ($spacing-section-gap), not
+  // the smaller $space-xl it had before -- this needs to read as "a new
+  // section starts here", not "a bit more Notes".
+  padding-top: $spacing-section-gap;
 
+  // h2 matches .recipe-group-heading's voice (same size, colour, stroke,
+  // vertical rhythm) -- the closest existing precedent for "a labelled
+  // subdivision that isn't one of the three page-level landmarks". Raised
+  // label-tape lettering (HANDOVER_v26.md §13.4.1), same as every other
+  // recipe-page heading.
   h2 {
     @extend %heading-base;
-    font-size: 0.85rem;
+    font-size: 1rem;
     letter-spacing: $letter-spacing-label;
-    color: $color-clear-text;
-    margin: $space-xxl 0 $space-md 0;
+    color: $color-text;
+    -webkit-text-stroke: $stroke-light $color-label-stroke;
+    @include punched(raised);
+    margin: $spacing-block-gap 0 $space-md 0;
 
     &:first-child { margin-top: 0; }
   }
 
+  // h3 stays quieter and plain -- deliberately not raised label-tape. This
+  // creates the hierarchy: h2 is a labelled subdivision (branded like the
+  // rest of the page), h3 is a step down from that, the same relationship
+  // .recipe-group-heading has to .recipe-section-heading one level up.
   h3 {
     @extend %heading-base;
     font-size: 0.78rem;
@@ -474,12 +511,15 @@ article.recipe .recipe-body-content {
 
   p {
     // font-family, font-weight, color, font-size, line-height inherited from article.recipe
+    // max-width: 65ch comes from the shared `article.recipe p` rule in
+    // _layout.scss -- repeating it here was dead weight, not a fallback.
     margin: 0 0 $space-lg 0;
-    max-width: 65ch;
   }
 
   ul, ol {
     // font-family, font-weight, color, font-size, line-height inherited from article.recipe
+    // Not covered by the shared article.recipe p rule (lists only, not p),
+    // so this one earns its keep.
     padding-left: $space-xl;
     max-width: 65ch;
 
@@ -488,13 +528,9 @@ article.recipe .recipe-body-content {
 
   strong { font-weight: 700; }
 
-  a {
-    color: $color-clear-text;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-
-    &:hover { color: $color-mood-active; }
-  }
+  // No link colour/underline override here any more -- article.recipe a
+  // (above) covers it now, same rose treatment as every other cross-recipe
+  // link on the page. One link style, not two.
 }
 
 // --- Group Headings ----------------------------------------------------------
@@ -513,7 +549,10 @@ article.recipe .recipe-body-content {
   font-size: 1rem;
   letter-spacing: $letter-spacing-label;
   color: $color-text;
-  -webkit-text-stroke: $stroke-light;
+  // Raised label-tape lettering (HANDOVER_v26.md §13.4.1) -- stroke width
+  // unchanged, colour and emboss shadow are new.
+  -webkit-text-stroke: $stroke-light $color-label-stroke;
+  @include punched(raised);
   line-height: 1.4;
 }
 
