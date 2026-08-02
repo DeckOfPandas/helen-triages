@@ -35,6 +35,32 @@ article.recipe {
   line-height: $line-height-body;
 }
 
+// --- Cross-recipe links -------------------------------------------------
+// Covers every prose field a link can appear in: tagline, ingredient items/
+// tips/notes, method steps/tips/notes. Deliberately more specific than the
+// shared `a { color: $color-text }` (_sass/shared/_base.scss) so it wins
+// without needing !important — article.recipe + a beats a plain a on
+// specificity. Does NOT touch .recipe-body-content a (a separate, more
+// specific rule below, its own not-yet-designed area — see DEV_JOBS_v26.md
+// §1.2b), and re-declares :hover, because the base a:hover (-> $color-
+// mood-root, the MOOD filter's cerulean) would otherwise win here on hover
+// even though it has lower specificity for everything else — a link that
+// changed to a completely unrelated hue on hover would be worse than the
+// bug this is fixing.
+//
+// font-weight 600 rather than the article's base 300: the sans-serif body
+// font has real weight gradations (unlike Courier New, see §13.6 in
+// HANDOVER), so a heavier weight reads as "different and interactive"
+// without needing an underline too.
+article.recipe a {
+  color: $color-recipe-link;
+  font-weight: 600;
+
+  &:hover {
+    color: darken($color-recipe-link, 10%);
+  }
+}
+
 // --- Title -------------------------------------------------------------------
 // Left-aligned, was centred.
 // Centring is what made a two-line title read as two separate headings: two
