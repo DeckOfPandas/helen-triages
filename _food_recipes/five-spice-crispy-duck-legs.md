@@ -1,7 +1,7 @@
 ---
 title: Five-Spice Crispy Duck Legs
 short_name: Five-Spice Duck Legs
-tagline: "Scored duck legs crusted in five-spice. Good with [cherry glaze](../cherry-glaze/). QQ LINK DOESN'T RENDER AS A LINK, HERE AND EVERYWHERE"
+tagline: "Scored duck legs crusted in five-spice. Good with [cherry glaze](../cherry-glaze/)."
 source:
 serves: 4
 prep_time: "15 mins plus at least 8 hrs curing and 2 hrs flavouring"
