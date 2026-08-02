@@ -49,8 +49,12 @@ layout: default
         {% if item.item %}
           <li class="ingredient ingredient--annotated">
             {% if item.amount %}
-              <span class="ingredient-amount highlighted">
-                <span class="highlighter-slot" aria-hidden="true"></span>{{ item.amount }}</span>
+              {% assign amount_parts = item.amount | split: " " %}
+              {% assign amount_number = amount_parts[0] %}
+              {% assign amount_unit = amount_parts | slice: 1, 99 | join: " " %}
+              <span class="ingredient-amount">
+                <span class="ingredient-amount-number highlighted">
+                  <span class="highlighter-slot" aria-hidden="true"></span>{{ amount_number }}</span>{% if amount_unit != "" %} {{ amount_unit }}{% endif %}</span>
             {% endif %}
             {{ item.item | markdownify | remove: '<p>' | remove: '</p>' }}
             {% if item.tip %}<span class="ingredient-annotation ingredient-annotation--tip">{{ item.tip }}</span>{% endif %}

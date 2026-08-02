@@ -517,11 +517,17 @@ article.recipe .recipe-body-content {
 // Inline highlight behind the quantity portion of an ingredient line.
 // Highlighter blob injected by highlighter.js into .highlighter-slot.
 .ingredient-amount {
-  position: relative;
   display: inline;
-  padding: 0 0.25em 0 0.2em;
   margin-right: 0.15em;
   font-weight: 500;
+}
+
+// Only the number gets the highlighter, not the unit that follows it — the
+// number is the figure you need at a glance while cooking; the unit is
+// secondary. .highlighted (shared/_base.scss) supplies position: relative,
+// the positioning context the injected SVG needs.
+.ingredient-amount-number {
+  padding: 0 0.25em 0 0.2em;
 }
 
 // --- Ingredient and step annotations ----------------------------------------

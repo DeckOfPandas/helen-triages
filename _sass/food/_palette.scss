@@ -150,8 +150,12 @@ $color-step-number: $color-text;
 // .search--name and .logo-header — and none of them has contained a slot since
 // the index moved to the blocky rule (.logo-header had not existed for far
 // longer than that). A custom property nothing reads is not wiring.
+//
+// Default fill is aureolin — the ingredient-amount highlighter's actual
+// colour (see the recipe page's colour budget above) — not $color-text; the
+// one consumer left is the highlighter itself, not body text.
 .highlighted svg path {
-  fill: var(--highlighter-fill, #{$color-text});
+  fill: var(--highlighter-fill, #{$color-aureolin});
   fill-opacity: var(--highlighter-opacity, 1);
 }
 
