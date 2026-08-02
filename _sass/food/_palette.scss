@@ -6,8 +6,14 @@
 // Four swatches left this file on 2026-08-01 with the decorations that were
 // the only things reading them — pencil grey and the near-blacks the logo and
 // highlighter labels used. A swatch nothing chooses from is not a palette, it
-// is a paint chart. Vivid rose came back on 2026-08-02 for cross-recipe links
-// ($color-recipe-link below) — a new consumer, not the one it left with.
+// is a paint chart.
+//
+// $color-vivid-rose briefly came back on 2026-08-02 for cross-recipe links,
+// then was removed again the same day once Helen asked for links to be
+// magenta instead — reusing $color-bright-magenta-dark (already a link-ish
+// colour, "for toggle buttons etc.") rather than spending a fifth hue on a
+// job an existing one already does. The recipe page's colour budget stays
+// at four as a result; see the note below.
 $color-pure-lime-green:     #8AE800;
 $color-vibrant-violet:      #7734EA;
 $color-vivid-cerulean:      #00A7EA;
@@ -15,7 +21,6 @@ $color-aureolin:            #FAF100;
 $color-hot-orange:          #FF6B00;
 $color-bright-magenta:      #FF00C8;
 $color-medium-spring-green: #00FF9F;
-$color-vivid-rose:          #FF0061;
 $color-bright-magenta-dark: darken($color-bright-magenta, 12);   // ~#c4009a
 
 // --- Core Application Canvas -------------------------------------------------
@@ -101,16 +106,26 @@ $color-label-stroke:         lighten($color-text, 20%);
 // Added 2026-08-02: links were inheriting the shared a { color: $color-text }
 // (_sass/shared/_base.scss) — a link reading as plain body text is not
 // "more obvious", which is what Helen asked for after one nearly went
-// unnoticed. $color-vivid-rose raw measures 3.64:1 against $color-bg, short
-// of the 4.5:1 normal-text needs at any of the sizes a recipe link actually
-// appears at (0.82–0.95rem, all "normal", none clearing the large-text 3:1
-// exception). Measured, not guessed: darken 6% is the first percentage that
-// clears 4.5:1 at all (4.59:1), but that's a thin enough margin that manual
-// rounding could tip it under; darken 8% clears comfortably at 4.96:1 while
-// staying the closest to the raw hue's brightness of any value with real
-// headroom — the same "smallest value that clears, measured" approach as
-// $darken-active-lime above.
-$color-recipe-link: darken($color-vivid-rose, 8);
+// unnoticed. First answer was a new hue, $color-vivid-rose; same day,
+// Helen's actual preference turned out to be magenta -- reusing
+// $color-bright-magenta-dark, already doing this exact job for
+// .btn-method-toggle ("for toggle buttons etc."), rather than a fifth hue
+// for a job an existing one already covers. Both links and the short-method
+// toggle now share one base colour and one hover behaviour -- see
+// article.recipe a and .btn-method-toggle in _recipe.scss.
+//
+// Measured, not guessed, same method as the rose calculation this replaced:
+// raw $color-bright-magenta is 3.24:1 against $color-bg, short of the 4.5:1
+// normal-text needs at any size a recipe link appears at (0.82–0.95rem, all
+// "normal", none clearing the large-text 3:1 exception).
+// $color-bright-magenta-dark (darken 12%) already clears comfortably at
+// 5.26:1. Hover goes LIGHTER, per Helen's ask -- darken 8% (between the raw
+// hue and the resting link colour) is visibly lighter than the 12% base
+// while still reading as intentional rather than washed out, at 4.46:1 --
+// under 4.5 by a hair, acceptable for a transient hover state rather than
+// the resting colour text has to stay legible in permanently.
+$color-recipe-link: $color-bright-magenta-dark;
+$color-recipe-link-hover: darken($color-bright-magenta, 8);
 
 // --- Reusable Structural Accents ---------------------------------------------
 // Nested bullets in the short method. Was cerulean-mixed; re-based on spring
@@ -119,19 +134,21 @@ $color-recipe-link: darken($color-vivid-rose, 8);
 $color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
 
 // --- The recipe page's colour budget -----------------------------------------
-// After the 2026-07-31 redesign the recipe page spent FOUR colours, and the
-// count was the design. It was seven — rose, cerulean, orange, spring green,
+// After the 2026-07-31 redesign the recipe page spends FOUR colours, and the
+// count is the design. It was seven — rose, cerulean, orange, spring green,
 // violet, aureolin and pencil grey — which is where "two design languages at
-// once" came from. A fifth was spent on 2026-08-02, deliberately, for
-// $color-recipe-link — see below for why "colour is on what you navigate by"
-// was judged to include links (you navigate BY them, off the page).
+// once" came from. Cross-recipe links, added 2026-08-02, briefly looked like
+// a fifth ($color-vivid-rose) before Helen asked for magenta instead — which
+// meant reusing $color-bright-magenta-dark rather than spending a new hue.
+// The count stays at four.
 //
-//   1. $color-bright-magenta       the blocky rule under the title, the footer
-//                                  hearts, the method toggle
+//   1. $color-bright-magenta       the blocky rule under the title, the
+//                                  footer hearts, the short-method toggle,
+//                                  and (as $color-bright-magenta-dark, via
+//                                  $color-recipe-link) cross-recipe links
 //   2. $color-section-underline    the upper rule under the section names
 //   3. $color-section-underline-2  the lower rule under them
 //   4. $color-aureolin             the highlighter on ingredient amounts
-//   5. $color-recipe-link          cross-recipe links, wherever they appear
 //
 // Everything else is text, $color-clear-text or $color-border — the whole of
 // the method, the notes, the tips and the boxes are monochrome apart from a
@@ -141,12 +158,15 @@ $color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
 // you somewhere the way the rules and highlighter do, not because it's
 // prettier prose.
 //
-// Two things to know about the first four still apply: magenta is also
-// $color-star-root, accepted as a rhyme; 2 and 3 only ever appear TOGETHER,
-// inside one composite mark, so neither reads as meaning anything on its own.
-// Rose is unrelated to both — it doesn't rhyme with anything else on the page
-// and doesn't need to. If a SIXTH colour is ever proposed, that's the point
-// to stop and ask whether "colour, but more sparing" still means anything.
+// Magenta now carries three jobs at once (title rule, toggle, links) on top
+// of doubling as $color-star-root — all accepted as the same rhyme, not four
+// separate coincidences: it is the site's one "this is interactive/branded"
+// colour, and a link is exactly that. 2 and 3 only ever appear TOGETHER,
+// inside one composite mark, so neither reads as meaning anything on its
+// own. If a FIFTH colour is ever proposed, that's the point to stop and ask
+// whether an existing hue could do the job instead, the way magenta just
+// did — and only past that, whether "colour, but more sparing" still means
+// anything.
 
 // The two colours of the blocky rule under INGREDIENTS / METHOD / NOTES. Both
 // live here rather than in the template, which is the point: the brush wash

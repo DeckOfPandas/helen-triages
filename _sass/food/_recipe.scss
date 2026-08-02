@@ -56,8 +56,11 @@ article.recipe a {
   color: $color-recipe-link;
   font-weight: 600;
 
+  // Lighter on hover, not darker -- Helen's ask, and the opposite of the
+  // usual "darken for hover" instinct. $color-recipe-link-hover is measured
+  // for this specifically (see _palette.scss), not a generic lighten().
   &:hover {
-    color: darken($color-recipe-link, 10%);
+    color: $color-recipe-link-hover;
   }
 }
 
@@ -256,16 +259,23 @@ article.recipe a {
 
 // --- Method Toggle Button ----------------------------------------------------
 // Matches .btn-clear-inline on the index page: Courier, 0.75rem, weight 800, scratchy.
+// Sans-serif, weight 600, no stroke -- deliberately matching article.recipe
+// a exactly (Helen: "update the short method link to the sans serif font so
+// all links feel uniform"), not Courier's heading family. It no longer
+// shares anything with %heading-base (every property that extend supplied
+// was already being overridden below anyway), so the extend is gone too.
+// letter-spacing: 0 stays -- this button is a child of .recipe-section-
+// heading, which sets letter-spacing: 0.08em, and would otherwise inherit
+// it.
 .btn-method-toggle {
-  @extend %heading-base;
+  font-family: $font-body;
   font-size: 0.75rem;
-  font-weight: $weight-clear-font;
+  font-weight: 600;
   text-transform: lowercase;
   letter-spacing: 0;
-  -webkit-text-stroke: $stroke-medium;
   background: none;
   border: none;
-  color: $color-bright-magenta-dark;
+  color: $color-recipe-link;
   padding: 0;
   cursor: pointer;
   transition: opacity 0.1s ease-in-out;
@@ -277,7 +287,10 @@ article.recipe a {
   top: 50%;
   transform: translateY(-50%);
 
-  &:hover { opacity: 0.7; }
+  // Lighter on hover, same colour and direction as every other link on the
+  // page -- was opacity: 0.7, which is now only the .active (currently
+  // showing the short method) state's job.
+  &:hover { color: $color-recipe-link-hover; }
   &.active { opacity: 0.7; }
 }
 
