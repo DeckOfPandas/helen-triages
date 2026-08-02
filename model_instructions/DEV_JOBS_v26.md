@@ -106,13 +106,6 @@ Scaffold is in, deliberately empty — `HANDOVER_v26.md` §9 is the only record
 of what's known. Helen will paste 5–10 real cocktail recipes; front matter
 comes from what those actually need. **Do not design it top-down.**
 
-### 1.7 The note box needs its own background treatment
-
-Open since 2026-07-31. Matched to the metadata grid's tint, then split back
-off the same day — Helen's call, it wants something that isn't a fainter
-copy of the metadata tint, not decided yet. Currently the old neutral mix.
-Revisit once there's an actual direction, not just "not this."
-
 ---
 
 ## 2. Content passes
