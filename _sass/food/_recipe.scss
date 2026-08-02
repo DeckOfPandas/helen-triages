@@ -908,11 +908,19 @@ article.recipe .recipe-body-content {
   color: $color-vibrant-violet;
 
   // TEMPORARY, per the two-candidate comparison in decorations.js: arrow 2
-  // pulled an extra 1rem right, closer to the text, per Helen's request.
-  // Arrow 1 stays put — she's happy with its position as is. Fold back to a
-  // single unmodified rule once one candidate wins.
+  // pulled an extra 1rem right, closer to the text, per Helen's request, and
+  // now sized up (2rem x 1.75rem, vs arrow 1's 1.2rem square) since a bigger
+  // gesture reads better at this angle. top is recentred against a single
+  // line of annotation text (line-height 1.45 x font-size 0.82rem =~
+  // 1.19rem) now that the mark is taller than the text line it sits beside:
+  // (1.19 - 1.75) / 2 =~ -0.28rem. Arrow 1 stays put — she's happy with its
+  // position as is. Fold back to a single unmodified rule once one
+  // candidate wins.
   &--arrow-2 {
     left: 1rem;
+    top: -0.28rem;
+    width: 2rem;
+    height: 1.75rem;
   }
 
   svg {
