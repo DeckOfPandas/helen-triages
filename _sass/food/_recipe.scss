@@ -86,7 +86,10 @@ article.recipe a {
   position: relative;
   padding: 0;
   margin: 0;
-  font-size: 1.4rem;
+  // No font-size here -- the only content is the nested .recipe-title-text
+  // span below, which sets its own (larger) size. A font-size here would
+  // never render against anything; this h1 previously carried 1.4rem that
+  // did exactly that, unnoticed since 2026-07-09.
   letter-spacing: 0.04em;
   // 60% of the 900px column is 540px, which wraps the longest titles to three
   // lines. `text-wrap: balance` then keeps
@@ -110,12 +113,25 @@ article.recipe a {
   display: inline-block;
   position: relative;
   color: $color-text;
-  font-size: 1.8rem;
+  // Was 1.8rem -- identical to .recipe-section-heading below, since
+  // 2026-07-09 (the recipe page's very first redesign commit set both to
+  // 1.8rem in the same change). Same font, same weight, same transform (both
+  // extend %heading-base), so the title and a section heading rendered as
+  // the same size text -- unnoticed until today's punched-tape pass made
+  // both carry the same stroke+emboss treatment too, which is what made the
+  // collision visible. 2.2rem re-establishes the h1 as bigger than any h2 on
+  // the page. Titles wrap within max-width: 60% above, so a longer title now
+  // wraps to slightly more lines than before -- worth another look once
+  // real titles are in front of you.
+  font-size: 2.2rem;
   // Raised label-tape lettering, matching the index's .category-label and the
   // shared wordmark (HANDOVER_v26.md §13.4.1) -- was plain stroke, the same
   // "scratched" look every other recipe-page heading below carries too, until
-  // now. Stroke width unchanged (still $stroke-heavy, this is still the
-  // heaviest text on the page); only the colour and the emboss shadow are new.
+  // now. Stroke WIDTH unchanged (still $stroke-heavy) -- at the new, larger
+  // size that's a slightly lighter proportion than before (0.8px was 2.78% of
+  // 1.8rem, now 2.27% of 2.2rem), which if anything moves it closer to the
+  // ~2.1-2.3% the rest of the page's punched lettering is calibrated to,
+  // rather than away from it. Only the colour and the emboss shadow are new.
   // Independent of overlapping-rule-double below: that mixin paints
   // background-image only, so there's no property collision with the
   // text-shadow punched() sets.
