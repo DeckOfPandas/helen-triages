@@ -9,7 +9,7 @@ layout: default
     </h1>
   </div>
 
-  {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline }}</p>{% endif %}
+  {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
   <ul class="recipe-meta">
     {% if page.serves %}<li><strong>Serves</strong><span>{{ page.serves }}</span></li>{% endif %}
@@ -59,7 +59,7 @@ layout: default
                   <span class="highlighter-slot" aria-hidden="true"></span>{{ amount_number }}</span>{% if amount_unit != "" %} {{ amount_unit }}{% endif %}</span>
             {% endif %}
             {{ item.item | markdownify | remove: '<p>' | remove: '</p>' }}
-            {% if item.tip %}<span class="ingredient-annotation ingredient-annotation--tip">{{ item.tip }}</span>{% endif %}
+            {% if item.tip %}<span class="ingredient-annotation ingredient-annotation--tip">{{ item.tip | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
             {% if item.note %}<span class="ingredient-annotation ingredient-annotation--note">{{ item.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
           </li>
         {% else %}
@@ -99,12 +99,12 @@ layout: default
         {% for step in group.steps %}
           {% if step.step %}
             <li class="step step--annotated">
-              {{ step.step }}
-              {% if step.tip %}<span class="step-annotation step-annotation--tip">{{ step.tip }}</span>{% endif %}
-              {% if step.note %}<span class="step-annotation step-annotation--note">{{ step.note }}</span>{% endif %}
+              {{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}
+              {% if step.tip %}<span class="step-annotation step-annotation--tip">{{ step.tip | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
+              {% if step.note %}<span class="step-annotation step-annotation--note">{{ step.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
             </li>
           {% else %}
-            <li class="step">{{ step }}</li>
+            <li class="step">{{ step | markdownify | remove: '<p>' | remove: '</p>' }}</li>
           {% endif %}
         {% endfor %}
       {% endfor %}
@@ -115,12 +115,12 @@ layout: default
       {% for step in steps %}
         {% if step.step %}
           <li class="step step--annotated">
-            {{ step.step }}
-            {% if step.tip %}<span class="step-annotation step-annotation--tip">{{ step.tip }}</span>{% endif %}
-            {% if step.note %}<span class="step-annotation step-annotation--note">{{ step.note }}</span>{% endif %}
+            {{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}
+            {% if step.tip %}<span class="step-annotation step-annotation--tip">{{ step.tip | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
+            {% if step.note %}<span class="step-annotation step-annotation--note">{{ step.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
           </li>
         {% else %}
-          <li class="step">{{ step }}</li>
+          <li class="step">{{ step | markdownify | remove: '<p>' | remove: '</p>' }}</li>
         {% endif %}
       {% endfor %}
     </ol>
