@@ -16,8 +16,8 @@
 - Prod Server: `jekyll-prod`, deploying to localhost:4002
 
 ## Git workflow
-- Before creating a new branch, checkout main and `git pull origin main` first.
-- Ask for confirmation before creating a new branch — wait for my go-ahead.
+- If we're starting new work, and we're currently on main, please check out a new branch.
+- Before creating a new branch, `git pull origin main` first in case Helen has forgotten to.
 - Commit freely without asking.
 - Never `git push` without my explicit confirmation first.
 

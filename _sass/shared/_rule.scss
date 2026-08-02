@@ -1,0 +1,47 @@
+// =============================================================================
+// PUNCHED TAPE — letters that sit slightly proud of the surface
+// =============================================================================
+// Moved here from food/_rule.scss on 2026-08-02 (unchanged, just moved) so the
+// shared header wordmark can use it — HELEN TRIAGES and the bracketed site
+// word both carry it now, on both sites. A mixin is only visible to partials
+// imported AFTER the one that defines it, and shared/_layout.scss (where the
+// wordmark lives) is imported by both food.scss and cocktails.scss BEFORE
+// either site's own partials — so the mixin had to move to something both
+// import that early, not stay food-only. It depends only on $color-bg and
+// $color-text, which the palette CONTRACT guarantees every site defines
+// (HANDOVER §2.3), so nothing about it actually assumed food to begin with.
+//
+// Helen's device, and the instinct is right: a label-maker letter reads as
+// raised because it catches light on one edge and drops a shadow on the
+// other.
+//
+// THE MECHANISM MATTERS, THOUGH, AND IT IS NOT THE STROKE. `-webkit-text-stroke`
+// is identical on every side of the glyph, and a uniform outline cannot say
+// which way the light is coming from. A slightly lighter stroke gives a soft
+// EDGE, which reads as "detached from the background" — genuinely nice — but
+// never as "raised", because there is no direction in it. Depth is a claim
+// about a light source.
+//
+// `text-shadow` can make that claim: two offset copies of the glyph, a light one
+// up-and-left where the light falls and a darker one down-and-right where it
+// does not. No blur — a hard offset reads as a crisp edge of a physical thing,
+// a blurred one reads as a drop shadow floating above the page, which is the
+// opposite of what a punched letter does.
+//
+// The two are separable dials and compose: the stroke sets the WEIGHT of the
+// edge, the shadow sets its DIRECTION. Turn either off independently.
+$emboss-offset: 1px;                            // hard, not blurred
+$color-emboss-light:  $color-bg;                // the paper catching the light
+$color-emboss-shadow: rgba($color-text, 0.38);  // where it does not
+
+// $style: raised   letters standing proud of the tape  (light from top-left)
+//         pressed  letters punched down into it        (the same light, inverted)
+@mixin punched($style: raised) {
+  @if $style == raised {
+    text-shadow: (-$emboss-offset) (-$emboss-offset) 0 $color-emboss-light,
+                 $emboss-offset    $emboss-offset    0 $color-emboss-shadow;
+  } @else {
+    text-shadow: $emboss-offset    $emboss-offset    0 $color-emboss-light,
+                 (-$emboss-offset) (-$emboss-offset) 0 $color-emboss-shadow;
+  }
+}

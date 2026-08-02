@@ -10,10 +10,12 @@
 // anything it likes. Nothing in shared/ imports anything from food/.
 @import "food/palette";
 @import "shared/tokens";
+// The punched-tape mixin, before shared/layout — the wordmark uses it, and a
+// mixin must be defined before the partial that calls it.
+@import "shared/rule";
 @import "shared/base";
 @import "shared/layout";
-// The blocky rule, before food/layout — the index uses its mixin, and a mixin
-// must be defined before the partial that calls it.
+// The blocky rule, before food/layout — the index uses its mixin, same reason.
 @import "food/rule";
 @import "food/layout";
 @import "food/recipe";

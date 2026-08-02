@@ -91,14 +91,41 @@ main {
   }
 }
 
+// How far past the tape's CORE (see .site-logo-tape below) the tape graphic
+// itself is allowed to extend on each side. Small deliberately, and trimmed
+// smaller again on Helen's request (was 1.5rem, then 0.5rem): the current
+// tape SVGs are a single near-rectangular polygon with no separate corner
+// geometry (see HANDOVER §13 for why that's next up for a redesign), so any
+// protrusion here is currently just "more of the same plain tape" rather than
+// a distinct corner tab — the closer this sits to zero, the closer the tape
+// hugs the lettering rather than reading as a placeholder gap. One value,
+// shared by both sites' .tape-bg — food and cocktails were never sized
+// independently here, so "make cocktails' shorter, then match food to it"
+// is already just this one number changing.
+$tape-protrusion: 0.2rem;
+
+// The CORE (what .tape-bg's protrusion is measured from) is whichever of the
+// two rows is naturally wider, not always HELEN TRIAGES. Both
+// .site-logo-top and .site-logo-tape report their own natural width to the
+// SAME grid column (grid-template-columns: max-content takes the max across
+// every item placed in it) and neither is forced to any other width, so the
+// column — and with it the tape's core — becomes exactly as wide as whichever
+// line actually needs more room. On food that's still HELEN TRIAGES, same as
+// before. On cocktails it's "[ COCKTAILS ]", which is why that word can stay
+// at food's own 2.5rem instead of needing its own smaller size — see
+// .site-logo-word below for why that used to be impossible.
 .site-logo {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0rem;
+  display: inline-grid;
+  grid-template-columns: max-content;
+  justify-items: center;
 }
 
 .site-logo-top {
+  grid-column: 1;
+  width: max-content;
+  max-width: 92vw;   // mobile safety net — see .site-logo-tape's old comment;
+                      // it's the text now driving the width, so the cap moved
+                      // to the text
   font-family: $font-headings;
   font-size: 2rem;
   font-weight: 1000;
@@ -106,29 +133,49 @@ main {
   color: $color-text;
   -webkit-text-stroke: 1.2px rgba(50,50,50,0.9);
   text-transform: uppercase;
-  padding-right: 0.18em;
+  // NOT padding-right: 0.18em, deliberately -- that was here before and it's
+  // why HELEN TRIAGES visibly shifted right on cocktails. letter-spacing adds
+  // a trailing gap after the LAST character too (same trap the recipe
+  // title's rule already documents), so this box's own max-content width
+  // already runs slightly past the visible glyphs. Matching padding-right on
+  // top of that doesn't compensate, it doubles the same bias. Harmless while
+  // this box always defined its own column (food), visible the moment
+  // something else (cocktails' wider word) does instead -- the box gets
+  // centered in extra space and the built-in right-bias becomes a shift.
+  @include punched(raised);
 }
 
 .site-logo-tape {
+  grid-column: 1;
+  // No explicit width here — deliberately. An earlier version set width:100%,
+  // which pins the core to HELEN TRIAGES no matter what, and that's exactly
+  // what made "[ COCKTAILS ]" at food's height impossible: 13 characters at
+  // 2.5rem is wider than HELEN TRIAGES's 13 characters at 2rem, so it could
+  // only ever fit by shrinking. Leaving width unset lets .site-logo-tape
+  // report ITS OWN natural size (the word plus its padding, both in em so
+  // they scale with the word's own font-size — see .site-logo-word) to the
+  // grid column instead, same as .site-logo-top does above, and the column
+  // takes whichever is bigger.
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transform: rotate(-1.75deg);
   transform-origin: center center;
-  // min() rather than a plain 425px: on a phone this was the one element on the
-  // site wide enough to force horizontal scroll. 92vw rather than 100vw because
-  // the rotation makes the rendered bounding box slightly wider than the
-  // declared width, and horizontal scroll is the most visible mobile failure
-  // there is. No media query needed.
-  width: min(425px, 92vw);
   height: 70px;
   margin-top: -$space-lg;  // pull it up toward HELEN TRIAGES
 
-
   .tape-bg {
     position: absolute;
-    inset: 0;
+    left: 50%;
+    top: 0;
+    // min(..., 92vw): same mobile safety net the old fixed-425px version had
+    // — rotation (above) makes the rendered bounding box slightly wider than
+    // the declared width, and this is the one element that has previously
+    // forced horizontal scroll on a phone.
+    width: min(calc(100% + #{$tape-protrusion * 2}), 92vw);
+    transform: translateX(-50%);
+    height: 100%;
     z-index: 0;
 
     svg {
@@ -139,6 +186,14 @@ main {
   }
 }
 
+// Same size on both sites now — 2.5rem, food's original height, applies to
+// "[ COCKTAILS ]" unchanged. Padding is em, not the earlier version's 13%:
+// percentage padding resolves against the CONTAINING block's width, but
+// .site-logo-tape's width is now itself derived FROM this element's content
+// (see above) — a percentage here would be circular, sized against a number
+// that's trying to size itself off this element. em has no such problem, and
+// scales with this element's own font-size same as the percentage used to
+// scale with the tape's.
 .site-logo-word {
   position: relative;
   z-index: 1;
@@ -151,7 +206,9 @@ main {
   text-transform: uppercase;
   text-align: center;
   line-height: 1;
-  padding: 0 13%;
+  padding: 0 1.4em;
+  white-space: nowrap;
+  @include punched(raised);
 
   .site-logo-bracket {
     letter-spacing: 0;

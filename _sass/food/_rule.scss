@@ -9,8 +9,12 @@
 //
 // The device is no longer the recipe page's alone, so this file has no business
 // naming a page. Anything below that is specific to one page belongs back in
-// that page's partial. The punched-tape mixin at the bottom is here for the
-// same reason: two partials want it and neither imports the other.
+// that page's partial.
+//
+// The punched-tape mixin used to live at the bottom of this file for the same
+// reason (two food partials wanted it, neither imported the other) but moved
+// to shared/_rule.scss on 2026-08-02 once the shared header wordmark started
+// using it too — see that file for the mechanism and why it had to move.
 // =============================================================================
 
 // A saturated bar overlapping the base of a heading with the lettering in front
@@ -136,42 +140,4 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   background-position:
     #{$rule-under-indent} #{$rule-under-drop},
     #{$rule-indent}       #{$rule-drop};
-}
-
-
-// =============================================================================
-// PUNCHED TAPE — letters that sit slightly proud of the surface
-// =============================================================================
-// Helen's, and the instinct is right: a label-maker letter reads as raised
-// because it catches light on one edge and drops a shadow on the other.
-//
-// THE MECHANISM MATTERS, THOUGH, AND IT IS NOT THE STROKE. `-webkit-text-stroke`
-// is identical on every side of the glyph, and a uniform outline cannot say
-// which way the light is coming from. A slightly lighter stroke gives a soft
-// EDGE, which reads as "detached from the background" — genuinely nice, and
-// what the site wordmark already does — but never as "raised", because there is
-// no direction in it. Depth is a claim about a light source.
-//
-// `text-shadow` can make that claim: two offset copies of the glyph, a light one
-// up-and-left where the light falls and a darker one down-and-right where it
-// does not. No blur — a hard offset reads as a crisp edge of a physical thing,
-// a blurred one reads as a drop shadow floating above the page, which is the
-// opposite of what a punched letter does.
-//
-// The two are separable dials and compose: the stroke sets the WEIGHT of the
-// edge, the shadow sets its DIRECTION. Turn either off independently.
-$emboss-offset: 1px;                            // hard, not blurred
-$color-emboss-light:  $color-bg;                // the paper catching the light
-$color-emboss-shadow: rgba($color-text, 0.38);  // where it does not
-
-// $style: raised   letters standing proud of the tape  (light from top-left)
-//         pressed  letters punched down into it        (the same light, inverted)
-@mixin punched($style: raised) {
-  @if $style == raised {
-    text-shadow: (-$emboss-offset) (-$emboss-offset) 0 $color-emboss-light,
-                 $emboss-offset    $emboss-offset    0 $color-emboss-shadow;
-  } @else {
-    text-shadow: $emboss-offset    $emboss-offset    0 $color-emboss-light,
-                 (-$emboss-offset) (-$emboss-offset) 0 $color-emboss-shadow;
-  }
 }
