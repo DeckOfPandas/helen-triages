@@ -6,7 +6,7 @@ source: "Adapted from Good Food, August 2024"
 serves: 4
 prep_time: "20 mins plus marinating"
 cook_time: "1 hr"
-main_ingredients: ["chicken thighs", "coconut cream", lemongrass, lime, cinnamon, cardamom, galangal, tamarind, "macadamia nuts"]
+main_ingredients: ["chicken thighs", "coconut cream", lemongrass, lime, cinnamon, cardamom, galangal, tamarind, "macadamia nuts", "lime leaves", "coconut palm sugar"]
 star_ingredient: poultry
 tags: [fakeaway, freezable, "make-ahead", "one-handed food"]
 ingredient_groups:

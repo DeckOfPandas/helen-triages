@@ -319,7 +319,14 @@ recipe. No cap.
 
 **Savoury — substitution test.** Not "would this fail" but "would I improvise
 around a gap": the protein, the liquid/fat that defines the character, anything
-you'd have to go buy, the vegetable that's the point. Cap at eight.
+you'd have to go buy, the vegetable that's the point. Cap at eight. **Not
+mechanically enforced** — no test checks the count, so a recipe with a
+spice-heavy ingredient list can go over deliberately, case by case, rather
+than being forced to cut something that genuinely fails the substitution
+test. `indonesian-chicken-curry-gulai-ayam.md` sits at 11, Helen's explicit
+call on 2026-08-02: everything in it is a "would have to specifically go
+buy" ingredient, so nothing was a good candidate to cut. Don't flag this one
+as a violation to fix.
 
 **Cheeses** use the bare name where it stands alone (cheddar, feta, comté) —
 keep "cheese" only where the qualifier is meaningless without it (blue cheese,
