@@ -132,8 +132,13 @@ def test_internal_recipe_links_resolve(recipe):
 
 
 def test_no_claude_markers_left(recipe):
-    """`QQ CLAUDE ...` markers are instructions to me, not content."""
-    markers = re.findall(r"QQ\s+CLAUDE[^\"\n]*", recipe.raw)
+    """A note addressed to me is an instruction for a future session, not
+    content ready to publish -- in any form, not just the "QQ CLAUDE ..."
+    one this test used to be scoped to. Broadened 2026-08-02 after a bare
+    "CLAUDE, I'd like bullet points here" note (no QQ prefix) slipped
+    through undetected in dark-chocolate-ganache.md.
+    """
+    markers = re.findall(r"[^\"\n]{0,10}\bCLAUDE\b[^\"\n]{0,40}", recipe.raw)
     assert not markers, (
         f"{where(recipe)} still contains marker(s) {markers}. "
         f"These are instructions left for a future session and should be "
