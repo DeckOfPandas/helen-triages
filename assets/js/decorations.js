@@ -118,18 +118,24 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Annotation marks — a small hand-drawn sparkle beside each ingredient/step
+  // Annotation marks — a small hand-drawn mark beside each ingredient/step
   // tip or note. One asset, no shuffling: unlike the highlighters, these are
   // meant to read as a consistent, recognisable "here's an aside" signal
   // rather than page-to-page variety.
+  //
+  // TEMPORARY: alternating between the two candidate arrows Helen supplied
+  // (2026-08-03) so both are visible in situ on any page with 2+ annotations,
+  // for comparison against the sparkle. Collapse to a single asset once she
+  // picks — see arrow-indent-1.svg / arrow-indent-2.svg in doodles/.
   // ---------------------------------------------------------------------------
   function annotationMarks() {
     var slots = document.querySelectorAll('.annotation-mark');
     if (!slots.length) return;
 
-    var url = HTF.siteAsset('/doodles/doodle-sparkles.svg');
-    if (!url) return;
-    slots.forEach(function (slot) {
+    var candidates = ['/doodles/arrow-indent-1.svg', '/doodles/arrow-indent-2.svg'];
+    slots.forEach(function (slot, i) {
+      var url = HTF.siteAsset(candidates[i % candidates.length]);
+      if (!url) return;
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
     });
   }
