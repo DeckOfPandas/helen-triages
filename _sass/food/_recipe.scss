@@ -536,8 +536,15 @@ article.recipe .recipe-body-content {
 // wrapped the full "400 g" (the whole run shifted together, so nothing beside
 // it to compare against); became visible the moment only the number sat in
 // the flex box next to a plain-text unit at the correct baseline.
+// No right padding: the injected highlighter SVG has a fixed few-px overflow
+// baked into every highlighters/*.svg asset (position:absolute; left:-4px;
+// width:calc(100% + 8px)), independent of this box's own size. Right padding
+// here just added more box for that fixed overflow to bleed past, painting
+// over the space before the unit and touching it. margin-right instead sits
+// outside the box the SVG paints into, so it isn't touched by the overflow.
 .ingredient-amount-number {
-  padding: 0 0.25em 0 0.2em;
+  padding: 0 0 0 0.2em;
+  margin-right: 0.15em;
   align-items: baseline;
 }
 
