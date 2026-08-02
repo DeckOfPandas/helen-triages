@@ -35,31 +35,23 @@ glance, and that's only ever been judged on a desktop monitor. In order:
   the `max-width: 92vw` caps actually prevent horizontal scroll on a real
   narrow device rather than just in the maths.
 
-### 1.2 Deploy — two things block it now, not one
+### 1.2 Deploy — the Actions workflow
 
-**a) The Actions workflow.** Written 2026-08-02 on branch
-`chore/deploy-github-pages` (`.github/workflows/build-and-deploy.yml`) — not
-yet merged or pushed; paused mid-session so Helen could fix design bugs
-first. **GitHub Actions** (`bundle exec jekyll build`), not native GitHub
-Pages build — keeps Jekyll at 4.3 (`test_gemfile_does_not_pin_jekyll_
-backwards` already assumes this). Native build pins Jekyll to 3.9. When
-picked back up: push the branch, merge to `main`, set Settings → Pages →
-Source → "GitHub Actions", and watch the first run together in the Actions
-tab, as agreed with Helen up front (she hasn't deployed this site before).
+Written 2026-08-02 on branch `chore/deploy-github-pages`
+(`.github/workflows/build-and-deploy.yml`) — not yet merged or pushed;
+paused mid-session so Helen could fix design bugs first. **GitHub Actions**
+(`bundle exec jekyll build`), not native GitHub Pages build — keeps Jekyll
+at 4.3 (`test_gemfile_does_not_pin_jekyll_backwards` already assumes this).
+Native build pins Jekyll to 3.9. When picked back up: push the branch,
+merge to `main`, set Settings → Pages → Source → "GitHub Actions", and
+watch the first run together in the Actions tab, as agreed with Helen up
+front (she hasn't deployed this site before).
 
 Repo rename to `helen-triages` and `origin` repoint are already done; `url:`
 in `_config.yml` already confirmed to match the GitHub username.
 
-**b) MVP styling for arbitrary recipe body content.** Added 2026-08-02 —
-Helen's own call, on remembering that `dark-chocolate-ganache.md` carries a
-substantial hand-written Tips/Troubleshooting section via `{{ content }}`
-(see `HANDOVER_v26.md` §4.1) that's never had a deliberate design pass.
-Baseline rules exist (`.recipe-body-content` in `_sass/food/_recipe.scss`
-covers headings/paragraphs/lists/links) but were never treated as a
-first-class page element the way the rest of the recipe page has been.
-Whether this pattern continues (more free-form sections written this way) or
-these get split into standalone blog-post-style pages is **undecided** —
-revisit once there's more than the one example to generalise from.
+(MVP styling for recipe body content, previously listed here as a second
+blocking item, is done — see `HANDOVER_v26.md` §4.1.)
 
 ### 1.3 The tape SVG itself needs a redesign — conversation parked mid-2026-08-02, pick it back up
 

@@ -272,13 +272,56 @@ recipe.html` renders it verbatim (`{{ content }}`) inside `.recipe-body-
 content`, between Notes and the source footer, if it's non-empty. As of
 2026-08-02 exactly one file uses this, of ~370 recipes and drafts combined:
 `dark-chocolate-ganache.md` carries a substantial hand-written Tips and
-Troubleshooting section this way. Baseline styling exists
-(`.recipe-body-content` in `_sass/food/_recipe.scss` — headings, paragraphs,
-lists, links) but has never had a deliberate design pass; **MVP styling for
-this is now a deploy-blocking job**, see `DEV_JOBS_v26.md` §1.2b. Whether
-this pattern continues or these sections get split into standalone
-blog-post-style pages instead is Helen's open call, undecided as of this
-writing.
+Troubleshooting section this way.
+
+**Decided 2026-08-02: this content continues the recipe, it does not become
+a blog post.** Helen considered three options — style it as a blog post with
+its own title; treat it as more recipe sections; or move it to a standalone
+page (which she does want eventually, for genuinely cross-recipe reference
+material like meat temperatures or food sustainability, but that's a
+different problem: reference material multiple recipes would link *to*,
+versus content that only makes sense in the context of one specific recipe).
+Her call, "least jar": section headings in body content are now **peers of
+INGREDIENTS/METHOD/NOTES**, not a quieter sub-level treatment — same size,
+same punched-tape mark, same `$spacing-section-top` rhythm as the rest of
+the page.
+
+**Peer headings need raw HTML, not `## Heading`.** Kramdown gives a plain
+markdown heading no class and no nested span, and `.recipe-section-heading`
+needs both — the span is what `overlapping-rule-double`'s background hugs.
+Write the exact markup `_layouts/recipe.html` generates directly in the body
+instead, blank-line-separated above and below so kramdown still parses the
+surrounding markdown as markdown rather than folding it into the HTML block:
+
+```
+<h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
+
+- A bullet list here parses as normal markdown again.
+```
+
+A subtitle directly under a peer heading (ganache's own "a.k.a. ganache is
+the worst", split out of the heading text itself so TROUBLESHOOTING reads
+clean) is `<p class="recipe-section-subtitle">`, same raw-HTML approach,
+placed right after the heading with no blank line between them. A bare `##
+Heading` still gets a sane fallback (`.recipe-body-content h2
+:not(.recipe-section-heading)` in `_recipe.scss`) rather than unstyled
+browser default, but it will not match the rest of the page — that
+mismatch is what peer status is for, not a bug to fix if you see it.
+
+**Reading width matches Method, not Notes.** Body content's `p`/`ul`/`ol`
+used to inherit the shared `article.recipe p { max-width: 65ch }`
+(`_layout.scss`) — the same cap Notes uses, only because both happen to be
+plain `<p>` tags, not because anyone decided body content should read at
+Notes' width. Helen's call: match Method instead, which has no cap at all.
+`.recipe-body-content p` now sets `max-width: none` to override the shared
+rule; `ul`/`ol` were never covered by it and just don't set one.
+
+MVP styling for this area is done (`DEV_JOBS_v26.md`'s former §1.2b, closed
+2026-08-02) — headings and width match the rest of the page now, this isn't
+a placeholder pending a "real" pass. Whether the peer-heading pattern
+generalises further (more recipes writing body content this way) is still
+open, but the pattern itself — raw HTML for peer headings, Method's reading
+width — is the decided shape, not provisional.
 
 ---
 
