@@ -11,6 +11,10 @@
 // _sass/root/_palette.scss — the same contract every site palette owes.
 @import "root/palette";
 @import "shared/tokens";
+// The punched-tape mixin, before shared/layout — the wordmark uses it, and a
+// mixin must be defined before the partial that calls it. Same reason
+// food.scss and cocktails.scss import it in the same relative position.
+@import "shared/rule";
 @import "shared/base";
 @import "shared/layout";
 @import "root/landing";

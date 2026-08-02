@@ -1,18 +1,31 @@
 // =============================================================================
-// HELEN TRIAGES COCKTAILS — DECORATION. EMPTY ON PURPOSE.
+// HELEN TRIAGES COCKTAILS — DECORATION. MOSTLY EMPTY ON PURPOSE.
 // =============================================================================
 // Food's decorative layer is watercolour brush washes, torn tape, scribbled
 // underlines and doodles, injected as SVG by assets/js/decorations.js and
 // assets/js/heading-underline.js from assets/img/food/.
 //
-// Cocktails has none of that drawn yet, and the scaffold does not fake it:
-//   - _data/sites.yml omits `tape` and `footer_svg` for cocktails, so no fetch
-//     is attempted and the console stays clean. An absent key means "nothing to
-//     draw"; a present key pointing at a missing file means a 404 and a warning.
-//   - assets/img/cocktails/ exists and is empty.
+// Cocktails has none of that drawn for itself yet, and the scaffold does not
+// fake it — footer_svg is still omitted from _data/sites.yml, so no fetch is
+// attempted for that and the console stays clean.
 //
-// When artwork arrives it goes in assets/img/cocktails/, the keys go back into
-// _data/sites.yml, and the styling for it goes here. Colour comes from
-// _sass/cocktails/_palette.scss and nowhere else — the same rule food follows,
-// and the reason SVGs use currentColor rather than baked-in fills.
+// The ONE exception, added 2026-08-02 at Helen's explicit call: `tape` in
+// _data/sites.yml now points at a direct COPY of food's tape-*.svg files
+// (assets/img/cocktails/tape/), reused as a placeholder rather than left
+// blank, "for now". When cocktails gets its own tape artwork, swap the files
+// in that directory and this override stays valid — nothing here assumes
+// which SVG is behind it.
+//
+// When more artwork arrives it goes in assets/img/cocktails/, the keys go
+// back into _data/sites.yml, and the styling for it goes here. Colour comes
+// from _sass/cocktails/_palette.scss and nowhere else — the same rule food
+// follows, and the reason SVGs use currentColor rather than baked-in fills.
+//
+// NO font-size override for "[ COCKTAILS ]" here, deliberately — an earlier
+// version of this file shrank it to 1.5rem to fit a tape core pinned to
+// HELEN TRIAGES's width. shared/_layout.scss no longer pins the core that
+// way (it's whichever of the two rows is naturally wider), so "[ COCKTAILS ]"
+// stays at food's own 2.5rem and the tape widens for it instead. If this
+// file ever needs a wordmark override again, check whether that mechanism
+// changed before reintroducing one.
 // =============================================================================

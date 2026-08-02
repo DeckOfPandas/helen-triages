@@ -13,6 +13,10 @@
 // it is not sketched in advance.
 @import "cocktails/palette";
 @import "shared/tokens";
+// The punched-tape mixin, before shared/layout — the wordmark uses it, and a
+// mixin must be defined before the partial that calls it. Same reason food.scss
+// imports it in the same relative position.
+@import "shared/rule";
 @import "shared/base";
 @import "shared/layout";
 @import "cocktails/decoration";

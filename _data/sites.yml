@@ -45,7 +45,12 @@ cocktails:
   description: What to drink, not how to mix it
   css: cocktails
   home: /cocktails/
-  # No tape and no footer_svg yet: the cocktails visual language is deliberately
-  # its own, and nothing has been drawn for it. Both are omitted rather than
-  # pointed at food's artwork, so the page renders undecorated and silent
-  # instead of borrowing a look it has not chosen.
+  # tape points at assets/img/cocktails/tape/, which as of 2026-08-02 holds a
+  # direct COPY of food's tape-*.svg files — a placeholder, at Helen's explicit
+  # call, so the wordmark isn't bare while cocktails' own visual language is
+  # still undecided. Swap the files in that directory when real artwork
+  # arrives; this key doesn't need to change.
+  tape: tape
+  tape_count: 4
+  # footer_svg still omitted: nothing drawn for the footer yet, and an absent
+  # key means no fetch is attempted rather than one that 404s and warns.
