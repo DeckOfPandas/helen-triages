@@ -420,7 +420,31 @@ article.recipe a {
 // Indented bullets express parallelism — outer = sequential, inner = parallel.
 .method-short {
   // font-family, font-weight, color, font-size, line-height inherited from article.recipe
-  margin: $space-sm 0 $space-xxl 0;
+  //
+  // Top margin is NEGATIVE, deliberately -- Helen: "clicking between the
+  // long and short methods means the top line jumps around... use the same
+  // vertical spacing for the short method as for the long method."
+  //
+  // .recipe-section-heading's own 2rem bottom margin is what actually sets
+  // the gap after METHOD -- it collapses through the empty
+  // .recipe-section-method wrapper div, then collapses again against
+  // whichever of .method-full/.method-short is the visible next sibling.
+  // .method-full's own margin-top ($space-sm, 0.5rem) is smaller than that
+  // 2rem, so adjoining-positive-margins collapsing just takes the larger
+  // one -- .method-full's declared margin never actually mattered; the
+  // heading's 2rem was always the real gap.
+  //
+  // .method-short is a padded box (padding-top: 1.25rem), and padding isn't
+  // collapsible -- it's added on top of whatever the margin collapse
+  // produces, not folded into it. With the old $space-sm margin that gave
+  // 2rem (collapsed) + 1.25rem (padding) = 3.25rem, 1.25rem more than
+  // .method-full's plain 2rem -- the jump on toggle. Per the spec, a
+  // negative margin collapsing against a positive one SUBTRACTS:
+  // collapsed = 2rem − |margin-top|. Setting margin-top: -1.25rem makes
+  // that 0.75rem, and 0.75rem + 1.25rem (padding) = 2rem again -- matching
+  // .method-full exactly, while the box's own padding stays symmetric on
+  // all four sides (unlike shrinking padding-top alone would).
+  margin: -1.25rem 0 $space-xxl 0;
   background-color: rgba($color-border, 0.12);
   padding: 1.25rem $space-xl;
   border-radius: $radius-sm;
@@ -440,7 +464,12 @@ article.recipe a {
         content: "*";
         position: absolute;
         left: -$space-xxl;
-        top: 0.1rem;
+        // Was 0.1rem -- Helen: "the bullet points in the short method
+        // section are currently slightly higher than their lines of text."
+        // A 1.4rem marker at line-height: 1 sits noticeably higher than the
+        // ~0.92rem body text beside it unless nudged down further than a
+        // smaller marker would need; 0.1rem wasn't enough at this size.
+        top: 0.25rem;
         color: $color-step-number;
         font-family: $font-headings;
         font-weight: 700;
@@ -460,7 +489,10 @@ article.recipe a {
         font-weight: 400;
         font-size: 1rem;
         color: $color-marker-accent;
-        top: 0;
+        // Was 0 -- same "sits higher than the text" issue as the outer *
+        // marker above, smaller here because 1rem is closer to the ~0.92rem
+        // body text than the outer marker's 1.4rem is.
+        top: 0.1rem;
       }
 
       ul {
