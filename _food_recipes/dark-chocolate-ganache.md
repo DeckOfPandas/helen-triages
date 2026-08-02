@@ -26,7 +26,15 @@ method:
   - "Stir gently from the centre using a perfectly dry silicone spatula (water = bad, accidental whipping = bad) until the temperature reaches 40–45°C. You'll see a visible change from muddy to glossy and thick — this is the emulsion forming."
   - Add the butter (and optional icing sugar) and stir until just incorporated. Add any other flavourings here too.
   - Stop stirring as soon as you can (over-stirring = bad).
-  - "Leave to cool at room temperature (uneven heat = bad) to your working temperature: CLAUDE, I'D LIKE BULLET POINTS HERE pouring/glazing 32–35°C; drip cakes 29–32°C; piping/filling 20–24°C; whipped ganache 18–21°C — cool completely, then beat with an electric mixer until light, fluffy, and holding its shape."
+  - |
+    Leave to cool at room temperature (uneven heat = bad) to your working temperature:
+
+    - Pouring/glazing: 32–35°C
+    - Drip cakes: 29–32°C
+    - Piping/filling: 20–24°C
+    - Whipped ganache: 18–21°C
+
+    Cool completely, then beat with an electric mixer until light, fluffy, and holding its shape.
 method_short:
   - |
     * Grate chocolate 150 into dry bowl
