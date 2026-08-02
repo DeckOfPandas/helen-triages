@@ -107,23 +107,27 @@ $color-label-stroke:         lighten($color-text, 20%);
 // (_sass/shared/_base.scss) — a link reading as plain body text is not
 // "more obvious", which is what Helen asked for after one nearly went
 // unnoticed. First answer was a new hue, $color-vivid-rose; same day,
-// Helen's actual preference turned out to be magenta -- reusing
-// $color-bright-magenta-dark, already doing this exact job for
-// .btn-method-toggle ("for toggle buttons etc."), rather than a fifth hue
-// for a job an existing one already covers. Both links and the short-method
-// toggle now share one base colour and one hover behaviour -- see
-// article.recipe a and .btn-method-toggle in _recipe.scss.
+// Helen's actual preference turned out to be magenta -- reusing an existing
+// hue rather than a fifth. Both links and the short-method toggle share one
+// base colour and one hover behaviour -- see article.recipe a and
+// .btn-method-toggle in _recipe.scss.
 //
-// Measured, not guessed, same method as the rose calculation this replaced:
-// raw $color-bright-magenta is 3.24:1 against $color-bg, short of the 4.5:1
-// normal-text needs at any size a recipe link appears at (0.82–0.95rem, all
-// "normal", none clearing the large-text 3:1 exception).
-// $color-bright-magenta-dark (darken 12%) already clears comfortably at
-// 5.26:1. Hover goes LIGHTER, per Helen's ask -- darken 8% (between the raw
-// hue and the resting link colour) is visibly lighter than the 12% base
-// while still reading as intentional rather than washed out, at 4.46:1 --
-// under 4.5 by a hair, acceptable for a transient hover state rather than
-// the resting colour text has to stay legible in permanently.
+// $color-bright-magenta-dark (darken 12%, 5.26:1 against $color-bg) is the
+// link colour. Briefly tried darker (20%, to put more distance between a
+// link and the raw-magenta footer hearts when both land in the same view)
+// and reverted the same day -- Helen tried it and preferred the
+// cohesiveness of matching the title rule's own magenta ("the cohesiveness
+// of the title underline and base page function (links) is pleasing"). The
+// footer-hearts near-miss is real but stays open (losing the heart footer
+// entirely was floated as one way to resolve it) -- doesn't block deploy,
+// revisit later rather than solve today by pulling links away from the
+// hue that's working.
+//
+// Hover goes LIGHTER, per Helen's ask -- darken 8% (between the raw hue and
+// the resting link colour) is visibly lighter than the 12% base while still
+// reading as intentional rather than washed out, at 4.46:1 -- under 4.5 by
+// a hair, acceptable for a transient hover state rather than the resting
+// colour text has to stay legible in permanently.
 $color-recipe-link: $color-bright-magenta-dark;
 $color-recipe-link-hover: darken($color-bright-magenta, 8);
 
@@ -139,13 +143,13 @@ $color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
 // violet, aureolin and pencil grey — which is where "two design languages at
 // once" came from. Cross-recipe links, added 2026-08-02, briefly looked like
 // a fifth ($color-vivid-rose) before Helen asked for magenta instead — which
-// meant reusing $color-bright-magenta-dark rather than spending a new hue.
-// The count stays at four.
+// meant a darker derivative of an existing hue rather than spending a new
+// one. The count stays at four.
 //
 //   1. $color-bright-magenta       the blocky rule under the title, the
 //                                  footer hearts, the short-method toggle,
-//                                  and (as $color-bright-magenta-dark, via
-//                                  $color-recipe-link) cross-recipe links
+//                                  and (as $color-recipe-link, darken 12%)
+//                                  cross-recipe links
 //   2. $color-section-underline    the upper rule under the section names
 //   3. $color-section-underline-2  the lower rule under them
 //   4. $color-aureolin             the highlighter on ingredient amounts
