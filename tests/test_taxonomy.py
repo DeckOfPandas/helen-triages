@@ -115,7 +115,7 @@ def test_no_oven_conversions(recipe):
 
 # --- links -----------------------------------------------------------------
 
-LINK = re.compile(r"\]\(/recipes/([a-z0-9-]+)/\)")
+LINK = re.compile(r"\]\(\.\./([a-z0-9-]+)/\)")
 PUBLISHED = {r.slug for r in ALL_RECIPES}
 
 

@@ -19,12 +19,12 @@ method:
   - "PLACEHOLDER - rewrite: Take the fillet out of the fridge at least 30 mins before cooking. Heat the oven to 200°C. Put a roasting pan in the oven to get hot."
   - "PLACEHOLDER - rewrite: Trim any fat or sinew from the fillet and season all over. Heat a non-stick frying pan until very hot. Sear the beef for 1½–2 mins on each side until evenly browned all over."
   - "PLACEHOLDER - rewrite: Transfer to the hot roasting pan and roast for 25 mins for medium rare — it should feel a little springy when lightly pressed. Rest for 10 mins."
-  - "PLACEHOLDER - rewrite: Slice thickly and overlap on a serving platter. Pile the rocket in the centre. Serve with the tomato tarragon dressing (see [tomato and tarragon dressing](/recipes/tomato-tarragon-dressing/))."
+  - "PLACEHOLDER - rewrite: Slice thickly and overlap on a serving platter. Pile the rocket in the centre. Serve with the tomato tarragon dressing (see [tomato and tarragon dressing](../tomato-tarragon-dressing/))."
 method_short:
   - ""
 notes:
   - "Take the fillet out of the fridge at least 30 mins before cooking so it comes up to room temperature — this ensures more even cooking. The resting step is important for tenderness; don't skip it."
-  - "Pairs perfectly with the [tomato and tarragon dressing](/recipes/tomato-tarragon-dressing/)."
+  - "Pairs perfectly with the [tomato and tarragon dressing](../tomato-tarragon-dressing/)."
 meta:
   rewritten: false
   proofread: false

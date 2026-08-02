@@ -29,7 +29,7 @@ method:
 method_short:
   - ""
 notes:
-  - "Made for [slow cooker confit duck legs](/recipes/slow-cooker-confit-duck-legs/)."
+  - "Made for [slow cooker confit duck legs](../slow-cooker-confit-duck-legs/)."
 meta:
   rewritten: true
   proofread: false

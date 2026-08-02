@@ -60,7 +60,7 @@ method:
   - "Leave for about 30 mins until a shiny skin forms on the tops."
   - "Bake for about 20 mins at 150°C: they should be slightly crisp, but easily dentable."
   - "Leave to cool on the tray for 5 mins, then slide off onto a wire rack."
-  - "Whisk filling ingredients together, or make [dark chocolate ganache](/recipes/dark-chocolate-ganache/)."
+  - "Whisk filling ingredients together, or make [dark chocolate ganache](../dark-chocolate-ganache/)."
 method_short:
   - ""
 notes:

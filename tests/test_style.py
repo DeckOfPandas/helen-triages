@@ -81,7 +81,7 @@ TYPOGRAPHY = [
     ("double hyphen", r"(?<!-)--(?!-)", "use an em dash —"),
     ("ASCII arrow", r"->", "use →"),
     ("wikilink", r"\[\[[^\]]+\]\]",
-     "cross-recipe links are markdown: [display text](/recipes/slug/)"),
+     "cross-recipe links are markdown, relative: [display text](../slug/)"),
     ("ampersand in title", None, None),  # handled separately below
 ]
 

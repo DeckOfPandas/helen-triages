@@ -1,7 +1,7 @@
 ---
 title: Five-Spice Crispy Duck Legs
 short_name: Five-Spice Duck Legs
-tagline: "Scored duck legs crusted in five-spice. Good with [cherry glaze](/recipes/cherry-glaze/)."
+tagline: "Scored duck legs crusted in five-spice. Good with [cherry glaze](../cherry-glaze/). QQ LINK DOESN'T RENDER AS A LINK, HERE AND EVERYWHERE"
 source:
 serves: 4
 prep_time: "15 mins plus at least 8 hrs curing and 2 hrs flavouring"
@@ -18,7 +18,7 @@ ingredient_groups:
     - item: Bay leaves
     - item: Thyme sprigs
     - amount: "4 tbsp"
-      item: "[five-spice seasoning](/recipes/five-spice-powder/)"
+      item: "[five-spice seasoning](../five-spice-powder/)"
 method:
   - "Pat the legs dry, then score them lightly in diamonds — through the skin but not into the meat — to allow the fat to render."
   - "Rub each leg thoroughly with coarse salt, pushing it into all the scores and under every fold of skin."

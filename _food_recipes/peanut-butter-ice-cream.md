@@ -12,7 +12,7 @@ tags: [dessert, "ice cream", "make-ahead"]
 ingredient_groups:
   - items:
     - item: "Sweet Cream Base No. 1"
-      tip: "Make this first — see [sweet cream base](/recipes/sweet-cream-base-1/)."
+      tip: "Make this first — see [sweet cream base](../sweet-cream-base-1/)."
     - amount: "85 g"
       item: smooth peanut butter
     - amount: "65 g"

@@ -35,7 +35,7 @@ method:
 method_short:
   - ""
 notes:
-  - "Made to go with [roast beef fillet](/recipes/roast-beef-fillet/). But it works with almost anything."
+  - "Made to go with [roast beef fillet](../roast-beef-fillet/). But it works with almost anything."
 meta:
   rewritten: true
   proofread: false
