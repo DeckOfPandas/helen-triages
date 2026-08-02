@@ -92,13 +92,17 @@ main {
 }
 
 // How far past the tape's CORE (see .site-logo-tape below) the tape graphic
-// itself is allowed to extend on each side. Small deliberately: the current
+// itself is allowed to extend on each side. Small deliberately, and trimmed
+// smaller again on Helen's request (was 1.5rem, then 0.5rem): the current
 // tape SVGs are a single near-rectangular polygon with no separate corner
 // geometry (see HANDOVER §13 for why that's next up for a redesign), so any
 // protrusion here is currently just "more of the same plain tape" rather than
-// a distinct corner tab — the less of it showing, the less that gap reads as
-// a placeholder.
-$tape-protrusion: 0.5rem;
+// a distinct corner tab — the closer this sits to zero, the closer the tape
+// hugs the lettering rather than reading as a placeholder gap. One value,
+// shared by both sites' .tape-bg — food and cocktails were never sized
+// independently here, so "make cocktails' shorter, then match food to it"
+// is already just this one number changing.
+$tape-protrusion: 0.2rem;
 
 // The CORE (what .tape-bg's protrusion is measured from) is whichever of the
 // two rows is naturally wider, not always HELEN TRIAGES. Both
@@ -129,7 +133,15 @@ $tape-protrusion: 0.5rem;
   color: $color-text;
   -webkit-text-stroke: 1.2px rgba(50,50,50,0.9);
   text-transform: uppercase;
-  padding-right: 0.18em;
+  // NOT padding-right: 0.18em, deliberately -- that was here before and it's
+  // why HELEN TRIAGES visibly shifted right on cocktails. letter-spacing adds
+  // a trailing gap after the LAST character too (same trap the recipe
+  // title's rule already documents), so this box's own max-content width
+  // already runs slightly past the visible glyphs. Matching padding-right on
+  // top of that doesn't compensate, it doubles the same bias. Harmless while
+  // this box always defined its own column (food), visible the moment
+  // something else (cocktails' wider word) does instead -- the box gets
+  // centered in extra space and the built-in right-bias becomes a shift.
   @include punched(raised);
 }
 
