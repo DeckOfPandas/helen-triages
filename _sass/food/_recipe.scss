@@ -127,18 +127,27 @@ article.recipe a {
   // wraps to slightly more lines than before -- worth another look once
   // real titles are in front of you.
   font-size: 2.2rem;
-  // Raised label-tape lettering, matching the index's .category-label and the
-  // shared wordmark (HANDOVER_v26.md §13.4.1) -- was plain stroke, the same
-  // "scratched" look every other recipe-page heading below carries too, until
-  // now. Stroke WIDTH unchanged (still $stroke-heavy) -- at the new, larger
-  // size that's a slightly lighter proportion than before (0.8px was 2.78% of
-  // 1.8rem, now 2.27% of 2.2rem), which if anything moves it closer to the
-  // ~2.1-2.3% the rest of the page's punched lettering is calibrated to,
-  // rather than away from it. Only the colour and the emboss shadow are new.
-  // Independent of overlapping-rule-double below: that mixin paints
+  // Raised label-tape lettering, matching the index's .category-label and
+  // the shared wordmark (HANDOVER_v26.md §13.4.1) -- was plain stroke, the
+  // same "scratched" look every other recipe-page heading carries too, until
+  // now. Independent of overlapping-rule-double below: that mixin paints
   // background-image only, so there's no property collision with the
   // text-shadow punched() sets.
-  -webkit-text-stroke: $stroke-heavy $color-label-stroke;
+  //
+  // Stroke width cut from $stroke-heavy (0.8px) to 0.4px, EXPERIMENTALLY --
+  // Helen: "the section headings feel far too bold... I don't know if just
+  // dropping the font weight is right." Font-weight isn't the right lever:
+  // Courier New only ships Regular/Bold as static faces (§13.6), so
+  // anything ≤500 jumps straight to Regular with no middle ground. The
+  // stroke's own proportion (2.1-2.3%, the §13.4.1 calibration) was worked
+  // out for a BARE stroke, before this mixin added a hard-edged emboss
+  // shadow on top -- two duplicate letterforms 1px apart plus an outlined
+  // edge compounds into visibly more ink than either alone, and compounds
+  // harder the bigger and bolder the base glyphs already are (700-weight
+  // Courier, page's biggest text). 0.4px keeps a visible edge without
+  // stacking a second full effect on top of the shadow. Unverified without
+  // a browser -- look and adjust.
+  -webkit-text-stroke: 0.4px $color-label-stroke;
   @include punched(raised);
   padding: 0;
   @include overlapping-rule-double(
@@ -234,11 +243,16 @@ article.recipe a {
   letter-spacing: 0.08em;
   color: $color-text;
   // Raised label-tape lettering (HANDOVER_v26.md §13.4.1), same treatment as
-  // .category-label on the index and the shared wordmark. Stroke width
-  // unchanged ($stroke-medium was already the calibrated proportion for
-  // 1.8rem type, see §13.4.1's worked example); only the stroke colour and
-  // the emboss shadow are new.
-  -webkit-text-stroke: $stroke-medium $color-label-stroke;
+  // .category-label on the index and the shared wordmark.
+  //
+  // Stroke cut from $stroke-medium (0.6px) to 0.3px, EXPERIMENTALLY -- see
+  // the matching note on .recipe-title-text above for why (Helen: "the
+  // section headings feel far too bold"; the §13.4.1 proportion was
+  // calibrated for a bare stroke, before punched() added a compounding
+  // emboss shadow on top of it). This is the class INGREDIENTS/METHOD/NOTES
+  // and any peer heading in .recipe-body-content all share, so the change
+  // reaches all of them. Unverified without a browser -- look and adjust.
+  -webkit-text-stroke: 0.3px $color-label-stroke;
   @include punched(raised);
   position: relative;  // anchor for absolute-positioned method toggle
 
@@ -542,11 +556,27 @@ article.recipe .recipe-body-content {
   // The "a.k.a." subtitle pattern -- same voice as .recipe-tagline (italic,
   // lightened text colour), smaller, sitting under a peer heading instead of
   // under the page title.
+  // Spacing modelled directly on .recipe-title/.recipe-tagline's own
+  // relationship (1.25rem above the tagline, 3rem below it, from
+  // .recipe-title and .recipe-meta's margins respectively) -- Helen: "so it
+  // reads like a tagline, not the first line of content."
+  //
+  // Above: adjacent margins collapse to their max, so a plain margin-top
+  // here couldn't shrink the gap below .recipe-section-heading's own 2rem
+  // bottom margin -- only a margin big enough in the other direction can.
+  // -0.75rem collapsed against that 2rem gives exactly 1.25rem (positive
+  // and negative margins sum when they collapse, they don't take the max of
+  // one positive and one negative).
+  //
+  // Below: bumped from $space-lg (1rem, too tight -- read as the first line
+  // of the paragraph that followed) to $spacing-section-gap, matching the
+  // real tagline's gap to .recipe-meta exactly rather than a value picked
+  // to look roughly separated.
   .recipe-section-subtitle {
     font-size: 0.9rem;
     font-style: italic;
     color: lighten($color-text, 20%);
-    margin: 0 0 $space-lg 0;
+    margin: -0.75rem 0 $spacing-section-gap 0;
   }
 
   h3 {
