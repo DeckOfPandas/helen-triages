@@ -11,7 +11,7 @@
   text-transform: uppercase;
 }
 
-// --- Box tint (metadata grid only, for now) -----------------------------------
+// --- Box tint (shared violet, three consumers now) ----------------------------
 // Was tinted off $color-border mixed with $color-surface — a neutral with no
 // relation to the page's actual accent colours. Re-based on the rule's own
 // violet instead, so the box stops being a fifth, unrelated colour and reads as
@@ -20,10 +20,20 @@
 // The note box was matched to this too on 2026-07-31 and then split back off
 // the same day — it wants a different treatment, not just a fainter version of
 // this one. See `DEV_JOBS_v24.md` §1.8. Kept named generically in case it ends
-// up shared again once notes have their own answer.
+// up shared again once notes have their own answer. It did, 2026-08-02 -- and
+// so has .method-short's box, but at its own, much stronger opacity (below):
+// metadata grid and notes are deliberately quiet washes, the short-method box
+// is meant to read as an obviously distinct container, not an echo of them.
 $color-box-tint: $color-vibrant-violet;   // reuse, not a new hue
 $box-tint-opacity: 0.03;   // TRANSPARENCY DIAL — turn up for a stronger wash,
-                           // down for a fainter one.
+                           // down for a fainter one. Metadata grid and notes
+                           // only; .method-short uses its own, see below.
+$method-short-tint-opacity: 0.08;   // Helen, on noticing the box for the
+                                     // first time: "it's just very faint...
+                                     // darken it enough to see easily."
+                                     // Same violet as the wash above, a
+                                     // deliberately stronger tint -- this box
+                                     // needs to be seen, not just hinted at.
 
 // --- Body text base ----------------------------------------------------------
 // Set once on the recipe article so children inherit and only override exceptions.
@@ -293,6 +303,18 @@ article.recipe a {
   font-weight: 600;
   text-transform: lowercase;
   letter-spacing: 0;
+  // Explicit resets, not decoration: this button is a child of
+  // .recipe-section-heading, which sets both of these (punched(raised) for
+  // text-shadow, -webkit-text-stroke directly) -- both properties inherit
+  // by default, so without resetting them the button was picking up the
+  // parent heading's emboss shadow and stroke on top of its own styling.
+  // Helen: "the PoY link text seems bouncier and maybe slightly
+  // wider-spaced letters? And is it a shade lighter in colour?" -- all
+  // three are consistent with an inherited shadow+stroke neither of us had
+  // actually checked for (dev tools shows inherited values greyed out
+  // under "Computed", easy to skim past).
+  -webkit-text-stroke: 0;
+  text-shadow: none;
   background: none;
   border: none;
   color: $color-recipe-link;
@@ -306,10 +328,14 @@ article.recipe a {
   transform: translateY(-50%);
 
   // Lighter on hover, same colour and direction as every other link on the
-  // page -- was opacity: 0.7, which is now only the .active (currently
-  // showing the short method) state's job.
+  // page. No .active rule any more (was opacity: 0.7, toggled by
+  // method-toggle.js whenever short method is showing) -- Helen: the
+  // persistent "click for full method" button, when short method is
+  // active, should look like a normal resting link, not the dimmed/faded
+  // read opacity: 0.7 actually gave it. method-toggle.js still toggles the
+  // .active class every time it switches modes; it's just unstyled here on
+  // purpose now, not a leftover.
   &:hover { color: $color-recipe-link-hover; }
-  &.active { opacity: 0.7; }
 }
 
 // --- Recipe Badges on recipe page --------------------------------------------
@@ -445,7 +471,13 @@ article.recipe a {
   // .method-full exactly, while the box's own padding stays symmetric on
   // all four sides (unlike shrinking padding-top alone would).
   margin: -1.25rem 0 $space-xxl 0;
-  background-color: rgba($color-border, 0.12);
+  // Was rgba($color-border, 0.12) -- a pale, low-saturation grey barely
+  // tinting an already-pale background, which is what made the box read as
+  // "very faint" even at a higher opacity than the wash below uses. Same
+  // violet as the metadata grid and notes, at $method-short-tint-opacity
+  // (see above) rather than $box-tint-opacity -- deliberately stronger, so
+  // this reads as an obviously distinct box.
+  background-color: rgba($color-box-tint, $method-short-tint-opacity);
   padding: 1.25rem $space-xl;
   border-radius: $radius-sm;
 
