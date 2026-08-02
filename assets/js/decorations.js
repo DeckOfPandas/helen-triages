@@ -10,6 +10,7 @@
 //   .highlighter-slot          scratchy highlighter behind ingredient amounts
 //   .tape-bg                   masking tape behind the site logo
 //   .site-footer-hearts        footer hearts
+//   .annotation-mark           hand-drawn sparkles beside a tip/note
 //
 // Two more lived here until 2026-08-01. `.watercolour-brush-slot` drew the
 // brush washes, which the blocky rule replaced on both pages; `[data-index-doodle]`
@@ -116,8 +117,26 @@
     if (url) HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
   }
 
+  // ---------------------------------------------------------------------------
+  // Annotation marks — a small hand-drawn sparkle beside each ingredient/step
+  // tip or note. One asset, no shuffling: unlike the highlighters, these are
+  // meant to read as a consistent, recognisable "here's an aside" signal
+  // rather than page-to-page variety.
+  // ---------------------------------------------------------------------------
+  function annotationMarks() {
+    var slots = document.querySelectorAll('.annotation-mark');
+    if (!slots.length) return;
+
+    var url = HTF.siteAsset('/doodles/doodle-sparkles.svg');
+    if (!url) return;
+    slots.forEach(function (slot) {
+      HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
+    });
+  }
+
   highlighters();
   tape();
   footerDecoration();
+  annotationMarks();
 
 })();

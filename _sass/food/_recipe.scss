@@ -884,3 +884,22 @@ article.recipe .recipe-body-content {
   &--tip  { color: $color-clear-text; }
   &--note { color: $color-clear-text; }
 }
+
+// A small hand-drawn sparkle before the annotation text — the same "here's an
+// aside" signal a paper recipe book gets from a felt-pen mark in the margin.
+// Magenta like the title rule and footer hearts: it's a decoration, not body
+// text, so it takes the raw hue rather than the darkened link/text variant.
+.annotation-mark {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  margin-right: 0.3em;
+  color: $color-bright-magenta;
+  vertical-align: -0.1em;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
