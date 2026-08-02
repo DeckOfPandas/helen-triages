@@ -43,14 +43,15 @@ meta:
   date_last_edited: "2026-07-25"
 ---
 
-## Tips
+<h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
 
 - Use perfectly clean and dry stainless steel bowls (water = bad) for even heating (over-heating = bad, under-melting = bad).
 - Use a perfectly clean and dry silicone spatula (water = bad) because it can create a tight seal against the bottom of the bowl, sweeping up melting pockets without whipping in air (which contains water so air = bad — see "seizing" below).
 - Heat the cream in a pan for the best temperature control, unless you have literally perfect microwave-fu (over-heating and under-melting = bad).
 - Allow the ganache to cool and set at room temperature. If you put it in the fridge, you'll need to stir it to combine the more-set and the less-set (over-stirring = bad).
 
-## Troubleshooting, a.k.a. ganache is the worst
+<h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
+<p class="recipe-section-subtitle">a.k.a. ganache is the worst</p>
 
 Ganache is an emulsion of fat (cocoa butter and dairy fat) suspended in water (from the cream). If it splits, at least one of these things will be wrong:
 
