@@ -229,17 +229,56 @@ meta:
 - `QQ` anywhere is Helen's placeholder. **Never flag it as an error.**
 - `serves` **xor** `makes` — `makes` for quantities you produce (bakes,
   sauces, base recipes; `makes: QQ` for base recipes), `serves` for what you
-  portion out.
+  portion out. **Values aren't always numeric** — both are free descriptive
+  text where a number doesn't fit ("Depends on appetite", "N/A, bring a
+  spoon", "6–8 as a condiment", "However many people want to eat 150 g
+  rice"). This is intentional, in Helen's own voice — don't "tidy" a prose
+  value into a number.
 - `method` **xor** `method_groups`. Both present means the second is dropped.
 - Group names are bare nouns (`dressing`, not `for the dressing`). Method
-  group names render bare and may be narrative phases.
-- Cross-recipe links: `[display text](/recipes/slug/)`. `[[wikilinks]]`
-  don't render and are retired.
-- `instructions:` is retired — it's `method:`, no fallback.
+  group names render bare and may be narrative phases. **Stored casing
+  doesn't matter for display** — both ingredient and method group headings
+  render through `.recipe-group-heading`, which inherits `text-transform:
+  uppercase` from the shared `%heading-base` placeholder
+  (`_sass/food/_recipe.scss`), the same mechanism as the INGREDIENTS/METHOD/
+  NOTES headings. Write group names in whatever case reads naturally as data
+  (lowercase bare nouns, per the rule above); the page uppercases them
+  regardless.
+- Cross-recipe links are markdown, **relative, not root-relative**:
+  `[display text](../slug/)`. Front-matter string values are never run
+  through Liquid, so a literal `/recipes/slug/` link can't pick up
+  `site.baseurl` and is simply wrong on this site (served at
+  `/helen-triages/food/recipes/slug/`, not `/recipes/slug/`) — this was a
+  real, live bug until 2026-08-02, silently broken both locally and once
+  deployed, because the test suite only checked that the target slug existed,
+  not that the URL resolved. `../slug/` resolves against the *current page's*
+  URL, which already includes the baseurl, so it's correct regardless of
+  where the site is hosted. `[[wikilinks]]` don't render and are retired.
+- `instructions:` is retired — it's `method:`, no fallback. Several other
+  fields are retired too (`published`, `date_added`, `difficulty`,
+  `nutrition`, `filling_note`, `headline_ingredient`) — `tests/
+  test_front_matter.py`'s `RETIRED` dict is the authoritative list with what
+  each was replaced by; not duplicated here to avoid the two drifting apart.
 - Filenames are stable by default; if a rename is clearly indicated, say so
   and ask. Don't rename unasked; don't assume it's forbidden.
 
 **Cocktails front matter does not exist yet and must not be invented.** See §9.
+
+### 4.1 Body content below the front matter (rare)
+
+A recipe file's Markdown body — the content *after* the closing `---` — is
+not part of the schema above, but isn't ignored either: `_layouts/
+recipe.html` renders it verbatim (`{{ content }}`) inside `.recipe-body-
+content`, between Notes and the source footer, if it's non-empty. As of
+2026-08-02 exactly one file uses this, of ~370 recipes and drafts combined:
+`dark-chocolate-ganache.md` carries a substantial hand-written Tips and
+Troubleshooting section this way. Baseline styling exists
+(`.recipe-body-content` in `_sass/food/_recipe.scss` — headings, paragraphs,
+lists, links) but has never had a deliberate design pass; **MVP styling for
+this is now a deploy-blocking job**, see `DEV_JOBS_v26.md` §1.2b. Whether
+this pattern continues or these sections get split into standalone
+blog-post-style pages instead is Helen's open call, undecided as of this
+writing.
 
 ---
 
