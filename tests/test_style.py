@@ -40,6 +40,26 @@ def test_no_estimated_timings(recipe):
     )
 
 
+QQ = re.compile(r"\bQQ\b")
+
+
+def test_no_qq_placeholder(recipe):
+    """`QQ` is Helen's own placeholder for "not decided/written yet" — see
+    HANDOVER_v26.md §4 and §12. Fine anywhere in `_food_drafts/`, and never to
+    be treated as an error there. But a `QQ` surviving into `_food_recipes/`
+    means the recipe isn't actually finished, whatever field it's hiding in
+    (a tagline link target, a cook_time, an ingredient amount) — the same
+    "drafting aid, not a published value" logic as `test_no_estimated_timings`
+    above, generalised to the marker Helen actually uses for "not yet".
+    """
+    hits = QQ.findall(recipe.raw)
+    assert not hits, (
+        f"{where(recipe)} still contains {len(hits)} `QQ` placeholder(s).\n"
+        f"Fine in _food_drafts/, not fine here — replace with the real "
+        f"content before this recipe counts as published."
+    )
+
+
 @pytest.mark.parametrize("field", TIME_FIELDS)
 def test_metadata_time_format(recipe, field):
     """Metadata uses the terse forms: `20 mins`, `1 hr 30 mins`, `2 hrs`."""
@@ -82,6 +102,9 @@ TYPOGRAPHY = [
     ("ASCII arrow", r"->", "use →"),
     ("wikilink", r"\[\[[^\]]+\]\]",
      "cross-recipe links are markdown, relative: [display text](../slug/)"),
+    ("reversed link brackets", r"\([^()\n]+\)\[[^\]\n]*\]",
+     "markdown links are [display text](../slug/), not (display text)[...] — "
+     "the (text)[url] order never renders as a link, in any field"),
     ("ampersand in title", None, None),  # handled separately below
 ]
 

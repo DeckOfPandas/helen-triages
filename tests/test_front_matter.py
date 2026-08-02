@@ -34,6 +34,23 @@ def test_required_field_present(recipe, field):
     )
 
 
+def test_tagline_is_not_blank(recipe):
+    """Present is not the same as written.
+
+    `test_required_field_present` only checks the key exists — a recipe with
+    `tagline: ""` passes it happily. A blank tagline is a real gap on a
+    published recipe (it's the one line of prose every recipe page shows
+    unconditionally), distinct from `_food_drafts/`, where a blank tagline is
+    completely normal for a stub not written up yet.
+    """
+    tagline = recipe.fm.get("tagline")
+    assert isinstance(tagline, str) and tagline.strip(), (
+        f"{where(recipe)} has a blank tagline ({tagline!r}).\n"
+        f"Fine in _food_drafts/, not fine here — every published recipe "
+        f"needs its one-line tagline written."
+    )
+
+
 def test_no_retired_fields(recipe):
     found = {f: why for f, why in RETIRED.items() if f in recipe.fm}
     assert not found, (
