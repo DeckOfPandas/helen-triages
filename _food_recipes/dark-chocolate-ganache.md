@@ -4,8 +4,8 @@ short_name: Dark Chocolate Ganache
 tagline: "Ganache is a fickle mistress, but absolutely worth the effort."
 source: "A lifetime of grainy, oily, solid, inedible regret."
 makes: "N/A, bring a spoon"
-prep_time: Estimated 5 mins
-cook_time: Estimated 15 mins
+prep_time: 5 mins
+cook_time: 15 mins
 main_ingredients: ["dark chocolate", "double cream", "salted butter", "icing sugar"]
 star_ingredient: chocolate
 tags: [extras]
@@ -32,9 +32,7 @@ method:
     - Pouring/glazing: 32–35°C
     - Drip cakes: 29–32°C
     - Piping/filling: 20–24°C
-    - Whipped ganache: 18–21°C
-
-    Cool completely, then beat with an electric mixer until light, fluffy, and holding its shape.
+    - Whipped ganache: 18–21°C — cool completely, then beat with an electric mixer until light, fluffy, and holding its shape.
 method_short:
   - |
     * Grate chocolate 150 into dry bowl
@@ -43,7 +41,9 @@ method_short:
     * Butter 1 tbsp, flavourings
     * Cool at room temp to working temp
 notes:
-  - "Ratios: 1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion). Add 2 tbsp icing sugar for ganache that sets more firmly. Season the cream with salt before heating — don't be shy."
+  - "Ratios: 1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
+  - "Add 2 tbsp icing sugar for ganache that sets more firmly."
+  - "Season the cream with salt before heating — don't be shy, as this greatly enhances the chocolate flavour."
 meta:
   rewritten: true
   proofread: false
