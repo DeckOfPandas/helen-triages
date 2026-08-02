@@ -611,11 +611,61 @@ article.recipe .recipe-body-content {
     li { margin-bottom: 0.5rem; }
   }
 
-  strong { font-weight: 700; }
+  // Numbered lists get Method's own numeral treatment -- Helen: "let's try
+  // styling the numbers in the ganache writing's numbered list the same way
+  // as method steps." Same font, stroke, size and colour as .method-full's
+  // ::before counter (see that rule above for the exact values this
+  // mirrors).
+  //
+  // Different LAYOUT mechanism, though: .method-full uses display: flex on
+  // the li, which works because a step is one line of text and nothing
+  // else. A body-content numbered item can contain a nested <ul> (each of
+  // ganache's failure modes has its own sub-bullets) -- flex would put that
+  // nested list beside the number instead of under it. Absolute positioning
+  // avoids that: the ::before sits in the padding-left gutter without
+  // joining the li's own flow, so both the bold lead-in and the nested list
+  // beneath it stack normally.
+  ol {
+    list-style: none;
+    padding-left: 2.4rem;   // matches .method-full's number column width
+    counter-reset: body-content-counter;
+
+    > li {
+      counter-increment: body-content-counter;
+      position: relative;
+
+      &::before {
+        content: counter(body-content-counter) ".";
+        position: absolute;
+        left: -2.4rem;
+        // Same nudge .method-full uses (margin-top: $space-xxs there) for
+        // the same reason: a 1.2rem numeral sitting flush with the top of a
+        // box built around ~0.92rem/700-weight text sits visibly higher
+        // than that text's own baseline. Helen: "the numbers are slightly
+        // higher" -- absolute positioning needs top: $space-xxs where the
+        // flex version needs margin-top: $space-xxs, same fix either way.
+        top: $space-xxs;
+        font-family: $font-headings;
+        font-weight: 700;
+        color: $color-step-number;
+        -webkit-text-stroke: $stroke-light;
+        font-size: 1.2rem;
+        line-height: 1.2;
+      }
+    }
+  }
+
+  // 600 rather than the browser default 700 -- Helen: "the font still seems
+  // too heavy." Only current use is the four failure-mode lead-ins in the
+  // numbered list above (dark-chocolate-ganache.md); a whole line of
+  // 700-weight sans-serif reads dense. 600 stays visibly bolder than the
+  // 300-weight body text around it without matching the numeral's own
+  // full-weight Courier bold one column to the left.
+  strong { font-weight: 600; }
 
   // No link colour/underline override here any more -- article.recipe a
-  // (above) covers it now, same rose treatment as every other cross-recipe
-  // link on the page. One link style, not two.
+  // (above) covers it now, same magenta treatment as every other
+  // cross-recipe link on the page. One link style, not two.
 }
 
 // --- Group Headings ----------------------------------------------------------
