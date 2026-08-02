@@ -526,8 +526,19 @@ article.recipe .recipe-body-content {
 // number is the figure you need at a glance while cooking; the unit is
 // secondary. .highlighted (shared/_base.scss) supplies position: relative,
 // the positioning context the injected SVG needs.
+//
+// align-items: baseline overrides .highlighted's own align-items: center.
+// With no flex item baseline-aligned, an inline-flex box's OWN baseline (the
+// one used to place it within the surrounding line of text) is synthesised
+// from the top edge of its first flex item rather than real text metrics —
+// that pushed the whole box, number included, below the "pt"/"g"/"oz" text
+// sitting right next to it outside the box. Harmless while .ingredient-amount
+// wrapped the full "400 g" (the whole run shifted together, so nothing beside
+// it to compare against); became visible the moment only the number sat in
+// the flex box next to a plain-text unit at the correct baseline.
 .ingredient-amount-number {
   padding: 0 0.25em 0 0.2em;
+  align-items: baseline;
 }
 
 // --- Ingredient and step annotations ----------------------------------------
