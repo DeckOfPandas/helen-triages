@@ -863,6 +863,28 @@ too. If you see the old claim anywhere (an older branch, a stale comment),
 the code is what to trust — check `_sass/shared/_layout.scss` directly
 rather than this document or an old comment.
 
+**The recipe page's own headings were stroke-only too, until the same day.**
+`.recipe-title-text`, `.recipe-section-heading`, `.recipe-group-heading` and
+`.recipe-meta li strong` all had a plain `-webkit-text-stroke` with no
+explicit colour (defaulting to `currentColor`, i.e. the same as the fill —
+no lighter derived tone, no emboss shadow) until Helen spotted the
+inconsistency: `.category-label` on the index had already been upgraded to
+the full punched treatment, matched to these same headings' proportions
+(the §13.4.1 worked example above), while the headings it was matched *to*
+still used the plain version. All four now call `@include punched(raised)`
+and use `$color-label-stroke` for the stroke colour, same as the index and
+the wordmark — stroke *widths* unchanged throughout (still `$stroke-heavy`/
+`$stroke-medium`/`$stroke-light` per element, the existing hierarchy), only
+the colour and the shadow are new. `.btn-method-toggle` deliberately did
+**not** get this — it's documented as matching the index's
+`.btn-clear-inline`, which has no stroke or punch treatment at all, so
+changing just the recipe-page half of that pair would have created a new
+inconsistency rather than closed one. `.recipe-body-content h2` (§4.1) was
+built with the punched treatment from the start, matched to
+`.recipe-group-heading`'s exact proportions; its `h3` deliberately stayed
+plain, on purpose — see the comment above `.recipe-body-content h2` in
+`_recipe.scss` for why that split is the hierarchy, not an oversight.
+
 **To extend the device somewhere new:** `@include punched(raised)`, plus a
 stroke computed at the same proportion as `.category-label`'s (or the recipe
 page headings', whichever is closer in size), and leave `$emboss-offset` /
