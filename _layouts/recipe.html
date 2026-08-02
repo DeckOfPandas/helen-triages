@@ -69,8 +69,6 @@ layout: default
     </ul>
   {% endfor %}
 
-  {% if page.filling_note %}<p class="note">{{ page.filling_note }}</p>{% endif %}
-
   {% assign has_short = false %}
   {% for step in page.method_short %}
     {% unless step == "QQ" or step == "" or step == blank %}{% assign has_short = true %}{% endunless %}
