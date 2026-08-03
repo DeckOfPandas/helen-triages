@@ -865,30 +865,36 @@ wash, and lost.
 
 ### 13.2 The recipe page's colour budget
 
-Five hues now, and the count is the design: `$color-bright-magenta` (title
-rule, footer hearts, method toggle), `$color-section-underline` /
-`$color-section-underline-2` (the two rule colours, spring green and violet,
-which only ever appear *together* inside one composite mark),
-`$color-aureolin` (ingredient-amount highlighter), and — added 2026-08-02 —
-`$color-recipe-link` (cross-recipe links, wherever one appears: tagline,
-tips, notes, method steps). Everything else — the whole of the method,
-notes, tips, boxes — is `$color-clear-text` or `$color-border`. Colour is on
-what you *navigate* by, off what you *read* — a link counts as something you
-navigate BY, even mid-sentence, not decoration on something you're reading.
+Four hues, and the count is the design: `$color-bright-magenta` (title rule,
+footer hearts, method toggle, and — as `$color-recipe-link`, darkened 12% —
+every cross-recipe link, wherever one appears: tagline, tips, notes, method
+steps), `$color-section-underline` / `$color-section-underline-2` (the two
+rule colours, spring green and violet, which only ever appear *together*
+inside one composite mark — and, since 2026-08-03, violet's second job: the
+hand-drawn arrow beside an ingredient/step tip or note, `.annotation-mark`
+in `_recipe.scss`), and `$color-aureolin` (ingredient-amount highlighter).
+Everything else — the whole of the method, notes, tips, boxes — is
+`$color-clear-text` or `$color-border`. Colour is on what you *navigate* by,
+off what you *read* — a link counts as something you navigate BY, even
+mid-sentence, not decoration on something you're reading. The annotation
+arrow is the one exception to that split: it's decoration, not navigation,
+but it took violet rather than magenta specifically *because* magenta
+already means "interactive" on this page — see `_palette.scss`'s "Cross-
+recipe links" comment for the full reasoning.
 
-Magenta doubles as `$color-star-root`, so the star badge matches the title —
-accepted as a rhyme, since the star is the hero and the title names the dish.
-Rose doesn't rhyme with anything else on the page, and doesn't need to — it
-was added because a link rendered as plain body-coloured text went nearly
-unnoticed (Helen: "please style the link to make it more obvious"), not to
-extend the mark's existing colour language. `_sass/food/_palette.scss`
-documents the exact contrast measurement (4.96:1 against `$color-bg`,
-darkened from the raw hue's 3.64:1) — a link at 0.82–0.95rem is normal text
-by WCAG's size thresholds, none of it large enough for the relaxed 3:1
-exception, so 4.5:1 was the real bar, not a nice-to-have. **If a sixth colour
-is ever proposed, that's the point to stop and ask whether "colour, but more
-sparing" still means anything** — five was already one past where this
-section stopped assuming it'd stay flat.
+Magenta carries three jobs at once (title rule, toggle, links) on top of
+doubling as `$color-star-root`, so the star badge matches the title — all
+accepted as the same rhyme, not four separate coincidences: magenta is the
+site's one "this is interactive/branded" colour. A new hue was tried for
+links first (`$color-vivid-rose`, 2026-08-02) and reverted the same day once
+Helen's actual preference turned out to be reusing magenta instead —
+`_palette.scss` documents both the exact contrast measurement (5.26:1
+against `$color-bg`, link text at 0.82–0.95rem is too small for the relaxed
+3:1 exception, so 4.5:1 was the real bar) and why a darker/further variant
+was tried and reverted (cohesiveness with the title rule won out over more
+distance from the footer hearts). **If a fifth colour is ever proposed,
+that's the point to stop and ask whether an existing hue could do the job
+instead, the way magenta and violet both just did.**
 
 ### 13.3 Spacing
 

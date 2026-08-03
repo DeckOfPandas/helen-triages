@@ -878,58 +878,39 @@ article.recipe .recipe-body-content {
   display: block;
   position: relative;
   margin-top: 0.25rem;
-  padding-left: 3rem;
+  padding-left: 4rem;
   font-size: 0.82rem;
   font-style: italic;
   line-height: 1.45;
 
   &--tip  { color: $color-clear-text; }
   &--note { color: $color-clear-text; }
-
-  // TEMPORARY: arrow 2 has grown wider than the base 3rem gutter (see
-  // .annotation-mark--arrow-2 below), so its container needs its own text
-  // start to keep a clear gap. Fold into the base padding-left once one
-  // candidate wins.
-  &--arrow-2 {
-    padding-left: 4rem;
-  }
 }
 
-// A hand-drawn sparkle in the gutter — the same "here's an aside" signal a
+// A hand-drawn arrow in the gutter — the same "here's an aside" signal a
 // paper recipe book gets from a felt-pen mark in the margin, not a footnote
 // asterisk. Positioned absolutely (the site's established mark-in-a-gutter
 // technique, also used for step numbers) rather than inline, so padding-left
 // indents every wrapped line of the annotation text evenly, not just the
-// first, and the extra indent (1rem clear of a step's own text) keeps it
-// from reading as another item in the numbered list's own rhythm.
+// first.
 //
 // Violet, not magenta: magenta already carries the title rule, the toggle
 // and every link, so a magenta mark here read as one more competing use of
 // the site's loudest colour rather than a quiet aside. Violet is already
 // spent on the box tints, so this reuses rather than adding a hue.
+//
+// top recentres the mark (2.5rem x 2rem) against a single line of
+// annotation text (line-height 1.45 x font-size 0.82rem =~ 1.19rem) rather
+// than aligning their top edges, since the mark is taller than the text
+// line it sits beside; -0.65rem is Helen's own eyeballed fine-tune of the
+// arithmetic result of ~-0.41rem.
 .annotation-mark {
   position: absolute;
-  left: 0;
-  top: -0.05rem;
-  width: 1.2rem;
-  height: 1.2rem;
+  left: 1rem;
+  top: -0.65rem;
+  width: 2.5rem;
+  height: 2rem;
   color: $color-vibrant-violet;
-
-  // TEMPORARY, per the two-candidate comparison in decorations.js: arrow 2
-  // pulled an extra 1rem right, closer to the text, per Helen's request, and
-  // sized up again to 2.5rem x 2rem (from 2rem x 1.75rem) — the container's
-  // own padding-left grew to match, see .step-annotation--arrow-2 above.
-  // top is recentred against a single line of annotation text (line-height
-  // 1.45 x font-size 0.82rem =~ 1.19rem) now that the mark is taller than
-  // the text line it sits beside: (1.19 - 2) / 2 =~ -0.41rem. Arrow 1 stays
-  // put — she's happy with its position as is. Fold back to a single
-  // unmodified rule once one candidate wins.
-  &--arrow-2 {
-    left: 1rem;
-    top: -0.41rem;
-    width: 2.5rem;
-    height: 2rem;
-  }
 
   svg {
     display: block;

@@ -118,40 +118,18 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Annotation marks — a small hand-drawn mark beside each ingredient/step
+  // Annotation marks — a small hand-drawn arrow beside each ingredient/step
   // tip or note. One asset, no shuffling: unlike the highlighters, these are
   // meant to read as a consistent, recognisable "here's an aside" signal
   // rather than page-to-page variety.
-  //
-  // TEMPORARY: alternating between the two candidate arrows Helen supplied
-  // (2026-08-03) so both are visible in situ on any page with 2+ annotations,
-  // for comparison against the sparkle. Collapse to a single asset once she
-  // picks — see arrow-indent-1.svg / arrow-indent-2.svg in doodles/.
   // ---------------------------------------------------------------------------
   function annotationMarks() {
     var slots = document.querySelectorAll('.annotation-mark');
     if (!slots.length) return;
 
-    var candidates = [
-      { file: '/doodles/arrow-indent-1.svg', suffix: 'arrow-1' },
-      { file: '/doodles/arrow-indent-2.svg', suffix: 'arrow-2' }
-    ];
-    slots.forEach(function (slot, i) {
-      var candidate = candidates[i % candidates.length];
-      slot.classList.add('annotation-mark--' + candidate.suffix);
-
-      // Arrow 2 has grown wider than the shared gutter, so its container
-      // needs its own text start too (.ingredient-annotation--arrow-2 /
-      // .step-annotation--arrow-2) — not just the mark itself.
-      var container = slot.closest('.ingredient-annotation, .step-annotation');
-      if (container) {
-        var base = container.classList.contains('ingredient-annotation')
-          ? 'ingredient-annotation' : 'step-annotation';
-        container.classList.add(base + '--' + candidate.suffix);
-      }
-
-      var url = HTF.siteAsset(candidate.file);
-      if (!url) return;
+    var url = HTF.siteAsset('/doodles/arrow-annotation.svg');
+    if (!url) return;
+    slots.forEach(function (slot) {
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
     });
   }
