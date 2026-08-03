@@ -45,7 +45,7 @@ ingredient_groups:
       tip: "Merlot or Cabernet Sauvignon preferred."
     - amount: "750 ml"
       item: beef stock
-      tip: "Preferably home-made. QQ link to beef bone stock recipe."
+      tip: "Preferably home-made."
 method_groups:
   - name: "day before: prepare the beef"
     steps:

@@ -1,7 +1,7 @@
 ---
-title: Dark Chocolate Ganache
-short_name: Dark Chocolate Ganache
-tagline: "Ganache is a fickle mistress, but absolutely worth the effort."
+title: Chocolate Ganache
+short_name: Chocolate Ganache
+tagline: "Ganache is a fickle mistress, but absolutely worth the effort. Recipe here is given for dark chocolate, but notes give ratios for milk or white."
 source: "A lifetime of grainy, oily, solid, inedible regret."
 makes: "N/A, bring a spoon"
 prep_time: 5 mins
@@ -61,9 +61,9 @@ meta:
 <h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
 <p class="recipe-section-subtitle">a.k.a. ganache is the worst</p>
 
-Ganache is an emulsion of fat (cocoa butter and dairy fat) suspended in water (from the cream). If it splits, at least one of these things will be wrong:
+Ganache is an emulsion of fat --- cocoa butter and dairy fat --- suspended in water from the cream. Here are four ways to get it wrong with likely causes:
 
-1. **Splitting: greasy, oily layer on top of grainy clumps**
+1. **Splitting: a greasy, oily layer on top of grainy clumps**
    - Over-heating (>55°C) broke the delicate bonds maintaining the emulsion, so the fat coalesced into larger pools of oil rather than remaining uniformly suspended.
    - Over-stirring created mechanical stress, forcing fat droplets to collide and coalesce.
    - Accidental whipping, such as from using a balloon whisk, increased the amount of air in the mixture, and air contains moisture — see "seizing" below (water = bad).
@@ -72,9 +72,10 @@ Ganache is an emulsion of fat (cocoa butter and dairy fat) suspended in water (f
    - Coarse chopping meant the residual heat of the cream died out before reaching the centre of the too-big pieces.
 3. **Seizing: mixture resembling concrete; a dry, grainy paste that can't be stirred**
    - Water somehow got into the chocolate, causing its sugar crystals to wet, stick together, and clump immediately.
-4. **Adding ingredients in the wrong order (that is, not following the recipe...ask me how I know):**
-   - Dropping cold pieces of chocolate into hot cream makes the temperature drop too rapidly and unevenly, resulting in cold chunks floating in hot fat that can't form an emulsion. Pouring cold cream into melted chocolate instantly shocks the chocolate, snap-freezing the cocoa butter out of the emulsion while forcing the sugars to clump (yum, curdled concrete).
+4. **Chaos: adding ingredients in the wrong order (that is, not following the recipe...ask me how I know):**
+   - Dropping cold pieces of chocolate into hot cream makes the temperature drop too rapidly and unevenly, resulting in cold chunks floating in hot fat that can't form an emulsion.
+   - Pouring cold cream into melted chocolate instantly shocks the chocolate, snap-freezing the cocoa butter out of the emulsion while forcing the sugars to clump...yum, curdled concrete.
 
 Dark chocolate ganache is less likely to split than lower %s because the dry cocoa solids act as a giant structural sponge holding the emulsion together. White chocolate has zero cocoa sponge, but lots of highly temperature-sensitive cocoa butter and moisture-sensitive sugar. Basically, white chocolate ganache splits if you even look at it wrong.
 
-See [Philosophy of Yum](https://philosophyofyum.com/grainy-ganache-fix-prevent/) for more troubleshooting.
+For more troubleshooting, see [Philosophy of Yum](https://philosophyofyum.com/grainy-ganache-fix-prevent/).

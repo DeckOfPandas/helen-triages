@@ -2,9 +2,9 @@
 title: Caesar Salad Dressing
 short_name: Caesar Salad Dressing
 tagline: "Doesn't really keep, but very easy and quick."
-source: QQ source
+source: Stella
 makes: about 300 ml
-prep_time: Estimated 5 mins
+prep_time: 5 mins
 cook_time: "None"
 main_ingredients: [mayonnaise, parmesan, "lemon juice", "anchovy paste", garlic]
 star_ingredient:
@@ -34,7 +34,7 @@ method:
 method_short:
   - ""
 meta:
-  rewritten: false
+  rewritten: true
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"

@@ -2,7 +2,7 @@
 title: "Grandma's Spice Cake"
 short_name: "Grandma's Spice Cake"
 tagline: "How can you beat this! Change the spices if you like, but this is the original recipe."
-source: ""
+source: "Grandma Kath"
 makes: "one 7-inch round cake"
 prep_time: "10 mins"
 cook_time: "35 mins"
@@ -26,7 +26,7 @@ ingredient_groups:
     - amount: "2 tsp"
       item: ground ginger
     - item: "1 tsp mixed spice"
-      note: "Mixed spice isn't really sold like this any more — see [Mixed Spice](../mixed-spice/) for a blend to make yourself."
+      note: "Mixed spice isn't really sold like this any more — see [mixed spice](../mixed-spice/) for a home-made blend."
 method:
   - Cream the butter and sugar thoroughly until fluffy. Longer than you think.
   - Mix in the beaten egg a little at a time.
@@ -39,7 +39,8 @@ method:
 method_short:
   - ""
 notes:
-  - "If the cake sinks in the middle, you added too much syrup. If the top of the cake cracks, bake at a lower temperature."
+  - "If the cake sinks in the middle, you added too much syrup."
+  - "If the top of the cake cracks, bake at a lower temperature."
 meta:
   rewritten: true
   proofread: false

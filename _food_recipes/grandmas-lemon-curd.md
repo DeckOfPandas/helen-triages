@@ -1,9 +1,9 @@
 ---
 title: "Grandma's Lemon Curd"
 short_name: "Grandma's Lemon Curd"
-tagline: "Good for jarring or for lemon meringue pie."
+tagline: "Good for jarring, or for lemon meringue pie."
 source: Grandma Kath
-makes: QQ
+makes: Enough for one normal lemon meringue pie
 prep_time: "10 mins"
 cook_time: "20 mins"
 main_ingredients: [lemon, butter, "golden caster sugar", eggs, cornflour]

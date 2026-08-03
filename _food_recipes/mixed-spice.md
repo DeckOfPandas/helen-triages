@@ -1,9 +1,9 @@
 ---
 title: Mixed Spice
 short_name: Mixed Spice
-tagline: QQ
+tagline: The capsicum-free version, which suffers not at all for the lack.
 source: ""
-makes: QQ
+makes: half as much as my spice blender will fit
 prep_time: "5 mins"
 cook_time: None
 main_ingredients: [cinnamon, nutmeg, cloves, ginger, mace]

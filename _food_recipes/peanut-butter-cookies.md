@@ -4,7 +4,7 @@ short_name: Peanut Butter Cookies
 tagline: "ULTRA-easy, melt-in-your-mouth, salty and sweet."
 source: "Adapted from Preppy Kitchen, recipe John Kanell"
 makes: "18 cookies"
-prep_time: Estimated 10 mins
+prep_time: 20 mins
 cook_time: "10 mins"
 main_ingredients: ["peanut butter", butter, flour, "brown sugar", egg]
 star_ingredient:
@@ -28,7 +28,7 @@ ingredient_groups:
       item: "large egg, room temperature"
     - amount: "3 g"
       item: baking powder
-    - item: ¼–½ tsp sea salt (optional)
+    - item: ¼–½ tsp sea salt, to taste
 method:
   - Sift the flour and baking powder.
   - "Cream the butter with the sugars, then mix in the peanut butter, then the egg and vanilla extract."

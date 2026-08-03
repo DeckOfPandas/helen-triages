@@ -3,7 +3,7 @@ title: Five-Spice
 short_name: Five-Spice
 tagline: Adapted to omit capsicum.
 source: ""
-makes: QQ
+makes: some
 prep_time: "5 mins"
 cook_time: "2 mins"
 main_ingredients: [cinnamon, "star anise", "fennel seed", "Sichuan peppercorn", cloves]

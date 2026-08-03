@@ -4,7 +4,7 @@ short_name: Best-Ever Chocolate Sponge Cake
 tagline: Needs no introduction.
 source: "Adapted from Green and Black's Chocolate Recipes"
 makes: "one double-layer 8-inch cake"
-prep_time: Estimated 30 mins
+prep_time: 20 mins
 cook_time: "20–25 mins"
 main_ingredients: ["cocoa powder", "dark chocolate", butter, eggs, flour]
 star_ingredient: chocolate
@@ -73,7 +73,7 @@ method_short:
           * Start the butter 50 and icing sugar 100, egg yolk 1 gradually
        * Add chocolate to butter mix
 notes:
-  - "Top with icing sugar. Or try [ganache](../dark-chocolate-ganache/), or simply melted chocolate with butter 2:1."
+  - "Top with icing sugar. Or try [chocolate ganache](../chocolate-ganache/), or simply melted chocolate with butter 2:1."
 meta:
   rewritten: true
   proofread: false
