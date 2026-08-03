@@ -165,25 +165,38 @@
   // between the filter section and the recipe list section"). Random or
   // per-position picks would both break that.
   //
-  // Shape 9 (and its flip) is a wedge with a diagonal that spans the shape's
-  // FULL width, unlike the other eight, where the torn/ragged detail is
-  // concentrated at the ends and the middle stretches safely. Stretched to a
-  // very narrow pill, that diagonal reads as a much steeper, near-vertical
-  // cut than it does at full width — excluded for short tag text
-  // specifically, not for every tag, so it still gets used on longer ones
-  // where it stretches fine.
+  // POOL, not all 18: with both the original and flip of every shape in
+  // play, a row mixed torn-left-clean-right shapes with their mirror image
+  // at random, which read as "drunken" (Helen, 2026-08-03) rather than
+  // varied — most of these were evidently drawn with the same consistent
+  // hand motion, so the originals mostly already agree with each other on
+  // which end is torn vs clean, and flipping half of them at random is what
+  // broke that agreement, not the individual shapes themselves. Kept every
+  // original; shape 4 also keeps its flip, since torn evenly at both ends
+  // it reads as genuinely symmetric rather than pointing either way. The
+  // dropped flips (1, 2, 3, 5, 6, 7, 8, 9-flip) are NOT deleted from
+  // doodles/ — still real files, just unwired here, in case this call was
+  // wrong for one of them.
+  //
+  // Shape 9 is a wedge with a diagonal that spans the shape's FULL width,
+  // unlike the others, where the torn/ragged detail is concentrated at the
+  // ends and the middle stretches safely. Stretched to a very narrow pill,
+  // that diagonal reads as a much steeper, near-vertical cut than it does at
+  // full width — excluded for short tag text specifically, not for every
+  // tag, so it still gets used on longer ones where it stretches fine.
   function tagShapes() {
     var slots = document.querySelectorAll('.tag-shape');
     if (!slots.length) return;
 
     var SHORT_TEXT_MAX = 6;
+    var POOL = [
+      'tag-shape-1', 'tag-shape-2', 'tag-shape-3',
+      'tag-shape-4', 'tag-shape-4-flip',
+      'tag-shape-5', 'tag-shape-6', 'tag-shape-7', 'tag-shape-8', 'tag-shape-9'
+    ];
 
     function pickShape(text) {
-      var pool = [];
-      for (var n = 1; n <= 9; n++) {
-        pool.push('tag-shape-' + n);
-        pool.push('tag-shape-' + n + '-flip');
-      }
+      var pool = POOL;
       if (text.length <= SHORT_TEXT_MAX) {
         pool = pool.filter(function (name) { return name.indexOf('tag-shape-9') !== 0; });
       }
