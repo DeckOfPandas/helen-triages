@@ -315,25 +315,29 @@ article.recipe .method-short {
     clip-path: none;
   }
 
-  // Resting pill shape at full-strength root hue read as too loud (Helen,
-  // 2026-08-03) once it was the shape's actual fill rather than a faint
-  // background tint — toned down with the same opacity dial the filter
-  // buttons' resting grey uses, rather than mixing in a separate grey.
-  // .badge--matched below overrides back to full opacity, so matching a
-  // tag still pops relative to the rest of the list.
+  // Resting pill shape, take two: rgba(..., 0.4) was still too loud (Helen,
+  // 2026-08-03: "still too loud for me... please try mixing with a grey").
+  // mix() with $color-border (the site's own "quiet, crisp structural
+  // lines" token, already the lightest neutral in the palette) rather than
+  // a transparency dial this time -- a semi-transparent hue over a white
+  // page just lightens it (still reads as a pale, bright tint), where an
+  // actual mix desaturates it into a dustier, quieter version of the same
+  // hue. Solid colour, not rgba -- the desaturation is doing the calming
+  // work here, not opacity. .badge--matched below still overrides back to
+  // the full-strength root hue, so a matched tag keeps popping.
   &-star {
     color: $color-star-active;
-    .tag-shape { color: rgba($color-star-root, 0.4); }
+    .tag-shape { color: mix($color-star-root, $color-border, 35%); }
   }
 
   &-mood {
     color: $color-mood-active;
-    .tag-shape { color: rgba($color-mood-root, 0.4); }
+    .tag-shape { color: mix($color-mood-root, $color-border, 35%); }
   }
 
   &-practicalities {
     color: $color-practicalities-active;
-    .tag-shape { color: rgba($color-practicalities-root, 0.4); }
+    .tag-shape { color: mix($color-practicalities-root, $color-border, 35%); }
   }
 }
 
@@ -377,6 +381,22 @@ article.recipe .method-short {
                 1px  1px 0 rgba($color-text, 0.3);
 }
 
+// Star and mood need MORE of the same effect, not a different one --
+// Helen, 2026-08-03, after the soft version landed: "Practicalities raised
+// lettering looks great now, but the Star and Mood aren't quite there yet
+// -- still too light." Per-hue, not a global bump: aureolin (practicalities)
+// is close to $color-bg already, so %tag-emboss-soft's shadow reads clearly
+// against it; magenta and cerulean are more mid-toned and need stronger
+// contrast on both sides to look raised at all. Boosting practicalities the
+// same amount would overshoot back into the cutout look this was built to
+// avoid — the same lesson this codebase has learned per-hue before
+// ($bar-unlit-darken-*, $darken-active-lime): one number rarely suits every
+// hue equally.
+%tag-emboss-soft-strong {
+  text-shadow: -1px -1px 0 rgba($color-bg, 0.75),
+                1px  1px 0 rgba($color-text, 0.5);
+}
+
 // ============================================================================
 // BUTTONS
 // ============================================================================
@@ -411,9 +431,9 @@ article.recipe .method-short {
   margin: 0.2rem 0.45rem 0.2rem 0;
   transition: all 0.1s ease-in-out;
 
-  // Lightened a little (0.35 -> 0.25 resting, 0.5 -> 0.4 hover), Helen's ask,
-  // 2026-08-03.
-  .tag-shape { color: rgba($color-text, 0.25); }
+  // Resting alpha: 0.35 -> 0.25 -> 0.15, two rounds of "lighten a little"
+  // (Helen, 2026-08-03).
+  .tag-shape { color: rgba($color-text, 0.15); }
 
   &:hover {
     color: $color-text;
@@ -610,7 +630,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    @extend %tag-emboss-soft;
+    @extend %tag-emboss-soft-strong;
     -webkit-text-stroke: 0.5px $color-star-active;
     .tag-shape { color: $color-star-root; }
   }
@@ -619,7 +639,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    @extend %tag-emboss-soft;
+    @extend %tag-emboss-soft-strong;
     -webkit-text-stroke: 0.6px $color-mood-active;
     .tag-shape { color: $color-mood-root; }
   }
@@ -764,22 +784,15 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     }
   }
 
+  // Was a full duplicate of .btn-clear-inline's styling under an ID
+  // selector — outweighed the class-based rule (.category.search--
+  // ingredients .btn-clear-inline in the CONTROLS section above) by
+  // specificity no matter what that rule said, so the 2026-08-03 link
+  // unification silently had no effect here. Only margin-left survives:
+  // genuine layout (spacing next to the search input), not typography the
+  // class-based rule already owns.
   #ingredient-search-clear {
-    font-family: $font-headings;
-    font-size: 0.75rem;
-    font-weight: $weight-clear-font;
-    text-transform: lowercase;
-    letter-spacing: 0;
-    cursor: pointer;
-    text-decoration: underline;
-    color: $color-ingredient-active;
     margin-left: $space-md;
-    white-space: nowrap;
-    transition: opacity 0.1s ease-in-out;
-
-    &:hover {
-      opacity: 0.7;
-    }
   }
 
   .search-results {
@@ -825,22 +838,9 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     }
   }
 
+  // Same duplicate-ID story as #ingredient-search-clear above.
   #name-search-clear {
-    font-family: $font-headings;
-    font-size: 0.75rem;
-    font-weight: $weight-clear-font;
-    text-transform: lowercase;
-    letter-spacing: 0;
-    cursor: pointer;
-    text-decoration: underline;
-    color: $color-name-search-active;
     margin-left: $space-md;
-    white-space: nowrap;
-    transition: opacity 0.1s ease-in-out;
-
-    &:hover {
-      opacity: 0.7;
-    }
   }
 }
 
@@ -870,16 +870,19 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   letter-spacing: 0.04em;
   padding: $space-xxs 0.65rem $space-xxs $space-sm;
   color: $color-text;
-  @extend %tag-emboss-soft;
 
+  // Emboss strength split per category here too, same reasoning as the
+  // active filter buttons above (%tag-emboss-soft-strong) — star/mood need
+  // more contrast than practicalities to read as raised at all.
+  //
   // .tag-shape back to full opacity (badge-star/mood/practicalities above
   // tone the RESTING shape down to rgba(..., 0.4) — matching a filter still
   // needs to pop against a page of otherwise-quiet pills). No more
   // background-color: that was the pre-tape-shape fill, stale since the SVG
   // shape itself is the visible fill now and sits UNDER it doing nothing.
-  &.badge-star           { -webkit-text-stroke: 0.5px $color-star-active; .tag-shape { color: $color-star-root; } }
-  &.badge-mood           { -webkit-text-stroke: 0.5px $color-mood-active; .tag-shape { color: $color-mood-root; } }
-  &.badge-practicalities { -webkit-text-stroke: 0.5px $color-practicalities-active; .tag-shape { color: $color-practicalities-root; } }
+  &.badge-star           { @extend %tag-emboss-soft-strong; -webkit-text-stroke: 0.5px $color-star-active; .tag-shape { color: $color-star-root; } }
+  &.badge-mood           { @extend %tag-emboss-soft-strong; -webkit-text-stroke: 0.5px $color-mood-active; .tag-shape { color: $color-mood-root; } }
+  &.badge-practicalities { @extend %tag-emboss-soft;        -webkit-text-stroke: 0.5px $color-practicalities-active; .tag-shape { color: $color-practicalities-root; } }
 }
 
 // Layers on top of a badge-star/mood/practicalities that's ALSO an
