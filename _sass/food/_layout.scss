@@ -339,13 +339,13 @@ article.recipe .method-short {
 
 // The tape shape itself: absolutely positioned behind the badge/button text,
 // stretched to fill (preserveAspectRatio="none" baked into the SVG files
-// themselves, same technique as the wordmark's own tape). One of 18 (9
-// shapes x original/flipped) assigned deterministically by tagShapes() in
-// decorations.js, keyed on the tag's own text -- same tag always gets the
-// same shape wherever it appears (a filter button and a recipe-row pill for
-// "greens" match), and shape 9's full-width diagonal is excluded for short
-// tag text specifically, since it distorts more than the others do when
-// stretched very narrow.
+// themselves, same technique as the wordmark's own tape). One of a curated
+// pool (see the POOL comment in decorations.js's tagShapes() for the full
+// reasoning) assigned deterministically by the tag's own text -- same tag
+// always gets the same shape wherever it appears (a filter button and a
+// recipe-row pill for "greens" match), and shape 9's full-width diagonal is
+// excluded for short tag text specifically, since it distorts more than the
+// others do when stretched very narrow.
 .tag-shape {
   position: absolute;
   top: 0;
@@ -359,6 +359,22 @@ article.recipe .method-short {
     width: 100%;
     height: 100%;
   }
+}
+
+// A softer emboss for small bold text sitting on a SATURATED tape-shape
+// fill -- @include punched(raised) (_sass/shared/_rule.scss) uses
+// $color-bg (near-white) at full opacity for its "light" side, which reads
+// fine when the surrounding context IS roughly $color-bg (headings, page
+// text) but as a stark white cutout outline against a fully-coloured
+// background. Helen, 2026-08-03, looking at a selected FRUIT/SOUP/
+// MAKE-AHEAD pill: "the light source catching white is too disruptive...
+// gives a cut-out effect." Same idea, same offset, both sides
+// semi-transparent instead of one side opaque -- softer, not different in
+// concept. Scoped to this file rather than touching the shared mixin, which
+// works correctly everywhere else it's already used.
+%tag-emboss-soft {
+  text-shadow: -1px -1px 0 rgba($color-bg, 0.55),
+                1px  1px 0 rgba($color-text, 0.3);
 }
 
 // ============================================================================
@@ -530,6 +546,14 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     padding: 0.22rem 0;
   }
 
+  // Brought closer to .btn-clear (the global "clear all", below) and to
+  // article.recipe a — Helen, 2026-08-03: this page already has multiple
+  // link designs (the global clear, the recipe page's own links), and this
+  // inline one, being bold Courier with an opacity-fade hover, was a THIRD
+  // distinct design competing with both. Sans, regular weight and a
+  // colour-shift hover now, same mechanism every other link on the site
+  // uses — still its own colour per section (unlike the neutral global
+  // clear), since that context IS worth keeping, just not the typography.
   .btn-clear-inline {
     // A real <button> since 2026-07-29 — it was a <span> with a click handler,
     // so it was unreachable by keyboard. These four lines strip the browser
@@ -539,29 +563,28 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     padding: 0;
     color: inherit;
 
-    font-family: $font-headings;
-    font-size: 0.75rem;
-    font-weight: $weight-clear-font;
+    font-family: $font-body;
+    font-size: 0.78rem;
+    font-weight: 400;
     text-transform: lowercase;
-    letter-spacing: 0;
+    letter-spacing: 0.02em;
     cursor: pointer;
     text-decoration: underline;
-    transition: opacity 0.1s ease-in-out;
+    transition: color 0.1s ease-in-out;
     white-space: nowrap;
-
-    &:hover {
-      opacity: 0.7;
-    }
   }
 
-  // Inline clear colors per group
-  &.category--star      { .btn-clear-inline { color: $color-star-active; } }
-  &.category--mood      { .btn-clear-inline { color: $color-mood-active; } }
-  &.category--practicalities { .btn-clear-inline { color: $color-practicalities-active; } }
+  // Inline clear colours per group — hover lightens to the raw root hue,
+  // same "hover goes lighter" rule article.recipe a and .btn-clear itself
+  // both already follow, rather than the previous opacity fade (a second,
+  // unrelated hover mechanism).
+  &.category--star      { .btn-clear-inline { color: $color-star-active;           &:hover { color: $color-star-root; } } }
+  &.category--mood      { .btn-clear-inline { color: $color-mood-active;           &:hover { color: $color-mood-root; } } }
+  &.category--practicalities { .btn-clear-inline { color: $color-practicalities-active; &:hover { color: $color-practicalities-root; } } }
   // The two searches never had one. They do now, for the same reason the other
   // three do: the clear link belongs to its section and should say so.
-  &.search--ingredients { .btn-clear-inline { color: $color-ingredient-active; } }
-  &.search--name        { .btn-clear-inline { color: $color-name-search-active; } }
+  &.search--ingredients { .btn-clear-inline { color: $color-ingredient-active;     &:hover { color: $color-ingredient-root; } } }
+  &.search--name        { .btn-clear-inline { color: $color-name-search-active;    &:hover { color: $color-name-search-root; } } }
 
   // Active states -- compound selectors (.category--star .btn-star.active)
   // have higher specificity than the base .btn-tag/.btn-star rule above,
@@ -587,7 +610,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    @include punched(raised);
+    @extend %tag-emboss-soft;
     -webkit-text-stroke: 0.5px $color-star-active;
     .tag-shape { color: $color-star-root; }
   }
@@ -596,7 +619,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    @include punched(raised);
+    @extend %tag-emboss-soft;
     -webkit-text-stroke: 0.6px $color-mood-active;
     .tag-shape { color: $color-mood-root; }
   }
@@ -605,7 +628,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    @include punched(raised);
+    @extend %tag-emboss-soft;
     -webkit-text-stroke: 0.5px $color-practicalities-active;
     .tag-shape { color: $color-practicalities-root; }
   }
@@ -847,7 +870,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   letter-spacing: 0.04em;
   padding: $space-xxs 0.65rem $space-xxs $space-sm;
   color: $color-text;
-  @include punched(raised);
+  @extend %tag-emboss-soft;
 
   // .tag-shape back to full opacity (badge-star/mood/practicalities above
   // tone the RESTING shape down to rgba(..., 0.4) — matching a filter still
@@ -870,7 +893,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   font-weight: 900;
   letter-spacing: 0.04em;
   color: $color-text;
-  @include punched(raised);
+  @extend %tag-emboss-soft;
   -webkit-text-stroke: 0.5px $color-ingredient-active;
 }
 

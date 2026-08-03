@@ -173,17 +173,22 @@
   // which end is torn vs clean, and flipping half of them at random is what
   // broke that agreement, not the individual shapes themselves. Kept every
   // original; shape 4 also keeps its flip, since torn evenly at both ends
-  // it reads as genuinely symmetric rather than pointing either way. The
-  // dropped flips (1, 2, 3, 5, 6, 7, 8, 9-flip) are NOT deleted from
-  // doodles/ — still real files, just unwired here, in case this call was
-  // wrong for one of them.
+  // it reads as genuinely symmetric rather than pointing either way.
   //
-  // Shape 9 is a wedge with a diagonal that spans the shape's FULL width,
-  // unlike the others, where the torn/ragged detail is concentrated at the
-  // ends and the middle stretches safely. Stretched to a very narrow pill,
-  // that diagonal reads as a much steeper, near-vertical cut than it does at
-  // full width — excluded for short tag text specifically, not for every
-  // tag, so it still gets used on longer ones where it stretches fine.
+  // Shape 8 dropped entirely 2026-08-03 — Helen's read on "root veg" and
+  // "shellfish" (both landed on it): too diagonal next to the rest of the
+  // set, and with nine other options there was no need to keep it. Shape 9
+  // is a wedge with a diagonal that spans the shape's FULL width, unlike
+  // the others, where the torn/ragged detail is concentrated at the ends
+  // and the middle stretches safely — stretched to a very narrow pill, that
+  // diagonal reads as a much steeper, near-vertical cut than it does at
+  // full width, so it's excluded for short tag text specifically rather
+  // than dropped outright; it still gets used on longer tags where it
+  // stretches fine.
+  //
+  // None of the unwired shapes (1, 2, 3, 5, 6, 7, 8, 9-flip) are deleted
+  // from doodles/ — still real files, just not in this pool, in case any of
+  // these calls needs revisiting.
   function tagShapes() {
     var slots = document.querySelectorAll('.tag-shape');
     if (!slots.length) return;
@@ -192,7 +197,7 @@
     var POOL = [
       'tag-shape-1', 'tag-shape-2', 'tag-shape-3',
       'tag-shape-4', 'tag-shape-4-flip',
-      'tag-shape-5', 'tag-shape-6', 'tag-shape-7', 'tag-shape-8', 'tag-shape-9'
+      'tag-shape-5', 'tag-shape-6', 'tag-shape-7', 'tag-shape-9'
     ];
 
     function pickShape(text) {
