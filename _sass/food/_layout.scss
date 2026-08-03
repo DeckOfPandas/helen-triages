@@ -108,6 +108,27 @@ article.recipe .method-short {
     &:hover {
       color: $color-star-root;
     }
+
+    // The substring of a title that matches the name-search box, wrapped by
+    // filters.js's updateTitleHighlights() -- Helen's stretch goal, "the
+    // part of the title hit gain the orange background and scratchy,
+    // capitalised lettering," matching the tag treatment used everywhere
+    // else: a lightened .tag-shape fill and flat $color-text stroke, this
+    // time capitalised same as the active-tag convention (the surrounding,
+    // unmatched title stays lowercase -- only the hit itself changes case).
+    // background: none resets <mark>'s native yellow -- left alone, it
+    // would paint on top of .tag-shape, which sits at z-index: -1
+    // specifically to stay behind its own element's background.
+    .title-hit {
+      position: relative;
+      display: inline-block;
+      background: none;
+      color: $color-text;
+      text-transform: uppercase;
+      -webkit-text-stroke: 0.6px $color-text;
+      padding: 0 0.25em;
+      .tag-shape { color: mix($color-name-search-root, $color-white, 82%); }
+    }
   }
 }
 
@@ -209,6 +230,7 @@ article.recipe .method-short {
 }
 
 .ingredient-pill {
+  position: relative;
   transition: color 0.12s ease-in-out, font-weight 0.12s ease-in-out;
 
   // Pantry staples (see _data/common_ingredients.yml) sink to the end of the
@@ -219,10 +241,24 @@ article.recipe .method-short {
     color: lighten($color-clear-text, 22%);
   }
 
+  // Was just a colour + weight bump ("just turning the text green" -- Helen,
+  // 2026-08-03, asking for more). Brought in line with the active-tag
+  // system used everywhere else instead: a lightened .tag-shape fill (same
+  // mix ratio as STAR/MOOD/PRACTICALITIES/the active ingredient tag) and
+  // flat $color-text stroke rather than a colour shift on the surrounding
+  // plain-text word. The .tag-shape slot is added/removed by filters.js
+  // only for pills that are actually matched right now, same reasoning as
+  // the ingredient-search swarm just above: dozens of ingredient pills sit
+  // on the page across every recipe row, so nothing gets a shape until it's
+  // actually the emphasis.
   &.ingredient--matched {
-    color: $color-ingredient-active;
-    font-weight: 700;
+    display: inline-block;
+    color: $color-text;
+    font-weight: 900;
     letter-spacing: 0.01em;
+    -webkit-text-stroke: 0.6px $color-text;
+    padding: 0 0.4em;
+    .tag-shape { color: mix($color-ingredient-root, $color-white, 82%); }
   }
 }
 
@@ -451,34 +487,25 @@ article.recipe .method-short {
 // (not just a family member pulled in alongside it — see hasWordMatch in
 // filters.js).
 //
-// NEUTRAL, NOT THE SECTION'S COLOUR, and the reason generalises. This was
-// `rgba($color-ingredient-root, $saturation-badge-bg)` — the search section's
-// own hue at badge strength — and it was chosen while that hue was AUREOLIN.
-// Yellow at 10% over the page is #FAF6DF, a warm cream that reads as neutral.
-// When the section became lime green on 2026-08-01 the same 10% became #EFF6DF,
-// which reads as green. Identical number, completely different result, because
-// how coloured a tint looks at a given alpha is a property of the hue.
-//
-// The same trap as $darken-active-extra being left on the ingredient line when
-// aureolin moved off it: a value tuned for a colour, stranded when the colour
-// moved. Worth checking for every time these five are reordered.
-//
-// It matters here and not on the badges because the count is UNBOUNDED — one
-// tinted badge per recipe row is an accent, forty tinted results appearing as
-// you type is a swarm. Colour cannot carry emphasis when you do not control how
-// much of it lands at once. A darker grey says "these ones matter more" without
-// colouring anything, and the section's hue still appears where selection
-// actually happens: the label's rule, and the active state.
-//
-// TWO CHANNELS, NOT ONE. 0.06 -> 0.12 on the background alone was not enough:
-// these chips are mostly text on a pale fill, so a slightly darker fill behind
-// the same grey letters barely registers across a wrapped grid of forty. The
-// text colour is the channel that actually carries here — the base is
-// lighten($color-text, 22%), so going to full $color-text is a visible step,
-// and the darker fill then reinforces it instead of doing the work alone.
+// Background dropped entirely 2026-08-03. It had been a flat grey rectangle
+// (rgba($color-text, 0.14)) precisely BECAUSE colouring/shaping an unbounded
+// swarm was the wrong move (see the old reasoning about NEUTRAL, NOT THE
+// SECTION'S COLOUR, preserved in git) — but that grey rectangle turned out
+// to have its own problem: the moment typing narrows the results to one
+// match, that lone survivor auto-activates and gets the full tape-shape
+// treatment, and a flat rectangle suddenly becoming a torn-tape shape read
+// as jarring (Helen: "one suddenly becomes a ta[pe] shape"). Removing the
+// background altogether removes that jump too — there's nothing for the
+// active state to visibly transform FROM. Colour still carries the
+// emphasis, just through text colour alone rather than text + fill: font
+// colour on a genuine word match, $color-ingredient-active (the dark end
+// of the green already used elsewhere for this section, not a new value).
+// Same "colour cannot carry emphasis at unbounded count" logic as before
+// still applies to giving every one of forty results its own shape or its
+// own full-strength fill — that idea was raised and set aside for the same
+// reason.
 .btn-ingredient--word-match {
-  background-color: rgba($color-text, 0.14);
-  color: $color-text;
+  color: $color-ingredient-active;
 }
 
 // ============================================================================

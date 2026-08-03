@@ -64,7 +64,11 @@ permalink: /food/
         <span class="category-label-text">{{ ingredients_data.label }}</span>
       </label>
       <input type="text" id="ingredient-search-box" autocomplete="off" placeholder="ingredient name..." />
-      <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="display: none;">&times; clear</button>
+      {% comment %} visibility, not display: none -- the button's own space
+         stays reserved in the row from the start, so the input doesn't
+         suddenly lose width the instant this appears. See its rule in
+         _sass/food/_layout.scss for the fuller story. {% endcomment %}
+      <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="visibility: hidden;">&times; clear</button>
     </div>
     {% comment %} Populated by filters.js as you type; aria-live announces the
        change so it is not a silent update. {% endcomment %}
@@ -77,7 +81,7 @@ permalink: /food/
         <span class="category-label-text">{{ name_search_data.label }}</span>
       </label>
       <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
-      <button type="button" class="btn-clear-inline" id="name-search-clear" style="display: none;">&times; clear</button>
+      <button type="button" class="btn-clear-inline" id="name-search-clear" style="visibility: hidden;">&times; clear</button>
     </div>
   </div>
 
@@ -127,7 +131,7 @@ permalink: /food/
       <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}">
 
         <div class="recipe-row-content">
-        <a href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
+        <a class="recipe-title-link" href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
 
         {% if recipe.main_ingredients and recipe.main_ingredients.size > 0 %}
         {% comment %} Order is a PRESENTATION concern — main_ingredients stays an
