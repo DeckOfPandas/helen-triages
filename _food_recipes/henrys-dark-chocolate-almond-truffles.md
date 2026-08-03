@@ -4,7 +4,7 @@ short_name: "Henry's Dark Chocolate Almond Truffles"
 tagline: "These don't take long to make, but have to be done in stages."
 source: Megan
 makes: "20–24 truffles"
-prep_time: "20 mins plus setting"
+prep_time: "20 mins plus time to set"
 cook_time: "5 mins"
 main_ingredients: ["dark chocolate", "ground almonds", butter, "icing sugar", "cocoa powder"]
 star_ingredient: chocolate
@@ -19,7 +19,7 @@ ingredient_groups:
       item: icing sugar
     - amount: "50 g"
       item: ground almonds
-    - item: "dusting: icing sugar, cocoa powder, nutmeg, cinnamon, or anything you fancy"
+    - item: "dusting as preferred: icing sugar, cocoa powder, nutmeg, cinnamon, or anything you fancy"
     - amount: "3 tbsp"
       item: "flavouring to taste: Bailey's, orange liqueur, amaretto, or 3 drops ginger essence"
 method:
@@ -29,7 +29,7 @@ method:
   - "Leave to cool, but don't let it become solid."
   - "Roll into ½-inch balls, then put in the fridge until solid, two hours or so."
   - "Roll in whatever you like for dusting, then put them back in the fridge."
-  - "Remove from fridge about 2 hours before you want to eat them."
+  - "Remove from the fridge about 2 hours before you want to eat them."
 method_short:
   - ""
 notes:

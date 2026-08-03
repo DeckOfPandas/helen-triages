@@ -1,9 +1,9 @@
 ---
 title: Marinated Mozzarella and Tomato Salad
 short_name: Marinated Mozzarella and Tomato Salad
-tagline: QQ
+tagline: Great for last-minute nibbles.
 source: Vickie from Malta
-serves: QQ
+serves: 2
 prep_time: "5 mins plus 1 hr marinating"
 cook_time: None
 main_ingredients: ["cherry tomatoes", mozzarella, "extra-virgin olive oil", "white wine vinegar", basil, garlic]
@@ -24,16 +24,16 @@ ingredient_groups:
     - amount: "5 g"
       item: "fresh basil, chopped"
     - amount: ½ tsp
-      item: salt
+      item: coarse sea salt
     - amount: ½ tsp
       item: ground pepper
 method:
-  - Shake in a 1 litre jar then leave for an hour.
+  - Shake in a 1-l jar then fridge for an hour.
 method_short:
   - ""
 meta:
   rewritten: true
   proofread: false
-  cooked_before: false
+  cooked_before: true
   date_last_edited: "2026-07-25"
 ---

@@ -5,7 +5,7 @@ tagline: "Less cream than a classic mousse, richer mouthfeel, intense chocolate 
 source: "Adapted from RecipeTin Eats, recipe Nagi"
 serves: 4
 prep_time: "20 mins"
-cook_time: QQ
+cook_time: None
 main_ingredients: ["dark chocolate", eggs, cream, "caster sugar", butter]
 star_ingredient: chocolate
 tags: [dessert, "make-ahead"]

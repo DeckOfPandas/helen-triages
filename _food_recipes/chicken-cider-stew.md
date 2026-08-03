@@ -1,10 +1,10 @@
 ---
 title: Chicken and Cider Stew
 short_name: Chicken and Cider Stew
-tagline: QQ
+tagline: Comfort food, but light enough for summer.
 source: Adapted from Riverford
 serves: 4
-prep_time: Estimated 15 mins
+prep_time: 15 mins
 cook_time: "1 hr"
 main_ingredients: ["chicken thighs and drumsticks", cider, carrots, "cooking apples", "crème fraîche"]
 star_ingredient: poultry

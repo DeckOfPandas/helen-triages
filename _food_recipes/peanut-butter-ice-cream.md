@@ -5,14 +5,14 @@ tagline: "Stop here. You need no further ice cream beyond this one."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "generous 900 ml"
 prep_time: "15 mins"
-cook_time: QQ
+cook_time: None
 main_ingredients: ["sweet cream base", "peanut butter", "roasted peanuts"]
 star_ingredient: something unusual
 tags: [dessert, "ice cream", "make-ahead"]
 ingredient_groups:
   - items:
     - item: "Sweet Cream Base No. 1"
-      tip: "Make this first — see [sweet cream base](../sweet-cream-base-1/)."
+      tip: "Make this first — see [sweet cream base](../ben-jerrys-sweet-cream-base-1/)."
     - amount: "85 g"
       item: smooth peanut butter
     - amount: "65 g"
