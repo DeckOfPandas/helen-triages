@@ -30,7 +30,7 @@ star:
   class: category--star
 
 ingredients:
-  label: "SEARCH INGREDIENTS"
+  label: "SEARCH MAIN INGREDIENTS"
 
 tag_groups:
   - name: mood

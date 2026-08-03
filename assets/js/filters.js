@@ -320,7 +320,7 @@ function renderResultsPool() {
 
     var recipeCountEl = document.getElementById('recipe-count');
     if (recipeCountEl && !suppressList) {
-      recipeCountEl.textContent = visibleCount + (visibleCount === 1 ? ' recipe' : ' recipes');
+      recipeCountEl.textContent = visibleCount + (visibleCount === 1 ? ' survivor' : ' survivors');
     }
 
     // Hidden entirely once showAll is set, not just its prev/next disabled --

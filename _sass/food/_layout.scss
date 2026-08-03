@@ -381,20 +381,21 @@ article.recipe .method-short {
                 1px  1px 0 rgba($color-text, 0.3);
 }
 
-// Star and mood need MORE of the same effect, not a different one --
-// Helen, 2026-08-03, after the soft version landed: "Practicalities raised
-// lettering looks great now, but the Star and Mood aren't quite there yet
-// -- still too light." Per-hue, not a global bump: aureolin (practicalities)
-// is close to $color-bg already, so %tag-emboss-soft's shadow reads clearly
-// against it; magenta and cerulean are more mid-toned and need stronger
-// contrast on both sides to look raised at all. Boosting practicalities the
-// same amount would overshoot back into the cutout look this was built to
-// avoid — the same lesson this codebase has learned per-hue before
-// ($bar-unlit-darken-*, $darken-active-lime): one number rarely suits every
-// hue equally.
+// Star and mood need a DIFFERENT balance, not just more of everything --
+// first attempt (2026-08-03) raised both sides equally (0.55/0.3 ->
+// 0.75/0.5) and overshot the light side specifically: "GAME and DRINKS
+// have too much light on them" (comparing against MAKE-AHEAD, still on
+// %tag-emboss-soft, which reads fine). The two sides aren't symmetric
+// against every background — aureolin (practicalities) is close to
+// $color-bg already, so the light shadow is nearly invisible against it
+// regardless of alpha, while magenta and cerulean have real luminance
+// contrast against near-white, so the SAME light alpha shows up far more
+// there. Light lowered below the soft version's own 0.55 to compensate;
+// dark stays boosted, since that's what was actually fixing "too light" in
+// the sense of "not enough depth."
 %tag-emboss-soft-strong {
-  text-shadow: -1px -1px 0 rgba($color-bg, 0.75),
-                1px  1px 0 rgba($color-text, 0.5);
+  text-shadow: -1px -1px 0 rgba($color-bg, 0.4),
+                1px  1px 0 rgba($color-text, 0.55);
 }
 
 // ============================================================================

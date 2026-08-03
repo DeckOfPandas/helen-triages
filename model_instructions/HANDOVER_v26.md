@@ -1046,7 +1046,7 @@ than a new effect invented each time.
 **Recipe page: five hues** (§13.2), colour as decoration, rationed.
 **Index page: five hues**, one per filter section, in page order: `$color-
 star-root` (STAR INGREDIENT), `$color-vivid-cerulean` (MOOD), `$color-
-aureolin` (PRACTICALITIES), `$color-pure-lime-green` (SEARCH INGREDIENTS),
+aureolin` (PRACTICALITIES), `$color-pure-lime-green` (SEARCH MAIN INGREDIENTS),
 `$color-hot-orange` (I KNOW WHAT I WANT). On the index colour is a CODE — each
 hue ties a section's rule to its filter buttons, active states, and badges,
 so it has to be learned and distinct. On the recipe page colour is
