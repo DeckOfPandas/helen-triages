@@ -119,17 +119,36 @@
 
   // ---------------------------------------------------------------------------
   // Annotation marks — a small hand-drawn arrow beside each ingredient/step
-  // tip or note. One asset, no shuffling: unlike the highlighters, these are
-  // meant to read as a consistent, recognisable "here's an aside" signal
-  // rather than page-to-page variety.
+  // tip or note.
+  //
+  // Step marks: one asset, no shuffling — these are meant to read as a
+  // consistent, recognisable "here's an aside" signal, and a step's tip is
+  // read as part of a sentence, not scanned.
+  //
+  // Ingredient marks: four horizontal arrows, dealt from a shuffled pool
+  // (same mechanism as highlighters() above — no repeats until all four have
+  // been used on the page). Ingredients are scanned, not read, so a single
+  // repeated glyph would read as more "system," not less; a handful of
+  // slightly different hand-drawn arrows reads as one hand, drawn fresh each
+  // time, which is closer to what a marginal note in a paper recipe actually
+  // looks like.
   // ---------------------------------------------------------------------------
   function annotationMarks() {
     var slots = document.querySelectorAll('.annotation-mark');
     if (!slots.length) return;
 
-    var url = HTF.siteAsset('/doodles/arrow-annotation.svg');
-    if (!url) return;
+    var stepUrl = HTF.siteAsset('/doodles/arrow-annotation.svg');
+    var nextIngredientArrow = HTF.makeShuffledPicker([
+      '/doodles/arrow-horizontal-1.svg',
+      '/doodles/arrow-horizontal-2.svg',
+      '/doodles/arrow-horizontal-3.svg',
+      '/doodles/arrow-horizontal-4.svg'
+    ]);
+
     slots.forEach(function (slot) {
+      var isIngredient = !!slot.closest('.ingredient-annotation');
+      var url = isIngredient ? HTF.siteAsset(nextIngredientArrow()) : stepUrl;
+      if (!url) return;
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
     });
   }

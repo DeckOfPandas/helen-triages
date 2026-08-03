@@ -941,10 +941,14 @@ $annotation-arrow-gap: 0.9em;
   &--note { color: $color-clear-text; }
 }
 
+// 1.6em x 0.8em (~2:1) matches the four horizontal arrows' own aspect ratio
+// (each is close to 2:1 once rotated to point right) — the box the
+// placeholder used was closer to square, so it was letterboxing the real
+// artwork down smaller than it needed to be.
 .ingredient-annotation .annotation-mark {
   display: inline-block;
-  width: 1.1em;
-  height: 0.85em;
+  width: 1.6em;
+  height: 0.8em;
   margin-right: $annotation-arrow-gap;
   vertical-align: middle;
 }
