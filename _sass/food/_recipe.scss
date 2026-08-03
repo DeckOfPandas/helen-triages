@@ -885,6 +885,14 @@ article.recipe .recipe-body-content {
 
   &--tip  { color: $color-clear-text; }
   &--note { color: $color-clear-text; }
+
+  // TEMPORARY: arrow 2 has grown wider than the base 3rem gutter (see
+  // .annotation-mark--arrow-2 below), so its container needs its own text
+  // start to keep a clear gap. Fold into the base padding-left once one
+  // candidate wins.
+  &--arrow-2 {
+    padding-left: 4rem;
+  }
 }
 
 // A hand-drawn sparkle in the gutter — the same "here's an aside" signal a
@@ -909,18 +917,18 @@ article.recipe .recipe-body-content {
 
   // TEMPORARY, per the two-candidate comparison in decorations.js: arrow 2
   // pulled an extra 1rem right, closer to the text, per Helen's request, and
-  // now sized up (2rem x 1.75rem, vs arrow 1's 1.2rem square) since a bigger
-  // gesture reads better at this angle. top is recentred against a single
-  // line of annotation text (line-height 1.45 x font-size 0.82rem =~
-  // 1.19rem) now that the mark is taller than the text line it sits beside:
-  // (1.19 - 1.75) / 2 =~ -0.28rem. Arrow 1 stays put — she's happy with its
-  // position as is. Fold back to a single unmodified rule once one
-  // candidate wins.
+  // sized up again to 2.5rem x 2rem (from 2rem x 1.75rem) — the container's
+  // own padding-left grew to match, see .step-annotation--arrow-2 above.
+  // top is recentred against a single line of annotation text (line-height
+  // 1.45 x font-size 0.82rem =~ 1.19rem) now that the mark is taller than
+  // the text line it sits beside: (1.19 - 2) / 2 =~ -0.41rem. Arrow 1 stays
+  // put — she's happy with its position as is. Fold back to a single
+  // unmodified rule once one candidate wins.
   &--arrow-2 {
     left: 1rem;
-    top: -0.28rem;
-    width: 2rem;
-    height: 1.75rem;
+    top: -0.41rem;
+    width: 2.5rem;
+    height: 2rem;
   }
 
   svg {

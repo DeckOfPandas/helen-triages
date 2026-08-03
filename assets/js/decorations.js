@@ -133,12 +133,23 @@
     if (!slots.length) return;
 
     var candidates = [
-      { file: '/doodles/arrow-indent-1.svg', modifier: 'annotation-mark--arrow-1' },
-      { file: '/doodles/arrow-indent-2.svg', modifier: 'annotation-mark--arrow-2' }
+      { file: '/doodles/arrow-indent-1.svg', suffix: 'arrow-1' },
+      { file: '/doodles/arrow-indent-2.svg', suffix: 'arrow-2' }
     ];
     slots.forEach(function (slot, i) {
       var candidate = candidates[i % candidates.length];
-      slot.classList.add(candidate.modifier);
+      slot.classList.add('annotation-mark--' + candidate.suffix);
+
+      // Arrow 2 has grown wider than the shared gutter, so its container
+      // needs its own text start too (.ingredient-annotation--arrow-2 /
+      // .step-annotation--arrow-2) — not just the mark itself.
+      var container = slot.closest('.ingredient-annotation, .step-annotation');
+      if (container) {
+        var base = container.classList.contains('ingredient-annotation')
+          ? 'ingredient-annotation' : 'step-annotation';
+        container.classList.add(base + '--' + candidate.suffix);
+      }
+
       var url = HTF.siteAsset(candidate.file);
       if (!url) return;
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
