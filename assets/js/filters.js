@@ -78,15 +78,13 @@ document.addEventListener('DOMContentLoaded', function () {
     return activeTags.size > 0 || activeStar !== null || activeMetaFilters.size > 0;
   }
 
-  // Fisher-Yates, then re-append in the shuffled order — appendChild on a node
-  // already in the document MOVES it rather than duplicating it, so this
-  // reorders the real DOM, not a detached copy of it.
+  // The shuffle itself is pure -- assets/js/recipe-list.js, tested directly
+  // with Node. This is the DOM half: re-appending in the new order.
+  // appendChild on a node already in the document MOVES it rather than
+  // duplicating it, so this reorders the real DOM, not a detached copy.
   function shuffleRecipeList() {
     if (!recipeList) return;
-    for (var i = items.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = items[i]; items[i] = items[j]; items[j] = tmp;
-    }
+    items = HTF.recipeList.shuffle(items);
     items.forEach(function(li) { recipeList.appendChild(li); });
   }
 
@@ -265,19 +263,18 @@ function renderResultsPool() {
       });
 
       visibleCount = matchingLis.length;
-      totalPages = Math.max(1, Math.ceil(visibleCount / PAGE_SIZE));
-      if (currentPage > totalPages) currentPage = totalPages;
-      if (currentPage < 1) currentPage = 1;
 
-      if (showAll) {
-        matchingLis.forEach(function(li) { li.style.display = ''; });
-      } else {
-        var pageStart = (currentPage - 1) * PAGE_SIZE;
-        var pageEnd = pageStart + PAGE_SIZE;
-        matchingLis.forEach(function(li, idx) {
-          li.style.display = (idx >= pageStart && idx < pageEnd) ? '' : 'none';
-        });
-      }
+      // The maths is pure -- assets/js/recipe-list.js -- and returns a
+      // legal currentPage even if the one we asked for no longer exists
+      // (a filter can narrow the results out from under whatever page you
+      // were on), so it's adopted back rather than just read.
+      var pageInfo = HTF.recipeList.paginate(visibleCount, currentPage, PAGE_SIZE, showAll);
+      currentPage = pageInfo.currentPage;
+      totalPages = pageInfo.totalPages;
+
+      matchingLis.forEach(function(li, idx) {
+        li.style.display = (idx >= pageInfo.start && idx < pageInfo.end) ? '' : 'none';
+      });
     }
 
     document.querySelectorAll('.recipe-list .badge').forEach(function(badge) {
