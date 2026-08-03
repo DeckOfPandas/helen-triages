@@ -621,19 +621,21 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   //
   // No emboss/raised text-shadow here any more (dropped 2026-08-03, see the
   // comment above %tag-emboss-soft's old spot) — flat stroke only, same
-  // 0.5px for all three categories rather than a value per category. The
-  // -webkit-text-stroke stays category-coloured, so the category identity
-  // still survives the switch to black text; .tag-shape's own fill is
-  // lightened slightly (mix with white) rather than full-strength root hue,
-  // Helen's suggestion for taking some of the loudness off now the emboss
-  // isn't doing any of that work either.
+  // 0.6px for all three categories rather than a value per category, and
+  // in $color-text (same dark colour as the letter itself) rather than the
+  // category -active hue — Helen's correction once she saw it: the
+  // category colour lived in .tag-shape already, and a stroke that matched
+  // the letter reads as one solid dark letterform instead of introducing a
+  // second colour. .tag-shape's own fill lightened further too (mix with
+  // white, 12% -> 18%), Helen's second nudge on the same "back off the
+  // loudness" idea.
   &.category--star .btn-star.active {
     @extend %btn-active-base;
     background: none;
     color: $color-text;
     text-shadow: none;
-    -webkit-text-stroke: 0.5px $color-star-active;
-    .tag-shape { color: mix($color-star-root, $color-white, 88%); }
+    -webkit-text-stroke: 0.6px $color-text;
+    .tag-shape { color: mix($color-star-root, $color-white, 82%); }
   }
 
   &.category--mood .btn-tag.active {
@@ -641,8 +643,8 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     background: none;
     color: $color-text;
     text-shadow: none;
-    -webkit-text-stroke: 0.5px $color-mood-active;
-    .tag-shape { color: mix($color-mood-root, $color-white, 88%); }
+    -webkit-text-stroke: 0.6px $color-text;
+    .tag-shape { color: mix($color-mood-root, $color-white, 82%); }
   }
 
   &.category--practicalities .btn-tag.active {
@@ -650,8 +652,8 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     background: none;
     color: $color-text;
     text-shadow: none;
-    -webkit-text-stroke: 0.5px $color-practicalities-active;
-    .tag-shape { color: mix($color-practicalities-root, $color-white, 88%); }
+    -webkit-text-stroke: 0.6px $color-text;
+    .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
   }
 
   .category-buttons {
@@ -861,9 +863,11 @@ $index-label-gap:   $space-md;   // a label to its own buttons
 // Text colour added 2026-08-03, same reasoning as the active filter buttons
 // above: near-black reads better than the category -active hue sitting on
 // top of the full-colour tape shape. No emboss/raised text-shadow any more
-// either (same date, same rule as the buttons above) — flat 0.5px stroke,
-// one value for every category, and .tag-shape lightened slightly rather
-// than full-strength root hue to take some of the loudness off in its place.
+// either (same date, same rule as the buttons above) — flat stroke, same
+// $color-text (not a category hue) and same 0.6px width as the buttons, so
+// the category identity lives only in .tag-shape's own fill, lightened
+// further again (mix with white, 12% -> 18%) to keep backing off the
+// loudness now that neither the shadow nor the stroke are carrying it.
 .recipe-list .badge.badge--matched {
   text-transform: uppercase;
   font-size: 0.72rem;
@@ -879,9 +883,9 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // pills). No more background-color: that was the pre-tape-shape fill,
   // stale since the SVG shape itself is the visible fill now and sits
   // UNDER it doing nothing.
-  &.badge-star           { -webkit-text-stroke: 0.5px $color-star-active;           .tag-shape { color: mix($color-star-root, $color-white, 88%); } }
-  &.badge-mood           { -webkit-text-stroke: 0.5px $color-mood-active;           .tag-shape { color: mix($color-mood-root, $color-white, 88%); } }
-  &.badge-practicalities { -webkit-text-stroke: 0.5px $color-practicalities-active; .tag-shape { color: mix($color-practicalities-root, $color-white, 88%); } }
+  &.badge-star           { -webkit-text-stroke: 0.6px $color-text; .tag-shape { color: mix($color-star-root, $color-white, 82%); } }
+  &.badge-mood           { -webkit-text-stroke: 0.6px $color-text; .tag-shape { color: mix($color-mood-root, $color-white, 82%); } }
+  &.badge-practicalities { -webkit-text-stroke: 0.6px $color-text; .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); } }
 }
 
 // Layers on top of a badge-star/mood/practicalities that's ALSO an
@@ -896,7 +900,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   letter-spacing: 0.04em;
   color: $color-text;
   text-shadow: none;
-  -webkit-text-stroke: 0.5px $color-ingredient-active;
+  -webkit-text-stroke: 0.6px $color-text;
 }
 
 // --- Global clear-all button (JS-created, prepended to .controls) -----
