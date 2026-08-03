@@ -320,6 +320,45 @@ article.recipe .method-short {
   }
 }
 
+// --- Sticker treatment: taxonomy tags only ------------------------------------
+// "Jazz up the tag pills" (Helen, 2026-08-03) after dropping the category-code
+// bar idea. Scoped to .badge-group__content specifically -- the star/mood/
+// practicalities tags, not .badge-group__meta's draft/needs-rewrite/
+// needs-proofread flags, which are operational status, not content, and
+// shouldn't compete for the same attention.
+//
+// filter: drop-shadow(), not box-shadow -- box-shadow paints behind the
+// element's own (unclipped) box, so it would show as a rectangle poking out
+// past the clip-path polygon's cut corners. drop-shadow renders a shadow of
+// the actual painted (already-clipped) silhouette, so it follows the facet
+// shape correctly.
+//
+// Rotation cycles through four fixed angles by position (nth-child), not
+// random -- random would jitter to a different tilt on every rebuild/reload,
+// which reads as a bug the moment you notice a page looking different for no
+// reason. Fixed-by-position is deterministic and still varied row to row,
+// since which position a given tag lands in changes recipe to recipe. Small
+// angles (max 2deg) -- enough to feel hand-placed, not enough to fight
+// readability at 0.72rem.
+.badge-group__content .badge {
+  filter: drop-shadow(1px 2px 1.5px rgba($color-text, 0.18));
+  transition: filter 0.1s ease-in-out, transform 0.1s ease-in-out;
+
+  &:nth-child(4n+1) { transform: rotate(-2deg); }
+  &:nth-child(4n+2) { transform: rotate(1.5deg); }
+  &:nth-child(4n+3) { transform: rotate(-1deg); }
+  &:nth-child(4n+4) { transform: rotate(2deg); }
+
+  // Straightens up and lifts slightly rather than just changing colour/weight
+  // -- a small physical response on top of .badge--matched's existing
+  // text-stroke escalation, not a replacement for it.
+  &:hover,
+  &.badge--matched {
+    transform: rotate(0deg) scale(1.05);
+    filter: drop-shadow(1.5px 3px 2px rgba($color-text, 0.25));
+  }
+}
+
 // ============================================================================
 // BUTTONS
 // ============================================================================
