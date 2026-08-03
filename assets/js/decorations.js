@@ -213,7 +213,15 @@
     }
 
     slots.forEach(function (slot) {
-      var host = slot.closest('.badge, .btn-tag, .btn-star');
+      // .ingredient-pill and .title-hit added 2026-08-04 -- both got a
+      // .tag-shape slot the same way badges and buttons do, but this list
+      // was never updated to match, so `host` came back null and the guard
+      // below silently skipped them: no shape ever fetched, no fill ever
+      // shown (Helen: "There's no fill though, just the scratched,
+      // capitalised font"). Same bug for both, just more obvious on
+      // .title-hit sitting on the plain page background than on
+      // .ingredient-pill's already-busier row.
+      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit');
       var text = (host ? host.textContent : '').trim().toLowerCase();
       if (!text) return;
       var shape = pickShape(text);

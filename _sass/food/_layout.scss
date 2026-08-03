@@ -126,7 +126,13 @@ article.recipe .method-short {
       color: $color-text;
       text-transform: uppercase;
       -webkit-text-stroke: 0.6px $color-text;
-      padding: 0 0.25em;
+      // Was 0 0.25em -- a title hit usually lands mid-word (GRAndma's, not
+      // a whole word on its own), so padding on BOTH sides reads as a
+      // stray space where the highlighted part rejoins the rest of the
+      // word (Helen: "a trailing space after the active substring").
+      // Trimmed down rather than dropped entirely -- the shape still wants
+      // a little room so its torn edge doesn't touch the letters.
+      padding: 0 0.08em;
       .tag-shape { color: mix($color-name-search-root, $color-white, 82%); }
     }
   }
@@ -506,6 +512,19 @@ article.recipe .method-short {
 // reason.
 .btn-ingredient--word-match {
   color: $color-ingredient-active;
+  // font-weight has nowhere left to go -- these are already font-weight:
+  // 700 (the .btn-tag base above, applied uniformly, matched or not), and
+  // Courier New only ships Regular and Bold as real static faces, so 700 is
+  // already this font's ceiling. Helen confirmed via devtools that matched
+  // and unmatched results were rendering at the same weight, which is
+  // consistent with that: there was never a separate, lighter weight on
+  // unmatched results for a match to stand out from. A stroke (her own
+  // suggestion, once weight was ruled out) is a real, working lever
+  // instead -- same trick @include punched() and .category-label's own
+  // stroke already use site-wide to read heavier than the font alone can
+  // render. Same colour as the fill, not a separate darker value, so it
+  // reads as "thicker green" rather than a mismatched outline.
+  -webkit-text-stroke: 0.5px $color-ingredient-active;
 }
 
 // ============================================================================
@@ -782,15 +801,24 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     align-items: center;
     gap: $space-md;
     width: 100%;
-    max-width: 550px;
+    // Was 550px. The clear button now reserves its own space at ALL times
+    // (visibility, not display -- see its own comment below), which is
+    // exactly what fixed it appearing to cut the input off mid-typing, but
+    // it also meant that reserved space came out of the input's share of
+    // the same 550px even at rest, before you'd typed a single character
+    // (Helen: "cut off even before typing anything -- it ends at the first
+    // '.'"). Widened by roughly the clear button's own footprint (its text
+    // plus $space-md of margin) so the input gets back the room it lost.
+    max-width: 620px;
     position: relative;
 
     // Both label and clear button default to flex-shrink: 1 with no
     // white-space override -- fine while the clear button stays hidden
-    // (display: none reserves no space), but once typing shows it, the row
-    // no longer fits everything at its natural width and something has to
-    // give. Without this, it was the LABEL that gave: shrinking below its
-    // own text's width and wrapping onto two lines ("search main" /
+    // (its own space is reserved but it has zero visible width impact on
+    // wrapping), but once typing narrows what's left, the row no longer
+    // fits everything at its natural width and something has to give.
+    // Without this, it was the LABEL that gave: shrinking below its own
+    // text's width and wrapping onto two lines ("search main" /
     // "ingredients" -- Helen, 2026-08-03). Pinning the label at its natural
     // width means the INPUT absorbs the squeeze instead, which is the
     // behaviour actually wanted -- a heading shouldn't reflow because of
