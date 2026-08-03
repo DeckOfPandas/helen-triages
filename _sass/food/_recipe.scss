@@ -941,13 +941,16 @@ $annotation-arrow-gap: 0.9em;
   &--note { color: $color-clear-text; }
 }
 
-// 1.6em x 0.8em (~2:1) matches the four horizontal arrows' own aspect ratio
-// (each is close to 2:1 once rotated to point right) — the box the
-// placeholder used was closer to square, so it was letterboxing the real
-// artwork down smaller than it needed to be.
+// Started at 1.6em x 0.8em, matching the four horizontal arrows' own ~2:1
+// aspect ratio. Width now stretched 50% (1.6em -> 2.4em) per Helen's ask —
+// height untouched, so it's a left-to-right stretch specifically, not a
+// scale-up. The arrow SVGs themselves needed preserveAspectRatio="none" for
+// this to actually distort the artwork rather than just add empty padding
+// either side of it (same technique the tape assets use to stretch-to-fill).
+// Horizontal spacing ($annotation-arrow-gap) deliberately untouched.
 .ingredient-annotation .annotation-mark {
   display: inline-block;
-  width: 1.6em;
+  width: 2.4em;
   height: 0.8em;
   margin-right: $annotation-arrow-gap;
   vertical-align: middle;
