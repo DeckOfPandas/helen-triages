@@ -913,16 +913,12 @@ article.recipe .recipe-body-content {
 }
 
 // --- Ingredient annotations: inline, same line as the ingredient -----------
-// PLACEHOLDER mark asset (arrow-annotation.svg, same as the step version) —
-// this is here to test the LAYOUT model, not the final artwork. Helen has
-// four horizontal arrows in progress for this slot specifically, picked at
-// random per instance the way highlighters() already does for highlighter
-// shapes; swap in once she supplies them.
-//
-// No gutter, no absolute positioning: the annotation is just inline content
-// after the ingredient text, wrapping like any other text if it runs past
-// the line. That's the point — a block-level aside below the line was
-// exactly what pulled Helen's eye out of scanning the list.
+// Mark artwork is four horizontal arrows dealt from a shuffled pool (see
+// annotationMarks() in decorations.js) — no gutter, no absolute positioning,
+// the annotation is just inline content after the ingredient text, wrapping
+// like any other text if it runs past the line. That's the point — a
+// block-level aside below the line was exactly what pulled Helen's eye out
+// of scanning the list.
 // $annotation-arrow-gap sits on both sides of the mark — before it (clear of
 // the ingredient text) and after it (clear of the annotation text) — so it
 // reads as a deliberate gap the arrow sits inside, not squeezed against
