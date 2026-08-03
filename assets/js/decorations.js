@@ -234,6 +234,14 @@
     });
   }
 
+  // Exposed so filters.js can re-run it after creating a .tag-shape slot of
+  // its own — the active ingredient-search tag is built by JS, after this
+  // file's own one-time pass over the page has already happened, so nothing
+  // would ever fill that slot in without a way to ask for another pass.
+  // Safe to call repeatedly: fetchSvg caches by URL (assets.js), so re-scanning
+  // slots that already have their shape costs no extra network activity.
+  HTF.tagShapes = tagShapes;
+
   highlighters();
   tape();
   footerDecoration();

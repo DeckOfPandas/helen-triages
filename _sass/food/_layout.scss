@@ -55,7 +55,9 @@ article.recipe .method-short {
 .results-heading {
   margin: $spacing-section-top 0 $space-lg;
   display: flex;
-  justify-content: flex-end;
+  // Was flex-end -- Helen, 2026-08-03: sitting alone at the right edge of
+  // an otherwise left-aligned page, it read as stray rather than placed.
+  justify-content: flex-start;
 }
 
 .recipe-list {
@@ -755,6 +757,26 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     width: 100%;
     max-width: 550px;
     position: relative;
+
+    // Both label and clear button default to flex-shrink: 1 with no
+    // white-space override -- fine while the clear button stays hidden
+    // (display: none reserves no space), but once typing shows it, the row
+    // no longer fits everything at its natural width and something has to
+    // give. Without this, it was the LABEL that gave: shrinking below its
+    // own text's width and wrapping onto two lines ("search main" /
+    // "ingredients" -- Helen, 2026-08-03). Pinning the label at its natural
+    // width means the INPUT absorbs the squeeze instead, which is the
+    // behaviour actually wanted -- a heading shouldn't reflow because of
+    // how much you've typed elsewhere in the same row.
+    .category-label {
+      white-space: nowrap;
+      flex-shrink: 0;
+      // "A little space after the heading" -- Helen, 2026-08-03. On top of
+      // the row's own $space-md gap (label to input to clear button,
+      // uniformly), not instead of it -- this row specifically wanted more
+      // breathing room right after the label.
+      margin-right: $space-sm;
+    }
   }
 
   #ingredient-search-box {
@@ -775,6 +797,18 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     border-bottom: 1px solid lighten($color-clear-text, 25%);
     color: lighten($color-text, 12%);
     flex: 1;
+    // Text inputs get a non-zero intrinsic min-width from the browser
+    // (roughly the UA's default `size`), which flexbox respects unless
+    // told otherwise, so flex: 1 alone doesn't let this shrink past that
+    // floor. SEARCH MAIN INGREDIENTS is longer than I KNOW WHAT I WANT, so
+    // this row's label ate more space and pushed THIS input against its
+    // floor sooner, overflowing .search-input's own max-width further than
+    // the shorter-labelled row did — the two inputs ended at different
+    // points instead of both flush with their row's own right edge.
+    // Helen: "it would look tidiest if both search input fields ended in
+    // the same place." Standard fix for a flex item refusing to shrink to
+    // its container; matching override on #name-search-box below.
+    min-width: 0;
 
     &:focus {
       outline: none;
@@ -829,6 +863,8 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     border-bottom: 1px solid lighten($color-clear-text, 25%);
     color: lighten($color-text, 12%);
     flex: 1;
+    // See #ingredient-search-box's own comment above.
+    min-width: 0;
 
     &:focus {
       outline: none;
@@ -847,11 +883,21 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   }
 }
 
-// Active ingredient search button
+// Active ingredient search button — brought in line with the STAR/MOOD/
+// PRACTICALITIES active tag treatment above (2026-08-03, Helen: "apply the
+// same tag styling to active ingredient search tags, based on the green
+// obviously"): flat $color-text stroke, no shadow, category identity
+// carried only by .tag-shape's own lightened fill. Its .tag-shape slot is
+// added by JS (filters.js's ensureActiveIngredientShape()) rather than by
+// a template, since this button is built dynamically as you type — see the
+// comment there for why it's the only ingredient-search button that gets one.
 .search .btn-tag.btn-ingredient.active {
   @extend %btn-active-base;
-  color: $color-ingredient-active;
-  -webkit-text-stroke: 0.5px $color-ingredient-active;
+  background: none;
+  color: $color-text;
+  text-shadow: none;
+  -webkit-text-stroke: 0.6px $color-text;
+  .tag-shape { color: mix($color-ingredient-root, $color-white, 82%); }
 }
 
 // ============================================================================

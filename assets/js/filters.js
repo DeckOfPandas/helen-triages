@@ -122,6 +122,30 @@ document.addEventListener('DOMContentLoaded', function () {
     return btn;
   }
 
+  // The tape-shape treatment other active filters get (STAR/MOOD/
+  // PRACTICALITIES) needs a .tag-shape slot in the markup, same as
+  // _includes/filter_group.html adds for those. Ingredient buttons are all
+  // built by makeIngredientButton() above with no slot at all, deliberately
+  // — a shape on every one of an unbounded swarm of search results would be
+  // exactly the "count is unbounded" noise .btn-ingredient--word-match's own
+  // comment already argues against. Only the ONE active button (Helen:
+  // "apply the same tag styling to active ingredient search tags") gets a
+  // slot, added here rather than at creation time since which button ends
+  // up active isn't always known yet when it's built (renderResultsPool's
+  // narrow-to-one-match case sets .active on an already-built button).
+  function ensureActiveIngredientShape() {
+    if (!matrix) return;
+    var activeBtn = matrix.querySelector('.btn-ingredient.active');
+    if (!activeBtn) return;
+    if (!activeBtn.querySelector('.tag-shape')) {
+      var shape = document.createElement('span');
+      shape.className = 'tag-shape';
+      shape.setAttribute('aria-hidden', 'true');
+      activeBtn.insertBefore(shape, activeBtn.firstChild);
+    }
+    if (window.HTF && HTF.tagShapes) HTF.tagShapes();
+  }
+
   function updateIngredientClear() {
     if (ingredientClear) {
       ingredientClear.style.display = (activeIngredient || (searchBox && searchBox.value.trim())) ? 'inline-block' : 'none';
@@ -163,6 +187,7 @@ function renderResultsPool() {
     onlyBtn.classList.add('active');
     isSearching = false;
   }
+  ensureActiveIngredientShape();
   update();
   updateIngredientClear();
 }
@@ -424,6 +449,8 @@ function renderResultsPool() {
           activeIngredient = null;
           isSearching = true;
           target.classList.remove('active');
+          var staleShape = target.querySelector('.tag-shape');
+          if (staleShape) staleShape.remove();
         } else {
           activeIngredient = ing;
           isSearching = false;
@@ -433,6 +460,7 @@ function renderResultsPool() {
           resultsPool.appendChild(target);
           matrix.querySelectorAll('.btn-ingredient').forEach(function(b) { b.classList.remove('active'); });
           target.classList.add('active');
+          ensureActiveIngredientShape();
         }
         update();
         return;
