@@ -865,15 +865,27 @@ article.recipe .recipe-body-content {
 }
 
 // --- Ingredient and step annotations ----------------------------------------
-// tip: active technique advice. note: contextual information.
-// Both display on a new line, smaller and lighter than the ingredient text.
-//
-// Both are now the same colour. Tips were cerulean, which spent a whole hue on
-// a distinction that barely occurs: across the published recipes there are 14
-// tips and 2 notes, so a page carrying both at once is close to hypothetical.
-// If the distinction ever needs to be visible, make it typographic — the colour
+// tip: active technique advice. note: contextual information. Both are the
+// same colour — tips were cerulean, which spent a whole hue on a distinction
+// that barely occurs: across the published recipes there are 14 tips and 2
+// notes, so a page carrying both at once is close to hypothetical. If the
+// distinction ever needs to be visible, make it typographic — the colour
 // budget is committed elsewhere.
-.ingredient-annotation,
+//
+// Step and ingredient annotations used to share one block/gutter layout.
+// Split apart 2026-08-03: Helen reads a step as a sentence, so dropping to a
+// new indented line for its tip doesn't cost her anything. She reads
+// ingredients as a list to scan (amounts, mainly — "how much of everything"),
+// and the same block/gutter treatment there pulled her eye out of that scan
+// every time. They're not two sizes of the same component any more, they're
+// two different components that happen to share a mark and a colour.
+
+// --- Step annotations: block, mark in a left gutter -------------------------
+// The mark sits absolutely positioned in the gutter (the site's established
+// mark-in-a-gutter technique, also used for step numbers) rather than
+// inline, so padding-left indents every wrapped line of the annotation text
+// evenly, not just the first — a step's tip is often a full sentence, long
+// enough to wrap.
 .step-annotation {
   display: block;
   position: relative;
@@ -887,44 +899,56 @@ article.recipe .recipe-body-content {
   &--note { color: $color-clear-text; }
 }
 
-// A hand-drawn arrow in the gutter — the same "here's an aside" signal a
-// paper recipe book gets from a felt-pen mark in the margin, not a footnote
-// asterisk. Positioned absolutely (the site's established mark-in-a-gutter
-// technique, also used for step numbers) rather than inline, so padding-left
-// indents every wrapped line of the annotation text evenly, not just the
-// first.
-//
-// Violet, not magenta: magenta already carries the title rule, the toggle
-// and every link, so a magenta mark here read as one more competing use of
-// the site's loudest colour rather than a quiet aside. Violet is already
-// spent on the box tints, so this reuses rather than adding a hue.
-//
-// top recentres the mark (2.5rem x 2rem) against a single line of
-// annotation text (line-height 1.45 x font-size 0.82rem =~ 1.19rem) rather
-// than aligning their top edges, since the mark is taller than the text
-// line it sits beside; -0.65rem is Helen's own eyeballed fine-tune of the
-// arithmetic result of ~-0.41rem.
-.annotation-mark {
+// top recentres the mark (2.5rem x 2rem) against a single line of annotation
+// text (line-height 1.45 x font-size 0.82rem =~ 1.19rem) rather than
+// aligning their top edges, since the mark is taller than the text line it
+// sits beside; -0.65rem is Helen's own eyeballed fine-tune of the arithmetic
+// result of ~-0.41rem.
+.step-annotation .annotation-mark {
   position: absolute;
   left: 1rem;
   top: -0.65rem;
   width: 2.5rem;
   height: 2rem;
-  color: $color-vibrant-violet;
+}
 
-  // Full size reads as "a lot" next to one short ingredient line (Helen,
-  // looking at macarons.md) — a step gets a whole sentence to sit beside,
-  // an ingredient gets "140 g finely ground almonds". Smaller here, and
-  // top recentred the same way the step version was: pure line-height
-  // arithmetic gives -0.21rem ((1.19 - 1.6) / 2); nudged further to -0.4rem
-  // since the step mark needed a similar nudge past its own arithmetic
-  // result (-0.41rem -> -0.65rem) — expect this to want the same kind of
-  // eyeballed correction once it's actually visible.
-  .ingredient-annotation & {
-    width: 2rem;
-    height: 1.6rem;
-    top: -0.4rem;
-  }
+// --- Ingredient annotations: inline, same line as the ingredient -----------
+// PLACEHOLDER mark asset (arrow-annotation.svg, same as the step version) —
+// this is here to test the LAYOUT model, not the final artwork. Helen has
+// four horizontal arrows in progress for this slot specifically, picked at
+// random per instance the way highlighters() already does for highlighter
+// shapes; swap in once she supplies them.
+//
+// No gutter, no absolute positioning: the annotation is just inline content
+// after the ingredient text, wrapping like any other text if it runs past
+// the line. That's the point — a block-level aside below the line was
+// exactly what pulled Helen's eye out of scanning the list.
+.ingredient-annotation {
+  display: inline;
+  margin-left: 0.4em;
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.45;
+
+  &--tip  { color: $color-clear-text; }
+  &--note { color: $color-clear-text; }
+}
+
+.ingredient-annotation .annotation-mark {
+  display: inline-block;
+  width: 1.1em;
+  height: 0.85em;
+  margin-right: 0.25em;
+  vertical-align: middle;
+}
+
+// Violet, not magenta, for both marks above: magenta already carries the
+// title rule, the toggle and every link, so a magenta mark here read as one
+// more competing use of the site's loudest colour rather than a quiet aside.
+// Violet is already spent on the box tints, so this reuses rather than
+// adding a hue.
+.annotation-mark {
+  color: $color-vibrant-violet;
 
   svg {
     display: block;
