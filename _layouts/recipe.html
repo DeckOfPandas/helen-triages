@@ -140,7 +140,9 @@ layout: default
         <span class="section-heading-text">Notes</span>
       </h2>
     </div>
-    {% for note in page.notes %}<p class="note">{{ note | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endfor %}
+    <div class="notes{% if page.notes.size == 1 %} notes--single{% endif %}">
+      {% for note in page.notes %}<p class="note">{{ note | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endfor %}
+    </div>
   {% endif %}
 
   {% if content != '' %}
