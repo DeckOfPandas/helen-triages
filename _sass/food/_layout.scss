@@ -282,11 +282,10 @@ article.recipe .method-short {
 }
 
 .badge {
-  // Was $font-headings (Courier), inherited from the shared clip-path rule
-  // above. Switched to the sans body face 2026-08-03, Helen's call — the
-  // same reasoning as the short-method toggle link earlier this session:
-  // Courier at 0.72rem reads cramped, and a pill is a label, not a heading.
-  font-family: $font-body;
+  // Briefly $font-body (sans), reverted same day: Helen wants the pills to
+  // match the filter buttons above them, which keep $font-headings
+  // (Courier) via the shared clip-path rule — inherited from there rather
+  // than set here again.
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: lowercase;
@@ -515,20 +514,29 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // have higher specificity than the base .btn-tag/.btn-star rule above,
   // so no !important needed here.
   // Shared typography/bg via %btn-active-base; each adds its own colour.
+  //
+  // background-color overrides %btn-active-base's generic grey with the same
+  // per-category tint the matched recipe-row pills use ($saturation-tag-
+  // pill-bg-matched) -- Helen's ask, "for a bit more of a pop" to match.
+  // RESTING .btn-tag/.btn-star (not .active) is untouched -- only the chosen
+  // state changes.
   &.category--star .btn-star.active {
     @extend %btn-active-base;
+    background-color: rgba($color-star-root, $saturation-tag-pill-bg-matched);
     color: $color-star-active;
     -webkit-text-stroke: 0.5px $color-star-active;
   }
 
   &.category--mood .btn-tag.active {
     @extend %btn-active-base;
+    background-color: rgba($color-mood-root, $saturation-tag-pill-bg-matched);
     color: $color-mood-active;
     -webkit-text-stroke: 0.6px $color-mood-active;
   }
 
   &.category--practicalities .btn-tag.active {
     @extend %btn-active-base;
+    background-color: rgba($color-practicalities-root, $saturation-tag-pill-bg-matched);
     color: $color-practicalities-active;
     -webkit-text-stroke: 0.5px $color-practicalities-active;
   }
