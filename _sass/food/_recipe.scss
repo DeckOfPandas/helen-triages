@@ -923,9 +923,16 @@ article.recipe .recipe-body-content {
 // after the ingredient text, wrapping like any other text if it runs past
 // the line. That's the point — a block-level aside below the line was
 // exactly what pulled Helen's eye out of scanning the list.
+// $annotation-arrow-gap sits on both sides of the mark — before it (clear of
+// the ingredient text) and after it (clear of the annotation text) — so it
+// reads as a deliberate gap the arrow sits inside, not squeezed against
+// either side. Generous rather than tight: Helen's ask was room enough that
+// the arrow doesn't drag her eye off the ingredient line she's scanning.
+$annotation-arrow-gap: 0.9em;
+
 .ingredient-annotation {
   display: inline;
-  margin-left: 0.4em;
+  margin-left: $annotation-arrow-gap;
   font-size: 0.82rem;
   font-style: italic;
   line-height: 1.45;
@@ -938,7 +945,7 @@ article.recipe .recipe-body-content {
   display: inline-block;
   width: 1.1em;
   height: 0.85em;
-  margin-right: 0.25em;
+  margin-right: $annotation-arrow-gap;
   vertical-align: middle;
 }
 
