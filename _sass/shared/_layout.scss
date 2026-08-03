@@ -228,10 +228,19 @@ $tape-protrusion: 0.2rem;
   // a BLACK tape background instead, where it suddenly has real contrast to
   // work with, and full-strength read as a stark white glow (Helen: "the
   // lit side of FOOD needs to be softer than white... turn it down").
-  // Overridden with a dimmer, partly-transparent white rather than the
-  // mixin's opaque near-white. Dark side left close to the mixin's own
-  // ratio -- it was never the complaint.
-  text-shadow: -1px -1px 0 rgba($color-white, 0.4),
+  //
+  // First attempt made the light side translucent instead of dimmer --
+  // rgba($color-white, 0.4) -- and that made it worse in a different way
+  // ("fuzzier rather than sharper"): partial alpha over solid black
+  // antialiases into a soft grey halo instead of a crisp doubled edge, and
+  // combines badly with the stroke's own partial alpha right next to it.
+  // Helen: "positioning was better before" (the 1px offset itself was
+  // fine) "-- can we try different colouring?" So the offset is back to
+  // matching the mixin's own, and what changed is a solid, fully-opaque,
+  // dimmer grey instead of a see-through white -- crisp edge, less glare.
+  // Dark side left close to the mixin's own ratio -- it was never the
+  // complaint.
+  text-shadow: -1px -1px 0 mix($color-white, $color-text, 75%),
                 1px  1px 0 rgba($color-text, 0.5);
 
   .site-logo-bracket {

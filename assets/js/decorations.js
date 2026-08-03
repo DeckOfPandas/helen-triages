@@ -222,7 +222,12 @@
       // --stretch modifier (see .tag-shape in _layout.scss) rather than
       // dropped from the pool, since it's genuinely fine at other widths
       // (Helen: fine for "duck", not fine for "make-ahead", same shape).
-      if (shape === 'tag-shape-2') slot.classList.add('tag-shape--stretch');
+      // Gated on the same SHORT_TEXT_MAX cutoff used above: duck is short
+      // text and was never the problem, so it must never pick this class up
+      // just because it happens to land on the same shape as make-ahead.
+      if (shape === 'tag-shape-2' && text.length > SHORT_TEXT_MAX) {
+        slot.classList.add('tag-shape--stretch');
+      }
       var url = HTF.siteAsset('/doodles/' + shape + '.svg');
       if (!url) return;
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });

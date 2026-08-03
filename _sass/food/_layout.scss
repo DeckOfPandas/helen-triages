@@ -367,17 +367,19 @@ article.recipe .method-short {
     height: 100%;
   }
 
-  // tag-shape-2 specifically stretched further than an exact fit —
-  // Helen: "the way the shape rolls off along the top left corner bothers
-  // me every time" on a wide pill (make-ahead), "doesn't bother me at all"
-  // on a narrow one (duck) — same shape, both hash to tag-shape-2, so it's
-  // genuinely the stretch ratio doing it, not the shape itself. Scaling it
-  // wider than the box moves the torn-corner detail further toward (and
-  // past) the visible edge, proportionally smaller relative to the flat
-  // middle. .tag-shape's own overflow: hidden crops the excess rather than
-  // letting it spill past the pill's edges.
+  // tag-shape-2 specifically stretched further than an exact fit, but only
+  // on a genuinely wide pill — Helen: "the way the shape rolls off along
+  // the top left corner bothers me every time" on make-ahead, "doesn't
+  // bother me at all" on duck, same shape both times. decorations.js only
+  // adds this class on long tag text (the same SHORT_TEXT_MAX cutoff used
+  // to keep tag-shape-9 off short pills), so duck is untouched. First pass
+  // at 1.25 overshot even on make-ahead ("too square, sorry, Goldilocks") —
+  // dialed back to a smaller nudge past 1, still enough to move the torn
+  // corner further toward the edge without flattening the shape's own
+  // character. .tag-shape's own overflow: hidden crops the excess rather
+  // than letting it spill past the pill's edges.
   &--stretch svg {
-    transform: scaleX(1.25);
+    transform: scaleX(1.1);
     transform-origin: center;
   }
 }
@@ -648,7 +650,8 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     background: none;
     color: $color-text;
     @extend %tag-emboss-soft-strong;
-    -webkit-text-stroke: 0.5px $color-star-active;
+    // Widened alongside .badge-star's own stroke — see the comment there.
+    -webkit-text-stroke: 0.9px $color-star-active;
     .tag-shape { color: $color-star-root; }
   }
 
@@ -657,7 +660,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     background: none;
     color: $color-text;
     @extend %tag-emboss-soft-strong;
-    -webkit-text-stroke: 0.6px $color-mood-active;
+    -webkit-text-stroke: 0.9px $color-mood-active;
     .tag-shape { color: $color-mood-root; }
   }
 
@@ -897,8 +900,18 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // needs to pop against a page of otherwise-quiet pills). No more
   // background-color: that was the pre-tape-shape fill, stale since the SVG
   // shape itself is the visible fill now and sits UNDER it doing nothing.
-  &.badge-star           { @extend %tag-emboss-soft-strong; -webkit-text-stroke: 0.5px $color-star-active; .tag-shape { color: $color-star-root; } }
-  &.badge-mood           { @extend %tag-emboss-soft-strong; -webkit-text-stroke: 0.5px $color-mood-active; .tag-shape { color: $color-mood-root; } }
+  //
+  // Star/mood stroke widened well past practicalities' 0.5px (2026-08-03,
+  // third round) — three rounds of tuning %tag-emboss-soft-strong's alpha
+  // never closed the legibility gap Helen kept flagging against
+  // practicalities' own softer emboss, and her read was that the letters
+  // themselves looked thinner, not just less contrasty. Practicalities'
+  // emboss happens to read almost like a second, lighter outline (light
+  // side 0.55 vs star/mood's 0.2) — an accident of alpha, not stroke — so
+  // widening the ACTUAL stroke here is a different lever, closer to what
+  // she was seeing, rather than a fourth pass at the same one.
+  &.badge-star           { @extend %tag-emboss-soft-strong; -webkit-text-stroke: 0.9px $color-star-active; .tag-shape { color: $color-star-root; } }
+  &.badge-mood           { @extend %tag-emboss-soft-strong; -webkit-text-stroke: 0.9px $color-mood-active; .tag-shape { color: $color-mood-root; } }
   &.badge-practicalities { @extend %tag-emboss-soft;        -webkit-text-stroke: 0.5px $color-practicalities-active; .tag-shape { color: $color-practicalities-root; } }
 }
 
