@@ -384,43 +384,15 @@ article.recipe .method-short {
   }
 }
 
-// A softer emboss for small bold text sitting on a SATURATED tape-shape
-// fill -- @include punched(raised) (_sass/shared/_rule.scss) uses
-// $color-bg (near-white) at full opacity for its "light" side, which reads
-// fine when the surrounding context IS roughly $color-bg (headings, page
-// text) but as a stark white cutout outline against a fully-coloured
-// background. Helen, 2026-08-03, looking at a selected FRUIT/SOUP/
-// MAKE-AHEAD pill: "the light source catching white is too disruptive...
-// gives a cut-out effect." Same idea, same offset, both sides
-// semi-transparent instead of one side opaque -- softer, not different in
-// concept. Scoped to this file rather than touching the shared mixin, which
-// works correctly everywhere else it's already used.
-%tag-emboss-soft {
-  text-shadow: -1px -1px 0 rgba($color-bg, 0.55),
-                1px  1px 0 rgba($color-text, 0.3);
-}
-
-// Star and mood need a DIFFERENT balance from practicalities, not just more
-// of everything. Three rounds tuning a single shared alpha never converged
-// (0.55/0.3 -> 0.75/0.5, overshot: "too much light" -> 0.4/0.55, still
-// "too light... harder to read") because magenta and cerulean don't sit at
-// the same distance from $color-bg that aureolin does — one alpha can't
-// serve both. Helen tuned the two by eye in devtools instead (2026-08-03)
-// and landed on two DIFFERENT literal colours, not a shared formula —
-// hence a mixin taking the light colour as a parameter, rather than a
-// placeholder both categories extend unchanged.
-//
-// Same round found the FOURTH attempt — widening the stroke instead
-// (0.5/0.6px -> 0.9px) on the theory that thicker letters read clearer —
-// was actively counterproductive. Helen's own devtools finding:
-// -webkit-text-stroke eats into the glyph's own fill from the inside as it
-// widens, so a fatter stroke on small bold text shrinks the black interior
-// and reads as THINNER, not thicker — the opposite of the intent. A
-// near-invisible 0.1px stroke was the clearest of everything she tried.
-@mixin tag-emboss-strong($light-colour) {
-  text-shadow: -1px -1px 0 $light-colour,
-                1px  1px 0 rgba($color-text, 0.65);
-}
+// Matched/active tag text had a raised emboss here through several rounds
+// (2026-08-03) — softened alpha, per-category alpha, a hand-tuned colour
+// per category, a widened stroke, all chasing star/mood legibility against
+// practicalities' own softer version, none of it landing. Helen's call: no
+// shadow at all, one flat stroke width for all three categories — "we're
+// fighting the raised font in our tags, and we're losing." Full history is
+// in git; the abandoned %tag-emboss-soft placeholder and
+// tag-emboss-strong($light-colour) mixin aren't worth keeping around only
+// to explain why they're gone.
 
 // ============================================================================
 // BUTTONS
@@ -646,38 +618,40 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // Text colour is $color-text (near-black), not the category -active hue —
   // Helen's read: the coloured text wasn't very readable once it was sitting
   // on the full-colour tape shape rather than a pale background tint.
-  // @include punched(raised) is the same "raised labelmaker tape" device the
-  // filter section headings already use (.category-label above), applied
-  // here for the first time to a SELECTED state rather than a permanent
-  // heading — the -webkit-text-stroke is unchanged, still category-coloured,
-  // so the category identity survives the switch to black text.
+  //
+  // No emboss/raised text-shadow here any more (dropped 2026-08-03, see the
+  // comment above %tag-emboss-soft's old spot) — flat stroke only, same
+  // 0.5px for all three categories rather than a value per category. The
+  // -webkit-text-stroke stays category-coloured, so the category identity
+  // still survives the switch to black text; .tag-shape's own fill is
+  // lightened slightly (mix with white) rather than full-strength root hue,
+  // Helen's suggestion for taking some of the loudness off now the emboss
+  // isn't doing any of that work either.
   &.category--star .btn-star.active {
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    // Both values Helen's own, tuned by eye in devtools — see the mixin's
-    // comment above for why this isn't a shared placeholder any more.
-    @include tag-emboss-strong(rgba(200, 197, 209, 0.2));
-    -webkit-text-stroke: 0.1px $color-star-active;
-    .tag-shape { color: $color-star-root; }
+    text-shadow: none;
+    -webkit-text-stroke: 0.5px $color-star-active;
+    .tag-shape { color: mix($color-star-root, $color-white, 88%); }
   }
 
   &.category--mood .btn-tag.active {
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    @include tag-emboss-strong(rgba(230, 227, 228, 0.2));
-    -webkit-text-stroke: 0.1px $color-mood-active;
-    .tag-shape { color: $color-mood-root; }
+    text-shadow: none;
+    -webkit-text-stroke: 0.5px $color-mood-active;
+    .tag-shape { color: mix($color-mood-root, $color-white, 88%); }
   }
 
   &.category--practicalities .btn-tag.active {
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    @extend %tag-emboss-soft;
+    text-shadow: none;
     -webkit-text-stroke: 0.5px $color-practicalities-active;
-    .tag-shape { color: $color-practicalities-root; }
+    .tag-shape { color: mix($color-practicalities-root, $color-white, 88%); }
   }
 
   .category-buttons {
@@ -884,12 +858,12 @@ $index-label-gap:   $space-md;   // a label to its own buttons
 // How badges and the clear-all button behave once a filter is on.
 
 // --- Matched state badges (when a filter is active) --------------------------
-// Text colour and @include punched(raised) added 2026-08-03, same change and
-// same reasoning as the active filter buttons above: near-black reads better
-// than the category -active hue sitting on top of the full-colour tape shape,
-// and the raised device is the same one the filter section headings and the
-// active buttons now use — one consistent "this is selected/matched" device
-// rather than a different one per element.
+// Text colour added 2026-08-03, same reasoning as the active filter buttons
+// above: near-black reads better than the category -active hue sitting on
+// top of the full-colour tape shape. No emboss/raised text-shadow any more
+// either (same date, same rule as the buttons above) — flat 0.5px stroke,
+// one value for every category, and .tag-shape lightened slightly rather
+// than full-strength root hue to take some of the loudness off in its place.
 .recipe-list .badge.badge--matched {
   text-transform: uppercase;
   font-size: 0.72rem;
@@ -897,35 +871,31 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   letter-spacing: 0.04em;
   padding: $space-xxs 0.65rem $space-xxs $space-sm;
   color: $color-text;
+  text-shadow: none;
 
-  // Emboss strength split per category here too, same reasoning as the
-  // active filter buttons above (tag-emboss-strong) — star/mood need a
-  // hand-tuned colour and a near-invisible stroke rather than practicalities'
-  // shared placeholder and 0.5px — see the mixin's comment for the full
-  // history of why.
-  //
-  // .tag-shape back to full opacity (badge-star/mood/practicalities above
-  // tone the RESTING shape down to rgba(..., 0.4) — matching a filter still
-  // needs to pop against a page of otherwise-quiet pills). No more
-  // background-color: that was the pre-tape-shape fill, stale since the SVG
-  // shape itself is the visible fill now and sits UNDER it doing nothing.
-  &.badge-star           { @include tag-emboss-strong(rgba(200, 197, 209, 0.2)); -webkit-text-stroke: 0.1px $color-star-active; .tag-shape { color: $color-star-root; } }
-  &.badge-mood           { @include tag-emboss-strong(rgba(230, 227, 228, 0.2)); -webkit-text-stroke: 0.1px $color-mood-active; .tag-shape { color: $color-mood-root; } }
-  &.badge-practicalities { @extend %tag-emboss-soft;        -webkit-text-stroke: 0.5px $color-practicalities-active; .tag-shape { color: $color-practicalities-root; } }
+  // .tag-shape back to (a lightened) full opacity (badge-star/mood/
+  // practicalities above tone the RESTING shape down to rgba(..., 0.4) —
+  // matching a filter still needs to pop against a page of otherwise-quiet
+  // pills). No more background-color: that was the pre-tape-shape fill,
+  // stale since the SVG shape itself is the visible fill now and sits
+  // UNDER it doing nothing.
+  &.badge-star           { -webkit-text-stroke: 0.5px $color-star-active;           .tag-shape { color: mix($color-star-root, $color-white, 88%); } }
+  &.badge-mood           { -webkit-text-stroke: 0.5px $color-mood-active;           .tag-shape { color: mix($color-mood-root, $color-white, 88%); } }
+  &.badge-practicalities { -webkit-text-stroke: 0.5px $color-practicalities-active; .tag-shape { color: mix($color-practicalities-root, $color-white, 88%); } }
 }
 
 // Layers on top of a badge-star/mood/practicalities that's ALSO an
 // ingredient-search hit — .tag-shape colour is already handled by that
 // category's own .badge--matched rule above, since this selector has no way
 // to know which category it is. Same text treatment as every other matched
-// state: near-black, raised, no stale background-color.
+// state: near-black, flat stroke, no stale background-color.
 .recipe-list .badge.badge--matched.badge-ingredient-hit {
   text-transform: uppercase;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.04em;
   color: $color-text;
-  @extend %tag-emboss-soft;
+  text-shadow: none;
   -webkit-text-stroke: 0.5px $color-ingredient-active;
 }
 

@@ -149,12 +149,12 @@ $tape-protrusion: 0.2rem;
   // colour, once followed through: at 1px the shadow barely clears the
   // stroke at all, so it read as a flat drop-shadow rather than a raised
   // letter. Widened to 2px so it's clearly visible past the stroke; dark
-  // side also strengthened a little for the same reason (0.38 -> 0.5),
-  // light side left at $color-bg, same as every other punched(raised)
-  // heading on the page background -- there's genuinely little room for a
-  // highlight to show against a near-white page regardless of alpha, so
-  // the visible "raised" cue here comes mostly from the dark side.
-  text-shadow: -2px -2px 0 $color-bg,
+  // side also strengthened a little for the same reason (0.38 -> 0.5).
+  // Light side confirmed good at $color-bg, then finalised by Helen at a
+  // literal #dad7d8 -- a touch darker than $color-bg, giving the highlight
+  // a bit more presence than "invisible against the page" without tipping
+  // back into the stark-white territory the tag work ran into.
+  text-shadow: -2px -2px 0 #dad7d8,
                 2px  2px 0 rgba($color-text, 0.5);
 }
 
