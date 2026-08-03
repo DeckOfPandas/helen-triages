@@ -307,29 +307,6 @@ function renderResultsPool() {
       if (matches) pill.classList.add('ingredient--matched');
     });
 
-    // Category-code bars: lit only when this row is currently MATCHED in
-    // that category, not merely tagged. Runs after both matching passes
-    // above so their DOM state (badge--matched, ingredient--matched) is
-    // fresh to read off rather than re-deriving the same matching logic a
-    // third time. star/mood/practicalities read badges; ingredient and
-    // name-search have no badge to read (main_ingredients and the title
-    // aren't rendered as badges), so those two are worked out directly.
-    items.forEach(function(li) {
-      li.querySelectorAll('.recipe-row-code__seg').forEach(function(seg) {
-        var cat = seg.dataset.category;
-        var hit;
-        if (cat === 'ingredient') {
-          hit = !!activeIngredient && li.querySelector('.ingredient-pill.ingredient--matched') !== null;
-        } else if (cat === 'name-search') {
-          var rowTitle = (li.querySelector('a') || {}).textContent || '';
-          hit = !!nameQuery && rowTitle.toLowerCase().indexOf(nameQuery) !== -1;
-        } else {
-          hit = li.querySelector('.badge-' + cat + '.badge--matched') !== null;
-        }
-        seg.classList.toggle('is-lit', hit);
-      });
-    });
-
     var emptyMessage = document.querySelector('.recipe-list-empty');
     emptyMessage.style.display = (!suppressList && visibleCount === 0) ? 'block' : 'none';
 
