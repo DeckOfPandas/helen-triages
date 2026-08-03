@@ -98,6 +98,17 @@ index.html              permalink /        the landing page
 
 `food/` and `cocktails/` hold each site's **pages**, not their collections.
 
+`_food_drafts/` and `_cocktail_drafts/` are each their own nested git repo
+(gitignored from this one — see `.gitignore`), pushed to a separate private
+GitHub repo. `output: false` only stops Jekyll rendering them; the repo
+split is what keeps their source out of a public repo regardless of build
+config. A draft is promoted to `_food_recipes/` — and so becomes public the
+moment this repo deploys — only once it contains no copyright material
+(Helen's own words/sufficiently adapted, not lifted verbatim from a
+source). This is the actual gate; the private-repo split is what makes it
+safe to leave drafts sitting there unpromoted for as long as needed rather
+than a reason to promote them faster.
+
 ### 2.2 Shared versus forked
 
 **Shared**, at the root, names neither site: `_layouts/default.html`;
@@ -229,17 +240,151 @@ meta:
 - `QQ` anywhere is Helen's placeholder. **Never flag it as an error.**
 - `serves` **xor** `makes` — `makes` for quantities you produce (bakes,
   sauces, base recipes; `makes: QQ` for base recipes), `serves` for what you
-  portion out.
+  portion out. **Values aren't always numeric** — both are free descriptive
+  text where a number doesn't fit ("Depends on appetite", "N/A, bring a
+  spoon", "6–8 as a condiment", "However many people want to eat 150 g
+  rice"). This is intentional, in Helen's own voice — don't "tidy" a prose
+  value into a number.
 - `method` **xor** `method_groups`. Both present means the second is dropped.
 - Group names are bare nouns (`dressing`, not `for the dressing`). Method
-  group names render bare and may be narrative phases.
-- Cross-recipe links: `[display text](/recipes/slug/)`. `[[wikilinks]]`
-  don't render and are retired.
-- `instructions:` is retired — it's `method:`, no fallback.
+  group names render bare and may be narrative phases. **Stored casing
+  doesn't matter for display** — both ingredient and method group headings
+  render through `.recipe-group-heading`, which inherits `text-transform:
+  uppercase` from the shared `%heading-base` placeholder
+  (`_sass/food/_recipe.scss`), the same mechanism as the INGREDIENTS/METHOD/
+  NOTES headings. Write group names in whatever case reads naturally as data
+  (lowercase bare nouns, per the rule above); the page uppercases them
+  regardless.
+- Cross-recipe links are markdown, **relative, not root-relative**:
+  `[display text](../slug/)`. Front-matter string values are never run
+  through Liquid, so a literal `/recipes/slug/` link can't pick up
+  `site.baseurl` and is simply wrong on this site (served at
+  `/helen-triages/food/recipes/slug/`, not `/recipes/slug/`) — this was a
+  real, live bug until 2026-08-02, silently broken both locally and once
+  deployed, because the test suite only checked that the target slug existed,
+  not that the URL resolved. `../slug/` resolves against the *current page's*
+  URL, which already includes the baseurl, so it's correct regardless of
+  where the site is hosted. `[[wikilinks]]` don't render and are retired.
+- `instructions:` is retired — it's `method:`, no fallback. Several other
+  fields are retired too (`published`, `date_added`, `difficulty`,
+  `nutrition`, `filling_note`, `headline_ingredient`) — `tests/
+  test_front_matter.py`'s `RETIRED` dict is the authoritative list with what
+  each was replaced by; not duplicated here to avoid the two drifting apart.
 - Filenames are stable by default; if a rename is clearly indicated, say so
   and ask. Don't rename unasked; don't assume it's forbidden.
 
 **Cocktails front matter does not exist yet and must not be invented.** See §9.
+
+### 4.1 Body content below the front matter (rare)
+
+A recipe file's Markdown body — the content *after* the closing `---` — is
+not part of the schema above, but isn't ignored either: `_layouts/
+recipe.html` renders it verbatim (`{{ content }}`) inside `.recipe-body-
+content`, between Notes and the source footer, if it's non-empty. As of
+2026-08-02 exactly one file uses this, of ~370 recipes and drafts combined:
+`dark-chocolate-ganache.md` carries a substantial hand-written Tips and
+Troubleshooting section this way.
+
+**Decided 2026-08-02: this content continues the recipe, it does not become
+a blog post.** Helen considered three options — style it as a blog post with
+its own title; treat it as more recipe sections; or move it to a standalone
+page (which she does want eventually, for genuinely cross-recipe reference
+material like meat temperatures or food sustainability, but that's a
+different problem: reference material multiple recipes would link *to*,
+versus content that only makes sense in the context of one specific recipe).
+Her call, "least jar": section headings in body content are now **peers of
+INGREDIENTS/METHOD/NOTES**, not a quieter sub-level treatment — same size,
+same punched-tape mark, same `$spacing-section-top` rhythm as the rest of
+the page.
+
+**Peer headings need raw HTML, not `## Heading`.** Kramdown gives a plain
+markdown heading no class and no nested span, and `.recipe-section-heading`
+needs both — the span is what `overlapping-rule-double`'s background hugs.
+Write the exact markup `_layouts/recipe.html` generates directly in the body
+instead, blank-line-separated above and below so kramdown still parses the
+surrounding markdown as markdown rather than folding it into the HTML block:
+
+```
+<h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
+
+- A bullet list here parses as normal markdown again.
+```
+
+A subtitle directly under a peer heading (ganache's own "a.k.a. ganache is
+the worst", split out of the heading text itself so TROUBLESHOOTING reads
+clean) is `<p class="recipe-section-subtitle">`, same raw-HTML approach,
+placed right after the heading with no blank line between them. A bare `##
+Heading` still gets a sane fallback (`.recipe-body-content h2
+:not(.recipe-section-heading)` in `_recipe.scss`) rather than unstyled
+browser default, but it will not match the rest of the page — that
+mismatch is what peer status is for, not a bug to fix if you see it.
+
+**Reading width matches Method, not Notes.** Body content's `p`/`ul`/`ol`
+used to inherit the shared `article.recipe p { max-width: 65ch }`
+(`_layout.scss`) — the same cap Notes uses, only because both happen to be
+plain `<p>` tags, not because anyone decided body content should read at
+Notes' width. Helen's call: match Method instead, which has no cap at all.
+`.recipe-body-content p` now sets `max-width: none` to override the shared
+rule; `ul`/`ol` were never covered by it and just don't set one.
+
+MVP styling for this area is done (`DEV_JOBS_v26.md`'s former §1.2b, closed
+2026-08-02) — headings and width match the rest of the page now, this isn't
+a placeholder pending a "real" pass. Whether the peer-heading pattern
+generalises further (more recipes writing body content this way) is still
+open, but the pattern itself — raw HTML for peer headings, Method's reading
+width — is the decided shape, not provisional.
+
+### 4.2 A bullet list inside one method step
+
+Every `method:` step is markdownified (`_layouts/recipe.html`, same as
+tagline/tips/notes) — a multi-line YAML block scalar can embed a genuine
+markdown list inside a single step, not just one line of prose. Write it as
+`|`, blank-line-separated around the list so kramdown parses it as an actual
+list rather than folding it into the surrounding paragraph:
+
+```yaml
+method:
+  - |
+    Leave to cool at room temperature to your working temperature:
+
+    - Pouring/glazing: 32–35°C
+    - Drip cakes: 29–32°C
+    - Piping/filling: 20–24°C
+
+    Cool completely, then beat until light and fluffy.
+```
+
+This needed a real fix, not just a content change, to work at all:
+`.method-full li` was `display: flex` (number and step text as two flex
+items, side by side) — flex turns each run of inline content *and* a nested
+block-level `<ul>` into separate items laid out in a row, so a list inside a
+step would have rendered beside the step number instead of underneath the
+step's own text. `.method-full li` now uses `position: relative` +
+`position: absolute` on the `::before` number instead (`_recipe.scss`), the
+same technique `.recipe-body-content`'s numbered list and `.method-short`'s
+bullets already used — whatever a step contains, one line or a paragraph
+plus a list plus another paragraph, stacks normally underneath the number.
+
+**Nested `<li>`s must not increment the step counter.** `.method-full li`'s
+`counter-increment: step-counter` is a descendant selector — it matches a
+bullet nested inside a step too, unless overridden. `.method-full ul li`
+explicitly resets `counter-increment: none` (and the number-column
+padding/`::before`) for exactly this reason; break it and every step number
+after the first list-containing one goes wrong silently, since nothing
+fails loudly when a counter just increments an extra few times.
+
+Grouped methods add a second wrinkle: `.method-full li.method-group-
+heading-item ~ li.step` indents grouped steps by `$space-xxl`, and now has
+to compose that with the number column (`$method-step-number-column`)
+rather than replace it — `calc($space-xxl + $method-step-number-column)`
+for the padding, and the `::before`'s own `left` shifted to `$space-xxl` too
+(`position: absolute`'s `left` is relative to the li's padding *edge*, fixed
+at the border, so padding-left alone only moves where the text starts, never
+the number). Verified against `beef-wellington.md` (one of six recipes using
+`method_groups`) after this change, not assumed safe by inspection alone.
+
+`dark-chocolate-ganache.md`'s own cooling step is the first (only, as of
+2026-08-02) real example.
 
 ---
 
@@ -280,7 +425,14 @@ recipe. No cap.
 
 **Savoury — substitution test.** Not "would this fail" but "would I improvise
 around a gap": the protein, the liquid/fat that defines the character, anything
-you'd have to go buy, the vegetable that's the point. Cap at eight.
+you'd have to go buy, the vegetable that's the point. Cap at eight. **Not
+mechanically enforced** — no test checks the count, so a recipe with a
+spice-heavy ingredient list can go over deliberately, case by case, rather
+than being forced to cut something that genuinely fails the substitution
+test. `indonesian-chicken-curry-gulai-ayam.md` sits at 11, Helen's explicit
+call on 2026-08-02: everything in it is a "would have to specifically go
+buy" ingredient, so nothing was a good candidate to cut. Don't flag this one
+as a violation to fix.
 
 **Cheeses** use the bare name where it stands alone (cheddar, feta, comté) —
 keep "cheese" only where the qualifier is meaningless without it (blue cheese,
@@ -441,8 +593,16 @@ from here.
 across `ingredient-search.test.js` (11) and `recipe-list.test.js` (9). Node
 tests, not pytest, because they test JS modules directly.
 
-**Known failures, stable:** nine `Estimated` timings (§5) and one link to a
-recipe still in drafts (`peanut-butter-ice-cream` → `sweet-cream-base-1`).
+**Known failures, stable:** nine `Estimated` timings (§5), one link to a
+recipe still in drafts (`peanut-butter-ice-cream` → `sweet-cream-base-1`),
+17 recipes with a leftover `QQ` placeholder (`test_no_qq_placeholder`,
+added 2026-08-02 — fine in `_food_drafts/`, not fine once published, and
+nobody had gone through the backlog yet as of this writing), and one
+reversed-bracket malformed link in `cherry-glaze.md`'s tagline
+(`test_typography`'s "reversed link brackets" case, same date — `(text)[...]`
+instead of `[text](...)`, spotted by Helen, deliberately left unfixed
+pending her own pass). All of these are Helen's to work through case by
+case, same as the `Estimated` timings — don't fix them unprompted.
 
 **Exactly three checks read `_food_drafts/`** — everything else is
 `_food_recipes/` only:
@@ -647,6 +807,31 @@ and declined for a stated reason — see `DEV_JOBS_v26.md` §3 if you want to
 reopen one, and argue against the recorded reason rather than proposing it
 fresh.
 
+**You will use `display: flex` for a simple two-part row, then break it the
+day one part needs more than one line of content.** `.method-full li` was
+flex (number, then step text) for exactly as long as every step was a single
+line — the day one needed a nested list (§4.2), flex turned the list into a
+third item laid out beside the number instead of underneath the text it
+belonged to. `position: relative` on the container + `position: absolute` on
+the generated number, the technique `.recipe-body-content`'s numbered list
+and `.method-short`'s bullets already used, doesn't have this failure mode:
+the number sits outside the element's own flow, so anything else inside —
+one line or several block-level children — stacks normally. Prefer this over
+flex for "a label plus arbitrary content" from the start, not just once
+something breaks it.
+
+**You will forget an element inherits from its parent when nesting inside a
+styled heading.** `.btn-method-toggle` sits inside `.recipe-section-heading`,
+which sets both `-webkit-text-stroke` and `text-shadow` (`punched()`) — both
+inherit by default, and neither was ever reset on the button, so it was
+picking up the parent's emboss effect on top of its own styling. Invisible
+in a casual look (dev tools shows inherited values in the same grey as
+irrelevant defaults) until Helen compared it side by side with a plain link
+and could tell something was different without being able to say what.
+Any interactive element nested inside a punched-tape heading needs explicit
+`-webkit-text-stroke: 0` and `text-shadow: none` unless it's actually meant
+to carry the effect too.
+
 ---
 
 ## 13. The site's visual design
@@ -692,15 +877,35 @@ wash, and lost.
 ### 13.2 The recipe page's colour budget
 
 Four hues, and the count is the design: `$color-bright-magenta` (title rule,
-footer hearts, method toggle), `$color-section-underline` /
-`$color-section-underline-2` (the two rule colours, spring green and violet,
-which only ever appear *together* inside one composite mark), and
-`$color-aureolin` (ingredient-amount highlighter). Everything else — the
-whole of the method, notes, tips, boxes — is `$color-clear-text` or
-`$color-border`. Colour is on what you *navigate* by, off what you *read*.
+footer hearts, method toggle, and — as `$color-recipe-link`, darkened 12% —
+every cross-recipe link, wherever one appears: tagline, tips, notes, method
+steps), `$color-section-underline` / `$color-section-underline-2` (the two
+rule colours, spring green and violet, which only ever appear *together*
+inside one composite mark — and, since 2026-08-03, violet's second job: the
+hand-drawn arrow beside an ingredient/step tip or note, `.annotation-mark`
+in `_recipe.scss`), and `$color-aureolin` (ingredient-amount highlighter).
+Everything else — the whole of the method, notes, tips, boxes — is
+`$color-clear-text` or `$color-border`. Colour is on what you *navigate* by,
+off what you *read* — a link counts as something you navigate BY, even
+mid-sentence, not decoration on something you're reading. The annotation
+arrow is the one exception to that split: it's decoration, not navigation,
+but it took violet rather than magenta specifically *because* magenta
+already means "interactive" on this page — see `_palette.scss`'s "Cross-
+recipe links" comment for the full reasoning.
 
-Magenta doubles as `$color-star-root`, so the star badge matches the title —
-accepted as a rhyme, since the star is the hero and the title names the dish.
+Magenta carries three jobs at once (title rule, toggle, links) on top of
+doubling as `$color-star-root`, so the star badge matches the title — all
+accepted as the same rhyme, not four separate coincidences: magenta is the
+site's one "this is interactive/branded" colour. A new hue was tried for
+links first (`$color-vivid-rose`, 2026-08-02) and reverted the same day once
+Helen's actual preference turned out to be reusing magenta instead —
+`_palette.scss` documents both the exact contrast measurement (5.26:1
+against `$color-bg`, link text at 0.82–0.95rem is too small for the relaxed
+3:1 exception, so 4.5:1 was the real bar) and why a darker/further variant
+was tried and reverted (cohesiveness with the title rule won out over more
+distance from the footer hearts). **If a fifth colour is ever proposed,
+that's the point to stop and ask whether an existing hue could do the job
+instead, the way magenta and violet both just did.**
 
 ### 13.3 Spacing
 
@@ -795,6 +1000,28 @@ too. If you see the old claim anywhere (an older branch, a stale comment),
 the code is what to trust — check `_sass/shared/_layout.scss` directly
 rather than this document or an old comment.
 
+**The recipe page's own headings were stroke-only too, until the same day.**
+`.recipe-title-text`, `.recipe-section-heading`, `.recipe-group-heading` and
+`.recipe-meta li strong` all had a plain `-webkit-text-stroke` with no
+explicit colour (defaulting to `currentColor`, i.e. the same as the fill —
+no lighter derived tone, no emboss shadow) until Helen spotted the
+inconsistency: `.category-label` on the index had already been upgraded to
+the full punched treatment, matched to these same headings' proportions
+(the §13.4.1 worked example above), while the headings it was matched *to*
+still used the plain version. All four now call `@include punched(raised)`
+and use `$color-label-stroke` for the stroke colour, same as the index and
+the wordmark — stroke *widths* unchanged throughout (still `$stroke-heavy`/
+`$stroke-medium`/`$stroke-light` per element, the existing hierarchy), only
+the colour and the shadow are new. `.btn-method-toggle` deliberately did
+**not** get this — it's documented as matching the index's
+`.btn-clear-inline`, which has no stroke or punch treatment at all, so
+changing just the recipe-page half of that pair would have created a new
+inconsistency rather than closed one. `.recipe-body-content h2` (§4.1) was
+built with the punched treatment from the start, matched to
+`.recipe-group-heading`'s exact proportions; its `h3` deliberately stayed
+plain, on purpose — see the comment above `.recipe-body-content h2` in
+`_recipe.scss` for why that split is the hierarchy, not an oversight.
+
 **To extend the device somewhere new:** `@include punched(raised)`, plus a
 stroke computed at the same proportion as `.category-label`'s (or the recipe
 page headings', whichever is closer in size), and leave `$emboss-offset` /
@@ -804,7 +1031,7 @@ than a new effect invented each time.
 
 ### 13.5 The colour contract, and why the two pages differ
 
-**Recipe page: four hues** (§13.2), colour as decoration, rationed.
+**Recipe page: five hues** (§13.2), colour as decoration, rationed.
 **Index page: five hues**, one per filter section, in page order: `$color-
 star-root` (STAR INGREDIENT), `$color-vivid-cerulean` (MOOD), `$color-
 aureolin` (PRACTICALITIES), `$color-pure-lime-green` (SEARCH INGREDIENTS),
@@ -812,7 +1039,10 @@ aureolin` (PRACTICALITIES), `$color-pure-lime-green` (SEARCH INGREDIENTS),
 hue ties a section's rule to its filter buttons, active states, and badges,
 so it has to be learned and distinct. On the recipe page colour is
 decoration and has to be rationed. **This is a principled divergence — don't
-equalise the counts.**
+equalise the counts.** They happen to both be five as of 2026-08-02 — that's
+coincidence, not the counts converging on some shared target. The recipe
+page's five could go to six tomorrow if a decoration earned it and the
+index's five stayed five; nothing ties them together.
 
 **One source.** `$color-star-root` and its four siblings in `_sass/food/
 _palette.scss` are the only place a section's colour is written. If you find

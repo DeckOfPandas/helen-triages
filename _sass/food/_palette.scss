@@ -3,10 +3,17 @@
 // =============================================================================
 
 // --- Raw palette (the swatches everything else is chosen from) ---------------
-// Five swatches left this file on 2026-08-01 with the decorations that were the
-// only things reading them — vivid rose, pencil grey, and the near-blacks the
-// logo and highlighter labels used. A swatch nothing chooses from is not a
-// palette, it is a paint chart.
+// Four swatches left this file on 2026-08-01 with the decorations that were
+// the only things reading them — pencil grey and the near-blacks the logo and
+// highlighter labels used. A swatch nothing chooses from is not a palette, it
+// is a paint chart.
+//
+// $color-vivid-rose briefly came back on 2026-08-02 for cross-recipe links,
+// then was removed again the same day once Helen asked for links to be
+// magenta instead — reusing $color-bright-magenta-dark (already a link-ish
+// colour, "for toggle buttons etc.") rather than spending a fifth hue on a
+// job an existing one already does. The recipe page's colour budget stays
+// at four as a result; see the note below.
 $color-pure-lime-green:     #8AE800;
 $color-vibrant-violet:      #7734EA;
 $color-vivid-cerulean:      #00A7EA;
@@ -95,6 +102,35 @@ $color-white:                #ffffff;
 // the same idea, and were two unrelated magic numbers.
 $color-label-stroke:         lighten($color-text, 20%);
 
+// --- Cross-recipe links --------------------------------------------------
+// Added 2026-08-02: links were inheriting the shared a { color: $color-text }
+// (_sass/shared/_base.scss) — a link reading as plain body text is not
+// "more obvious", which is what Helen asked for after one nearly went
+// unnoticed. First answer was a new hue, $color-vivid-rose; same day,
+// Helen's actual preference turned out to be magenta -- reusing an existing
+// hue rather than a fifth. Both links and the short-method toggle share one
+// base colour and one hover behaviour -- see article.recipe a and
+// .btn-method-toggle in _recipe.scss.
+//
+// $color-bright-magenta-dark (darken 12%, 5.26:1 against $color-bg) is the
+// link colour. Briefly tried darker (20%, to put more distance between a
+// link and the raw-magenta footer hearts when both land in the same view)
+// and reverted the same day -- Helen tried it and preferred the
+// cohesiveness of matching the title rule's own magenta ("the cohesiveness
+// of the title underline and base page function (links) is pleasing"). The
+// footer-hearts near-miss is real but stays open (losing the heart footer
+// entirely was floated as one way to resolve it) -- doesn't block deploy,
+// revisit later rather than solve today by pulling links away from the
+// hue that's working.
+//
+// Hover goes LIGHTER, per Helen's ask -- darken 8% (between the raw hue and
+// the resting link colour) is visibly lighter than the 12% base while still
+// reading as intentional rather than washed out, at 4.46:1 -- under 4.5 by
+// a hair, acceptable for a transient hover state rather than the resting
+// colour text has to stay legible in permanently.
+$color-recipe-link: $color-bright-magenta-dark;
+$color-recipe-link-hover: darken($color-bright-magenta, 8);
+
 // --- Reusable Structural Accents ---------------------------------------------
 // Nested bullets in the short method. Was cerulean-mixed; re-based on spring
 // green when cerulean left the recipe page entirely, so it stays a pale echo of
@@ -105,26 +141,45 @@ $color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
 // After the 2026-07-31 redesign the recipe page spends FOUR colours, and the
 // count is the design. It was seven — rose, cerulean, orange, spring green,
 // violet, aureolin and pencil grey — which is where "two design languages at
-// once" came from.
+// once" came from. Cross-recipe links, added 2026-08-02, briefly looked like
+// a fifth ($color-vivid-rose) before Helen asked for magenta instead — which
+// meant a darker derivative of an existing hue rather than spending a new
+// one. The count stays at four.
 //
-//   1. $color-bright-magenta       the blocky rule under the title, the footer
-//                                  hearts, the method toggle
+//   1. $color-bright-magenta       the blocky rule under the title, the
+//                                  footer hearts, the short-method toggle,
+//                                  and (as $color-recipe-link, darken 12%)
+//                                  cross-recipe links
 //   2. $color-section-underline    the upper rule under the section names
-//   3. $color-section-underline-2  the lower rule under them
+//   3. $color-section-underline-2  the lower rule under them, and (since
+//                                  2026-08-03) the hand-drawn arrow beside
+//                                  an ingredient/step tip or note — see
+//                                  .annotation-mark in _recipe.scss
 //   4. $color-aureolin             the highlighter on ingredient amounts
 //
 // Everything else is text, $color-clear-text or $color-border — the whole of
-// the method, the notes, the tips and the boxes are monochrome. The colour is
-// on what you NAVIGATE by and off what you READ, which is what "colour, but
-// more sparing" turned out to mean.
+// the method, the notes, the tips and the boxes are monochrome apart from a
+// link inside them. The colour is on what you NAVIGATE by and off what you
+// READ, which is what "colour, but more sparing" turned out to mean — a link
+// fits the NAVIGATE side of that line, even mid-sentence, because it takes
+// you somewhere the way the rules and highlighter do, not because it's
+// prettier prose. The annotation arrow is the one deliberate exception —
+// it's decoration, not navigation — and it took violet specifically because
+// magenta already means "interactive" here: an arrow in the link colour
+// would read as clickable when it isn't.
 //
-// Two things to know before spending a fifth. Magenta is also $color-star-root,
-// so the star-ingredient badge matches the title: accepted as a rhyme, since
-// the star is the hero and the title names the dish. And 2 and 3 only ever
-// appear TOGETHER, inside one composite mark, so neither has to be read as
-// meaning anything on its own — which is why four here is not the same as four
-// scattered around the page. If violet starts appearing anywhere else, the
-// count begins to matter again.
+// Magenta carries three jobs at once (title rule, toggle, links) on top of
+// doubling as $color-star-root — all accepted as the same rhyme, not four
+// separate coincidences: it is the site's one "this is interactive/branded"
+// colour, and a link is exactly that. Violet now carries two (the rule,
+// the annotation arrow) for the equivalent reason — it's the "quiet,
+// structural, secondary" colour, which is what an annotation mark actually
+// is. 2 and 3 no longer *only* appear together, since the arrow is 3 without
+// 2 — that only held while violet's one job was half of a composite mark.
+// If a FIFTH colour is ever proposed, that's the point to stop and ask
+// whether an existing hue could do the job instead, the way magenta and
+// violet both just did — and only past that, whether "colour, but more
+// sparing" still means anything.
 
 // The two colours of the blocky rule under INGREDIENTS / METHOD / NOTES. Both
 // live here rather than in the template, which is the point: the brush wash
@@ -150,8 +205,12 @@ $color-step-number: $color-text;
 // .search--name and .logo-header — and none of them has contained a slot since
 // the index moved to the blocky rule (.logo-header had not existed for far
 // longer than that). A custom property nothing reads is not wiring.
+//
+// Default fill is aureolin — the ingredient-amount highlighter's actual
+// colour (see the recipe page's colour budget above) — not $color-text; the
+// one consumer left is the highlighter itself, not body text.
 .highlighted svg path {
-  fill: var(--highlighter-fill, #{$color-text});
+  fill: var(--highlighter-fill, #{$color-aureolin});
   fill-opacity: var(--highlighter-opacity, 1);
 }
 

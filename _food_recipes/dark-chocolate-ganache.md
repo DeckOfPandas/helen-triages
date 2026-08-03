@@ -4,8 +4,8 @@ short_name: Dark Chocolate Ganache
 tagline: "Ganache is a fickle mistress, but absolutely worth the effort."
 source: "A lifetime of grainy, oily, solid, inedible regret."
 makes: "N/A, bring a spoon"
-prep_time: Estimated 5 mins
-cook_time: Estimated 15 mins
+prep_time: 5 mins
+cook_time: 15 mins
 main_ingredients: ["dark chocolate", "double cream", "salted butter", "icing sugar"]
 star_ingredient: chocolate
 tags: [extras]
@@ -26,7 +26,13 @@ method:
   - "Stir gently from the centre using a perfectly dry silicone spatula (water = bad, accidental whipping = bad) until the temperature reaches 40–45°C. You'll see a visible change from muddy to glossy and thick — this is the emulsion forming."
   - Add the butter (and optional icing sugar) and stir until just incorporated. Add any other flavourings here too.
   - Stop stirring as soon as you can (over-stirring = bad).
-  - "Leave to cool at room temperature (uneven heat = bad) to your working temperature: CLAUDE, I'D LIKE BULLET POINTS HERE pouring/glazing 32–35°C; drip cakes 29–32°C; piping/filling 20–24°C; whipped ganache 18–21°C — cool completely, then beat with an electric mixer until light, fluffy, and holding its shape."
+  - |
+    Leave to cool at room temperature (uneven heat = bad) to your working temperature:
+
+    - Pouring/glazing: 32–35°C
+    - Drip cakes: 29–32°C
+    - Piping/filling: 20–24°C
+    - Whipped ganache: 18–21°C — cool completely, then beat with an electric mixer until light, fluffy, and holding its shape.
 method_short:
   - |
     * Grate chocolate 150 into dry bowl
@@ -35,7 +41,9 @@ method_short:
     * Butter 1 tbsp, flavourings
     * Cool at room temp to working temp
 notes:
-  - "Ratios: 1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion). Add 2 tbsp icing sugar for ganache that sets more firmly. Season the cream with salt before heating — don't be shy."
+  - "Ratios: 1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
+  - "Add 2 tbsp icing sugar for ganache that sets more firmly."
+  - "Season the cream with salt before heating — don't be shy, as this greatly enhances the chocolate flavour."
 meta:
   rewritten: true
   proofread: false
@@ -43,31 +51,29 @@ meta:
   date_last_edited: "2026-07-25"
 ---
 
-## Tips
+<h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
 
 - Use perfectly clean and dry stainless steel bowls (water = bad) for even heating (over-heating = bad, under-melting = bad).
 - Use a perfectly clean and dry silicone spatula (water = bad) because it can create a tight seal against the bottom of the bowl, sweeping up melting pockets without whipping in air (which contains water so air = bad — see "seizing" below).
 - Heat the cream in a pan for the best temperature control, unless you have literally perfect microwave-fu (over-heating and under-melting = bad).
 - Allow the ganache to cool and set at room temperature. If you put it in the fridge, you'll need to stir it to combine the more-set and the less-set (over-stirring = bad).
 
-## Troubleshooting, a.k.a. ganache is the worst
+<h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
+<p class="recipe-section-subtitle">a.k.a. ganache is the worst</p>
 
 Ganache is an emulsion of fat (cocoa butter and dairy fat) suspended in water (from the cream). If it splits, at least one of these things will be wrong:
 
-**Splitting: greasy, oily layer on top of grainy clumps**
-- Over-heating (>55°C) broke the delicate bonds maintaining the emulsion, so the fat coalesced into larger pools of oil rather than remaining uniformly suspended.
-- Over-stirring created mechanical stress, forcing fat droplets to collide and coalesce.
-- Accidental whipping, such as from using a balloon whisk, increased the amount of air in the mixture, and air contains moisture — see "seizing" below (water = bad).
-
-**Under-melting: chunky texture with solid, hard flecks of chocolate**
-- Cold cream that wasn't warm enough to completely melt the crystalline structure of the cocoa butter meant it couldn't emulsify.
-- Coarse chopping meant the residual heat of the cream died out before reaching the centre of the too-big pieces.
-
-**Seizing: mixture resembling concrete; a dry, grainy paste that can't be stirred**
-- Water somehow got into the chocolate, causing its sugar crystals to wet, stick together, and clump immediately.
-
-**Adding ingredients in the wrong order (that is, not following the recipe...ask me how I know):**
-- Dropping cold pieces of chocolate into hot cream makes the temperature drop too rapidly and unevenly, resulting in cold chunks floating in hot fat that can't form an emulsion. Pouring cold cream into melted chocolate instantly shocks the chocolate, snap-freezing the cocoa butter out of the emulsion while forcing the sugars to clump (yum, curdled concrete).
+1. **Splitting: greasy, oily layer on top of grainy clumps**
+   - Over-heating (>55°C) broke the delicate bonds maintaining the emulsion, so the fat coalesced into larger pools of oil rather than remaining uniformly suspended.
+   - Over-stirring created mechanical stress, forcing fat droplets to collide and coalesce.
+   - Accidental whipping, such as from using a balloon whisk, increased the amount of air in the mixture, and air contains moisture — see "seizing" below (water = bad).
+2. **Under-melting: chunky texture with solid, hard flecks of chocolate**
+   - Cold cream that wasn't warm enough to completely melt the crystalline structure of the cocoa butter meant it couldn't emulsify.
+   - Coarse chopping meant the residual heat of the cream died out before reaching the centre of the too-big pieces.
+3. **Seizing: mixture resembling concrete; a dry, grainy paste that can't be stirred**
+   - Water somehow got into the chocolate, causing its sugar crystals to wet, stick together, and clump immediately.
+4. **Adding ingredients in the wrong order (that is, not following the recipe...ask me how I know):**
+   - Dropping cold pieces of chocolate into hot cream makes the temperature drop too rapidly and unevenly, resulting in cold chunks floating in hot fat that can't form an emulsion. Pouring cold cream into melted chocolate instantly shocks the chocolate, snap-freezing the cocoa butter out of the emulsion while forcing the sugars to clump (yum, curdled concrete).
 
 Dark chocolate ganache is less likely to split than lower %s because the dry cocoa solids act as a giant structural sponge holding the emulsion together. White chocolate has zero cocoa sponge, but lots of highly temperature-sensitive cocoa butter and moisture-sensitive sugar. Basically, white chocolate ganache splits if you even look at it wrong.
 

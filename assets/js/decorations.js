@@ -10,6 +10,7 @@
 //   .highlighter-slot          scratchy highlighter behind ingredient amounts
 //   .tape-bg                   masking tape behind the site logo
 //   .site-footer-hearts        footer hearts
+//   .annotation-mark           hand-drawn sparkles beside a tip/note
 //
 // Two more lived here until 2026-08-01. `.watercolour-brush-slot` drew the
 // brush washes, which the blocky rule replaced on both pages; `[data-index-doodle]`
@@ -116,8 +117,44 @@
     if (url) HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
   }
 
+  // ---------------------------------------------------------------------------
+  // Annotation marks — a small hand-drawn arrow beside each ingredient/step
+  // tip or note. Both step and ingredient marks are dealt from their own
+  // shuffled pool (same mechanism as highlighters() above — no repeats until
+  // every arrow in the pool has been used on the page), just with different
+  // artwork: ingredients get four horizontal arrows, steps get three curved
+  // ones. A single repeated glyph reads as more "system," not less; a
+  // handful of slightly different hand-drawn arrows reads as one hand,
+  // drawn fresh each time, which is closer to what a marginal note in a
+  // paper recipe actually looks like.
+  // ---------------------------------------------------------------------------
+  function annotationMarks() {
+    var slots = document.querySelectorAll('.annotation-mark');
+    if (!slots.length) return;
+
+    var nextStepArrow = HTF.makeShuffledPicker([
+      '/doodles/arrow-annotation-1.svg',
+      '/doodles/arrow-annotation-2.svg',
+      '/doodles/arrow-annotation-3.svg'
+    ]);
+    var nextIngredientArrow = HTF.makeShuffledPicker([
+      '/doodles/arrow-horizontal-1.svg',
+      '/doodles/arrow-horizontal-2.svg',
+      '/doodles/arrow-horizontal-3.svg',
+      '/doodles/arrow-horizontal-4.svg'
+    ]);
+
+    slots.forEach(function (slot) {
+      var isIngredient = !!slot.closest('.ingredient-annotation');
+      var url = HTF.siteAsset(isIngredient ? nextIngredientArrow() : nextStepArrow());
+      if (!url) return;
+      HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
+    });
+  }
+
   highlighters();
   tape();
   footerDecoration();
+  annotationMarks();
 
 })();

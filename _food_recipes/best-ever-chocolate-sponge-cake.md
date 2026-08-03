@@ -73,7 +73,7 @@ method_short:
           * Start the butter 50 and icing sugar 100, egg yolk 1 gradually
        * Add chocolate to butter mix
 notes:
-  - "Top with icing sugar. Or try [ganache](/recipes/dark-chocolate-ganache/), or simply melted chocolate with butter 2:1."
+  - "Top with icing sugar. Or try [ganache](../dark-chocolate-ganache/), or simply melted chocolate with butter 2:1."
 meta:
   rewritten: true
   proofread: false

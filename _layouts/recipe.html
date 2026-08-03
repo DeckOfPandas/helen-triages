@@ -9,7 +9,7 @@ layout: default
     </h1>
   </div>
 
-  {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline }}</p>{% endif %}
+  {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
   <ul class="recipe-meta">
     {% if page.serves %}<li><strong>Serves</strong><span>{{ page.serves }}</span></li>{% endif %}
@@ -23,7 +23,7 @@ layout: default
   </div>
 
   {% if page.ingredient_groups %}
-    <div class="recipe-section--ingredients">
+    <div class="recipe-section-ingredients">
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">Ingredients</span>
       </h2>
@@ -37,11 +37,13 @@ layout: default
   {% endif %}
 
   {% for group in page.ingredient_groups %}
-    {% if multiple_ingredient_groups and group.name %}
+    {% if multiple_ingredient_groups %}
       {% if group.name == "to serve" %}
         <h3 class="recipe-group-heading">To serve:</h3>
+      {% elsif group.name %}
+        <h3 class="recipe-group-heading">For the {{ group.name }}:</h3>
       {% else %}
-        <h3 class="recipe-group-heading">For the {{ group.name | downcase }}:</h3>
+        <h3 class="recipe-group-heading">For the base:</h3>
       {% endif %}
     {% endif %}
     <ul class="ingredients">
@@ -49,12 +51,16 @@ layout: default
         {% if item.item %}
           <li class="ingredient ingredient--annotated">
             {% if item.amount %}
-              <span class="ingredient-amount highlighted">
-                <span class="highlighter-slot" aria-hidden="true"></span>{{ item.amount }}</span>
+              {% assign amount_parts = item.amount | split: " " %}
+              {% assign amount_number = amount_parts[0] %}
+              {% assign amount_unit = amount_parts | slice: 1, 99 | join: " " %}
+              <span class="ingredient-amount">
+                <span class="ingredient-amount-number highlighted">
+                  <span class="highlighter-slot" aria-hidden="true"></span>{{ amount_number }}</span>{% if amount_unit != "" %} {{ amount_unit }}{% endif %}</span>
             {% endif %}
             {{ item.item | markdownify | remove: '<p>' | remove: '</p>' }}
-            {% if item.tip %}<span class="ingredient-annotation ingredient-annotation--tip">{{ item.tip }}</span>{% endif %}
-            {% if item.note %}<span class="ingredient-annotation ingredient-annotation--note">{{ item.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
+            {% if item.tip %}<span class="ingredient-annotation ingredient-annotation--tip"><span class="annotation-mark" aria-hidden="true"></span>{{ item.tip | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
+            {% if item.note %}<span class="ingredient-annotation ingredient-annotation--note"><span class="annotation-mark" aria-hidden="true"></span>{{ item.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
           </li>
         {% else %}
           <li class="ingredient">{{ item | markdownify | remove: '<p>' | remove: '</p>' }}</li>
@@ -63,14 +69,12 @@ layout: default
     </ul>
   {% endfor %}
 
-  {% if page.filling_note %}<p class="note">{{ page.filling_note }}</p>{% endif %}
-
   {% assign has_short = false %}
   {% for step in page.method_short %}
     {% unless step == "QQ" or step == "" or step == blank %}{% assign has_short = true %}{% endunless %}
   {% endfor %}
 
-  <div class="recipe-section--method">
+  <div class="recipe-section-method">
     <h2 class="recipe-section-heading">
       <span class="section-heading-text">Method</span>
       {% if has_short %}
@@ -95,12 +99,12 @@ layout: default
         {% for step in group.steps %}
           {% if step.step %}
             <li class="step step--annotated">
-              {{ step.step }}
-              {% if step.tip %}<span class="step-annotation step-annotation--tip">{{ step.tip }}</span>{% endif %}
-              {% if step.note %}<span class="step-annotation step-annotation--note">{{ step.note }}</span>{% endif %}
+              {{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}
+              {% if step.tip %}<span class="step-annotation step-annotation--tip"><span class="annotation-mark" aria-hidden="true"></span>{{ step.tip | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
+              {% if step.note %}<span class="step-annotation step-annotation--note"><span class="annotation-mark" aria-hidden="true"></span>{{ step.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
             </li>
           {% else %}
-            <li class="step">{{ step }}</li>
+            <li class="step">{{ step | markdownify | remove: '<p>' | remove: '</p>' }}</li>
           {% endif %}
         {% endfor %}
       {% endfor %}
@@ -111,12 +115,12 @@ layout: default
       {% for step in steps %}
         {% if step.step %}
           <li class="step step--annotated">
-            {{ step.step }}
-            {% if step.tip %}<span class="step-annotation step-annotation--tip">{{ step.tip }}</span>{% endif %}
-            {% if step.note %}<span class="step-annotation step-annotation--note">{{ step.note }}</span>{% endif %}
+            {{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}
+            {% if step.tip %}<span class="step-annotation step-annotation--tip"><span class="annotation-mark" aria-hidden="true"></span>{{ step.tip | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
+            {% if step.note %}<span class="step-annotation step-annotation--note"><span class="annotation-mark" aria-hidden="true"></span>{{ step.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
           </li>
         {% else %}
-          <li class="step">{{ step }}</li>
+          <li class="step">{{ step | markdownify | remove: '<p>' | remove: '</p>' }}</li>
         {% endif %}
       {% endfor %}
     </ol>
@@ -131,7 +135,7 @@ layout: default
   {% endif %}
 
   {% if page.notes %}
-    <div class="recipe-section--notes" id="recipe-section-notes">
+    <div class="recipe-section-notes">
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">Notes</span>
       </h2>

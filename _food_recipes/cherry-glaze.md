@@ -1,7 +1,7 @@
 ---
 title: Cherry Glaze
 short_name: Cherry Glaze
-tagline: "Great over (Five-spice roast duck legs)[QQ LINK] or many other things."
+tagline: "Great over [Five-spice roast duck legs](../five-spice-crispy-duck-legs/) or many other things."
 source: Adapted from Gordon Ramsay
 makes: Depends
 prep_time: "5 mins"
@@ -31,7 +31,7 @@ method_short:
   - ""
 notes:
   - "If using frozen cherries, thaw and strain ahead as they hold more water."
-  - "Made for [five-spice crispy duck legs](/recipes/five-spice-crispy-duck-legs/)."
+  - "Made for [five-spice crispy duck legs](../five-spice-crispy-duck-legs/)."
 meta:
   rewritten: true
   proofread: false

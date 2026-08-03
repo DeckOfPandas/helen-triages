@@ -11,7 +11,7 @@
   text-transform: uppercase;
 }
 
-// --- Box tint (metadata grid only, for now) -----------------------------------
+// --- Box tint (shared violet, three consumers now) ----------------------------
 // Was tinted off $color-border mixed with $color-surface — a neutral with no
 // relation to the page's actual accent colours. Re-based on the rule's own
 // violet instead, so the box stops being a fifth, unrelated colour and reads as
@@ -20,10 +20,20 @@
 // The note box was matched to this too on 2026-07-31 and then split back off
 // the same day — it wants a different treatment, not just a fainter version of
 // this one. See `DEV_JOBS_v24.md` §1.8. Kept named generically in case it ends
-// up shared again once notes have their own answer.
+// up shared again once notes have their own answer. It did, 2026-08-02 -- and
+// so has .method-short's box, but at its own, much stronger opacity (below):
+// metadata grid and notes are deliberately quiet washes, the short-method box
+// is meant to read as an obviously distinct container, not an echo of them.
 $color-box-tint: $color-vibrant-violet;   // reuse, not a new hue
 $box-tint-opacity: 0.03;   // TRANSPARENCY DIAL — turn up for a stronger wash,
-                           // down for a fainter one.
+                           // down for a fainter one. Metadata grid and notes
+                           // only; .method-short uses its own, see below.
+$method-short-tint-opacity: 0.08;   // Helen, on noticing the box for the
+                                     // first time: "it's just very faint...
+                                     // darken it enough to see easily."
+                                     // Same violet as the wash above, a
+                                     // deliberately stronger tint -- this box
+                                     // needs to be seen, not just hinted at.
 
 // --- Body text base ----------------------------------------------------------
 // Set once on the recipe article so children inherit and only override exceptions.
@@ -33,6 +43,35 @@ article.recipe {
   color: $color-text;
   font-size: $font-size-body-sm;
   line-height: $line-height-body;
+}
+
+// --- Cross-recipe links -------------------------------------------------
+// Covers every prose field a link can appear in: tagline, ingredient items/
+// tips/notes, method steps/tips/notes, and (as of the .recipe-body-content
+// MVP pass below) long-form body content too -- one link style for the whole
+// page, no separate override left anywhere. Deliberately more specific than
+// the shared `a { color: $color-text }` (_sass/shared/_base.scss) so it wins
+// without needing !important — article.recipe + a beats a plain a on
+// specificity. Re-declares :hover, because the base a:hover (-> $color-
+// mood-root, the MOOD filter's cerulean) would otherwise win here on hover
+// even though it has lower specificity for everything else — a link that
+// changed to a completely unrelated hue on hover would be worse than the
+// bug this is fixing.
+//
+// font-weight 600 rather than the article's base 300: the sans-serif body
+// font has real weight gradations (unlike Courier New, see §13.6 in
+// HANDOVER), so a heavier weight reads as "different and interactive"
+// without needing an underline too.
+article.recipe a {
+  color: $color-recipe-link;
+  font-weight: 600;
+
+  // Lighter on hover, not darker -- Helen's ask, and the opposite of the
+  // usual "darken for hover" instinct. $color-recipe-link-hover is measured
+  // for this specifically (see _palette.scss), not a generic lighten().
+  &:hover {
+    color: $color-recipe-link-hover;
+  }
 }
 
 // --- Title -------------------------------------------------------------------
@@ -60,7 +99,10 @@ article.recipe {
   position: relative;
   padding: 0;
   margin: 0;
-  font-size: 1.4rem;
+  // No font-size here -- the only content is the nested .recipe-title-text
+  // span below, which sets its own (larger) size. A font-size here would
+  // never render against anything; this h1 previously carried 1.4rem that
+  // did exactly that, unnoticed since 2026-07-09.
   letter-spacing: 0.04em;
   // 60% of the 900px column is 540px, which wraps the longest titles to three
   // lines. `text-wrap: balance` then keeps
@@ -84,8 +126,39 @@ article.recipe {
   display: inline-block;
   position: relative;
   color: $color-text;
-  font-size: 1.8rem;
-  -webkit-text-stroke: $stroke-heavy;
+  // Was 1.8rem -- identical to .recipe-section-heading below, since
+  // 2026-07-09 (the recipe page's very first redesign commit set both to
+  // 1.8rem in the same change). Same font, same weight, same transform (both
+  // extend %heading-base), so the title and a section heading rendered as
+  // the same size text -- unnoticed until today's punched-tape pass made
+  // both carry the same stroke+emboss treatment too, which is what made the
+  // collision visible. 2.2rem re-establishes the h1 as bigger than any h2 on
+  // the page. Titles wrap within max-width: 60% above, so a longer title now
+  // wraps to slightly more lines than before -- worth another look once
+  // real titles are in front of you.
+  font-size: 2.2rem;
+  // Raised label-tape lettering, matching the index's .category-label and
+  // the shared wordmark (HANDOVER_v26.md §13.4.1) -- was plain stroke, the
+  // same "scratched" look every other recipe-page heading carries too, until
+  // now. Independent of overlapping-rule-double below: that mixin paints
+  // background-image only, so there's no property collision with the
+  // text-shadow punched() sets.
+  //
+  // Stroke width cut from $stroke-heavy (0.8px) to 0.4px, EXPERIMENTALLY --
+  // Helen: "the section headings feel far too bold... I don't know if just
+  // dropping the font weight is right." Font-weight isn't the right lever:
+  // Courier New only ships Regular/Bold as static faces (§13.6), so
+  // anything ≤500 jumps straight to Regular with no middle ground. The
+  // stroke's own proportion (2.1-2.3%, the §13.4.1 calibration) was worked
+  // out for a BARE stroke, before this mixin added a hard-edged emboss
+  // shadow on top -- two duplicate letterforms 1px apart plus an outlined
+  // edge compounds into visibly more ink than either alone, and compounds
+  // harder the bigger and bolder the base glyphs already are (700-weight
+  // Courier, page's biggest text). 0.4px keeps a visible edge without
+  // stacking a second full effect on top of the shadow. Unverified without
+  // a browser -- look and adjust.
+  -webkit-text-stroke: 0.4px $color-label-stroke;
+  @include punched(raised);
   padding: 0;
   @include overlapping-rule-double(
     $color-bright-magenta,
@@ -142,7 +215,10 @@ article.recipe {
       font-size: 0.85rem;
       letter-spacing: $letter-spacing-label;
       color: $color-text;
-      -webkit-text-stroke: $stroke-light;
+      // Raised label-tape lettering (HANDOVER_v26.md §13.4.1) -- stroke width
+      // unchanged, colour and emboss shadow are new.
+      -webkit-text-stroke: $stroke-light $color-label-stroke;
+      @include punched(raised);
       margin-bottom: $space-xs;
     }
 
@@ -176,7 +252,18 @@ article.recipe {
   font-size: 1.8rem;
   letter-spacing: 0.08em;
   color: $color-text;
-  -webkit-text-stroke: $stroke-medium;
+  // Raised label-tape lettering (HANDOVER_v26.md §13.4.1), same treatment as
+  // .category-label on the index and the shared wordmark.
+  //
+  // Stroke cut from $stroke-medium (0.6px) to 0.3px, EXPERIMENTALLY -- see
+  // the matching note on .recipe-title-text above for why (Helen: "the
+  // section headings feel far too bold"; the §13.4.1 proportion was
+  // calibrated for a bare stroke, before punched() added a compounding
+  // emboss shadow on top of it). This is the class INGREDIENTS/METHOD/NOTES
+  // and any peer heading in .recipe-body-content all share, so the change
+  // reaches all of them. Unverified without a browser -- look and adjust.
+  -webkit-text-stroke: 0.3px $color-label-stroke;
+  @include punched(raised);
   position: relative;  // anchor for absolute-positioned method toggle
 
   // The horizontal padding that used to give the ragged brush shape room to
@@ -196,29 +283,59 @@ article.recipe {
 
 // --- Method Toggle Button ----------------------------------------------------
 // Matches .btn-clear-inline on the index page: Courier, 0.75rem, weight 800, scratchy.
+// Sans-serif, weight 600, no stroke -- deliberately matching article.recipe
+// a exactly (Helen: "update the short method link to the sans serif font so
+// all links feel uniform"), not Courier's heading family. It no longer
+// shares anything with %heading-base (every property that extend supplied
+// was already being overridden below anyway), so the extend is gone too.
+// letter-spacing: 0 stays -- this button is a child of .recipe-section-
+// heading, which sets letter-spacing: 0.08em, and would otherwise inherit
+// it.
 .btn-method-toggle {
-  @extend %heading-base;
-  font-size: 0.75rem;
-  font-weight: $weight-clear-font;
+  font-family: $font-body;
+  // Was 0.75rem with an underline -- Helen: "match the look of the short
+  // method link exactly to body links like Philosophy of Yum." A body link
+  // has no font-size of its own; it inherits article.recipe's own
+  // $font-size-body-sm. Using that token directly here, rather than a
+  // number picked to look close, is what makes this an exact match instead
+  // of an approximation.
+  font-size: $font-size-body-sm;
+  font-weight: 600;
   text-transform: lowercase;
   letter-spacing: 0;
-  -webkit-text-stroke: $stroke-medium;
+  // Explicit resets, not decoration: this button is a child of
+  // .recipe-section-heading, which sets both of these (punched(raised) for
+  // text-shadow, -webkit-text-stroke directly) -- both properties inherit
+  // by default, so without resetting them the button was picking up the
+  // parent heading's emboss shadow and stroke on top of its own styling.
+  // Helen: "the PoY link text seems bouncier and maybe slightly
+  // wider-spaced letters? And is it a shade lighter in colour?" -- all
+  // three are consistent with an inherited shadow+stroke neither of us had
+  // actually checked for (dev tools shows inherited values greyed out
+  // under "Computed", easy to skim past).
+  -webkit-text-stroke: 0;
+  text-shadow: none;
   background: none;
   border: none;
-  color: $color-bright-magenta-dark;
+  color: $color-recipe-link;
   padding: 0;
   cursor: pointer;
   transition: opacity 0.1s ease-in-out;
-  text-decoration: underline;
-  text-underline-offset: 2px;
   white-space: nowrap;
   position: absolute;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
 
-  &:hover { opacity: 0.7; }
-  &.active { opacity: 0.7; }
+  // Lighter on hover, same colour and direction as every other link on the
+  // page. No .active rule any more (was opacity: 0.7, toggled by
+  // method-toggle.js whenever short method is showing) -- Helen: the
+  // persistent "click for full method" button, when short method is
+  // active, should look like a normal resting link, not the dimmed/faded
+  // read opacity: 0.7 actually gave it. method-toggle.js still toggles the
+  // .active class every time it switches modes; it's just unstyled here on
+  // purpose now, not a leftover.
+  &:hover { color: $color-recipe-link-hover; }
 }
 
 // --- Recipe Badges on recipe page --------------------------------------------
@@ -269,18 +386,34 @@ article.recipe {
 // so the heading sits in its own gutter and the group reads as a block.
 //
 // Adjacent-sibling selectors, so no markup changed. Safe because the template
-// only emits a group heading when there is more than one group, and all 18
-// multi-group recipes name every group — so there is no case where one group
-// indents and the next does not.
+// emits a group heading for every group once there is more than one — an
+// unnamed group falls back to "For the base:" (_layouts/recipe.html) rather
+// than rendering no heading, so there is no case where one group indents and
+// the next does not.
 .recipe-group-heading + .ingredients {
   padding-left: $space-xxl;
 }
 
+// Number column (2.4rem, wide enough for two digits at 1.2rem) plus the gap
+// the old flex layout gave the number and the text (0.9rem) -- named so the
+// grouped-step rule below can compose with it instead of guessing the same
+// two numbers again.
+$method-step-number-column: 2.4rem + 0.9rem;
+
 // Method groups all live in one <ol>, so this is "every step after the first
 // group heading" — which is every step in a grouped method. The heading items
 // themselves are excluded and stay flush.
+//
+// Composes with the number column below rather than replacing it: a grouped
+// step needs BOTH the group indent and room for its own number. ::before's
+// own `left` has to move by the same amount too -- position: absolute's
+// `left` is relative to the li's padding edge (fixed at the border, not
+// wherever the content box happens to start), so padding-left alone only
+// moves where the TEXT starts, never the number.
 .method-full li.method-group-heading-item ~ li.step {
-  padding-left: $space-xxl;
+  padding-left: calc(#{$space-xxl} + #{$method-step-number-column});
+
+  &::before { left: $space-xxl; }
 }
 
 .method-full {
@@ -289,14 +422,27 @@ article.recipe {
 
   li {
     counter-increment: step-counter;
+    position: relative;
+    // Was display: flex + gap -- couldn't survive a step containing a
+    // nested block-level list. Flex turns each run of inline content AND a
+    // nested <ul> into separate flex items laid out in a ROW, so a bullet
+    // sub-list within one step would render beside the number instead of
+    // underneath the step's own text. Helen: "there's a note for you in
+    // the ganache about bullet points [in a method step] -- work out
+    // formatting we can use on other pages." position: absolute (the same
+    // technique .recipe-body-content's numbered list and .method-short's
+    // bullets already use) keeps the number out of the li's own flow
+    // entirely, so whatever the step contains -- one line, or a paragraph
+    // plus a nested list plus another paragraph -- stacks normally.
+    padding-left: $method-step-number-column;
     margin-bottom: $space-xl;
     line-height: $line-height-body;
-    display: flex;
-    align-items: baseline;
-    gap: 0.9rem;
 
     &::before {
       content: counter(step-counter) ".";
+      position: absolute;
+      left: 0;
+      top: $space-xxs;  // nudge down to align with first line of body text
       font-family: $font-headings;
       font-weight: 700;
       color: $color-step-number;
@@ -306,21 +452,45 @@ article.recipe {
       // tuned for 1.8rem and reads as a blob at 1.2rem.
       -webkit-text-stroke: $stroke-light;
       font-size: 1.2rem;
-      display: inline-block;
-      min-width: 2.4rem;   // wide enough for two digits at 1.4rem
-      flex-shrink: 0;
       line-height: 1.2;
-      margin-top: $space-xxs;  // nudge down to align with first line of body text
-      align-self: flex-start;
     }
   }
 
   li.method-group-heading-item {
     counter-increment: none;
-    display: block;
+    padding-left: 0;
     margin-bottom: $space-sm;
 
     &::before { content: none; }
+  }
+
+  // A step's text is markdownified (recipe.html), same as tips/notes/tagline
+  // -- so a multi-line YAML block scalar can embed a genuine markdown bullet
+  // list inside one step, the formatting Helen asked for. Undoes everything
+  // the outer li rule sets for any <li> that ends up nested inside one of
+  // these: no counter (it would otherwise increment the SAME step-counter
+  // and throw off every step number after it -- .method-full li's own
+  // counter-increment is a descendant selector, matching these too, unless
+  // overridden here), no number column, no absolutely-positioned ::before.
+  // A native bullet is exactly what a sub-item within a step needs.
+  //
+  // list-style: none is set on .method-full itself (".ingredients,
+  // .method-full { list-style: none; }" above) and inherits into any nested
+  // list by default -- list-style: disc here is a real override, not
+  // decoration.
+  ul {
+    list-style: disc;
+    padding-left: $space-lg;
+    margin: $space-sm 0;
+
+    li {
+      counter-increment: none;
+      position: static;
+      padding-left: 0;
+      margin-bottom: 0.3rem;
+
+      &::before { content: none; }
+    }
   }
 }
 
@@ -328,8 +498,38 @@ article.recipe {
 // Indented bullets express parallelism — outer = sequential, inner = parallel.
 .method-short {
   // font-family, font-weight, color, font-size, line-height inherited from article.recipe
-  margin: $space-sm 0 $space-xxl 0;
-  background-color: rgba($color-border, 0.12);
+  //
+  // Top margin is NEGATIVE, deliberately -- Helen: "clicking between the
+  // long and short methods means the top line jumps around... use the same
+  // vertical spacing for the short method as for the long method."
+  //
+  // .recipe-section-heading's own 2rem bottom margin is what actually sets
+  // the gap after METHOD -- it collapses through the empty
+  // .recipe-section-method wrapper div, then collapses again against
+  // whichever of .method-full/.method-short is the visible next sibling.
+  // .method-full's own margin-top ($space-sm, 0.5rem) is smaller than that
+  // 2rem, so adjoining-positive-margins collapsing just takes the larger
+  // one -- .method-full's declared margin never actually mattered; the
+  // heading's 2rem was always the real gap.
+  //
+  // .method-short is a padded box (padding-top: 1.25rem), and padding isn't
+  // collapsible -- it's added on top of whatever the margin collapse
+  // produces, not folded into it. With the old $space-sm margin that gave
+  // 2rem (collapsed) + 1.25rem (padding) = 3.25rem, 1.25rem more than
+  // .method-full's plain 2rem -- the jump on toggle. Per the spec, a
+  // negative margin collapsing against a positive one SUBTRACTS:
+  // collapsed = 2rem − |margin-top|. Setting margin-top: -1.25rem makes
+  // that 0.75rem, and 0.75rem + 1.25rem (padding) = 2rem again -- matching
+  // .method-full exactly, while the box's own padding stays symmetric on
+  // all four sides (unlike shrinking padding-top alone would).
+  margin: -1.25rem 0 $space-xxl 0;
+  // Was rgba($color-border, 0.12) -- a pale, low-saturation grey barely
+  // tinting an already-pale background, which is what made the box read as
+  // "very faint" even at a higher opacity than the wash below uses. Same
+  // violet as the metadata grid and notes, at $method-short-tint-opacity
+  // (see above) rather than $box-tint-opacity -- deliberately stronger, so
+  // this reads as an obviously distinct box.
+  background-color: rgba($color-box-tint, $method-short-tint-opacity);
   padding: 1.25rem $space-xl;
   border-radius: $radius-sm;
 
@@ -348,7 +548,12 @@ article.recipe {
         content: "*";
         position: absolute;
         left: -$space-xxl;
-        top: 0.1rem;
+        // Was 0.1rem -- Helen: "the bullet points in the short method
+        // section are currently slightly higher than their lines of text."
+        // A 1.4rem marker at line-height: 1 sits noticeably higher than the
+        // ~0.92rem body text beside it unless nudged down further than a
+        // smaller marker would need; 0.1rem wasn't enough at this size.
+        top: 0.25rem;
         color: $color-step-number;
         font-family: $font-headings;
         font-weight: 700;
@@ -368,7 +573,10 @@ article.recipe {
         font-weight: 400;
         font-size: 1rem;
         color: $color-marker-accent;
-        top: 0;
+        // Was 0 -- same "sits higher than the text" issue as the outer *
+        // marker above, smaller here because 1rem is closer to the ~0.92rem
+        // body text than the outer marker's 1.4rem is.
+        top: 0.1rem;
       }
 
       ul {
@@ -384,18 +592,17 @@ article.recipe {
 }
 
 // --- Note --------------------------------------------------------------------
-// Neutral, deliberately. This box used to be tinted spring green, with a green
-// rule and a green label — a fourth hue spent on a box that already announces
-// itself by being a box with the word "note" on it. The shape does the work;
-// the colour was only decoration, and the redesign is spending its colour on
-// the three section headings and the ingredient amounts instead.
+// Was a flat neutral mix (mix($color-border, $color-surface, 35%)), left that
+// way pending a proper answer — see DEV_JOBS_v24.md §1.8. Now shares the
+// metadata grid's own tint ($color-box-tint / $box-tint-opacity, both defined
+// above), so the two boxes read as the same device rather than the note being
+// an unrelated fainter grey next to the meta grid's violet.
 .note {
   position: relative;
   // font-family, font-weight, color, font-size, line-height inherited from article.recipe
   margin: $spacing-block-gap 0;
   padding: 1.1rem 1.4rem;
-  background-color: mix($color-border, $color-surface, 35%);   // left as it
-  // was pending a proper answer for this box — see DEV_JOBS_v24.md §1.8
+  background-color: rgba($color-box-tint, $box-tint-opacity);
   border-radius: $radius-sm;
 
   &::before {
@@ -423,19 +630,73 @@ article.recipe {
   }
 }
 
-// --- Body Content (long-form prose via {{ content }}) ----------------------
+// --- Body Content (long-form prose via {{ content }}) -----------------------
+// A recipe's Markdown body below its front matter -- rare (one file as of
+// 2026-08-02, dark-chocolate-ganache.md, see HANDOVER_v26.md §4.1) but real.
+//
+// Section headings in here are PEERS of INGREDIENTS/METHOD/NOTES, per
+// Helen's call 2026-08-02: "I can imagine TIPS and TROUBLESHOOTING being
+// peer headings with INGREDIENTS etc. I think that would cause the least
+// jar." Plain `## Heading` markdown can't do this -- kramdown gives it no
+// class and no nested span, and .recipe-section-heading's mark needs both
+// (the span is what overlapping-rule-double hugs). Write raw HTML directly
+// in the body instead, blank-line-separated so kramdown still parses the
+// surrounding markdown as markdown:
+//
+//   <h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
+//
+// A subtitle directly under a peer heading (dark-chocolate-ganache's own
+// "a.k.a. ganache is the worst", split out of the heading text itself) is a
+// <p class="recipe-section-subtitle"> straight after it, same approach.
+//
+// A bare `## Heading` still gets a reasonable fallback below rather than
+// unstyled browser default -- but it will not match the page's other
+// section headings, which is the entire distinction peer status is for.
 article.recipe .recipe-body-content {
   margin-top: 0;
-  padding-top: $space-xl;
+  // No padding-top: a peer heading brings its own $spacing-section-top
+  // (4.5rem) exactly like INGREDIENTS/METHOD/NOTES do, unconditionally, not
+  // just on first-child -- the same rhythm the rest of the page already
+  // uses between sections, not a bespoke gap invented for this one area.
+  // Adding a second gap here would double up.
 
-  h2 {
+  // Fallback for a heading that didn't opt into peer status via the raw-HTML
+  // pattern above. :not(.recipe-section-heading) so this never fights that
+  // class on specificity when both are present on the same element.
+  h2:not(.recipe-section-heading) {
     @extend %heading-base;
-    font-size: 0.85rem;
+    font-size: 1rem;
     letter-spacing: $letter-spacing-label;
-    color: $color-clear-text;
-    margin: $space-xxl 0 $space-md 0;
+    color: $color-text;
+    -webkit-text-stroke: $stroke-light $color-label-stroke;
+    @include punched(raised);
+    margin: $spacing-section-gap 0 $space-md 0;
+  }
 
-    &:first-child { margin-top: 0; }
+  // The "a.k.a." subtitle pattern -- same voice as .recipe-tagline (italic,
+  // lightened text colour), smaller, sitting under a peer heading instead of
+  // under the page title.
+  // Spacing modelled directly on .recipe-title/.recipe-tagline's own
+  // relationship (1.25rem above the tagline, 3rem below it, from
+  // .recipe-title and .recipe-meta's margins respectively) -- Helen: "so it
+  // reads like a tagline, not the first line of content."
+  //
+  // Above: adjacent margins collapse to their max, so a plain margin-top
+  // here couldn't shrink the gap below .recipe-section-heading's own 2rem
+  // bottom margin -- only a margin big enough in the other direction can.
+  // -0.75rem collapsed against that 2rem gives exactly 1.25rem (positive
+  // and negative margins sum when they collapse, they don't take the max of
+  // one positive and one negative).
+  //
+  // Below: bumped from $space-lg (1rem, too tight -- read as the first line
+  // of the paragraph that followed) to $spacing-section-gap, matching the
+  // real tagline's gap to .recipe-meta exactly rather than a value picked
+  // to look roughly separated.
+  .recipe-section-subtitle {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: lighten($color-text, 20%);
+    margin: -0.75rem 0 $spacing-section-gap 0;
   }
 
   h3 {
@@ -448,27 +709,79 @@ article.recipe .recipe-body-content {
 
   p {
     // font-family, font-weight, color, font-size, line-height inherited from article.recipe
+    // Same reading width as Method, not Notes: max-width: none overrides the
+    // shared `article.recipe p { max-width: 65ch }` in _layout.scss, which
+    // matched this to Notes only because both happen to be plain <p> tags,
+    // not because anyone decided body content should read at Notes' width.
+    // Method has no cap at all -- this shouldn't either, per Helen's call.
+    max-width: none;
     margin: 0 0 $space-lg 0;
-    max-width: 65ch;
   }
 
   ul, ol {
     // font-family, font-weight, color, font-size, line-height inherited from article.recipe
+    // Not covered by the shared article.recipe p rule (lists only, not p).
+    // No max-width here either, same reasoning as p above.
     padding-left: $space-xl;
-    max-width: 65ch;
 
     li { margin-bottom: 0.5rem; }
   }
 
-  strong { font-weight: 700; }
+  // Numbered lists get Method's own numeral treatment -- Helen: "let's try
+  // styling the numbers in the ganache writing's numbered list the same way
+  // as method steps." Same font, stroke, size and colour as .method-full's
+  // ::before counter (see that rule above for the exact values this
+  // mirrors).
+  //
+  // Different LAYOUT mechanism, though: .method-full uses display: flex on
+  // the li, which works because a step is one line of text and nothing
+  // else. A body-content numbered item can contain a nested <ul> (each of
+  // ganache's failure modes has its own sub-bullets) -- flex would put that
+  // nested list beside the number instead of under it. Absolute positioning
+  // avoids that: the ::before sits in the padding-left gutter without
+  // joining the li's own flow, so both the bold lead-in and the nested list
+  // beneath it stack normally.
+  ol {
+    list-style: none;
+    padding-left: 2.4rem;   // matches .method-full's number column width
+    counter-reset: body-content-counter;
 
-  a {
-    color: $color-clear-text;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    > li {
+      counter-increment: body-content-counter;
+      position: relative;
 
-    &:hover { color: $color-mood-active; }
+      &::before {
+        content: counter(body-content-counter) ".";
+        position: absolute;
+        left: -2.4rem;
+        // Same nudge .method-full uses (margin-top: $space-xxs there) for
+        // the same reason: a 1.2rem numeral sitting flush with the top of a
+        // box built around ~0.92rem/700-weight text sits visibly higher
+        // than that text's own baseline. Helen: "the numbers are slightly
+        // higher" -- absolute positioning needs top: $space-xxs where the
+        // flex version needs margin-top: $space-xxs, same fix either way.
+        top: $space-xxs;
+        font-family: $font-headings;
+        font-weight: 700;
+        color: $color-step-number;
+        -webkit-text-stroke: $stroke-light;
+        font-size: 1.2rem;
+        line-height: 1.2;
+      }
+    }
   }
+
+  // 600 rather than the browser default 700 -- Helen: "the font still seems
+  // too heavy." Only current use is the four failure-mode lead-ins in the
+  // numbered list above (dark-chocolate-ganache.md); a whole line of
+  // 700-weight sans-serif reads dense. 600 stays visibly bolder than the
+  // 300-weight body text around it without matching the numeral's own
+  // full-weight Courier bold one column to the left.
+  strong { font-weight: 600; }
+
+  // No link colour/underline override here any more -- article.recipe a
+  // (above) covers it now, same magenta treatment as every other
+  // cross-recipe link on the page. One link style, not two.
 }
 
 // --- Group Headings ----------------------------------------------------------
@@ -487,7 +800,10 @@ article.recipe .recipe-body-content {
   font-size: 1rem;
   letter-spacing: $letter-spacing-label;
   color: $color-text;
-  -webkit-text-stroke: $stroke-light;
+  // Raised label-tape lettering (HANDOVER_v26.md §13.4.1) -- stroke width
+  // unchanged, colour and emboss shadow are new.
+  -webkit-text-stroke: $stroke-light $color-label-stroke;
+  @include punched(raised);
   line-height: 1.4;
 }
 
@@ -517,30 +833,136 @@ article.recipe .recipe-body-content {
 // Inline highlight behind the quantity portion of an ingredient line.
 // Highlighter blob injected by highlighter.js into .highlighter-slot.
 .ingredient-amount {
-  position: relative;
   display: inline;
-  padding: 0 0.25em 0 0.2em;
   margin-right: 0.15em;
   font-weight: 500;
 }
 
-// --- Ingredient and step annotations ----------------------------------------
-// tip: active technique advice. note: contextual information.
-// Both display on a new line, smaller and lighter than the ingredient text.
+// Only the number gets the highlighter, not the unit that follows it — the
+// number is the figure you need at a glance while cooking; the unit is
+// secondary. .highlighted (shared/_base.scss) supplies position: relative,
+// the positioning context the injected SVG needs.
 //
-// Both are now the same colour. Tips were cerulean, which spent a whole hue on
-// a distinction that barely occurs: across the published recipes there are 14
-// tips and 2 notes, so a page carrying both at once is close to hypothetical.
-// If the distinction ever needs to be visible, make it typographic — the colour
+// align-items: baseline overrides .highlighted's own align-items: center.
+// With no flex item baseline-aligned, an inline-flex box's OWN baseline (the
+// one used to place it within the surrounding line of text) is synthesised
+// from the top edge of its first flex item rather than real text metrics —
+// that pushed the whole box, number included, below the "pt"/"g"/"oz" text
+// sitting right next to it outside the box. Harmless while .ingredient-amount
+// wrapped the full "400 g" (the whole run shifted together, so nothing beside
+// it to compare against); became visible the moment only the number sat in
+// the flex box next to a plain-text unit at the correct baseline.
+// No right padding: the injected highlighter SVG has a fixed few-px overflow
+// baked into every highlighters/*.svg asset (position:absolute; left:-4px;
+// width:calc(100% + 8px)), independent of this box's own size. Right padding
+// here just added more box for that fixed overflow to bleed past, painting
+// over the space before the unit and touching it. margin-right instead sits
+// outside the box the SVG paints into, so it isn't touched by the overflow.
+.ingredient-amount-number {
+  padding: 0 0 0 0.2em;
+  margin-right: 0.15em;
+  align-items: baseline;
+}
+
+// --- Ingredient and step annotations ----------------------------------------
+// tip: active technique advice. note: contextual information. Both are the
+// same colour — tips were cerulean, which spent a whole hue on a distinction
+// that barely occurs: across the published recipes there are 14 tips and 2
+// notes, so a page carrying both at once is close to hypothetical. If the
+// distinction ever needs to be visible, make it typographic — the colour
 // budget is committed elsewhere.
-.ingredient-annotation,
+//
+// Step and ingredient annotations used to share one block/gutter layout.
+// Split apart 2026-08-03: Helen reads a step as a sentence, so dropping to a
+// new indented line for its tip doesn't cost her anything. She reads
+// ingredients as a list to scan (amounts, mainly — "how much of everything"),
+// and the same block/gutter treatment there pulled her eye out of that scan
+// every time. They're not two sizes of the same component any more, they're
+// two different components that happen to share a mark and a colour.
+
+// --- Step annotations: block, mark in a left gutter -------------------------
+// The mark sits absolutely positioned in the gutter (the site's established
+// mark-in-a-gutter technique, also used for step numbers) rather than
+// inline, so padding-left indents every wrapped line of the annotation text
+// evenly, not just the first — a step's tip is often a full sentence, long
+// enough to wrap.
 .step-annotation {
   display: block;
+  position: relative;
   margin-top: 0.25rem;
+  padding-left: 4rem;
   font-size: 0.82rem;
   font-style: italic;
   line-height: 1.45;
 
   &--tip  { color: $color-clear-text; }
   &--note { color: $color-clear-text; }
+}
+
+// top recentres the mark (2.5rem x 2rem) against a single line of annotation
+// text (line-height 1.45 x font-size 0.82rem =~ 1.19rem) rather than
+// aligning their top edges, since the mark is taller than the text line it
+// sits beside; -0.65rem is Helen's own eyeballed fine-tune of the arithmetic
+// result of ~-0.41rem.
+.step-annotation .annotation-mark {
+  position: absolute;
+  left: 1rem;
+  top: -0.65rem;
+  width: 2.5rem;
+  height: 2rem;
+}
+
+// --- Ingredient annotations: inline, same line as the ingredient -----------
+// Mark artwork is four horizontal arrows dealt from a shuffled pool (see
+// annotationMarks() in decorations.js) — no gutter, no absolute positioning,
+// the annotation is just inline content after the ingredient text, wrapping
+// like any other text if it runs past the line. That's the point — a
+// block-level aside below the line was exactly what pulled Helen's eye out
+// of scanning the list.
+// $annotation-arrow-gap sits on both sides of the mark — before it (clear of
+// the ingredient text) and after it (clear of the annotation text) — so it
+// reads as a deliberate gap the arrow sits inside, not squeezed against
+// either side. Generous rather than tight: Helen's ask was room enough that
+// the arrow doesn't drag her eye off the ingredient line she's scanning.
+$annotation-arrow-gap: 0.9em;
+
+.ingredient-annotation {
+  display: inline;
+  margin-left: $annotation-arrow-gap;
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.45;
+
+  &--tip  { color: $color-clear-text; }
+  &--note { color: $color-clear-text; }
+}
+
+// Started at 1.6em x 0.8em, matching the four horizontal arrows' own ~2:1
+// aspect ratio. Width now stretched 50% (1.6em -> 2.4em) per Helen's ask —
+// height untouched, so it's a left-to-right stretch specifically, not a
+// scale-up. The arrow SVGs themselves needed preserveAspectRatio="none" for
+// this to actually distort the artwork rather than just add empty padding
+// either side of it (same technique the tape assets use to stretch-to-fill).
+// Horizontal spacing ($annotation-arrow-gap) deliberately untouched.
+.ingredient-annotation .annotation-mark {
+  display: inline-block;
+  width: 2.4em;
+  height: 0.8em;
+  margin-right: $annotation-arrow-gap;
+  vertical-align: middle;
+}
+
+// Violet, not magenta, for both marks above: magenta already carries the
+// title rule, the toggle and every link, so a magenta mark here read as one
+// more competing use of the site's loudest colour rather than a quiet aside.
+// Violet is already spent on the box tints, so this reuses rather than
+// adding a hue.
+.annotation-mark {
+  color: $color-vibrant-violet;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 }
