@@ -98,6 +98,17 @@ index.html              permalink /        the landing page
 
 `food/` and `cocktails/` hold each site's **pages**, not their collections.
 
+`_food_drafts/` and `_cocktail_drafts/` are each their own nested git repo
+(gitignored from this one — see `.gitignore`), pushed to a separate private
+GitHub repo. `output: false` only stops Jekyll rendering them; the repo
+split is what keeps their source out of a public repo regardless of build
+config. A draft is promoted to `_food_recipes/` — and so becomes public the
+moment this repo deploys — only once it contains no copyright material
+(Helen's own words/sufficiently adapted, not lifted verbatim from a
+source). This is the actual gate; the private-repo split is what makes it
+safe to leave drafts sitting there unpromoted for as long as needed rather
+than a reason to promote them faster.
+
 ### 2.2 Shared versus forked
 
 **Shared**, at the root, names neither site: `_layouts/default.html`;

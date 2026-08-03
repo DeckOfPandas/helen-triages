@@ -11,31 +11,7 @@ here.
 
 ## 1. Next up
 
-### 1.1 Look at the site on the 13-inch iPad — still never done
-
-Carried across three redesigns now. Portrait is ~834 CSS px against a 900px
-content width. **This is the largest unverified claim in the project** — both
-the recipe page and index redesigns rest on marks being findable at a
-glance, and that's only ever been judged on a desktop monitor. In order:
-
-- Do all five index filter headers fit on one screen? The whole point of the
-  index's density values (`HANDOVER_v26.md` §13.4) and the only number
-  behind it is an estimate from compiled CSS. If close but short,
-  `$index-section-gap` down to `$space-lg` buys ~32px, one line.
-- Do the section marks read from a few feet away, on both pages?
-- The recipe title at `max-width: 60%` — 500px on the iPad rather than 540px.
-- `$spacing-section-top: 4.5rem` on the recipe page — generous on a 900px
-  desktop column, possibly wasteful where scrolling costs more.
-- Does the new recipe-list row layout (category-code bar, clamped
-  ingredient line, pagination) hold up at that width? Nobody's looked yet —
-  it postdates every other iPad concern on this list.
-- The wordmark's tape width is now dynamic (`HANDOVER_v26.md` §13.8) rather
-  than a fixed `min(425px, 92vw)` — check both sites' headers specifically at
-  the 92vw safety-net width, not just at desktop width. Nobody's confirmed
-  the `max-width: 92vw` caps actually prevent horizontal scroll on a real
-  narrow device rather than just in the maths.
-
-### 1.2 Deploy — the Actions workflow
+### 1.1 Deploy — the Actions workflow
 
 Written 2026-08-02 on branch `chore/deploy-github-pages`
 (`.github/workflows/build-and-deploy.yml`) — not yet merged or pushed;
@@ -53,7 +29,7 @@ in `_config.yml` already confirmed to match the GitHub username.
 (MVP styling for recipe body content, previously listed here as a second
 blocking item, is done — see `HANDOVER_v26.md` §4.1.)
 
-### 1.3 The tape SVG itself needs a redesign — conversation parked mid-2026-08-02, pick it back up
+### 1.2 The tape SVG itself needs a redesign — conversation parked mid-2026-08-02, pick it back up
 
 Raised by Helen right after the wordmark restyle (`HANDOVER_v26.md` §13.8)
 landed: "let's discuss the SVG of the tape itself, as that work was parked
@@ -82,17 +58,12 @@ something you read" — though the tape may be a genuinely different case
 need to re-find on every page) rather than the same mistake. Worth deciding
 out loud either way, not by default.
 
-### 1.4 Move `_food_drafts/` into a private repo
-
-Decided, not done. `output: false` stops drafts *publishing*, not the source
-markdown sitting in a public repo. More urgent once the repo is public.
-
-### 1.5 Delete the stale draft duplicates
+### 1.3 Delete the stale draft duplicates
 
 List was in `RECIPES_SEEN_v23.md`, now stale — draft count has grown
 significantly since. Re-derive before acting on the old list.
 
-### 1.6 Derive the cocktails schema from real recipes
+### 1.4 Derive the cocktails schema from real recipes
 
 Scaffold is in, deliberately empty — `HANDOVER_v26.md` §9 is the only record
 of what's known. Helen will paste 5–10 real cocktail recipes; front matter
@@ -155,8 +126,13 @@ results). Each considered and declined for the stated reason.
   "almost never, by accident" — the actual job is making it deliberate, not
   extending it. The `draft` fixture in `conftest.py` is dead — used by
   nothing. Either use it or delete it.
-- **Mobile**, deferred deliberately — no fixed widths overflow, no media
-  queries needed yet. Revisit after §1.1, iPad in hand.
+- **Mobile / narrow-device check**, deferred deliberately. No fixed widths
+  overflow, no media queries needed yet, but nobody has actually looked at
+  either page on a real narrow device across three redesigns — Helen's
+  explicit call (2026-08-03): deployment can't be on the critical path to
+  itself, and a design mistake is embarrassing, not a real-world harm, so
+  this isn't a pre-deploy gate. Worth doing once things are live, not
+  before.
 - **`_includes/` is shared but its contents are food-specific**
   (`filter_group.html`, `recipe_badges.html`). Fine until cocktails needs
   includes of its own — decide the convention (`food_`/`cocktail_` prefix,
@@ -170,3 +146,9 @@ results). Each considered and declined for the stated reason.
   never.
 - **`_data/food/common_ingredients.yml`** holds one `pantry:` key, could be
   `pantry.yml`.
+- **Stretch goal: ice cream recipes clickable from an index page list.**
+  Parked here 2026-08-03 from a `CLAUDE` marker in
+  `ben-jerrys-sweet-cream-base-1.md`'s `notes:` — the idea was a list on the
+  index page (or somewhere) of all ice cream recipes, so a base recipe like
+  this one can link out to what's built on it. No design or scoping done
+  yet; this is the idea, not a spec.
