@@ -261,13 +261,16 @@ article.recipe .method-short {
 }
 
 
-// Shared clip-path shape for badges and filter buttons
-.badge,
-.btn-tag,
-.btn-star {
+// Clip-path shape — now for .badge only (the meta/draft status flags:
+// -draft, -meta-rewrite, -meta-proofread). .badge-star/mood/practicalities
+// and .btn-tag/.btn-star moved to the tape-shape SVG system below
+// (Helen, 2026-08-03: "the grey shapes... don't really look like anything
+// in particular... hastily broken old-fashioned highlighter tape").
+.badge {
   display: inline-block;
   font-family: $font-headings;
   white-space: nowrap;
+  position: relative;
 
   clip-path: polygon(
     1% 1%,
@@ -279,13 +282,7 @@ article.recipe .method-short {
     3% 94%,
     0% 42%
   );
-}
 
-.badge {
-  // Briefly $font-body (sans), reverted same day: Helen wants the pills to
-  // match the filter buttons above them, which keep $font-headings
-  // (Courier) via the shared clip-path rule — inherited from there rather
-  // than set here again.
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: lowercase;
@@ -308,19 +305,53 @@ article.recipe .method-short {
     color: lighten($color-clear-text, 12%);
   }
 
+  // Tape shape instead of clip-path + flat fill -- no background-color at
+  // all, the SVG itself is the visible fill, ragged edges and all. .tag-shape
+  // gets its OWN colour (the raw root hue) separate from the text colour
+  // (the darker -active hue), same two-tone split the rest of the page's
+  // colour system already uses -- text needs to stay readable sitting on
+  // top of the shape, not disappear into it.
+  &-star, &-mood, &-practicalities {
+    clip-path: none;
+  }
+
   &-star {
-    background-color: rgba($color-star-root, $saturation-tag-pill-bg);
     color: $color-star-active;
+    .tag-shape { color: $color-star-root; }
   }
 
   &-mood {
-    background-color: rgba($color-mood-root, $saturation-tag-pill-bg);
     color: $color-mood-active;
+    .tag-shape { color: $color-mood-root; }
   }
 
   &-practicalities {
-    background-color: rgba($color-practicalities-root, $saturation-tag-pill-bg);
     color: $color-practicalities-active;
+    .tag-shape { color: $color-practicalities-root; }
+  }
+}
+
+// The tape shape itself: absolutely positioned behind the badge/button text,
+// stretched to fill (preserveAspectRatio="none" baked into the SVG files
+// themselves, same technique as the wordmark's own tape). One of 18 (9
+// shapes x original/flipped) assigned deterministically by tagShapes() in
+// decorations.js, keyed on the tag's own text -- same tag always gets the
+// same shape wherever it appears (a filter button and a recipe-row pill for
+// "greens" match), and shape 9's full-width diagonal is excluded for short
+// tag text specifically, since it distorts more than the others do when
+// stretched very narrow.
+.tag-shape {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 }
 
@@ -333,12 +364,24 @@ article.recipe .method-short {
 // Defined before .category so active-state compound selectors
 // (two classes) correctly win over these single-class rules by specificity.
 
+// Tape shape now, not a flat clip-path fill (see .tag-shape, BADGES above)
+// — position:relative/inline-block/font-family/white-space moved here from
+// the old shared .badge/.btn-tag/.btn-star rule, since these two no longer
+// share a rule with .badge at all. Resting .tag-shape colour is a
+// translucent neutral (rgba($color-text, ...)) matching the previous flat
+// background's visual weight; category colour only appears once a filter is
+// actually chosen (.active rules below) — same principle as the existing
+// active-state colour pop, extended to the shape itself.
 .btn-tag,
 .btn-star {
+  position: relative;
+  display: inline-block;
+  font-family: $font-headings;
+  white-space: nowrap;
   text-transform: lowercase;
   font-weight: 700;
   border: none;
-  background-color: rgba($color-text, 0.06);
+  background: none;
   color: lighten($color-text, 22%);
   padding: $space-xs $space-md;
   cursor: pointer;
@@ -346,9 +389,11 @@ article.recipe .method-short {
   margin: 0.2rem 0.45rem 0.2rem 0;
   transition: all 0.1s ease-in-out;
 
+  .tag-shape { color: rgba($color-text, 0.35); }
+
   &:hover {
-    background-color: rgba($color-text, 0.10);
     color: $color-text;
+    .tag-shape { color: rgba($color-text, 0.5); }
   }
 }
 
@@ -513,32 +558,36 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // Active states -- compound selectors (.category--star .btn-star.active)
   // have higher specificity than the base .btn-tag/.btn-star rule above,
   // so no !important needed here.
-  // Shared typography/bg via %btn-active-base; each adds its own colour.
+  // Shared typography via %btn-active-base; each adds its own colour.
   //
-  // background-color overrides %btn-active-base's generic grey with the same
-  // per-category tint the matched recipe-row pills use ($saturation-tag-
-  // pill-bg-matched) -- Helen's ask, "for a bit more of a pop" to match.
-  // RESTING .btn-tag/.btn-star (not .active) is untouched -- only the chosen
-  // state changes.
+  // background: none cancels %btn-active-base's generic flat grey — the
+  // tape shape (.tag-shape) is the fill now, not a background-color. Colour
+  // there jumps from the resting translucent neutral to the solid category
+  // root hue, the tape-shape equivalent of the pop the matched recipe-row
+  // pills already get. RESTING .btn-tag/.btn-star (not .active) is
+  // untouched -- only the chosen state changes.
   &.category--star .btn-star.active {
     @extend %btn-active-base;
-    background-color: rgba($color-star-root, $saturation-tag-pill-bg-matched);
+    background: none;
     color: $color-star-active;
     -webkit-text-stroke: 0.5px $color-star-active;
+    .tag-shape { color: $color-star-root; }
   }
 
   &.category--mood .btn-tag.active {
     @extend %btn-active-base;
-    background-color: rgba($color-mood-root, $saturation-tag-pill-bg-matched);
+    background: none;
     color: $color-mood-active;
     -webkit-text-stroke: 0.6px $color-mood-active;
+    .tag-shape { color: $color-mood-root; }
   }
 
   &.category--practicalities .btn-tag.active {
     @extend %btn-active-base;
-    background-color: rgba($color-practicalities-root, $saturation-tag-pill-bg-matched);
+    background: none;
     color: $color-practicalities-active;
     -webkit-text-stroke: 0.5px $color-practicalities-active;
+    .tag-shape { color: $color-practicalities-root; }
   }
 
   .category-buttons {

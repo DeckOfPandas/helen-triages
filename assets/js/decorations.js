@@ -11,6 +11,7 @@
 //   .tape-bg                   masking tape behind the site logo
 //   .site-footer-hearts        footer hearts
 //   .annotation-mark           hand-drawn sparkles beside a tip/note
+//   .tag-shape                 torn-tape shape behind a tag pill/filter button
 //
 // Two more lived here until 2026-08-01. `.watercolour-brush-slot` drew the
 // brush washes, which the blocky rule replaced on both pages; `[data-index-doodle]`
@@ -152,9 +153,61 @@
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // Tag shapes — the torn-tape background behind a recipe-row pill or a
+  // STAR/MOOD/PRACTICALITIES filter button (index page only; a no-op
+  // elsewhere since .tag-shape only appears in that markup).
+  //
+  // Assigned by a deterministic hash of the tag's own text, not randomly and
+  // not by position — the same tag gets the same shape everywhere it
+  // appears (a filter button and a recipe-row pill for "greens" match),
+  // which is the whole point (Helen: "this will give some visual stability
+  // between the filter section and the recipe list section"). Random or
+  // per-position picks would both break that.
+  //
+  // Shape 9 (and its flip) is a wedge with a diagonal that spans the shape's
+  // FULL width, unlike the other eight, where the torn/ragged detail is
+  // concentrated at the ends and the middle stretches safely. Stretched to a
+  // very narrow pill, that diagonal reads as a much steeper, near-vertical
+  // cut than it does at full width — excluded for short tag text
+  // specifically, not for every tag, so it still gets used on longer ones
+  // where it stretches fine.
+  function tagShapes() {
+    var slots = document.querySelectorAll('.tag-shape');
+    if (!slots.length) return;
+
+    var SHORT_TEXT_MAX = 6;
+
+    function pickShape(text) {
+      var pool = [];
+      for (var n = 1; n <= 9; n++) {
+        pool.push('tag-shape-' + n);
+        pool.push('tag-shape-' + n + '-flip');
+      }
+      if (text.length <= SHORT_TEXT_MAX) {
+        pool = pool.filter(function (name) { return name.indexOf('tag-shape-9') !== 0; });
+      }
+      var hash = 0;
+      for (var i = 0; i < text.length; i++) {
+        hash = (hash * 31 + text.charCodeAt(i)) | 0;
+      }
+      return pool[Math.abs(hash) % pool.length];
+    }
+
+    slots.forEach(function (slot) {
+      var host = slot.closest('.badge, .btn-tag, .btn-star');
+      var text = (host ? host.textContent : '').trim().toLowerCase();
+      if (!text) return;
+      var url = HTF.siteAsset('/doodles/' + pickShape(text) + '.svg');
+      if (!url) return;
+      HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
+    });
+  }
+
   highlighters();
   tape();
   footerDecoration();
   annotationMarks();
+  tagShapes();
 
 })();
