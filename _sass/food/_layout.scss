@@ -400,19 +400,25 @@ article.recipe .method-short {
                 1px  1px 0 rgba($color-text, 0.3);
 }
 
-// Star and mood need a DIFFERENT balance, not just more of everything.
-// Two rounds down from here (2026-08-03): 0.55/0.3 -> 0.75/0.5 (overshot
-// the light side: "too much light") -> 0.4/0.55 -> still "too light...
-// makes the lettering harder to read" against EGGS/CHEESE-TASTIC. Going
-// further this time rather than nudging again: light down hard, dark up
-// further, closer to "mostly a drop shadow with a whisper of highlight"
-// than a balanced two-sided emboss. The two sides aren't symmetric across
-// hues — aureolin (practicalities) is close to $color-bg already, so its
-// light shadow is nearly invisible at any alpha, while magenta and
-// cerulean show the same light alpha far more strongly, at the direct cost
-// of legibility once it's strong enough to compete with the dark side.
-%tag-emboss-soft-strong {
-  text-shadow: -1px -1px 0 rgba($color-bg, 0.2),
+// Star and mood need a DIFFERENT balance from practicalities, not just more
+// of everything. Three rounds tuning a single shared alpha never converged
+// (0.55/0.3 -> 0.75/0.5, overshot: "too much light" -> 0.4/0.55, still
+// "too light... harder to read") because magenta and cerulean don't sit at
+// the same distance from $color-bg that aureolin does — one alpha can't
+// serve both. Helen tuned the two by eye in devtools instead (2026-08-03)
+// and landed on two DIFFERENT literal colours, not a shared formula —
+// hence a mixin taking the light colour as a parameter, rather than a
+// placeholder both categories extend unchanged.
+//
+// Same round found the FOURTH attempt — widening the stroke instead
+// (0.5/0.6px -> 0.9px) on the theory that thicker letters read clearer —
+// was actively counterproductive. Helen's own devtools finding:
+// -webkit-text-stroke eats into the glyph's own fill from the inside as it
+// widens, so a fatter stroke on small bold text shrinks the black interior
+// and reads as THINNER, not thicker — the opposite of the intent. A
+// near-invisible 0.1px stroke was the clearest of everything she tried.
+@mixin tag-emboss-strong($light-colour) {
+  text-shadow: -1px -1px 0 $light-colour,
                 1px  1px 0 rgba($color-text, 0.65);
 }
 
@@ -649,9 +655,10 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    @extend %tag-emboss-soft-strong;
-    // Widened alongside .badge-star's own stroke — see the comment there.
-    -webkit-text-stroke: 0.9px $color-star-active;
+    // Both values Helen's own, tuned by eye in devtools — see the mixin's
+    // comment above for why this isn't a shared placeholder any more.
+    @include tag-emboss-strong(rgba(200, 197, 209, 0.2));
+    -webkit-text-stroke: 0.1px $color-star-active;
     .tag-shape { color: $color-star-root; }
   }
 
@@ -659,8 +666,8 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     @extend %btn-active-base;
     background: none;
     color: $color-text;
-    @extend %tag-emboss-soft-strong;
-    -webkit-text-stroke: 0.9px $color-mood-active;
+    @include tag-emboss-strong(rgba(230, 227, 228, 0.2));
+    -webkit-text-stroke: 0.1px $color-mood-active;
     .tag-shape { color: $color-mood-root; }
   }
 
@@ -892,26 +899,18 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   color: $color-text;
 
   // Emboss strength split per category here too, same reasoning as the
-  // active filter buttons above (%tag-emboss-soft-strong) — star/mood need
-  // more contrast than practicalities to read as raised at all.
+  // active filter buttons above (tag-emboss-strong) — star/mood need a
+  // hand-tuned colour and a near-invisible stroke rather than practicalities'
+  // shared placeholder and 0.5px — see the mixin's comment for the full
+  // history of why.
   //
   // .tag-shape back to full opacity (badge-star/mood/practicalities above
   // tone the RESTING shape down to rgba(..., 0.4) — matching a filter still
   // needs to pop against a page of otherwise-quiet pills). No more
   // background-color: that was the pre-tape-shape fill, stale since the SVG
   // shape itself is the visible fill now and sits UNDER it doing nothing.
-  //
-  // Star/mood stroke widened well past practicalities' 0.5px (2026-08-03,
-  // third round) — three rounds of tuning %tag-emboss-soft-strong's alpha
-  // never closed the legibility gap Helen kept flagging against
-  // practicalities' own softer emboss, and her read was that the letters
-  // themselves looked thinner, not just less contrasty. Practicalities'
-  // emboss happens to read almost like a second, lighter outline (light
-  // side 0.55 vs star/mood's 0.2) — an accident of alpha, not stroke — so
-  // widening the ACTUAL stroke here is a different lever, closer to what
-  // she was seeing, rather than a fourth pass at the same one.
-  &.badge-star           { @extend %tag-emboss-soft-strong; -webkit-text-stroke: 0.9px $color-star-active; .tag-shape { color: $color-star-root; } }
-  &.badge-mood           { @extend %tag-emboss-soft-strong; -webkit-text-stroke: 0.9px $color-mood-active; .tag-shape { color: $color-mood-root; } }
+  &.badge-star           { @include tag-emboss-strong(rgba(200, 197, 209, 0.2)); -webkit-text-stroke: 0.1px $color-star-active; .tag-shape { color: $color-star-root; } }
+  &.badge-mood           { @include tag-emboss-strong(rgba(230, 227, 228, 0.2)); -webkit-text-stroke: 0.1px $color-mood-active; .tag-shape { color: $color-mood-root; } }
   &.badge-practicalities { @extend %tag-emboss-soft;        -webkit-text-stroke: 0.5px $color-practicalities-active; .tag-shape { color: $color-practicalities-root; } }
 }
 

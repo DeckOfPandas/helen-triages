@@ -235,13 +235,24 @@ $tape-protrusion: 0.2rem;
   // antialiases into a soft grey halo instead of a crisp doubled edge, and
   // combines badly with the stroke's own partial alpha right next to it.
   // Helen: "positioning was better before" (the 1px offset itself was
-  // fine) "-- can we try different colouring?" So the offset is back to
-  // matching the mixin's own, and what changed is a solid, fully-opaque,
-  // dimmer grey instead of a see-through white -- crisp edge, less glare.
-  // Dark side left close to the mixin's own ratio -- it was never the
-  // complaint.
+  // fine) "-- can we try different colouring?" So the offset went back to
+  // matching the mixin's own, and the light side became a solid,
+  // fully-opaque, dimmer grey instead of a see-through white.
+  //
+  // That still wasn't right -- Helen: "I think we need to drop darker from
+  // white to show which part should be in front of the other part," which
+  // is the real bug, not another light-side nudge. The DARK side here was
+  // still rgba($color-text, 0.5) -- correct everywhere else, where it sits
+  // on $color-bg, but wrong on THIS element specifically: the tape SVG's
+  // fill is #0d0d0d, and $color-text (#211f20) is actually a shade
+  // LIGHTER than that. Blended at any alpha it lightens the tape slightly
+  // instead of darkening it, so the corner that's supposed to read as
+  // receding into shadow was never actually darker than what it sits on --
+  // there was no "back" for the light corner to sit in front of. Dark side
+  // swapped for a colour that's genuinely darker than the tape, solid for
+  // the same crisp-edge reason as the light side above.
   text-shadow: -1px -1px 0 mix($color-white, $color-text, 75%),
-                1px  1px 0 rgba($color-text, 0.5);
+                1px  1px 0 #000;
 
   .site-logo-bracket {
     letter-spacing: 0;
