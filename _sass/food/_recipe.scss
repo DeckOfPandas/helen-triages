@@ -638,21 +638,25 @@ $method-step-number-column: 2.4rem + 0.9rem;
     background: $color-border;
     border-radius: 1px;
   }
+}
 
-  &::after {
-    content: "note";
-    position: absolute;
-    top: -0.65rem;
-    left: 1.1rem;
-    font-family: $font-headings;
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: $letter-spacing-label;
-    color: $color-clear-text;
-    background: $color-bg;
-    padding: 0 $space-xs;
-  }
+// Was a CSS-generated ::after reading the same static "note" on every box —
+// couldn't say anything about what the note actually is, and started looking
+// odd once boxes sit two per row under one "NOTES" heading (every tab in the
+// row saying "note" again). Now a real element carrying page data
+// (notes: [{label, text}] in front matter) instead of a fixed string.
+.note-label {
+  position: absolute;
+  top: -0.65rem;
+  left: 1.1rem;
+  font-family: $font-headings;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+  color: $color-clear-text;
+  background: $color-bg;
+  padding: 0 $space-xs;
 }
 
 // --- Body Content (long-form prose via {{ content }}) -----------------------

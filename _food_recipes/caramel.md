@@ -30,8 +30,10 @@ method:
 method_short:
   - ""
 notes:
-  - The salt is crucial, and this can take a lot depending on your taste.
-  - If you make this for brother Andrew, take care to call it "sea-salted caramel".
+  - label: "Salt"
+    text: The salt is crucial, and this can take a lot depending on your taste.
+  - label: "For Andrew"
+    text: If you make this for brother Andrew, take care to call it "sea-salted caramel".
 meta:
   rewritten: true
   proofread: false

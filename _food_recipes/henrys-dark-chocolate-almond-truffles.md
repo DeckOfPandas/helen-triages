@@ -33,7 +33,8 @@ method:
 method_short:
   - ""
 notes:
-  - "Simon has been known to call these \"chocolate poos\"...lovely."
+  - label: "Simon says"
+    text: "Simon has been known to call these \"chocolate poos\"...lovely."
 meta:
   rewritten: true
   proofread: false

@@ -71,7 +71,8 @@ method_groups:
 method_short:
   - ""
 notes:
-  - "Can be simmered a little longer but becomes tough if left too long. Lemongrass stalks don't need to be scaled up linearly for larger batches."
+  - label: "Scaling up"
+    text: "Can be simmered a little longer but becomes tough if left too long. Lemongrass stalks don't need to be scaled up linearly for larger batches."
 meta:
   rewritten: true
   proofread: false

@@ -33,9 +33,12 @@ method:
 method_short:
   - ""
 notes:
-  - "This makes 1 dozen."
-  - "If you don't chill the pastry twice, the pies will crack and/or shrink."
-  - "Robertson's mincemeat from a jar is fine."
+  - label: "Yield"
+    text: "This makes 1 dozen."
+  - label: "Chilling"
+    text: "If you don't chill the pastry twice, the pies will crack and/or shrink."
+  - label: "Mincemeat"
+    text: "Robertson's mincemeat from a jar is fine."
 meta:
   rewritten: true
   proofread: false

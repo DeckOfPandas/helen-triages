@@ -45,7 +45,8 @@ method:
 method_short:
   - ""
 notes:
-  - "The cake freezes well without the frosting; the frosting does not freeze."
+  - label: "Freezing"
+    text: "The cake freezes well without the frosting; the frosting does not freeze."
 # notes:
 #   -
 meta:

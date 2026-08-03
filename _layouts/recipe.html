@@ -141,7 +141,11 @@ layout: default
       </h2>
     </div>
     <div class="notes{% if page.notes.size == 1 %} notes--single{% endif %}">
-      {% for note in page.notes %}<p class="note">{{ note | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endfor %}
+      {% for note in page.notes %}
+        {% if note.text %}<p class="note"><span class="note-label">{{ note.label | default: "note" }}</span>{{ note.text | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+        {% else %}<p class="note"><span class="note-label">note</span>{{ note | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+        {% endif %}
+      {% endfor %}
     </div>
   {% endif %}
 

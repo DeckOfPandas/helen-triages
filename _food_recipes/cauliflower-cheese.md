@@ -47,7 +47,8 @@ method_short:
     * Half cheese in the sauce, rest breadcrumbs thyme and top
     * Bake 180°C 15–20 mins
 notes:
-  - "Most combinations of hard cheeses are fine. Brie or similar will take over, but maybe you like that."
+  - label: "Cheese choice"
+    text: "Most combinations of hard cheeses are fine. Brie or similar will take over, but maybe you like that."
 meta:
   rewritten: true
   proofread: false

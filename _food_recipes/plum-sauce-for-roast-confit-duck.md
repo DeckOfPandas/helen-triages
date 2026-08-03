@@ -29,7 +29,8 @@ method:
 method_short:
   - ""
 notes:
-  - "Made for [slow cooker confit duck legs](../slow-cooker-confit-duck-legs/)."
+  - label: "Pairs with"
+    text: "Made for [slow cooker confit duck legs](../slow-cooker-confit-duck-legs/)."
 meta:
   rewritten: true
   proofread: false

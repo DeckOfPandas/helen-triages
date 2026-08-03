@@ -37,7 +37,8 @@ method:
 method_short:
   - ""
 notes:
-  - "These don't keep at all — not even for five minutes while you're eating the first ones. If making a second batch while eating the first, prop them up in pairs like a house of cards to stop them going soggy."
+  - label: "Keeping"
+    text: "These don't keep at all — not even for five minutes while you're eating the first ones. If making a second batch while eating the first, prop them up in pairs like a house of cards to stop them going soggy."
 meta:
   rewritten: true
   proofread: false

@@ -45,8 +45,10 @@ method:
 method_short:
   - ""
 notes:
-  - "Amounts don't really matter — keep tasting."
-  - "Cooking time is very flexible; this dish is forgiving however long you leave it."
+  - label: "Amounts"
+    text: "Amounts don't really matter — keep tasting."
+  - label: "Cooking time"
+    text: "Cooking time is very flexible; this dish is forgiving however long you leave it."
 meta:
   rewritten: true
   proofread: false

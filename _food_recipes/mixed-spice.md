@@ -26,7 +26,8 @@ method:
 method_short:
   - ""
 notes:
-  - Cinnamon-forward. Adjust to taste.
+  - label: "Adjusting the blend"
+    text: Cinnamon-forward. Adjust to taste.
 meta:
   rewritten: true
   proofread: false

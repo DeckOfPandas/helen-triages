@@ -30,8 +30,10 @@ method:
 method_short:
   - ""
 notes:
-  - Try more cocoa and less syrup.
-  - I used to add grated chocolate to this but it goes weird when frozen.
+  - label: "Adjusting sweetness"
+    text: Try more cocoa and less syrup.
+  - label: "Grated chocolate"
+    text: I used to add grated chocolate to this but it goes weird when frozen.
 meta:
   rewritten: true
   proofread: false

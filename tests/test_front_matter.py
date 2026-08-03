@@ -112,9 +112,24 @@ def test_notes_is_a_list(recipe):
     assert isinstance(recipe.fm["notes"], list), (
         f"{where(recipe)} has `notes:` as a "
         f"{type(recipe.fm['notes']).__name__}, not a list. "
-        f"Notes are always a list of separate strings, never one blob — the "
+        f"Notes are always a list of separate entries, never one blob — the "
         f"renderer styles each note individually."
     )
+
+
+def test_note_dicts_have_label_and_text(recipe):
+    """A note is either a plain string, or `{label, text}` — added 2026-08-03
+    so each note box can carry a topical label ("Sinking", "Portion size")
+    instead of every box in the Notes grid saying the same static "note".
+    A dict missing either key renders blank or unlabelled with no error, so
+    this is worth catching here rather than by eye.
+    """
+    for i, note in enumerate(recipe.fm.get("notes") or [], 1):
+        if isinstance(note, dict):
+            assert note.get("label") and note.get("text"), (
+                f"{where(recipe)} note {i} is a dict but missing `label` "
+                f"and/or `text`: {note!r}."
+            )
 
 
 def test_method_short_is_a_list(recipe):

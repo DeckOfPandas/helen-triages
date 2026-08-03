@@ -57,8 +57,10 @@ method:
 method_short:
   - ""
 notes:
-  - "Better the longer you cook it."
-  - "Somehow even better after freezing."
+  - label: "Cooking time"
+    text: "Better the longer you cook it."
+  - label: "Freezing"
+    text: "Somehow even better after freezing."
 meta:
   rewritten: true
   proofread: false

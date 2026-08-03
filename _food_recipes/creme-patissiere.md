@@ -32,7 +32,8 @@ method:
   - Taste to check.
   - Cover with buttered paper to cool.
 notes:
-  - "It may need a quick whisk before using as it could look a little lumpy, but generally nobody notices."
+  - label: "Before using"
+    text: "It may need a quick whisk before using as it could look a little lumpy, but generally nobody notices."
 method_short:
   - ""
 meta:

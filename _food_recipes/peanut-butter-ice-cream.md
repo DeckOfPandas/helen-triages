@@ -26,8 +26,10 @@ method:
 method_short:
   - ""
 notes:
-  - "Peanut Butter Chocolate Chip: leave out the chopped peanuts and add 130 g semisweet chocolate chips once the ice cream stiffens, about 2 mins before it's done, then continue freezing."
-  - "Peanut Butter Fudge Swirl: about 10 mins before the ice cream is ready, melt 200 g coarsely chopped chocolate fudge in a bain-marie, simmer for 3–4 mins, cool for about 5 mins, then fold into the ice cream just before the fudge hardens. Continue freezing."
+  - label: "Chocolate chip variant"
+    text: "Peanut Butter Chocolate Chip: leave out the chopped peanuts and add 130 g semisweet chocolate chips once the ice cream stiffens, about 2 mins before it's done, then continue freezing."
+  - label: "Fudge swirl variant"
+    text: "Peanut Butter Fudge Swirl: about 10 mins before the ice cream is ready, melt 200 g coarsely chopped chocolate fudge in a bain-marie, simmer for 3–4 mins, cool for about 5 mins, then fold into the ice cream just before the fudge hardens. Continue freezing."
 meta:
   rewritten: true
   proofread: false

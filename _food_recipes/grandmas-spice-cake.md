@@ -39,8 +39,10 @@ method:
 method_short:
   - ""
 notes:
-  - "If the cake sinks in the middle, you added too much syrup."
-  - "If the top of the cake cracks, bake at a lower temperature."
+  - label: "Sinking"
+    text: "If the cake sinks in the middle, you added too much syrup."
+  - label: "Temperature"
+    text: "If the top of the cake cracks, bake at a lower temperature."
 meta:
   rewritten: true
   proofread: false

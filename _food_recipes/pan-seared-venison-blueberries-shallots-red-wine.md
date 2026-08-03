@@ -37,7 +37,8 @@ method:
 method_short:
   - ""
 notes:
-  - "Some people will add a splash of wine. Others will add most of the bottle. We will never stop them, nor should we wish to."
+  - label: "Wine"
+    text: "Some people will add a splash of wine. Others will add most of the bottle. We will never stop them, nor should we wish to."
 meta:
   rewritten: true
   proofread: false

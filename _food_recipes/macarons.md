@@ -64,7 +64,8 @@ method:
 method_short:
   - ""
 notes:
-  - "The method above is primarily for the vanilla version — for chocolate, substitute accordingly using the chocolate biscuit ingredients."
+  - label: "Chocolate version"
+    text: "The method above is primarily for the vanilla version — for chocolate, substitute accordingly using the chocolate biscuit ingredients."
 meta:
   rewritten: true
   proofread: false

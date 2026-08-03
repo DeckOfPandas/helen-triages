@@ -30,8 +30,10 @@ method:
 method_short:
   - ""
 notes:
-  - "If using frozen cherries, thaw and strain ahead as they hold more water."
-  - "Made for [five-spice crispy duck legs](../five-spice-crispy-duck-legs/)."
+  - label: "Frozen cherries"
+    text: "If using frozen cherries, thaw and strain ahead as they hold more water."
+  - label: "Pairs with"
+    text: "Made for [five-spice crispy duck legs](../five-spice-crispy-duck-legs/)."
 meta:
   rewritten: true
   proofread: false

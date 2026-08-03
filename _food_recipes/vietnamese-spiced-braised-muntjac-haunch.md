@@ -50,8 +50,10 @@ method:
 method_short:
   - ""
 notes:
-  - "On the loomi — piercing rather than halving it means the flavour releases gradually. If the sauce tastes noticeably bitter before the braise is done, fish it out early rather than leaving it for the cooking full time."
-  - "On doneness — 90 mins should leave the joint tender but still sliceable. If you have a probe, you're looking for around 75–80°C internal after resting."
+  - label: "Loomi"
+    text: "Piercing rather than halving it means the flavour releases gradually. If the sauce tastes noticeably bitter before the braise is done, fish it out early rather than leaving it for the cooking full time."
+  - label: "Doneness"
+    text: "90 mins should leave the joint tender but still sliceable. If you have a probe, you're looking for around 75–80°C internal after resting."
 meta:
   rewritten: true
   proofread: false

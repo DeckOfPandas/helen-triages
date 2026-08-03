@@ -25,7 +25,8 @@ method:
 method_short:
   - ""
 notes:
-  - "Reportedly some people add a knob of butter before serving."
+  - label: "Butter"
+    text: "Reportedly some people add a knob of butter before serving."
 meta:
   rewritten: true
   proofread: false

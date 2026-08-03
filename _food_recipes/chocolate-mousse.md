@@ -50,7 +50,8 @@ method_short:
     * Loosen with ¼ whites 10 folds max, pour back into whites 12 folds max
     * Portion, fridge >6h
 notes:
-  - "Use cooking chocolate from the baking aisle, not eating chocolate, because it melts more smoothly. 70% cocoa chocolate is ideal. Full-fat cream only."
+  - label: "Chocolate choice"
+    text: "Use cooking chocolate from the baking aisle, not eating chocolate, because it melts more smoothly. 70% cocoa chocolate is ideal. Full-fat cream only."
 meta:
   rewritten: true
   proofread: false
