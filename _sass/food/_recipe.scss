@@ -912,6 +912,20 @@ article.recipe .recipe-body-content {
   height: 2rem;
   color: $color-vibrant-violet;
 
+  // Full size reads as "a lot" next to one short ingredient line (Helen,
+  // looking at macarons.md) — a step gets a whole sentence to sit beside,
+  // an ingredient gets "140 g finely ground almonds". Smaller here, and
+  // top recentred the same way the step version was: pure line-height
+  // arithmetic gives -0.21rem ((1.19 - 1.6) / 2); nudged further to -0.4rem
+  // since the step mark needed a similar nudge past its own arithmetic
+  // result (-0.41rem -> -0.65rem) — expect this to want the same kind of
+  // eyeballed correction once it's actually visible.
+  .ingredient-annotation & {
+    width: 2rem;
+    height: 1.6rem;
+    top: -0.4rem;
+  }
+
   svg {
     display: block;
     width: 100%;
