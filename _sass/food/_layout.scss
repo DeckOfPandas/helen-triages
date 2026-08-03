@@ -282,6 +282,11 @@ article.recipe .method-short {
 }
 
 .badge {
+  // Was $font-headings (Courier), inherited from the shared clip-path rule
+  // above. Switched to the sans body face 2026-08-03, Helen's call — the
+  // same reasoning as the short-method toggle link earlier this session:
+  // Courier at 0.72rem reads cramped, and a pill is a label, not a heading.
+  font-family: $font-body;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: lowercase;
@@ -305,17 +310,17 @@ article.recipe .method-short {
   }
 
   &-star {
-    background-color: rgba($color-star-root, $saturation-badge-bg);
+    background-color: rgba($color-star-root, $saturation-tag-pill-bg);
     color: $color-star-active;
   }
 
   &-mood {
-    background-color: rgba($color-mood-root, $saturation-badge-bg);
+    background-color: rgba($color-mood-root, $saturation-tag-pill-bg);
     color: $color-mood-active;
   }
 
   &-practicalities {
-    background-color: rgba($color-practicalities-root, $saturation-badge-bg);
+    background-color: rgba($color-practicalities-root, $saturation-tag-pill-bg);
     color: $color-practicalities-active;
   }
 }
@@ -759,9 +764,13 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   letter-spacing: 0.04em;
   padding: $space-xxs 0.65rem $space-xxs $space-sm;
 
-  &.badge-star           { -webkit-text-stroke: 0.5px $color-star-active; }
-  &.badge-mood           { -webkit-text-stroke: 0.5px $color-mood-active; }
-  &.badge-practicalities { -webkit-text-stroke: 0.5px $color-practicalities-active; }
+  // Background jumps to the matched opacity on top of the existing
+  // stroke/weight escalation, rather than just changing text -- two tiers
+  // (quiet resting tint, solid matched fill), same idea the deleted
+  // category-code bar's unlit/lit states used.
+  &.badge-star           { background-color: rgba($color-star-root, $saturation-tag-pill-bg-matched); -webkit-text-stroke: 0.5px $color-star-active; }
+  &.badge-mood           { background-color: rgba($color-mood-root, $saturation-tag-pill-bg-matched); -webkit-text-stroke: 0.5px $color-mood-active; }
+  &.badge-practicalities { background-color: rgba($color-practicalities-root, $saturation-tag-pill-bg-matched); -webkit-text-stroke: 0.5px $color-practicalities-active; }
 }
 
 .recipe-list .badge.badge--matched.badge-ingredient-hit {
@@ -770,7 +779,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   font-weight: 900;
   letter-spacing: 0.04em;
   -webkit-text-stroke: 0.5px $color-ingredient-active;
-  background-color: rgba($color-ingredient-root, $saturation-badge-bg);
+  background-color: rgba($color-ingredient-root, $saturation-tag-pill-bg-matched);
   color: $color-ingredient-active;
 }
 
