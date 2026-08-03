@@ -216,7 +216,14 @@
       var host = slot.closest('.badge, .btn-tag, .btn-star');
       var text = (host ? host.textContent : '').trim().toLowerCase();
       if (!text) return;
-      var url = HTF.siteAsset('/doodles/' + pickShape(text) + '.svg');
+      var shape = pickShape(text);
+      // tag-shape-2's torn top-left corner reads fine at most widths but
+      // draws the eye on a wide pill -- stretched further via the
+      // --stretch modifier (see .tag-shape in _layout.scss) rather than
+      // dropped from the pool, since it's genuinely fine at other widths
+      // (Helen: fine for "duck", not fine for "make-ahead", same shape).
+      if (shape === 'tag-shape-2') slot.classList.add('tag-shape--stretch');
+      var url = HTF.siteAsset('/doodles/' + shape + '.svg');
       if (!url) return;
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
     });

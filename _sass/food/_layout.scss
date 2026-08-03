@@ -357,11 +357,28 @@ article.recipe .method-short {
   width: 100%;
   height: 100%;
   z-index: -1;
+  // Lets --stretch below overflow the slot itself without spilling into
+  // whatever sits next to the pill.
+  overflow: hidden;
 
   svg {
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  // tag-shape-2 specifically stretched further than an exact fit —
+  // Helen: "the way the shape rolls off along the top left corner bothers
+  // me every time" on a wide pill (make-ahead), "doesn't bother me at all"
+  // on a narrow one (duck) — same shape, both hash to tag-shape-2, so it's
+  // genuinely the stretch ratio doing it, not the shape itself. Scaling it
+  // wider than the box moves the torn-corner detail further toward (and
+  // past) the visible edge, proportionally smaller relative to the flat
+  // middle. .tag-shape's own overflow: hidden crops the excess rather than
+  // letting it spill past the pill's edges.
+  &--stretch svg {
+    transform: scaleX(1.25);
+    transform-origin: center;
   }
 }
 
@@ -381,21 +398,20 @@ article.recipe .method-short {
                 1px  1px 0 rgba($color-text, 0.3);
 }
 
-// Star and mood need a DIFFERENT balance, not just more of everything --
-// first attempt (2026-08-03) raised both sides equally (0.55/0.3 ->
-// 0.75/0.5) and overshot the light side specifically: "GAME and DRINKS
-// have too much light on them" (comparing against MAKE-AHEAD, still on
-// %tag-emboss-soft, which reads fine). The two sides aren't symmetric
-// against every background — aureolin (practicalities) is close to
-// $color-bg already, so the light shadow is nearly invisible against it
-// regardless of alpha, while magenta and cerulean have real luminance
-// contrast against near-white, so the SAME light alpha shows up far more
-// there. Light lowered below the soft version's own 0.55 to compensate;
-// dark stays boosted, since that's what was actually fixing "too light" in
-// the sense of "not enough depth."
+// Star and mood need a DIFFERENT balance, not just more of everything.
+// Two rounds down from here (2026-08-03): 0.55/0.3 -> 0.75/0.5 (overshot
+// the light side: "too much light") -> 0.4/0.55 -> still "too light...
+// makes the lettering harder to read" against EGGS/CHEESE-TASTIC. Going
+// further this time rather than nudging again: light down hard, dark up
+// further, closer to "mostly a drop shadow with a whisper of highlight"
+// than a balanced two-sided emboss. The two sides aren't symmetric across
+// hues — aureolin (practicalities) is close to $color-bg already, so its
+// light shadow is nearly invisible at any alpha, while magenta and
+// cerulean show the same light alpha far more strongly, at the direct cost
+// of legibility once it's strong enough to compete with the dark side.
 %tag-emboss-soft-strong {
-  text-shadow: -1px -1px 0 rgba($color-bg, 0.4),
-                1px  1px 0 rgba($color-text, 0.55);
+  text-shadow: -1px -1px 0 rgba($color-bg, 0.2),
+                1px  1px 0 rgba($color-text, 0.65);
 }
 
 // ============================================================================
