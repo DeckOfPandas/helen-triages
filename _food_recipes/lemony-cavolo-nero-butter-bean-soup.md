@@ -39,8 +39,10 @@ method:
 method_short:
   - ""
 notes:
-  - "Any greens are fine here."
-  - "Mash some of the beans with a fork before adding them if you want a thicker soup."
+  - label: "Swaps"
+    text: "Any greens are fine here."
+  - label: "Thicker soup"
+    text: "Mash some of the beans with a fork before adding them if you want a thicker soup."
 meta:
   rewritten: true
   proofread: false

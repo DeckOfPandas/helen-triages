@@ -42,7 +42,8 @@ method:
 method_short:
   - ""
 notes:
-  - "Scatter Gruyère generousl. Nobody's counting."
+  - label: "Gruyère"
+    text: "Scatter Gruyère generousl. Nobody's counting."
 meta:
   rewritten: true
   proofread: false

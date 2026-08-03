@@ -36,8 +36,10 @@ method:
 method_short:
   - ""
 notes:
-  - "Can be prepped up to a day ahead up to the end of step 4, then kept refrigerated."
-  - "Roast potatoes in the fat!"
+  - label: "Make ahead"
+    text: "Can be prepped up to a day ahead up to the end of step 4, then kept refrigerated."
+  - label: "Roast potatoes"
+    text: "Roast potatoes in the fat!"
 meta:
   rewritten: true
   proofread: false

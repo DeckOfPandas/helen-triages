@@ -33,7 +33,8 @@ method:
 method_short:
   - ""
 notes:
-  - "Make early to allow the sultanas time to soak up the liquid. Undercooked brown rice is nice and nutty. [Cow says… Canned pineapple works well*. Cow loves sissy.] *Henry disagrees"
+  - label: "Make ahead"
+    text: "Make early to allow the sultanas time to soak up the liquid. Undercooked brown rice is nice and nutty. [Cow says… Canned pineapple works well*. Cow loves sissy.] *Henry disagrees"
 meta:
   rewritten: true
   proofread: false

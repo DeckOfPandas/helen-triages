@@ -56,8 +56,10 @@ method_short:
     * Beans boil 5 mins
     * crème fraîche 2 mins
 notes:
-  - "Season and flavour the liquid with stock cubes, mushroom ketchup, anchovy sauce, Worcestershire sauce, English mustard powder, chicken stock cubes, bay leaves, lemon juice, olive oil, anything: whatever it needs and whatever you like."
-  - "I never bother peeling vegetables any more because they taste better skin-on. The last time I started peeling an apple I had epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I didn't continue peeling the apple."
+  - label: "Seasoning"
+    text: "Season and flavour the liquid with stock cubes, mushroom ketchup, anchovy sauce, Worcestershire sauce, English mustard powder, chicken stock cubes, bay leaves, lemon juice, olive oil, anything: whatever it needs and whatever you like."
+  - label: "Peeling"
+    text: "I never bother peeling vegetables any more because they taste better skin-on. The last time I started peeling an apple I had epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I didn't continue peeling the apple."
 meta:
   rewritten: true
   proofread: false

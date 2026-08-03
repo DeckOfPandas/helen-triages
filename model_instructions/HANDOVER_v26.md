@@ -226,8 +226,9 @@ method:                          # xor method_groups: — never both
     tip: "An aside."
 method_short:
   - ""                           # [""] = not written. A block scalar = written.
-notes:
-  - "Always a list, never a blob."
+notes:                           # always a list, never a blob
+  - label: "Sinking"              # or a bare string — see below
+    text: "If it sinks, you added too much syrup."
 meta:
   rewritten: false
   proofread: false
@@ -265,6 +266,17 @@ meta:
   not that the URL resolved. `../slug/` resolves against the *current page's*
   URL, which already includes the baseurl, so it's correct regardless of
   where the site is hosted. `[[wikilinks]]` don't render and are retired.
+- `notes:` items are `{label, text}` (added 2026-08-03) or a bare string —
+  same polymorphism as `method`/ingredient items (`step.get("step") if
+  isinstance(step, dict) else step`, `tests/conftest.py`), for the same
+  reason: a note jotted in `_food_drafts/` doesn't have to carry a label
+  immediately. `label` renders as the small tab at the top of the box
+  (`.note-label` in `_recipe.scss`); a bare string, or a dict missing
+  `label`, falls back to the literal word "note". Notes render two per row
+  (`.notes` grid, `_recipe.scss`) rather than stacked — a lone note stays
+  full width (`.notes--single`). Nobody has needed more than 3 on one
+  recipe; 4+ is the signal to write `{{ content }}` prose instead (§4.1),
+  the way `dark-chocolate-ganache.md`'s Troubleshooting section does.
 - `instructions:` is retired — it's `method:`, no fallback. Several other
   fields are retired too (`published`, `date_added`, `difficulty`,
   `nutrition`, `filling_note`, `headline_ingredient`) — `tests/

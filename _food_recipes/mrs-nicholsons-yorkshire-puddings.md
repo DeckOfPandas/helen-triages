@@ -27,7 +27,8 @@ method:
 method_short:
   - ""
 notes:
-  - "Do not use olive oil. Kristian once used olive oil, and after we re-entered the evacuated house we found him lying on the kitchen floor with a wet towel over his face."
+  - label: "Olive oil"
+    text: "Do not use olive oil. Kristian once used olive oil, and after we re-entered the evacuated house we found him lying on the kitchen floor with a wet towel over his face."
 meta:
   rewritten: true
   proofread: false

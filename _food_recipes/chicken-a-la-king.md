@@ -55,8 +55,10 @@ method_short:
     * Simmer 10 mins
     * Peas/whatever, crème fraîche
 notes:
-  - "You can chuck any vegetables in here and it'll still be comforting."
-  - "Button mushrooms are always fun to eat in one-handed food, especially if you don't halve them, because then you get to chase them around your plate."
+  - label: "Vegetables"
+    text: "You can chuck any vegetables in here and it'll still be comforting."
+  - label: "Mushrooms"
+    text: "Button mushrooms are always fun to eat in one-handed food, especially if you don't halve them, because then you get to chase them around your plate."
 meta:
   rewritten: true
   proofread: false

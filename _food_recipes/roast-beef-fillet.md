@@ -23,8 +23,10 @@ method:
 method_short:
   - ""
 notes:
-  - "Take the fillet out of the fridge at least 30 mins before cooking so it comes up to room temperature — this ensures more even cooking. The resting step is important for tenderness; don't skip it."
-  - "Pairs perfectly with the [tomato and tarragon dressing](../tomato-tarragon-dressing/)."
+  - label: "Resting & temperature"
+    text: "Take the fillet out of the fridge at least 30 mins before cooking so it comes up to room temperature — this ensures more even cooking. The resting step is important for tenderness; don't skip it."
+  - label: "Pairs with"
+    text: "Pairs perfectly with the [tomato and tarragon dressing](../tomato-tarragon-dressing/)."
 meta:
   rewritten: false
   proofread: false

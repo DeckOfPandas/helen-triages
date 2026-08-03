@@ -96,7 +96,13 @@ class Recipe:
         for i, step in enumerate(self.method_steps, 1):
             out.append((f"method step {i}", step))
         for i, note in enumerate(self.fm.get("notes") or [], 1):
-            out.append((f"note {i}", note))
+            if isinstance(note, dict):
+                if note.get("label"):
+                    out.append((f"note {i} label", note["label"]))
+                if note.get("text"):
+                    out.append((f"note {i}", note["text"]))
+            else:
+                out.append((f"note {i}", note))
         for i, short in enumerate(self.fm.get("method_short") or [], 1):
             if short:
                 out.append((f"method_short {i}", short))

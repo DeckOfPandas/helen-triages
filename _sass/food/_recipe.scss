@@ -591,7 +591,33 @@ $method-step-number-column: 2.4rem + 0.9rem;
   }
 }
 
-// --- Note --------------------------------------------------------------------
+// --- Notes (plural: the grid) -------------------------------------------------
+// Two per row rather than a stack — a page with 2–3 notes read as a set of
+// thin horizontal stripes, one under the other. Exactly 2 columns (not an
+// auto-fit that could quietly become 3 on a wide screen) so it stays
+// deliberately "a couple of things side by side," not "however many fit."
+// The common case is a single note (20 of the 37 recipes that have any) —
+// .notes--single drops to one column so it isn't stranded at half width.
+//
+// align-items: start, not stretch: a short note next to a tall one keeps its
+// own height rather than being stretched to match, leaving a gap beneath it
+// instead of an oddly empty box. Two different-sized things sitting side by
+// side reads more like items placed on a corkboard than a layout bug — closer
+// to this site's general hand-placed, imperfect character than forcing every
+// box to match its neighbour.
+.notes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: start;
+  gap: $spacing-block-gap;
+  margin: $spacing-block-gap 0;
+
+  &--single {
+    grid-template-columns: 1fr;
+  }
+}
+
+// --- Note (singular: one box) -------------------------------------------------
 // Was a flat neutral mix (mix($color-border, $color-surface, 35%)), left that
 // way pending a proper answer — see DEV_JOBS_v24.md §1.8. Now shares the
 // metadata grid's own tint ($color-box-tint / $box-tint-opacity, both defined
@@ -600,7 +626,6 @@ $method-step-number-column: 2.4rem + 0.9rem;
 .note {
   position: relative;
   // font-family, font-weight, color, font-size, line-height inherited from article.recipe
-  margin: $spacing-block-gap 0;
   padding: 1.1rem 1.4rem;
   background-color: rgba($color-box-tint, $box-tint-opacity);
   border-radius: $radius-sm;
@@ -613,21 +638,25 @@ $method-step-number-column: 2.4rem + 0.9rem;
     background: $color-border;
     border-radius: 1px;
   }
+}
 
-  &::after {
-    content: "note";
-    position: absolute;
-    top: -0.65rem;
-    left: 1.1rem;
-    font-family: $font-headings;
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: $letter-spacing-label;
-    color: $color-clear-text;
-    background: $color-bg;
-    padding: 0 $space-xs;
-  }
+// Was a CSS-generated ::after reading the same static "note" on every box —
+// couldn't say anything about what the note actually is, and started looking
+// odd once boxes sit two per row under one "NOTES" heading (every tab in the
+// row saying "note" again). Now a real element carrying page data
+// (notes: [{label, text}] in front matter) instead of a fixed string.
+.note-label {
+  position: absolute;
+  top: -0.65rem;
+  left: 1.1rem;
+  font-family: $font-headings;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+  color: $color-clear-text;
+  background: $color-bg;
+  padding: 0 $space-xs;
 }
 
 // --- Body Content (long-form prose via {{ content }}) -----------------------

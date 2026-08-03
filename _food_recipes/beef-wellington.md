@@ -73,8 +73,10 @@ method_groups:
 method_short:
   - "Wrap and chill, sear, duxelle, assemble, sauce, cook."
 notes:
-  - "Do not attempt this without a meat thermometer unless you have deep pockets and nerves of steel."
-  - "This serves 4, but fillet is expensive and rich — two Wellingtons may feed 6 comfortably if there are generous sides."
+  - label: "Equipment"
+    text: "Do not attempt this without a meat thermometer unless you have deep pockets and nerves of steel."
+  - label: "Portion size"
+    text: "This serves 4, but fillet is expensive and rich — two Wellingtons may feed 6 comfortably if there are generous sides."
 meta:
   rewritten: true
   proofread: false

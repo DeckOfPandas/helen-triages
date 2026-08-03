@@ -44,7 +44,8 @@ method:
 method_short:
   - ""
 notes:
-  - "Keeps for ages wrapped in foil or in a tin."
+  - label: "Keeping"
+    text: "Keeps for ages wrapped in foil or in a tin."
 meta:
   rewritten: true
   proofread: false

@@ -41,9 +41,12 @@ method_short:
     * Butter 1 tbsp, flavourings
     * Cool at room temp to working temp
 notes:
-  - "Ratios: 1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
-  - "Add 2 tbsp icing sugar for ganache that sets more firmly."
-  - "Season the cream with salt before heating — don't be shy, as this greatly enhances the chocolate flavour."
+  - label: "Ratios"
+    text: "1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
+  - label: "Firmer set"
+    text: "Add 2 tbsp icing sugar for ganache that sets more firmly."
+  - label: "Salt"
+    text: "Season the cream with salt before heating — don't be shy, as this greatly enhances the chocolate flavour."
 meta:
   rewritten: true
   proofread: false

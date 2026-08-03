@@ -26,7 +26,8 @@ method:
 method_short:
   - ""
 notes:
-  - "This is a base recipe used to build ice creams, not a standalone dessert."
+  - label: "Base recipe"
+    text: "This is a base recipe used to build ice creams, not a standalone dessert."
 meta:
   rewritten: true
   proofread: false
