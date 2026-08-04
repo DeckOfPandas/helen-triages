@@ -887,10 +887,15 @@ article.recipe .recipe-body-content {
   max-width: 100vw;
   border-top: 1px dashed $color-border;
 
+  // GitHub issue #96: 0.72rem plus a further 15%-lightened colour on top of
+  // an already-muted grey made this hard to read for something Helen wants
+  // legible -- source attribution matters. Same font-size the annotation
+  // text elsewhere in this file already uses as its "small but legible"
+  // size, and the plain (not lightened) colour.
   .recipe-source {
     font-family: $font-headings;
-    font-size: 0.72rem;
-    color: lighten($color-clear-text, 15%);
+    font-size: 0.82rem;
+    color: $color-clear-text;
     margin: $space-xs 0;
     letter-spacing: 0.04em;
     text-transform: lowercase;
