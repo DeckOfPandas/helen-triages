@@ -47,7 +47,7 @@ article.recipe {
 
 // --- Cross-recipe links -------------------------------------------------
 // Covers every prose field a link can appear in: tagline, ingredient items/
-// tips/notes, method steps/tips/notes, and (as of the .recipe-body-content
+// notes, method steps/notes, and (as of the .recipe-body-content
 // MVP pass below) long-form body content too -- one link style for the whole
 // page, no separate override left anywhere. Deliberately more specific than
 // the shared `a { color: $color-text }` (_sass/shared/_base.scss) so it wins
@@ -416,7 +416,7 @@ $method-step-number-column: 2.4rem + 0.9rem;
   &::before { left: $space-xxl; }
 }
 
-// GitHub issue #57: a tip/note adds real height inside a step's own <li>,
+// GitHub issue #57: a note adds real height inside a step's own <li>,
 // but the flat margin-bottom every step gets (below, $space-xl) doesn't
 // account for that -- fine most of the time, since the next thing is just
 // another step, but when the annotated step is the LAST one before a
@@ -494,7 +494,7 @@ $method-step-number-column: 2.4rem + 0.9rem;
     &::before { content: none; }
   }
 
-  // A step's text is markdownified (recipe.html), same as tips/notes/tagline
+  // A step's text is markdownified (recipe.html), same as notes/tagline
   // -- so a multi-line YAML block scalar can embed a genuine markdown bullet
   // list inside one step, the formatting Helen asked for. Undoes everything
   // the outer li rule sets for any <li> that ends up nested inside one of
@@ -930,16 +930,17 @@ article.recipe .recipe-body-content {
 }
 
 // --- Ingredient and step annotations ----------------------------------------
-// tip: active technique advice. note: contextual information. Both are the
-// same colour — tips were cerulean, which spent a whole hue on a distinction
-// that barely occurs: across the published recipes there are 14 tips and 2
-// notes, so a page carrying both at once is close to hypothetical. If the
-// distinction ever needs to be visible, make it typographic — the colour
-// budget is committed elsewhere.
+// Used to be two front-matter keys, tip (active technique advice) and note
+// (contextual information) -- always rendered identically (same colour, no
+// visible label either way) since tips stopped being cerulean, so the
+// distinction was purely a YAML key name with no reader-facing meaning.
+// Collapsed to a single `note:` key 2026-08-04 (GitHub issue: standardise
+// tip/note naming) -- one CSS class each for step and ingredient
+// annotations now, no modifier.
 //
 // Step and ingredient annotations used to share one block/gutter layout.
 // Split apart 2026-08-03: Helen reads a step as a sentence, so dropping to a
-// new indented line for its tip doesn't cost her anything. She reads
+// new indented line for its note doesn't cost her anything. She reads
 // ingredients as a list to scan (amounts, mainly — "how much of everything"),
 // and the same block/gutter treatment there pulled her eye out of that scan
 // every time. They're not two sizes of the same component any more, they're
@@ -949,7 +950,7 @@ article.recipe .recipe-body-content {
 // The mark sits absolutely positioned in the gutter (the site's established
 // mark-in-a-gutter technique, also used for step numbers) rather than
 // inline, so padding-left indents every wrapped line of the annotation text
-// evenly, not just the first — a step's tip is often a full sentence, long
+// evenly, not just the first — a step's note is often a full sentence, long
 // enough to wrap.
 .step-annotation {
   display: block;
@@ -959,9 +960,7 @@ article.recipe .recipe-body-content {
   font-size: 0.82rem;
   font-style: italic;
   line-height: 1.45;
-
-  &--tip  { color: $color-clear-text; }
-  &--note { color: $color-clear-text; }
+  color: $color-clear-text;
 }
 
 // top recentres the mark (2.5rem x 2rem) against a single line of annotation
@@ -997,9 +996,7 @@ $annotation-arrow-gap: 0.9em;
   font-size: 0.82rem;
   font-style: italic;
   line-height: 1.45;
-
-  &--tip  { color: $color-clear-text; }
-  &--note { color: $color-clear-text; }
+  color: $color-clear-text;
 }
 
 // Started at 1.6em x 0.8em, matching the four horizontal arrows' own ~2:1

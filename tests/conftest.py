@@ -108,10 +108,8 @@ class Recipe:
                 out.append((f"method_short {i}", short))
         for group in self.fm.get("ingredient_groups") or []:
             for item in group.get("items") or []:
-                if isinstance(item, dict):
-                    for key in ("tip", "note"):
-                        if item.get(key):
-                            out.append((f"{key} on '{item.get('item')}'", item[key]))
+                if isinstance(item, dict) and item.get("note"):
+                    out.append((f"note on '{item.get('item')}'", item["note"]))
         return out
 
 

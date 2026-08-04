@@ -14,7 +14,7 @@ ingredient_groups:
     items:
     - amount: "140 g"
       item: finely ground almonds
-      tip: "Use very finely ground almonds."
+      note: "Use very finely ground almonds."
     - amount: "240 g"
       item: icing sugar
     - amount: "1 tsp"
@@ -33,7 +33,7 @@ ingredient_groups:
       item: icing sugar
     - amount: "100 g"
       item: finely ground almonds
-      tip: "Use very finely ground almonds."
+      note: "Use very finely ground almonds."
     - amount: "2"
       item: "large egg whites, with 90 g caster sugar whisked in after peaks start to form"
     - amount: "½ tbsp"
@@ -49,11 +49,11 @@ ingredient_groups:
     - amount: "1 tbsp"
       item: icing sugar
     - item: "flavouring or fruit, to taste"
-      tip: "If adding colouring, use gel or paste — water-based will collapse the egg whites."
+      note: "If adding colouring, use gel or paste — water-based will collapse the egg whites."
 method:
   - "Mix the dry ingredients and vanilla."
   - step: "Whisk the egg whites and cream of tartar to a firm and shiny foam."
-    tip: "Eggs more than a week old work best. The bowl must be perfectly clean and dry — wipe it out with lemon juice if in doubt."
+    note: "Eggs more than a week old work best. The bowl must be perfectly clean and dry — wipe it out with lemon juice if in doubt."
   - "Fold in the almond mixture using a metal spoon and bang the bowl down several times to release air."
   - "Pipe into 2.5 cm mounds on a sheet (or use a teaspoon, but, for once, piping is actually easier)."
   - "Bang the sheet down several times carefully to release any bubbles."

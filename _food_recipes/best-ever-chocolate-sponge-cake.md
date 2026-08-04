@@ -33,7 +33,7 @@ ingredient_groups:
     - amount: ½ tsp
       item: vanilla extract
     - item: a good pinch of salt
-      tip: "Don't be shy with the salt. It brings chocolate out amazingly."
+      note: "Don't be shy with the salt. It brings chocolate out amazingly."
   - name: buttercream filling
     items:
     - amount: "100 g"
@@ -48,7 +48,7 @@ method_groups:
   - name: cake
     steps:
     - step: "Sift the flour, cocoa, baking powder and bicarbonate of soda. Stir in the salt."
-      tip: Actually do sift this time. I'm watching you. Cocoa powder is sneaky and you're not above this.
+      note: Actually do sift this time. I'm watching you. Cocoa powder is sneaky and you're not above this.
     - Curdle the milk with the lemon juice.
     - "Cream the butter with the sugar until fluffy, then add some beaten egg, some flour mixture, then some milk mixture bit by bit until all combined. You might not need all the milk."
     - Add in the vanilla extract last.

@@ -10,7 +10,7 @@
 //   .highlighter-slot          scratchy highlighter behind ingredient amounts
 //   .tape-bg                   masking tape behind the site logo
 //   .site-footer-hearts        footer hearts
-//   .annotation-mark           hand-drawn sparkles beside a tip/note
+//   .annotation-mark           hand-drawn sparkles beside a note
 //   .tag-shape                 torn-tape shape behind a tag pill/filter button
 //
 // Two more lived here until 2026-08-01. `.watercolour-brush-slot` drew the
@@ -120,7 +120,7 @@
 
   // ---------------------------------------------------------------------------
   // Annotation marks — a small hand-drawn arrow beside each ingredient/step
-  // tip or note. Both step and ingredient marks are dealt from their own
+  // note. Both step and ingredient marks are dealt from their own
   // shuffled pool (same mechanism as highlighters() above — no repeats until
   // every arrow in the pool has been used on the page), just with different
   // artwork: ingredients get four horizontal arrows, steps get three curved
