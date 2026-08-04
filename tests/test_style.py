@@ -225,6 +225,45 @@ def _accented_words() -> dict:
     return (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("words") or {}
 
 
+def _accent_check_fields(recipe) -> list[tuple[str, str]]:
+    """Every field an accent might need to appear in, beyond recipe.prose.
+
+    GitHub issues #46/#48/#82: "glace cherries" (an ingredient item name AND
+    a main_ingredients entry), "Creme Brulee" (a title), "cafe" (found in
+    henrys-quick-hollandaise-sauce.md's free-text body content, the long-form
+    write-up added after HANDOVER's "exactly one file uses this" note was
+    written) -- none of these are in .prose, which was built for the
+    typography/time-word tests and only ever covered front-matter running
+    text, not names or body content. title/short_name/main_ingredients/
+    star_ingredient/ingredient item names/body content all get the same
+    treatment as prose does; slugs, filenames and `source:` still don't --
+    see test_accents_in_prose's docstring for why.
+    """
+    out = list(recipe.prose)
+    if recipe.fm.get("title"):
+        out.append(("title", recipe.fm["title"]))
+    if recipe.fm.get("short_name"):
+        out.append(("short_name", recipe.fm["short_name"]))
+    for i, ing in enumerate(recipe.fm.get("main_ingredients") or [], 1):
+        out.append((f"main_ingredients {i}", str(ing)))
+    if recipe.fm.get("star_ingredient"):
+        out.append(("star_ingredient", str(recipe.fm["star_ingredient"])))
+    if recipe.body:
+        out.append(("body content", recipe.body))
+    for i, item in enumerate(recipe.ingredient_items, 1):
+        out.append((f"ingredient item {i}", item))
+    return out
+
+
+def _accent_problems(fields: list[tuple[str, str]], words: dict) -> list[str]:
+    problems = []
+    for location, text in fields:
+        for plain, accented in words.items():
+            if re.search(rf"\b{re.escape(plain)}\b", text, re.I):
+                problems.append(f"{location}: '{plain}' should be '{accented}'")
+    return problems
+
+
 def test_accents_in_prose(recipe):
     """Culinary words that take an accent should have one.
 
@@ -232,20 +271,41 @@ def test_accents_in_prose(recipe):
     detection, because no detector can tell a missing accent from a word that
     never had one.
 
-    Scope is prose only — never slugs or filenames, which must stay ASCII, and
-    never `source:`, where a citation is reproduced as the publication spells it.
+    Scope is title/short_name/main_ingredients/star_ingredient/ingredient item
+    names plus everything in .prose (tagline, method, notes, ingredient
+    notes) -- never slugs or filenames, which must stay ASCII, and never
+    `source:`, where a citation is reproduced as the publication spells it.
     """
     words = _accented_words()
     if not words:
         return
-    problems = []
-    for location, text in recipe.prose:
-        for plain, accented in words.items():
-            if re.search(rf"\b{re.escape(plain)}\b", text, re.I):
-                problems.append(f"{location}: '{plain}' should be '{accented}'")
+    problems = _accent_problems(_accent_check_fields(recipe), words)
     assert not problems, (
         f"{where(recipe)} uses unaccented spelling(s):\n  " + "\n  ".join(problems)
         + "\n\nIf the word genuinely takes no accent in British usage, add it to "
           "the `no_accent` list in _data/accented_words.yml so nobody 'fixes' it "
           "back."
+    )
+
+
+def test_accents_in_drafts():
+    """Same rule as test_accents_in_prose, for _food_drafts/.
+
+    Same reasoning as test_no_main_ingredient_spelling_collisions in
+    test_taxonomy.py: a draft carries its spelling forward when it's
+    promoted to _food_recipes/, so it's worth catching before that happens
+    rather than after.
+    """
+    from conftest import ALL_DRAFTS
+
+    words = _accented_words()
+    if not words:
+        return
+    problems = []
+    for draft in ALL_DRAFTS:
+        for p in _accent_problems(_accent_check_fields(draft), words):
+            problems.append(f"_food_drafts/{draft.slug}.md — {p}")
+    assert not problems, (
+        "Unaccented spelling(s) in drafts:\n  " + "\n  ".join(problems)
+        + "\n\nFix now so it's already right when the draft is promoted."
     )
