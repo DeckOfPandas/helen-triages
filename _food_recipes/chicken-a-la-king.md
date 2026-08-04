@@ -30,7 +30,7 @@ ingredient_groups:
       item: flour
     - amount: "250 ml"
       item: chicken stock
-    - item: "Flavourings like onion powder, English mustard powder, Worcestershire sauce, mushroom ketchup, cayenne pepper to taste."
+    - item: "Flavourings to taste like onion powder, English mustard powder, Worcestershire sauce, mushroom ketchup, MSG."
     - amount: "250 g"
       item: mushrooms
     - amount: "125 g"
@@ -39,10 +39,10 @@ ingredient_groups:
     - amount: "200 ml"
       item: crème fraîche or single cream
 method:
-  - Pat the chicken dry and season. Fry for 3 mins each side. Remove from heat and rest for 10 mins.
   - "Sweat the onions, carrots and celery until soft and golden, then increase the heat to brown them. Add the minced garlic 2 mins before you're done."
-  - step: "Deglaze with a splash of white wine, scraping all the bits off the bottom of the pan, then reduce the heat to medium. Sprinkle in the flour and stir to combine."
-    tip: "Don't panic if the flour goes clumpy, all will be well, just don't stop stirring until it boils."
+  - At the same time, pat the chicken dry and season. Fry for 3 mins each side. Remove from heat and rest for 10 mins.
+  - step: "Deglaze with a few splashes of white wine, scraping all the bits off the bottom of the pan, then reduce the heat to medium. Sprinkle in the flour and stir to combine."
+    tip: "Don't panic if the flour goes clumpy, all will be well, just don't stop stirring until it bubbles."
   - "Chop the chicken and add it back to the pan. Add the rest of the wine and simmer for a minute or two. Then add the stock, and bring to the boil while stirring continuously. After it boils, you can stop stirring. Let it cook for about 5 mins. Season and flavour to taste."
   - Add the mushrooms then boil for 5 mins until softened.
   - "Add the peas and any fresh herbs, and simmer uncovered for 5–10 more minutes until thickened. Check seasoning."
@@ -61,7 +61,7 @@ notes:
     text: "Button mushrooms are always fun to eat in one-handed food, especially if you don't halve them, because then you get to chase them around your plate."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

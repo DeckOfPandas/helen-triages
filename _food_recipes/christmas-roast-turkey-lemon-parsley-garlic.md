@@ -5,7 +5,7 @@ tagline: "A classic Christmas roast turkey."
 source: Adapted from Christmas by Gordon Ramsay
 serves: "8–10"
 prep_time: "30 mins"
-cook_time: "2 hrs 30 mins (for a 5 kg bird)"
+cook_time: "2 hrs 30 mins for a 5-kg bird"
 main_ingredients: [turkey, butter, lemon, parsley, garlic]
 star_ingredient: poultry
 tags: [festive, showstopper, "make-ahead"]
@@ -47,13 +47,13 @@ method_groups:
       - "Loosen the skin on the breasts from both ends of the bird, keeping the skin intact, then do the same on the legs."
       - "Stuff half the butter mix under the skin. From the outside, gently massage the butter around the breasts so that the meat is evenly covered. Insert the rest of the bay leaves under the skin of the breasts."
       - "Place the bird in a large roasting tray, breast side up. Spread the rest of the butter all over the skin. Season well with salt and pepper, then drizzle with olive oil. If preparing a day ahead, cover with foil and refrigerate."
-      - "Roast the turkey at 220°C for 10–15 mins, then baste with the pan juices and lay the bacon rashers over the breast to keep it moist. Baste again. Lower the setting to 180°C and roast for about 2½ hours (30 mins per kg) until done, basting occasionally."
+      - "Roast the turkey at 220°C for 10–15 mins, then baste with the pan juices and lay the bacon rashers over the breast to keep it moist. Baste again. Lower to 180°C and roast for about 2½ hours (30 mins per kg) until done, basting occasionally."
       - "Transfer the turkey to a warmed platter and remove the parson's nose, wings and tips of the drumsticks. Keep these for the gravy. Leave the turkey to rest under foil and towels for at least 45 mins. Remove the bay leaves from under the skin before carving."
 method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-29"
 ---

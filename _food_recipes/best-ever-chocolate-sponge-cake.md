@@ -1,7 +1,7 @@
 ---
 title: Best-Ever Chocolate Sponge Cake
 short_name: Best-Ever Chocolate Sponge Cake
-tagline: Needs no introduction.
+tagline: Needs no introduction. Stop the search.
 source: "Adapted from Green and Black's Chocolate Recipes"
 makes: "one double-layer 8-inch cake"
 prep_time: 20 mins
@@ -48,13 +48,14 @@ method_groups:
   - name: cake
     steps:
     - step: "Sift the flour, cocoa, baking powder and bicarbonate of soda. Stir in the salt."
-      tip: Actually do sift this time.
+      tip: Actually do sift this time. I'm watching you. Cocoa powder is sneaky and you're not above this.
     - Curdle the milk with the lemon juice.
     - "Cream the butter with the sugar until fluffy, then add some beaten egg, some flour mixture, then some milk mixture bit by bit until all combined. You might not need all the milk."
     - Add in the vanilla extract last.
     - Pour into two greased 8-inch round tins and level off with the back of a spoon.
-    - Bake for 20–25 mins until centre is springy and sides begin to pull away from the tin.
-    - "Leave to cool in the tins for a few mins, then turn out upside down on a wire rack and prick the bottoms all over with a fork — upside down to flatten the tops ready for stacking."
+    - Bake for 20–25 mins at 170C (QQ CLAUDE PLEASE FORMAT) until centre is springy and sides begin to pull away from the tin.
+    - step: "Leave to cool in the tins for a few mins, then turn out upside down on a wire rack and prick the bottoms all over with a fork."
+      note: "Cooling upside down flattens the tops ready for stacking."
   - name: buttercream filling
     steps:
     - Melt the chocolate over a bain-marie.
@@ -74,10 +75,10 @@ method_short:
        * Add chocolate to butter mix
 notes:
   - label: "Topping"
-    text: "Top with icing sugar. Or try [chocolate ganache](../chocolate-ganache/), or simply melted chocolate with butter 2:1."
+    text: "Top with icing sugar. Or try [chocolate ganache](../chocolate-ganache/), or simply melted chocolate with salted butter 2:1."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

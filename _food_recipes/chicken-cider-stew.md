@@ -38,15 +38,15 @@ ingredient_groups:
     - item: "handful of fresh chives and/or parsley"
     - item: seasoning and flavourings — see note
 method:
-  - Toss the chicken in olive oil then season.
-  - "Fry in batches, 2 mins per side, turning once, until there's a golden brown crust. Remove from pan to rest."
+  - Toss the chicken in olive oil then season generously.
+  - "Sear in batches, 2 mins per side. Remove from pan to rest."
   - "Sweat onions, carrots and celery until soft and golden, then increase the heat to brown them. Add the garlic when you're 2 mins from done."
   - Return the chicken to the pan.
   - "Add cider to deglaze, then the tarragon, and bring to the boil. Then simmer gently for 40 mins."
   - "Add more carrots if you like, and turnips and apples, then simmer for 10–15 mins."
   - "Add the beans, increase the heat, and cook for 5 mins."
   - "Add the crème fraîche, stir to combine, and heat for another 2 mins."
-  - Add the parsley and/or chives to serve.
+  - Sprinkle the parsley and/or chives to serve.
 method_short:
   - |
     * Sear chicken
@@ -57,12 +57,12 @@ method_short:
     * crème fraîche 2 mins
 notes:
   - label: "Seasoning"
-    text: "Season and flavour the liquid with stock cubes, mushroom ketchup, anchovy sauce, Worcestershire sauce, English mustard powder, chicken stock cubes, bay leaves, lemon juice, olive oil, anything: whatever it needs and whatever you like."
+    text: "Season and flavour the liquid with stock cubes, mushroom ketchup, anchovy sauce, Worcestershire sauce, English mustard powder, chicken stock cubes, soy sauce, rice wine or balsamic vinegar, bay leaves, lemon juice, olive oil, anything: whatever it needs and whatever you like."
   - label: "Peeling"
-    text: "I never bother peeling vegetables any more because they taste better skin-on. The last time I started peeling an apple I had epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I didn't continue peeling the apple."
+    text: "I never bother peeling vegetables any more because they taste better skin-on. The last time I noticed I was peeling an apple I had epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I didn't continue peeling the apple."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---
