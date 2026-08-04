@@ -58,7 +58,7 @@ notes:
   - label: "Seasoning"
     text: "Season and flavour the liquid with stock cubes, mushroom ketchup, anchovy sauce, Worcestershire sauce, English mustard powder, chicken stock cubes, soy sauce, rice wine or balsamic vinegar, bay leaves, lemon juice, olive oil, anything: whatever it needs and whatever you like."
   - label: "Peeling"
-    text: "I never bother peeling vegetables any more because they taste better skin-on. The last time I noticed I was peeling an apple I had epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I didn't continue peeling the apple."
+    text: "I never bother peeling vegetables any more because they taste better skin-on. The last time I noticed I was peeling an apple I had an epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I did not continue peeling the apple."
 meta:
   rewritten: true
   proofread: true

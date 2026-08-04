@@ -6,7 +6,7 @@ source: Adapted from Gordon Ramsay
 serves: 6
 prep_time: "35 mins"
 cook_time: "2–3 hrs depending on weight"
-main_ingredients: ["whole goose", lemons, limes, "five-spice powder", honey, "freh thyme"]
+main_ingredients: ["whole goose", lemons, limes, "five-spice powder", honey, "fresh thyme"]
 star_ingredient: poultry
 tags: [festive, showstopper]
 ingredient_groups:
