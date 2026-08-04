@@ -188,3 +188,31 @@ def test_no_main_ingredient_spelling_collisions():
         + "\n\nPick one spelling and use it everywhere. Proper nouns keep their "
           "capital (Parma ham, Dijon mustard); everything else is lowercase."
     )
+
+
+def test_incidental_not_in_main_ingredients(recipe):
+    """An ingredient item marked `incidental: true` (see HANDOVER "Easy to
+    get wrong") is a cooking fluid, not a real recipe component. It has no
+    business turning up as a recipe-row ingredient pill or an
+    ingredient-search hit on the index page -- both read from
+    `main_ingredients` -- so it should never also be listed there.
+    """
+    main = {_fold(str(m)) for m in (recipe.fm.get("main_ingredients") or [])}
+    if not main:
+        return
+    offenders = []
+    for group in recipe.fm.get("ingredient_groups") or []:
+        for item in group.get("items") or []:
+            if not isinstance(item, dict) or not item.get("incidental"):
+                continue
+            name = _fold(str(item.get("item", "")).split(",")[0].strip())
+            hits = [m for m in main if name and (name in m or m in name)]
+            if hits:
+                offenders.append((item.get("item"), hits))
+    assert not offenders, (
+        f"{where(recipe)} marks ingredient(s) `incidental: true` that still "
+        f"appear in main_ingredients: {offenders}. An incidental cooking "
+        f"fluid shouldn't show up as a recipe-row pill or an ingredient-"
+        f"search hit -- remove it from main_ingredients, or drop the "
+        f"incidental flag if it's actually core."
+    )

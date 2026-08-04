@@ -220,6 +220,8 @@ ingredient_groups:
     - amount: "400 g"
       item: "butter beans, drained"
       tip: "Jarred are worth it here."
+    - item: "vegetable oil, to fry"
+      incidental: true              # optional; see "Easy to get wrong" below
 method:                          # xor method_groups: — never both
   - "Step text."
   - step: "Step text."
@@ -239,6 +241,18 @@ meta:
 **Easy to get wrong:**
 
 - `QQ` anywhere is Helen's placeholder. **Never flag it as an error.**
+- `incidental: true` on an ingredient item (e.g. frying oil, greasing
+  butter) marks it as a cooking fluid rather than a real recipe component —
+  Helen: "It's silly to write '2 tbsp olive oil' for a sear, when people
+  will obviously use as much as they like. Whereas in a salad dressing, an
+  amount is needed." Whether an oil is core or incidental is a judgement
+  call (unusual oil, a stated high smoke point, searing for flavour, or a
+  finishing drizzle all argue for core) that can't be inferred from the
+  text alone, so it's an explicit flag, not a heuristic. Default is core
+  (omit the key). `test_incidental_not_in_main_ingredients`
+  (test_taxonomy.py) keeps it consistent with `main_ingredients`, which
+  both the recipe-row ingredient pills and ingredient-search matching on
+  the index page read from — an incidental oil should appear in neither.
 - `serves` **xor** `makes` — `makes` for quantities you produce (bakes,
   sauces, base recipes; `makes: QQ` for base recipes), `serves` for what you
   portion out. **Values aren't always numeric** — both are free descriptive
