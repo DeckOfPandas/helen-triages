@@ -6,7 +6,7 @@ source: "Adapted from Gordon Ramsay's Ultimate Cookery Course (Hodder & Stoughto
 serves: 4
 prep_time: "1 hr 30 mins, plus overnight chilling"
 cook_time: "15–20 mins"
-main_ingredients: ["beef fillet", "puff pastry", "wild mushrooms", "Parma ham", "Dijon mustard", "egg yolks"]
+main_ingredients: ["beef fillet", "puff pastry", "wild mushrooms", "Parma ham", "Dijon mustard", "egg yolks", "red wine", "shallots", "beef stock"]
 star_ingredient: beef
 tags: [showstopper, "make-ahead"]
 ingredient_groups:
@@ -40,8 +40,8 @@ ingredient_groups:
     - amount: "1"
       item: thyme sprig
     - item: splash of red wine vinegar
-    - amount: "1"
-      item: "bottle red wine (750 ml)"
+    - amount: "1 bottle"
+      item: "red wine (750 ml)"
       tip: "Preferably Merlot or Cab."
     - amount: "750 ml"
       item: beef stock
