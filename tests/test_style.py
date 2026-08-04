@@ -309,3 +309,59 @@ def test_accents_in_drafts():
         "Unaccented spelling(s) in drafts:\n  " + "\n  ".join(problems)
         + "\n\nFix now so it's already right when the draft is promoted."
     )
+
+
+# --- pan/ingredient sizes ----------------------------------------------------
+
+_SIZE_NUMBER_WORDS = {
+    "one": "1", "two": "2", "three": "3", "four": "4", "five": "5",
+    "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10",
+    "eleven": "11", "twelve": "12",
+}
+_SIZE_UNIT = r"(?:inch(?:es)?|cm|centimet(?:re|er)s?|mm|millimet(?:re|er)s?)"
+
+
+def _size_problems(fields: list[tuple[str, str]]) -> list[str]:
+    problems = []
+    for location, text in fields:
+        for word, digit in _SIZE_NUMBER_WORDS.items():
+            m = re.search(rf"\b{word}[- ]{_SIZE_UNIT}\b", text, re.I)
+            if m:
+                unit = re.split(r"[- ]", m.group(0), maxsplit=1)[1]
+                problems.append(f"{location}: {m.group(0)!r} should be '{digit}-{unit}'")
+    return problems
+
+
+def test_pan_and_ingredient_sizes_use_digits(recipe):
+    """GitHub issue #95: "7-inch" not "seven-inch", same for an ingredient
+    size like "4-cm piece of ginger". Unlike time words ("ten minutes of
+    glory" is fine, per this file's own docstring), a size describing a
+    physical dimension is a measurement, not prose, and reads the same way
+    every other measurement on this site already does -- digits.
+
+    Same field set as the accent checks (title/short_name/main_ingredients/
+    star_ingredient/ingredient item names, plus prose): a size can appear as
+    an ingredient's own name ("4-cm piece of ginger") just as easily as in
+    a method step ("a 7-inch tin").
+    """
+    problems = _size_problems(_accent_check_fields(recipe))
+    assert not problems, (
+        f"{where(recipe)} spells out a size instead of using digits:\n  "
+        + "\n  ".join(problems)
+    )
+
+
+def test_pan_and_ingredient_sizes_use_digits_in_drafts():
+    """Same rule as test_pan_and_ingredient_sizes_use_digits, for
+    _food_drafts/ -- same reasoning as test_accents_in_drafts.
+    """
+    from conftest import ALL_DRAFTS
+
+    problems = []
+    for draft in ALL_DRAFTS:
+        for p in _size_problems(_accent_check_fields(draft)):
+            problems.append(f"_food_drafts/{draft.slug}.md — {p}")
+    assert not problems, (
+        "Spelled-out size(s) in drafts:\n  " + "\n  ".join(problems)
+        + "\n\nFix now so it's already right when the draft is promoted."
+    )
