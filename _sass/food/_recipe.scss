@@ -478,7 +478,18 @@ $method-step-number-column: 2.4rem + 0.9rem;
   li.method-group-heading-item {
     counter-increment: none;
     padding-left: 0;
-    margin-bottom: $space-sm;
+    // Was $space-sm (0.5rem) -- adjacent margins collapse to the LARGER of
+    // the two, so this never actually won against .recipe-group-heading's
+    // own margin-bottom ($space-md, 0.75rem): the true gap above the first
+    // step was 0.75rem regardless of what this said. Helen (GitHub issue
+    // #55): "too cramped/close" between the heading and the step number
+    // right below it, both bold stroked Courier at close sizes. Raised
+    // past $space-md so THIS margin is the one that wins the collapse.
+    // Scoped here rather than raising .recipe-group-heading's own
+    // margin-bottom, which also sets the gap above ingredient group
+    // headings ("For the base:") — a different context, not part of this
+    // issue.
+    margin-bottom: $space-xl;
 
     &::before { content: none; }
   }
