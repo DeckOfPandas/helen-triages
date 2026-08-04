@@ -42,7 +42,7 @@ method:
   - "Sweat the onions, carrots and celery until soft and golden, then increase the heat to brown them. Add the minced garlic 2 mins before you're done."
   - At the same time, pat the chicken dry and season. Fry for 3 mins each side. Remove from heat and rest for 10 mins.
   - step: "Deglaze with a few splashes of white wine, scraping all the bits off the bottom of the pan, then reduce the heat to medium. Sprinkle in the flour and stir to combine."
-    tip: "Don't panic if the flour goes clumpy, all will be well, just don't stop stirring until it bubbles."
+    note: "Don't panic if the flour goes clumpy, all will be well, just don't stop stirring until it bubbles."
   - "Chop the chicken and add it back to the pan. Add the rest of the wine and simmer for a minute or two. Then add the stock, and bring to the boil while stirring continuously. After it boils, you can stop stirring. Let it cook for about 5 mins. Season and flavour to taste."
   - Add the mushrooms then boil for 5 mins until softened.
   - "Add the peas and any fresh herbs, and simmer uncovered for 5–10 more minutes until thickened. Check seasoning."

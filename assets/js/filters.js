@@ -3,7 +3,14 @@ document.addEventListener('DOMContentLoaded', function () {
   var activeStar = null;
   var activeIngredient = null;
   var activeMetaFilters = new Set();
-  var nameQuery = ''; // 'rewrite' and/or 'proofread'
+  // Folded (accents stripped, HTF.ingredientSearch.fold) and lowercased, same
+  // treatment ingredient-search.js already gives its own query -- GitHub
+  // issue #45: typing "creme brulee" found nothing against a title that
+  // actually reads "Crème Brûlée". Every match against a title (here and in
+  // updateTitleHighlights() below) folds that title's text the same way
+  // before comparing, so an accented title still matches an unaccented
+  // query and vice versa; the title itself is never folded for display.
+  var nameQuery = '';
   var isSearching = false;
 
   var PAGE_SIZE = 20;
@@ -101,10 +108,21 @@ document.addEventListener('DOMContentLoaded', function () {
   // are cut off. Hidden rows (display:none, offsetParent null) are skipped:
   // they measure 0/0 either way, and get measured again once a filter or
   // page change makes them visible, because this runs at the end of update().
+  //
+  // GitHub issue #93: Helen saw the fade on rows that read as fully visible,
+  // not just genuinely clamped ones -- "each recipe row", not "some". A
+  // -webkit-box + -webkit-line-clamp box's scrollHeight vs. clientHeight
+  // comparison is a known source of exactly this kind of false positive:
+  // sub-pixel line-height rounding can put scrollHeight a pixel or two above
+  // clientHeight even when nothing is actually cut off, especially at
+  // fractional device pixel ratios. +1 wasn't enough headroom; +3 is more
+  // forgiving of that rounding while still catching genuine overflow, which
+  // is never a near-miss (a whole clamped line is comfortably taller than a
+  // few px). Not fully verifiable without a browser -- please check locally.
   function updateIngredientClamp() {
     document.querySelectorAll('.recipe-list .ingredient-list').forEach(function(el) {
       if (el.offsetParent === null) return;
-      el.classList.toggle('is-clamped', el.scrollHeight > el.clientHeight + 1);
+      el.classList.toggle('is-clamped', el.scrollHeight > el.clientHeight + 3);
     });
   }
 
@@ -182,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
         a.textContent = original;
         return;
       }
-      var idx = original.toLowerCase().indexOf(nameQuery);
+      var idx = HTF.ingredientSearch.fold(original.toLowerCase()).indexOf(nameQuery);
       if (idx === -1) {
         a.textContent = original;
         return;
@@ -297,7 +315,7 @@ function renderResultsPool() {
 
         if (nameQuery) {
           var title = (li.querySelector('a') || {}).textContent || '';
-          if (title.toLowerCase().indexOf(nameQuery) === -1) visible = false;
+          if (HTF.ingredientSearch.fold(title.toLowerCase()).indexOf(nameQuery) === -1) visible = false;
         }
 
         if (activeMetaFilters.has('rewrite') && li.dataset.metaRewrite !== 'true') visible = false;
@@ -536,7 +554,7 @@ function renderResultsPool() {
 
   if (nameSearchBox) {
     nameSearchBox.addEventListener('input', function() {
-      nameQuery = nameSearchBox.value.trim().toLowerCase();
+      nameQuery = HTF.ingredientSearch.fold(nameSearchBox.value.trim().toLowerCase());
       update();
     });
   }

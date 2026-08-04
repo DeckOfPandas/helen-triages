@@ -33,7 +33,7 @@ method:
   - Sift the flour and baking powder.
   - "Cream the butter with the sugars, then mix in the peanut butter, then the egg and vanilla extract."
   - Stir in the flour mixture.
-  - "Roll into one-inch balls, coat in demerara sugar, place on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."
+  - "Roll into 1-inch balls, coat in demerara sugar, place on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."
   - Bake at 180°C for about 10 mins.
   - Allow to cool completely on the baking sheet — they need to set before being transferred to a cooling rack.
 method_short:
