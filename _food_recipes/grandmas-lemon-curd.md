@@ -6,7 +6,7 @@ source: Grandma Kath
 makes: Enough for one normal lemon meringue pie
 prep_time: "10 mins"
 cook_time: "20 mins"
-main_ingredients: [lemon, butter, "golden caster sugar", eggs, cornflour]
+main_ingredients: [lemons, "salted butter", "golden caster sugar", eggs, cornflour]
 star_ingredient: fruit
 tags: [extras, "make-ahead"]
 ingredient_groups:
@@ -17,24 +17,26 @@ ingredient_groups:
       item: salted butter
     - amount: "8 oz"
       item: golden caster sugar
-    - amount: "2"
-      item: "heaped tsp cornflour"
+    - amount: "2 heaped tsp"
+      item: cornflour
     - amount: "3"
       item: large eggs
+    - item: knob of salted butter, optional
 method:
   - "Slowly melt the butter in a pan, then stir in the sugar until dissolved."
-  - "Mix the cornflour with some of the lemon juice, and add the rest of the juice and the rind."
-  - "When hot, add the cornflour mixture slowly and stir well."
-  - "When the texture of the lemon mixture changes, stir in the beaten eggs."
+  - "Mix the cornflour with some of the lemon juice until combined and even-ish, then add the rest of the juice and the rind."
+  - "When the butter and sugar is hot, add the cornflour mixture slowly and stir well."
+  - "When the texture changes, stir in the beaten eggs."
   - "Keep stirring continuously until it all thickens. DON'T LET IT BOIL, OTHERWISE YOU WILL END UP WITH SCRAMBLED EGGS."
-  - "Leave to cool before putting in jars."
+  - "Leave to cool in the pan. When no longer hot, stir through a knob of butter if you like."
+  - "Leave to cool completely before putting in jars."
 method_short:
   - ""
 # notes:
 #   -
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

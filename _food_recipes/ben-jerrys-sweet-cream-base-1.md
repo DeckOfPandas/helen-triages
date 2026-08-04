@@ -6,7 +6,7 @@ source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book, page 28"
 makes: "1 quart"
 prep_time: "10 mins"
 cook_time: none
-main_ingredients: [eggs, sugar, "whipping cream", milk]
+main_ingredients: [eggs, "golden caster sugar", "whipping cream", "whole milk"]
 star_ingredient: eggs
 tags: [extras, freezable]
 ingredient_groups:

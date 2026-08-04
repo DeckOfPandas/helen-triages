@@ -2,11 +2,11 @@
 title: "Henry's Sunday Waffles"
 short_name: "Henry's Sunday Waffles"
 tagline: "I've tried a lot of waffle recipes. This one has been iterated and iterated until, well, perfection."
-source: ""
+source: "Adapted from Sunlight Cafe"
 makes: "4–6 waffles depending on your waffle iron"
 prep_time: "5 mins"
 cook_time: "15 mins"
-main_ingredients: ["plain flour", eggs, milk, "groundnut oil", butter]
+main_ingredients: ["plain flour", eggs, milk, "groundnut oil", "salted butter"]
 star_ingredient: eggs
 tags: [breakfast, "carbs party"]
 ingredient_groups:
@@ -28,12 +28,12 @@ ingredient_groups:
 method:
   - "Beat the egg yolks a little, then stir in the milk and oil. This won't mix well, but it doesn't matter."
   - "Stir together the flour, baking powder and salt."
-  - "Make a well in the centre of the flour mixture, then whisk in the milk mixture. It will be lumpy — don't panic."
+  - "Make a well in the centre of the flour mixture, then whisk in the milk mixture. It will be lumpy, but it doesn't matter."
   - "Beat the egg whites with a pinch of cream of tartar until stiff peaks form, but don't overbeat."
   - "Gently stir half the egg white into the milk mixture with a metal spoon to loosen it, then gently fold in the rest. It's fine to leave little wisps of egg white — definitely don't overmix."
   - Stir in the melted butter.
   - Spoon into waffle iron and cook until golden. Add more melted butter to encourage browning if you want.
-  - "Serve with real maple syrup, sugar, lemon, berries, chocolate ganache or whatever."
+  - "Serve with real maple syrup, sugar, lemon, berries, [chocolate ganache](../chocolate-ganache/) or whatever."
 method_short:
   - ""
 notes:

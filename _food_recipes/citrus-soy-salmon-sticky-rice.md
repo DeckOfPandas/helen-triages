@@ -6,15 +6,18 @@ source: "Adapted from Good Food, May 2026"
 serves: 6
 prep_time: "20 mins"
 cook_time: "30 mins"
-main_ingredients: [salmon, "sticky rice", edamame, "soy sauce", lime, ginger, sesame]
+main_ingredients: [salmon, "sticky rice", edamame, "soy sauce", lime, ginger, "sesame seeds", cucumber, coriander, "Greek yoghurt", "spring onions"]
 star_ingredient: oily fish
 tags: [salad, virtuous]
 ingredient_groups:
-  - items:
+  - name: salmon
+    items:
     - amount: "350 g"
       item: short-grain sticky rice
     - amount: "1 kg"
       item: salmon side
+  - name: glaze
+    items:
     - amount: "50 ml"
       item: light soy sauce
     - amount: "3"
@@ -23,10 +26,12 @@ ingredient_groups:
       item: "ginger, finely grated"
     - amount: "2"
       item: "limes, both zested, 1 juiced, plus wedges to serve"
-    - amount: "50 ml"
+    - amount: "50 ml"    
       item: oyster sauce
     - amount: "2 tbsp"
       item: brown sugar
+  - name: salad
+    items:
     - amount: "30 g"
       item: sesame seeds
     - amount: "165 g"
@@ -35,12 +40,14 @@ ingredient_groups:
       item: sesame oil
     - amount: "2"
       item: "cucumbers, thinly sliced"
-    - amount: "2"
+    - amount: 2
       item: "spring onions in thin strips"
+    - amount: "400 g"
+      item: frozen edamame  
     - amount: "10 g"
       item: "coriander, roughly chopped"
-    - amount: "400 g"
-      item: frozen edamame
+ 
+    
 method:
   - "Cook the rinsed rice in a covered saucepan, with some salt, and leave to steam with the lid on."
   - "Season the salmon. Simmer the soy, garlic, ginger, lime zest and juice, oyster sauce, and sugar into a glaze, brush over the salmon and bake until just cooked."

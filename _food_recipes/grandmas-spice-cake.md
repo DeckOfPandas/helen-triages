@@ -12,7 +12,7 @@ tags: [bakes]
 ingredient_groups:
   - items:
     - amount: "4 oz"
-      item: butter
+      item: salted butter
     - amount: "4 oz"
       item: demerara sugar
     - amount: "1"
@@ -25,8 +25,9 @@ ingredient_groups:
       item: self-raising flour
     - amount: "2 tsp"
       item: ground ginger
-    - item: "1 tsp mixed spice"
-      note: "Mixed spice isn't really sold like this any more — see [mixed spice](../mixed-spice/) for a home-made blend."
+    - amount: 1 tsp
+      item: "mixed spice"
+      note: "mixed spice isn't really sold like this any more — see [mixed spice](../mixed-spice/) for a home-made blend."
 method:
   - Cream the butter and sugar thoroughly until fluffy. Longer than you think.
   - Mix in the beaten egg a little at a time.
@@ -41,11 +42,11 @@ method_short:
 notes:
   - label: "Sinking"
     text: "If the cake sinks in the middle, you added too much syrup."
-  - label: "Temperature"
+  - label: "Cracking"
     text: "If the top of the cake cracks, bake at a lower temperature."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

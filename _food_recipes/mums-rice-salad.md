@@ -13,10 +13,10 @@ ingredient_groups:
   - items:
     - amount: "150 g"
       item: brown rice
-    - amount: "2"
-      item: "handfuls of cashews, toasted"
-    - amount: "2"
-      item: handfuls of sultanas
+    - amount: "2 handfuls"
+      item: "cashews, toasted"
+    - amount: "2 handfuls"
+      item: sultanas
     - amount: "2 tbsp"
       item: olive oil
     - amount: "3 tbsp"

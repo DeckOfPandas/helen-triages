@@ -6,7 +6,7 @@ source: Adapted from Riverford
 serves: 2
 prep_time: "5 mins"
 cook_time: "30 mins"
-main_ingredients: ["chicken leg", "salad potatoes", sorrel, "French beans", "white wine", "wholegrain mustard"]
+main_ingredients: ["chicken leg", "new potatoes", sorrel, "French beans", "white wine", "wholegrain mustard"]
 star_ingredient: poultry
 tags: ["one-handed food", virtuous]
 ingredient_groups:
@@ -17,8 +17,8 @@ ingredient_groups:
       item: "medium carrots, diced"
     - amount: "2"
       item: "stalks celery, diced"
-    - amount: "3"
-      item: "cloves garlic, minced"
+    - amount: "3 cloves"
+      item: "garlic, minced"
     - amount: "300 g"
       item: "chicken leg, cubed"
     - amount: "400 g"
@@ -32,7 +32,7 @@ ingredient_groups:
     - amount: "60 g"
       item: "sorrel or more to taste, thinly shredded at the last minute"
     - amount: "1 tbsp"
-      item: coarse mustard
+      item: wholegrain mustard
 method:
   - "Oil and season the chicken, then sear, turning often, 3–4 mins, until golden. Remove."
   - "Sweat the onions, carrots and celery in the chicken fat pan, for 10 mins or more until soft and golden. Add the garlic 2 mins before the end."

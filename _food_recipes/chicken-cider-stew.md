@@ -6,7 +6,7 @@ source: Adapted from Riverford
 serves: 4
 prep_time: 15 mins
 cook_time: "1 hr"
-main_ingredients: ["chicken thighs and drumsticks", cider, carrots, "cooking apples", "crème fraîche"]
+main_ingredients: ["chicken thighs and drumsticks", cider, "cooking apples", "crème fraîche", turnip, "green beans"]
 star_ingredient: poultry
 tags: ["one-handed food", virtuous]
 ingredient_groups:
@@ -19,10 +19,9 @@ ingredient_groups:
       item: "medium carrots, diced, and extra in chunks if you like them"
     - amount: "4"
       item: "stalks celery, diced"
-    - amount: "4"
-      item: "cloves garlic, minced"
-    - amount: "2 tbsp"
-      item: olive oil
+    - amount: "4 cloves"
+      item: "garlic, minced"
+    - item: olive oil
     - amount: "350 ml"
       item: medium-dry cider
     - amount: "3"

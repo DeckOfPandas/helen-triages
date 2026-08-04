@@ -6,13 +6,14 @@ source: ""
 makes: some
 prep_time: "5 mins"
 cook_time: "2 mins"
-main_ingredients: [cinnamon, "star anise", "fennel seed", "Sichuan peppercorn", cloves]
+main_ingredients: ["cinnamon sticks", "star anise", "fennel seed", "Sichuan peppercorn", "whole cloves"]
 star_ingredient:
 tags: [extras]
 ingredient_groups:
   - items:
-    - amount: "2 tbsp"
-      item: cinnamon or 2 cinnamon sticks
+    - amount: "2"
+      item: cinnamon sticks
+      note: or 1 tbsp ground cinnamon per stick if you for some reason want to go to all the hassle of making this from scratch but are happy to only go half the way
     - amount: "1 tbsp"
       item: fennel seeds
     - amount: "6"
@@ -21,14 +22,16 @@ ingredient_groups:
       item: Sichuan peppercorns
     - amount: "1 tsp"
       item: whole cloves
+      note: I like more than this, but apparently that's uncommon
 method:
-  - Fry the whole spices until aromatic and darkened.
+  - step: Fry the whole spices until aromatic and darkened.
+    note: if you can't be bothered to do this then, honestly, just don't make five-spice yourself
   - Grind or crush to a fine powder.
 method_short:
   - Oh come on.
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

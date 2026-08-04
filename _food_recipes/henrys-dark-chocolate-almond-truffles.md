@@ -6,7 +6,7 @@ source: Megan
 makes: "20–24 truffles"
 prep_time: "20 mins plus time to set"
 cook_time: "5 mins"
-main_ingredients: ["dark chocolate", "ground almonds", butter, "icing sugar", "cocoa powder"]
+main_ingredients: ["dark chocolate", "ground almonds", butter, "icing sugar"]
 star_ingredient: chocolate
 tags: [nibbles, sweets]
 ingredient_groups:
@@ -33,11 +33,11 @@ method:
 method_short:
   - ""
 notes:
-  - label: "Simon says"
+  - label: "Simon is delightful"
     text: "Simon has been known to call these \"chocolate poos\"...lovely."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-13"
 ---

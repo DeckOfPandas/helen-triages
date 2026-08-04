@@ -15,18 +15,18 @@ ingredient_groups:
     - item: Sunflower oil
     - amount: "8"
       item: good-quality sausages
-    - amount: "4"
-      item: sprigs rosemary
+    - amount: "4 sprigs"
+      item: rosemary
     - amount: "2"
       item: large red onions
-    - amount: "2"
-      item: "cloves garlic, minced"
+    - amount: "2 cloves"
+      item: "garlic, minced"
     - amount: "2"
       item: pats unsalted butter
     - amount: "6 tbsp"
       item: balsamic vinegar
-    - amount: "1"
-      item: level tbsp vegetable stock powder or 1 organic vegetable stock cube
+    - amount: "1 level tbsp"
+      item: vegetable stock powder or 1 organic vegetable stock cube
   - name: batter
     items:
     - amount: "285 ml"

@@ -6,7 +6,7 @@ source: "Adapted from Green and Black's Chocolate Recipes"
 makes: "one double-layer 8-inch cake"
 prep_time: 20 mins
 cook_time: "20–25 mins"
-main_ingredients: ["cocoa powder", "dark chocolate", butter, eggs, flour]
+main_ingredients: ["cocoa powder", "dark chocolate", butter, eggs, "plain flour", vanilla, salt]
 star_ingredient: chocolate
 tags: [bakes, showstopper]
 ingredient_groups:
@@ -53,7 +53,7 @@ method_groups:
     - "Cream the butter with the sugar until fluffy, then add some beaten egg, some flour mixture, then some milk mixture bit by bit until all combined. You might not need all the milk."
     - Add in the vanilla extract last.
     - Pour into two greased 8-inch round tins and level off with the back of a spoon.
-    - Bake for 20–25 mins at 170C (QQ CLAUDE PLEASE FORMAT) until centre is springy and sides begin to pull away from the tin.
+    - Bake for 20–25 mins at 170°C until centre is springy and sides begin to pull away from the tin.
     - step: "Leave to cool in the tins for a few mins, then turn out upside down on a wire rack and prick the bottoms all over with a fork."
       note: "Cooling upside down flattens the tops ready for stacking."
   - name: buttercream filling

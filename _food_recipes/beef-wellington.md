@@ -21,8 +21,8 @@ ingredient_groups:
     - item: "Dijon mustard, to brush"
     - amount: "500 g"
       item: puff pastry
-    - amount: "8"
-      item: slices of Parma ham
+    - amount: "8 slices"
+      item: Parma ham
     - amount: "2"
       item: "egg yolks, beaten with 1 tbsp water and a pinch of salt"
     - item: sea salt and freshly ground black pepper
