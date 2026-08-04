@@ -136,6 +136,7 @@ SPELLINGS = {
     r"\bgruyere\b": "gruyère",
     r"\bpuree\b": "purée",
     r"\bsaute\b": "sauté",
+    r"\bbain marie\b": "bain-marie",
 }
 
 
