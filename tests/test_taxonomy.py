@@ -256,3 +256,77 @@ def test_ingredient_annotation_style(recipe, taxonomy):
     assert not problems, (
         f"{where(recipe)} ingredient note style:\n  " + "\n  ".join(problems)
     )
+
+
+# --- ingredient group order (GitHub issue #69) -------------------------------
+
+def _title_head_clause(title: str) -> str:
+    """The part of a title naming the dish itself, before any "with ..."
+    clause and any parenthetical translation/aside.
+
+    "Christmas Roast Turkey with Lemon, Parsley and Garlic" -> "Christmas
+    Roast Turkey". "Indonesian Chicken Curry (Gulai Ayam)" -> "Indonesian
+    Chicken Curry". Matching a group's name against this narrower clause,
+    rather than the whole title, is what keeps this test from flagging
+    lemon-meringue-pie ("meringue" is a real word in the title, but it's a
+    modifier of "pie", not the dish's own head noun -- the pastry-then-
+    filling-then-meringue build order is correct as it stands) or
+    miso-salmon-veg-traybake ("miso" describes the salmon, it doesn't mean
+    the marinade group belongs first).
+    """
+    head = re.split(r"\bwith\b", title, flags=re.I)[0]
+    head = re.sub(r"\([^)]*\)", "", head)
+    return head.strip().lower()
+
+
+def _group_matches_title(title_head: str, group_name: str) -> bool:
+    """Whether group_name names the dish itself, not just any word overlap.
+
+    English noun phrases put modifiers before the head noun, so "matches"
+    means "is the head clause's own tail", not "appears anywhere in it" --
+    that distinction is exactly what keeps "Lemon Meringue Pie" from
+    matching a group called 'meringue' (a modifier of 'pie', not the head
+    noun) while still matching 'turkey' against "Christmas Roast Turkey".
+    """
+    name = (group_name or "").strip().lower()
+    return bool(name) and title_head.endswith(name)
+
+
+def test_ingredient_group_order_matches_title(recipe):
+    """A group named for the dish itself leads; a group named for a
+    component the title doesn't call out (dressing, marinade, glaze, to
+    serve...) doesn't get to come first just because it happens to be
+    listed first in the file.
+
+    Helen: title-relevance for group order (this test), call order for
+    ingredients within a group (GitHub issue #68 -- not automatable
+    reliably enough to test; see the commit that added this test for why).
+
+    Deliberately conservative: only flags a group whose name doesn't
+    appear in the title's own head clause sitting before one that does.
+    Two groups that both match, or both don't, are never compared against
+    each other -- there's no title signal to arbitrate between them, so
+    guessing would just trade a real problem for a noisy one.
+    """
+    groups = recipe.fm.get("ingredient_groups") or []
+    if len(groups) < 2:
+        return
+    title_head = _title_head_clause(recipe.fm.get("title") or "")
+    names = [g.get("name") for g in groups]
+    matches = [_group_matches_title(title_head, n) for n in names]
+    if not any(matches):
+        return
+    problems = []
+    for i in range(len(groups)):
+        if matches[i]:
+            continue
+        for j in range(i + 1, len(groups)):
+            if matches[j]:
+                problems.append(
+                    f"{names[i]!r} (no title match) is listed before "
+                    f"{names[j]!r} (matches the title)"
+                )
+    assert not problems, (
+        f"{where(recipe)} ingredient_groups order:\n  " + "\n  ".join(problems)
+        + f"\n\ntitle head clause checked against: {title_head!r}"
+    )
