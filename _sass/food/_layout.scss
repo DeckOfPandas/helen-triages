@@ -260,15 +260,11 @@ article.recipe .method-short {
   &.ingredient--matched {
     display: inline-block;
     color: $color-text;
-    // Was 900 -- on top of the 0.6px stroke below, that's TWO emphasis
-    // levers stacked (a big weight jump AND a stroke), heavier than every
-    // other matched/active tag in this system, which lean on stroke alone
-    // (their own base weight doesn't change between resting and matched).
-    // Helen: "very aggressive... we need to back off the font weight."
-    // Dropped to 700, the same weight this rule used before the tape-shape
-    // treatment was added and the one every badge already treats as its
-    // resting weight -- stroke stays the one thing that actually changes.
-    font-weight: 700;
+    // 900 -> 700 -> 500 (Helen, 2026-08-04, after checking in devtools):
+    // 900 stacked two emphasis levers on top of each other (a big weight
+    // jump AND the stroke below), and even 700 was still "aggressive."
+    // Landed on 500, still a real step up from the resting list's 350.
+    font-weight: 500;
     letter-spacing: 0.01em;
     -webkit-text-stroke: 0.6px $color-text;
     padding: 0 0.4em;

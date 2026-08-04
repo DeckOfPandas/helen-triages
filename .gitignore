@@ -28,6 +28,11 @@ __pycache__/
 # system-wide, so it stays out of version control)
 .node-runtime/
 
+# GitHub CLI (local install only, so Claude can read/act on Issues and PRs
+# without a global apt package or sudo -- downloaded from cli.github.com's
+# GitHub releases, extracted here, not part of the site or its build)
+.gh-runtime/
+
 # OS
 .DS_Store
 Thumbs.db
