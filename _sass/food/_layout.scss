@@ -55,7 +55,9 @@ article.recipe .method-short {
 .results-heading {
   margin: $spacing-section-top 0 $space-lg;
   display: flex;
-  justify-content: flex-end;
+  // Was flex-end -- Helen, 2026-08-03: sitting alone at the right edge of
+  // an otherwise left-aligned page, it read as stray rather than placed.
+  justify-content: flex-start;
 }
 
 .recipe-list {
@@ -106,90 +108,34 @@ article.recipe .method-short {
     &:hover {
       color: $color-star-root;
     }
+
+    // The substring of a title that matches the name-search box, wrapped by
+    // filters.js's updateTitleHighlights() -- Helen's stretch goal, "the
+    // part of the title hit gain the orange background and scratchy,
+    // capitalised lettering," matching the tag treatment used everywhere
+    // else: a lightened .tag-shape fill and flat $color-text stroke, this
+    // time capitalised same as the active-tag convention (the surrounding,
+    // unmatched title stays lowercase -- only the hit itself changes case).
+    // background: none resets <mark>'s native yellow -- left alone, it
+    // would paint on top of .tag-shape, which sits at z-index: -1
+    // specifically to stay behind its own element's background.
+    .title-hit {
+      position: relative;
+      display: inline-block;
+      background: none;
+      color: $color-text;
+      text-transform: uppercase;
+      -webkit-text-stroke: 0.6px $color-text;
+      // Was 0 0.25em -- a title hit usually lands mid-word (GRAndma's, not
+      // a whole word on its own), so padding on BOTH sides reads as a
+      // stray space where the highlighted part rejoins the rest of the
+      // word (Helen: "a trailing space after the active substring").
+      // Trimmed down rather than dropped entirely -- the shape still wants
+      // a little room so its torn edge doesn't touch the letters.
+      padding: 0 0.08em;
+      .tag-shape { color: mix($color-name-search-root, $color-white, 82%); }
+    }
   }
-}
-
-// --- The category-code bar ----------------------------------------------------
-// Fourth attempt, back to stacked -- Helen's call: five squares stacked top to
-// bottom, filling the row's full height between them, rather than five
-// stripes running side by side. All five always render; only is-lit varies,
-// same as before.
-//
-// EACH SEGMENT IS flex: 1 IN A COLUMN, not a fixed height, so the five split
-// whatever height the row actually has -- a tall row (two-line title, wrapped
-// badges) gets slightly bigger squares than a short one, always exactly
-// filling the row rather than under- or over-running it.
-//
-// WIDTH TRACKS HEIGHT VIA aspect-ratio: 1, not a fixed px, because each
-// segment's height is only known once flex has resolved it -- there's no
-// number to hand-write here that would stay right across every row's
-// different height. align-items: flex-start on the container is what makes
-// this take effect: the default flex stretch would otherwise force each
-// segment to the CONTAINER's width and override the ratio.
-.recipe-row-code {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex-shrink: 0;
-  // Unconditional now that every row always shows all five segments -- the
-  // :has() guard existed only to avoid paying for a gap next to an empty,
-  // all-hidden bar, and an always-populated bar is never empty.
-  margin-right: $space-xxl;
-
-  &__seg {
-    display: block;
-    flex: 1;
-    aspect-ratio: 1;
-    // Definition for the lightest hues (aureolin, lime) against $color-bg,
-    // without touching the fill itself -- see the note this replaced on why
-    // that distinction (edge vs hue) matters.
-    box-shadow: inset 0 0 0 1px rgba($color-text, 0.15);
-  }
-}
-
-// UNLIT: darken a little, then make it somewhat transparent -- NOT the
-// -active tokens (tuned for text-on-fill, not a bare swatch -- see the
-// previous version of this comment in git history for why that went wrong)
-// and NOT the raw root at low alpha either (reads as a washed-out pastel with
-// no relationship to the actual paintbox). A small darken plus a moderate
-// alpha keeps the hue recognisably itself while sitting back from the lit
-// state. Alphas dropped again on Helen's feedback that the hues themselves
-// were right but all five read as too solid together.
-//
-// LIT: the true root colour, barely touched -- "so they don't shout too
-// loud" was the brief, not "so they read as a different, muted colour".
-//
-// SEPARATE DIALS PER HUE, not one number applied to all five: the same darken
-// or alpha reads differently depending on where a hue starts (this is the
-// same lesson $darken-active-extra already taught this codebase once, for
-// aureolin specifically -- see _palette.scss). Tune each independently here
-// rather than solving for one value that's wrong for all of them.
-$bar-unlit-darken-star:           8%;
-$bar-unlit-alpha-star:            0.45;
-$bar-unlit-darken-mood:           8%;
-$bar-unlit-alpha-mood:            0.45;
-$bar-unlit-darken-practicalities: 12%;
-$bar-unlit-alpha-practicalities:  0.5;
-$bar-unlit-darken-ingredient:     10%;
-$bar-unlit-alpha-ingredient:      0.45;
-$bar-unlit-darken-name-search:    8%;
-$bar-unlit-alpha-name-search:     0.45;
-
-$bar-lit-alpha: 0.88;
-
-.recipe-row-code__seg {
-  &--star            { background-color: rgba(darken($color-star-root, $bar-unlit-darken-star), $bar-unlit-alpha-star); }
-  &--mood            { background-color: rgba(darken($color-mood-root, $bar-unlit-darken-mood), $bar-unlit-alpha-mood); }
-  &--practicalities  { background-color: rgba(darken($color-practicalities-root, $bar-unlit-darken-practicalities), $bar-unlit-alpha-practicalities); }
-  &--ingredient      { background-color: rgba(darken($color-ingredient-root, $bar-unlit-darken-ingredient), $bar-unlit-alpha-ingredient); }
-  &--name-search     { background-color: rgba(darken($color-name-search-root, $bar-unlit-darken-name-search), $bar-unlit-alpha-name-search); }
-
-  // Lit overrides unlit -- declared after, wins at equal specificity.
-  &--star.is-lit            { background-color: rgba($color-star-root, $bar-lit-alpha); }
-  &--mood.is-lit            { background-color: rgba($color-mood-root, $bar-lit-alpha); }
-  &--practicalities.is-lit  { background-color: rgba($color-practicalities-root, $bar-lit-alpha); }
-  &--ingredient.is-lit      { background-color: rgba($color-ingredient-root, $bar-lit-alpha); }
-  &--name-search.is-lit     { background-color: rgba($color-name-search-root, $bar-lit-alpha); }
 }
 
 // --- Ingredient list below each recipe entry ---------------------------------
@@ -290,6 +236,7 @@ $bar-lit-alpha: 0.88;
 }
 
 .ingredient-pill {
+  position: relative;
   transition: color 0.12s ease-in-out, font-weight 0.12s ease-in-out;
 
   // Pantry staples (see _data/common_ingredients.yml) sink to the end of the
@@ -300,10 +247,28 @@ $bar-lit-alpha: 0.88;
     color: lighten($color-clear-text, 22%);
   }
 
+  // Was just a colour + weight bump ("just turning the text green" -- Helen,
+  // 2026-08-03, asking for more). Brought in line with the active-tag
+  // system used everywhere else instead: a lightened .tag-shape fill (same
+  // mix ratio as STAR/MOOD/PRACTICALITIES/the active ingredient tag) and
+  // flat $color-text stroke rather than a colour shift on the surrounding
+  // plain-text word. The .tag-shape slot is added/removed by filters.js
+  // only for pills that are actually matched right now, same reasoning as
+  // the ingredient-search swarm just above: dozens of ingredient pills sit
+  // on the page across every recipe row, so nothing gets a shape until it's
+  // actually the emphasis.
   &.ingredient--matched {
-    color: $color-ingredient-active;
-    font-weight: 700;
+    display: inline-block;
+    color: $color-text;
+    // 900 -> 700 -> 500 (Helen, 2026-08-04, after checking in devtools):
+    // 900 stacked two emphasis levers on top of each other (a big weight
+    // jump AND the stroke below), and even 700 was still "aggressive."
+    // Landed on 500, still a real step up from the resting list's 350.
+    font-weight: 500;
     letter-spacing: 0.01em;
+    -webkit-text-stroke: 0.6px $color-text;
+    padding: 0 0.4em;
+    .tag-shape { color: mix($color-ingredient-root, $color-white, 82%); }
   }
 }
 
@@ -344,13 +309,16 @@ $bar-lit-alpha: 0.88;
 }
 
 
-// Shared clip-path shape for badges and filter buttons
-.badge,
-.btn-tag,
-.btn-star {
+// Clip-path shape — now for .badge only (the meta/draft status flags:
+// -draft, -meta-rewrite, -meta-proofread). .badge-star/mood/practicalities
+// and .btn-tag/.btn-star moved to the tape-shape SVG system below
+// (Helen, 2026-08-03: "the grey shapes... don't really look like anything
+// in particular... hastily broken old-fashioned highlighter tape").
+.badge {
   display: inline-block;
   font-family: $font-headings;
   white-space: nowrap;
+  position: relative;
 
   clip-path: polygon(
     1% 1%,
@@ -362,9 +330,7 @@ $bar-lit-alpha: 0.88;
     3% 94%,
     0% 42%
   );
-}
 
-.badge {
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: lowercase;
@@ -387,21 +353,94 @@ $bar-lit-alpha: 0.88;
     color: lighten($color-clear-text, 12%);
   }
 
+  // Tape shape instead of clip-path + flat fill -- no background-color at
+  // all, the SVG itself is the visible fill, ragged edges and all. .tag-shape
+  // gets its OWN colour (the raw root hue) separate from the text colour
+  // (the darker -active hue), same two-tone split the rest of the page's
+  // colour system already uses -- text needs to stay readable sitting on
+  // top of the shape, not disappear into it.
+  &-star, &-mood, &-practicalities {
+    clip-path: none;
+  }
+
+  // Resting pill shape, take two: rgba(..., 0.4) was still too loud (Helen,
+  // 2026-08-03: "still too loud for me... please try mixing with a grey").
+  // mix() with $color-border (the site's own "quiet, crisp structural
+  // lines" token, already the lightest neutral in the palette) rather than
+  // a transparency dial this time -- a semi-transparent hue over a white
+  // page just lightens it (still reads as a pale, bright tint), where an
+  // actual mix desaturates it into a dustier, quieter version of the same
+  // hue. Solid colour, not rgba -- the desaturation is doing the calming
+  // work here, not opacity. .badge--matched below still overrides back to
+  // the full-strength root hue, so a matched tag keeps popping.
   &-star {
-    background-color: rgba($color-star-root, $saturation-badge-bg);
     color: $color-star-active;
+    .tag-shape { color: mix($color-star-root, $color-border, 35%); }
   }
 
   &-mood {
-    background-color: rgba($color-mood-root, $saturation-badge-bg);
     color: $color-mood-active;
+    .tag-shape { color: mix($color-mood-root, $color-border, 35%); }
   }
 
   &-practicalities {
-    background-color: rgba($color-practicalities-root, $saturation-badge-bg);
     color: $color-practicalities-active;
+    .tag-shape { color: mix($color-practicalities-root, $color-border, 35%); }
   }
 }
+
+// The tape shape itself: absolutely positioned behind the badge/button text,
+// stretched to fill (preserveAspectRatio="none" baked into the SVG files
+// themselves, same technique as the wordmark's own tape). One of a curated
+// pool (see the POOL comment in decorations.js's tagShapes() for the full
+// reasoning) assigned deterministically by the tag's own text -- same tag
+// always gets the same shape wherever it appears (a filter button and a
+// recipe-row pill for "greens" match), and shape 9's full-width diagonal is
+// excluded for short tag text specifically, since it distorts more than the
+// others do when stretched very narrow.
+.tag-shape {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  // Lets --stretch below overflow the slot itself without spilling into
+  // whatever sits next to the pill.
+  overflow: hidden;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  // tag-shape-2 specifically stretched further than an exact fit, but only
+  // on a genuinely wide pill — Helen: "the way the shape rolls off along
+  // the top left corner bothers me every time" on make-ahead, "doesn't
+  // bother me at all" on duck, same shape both times. decorations.js only
+  // adds this class on long tag text (the same SHORT_TEXT_MAX cutoff used
+  // to keep tag-shape-9 off short pills), so duck is untouched. First pass
+  // at 1.25 overshot even on make-ahead ("too square, sorry, Goldilocks") —
+  // dialed back to a smaller nudge past 1, still enough to move the torn
+  // corner further toward the edge without flattening the shape's own
+  // character. .tag-shape's own overflow: hidden crops the excess rather
+  // than letting it spill past the pill's edges.
+  &--stretch svg {
+    transform: scaleX(1.1);
+    transform-origin: center;
+  }
+}
+
+// Matched/active tag text had a raised emboss here through several rounds
+// (2026-08-03) — softened alpha, per-category alpha, a hand-tuned colour
+// per category, a widened stroke, all chasing star/mood legibility against
+// practicalities' own softer version, none of it landing. Helen's call: no
+// shadow at all, one flat stroke width for all three categories — "we're
+// fighting the raised font in our tags, and we're losing." Full history is
+// in git; the abandoned %tag-emboss-soft placeholder and
+// tag-emboss-strong($light-colour) mixin aren't worth keeping around only
+// to explain why they're gone.
 
 // ============================================================================
 // BUTTONS
@@ -412,12 +451,24 @@ $bar-lit-alpha: 0.88;
 // Defined before .category so active-state compound selectors
 // (two classes) correctly win over these single-class rules by specificity.
 
+// Tape shape now, not a flat clip-path fill (see .tag-shape, BADGES above)
+// — position:relative/inline-block/font-family/white-space moved here from
+// the old shared .badge/.btn-tag/.btn-star rule, since these two no longer
+// share a rule with .badge at all. Resting .tag-shape colour is a
+// translucent neutral (rgba($color-text, ...)) matching the previous flat
+// background's visual weight; category colour only appears once a filter is
+// actually chosen (.active rules below) — same principle as the existing
+// active-state colour pop, extended to the shape itself.
 .btn-tag,
 .btn-star {
+  position: relative;
+  display: inline-block;
+  font-family: $font-headings;
+  white-space: nowrap;
   text-transform: lowercase;
   font-weight: 700;
   border: none;
-  background-color: rgba($color-text, 0.06);
+  background: none;
   color: lighten($color-text, 22%);
   padding: $space-xs $space-md;
   cursor: pointer;
@@ -425,9 +476,13 @@ $bar-lit-alpha: 0.88;
   margin: 0.2rem 0.45rem 0.2rem 0;
   transition: all 0.1s ease-in-out;
 
+  // Resting alpha: 0.35 -> 0.25 -> 0.15, two rounds of "lighten a little"
+  // (Helen, 2026-08-03).
+  .tag-shape { color: rgba($color-text, 0.15); }
+
   &:hover {
-    background-color: rgba($color-text, 0.10);
     color: $color-text;
+    .tag-shape { color: rgba($color-text, 0.4); }
   }
 }
 
@@ -442,34 +497,38 @@ $bar-lit-alpha: 0.88;
 // (not just a family member pulled in alongside it — see hasWordMatch in
 // filters.js).
 //
-// NEUTRAL, NOT THE SECTION'S COLOUR, and the reason generalises. This was
-// `rgba($color-ingredient-root, $saturation-badge-bg)` — the search section's
-// own hue at badge strength — and it was chosen while that hue was AUREOLIN.
-// Yellow at 10% over the page is #FAF6DF, a warm cream that reads as neutral.
-// When the section became lime green on 2026-08-01 the same 10% became #EFF6DF,
-// which reads as green. Identical number, completely different result, because
-// how coloured a tint looks at a given alpha is a property of the hue.
-//
-// The same trap as $darken-active-extra being left on the ingredient line when
-// aureolin moved off it: a value tuned for a colour, stranded when the colour
-// moved. Worth checking for every time these five are reordered.
-//
-// It matters here and not on the badges because the count is UNBOUNDED — one
-// tinted badge per recipe row is an accent, forty tinted results appearing as
-// you type is a swarm. Colour cannot carry emphasis when you do not control how
-// much of it lands at once. A darker grey says "these ones matter more" without
-// colouring anything, and the section's hue still appears where selection
-// actually happens: the label's rule, and the active state.
-//
-// TWO CHANNELS, NOT ONE. 0.06 -> 0.12 on the background alone was not enough:
-// these chips are mostly text on a pale fill, so a slightly darker fill behind
-// the same grey letters barely registers across a wrapped grid of forty. The
-// text colour is the channel that actually carries here — the base is
-// lighten($color-text, 22%), so going to full $color-text is a visible step,
-// and the darker fill then reinforces it instead of doing the work alone.
+// Background dropped entirely 2026-08-03. It had been a flat grey rectangle
+// (rgba($color-text, 0.14)) precisely BECAUSE colouring/shaping an unbounded
+// swarm was the wrong move (see the old reasoning about NEUTRAL, NOT THE
+// SECTION'S COLOUR, preserved in git) — but that grey rectangle turned out
+// to have its own problem: the moment typing narrows the results to one
+// match, that lone survivor auto-activates and gets the full tape-shape
+// treatment, and a flat rectangle suddenly becoming a torn-tape shape read
+// as jarring (Helen: "one suddenly becomes a ta[pe] shape"). Removing the
+// background altogether removes that jump too — there's nothing for the
+// active state to visibly transform FROM. Colour still carries the
+// emphasis, just through text colour alone rather than text + fill: font
+// colour on a genuine word match, $color-ingredient-active (the dark end
+// of the green already used elsewhere for this section, not a new value).
+// Same "colour cannot carry emphasis at unbounded count" logic as before
+// still applies to giving every one of forty results its own shape or its
+// own full-strength fill — that idea was raised and set aside for the same
+// reason.
 .btn-ingredient--word-match {
-  background-color: rgba($color-text, 0.14);
-  color: $color-text;
+  color: $color-ingredient-active;
+  // font-weight has nowhere left to go -- these are already font-weight:
+  // 700 (the .btn-tag base above, applied uniformly, matched or not), and
+  // Courier New only ships Regular and Bold as real static faces, so 700 is
+  // already this font's ceiling. Helen confirmed via devtools that matched
+  // and unmatched results were rendering at the same weight, which is
+  // consistent with that: there was never a separate, lighter weight on
+  // unmatched results for a match to stand out from. A stroke (her own
+  // suggestion, once weight was ruled out) is a real, working lever
+  // instead -- same trick @include punched() and .category-label's own
+  // stroke already use site-wide to read heavier than the font alone can
+  // render. Same colour as the fill, not a separate darker value, so it
+  // reads as "thicker green" rather than a mismatched outline.
+  -webkit-text-stroke: 0.5px $color-ingredient-active;
 }
 
 // ============================================================================
@@ -556,6 +615,14 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     padding: 0.22rem 0;
   }
 
+  // Brought closer to .btn-clear (the global "clear all", below) and to
+  // article.recipe a — Helen, 2026-08-03: this page already has multiple
+  // link designs (the global clear, the recipe page's own links), and this
+  // inline one, being bold Courier with an opacity-fade hover, was a THIRD
+  // distinct design competing with both. Sans, regular weight and a
+  // colour-shift hover now, same mechanism every other link on the site
+  // uses — still its own colour per section (unlike the neutral global
+  // clear), since that context IS worth keeping, just not the typography.
   .btn-clear-inline {
     // A real <button> since 2026-07-29 — it was a <span> with a click handler,
     // so it was unreachable by keyboard. These four lines strip the browser
@@ -565,50 +632,80 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     padding: 0;
     color: inherit;
 
-    font-family: $font-headings;
-    font-size: 0.75rem;
-    font-weight: $weight-clear-font;
+    font-family: $font-body;
+    font-size: 0.78rem;
+    font-weight: 400;
     text-transform: lowercase;
-    letter-spacing: 0;
+    letter-spacing: 0.02em;
     cursor: pointer;
     text-decoration: underline;
-    transition: opacity 0.1s ease-in-out;
+    transition: color 0.1s ease-in-out;
     white-space: nowrap;
-
-    &:hover {
-      opacity: 0.7;
-    }
   }
 
-  // Inline clear colors per group
-  &.category--star      { .btn-clear-inline { color: $color-star-active; } }
-  &.category--mood      { .btn-clear-inline { color: $color-mood-active; } }
-  &.category--practicalities { .btn-clear-inline { color: $color-practicalities-active; } }
+  // Inline clear colours per group — hover lightens to the raw root hue,
+  // same "hover goes lighter" rule article.recipe a and .btn-clear itself
+  // both already follow, rather than the previous opacity fade (a second,
+  // unrelated hover mechanism).
+  &.category--star      { .btn-clear-inline { color: $color-star-active;           &:hover { color: $color-star-root; } } }
+  &.category--mood      { .btn-clear-inline { color: $color-mood-active;           &:hover { color: $color-mood-root; } } }
+  &.category--practicalities { .btn-clear-inline { color: $color-practicalities-active; &:hover { color: $color-practicalities-root; } } }
   // The two searches never had one. They do now, for the same reason the other
   // three do: the clear link belongs to its section and should say so.
-  &.search--ingredients { .btn-clear-inline { color: $color-ingredient-active; } }
-  &.search--name        { .btn-clear-inline { color: $color-name-search-active; } }
+  &.search--ingredients { .btn-clear-inline { color: $color-ingredient-active;     &:hover { color: $color-ingredient-root; } } }
+  &.search--name        { .btn-clear-inline { color: $color-name-search-active;    &:hover { color: $color-name-search-root; } } }
 
   // Active states -- compound selectors (.category--star .btn-star.active)
   // have higher specificity than the base .btn-tag/.btn-star rule above,
   // so no !important needed here.
-  // Shared typography/bg via %btn-active-base; each adds its own colour.
+  // Shared typography via %btn-active-base; each adds its own colour.
+  //
+  // background: none cancels %btn-active-base's generic flat grey — the
+  // tape shape (.tag-shape) is the fill now, not a background-color. Colour
+  // there jumps from the resting translucent neutral to the solid category
+  // root hue, the tape-shape equivalent of the pop the matched recipe-row
+  // pills already get. RESTING .btn-tag/.btn-star (not .active) is
+  // untouched -- only the chosen state changes.
+  //
+  // Text colour is $color-text (near-black), not the category -active hue —
+  // Helen's read: the coloured text wasn't very readable once it was sitting
+  // on the full-colour tape shape rather than a pale background tint.
+  //
+  // No emboss/raised text-shadow here any more (dropped 2026-08-03, see the
+  // comment above %tag-emboss-soft's old spot) — flat stroke only, same
+  // 0.6px for all three categories rather than a value per category, and
+  // in $color-text (same dark colour as the letter itself) rather than the
+  // category -active hue — Helen's correction once she saw it: the
+  // category colour lived in .tag-shape already, and a stroke that matched
+  // the letter reads as one solid dark letterform instead of introducing a
+  // second colour. .tag-shape's own fill lightened further too (mix with
+  // white, 12% -> 18%), Helen's second nudge on the same "back off the
+  // loudness" idea.
   &.category--star .btn-star.active {
     @extend %btn-active-base;
-    color: $color-star-active;
-    -webkit-text-stroke: 0.5px $color-star-active;
+    background: none;
+    color: $color-text;
+    text-shadow: none;
+    -webkit-text-stroke: 0.6px $color-text;
+    .tag-shape { color: mix($color-star-root, $color-white, 82%); }
   }
 
   &.category--mood .btn-tag.active {
     @extend %btn-active-base;
-    color: $color-mood-active;
-    -webkit-text-stroke: 0.6px $color-mood-active;
+    background: none;
+    color: $color-text;
+    text-shadow: none;
+    -webkit-text-stroke: 0.6px $color-text;
+    .tag-shape { color: mix($color-mood-root, $color-white, 82%); }
   }
 
   &.category--practicalities .btn-tag.active {
     @extend %btn-active-base;
-    color: $color-practicalities-active;
-    -webkit-text-stroke: 0.5px $color-practicalities-active;
+    background: none;
+    color: $color-text;
+    text-shadow: none;
+    -webkit-text-stroke: 0.6px $color-text;
+    .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
   }
 
   .category-buttons {
@@ -708,8 +805,37 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     align-items: center;
     gap: $space-md;
     width: 100%;
-    max-width: 550px;
+    // Was 550px. The clear button now reserves its own space at ALL times
+    // (visibility, not display -- see its own comment below), which is
+    // exactly what fixed it appearing to cut the input off mid-typing, but
+    // it also meant that reserved space came out of the input's share of
+    // the same 550px even at rest, before you'd typed a single character
+    // (Helen: "cut off even before typing anything -- it ends at the first
+    // '.'"). Widened by roughly the clear button's own footprint (its text
+    // plus $space-md of margin) so the input gets back the room it lost.
+    max-width: 620px;
     position: relative;
+
+    // Both label and clear button default to flex-shrink: 1 with no
+    // white-space override -- fine while the clear button stays hidden
+    // (its own space is reserved but it has zero visible width impact on
+    // wrapping), but once typing narrows what's left, the row no longer
+    // fits everything at its natural width and something has to give.
+    // Without this, it was the LABEL that gave: shrinking below its own
+    // text's width and wrapping onto two lines ("search main" /
+    // "ingredients" -- Helen, 2026-08-03). Pinning the label at its natural
+    // width means the INPUT absorbs the squeeze instead, which is the
+    // behaviour actually wanted -- a heading shouldn't reflow because of
+    // how much you've typed elsewhere in the same row.
+    .category-label {
+      white-space: nowrap;
+      flex-shrink: 0;
+      // "A little space after the heading" -- Helen, 2026-08-03. On top of
+      // the row's own $space-md gap (label to input to clear button,
+      // uniformly), not instead of it -- this row specifically wanted more
+      // breathing room right after the label.
+      margin-right: $space-sm;
+    }
   }
 
   #ingredient-search-box {
@@ -730,6 +856,18 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     border-bottom: 1px solid lighten($color-clear-text, 25%);
     color: lighten($color-text, 12%);
     flex: 1;
+    // Text inputs get a non-zero intrinsic min-width from the browser
+    // (roughly the UA's default `size`), which flexbox respects unless
+    // told otherwise, so flex: 1 alone doesn't let this shrink past that
+    // floor. SEARCH MAIN INGREDIENTS is longer than I KNOW WHAT I WANT, so
+    // this row's label ate more space and pushed THIS input against its
+    // floor sooner, overflowing .search-input's own max-width further than
+    // the shorter-labelled row did — the two inputs ended at different
+    // points instead of both flush with their row's own right edge.
+    // Helen: "it would look tidiest if both search input fields ended in
+    // the same place." Standard fix for a flex item refusing to shrink to
+    // its container; matching override on #name-search-box below.
+    min-width: 0;
 
     &:focus {
       outline: none;
@@ -742,22 +880,15 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     }
   }
 
+  // Was a full duplicate of .btn-clear-inline's styling under an ID
+  // selector — outweighed the class-based rule (.category.search--
+  // ingredients .btn-clear-inline in the CONTROLS section above) by
+  // specificity no matter what that rule said, so the 2026-08-03 link
+  // unification silently had no effect here. Only margin-left survives:
+  // genuine layout (spacing next to the search input), not typography the
+  // class-based rule already owns.
   #ingredient-search-clear {
-    font-family: $font-headings;
-    font-size: 0.75rem;
-    font-weight: $weight-clear-font;
-    text-transform: lowercase;
-    letter-spacing: 0;
-    cursor: pointer;
-    text-decoration: underline;
-    color: $color-ingredient-active;
     margin-left: $space-md;
-    white-space: nowrap;
-    transition: opacity 0.1s ease-in-out;
-
-    &:hover {
-      opacity: 0.7;
-    }
   }
 
   .search-results {
@@ -791,6 +922,8 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     border-bottom: 1px solid lighten($color-clear-text, 25%);
     color: lighten($color-text, 12%);
     flex: 1;
+    // See #ingredient-search-box's own comment above.
+    min-width: 0;
 
     &:focus {
       outline: none;
@@ -803,30 +936,27 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     }
   }
 
+  // Same duplicate-ID story as #ingredient-search-clear above.
   #name-search-clear {
-    font-family: $font-headings;
-    font-size: 0.75rem;
-    font-weight: $weight-clear-font;
-    text-transform: lowercase;
-    letter-spacing: 0;
-    cursor: pointer;
-    text-decoration: underline;
-    color: $color-name-search-active;
     margin-left: $space-md;
-    white-space: nowrap;
-    transition: opacity 0.1s ease-in-out;
-
-    &:hover {
-      opacity: 0.7;
-    }
   }
 }
 
-// Active ingredient search button
+// Active ingredient search button — brought in line with the STAR/MOOD/
+// PRACTICALITIES active tag treatment above (2026-08-03, Helen: "apply the
+// same tag styling to active ingredient search tags, based on the green
+// obviously"): flat $color-text stroke, no shadow, category identity
+// carried only by .tag-shape's own lightened fill. Its .tag-shape slot is
+// added by JS (filters.js's ensureActiveIngredientShape()) rather than by
+// a template, since this button is built dynamically as you type — see the
+// comment there for why it's the only ingredient-search button that gets one.
 .search .btn-tag.btn-ingredient.active {
   @extend %btn-active-base;
-  color: $color-ingredient-active;
-  -webkit-text-stroke: 0.5px $color-ingredient-active;
+  background: none;
+  color: $color-text;
+  text-shadow: none;
+  -webkit-text-stroke: 0.6px $color-text;
+  .tag-shape { color: mix($color-ingredient-root, $color-white, 82%); }
 }
 
 // ============================================================================
@@ -835,26 +965,47 @@ $index-label-gap:   $space-md;   // a label to its own buttons
 // How badges and the clear-all button behave once a filter is on.
 
 // --- Matched state badges (when a filter is active) --------------------------
+// Text colour added 2026-08-03, same reasoning as the active filter buttons
+// above: near-black reads better than the category -active hue sitting on
+// top of the full-colour tape shape. No emboss/raised text-shadow any more
+// either (same date, same rule as the buttons above) — flat stroke, same
+// $color-text (not a category hue) and same 0.6px width as the buttons, so
+// the category identity lives only in .tag-shape's own fill, lightened
+// further again (mix with white, 12% -> 18%) to keep backing off the
+// loudness now that neither the shadow nor the stroke are carrying it.
 .recipe-list .badge.badge--matched {
   text-transform: uppercase;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.04em;
   padding: $space-xxs 0.65rem $space-xxs $space-sm;
+  color: $color-text;
+  text-shadow: none;
 
-  &.badge-star           { -webkit-text-stroke: 0.5px $color-star-active; }
-  &.badge-mood           { -webkit-text-stroke: 0.5px $color-mood-active; }
-  &.badge-practicalities { -webkit-text-stroke: 0.5px $color-practicalities-active; }
+  // .tag-shape back to (a lightened) full opacity (badge-star/mood/
+  // practicalities above tone the RESTING shape down to rgba(..., 0.4) —
+  // matching a filter still needs to pop against a page of otherwise-quiet
+  // pills). No more background-color: that was the pre-tape-shape fill,
+  // stale since the SVG shape itself is the visible fill now and sits
+  // UNDER it doing nothing.
+  &.badge-star           { -webkit-text-stroke: 0.6px $color-text; .tag-shape { color: mix($color-star-root, $color-white, 82%); } }
+  &.badge-mood           { -webkit-text-stroke: 0.6px $color-text; .tag-shape { color: mix($color-mood-root, $color-white, 82%); } }
+  &.badge-practicalities { -webkit-text-stroke: 0.6px $color-text; .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); } }
 }
 
+// Layers on top of a badge-star/mood/practicalities that's ALSO an
+// ingredient-search hit — .tag-shape colour is already handled by that
+// category's own .badge--matched rule above, since this selector has no way
+// to know which category it is. Same text treatment as every other matched
+// state: near-black, flat stroke, no stale background-color.
 .recipe-list .badge.badge--matched.badge-ingredient-hit {
   text-transform: uppercase;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.04em;
-  -webkit-text-stroke: 0.5px $color-ingredient-active;
-  background-color: rgba($color-ingredient-root, $saturation-badge-bg);
-  color: $color-ingredient-active;
+  color: $color-text;
+  text-shadow: none;
+  -webkit-text-stroke: 0.6px $color-text;
 }
 
 // --- Global clear-all button (JS-created, prepended to .controls) -----

@@ -94,6 +94,19 @@ $weight-clear-font:  800;
 // Badge bgs
 $saturation-badge-bg:     0.1;
 
+// Recipe-row taxonomy pills (star/mood/practicalities badges) specifically —
+// separate from $saturation-badge-bg above, which is also used by the active
+// filter-button state (%btn-active-base) and the ingredient-hit badge. Those
+// are different elements with their own tuning history; giving the pills
+// their own dial means changing one doesn't strand a number tuned for the
+// other. Added 2026-08-03, Helen: the shared 0.1 read as too transparent for
+// the pills specifically. Matched state jumps further rather than changing
+// hue — same two-tier idea the deleted category-code bar used (a quiet
+// resting tint, a solid "this one" state), just carried by the pill's own
+// background now that the bar is gone.
+$saturation-tag-pill-bg:         0.22;
+$saturation-tag-pill-bg-matched: 0.42;
+
 // --- Recipe Page Utilities ---------------------------------------------------
 $color-white:                #ffffff;
 // The soft edge on the index filter labels. Derived from the text it outlines

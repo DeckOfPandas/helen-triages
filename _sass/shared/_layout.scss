@@ -143,6 +143,19 @@ $tape-protrusion: 0.2rem;
   // something else (cocktails' wider word) does instead -- the box gets
   // centered in extra space and the built-in right-bias becomes a shift.
   @include punched(raised);
+  // Default 1px emboss offset was getting swallowed by this element's own
+  // heavy 1.2px stroke -- Helen: "can HELEN TRIAGES be raised too... if it
+  // is already then we need to look at the colours." Traced to offset, not
+  // colour, once followed through: at 1px the shadow barely clears the
+  // stroke at all, so it read as a flat drop-shadow rather than a raised
+  // letter. Widened to 2px so it's clearly visible past the stroke; dark
+  // side also strengthened a little for the same reason (0.38 -> 0.5).
+  // Light side confirmed good at $color-bg, then finalised by Helen at a
+  // literal #dad7d8 -- a touch darker than $color-bg, giving the highlight
+  // a bit more presence than "invisible against the page" without tipping
+  // back into the stark-white territory the tag work ran into.
+  text-shadow: -2px -2px 0 #dad7d8,
+                2px  2px 0 rgba($color-text, 0.5);
 }
 
 .site-logo-tape {
@@ -202,13 +215,36 @@ $tape-protrusion: 0.2rem;
   font-weight: 1000;
   letter-spacing: 0.18em;
   color: $color-white;
-  -webkit-text-stroke: 0.8px rgba(230, 230, 230, 0.9);
+  // Stroke width dropped to 0 in Helen's final pass (2026-08-03) -- with
+  // the emboss itself doing the work below, the stroke was competing with
+  // it rather than adding definition. Colour left as-is in case a stroke
+  // comes back later.
+  -webkit-text-stroke: 0px rgba(230, 230, 230, 0.9);
   text-transform: uppercase;
   text-align: center;
   line-height: 1;
   padding: 0 1.4em;
   white-space: nowrap;
   @include punched(raised);
+  // The shared mixin's light side is $color-bg -- near-white, at full
+  // opacity. Every other punched(raised) element sits ON $color-bg, so that
+  // shadow is effectively invisible there; this is the first one sitting on
+  // a BLACK tape background instead, where it suddenly has real contrast to
+  // work with, and full-strength read as a stark white glow (Helen: "the
+  // lit side of FOOD needs to be softer than white... turn it down").
+  //
+  // Went through two intermediate attempts before landing here: a
+  // translucent light side read "fuzzy" instead of crisp (partial alpha
+  // over solid black antialiases into a halo); a solid-but-still-pale grey
+  // dark side never actually looked darker than the tape it sat on, because
+  // the tape SVG's fill is #0d0d0d and $color-text (#211f20) is a shade
+  // LIGHTER than that, so blending it never produced real recession. Helen
+  // tuned both sides directly in devtools instead of another guess: a
+  // darker, still-solid light side, and a dark side close to $color-text
+  // but pushed toward true black and nearly opaque, so it reads as
+  // genuinely darker than the tape rather than blending into it.
+  text-shadow: -1px -1px 0 rgb(139.5, 139, 139.25),
+                1px  1px 0 rgba(42, 41, 42, 0.9);
 
   .site-logo-bracket {
     letter-spacing: 0;

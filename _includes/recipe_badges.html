@@ -1,5 +1,5 @@
 {% if include.recipe.star_ingredient %}
-  <span class="badge badge-star">{{ include.recipe.star_ingredient }}</span>
+  <span class="badge badge-star"><span class="tag-shape" aria-hidden="true"></span>{{ include.recipe.star_ingredient }}</span>
 {% endif %}
 
 {% comment %} Group membership comes from _data/taxonomy.yml; the badge class is
@@ -14,7 +14,7 @@
 
   {% for tag in include.recipe.tags %}
     {% if group_tags contains tag %}
-      <span class="badge badge-{{ group.name }}">{{ tag }}</span>
+      <span class="badge badge-{{ group.name }}"><span class="tag-shape" aria-hidden="true"></span>{{ tag }}</span>
     {% endif %}
   {% endfor %}
 {% endfor %}

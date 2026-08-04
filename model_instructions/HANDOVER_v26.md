@@ -191,7 +191,7 @@ do this now:
 |---|---|---|
 | `assets/js/ingredient-search.js` | The matching/ranking algorithm | `tests/js/ingredient-search.test.js`, 11 checks |
 | `assets/js/recipe-list.js` | Shuffle (Fisher-Yates) and pagination maths | `tests/js/recipe-list.test.js`, 9 checks |
-| `assets/js/filters.js` | DOM wiring for all of the above, plus the category-code bar's is-lit logic (reads badge classes off actual elements — no DOM-free version of that one is worth extracting) | Not directly tested; exercised by hand |
+| `assets/js/filters.js` | DOM wiring for all of the above | Not directly tested; exercised by hand |
 
 `HTF.asset(path)` is for genuinely shared files; anything under a site's own
 image directory goes through `HTF.siteAsset(path)`, which builds the path
@@ -1046,7 +1046,7 @@ than a new effect invented each time.
 **Recipe page: five hues** (§13.2), colour as decoration, rationed.
 **Index page: five hues**, one per filter section, in page order: `$color-
 star-root` (STAR INGREDIENT), `$color-vivid-cerulean` (MOOD), `$color-
-aureolin` (PRACTICALITIES), `$color-pure-lime-green` (SEARCH INGREDIENTS),
+aureolin` (PRACTICALITIES), `$color-pure-lime-green` (SEARCH MAIN INGREDIENTS),
 `$color-hot-orange` (I KNOW WHAT I WANT). On the index colour is a CODE — each
 hue ties a section's rule to its filter buttons, active states, and badges,
 so it has to be learned and distinct. On the recipe page colour is
@@ -1063,8 +1063,8 @@ override.
 
 ### 13.6 The recipe list
 
-Each row: a category-code bar, then title, ingredient line, and pills — in
-that order, deliberately (§13.6.2).
+Each row: title, ingredient line, then pills — in that order, deliberately
+(§13.6.1).
 
 **Title** is `$font-headings` (Courier), lowercase, weight 600, 1rem. Weight
 400 and 500 render *identically* — Courier New only ships Regular and Bold as
@@ -1080,58 +1080,20 @@ CSS mask** — a percentage-based or always-on fade was tried first and
 visibly faded short, complete lines that were never actually truncated; CSS
 alone has no selector for "this box's content overflowed it."
 
-#### 13.6.1 The category-code bar
+A row used to open with a "category-code bar" — five squares showing which
+of the five filter categories that recipe hit, lit or unlit. Removed
+2026-08-03: four rounds of tuning (colours, then alpha, then per-hue darken
+values) and Helen still didn't love it — see git history
+(`.recipe-row-code` in `_layout.scss`/`food/index.html`, the "Category-code
+bars" block in `filters.js`) if reviving the idea. The `data-tags`/
+`data-star`/`data-ingredients`/`data-meta-*` attributes on each `<li>` stay
+— those drive actual filtering, not the bar.
 
-Five squares, stacked top to bottom, filling the row's full height between
-them — `flex: 1` in a column so the five split whatever height that row's
-content gives it, `aspect-ratio: 1` so width tracks the computed height
-rather than a fixed pixel value that would be wrong for every row of a
-different height. `align-items: flex-start` on the container is required for
-the ratio to take effect — default stretch would otherwise force each
-segment to the container's width and override it.
-
-**All five always render**, in the fixed order star/mood/practicalities/
-ingredient/name-search, whether or not the recipe has anything in that
-category. Two rejected alternatives, recorded so they aren't retried:
-
-- *Only render segments the recipe actually has something in* — meant a
-  bar's length AND the position of each colour within it both varied row to
-  row, so "third square = yellow" was only true on rows where star and mood
-  happened to be present too. Always-five makes it a fixed, learnable legend.
-- *Light a segment only when an active filter currently matches it*, no
-  unlit state at all — under AND-filtering every row left visible by a
-  filter already satisfies it by definition, so every visible row's bar for
-  an active category was identically lit. Uniform colour carries no
-  information; it's noise.
-
-**Two tiers, one hue each, no darkened intermediate token.** Unlit = the root
-hue darkened a little (`$bar-unlit-darken-*`) and made somewhat transparent
-(`$bar-unlit-alpha-*`), lit = the true root colour at `$bar-lit-alpha`
-(0.88). Both **per-hue**, not one number for all five — the same darken or
-alpha reads differently depending where a hue starts (aureolin is nearly as
-light as a colour gets; darkening it the same amount as magenta reads
-completely differently). This replaced an earlier version using the
-palette's `-active` tokens, which are tuned for *text sitting on a fill* —
-correct for badge lettering, wrong for a bare swatch, where it just read as
-dark, and darkening several warm hues together pulled them toward the same
-muddy brown, undermining the one thing a colour code can't afford: two
-categories becoming hard to tell apart. A 1px inset box-shadow gives the
-lightest hues (aureolin, lime) edge definition against `$color-bg` without
-touching the fill itself.
-
-`filters.js` lights a segment by reading the `badge--matched`/
-`ingredient--matched` state it already computes for the pills, not by
-re-deriving tag matching a second time — star/mood/practicalities read
-badge classes; ingredient and name-search have no badge to read (main_
-ingredients and the title aren't rendered as badges) so those two are
-matched inline against `activeIngredient`/`nameQuery`.
-
-#### 13.6.2 Row order and why
+#### 13.6.1 Row order and why
 
 Title, then ingredients, then pills — ingredients outrank pills because they
 carry the recall-lookup case ("the one with the sorrel") the search exists
-to serve; pills are more useful at filter-time (§13.6.1 already does that
-job visually) than at browse-time.
+to serve; pills matter more at filter-time than at browse-time.
 
 ### 13.7 Results heading, pagination, shuffle
 

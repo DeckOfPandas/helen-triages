@@ -5,9 +5,7 @@
 // testable directly with Node (see tests/js/recipe-list.test.js) instead of
 // only checked by hand against a live page. filters.js still owns everything
 // DOM-shaped -- reading `items` off the page, re-appending them in shuffled
-// order, setting `li.style.display`. The category-code bar's is-lit logic
-// stayed in filters.js on purpose: it reads badge classes off actual DOM
-// elements, so there's no DOM-free version of it worth extracting.
+// order, setting `li.style.display`.
 //
 // Loaded two ways from the one file, no bundler:
 //   - In the browser, as a plain <script> before filters.js, attaching to

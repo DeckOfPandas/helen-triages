@@ -11,6 +11,7 @@
 //   .tape-bg                   masking tape behind the site logo
 //   .site-footer-hearts        footer hearts
 //   .annotation-mark           hand-drawn sparkles beside a tip/note
+//   .tag-shape                 torn-tape shape behind a tag pill/filter button
 //
 // Two more lived here until 2026-08-01. `.watercolour-brush-slot` drew the
 // brush washes, which the blocky rule replaced on both pages; `[data-index-doodle]`
@@ -152,9 +153,130 @@
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // Tag shapes — the torn-tape background behind a recipe-row pill or a
+  // STAR/MOOD/PRACTICALITIES filter button (index page only; a no-op
+  // elsewhere since .tag-shape only appears in that markup).
+  //
+  // Assigned by a deterministic hash of the tag's own text, not randomly and
+  // not by position — the same tag gets the same shape everywhere it
+  // appears (a filter button and a recipe-row pill for "greens" match),
+  // which is the whole point (Helen: "this will give some visual stability
+  // between the filter section and the recipe list section"). Random or
+  // per-position picks would both break that.
+  //
+  // POOL, not all 18: with both the original and flip of every shape in
+  // play, a row mixed torn-left-clean-right shapes with their mirror image
+  // at random, which read as "drunken" (Helen, 2026-08-03) rather than
+  // varied — most of these were evidently drawn with the same consistent
+  // hand motion, so the originals mostly already agree with each other on
+  // which end is torn vs clean, and flipping half of them at random is what
+  // broke that agreement, not the individual shapes themselves. Kept every
+  // original; shape 4 also keeps its flip, since torn evenly at both ends
+  // it reads as genuinely symmetric rather than pointing either way.
+  //
+  // Shape 8 dropped entirely 2026-08-03 — Helen's read on "root veg" and
+  // "shellfish" (both landed on it): too diagonal next to the rest of the
+  // set, and with nine other options there was no need to keep it. Shape 9
+  // is a wedge with a diagonal that spans the shape's FULL width, unlike
+  // the others, where the torn/ragged detail is concentrated at the ends
+  // and the middle stretches safely — stretched to a very narrow pill, that
+  // diagonal reads as a much steeper, near-vertical cut than it does at
+  // full width, so it's excluded for short tag text specifically rather
+  // than dropped outright; it still gets used on longer tags where it
+  // stretches fine.
+  //
+  // None of the unwired shapes (1, 2, 3, 5, 6, 7, 8, 9-flip) are deleted
+  // from doodles/ — still real files, just not in this pool, in case any of
+  // these calls needs revisiting.
+  function tagShapes() {
+    var slots = document.querySelectorAll('.tag-shape');
+    if (!slots.length) return;
+
+    var SHORT_TEXT_MAX = 6;
+    var POOL = [
+      'tag-shape-1', 'tag-shape-2', 'tag-shape-3',
+      'tag-shape-4', 'tag-shape-4-flip',
+      'tag-shape-5', 'tag-shape-6', 'tag-shape-7', 'tag-shape-9'
+    ];
+
+    function pickShape(text) {
+      var pool = POOL;
+      if (text.length <= SHORT_TEXT_MAX) {
+        pool = pool.filter(function (name) { return name.indexOf('tag-shape-9') !== 0; });
+      }
+      var hash = 0;
+      for (var i = 0; i < text.length; i++) {
+        hash = (hash * 31 + text.charCodeAt(i)) | 0;
+      }
+      return pool[Math.abs(hash) % pool.length];
+    }
+
+    // A title hit is an arbitrary substring of whatever's currently typed —
+    // it changes every keystroke, so the hash-based pool's whole point
+    // (the SAME tag always gets the SAME shape everywhere it appears) has
+    // no meaning here; there's no stable "tag identity" to be consistent
+    // about. One fixed shape instead, chosen deliberately rather than left
+    // to the hash — Helen, 2026-08-04, assumed it already had been ("I
+    // expect you chose the highlighter shape deliberately") and asked for
+    // one "slightly less square at the ends." It hadn't been picked at
+    // all; rendered every candidate in the pool to a PNG at this exact
+    // narrow width to actually look before choosing. tag-shape-6 has a
+    // genuinely jagged, organic tear at one end rather than a straight or
+    // notched-rectangular cut, which reads least "square" of the set —
+    // tag-shape-5 was the opposite extreme, essentially a flat rectangle.
+    var TITLE_HIT_SHAPE = 'tag-shape-6';
+
+    slots.forEach(function (slot) {
+      // .ingredient-pill and .title-hit added 2026-08-04 -- both got a
+      // .tag-shape slot the same way badges and buttons do, but this list
+      // was never updated to match, so `host` came back null and the guard
+      // below silently skipped them: no shape ever fetched, no fill ever
+      // shown (Helen: "There's no fill though, just the scratched,
+      // capitalised font"). Same bug for both, just more obvious on
+      // .title-hit sitting on the plain page background than on
+      // .ingredient-pill's already-busier row.
+      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit');
+      var text = (host ? host.textContent : '').trim().toLowerCase();
+      if (!text) return;
+
+      var shape;
+      if (host.classList.contains('title-hit')) {
+        shape = TITLE_HIT_SHAPE;
+      } else {
+        shape = pickShape(text);
+        // tag-shape-2's torn top-left corner reads fine at most widths but
+        // draws the eye on a wide pill -- stretched further via the
+        // --stretch modifier (see .tag-shape in _layout.scss) rather than
+        // dropped from the pool, since it's genuinely fine at other widths
+        // (Helen: fine for "duck", not fine for "make-ahead", same shape).
+        // Gated on the same SHORT_TEXT_MAX cutoff used above: duck is short
+        // text and was never the problem, so it must never pick this class
+        // up just because it happens to land on the same shape as
+        // make-ahead.
+        if (shape === 'tag-shape-2' && text.length > SHORT_TEXT_MAX) {
+          slot.classList.add('tag-shape--stretch');
+        }
+      }
+
+      var url = HTF.siteAsset('/doodles/' + shape + '.svg');
+      if (!url) return;
+      HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
+    });
+  }
+
+  // Exposed so filters.js can re-run it after creating a .tag-shape slot of
+  // its own — the active ingredient-search tag is built by JS, after this
+  // file's own one-time pass over the page has already happened, so nothing
+  // would ever fill that slot in without a way to ask for another pass.
+  // Safe to call repeatedly: fetchSvg caches by URL (assets.js), so re-scanning
+  // slots that already have their shape costs no extra network activity.
+  HTF.tagShapes = tagShapes;
+
   highlighters();
   tape();
   footerDecoration();
   annotationMarks();
+  tagShapes();
 
 })();

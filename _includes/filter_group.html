@@ -23,7 +23,7 @@
   </div>
   <div class="category-buttons">
     {% for item in include.items %}
-      <button type="button" class="{{ include.btn_class }}" aria-pressed="false" {{ include.data_attr }}="{{ item }}">{{ item }}</button>
+      <button type="button" class="{{ include.btn_class }}" aria-pressed="false" {{ include.data_attr }}="{{ item }}"><span class="tag-shape" aria-hidden="true"></span>{{ item }}</button>
     {% endfor %}
   </div>
 </div>

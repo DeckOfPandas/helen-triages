@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', function () {
   // screen rather than the page's original load-time order.
   var items = Array.from(document.querySelectorAll('.recipe-list li'));
 
+  // Original, unmarked-up title text per link, read once. updateTitleHighlights()
+  // always rebuilds from this rather than the link's current (possibly already
+  // wrapped) textContent, so re-running it on every keystroke never compounds.
+  var titleLinks = Array.from(document.querySelectorAll('.recipe-title-link'));
+  titleLinks.forEach(function (a) { a.dataset.titleText = a.textContent; });
+
   var matrix = document.querySelector('.controls');
   var recipeList = document.querySelector('.recipe-list');
   var clearButton = null;
@@ -122,10 +128,73 @@ document.addEventListener('DOMContentLoaded', function () {
     return btn;
   }
 
+  // The tape-shape treatment other active filters get (STAR/MOOD/
+  // PRACTICALITIES) needs a .tag-shape slot in the markup, same as
+  // _includes/filter_group.html adds for those. Ingredient buttons are all
+  // built by makeIngredientButton() above with no slot at all, deliberately
+  // — a shape on every one of an unbounded swarm of search results would be
+  // exactly the "count is unbounded" noise .btn-ingredient--word-match's own
+  // comment already argues against. Only the ONE active button (Helen:
+  // "apply the same tag styling to active ingredient search tags") gets a
+  // slot, added here rather than at creation time since which button ends
+  // up active isn't always known yet when it's built (renderResultsPool's
+  // narrow-to-one-match case sets .active on an already-built button).
+  function ensureActiveIngredientShape() {
+    if (!matrix) return;
+    var activeBtn = matrix.querySelector('.btn-ingredient.active');
+    if (!activeBtn) return;
+    if (!activeBtn.querySelector('.tag-shape')) {
+      var shape = document.createElement('span');
+      shape.className = 'tag-shape';
+      shape.setAttribute('aria-hidden', 'true');
+      activeBtn.insertBefore(shape, activeBtn.firstChild);
+    }
+    if (window.HTF && HTF.tagShapes) HTF.tagShapes();
+  }
+
   function updateIngredientClear() {
     if (ingredientClear) {
-      ingredientClear.style.display = (activeIngredient || (searchBox && searchBox.value.trim())) ? 'inline-block' : 'none';
+      // visibility, not display -- see the button's own comment in
+      // food/index.html. Toggling display added/removed it from the flex
+      // row entirely, so the input's rendered width jumped the instant it
+      // appeared instead of the clear link calmly sitting in space that
+      // was already there (Helen: "the clear link appears cutting off the
+      // field rather than to the right of it").
+      ingredientClear.style.visibility = (activeIngredient || (searchBox && searchBox.value.trim())) ? 'visible' : 'hidden';
     }
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // Wraps the substring of each recipe title that matches nameQuery in a
+  // .title-hit span, same "same tag styling" idea as the ingredient pills
+  // above -- Helen's stretch goal: "could the part of the title hit gain
+  // the orange background and scratchy, capitalised lettering." Only the
+  // MATCHED substring gets the treatment, not the whole title, so this
+  // rebuilds from the original text (stashed once, above) every time
+  // rather than patching whatever's currently in the DOM.
+  function updateTitleHighlights() {
+    titleLinks.forEach(function (a) {
+      var original = a.dataset.titleText;
+      if (!nameQuery) {
+        a.textContent = original;
+        return;
+      }
+      var idx = original.toLowerCase().indexOf(nameQuery);
+      if (idx === -1) {
+        a.textContent = original;
+        return;
+      }
+      var before = original.slice(0, idx);
+      var hit = original.slice(idx, idx + nameQuery.length);
+      var after = original.slice(idx + nameQuery.length);
+      a.innerHTML = escapeHtml(before) +
+        '<mark class="title-hit"><span class="tag-shape" aria-hidden="true"></span>' + escapeHtml(hit) + '</mark>' +
+        escapeHtml(after);
+    });
+    if (nameQuery && window.HTF && HTF.tagShapes) HTF.tagShapes();
   }
 
 
@@ -163,6 +232,7 @@ function renderResultsPool() {
     onlyBtn.classList.add('active');
     isSearching = false;
   }
+  ensureActiveIngredientShape();
   update();
   updateIngredientClear();
 }
@@ -207,6 +277,8 @@ function renderResultsPool() {
     var totalPages = 1;
     var suppressList = isSearching && !hasActiveFilters();
     if (recipeList) recipeList.style.display = suppressList ? 'none' : '';
+
+    updateTitleHighlights();
 
     if (!suppressList) {
       var matchingLis = [];
@@ -293,7 +365,16 @@ function renderResultsPool() {
       : [];
     document.querySelectorAll('.recipe-list .ingredient-pill').forEach(function(pill) {
       pill.classList.remove('ingredient--matched');
-      if (!activeKey2) return;
+      if (!activeKey2) {
+        // Strip any shape left from a previous match -- .ingredient-pill
+        // has no default .tag-shape colour of its own (unlike .badge/
+        // .btn-tag), so an orphaned slot here would render at whatever
+        // colour this pill's own text is, a faint stray shape behind
+        // ordinary unmatched text.
+        var stale = pill.querySelector('.tag-shape');
+        if (stale) stale.remove();
+        return;
+      }
       var pillText = pill.textContent.trim().toLowerCase();
       var matches;
       if (activeSynonyms2) {
@@ -304,31 +385,17 @@ function renderResultsPool() {
           return pillWords.some(function(pw) { return pw.indexOf(aw) !== -1; });
         });
       }
-      if (matches) pill.classList.add('ingredient--matched');
-    });
-
-    // Category-code bars: lit only when this row is currently MATCHED in
-    // that category, not merely tagged. Runs after both matching passes
-    // above so their DOM state (badge--matched, ingredient--matched) is
-    // fresh to read off rather than re-deriving the same matching logic a
-    // third time. star/mood/practicalities read badges; ingredient and
-    // name-search have no badge to read (main_ingredients and the title
-    // aren't rendered as badges), so those two are worked out directly.
-    items.forEach(function(li) {
-      li.querySelectorAll('.recipe-row-code__seg').forEach(function(seg) {
-        var cat = seg.dataset.category;
-        var hit;
-        if (cat === 'ingredient') {
-          hit = !!activeIngredient && li.querySelector('.ingredient-pill.ingredient--matched') !== null;
-        } else if (cat === 'name-search') {
-          var rowTitle = (li.querySelector('a') || {}).textContent || '';
-          hit = !!nameQuery && rowTitle.toLowerCase().indexOf(nameQuery) !== -1;
-        } else {
-          hit = li.querySelector('.badge-' + cat + '.badge--matched') !== null;
+      if (matches) {
+        pill.classList.add('ingredient--matched');
+        if (!pill.querySelector('.tag-shape')) {
+          var shape = document.createElement('span');
+          shape.className = 'tag-shape';
+          shape.setAttribute('aria-hidden', 'true');
+          pill.insertBefore(shape, pill.firstChild);
         }
-        seg.classList.toggle('is-lit', hit);
-      });
+      }
     });
+    if (activeKey2 && window.HTF && HTF.tagShapes) HTF.tagShapes();
 
     var emptyMessage = document.querySelector('.recipe-list-empty');
     emptyMessage.style.display = (!suppressList && visibleCount === 0) ? 'block' : 'none';
@@ -338,12 +405,13 @@ function renderResultsPool() {
 
     if (clearButton) {
       clearButton.style.visibility = (activeTags.size > 0 || activeStar || activeIngredient || activeMetaFilters.size > 0) ? 'visible' : 'hidden';
-      if (nameSearchClear) nameSearchClear.style.display = nameQuery ? 'inline' : 'none';
+      // visibility, not display -- same reasoning as ingredientClear above.
+      if (nameSearchClear) nameSearchClear.style.visibility = nameQuery ? 'visible' : 'hidden';
     }
 
     var recipeCountEl = document.getElementById('recipe-count');
     if (recipeCountEl && !suppressList) {
-      recipeCountEl.textContent = visibleCount + (visibleCount === 1 ? ' recipe' : ' recipes');
+      recipeCountEl.textContent = visibleCount + (visibleCount === 1 ? ' survivor' : ' survivors');
     }
 
     // Hidden entirely once showAll is set, not just its prev/next disabled --
@@ -447,6 +515,8 @@ function renderResultsPool() {
           activeIngredient = null;
           isSearching = true;
           target.classList.remove('active');
+          var staleShape = target.querySelector('.tag-shape');
+          if (staleShape) staleShape.remove();
         } else {
           activeIngredient = ing;
           isSearching = false;
@@ -456,6 +526,7 @@ function renderResultsPool() {
           resultsPool.appendChild(target);
           matrix.querySelectorAll('.btn-ingredient').forEach(function(b) { b.classList.remove('active'); });
           target.classList.add('active');
+          ensureActiveIngredientShape();
         }
         update();
         return;
@@ -474,7 +545,7 @@ function renderResultsPool() {
     nameSearchClear.addEventListener('click', function() {
       nameQuery = '';
       nameSearchBox.value = '';
-      nameSearchClear.style.display = 'none';
+      nameSearchClear.style.visibility = 'hidden';
       update();
     });
   }
@@ -489,7 +560,7 @@ function renderResultsPool() {
       isSearching = false;
       if (searchBox) searchBox.value = '';
       if (nameSearchBox) nameSearchBox.value = '';
-      if (nameSearchClear) nameSearchClear.style.display = 'none';
+      if (nameSearchClear) nameSearchClear.style.visibility = 'hidden';
       if (resultsPool) resultsPool.innerHTML = '';
       if (matrix) {
         matrix.querySelectorAll('.btn-tag, .btn-star, .btn-meta').forEach(function(btn) {
