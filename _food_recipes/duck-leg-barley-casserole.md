@@ -54,7 +54,7 @@ method:
   - "Cover and simmer again for about 1 hour, to taste."
   - "Check the seasoning."
   - step: "Add the mushrooms 20 mins before the end."
-    tip: "Add them too early and they'll turn to mush."
+    note: "Add them too early and they'll turn to mush."
   - "At the end, the meat will fall off the bones when you remove them."
 method_short:
   - ""

@@ -23,7 +23,7 @@ ingredient_groups:
       item: baking powder
     - amount: "9 oz"
       item: "glace cherries, quartered, washed and dried"
-      tip: "The cherries must be perfectly dry and non-sticky — if they aren't, they'll sink."
+      note: "The cherries must be perfectly dry and non-sticky — if they aren't, they'll sink."
     - amount: "4 oz"
       item: ground almonds
     - amount: "2 tbsp"

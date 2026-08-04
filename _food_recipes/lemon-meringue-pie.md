@@ -39,7 +39,7 @@ method:
   - "Beat the egg whites with a pinch of cream of tartar until soft peaks form."
   - "Beat in the sugar bit by bit until the mixture is stiff and shiny but not dry."
   - step: "Spread the meringue over the filling."
-    tip: "Don't worry about smoothing it off too much — crests at different heights catch the heat differently to attractive effect."
+    note: "Don't worry about smoothing it off too much — crests at different heights catch the heat differently to attractive effect."
   - "Bake at 200°C for 25 mins, then take out of oven and leave to cool in the dish for at least 30 mins before eating."
 method_short:
   - ""

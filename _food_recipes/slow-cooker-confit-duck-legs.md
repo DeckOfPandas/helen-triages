@@ -26,7 +26,7 @@ method:
   - "Transfer legs into a loaf pan and cover with the rendered fat."
   - "Cook within a day or two, or longer if totally covered in fat."
   - step: "To finish: pan fry on medium-high heat in a cast iron skillet with no oil, until golden brown and crispy — 4–5 mins skin side, then 1–2 mins other side."
-    tip: "Turn carefully — the skin is fragile."
+    note: "Turn carefully — the skin is fragile."
 method_short:
   - ""
 # notes:

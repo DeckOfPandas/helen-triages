@@ -166,12 +166,12 @@ $color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
 //   2. $color-section-underline    the upper rule under the section names
 //   3. $color-section-underline-2  the lower rule under them, and (since
 //                                  2026-08-03) the hand-drawn arrow beside
-//                                  an ingredient/step tip or note — see
+//                                  an ingredient/step note — see
 //                                  .annotation-mark in _recipe.scss
 //   4. $color-aureolin             the highlighter on ingredient amounts
 //
 // Everything else is text, $color-clear-text or $color-border — the whole of
-// the method, the notes, the tips and the boxes are monochrome apart from a
+// the method, the notes and the boxes are monochrome apart from a
 // link inside them. The colour is on what you NAVIGATE by and off what you
 // READ, which is what "colour, but more sparing" turned out to mean — a link
 // fits the NAVIGATE side of that line, even mid-sentence, because it takes
