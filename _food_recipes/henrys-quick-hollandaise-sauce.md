@@ -51,7 +51,7 @@ And a note on food safety: this is a warm, barely-cooked egg yolk sauce meant to
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
 
-- **Use a heavy-bottomed saucepan for the butter**. If it gets away from you and browns, you won't end up with Hollandaise, but maybe something from an achingly cool hipster cafe with things like "deconstructed organic sunlight in a Kilner jar" on the menu for £34. But in a bad way.
+- **Use a heavy-bottomed saucepan for the butter**. If it gets away from you and browns, you won't end up with Hollandaise, but maybe something from an achingly cool hipster café with things like "deconstructed organic sunlight in a Kilner jar" on the menu for £34. But in a bad way.
 - **Trust the science of cooling**. It hasn't failed to set until it's finger-warm and still not set. 
 - **Whisk manually with a balloon whisk for better control of texture**. You want a classic, glossy, velvety finish rather than over-aerated foam. There's a higher chance of splitting with an electric whisk because the high speed can break the emulsion before it has had time to form, compromising stability. Furthermore, with an electric beater you'll have poor bowl contact compared with the manual approach. Think of it as free gym. 
 - **Use clarified butter**. Whole butter carries in about 15% water and milk solids before you've even started — you can get away with it, but you're gifting your already-narrow emulsion even less room for error. Clarifying your butter first gives a slightly bigger safety net.

@@ -3,7 +3,14 @@ document.addEventListener('DOMContentLoaded', function () {
   var activeStar = null;
   var activeIngredient = null;
   var activeMetaFilters = new Set();
-  var nameQuery = ''; // 'rewrite' and/or 'proofread'
+  // Folded (accents stripped, HTF.ingredientSearch.fold) and lowercased, same
+  // treatment ingredient-search.js already gives its own query -- GitHub
+  // issue #45: typing "creme brulee" found nothing against a title that
+  // actually reads "Crème Brûlée". Every match against a title (here and in
+  // updateTitleHighlights() below) folds that title's text the same way
+  // before comparing, so an accented title still matches an unaccented
+  // query and vice versa; the title itself is never folded for display.
+  var nameQuery = '';
   var isSearching = false;
 
   var PAGE_SIZE = 20;
@@ -182,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
         a.textContent = original;
         return;
       }
-      var idx = original.toLowerCase().indexOf(nameQuery);
+      var idx = HTF.ingredientSearch.fold(original.toLowerCase()).indexOf(nameQuery);
       if (idx === -1) {
         a.textContent = original;
         return;
@@ -297,7 +304,7 @@ function renderResultsPool() {
 
         if (nameQuery) {
           var title = (li.querySelector('a') || {}).textContent || '';
-          if (title.toLowerCase().indexOf(nameQuery) === -1) visible = false;
+          if (HTF.ingredientSearch.fold(title.toLowerCase()).indexOf(nameQuery) === -1) visible = false;
         }
 
         if (activeMetaFilters.has('rewrite') && li.dataset.metaRewrite !== 'true') visible = false;
@@ -536,7 +543,7 @@ function renderResultsPool() {
 
   if (nameSearchBox) {
     nameSearchBox.addEventListener('input', function() {
-      nameQuery = nameSearchBox.value.trim().toLowerCase();
+      nameQuery = HTF.ingredientSearch.fold(nameSearchBox.value.trim().toLowerCase());
       update();
     });
   }

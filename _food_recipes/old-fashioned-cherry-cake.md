@@ -6,7 +6,7 @@ source: Grandma Kath
 makes: "one 8-inch round cake"
 prep_time: "10 mins"
 cook_time: "1 hr 30 mins"
-main_ingredients: ["glace cherries", "ground almonds", butter, eggs, flour, "caster sugar", demerara sugar]
+main_ingredients: ["glacé cherries", "ground almonds", butter, eggs, flour, "caster sugar", demerara sugar]
 star_ingredient: fruit
 tags: [bakes]
 ingredient_groups:
@@ -22,7 +22,7 @@ ingredient_groups:
     - amount: "½ tsp"
       item: baking powder
     - amount: "9 oz"
-      item: "glace cherries, quartered, washed and dried"
+      item: "glacé cherries, quartered, washed and dried"
       note: "The cherries must be perfectly dry and non-sticky — if they aren't, they'll sink."
     - amount: "4 oz"
       item: ground almonds
