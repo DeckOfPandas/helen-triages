@@ -172,26 +172,31 @@ def test_flour_and_sugar_specify_type(recipe):
     )
 
 
-# Helen: "light brown muscovado sugar" and "dark brown muscovado sugar" are
-# both permitted alongside the default "soft brown sugar" -- muscovado is a
-# real, distinct product, not just a wordier way of saying the same thing.
+# Same under-specification problem as bare `flour`/`sugar` above, not a
+# wording preference: light/dark is a required qualifier, not optional
+# decoration, so bare "soft brown sugar" is NOT in this list -- Helen: the
+# allowed names are "light soft brown sugar" and "dark soft brown sugar".
+# Muscovado is a real, distinct product (also always light/dark-qualified),
+# not just a wordier way of saying the same thing, so it gets its own two
+# entries rather than being folded into the soft-brown-sugar names.
 # Allowed as the ingredient's own name, optionally after a leading quantity
 # ("~2 tbsp dark brown muscovado sugar") that isn't in a proper `amount:`
 # field -- that's a separate, unrelated data-placement question.
 _BROWN_SUGAR_OK = re.compile(
     r"(?:^|\d[\d./½¼¾⅓⅔]*\s*(?:tbsp|tsp|g|kg|ml|l|oz|lb)?\s+)"
-    r"(soft brown sugar|light brown muscovado sugar|dark brown muscovado sugar)$",
+    r"(light soft brown sugar|dark soft brown sugar"
+    r"|light brown muscovado sugar|dark brown muscovado sugar)$",
     re.I,
 )
 
 
 def test_brown_sugar_is_soft_brown_sugar(recipe):
-    """GitHub issue #79: "light brown sugar", "light soft brown sugar"...
-    everything except the three names in _BROWN_SUGAR_OK is non-standard.
-    Checks the ingredient's own name (up to the first comma/parenthesis),
-    not just that an allowed phrase appears somewhere in it -- "light soft
-    brown sugar" contains "soft brown sugar" as a substring but is still a
-    different, non-standard name.
+    """GitHub issue #79: "brown sugar", "dark brown soft sugar"... everything
+    except the four names in _BROWN_SUGAR_OK is non-standard, including bare
+    "soft brown sugar" with no light/dark qualifier. Checks the ingredient's
+    own name (up to the first comma/parenthesis), not just that an allowed
+    phrase appears somewhere in it -- "light brown soft sugar" contains
+    "brown sugar" as a substring but the words are in the wrong order.
     """
     bad = []
     for item in recipe.ingredient_items:
@@ -201,8 +206,8 @@ def test_brown_sugar_is_soft_brown_sugar(recipe):
                 bad.append(item)
     assert not bad, (
         f"{where(recipe)} has non-standard brown sugar name(s) {bad!r}. "
-        f"Allowed: soft brown sugar, light brown muscovado sugar, dark "
-        f"brown muscovado sugar."
+        f"Allowed: light soft brown sugar, dark soft brown sugar, light "
+        f"brown muscovado sugar, dark brown muscovado sugar."
     )
 
 
