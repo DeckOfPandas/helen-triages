@@ -475,10 +475,10 @@ $method-group-step-indent: $space-xxl + $space-lg;
       // part of the step's own text, not as a second heading style.
       //
       // top: nudges the number down to align with the first line of body
-      // text. Was $space-xxs (0.15rem) under $font-headings -- too high.
-      // 0.3rem after the font switch overshot the other way -- too low.
-      // Splitting the difference; still a guess, look again.
-      top: 0.22rem;
+      // text. 0.15rem (round 1) too high, 0.3rem (round 2) too low, 0.22rem
+      // (round 3) still slightly low -- 0.16rem is Helen's own eyeballed
+      // final value.
+      top: 0.16rem;
       font-family: $font-body;
       font-weight: 700;
       color: $color-step-number;
