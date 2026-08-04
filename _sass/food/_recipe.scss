@@ -416,6 +416,25 @@ $method-step-number-column: 2.4rem + 0.9rem;
   &::before { left: $space-xxl; }
 }
 
+// GitHub issue #57: a tip/note adds real height inside a step's own <li>,
+// but the flat margin-bottom every step gets (below, $space-xl) doesn't
+// account for that -- fine most of the time, since the next thing is just
+// another step, but when the annotated step is the LAST one before a
+// section boundary -- the next method group's heading, or the end of
+// Method itself -- that flat gap reads as crowding whatever follows,
+// rather than a clear "this block is done." Covers both boundaries Helen
+// confirmed she wants: immediately before a group heading, via the
+// adjacent-sibling check, and the very end of the list, via :last-child
+// (safe as "the last step in a group is also the last child of
+// .method-full" only when it's the LAST group too, which :last-child
+// alone already guarantees).
+.method-full li.step:has(.step-annotation) {
+  &:has(+ li.method-group-heading-item),
+  &:last-child {
+    margin-bottom: $space-xxl;
+  }
+}
+
 .method-full {
   counter-reset: step-counter;
   margin-top: $space-sm;
