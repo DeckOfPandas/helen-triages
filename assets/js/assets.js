@@ -78,10 +78,24 @@ window.HTF = window.HTF || {};
 
   // --- SVG loading -----------------------------------------------------------
   var cache = {};
+  // URLs with a fetch already in flight, each holding the callbacks still
+  // waiting on it. `cache` only gets written once a fetch RESOLVES, so
+  // without this, N callers asking for the same not-yet-cached URL before
+  // the first one resolves each saw a cache miss and fired their own
+  // fetch() -- harmless for one or two callers, but decorations.js's
+  // tagShapes() calls this once per .tag-shape slot, and a page can easily
+  // have 100+ of those sharing a pool of ~9 SVG files (Helen, 2026-08-04:
+  // the index page's ingredient pills took "up to 7 seconds" to fill in,
+  // "in groups" -- the classic signature of a browser's per-host connection
+  // cap queueing dozens of redundant requests for the same handful of
+  // files). Now the first caller for a URL starts the one real fetch and
+  // every other caller just joins its callback list.
+  var pending = {};
 
   /**
    * Fetch an SVG's source text and hand it to cb. Responses are cached, so
-   * repeated requests for the same URL cost one network call.
+   * repeated requests for the same URL cost one network call -- including
+   * concurrent requests that land before the first one has resolved.
    *
    * A failure warns with the URL and points at the likely cause. It does not
    * throw: decoration is not worth breaking a page for, but it IS worth saying
@@ -92,6 +106,8 @@ window.HTF = window.HTF || {};
    */
   HTF.fetchSvg = function (url, cb) {
     if (cache[url]) { cb(cache[url]); return; }
+    if (pending[url]) { pending[url].push(cb); return; }
+    pending[url] = [cb];
     fetch(url)
       .then(function (response) {
         if (!response.ok) {
@@ -101,9 +117,12 @@ window.HTF = window.HTF || {};
       })
       .then(function (text) {
         cache[url] = text;
-        cb(text);
+        var waiting = pending[url];
+        delete pending[url];
+        waiting.forEach(function (fn) { fn(text); });
       })
       .catch(function (error) {
+        delete pending[url];
         console.warn(
           'assets.js: could not load ' + url + ' — ' + error.message + '\n' +
           'If every decoration on the page is missing, the likely cause is ' +
