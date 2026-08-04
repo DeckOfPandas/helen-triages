@@ -59,8 +59,8 @@ layout: default
                   <span class="highlighter-slot" aria-hidden="true"></span>{{ amount_number }}{% if amount_unit != "" %} {{ amount_unit }}{% endif %}</span></span>
             {% endif %}
             {{ item.item | markdownify | remove: '<p>' | remove: '</p>' }}
-            {% if item.tip %}<span class="ingredient-annotation ingredient-annotation--tip"><span class="annotation-mark" aria-hidden="true"></span><span class="annotation-text">{{ item.tip | markdownify | remove: '<p>' | remove: '</p>' }}</span></span>{% endif %}
-            {% if item.note %}<span class="ingredient-annotation ingredient-annotation--note"><span class="annotation-mark" aria-hidden="true"></span><span class="annotation-text">{{ item.note | markdownify | remove: '<p>' | remove: '</p>' }}</span></span>{% endif %}
+            {% if item.tip %}<span class="ingredient-annotation ingredient-annotation--tip"><span class="annotation-mark" aria-hidden="true"></span>{{ item.tip | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
+            {% if item.note %}<span class="ingredient-annotation ingredient-annotation--note"><span class="annotation-mark" aria-hidden="true"></span>{{ item.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
           </li>
         {% else %}
           <li class="ingredient">{{ item | markdownify | remove: '<p>' | remove: '</p>' }}</li>

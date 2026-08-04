@@ -1017,23 +1017,27 @@ $annotation-arrow-gap: 0.9em;
   vertical-align: middle;
 }
 
-// GitHub issue #77: a long tip/note wrapping mid-word landed its second line
-// flush with the LI's own left edge, under the ingredient name rather than
-// under where the annotation text itself started -- because the bare text
-// after .annotation-mark was just inline content, wrapping as part of the
-// SAME line box as the ingredient name and amount, with no box of its own to
-// hang-indent against.
-//
-// display: inline-block gives it exactly that box, still placed inline right
-// after the arrow (so it can still share the ingredient's own line when
-// there's room -- the whole point of the comment above about not pulling
-// Helen's eye into a block-level aside). Once placed, EVERY line the text
-// wraps to is flush with THIS box's own left edge, not the LI's -- no
-// text-indent hack needed, since that edge no longer moves per line.
-.ingredient-annotation .annotation-text {
-  display: inline-block;
-  max-width: 90%;
-}
+// GitHub issue #77, reverted: tried display: inline-block on .annotation-text
+// so a wrapped continuation line would hang-indent to ITS OWN left edge
+// rather than the LI's. Broke a case Helen caught by screenshot -- a short
+// ingredient name (little room used on its line) followed by a long note:
+// the WHOLE box dropped to a fresh line, flush left under the ingredient
+// name, arrow left dangling at the end of the line above. Root cause:
+// inline-block sizes itself (shrink-to-fit, up to its max-width) against the
+// full containing block, not the space actually left on the current line
+// after the arrow -- so a long note computes a wide preferred width even
+// though it could have wrapped into the room available right after the
+// arrow, and a box that wide no longer fits there, so the whole thing (not
+// just the overflow) moves down as one atomic unit. Plain inline content
+// doesn't have this failure mode -- it just keeps flowing word by word from
+// wherever the arrow left off -- at the cost of the original ask: a wrapped
+// line still falls back to the LI's own edge, not the annotation's start.
+// No known pure-CSS fix keeps both a guaranteed same-line start (the
+// arrow-adjacent placement Helen wants) AND a hanging indent to a start
+// position that varies with the ingredient name's own length; the reliable
+// way to get the latter is measuring the actual rendered position in JS
+// (as decorations.js already does for shape/stretch decisions elsewhere)
+// and setting it as a custom property. Not done here -- ask first.
 
 // Violet, not magenta, for both marks above: magenta already carries the
 // title rule, the toggle and every link, so a magenta mark here read as one
