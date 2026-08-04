@@ -109,6 +109,15 @@ source). This is the actual gate; the private-repo split is what makes it
 safe to leave drafts sitting there unpromoted for as long as needed rather
 than a reason to promote them faster.
 
+**Practical consequence**: editing a file inside `_food_drafts/` or
+`_cocktail_drafts/` from *this* repo's working tree is completely normal
+and expected — Helen does it routinely — but `git status`/`git diff` in
+*this* repo will never show it, and `git add`/`git commit` here can't
+capture it either, because it's a different repo. That's not a sign
+anything went wrong or got lost; it's a separate, private history Helen
+manages on her own. Don't try to "fix" the missing tracking, and don't
+report draft edits as uncommitted/at-risk work in this repo.
+
 ### 2.2 Shared versus forked
 
 **Shared**, at the root, names neither site: `_layouts/default.html`;
