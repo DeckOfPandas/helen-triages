@@ -34,10 +34,10 @@ ingredient_groups:
     - amount: "1 tbsp"
       item: coarse mustard
 method:
-  - "Oil and season the chicken, then sear, turning often, 3–4 mins, until golden."
-  - "Sweat onions, carrots and celery in the chicken fat pan, for 10 mins or more until soft and golden. Add the garlic 2 mins before the end."
+  - "Oil and season the chicken, then sear, turning often, 3–4 mins, until golden. Remove."
+  - "Sweat the onions, carrots and celery in the chicken fat pan, for 10 mins or more until soft and golden. Add the garlic 2 mins before the end."
   - "Add the white wine without increasing the heat, leave for 2 mins, increase the heat, and let the wine bubble until almost all absorbed."
-  - "Add the stock and potatoes, season, then low boil for 5 mins."
+  - "Add the stock and potatoes, season, then low-boil for 5 mins."
   - "Add the chicken back to the pan, cover, and simmer for 5 mins, then add the beans, re-cover, and simmer for 5 mins more until the chicken and potatoes are cooked through."
   - step: "Once cooked, add the mustard and sorrel. Don't be shy with the sorrel. Check seasoning, then serve."
     tip: Sorrel quickly loses its flavour if overcooked so add it near the end.
@@ -51,7 +51,7 @@ method_short:
     * Mustard, sorrel, seasoning
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

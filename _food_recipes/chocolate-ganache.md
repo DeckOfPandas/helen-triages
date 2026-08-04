@@ -1,7 +1,7 @@
 ---
 title: Chocolate Ganache
 short_name: Chocolate Ganache
-tagline: "Ganache is a fickle mistress, but absolutely worth the effort. Recipe here is given for dark chocolate, but notes give ratios for milk or white."
+tagline: "Ganache is a fickle mistress, but a little bit of thought goes a long way. Recipe here is given for dark chocolate, but notes give ratios for milk or white."
 source: "A lifetime of grainy, oily, solid, inedible regret."
 makes: "N/A, bring a spoon"
 prep_time: 5 mins
@@ -20,10 +20,10 @@ ingredient_groups:
     - amount: "2 tbsp"
       item: icing sugar — optional — for a ganache that sets more firmly
 method:
-  - "Grate the chocolate (coarse chopping = bad) into a perfectly dry stainless steel bowl (water = bad, hotspots = bad)."
+  - "Grate the chocolate (coarse chopping = bad) into a perfectly dry stainless steel bowl (water = bad, hotspots = bad, see below)."
   - "Heat the cream gently in a pan to 88–90°C — it should look active, but DO NOT LET IT BOIL (over-heating = bad)."
   - Pour the heated cream over the grated chocolate. Wait 2–3 mins. The temperature will drop fast.
-  - "Stir gently from the centre using a perfectly dry silicone spatula (water = bad, accidental whipping = bad) until the temperature reaches 40–45°C. You'll see a visible change from muddy to glossy and thick — this is the emulsion forming."
+  - "Stir gently from the centre using a perfectly dry silicone spatula (water = bad, accidental whipping = bad, see below) until the temperature reaches 40–45°C. You'll see a visible change from muddy to glossy and thick — this is the emulsion forming."
   - Add the butter (and optional icing sugar) and stir until just incorporated. Add any other flavourings here too.
   - Stop stirring as soon as you can (over-stirring = bad).
   - |
@@ -43,13 +43,13 @@ method_short:
 notes:
   - label: "Ratios"
     text: "1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
-  - label: "Firmer set"
+  - label: "Setting"
     text: "Add 2 tbsp icing sugar for ganache that sets more firmly."
   - label: "Salt"
     text: "Season the cream with salt before heating — don't be shy, as this greatly enhances the chocolate flavour."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---
@@ -64,7 +64,9 @@ meta:
 <h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
 <p class="recipe-section-subtitle">a.k.a. ganache is the worst</p>
 
-Ganache is an emulsion of fat --- cocoa butter and dairy fat --- suspended in water from the cream. Here are four ways to get it wrong with likely causes:
+Ganache is an emulsion: cocoa butter fat and dairy fat need to become suspended in water from the cream. 
+
+Here are four ways to screw up making ganahce, with likely causes:
 
 1. **Splitting: a greasy, oily layer on top of grainy clumps**
    - Over-heating (>55°C) broke the delicate bonds maintaining the emulsion, so the fat coalesced into larger pools of oil rather than remaining uniformly suspended.

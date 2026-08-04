@@ -3,7 +3,7 @@ title: Cauliflower Cheese
 short_name: Cauliflower Cheese
 tagline: A three-cheese British classic.
 source: Adapted from Gordon Ramsay Restaurants
-serves: 5
+serves: 5 (or...1)
 prep_time: 15 mins
 cook_time: "20-25 mins"
 main_ingredients: [cauliflower, cheddar, lancashire, cheshire, breadcrumbs, milk, "English mustard"]
@@ -21,7 +21,7 @@ ingredient_groups:
       item: whole milk
     - amount: "1 tbsp"
       item: English mustard powder
-    - item: "Curry powder, Worcestershire sauce etc to taste"
+    - item: "flavourings like curry powder, Worcestershire sauce etc to taste"
     - amount: "100 g"
       item: "mature Cheddar cheese, grated"
     - amount: "100 g"
@@ -31,12 +31,13 @@ ingredient_groups:
     - amount: "50 g"
       item: breadcrumbs
     - amount: "1 tbsp"
-      item: thyme leaves
+      item: chopped fresh thyme leaves
 method:
   - "Boil the cauliflower florets 4–5 mins until just tender. Drain and refresh in iced water, then drain again and lay out in an oven dish."
-  - "Meanwhile, make a roux: melt the butter gently, then stir in the flour and mustard powder until it's a smooth paste. Then add the milk a little at a time, stirring/whisking continuously until completely smooth and almost shiny."
+  - step: "Meanwhile, make a roux: melt the butter gently, then stir in the flour and mustard powder until it's a smooth paste. Then add the milk a little at a time, stirring/whisking continuously until completely smooth and almost shiny."
+    note: "Each of these stages takes longer than you think."
   - "Bring to the boil, then simmer for a few minutes, stirring continuously, until it thickens. Remove from the heat and mix any other flavours and seasoning."
-  - Grate the three cheeses together. Add half to the pan and stir until fully melted into the hot sauce. Pour the cheese over the cauliflower.
+  - Grate the three cheeses together. Add half to the pan and stir until fully melted into the hot sauce. Pour the sauce over the cauliflower.
   - "Add the breadcrumbs and thyme to the other half of the cheese, then tip evenly over the cauliflower dish."
   - Bake at 180°C for about 20 mins until the topping is crisp and the sauce is bubbling.
 method_short:
@@ -47,11 +48,11 @@ method_short:
     * Half cheese in the sauce, rest breadcrumbs thyme and top
     * Bake 180°C 15–20 mins
 notes:
-  - label: "Cheese choice"
-    text: "Most combinations of hard cheeses are fine. Brie or similar will take over, but maybe you like that."
+  - label: "Choice of cheese"
+    text: "Most combinations of hard cheeses are fine. Brie or similar will take over, but maybe you're into that."
 meta:
   rewritten: true
-  proofread: false
-  cooked_before: false
+  proofread: true
+  cooked_before: true
   date_last_edited: "2026-07-29"
 ---

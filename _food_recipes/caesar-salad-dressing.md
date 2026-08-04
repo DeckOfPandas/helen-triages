@@ -32,10 +32,10 @@ ingredient_groups:
 method:
   - Mix everything together and shake really well.
 method_short:
-  - ""
+  - "lol"
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

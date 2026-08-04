@@ -8,14 +8,14 @@ prep_time: "20 mins"
 cook_time: None
 main_ingredients: ["dark chocolate", eggs, cream, "caster sugar", butter]
 star_ingredient: chocolate
-tags: [dessert, "make-ahead"]
+tags: [dessert, "make-ahead", "no-cook"]
 ingredient_groups:
   - name: mousse
     items:
     - amount: "3"
       item: large eggs
     - amount: "125 g"
-      item: "dark cooking chocolate, bittersweet / 70% cocoa"
+      item: "70%-cacao chocolate"
     - amount: "10 g"
       item: salted butter
     - amount: "125 ml"
@@ -28,7 +28,7 @@ ingredient_groups:
     - item: chocolate shavings
 method:
   - "Get on with it so the whipped egg whites and cream don't get too warm."
-  - "Separate eggs while cold, whites into a large bowl and yolks into a small bowl."
+  - "Separate the eggs before they warm up: whites into a large bowl and yolks into a small bowl."
   - "Whisk yolks until pale and fluffy."
   - "Melt the chocolate over a bain-marie, stir in the butter, season generously with salt, then set aside to cool slightly."
   - "Beat the cream until stiff peaks form, being careful not to over-whip."
@@ -49,12 +49,9 @@ method_short:
     * Chocolate into cream/yolk, 8 folds max
     * Loosen with ¼ whites 10 folds max, pour back into whites 12 folds max
     * Portion, fridge >6h
-notes:
-  - label: "Chocolate choice"
-    text: "Use cooking chocolate from the baking aisle, not eating chocolate, because it melts more smoothly. 70% cocoa chocolate is ideal. Full-fat cream only."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

@@ -1,7 +1,7 @@
 ---
 title: Asparagus and Gruyère Quiche with Parmesan and Paprika Crust
 short_name: Asparagus and Gruyère Quiche
-tagline: "Just as good cold as hot, and reheats really well. Make loads and have enough for leftovers."
+tagline: "As good hot, reheated, cold, or straight from the fridge with a guilty look on your face. Strategically over-cater to ensure leftovers."
 source: Good friend Daniel
 serves: "4–6"
 prep_time: "30 mins plus 30 mins resting"
@@ -69,7 +69,7 @@ notes:
     text: "Other easy but tasty fillings: goat's cheese and cherry tomato; mushroom, kale and tomato; ham, egg and mozzarella."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---
