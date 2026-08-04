@@ -120,3 +120,17 @@ co_tags:
   ice cream:
     - dessert
     - make-ahead
+
+# -----------------------------------------------------------------------------
+# Proper nouns
+#
+# GitHub issue #71: ingredient tips/notes are lower case except for proper
+# nouns (the pronoun "I" is also always allowed, checked separately --
+# it isn't a noun). Declared here for the same reason star_ingredients and
+# tags are declared above: whether a word is a genuine proper noun (Parmesan)
+# or just a sentence-initial capital that needs lowercasing (Preferably,
+# Thaw, Use...) is Helen's judgement call, not something a test can infer.
+# Empty until she reviews the test_ingredient_annotation_style violations
+# and adds the real ones.
+# -----------------------------------------------------------------------------
+proper_nouns: []

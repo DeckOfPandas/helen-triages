@@ -216,3 +216,47 @@ def test_incidental_not_in_main_ingredients(recipe):
         f"search hit -- remove it from main_ingredients, or drop the "
         f"incidental flag if it's actually core."
     )
+
+
+# --- ingredient tip/note style (GitHub issue #71) ---------------------------
+
+def _first_word(text: str) -> str:
+    match = re.match(r"[A-Za-z']+", text.strip())
+    return match.group(0) if match else ""
+
+
+def test_ingredient_annotation_style(recipe, taxonomy):
+    """One sentence, no trailing full stop, lower case unless the first word
+    is `I` or a proper noun declared in taxonomy.yml's `proper_nouns` list.
+
+    Helen: "I'll look at violations myself because I care about tone of
+    voice" -- this test only flags, it never rewrites. Whether a capitalised
+    first word is a real proper noun or just needs lowercasing is her call,
+    made by editing the tip/note text or adding to `proper_nouns`.
+    """
+    proper_nouns = {p.lower() for p in (taxonomy.get("proper_nouns") or [])}
+    problems = []
+    for group in recipe.fm.get("ingredient_groups") or []:
+        for item in group.get("items") or []:
+            if not isinstance(item, dict):
+                continue
+            for key in ("tip", "note"):
+                text = item.get(key)
+                if not text:
+                    continue
+                text = text.strip()
+                label = f"{key} on '{item.get('item')}'"
+                if text.endswith("."):
+                    problems.append(f"{label}: ends with a full stop -- {text!r}")
+                sentences = [s for s in re.split(r"(?<=[.!?])\s+", text.rstrip(".!?")) if s]
+                if len(sentences) > 1:
+                    problems.append(f"{label}: reads as {len(sentences)} sentences -- {text!r}")
+                first = _first_word(text)
+                if first and first[0].isupper() and first != "I" and first.lower() not in proper_nouns:
+                    problems.append(
+                        f"{label}: starts with capitalised {first!r}, not `I` or a "
+                        f"declared proper noun -- {text!r}"
+                    )
+    assert not problems, (
+        f"{where(recipe)} ingredient tip/note style:\n  " + "\n  ".join(problems)
+    )
