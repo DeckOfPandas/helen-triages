@@ -6,7 +6,7 @@ source: Grandma Kath
 makes: "12 fairy cakes"
 prep_time:
 cook_time: "Until done"
-main_ingredients: [butter, sugar, eggs, flour, sultanas]
+main_ingredients: ["salted butter", "caster sugar", eggs, "self-raising flour", sultanas]
 star_ingredient:
 tags: [bakes]
 ingredient_groups:
@@ -24,7 +24,8 @@ ingredient_groups:
 method:
   - "Cream the butter and sugar thoroughly until fluffy."
   - "Whisk in the beaten egg a bit at a time."
-  - "Stir in the flour and a pinch of salt, then the fruit."
+  - step: "Stir in the flour and a pinch of salt, then the fruit."
+    note: "loosen with a tiny splash of milk if needed"
   - "Spoon carefully into paper cases in a cake tray, using the back of a spoon to level off the tops."
   - "Bake at 180°C until springy in the middle."
 method_short:
@@ -33,7 +34,7 @@ method_short:
 #   -
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

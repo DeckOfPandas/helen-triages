@@ -23,6 +23,7 @@ ingredient_groups:
     - amount: "4 tsp"
       item: cold water
     - item: pinch of paprika
+      note: fine to skip
   - name: filling
     items:
     - amount: "1"
@@ -31,8 +32,8 @@ ingredient_groups:
       item: eggs
     - amount: "360 ml"
       item: double cream
-    - amount: "2"
-      item: "bunches young asparagus, chopped on a diagonal into ½–1-inch pieces"
+    - amount: "2 bunches"
+      item: "young asparagus, chopped on a diagonal into ½–1-inch pieces"
     - item: "150 g gruyère, grated"
       note: "All cheese amounts are notional!"
     - amount: "20 g"

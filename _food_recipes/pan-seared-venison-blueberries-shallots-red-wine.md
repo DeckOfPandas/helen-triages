@@ -11,8 +11,8 @@ star_ingredient: game
 tags: [showstopper, virtuous]
 ingredient_groups:
   - items:
-    - amount: "1"
-      item: "small handful fresh thyme, leaves picked"
+    - amount: "1 small handful"
+      item: "fresh thyme, leaves picked"
     - amount: "5"
       item: dried juniper berries
     - item: sea salt and freshly ground black pepper
@@ -21,8 +21,8 @@ ingredient_groups:
       item: "venison loin, trimmed"
     - amount: "4"
       item: "shallots, peeled and finely sliced"
-    - amount: "1"
-      item: "clove of garlic, peeled and finely sliced"
+    - amount: "1 clove"
+      item: "garlic, peeled and finely sliced"
     - item: "a glass of robust red wine, preferably Cab or Merlot"
     - amount: "200 g"
       item: fresh blueberries
@@ -42,6 +42,6 @@ notes:
 meta:
   rewritten: true
   proofread: false
-  cooked_before: false
+  cooked_before: true
   date_last_edited: "2026-07-25"
 ---

@@ -21,8 +21,8 @@ ingredient_groups:
       item: "carrot, finely chopped"
     - amount: "2"
       item: "garlic cloves, finely chopped"
-    - amount: "2 x 400 g"
-      item: "cans white beans, one drained, one left undrained (we used cannellini and butter beans)"
+    - amount: "2 x 400 g cans"
+      item: "white beans, one drained, one left undrained (we used cannellini and butter beans)"
     - amount: "500 ml"
       item: chicken stock
     - amount: "1"
@@ -46,6 +46,6 @@ method_short:
 meta:
   rewritten: true
   proofread: false
-  cooked_before: false
+  cooked_before: true
   date_last_edited: "2026-07-25"
 ---

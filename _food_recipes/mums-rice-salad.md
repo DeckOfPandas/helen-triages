@@ -1,22 +1,22 @@
 ---
 title: "Mum's Rice Salad"
 short_name: "Mum's Rice Salad"
-tagline: Apparently normal people add diced peppers to this
+tagline: Apparently other people add diced peppers to this.
 source: Mum
 serves: However many people want to eat 150 g rice
 prep_time: "10 mins"
 cook_time: "20 mins"
-main_ingredients: ["brown rice", cashews, sultanas, "soy sauce", ginger, lemon, garlic]
+main_ingredients: ["brown rice", cashews, sultanas, "dark soy sauce", "ginger paste", lemon, "garlic purée"]
 star_ingredient:
-tags: [salad]
+tags: [salad, make-ahead]
 ingredient_groups:
   - items:
     - amount: "150 g"
       item: brown rice
-    - amount: "2"
-      item: "handfuls of cashews, toasted"
-    - amount: "2"
-      item: handfuls of sultanas
+    - amount: "2 handfuls"
+      item: "cashews, toasted"
+    - amount: "2 handfuls"
+      item: sultanas
     - amount: "2 tbsp"
       item: olive oil
     - amount: "3 tbsp"
@@ -34,7 +34,11 @@ method_short:
   - ""
 notes:
   - label: "Make ahead"
-    text: "Make early to allow the sultanas time to soak up the liquid. Undercooked brown rice is nice and nutty. [Cow says… Canned pineapple works well*. Cow loves sissy.] *Henry disagrees"
+    text: "Make early to allow the sultanas time to soak up the liquid."
+  - label: "Don't overcook the rice"
+    text: "Undercooked brown rice is nice and nutty."
+  - label: "Robbie is incorrect"
+    text: "Robbie thinks this salad is nice with added pineapple."
 meta:
   rewritten: true
   proofread: false

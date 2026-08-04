@@ -27,8 +27,8 @@ ingredient_groups:
       item: vegetable stock
     - amount: "200 g"
       item: cavolo nero
-    - amount: "2 x 400 g"
-      item: cans butter beans
+    - amount: "2 x 400 g cans"
+      item: butter beans
     - amount: "1–2"
       item: "lemons, juiced, to taste"
     - item: "extra virgin olive oil, to garnish"
@@ -46,6 +46,6 @@ notes:
 meta:
   rewritten: true
   proofread: false
-  cooked_before: false
+  cooked_before: true
   date_last_edited: "2026-07-25"
 ---

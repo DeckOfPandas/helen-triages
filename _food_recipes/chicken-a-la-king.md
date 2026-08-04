@@ -6,7 +6,7 @@ source: Adapted from The Cozy Cook
 serves: 6
 prep_time: "15 mins"
 cook_time: "45 mins"
-main_ingredients: ["chicken breast", mushrooms, cream, peas, "white wine", celery, carrots]
+main_ingredients: ["chicken breast", mushrooms, "crème fraîche", peas, "white wine", "chicken stock"]
 star_ingredient: poultry
 tags: [freezable, "make-ahead", "one-handed food"]
 ingredient_groups:
@@ -22,8 +22,8 @@ ingredient_groups:
       item: "medium carrots, diced"
     - amount: "2"
       item: "stalks celery, diced"
-    - amount: "3"
-      item: "cloves of garlic, minced"
+    - amount: "3 cloves"
+      item: "garlic, minced"
     - amount: "125 ml"
       item: dry white wine
     - amount: "40 g"

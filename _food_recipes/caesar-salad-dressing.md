@@ -19,8 +19,8 @@ ingredient_groups:
       item: Worcestershire sauce
     - amount: "1 tsp"
       item: anchovy paste (or 2 anchovies from a jar if using a blender)
-    - amount: "1"
-      item: "clove of garlic, minced"
+    - amount: "1 clove"
+      item: "garlic, minced"
     - amount: ¼ tsp
       item: salt
     - amount: "⅛ tsp"

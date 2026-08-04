@@ -6,7 +6,7 @@ source: Mrs Nicholson
 makes: "about 600 ml"
 prep_time: 20 mins
 cook_time: None
-main_ingredients: [milk, eggs, "caster sugar", "plain flour", vanilla]
+main_ingredients: [milk, eggs, "caster sugar", "plain white flour", vanilla]
 star_ingredient:
 tags: [extras]
 ingredient_groups:
@@ -23,11 +23,11 @@ ingredient_groups:
 method:
   - Heat the milk to boiling with the vanilla.
   - Beat the egg yolks with the sugar and flour to a very pale fluffy mass.
-  - Pour the nearly boiling milk over the egg mixture.
+  - step: Pour the nearly boiling milk over the egg mixture.
+    tip: if you do this the other way round you'll get scrambled eggs 
   - Rinse out the milk pan and make sure the bottom is clean.
-  - Return everything to the rinsed-out milk pan and stir gently over a moderate heat.
-  - "When boiling, whisk more vigorously to stop the mixture sticking to the bottom of the pan."
-  - It should become thick and smooth.
+  - Return everything to the rinsed-out pan and stir gently over a moderate heat.
+  - When boiling, whisk more vigorously to stop the mixture sticking to the bottom of the pan. It should become thick and smooth.
   - Continue cooking for about 2–3 mins to cook out the flour.
   - Taste to check.
   - Cover with buttered paper to cool.
@@ -38,7 +38,7 @@ method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
-  cooked_before: false
+  proofread: true
+  cooked_before: true
   date_last_edited: "2026-07-25"
 ---

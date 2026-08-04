@@ -1,12 +1,12 @@
 ---
 title: Duck Leg and Barley Casserole
 short_name: Duck Leg and Barley Casserole
-tagline: "This cooks beautifully in a 40 cm Le Creuset casserole pan (oval), with six duck lges forming one perfect layer."
+tagline: "This cooks beautifully in a 40-cm Le Creuset casserole pan (oval), with six duck legs forming one perfect layer."
 source: Henry
 serves: 12
 prep_time: "30 mins"
 cook_time: "8 hrs"
-main_ingredients: ["Gressingham duck legs", "pearl barley", "red wine", pancetta, mushrooms]
+main_ingredients: ["Gressingham duck legs", "pearl barley", "red wine", pancetta, mushrooms, carrots, baby potatoes, "red wine"]
 star_ingredient: duck
 tags: [freezable, "make-ahead", "one-handed food"]
 ingredient_groups:
@@ -17,10 +17,10 @@ ingredient_groups:
       item: "small onions, diced"
     - amount: "300 g"
       item: pancetta
-    - amount: "9"
-      item: "cloves of garlic, diced"
+    - amount: "9 cloves"
+      item: "garlic, diced"
     - amount: "6-9"
-      item: "rainbow carrots, chopped into half or quarter cylinder chunks"
+      item: "rainbow carrots, chopped into half- or quarter-cylinder chunks"
     - amount: "300 g"
       item: "baby potatoes, quartered"
     - amount: "6 tbsp"
@@ -28,7 +28,8 @@ ingredient_groups:
     - amount: "1½ l"
       item: good red wine, preferably merlot or Cab
     - amount: "2.5 l"
-      item: "stock (3 Kallo chicken cubes, 1 Kallo vegeteable cube, 1 Kallo garlic and herb cube, 1 Knorr chicken stock pot, 1 pot tomato paste, mushroom ketchup, anchovy sauce, magic Delia powder)"
+      item: stock
+      note: "3 Kallo chicken cubes, 1 Kallo vegeteable cube, 1 Kallo garlic and herb cube, 1 Knorr chicken stock pot, 1 pot tomato paste, mushroom ketchup, anchovy sauce, magic Delia powder"
     - amount: "4"
       item: "Bart bouquet garni bags, or one enormous home-made one"
     - amount: "1 kg"
@@ -44,16 +45,17 @@ method:
   - "Fry the diced onions in some of the duck fat until half done, adding more fat occasionally so they don't dry out."
   - "Add the cubed pancetta, then after a bit the garlic, then after a bit the carrots, then after a bit the quartered potatoes."
   - "Add the flour and cook for 1 min."
-  - "Add the wine to graze, scrape the bottom of the pan thoroughly, and simmer until reduced by half."
+  - "Add the wine to deglaze, scrape the bottom of the pan thoroughly, and simmer until reduced by half."
   - "Add the stock and bouquet garni."
   - "Add the duck legs."
   - "Cover and simmer for about 6 hours, checking occasionally. Add more stock if needed."
   - "Check the seasoning."
   - "Add the pearl barley."
-  - "Cover and simmer again for 1-2 hours to taste."
+  - "Cover and simmer again for about 1 hour, to taste."
   - "Check the seasoning."
   - step: "Add the mushrooms 20 mins before the end."
     tip: "Add them too early and they'll turn to mush."
+  - "At the end, the meat will fall off the bones when you remove them."
 method_short:
   - ""
 notes:
@@ -63,7 +65,7 @@ notes:
     text: "Somehow even better after freezing."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

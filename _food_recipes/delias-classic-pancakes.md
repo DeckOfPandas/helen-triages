@@ -6,7 +6,7 @@ source: Adapted from Delia Smith
 makes: "about 8"
 prep_time: 10 mins
 cook_time: "3–4 mins per pancake"
-main_ingredients: [flour, eggs, milk, butter]
+main_ingredients: ["plain flour", eggs, milk, butter]
 star_ingredient: eggs
 tags: ["carbs party", festive]
 ingredient_groups:
@@ -29,7 +29,7 @@ method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

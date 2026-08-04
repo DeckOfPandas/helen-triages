@@ -6,7 +6,7 @@ source: Adapted from Good Food
 serves: 6
 prep_time: "40 mins plus at least 2 hrs chilling"
 cook_time: "30 mins"
-main_ingredients: ["lamb shoulder", "Greek yoghurt", hummus, "pomegranate seeds", herbs]
+main_ingredients: ["lamb shoulder", "Greek yoghurt", hummus, "pomegranate seeds", garlic, coriander, cumin, turmeric, mint]
 star_ingredient: lamb
 tags: [fakeaway, "make-ahead", "one-handed food"]
 ingredient_groups:
@@ -49,7 +49,7 @@ method_short:
 #   -
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

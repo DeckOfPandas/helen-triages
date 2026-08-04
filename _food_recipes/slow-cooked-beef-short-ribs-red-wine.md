@@ -13,10 +13,10 @@ ingredient_groups:
   - items:
     - amount: "6"
       item: thick-cut beef short ribs
-    - amount: "1"
-      item: "large head of garlic, cut in half horizontally"
-    - amount: "1"
-      item: heaped tbsp tomato purée
+    - amount: "1 large head"
+      item: "garlic, cut in half horizontally"
+    - amount: "1 heaped tbsp"
+      item: tomato purée
     - amount: "1 bottle"
       item: "red wine (750 ml)"
     - amount: "1 litre"

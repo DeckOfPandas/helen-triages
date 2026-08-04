@@ -6,7 +6,7 @@ source: "A lifetime of grainy, oily, solid, inedible regret."
 makes: "N/A, bring a spoon"
 prep_time: 5 mins
 cook_time: 15 mins
-main_ingredients: ["dark chocolate", "double cream", "salted butter", "icing sugar"]
+main_ingredients: ["dark chocolate", "double cream", "salted butter"]
 star_ingredient: chocolate
 tags: [extras]
 ingredient_groups:
@@ -41,9 +41,9 @@ method_short:
     * Butter 1 tbsp, flavourings
     * Cool at room temp to working temp
 notes:
-  - label: "Ratios"
+  - label: "Chocolate:cream ratio"
     text: "1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
-  - label: "Setting"
+  - label: "Use as a topping"
     text: "Add 2 tbsp icing sugar for ganache that sets more firmly."
   - label: "Salt"
     text: "Season the cream with salt before heating — don't be shy, as this greatly enhances the chocolate flavour."
@@ -56,17 +56,17 @@ meta:
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
 
-- Use perfectly clean and dry stainless steel bowls (water = bad) for even heating (over-heating = bad, under-melting = bad).
-- Use a perfectly clean and dry silicone spatula (water = bad) because it can create a tight seal against the bottom of the bowl, sweeping up melting pockets without whipping in air (which contains water so air = bad — see "seizing" below).
-- Heat the cream in a pan for the best temperature control, unless you have literally perfect microwave-fu (over-heating and under-melting = bad).
-- Allow the ganache to cool and set at room temperature. If you put it in the fridge, you'll need to stir it to combine the more-set and the less-set (over-stirring = bad).
+- **Use perfectly clean and dry stainless steel bowls** (water = bad) for even heating (over-heating = bad, under-melting = bad).
+- **Use a perfectly clean and dry silicone spatula** (water = bad) because it can create a tight seal against the bottom of the bowl, sweeping up melting pockets without whipping in air (which contains water so air = bad — see "seizing" below).
+- **Heat the cream in a pan** for the best temperature control, unless you have literally perfect microwave-fu (over-heating and under-melting = bad).
+- **Allow the ganache to cool slowly**, and set at room temperature. If you put it in the fridge, you'll need to stir it to combine the more-set and the less-set (over-stirring = bad).
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
 <p class="recipe-section-subtitle">a.k.a. ganache is the worst</p>
 
 Ganache is an emulsion: cocoa butter fat and dairy fat need to become suspended in water from the cream. 
 
-Here are four ways to screw up making ganahce, with likely causes:
+Here are four ways to accidentally not make ganache, with likely causes:
 
 1. **Splitting: a greasy, oily layer on top of grainy clumps**
    - Over-heating (>55°C) broke the delicate bonds maintaining the emulsion, so the fat coalesced into larger pools of oil rather than remaining uniformly suspended.
@@ -81,6 +81,6 @@ Here are four ways to screw up making ganahce, with likely causes:
    - Dropping cold pieces of chocolate into hot cream makes the temperature drop too rapidly and unevenly, resulting in cold chunks floating in hot fat that can't form an emulsion.
    - Pouring cold cream into melted chocolate instantly shocks the chocolate, snap-freezing the cocoa butter out of the emulsion while forcing the sugars to clump...yum, curdled concrete.
 
-Dark chocolate ganache is less likely to split than lower %s because the dry cocoa solids act as a giant structural sponge holding the emulsion together. White chocolate has zero cocoa sponge, but lots of highly temperature-sensitive cocoa butter and moisture-sensitive sugar. Basically, white chocolate ganache splits if you even look at it wrong.
+Dark chocolate ganache is less likely to split than lower %s because the dry cocoa solids act as a giant structural sponge holding the emulsion together. White chocolate has zero cocoa sponge, but lots of highly temperature-sensitive cocoa butter and moisture-sensitive sugar. Basically, white chocolate ganache is a temperamental toddler, and splits if you even look at it wrong.
 
 For more troubleshooting, see [Philosophy of Yum](https://philosophyofyum.com/grainy-ganache-fix-prevent/).
