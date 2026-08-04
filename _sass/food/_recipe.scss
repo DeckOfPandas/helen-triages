@@ -104,10 +104,10 @@ article.recipe a {
   // never render against anything; this h1 previously carried 1.4rem that
   // did exactly that, unnoticed since 2026-07-09.
   letter-spacing: 0.04em;
-  // 60% of the 900px column is 540px, which wraps the longest titles to three
-  // lines. `text-wrap: balance` then keeps
-  // those lines a similar length, so no line ends up carrying a stub of a rule.
-  max-width: 60%;
+  // Was 60% (GitHub issue #66: too narrow). 70% of the 900px column is
+  // 630px. `text-wrap: balance` keeps whatever lines that wraps to a
+  // similar length, so no line ends up carrying a stub of a rule.
+  max-width: 70%;
   text-wrap: balance;
 }
 
@@ -416,6 +416,25 @@ $method-step-number-column: 2.4rem + 0.9rem;
   &::before { left: $space-xxl; }
 }
 
+// GitHub issue #57: a tip/note adds real height inside a step's own <li>,
+// but the flat margin-bottom every step gets (below, $space-xl) doesn't
+// account for that -- fine most of the time, since the next thing is just
+// another step, but when the annotated step is the LAST one before a
+// section boundary -- the next method group's heading, or the end of
+// Method itself -- that flat gap reads as crowding whatever follows,
+// rather than a clear "this block is done." Covers both boundaries Helen
+// confirmed she wants: immediately before a group heading, via the
+// adjacent-sibling check, and the very end of the list, via :last-child
+// (safe as "the last step in a group is also the last child of
+// .method-full" only when it's the LAST group too, which :last-child
+// alone already guarantees).
+.method-full li.step:has(.step-annotation) {
+  &:has(+ li.method-group-heading-item),
+  &:last-child {
+    margin-bottom: $space-xxl;
+  }
+}
+
 .method-full {
   counter-reset: step-counter;
   margin-top: $space-sm;
@@ -459,7 +478,18 @@ $method-step-number-column: 2.4rem + 0.9rem;
   li.method-group-heading-item {
     counter-increment: none;
     padding-left: 0;
-    margin-bottom: $space-sm;
+    // Was $space-sm (0.5rem) -- adjacent margins collapse to the LARGER of
+    // the two, so this never actually won against .recipe-group-heading's
+    // own margin-bottom ($space-md, 0.75rem): the true gap above the first
+    // step was 0.75rem regardless of what this said. Helen (GitHub issue
+    // #55): "too cramped/close" between the heading and the step number
+    // right below it, both bold stroked Courier at close sizes. Raised
+    // past $space-md so THIS margin is the one that wins the collapse.
+    // Scoped here rather than raising .recipe-group-heading's own
+    // margin-bottom, which also sets the gap above ingredient group
+    // headings ("For the base:") — a different context, not part of this
+    // issue.
+    margin-bottom: $space-xl;
 
     &::before { content: none; }
   }
@@ -867,29 +897,35 @@ article.recipe .recipe-body-content {
   font-weight: 500;
 }
 
-// Only the number gets the highlighter, not the unit that follows it — the
-// number is the figure you need at a glance while cooking; the unit is
-// secondary. .highlighted (shared/_base.scss) supplies position: relative,
-// the positioning context the injected SVG needs.
+// Was number-only, unit left plain outside the highlight -- Helen,
+// 2026-08-04 (GitHub issue #54): "Ingredient amounts currently only get
+// bolder [the shared font-weight: 500 above], no scratchy lettering.
+// Please simply extend this formatting right-wards." The unit moved INTO
+// this span (_layouts/recipe.html) rather than getting a highlight of its
+// own, so one continuous highlighter SVG now covers "400 g" as a single
+// run instead of two.
+//
+// .highlighted (shared/_base.scss) supplies position: relative, the
+// positioning context the injected SVG needs.
 //
 // align-items: baseline overrides .highlighted's own align-items: center.
 // With no flex item baseline-aligned, an inline-flex box's OWN baseline (the
 // one used to place it within the surrounding line of text) is synthesised
 // from the top edge of its first flex item rather than real text metrics —
-// that pushed the whole box, number included, below the "pt"/"g"/"oz" text
-// sitting right next to it outside the box. Harmless while .ingredient-amount
-// wrapped the full "400 g" (the whole run shifted together, so nothing beside
-// it to compare against); became visible the moment only the number sat in
-// the flex box next to a plain-text unit at the correct baseline.
+// that pushed the whole box below the ingredient name text sitting right
+// next to it outside the box.
 // No right padding: the injected highlighter SVG has a fixed few-px overflow
 // baked into every highlighters/*.svg asset (position:absolute; left:-4px;
 // width:calc(100% + 8px)), independent of this box's own size. Right padding
-// here just added more box for that fixed overflow to bleed past, painting
-// over the space before the unit and touching it. margin-right instead sits
-// outside the box the SVG paints into, so it isn't touched by the overflow.
+// here just adds more box for that fixed overflow to bleed past, painting
+// over the space before the ingredient name and touching it.
+//
+// No margin-right here any more either, now that the unit lives inside this
+// span rather than right after it — .ingredient-amount's own margin-right is
+// the only gap left before the ingredient name; doubling it here on top
+// would have opened a visibly wider gap than intended.
 .ingredient-amount-number {
   padding: 0 0 0 0.2em;
-  margin-right: 0.15em;
   align-items: baseline;
 }
 
@@ -980,6 +1016,28 @@ $annotation-arrow-gap: 0.9em;
   margin-right: $annotation-arrow-gap;
   vertical-align: middle;
 }
+
+// GitHub issue #77, reverted: tried display: inline-block on .annotation-text
+// so a wrapped continuation line would hang-indent to ITS OWN left edge
+// rather than the LI's. Broke a case Helen caught by screenshot -- a short
+// ingredient name (little room used on its line) followed by a long note:
+// the WHOLE box dropped to a fresh line, flush left under the ingredient
+// name, arrow left dangling at the end of the line above. Root cause:
+// inline-block sizes itself (shrink-to-fit, up to its max-width) against the
+// full containing block, not the space actually left on the current line
+// after the arrow -- so a long note computes a wide preferred width even
+// though it could have wrapped into the room available right after the
+// arrow, and a box that wide no longer fits there, so the whole thing (not
+// just the overflow) moves down as one atomic unit. Plain inline content
+// doesn't have this failure mode -- it just keeps flowing word by word from
+// wherever the arrow left off -- at the cost of the original ask: a wrapped
+// line still falls back to the LI's own edge, not the annotation's start.
+// No known pure-CSS fix keeps both a guaranteed same-line start (the
+// arrow-adjacent placement Helen wants) AND a hanging indent to a start
+// position that varies with the ingredient name's own length; the reliable
+// way to get the latter is measuring the actual rendered position in JS
+// (as decorations.js already does for shape/stretch decisions elsewhere)
+// and setting it as a custom property. Not done here -- ask first.
 
 // Violet, not magenta, for both marks above: magenta already carries the
 // title rule, the toggle and every link, so a magenta mark here read as one

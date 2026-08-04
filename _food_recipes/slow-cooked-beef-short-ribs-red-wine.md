@@ -17,8 +17,8 @@ ingredient_groups:
       item: "large head of garlic, cut in half horizontally"
     - amount: "1"
       item: heaped tbsp tomato purée
-    - amount: "1 x 750 ml"
-      item: bottle red wine
+    - amount: "1 bottle"
+      item: "red wine (750 ml)"
     - amount: "1 litre"
       item: good beef stock
     - item: sea salt and freshly ground black pepper
@@ -36,6 +36,6 @@ method_short:
 meta:
   rewritten: true
   proofread: false
-  cooked_before: false
+  cooked_before: true
   date_last_edited: "2026-07-25"
 ---

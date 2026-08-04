@@ -120,3 +120,56 @@ co_tags:
   ice cream:
     - dessert
     - make-ahead
+
+# -----------------------------------------------------------------------------
+# Proper nouns
+#
+# GitHub issue #71: ingredient tips/notes are lower case except for proper
+# nouns (the pronoun "I" is also always allowed, checked separately --
+# it isn't a noun). Declared here for the same reason star_ingredients and
+# tags are declared above: whether a word is a genuine proper noun (Parmesan)
+# or just a sentence-initial capital that needs lowercasing (Preferably,
+# Thaw, Use...) is Helen's judgement call, not something a test can infer.
+# Seeded 2026-08-04 from words recurring across the recipe corpus (brands,
+# place names, demonyms, cultivar names). test_ingredient_annotation_style
+# only checks the FIRST WORD of a tip/note, so compound names (Maris Piper,
+# Granny Smith, Yukon Gold) are split into their individual words -- either
+# one could plausibly open a sentence.
+# -----------------------------------------------------------------------------
+proper_nouns:
+  - Aleppo
+  - Bart
+  - Brussels
+  - Cab
+  - Calvados
+  - Ceylon
+  - Cheddar
+  - Cheshire
+  - Chinese
+  - Delia
+  - Dijon
+  - English
+  - French
+  - Gold
+  - Granny
+  - Greek
+  - Gressingham
+  - Guinness
+  - Kalamata
+  - Kallo
+  - Kashmiri
+  - Knorr
+  - Lancashire
+  - Maris
+  - Marmite
+  - Merlot
+  - Morrisons
+  - Norfolk
+  - Parma
+  - Parmesan
+  - Piper
+  - Sichuan
+  - Smith
+  - Thai
+  - Worcestershire
+  - Yukon

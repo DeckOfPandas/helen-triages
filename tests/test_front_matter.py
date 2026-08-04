@@ -81,6 +81,23 @@ def test_meta_block_complete(recipe):
     )
 
 
+def test_cooked_before_is_true(recipe):
+    """`_food_recipes/` is the published collection (`output: true` in
+    _config.yml) — every file in it gets a live URL unconditionally. Helen:
+    "I never want to publish anything I haven't tested." A recipe she's
+    still collecting but hasn't cooked yet belongs in `_food_drafts/`
+    (`output: false`, no URL) until `meta.cooked_before` is genuinely true.
+    """
+    meta = recipe.fm.get("meta")
+    if not isinstance(meta, dict):
+        return  # test_meta_block_complete already reports the missing block
+    assert meta.get("cooked_before") is True, (
+        f"{where(recipe)} has `meta.cooked_before: {meta.get('cooked_before')!r}`. "
+        f"Either cook it and flip this to true, or move the file back to "
+        f"_food_drafts/ until you have."
+    )
+
+
 def test_serves_xor_makes(recipe):
     has_serves = "serves" in recipe.fm
     has_makes = "makes" in recipe.fm

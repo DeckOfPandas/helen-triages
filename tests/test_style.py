@@ -136,6 +136,7 @@ SPELLINGS = {
     r"\bgruyere\b": "gruyère",
     r"\bpuree\b": "purée",
     r"\bsaute\b": "sauté",
+    r"\bbain marie\b": "bain-marie",
 }
 
 
@@ -154,6 +155,59 @@ def test_temperatures_use_degree_c(recipe):
     assert not bad, (
         f"{where(recipe)} writes temperature(s) {bad} without the degree sign. "
         f"Always °C, e.g. 200°C."
+    )
+
+
+def test_flour_and_sugar_specify_type(recipe):
+    """GitHub issue #79: bare "flour" or "sugar" as an ingredient name, with
+    no type in front of it (plain, self-raising, caster, icing...), leaves
+    the cook guessing. Only checks the ingredient's own name, not method
+    text -- "add the flour" there correctly refers back to an already-typed
+    ingredient.
+    """
+    bad = [i for i in recipe.ingredient_items if re.match(r"^(flour|sugar)\b", i.strip(), re.I)]
+    assert not bad, (
+        f"{where(recipe)} has ingredient(s) {bad!r} with no type specified. "
+        f"Say which flour or sugar, e.g. `plain flour`, `caster sugar`."
+    )
+
+
+# Same under-specification problem as bare `flour`/`sugar` above, not a
+# wording preference: light/dark is a required qualifier, not optional
+# decoration, so bare "soft brown sugar" is NOT in this list -- Helen: the
+# allowed names are "light soft brown sugar" and "dark soft brown sugar".
+# Muscovado is a real, distinct product (also always light/dark-qualified),
+# not just a wordier way of saying the same thing, so it gets its own two
+# entries rather than being folded into the soft-brown-sugar names.
+# Allowed as the ingredient's own name, optionally after a leading quantity
+# ("~2 tbsp dark brown muscovado sugar") that isn't in a proper `amount:`
+# field -- that's a separate, unrelated data-placement question.
+_BROWN_SUGAR_OK = re.compile(
+    r"(?:^|\d[\d./½¼¾⅓⅔]*\s*(?:tbsp|tsp|g|kg|ml|l|oz|lb)?\s+)"
+    r"(light soft brown sugar|dark soft brown sugar"
+    r"|light brown muscovado sugar|dark brown muscovado sugar)$",
+    re.I,
+)
+
+
+def test_brown_sugar_is_soft_brown_sugar(recipe):
+    """GitHub issue #79: "brown sugar", "dark brown soft sugar"... everything
+    except the four names in _BROWN_SUGAR_OK is non-standard, including bare
+    "soft brown sugar" with no light/dark qualifier. Checks the ingredient's
+    own name (up to the first comma/parenthesis), not just that an allowed
+    phrase appears somewhere in it -- "light brown soft sugar" contains
+    "brown sugar" as a substring but the words are in the wrong order.
+    """
+    bad = []
+    for item in recipe.ingredient_items:
+        name = re.split(r"[,(]", item)[0].strip()
+        if re.search(r"\bbrown\b", name, re.I) and re.search(r"\bsugar\b", name, re.I):
+            if not _BROWN_SUGAR_OK.search(name):
+                bad.append(item)
+    assert not bad, (
+        f"{where(recipe)} has non-standard brown sugar name(s) {bad!r}. "
+        f"Allowed: light soft brown sugar, dark soft brown sugar, light "
+        f"brown muscovado sugar, dark brown muscovado sugar."
     )
 
 
