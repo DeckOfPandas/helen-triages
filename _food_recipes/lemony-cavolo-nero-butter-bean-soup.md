@@ -8,13 +8,13 @@ prep_time: "15 mins"
 cook_time: "20 mins"
 main_ingredients: ["cavolo nero", "butter beans", carrots, lemon, onion, "tomato purée", "vegetable stock"]
 star_ingredient: greens
-tags: ["one-handed food", soup, virtuous]
+tags: ["one-handed food", virtuous]
 ingredient_groups:
   - items:
     - amount: "2"
-      item: carrots
+      item: carrots, finely chopped
     - amount: "1"
-      item: onion
+      item: onion, finely chopped
     - amount: "2"
       item: garlic cloves
     - amount: "2"
@@ -26,15 +26,15 @@ ingredient_groups:
     - amount: "1 litre"
       item: vegetable stock
     - amount: "200 g"
-      item: cavolo nero
+      item: cavolo nero, roughly chopped
     - amount: "2 x 400 g cans"
       item: butter beans
     - amount: "1–2"
       item: "lemons, juiced, to taste"
     - item: "extra virgin olive oil, to garnish"
 method:
-  - "Fry the finely chopped onion and carrot with a pinch of salt for 6–8 mins until soft. Stir in the garlic and herbs, cook for a minute, then add the tomato purée and cook until darkened. Pour in the stock and simmer."
-  - "Add roughly chopped cavolo nero and the drained butter beans, then simmer for 6–8 mins until the greens are tender. Season generously."
+  - "Fry the onion and carrot with a pinch of salt for 6–8 mins until soft. Stir in the garlic and herbs, cook for a minute, then add the tomato purée and cook until darkened. Pour in the stock and simmer."
+  - "Add the cavolo nero and the butter beans, including their juice, then simmer for 6–8 mins until the greens are tender. Season generously."
   - "Add the lemon juice to taste — it should be bright and flavourful. Remove the herb sprigs. Serve in bowls with extra virgin olive oil on top."
 method_short:
   - ""
@@ -45,7 +45,7 @@ notes:
     text: "Mash some of the beans with a fork before adding them if you want a thicker soup."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---
