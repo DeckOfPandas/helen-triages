@@ -7,9 +7,11 @@
 
 ## Critical Restrictions
 - NEVER run `rm -rf` without explicit human confirmation.
-- NEVER alter system configurations, `.bashrc`, or install global apt packages.
+- Do not attempt to run `rm -rf` in the middle of a long job EXCEPT in folder "tmp/" within this working directory you were launched in. Complete the job first, then tidy up afterwards, to reduce interruptions.
+- NEVER alter system configurations, `.bashrc`, `.bash_profile`, `.bash_aliases`, or install global apt packages.
 - NEVER access or create `.env` files containing deployment API keys.
-- Do not run commands using the `--dangerously-skip-permissions` flag.
+- NEVER run commands using the `--dangerously-skip-permissions` flag.
+- NEVER read, write or execute above the foler you're in.
 
 ## Build Commands
 - Dev Server: `jekyll-local`, deploying to localhost:4001
@@ -22,5 +24,7 @@
 - Never `git push` without my explicit confirmation first.
 
 ## Normal workflow
-- Please do not try to write to /tmp. If you need a scratch temporary folder, create one here and add it to .gitignore
-- Don't delete handover or jobs list documents. I move these out myself to store elsewhere just in case, because they're not under version control.
+- If you need a scratch temporary folder, create one in this project folder and add it to .gitignore
+- Don't delete handover or jobs list documents.
+- You don't need to ask permission to cd into folders at or below /home/helen/projects/helen-triages/food.
+- You don't need to ask permission to read or write to tmp in /home/helen/projects/helen-triages/food.
