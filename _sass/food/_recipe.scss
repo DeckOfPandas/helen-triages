@@ -410,10 +410,16 @@ $method-step-number-column: 2.4rem + 0.9rem;
 // `left` is relative to the li's padding edge (fixed at the border, not
 // wherever the content box happens to start), so padding-left alone only
 // moves where the TEXT starts, never the number.
-.method-full li.method-group-heading-item ~ li.step {
-  padding-left: calc(#{$space-xxl} + #{$method-step-number-column});
+// GitHub issue #94: still read as flush with the group heading above rather
+// than nested under it, even with the group indent. $space-xxl (2rem) is the
+// largest spacing token there is, so this composes two of them rather than
+// inventing a one-off value.
+$method-group-step-indent: $space-xxl + $space-lg;
 
-  &::before { left: $space-xxl; }
+.method-full li.method-group-heading-item ~ li.step {
+  padding-left: calc(#{$method-group-step-indent} + #{$method-step-number-column});
+
+  &::before { left: $method-group-step-indent; }
 }
 
 // GitHub issue #57: a note adds real height inside a step's own <li>,
@@ -468,9 +474,12 @@ $method-step-number-column: 2.4rem + 0.9rem;
       // The scratchy typewriter treatment the headings use, at the lightest of
       // the three weights — $stroke-light is the token for small Courier marks
       // (it already carries the meta labels and group headings). Medium is
-      // tuned for 1.8rem and reads as a blob at 1.2rem.
+      // tuned for 1.8rem and reads as a blob even at the smaller size below.
+      //
+      // GitHub issue #94: was 1.2rem, read as too large once the group-
+      // heading gap (#55) gave the numbers more room to be compared against.
       -webkit-text-stroke: $stroke-light;
-      font-size: 1.2rem;
+      font-size: 1rem;
       line-height: 1.2;
     }
   }
