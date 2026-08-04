@@ -56,7 +56,7 @@ layout: default
               {% assign amount_unit = amount_parts | slice: 1, 99 | join: " " %}
               <span class="ingredient-amount">
                 <span class="ingredient-amount-number highlighted">
-                  <span class="highlighter-slot" aria-hidden="true"></span>{{ amount_number }}</span>{% if amount_unit != "" %} {{ amount_unit }}{% endif %}</span>
+                  <span class="highlighter-slot" aria-hidden="true"></span>{{ amount_number }}{% if amount_unit != "" %} {{ amount_unit }}{% endif %}</span></span>
             {% endif %}
             {{ item.item | markdownify | remove: '<p>' | remove: '</p>' }}
             {% if item.tip %}<span class="ingredient-annotation ingredient-annotation--tip"><span class="annotation-mark" aria-hidden="true"></span>{{ item.tip | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}

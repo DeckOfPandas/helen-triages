@@ -897,29 +897,35 @@ article.recipe .recipe-body-content {
   font-weight: 500;
 }
 
-// Only the number gets the highlighter, not the unit that follows it — the
-// number is the figure you need at a glance while cooking; the unit is
-// secondary. .highlighted (shared/_base.scss) supplies position: relative,
-// the positioning context the injected SVG needs.
+// Was number-only, unit left plain outside the highlight -- Helen,
+// 2026-08-04 (GitHub issue #54): "Ingredient amounts currently only get
+// bolder [the shared font-weight: 500 above], no scratchy lettering.
+// Please simply extend this formatting right-wards." The unit moved INTO
+// this span (_layouts/recipe.html) rather than getting a highlight of its
+// own, so one continuous highlighter SVG now covers "400 g" as a single
+// run instead of two.
+//
+// .highlighted (shared/_base.scss) supplies position: relative, the
+// positioning context the injected SVG needs.
 //
 // align-items: baseline overrides .highlighted's own align-items: center.
 // With no flex item baseline-aligned, an inline-flex box's OWN baseline (the
 // one used to place it within the surrounding line of text) is synthesised
 // from the top edge of its first flex item rather than real text metrics —
-// that pushed the whole box, number included, below the "pt"/"g"/"oz" text
-// sitting right next to it outside the box. Harmless while .ingredient-amount
-// wrapped the full "400 g" (the whole run shifted together, so nothing beside
-// it to compare against); became visible the moment only the number sat in
-// the flex box next to a plain-text unit at the correct baseline.
+// that pushed the whole box below the ingredient name text sitting right
+// next to it outside the box.
 // No right padding: the injected highlighter SVG has a fixed few-px overflow
 // baked into every highlighters/*.svg asset (position:absolute; left:-4px;
 // width:calc(100% + 8px)), independent of this box's own size. Right padding
-// here just added more box for that fixed overflow to bleed past, painting
-// over the space before the unit and touching it. margin-right instead sits
-// outside the box the SVG paints into, so it isn't touched by the overflow.
+// here just adds more box for that fixed overflow to bleed past, painting
+// over the space before the ingredient name and touching it.
+//
+// No margin-right here any more either, now that the unit lives inside this
+// span rather than right after it — .ingredient-amount's own margin-right is
+// the only gap left before the ingredient name; doubling it here on top
+// would have opened a visibly wider gap than intended.
 .ingredient-amount-number {
   padding: 0 0 0 0.2em;
-  margin-right: 0.15em;
   align-items: baseline;
 }
 
