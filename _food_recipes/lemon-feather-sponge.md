@@ -32,9 +32,9 @@ method:
   - "Add the lemon juice and zest."
   - "Whisk the egg whites until stiff and shiny but not dry, then fold in with a metal spoon."
   - step: "Scoop the mixture into a lined and sugared 7-inch round tin."
-    tip: "This is one of those times when you really do have to line and sugar the tin — the cake will never come out otherwise."
+    note: "This is one of those times when you really do have to line and sugar the tin — the cake will never come out otherwise."
   - step: "Bake for about 40 mins at 180°C until springy and the sides have started to pull away, then leave to cool in the tin for 5 mins. Carefully transfer to a wire rack."
-    tip: "The cake will be very delicate so be gentle."
+    note: "The cake will be very delicate so be gentle."
   - "Top with sugar stirred with lemon juice, scoring the cake first so it all seeps in, whipped cream, lemon curd or anything else."
 method_short:
   - ""

@@ -40,7 +40,7 @@ method:
   - "Add the stock and potatoes, season, then low-boil for 5 mins."
   - "Add the chicken back to the pan, cover, and simmer for 5 mins, then add the beans, re-cover, and simmer for 5 mins more until the chicken and potatoes are cooked through."
   - step: "Once cooked, add the mustard and sorrel. Don't be shy with the sorrel. Check seasoning, then serve."
-    tip: Sorrel quickly loses its flavour if overcooked so add it near the end.
+    note: Sorrel quickly loses its flavour if overcooked so add it near the end.
 method_short:
   - |
     * Sear chicken 3 mins

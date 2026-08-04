@@ -53,7 +53,7 @@ method:
   - "Cover and simmer again for 1-2 hours to taste."
   - "Check the seasoning."
   - step: "Add the mushrooms 20 mins before the end."
-    tip: "Add them too early and they'll turn to mush."
+    note: "Add them too early and they'll turn to mush."
 method_short:
   - ""
 notes:

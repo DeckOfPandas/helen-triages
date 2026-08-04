@@ -25,7 +25,7 @@ method:
   - "Arrange in a single layer, skin-side up, tucking bay leaves and thyme sprigs underneath and between, then leave uncovered in the fridge for 8–12 hours."
   - "Rub the salt off each leg thoroughly, and rub five-spice into each leg, again especially into all the scores and under every fold. Leave uncovered in the fridge for at least a couple of hours."
   - step: Roast uncovered at 160°C for 75 mins until crispy. Baste gently with the rendered fat after 60 mins and again at 75 mins if needed.
-    tip: A cast iron tray is great for rendering all the fat evenly.
+    note: A cast iron tray is great for rendering all the fat evenly.
   - Blast at 220°C for 10–15 mins to crisp the skin.
   - Cover and rest for at least 15 mins before serving.
 method_short:

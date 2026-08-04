@@ -26,7 +26,7 @@ ingredient_groups:
     - item: "a glass of robust red wine, preferably Cab or Merlot"
     - amount: "200 g"
       item: fresh blueberries
-      tip: "Thaw and drain well if using frozen."
+      note: "Thaw and drain well if using frozen."
     - amount: "2"
       item: "large pats of butter"
 method:
