@@ -108,10 +108,21 @@ document.addEventListener('DOMContentLoaded', function () {
   // are cut off. Hidden rows (display:none, offsetParent null) are skipped:
   // they measure 0/0 either way, and get measured again once a filter or
   // page change makes them visible, because this runs at the end of update().
+  //
+  // GitHub issue #93: Helen saw the fade on rows that read as fully visible,
+  // not just genuinely clamped ones -- "each recipe row", not "some". A
+  // -webkit-box + -webkit-line-clamp box's scrollHeight vs. clientHeight
+  // comparison is a known source of exactly this kind of false positive:
+  // sub-pixel line-height rounding can put scrollHeight a pixel or two above
+  // clientHeight even when nothing is actually cut off, especially at
+  // fractional device pixel ratios. +1 wasn't enough headroom; +3 is more
+  // forgiving of that rounding while still catching genuine overflow, which
+  // is never a near-miss (a whole clamped line is comfortably taller than a
+  // few px). Not fully verifiable without a browser -- please check locally.
   function updateIngredientClamp() {
     document.querySelectorAll('.recipe-list .ingredient-list').forEach(function(el) {
       if (el.offsetParent === null) return;
-      el.classList.toggle('is-clamped', el.scrollHeight > el.clientHeight + 1);
+      el.classList.toggle('is-clamped', el.scrollHeight > el.clientHeight + 3);
     });
   }
 
