@@ -10,6 +10,19 @@ main_ingredients: ["Brussels sprouts", "pomegranate seeds", walnuts, apple, "red
 star_ingredient: greens
 tags: [salad, "no-cook", "make-ahead", virtuous]
 ingredient_groups:
+  - name: salad
+    items:
+    - amount: "350 g"
+      item: brussels sprouts
+    - amount: "½"
+      item: "red onion, finely sliced (¼ or skip is fine)"
+    - amount: "1"
+      item: "apple, cut into thin matchsticks"
+    - amount: "75 g"
+      item: pomegranate seeds
+    - amount: "75 g"
+      item: walnuts
+    - item: "handful of mint leaves, chopped, plus extra to garnish"
   - name: dressing
     items:
     - amount: "1"
@@ -24,19 +37,6 @@ ingredient_groups:
       item: natural yoghurt
     - amount: "2 tbsp"
       item: extra virgin olive oil
-  - name: salad
-    items:
-    - amount: "350 g"
-      item: brussels sprouts
-    - amount: "½"
-      item: "red onion, finely sliced (¼ or skip is fine)"
-    - amount: "1"
-      item: "apple, cut into thin matchsticks"
-    - amount: "75 g"
-      item: pomegranate seeds
-    - amount: "75 g"
-      item: walnuts
-    - item: "handful of mint leaves, chopped, plus extra to garnish"
 method:
   - "Mix the dressing in a bowl and season generously."
   - "Halve and finely slice the sprouts using the slicing attachment on a food processor."
