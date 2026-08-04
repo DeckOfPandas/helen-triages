@@ -400,21 +400,20 @@ article.recipe a {
 // two numbers again.
 $method-step-number-column: 2.4rem + 0.9rem;
 
-// Method groups all live in one <ol>, so this is "every step after the first
-// group heading" — which is every step in a grouped method. The heading items
-// themselves are excluded and stay flush.
+// GitHub issue #94: still read as flush with the group heading above rather
+// than nested under it, even with the group indent. $space-xxl (2rem) is the
+// largest spacing token there is, so this composes two of them rather than
+// inventing a one-off value.
 //
-// Composes with the number column below rather than replacing it: a grouped
-// step needs BOTH the group indent and room for its own number. ::before's
-// own `left` has to move by the same amount too -- position: absolute's
-// `left` is relative to the li's padding edge (fixed at the border, not
-// wherever the content box happens to start), so padding-left alone only
-// moves where the TEXT starts, never the number.
-.method-full li.method-group-heading-item ~ li.step {
-  padding-left: calc(#{$space-xxl} + #{$method-step-number-column});
-
-  &::before { left: $space-xxl; }
-}
+// GitHub issue #94, round 2: applied to EVERY step now, not just grouped
+// ones -- Helen: "when there are no ingredient group headings, the
+// numbering should be at the same level of indentation as when there are."
+// Used to live on a selector scoped to `li.method-group-heading-item ~
+// li.step` composing on top of the base indent below; that made grouped and
+// ungrouped methods indent differently, which is exactly what she doesn't
+// want. Baked into the base .method-full li rule instead, so there's only
+// ever one indent level regardless of whether this recipe has groups.
+$method-group-step-indent: $space-xxl + $space-lg;
 
 // GitHub issue #57: a note adds real height inside a step's own <li>,
 // but the flat margin-bottom every step gets (below, $space-xl) doesn't
@@ -422,17 +421,21 @@ $method-step-number-column: 2.4rem + 0.9rem;
 // another step, but when the annotated step is the LAST one before a
 // section boundary -- the next method group's heading, or the end of
 // Method itself -- that flat gap reads as crowding whatever follows,
-// rather than a clear "this block is done." Covers both boundaries Helen
-// confirmed she wants: immediately before a group heading, via the
-// adjacent-sibling check, and the very end of the list, via :last-child
-// (safe as "the last step in a group is also the last child of
-// .method-full" only when it's the LAST group too, which :last-child
-// alone already guarantees).
-.method-full li.step:has(.step-annotation) {
-  &:has(+ li.method-group-heading-item),
-  &:last-child {
-    margin-bottom: $space-xxl;
-  }
+// rather than a clear "this block is done." :last-child is safe as "the
+// last step in a group is also the last child of .method-full" only when
+// it's the LAST group too, which :last-child alone already guarantees.
+.method-full li.step:has(.step-annotation):last-child {
+  margin-bottom: $space-xxl;
+}
+
+// GitHub issue #94, round 2: the OTHER boundary #57 covered -- immediately
+// before the next group heading -- generalised from annotated steps only
+// to every step. Helen: "more space between the steps in a group and the
+// next heading", not "more space when that step happens to carry a tip".
+// li.method-group-heading-item has no margin-top of its own for this to
+// collapse against, so raising the step's margin-bottom is the whole fix.
+.method-full li.step:has(+ li.method-group-heading-item) {
+  margin-bottom: $space-xxl;
 }
 
 .method-full {
@@ -453,24 +456,35 @@ $method-step-number-column: 2.4rem + 0.9rem;
     // bullets already use) keeps the number out of the li's own flow
     // entirely, so whatever the step contains -- one line, or a paragraph
     // plus a nested list plus another paragraph -- stacks normally.
-    padding-left: $method-step-number-column;
+    // GitHub issue #94, round 2: composes $method-group-step-indent (see
+    // above) so every step indents the same amount whether or not this
+    // recipe has method groups.
+    padding-left: calc(#{$method-group-step-indent} + #{$method-step-number-column});
     margin-bottom: $space-xl;
     line-height: $line-height-body;
 
     &::before {
       content: counter(step-counter) ".";
       position: absolute;
-      left: 0;
-      top: $space-xxs;  // nudge down to align with first line of body text
-      font-family: $font-headings;
+      left: $method-group-step-indent;
+      // GitHub issue #94, round 2: was $font-headings (Courier) with the
+      // same scratchy -webkit-text-stroke emboss the group headings above
+      // it carry -- Helen: "confusing with the group headings", competing
+      // for the same "this is a heading" read a numeral shouldn't have.
+      // $font-body instead, plain, no stroke -- the number now reads as
+      // part of the step's own text, not as a second heading style.
+      //
+      // top: nudges the number down to align with the first line of body
+      // text. 0.15rem (round 1) too high, 0.3rem (round 2) too low, 0.22rem
+      // (round 3) still slightly low -- 0.16rem is Helen's own eyeballed
+      // final value.
+      top: 0.16rem;
+      font-family: $font-body;
       font-weight: 700;
       color: $color-step-number;
-      // The scratchy typewriter treatment the headings use, at the lightest of
-      // the three weights — $stroke-light is the token for small Courier marks
-      // (it already carries the meta labels and group headings). Medium is
-      // tuned for 1.8rem and reads as a blob at 1.2rem.
-      -webkit-text-stroke: $stroke-light;
-      font-size: 1.2rem;
+      // GitHub issue #94: was 1.2rem, read as too large once the group-
+      // heading gap (#55) gave the numbers more room to be compared against.
+      font-size: 1rem;
       line-height: 1.2;
     }
   }
@@ -878,10 +892,15 @@ article.recipe .recipe-body-content {
   max-width: 100vw;
   border-top: 1px dashed $color-border;
 
+  // GitHub issue #96: 0.72rem plus a further 15%-lightened colour on top of
+  // an already-muted grey made this hard to read for something Helen wants
+  // legible -- source attribution matters. Same font-size the annotation
+  // text elsewhere in this file already uses as its "small but legible"
+  // size, and the plain (not lightened) colour.
   .recipe-source {
     font-family: $font-headings;
-    font-size: 0.72rem;
-    color: lighten($color-clear-text, 15%);
+    font-size: 0.82rem;
+    color: $color-clear-text;
     margin: $space-xs 0;
     letter-spacing: 0.04em;
     text-transform: lowercase;
