@@ -71,7 +71,7 @@ method_groups:
       - "Score the pastry lightly, making sure not to cut through, and brush again with egg wash."
       - "Bake at 200°C for 15–20 mins until the pastry is golden brown. Rest for 10 mins before carving."
       - step: "Reheat the sauce and serve alongside the sliced Wellington."
-        note: "Slice across the middle (of the long sides) on a slight angle for maximal prettiness."
+        note: "Slice across the middle (across the grain) on a slight angle for maximal prettiness."
 method_short:
   - "Wrap and chill, sear, duxelle, assemble, sauce, cook."
 notes:

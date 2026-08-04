@@ -13,6 +13,13 @@ _site_prod/
 _food_drafts/
 _cocktail_drafts/
 
+# Individual pages held back the same way as the collections above — not
+# ready for a public repo, regardless of what Jekyll would or wouldn't build.
+# `published: false` in the page's own front matter is a SEPARATE, unrelated
+# switch (controls what Jekyll renders); it does nothing about git. This is
+# the entry that actually keeps the file off GitHub.
+food/about.html
+
 # Ruby
 vendor/
 .bundle/

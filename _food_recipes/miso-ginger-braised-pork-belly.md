@@ -1,21 +1,21 @@
 ---
 title: Miso and Ginger Braised Pork Belly
 short_name: Miso and Ginger Braised Pork Belly
-tagline: "Only gets better the next day. Make extra to ensure leftovers."
+tagline: "Only gets better the next day. Strategic over-catering is prudent."
 source: "Adapted from Great British Chefs, recipe Shu Han Lee"
 serves: 4
 prep_time: "20 mins"
 cook_time: "2 hrs 45 mins"
-main_ingredients: ["pork belly", "barley miso", ginger, mirin, "spring onions"]
+main_ingredients: ["pork belly", "barley miso", "fresh ginger", mirin, "spring onions"]
 star_ingredient: pork
-tags: ["make-ahead", "one-handed food"]
+tags: ["make-ahead", "one-handed food", fakeaway]
 ingredient_groups:
   - name: pork
     items:
     - amount: "800 g"
       item: "skin-on boneless pork belly"
     - amount: "2 inches"
-      item: ginger
+      item: fresh ginger
     - amount: "1 bunch"
       item: spring onions
     - amount: "5 tbsp"
@@ -27,7 +27,7 @@ ingredient_groups:
   - name: to serve
     items:
     - item: "spring onions, finely chopped"
-    - item: "ginger, julienned"
+    - item: "fresh ginger, julienned"
     - item: "white pepper, freshly ground"
 method:
   - "Cut the pork belly into 2.5-cm chunks. Blanch in boiling water for about 2 mins to clean, then drain and rinse well."
@@ -42,7 +42,7 @@ method_short:
 #   -
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---
