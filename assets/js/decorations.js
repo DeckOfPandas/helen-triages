@@ -212,6 +212,21 @@
       return pool[Math.abs(hash) % pool.length];
     }
 
+    // A title hit is an arbitrary substring of whatever's currently typed —
+    // it changes every keystroke, so the hash-based pool's whole point
+    // (the SAME tag always gets the SAME shape everywhere it appears) has
+    // no meaning here; there's no stable "tag identity" to be consistent
+    // about. One fixed shape instead, chosen deliberately rather than left
+    // to the hash — Helen, 2026-08-04, assumed it already had been ("I
+    // expect you chose the highlighter shape deliberately") and asked for
+    // one "slightly less square at the ends." It hadn't been picked at
+    // all; rendered every candidate in the pool to a PNG at this exact
+    // narrow width to actually look before choosing. tag-shape-6 has a
+    // genuinely jagged, organic tear at one end rather than a straight or
+    // notched-rectangular cut, which reads least "square" of the set —
+    // tag-shape-5 was the opposite extreme, essentially a flat rectangle.
+    var TITLE_HIT_SHAPE = 'tag-shape-6';
+
     slots.forEach(function (slot) {
       // .ingredient-pill and .title-hit added 2026-08-04 -- both got a
       // .tag-shape slot the same way badges and buttons do, but this list
@@ -224,18 +239,26 @@
       var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit');
       var text = (host ? host.textContent : '').trim().toLowerCase();
       if (!text) return;
-      var shape = pickShape(text);
-      // tag-shape-2's torn top-left corner reads fine at most widths but
-      // draws the eye on a wide pill -- stretched further via the
-      // --stretch modifier (see .tag-shape in _layout.scss) rather than
-      // dropped from the pool, since it's genuinely fine at other widths
-      // (Helen: fine for "duck", not fine for "make-ahead", same shape).
-      // Gated on the same SHORT_TEXT_MAX cutoff used above: duck is short
-      // text and was never the problem, so it must never pick this class up
-      // just because it happens to land on the same shape as make-ahead.
-      if (shape === 'tag-shape-2' && text.length > SHORT_TEXT_MAX) {
-        slot.classList.add('tag-shape--stretch');
+
+      var shape;
+      if (host.classList.contains('title-hit')) {
+        shape = TITLE_HIT_SHAPE;
+      } else {
+        shape = pickShape(text);
+        // tag-shape-2's torn top-left corner reads fine at most widths but
+        // draws the eye on a wide pill -- stretched further via the
+        // --stretch modifier (see .tag-shape in _layout.scss) rather than
+        // dropped from the pool, since it's genuinely fine at other widths
+        // (Helen: fine for "duck", not fine for "make-ahead", same shape).
+        // Gated on the same SHORT_TEXT_MAX cutoff used above: duck is short
+        // text and was never the problem, so it must never pick this class
+        // up just because it happens to land on the same shape as
+        // make-ahead.
+        if (shape === 'tag-shape-2' && text.length > SHORT_TEXT_MAX) {
+          slot.classList.add('tag-shape--stretch');
+        }
       }
+
       var url = HTF.siteAsset('/doodles/' + shape + '.svg');
       if (!url) return;
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
