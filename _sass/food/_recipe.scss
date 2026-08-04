@@ -104,10 +104,10 @@ article.recipe a {
   // never render against anything; this h1 previously carried 1.4rem that
   // did exactly that, unnoticed since 2026-07-09.
   letter-spacing: 0.04em;
-  // 60% of the 900px column is 540px, which wraps the longest titles to three
-  // lines. `text-wrap: balance` then keeps
-  // those lines a similar length, so no line ends up carrying a stub of a rule.
-  max-width: 60%;
+  // Was 60% (GitHub issue #66: too narrow). 70% of the 900px column is
+  // 630px. `text-wrap: balance` keeps whatever lines that wraps to a
+  // similar length, so no line ends up carrying a stub of a rule.
+  max-width: 70%;
   text-wrap: balance;
 }
 
