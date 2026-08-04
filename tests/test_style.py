@@ -158,6 +158,41 @@ def test_temperatures_use_degree_c(recipe):
     )
 
 
+def test_flour_and_sugar_specify_type(recipe):
+    """GitHub issue #79: bare "flour" or "sugar" as an ingredient name, with
+    no type in front of it (plain, self-raising, caster, icing...), leaves
+    the cook guessing. Only checks the ingredient's own name, not method
+    text -- "add the flour" there correctly refers back to an already-typed
+    ingredient.
+    """
+    bad = [i for i in recipe.ingredient_items if re.match(r"^(flour|sugar)\b", i.strip(), re.I)]
+    assert not bad, (
+        f"{where(recipe)} has ingredient(s) {bad!r} with no type specified. "
+        f"Say which flour or sugar, e.g. `plain flour`, `caster sugar`."
+    )
+
+
+def test_brown_sugar_is_soft_brown_sugar(recipe):
+    """GitHub issue #79: "light brown sugar", "dark brown muscovado sugar",
+    "light soft brown sugar"... only `soft brown sugar` is the house term.
+    Checks the ingredient's own name (up to the first comma/parenthesis) is
+    that exact phrase, not just that it contains it somewhere -- "light soft
+    brown sugar" does contain "soft brown sugar" as a substring but is still
+    a different, non-standard name.
+    """
+    bad = []
+    for item in recipe.ingredient_items:
+        name = re.split(r"[,(]", item)[0].strip()
+        if re.search(r"\bbrown\b", name, re.I) and re.search(r"\bsugar\b", name, re.I):
+            if name.lower() != "soft brown sugar":
+                bad.append(item)
+    assert not bad, (
+        f"{where(recipe)} has non-standard brown sugar name(s) {bad!r}. "
+        f"House term is exactly `soft brown sugar` -- if a recipe genuinely "
+        f"needs muscovado specifically, that's a call for Helen, not this test."
+    )
+
+
 # --- accents ----------------------------------------------------------------
 
 def _accented_words() -> dict:
