@@ -172,24 +172,37 @@ def test_flour_and_sugar_specify_type(recipe):
     )
 
 
+# Helen: "light brown muscovado sugar" and "dark brown muscovado sugar" are
+# both permitted alongside the default "soft brown sugar" -- muscovado is a
+# real, distinct product, not just a wordier way of saying the same thing.
+# Allowed as the ingredient's own name, optionally after a leading quantity
+# ("~2 tbsp dark brown muscovado sugar") that isn't in a proper `amount:`
+# field -- that's a separate, unrelated data-placement question.
+_BROWN_SUGAR_OK = re.compile(
+    r"(?:^|\d[\d./½¼¾⅓⅔]*\s*(?:tbsp|tsp|g|kg|ml|l|oz|lb)?\s+)"
+    r"(soft brown sugar|light brown muscovado sugar|dark brown muscovado sugar)$",
+    re.I,
+)
+
+
 def test_brown_sugar_is_soft_brown_sugar(recipe):
-    """GitHub issue #79: "light brown sugar", "dark brown muscovado sugar",
-    "light soft brown sugar"... only `soft brown sugar` is the house term.
-    Checks the ingredient's own name (up to the first comma/parenthesis) is
-    that exact phrase, not just that it contains it somewhere -- "light soft
-    brown sugar" does contain "soft brown sugar" as a substring but is still
-    a different, non-standard name.
+    """GitHub issue #79: "light brown sugar", "light soft brown sugar"...
+    everything except the three names in _BROWN_SUGAR_OK is non-standard.
+    Checks the ingredient's own name (up to the first comma/parenthesis),
+    not just that an allowed phrase appears somewhere in it -- "light soft
+    brown sugar" contains "soft brown sugar" as a substring but is still a
+    different, non-standard name.
     """
     bad = []
     for item in recipe.ingredient_items:
         name = re.split(r"[,(]", item)[0].strip()
         if re.search(r"\bbrown\b", name, re.I) and re.search(r"\bsugar\b", name, re.I):
-            if name.lower() != "soft brown sugar":
+            if not _BROWN_SUGAR_OK.search(name):
                 bad.append(item)
     assert not bad, (
         f"{where(recipe)} has non-standard brown sugar name(s) {bad!r}. "
-        f"House term is exactly `soft brown sugar` -- if a recipe genuinely "
-        f"needs muscovado specifically, that's a call for Helen, not this test."
+        f"Allowed: soft brown sugar, light brown muscovado sugar, dark "
+        f"brown muscovado sugar."
     )
 
 
