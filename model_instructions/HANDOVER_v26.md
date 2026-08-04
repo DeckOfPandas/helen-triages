@@ -219,13 +219,13 @@ ingredient_groups:
     items:
     - amount: "400 g"
       item: "butter beans, drained"
-      tip: "Jarred are worth it here."
+      note: "Jarred are worth it here."
     - item: "vegetable oil, to fry"
       incidental: true              # optional; see "Easy to get wrong" below
 method:                          # xor method_groups: — never both
   - "Step text."
   - step: "Step text."
-    tip: "An aside."
+    note: "An aside."
 method_short:
   - ""                           # [""] = not written. A block scalar = written.
 notes:                           # always a list, never a blob
@@ -363,7 +363,7 @@ width — is the decided shape, not provisional.
 ### 4.2 A bullet list inside one method step
 
 Every `method:` step is markdownified (`_layouts/recipe.html`, same as
-tagline/tips/notes) — a multi-line YAML block scalar can embed a genuine
+tagline/notes) — a multi-line YAML block scalar can embed a genuine
 markdown list inside a single step, not just one line of prose. Write it as
 `|`, blank-line-separated around the list so kramdown parses it as an actual
 list rather than folding it into the surrounding paragraph:
@@ -904,13 +904,13 @@ wash, and lost.
 
 Four hues, and the count is the design: `$color-bright-magenta` (title rule,
 footer hearts, method toggle, and — as `$color-recipe-link`, darkened 12% —
-every cross-recipe link, wherever one appears: tagline, tips, notes, method
+every cross-recipe link, wherever one appears: tagline, notes, method
 steps), `$color-section-underline` / `$color-section-underline-2` (the two
 rule colours, spring green and violet, which only ever appear *together*
 inside one composite mark — and, since 2026-08-03, violet's second job: the
-hand-drawn arrow beside an ingredient/step tip or note, `.annotation-mark`
+hand-drawn arrow beside an ingredient/step note, `.annotation-mark`
 in `_recipe.scss`), and `$color-aureolin` (ingredient-amount highlighter).
-Everything else — the whole of the method, notes, tips, boxes — is
+Everything else — the whole of the method, notes, boxes — is
 `$color-clear-text` or `$color-border`. Colour is on what you *navigate* by,
 off what you *read* — a link counts as something you navigate BY, even
 mid-sentence, not decoration on something you're reading. The annotation
