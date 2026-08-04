@@ -428,17 +428,21 @@ $method-group-step-indent: $space-xxl + $space-lg;
 // another step, but when the annotated step is the LAST one before a
 // section boundary -- the next method group's heading, or the end of
 // Method itself -- that flat gap reads as crowding whatever follows,
-// rather than a clear "this block is done." Covers both boundaries Helen
-// confirmed she wants: immediately before a group heading, via the
-// adjacent-sibling check, and the very end of the list, via :last-child
-// (safe as "the last step in a group is also the last child of
-// .method-full" only when it's the LAST group too, which :last-child
-// alone already guarantees).
-.method-full li.step:has(.step-annotation) {
-  &:has(+ li.method-group-heading-item),
-  &:last-child {
-    margin-bottom: $space-xxl;
-  }
+// rather than a clear "this block is done." :last-child is safe as "the
+// last step in a group is also the last child of .method-full" only when
+// it's the LAST group too, which :last-child alone already guarantees.
+.method-full li.step:has(.step-annotation):last-child {
+  margin-bottom: $space-xxl;
+}
+
+// GitHub issue #94, round 2: the OTHER boundary #57 covered -- immediately
+// before the next group heading -- generalised from annotated steps only
+// to every step. Helen: "more space between the steps in a group and the
+// next heading", not "more space when that step happens to carry a tip".
+// li.method-group-heading-item has no margin-top of its own for this to
+// collapse against, so raising the step's margin-bottom is the whole fix.
+.method-full li.step:has(+ li.method-group-heading-item) {
+  margin-bottom: $space-xxl;
 }
 
 .method-full {
@@ -467,18 +471,23 @@ $method-group-step-indent: $space-xxl + $space-lg;
       content: counter(step-counter) ".";
       position: absolute;
       left: 0;
-      top: $space-xxs;  // nudge down to align with first line of body text
-      font-family: $font-headings;
+      // GitHub issue #94, round 2: was $font-headings (Courier) with the
+      // same scratchy -webkit-text-stroke emboss the group headings above
+      // it carry -- Helen: "confusing with the group headings", competing
+      // for the same "this is a heading" read a numeral shouldn't have.
+      // $font-body instead, plain, no stroke -- the number now reads as
+      // part of the step's own text, not as a second heading style.
+      top: 0.3rem;  // nudge down to align with first line of body text --
+                     // was $space-xxs (0.15rem) under $font-headings; the
+                     // switch to $font-body moved the glyph's own vertical
+                     // metrics, so this needed re-tuning, not just carrying
+                     // the old value over. Still a first-pass guess -- look
+                     // again.
+      font-family: $font-body;
       font-weight: 700;
       color: $color-step-number;
-      // The scratchy typewriter treatment the headings use, at the lightest of
-      // the three weights — $stroke-light is the token for small Courier marks
-      // (it already carries the meta labels and group headings). Medium is
-      // tuned for 1.8rem and reads as a blob even at the smaller size below.
-      //
       // GitHub issue #94: was 1.2rem, read as too large once the group-
       // heading gap (#55) gave the numbers more room to be compared against.
-      -webkit-text-stroke: $stroke-light;
       font-size: 1rem;
       line-height: 1.2;
     }
