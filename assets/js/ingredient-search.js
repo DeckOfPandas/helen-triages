@@ -15,16 +15,23 @@
 (function (root) {
   'use strict';
 
-  // Strip diacritics for MATCHING ONLY. Nobody types "comté" into a search
-  // box, so folding both sides lets `comte`, `comté` and `mte` all find the
-  // same ingredient. Display is never folded — buttons render the
-  // ingredient's real text, accents intact.
+  // Strip diacritics and normalise hyphens to spaces, for MATCHING ONLY.
+  // Nobody types "comté" into a search box, so folding both sides lets
+  // `comte`, `comté` and `mte` all find the same ingredient. Same idea for
+  // hyphens -- "five-spice" is one compound ingredient name, but a query
+  // typed as "five spice" (a space, the natural way to type two words)
+  // should match it exactly as if the hyphen were a space. Display is
+  // never folded -- buttons render the ingredient's real text, hyphens
+  // and accents intact.
   function fold(str) {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/-/g, ' ');
   }
 
+  // Splits on hyphens as well as whitespace so "five-spice" tokenises as
+  // ["five", "spice"] for matching, the same as a query typed "five spice"
+  // -- see fold() above for why hyphens are treated as word boundaries.
   function getWords(str) {
-    return str.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    return str.toLowerCase().trim().split(/[\s-]+/).filter(Boolean);
   }
 
   // Builds a matcher bound to one vocabulary (the parsed contents of
@@ -147,6 +154,13 @@
         wordToEntries[headWord].add(entryKey);
       });
 
+      // Whether the query is a genuine prefix of ANY head word at all,
+      // anywhere in the corpus — used below to decide whether structural
+      // family detection needs to fall back to a looser, substring check.
+      var anyHeadwordPrefixed = Object.keys(wordToEntries).some(function (hw) {
+        return hw.indexOf(query) === 0;
+      });
+
       var renderedKeys = new Set();
 
       if (multiWord) {
@@ -254,12 +268,22 @@
 
         // Check for STRUCTURAL family membership — a FIRST word with no
         // curated synonym list that nonetheless heads 2+ distinct entries.
-        // Only the head word, and only as a PREFIX of it — not contained
+        // Normally only as a PREFIX of the head word — not contained
         // anywhere in it: "chi" sits inside "pistachios" with no relation
         // to what was typed. Excludes never_family — "red", "white",
         // "mixed" genuinely head 2+ entries, but those entries are
         // unrelated foods that merely share a colour or variety word.
-        if (enableFamilyButtons && (fold(ingWords[0]).indexOf(query) === 0 || normWords[0].indexOf(query) === 0)) {
+        //
+        // GitHub issue #56: "hic" should still collapse chicken breast/
+        // thigh/stock into "chicken (all)", even though "hic" isn't a
+        // prefix of "chicken" — it's buried mid-word. Falls back to a
+        // substring check on the head word, but ONLY when the query
+        // doesn't prefix ANY head word anywhere in the corpus — a real
+        // prefix relationship ("chi" → "chicken") always wins outright and
+        // never gets diluted by this looser fallback.
+        var headIsPrefixMatch = fold(ingWords[0]).indexOf(query) === 0 || normWords[0].indexOf(query) === 0;
+        var headIsSubstringFallback = !headIsPrefixMatch && !anyHeadwordPrefixed && normWords[0].indexOf(query) !== -1;
+        if (enableFamilyButtons && (headIsPrefixMatch || headIsSubstringFallback)) {
           var headWord = normWords[0];
           if (!neverFamilySet.has(headWord)) {
             var entries = wordToEntries[headWord];

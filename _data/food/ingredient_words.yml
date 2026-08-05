@@ -262,3 +262,15 @@ synonyms:
   stock:
     - stock
     - broth
+
+  # GitHub issue #59: flour is always the TRAILING word in this corpus
+  # ("plain flour", "self-raising flour") — never the first — so it can
+  # never form a family the structural, first-word-only way. Cornflour is
+  # deliberately excluded: a different product (cornstarch), not a wheat
+  # flour, the same call already made for "cherry tomatoes" not counting
+  # towards "cherry".
+  flour:
+    - flour
+    - plain flour
+    - self-raising flour
+    - plain white flour
