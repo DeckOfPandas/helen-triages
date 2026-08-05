@@ -48,7 +48,13 @@ layout: default
     {% endif %}
     <ul class="ingredients">
       {% for item in group.items %}
-        {% if item.item %}
+        {% if item.item and item.incidental %}
+          {% comment %} GitHub issue #75: incidental items (a generic
+          cooking fluid, not a real recipe component) shouldn't be shown
+          in main_ingredients on the index page OR in the ingredients list
+          on the recipe page -- Helen. Still mentioned in the method text
+          itself where it's actually used, just not itemised here. {% endcomment %}
+        {% elsif item.item %}
           <li class="ingredient ingredient--annotated">
             {% if item.amount %}
               {% assign amount_parts = item.amount | split: " " %}
