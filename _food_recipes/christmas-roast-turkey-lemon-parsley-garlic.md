@@ -24,6 +24,7 @@ ingredient_groups:
     - amount: "6"
       item: bay leaves
     - item: "olive oil, to drizzle"
+      incidental: true
     - amount: "8"
       item: rashers of streaky bacon
   - name: "lemon, parsley and garlic butter"
