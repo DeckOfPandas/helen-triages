@@ -69,6 +69,20 @@ Scaffold is in, deliberately empty — `HANDOVER_v26.md` §9 is the only record
 of what's known. Helen will paste 5–10 real cocktail recipes; front matter
 comes from what those actually need. **Do not design it top-down.**
 
+### 1.5a Continuing GitHub issue #68 (ingredient order within a group)
+
+Not automatable reliably enough for a real test (see `tests/test_taxonomy.py`'s
+`test_ingredient_group_order_matches_title` commit message for why item-level
+matching against free prose kept producing false positives). Working
+through it manually instead, recipe by recipe, Helen deciding each case.
+`scripts/find_ingredient_order_candidates.py` ranks recipes by how much
+their ingredient order seems to disagree with the method — a discovery
+aid to point a human at what's worth reading, not a source of truth.
+Read the actual recipe before touching anything; several of its
+top-ranked "inversions" per run turn out to be word-collision artefacts,
+not real issues. First round (2026-08-05) covered its top ~13 candidates
+by inversion count; plenty of the corpus hasn't been looked at yet.
+
 ### 1.5 Finish implementing `incidental: true`
 
 So far it only does half of what its own name implies. What exists:
