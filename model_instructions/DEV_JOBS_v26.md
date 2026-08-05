@@ -69,6 +69,21 @@ Scaffold is in, deliberately empty — `HANDOVER_v26.md` §9 is the only record
 of what's known. Helen will paste 5–10 real cocktail recipes; front matter
 comes from what those actually need. **Do not design it top-down.**
 
+### 1.5 Finish implementing `incidental: true`
+
+So far it only does half of what its own name implies. What exists:
+`test_incidental_not_in_main_ingredients` (`test_taxonomy.py`) and the
+schema note in `HANDOVER_v26.md` (see "Easy to get wrong") — a flagged item
+is kept out of `main_ingredients`, so it correctly never shows as an
+index-page pill or an ingredient-search hit. What's missing: nothing reads
+the flag in `_layouts/recipe.html`, so a flagged item still renders in the
+recipe page's own Ingredients section exactly like a core one — no
+different styling, no exclusion. First two real uses landed 2026-08-05
+(`chicken-cider-stew.md`, `chicken-a-la-king.md`, both a bare/near-bare
+olive oil never named again in the method). Helen: "don't include olive oil
+in the ingredients list this time" — that's the ask this job doesn't
+satisfy yet.
+
 ---
 
 ## 2. Content passes
