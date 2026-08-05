@@ -13,6 +13,8 @@ ingredient_groups:
   - items:
     - amount: "175 g"
       item: dark chocolate
+    - amount: "3 tbsp"
+      item: "flavouring to taste: Bailey's, orange liqueur, amaretto, or 3 drops ginger essence"
     - amount: "40 g"
       item: salted butter
     - amount: "80 g"
@@ -20,8 +22,6 @@ ingredient_groups:
     - amount: "50 g"
       item: ground almonds
     - item: "dusting as preferred: icing sugar, cocoa powder, nutmeg, cinnamon, or anything you fancy"
-    - amount: "3 tbsp"
-      item: "flavouring to taste: Bailey's, orange liqueur, amaretto, or 3 drops ginger essence"
 method:
   - "Melt the chocolate over a bain-marie, then add any flavouring."
   - "Stir in the butter until just melted then take off the heat."
