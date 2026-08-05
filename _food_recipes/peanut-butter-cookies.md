@@ -13,21 +13,21 @@ ingredient_groups:
   - items:
     - amount: "180 g"
       item: plain flour
+    - amount: "3 g"
+      item: baking powder
     - amount: "100 g"
       item: "unsalted butter, room temperature"
-    - amount: "250 g"
-      item: peanut butter
     - amount: "100 g"
       item: "dark brown soft sugar, lightly packed"
     - amount: "100 g"
       item: golden caster sugar
-    - item: Extra demerara sugar to coat
-    - amount: "1 tsp"
-      item: vanilla extract
+    - amount: "250 g"
+      item: peanut butter
     - amount: "1"
       item: "large egg, room temperature"
-    - amount: "3 g"
-      item: baking powder
+    - amount: "1 tsp"
+      item: vanilla extract
+    - item: Extra demerara sugar to coat
     - item: ¼–½ tsp sea salt, to taste
 method:
   - Sift the flour and baking powder.

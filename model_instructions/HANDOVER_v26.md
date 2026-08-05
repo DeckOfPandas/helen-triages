@@ -262,6 +262,11 @@ meta:
   (test_taxonomy.py) keeps it consistent with `main_ingredients`, which
   both the recipe-row ingredient pills and ingredient-search matching on
   the index page read from — an incidental oil should appear in neither.
+  `_layouts/recipe.html` also skips it entirely when rendering the recipe
+  page's own Ingredients section — it's still mentioned in the method
+  text wherever it's actually used (or, per Helen, not, when the
+  technique is assumed knowledge — searing beef in oil doesn't need
+  spelling out), just not itemised as its own line.
 - `serves` **xor** `makes` — `makes` for quantities you produce (bakes,
   sauces, base recipes; `makes: QQ` for base recipes), `serves` for what you
   portion out. **Values aren't always numeric** — both are free descriptive

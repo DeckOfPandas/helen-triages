@@ -6,7 +6,7 @@ source: "Adapted from Good Food 2026 wall calendar"
 serves: 2
 prep_time: "10 mins"
 cook_time: "35 mins"
-main_ingredients: ["salmon or trout", "sweet potatoes", broccoli, "pak choi", "white miso", "mirin", dark brown sugar", "fresh ginger"]
+main_ingredients: ["salmon or trout", "sweet potatoes", broccoli, "pak choi", "white miso", "mirin", "dark brown sugar", "fresh ginger"]
 star_ingredient: oily fish
 tags: [virtuous]
 ingredient_groups:
@@ -40,6 +40,7 @@ method:
     note: "large bowl = raw fish-ed bowl, small bowl = clean bowl"
   - "Slice the sweet potatoes into ½-cm slices. Toss with oil and salt on a baking tray, then arrange in an even layer. Bake for 15–20 mins until almost tender."
   - step: "Add the salmon, broccoli and pak choi to the tray. Sprinkle over the sesame seeds, drizzle over any marinade left in the large bowl and return to the oven for 12 mins."
+    note: "large bowl = raw fish-ed bowl, small bowl = clean bowl"
   - "Serve immediately, drizzling the salmon with the reserved miso marinade from the smaller bowl. Top with the spring onions."
 method_short:
   - ""

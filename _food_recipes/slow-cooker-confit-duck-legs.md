@@ -15,7 +15,8 @@ ingredient_groups:
     - item: coarse sea salt
     - item: fresh thyme
     - item: fresh garlic
-    - item: "duck fat (or olive oil)"
+    - item: duck fat
+      note: "or olive oil, in a pinch, but why be in a pinch for confit duck"
 method:
   - "Make a layer of salt, garlic and thyme in the bottom of a dish."
   - "Lay the duck on top, fat side down."

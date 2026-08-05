@@ -20,6 +20,7 @@ ingredient_groups:
     - amount: "2–3 tbsp"
       item: plum jam
     - item: "a pat of butter, to finish"
+      incidental: true
 method:
   - "Fry the plums until coloured and slightly softened, about 2 mins."
   - "Add the wine and bubble to reduce by ⅓."

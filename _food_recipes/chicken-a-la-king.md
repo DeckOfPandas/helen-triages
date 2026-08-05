@@ -14,6 +14,7 @@ ingredient_groups:
     items:
     - amount: "1 tbsp"
       item: olive oil
+      incidental: true
     - amount: "600 g"
       item: boneless skinless chicken breast
     - amount: "1"

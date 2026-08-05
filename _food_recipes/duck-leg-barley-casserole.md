@@ -13,6 +13,7 @@ ingredient_groups:
   - items:
     - amount: "12"
       item: "Gressingham duck legs, patted very dry"
+    - item: extra virgin olive oil
     - amount: "6"
       item: "small onions, diced"
     - amount: "300 g"
@@ -38,7 +39,6 @@ ingredient_groups:
       item: "large open mushrooms, each cut into 6–9 pieces"
     - amount: "150 g"
       item: "button mushrooms, larger ones cut in half"
-    - item: extra virgin olive oil
 method:
   - "Salt the duck all over, rubbing the salt into every crevice and especially all skin folds."
   - "Brown the duck legs on both sides in minimal extra virgin olive oil, then remove from the pan, reserving the rendered fat."

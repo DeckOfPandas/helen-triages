@@ -13,22 +13,22 @@ ingredient_groups:
   - items:
     - amount: "½"
       item: onion
+    - item: groundnut oil
     - amount: "200 g"
       item: new potatoes
     - amount: "500 g"
       item: chicken
-    - item: groundnut oil
     - item: "~1 clove garlic (or squirty or chopped)"
     - item: "~½ to 1 jar Thai green curry paste"
     - item: "~1 tbsp tamarind paste"
     - item: "lemongrass paste to taste"
+    - item: "zest and juice of 1 lime"
     - amount: "200–400 ml"
       item: coconut milk
     - amount: "125 ml"
       item: coconut cream
     - item: "~2 tbsp dark brown muscovado sugar"
     - item: "~2 tsp Thai fish sauce"
-    - item: "zest and juice of 1 lime"
     - item: "30–50 g flaked almonds"
     - amount: "100 g"
       item: green beans

@@ -98,18 +98,21 @@ def test_no_cook_tag_implies_no_cook_time(recipe):
 
 
 def test_no_oven_conversions(recipe):
-    """Fan oven only. Conversions are noise, and worse, a trap.
+    """Fan oven only, one temperature. "180°C fan" is exactly right --
+    Helen: "saying 'fan' isn't a conversion." What's actually banned is a
+    SECOND, conventional-oven-equivalent temperature alongside it -- "180°C
+    fan (160°C conventional)" in any form, bracketed or not -- and gas
+    marks, always, no exceptions.
 
     A conventional temperature left in place is 20 degrees too hot in this
     kitchen, so a stray conversion is not merely untidy.
     """
-    hits = re.findall(r"[^\s]*\s*(?:non-fan|fan\b|gas mark \d|gas \d)[^,.\"]{0,10}", recipe.raw)
-    hits = [h for h in hits if "fancy" not in h]
+    hits = re.findall(r"[^\s]*\s*(?:non-fan|conventional|gas mark \d|gas \d)[^,.\"]{0,10}", recipe.raw, re.I)
     assert not hits, (
         f"{where(recipe)} contains oven conversion(s): {hits}.\n"
-        f"This site is fan-oven only. Keep the fan temperature and delete the "
-        f"conventional and gas equivalents — but check which of the two figures "
-        f"is the fan one before deleting, they are not always in the same order."
+        f"This site is fan-oven only, one temperature: '180°C fan', never "
+        f"'180°C fan (160°C conventional)' in any form, and never a gas "
+        f"mark."
     )
 
 
