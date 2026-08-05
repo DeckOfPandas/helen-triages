@@ -24,7 +24,6 @@ ingredient_groups:
     - amount: "6"
       item: bay leaves
     - item: "olive oil, to drizzle"
-      incidental: true
     - amount: "8"
       item: rashers of streaky bacon
   - name: "lemon, parsley and garlic butter"
@@ -48,7 +47,7 @@ method_groups:
       - "Loosen the skin on the breasts from both ends of the bird, keeping the skin intact, then do the same on the legs."
       - "Stuff half the butter mix under the skin. From the outside, gently massage the butter around the breasts so that the meat is evenly covered. Insert the rest of the bay leaves under the skin of the breasts."
       - "Place the bird in a large roasting tray, breast side up. Spread the rest of the butter all over the skin. Season well with salt and pepper, then drizzle with olive oil. If preparing a day ahead, cover with foil and refrigerate."
-      - "Roast the turkey at 220°C for 10–15 mins, then baste with the pan juices and lay the bacon rashers over the breast to keep it moist. Baste again. Lower to 180°C and roast for about 2½ hours (30 mins per kg) until done, basting occasionally."
+      - "Roast the turkey at 200°C fan for 10–15 mins, then baste with the pan juices and lay the bacon rashers over the breast to keep it moist. Baste again. Lower to 160°C fan and roast for about 2½ hours (30 mins per kg) until done, basting occasionally."
       - "Transfer the turkey to a warmed platter and remove the parson's nose, wings and tips of the drumsticks. Keep these for the gravy. Leave the turkey to rest under foil and towels for at least 45 mins. Remove the bay leaves from under the skin before carving."
 method_short:
   - ""
