@@ -11,14 +11,14 @@ star_ingredient: fruit
 tags: [extras, "make-ahead"]
 ingredient_groups:
   - items:
-    - amount: "3"
-      item: "large lemons, rind and juice"
     - amount: "3 oz"
       item: salted butter
     - amount: "8 oz"
       item: golden caster sugar
     - amount: "2 heaped tsp"
       item: cornflour
+    - amount: "3"
+      item: "large lemons, rind and juice"
     - amount: "3"
       item: large eggs
     - item: knob of salted butter, optional
