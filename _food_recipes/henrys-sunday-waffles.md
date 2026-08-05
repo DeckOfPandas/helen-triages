@@ -11,18 +11,18 @@ star_ingredient: eggs
 tags: [breakfast, "carbs party"]
 ingredient_groups:
   - items:
-    - amount: "1¾ cups"
-      item: plain flour
-    - amount: "1 tsp"
-      item: baking powder
-    - amount: ¼ tsp
-      item: salt
     - amount: "2"
       item: "large eggs, separated"
     - amount: "1¾ cups"
       item: milk
     - amount: ½ cup
       item: groundnut oil
+    - amount: "1¾ cups"
+      item: plain flour
+    - amount: "1 tsp"
+      item: baking powder
+    - amount: ¼ tsp
+      item: salt
     - amount: "1 tbsp"
       item: melted butter
 method:
