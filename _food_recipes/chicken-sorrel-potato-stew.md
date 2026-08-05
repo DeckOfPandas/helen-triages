@@ -11,6 +11,8 @@ star_ingredient: poultry
 tags: ["one-handed food", virtuous]
 ingredient_groups:
   - items:
+    - amount: "300 g"
+      item: "chicken leg, cubed"
     - amount: "1"
       item: "large onion, diced"
     - amount: "2"
@@ -19,12 +21,10 @@ ingredient_groups:
       item: "stalks celery, diced"
     - amount: "3 cloves"
       item: "garlic, minced"
-    - amount: "300 g"
-      item: "chicken leg, cubed"
-    - amount: "400 g"
-      item: "new potatoes, quartered"
     - amount: "50 ml"
       item: white wine
+    - amount: "400 g"
+      item: "new potatoes, quartered"
     - amount: "500 ml"
       item: chicken stock
     - amount: "150 g"
