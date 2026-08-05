@@ -14,7 +14,6 @@ ingredient_groups:
     - amount: "½"
       item: onion
     - item: groundnut oil
-      incidental: true
     - amount: "200 g"
       item: new potatoes
     - amount: "500 g"
