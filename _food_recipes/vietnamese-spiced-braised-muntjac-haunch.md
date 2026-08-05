@@ -23,20 +23,21 @@ ingredient_groups:
       item: star anise
     - amount: "1"
       item: cinnamon stick
-    - amount: "1"
-      item: "yellow loomi, pierced once or twice with a skewer"
+    - amount: "2 tbsp"
+      item: tomato purée
+    - amount: "400 ml"
+      item: beef or venison stock
     - amount: "3 tbsp"
       item: fish sauce
     - amount: "2 tbsp"
       item: light soy sauce
     - amount: "2 tbsp"
       item: coconut palm sugar
-    - amount: "2 tbsp"
-      item: tomato purée
-    - amount: "400 ml"
-      item: beef or venison stock
+    - amount: "1"
+      item: "yellow loomi, pierced once or twice with a skewer"
     - amount: "2 tbsp"
       item: neutral oil
+      incidental: true
     - amount: "3"
       item: "spring onions, sliced, to serve"
     - item: "A large handful of fresh coriander, to serve"
