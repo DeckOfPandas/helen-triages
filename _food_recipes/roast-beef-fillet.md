@@ -13,8 +13,6 @@ ingredient_groups:
   - items:
     - amount: "1.2 kg"
       item: "prime beef fillet, in one piece, cut from the thick end"
-    - item: "olive oil, to sear"
-      incidental: true
     - item: "a few handfuls of wild rocket leaves"
 method:
   - "PLACEHOLDER - rewrite: Take the fillet out of the fridge at least 30 mins before cooking. Heat the oven to 200°C. Put a roasting pan in the oven to get hot."

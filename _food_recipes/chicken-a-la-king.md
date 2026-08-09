@@ -12,9 +12,6 @@ tags: [freezable, "make-ahead", "one-handed food"]
 ingredient_groups:
   - name: sauce
     items:
-    - amount: "1 tbsp"
-      item: olive oil
-      incidental: true
     - amount: "600 g"
       item: boneless skinless chicken breast
     - amount: "1"

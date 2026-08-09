@@ -35,9 +35,6 @@ ingredient_groups:
       item: coconut palm sugar
     - amount: "1"
       item: "yellow loomi, pierced once or twice with a skewer"
-    - amount: "2 tbsp"
-      item: neutral oil
-      incidental: true
     - amount: "3"
       item: "spring onions, sliced, to serve"
     - item: "A large handful of fresh coriander, to serve"

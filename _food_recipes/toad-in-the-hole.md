@@ -12,8 +12,6 @@ tags: ["carbs party"]
 ingredient_groups:
   - name: sausages
     items:
-    - item: Sunflower oil
-      incidental: true
     - amount: "8"
       item: good-quality sausages
     - amount: "4 sprigs"
