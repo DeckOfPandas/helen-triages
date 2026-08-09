@@ -155,6 +155,34 @@ family_exceptions:
   - oyster mushrooms
 
 # -----------------------------------------------------------------------------
+# Aliases — whole-phrase entry on the left, the entry it collapses into on
+# the right. Different from `singulars`: singulars normalises one WORD for
+# MATCHING only ("chicken legs" still displays as "chicken legs", it just
+# also matches "chicken leg"). This collapses two whole master-list entries
+# into ONE, so only the right-hand form ever appears as a search result at
+# all — the same "duck leg"/"Gressingham duck legs" call already made for
+# `modifiers`' "gressingham" entry, just phrased for a trailing word instead
+# of a leading one.
+#
+# "five-spice" (five-spice-crispy-duck-legs.md) and "five-spice powder"
+# (gordons-christmas-roast-goose.md) are the one product, written two ways
+# across two recipes — five-spice-powder.md, the ingredient's own page, is
+# titled plainly "Five-Spice". Typing "five" used to surface three things:
+# "five-spice", "five-spice powder", and a "five (all)" umbrella over just
+# those two — Helen: collapse the two into one, and don't add a family
+# button for a "family" that's actually one ingredient spelled two ways.
+# Collapsing them to a single master-list entry does both at once: with
+# only one entry left, "five (all)" no longer has 2+ members to group.
+#
+# Not a general "strip trailing powder" rule — "cocoa powder" stays as
+# written, the same way `modifiers` won't strip "smoked" or "roasted": most
+# "powder" entries mark a real product difference (chilli powder vs.
+# chilli), so this only ever collapses phrases explicitly listed here.
+# -----------------------------------------------------------------------------
+aliases:
+  five-spice powder: five-spice
+
+# -----------------------------------------------------------------------------
 # Singulars — plural form on the left, the form to match on, on the right.
 #
 # Used to normalise ingredient words before comparison, so that "chicken legs"

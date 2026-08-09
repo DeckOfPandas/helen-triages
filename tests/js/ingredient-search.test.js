@@ -166,6 +166,18 @@ test("family_exceptions are excluded from their own head word's family count", (
     'cherry (all) should not form once the impostor is excluded from the count');
 });
 
+test('aliases collapse a whole phrase into another, so only the canonical form appears', () => {
+  const vocab = Object.assign({}, VOCAB, { aliases: { 'five-spice powder': 'five-spice' } });
+  const ingredients = ['five-spice', 'five-spice powder'];
+  const master = IS.create(vocab).buildMasterList(ingredients);
+  assert.deepStrictEqual(master, ['five-spice']);
+  const result = IS.create(vocab).search('five', master);
+  // Two recipes, but one collapsed entry -- and with only one entry left,
+  // there's nothing to group into a "five (all)" button.
+  assert.deepStrictEqual(result.results.map((r) => r.ing), ['five-spice']);
+  assert.ok(!result.familyButtons.includes('five'), 'five (all) should not form once collapsed to one entry');
+});
+
 test('a longer entry is never hidden behind a similar shorter one', () => {
   const master = matcher().buildMasterList(['brown sugar', 'soft brown sugar']);
   const result = matcher().search('sugar', master);

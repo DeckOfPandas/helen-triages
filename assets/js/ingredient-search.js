@@ -92,6 +92,17 @@
       return fold(String(w).toLowerCase());
     }));
 
+    // Whole-phrase collapses ("five-spice powder" -> "five-spice") — folded
+    // keys so "Five-Spice Powder" still matches. See _data/ingredient_words.yml.
+    var aliasMap = {};
+    Object.keys(vocabulary.aliases || {}).forEach(function (key) {
+      aliasMap[fold(key.toLowerCase())] = vocabulary.aliases[key];
+    });
+
+    function applyAlias(ing) {
+      return aliasMap[fold(ing.toLowerCase())] || ing;
+    }
+
     function stripModifiers(ing) {
       var words = ing.split(/\s+/);
       while (words.length > 1 && modifierSet.has(fold(words[0].toLowerCase()))) {
@@ -117,7 +128,7 @@
     function buildMasterList(rawIngredientStrings) {
       var set = new Set();
       rawIngredientStrings.forEach(function (ing) {
-        set.add(stripModifiers(ing));
+        set.add(applyAlias(stripModifiers(ing)));
       });
       return Array.from(set).sort(function (a, b) {
         return a.toLowerCase().localeCompare(b.toLowerCase());
