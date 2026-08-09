@@ -21,7 +21,7 @@ ingredient_groups:
     - amount: "3"
       item: "garlic cloves, chopped"
     - amount: "2 tbsp"
-      item: "dark soft brown sugar"
+      item: "dark brown soft sugar"
     - amount: "300 ml"
       item: "chicken stock"
     - item: "grated fresh galangal, to taste"

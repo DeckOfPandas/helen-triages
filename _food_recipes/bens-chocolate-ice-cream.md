@@ -25,7 +25,7 @@ ingredient_groups:
       item: vanilla extract
     - amount: "1 pinch"
       item: salt
-      note: "You're more likely to under-salt than over-salt, and given that salt brings out chocolate flavour under-salting would be a crime."
+      note: "you're more likely to under-salt than over-salt, and given that salt brings out chocolate flavour under-salting would be a crime"
 method:
   - "Melt the unsweetened chocolate in a bain-marie. Gradually whisk in the milk and heat, stirring constantly, until smooth. Let it cool."
   - "Whisk the eggs until light and fluffy, 1–2 mins. Whisk in the sugar gradually, then continue whisking until fully blended, about 1 min more. Add the cream, vanilla, and salt and whisk to blend."

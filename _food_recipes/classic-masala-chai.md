@@ -1,7 +1,7 @@
 ---
 title: "Classic Masala Chai"
 short_name: "Classic Masala Chai"
-tagline: "QQ"
+tagline: "Just perfect."
 source: "delicious. magazine"
 serves: 4
 prep_time: "5 mins"

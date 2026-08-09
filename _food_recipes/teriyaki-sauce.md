@@ -6,7 +6,7 @@ source: "Adapted from The Daring Gourmet, recipe Kimberly Killebrew"
 makes: about 300 ml
 prep_time: "5 mins"
 cook_time: "5 mins"
-main_ingredients: [tamari, "dark soft brown sugar", "fresh ginger", "fresh garlic", mirin, honey]
+main_ingredients: [tamari, "dark brown soft sugar", "fresh ginger", "fresh garlic", mirin, honey]
 star_ingredient:
 tags: [extras]
 ingredient_groups:
@@ -14,7 +14,7 @@ ingredient_groups:
     - amount: "120 ml"
       item: tamari (or low-sodium soy sauce)
     - amount: "50 g"
-      item: dark soft brown sugar
+      item: dark brown soft sugar
     - amount: "1½ tsp"
       item: "fresh ginger, minced"
     - amount: "1 tsp"

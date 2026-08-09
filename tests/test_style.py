@@ -174,8 +174,12 @@ def test_flour_and_sugar_specify_type(recipe):
 
 # Same under-specification problem as bare `flour`/`sugar` above, not a
 # wording preference: light/dark is a required qualifier, not optional
-# decoration, so bare "soft brown sugar" is NOT in this list -- Helen: the
-# allowed names are "light soft brown sugar" and "dark soft brown sugar".
+# decoration, so bare "brown soft sugar" is NOT in this list -- Helen: the
+# allowed names are "light brown soft sugar" and "dark brown soft sugar" --
+# colour first, same order as the muscovado names below (corrected
+# 2026-08-09; earlier versions of this test had the order backwards, which
+# is why several already-published recipes using the correct colour-first
+# order were failing it).
 # Muscovado is a real, distinct product (also always light/dark-qualified),
 # not just a wordier way of saying the same thing, so it gets its own two
 # entries rather than being folded into the soft-brown-sugar names.
@@ -184,18 +188,18 @@ def test_flour_and_sugar_specify_type(recipe):
 # field -- that's a separate, unrelated data-placement question.
 _BROWN_SUGAR_OK = re.compile(
     r"(?:^|\d[\d./½¼¾⅓⅔]*\s*(?:tbsp|tsp|g|kg|ml|l|oz|lb)?\s+)"
-    r"(light soft brown sugar|dark soft brown sugar"
+    r"(light brown soft sugar|dark brown soft sugar"
     r"|light brown muscovado sugar|dark brown muscovado sugar)$",
     re.I,
 )
 
 
 def test_brown_sugar_is_soft_brown_sugar(recipe):
-    """GitHub issue #79: "brown sugar", "dark brown soft sugar"... everything
+    """GitHub issue #79: "brown sugar", "dark soft brown sugar"... everything
     except the four names in _BROWN_SUGAR_OK is non-standard, including bare
-    "soft brown sugar" with no light/dark qualifier. Checks the ingredient's
+    "brown soft sugar" with no light/dark qualifier. Checks the ingredient's
     own name (up to the first comma/parenthesis), not just that an allowed
-    phrase appears somewhere in it -- "light brown soft sugar" contains
+    phrase appears somewhere in it -- "dark soft brown sugar" contains
     "brown sugar" as a substring but the words are in the wrong order.
     """
     bad = []
@@ -206,7 +210,7 @@ def test_brown_sugar_is_soft_brown_sugar(recipe):
                 bad.append(item)
     assert not bad, (
         f"{where(recipe)} has non-standard brown sugar name(s) {bad!r}. "
-        f"Allowed: light soft brown sugar, dark soft brown sugar, light "
+        f"Allowed: light brown soft sugar, dark brown soft sugar, light "
         f"brown muscovado sugar, dark brown muscovado sugar."
     )
 

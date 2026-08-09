@@ -1,10 +1,10 @@
 ---
 title: "Gluten-Free Crumble Topping"
 short_name: "Gluten-Free Crumble Topping"
-tagline: "A base crumble topping, made gluten-free."
-source: "QQ source"
+tagline: "Surprisingly good."
+source: "Henry"
 makes: "Enough to top a 1.5 l dish (22 x 17 cm) — about one food processor bowl full"
-prep_time: "QQ"
+prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["gluten-free flour", "ground almonds", "demerara sugar", "butter"]
 star_ingredient:
@@ -27,8 +27,8 @@ method:
 method_short:
   - ""
 notes:
-  - label: "This is not a dessert"
-    text: "This is a base recipe — a crumble topping to use on other bakes. Not a standalone dessert; link/namedrop back to this page from recipes that use it."
+  - label: "Swapping flours"
+    text: "If you change flour types, make sure the total flour plus any ground almonds is twice the sugar or butter amount to maintain the classic ratio."
 meta:
   rewritten: true
   proofread: false

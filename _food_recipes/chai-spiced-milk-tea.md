@@ -1,7 +1,7 @@
 ---
 title: Chai-Spiced Milk Tea
 short_name: Chai-Spiced Milk Tea
-tagline: "Maximally comforting."
+tagline: "Maximally comforting. Use [chai spice powder](../chai-spice-powder/)."
 source: "Adapted from indianhealthyrecipes.com"
 serves: 1
 prep_time: "None"
@@ -19,7 +19,7 @@ ingredient_groups:
       item: whole milk
     - item: "golden caster sugar, to taste"
     - amount: "½ tsp"
-      item: "[chai spice](../chai-spice/)"
+      item: "[chai spice powder](../chai-spice-powder/)"
 method_groups:
   - name: "Make the tea"
     steps:
