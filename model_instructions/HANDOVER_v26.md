@@ -469,10 +469,14 @@ you'd have to go buy, the vegetable that's the point. Cap at eight. **Not
 mechanically enforced** — no test checks the count, so a recipe with a
 spice-heavy ingredient list can go over deliberately, case by case, rather
 than being forced to cut something that genuinely fails the substitution
-test. `indonesian-chicken-curry-gulai-ayam.md` sits at 11, Helen's explicit
-call on 2026-08-02: everything in it is a "would have to specifically go
-buy" ingredient, so nothing was a good candidate to cut. Don't flag this one
-as a violation to fix.
+test. `indonesian-chicken-curry-gulai-ayam.md` (11) and `citrus-soy-salmon-
+sticky-rice.md` (12) both sit well past the cap — Helen's explicit call
+(2026-08-02 and 2026-08-09 respectively): everything in each is a "would
+have to specifically go buy" ingredient, so nothing was a good candidate to
+cut. Don't flag either as a violation to fix, and don't expect this to stop
+happening — more lists will grow past eight over time as ingredients get
+added to existing recipes. The cap is a soft first-pass guide, not something
+to defend by cutting a genuine substitution-test ingredient.
 
 **Cheeses** use the bare name where it stands alone (cheddar, feta, comté) —
 keep "cheese" only where the qualifier is meaningless without it (blue cheese,
@@ -486,9 +490,25 @@ enforces it across recipes *and* drafts.
 Declared in `_data/food/taxonomy.yml`. Adding a term there is all that's
 needed.
 
-**Star ingredients** (15, optional): beef, chocolate, duck, eggs, fruit, game,
-greens, lamb, oily fish, pork, poultry, root veg, shellfish, something
-unusual, white fish.
+**Star ingredients** (13, optional): beef, chocolate, duck, fruit, game,
+greens, lamb, oily fish, pork, poultry, root veg, shellfish, white fish.
+`something unusual` retired 2026-08-09 -- see `_data/food/taxonomy.yml`'s own
+comment for the reasoning (culturally relative, not a real craving, barely
+and inconsistently used). `legumes` considered the same day and not added:
+only two candidate recipes across the whole collection, both already
+adequately covered by an existing star -- not revisited unless that changes.
+`eggs` also retired the same day: every one of its six members used egg as
+a technique or structural ingredient, not as the thing the dish is actually
+about -- see `_data/food/taxonomy.yml`'s own comment for the full reasoning
+and the member list. A genuine egg-forward dish (Turkish eggs, deviled eggs,
+a frittata) would earn the star back; nothing in the collection qualifies
+today.
+
+**`goats-cheese-squash-rosemary-griddle-cakes.md` is `root veg`**
+(2026-08-09) — squash counts, per Helen. First (and so far only) recipe
+using this star; check against it, not just the bare word list, when
+deciding whether a future squash/parsnip/swede/carrot-forward dish
+qualifies.
 
 **Mood** (15) — *what you feel like eating, a craving*: bakes, carbs party,
 cheese-tastic, dessert, drinks, fakeaway, hot snack, ice cream, nibbles,
@@ -530,6 +550,11 @@ re-litigated:**
   a fact, `no-cook` answers "can I put this on the table without cooking?" A
   spice blend is honestly uncooked but a useless answer to that question, so
   it stays untagged.
+
+**`lemony-cavolo-nero-butter-bean-soup.md` isn't tagged `soup`, on purpose**
+(2026-08-09) — its own tagline calls it "a one-pot stew", and Helen considers
+the dish more stew than soup despite the title. Don't add `soup` to "fix"
+this.
 
 **`drinks`** = anything drinkable that isn't a cocktail (frappé, cordial, hot
 chocolate). Cocktails belong to the sibling site.

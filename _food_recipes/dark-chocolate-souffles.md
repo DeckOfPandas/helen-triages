@@ -6,7 +6,7 @@ source: "Adapted from Green & Black's recipe book."
 serves: 6
 prep_time: 15 mins
 cook_time: "10–15 mins"
-main_ingredients: ["dark chocolate", "cocoa powder", "egg whites", "salted butter", "golden caster sugar", "demerara sugar"]
+main_ingredients: ["dark chocolate", "cocoa powder", "egg whites", "salted butter", "golden caster sugar", "Demerara sugar"]
 star_ingredient: chocolate
 tags: [dessert, showstopper]
 ingredient_groups:
@@ -19,9 +19,9 @@ ingredient_groups:
       item: large egg whites
     - amount: "60 g"
       item: golden caster sugar
-    - item: salted butter, demerara sugar and cocoa powder to coat the ramekins
+    - item: salted butter, Demerara sugar and cocoa powder to coat the ramekins
 method:
-  - step: "Prepare the ramekins by wiping upwards with melted salted butter, then swirl around a mix of demerara sugar and cocoa until the butter is covered evenly."
+  - step: "Prepare the ramekins by wiping upwards with melted salted butter, then swirl around a mix of Demerara sugar and cocoa until the butter is covered evenly."
     note: Wipe the butter upwards to encourage the soufflés to rise. To sugar, hold each ramekin sideways over another one and rotate it until all the sides are coated, knocking off any excess.
   - Melt the chocolate over a bain-marie.
   - "Mix the cocoa with 150 ml cold water in a saucepan, then bring to the boil while stirring continuously, boil for 10 seconds, then stir into the melted chocolate."

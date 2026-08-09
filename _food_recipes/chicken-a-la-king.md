@@ -12,9 +12,6 @@ tags: [freezable, "make-ahead", "one-handed food"]
 ingredient_groups:
   - name: sauce
     items:
-    - amount: "1 tbsp"
-      item: olive oil
-      incidental: true
     - amount: "600 g"
       item: boneless skinless chicken breast
     - amount: "1"
@@ -28,7 +25,7 @@ ingredient_groups:
     - amount: "125 ml"
       item: dry white wine
     - amount: "40 g"
-      item: flour
+      item: plain flour
     - amount: "250 ml"
       item: chicken stock
     - item: "Flavourings to taste like onion powder, English mustard powder, Worcestershire sauce, mushroom ketchup, MSG."

@@ -6,7 +6,7 @@ source: "Adapted from Good Food, recipe Sara Buenfeld"
 makes: "12 slices"
 prep_time: "10 mins"
 cook_time: "50 mins"
-main_ingredients: [courgette, orange, sultanas, "cream cheese", pistachios, "light soft brown sugar", "self-raising flour"]
+main_ingredients: [courgette, orange, sultanas, "cream cheese", pistachios, "light brown soft sugar", "self-raising flour"]
 star_ingredient:
 tags: [bakes, freezable]
 ingredient_groups:
@@ -15,7 +15,7 @@ ingredient_groups:
     - amount: "350 g"
       item: courgettes
     - amount: "200 g"
-      item: light soft brown sugar
+      item: light brown soft sugar
     - amount: "125 ml"
       item: sunflower oil
     - amount: "3"

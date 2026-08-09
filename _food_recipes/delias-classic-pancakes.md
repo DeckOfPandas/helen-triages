@@ -7,7 +7,7 @@ makes: "about 8"
 prep_time: 10 mins
 cook_time: "3–4 mins per pancake"
 main_ingredients: ["plain flour", eggs, milk, butter]
-star_ingredient: eggs
+star_ingredient:
 tags: ["carbs party", festive]
 ingredient_groups:
   - items:

@@ -8,7 +8,7 @@ prep_time: "5 mins"
 cook_time: "30 mins"
 main_ingredients: ["chicken leg", "new potatoes", sorrel, "French beans", "white wine", "wholegrain mustard"]
 star_ingredient: poultry
-tags: ["one-handed food", virtuous]
+tags: ["one-handed food", virtuous, freezable]
 ingredient_groups:
   - items:
     - amount: "300 g"

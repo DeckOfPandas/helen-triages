@@ -25,12 +25,33 @@
 # `star_ingredient` is OPTIONAL. Roughly a quarter of the collection leaves it
 # blank, and that is correct — a plain sponge, a spice blend or a dressing has
 # no hero ingredient, and inventing one for them would be worse than nothing.
+#
+# `something unusual` retired 2026-08-09, Helen's call: it's the only entry
+# defined relative to a subjective, cultural norm rather than an actual food
+# group, it isn't a real craving the way "beef" or "greens" are, and it was
+# barely used (1 of 77 recipes) — and not even consistently: peanut-butter-
+# cookies.md has the identical headline ingredient (peanut butter) and was
+# left blank instead. peanut-butter-ice-cream.md, its one user, is blank now.
+#
+# `legumes` considered and NOT added, same date: only two candidate recipes
+# existed (lemony-cavolo-nero-butter-bean-soup.md, pancetta-white-bean-
+# stew.md, both already covered by `greens`/`pork`) — not enough to be a
+# useful discriminator across the collection. Don't re-raise this on your
+# own; Helen will bring it back if her own cooking makes it worth it.
+#
+# `eggs` retired 2026-08-09, Helen's call: every one of its six members
+# (asparagus-gruyere-quiche, ben-jerrys-sweet-cream-base-1, delias-classic-
+# pancakes, henrys-quick-bulletproof-hollandaise-sauce, henrys-sunday-
+# waffles, mrs-nicholsons-yorkshire-puddings) uses egg as a technique or
+# structural ingredient, not as the thing the dish is actually about — "if
+# one wants to make eggs then one just does [eggs]". A genuine egg-forward
+# dish (Turkish eggs, deviled eggs, a frittata) would earn this star back;
+# nothing in the collection currently qualifies. All six are blank now.
 # -----------------------------------------------------------------------------
 star_ingredients:
   - beef
   - chocolate
   - duck
-  - eggs
   - fruit
   - game
   - greens
@@ -40,7 +61,6 @@ star_ingredients:
   - poultry
   - root veg
   - shellfish
-  - something unusual
   - white fish
 
 # -----------------------------------------------------------------------------
@@ -141,12 +161,14 @@ proper_nouns:
   - Bart
   - Brussels
   - Cab
+  - Caesar
   - Calvados
   - Ceylon
   - Cheddar
   - Cheshire
   - Chinese
   - Delia
+  - Demerara
   - Dijon
   - English
   - French
@@ -169,6 +191,7 @@ proper_nouns:
   - Parmesan
   - Piper
   - Sichuan
+  - Skippy
   - Smith
   - Thai
   - Worcestershire

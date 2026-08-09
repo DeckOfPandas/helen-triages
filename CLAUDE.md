@@ -12,6 +12,9 @@
 - NEVER access or create `.env` files containing deployment API keys.
 - NEVER run commands using the `--dangerously-skip-permissions` flag.
 - NEVER read, write or execute above the folder you're in.
+- NEVER read, write or execute in `~` (my home directory) or anywhere outside this project folder, for any reason -- if Claude Code config/settings storage is ever needed, it belongs in this project's own `.claude/` folder, never `~/.claude/`.
+- NEVER read, write or execute using the system `/tmp` directory (an absolute path starting `/tmp`). Use this project's own `tmp/` folder for all scratch and temporary files. Settings-level deny rules block this for the Read/Write/Edit tools, but Bash can't be perfectly path-restricted by permission patterns -- this rule is the actual backstop.
+- NEVER use `$CLAUDE_JOB_DIR` or any path under `/home/helen/.claude/jobs/` as a scratch location, even though background-job tooling suggests it by default. All scratch/temporary files -- including any helper script written to a file specifically to avoid a shell-quoting/brace-expansion warning -- belong in this project's own `tmp/` folder, always.
 
 ## Build Commands
 - Dev Server: `jekyll-local`, deploying to localhost:4001
@@ -22,6 +25,7 @@
 - Before creating a new branch, checkout out the main branch, then `git pull origin main`.
 - Commit freely without asking.
 - Never `git push` without my explicit confirmation first.
+- If a commit resolves a GitHub Issue, add a `Fixes #N` (or `Closes #N`) trailer to the commit message for every issue it resolves. GitHub auto-closes the issue once that commit reaches `main`. Never attempt to gain GitHub write access (`gh auth login` or similar) to close issues directly -- read-only access only, always. When summarising work, list the issue numbers involved so I can close anything the trailer mechanism didn't reach by hand.
 
 ## Normal workflow
 - If you need a scratch temporary folder, create one in this project folder and add it to .gitignore

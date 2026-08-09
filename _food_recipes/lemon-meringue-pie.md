@@ -6,14 +6,14 @@ source: Grandma Kath
 makes: "one pie"
 prep_time: "30 mins in stages"
 cook_time: "55 mins plus cooling"
-main_ingredients: [flour, butter, eggs, "lemon curd", "egg whites"]
+main_ingredients: ["plain flour", butter, eggs, "lemon curd", "egg whites"]
 star_ingredient:
 tags: [bakes, dessert, showstopper]
 ingredient_groups:
   - name: pastry base
     items:
     - amount: "8 oz"
-      item: flour
+      item: plain flour
     - amount: "4 oz"
       item: butter
     - amount: "3 oz"

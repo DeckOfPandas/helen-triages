@@ -8,7 +8,7 @@ prep_time: 15 mins
 cook_time: "1 hr"
 main_ingredients: ["chicken thighs and drumsticks", cider, "cooking apples", "crème fraîche", turnip, "green beans"]
 star_ingredient: poultry
-tags: ["one-handed food", virtuous]
+tags: ["one-handed food", virtuous, freezable]
 ingredient_groups:
   - items:
     - amount: "1.5 kg"
@@ -21,8 +21,6 @@ ingredient_groups:
       item: "stalks celery, diced"
     - amount: "4 cloves"
       item: "garlic, minced"
-    - item: olive oil
-      incidental: true
     - amount: "350 ml"
       item: medium-dry cider
     - amount: "3"

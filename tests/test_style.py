@@ -60,6 +60,24 @@ def test_no_qq_placeholder(recipe):
     )
 
 
+PLACEHOLDER = re.compile(r"\bPLACEHOLDER\b")
+
+
+def test_no_placeholder_marker(recipe):
+    """`PLACEHOLDER` is a second draft marker, alongside `QQ` -- found
+    2026-08-09 in roast-beef-fillet.md, where every method step read
+    "PLACEHOLDER - rewrite: ..." despite the recipe being published. Same
+    "drafting aid, not a published value" logic as `test_no_qq_placeholder`:
+    fine in _food_drafts/, never fine once a recipe counts as published.
+    """
+    hits = PLACEHOLDER.findall(recipe.raw)
+    assert not hits, (
+        f"{where(recipe)} still contains {len(hits)} `PLACEHOLDER` marker(s).\n"
+        f"Fine in _food_drafts/, not fine here — replace with the real "
+        f"content before this recipe counts as published."
+    )
+
+
 @pytest.mark.parametrize("field", TIME_FIELDS)
 def test_metadata_time_format(recipe, field):
     """Metadata uses the terse forms: `20 mins`, `1 hr 30 mins`, `2 hrs`."""
@@ -174,8 +192,12 @@ def test_flour_and_sugar_specify_type(recipe):
 
 # Same under-specification problem as bare `flour`/`sugar` above, not a
 # wording preference: light/dark is a required qualifier, not optional
-# decoration, so bare "soft brown sugar" is NOT in this list -- Helen: the
-# allowed names are "light soft brown sugar" and "dark soft brown sugar".
+# decoration, so bare "brown soft sugar" is NOT in this list -- Helen: the
+# allowed names are "light brown soft sugar" and "dark brown soft sugar" --
+# colour first, same order as the muscovado names below (corrected
+# 2026-08-09; earlier versions of this test had the order backwards, which
+# is why several already-published recipes using the correct colour-first
+# order were failing it).
 # Muscovado is a real, distinct product (also always light/dark-qualified),
 # not just a wordier way of saying the same thing, so it gets its own two
 # entries rather than being folded into the soft-brown-sugar names.
@@ -184,18 +206,18 @@ def test_flour_and_sugar_specify_type(recipe):
 # field -- that's a separate, unrelated data-placement question.
 _BROWN_SUGAR_OK = re.compile(
     r"(?:^|\d[\d./½¼¾⅓⅔]*\s*(?:tbsp|tsp|g|kg|ml|l|oz|lb)?\s+)"
-    r"(light soft brown sugar|dark soft brown sugar"
+    r"(light brown soft sugar|dark brown soft sugar"
     r"|light brown muscovado sugar|dark brown muscovado sugar)$",
     re.I,
 )
 
 
 def test_brown_sugar_is_soft_brown_sugar(recipe):
-    """GitHub issue #79: "brown sugar", "dark brown soft sugar"... everything
+    """GitHub issue #79: "brown sugar", "dark soft brown sugar"... everything
     except the four names in _BROWN_SUGAR_OK is non-standard, including bare
-    "soft brown sugar" with no light/dark qualifier. Checks the ingredient's
+    "brown soft sugar" with no light/dark qualifier. Checks the ingredient's
     own name (up to the first comma/parenthesis), not just that an allowed
-    phrase appears somewhere in it -- "light brown soft sugar" contains
+    phrase appears somewhere in it -- "dark soft brown sugar" contains
     "brown sugar" as a substring but the words are in the wrong order.
     """
     bad = []
@@ -206,7 +228,7 @@ def test_brown_sugar_is_soft_brown_sugar(recipe):
                 bad.append(item)
     assert not bad, (
         f"{where(recipe)} has non-standard brown sugar name(s) {bad!r}. "
-        f"Allowed: light soft brown sugar, dark soft brown sugar, light "
+        f"Allowed: light brown soft sugar, dark brown soft sugar, light "
         f"brown muscovado sugar, dark brown muscovado sugar."
     )
 
@@ -230,9 +252,9 @@ def _accent_check_fields(recipe) -> list[tuple[str, str]]:
 
     GitHub issues #46/#48/#82: "glace cherries" (an ingredient item name AND
     a main_ingredients entry), "Creme Brulee" (a title), "cafe" (found in
-    henrys-quick-hollandaise-sauce.md's free-text body content, the long-form
-    write-up added after HANDOVER's "exactly one file uses this" note was
-    written) -- none of these are in .prose, which was built for the
+    henrys-quick-bulletproof-hollandaise-sauce.md's free-text body content,
+    the long-form write-up added after HANDOVER's "exactly one file uses this"
+    note was written) -- none of these are in .prose, which was built for the
     typography/time-word tests and only ever covered front-matter running
     text, not names or body content. title/short_name/main_ingredients/
     star_ingredient/ingredient item names/body content all get the same
