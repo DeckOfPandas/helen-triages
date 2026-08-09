@@ -178,6 +178,21 @@ test('aliases collapse a whole phrase into another, so only the canonical form a
   assert.ok(!result.familyButtons.includes('five'), 'five (all) should not form once collapsed to one entry');
 });
 
+test('display_names relabels a result without changing its match key', () => {
+  const vocab = Object.assign({}, VOCAB, {
+    aliases: { 'five-spice powder': 'five-spice' },
+    display_names: { 'five-spice': 'Chinese five-spice powder' }
+  });
+  const master = IS.create(vocab).buildMasterList(['five-spice', 'five-spice powder']);
+  const result = IS.create(vocab).search('five', master);
+  assert.strictEqual(result.results.length, 1);
+  // The match key -- what filters.js stores as dataset.ingredient and uses
+  // to test recipes -- stays the literal text that's actually in the data.
+  assert.strictEqual(result.results[0].ing, 'five-spice');
+  // Only the label shown on the button changes.
+  assert.strictEqual(result.results[0].label, 'Chinese five-spice powder');
+});
+
 test('a longer entry is never hidden behind a similar shorter one', () => {
   const master = matcher().buildMasterList(['brown sugar', 'soft brown sugar']);
   const result = matcher().search('sugar', master);

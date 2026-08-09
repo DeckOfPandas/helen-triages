@@ -103,6 +103,18 @@
       return aliasMap[fold(ing.toLowerCase())] || ing;
     }
 
+    // Button label overrides, keyed by the match key they relabel — kept
+    // separate from `aliases` because matching still has to run against the
+    // real match key, not the pretty name. See _data/ingredient_words.yml.
+    var displayNameMap = {};
+    Object.keys(vocabulary.display_names || {}).forEach(function (key) {
+      displayNameMap[fold(key.toLowerCase())] = vocabulary.display_names[key];
+    });
+
+    function getDisplayLabel(ing) {
+      return displayNameMap[fold(ing.toLowerCase())] || ing;
+    }
+
     function stripModifiers(ing) {
       var words = ing.split(/\s+/);
       while (words.length > 1 && modifierSet.has(fold(words[0].toLowerCase()))) {
@@ -205,7 +217,7 @@
         multiPrefix.concat(multiRestMatched, multiRestOther).forEach(function (c) {
           if (!renderedKeys.has(c.ingKey)) {
             renderedKeys.add(c.ingKey);
-            multiResults.push({ ing: c.ing, isPrefixMatch: c.isPrefixMatch, hasWordMatch: c.hasWordMatch });
+            multiResults.push({ ing: c.ing, label: getDisplayLabel(c.ing), isPrefixMatch: c.isPrefixMatch, hasWordMatch: c.hasWordMatch });
           }
         });
         return { familyButtons: [], results: multiResults };
@@ -321,7 +333,7 @@
       prefixMatches.concat(restMatched, restFamilyOnly).forEach(function (c) {
         if (!renderedKeys.has(c.normKey)) {
           renderedKeys.add(c.normKey);
-          results.push({ ing: c.ing, isPrefixMatch: c.isPrefixMatch, hasWordMatch: c.hasWordMatch });
+          results.push({ ing: c.ing, label: getDisplayLabel(c.ing), isPrefixMatch: c.isPrefixMatch, hasWordMatch: c.hasWordMatch });
         }
       });
 

@@ -183,6 +183,22 @@ aliases:
   five-spice powder: five-spice
 
 # -----------------------------------------------------------------------------
+# Display names — the entry on the left (a master-list/alias TARGET, after
+# collapsing) shows as the text on the right, for the button label only.
+#
+# Kept separate from `aliases` on purpose: matching still runs against the
+# left-hand key ("five-spice"), because that's the literal text that has to
+# overlap with what's actually in main_ingredients for at least one recipe
+# ("five-spice" in five-spice-crispy-duck-legs.md). "Chinese five-spice
+# powder" appears in neither recipe's main_ingredients verbatim — using it
+# as the match key itself would match zero recipes. This only swaps the
+# label shown on the button and pre-filled into the search box once
+# selected; what gets matched against recipes never changes.
+# -----------------------------------------------------------------------------
+display_names:
+  five-spice: Chinese five-spice powder
+
+# -----------------------------------------------------------------------------
 # Singulars — plural form on the left, the form to match on, on the right.
 #
 # Used to normalise ingredient words before comparison, so that "chicken legs"

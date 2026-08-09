@@ -272,7 +272,7 @@ function renderResultsPool() {
     // to 'chicken' I'd look at both". Only suppresses an exact bare-word
     // entry, never a real multi-word one like "chicken breast".
     if (result.familyButtons.indexOf(fold(r.ing.trim().toLowerCase())) !== -1) return;
-    resultsPool.appendChild(makeIngredientButton(r.ing, r.ing, r.hasWordMatch));
+    resultsPool.appendChild(makeIngredientButton(r.ing, r.label || r.ing, r.hasWordMatch));
   });
 
   var buttons = resultsPool.querySelectorAll('.btn-ingredient');
@@ -581,8 +581,11 @@ function renderResultsPool() {
         } else {
           activeIngredient = ing;
           isSearching = false;
-          var rawKey = target.dataset.ingredient;
-          if (searchBox) searchBox.value = rawKey.replace(' (all)', '').trim();
+          // The search box should echo what the button actually SHOWS, not
+          // its internal match key -- for an aliased entry like "five-spice"
+          // displayed as "Chinese five-spice powder", the two differ. See
+          // display_names in _data/ingredient_words.yml.
+          if (searchBox) searchBox.value = target.textContent.replace(' (all)', '').trim();
           resultsPool.innerHTML = '';
           resultsPool.appendChild(target);
           matrix.querySelectorAll('.btn-ingredient').forEach(function(b) { b.classList.remove('active'); });
