@@ -498,13 +498,17 @@ and inconsistently used). `legumes` considered the same day and not added:
 only two candidate recipes across the whole collection, both already
 adequately covered by an existing star -- not revisited unless that changes.
 
-**Two recipes with a blank `star_ingredient` that look like candidates but
-aren't** (2026-08-09, Helen's explicit call, don't re-flag either):
-`mrs-nicholsons-creme-patissiere.md` (egg-yolk-thickened custard -- looks
-like it should follow the same `eggs` logic as the hollandaise/pancakes/
-Yorkshire puddings/waffles cluster, but Helen wants it blank) and
-`goats-cheese-squash-rosemary-griddle-cakes.md` (squash is the headline
-ingredient, but Helen doesn't consider it a `root veg` case).
+**`mrs-nicholsons-creme-patissiere.md` has a blank `star_ingredient` on
+purpose** (2026-08-09, Helen's explicit call, don't re-flag): it's an
+egg-yolk-thickened custard and looks like it should follow the same `eggs`
+logic as the hollandaise/pancakes/Yorkshire puddings/waffles cluster, but
+Helen wants it blank regardless.
+
+**`goats-cheese-squash-rosemary-griddle-cakes.md` is `root veg`**
+(2026-08-09) — squash counts, per Helen. First (and so far only) recipe
+using this star; check against it, not just the bare word list, when
+deciding whether a future squash/parsnip/swede/carrot-forward dish
+qualifies.
 
 **Mood** (15) — *what you feel like eating, a craving*: bakes, carbs party,
 cheese-tastic, dessert, drinks, fakeaway, hot snack, ice cream, nibbles,
