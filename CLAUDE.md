@@ -22,6 +22,7 @@
 - Before creating a new branch, checkout out the main branch, then `git pull origin main`.
 - Commit freely without asking.
 - Never `git push` without my explicit confirmation first.
+- If a commit resolves a GitHub Issue, add a `Fixes #N` (or `Closes #N`) trailer to the commit message for every issue it resolves. GitHub auto-closes the issue once that commit reaches `main`. Never attempt to gain GitHub write access (`gh auth login` or similar) to close issues directly -- read-only access only, always. When summarising work, list the issue numbers involved so I can close anything the trailer mechanism didn't reach by hand.
 
 ## Normal workflow
 - If you need a scratch temporary folder, create one in this project folder and add it to .gitignore
