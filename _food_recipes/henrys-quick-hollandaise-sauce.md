@@ -6,7 +6,7 @@ source: "Furious, split, slack and curdled decades of cursing at eggs"
 serves: "4, generously"
 prep_time: "15 mins"
 cook_time: "10 mins"
-main_ingredients: ["salted butter", "egg yolks", "lemon juice", "apple cider vinegar"]
+main_ingredients: ["salted butter", "egg yolk", "lemon juice", "apple cider vinegar"]
 star_ingredient: eggs
 tags: [extras]
 ingredient_groups:

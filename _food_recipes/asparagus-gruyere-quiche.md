@@ -13,7 +13,7 @@ ingredient_groups:
   - name: pastry
     items:
     - amount: "220 g"
-      item: flour
+      item: plain flour
     - amount: "150 g"
       item: butter
     - amount: "6 tbsp"

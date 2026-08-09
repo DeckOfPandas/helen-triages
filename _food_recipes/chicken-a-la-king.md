@@ -28,7 +28,7 @@ ingredient_groups:
     - amount: "125 ml"
       item: dry white wine
     - amount: "40 g"
-      item: flour
+      item: plain flour
     - amount: "250 ml"
       item: chicken stock
     - item: "Flavourings to taste like onion powder, English mustard powder, Worcestershire sauce, mushroom ketchup, MSG."

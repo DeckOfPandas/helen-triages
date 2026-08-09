@@ -23,6 +23,7 @@ ingredient_groups:
       item: golden caster sugar
     - amount: "250 g"
       item: peanut butter
+      note: Skippy is fantastic
     - amount: "1"
       item: "large egg, room temperature"
     - amount: "1 tsp"
