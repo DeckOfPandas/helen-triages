@@ -29,7 +29,7 @@ ingredient_groups:
       item: "whole milk"
       note: "or almond and oat milk are good too"
     - amount: "1–2 tbsp"
-      item: "sugar, jaggery or any kind of honey, to taste"
+      item: "golden caster sugar, jaggery or any kind of honey, to taste"
 method:
   - "Put the cardamom, cinnamon, cloves, peppercorns, ginger and 460 ml water in a medium saucepan. Bring to the boil over a medium heat, then simmer for 5–7 mins to allow the spices to infuse the water — the longer you simmer, the stronger the flavour."
   - "Add the tea leaves to the hot, spiced water. Stir well, then simmer for 2–3 mins. The tea should begin to darken and the flavour should start to infuse."

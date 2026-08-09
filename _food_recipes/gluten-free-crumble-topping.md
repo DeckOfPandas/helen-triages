@@ -4,9 +4,9 @@ short_name: "Gluten-Free Crumble Topping"
 tagline: "A base crumble topping, made gluten-free."
 source: "QQ source"
 makes: "Enough to top a 1.5 l dish (22 x 17 cm) — about one food processor bowl full"
-prep_time: "Estimated 10 mins"
+prep_time: "QQ"
 cook_time: "None"
-main_ingredients: ["gluten-free flour", "ground almonds", "Demerara sugar", "butter"]
+main_ingredients: ["gluten-free flour", "ground almonds", "demerara sugar", "butter"]
 star_ingredient:
 tags: ["no-cook", "extras"]
 ingredient_groups:
@@ -20,7 +20,7 @@ ingredient_groups:
     - amount: "50 g"
       item: "ground almonds"
     - amount: "125 g"
-      item: "Demerara sugar (or light brown soft sugar, or a half-and-half mix of the two)"
+      item: "demerara sugar (or light brown soft sugar, or a half-and-half mix of the two)"
     - item: "salt, to taste — don't hold back, you're more likely to under-do it than over-do it"
 method:
   - "Blend everything together in a food processor, or rub the butter into the dry ingredients with your fingertips if for some reason you want to spend ages getting the same result."

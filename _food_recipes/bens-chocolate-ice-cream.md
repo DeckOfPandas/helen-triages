@@ -18,7 +18,7 @@ ingredient_groups:
     - amount: "2 large"
       item: eggs
     - amount: "200 g"
-      item: sugar
+      item: golden caster sugar
     - amount: "240 ml"
       item: whipping cream, about 38% fat
     - amount: "1 tsp"
