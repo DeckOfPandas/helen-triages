@@ -7,7 +7,7 @@ makes: "4–6 waffles depending on your waffle iron"
 prep_time: "5 mins"
 cook_time: "15 mins"
 main_ingredients: ["plain flour", eggs, milk, "groundnut oil", "salted butter"]
-star_ingredient: eggs
+star_ingredient:
 tags: [breakfast, "carbs party"]
 ingredient_groups:
   - items:

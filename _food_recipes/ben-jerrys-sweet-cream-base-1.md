@@ -7,7 +7,7 @@ makes: "1 quart"
 prep_time: "10 mins"
 cook_time: none
 main_ingredients: [eggs, "golden caster sugar", "whipping cream", "whole milk"]
-star_ingredient: eggs
+star_ingredient:
 tags: [extras, freezable]
 ingredient_groups:
   - items:

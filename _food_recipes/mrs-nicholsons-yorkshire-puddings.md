@@ -7,7 +7,7 @@ makes: "12 normal Yorkshire puddings"
 prep_time: "10 mins"
 cook_time: "20 mins"
 main_ingredients: ["self-raising flour", eggs, milk, "groundnut oil"]
-star_ingredient: eggs
+star_ingredient:
 tags: [extras]
 ingredient_groups:
   - items:

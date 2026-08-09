@@ -490,19 +490,19 @@ enforces it across recipes *and* drafts.
 Declared in `_data/food/taxonomy.yml`. Adding a term there is all that's
 needed.
 
-**Star ingredients** (14, optional): beef, chocolate, duck, eggs, fruit, game,
+**Star ingredients** (13, optional): beef, chocolate, duck, fruit, game,
 greens, lamb, oily fish, pork, poultry, root veg, shellfish, white fish.
 `something unusual` retired 2026-08-09 -- see `_data/food/taxonomy.yml`'s own
 comment for the reasoning (culturally relative, not a real craving, barely
 and inconsistently used). `legumes` considered the same day and not added:
 only two candidate recipes across the whole collection, both already
 adequately covered by an existing star -- not revisited unless that changes.
-
-**`mrs-nicholsons-creme-patissiere.md` has a blank `star_ingredient` on
-purpose** (2026-08-09, Helen's explicit call, don't re-flag): it's an
-egg-yolk-thickened custard and looks like it should follow the same `eggs`
-logic as the hollandaise/pancakes/Yorkshire puddings/waffles cluster, but
-Helen wants it blank regardless.
+`eggs` also retired the same day: every one of its six members used egg as
+a technique or structural ingredient, not as the thing the dish is actually
+about -- see `_data/food/taxonomy.yml`'s own comment for the full reasoning
+and the member list. A genuine egg-forward dish (Turkish eggs, deviled eggs,
+a frittata) would earn the star back; nothing in the collection qualifies
+today.
 
 **`goats-cheese-squash-rosemary-griddle-cakes.md` is `root veg`**
 (2026-08-09) — squash counts, per Helen. First (and so far only) recipe
