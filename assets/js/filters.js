@@ -101,6 +101,32 @@ document.addEventListener('DOMContentLoaded', function () {
     items.forEach(function(li) { recipeList.appendChild(li); });
   }
 
+  // GitHub issues #63/#78: while a title search is active, matching rows
+  // are grouped into three tiers (title starts with the query > some other
+  // word in the title starts with it > query is only a mid-word substring
+  // somewhere) — see HTF.recipeList.titleMatchTier's own comment for the
+  // exact rule. Each tier is independently shuffled, same "fair shot" idea
+  // as shuffleRecipeList() above, so no recipe is permanently stuck at the
+  // bottom of a tier it shares with dozens of others. Runs on every
+  // keystroke, same as the matching itself — the ranking is only ever
+  // correct for the query that's currently typed.
+  function reorderForTitleSearch() {
+    if (!recipeList) return;
+    var byTier = { 0: [], 1: [], 2: [], 3: [] };
+    items.forEach(function(li) {
+      var title = (li.querySelector('a') || {}).textContent || '';
+      var tier = HTF.recipeList.titleMatchTier(title, nameQuery, fold);
+      byTier[tier].push(li);
+    });
+    items = [].concat(
+      HTF.recipeList.shuffle(byTier[1]),
+      HTF.recipeList.shuffle(byTier[2]),
+      HTF.recipeList.shuffle(byTier[3]),
+      byTier[0]
+    );
+    items.forEach(function(li) { recipeList.appendChild(li); });
+  }
+
   // Whether a row's ingredient line is ACTUALLY truncated by its line-clamp,
   // not just short. CSS has no selector for "this box's content overflowed
   // it" — mask-image can't conditionally apply itself — so this measures
@@ -240,7 +266,13 @@ function renderResultsPool() {
     resultsPool.appendChild(makeIngredientButton(label, label, true));
   });
   result.results.forEach(function(r) {
-    resultsPool.appendChild(makeIngredientButton(r.ing, r.ing, r.hasWordMatch));
+    // GitHub issue #51: if "chicken (all)" is already offered, don't also
+    // show a bare "chicken" row right next to it — Helen: "I am always
+    // suspicious of searches like this, so if I read 'chicken (all)' next
+    // to 'chicken' I'd look at both". Only suppresses an exact bare-word
+    // entry, never a real multi-word one like "chicken breast".
+    if (result.familyButtons.indexOf(fold(r.ing.trim().toLowerCase())) !== -1) return;
+    resultsPool.appendChild(makeIngredientButton(r.ing, r.label || r.ing, r.hasWordMatch));
   });
 
   var buttons = resultsPool.querySelectorAll('.btn-ingredient');
@@ -298,62 +330,73 @@ function renderResultsPool() {
 
     updateTitleHighlights();
 
-    if (!suppressList) {
-      var matchingLis = [];
+    // Matching runs regardless of suppressList, so the "N survivors" count
+    // below always reflects the filters actually in effect (title search,
+    // tags, star, meta) rather than freezing at a stale number. GitHub
+    // issue #60: Helen typed a title search (ten rows), then an ingredient
+    // search that matched nothing -- the list correctly emptied, but the
+    // count stayed stuck at "10 survivors" because this whole block, count
+    // included, used to be skipped outright while suppressList was true.
+    // Only the actual <li> visibility/pagination stays gated by
+    // suppressList below -- whether the list itself should keep showing
+    // rows while you're still picking an ingredient search result is a
+    // separate, open design question Helen hasn't resolved yet.
+    var matchingLis = [];
 
-      items.forEach(function(li) {
-        var tags = (li.dataset.tags || '').split(',').filter(Boolean);
-        var star = li.dataset.star || '';
-        var ingList = (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); });
-        var visible = true;
+    items.forEach(function(li) {
+      var tags = (li.dataset.tags || '').split(',').filter(Boolean);
+      var star = li.dataset.star || '';
+      var ingList = (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); });
+      var visible = true;
 
-        activeTags.forEach(function(t) {
-          if (tags.indexOf(t) === -1) visible = false;
-        });
-
-        if (activeStar && star !== activeStar) visible = false;
-
-        if (nameQuery) {
-          var title = (li.querySelector('a') || {}).textContent || '';
-          if (HTF.ingredientSearch.fold(title.toLowerCase()).indexOf(nameQuery) === -1) visible = false;
-        }
-
-        if (activeMetaFilters.has('rewrite') && li.dataset.metaRewrite !== 'true') visible = false;
-        if (activeMetaFilters.has('proofread') && li.dataset.metaProofread !== 'true') visible = false;
-        if (activeMetaFilters.has('no-short') && li.dataset.metaShort === 'true') visible = false;
-        if (activeMetaFilters.has('has-short') && li.dataset.metaShort !== 'true') visible = false;
-
-        if (activeIngredient) {
-          var hasMatch = false;
-          var activeKey = activeIngredient.replace(' (all)', '').trim();
-          var activeSynonyms = IS.getSynonymWords(activeKey);
-          if (activeSynonyms) {
-            // Synonym (all): match any ingredient containing any synonym word
-            for (var i = 0; i < ingList.length; i++) {
-              var ingLower2 = ingList[i].toLowerCase();
-              if (activeSynonyms.some(function(syn) { return ingLower2.indexOf(syn) !== -1; })) {
-                hasMatch = true; break;
-              }
-            }
-          } else {
-            var activeWords = getWords(activeKey).map(IS.normaliseIngredientWord);
-            for (var i = 0; i < ingList.length; i++) {
-              var ingWords2 = getWords(ingList[i]).map(IS.normaliseIngredientWord);
-              var allMatch = activeWords.every(function(aw) {
-                return ingWords2.some(function(iw) { return iw.indexOf(aw) !== -1; });
-              });
-              if (allMatch) { hasMatch = true; break; }
-            }
-          }
-          if (!hasMatch) visible = false;
-        }
-
-        if (visible) matchingLis.push(li);
-        else li.style.display = 'none';
+      activeTags.forEach(function(t) {
+        if (tags.indexOf(t) === -1) visible = false;
       });
 
-      visibleCount = matchingLis.length;
+      if (activeStar && star !== activeStar) visible = false;
 
+      if (nameQuery) {
+        var title = (li.querySelector('a') || {}).textContent || '';
+        if (HTF.ingredientSearch.fold(title.toLowerCase()).indexOf(nameQuery) === -1) visible = false;
+      }
+
+      if (activeMetaFilters.has('rewrite') && li.dataset.metaRewrite !== 'true') visible = false;
+      if (activeMetaFilters.has('proofread') && li.dataset.metaProofread !== 'true') visible = false;
+      if (activeMetaFilters.has('no-short') && li.dataset.metaShort === 'true') visible = false;
+      if (activeMetaFilters.has('has-short') && li.dataset.metaShort !== 'true') visible = false;
+
+      if (activeIngredient) {
+        var hasMatch = false;
+        var activeKey = activeIngredient.replace(' (all)', '').trim();
+        var activeSynonyms = IS.getSynonymWords(activeKey);
+        if (activeSynonyms) {
+          // Synonym (all): match any ingredient containing any synonym word
+          for (var i = 0; i < ingList.length; i++) {
+            var ingLower2 = ingList[i].toLowerCase();
+            if (activeSynonyms.some(function(syn) { return ingLower2.indexOf(syn) !== -1; })) {
+              hasMatch = true; break;
+            }
+          }
+        } else {
+          var activeWords = getWords(activeKey).map(IS.normaliseIngredientWord);
+          for (var i = 0; i < ingList.length; i++) {
+            var ingWords2 = getWords(ingList[i]).map(IS.normaliseIngredientWord);
+            var allMatch = activeWords.every(function(aw) {
+              return ingWords2.some(function(iw) { return iw.indexOf(aw) !== -1; });
+            });
+            if (allMatch) { hasMatch = true; break; }
+          }
+        }
+        if (!hasMatch) visible = false;
+      }
+
+      if (visible) matchingLis.push(li);
+      else if (!suppressList) li.style.display = 'none';
+    });
+
+    visibleCount = matchingLis.length;
+
+    if (!suppressList) {
       // The maths is pure -- assets/js/recipe-list.js -- and returns a
       // legal currentPage even if the one we asked for no longer exists
       // (a filter can narrow the results out from under whatever page you
@@ -428,7 +471,7 @@ function renderResultsPool() {
     }
 
     var recipeCountEl = document.getElementById('recipe-count');
-    if (recipeCountEl && !suppressList) {
+    if (recipeCountEl) {
       recipeCountEl.textContent = visibleCount + (visibleCount === 1 ? ' survivor' : ' survivors');
     }
 
@@ -538,8 +581,11 @@ function renderResultsPool() {
         } else {
           activeIngredient = ing;
           isSearching = false;
-          var rawKey = target.dataset.ingredient;
-          if (searchBox) searchBox.value = rawKey.replace(' (all)', '').trim();
+          // The search box should echo what the button actually SHOWS, not
+          // its internal match key -- for an aliased entry like "five-spice"
+          // displayed as "Chinese five-spice powder", the two differ. See
+          // display_names in _data/ingredient_words.yml.
+          if (searchBox) searchBox.value = target.textContent.replace(' (all)', '').trim();
           resultsPool.innerHTML = '';
           resultsPool.appendChild(target);
           matrix.querySelectorAll('.btn-ingredient').forEach(function(b) { b.classList.remove('active'); });
@@ -555,6 +601,15 @@ function renderResultsPool() {
   if (nameSearchBox) {
     nameSearchBox.addEventListener('input', function() {
       nameQuery = HTF.ingredientSearch.fold(nameSearchBox.value.trim().toLowerCase());
+      // Reshuffle to a fresh random base order once the query is cleared —
+      // same "returning to unfiltered" moment shuffleRecipeList() already
+      // covers for the "clear all" button, so titles don't stay stuck in
+      // whatever tiered order the last search left them in.
+      if (nameQuery) {
+        reorderForTitleSearch();
+      } else {
+        shuffleRecipeList();
+      }
       update();
     });
   }
@@ -564,6 +619,7 @@ function renderResultsPool() {
       nameQuery = '';
       nameSearchBox.value = '';
       nameSearchClear.style.visibility = 'hidden';
+      shuffleRecipeList();
       update();
     });
   }

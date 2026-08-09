@@ -49,7 +49,27 @@
     };
   }
 
-  var api = { shuffle: shuffle, paginate: paginate };
+  // Which of the three title-search tiers a title falls into, for a given
+  // (already folded+lowercased) query — GitHub issues #63/#78. Helen's
+  // rule: a title starting with the query outranks one where the query
+  // merely starts some OTHER word in it, which in turn outranks one where
+  // the query is only a mid-word substring somewhere. Returns 1/2/3 for
+  // those three tiers, or 0 for no match at all (the caller is expected to
+  // already know which titles matched; 0 only matters if it doesn't).
+  // `fold` is injected rather than required here, so this file stays free
+  // of a hard dependency on ingredient-search.js the way shuffle/paginate
+  // above are — filters.js already has a `fold` in scope to pass in.
+  function titleMatchTier(title, query, fold) {
+    if (!query) return 0;
+    var folded = fold(title.toLowerCase());
+    var words = folded.split(/\s+/).filter(Boolean);
+    if (words.length && words[0].indexOf(query) === 0) return 1;
+    if (words.some(function (w) { return w.indexOf(query) === 0; })) return 2;
+    if (folded.indexOf(query) !== -1) return 3;
+    return 0;
+  }
+
+  var api = { shuffle: shuffle, paginate: paginate, titleMatchTier: titleMatchTier };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;

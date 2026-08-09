@@ -69,3 +69,28 @@ test('paginate: showAll ignores the requested page and pageSize entirely', () =>
   assert.strictEqual(page.start, 0);
   assert.strictEqual(page.end, 45);
 });
+
+// titleMatchTier doesn't fold accents/hyphens itself -- that's the folder's
+// job, injected as a parameter -- so these tests use a trivial identity
+// fold, matching the real fold() closely enough for plain-ASCII titles.
+const identityFold = (s) => s;
+
+test('titleMatchTier: title starting with the query is tier 1', () => {
+  assert.strictEqual(RL.titleMatchTier('Chicken Fajitas', 'chi', identityFold), 1);
+});
+
+test('titleMatchTier: query prefixing a later word, not the first, is tier 2', () => {
+  assert.strictEqual(RL.titleMatchTier('Chicken Fajitas', 'faj', identityFold), 2);
+});
+
+test('titleMatchTier: query buried mid-word, matching no word\'s start, is tier 3', () => {
+  assert.strictEqual(RL.titleMatchTier('Chicken Fajitas', 'hic', identityFold), 3);
+});
+
+test('titleMatchTier: no match anywhere is tier 0', () => {
+  assert.strictEqual(RL.titleMatchTier('Chicken Fajitas', 'beef', identityFold), 0);
+});
+
+test('titleMatchTier: an empty query is always tier 0', () => {
+  assert.strictEqual(RL.titleMatchTier('Chicken Fajitas', '', identityFold), 0);
+});
