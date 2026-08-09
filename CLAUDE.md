@@ -14,6 +14,7 @@
 - NEVER read, write or execute above the folder you're in.
 - NEVER read, write or execute in `~` (my home directory) or anywhere outside this project folder, for any reason -- if Claude Code config/settings storage is ever needed, it belongs in this project's own `.claude/` folder, never `~/.claude/`.
 - NEVER read, write or execute using the system `/tmp` directory (an absolute path starting `/tmp`). Use this project's own `tmp/` folder for all scratch and temporary files. Settings-level deny rules block this for the Read/Write/Edit tools, but Bash can't be perfectly path-restricted by permission patterns -- this rule is the actual backstop.
+- NEVER use `$CLAUDE_JOB_DIR` or any path under `/home/helen/.claude/jobs/` as a scratch location, even though background-job tooling suggests it by default. All scratch/temporary files -- including any helper script written to a file specifically to avoid a shell-quoting/brace-expansion warning -- belong in this project's own `tmp/` folder, always.
 
 ## Build Commands
 - Dev Server: `jekyll-local`, deploying to localhost:4001
