@@ -12,6 +12,8 @@
 - NEVER access or create `.env` files containing deployment API keys.
 - NEVER run commands using the `--dangerously-skip-permissions` flag.
 - NEVER read, write or execute above the folder you're in.
+- NEVER read, write or execute in `~` (my home directory) or anywhere outside this project folder, for any reason -- if Claude Code config/settings storage is ever needed, it belongs in this project's own `.claude/` folder, never `~/.claude/`.
+- NEVER read, write or execute using the system `/tmp` directory (an absolute path starting `/tmp`). Use this project's own `tmp/` folder for all scratch and temporary files. Settings-level deny rules block this for the Read/Write/Edit tools, but Bash can't be perfectly path-restricted by permission patterns -- this rule is the actual backstop.
 
 ## Build Commands
 - Dev Server: `jekyll-local`, deploying to localhost:4001
