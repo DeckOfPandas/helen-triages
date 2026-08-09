@@ -165,9 +165,9 @@ family_exceptions:
 # of a leading one.
 #
 # "five-spice" (five-spice-crispy-duck-legs.md) and "five-spice powder"
-# (gordons-christmas-roast-goose.md) are the one product, written two ways
-# across two recipes — five-spice-powder.md, the ingredient's own page, is
-# titled plainly "Five-Spice". Typing "five" used to surface three things:
+# (gordons-christmas-five-spice-roast-goose.md) are the one product, written
+# two ways across two recipes — five-spice-powder.md, the ingredient's own
+# page, is titled "Five-Spice Powder". Typing "five" used to surface three things:
 # "five-spice", "five-spice powder", and a "five (all)" umbrella over just
 # those two — Helen: collapse the two into one, and don't add a family
 # button for a "family" that's actually one ingredient spelled two ways.

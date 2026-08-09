@@ -234,9 +234,9 @@ def _accent_check_fields(recipe) -> list[tuple[str, str]]:
 
     GitHub issues #46/#48/#82: "glace cherries" (an ingredient item name AND
     a main_ingredients entry), "Creme Brulee" (a title), "cafe" (found in
-    henrys-quick-hollandaise-sauce.md's free-text body content, the long-form
-    write-up added after HANDOVER's "exactly one file uses this" note was
-    written) -- none of these are in .prose, which was built for the
+    henrys-quick-bulletproof-hollandaise-sauce.md's free-text body content,
+    the long-form write-up added after HANDOVER's "exactly one file uses this"
+    note was written) -- none of these are in .prose, which was built for the
     typography/time-word tests and only ever covered front-matter running
     text, not names or body content. title/short_name/main_ingredients/
     star_ingredient/ingredient item names/body content all get the same

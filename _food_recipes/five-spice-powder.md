@@ -1,5 +1,5 @@
 ---
-title: Five-Spice
+title: Five-Spice Powder
 short_name: Five-Spice
 tagline: Adapted to omit capsicum.
 source: ""
