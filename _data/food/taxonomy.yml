@@ -25,6 +25,19 @@
 # `star_ingredient` is OPTIONAL. Roughly a quarter of the collection leaves it
 # blank, and that is correct — a plain sponge, a spice blend or a dressing has
 # no hero ingredient, and inventing one for them would be worse than nothing.
+#
+# `something unusual` retired 2026-08-09, Helen's call: it's the only entry
+# defined relative to a subjective, cultural norm rather than an actual food
+# group, it isn't a real craving the way "beef" or "greens" are, and it was
+# barely used (1 of 77 recipes) — and not even consistently: peanut-butter-
+# cookies.md has the identical headline ingredient (peanut butter) and was
+# left blank instead. peanut-butter-ice-cream.md, its one user, is blank now.
+#
+# `legumes` considered and NOT added, same date: only two candidate recipes
+# existed (lemony-cavolo-nero-butter-bean-soup.md, pancetta-white-bean-
+# stew.md, both already covered by `greens`/`pork`) — not enough to be a
+# useful discriminator across the collection. Don't re-raise this on your
+# own; Helen will bring it back if her own cooking makes it worth it.
 # -----------------------------------------------------------------------------
 star_ingredients:
   - beef
@@ -40,7 +53,6 @@ star_ingredients:
   - poultry
   - root veg
   - shellfish
-  - something unusual
   - white fish
 
 # -----------------------------------------------------------------------------

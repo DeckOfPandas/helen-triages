@@ -490,9 +490,21 @@ enforces it across recipes *and* drafts.
 Declared in `_data/food/taxonomy.yml`. Adding a term there is all that's
 needed.
 
-**Star ingredients** (15, optional): beef, chocolate, duck, eggs, fruit, game,
-greens, lamb, oily fish, pork, poultry, root veg, shellfish, something
-unusual, white fish.
+**Star ingredients** (14, optional): beef, chocolate, duck, eggs, fruit, game,
+greens, lamb, oily fish, pork, poultry, root veg, shellfish, white fish.
+`something unusual` retired 2026-08-09 -- see `_data/food/taxonomy.yml`'s own
+comment for the reasoning (culturally relative, not a real craving, barely
+and inconsistently used). `legumes` considered the same day and not added:
+only two candidate recipes across the whole collection, both already
+adequately covered by an existing star -- not revisited unless that changes.
+
+**Two recipes with a blank `star_ingredient` that look like candidates but
+aren't** (2026-08-09, Helen's explicit call, don't re-flag either):
+`mrs-nicholsons-creme-patissiere.md` (egg-yolk-thickened custard -- looks
+like it should follow the same `eggs` logic as the hollandaise/pancakes/
+Yorkshire puddings/waffles cluster, but Helen wants it blank) and
+`goats-cheese-squash-rosemary-griddle-cakes.md` (squash is the headline
+ingredient, but Helen doesn't consider it a `root veg` case).
 
 **Mood** (15) — *what you feel like eating, a craving*: bakes, carbs party,
 cheese-tastic, dessert, drinks, fakeaway, hot snack, ice cream, nibbles,

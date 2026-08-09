@@ -7,6 +7,7 @@ serves: 4
 prep_time: "5 mins"
 cook_time: "10 mins"
 main_ingredients: ["green cardamom pods", "cinnamon stick", "whole cloves", "fresh ginger", "black tea leaves", "whole milk"]
+star_ingredient:
 tags: ["drinks"]
 ingredient_groups:
   - name: "chai"

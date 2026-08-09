@@ -7,6 +7,7 @@ serves: 1
 prep_time: "None"
 cook_time: "10 mins"
 main_ingredients: ["loose-leaf black tea", "whole milk", "chai spice", "golden caster sugar"]
+star_ingredient:
 tags: [drinks]
 ingredient_groups:
   - name: tea

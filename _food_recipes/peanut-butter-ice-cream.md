@@ -7,7 +7,7 @@ makes: "generous 900 ml"
 prep_time: "15 mins"
 cook_time: None
 main_ingredients: ["sweet cream base", "peanut butter", "roasted peanuts"]
-star_ingredient: something unusual
+star_ingredient:
 tags: [dessert, "ice cream", "make-ahead"]
 ingredient_groups:
   - items:
