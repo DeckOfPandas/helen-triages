@@ -266,7 +266,16 @@ meta:
   page's own Ingredients section — it's still mentioned in the method
   text wherever it's actually used (or, per Helen, not, when the
   technique is assumed knowledge — searing beef in oil doesn't need
-  spelling out), just not itemised as its own line.
+  spelling out), just not itemised as its own line. **Resolved 2026-08-09,
+  issue #75, Helen's interactive pass**: no recipe in `_food_recipes/`
+  currently uses `incidental: true` — five files had their generic
+  frying/searing oil line deleted outright rather than kept hidden behind
+  the flag (her call: nobody starting toad in the hole lacks a normal
+  frying oil), and one (the finishing butter in `plum-sauce-for-duck.md`)
+  was un-flagged back to a visible ingredient because it's specific enough
+  to be worth buying. The mechanism itself stays for a future finishing
+  drizzle or unusual oil — don't go looking for a live example of the flag
+  in the current collection, there isn't one.
 - `serves` **xor** `makes` — `makes` for quantities you produce (bakes,
   sauces, base recipes; `makes: QQ` for base recipes), `serves` for what you
   portion out. **Values aren't always numeric** — both are free descriptive
@@ -441,9 +450,11 @@ mins`/`1 hr 30 mins`/`2 hrs`; prose uses `mins`/`hours`/`seconds`. Only
 numeric quantities are abbreviated — "ten minutes of glory" stays as written.
 `cook_time: "Until done"` for family bakes with no stated time.
 
-**`Estimated N mins` must never appear in a published recipe.** Nine remain in
-`_food_recipes/`, invented by an earlier Claude, left for Helen to replace by
-hand rather than converted to `QQ` — a poor estimate publishes, a `QQ` blocks.
+**`Estimated N mins` must never appear in a published recipe.** All nine that
+an earlier Claude had invented are gone as of 2026-08-09 — Helen replaced
+them by hand rather than have them converted to `QQ` (a poor estimate
+publishes, a `QQ` blocks). If one turns up again, same rule: leave it for
+her, don't convert it yourself.
 
 **Accents** via `_data/accented_words.yml` (repo root, not `_data/food/` —
 it's house style, applies to cocktails too): a curated unaccented→accented
@@ -550,6 +561,11 @@ re-litigated:**
   a fact, `no-cook` answers "can I put this on the table without cooking?" A
   spice blend is honestly uncooked but a useless answer to that question, so
   it stays untagged.
+
+**Freezable calls, issue #72, 2026-08-09:** `chicken-cider-stew.md` and
+`chicken-sorrel-potato-stew.md` get `freezable`; `pancetta-white-bean-stew.md`
+does not — Helen's explicit case-by-case call, don't add it there to "match
+the other two".
 
 **`lemony-cavolo-nero-butter-bean-soup.md` isn't tagged `soup`, on purpose**
 (2026-08-09) — its own tagline calls it "a one-pot stew", and Helen considers
@@ -658,16 +674,48 @@ from here.
 across `ingredient-search.test.js` (11) and `recipe-list.test.js` (9). Node
 tests, not pytest, because they test JS modules directly.
 
-**Known failures, stable:** nine `Estimated` timings (§5), one link to a
-recipe still in drafts (`peanut-butter-ice-cream` → `sweet-cream-base-1`),
-17 recipes with a leftover `QQ` placeholder (`test_no_qq_placeholder`,
-added 2026-08-02 — fine in `_food_drafts/`, not fine once published, and
-nobody had gone through the backlog yet as of this writing), and one
-reversed-bracket malformed link in `cherry-glaze.md`'s tagline
-(`test_typography`'s "reversed link brackets" case, same date — `(text)[...]`
-instead of `[text](...)`, spotted by Helen, deliberately left unfixed
-pending her own pass). All of these are Helen's to work through case by
-case, same as the `Estimated` timings — don't fix them unprompted.
+**`test_no_placeholder_marker`** (`test_style.py`, added 2026-08-09 after
+`roast-beef-fillet.md` published with literal "PLACEHOLDER - rewrite: ..."
+still in every method step) mirrors `test_no_qq_placeholder` mechanically
+(fine in drafts, fails once published) but means the **opposite** of `QQ`:
+`QQ` is Helen's deliberate marker and must never be flagged or touched;
+`PLACEHOLDER` is leftover sloppy text from an earlier Claude and should be.
+Don't conflate the two.
+
+**`test_ingredient_annotation_style`** (`test_taxonomy.py`) checks: one
+sentence, no trailing full stop, lower case unless the first word is `I` or a
+declared proper noun. It only flags, never rewrites, because Helen said so
+directly: "I'll look at violations myself because I care about tone of
+voice." **Don't fix a future violation of this test unprompted** — whether a
+capitalised first word needs lowercasing or is actually a proper noun that
+belongs in `taxonomy.yml`'s `proper_nouns` list is her call, same standing
+rule as `QQ`.
+
+**The ~12-recipe backlog against that test was cleared 2026-08-09, at
+Helen's explicit in-session request** — this one batch was prompted, not a
+change to the standing rule above. Nearly all were mechanical (strip the
+full stop, lowercase the first word, leave mid-sentence proper nouns like
+Merlot or Ceylon alone). Three needed real judgement and are worth Helen
+double-checking the actual wording chosen, not just that the test now
+passes: `best-ever-chocolate-sponge-cake.md` and `chai-spice-powder.md`
+each had a genuine two-sentence note merged into one; `indonesian-chicken-
+curry-gulai-ayam.md`'s ginger note started "I'm", which the test doesn't
+exempt the way it exempts bare `I` (lowercasing to "i'm" would just be bad
+grammar), so the sentence was reworded to drop the leading "I'm" instead of
+touching the test.
+
+The `Estimated`-timing (§5), `QQ`-placeholder, and `cherry-glaze.md`
+reversed-bracket-link failures that used to live in this list are all
+resolved — don't go looking for them. `peanut-butter-ice-cream` still links
+to `ben-jerrys-sweet-cream-base-1`, but that recipe was promoted out of
+drafts 2026-08-09, so the link is no longer to a draft.
+
+**Newly surfaced, not yet triaged** (found running the full suite
+2026-08-09, not confirmed as deliberate the way the annotation-style ones
+are — see `DEV_JOBS_v26.md` §2): `test_typography` fails on
+`indonesian-chicken-curry-gulai-ayam.md` (slash fractions, double hyphen)
+and `mixed-spice.md` (slash fractions); `test_brown_sugar_is_soft_brown_sugar`
+fails on `citrus-soy-salmon-sticky-rice.md` and `miso-salmon-veg-traybake.md`.
 
 **Exactly three checks read `_food_drafts/`** — everything else is
 `_food_recipes/` only:

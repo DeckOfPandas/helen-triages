@@ -17,7 +17,7 @@ ingredient_groups:
       item: "orange, zested and juiced"
     - amount: "250 g"
       item: "fresh or frozen cranberries"
-      note: "If using frozen, thaw first and drain away excess water, otherwise your sauce will be soup."
+      note: "if using frozen, thaw first and drain away excess water, otherwise your sauce will be soup"
 method:
   - "Heat the orange juice with the sugar."
   - "When it boils, add the cranberries."

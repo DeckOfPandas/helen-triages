@@ -35,7 +35,7 @@ ingredient_groups:
     - amount: "2 bunches"
       item: "young asparagus, chopped on a diagonal into ½–1-inch pieces"
     - item: "150 g gruyère, grated"
-      note: "All cheese amounts are notional!"
+      note: "all cheese amounts are notional!"
     - amount: "20 g"
       item: plain flour
     - item: "grated parmesan, to top"

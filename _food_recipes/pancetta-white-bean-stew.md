@@ -27,7 +27,7 @@ ingredient_groups:
       item: chicken stock
     - amount: "1"
       item: parmesan rind (optional)
-      note: "Parmesan rinds freeze well — add straight from frozen for extra savoury depth."
+      note: "Parmesan rinds freeze well — add straight from frozen for extra savoury depth"
     - amount: "200 g"
       item: "cavolo nero, leaves roughly chopped"
     - amount: "½ tbsp"

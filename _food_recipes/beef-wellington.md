@@ -30,7 +30,7 @@ ingredient_groups:
     items:
     - amount: "200 g"
       item: beef trimmings
-      note: "If buying in person, ask your butcher to reserve these when trimming the fillet."
+      note: "if buying in person, ask your butcher to reserve these when trimming the fillet"
     - amount: "4"
       item: "large shallots, peeled and sliced"
     - amount: "12"
@@ -42,10 +42,10 @@ ingredient_groups:
     - item: splash of red wine vinegar
     - amount: "1 bottle"
       item: "red wine (750 ml)"
-      note: "Preferably Merlot or Cab."
+      note: "preferably Merlot or Cab"
     - amount: "750 ml"
       item: beef stock
-      note: "Preferably home-made."
+      note: "preferably home-made"
 method_groups:
   - name: "day before: prepare the beef"
     steps:

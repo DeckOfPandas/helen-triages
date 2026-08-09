@@ -69,49 +69,54 @@ Scaffold is in, deliberately empty — `HANDOVER_v26.md` §9 is the only record
 of what's known. Helen will paste 5–10 real cocktail recipes; front matter
 comes from what those actually need. **Do not design it top-down.**
 
-### 1.5 Continuing GitHub issue #68 (ingredient order within a group)
+### 1.5 Evaluate `normalize_recipes.py` (issue #114)
 
-Not automatable reliably enough for a real test (see `tests/test_taxonomy.py`'s
-`test_ingredient_group_order_matches_title` commit message for why item-level
-matching against free prose kept producing false positives). Working
-through it manually instead, recipe by recipe, Helen deciding each case.
-`scripts/find_ingredient_order_candidates.py` ranks recipes by how much
-their ingredient order seems to disagree with the method — a discovery
-aid to point a human at what's worth reading, not a source of truth.
-Read the actual recipe before touching anything; several of its
-top-ranked "inversions" per run turn out to be word-collision artefacts,
-not real issues. First round (2026-08-05) covered its top ~13 candidates
-by inversion count; plenty of the corpus hasn't been looked at yet.
+A candidate script exists — `DO_NOT_RUN_normalize_recipes DOT PY` in the repo
+root (untracked, from a web Claude session per `git log`, 2026-08-09; not
+reviewed or run). Its own docstring is the spec: mechanical, deterministic
+fixes only, one per existing pytest check, edited as text in place (never a
+YAML round-trip — see `HANDOVER_v26.md` §12's `yaml.dump()` trap), dry-run by
+default. Explicitly excludes anything needing a judgement call or a fact
+about the recipe (a missing tagline, an `Estimated` time, `QQ`, which oven
+figure is the fan one, an undeclared tag/star, a spelling collision, the
+ingredient-note style rule Helen reviews herself — see `HANDOVER_v26.md` §10).
+Issue #114 is "find out if this will save time and whether it covers
+everything" — that's the job: read it, run it dry, spot-check its report
+against a few files by hand, tell Helen what it'd actually fix before anyone
+runs it with `--write`. Move it into `tmp/` or `scripts/` once it's actually
+being used — it shouldn't live in the repo root long-term.
 
 ---
 
 ## 2. Content passes
 
-### 2.1 Oven conversions in `_food_drafts/`
-`180C/160C fan/gas 4` and similar. `_food_recipes/` is clean. Keep the fan
-figure and **check which of the pair is the fan one before deleting** — not
-always in the same order; getting it wrong bakes 20° too hot. Count is stale
-(was 71 in v25) — re-derive with
-`grep -lE '[0-9]{2,3} ?C ?/ ?[0-9]{2,3} ?C|gas ?[0-9]|gas mark' _food_drafts/*.md`.
+### 2.1 Newly surfaced test failures, not yet triaged (found 2026-08-09)
 
-### 2.2 The nine `Estimated` timings
-`best-ever-chocolate-sponge-cake`, `caesar-salad-dressing`, `caramel` (×2),
-`cauliflower-cheese`, `chicken-cider-stew`, `dark-chocolate-ganache` (×2),
-`dark-chocolate-souffles`, `delias-classic-pancakes`, `peanut-butter-cookies`.
-Leave them rather than convert to `QQ` — a poor estimate publishes, a `QQ`
-blocks.
+A full `pytest` run turned these up; nobody's read the actual files yet to
+say whether each is a real bug or a deliberate call worth documenting. Not
+the same category as `test_ingredient_annotation_style` (`HANDOVER_v26.md`
+§10), which is confirmed deliberate — these are just unread:
 
-### 2.3 Loose ends in individual recipes
+- `test_typography` — `indonesian-chicken-curry-gulai-ayam.md` (slash
+  fractions, double hyphen), `mixed-spice.md` (slash fractions)
+- `test_brown_sugar_is_soft_brown_sugar` — `citrus-soy-salmon-sticky-rice.md`,
+  `miso-salmon-veg-traybake.md`
+
+(Oven conversions in `_food_drafts/` and the nine `Estimated` timings, both
+previously tracked here, are fully resolved as of 2026-08-09 — `grep`/pytest
+both come back clean. Removed rather than left as a stale "re-derive the
+count" placeholder, since zero isn't a count that needs re-deriving.)
+
+### 2.2 Loose ends in individual recipes
 - `beef-wellington` — Dijon is in the ingredients, no method step mentions
   it (belongs in "Assemble"); also `QQ link to beef bone stock recipe`
 - `schmaltzy-lentils-chicken-lemon` — reconstructed from a transcript, check
   breasts vs thighs; `source:` is only ever "magazine"
 - `tom-kerridge-flourless-chocolate-cake` — 120°C fan set on reasoning, not
   experience; worth a note in Helen's voice once made
-- `peanut-butter-ice-cream` links to `sweet-cream-base-1`, still a draft
 - `beef-bourguignon` — placeholder only. **Do not auto-generate content**
 
-### 2.4 Draft tidying is not urgent and not yours
+### 2.3 Draft tidying is not urgent and not yours
 Helen adds drafts in batches, several times a day. Only three tests read
 `_food_drafts/` at all (`HANDOVER_v26.md` §10) — in practice only the
 spelling-collision one ever fires. Oven conversions and placeholder steps in
@@ -160,6 +165,16 @@ results). Each considered and declined for the stated reason.
   never.
 - **`_data/food/common_ingredients.yml`** holds one `pantry:` key, could be
   `pantry.yml`.
+- **GitHub issue #68 (ingredient order within a group) is closed.** Helen
+  confirmed 2026-08-09 the behaviour's fine and she doesn't remember what
+  she originally wanted fixed. The manual discovery tool from when this was
+  active work still exists if she ever wants to resume the corpus sweep —
+  `scripts/find_ingredient_order_candidates.py` ranks recipes by how much
+  their ingredient order seems to disagree with the method (a pointer for a
+  human to read, not a source of truth; several top-ranked "inversions" per
+  run turn out to be word-collision artefacts). First and only round
+  (2026-08-05) covered its top ~13 candidates; most of the corpus was never
+  looked at. Not worth restarting without her asking.
 - **Stretch goal: ice cream recipes clickable from an index page list.**
   Parked here 2026-08-03 from a `CLAUDE` marker in
   `ben-jerrys-sweet-cream-base-1.md`'s `notes:` — the idea was a list on the

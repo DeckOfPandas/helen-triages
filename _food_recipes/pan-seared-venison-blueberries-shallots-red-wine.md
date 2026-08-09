@@ -26,19 +26,19 @@ ingredient_groups:
     - item: "a glass of robust red wine, preferably Cab or Merlot"
     - amount: "200 g"
       item: fresh blueberries
-      note: "Thaw and drain well if using frozen."
+      note: "thaw and drain well if using frozen"
     - amount: "2"
       item: "large pats of butter"
 method:
   - "Crush the thyme and juniper berries in a pestle and mortar with generous salt and pepper. Loosen with olive oil. Pat the venison dry with kitchen paper and rub the oil mixture all over it."
   - "Sear the meat in a hot pan on all sides — roughly 6 mins for medium rare, 7–8 mins for medium. Cover and rest on a plate for 4 mins."
-  - "Reduce the heat under the pan and add a little olive oil. Add the shallots and garlic and fry gently for around 3 mins until translucent and tender. Turn up the heat, add the wine and let it reduce by half. Add the blueberries and simmer slowly for 4 mins, then remove from the heat, add the butter and swirl the pan so the sauce turns slightly opaque and shiny. Season to taste."
-  - "Slice the venison into 2-cm slices and serve with greens such as steamed purple sprouting broccoli. Add the meat's resting juices to the sauce and spoon over."
+  - "Reduce the heat, and fry the shallots and garlic in olive oil for around 3 mins until translucent and tender. Turn up the heat, add the wine and let it reduce by half. Add the blueberries and simmer slowly for 4 mins, then remove from the heat, add the butter and swirl the pan so the sauce turns slightly opaque and shiny. Season to taste."
+  - "Slice the venison into 2-cm slices and serve. Add the meat's resting juices to the sauce and spoon over."
 method_short:
   - ""
 notes:
   - label: "Wine"
-    text: "Some people will add a splash of wine. Others will add most of the bottle. We will never stop them, nor should we wish to."
+    text: "Some people will add a splash of wine. Others will add most of the bottle. Everything is fine."
 meta:
   rewritten: true
   proofread: false

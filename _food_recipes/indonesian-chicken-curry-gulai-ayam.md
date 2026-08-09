@@ -54,7 +54,7 @@ ingredient_groups:
       item: "banana shallots (echalions), peeled"
     - amount: "5 cm"
       item: "piece of ginger, peeled and chopped"
-      note: "I'm not giving an equivalent here because fresh ginger is mandatory"
+      note: "not giving an equivalent here because fresh ginger is mandatory"
     - amount: "2 cm"
       item: "piece of galangal, peeled and chopped"
       note: "or 4 tsp paste from a jar"

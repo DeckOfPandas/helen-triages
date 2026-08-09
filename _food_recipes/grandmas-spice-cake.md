@@ -27,7 +27,7 @@ ingredient_groups:
       item: ground ginger
     - amount: 1 tsp
       item: "mixed spice"
-      note: "mixed spice isn't really sold like this any more — see [mixed spice](../mixed-spice/) for a home-made blend."
+      note: "mixed spice isn't really sold like this any more — see [mixed spice](../mixed-spice/) for a home-made blend"
 method:
   - Cream the butter and sugar thoroughly until fluffy. Longer than you think.
   - Mix in the beaten egg a little at a time.

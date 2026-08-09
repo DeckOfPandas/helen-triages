@@ -21,7 +21,7 @@ ingredient_groups:
     - amount: "1 tsp"
       item: bicarbonate of soda
     - item: a good pinch of salt
-      note: "Don't be shy with the salt. It brings chocolate out amazingly."
+      note: "don't be shy with the salt — it brings chocolate out amazingly"
     - amount: "200 ml"
       item: semi-skimmed milk
     - amount: "1 tbsp"

@@ -18,7 +18,7 @@ ingredient_groups:
       item: green cardamom pods
     - amount: "1 small stick (8 g)"
       item: cinnamon
-      note: "True Ceylon cinnamon, not cassia."
+      note: "true Ceylon cinnamon, not cassia"
     - amount: "1 tbsp (6 g)"
       item: "whole cloves"
     - amount: "2 tbsp (14 g)"
@@ -27,7 +27,7 @@ ingredient_groups:
       item: whole fennel seeds
     - amount: "3 (3 g)"
       item: "black cardamom pods, peeled"
-      note: "Optional — impart a strong smoky flavour. Discard the peels or leave them out entirely if you don't want that; use them for the full spiced-chai character."
+      note: "optional, for a strong smoky flavour — discard the peels or leave them out entirely if you don't want that, or use them for the full spiced-chai character"
     - amount: "1 large"
       item: star anise
     - amount: "1 medium (4 g)"

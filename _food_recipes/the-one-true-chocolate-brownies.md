@@ -24,7 +24,7 @@ ingredient_groups:
     - amount: "200 g"
       item: plain flour
     - item: "1 tsp salt"
-      note: "Don't be shy with the salt."
+      note: "don't be shy with the salt"
 method:
   - Melt the chocolate over a bain-marie then stir in the butter until totally melted.
   - "Beat the eggs, sugar and vanilla extract together until pale and thick."
