@@ -6,7 +6,7 @@ source: Stella
 makes: about 300 ml
 prep_time: 5 mins
 cook_time: "None"
-main_ingredients: [mayonnaise, parmesan, "lemon juice", "anchovy paste", garlic]
+main_ingredients: [mayonnaise, parmesan, "lemon juice", "Worcestershire sauce", "anchovy paste", garlic]
 star_ingredient:
 tags: [extras, "no-cook"]
 ingredient_groups:

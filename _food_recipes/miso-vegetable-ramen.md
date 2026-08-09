@@ -6,7 +6,7 @@ source: "Adapted from BBC Food, recipe Rachel Phipps"
 serves: 2
 prep_time: 5 mins
 cook_time: "10–30 mins"
-main_ingredients: ["ramen noodles", "white miso", "cashew butter", "vegetable stock", "rice vinegar", "dark soy sauce", edamame, "pak choi", "tenderstem broccoli", "fresh garlic", "fresh ginger"]
+main_ingredients: ["ramen noodles", "white miso", "cashew butter", "vegetable stock", "rice vinegar", "dark soy sauce", edamame, "pak choi", "tenderstem broccoli", "spring onions", carrot, "fresh garlic", "fresh ginger"]
 star_ingredient: greens
 tags: [soup]
 ingredient_groups:

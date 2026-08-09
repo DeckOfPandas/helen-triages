@@ -6,7 +6,7 @@ source: "Adapted from The Daring Gourmet, recipe Kimberly Killebrew"
 makes: about 300 ml
 prep_time: "5 mins"
 cook_time: "5 mins"
-main_ingredients: [tamari, "dark brown soft sugar", "fresh ginger", "fresh garlic", mirin, honey]
+main_ingredients: [tamari, "dark brown soft sugar", "fresh ginger", "fresh garlic", mirin, honey, "sesame oil"]
 star_ingredient:
 tags: [extras]
 ingredient_groups:

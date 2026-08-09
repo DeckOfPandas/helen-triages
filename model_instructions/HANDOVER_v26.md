@@ -469,10 +469,14 @@ you'd have to go buy, the vegetable that's the point. Cap at eight. **Not
 mechanically enforced** — no test checks the count, so a recipe with a
 spice-heavy ingredient list can go over deliberately, case by case, rather
 than being forced to cut something that genuinely fails the substitution
-test. `indonesian-chicken-curry-gulai-ayam.md` sits at 11, Helen's explicit
-call on 2026-08-02: everything in it is a "would have to specifically go
-buy" ingredient, so nothing was a good candidate to cut. Don't flag this one
-as a violation to fix.
+test. `indonesian-chicken-curry-gulai-ayam.md` (11) and `citrus-soy-salmon-
+sticky-rice.md` (11) both sit well past the cap — Helen's explicit call
+(2026-08-02 and 2026-08-09 respectively): everything in each is a "would
+have to specifically go buy" ingredient, so nothing was a good candidate to
+cut. Don't flag either as a violation to fix, and don't expect this to stop
+happening — more lists will grow past eight over time as ingredients get
+added to existing recipes. The cap is a soft first-pass guide, not something
+to defend by cutting a genuine substitution-test ingredient.
 
 **Cheeses** use the bare name where it stands alone (cheddar, feta, comté) —
 keep "cheese" only where the qualifier is meaningless without it (blue cheese,
@@ -530,6 +534,11 @@ re-litigated:**
   a fact, `no-cook` answers "can I put this on the table without cooking?" A
   spice blend is honestly uncooked but a useless answer to that question, so
   it stays untagged.
+
+**`lemony-cavolo-nero-butter-bean-soup.md` isn't tagged `soup`, on purpose**
+(2026-08-09) — its own tagline calls it "a one-pot stew", and Helen considers
+the dish more stew than soup despite the title. Don't add `soup` to "fix"
+this.
 
 **`drinks`** = anything drinkable that isn't a cocktail (frappé, cordial, hot
 chocolate). Cocktails belong to the sibling site.
