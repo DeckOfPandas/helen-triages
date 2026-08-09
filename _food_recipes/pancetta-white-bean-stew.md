@@ -6,7 +6,7 @@ source: Unknown
 serves: 4
 prep_time: "15 mins"
 cook_time: "40 mins"
-main_ingredients: [pancetta, "white beans", "cavolo nero", carrot, celery, onion, "chicken stock", "parmesan rind"]
+main_ingredients: [pancetta, "white beans", "cavolo nero", carrot, celery, onion, "chicken stock", "parmesan rind", "sherry vinegar"]
 star_ingredient: pork
 tags: ["one-handed food"]
 ingredient_groups:

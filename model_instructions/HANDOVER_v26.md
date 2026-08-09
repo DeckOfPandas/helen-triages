@@ -470,7 +470,7 @@ mechanically enforced** — no test checks the count, so a recipe with a
 spice-heavy ingredient list can go over deliberately, case by case, rather
 than being forced to cut something that genuinely fails the substitution
 test. `indonesian-chicken-curry-gulai-ayam.md` (11) and `citrus-soy-salmon-
-sticky-rice.md` (11) both sit well past the cap — Helen's explicit call
+sticky-rice.md` (12) both sit well past the cap — Helen's explicit call
 (2026-08-02 and 2026-08-09 respectively): everything in each is a "would
 have to specifically go buy" ingredient, so nothing was a good candidate to
 cut. Don't flag either as a violation to fix, and don't expect this to stop

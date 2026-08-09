@@ -6,7 +6,7 @@ source: Henry
 serves: "4–6"
 prep_time: "20 mins"
 cook_time: "None"
-main_ingredients: ["Brussels sprouts", "pomegranate seeds", walnuts, apple, "red onion", tahini, honey]
+main_ingredients: ["Brussels sprouts", "pomegranate seeds", walnuts, apple, "red onion", tahini, honey, "natural yoghurt"]
 star_ingredient: greens
 tags: [salad, "no-cook", "make-ahead", virtuous]
 ingredient_groups:
