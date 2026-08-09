@@ -1,7 +1,7 @@
 ---
 title: Chai Spice Powder
 short_name: Chai Spice Powder
-tagline: "The perfect flavour for drinks like [chai spiced milk tea](../chai-spiced-milk-tea/)."
+tagline: "The perfect flavour for drinks like [chai-spiced milk tea](../chai-spiced-milk-tea/)."
 source: "Adapted from indianhealthyrecipes.com"
 makes: "approx. 75 g"
 prep_time: "2 mins"

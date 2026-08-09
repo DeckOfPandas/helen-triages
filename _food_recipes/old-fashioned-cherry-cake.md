@@ -6,7 +6,7 @@ source: Grandma Kath
 makes: "one 8-inch round cake"
 prep_time: "10 mins"
 cook_time: "1 hr 30 mins"
-main_ingredients: ["glacé cherries", "ground almonds", "salted butter", eggs, "plain flour", "golden caster sugar", "demerara sugar"]
+main_ingredients: ["glacé cherries", "ground almonds", "salted butter", eggs, "plain flour", "golden caster sugar", "Demerara sugar"]
 star_ingredient: fruit
 tags: [bakes]
 ingredient_groups:
@@ -29,7 +29,7 @@ ingredient_groups:
     - amount: "1 tbsp"
       item: milk
     - amount: "2 tbsp"
-      item: demerara sugar
+      item: Demerara sugar
 method:
   - "Cream the butter and sugar for ages until light and fluffy — about 5 mins."
   - "Add the beaten egg a little at a time."
@@ -37,7 +37,7 @@ method:
   - "Toss the cleaned, dried and quartered cherries in the ground almonds, then stir most of them in."
   - "Stir in the milk."
   - "Spoon into a lined and sugared 8-inch round tin, then sprinkle the rest of the cherries over the top and poke them in with a teaspoon."
-  - "Level the top carefully with the back of a spoon, then sprinkle the demerara sugar evenly over the top — you can double the amount if you like, no one's looking."
+  - "Level the top carefully with the back of a spoon, then sprinkle the Demerara sugar evenly over the top — you can double the amount if you like, no one's looking."
   - step: "Bake at 180°C for about 50 mins, then cover tightly with foil and bake for about ten more minutes."
     note: "so the sugar caramelises, but doesn't burn"
   - "Leave to cool in the tin for 15 mins, then turn out onto a wire rack."
