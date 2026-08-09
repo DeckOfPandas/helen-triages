@@ -36,7 +36,7 @@ method:
   - step: "Bake for about 40 mins at 180°C until springy and the sides have started to pull away, then leave to cool in the tin for 5 mins. Carefully transfer to a wire rack."
     note: "The cake will be very delicate."
   - step: "Top with sugar stirred with lemon juice, scoring or pricking the cake first so it all seeps in."
-    note: "also lovely with [lemon curd](../grandmas-lemon-curd)"
+    note: "also lovely with [lemon curd](../grandmas-lemon-curd/)"
 method_short:
   - ""
 notes:
