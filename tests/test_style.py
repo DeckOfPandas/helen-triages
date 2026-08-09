@@ -60,6 +60,24 @@ def test_no_qq_placeholder(recipe):
     )
 
 
+PLACEHOLDER = re.compile(r"\bPLACEHOLDER\b")
+
+
+def test_no_placeholder_marker(recipe):
+    """`PLACEHOLDER` is a second draft marker, alongside `QQ` -- found
+    2026-08-09 in roast-beef-fillet.md, where every method step read
+    "PLACEHOLDER - rewrite: ..." despite the recipe being published. Same
+    "drafting aid, not a published value" logic as `test_no_qq_placeholder`:
+    fine in _food_drafts/, never fine once a recipe counts as published.
+    """
+    hits = PLACEHOLDER.findall(recipe.raw)
+    assert not hits, (
+        f"{where(recipe)} still contains {len(hits)} `PLACEHOLDER` marker(s).\n"
+        f"Fine in _food_drafts/, not fine here — replace with the real "
+        f"content before this recipe counts as published."
+    )
+
+
 @pytest.mark.parametrize("field", TIME_FIELDS)
 def test_metadata_time_format(recipe, field):
     """Metadata uses the terse forms: `20 mins`, `1 hr 30 mins`, `2 hrs`."""
