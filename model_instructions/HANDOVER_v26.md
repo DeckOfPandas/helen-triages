@@ -645,13 +645,21 @@ decoration are what separate the sites; typography is the family resemblance.
 
 **The wordmark tape is now the one exception to "cocktails has no
 decoration"**, added 2026-08-02 at Helen's explicit call: `assets/img/
-cocktails/tape/` holds a direct copy of food's `tape-1..4.svg`, wired via
+cocktails/tape/` holds a direct copy of food's tape files, wired via
 `tape`/`tape_count` in `sites.yml`, reused as a placeholder rather than
 leaving the wordmark bare while cocktails' own visual language is still
 undecided. Swap the files in that directory when real artwork arrives — the
 key doesn't need to change. See §13.8 for the sizing mechanism this feeds
 into, and the note at the top of `_sass/cocktails/_decoration.scss` for the
 same context in code.
+
+**Stale as of the 2026-08-10 tape redesign (§13.9): cocktails' copy is still
+the OLD 4-file set** (`tape_count: 4`), not the new 7-file one food shipped
+(`tape_count: 7`). Not an oversight to silently fix — copying the new set
+over is a real content decision (is food's redesigned artwork actually right
+as cocktails' placeholder, or should cocktails just stay on the old plainer
+files until it has its own?) that hasn't been asked yet. See
+`DEV_JOBS_v26.md` 1.2.
 
 `tests/` is the FOOD suite (`conftest.py` says so). Cocktails gets its own
 test file once it has content to test against.
@@ -944,6 +952,28 @@ and could tell something was different without being able to say what.
 Any interactive element nested inside a punched-tape heading needs explicit
 `-webkit-text-stroke: 0` and `text-shadow: none` unless it's actually meant
 to carry the effect too.
+
+**You will run a content session and a design session in parallel Claude
+Code instances against the same working directory, assuming they're
+independent because they touch different files.** They aren't — it's one
+git working tree and one `pytest` reading whatever's on disk at the moment
+it runs, regardless of which session put it there. Real incident,
+2026-08-10: a content session and a design session (this one) ran at once;
+`pytest` in the design session started showing failures that hadn't been
+there a run earlier, then went away again a run after that — not a
+regression from either session's own work, just the other session's
+in-progress edits passing through disk on their way to being fixed. Worse,
+one session's `git checkout` moves `HEAD` for *both* sessions, since it's
+the same repo — a design session mid-edit can find itself looking at a
+different branch's tracked files without having asked for one, while its
+own uncommitted changes (not tied to any branch until committed) just sit
+there regardless. **If a test failure looks unrelated to what you're doing,
+or the branch looks wrong, check `git reflog` and file mtimes before
+assuming you caused it** — per Helen, 2026-08-10: "I thought I could work
+on content and design in current sessions, but I was messy and didn't take
+into account that tests might clash." One session at a time against this
+working directory, or accept that either might see the other's transient
+state.
 
 ---
 
@@ -1293,3 +1323,82 @@ internally lopsided inside extra space makes the lopsidedness visible for
 the first time. Removed. See §12 for the general form of this trap — it will
 recur anywhere an element's width and its container's width are assumed to
 always be equal until one day they aren't.
+
+### 13.9 The tape background
+
+Redesigned 2026-08-10, issue #122 — replaced food's original 4 tape files
+(one plain skewed polygon each, sparse and left-heavy machine marks, no
+bevel — see git history before this date if you need to see them) with 7
+new ones. **`scripts/generate_tape.py` is the tool, and its own docstring is
+the actual spec** — this section is the summary, not a substitute for
+reading it before regenerating anything.
+
+```
+python3 scripts/generate_tape.py --corner-mode both_acute --seed 30 \
+    --out assets/img/food/tape/tape-1.svg
+```
+
+`--seed` drives the corner shape; `--marks-seed` (defaults to `--seed`)
+drives the machine marks independently, so a shape you like can be paired
+with a different mark layout without redrawing the corners. There is no
+"generate a good one automatically" mode — generate a batch across all
+three `--corner-mode` values, look at them against the real header (a
+throwaway HTML file reusing the actual `.site-logo-*` CSS from
+`_sass/shared/_layout.scss` is the fastest way — inline the candidate SVGs,
+don't screenshot the live site), and hand-pick. That's genuinely how the
+current 7 were chosen, over several rounds of feedback, not a one-shot
+generation.
+
+**Three independent parts, same file:**
+
+- **Corner shape.** The polygon's top edge stays flat; each BOTTOM corner
+  can independently be acute (<90°, that side's bottom edge flares past the
+  top edge) or obtuse (>90°, it insets under it) — `corner_mode` is
+  `both_acute`, `both_obtuse`, or `mixed` (one of each). Magnitude is
+  randomised within the seed, currently 4–16px of skew. Helen's read after
+  comparing all three across a real batch: no consistent winner — the
+  current 7 mix all three corner modes deliberately, not by accident.
+- **Machine marks.** 5–7 narrow clusters (weighted to land on 6), each a
+  handful of jittered near-vertical lines — not an even scatter, gaps
+  between clusters are wide and irregular on purpose, closer to how a
+  physical label-maker actually marks tape than uniform spacing. The tape
+  is split into three zones (left flank / the "letter zone" behind the
+  lettering / right flank); every generation guarantees at least one
+  cluster per zone, and the single clearest and second-clearest cluster on
+  the whole tape always land one per flank — enforced by construction
+  (assigned before the rest are drawn), not checked afterwards. Which flank
+  gets the single clearest mark is randomised. `LEFT_FLANK_FRAC` /
+  `RIGHT_FLANK_FRAC` (0.16 each) are a guess at how much of the tape's
+  rendered width sits outside the word block — not measured against real
+  font metrics, since the source viewBox is stretched non-uniformly
+  (`preserveAspectRatio="none"`) to whatever the real wordmark width turns
+  out to be. Worth rechecking by eye if the flank ever reads too wide or
+  narrow against real lettering.
+- **Edge bevel.** A highlight line pair on the top and left edges, a much
+  subtler pair on bottom and right, both hard-offset with no blur — the
+  same light-from-top-left, two-hard-copies logic as the wordmark's own
+  `punched(raised)` mixin (§13.4.1), not a separate effect invented for the
+  tape. Because `.site-logo-tape` rotates the tape and the lettering
+  together as one unit, defining "top-left" in the SVG's own local,
+  pre-rotation coordinate space keeps it automatically consistent with the
+  lettering's light source with no compensation needed for the
+  `rotate(-1.75deg)` — both tilt together afterward.
+
+**The wordmark lettering got a matching fix in the same pass** (`.site-logo-
+word` in `_sass/shared/_layout.scss`) — not part of the SVG generator, but
+decided alongside it and worth knowing about together. The old version's
+fill was pure `$color-white`, already the top of the brightness range, so
+its "light" shadow copy (a mid grey) was actually *darker* than the letter
+it was meant to highlight — no headroom, so it read as two overlapping
+letterforms rather than one raised one. Fixed by pulling the fill to an
+off-white (`#e7e2e3`) so a genuinely brighter copy has room to exist above
+it, and splitting the single shadow pair into a tight crisp one at the
+glyph edge plus a wider soft one further out — same bevel logic as the
+tape's own edge highlight, applied to text. Helen's own call after
+comparing a higher-contrast pull side by side: the lighter version read
+better — less "realistic" contrast, more effective as a label.
+
+**Open, not decided in this pass** — see `DEV_JOBS_v26.md` 1.2:
+`assets/img/cocktails/tape/` still holds the OLD 4-file placeholder set,
+unrefreshed (§9); `decorations.js` still picks a tape at random on every
+page load, the exact pattern §13.1 rejected elsewhere, never revisited here.
