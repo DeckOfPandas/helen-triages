@@ -271,10 +271,14 @@ def test_sugar_specifies_type(recipe):
 # GitHub issues #143/#142/#136/#137 -- same closed-list pattern and the same
 # _unqualified() helper as butter/sugar/flour above, just different words and
 # allowed sets. Mustard needed no data fixes at all when this was written --
-# every real instance already used one of the six allowed names.
+# every real instance already used one of the six allowed names. "mustard
+# oil" added later (indian-mutton-raan-roast.md) -- a real, distinct
+# ingredient (a cooking oil pressed from mustard seeds, common in Indian/
+# Bengali cooking), not a variant of condiment mustard.
 _QUALIFIED_MUSTARD = {
     "english mustard", "english mustard powder", "dijon mustard",
     "french mustard", "wholegrain mustard", "whole mustard seeds",
+    "mustard oil",
 }
 _QUALIFIED_SOY_SAUCE = {"dark soy sauce", "light soy sauce"}
 _QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste"}

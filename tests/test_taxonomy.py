@@ -360,3 +360,86 @@ def test_ingredient_group_order_matches_title(recipe):
         f"{where(recipe)} ingredient_groups order:\n  " + "\n  ".join(problems)
         + f"\n\ntitle head clause checked against: {title_head!r}"
     )
+
+
+# --- spice order within a group (Helen's own cooking convention) -----------
+# NOT GitHub issue #68 (within-group order matched against method-text call
+# order) -- that one is explicitly documented as not automatable reliably
+# enough to test (see test_ingredient_group_order_matches_title's own
+# docstring above, and scripts/find_ingredient_order_candidates.py, which
+# found real word-collision false positives -- "chicken breast" vs "chicken
+# stock" both matching "chicken"). This is a different, much safer thing:
+# a small, fixed sequence Helen actually cooks by, checked against a
+# declared list rather than fuzzy-matched against free-form prose, so
+# there's no word-collision risk the same way. Confirmed with Helen
+# 2026-08-10: base spices in this exact order among themselves, then any of
+# the warm/whole spices in any order, but always after the base spices.
+_SPICE_BASE_ORDER = ["coriander", "cumin", "turmeric", "fennel"]
+_SPICE_WARM = {"cinnamon", "cloves", "nutmeg", "cardamom", "star anise", "ajwain", "mace"}
+# "garlic cloves" isn't the spice cloves -- same shape of collision as
+# butter beans/garlic cloves elsewhere in tests/test_style.py.
+_SPICE_GARLIC_EXCLUDE = re.compile(r"\bgarlic\b", re.I)
+# "coriander" alone is genuinely ambiguous -- the dried seed/ground spice
+# this rule is about, or the fresh leaf herb used as a garnish (never as
+# part of a "spices added together" step, so exempt from the order rule
+# entirely). Real false positives caught running this for real: "handful
+# coriander, torn (optional)" and "a large handful of fresh coriander, to
+# serve" -- both share "handful", only one says "fresh".
+_CORIANDER_HERB_SIGNAL = re.compile(r"\b(fresh|handful|leaves|garnish|to serve)\b", re.I)
+# Recipes for a named spice blend itself -- the whole point is stating that
+# blend's own fixed component list, not spices added together mid-cook, so
+# Helen's order convention doesn't apply to these (confirmed 2026-08-10).
+_SPICE_BLEND_RECIPES = {"chai-spice-powder", "five-spice-powder", "mixed-spice-powder"}
+
+
+def _spice_rank(name: str):
+    """None if `name` isn't one of the tracked spices at all -- most
+    ingredients aren't, and that's not a signal either way. Base spices
+    rank 0..3 by their required order; every warm spice ties at rank 4,
+    since order among them is deliberately not enforced.
+    """
+    if _SPICE_GARLIC_EXCLUDE.search(name):
+        return None
+    for i, word in enumerate(_SPICE_BASE_ORDER):
+        if word == "coriander" and _CORIANDER_HERB_SIGNAL.search(name):
+            continue
+        if re.search(rf"\b{word}\b", name, re.I):
+            return i
+    for word in _SPICE_WARM:
+        if re.search(rf"\b{re.escape(word)}\b", name, re.I):
+            return len(_SPICE_BASE_ORDER)
+    return None
+
+
+def test_spice_order_within_group(recipe):
+    """Helen's own cooking convention (confirmed 2026-08-10, prompted by
+    indian-mutton-raan-roast.md): within one ingredient group, coriander,
+    cumin, turmeric, fennel (seeds) in that order among themselves, then
+    whichever of cinnamon/cloves/nutmeg/cardamom/star anise/ajwain/mace are
+    used, in any order, but always after the base spices. Exempts recipes
+    for a named spice blend itself (chai-spice-powder.md etc.) -- that
+    list's order is the blend's own, not a "spices added together" step.
+    """
+    if recipe.slug in _SPICE_BLEND_RECIPES:
+        return
+    problems = []
+    for group in recipe.fm.get("ingredient_groups") or []:
+        ranked = []
+        for it in group.get("items") or []:
+            text = it.get("item", "") if isinstance(it, dict) else str(it)
+            name = re.split(r"[,(]", text)[0].strip()
+            rank = _spice_rank(name)
+            if rank is not None:
+                ranked.append((rank, text))
+        for i in range(len(ranked)):
+            for j in range(i + 1, len(ranked)):
+                if ranked[i][0] > ranked[j][0]:
+                    problems.append(
+                        f"{ranked[i][1]!r} is listed before {ranked[j][1]!r} "
+                        f"in group {group.get('name') or '(unnamed)'!r}"
+                    )
+    assert not problems, (
+        f"{where(recipe)} spice order:\n  " + "\n  ".join(problems)
+        + "\n\nOrder: coriander, cumin, turmeric, fennel, then any of "
+          "cinnamon/cloves/nutmeg/cardamom/star anise/ajwain/mace."
+    )
