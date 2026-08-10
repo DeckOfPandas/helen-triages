@@ -1,0 +1,288 @@
+// =============================================================================
+// HELEN TRIAGES FOOD - RECIPE PAGE: INGREDIENTS AND METHOD
+// =============================================================================
+// Split out of the old food/_recipe.scss (2026-08-10). No shared bases of its
+// own -- %heading-base isn't used here, so this file has no ordering
+// requirement relative to food/_recipe-header.scss beyond the general
+// palette/tokens/rule imports every food partial already needs.
+
+// --- Lists & Content Typography ----------------------------------------------
+// Both lists sit flush at the page's left edge, on the same axis as the section
+// headings above them. The 2.5rem indent they used to carry existed to clear
+// the doodle that flanked each heading; with the doodles gone it only pushed
+// the content off the alignment it was meant to match.
+.ingredients,
+.method-full {
+  padding-left: 0;
+  list-style: none;
+  // font-family, font-weight, color inherited from article.recipe
+}
+
+// The violet asterisk bullets are gone, and nothing replaced them. Almost every
+// line opens with its yellow-highlighted amount, so the highlights themselves
+// form the column your eye runs down — a marker that carries information rather
+// than one that only marks the start of a line.
+.ingredients li {
+  margin-bottom: $space-md;
+  line-height: 1.5;
+  position: relative;
+}
+
+// --- Group indent ------------------------------------------------------------
+// Replaces the scribbled underline that used to sit under "For the dressing:".
+// The underline marked where a group STARTED; the indent shows how far it
+// EXTENDS, which is the thing you need when you are checking whether you have
+// everything for one component of the dish.
+//
+// A hanging label: the heading stays flush at zero and only its content moves,
+// so the heading sits in its own gutter and the group reads as a block.
+//
+// Adjacent-sibling selectors, so no markup changed. Safe because the template
+// emits a group heading for every group once there is more than one — an
+// unnamed group falls back to "For the base:" (_layouts/recipe.html) rather
+// than rendering no heading, so there is no case where one group indents and
+// the next does not.
+.recipe-group-heading + .ingredients {
+  padding-left: $space-xxl;
+}
+
+// Number column (2.4rem, wide enough for two digits at 1.2rem) plus the gap
+// the old flex layout gave the number and the text (0.9rem) -- named so the
+// grouped-step rule below can compose with it instead of guessing the same
+// two numbers again.
+$method-step-number-column: 2.4rem + 0.9rem;
+
+// GitHub issue #94: still read as flush with the group heading above rather
+// than nested under it, even with the group indent. $space-xxl (2rem) is the
+// largest spacing token there is, so this composes two of them rather than
+// inventing a one-off value.
+//
+// GitHub issue #94, round 2: applied to EVERY step now, not just grouped
+// ones -- Helen: "when there are no ingredient group headings, the
+// numbering should be at the same level of indentation as when there are."
+// Used to live on a selector scoped to `li.method-group-heading-item ~
+// li.step` composing on top of the base indent below; that made grouped and
+// ungrouped methods indent differently, which is exactly what she doesn't
+// want. Baked into the base .method-full li rule instead, so there's only
+// ever one indent level regardless of whether this recipe has groups.
+$method-group-step-indent: $space-xxl + $space-lg;
+
+// GitHub issue #57: a note adds real height inside a step's own <li>,
+// but the flat margin-bottom every step gets (below, $space-xl) doesn't
+// account for that -- fine most of the time, since the next thing is just
+// another step, but when the annotated step is the LAST one before a
+// section boundary -- the next method group's heading, or the end of
+// Method itself -- that flat gap reads as crowding whatever follows,
+// rather than a clear "this block is done." :last-child is safe as "the
+// last step in a group is also the last child of .method-full" only when
+// it's the LAST group too, which :last-child alone already guarantees.
+.method-full li.step:has(.step-annotation):last-child {
+  margin-bottom: $space-xxl;
+}
+
+// GitHub issue #94, round 2: the OTHER boundary #57 covered -- immediately
+// before the next group heading -- generalised from annotated steps only
+// to every step. Helen: "more space between the steps in a group and the
+// next heading", not "more space when that step happens to carry a tip".
+// li.method-group-heading-item has no margin-top of its own for this to
+// collapse against, so raising the step's margin-bottom is the whole fix.
+.method-full li.step:has(+ li.method-group-heading-item) {
+  margin-bottom: $space-xxl;
+}
+
+.method-full {
+  counter-reset: step-counter;
+  margin-top: $space-sm;
+
+  li {
+    counter-increment: step-counter;
+    position: relative;
+    // Was display: flex + gap -- couldn't survive a step containing a
+    // nested block-level list. Flex turns each run of inline content AND a
+    // nested <ul> into separate flex items laid out in a ROW, so a bullet
+    // sub-list within one step would render beside the number instead of
+    // underneath the step's own text. Helen: "there's a note for you in
+    // the ganache about bullet points [in a method step] -- work out
+    // formatting we can use on other pages." position: absolute (the same
+    // technique .recipe-body-content's numbered list and .method-short's
+    // bullets already use) keeps the number out of the li's own flow
+    // entirely, so whatever the step contains -- one line, or a paragraph
+    // plus a nested list plus another paragraph -- stacks normally.
+    // GitHub issue #94, round 2: composes $method-group-step-indent (see
+    // above) so every step indents the same amount whether or not this
+    // recipe has method groups.
+    padding-left: calc(#{$method-group-step-indent} + #{$method-step-number-column});
+    margin-bottom: $space-xl;
+    line-height: $line-height-body;
+
+    &::before {
+      content: counter(step-counter) ".";
+      position: absolute;
+      left: $method-group-step-indent;
+      // GitHub issue #94, round 2: was $font-headings (Courier) with the
+      // same scratchy -webkit-text-stroke emboss the group headings above
+      // it carry -- Helen: "confusing with the group headings", competing
+      // for the same "this is a heading" read a numeral shouldn't have.
+      // $font-body instead, plain, no stroke -- the number now reads as
+      // part of the step's own text, not as a second heading style.
+      //
+      // top: nudges the number down to align with the first line of body
+      // text. 0.15rem (round 1) too high, 0.3rem (round 2) too low, 0.22rem
+      // (round 3) still slightly low -- 0.16rem is Helen's own eyeballed
+      // final value.
+      top: 0.16rem;
+      font-family: $font-body;
+      font-weight: 700;
+      color: $color-step-number;
+      // GitHub issue #94: was 1.2rem, read as too large once the group-
+      // heading gap (#55) gave the numbers more room to be compared against.
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+  }
+
+  li.method-group-heading-item {
+    counter-increment: none;
+    padding-left: 0;
+    // Was $space-sm (0.5rem) -- adjacent margins collapse to the LARGER of
+    // the two, so this never actually won against .recipe-group-heading's
+    // own margin-bottom ($space-md, 0.75rem): the true gap above the first
+    // step was 0.75rem regardless of what this said. Helen (GitHub issue
+    // #55): "too cramped/close" between the heading and the step number
+    // right below it, both bold stroked Courier at close sizes. Raised
+    // past $space-md so THIS margin is the one that wins the collapse.
+    // Scoped here rather than raising .recipe-group-heading's own
+    // margin-bottom, which also sets the gap above ingredient group
+    // headings ("For the base:") — a different context, not part of this
+    // issue.
+    margin-bottom: $space-xl;
+
+    &::before { content: none; }
+  }
+
+  // A step's text is markdownified (recipe.html), same as notes/tagline
+  // -- so a multi-line YAML block scalar can embed a genuine markdown bullet
+  // list inside one step, the formatting Helen asked for. Undoes everything
+  // the outer li rule sets for any <li> that ends up nested inside one of
+  // these: no counter (it would otherwise increment the SAME step-counter
+  // and throw off every step number after it -- .method-full li's own
+  // counter-increment is a descendant selector, matching these too, unless
+  // overridden here), no number column, no absolutely-positioned ::before.
+  // A native bullet is exactly what a sub-item within a step needs.
+  //
+  // list-style: none is set on .method-full itself (".ingredients,
+  // .method-full { list-style: none; }" above) and inherits into any nested
+  // list by default -- list-style: disc here is a real override, not
+  // decoration.
+  ul {
+    list-style: disc;
+    padding-left: $space-lg;
+    margin: $space-sm 0;
+
+    li {
+      counter-increment: none;
+      position: static;
+      padding-left: 0;
+      margin-bottom: 0.3rem;
+
+      &::before { content: none; }
+    }
+  }
+}
+
+// --- Short Method Block ------------------------------------------------------
+// Indented bullets express parallelism — outer = sequential, inner = parallel.
+.method-short {
+  // font-family, font-weight, color, font-size, line-height inherited from article.recipe
+  //
+  // Top margin is NEGATIVE, deliberately -- Helen: "clicking between the
+  // long and short methods means the top line jumps around... use the same
+  // vertical spacing for the short method as for the long method."
+  //
+  // .recipe-section-heading's own 2rem bottom margin is what actually sets
+  // the gap after METHOD -- it collapses through the empty
+  // .recipe-section-method wrapper div, then collapses again against
+  // whichever of .method-full/.method-short is the visible next sibling.
+  // .method-full's own margin-top ($space-sm, 0.5rem) is smaller than that
+  // 2rem, so adjoining-positive-margins collapsing just takes the larger
+  // one -- .method-full's declared margin never actually mattered; the
+  // heading's 2rem was always the real gap.
+  //
+  // .method-short is a padded box (padding-top: 1.25rem), and padding isn't
+  // collapsible -- it's added on top of whatever the margin collapse
+  // produces, not folded into it. With the old $space-sm margin that gave
+  // 2rem (collapsed) + 1.25rem (padding) = 3.25rem, 1.25rem more than
+  // .method-full's plain 2rem -- the jump on toggle. Per the spec, a
+  // negative margin collapsing against a positive one SUBTRACTS:
+  // collapsed = 2rem − |margin-top|. Setting margin-top: -1.25rem makes
+  // that 0.75rem, and 0.75rem + 1.25rem (padding) = 2rem again -- matching
+  // .method-full exactly, while the box's own padding stays symmetric on
+  // all four sides (unlike shrinking padding-top alone would).
+  margin: -1.25rem 0 $space-xxl 0;
+  // Was rgba($color-border, 0.12) -- a pale, low-saturation grey barely
+  // tinting an already-pale background, which is what made the box read as
+  // "very faint" even at a higher opacity than the wash below uses. Same
+  // violet as the metadata grid and notes, at $method-short-tint-opacity
+  // (see above) rather than $box-tint-opacity -- deliberately stronger, so
+  // this reads as an obviously distinct box.
+  background-color: rgba($color-box-tint, $method-short-tint-opacity);
+  padding: 1.25rem $space-xl;
+  border-radius: $radius-sm;
+
+  p, ul, ol { margin: 0.4rem 0; }
+
+  ul {
+    padding-left: $space-xxl;
+    list-style: none;
+
+    li {
+      position: relative;
+      padding-left: 0;
+      margin-bottom: 0.4rem;
+
+      &::before {
+        content: "*";
+        position: absolute;
+        left: -$space-xxl;
+        // Was 0.1rem -- Helen: "the bullet points in the short method
+        // section are currently slightly higher than their lines of text."
+        // A 1.4rem marker at line-height: 1 sits noticeably higher than the
+        // ~0.92rem body text beside it unless nudged down further than a
+        // smaller marker would need; 0.1rem wasn't enough at this size.
+        top: 0.25rem;
+        color: $color-step-number;
+        font-family: $font-headings;
+        font-weight: 700;
+        font-size: 1.4rem;
+        line-height: 1;
+      }
+    }
+
+    // Nested = parallel tasks (smaller, quieter)
+    ul {
+      margin-top: 0.25rem;
+      padding-left: $space-xl;
+
+      li::before {
+        content: "·";
+        left: -$space-lg;
+        font-weight: 400;
+        font-size: 1rem;
+        color: $color-marker-accent;
+        // Was 0 -- same "sits higher than the text" issue as the outer *
+        // marker above, smaller here because 1rem is closer to the ~0.92rem
+        // body text than the outer marker's 1.4rem is.
+        top: 0.1rem;
+      }
+
+      ul {
+        padding-left: $space-xl;
+
+        li::before {
+          content: "·";
+          opacity: 0.45;
+        }
+      }
+    }
+  }
+}

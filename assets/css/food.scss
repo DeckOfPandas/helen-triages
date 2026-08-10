@@ -34,4 +34,13 @@
 @import "food/category-labels";
 @import "food/search";
 @import "food/active-filter-states";
-@import "food/recipe";
+// food/_recipe.scss was also 1,088 lines as of 2026-08-10 -- split the same
+// day into the four partials below, straight top-to-bottom (no section
+// needed reordering, unlike the food/layout split above: verified every use
+// of %heading-base and the box-tint variables, both defined in recipe-header,
+// already came after their definition in the original file). recipe-header
+// must stay first -- both shared bases are defined there.
+@import "food/recipe-header";
+@import "food/recipe-ingredients-method";
+@import "food/recipe-notes-body";
+@import "food/recipe-annotations";
