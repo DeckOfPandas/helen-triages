@@ -6,7 +6,7 @@ source: "delicious. magazine"
 serves: 6
 prep_time: "40 mins"
 cook_time: "45 mins"
-main_ingredients: ["whole chicken", "pineapple", "ginger"]
+main_ingredients: ["whole chicken", "pineapple", "fresh ginger"]
 star_ingredient: poultry
 tags: ["showstopper"]
 ingredient_groups:
@@ -17,7 +17,7 @@ ingredient_groups:
     - amount: "1"
       item: "pineapple (about 1 kg without the leaves), peeled"
     - amount: "40 g"
-      item: "ginger, half finely grated, half cut into matchsticks"
+      item: "fresh ginger, half finely grated, half cut into matchsticks"
     - amount: "3"
       item: "garlic cloves, chopped"
     - amount: "2 tbsp"
@@ -29,7 +29,7 @@ ingredient_groups:
     - item: "freshly ground Szechuan peppercorns, to taste"
     - item: "freshly ground cloves, to taste"
     - item: "rice wine vinegar, to taste"
-    - item: "soy sauce, to taste"
+    - item: "light soy sauce, to taste"
 
 method_groups:
   - name: "Spatchcock the chicken"

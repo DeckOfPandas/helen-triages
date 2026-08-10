@@ -37,7 +37,7 @@ ingredient_groups:
   - name: buttercream filling
     items:
     - amount: "100 g"
-      item: dark chocolate
+      item: "dark chocolate, 70% cacao"
     - amount: "50 g"
       item: salted butter
     - amount: "100 g"

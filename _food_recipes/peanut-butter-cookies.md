@@ -31,7 +31,7 @@ ingredient_groups:
     - item: Extra Demerara sugar to coat
     - item: ¼–½ tsp sea salt, to taste
 method:
-  - Sift the flour and baking powder.
+  - Sift the flour, baking powder and salt.
   - "Cream the butter with the sugars, then mix in the peanut butter, then the egg and vanilla extract."
   - Stir in the flour mixture.
   - "Roll into 1-inch balls, coat in Demerara sugar, place on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."

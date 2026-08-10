@@ -14,7 +14,7 @@ ingredient_groups:
     - amount: "300 g"
       item: unsalted butter
     - amount: "300 g"
-      item: dark chocolate
+      item: "dark chocolate, 70% cacao"
     - amount: "5"
       item: large eggs
     - amount: "450 g"

@@ -6,7 +6,7 @@ source: "Henry"
 makes: half as much as my spice blender will fit
 prep_time: "5 mins"
 cook_time: None
-main_ingredients: [cinnamon, nutmeg, cloves, ginger, mace]
+main_ingredients: [cinnamon, nutmeg, cloves, "ground ginger", mace]
 star_ingredient:
 tags: [extras]
 ingredient_groups:

@@ -12,7 +12,7 @@ tags: [nibbles, sweets]
 ingredient_groups:
   - items:
     - amount: "175 g"
-      item: dark chocolate
+      item: "dark chocolate, 70% cacao"
     - amount: "3 tbsp"
       item: "flavouring to taste: Bailey's, orange liqueur, amaretto, or 3 drops ginger essence"
     - amount: "40 g"

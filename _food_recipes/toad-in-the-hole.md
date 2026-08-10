@@ -21,7 +21,7 @@ ingredient_groups:
     - amount: "2 cloves"
       item: "garlic, minced"
     - amount: "2"
-      item: pats unsalted butter
+      item: pats salted butter
     - amount: "6 tbsp"
       item: balsamic vinegar
     - amount: "1 level tbsp"

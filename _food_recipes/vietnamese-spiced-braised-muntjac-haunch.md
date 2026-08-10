@@ -6,7 +6,7 @@ source: Helen
 serves: 4
 prep_time: "20 mins"
 cook_time: "2 hrs"
-main_ingredients: ["muntjac haunch", lemongrass, ginger, "star anise", "fish sauce", "coconut palm sugar"]
+main_ingredients: ["muntjac haunch", lemongrass, "fresh ginger", "star anise", "fish sauce", "coconut palm sugar"]
 star_ingredient: game
 tags: [fakeaway, "make-ahead"]
 ingredient_groups:

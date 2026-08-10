@@ -6,7 +6,7 @@ source: "Henry"
 makes: "Enough to top a 1.5 l dish (22 x 17 cm) — about one food processor bowl full"
 prep_time: "5 mins"
 cook_time: "None"
-main_ingredients: ["gluten-free flour", "ground almonds", "Demerara sugar", "unsalted butter"]
+main_ingredients: ["gluten-free flour", "rice flour", "ground almonds", "Demerara sugar", "unsalted butter"]
 star_ingredient:
 tags: ["no-cook", "extras"]
 ingredient_groups:

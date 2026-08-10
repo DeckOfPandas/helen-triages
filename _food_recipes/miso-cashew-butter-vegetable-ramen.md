@@ -28,7 +28,7 @@ ingredient_groups:
       item: toasted sesame oil
     - amount: "1"
       item: "large garlic clove, grated"
-    - item: "thumb-sized piece fresh root ginger, grated"
+    - item: "thumb-sized piece of fresh ginger, grated"
   - name: to serve
     items:
     - amount: "2"

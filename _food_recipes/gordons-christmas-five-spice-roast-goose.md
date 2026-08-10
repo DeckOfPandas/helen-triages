@@ -17,7 +17,7 @@ ingredient_groups:
     - amount: "3"
       item: "limes, zested"
     - amount: "1 tsp"
-      item: "[Chinese five-spice powder](../_food_recipes/five-spice-powder/)"
+      item: "[Chinese five-spice powder](../five-spice-powder/)"
     - item: "small handful each of parsley sprigs, thyme and sage, plus extra for garnishing"
     - amount: "3 tbsp"
       item: clear honey

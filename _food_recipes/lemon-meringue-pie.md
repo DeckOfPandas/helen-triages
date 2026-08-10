@@ -21,6 +21,7 @@ ingredient_groups:
       note: "or 2 oz, but the pastry will be less crisp"
     - amount: "1"
       item: large egg yolk
+    - item: pinch of salt
   - name: filling
     items:
     - item: "[grandma's lemon curd](../grandmas-lemon-curd/)"
@@ -34,7 +35,7 @@ ingredient_groups:
 method_groups:
   - name: bake the pastry
     steps:
-      - "Mix the flour and sugar, then rub in the butter lightly with fingertips."
+      - "Mix the flour, sugar and salt, then rub in the butter lightly with fingertips."
       - "Mix in the egg yolk and combine gently."
       - "Squish half the pastry into the dish and flatten it ish, freezing the other half."
       - "Bake at 190°C for 30 mins."

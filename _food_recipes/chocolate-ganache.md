@@ -14,7 +14,7 @@ ingredient_groups:
     - amount: "150 ml"
       item: double cream
     - amount: "150 g"
-      item: dark chocolate
+      item: "dark chocolate, 70% cacao"
     - amount: "1 tbsp"
       item: salted butter and/or salt to taste
     - amount: "2 tbsp"

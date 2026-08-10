@@ -16,7 +16,7 @@ ingredient_groups:
     - amount: "250 g"
       item: cooked and peeled beetroot
     - amount: "200 g"
-      item: "dark chocolate (70% cocoa solids)"
+      item: "dark chocolate, 70% cacao"
     - amount: "4 tbsp"
       item: hot cocoa
     - amount: "135 g"

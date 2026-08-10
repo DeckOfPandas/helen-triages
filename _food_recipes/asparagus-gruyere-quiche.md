@@ -22,6 +22,7 @@ ingredient_groups:
       item: egg yolks
     - amount: "4 tsp"
       item: cold water
+    - item: pinch of salt
     - item: pinch of paprika
       note: fine to skip
   - name: filling
@@ -42,7 +43,7 @@ ingredient_groups:
 method_groups:
   - name: pastry
     steps:
-    - "Mix the dry pastry ingredients, then rub in the butter lightly with fingertips."
+    - "Mix the dry pastry ingredients with the salt, then rub in the butter lightly with fingertips."
     - "Add the egg yolks, then the water, then knead until smooth. Don't over-knead. Add all the water even if the pastry feels too wet."
     - "Leave to rest wrapped in clingfilm in the fridge for about half an hour. Don't skip this otherwise the pastry won't stretch nicely into your dish, and it will shrink, bend and crack when you cook it."
     - Press the pastry into a greased ceramic baking dish. Prick liberally all over with a fork.

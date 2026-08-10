@@ -28,11 +28,11 @@ ingredient_groups:
     - amount: "1 tsp"
       item: white miso paste
     - amount: "1 tsp"
-      item: soy sauce
+      item: dark soy sauce
     - amount: "1 tbsp"
       item: mirin
     - amount: "1 tsp"
-      item: grated ginger
+      item: grated fresh ginger
     - amount: "½ tsp"
       item: dark brown soft sugar
 method:

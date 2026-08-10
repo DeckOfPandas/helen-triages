@@ -6,7 +6,7 @@ source: "Grandma Kath"
 makes: "one 7-inch round cake"
 prep_time: "10 mins"
 cook_time: "35 mins"
-main_ingredients: ["salted butter", "Demerara sugar", "golden syrup", "self-raising flour", ginger, "mixed spice"]
+main_ingredients: ["salted butter", "Demerara sugar", "golden syrup", "self-raising flour", "ground ginger", "mixed spice powder"]
 star_ingredient:
 tags: [bakes]
 ingredient_groups:
@@ -26,7 +26,7 @@ ingredient_groups:
     - amount: "2 tsp"
       item: ground ginger
     - amount: 1 tsp
-      item: "mixed spice"
+      item: "mixed spice powder"
       note: "mixed spice isn't really sold like this any more — see [mixed spice](../mixed-spice/) for a home-made blend"
 method:
   - Cream the butter and sugar thoroughly until fluffy. Longer than you think.
