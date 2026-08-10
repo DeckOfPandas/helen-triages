@@ -90,24 +90,7 @@ being used — it shouldn't live in the repo root long-term.
 
 ## 2. Content passes
 
-### 2.1 Newly surfaced test failures, not yet triaged (found 2026-08-09)
-
-A full `pytest` run turned these up; nobody's read the actual files yet to
-say whether each is a real bug or a deliberate call worth documenting. Not
-the same category as `test_ingredient_annotation_style` (`HANDOVER_v26.md`
-§10), which is confirmed deliberate — these are just unread:
-
-- `test_typography` — `indonesian-chicken-curry-gulai-ayam.md` (slash
-  fractions, double hyphen), `mixed-spice.md` (slash fractions)
-- `test_brown_sugar_is_soft_brown_sugar` — `citrus-soy-salmon-sticky-rice.md`,
-  `miso-salmon-veg-traybake.md`
-
-(Oven conversions in `_food_drafts/` and the nine `Estimated` timings, both
-previously tracked here, are fully resolved as of 2026-08-09 — `grep`/pytest
-both come back clean. Removed rather than left as a stale "re-derive the
-count" placeholder, since zero isn't a count that needs re-deriving.)
-
-### 2.2 Loose ends in individual recipes
+### 2.1 Loose ends in individual recipes
 - `beef-wellington` — Dijon is in the ingredients, no method step mentions
   it (belongs in "Assemble"); also `QQ link to beef bone stock recipe`
 - `schmaltzy-lentils-chicken-lemon` — reconstructed from a transcript, check
@@ -116,7 +99,7 @@ count" placeholder, since zero isn't a count that needs re-deriving.)
   experience; worth a note in Helen's voice once made
 - `beef-bourguignon` — placeholder only. **Do not auto-generate content**
 
-### 2.3 Draft tidying is not urgent and not yours
+### 2.2 Draft tidying is not urgent and not yours
 Helen adds drafts in batches, several times a day. Only three tests read
 `_food_drafts/` at all (`HANDOVER_v26.md` §10) — in practice only the
 spelling-collision one ever fires. Oven conversions and placeholder steps in
