@@ -27,8 +27,8 @@ ingredient_groups:
       note: fine to skip
   - name: filling
     items:
-    - amount: "1"
-      item: "large onion, diced finely"
+    - amount: "1 large"
+      item: "onion, diced finely"
     - amount: "4"
       item: eggs
     - amount: "360 ml"

@@ -16,8 +16,8 @@ ingredient_groups:
       item: blanched hazelnuts
     - amount: "1 heaped tsp"
       item: cumin seeds
-    - amount: "1"
-      item: "small red onion, finely chopped"
+    - amount: "1 small"
+      item: "red onion, finely chopped"
       note: fine to halve or skip
     - amount: "400 g"
       item: "Brussels sprouts, shredded"

@@ -16,8 +16,8 @@ ingredient_groups:
       item: good-quality sausages
     - amount: "4 sprigs"
       item: rosemary
-    - amount: "2"
-      item: large red onions
+    - amount: "2 large"
+      item: red onions
     - amount: "2 cloves"
       item: "garlic, minced"
     - amount: "2"
