@@ -1,0 +1,170 @@
+// ============================================================================
+// BADGES
+// ============================================================================
+// Star, mood and practicality badges on each recipe entry.
+// Note: the clip-path SHAPES for .btn-star and .badge live here, deliberately
+// grouped with the badges. Their appearance is under BUTTONS below.
+
+.badge-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  width: 100%;
+  gap: $space-md;
+
+  // Flat hyphenation, not BEM __element -- matches every other nested class
+  // on the site (e.g. .site-logo-word inside .site-logo). Renamed from
+  // .badge-group__content/__meta 2026-08-10, the one BEM-element holdout
+  // in the whole codebase; see HANDOVER's CSS naming section.
+  &-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-sm;
+    flex: 1;
+  }
+
+  &-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: $space-sm;
+    flex-shrink: 0;
+  }
+}
+
+
+// Clip-path shape — now for .badge only (the meta/draft status flags:
+// -draft, -meta-rewrite, -meta-proofread). .badge-star/mood/practicalities
+// and .btn-tag/.btn-star moved to the tape-shape SVG system below
+// (Helen, 2026-08-03: "the grey shapes... don't really look like anything
+// in particular... hastily broken old-fashioned highlighter tape").
+.badge {
+  display: inline-block;
+  font-family: $font-headings;
+  white-space: nowrap;
+  position: relative;
+
+  clip-path: polygon(
+    1% 1%,
+    95% 3%,
+    99% 16%,
+    94% 46%,
+    100% 74%,
+    96% 97%,
+    3% 94%,
+    0% 42%
+  );
+
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  padding: $space-xxs 0.65rem $space-xxs $space-sm;
+  transition: all 0.1s ease-in-out;
+
+  &-draft {
+    background-color: rgba($color-text, 0.05);
+    color: lighten($color-clear-text, 12%);
+  }
+
+  &-meta-rewrite {
+    background-color: rgba($color-text, 0.05);
+    color: lighten($color-clear-text, 12%);
+  }
+
+  &-meta-proofread {
+    background-color: rgba($color-text, 0.05);
+    color: lighten($color-clear-text, 12%);
+  }
+
+  // Tape shape instead of clip-path + flat fill -- no background-color at
+  // all, the SVG itself is the visible fill, ragged edges and all. .tag-shape
+  // gets its OWN colour (the raw root hue) separate from the text colour
+  // (the darker -active hue), same two-tone split the rest of the page's
+  // colour system already uses -- text needs to stay readable sitting on
+  // top of the shape, not disappear into it.
+  &-star, &-mood, &-practicalities {
+    clip-path: none;
+  }
+
+  // Resting pill shape, take two: rgba(..., 0.4) was still too loud (Helen,
+  // 2026-08-03: "still too loud for me... please try mixing with a grey").
+  // mix() with $color-border (the site's own "quiet, crisp structural
+  // lines" token, already the lightest neutral in the palette) rather than
+  // a transparency dial this time -- a semi-transparent hue over a white
+  // page just lightens it (still reads as a pale, bright tint), where an
+  // actual mix desaturates it into a dustier, quieter version of the same
+  // hue. Solid colour, not rgba -- the desaturation is doing the calming
+  // work here, not opacity. .badge--matched below still overrides back to
+  // the full-strength root hue, so a matched tag keeps popping.
+  &-star {
+    color: $color-star-active;
+    .tag-shape { color: mix($color-star-root, $color-border, 35%); }
+  }
+
+  &-mood {
+    color: $color-mood-active;
+    .tag-shape { color: mix($color-mood-root, $color-border, 35%); }
+  }
+
+  &-practicalities {
+    color: $color-practicalities-active;
+    .tag-shape { color: mix($color-practicalities-root, $color-border, 35%); }
+  }
+}
+
+// The tape shape itself: absolutely positioned behind the badge/button text,
+// stretched to fill (preserveAspectRatio="none" baked into the SVG files
+// themselves, same technique as the wordmark's own tape). One of a curated
+// pool (see the POOL comment in decorations.js's tagShapes() for the full
+// reasoning) assigned deterministically by the tag's own text -- same tag
+// always gets the same shape wherever it appears (a filter button and a
+// recipe-row pill for "greens" match), and shape 9's full-width diagonal is
+// excluded for short tag text specifically, since it distorts more than the
+// others do when stretched very narrow.
+.tag-shape {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  // Lets --stretch below overflow the slot itself without spilling into
+  // whatever sits next to the pill.
+  overflow: hidden;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  // tag-shape-2 specifically stretched further than an exact fit, but only
+  // on a genuinely wide pill — Helen: "the way the shape rolls off along
+  // the top left corner bothers me every time" on make-ahead, "doesn't
+  // bother me at all" on duck, same shape both times. decorations.js only
+  // adds this class on long tag text (the same SHORT_TEXT_MAX cutoff used
+  // to keep tag-shape-9 off short pills), so duck is untouched. First pass
+  // at 1.25 overshot even on make-ahead ("too square, sorry, Goldilocks") —
+  // dialed back to a smaller nudge past 1, still enough to move the torn
+  // corner further toward the edge without flattening the shape's own
+  // character. .tag-shape's own overflow: hidden crops the excess rather
+  // than letting it spill past the pill's edges.
+  &--stretch svg {
+    transform: scaleX(1.1);
+    transform-origin: center;
+  }
+}
+
+// Matched/active tag text had a raised emboss here through several rounds
+// (2026-08-03) — softened alpha, per-category alpha, a hand-tuned colour
+// per category, a widened stroke, all chasing star/mood legibility against
+// practicalities' own softer version, none of it landing. Helen's call: no
+// shadow at all, one flat stroke width for all three categories — "we're
+// fighting the raised font in our tags, and we're losing." Full history is
+// in git; the abandoned %tag-emboss-soft placeholder and
+// tag-emboss-strong($light-colour) mixin aren't worth keeping around only
+// to explain why they're gone.

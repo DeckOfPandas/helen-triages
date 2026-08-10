@@ -1,0 +1,88 @@
+// ============================================================================
+// BUTTONS
+// ============================================================================
+// Filter button appearance and states. Shapes are under BADGES above.
+
+// --- Button Base Controls -----------------------------------------------------
+// Defined before .category so active-state compound selectors
+// (two classes) correctly win over these single-class rules by specificity.
+
+// Tape shape now, not a flat clip-path fill (see .tag-shape, BADGES above)
+// — position:relative/inline-block/font-family/white-space moved here from
+// the old shared .badge/.btn-tag/.btn-star rule, since these two no longer
+// share a rule with .badge at all. Resting .tag-shape colour is a
+// translucent neutral (rgba($color-text, ...)) matching the previous flat
+// background's visual weight; category colour only appears once a filter is
+// actually chosen (.active rules below) — same principle as the existing
+// active-state colour pop, extended to the shape itself.
+.btn-tag,
+.btn-star {
+  position: relative;
+  display: inline-block;
+  font-family: $font-headings;
+  white-space: nowrap;
+  text-transform: lowercase;
+  font-weight: 700;
+  border: none;
+  background: none;
+  color: lighten($color-text, 22%);
+  padding: $space-xs $space-md;
+  cursor: pointer;
+  font-size: 0.75rem;
+  margin: 0.2rem 0.45rem 0.2rem 0;
+  transition: all 0.1s ease-in-out;
+
+  // Resting alpha: 0.35 -> 0.25 -> 0.15, two rounds of "lighten a little"
+  // (Helen, 2026-08-03).
+  .tag-shape { color: rgba($color-text, 0.15); }
+
+  &:hover {
+    color: $color-text;
+    .tag-shape { color: rgba($color-text, 0.4); }
+  }
+}
+
+.btn-tag, .btn-star, .btn-clear, .btn-meta {
+  &:focus-visible {
+    outline: none;
+    background-color: rgba($color-text, 0.15);
+  }
+}
+
+// A search-result tag where some word genuinely starts with what was typed
+// (not just a family member pulled in alongside it — see hasWordMatch in
+// filters.js).
+//
+// Background dropped entirely 2026-08-03. It had been a flat grey rectangle
+// (rgba($color-text, 0.14)) precisely BECAUSE colouring/shaping an unbounded
+// swarm was the wrong move (see the old reasoning about NEUTRAL, NOT THE
+// SECTION'S COLOUR, preserved in git) — but that grey rectangle turned out
+// to have its own problem: the moment typing narrows the results to one
+// match, that lone survivor auto-activates and gets the full tape-shape
+// treatment, and a flat rectangle suddenly becoming a torn-tape shape read
+// as jarring (Helen: "one suddenly becomes a ta[pe] shape"). Removing the
+// background altogether removes that jump too — there's nothing for the
+// active state to visibly transform FROM. Colour still carries the
+// emphasis, just through text colour alone rather than text + fill: font
+// colour on a genuine word match, $color-ingredient-active (the dark end
+// of the green already used elsewhere for this section, not a new value).
+// Same "colour cannot carry emphasis at unbounded count" logic as before
+// still applies to giving every one of forty results its own shape or its
+// own full-strength fill — that idea was raised and set aside for the same
+// reason.
+.btn-ingredient--word-match {
+  color: $color-ingredient-active;
+  // font-weight has nowhere left to go -- these are already font-weight:
+  // 700 (the .btn-tag base above, applied uniformly, matched or not), and
+  // Courier New only ships Regular and Bold as real static faces, so 700 is
+  // already this font's ceiling. Helen confirmed via devtools that matched
+  // and unmatched results were rendering at the same weight, which is
+  // consistent with that: there was never a separate, lighter weight on
+  // unmatched results for a match to stand out from. A stroke (her own
+  // suggestion, once weight was ruled out) is a real, working lever
+  // instead -- same trick @include punched() and .category-label's own
+  // stroke already use site-wide to read heavier than the font alone can
+  // render. Same colour as the fill, not a separate darker value, so it
+  // reads as "thicker green" rather than a mismatched outline.
+  -webkit-text-stroke: 0.5px $color-ingredient-active;
+}

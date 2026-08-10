@@ -1,0 +1,332 @@
+// ============================================================================
+// FILTER LABELS AND CATEGORIES
+// ============================================================================
+// Category wrappers, labels, and the highlighter backgrounds behind them.
+// Also holds the category label doodles and the blocky underline rule --
+// both decorate the same label this file is already about, and were too
+// small (26 and 31 lines) to earn their own file in the 2026-08-10 split.
+
+// --- Active filter button base -----------------------------------------------
+// All active filter states share these four properties; each rule then adds
+// its colour-specific ones (color, -webkit-text-stroke) on top. Extended
+// from here and from food/_search.scss -- lives in whichever of the two is
+// imported first.
+//
+// Lives here rather than in shared/_tokens.scss because it reads $color-text
+// and $saturation-badge-bg. A "shared" token that depends on one site's palette
+// is not shared, and this was the only thing in that file that did.
+%btn-active-base {
+  text-transform: uppercase;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  background-color: rgba($color-text, $saturation-badge-bg);
+}
+
+// --- Filter Label Bases & Background Highlighters ---------------------------------
+// --- Index density ----------------------------------------------------------
+// THE INDEX IS A CONTROL PANEL, NOT A DOCUMENT, and its own two spacing values
+// say so. These are deliberately NOT $spacing-section-top / $space-xxl.
+//
+// Its job is to be taken in at a glance: every filter section visible in one
+// eye pass, so nothing is missed on a first look. That is a DENSITY
+// requirement, and it is the exact opposite of the recipe page's, where a cook
+// mid-task needs to land on one section and space is what isolates it. The same
+// numbers cannot serve both.
+//
+// Matching the recipe page token for token was tried on 2026-08-01 and rejected
+// on sight — it pushed the five sections about 340px apart and you could no
+// longer see them together, which is the one thing this page has to do.
+//
+// Tune density here. Keep the ratio near 2:1 or the structure blurs: the gap
+// BETWEEN sections has to read as clearly larger than the gap WITHIN one.
+$index-section-gap: $space-xl;   // between one filter section and the next
+$index-label-gap:   $space-md;   // a label to its own buttons
+
+.category {
+  margin: $index-section-gap 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $index-label-gap;
+
+  .category-label-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: $space-lg;   // horizontal, label to its inline clear link
+  }
+
+  // TYPOGRAPHY MATCHED TO THE RECIPE PAGE'S SECTION HEADINGS, ONE STEP DOWN.
+  // These carry the same blocky rule, so they have to belong to the same voice
+  // — but they are filter labels on a control panel, five of them stacked in a
+  // screenful, not the three landmarks of a long scrolling page. Same family,
+  // lower level.
+  //
+  // Was 0.78rem / weight 900 / 0.8px stroke, which was neither.
+  //
+  // THE STROKE IS SET BY PROPORTION, NOT BY COPYING THE NUMBER. -webkit-text-stroke
+  // is an absolute px width, so the same token on smaller type is a
+  // proportionally FATTER letterform — which reads as a different, chunkier
+  // font rather than as the same font smaller. The recipe page's section
+  // headings are 0.6px on 1.8rem, or 2.08% of the type size. $stroke-light on
+  // 1.35rem is 2.31%. Near enough identical, using a token that already exists.
+  //
+  // 0.8px on 0.78rem, for comparison, was 6.4% — three times heavier than the
+  // biggest headings on the site. Nobody chose that; it accumulated under a
+  // brush wash that was absorbing it.
+  .category-label {
+    font-family: $font-headings;
+    text-transform: uppercase;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    // A LIGHTER stroke than the letter, restoring Helen's punched-tape edge —
+    // but derived from the text colour instead of a standalone rgba(50,50,50),
+    // which was a grey with no relationship to the letter it outlined.
+    // This is half the effect; @include punched() below is the other half, and
+    // the two are independent. See the long note in _sass/food/_rule.scss.
+    -webkit-text-stroke: $stroke-light $color-label-stroke;
+    @include punched(raised);   // `pressed` inverts the light and punches IN
+    // Was $color-highlighter-label — "text sitting on top of a highlighter",
+    // of which there is none here any more. Plain body text colour, same as
+    // every heading on the recipe page.
+    color: $color-text;
+    position: relative;   // anchors the absolutely-positioned wash slot
+    // Was `padding: 0.22rem 3rem` here plus an inline `padding: 0.22rem 1rem`
+    // on the element, which won. Both existed only to give the ragged brush
+    // wash room to bleed past the lettering. With the blocky rule there is
+    // nothing to bleed, and the padding was pushing the label 1rem right of the
+    // filter buttons underneath it — invisible under a wash, obvious under a
+    // straight rule.
+    padding: 0.22rem 0;
+  }
+
+  // Brought closer to .btn-clear (the global "clear all", below) and to
+  // article.recipe a — Helen, 2026-08-03: this page already has multiple
+  // link designs (the global clear, the recipe page's own links), and this
+  // inline one, being bold Courier with an opacity-fade hover, was a THIRD
+  // distinct design competing with both. Sans, regular weight and a
+  // colour-shift hover now, same mechanism every other link on the site
+  // uses — still its own colour per section (unlike the neutral global
+  // clear), since that context IS worth keeping, just not the typography.
+  .btn-clear-inline {
+    // A real <button> since 2026-07-29 — it was a <span> with a click handler,
+    // so it was unreachable by keyboard. These four lines strip the browser
+    // chrome so it looks exactly as it did.
+    border: 0;
+    background: none;
+    padding: 0;
+    color: inherit;
+
+    font-family: $font-body;
+    font-size: 0.78rem;
+    font-weight: 400;
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.1s ease-in-out;
+    white-space: nowrap;
+  }
+
+  // Inline clear colours per group — hover lightens to the raw root hue,
+  // same "hover goes lighter" rule article.recipe a and .btn-clear itself
+  // both already follow, rather than the previous opacity fade (a second,
+  // unrelated hover mechanism).
+  &.category--star      { .btn-clear-inline { color: $color-star-active;           &:hover { color: $color-star-root; } } }
+  &.category--mood      { .btn-clear-inline { color: $color-mood-active;           &:hover { color: $color-mood-root; } } }
+  &.category--practicalities { .btn-clear-inline { color: $color-practicalities-active; &:hover { color: $color-practicalities-root; } } }
+  // The two searches never had one. They do now, for the same reason the other
+  // three do: the clear link belongs to its section and should say so.
+  &.search--ingredients { .btn-clear-inline { color: $color-ingredient-active;     &:hover { color: $color-ingredient-root; } } }
+  &.search--name        { .btn-clear-inline { color: $color-name-search-active;    &:hover { color: $color-name-search-root; } } }
+
+  // Active states -- compound selectors (.category--star .btn-star.active)
+  // have higher specificity than the base .btn-tag/.btn-star rule above,
+  // so no !important needed here.
+  // Shared typography via %btn-active-base; each adds its own colour.
+  //
+  // background: none cancels %btn-active-base's generic flat grey — the
+  // tape shape (.tag-shape) is the fill now, not a background-color. Colour
+  // there jumps from the resting translucent neutral to the solid category
+  // root hue, the tape-shape equivalent of the pop the matched recipe-row
+  // pills already get. RESTING .btn-tag/.btn-star (not .active) is
+  // untouched -- only the chosen state changes.
+  //
+  // Text colour is $color-text (near-black), not the category -active hue —
+  // Helen's read: the coloured text wasn't very readable once it was sitting
+  // on the full-colour tape shape rather than a pale background tint.
+  //
+  // No emboss/raised text-shadow here any more (dropped 2026-08-03, see the
+  // comment above %tag-emboss-soft's old spot) — flat stroke only, same
+  // 0.6px for all three categories rather than a value per category, and
+  // in $color-text (same dark colour as the letter itself) rather than the
+  // category -active hue — Helen's correction once she saw it: the
+  // category colour lived in .tag-shape already, and a stroke that matched
+  // the letter reads as one solid dark letterform instead of introducing a
+  // second colour. .tag-shape's own fill lightened further too (mix with
+  // white, 12% -> 18%), Helen's second nudge on the same "back off the
+  // loudness" idea.
+  &.category--star .btn-star.active {
+    @extend %btn-active-base;
+    background: none;
+    color: $color-text;
+    text-shadow: none;
+    -webkit-text-stroke: 0.6px $color-text;
+    .tag-shape { color: mix($color-star-root, $color-white, 82%); }
+  }
+
+  &.category--mood .btn-tag.active {
+    @extend %btn-active-base;
+    background: none;
+    color: $color-text;
+    text-shadow: none;
+    -webkit-text-stroke: 0.6px $color-text;
+    .tag-shape { color: mix($color-mood-root, $color-white, 82%); }
+  }
+
+  &.category--practicalities .btn-tag.active {
+    @extend %btn-active-base;
+    background: none;
+    color: $color-text;
+    text-shadow: none;
+    -webkit-text-stroke: 0.6px $color-text;
+    .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
+  }
+
+  .category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+  }
+
+  // THE GAP AFTER THE INGREDIENT SEARCH THAT NOTHING ELSE HAS.
+  // .search--ingredients holds two flex children: the input, and the results
+  // pool that filters.js fills as you type. The pool is EMPTY on load — but a
+  // flex `gap` applies between items regardless of their size, so an empty div
+  // still buys a full gap of dead air. .search--name has one child and no such
+  // gap, which is why the space below SEARCH INGREDIENTS has always looked
+  // bigger than the space below PRACTICALITIES. It is not an illusion; it was a
+  // real $space-md of extra space, and briefly a real $space-xxl.
+  //
+  // The gap is moved onto the pool itself, conditional on it having content.
+  // `:not(:empty)` rather than hiding the empty pool with `display: none`,
+  // because the pool carries aria-live and a region announces more reliably if
+  // it stays in the tree rather than appearing at the moment it is filled.
+  &.search {
+    gap: 0;
+
+    .search-results:not(:empty) {
+      margin-top: $index-label-gap;
+    }
+  }
+
+  // Meta filter buttons — darkened grey, matching the meta badges
+  &.category--meta {
+    // No margin override. It was $space-md, tuned when every category sat
+    // $space-xl apart; against $spacing-section-top it made the meta row hug
+    // the section above it. A local-only appendix is still a section.
+    align-items: center;
+    width: 100%;
+
+    .category-label-row {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .category-buttons {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .category-label {
+      font-size: 0.72rem;
+      color: lighten($color-clear-text, 12%);
+      -webkit-text-stroke: 0;
+    }
+  }
+
+  &.category--meta .btn-meta.active {
+    @extend %btn-active-base;
+    color: $color-clear-text;
+    -webkit-text-stroke: 0.5px $color-clear-text;
+  }
+}
+
+.btn-meta {
+  font-family: $font-headings;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  padding: $space-xxs 0.65rem $space-xxs $space-sm;
+  transition: all 0.1s ease-in-out;
+  background-color: rgba($color-text, 0.05);
+  color: lighten($color-clear-text, 12%);
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+
+  &:hover {
+    background-color: rgba($color-text, 0.1);
+  }
+}
+
+// ============================================================================
+// CATEGORY LABEL DOODLES
+// ============================================================================
+// Hand-drawn marks beside the filter labels.
+
+// --- Category label doodles --------------------------------------------------
+// Matches the recipe page section-heading-sparkle pattern.
+// Left and right spans display the SVG inline; text span holds the label.
+.category-label-doodle--left,
+.category-label-doodle--right {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  svg {
+    display: block;
+    width: auto;
+    height: 32px;   // matches recipe page doodle height
+  }
+}
+
+.category-label-doodle--text {
+  display: inline;
+}
+
+// ============================================================================
+// THE BLOCKY RULE ON THE INDEX
+// ============================================================================
+// The same device as the recipe page (see _sass/food/_rule.scss and
+// HANDOVER §13), on the five filter section labels. This settles
+// DEV_JOBS §1.6: the index follows, and the two pages differ on colour
+// DISCIPLINE rather than on marks — five hues here because on the index colour
+// is a CODE, tied to each section's buttons and badges, where on the recipe
+// page it is decoration and had to be rationed.
+//
+// The order is the order they appear down the page, which is not the order they
+// appear in _data/food/filter_sections.yml — the two tag_groups (mood,
+// practicalities) render between star and the two searches.
+// Each section's colour comes from _sass/food/_palette.scss — $color-star-root
+// and its four siblings, which also drive that section's filter buttons, its
+// active states, its clear link and its badges on every recipe row. Nothing
+// about a section's colour is written here.
+//
+// The violet is $color-section-underline-2, shared with the recipe page: it is
+// the same second rule on both, so there is one value for it, not two that have
+// to be kept in step by hand.
+.category .category-label-text {
+  display: inline;
+}
+
+
+.category--star            .category-label-text { @include overlapping-rule-double($color-star-root,           $color-section-underline-2); }
+.category--mood            .category-label-text { @include overlapping-rule-double($color-mood-root,           $color-section-underline-2); }
+.category--practicalities  .category-label-text { @include overlapping-rule-double($color-practicalities-root, $color-section-underline-2); }
+.search--ingredients       .category-label-text { @include overlapping-rule-double($color-ingredient-root,     $color-section-underline-2); }
+.search--name              .category-label-text { @include overlapping-rule-double($color-name-search-root,    $color-section-underline-2); }

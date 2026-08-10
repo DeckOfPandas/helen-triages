@@ -37,12 +37,29 @@ $method-short-tint-opacity: 0.08;   // Helen, on noticing the box for the
 
 // --- Body text base ----------------------------------------------------------
 // Set once on the recipe article so children inherit and only override exceptions.
+//
+// position/width folded in from food/_layout.scss during the 2026-08-10 split
+// -- article.recipe used to be declared in both files, an orphaned duplicate
+// rather than a deliberate split. The old --annotation-gutter custom property
+// that lived alongside it is dropped, not carried over: declared for a
+// margin-annotations feature that was never built, and read by nothing
+// anywhere in _sass/.
 article.recipe {
+  position: relative;
+  width: 100%;
   font-family: $font-body;
   font-weight: 300;
   color: $color-text;
   font-size: $font-size-body-sm;
   line-height: $line-height-body;
+}
+
+// Constrain prose reading width on the recipe page.
+// 65ch ≈ the typographic sweet spot of 60–65 characters per line.
+article.recipe p,
+article.recipe .note,
+article.recipe .method-short {
+  max-width: 65ch;
 }
 
 // --- Cross-recipe links -------------------------------------------------

@@ -4,7 +4,7 @@
 // site_key is `food` (see _data/sites.yml → food.css).
 //
 // Import order matters: palette first, then tokens and base (which reference
-// palette variables), then layout, then the recipe page.
+// palette variables), then the index-page partials, then the recipe page.
 //
 // shared/ is imported by both sites and may not name either. food/ may assume
 // anything it likes. Nothing in shared/ imports anything from food/.
@@ -15,7 +15,23 @@
 @import "shared/rule";
 @import "shared/base";
 @import "shared/layout";
-// The blocky rule, before food/layout — the index uses its mixin, same reason.
+// The blocky rule, before the index partials below — they use its mixin,
+// same reason.
 @import "food/rule";
-@import "food/layout";
+// food/_layout.scss was one 1,111-line file as of 2026-08-09; split
+// 2026-08-10 into the six partials below, one per section it already had
+// (see each file's own header comment, and HANDOVER for the full story).
+// Order preserved from the original file except food/category-labels, which
+// now also carries the old CATEGORY LABEL DOODLES and THE BLOCKY RULE ON THE
+// INDEX sections (originally last) -- verified safe to move earlier: neither
+// touches a class any of the sections between its old and new position also
+// styles.
+@import "food/recipe-list";
+@import "food/badges";
+@import "food/buttons";
+// %btn-active-base is defined in category-labels and @extended from here and
+// from search -- must stay imported before both.
+@import "food/category-labels";
+@import "food/search";
+@import "food/active-filter-states";
 @import "food/recipe";
