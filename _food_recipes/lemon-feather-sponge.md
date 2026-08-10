@@ -25,7 +25,8 @@ ingredient_groups:
       item: eggs
     - amount: "3 fl oz plus 1 tbsp"
       item: groundnut or canola oil
-    - item: "zest and juice of 1 large lemon"
+    - amount: "1 large"
+      item: "lemon, zest and juice"
 method:
   - "Stir the egg yolks with the oil and 3 fl oz water. It won't mix well but this doesn't matter."
   - "Mix the dry ingredients separately, then stir in the egg/oil mixture until smooth."
