@@ -135,18 +135,22 @@ def test_notes_is_a_list(recipe):
 
 
 def test_note_dicts_have_label_and_text(recipe):
-    """A note is either a plain string, or `{label, text}` — added 2026-08-03
-    so each note box can carry a topical label ("Sinking", "Portion size")
-    instead of every box in the Notes grid saying the same static "note".
-    A dict missing either key renders blank or unlabelled with no error, so
-    this is worth catching here rather than by eye.
+    """GitHub issue #141. Every note is `{label, text}`, both present — the
+    bare-string form (allowed since 2026-08-03 so each note box could carry
+    a topical label like "Sinking"/"Portion size" instead of every box in
+    the Notes grid saying the same static "note") is retired for published
+    recipes as of this issue. A bare string, or a dict missing either key,
+    renders blank or unlabelled with no error, so this is worth catching
+    here rather than by eye. Zero recipes needed fixing when this landed --
+    every published note was already `{label, text}`; the bare-string form
+    is still deliberately allowed in _food_drafts/ (HANDOVER_v26.md §4/§9),
+    which this test never reads.
     """
     for i, note in enumerate(recipe.fm.get("notes") or [], 1):
-        if isinstance(note, dict):
-            assert note.get("label") and note.get("text"), (
-                f"{where(recipe)} note {i} is a dict but missing `label` "
-                f"and/or `text`: {note!r}."
-            )
+        assert isinstance(note, dict) and note.get("label") and note.get("text"), (
+            f"{where(recipe)} note {i} must be `{{label, text}}`, both "
+            f"present, not {note!r}."
+        )
 
 
 def test_method_short_is_a_list(recipe):
