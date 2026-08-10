@@ -18,7 +18,7 @@ ingredient_groups:
       item: unsalted butter
     - amount: "6 tbsp"
       item: parmesan
-    - amount: "2"
+    - amount: "2 large"
       item: egg yolks
     - amount: "4 tsp"
       item: cold water
@@ -29,7 +29,7 @@ ingredient_groups:
     items:
     - amount: "1 large"
       item: "onion, diced finely"
-    - amount: "4"
+    - amount: "4 large"
       item: eggs
     - amount: "360 ml"
       item: double cream

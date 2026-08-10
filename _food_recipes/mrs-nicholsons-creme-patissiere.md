@@ -16,7 +16,7 @@ ingredient_groups:
     - amount: "1"
       item: "vanilla pod, split lengthways"
       note: "or several drops of good vanilla essence"
-    - amount: "6"
+    - amount: "6 large"
       item: egg yolks
     - amount: "100 g"
       item: golden caster sugar

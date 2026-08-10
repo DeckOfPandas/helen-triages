@@ -24,8 +24,8 @@ ingredient_groups:
     - amount: "250 g"
       item: peanut butter
       note: Skippy is fantastic
-    - amount: "1"
-      item: "large egg, room temperature"
+    - amount: "1 large"
+      item: "egg, room temperature"
     - amount: "1 tsp"
       item: vanilla extract
     - item: Extra Demerara sugar to coat

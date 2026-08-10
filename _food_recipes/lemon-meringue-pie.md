@@ -19,16 +19,16 @@ ingredient_groups:
     - amount: "3 oz"
       item: "golden caster sugar"
       note: "or 2 oz, but the pastry will be less crisp"
-    - amount: "1"
-      item: large egg yolk
+    - amount: "1 large"
+      item: egg yolk
     - item: pinch of salt
   - name: filling
     items:
     - item: "[grandma's lemon curd](../grandmas-lemon-curd/)"
   - name: meringue
     items:
-    - amount: "4"
-      item: large egg whites
+    - amount: "4 large"
+      item: egg whites
     - item: "pinch of cream of tartar"
     - amount: "4 oz"
       item: "white caster sugar"

@@ -17,8 +17,8 @@ ingredient_groups:
       item: salted butter
     - amount: "2 oz"
       item: golden caster sugar
-    - amount: "1"
-      item: large egg
+    - amount: "1 large"
+      item: egg
     - amount: "2 tbsp"
       item: milk
     - amount: "4 oz"

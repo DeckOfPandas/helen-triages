@@ -21,8 +21,8 @@ ingredient_groups:
       item: salt
     - amount: "5 oz"
       item: golden caster sugar
-    - amount: "2"
-      item: large eggs
+    - amount: "2 large"
+      item: eggs
     - amount: "3 fl oz plus 1 tbsp"
       item: groundnut or canola oil
     - item: "zest and juice of 1 large lemon"

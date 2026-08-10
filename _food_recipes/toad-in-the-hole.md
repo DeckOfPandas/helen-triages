@@ -32,8 +32,8 @@ ingredient_groups:
       item: milk
     - amount: "115 g"
       item: plain flour
-    - amount: "3"
-      item: large free-range eggs
+    - amount: "3 large"
+      item: free-range eggs
 method_groups:
   - name: toad in the hole
     steps:

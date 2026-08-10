@@ -13,8 +13,8 @@ ingredient_groups:
   - items:
     - amount: "120 g"
       item: plain flour sifted with a pinch of salt
-    - amount: "2"
-      item: large eggs
+    - amount: "2 large"
+      item: eggs
     - amount: "210 ml"
       item: milk mixed with 90ml water
     - amount: "2 tbsp"

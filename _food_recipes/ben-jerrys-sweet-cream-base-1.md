@@ -11,8 +11,8 @@ star_ingredient:
 tags: [extras, freezable]
 ingredient_groups:
   - items:
-    - amount: "2"
-      item: large eggs
+    - amount: "2 large"
+      item: eggs
     - amount: ¾ cup
       item: golden caster sugar
     - amount: "2 cups"
