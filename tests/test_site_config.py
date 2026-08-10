@@ -236,6 +236,69 @@ def test_pantry_entries_are_actually_used():
     )
 
 
+def test_pantry_list_is_lowercase():
+    """The match in food/index.html is `ing | downcase` against a raw `contains`
+    check on this list -- an uppercase entry here would silently never match
+    anything (Liquid does not lowercase the pantry side), the exact "test that
+    cannot fail and not notice" failure mode HANDOVER_v26.md §12 warns about:
+    green, no error, just an entry that's dead weight forever.
+    """
+    path = DATA / "common_ingredients.yml"
+    if not path.exists():
+        pytest.skip("_data/food/common_ingredients.yml does not exist yet")
+    pantry = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("pantry") or []
+
+    not_lower = [p for p in pantry if p != p.lower()]
+    assert not not_lower, (
+        f"_data/food/common_ingredients.yml has non-lowercase entries: {not_lower}.\n"
+        f"food/index.html compares `ing | downcase` against this list as-is -- an "
+        f"uppercase entry here matches nothing, ever, and nothing will tell you."
+    )
+
+
+def _sink_pantry(main_ingredients, pantry):
+    """Python mirror of food/index.html's ordering Liquid (issue #107/#74):
+    non-pantry ingredients first, pantry staples sunk to the end, authored
+    order preserved within each half. Exact, lowercase match.
+
+    This is a *parallel* implementation, not a render of the real template --
+    it cannot catch food/index.html drifting from this rule, only regressions
+    in the rule itself. If the Liquid there changes, update this to match, or
+    this test will pass green while checking something the page no longer does.
+    """
+    lead = [i for i in main_ingredients if str(i).lower() not in pantry]
+    tail = [i for i in main_ingredients if str(i).lower() in pantry]
+    return lead + tail
+
+
+def test_main_ingredients_sink_pantry_to_the_end():
+    """GitHub issue #74/#107: main_ingredients render in "larder order" on the
+    index page -- distinctive ingredients first, pantry staples trailing, so
+    the eye meets what makes the dish itself before the things every kitchen
+    already has. Checks the rule against known cases, not just that it runs.
+    """
+    pantry = {"onion", "butter", "salt", "garlic"}
+
+    # Ordinary split: distinctive ingredients lead, pantry trails.
+    assert _sink_pantry(["chicken", "onion", "lemon", "butter"], pantry) == [
+        "chicken", "lemon", "onion", "butter",
+    ]
+
+    # Exact match only -- a variety naming itself is not demoted (§6/common_ingredients.yml).
+    assert _sink_pantry(["red onions", "onion"], pantry) == ["red onions", "onion"]
+
+    # Case-insensitive: `ing | downcase` in the template.
+    assert _sink_pantry(["Onion", "Chicken"], pantry) == ["Chicken", "Onion"]
+
+    # Authored order is preserved within each half, not re-sorted.
+    assert _sink_pantry(["butter", "salt", "lemon", "chicken"], pantry) == [
+        "lemon", "chicken", "butter", "salt",
+    ]
+
+    # Nothing pantry: no reordering at all.
+    assert _sink_pantry(["lemon", "chicken"], pantry) == ["lemon", "chicken"]
+
+
 # --- one base URL, one fetch path -------------------------------------------
 
 JS_DIR = ROOT / "assets" / "js"
