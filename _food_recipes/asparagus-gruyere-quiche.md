@@ -15,7 +15,7 @@ ingredient_groups:
     - amount: "220 g"
       item: plain flour
     - amount: "150 g"
-      item: butter
+      item: unsalted butter
     - amount: "6 tbsp"
       item: parmesan
     - amount: "2"

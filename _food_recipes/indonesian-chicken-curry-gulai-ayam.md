@@ -40,7 +40,7 @@ ingredient_groups:
     - amount: "1 tsp"
       item: ground turmeric
     - amount: "50 g"
-      item: coconut palm sugar or coconut sugar
+      item: coconut palm sugar
     - amount: "2 tsp"
       item: tamarind paste
     - amount: "200 ml"

@@ -164,60 +164,105 @@ def test_temperatures_use_degree_c(recipe):
     )
 
 
-def test_flour_and_sugar_specify_type(recipe):
-    """GitHub issue #79: bare "flour" or "sugar" as an ingredient name, with
-    no type in front of it (plain, self-raising, caster, icing...), leaves
-    the cook guessing. Only checks the ingredient's own name, not method
-    text -- "add the flour" there correctly refers back to an already-typed
-    ingredient.
+# --- butter, sugar, flour: closed list of qualifiers ------------------------
+# GitHub issue #74's main_ingredients spot-check (2026-08-10) turned this
+# into a real closed-list rule, not just "isn't bare" -- Helen: outside an
+# incidental use (melted butter for greasing a tin), butter is always
+# "salted butter" or "unsalted butter", full stop, and sugar/flour each have
+# their own short list of allowed names. See HANDOVER_v26.md for the
+# reasoning behind each list.
+#
+# Supersedes two narrower tests: the old test_flour_and_sugar_specify_type
+# only caught a totally bare name ("caster sugar" passed it fine, since it
+# isn't bare), and the old brown-sugar-only test had a real gap -- it only
+# fired when the name contained the word "brown", so bare "muscovado sugar"
+# or "light muscovado sugar" (missing "brown" entirely) slipped through
+# unnoticed. Found by running this same check against real data
+# (sticky-marmalade-ham.md, a draft) before writing the replacement.
+#
+# Checked as a whole-word phrase anywhere in the name, not just a prefix or
+# suffix -- real data has qualifiers wrapped in all directions: "melted
+# salted butter", "knob of salted butter, optional", "~2 tbsp dark brown
+# muscovado sugar", "dusting as preferred: icing sugar, cocoa powder...".
+# A plain substring check would be too loose (e.g. "salted" inside
+# "unsalted"), but \b...\b isn't fooled by that -- there's no word boundary
+# between "un" and "salted" in "unsalted".
+_QUALIFIED_BUTTER = {"salted butter", "unsalted butter"}
+_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour"}
+_QUALIFIED_SUGAR = {
+    "golden caster sugar", "golden granulated sugar", "white caster sugar",
+    "light brown soft sugar", "dark brown soft sugar",
+    "light brown muscovado sugar", "dark brown muscovado sugar",
+    "demerara sugar", "icing sugar", "coconut palm sugar", "palm sugar",
+}
+
+# Ingredients that merely contain the word but aren't the ingredient itself
+# -- a butter bean isn't butter, sugar snap peas aren't sugar. Out of scope
+# entirely, not something that needs a qualifier.
+_COMPOUND_EXCLUDE = {
+    "butter": re.compile(
+        r"\b(butter beans?|peanut butter|almond butter|cashew butter"
+        r"|pistachio butter|all-butter)\b", re.I,
+    ),
+    "sugar": re.compile(r"\bsugar snap\b", re.I),
+    "flour": None,
+}
+
+
+def _unqualified(recipe, word: str, allowed: set[str]) -> list[str]:
+    exclude = _COMPOUND_EXCLUDE.get(word)
+    allowed_pattern = re.compile(
+        "|".join(rf"\b{re.escape(phrase)}\b" for phrase in allowed), re.I,
+    )
+    fields = [
+        ("main_ingredients", [str(x) for x in (recipe.fm.get("main_ingredients") or [])]),
+        ("ingredient", recipe.ingredient_items),
+    ]
+    bad = []
+    for field, values in fields:
+        for v in values:
+            name = re.split(r"[,(]", v)[0].strip()
+            if not re.search(rf"\b{word}\b", name, re.I):
+                continue
+            if exclude and exclude.search(name):
+                continue
+            if not allowed_pattern.search(name):
+                bad.append(f"{field} {v!r}")
+    return bad
+
+
+def test_butter_specifies_salted_or_unsalted(recipe):
+    """GitHub issues #74/#140. Only two names allowed, full stop -- not a
+    style preference, salted-vs-unsalted actually changes the recipe.
     """
-    bad = [i for i in recipe.ingredient_items if re.match(r"^(flour|sugar)\b", i.strip(), re.I)]
+    bad = _unqualified(recipe, "butter", _QUALIFIED_BUTTER)
     assert not bad, (
-        f"{where(recipe)} has ingredient(s) {bad!r} with no type specified. "
-        f"Say which flour or sugar, e.g. `plain flour`, `caster sugar`."
+        f"{where(recipe)} has unqualified butter: {bad!r}. "
+        f"Allowed: salted butter, unsalted butter."
     )
 
 
-# Same under-specification problem as bare `flour`/`sugar` above, not a
-# wording preference: light/dark is a required qualifier, not optional
-# decoration, so bare "brown soft sugar" is NOT in this list -- Helen: the
-# allowed names are "light brown soft sugar" and "dark brown soft sugar" --
-# colour first, same order as the muscovado names below (corrected
-# 2026-08-09; earlier versions of this test had the order backwards, which
-# is why several already-published recipes using the correct colour-first
-# order were failing it).
-# Muscovado is a real, distinct product (also always light/dark-qualified),
-# not just a wordier way of saying the same thing, so it gets its own two
-# entries rather than being folded into the soft-brown-sugar names.
-# Allowed as the ingredient's own name, optionally after a leading quantity
-# ("~2 tbsp dark brown muscovado sugar") that isn't in a proper `amount:`
-# field -- that's a separate, unrelated data-placement question.
-_BROWN_SUGAR_OK = re.compile(
-    r"(?:^|\d[\d./½¼¾⅓⅔]*\s*(?:tbsp|tsp|g|kg|ml|l|oz|lb)?\s+)"
-    r"(light brown soft sugar|dark brown soft sugar"
-    r"|light brown muscovado sugar|dark brown muscovado sugar)$",
-    re.I,
-)
-
-
-def test_brown_sugar_is_soft_brown_sugar(recipe):
-    """GitHub issue #79: "brown sugar", "dark soft brown sugar"... everything
-    except the four names in _BROWN_SUGAR_OK is non-standard, including bare
-    "brown soft sugar" with no light/dark qualifier. Checks the ingredient's
-    own name (up to the first comma/parenthesis), not just that an allowed
-    phrase appears somewhere in it -- "dark soft brown sugar" contains
-    "brown sugar" as a substring but the words are in the wrong order.
-    """
-    bad = []
-    for item in recipe.ingredient_items:
-        name = re.split(r"[,(]", item)[0].strip()
-        if re.search(r"\bbrown\b", name, re.I) and re.search(r"\bsugar\b", name, re.I):
-            if not _BROWN_SUGAR_OK.search(name):
-                bad.append(item)
+def test_flour_specifies_type(recipe):
+    """GitHub issue #74. Bare "flour" leaves the cook guessing which one."""
+    bad = _unqualified(recipe, "flour", _QUALIFIED_FLOUR)
     assert not bad, (
-        f"{where(recipe)} has non-standard brown sugar name(s) {bad!r}. "
-        f"Allowed: light brown soft sugar, dark brown soft sugar, light "
-        f"brown muscovado sugar, dark brown muscovado sugar."
+        f"{where(recipe)} has unqualified flour: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_FLOUR))}."
+    )
+
+
+def test_sugar_specifies_type(recipe):
+    """GitHub issues #74/#79. Bare "sugar", "caster sugar" (needs "golden"),
+    "brown sugar" (needs light/dark and soft/muscovado) etc. all leave the
+    cook guessing. "white caster sugar" is deliberately its own allowed name,
+    distinct from "golden caster sugar" -- lemon-meringue-pie.md uses it
+    specifically for the meringue, where a whiter sugar keeps the meringue
+    from picking up a cream tint golden caster sugar would give it.
+    """
+    bad = _unqualified(recipe, "sugar", _QUALIFIED_SUGAR)
+    assert not bad, (
+        f"{where(recipe)} has unqualified sugar: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_SUGAR))}."
     )
 
 

@@ -6,7 +6,7 @@ source: "Adapted from Green & Black's recipe book"
 makes: "enough for that edge-brownie tin I made James buy me"
 prep_time: "10 mins"
 cook_time: "20–25 mins"
-main_ingredients: ["dark chocolate", butter, eggs, "golden granulated sugar", flour]
+main_ingredients: ["dark chocolate", "unsalted butter", eggs, "golden granulated sugar", "plain flour"]
 star_ingredient: chocolate
 tags: [bakes]
 ingredient_groups:

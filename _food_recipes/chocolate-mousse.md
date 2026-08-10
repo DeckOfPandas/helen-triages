@@ -6,7 +6,7 @@ source: "Adapted from RecipeTin Eats, recipe Nagi"
 serves: 4
 prep_time: "20 mins"
 cook_time: None
-main_ingredients: ["dark chocolate", eggs, cream, "golden caster sugar", butter]
+main_ingredients: ["dark chocolate", eggs, cream, "golden caster sugar", "salted butter"]
 star_ingredient: chocolate
 tags: [dessert, "make-ahead", "no-cook"]
 ingredient_groups:

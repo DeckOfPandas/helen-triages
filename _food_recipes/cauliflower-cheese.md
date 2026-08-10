@@ -6,7 +6,7 @@ source: Adapted from Gordon Ramsay Restaurants
 serves: 5 (or...1)
 prep_time: 15 mins
 cook_time: "20-25 mins"
-main_ingredients: [cauliflower, cheddar, "lancashire cheese", "cheshire cheese", breadcrumbs, "whole milk", butter, flour, "English mustard"]
+main_ingredients: [cauliflower, cheddar, "lancashire cheese", "cheshire cheese", breadcrumbs, "whole milk", "salted butter", "plain flour", "English mustard"]
 star_ingredient:
 tags: ["cheese-tastic", "one-handed food"]
 ingredient_groups:
@@ -14,7 +14,7 @@ ingredient_groups:
     - amount: "1"
       item: "cauliflower (about 600 g), cut into florets"
     - amount: "60 g"
-      item: butter
+      item: salted butter
     - amount: "60 g"
       item: plain flour
     - amount: "600 ml"

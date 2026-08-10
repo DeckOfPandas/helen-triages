@@ -6,7 +6,7 @@ source: Grandma Kath
 makes: "2 large rounds of 4"
 prep_time: "10 mins"
 cook_time: "15–20 mins"
-main_ingredients: ["self-raising flour", "salted butter", "caster sugar", sultanas, egg, milk]
+main_ingredients: ["self-raising flour", "salted butter", "golden caster sugar", sultanas, egg, milk]
 star_ingredient:
 tags: [bakes]
 ingredient_groups:
@@ -16,7 +16,7 @@ ingredient_groups:
     - amount: "2 oz"
       item: salted butter
     - amount: "2 oz"
-      item: caster sugar
+      item: golden caster sugar
     - amount: "1"
       item: large egg
     - amount: "2 tbsp"

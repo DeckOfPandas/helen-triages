@@ -6,7 +6,7 @@ source: "Adapted from Green and Black's Chocolate Recipes"
 makes: "one double-layer 8-inch cake"
 prep_time: 20 mins
 cook_time: "20–25 mins"
-main_ingredients: ["cocoa powder", "dark chocolate", butter, eggs, "plain flour", vanilla, salt]
+main_ingredients: ["cocoa powder", "dark chocolate", "salted butter", eggs, "plain flour", vanilla, salt]
 star_ingredient: chocolate
 tags: [bakes, showstopper]
 ingredient_groups:
@@ -29,7 +29,7 @@ ingredient_groups:
     - amount: "100 g"
       item: salted butter
     - amount: "175 g"
-      item: caster sugar
+      item: golden caster sugar
     - amount: "2"
       item: large eggs
     - amount: ½ tsp

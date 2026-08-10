@@ -6,7 +6,7 @@ source: Bitter experience
 makes: "1 dozen mince pies"
 prep_time: "2 hrs including 1 hr 30 mins chilling time"
 cook_time: "20 mins"
-main_ingredients: [mincemeat, "ground almonds", butter, flour, egg, sugar]
+main_ingredients: [mincemeat, "ground almonds", "unsalted butter", "plain flour", egg, "golden caster sugar"]
 star_ingredient:
 tags: [bakes, festive]
 ingredient_groups:

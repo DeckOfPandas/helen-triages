@@ -6,7 +6,7 @@ source: "Grandma Kath"
 makes: "one 7-inch round cake"
 prep_time: "10 mins"
 cook_time: "35 mins"
-main_ingredients: [butter, "Demerara sugar", "golden syrup", flour, ginger, "mixed spice"]
+main_ingredients: ["salted butter", "Demerara sugar", "golden syrup", "self-raising flour", ginger, "mixed spice"]
 star_ingredient:
 tags: [bakes]
 ingredient_groups:

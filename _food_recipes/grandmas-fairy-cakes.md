@@ -6,7 +6,7 @@ source: Grandma Kath
 makes: "12 fairy cakes"
 prep_time:
 cook_time: "Until done"
-main_ingredients: ["salted butter", "caster sugar", eggs, "self-raising flour", sultanas]
+main_ingredients: ["salted butter", "golden caster sugar", eggs, "self-raising flour", sultanas]
 star_ingredient:
 tags: [bakes]
 ingredient_groups:
@@ -14,7 +14,7 @@ ingredient_groups:
     - amount: "4 oz"
       item: salted butter
     - amount: "4 oz"
-      item: caster sugar
+      item: golden caster sugar
     - amount: "2"
       item: large eggs
     - amount: "4 oz"
