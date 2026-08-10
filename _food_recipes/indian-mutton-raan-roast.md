@@ -1,7 +1,7 @@
 ---
 title: Indian Mutton Raan Roast
 short_name: Indian Mutton Raan Roast
-tagline: "Prep happens over days, but it's totally worth it. Uses [garam masala powder](../garam-masala/)."
+tagline: "Prep happens over days, but it's totally worth it. Uses [garam masala powder](../garam-masala-powder/)."
 source: "Debjani Chatterjee Alam, Debjanir Rannaghar"
 serves: 10
 prep_time: "30 mins active, plus 48–72 hrs marinating"

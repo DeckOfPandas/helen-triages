@@ -389,7 +389,10 @@ _CORIANDER_HERB_SIGNAL = re.compile(r"\b(fresh|handful|leaves|garnish|to serve)\
 # Recipes for a named spice blend itself -- the whole point is stating that
 # blend's own fixed component list, not spices added together mid-cook, so
 # Helen's order convention doesn't apply to these (confirmed 2026-08-10).
-_SPICE_BLEND_RECIPES = {"chai-spice-powder", "five-spice-powder", "mixed-spice-powder"}
+_SPICE_BLEND_RECIPES = {
+    "chai-spice-powder", "five-spice-powder", "mixed-spice-powder",
+    "garam-masala-powder",
+}
 
 
 def _spice_rank(name: str):
