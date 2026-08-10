@@ -18,17 +18,22 @@ ingredient_groups:
       item: new potatoes
     - amount: "500 g"
       item: chicken
-    - item: "~1 clove garlic (or squirty or chopped)"
-    - item: "~½ to 1 jar Thai green curry paste"
-    - item: "~1 tbsp tamarind paste"
+    - amount: "~1"
+      item: "garlic clove (or squirty or chopped)"
+    - amount: "~½ to 1"
+      item: "jar Thai green curry paste"
+    - amount: "~1 tbsp"
+      item: tamarind paste
     - item: "lemongrass paste to taste"
     - item: "zest and juice of 1 lime"
     - amount: "200–400 ml"
       item: coconut milk
     - amount: "125 ml"
       item: coconut cream
-    - item: "~2 tbsp dark brown muscovado sugar"
-    - item: "~2 tsp Thai fish sauce"
+    - amount: "~2 tbsp"
+      item: dark brown muscovado sugar
+    - amount: "~2 tsp"
+      item: Thai fish sauce
     - item: "30–50 g flaked almonds"
     - amount: "100 g"
       item: green beans
