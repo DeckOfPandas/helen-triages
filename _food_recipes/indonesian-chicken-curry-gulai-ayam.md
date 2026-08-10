@@ -23,22 +23,22 @@ ingredient_groups:
       item: "lemongrass stalks, bruised"
     - amount: "6"
       item: "lime leaves, torn, preferably fresh"
-    - amount: "2"
-      item: cinnamon sticks
-    - amount: "6"
-      item: "green cardamom pods, seeds crushed"
-      note: "or ¾–1 tsp Barts cardamom powder to taste"
     - amount: "5 tsp"
       item: whole coriander seeds
       note: "or 4 tsp ground coriander"
-    - amount: "½"
-      item: whole nutmeg
-      note: "12-15 passes across a microplane grater, or 1 tsp ground nutmeg"
     - amount: "1¼ tsp"
       item: whole cumin seeds
       note: "or 1 tsp ground cumin"
     - amount: "1 tsp"
       item: ground turmeric
+    - amount: "2"
+      item: cinnamon sticks
+    - amount: "6"
+      item: "green cardamom pods, seeds crushed"
+      note: "or ¾–1 tsp Barts cardamom powder to taste"
+    - amount: "½"
+      item: whole nutmeg
+      note: "12-15 passes across a microplane grater, or 1 tsp ground nutmeg"
     - amount: "50 g"
       item: coconut palm sugar
     - amount: "2 tsp"

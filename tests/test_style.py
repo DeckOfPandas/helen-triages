@@ -271,10 +271,14 @@ def test_sugar_specifies_type(recipe):
 # GitHub issues #143/#142/#136/#137 -- same closed-list pattern and the same
 # _unqualified() helper as butter/sugar/flour above, just different words and
 # allowed sets. Mustard needed no data fixes at all when this was written --
-# every real instance already used one of the six allowed names.
+# every real instance already used one of the six allowed names. "mustard
+# oil" added later (indian-mutton-raan-roast.md) -- a real, distinct
+# ingredient (a cooking oil pressed from mustard seeds, common in Indian/
+# Bengali cooking), not a variant of condiment mustard.
 _QUALIFIED_MUSTARD = {
     "english mustard", "english mustard powder", "dijon mustard",
     "french mustard", "wholegrain mustard", "whole mustard seeds",
+    "mustard oil",
 }
 _QUALIFIED_SOY_SAUCE = {"dark soy sauce", "light soy sauce"}
 _QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste"}
@@ -345,6 +349,32 @@ def test_nutmeg_cinnamon_cloves_vanilla_specify_type(recipe):
         f"cinnamon ({', '.join(sorted(_QUALIFIED_CINNAMON))}), "
         f"cloves ({', '.join(sorted(_QUALIFIED_CLOVES))}), "
         f"vanilla ({', '.join(sorted(_QUALIFIED_VANILLA))})."
+    )
+
+
+# --- cardamom -----------------------------------------------------------------
+# Prompted by garam-masala-powder.md: main_ingredients said "black cardamom"
+# while the ingredient list said "black cardamom pods" -- a mismatch
+# invisible to every other test, since cardamom wasn't tracked at all.
+# Helen's rule: always green or black, always pods/powder/seeds. Singular
+# forms included alongside the plurals -- indian-mutton-raan-roast.md
+# genuinely uses a single "black cardamom pod" (amount: 1), and forcing
+# that to the plural would just be bad grammar for the sake of a shorter
+# allowed list.
+_QUALIFIED_CARDAMOM = {
+    "green cardamom pod", "green cardamom pods", "green cardamom powder",
+    "green cardamom seed", "green cardamom seeds",
+    "black cardamom pod", "black cardamom pods", "black cardamom powder",
+    "black cardamom seed", "black cardamom seeds",
+}
+
+
+def test_cardamom_specifies_type(recipe):
+    """Always green or black, always pods/powder/seeds."""
+    bad = _unqualified(recipe, "cardamom", _QUALIFIED_CARDAMOM)
+    assert not bad, (
+        f"{where(recipe)} has unqualified cardamom: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_CARDAMOM))}."
     )
 
 
