@@ -6,7 +6,7 @@ source: Mrs Nicholson
 makes: "about 600 ml"
 prep_time: 20 mins
 cook_time: None
-main_ingredients: [milk, eggs, "caster sugar", "plain white flour", vanilla]
+main_ingredients: [milk, eggs, "golden caster sugar", "plain flour", "vanilla essence"]
 star_ingredient:
 tags: [extras]
 ingredient_groups:
@@ -17,9 +17,9 @@ ingredient_groups:
     - amount: "6"
       item: egg yolks
     - amount: "100 g"
-      item: caster sugar
+      item: golden caster sugar
     - amount: "50 g"
-      item: plain white flour
+      item: plain flour
 method:
   - Heat the milk to boiling with the vanilla.
   - Beat the egg yolks with the sugar and flour to a very pale fluffy mass.

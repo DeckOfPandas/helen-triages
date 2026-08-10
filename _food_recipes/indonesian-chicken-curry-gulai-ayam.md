@@ -6,7 +6,7 @@ source: "Adapted from Good Food, August 2024"
 serves: 4
 prep_time: "20 mins plus marinating"
 cook_time: "1 hr"
-main_ingredients: ["chicken thighs", "coconut cream", "lemongrass stalks", lime, "cinnamon sticks", "green cardamom pods", galangal, "fresh ginger", nutmeg, "tamarind paste", "macadamia nuts", "lime leaves", "coconut palm sugar", "banana shallots (echalions)"]
+main_ingredients: ["chicken thighs", "coconut cream", "lemongrass stalks", lime, "cinnamon sticks", "green cardamom pods", galangal, "fresh ginger", "whole nutmeg", "tamarind paste", "macadamia nuts", "lime leaves", "coconut palm sugar", "banana shallots (echalions)"]
 star_ingredient: poultry
 tags: [fakeaway, freezable, "make-ahead", "one-handed food"]
 ingredient_groups:
@@ -21,6 +21,7 @@ ingredient_groups:
       item: coconut oil or olive oil
     - amount: "3"
       item: "lemongrass stalks, bruised"
+      paste_equivalent_pending: true
     - amount: "6"
       item: "lime leaves, torn, preferably fresh"
     - amount: "2"
@@ -40,7 +41,7 @@ ingredient_groups:
     - amount: "1 tsp"
       item: ground turmeric
     - amount: "50 g"
-      item: coconut palm sugar or coconut sugar
+      item: coconut palm sugar
     - amount: "2 tsp"
       item: tamarind paste
     - amount: "200 ml"
@@ -50,11 +51,13 @@ ingredient_groups:
     items:
     - amount: "8"
       item: fresh garlic cloves
+      paste_equivalent_pending: true
     - amount: "6"
       item: "banana shallots (echalions), peeled"
     - amount: "5 cm"
-      item: "piece of ginger, peeled and chopped"
+      item: "piece of fresh ginger, peeled and chopped"
       note: "not giving an equivalent here because fresh ginger is mandatory"
+      paste_equivalent_pending: false
     - amount: "2 cm"
       item: "piece of galangal, peeled and chopped"
       note: "or 4 tsp paste from a jar"

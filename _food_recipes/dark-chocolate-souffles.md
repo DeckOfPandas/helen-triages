@@ -12,7 +12,7 @@ tags: [dessert, showstopper]
 ingredient_groups:
   - items:
     - amount: "100 g"
-      item: dark chocolate
+      item: "dark chocolate, 70% cacao"
     - amount: "60 g"
       item: cocoa powder
     - amount: "8"

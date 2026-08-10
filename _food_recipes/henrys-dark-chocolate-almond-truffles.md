@@ -6,13 +6,13 @@ source: Megan
 makes: "20–24 truffles"
 prep_time: "20 mins plus time to set"
 cook_time: "5 mins"
-main_ingredients: ["dark chocolate", "ground almonds", butter, "icing sugar"]
+main_ingredients: ["dark chocolate", "ground almonds", "salted butter", "icing sugar"]
 star_ingredient: chocolate
 tags: [nibbles, sweets]
 ingredient_groups:
   - items:
     - amount: "175 g"
-      item: dark chocolate
+      item: "dark chocolate, 70% cacao"
     - amount: "3 tbsp"
       item: "flavouring to taste: Bailey's, orange liqueur, amaretto, or 3 drops ginger essence"
     - amount: "40 g"

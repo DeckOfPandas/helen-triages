@@ -730,7 +730,7 @@ touching the test.
 The `Estimated`-timing (§5), `QQ`-placeholder, `cherry-glaze.md`
 reversed-bracket-link, and the `test_typography`/
 `test_brown_sugar_is_soft_brown_sugar` failures on
-`indonesian-chicken-curry-gulai-ayam.md`, `mixed-spice.md`,
+`indonesian-chicken-curry-gulai-ayam.md`, `mixed-spice-powder.md`,
 `citrus-soy-salmon-sticky-rice.md` and `miso-salmon-veg-traybake.md` that
 used to live in this list are all resolved (the last batch fixed
 2026-08-10, commit `117edc9`) — don't go looking for them.

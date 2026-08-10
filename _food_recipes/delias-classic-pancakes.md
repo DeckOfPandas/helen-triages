@@ -6,7 +6,7 @@ source: Adapted from Delia Smith
 makes: "about 8"
 prep_time: 10 mins
 cook_time: "3–4 mins per pancake"
-main_ingredients: ["plain flour", eggs, milk, butter]
+main_ingredients: ["plain flour", eggs, milk, "salted butter"]
 star_ingredient:
 tags: ["carbs party", festive]
 ingredient_groups:
@@ -18,7 +18,7 @@ ingredient_groups:
     - amount: "210 ml"
       item: milk mixed with 90ml water
     - amount: "2 tbsp"
-      item: melted butter
+      item: melted salted butter
 method:
   - step: "Sift the flour, then make a well in the middle and break the eggs into it."
     note: This is one of those times when you actually have to sift the flour.

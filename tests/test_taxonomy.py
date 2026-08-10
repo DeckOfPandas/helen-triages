@@ -81,7 +81,7 @@ def test_no_cook_tag_implies_no_cook_time(recipe):
         tagged no-cook  ->  must have cook_time "None"
         cook_time None  ->  MAY be tagged, but need not be
 
-    That is what lets a base recipe like mixed-spice be honestly uncooked
+    That is what lets a base recipe like mixed-spice-powder be honestly uncooked
     without cluttering the no-cook filter, which exists to answer a dinner
     question, not a spice-blend question.
     """

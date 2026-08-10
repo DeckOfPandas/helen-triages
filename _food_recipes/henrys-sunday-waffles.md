@@ -24,7 +24,7 @@ ingredient_groups:
     - amount: ¼ tsp
       item: salt
     - amount: "1 tbsp"
-      item: melted butter
+      item: melted salted butter
 method:
   - "Beat the egg yolks a little, then stir in the milk and oil. This won't mix well, but it doesn't matter."
   - "Stir together the flour, baking powder and salt."

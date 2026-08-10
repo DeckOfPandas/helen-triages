@@ -17,7 +17,7 @@ ingredient_groups:
     - amount: "3 tbsp (20 g)"
       item: green cardamom pods
     - amount: "1 small stick (8 g)"
-      item: cinnamon
+      item: cinnamon stick
       note: "true Ceylon cinnamon, not cassia"
     - amount: "1 tbsp (6 g)"
       item: "whole cloves"

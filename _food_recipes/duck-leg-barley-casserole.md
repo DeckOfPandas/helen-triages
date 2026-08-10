@@ -20,6 +20,7 @@ ingredient_groups:
       item: pancetta
     - amount: "9 cloves"
       item: "garlic, diced"
+      paste_equivalent_pending: true
     - amount: "6-9"
       item: "rainbow carrots, chopped into half- or quarter-cylinder chunks"
     - amount: "300 g"

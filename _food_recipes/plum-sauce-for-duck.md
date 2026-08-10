@@ -19,7 +19,7 @@ ingredient_groups:
       item: beef stock
     - amount: "2–3 tbsp"
       item: plum jam
-    - item: "a pat of butter, to finish"
+    - item: "a pat of salted butter, to finish"
 method:
   - "Fry the plums until coloured and slightly softened, about 2 mins."
   - "Add the wine and bubble to reduce by ⅓."

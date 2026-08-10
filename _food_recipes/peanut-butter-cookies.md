@@ -6,7 +6,7 @@ source: "Adapted from Preppy Kitchen, recipe John Kanell"
 makes: "18 cookies"
 prep_time: 20 mins
 cook_time: "10 mins"
-main_ingredients: ["peanut butter", butter, "plain flour", "dark brown soft sugar", egg]
+main_ingredients: ["peanut butter", "unsalted butter", "plain flour", "dark brown soft sugar", egg]
 star_ingredient:
 tags: [bakes]
 ingredient_groups:
@@ -31,7 +31,7 @@ ingredient_groups:
     - item: Extra Demerara sugar to coat
     - item: ¼–½ tsp sea salt, to taste
 method:
-  - Sift the flour and baking powder.
+  - Sift the flour, baking powder and salt.
   - "Cream the butter with the sugars, then mix in the peanut butter, then the egg and vanilla extract."
   - Stir in the flour mixture.
   - "Roll into 1-inch balls, coat in Demerara sugar, place on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."

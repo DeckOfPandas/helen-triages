@@ -6,7 +6,7 @@ source: Adapted from Christmas by Gordon Ramsay
 serves: "8–10"
 prep_time: "30 mins"
 cook_time: "2 hrs 30 mins for a 5-kg bird"
-main_ingredients: [turkey, butter, lemon, parsley, garlic, "streaky bacon"]
+main_ingredients: [turkey, "salted butter", lemon, parsley, garlic, "streaky bacon"]
 star_ingredient: poultry
 tags: [festive, showstopper, "make-ahead"]
 ingredient_groups:
@@ -21,6 +21,7 @@ ingredient_groups:
       item: "lemon, halved"
     - amount: "1 head"
       item: "garlic, halved horizontally"
+      paste_equivalent_pending: true
     - amount: "6"
       item: bay leaves
     - item: "olive oil, to drizzle"
@@ -29,13 +30,14 @@ ingredient_groups:
   - name: "lemon, parsley and garlic butter"
     items:
     - amount: "375 g"
-      item: "butter, at room temperature"
+      item: "salted butter, at room temperature"
     - amount: "1 tbsp"
       item: olive oil
     - amount: "2"
       item: "small lemons, finely grated zest and juice"
     - amount: "3"
       item: "garlic cloves, crushed"
+      paste_equivalent_pending: true
     - item: "small bunch of flat-leaf parsley, leaves only, chopped"
 method_groups:
   - name: Herb butter

@@ -6,7 +6,7 @@ source: "Adapted from RecipeTin Eats, recipe Nagi"
 serves: 4
 prep_time: "20 mins"
 cook_time: None
-main_ingredients: ["dark chocolate", eggs, cream, "golden caster sugar", butter]
+main_ingredients: ["dark chocolate", eggs, cream, "golden caster sugar", "salted butter"]
 star_ingredient: chocolate
 tags: [dessert, "make-ahead", "no-cook"]
 ingredient_groups:
@@ -15,7 +15,7 @@ ingredient_groups:
     - amount: "3"
       item: large eggs
     - amount: "125 g"
-      item: "70%-cacao chocolate"
+      item: "dark chocolate, 70% cacao"
     - amount: "10 g"
       item: salted butter
     - amount: "125 ml"
@@ -25,7 +25,7 @@ ingredient_groups:
   - name: to serve
     items:
     - item: whipped cream
-    - item: chocolate shavings
+    - item: dark chocolate shavings
 method:
   - "Get on with it so the whipped egg whites and cream don't get too warm."
   - "Separate the eggs before they warm up: whites into a large bowl and yolks into a small bowl."

@@ -6,7 +6,7 @@ source: "Adapted from Good Food, May 2026"
 serves: 6
 prep_time: "20 mins"
 cook_time: "30 mins"
-main_ingredients: [salmon, "sticky rice", edamame, "soy sauce", "oyster sauce", lime, ginger, "sesame seeds", cucumber, coriander, "Greek yoghurt", "spring onions"]
+main_ingredients: [salmon, "sticky rice", edamame, "light soy sauce", "oyster sauce", lime, "fresh ginger", "sesame seeds", cucumber, coriander, "Greek yoghurt", "spring onions"]
 star_ingredient: oily fish
 tags: [salad, virtuous]
 ingredient_groups:
@@ -22,8 +22,10 @@ ingredient_groups:
       item: light soy sauce
     - amount: "3"
       item: "garlic cloves, finely grated"
+      paste_equivalent_pending: true
     - amount: "10 g"
-      item: "ginger, finely grated"
+      item: "fresh ginger, finely grated"
+      paste_equivalent_pending: true
     - amount: "2"
       item: "limes, both zested, 1 juiced, plus wedges to serve"
     - amount: "50 ml"    

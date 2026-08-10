@@ -6,7 +6,7 @@ source: "Adapted from The Daring Gourmet, recipe Kimberly Killebrew"
 serves: 4
 prep_time: "10 mins plus at least 30 mins marinading"
 cook_time: "11–14 mins"
-main_ingredients: [salmon, tamari, mirin, "dark brown soft sugar", honey, "fresh garlic", "fresh ginger", "rice wine vinegar"]
+main_ingredients: [salmon, tamari, mirin, "dark brown soft sugar", honey, "fresh garlic", "fresh ginger", "rice vinegar"]
 star_ingredient: oily fish
 tags: [fakeaway, "make-ahead"]
 ingredient_groups:
@@ -26,12 +26,14 @@ ingredient_groups:
       item: honey
     - amount: "2"
       item: "cloves garlic, minced"
+      paste_equivalent_pending: true
     - amount: "1½ tsp"
       item: fresh ginger, minced
+      paste_equivalent_pending: true
     - amount: "1 tsp"
       item: toasted sesame oil
     - amount: "1 tsp"
-      item: rice wine vinegar
+      item: rice vinegar
     - amount: "2 tsp"
       item: cornstarch dissolved in 3 tbsp water
 method:

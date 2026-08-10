@@ -31,7 +31,7 @@ ingredient_groups:
     - amount: "1"
       item: "lemon, zested and juiced"
     - amount: "3 tbsp"
-      item: "rice wine vinegar"
+      item: "rice vinegar"
       note: "you can also use cider vinegar plus an extra pinch of sugar"
     - amount: "1 tbsp"
       item: golden caster sugar

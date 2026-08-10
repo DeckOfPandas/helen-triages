@@ -6,13 +6,13 @@ source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book, page 44"
 makes: "950 ml"
 prep_time: "20 mins"
 cook_time: "None"
-main_ingredients: ["dark chocolate", "whole milk", eggs, "golden caster sugar", "whipping cream", "vanilla extract"]
+main_ingredients: ["unsweetened chocolate", "whole milk", eggs, "golden caster sugar", "whipping cream", "vanilla extract"]
 star_ingredient: chocolate
 tags: [dessert, "ice cream", "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "100 g"
-      item: very dark chocolate, 100% cacao
+      item: "unsweetened chocolate, 100% cacao"
     - amount: "240 ml"
       item: milk
     - amount: "2 large"

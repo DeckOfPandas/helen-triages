@@ -23,12 +23,13 @@ ingredient_groups:
       item: "shallots, peeled and finely sliced"
     - amount: "1 clove"
       item: "garlic, peeled and finely sliced"
+      paste_equivalent_pending: true
     - item: "a glass of robust red wine, preferably Cab or Merlot"
     - amount: "200 g"
       item: fresh blueberries
       note: "thaw and drain well if using frozen"
     - amount: "2"
-      item: "large pats of butter"
+      item: "large pats of salted butter"
 method:
   - "Crush the thyme and juniper berries in a pestle and mortar with generous salt and pepper. Loosen with olive oil. Pat the venison dry with kitchen paper and rub the oil mixture all over it."
   - "Sear the meat in a hot pan on all sides — roughly 6 mins for medium rare, 7–8 mins for medium. Cover and rest on a plate for 4 mins."

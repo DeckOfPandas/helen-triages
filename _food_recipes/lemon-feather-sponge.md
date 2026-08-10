@@ -6,7 +6,7 @@ source: "Adapted from Delia Smith's Book of Cakes"
 makes: "one 7-inch round cake"
 prep_time:
 cook_time: "40 mins"
-main_ingredients: [flour, cornflour, "caster sugar", eggs, lemon, "groundnut oil"]
+main_ingredients: ["plain flour", cornflour, "golden caster sugar", eggs, lemon, "groundnut oil"]
 star_ingredient:
 tags: [bakes]
 ingredient_groups:
@@ -20,7 +20,7 @@ ingredient_groups:
     - amount: "¼ tsp"
       item: salt
     - amount: "5 oz"
-      item: caster sugar
+      item: golden caster sugar
     - amount: "2"
       item: large eggs
     - amount: "3 fl oz plus 1 tbsp"

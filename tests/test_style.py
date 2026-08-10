@@ -164,60 +164,354 @@ def test_temperatures_use_degree_c(recipe):
     )
 
 
-def test_flour_and_sugar_specify_type(recipe):
-    """GitHub issue #79: bare "flour" or "sugar" as an ingredient name, with
-    no type in front of it (plain, self-raising, caster, icing...), leaves
-    the cook guessing. Only checks the ingredient's own name, not method
-    text -- "add the flour" there correctly refers back to an already-typed
-    ingredient.
+# --- butter, sugar, flour: closed list of qualifiers ------------------------
+# GitHub issue #74's main_ingredients spot-check (2026-08-10) turned this
+# into a real closed-list rule, not just "isn't bare" -- Helen: outside an
+# incidental use (melted butter for greasing a tin), butter is always
+# "salted butter" or "unsalted butter", full stop, and sugar/flour each have
+# their own short list of allowed names. See HANDOVER_v26.md for the
+# reasoning behind each list.
+#
+# Supersedes two narrower tests: the old test_flour_and_sugar_specify_type
+# only caught a totally bare name ("caster sugar" passed it fine, since it
+# isn't bare), and the old brown-sugar-only test had a real gap -- it only
+# fired when the name contained the word "brown", so bare "muscovado sugar"
+# or "light muscovado sugar" (missing "brown" entirely) slipped through
+# unnoticed. Found by running this same check against real data
+# (sticky-marmalade-ham.md, a draft) before writing the replacement.
+#
+# Checked as a whole-word phrase anywhere in the name, not just a prefix or
+# suffix -- real data has qualifiers wrapped in all directions: "melted
+# salted butter", "knob of salted butter, optional", "~2 tbsp dark brown
+# muscovado sugar", "dusting as preferred: icing sugar, cocoa powder...".
+# A plain substring check would be too loose (e.g. "salted" inside
+# "unsalted"), but \b...\b isn't fooled by that -- there's no word boundary
+# between "un" and "salted" in "unsalted".
+_QUALIFIED_BUTTER = {"salted butter", "unsalted butter"}
+_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour"}
+_QUALIFIED_SUGAR = {
+    "golden caster sugar", "golden granulated sugar", "white caster sugar",
+    "light brown soft sugar", "dark brown soft sugar",
+    "light brown muscovado sugar", "dark brown muscovado sugar",
+    "demerara sugar", "icing sugar", "coconut palm sugar", "palm sugar",
+}
+
+# Ingredients that merely contain the word but aren't the ingredient itself
+# -- a butter bean isn't butter, sugar snap peas aren't sugar. Out of scope
+# entirely, not something that needs a qualifier.
+_COMPOUND_EXCLUDE = {
+    "butter": re.compile(
+        r"\b(butter beans?|peanut butter|almond butter|cashew butter"
+        r"|pistachio butter|all-butter)\b", re.I,
+    ),
+    "sugar": re.compile(r"\bsugar snap\b", re.I),
+    "flour": None,
+    "cloves": re.compile(r"\bgarlic\b", re.I),
+}
+
+
+def _unqualified(recipe, word: str, allowed: set[str]) -> list[str]:
+    exclude = _COMPOUND_EXCLUDE.get(word)
+    allowed_pattern = re.compile(
+        "|".join(rf"\b{re.escape(phrase)}\b" for phrase in allowed), re.I,
+    )
+    fields = [
+        ("main_ingredients", [str(x) for x in (recipe.fm.get("main_ingredients") or [])]),
+        ("ingredient", recipe.ingredient_items),
+    ]
+    bad = []
+    for field, values in fields:
+        for v in values:
+            name = re.split(r"[,(]", v)[0].strip()
+            if not re.search(rf"\b{word}\b", name, re.I):
+                continue
+            if exclude and exclude.search(name):
+                continue
+            if not allowed_pattern.search(name):
+                bad.append(f"{field} {v!r}")
+    return bad
+
+
+def test_butter_specifies_salted_or_unsalted(recipe):
+    """GitHub issues #74/#140. Only two names allowed, full stop -- not a
+    style preference, salted-vs-unsalted actually changes the recipe.
     """
-    bad = [i for i in recipe.ingredient_items if re.match(r"^(flour|sugar)\b", i.strip(), re.I)]
+    bad = _unqualified(recipe, "butter", _QUALIFIED_BUTTER)
     assert not bad, (
-        f"{where(recipe)} has ingredient(s) {bad!r} with no type specified. "
-        f"Say which flour or sugar, e.g. `plain flour`, `caster sugar`."
+        f"{where(recipe)} has unqualified butter: {bad!r}. "
+        f"Allowed: salted butter, unsalted butter."
     )
 
 
-# Same under-specification problem as bare `flour`/`sugar` above, not a
-# wording preference: light/dark is a required qualifier, not optional
-# decoration, so bare "brown soft sugar" is NOT in this list -- Helen: the
-# allowed names are "light brown soft sugar" and "dark brown soft sugar" --
-# colour first, same order as the muscovado names below (corrected
-# 2026-08-09; earlier versions of this test had the order backwards, which
-# is why several already-published recipes using the correct colour-first
-# order were failing it).
-# Muscovado is a real, distinct product (also always light/dark-qualified),
-# not just a wordier way of saying the same thing, so it gets its own two
-# entries rather than being folded into the soft-brown-sugar names.
-# Allowed as the ingredient's own name, optionally after a leading quantity
-# ("~2 tbsp dark brown muscovado sugar") that isn't in a proper `amount:`
-# field -- that's a separate, unrelated data-placement question.
-_BROWN_SUGAR_OK = re.compile(
-    r"(?:^|\d[\d./½¼¾⅓⅔]*\s*(?:tbsp|tsp|g|kg|ml|l|oz|lb)?\s+)"
-    r"(light brown soft sugar|dark brown soft sugar"
-    r"|light brown muscovado sugar|dark brown muscovado sugar)$",
-    re.I,
-)
+def test_flour_specifies_type(recipe):
+    """GitHub issue #74. Bare "flour" leaves the cook guessing which one."""
+    bad = _unqualified(recipe, "flour", _QUALIFIED_FLOUR)
+    assert not bad, (
+        f"{where(recipe)} has unqualified flour: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_FLOUR))}."
+    )
 
 
-def test_brown_sugar_is_soft_brown_sugar(recipe):
-    """GitHub issue #79: "brown sugar", "dark soft brown sugar"... everything
-    except the four names in _BROWN_SUGAR_OK is non-standard, including bare
-    "brown soft sugar" with no light/dark qualifier. Checks the ingredient's
-    own name (up to the first comma/parenthesis), not just that an allowed
-    phrase appears somewhere in it -- "dark soft brown sugar" contains
-    "brown sugar" as a substring but the words are in the wrong order.
+def test_sugar_specifies_type(recipe):
+    """GitHub issues #74/#79. Bare "sugar", "caster sugar" (needs "golden"),
+    "brown sugar" (needs light/dark and soft/muscovado) etc. all leave the
+    cook guessing. "white caster sugar" is deliberately its own allowed name,
+    distinct from "golden caster sugar" -- lemon-meringue-pie.md uses it
+    specifically for the meringue, where a whiter sugar keeps the meringue
+    from picking up a cream tint golden caster sugar would give it.
+    """
+    bad = _unqualified(recipe, "sugar", _QUALIFIED_SUGAR)
+    assert not bad, (
+        f"{where(recipe)} has unqualified sugar: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_SUGAR))}."
+    )
+
+
+# --- mustard, soy sauce, ginger, mixed/five-spice powder ---------------------
+# GitHub issues #143/#142/#136/#137 -- same closed-list pattern and the same
+# _unqualified() helper as butter/sugar/flour above, just different words and
+# allowed sets. Mustard needed no data fixes at all when this was written --
+# every real instance already used one of the six allowed names.
+_QUALIFIED_MUSTARD = {
+    "english mustard", "english mustard powder", "dijon mustard",
+    "french mustard", "wholegrain mustard", "whole mustard seeds",
+}
+_QUALIFIED_SOY_SAUCE = {"dark soy sauce", "light soy sauce"}
+_QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste"}
+
+
+def test_mustard_specifies_type(recipe):
+    """GitHub issue #143."""
+    bad = _unqualified(recipe, "mustard", _QUALIFIED_MUSTARD)
+    assert not bad, (
+        f"{where(recipe)} has unqualified mustard: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_MUSTARD))}."
+    )
+
+
+def test_soy_sauce_specifies_dark_or_light(recipe):
+    """GitHub issue #142."""
+    bad = _unqualified(recipe, "soy sauce", _QUALIFIED_SOY_SAUCE)
+    assert not bad, (
+        f"{where(recipe)} has unqualified soy sauce: {bad!r}. "
+        f"Allowed: dark soy sauce, light soy sauce."
+    )
+
+
+def test_ginger_specifies_fresh_ground_or_paste(recipe):
+    """GitHub issue #136. Checked in both fields, not just main_ingredients
+    -- Helen's call: the ingredient list needs the literal word too, not
+    just a prep description ("grated ginger" -> "grated fresh ginger"),
+    since a prep word alone doesn't say which kind was used.
+    """
+    bad = _unqualified(recipe, "ginger", _QUALIFIED_GINGER)
+    assert not bad, (
+        f"{where(recipe)} has unqualified ginger: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_GINGER))}."
+    )
+
+
+def test_mixed_spice_and_five_spice_say_powder(recipe):
+    """GitHub issue #137. Sold and used as a powder -- the ingredient name
+    should say so, not just "mixed spice" / "five-spice".
+    """
+    bad = _unqualified(recipe, "mixed spice", {"mixed spice powder"})
+    bad += _unqualified(recipe, "five-spice", {"five-spice powder"})
+    assert not bad, (
+        f"{where(recipe)} has {bad!r} without \"powder\". "
+        f"Allowed: mixed spice powder, five-spice powder."
+    )
+
+
+# --- nutmeg, cinnamon, cloves, vanilla ---------------------------------------
+# GitHub issue #151. Same closed-list pattern again. "cloves" excludes garlic
+# cloves via _COMPOUND_EXCLUDE -- a completely unrelated ingredient that
+# happens to share the word, same shape of problem as butter beans earlier.
+_QUALIFIED_NUTMEG = {"whole nutmeg", "ground nutmeg"}
+_QUALIFIED_CINNAMON = {"cinnamon stick", "cinnamon sticks", "ground cinnamon"}
+_QUALIFIED_CLOVES = {"whole cloves", "ground cloves"}
+_QUALIFIED_VANILLA = {"vanilla extract", "vanilla essence", "vanilla pod"}
+
+
+def test_nutmeg_cinnamon_cloves_vanilla_specify_type(recipe):
+    """GitHub issue #151."""
+    bad = _unqualified(recipe, "nutmeg", _QUALIFIED_NUTMEG)
+    bad += _unqualified(recipe, "cinnamon", _QUALIFIED_CINNAMON)
+    bad += _unqualified(recipe, "cloves", _QUALIFIED_CLOVES)
+    bad += _unqualified(recipe, "vanilla", _QUALIFIED_VANILLA)
+    assert not bad, (
+        f"{where(recipe)} has unqualified spice(s): {bad!r}. "
+        f"Allowed: nutmeg ({', '.join(sorted(_QUALIFIED_NUTMEG))}), "
+        f"cinnamon ({', '.join(sorted(_QUALIFIED_CINNAMON))}), "
+        f"cloves ({', '.join(sorted(_QUALIFIED_CLOVES))}), "
+        f"vanilla ({', '.join(sorted(_QUALIFIED_VANILLA))})."
+    )
+
+
+# --- vinegar ------------------------------------------------------------------
+# GitHub issue #150. Needed zero data fixes for bare "vinegar" -- every real
+# instance already named a type. Only real change was consolidating "rice
+# wine vinegar" into "rice vinegar" (both named the same product; picked one).
+# White wine and malt vinegar are in the allowed list pre-emptively -- common
+# UK types, just not used by any current recipe.
+_QUALIFIED_VINEGAR = {
+    "apple cider vinegar", "balsamic vinegar", "red wine vinegar",
+    "rice vinegar", "sherry vinegar", "white wine vinegar", "malt vinegar",
+}
+
+
+def test_vinegar_specifies_type(recipe):
+    """GitHub issue #150."""
+    bad = _unqualified(recipe, "vinegar", _QUALIFIED_VINEGAR)
+    assert not bad, (
+        f"{where(recipe)} has unqualified vinegar: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_VINEGAR))}."
+    )
+
+
+# --- ginger, garlic, lemongrass: paste equivalent stated or flagged --------
+# GitHub issues #153/#155. Every fresh ginger/garlic/lemongrass ingredient
+# item must either state its paste equivalent in the item's own note, or
+# explicitly carry paste_equivalent_pending -- true for a genuine gap (not
+# yet worked out), false when a note already explains why none applies
+# (e.g. "fresh ginger is mandatory" on indonesian-chicken-curry-gulai-ayam.md
+# -- Helen's call: even a deliberate "no equivalent" case sets the field
+# explicitly rather than relying on a test parsing free text to guess
+# intent). Already-paste forms (ginger paste, garlic purée, lemongrass
+# paste) are out of scope entirely -- there's nothing left to convert, they
+# already are the paste.
+_FRESH_FORM_EXCLUDE = re.compile(r"\b(paste|pur[ée]e)\b", re.I)
+
+
+def test_ginger_garlic_lemongrass_paste_equivalent_stated_or_flagged(recipe):
+    """GitHub issues #153/#155."""
+    bad = []
+    for group in recipe.fm.get("ingredient_groups") or []:
+        for it in group.get("items") or []:
+            if not isinstance(it, dict):
+                continue
+            text = it.get("item", "")
+            base = re.split(r"[,(]", text)[0].strip()
+            if _FRESH_FORM_EXCLUDE.search(base):
+                continue
+            is_ginger = re.search(r"\bfresh ginger\b", base, re.I)
+            is_garlic = re.search(r"\bgarlic\b", base, re.I)
+            is_lemongrass = re.search(r"\blemongrass\b", base, re.I)
+            if not (is_ginger or is_garlic or is_lemongrass):
+                continue
+            note = it.get("note") or ""
+            has_paste_note = "paste" in note.lower()
+            has_flag = "paste_equivalent_pending" in it
+            if not has_paste_note and not has_flag:
+                bad.append(text)
+    assert not bad, (
+        f"{where(recipe)} has fresh ginger/garlic/lemongrass with no paste "
+        f"note and no paste_equivalent_pending flag: {bad!r}. Either state "
+        f"the paste equivalent in the item's own note, or set "
+        f"paste_equivalent_pending: true (a real gap) / false (deliberately "
+        f"no equivalent, with a note explaining why)."
+    )
+
+
+# --- chocolate: type, plus a cacao percentage on the recipe page only -------
+# GitHub issue #139. Helen: dark-family chocolate needs a cacao percentage on
+# the recipe page's own ingredient list so a cook knows what to buy -- dark
+# 70%, very dark 90%, unsweetened 100% -- but main_ingredients stays a plain
+# type name with no percentage, the same vocabulary-vs-presentation split as
+# everywhere else main_ingredients appears. Milk and white chocolate never
+# get a percentage -- the distinction that matters for them isn't cacao
+# content. Chip/shaving forms need a type word ("dark chocolate chips") but
+# no percentage -- they're a mix-in or garnish, not the recipe's defining
+# chocolate.
+_CHOCOLATE_PERCENT = {
+    "dark chocolate": "70",
+    "very dark chocolate": "90",
+    "unsweetened chocolate": "100",
+}
+_CHOCOLATE_NO_PERCENT = {"milk chocolate", "white chocolate"}
+_ALL_CHOCOLATE_TYPES = set(_CHOCOLATE_PERCENT) | _CHOCOLATE_NO_PERCENT
+_CHOCOLATE_FORM_EXEMPT = re.compile(r"\b(chips|shavings)\b", re.I)
+
+# A prepared/branded product, not a bar of chocolate to type -- exempt
+# entirely, same treatment as peanut butter/butter beans earlier.
+_CHOCOLATE_COMPOUND_EXCLUDE = re.compile(r"\bchocolate (syrup|beans)\b", re.I)
+
+
+def test_chocolate_specifies_type(recipe):
+    """GitHub issue #139. Every chocolate mention, in either field, names
+    one of the five allowed types.
+    """
+    allowed_pattern = re.compile(
+        "|".join(rf"\b{re.escape(t)}\b" for t in _ALL_CHOCOLATE_TYPES), re.I,
+    )
+    fields = [
+        ("main_ingredients", [str(x) for x in (recipe.fm.get("main_ingredients") or [])]),
+        ("ingredient", recipe.ingredient_items),
+    ]
+    bad = []
+    for field, values in fields:
+        for v in values:
+            name = re.split(r"[,(]", v)[0].strip()
+            if not re.search(r"\bchocolate\b", name, re.I):
+                continue
+            if _CHOCOLATE_COMPOUND_EXCLUDE.search(name):
+                continue
+            if not allowed_pattern.search(name):
+                bad.append(f"{field} {v!r}")
+    assert not bad, (
+        f"{where(recipe)} has unqualified chocolate: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_ALL_CHOCOLATE_TYPES))}."
+    )
+
+
+def test_chocolate_main_ingredients_has_no_percentage(recipe):
+    """GitHub issue #139. main_ingredients names the type only -- "dark
+    chocolate", never "dark chocolate, 70% cacao". The percentage belongs on
+    the recipe page's own ingredient list, not the index-page pill.
+    """
+    bad = []
+    for v in (recipe.fm.get("main_ingredients") or []):
+        name = str(v)
+        if not re.search(r"\bchocolate\b", name, re.I):
+            continue
+        if re.search(r"\d+\s*%", name):
+            bad.append(name)
+    assert not bad, (
+        f"{where(recipe)} has a percentage in main_ingredients: {bad!r}. "
+        f"Percentages belong on the recipe page's ingredient list, not here."
+    )
+
+
+def test_chocolate_percentage_matches_type(recipe):
+    """GitHub issue #139. On the recipe page's own ingredient list (not
+    main_ingredients), dark/very dark/unsweetened chocolate must carry the
+    percentage that identifies which of the three it is -- 70/90/100. Chip
+    and shaving forms are exempt (type word only, per Helen's call). A
+    missing or mismatched percentage is exactly the kind of thing that looks
+    fine at a glance: bens-chocolate-ice-cream.md said "very dark chocolate,
+    100% cacao" for real, until this was caught and fixed 2026-08-10 --
+    100% is unsweetened, not very dark.
     """
     bad = []
     for item in recipe.ingredient_items:
         name = re.split(r"[,(]", item)[0].strip()
-        if re.search(r"\bbrown\b", name, re.I) and re.search(r"\bsugar\b", name, re.I):
-            if not _BROWN_SUGAR_OK.search(name):
-                bad.append(item)
+        if not re.search(r"\bchocolate\b", name, re.I):
+            continue
+        if _CHOCOLATE_COMPOUND_EXCLUDE.search(name) or _CHOCOLATE_FORM_EXEMPT.search(item):
+            continue
+        # Longest phrase first and stop at the first match -- "very dark
+        # chocolate" also contains "dark chocolate" as a substring, so
+        # checking every entry would test a "very dark" item against plain
+        # dark's 70% too and wrongly flag a correct "..., 90% cacao".
+        for choc_type in sorted(_CHOCOLATE_PERCENT, key=len, reverse=True):
+            if re.search(rf"\b{re.escape(choc_type)}\b", name, re.I):
+                pct = _CHOCOLATE_PERCENT[choc_type]
+                if not re.search(rf"\b{pct}%\s*cacao\b", item, re.I):
+                    bad.append(item)
+                break
     assert not bad, (
-        f"{where(recipe)} has non-standard brown sugar name(s) {bad!r}. "
-        f"Allowed: light brown soft sugar, dark brown soft sugar, light "
-        f"brown muscovado sugar, dark brown muscovado sugar."
+        f"{where(recipe)} has {bad!r} without its required cacao percentage "
+        f"(dark 70%, very dark 90%, unsweetened 100%)."
     )
 
 

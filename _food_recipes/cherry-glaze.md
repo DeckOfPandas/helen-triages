@@ -6,7 +6,7 @@ source: Adapted from Gordon Ramsay
 makes: Some
 prep_time: "5 mins"
 cook_time: "20 mins"
-main_ingredients: [honey, "soy sauce", "red wine vinegar", "chicken stock", cherries]
+main_ingredients: [honey, "dark soy sauce", "red wine vinegar", "chicken stock", cherries]
 star_ingredient: fruit
 tags: ["make-ahead", extras]
 ingredient_groups:
@@ -15,7 +15,7 @@ ingredient_groups:
     - amount: "3 tbsp"
       item: honey
     - amount: "1½ tbsp"
-      item: soy sauce
+      item: dark soy sauce
     - amount: "3 tbsp"
       item: red wine vinegar
     - amount: "6 oz"

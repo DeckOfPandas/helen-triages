@@ -6,7 +6,7 @@ source: Bitter experience
 makes: "1 dozen mince pies"
 prep_time: "2 hrs including 1 hr 30 mins chilling time"
 cook_time: "20 mins"
-main_ingredients: [mincemeat, "ground almonds", butter, flour, egg, sugar]
+main_ingredients: [mincemeat, "ground almonds", "unsalted butter", "plain flour", egg, "golden caster sugar"]
 star_ingredient:
 tags: [bakes, festive]
 ingredient_groups:
@@ -19,13 +19,14 @@ ingredient_groups:
       item: golden caster sugar
     - amount: "75 g"
       item: ground almonds
+    - item: pinch of salt
     - amount: "125 g"
       item: "unsalted butter, diced"
     - amount: "1"
       item: "large free-range egg, beaten"
     - item: "milk, to glaze"
 method:
-  - "Blend the flour, sugar, almonds and butter in a food processor until the mixture resembles breadcrumbs, then slowly add the egg. Or, if you're feeling keen, rub the butter into the dry ingredients with your fingertips then stir in the egg."
+  - "Blend the flour, sugar, almonds, salt and butter in a food processor until the mixture resembles breadcrumbs, then slowly add the egg. Or, if you're feeling keen, rub the butter into the dry ingredients with your fingertips then stir in the egg."
   - "Wrap in cling film and chill for 1 hour."
   - "Cut out circles and stars, assemble the pies, then chill for another 30 mins."
   - "Brush lightly with milk, then bake for 20 mins at 200°C."

@@ -21,6 +21,7 @@ ingredient_groups:
       item: "stalks celery, diced"
     - amount: "4 cloves"
       item: "garlic, minced"
+      paste_equivalent_pending: true
     - amount: "350 ml"
       item: medium-dry cider
     - amount: "3"

@@ -20,8 +20,9 @@ ingredient_groups:
       item: large red onions
     - amount: "2 cloves"
       item: "garlic, minced"
+      paste_equivalent_pending: true
     - amount: "2"
-      item: pats unsalted butter
+      item: pats salted butter
     - amount: "6 tbsp"
       item: balsamic vinegar
     - amount: "1 level tbsp"
