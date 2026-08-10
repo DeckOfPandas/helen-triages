@@ -214,37 +214,34 @@ $tape-protrusion: 0.2rem;
   font-size: 2.5rem;
   font-weight: 1000;
   letter-spacing: 0.18em;
-  color: $color-white;
-  // Stroke width dropped to 0 in Helen's final pass (2026-08-03) -- with
-  // the emboss itself doing the work below, the stroke was competing with
-  // it rather than adding definition. Colour left as-is in case a stroke
-  // comes back later.
-  -webkit-text-stroke: 0px rgba(230, 230, 230, 0.9);
+  -webkit-text-stroke: 0px;
   text-transform: uppercase;
   text-align: center;
   line-height: 1;
   padding: 0 1.4em;
   white-space: nowrap;
-  @include punched(raised);
-  // The shared mixin's light side is $color-bg -- near-white, at full
-  // opacity. Every other punched(raised) element sits ON $color-bg, so that
-  // shadow is effectively invisible there; this is the first one sitting on
-  // a BLACK tape background instead, where it suddenly has real contrast to
-  // work with, and full-strength read as a stark white glow (Helen: "the
-  // lit side of FOOD needs to be softer than white... turn it down").
+  // Redesigned in the issue #122 pass (2026-08-10), replacing the
+  // @include punched(raised) + single-pair-shadow version this used to be.
+  // That version's fill was pure $color-white -- already the top of the
+  // brightness range, so the "light" shadow copy (a mid grey) was actually
+  // DARKER than the letter it was meant to highlight. No headroom, no real
+  // raised read, just two overlapping letterforms at a glance ("just looks
+  // like two sets of lettering", Helen).
   //
-  // Went through two intermediate attempts before landing here: a
-  // translucent light side read "fuzzy" instead of crisp (partial alpha
-  // over solid black antialiases into a halo); a solid-but-still-pale grey
-  // dark side never actually looked darker than the tape it sat on, because
-  // the tape SVG's fill is #0d0d0d and $color-text (#211f20) is a shade
-  // LIGHTER than that, so blending it never produced real recession. Helen
-  // tuned both sides directly in devtools instead of another guess: a
-  // darker, still-solid light side, and a dark side close to $color-text
-  // but pushed toward true black and nearly opaque, so it reads as
-  // genuinely darker than the tape rather than blending into it.
-  text-shadow: -1px -1px 0 rgb(139.5, 139, 139.25),
-                1px  1px 0 rgba(42, 41, 42, 0.9);
+  // Fixed two ways: fill pulled off pure white to #e7e2e3 so a genuinely
+  // brighter copy has room to exist above it; and the single shadow pair
+  // became two pairs -- one tight/crisp right at the glyph edge (a cut
+  // line), one wider/softer further out (the glow) -- same multi-copy
+  // bevel logic as the tape's own edge highlight
+  // (assets/img/food/tape/*.svg), not a new effect invented for text.
+  // Helen's own verdict after comparing a higher-contrast pull: this
+  // lighter version read better -- less "realistic" contrast, more
+  // effective as a label.
+  color: #e7e2e3;
+  text-shadow: -0.6px -0.6px 0 #fdfbfe,
+               -2.2px -2.2px 0 rgba(253, 251, 254, 0.55),
+                0.6px  0.6px 0 rgba(5, 5, 5, 0.9),
+                2.2px  2.2px 0 rgba(5, 5, 5, 0.45);
 
   .site-logo-bracket {
     letter-spacing: 0;

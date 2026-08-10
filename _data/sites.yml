@@ -36,7 +36,7 @@ food:
   css: food
   home: /food/
   tape: tape
-  tape_count: 4
+  tape_count: 7
   footer_svg: hearts/site-footer-hearts.svg
 
 cocktails:

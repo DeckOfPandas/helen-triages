@@ -29,34 +29,29 @@ in `_config.yml` already confirmed to match the GitHub username.
 (MVP styling for recipe body content, previously listed here as a second
 blocking item, is done — see `HANDOVER_v26.md` §4.1.)
 
-### 1.2 The tape SVG itself needs a redesign — conversation parked mid-2026-08-02, pick it back up
+### 1.2 The tape SVG redesign — done for food, 2026-08-10 (issue #122)
 
-Raised by Helen right after the wordmark restyle (`HANDOVER_v26.md` §13.8)
-landed: "let's discuss the SVG of the tape itself, as that work was parked
-with another Claude before being finished." Nobody has picked it back up yet
-— this is a placeholder for that conversation, not a spec for it.
+Was parked since mid-2026-08-02; picked back up and largely resolved
+2026-08-10. `scripts/generate_tape.py` is the new tool:
+each tape is one polygon (still `0 0 1400 170`, `fill="#0d0d0d"`) but now
+with real **corner geometry** (bottom corners independently acute/obtuse —
+the flat-polygon, no-corner-tab problem the old entry here described is
+gone), plus deliberately clustered "machine marks" and a hard-edged edge
+bevel matching the wordmark's own `punched(raised)` logic. `food/`'s set
+grew from 4 to 7 (`tape_count: 4` → `7` in `_data/sites.yml`); the script's
+own docstring is the actual spec — read it before regenerating anything.
+The wordmark's own bracket lettering (`[ FOOD ]`) got a matching pass in
+the same session, fixing a since-2026-08-02 bug where its text-shadow
+"light" copy was actually darker than the pure-white fill it sat on.
 
-What's actually there now: `assets/img/food/tape/tape-1.svg`..`tape-4.svg`
-(and, since §13.8, a direct copy of the same four files under `assets/img/
-cocktails/tape/` as a placeholder). Each is **one plain, slightly skewed
-polygon** (`fill="#0d0d0d"`) inside a `0 0 1400 170` viewBox, textured with a
-few hundred short, low-opacity `<line>` elements for machine marks and edge
-shading. **No separate corner geometry at all** — the "protrusion" §13.8's
-sizing mechanism supports (tape extending past the core lettering width) is
-currently just more of the same plain polygon showing at the ends, not a
-distinct torn or cut corner tab. That's why protrusion was trimmed small
-(`$tape-protrusion: 0.2rem`) rather than designed around — there's nothing
-interesting to reveal yet.
-
-One more thing worth raising in that conversation rather than deciding here:
-`decorations.js` currently picks one of the four SVGs **at random on every
-page load** (`data-tape-count`). That's the exact pattern §13.1 records as
-having been tried and rejected for the recipe/index section marks — "an
-identical, repeated mark becomes something you recognise rather than
-something you read" — though the tape may be a genuinely different case
-(background texture behind a fixed wordmark, not a wayfinding device you
-need to re-find on every page) rather than the same mistake. Worth deciding
-out loud either way, not by default.
+**Still open:**
+- `assets/img/cocktails/tape/` is still the old 4-file placeholder copy —
+  not updated to match food's new 7-file set. Deliberate or an oversight?
+  Ask before touching it either way.
+- `decorations.js` still picks one of the tape SVGs **at random on every
+  page load** (`data-tape-count`) — the exact pattern §13.1 records as
+  tried and rejected for the recipe/index section marks. Never revisited
+  in this pass; still worth deciding out loud rather than by default.
 
 ### 1.3 Delete the stale draft duplicates
 
