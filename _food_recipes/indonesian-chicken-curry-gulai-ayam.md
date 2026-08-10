@@ -31,10 +31,10 @@ ingredient_groups:
     - amount: "5 tsp"
       item: whole coriander seeds
       note: "or 4 tsp ground coriander"
-    - amount: "1/2"
+    - amount: "½"
       item: whole nutmeg
       note: "12-15 passes across a microplane grater, or 1 tsp ground nutmeg"
-    - amount: "1 1/4 tsp"
+    - amount: "1¼ tsp"
       item: whole cumin seeds
       note: "or 1 tsp ground cumin"
     - amount: "1 tsp"
@@ -73,10 +73,10 @@ method_groups:
   - name: curry
     steps:
     - Add the chicken and stir to coat in the spices. Cook for about 5 mins. Don't let it burn.
-    - "Add the sugar, tamarind and 100 ml water -- skip the water if the mixture is already loose. Add chicken stock cubes and other flavourings. Stir, bring to the boil, then reduce to a simmer."
+    - "Add the sugar, tamarind and 100 ml water — skip the water if the mixture is already loose. Add chicken stock cubes and other flavourings. Stir, bring to the boil, then reduce to a simmer."
     - Cover and cook for 20 mins.
     - Add the coconut cream and simmer for 15 mins more until the chicken is cooked through.
-    - Pull out the bones -- the meat will just fall off.
+    - Pull out the bones — the meat will just fall off.
     - Serve with steamed rice. I like sticky rice.
 method_short:
   - ""

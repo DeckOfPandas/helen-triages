@@ -143,8 +143,9 @@ results). Each considered and declined for the stated reason.
   may not name a site (`test_shared_scss_names_no_site` enforces this).
 - **Should the test suite cover `_food_drafts/` more?** Current scope is
   "almost never, by accident" — the actual job is making it deliberate, not
-  extending it. The `draft` fixture in `conftest.py` is dead — used by
-  nothing. Either use it or delete it.
+  extending it. (The dead `draft` fixture that used to live here was deleted
+  2026-08-10 — it had zero consumers, and the three tests that do read
+  `_food_drafts/` use `ALL_DRAFTS` directly, a separate mechanism.)
 - **Mobile / narrow-device check**, deferred deliberately. No fixed widths
   overflow, no media queries needed yet, but nobody has actually looked at
   either page on a real narrow device across three redesigns — Helen's

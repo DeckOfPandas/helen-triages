@@ -29,7 +29,7 @@ ingredient_groups:
     - amount: "50 ml"    
       item: oyster sauce
     - amount: "2 tbsp"
-      item: brown sugar
+      item: light brown soft sugar
   - name: salad
     items:
     - amount: "30 g"

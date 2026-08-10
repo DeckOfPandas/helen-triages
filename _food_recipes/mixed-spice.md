@@ -15,7 +15,7 @@ ingredient_groups:
       item: cinnamon stick
     - amount: "1"
       item: whole nutmeg, chopped
-    - amount: "1 1/4 tsp"
+    - amount: "1¼ tsp"
       item: whole cloves
     - amount: "1 tsp"
       item: ground ginger
