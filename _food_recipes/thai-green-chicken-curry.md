@@ -25,7 +25,8 @@ ingredient_groups:
     - amount: "~1 tbsp"
       item: tamarind paste
     - item: "lemongrass paste to taste"
-    - item: "zest and juice of 1 lime"
+    - amount: "1"
+      item: "lime, zest and juice"
     - amount: "200–400 ml"
       item: coconut milk
     - amount: "125 ml"
