@@ -17,10 +17,8 @@ ingredient_groups:
       item: dark brown soft sugar
     - amount: "1½ tsp"
       item: "fresh ginger, minced"
-      paste_equivalent_pending: true
     - amount: "1 tsp"
       item: "garlic, minced"
-      paste_equivalent_pending: true
     - amount: "1 tbsp"
       item: honey
     - amount: "1 tsp"

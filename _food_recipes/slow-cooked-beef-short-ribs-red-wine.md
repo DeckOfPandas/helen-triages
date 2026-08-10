@@ -15,7 +15,6 @@ ingredient_groups:
       item: thick-cut beef short ribs
     - amount: "1 large head"
       item: "garlic, cut in half horizontally"
-      paste_equivalent_pending: true
     - amount: "1 heaped tbsp"
       item: tomato purée
     - amount: "1 bottle"

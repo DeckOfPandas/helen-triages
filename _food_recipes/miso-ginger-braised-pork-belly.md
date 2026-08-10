@@ -16,7 +16,6 @@ ingredient_groups:
       item: "skin-on boneless pork belly"
     - amount: "2 inches"
       item: fresh ginger
-      paste_equivalent_pending: true
     - amount: "1 bunch"
       item: spring onions
     - amount: "5 tbsp"
@@ -29,7 +28,6 @@ ingredient_groups:
     items:
     - item: "spring onions, finely chopped"
     - item: "fresh ginger, julienned"
-      paste_equivalent_pending: true
     - item: "white pepper, freshly ground"
 method:
   - "Cut the pork belly into 2.5-cm chunks. Blanch in boiling water for about 2 mins to clean, then drain and rinse well."

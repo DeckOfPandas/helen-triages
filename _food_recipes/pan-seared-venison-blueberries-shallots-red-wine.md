@@ -23,7 +23,6 @@ ingredient_groups:
       item: "shallots, peeled and finely sliced"
     - amount: "1 clove"
       item: "garlic, peeled and finely sliced"
-      paste_equivalent_pending: true
     - item: "a glass of robust red wine, preferably Cab or Merlot"
     - amount: "200 g"
       item: fresh blueberries

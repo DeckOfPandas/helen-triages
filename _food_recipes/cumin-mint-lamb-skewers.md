@@ -16,7 +16,6 @@ ingredient_groups:
       item: full-fat Greek yoghurt
     - amount: "2"
       item: "garlic cloves, minced"
-      paste_equivalent_pending: true
     - amount: "1 tsp"
       item: ground coriander
     - amount: "2 tsp"

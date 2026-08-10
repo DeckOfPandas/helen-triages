@@ -17,7 +17,6 @@ ingredient_groups:
       item: onion, finely chopped
     - amount: "2"
       item: garlic cloves
-      paste_equivalent_pending: true
     - amount: "2"
       item: "woody herb sprigs such as thyme or rosemary"
     - amount: "1"

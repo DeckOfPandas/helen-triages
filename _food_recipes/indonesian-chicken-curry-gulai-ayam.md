@@ -21,7 +21,6 @@ ingredient_groups:
       item: coconut oil or olive oil
     - amount: "3"
       item: "lemongrass stalks, bruised"
-      paste_equivalent_pending: true
     - amount: "6"
       item: "lime leaves, torn, preferably fresh"
     - amount: "2"
@@ -51,13 +50,11 @@ ingredient_groups:
     items:
     - amount: "8"
       item: fresh garlic cloves
-      paste_equivalent_pending: true
     - amount: "6"
       item: "banana shallots (echalions), peeled"
     - amount: "5 cm"
       item: "piece of fresh ginger, peeled and chopped"
       note: "not giving an equivalent here because fresh ginger is mandatory"
-      paste_equivalent_pending: false
     - amount: "2 cm"
       item: "piece of galangal, peeled and chopped"
       note: "or 4 tsp paste from a jar"

@@ -22,7 +22,6 @@ ingredient_groups:
       item: "stalks celery, diced"
     - amount: "3 cloves"
       item: "garlic, minced"
-      paste_equivalent_pending: true
     - amount: "125 ml"
       item: dry white wine
     - amount: "40 g"
