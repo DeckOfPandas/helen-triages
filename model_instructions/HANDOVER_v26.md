@@ -1392,6 +1392,48 @@ tape's own edge highlight, applied to text. Helen's own call after
 comparing a higher-contrast pull side by side: the lighter version read
 better — less "realistic" contrast, more effective as a label.
 
+**Lettering alternatives tried and rejected, so they aren't re-proposed —
+this session's own commit message didn't capture these, only the final
+pick, so it's recorded here instead:**
+
+- A flat, bigger emboss offset (no stepped bevel — just the original
+  single shadow pair, offset further, on the lighter fill). Helen: "looks
+  raised up and left... and not well" — reads as the whole letter shifted
+  diagonally, not as a raised edge.
+- A gradient fill on the glyph itself (`background-clip: text`, a diagonal
+  light-to-dark sweep inside each letterform), on the theory that internal
+  shading would look more physical than an offset copy. Helen: "looks like
+  the lettering is made from twisted wire" — a diagonal gradient samples
+  differently across a thin bold stroke's horizontal vs. vertical segments,
+  which reads as a twist rather than a shaded surface. Tightening the
+  gradient's transition band (from a 30–100% smooth sweep to a near-step at
+  46–54%) was tried as a fix and not pursued further once B was already
+  winning.
+- The gradient fill combined with the stepped bevel (all of the above at
+  once). Helen: "good, but I prefer the crispness of B... even if less,
+  you know, accurate" — B's flat fill plus stepped shadow read more
+  dynamic than the more literally physical combined version.
+- Higher-contrast pulls of B's fill (`#a8a2a3`, `#8a8384`, pulling further
+  from white than the shipped `#e7e2e3`) — more headroom for the highlight,
+  in principle more "accurate", but rejected in a direct side-by-side: the
+  lighter, less contrasty version was the one that actually read as raised.
+
+**Provenance of the 7 shipped files** — which `--seed`/`--corner-mode`
+produced each, for anyone regenerating or swapping just one:
+
+| File | Seed | Corner mode |
+|---|---|---|
+| `tape-1.svg` | 30 | both_acute |
+| `tape-2.svg` | 32 | both_acute |
+| `tape-3.svg` | 33 | both_acute |
+| `tape-4.svg` | 35 | both_obtuse |
+| `tape-5.svg` | 36 | both_obtuse |
+| `tape-6.svg` | 40 | mixed |
+| `tape-7.svg` | 45 | mixed |
+
+All generated with `marks_seed` unset (defaults to `seed`) — see
+`scripts/generate_tape.py`'s own `generate()` signature.
+
 **If you're picking this up next, two things were raised but not decided:**
 
 1. **Cocktails' tape placeholder is now stale.** `assets/img/cocktails/tape/`
