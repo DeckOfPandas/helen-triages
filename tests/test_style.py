@@ -352,6 +352,32 @@ def test_nutmeg_cinnamon_cloves_vanilla_specify_type(recipe):
     )
 
 
+# --- cardamom -----------------------------------------------------------------
+# Prompted by garam-masala-powder.md: main_ingredients said "black cardamom"
+# while the ingredient list said "black cardamom pods" -- a mismatch
+# invisible to every other test, since cardamom wasn't tracked at all.
+# Helen's rule: always green or black, always pods/powder/seeds. Singular
+# forms included alongside the plurals -- indian-mutton-raan-roast.md
+# genuinely uses a single "black cardamom pod" (amount: 1), and forcing
+# that to the plural would just be bad grammar for the sake of a shorter
+# allowed list.
+_QUALIFIED_CARDAMOM = {
+    "green cardamom pod", "green cardamom pods", "green cardamom powder",
+    "green cardamom seed", "green cardamom seeds",
+    "black cardamom pod", "black cardamom pods", "black cardamom powder",
+    "black cardamom seed", "black cardamom seeds",
+}
+
+
+def test_cardamom_specifies_type(recipe):
+    """Always green or black, always pods/powder/seeds."""
+    bad = _unqualified(recipe, "cardamom", _QUALIFIED_CARDAMOM)
+    assert not bad, (
+        f"{where(recipe)} has unqualified cardamom: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_CARDAMOM))}."
+    )
+
+
 # --- vinegar ------------------------------------------------------------------
 # GitHub issue #150. Needed zero data fixes for bare "vinegar" -- every real
 # instance already named a type. Only real change was consolidating "rice

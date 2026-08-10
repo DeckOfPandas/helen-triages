@@ -123,6 +123,44 @@ def test_method_xor_method_groups(recipe):
     )
 
 
+def test_method_groups_have_name_and_steps(recipe):
+    """A method_groups entry needs both `name` and a non-empty `steps` --
+    neither is a rendering requirement pytest can infer from
+    test_method_xor_method_groups above, so a key typo (`step:` singular
+    instead of `steps:`) or a missing `name` doesn't error, it just
+    silently produces a group with no content. Caught for real on
+    garam-masala-powder.md: every group used `step:` with no `name:` at
+    all, so recipe.method_steps returned [] even though the file had three
+    real steps -- invisible to every prose-scanning test, since there was
+    nothing left for them to scan.
+    """
+    for i, group in enumerate(recipe.fm.get("method_groups") or []):
+        assert group.get("name"), (
+            f"{where(recipe)} method_groups entry {i} has no `name`."
+        )
+        assert group.get("steps"), (
+            f"{where(recipe)} method_groups entry {i} "
+            f"({group.get('name')!r}) has no `steps` -- check for a "
+            f"`step:` (singular) typo."
+        )
+
+
+def test_method_produces_actual_steps(recipe):
+    """Defense in depth alongside test_method_groups_have_name_and_steps
+    above: whatever the specific cause, a recipe that declares `method` or
+    `method_groups` but ends up with recipe.method_steps == [] has a real
+    content bug that every prose-scanning test (typography, time-word
+    abbreviations, ingredient annotation style...) would otherwise
+    silently skip rather than fail, since they all iterate method_steps.
+    """
+    if "method" not in recipe.fm and "method_groups" not in recipe.fm:
+        return
+    assert recipe.method_steps, (
+        f"{where(recipe)} declares method/method_groups but produces zero "
+        f"actual steps."
+    )
+
+
 def test_notes_is_a_list(recipe):
     if "notes" not in recipe.fm:
         return

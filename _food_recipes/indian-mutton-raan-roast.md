@@ -6,7 +6,7 @@ source: "Debjani Chatterjee Alam, Debjanir Rannaghar"
 serves: 10
 prep_time: "30 mins active, plus 48–72 hrs marinating"
 cook_time: "About 3 hrs"
-main_ingredients: ["mutton leg", "plain curd", "mustard oil", "ghee", "onions", "tomatoes", "garam masala powder", "black and green cardamom", "star anise", "cinnamon sticks", "crispy fried onions"]
+main_ingredients: ["mutton leg", "plain curd", "mustard oil", "ghee", "onions", "tomatoes", "garam masala powder", "black cardamom pod", "green cardamom pods", "star anise", "cinnamon sticks", "crispy fried onions"]
 star_ingredient: lamb
 tags: ["showstopper", "make-ahead"]
 ingredient_groups:

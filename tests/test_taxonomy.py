@@ -161,6 +161,32 @@ def test_internal_links_have_trailing_slash(recipe):
     )
 
 
+# Catches "](../" followed by anything up to ")" -- the universe of every
+# internal-recipe-link attempt, well-formed or not. LINK and
+# MISSING_TRAILING_SLASH above both only match a slug made of [a-z0-9-]+,
+# so anything else -- a stray file extension, an underscore, a typo -- is
+# invisible to both rather than failing, the same "test that cannot fail
+# and not notice" trap as the missing-trailing-slash case. Real bug,
+# 2026-08-10: indian-mutton-raan-roast.md's tagline linked to
+# ../garam-masala-powder.md), which doesn't quietly 404 -- it's simply not
+# a shape either existing test considered at all.
+ANY_RELATIVE_LINK = re.compile(r"\]\(\.\./([^)]+)\)")
+_WELL_FORMED_TARGET = re.compile(r"^[a-z0-9-]+/?$")
+
+
+def test_internal_links_are_well_formed(recipe):
+    """Anything `](../...)` that isn't a plain `slug` or `slug/` -- the two
+    shapes test_internal_recipe_links_resolve and
+    test_internal_links_have_trailing_slash already check between them.
+    """
+    bad = [t for t in ANY_RELATIVE_LINK.findall(recipe.raw) if not _WELL_FORMED_TARGET.match(t)]
+    assert not bad, (
+        f"{where(recipe)} has internal link(s) in an unrecognised shape: "
+        f"{bad!r}.\nCross-recipe links must be [text](../slug/) -- check "
+        f"for a stray file extension or typo."
+    )
+
+
 def test_no_claude_markers_left(recipe):
     """A note addressed to me is an instruction for a future session, not
     content ready to publish -- in any form, not just the "QQ CLAUDE ..."
