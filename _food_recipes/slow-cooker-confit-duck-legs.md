@@ -15,7 +15,6 @@ ingredient_groups:
     - item: coarse sea salt
     - item: fresh thyme
     - item: fresh garlic
-      paste_equivalent_pending: true
     - item: duck fat
       note: "or olive oil, in a pinch, but why be in a pinch for confit duck"
 method:

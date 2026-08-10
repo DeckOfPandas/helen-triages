@@ -21,7 +21,6 @@ ingredient_groups:
       item: anchovy paste (or 2 anchovies from a jar if using a blender)
     - amount: "1 clove"
       item: "garlic, minced"
-      paste_equivalent_pending: true
     - amount: ¼ tsp
       item: salt
     - amount: "⅛ tsp"

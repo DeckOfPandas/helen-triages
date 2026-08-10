@@ -11,8 +11,8 @@ star_ingredient:
 tags: [breakfast, "carbs party"]
 ingredient_groups:
   - items:
-    - amount: "2"
-      item: "large eggs, separated"
+    - amount: "2 large"
+      item: "eggs, separated"
     - amount: "1¾ cups"
       item: milk
     - amount: ½ cup

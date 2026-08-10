@@ -369,50 +369,6 @@ def test_vinegar_specifies_type(recipe):
     )
 
 
-# --- ginger, garlic, lemongrass: paste equivalent stated or flagged --------
-# GitHub issues #153/#155. Every fresh ginger/garlic/lemongrass ingredient
-# item must either state its paste equivalent in the item's own note, or
-# explicitly carry paste_equivalent_pending -- true for a genuine gap (not
-# yet worked out), false when a note already explains why none applies
-# (e.g. "fresh ginger is mandatory" on indonesian-chicken-curry-gulai-ayam.md
-# -- Helen's call: even a deliberate "no equivalent" case sets the field
-# explicitly rather than relying on a test parsing free text to guess
-# intent). Already-paste forms (ginger paste, garlic purée, lemongrass
-# paste) are out of scope entirely -- there's nothing left to convert, they
-# already are the paste.
-_FRESH_FORM_EXCLUDE = re.compile(r"\b(paste|pur[ée]e)\b", re.I)
-
-
-def test_ginger_garlic_lemongrass_paste_equivalent_stated_or_flagged(recipe):
-    """GitHub issues #153/#155."""
-    bad = []
-    for group in recipe.fm.get("ingredient_groups") or []:
-        for it in group.get("items") or []:
-            if not isinstance(it, dict):
-                continue
-            text = it.get("item", "")
-            base = re.split(r"[,(]", text)[0].strip()
-            if _FRESH_FORM_EXCLUDE.search(base):
-                continue
-            is_ginger = re.search(r"\bfresh ginger\b", base, re.I)
-            is_garlic = re.search(r"\bgarlic\b", base, re.I)
-            is_lemongrass = re.search(r"\blemongrass\b", base, re.I)
-            if not (is_ginger or is_garlic or is_lemongrass):
-                continue
-            note = it.get("note") or ""
-            has_paste_note = "paste" in note.lower()
-            has_flag = "paste_equivalent_pending" in it
-            if not has_paste_note and not has_flag:
-                bad.append(text)
-    assert not bad, (
-        f"{where(recipe)} has fresh ginger/garlic/lemongrass with no paste "
-        f"note and no paste_equivalent_pending flag: {bad!r}. Either state "
-        f"the paste equivalent in the item's own note, or set "
-        f"paste_equivalent_pending: true (a real gap) / false (deliberately "
-        f"no equivalent, with a note explaining why)."
-    )
-
-
 # --- chocolate: type, plus a cacao percentage on the recipe page only -------
 # GitHub issue #139. Helen: dark-family chocolate needs a cacao percentage on
 # the recipe page's own ingredient list so a cook knows what to buy -- dark

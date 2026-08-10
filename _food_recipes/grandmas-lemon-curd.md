@@ -19,8 +19,8 @@ ingredient_groups:
       item: cornflour
     - amount: "3"
       item: "large lemons, rind and juice"
-    - amount: "3"
-      item: large eggs
+    - amount: "3 large"
+      item: eggs
     - item: knob of salted butter, optional
 method:
   - "Slowly melt the butter in a pan, then stir in the sugar until dissolved."

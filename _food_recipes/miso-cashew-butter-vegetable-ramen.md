@@ -28,9 +28,7 @@ ingredient_groups:
       item: toasted sesame oil
     - amount: "1"
       item: "large garlic clove, grated"
-      paste_equivalent_pending: true
     - item: "thumb-sized piece of fresh ginger, grated"
-      paste_equivalent_pending: true
   - name: to serve
     items:
     - amount: "2"
@@ -39,8 +37,8 @@ ingredient_groups:
       item: "spring onions, finely sliced"
     - amount: "2 handfuls"
       item: "frozen edamame (soya beans), defrosted"
-    - amount: "1"
-      item: "small carrot, sliced into ribbons"
+    - amount: "1 small"
+      item: "carrot, sliced into ribbons"
     - item: black sesame seeds and fresh coriander leaves (optional)
 method:
   - "Whisk together the cashew butter, miso paste, soy sauce and rice vinegar to a smooth paste. Just loosen enough to pour as a sauce."

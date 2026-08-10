@@ -21,7 +21,6 @@ ingredient_groups:
       item: "carrot, finely chopped"
     - amount: "2"
       item: "garlic cloves, finely chopped"
-      paste_equivalent_pending: true
     - amount: "2 x 400 g cans"
       item: "white beans, one drained, one left undrained (we used cannellini and butter beans)"
     - amount: "500 ml"

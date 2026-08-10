@@ -22,8 +22,8 @@ ingredient_groups:
     - item: pinch of salt
     - amount: "125 g"
       item: "unsalted butter, diced"
-    - amount: "1"
-      item: "large free-range egg, beaten"
+    - amount: "1 large"
+      item: "free-range egg, beaten"
     - item: "milk, to glaze"
 method:
   - "Blend the flour, sugar, almonds, salt and butter in a food processor until the mixture resembles breadcrumbs, then slowly add the egg. Or, if you're feeling keen, rub the butter into the dry ingredients with your fingertips then stir in the egg."

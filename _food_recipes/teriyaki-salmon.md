@@ -26,10 +26,8 @@ ingredient_groups:
       item: honey
     - amount: "2"
       item: "cloves garlic, minced"
-      paste_equivalent_pending: true
     - amount: "1½ tsp"
       item: fresh ginger, minced
-      paste_equivalent_pending: true
     - amount: "1 tsp"
       item: toasted sesame oil
     - amount: "1 tsp"

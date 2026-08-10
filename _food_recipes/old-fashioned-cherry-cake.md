@@ -15,8 +15,8 @@ ingredient_groups:
       item: salted butter
     - amount: "8 oz"
       item: golden caster sugar
-    - amount: "4"
-      item: large eggs
+    - amount: "4 large"
+      item: eggs
     - amount: "8 oz"
       item: plain flour
     - amount: "½ tsp"

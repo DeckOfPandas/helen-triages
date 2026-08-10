@@ -14,15 +14,14 @@ ingredient_groups:
     items:
     - amount: "600 g"
       item: boneless skinless chicken breast
-    - amount: "1"
-      item: "large onion, diced"
-    - amount: "2"
-      item: "medium carrots, diced"
+    - amount: "1 large"
+      item: "onion, diced"
+    - amount: "2 medium"
+      item: "carrots, diced"
     - amount: "2"
       item: "stalks celery, diced"
     - amount: "3 cloves"
       item: "garlic, minced"
-      paste_equivalent_pending: true
     - amount: "125 ml"
       item: dry white wine
     - amount: "40 g"

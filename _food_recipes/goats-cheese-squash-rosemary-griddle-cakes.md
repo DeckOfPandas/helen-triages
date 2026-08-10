@@ -17,8 +17,8 @@ ingredient_groups:
       item: baking powder
     - amount: "1 sprig"
       item: "rosemary, leaves finely chopped"
-    - amount: "1"
-      item: large egg
+    - amount: "1 large"
+      item: egg
     - amount: "300 ml"
       item: whole milk
     - amount: "25 g"

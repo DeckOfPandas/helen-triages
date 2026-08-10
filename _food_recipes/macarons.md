@@ -18,8 +18,8 @@ ingredient_groups:
       item: icing sugar
     - amount: "1 tsp"
       item: vanilla extract
-    - amount: "2"
-      item: large egg whites
+    - amount: "2 large"
+      item: egg whites
     - amount: "½ tbsp"
       item: cream of tartar
   - name: chocolate biscuits
@@ -32,8 +32,8 @@ ingredient_groups:
       item: icing sugar
     - amount: "100 g"
       item: finely ground almonds
-    - amount: "2"
-      item: "large egg whites, with 90 g caster sugar whisked in after peaks start to form"
+    - amount: "2 large"
+      item: "egg whites, with 90 g caster sugar whisked in after peaks start to form"
     - amount: "½ tbsp"
       item: cream of tartar
   - name: filling

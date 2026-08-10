@@ -13,15 +13,14 @@ ingredient_groups:
   - items:
     - amount: "1.5 kg"
       item: chicken thighs and drumsticks
-    - amount: "2"
-      item: "large onions, diced"
-    - amount: "4"
-      item: "medium carrots, diced, and extra in chunks if you like them"
+    - amount: "2 large"
+      item: "onions, diced"
+    - amount: "4 medium"
+      item: "carrots, diced, and extra in chunks if you like them"
     - amount: "4"
       item: "stalks celery, diced"
     - amount: "4 cloves"
       item: "garlic, minced"
-      paste_equivalent_pending: true
     - amount: "350 ml"
       item: medium-dry cider
     - amount: "3"

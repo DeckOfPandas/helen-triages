@@ -16,11 +16,10 @@ ingredient_groups:
       item: good-quality sausages
     - amount: "4 sprigs"
       item: rosemary
-    - amount: "2"
-      item: large red onions
+    - amount: "2 large"
+      item: red onions
     - amount: "2 cloves"
       item: "garlic, minced"
-      paste_equivalent_pending: true
     - amount: "2"
       item: pats salted butter
     - amount: "6 tbsp"
@@ -33,8 +32,8 @@ ingredient_groups:
       item: milk
     - amount: "115 g"
       item: plain flour
-    - amount: "3"
-      item: large free-range eggs
+    - amount: "3 large"
+      item: free-range eggs
 method_groups:
   - name: toad in the hole
     steps:

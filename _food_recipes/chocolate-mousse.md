@@ -12,8 +12,8 @@ tags: [dessert, "make-ahead", "no-cook"]
 ingredient_groups:
   - name: mousse
     items:
-    - amount: "3"
-      item: large eggs
+    - amount: "3 large"
+      item: eggs
     - amount: "125 g"
       item: "dark chocolate, 70% cacao"
     - amount: "10 g"

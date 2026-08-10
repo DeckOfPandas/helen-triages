@@ -6,7 +6,7 @@ source: "Furious, split, slack and curdled decades of cursing at eggs"
 serves: "4, generously"
 prep_time: "15 mins"
 cook_time: "10 mins"
-main_ingredients: ["unsalted butter", "egg yolk", "lemon juice", "apple cider vinegar"]
+main_ingredients: ["unsalted butter", "egg yolks", "lemon juice", "apple cider vinegar"]
 star_ingredient:
 tags: [extras]
 ingredient_groups:
@@ -19,8 +19,8 @@ ingredient_groups:
     - amount: "3 tbsp"
       item: lemon juice
       note: "so much better with freshly squeezed lemon juice than bottled that it's almost not worth making this without it"
-    - amount: "4"
-      item: large egg yolks
+    - amount: "4 large"
+      item: egg yolks
     - item: salt
       note: "go easy if you're serving this over something already salty, like bacon or ham"
     - item: pepper

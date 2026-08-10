@@ -13,8 +13,8 @@ ingredient_groups:
   - items:
     - amount: "1 pt"
       item: milk
-    - amount: "4"
-      item: large eggs
+    - amount: "4 large"
+      item: eggs
     - amount: "8 oz"
       item: self-raising flour
     - item: Groundnut oil (or other high smoke-point oil)

@@ -25,8 +25,8 @@ ingredient_groups:
       item: baking powder
     - amount: "3 tbsp"
       item: cocoa powder
-    - amount: "5"
-      item: "large free-range eggs, separated"
+    - amount: "5 large"
+      item: "free-range eggs, separated"
     - amount: "190 g"
       item: golden caster sugar
     - item: "crème fraîche or double cream, to serve"

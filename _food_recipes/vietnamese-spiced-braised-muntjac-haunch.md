@@ -15,13 +15,10 @@ ingredient_groups:
       item: "muntjac haunch, boneless and rolled"
     - amount: "3"
       item: "lemongrass stalks, bruised and roughly chopped"
-      paste_equivalent_pending: true
     - amount: "5"
       item: "garlic cloves, crushed"
-      paste_equivalent_pending: true
     - amount: "40 g"
       item: "fresh ginger, peeled and sliced"
-      paste_equivalent_pending: true
     - amount: "3"
       item: star anise
     - amount: "1"

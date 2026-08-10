@@ -15,8 +15,8 @@ ingredient_groups:
       item: salted butter
     - amount: "4 oz"
       item: golden caster sugar
-    - amount: "2"
-      item: large eggs
+    - amount: "2 large"
+      item: eggs
     - amount: "4 oz"
       item: self-raising flour
     - amount: "4–6 oz"

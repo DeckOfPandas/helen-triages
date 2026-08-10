@@ -13,15 +13,14 @@ ingredient_groups:
   - items:
     - amount: "300 g"
       item: "chicken leg, cubed"
-    - amount: "1"
-      item: "large onion, diced"
-    - amount: "2"
-      item: "medium carrots, diced"
+    - amount: "1 large"
+      item: "onion, diced"
+    - amount: "2 medium"
+      item: "carrots, diced"
     - amount: "2"
       item: "stalks celery, diced"
     - amount: "3 cloves"
       item: "garlic, minced"
-      paste_equivalent_pending: true
     - amount: "50 ml"
       item: white wine
     - amount: "400 g"

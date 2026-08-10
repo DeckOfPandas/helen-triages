@@ -33,7 +33,6 @@ ingredient_groups:
       item: mirin
     - amount: "1 tsp"
       item: grated fresh ginger
-      paste_equivalent_pending: true
     - amount: "½ tsp"
       item: dark brown soft sugar
 method:

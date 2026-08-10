@@ -15,8 +15,8 @@ ingredient_groups:
       item: "dark chocolate, 70% cacao"
     - amount: "60 g"
       item: cocoa powder
-    - amount: "8"
-      item: large egg whites
+    - amount: "8 large"
+      item: egg whites
     - amount: "60 g"
       item: golden caster sugar
     - item: salted butter, Demerara sugar and cocoa powder to coat the ramekins

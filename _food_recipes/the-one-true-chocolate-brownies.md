@@ -15,8 +15,8 @@ ingredient_groups:
       item: unsalted butter
     - amount: "300 g"
       item: "dark chocolate, 70% cacao"
-    - amount: "5"
-      item: large eggs
+    - amount: "5 large"
+      item: eggs
     - amount: "450 g"
       item: golden granulated sugar
     - amount: "2 tsp"
