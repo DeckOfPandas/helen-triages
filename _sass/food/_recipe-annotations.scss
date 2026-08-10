@@ -1,0 +1,170 @@
+// =============================================================================
+// HELEN TRIAGES FOOD - RECIPE PAGE: INGREDIENT AMOUNTS AND ANNOTATIONS
+// =============================================================================
+// Split out of the old food/_recipe.scss (2026-08-10). No shared bases of its
+// own -- doesn't use %heading-base or the box-tint variables, so this file
+// has no ordering requirement relative to the other recipe partials beyond
+// the general palette/tokens/rule imports every food partial already needs.
+
+// --- Ingredient amount highlights -------------------------------------------
+// Inline highlight behind the quantity portion of an ingredient line.
+// Highlighter blob injected by highlighter.js into .highlighter-slot.
+.ingredient-amount {
+  display: inline;
+  margin-right: 0.15em;
+  font-weight: 500;
+}
+
+// Was number-only, unit left plain outside the highlight -- Helen,
+// 2026-08-04 (GitHub issue #54): "Ingredient amounts currently only get
+// bolder [the shared font-weight: 500 above], no scratchy lettering.
+// Please simply extend this formatting right-wards." The unit moved INTO
+// this span (_layouts/recipe.html) rather than getting a highlight of its
+// own, so one continuous highlighter SVG now covers "400 g" as a single
+// run instead of two.
+//
+// .highlighted (shared/_base.scss) supplies position: relative, the
+// positioning context the injected SVG needs.
+//
+// align-items: baseline overrides .highlighted's own align-items: center.
+// With no flex item baseline-aligned, an inline-flex box's OWN baseline (the
+// one used to place it within the surrounding line of text) is synthesised
+// from the top edge of its first flex item rather than real text metrics —
+// that pushed the whole box below the ingredient name text sitting right
+// next to it outside the box.
+// No right padding: the injected highlighter SVG has a fixed few-px overflow
+// baked into every highlighters/*.svg asset (position:absolute; left:-4px;
+// width:calc(100% + 8px)), independent of this box's own size. Right padding
+// here just adds more box for that fixed overflow to bleed past, painting
+// over the space before the ingredient name and touching it.
+//
+// No margin-right here any more either, now that the unit lives inside this
+// span rather than right after it — .ingredient-amount's own margin-right is
+// the only gap left before the ingredient name; doubling it here on top
+// would have opened a visibly wider gap than intended.
+.ingredient-amount-number {
+  padding: 0 0 0 0.2em;
+  align-items: baseline;
+}
+
+// --- Ingredient and step annotations ----------------------------------------
+// Used to be two front-matter keys, tip (active technique advice) and note
+// (contextual information) -- always rendered identically (same colour, no
+// visible label either way) since tips stopped being cerulean, so the
+// distinction was purely a YAML key name with no reader-facing meaning.
+// Collapsed to a single `note:` key 2026-08-04 (GitHub issue: standardise
+// tip/note naming) -- one CSS class each for step and ingredient
+// annotations now, no modifier.
+//
+// Step and ingredient annotations used to share one block/gutter layout.
+// Split apart 2026-08-03: Helen reads a step as a sentence, so dropping to a
+// new indented line for its note doesn't cost her anything. She reads
+// ingredients as a list to scan (amounts, mainly — "how much of everything"),
+// and the same block/gutter treatment there pulled her eye out of that scan
+// every time. They're not two sizes of the same component any more, they're
+// two different components that happen to share a mark and a colour.
+
+// --- Step annotations: block, mark in a left gutter -------------------------
+// The mark sits absolutely positioned in the gutter (the site's established
+// mark-in-a-gutter technique, also used for step numbers) rather than
+// inline, so padding-left indents every wrapped line of the annotation text
+// evenly, not just the first — a step's note is often a full sentence, long
+// enough to wrap.
+.step-annotation {
+  display: block;
+  position: relative;
+  margin-top: 0.25rem;
+  padding-left: 4rem;
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: $color-clear-text;
+}
+
+// top recentres the mark (2.5rem x 2rem) against a single line of annotation
+// text (line-height 1.45 x font-size 0.82rem =~ 1.19rem) rather than
+// aligning their top edges, since the mark is taller than the text line it
+// sits beside; -0.65rem is Helen's own eyeballed fine-tune of the arithmetic
+// result of ~-0.41rem.
+.step-annotation .annotation-mark {
+  position: absolute;
+  left: 1rem;
+  top: -0.65rem;
+  width: 2.5rem;
+  height: 2rem;
+}
+
+// --- Ingredient annotations: inline, same line as the ingredient -----------
+// Mark artwork is four horizontal arrows dealt from a shuffled pool (see
+// annotationMarks() in decorations.js) — no gutter, no absolute positioning,
+// the annotation is just inline content after the ingredient text, wrapping
+// like any other text if it runs past the line. That's the point — a
+// block-level aside below the line was exactly what pulled Helen's eye out
+// of scanning the list.
+// $annotation-arrow-gap sits on both sides of the mark — before it (clear of
+// the ingredient text) and after it (clear of the annotation text) — so it
+// reads as a deliberate gap the arrow sits inside, not squeezed against
+// either side. Generous rather than tight: Helen's ask was room enough that
+// the arrow doesn't drag her eye off the ingredient line she's scanning.
+$annotation-arrow-gap: 0.9em;
+
+.ingredient-annotation {
+  display: inline;
+  margin-left: $annotation-arrow-gap;
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: $color-clear-text;
+}
+
+// Started at 1.6em x 0.8em, matching the four horizontal arrows' own ~2:1
+// aspect ratio. Width now stretched 50% (1.6em -> 2.4em) per Helen's ask —
+// height untouched, so it's a left-to-right stretch specifically, not a
+// scale-up. The arrow SVGs themselves needed preserveAspectRatio="none" for
+// this to actually distort the artwork rather than just add empty padding
+// either side of it (same technique the tape assets use to stretch-to-fill).
+// Horizontal spacing ($annotation-arrow-gap) deliberately untouched.
+.ingredient-annotation .annotation-mark {
+  display: inline-block;
+  width: 2.4em;
+  height: 0.8em;
+  margin-right: $annotation-arrow-gap;
+  vertical-align: middle;
+}
+
+// GitHub issue #77, reverted: tried display: inline-block on .annotation-text
+// so a wrapped continuation line would hang-indent to ITS OWN left edge
+// rather than the LI's. Broke a case Helen caught by screenshot -- a short
+// ingredient name (little room used on its line) followed by a long note:
+// the WHOLE box dropped to a fresh line, flush left under the ingredient
+// name, arrow left dangling at the end of the line above. Root cause:
+// inline-block sizes itself (shrink-to-fit, up to its max-width) against the
+// full containing block, not the space actually left on the current line
+// after the arrow -- so a long note computes a wide preferred width even
+// though it could have wrapped into the room available right after the
+// arrow, and a box that wide no longer fits there, so the whole thing (not
+// just the overflow) moves down as one atomic unit. Plain inline content
+// doesn't have this failure mode -- it just keeps flowing word by word from
+// wherever the arrow left off -- at the cost of the original ask: a wrapped
+// line still falls back to the LI's own edge, not the annotation's start.
+// No known pure-CSS fix keeps both a guaranteed same-line start (the
+// arrow-adjacent placement Helen wants) AND a hanging indent to a start
+// position that varies with the ingredient name's own length; the reliable
+// way to get the latter is measuring the actual rendered position in JS
+// (as decorations.js already does for shape/stretch decisions elsewhere)
+// and setting it as a custom property. Not done here -- ask first.
+
+// Violet, not magenta, for both marks above: magenta already carries the
+// title rule, the toggle and every link, so a magenta mark here read as one
+// more competing use of the site's loudest colour rather than a quiet aside.
+// Violet is already spent on the box tints, so this reuses rather than
+// adding a hue.
+.annotation-mark {
+  color: $color-vibrant-violet;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}

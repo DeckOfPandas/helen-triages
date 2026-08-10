@@ -1,0 +1,279 @@
+// =============================================================================
+// HELEN TRIAGES FOOD - RECIPE PAGE: NOTES, BODY CONTENT, GROUP HEADINGS, FOOTER
+// =============================================================================
+// Split out of the old food/_recipe.scss (2026-08-10). Uses %heading-base and
+// the box-tint variables, both defined in food/_recipe-header.scss -- must
+// stay imported after it.
+
+// --- Notes (plural: the grid) -------------------------------------------------
+// Two per row rather than a stack — a page with 2–3 notes read as a set of
+// thin horizontal stripes, one under the other. Exactly 2 columns (not an
+// auto-fit that could quietly become 3 on a wide screen) so it stays
+// deliberately "a couple of things side by side," not "however many fit."
+// The common case is a single note (20 of the 37 recipes that have any) —
+// .notes--single drops to one column so it isn't stranded at half width.
+//
+// align-items: start, not stretch: a short note next to a tall one keeps its
+// own height rather than being stretched to match, leaving a gap beneath it
+// instead of an oddly empty box. Two different-sized things sitting side by
+// side reads more like items placed on a corkboard than a layout bug — closer
+// to this site's general hand-placed, imperfect character than forcing every
+// box to match its neighbour.
+.notes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: start;
+  gap: $spacing-block-gap;
+  margin: $spacing-block-gap 0;
+
+  &--single {
+    grid-template-columns: 1fr;
+  }
+}
+
+// --- Note (singular: one box) -------------------------------------------------
+// Was a flat neutral mix (mix($color-border, $color-surface, 35%)), left that
+// way pending a proper answer — see DEV_JOBS_v24.md §1.8. Now shares the
+// metadata grid's own tint ($color-box-tint / $box-tint-opacity, both defined
+// above), so the two boxes read as the same device rather than the note being
+// an unrelated fainter grey next to the meta grid's violet.
+.note {
+  position: relative;
+  // font-family, font-weight, color, font-size, line-height inherited from article.recipe
+  padding: 1.1rem 1.4rem;
+  background-color: rgba($color-box-tint, $box-tint-opacity);
+  border-radius: $radius-sm;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: $color-border;
+    border-radius: 1px;
+  }
+}
+
+// Was a CSS-generated ::after reading the same static "note" on every box —
+// couldn't say anything about what the note actually is, and started looking
+// odd once boxes sit two per row under one "NOTES" heading (every tab in the
+// row saying "note" again). Now a real element carrying page data
+// (notes: [{label, text}] in front matter) instead of a fixed string.
+.note-label {
+  position: absolute;
+  top: -0.65rem;
+  left: 1.1rem;
+  font-family: $font-headings;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+  color: $color-clear-text;
+  background: $color-bg;
+  padding: 0 $space-xs;
+}
+
+// --- Body Content (long-form prose via {{ content }}) -----------------------
+// A recipe's Markdown body below its front matter -- rare (one file as of
+// 2026-08-02, dark-chocolate-ganache.md, see HANDOVER_v26.md §4.1) but real.
+//
+// Section headings in here are PEERS of INGREDIENTS/METHOD/NOTES, per
+// Helen's call 2026-08-02: "I can imagine TIPS and TROUBLESHOOTING being
+// peer headings with INGREDIENTS etc. I think that would cause the least
+// jar." Plain `## Heading` markdown can't do this -- kramdown gives it no
+// class and no nested span, and .recipe-section-heading's mark needs both
+// (the span is what overlapping-rule-double hugs). Write raw HTML directly
+// in the body instead, blank-line-separated so kramdown still parses the
+// surrounding markdown as markdown:
+//
+//   <h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
+//
+// A subtitle directly under a peer heading (dark-chocolate-ganache's own
+// "a.k.a. ganache is the worst", split out of the heading text itself) is a
+// <p class="recipe-section-subtitle"> straight after it, same approach.
+//
+// A bare `## Heading` still gets a reasonable fallback below rather than
+// unstyled browser default -- but it will not match the page's other
+// section headings, which is the entire distinction peer status is for.
+article.recipe .recipe-body-content {
+  margin-top: 0;
+  // No padding-top: a peer heading brings its own $spacing-section-top
+  // (4.5rem) exactly like INGREDIENTS/METHOD/NOTES do, unconditionally, not
+  // just on first-child -- the same rhythm the rest of the page already
+  // uses between sections, not a bespoke gap invented for this one area.
+  // Adding a second gap here would double up.
+
+  // Fallback for a heading that didn't opt into peer status via the raw-HTML
+  // pattern above. :not(.recipe-section-heading) so this never fights that
+  // class on specificity when both are present on the same element.
+  h2:not(.recipe-section-heading) {
+    @extend %heading-base;
+    font-size: 1rem;
+    letter-spacing: $letter-spacing-label;
+    color: $color-text;
+    -webkit-text-stroke: $stroke-light $color-label-stroke;
+    @include punched(raised);
+    margin: $spacing-section-gap 0 $space-md 0;
+  }
+
+  // The "a.k.a." subtitle pattern -- same voice as .recipe-tagline (italic,
+  // lightened text colour), smaller, sitting under a peer heading instead of
+  // under the page title.
+  // Spacing modelled directly on .recipe-title/.recipe-tagline's own
+  // relationship (1.25rem above the tagline, 3rem below it, from
+  // .recipe-title and .recipe-meta's margins respectively) -- Helen: "so it
+  // reads like a tagline, not the first line of content."
+  //
+  // Above: adjacent margins collapse to their max, so a plain margin-top
+  // here couldn't shrink the gap below .recipe-section-heading's own 2rem
+  // bottom margin -- only a margin big enough in the other direction can.
+  // -0.75rem collapsed against that 2rem gives exactly 1.25rem (positive
+  // and negative margins sum when they collapse, they don't take the max of
+  // one positive and one negative).
+  //
+  // Below: bumped from $space-lg (1rem, too tight -- read as the first line
+  // of the paragraph that followed) to $spacing-section-gap, matching the
+  // real tagline's gap to .recipe-meta exactly rather than a value picked
+  // to look roughly separated.
+  .recipe-section-subtitle {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: lighten($color-text, 20%);
+    margin: -0.75rem 0 $spacing-section-gap 0;
+  }
+
+  h3 {
+    @extend %heading-base;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: lighten($color-clear-text, 10%);
+    margin: $space-xl 0 $space-sm 0;
+  }
+
+  p {
+    // font-family, font-weight, color, font-size, line-height inherited from article.recipe
+    // Same reading width as Method, not Notes: max-width: none overrides the
+    // shared `article.recipe p { max-width: 65ch }` in _layout.scss, which
+    // matched this to Notes only because both happen to be plain <p> tags,
+    // not because anyone decided body content should read at Notes' width.
+    // Method has no cap at all -- this shouldn't either, per Helen's call.
+    max-width: none;
+    margin: 0 0 $space-lg 0;
+  }
+
+  ul, ol {
+    // font-family, font-weight, color, font-size, line-height inherited from article.recipe
+    // Not covered by the shared article.recipe p rule (lists only, not p).
+    // No max-width here either, same reasoning as p above.
+    padding-left: $space-xl;
+
+    li { margin-bottom: 0.5rem; }
+  }
+
+  // Numbered lists get Method's own numeral treatment -- Helen: "let's try
+  // styling the numbers in the ganache writing's numbered list the same way
+  // as method steps." Same font, stroke, size and colour as .method-full's
+  // ::before counter (see that rule above for the exact values this
+  // mirrors).
+  //
+  // Different LAYOUT mechanism, though: .method-full uses display: flex on
+  // the li, which works because a step is one line of text and nothing
+  // else. A body-content numbered item can contain a nested <ul> (each of
+  // ganache's failure modes has its own sub-bullets) -- flex would put that
+  // nested list beside the number instead of under it. Absolute positioning
+  // avoids that: the ::before sits in the padding-left gutter without
+  // joining the li's own flow, so both the bold lead-in and the nested list
+  // beneath it stack normally.
+  ol {
+    list-style: none;
+    padding-left: 2.4rem;   // matches .method-full's number column width
+    counter-reset: body-content-counter;
+
+    > li {
+      counter-increment: body-content-counter;
+      position: relative;
+
+      &::before {
+        content: counter(body-content-counter) ".";
+        position: absolute;
+        left: -2.4rem;
+        // Same nudge .method-full uses (margin-top: $space-xxs there) for
+        // the same reason: a 1.2rem numeral sitting flush with the top of a
+        // box built around ~0.92rem/700-weight text sits visibly higher
+        // than that text's own baseline. Helen: "the numbers are slightly
+        // higher" -- absolute positioning needs top: $space-xxs where the
+        // flex version needs margin-top: $space-xxs, same fix either way.
+        top: $space-xxs;
+        font-family: $font-headings;
+        font-weight: 700;
+        color: $color-step-number;
+        -webkit-text-stroke: $stroke-light;
+        font-size: 1.2rem;
+        line-height: 1.2;
+      }
+    }
+  }
+
+  // 600 rather than the browser default 700 -- Helen: "the font still seems
+  // too heavy." Only current use is the four failure-mode lead-ins in the
+  // numbered list above (dark-chocolate-ganache.md); a whole line of
+  // 700-weight sans-serif reads dense. 600 stays visibly bolder than the
+  // 300-weight body text around it without matching the numeral's own
+  // full-weight Courier bold one column to the left.
+  strong { font-weight: 600; }
+
+  // No link colour/underline override here any more -- article.recipe a
+  // (above) covers it now, same magenta treatment as every other
+  // cross-recipe link on the page. One link style, not two.
+}
+
+// --- Group Headings ----------------------------------------------------------
+// "For the dressing:" in the ingredients, and the phase names in a grouped
+// method. A bare h3 — it carried two nested spans until 2026-07-31, purely so
+// heading-underline.js could measure the text width and hang a scribbled SVG
+// underneath it. The scribble was cut and the content below the heading indents
+// by $space-xxl instead (see the group indent block in food/_recipe-ingredients-
+// method.scss): the underline marked where a group STARTED, the indent shows
+// how far it EXTENDS, which is what you actually need when checking you have
+// everything for one component.
+.recipe-group-heading {
+  @extend %heading-base;
+  display: block;
+  margin-top: $spacing-block-gap;
+  margin-bottom: $space-md;
+  font-size: 1rem;
+  letter-spacing: $letter-spacing-label;
+  color: $color-text;
+  // Raised label-tape lettering (HANDOVER_v26.md §13.4.1) -- stroke width
+  // unchanged, colour and emboss shadow are new.
+  -webkit-text-stroke: $stroke-light $color-label-stroke;
+  @include punched(raised);
+  line-height: 1.4;
+}
+
+// --- Footer ------------------------------------------------------------------
+.recipe-footer {
+  margin-top: $spacing-section-gap;
+  padding-top: 1.25rem;
+  // Break out to match site-footer border width
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: $width-content;
+  max-width: 100vw;
+  border-top: 1px dashed $color-border;
+
+  // GitHub issue #96: 0.72rem plus a further 15%-lightened colour on top of
+  // an already-muted grey made this hard to read for something Helen wants
+  // legible -- source attribution matters. Same font-size the annotation
+  // text elsewhere in this file already uses as its "small but legible"
+  // size, and the plain (not lightened) colour.
+  .recipe-source {
+    font-family: $font-headings;
+    font-size: 0.82rem;
+    color: $color-clear-text;
+    margin: $space-xs 0;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+  }
+}
