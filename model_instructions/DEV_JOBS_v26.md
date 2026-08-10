@@ -31,10 +31,8 @@ blocking item, is done — see `HANDOVER_v26.md` §4.1.)
 
 ### 1.2 The tape SVG redesign — done for food, 2026-08-10 (issue #122)
 
-Was parked since mid-2026-08-02; picked back up and largely resolved in a
-concurrent session on 2026-08-10, while this session was doing content
-work on the same repo — see `HANDOVER_v26.md`'s note on running content and
-design sessions in parallel. `scripts/generate_tape.py` is the new tool:
+Was parked since mid-2026-08-02; picked back up and largely resolved
+2026-08-10. `scripts/generate_tape.py` is the new tool:
 each tape is one polygon (still `0 0 1400 170`, `fill="#0d0d0d"`) but now
 with real **corner geometry** (bottom corners independently acute/obtuse —
 the flat-polygon, no-corner-tab problem the old entry here described is

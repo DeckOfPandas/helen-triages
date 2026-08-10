@@ -953,28 +953,6 @@ Any interactive element nested inside a punched-tape heading needs explicit
 `-webkit-text-stroke: 0` and `text-shadow: none` unless it's actually meant
 to carry the effect too.
 
-**You will run a content session and a design session in parallel Claude
-Code instances against the same working directory, assuming they're
-independent because they touch different files.** They aren't — it's one
-git working tree and one `pytest` reading whatever's on disk at the moment
-it runs, regardless of which session put it there. Real incident,
-2026-08-10: a content session and a design session (this one) ran at once;
-`pytest` in the design session started showing failures that hadn't been
-there a run earlier, then went away again a run after that — not a
-regression from either session's own work, just the other session's
-in-progress edits passing through disk on their way to being fixed. Worse,
-one session's `git checkout` moves `HEAD` for *both* sessions, since it's
-the same repo — a design session mid-edit can find itself looking at a
-different branch's tracked files without having asked for one, while its
-own uncommitted changes (not tied to any branch until committed) just sit
-there regardless. **If a test failure looks unrelated to what you're doing,
-or the branch looks wrong, check `git reflog` and file mtimes before
-assuming you caused it** — per Helen, 2026-08-10: "I thought I could work
-on content and design in current sessions, but I was messy and didn't take
-into account that tests might clash." One session at a time against this
-working directory, or accept that either might see the other's transient
-state.
-
 ---
 
 ## 13. The site's visual design
