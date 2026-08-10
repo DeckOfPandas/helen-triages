@@ -23,6 +23,7 @@ ingredient_groups:
       note: "optional, for extra heat"
     - amount: "2.5-cm piece"
       item: "fresh ginger, thinly sliced"
+      paste_equivalent_pending: true
     - amount: "2 tbsp"
       item: "loose black tea leaves"
       note: "preferably Assam or Darjeeling"

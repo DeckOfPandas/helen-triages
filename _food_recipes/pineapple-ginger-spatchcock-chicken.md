@@ -18,8 +18,10 @@ ingredient_groups:
       item: "pineapple (about 1 kg without the leaves), peeled"
     - amount: "40 g"
       item: "fresh ginger, half finely grated, half cut into matchsticks"
+      paste_equivalent_pending: true
     - amount: "3"
       item: "garlic cloves, chopped"
+      paste_equivalent_pending: true
     - amount: "2 tbsp"
       item: "dark brown soft sugar"
     - amount: "300 ml"
@@ -28,7 +30,7 @@ ingredient_groups:
     - item: "freshly ground black peppercorns, to taste"
     - item: "freshly ground Szechuan peppercorns, to taste"
     - item: "freshly ground cloves, to taste"
-    - item: "rice wine vinegar, to taste"
+    - item: "rice vinegar, to taste"
     - item: "light soy sauce, to taste"
 
 method_groups:

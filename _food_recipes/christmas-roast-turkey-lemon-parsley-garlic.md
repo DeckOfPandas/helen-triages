@@ -21,6 +21,7 @@ ingredient_groups:
       item: "lemon, halved"
     - amount: "1 head"
       item: "garlic, halved horizontally"
+      paste_equivalent_pending: true
     - amount: "6"
       item: bay leaves
     - item: "olive oil, to drizzle"
@@ -36,6 +37,7 @@ ingredient_groups:
       item: "small lemons, finely grated zest and juice"
     - amount: "3"
       item: "garlic cloves, crushed"
+      paste_equivalent_pending: true
     - item: "small bunch of flat-leaf parsley, leaves only, chopped"
 method_groups:
   - name: Herb butter

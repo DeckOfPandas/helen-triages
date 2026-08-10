@@ -6,7 +6,7 @@ source: "Adapted from Green and Black's Chocolate Recipes"
 makes: "one double-layer 8-inch cake"
 prep_time: 20 mins
 cook_time: "20–25 mins"
-main_ingredients: ["cocoa powder", "dark chocolate", "salted butter", eggs, "plain flour", vanilla, salt]
+main_ingredients: ["cocoa powder", "dark chocolate", "salted butter", eggs, "plain flour", "vanilla extract", salt]
 star_ingredient: chocolate
 tags: [bakes, showstopper]
 ingredient_groups:

@@ -6,7 +6,7 @@ source: "Adapted from Gordon Ramsay's Desserts"
 makes: "64+ tiny macarons"
 prep_time: "30 mins plus 30 mins resting"
 cook_time: "20 mins"
-main_ingredients: ["ground almonds", "icing sugar", "cocoa powder", "egg whites", mascarpone, cream, vanilla, "cream of tartar", "plain flour", "natural yoghurt", "double cream"]
+main_ingredients: ["ground almonds", "icing sugar", "cocoa powder", "egg whites", mascarpone, cream, "vanilla extract", "cream of tartar", "plain flour", "natural yoghurt", "double cream"]
 star_ingredient:
 tags: [bakes, showstopper]
 ingredient_groups:

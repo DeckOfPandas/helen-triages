@@ -1,5 +1,5 @@
 ---
-title: Asparagus and Gruyère Quiche with Parmesan and Paprika Crust
+title: Asparagus and Gruyère Quiche with Parmesan Crust
 short_name: Asparagus and Gruyère Quiche
 tagline: "As good hot, reheated, cold, or straight from the fridge with a guilty look on your face. Strategically over-cater to ensure leftovers."
 source: Good friend Daniel

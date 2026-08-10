@@ -22,8 +22,10 @@ ingredient_groups:
       item: light soy sauce
     - amount: "3"
       item: "garlic cloves, finely grated"
+      paste_equivalent_pending: true
     - amount: "10 g"
       item: "fresh ginger, finely grated"
+      paste_equivalent_pending: true
     - amount: "2"
       item: "limes, both zested, 1 juiced, plus wedges to serve"
     - amount: "50 ml"    

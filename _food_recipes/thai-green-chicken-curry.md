@@ -19,6 +19,7 @@ ingredient_groups:
     - amount: "500 g"
       item: chicken
     - item: "~1 clove garlic (or squirty or chopped)"
+      paste_equivalent_pending: true
     - item: "~½ to 1 jar Thai green curry paste"
     - item: "~1 tbsp tamarind paste"
     - item: "lemongrass paste to taste"

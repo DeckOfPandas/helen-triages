@@ -206,6 +206,7 @@ _COMPOUND_EXCLUDE = {
     ),
     "sugar": re.compile(r"\bsugar snap\b", re.I),
     "flour": None,
+    "cloves": re.compile(r"\bgarlic\b", re.I),
 }
 
 
@@ -319,6 +320,96 @@ def test_mixed_spice_and_five_spice_say_powder(recipe):
     assert not bad, (
         f"{where(recipe)} has {bad!r} without \"powder\". "
         f"Allowed: mixed spice powder, five-spice powder."
+    )
+
+
+# --- nutmeg, cinnamon, cloves, vanilla ---------------------------------------
+# GitHub issue #151. Same closed-list pattern again. "cloves" excludes garlic
+# cloves via _COMPOUND_EXCLUDE -- a completely unrelated ingredient that
+# happens to share the word, same shape of problem as butter beans earlier.
+_QUALIFIED_NUTMEG = {"whole nutmeg", "ground nutmeg"}
+_QUALIFIED_CINNAMON = {"cinnamon stick", "cinnamon sticks", "ground cinnamon"}
+_QUALIFIED_CLOVES = {"whole cloves", "ground cloves"}
+_QUALIFIED_VANILLA = {"vanilla extract", "vanilla essence", "vanilla pod"}
+
+
+def test_nutmeg_cinnamon_cloves_vanilla_specify_type(recipe):
+    """GitHub issue #151."""
+    bad = _unqualified(recipe, "nutmeg", _QUALIFIED_NUTMEG)
+    bad += _unqualified(recipe, "cinnamon", _QUALIFIED_CINNAMON)
+    bad += _unqualified(recipe, "cloves", _QUALIFIED_CLOVES)
+    bad += _unqualified(recipe, "vanilla", _QUALIFIED_VANILLA)
+    assert not bad, (
+        f"{where(recipe)} has unqualified spice(s): {bad!r}. "
+        f"Allowed: nutmeg ({', '.join(sorted(_QUALIFIED_NUTMEG))}), "
+        f"cinnamon ({', '.join(sorted(_QUALIFIED_CINNAMON))}), "
+        f"cloves ({', '.join(sorted(_QUALIFIED_CLOVES))}), "
+        f"vanilla ({', '.join(sorted(_QUALIFIED_VANILLA))})."
+    )
+
+
+# --- vinegar ------------------------------------------------------------------
+# GitHub issue #150. Needed zero data fixes for bare "vinegar" -- every real
+# instance already named a type. Only real change was consolidating "rice
+# wine vinegar" into "rice vinegar" (both named the same product; picked one).
+# White wine and malt vinegar are in the allowed list pre-emptively -- common
+# UK types, just not used by any current recipe.
+_QUALIFIED_VINEGAR = {
+    "apple cider vinegar", "balsamic vinegar", "red wine vinegar",
+    "rice vinegar", "sherry vinegar", "white wine vinegar", "malt vinegar",
+}
+
+
+def test_vinegar_specifies_type(recipe):
+    """GitHub issue #150."""
+    bad = _unqualified(recipe, "vinegar", _QUALIFIED_VINEGAR)
+    assert not bad, (
+        f"{where(recipe)} has unqualified vinegar: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_VINEGAR))}."
+    )
+
+
+# --- ginger, garlic, lemongrass: paste equivalent stated or flagged --------
+# GitHub issues #153/#155. Every fresh ginger/garlic/lemongrass ingredient
+# item must either state its paste equivalent in the item's own note, or
+# explicitly carry paste_equivalent_pending -- true for a genuine gap (not
+# yet worked out), false when a note already explains why none applies
+# (e.g. "fresh ginger is mandatory" on indonesian-chicken-curry-gulai-ayam.md
+# -- Helen's call: even a deliberate "no equivalent" case sets the field
+# explicitly rather than relying on a test parsing free text to guess
+# intent). Already-paste forms (ginger paste, garlic purée, lemongrass
+# paste) are out of scope entirely -- there's nothing left to convert, they
+# already are the paste.
+_FRESH_FORM_EXCLUDE = re.compile(r"\b(paste|pur[ée]e)\b", re.I)
+
+
+def test_ginger_garlic_lemongrass_paste_equivalent_stated_or_flagged(recipe):
+    """GitHub issues #153/#155."""
+    bad = []
+    for group in recipe.fm.get("ingredient_groups") or []:
+        for it in group.get("items") or []:
+            if not isinstance(it, dict):
+                continue
+            text = it.get("item", "")
+            base = re.split(r"[,(]", text)[0].strip()
+            if _FRESH_FORM_EXCLUDE.search(base):
+                continue
+            is_ginger = re.search(r"\bfresh ginger\b", base, re.I)
+            is_garlic = re.search(r"\bgarlic\b", base, re.I)
+            is_lemongrass = re.search(r"\blemongrass\b", base, re.I)
+            if not (is_ginger or is_garlic or is_lemongrass):
+                continue
+            note = it.get("note") or ""
+            has_paste_note = "paste" in note.lower()
+            has_flag = "paste_equivalent_pending" in it
+            if not has_paste_note and not has_flag:
+                bad.append(text)
+    assert not bad, (
+        f"{where(recipe)} has fresh ginger/garlic/lemongrass with no paste "
+        f"note and no paste_equivalent_pending flag: {bad!r}. Either state "
+        f"the paste equivalent in the item's own note, or set "
+        f"paste_equivalent_pending: true (a real gap) / false (deliberately "
+        f"no equivalent, with a note explaining why)."
     )
 
 

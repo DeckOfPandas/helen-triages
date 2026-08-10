@@ -6,7 +6,7 @@ source: Mrs Nicholson
 makes: "about 600 ml"
 prep_time: 20 mins
 cook_time: None
-main_ingredients: [milk, eggs, "golden caster sugar", "plain flour", vanilla]
+main_ingredients: [milk, eggs, "golden caster sugar", "plain flour", "vanilla essence"]
 star_ingredient:
 tags: [extras]
 ingredient_groups:

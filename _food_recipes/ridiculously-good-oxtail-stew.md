@@ -24,7 +24,7 @@ ingredient_groups:
     - amount: "4"
       item: fresh bay leaves
     - amount: "4"
-      item: cloves
+      item: whole cloves
     - amount: "2 heaped tbsp"
       item: plain flour
     - amount: "2 x 400 g tins"
