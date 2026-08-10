@@ -34,7 +34,8 @@ ingredient_groups:
       item: dark brown muscovado sugar
     - amount: "~2 tsp"
       item: Thai fish sauce
-    - item: "30–50 g flaked almonds"
+    - amount: "30–50 g"
+      item: flaked almonds
     - amount: "100 g"
       item: green beans
     - amount: "1"
