@@ -6,13 +6,13 @@ source: "Furious, split, slack and curdled decades of cursing at eggs"
 serves: "4, generously"
 prep_time: "15 mins"
 cook_time: "10 mins"
-main_ingredients: ["salted butter", "egg yolk", "lemon juice", "apple cider vinegar"]
+main_ingredients: ["unsalted butter", "egg yolk", "lemon juice", "apple cider vinegar"]
 star_ingredient:
 tags: [extras]
 ingredient_groups:
   - items:
     - amount: "8 oz"
-      item: butter
+      item: unsalted butter
     - amount: "1 tbsp"
       item: apple cider vinegar
       note: white wine vinegar is acceptable, but not as good
@@ -21,9 +21,11 @@ ingredient_groups:
       note: "so much better with freshly squeezed lemon juice than bottled that it's almost not worth making this without it"
     - amount: "4"
       item: large egg yolks
-    - item: salt and pepper
+    - item: salt
+      note: "go easy if you're serving this over something already salty, like bacon or ham"
+    - item: pepper
 method:
-  - "Whisk the egg yolks until thick and creamy, then season — not much salt if you're using salted butter or serving over bacon."
+  - "Whisk the egg yolks until thick and creamy, then season with the salt and pepper — go easy on the salt if you're serving this over bacon or ham."
   - "Heat the acids until boiling briskly, then dribble very slowly into the egg yolks while whisking continuously."
   - Melt the butter in another pan until it starts to froth, but if it boils you've gone far too far.
   - "Dribble the butter very slowly into the yolk/acid mixture while still whisking, until the mixture thickens."
@@ -55,7 +57,7 @@ And a note on food safety: this is a warm, barely-cooked egg yolk sauce meant to
 - **Trust the science of cooling**. It hasn't failed to set until it's finger-warm and still not set. 
 - **Whisk manually with a balloon whisk for better control of texture**. You want a classic, glossy, velvety finish rather than over-aerated foam. There's a higher chance of splitting with an electric whisk because the high speed can break the emulsion before it has had time to form, compromising stability. Furthermore, with an electric beater you'll have poor bowl contact compared with the manual approach. Think of it as free gym. 
 - **Use clarified butter**. Whole butter carries in about 15% water and milk solids before you've even started — you can get away with it, but you're gifting your already-narrow emulsion even less room for error. Clarifying your butter first gives a slightly bigger safety net.
-- **Salt helps:** Using salted butter gives you a tiny safety margin because the sodium and chloride ions slightly alter the protein matrix, allowing it to hold water better. Unsalted butter leaves you completely exposed to the whims of the universe.
+- **Salt helps:** the sodium and chloride ions slightly alter the protein matrix, helping it hold water better — one more reason not to skip seasoning. Unsalted butter plus salt added directly, rather than however much happens to be in salted butter, means you can actually control that margin — and dial it back if you're serving this over something already salty, like bacon or ham.
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
 <p class="recipe-section-subtitle">a.k.a. egg yolks are sneaky</p>
