@@ -625,3 +625,49 @@ def test_pan_and_ingredient_sizes_use_digits_in_drafts():
         "Spelled-out size(s) in drafts:\n  " + "\n  ".join(problems)
         + "\n\nFix now so it's already right when the draft is promoted."
     )
+
+
+# --- oven temperature: fan required ------------------------------------------
+# GitHub issue #146. House style has been fan-only for a while
+# (HANDOVER_v26.md §5: "always fan oven only, never conventional or gas
+# mark"), but the word "fan" isn't actually written next to every existing
+# temperature yet. Helen's explicit call: don't assume the numbers already
+# there are confirmed fan figures just because house style says they should
+# be -- leave this test failing on every one that's missing the word, and
+# she'll confirm each against its original source recipe and add "fan" by
+# hand as she gets to it, rather than have the test silently pass on
+# unverified numbers. This is deliberately a checklist, not a guard that's
+# expected to be green.
+_OVEN_WORD_RE = re.compile(r"\b(?:bake|roast|blast|oven)\w*\b", re.I)
+_OVEN_TEMP_RE = re.compile(r"\d{2,3}(?:[–-]\d{2,3})?\s*°C(\s*fan)?\b", re.I)
+_INTERNAL_TEMP_RE = re.compile(r"internal temperature\s+of\s*$", re.I)
+
+
+def test_oven_temperature_says_fan(recipe):
+    """GitHub issue #146. A °C figure only counts as an oven temperature when
+    its step also mentions baking/roasting/blasting/the oven -- deliberately
+    excludes stovetop and tempering readings (chocolate-ganache.md's
+    cooling-stage figures, chocolate-mousse.md's "still warm" check) and
+    internal-doneness checks (teriyaki-salmon.md's "internal temperature of
+    57°C"), none of which are an oven setting "fan" does or doesn't apply to.
+
+    Known gap, not a false pass: gordons-christmas-five-spice-roast-goose.md
+    has a "Calculate the cooking time: 10 mins at 240°C, then reduce to
+    190°C..." step that restates the same figures as the actual method step
+    below it, without an oven word of its own -- this test won't catch that
+    one, so check it by hand when you get to this recipe.
+    """
+    bad = []
+    for step in recipe.method_steps:
+        if not _OVEN_WORD_RE.search(step):
+            continue
+        for m in _OVEN_TEMP_RE.finditer(step):
+            if _INTERNAL_TEMP_RE.search(step[: m.start()][-40:]):
+                continue
+            if not m.group(1):
+                bad.append(m.group(0))
+    assert not bad, (
+        f"{where(recipe)} has oven temperature(s) without \"fan\": {bad!r}. "
+        f"House style is fan-only -- confirm from the original recipe and "
+        f"add \"fan\", e.g. \"180°C fan\"."
+    )
