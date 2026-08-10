@@ -6,7 +6,7 @@ source: "Adapted from Good Food 2026 wall calendar"
 serves: 2
 prep_time: "10 mins"
 cook_time: "35 mins"
-main_ingredients: ["salmon or trout", "sweet potatoes", broccoli, "pak choi", "white miso", "mirin", "dark brown sugar", "fresh ginger"]
+main_ingredients: ["salmon or trout", "sweet potatoes", broccoli, "pak choi", "white miso", "mirin", "dark brown soft sugar", "fresh ginger"]
 star_ingredient: oily fish
 tags: [virtuous]
 ingredient_groups:
@@ -34,7 +34,7 @@ ingredient_groups:
     - amount: "1 tsp"
       item: grated ginger
     - amount: "½ tsp"
-      item: dark brown soft or muscovado sugar
+      item: dark brown soft sugar
 method:
   - step: "Combine the marinade ingredients with 2 tbsp water in a large bowl. Pour half of the marinade into a smaller bowl, then add the salmon to the large bowl. Coat thoroughly."
     note: "large bowl = raw fish-ed bowl, small bowl = clean bowl"

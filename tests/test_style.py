@@ -48,31 +48,19 @@ def test_no_qq_placeholder(recipe):
     HANDOVER_v26.md §4 and §12. Fine anywhere in `_food_drafts/`, and never to
     be treated as an error there. But a `QQ` surviving into `_food_recipes/`
     means the recipe isn't actually finished, whatever field it's hiding in
-    (a tagline link target, a cook_time, an ingredient amount) — the same
+    (a tagline link target, a cook_time, an ingredient amount, or an
+    un-rewritten method step from ingest — `QQ - rewrite: ...`) — the same
     "drafting aid, not a published value" logic as `test_no_estimated_timings`
-    above, generalised to the marker Helen actually uses for "not yet".
+    above, generalised to the one marker Helen actually uses for "not yet".
+
+    A second marker, `PLACEHOLDER`, briefly existed alongside this one
+    (found 2026-08-09 in roast-beef-fillet.md's method) and was retired
+    2026-08-10 at Helen's direction: one marker for everything, not two —
+    see HANDOVER_v26.md §4's ingest paragraph. Don't reintroduce it.
     """
     hits = QQ.findall(recipe.raw)
     assert not hits, (
         f"{where(recipe)} still contains {len(hits)} `QQ` placeholder(s).\n"
-        f"Fine in _food_drafts/, not fine here — replace with the real "
-        f"content before this recipe counts as published."
-    )
-
-
-PLACEHOLDER = re.compile(r"\bPLACEHOLDER\b")
-
-
-def test_no_placeholder_marker(recipe):
-    """`PLACEHOLDER` is a second draft marker, alongside `QQ` -- found
-    2026-08-09 in roast-beef-fillet.md, where every method step read
-    "PLACEHOLDER - rewrite: ..." despite the recipe being published. Same
-    "drafting aid, not a published value" logic as `test_no_qq_placeholder`:
-    fine in _food_drafts/, never fine once a recipe counts as published.
-    """
-    hits = PLACEHOLDER.findall(recipe.raw)
-    assert not hits, (
-        f"{where(recipe)} still contains {len(hits)} `PLACEHOLDER` marker(s).\n"
         f"Fine in _food_drafts/, not fine here — replace with the real "
         f"content before this recipe counts as published."
     )

@@ -250,6 +250,18 @@ meta:
 **Easy to get wrong:**
 
 - `QQ` anywhere is Helen's placeholder. **Never flag it as an error.**
+  **When ingesting a recipe** (a magazine scan, a website, a transcript,
+  anything not already in Helen's own voice) and a method step or other
+  field is still the original source text rather than her rewrite, prefix
+  it with `QQ` — e.g. `QQ - rewrite: <original step text>` — so it's
+  visibly unfinished and `test_no_qq_placeholder` (§10) will catch it if it
+  ever reaches `_food_recipes/` un-rewritten. One marker, not two: don't
+  invent `PLACEHOLDER` or anything else for this. (This is the exact
+  convention already in wide use across `_food_drafts/` — as of 2026-08-10
+  it's still written there as `PLACEHOLDER - rewrite: ...` in roughly 190
+  files, predating this paragraph existing at all. Those weren't
+  bulk-converted — see §12/DEV_JOBS on not tidying a draft unprompted — but
+  every new ingest from here on uses `QQ`.)
 - `incidental: true` on an ingredient item (e.g. frying oil, greasing
   butter) marks it as a cooking fluid rather than a real recipe component —
   Helen: "It's silly to write '2 tbsp olive oil' for a sear, when people
@@ -674,13 +686,15 @@ from here.
 across `ingredient-search.test.js` (11) and `recipe-list.test.js` (9). Node
 tests, not pytest, because they test JS modules directly.
 
-**`test_no_placeholder_marker`** (`test_style.py`, added 2026-08-09 after
+**`PLACEHOLDER` briefly existed as a second draft marker alongside `QQ`**
+(added 2026-08-09, its own `test_no_placeholder_marker`, after
 `roast-beef-fillet.md` published with literal "PLACEHOLDER - rewrite: ..."
-still in every method step) mirrors `test_no_qq_placeholder` mechanically
-(fine in drafts, fails once published) but means the **opposite** of `QQ`:
-`QQ` is Helen's deliberate marker and must never be flagged or touched;
-`PLACEHOLDER` is leftover sloppy text from an earlier Claude and should be.
-Don't conflate the two.
+still in every method step) and was retired 2026-08-10 — one marker for
+everything now, not two. `test_no_qq_placeholder` covers both cases: a
+blank field (`cook_time: QQ`) and an un-rewritten ingest line
+(`QQ - rewrite: ...`). If you see `PLACEHOLDER` anywhere, it predates this
+retirement — treat it exactly as `QQ`, don't add a third marker, and see
+§4's ingest paragraph for the actual instruction.
 
 **`test_ingredient_annotation_style`** (`test_taxonomy.py`) checks: one
 sentence, no trailing full stop, lower case unless the first word is `I` or a

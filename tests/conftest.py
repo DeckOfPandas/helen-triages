@@ -124,11 +124,16 @@ ALL_DRAFTS = _load(DRAFTS_DIR)
 
 
 def pytest_generate_tests(metafunc):
-    """Parametrise any test that asks for a `recipe` or `draft` argument."""
+    """Parametrise any test that asks for a `recipe` argument.
+
+    Nothing parametrises on a `draft` argument today — the three tests that
+    read `_food_drafts/` do it via the `ALL_DRAFTS` list directly (see
+    HANDOVER_v26.md §10), not a per-draft fixture. A `draft`-parametrised
+    hook lived here until 2026-08-10 with zero consumers; removed rather
+    than kept "in case" — add it back the day a test actually needs it.
+    """
     if "recipe" in metafunc.fixturenames:
         metafunc.parametrize("recipe", ALL_RECIPES, ids=[r.slug for r in ALL_RECIPES])
-    if "draft" in metafunc.fixturenames:
-        metafunc.parametrize("draft", ALL_DRAFTS, ids=[d.slug for d in ALL_DRAFTS])
 
 
 @pytest.fixture(scope="session")
