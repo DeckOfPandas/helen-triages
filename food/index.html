@@ -162,10 +162,10 @@ permalink: /food/
         {% endif %}
 
         <div class="badge-group">
-          <div class="badge-group__content">
+          <div class="badge-group-content">
             {% include recipe_badges.html recipe=recipe %}
           </div>
-          <div class="badge-group__meta">
+          <div class="badge-group-meta">
             {% if site.show_unrewritten %}
               {% unless recipe.meta.rewritten %}<span class="badge badge-meta-rewrite">needs rewrite</span>{% endunless %}
               {% unless recipe.meta.proofread %}<span class="badge badge-meta-proofread">needs proofread</span>{% endunless %}
