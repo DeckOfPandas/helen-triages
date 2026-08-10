@@ -670,8 +670,8 @@ the OLD 4-file set** (`tape_count: 4`), not the new 7-file one food shipped
 (`tape_count: 7`). Not an oversight to silently fix — copying the new set
 over is a real content decision (is food's redesigned artwork actually right
 as cocktails' placeholder, or should cocktails just stay on the old plainer
-files until it has its own?) that hasn't been asked yet. See
-`DEV_JOBS_v26.md` 1.2.
+files until it has its own?) that hasn't been asked yet — see §13.9's own
+closing note.
 
 `tests/` is the FOOD suite (`conftest.py` says so). Cocktails gets its own
 test file once it has content to test against.
@@ -1283,12 +1283,13 @@ core the tape graphic itself extends, currently `0.2rem`, trimmed down twice
 on Helen's request from an initial `1.5rem`. One value, shared by both
 sites' `.tape-bg` — there's no per-site protrusion, so "make cocktails'
 shorter, then match food to it" is already true by construction whenever
-this number changes. Small on purpose beyond just taste: the current tape
-SVGs are a single near-rectangular polygon with no separate corner geometry
-(§9's placeholder note, and the SVG redesign that's next up in
-`DEV_JOBS_v26.md`), so protrusion today reads as "a bit more plain tape
-showing," not a distinct torn corner — the closer to zero, the less that
-gap reads as unfinished.
+this number changes. Kept small even after the §13.9 redesign gave food's
+tape real corner geometry — the corner shape reads at the tape's own ends,
+not in how far it protrudes past the lettering, so there's been no reason
+to revisit this number for that reason. (Originally written when the old
+pre-redesign SVGs really were a single near-rectangular polygon with no
+corner geometry at all, which is no longer true for food — see §13.9. Still
+true for cocktails, which hasn't had its own redesign pass.)
 
 **`.site-logo-word`'s padding is `1.4em`, not a percentage — this isn't a
 style preference, percentage padding here would be circular.** Percentage
@@ -1390,7 +1391,20 @@ tape's own edge highlight, applied to text. Helen's own call after
 comparing a higher-contrast pull side by side: the lighter version read
 better — less "realistic" contrast, more effective as a label.
 
-**Open, not decided in this pass** — see `DEV_JOBS_v26.md` 1.2:
-`assets/img/cocktails/tape/` still holds the OLD 4-file placeholder set,
-unrefreshed (§9); `decorations.js` still picks a tape at random on every
-page load, the exact pattern §13.1 rejected elsewhere, never revisited here.
+**If you're picking this up next, two things were raised but not decided:**
+
+1. **Cocktails' tape placeholder is now stale.** `assets/img/cocktails/tape/`
+   still holds the OLD 4-file set (§9), not food's new 7. Copying food's
+   redesigned set over is a genuine content decision, not a mechanical
+   sync — is food's artwork actually right as cocktails' placeholder, or
+   should cocktails stay on the old plainer files until it has its own
+   visual language? **Ask Helen before touching it either way**, same as
+   any other cocktails content call (§9).
+2. **`decorations.js`'s `tape()` still picks one of the N SVGs at random on
+   every page load** (`data-tape-count`). This is the exact pattern §13.1
+   documents as tried and rejected for the recipe/index section marks — "an
+   identical, repeated mark becomes something you recognise rather than
+   something you read" — but whether that reasoning actually applies to a
+   background texture behind a fixed wordmark (rather than a wayfinding
+   device you need to re-find on every page) was never revisited in this
+   pass. Worth deciding out loud, not by default either way.
