@@ -18,6 +18,9 @@ layout: default
     {% if page.cook_time %}<li><strong>Cook</strong><span>{{ page.cook_time }}</span></li>{% endif %}
   </ul>
 
+  {% if page.source %}<p class="recipe-source">Source: {{ page.source }}</p>{% endif %}
+  {% if page.meta.date_ingested %}<p class="recipe-source">Date added: {{ page.meta.date_ingested }}</p>{% endif %}
+
   <div class="recipe-badges">
     {% include recipe_badges.html recipe=page %}
   </div>
@@ -156,13 +159,6 @@ layout: default
   <div class="recipe-body-content">
     {{ content }}
   </div>
-  {% endif %}
-
-  {% if page.source or page.meta.date_ingested %}
-    <div class="recipe-footer">
-      {% if page.source %}<p class="recipe-source">Source: {{ page.source }}</p>{% endif %}
-      {% if page.meta.date_ingested %}<p class="recipe-source">Date added: {{ page.meta.date_ingested }}</p>{% endif %}
-    </div>
   {% endif %}
 
 </article>

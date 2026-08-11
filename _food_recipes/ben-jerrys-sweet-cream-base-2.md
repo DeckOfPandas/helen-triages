@@ -2,7 +2,7 @@
 title: Ben and Jerry's Sweet Cream Base No. 2
 short_name: Ben and Jerry's Sweet Cream Base No. 2
 tagline: "The most creamy of the three."
-source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book, page 29"
+source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
 prep_time: "5 mins"
 cook_time: "None"

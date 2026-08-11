@@ -2,7 +2,7 @@
 title: "Lemony Cavolo Nero and Butter Bean Soup"
 short_name: Lemony Cavolo Nero and Butter Bean Soup
 tagline: "It's fun to have a one-pot stew that is bright and acidic without relying on tomatoes."
-source: "Adapted from Good Food, January 2026, page 41"
+source: "Adapted from Good Food, January 2026"
 serves: 4
 prep_time: "15 mins"
 cook_time: "20 mins"

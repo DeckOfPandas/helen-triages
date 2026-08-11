@@ -1,5 +1,5 @@
 // =============================================================================
-// HELEN TRIAGES FOOD - RECIPE PAGE: NOTES, BODY CONTENT, GROUP HEADINGS, FOOTER
+// HELEN TRIAGES FOOD - RECIPE PAGE: NOTES, BODY CONTENT, GROUP HEADINGS
 // =============================================================================
 // Split out of the old food/_recipe.scss (2026-08-10). Uses %heading-base and
 // the box-tint variables, both defined in food/_recipe-header.scss -- must
@@ -249,31 +249,4 @@ article.recipe .recipe-body-content {
   -webkit-text-stroke: $stroke-light $color-label-stroke;
   @include punched(raised);
   line-height: 1.4;
-}
-
-// --- Footer ------------------------------------------------------------------
-.recipe-footer {
-  margin-top: $spacing-section-gap;
-  padding-top: 1.25rem;
-  // Break out to match site-footer border width
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  width: $width-content;
-  max-width: 100vw;
-  border-top: 1px dashed $color-border;
-
-  // GitHub issue #96: 0.72rem plus a further 15%-lightened colour on top of
-  // an already-muted grey made this hard to read for something Helen wants
-  // legible -- source attribution matters. Same font-size the annotation
-  // text elsewhere in this file already uses as its "small but legible"
-  // size, and the plain (not lightened) colour.
-  .recipe-source {
-    font-family: $font-headings;
-    font-size: 0.82rem;
-    color: $color-clear-text;
-    margin: $space-xs 0;
-    letter-spacing: 0.04em;
-    text-transform: lowercase;
-  }
 }
