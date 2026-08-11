@@ -1,7 +1,7 @@
 ---
 title: "Gordon's Christmas Five-Spice Roast Goose"
 short_name: "Gordon's Christmas Five-Spice Goose"
-tagline: "Gordon Ramsay's chef's choice of Christmas main — a golden goose."
+tagline: "Five-spice and citrus cut through goose fat beautifully."
 source: Adapted from Gordon Ramsay
 serves: 6
 prep_time: "35 mins"
@@ -23,26 +23,26 @@ ingredient_groups:
       item: clear honey
     - item: fresh parsley, thyme and sage
 method:
-  - "Calculate the cooking time: 10 mins at 240°C, then reduce to 190°C and cook for 20 mins per kg for medium-rare, 32 mins per kg for well done, plus 30 mins resting."
-  - "Loosen the trussing string and pull out the legs and wings a little to help the bird cook better. Remove any giblets or pads of fat from the inside. Lightly score the breast and leg skin in a criss-cross pattern to help the fat render, being careful not to cut right through."
+  - "Calculate the cooking time: 10 mins at 220°C fan, then reduce to 170°C fan and cook for 20 mins per kg for medium-rare, 32 mins per kg for well done, plus 30 mins resting."
+  - "Loosen the trussing string and pull out the legs and wings a little to help the bird cook better. Remove any giblets or pads of fat from the inside. Lightly score the breast and leg in a criss-cross pattern to help the fat render, being careful not to cut all the way through the skin."
   - "Mix the citrus zest with 2 tsp fine sea salt, the five-spice powder, and ground white pepper to taste."
   - "Season the cavity of the goose generously with salt, then rub the citrus mix well into the skin and sprinkle some inside the cavity. Stuff the zested fruit and a small handful of parsley, thyme and sage sprigs inside the bird and set aside for at least 15 mins."
   - "Brown in a large frying pan, pressing down on the breasts for good contact."
   - "Place the bird in an oven tray, then drizzle with the honey and sprinkle with thyme leaves."
-  - "Roast for 10 mins at 240°C, then reduce to 190°C for the rest of the calculated time. Cover with foil if it starts to brown too much."
-  - "Baste the bird with the pan juices every 30 mins or so. Remove to rest. Strain off the fat into a large heatproof bowl and retain for another time — you should get at least 1 litre."
+  - "Roast for 10 mins at 220°C fan, then reduce to 170°C fan for the rest of the calculated time. Baste the bird with the pan juices every 30 mins or so. Cover with foil if it starts to brown too much."
+  - "Remove to rest. Strain off the fat into a large heatproof bowl and retain for another time — at least 1 litre will come off."
   - step: "Rest for at least 30 mins, covered loosely with foil and towels."
     note: "Time to rest is not optional for goose."
 method_short:
   - ""
 notes:
   - label: "Make ahead"
-    text: "Can be prepped up to a day ahead up to the end of step 4, then kept refrigerated."
+    text: "Can be prepped up to a day ahead up to the browning step."
   - label: "Keep the fat"
-    text: "Roast potatoes in the fat!"
+    text: "Roast potatoes. Adjective and imperative."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-08-11"
 ---

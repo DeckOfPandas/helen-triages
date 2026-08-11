@@ -1,7 +1,7 @@
 ---
 title: Teriyaki Salmon
 short_name: Teriyaki Salmon
-tagline: Marinated salmon fillets baked and glazed with a teriyaki marinade. Also great with this [teriyaki sauce](../teriyaki-sauce/).
+tagline: It's teriyaki salmon.
 source: "Adapted from The Daring Gourmet, recipe Kimberly Killebrew"
 serves: 4
 prep_time: "10 mins plus at least 30 mins marinading"
@@ -36,17 +36,17 @@ ingredient_groups:
       item: cornstarch dissolved in 3 tbsp water
 method:
   - "Mix together the marinade ingredients, except for the cornstarch, until the sugar is dissolved. Marinate the salmon in a zip-lock bag and leave for 30 mins."
-  - "Drain the marinade into a small saucepan and set aside. Bake at 180°C fan for 11–14 mins, until it starts to flake with a fork, or to an internal temperature of 57°C at the thickest part."
+  - "Drain the marinade into a small saucepan and set aside. Bake at 170°C fan for 11–14 mins, until it starts to flake with a fork, or to an internal temperature of 57°C at the thickest part."
   - "Boil the reserved marinade, then simmer for 2–3 mins. Thicken with the cornstarch and simmer for another minute. Cool. Towards the end of the salmon's cooking time, brush with some of the sauce."
   - "Serve immediately, with the remaining marinade on the side as a sauce."
 method_short:
   - ""
 notes:
-  - label: "Pairs well with"
-    text: "Also great with this [teriyaki sauce](../teriyaki-sauce/)."
+  - label: "Saving time"
+    text: "The [teriyaki sauce](../teriyaki-sauce/) recipe is this same sauce on its own —  it keeps in the fridge for about a week."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-29"
+  date_last_edited: "2026-08-11"
 ---

@@ -26,7 +26,7 @@ ingredient_groups:
     - amount: "3"
       item: tarragon sprigs
     - amount: "200 g"
-      item: "summer turnips, peeled and chopped"
+      item: "summer turnips, chopped"
     - amount: "2"
       item: "large cooking apples, chopped"
     - amount: "300 g"
@@ -40,9 +40,9 @@ method:
   - "Sear in batches, 2 mins per side. Remove from pan to rest."
   - "Sweat onions, carrots and celery until soft and golden, then increase the heat to brown them. Add the garlic when you're 2 mins from done."
   - Return the chicken to the pan.
-  - "Add cider to deglaze, then the tarragon, and bring to the boil. Then simmer gently for 40 mins."
+  - "Add cider to deglaze, leave for 2 mins without increasing the heat, then add the tarragon and bring to the boil. Simmer gently for 40 mins."
   - "Add more carrots if you like, and turnips and apples, then simmer for 10–15 mins."
-  - "Add the beans, increase the heat, and cook for 5 mins."
+  - "Increase the heat, then add the beans and cook for 5 mins."
   - "Add the crème fraîche, stir to combine, and heat for another 2 mins."
   - Sprinkle the parsley and/or chives to serve.
 method_short:
@@ -56,11 +56,11 @@ method_short:
 notes:
   - label: "Seasoning"
     text: "Season and flavour the liquid with stock cubes, mushroom ketchup, anchovy sauce, Worcestershire sauce, English mustard powder, chicken stock cubes, soy sauce, rice wine or balsamic vinegar, bay leaves, lemon juice, olive oil, anything: whatever it needs and whatever you like."
-  - label: "Peeling"
+  - label: "Philosophy of peeling"
     text: "I never bother peeling vegetables any more because they taste better skin-on. The last time I noticed I was peeling an apple I had an epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I did not continue peeling the apple."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

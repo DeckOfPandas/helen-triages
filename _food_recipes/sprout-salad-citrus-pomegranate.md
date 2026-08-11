@@ -1,7 +1,7 @@
 ---
-title: "Sprout Salad with Citrus and Pomegranate"
-short_name: Sprout Salad Citrus Pomegranate
-tagline: "Light and crunchy."
+title: "Sprout Salad with Hazelnuts"
+short_name: Sprout Salad Hazelnuts
+tagline: "Raw shredded sprouts sound like a hard sell. Toasted hazelnuts, cumin and a citrus-mustard dressing make the case for you."
 source: "Adapted from BBC Good Food, December 2017"
 serves: "4–6"
 prep_time: "10 mins plus chilling"
@@ -32,7 +32,7 @@ ingredient_groups:
       item: "lemon, zested and juiced"
     - amount: "3 tbsp"
       item: "rice vinegar"
-      note: "you can also use cider vinegar plus an extra pinch of sugar"
+      note: "can swap for cider vinegar plus an extra pinch of sugar"
     - amount: "1 tbsp"
       item: golden caster sugar
     - amount: "5 tbsp"
@@ -41,15 +41,17 @@ ingredient_groups:
       item: wholegrain mustard
 method:
   - "Toast the hazelnuts in a frying pan until starting to golden, then set aside to cool. Toast the cumin seeds in the same pan until fragrant, then cool."
-  - "Whisk the dressing ingredients in the pan with the cumin seeds, season generously, then add the onion and set aside."
+  - "Whisk the dressing ingredients in the pan with the cumin seeds. Salt it properly because raw sprout is bitter. Add the onion and set aside."
   - "Pour the dressing over the sprouts and toss very well, then set aside for at least 10 mins or chill for up to 1 hour."
-  - "Fold in the coriander (if using), the pomegranate seeds and the roughly chopped hazelnuts before serving."
+  - "Fold in the coriander, the pomegranate seeds and the roughly chopped hazelnuts before serving."
 method_short:
   - ""
-notes: []
+notes:
+  - label: "one-pan dressing"
+    text: "Making the dressing in the same pan you toasted the cumin in picks up the toasted oil left behind."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-29"
+  date_last_edited: "2026-08-11"
 ---

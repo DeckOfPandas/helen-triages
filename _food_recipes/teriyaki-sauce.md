@@ -28,7 +28,9 @@ ingredient_groups:
     - amount: "60 ml"
       item: water mixed with 3 tsp cornstarch
 method:
-  - "Boil all ingredients in a small saucepan, then reduce the heat and simmer for about 4 mins. Cool."
+  - "Whisk together all the ingredients except the cornstarch in a small saucepan and bring to the boil."
+  - "Reduce the heat, whisk in the cornstarch, and simmer until glossy and thickened enough to coat the back of a spoon, about 4 mins."
+  - "Take off the heat and cool completely — it thickens further as it cools."
 method_short:
   - ""
 notes:
@@ -40,5 +42,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-08-11"
 ---

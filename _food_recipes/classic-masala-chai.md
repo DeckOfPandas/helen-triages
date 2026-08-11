@@ -28,24 +28,24 @@ ingredient_groups:
       note: "preferably Assam or Darjeeling"
     - amount: "460 ml"
       item: "whole milk"
-      note: "or almond and oat milk are good too"
+      note: "almond and oat milk are good too"
     - amount: "1–2 tbsp"
       item: "golden caster sugar, jaggery or any kind of honey, to taste"
 method:
-  - "Put the cardamom, cinnamon, cloves, peppercorns, ginger and 460 ml water in a medium saucepan. Bring to the boil over a medium heat, then simmer for 5–7 mins to allow the spices to infuse the water — the longer you simmer, the stronger the flavour."
-  - "Add the tea leaves to the hot, spiced water. Stir well, then simmer for 2–3 mins. The tea should begin to darken and the flavour should start to infuse."
-  - "Pour in the milk and add the sweetener. Bring back to the boil, stirring occasionally so it doesn't boil over. Then reduce the heat and simmer for 2–3 more mins, allowing the flavours to blend."
-  - "Remove from the heat and strain it into cups or heatproof glasses using a fine mesh strainer — discard the tea and spices."
+  - "Put the cardamom, cinnamon, cloves, peppercorns, ginger and 460 ml water in a medium saucepan. Bring to the boil over a medium heat, then simmer for 5–7 mins, longer for stronger."
+  - "Add the tea leaves to the water. Stir well, then simmer for 2–3 mins. The tea will begin to darken and the flavour will start to infuse."
+  - "Pour in the milk and add any sweetener. Bring back to the boil, stirring occasionally so it doesn't boil over. Then reduce the heat and simmer for 2–3 more mins."
+  - "Remove from the heat and strain into cups or heatproof glasses using a fine mesh strainer, discarding the tea and spices."
 method_short:
   - ""
 notes:
   - label: "Fresh spices"
     text: "Use fresh spices or basically don't bother."
-  - label: "Don't over-boil"
-    text: "Don't over-boil the spices, as they can become bitter — simmering extracts the most flavour."
+  - label: "Pay attention"
+    text: "Don't over-boil the spices, because they turn bitter fast."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-31"
+  date_last_edited: "2026-08-11"
 ---

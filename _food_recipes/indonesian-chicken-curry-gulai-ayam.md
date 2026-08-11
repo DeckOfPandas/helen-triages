@@ -1,7 +1,7 @@
 ---
 title: Indonesian Chicken Curry (Gulai Ayam)
 short_name: Indonesian Chicken Curry
-tagline: It's much better to use whole spices for everything and then grind after dry roasting, if you have the extra 5 mins.
+tagline: "A proper fakeaway, and it freezes like a dream. The ingredient list is long, but there's no filler."
 source: "Adapted from Good Food, August 2024"
 serves: 4
 prep_time: "20 mins plus marinating"
@@ -44,8 +44,10 @@ ingredient_groups:
     - amount: "2 tsp"
       item: tamarind paste
     - amount: "200 ml"
+    - item: "flavourings to taste, like chicken stock cubes, fish sauce, MSG or anything"
       item: coconut cream
     - item: "Steamed white or sticky rice, to serve"
+      note: "I like sticky rice best here"
   - name: bumbu (spice paste)
     items:
     - amount: "8"
@@ -73,14 +75,16 @@ method_groups:
   - name: curry
     steps:
     - Add the chicken and stir to coat in the spices. Cook for about 5 mins. Don't let it burn.
-    - "Add the sugar, tamarind and 100 ml water — skip the water if the mixture is already loose. Add chicken stock cubes and other flavourings. Stir, bring to the boil, then reduce to a simmer."
+    - step: "Add the sugar, tamarind and 100 ml water — skip the water if the mixture is already loose. Add chicken stock cubes and other flavourings. Stir, bring to the boil, then reduce to a simmer."
     - Cover and cook for 20 mins.
     - Add the coconut cream and simmer for 15 mins more until the chicken is cooked through.
     - Pull out the bones — the meat will just fall off.
-    - Serve with steamed rice. I like sticky rice.
+    - Serve with steamed rice.
 method_short:
   - ""
 notes:
+  - label: "Whole vs ground spices"
+    text: "Much better to use whole spices throughout and grind them yourself after dry-roasting, if you've got the extra 5 mins."
   - label: "Scaling up"
     text: "Lemongrass stalks don't need to be scaled up linearly for larger batches."
   - label: "Freezing"
@@ -91,5 +95,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

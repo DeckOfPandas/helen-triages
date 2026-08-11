@@ -12,7 +12,7 @@ tags: ["one-handed food", virtuous, freezable]
 ingredient_groups:
   - items:
     - amount: "300 g"
-      item: "chicken leg, cubed"
+      item: "chicken leg meat, cubed"
     - amount: "1 large"
       item: "onion, diced"
     - amount: "2 medium"
@@ -34,12 +34,12 @@ ingredient_groups:
     - amount: "1 tbsp"
       item: wholegrain mustard
 method:
-  - "Oil and season the chicken, then sear, turning often, 3–4 mins, until golden. Remove."
+  - "Oil and season the chicken, then sear, turning often, until golden, 3–4 mins. Remove."
   - "Sweat the onions, carrots and celery in the chicken fat pan, for 10 mins or more until soft and golden. Add the garlic 2 mins before the end."
   - "Add the white wine without increasing the heat, leave for 2 mins, increase the heat, and let the wine bubble until almost all absorbed."
   - "Add the stock and potatoes, season, then low-boil for 5 mins."
   - "Add the chicken back to the pan, cover, and simmer for 5 mins, then add the beans, re-cover, and simmer for 5 mins more until the chicken and potatoes are cooked through."
-  - step: "Once cooked, add the mustard and sorrel. Don't be shy with the sorrel. Check seasoning, then serve."
+  - step: "Once cooked, add the mustard and sorrel. Don't hold back on the sorrel. Taste before adding more salt — the sorrel's tartness usually means it needs less than you'd think."
     note: Sorrel quickly loses its flavour if overcooked so add it near the end.
 method_short:
   - |
@@ -49,9 +49,12 @@ method_short:
        * Prep sorrel and beans
     * Add chicken back, simmer 5 mins, beans, simmer 5 mins
     * Mustard, sorrel, seasoning
+notes:
+  - label: "Freezing"
+    text: "Freeze the base before adding the mustard and sorrel, then stir both in fresh once reheated — the sorrel won't survive freezing and reheating."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

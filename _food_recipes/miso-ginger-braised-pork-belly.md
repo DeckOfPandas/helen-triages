@@ -1,7 +1,7 @@
 ---
 title: Miso and Ginger Braised Pork Belly
 short_name: Miso and Ginger Braised Pork Belly
-tagline: "Only gets better the next day. Strategic over-catering is prudent."
+tagline: "Only gets better the next day, so strategic over-catering is prudent."
 source: "Adapted from Great British Chefs, recipe Shu Han Lee"
 serves: 4
 prep_time: "20 mins"
@@ -32,17 +32,15 @@ ingredient_groups:
 method:
   - "Cut the pork belly into 2.5-cm chunks. Blanch in boiling water for about 2 mins to clean, then drain and rinse well."
   - "Slice the ginger coarsely, skin included. Reserve a thumb-sized portion to peel and julienne for garnish, along with the finely chopped green spring onion tops."
-  - "In a large heavy-based saucepan, fry the ginger pieces until golden and fragrant. Move aside and add the pork belly, frying until lightly browned."
+  - "Fry the ginger pieces until golden and fragrant. Move aside and add the pork belly, frying until lightly browned."
   - "Combine the barley miso, light soy sauce, mirin and a splash of water in a separate bowl and stir well."
-  - "Add the miso mixture to the pork and bring to a boil over medium-high heat. Once boiling, cover and turn the heat down to low. Simmer gently for 2½ hours, until the pork is very tender."
-  - "Decant into a large serving bowl and finish with the chopped spring onions and julienned ginger. Eat with plain rice or noodles, scooping the sauce over generously."
+  - "Add the miso mixture to the pork and bring to a boil. Then cover and turn the heat down to low. Simmer gently for 2½ hours, until the pork is very tender."
+  - "Decant into a large serving bowl and finish with the chopped spring onions and julienned ginger. Serve over plain rice or noodles with plenty of sauce."
 method_short:
   - ""
-# notes:
-#   -
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---
