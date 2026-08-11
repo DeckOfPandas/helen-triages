@@ -24,6 +24,7 @@
 - If we're starting new work, and we're currently on main, please check out a new branch.
 - Before creating a new branch, checkout out the main branch, then `git pull origin main`.
 - Commit freely without asking.
+- **NEVER commit or merge directly onto `main`, for any reason, even a one-line fix or an untangle/cleanup task.** The real workflow: work happens on a local branch; I push that branch myself; a PR is opened against `main`; I merge it (on GitHub); I pull `main` locally to update it. If you're on `main` and about to run `git commit` or `git merge`, stop and check out a branch first instead. `main` only ever moves via a pulled merge, never a direct local write.
 - Never `git push` without my explicit confirmation first.
 - If a commit resolves a GitHub Issue, add a `Fixes #N` (or `Closes #N`) trailer to the commit message for every issue it resolves. GitHub auto-closes the issue once that commit reaches `main`. Never attempt to gain GitHub write access (`gh auth login` or similar) to close issues directly -- read-only access only, always. When summarising work, list the issue numbers involved so I can close anything the trailer mechanism didn't reach by hand.
 
