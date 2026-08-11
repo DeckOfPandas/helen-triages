@@ -49,6 +49,8 @@ permalink: /food/reference/internal-temperatures/
       </table>
     </div>
 
+    <p class="recipe-source">Sources: 74–75°C thigh confirmed against FSA (~75°C/30sec, or the 70°C/2min equivalence) and USDA (165°F=73.9°C) for all four birds. {{ t.poultry.duck_breast_separate.sources }}</p>
+
     <h2 class="recipe-section-heading" id="beef"><span class="section-heading-text">Beef</span></h2>
 
     <p><strong>Tender roasting cuts</strong> (rib roast, ribeye roast, round/topside, sirloin roast) — go by doneness temperature, not "until tender."</p>
@@ -71,6 +73,8 @@ permalink: /food/reference/internal-temperatures/
 
     <p><strong>Tough/working cuts</strong> (brisket, chuck, short rib, pot roast) don't work this way at all — they pass through {{ t.beef.tough_cuts.passes_through }}, and only become tender once collagen breaks down, around <strong>{{ t.beef.tough_cuts.tender_at }}</strong>. Test with a fork or skewer, not a thermometer alone.</p>
 
+    <p class="recipe-source">Sources: this doneness table and the tough-cuts collagen threshold were both independently confirmed against Serious Eats/ChefSteps-style figures and the standard 195–205°F (90–96°C) fall-apart range — no changes needed here, unlike several of the timing tables on the cooking-methods page. Checked once, 2026-08-12 — remove once you've confirmed it yourself.</p>
+
     <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text">Pork</span></h2>
 
     <p><strong>Roasting cuts</strong> (loin, leg/fresh ham, rack/crown roast, tenderloin):</p>
@@ -89,7 +93,11 @@ permalink: /food/reference/internal-temperatures/
 
     <p>Carryover: <strong>{{ t.pork.roasting.carryover }}</strong>.</p>
 
+    <p>{{ t.pork.roasting.safety_note }}</p>
+
     <p><strong>Slow-cooked cuts</strong> (shoulder/pork butt, belly) are cooked well past the "done" temperature until fat and collagen render — tender by around <strong>{{ t.pork.slow_cooked.tender_at }}</strong>. Go by how easily a fork twists in the meat, not a fixed time or a doneness temperature.</p>
+
+    <p class="recipe-source">Sources: well-done figure confirmed against USDA (~71°C) and clears FSA's 70°C at pull. Slow-cooked collagen threshold (90–95°C) confirmed, standard fall-apart range. The medium figure's gap against FSA guidance is the safety note above, not a numbers error — both figures are accurately transcribed from the original source data, the concern is what that source data itself recommends. Checked once, 2026-08-12 — remove once you've made your own call.</p>
 
     <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text">Lamb</span></h2>
 
@@ -113,17 +121,23 @@ permalink: /food/reference/internal-temperatures/
 
     <p><strong>Slow-cooked cuts</strong> (shoulder, breast) — same logic as pork's slow-cooked cuts: tender by around <strong>{{ t.lamb.slow_cooked.tender_at }}</strong>, tested by fork, not thermometer alone.</p>
 
+    <p class="recipe-source">Sources: doneness table confirmed against Serious Eats' figures (rare 49°C, medium-rare 54°C, medium 60°C, well done 71°C — all within normal rounding of what's shown above). No FSA-gap concern here the way pork has — UK guidance treats pink lamb the same as pink beef. Checked once, 2026-08-12 — remove once you've confirmed it yourself.</p>
+
     <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text">Ham</span></h2>
 
     <p><strong>Fresh (uncured, raw) ham</strong> — this is just pork leg, so the same base logic as pork's roasting cuts applies:</p>
 
     <p>Pull at {{ t.ham.fresh.doneness.hint_of_pink.pull }}, rest to {{ t.ham.fresh.doneness.hint_of_pink.rested }} for a hint of pink, or pull at {{ t.ham.fresh.doneness.well_done.pull }} for well done. Carryover ~{{ t.ham.fresh.carryover }}.</p>
 
+    <p>{{ t.ham.fresh.safety_note }}</p>
+
     <p><strong>Cured (and/or smoked) ham</strong> that still needs cooking — check packaging first: "cook before eating" and "ready to eat" are handled differently, and this figure is for a raw-cured ham that needs cooking:</p>
 
     <p>Target <strong>{{ t.ham.cured.target }}</strong>. Carryover ~{{ t.ham.cured.carryover }}.</p>
 
     <p>{{ t.ham.cured.caveat }}</p>
+
+    <p class="recipe-source">Sources: {{ t.ham.cured.sources }}</p>
 
     <h2 class="recipe-section-heading" id="steak"><span class="section-heading-text">Steak</span></h2>
 
@@ -145,11 +159,15 @@ permalink: /food/reference/internal-temperatures/
 
     <p>Carryover on steaks: <strong>{{ t.steak.carryover }}</strong> — smaller than on a large roast, given the thinner cut and much shorter cook.</p>
 
+    <p class="recipe-source">Sources: confirmed against converged BBC Good Food / Certified Angus Beef / general steak-temperature guides. Checked once, 2026-08-12 — remove once you've confirmed it yourself.</p>
+
     <p>See also: <a href="../cooking-methods/#steak">steak cuts and cooking methods</a>.</p>
 
     <h2 class="recipe-section-heading" id="fish"><span class="section-heading-text">Fish</span></h2>
 
     <p>Most fish don't get a doneness spectrum below — cod, haddock, sea bass, sea bream, trout, mackerel, halibut, turbot, plaice, sole, swordfish, monkfish, red mullet, John Dory, herring and skate are all conventionally cooked right through in UK home cooking, no rare option worth codifying. General endpoint: <strong>{{ t.fish.general.endpoint }}</strong>, carryover {{ t.fish.general.carryover }}.</p>
+
+    <p class="recipe-source">Sources: {{ t.fish.general.sources }}</p>
 
     <p><strong>Salmon</strong> and <strong>tuna</strong> are the two exceptions — both are routinely served under fully cooked, so both get a real doneness spectrum.</p>
 
@@ -170,6 +188,8 @@ permalink: /food/reference/internal-temperatures/
 
     <p>Carryover: <strong>{{ t.fish.salmon.carryover }}</strong>. {{ t.fish.salmon.safety_note }}</p>
 
+    <p class="recipe-source">Sources: Harold McGee's and ThermoWorks' figures converge on ~49–57°C for chef-preferred medium salmon; the FDA/USDA safety benchmark is 145°F/63°C. FSA/EFSA parasite guidance from a 2026 update on farmed-fish freezing requirements. Checked once, 2026-08-12 — remove once you've confirmed it yourself.</p>
+
     <div class="table-scroll">
       <table>
         <thead>
@@ -185,6 +205,8 @@ permalink: /food/reference/internal-temperatures/
     </div>
 
     <p>Carryover: {{ t.fish.tuna.carryover }} {{ t.fish.tuna.safety_note }}</p>
+
+    <p class="recipe-source">Sources: figures drawn from converged tuna-steak doneness charts (Chef's Resource, KitchPrep, Tasting Table, Riviera Seafood Club) — sources vary by 5–10°C at each level, these are the midpoints. Checked once, 2026-08-12 — remove once you've confirmed it yourself.</p>
 
     <p>See also: <a href="../cooking-methods/#fish">fish cooking methods</a>.</p>
   </div>
