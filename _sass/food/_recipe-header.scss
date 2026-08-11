@@ -253,6 +253,26 @@ article.recipe a {
   }
 }
 
+// --- Source --------------------------------------------------------------
+// Moved here from a page-footer block, 2026-08-11 -- source is recipe
+// metadata, so it reads as metadata: directly under the meta grid, not as
+// a footnote at the bottom of the page. Font-size/colour unchanged from the
+// footer version -- GitHub issue #96 already settled that this needs to be
+// legible, not a muted afterthought, and that reasoning doesn't change just
+// because the block moved.
+.recipe-source {
+  font-family: $font-headings;
+  font-size: 0.82rem;
+  color: $color-clear-text;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  margin: 0 0 $space-xs 0;
+
+  &:last-of-type {
+    margin-bottom: $spacing-block-gap;
+  }
+}
+
 // --- Section Headings --------------------------------------------------------
 // INGREDIENTS / METHOD / NOTES, each on a single brush wash. These are the
 // page's landmarks: the whole point is that a cook glancing at a propped-up

@@ -2,7 +2,7 @@
 title: Ben and Jerry's Sweet Cream Base No. 1
 short_name: Ben and Jerrys Sweet Cream Base No. 1
 tagline: "Ben and Jerry say this is their most popular base: ''...creamy, medium body, subtle and understated...''"
-source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book, page 28"
+source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "1 quart"
 prep_time: "10 mins"
 cook_time: none
