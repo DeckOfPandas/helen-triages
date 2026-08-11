@@ -4,6 +4,14 @@ title: "Internal Temperatures"
 permalink: /food/reference/internal-temperatures/
 ---
 
+{% comment %} Every temperature figure on this page is a Liquid lookup into
+   _data/food/internal_temperatures.yml, not a literal — that file is the
+   single source, also read by _layouts/recipe.html for a recipe's own
+   "Internal temp" meta line. Change a number in the data file and both
+   update together. See that file's own header comment for the fuller
+   story and the shapes it uses. {% endcomment %}
+{% assign t = site.data.food.internal_temperatures %}
+
 <article class="recipe">
   <div class="recipe-title">
     <h1 class="recipe-main-title"><span class="recipe-title-text">Internal Temperatures</span></h1>
@@ -31,11 +39,11 @@ permalink: /food/reference/internal-temperatures/
           <tr><th>Bird</th><th>Endpoint</th><th>Carryover</th><th>Notes</th></tr>
         </thead>
         <tbody>
-          <tr><td>Chicken</td><td>74–75°C in the thigh</td><td>1–3°C</td><td>Smaller carryover than a large roast — poultry isn't dense enough to keep climbing much after it's out.</td></tr>
-          <tr><td>Turkey</td><td>74–75°C in the thickest part of the thigh, not touching bone</td><td>1–3°C</td><td>Also check the breast reaches at least 70°C.</td></tr>
-          <tr><td>Goose</td><td>74–75°C in the thigh</td><td>1–3°C</td><td>Rest a full 20–30 minutes regardless — goose is fatty enough that this matters more than the temperature reading does.</td></tr>
-          <tr><td>Duck (whole bird)</td><td>74–75°C in the thigh</td><td>1–3°C</td><td>Cooking a whole duck as one piece means accepting the breast will be more well-done than it would be cooked alone — see below.</td></tr>
-          <tr><td>Duck breast (cooked separately)</td><td>57–60°C for pink meat, then rested</td><td>1–3°C</td><td>Only applies when a breast is cooked on its own, off the bone — not the figure to use for a whole roast bird.</td></tr>
+          <tr><td>Chicken</td><td>{{ t.poultry.chicken.endpoint }}</td><td>{{ t.poultry.chicken.carryover }}</td><td>{{ t.poultry.chicken.note }}</td></tr>
+          <tr><td>Turkey</td><td>{{ t.poultry.turkey.endpoint }}</td><td>{{ t.poultry.turkey.carryover }}</td><td>{{ t.poultry.turkey.note }}</td></tr>
+          <tr><td>Goose</td><td>{{ t.poultry.goose.endpoint }}</td><td>{{ t.poultry.goose.carryover }}</td><td>{{ t.poultry.goose.note }}</td></tr>
+          <tr><td>Duck (whole bird)</td><td>{{ t.poultry.duck.endpoint }}</td><td>{{ t.poultry.duck.carryover }}</td><td>{{ t.poultry.duck.note }}</td></tr>
+          <tr><td>Duck breast (cooked separately)</td><td>{{ t.poultry.duck_breast_separate.endpoint }}</td><td>{{ t.poultry.duck_breast_separate.carryover }}</td><td>{{ t.poultry.duck_breast_separate.note }}</td></tr>
         </tbody>
       </table>
     </div>
@@ -50,17 +58,17 @@ permalink: /food/reference/internal-temperatures/
           <tr><th>Doneness</th><th>Pull at</th><th>After ~15–20 min rest</th></tr>
         </thead>
         <tbody>
-          <tr><td>Rare</td><td>48–50°C</td><td>~52–54°C</td></tr>
-          <tr><td>Medium-rare</td><td>52–54°C</td><td>~56–58°C</td></tr>
-          <tr><td>Medium</td><td>58–60°C</td><td>~62–64°C</td></tr>
-          <tr><td>Well done</td><td>68–70°C</td><td>~72°C</td></tr>
+          <tr><td>Rare</td><td>{{ t.beef.tender_roast.doneness.rare.pull }}</td><td>{{ t.beef.tender_roast.doneness.rare.rested }}</td></tr>
+          <tr><td>Medium-rare</td><td>{{ t.beef.tender_roast.doneness.medium_rare.pull }}</td><td>{{ t.beef.tender_roast.doneness.medium_rare.rested }}</td></tr>
+          <tr><td>Medium</td><td>{{ t.beef.tender_roast.doneness.medium.pull }}</td><td>{{ t.beef.tender_roast.doneness.medium.rested }}</td></tr>
+          <tr><td>Well done</td><td>{{ t.beef.tender_roast.doneness.well_done.pull }}</td><td>{{ t.beef.tender_roast.doneness.well_done.rested }}</td></tr>
         </tbody>
       </table>
     </div>
 
-    <p>Carryover on a large roasting joint: <strong>4–6°C</strong> — bigger than poultry's, because there's more hot mass still driving heat inward after it leaves the oven.</p>
+    <p>Carryover on a large roasting joint: <strong>{{ t.beef.tender_roast.carryover }}</strong> — bigger than poultry's, because there's more hot mass still driving heat inward after it leaves the oven.</p>
 
-    <p><strong>Tough/working cuts</strong> (brisket, chuck, short rib, pot roast) don't work this way at all — they pass through 60–70°C while still tough, and only become tender once collagen breaks down, around <strong>90–96°C</strong>. Test with a fork or skewer, not a thermometer alone.</p>
+    <p><strong>Tough/working cuts</strong> (brisket, chuck, short rib, pot roast) don't work this way at all — they pass through {{ t.beef.tough_cuts.passes_through }}, and only become tender once collagen breaks down, around <strong>{{ t.beef.tough_cuts.tender_at }}</strong>. Test with a fork or skewer, not a thermometer alone.</p>
 
     <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text">Pork</span></h2>
 
@@ -72,15 +80,15 @@ permalink: /food/reference/internal-temperatures/
           <tr><th>Doneness</th><th>Pull at</th><th>After ~15 min rest</th></tr>
         </thead>
         <tbody>
-          <tr><td>Medium (slightly pink, standard today)</td><td>60–62°C</td><td>~63–65°C</td></tr>
-          <tr><td>Well done</td><td>68–70°C</td><td>~71–72°C</td></tr>
+          <tr><td>Medium ({{ t.pork.roasting.doneness.medium.description }})</td><td>{{ t.pork.roasting.doneness.medium.pull }}</td><td>{{ t.pork.roasting.doneness.medium.rested }}</td></tr>
+          <tr><td>Well done</td><td>{{ t.pork.roasting.doneness.well_done.pull }}</td><td>{{ t.pork.roasting.doneness.well_done.rested }}</td></tr>
         </tbody>
       </table>
     </div>
 
-    <p>Carryover: <strong>3–4°C</strong>.</p>
+    <p>Carryover: <strong>{{ t.pork.roasting.carryover }}</strong>.</p>
 
-    <p><strong>Slow-cooked cuts</strong> (shoulder/pork butt, belly) are cooked well past the "done" temperature until fat and collagen render — tender by around <strong>90–95°C</strong>. Go by how easily a fork twists in the meat, not a fixed time or a doneness temperature.</p>
+    <p><strong>Slow-cooked cuts</strong> (shoulder/pork butt, belly) are cooked well past the "done" temperature until fat and collagen render — tender by around <strong>{{ t.pork.slow_cooked.tender_at }}</strong>. Go by how easily a fork twists in the meat, not a fixed time or a doneness temperature.</p>
 
     <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text">Lamb</span></h2>
 
@@ -92,29 +100,29 @@ permalink: /food/reference/internal-temperatures/
           <tr><th>Doneness</th><th>Pull at</th><th>After ~15 min rest</th></tr>
         </thead>
         <tbody>
-          <tr><td>Rare</td><td>50–52°C</td><td>~54–56°C</td></tr>
-          <tr><td>Medium-rare</td><td>54–57°C</td><td>~58–60°C</td></tr>
-          <tr><td>Medium</td><td>60–63°C</td><td>~63–65°C</td></tr>
-          <tr><td>Well done</td><td>68–70°C</td><td>~71–72°C</td></tr>
+          <tr><td>Rare</td><td>{{ t.lamb.roasting.doneness.rare.pull }}</td><td>{{ t.lamb.roasting.doneness.rare.rested }}</td></tr>
+          <tr><td>Medium-rare</td><td>{{ t.lamb.roasting.doneness.medium_rare.pull }}</td><td>{{ t.lamb.roasting.doneness.medium_rare.rested }}</td></tr>
+          <tr><td>Medium</td><td>{{ t.lamb.roasting.doneness.medium.pull }}</td><td>{{ t.lamb.roasting.doneness.medium.rested }}</td></tr>
+          <tr><td>Well done</td><td>{{ t.lamb.roasting.doneness.well_done.pull }}</td><td>{{ t.lamb.roasting.doneness.well_done.rested }}</td></tr>
         </tbody>
       </table>
     </div>
 
-    <p>Carryover: <strong>3–4°C</strong>.</p>
+    <p>Carryover: <strong>{{ t.lamb.roasting.carryover }}</strong>.</p>
 
-    <p><strong>Slow-cooked cuts</strong> (shoulder, breast) — same logic as pork's slow-cooked cuts: tender by around <strong>90–95°C</strong>, tested by fork, not thermometer alone.</p>
+    <p><strong>Slow-cooked cuts</strong> (shoulder, breast) — same logic as pork's slow-cooked cuts: tender by around <strong>{{ t.lamb.slow_cooked.tender_at }}</strong>, tested by fork, not thermometer alone.</p>
 
     <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text">Ham</span></h2>
 
     <p><strong>Fresh (uncured, raw) ham</strong> — this is just pork leg, so the same base logic as pork's roasting cuts applies:</p>
 
-    <p>Pull at 60–62°C, rest to 63–65°C for a hint of pink, or pull at 68–70°C for well done. Carryover ~3–4°C.</p>
+    <p>Pull at {{ t.ham.fresh.doneness.hint_of_pink.pull }}, rest to {{ t.ham.fresh.doneness.hint_of_pink.rested }} for a hint of pink, or pull at {{ t.ham.fresh.doneness.well_done.pull }} for well done. Carryover ~{{ t.ham.fresh.carryover }}.</p>
 
     <p><strong>Cured (and/or smoked) ham</strong> that still needs cooking — check packaging first: "cook before eating" and "ready to eat" are handled differently, and this figure is for a raw-cured ham that needs cooking:</p>
 
-    <p>Target <strong>68–72°C</strong> at the thickest point. Carryover ~3–4°C.</p>
+    <p>Target <strong>{{ t.ham.cured.target }}</strong>. Carryover ~{{ t.ham.cured.carryover }}.</p>
 
-    <p>Cured ham labelling varies a lot (unsmoked vs smoked, wet vs dry-cured, cook-before-eating vs ready-to-eat) — check the packaging instructions against the thermometer reading rather than relying on a generic figure alone.</p>
+    <p>{{ t.ham.cured.caveat }}</p>
 
     <h2 class="recipe-section-heading" id="steak"><span class="section-heading-text">Steak</span></h2>
 
@@ -124,17 +132,17 @@ permalink: /food/reference/internal-temperatures/
           <tr><th>Doneness</th><th>Pull at</th><th>After rest (~5 min)</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td>Blue rare</td><td>46–49°C</td><td>~49–50°C</td><td>Cool red centre, barely warmed</td></tr>
-          <tr><td>Rare</td><td>50–52°C</td><td>~52–54°C</td><td>Red centre, cool-warm</td></tr>
-          <tr><td>Medium-rare</td><td>54–57°C</td><td>~57–59°C</td><td>Warm red-pink centre</td></tr>
-          <tr><td>Medium</td><td>60–63°C</td><td>~63–65°C</td><td>Pink centre</td></tr>
-          <tr><td>Medium-well</td><td>65–68°C</td><td>~68–70°C</td><td>Slight pink, mostly grey-brown</td></tr>
-          <tr><td>Well done</td><td>70°C+</td><td>~72–74°C</td><td>No pink</td></tr>
+          <tr><td>Blue rare</td><td>{{ t.steak.doneness.blue_rare.pull }}</td><td>{{ t.steak.doneness.blue_rare.rested }}</td><td>{{ t.steak.doneness.blue_rare.description }}</td></tr>
+          <tr><td>Rare</td><td>{{ t.steak.doneness.rare.pull }}</td><td>{{ t.steak.doneness.rare.rested }}</td><td>{{ t.steak.doneness.rare.description }}</td></tr>
+          <tr><td>Medium-rare</td><td>{{ t.steak.doneness.medium_rare.pull }}</td><td>{{ t.steak.doneness.medium_rare.rested }}</td><td>{{ t.steak.doneness.medium_rare.description }}</td></tr>
+          <tr><td>Medium</td><td>{{ t.steak.doneness.medium.pull }}</td><td>{{ t.steak.doneness.medium.rested }}</td><td>{{ t.steak.doneness.medium.description }}</td></tr>
+          <tr><td>Medium-well</td><td>{{ t.steak.doneness.medium_well.pull }}</td><td>{{ t.steak.doneness.medium_well.rested }}</td><td>{{ t.steak.doneness.medium_well.description }}</td></tr>
+          <tr><td>Well done</td><td>{{ t.steak.doneness.well_done.pull }}</td><td>{{ t.steak.doneness.well_done.rested }}</td><td>{{ t.steak.doneness.well_done.description }}</td></tr>
         </tbody>
       </table>
     </div>
 
-    <p>Carryover on steaks: <strong>2–3°C</strong> — smaller than on a large roast, given the thinner cut and much shorter cook.</p>
+    <p>Carryover on steaks: <strong>{{ t.steak.carryover }}</strong> — smaller than on a large roast, given the thinner cut and much shorter cook.</p>
 
     <p>See also: <a href="../cooking-methods/#steak">steak cuts and cooking methods</a>.</p>
   </div>

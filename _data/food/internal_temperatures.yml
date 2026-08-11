@@ -1,0 +1,111 @@
+# =============================================================================
+# THE VOCABULARY LAYER for internal temperatures — pull temps, rested temps,
+# endpoints and carryover, single source of truth.
+#
+# Read by:
+#   food/reference/internal-temperatures.html   the lookup page — every number
+#                                                 on it is a Liquid reference
+#                                                 into this file, not a literal
+#   _layouts/recipe.html                        a recipe's own "Internal temp"
+#                                                 meta line, resolved from
+#                                                 `internal_temp_ref` (+
+#                                                 `doneness` where relevant) in
+#                                                 that recipe's front matter
+#
+# Change a number here and both update together — that's the entire point.
+# Before this file existed, the same figures were typed out by hand in the
+# reference page's markdown source and, separately, in whichever recipes
+# happened to mention a temperature — no relationship between the two copies,
+# so a correction in one never reached the other. See HANDOVER's "next step"
+# note on this, 2026-08-11.
+#
+# SHAPE: deliberately not uniform across proteins, because the source data
+# wasn't uniform either — a whole roast bird has one endpoint, a steak has six
+# doneness levels, a tough cut has no doneness spectrum at all, just a
+# tenderness threshold. Four shapes, used as fits:
+#   endpoint + carryover              whole poultry
+#   doneness: { level: {pull, rested} } + carryover   things with a doneness
+#                                                       spectrum (beef/pork/
+#                                                       lamb tender roasts,
+#                                                       ham fresh, steak)
+#   tender_at                         tough/slow-cooked cuts (collagen
+#                                       breakdown, not a pull temperature)
+#   target + carryover                cured ham (one figure, not a range of
+#                                       doneness choices)
+# A consumer (recipe.html, the reference page) checks which keys exist on the
+# node it resolved to, rather than assuming a shape from the protein name.
+# =============================================================================
+
+poultry:
+  chicken:
+    endpoint: "74–75°C in the thigh"
+    carryover: "1–3°C"
+  turkey:
+    endpoint: "74–75°C in the thickest part of the thigh, not touching bone"
+    carryover: "1–3°C"
+    note: "Also check the breast reaches at least 70°C."
+  goose:
+    endpoint: "74–75°C in the thigh"
+    carryover: "1–3°C"
+    note: "Rest a full 20–30 minutes regardless — goose is fatty enough that this matters more than the temperature reading does."
+  duck:
+    endpoint: "74–75°C in the thigh"
+    carryover: "1–3°C"
+    note: "Cooking a whole duck as one piece means accepting the breast will be more well-done than it would be cooked alone."
+  duck_breast_separate:
+    endpoint: "57–60°C for pink meat, then rested"
+    carryover: "1–3°C"
+    note: "Only applies when a breast is cooked on its own, off the bone."
+
+beef:
+  tender_roast:
+    carryover: "4–6°C"
+    doneness:
+      rare: { pull: "48–50°C", rested: "~52–54°C" }
+      medium_rare: { pull: "52–54°C", rested: "~56–58°C" }
+      medium: { pull: "58–60°C", rested: "~62–64°C" }
+      well_done: { pull: "68–70°C", rested: "~72°C" }
+  tough_cuts:
+    passes_through: "60–70°C while still tough"
+    tender_at: "90–96°C"
+
+pork:
+  roasting:
+    carryover: "3–4°C"
+    doneness:
+      medium: { pull: "60–62°C", rested: "~63–65°C", description: "slightly pink, standard for pork today" }
+      well_done: { pull: "68–70°C", rested: "~71–72°C" }
+  slow_cooked:
+    tender_at: "90–95°C"
+
+lamb:
+  roasting:
+    carryover: "3–4°C"
+    doneness:
+      rare: { pull: "50–52°C", rested: "~54–56°C" }
+      medium_rare: { pull: "54–57°C", rested: "~58–60°C" }
+      medium: { pull: "60–63°C", rested: "~63–65°C" }
+      well_done: { pull: "68–70°C", rested: "~71–72°C" }
+  slow_cooked:
+    tender_at: "90–95°C"
+
+ham:
+  fresh:
+    carryover: "3–4°C"
+    doneness:
+      hint_of_pink: { pull: "60–62°C", rested: "~63–65°C" }
+      well_done: { pull: "68–70°C" }
+  cured:
+    carryover: "3–4°C"
+    target: "68–72°C at the thickest point"
+    caveat: "Cured ham labelling varies a lot (unsmoked vs smoked, wet vs dry-cured, cook-before-eating vs ready-to-eat) — check packaging instructions against the thermometer reading rather than relying on this figure alone."
+
+steak:
+  carryover: "2–3°C"
+  doneness:
+    blue_rare: { pull: "46–49°C", rested: "~49–50°C", description: "Cool red centre, barely warmed" }
+    rare: { pull: "50–52°C", rested: "~52–54°C", description: "Red centre, cool-warm" }
+    medium_rare: { pull: "54–57°C", rested: "~57–59°C", description: "Warm red-pink centre" }
+    medium: { pull: "60–63°C", rested: "~63–65°C", description: "Pink centre" }
+    medium_well: { pull: "65–68°C", rested: "~68–70°C", description: "Slight pink, mostly grey-brown" }
+    well_done: { pull: "70°C+", rested: "~72–74°C", description: "No pink" }

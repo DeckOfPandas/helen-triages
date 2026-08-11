@@ -51,6 +51,52 @@ def test_tagline_is_not_blank(recipe):
     )
 
 
+def test_internal_temp_ref_resolves(recipe, internal_temperatures):
+    """`internal_temp_ref` (+ optional `doneness`) must resolve to a real
+
+    path in _data/food/internal_temperatures.yml. _layouts/recipe.html
+    resolves this the same way, dot-segment by dot-segment, via Liquid's
+    `hash[variable]` lookup — Liquid has no equivalent of this assertion, so
+    a typo'd path there doesn't error, it just silently renders no "Internal
+    temp" line at all. This is the only thing that would ever catch that.
+    """
+    ref = recipe.fm.get("internal_temp_ref")
+    doneness = recipe.fm.get("doneness")
+
+    if ref is None:
+        assert doneness is None, (
+            f"{where(recipe)} sets `doneness: {doneness!r}` with no "
+            f"`internal_temp_ref:` to apply it to — it does nothing on its own."
+        )
+        return
+
+    node = internal_temperatures
+    walked = []
+    for key in ref.split("."):
+        walked.append(key)
+        assert isinstance(node, dict) and key in node, (
+            f"{where(recipe)} has `internal_temp_ref: {ref}`, but "
+            f"{'.'.join(walked)} doesn't exist in "
+            f"_data/food/internal_temperatures.yml."
+        )
+        node = node[key]
+
+    if doneness is not None:
+        assert isinstance(node, dict) and "doneness" in node, (
+            f"{where(recipe)} sets `doneness: {doneness!r}`, but "
+            f"internal_temp_ref: {ref} has no `doneness` map in "
+            f"_data/food/internal_temperatures.yml -- that entry uses a "
+            f"different shape (endpoint/target/tender_at), which doesn't "
+            f"take a doneness level."
+        )
+        assert doneness in node["doneness"], (
+            f"{where(recipe)} has `doneness: {doneness!r}`, which isn't one "
+            f"of {sorted(node['doneness'].keys())} under "
+            f"internal_temp_ref: {ref} in "
+            f"_data/food/internal_temperatures.yml."
+        )
+
+
 def test_no_retired_fields(recipe):
     found = {f: why for f, why in RETIRED.items() if f in recipe.fm}
     assert not found, (

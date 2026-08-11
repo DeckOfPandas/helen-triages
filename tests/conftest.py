@@ -158,6 +158,23 @@ def taxonomy() -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
+@pytest.fixture(scope="session")
+def internal_temperatures() -> dict:
+    """_data/food/internal_temperatures.yml — pull temps, endpoints and
+
+    carryover, single source of truth for both the reference page and a
+    recipe's own `internal_temp_ref` front-matter field. See that file's own
+    header comment for the shapes it uses.
+    """
+    path = DATA_DIR / "internal_temperatures.yml"
+    if not path.exists():
+        pytest.skip(
+            "_data/food/internal_temperatures.yml does not exist. These "
+            "tests are the spec for it."
+        )
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
 def where(recipe: Recipe, detail: str = "") -> str:
     """Consistent location prefix for failure messages."""
     return f"_food_recipes/{recipe.slug}.md" + (f" — {detail}" if detail else "")

@@ -9,6 +9,12 @@ cook_time: "15–20 mins"
 main_ingredients: ["beef fillet", "puff pastry", "wild mushrooms", "Parma ham", "Dijon mustard", "egg yolks", "red wine", "shallots", "beef stock"]
 star_ingredient: beef
 tags: [showstopper, "make-ahead"]
+# Your own call, not mine — I picked medium_rare as the classic Wellington
+# centre (see the "Internal temperature" note below), but you know what
+# you've actually served here. Change the doneness key if it's not right;
+# see _data/food/internal_temperatures.yml for the other levels available.
+internal_temp_ref: beef.tender_roast
+doneness: medium_rare
 ingredient_groups:
   - name: wellington
     items:

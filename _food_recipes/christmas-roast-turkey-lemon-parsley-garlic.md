@@ -8,6 +8,7 @@ prep_time: "30 mins"
 cook_time: "2 hrs 30 mins for a 5-kg bird"
 main_ingredients: [turkey, "salted butter", lemon, parsley, garlic, "streaky bacon"]
 star_ingredient: poultry
+internal_temp_ref: poultry.turkey
 tags: [festive, showstopper, "make-ahead"]
 ingredient_groups:
   - name: turkey
