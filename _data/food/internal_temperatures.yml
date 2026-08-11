@@ -109,3 +109,31 @@ steak:
     medium: { pull: "60–63°C", rested: "~63–65°C", description: "Pink centre" }
     medium_well: { pull: "65–68°C", rested: "~68–70°C", description: "Slight pink, mostly grey-brown" }
     well_done: { pull: "70°C+", rested: "~72–74°C", description: "No pink" }
+
+# Only salmon and tuna get a doneness spectrum. Everything else on the
+# cooking-methods page (cod, haddock, sea bass, sea bream, trout, mackerel,
+# halibut, turbot, plaice, sole, swordfish, monkfish, red mullet, John Dory,
+# herring, skate) is conventionally cooked through in UK home cooking, with
+# no rare/medium option worth codifying — `general` below covers those.
+fish:
+  general:
+    endpoint: "~63°C, opaque and flaking"
+    carryover: "1–2°C"
+    note: "The FSA/USDA food-safety benchmark for fish generally, and where most fish are conventionally taken in UK home cooking. See HANDOVER-adjacent note: the cooking-methods page's own \"~55–60°C\" rule of thumb for fish generally sits below this — worth reconciling, not done as part of adding salmon/tuna here."
+  salmon:
+    carryover: "1–2°C"
+    doneness:
+      rare: { pull: "43–49°C", rested: "~45–50°C", description: "Very soft, translucent centre — sushi-grade fish only" }
+      medium_rare: { pull: "49–52°C", rested: "~50–54°C", description: "Slightly opaque, soft, still moist — a common restaurant 'just cooked' salmon" }
+      medium: { pull: "52–57°C", rested: "~54–59°C", description: "Flaky and moist — the most commonly recommended sweet spot" }
+      medium_well: { pull: "57–60°C", rested: "~59–62°C", description: "Firmer, lighter pink centre, less moist" }
+      well_done: { pull: "60–63°C", rested: "~62–65°C", description: "Fully opaque, creamy white throughout — clears the FSA/USDA ~63°C benchmark" }
+    safety_note: "Farmed salmon (most UK supermarket salmon) carries negligible parasite risk per FSA/EFSA and doesn't need pre-freezing to eat rare. Wild-caught salmon is the case where freezing first genuinely matters if serving it under well-done."
+  tuna:
+    carryover: "Often larger than other fish, given how hot the sear usually is — pull 5–10°C below the target, more towards the low end for a very hot pan."
+    doneness:
+      blue_rare: { pull: "38–41°C", description: "Seared exterior only, cool centre — essentially raw within" }
+      rare: { pull: "43–46°C", description: "Warm red centre — the standard way to serve a seared tuna steak" }
+      medium_rare: { pull: "49–52°C", description: "Pink centre, still soft" }
+      well_done: { pull: "60–65°C", description: "Cooked through, dry and firm — not traditional for tuna, but the figure to use for no pink at all" }
+    safety_note: "Standard for sushi-grade tuna, which is typically previously frozen to kill parasites — a supplier/labelling fact, not something a thermometer confirms. Buy from a source that states it, same as for any fish eaten raw or rare."

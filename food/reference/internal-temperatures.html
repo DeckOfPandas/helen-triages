@@ -27,6 +27,7 @@ permalink: /food/reference/internal-temperatures/
       <li><a href="#lamb">Lamb</a></li>
       <li><a href="#ham">Ham</a> (fresh and cured)</li>
       <li><a href="#steak">Steak</a></li>
+      <li><a href="#fish">Fish</a> (salmon, tuna)</li>
     </ul>
 
     <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text">Poultry</span></h2>
@@ -145,5 +146,46 @@ permalink: /food/reference/internal-temperatures/
     <p>Carryover on steaks: <strong>{{ t.steak.carryover }}</strong> — smaller than on a large roast, given the thinner cut and much shorter cook.</p>
 
     <p>See also: <a href="../cooking-methods/#steak">steak cuts and cooking methods</a>.</p>
+
+    <h2 class="recipe-section-heading" id="fish"><span class="section-heading-text">Fish</span></h2>
+
+    <p>Most fish don't get a doneness spectrum below — cod, haddock, sea bass, sea bream, trout, mackerel, halibut, turbot, plaice, sole, swordfish, monkfish, red mullet, John Dory, herring and skate are all conventionally cooked right through in UK home cooking, no rare option worth codifying. General endpoint: <strong>{{ t.fish.general.endpoint }}</strong>, carryover {{ t.fish.general.carryover }}.</p>
+
+    <p><strong>Salmon</strong> and <strong>tuna</strong> are the two exceptions — both are routinely served under fully cooked, so both get a real doneness spectrum.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Salmon doneness</th><th>Pull at</th><th>After rest</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Rare</td><td>{{ t.fish.salmon.doneness.rare.pull }}</td><td>{{ t.fish.salmon.doneness.rare.rested }}</td><td>{{ t.fish.salmon.doneness.rare.description }}</td></tr>
+          <tr><td>Medium-rare</td><td>{{ t.fish.salmon.doneness.medium_rare.pull }}</td><td>{{ t.fish.salmon.doneness.medium_rare.rested }}</td><td>{{ t.fish.salmon.doneness.medium_rare.description }}</td></tr>
+          <tr><td>Medium</td><td>{{ t.fish.salmon.doneness.medium.pull }}</td><td>{{ t.fish.salmon.doneness.medium.rested }}</td><td>{{ t.fish.salmon.doneness.medium.description }}</td></tr>
+          <tr><td>Medium-well</td><td>{{ t.fish.salmon.doneness.medium_well.pull }}</td><td>{{ t.fish.salmon.doneness.medium_well.rested }}</td><td>{{ t.fish.salmon.doneness.medium_well.description }}</td></tr>
+          <tr><td>Well done</td><td>{{ t.fish.salmon.doneness.well_done.pull }}</td><td>{{ t.fish.salmon.doneness.well_done.rested }}</td><td>{{ t.fish.salmon.doneness.well_done.description }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Carryover: <strong>{{ t.fish.salmon.carryover }}</strong>. {{ t.fish.salmon.safety_note }}</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Tuna doneness</th><th>Pull at</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Blue rare</td><td>{{ t.fish.tuna.doneness.blue_rare.pull }}</td><td>{{ t.fish.tuna.doneness.blue_rare.description }}</td></tr>
+          <tr><td>Rare</td><td>{{ t.fish.tuna.doneness.rare.pull }}</td><td>{{ t.fish.tuna.doneness.rare.description }}</td></tr>
+          <tr><td>Medium-rare</td><td>{{ t.fish.tuna.doneness.medium_rare.pull }}</td><td>{{ t.fish.tuna.doneness.medium_rare.description }}</td></tr>
+          <tr><td>Well done</td><td>{{ t.fish.tuna.doneness.well_done.pull }}</td><td>{{ t.fish.tuna.doneness.well_done.description }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Carryover: {{ t.fish.tuna.carryover }} {{ t.fish.tuna.safety_note }}</p>
+
+    <p>See also: <a href="../cooking-methods/#fish">fish cooking methods</a>.</p>
   </div>
 </article>
