@@ -276,7 +276,14 @@ def _unqualified(recipe, word: str, allowed: set[str]) -> list[str]:
                 continue
             if exclude and exclude.search(name):
                 continue
-            if not allowed_pattern.search(name):
+            # The word-presence gate above stays narrow (cut at the first
+            # comma OR paren) so it doesn't fire on the word turning up in
+            # some unrelated later clause. But a qualifier can legitimately
+            # sit in a trailing parenthetical -- "milk (any kind)" -- not
+            # just before the word itself, so the allowed-phrase check gets
+            # a wider scope: cut at the first comma only, keeping any paren.
+            qualify_scope = v.split(",", 1)[0].strip()
+            if not allowed_pattern.search(qualify_scope):
                 bad.append(f"{field} {v!r}")
     return bad
 
@@ -506,19 +513,23 @@ def test_loomi_specifies_colour(recipe):
 
 
 # --- milk: type -- deliberately a standing checklist -------------------------
-# GitHub issue #167, open, picked up 2026-08-12. Deliberately a standing
-# checklist, not a guard expected to be green -- 8 recipes currently say
-# bare "milk" (bens-chocolate-ice-cream, caesar-salad-dressing, delias-
-# classic-pancakes, grandmas-scones, henrys-sunday-waffles, mrs-nicholsons-
-# creme-patissiere, mrs-nicholsons-yorkshire-puddings, old-fashioned-cherry-
-# cake, sweet-shortcrust-pastry-mince-pies), and which milk each original
-# recipe actually specified (whole vs semi-skimmed, almost certainly whole
-# for a bake, but not safe to assume for all nine) needs the source, not a
-# default. Don't bulk-convert to "whole milk" blind.
+# GitHub issue #167, picked up 2026-08-12. Deliberately a standing
+# checklist, not a guard expected to be green -- confirming which milk each
+# original recipe actually specified (whole vs semi-skimmed, almost
+# certainly whole for a bake, but not safe to assume) needs the source, not
+# a default. Don't bulk-convert to "whole milk" blind.
+#
+# "milk (any kind)" added 2026-08-12, Helen's explicit call: some recipes
+# genuinely don't care which milk goes in, and that's a real answer to
+# "confirm from the source", not a dodge of the rule -- it says something
+# was actually checked, the same way a specific type does. Only recognised
+# as a trailing parenthetical, e.g. "milk (any kind), to glaze" -- see
+# _unqualified's qualify_scope for why a parenthetical needs separate
+# handling from a leading qualifier word like "whole".
 _QUALIFIED_MILK = {
     "whole milk", "semi-skimmed milk", "skimmed milk", "buttermilk",
     "oat milk", "almond milk", "soya milk", "coconut milk", "evaporated milk",
-    "condensed milk", "sweetened condensed milk", "goat's milk",
+    "condensed milk", "sweetened condensed milk", "goat's milk", "any kind",
 }
 
 
