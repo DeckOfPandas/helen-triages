@@ -43,21 +43,7 @@
 $index-section-gap: $space-xl;   // between one filter section and the next
 $index-label-gap:   $space-md;   // a label to its own buttons
 
-.category {
-  margin: $index-section-gap 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $index-label-gap;
-
-  .category-label-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: $space-lg;   // horizontal, label to its inline clear link
-  }
-
-  // TYPOGRAPHY MATCHED TO THE RECIPE PAGE'S SECTION HEADINGS, ONE STEP DOWN.
+// TYPOGRAPHY MATCHED TO THE RECIPE PAGE'S SECTION HEADINGS, ONE STEP DOWN.
   // These carry the same blocky rule, so they have to belong to the same voice
   // — but they are filter labels on a control panel, five of them stacked in a
   // screenful, not the three landmarks of a long scrolling page. Same family,
@@ -81,7 +67,22 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // be running heavy enough to swallow the emboss shadow that is the other
   // half of the effect. Same principle this comment already stated, applied
   // everywhere instead of in one place.
-  .category-label {
+  //
+  // DELIBERATELY NOT NESTED INSIDE .category, unlike everything else in this
+  // block. It was, until 2026-08-12, and that quietly excluded the one
+  // .category-label on the page that has no .category ancestor: the results
+  // heading's own "N survivors" count (food/index.html, `<div
+  // class="results-heading"><span class="category-label">`). That element's
+  // comment says it "reuses the exact filter-heading treatment (punched label +
+  // stroke)" -- it intended to and never did, so the count was rendering in the
+  // body sans with no lettering at all while every label above it was Courier.
+  // Found by reading the compiled cascade after Helen asked whether the site-
+  // wide lettering pass had actually reached the landing page's headings.
+  //
+// Nothing needs the .category scope: every .category-label in the markup
+// wants this, and the two rules that legitimately differ (.search
+// .search-input, .category--meta) still out-specify a single class.
+.category-label {
     font-family: $font-headings;
     text-transform: uppercase;
     font-size: 1.35rem;
@@ -112,6 +113,20 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     // filter buttons underneath it — invisible under a wash, obvious under a
     // straight rule.
     padding: 0.22rem 0;
+}
+
+.category {
+  margin: $index-section-gap 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $index-label-gap;
+
+  .category-label-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: $space-lg;   // horizontal, label to its inline clear link
   }
 
   // Brought closer to .btn-clear (the global "clear all", below) and to
@@ -256,7 +271,15 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     .category-label {
       font-size: 0.72rem;
       color: lighten($color-clear-text, 12%);
-      -webkit-text-stroke: 0;
+      // The `-webkit-text-stroke: 0` that used to sit here is gone, 2026-08-12.
+      // It was a workaround for the exact problem the em-based $emboss-stroke
+      // now solves: at 0.72rem the old flat $stroke-light was 4.9% of the type,
+      // heavier than anything else on the site, so switching it off entirely
+      // was the only way to stop this label looking chunkier than the 1.35rem
+      // ones above it. That left it as the one label wearing half the effect --
+      // an emboss shadow with no edge under it. Inheriting the proportional
+      // stroke gives it the whole treatment at its own size; it stays demoted
+      // by size and colour, which is what "local-only appendix" should mean.
     }
   }
 

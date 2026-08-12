@@ -235,6 +235,25 @@ $tape-protrusion: 0.2rem;
   line-height: 1;
   padding: 0 1.4em;
   white-space: nowrap;
+  // ==========================================================================
+  // THE ONE HEADING ON THE SITE THAT IS DELIBERATELY EXCLUDED FROM THE SHARED
+  // PUNCHED-TAPE LETTERING. DO NOT "FIX" IT BY GIVING IT $emboss-stroke OR
+  // @include punched() -- that is what it had, and it did not work.
+  // ==========================================================================
+  // Confirmed as a permanent exception by Helen on 2026-08-12, when the
+  // treatment went site-wide and everything else came onto one ratio: "please
+  // note in the docs that [ FOOD ] is handled differently -- I think it needs
+  // the special treatment." Written up in HANDOVER §13.4.1 as well as here,
+  // because a future pass tidying up "the one element that doesn't match" is
+  // the obvious way to lose this.
+  //
+  // THE REASON IS THE BACKGROUND, and it applies to nothing else on the site.
+  // Every other heading is dark type on $color-bg, where a light copy offset
+  // up-and-left genuinely reads as a highlight. This word is LIGHT TYPE ON THE
+  // TAPE SVG. Its sibling .site-logo-top (HELEN TRIAGES) is a normal consumer
+  // of the shared treatment and was brought onto the ratios the same day; the
+  // two halves of the lockup have always been styled independently.
+  //
   // Redesigned in the issue #122 pass (2026-08-10), replacing the
   // @include punched(raised) + single-pair-shadow version this used to be.
   // That version's fill was pure $color-white -- already the top of the

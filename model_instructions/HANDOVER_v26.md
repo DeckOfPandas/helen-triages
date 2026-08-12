@@ -1260,14 +1260,17 @@ ratio near 2:1.
 
 #### 13.4.1 The punched-tape effect — mechanism, not just description
 
-Helen's device. Used by `.category-label` (the index's filter section
-labels — STAR INGREDIENT, MOOD, etc.), styled in `_sass/food/_layout.scss`,
-**and, since 2026-08-02, by the shared header wordmark** — both HELEN TRIAGES
-and the bracketed site word — styled in `_sass/shared/_layout.scss`; see
-§13.8 for what's specific to the wordmark's use of it. Written out in full
-because "reads as embossed label-maker text" is not enough to reproduce it —
-the actual mechanism, and the trap in it, aren't visible from the compiled
-CSS.
+Helen's device. **Since 2026-08-12 it is on EVERY heading on every site, and
+it is applied from one place: the `h1, h2, h3` rule in
+`_sass/shared/_base.scss`.** Individual components override the colour, the
+size and (on the two biggest) the offset, but none of them opts *in* any more —
+opting in was exactly how the effect came to be missing from some headings and
+mis-tuned on others. `.category-label` (the index's filter section labels —
+STAR INGREDIENT, MOOD, etc., plus the results heading's "N survivors" count)
+lives in `_sass/food/_category-labels.scss`; the header wordmark lives in
+`_sass/shared/_layout.scss`, see §13.8. Written out in full because "reads as
+embossed label-maker text" is not enough to reproduce it — the actual
+mechanism, and the trap in it, aren't visible from the compiled CSS.
 
 **Where it lives.** The mixin is `@include punched($style: raised)`, defined
 in `_sass/shared/_rule.scss`. It moved there from `_sass/food/_rule.scss` on
@@ -1291,7 +1294,7 @@ hypothetical — both are real, tested options.
   This is what gives the sense of a light source and depth. No blur
   specifically: a blurred shadow reads as floating *above* the page, the
   opposite of a letter punched *into* it.
-- `-webkit-text-stroke: $stroke-light $color-label-stroke` is a **separate
+- `-webkit-text-stroke: $emboss-stroke $color-label-stroke` is a **separate
   declaration alongside the mixin call, not inside it**. It's what gives the
   letterform its edge weight.
 
@@ -1300,18 +1303,70 @@ touching the other.** A uniform stroke has no direction in it — it can only
 give a soft, detached-from-the-background edge, not a claim about which way
 the light falls. That claim is what the shadow half is for.
 
-**The trap, with the actual numbers.** `-webkit-text-stroke` is an absolute
-pixel value. Copy a stroke token verbatim onto smaller type and the letters
-get proportionally *fatter* — a chunkier font, not the same font smaller.
-The fix is matching the **proportion** (stroke px ÷ font-size px), never the
-raw token. Worked example, so this is a calculation to repeat, not a number
-to guess: the recipe page's section headings use `$stroke-medium` (0.6px) on
-1.8rem type, which is 0.6 ÷ (1.8 × 16) = **2.08%** of the type size; the
-index's filter labels use `$stroke-light` (0.5px) on 1.35rem, which is 0.5 ÷
-(1.35 × 16) = **2.31%** — close enough to read as the same face at a
-different size. Applying this to new type: compute that percentage on the
-new font-size and pick a stroke that matches it, don't reuse `$stroke-light`
-just because it's nearby in the token list.
+**BOTH HALVES ARE PROPORTIONS OF THE TYPE THEY SIT ON. This is the whole
+trap, and it bit twice before it was understood.** Both `-webkit-text-stroke`
+and a `text-shadow` offset are absolute lengths, so one value across a range
+of type sizes is a range of different letters — and the two failures look
+nothing alike, which is why they were diagnosed years apart:
+
+- **Too much stroke** and the outline fills the counters, leaving the emboss
+  copies no crisp edge to sit against. The letter reads *outlined*, not
+  raised. This is what a flat `0.5px` was doing to 0.85rem meta labels (3.7%
+  of the type).
+- **Too little offset** and the shadow copies barely clear the glyph at all.
+  The letter reads *flat*. This is what a flat `1px` was doing to 1.8rem
+  section headings (3.5%), while the same 1px on a 0.9rem label (6.8%) looked
+  exactly right — the effect was strongest on the smallest type on the site
+  and weakest on the biggest, the opposite of what the source implied.
+
+**So do not write either value as a raw number.** The three fixed stroke
+tokens (`$stroke-heavy` / `$stroke-medium` / `$stroke-light`) were retired on
+2026-08-12; if you find them referenced anywhere, that reference is stale.
+Use instead, both in `_sass/shared/_rule.scss`:
+
+- `$emboss-stroke` — **`0.014em`**, i.e. 1.4% of font-size. An `em` resolves
+  against the element's own computed size, so this is self-scaling and needs
+  no argument, no arithmetic and no maintenance. It is what lets the global
+  `h1, h2, h3` rule work at all, since that rule cannot know what size a
+  heading will turn out to be.
+- `$emboss-offset` (`1px`) and `$emboss-offset-large` (`2px`) — target 6.5%
+  of font-size. These stay hard whole pixels rather than a computed
+  proportion, deliberately: a fractional stroke antialiases harmlessly along
+  an edge, but a fractional shadow offset antialiases the whole duplicate
+  glyph, which is the soft floating read the "no blur" rule exists to
+  prevent. 1px up to about 1.2rem, 2px from about 1.6rem. Only the recipe
+  title and the recipe section headings need the large one.
+
+The two ratios aren't invented — they're where the two elements that
+demonstrably worked already sat: HELEN TRIAGES at 6.3% offset after Helen
+tuned it by hand, and the longform Tips label at 6.8% offset / 1.4% stroke,
+which is the element she pointed at ("it looks better than the lettering for
+my existing page headings — am I imagining this?"). She wasn't.
+
+**`[ FOOD ]` IS THE ONE DELIBERATE EXCLUSION, AND IT MUST STAY EXCLUDED.**
+`.site-logo-word` — the bracketed site word sitting on the tape, `[ FOOD ]` /
+`[ COCKTAILS ]` — sets `-webkit-text-stroke: 0` and does **not** call
+`punched()`. It carries a bespoke four-copy `text-shadow` instead (two pairs:
+one tight and crisp right at the glyph edge, one wider and softer further
+out), built in the issue #122 pass on 2026-08-10. That is not an unconverted
+straggler and it is not drift: it is a different problem being solved.
+
+The reason is the background. Every other heading on the site is dark type on
+`$color-bg`, so a light copy up-and-left genuinely reads as a highlight. This
+word is **light type sitting on the tape SVG**, and the version before #122
+did call `punched(raised)` — with the result that the "light" copy (a mid
+grey) came out *darker* than the near-white letter it was supposed to lift.
+No headroom, no raised read, "just looks like two sets of lettering" (Helen).
+The fix pulled the fill off pure white to `#e7e2e3` so a brighter copy has
+somewhere to exist, and split one shadow pair into two so the letter gets both
+a cut line and a glow.
+
+Applying `$emboss-stroke` or `punched()` here would undo that. Its sibling
+`.site-logo-top` (HELEN TRIAGES) is a normal consumer and *was* brought onto
+the ratios on 2026-08-12; the two halves of the lockup have always been
+styled independently and always will be. If the lockup ever looks mismatched,
+the answer is to tune `.site-logo-word`'s own four copies, not to hand it the
+shared treatment.
 
 **One explicit exclusion: no square brackets around punched-tape text.**
 Tried, cut. Brackets are the wordmark's own device — `[ FOOD ]` /
@@ -1339,17 +1394,25 @@ the full punched treatment, matched to these same headings' proportions
 (the §13.4.1 worked example above), while the headings it was matched *to*
 still used the plain version. All four now call `@include punched(raised)`
 and use `$color-label-stroke` for the stroke colour, same as the index and
-the wordmark — stroke *widths* unchanged throughout (still `$stroke-heavy`/
-`$stroke-medium`/`$stroke-light` per element, the existing hierarchy), only
-the colour and the shadow are new. `.btn-method-toggle` deliberately did
-**not** get this — it's documented as matching the index's
-`.btn-clear-inline`, which has no stroke or punch treatment at all, so
-changing just the recipe-page half of that pair would have created a new
-inconsistency rather than closed one. `.recipe-body-content h2` (§4.1) was
-built with the punched treatment from the start, matched to
-`.recipe-group-heading`'s exact proportions; its `h3` deliberately stayed
-plain, on purpose — see the comment above `.recipe-body-content h2` in
-`_recipe.scss` for why that split is the hierarchy, not an oversight.
+the wordmark. Stroke *widths* stayed per-element on that pass and drifted for
+another ten days; they are all `$emboss-stroke` now — see the proportion
+section above. `.btn-method-toggle` deliberately did **not** get this — it's
+documented as matching the index's `.btn-clear-inline`, which has no stroke
+or punch treatment at all, so changing just the recipe-page half of that pair
+would have created a new inconsistency rather than closed one.
+
+**`.recipe-body-content h3` is no longer an exception.** An earlier version of
+this section said it "deliberately stayed plain, on purpose... that split is
+the hierarchy, not an oversight." That is out of date as of 2026-08-12: it now
+takes the treatment from the global rule like every other heading, and states
+only its stroke *colour* locally (`shared/` may name just the nine
+palette-contract variables, so it outlines in `$color-text` by default, which
+is too dark against this element's own lightened grey). The hierarchy between
+`h2` and `h3` in body content is carried by size, colour and spacing, which
+was always doing the real work — "no emboss at all" was one level of
+difference too many, and it made `h3` the odd heading out on a site where
+every other one is embossed. The about page's FAQ questions are the visible
+case.
 
 **To extend the device somewhere new:** `@include punched(raised)`, plus a
 stroke computed at the same proportion as `.category-label`'s (or the recipe
