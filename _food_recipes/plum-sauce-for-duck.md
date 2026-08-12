@@ -1,14 +1,13 @@
 ---
-title: Plum Sauce for Duck
-short_name: Plum Sauce for Duck
+title: "Plum Sauce for Duck"
 tagline: "This is plum sauce...for duck."
-source: Original
-serves: 2
+source: "Original"
+serves: "2"
 prep_time: "5 mins"
 cook_time: "15 mins"
-main_ingredients: [plums, "red wine", "beef stock", "plum jam"]
-star_ingredient: fruit
-tags: [extras]
+main_ingredients: ["plums", "red wine", "beef stock", "plum jam"]
+star_ingredient: "fruit"
+tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "2–3"
@@ -36,4 +35,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

@@ -1,14 +1,13 @@
 ---
 title: "Ben's Chocolate Ice Cream"
-short_name: "Ben's Chocolate Ice Cream"
 tagline: "As rich as they come, real chocolate and all the goodies."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
 prep_time: "20 mins"
 cook_time: "None"
-main_ingredients: ["unsweetened chocolate", "whole milk", eggs, "golden caster sugar", "whipping cream", "vanilla extract"]
-star_ingredient: chocolate
-tags: [dessert, "ice cream", "make-ahead"]
+main_ingredients: ["unsweetened chocolate", "whole milk", "eggs", "golden caster sugar", "whipping cream", "vanilla extract"]
+star_ingredient: "chocolate"
+tags: ["dessert", "ice cream", "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "100 g"
@@ -41,4 +40,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

@@ -1,14 +1,13 @@
 ---
-title: Teriyaki Salmon
-short_name: Teriyaki Salmon
-tagline: It's teriyaki salmon.
+title: "Teriyaki Salmon"
+tagline: "It's teriyaki salmon."
 source: "Adapted from The Daring Gourmet, recipe Kimberly Killebrew"
-serves: 4
+serves: "4"
 prep_time: "10 mins plus at least 30 mins marinading"
 cook_time: "11–14 mins"
-main_ingredients: [salmon, tamari, mirin, "dark brown soft sugar", honey, "fresh garlic", "fresh ginger", "rice vinegar"]
-star_ingredient: oily fish
-tags: [fakeaway, "make-ahead"]
+main_ingredients: ["salmon", "tamari", "mirin", "dark brown soft sugar", "honey", "garlic cloves", "fresh ginger", "rice vinegar"]
+star_ingredient: "oily fish"
+tags: ["fakeaway", "make-ahead"]
 ingredient_groups:
   - name: salmon
     items:
@@ -49,4 +48,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

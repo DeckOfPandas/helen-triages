@@ -1,14 +1,13 @@
 ---
-title: Beetroot Chocolate Cake
-short_name: Beetroot Chocolate Cake
+title: "Beetroot Chocolate Cake"
 tagline: "Beetroot isn't here for health reasons, I promise. It keeps the cake moist under all the chocolate."
 source: "Adapted from BBC Food, recipe Nigel Slater"
-makes: one 8-inch cake
-prep_time: 15 mins
+makes: "one 8-inch cake"
+prep_time: "15 mins"
 cook_time: "40 mins"
-main_ingredients: [beetroot, "dark chocolate", "cocoa powder", "salted butter", "plain flour", "golden caster sugar", eggs]
-star_ingredient: chocolate
-tags: [bakes]
+main_ingredients: ["beetroot", "dark chocolate", "cocoa powder", "salted butter", "plain flour", "golden caster sugar", "eggs"]
+star_ingredient: "chocolate"
+tags: ["bakes"]
 ingredient_groups:
   - items:
     - amount: "200 g"
@@ -51,4 +50,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

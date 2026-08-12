@@ -1,13 +1,12 @@
 ---
-title: Toad in the Hole
-short_name: Toad in the Hole
-tagline: Sausages baked into a giant Yorkshire pudding. The oven door stays shut until it's done.
-source: Adapted from Jamie Oliver
-serves: 4
+title: "Toad in the Hole"
+tagline: "Sausages baked into a giant Yorkshire pudding. The oven door stays shut until it's done."
+source: "Adapted from Jamie Oliver"
+serves: "4"
 prep_time: "10 mins"
 cook_time: "40 mins"
-main_ingredients: [sausages, "plain flour", eggs, "whole milk", "red onions", "balsamic vinegar", "fresh rosemary"]
-star_ingredient: pork
+main_ingredients: ["sausages", "plain flour", "eggs", "whole milk", "red onions", "balsamic vinegar", "fresh rosemary"]
+star_ingredient: "pork"
 tags: ["carbs party"]
 ingredient_groups:
   - name: sausages
@@ -58,4 +57,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

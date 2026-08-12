@@ -1,14 +1,13 @@
 ---
-title: Vietnamese-Spiced Braised Muntjac Haunch
-short_name: Vietnamese-Spiced Braised Muntjac Haunch
-tagline: Yeah I know, I'd never seen those words before until now either.
-source: Helen
-serves: 4
+title: "Vietnamese-Spiced Braised Muntjac Haunch"
+tagline: "Yeah I know, I'd never seen those words before until now either."
+source: "Helen"
+serves: "4"
 prep_time: "20 mins"
 cook_time: "2 hrs"
 main_ingredients: ["muntjac haunch", "lemongrass stalks", "fresh ginger", "cinnamon stick", "star anise", "fish sauce", "coconut palm sugar", "beef stock", "yellow loomi"]
-star_ingredient: game
-tags: [fakeaway, "make-ahead"]
+star_ingredient: "game"
+tags: ["fakeaway", "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "1 kg"
@@ -57,4 +56,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

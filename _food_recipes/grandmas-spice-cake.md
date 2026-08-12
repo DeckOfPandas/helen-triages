@@ -1,6 +1,5 @@
 ---
 title: "Grandma's Spice Cake"
-short_name: "Grandma's Spice Cake"
 tagline: "How can you beat this. Change the spices if you like, but this is the original recipe."
 source: "Grandma Kath"
 makes: "one 7-inch round cake"
@@ -8,15 +7,15 @@ prep_time: "10 mins"
 cook_time: "35 mins"
 main_ingredients: ["salted butter", "Demerara sugar", "golden syrup", "self-raising flour", "ground ginger", "mixed spice powder"]
 star_ingredient:
-tags: [bakes]
+tags: ["bakes"]
 ingredient_groups:
   - items:
     - amount: "4 oz"
       item: salted butter
     - amount: "4 oz"
       item: Demerara sugar
-    - amount: "1"
-      item: large egg
+    - amount: "1 large"
+      item: egg
     - amount: "1 tbsp"
       item: golden syrup
     - amount: ½ tsp

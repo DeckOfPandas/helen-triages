@@ -1,14 +1,13 @@
 ---
-title: Best-Ever Chocolate Sponge Cake
-short_name: Best-Ever Chocolate Sponge Cake
-tagline: Needs no introduction. Stop the search.
+title: "Best-Ever Chocolate Sponge Cake"
+tagline: "Needs no introduction. Stop the search."
 source: "Adapted from Green & Black's Chocolate Recipes"
 makes: "one double-layer 8-inch cake"
-prep_time: 20 mins
+prep_time: "20 mins"
 cook_time: "20–25 mins"
-main_ingredients: ["cocoa powder", "dark chocolate", "salted butter", eggs, "plain flour", "vanilla extract", salt]
-star_ingredient: chocolate
-tags: [bakes, showstopper]
+main_ingredients: ["cocoa powder", "dark chocolate", "salted butter", "eggs", "plain flour", "vanilla extract", "salt"]
+star_ingredient: "chocolate"
+tags: ["bakes", "showstopper"]
 ingredient_groups:
   - name: cake
     items:
@@ -81,4 +80,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

@@ -1,6 +1,5 @@
 ---
 title: "Gluten-Free Crumble Topping"
-short_name: "Gluten-Free Crumble Topping"
 tagline: "Surprisingly good."
 source: "Henry"
 makes: "Enough to top a 1.5 l dish (22 x 17 cm) — about one food processor bowl full"

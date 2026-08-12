@@ -1,6 +1,5 @@
 ---
-title: Garam Masala
-short_name: Garam Masala
+title: "Garam Masala"
 tagline: "If you can't be bothered to make this from scratch, can you really be bothered to cook?"
 source: "Adapted from indianhealthyrecipes.com"
 makes: "approx. 140 g"
@@ -47,4 +46,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-31"
+
 ---

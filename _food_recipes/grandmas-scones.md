@@ -1,14 +1,13 @@
 ---
 title: "Grandma's Scones"
-short_name: "Grandma's Scones"
 tagline: "Rock cakes to anyone else, but scones to me."
-source: Grandma Kath
+source: "Grandma Kath"
 makes: "2 large rounds of 4"
 prep_time: "10 mins"
 cook_time: "15–20 mins"
-main_ingredients: ["self-raising flour", "salted butter", "golden caster sugar", sultanas, egg, milk]
+main_ingredients: ["self-raising flour", "salted butter", "golden caster sugar", "sultanas", "egg", "milk"]
 star_ingredient:
-tags: [bakes]
+tags: ["bakes"]
 ingredient_groups:
   - items:
     - amount: "8 oz"
@@ -40,4 +39,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-13"
+
 ---

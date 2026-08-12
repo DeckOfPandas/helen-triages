@@ -1,12 +1,11 @@
 ---
-title: Cauliflower Cheese
-short_name: Cauliflower Cheese
-tagline: The cauliflower is really just a vehicle for the cheese sauce.
-source: Adapted from Gordon Ramsay Restaurants
-serves: 5 (or...1)
-prep_time: 15 mins
+title: "Cauliflower Cheese"
+tagline: "The cauliflower is really just a vehicle for the cheese sauce."
+source: "Adapted from Gordon Ramsay Restaurants"
+serves: "5 (or...1)"
+prep_time: "15 mins"
 cook_time: "20-25 mins"
-main_ingredients: [cauliflower, cheddar, "lancashire cheese", "cheshire cheese", breadcrumbs, "whole milk", "salted butter", "plain flour", "English mustard"]
+main_ingredients: ["cauliflower", "cheddar", "lancashire cheese", "cheshire cheese", "breadcrumbs", "whole milk", "salted butter", "plain flour", "English mustard"]
 star_ingredient:
 tags: ["cheese-tastic", "one-handed food"]
 ingredient_groups:
@@ -55,4 +54,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

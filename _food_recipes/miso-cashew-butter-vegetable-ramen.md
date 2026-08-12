@@ -1,14 +1,13 @@
 ---
-title: Miso and Cashew Butter Vegetable Ramen
-short_name: Miso Cashew Butter Vegetable Ramen
+title: "Miso and Cashew Butter Vegetable Ramen"
 tagline: "Cashew butter for texture. Whisk, simmer, done."
 source: "Adapted from BBC Food, recipe Rachel Phipps"
-serves: 2
-prep_time: 5 mins
+serves: "2"
+prep_time: "5 mins"
 cook_time: "10–30 mins"
-main_ingredients: ["ramen noodles", "white miso", "cashew butter", "vegetable stock", "rice vinegar", "dark soy sauce", edamame, "pak choi", "tenderstem broccoli", "spring onions", carrot, "fresh garlic", "fresh ginger"]
-star_ingredient: greens
-tags: [soup]
+main_ingredients: ["ramen noodles", "white miso", "cashew butter", "vegetable stock", "rice vinegar", "dark soy sauce", "edamame", "pak choi", "tenderstem broccoli", "spring onions", "carrot", "garlic cloves", "fresh ginger"]
+star_ingredient: "greens"
+tags: ["soup"]
 ingredient_groups:
   - name: ramen
     items:
@@ -26,12 +25,12 @@ ingredient_groups:
       item: ramen noodles
     - amount: "½ tbsp"
       item: toasted sesame oil
-    - amount: "1"
-      item: "large garlic clove, grated"
+    - amount: "1 large"
+      item: "garlic clove, grated"
     - item: "thumb-sized piece of fresh ginger, grated"
   - name: to serve
     items:
-    - amount: "2"
+    - amount: "2 large"
       item: "soft-boiled eggs, halved (optional) — soy mirin eggs, ajitsuke tamago, are great"
     - amount: "2"
       item: "spring onions, finely sliced"
@@ -56,4 +55,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

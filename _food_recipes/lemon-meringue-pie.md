@@ -1,14 +1,13 @@
 ---
-title: Lemon Meringue Pie
-short_name: Lemon Meringue Pie
+title: "Lemon Meringue Pie"
 tagline: "Fits inside my round white ceramic dish. Pastry recipe makes two lots — freeze the other half."
-source: Grandma Kath
+source: "Grandma Kath"
 makes: "one pie"
 prep_time: "30 mins in stages"
 cook_time: "55 mins plus cooling"
 main_ingredients: ["plain flour", "unsalted butter", "egg yolk", "lemon curd", "egg whites"]
 star_ingredient:
-tags: [bakes, dessert, showstopper]
+tags: ["bakes", "dessert", "showstopper"]
 ingredient_groups:
   - name: pastry base
     items:
@@ -57,4 +56,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

@@ -1,14 +1,13 @@
 ---
 title: "Jerry's Chocolate Ice Cream"
-short_name: "Jerry's Chocolate Ice Cream"
 tagline: "Chocolate three ways, and no cooked-custard fuss."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
-prep_time: 10 mins
-cook_time: None
-main_ingredients: ["unsweetened chocolate", "cocoa powder", "whipping cream", eggs, "golden caster sugar", "dark chocolate chips", "whole milk"]
-star_ingredient: chocolate
-tags: [dessert, "ice cream", "make-ahead"]
+prep_time: "10 mins"
+cook_time: "None"
+main_ingredients: ["unsweetened chocolate", "cocoa powder", "whipping cream", "eggs", "golden caster sugar", "dark chocolate chips", "whole milk"]
+star_ingredient: "chocolate"
+tags: ["dessert", "ice cream", "make-ahead"]
 ingredient_groups:
   - name: ice cream
     items:
@@ -42,4 +41,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

@@ -1,6 +1,5 @@
 ---
-title: Chai Spice Powder
-short_name: Chai Spice Powder
+title: "Chai Spice Powder"
 tagline: "The best way to spicy bakes and [chai-spiced milk tea](../chai-spiced-milk-tea/)."
 source: "Adapted from indianhealthyrecipes.com"
 makes: "approx. 75 g"
@@ -44,7 +43,7 @@ method_groups:
   - name: Grind
     steps:
       - step: "Cool completely, then grind to a powder."
-        note: "coarse is fine for chai alone, but a fine powder blends better as an ingredient for food recipes"
+        note: "Coarse is fine for chai alone, but a fine powder blends better as an ingredient for food recipes."
 method_short:
   - ""
 notes:
@@ -61,4 +60,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

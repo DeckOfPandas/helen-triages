@@ -1,14 +1,13 @@
 ---
 title: "Pan-Seared Venison with Blueberries, Shallots and Red Wine"
-short_name: Venison with Blueberry Sauce
 tagline: "Blueberries in a meat sauce sounds like a mistake until you taste it."
-source: Adapted from Jamie Oliver
-serves: 4
+source: "Adapted from Jamie Oliver"
+serves: "4"
 prep_time: "10 mins"
 cook_time: "15 mins"
-main_ingredients: [venison, blueberries, shallots, "red wine", thyme, "juniper berries"]
-star_ingredient: game
-tags: [showstopper, virtuous]
+main_ingredients: ["venison", "blueberries", "shallots", "red wine", "thyme", "juniper berries"]
+star_ingredient: "game"
+tags: ["showstopper", "virtuous"]
 ingredient_groups:
   - items:
     - amount: "1 small handful"
@@ -27,8 +26,8 @@ ingredient_groups:
     - amount: "200 g"
       item: fresh blueberries
       note: "thaw and drain well if using frozen"
-    - amount: "2"
-      item: "large pats of salted butter"
+    - amount: "2 large"
+      item: "pats of salted butter"
 method:
   - "Crush the thyme and juniper berries in a pestle and mortar with salt and pepper. Loosen with olive oil. Pat the venison dry and rub the oil mixture all over it."
   - "Sear in a hot pan on all sides — roughly 6 mins for medium rare, 7–8 mins for medium. Cover and rest on a plate for 4 mins."
@@ -46,4 +45,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

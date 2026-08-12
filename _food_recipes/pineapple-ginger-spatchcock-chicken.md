@@ -1,13 +1,12 @@
 ---
 title: "Pineapple and Ginger Spatchcock Chicken"
-short_name: "Pineapple and Ginger Spatchcock Chicken"
 tagline: "Pineapple and ginger instead of capsicum, with Szechuan pepper because we all love the pain."
 source: "delicious. magazine"
-serves: 6
+serves: "6"
 prep_time: "40 mins"
 cook_time: "45 mins"
 main_ingredients: ["whole chicken", "pineapple", "fresh ginger"]
-star_ingredient: poultry
+star_ingredient: "poultry"
 internal_temp_ref: poultry.chicken
 tags: ["showstopper"]
 ingredient_groups:
@@ -60,4 +59,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

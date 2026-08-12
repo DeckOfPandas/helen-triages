@@ -1,14 +1,13 @@
 ---
 title: "Miso Salmon and Veg Traybake"
-short_name: Miso Salmon Veg Traybake
 tagline: "Sweet and sticky but still virtuous."
 source: "Adapted from Good Food 2026 calendar"
-serves: 2
+serves: "2"
 prep_time: "10 mins"
 cook_time: "35 mins"
-main_ingredients: ["salmon or trout", "sweet potatoes", broccoli, "pak choi", "white miso", "mirin", "dark brown soft sugar", "fresh ginger"]
-star_ingredient: oily fish
-tags: [virtuous]
+main_ingredients: ["salmon or trout", "sweet potatoes", "broccoli", "pak choi", "white miso", "mirin", "dark brown soft sugar", "fresh ginger"]
+star_ingredient: "oily fish"
+tags: ["virtuous"]
 ingredient_groups:
   - name: traybake
     items:
@@ -38,10 +37,10 @@ ingredient_groups:
     - item: greens like broccoli and pak choi
 method:
   - step: "Combine the marinade ingredients with 2 tbsp water in a large bowl. Pour half of the marinade into a smaller bowl, then add the salmon to the large bowl. Coat thoroughly."
-    note: "large bowl = raw fish-ed bowl, small bowl = clean bowl"
+    note: "Large bowl = raw fish-ed bowl, small bowl = clean bowl."
   - "Slice the sweet potatoes into ½-cm slices. Toss with oil and salt on a baking tray, then arrange in an even layer. Bake at 170°C fan for 15–20 mins until almost tender."
   - step: "Add the salmon and greens to the tray. Sprinkle over the sesame seeds, drizzle over any marinade left in the large bowl and return to the oven for 11-14 mins, until the salmon flakes easily."
-    note: "raw fish-ed bowl marinade is fine here — it's getting back in the oven to cook off"
+    note: "Raw fish-ed bowl marinade is fine here — it's getting back in the oven to cook off."
   - "Serve immediately, drizzling the salmon with the rest of the miso marinade from the clean bowl. Garnish with the spring onions."
 method_short:
   - ""
@@ -54,4 +53,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

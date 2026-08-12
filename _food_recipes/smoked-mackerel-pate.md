@@ -1,14 +1,13 @@
 ---
-title: Smoked Mackerel Pâté
-short_name: Smoked Mackerel Pâté
+title: "Smoked Mackerel Pâté"
 tagline: "Couldn't be easier. Once impressed Grandma's local WI."
-source: Sue
-serves: Depends on appetite
+source: "Sue"
+serves: "Depends on appetite"
 prep_time: "5 mins"
-cook_time: None
+cook_time: "None"
 main_ingredients: ["smoked mackerel fillets", "cream cheese", "lemon juice"]
-star_ingredient: oily fish
-tags: [nibbles, starter, "no-cook"]
+star_ingredient: "oily fish"
+tags: ["nibbles", "starter", "no-cook"]
 ingredient_groups:
   - items:
     - amount: "200 g"
@@ -29,4 +28,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

@@ -1,13 +1,12 @@
 ---
-title: Slow-Cooked Beef Short Ribs in Red Wine
-short_name: Slow-Cooked Beef Short Ribs
+title: "Slow-Cooked Beef Short Ribs in Red Wine"
 tagline: "Sear it, forget about it for three hours, then squeeze a whole head of roasted garlic all up in there."
 source: "Adapted from Gordon Ramsay's Ultimate Cookery Course"
-serves: 4
+serves: "4"
 prep_time: "20 mins"
 cook_time: "3 hrs 30 mins"
-main_ingredients: ["beef short ribs", "red wine", "beef stock", "fresh garlic", "tomato purée"]
-star_ingredient: beef
+main_ingredients: ["beef short ribs", "red wine", "beef stock", "garlic cloves", "tomato purée"]
+star_ingredient: "beef"
 tags: ["make-ahead", "one-handed food"]
 ingredient_groups:
   - items:
@@ -40,4 +39,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

@@ -1,14 +1,13 @@
 ---
-title: Double Chocolate Frap
-short_name: Double Chocolate Frap
+title: "Double Chocolate Frap"
 tagline: "Nearly as good as Starbucks, but you can still fit in dinner."
-source: Helen
-serves: 2
+source: "Helen"
+serves: "2"
 prep_time: "5 mins"
-cook_time: None
-main_ingredients: [ice, "whole milk", "Hershey's chocolate syrup", "cocoa powder", "xanthan gum", "vanilla essence", "golden granulated sugar"]
-star_ingredient: chocolate
-tags: [drinks, "no-cook"]
+cook_time: "None"
+main_ingredients: ["ice", "whole milk", "Hershey's chocolate syrup", "cocoa powder", "xanthan gum", "vanilla essence", "golden granulated sugar"]
+star_ingredient: "chocolate"
+tags: ["drinks", "no-cook"]
 ingredient_groups:
   - items:
     - amount: "250 g"
@@ -38,4 +37,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-29"
+
 ---

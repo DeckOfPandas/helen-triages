@@ -1,14 +1,13 @@
 ---
 title: "Grandma's Lemon Curd"
-short_name: "Grandma's Lemon Curd"
 tagline: "Good for jarring, cakes, or lemon meringue pie."
-source: Grandma Kath
-makes: Enough for one normal lemon meringue pie
+source: "Grandma Kath"
+makes: "Enough for one normal lemon meringue pie"
 prep_time: "10 mins"
 cook_time: "20 mins"
-main_ingredients: [lemons, "salted butter", "golden caster sugar", eggs, cornflour]
-star_ingredient: fruit
-tags: [extras, "make-ahead"]
+main_ingredients: ["lemons", "salted butter", "golden caster sugar", "eggs", "cornflour"]
+star_ingredient: "fruit"
+tags: ["extras", "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "3 oz"
@@ -17,8 +16,8 @@ ingredient_groups:
       item: golden caster sugar
     - amount: "2 heaped tsp"
       item: cornflour
-    - amount: "3"
-      item: "large lemons, rind and juice"
+    - amount: "3 large"
+      item: "lemons, rind and juice"
     - amount: "3 large"
       item: eggs
     - item: knob of salted butter, optional
@@ -39,4 +38,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

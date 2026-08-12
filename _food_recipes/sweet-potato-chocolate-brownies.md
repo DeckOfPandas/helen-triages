@@ -1,14 +1,13 @@
 ---
-title: Sweet Potato Chocolate Brownies
-short_name: Sweet Potato Chocolate Brownies
+title: "Sweet Potato Chocolate Brownies"
 tagline: "These don't exactly not taste like sweet potato, but they also taste of chocolate brownie, and they're fun to eat."
-source: Adapted from Healthier Baking
+source: "Adapted from Healthier Baking"
 makes: "16 squares"
 prep_time: "15 mins plus cooling"
 cook_time: "1 hr 30 mins"
 main_ingredients: ["sweet potatoes", "almond butter", "cocoa powder", "dark chocolate", "maple syrup", "plain flour"]
-star_ingredient: root veg
-tags: [bakes]
+star_ingredient: "root veg"
+tags: ["bakes"]
 ingredient_groups:
   - items:
     - amount: "2"
@@ -38,4 +37,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-29"
+
 ---

@@ -1,14 +1,13 @@
 ---
-title: Chicken à la King
-short_name: Chicken à la King
-tagline: American loveliness.
-source: Adapted from The Cozy Cook
-serves: 6
+title: "Chicken à la King"
+tagline: "American loveliness."
+source: "Adapted from The Cozy Cook"
+serves: "6"
 prep_time: "15 mins"
 cook_time: "45 mins"
-main_ingredients: ["chicken breast", mushrooms, "crème fraîche", peas, "white wine", "chicken stock"]
-star_ingredient: poultry
-tags: [freezable, "make-ahead", "one-handed food"]
+main_ingredients: ["chicken breast", "mushrooms", "crème fraîche", "peas", "white wine", "chicken stock"]
+star_ingredient: "poultry"
+tags: ["freezable", "make-ahead", "one-handed food"]
 ingredient_groups:
   - name: sauce
     items:
@@ -62,4 +61,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

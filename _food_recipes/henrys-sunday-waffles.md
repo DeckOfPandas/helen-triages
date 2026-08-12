@@ -1,14 +1,13 @@
 ---
 title: "Henry's Sunday Waffles"
-short_name: "Henry's Sunday Waffles"
 tagline: "I've tried a lot of waffle recipes. This one has been iterated and iterated until, well, perfection."
 source: "Adapted from Sunlight Cafe"
 makes: "4–6 waffles depending on your waffle iron"
 prep_time: "5 mins"
 cook_time: "15 mins"
-main_ingredients: ["plain flour", eggs, milk, "groundnut oil", "salted butter"]
+main_ingredients: ["plain flour", "eggs", "milk", "groundnut oil", "salted butter"]
 star_ingredient:
-tags: [breakfast, "carbs party"]
+tags: ["breakfast", "carbs party"]
 ingredient_groups:
   - items:
     - amount: "2 large"

@@ -1,14 +1,13 @@
 ---
-title: Teriyaki Sauce
-short_name: Teriyaki Sauce
+title: "Teriyaki Sauce"
 tagline: "Once you've made this you won't use shop-bought again."
 source: "Adapted from The Daring Gourmet, recipe Kimberly Killebrew"
-makes: about 300 ml
+makes: "about 300 ml"
 prep_time: "5 mins"
 cook_time: "5 mins"
-main_ingredients: [tamari, "dark brown soft sugar", "fresh ginger", "fresh garlic", mirin, honey, "sesame oil"]
+main_ingredients: ["tamari", "dark brown soft sugar", "fresh ginger", "garlic cloves", "mirin", "honey", "sesame oil"]
 star_ingredient:
-tags: [extras]
+tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "120 ml"
@@ -18,7 +17,7 @@ ingredient_groups:
     - amount: "1½ tsp"
       item: "fresh ginger, minced"
     - amount: "1 tsp"
-      item: "garlic, minced"
+      item: "garlic cloves, minced"
     - amount: "1 tbsp"
       item: honey
     - amount: "1 tsp"
@@ -43,4 +42,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

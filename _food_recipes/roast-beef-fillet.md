@@ -1,14 +1,13 @@
 ---
-title: Roast Beef Fillet
-short_name: Roast Beef Fillet
+title: "Roast Beef Fillet"
 tagline: "Seared and roasted beef fillet — simple, perfect, showstopper. Lovely with rocket and [tomato and tarragon dressing](../tomato-tarragon-dressing/)."
 source: "Adapted from Gordon Ramsay"
-serves: 4–6
+serves: "4–6"
 prep_time: "20 mins"
 cook_time: "30 mins"
 main_ingredients: ["beef fillet"]
-star_ingredient: beef
-tags: [showstopper]
+star_ingredient: "beef"
+tags: ["showstopper"]
 ingredient_groups:
   - items:
     - amount: "1.2 kg"
@@ -29,4 +28,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

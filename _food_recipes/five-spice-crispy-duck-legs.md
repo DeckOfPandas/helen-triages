@@ -1,14 +1,13 @@
 ---
-title: Five-Spice Crispy Duck Legs
-short_name: Five-Spice Crispy Duck Legs
+title: "Five-Spice Crispy Duck Legs"
 tagline: "These go with anything, inlcuding five-spice brispy duck legs."
-source: Henry
-serves: 4
+source: "Henry"
+serves: "4"
 prep_time: "15 mins plus at least 8 hrs curing and 2 hrs flavouring"
 cook_time: "1 hr 30 mins plus 15 mins resting"
 main_ingredients: ["duck legs", "five-spice powder", "bay leaves", "fresh thyme"]
-star_ingredient: duck
-tags: ["make-ahead", showstopper]
+star_ingredient: "duck"
+tags: ["make-ahead", "showstopper"]
 ingredient_groups:
   - name: duck
     items:
@@ -28,7 +27,7 @@ method:
     note: A cast iron tray is great for rendering the fat evenly.
   - Blast at 220°C fan for 10–15 mins to crisp the skin.
   - step: "Rest, loosely covered, for at least 15 mins before serving."
-    note: "if you cover it too tightly you'll steam the skin you just so lovingly crisped"
+    note: "If you cover it too tightly you'll steam the skin you just so lovingly crisped."
 method_short:
   - ""
 notes:
@@ -39,4 +38,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

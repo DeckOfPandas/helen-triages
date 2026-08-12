@@ -1,14 +1,13 @@
 ---
-title: Five-Spice Powder
-short_name: Five-Spice
-tagline: Adapted to omit capsicum.
+title: "Five-Spice Powder"
+tagline: "Adapted to omit capsicum."
 source: ""
-makes: some
+makes: "some"
 prep_time: "5 mins"
 cook_time: "2 mins"
 main_ingredients: ["cinnamon sticks", "star anise", "fennel seed", "Sichuan peppercorn", "whole cloves"]
 star_ingredient:
-tags: [extras]
+tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "2"
@@ -25,7 +24,7 @@ ingredient_groups:
       note: I like more than this, but apparently that's uncommon
 method:
   - step: Fry the whole spices until aromatic and darkened.
-    note: if you can't be bothered to do this then, honestly, just don't make five-spice yourself
+    note: "If you can't be bothered to do this then, honestly, just don't make five-spice yourself."
   - Grind or crush to a fine powder.
 method_short:
   - Oh come on.
@@ -34,4 +33,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

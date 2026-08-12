@@ -1,6 +1,5 @@
 ---
 title: "Henry's Quick and Bulletproof Hollandaise Sauce"
-short_name: "Henry's Quick and Bulletproof Hollandaise Sauce"
 tagline: "The search ends here. But read to the bottom to get it right."
 source: "Furious, split and curdled years of cursing at eggs"
 serves: "4, generously"
@@ -8,7 +7,7 @@ prep_time: "15 mins"
 cook_time: "10 mins"
 main_ingredients: ["unsalted butter", "egg yolks", "lemon juice", "apple cider vinegar"]
 star_ingredient:
-tags: [extras]
+tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "8 oz"
@@ -28,7 +27,7 @@ method:
   - Melt the butter in another pan until it starts to froth, but if it boils you've gone too far.
   - "Dribble the butter very slowly into the yolk/acid mixture while still whisking, until the mixture thickens."
   - step: It will thicken slightly as it cools.
-    note: "so don't panic — it hasn't failed to set until it's finger-warm and still failed to set"
+    note: "So don't panic — it hasn't failed to set until it's finger-warm and still failed to set."
   - "Check seasoning, and keep warm over a bain-marie until serving."
 method_short:
   - ""

@@ -1,14 +1,13 @@
 ---
-title: Beef Wellington
-short_name: Beef Wellington
+title: "Beef Wellington"
 tagline: "The ultimate showstopper. Two days of love for ten minutes of glory."
 source: "Adapted from Gordon Ramsay's Ultimate Cookery Course (Hodder & Stoughton)"
-serves: 4
+serves: "4"
 prep_time: "1 hr 30 mins, plus overnight chilling"
 cook_time: "15–20 mins"
 main_ingredients: ["beef fillet", "puff pastry", "wild mushrooms", "Parma ham", "Dijon mustard", "egg yolks", "red wine", "shallots", "beef stock"]
-star_ingredient: beef
-tags: [showstopper, "make-ahead"]
+star_ingredient: "beef"
+tags: ["showstopper", "make-ahead"]
 # Your own call, not mine — I picked medium_rare as the classic Wellington
 # centre (see the "Internal temperature" note below), but you know what
 # you've actually served here. Change the doneness key if it's not right;
@@ -90,4 +89,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

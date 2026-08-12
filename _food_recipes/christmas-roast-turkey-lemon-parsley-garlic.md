@@ -1,14 +1,13 @@
 ---
 title: "Christmas Roast Turkey with Lemon, Parsley and Garlic"
-short_name: Christmas Roast Turkey
 tagline: "This is not a dish you get to redo, but how fun to try it anyway."
-source: Adapted from Christmas by Gordon Ramsay
+source: "Adapted from Christmas by Gordon Ramsay"
 serves: "8–10"
 prep_time: "30 mins"
 cook_time: "2 hrs 30 mins for a 5-kg bird"
-main_ingredients: [turkey, "salted butter", lemon, "fresh parsley", garlic, "streaky bacon"]
-star_ingredient: poultry
-tags: [festive, showstopper, "make-ahead"]
+main_ingredients: ["turkey", "salted butter", "lemon", "fresh parsley", "garlic cloves", "streaky bacon"]
+star_ingredient: "poultry"
+tags: ["festive", "showstopper", "make-ahead"]
 ingredient_groups:
   - name: turkey
     items:
@@ -32,8 +31,8 @@ ingredient_groups:
       item: "salted butter, at room temperature"
     - amount: "1 tbsp"
       item: olive oil
-    - amount: "2"
-      item: "small lemons, finely grated zest and juice"
+    - amount: "2 small"
+      item: "lemons, finely grated zest and juice"
     - amount: "3"
       item: "garlic cloves, crushed"
     - item: "small bunch of flat-leaf parsley, leaves only, chopped"
@@ -59,4 +58,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

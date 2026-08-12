@@ -1,13 +1,12 @@
 ---
 title: "Pancetta and White Bean Stew"
-short_name: Pancetta and White Bean Stew
 tagline: "This stew doesn't care what vegetables go in — carrot, celery and onion are just filler, and whatever's wilting in the fridge will do instead."
-source: Unknown
-serves: 4
+source: "Unknown"
+serves: "4"
 prep_time: "15 mins"
 cook_time: "40 mins"
-main_ingredients: [pancetta, "white beans", "cavolo nero", carrot, celery, onion, "chicken stock", "parmesan rind", "sherry vinegar"]
-star_ingredient: pork
+main_ingredients: ["pancetta", "white beans", "cavolo nero", "carrot", "celery", "onion", "chicken stock", "parmesan rind", "sherry vinegar"]
+star_ingredient: "pork"
 tags: ["one-handed food"]
 ingredient_groups:
   - items:
@@ -49,4 +48,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

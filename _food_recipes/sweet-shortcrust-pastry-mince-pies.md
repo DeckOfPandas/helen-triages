@@ -1,14 +1,13 @@
 ---
-title: Sweet Shortcrust Pastry / Mince Pies
-short_name: Sweet Shortcrust Pastry / Mince Pies
+title: "Sweet Shortcrust Pastry / Mince Pies"
 tagline: "Foolproof sweet shortcrust for 12 mince pies with star hats."
-source: Bitter experience
+source: "Bitter experience"
 makes: "1 dozen mince pies"
 prep_time: "2 hrs including 1 hr 30 mins chilling time"
 cook_time: "20 mins"
-main_ingredients: [mincemeat, "ground almonds", "unsalted butter", "plain flour", egg, "golden caster sugar"]
+main_ingredients: ["mincemeat", "ground almonds", "unsalted butter", "plain flour", "egg", "golden caster sugar"]
 star_ingredient:
-tags: [bakes, festive]
+tags: ["bakes", "festive"]
 ingredient_groups:
   - items:
     - amount: "350 g"
@@ -46,4 +45,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---
