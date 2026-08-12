@@ -202,6 +202,26 @@ $color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
 $color-section-underline: $color-medium-spring-green;
 $color-section-underline-2: $color-vibrant-violet;   // the second, lower rule
 
+// Aureolin over electric cobalt -- Helen's call, 2026-08-13, for one
+// specific heading only: the About page's own "FAQ"
+// (`.section-heading-text--about-faq`, see food/about.html and
+// _recipe-header.scss). NOT a change to the shared
+// $color-section-underline/-2 pair above, which every recipe page's
+// INGREDIENTS/METHOD/NOTES/Tips/Troubleshooting headings still use
+// unmodified -- a first attempt changed those site-wide by mistake, caught
+// and reverted the same day.
+//
+// $color-electric-cobalt existed here before, as $color-name-search-root
+// (the "I KNOW WHAT I WANT" search category) -- removed 2026-08-01 by
+// 65d3c3b, "prune the palette of values nothing reads", when that root
+// colour moved to $color-hot-orange instead and nothing else referenced
+// electric cobalt any more. Restored at its exact original value (#0047FF,
+// confirmed via `git log -S`, not re-guessed) rather than the visually
+// similar #0047AB ("cobalt blue") a first attempt used -- Helen asked for
+// the specific colour that used to exist in this project, not a same-name
+// pigment reference.
+$color-electric-cobalt: #0047FF;
+
 // Step numerals in the method, and the top-level bullets in the short method.
 // Body text colour, not a hue of their own. They were violet, then a darkened
 // cerulean; both spent colour on something that is already unmistakable by

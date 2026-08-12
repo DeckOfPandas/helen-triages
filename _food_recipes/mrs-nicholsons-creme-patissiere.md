@@ -5,13 +5,13 @@ source: "Mrs Nicholson"
 makes: "about 600 ml"
 prep_time: "20 mins"
 cook_time: "None"
-main_ingredients: ["milk", "egg yolks", "golden caster sugar", "plain flour", "vanilla pod"]
+main_ingredients: ["whole milk", "egg yolks", "golden caster sugar", "plain flour", "vanilla pod"]
 star_ingredient:
 tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "500 ml"
-      item: milk
+      item: whole milk
     - amount: "1"
       item: "vanilla pod, split lengthways"
       note: "or several drops of good vanilla essence"

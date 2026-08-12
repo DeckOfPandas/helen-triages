@@ -30,18 +30,74 @@
 //
 // The two are separable dials and compose: the stroke sets the WEIGHT of the
 // edge, the shadow sets its DIRECTION. Turn either off independently.
-$emboss-offset: 1px;                            // hard, not blurred
+// BOTH DIALS ARE PROPORTIONS OF THE TYPE THEY SIT ON, NOT FIXED WIDTHS, and
+// this is the single thing most likely to be got wrong when adding a new
+// consumer. Added 2026-08-12, after Helen looked at the small Courier labels in
+// a recipe's longform Tips and asked whether she was imagining that they read
+// as more raised than the page's own headings. She wasn't. Both dials had
+// drifted, in opposite directions on different elements, and both drifts do the
+// same damage: THE SHADOW HAS TO CLEAR THE STROKE TO BE SEEN AT ALL.
+//
+// The stroke is the more obvious one, and _sass/food/_category-labels.scss
+// already worked it out for its own element: -webkit-text-stroke is an absolute
+// px width, so the same value on smaller type is a proportionally FATTER
+// letterform. Past about 3% of the type size it stops reading as an edge and
+// starts filling the counters, and the emboss copies have nothing crisp left to
+// sit against.
+//
+// The offset is the one nobody had generalised, though .site-logo-top hit it
+// head-on and fixed itself in place (see its comment: "at 1px the shadow barely
+// clears the stroke at all, so it read as a flat drop-shadow rather than a
+// raised letter", widened to 2px). A fixed 1px offset is ~7% of a 0.9rem label
+// and ~3% of a 1.8rem heading -- so the effect was at full strength on the
+// smallest type on the site and half-swallowed on the biggest, which is exactly
+// backwards from how it looked in the file, where every consumer wrote the same
+// @include and could reasonably expect the same result.
+//
+// The two ratios below are not invented: they are where the two elements that
+// demonstrably work already sit. HELEN TRIAGES is at 6.3% offset after Helen
+// tuned it by hand; the Tips label is at 6.8% and 1.4% stroke, and is what
+// prompted this. Everything else is now brought onto them.
+// THE STROKE IS AN `em`, WHICH IS THE WHOLE TRICK. A length in em resolves
+// against the element's OWN computed font-size, so one value is 1.4% of
+// whatever it lands on without anyone having to know, state or maintain the
+// size. The first version of this was a punched-stroke($size) function taking
+// the size as an argument, which worked but had to be told the number every
+// time -- fine on the six elements that set their own font-size, useless on the
+// global h1/h2/h3 rule in shared/_base.scss, where the size is whatever the
+// document says it is. Since that rule is what makes the treatment reach EVERY
+// heading rather than a list of them, em wins on both counts: it does more and
+// it can't drift.
+$emboss-stroke: 0.014em;       // 1.4% of font-size, self-scaling
+$emboss-offset-ratio: 0.065;   // 6.5% of font-size -- see the two values below
+
+// The offset stays a WHOLE PIXEL rather than a computed proportion, unlike the
+// stroke, and the difference is deliberate: a fractional stroke width is
+// already normal here and antialiases harmlessly along a letterform's edge,
+// but a fractional shadow offset antialiases the whole duplicate glyph, which
+// is the soft, floating read the "no blur" rule above exists to avoid. Two
+// values cover every size on the site at close enough to 6.5% -- so they are
+// two hard values, with the arithmetic written down rather than performed.
+//
+//   1px    up to ~1.2rem   (0.85rem meta label = 7.4%, 1rem = 6.3%)
+//   2px    from ~1.6rem    (1.8rem section heading = 6.9%, 2.2rem title = 5.7%)
+//
+// A size in between (the index's 1.35rem .category-label, which wants 1.4px)
+// takes whichever of the two looks right rather than a half pixel.
+$emboss-offset:       1px;                      // hard, not blurred
+$emboss-offset-large: 2px;                      // the same, on display sizes
 $color-emboss-light:  $color-bg;                // the paper catching the light
 $color-emboss-shadow: rgba($color-text, 0.38);  // where it does not
 
 // $style: raised   letters standing proud of the tape  (light from top-left)
 //         pressed  letters punched down into it        (the same light, inverted)
-@mixin punched($style: raised) {
+// $offset          $emboss-offset-large on display type; see the note above
+@mixin punched($style: raised, $offset: $emboss-offset) {
   @if $style == raised {
-    text-shadow: (-$emboss-offset) (-$emboss-offset) 0 $color-emboss-light,
-                 $emboss-offset    $emboss-offset    0 $color-emboss-shadow;
+    text-shadow: (-$offset) (-$offset) 0 $color-emboss-light,
+                 $offset    $offset    0 $color-emboss-shadow;
   } @else {
-    text-shadow: $emboss-offset    $emboss-offset    0 $color-emboss-light,
-                 (-$emboss-offset) (-$emboss-offset) 0 $color-emboss-shadow;
+    text-shadow: $offset    $offset    0 $color-emboss-light,
+                 (-$offset) (-$offset) 0 $color-emboss-shadow;
   }
 }

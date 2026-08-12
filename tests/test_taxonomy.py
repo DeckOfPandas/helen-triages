@@ -348,7 +348,7 @@ def _first_word(text: str) -> str:
     return match.group(0) if match else ""
 
 
-def test_ingredient_annotation_style(recipe, taxonomy):
+def test_ingredient_notes_are_lowercase_fragments(recipe, taxonomy):
     """One sentence, no trailing full stop, lower case unless the first word
     is `I` or a proper noun declared in taxonomy.yml's `proper_nouns` list.
 
@@ -467,12 +467,12 @@ def test_ingredient_group_order_matches_title(recipe):
 # which is a real trap: a naive non-alphanumeric split treats the "s" after
 # an apostrophe as its own word, and that word will never appear in any
 # slug. Calibrated against the whole collection 2026-08-12: every recipe
-# scores a clean match except ridiculously-good-oxtail-stew.md, whose title
-# is "Sticky Oxtail Stew" -- agreeing with its own tagline ("Six hours in
-# the oven breaks oxtail down into sticky heaven"), so this reads as the
-# title having been deliberately changed at some point without the filename
-# following -- Helen's call whether to rename the file or revert the title,
-# not something to guess at.
+# scored a clean match except ridiculously-good-oxtail-stew.md, whose title
+# was "Sticky Oxtail Stew" -- agreeing with its own tagline ("Six hours in
+# the oven breaks oxtail down into sticky heaven"), reading as the title
+# having been deliberately changed at some point without the filename
+# following. Resolved 2026-08-12, Helen's call: renamed the file to
+# sticky-oxtail-stew.md rather than reverting the title.
 _STOPWORDS = {"a", "an", "and", "the", "with", "for", "of", "in", "on", "to", "no"}
 
 

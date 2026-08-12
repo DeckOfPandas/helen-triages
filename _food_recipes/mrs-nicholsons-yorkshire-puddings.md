@@ -5,13 +5,13 @@ source: "Mrs Nicholson"
 makes: "12 normal Yorkshire puddings"
 prep_time: "10 mins"
 cook_time: "20 mins"
-main_ingredients: ["self-raising flour", "eggs", "milk", "groundnut oil"]
+main_ingredients: ["self-raising flour", "eggs", "whole milk", "groundnut oil"]
 star_ingredient:
 tags: ["extras"]
 ingredient_groups:
   - items:
-    - amount: "1 pt"
-      item: milk
+    - amount: "550 ml"
+      item: whole milk
     - amount: "4 large"
       item: eggs
     - amount: "8 oz"

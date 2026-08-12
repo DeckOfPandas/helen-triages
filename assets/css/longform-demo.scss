@@ -1,0 +1,125 @@
+---
+---
+// =============================================================================
+// LONGFORM: THE VARIANT NOT TAKEN ("C")
+// =============================================================================
+// KEPT ON PURPOSE, at Helen's request -- "C has charm though... keep the
+// stylesheet for C somewhere in the project so I can change my mind." This is
+// not dead code and not a leftover: it is the runner-up, kept somewhere you can
+// LOOK at it rather than read about it, because looking is the whole point.
+//
+//   /food/longform-demo/ganache/
+//   /food/longform-demo/hollandaise/
+//
+// Loaded only by those two pages, via a <link> in their own markup. Nothing
+// else in the site imports this file, and every rule below is scoped to `.lf-c`
+// -- a class that exists nowhere except there -- so it cannot reach a real
+// recipe page however wrong it goes.
+//
+// It is an OVERRIDE OF THE LIVE STYLING, not a copy of it: the shipped design
+// ("B", in _sass/food/_recipe-notes-body.scss) does all the work, and the two
+// rules below undo exactly the two decisions C makes differently. That means it
+// can't drift into a stale duplicate of a design that has moved on -- if the
+// live longform styling changes, these pages change with it, and if a change
+// makes an override redundant it will be visible immediately.
+//
+// THE TWO DECISIONS C TURNS THE OTHER WAY:
+//   1. A Tips lead-in stays INLINE in its sentence, set in Courier, instead of
+//      being promoted to its own line as a label.
+//   2. A failure-mode name is separated by a HAIRLINE above its block instead
+//      of carrying the violet rule behind it. Spends no colour at all.
+//
+// If C is ever adopted, these rules move into _recipe-notes-body.scss in place
+// of the ones they override, and this file plus food/longform-demo/ get
+// deleted. If B is confirmed for good, the same deletion, without the move.
+
+@import "food/palette";
+@import "shared/tokens";
+@import "shared/rule";
+@import "food/rule";
+
+article.recipe .recipe-body-content.lf-c {
+
+  // --- C1: Tips lead-in inline, in Courier -----------------------------------
+  // The argument for it: the lead-in stands out by SHAPE rather than by ink,
+  // which is the same trick the method's step numerals use -- "1.2rem bold
+  // Courier against 0.92rem light sans," judged in $color-step-number's comment
+  // to be more than enough to find your place with, without spending colour.
+  // It is lighter on the page than a bold sans run, and it makes
+  // emphasis-in-prose a member of the site's type system instead of a browser
+  // default.
+  //
+  // The argument against, and it is the reason B won: a dozen Courier runs in
+  // one screen can tip from "typed" into ransom note, and inline keeps the rule
+  // and its reason welded into one sentence, which is what made Tips choppy in
+  // the first place (issue #185).
+  //
+  // No punched-tape lettering here, unlike B's label: the emboss shadow reads
+  // as a raised LABEL, and this is meant to read as a word inside a sentence.
+  > ul > li:has(> strong:first-child) {
+    margin-bottom: $space-lg;
+
+    > strong:first-child {
+      display: inline;
+      // Courier runs visually smaller than the sans at the same size, so this
+      // sits a hair above $font-size-body-sm to match it optically. B's label
+      // doesn't need the nudge -- it's on its own line, with nothing beside it
+      // to match.
+      font-size: 0.96rem;
+      letter-spacing: 0;
+      line-height: inherit;
+      -webkit-text-stroke: 0;
+      text-shadow: none;
+      margin-bottom: 0;
+      max-width: none;
+    }
+  }
+
+  // --- C2: a hairline above, instead of the violet rule ----------------------
+  // Same three-level structure as B, same uppercase Courier name -- only the
+  // landmark changes, from a mark behind the word to a line above the block.
+  //
+  // The honest case for it: it spends no colour, and violet is already carrying
+  // two jobs (the section rule, the annotation arrow) before this one. The
+  // honest case against: a hairline is a DIVIDER, and a divider separates
+  // things without pointing at any of them, which is close to what was already
+  // rejected for not screaming "read me now".
+  ol > li {
+    border-top: 1px solid $color-border;
+    padding-top: $space-lg;
+
+    > strong:first-child {
+      // Unwind overlapping-rule-single. The background is the whole mark, so
+      // removing the image removes it; the two paddings only existed to give
+      // that background somewhere to paint.
+      background-image: none;
+      padding-right: 0;
+      padding-bottom: 0;
+    }
+
+    // No rule to clear any more, so the symptom can sit up close to the name --
+    // B's 0.7rem is measured from the bottom of the violet bar, not from the
+    // lettering.
+    > em:first-of-type {
+      margin-top: $space-xs;
+    }
+  }
+}
+
+// --- Demo page furniture, not part of any proposal ---------------------------
+.lf-nav {
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  margin-bottom: $spacing-section-gap;
+
+  a { font-weight: 700; }
+}
+
+.lf-specimen-note {
+  font-family: $font-body;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: $color-clear-text;
+  max-width: 62ch;
+  margin: 0 0 $space-xl 0;
+}

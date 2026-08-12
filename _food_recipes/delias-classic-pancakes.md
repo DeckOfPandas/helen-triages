@@ -5,7 +5,7 @@ source: "Adapted from Delia Smith"
 makes: "about 8"
 prep_time: "10 mins"
 cook_time: "3–4 mins per pancake"
-main_ingredients: ["plain flour", "eggs", "milk", "salted butter"]
+main_ingredients: ["plain flour", "eggs", "whole milk", "salted butter"]
 star_ingredient:
 tags: ["carbs party", "festive"]
 ingredient_groups:
@@ -15,7 +15,7 @@ ingredient_groups:
     - amount: "2 large"
       item: eggs
     - amount: "210 ml"
-      item: milk mixed with 90ml water
+      item: whole milk mixed with 90ml water
     - amount: "2 tbsp"
       item: melted salted butter
 method:

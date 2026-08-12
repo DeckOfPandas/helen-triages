@@ -24,12 +24,37 @@ a {
   }
 }
 
+// EVERY HEADING ON EVERY SITE GETS THE PUNCHED-TAPE LETTERING FROM HERE, not
+// from a list of named components. Helen, 2026-08-12: "Did your heading
+// lettering change touch all headings on the whole site? That is what I want."
+// It hadn't -- the first pass fixed the six or seven elements that already
+// carried the effect and left the ones that had never opted in, which is how it
+// drifted apart in the first place. A heading that hasn't been styled yet is
+// exactly the heading most likely to get missed again.
+//
+// The stroke is $emboss-stroke, an em, so it is 1.4% of whatever size the
+// heading turns out to be WITHOUT this rule knowing the size -- which it can't,
+// since h1/h2/h3 here take the browser's own 2em/1.5em/1.17em unless a
+// component overrides them. See shared/_rule.scss; that self-scaling is the
+// entire reason this rule can exist at all.
+//
+// The offset stays the default 1px, which is right up to about 1.2rem. The two
+// elements big enough to need $emboss-offset-large (the recipe title and the
+// recipe section headings) already pass it explicitly, and they'd have to
+// override this rule anyway.
+//
+// $color-text rather than food's $color-label-stroke: this is shared, and only
+// the nine palette-contract variables may be named here (HANDOVER §2.3). A site
+// wanting a softer outline colour overrides it on its own components, which
+// food does on all of its.
 h1, h2, h3 {
   font-family: $font-headings;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-top: 0;
+  -webkit-text-stroke: $emboss-stroke $color-text;
+  @include punched(raised);
 }
 
 body, button {

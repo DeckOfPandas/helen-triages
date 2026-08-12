@@ -63,6 +63,45 @@ main {
   }
 }
 
+// .site-header itself is edge-to-edge, full viewport width -- it has no
+// content column of its own to align anything against. This shares main's
+// own max-width/margin:auto formula so the "?" lines up with the right
+// edge of the actual content column beneath it, at every viewport width,
+// not just a fixed offset from the header's own edge.
+.site-header-inner {
+  max-width: $width-content;
+  margin: 0 auto;
+  position: relative;
+}
+
+// The small print / about link. Deliberately not spelled out as "about"
+// anywhere a nav shows it -- Helen's explicit call, and the about page's
+// own title ("???") echoes the same instinct. Deliberately bare -- Helen:
+// "much more minimalist... a naked ? in body font and style" -- no circle,
+// no border, no heading font: just a character sitting quietly in the
+// corner in the page's own body font, indistinguishable from ordinary text
+// until you're actually looking for it. Colour stays at this component's
+// shared default here (only $color-clear-text is guaranteed by every
+// site's palette, see _tokens.scss's palette contract); the hot-magenta
+// hover Helen actually asked for is food-specific
+// ($color-bright-magenta isn't one of the nine guaranteed variables), so
+// it lives as an override in food/_recipe-header.scss, not here.
+.site-about-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-family: $font-body;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: $color-clear-text;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: $color-text;
+  }
+}
+
 .site-footer {
   max-width: $width-content;
   margin: 0 auto;
@@ -131,7 +170,22 @@ $tape-protrusion: 0.2rem;
   font-weight: 1000;
   letter-spacing: 0.18em;
   color: $color-text;
-  -webkit-text-stroke: 1.2px rgba(50,50,50,0.9);
+  // Brought onto $emboss-stroke 2026-08-12 with every other heading on the
+  // site. THIS IS THE CHANGE HERE MOST LIKELY TO WANT REVERTING, so: it was
+  // `1.2px rgba(50,50,50,0.9)`, which is 3.75% of this element's 2rem -- the
+  // heaviest outline anywhere, and the reason the note below had to widen the
+  // offset to 2px to be seen past it at all. Thinning the stroke is the other
+  // way to solve that same problem, and it's the way every other heading now
+  // solves it. Put the old line back verbatim if HELEN TRIAGES has lost too
+  // much weight; the 2px offset below is independent and should stay either
+  // way (2rem x 6.5% = 2.1px, so it is on the ratio, not a compensation any
+  // more).
+  //
+  // Colour follows too: rgba(50,50,50,0.9) was a standalone grey with no
+  // relationship to the letter it outlined -- the same thing .category-label
+  // called out and fixed for itself. $color-text at 0.8 is derived from the
+  // lettering, and shared/ may name it (palette contract, HANDOVER §2.3).
+  -webkit-text-stroke: $emboss-stroke rgba($color-text, 0.8);
   text-transform: uppercase;
   // NOT padding-right: 0.18em, deliberately -- that was here before and it's
   // why HELEN TRIAGES visibly shifted right on cocktails. letter-spacing adds
@@ -220,6 +274,25 @@ $tape-protrusion: 0.2rem;
   line-height: 1;
   padding: 0 1.4em;
   white-space: nowrap;
+  // ==========================================================================
+  // THE ONE HEADING ON THE SITE THAT IS DELIBERATELY EXCLUDED FROM THE SHARED
+  // PUNCHED-TAPE LETTERING. DO NOT "FIX" IT BY GIVING IT $emboss-stroke OR
+  // @include punched() -- that is what it had, and it did not work.
+  // ==========================================================================
+  // Confirmed as a permanent exception by Helen on 2026-08-12, when the
+  // treatment went site-wide and everything else came onto one ratio: "please
+  // note in the docs that [ FOOD ] is handled differently -- I think it needs
+  // the special treatment." Written up in HANDOVER §13.4.1 as well as here,
+  // because a future pass tidying up "the one element that doesn't match" is
+  // the obvious way to lose this.
+  //
+  // THE REASON IS THE BACKGROUND, and it applies to nothing else on the site.
+  // Every other heading is dark type on $color-bg, where a light copy offset
+  // up-and-left genuinely reads as a highlight. This word is LIGHT TYPE ON THE
+  // TAPE SVG. Its sibling .site-logo-top (HELEN TRIAGES) is a normal consumer
+  // of the shared treatment and was brought onto the ratios the same day; the
+  // two halves of the lockup have always been styled independently.
+  //
   // Redesigned in the issue #122 pass (2026-08-10), replacing the
   // @include punched(raised) + single-pair-shadow version this used to be.
   // That version's fill was pure $color-white -- already the top of the

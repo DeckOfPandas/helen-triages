@@ -5,7 +5,7 @@ source: "Adapted from Sunlight Cafe"
 makes: "4–6 waffles depending on your waffle iron"
 prep_time: "5 mins"
 cook_time: "15 mins"
-main_ingredients: ["plain flour", "eggs", "milk", "groundnut oil", "salted butter"]
+main_ingredients: ["plain flour", "eggs", "whole milk", "groundnut oil", "salted butter"]
 star_ingredient:
 tags: ["breakfast", "carbs party"]
 ingredient_groups:
@@ -13,7 +13,7 @@ ingredient_groups:
     - amount: "2 large"
       item: "eggs, separated"
     - amount: "1¾ cups"
-      item: milk
+      item: whole milk
     - amount: ½ cup
       item: groundnut oil
     - amount: "1¾ cups"
