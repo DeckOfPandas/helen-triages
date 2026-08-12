@@ -784,14 +784,18 @@ before removal; see §4).
 
 **Deliberately standing checklists, not guards expected to be green** (same
 shape as `test_oven_temperature_says_fan`, §10 above) — these need Helen's
-own source material or judgement, not a guess: `test_bake_eggs_state_a_
-weight` (#145's second half, 11 recipes, no fabricated gram weights) ·
-`test_milk_specifies_type` (#167, 9 recipes, don't bulk-convert to "whole
-milk" blind) · `test_fresh_aromatics_state_a_paste_equivalent` (#153/#155,
-15 recipes across ginger/garlic/lemongrass — also worth Helen reconsidering
-scope before working through it by hand, since garlic is so ubiquitous a
-paste-equivalent note on every single clove mention may be more repetition
-than she wants).
+own source material or judgement, not a guess: `test_milk_specifies_type`
+(#167, 9 recipes, don't bulk-convert to "whole milk" blind).
+
+**Retired 2026-08-12, Helen's explicit call, not fixed by filling in
+values**: `test_bake_eggs_state_a_weight` (#145's second half — a bake
+stating a gram weight/range for its eggs on top of the UK size band) and
+`test_fresh_aromatics_state_a_paste_equivalent` (#153/#155 — fresh
+ginger/garlic/lemongrass stating a paste/purée equivalent) are both gone,
+issues #181/#182 closed. Neither had a single compliant recipe as of
+2026-08-12; Helen decided the requirement itself wasn't worth keeping
+rather than working through the backlog by hand. `test_egg_size_is_stated`
+(UK size band, no gram weight) is unaffected and still enforced.
 
 **One genuine standing bug, not fixed**: `ridiculously-good-oxtail-stew.md`
 — title is "Sticky Oxtail Stew" (agreeing with its own tagline), filename
