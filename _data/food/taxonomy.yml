@@ -63,6 +63,34 @@ star_ingredients:
   - shellfish
   - white fish
 
+# Retired star_ingredient values, with the reason -- same shape as
+# test_front_matter.py's RETIRED dict for front-matter fields. A value here
+# is a NAME COLLISION waiting to happen: `star_ingredient` isn't declared
+# anywhere else, so a retired value left in a file renders no filter button
+# and looks like ordinary undeclared-star noise until you know the value used
+# to mean something. test_star_ingredient_is_declared (test_taxonomy.py,
+# test_drafts.py) checks this dict first so the failure names the reason
+# instead of just "not declared" -- caught for real 2026-08-12: five drafts
+# (hazelnut-paris-brest, leratos-tanzanian-banana-curry, matcha-white-
+# chocolate-blondies, ukrainian-dumplings-chestnuts-kraut-filling,
+# zucchini-orange-cake-with-pistachios) were still carrying `something
+# unusual` three days after it was retired, invisible until someone actually
+# read the test output rather than trusting a green run. All five are blank
+# now, the correct state per the retirement note above.
+retired_star_ingredients:
+  something unusual: >-
+    Retired 2026-08-09 -- defined relative to a subjective, cultural norm
+    rather than an actual food group, not a real craving the way "beef" or
+    "greens" are, and barely/inconsistently used. Not coming back -- blank
+    the field, don't reintroduce it.
+  eggs: >-
+    Retired 2026-08-09 -- every prior member used egg as a technique or
+    structural ingredient, not the thing the dish is actually about. A
+    genuine egg-forward dish (Turkish eggs, deviled eggs, a frittata) would
+    earn it back -- that is Helen's call to make deliberately, not a reason
+    to leave the old value sitting in a file meanwhile. Blank it unless she
+    says otherwise.
+
 # -----------------------------------------------------------------------------
 # Tags
 #
@@ -196,3 +224,18 @@ proper_nouns:
   - Thai
   - Worcestershire
   - Yukon
+
+# -----------------------------------------------------------------------------
+# Ampersand proper nouns
+#
+# House style is "and", never "&", in a title (HANDOVER_v26.md §5)
+# -- but a real brand or proper name that is itself spelled with an ampersand
+# ("Ben & Jerry's") would be misspelled by swapping it for "and". Same
+# reasoning and same shape as proper_nouns above: whether an "&" is a genuine
+# part of a name or just a lazy join is Helen's call, declared here rather
+# than guessed at. test_no_ampersand_in_title only waives the ampersands
+# actually covered by an exact phrase below -- anything else still fails, so
+# a new stylistic "&" still needs fixing, not a new taxonomy entry.
+# -----------------------------------------------------------------------------
+ampersand_proper_nouns:
+  - "Ben & Jerry's"
