@@ -1,6 +1,5 @@
 ---
 title: "Parsnip, Cranberry and Chestnut Loaf"
-short_name: "Parsnip, Cranberry and Chestnut Loaf"
 tagline: "I promise this is delicious."
 source: "Adapted from BBC Good Food, recipe Sarah Cook"
 serves: "4–6"

@@ -1,14 +1,13 @@
 ---
-title: Miso and Ginger Braised Pork Belly
-short_name: Miso and Ginger Braised Pork Belly
+title: "Miso and Ginger Braised Pork Belly"
 tagline: "Only gets better the next day, so strategic over-catering is prudent."
 source: "Adapted from Great British Chefs, recipe Shu Han Lee"
-serves: 4
+serves: "4"
 prep_time: "20 mins"
 cook_time: "2 hrs 45 mins"
-main_ingredients: ["pork belly", "barley miso", "fresh ginger", mirin, "spring onions"]
-star_ingredient: pork
-tags: ["make-ahead", "one-handed food", fakeaway]
+main_ingredients: ["pork belly", "barley miso", "fresh ginger", "mirin", "spring onions"]
+star_ingredient: "pork"
+tags: ["make-ahead", "one-handed food", "fakeaway"]
 ingredient_groups:
   - name: pork
     items:
@@ -43,4 +42,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

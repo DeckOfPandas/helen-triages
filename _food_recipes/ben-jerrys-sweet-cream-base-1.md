@@ -1,14 +1,13 @@
 ---
-title: Ben and Jerry's Sweet Cream Base No. 1
-short_name: Ben and Jerry's Sweet Cream Base No. 1
+title: "Ben and Jerry's Sweet Cream Base No. 1"
 tagline: "Ben and Jerry call this their most popular base. It's also the only one of their three bases with eggs in it, but they're whisked in raw, no custard step needed."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "1 quart"
 prep_time: "10 mins"
-cook_time: none
-main_ingredients: [eggs, "golden caster sugar", "whipping cream", "whole milk"]
+cook_time: "none"
+main_ingredients: ["eggs", "golden caster sugar", "whipping cream", "whole milk"]
 star_ingredient:
-tags: [extras, freezable]
+tags: ["extras", "freezable"]
 ingredient_groups:
   - items:
     - amount: "2 large"
@@ -34,4 +33,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

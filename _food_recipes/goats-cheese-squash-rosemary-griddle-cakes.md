@@ -1,14 +1,13 @@
 ---
 title: "Goat's Cheese, Squash and Rosemary Griddle Cakes"
-short_name: "Goat's Cheese and Squash Griddle Cakes"
 tagline: "Thick, savoury pancakes loaded with butternut squash and goat's cheese. Defensibly tagged with 'virtuous', but the virtue of the garnish is up to you."
-source: Adapted from Mollie Katzen's Sunlight Café
-makes: Plenty for two people
+source: "Adapted from Mollie Katzen's Sunlight Café"
+makes: "Plenty for two people"
 prep_time: "20 mins"
 cook_time: "25 mins"
-main_ingredients: ["butternut squash", "goat's cheese", "self-raising flour", "fresh rosemary", egg, "whole milk"]
-star_ingredient: root veg
-tags: [breakfast, starter, virtuous]
+main_ingredients: ["butternut squash", "goat's cheese", "self-raising flour", "fresh rosemary", "egg", "whole milk"]
+star_ingredient: "root veg"
+tags: ["breakfast", "starter", "virtuous"]
 ingredient_groups:
   - items:
     - amount: "200 g"
@@ -42,4 +41,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

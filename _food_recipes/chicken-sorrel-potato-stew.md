@@ -1,14 +1,13 @@
 ---
 title: "Chicken, Sorrel and Potato Stew with French Beans and Mustard"
-short_name: "Chicken, Sorrel and Potato Stew"
-tagline: Sorrel is just brilliant — all citrus and tang — and I buy it whenever I can.
-source: Adapted from Riverford
-serves: 2
+tagline: "Sorrel is just brilliant — all citrus and tang — and I buy it whenever I can."
+source: "Adapted from Riverford"
+serves: "2"
 prep_time: "5 mins"
 cook_time: "30 mins"
-main_ingredients: ["chicken leg", "new potatoes", sorrel, "French beans", "white wine", "wholegrain mustard"]
-star_ingredient: poultry
-tags: ["one-handed food", virtuous, freezable]
+main_ingredients: ["chicken leg", "new potatoes", "sorrel", "French beans", "white wine", "wholegrain mustard"]
+star_ingredient: "poultry"
+tags: ["one-handed food", "virtuous", "freezable"]
 ingredient_groups:
   - items:
     - amount: "300 g"
@@ -57,4 +56,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

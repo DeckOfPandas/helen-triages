@@ -1,14 +1,13 @@
 ---
 title: "Citrus and Soy Salmon with Sticky Rice, Cucumber Salad and Edamame"
-short_name: Citrus Soy Salmon
 tagline: "Tastes like more effort than it is."
 source: "Adapted from Good Food, May 2026"
-serves: 6
+serves: "6"
 prep_time: "20 mins"
 cook_time: "30 mins"
-main_ingredients: [salmon, "sticky rice", edamame, "light soy sauce", "oyster sauce", lime, "fresh ginger", "sesame seeds", cucumber, coriander, "Greek yoghurt", "spring onions"]
-star_ingredient: oily fish
-tags: [salad, virtuous]
+main_ingredients: ["salmon", "sticky rice", "edamame", "light soy sauce", "oyster sauce", "lime", "fresh ginger", "sesame seeds", "cucumber", "coriander", "Greek yoghurt", "spring onions"]
+star_ingredient: "oily fish"
+tags: ["salad", "virtuous"]
 ingredient_groups:
   - name: salmon
     items:
@@ -59,4 +58,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

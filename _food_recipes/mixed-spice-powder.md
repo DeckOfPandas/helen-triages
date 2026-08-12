@@ -1,14 +1,13 @@
 ---
-title: Mixed Spice Powder
-short_name: Mixed Spice Powder
+title: "Mixed Spice Powder"
 tagline: "A capsicum-free version, which suffers not at all for the lack."
 source: "Henry"
-makes: slightly more than half as much as my spice blender will fit, hmph
+makes: "slightly more than half as much as my spice blender will fit, hmph"
 prep_time: "5 mins"
-cook_time: None
-main_ingredients: ["cinnamon stick", "whole nutmeg", "whole cloves", "ground ginger", mace]
+cook_time: "None"
+main_ingredients: ["cinnamon stick", "whole nutmeg", "whole cloves", "ground ginger", "mace"]
 star_ingredient:
-tags: [extras]
+tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "1"
@@ -36,4 +35,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

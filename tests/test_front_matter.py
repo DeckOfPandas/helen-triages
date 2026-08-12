@@ -11,7 +11,7 @@ import pytest
 
 from conftest import where
 
-REQUIRED = ["title", "short_name", "tagline", "source", "main_ingredients",
+REQUIRED = ["title", "tagline", "source", "main_ingredients",
             "tags", "ingredient_groups", "method_short", "meta"]
 
 RETIRED = {
@@ -21,6 +21,9 @@ RETIRED = {
     "nutrition": "removed from the schema",
     "filling_note": "folded into notes:",
     "headline_ingredient": "renamed to star_ingredient",
+    "short_name": "removed from the schema, GitHub issue #169 -- confirmed "
+                  "zero references in any template/JS/SCSS before removal, "
+                  "2026-08-12; a leftover value is dead weight, not data",
 }
 
 MISPLACED_META = ["rewritten", "proofread", "cooked_before", "date_last_edited"]
@@ -285,4 +288,42 @@ def test_group_names_omit_leading_article(recipe):
         f"{where(recipe)} has group name(s) with a leading article: {offenders}.\n"
         f'The template supplies "For the " itself, so `for the dressing` renders '
         f'as "For the for the dressing:". Strip the article — `dressing`.'
+    )
+
+
+# --- scalar front-matter values are always double-quoted --------------------
+# GitHub issue #168, open, picked up 2026-08-12 -- the broader sibling of
+# #170 (main_ingredients specifically, test_taxonomy.py) and applied to
+# tags there too. Same Sublime-editing convenience, same "formatting, not
+# data" safety -- EXCEPT this is deliberately NOT "every value in the
+# file": `meta:` booleans are excluded on purpose. Quoting `rewritten: true`
+# would silently turn it into the STRING "true", and
+# `meta.get("cooked_before") is True` (test_cooked_before_is_true, this
+# file) would then read False for every recipe -- checked against the
+# actual test code before touching a single meta value, not assumed safe.
+# 284 unquoted scalars across 76 recipes fixed 2026-08-12 via a line-by-line
+# raw-text substitution restricted to these nine top-level scalar fields
+# specifically -- not a YAML dump (CLAUDE.md), and not the nested list/dict
+# fields (ingredient items, method steps, notes), which is a larger, separate
+# piece of work than this pass covers.
+SCALAR_STRING_FIELDS = ["title", "tagline", "source", "prep_time",
+                         "cook_time", "star_ingredient", "makes", "serves"]
+
+
+def test_scalar_fields_are_quoted(recipe):
+    match = re.match(r"\A---\n(.*?\n)---", recipe.raw, re.S)
+    fm_text = match.group(1)
+    bad = []
+    for field in SCALAR_STRING_FIELDS:
+        m = re.search(rf"^{field}:[ \t]*(.+)$", fm_text, re.M)
+        if not m:
+            continue
+        val = m.group(1).rstrip()
+        if val.startswith("[") or val.startswith("{"):
+            continue  # a flow sequence/mapping, not a bare scalar
+        if not (val.startswith('"') and val.endswith('"')):
+            bad.append(f"{field}: {val}")
+    assert not bad, (
+        f"{where(recipe)} has unquoted scalar front-matter value(s): {bad!r}. "
+        f'Wrap each in double quotes, e.g. title: "Beef Wellington".'
     )

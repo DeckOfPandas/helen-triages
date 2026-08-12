@@ -1,14 +1,13 @@
 ---
-title: Duck Leg and Barley Casserole
-short_name: Duck Leg and Barley Casserole
+title: "Duck Leg and Barley Casserole"
 tagline: "This cooks beautifully in a 40-cm Le Creuset casserole pan (oval), with six duck legs forming one perfect layer."
-source: Henry
-serves: 12
+source: "Henry"
+serves: "12"
 prep_time: "30 mins"
 cook_time: "8 hrs"
-main_ingredients: ["Gressingham duck legs", "pearl barley", "red wine", pancetta, mushrooms, carrots, baby potatoes]
-star_ingredient: duck
-tags: [freezable, "make-ahead", "one-handed food"]
+main_ingredients: ["Gressingham duck legs", "pearl barley", "red wine", "pancetta", "mushrooms", "carrots", "baby potatoes"]
+star_ingredient: "duck"
+tags: ["freezable", "make-ahead", "one-handed food"]
 ingredient_groups:
   - items:
     - amount: "12"
@@ -68,4 +67,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

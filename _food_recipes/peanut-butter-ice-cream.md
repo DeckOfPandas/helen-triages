@@ -1,14 +1,13 @@
 ---
-title: Peanut Butter Ice Cream
-short_name: Peanut Butter Ice Cream
+title: "Peanut Butter Ice Cream"
 tagline: "Stop here. You need no further ice cream beyond this one."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
 prep_time: "15 mins"
-cook_time: None
+cook_time: "None"
 main_ingredients: ["sweet cream base", "smooth peanut butter", "roasted peanuts"]
 star_ingredient:
-tags: [dessert, "ice cream", "make-ahead"]
+tags: ["dessert", "ice cream", "make-ahead"]
 ingredient_groups:
   - items:
     - item: "[Ben & Jerry's Sweet Cream Base No. 1](../ben-jerrys-sweet-cream-base-1/)"
@@ -33,4 +32,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

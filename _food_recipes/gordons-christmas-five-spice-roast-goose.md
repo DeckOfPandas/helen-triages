@@ -1,14 +1,13 @@
 ---
 title: "Gordon's Christmas Five-Spice Roast Goose"
-short_name: "Gordon's Christmas Five-Spice Goose"
 tagline: "Five-spice and citrus cut through goose fat beautifully."
-source: Adapted from Gordon Ramsay
-serves: 6
+source: "Adapted from Gordon Ramsay"
+serves: "6"
 prep_time: "35 mins"
 cook_time: "2–3 hrs depending on weight"
-main_ingredients: ["whole goose", lemons, limes, "five-spice powder", honey, "fresh thyme"]
-star_ingredient: poultry
-tags: [festive, showstopper]
+main_ingredients: ["whole goose", "lemons", "limes", "five-spice powder", "honey", "fresh thyme"]
+star_ingredient: "poultry"
+tags: ["festive", "showstopper"]
 ingredient_groups:
   - items:
     - item: "4–5.5 kg fresh goose"
@@ -45,4 +44,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

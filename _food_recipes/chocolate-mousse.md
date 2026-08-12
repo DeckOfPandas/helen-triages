@@ -1,14 +1,13 @@
 ---
-title: Chocolate Mousse
-short_name: Chocolate Mousse
+title: "Chocolate Mousse"
 tagline: "Less cream than a classic mousse, so richer, denser, and more intensely chocolate-y."
 source: "Adapted from RecipeTin Eats, recipe Nagi"
-serves: 4
+serves: "4"
 prep_time: "20 mins"
-cook_time: None
-main_ingredients: ["dark chocolate", eggs, cream, "golden caster sugar", "salted butter"]
-star_ingredient: chocolate
-tags: [dessert, "make-ahead", "no-cook"]
+cook_time: "None"
+main_ingredients: ["dark chocolate", "eggs", "cream", "golden caster sugar", "salted butter"]
+star_ingredient: "chocolate"
+tags: ["dessert", "make-ahead", "no-cook"]
 ingredient_groups:
   - name: mousse
     items:
@@ -54,4 +53,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

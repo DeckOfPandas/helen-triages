@@ -1,14 +1,13 @@
 ---
 title: "Henry's Dark Chocolate Almond Truffles"
-short_name: "Henry's Dark Chocolate Almond Truffles"
 tagline: "I've inflicted these on many Christmas parties over the years, and latterly they were even nice."
-source: Megan
+source: "Megan"
 makes: "20–24 truffles"
 prep_time: "20 mins plus time to set"
 cook_time: "5 mins"
 main_ingredients: ["dark chocolate", "ground almonds", "salted butter", "icing sugar"]
-star_ingredient: chocolate
-tags: [nibbles, sweets]
+star_ingredient: "chocolate"
+tags: ["nibbles", "sweets"]
 ingredient_groups:
   - items:
     - amount: "175 g"
@@ -42,4 +41,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-13"
+
 ---

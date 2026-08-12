@@ -1,14 +1,13 @@
 ---
-title: Caesar Salad Dressing
-short_name: Caesar Salad Dressing
+title: "Caesar Salad Dressing"
 tagline: "Doesn't really keep, but very easy and quick."
-source: Stella
-makes: about 300 ml
-prep_time: 5 mins
+source: "Stella"
+makes: "about 300 ml"
+prep_time: "5 mins"
 cook_time: "None"
-main_ingredients: [mayonnaise, parmesan, "lemon juice", "Worcestershire sauce", "anchovy paste", garlic]
+main_ingredients: ["mayonnaise", "parmesan", "lemon juice", "Worcestershire sauce", "anchovy paste", "garlic cloves"]
 star_ingredient:
-tags: [extras, "no-cook"]
+tags: ["extras", "no-cook"]
 ingredient_groups:
   - items:
     - amount: "225 g"
@@ -38,4 +37,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

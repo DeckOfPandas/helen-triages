@@ -1,14 +1,13 @@
 ---
 title: "Lemony Cavolo Nero and Butter Bean Soup"
-short_name: Lemony Cavolo Nero and Butter Bean Soup
 tagline: "It's fun to have a one-pot stew that's bright and acidic without relying on tomatoes."
 source: "Adapted from Good Food, January 2026"
-serves: 4
+serves: "4"
 prep_time: "15 mins"
 cook_time: "20 mins"
-main_ingredients: ["cavolo nero", "butter beans", carrots, lemon, onion, "tomato purée", "vegetable stock"]
-star_ingredient: greens
-tags: ["one-handed food", virtuous]
+main_ingredients: ["cavolo nero", "butter beans", "carrots", "lemon", "onion", "tomato purée", "vegetable stock"]
+star_ingredient: "greens"
+tags: ["one-handed food", "virtuous"]
 ingredient_groups:
   - items:
     - amount: "2"
@@ -48,4 +47,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

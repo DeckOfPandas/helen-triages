@@ -1,14 +1,13 @@
 ---
-title: Dark Chocolate Soufflés
-short_name: Dark Chocolate Soufflés
-tagline: Easier than one might expect.
+title: "Dark Chocolate Soufflés"
+tagline: "Easier than one might expect."
 source: "Adapted from Green & Black's recipe book."
-serves: 6
-prep_time: 15 mins
+serves: "6"
+prep_time: "15 mins"
 cook_time: "10–15 mins"
 main_ingredients: ["dark chocolate", "cocoa powder", "egg whites", "salted butter", "golden caster sugar", "Demerara sugar"]
-star_ingredient: chocolate
-tags: [dessert, showstopper]
+star_ingredient: "chocolate"
+tags: ["dessert", "showstopper"]
 ingredient_groups:
   - items:
     - amount: "100 g"
@@ -38,4 +37,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

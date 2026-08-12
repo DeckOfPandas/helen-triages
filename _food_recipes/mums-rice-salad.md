@@ -1,14 +1,13 @@
 ---
 title: "Mum's Rice Salad"
-short_name: "Mum's Rice Salad"
-tagline: Apparently other people add diced peppers to this.
-source: Mum
-serves: However many people want to eat 150 g rice
+tagline: "Apparently other people add diced peppers to this."
+source: "Mum"
+serves: "However many people want to eat 150 g rice"
 prep_time: "10 mins"
 cook_time: "20 mins"
-main_ingredients: ["brown rice", cashews, sultanas, "dark soy sauce", "ginger paste", lemon, "garlic purée"]
+main_ingredients: ["brown rice", "cashews", "sultanas", "dark soy sauce", "ginger paste", "lemon", "garlic purée"]
 star_ingredient:
-tags: [salad, make-ahead]
+tags: ["salad", "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "150 g"
@@ -44,4 +43,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

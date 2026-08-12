@@ -1,14 +1,13 @@
 ---
-title: The One True Chocolate Brownies
-short_name: Chocolate Brownies
-tagline: Foolproof.
+title: "The One True Chocolate Brownies"
+tagline: "Foolproof."
 source: "Adapted from Green & Black's recipe book"
 makes: "enough for that edge-brownie tin I made James buy me"
 prep_time: "10 mins"
 cook_time: "20–25 mins"
-main_ingredients: ["dark chocolate", "unsalted butter", eggs, "golden granulated sugar", "plain flour"]
-star_ingredient: chocolate
-tags: [bakes]
+main_ingredients: ["dark chocolate", "unsalted butter", "eggs", "golden granulated sugar", "plain flour"]
+star_ingredient: "chocolate"
+tags: ["bakes"]
 ingredient_groups:
   - items:
     - amount: "300 g"
@@ -47,4 +46,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

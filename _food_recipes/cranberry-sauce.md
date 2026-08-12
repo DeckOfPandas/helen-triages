@@ -1,14 +1,13 @@
 ---
-title: Cranberry Sauce
-short_name: Cranberry Sauce
+title: "Cranberry Sauce"
 tagline: "The simplest this could possibly be."
-source: Experience
+source: "Experience"
 serves: "6–8 as a condiment"
 prep_time: "2 mins"
 cook_time: "10 mins"
-main_ingredients: [cranberries, orange, "light brown muscovado sugar"]
-star_ingredient: fruit
-tags: [extras, festive, "make-ahead", freezable]
+main_ingredients: ["cranberries", "orange", "light brown muscovado sugar"]
+star_ingredient: "fruit"
+tags: ["extras", "festive", "make-ahead", "freezable"]
 ingredient_groups:
   - items:
     - amount: "100 g"
@@ -32,4 +31,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

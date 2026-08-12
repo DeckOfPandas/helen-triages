@@ -1,9 +1,8 @@
 ---
 title: "Classic Masala Chai"
-short_name: "Classic Masala Chai"
 tagline: "Just perfect."
 source: "delicious. magazine"
-serves: 4
+serves: "4"
 prep_time: "5 mins"
 cook_time: "10 mins"
 main_ingredients: ["green cardamom pods", "cinnamon stick", "whole cloves", "fresh ginger", "black tea leaves", "whole milk"]
@@ -48,4 +47,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

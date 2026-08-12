@@ -124,16 +124,29 @@ ALL_DRAFTS = _load(DRAFTS_DIR)
 
 
 def pytest_generate_tests(metafunc):
-    """Parametrise any test that asks for a `recipe` argument.
+    """Parametrise any test that asks for a `recipe` or `draft` argument.
 
-    Nothing parametrises on a `draft` argument today — the three tests that
-    read `_food_drafts/` do it via the `ALL_DRAFTS` list directly (see
-    HANDOVER_v26.md §10), not a per-draft fixture. A `draft`-parametrised
-    hook lived here until 2026-08-10 with zero consumers; removed rather
-    than kept "in case" — add it back the day a test actually needs it.
+    A `draft`-parametrised hook lived here until 2026-08-10 with zero
+    consumers, and was removed rather than kept "in case" — added back
+    2026-08-11 for tests/test_drafts.py, the day one actually needed it.
+    `recipe` and `draft` are deliberately separate fixtures over separate
+    lists (ALL_RECIPES vs ALL_DRAFTS) so a recipe-only rule (e.g. a blank
+    tagline, a missing `QQ`) never gets silently enforced against a draft,
+    and vice versa — see test_drafts.py's own module docstring for which
+    rules apply to both and which don't.
+
+    The five tests that read `_food_drafts/` directly via the ALL_DRAFTS
+    list rather than this fixture (test_no_main_ingredient_spelling_
+    collisions, test_pantry_entries_are_actually_used, test_no_recipe_uses_
+    the_retired_instructions_field, test_accents_in_drafts, test_pan_and_
+    ingredient_sizes_use_digits_in_drafts) are cross-collection or module-
+    level checks that don't want a per-file failure id, so they're left as
+    they are rather than converted.
     """
     if "recipe" in metafunc.fixturenames:
         metafunc.parametrize("recipe", ALL_RECIPES, ids=[r.slug for r in ALL_RECIPES])
+    if "draft" in metafunc.fixturenames:
+        metafunc.parametrize("draft", ALL_DRAFTS, ids=[d.slug for d in ALL_DRAFTS])
 
 
 @pytest.fixture(scope="session")
@@ -178,3 +191,11 @@ def internal_temperatures() -> dict:
 def where(recipe: Recipe, detail: str = "") -> str:
     """Consistent location prefix for failure messages."""
     return f"_food_recipes/{recipe.slug}.md" + (f" — {detail}" if detail else "")
+
+
+def where_draft(draft: Recipe, detail: str = "") -> str:
+    """Same as where(), for a _food_drafts/ file — the two collections are
+    never confused in a failure message even though they share the Recipe
+    class.
+    """
+    return f"_food_drafts/{draft.slug}.md" + (f" — {detail}" if detail else "")

@@ -1,14 +1,13 @@
 ---
-title: Indonesian Chicken Curry (Gulai Ayam)
-short_name: Indonesian Chicken Curry
+title: "Indonesian Chicken Curry (Gulai Ayam)"
 tagline: "A proper fakeaway, and it freezes like a dream. The ingredient list is long, but there's no filler."
 source: "Adapted from Good Food, August 2024"
-serves: 4
+serves: "4"
 prep_time: "20 mins plus marinating"
 cook_time: "1 hr"
-main_ingredients: ["chicken thighs", "coconut cream", "lemongrass stalks", lime, "cinnamon sticks", "green cardamom pods", galangal, "fresh ginger", "whole nutmeg", "tamarind paste", "macadamia nuts", "lime leaves", "coconut palm sugar", "banana shallots (echalions)"]
-star_ingredient: poultry
-tags: [fakeaway, freezable, "make-ahead", "one-handed food"]
+main_ingredients: ["chicken thighs", "coconut cream", "lemongrass stalks", "lime", "cinnamon sticks", "green cardamom pods", "galangal", "fresh ginger", "whole nutmeg", "tamarind paste", "macadamia nuts", "lime leaves", "coconut palm sugar", "banana shallots (echalions)"]
+star_ingredient: "poultry"
+tags: ["fakeaway", "freezable", "make-ahead", "one-handed food"]
 ingredient_groups:
   - name: curry
     items:
@@ -67,7 +66,7 @@ method_groups:
   - name: marinate
     steps:
     - step: "Put the chicken in a large bowl with the lime juice and zest, and some salt. Cover and leave for ≥2h."
-      note: "don't skip the salt, it's part of the chemical process"
+      note: "Don't skip the salt, it's part of the chemical process."
   - name: bumbu
     steps:
     - Blend the bumbu ingredients with some oil until smooth.
@@ -96,4 +95,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

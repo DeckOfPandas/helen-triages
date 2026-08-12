@@ -1,14 +1,13 @@
 ---
-title: Cherry Glaze
-short_name: Cherry Glaze
+title: "Cherry Glaze"
 tagline: "A sweet-sour reduction, excellent with [five-spice duck](../five-spice-crispy-duck-legs/)."
-source: Adapted from Gordon Ramsay
-makes: Some
+source: "Adapted from Gordon Ramsay"
+makes: "Some"
 prep_time: "5 mins"
 cook_time: "20 mins"
-main_ingredients: [honey, "dark soy sauce", "red wine vinegar", "chicken stock", cherries]
-star_ingredient: fruit
-tags: ["make-ahead", extras]
+main_ingredients: ["honey", "dark soy sauce", "red wine vinegar", "chicken stock", "cherries"]
+star_ingredient: "fruit"
+tags: ["make-ahead", "extras"]
 ingredient_groups:
   - name: glaze
     items:
@@ -37,4 +36,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

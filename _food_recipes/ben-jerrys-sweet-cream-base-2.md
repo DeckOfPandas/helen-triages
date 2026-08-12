@@ -1,6 +1,5 @@
 ---
-title: Ben & Jerry's Sweet Cream Base No. 2
-short_name: Ben & Jerry's Sweet Cream Base No. 2
+title: "Ben & Jerry's Sweet Cream Base No. 2"
 tagline: "The richest of the three bases from Ben & Jerry: no eggs, no milk, just cream and sugar. It doesn't keep particularly well, so best to eat it all up."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
@@ -8,7 +7,7 @@ prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["whipping cream", "single cream", "golden caster sugar"]
 star_ingredient:
-tags: [extras, "no-cook"]
+tags: ["extras", "no-cook"]
 ingredient_groups:
   - items:
     - amount: "480 ml"
@@ -33,4 +32,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

@@ -1,14 +1,13 @@
 ---
-title: Macarons
-short_name: Macarons
+title: "Macarons"
 tagline: "Really not as hard as you think."
 source: "Adapted from Gordon Ramsay's Desserts"
 makes: "64+ tiny macarons"
 prep_time: "30 mins plus 30 mins resting"
 cook_time: "20 mins"
-main_ingredients: ["ground almonds", "icing sugar", "cocoa powder", "egg whites", mascarpone, cream, "vanilla extract", "cream of tartar", "plain flour", "natural yoghurt", "double cream"]
+main_ingredients: ["ground almonds", "icing sugar", "cocoa powder", "egg whites", "mascarpone", "cream", "vanilla extract", "cream of tartar", "plain flour", "natural yoghurt", "double cream"]
 star_ingredient:
-tags: [bakes, showstopper]
+tags: ["bakes", "showstopper"]
 ingredient_groups:
   - name: vanilla biscuits
     items:
@@ -51,10 +50,10 @@ ingredient_groups:
 method:
   - "Mix the dry ingredients and vanilla."
   - step: "Whisk the egg whites and cream of tartar to a firm and shiny foam."
-    note: "eggs more than a week old work best, and the bowl must be perfectly clean and dry — wipe it out with lemon juice if in doubt"
+    note: "Eggs more than a week old work best, and the bowl must be perfectly clean and dry — wipe it out with lemon juice if in doubt."
   - "Fold in the dry mixture using a metal spoon and bang the bowl down several times to release any air pockets."
   - step: "Pipe into 2.5 cm mounds on a sheet"
-    note: "or use a teaspoon, but, for once, piping is actually easier and less hassle"
+    note: "Or use a teaspoon, but, for once, piping is actually easier and less hassle."
   - "Bang the sheet down several times carefully to release any bubbles."
   - "Leave for about 30 mins until a shiny skin forms on the tops."
   - "Bake for about 20 mins at 130-135°C fan: they should be slightly crisp, but easily dentable."
@@ -72,4 +71,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

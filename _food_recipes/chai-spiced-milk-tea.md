@@ -1,14 +1,13 @@
 ---
-title: Chai-Spiced Milk Tea
-short_name: Chai-Spiced Milk Tea
+title: "Chai-Spiced Milk Tea"
 tagline: "Actual simmered chai, not a teabag dunked in hot milk. Use [chai spice powder](../chai-spice-powder/)."
 source: "Adapted from indianhealthyrecipes.com"
-serves: 1
+serves: "1"
 prep_time: "None"
 cook_time: "10 mins"
 main_ingredients: ["loose-leaf black tea", "whole milk", "chai spice powder", "golden caster sugar"]
 star_ingredient:
-tags: [drinks]
+tags: ["drinks"]
 ingredient_groups:
   - name: tea
     items:
@@ -38,4 +37,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

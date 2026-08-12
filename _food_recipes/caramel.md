@@ -1,14 +1,13 @@
 ---
-title: Caramel
-short_name: Caramel
+title: "Caramel"
 tagline: "For topping, filling, millionaire's shortbread, or ...#WheresMySpoon."
-source: Mrs Nicholson
-makes: I mean, who cares, make double anyway
-prep_time: 5 mins
-cook_time: 10 mins
+source: "Mrs Nicholson"
+makes: "I mean, who cares, make double anyway"
+prep_time: "5 mins"
+cook_time: "10 mins"
 main_ingredients: ["light brown soft sugar", "salted butter", "double cream", "condensed milk"]
 star_ingredient:
-tags: [extras]
+tags: ["extras"]
 ingredient_groups:
   - name: caramel
     items:
@@ -40,4 +39,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

@@ -1,14 +1,13 @@
 ---
-title: Chicken and Cider Stew
-short_name: Chicken and Cider Stew
-tagline: Comfort food, but light enough for summer.
-source: Adapted from Riverford
-serves: 4
-prep_time: 15 mins
+title: "Chicken and Cider Stew"
+tagline: "Comfort food, but light enough for summer."
+source: "Adapted from Riverford"
+serves: "4"
+prep_time: "15 mins"
 cook_time: "1 hr"
-main_ingredients: ["chicken thighs and drumsticks", cider, "cooking apples", "crème fraîche", turnip, "green beans"]
-star_ingredient: poultry
-tags: ["one-handed food", virtuous, freezable]
+main_ingredients: ["chicken thighs and drumsticks", "cider", "cooking apples", "crème fraîche", "turnip", "green beans"]
+star_ingredient: "poultry"
+tags: ["one-handed food", "virtuous", "freezable"]
 ingredient_groups:
   - items:
     - amount: "1.5 kg"
@@ -27,8 +26,8 @@ ingredient_groups:
       item: tarragon sprigs
     - amount: "200 g"
       item: "summer turnips, chopped"
-    - amount: "2"
-      item: "large cooking apples, chopped"
+    - amount: "2 large"
+      item: "cooking apples, chopped"
     - amount: "300 g"
       item: green beans
     - amount: "150 g"
@@ -63,4 +62,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

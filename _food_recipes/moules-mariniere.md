@@ -1,14 +1,13 @@
 ---
-title: Moules Marinière
-short_name: Moules Marinière
+title: "Moules Marinière"
 tagline: "Just five ingredients — the hardest part is deciding which mussels don't make it into the pot."
-source: France
-serves: 4
+source: "France"
+serves: "4"
 prep_time: "15 mins"
 cook_time: "10 mins"
-main_ingredients: [mussels, "white wine", shallots, "salted butter", "fresh flat-leaf parsley"]
-star_ingredient: shellfish
-tags: [starter, virtuous]
+main_ingredients: ["mussels", "white wine", "shallots", "salted butter", "fresh flat-leaf parsley"]
+star_ingredient: "shellfish"
+tags: ["starter", "virtuous"]
 ingredient_groups:
   - items:
     - amount: "2 kg"
@@ -36,4 +35,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

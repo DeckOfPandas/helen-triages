@@ -1,14 +1,13 @@
 ---
 title: "Delia's Classic Pancakes"
-short_name: "Delia's Classic Pancakes"
 tagline: "You don't need to make this batter beforehand like other recipes...amazing but true."
-source: Adapted from Delia Smith
+source: "Adapted from Delia Smith"
 makes: "about 8"
-prep_time: 10 mins
+prep_time: "10 mins"
 cook_time: "3–4 mins per pancake"
-main_ingredients: ["plain flour", eggs, milk, "salted butter"]
+main_ingredients: ["plain flour", "eggs", "milk", "salted butter"]
 star_ingredient:
-tags: ["carbs party", festive]
+tags: ["carbs party", "festive"]
 ingredient_groups:
   - items:
     - amount: "120 g"
@@ -32,4 +31,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

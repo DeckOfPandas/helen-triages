@@ -1,14 +1,13 @@
 ---
-title: Sticky Oxtail Stew
-short_name: Sticky Oxtail Stew
+title: "Sticky Oxtail Stew"
 tagline: "Six hours in the oven breaks oxtail down into sticky heaven."
-source: Adapted from Jamie Oliver
-serves: 8
-prep_time: 30 mins
+source: "Adapted from Jamie Oliver"
+serves: "8"
+prep_time: "30 mins"
 cook_time: "6 hrs"
-main_ingredients: [oxtail, porter, "plum tomatoes", leeks, carrots, celery, "fresh thyme", "fresh rosemary", "fresh bay leaves"]
-star_ingredient: beef
-tags: [freezable, "make-ahead", "one-handed food"]
+main_ingredients: ["oxtail", "porter", "plum tomatoes", "leeks", "carrots", "celery", "fresh thyme", "fresh rosemary", "fresh bay leaves"]
+star_ingredient: "beef"
+tags: ["freezable", "make-ahead", "one-handed food"]
 ingredient_groups:
   - items:
     - amount: "2.5 kg"
@@ -63,4 +62,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

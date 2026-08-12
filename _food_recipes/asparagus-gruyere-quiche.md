@@ -1,12 +1,11 @@
 ---
-title: Asparagus and Gruyère Quiche with Parmesan Crust
-short_name: Asparagus and Gruyère Quiche
+title: "Asparagus and Gruyère Quiche with Parmesan Crust"
 tagline: "As good hot, reheated, cold, or straight from the fridge with a guilty look on your face. Strategically over-cater to ensure leftovers."
-source: Good friend Daniel
+source: "Good friend Daniel"
 serves: "4–6"
 prep_time: "30 mins plus 30 mins resting"
 cook_time: "1 hr"
-main_ingredients: [asparagus, gruyère, eggs, "double cream", parmesan, onion]
+main_ingredients: ["asparagus", "gruyère", "eggs", "double cream", "parmesan", "onion"]
 star_ingredient:
 tags: ["cheese-tastic", "make-ahead", "one-handed food"]
 ingredient_groups:
@@ -74,4 +73,5 @@ meta:
   proofread: true
   cooked_before: true
   date_last_edited: "2026-07-25"
+
 ---

@@ -1,14 +1,13 @@
 ---
-title: Courgette and Orange Cake with Cream Cheese Frosting
-short_name: Courgette and Orange Cake
+title: "Courgette and Orange Cake with Cream Cheese Frosting"
 tagline: "Lighter and more savoury than carrot cake."
 source: "Adapted from Good Food, recipe Sara Buenfeld"
 makes: "12 slices"
 prep_time: "10 mins"
 cook_time: "50 mins"
-main_ingredients: [courgette, orange, sultanas, "cream cheese", pistachios, "light brown soft sugar", "icing sugar", self-raising flour", "large eggs"]
+main_ingredients: ["courgette", "orange", "sultanas", "cream cheese", "pistachios", "light brown soft sugar", "icing sugar", "self-raising flour", "eggs"]
 star_ingredient:
-tags: [bakes, freezable]
+tags: ["bakes", "freezable"]
 ingredient_groups:
   - name: cake
     items:
@@ -18,8 +17,8 @@ ingredient_groups:
       item: light brown soft sugar
     - amount: "125 ml"
       item: sunflower oil
-    - amount: "3"
-      item: "large eggs, lightly beaten"
+    - amount: "3 large"
+      item: "eggs, lightly beaten"
     - amount: "1"
       item: "orange, zest only"
     - amount: "1 tsp"
@@ -55,4 +54,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---

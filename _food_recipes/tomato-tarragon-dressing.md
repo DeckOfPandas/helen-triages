@@ -1,14 +1,13 @@
 ---
-title: Tomato and Tarragon Dressing
-short_name: Tomato Tarragon Dressing
+title: "Tomato and Tarragon Dressing"
 tagline: "A bright dressing that works brilliantly with beef, but honestly with anything. It's also sort of a salad on its own."
 source: "Adapted from GoodtoKnow, recipe Gordon Ramsay"
-serves: 6
+serves: "6"
 prep_time: "15 mins plus 20 mins chilling"
 cook_time: "None"
 main_ingredients: ["plum tomatoes", "Worcestershire sauce", "Dijon mustard", "lemon", "balsamic vinegar", "shallots", "fresh tarragon", "fresh parsley"]
 star_ingredient:
-tags: [extras, "no-cook", "make-ahead", "salad"]
+tags: ["extras", "no-cook", "make-ahead", "salad"]
 ingredient_groups:
   - items:
     - amount: "500 g"
@@ -42,4 +41,5 @@ meta:
   proofread: false
   cooked_before: true
   date_last_edited: "2026-08-11"
+
 ---
