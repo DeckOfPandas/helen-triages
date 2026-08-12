@@ -171,31 +171,28 @@ article.recipe .recipe-body-content {
     margin: 0 0 $space-lg 0;
   }
 
-  // --- The lede ------------------------------------------------------------
-  // The first paragraph under a longform heading, one step up in size.
+  // --- NO LEDE. Prose is one size, end to end. -----------------------------
+  // There WAS one here for a day: the first paragraph under a longform heading,
+  // set one step up (1.06rem/62ch), as half the answer to "the whole thing just
+  // doesn't scream oh my god read me now" (issue #185). The idea was that the
+  // section headings shout and then everything beneath them was flat grey, so
+  // the heading had nowhere to hand off to.
   //
-  // This is the answer to the second half of Helen's issue #185 -- "the whole
-  // thing just doesn't scream oh my god read me now." The section headings
-  // already shout (1.8rem Courier, punched tape, two-colour rule) and then
-  // everything beneath them was one flat grey texture at 0.92rem, so the eye
-  // landed on the heading and had nowhere to go next. A lede gives the heading
-  // something to hand off to.
+  // It didn't survive being looked at. Helen: "I think this looks uneven. I'd
+  // prefer the size to be the same throughout." The reasoning was circular, and
+  // the screenshots showed why: a lede works when it is visibly a SHORT
+  // standalone opener, and these run three and four lines -- near enough the
+  // same length as the paragraph after them. Nothing marked them as the opener
+  // except the size change itself, so it read as inconsistency rather than as
+  // hierarchy.
   //
-  // Size and measure only -- not bold, not coloured. Weight now has exactly one
-  // job on this page (see the cause lead-ins below) and colour is spent on what
-  // you navigate by, not on what you read (_palette.scss's colour budget).
-  //
-  // Selected structurally rather than by class, because kramdown can't add one:
-  // "the p straight after a peer heading", or straight after that heading's
-  // a.k.a. subtitle where one exists. The :not() keeps the subtitle itself --
-  // which is also a p directly after an h2 -- out of it.
-  h2 + p:not(.recipe-section-subtitle),
-  .recipe-section-subtitle + p {
-    font-size: 1.06rem;
-    line-height: 1.6;
-    max-width: 62ch;
-    margin-bottom: $space-xl;
-  }
+  // DON'T RE-ADD IT, and don't reach for a smaller version of the same idea
+  // either. Everything a lede was there to do is being done by devices that
+  // don't touch the prose: the section heading's own mark, the Tips labels, and
+  // the violet rule on each failure name. The prose underneath is one size, one
+  // weight and one colour, deliberately -- it is the thing being read, not a
+  // thing being navigated by (_palette.scss's colour budget makes the same
+  // split for colour, and it applies to size just as well).
 
   // --- Bulleted lists, the plain case --------------------------------------
   // A light em dash rather than the browser default disc. Issue #185, Helen:
@@ -252,8 +249,11 @@ article.recipe .recipe-body-content {
   // step up. Helen, on the first pass: "is the mixture of two body font sizes
   // intentional? It feels uneven." It wasn't; five sizes had accreted between
   // 0.88 and 1.06rem, several within 4% of each other -- too close to read as
-  // deliberate steps, too far apart to read as the same size. Longform now
-  // spends exactly TWO: this one and the lede's 1.06rem. Everything else is
+  // deliberate steps, too far apart to read as the same size. That collapsed to
+  // two, and then, once the lede went, to ONE for everything you read: every
+  // paragraph, every Tips label and every symptom line is $font-size-body-sm.
+  // The only other size left in longform is the failure name, which is a
+  // heading wearing a rule, not prose. Everything else is
   // separated by face, case, colour, italic or the mark, which is this page's
   // own logic already (see $color-step-number's comment: "face, size, weight
   // and stroke all differ, which is more than enough").
@@ -355,10 +355,13 @@ article.recipe .recipe-body-content {
       // line break beneath it comes from the symptom being display: block, not
       // from this being a block itself.
       //
-      // 1.06rem, the same size as the lede above: longform now spends exactly
-      // two type sizes (see the labelled-list rule for why). It doesn't need a
-      // third to outrank the prose -- it's uppercase Courier wearing a violet
-      // rule, against light sans.
+      // 1.06rem, and the ONLY size in longform that isn't $font-size-body-sm.
+      // It survives the "one size throughout" rule the prose now follows
+      // because it isn't prose: uppercase Courier wearing a violet rule reads
+      // as a heading whatever size it is set at, so if this ever looks like
+      // part of the unevenness rather than apart from it, drop it to
+      // $font-size-body-sm and nothing else has to change -- the mark, the case
+      // and the face carry the whole distinction on their own.
       > strong:first-child {
         font-family: $font-headings;
         font-weight: 700;

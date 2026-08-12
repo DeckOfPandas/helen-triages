@@ -59,7 +59,7 @@ And a note on food safety: don't let it sit too long in the temperature "danger 
 <p class="recipe-section-subtitle">a.k.a. egg yolks are sneaky</p>
 
 
-Here are four ways the emulsion can fail.
+Here are four ways the emulsion can fail:
 
 1. **Splitting** *a greasy yellow slick floating on top of flabby egg mush*
    - **You added the butter too quickly.** There's a limit to how fast egg yolk can coat butter.
@@ -78,6 +78,6 @@ Here are four ways the emulsion can fail.
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">A Final Warning</span></h2>
 
-Reheating Hollandaise sauce is really hard. If you reheat cold, set Hollandaise clumsily, it will melt too fast and giant blobs of lipids will split the sauce because the egg can't keep up.
+**Reheating Hollandaise sauce is really hard**. If you reheat cold, set Hollandaise clumsily, it will melt too fast and giant blobs of lipids will split the sauce because the egg can't keep up.
 
 If you must reheat, do so very very slowly over a bain-marie, throw some salt over your left shoulder, and stir continuously but very gently.
