@@ -43,7 +43,8 @@
 $index-section-gap: $space-xl;   // between one filter section and the next
 $index-label-gap:   $space-md;   // a label to its own buttons
 
-// TYPOGRAPHY MATCHED TO THE RECIPE PAGE'S SECTION HEADINGS, ONE STEP DOWN.
+.category {
+  // TYPOGRAPHY MATCHED TO THE RECIPE PAGE'S SECTION HEADINGS, ONE STEP DOWN.
   // These carry the same blocky rule, so they have to belong to the same voice
   // — but they are filter labels on a control panel, five of them stacked in a
   // screenful, not the three landmarks of a long scrolling page. Same family,
@@ -68,21 +69,21 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // half of the effect. Same principle this comment already stated, applied
   // everywhere instead of in one place.
   //
-  // DELIBERATELY NOT NESTED INSIDE .category, unlike everything else in this
-  // block. It was, until 2026-08-12, and that quietly excluded the one
-  // .category-label on the page that has no .category ancestor: the results
-  // heading's own "N survivors" count (food/index.html, `<div
-  // class="results-heading"><span class="category-label">`). That element's
-  // comment says it "reuses the exact filter-heading treatment (punched label +
-  // stroke)" -- it intended to and never did, so the count was rendering in the
-  // body sans with no lettering at all while every label above it was Courier.
-  // Found by reading the compiled cascade after Helen asked whether the site-
-  // wide lettering pass had actually reached the landing page's headings.
+  // SCOPED TO .category ON PURPOSE, AND THE SCOPE IS LOAD-BEARING. It is what
+  // keeps the results heading's "N survivors" count out of this rule -- that
+  // count is the one .category-label in the markup with no .category ancestor
+  // (food/index.html: `<div class="results-heading"><span
+  // class="category-label">`), so it has never picked any of this up, despite
+  // that element's own comment claiming it "reuses the exact filter-heading
+  // treatment".
   //
-// Nothing needs the .category scope: every .category-label in the markup
-// wants this, and the two rules that legitimately differ (.search
-// .search-input, .category--meta) still out-specify a single class.
-.category-label {
+  // Un-scoped on 2026-08-12 on the reading that the mismatch was a bug, and put
+  // back the same day. Helen: "please revert the N survivors change. I liked it
+  // bare -- just actively style it to control it, but leave it looking how it
+  // was." So the scope stays, and the bare look is now DECLARED rather than
+  // left to the absence of a matching rule -- see .results-heading
+  // .category-label directly below.
+  .category-label {
     font-family: $font-headings;
     text-transform: uppercase;
     font-size: 1.35rem;
@@ -113,6 +114,33 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     // filter buttons underneath it — invisible under a wash, obvious under a
     // straight rule.
     padding: 0.22rem 0;
+  }
+}
+
+// THE RESULTS COUNT IS DELIBERATELY BARE, and this rule exists to say so.
+// Helen: "I liked it bare -- just actively style it to control it, but leave it
+// looking how it was."
+//
+// Every value below is what the element was already inheriting when nothing
+// matched it at all, so this changes nothing on the page today. That is the
+// point: the count reads as plain body text because someone decided it should,
+// not because a selector happens to miss it. Without this rule the look
+// survives only as an accident of .category-label being scoped -- and that
+// scoping was un-scoped once already, on exactly the reasoning that a label
+// class not looking like a label must be a bug.
+//
+// If you are here because you want the count to match the filter labels above
+// it: that was tried on 2026-08-12 and Helen preferred it bare. Don't.
+.results-heading .category-label {
+  font-family: $font-body;
+  font-size: 1rem;          // body default; no size of its own
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.01em;   // matches the `body, button` rule in shared/_base
+  color: $color-text;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  padding: 0;
 }
 
 .category {

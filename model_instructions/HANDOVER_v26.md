@@ -1266,9 +1266,19 @@ it is applied from one place: the `h1, h2, h3` rule in
 size and (on the two biggest) the offset, but none of them opts *in* any more —
 opting in was exactly how the effect came to be missing from some headings and
 mis-tuned on others. `.category-label` (the index's filter section labels —
-STAR INGREDIENT, MOOD, etc., plus the results heading's "N survivors" count)
-lives in `_sass/food/_category-labels.scss`; the header wordmark lives in
-`_sass/shared/_layout.scss`, see §13.8. Written out in full because "reads as
+STAR INGREDIENT, MOOD, etc.) lives in `_sass/food/_category-labels.scss`; the
+header wordmark lives in `_sass/shared/_layout.scss`, see §13.8.
+
+**Two things on the index deliberately do NOT wear it, and both were checked
+with Helen rather than assumed.** The results heading's "N survivors" count is
+plain body text — it carries `class="category-label"` but sits outside
+`.category`, so the rule is scoped to keep it out, and `.results-heading
+.category-label` now states the bare treatment outright so it can't be
+"fixed" again by accident (it was, once, on 2026-08-12; Helen: "I liked it
+bare"). And the **active states of filter buttons and recipe-row tags** carry
+a heavy `-webkit-text-stroke` in the *same* colour as the letter with
+`text-shadow: none` — see §13.4.2, that is a different effect wearing the same
+property. Written out in full because "reads as
 embossed label-maker text" is not enough to reproduce it — the actual
 mechanism, and the trap in it, aren't visible from the compiled CSS.
 
@@ -1414,12 +1424,49 @@ difference too many, and it made `h3` the odd heading out on a site where
 every other one is embossed. The about page's FAQ questions are the visible
 case.
 
-**To extend the device somewhere new:** `@include punched(raised)`, plus a
-stroke computed at the same proportion as `.category-label`'s (or the recipe
-page headings', whichever is closer in size), and leave `$emboss-offset` /
-`$color-emboss-light` / `$color-emboss-shadow` alone — those are the
-constants that make every use of this read as one consistent device rather
-than a new effect invented each time.
+**To extend the device somewhere new:** `@include punched(raised)` plus
+`-webkit-text-stroke: $emboss-stroke <a colour LIGHTER than the letter>`, and
+leave `$emboss-offset` / `$color-emboss-light` / `$color-emboss-shadow` alone —
+those are the constants that make every use of this read as one consistent
+device rather than a new effect invented each time.
+
+#### 13.4.2 The other `-webkit-text-stroke` — faux-bold, not an edge
+
+**One CSS property, two unrelated jobs, and telling them apart is the whole
+of this section.** Check the stroke's COLOUR before assuming a heavy stroke is
+a mis-tuned punched-tape edge:
+
+- **Lighter than the letter** (`$color-label-stroke`) → it's an **edge**, half
+  of the punched-tape effect. Wants `$emboss-stroke`, 1.4%. §13.4.1.
+- **The same colour as the letter** (`$color-text`) → it's a **faux-bold**,
+  and has nothing to do with the punched effect. Wants to stay heavy.
+
+The faux-bold exists because **Courier New ships only Regular and Bold as
+static faces**, so `font-weight: 900` already resolves to Bold and there is
+nothing above it. Thickening the glyph with a stroke in its own colour is the
+only way to get "heavier than bold" — which is what an *active* filter button
+needs, since the whole signal is that it looks heavier than the ones next to
+it. It's used at ~0.6px by the active states of the filter buttons
+(`_category-labels.scss`, `_search.scss`, `_active-filter-states.scss`) and by
+the matched tags, title hits and ingredient hits on a recipe row
+(`_recipe-list.scss`).
+
+**These are NOT raised, despite looking as if they might be.** Every one of
+them sets `text-shadow: none` explicitly. Helen removed the emboss from them on
+2026-08-03 for a reason that still holds: the category colour already lives in
+`.tag-shape`, and the punched treatment means "landmark / heading" everywhere
+else on the site, where these are controls in a selected state. She raised the
+question again on 2026-08-12 ("should these get the same treatment... I could
+argue it either way") and the answer was no on both counts — bringing them onto
+`$emboss-stroke` would thin them by roughly 3.5× and delete the selected-state
+weight jump, which is the only thing distinguishing an on filter from an off
+one.
+
+**What they DO share with §13.4.1 is the drift, in their own job.** 0.6px is
+absolute across type from 0.72rem to 1rem, so it runs 5.2% on a badge and 3.75%
+on a `.title-hit` — two elements that sit on the same recipe row. If that gets
+fixed, it gets its own em constant with its own name, next to `$emboss-stroke`
+and explicitly not it. Open, not done.
 
 ### 13.5 The colour contract, and why the two pages differ
 
