@@ -68,8 +68,8 @@ $letter-spacing-label: 0.1em;
 // $stroke-light, was doing 0.5px on everything from 0.85rem to 1.35rem, which
 // is 3.7% of the type on one and 2.3% on another.
 //
-// Replaced by punched-stroke($size) in shared/_rule.scss, which takes the type
-// size and returns its proportion. That file's own comment has the reasoning
+// Replaced by $emboss-stroke in shared/_rule.scss -- one em-based value that
+// is 1.4% of whatever it lands on. That file's own comment has the reasoning
 // and the measurements; it lives there because the stroke is one half of the
 // punched-tape effect and the emboss offset is the other, and separating them
 // is what let them drift apart in the first place.

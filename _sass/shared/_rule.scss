@@ -58,12 +58,18 @@
 // demonstrably work already sit. HELEN TRIAGES is at 6.3% offset after Helen
 // tuned it by hand; the Tips label is at 6.8% and 1.4% stroke, and is what
 // prompted this. Everything else is now brought onto them.
-$emboss-stroke-ratio: 0.014;   // 1.4% of font-size
-$emboss-offset-ratio: 0.065;   // 6.5% of font-size
-
-@function punched-stroke($size) {
-  @return $size * $emboss-stroke-ratio;
-}
+// THE STROKE IS AN `em`, WHICH IS THE WHOLE TRICK. A length in em resolves
+// against the element's OWN computed font-size, so one value is 1.4% of
+// whatever it lands on without anyone having to know, state or maintain the
+// size. The first version of this was a punched-stroke($size) function taking
+// the size as an argument, which worked but had to be told the number every
+// time -- fine on the six elements that set their own font-size, useless on the
+// global h1/h2/h3 rule in shared/_base.scss, where the size is whatever the
+// document says it is. Since that rule is what makes the treatment reach EVERY
+// heading rather than a list of them, em wins on both counts: it does more and
+// it can't drift.
+$emboss-stroke: 0.014em;       // 1.4% of font-size, self-scaling
+$emboss-offset-ratio: 0.065;   // 6.5% of font-size -- see the two values below
 
 // The offset stays a WHOLE PIXEL rather than a computed proportion, unlike the
 // stroke, and the difference is deliberate: a fractional stroke width is

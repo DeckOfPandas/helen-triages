@@ -131,7 +131,22 @@ $tape-protrusion: 0.2rem;
   font-weight: 1000;
   letter-spacing: 0.18em;
   color: $color-text;
-  -webkit-text-stroke: 1.2px rgba(50,50,50,0.9);
+  // Brought onto $emboss-stroke 2026-08-12 with every other heading on the
+  // site. THIS IS THE CHANGE HERE MOST LIKELY TO WANT REVERTING, so: it was
+  // `1.2px rgba(50,50,50,0.9)`, which is 3.75% of this element's 2rem -- the
+  // heaviest outline anywhere, and the reason the note below had to widen the
+  // offset to 2px to be seen past it at all. Thinning the stroke is the other
+  // way to solve that same problem, and it's the way every other heading now
+  // solves it. Put the old line back verbatim if HELEN TRIAGES has lost too
+  // much weight; the 2px offset below is independent and should stay either
+  // way (2rem x 6.5% = 2.1px, so it is on the ratio, not a compensation any
+  // more).
+  //
+  // Colour follows too: rgba(50,50,50,0.9) was a standalone grey with no
+  // relationship to the letter it outlined -- the same thing .category-label
+  // called out and fixed for itself. $color-text at 0.8 is derived from the
+  // lettering, and shared/ may name it (palette contract, HANDOVER §2.3).
+  -webkit-text-stroke: $emboss-stroke rgba($color-text, 0.8);
   text-transform: uppercase;
   // NOT padding-right: 0.18em, deliberately -- that was here before and it's
   // why HELEN TRIAGES visibly shifted right on cocktails. letter-spacing adds

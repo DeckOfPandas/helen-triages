@@ -111,7 +111,7 @@ article.recipe .recipe-body-content {
     font-size: 1rem;
     letter-spacing: $letter-spacing-label;
     color: $color-text;
-    -webkit-text-stroke: punched-stroke(1rem) $color-label-stroke;
+    -webkit-text-stroke: $emboss-stroke $color-label-stroke;
     @include punched(raised);
     margin: $spacing-section-gap 0 $space-md 0;
   }
@@ -142,11 +142,23 @@ article.recipe .recipe-body-content {
     margin: -0.75rem 0 $spacing-section-gap 0;
   }
 
+  // The quiet sub-level: the about page's FAQ questions, and any h3 a reference
+  // page writes. It never carried the punched-tape lettering at all until the
+  // global h1/h2/h3 rule in shared/_base.scss started handing it out
+  // unconditionally (2026-08-12) -- one of the headings the first calibration
+  // pass missed precisely because it had never opted in.
+  //
+  // Only the stroke COLOUR needs restating here. The shared rule can only name
+  // the nine palette-contract variables, so it outlines in $color-text; every
+  // heading on this site uses the softer $color-label-stroke instead, and a
+  // full-strength dark outline on this element's already-lightened grey would
+  // read heavier than the 1.8rem section heading above it, which is backwards.
   h3 {
     @extend %heading-base;
     font-size: 0.78rem;
     letter-spacing: 0.08em;
     color: lighten($color-clear-text, 10%);
+    -webkit-text-stroke: $emboss-stroke $color-label-stroke;
     margin: $space-xl 0 $space-sm 0;
   }
 
@@ -283,9 +295,9 @@ article.recipe .recipe-body-content {
       // The element the site's emboss ratios were calibrated from, once Helen
       // noticed it read as more raised than the page's own headings and asked
       // whether she was imagining it. Now expressed through the function like
-      // everything else -- punched-stroke(0.92rem) is 0.206px, which is the
+      // everything else -- $emboss-stroke on 0.92rem is 0.206px, which is the
       // 0.2px this was hand-set to.
-      -webkit-text-stroke: punched-stroke($font-size-body-sm) $color-label-stroke;
+      -webkit-text-stroke: $emboss-stroke $color-label-stroke;
       @include punched(raised);
       margin-bottom: $space-xs;
       // Shorter than the prose it labels, so a long label wraps before the
@@ -369,7 +381,7 @@ article.recipe .recipe-body-content {
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: $color-text;
-        -webkit-text-stroke: punched-stroke(1.06rem) $color-label-stroke;
+        -webkit-text-stroke: $emboss-stroke $color-label-stroke;
         @include punched(raised);
         @include overlapping-rule-single($color-section-underline-2);
       }
@@ -485,7 +497,7 @@ article.recipe .recipe-body-content {
   // Raised label-tape lettering (HANDOVER_v26.md §13.4.1). Stroke was
   // $stroke-light's flat 0.5px, i.e. 3.1% of this element's own 1rem -- same
   // swallowing problem the meta labels had, see food/_recipe-header.scss.
-  -webkit-text-stroke: punched-stroke(1rem) $color-label-stroke;
+  -webkit-text-stroke: $emboss-stroke $color-label-stroke;
   @include punched(raised);
   line-height: 1.4;
 }
