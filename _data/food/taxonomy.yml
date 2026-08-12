@@ -39,19 +39,33 @@
 # useful discriminator across the collection. Don't re-raise this on your
 # own; Helen will bring it back if her own cooking makes it worth it.
 #
-# `eggs` retired 2026-08-09, Helen's call: every one of its six members
-# (asparagus-gruyere-quiche, ben-jerrys-sweet-cream-base-1, delias-classic-
-# pancakes, henrys-quick-bulletproof-hollandaise-sauce, henrys-sunday-
-# waffles, mrs-nicholsons-yorkshire-puddings) uses egg as a technique or
-# structural ingredient, not as the thing the dish is actually about — "if
-# one wants to make eggs then one just does [eggs]". A genuine egg-forward
-# dish (Turkish eggs, deviled eggs, a frittata) would earn this star back;
-# nothing in the collection currently qualifies. All six are blank now.
+# `eggs` retired 2026-08-09, reinstated 2026-08-12 (issue #187), both
+# Helen's explicit call. The 2026-08-09 retirement was sound for the six
+# members it was retired over (asparagus-gruyere-quiche, ben-jerrys-sweet-
+# cream-base-1, delias-classic-pancakes, henrys-quick-bulletproof-
+# hollandaise-sauce, henrys-sunday-waffles, mrs-nicholsons-yorkshire-
+# puddings) — every one used egg as a technique or structural ingredient,
+# not the thing the dish is actually about, and all six stayed blank. But
+# by 2026-08-12 eight _food_drafts/ recipes had `star_ingredient: eggs`
+# sitting invalid against the retirement, which is what surfaced this as a
+# real, not hypothetical, question — checked recipe by recipe against the
+# same test ("is egg the craving, or just doing technique/structural
+# work"), not reinstated wholesale: ajitsuke-tamago (literally "seasoned
+# egg", nothing else in the dish), green-baked-eggs, pink-eggs-beetroot-
+# yogurt-chilli-butter (the poached eggs' colour is the tagline's own
+# selling point), and spring-onion-feta-frittata kept eggs. quick-creme-
+# brulees, spring-herb-goats-cheese-souffle (egg whites are the leavening
+# mechanism, same reasoning that already correctly keeps dark-chocolate-
+# souffles.md on "chocolate"), caramelised-leek-udon-sesame-fried-eggs
+# (title's own head clause, before "with", is "Caramelised Leek Udon") and
+# broad-bean-herb-and-ricotta-fritters (egg as fritter binder) went back to
+# blank, the original retirement reasoning applied to them specifically.
 # -----------------------------------------------------------------------------
 star_ingredients:
   - beef
   - chocolate
   - duck
+  - eggs
   - fruit
   - game
   - greens
@@ -83,13 +97,6 @@ retired_star_ingredients:
     rather than an actual food group, not a real craving the way "beef" or
     "greens" are, and barely/inconsistently used. Not coming back -- blank
     the field, don't reintroduce it.
-  eggs: >-
-    Retired 2026-08-09 -- every prior member used egg as a technique or
-    structural ingredient, not the thing the dish is actually about. A
-    genuine egg-forward dish (Turkish eggs, deviled eggs, a frittata) would
-    earn it back -- that is Helen's call to make deliberately, not a reason
-    to leave the old value sitting in a file meanwhile. Blank it unless she
-    says otherwise.
 
 # -----------------------------------------------------------------------------
 # Tags
