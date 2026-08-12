@@ -492,7 +492,7 @@ def test_garlic_specifies_form(recipe):
 
 # --- loomi: colour, since black and white/yellow are different products ----
 # GitHub issue #173, open, picked up 2026-08-12. Only one current user
-# (vietnamese-spiced-braised-muntjac-haunch.md, "yellow loomi") and it
+# (vietnamese-spiced-braised-venison-haunch.md, "yellow loomi") and it
 # already qualifies -- this is a regression guard, not a fix.
 _QUALIFIED_LOOMI = {"black loomi", "white loomi", "yellow loomi"}
 

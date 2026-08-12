@@ -5,7 +5,7 @@ source: "Adapted from Jamie Oliver"
 serves: "4"
 prep_time: "10 mins"
 cook_time: "15 mins"
-main_ingredients: ["venison", "blueberries", "shallots", "red wine", "thyme", "juniper berries"]
+main_ingredients: ["venison loin", "fresh blueberries", "shallots", "garlic", "red wine", "fresh thyme", "juniper berries"]
 star_ingredient: "game"
 tags: ["showstopper", "virtuous"]
 ingredient_groups:
@@ -31,15 +31,16 @@ ingredient_groups:
 method:
   - "Crush the thyme and juniper berries in a pestle and mortar with salt and pepper. Loosen with olive oil. Pat the venison dry and rub the oil mixture all over it."
   - "Sear in a hot pan on all sides — roughly 6 mins for medium rare, 7–8 mins for medium. Cover and rest on a plate for 4 mins."
-  - "Reduce the heat, and fry the shallots and garlic in olive oil for around 3 mins until translucent and tender. Turn up the heat, add the wine and let it reduce by half. Add the blueberries and simmer slowly for 4 mins, then remove from the heat, and add the butter and swirl the pan so the sauce turns slightly opaque and shiny. Season to taste — venison is lean, and ends up bland if you're shy with the salt."
+  - "Reduce the heat, and fry the shallots and garlic in olive oil for around 3 mins until translucent and tender. Turn up the heat, add the wine and let it reduce by half."
+  - "Add the blueberries and simmer slowly for 3–4 mins, then remove from the heat, and add the butter and swirl the pan so the sauce turns slightly opaque and shiny. Season to taste — venison is lean, and ends up bland if you're shy with the salt."
   - "Slice into 2-cm slices and serve. Add any resting juices to the sauce and spoon over."
 method_short:
   - ""
 notes:
-  - label: "Wine amount"
-    text: "Everything is fine."
   - label: "Don't overcook it"
     text: "Venison loin goes from rare to shoe leather on a tuppence."
+  - label: "Wine amount"
+    text: "Everything is fine."
 meta:
   rewritten: true
   proofread: false
