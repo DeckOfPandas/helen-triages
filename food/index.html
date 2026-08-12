@@ -95,6 +95,7 @@ permalink: /food/
       <button type="button" class="btn-meta" aria-pressed="false" data-meta="proofread">needs proofread</button>
       <button type="button" class="btn-meta" aria-pressed="false" data-meta="no-short">no short method</button>
       <button type="button" class="btn-meta" aria-pressed="false" data-meta="has-short">has short method</button>
+      <button type="button" class="btn-meta" aria-pressed="false" data-meta="draft">draft</button>
     </div>
   </div>
   {% endif %}
@@ -128,7 +129,7 @@ permalink: /food/
           {% assign _has_short = true %}
         {% endunless %}
       {% endfor %}
-      <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}">
+      <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}" data-meta-draft="{{ is_draft }}">
 
         <div class="recipe-row-content">
         <a class="recipe-title-link" href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
