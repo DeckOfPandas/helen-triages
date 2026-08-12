@@ -2,7 +2,7 @@
 title: "Miso Salmon and Veg Traybake"
 short_name: Miso Salmon Veg Traybake
 tagline: "Sweet and sticky but still virtuous."
-source: "Adapted from Good Food 2026 wall calendar"
+source: "Adapted from Good Food 2026 calendar"
 serves: 2
 prep_time: "10 mins"
 cook_time: "35 mins"
@@ -35,13 +35,14 @@ ingredient_groups:
       item: grated fresh ginger
     - amount: "½ tsp"
       item: dark brown soft sugar
+    - item: greens like broccoli and pak choi
 method:
   - step: "Combine the marinade ingredients with 2 tbsp water in a large bowl. Pour half of the marinade into a smaller bowl, then add the salmon to the large bowl. Coat thoroughly."
     note: "large bowl = raw fish-ed bowl, small bowl = clean bowl"
-  - "Slice the sweet potatoes into ½-cm slices. Toss with oil and salt on a baking tray, then arrange in an even layer. Bake for 15–20 mins until almost tender."
-  - step: "Add the salmon, broccoli and pak choi to the tray. Sprinkle over the sesame seeds, drizzle over any marinade left in the large bowl and return to the oven for 12 mins."
-    note: "large bowl = raw fish-ed bowl, small bowl = clean bowl"
-  - "Serve immediately, drizzling the salmon with the reserved miso marinade from the smaller bowl. Top with the spring onions."
+  - "Slice the sweet potatoes into ½-cm slices. Toss with oil and salt on a baking tray, then arrange in an even layer. Bake at 170°C fan for 15–20 mins until almost tender."
+  - step: "Add the salmon and greens to the tray. Sprinkle over the sesame seeds, drizzle over any marinade left in the large bowl and return to the oven for 11-14 mins, until the salmon flakes easily."
+    note: "raw fish-ed bowl marinade is fine here — it's getting back in the oven to cook off"
+  - "Serve immediately, drizzling the salmon with the rest of the miso marinade from the clean bowl. Garnish with the spring onions."
 method_short:
   - ""
 notes:
@@ -50,7 +51,7 @@ notes:
 
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

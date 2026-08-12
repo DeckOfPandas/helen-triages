@@ -26,12 +26,12 @@ ingredient_groups:
     - item: "1 tsp salt"
       note: "don't be shy with the salt"
 method:
-  - Melt the chocolate over a bain-marie then stir in the butter until totally melted.
-  - "Beat the eggs, sugar and vanilla extract together until pale and thick."
-  - Stir the egg mixture into the chocolate mixture.
+  - Melt the chocolate over a bain-marie, then stir in the butter until totally melted and glossy.
+  - "Beat the eggs, sugar and vanilla extract together until pale, thick and doubled in volume."
+  - Stir the egg mixture into the chocolate mixture in three additions, so it doesn't split.
   - step: "Fold in the flour and salt with a metal spoon until smooth, but don't knock the air out too much."
-    note: "You can add chunks of chocolate, dried fruit, Celebrations etc at this point."
-  - "Persuade into the greased brownie tin and bake at 180°C for 20–25 mins, until a light-brown crust forms and starts to crack. The finished brownie should not wobble but will seem liquid inside if you stab it with a fork."
+    note: "You can add chunks of chocolate, dried fruit, Celebrations, whatever."
+  - "Persuade into the greased brownie tin and bake at 160°C fan for 20–25 mins, until a light-brown crust forms and starts to crack. The finished brownie should not wobble but will seem liquid inside if you stab it with a fork."
   - step: Leave to cool in the tin for 30 mins.
     note: "If you don't wait for this you'll need a straw not a fork."
 method_short:
@@ -46,5 +46,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

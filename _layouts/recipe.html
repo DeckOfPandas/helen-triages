@@ -11,11 +11,49 @@ layout: default
 
   {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
+  {% comment %} Internal temp meta line -- optional. `internal_temp_ref` is a
+     dot-path into _data/food/internal_temperatures.yml (e.g.
+     "beef.tender_roast"); `doneness` (optional) picks a level within that
+     entry's own `doneness` map (e.g. "medium_rare") where one exists. Front
+     matter is never Liquid-templated (HANDOVER §4), so the actual number
+     can't be typed into a method step or note -- this meta line is the one
+     place on a recipe page a value from that data file can actually render,
+     which is why it lives here rather than closer to the relevant method
+     step. The four shapes in the data file (endpoint, doneness/pull+rested,
+     tender_at, target) aren't uniform, so this checks which keys are present
+     on whatever it resolved to rather than assuming one from the protein
+     name -- see that file's own header comment. {% endcomment %}
+  {% assign _internal_temp = nil %}
+  {% if page.internal_temp_ref %}
+    {% assign _temp_node = site.data.food.internal_temperatures %}
+    {% assign _temp_path = page.internal_temp_ref | split: "." %}
+    {% for _key in _temp_path %}
+      {% assign _temp_node = _temp_node[_key] %}
+    {% endfor %}
+    {% if page.doneness %}
+      {% assign _temp_node = _temp_node.doneness[page.doneness] %}
+    {% endif %}
+    {% assign _internal_temp = _temp_node %}
+  {% endif %}
+
   <ul class="recipe-meta">
     {% if page.serves %}<li><strong>Serves</strong><span>{{ page.serves }}</span></li>{% endif %}
     {% if page.makes %}<li><strong>Makes</strong><span>{{ page.makes }}</span></li>{% endif %}
     {% if page.prep_time %}<li><strong>Prep</strong><span>{{ page.prep_time }}</span></li>{% endif %}
     {% if page.cook_time %}<li><strong>Cook</strong><span>{{ page.cook_time }}</span></li>{% endif %}
+    {% if _internal_temp %}
+      <li>
+        <strong>Internal temp</strong>
+        <span>
+          {% if _internal_temp.pull %}Pull at {{ _internal_temp.pull }}{% if _internal_temp.rested %}, rest to {{ _internal_temp.rested }}{% endif %}
+          {% elsif _internal_temp.endpoint %}{{ _internal_temp.endpoint }}
+          {% elsif _internal_temp.target %}{{ _internal_temp.target }}
+          {% elsif _internal_temp.tender_at %}Tender at {{ _internal_temp.tender_at }}
+          {% endif %}
+          (<a href="{{ '/food/reference/internal-temperatures/' | relative_url }}">more</a>)
+        </span>
+      </li>
+    {% endif %}
   </ul>
 
   {% if page.source %}<p class="recipe-source">Source: {{ page.source }}</p>{% endif %}

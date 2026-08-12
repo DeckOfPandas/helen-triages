@@ -9,6 +9,12 @@ cook_time: "15–20 mins"
 main_ingredients: ["beef fillet", "puff pastry", "wild mushrooms", "Parma ham", "Dijon mustard", "egg yolks", "red wine", "shallots", "beef stock"]
 star_ingredient: beef
 tags: [showstopper, "make-ahead"]
+# Your own call, not mine — I picked medium_rare as the classic Wellington
+# centre (see the "Internal temperature" note below), but you know what
+# you've actually served here. Change the doneness key if it's not right;
+# see _data/food/internal_temperatures.yml for the other levels available.
+internal_temp_ref: beef.tender_roast
+doneness: medium_rare
 ingredient_groups:
   - name: wellington
     items:
@@ -65,7 +71,7 @@ method_groups:
   - name: Red wine sauce
     steps:
       - "Fry the beef trimmings until browned all over. Add the shallots, peppercorns, bay and thyme and cook for about 5 mins until the shallots are golden."
-      - "Deglaze with vinegar and bubble until almost dry. Add the wine and boil until almost completely reduced. Add the stock, bring to the boil, then simmer gently for 1 hour, skimming any scum, until you have the consistency you want. Strain through a fine sieve. Check seasoning and set aside."
+      - "Deglaze with vinegar and bubble until almost dry. Add the wine and boil until almost completely reduced. Add the stock, bring to the boil, then simmer gently for 1 hour, skimming any scum, until the sauce coats the back of a spoon. Strain through a fine sieve. Check seasoning and set aside."
   - name: Cook and serve
     steps:
       - "Score the pastry lightly, making sure not to cut through, and brush again with egg wash."
@@ -75,13 +81,13 @@ method_groups:
 method_short:
   - "Wrap and chill, sear, duxelle, assemble, sauce, cook."
 notes:
-  - label: "Internal temperature"
-    text: "Do not attempt this without a meat thermometer unless you have deep pockets and nerves of steel."
+  - label: "In-oven heat probe"
+    text: "Do not attempt this without a meat thermometer unless you have deep pockets and nerves of steel. I use an in-oven meat probe."
   - label: "Portion size"
-    text: "In theory this serves 4, but fillet is rich...and also expensive. Two Wellingtons may feed 6 comfortably if there are generous sides."
+    text: "In theory this serves 4, but fillet is rich...and also expensive. Two Wellingtons may feed 6 comfortably if there are generous sides. Helen, Simon, Patrick and Lauren once happily shared just one, but then there were two different kinds of potato Dauphinoise on the table so."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-29"
+  date_last_edited: "2026-08-11"
 ---

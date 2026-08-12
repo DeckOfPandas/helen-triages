@@ -225,6 +225,45 @@ article.recipe .recipe-body-content {
   // No link colour/underline override here any more -- article.recipe a
   // (above) covers it now, same magenta treatment as every other
   // cross-recipe link on the page. One link style, not two.
+
+  // --- Tables ------------------------------------------------------------
+  // No table existed anywhere on the site before the reference pages
+  // (food/reference/*.html, 2026-08-11) -- MVP styling only: readable rows
+  // and a distinct header, not a designed component. Wrapped in a
+  // horizontally-scrolling div in the pages themselves, since these tables
+  // are wide and max-width: none (above) means they aren't otherwise capped.
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 $space-lg 0;
+    font-size: $font-size-body-sm;
+  }
+
+  th, td {
+    text-align: left;
+    padding: $space-sm $space-md;
+    border-bottom: 1px solid $color-border;
+    vertical-align: top;
+  }
+
+  th {
+    font-family: $font-headings;
+    font-size: 0.7rem;
+    letter-spacing: $letter-spacing-label;
+    text-transform: uppercase;
+    color: $color-clear-text;
+    border-bottom: 2px solid $color-border;
+    white-space: nowrap;
+  }
+
+  // Wraps each table individually (not the whole page) so a wide one scrolls
+  // on its own rather than pushing the page itself wider than the viewport.
+  .table-scroll {
+    overflow-x: auto;
+    margin: 0 0 $space-lg 0;
+
+    table { margin-bottom: 0; }
+  }
 }
 
 // --- Group Headings ----------------------------------------------------------

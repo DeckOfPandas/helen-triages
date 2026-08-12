@@ -1,7 +1,7 @@
 ---
 title: Cherry Glaze
 short_name: Cherry Glaze
-tagline: "Great over [five-spice roast duck legs](../five-spice-crispy-duck-legs/) or many other things."
+tagline: "A sweet-sour reduction, excellent with [five-spice duck](../five-spice-crispy-duck-legs/)."
 source: Adapted from Gordon Ramsay
 makes: Some
 prep_time: "5 mins"
@@ -25,18 +25,16 @@ ingredient_groups:
 method:
   - "Caramelise the honey over medium heat for 2 mins until it thickens and begins to darken. Deglaze with the red wine vinegar, until almost evaporated and syrupy."
   - Add the chicken stock and cook down for 3–5 mins until most has reduced.
-  - Add the soy sauce and reduce again to a syrupy consistency. Taste and adjust seasoning.
+  - Add the soy sauce and reduce again to a syrupy consistency. If it tastes flat, add vinegar rather than more salt.
   - "Add the cherries and cook for 1–2 mins, then remove from the heat and let them finish cooking in the cooling pan."
 method_short:
   - ""
 notes:
   - label: "Frozen cherries"
-    text: "If using frozen cherries, thaw and strain them ahead to get rid of  the water."
-  - label: "Pairs with"
-    text: "Perfect with [five-spice crispy duck legs](../five-spice-crispy-duck-legs/)."
+    text: "If using frozen cherries, thaw and strain them ahead to get rid of the spare water."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

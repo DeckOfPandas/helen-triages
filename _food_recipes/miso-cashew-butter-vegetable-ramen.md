@@ -1,7 +1,7 @@
 ---
 title: Miso and Cashew Butter Vegetable Ramen
-short_name: Miso Vegetable Ramen
-tagline: "A rich broth."
+short_name: Miso Cashew Butter Vegetable Ramen
+tagline: "Cashew butter for texture. Whisk, simmer, done."
 source: "Adapted from BBC Food, recipe Rachel Phipps"
 serves: 2
 prep_time: 5 mins
@@ -41,17 +41,19 @@ ingredient_groups:
       item: "carrot, sliced into ribbons"
     - item: black sesame seeds and fresh coriander leaves (optional)
 method:
-  - "Whisk together the cashew butter, miso paste, soy sauce and rice vinegar to a smooth paste. Just loosen enough to pour as a sauce."
-  - "Cook the noodles as per the packet instructions. Quench, rinse and drain."
-  - "Fry the garlic and ginger in sesame oil for at least 30 seconds — ginger first if you're prone to burning garlic."
-  - "Add the sauce, cook for a minute, then add the rest of the stock. Simmer until slightly thickened."
+  - "Whisk the cashew butter, miso paste, soy sauce and rice vinegar into a smooth paste. Loosen enough to pour as a sauce."
+  - "Cook the noodles per packet instructions. Quench, rinse and drain."
+  - "Fry the garlic and ginger in sesame oil for at least 30 seconds, ginger first if you're prone to burning garlic."
+  - "Add the sauce, cook for a minute, then add the rest of the stock. Simmer for a minute or two, until it coats the back of a spoon."
   - "Stir in the noodles to just warm through. Serve in two warm bowls, topping with the eggs, spring onions, edamame and carrot ribbons or anything else. Sprinkle with black sesame seeds and fresh coriander."
 method_short:
   - ""
-notes: []
+notes:
+  - label: "cashew butter"
+    text: "Make sure it's plain and unsweetened."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-29"
+  date_last_edited: "2026-08-11"
 ---

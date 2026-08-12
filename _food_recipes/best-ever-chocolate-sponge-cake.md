@@ -2,7 +2,7 @@
 title: Best-Ever Chocolate Sponge Cake
 short_name: Best-Ever Chocolate Sponge Cake
 tagline: Needs no introduction. Stop the search.
-source: "Adapted from Green and Black's Chocolate Recipes"
+source: "Adapted from Green & Black's Chocolate Recipes"
 makes: "one double-layer 8-inch cake"
 prep_time: 20 mins
 cook_time: "20–25 mins"
@@ -47,18 +47,18 @@ ingredient_groups:
 method_groups:
   - name: cake
     steps:
-    - step: "Sift the flour, cocoa, baking powder and bicarbonate of soda. Stir in the salt."
-      note: Actually do sift this time. I'm watching you. Cocoa powder is sneaky and you're not above this.
-    - Curdle the milk with the lemon juice.
+    - step: "Sift the flour, cocoa, baking powder and bicarbonate of soda together. Stir in the salt."
+      note: Actually do sift this time, Helen. Cocoa powder is sneaky and you're not above this.
+    - Curdle the milk with the lemon juice. Leave it to stand for 5 mins until it thickens slightly.
     - "Cream the butter with the sugar until fluffy, then add some beaten egg, some flour mixture, then some milk mixture bit by bit until all combined. You might not need all the milk."
-    - Add in the vanilla extract last.
-    - Pour into two greased 8-inch round tins and level off with the back of a spoon.
-    - Bake for 20–25 mins at 170°C until centre is springy and sides begin to pull away from the tin.
+    - Add the vanilla extract last.
+    - Divide the batter evenly between two greased 8-inch round tins — weigh them if you can be bothered — and smooth the tops with the back of a spoon.
+    - Bake for 20–25 mins at 170°C until the centres is springy and the sides begin to pull away from the tin.
     - step: "Leave to cool in the tins for a few mins, then turn out upside down on a wire rack and prick the bottoms all over with a fork."
       note: "Cooling upside down flattens the tops ready for stacking."
   - name: buttercream filling
     steps:
-    - Melt the chocolate over a bain-marie.
+    - Melt the chocolate over a bain-marie, bowl not touching the water, and stir until smooth.
     - "Cream the butter and icing sugar, then beat in the egg yolk bit by bit and whisk until shiny."
     - "Beat in the melted chocolate, then leave to cool."
 method_short:
@@ -78,7 +78,7 @@ notes:
     text: "Top with icing sugar. Or try [chocolate ganache](../chocolate-ganache/), or simply melted chocolate with salted butter 2:1."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

@@ -1,7 +1,7 @@
 ---
 title: "Pancetta and White Bean Stew"
 short_name: Pancetta and White Bean Stew
-tagline: "Uses up any veg in the fridge."
+tagline: "This stew doesn't care what vegetables go in — carrot, celery and onion are just filler, and whatever's wilting in the fridge will do instead."
 source: Unknown
 serves: 4
 prep_time: "15 mins"
@@ -37,15 +37,16 @@ ingredient_groups:
 method:
   - "Cook the pancetta in a deep flameproof casserole dish on a medium heat for 5–6 mins until crispy and releasing its fat. Remove with a slotted spoon, leaving the fat behind."
   - "Add the onion, celery and carrot. Fry for 12–15 mins until turning golden. Add the garlic and cook for 1 min more."
-  - "Pour in the beans, chicken stock and optional parmesan rind. Cook for 15 mins on a medium heat, then stir in the cavolo nero and cooked pancetta for a final 5 mins. Stir in the sherry vinegar to taste and season."
+  - "Pour in the beans, chicken stock and optional parmesan rind. Cook for 15 mins on a medium heat, then stir in the cavolo nero and cooked pancetta for a final 5 mins. Stir in the sherry vinegar to taste and season — the pancetta and parmesan rind have already salted the stock, so taste before adding more."
   - "Sprinkle with chives to serve."
 method_short:
   - ""
-# notes:
-#   -
+notes:
+  - label: "Undrained beans"
+    text: "One can goes in with its liquid rather than drained — the starch thickens the stew as it simmers, so there's no need for flour or cream."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

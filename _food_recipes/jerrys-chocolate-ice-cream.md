@@ -1,7 +1,7 @@
 ---
 title: "Jerry's Chocolate Ice Cream"
 short_name: "Jerry's Chocolate Ice Cream"
-tagline: "A rich chocolate ice cream with extra mouthfeel from cocoa powder and unsweetened chocolate"
+tagline: "Chocolate three ways, and no cooked-custard fuss."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
 prep_time: 10 mins
@@ -33,14 +33,13 @@ ingredient_groups:
 method:
   - "Melt the chocolate in a bain-marie, then gradually whisk in the cocoa, stirring until smooth. Whisk in the milk a little at a time and heat until completely blended, then remove from the heat and let cool."
   - "Whisk the eggs until light and fluffy, then whisk in the sugar a little at a time until fully blended. Then whisk in the cream and vanilla."
-  - "Pour the chocolate mixture into the cream mixture and blend, then cover and refrigerate until cold (1–3 hours depending on your fridge). Add chocolate chips 2 mins before freezing the ice cream if you want."
+  - "Pour the chocolate mixture into the cream mixture and blend, then cover and refrigerate until cold, 1–3 hours. Add chocolate chips 2 mins before freezing."
   - "Freeze however you do it."
 method_short:
   - ""
-notes: []
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-29"
+  date_last_edited: "2026-08-11"
 ---

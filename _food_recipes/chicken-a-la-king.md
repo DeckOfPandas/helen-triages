@@ -1,7 +1,7 @@
 ---
 title: Chicken à la King
 short_name: Chicken à la King
-tagline: The ultimate comfort food.
+tagline: American loveliness.
 source: Adapted from The Cozy Cook
 serves: 6
 prep_time: "15 mins"
@@ -28,7 +28,7 @@ ingredient_groups:
       item: plain flour
     - amount: "250 ml"
       item: chicken stock
-    - item: "Flavourings to taste like onion powder, English mustard powder, Worcestershire sauce, mushroom ketchup, MSG."
+    - item: "Flavourings to taste like onion powder, English mustard powder, Worcestershire sauce, mushroom ketchup, MSG"
     - amount: "250 g"
       item: mushrooms
     - amount: "125 g"
@@ -38,12 +38,12 @@ ingredient_groups:
       item: crème fraîche or single cream
 method:
   - "Sweat the onions, carrots and celery until soft and golden, then increase the heat to brown them. Add the minced garlic 2 mins before you're done."
-  - At the same time, pat the chicken dry and season. Fry for 3 mins each side. Remove from heat and rest for 10 mins.
+  - At the same time, pat the chicken dry and season. Fry for 3 mins each side. Remove from the heat and rest for 10 mins.
   - step: "Deglaze with a few splashes of white wine, scraping all the bits off the bottom of the pan, then reduce the heat to medium. Sprinkle in the flour and stir to combine."
     note: "Don't panic if the flour goes clumpy, all will be well, just don't stop stirring until it bubbles."
-  - "Chop the chicken and add it back to the pan. Add the rest of the wine and simmer for a minute or two. Then add the stock, and bring to the boil while stirring continuously. After it boils, you can stop stirring. Let it cook for about 5 mins. Season and flavour to taste."
+  - "Chop the chicken and add it back to the pan. Add the rest of the wine and simmer for a minute or two. Then add the stock, and bring to the boil while stirring continuously. After it boils, you can stop stirring. Let it cook for about 5 mins. Add any flavourings."
   - Add the mushrooms then boil for 5 mins until softened.
-  - "Add the peas and any fresh herbs, and simmer uncovered for 5–10 more minutes until thickened. Check seasoning."
+  - "Add the peas and any fresh herbs, and simmer uncovered for 5–10 more minutes until thickened. Taste and add salt if it needs it."
   - "Stir through the crème fraîche or cream at the end, and cook for 1 more minute."
 method_short:
   - |
@@ -55,11 +55,11 @@ method_short:
 notes:
   - label: "Vegetables"
     text: "You can chuck any vegetables in here and it'll still be comforting."
-  - label: "Mushrooms"
+  - label: "Mushroom fun"
     text: "Button mushrooms are always fun to eat in one-handed food, especially if you don't halve them, because then you get to chase them around your plate."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

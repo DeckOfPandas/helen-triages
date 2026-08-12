@@ -1,7 +1,7 @@
 ---
 title: Beetroot Chocolate Cake
 short_name: Beetroot Chocolate Cake
-tagline: "Beetroot and chocolate cake are a brilliant combination."
+tagline: "Beetroot isn't here for health reasons, I promise. It keeps the cake moist under all the chocolate."
 source: "Adapted from BBC Food, recipe Nigel Slater"
 makes: one 8-inch cake
 prep_time: 15 mins
@@ -24,7 +24,7 @@ ingredient_groups:
     - amount: "1 heaped tsp"
       item: baking powder
     - amount: "3 tbsp"
-      item: cocoa powder
+      item: cocoa powder, 100& cacao
     - amount: "5 large"
       item: "free-range eggs, separated"
     - amount: "190 g"
@@ -36,15 +36,19 @@ method:
   - "Stir the butter into the chocolate in small pieces and leave to soften. Remove from the heat and allow to cool slightly."
   - "Whisk the egg yolks in a bowl until frothy. Stir the egg yolks into the chocolate and butter mixture, then fold in the beetroot."
   - "Whisk the egg whites until stiff peaks form. Fold in the sugar with a clean, dry metal spoon."
-  - "Fold the sugar and egg whites into the chocolate mixture. Sift the flour, baking powder and cocoa powder together, and fold in."
+  - "Fold the egg white mixture into the chocolate mixture. Sift the flour, baking powder and cocoa powder together, and fold in."
   - "Pour the batter into the greased and lined tin and bake at 160°C fan for 40 mins."
   - "Allow to cool in the tin, then serve with crème fraîche or double cream."
 method_short:
   - ""
-notes: []
+notes:
+  - label: "beetroot"
+    text: "Use plain cooked beetroot, not the vinegar-pickled kind. In case not glaringly obvious."
+  - label: "patience"
+    text: "Arguably better on day two than straight out of the tin."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-08-11"
 ---

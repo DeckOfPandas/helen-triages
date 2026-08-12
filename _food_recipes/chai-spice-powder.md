@@ -1,7 +1,7 @@
 ---
 title: Chai Spice Powder
 short_name: Chai Spice Powder
-tagline: "The perfect flavour for drinks like [chai-spiced milk tea](../chai-spiced-milk-tea/)."
+tagline: "The best way to spicy bakes and [chai-spiced milk tea](../chai-spiced-milk-tea/)."
 source: "Adapted from indianhealthyrecipes.com"
 makes: "approx. 75 g"
 prep_time: "2 mins"
@@ -27,19 +27,19 @@ ingredient_groups:
       item: whole fennel seeds
     - amount: "3 (3 g)"
       item: "black cardamom pods, peeled"
-      note: "optional, for a strong smoky flavour — discard the peels or leave them out entirely if you don't want that, or use them for the full spiced-chai character"
+      note: "optional, for a strong smoky flavour — discard the peels or leave them out if preferred"
     - amount: "1 large"
       item: star anise
     - amount: "1 medium (4 g)"
       item: "whole nutmeg"
       note: "break open with a nutcracker or pestle and mortar before dry-roasting"
 method_groups:
-  - name: Prepare and dry-roast
+  - name: Prepare and dry-fry
     steps:
       - "Break open the nutmeg with a nutcracker or in a mortar and pestle, and peel the black cardamom pods."
-      - "Add the larger spices to a pan: cinnamon stick, green cardamom pods, black cardamom peels, and star anise. Dry-roast gently on a low flame for 3–4 mins."
-      - "Add the black peppercorns, black cardamom seeds, whole cloves and fennel seeds. Dry-roast for 2–3 mins, stirring often."
-      - "Add the crushed whole nutmeg and dry-roast for just a minute."
+      - "Add the larger spices to a pan: cinnamon stick, green cardamom pods, black cardamom peels, and star anise. Dry-fry gently on a low flame for 3–4 mins."
+      - "Add the black peppercorns, black cardamom seeds, whole cloves and fennel seeds. Dry-fry for 2–3 mins, stirring often."
+      - "Add the crushed whole nutmeg and dry-fry for just a minute."
       - "Turn off the heat, then add the ground ginger, and mix until the ginger turns fragrant without heating further."
   - name: Grind
     steps:
@@ -60,5 +60,5 @@ meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-31"
+  date_last_edited: "2026-08-11"
 ---

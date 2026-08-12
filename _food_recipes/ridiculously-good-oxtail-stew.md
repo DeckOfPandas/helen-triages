@@ -1,7 +1,7 @@
 ---
-title: Ridiculously Good Oxtail Stew
-short_name: Ridiculously Good Oxtail Stew
-tagline: "Jamie Oliver's slow-braised oxtail stew."
+title: Sticky Oxtail Stew
+short_name: Sticky Oxtail Stew
+tagline: "Six hours in the oven breaks oxtail down into sticky heaven."
 source: Adapted from Jamie Oliver
 serves: 8
 prep_time: 30 mins
@@ -39,28 +39,28 @@ method_groups:
   - name: "Brown the oxtail"
     steps:
       - "Preheat a large roasting tray in the oven at 220°C fan."
-      - "Add the oxtail (carefully). Season, then drizzle with olive oil, then toss to coat and place back in the hot oven for around 20 mins, or until golden and caramelised."
+      - "Add the oxtail (carefully). Season, drizzle with olive oil, toss to coat, and return to the hot oven for around 20 mins, or until golden and caramelised."
   - name: "Build the stew"
     steps:
-      - "Trim and halve the leeks and celery lengthways, then chop into rough 2-cm chunks. Chop the carrots into 2-cm pieces, heat in a large ovenproof casserole pan over a medium-low heat with 1 tbsp of olive oil."
-      - "Roughly chop the thyme and rosemary leaves and add them, then add the bay and cook for around 20 mins, or until soft and sweet, stirring frequently."
-      - "Remove the oxtail from the oven and set aside. Reduce the oven temperature to 170°C fan."
-      - "Add the cloves and flour to the veg, stirring well to combine, then pour in the tomatoes and porter. Add the oxtail and any roasting juices, cover with the beef stock or 1 l of water and stir well."
-      - "Bring to the boil, cover, then place in the hot oven for around 5 hours, or until the meat falls away from the bone, stirring every hour or so and adding a splash of water to loosen if needed."
+      - "Trim and halve the leeks and celery lengthways, then chop into rough 2-cm pieces. Chop the carrots into 2-cm pieces. Heat with olive oil in a heavy pan."
+      - "Roughly chop the thyme and rosemary leaves, add them along with the bay, and cook for around 20 mins, until soft and sweet, stirring frequently."
+      - "Remove the oxtail from the oven and set aside. Reduce the oven temperature to 160°C fan."
+      - "Add the cloves and flour to the vegetables, stirring well to combine, then pour in the tomatoes and porter. Add the oxtail and any roasting juices, cover with the beef stock and stir well."
+      - "Bring to the boil, cover, then place in the hot oven for about 5 hours, or until the meat falls away from the bone, stirring every hour or so and adding a splash of water to loosen if needed."
   - name: "Finish"
     steps:
       - "Cool for about 10 mins. Strip the meat from the bones and return it to the pan, discarding the bones."
-      - "Add a good splash of Worcestershire sauce and anything else you like, season to taste."
+      - "Flavour with Worcestershire sauce and anything else you like. Taste before automatically adding salt — the stock and Worcestershire sauce are usually salty enough on their own."
 method_short:
   - ""
 notes:
   - label: "Turn it into soup"
-    text: "Turn this into soup by adding boiling water or more stock and simmering to soup consistency."
+    text: "Loosen with boiling water or more stock and simmer to soup consistency."
   - label: "As a pasta sauce"
     text: "Also excellent stirred through pappardelle and served with grated Parmesan."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-13"
+  date_last_edited: "2026-08-11"
 ---

@@ -92,6 +92,7 @@ assets/img/   favicon.svg   food/   cocktails/
 assets/js/    (shared — every script is site-agnostic)
 
 food/index.html        permalink /food/
+food/reference/*.html  permalink /food/reference/...   see §14
 cocktails/index.html   permalink /cocktails/
 index.html              permalink /        the landing page
 ```
@@ -222,6 +223,8 @@ prep_time: "20 mins"
 cook_time: "1 hr 30 mins"
 main_ingredients: ["cavolo nero", "butter beans", lemon]
 star_ingredient: greens          # optional; ~a quarter are legitimately blank
+internal_temp_ref: beef.tender_roast   # optional; see §14 — most recipes have neither this nor doneness
+doneness: medium_rare                  # optional, only alongside internal_temp_ref; see §14
 tags: [soup, "one-pot"]
 ingredient_groups:
   - name: soup                   # bare noun — template adds "For the "
@@ -337,6 +340,11 @@ meta:
   full width (`.notes--single`). Nobody has needed more than 3 on one
   recipe; 4+ is the signal to write `{{ content }}` prose instead (§4.1),
   the way `dark-chocolate-ganache.md`'s Troubleshooting section does.
+- `internal_temp_ref` (+ optional `doneness`) is how a recipe pulls a live
+  figure from `_data/food/internal_temperatures.yml` — see §14 for the
+  mechanism and why it can only render in `recipe-meta`, never inline in a
+  method step. Opt-in, not rolled out: most recipes have neither field, and
+  that's correct, not a gap to fill in.
 - `instructions:` is retired — it's `method:`, no fallback. Several other
   fields are retired too (`published`, `date_added`, `difficulty`,
   `nutrition`, `filling_note`, `headline_ingredient`) — `tests/
@@ -360,11 +368,11 @@ Troubleshooting section this way.
 **Decided 2026-08-02: this content continues the recipe, it does not become
 a blog post.** Helen considered three options — style it as a blog post with
 its own title; treat it as more recipe sections; or move it to a standalone
-page (which she does want eventually, for genuinely cross-recipe reference
-material like meat temperatures or food sustainability, but that's a
-different problem: reference material multiple recipes would link *to*,
-versus content that only makes sense in the context of one specific recipe).
-Her call, "least jar": section headings in body content are now **peers of
+page (a different problem: reference material multiple recipes would link
+*to*, versus content that only makes sense in the context of one specific
+recipe — built 2026-08-11, see §14, not hypothetical any more if you're
+reading this after that date). Her call, "least jar": section headings in
+body content are now **peers of
 INGREDIENTS/METHOD/NOTES**, not a quieter sub-level treatment — same size,
 same punched-tape mark, same `$spacing-section-top` rhythm as the rest of
 the page.
@@ -1481,3 +1489,122 @@ All generated with `marks_seed` unset (defaults to `seed`) — see
    background texture behind a fixed wordmark (rather than a wayfinding
    device you need to re-find on every page) was never revisited in this
    pass. Worth deciding out loud, not by default either way.
+
+---
+
+## 14. Reference pages and the internal-temperatures data layer
+
+Built 2026-08-11–12, at Helen's request — the "standalone page for
+cross-recipe reference material" §4.1 mentions was hypothetical until now.
+
+### What exists
+
+`food/reference/` — four pages: `index.html` plus `internal-temperatures.html`,
+`cooking-methods.html`, `sustainability.html`. Same `site_key: food`
+inheritance as every other page under `food/` (§2.4). Content ingested from
+15 draft tables in `_food_drafts/reference-info/` (chicken/turkey/goose/duck
+roasting, beef/pork/lamb/ham roasting and slow-cooking, steak, fish and
+shellfish cooking, fish and shellfish sustainability, meat carbon, nut
+milks) — the drafts are done; this section is about what they became.
+
+**Page pattern**: reuses `.recipe`/`.recipe-body-content`, the same wrapper
+`food/about.html` already used for a prose page — no new page type
+invented. Tables are hand-authored `<table>` markup, not markdown pipe
+tables: `food/*.html` files aren't run through kramdown (only `.md` is), so
+a markdown table in one of them renders as literal pipe characters, not a
+table. No table CSS existed anywhere on the site before this —
+`article.recipe .recipe-body-content table`/`th`/`td` plus a
+`.table-scroll` horizontal-scroll wrapper, both in
+`_sass/food/_recipe-notes-body.scss`.
+
+### The data layer — internal temperatures only
+
+`_data/food/internal_temperatures.yml` is the single source for pull
+temps, endpoints and carryover — VOCABULARY layer, same status as
+`taxonomy.yml` (§7). Read by two things: `internal-temperatures.html`
+(every number on the page is a Liquid lookup into this file, not a
+literal) and `recipe.html` (a recipe's own `internal_temp_ref` +
+`doneness` front matter, §4).
+
+Four shapes, because the source data wasn't uniform: `endpoint` +
+`carryover` (whole poultry — one figure, no doneness choice);
+`doneness: { level: {pull, rested} }` + `carryover` (beef/pork/lamb tender
+roasts, ham fresh, steak, salmon, tuna — a real doneness spectrum);
+`tender_at` alone (tough/slow-cooked cuts — collagen breakdown, not a pull
+temperature); `target` + `carryover` (cured ham — one figure, not a
+spectrum). A consumer checks which keys exist on the resolved node rather
+than assuming a shape from the protein name — see the file's own header
+comment.
+
+**`cooking-methods.html` and `sustainability.html` are NOT in this data
+layer** — still static HTML, hand-corrected where research found errors
+(below) but with no structured backing data. Only internal temperatures
+moved, because that's what Helen asked for as the next step; don't assume
+the other two pages work the same way underneath.
+
+### Recipe wiring
+
+`internal_temp_ref` is a dot-path into the data file (`beef.tender_roast`);
+`doneness` (optional) picks a level within that entry's own `doneness` map
+(`medium_rare`). Resolved in `recipe.html` into a new "Internal temp" line
+in `recipe-meta`, alongside Serves/Prep/Cook.
+
+**Why it can only live in `recipe-meta`, never inline in a method step or
+note**: front matter is never Liquid-templated (§4) — a live number can
+only render somewhere the layout itself controls, not inside text the
+recipe author typed. Real constraint, not a design choice; don't try to
+thread a live figure into a method sentence, it can't work without
+changing that rule.
+
+Opt-in, per recipe, not rolled out — a handful of recipes use it as of
+2026-08-12, added by more than one session working on this in parallel.
+Check a given recipe's own front matter rather than assuming a protein has
+or hasn't been wired.
+
+**Guard test**: `test_internal_temp_ref_resolves` (`test_front_matter.py`)
++ the `internal_temperatures` fixture (`conftest.py`) — same pattern as
+`test_tags_are_declared` (§7). Liquid's `hash[variable]` lookup has no
+equivalent of a KeyError, so a typo'd path doesn't error, it silently
+renders no "Internal temp" line at all; this is the only thing that
+catches that.
+
+### Fact-checking status — read before trusting a number on either page
+
+Every figure on `internal-temperatures.html` and `cooking-methods.html`
+has been checked at least once against real sources (UK FSA, USDA FSIS,
+Waitrose, BBC Good Food, Delia Smith, Jamie Oliver, Gordon Ramsay and
+others — cited under each table via `<p class="recipe-source">`). A
+systematic error was found and corrected 2026-08-12: turkey, goose, beef's
+standard roast, pork's leg/tenderloin, lamb's rack, and cured ham's
+boil/roast timing were all roughly half the real rate. Helen's own
+recollection is that an earlier session muddled 500g/lb timings with 1kg
+timings when the drafts were first written, and the shape of the error
+(consistently ~2× too fast) matches that. If you find another row that
+looks suspiciously fast against a real recipe, this is the first thing to
+suspect.
+
+**`sustainability.html` has had zero fact-checking** — still exactly as
+transcribed from the original drafts. Don't assume it got the same
+treatment as the other two pages just because they're siblings.
+
+**The "checked once... remove once confirmed" notes under each table are
+Helen's own working scaffolding, not errors to fix.** She's verifying each
+cited source herself over time and will strip a note once she has. Same
+standing rule as `QQ` (§4) and `test_ingredient_annotation_style` (§10) —
+don't "helpfully" remove one unprompted.
+
+**Two flagged, not fixed, food-safety gaps**: pork's "medium" doneness
+(60–62°C) and fresh ham's "hint of pink" doneness don't clear the UK FSA's
+pork-specific core-temperature guidance, unlike beef/lamb, which FSA
+treats differently — `internal_temperatures.yml`'s `safety_note` fields on
+`pork.roasting` and `ham.fresh` have the detail. Deliberately not
+"corrected" to the well-done figure — whether to keep serving pork pink is
+Helen's call, not something to silently override.
+
+### What's not done
+
+No recipe currently links to any of these three pages — the original ask
+was "pages I can link to from recipes," and that link-back hasn't happened
+yet anywhere in `_food_recipes/`. Nothing systematic connects the wider
+~370-recipe collection to `internal_temp_ref` either; that rollout is
+still ahead, not started.

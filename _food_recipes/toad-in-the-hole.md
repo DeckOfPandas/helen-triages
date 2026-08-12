@@ -1,12 +1,12 @@
 ---
 title: Toad in the Hole
 short_name: Toad in the Hole
-tagline: Sausages baked in a giant Yorkshire pudding.
+tagline: Sausages baked into a giant Yorkshire pudding. The oven door stays shut until it's done.
 source: Adapted from Jamie Oliver
 serves: 4
 prep_time: "10 mins"
 cook_time: "40 mins"
-main_ingredients: [sausages, "plain flour", eggs, milk, "red onions", "balsamic vinegar", rosemary]
+main_ingredients: [sausages, "plain flour", eggs, "whole milk", "red onions", "balsamic vinegar", "fresh rosemary"]
 star_ingredient: pork
 tags: ["carbs party"]
 ingredient_groups:
@@ -15,7 +15,7 @@ ingredient_groups:
     - amount: "8"
       item: good-quality sausages
     - amount: "4 sprigs"
-      item: rosemary
+      item: "fresh rosemary"
     - amount: "2 large"
       item: red onions
     - amount: "2 cloves"
@@ -29,19 +29,19 @@ ingredient_groups:
   - name: batter
     items:
     - amount: "285 ml"
-      item: milk
+      item: "whole milk"
     - amount: "115 g"
       item: plain flour
     - amount: "3 large"
       item: free-range eggs
 method_groups:
-  - name: toad in the hole
+  - name: toad and hole
     steps:
     - Whisk the batter ingredients together with a pinch of salt.
-    - "Put 2 tbsp sunflower oil in a thin-walled baking tin, and heat in the oven at 240–250°C until sizzling."
-    - "When up to temperature, roast the sausages in the tin until slightly golden, turning once or twice."
-    - "Pour the batter over the sausages (carefully), and add the rosemary sprigs."
-    - "Don't open the oven for at least 20 mins. Remove when golden and crisp."
+    - "Put 2 tbsp sunflower oil in a thin-walled baking tin, and heat in the oven at 240–250°C fan until sizzling."
+    - "Once the oil's up to temperature, roast the sausages in the tin until golden, turning once or twice."
+    - "Carefully pour the batter over the sausages and add the rosemary sprigs."
+    - "Bake without opening the oven for at least 20 mins. Remove when golden, crisp, and well risen."
   - name: onion gravy
     steps:
     - Fry the finely sliced onions in the butter on a medium heat for about 5 mins until translucent.
@@ -50,9 +50,12 @@ method_groups:
     - Add the stock and a little water then simmer.
 method_short:
   - ""
+notes:
+  - label: "Hot oil, hot sausages"
+    text: "Both need to be properly hot before the batter goes in otherwise you'll get marshmallow but not in a good way."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

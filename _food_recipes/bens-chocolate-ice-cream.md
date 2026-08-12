@@ -1,7 +1,7 @@
 ---
 title: "Ben's Chocolate Ice Cream"
 short_name: "Ben's Chocolate Ice Cream"
-tagline: As rich as they come.
+tagline: "As rich as they come, real chocolate and all the goodies."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
 prep_time: "20 mins"
@@ -35,10 +35,10 @@ method_short:
   - ""
 notes:
   - label: "Chocolate Almond Variation"
-    text: "Add 150 g roasted whole almonds (salted or unsalted) once the ice cream stiffens, about 2 mins before it's done, then continue freezing until ready."
+    text: "Add 150 g roasted whole almonds (salted or unsalted) once the ice cream stiffens, about 2 mins before it's done."
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-29"
+  date_last_edited: "2026-08-11"
 ---

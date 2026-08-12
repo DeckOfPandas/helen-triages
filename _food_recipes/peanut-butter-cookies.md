@@ -1,7 +1,7 @@
 ---
 title: Peanut Butter Cookies
 short_name: Peanut Butter Cookies
-tagline: "ULTRA-easy, melt-in-your-mouth, salty and sweet."
+tagline: "Dangerous."
 source: "Adapted from Preppy Kitchen, recipe John Kanell"
 makes: "18 cookies"
 prep_time: 20 mins
@@ -34,14 +34,15 @@ method:
   - Sift the flour, baking powder and salt.
   - "Cream the butter with the sugars, then mix in the peanut butter, then the egg and vanilla extract."
   - Stir in the flour mixture.
-  - "Roll into 1-inch balls, coat in Demerara sugar, place on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."
-  - Bake at 180°C for about 10 mins.
-  - Allow to cool completely on the baking sheet — they need to set before being transferred to a cooling rack.
+  - step: "Roll into 1-inch balls, coat in Demerara sugar, arrange  on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."
+    note: "leave plenty of space in between because they'll spread"
+  - "Bake at 160-170°C fan for about 10 mins, until the edges are set and the centres still look soft. They firm up on the tray as they cool."
+  - Allow to cool completely on the baking sheet. They need to set before being transferred to a cooling rack.
 method_short:
   - ""
 meta:
   rewritten: true
   proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---

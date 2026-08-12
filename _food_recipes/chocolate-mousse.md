@@ -1,7 +1,7 @@
 ---
 title: Chocolate Mousse
 short_name: Chocolate Mousse
-tagline: "Less cream than a classic mousse, with a richer mouthfeel, and an intense chocolate flavour."
+tagline: "Less cream than a classic mousse, so richer, denser, and more intensely chocolate-y."
 source: "Adapted from RecipeTin Eats, recipe Nagi"
 serves: 4
 prep_time: "20 mins"
@@ -19,7 +19,7 @@ ingredient_groups:
     - amount: "10 g"
       item: salted butter
     - amount: "125 ml"
-      item: full-fat cream
+      item: whole cream
     - amount: "35 g"
       item: golden caster sugar
   - name: to serve
@@ -27,18 +27,18 @@ ingredient_groups:
     - item: whipped cream
     - item: dark chocolate shavings
 method:
-  - "Get on with it so the whipped egg whites and cream don't get too warm."
+  - "In general, get on with this so the eggs and cream don't get too warm."
   - "Separate the eggs before they warm up: whites into a large bowl and yolks into a small bowl."
   - "Whisk yolks until pale and fluffy."
-  - "Melt the chocolate over a bain-marie, stir in the butter, season generously with salt, then set aside to cool slightly."
+  - "Melt the chocolate over a bain-marie, stir in the butter, season properly with salt, then set aside to cool slightly."
   - "Beat the cream until stiff peaks form, being careful not to over-whip."
   - "Beat the egg whites, adding the sugar a little at a time, until stiff peaks form."
-  - "Fold the egg yolks into the cream using a rubber spatula — 8 folds max. Some streaks are fine."
-  - "Check the chocolate temperature — it should still be runny but warm (min 35°C). Pour the chocolate into the cream/yolk mixture. Fold through — 8 folds max."
-  - "Add ¼ of the beaten egg whites into the chocolate mixture to loosen it. Fold through to incorporate — 10 folds max."
-  - "Pour the chocolate mixture into the remaining egg whites. Fold through until incorporated with no white patches — 12 folds max."
+  - "Fold the egg yolks into the cream using a rubber spatula, 8 folds max. Some streaks are fine."
+  - "Check the chocolate temperature. It should still be runny but warm (min 35°C). Pour the chocolate into the cream/yolk mixture. Fold through, 8 folds max."
+  - "Add ¼ of the beaten egg whites to the chocolate mixture to loosen it. Fold through to incorporate, 10 folds max."
+  - "Pour the chocolate mixture into the remaining egg whites. Fold through until incorporated with no white patches, 12 folds max."
   - "Divide between 4 small pots. Refrigerate for at least 6 hours, preferably overnight."
-  - "Garnish with whipped cream and chocolate shavings to serve."
+  - "Top with whipped cream and a scatter of chocolate shavings just before serving."
 method_short:
   - |
     * Melt chocolate/butter small bowl 125/10
@@ -51,7 +51,7 @@ method_short:
     * Portion, fridge >6h
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
-  date_last_edited: "2026-07-25"
+  date_last_edited: "2026-08-11"
 ---
