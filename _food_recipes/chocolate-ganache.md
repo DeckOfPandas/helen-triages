@@ -1,6 +1,6 @@
 ---
 title: "Chocolate Ganache"
-tagline: "Ganache is a fickle mistress, but a little bit of thought goes a long way. The recipe here is for dark chocolate, but notes below give ratios for milk or white."
+tagline: "Ganache sometimes fails, and sometimes I am involved."
 source: "A lifetime of grainy, oily, solid, inedible regret."
 makes: "N/A, bring a spoon"
 prep_time: "5 mins"
@@ -23,9 +23,9 @@ ingredient_groups:
       note: for a ganache that sets more firmly
 method:
   - step: "Grate the chocolate into a perfectly dry stainless steel bowl."
-    note: "See below: coarse chopping&nbsp;=&nbsp;bad, water&nbsp;=&nbsp;bad, hotspots&nbsp;=&nbsp;bad."
+    note: "see below: coarse chopping&nbsp;=&nbsp;bad, water&nbsp;=&nbsp;bad, hotspots&nbsp;=&nbsp;bad"
   - step: "Salt the cream, then heat it gently in a pan to 88–90°C — it should look active, but DO NOT LET IT BOIL."
-    note: "Under-heating&nbsp;=&nbsp;bad but also over-heating&nbsp;=&nbsp;bad."
+    note: "under-heating&nbsp;=&nbsp;bad but also over-heating&nbsp;=&nbsp;bad"
   - Pour the heated cream over the grated chocolate. Wait 2–3 mins. The temperature will drop fast.
   - step: "Stir gently from the centre using a perfectly dry silicone spatula until the temperature reaches 40–45°C. The mixture will visibly change from muddy to glossy and thick as the emulsion forms."
     note: "Over-stirring&nbsp;=&nbsp;bad because moisture from the air will find a way in."
@@ -62,7 +62,7 @@ meta:
 - **Use perfectly clean and dry stainless steel bowls** for even heating.
 - **Use a perfectly clean and dry silicone spatula** because it can create a tight seal against the bottom of the bowl, sweeping up melting pockets without whipping in air.
 - **Heat the cream in a pan** for the best temperature control, unless you have literally perfect microwave-fu.
-- **Allow the ganache to cool slowly**, and set at room temperature. If you put it in the fridge, you'll need to stir more than you want so the more-set and less-set bits combine.
+- **Allow the ganache to cool slowly**, and set at room temperature. If you put it in the fridge, you'll need to stir more than you want to get the more-set and less-set bits combine.
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
 <p class="recipe-section-subtitle">a.k.a. ganache is the worst</p>
@@ -80,7 +80,7 @@ Here are four ways to accidentally not make ganache, with likely causes:
 3. **Seizing:** *mixture resembling concrete; a dry, grainy paste that can't be stirred*
    - **Water got in**, so the chocolate's sugar crystals clumped immediately.
    - **Accidental whipping**, such as from using a balloon whisk, let moisture from the air sneak in.
-4. **Chaos: adding ingredients in the wrong order:** (that is, not following the recipe...ask me how I know)
+4. **Chaos: not following the recipe:** ...see source line above.
    - Dropping cold pieces of chocolate into hot cream is simply cold chunks floating in hot fat, like bad hotpot, which doesn't sound much like an emulsion to me.
    - Pouring cold cream into melted chocolate snap-freezes the cocoa butter out of the emulsion, and the sugars immediately make the most of the opportunity to clump...yum, curdled concrete.
 
