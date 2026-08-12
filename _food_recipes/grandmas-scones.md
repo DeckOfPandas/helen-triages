@@ -19,7 +19,7 @@ ingredient_groups:
     - amount: "1 large"
       item: egg
     - amount: "2 tbsp"
-      item: milk
+      item: milk (any kind)
     - amount: "4 oz"
       item: sultanas
 method:

@@ -23,7 +23,7 @@ ingredient_groups:
       item: "unsalted butter straight from the fridge, diced"
     - amount: "1 large"
       item: "free-range egg, beaten"
-    - item: "milk, to glaze"
+    - item: "milk (any kind), to glaze"
     - item: icing sugar, to dust
     - item: orange zest, to sprinkle (very optional)
 method:

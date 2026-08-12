@@ -19,7 +19,7 @@ ingredient_groups:
     - amount: "1 tbsp"
       item: golden syrup
     - amount: ½ tsp
-      item: bicarbonate of soda dissolved in 3 fl oz milk
+      item: bicarbonate of soda dissolved in 3 fl oz milk (any kind)
     - amount: "8 oz"
       item: self-raising flour
     - amount: "2 tsp"

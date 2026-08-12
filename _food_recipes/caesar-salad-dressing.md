@@ -27,7 +27,7 @@ ingredient_groups:
     - amount: "50 g"
       item: "parmesan, finely grated"
     - amount: "1 tbsp"
-      item: milk
+      item: milk (any kind)
 method:
   - Mix everything together and shake really well.
 method_short:

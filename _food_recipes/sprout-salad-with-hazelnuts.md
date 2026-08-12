@@ -1,14 +1,13 @@
 ---
 title: "Sprout Salad with Hazelnuts"
-short_name: Sprout Salad Hazelnuts
-tagline: "Raw shredded sprouts sound like a hard sell. Toasted hazelnuts, cumin and a citrus-mustard dressing make the case for you."
+tagline: "Raw shredded sprouts sound like a hard sell. Toasted hazelnuts, cumin and a citrus-mustard dressing make the case."
 source: "Adapted from BBC Good Food, December 2017"
 serves: "4–6"
 prep_time: "10 mins plus chilling"
 cook_time: "10 mins"
-main_ingredients: ["Brussels sprouts", "pomegranate seeds", hazelnuts, orange, "cumin seeds", lemon, "wholegrain mustard"]
-star_ingredient: greens
-tags: [festive, salad]
+main_ingredients: ["Brussels sprouts", "pomegranate seeds", "hazelnuts", "orange", "cumin seeds", "lemon", "wholegrain mustard"]
+star_ingredient: "greens"
+tags: ["festive", "salad"]
 ingredient_groups:
   - name: salad
     items:

@@ -26,7 +26,7 @@ ingredient_groups:
     - amount: "4 oz"
       item: ground almonds
     - amount: "1 tbsp"
-      item: milk
+      item: milk (any kind)
     - amount: "2 tbsp"
       item: Demerara sugar
 method:
