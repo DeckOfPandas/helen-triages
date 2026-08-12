@@ -34,7 +34,7 @@ ingredient_groups:
       item: coconut palm sugar
     - amount: "1"
       item: "yellow loomi, pierced once or twice with a skewer"
-      note: "Piercing rather than halving it means the flavour releases gradually — see Note."
+      note: "piercing rather than halving it means the flavour releases gradually — see Note"
     - amount: "2 tbsp"
       item: neutral oil
       incidental: true

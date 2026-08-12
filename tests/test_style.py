@@ -103,7 +103,7 @@ def test_prose_abbreviates_minutes_only(recipe):
 
 # --- method-step notes read as sentences, unlike ingredient notes -----------
 # GitHub issue #174, open, picked up 2026-08-12. The opposite convention from
-# test_ingredient_annotation_style (test_taxonomy.py) on purpose -- an
+# test_ingredient_notes_are_lowercase_fragments (test_taxonomy.py) on purpose -- an
 # ingredient note is a fragment ("swap for cider vinegar plus a pinch of
 # sugar"), a method-step note is an aside in full sentence form ("Don't
 # skip the salt, it's part of the chemical process."), and the two were

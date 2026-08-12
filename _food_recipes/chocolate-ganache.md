@@ -23,9 +23,9 @@ ingredient_groups:
       note: for a ganache that sets more firmly
 method:
   - step: "Grate the chocolate into a perfectly dry stainless steel bowl."
-    note: "see below: coarse chopping&nbsp;=&nbsp;bad, water&nbsp;=&nbsp;bad, hotspots&nbsp;=&nbsp;bad"
+    note: "See below: coarse chopping&nbsp;=&nbsp;bad, water&nbsp;=&nbsp;bad, hotspots&nbsp;=&nbsp;bad."
   - step: "Salt the cream, then heat it gently in a pan to 88–90°C — it should look active, but DO NOT LET IT BOIL."
-    note: "under-heating&nbsp;=&nbsp;bad but also over-heating&nbsp;=&nbsp;bad"
+    note: "Under-heating&nbsp;=&nbsp;bad but also over-heating&nbsp;=&nbsp;bad."
   - Pour the heated cream over the grated chocolate. Wait 2–3 mins. The temperature will drop fast.
   - step: "Stir gently from the centre using a perfectly dry silicone spatula until the temperature reaches 40–45°C. The mixture will visibly change from muddy to glossy and thick as the emulsion forms."
     note: "Over-stirring&nbsp;=&nbsp;bad because moisture from the air will find a way in."

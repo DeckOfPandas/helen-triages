@@ -32,7 +32,7 @@ Deliberately NOT ported here, and why — don't add these without asking:
   violations across 14 files alone, checked by hand 2026-08-11), not a
   structural bug. This is exactly the tidy-up-to-promote work this file
   exists to reduce, not something a raw draft should already satisfy.
-- test_ingredient_annotation_style, test_ingredient_group_order_matches_
+- test_ingredient_notes_are_lowercase_fragments, test_ingredient_group_order_matches_
   title (test_taxonomy.py) — both explicitly flag-only even for published
   recipes ("I'll look at violations myself", HANDOVER_v26.md §10), and the
   proper_nouns list they lean on was seeded from the recipe corpus, not the
