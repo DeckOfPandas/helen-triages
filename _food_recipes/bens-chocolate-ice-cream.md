@@ -13,7 +13,7 @@ ingredient_groups:
     - amount: "100 g"
       item: "unsweetened chocolate, 100% cacao"
     - amount: "240 ml"
-      item: milk
+      item: whole milk
     - amount: "2 large"
       item: eggs
     - amount: "200 g"

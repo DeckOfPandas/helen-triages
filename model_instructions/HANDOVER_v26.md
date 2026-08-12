@@ -787,7 +787,7 @@ form (`test_garlic_specifies_form`, real main_ingredients fixes across 8
 recipes) · #173 loomi colour (`test_loomi_specifies_colour`, already
 compliant, one user) · #174 method-step notes read as sentences
 (`test_method_step_notes_are_sentences`, 18 real fixes across 13 recipes,
-the mirror-image convention to `test_ingredient_annotation_style`) · #172
+the mirror-image convention to `test_ingredient_notes_are_lowercase_fragments`) · #172
 title/slug divergence (`test_title_and_slug_dont_diverge` in
 `test_taxonomy.py`, one real standing case — see below) · #170/#168
 quoting (`test_main_ingredients_entries_are_quoted`, `test_tags_entries_
@@ -814,15 +814,15 @@ issues #181/#182 closed. Neither had a single compliant recipe as of
 rather than working through the backlog by hand. `test_egg_size_is_stated`
 (UK size band, no gram weight) is unaffected and still enforced.
 
-**One genuine standing bug, not fixed**: `ridiculously-good-oxtail-stew.md`
-— title is "Sticky Oxtail Stew" (agreeing with its own tagline), filename
-says something else entirely. Reads as a deliberate title change with no
-matching rename. Don't rename the file or revert the title without asking
-— HANDOVER's own filename-stability rule (§4) applies.
+**Resolved 2026-08-12**: `ridiculously-good-oxtail-stew.md`'s title,
+"Sticky Oxtail Stew" (agreeing with its own tagline), had disagreed with
+its filename since before this HANDOVER's own §4 filename-stability rule
+started blocking an unprompted rename. Helen's explicit call: renamed the
+file to `sticky-oxtail-stew.md` rather than reverting the title.
 
 **Deliberately NOT ported to every value in the file, and why** (checked
 against real data before deciding, not assumed): the qualified-ingredient
-closed lists, `test_ingredient_annotation_style`, `test_ingredient_group_
+closed lists, `test_ingredient_notes_are_lowercase_fragments`, `test_ingredient_group_
 order_matches_title`, and `test_spice_order_within_group` were all
 considered for a draft-scoped version and rejected — see `test_drafts.py`'s
 own module docstring for the full reasoning per rule.
@@ -841,11 +841,13 @@ blank field (`cook_time: QQ`) and an un-rewritten ingest line
 retirement — treat it exactly as `QQ`, don't add a third marker, and see
 §4's ingest paragraph for the actual instruction.
 
-**`test_ingredient_annotation_style`** (`test_taxonomy.py`) checks: one
-sentence, no trailing full stop, lower case unless the first word is `I` or a
-declared proper noun. It only flags, never rewrites, because Helen said so
-directly: "I'll look at violations myself because I care about tone of
-voice." **Don't fix a future violation of this test unprompted** — whether a
+**`test_ingredient_notes_are_lowercase_fragments`** (`test_taxonomy.py`,
+renamed 2026-08-12 from `test_ingredient_annotation_style` so the failure
+summary states the rule without opening the file) checks: one sentence, no
+trailing full stop, lower case unless the first word is `I` or a declared
+proper noun. It only flags, never rewrites, because Helen said so directly:
+"I'll look at violations myself because I care about tone of voice."
+**Don't fix a future violation of this test unprompted** — whether a
 capitalised first word needs lowercasing or is actually a proper noun that
 belongs in `taxonomy.yml`'s `proper_nouns` list is her call, same standing
 rule as `QQ`.
@@ -1743,7 +1745,7 @@ treatment as the other two pages just because they're siblings.
 **The "checked once... remove once confirmed" notes under each table are
 Helen's own working scaffolding, not errors to fix.** She's verifying each
 cited source herself over time and will strip a note once she has. Same
-standing rule as `QQ` (§4) and `test_ingredient_annotation_style` (§10) —
+standing rule as `QQ` (§4) and `test_ingredient_notes_are_lowercase_fragments` (§10) —
 don't "helpfully" remove one unprompted.
 
 **Two flagged, not fixed, food-safety gaps**: pork's "medium" doneness

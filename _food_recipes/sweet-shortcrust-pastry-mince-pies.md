@@ -23,14 +23,14 @@ ingredient_groups:
       item: "unsalted butter straight from the fridge, diced"
     - amount: "1 large"
       item: "free-range egg, beaten"
-    - item: "milk, to glaze"
+    - item: "milk (any kind), to glaze"
     - item: icing sugar, to dust
     - item: orange zest, to sprinkle (very optional)
 method:
   - "Blend the flour, sugar, almonds, salt and butter in a food processor until the mixture resembles breadcrumbs, then slowly add the egg. Or, if you're feeling keen, rub the butter into the dry ingredients with your fingertips then stir in the egg."
   - "Wrap in cling film and chill for 1 hour."
   - "Cut out circles and stars, assemble the pies, then chill for another 30 mins."
-  - step: "Brush lightly with milk, then bake at 170°C for 20 mins."
+  - step: "Brush lightly with milk, then bake at 180°C fan for 15-20 mins."
     note: "If the edges brown too fast, either: a) live with it, because it's pretty, or b) turn the oven down by 10° for the next batch."
   - "Cool on a wire rack."
   - "Sieve icing sugar attractively over them, and sprinkle orange zest too if you want."
