@@ -534,7 +534,17 @@ _QUALIFIED_MILK = {
 
 
 def test_milk_specifies_type(recipe):
+    """main_ingredients is vocabulary, not the place the actual
+    qualification lives -- if any ingredient line already states "milk
+    (any kind)", a bare "milk" in main_ingredients is describing that same
+    already-answered choice, not a second unconfirmed one, so it's exempt
+    too. Ingredient-line "milk (any kind)" itself is still required to
+    match _QUALIFIED_MILK's own "any kind" entry -- this exemption only
+    ever removes a main_ingredients hit, never an ingredient one.
+    """
     bad = _unqualified(recipe, "milk", _QUALIFIED_MILK)
+    if any(re.search(r"\bmilk\s*\(any kind\)", item, re.I) for item in recipe.ingredient_items):
+        bad = [b for b in bad if not b.startswith("main_ingredients")]
     assert not bad, (
         f"{where(recipe)} has unqualified milk: {bad!r}. Confirm from the "
         f"original source rather than assuming whole milk -- "
