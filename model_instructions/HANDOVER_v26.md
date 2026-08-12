@@ -215,7 +215,6 @@ script may not know which site it's on — a test forbids reaching into
 
 ```yaml
 title: "Lemony Cavolo Nero and Butter Bean Soup"
-short_name: Lemony Cavolo Nero and Butter Bean Soup
 tagline: "It's fun to have a one-pot stew that is bright and acidic..."
 source: "Adapted from Good Food, January 2026, page 41"
 serves: 4                        # xor makes: — never both
@@ -249,6 +248,17 @@ meta:
   cooked_before: false
   date_last_edited: "2026-07-29"
 ```
+
+**`short_name` retired 2026-08-12, GitHub issue #169.** Confirmed zero
+references anywhere in `_layouts/`, `_includes/`, `assets/js/`, or `food/`
+before removal — every recipe carried the field, nothing ever read it. All
+~90 `_food_recipes/` files and ~310 `_food_drafts/` files had the line
+removed in one pass; `test_no_retired_fields` (test_front_matter.py,
+test_drafts.py) now guards against it reappearing, same as `published`/
+`date_added`/`difficulty`/`nutrition`/`filling_note`/`headline_ingredient`.
+If you find yourself wanting a shortened display title somewhere, that's a
+real gap the field used to paper over without actually filling it — raise
+it fresh, don't resurrect the old field.
 
 **Easy to get wrong:**
 
@@ -543,8 +553,29 @@ adequately covered by an existing star -- not revisited unless that changes.
 a technique or structural ingredient, not as the thing the dish is actually
 about -- see `_data/food/taxonomy.yml`'s own comment for the full reasoning
 and the member list. A genuine egg-forward dish (Turkish eggs, deviled eggs,
-a frittata) would earn the star back; nothing in the collection qualifies
-today.
+a frittata) would earn the star back; nothing in `_food_recipes/` qualifies
+today. **`_food_drafts/spring-onion-feta-frittata.md` is a real candidate**
+(flagged 2026-08-11, still open) -- a frittata is the literal example this
+paragraph already named, but reinstating a retired taxonomy value is
+Helen's call to make deliberately, not a reason to leave the stale value
+sitting in the file meanwhile (which is why it, and 7 other `eggs` drafts,
+are blank as of 2026-08-12 rather than left retired-but-present).
+
+**Retired star values need actively removing, not just retiring -- caught
+for real, 2026-08-12.** `_data/food/taxonomy.yml`'s `retired_star_
+ingredients` dict (added the same day) is the enforcement half of this:
+`test_star_ingredient_is_declared` (`test_taxonomy.py`, `test_drafts.py`)
+checks it first and fails with the retirement reason, rather than a value
+that used to mean something silently blending into the generic "not
+declared" pile. Five drafts (hazelnut-paris-brest, leratos-tanzanian-
+banana-curry, matcha-white-chocolate-blondies, ukrainian-dumplings-
+chestnuts-kraut-filling, zucchini-orange-cake-with-pistachios) were still
+carrying `something unusual` three days after its retirement note above was
+written -- the note recorded the *decision*, but nothing enforced it
+against existing files, so it was only found by reading test output rather
+than trusting a green run. All five are blank now. Unlike `eggs`, Helen
+confirmed `something unusual` has nothing left to reconsider -- it's gone,
+don't reintroduce it.
 
 **`goats-cheese-squash-rosemary-griddle-cakes.md` is `root veg`**
 (2026-08-09) — squash counts, per Helen. First (and so far only) recipe
@@ -708,6 +739,72 @@ from here.
 | `test_style.py` | Typography, spellings, accents, time formats, `Estimated` |
 | `test_taxonomy.py` | Declared tags/stars, co-tags, links, spelling collisions |
 | `test_site_config.py` | Architecture guards, not recipes — every check exists because something went wrong at least once |
+| `test_drafts.py` | `_food_drafts/`-scoped subset of the structural/style rules above, via its own `draft` fixture — see its own module docstring for exactly which rules ported and which deliberately didn't |
+
+### 10.1 The 2026-08-12 issue audit
+
+Helen's own framing: "I keep getting confused… I'm concerned that issues we
+closed in the last few days weren't represented as tests — I wasn't paying
+attention, and I'm not sorry, because that's part of the experiment, but I
+still don't want to end up in a mess." The finding: of ~35 real (non-PR)
+issues closed 2026-08-10 through 2026-08-12, most had a matching test, but
+a real cluster didn't — closed by hand, correctly, with nothing guarding
+the fix afterward. Method: grepped every test file for `issue #NNN`
+citations, diffed that set against the closed-issue list pulled via
+`curl` to the GitHub API (read-only, no `gh auth` — see CLAUDE.md), then
+checked each gap against the actual front matter before deciding whether it
+was a real gap, already-satisfied-but-untested, or a false alarm from a
+too-strict reading of the issue title.
+
+**Fixed and now guarded** (GitHub issue → test): #147 main_ingredients
+egg/eggs count agreement (`test_main_ingredients_egg_count_agrees`,
+already-compliant data, pure regression guard) · #144/#145 egg size in
+`amount:` (`test_egg_size_is_stated`, one real placement bug fixed) · #149
+size word in `amount:` not `item:` (`test_size_word_is_with_the_count_not_
+the_item`, five real fixes — apples, lemons ×2, garlic, butter pats, not
+just #149's own carrot example) · #135 homemade pastry needs salt
+(`test_homemade_pastry_has_salt`, already compliant) · #138 unsalted
+butter needs salt or a note (`test_unsalted_butter_has_salt_or_a_note`,
+already compliant except one method-step wording nuance) · #171 garlic
+form (`test_garlic_specifies_form`, real main_ingredients fixes across 8
+recipes) · #173 loomi colour (`test_loomi_specifies_colour`, already
+compliant, one user) · #174 method-step notes read as sentences
+(`test_method_step_notes_are_sentences`, 18 real fixes across 13 recipes,
+the mirror-image convention to `test_ingredient_annotation_style`) · #172
+title/slug divergence (`test_title_and_slug_dont_diverge` in
+`test_taxonomy.py`, one real standing case — see below) · #170/#168
+quoting (`test_main_ingredients_entries_are_quoted`, `test_tags_entries_
+are_quoted`, `test_scalar_fields_are_quoted` — 125 + 94 + 284 unquoted
+values fixed across the whole collection; **deliberately excludes
+`meta:` booleans** — quoting `rewritten: true` would silently make it the
+string `"true"` and break every `is True` check in the suite, checked
+against the actual test code before touching a single value) · #169
+`short_name` removed entirely (zero template/JS/SCSS references found
+before removal; see §4).
+
+**Deliberately standing checklists, not guards expected to be green** (same
+shape as `test_oven_temperature_says_fan`, §10 above) — these need Helen's
+own source material or judgement, not a guess: `test_bake_eggs_state_a_
+weight` (#145's second half, 11 recipes, no fabricated gram weights) ·
+`test_milk_specifies_type` (#167, 9 recipes, don't bulk-convert to "whole
+milk" blind) · `test_fresh_aromatics_state_a_paste_equivalent` (#153/#155,
+15 recipes across ginger/garlic/lemongrass — also worth Helen reconsidering
+scope before working through it by hand, since garlic is so ubiquitous a
+paste-equivalent note on every single clove mention may be more repetition
+than she wants).
+
+**One genuine standing bug, not fixed**: `ridiculously-good-oxtail-stew.md`
+— title is "Sticky Oxtail Stew" (agreeing with its own tagline), filename
+says something else entirely. Reads as a deliberate title change with no
+matching rename. Don't rename the file or revert the title without asking
+— HANDOVER's own filename-stability rule (§4) applies.
+
+**Deliberately NOT ported to every value in the file, and why** (checked
+against real data before deciding, not assumed): the qualified-ingredient
+closed lists, `test_ingredient_annotation_style`, `test_ingredient_group_
+order_matches_title`, and `test_spice_order_within_group` were all
+considered for a draft-scoped version and rejected — see `test_drafts.py`'s
+own module docstring for the full reasoning per rule.
 
 `.node-runtime/node/bin/node --test` runs `tests/js/*.test.js` — 20 checks
 across `ingredient-search.test.js` (11) and `recipe-list.test.js` (9). Node
@@ -799,6 +896,41 @@ Helen writes no code by choice, has strong systems judgement, wants
 explanations that assume both. Offer aesthetic opinions — she asks for them.
 Disagree with her when you think she's wrong; say plainly when you were
 wrong yourself.
+
+**The test suite is self-sufficient by design — GitHub Issues are
+provenance, never a dependency.** Confirmed explicitly 2026-08-12, Helen's
+own request: you should be able to bring `_food_recipes/`/`_food_drafts/`
+into shape from `pytest` output and this file alone, with no GitHub access
+at all. A `GitHub issue #NNN` citation in a test docstring or comment
+records *why* a rule exists, historically — it is never the only place the
+rule itself is stated. Every assert message names the actual fix (the
+allowed list, the required shape, the reasoning), not just an issue number
+to go look up. **Keep this true when you add a test**: if you find yourself
+writing a docstring that only makes sense after reading the issue it cites,
+that is a gap to close in the docstring, not something to leave for the
+next session to chase down. This does not mean stop citing issue numbers —
+they are useful history and cost nothing to keep — it means the citation
+must never be load-bearing.
+
+**Test names and error messages are both expressive, on purpose — Helen's
+own words, 2026-08-12.** The self-sufficiency above depends on this, not
+just on docstrings: a failing-test summary (`pytest -q`'s one-line-per-
+failure output, or a CI notification) shows the test NAME and the assert
+MESSAGE, not the docstring underneath it. If either one is generic, the
+self-sufficiency is fake — you'd have to already know where to look.
+
+- **Name the rule, not the mechanism**: `test_egg_size_is_stated`,
+  `test_unsalted_butter_has_salt_or_a_note`, `test_title_and_slug_dont_
+  diverge` — a reader knows what broke before opening the file. Not
+  `test_egg_1`, `test_check_butter`, `test_slug_rule_2`.
+- **The assert message names the actual fix**, inline, every time — the
+  offending value, the allowed list or required shape, and (for a standing
+  checklist) why it's not safe to fix blind. `f"{where(recipe)} has
+  unqualified mustard: {bad!r}. Allowed: {...}."` tells you the file, the
+  problem, and the fix in one line; `assert not bad` alone tells you
+  nothing pytest didn't already know.
+- Applies to every new test, not just the ones from a GitHub issue —
+  this is a general standard for the suite, not scoped to 2026-08-12's audit.
 
 **Git.** Branch/commit/push mechanics are in `CLAUDE.md` at the repo root —
 that's the source of truth now, not this file. In short: `main` before
