@@ -17,7 +17,7 @@ ingredient_groups:
     - amount: "1 heaped tbsp"
       item: tomato purée
     - amount: "1 bottle"
-      item: "red wine (750 ml)"
+      item: "red wine (750 ml), preferably Cab or Merlot"
       note: preferably Merlot or Cab
     - amount: "1 litre"
       item: good beef stock

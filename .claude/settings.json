@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pytest *)",
+      "Bash(python3 -m pytest *)",
+      "Bash(.node-runtime/node/bin/node --test *)",
+      "Bash(curl -s \"https://api.github.com/repos/DeckOfPandas/helen-triages/*)",
+      "Bash(.gh-runtime/bin/gh auth status)",
+      "Bash(.gh-runtime/bin/gh issue *)"
+    ]
+  }
+}

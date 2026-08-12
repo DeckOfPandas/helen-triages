@@ -47,3 +47,7 @@ Thumbs.db
 # Local workflow
 *Zone.Identifier
 tmp/
+
+# Claude
+.claude/settings.local.json
+

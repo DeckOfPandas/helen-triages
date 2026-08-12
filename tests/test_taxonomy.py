@@ -497,6 +497,60 @@ def test_title_and_slug_dont_diverge(recipe):
     )
 
 
+# --- internal link text stays honest about its target -----------------------
+# GitHub issue #112. A rename is easy to get half-done: update the slug
+# everywhere it's linked (test_internal_recipe_links_resolve already catches
+# a stale slug) but leave a link's own display TEXT still describing the old
+# name. Real near-miss, 2026-08-12: renaming tomato-tarragon-dressing.md to
+# ...-salad.md left roast-beef-fillet.md's own link reading "tomato and
+# tarragon dressing" until caught by hand while doing exactly that rename.
+#
+# Deliberately loose, not a strict word-subset check: calibrated against
+# every real internal link in the collection 2026-08-12, a strict "every
+# link word must appear in the target's title" rule false-positived on two
+# legitimate, non-stale links -- "Chinese five-spice powder" (a real
+# descriptive word; the target is just titled "Five-Spice Powder") and
+# "garam masala powder" (target is "Garam Masala" -- garam masala already
+# means a powder blend, "powder" isn't wrong, just redundant). Both are
+# hardcoded exceptions below rather than loosening the rule generally, the
+# same pattern _data/food/ingredient_words.yml's family_exceptions uses for
+# a single word excluded from an otherwise-sound rule. A link entirely
+# missing from PUBLISHED is test_internal_recipe_links_resolve's job, not
+# this test's -- skipped here rather than double-reported.
+LINK_WITH_TEXT = re.compile(r"\[([^\]]+)\]\(\.\./([a-z0-9-]+)/\)")
+_LINK_TEXT_EXTRA_WORD_EXCEPTIONS = {
+    ("chinese five-spice powder", "five-spice-powder"): {"chinese"},
+    ("garam masala powder", "garam-masala-powder"): {"powder"},
+}
+
+
+def _significant_words(text: str) -> set[str]:
+    folded = _fold(text.replace("’", "").replace("'", ""))
+    return {w for w in re.findall(r"[a-z0-9]+", folded) if w not in _STOPWORDS}
+
+
+_TITLE_WORDS_BY_SLUG = {r.slug: _significant_words(r.fm.get("title") or "") for r in ALL_RECIPES}
+_TITLE_BY_SLUG = {r.slug: (r.fm.get("title") or "") for r in ALL_RECIPES}
+
+
+def test_internal_link_text_matches_target_title(recipe):
+    problems = []
+    for text, slug in LINK_WITH_TEXT.findall(recipe.raw):
+        if slug not in PUBLISHED:
+            continue
+        extra = _significant_words(text) - _TITLE_WORDS_BY_SLUG.get(slug, set())
+        extra -= _LINK_TEXT_EXTRA_WORD_EXCEPTIONS.get((text.lower(), slug), set())
+        if extra:
+            problems.append(f"{text!r} -> ../{slug}/ (title {_TITLE_BY_SLUG.get(slug, '')!r}): {sorted(extra)}")
+    assert not problems, (
+        f"{where(recipe)} has internal link text that doesn't match its "
+        f"target's current title:\n  " + "\n  ".join(problems) + "\n\n"
+        f"Either the link text is stale from a rename the text side never "
+        f"caught up with, or -- if it's a legitimate descriptive word -- add "
+        f"a calibrated exception to _LINK_TEXT_EXTRA_WORD_EXCEPTIONS above."
+    )
+
+
 # --- spice order within a group (Helen's own cooking convention) -----------
 # NOT GitHub issue #68 (within-group order matched against method-text call
 # order) -- that one is explicitly documented as not automatable reliably

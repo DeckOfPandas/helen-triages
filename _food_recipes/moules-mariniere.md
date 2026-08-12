@@ -20,8 +20,8 @@ ingredient_groups:
       item: dry white wine
     - item: "handful of fresh flat-leaf parsley, chopped"
 method:
-  - "Rinse the mussels under cold running water, discarding any that: a) are cracked, b) don't close under running water, or then continue not to close when tapped sharply on the side of the sink. Drain well."
-  - "Melt the butter in a large, deep pan with a lid over a medium heat and soften the shallots with a little salt for 3–4 mins."
+  - "Rinse the mussels under cold running water, discarding any that: a) are cracked, b) don't close under running water with enthusiastic rattling, AND then continue not to close when tapped sharply on the side of the sink. Drain well."
+  - "Melt the butter in a large, deep, lidded pan over a medium heat, then soften the shallots with a little salt for 3–4 mins."
   - "Turn up the heat and add the mussels, then the wine. Cover and cook for 4–5 mins, giving the pan an occasional shake until all the mussels have opened. Discard any that stay shut. Scatter over the parsley and season with a little black pepper, then turn everything over using a large serving spoon. Spoon over the cooking liquid to serve."
 method_short:
   - ""

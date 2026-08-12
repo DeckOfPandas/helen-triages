@@ -26,7 +26,7 @@ ingredient_groups:
       item: chicken stock
     - amount: "1"
       item: parmesan rind (optional)
-      note: "Parmesan rinds freeze well — add straight from frozen for extra savoury depth"
+      note: "Parmesan rinds freeze well — and you can add them straight from frozen"
     - amount: "200 g"
       item: "cavolo nero, leaves roughly chopped"
     - amount: "½ tbsp"
@@ -34,10 +34,10 @@ ingredient_groups:
     - amount: "10 g"
       item: chives
 method:
-  - "Cook the pancetta in a deep flameproof casserole dish on a medium heat for 5–6 mins until crispy and releasing its fat. Remove with a slotted spoon, leaving the fat behind."
-  - "Add the onion, celery and carrot. Fry for 12–15 mins until turning golden. Add the garlic and cook for 1 min more."
-  - "Pour in the beans, chicken stock and optional parmesan rind. Cook for 15 mins on a medium heat, then stir in the cavolo nero and cooked pancetta for a final 5 mins. Stir in the sherry vinegar to taste and season — the pancetta and parmesan rind have already salted the stock, so taste before adding more."
-  - "Sprinkle with chives to serve."
+  - "Fry the pancetta on medium heat for 5–6 mins until crispy and releasing its fat. Remove with a slotted spoon, leaving the fat."
+  - "Fry the onion, celery and carrot for 12–15 mins until turning golden. Add the garlic and cook for 1 min more."
+  - "Add in the beans, chicken stock and optional parmesan rind for extra savoury depth. Cook for about 15 mins on a medium heat, then stir in the cavolo nero and cooked pancetta for a final 5 mins. Add the sherry vinegar to taste and season — the pancetta and parmesan rind have already salted the stock, so taste before adding more."
+  - "Sprinkle with fresh chives to serve."
 method_short:
   - ""
 notes:

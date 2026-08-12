@@ -35,7 +35,7 @@ ingredient_groups:
     - amount: "2 bunches"
       item: "young asparagus, chopped on a diagonal into ½–1-inch pieces"
     - item: "150 g gruyère, grated"
-      note: "all cheese amounts are notional!"
+      note: "all cheese amounts are notional"
     - amount: "20 g"
       item: plain flour
     - item: "grated parmesan, to top"
@@ -46,7 +46,7 @@ method_groups:
     - "Add the egg yolks, then the water, then knead until smooth. Don't over-knead. Add all the water even if the pastry feels too wet."
     - "Leave to rest wrapped in clingfilm in the fridge for about half an hour. Don't skip this otherwise the pastry won't stretch nicely into your dish, and it will shrink, bend and crack when you cook it."
     - Press the pastry into a greased ceramic baking dish. Prick liberally all over with a fork.
-    - "Bake blind for 15 mins at 160°C, then 10 mins open at 180°C."
+    - "Bake blind for 15 mins at 160°C fan, then 10 mins open at 180°C fan."
   - name: filling
     steps:
     - Sweat the onions in butter until soft and golden. This takes a weirdly long time.
@@ -54,17 +54,17 @@ method_groups:
     - "Whisk the eggs in a jug, then add the cream and flour."
     - "Sprinkle the onions over the pastry base, then layer the cheese and asparagus on top, then pour over the egg/cream/flour mixture."
     - Top with the grated parmesan.
-    - "Bake at 180°C for about 45 mins, or until set and golden."
+    - "Bake at 160°C fan for about 45 mins, or until set and golden."
 method_short:
   - |
     * Flour 220, parmesan 6 tbsp, seasoning, butter 150, egg yolks 2, water 4 tsp
     * Rest 30 mins
-    * Blind bake 160°C 15 mins then 180°C 10 mins open
+    * Blind bake 160°C fan 15 mins then 180°C fan 10 mins open
        * Sweat onion 1
           * Blanch asparagus 2 bunches 1 min then iced water
           * Eggs 4, cream 360, flour 20
     * Layer onions; cheese and asparagus; pour over egg, top parmesan
-    * Bake 180°C 45 mins
+    * Bake 180°C fan 45 mins
 notes:
   - label: "I also like..."
     text: "...goat's cheese and cherry tomato."

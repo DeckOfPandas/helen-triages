@@ -542,24 +542,41 @@ enforces it across recipes *and* drafts.
 Declared in `_data/food/taxonomy.yml`. Adding a term there is all that's
 needed.
 
-**Star ingredients** (13, optional): beef, chocolate, duck, fruit, game,
-greens, lamb, oily fish, pork, poultry, root veg, shellfish, white fish.
-`something unusual` retired 2026-08-09 -- see `_data/food/taxonomy.yml`'s own
-comment for the reasoning (culturally relative, not a real craving, barely
-and inconsistently used). `legumes` considered the same day and not added:
-only two candidate recipes across the whole collection, both already
-adequately covered by an existing star -- not revisited unless that changes.
-`eggs` also retired the same day: every one of its six members used egg as
-a technique or structural ingredient, not as the thing the dish is actually
-about -- see `_data/food/taxonomy.yml`'s own comment for the full reasoning
-and the member list. A genuine egg-forward dish (Turkish eggs, deviled eggs,
-a frittata) would earn the star back; nothing in `_food_recipes/` qualifies
-today. **`_food_drafts/spring-onion-feta-frittata.md` is a real candidate**
-(flagged 2026-08-11, still open) -- a frittata is the literal example this
-paragraph already named, but reinstating a retired taxonomy value is
-Helen's call to make deliberately, not a reason to leave the stale value
-sitting in the file meanwhile (which is why it, and 7 other `eggs` drafts,
-are blank as of 2026-08-12 rather than left retired-but-present).
+**Star ingredients** (14, optional): beef, chocolate, duck, eggs, fruit,
+game, greens, lamb, oily fish, pork, poultry, root veg, shellfish, white
+fish. `something unusual` retired 2026-08-09 -- see `_data/food/
+taxonomy.yml`'s own comment for the reasoning (culturally relative, not a
+real craving, barely and inconsistently used). `legumes` considered the
+same day and not added: only two candidate recipes across the whole
+collection, both already adequately covered by an existing star -- not
+revisited unless that changes.
+
+`eggs` retired 2026-08-09, **reinstated 2026-08-12, issue #187, Helen's
+explicit call.** The 2026-08-09 retirement was sound for the six recipes it
+covered then (asparagus-gruyere-quiche, ben-jerrys-sweet-cream-base-1,
+delias-classic-pancakes, henrys-quick-bulletproof-hollandaise-sauce,
+henrys-sunday-waffles, mrs-nicholsons-yorkshire-puddings) -- every one used
+egg as a technique or structural ingredient, not the thing the dish is
+actually about, and all six stayed blank, still correct. But by 2026-08-12
+eight `_food_drafts/` recipes had `star_ingredient: eggs` sitting invalid
+against the retirement (not blank, contrary to what a previous version of
+this paragraph claimed -- checked directly against the files, not assumed).
+That's what turned this from hypothetical into a real decision: checked
+each of the eight against the same test as the original retirement ("is
+egg the craving, or just doing technique/structural work"), not reinstated
+wholesale. Kept `eggs`: `ajitsuke-tamago.md` (literally "seasoned egg",
+nothing else in the dish), `green-baked-eggs.md`, `pink-eggs-beetroot-
+yogurt-chilli-butter.md` (the poached eggs' colour is the tagline's own
+selling point), `spring-onion-feta-frittata.md` (the literal frittata
+example this paragraph used to cite as hypothetical). Blanked, the original
+retirement reasoning applied to them specifically: `quick-creme-
+brulees.md`, `spring-herb-goats-cheese-souffle.md` (egg whites are the
+leavening mechanism -- same reasoning that already correctly keeps
+`dark-chocolate-souffles.md` on "chocolate", not eggs), `caramelised-leek-
+udon-sesame-fried-eggs.md` (title's own head clause, before "with", is
+"Caramelised Leek Udon"), `broad-bean-herb-and-ricotta-fritters.md` (egg as
+fritter binder). See `_data/food/taxonomy.yml`'s own comment for the same
+reasoning inline with the data.
 
 **Retired star values need actively removing, not just retiring -- caught
 for real, 2026-08-12.** `_data/food/taxonomy.yml`'s `retired_star_
@@ -784,14 +801,18 @@ before removal; see §4).
 
 **Deliberately standing checklists, not guards expected to be green** (same
 shape as `test_oven_temperature_says_fan`, §10 above) — these need Helen's
-own source material or judgement, not a guess: `test_bake_eggs_state_a_
-weight` (#145's second half, 11 recipes, no fabricated gram weights) ·
-`test_milk_specifies_type` (#167, 9 recipes, don't bulk-convert to "whole
-milk" blind) · `test_fresh_aromatics_state_a_paste_equivalent` (#153/#155,
-15 recipes across ginger/garlic/lemongrass — also worth Helen reconsidering
-scope before working through it by hand, since garlic is so ubiquitous a
-paste-equivalent note on every single clove mention may be more repetition
-than she wants).
+own source material or judgement, not a guess: `test_milk_specifies_type`
+(#167, 9 recipes, don't bulk-convert to "whole milk" blind).
+
+**Retired 2026-08-12, Helen's explicit call, not fixed by filling in
+values**: `test_bake_eggs_state_a_weight` (#145's second half — a bake
+stating a gram weight/range for its eggs on top of the UK size band) and
+`test_fresh_aromatics_state_a_paste_equivalent` (#153/#155 — fresh
+ginger/garlic/lemongrass stating a paste/purée equivalent) are both gone,
+issues #181/#182 closed. Neither had a single compliant recipe as of
+2026-08-12; Helen decided the requirement itself wasn't worth keeping
+rather than working through the backlog by hand. `test_egg_size_is_stated`
+(UK size band, no gram weight) is unaffected and still enforced.
 
 **One genuine standing bug, not fixed**: `ridiculously-good-oxtail-stew.md`
 — title is "Sticky Oxtail Stew" (agreeing with its own tagline), filename

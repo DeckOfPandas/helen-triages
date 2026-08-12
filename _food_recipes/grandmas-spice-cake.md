@@ -33,7 +33,7 @@ method:
   - "Sift the spices with the flour, then fold in with a metal spoon."
   - Gently stir in the milk/bicarb mixture.
   - "Spoon into a 7-inch round tin and level with the back of a spoon, making a slight dip towards the middle."
-  - Bake at 180°C for about 35 mins.
+  - Bake at 170°C fan for about 35 mins.
   - Leave to cool in the tin for a few mins.
 method_short:
   - ""

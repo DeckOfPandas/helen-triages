@@ -1,13 +1,13 @@
 ---
 title: "Thai Green Chicken Curry"
-tagline: "Easy, unfussy and forgiving."
+tagline: "Unfussy and forgiving."
 source: "Henry"
 serves: "4"
 prep_time: "15 mins"
 cook_time: "30 mins"
-main_ingredients: ["chicken", "Thai green curry paste", "coconut milk", "new potatoes", "green beans", "lemongrass paste", "tamarind paste", "lime"]
+main_ingredients: ["chicken", "Thai green curry paste", "coconut milk", "new potatoes", "green beans", "lemongrass paste", "tamarind paste", "lime", "fish sauce", "flaked almonds"]
 star_ingredient: "poultry"
-tags: ["fakeaway", "one-handed food"]
+tags: ["fakeaway", "one-handed food", "freezable"]
 ingredient_groups:
   - items:
     - amount: "½"

@@ -52,7 +52,7 @@ method_groups:
     - "Cream the butter with the sugar until fluffy, then add some beaten egg, some flour mixture, then some milk mixture bit by bit until all combined. You might not need all the milk."
     - Add the vanilla extract last.
     - Divide the batter evenly between two greased 8-inch round tins — weigh them if you can be bothered — and smooth the tops with the back of a spoon.
-    - Bake for 20–25 mins at 170°C until the centres is springy and the sides begin to pull away from the tin.
+    - Bake for 20–25 mins at 160°C fan until the centres is springy and the sides begin to pull away from the tin.
     - step: "Leave to cool in the tins for a few mins, then turn out upside down on a wire rack and prick the bottoms all over with a fork."
       note: "Cooling upside down flattens the tops ready for stacking."
   - name: buttercream filling
@@ -68,7 +68,7 @@ method_short:
        * Whisk the eggs 2
     * Add dry / milk / egg to butter/sugar in turn
     * Add vanilla ½ tsp
-    * Bake two 8" 170°C 20–25 mins
+    * Bake two 8" 160°C fan 20–25 mins
        * Melt chocolate 100
           * Start the butter 50 and icing sugar 100, egg yolk 1 gradually
        * Add chocolate to butter mix

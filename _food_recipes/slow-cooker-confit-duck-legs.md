@@ -5,7 +5,7 @@ source: "Adapted from Pinch and Swirl"
 makes: "however many you make"
 prep_time: "10 mins"
 cook_time: "6 hrs"
-main_ingredients: ["duck legs", "coarse sea salt", "thyme", "garlic cloves", "duck fat"]
+main_ingredients: ["duck legs", "coarse sea salt", "fresh thyme", "garlic cloves", "duck fat"]
 star_ingredient: "duck"
 tags: ["make-ahead"]
 ingredient_groups:

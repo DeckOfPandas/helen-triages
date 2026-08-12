@@ -39,7 +39,7 @@ method_short:
        * Eggs 5, sugar 450, vanilla 2 tsp
     * Egg into chocolate
     * Flour 200, salt 1 tsp
-    * Bake 180°C 20–25 mins until just cracked and doesn't wobble
+    * Bake 160°C fan 20–25 mins until just cracked and doesn't wobble
     * Cool in the tin >30 mins
 meta:
   rewritten: true

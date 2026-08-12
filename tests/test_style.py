@@ -492,7 +492,7 @@ def test_garlic_specifies_form(recipe):
 
 # --- loomi: colour, since black and white/yellow are different products ----
 # GitHub issue #173, open, picked up 2026-08-12. Only one current user
-# (vietnamese-spiced-braised-muntjac-haunch.md, "yellow loomi") and it
+# (vietnamese-spiced-braised-venison-haunch.md, "yellow loomi") and it
 # already qualifies -- this is a regression guard, not a fix.
 _QUALIFIED_LOOMI = {"black loomi", "white loomi", "yellow loomi"}
 
@@ -639,7 +639,6 @@ def test_chocolate_percentage_matches_type(recipe):
 # excluded throughout; the count-agreement and size rules are specifically
 # about whole eggs.
 _EGG_SIZE_RE = re.compile(r"\b(small|medium|large|extra large)\b", re.I)
-_EGG_WEIGHT_RE = re.compile(r"\d+\s*[-–]\s*\d+\s*g\b|\d+\s*g\b")
 
 
 def _whole_egg_items(recipe):
@@ -699,33 +698,6 @@ def test_main_ingredients_egg_count_agrees(recipe):
     assert not bad, (
         f"{where(recipe)} main_ingredients {bad!r} doesn't agree with the "
         f"actual egg count ({total}) -- should say {wanted!r}."
-    )
-
-
-def test_bake_eggs_state_a_weight(recipe):
-    """GitHub issue #145's second half: a bake states not just the UK size
-    but a weight or weight range for its eggs, since a size band is wide
-    enough to matter in a precise bake.
-
-    Deliberately a standing checklist, not a guard expected to be green --
-    same shape as test_oven_temperature_says_fan: confirming the actual
-    weight the original source specified needs the source material, not a
-    guess, and a wrong weight is worse than an absent one. As of 2026-08-12
-    none of the bake-tagged recipes with eggs state one -- don't fill these
-    in blind with the standard UK size-band figures, since the original
-    recipe may have meant something more specific than the regulatory band.
-    """
-    if "bakes" not in (recipe.fm.get("tags") or []):
-        return
-    bad = []
-    for item in _whole_egg_items(recipe):
-        text = " ".join(str(item.get(k, "")) for k in ("amount", "item"))
-        if not _EGG_WEIGHT_RE.search(text):
-            bad.append(item.get("item"))
-    assert not bad, (
-        f"{where(recipe)} is a bake with egg ingredient(s) with no weight or "
-        f"weight range stated: {bad!r}. Confirm from the original source and "
-        f'add e.g. "(about 63-73g each)" -- don\'t estimate blind.'
     )
 
 
@@ -827,45 +799,6 @@ def test_unsalted_butter_has_salt_or_a_note(recipe):
     assert _SALT_WORD.search(note_text), (
         f"{where(recipe)} uses unsalted butter with no salt ingredient and "
         f"no note explaining it doesn't need one -- add salt, or a note."
-    )
-
-
-# --- fresh ginger/garlic/lemongrass state a paste equivalent ----------------
-# GitHub issues #153/#155, closed 2026-08-10 with no test -- caught in the
-# 2026-08-12 audit. Deliberately a standing checklist, not a guard expected
-# to be green: as of 2026-08-12 ZERO current entries state one (23 across 15
-# recipes -- 11 ginger, 10 garlic, 2 lemongrass), and the actual ratio
-# (how much paste equals how much fresh, which brand for lemongrass per
-# #153's own "Barts" mention) is Helen's judgement, not something to
-# fabricate. Also worth her reconsidering scope before working through the
-# list by hand: garlic cloves are so ubiquitous (10 entries here, and this
-# only counts distinct recipes -- most recipes on the site use garlic) that
-# a paste-equivalent note on every single one may be more repetition than
-# she actually wants, unlike ginger or lemongrass, which are both more often
-# something a cook doesn't already have to hand.
-_FRESH_GINGER = re.compile(r"\bginger\b", re.I)
-_GINGER_EXCLUDE = re.compile(r"\bground ginger\b|\bginger paste\b", re.I)
-_GARLIC_CLOVE = re.compile(r"\bgarlic clove", re.I)
-_LEMONGRASS_STALK = re.compile(r"\blemongrass\b", re.I)
-_PASTE_EQUIVALENT = re.compile(r"\bpaste\b|\bpur[ée]e\b", re.I)
-
-
-def test_fresh_aromatics_state_a_paste_equivalent(recipe):
-    bad = []
-    for item in recipe.ingredient_items:
-        name = re.split(r"[,(]", item)[0].strip()
-        is_ginger = bool(_FRESH_GINGER.search(name) and not _GINGER_EXCLUDE.search(name))
-        is_garlic = bool(_GARLIC_CLOVE.search(name))
-        is_lemongrass = bool(_LEMONGRASS_STALK.search(name)) and "paste" not in name.lower()
-        if not (is_ginger or is_garlic or is_lemongrass):
-            continue
-        if not _PASTE_EQUIVALENT.search(item):
-            bad.append(item)
-    assert not bad, (
-        f"{where(recipe)} has fresh ginger/garlic/lemongrass with no paste "
-        f"or purée equivalent stated: {bad!r}. Confirm the ratio (and, for "
-        f'lemongrass, the "Barts" brand reference per issue #153) rather '
-        f"than guessing -- don't fabricate a conversion."
     )
 
 

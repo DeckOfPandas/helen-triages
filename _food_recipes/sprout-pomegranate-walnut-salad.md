@@ -1,13 +1,13 @@
 ---
 title: "Sprout, Pomegranate and Walnut Salad"
-tagline: "Citrus-curing tempers the raw sprouts, I promise, and the tahini-honey dressing does the rest."
+tagline: "A citrus-cured sprout salad with a tahini dressing. This is now part of family Christmas dinner."
 source: "Henry"
 serves: "4–6"
 prep_time: "20 mins"
 cook_time: "None"
-main_ingredients: ["Brussels sprouts", "pomegranate seeds", "walnuts", "apple", "red onion", "tahini", "honey", "natural yoghurt"]
+main_ingredients: ["Brussels sprouts", "pomegranate seeds", "walnuts", "apple", "red onion", "tahini", "honey", "fresh mint", "lemon", "natural yoghurt"]
 star_ingredient: "greens"
-tags: ["salad", "no-cook", "make-ahead", "virtuous"]
+tags: ["salad", "no-cook", "make-ahead", "virtuous", "festive"]
 ingredient_groups:
   - name: salad
     items:

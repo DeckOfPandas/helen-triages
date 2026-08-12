@@ -26,7 +26,7 @@ method:
   - step: "Stir in the flour and a pinch of salt, then the fruit."
     note: "Loosen with a splash of milk if needed."
   - "Spoon carefully into paper cases in a cake tray, using the back of the spoon to level off the tops."
-  - "Bake at 160°C fan until springy in the middle."
+  - "Bake at 170°C fan until springy in the middle."
 method_short:
   - ""
 # notes:

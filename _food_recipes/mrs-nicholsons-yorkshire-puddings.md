@@ -19,7 +19,7 @@ ingredient_groups:
     - item: Groundnut oil (or other high smoke-point oil)
 method:
   - "Fill each hole of a Yorkshire pudding tray about ¼ full with oil, brushing it up the sides."
-  - "Put the oiled tray in the oven at 240°C while making the batter, until the oil is very hot."
+  - "Put the oiled tray in the oven at 200–210°C fan while making the batter, until the oil is very hot, 10–15 mins."
   - Whisk all the ingredients together until smooth.
   - Pour carefully into the tray — the hot oil will spit.
   - Cook until done and well risen. Consume instantly.

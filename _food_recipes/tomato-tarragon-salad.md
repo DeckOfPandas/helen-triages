@@ -1,11 +1,11 @@
 ---
-title: "Tomato and Tarragon Dressing"
-tagline: "A bright dressing that works brilliantly with beef, but honestly with anything. It's also sort of a salad on its own."
+title: "Tomato and Tarragon Salad"
+tagline: "A punchy, herb-heavy salad — which can also be used as a dressing. It works brilliantly with beef, but it sort of goes with anything."
 source: "Adapted from GoodtoKnow, recipe Gordon Ramsay"
 serves: "6"
 prep_time: "15 mins plus 20 mins chilling"
 cook_time: "None"
-main_ingredients: ["plum tomatoes", "Worcestershire sauce", "Dijon mustard", "lemon", "balsamic vinegar", "shallots", "fresh tarragon", "fresh parsley"]
+main_ingredients: ["plum tomatoes", "tarragon", "flat-leaf parsley", "Worcestershire sauce", "balsamic vinegar", "Dijon mustard", "shallots"]
 star_ingredient:
 tags: ["extras", "no-cook", "make-ahead", "salad"]
 ingredient_groups:

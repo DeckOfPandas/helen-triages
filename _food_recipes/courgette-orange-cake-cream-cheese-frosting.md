@@ -40,7 +40,7 @@ ingredient_groups:
 method:
   - "Finely grate the courgettes, then squeeze out as much liquid as possible so the cake isn't soggy."
   - "Stir the courgettes with the sugar, sunflower oil, eggs, orange zest, vanilla and sultanas, then fold in the flour and baking powder."
-  - "Coax the mixture into an oiled and lined 1-kg loaf tin and bake for about 50 mins at 180°C fan, until a skewer inserted into the centre comes out clean. Cool on a wire rack."
+  - "Coax the mixture into an oiled and lined 1-kg loaf tin and bake for about 50 mins at 160°C fan, until a skewer inserted into the centre comes out clean. Cool on a wire rack."
   - "Beat the cream cheese with the icing sugar then fridge for 30 mins. Spread over the cooled cake, then scatter with the zest and chopped pistachios."
 method_short:
   - ""
