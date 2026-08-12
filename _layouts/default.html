@@ -96,6 +96,20 @@
 <body>
 
   <header class="site-header">
+  {% comment %} The small print / about link -- deliberately not spelled out
+     as "about" anywhere a nav shows it, Helen's explicit call. Omitted
+     entirely rather than linking nowhere when a site has no about_url yet
+     (cocktails, as of 2026-08-13) -- see sites.yml's own comment.
+
+     .site-header-inner shares main's own max-width/margin:auto formula
+     (see _layout.scss) purely so the "?" can align with the right edge of
+     the CONTENT column -- .site-header itself is edge-to-edge full width,
+     with no column of its own to align against otherwise. {% endcomment %}
+  {% if this_site.about_url %}
+  <div class="site-header-inner">
+    <a href="{{ this_site.about_url | relative_url }}" class="site-about-link" aria-label="About this site">?</a>
+  </div>
+  {% endif %}
   <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">
     <div class="site-logo">
       <div class="site-logo-top">HELEN TRIAGES</div>

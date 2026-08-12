@@ -63,6 +63,45 @@ main {
   }
 }
 
+// .site-header itself is edge-to-edge, full viewport width -- it has no
+// content column of its own to align anything against. This shares main's
+// own max-width/margin:auto formula so the "?" lines up with the right
+// edge of the actual content column beneath it, at every viewport width,
+// not just a fixed offset from the header's own edge.
+.site-header-inner {
+  max-width: $width-content;
+  margin: 0 auto;
+  position: relative;
+}
+
+// The small print / about link. Deliberately not spelled out as "about"
+// anywhere a nav shows it -- Helen's explicit call, and the about page's
+// own title ("???") echoes the same instinct. Deliberately bare -- Helen:
+// "much more minimalist... a naked ? in body font and style" -- no circle,
+// no border, no heading font: just a character sitting quietly in the
+// corner in the page's own body font, indistinguishable from ordinary text
+// until you're actually looking for it. Colour stays at this component's
+// shared default here (only $color-clear-text is guaranteed by every
+// site's palette, see _tokens.scss's palette contract); the hot-magenta
+// hover Helen actually asked for is food-specific
+// ($color-bright-magenta isn't one of the nine guaranteed variables), so
+// it lives as an override in food/_recipe-header.scss, not here.
+.site-about-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-family: $font-body;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: $color-clear-text;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: $color-text;
+  }
+}
+
 .site-footer {
   max-width: $width-content;
   margin: 0 auto;
