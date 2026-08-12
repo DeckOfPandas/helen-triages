@@ -1,7 +1,7 @@
 ---
 title: "Grandma's Spice Cake"
 short_name: "Grandma's Spice Cake"
-tagline: "How can you beat this! Change the spices if you like, but this is the original recipe."
+tagline: "How can you beat this. Change the spices if you like, but this is the original recipe."
 source: "Grandma Kath"
 makes: "one 7-inch round cake"
 prep_time: "10 mins"
@@ -27,11 +27,10 @@ ingredient_groups:
       item: ground ginger
     - amount: 1 tsp
       item: "mixed spice powder"
-      note: "mixed spice isn't really sold like this any more — see [mixed spice powder](../mixed-spice-powder/) for a home-made blend"
+      note: "mixed spice isn't really sold like this any more, but my [mixed spice powder](../mixed-spice-powder/) is better anyway"
 method:
   - Cream the butter and sugar thoroughly until fluffy. Longer than you think.
-  - Mix in the beaten egg a little at a time.
-  - Mix in the syrup.
+  - Mix in the beaten egg a little at a time, then the syrup.
   - "Sift the spices with the flour, then fold in with a metal spoon."
   - Gently stir in the milk/bicarb mixture.
   - "Spoon into a 7-inch round tin and level with the back of a spoon, making a slight dip towards the middle."

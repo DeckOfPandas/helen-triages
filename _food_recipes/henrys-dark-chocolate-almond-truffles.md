@@ -1,7 +1,7 @@
 ---
 title: "Henry's Dark Chocolate Almond Truffles"
 short_name: "Henry's Dark Chocolate Almond Truffles"
-tagline: "These don't take long to make, but have to be done in stages."
+tagline: "I've inflicted these on many Christmas parties over the years, and latterly they were even nice."
 source: Megan
 makes: "20–24 truffles"
 prep_time: "20 mins plus time to set"
@@ -28,16 +28,18 @@ method:
   - "Mix the icing sugar and almonds together, then stir them in."
   - "Leave to cool, but don't let it become solid."
   - "Roll into ½-inch balls, then put in the fridge until solid, two hours or so."
-  - "Roll in whatever you like for dusting, then put them back in the fridge."
+  - "Roll in whatever you like for dusting (see note), then put them back in the fridge."
   - "Remove from the fridge about 2 hours before you want to eat them."
 method_short:
   - ""
 notes:
   - label: "Simon is delightful"
-    text: "Simon has been known to call these \"chocolate poos\"...lovely."
+    text: "Simon has been known to call these \"chocolate poos\"."
+  - label: "dusting"
+    text: "Every time I've dusted them with icing sugar then re-fridged, they suck the icing sugar in, making their surfaces look all weird. I now tend to leave them to their own devices, and dust as close to gifting as I can get away with."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
   date_last_edited: "2026-07-13"
 ---

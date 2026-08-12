@@ -28,7 +28,7 @@ method_short:
   - ""
 notes:
   - label: "Swapping flours"
-    text: "If you change flour types, make sure the total flour plus any ground almonds is twice the sugar or butter amount to maintain the classic ratio."
+    text: "Just maintain the classic ratio."
 meta:
   rewritten: true
   proofread: false

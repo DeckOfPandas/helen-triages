@@ -26,14 +26,13 @@ ingredient_groups:
     - item: ⅛ tsp vanilla essence
 method:
   - Nutribullet.
-  - Enjoy.
 method_short:
   - ""
 notes:
   - label: "Adjusting sweetness"
     text: Try more cocoa and less syrup.
   - label: "Grated chocolate"
-    text: I used to add grated chocolate to this but it goes weird when frozen.
+    text: I used to add grated chocolate to this but it goes weird when frozen so now I don't.
 meta:
   rewritten: true
   proofread: true

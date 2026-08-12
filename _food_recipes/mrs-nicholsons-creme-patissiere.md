@@ -33,11 +33,11 @@ method:
   - Continue cooking for about 2–3 mins to cook out the flour.
   - Taste to check.
   - Cover with buttered paper to cool.
+method_short:
+  - ""
 notes:
   - label: "Before using"
     text: "It may need a quick whisk before using as it could look a little lumpy, but generally nobody notices."
-method_short:
-  - ""
 meta:
   rewritten: true
   proofread: true

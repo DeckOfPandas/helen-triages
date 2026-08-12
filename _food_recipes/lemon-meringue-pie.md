@@ -38,7 +38,7 @@ method_groups:
       - "Mix the flour, sugar and salt, then rub in the butter lightly with fingertips."
       - "Mix in the egg yolk and combine gently."
       - "Squish half the pastry into the dish and flatten it ish, freezing the other half."
-      - "Bake at 190°C for 30 mins."
+      - "Bake at 190°C fan for 30 mins."
   - name: assemble the pie
     steps:
       - "Spread the curd onto the baked pastry."
@@ -46,7 +46,8 @@ method_groups:
       - "Beat in the sugar bit by bit until the mixture is stiff and shiny but not dry."
       - step: "Spread the meringue over the filling."
         note: "Don't worry about smoothing it off too much — crests at different heights catch the heat differently to attractive effect."
-      - "Bake at 200°C for 25 mins, then take out of oven and leave to cool in the dish for at least 30 mins before eating."
+      - step: "Bake at 160°C fan for 25 mins, then take out of oven and leave to cool in the dish for at least 30 mins before eating."
+        note: "Turn up to 180°C fan for the last 15-20 mins for more browning."
 method_short:
   - ""
 # notes:

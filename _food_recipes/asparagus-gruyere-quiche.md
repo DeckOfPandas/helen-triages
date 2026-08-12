@@ -67,8 +67,8 @@ method_short:
     * Layer onions; cheese and asparagus; pour over egg, top parmesan
     * Bake 180°C 45 mins
 notes:
-  - label: "Other fillings"
-    text: "Other easy but tasty fillings: goat's cheese and cherry tomato; mushroom, kale and tomato; ham, egg and mozzarella."
+  - label: "I also like..."
+    text: "...goat's cheese and cherry tomato."
 meta:
   rewritten: true
   proofread: true
