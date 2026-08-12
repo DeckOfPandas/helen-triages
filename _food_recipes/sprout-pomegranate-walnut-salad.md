@@ -1,7 +1,7 @@
 ---
 title: "Sprout, Pomegranate and Walnut Salad"
 short_name: "Sprout, Pomegranate and Walnut Salad"
-tagline: "Finely sliced raw sprouts with apple, walnuts, red onion, and pomegranate, and a tahini-honey dressing."
+tagline: "Citrus-curing tempers the raw sprouts, I promise, and the tahini-honey dressing does the rest."
 source: Henry
 serves: "4–6"
 prep_time: "20 mins"
@@ -38,11 +38,11 @@ ingredient_groups:
     - amount: "2 tbsp"
       item: extra virgin olive oil
 method:
-  - "Mix the dressing in a bowl and season generously."
-  - "Halve and finely slice the sprouts using the slicing attachment on a food processor."
+  - "Mix the dressing in a bowl and salt like you intend to cure."
+  - "Halve and finely slice the sprouts using the slicing attachment on a food processor (or the adamantium index finger you must have if you want to do this by hand)."
   - "Toss the sprouts in the dressing with the onion, apple, pomegranate seeds, walnuts and mint."
   - "Mix everything then leave to stand for at least 20 mins until the sprouts soften."
-  - "Garnish with extra mint and serve."
+  - "Go nuts with extra mint if wanted, then serve."
 method_short:
   - ""
 # notes:

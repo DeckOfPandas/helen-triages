@@ -6,7 +6,7 @@ source: Henry
 serves: 12
 prep_time: "30 mins"
 cook_time: "8 hrs"
-main_ingredients: ["Gressingham duck legs", "pearl barley", "red wine", pancetta, mushrooms, carrots, baby potatoes, "red wine"]
+main_ingredients: ["Gressingham duck legs", "pearl barley", "red wine", pancetta, mushrooms, carrots, baby potatoes]
 star_ingredient: duck
 tags: [freezable, "make-ahead", "one-handed food"]
 ingredient_groups:
@@ -30,7 +30,7 @@ ingredient_groups:
       item: good red wine, preferably merlot or Cab
     - amount: "2.5 l"
       item: stock
-      note: "3 Kallo chicken cubes, 1 Kallo vegeteable cube, 1 Kallo garlic and herb cube, 1 Knorr chicken stock pot, 1 pot tomato paste, mushroom ketchup, anchovy sauce, magic Delia powder"
+      note: "3 Kallo chicken cubes, 1 Kallo vegetable cube, 1 Kallo garlic and herb cube, 1 Knorr chicken stock pot, 1 pot tomato paste, mushroom ketchup, anchovy sauce, magic Delia powder"
     - amount: "4"
       item: "Bart bouquet garni bags, or one enormous home-made one"
     - amount: "1 kg"

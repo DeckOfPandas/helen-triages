@@ -27,7 +27,7 @@ ingredient_groups:
       item: ginger paste
     - amount: "1 tsp"
       item: garlic purée
-    - item: Salt and plenty of pepper
+    - item: salt and plenty of pepper
 method:
   - Use common sense.
 method_short:

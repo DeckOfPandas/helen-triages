@@ -1,7 +1,7 @@
 ---
 title: Plum Sauce for Duck
 short_name: Plum Sauce for Duck
-tagline: "Lovely with roast or confit."
+tagline: "This is plum sauce...for duck."
 source: Original
 serves: 2
 prep_time: "5 mins"

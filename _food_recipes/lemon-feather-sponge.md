@@ -4,7 +4,7 @@ short_name: Lemon Feather Sponge
 tagline: "A genuine delight."
 source: "Adapted from Delia Smith's Book of Cakes"
 makes: "one 7-inch round cake"
-prep_time:
+prep_time: 10 mins
 cook_time: "40 mins"
 main_ingredients: ["plain flour", cornflour, "golden caster sugar", eggs, lemon, "groundnut oil"]
 star_ingredient:

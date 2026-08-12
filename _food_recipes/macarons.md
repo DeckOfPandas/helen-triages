@@ -66,10 +66,10 @@ notes:
   - label: "Chocolate version"
     text: "The method above is primarily for the vanilla version — for chocolate, substitute accordingly using the chocolate biscuit ingredients."
   - label: "very finely ground almonds"
-    text: "When I discovered I could buy ground almonds much more cheaply if they weren't in the baking section, I was jubliant. But jubliance was short-lived due to resultant chewy sawdust batter and easy-grip macarons."
+    text: "When I discovered I could buy ground almonds much more cheaply if they weren't in the baking section, I was jubilant. But jubilation ended at chewy sawdust batter and weirdly easy-grip macarons."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

@@ -4,7 +4,7 @@ short_name: "Grandma's Fairy Cakes"
 tagline: "The ones Grandma used to make."
 source: Grandma Kath
 makes: "12 fairy cakes"
-prep_time:
+prep_time: 10 mins
 cook_time: "Until done"
 main_ingredients: ["salted butter", "golden caster sugar", eggs, "self-raising flour", sultanas]
 star_ingredient:
@@ -25,9 +25,9 @@ method:
   - "Cream the butter and sugar thoroughly until fluffy."
   - "Whisk in the beaten egg a bit at a time."
   - step: "Stir in the flour and a pinch of salt, then the fruit."
-    note: "loosen with a tiny splash of milk if needed"
-  - "Spoon carefully into paper cases in a cake tray, using the back of a spoon to level off the tops."
-  - "Bake at 180°C until springy in the middle."
+    note: "loosen with a splash of milk if needed"
+  - "Spoon carefully into paper cases in a cake tray, using the back of the spoon to level off the tops."
+  - "Bake at 160°C fan until springy in the middle."
 method_short:
   - ""
 # notes:
