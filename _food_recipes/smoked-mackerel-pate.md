@@ -1,6 +1,6 @@
 ---
 title: "Smoked Mackerel Pâté"
-tagline: "Couldn't be easier. Once impressed Grandma's local WI."
+tagline: "Once impressed Grandma's local WI."
 source: "Sue"
 serves: "Depends on appetite"
 prep_time: "5 mins"

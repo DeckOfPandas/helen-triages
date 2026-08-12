@@ -1,6 +1,6 @@
 ---
 title: "Peanut Butter Ice Cream"
-tagline: "Stop here. You need no further ice cream beyond this one."
+tagline: "Stop here. You need no further peanut butter ice cream beyond this one."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
 prep_time: "15 mins"
