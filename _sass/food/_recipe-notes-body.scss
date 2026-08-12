@@ -150,76 +150,267 @@ article.recipe .recipe-body-content {
     margin: $space-xl 0 $space-sm 0;
   }
 
+  // --- Reading width -----------------------------------------------------
+  // THIS REVERSES A DELIBERATE EARLIER CALL, knowingly. Body content used to
+  // set max-width: none to match Method rather than Notes (HANDOVER_v26.md
+  // §4.1, Helen's decision 2026-08-02) -- but that call was made when the only
+  // question was which of two existing caps to copy, and "no cap" and "65ch"
+  // look identical on Method, where a step is a short imperative that rarely
+  // reaches the right edge anyway. They do not look identical here: a real
+  // paragraph runs the full 900px column, which at $font-size-body-sm is ~105
+  // characters, against the 60-75 every other prose element on the site
+  // respects.
+  //
+  // 68ch rather than reusing Notes' 65ch: this is the section you sit and READ
+  // rather than glance at, so it takes a slightly longer line -- and a visible
+  // difference reads as a decision where 2ch would read as a failed attempt to
+  // match.
   p {
     // font-family, font-weight, color, font-size, line-height inherited from article.recipe
-    // Same reading width as Method, not Notes: max-width: none overrides the
-    // shared `article.recipe p { max-width: 65ch }` in _layout.scss, which
-    // matched this to Notes only because both happen to be plain <p> tags,
-    // not because anyone decided body content should read at Notes' width.
-    // Method has no cap at all -- this shouldn't either, per Helen's call.
-    max-width: none;
+    max-width: 68ch;
     margin: 0 0 $space-lg 0;
   }
 
-  ul, ol {
-    // font-family, font-weight, color, font-size, line-height inherited from article.recipe
-    // Not covered by the shared article.recipe p rule (lists only, not p).
-    // No max-width here either, same reasoning as p above.
-    padding-left: $space-xl;
-
-    li { margin-bottom: 0.5rem; }
+  // --- The lede ------------------------------------------------------------
+  // The first paragraph under a longform heading, one step up in size.
+  //
+  // This is the answer to the second half of Helen's issue #185 -- "the whole
+  // thing just doesn't scream oh my god read me now." The section headings
+  // already shout (1.8rem Courier, punched tape, two-colour rule) and then
+  // everything beneath them was one flat grey texture at 0.92rem, so the eye
+  // landed on the heading and had nowhere to go next. A lede gives the heading
+  // something to hand off to.
+  //
+  // Size and measure only -- not bold, not coloured. Weight now has exactly one
+  // job on this page (see the cause lead-ins below) and colour is spent on what
+  // you navigate by, not on what you read (_palette.scss's colour budget).
+  //
+  // Selected structurally rather than by class, because kramdown can't add one:
+  // "the p straight after a peer heading", or straight after that heading's
+  // a.k.a. subtitle where one exists. The :not() keeps the subtitle itself --
+  // which is also a p directly after an h2 -- out of it.
+  h2 + p:not(.recipe-section-subtitle),
+  .recipe-section-subtitle + p {
+    font-size: 1.06rem;
+    line-height: 1.6;
+    max-width: 62ch;
+    margin-bottom: $space-xl;
   }
 
-  // Numbered lists get Method's own numeral treatment -- Helen: "let's try
-  // styling the numbers in the ganache writing's numbered list the same way
-  // as method steps." Same font, stroke, size and colour as .method-full's
-  // ::before counter (see that rule above for the exact values this
-  // mirrors).
+  // --- Bulleted lists, the plain case --------------------------------------
+  // A light em dash rather than the browser default disc. Issue #185, Helen:
+  // "I find the bullet points choppy" -- a round disc reads as a checklist-app
+  // default dropped into a page that otherwise sets every rule itself, and the
+  // dash matches this site's own prose voice (em dashes throughout, house
+  // style §5) instead of introducing a shape nothing else here uses.
   //
-  // Different LAYOUT mechanism, though: .method-full uses display: flex on
-  // the li, which works because a step is one line of text and nothing
-  // else. A body-content numbered item can contain a nested <ul> (each of
-  // ganache's failure modes has its own sub-bullets) -- flex would put that
-  // nested list beside the number instead of under it. Absolute positioning
-  // avoids that: the ::before sits in the padding-left gutter without
-  // joining the li's own flow, so both the bold lead-in and the nested list
-  // beneath it stack normally.
-  ol {
+  // The dash alone did NOT fix "choppy", and it was never going to: what made
+  // Tips choppy is that each item welds two different things into one sentence
+  // -- a rule ("use a dry bowl") and the reason for it -- read at the same
+  // size, weight and indent, so the eye gets rule, reason, rule, reason. The
+  // marker was incidental. See the labelled-list rule below, which is the
+  // actual answer; this base case is what's left over for a plain list (the
+  // contents lists on food/reference/*, which open with a link rather than a
+  // bold lead-in).
+  ul {
+    // font-family, font-weight, color, font-size, line-height inherited from article.recipe
+    padding-left: 0;
     list-style: none;
-    padding-left: 2.4rem;   // matches .method-full's number column width
-    counter-reset: body-content-counter;
 
-    > li {
-      counter-increment: body-content-counter;
+    li {
       position: relative;
+      padding-left: $space-lg;
+      margin-bottom: $space-sm;
+      max-width: 68ch;
 
       &::before {
-        content: counter(body-content-counter) ".";
+        content: "—";
         position: absolute;
-        left: -2.4rem;
-        // Same nudge .method-full uses (margin-top: $space-xxs there) for
-        // the same reason: a 1.2rem numeral sitting flush with the top of a
-        // box built around ~0.92rem/700-weight text sits visibly higher
-        // than that text's own baseline. Helen: "the numbers are slightly
-        // higher" -- absolute positioning needs top: $space-xxs where the
-        // flex version needs margin-top: $space-xxs, same fix either way.
-        top: $space-xxs;
-        font-family: $font-headings;
-        font-weight: 700;
-        color: $color-step-number;
-        -webkit-text-stroke: $stroke-light;
-        font-size: 1.2rem;
-        line-height: 1.2;
+        left: 0;
+        color: lighten($color-text, 35%);
       }
     }
   }
 
-  // 600 rather than the browser default 700 -- Helen: "the font still seems
-  // too heavy." Only current use is the four failure-mode lead-ins in the
-  // numbered list above (dark-chocolate-ganache.md); a whole line of
-  // 700-weight sans-serif reads dense. 600 stays visibly bolder than the
-  // 300-weight body text around it without matching the numeral's own
-  // full-weight Courier bold one column to the left.
+  // --- Labelled lists (Tips) -----------------------------------------------
+  // A top-level list whose items each open with a bold lead-in. Both current
+  // longform recipes use exactly this shape for Tips, and the fix for the
+  // choppiness above is to stop pretending it's a bullet list at all: split the
+  // rule from the reason, promote the rule to a LABEL in the page's own label
+  // voice, and drop the marker entirely. A labelled block doesn't need a
+  // marker -- the label is the marker.
+  //
+  // Courier with the punched-tape lettering, i.e. what every heading, group
+  // heading and meta label on this site already wears. NOT uppercase, unlike
+  // .recipe-group-heading and the meta labels: those are one or two words,
+  // while these run to eight ("Whisk manually with a balloon whisk for better
+  // control of texture"), and a sentence of uppercase Courier at that length
+  // stops reading as a label and starts reading as shouting. The face does the
+  // work; the case doesn't have to.
+  //
+  // Size is $font-size-body-sm -- the SAME size as the prose under it, not a
+  // step up. Helen, on the first pass: "is the mixture of two body font sizes
+  // intentional? It feels uneven." It wasn't; five sizes had accreted between
+  // 0.88 and 1.06rem, several within 4% of each other -- too close to read as
+  // deliberate steps, too far apart to read as the same size. Longform now
+  // spends exactly TWO: this one and the lede's 1.06rem. Everything else is
+  // separated by face, case, colour, italic or the mark, which is this page's
+  // own logic already (see $color-step-number's comment: "face, size, weight
+  // and stroke all differ, which is more than enough").
+  //
+  // :has() rather than a class, because kramdown emits a bare <ul> and can't be
+  // told otherwise. It also has to be `> ul >` -- a direct child -- so it can't
+  // reach the nested causes inside a diagnostic block below, which open with a
+  // bold lead-in too but must NOT become labels.
+  //
+  // AUTHORING CONVENTION: the lead-in must carry its own closing punctuation
+  // INSIDE the bold -- `**Use clarified butter.**` not `**Use clarified
+  // butter**.` -- or the stray full stop starts the next line on its own.
+  > ul > li:has(> strong:first-child) {
+    padding-left: 0;
+    margin-bottom: $space-xl;
+
+    &::before { content: none; }
+
+    > strong:first-child {
+      display: block;
+      font-family: $font-headings;
+      font-weight: 700;
+      font-size: $font-size-body-sm;
+      letter-spacing: 0.02em;
+      line-height: 1.35;
+      color: $color-text;
+      -webkit-text-stroke: 0.2px $color-label-stroke;
+      @include punched(raised);
+      margin-bottom: $space-xs;
+      // Shorter than the prose it labels, so a long label wraps before the
+      // paragraph under it does and the two never share a right edge.
+      max-width: 52ch;
+    }
+  }
+
+  // --- Diagnostic blocks (a numbered list's <li>s, each with its own
+  // nested <ul> of causes) ------------------------------------------------
+  // Issue #185, Helen: "the numbering is definitely not working for me...
+  // the whole thing just doesn't scream oh my god read me now." The
+  // previous version gave these Method's own step-numeral treatment (see
+  // the commit that added it) -- visually correct in isolation, but wrong
+  // for what this content actually is: Method's numbers promise "step 1,
+  // then step 2," a sequence to follow in order, and a set of independent
+  // failure modes (Splitting, Under-melting, Seizing... ganache and
+  // hollandaise both use this exact shape) isn't a sequence at all. Borrowing
+  // that visual language implied an order that doesn't exist. The count ("here
+  // are four ways") lives in the sentence above the list, which is where it
+  // belongs; the list itself never needed to carry it.
+  //
+  // That was one of two problems. The second, and the bigger one, survived the
+  // numbers being removed:
+  // each item packs three levels -- name, symptom, causes -- and gave them
+  // bold, italic and a bullet. Three inline tweaks, all at 0.92rem, all at the
+  // same indent. Nothing was a landmark, so nothing screamed.
+  //
+  // A round of tinted CARDS was tried for this and rejected: a tinted box on
+  // this page already means "aside" (.note, and the metadata grid's own wash),
+  // so four of them said "here are four asides" about the most important
+  // content in the section -- and a fill plus a grey left border adds visual
+  // weight without adding any hierarchy INSIDE the block, which is where the
+  // flatness actually lived. It also cut against the grain of the site, where
+  // every device is a MARK (rule, punched tape, highlighter, annotation arrow)
+  // and there is no card anywhere except that one aside.
+  //
+  // What's here instead: the failure name takes the blocky mark, one tier below
+  // a section heading -- title (magenta + violet), section heading (green +
+  // violet), failure name (violet alone). One device the reader already
+  // recognises, at three sizes, spending no new colour. See
+  // overlapping-rule-single in food/_rule.scss.
+  //
+  // Authoring convention for any future list of this shape: kramdown must emit
+  // `<strong>Name</strong> <em>symptom</em>` as the first two inline children
+  // of the <li>, then a nested `<ul>` of causes -- see chocolate-ganache.md or
+  // henrys-quick-bulletproof-hollandaise-sauce.md for the exact markdown to
+  // copy. NO COLON after the name: it used to be `**Splitting:**` and the colon
+  // sat on top of the rule.
+  ol {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    // $spacing-block-gap, not $space-lg: bigger than the gap between a name and
+    // its own causes by enough to read as a level of hierarchy rather than as
+    // 15% more air, which is the whole principle the named spacing scale is
+    // built on (HANDOVER §13.3).
+    gap: $spacing-block-gap;
+
+    > li {
+      max-width: 68ch;
+
+      // The failure name. Stays an INLINE <strong> -- that is what makes the
+      // mark work at all, since the background has to be cloned per line box
+      // (see food/_rule.scss for why a background and not an underline). The
+      // line break beneath it comes from the symptom being display: block, not
+      // from this being a block itself.
+      //
+      // 1.06rem, the same size as the lede above: longform now spends exactly
+      // two type sizes (see the labelled-list rule for why). It doesn't need a
+      // third to outrank the prose -- it's uppercase Courier wearing a violet
+      // rule, against light sans.
+      > strong:first-child {
+        font-family: $font-headings;
+        font-weight: 700;
+        font-size: 1.06rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: $color-text;
+        -webkit-text-stroke: 0.25px $color-label-stroke;
+        @include punched(raised);
+        @include overlapping-rule-single($color-section-underline-2);
+      }
+
+      // The symptom -- same voice as .recipe-tagline/.recipe-section-subtitle
+      // (italic, lightened text colour), reused rather than a third italic
+      // invented for the job, since too many type voices is half of what went
+      // wrong here in the first place. No font-size: it inherits the article's
+      // own, which is the point.
+      //
+      // 0.7rem above rather than a token: the mark hangs below the lettering
+      // (it runs to 1.18em, close to the bottom of the line box), so this gap
+      // is measured from the RULE, not from the letters.
+      > em:first-of-type {
+        display: block;
+        font-style: italic;
+        color: lighten($color-text, 22%);
+        margin: 0.7rem 0 $space-lg 0;
+      }
+
+      // The causes. Violet dash rather than the plain list's grey one, tying
+      // them to the marked name above them -- violet's existing job as the
+      // page's quiet structural colour, not a new one.
+      ul {
+        margin: 0;
+
+        li {
+          padding-left: 1.15rem;
+          margin-bottom: $space-md;
+          max-width: 66ch;
+
+          &:last-child { margin-bottom: 0; }
+
+          &::before { color: rgba($color-vibrant-violet, 0.55); }
+        }
+      }
+    }
+  }
+
+  // 600 rather than the browser default 700 -- Helen: "the font still seems too
+  // heavy." The weight was never really the problem, though; the COUNT was.
+  // Bold used to open every Tips item AND every cause, twelve to fifteen runs
+  // in a screenful, which stops being emphasis and becomes texture. Tips'
+  // lead-ins are Courier labels now and the failure names are marks, so bold is
+  // left with exactly one job on this page -- the cause lead-ins -- and can go
+  // back to meaning something.
+  //
+  // No :not() exclusion needed any more: both of those rules out-specify this
+  // one on their own (three classes and two, against this rule's one).
   strong { font-weight: 600; }
 
   // No link colour/underline override here any more -- article.recipe a

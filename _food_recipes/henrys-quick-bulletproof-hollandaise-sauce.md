@@ -49,35 +49,35 @@ And a note on food safety: don't let it sit too long in the temperature "danger 
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
 
-- **Use a heavy-bottomed saucepan for the butter**. If it gets away from you and browns, hide the eggs and tell everyone you meant to make beurre noisette instead.
-- **Trust the science of cooling**. It hasn't failed to set until it's finger-warm and still failed to set. 
-- **Whisk manually with a balloon whisk for better control of texture**. You want a classic, glossy, velvety finish rather than over-aerated foam. There's a higher chance of splitting with an electric whisk, and you'll have poor bowl contact compared with doing it by hand. Put "Eye of the Tiger" on and get to it.
-- **Use clarified butter**. Whole butter brings in about 15% water and milk solids. Clarifying your butter first gives a slightly bigger safety net for the emulsion to form.
-- **Salt helps:** the sodium and chloride ions slightly alter the protein matrix, helping it hold water better. Unsalted butter plus salt added directly, rather than however much happens to be in salted butter, means you can control that margin.
+- **Use a heavy-bottomed saucepan for the butter.** If it gets away from you and browns, hide the eggs and tell everyone you meant to make beurre noisette instead.
+- **Trust the science of cooling.** It hasn't failed to set until it's finger-warm and still failed to set. 
+- **Whisk manually with a balloon whisk for better control of texture.** You want a classic, glossy, velvety finish rather than over-aerated foam. There's a higher chance of splitting with an electric whisk, and you'll have poor bowl contact compared with doing it by hand. Put "Eye of the Tiger" on and get to it.
+- **Use clarified butter.** Whole butter brings in about 15% water and milk solids. Clarifying your butter first gives a slightly bigger safety net for the emulsion to form.
+- **Salt helps.** The sodium and chloride ions slightly alter the protein matrix, helping it hold water better. Unsalted butter plus salt added directly, rather than however much happens to be in salted butter, means you can control that margin.
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
 <p class="recipe-section-subtitle">a.k.a. egg yolks are sneaky</p>
 
 
-Here are four ways the emulsion can fail:
+Here are four ways the emulsion can fail.
 
-1. **Splitting:** *a greasy yellow slick floating on top of flabby egg mush*
-   - **You added the butter too quickly:** There's a limit to how fast egg yolk can coat butter.
-   - **You let the butter boil:** It cooked the egg proteins on contact due to sheer volume, destroying their ability to emulsify.
+1. **Splitting** *a greasy yellow slick floating on top of flabby egg mush*
+   - **You added the butter too quickly.** There's a limit to how fast egg yolk can coat butter.
+   - **You let the butter boil.** It cooked the egg proteins on contact due to sheer volume, destroying their ability to emulsify.
 
-2. **Slackness:** *a thin, watery liquid that refuses to hold its shape*
-   - **Your acid wasn't boiling when it hit the yolks:** Cold acid can't soften them enough to beat into small droplets.
-   - **Insufficient violence:** You didn't whisk enough. If you don't break the fat into microscopic droplets, large droplets slide past each other, and the sauce will never thicken.
+2. **Slackness** *a thin, watery liquid that refuses to hold its shape*
+   - **Your acid wasn't boiling when it hit the yolks.** Cold acid can't soften them enough to beat into small droplets.
+   - **Insufficient violence.** You didn't whisk enough. If you don't break the fat into microscopic droplets, large droplets slide past each other, and the sauce will never thicken.
 
-3. **Curdling:** *a lumpy, grainy texture like wet sand*
-   - **Your bain-marie was too hot:** Eggs coagulate permanently at 65°C. Note the word "permanently".
+3. **Curdling** *a lumpy, grainy texture like wet sand*
+   - **Your bain-marie was too hot.** Eggs coagulate permanently at 65°C. Note the word "permanently".
 
-4. **Overcooking:** *a stodgy, gluey sauce that stands up like wallpaper paste*
-   - **You used too little acid, or over-clarified butter:** There was nothing but fat and protein left to do the work, so the sauce set thick and pasty instead of staying pourable.
-   - **Your heart wanted to make scrambled eggs instead:** You followed misplaced advice to slowly warm the egg yolks over low heat before adding the butter. The cooked proteins lost the flexibility to stretch and coat the fat droplets properly, so instead of smooth thickening you got weird blancmange.
+4. **Overcooking** *a stodgy, gluey sauce that stands up like wallpaper paste*
+   - **You used too little acid, or over-clarified butter.** There was nothing but fat and protein left to do the work, so the sauce set thick and pasty instead of staying pourable.
+   - **Your heart wanted to make scrambled eggs instead.** You followed misplaced advice to slowly warm the egg yolks over low heat before adding the butter. The cooked proteins lost the flexibility to stretch and coat the fat droplets properly, so instead of smooth thickening you got weird blancmange.
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">A Final Warning</span></h2>
 
-**Reheating Hollandaise sauce is really hard**. If you reheat cold, set Hollandaise clumsily, it will melt too fast and giant blobs of lipids will split the sauce because the egg can't keep up.
+Reheating Hollandaise sauce is really hard. If you reheat cold, set Hollandaise clumsily, it will melt too fast and giant blobs of lipids will split the sauce because the egg can't keep up.
 
 If you must reheat, do so very very slowly over a bain-marie, throw some salt over your left shoulder, and stir continuously but very gently.

@@ -112,6 +112,49 @@ $rule-under-indent:    $rule-under-inset-left;
 // violet rule visibly short at the right.
 $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 
+// --- A third tier: the under rule, on its own --------------------------------
+// Added 2026-08-12 for the failure-mode names in a recipe's longform
+// Troubleshooting section (.recipe-body-content ol, see food/_recipe-notes-
+// body.scss). Those sit one level below a section heading and needed a
+// landmark; this is the same device with one bar instead of two.
+//
+// EVERY NUMBER BELOW IS THE DOUBLE MIXIN'S OWN. This is deliberately not a
+// smaller rule of its own invention: it is literally the violet layer of
+// overlapping-rule-double, extracted, so the three tiers on the page (title,
+// section heading, failure name) are one mark at one position, differing only
+// in how many bars they carry. A first pass did give it its own thinner/higher
+// dials and Helen's read was immediate -- "the violet underline is crushing the
+// headings" -- because a shallower $rule-drop puts the bar across the baseline
+// instead of below it. Change $rule-under-* and all three tiers move together;
+// there is nothing to keep in sync by hand.
+//
+// Colour is violet by default and should stay violet: it is the page's quiet
+// structural hue, it already appears alone (the annotation arrow), and magenta
+// is unavailable because magenta means "interactive" here -- a marked-up name
+// in the link colour would read as clickable. See _palette.scss's colour
+// budget.
+@mixin overlapping-rule-single($colour: $color-section-underline-2) {
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+
+  padding-right: $rule-overhang;
+  // Same vertical room the double mixin reserves, and needed for the same
+  // reason: the bar runs to 1.18em and Courier's content box is only ~1.13em.
+  padding-bottom: 0.45em;
+
+  // $rule-front-opacity, not solid, even though there is no second bar behind
+  // this one -- so a single rule and the violet half of a double rule are the
+  // same ink on the page rather than two slightly different violets.
+  background-image:
+    linear-gradient(rgba($colour, $rule-front-opacity), rgba($colour, $rule-front-opacity));
+  background-repeat: no-repeat;
+  background-size:
+    calc(100% - #{$rule-overhang + $rule-under-inset-left + $rule-under-inset-right}) #{$rule-under-thickness};
+  background-position:
+    #{$rule-under-indent} #{$rule-under-drop};
+}
+
 @mixin overlapping-rule-double($top-colour, $under-colour, $inset-right: $rule-under-inset-right) {
   display: inline;
   box-decoration-break: clone;
