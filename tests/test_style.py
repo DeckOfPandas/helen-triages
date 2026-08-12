@@ -101,6 +101,37 @@ def test_prose_abbreviates_minutes_only(recipe):
     )
 
 
+# --- method-step notes read as sentences, unlike ingredient notes -----------
+# GitHub issue #174, open, picked up 2026-08-12. The opposite convention from
+# test_ingredient_annotation_style (test_taxonomy.py) on purpose -- an
+# ingredient note is a fragment ("swap for cider vinegar plus a pinch of
+# sugar"), a method-step note is an aside in full sentence form ("Don't
+# skip the salt, it's part of the chemical process."), and the two were
+# never meant to share a style. 18 real violations across 13 recipes found
+# 2026-08-12, none via a bulk YAML tool (see CLAUDE.md on not round-tripping
+# YAML) -- fixed one note string at a time, capital first letter and a
+# trailing full stop, no wording changed. Scoped to `method`/`method_groups`
+# step notes only -- an ingredient item's own `note:` field is deliberately
+# NOT checked here, it already has its own test and its own opposite rule.
+def test_method_step_notes_are_sentences(recipe):
+    bad = []
+    for step in recipe.fm.get("method") or []:
+        if isinstance(step, dict) and step.get("note"):
+            bad.append(step["note"])
+    for group in recipe.fm.get("method_groups") or []:
+        for step in group.get("steps") or []:
+            if isinstance(step, dict) and step.get("note"):
+                bad.append(step["note"])
+    problems = [
+        n for n in bad
+        if not (n[0:1].isupper() and n.rstrip().endswith("."))
+    ]
+    assert not problems, (
+        f"{where(recipe)} has method-step note(s) not styled as a sentence "
+        f"(capital letter, trailing full stop): {problems!r}."
+    )
+
+
 TYPOGRAPHY = [
     ("slash fractions", r"(?<![\d/])(1/2|1/4|3/4|1/3|2/3|1/8|3/8|5/8|7/8)(?![\d/])",
      "use Unicode fractions: ½ ¼ ¾ ⅓ ⅔ ⅛ ⅜ ⅝ ⅞"),
@@ -126,13 +157,30 @@ def test_typography(recipe, name, pattern, fix):
     )
 
 
-def test_no_ampersand_in_title(recipe):
-    for field in ("title", "short_name"):
-        value = str(recipe.fm.get(field, ""))
-        assert "&" not in value, (
-            f"{where(recipe)} `{field}: {value!r}` contains an ampersand. "
-            f"Titles use the word 'and'."
-        )
+def test_no_ampersand_in_title(recipe, taxonomy):
+    """Titles use 'and', never '&' -- except a real proper noun that is
+    itself spelled with an ampersand ("Ben & Jerry's"), where swapping in
+    'and' would misspell the name rather than restyle it.
+
+    _data/food/taxonomy.yml's ampersand_proper_nouns is the curated
+    allow-list, same pattern as proper_nouns: declared by exact phrase, not
+    guessed at, so a lazy stylistic '&' still fails and a new brand name
+    needs an explicit entry rather than silently passing. `short_name` used
+    to be checked here too; retired 2026-08-12, GitHub issue #169.
+    """
+    allowed = taxonomy.get("ampersand_proper_nouns") or []
+    value = str(recipe.fm.get("title", ""))
+    if "&" not in value:
+        return
+    remainder = value
+    for phrase in allowed:
+        remainder = remainder.replace(phrase, "")
+    assert "&" not in remainder, (
+        f"{where(recipe)} `title: {value!r}` contains an ampersand that "
+        f"isn't part of a declared proper noun. Titles use the word "
+        f"'and' -- if this is a real brand/proper name, add the exact "
+        f"phrase to ampersand_proper_nouns in _data/food/taxonomy.yml."
+    )
 
 
 SPELLINGS = {
@@ -207,6 +255,7 @@ _COMPOUND_EXCLUDE = {
     "sugar": re.compile(r"\bsugar snap\b", re.I),
     "flour": None,
     "cloves": re.compile(r"\bgarlic\b", re.I),
+    "milk": re.compile(r"\bmilk chocolate\b", re.I),
 }
 
 
@@ -399,6 +448,89 @@ def test_vinegar_specifies_type(recipe):
     )
 
 
+# --- garlic: form, not the amount/item split ---------------------------------
+# GitHub issue #171, open, picked up 2026-08-12. Deliberately NOT the shared
+# _unqualified() helper (item text only): garlic's count unit is "clove" --
+# "amount: 3 cloves, item: garlic, minced" is a complete, standard
+# description the same way "amount: 1 stick, item: celery" is elsewhere on
+# the site, and treating that as unqualified would be the same mistake as
+# moving a genuine counting unit into item text. Checked amount+item
+# together for the ingredient list; main_ingredients has no amount to pair
+# with, so the qualifier has to be in the string itself there, same as every
+# other closed-list rule. slow-cooker-confit-duck-legs.md's "fresh garlic"
+# with no amount at all was the one real gap (fixed 2026-08-12, "garlic
+# cloves") -- "fresh" doesn't say whether you're buying a bulb or a jar.
+_QUALIFIED_GARLIC_FORM = re.compile(
+    r"\bcloves?\b|\bhead\b|\bpaste\b|\bpur[ée]e\b|\bpowder\b|\bgranulated\b|\bwild garlic\b", re.I,
+)
+
+
+def test_garlic_specifies_form(recipe):
+    bad = []
+    for m in (recipe.fm.get("main_ingredients") or []):
+        name = str(m)
+        if not re.search(r"\bgarlic\b", name, re.I):
+            continue
+        if not _QUALIFIED_GARLIC_FORM.search(name):
+            bad.append(f"main_ingredients {name!r}")
+    for group in recipe.fm.get("ingredient_groups") or []:
+        for item in group.get("items") or []:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("item", ""))
+            base = re.split(r"[,(]", name)[0].strip()
+            if not re.search(r"\bgarlic\b", base, re.I):
+                continue
+            combined = f"{item.get('amount', '')} {name}"
+            if not _QUALIFIED_GARLIC_FORM.search(combined):
+                bad.append(f"ingredient {name!r}")
+    assert not bad, (
+        f"{where(recipe)} has unqualified garlic: {bad!r}. State the form -- "
+        f"cloves, head, paste, purée, powder, or granulated."
+    )
+
+
+# --- loomi: colour, since black and white/yellow are different products ----
+# GitHub issue #173, open, picked up 2026-08-12. Only one current user
+# (vietnamese-spiced-braised-muntjac-haunch.md, "yellow loomi") and it
+# already qualifies -- this is a regression guard, not a fix.
+_QUALIFIED_LOOMI = {"black loomi", "white loomi", "yellow loomi"}
+
+
+def test_loomi_specifies_colour(recipe):
+    bad = _unqualified(recipe, "loomi", _QUALIFIED_LOOMI)
+    assert not bad, (
+        f"{where(recipe)} has unqualified loomi: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_LOOMI))}."
+    )
+
+
+# --- milk: type -- deliberately a standing checklist -------------------------
+# GitHub issue #167, open, picked up 2026-08-12. Deliberately a standing
+# checklist, not a guard expected to be green -- 8 recipes currently say
+# bare "milk" (bens-chocolate-ice-cream, caesar-salad-dressing, delias-
+# classic-pancakes, grandmas-scones, henrys-sunday-waffles, mrs-nicholsons-
+# creme-patissiere, mrs-nicholsons-yorkshire-puddings, old-fashioned-cherry-
+# cake, sweet-shortcrust-pastry-mince-pies), and which milk each original
+# recipe actually specified (whole vs semi-skimmed, almost certainly whole
+# for a bake, but not safe to assume for all nine) needs the source, not a
+# default. Don't bulk-convert to "whole milk" blind.
+_QUALIFIED_MILK = {
+    "whole milk", "semi-skimmed milk", "skimmed milk", "buttermilk",
+    "oat milk", "almond milk", "soya milk", "coconut milk", "evaporated milk",
+    "condensed milk", "sweetened condensed milk", "goat's milk",
+}
+
+
+def test_milk_specifies_type(recipe):
+    bad = _unqualified(recipe, "milk", _QUALIFIED_MILK)
+    assert not bad, (
+        f"{where(recipe)} has unqualified milk: {bad!r}. Confirm from the "
+        f"original source rather than assuming whole milk -- "
+        f"allowed: {', '.join(sorted(_QUALIFIED_MILK))}."
+    )
+
+
 # --- chocolate: type, plus a cacao percentage on the recipe page only -------
 # GitHub issue #139. Helen: dark-family chocolate needs a cacao percentage on
 # the recipe page's own ingredient list so a cook knows what to buy -- dark
@@ -501,6 +633,242 @@ def test_chocolate_percentage_matches_type(recipe):
     )
 
 
+# --- eggs: size, count agreement, weight for bakes ---------------------------
+# GitHub issues #144/#145/#147, closed 2026-08-10/11 with no test -- caught in
+# the 2026-08-12 issue audit. Yolks/whites are a different noun from "egg" and
+# excluded throughout; the count-agreement and size rules are specifically
+# about whole eggs.
+_EGG_SIZE_RE = re.compile(r"\b(small|medium|large|extra large)\b", re.I)
+_EGG_WEIGHT_RE = re.compile(r"\d+\s*[-–]\s*\d+\s*g\b|\d+\s*g\b")
+
+
+def _whole_egg_items(recipe):
+    out = []
+    for group in recipe.fm.get("ingredient_groups") or []:
+        for item in group.get("items") or []:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("item", ""))
+            if re.search(r"\begg", name, re.I) and not re.search(r"\b(yolks?|whites?)\b", name, re.I):
+                out.append(item)
+    return out
+
+
+def test_egg_size_is_stated(recipe):
+    """GitHub issues #144/#145. Every whole-egg ingredient states a UK size
+    (small/medium/large/extra large) in its `amount:` field -- not buried in
+    `item:`, which is where courgette-orange-cake-cream-cheese-frosting.md
+    had it ("large eggs, lightly beaten" with amount: "3") until this was
+    caught and moved, 2026-08-12. Fixing that file also surfaced a real,
+    separate bug: main_ingredients had "self-raising flour\"" with a stray
+    literal quote baked into the string (a missing opening quote had let
+    YAML swallow it as plain text) -- fixed in the same pass.
+    """
+    bad = []
+    for item in _whole_egg_items(recipe):
+        amount = str(item.get("amount", ""))
+        if not _EGG_SIZE_RE.search(amount):
+            bad.append(item.get("item"))
+    assert not bad, (
+        f"{where(recipe)} has egg ingredient(s) with no UK size in `amount:`: "
+        f"{bad!r}. State small/medium/large/extra large, e.g. amount: "
+        f'"2 large".'
+    )
+
+
+def test_main_ingredients_egg_count_agrees(recipe):
+    """GitHub issue #147. main_ingredients says "egg" for a single egg,
+    "eggs" for more than one -- checked against the actual total count in
+    the ingredient list, not guessed.
+    """
+    main = [str(m) for m in (recipe.fm.get("main_ingredients") or [])]
+    egg_entries = [m for m in main if re.search(r"\begg", m, re.I)
+                   and not re.search(r"\b(yolks?|whites?)\b", m, re.I)]
+    if not egg_entries:
+        return
+    items = _whole_egg_items(recipe)
+    total = 0
+    for item in items:
+        count_match = re.match(r"\s*(\d+)", str(item.get("amount", "")))
+        if count_match:
+            total += int(count_match.group(1))
+    if total == 0:
+        return
+    wanted = "egg" if total == 1 else "eggs"
+    bad = [e for e in egg_entries if not re.search(rf"\b{wanted}\b", e, re.I)]
+    assert not bad, (
+        f"{where(recipe)} main_ingredients {bad!r} doesn't agree with the "
+        f"actual egg count ({total}) -- should say {wanted!r}."
+    )
+
+
+def test_bake_eggs_state_a_weight(recipe):
+    """GitHub issue #145's second half: a bake states not just the UK size
+    but a weight or weight range for its eggs, since a size band is wide
+    enough to matter in a precise bake.
+
+    Deliberately a standing checklist, not a guard expected to be green --
+    same shape as test_oven_temperature_says_fan: confirming the actual
+    weight the original source specified needs the source material, not a
+    guess, and a wrong weight is worse than an absent one. As of 2026-08-12
+    none of the bake-tagged recipes with eggs state one -- don't fill these
+    in blind with the standard UK size-band figures, since the original
+    recipe may have meant something more specific than the regulatory band.
+    """
+    if "bakes" not in (recipe.fm.get("tags") or []):
+        return
+    bad = []
+    for item in _whole_egg_items(recipe):
+        text = " ".join(str(item.get(k, "")) for k in ("amount", "item"))
+        if not _EGG_WEIGHT_RE.search(text):
+            bad.append(item.get("item"))
+    assert not bad, (
+        f"{where(recipe)} is a bake with egg ingredient(s) with no weight or "
+        f"weight range stated: {bad!r}. Confirm from the original source and "
+        f'add e.g. "(about 63-73g each)" -- don\'t estimate blind.'
+    )
+
+
+# --- size belongs with the count, not prefixed onto the item ----------------
+# GitHub issue #149, closed 2026-08-10 with no test -- caught in the 2026-08-12
+# audit, five real violations found (apples, lemons x2, garlic, butter pats,
+# not just the issue's own carrot example -- the underlying rule generalises
+# past literal vegetables to anything counted). Scoped to a bare numeric
+# count specifically: a weight-based amount ("400 g large open mushrooms")
+# reads fine keeping the size as a descriptive adjective, and a "small
+# bunch"/"small handful" idiom with no numeric amount at all is the amount,
+# not a count carrying a stray adjective -- neither of those is this bug.
+_LEADING_SIZE_WORD = re.compile(r"^(small|medium|large|extra large|baby)\s+", re.I)
+
+
+def test_size_word_is_with_the_count_not_the_item(recipe):
+    """"2 large cooking apples" as amount: "2", item: "large cooking apples"
+    means the highlighter only picks up "2" -- the size sits unstyled in the
+    item text with no error anywhere, the same "quantity embedded in item
+    text" trap HANDOVER_v26.md §4 already documents for a leading `~` or a
+    "zest and juice of 1 lime" pattern. Bare numeric counts only -- see
+    module comment above for what's deliberately excluded.
+    """
+    bad = []
+    for group in recipe.fm.get("ingredient_groups") or []:
+        for item in group.get("items") or []:
+            if not isinstance(item, dict):
+                continue
+            amount = str(item.get("amount", ""))
+            name = str(item.get("item", ""))
+            if re.fullmatch(r"\d+", amount) and _LEADING_SIZE_WORD.match(name):
+                bad.append(item.get("item"))
+    assert not bad, (
+        f"{where(recipe)} has size word(s) prefixed onto the item instead of "
+        f"the amount: {bad!r}. e.g. amount: \"2 large\", item: \"cooking "
+        f"apples, chopped\", not amount: \"2\", item: \"large cooking "
+        f"apples, chopped\"."
+    )
+
+
+# --- homemade pastry needs salt ----------------------------------------------
+# GitHub issue #135, closed 2026-08-10 with no test -- caught in the 2026-08-12
+# audit. Already true of every current homemade-pastry recipe (asparagus-
+# gruyere-quiche, lemon-meringue-pie, sweet-shortcrust-pastry-mince-pies), so
+# this is a real regression guard, not a checklist. Detected via an
+# ingredient GROUP named for pastry/dough/choux specifically -- not "has
+# flour and butter", which a cake batter also has, and not "the word pastry
+# appears anywhere", which beef-wellington.md trips just by buying 500g of
+# it ready-made (has_flour is False for that group: nothing is rubbed
+# together, there's nothing here for salt to season).
+_PASTRY_GROUP_NAME = re.compile(r"\b(pastry|dough|choux)\b", re.I)
+
+
+def test_homemade_pastry_has_salt(recipe):
+    for group in recipe.fm.get("ingredient_groups") or []:
+        name = (group.get("name") or "") if isinstance(group, dict) else ""
+        if not _PASTRY_GROUP_NAME.search(name):
+            continue
+        items = [str(it.get("item", "")) if isinstance(it, dict) else str(it)
+                 for it in (group.get("items") or [])]
+        has_salt = any(re.search(r"\bsalt\b", it, re.I) for it in items)
+        assert has_salt, (
+            f"{where(recipe)} has a homemade pastry group ({name!r}) with no "
+            f"salt among its ingredients."
+        )
+        method_text = " ".join(recipe.method_steps)
+        assert re.search(r"\bsalt\b", method_text, re.I), (
+            f"{where(recipe)} has salt in the {name!r} ingredient list but "
+            f"the method never mentions it -- season the pastry."
+        )
+
+
+# --- unsalted butter needs salt somewhere, or an explicit note --------------
+# GitHub issue #138, closed 2026-08-10 with no test -- caught in the 2026-08-12
+# audit. "Included in a method step" doesn't require the literal word "salt"
+# if the method is a single catch-all step that already covers every
+# ingredient by name (gluten-free-crumble-topping.md: "Blend everything
+# together" -- salt is one of the things being blended) -- checked for real
+# against that file specifically, not assumed safe.
+_SALT_WORD = re.compile(r"(?<!un)salt", re.I)
+_CATCH_ALL_METHOD = re.compile(r"\beverything\b|\ball\b", re.I)
+
+
+def test_unsalted_butter_has_salt_or_a_note(recipe):
+    items = recipe.ingredient_items
+    if not any(re.search(r"\bunsalted butter\b", it, re.I) for it in items):
+        return
+    has_salt_ingredient = any(_SALT_WORD.search(it) for it in items)
+    if has_salt_ingredient:
+        method_text = " ".join(recipe.method_steps)
+        assert _SALT_WORD.search(method_text) or _CATCH_ALL_METHOD.search(method_text), (
+            f"{where(recipe)} uses unsalted butter and lists salt as an "
+            f"ingredient, but the method never mentions it (and isn't a "
+            f"single catch-all step that already covers every ingredient)."
+        )
+        return
+    notes = recipe.fm.get("notes") or []
+    note_text = " ".join((n.get("text", "") if isinstance(n, dict) else str(n)) for n in notes)
+    assert _SALT_WORD.search(note_text), (
+        f"{where(recipe)} uses unsalted butter with no salt ingredient and "
+        f"no note explaining it doesn't need one -- add salt, or a note."
+    )
+
+
+# --- fresh ginger/garlic/lemongrass state a paste equivalent ----------------
+# GitHub issues #153/#155, closed 2026-08-10 with no test -- caught in the
+# 2026-08-12 audit. Deliberately a standing checklist, not a guard expected
+# to be green: as of 2026-08-12 ZERO current entries state one (23 across 15
+# recipes -- 11 ginger, 10 garlic, 2 lemongrass), and the actual ratio
+# (how much paste equals how much fresh, which brand for lemongrass per
+# #153's own "Barts" mention) is Helen's judgement, not something to
+# fabricate. Also worth her reconsidering scope before working through the
+# list by hand: garlic cloves are so ubiquitous (10 entries here, and this
+# only counts distinct recipes -- most recipes on the site use garlic) that
+# a paste-equivalent note on every single one may be more repetition than
+# she actually wants, unlike ginger or lemongrass, which are both more often
+# something a cook doesn't already have to hand.
+_FRESH_GINGER = re.compile(r"\bginger\b", re.I)
+_GINGER_EXCLUDE = re.compile(r"\bground ginger\b|\bginger paste\b", re.I)
+_GARLIC_CLOVE = re.compile(r"\bgarlic clove", re.I)
+_LEMONGRASS_STALK = re.compile(r"\blemongrass\b", re.I)
+_PASTE_EQUIVALENT = re.compile(r"\bpaste\b|\bpur[ée]e\b", re.I)
+
+
+def test_fresh_aromatics_state_a_paste_equivalent(recipe):
+    bad = []
+    for item in recipe.ingredient_items:
+        name = re.split(r"[,(]", item)[0].strip()
+        is_ginger = bool(_FRESH_GINGER.search(name) and not _GINGER_EXCLUDE.search(name))
+        is_garlic = bool(_GARLIC_CLOVE.search(name))
+        is_lemongrass = bool(_LEMONGRASS_STALK.search(name)) and "paste" not in name.lower()
+        if not (is_ginger or is_garlic or is_lemongrass):
+            continue
+        if not _PASTE_EQUIVALENT.search(item):
+            bad.append(item)
+    assert not bad, (
+        f"{where(recipe)} has fresh ginger/garlic/lemongrass with no paste "
+        f"or purée equivalent stated: {bad!r}. Confirm the ratio (and, for "
+        f'lemongrass, the "Barts" brand reference per issue #153) rather '
+        f"than guessing -- don't fabricate a conversion."
+    )
+
+
 # --- accents ----------------------------------------------------------------
 
 def _accented_words() -> dict:
@@ -524,16 +892,15 @@ def _accent_check_fields(recipe) -> list[tuple[str, str]]:
     the long-form write-up added after HANDOVER's "exactly one file uses this"
     note was written) -- none of these are in .prose, which was built for the
     typography/time-word tests and only ever covered front-matter running
-    text, not names or body content. title/short_name/main_ingredients/
-    star_ingredient/ingredient item names/body content all get the same
-    treatment as prose does; slugs, filenames and `source:` still don't --
-    see test_accents_in_prose's docstring for why.
+    text, not names or body content. title/main_ingredients/star_ingredient/
+    ingredient item names/body content all get the same treatment as prose
+    does; slugs, filenames and `source:` still don't -- see
+    test_accents_in_prose's docstring for why. `short_name` used to be
+    checked here too; retired 2026-08-12, GitHub issue #169.
     """
     out = list(recipe.prose)
     if recipe.fm.get("title"):
         out.append(("title", recipe.fm["title"]))
-    if recipe.fm.get("short_name"):
-        out.append(("short_name", recipe.fm["short_name"]))
     for i, ing in enumerate(recipe.fm.get("main_ingredients") or [], 1):
         out.append((f"main_ingredients {i}", str(ing)))
     if recipe.fm.get("star_ingredient"):
@@ -561,7 +928,7 @@ def test_accents_in_prose(recipe):
     detection, because no detector can tell a missing accent from a word that
     never had one.
 
-    Scope is title/short_name/main_ingredients/star_ingredient/ingredient item
+    Scope is title/main_ingredients/star_ingredient/ingredient item
     names plus everything in .prose (tagline, method, notes, ingredient
     notes) -- never slugs or filenames, which must stay ASCII, and never
     `source:`, where a citation is reproduced as the publication spells it.
@@ -629,7 +996,7 @@ def test_pan_and_ingredient_sizes_use_digits(recipe):
     physical dimension is a measurement, not prose, and reads the same way
     every other measurement on this site already does -- digits.
 
-    Same field set as the accent checks (title/short_name/main_ingredients/
+    Same field set as the accent checks (title/main_ingredients/
     star_ingredient/ingredient item names, plus prose): a size can appear as
     an ingredient's own name ("4-cm piece of ginger") just as easily as in
     a method step ("a 7-inch tin").
@@ -670,7 +1037,12 @@ def test_pan_and_ingredient_sizes_use_digits_in_drafts():
 # expected to be green.
 _OVEN_WORD_RE = re.compile(r"\b(?:bake|roast|blast|oven)\w*\b", re.I)
 _OVEN_TEMP_RE = re.compile(r"\d{2,3}(?:[–-]\d{2,3})?\s*°C(\s*fan)?\b", re.I)
-_INTERNAL_TEMP_RE = re.compile(r"internal temperature\s+of\s*$", re.I)
+_INTERNAL_TEMP_RE = re.compile(
+    r"(?:(?:internal|thigh|breast|core|centre|center)\s+temp(?:erature)?\s+of"
+    r"|reads?|reach(?:es)?)"
+    r"(?:\s+(?:at least|about|around))?\s*$",
+    re.I,
+)
 
 
 def test_oven_temperature_says_fan(recipe):

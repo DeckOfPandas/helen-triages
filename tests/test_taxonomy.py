@@ -21,6 +21,13 @@ def test_star_ingredient_is_declared(recipe, taxonomy):
     star = recipe.fm.get("star_ingredient")
     if star in (None, ""):
         return
+    retired = taxonomy.get("retired_star_ingredients") or {}
+    if star in retired:
+        assert False, (
+            f"{where(recipe)} has `star_ingredient: {star!r}`, which was "
+            f"retired: {retired[star]}\n"
+            f"Blank the field rather than leaving the retired value in place."
+        )
     declared = taxonomy.get("star_ingredients") or []
     assert star in declared, (
         f"{where(recipe)} has `star_ingredient: {star!r}`, which is not declared "
@@ -274,6 +281,66 @@ def test_incidental_not_in_main_ingredients(recipe):
     )
 
 
+# --- main_ingredients entries are always double-quoted -----------------------
+# GitHub issue #170, open, picked up 2026-08-12. Purely a Sublime-editing
+# convenience -- an unquoted YAML flow-sequence scalar and a double-quoted
+# one parse identically, so this changes formatting, not data. Checked
+# against the raw text of the flow sequence itself (not the parsed value,
+# which can't tell you how it was written) -- 125 unquoted entries across 54
+# recipes fixed 2026-08-12 via a raw-text substitution on the
+# `main_ingredients: [...]` line specifically, not a YAML dump (CLAUDE.md:
+# a round-trip through yaml.dump() silently loses quoting style and key
+# order across the whole file, correct in a spot check, wrong at scale).
+_MAIN_INGREDIENTS_LINE = re.compile(r"^main_ingredients:\s*\[(.*?)\]\s*$", re.M)
+
+
+def _split_flow_sequence(inner: str) -> list[str]:
+    parts, buf, in_quotes = [], "", False
+    for ch in inner:
+        if ch == '"':
+            in_quotes = not in_quotes
+            buf += ch
+        elif ch == "," and not in_quotes:
+            parts.append(buf)
+            buf = ""
+        else:
+            buf += ch
+    if buf.strip():
+        parts.append(buf)
+    return parts
+
+
+def test_main_ingredients_entries_are_quoted(recipe):
+    match = _MAIN_INGREDIENTS_LINE.search(recipe.raw)
+    assert match, f"{where(recipe)} has no single-line `main_ingredients: [...]` to check."
+    unquoted = [
+        p.strip() for p in _split_flow_sequence(match.group(1))
+        if not (p.strip().startswith('"') and p.strip().endswith('"'))
+    ]
+    assert not unquoted, (
+        f"{where(recipe)} has unquoted main_ingredients entries: {unquoted!r}. "
+        f'Wrap each in double quotes, e.g. "beef", not beef.'
+    )
+
+
+def test_tags_entries_are_quoted(recipe):
+    """GitHub issue #170's own reasoning extends to tags -- same flow
+    sequence shape as main_ingredients, same Sublime-editing convenience,
+    same "formatting, not data" safety. 94 unquoted entries across 68
+    recipes fixed 2026-08-12, same raw-text substitution approach.
+    """
+    match = re.search(r"^tags:\s*\[(.*?)\]\s*$", recipe.raw, re.M)
+    assert match, f"{where(recipe)} has no single-line `tags: [...]` to check."
+    unquoted = [
+        p.strip() for p in _split_flow_sequence(match.group(1))
+        if not (p.strip().startswith('"') and p.strip().endswith('"'))
+    ]
+    assert not unquoted, (
+        f"{where(recipe)} has unquoted tags entries: {unquoted!r}. "
+        f'Wrap each in double quotes, e.g. "make-ahead", not make-ahead.'
+    )
+
+
 # --- ingredient note style (GitHub issue #71) --------------------------------
 
 def _first_word(text: str) -> str:
@@ -385,6 +452,48 @@ def test_ingredient_group_order_matches_title(recipe):
     assert not problems, (
         f"{where(recipe)} ingredient_groups order:\n  " + "\n  ".join(problems)
         + f"\n\ntitle head clause checked against: {title_head!r}"
+    )
+
+
+# --- title and slug shouldn't diverge -----------------------------------
+
+# GitHub issue #172, open, picked up 2026-08-12 -- the "add a test" successor
+# to #81's manual spot check. Reuses _title_head_clause (above) rather than
+# the whole title, for the same reason the group-order test does: a "with
+# ..." clause is a real, deliberate difference (the slug is the dish, the
+# clause is what accompanies it), not divergence. Apostrophes are stripped
+# before splitting into words -- "Grandma's" must fold to the single token
+# "grandmas" the way the slug itself does, not split into "grandma" + "s",
+# which is a real trap: a naive non-alphanumeric split treats the "s" after
+# an apostrophe as its own word, and that word will never appear in any
+# slug. Calibrated against the whole collection 2026-08-12: every recipe
+# scores a clean match except ridiculously-good-oxtail-stew.md, whose title
+# is "Sticky Oxtail Stew" -- agreeing with its own tagline ("Six hours in
+# the oven breaks oxtail down into sticky heaven"), so this reads as the
+# title having been deliberately changed at some point without the filename
+# following -- Helen's call whether to rename the file or revert the title,
+# not something to guess at.
+_STOPWORDS = {"a", "an", "and", "the", "with", "for", "of", "in", "on", "to", "no"}
+
+
+def _head_clause_words(title: str) -> set[str]:
+    text = title.replace("’", "").replace("'", "")
+    folded = _fold(_title_head_clause(text))
+    return {w for w in re.findall(r"[a-z0-9]+", folded) if w not in _STOPWORDS}
+
+
+def test_title_and_slug_dont_diverge(recipe):
+    head_words = _head_clause_words(recipe.fm.get("title") or "")
+    if not head_words:
+        return
+    slug_words = set(re.findall(r"[a-z0-9]+", recipe.slug))
+    missing = head_words - slug_words
+    assert not missing, (
+        f"{where(recipe)} has title word(s) {sorted(missing)} that don't "
+        f"appear anywhere in the slug -- title head clause was "
+        f"{_title_head_clause(recipe.fm.get('title') or '')!r}. Either the "
+        f"title changed without a rename, or the rename never happened; "
+        f"confirm which before touching the filename."
     )
 
 
