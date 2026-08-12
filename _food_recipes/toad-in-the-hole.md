@@ -37,7 +37,7 @@ method_groups:
   - name: toad and hole
     steps:
     - Whisk the batter ingredients together with a pinch of salt.
-    - "Put 2 tbsp sunflower oil in a thin-walled baking tin, and heat in the oven at 240–250°C fan until sizzling."
+    - "Put 2 tbsp sunflower oil in a thin-walled baking tin, and heat in the oven at 220°C fan until sizzling."
     - "Once the oil's up to temperature, roast the sausages in the tin until golden, turning once or twice."
     - "Carefully pour the batter over the sausages and add the rosemary sprigs."
     - "Bake without opening the oven for at least 20 mins. Remove when golden, crisp, and well risen."

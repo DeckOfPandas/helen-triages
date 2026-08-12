@@ -29,7 +29,8 @@ method:
   - step: "Using a clean metal spoon, add a blob of egg white to the chocolate mixture and stir well to loosen it, then fold in the rest of the egg whites carefully."
     note: "It's better to undermix than overmix when folding in the egg whites — it's fine for streaks to remain."
   - "Spoon the mixture levelly into six 3-inch ramekins. Ensure not to drip mixture up the sides at all, to encourage even rising. Fill each ramekin no more than ⅔ full."
-  - step: "Place the ramekins on a stiff baking tray, and bake for 10–15 mins without opening the oven door until risen."
+  - step: "Place the ramekins on a stiff baking tray, and bake at 180°C fan for 10–15 mins without opening the oven door until risen."
+    note: "Do not overbake."
 method_short:
   - "Are you kidding...there is no short method for soufflé!"
 meta:

@@ -56,7 +56,7 @@ method:
     note: "Or use a teaspoon, but, for once, piping is actually easier and less hassle."
   - "Bang the sheet down several times carefully to release any bubbles."
   - "Leave for about 30 mins until a shiny skin forms on the tops."
-  - "Bake for about 20 mins at 130-135°C fan: they should be slightly crisp, but easily dentable."
+  - "Bake for about 20 mins at 130-140°C fan: they should be slightly crisp, but easily dentable."
   - "Leave to cool on the tray for 5 mins, then slide off onto a wire rack."
   - "Whisk filling ingredients together, or make [chocolate ganache](../chocolate-ganache/)."
 method_short:

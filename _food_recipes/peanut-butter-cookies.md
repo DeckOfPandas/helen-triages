@@ -35,7 +35,8 @@ method:
   - Stir in the flour mixture.
   - step: "Roll into 1-inch balls, coat in Demerara sugar, arrange  on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."
     note: "Leave plenty of space in between because they'll spread."
-  - "Bake at 160-170°C fan for about 10 mins, until the edges are set and the centres still look soft. They firm up on the tray as they cool."
+  - step: "Bake at 165°C fan for 8-12 mins until they look done."
+    note: "They shouldn't be quite set — they firm up on the tray as they cool."
   - Allow to cool completely on the baking sheet. They need to set before being transferred to a cooling rack.
 method_short:
   - ""
