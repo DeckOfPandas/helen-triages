@@ -983,6 +983,38 @@ table that listed a file nobody had ever written, for three versions running,
 because nobody checked. **If the code and this file disagree, the code wins,**
 and the fix is to correct this file, not to trust it harder next time.
 
+### 11.3 CSS naming — flat noun for the thing, `--modifier` for its state
+
+Not a split that needs unifying (issue #131 is still open on GitHub — a
+2026-08-10 commit's `Closes #128, #131` trailer never actually closed it,
+and cited a HANDOVER "CSS naming section" that didn't exist until now). Two
+registers, both deliberate:
+
+- **Flat hyphenation names the thing**: `recipe-meta`, `ingredient-pill`,
+  `btn-ingredient`, `category-label`. This is the default and covers most of
+  the codebase.
+- **A trailing `--modifier` flags state or variant on that thing**, real BEM
+  (base class always present alongside the modifier, never standalone):
+  `ingredient.ingredient--annotated`, `category.category--star`,
+  `badge.badge--matched`, `ingredient-pill.ingredient-pill--pantry`. Confirmed
+  2026-08-12 by checking every `--`-suffixed class site-wide for its base
+  class — 8/9 had one. Helen's own read on this, then verified: the person
+  who introduced `--modifier` classes meant it as a real pattern, not drift.
+  `8f9eb52` (2026-08-02, also Helen's) already established this narrowly for
+  the recipe page — turned out to hold site-wide.
+- The one exception was a real bug, now fixed: `.ingredient--matched` in
+  `_recipe-list.scss` had no `.ingredient` base (the pill's actual base is
+  `.ingredient-pill`) — same defect class `8f9eb52` fixed elsewhere. Renamed
+  to `.ingredient-pill--matched`.
+- BEM **element** syntax (`__content`) is different and *was* a real
+  inconsistency — fixed in the same 2026-08-10 commit
+  (`.badge-group__content/__meta` → `.badge-group-content/-meta`).
+- **Do not attempt a big-bang rename.** The issue text says so directly:
+  "apply opportunistically, not as a big-bang rename across ~1,400 lines for
+  no functional gain." A prior architecture review (2026-08-12) drafted a
+  full file-by-file migration plan before this check ran — don't resurrect
+  it; the premise (BEM-as-drift) didn't survive checking the base classes.
+
 ---
 
 ## 12. Traps you will fall into

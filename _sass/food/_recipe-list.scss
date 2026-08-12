@@ -208,8 +208,8 @@
 
   // Pantry staples (see _data/common_ingredients.yml) sink to the end of the
   // line and recede, so the eye meets the distinctive ingredients first.
-  // Declared BEFORE .ingredient--matched: equal specificity, source order wins,
-  // and a matched pantry staple should still light up.
+  // Declared BEFORE .ingredient-pill--matched: equal specificity, source order
+  // wins, and a matched pantry staple should still light up.
   &.ingredient-pill--pantry {
     color: lighten($color-clear-text, 22%);
   }
@@ -224,7 +224,7 @@
   // the ingredient-search swarm just above: dozens of ingredient pills sit
   // on the page across every recipe row, so nothing gets a shape until it's
   // actually the emphasis.
-  &.ingredient--matched {
+  &.ingredient-pill--matched {
     display: inline-block;
     color: $color-text;
     // 900 -> 700 -> 500 (Helen, 2026-08-04, after checking in devtools):
