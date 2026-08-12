@@ -111,7 +111,7 @@ article.recipe .recipe-body-content {
     font-size: 1rem;
     letter-spacing: $letter-spacing-label;
     color: $color-text;
-    -webkit-text-stroke: $stroke-light $color-label-stroke;
+    -webkit-text-stroke: punched-stroke(1rem) $color-label-stroke;
     @include punched(raised);
     margin: $spacing-section-gap 0 $space-md 0;
   }
@@ -280,7 +280,12 @@ article.recipe .recipe-body-content {
       letter-spacing: 0.02em;
       line-height: 1.35;
       color: $color-text;
-      -webkit-text-stroke: 0.2px $color-label-stroke;
+      // The element the site's emboss ratios were calibrated from, once Helen
+      // noticed it read as more raised than the page's own headings and asked
+      // whether she was imagining it. Now expressed through the function like
+      // everything else -- punched-stroke(0.92rem) is 0.206px, which is the
+      // 0.2px this was hand-set to.
+      -webkit-text-stroke: punched-stroke($font-size-body-sm) $color-label-stroke;
       @include punched(raised);
       margin-bottom: $space-xs;
       // Shorter than the prose it labels, so a long label wraps before the
@@ -361,7 +366,7 @@ article.recipe .recipe-body-content {
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: $color-text;
-        -webkit-text-stroke: 0.25px $color-label-stroke;
+        -webkit-text-stroke: punched-stroke(1.06rem) $color-label-stroke;
         @include punched(raised);
         @include overlapping-rule-single($color-section-underline-2);
       }
@@ -474,9 +479,10 @@ article.recipe .recipe-body-content {
   font-size: 1rem;
   letter-spacing: $letter-spacing-label;
   color: $color-text;
-  // Raised label-tape lettering (HANDOVER_v26.md §13.4.1) -- stroke width
-  // unchanged, colour and emboss shadow are new.
-  -webkit-text-stroke: $stroke-light $color-label-stroke;
+  // Raised label-tape lettering (HANDOVER_v26.md §13.4.1). Stroke was
+  // $stroke-light's flat 0.5px, i.e. 3.1% of this element's own 1rem -- same
+  // swallowing problem the meta labels had, see food/_recipe-header.scss.
+  -webkit-text-stroke: punched-stroke(1rem) $color-label-stroke;
   @include punched(raised);
   line-height: 1.4;
 }

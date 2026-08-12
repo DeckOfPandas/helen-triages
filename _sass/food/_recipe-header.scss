@@ -97,6 +97,17 @@ article.recipe a {
   }
 }
 
+// The header's small print / about link (base styling in shared/_layout.scss,
+// .site-about-link) -- hot magenta on hover was Helen's explicit ask, but
+// $color-bright-magenta isn't one of the nine variables every site's
+// palette is guaranteed to define, so the shared file can't reference it
+// directly (see that rule's own comment). Food-only override; cocktails
+// gets a plainer hover from the shared default until it wants its own.
+.site-about-link:hover,
+.site-about-link:focus-visible {
+  color: $color-bright-magenta;
+}
+
 // --- Title -------------------------------------------------------------------
 // Left-aligned, was centred.
 // Centring is what made a two-line title read as two separate headings: two
@@ -167,21 +178,21 @@ article.recipe a {
   // background-image only, so there's no property collision with the
   // text-shadow punched() sets.
   //
-  // Stroke width cut from $stroke-heavy (0.8px) to 0.4px, EXPERIMENTALLY --
+  // Stroke width was cut from $stroke-heavy (0.8px) to a hand-picked 0.4px --
   // Helen: "the section headings feel far too bold... I don't know if just
   // dropping the font weight is right." Font-weight isn't the right lever:
   // Courier New only ships Regular/Bold as static faces (§13.6), so
-  // anything ≤500 jumps straight to Regular with no middle ground. The
-  // stroke's own proportion (2.1-2.3%, the §13.4.1 calibration) was worked
-  // out for a BARE stroke, before this mixin added a hard-edged emboss
-  // shadow on top -- two duplicate letterforms 1px apart plus an outlined
-  // edge compounds into visibly more ink than either alone, and compounds
-  // harder the bigger and bolder the base glyphs already are (700-weight
-  // Courier, page's biggest text). 0.4px keeps a visible edge without
-  // stacking a second full effect on top of the shadow. Unverified without
-  // a browser -- look and adjust.
-  -webkit-text-stroke: 0.4px $color-label-stroke;
-  @include punched(raised);
+  // anything ≤500 jumps straight to Regular with no middle ground. 0.4px was
+  // the right call and punched-stroke() lands within a rounding error of it
+  // (2.2rem x 1.4% = 0.0308rem, or 0.49px) -- the change here is that the
+  // number is now derived from the size instead of guessed against it.
+  //
+  // The EMBOSS OFFSET is the real fix on this element. At the shared 1px it
+  // was 2.8% of a 2.2rem glyph, the smallest proportion anywhere on the site,
+  // so the raised read this treatment exists for was barely present at the
+  // one size it should be most obvious. See shared/_rule.scss.
+  -webkit-text-stroke: punched-stroke(2.2rem) $color-label-stroke;
+  @include punched(raised, $emboss-offset-large);
   padding: 0;
   @include overlapping-rule-double(
     $color-bright-magenta,
@@ -238,9 +249,17 @@ article.recipe a {
       font-size: 0.85rem;
       letter-spacing: $letter-spacing-label;
       color: $color-text;
-      // Raised label-tape lettering (HANDOVER_v26.md §13.4.1) -- stroke width
-      // unchanged, colour and emboss shadow are new.
-      -webkit-text-stroke: $stroke-light $color-label-stroke;
+      // Raised label-tape lettering (HANDOVER_v26.md §13.4.1).
+      //
+      // This is the element the whole 2026-08-12 emboss pass came out of: it
+      // sits at 0.85rem, a hair under the longform Tips label Helen liked, and
+      // carried $stroke-light's flat 0.5px -- 3.7% of its own type size, the
+      // heaviest proportion anywhere on the site and nearly three times the
+      // label's. At that weight the outline fills the letterform and the
+      // emboss copies have no crisp edge to sit against, so SERVES/PREP/COOK
+      // read as outlined rather than raised. Offset was already fine here
+      // (1px on 0.85rem is 7.4%); it's the stroke that was swallowing it.
+      -webkit-text-stroke: punched-stroke(0.85rem) $color-label-stroke;
       @include punched(raised);
       margin-bottom: $space-xs;
     }
@@ -298,15 +317,19 @@ article.recipe a {
   // Raised label-tape lettering (HANDOVER_v26.md §13.4.1), same treatment as
   // .category-label on the index and the shared wordmark.
   //
-  // Stroke cut from $stroke-medium (0.6px) to 0.3px, EXPERIMENTALLY -- see
-  // the matching note on .recipe-title-text above for why (Helen: "the
-  // section headings feel far too bold"; the §13.4.1 proportion was
-  // calibrated for a bare stroke, before punched() added a compounding
-  // emboss shadow on top of it). This is the class INGREDIENTS/METHOD/NOTES
-  // and any peer heading in .recipe-body-content all share, so the change
-  // reaches all of them. Unverified without a browser -- look and adjust.
-  -webkit-text-stroke: 0.3px $color-label-stroke;
-  @include punched(raised);
+  // Stroke was cut from $stroke-medium (0.6px) to a hand-picked 0.3px -- see
+  // the matching note on .recipe-title-text above (Helen: "the section
+  // headings feel far too bold"). punched-stroke() gives 0.0252rem, or
+  // 0.40px, a touch heavier than the guess but on the same ratio as every
+  // other punched element now rather than on its own.
+  //
+  // As with the title, the offset is the substantive change: 1px on 1.8rem is
+  // 3.5%, half the proportion the small labels get, so these read flat where
+  // a 0.9rem label reads raised. This is the class INGREDIENTS/METHOD/NOTES
+  // and every peer heading in .recipe-body-content share, so it reaches all
+  // of them at once.
+  -webkit-text-stroke: punched-stroke(1.8rem) $color-label-stroke;
+  @include punched(raised, $emboss-offset-large);
   position: relative;  // anchor for absolute-positioned method toggle
 
   // The horizontal padding that used to give the ragged brush shape room to
@@ -321,6 +344,19 @@ article.recipe a {
     @include overlapping-rule-double($color-section-underline, $color-section-underline-2);
   }
 
+}
+
+// Aureolin over cobalt, Helen's call -- the About page's own "FAQ" heading
+// only (food/about.html), not a site-wide change to .section-heading-text
+// above. Scoped with its own modifier class rather than touching
+// $color-section-underline/-2 directly, which every recipe page's section
+// headings also use. Compound selector (.section-heading-text AND the
+// modifier, not the modifier alone) so its specificity actually beats
+// .recipe-section-heading .section-heading-text above -- a bare
+// .section-heading-text--about-faq is only one class, lower specificity
+// than that two-class descendant selector, and would silently lose.
+.section-heading-text.section-heading-text--about-faq {
+  @include overlapping-rule-double($color-aureolin, $color-electric-cobalt);
 }
 
 

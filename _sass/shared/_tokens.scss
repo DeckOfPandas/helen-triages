@@ -58,11 +58,21 @@ $line-height-body:   1.65;       // instructions, method-short, notes, body pros
 $letter-spacing-label: 0.1em;
 
 // --- Stroke Weights ----------------------------------------------------------
-// Three tiers of -webkit-text-stroke for the scratchy heading treatment.
-// Title uses heavy, section headings medium, sub-labels light.
-$stroke-heavy:  0.8px;   // recipe title
-$stroke-medium: 0.6px;   // section headings, method toggle
-$stroke-light:  0.5px;   // meta labels, group headings
+// The three fixed-px tiers that used to live here ($stroke-heavy 0.8px,
+// $stroke-medium 0.6px, $stroke-light 0.5px) are gone, 2026-08-12. They were a
+// scale of the wrong KIND of value: -webkit-text-stroke is absolute, so one
+// token on two different type sizes is two different letterforms, and a "tier"
+// that has to be re-chosen per element every time isn't a scale. Two of the
+// three were already dead -- title and section headings had both been cut to
+// hand-picked literals (0.4px, 0.3px) months before this -- and the third,
+// $stroke-light, was doing 0.5px on everything from 0.85rem to 1.35rem, which
+// is 3.7% of the type on one and 2.3% on another.
+//
+// Replaced by punched-stroke($size) in shared/_rule.scss, which takes the type
+// size and returns its proportion. That file's own comment has the reasoning
+// and the measurements; it lives there because the stroke is one half of the
+// punched-tape effect and the emboss offset is the other, and separating them
+// is what let them drift apart in the first place.
 
 // --- Borders & Radii ---------------------------------------------------------
 $radius-sm: 2px;   // note boxes, method-short box, meta wash

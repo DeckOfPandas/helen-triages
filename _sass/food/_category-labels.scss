@@ -68,13 +68,19 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // THE STROKE IS SET BY PROPORTION, NOT BY COPYING THE NUMBER. -webkit-text-stroke
   // is an absolute px width, so the same token on smaller type is a
   // proportionally FATTER letterform — which reads as a different, chunkier
-  // font rather than as the same font smaller. The recipe page's section
-  // headings are 0.6px on 1.8rem, or 2.08% of the type size. $stroke-light on
-  // 1.35rem is 2.31%. Near enough identical, using a token that already exists.
+  // font rather than as the same font smaller.
   //
   // 0.8px on 0.78rem, for comparison, was 6.4% — three times heavier than the
   // biggest headings on the site. Nobody chose that; it accumulated under a
   // brush wash that was absorbing it.
+  //
+  // This file worked that out first, for this element alone, and matched it by
+  // hand to $stroke-light (2.31% here against the section headings' 2.08%).
+  // Both numbers moved on 2026-08-12: the ratio is now punched-stroke() in
+  // shared/_rule.scss and sits at 1.4%, because the whole scale turned out to
+  // be running heavy enough to swallow the emboss shadow that is the other
+  // half of the effect. Same principle this comment already stated, applied
+  // everywhere instead of in one place.
   .category-label {
     font-family: $font-headings;
     text-transform: uppercase;
@@ -86,7 +92,13 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     // which was a grey with no relationship to the letter it outlined.
     // This is half the effect; @include punched() below is the other half, and
     // the two are independent. See the long note in _sass/food/_rule.scss.
-    -webkit-text-stroke: $stroke-light $color-label-stroke;
+    -webkit-text-stroke: punched-stroke(1.35rem) $color-label-stroke;
+    // 1.35rem sits between the two offset values (it wants 1.4px). Staying at
+    // 1px rather than rounding up to 2: this is a control-panel label with
+    // five of them stacked in a screenful, not a landmark, and the ratio
+    // matters least at the size where both values are close. Try
+    // $emboss-offset-large here if the index reads flatter than the recipe
+    // page once both are in front of you.
     @include punched(raised);   // `pressed` inverts the light and punches IN
     // Was $color-highlighter-label — "text sitting on top of a highlighter",
     // of which there is none here any more. Plain body text colour, same as
