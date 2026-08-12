@@ -1,0 +1,188 @@
+// =============================================================================
+// HELEN TRIAGES FOOD - THE ABOUT PAGE
+// =============================================================================
+// One page, one device: A COLUMN OF MARKS DOWN THE LEFT EDGE.
+//
+// The about page was a wall of prose with two enumerations buried inside
+// paragraphs as literal "1. ... 2. ..." runs -- lists in the writing that were
+// never lists in the markup, so nothing could style them. They are real <ol>s
+// now, and each item's number is set as a large Courier glyph in a gutter at
+// the page's left axis. The FAQ below gets the same gutter, carrying a "?"
+// instead of a numeral.
+//
+// Read down the page and the left edge now says:  1 2 . 1 2 3 . ? ? ? ? ?
+// -- the page's own structure, visible before you read a word of it. The "?"
+// column is the point: this page is titled "???" and is reached from a bare "?"
+// in the site header, so the question mark is already its identity. Repeating
+// it five times down the margin makes the FAQ look like what the page has been
+// called all along, rather than a heading that happens to say FAQ.
+//
+// THE GUTTER IS AT x=0 AND THE TEXT IS INDENTED, never the reverse. Hanging
+// the marks out into the left margin was the obvious way to draw this and is
+// specifically wrong here -- HANDOVER §13.1: everything on this site starts at
+// x=0, and a mark to the left of that axis reads as broken alignment rather
+// than as design. The marks take the axis and the prose steps right of them.
+//
+// COLOUR: $color-electric-cobalt, and it is not a new hue. This page already
+// claimed cobalt on 2026-08-12, as the under-rule of its own FAQ heading
+// (.section-heading-text--about-faq in food/_recipe-header.scss, aureolin over
+// cobalt where every recipe page uses spring green over violet). So the marks
+// reuse the colour the page had already been given rather than spending a
+// fresh one -- the same test _palette.scss's colour budget applies to the
+// recipe page, passed the same way magenta and violet passed it there.
+//
+// It is also cobalt rather than magenta for the reason the annotation arrow is
+// violet rather than magenta (see _palette.scss): magenta means "interactive"
+// site-wide, and a big magenta "?" sitting beside a question would read as a
+// control you can press. These marks are decoration. Cobalt is this page's
+// structural/secondary colour exactly as violet is the recipe page's, so it is
+// already carrying that meaning here.
+//
+// Contrast, measured not assumed: #0047FF on $color-bg is 5.9:1, clear of the
+// 4.5:1 bar even though these glyphs are large enough to qualify for the
+// relaxed one.
+
+// --- The two dials ----------------------------------------------------------
+// The gutter width and the mark size are one decision, not two: the gutter has
+// to hold the glyph with air around it, so moving either without the other
+// either crowds the text or strands the mark. Both are used by the
+// enumerations AND the FAQ, which is what puts every mark on one axis.
+$about-mark-size: 1.6rem;   // between the section headings' 1.8rem and body
+                            // text -- big enough to read as a mark rather than
+                            // as a numeral in a sentence, small enough not to
+                            // compete with the heading it sits under
+$about-gutter:    2.8rem;
+
+// Scoped to .about-page (a second class on the page's .recipe-body-content) so
+// every rule here out-specifies the longform recipe styling it sits on top of.
+// That matters more than usual: .recipe-body-content's own `ol` rule is built
+// for a recipe's Troubleshooting section -- flex column, big gap, a violet rule
+// behind a bold lead-in -- and an <ol> added to this page would otherwise
+// inherit all of it.
+article.recipe .recipe-body-content.about-page {
+
+  // --- The enumerations ------------------------------------------------------
+  // Undoes the diagnostic-block treatment (display: flex, $spacing-block-gap)
+  // and replaces it with an ordinary block list carrying its own counter --
+  // list-style stays none, inherited, because the numeral is drawn by hand
+  // below rather than by the browser.
+  //
+  // A NUMERAL IS RIGHT HERE IN A WAY IT WASN'T FOR A RECIPE'S FAILURE MODES,
+  // where it was removed on 2026-08-12 for implying a sequence that didn't
+  // exist. The difference is that the prose promises the count out loud --
+  // "two problems", "Three reasons" -- so the number is a fact the reader has
+  // already been given and is now looking for, not an order imposed on things
+  // that have none.
+  .about-enum {
+    display: block;
+    counter-reset: about-enum;
+    padding-left: 0;
+    margin: 0 0 $space-xl 0;
+
+    > li {
+      counter-increment: about-enum;
+      position: relative;
+      // The gutter. Wide enough for a 1.6rem numeral plus air, and shared
+      // exactly with .about-faq-item below so the two blocks' marks sit on one
+      // vertical line down the page -- which is the whole effect. Change it in
+      // both or in neither.
+      padding-left: $about-gutter;
+      margin-bottom: $space-lg;
+      max-width: calc(68ch + #{$about-gutter});
+
+      &::before {
+        content: counter(about-enum);
+        position: absolute;
+        left: 0;
+        // Optical, not metric: a 1.6rem Courier numeral hung off a 0.92rem
+        // line sits visibly high when its box is flush with the text's box,
+        // because the numeral's own cap height starts lower in a much taller
+        // line box. Nudged down to sit on the first line's baseline by eye,
+        // the same correction .method-full's step numbers needed.
+        top: 0.1rem;
+        font-family: $font-headings;
+        font-weight: 700;
+        font-size: $about-mark-size;
+        line-height: 1;
+        color: $color-electric-cobalt;
+      }
+    }
+  }
+
+  // --- The a) b) sub-list ----------------------------------------------------
+  // Same voice one step down: same face, same colour, body size rather than
+  // display size, and a closing bracket because that is what the prose used
+  // before it became a list ("doesn't require me to a) ... or b) ...").
+  //
+  // Overrides the em-dash marker every other bulleted list in
+  // .recipe-body-content gets -- this list is enumerated, not itemised, and a
+  // dash would throw away the a/b the sentence above it depends on.
+  .about-enum-sub {
+    counter-reset: about-enum-sub;
+    padding-left: 0;
+    margin: $space-sm 0 0 0;
+
+    > li {
+      counter-increment: about-enum-sub;
+      position: relative;
+      padding-left: 1.7rem;
+      margin-bottom: $space-xs;
+
+      &::before {
+        content: counter(about-enum-sub, lower-alpha) ")";
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-family: $font-headings;
+        font-weight: 700;
+        font-size: $font-size-body-sm;
+        color: $color-electric-cobalt;
+      }
+    }
+  }
+
+  // --- The FAQ ---------------------------------------------------------------
+  // A question and its answer, wrapped so the pair can share one gutter -- the
+  // mark belongs to the whole exchange, not to the heading alone, and an answer
+  // sitting back at x=0 under an indented question would break the column the
+  // device is built on.
+  //
+  // The "?" is a real glyph in the page's heading face, not a bullet standing
+  // in for one, so it matches the "???" title above it and the "?" in the site
+  // header at a third size. Aria-hidden isn't needed: it is a CSS ::before, so
+  // it is already absent from the accessibility tree, and each question is
+  // still a real <h3> in the document outline.
+  .about-faq-item {
+    position: relative;
+    padding-left: $about-gutter;
+    margin-bottom: $spacing-block-gap;
+
+    &::before {
+      content: "?";
+      position: absolute;
+      left: 0;
+      // Aligned to the QUESTION's cap height rather than the block's top edge,
+      // which is the same top: 0.1rem the numerals use -- but h3 carries its
+      // own margin-top ($space-xl, see _recipe-notes-body.scss) and the ::before
+      // is positioned against this wrapper, not against the h3, so the mark has
+      // to clear that margin itself.
+      top: calc(#{$space-xl} + 0.05rem);
+      font-family: $font-headings;
+      font-weight: 700;
+      font-size: $about-mark-size;
+      line-height: 1;
+      color: $color-electric-cobalt;
+    }
+
+    // The first item follows the FAQ heading's own gap, so it doesn't need the
+    // h3's usual top margin as well -- and without this the first "?" hangs a
+    // long way below the heading it belongs to.
+    &:first-of-type {
+      h3 { margin-top: 0; }
+      &::before { top: 0.05rem; }
+    }
+
+    // The answer sits directly under its question inside the shared gutter.
+    p:last-child { margin-bottom: 0; }
+  }
+}
