@@ -364,6 +364,7 @@ function renderResultsPool() {
       if (activeMetaFilters.has('proofread') && li.dataset.metaProofread !== 'true') visible = false;
       if (activeMetaFilters.has('no-short') && li.dataset.metaShort === 'true') visible = false;
       if (activeMetaFilters.has('has-short') && li.dataset.metaShort !== 'true') visible = false;
+      if (activeMetaFilters.has('draft') && li.dataset.metaDraft !== 'true') visible = false;
 
       if (activeIngredient) {
         var hasMatch = false;
