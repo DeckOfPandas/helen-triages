@@ -44,3 +44,7 @@
 @import "food/recipe-ingredients-method";
 @import "food/recipe-notes-body";
 @import "food/recipe-annotations";
+// The about page, last: it sits on top of .recipe-body-content's longform
+// styling (that page uses the same wrapper) and overrides the parts built for a
+// recipe's Troubleshooting section, so it has to be imported after it.
+@import "food/about";
