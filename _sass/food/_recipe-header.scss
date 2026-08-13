@@ -355,8 +355,18 @@ article.recipe a {
 // .recipe-section-heading .section-heading-text above -- a bare
 // .section-heading-text--about-faq is only one class, lower specificity
 // than that two-class descendant selector, and would silently lose.
+// Aureolin over VIOLET, not over cobalt. Cobalt was tried here on 2026-08-12
+// and pulled the next day -- Helen: "I love colour, but even I need to accept
+// that adding the cobalt was too much." Aureolin alone is the departure that
+// earns its keep (this is the one page that isn't a recipe, and the top rule
+// says so); pairing it with a second unfamiliar hue made the mark read as an
+// unrelated device rather than as the site's own mark in a different key.
+//
+// Violet is the under-rule under every section heading on every recipe page,
+// so keeping it here means only ONE thing has changed about this mark, which
+// is exactly as much difference as "this page is not a recipe" needs.
 .section-heading-text.section-heading-text--about-faq {
-  @include overlapping-rule-double($color-aureolin, $color-electric-cobalt);
+  @include overlapping-rule-double($color-aureolin, $color-section-underline-2);
 }
 
 

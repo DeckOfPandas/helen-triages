@@ -5,53 +5,66 @@
 //
 // The about page was a wall of prose with two enumerations buried inside
 // paragraphs as literal "1. ... 2. ..." runs -- lists in the writing that were
-// never lists in the markup, so nothing could style them. They are real <ol>s
-// now, and each item's number is set as a large Courier glyph in a gutter at
-// the page's left axis. The FAQ below gets the same gutter, carrying a "?"
-// instead of a numeral.
+// never lists in the markup, so nothing could style them. They are real lists
+// now, and each one puts a large Courier glyph in a gutter at the page's left
+// axis, with the prose stepping right of it.
 //
-// Read down the page and the left edge now says:  1 2 . 1 2 3 . ? ? ? ? ?
-// -- the page's own structure, visible before you read a word of it. The "?"
-// column is the point: this page is titled "???" and is reached from a bare "?"
-// in the site header, so the question mark is already its identity. Repeating
-// it five times down the margin makes the FAQ look like what the page has been
-// called all along, rather than a heading that happens to say FAQ.
+// Read down the left edge and it says:
 //
-// THE GUTTER IS AT x=0 AND THE TEXT IS INDENTED, never the reverse. Hanging
-// the marks out into the left margin was the obvious way to draw this and is
+//     1  2   ·   →  →  →   ·   ?  ?  ?  ?  ?
+//
+// -- the page's own structure, visible before you read a word of it. AND THE
+// MARK SAYS WHAT KIND OF LIST IT IS: numerals where the prose promised a count
+// ("two problems"), arrows for the ways into the collection, question marks for
+// the FAQ. Three lists, three marks, one axis.
+//
+// The "?" column is the point of the whole thing: this page is titled "???" and
+// is reached from a bare "?" in the site header, so the question mark is
+// already its identity. Repeating it down the margin makes the FAQ look like
+// what the page has been called all along, rather than a heading that happens
+// to say FAQ.
+//
+// THE GUTTER IS AT x=0 AND THE TEXT IS INDENTED, never the reverse. Hanging the
+// marks out into the left margin was the obvious way to draw this and is
 // specifically wrong here -- HANDOVER §13.1: everything on this site starts at
 // x=0, and a mark to the left of that axis reads as broken alignment rather
-// than as design. The marks take the axis and the prose steps right of them.
+// than as design.
 //
-// COLOUR: $color-electric-cobalt, and it is not a new hue. This page already
-// claimed cobalt on 2026-08-12, as the under-rule of its own FAQ heading
-// (.section-heading-text--about-faq in food/_recipe-header.scss, aureolin over
-// cobalt where every recipe page uses spring green over violet). So the marks
-// reuse the colour the page had already been given rather than spending a
-// fresh one -- the same test _palette.scss's colour budget applies to the
-// recipe page, passed the same way magenta and violet passed it there.
+// COLOUR: violet, the same $color-section-underline-2 that under-rules every
+// section heading on every recipe page. The first version of this page used
+// $color-electric-cobalt, which the FAQ heading had also just taken -- Helen,
+// the next day: "I love colour, but even I need to accept that adding the
+// cobalt was too much." Both are violet now, this file and that heading
+// (food/_recipe-header.scss).
 //
-// It is also cobalt rather than magenta for the reason the annotation arrow is
-// violet rather than magenta (see _palette.scss): magenta means "interactive"
-// site-wide, and a big magenta "?" sitting beside a question would read as a
-// control you can press. These marks are decoration. Cobalt is this page's
-// structural/secondary colour exactly as violet is the recipe page's, so it is
-// already carrying that meaning here.
-//
-// Contrast, measured not assumed: #0047FF on $color-bg is 5.9:1, clear of the
-// 4.5:1 bar even though these glyphs are large enough to qualify for the
-// relaxed one.
+// Violet is right on its own merits, not just as a retreat from cobalt: the
+// recipe page spends it on the annotation arrow specifically BECAUSE it is
+// decoration rather than navigation, magenta being the site's "this is
+// interactive" colour (see _palette.scss). These marks are decoration too, and
+// a large magenta "?" sitting beside a question would read as a control you
+// can press.
 
-// --- The two dials ----------------------------------------------------------
+// --- The dials ---------------------------------------------------------------
 // The gutter width and the mark size are one decision, not two: the gutter has
-// to hold the glyph with air around it, so moving either without the other
-// either crowds the text or strands the mark. Both are used by the
-// enumerations AND the FAQ, which is what puts every mark on one axis.
-$about-mark-size: 1.6rem;   // between the section headings' 1.8rem and body
-                            // text -- big enough to read as a mark rather than
-                            // as a numeral in a sentence, small enough not to
-                            // compete with the heading it sits under
-$about-gutter:    2.8rem;
+// to hold the glyph with air around it, so moving either alone either crowds
+// the text or strands the mark. Both are used by ALL THREE lists, which is what
+// puts every mark on one axis -- change them for one and the column breaks.
+$about-mark-size:   1.6rem;   // between the section headings' 1.8rem and body
+                              // text: big enough to read as a mark rather than
+                              // as a character in a sentence, small enough not
+                              // to compete with the heading above it
+$about-gutter:      2.8rem;
+$about-mark-colour: $color-section-underline-2;
+
+// The reading measure, shared by everything on this page that sits in a gutter.
+// A rem value rather than the `68ch` the rest of longform uses, and it has to
+// be: `ch` is the width of "0" IN THE CURRENT FONT, so 68ch on a Courier
+// heading and 68ch on a sans paragraph are two different widths, and a question
+// set in one directly above its answer set in the other would visibly fail to
+// share a right edge. Helen: "please constrain the width of FAQ item titles to
+// the same container." One length in one unit is the only way they actually
+// match. 34.5rem is the sans measure's own width, so the prose is unchanged.
+$about-measure: 34.5rem;
 
 // Scoped to .about-page (a second class on the page's .recipe-body-content) so
 // every rule here out-specifies the longform recipe styling it sits on top of.
@@ -61,6 +74,20 @@ $about-gutter:    2.8rem;
 // inherit all of it.
 article.recipe .recipe-body-content.about-page {
 
+  // --- Shared: the mark in the gutter ----------------------------------------
+  // Every mark on the page is the same glyph treatment at the same position and
+  // differs only in its `content`. Extended rather than repeated so the three
+  // lists cannot drift apart -- which is the entire effect.
+  %about-mark {
+    position: absolute;
+    left: 0;
+    font-family: $font-headings;
+    font-weight: 700;
+    font-size: $about-mark-size;
+    line-height: 1;
+    color: $about-mark-colour;
+  }
+
   // --- The enumerations ------------------------------------------------------
   // Undoes the diagnostic-block treatment (display: flex, $spacing-block-gap)
   // and replaces it with an ordinary block list carrying its own counter --
@@ -68,11 +95,10 @@ article.recipe .recipe-body-content.about-page {
   // below rather than by the browser.
   //
   // A NUMERAL IS RIGHT HERE IN A WAY IT WASN'T FOR A RECIPE'S FAILURE MODES,
-  // where it was removed on 2026-08-12 for implying a sequence that didn't
-  // exist. The difference is that the prose promises the count out loud --
-  // "two problems", "Three reasons" -- so the number is a fact the reader has
-  // already been given and is now looking for, not an order imposed on things
-  // that have none.
+  // where one was removed on 2026-08-12 for implying a sequence that didn't
+  // exist. The difference is that this prose promises the count out loud --
+  // "two problems" -- so the number is a fact the reader has already been given
+  // and is now looking for, not an order imposed on things that have none.
   .about-enum {
     display: block;
     counter-reset: about-enum;
@@ -82,29 +108,17 @@ article.recipe .recipe-body-content.about-page {
     > li {
       counter-increment: about-enum;
       position: relative;
-      // The gutter. Wide enough for a 1.6rem numeral plus air, and shared
-      // exactly with .about-faq-item below so the two blocks' marks sit on one
-      // vertical line down the page -- which is the whole effect. Change it in
-      // both or in neither.
       padding-left: $about-gutter;
       margin-bottom: $space-lg;
-      max-width: calc(68ch + #{$about-gutter});
+      max-width: calc(#{$about-measure} + #{$about-gutter});
 
       &::before {
+        @extend %about-mark;
         content: counter(about-enum);
-        position: absolute;
-        left: 0;
-        // Optical, not metric: a 1.6rem Courier numeral hung off a 0.92rem
-        // line sits visibly high when its box is flush with the text's box,
-        // because the numeral's own cap height starts lower in a much taller
-        // line box. Nudged down to sit on the first line's baseline by eye,
-        // the same correction .method-full's step numbers needed.
+        // Optical, not metric: a 1.6rem numeral hung off a 0.92rem line sits
+        // visibly high when the two boxes are flush, because the numeral's cap
+        // height starts lower inside a much taller line box.
         top: 0.1rem;
-        font-family: $font-headings;
-        font-weight: 700;
-        font-size: $about-mark-size;
-        line-height: 1;
-        color: $color-electric-cobalt;
       }
     }
   }
@@ -112,10 +126,12 @@ article.recipe .recipe-body-content.about-page {
   // --- The a) b) sub-list ----------------------------------------------------
   // Same voice one step down: same face, same colour, body size rather than
   // display size, and a closing bracket because that is what the prose used
-  // before it became a list ("doesn't require me to a) ... or b) ...").
+  // before it became a list ("without having to a) ... or b) ..."). It does NOT
+  // take the gutter -- it is subordinate to an item that already has one, and a
+  // second mark on the same axis would break the column.
   //
   // Overrides the em-dash marker every other bulleted list in
-  // .recipe-body-content gets -- this list is enumerated, not itemised, and a
+  // .recipe-body-content gets: this list is enumerated, not itemised, and a
   // dash would throw away the a/b the sentence above it depends on.
   .about-enum-sub {
     counter-reset: about-enum-sub;
@@ -136,53 +152,124 @@ article.recipe .recipe-body-content.about-page {
         font-family: $font-headings;
         font-weight: 700;
         font-size: $font-size-body-sm;
-        color: $color-electric-cobalt;
+        color: $about-mark-colour;
+      }
+    }
+  }
+
+  // --- The ways into the collection ------------------------------------------
+  // "Filter recipes: by what you have in your hand / by what's lurking in your
+  // fridge / by being in the mood for a giant pile of cheese."
+  //
+  // An arrow, because these are three doors into the same room -- alternatives,
+  // not steps and not questions, so neither of the other two marks is honest
+  // about what the list is. It is also the house arrow: → is what this site
+  // writes for an arrow everywhere in prose (house style §5), so it costs no
+  // new vocabulary. U+2192 is in WGL4, which Courier New implements, so it
+  // renders in the same face as the numerals rather than falling back to some
+  // other font for that one glyph.
+  .about-ways {
+    padding-left: 0;
+    margin: 0 0 $space-xl 0;
+
+    > li {
+      position: relative;
+      padding-left: $about-gutter;
+      margin-bottom: $space-sm;
+      max-width: calc(#{$about-measure} + #{$about-gutter});
+
+      &::before {
+        @extend %about-mark;
+        content: "→";
+        // Sits a touch higher than the numerals: an arrow is centred on the
+        // x-height where a numeral sits on the baseline, so matching their
+        // `top` would drop it visibly below the line it belongs to.
+        top: -0.05rem;
       }
     }
   }
 
   // --- The FAQ ---------------------------------------------------------------
   // A question and its answer, wrapped so the pair can share one gutter -- the
-  // mark belongs to the whole exchange, not to the heading alone, and an answer
-  // sitting back at x=0 under an indented question would break the column the
-  // device is built on.
-  //
-  // The "?" is a real glyph in the page's heading face, not a bullet standing
-  // in for one, so it matches the "???" title above it and the "?" in the site
-  // header at a third size. Aria-hidden isn't needed: it is a CSS ::before, so
-  // it is already absent from the accessibility tree, and each question is
-  // still a real <h3> in the document outline.
+  // mark belongs to the exchange, not to the heading alone, and an answer
+  // sitting back at x=0 under an indented question would break the column.
   .about-faq-item {
     position: relative;
     padding-left: $about-gutter;
     margin-bottom: $spacing-block-gap;
 
-    &::before {
-      content: "?";
-      position: absolute;
-      left: 0;
-      // Aligned to the QUESTION's cap height rather than the block's top edge,
-      // which is the same top: 0.1rem the numerals use -- but h3 carries its
-      // own margin-top ($space-xl, see _recipe-notes-body.scss) and the ::before
-      // is positioned against this wrapper, not against the h3, so the mark has
-      // to clear that margin itself.
-      top: calc(#{$space-xl} + 0.05rem);
-      font-family: $font-headings;
-      font-weight: 700;
-      font-size: $about-mark-size;
-      line-height: 1;
-      color: $color-electric-cobalt;
+    // THE MARK HANGS OFF THE QUESTION, NOT OFF THE WRAPPER, and that is the fix
+    // for Helen's "the ? marks aren't aligned with the title lines, and in fact
+    // drift further for each item."
+    //
+    // The first version positioned it against .about-faq-item and guessed a
+    // `top` that allowed for the h3's own margin-top. That was wrong twice
+    // over. First, the h3's top margin COLLAPSES THROUGH this wrapper -- it has
+    // no top border or padding and doesn't establish a BFC -- so the heading
+    // was already flush with the wrapper's top edge and the allowance pushed
+    // every mark a clear 1.5rem too low, landing it beside the answer instead
+    // of the question. Second, and worse, an offset measured from the wrapper
+    // is only ever right for one shape of item: a question that wraps to two
+    // lines moves its own text but not the mark, so the error grew as the
+    // questions got longer -- exactly the drift she saw.
+    //
+    // Positioning against the h3 itself removes the guess entirely. The mark is
+    // on the question's first line by construction, whatever the margins
+    // collapse to and however many lines the question runs to. `left` is
+    // negative because the h3 starts at the wrapper's padding edge, so the
+    // gutter is behind it.
+    h3 {
+      position: relative;
+      // Constrains the question to the same measure as its own answer, so the
+      // two share a right edge -- Helen's ask. See $about-measure above for why
+      // this can't just be the `68ch` the paragraphs use.
+      max-width: $about-measure;
+
+      &::before {
+        @extend %about-mark;
+        content: "?";
+        left: -$about-gutter;
+        // Courier's "?" sits high in its box; this lands it on the question's
+        // own cap height rather than above it.
+        top: -0.15rem;
+      }
     }
 
-    // The first item follows the FAQ heading's own gap, so it doesn't need the
-    // h3's usual top margin as well -- and without this the first "?" hangs a
-    // long way below the heading it belongs to.
-    &:first-of-type {
-      h3 { margin-top: 0; }
-      &::before { top: 0.05rem; }
-    }
-
-    // The answer sits directly under its question inside the shared gutter.
     p:last-child { margin-bottom: 0; }
+  }
+
+  // --- Section dividers ------------------------------------------------------
+  // Helen added two <hr>s and asked for them styled "or suggest something
+  // better". This is the something better: not a rule across the page, but the
+  // page's own mark with the lettering taken away -- an aureolin bar with a
+  // violet one stepped under it, the exact pair the FAQ heading below wears,
+  // sitting at x=0 like everything else.
+  //
+  // A full-width line would be the first thing on this site that divides the
+  // page by drawing across it. Every other separator here is a mark you read
+  // past (a heading, a gap), and §13.1's whole argument for the blocky rule is
+  // that ONE repeated mark becomes something you recognise rather than
+  // something you read. A stub of that mark says "new movement" using
+  // vocabulary the reader already has, where a hairline would be a new device
+  // introduced for two occurrences.
+  //
+  // Drawn as backgrounds rather than borders for the same reason the heading
+  // mark is (see food/_rule.scss): two bars, independently sized and offset,
+  // are one gradient each and would otherwise need two elements.
+  hr {
+    border: 0;
+    width: 4.5rem;
+    height: 0.85rem;
+    margin: $spacing-section-gap 0;
+    background-image:
+      linear-gradient(rgba($color-section-underline-2, $rule-front-opacity),
+                      rgba($color-section-underline-2, $rule-front-opacity)),
+      linear-gradient($color-aureolin, $color-aureolin);
+    background-repeat: no-repeat, no-repeat;
+    // The violet is inset at both ends and sits under the aureolin, overlapping
+    // it slightly -- the same stepped, slightly-out-of-register read the
+    // section headings' pair has, at the same proportions.
+    background-size: 3.5rem 0.2rem, 4.5rem 0.38rem;
+    background-position: 0.35rem 0.28rem, 0 0;
   }
 }
