@@ -426,7 +426,7 @@ function renderResultsPool() {
       ? getWords(activeKey2).map(IS.normaliseIngredientWord)
       : [];
     document.querySelectorAll('.recipe-list .ingredient-pill').forEach(function(pill) {
-      pill.classList.remove('ingredient--matched');
+      pill.classList.remove('ingredient-pill--matched');
       if (!activeKey2) {
         // Strip any shape left from a previous match -- .ingredient-pill
         // has no default .tag-shape colour of its own (unlike .badge/
@@ -448,7 +448,7 @@ function renderResultsPool() {
         });
       }
       if (matches) {
-        pill.classList.add('ingredient--matched');
+        pill.classList.add('ingredient-pill--matched');
         if (!pill.querySelector('.tag-shape')) {
           var shape = document.createElement('span');
           shape.className = 'tag-shape';
