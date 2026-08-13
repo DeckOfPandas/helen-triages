@@ -256,20 +256,47 @@ article.recipe .recipe-body-content.about-page {
   // Drawn as backgrounds rather than borders for the same reason the heading
   // mark is (see food/_rule.scss): two bars, independently sized and offset,
   // are one gradient each and would otherwise need two elements.
+  //
+  // FIRST VERSION WAS SYMMETRIC AND THAT WAS THE WHOLE PROBLEM -- Helen: "they
+  // look a little too even compared with the way we do underlining." It had the
+  // violet inset by the same amount at both ends, centred under the aureolin,
+  // which is a neat little sandwich and reads as a graphic element someone
+  // drew. THE SITE'S MARK IS DELIBERATELY OUT OF REGISTER: the under rule is
+  // flush at the LEFT and stops short at the right, the top rule is inset at
+  // the left and runs past at the right, so the pair reads as two-colour
+  // printing very slightly misaligned rather than as one tidy object. That
+  // asymmetry is the character, and dropping it is what made these look even.
+  //
+  // So this no longer approximates the geometry with its own numbers -- it uses
+  // $rule-* directly, the same variables food/_rule.scss's mixin uses, at
+  // font-size 1.8rem so those em values resolve to exactly the size the section
+  // headings' own mark is. It IS the section-heading mark with the lettering
+  // taken away, not a smaller thing shaped like one, and it follows if those
+  // dials are ever retuned. Bigger and heavier than the first attempt as a
+  // consequence, which is also what "make them a little more striking" wanted.
   hr {
     border: 0;
-    width: 4.5rem;
-    height: 0.85rem;
+    // Not decoration on text, but the em basis every $rule-* dial is expressed
+    // in -- see .recipe-section-heading, which is 1.8rem for the same reason.
+    font-size: 1.8rem;
+    width: 3em;
+    // Down to the bottom of the under rule: the top bar's own depth, less the
+    // amount the violet rises into it, plus the violet's depth.
+    height: $rule-thickness - $rule-overlap + $rule-under-thickness;
     margin: $spacing-section-gap 0;
     background-image:
       linear-gradient(rgba($color-section-underline-2, $rule-front-opacity),
                       rgba($color-section-underline-2, $rule-front-opacity)),
       linear-gradient($color-aureolin, $color-aureolin);
     background-repeat: no-repeat, no-repeat;
-    // The violet is inset at both ends and sits under the aureolin, overlapping
-    // it slightly -- the same stepped, slightly-out-of-register read the
-    // section headings' pair has, at the same proportions.
-    background-size: 3.5rem 0.2rem, 4.5rem 0.38rem;
-    background-position: 0.35rem 0.28rem, 0 0;
+    background-size:
+      calc(100% - #{$rule-overhang + $rule-under-inset-left + $rule-under-inset-right}) #{$rule-under-thickness},
+      calc(100% - #{$rule-indent}) #{$rule-thickness};
+    // Vertical positions start at the top rather than at $rule-drop, which is
+    // the one thing that can't carry over: $rule-drop measures how far the bar
+    // sits BELOW THE TOP OF A LINE OF TEXT, and there is no text here.
+    background-position:
+      #{$rule-under-indent} #{$rule-thickness - $rule-overlap},
+      #{$rule-indent}       0;
   }
 }
