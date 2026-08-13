@@ -18,7 +18,7 @@ _cocktail_drafts/
 # `published: false` in the page's own front matter is a SEPARATE, unrelated
 # switch (controls what Jekyll renders); it does nothing about git. This is
 # the entry that actually keeps the file off GitHub.
-food/about.html
+# food/about.html
 
 # Ruby
 vendor/
