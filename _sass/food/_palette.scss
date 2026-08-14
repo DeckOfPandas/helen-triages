@@ -153,13 +153,18 @@ $color-label-stroke:         lighten($color-text, 20%);
 // revisit later rather than solve today by pulling links away from the
 // hue that's working.
 //
-// Hover goes LIGHTER, per Helen's ask -- darken 8% (between the raw hue and
-// the resting link colour) is visibly lighter than the 12% base while still
-// reading as intentional rather than washed out, at 4.46:1 -- under 4.5 by
-// a hair, acceptable for a transient hover state rather than the resting
-// colour text has to stay legible in permanently.
+// Hover goes LIGHTER, per Helen's ask. Was darken 8% (4.46:1, "under 4.5 by
+// a hair") until issue #199, 2026-08-14: Helen's own read was that the shift
+// from the 12%-darkened resting colour barely registered, because both ends
+// stayed inside the same hue -- unlike .site-about-link's "?" hover, which
+// jumps from a neutral grey resting colour straight to this same raw
+// $color-bright-magenta and is obviously a different colour. Her explicit
+// call, having seen the contrast math (3.24:1 against $color-bg, well under
+// the 4.5:1 body-text floor): the bigger, unambiguous colour jump is worth
+// it for a hover state, which is transient by definition -- text is never
+// read continuously in this colour the way the resting link colour is.
 $color-recipe-link: $color-bright-magenta-dark;
-$color-recipe-link-hover: darken($color-bright-magenta, 8);
+$color-recipe-link-hover: $color-bright-magenta;
 
 // --- Reusable Structural Accents ---------------------------------------------
 // Nested bullets in the short method. Was cerulean-mixed; re-based on spring
