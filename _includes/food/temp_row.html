@@ -3,7 +3,7 @@
 
   Parameters
     label   the row's name, already human-readable
-    spec    a node holding pull_min/pull_max, and optionally rested_min/max
+    spec    a node holding out_at_min/out_at_max, and optionally rested_min/max
     tip     extra hover text (optional)
 
   WHY AN INCLUDE. Every row is the same four marks at different coordinates, and
@@ -18,21 +18,21 @@
   it works whenever the page happens to have a variable of that name and breaks
   the moment it doesn't.
 
-  "OUT AT", NOT "PULL AT". Helen: "I don't love the word 'pull'... mostly
+  "OUT AT", NOT "PULL AT". Helen: "I don't love the word 'out_at'... mostly
   because it's American." Out at is shorter, reads as plain English, and stays
   true for a pan, a grill or a bain-marie where "out of the oven" wouldn't. It
   also matches the calculator, which says "in at 14:20, out at 17:05" -- so one
   verb now carries the same meaning across both instruments, and the schedule
   hands straight over to the thermometer figure.
 
-  The DATA still uses `pull_min`/`pull_max`, deliberately: renaming those keys
+  The DATA still uses `out_at_min`/`out_at_max`, deliberately: renaming those keys
   means touching _layouts/recipe.html, the reference page and the guard tests
   at once, and the field name is nobody's reading experience. Display language
   changed here; the existing pages' own "Pull at" column headings are a copy
   pass still to do.
 
   THE CARRYOVER BAR IS ONLY DRAWN WHEN THERE IS A GAP TO DRAW. Salmon's
-  carryover is 1–2°C and its pull and rested ranges overlap, so there is no
+  carryover is 1–2°C and its out_at and rested ranges overlap, so there is no
   clear space between them; a dotted connector there would be drawn on top of
   the bars it's meant to join and read as noise. Beef's 4–6°C carryover leaves a
   real gap, and that gap is the whole point of the chart.
@@ -44,7 +44,7 @@
   FOUR SHAPES, ONE ROW. internal_temperatures.yml deliberately isn't uniform
   (see its own header): a doneness level has pull/rested, a whole bird has an
   endpoint, a cured ham has a target, and a tough cut has tender_at and no
-  pull temperature at all because collagen breakdown isn't a doneness.
+  out_at temperature at all because collagen breakdown isn't a doneness.
 
   Rather than four includes, this finds whichever figure the node actually
   carries. That follows the data file's own instruction to consumers -- "check
@@ -61,8 +61,8 @@
    looks self-contained and isn't. {% endcomment %}
 {% assign prefix = "" %}
 
-{% if spec.pull_min %}
-  {% assign from = spec.pull_min %}{% assign to = spec.pull_max %}{% assign shown = spec.pull %}
+{% if spec.out_at_min %}
+  {% assign from = spec.out_at_min %}{% assign to = spec.out_at_max %}{% assign shown = spec.out_at %}
 {% elsif spec.endpoint_min %}
   {% assign from = spec.endpoint_min %}{% assign to = spec.endpoint_max %}{% assign shown = spec.endpoint %}
 {% elsif spec.target_min %}
@@ -86,10 +86,10 @@
    and where the hover target ends. {% endcomment %}
 {% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = to %}{% endif %}
 
-<div class="tc-row">
-  <div class="tc-row-label">{{ include.label }}</div>
+<div class="tc-row{% if include.suggested %} tc-row--suggested{% endif %}">
+  <div class="tc-row-label">{{ include.label }}{% if include.suggested %}<span class="tc-suggested" title="What this recipe suggests">this recipe</span>{% endif %}</div>
   <div class="tc-track">
-    <div class="tc-pull" style="--a:{{ from }}; --b:{{ to }};"></div>
+    <div class="tc-out_at" style="--a:{{ from }}; --b:{{ to }};"></div>
 
     {% if has_rested and spec.rested_min > to %}
       <div class="tc-carry" style="--a:{{ to }}; --b:{{ spec.rested_min }};"></div>
@@ -104,6 +104,6 @@
     </div>
 
     <div class="tc-hit" tabindex="0" style="--a:{{ from }}; --b:{{ right }};"
-         data-tip="{{ include.label }}{% if spec.description %} — {{ spec.description }}{% endif %}. {% if spec.pull %}Out at{% else %}Reaches{% endif %} {{ shown }}{% if has_rested %}, rests to {{ spec.rested }}{% endif %}.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
+         data-tip="{{ include.label }}{% if spec.description %} — {{ spec.description }}{% endif %}. {% if spec.out_at %}Out at{% else %}Reaches{% endif %} {{ shown }}{% if has_rested %}, rests to {{ spec.rested }}{% endif %}.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
   </div>
 </div>

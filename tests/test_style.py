@@ -991,8 +991,19 @@ def test_pan_and_ingredient_sizes_use_digits_in_drafts():
 # expected to be green.
 _OVEN_WORD_RE = re.compile(r"\b(?:bake|roast|blast|oven)\w*\b", re.I)
 _OVEN_TEMP_RE = re.compile(r"\d{2,3}(?:[–-]\d{2,3})?\s*°C(\s*fan)?\b", re.I)
+# The phrasings that mark a °C figure as an INTERNAL temperature rather than an
+# oven setting, so the fan rule below doesn't demand "fan" on a thermometer
+# reading. Meat has no fan setting.
+#
+# "out at" / "take it out at" joined the list on 2026-08-14, when the reference
+# work standardised on that wording -- Helen: "I don't love the word pull...
+# mostly because it's American". The temperature charts, the timings page and
+# _layouts/recipe.html all say "out at" now, so a recipe writing the same figure
+# into a method step says it too, and this test has to know the site's own
+# vocabulary or it flags correct copy.
 _INTERNAL_TEMP_RE = re.compile(
     r"(?:(?:internal|thigh|breast|core|centre|center)\s+temp(?:erature)?\s+of"
+    r"|(?:take\s+(?:it|them)\s+)?out\s+at"
     r"|reads?|reach(?:es)?)"
     r"(?:\s+(?:at least|about|around))?\s*$",
     re.I,

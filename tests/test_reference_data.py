@@ -3,7 +3,7 @@
 WHY THIS FILE EXISTS. _data/food/internal_temperatures.yml now holds every
 temperature TWICE: once as the display string the pages and a recipe's meta
 line print ("48–50°C"), and once as a numeric pair the temperature charts draws
-from (pull_min: 48, pull_max: 50).
+from (out_at_min: 48, out_at_max: 50).
 
 Duplicating a fact is normally the thing to avoid, and the alternative was
 considered: store numbers only and render the strings in Liquid. It was not
@@ -27,13 +27,13 @@ import re
 import pytest
 
 
-# Mirrors tmp/add_numbers.py's own parser, deliberately reimplemented rather
+# Mirrors scripts/build_cooking_methods.py's own parser, deliberately reimplemented rather
 # than imported: a test that shares its parser with the thing that generated
 # the data would agree with itself no matter how wrong both were.
 _RANGE = re.compile(r"^(\d+(?:\.\d+)?)\s*(?:°C)?\s*[–-]\s*(\d+(?:\.\d+)?)")
 _SINGLE = re.compile(r"^(\d+(?:\.\d+)?)")
 
-TEMP_KEYS = ("pull", "rested", "endpoint", "target", "tender_at", "carryover",
+TEMP_KEYS = ("out_at", "rested", "endpoint", "target", "tender_at", "carryover",
              "passes_through")
 
 
@@ -118,7 +118,7 @@ def test_ranges_are_the_right_way_round(internal_temperatures):
 
 
 def test_open_ended_figures_are_flagged(internal_temperatures):
-    """`70°C+` has no upper bound, and pull_max repeats pull_min to say so.
+    """`70°C+` has no upper bound, and out_at_max repeats out_at_min to say so.
 
     Without the flag a consumer can't tell "70 to 70" (a point) from "70 and
     up" (an open end), and the charts would draw a well-done steak as a 3px
@@ -139,7 +139,7 @@ def test_open_ended_figures_are_flagged(internal_temperatures):
 
 
 def test_carryover_moves_the_temperature_up(internal_temperatures):
-    """A rested figure below its own pull figure would be a transcription slip.
+    """A rested figure below its own out_at figure would be a transcription slip.
 
     Carryover only goes one way: meat keeps cooking after it leaves the heat.
     This is the check that would have caught a digit swap in any of the 30-odd
@@ -147,11 +147,11 @@ def test_carryover_moves_the_temperature_up(internal_temperatures):
     """
     wrong = []
     for path, node in _walk(internal_temperatures):
-        if "pull_min" in node and "rested_min" in node:
-            if node["rested_min"] < node["pull_min"]:
+        if "out_at_min" in node and "rested_min" in node:
+            if node["rested_min"] < node["out_at_min"]:
                 wrong.append(
                     f"{'.'.join(path)}: rests to {node['rested_min']:g}°C but "
-                    f"is pulled at {node['pull_min']:g}°C"
+                    f"is pulled at {node['out_at_min']:g}°C"
                 )
     assert not wrong, "\n  ".join(wrong)
 
@@ -175,10 +175,15 @@ def test_every_temperature_fits_on_the_chart_axis(internal_temperatures):
     tidier fails immediately rather than quietly cropping whatever now falls
     outside it.
     """
+    # Follows the dials, which moved from assets/css/reference-demo.scss to
+    # _sass/food/_temperature-chart.scss on 2026-08-14 when the chart stopped
+    # being a demo and started drawing on recipe pages. This test caught the
+    # move itself, which is the behaviour you want from a guard that reads
+    # another file: it failed loudly rather than silently bounding nothing.
     scss = (pathlib.Path(__file__).resolve().parent.parent
-            / "assets" / "css" / "reference-demo.scss")
+            / "_sass" / "food" / "_temperature-chart.scss")
     if not scss.exists():
-        pytest.skip("the charts stylesheet has gone; nothing to bound against")
+        pytest.skip("the chart stylesheet has gone; nothing to bound against")
 
     text = scss.read_text(encoding="utf-8")
     bounds = {}
@@ -224,8 +229,8 @@ def test_doneness_levels_ascend(internal_temperatures, protein):
     if not doneness:
         pytest.skip(f"{protein} has no doneness spectrum")
 
-    levels = [(name, spec["pull_min"]) for name, spec in doneness.items()
-              if "pull_min" in spec]
+    levels = [(name, spec["out_at_min"]) for name, spec in doneness.items()
+              if "out_at_min" in spec]
     ascending = all(levels[i][1] <= levels[i + 1][1]
                     for i in range(len(levels) - 1))
     assert ascending, (
@@ -237,7 +242,7 @@ def test_doneness_levels_ascend(internal_temperatures, protein):
 # =============================================================================
 # COOKING METHODS — the calculator's data layer
 # =============================================================================
-# Generated from cooking-methods.html by tmp/emit_cooking_methods.py rather than
+# Generated from cooking-methods.html by scripts/build_cooking_methods.py rather than
 # retyped. These tests are what makes that generation trustworthy: a parser that
 # quietly mis-reads one row in sixty-six produces a data file that looks
 # perfectly plausible and schedules someone's dinner wrong.
@@ -546,7 +551,7 @@ def test_outbound_links_are_still_in_the_data(cooking_methods):
 def test_the_data_file_is_not_empty(cooking_methods):
     """A floor, and it exists because the floor gave way once.
 
-    tmp/emit_cooking_methods.py parses cooking-methods.html — and that page now
+    scripts/build_cooking_methods.py parses cooking-methods.html — and that page now
     renders FROM this data file. Running the generator against the working copy
     therefore made it its own consumer: it found no tables, wrote an empty data
     file, and the page went blank. The generator is pinned to the pre-migration
@@ -565,3 +570,324 @@ def test_the_data_file_is_not_empty(cooking_methods):
         f"expected 65 methods, found {total} — 66 were migrated and beef's "
         f"closed-oven-off method was dropped on 2026-08-14 at Helen's request"
     )
+
+
+def test_temperatures_written_into_method_text_match_the_data(internal_temperatures):
+    """A figure typed into a method step has to agree with the data behind it.
+
+    Front matter is never Liquid-templated (HANDOVER §4), so a temperature a
+    cook needs mid-step can only be typed by hand — which re-creates exactly the
+    duplication internal_temperatures.yml was built to end. The compromise is
+    the one this project already makes elsewhere: duplicate, and guard it.
+
+    SCOPED TO STEPS THAT LINK TO THE CHART. A method step is full of oven
+    temperatures ("roast at 170-180°C fan"), and no parser can tell those from
+    an internal one by looking. A step carrying `(#doneness)` has declared what
+    its number means, so that link is the marker — which also means adding the
+    link is what opts a step into being checked, rather than something separate
+    to remember.
+    """
+    import pathlib as _p
+    import re as _re
+    import yaml as _yaml
+
+    problems = []
+    for path in sorted(_p.Path("_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        if "#doneness" not in raw:
+            continue
+        fm = _yaml.safe_load(raw.split("---")[1])
+        ref = fm.get("internal_temp_ref")
+        if not ref:
+            problems.append(f"{path.name}: links to #doneness with no internal_temp_ref")
+            continue
+
+        node = internal_temperatures
+        for key in ref.split("."):
+            node = node.get(key) if isinstance(node, dict) else None
+        if fm.get("doneness"):
+            node = (node or {}).get("doneness", {}).get(fm["doneness"])
+        if not node:
+            continue                    # other tests own an unresolvable ref
+
+        allowed = set()
+        for k in ("out_at", "rested", "endpoint", "target", "tender_at"):
+            lo, hi = node.get(f"{k}_min"), node.get(f"{k}_max")
+            if lo is not None:
+                allowed.add((lo, hi))
+
+        for step in fm.get("method") or []:
+            text = step.get("step") if isinstance(step, dict) else str(step)
+            if "#doneness" not in text:
+                continue
+            # A linked step carries BOTH kinds of temperature -- "roast at
+            # 170-180°C fan ... take it out at 52–54°C" -- so the link alone
+            # isn't enough to tell them apart. House style is the discriminator:
+            # every oven temperature on this site says "fan" (§5, enforced for
+            # the methods data by test_every_oven_temperature_says_fan), and an
+            # internal one never does. Meat has no fan setting.
+            for lo, hi in _re.findall(r"(\d+)\s*[–-]\s*(\d+)\s*°C(?!\s*fan)", text):
+                if (float(lo), float(hi)) not in allowed:
+                    problems.append(
+                        f"{path.name}: step says {lo}–{hi}°C beside its "
+                        f"#doneness link, but {ref} offers "
+                        f"{sorted(allowed) or 'nothing'}"
+                    )
+
+    assert not problems, "\n  ".join(problems)
+
+
+# The three nodes whose doneness levels include figures that do NOT clear the
+# guidance cited for them. Named explicitly rather than inferred: this is a
+# specification, not a heuristic, and it is the list that decides whether a
+# chart warns anybody.
+#
+# Beef, lamb and steak are deliberately absent -- UK guidance treats pink beef
+# and lamb as fine, so there is no line to draw. Tuna has a safety_note about
+# parasites and sourcing, which a thermometer can't confirm and a threshold on a
+# temperature axis can't express.
+SAFETY_THRESHOLDS = {
+    ("fish", "salmon"): 63,
+    ("pork", "roasting"): 70,
+    ("ham", "fresh"): 70,
+}
+
+
+def test_hazardous_spectra_carry_a_drawable_threshold(internal_temperatures):
+    """A doneness level below the cited guidance must never render unqualified.
+
+    THIS IS A REAL FAILURE, not a hypothetical. The recipe-page chart shipped
+    without the shading on 2026-08-14, on the reasoning that the reference page
+    had room to explain it. Teriyaki salmon then offered "rare, out at 43–49°C"
+    as one of five equal options, with nothing anywhere on the page to say that
+    four of the five sit under the FSA benchmark. Helen caught it.
+
+    The threshold was a hard-coded `--t:63` in the charts page's markup, which is
+    exactly why it couldn't travel to the second chart that needed it. It is a
+    figure on the node now, so anything drawing that node draws the warning.
+    """
+    missing = []
+    for path, expected in SAFETY_THRESHOLDS.items():
+        node = internal_temperatures
+        for key in path:
+            node = node.get(key, {})
+        ref = ".".join(path)
+        if node.get("safety_min") != expected:
+            missing.append(f"{ref}: safety_min is {node.get('safety_min')!r}, expected {expected}")
+        if not node.get("safety_label"):
+            missing.append(f"{ref}: no safety_label, so the line would be unlabelled")
+        if not node.get("safety_summary"):
+            missing.append(f"{ref}: no safety_summary — shading says 'below the line' "
+                           f"but not which levels clear it")
+    assert not missing, "\n  ".join(missing)
+
+
+def test_a_threshold_actually_excludes_something(internal_temperatures):
+    """A threshold no level falls below is decoration, and worse, it implies the
+    page checked and found nothing wrong. Each of the three must genuinely
+    exclude at least one doneness level, and must genuinely leave at least one
+    clearing it — a line everything fails is a broken figure, not a warning.
+    """
+    def reaches(spec):
+        """The highest temperature this level actually gets to.
+
+        "Clears the guidance" is a claim about the temperature the food REACHES,
+        not the one you take it out at -- salmon's well done comes out at
+        60–63°C and rests to 65, and it is the 65 that clears the 63 benchmark.
+        Comparing out-at figures instead said no salmon doneness clears it at
+        all, which is both wrong and the kind of wrong that would have had
+        someone "fix" the threshold rather than the test.
+
+        (Pork is the case where reaching isn't sufficient -- FSA's table is
+        about temperature HELD, not passed through on the way down. That is why
+        its safety_summary says so in words: a single figure can't express it,
+        and this test isn't trying to.)"""
+        return max(spec.get("rested_max") or 0, spec.get("out_at_max") or 0)
+
+    problems = []
+    for path in SAFETY_THRESHOLDS:
+        node = internal_temperatures
+        for key in path:
+            node = node.get(key, {})
+        limit = node.get("safety_min")
+        levels = node.get("doneness") or {}
+        below = [n for n, s in levels.items() if reaches(s) < limit]
+        clears = [n for n, s in levels.items() if reaches(s) >= limit]
+        ref = ".".join(path)
+        if not below:
+            problems.append(f"{ref}: nothing falls below {limit}°C — why is the line there?")
+        if not clears:
+            problems.append(f"{ref}: NO level clears {limit}°C — the figure or the levels are wrong")
+    assert not problems, "\n  ".join(problems)
+
+
+def test_the_safety_zone_shares_the_bars_coordinate_space():
+    """The shaded zone must be measured against the same thing the bars are.
+
+    A chart row is a grid — a label column, then `1fr` — so a bar's percentage
+    resolves against that `1fr`. The zone is absolutely positioned on .tc-plot,
+    which is the WHOLE row width including the label column, so the same number
+    means two different places. Salmon's 63°C line drew at roughly 54°C, about
+    100px left of the figure it was labelled with.
+
+    That under-stated the hazard in the only direction that matters: medium and
+    medium-well sat to the right of a line they don't clear, on a chart added
+    specifically to stop a low figure reading as an unqualified option.
+
+    Checked in the SOURCE rather than by measuring a render, because there is no
+    browser here — but the thing being asserted is the actual cause, not a
+    symptom: if the zone's geometry doesn't mention the label column, it isn't
+    working in the track's coordinate space and it is wrong again.
+    """
+    scss = (pathlib.Path(__file__).resolve().parent.parent
+            / "_sass" / "food" / "_temperature-chart.scss")
+    if not scss.exists():
+        pytest.skip("the chart stylesheet has gone")
+    text = scss.read_text(encoding="utf-8")
+
+    problems = []
+    for selector in (".tc-unsafe", ".tc-threshold-label"):
+        start = text.index(selector + " {")
+        block = text[start:text.index("\n}", start)]
+        geometry = " ".join(
+            line for line in block.splitlines()
+            if line.strip().startswith(("left:", "width:"))
+        )
+        if "tc-track-start" not in geometry and "tc-track-width" not in geometry:
+            problems.append(
+                f"{selector} positions itself without the label column: {geometry.strip()!r}. "
+                f"It shares .tc-plot with the bars but not their origin, so its "
+                f"°C figure will land at a different place from theirs."
+            )
+    assert not problems, "\n  ".join(problems)
+
+
+# =============================================================================
+# DELIBERATELY NOT TESTED: cook_time against the method's own timings
+# =============================================================================
+# roast-beef-fillet said "30 mins" where its method adds up to nearer 40, and the
+# obvious response is a test that sums the times in each method and flags the
+# gap. Helen ruled it out on 2026-08-14, and the reasoning is better than the
+# test would have been: "if a recipe contains complicated meat, a nudge to the
+# temperature chart should catch most users."
+#
+# She is right that the drift is a symptom. A clock figure cannot answer "is it
+# done", so tightening it buys very little, while the ", but check cooking
+# temperatures" link in _layouts/recipe.html sends you to the thing that can.
+# The test would also be fuzzy in the worst way -- half these methods say "until
+# golden" -- so it would need an exception list longer than its own logic.
+#
+# Don't add it. If the arithmetic matters somewhere specific, fix that recipe.
+
+
+# =============================================================================
+# COVERAGE — the gap every other test in this file has
+# =============================================================================
+# Everything above validates recipes that OPTED IN. A recipe that should carry a
+# temperature and doesn't is invisible to all of it: roast turkey and roast goose
+# sat unwired for a day with 27 passing tests, because nothing was looking for
+# absence.
+#
+# So this is the inverse test. It names the proteins we hold data for, finds
+# published recipes whose main ingredients say one of them, and requires either
+# an internal_temp_ref or an entry below saying why not.
+#
+# THE OPT-OUT LIST IS THE POINT, not a way round the test. Each entry is a
+# decision with a reason attached, so "why doesn't the lamb one have a
+# temperature?" is answered in the repo rather than in someone's memory.
+PROTEIN_WORDS = {
+    "chicken": "poultry", "turkey": "poultry", "goose": "poultry", "duck": "poultry",
+    "beef": "beef", "steak": "beef", "oxtail": "beef", "brisket": "beef",
+    "pork": "pork", "gammon": "ham", "ham": "ham",
+    "lamb": "lamb", "salmon": "fish", "tuna": "fish", "trout": "fish",
+    "cod": "fish", "haddock": "fish", "mackerel": "fish", "sea bass": "fish",
+}
+
+NO_TEMPERATURE_BECAUSE = {
+    # Not the dish. The protein is a stock, a garnish or an accompaniment.
+    "cherry-glaze": "a glaze; poultry is what you'd put it on, not what you cook",
+    "plum-sauce-for-duck": "a sauce; beef stock is an ingredient",
+    "pancetta-white-bean-stew": "pancetta is cured and diced, not a cut cooked to a temperature",
+    "smoked-mackerel-pate": "the mackerel arrives smoked; nothing is cooked",
+
+    # A cut the data doesn't cover. These are the honest gaps -- each one names a
+    # real thing missing from internal_temperatures.yml rather than a chore.
+    "cumin-mint-lamb-skewers": "grilled shoulder chunks; lamb.roasting is joints and "
+                               "lamb.slow_cooked is a whole shoulder, neither is this",
+    "vietnamese-spiced-braised-venison-haunch": "venison isn't in the data at all — Helen "
+                                                "is raising an issue for it, 2026-08-14",
+
+    # Chicken pieces in a wet dish. poultry.chicken's endpoint is written for a
+    # WHOLE BIRD ("74–75°C in the thigh"), and a thigh in a stew reaches that
+    # long before the dish is finished, so quoting it would be technically true
+    # and useless. Helen's duck-leg reasoning (the figure says "in the thigh",
+    # so a leg takes it) applies to a ROASTED leg, where the temperature is what
+    # you stop at. Revisit if a pieces/braise figure is ever added.
+    "chicken-a-la-king": "diced breast in a sauce; no figure for pieces",
+    "chicken-cider-stew": "thighs and drumsticks braised; no figure for pieces",
+    "chicken-sorrel-potato-stew": "leg braised; no figure for pieces",
+    "indonesian-chicken-curry-gulai-ayam": "thighs in a curry; no figure for pieces",
+    "thai-green-chicken-curry": "chicken in a curry; no figure for pieces",
+}
+
+
+def test_every_recipe_with_a_known_protein_has_a_temperature_or_a_reason():
+    import re as _re
+    import yaml as _yaml
+
+    missing = []
+    for path in sorted(pathlib.Path("_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        if not raw.startswith("---"):
+            continue
+        fm = _yaml.safe_load(raw.split("---")[1]) or {}
+        if fm.get("internal_temp_ref") or path.stem in NO_TEMPERATURE_BECAUSE:
+            continue
+        mains = [str(x).lower() for x in (fm.get("main_ingredients") or [])]
+        hits = sorted({fam for word, fam in PROTEIN_WORDS.items()
+                       if any(_re.search(rf"\b{word}\b", m) for m in mains)})
+        if hits:
+            missing.append(f"{path.stem}: names {hits} — add an internal_temp_ref, "
+                           f"or an entry in NO_TEMPERATURE_BECAUSE saying why not")
+    assert not missing, "\n  ".join(missing)
+
+
+def test_the_opt_out_list_has_no_stale_entries():
+    """An opt-out for a recipe that has since been wired, renamed or deleted is
+    worse than no entry: it silently exempts nothing while looking like a
+    decision someone made."""
+    import yaml as _yaml
+    stale = []
+    for slug in NO_TEMPERATURE_BECAUSE:
+        path = pathlib.Path("_food_recipes") / f"{slug}.md"
+        if not path.exists():
+            stale.append(f"{slug}: no such recipe")
+            continue
+        fm = _yaml.safe_load(path.read_text(encoding="utf-8").split("---")[1]) or {}
+        if fm.get("internal_temp_ref"):
+            stale.append(f"{slug}: now wired to {fm['internal_temp_ref']}, so the opt-out is dead")
+    assert not stale, "\n  ".join(stale)
+
+
+def test_chart_anchors_point_at_sections_that_exist(internal_temperatures):
+    """Every chart_anchor has to match an id on the temperatures page.
+
+    A wrong one doesn't error anywhere: the recipe's "more meat temperatures"
+    link renders, resolves to a real page, and lands at the top of it. The only
+    symptom is arriving in the wrong place, which reads as a missing scroll
+    rather than a broken link — and it will happen the first time a section is
+    renamed, which has already happened twice this week (Steak -> Beef: steak,
+    Everything one scale -> All).
+    """
+    page = pathlib.Path("food/reference/temperatures.html")
+    if not page.exists():
+        pytest.skip("the temperatures page has moved; nothing to check against")
+    ids = set(re.findall(r'id="([^"]+)"', page.read_text(encoding="utf-8")))
+
+    broken = []
+    for path, node in _walk(internal_temperatures):
+        anchor = node.get("chart_anchor")
+        if anchor and anchor not in ids:
+            broken.append(f"{'.'.join(path)}: chart_anchor {anchor!r} — "
+                          f"the page has {sorted(i for i in ids if i != 'top')}")
+    assert not broken, "\n  ".join(broken)

@@ -24,36 +24,62 @@ layout: default
      on whatever it resolved to rather than assuming one from the protein
      name -- see that file's own header comment. {% endcomment %}
   {% assign _internal_temp = nil %}
+  {% assign _temp_spectrum = nil %}
   {% if page.internal_temp_ref %}
     {% assign _temp_node = site.data.food.internal_temperatures %}
     {% assign _temp_path = page.internal_temp_ref | split: "." %}
     {% for _key in _temp_path %}
       {% assign _temp_node = _temp_node[_key] %}
     {% endfor %}
-    {% if page.doneness %}
-      {% assign _temp_node = _temp_node.doneness[page.doneness] %}
+    {% comment %} A node carrying a `doneness` map is a SPECTRUM, and the two
+       cases below are genuinely different. With a `doneness:` in front matter
+       we resolve to that one level. WITHOUT one we must not resolve into the
+       node itself: beef.tender_roast has no pull/endpoint/target/tender_at of
+       its own -- only carryover and the doneness map -- so every test in the
+       chain below failed and the meta line rendered its label and its link with
+       NO FIGURE BETWEEN THEM. Silent, and sitting directly in front of the
+       rollout in issue #202, because `internal_temp_ref: beef.tender_roast` is
+       exactly what you would naturally write. {% endcomment %}
+    {% if _temp_node.doneness %}
+      {% assign _temp_spectrum = _temp_node %}
+      {% if page.doneness %}
+        {% assign _internal_temp = _temp_node.doneness[page.doneness] %}
+      {% endif %}
+    {% else %}
+      {% assign _internal_temp = _temp_node %}
     {% endif %}
-    {% assign _internal_temp = _temp_node %}
   {% endif %}
 
   <ul class="recipe-meta">
     {% if page.serves %}<li><strong>Serves</strong><span>{{ page.serves }}</span></li>{% endif %}
     {% if page.makes %}<li><strong>Makes</strong><span>{{ page.makes }}</span></li>{% endif %}
     {% if page.prep_time %}<li><strong>Prep</strong><span>{{ page.prep_time }}</span></li>{% endif %}
-    {% if page.cook_time %}<li><strong>Cook</strong><span>{{ page.cook_time }}</span></li>{% endif %}
-    {% if _internal_temp %}
+    {% comment %} A wired recipe's cook time hands off to its own temperatures
+       rather than pretending a single number settles it. Helen, on roast beef
+       fillet: "About 30 mins, but check beef cooking temperatures."
+
+       That is the right shape for the whole collection, not just that recipe.
+       The clock figure was doing two jobs badly -- planning ("when do I start?")
+       and doneness ("when is it ready?") -- and it can only ever do the first.
+       An earlier attempt loaded the second onto it as "40 mins for medium rare",
+       which Helen rejected: qualifying the number doesn't help, because the
+       number was never the answer to that question.
+
+       Added by the layout rather than typed into cook_time, so no markup lives
+       in a metadata field and every wired recipe says it the same way. {% endcomment %}
+    {% if page.cook_time %}
       <li>
-        <strong>Internal temp</strong>
-        <span>
-          {% if _internal_temp.pull %}Pull at {{ _internal_temp.pull }}{% if _internal_temp.rested %}, rest to {{ _internal_temp.rested }}{% endif %}
-          {% elsif _internal_temp.endpoint %}{{ _internal_temp.endpoint }}
-          {% elsif _internal_temp.target %}{{ _internal_temp.target }}
-          {% elsif _internal_temp.tender_at %}Tender at {{ _internal_temp.tender_at }}
-          {% endif %}
-          (<a href="{{ '/food/reference/internal-temperatures/' | relative_url }}">more</a>)
-        </span>
+        <strong>Cook</strong>
+        <span>{{ page.cook_time }}{% if _temp_spectrum or _internal_temp %}, but check <a href="#doneness">cooking temperatures</a>{% endif %}</span>
       </li>
     {% endif %}
+    {% comment %} NO INTERNAL-TEMP CELL HERE ANY MORE. Helen: "I don't like the
+       internal temperature featuring in the metadata -- it's ugly, it spoils
+       the rule of 3, and it's nowhere in sight when you're actually cooking."
+       All three are true, and the last is the one that decides it: this grid is
+       read once, while deciding whether to cook the thing. A temperature is
+       read with a probe in your hand, twenty minutes in. It lives below Notes
+       now, and the method step that needs it links straight to it. {% endcomment %}
   </ul>
 
   {% if page.source %}<p class="recipe-source">Source: {{ page.source }}</p>{% endif %}
@@ -191,6 +217,24 @@ layout: default
         {% endif %}
       {% endfor %}
     </div>
+  {% endif %}
+
+  {% comment %} BELOW NOTES, and with an id, because it is a thing you are sent
+     to rather than a thing you scroll past. Helen: "I like including the image,
+     but it can't go above the fold." It was sitting between the metadata and the
+     ingredients, which put reference material in the middle of the decision to
+     cook at all.
+
+     Rendered for ANY wired recipe, not just the ones with a spectrum: with the
+     meta cell gone this is the only place a single figure appears, so a tough
+     cut's "tender at 90–96°C" would otherwise have nowhere to live. {% endcomment %}
+  {% if _temp_spectrum or _internal_temp %}
+    <div id="doneness" class="recipe-section-temp">
+      <h2 class="recipe-section-heading">
+        <span class="section-heading-text">{% if _temp_spectrum %}Doneness{% else %}Internal temp{% endif %}</span>
+      </h2>
+    </div>
+    {% include food/doneness_chart.html node=_temp_spectrum single=_internal_temp suggested=page.doneness %}
   {% endif %}
 
   {% if content != '' %}

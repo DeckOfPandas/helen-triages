@@ -7,6 +7,8 @@ prep_time: "10 mins plus at least 30 mins marinading"
 cook_time: "11–14 mins"
 main_ingredients: ["salmon", "tamari", "mirin", "dark brown soft sugar", "honey", "garlic cloves", "fresh ginger", "rice vinegar"]
 star_ingredient: "oily fish"
+internal_temp_ref: fish.salmon
+doneness: medium
 tags: ["fakeaway", "make-ahead"]
 ingredient_groups:
   - name: salmon

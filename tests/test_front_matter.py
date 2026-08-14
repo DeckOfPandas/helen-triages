@@ -54,6 +54,39 @@ def test_tagline_is_not_blank(recipe):
     )
 
 
+def test_doneness_names_a_real_level(recipe, internal_temperatures):
+    """`doneness` has to name a level the resolved node actually offers, and the
+    node has to be one that offers levels at all.
+
+    Both failures are silent in Liquid. A typo'd level resolves to nothing, so
+    the meta line renders its label and its link with no figure between them;
+    and `doneness` on a single-figure node (poultry, a tough cut) does nothing
+    while looking like it configures something.
+
+    This became worth testing when issue #189's doneness chart landed: the front
+    matter now drives which row is marked as the recipe's own suggestion, so a
+    wrong level means a chart that recommends nothing, with no error anywhere.
+    """
+    ref, level = recipe.fm.get("internal_temp_ref"), recipe.fm.get("doneness")
+    if not ref or not level:
+        return
+
+    node = internal_temperatures
+    for key in ref.split("."):
+        node = node.get(key) if isinstance(node, dict) else None
+    if node is None:
+        return                      # test_internal_temp_ref_resolves owns this
+
+    assert "doneness" in node, (
+        f"{where(recipe)} sets `doneness: {level}`, but {ref} has no doneness "
+        f"levels — it is a single figure, so there is nothing to choose."
+    )
+    assert level in node["doneness"], (
+        f"{where(recipe)} sets `doneness: {level}`, which {ref} doesn't offer. "
+        f"It has: {sorted(node['doneness'])}"
+    )
+
+
 def test_internal_temp_ref_resolves(recipe, internal_temperatures):
     """`internal_temp_ref` (+ optional `doneness`) must resolve to a real
 

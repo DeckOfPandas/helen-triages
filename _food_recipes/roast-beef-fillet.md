@@ -4,9 +4,11 @@ tagline: "Seared and roasted beef fillet — simple, perfect, showstopper. Lovel
 source: "Adapted from Gordon Ramsay"
 serves: "4–6"
 prep_time: "20 mins"
-cook_time: "30 mins"
+cook_time: "About 30 mins"
 main_ingredients: ["beef fillet"]
 star_ingredient: "beef"
+internal_temp_ref: beef.tender_roast
+doneness: medium_rare
 tags: ["showstopper"]
 ingredient_groups:
   - items:
@@ -16,7 +18,7 @@ ingredient_groups:
 method:
   - "Take the fillet out of the fridge at least 30 mins before cooking. Pre-heat the roasting pan at 170-180°C fan."
   - "Trim any fat or sinew from the fillet and season all over. Sear the beef very hot for 1½–2 mins on each side until evenly browned."
-  - "Transfer to the hot roasting pan and roast at 170-180°C fan depending on thickness for 25 mins for medium rare — it should feel a little springy when lightly pressed. Rest for 10 mins."
+  - "Transfer to the hot roasting pan and roast at 170-180°C fan depending on thickness for 25 mins for medium rare — take it out at 52–54°C ([more](#doneness)), when it should feel a little springy when lightly pressed. Rest for 10 mins."
   - "Slice thickly and overlap on a serving platter."
 method_short:
   - ""

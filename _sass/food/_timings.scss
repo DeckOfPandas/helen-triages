@@ -1,0 +1,325 @@
+// =============================================================================
+// HELEN TRIAGES FOOD - THE TIMINGS AND METHODS PAGE
+// =============================================================================
+// Promoted out of assets/css/reference-demo.scss on 2026-08-14, when the page
+// stopped being a proposal. That stylesheet is gone: it existed to let two
+// demos be styled without touching the real site, and there are no demos left.
+// Loaded by /food/reference/timings/ via food.scss. The temperature chart
+// styles that used to live here moved to _sass/food/_temperature-chart.scss on
+// 2026-08-14, when recipe pages started drawing doneness spectra too (#189):
+// two pages using a device is the point at which it stops being a demo. What is
+// left here is the timings calculator, which is still a proposal.
+
+@import "food/palette";
+@import "shared/tokens";
+@import "shared/rule";
+@import "food/rule";
+// --- Demo page furniture, not part of the proposal ---------------------------
+.tc-note {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: $color-clear-text;
+  max-width: 62ch;
+  margin: 0 0 $space-xl 0;
+}
+
+// =============================================================================
+// THE TIMING CALCULATOR
+// =============================================================================
+// Scoped to .ct-* and loaded by the same demo stylesheet as the charts, because
+// the two instruments are meant to read as one family: same Courier labels,
+// same violet, same restraint about colour.
+//
+// A CARD PER METHOD, not a table row. The calculator's whole job is to answer
+// "how long, which way?", which means comparing seven methods at a glance --
+// and a table forces every method into the same columns even when they don't
+// have the same shape (one is timed by the piece, one runs in two stages, two
+// refuse to answer at all). Cards let a row say something different without
+// leaving a hole in a grid.
+
+// TWO GRID ROWS, NOT FOUR FLEX COLUMNS. Helen: "the time calculator box labels
+// are misaligned vertically." They were: the fields were flex columns aligned
+// at their BOTTOM edge, which lines the inputs up perfectly and lets the labels
+// float to wherever their own height puts them -- so "Eating at (optional)",
+// being the one label that wraps to two lines, sat a line higher than its
+// neighbours.
+//
+// Fixing the symptom (a min-height on the label) would hold only until someone
+// wrote a longer label. A grid with an explicit label row and input row makes
+// the alignment structural: every label is in row 1 and every input in row 2,
+// however many lines either takes. `display: contents` on the field lets the
+// label and its input become grid items directly while keeping the <label>
+// wrapping its own <input>, so the two stay associated without a `for`.
+.ct-form {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  grid-template-rows: auto auto;
+  // Row gap between the labels and their inputs, column gap between fields.
+  gap: $space-sm $space-xl;
+  margin: 0 0 $spacing-block-gap 0;
+}
+
+.ct-field {
+  display: contents;
+
+  // Labels sit on the row's bottom edge, so a one-line and a two-line label
+  // share a baseline immediately above their inputs.
+  > span { align-self: end; }
+
+  > span {
+    font-family: $font-headings;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-label;
+    color: $color-text;
+    -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+    @include punched(raised);
+
+    // "(optional)" carries the one instruction that matters most about this
+    // form -- Helen: "don't enforce giving an end time". Set quieter than its
+    // label so the form reads as "weight, and optionally more" at a glance.
+    em {
+      font-family: $font-body;
+      font-style: italic;
+      text-transform: none;
+      letter-spacing: 0;
+      -webkit-text-stroke: 0;
+      text-shadow: none;
+      color: $color-clear-text;
+    }
+  }
+
+  input, select {
+    font-family: $font-headings;
+    font-size: 1rem;
+    color: $color-text;
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-bottom: 2px solid rgba($color-vibrant-violet, 0.55);
+    border-radius: $radius-sm;
+    padding: $space-sm $space-md;
+    min-width: 8rem;
+
+    &:focus-visible {
+      outline: 2px solid $color-vibrant-violet;
+      outline-offset: 1px;
+    }
+  }
+}
+
+// The answer to the question you just asked, so it gets room and a size --
+// Helen: "it could use some tasteful vertical space in the top sections, above
+// the cards." The page had form, summary, table and cards stacked at one
+// rhythm, which read as one undifferentiated column. Now there are three
+// bands: the controls, the answer and the table you choose from, and the cards
+// under their own heading.
+// THE TOP OF THE PAGE NEEDED AIR. Helen: "we need more vertical space at the
+// top... or at least some change to help me breathe." Title, summary, "Done
+// at", four labels and four inputs were arriving at one rhythm inside about
+// 300px, so nothing had a chance to read as a separate step.
+//
+// The gaps now say what belongs to what: the two summary lines sit close
+// together because they are one answer, and the whole block is held well clear
+// of the controls beneath it — which is the junction that was tightest, the
+// bold "Done at" line landing directly on top of the WHAT label.
+.ct-summary {
+  font-size: 1.06rem;
+  line-height: 1.5;
+  // Clear of the title above and of the controls below in its own right: it is
+  // the sentence that explains what the four boxes are for, and it only does
+  // that job if it isn't crowded onto them.
+  margin: $space-xl 0 $spacing-section-top 0;
+  max-width: 62ch;
+}
+
+// The finishing temperature, now BELOW the controls because it is a result of
+// them. Figure left, way-out right: the two are different kinds of thing -- one
+// is the answer, one is an admission that this page shows a single doneness at
+// a time -- and pushing them apart stops the link reading as part of the
+// sentence.
+// Controls plus the figure they produce, as one band closed by a rule. The rule
+// used to sit between the two, which grouped the finishing temperature with the
+// table below -- something it has nothing to do with -- and is why it read as
+// lost rather than as an answer.
+.ct-controls {
+  padding: 0 0 $spacing-block-gap 0;
+  border-bottom: 1px solid $color-border;
+  margin: 0 0 $spacing-section-top 0;
+}
+
+.ct-doneat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-md;
+  font-size: 1.06rem;
+  // No margin of its own: it closes the band, and the wrapper owns the gap
+  // between that band and the table.
+  margin: 0;
+
+  a {
+    font-family: $font-body;
+    font-weight: 600;
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+}
+
+#ct-table {
+  margin-bottom: $spacing-section-gap;
+}
+
+// The one line left of what used to be four paragraphs of explanation.
+.ct-seealso {
+  margin-top: $spacing-section-gap;
+}
+
+.ct-results {
+  display: grid;
+  // Wider than the old 17rem: the name and the time now share the card's top
+  // line, and at 17rem a long method name wrapped under its own time and undid
+  // the point of putting them on one line.
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: $spacing-block-gap;
+  margin-bottom: $spacing-section-gap;
+}
+
+.ct-card {
+  padding: $space-xl;
+  // The violet wash, spelled out rather than borrowed. $color-box-tint and
+  // $box-tint-opacity live in food/_recipe-header.scss, which this standalone
+  // stylesheet deliberately does not import -- pulling that partial in to reach
+  // two variables would emit the whole recipe page's CSS alongside a demo. The
+  // values are the same 3% violet the note boxes and metadata grid use.
+  background-color: rgba($color-vibrant-violet, 0.03);
+  border-radius: $radius-sm;
+  // The violet edge is the same "this is structural" signal the charts' bars
+  // carry; a declined card drops it to grey, below, so refusal is visible
+  // before you read a word.
+  border-left: 3px solid rgba($color-vibrant-violet, 0.55);
+
+  &--declined {
+    border-left-color: $color-border;
+    background: none;
+  }
+}
+
+// THE CARD'S TOP LINE: the method and its time, at the same weight, with the
+// time pushed to the right edge so a column of cards can be read down either
+// side. They answer one question between them and used to be three elements
+// apart, with a large number arriving before the thing it described.
+.ct-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-md;
+  margin: 0 0 $space-xs 0;
+}
+
+.ct-card-name,
+.ct-total {
+  font-family: $font-headings;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: $color-text;
+  margin: 0;
+}
+
+.ct-card-name {
+  letter-spacing: 0.02em;
+  -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+  @include punched(raised);
+}
+
+.ct-total {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// The two things you actually set: oven and covering, on one line, directly
+// under the head. `.ct-outcome` used to sit between them and is gone -- the
+// decision table three paragraphs up already says it, and repeating it opened
+// every card with two near-identical sentences.
+.ct-settings {
+  font-family: $font-headings;
+  font-size: 0.76rem;
+  color: $color-clear-text;
+  margin: 0 0 $space-md 0;
+  line-height: 1.4;
+}
+
+.ct-declined {
+  font-family: $font-headings;
+  font-size: 0.86rem;
+  color: $color-clear-text;
+  margin: 0 0 $space-sm 0;
+}
+
+.ct-stages, .ct-schedule {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 $space-md 0;
+  font-size: 0.88rem;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: $space-md;
+    padding: $space-xxs 0;
+    border-bottom: 1px dotted $color-border;
+
+    &:last-child { border-bottom: 0; }
+
+    span:first-child {
+      font-family: $font-headings;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: $letter-spacing-label;
+      color: $color-clear-text;
+      flex-shrink: 0;
+    }
+
+    em {
+      font-size: 0.78rem;
+      color: $color-clear-text;
+    }
+  }
+}
+
+.ct-aside {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: $color-clear-text;
+  margin: 0 0 $space-sm 0;
+}
+
+.ct-meta {
+  font-size: 0.8rem;
+  margin: 0 0 $space-xs 0;
+
+  span {
+    font-family: $font-headings;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-label;
+    color: $color-clear-text;
+    margin-right: $space-sm;
+  }
+}
+
+// Caveats and notes, as ONE closing block rather than two paragraphs at full
+// spacing -- which gave a footnote the same presence as the answer above it.
+// Set apart by a rule instead of by a gap, so the card ends deliberately rather
+// than just running out.
+.ct-notes {
+  font-size: 0.82rem;
+  color: $color-clear-text;
+  margin: $space-md 0 0 0;
+  padding-top: $space-md;
+  border-top: 1px solid rgba($color-vibrant-violet, 0.15);
+  line-height: 1.5;
+}
+
