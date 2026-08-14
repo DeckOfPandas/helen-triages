@@ -8,7 +8,7 @@
 // above: near-black reads better than the category -active hue sitting on
 // top of the full-colour tape shape. No emboss/raised text-shadow any more
 // either (same date, same rule as the buttons above) — flat stroke, same
-// $color-text (not a category hue) and same 0.6px width as the buttons, so
+// $color-text (not a category hue) and same $faux-bold-stroke width as the buttons, so
 // the category identity lives only in .tag-shape's own fill, lightened
 // further again (mix with white, 12% -> 18%) to keep backing off the
 // loudness now that neither the shadow nor the stroke are carrying it.
@@ -27,9 +27,9 @@
   // pills). No more background-color: that was the pre-tape-shape fill,
   // stale since the SVG shape itself is the visible fill now and sits
   // UNDER it doing nothing.
-  &.badge-star           { -webkit-text-stroke: 0.6px $color-text; .tag-shape { color: mix($color-star-root, $color-white, 82%); } }
-  &.badge-mood           { -webkit-text-stroke: 0.6px $color-text; .tag-shape { color: mix($color-mood-root, $color-white, 82%); } }
-  &.badge-practicalities { -webkit-text-stroke: 0.6px $color-text; .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); } }
+  &.badge-star           { -webkit-text-stroke: $faux-bold-stroke $color-text; .tag-shape { color: mix($color-star-root, $color-white, 82%); } }
+  &.badge-mood           { -webkit-text-stroke: $faux-bold-stroke $color-text; .tag-shape { color: mix($color-mood-root, $color-white, 82%); } }
+  &.badge-practicalities { -webkit-text-stroke: $faux-bold-stroke $color-text; .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); } }
 }
 
 // Layers on top of a badge-star/mood/practicalities that's ALSO an
@@ -44,7 +44,7 @@
   letter-spacing: 0.04em;
   color: $color-text;
   text-shadow: none;
-  -webkit-text-stroke: 0.6px $color-text;
+  -webkit-text-stroke: $faux-bold-stroke $color-text;
 }
 
 // --- Global clear-all button (JS-created, prepended to .controls) -----
@@ -73,6 +73,20 @@
   &:hover {
     color: $color-star-root;
   }
+}
+
+// Issue #67: the same button repeated after the last filter section, so
+// clearing doesn't mean scrolling back past all five. Overrides the base
+// rule's `position: absolute` -- this one sits in normal flow, at the end of
+// `.controls`, not pinned to the matrix's own top-right corner. `width:
+// fit-content` gives it a definite (shrink-to-fit) box so `margin-left: auto`
+// has spare width to consume and pushes it to the right, same edge as the
+// top copy, without needing a wrapping element.
+.btn-clear--bottom {
+  position: static;
+  display: block;
+  width: fit-content;
+  margin: $spacing-block-gap 0 0 auto;
 }
 
 .recipe-list-empty,

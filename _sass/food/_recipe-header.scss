@@ -469,7 +469,10 @@ article.recipe a {
   white-space: nowrap;
   vertical-align: middle;
 
-  &:hover { color: $color-recipe-link; }
+  // Issue #199: was $color-recipe-link (the darker resting link colour) --
+  // the one hover on the page going darker instead of lighter, against the
+  // "lighter on hover" rule article.recipe a and %link-button both follow.
+  &:hover { color: $color-recipe-link-hover; }
 }
 
 // --- A button that looks like a body link ------------------------------------

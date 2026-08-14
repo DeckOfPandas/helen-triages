@@ -166,6 +166,6 @@
   background: none;
   color: $color-text;
   text-shadow: none;
-  -webkit-text-stroke: 0.6px $color-text;
+  -webkit-text-stroke: $faux-bold-stroke $color-text;
   .tag-shape { color: mix($color-ingredient-root, $color-white, 82%); }
 }
