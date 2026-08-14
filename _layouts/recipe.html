@@ -180,8 +180,8 @@ layout: default
                 <span class="ingredient-amount-number highlighted">
                   <span class="highlighter-slot" aria-hidden="true"></span>{{ amount_number }}{% if amount_unit != "" %} {{ amount_unit }}{% endif %}</span></span>
             {% endif %}
-            {{ item.item | markdownify | remove: '<p>' | remove: '</p>' }}
-            {% if item.note %}<span class="ingredient-annotation"><span class="annotation-mark" aria-hidden="true"></span>{{ item.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
+            {{ item.item | markdownify | remove: '<p>' | remove: '</p>' | strip }}
+            {%- if item.note %}<span class="ingredient-annotation"><span class="annotation-mark" aria-hidden="true"></span>{{ item.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
           </li>
         {% else %}
           <li class="ingredient">{{ item | markdownify | remove: '<p>' | remove: '</p>' }}</li>
