@@ -468,6 +468,17 @@ def test_every_method_has_a_short_outcome(cooking_methods):
 # Every column name _includes/food/method_table.html knows how to fill. A name
 # outside this set renders an EMPTY CELL rather than failing, so the test is the
 # only thing standing between a renamed column and a silently blank table.
+def test_every_protein_points_at_the_ruler(cooking_methods):
+    """Each protein carries `ruler_anchor`, the section of the temperature ruler
+    holding its full doneness spectrum, so the "see other doneness" link has
+    somewhere to go. Not derivable from internal_temp_ref: four birds share one
+    ruler section, and beef's ref points at tender_roast while the ruler splits
+    beef three ways. A missing anchor doesn't error — the link just isn't
+    rendered, and the page quietly dead-ends on one doneness figure."""
+    missing = [p for p, node in cooking_methods.items() if not node.get("ruler_anchor")]
+    assert not missing, f"no ruler_anchor for: {missing}"
+
+
 KNOWN_COLUMNS = {
     "Method", "Oven temp", "Timing", "Timing (per kg)", "Temp change",
     "Covering", "Temp/covering", "Liquid", "Weight range", "Notes",
@@ -550,4 +561,7 @@ def test_the_data_file_is_not_empty(cooking_methods):
         f"{sorted(cooking_methods)}"
     )
     total = sum(len(node["methods"]) for node in cooking_methods.values())
-    assert total == 66, f"expected 66 methods, found {total}"
+    assert total == 65, (
+        f"expected 65 methods, found {total} — 66 were migrated and beef's "
+        f"closed-oven-off method was dropped on 2026-08-14 at Helen's request"
+    )

@@ -444,6 +444,30 @@ $tr-label-gap: $space-xl;
   max-width: 62ch;
 }
 
+// Two lines, and they are different kinds of thing: the first describes what
+// you are looking at, the second is a figure you act on at the end. Stacking
+// them is the whole point -- riding along at the tail of a sentence is how the
+// temperature got overlooked.
+.ct-summary-count,
+.ct-summary-temp {
+  display: block;
+}
+
+.ct-summary-temp {
+  margin-top: $space-sm;
+
+  // The way out to the rest of the spectrum. Body font and normal weight
+  // inside a bold line, so it reads as a link rather than as more of the
+  // heading it sits in.
+  a {
+    font-family: $font-body;
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin-left: $space-sm;
+    white-space: nowrap;
+  }
+}
+
 #ct-table {
   margin-bottom: $spacing-section-gap;
 }
@@ -459,7 +483,7 @@ $tr-label-gap: $space-xl;
 }
 
 .ct-card {
-  padding: $space-lg $space-xl;
+  padding: $space-xl;
   // The violet wash, spelled out rather than borrowed. $color-box-tint and
   // $box-tint-opacity live in food/_recipe-header.scss, which this standalone
   // stylesheet deliberately does not import -- pulling that partial in to reach
@@ -511,17 +535,10 @@ $tr-label-gap: $space-xl;
   flex-shrink: 0;
 }
 
-// What you get, in the same words the decision table uses -- so a card you
-// arrive at from that table confirms itself rather than restating.
-.ct-outcome {
-  font-size: 0.92rem;
-  color: $color-text;
-  margin: 0 0 $space-sm 0;
-}
-
-// The two things you actually set: oven and covering, on one line. Each was a
-// separate paragraph before, one of them spending a full row on four
-// characters.
+// The two things you actually set: oven and covering, on one line, directly
+// under the head. `.ct-outcome` used to sit between them and is gone -- the
+// decision table three paragraphs up already says it, and repeating it opened
+// every card with two near-identical sentences.
 .ct-settings {
   font-family: $font-headings;
   font-size: 0.76rem;
@@ -589,10 +606,16 @@ $tr-label-gap: $space-xl;
   }
 }
 
+// Caveats and notes, as ONE closing block rather than two paragraphs at full
+// spacing -- which gave a footnote the same presence as the answer above it.
+// Set apart by a rule instead of by a gap, so the card ends deliberately rather
+// than just running out.
 .ct-notes {
   font-size: 0.82rem;
   color: $color-clear-text;
-  margin: 0;
+  margin: $space-md 0 0 0;
+  padding-top: $space-md;
+  border-top: 1px solid rgba($color-vibrant-violet, 0.15);
   line-height: 1.5;
 }
 

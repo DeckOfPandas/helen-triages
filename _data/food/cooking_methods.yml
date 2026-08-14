@@ -42,6 +42,7 @@
 chicken:
   label: Chicken
   internal_temp_ref: poultry.chicken
+  ruler_anchor: poultry
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -156,6 +157,7 @@ chicken:
 turkey:
   label: Turkey
   internal_temp_ref: poultry.turkey
+  ruler_anchor: poultry
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -287,6 +289,7 @@ turkey:
 goose:
   label: Goose
   internal_temp_ref: poultry.goose
+  ruler_anchor: poultry
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -387,6 +390,7 @@ goose:
 duck:
   label: Duck
   internal_temp_ref: poultry.duck
+  ruler_anchor: poultry
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -488,6 +492,7 @@ duck:
 beef:
   label: Beef
   internal_temp_ref: beef.tender_roast
+  ruler_anchor: beef-tender-roasting-cuts
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -551,17 +556,6 @@ beef:
     flat_add: 10
     flat_add_max: 15
     notes: Combines even cook with a crisp exterior. Same base-rate correction as the row above
-  - id: closed_oven_off_method
-    name: Closed-oven-off method
-    shape: unparsed
-    timing: ~1.5–3 hrs in residual heat, oven-dependent
-    group: Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast
-    covering: Uncovered
-    temp_change: Oven switched off
-    outcome: Old trick, oven-dependent
-    oven: Sear at 230°C fan for 20 min, turn oven off, leave door shut
-    oven_basis: inferred
-    notes: Old technique; timing is oven-dependent — confirm with thermometer
   - id: oven_brisket_covered_no_liquid
     name: Oven brisket, covered, no liquid
     shape: rate
@@ -643,7 +637,7 @@ beef:
     - kind: weight
       html: '<strong>Weight range:</strong> formulas hold well for <strong>1–4 kg</strong>. Below 1 kg, treat like a large steak and check early. Above 4–5 kg, switch to thermometer-only timing. Doneness pull temps: see <a href="../internal-temperatures/#beef">internal temperatures</a>.'
     - kind: sources
-      html: 'Sources: <a href="https://www.waitrose.com/ecom/content/inspiration/guides/roast-guide">Waitrose''s roast guide</a> (20 min/500g rare, 25 min/500g medium, at 160°C fan) and Certified Angus Beef for the standard/sear rates. River Cottage''s slow-roast method for the reverse-sear row (flagged moderate confidence — sourced for one joint size, not a range of weights). Closed-oven-off wasn''t re-checked; it was already appropriately hedged. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
+      html: 'Sources: <a href="https://www.waitrose.com/ecom/content/inspiration/guides/roast-guide">Waitrose''s roast guide</a> (20 min/500g rare, 25 min/500g medium, at 160°C fan) and Certified Angus Beef for the standard/sear rates. River Cottage''s slow-roast method for the reverse-sear row (flagged moderate confidence — sourced for one joint size, not a range of weights). Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
   - name: Tough/working cuts — brisket, chuck, short rib, pot roast
     columns:
     - Method
@@ -663,6 +657,7 @@ beef:
 pork:
   label: Pork
   internal_temp_ref: pork.roasting
+  ruler_anchor: pork
   methods:
   - id: standard_constant_roast_lean_loin_no_crackling
     name: Standard constant roast — lean loin, no crackling
@@ -842,6 +837,7 @@ pork:
 lamb:
   label: Lamb
   internal_temp_ref: lamb.roasting
+  ruler_anchor: lamb
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -1003,6 +999,7 @@ lamb:
 ham:
   label: Ham
   internal_temp_ref: ham.cured
+  ruler_anchor: ham
   methods:
   - id: standard_constant_roast_plain
     name: Standard constant roast, plain

@@ -217,12 +217,29 @@
       return;
     }
 
+    /* TWO LINES, NOT ONE SENTENCE. The finishing temperature is the thing you
+       act on at the end and it was riding along at the tail of a sentence about
+       how many methods there are. It gets its own line, and a way out to the
+       rest of its own spectrum: this page can only show one doneness at a time,
+       and "rare" is not an opinion anyone should be stuck with. */
     var temp = finishingTemp(protein.internal_temp_ref);
-    els.summary.innerHTML =
-      protein.methods.length + " ways to cook " + kg + " kg of " +
-      els.protein.options[els.protein.selectedIndex].text.toLowerCase() +
-      (serveAt === null ? ". Add a serving time for clock times." : ".") +
-      (temp ? " <strong>Done at " + temp + "</strong>." : "");
+    var proteinName = els.protein.options[els.protein.selectedIndex].text.toLowerCase();
+
+    var lines =
+      "<span class='ct-summary-count'>" +
+        protein.methods.length + " ways to cook " + kg + " kg of " + proteinName +
+        (serveAt === null ? ". Add a serving time for clock times." : ".") +
+      "</span>";
+
+    if (temp) {
+      lines += "<strong class='ct-summary-temp'>Done at " + temp +
+        (protein.ruler_anchor
+          ? " <a href='../temperature-ruler/#" + protein.ruler_anchor +
+            "'>see other doneness</a>"
+          : "") +
+        "</strong>";
+    }
+    els.summary.innerHTML = lines;
 
     /* --- the decision table ------------------------------------------------
        The cards below answer "how long does this method take". They do not
@@ -234,7 +251,24 @@
        Table for choosing, cards for doing. Uses the site's existing table
        styles (article.recipe .recipe-body-content table) and the .table-scroll
        wrapper that already exists for wide tables -- no new CSS. */
-    var rows = protein.methods.map(function (method) {
+    /* ONE ORDER FOR BOTH VIEWS, shortest first. Helen: "either order it by time
+       taken (lower bound) or alphabetically by method name, then same for the
+       cards." Time wins over alphabetical because it makes the table a ranking
+       rather than a list -- "what can I do in the time I have" is the question
+       a sorted column answers for free, and alphabetical answers nothing.
+
+       The two rows that decline to be timed sort last: they have no lower bound
+       to rank on, and an unanswerable row at the top of a table of times would
+       read as the fastest. */
+    var ordered = protein.methods.slice().sort(function (a, b) {
+      var ra = resolve(a, kg, doneness, protein.methods);
+      var rb = resolve(b, kg, doneness, protein.methods);
+      if (ra.ok !== rb.ok) return ra.ok ? -1 : 1;
+      if (!ra.ok) return a.name.localeCompare(b.name);
+      return ra.lo - rb.lo;
+    });
+
+    var rows = ordered.map(function (method) {
       var r = resolve(method, kg, doneness, protein.methods);
       return "<tr>" +
         "<td>" + method.name + "</td>" +
@@ -247,7 +281,7 @@
       "<table><thead><tr><th>Method</th><th>What you get</th><th>Time</th>" +
       "</tr></thead><tbody>" + rows + "</tbody></table>";
 
-    protein.methods.forEach(function (method) {
+    ordered.forEach(function (method) {
       var r = resolve(method, kg, doneness, protein.methods);
       var card = document.createElement("div");
       card.className = "ct-card" + (r.ok ? "" : " ct-card--declined");
@@ -269,14 +303,21 @@
           "<p class='ct-total'>" + (r.ok ? span(r.lo, r.hi) : "—") + "</p>" +
         "</div>";
 
-      if (method.outcome) html += "<p class='ct-outcome'>" + method.outcome + "</p>";
-
+      /* NO `outcome` LINE ON THE CARD. It was here to "confirm" the choice you
+         made in the table above -- but the table already says it, three
+         paragraphs up, and repeating it made the card open with two
+         near-identical sentences ("Reliable default" then "Reliable, even
+         results; use a thermometer"). Helen: "below that it's still a bit of a
+         clutter." The table is where you choose; the card is where you get the
+         things the table has no room for. */
       var settings = [];
       if (method.oven) settings.push(method.oven);
       if (method.covering) settings.push(method.covering.toLowerCase());
       if (settings.length) {
         html += "<p class='ct-settings'>" + settings.join(" &middot; ") + "</p>";
       }
+
+      var asides = [];
 
       if (r.ok) {
 
@@ -302,13 +343,19 @@
             "</ul>";
         }
 
-        if (r.aside) html += "<p class='ct-aside'>" + r.aside + "</p>";
+        if (r.aside) asides.push(r.aside);
       } else {
         html += "<p class='ct-declined'>Won’t guess this one.</p>" +
                 "<p class='ct-aside'>" + r.why + "</p>";
       }
 
-      if (method.notes) html += "<p class='ct-notes'>" + method.notes + "</p>";
+      /* Caveats and notes end the card as ONE quiet block. They were two
+         paragraphs at full spacing, which gave a footnote the same presence as
+         the answer above it. */
+      if (method.notes) asides.push(method.notes);
+      if (asides.length) {
+        html += "<p class='ct-notes'>" + asides.join(" ") + "</p>";
+      }
 
       card.innerHTML = html;
       els.out.appendChild(card);
