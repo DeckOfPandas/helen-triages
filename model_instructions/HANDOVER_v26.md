@@ -1922,8 +1922,21 @@ safety-threshold spec, and the note-integrity checks.
 
 **Recipes draw the whole doneness spectrum, below Notes, at `#doneness`.** The
 metadata grid carries no temperature — Helen: "it's nowhere in sight when you're
-actually cooking". 9 recipes are wired; `internal_temp_ref` plus an optional
-`doneness` naming which level the recipe suggests.
+actually cooking". 14 of 81 published recipes are wired -- `internal_temp_ref`
+plus an optional `doneness` naming which level the recipe suggests.
+
+**A recipe that SHOULD be wired and isn't is a test failure.**
+`test_every_recipe_with_a_known_protein_has_a_temperature_or_a_reason` demands
+either a ref or an entry in `NO_TEMPERATURE_BECAUSE` with a reason. Drafts are
+deliberately exempt -- Helen, 2026-08-14: wiring one is wasted work until she has
+cooked it. The test catches each draft on the day it is promoted, which is the
+right moment.
+
+**`tests/test_rendered_pages.py` asserts on BUILT HTML**, and exists because the
+two worst bugs here lived in the gap between correct data and what Liquid
+emitted -- a `{% assign %}` leaking out of an include onto all 42 chart rows,
+and a safety zone drawing 9°C off its own label. Both passed every data test.
+It skips without bundler.
 
 **`safety_min` / `safety_label` / `safety_summary` shade everything below the
 cited guidance.** On `fish.salmon` (63°C), `pork.roasting` and `ham.fresh`
