@@ -795,7 +795,29 @@ def test_the_safety_zone_shares_the_bars_coordinate_space():
 # THE OPT-OUT LIST IS THE POINT, not a way round the test. Each entry is a
 # decision with a reason attached, so "why doesn't the lamb one have a
 # temperature?" is answered in the repo rather than in someone's memory.
+# STAR INGREDIENT IS THE PRIMARY SIGNAL, because it is a declared vocabulary
+# (taxonomy.yml, guarded by its own test) rather than free text. Indian Mutton
+# Raan slipped past the first version of this test entirely: its main
+# ingredients say "mutton leg" and the word list only knew "lamb", so a
+# three-hour roast with "until done according to an in-oven probe" and no figure
+# in it passed a test written specifically to find that.
+#
+# Its star_ingredient said "lamb" all along. The collection had already made the
+# call that mutton files under lamb; the test just wasn't reading the field that
+# knew.
+#
+# Only families we actually hold data for are mapped. `game` and `shellfish` are
+# absent on purpose -- there is no venison or shellfish node, so demanding a ref
+# would be demanding something that doesn't exist. Add them here the day the
+# data does, and the test will start asking for them on its own.
+STAR_INGREDIENTS_WITH_DATA = {
+    "beef", "duck", "lamb", "pork", "poultry", "oily fish", "white fish",
+}
+
+# The fallback, used ONLY when a recipe declares no star ingredient at all.
+# "mutton" and "hogget" are here now for the same reason lamb was.
 PROTEIN_WORDS = {
+    "mutton": "lamb", "hogget": "lamb",
     "chicken": "poultry", "turkey": "poultry", "goose": "poultry", "duck": "poultry",
     "beef": "beef", "steak": "beef", "oxtail": "beef", "brisket": "beef",
     "pork": "pork", "gammon": "ham", "ham": "ham",
@@ -805,17 +827,20 @@ PROTEIN_WORDS = {
 
 NO_TEMPERATURE_BECAUSE = {
     # Not the dish. The protein is a stock, a garnish or an accompaniment.
-    "cherry-glaze": "a glaze; poultry is what you'd put it on, not what you cook",
-    "plum-sauce-for-duck": "a sauce; beef stock is an ingredient",
+    # (cherry-glaze and plum-sauce-for-duck used to be listed here and no longer
+    # need to be: their star_ingredient is "fruit", and free-text "beef stock"
+    # stopped counting once the star became the primary signal.)
     "pancetta-white-bean-stew": "pancetta is cured and diced, not a cut cooked to a temperature",
     "smoked-mackerel-pate": "the mackerel arrives smoked; nothing is cooked",
+    "toad-in-the-hole": "sausages; pork.roasting is loin and leg joints, "
+                        "pork.slow_cooked is shoulder and belly, and neither is "
+                        "a thing you probe — found by the star_ingredient net, "
+                        "which the free-text one had been missing",
 
     # A cut the data doesn't cover. These are the honest gaps -- each one names a
     # real thing missing from internal_temperatures.yml rather than a chore.
     "cumin-mint-lamb-skewers": "grilled shoulder chunks; lamb.roasting is joints and "
                                "lamb.slow_cooked is a whole shoulder, neither is this",
-    "vietnamese-spiced-braised-venison-haunch": "venison isn't in the data at all — Helen "
-                                                "is raising an issue for it, 2026-08-14",
 
     # Chicken pieces in a wet dish. poultry.chicken's endpoint is written for a
     # WHOLE BIRD ("74–75°C in the thigh"), and a thigh in a stew reaches that
@@ -843,9 +868,18 @@ def test_every_recipe_with_a_known_protein_has_a_temperature_or_a_reason():
         fm = _yaml.safe_load(raw.split("---")[1]) or {}
         if fm.get("internal_temp_ref") or path.stem in NO_TEMPERATURE_BECAUSE:
             continue
-        mains = [str(x).lower() for x in (fm.get("main_ingredients") or [])]
-        hits = sorted({fam for word, fam in PROTEIN_WORDS.items()
-                       if any(_re.search(rf"\b{word}\b", m) for m in mains)})
+        # A DECLARED STAR WINS OUTRIGHT. If the recipe says what it is about,
+        # that is the answer -- cherry-glaze is "fruit" however much duck its
+        # ingredients mention, and the venison braise is "game" however much
+        # beef stock is in it. The free-text net below is a FALLBACK for a
+        # protein-led recipe that never set one, not a second opinion.
+        star = (fm.get("star_ingredient") or "").strip().lower()
+        if star:
+            hits = [star] if star in STAR_INGREDIENTS_WITH_DATA else []
+        else:
+            mains = [str(x).lower() for x in (fm.get("main_ingredients") or [])]
+            hits = sorted({fam for word, fam in PROTEIN_WORDS.items()
+                           if any(_re.search(rf"\b{word}\b", m) for m in mains)})
         if hits:
             missing.append(f"{path.stem}: names {hits} — add an internal_temp_ref, "
                            f"or an entry in NO_TEMPERATURE_BECAUSE saying why not")
@@ -891,3 +925,29 @@ def test_chart_anchors_point_at_sections_that_exist(internal_temperatures):
             broken.append(f"{'.'.join(path)}: chart_anchor {anchor!r} — "
                           f"the page has {sorted(i for i in ids if i != 'top')}")
     assert not broken, "\n  ".join(broken)
+
+
+def test_every_figure_a_recipe_can_point_at_has_a_chart_anchor(internal_temperatures):
+    """Anchors have to be PRESENT, not just valid when present.
+
+    test_chart_anchors_point_at_sections_that_exist checks the ones that are
+    there. It cannot see a node that has none — and a missing anchor doesn't
+    break anything visible: the chart still draws, the figure is still right,
+    there is simply no way out to the rest of the spectrum. Indian Mutton Raan
+    shipped like that, because an earlier pass added anchors by searching for
+    "  slow_cooked:" and matched pork's copy of the key rather than lamb's.
+
+    Any node carrying a figure is a node some recipe can name in
+    internal_temp_ref, so any node carrying a figure needs somewhere to send
+    them.
+    """
+    orphans = []
+    for path, node in _walk(internal_temperatures):
+        has_figure = any(k in node for k in ("doneness", "endpoint", "target", "tender_at"))
+        if has_figure and not node.get("chart_anchor"):
+            orphans.append(".".join(path))
+    assert not orphans, (
+        "these nodes hold a figure a recipe can point at, but no chart_anchor, "
+        "so their 'more temperatures' link is silently omitted:\n  "
+        + "\n  ".join(orphans)
+    )
