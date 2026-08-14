@@ -65,6 +65,36 @@
     display: block;
   }
 
+  // --- The ingredient highlighter has to survive the printer -------------
+  // Helen, 2026-08-14: the yellow was not rendering in print preview at all,
+  // and she wants it even printing greyscale on a mono laser. It is the one
+  // decoration on the page that carries information -- the column of
+  // highlights IS how you scan an ingredient list for amounts
+  // (food/_recipe-ingredients-method.scss says so where the asterisk bullets
+  // were removed), so losing it on paper is losing a feature, not a flourish.
+  //
+  // The cause is the texture, not the colour. Every highlighters/*.svg draws
+  // its blob as a path carrying `filter="url(#ink-tex)"` -- an feTurbulence
+  // chain that gives the scratchy ink edge, ending in an feColorMatrix that
+  // rewrites alpha. Print rasterisers are notoriously poor with SVG filters
+  // and feTurbulence especially; a filter that fails to a transparent result
+  // takes the whole blob with it, which is exactly the symptom.
+  //
+  // So print without it: the same hand-drawn shape, the same aureolin, flat
+  // instead of textured. A CSS `filter` beats the presentation attribute on
+  // the element, so this needs no change to the assets and nothing to keep in
+  // step with them. The texture is the thing given up, and it is the right
+  // thing to give up -- it is the part that cannot survive the medium.
+  //
+  // Greyscale is a separate question this does not answer: aureolin is a very
+  // light yellow, so a mono printer will render it as a pale grey whatever we
+  // do here. If it comes out too faint on real paper, the fix is a print-only
+  // tint on .ingredient-amount-number rather than anything in this rule.
+  .highlighter-slot svg,
+  .highlighter-slot path {
+    filter: none;
+  }
+
   // --- Breaking ---------------------------------------------------------
   // One ingredient, one step, one note, one chart row: each is a single unit
   // of "look down, read one thing, look back at the pan", and splitting one

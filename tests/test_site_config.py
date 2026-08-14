@@ -1031,6 +1031,41 @@ def test_print_rules_target_classes_that_exist():
     )
 
 
+def test_list_sections_are_conditioned_on_size_not_truthiness():
+    """An empty array is TRUTHY in Liquid, so a section guarded by a bare
+    truth test renders its heading with nothing underneath it.
+
+    Only nil and false are falsy. `notes: []` therefore drew the NOTES
+    heading and an empty grid on 49 drafts, unnoticed until Helen looked at
+    one while checking the print layout -- and the pages it affects are
+    exactly the ones nobody scrutinises, because a draft looking unfinished
+    is not a surprise.
+
+    Nothing else can catch this: the data is valid, the template is valid,
+    the build is clean, and the only symptom is a heading over blank space
+    on whichever files happen to hold an empty list today.
+
+    Scoped to the fields that are lists and that gate a whole section --
+    `.size > 0` is the fix, `.size > 1` and `.size == 1` are fine too since
+    they are already asking about length rather than existence.
+    """
+    layout = read("_layouts", "recipe.html")
+    # The comment blocks in this layout describe the bad pattern in prose
+    # rather than quoting it, precisely because Liquid parses tag delimiters
+    # inside a comment -- so there is nothing here to strip first.
+    bare = re.findall(
+        r"\{%-?\s*if\s+page\.(notes|ingredient_groups|method_short|tags|main_ingredients)"
+        r"\s*(?:%\}|-%\})",
+        layout,
+    )
+    assert not bare, (
+        f"_layouts/recipe.html gates a section on the bare truthiness of "
+        f"{sorted(set(bare))}. An empty array is truthy in Liquid, so that "
+        f"renders the section's heading over nothing whenever the list is "
+        f"empty. Test the length instead: `page.notes.size > 0`."
+    )
+
+
 def test_pdf_link_points_where_the_pdfs_are_written():
     """GitHub issue #86. The "pdf" link on a recipe page and the file
     scripts/generate_pdfs.py writes have to agree on one directory, and

@@ -52,9 +52,25 @@
   // marks, the metadata wash, the note boxes and the doneness chart's bars
   // without any of them naming it. Unprefixed first, then the -webkit- form
   // for Safari, which still only understands that one.
+  //
+  // NO PAGE BACKGROUND, and this is the deliberate half. $color-bg is a tint
+  // (#faf7f8), not white, so painting it here floods every sheet with a flat
+  // all-over wash -- an unreasonable amount of ink for a decorative ground,
+  // and on a home printer the kind of large flat fill that bands. Helen,
+  // 2026-08-14: "That's simply unfair." The paper IS the ground on paper.
+  //
+  // Three things assume the ground is $color-bg and lose a little by this:
+  // $color-emboss-light (shared/_rule.scss) is $color-bg, so the highlight
+  // copy of the punched lettering no longer sits against a matching ground;
+  // .note-label's tab and the doneness chart's halos paint $color-bg to mask
+  // what is behind them. None of it is serious, and that is worth being
+  // precise about rather than hand-waving: #faf7f8 on white paper is a ~3%
+  // difference, so those three go from matching the ground to being
+  // near-invisible against it, and the emboss keeps its dark copy, which is
+  // the half that carries the raised read anyway. Helen's call, and the right
+  // one: "I don't care if my headings don't look like label tape."
   html,
   body {
-    background: $color-bg;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }

@@ -133,7 +133,12 @@ layout: default
     {% include recipe_badges.html recipe=page %}
   </div>
 
-  {% if page.ingredient_groups %}
+  {% comment %} `.size > 0` for the same reason the NOTES section below uses it:
+     an empty array is truthy in Liquid, so `ingredient_groups: []` would render
+     an INGREDIENTS heading with nothing beneath it. No file does that today --
+     this is the latent twin of a bug that was live on 49 drafts, fixed at the
+     same time rather than left to be found the same way. {% endcomment %}
+  {% if page.ingredient_groups.size > 0 %}
     <div class="recipe-section-ingredients">
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">Ingredients</span>
@@ -254,7 +259,19 @@ layout: default
     </div>
   {% endif %}
 
-  {% if page.notes %}
+  {% comment %} `.size > 0`, and NOT a bare truth test on page.notes itself. An
+     empty array is TRUTHY in Liquid -- only nil and false are falsy -- so
+     `notes: []` rendered the NOTES heading with an empty grid under it, on 49
+     drafts. Helen spotted it on sticky-tamarind-pork-ribs while checking the
+     print layout; it is not a print bug, it has been on screen the whole time.
+     `.size` on a nil is nil, and nil is not greater than 0, so this handles a
+     missing key too.
+
+     (Writing the bad version out longhand in this comment is what broke the
+     build the first time round: Liquid parses tag delimiters inside a comment
+     block, so a quoted `if` tag in here is a real tag as far as it is
+     concerned. Describe it, do not quote it.) {% endcomment %}
+  {% if page.notes.size > 0 %}
     <div class="recipe-section-notes">
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">Notes</span>
