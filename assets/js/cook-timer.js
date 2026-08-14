@@ -63,8 +63,19 @@
      Minutes are the working unit throughout and only ever become words at the
      edge. "2 hrs 5 min" rather than "125 min": you read this while planning a
      meal, not while timing an experiment. */
+  /* FIVE-MINUTE GRANULARITY, applied once here and reused by the clock
+     arithmetic below so a duration and the time it implies can never disagree.
+     Helen: "let's round cooking times to the nearest 5 mins to preserve
+     sanity." She's right, and not only about sanity: "1 hr 37 min" claims a
+     precision the underlying figure hasn't got — most of these rates are
+     themselves a range, and several are estimates by analogy. Rounding is
+     honesty about the input, not just tidiness in the output. */
+  function round5(mins) {
+    return Math.round(mins / 5) * 5;
+  }
+
   function hhmm(mins) {
-    mins = Math.round(mins);
+    mins = round5(mins);
     var h = Math.floor(mins / 60), m = mins % 60;
     if (!h) return m + " min";
     if (!m) return h + " hr" + (h > 1 ? "s" : "");
@@ -72,7 +83,10 @@
   }
 
   function span(lo, hi) {
-    return Math.round(lo) === Math.round(hi)
+    /* Compared AFTER rounding: 95 and 97 minutes are one answer once you've
+       decided five minutes is the resolution, and printing "1 hr 35 – 1 hr 35"
+       would be the arithmetic showing through. */
+    return round5(lo) === round5(hi)
       ? hhmm(lo) : hhmm(lo) + " – " + hhmm(hi);
   }
 
@@ -238,11 +252,33 @@
       var card = document.createElement("div");
       card.className = "ct-card" + (r.ok ? "" : " ct-card--declined");
 
-      var html = "<h3 class='ct-card-name'>" + method.name + "</h3>";
-      if (method.oven) html += "<p class='ct-oven'>" + method.oven + "</p>";
+      /* NAME AND TIME ON ONE LINE, AT THE SAME WEIGHT. Helen: "the cooking
+         method name should be as bold as the time." The card used to open with
+         a small grey heading, then the oven temperature, then a large time —
+         so the eye found the number first and had to travel back up for the
+         thing it belonged to. They are one fact ("this method takes this
+         long") and now read as one line.
+
+         Everything under it is ordered by how often you need it: what you get,
+         then the two settings you act on, then the schedule, then the caveats.
+         The oven temperature moved out of its own paragraph and into that
+         settings line — it was taking a full row to say four characters. */
+      var html =
+        "<div class='ct-card-head'>" +
+          "<h3 class='ct-card-name'>" + method.name + "</h3>" +
+          "<p class='ct-total'>" + (r.ok ? span(r.lo, r.hi) : "—") + "</p>" +
+        "</div>";
+
+      if (method.outcome) html += "<p class='ct-outcome'>" + method.outcome + "</p>";
+
+      var settings = [];
+      if (method.oven) settings.push(method.oven);
+      if (method.covering) settings.push(method.covering.toLowerCase());
+      if (settings.length) {
+        html += "<p class='ct-settings'>" + settings.join(" &middot; ") + "</p>";
+      }
 
       if (r.ok) {
-        html += "<p class='ct-total'>" + span(r.lo, r.hi) + "</p>";
 
         if (r.stages) {
           html += "<ul class='ct-stages'>" + r.stages.map(function (st) {
@@ -255,10 +291,11 @@
              time on purpose: being ready early and holding is recoverable,
              being late is not. */
           var outAt = serveAt - rest;
+          var longest = round5(r.hi), shortest = round5(r.lo);
           html += "<ul class='ct-schedule'>" +
-            "<li><span>in at</span> " + clock(outAt - r.hi) +
-              (Math.round(r.lo) !== Math.round(r.hi)
-                ? " <em>(or " + clock(outAt - r.lo) + " if it runs to the quicker end)</em>" : "") +
+            "<li><span>in at</span> " + clock(outAt - longest) +
+              (shortest !== longest
+                ? " <em>(or " + clock(outAt - shortest) + " if it runs to the quicker end)</em>" : "") +
             "</li>" +
             "<li><span>out at</span> " + clock(outAt) + "</li>" +
             (rest ? "<li><span>rest until</span> " + clock(serveAt) + "</li>" : "") +
@@ -271,7 +308,6 @@
                 "<p class='ct-aside'>" + r.why + "</p>";
       }
 
-      if (method.covering) html += "<p class='ct-meta'><span>covering</span> " + method.covering + "</p>";
       if (method.notes) html += "<p class='ct-notes'>" + method.notes + "</p>";
 
       card.innerHTML = html;

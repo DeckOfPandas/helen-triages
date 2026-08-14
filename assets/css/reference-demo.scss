@@ -359,20 +359,36 @@ $tr-label-gap: $space-xl;
 // refuse to answer at all). Cards let a row say something different without
 // leaving a hole in a grid.
 
+// TWO GRID ROWS, NOT FOUR FLEX COLUMNS. Helen: "the time calculator box labels
+// are misaligned vertically." They were: the fields were flex columns aligned
+// at their BOTTOM edge, which lines the inputs up perfectly and lets the labels
+// float to wherever their own height puts them -- so "Eating at (optional)",
+// being the one label that wraps to two lines, sat a line higher than its
+// neighbours.
+//
+// Fixing the symptom (a min-height on the label) would hold only until someone
+// wrote a longer label. A grid with an explicit label row and input row makes
+// the alignment structural: every label is in row 1 and every input in row 2,
+// however many lines either takes. `display: contents` on the field lets the
+// label and its input become grid items directly while keeping the <label>
+// wrapping its own <input>, so the two stay associated without a `for`.
 .ct-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-xl;
-  align-items: flex-end;
-  margin: 0 0 $spacing-block-gap 0;
-  padding: 0 0 $space-xl 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  grid-template-rows: auto auto;
+  gap: $space-xs $space-xl;
+  margin: 0 0 $spacing-section-gap 0;
+  padding: 0 0 $spacing-block-gap 0;
   border-bottom: 1px solid $color-border;
 }
 
 .ct-field {
-  display: flex;
-  flex-direction: column;
-  gap: $space-xs;
+  display: contents;
+
+  // Labels sit on the row's bottom edge, so a one-line and a two-line label
+  // share a baseline immediately above their inputs.
+  > span { align-self: end; }
 
   > span {
     font-family: $font-headings;
@@ -415,15 +431,29 @@ $tr-label-gap: $space-xl;
   }
 }
 
+// The answer to the question you just asked, so it gets room and a size --
+// Helen: "it could use some tasteful vertical space in the top sections, above
+// the cards." The page had form, summary, table and cards stacked at one
+// rhythm, which read as one undifferentiated column. Now there are three
+// bands: the controls, the answer and the table you choose from, and the cards
+// under their own heading.
 .ct-summary {
-  font-size: 1rem;
-  margin: 0 0 $space-xl 0;
+  font-size: 1.06rem;
+  line-height: 1.5;
+  margin: 0 0 $spacing-block-gap 0;
   max-width: 62ch;
+}
+
+#ct-table {
+  margin-bottom: $spacing-section-gap;
 }
 
 .ct-results {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  // Wider than the old 17rem: the name and the time now share the card's top
+  // line, and at 17rem a long method name wrapped under its own time and undid
+  // the point of putting them on one line.
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   gap: $spacing-block-gap;
   margin-bottom: $spacing-section-gap;
 }
@@ -448,37 +478,61 @@ $tr-label-gap: $space-xl;
   }
 }
 
-.ct-card-name {
-  font-family: $font-headings;
-  font-size: 0.82rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: $color-text;
-  -webkit-text-stroke: $emboss-stroke $color-label-stroke;
-  @include punched(raised);
+// THE CARD'S TOP LINE: the method and its time, at the same weight, with the
+// time pushed to the right edge so a column of cards can be read down either
+// side. They answer one question between them and used to be three elements
+// apart, with a large number arriving before the thing it described.
+.ct-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-md;
   margin: 0 0 $space-xs 0;
 }
 
-.ct-oven {
-  font-size: 0.8rem;
-  color: $color-clear-text;
-  margin: 0 0 $space-md 0;
-}
-
-// THE HERO NUMBER. One figure per card, big, because it is the entire question
-// the page exists to answer -- everything else on the card is qualification.
+.ct-card-name,
 .ct-total {
   font-family: $font-headings;
-  font-size: 1.35rem;
+  font-size: 1rem;
   font-weight: 700;
+  line-height: 1.25;
   color: $color-text;
+  margin: 0;
+}
+
+.ct-card-name {
+  letter-spacing: 0.02em;
+  -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+  @include punched(raised);
+}
+
+.ct-total {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// What you get, in the same words the decision table uses -- so a card you
+// arrive at from that table confirms itself rather than restating.
+.ct-outcome {
+  font-size: 0.92rem;
+  color: $color-text;
+  margin: 0 0 $space-sm 0;
+}
+
+// The two things you actually set: oven and covering, on one line. Each was a
+// separate paragraph before, one of them spending a full row on four
+// characters.
+.ct-settings {
+  font-family: $font-headings;
+  font-size: 0.76rem;
+  color: $color-clear-text;
   margin: 0 0 $space-md 0;
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
 .ct-declined {
   font-family: $font-headings;
-  font-size: 1rem;
+  font-size: 0.86rem;
   color: $color-clear-text;
   margin: 0 0 $space-sm 0;
 }
