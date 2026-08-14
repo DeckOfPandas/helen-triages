@@ -24,16 +24,30 @@ layout: default
      on whatever it resolved to rather than assuming one from the protein
      name -- see that file's own header comment. {% endcomment %}
   {% assign _internal_temp = nil %}
+  {% assign _temp_spectrum = nil %}
   {% if page.internal_temp_ref %}
     {% assign _temp_node = site.data.food.internal_temperatures %}
     {% assign _temp_path = page.internal_temp_ref | split: "." %}
     {% for _key in _temp_path %}
       {% assign _temp_node = _temp_node[_key] %}
     {% endfor %}
-    {% if page.doneness %}
-      {% assign _temp_node = _temp_node.doneness[page.doneness] %}
+    {% comment %} A node carrying a `doneness` map is a SPECTRUM, and the two
+       cases below are genuinely different. With a `doneness:` in front matter
+       we resolve to that one level. WITHOUT one we must not resolve into the
+       node itself: beef.tender_roast has no pull/endpoint/target/tender_at of
+       its own -- only carryover and the doneness map -- so every test in the
+       chain below failed and the meta line rendered its label and its link with
+       NO FIGURE BETWEEN THEM. Silent, and sitting directly in front of the
+       rollout in issue #202, because `internal_temp_ref: beef.tender_roast` is
+       exactly what you would naturally write. {% endcomment %}
+    {% if _temp_node.doneness %}
+      {% assign _temp_spectrum = _temp_node %}
+      {% if page.doneness %}
+        {% assign _internal_temp = _temp_node.doneness[page.doneness] %}
+      {% endif %}
+    {% else %}
+      {% assign _internal_temp = _temp_node %}
     {% endif %}
-    {% assign _internal_temp = _temp_node %}
   {% endif %}
 
   <ul class="recipe-meta">
@@ -41,16 +55,40 @@ layout: default
     {% if page.makes %}<li><strong>Makes</strong><span>{{ page.makes }}</span></li>{% endif %}
     {% if page.prep_time %}<li><strong>Prep</strong><span>{{ page.prep_time }}</span></li>{% endif %}
     {% if page.cook_time %}<li><strong>Cook</strong><span>{{ page.cook_time }}</span></li>{% endif %}
-    {% if _internal_temp %}
+    {% if _internal_temp or _temp_spectrum %}
       <li>
         <strong>Internal temp</strong>
         <span>
-          {% if _internal_temp.pull %}Pull at {{ _internal_temp.pull }}{% if _internal_temp.rested %}, rest to {{ _internal_temp.rested }}{% endif %}
+          {% comment %} "Out at", not "pull at" -- Helen, 2026-08-13: "I don't
+             love the word pull... mostly because it's American." The charts and
+             the timings page changed the same day; this was the last place it
+             survived. {% endcomment %}
+          {% if _internal_temp.pull %}Out at {{ _internal_temp.pull }}{% if _internal_temp.rested %}, rests to {{ _internal_temp.rested }}{% endif %}
           {% elsif _internal_temp.endpoint %}{{ _internal_temp.endpoint }}
           {% elsif _internal_temp.target %}{{ _internal_temp.target }}
           {% elsif _internal_temp.tender_at %}Tender at {{ _internal_temp.tender_at }}
+          {% elsif _temp_spectrum %}
+            {% comment %} A spectrum with no level chosen: give the span it
+               covers rather than nothing. Computed from the data's own first
+               and last levels, so adding a level upstream widens it here.
+               {% endcomment %}
+            {% assign _lo = 999 %}{% assign _hi = 0 %}
+            {% for _lvl in _temp_spectrum.doneness %}
+              {% if _lvl[1].pull_min and _lvl[1].pull_min < _lo %}{% assign _lo = _lvl[1].pull_min %}{% endif %}
+              {% if _lvl[1].rested_max and _lvl[1].rested_max > _hi %}{% assign _hi = _lvl[1].rested_max %}{% endif %}
+              {% if _lvl[1].pull_max and _lvl[1].pull_max > _hi %}{% assign _hi = _lvl[1].pull_max %}{% endif %}
+            {% endfor %}
+            {{ _lo }}–{{ _hi }}°C, by doneness
           {% endif %}
-          (<a href="{{ '/food/reference/internal-temperatures/' | relative_url }}">more</a>)
+          {% comment %} Straight to this protein's own section of the charts,
+             not to the top of the old tables page -- which is where this link
+             used to land, on a page long enough that arriving at the top tells
+             you nothing. {% endcomment %}
+          {% if _temp_spectrum.chart_anchor or _temp_node.chart_anchor %}
+            (<a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}#{{ _temp_spectrum.chart_anchor | default: _temp_node.chart_anchor }}">chart</a>)
+          {% else %}
+            (<a href="{{ '/food/reference/internal-temperatures/' | relative_url }}">more</a>)
+          {% endif %}
         </span>
       </li>
     {% endif %}
@@ -58,6 +96,14 @@ layout: default
 
   {% if page.source %}<p class="recipe-source">Source: {{ page.source }}</p>{% endif %}
   {% if page.meta.date_ingested %}<p class="recipe-source">Date added: {{ page.meta.date_ingested }}</p>{% endif %}
+
+  {% comment %} The whole spectrum, for a protein where doneness is a choice
+     (#189). Below the meta grid because it elaborates the one figure up there,
+     and above the ingredients because it is still reference rather than
+     instruction. {% endcomment %}
+  {% if _temp_spectrum %}
+    {% include food/doneness_chart.html node=_temp_spectrum suggested=page.doneness %}
+  {% endif %}
 
   <div class="recipe-badges">
     {% include recipe_badges.html recipe=page %}

@@ -83,6 +83,9 @@ poultry:
 
 beef:
   tender_roast:
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: beef-tender-roasting-cuts
     # Rest time as STATED by internal-temperatures.html's own table header
     # ("After ~15–20 min rest"), so the timings page can default its rest box
     # to the figure this data already publishes rather than to a round 20 that
@@ -123,6 +126,9 @@ beef:
         rested_min: 72
         rested_max: 72
   tough_cuts:
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: beef-tough-cuts
     passes_through: "60–70°C while still tough"
     passes_through_min: 60
     passes_through_max: 70
@@ -132,6 +138,9 @@ beef:
 
 pork:
   roasting:
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: pork
     # Rest time as STATED by internal-temperatures.html's own table header
     # ("After ~15 min rest"), so the timings page can default its rest box
     # to the figure this data already publishes rather than to a round 20 that
@@ -160,12 +169,18 @@ pork:
         rested_max: 72
     safety_note: "FOOD SAFETY: the 'medium' pull temp above (60–62°C) does not clear the UK FSA's own core-temperature equivalence table for pork specifically (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec — held at that temperature, not passed through via carryover). FSA does not extend beef/lamb's 'pink is fine' reasoning to pork (hepatitis E risk cited). USDA's own standard is more permissive (145°F/62.8°C + 3min rest), but that's a different regulatory bar. The well-done option (68–70°C, clears 70°C at pull with margin) is the one that unambiguously satisfies FSA guidance. Flagging, not changing the medium figure — your call whether to keep it, since plenty of UK cooking still serves pork pink. Checked once, 2026-08-12 — remove this note once you've made your own call and confirmed the figure you want to keep."
   slow_cooked:
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: pork
     tender_at: "90–95°C"
     tender_at_min: 90
     tender_at_max: 95
 
 lamb:
   roasting:
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: lamb
     # Rest time as STATED by internal-temperatures.html's own table header
     # ("After ~15 min rest"), so the timings page can default its rest box
     # to the figure this data already publishes rather than to a round 20 that
@@ -212,6 +227,9 @@ lamb:
 
 ham:
   fresh:
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: ham
     carryover: "3–4°C"
     carryover_min: 3
     carryover_max: 4
@@ -229,6 +247,9 @@ ham:
         pull_max: 70
     safety_note: "FOOD SAFETY: same issue as pork's medium doneness above (a fresh ham is pork leg) — 60–62°C doesn't clear the FSA's pork-specific core-temperature equivalence table (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec, held not passed-through). The well-done option (68–70°C) is the one that clears FSA guidance unambiguously. Flagging, not changing the hint-of-pink figure. Checked once, 2026-08-12 — remove once you've made your own call."
   cured:
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: ham
     carryover: "3–4°C"
     carryover_min: 3
     carryover_max: 4
@@ -239,6 +260,9 @@ ham:
     sources: "Waitrose targets 75°C; FSA's general reference point is 70°C. Corrected 2026-08-12 from an original 68–72°C, which sat a little under both. Checked once — remove once confirmed."
 
 steak:
+  # Which section of the temperature charts holds this spectrum, so a
+  # recipe can link straight to it rather than to the top of a long page.
+  chart_anchor: beef-steak
   carryover: "2–3°C"
   carryover_min: 2
   carryover_max: 3
@@ -314,6 +338,9 @@ fish:
     note: "The FSA/USDA food-safety benchmark for fish generally, and where most fish are conventionally taken in UK home cooking. cooking-methods.html's own rule of thumb used to say ~55–60°C, which sits below this and reflects chef/texture preference (many pull salmon and similar fish lower for a moister result) rather than the safety endpoint — both pages now say the same thing, reconciled 2026-08-12."
     sources: "USDA FSIS: 145°F/62.8°C. UK FSA points to ~63°C as the standard fish safety benchmark. Checked once — remove this note once you've confirmed it yourself."
   salmon:
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: fish-salmon
     carryover: "1–2°C"
     carryover_min: 1
     carryover_max: 2

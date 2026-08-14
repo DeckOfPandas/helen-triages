@@ -86,8 +86,8 @@
    and where the hover target ends. {% endcomment %}
 {% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = to %}{% endif %}
 
-<div class="tc-row">
-  <div class="tc-row-label">{{ include.label }}</div>
+<div class="tc-row{% if include.suggested %} tc-row--suggested{% endif %}">
+  <div class="tc-row-label">{{ include.label }}{% if include.suggested %}<span class="tc-suggested" title="What this recipe suggests">this recipe</span>{% endif %}</div>
   <div class="tc-track">
     <div class="tc-pull" style="--a:{{ from }}; --b:{{ to }};"></div>
 

@@ -1,0 +1,18 @@
+{% comment %}
+  The chart's axis. One file so the charts page and a recipe page can't drift
+  onto different scales — the ticks are meaningless unless every chart on the
+  site reads against the same one, which is the whole argument for a shared
+  35–100°C axis in the first place (see _sass/food/_temperature-chart.scss).
+{% endcomment %}
+<div class="tc-axis">
+  <div></div>
+  <div class="tc-axis-scale">
+    <div class="tc-tick" style="--t:40;">40°C</div>
+    <div class="tc-tick" style="--t:50;">50</div>
+    <div class="tc-tick" style="--t:60;">60</div>
+    <div class="tc-tick" style="--t:70;">70</div>
+    <div class="tc-tick" style="--t:80;">80</div>
+    <div class="tc-tick" style="--t:90;">90</div>
+    <div class="tc-tick" style="--t:100;">100°C</div>
+  </div>
+</div>

@@ -7,6 +7,8 @@ prep_time: "20 mins"
 cook_time: "30 mins"
 main_ingredients: ["beef fillet"]
 star_ingredient: "beef"
+internal_temp_ref: beef.tender_roast
+doneness: medium_rare
 tags: ["showstopper"]
 ingredient_groups:
   - items:

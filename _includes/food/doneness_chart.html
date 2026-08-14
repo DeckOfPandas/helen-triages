@@ -1,0 +1,41 @@
+{% comment %}
+  A protein's whole doneness spectrum, on a recipe page. GitHub issue #189:
+  "for proteins with discretionary cooking times like steak, show all internal
+  temperature options."
+
+  Parameters
+    node       a node from internal_temperatures.yml carrying a `doneness` map
+    suggested  the level this recipe recommends (a recipe's own `doneness:`
+               front matter), or blank
+
+  WHY A CHART AND NOT ONE FIGURE. The meta line above can only hold one number,
+  and for seven of the refs in that data file one number is a lie by omission:
+  doneness is the EATER'S choice, not the recipe's. A recipe can suggest
+  medium-rare; it has no business hiding the other five.
+
+  The recipe's own suggestion is marked rather than isolated -- it stays in
+  place on the scale, so you can see what you are trading when you ignore it.
+  That is the point of drawing the spectrum instead of listing it: the distance
+  between "what this recipe says" and "what you want" is a real distance.
+{% endcomment %}
+
+{% if include.node.doneness %}
+  <div class="doneness">
+    <h3 class="doneness-label">Doneness</h3>
+    <div class="tc">
+      <div class="tc-plot">
+        {% for level in include.node.doneness %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% assign is_suggested = false %}
+          {% if include.suggested and level[0] == include.suggested %}{% assign is_suggested = true %}{% endif %}
+          {% include food/temp_row.html label=label spec=spec suggested=is_suggested %}
+        {% endfor %}
+      </div>
+      {% include food/temp_axis.html %}
+    </div>
+    {% if include.node.chart_anchor %}
+      <p class="doneness-more"><a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}#{{ include.node.chart_anchor }}">the full chart, with carryover and safety figures</a></p>
+    {% endif %}
+  </div>
+{% endif %}

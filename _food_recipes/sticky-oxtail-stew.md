@@ -7,6 +7,7 @@ prep_time: "30 mins"
 cook_time: "6 hrs"
 main_ingredients: ["oxtail", "porter", "plum tomatoes", "leeks", "carrots", "celery", "fresh thyme", "fresh rosemary", "fresh bay leaves"]
 star_ingredient: "beef"
+internal_temp_ref: beef.tough_cuts
 tags: ["freezable", "make-ahead", "one-handed food"]
 ingredient_groups:
   - items:

@@ -175,10 +175,15 @@ def test_every_temperature_fits_on_the_chart_axis(internal_temperatures):
     tidier fails immediately rather than quietly cropping whatever now falls
     outside it.
     """
+    # Follows the dials, which moved from assets/css/reference-demo.scss to
+    # _sass/food/_temperature-chart.scss on 2026-08-14 when the chart stopped
+    # being a demo and started drawing on recipe pages. This test caught the
+    # move itself, which is the behaviour you want from a guard that reads
+    # another file: it failed loudly rather than silently bounding nothing.
     scss = (pathlib.Path(__file__).resolve().parent.parent
-            / "assets" / "css" / "reference-demo.scss")
+            / "_sass" / "food" / "_temperature-chart.scss")
     if not scss.exists():
-        pytest.skip("the charts stylesheet has gone; nothing to bound against")
+        pytest.skip("the chart stylesheet has gone; nothing to bound against")
 
     text = scss.read_text(encoding="utf-8")
     bounds = {}

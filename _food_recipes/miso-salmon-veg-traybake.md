@@ -7,6 +7,8 @@ prep_time: "10 mins"
 cook_time: "35 mins"
 main_ingredients: ["salmon or trout", "sweet potatoes", "broccoli", "pak choi", "white miso", "mirin", "dark brown soft sugar", "fresh ginger"]
 star_ingredient: "oily fish"
+internal_temp_ref: fish.salmon
+doneness: medium
 tags: ["virtuous"]
 ingredient_groups:
   - name: traybake
