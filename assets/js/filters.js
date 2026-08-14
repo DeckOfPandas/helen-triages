@@ -31,14 +31,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var matrix = document.querySelector('.controls');
   var recipeList = document.querySelector('.recipe-list');
-  var clearButton = null;
+  // Two buttons, same action -- issue #67. The top one is the original,
+  // pinned top-right of the matrix; the bottom one repeats it after the last
+  // filter section so clearing doesn't mean scrolling back up past five
+  // sections. Both stay in sync (visibility, click) via clearButtons below.
+  var clearButtons = [];
   if (matrix) {
-    var clearBtn = document.createElement('button');
-    clearBtn.type = 'button';
-    clearBtn.className = 'btn-clear';
-    clearBtn.textContent = '× clear all';
-    matrix.insertBefore(clearBtn, matrix.firstChild);
-    clearButton = clearBtn;
+    var clearBtnTop = document.createElement('button');
+    clearBtnTop.type = 'button';
+    clearBtnTop.className = 'btn-clear';
+    clearBtnTop.textContent = '× clear all';
+    matrix.insertBefore(clearBtnTop, matrix.firstChild);
+    clearButtons.push(clearBtnTop);
+
+    var clearBtnBottom = document.createElement('button');
+    clearBtnBottom.type = 'button';
+    clearBtnBottom.className = 'btn-clear btn-clear--bottom';
+    clearBtnBottom.textContent = '× clear all';
+    matrix.appendChild(clearBtnBottom);
+    clearButtons.push(clearBtnBottom);
   }
 
   var searchBox = document.getElementById('ingredient-search-box');
@@ -465,8 +476,9 @@ function renderResultsPool() {
     var searchingMessage = document.querySelector('.recipe-list-searching');
     if (searchingMessage) searchingMessage.style.display = suppressList ? 'block' : 'none';
 
-    if (clearButton) {
-      clearButton.style.visibility = (activeTags.size > 0 || activeStar || activeIngredient || activeMetaFilters.size > 0) ? 'visible' : 'hidden';
+    if (clearButtons.length) {
+      var clearVisibility = (activeTags.size > 0 || activeStar || activeIngredient || activeMetaFilters.size > 0) ? 'visible' : 'hidden';
+      clearButtons.forEach(function (btn) { btn.style.visibility = clearVisibility; });
       // visibility, not display -- same reasoning as ingredientClear above.
       if (nameSearchClear) nameSearchClear.style.visibility = nameQuery ? 'visible' : 'hidden';
     }
@@ -625,8 +637,8 @@ function renderResultsPool() {
     });
   }
 
-  if (clearButton) {
-    clearButton.addEventListener('click', function() {
+  if (clearButtons.length) {
+    var clearAllFilters = function() {
       activeTags.clear();
       activeStar = null;
       activeIngredient = null;
@@ -648,6 +660,9 @@ function renderResultsPool() {
       // unrelated action reordering the page underneath you.
       shuffleRecipeList();
       update();
+    };
+    clearButtons.forEach(function (btn) {
+      btn.addEventListener('click', clearAllFilters);
     });
   }
 
