@@ -70,6 +70,14 @@ $tc-label-width: 9.5rem;
 // bar that starts at the very first tick still sits uncomfortably close to the
 // word naming it.
 $tc-label-gap: $space-xl;
+// Where the plot's TRACK begins, and how wide it is. The rows are a grid --
+// label column, then 1fr -- so a bar's percentage is measured against that 1fr
+// and nothing else. Anything else drawn on the plot has to use the same basis
+// or it lands somewhere else entirely; see .tc-unsafe for what that cost.
+$tc-track-start: calc(#{$tc-label-width} + #{$tc-label-gap});
+$tc-track-width: calc(100% - #{$tc-label-width} - #{$tc-label-gap});
+// Headroom above the rows for the threshold's own label.
+$tc-threshold-height: 1.35rem;
 
 .tc {
   font-family: $font-body;
@@ -112,6 +120,10 @@ $tc-label-gap: $space-xl;
 // 10°C intervals across the 60° span.
 .tc-plot {
   position: relative;
+  // Room for the threshold label, which sits above the first row rather than on
+  // top of it. It was at top: 0 with nothing reserved, so it overprinted the
+  // first doneness level and was clipped by the container edge.
+  padding-top: $tc-threshold-height;
   background-image: repeating-linear-gradient(
     to right,
     $color-border 0,
@@ -183,12 +195,23 @@ $tc-label-gap: $space-xl;
 // Hatched rather than filled so it reads as "struck through" rather than as a
 // series, and so it survives greyscale and forced-colors, which a tint would
 // not.
+// MEASURED AGAINST THE TRACK, NOT THE PLOT, and this was a genuine safety bug
+// rather than a cosmetic one. The zone used to take its width as a percentage
+// of .tc-plot -- which includes the 9.5rem label column and the gap -- while
+// every bar takes its position from .tc-track, the 1fr beside that column. Same
+// number, two different bases: salmon's 63°C line rendered at about 54°C, some
+// 100px left of the figure it claimed.
+//
+// It under-stated the hazard in the only direction that matters. Medium and
+// medium-well sat to the RIGHT of a line they do not actually clear, so a chart
+// added specifically to stop 43°C reading as an unqualified option was telling
+// the same lie about two more levels.
 .tc-unsafe {
   position: absolute;
-  top: 0;
+  top: $tc-threshold-height;
   bottom: 0;
-  left: 0;
-  width: calc((var(--t) - #{$tc-min}) / #{$tc-max - $tc-min} * 100%);
+  left: $tc-track-start;
+  width: calc(#{$tc-track-width} * (var(--t) - #{$tc-min}) / #{$tc-max - $tc-min});
   background-image: repeating-linear-gradient(
     135deg,
     rgba($color-text, 0.07) 0 2px,
@@ -201,7 +224,7 @@ $tc-label-gap: $space-xl;
 .tc-threshold-label {
   position: absolute;
   top: 0;
-  left: calc((var(--t) - #{$tc-min}) / #{$tc-max - $tc-min} * 100%);
+  left: calc(#{$tc-track-start} + #{$tc-track-width} * (var(--t) - #{$tc-min}) / #{$tc-max - $tc-min});
   transform: translateX(-100%);
   padding-right: $space-xs;
   font-family: $font-headings;

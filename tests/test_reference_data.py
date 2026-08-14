@@ -719,3 +719,44 @@ def test_a_threshold_actually_excludes_something(internal_temperatures):
         if not clears:
             problems.append(f"{ref}: NO level clears {limit}°C — the figure or the levels are wrong")
     assert not problems, "\n  ".join(problems)
+
+
+def test_the_safety_zone_shares_the_bars_coordinate_space():
+    """The shaded zone must be measured against the same thing the bars are.
+
+    A chart row is a grid — a label column, then `1fr` — so a bar's percentage
+    resolves against that `1fr`. The zone is absolutely positioned on .tc-plot,
+    which is the WHOLE row width including the label column, so the same number
+    means two different places. Salmon's 63°C line drew at roughly 54°C, about
+    100px left of the figure it was labelled with.
+
+    That under-stated the hazard in the only direction that matters: medium and
+    medium-well sat to the right of a line they don't clear, on a chart added
+    specifically to stop a low figure reading as an unqualified option.
+
+    Checked in the SOURCE rather than by measuring a render, because there is no
+    browser here — but the thing being asserted is the actual cause, not a
+    symptom: if the zone's geometry doesn't mention the label column, it isn't
+    working in the track's coordinate space and it is wrong again.
+    """
+    scss = (pathlib.Path(__file__).resolve().parent.parent
+            / "_sass" / "food" / "_temperature-chart.scss")
+    if not scss.exists():
+        pytest.skip("the chart stylesheet has gone")
+    text = scss.read_text(encoding="utf-8")
+
+    problems = []
+    for selector in (".tc-unsafe", ".tc-threshold-label"):
+        start = text.index(selector + " {")
+        block = text[start:text.index("\n}", start)]
+        geometry = " ".join(
+            line for line in block.splitlines()
+            if line.strip().startswith(("left:", "width:"))
+        )
+        if "tc-track-start" not in geometry and "tc-track-width" not in geometry:
+            problems.append(
+                f"{selector} positions itself without the label column: {geometry.strip()!r}. "
+                f"It shares .tc-plot with the bars but not their origin, so its "
+                f"°C figure will land at a different place from theirs."
+            )
+    assert not problems, "\n  ".join(problems)
