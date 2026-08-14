@@ -106,6 +106,17 @@ layout: default
      site has no media queries to fix it with if it did. {% endcomment %}
   <div class="recipe-actions">
     <button type="button" class="btn-print" hidden>print</button>
+    {% comment %} PRODUCTION ONLY, and not a hedge -- the file genuinely is not
+       there in a local build. The PDFs are rendered from the finished _site by
+       scripts/generate_pdfs.py, which runs in the deploy workflow between
+       `jekyll build` and the artifact upload; nothing Jekyll does creates
+       them. Emitting the link locally would mean a permanent 404 in the one
+       view Helen actually works in, which is a good way to learn to ignore a
+       link. The trade is that this half of the pair can only be seen on the
+       live site. {% endcomment %}
+    {% if jekyll.environment == "production" %}
+      <a href="{{ '/food/recipes/' | append: page.slug | append: '.pdf' | relative_url }}">pdf</a>
+    {% endif %}
   </div>
 
   <div class="recipe-badges">

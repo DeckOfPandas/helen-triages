@@ -1031,6 +1031,57 @@ def test_print_rules_target_classes_that_exist():
     )
 
 
+def test_pdf_link_points_where_the_pdfs_are_written():
+    """GitHub issue #86. The "pdf" link on a recipe page and the file
+    scripts/generate_pdfs.py writes have to agree on one directory, and
+    nothing at either end would notice if they stopped.
+
+    Almost everything else about this feature fails loudly: no browser, a
+    crashed render, a build with no recipe pages in it all exit the workflow
+    non-zero. This one does not. Change the collection's permalink and the
+    script keeps working perfectly -- it globs whatever the build produced --
+    while every link in the markup goes on pointing at the old path. The
+    result is a deploy that succeeds, a site that looks right, and a link that
+    404s on every recipe.
+
+    So all three are read from where they actually live rather than restated
+    here: the permalink from _config.yml, the link from the layout, and the
+    write path from the script.
+    """
+    config = yaml.safe_load(read("_config.yml"))
+    permalink = ((config.get("collections") or {}).get("food_recipes") or {}).get("permalink")
+    assert permalink, (
+        "_config.yml declares no permalink for the food_recipes collection. "
+        "If the collection was renamed, this check no longer knows where "
+        "recipe pages live."
+    )
+    # "/food/recipes/:path/" -> "/food/recipes/"
+    expected = permalink.split(":")[0]
+
+    layout = read("_layouts", "recipe.html")
+    link = re.search(r"\{\{\s*'([^']+)'\s*\|\s*append:\s*page\.slug\s*\|\s*append:\s*'\.pdf'", layout)
+    assert link, (
+        "_layouts/recipe.html no longer builds the PDF link as "
+        "`'<dir>' | append: page.slug | append: '.pdf'`. If the link is built "
+        "another way now, this check needs to follow it -- it is the only "
+        "thing tying the link to where the files are written."
+    )
+    assert link.group(1) == expected, (
+        f"The PDF link points at {link.group(1)!r} but recipe pages are "
+        f"published under {expected!r} (from _config.yml's permalink), which "
+        f"is where scripts/generate_pdfs.py writes each PDF -- it puts "
+        f"<slug>.pdf beside the recipe's own output directory. One of the two "
+        f"has moved and the other has not."
+    )
+
+    script = read("scripts", "generate_pdfs.py")
+    assert 'glob("food/recipes/*/index.html")' in script, (
+        "scripts/generate_pdfs.py no longer globs food/recipes/*/index.html, "
+        "so it may be writing PDFs somewhere other than beside the recipe "
+        "pages this link points at."
+    )
+
+
 def test_spacing_tokens_are_not_used_for_type():
     """$space-* is for margin, padding and gaps — never font-size.
 
