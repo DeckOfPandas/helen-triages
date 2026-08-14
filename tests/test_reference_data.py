@@ -366,3 +366,44 @@ def test_no_method_produces_an_absurd_time(cooking_methods):
                 f"(from {m['timing']!r})"
             )
     assert not absurd, "\n  ".join(absurd)
+
+
+def test_every_oven_temperature_says_fan(cooking_methods):
+    """House style is fan-only — HANDOVER §5, "°C always, FAN OVEN ONLY, never
+    conventional or gas mark".
+
+    The source page didn't follow it: three rows spelled out a fan/conventional
+    pair and 63 gave a bare figure with no basis at all, which is the worst of
+    the three options — a number you can't act on without guessing which oven
+    it means, and a 20°C guess either way.
+
+    Helen, on the calculator: "only one option has fan oven though, the rest say
+    nothing... so 'fan' every time." This holds that.
+    """
+    import re as _re
+    problems = []
+    for protein, m in _all_methods(cooking_methods):
+        oven = m.get("oven")
+        if not oven:
+            continue
+        if "conventional" in oven.lower():
+            problems.append(f"{protein}/{m['id']}: still names a conventional "
+                            f"temperature — {oven!r}")
+        for figure in _re.findall(r"\d+(?:\s*[–-]\s*\d+)?\s*°C(?!\s*fan)", oven):
+            problems.append(f"{protein}/{m['id']}: {figure!r} doesn't say fan "
+                            f"— {oven!r}")
+    assert not problems, "\n  ".join(problems)
+
+
+def test_oven_basis_is_recorded(cooking_methods):
+    """Whether a fan figure was STATED by the source or INFERRED by us is the
+    kind of thing that quietly becomes fact once it's been in a data file for a
+    month. 63 of the 66 are inferred, on the evidence that every bare figure
+    which could be checked against a stated pair in its own protein matched the
+    fan half — good evidence, but evidence, not a citation."""
+    missing = [f"{p}/{m['id']}" for p, m in _all_methods(cooking_methods)
+               if m.get("oven") and m.get("oven_basis") not in {"stated", "inferred"}]
+    assert not missing, (
+        "these rows carry an oven temperature with no basis recorded:\n  "
+        + "\n  ".join(missing)
+    )
