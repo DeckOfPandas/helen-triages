@@ -1,0 +1,88 @@
+{% comment %}
+  One protein's section of food/reference/cooking-methods.html, rendered from
+  _data/food/cooking_methods.yml.
+
+  Parameters
+    id        the anchor id (also the data key)
+    label     the heading text
+    protein   the node from cooking_methods.yml
+
+  WHY THIS EXISTS. The page and the data held the same 66 timing rows twice, and
+  had started to disagree: the data says "180°C fan" where the page still says
+  "180°C fan / 200°C conventional", and bare figures on the page carry no oven
+  basis at all. Two copies of a fact, one of which is quietly wrong, is the
+  problem the data layer was built to end.
+
+  THE COLUMN SET COMES FROM THE DATA, not from this template. There are six
+  distinct shapes across the fourteen tables -- chicken alone says "Timing (per
+  kg)" and omits "Weight range"; beef's tough cuts swap "Temp change"/"Covering"
+  for "Temp/covering"/"Liquid"; pork and lamb's slow-cooked tables drop "Temp
+  change" entirely. Hard-coding one shape would silently regularise five tables
+  into something the sources don't say.
+
+  PROSE IS RENDERED FROM ORDERED LISTS, before the table and after it, each item
+  keeping its original class and inner HTML. That is what carries the weight-
+  range paragraphs, the FOOD SAFETY flags, ham's Caveat, the group intros and
+  the sources notes -- including the four outbound links that live inside those
+  sources notes and are the only ones on the page.
+{% endcomment %}
+
+<h2 class="recipe-section-heading" id="{{ include.id }}">
+  <span class="section-heading-text">{{ include.label }}</span>
+  <a class="cm-totop" href="#top">&uarr; top</a>
+</h2>
+
+{% for group in include.protein.groups %}
+  {% if group.name %}<p class="recipe-section-subtitle">{{ group.name }}</p>{% endif %}
+
+  {% for block in group.before %}
+    <p{% if block.kind == 'sources' %} class="recipe-source"{% endif %}>{{ block.html }}</p>
+  {% endfor %}
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>{% for column in group.columns %}<th>{{ column }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for method in include.protein.methods %}
+          {% if method.group == group.name %}
+            <tr>
+              {% for column in group.columns %}
+                {% comment %} One cell per declared column, resolved by NAME
+                   rather than by position -- the six column shapes don't share
+                   an index, and a positional lookup would put a covering
+                   instruction in the liquid column on two of the tables. {% endcomment %}
+                {% case column %}
+                  {% when 'Method' %}<td>{{ method.name }}</td>
+                  {% when 'Oven temp' %}<td>{{ method.oven }}</td>
+                  {% when 'Timing' %}<td>{{ method.timing }}</td>
+                  {% when 'Timing (per kg)' %}<td>{{ method.timing }}</td>
+                  {% when 'Temp change' %}<td>{{ method.temp_change }}</td>
+                  {% when 'Covering' %}<td>{{ method.covering }}</td>
+                  {% when 'Temp/covering' %}<td>{{ method.covering }}</td>
+                  {% when 'Liquid' %}<td>{{ method.liquid }}</td>
+                  {% when 'Weight range' %}<td>{{ method.weight_range }}</td>
+                  {% when 'Notes' %}
+                    {% comment %} source_note is folded back in here rather than
+                       given its own column: it was split out of `notes` so the
+                       calculator's "what you get" column reads as an outcome,
+                       but on this page the sourcing belongs beside the row it
+                       vouches for, exactly where it was. {% endcomment %}
+                    <td>{{ method.notes }}{% if method.source_note %} {{ method.source_note }}{% endif %}</td>
+                  {% else %}<td></td>
+                {% endcase %}
+              {% endfor %}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% for block in group.after %}
+    <p{% if block.kind == 'sources' %} class="recipe-source"{% endif %}>{{ block.html }}</p>
+  {% endfor %}
+{% endfor %}
+
+{% if include.protein.see_also %}<p>{{ include.protein.see_also }}</p>{% endif %}

@@ -394,6 +394,42 @@ article.recipe a {
 }
 
 
+// --- Anchored section headings ------------------------------------------------
+// The reference pages carry a contents list of in-page anchors, and until now
+// nothing on this site did -- so nothing had ever needed scroll-margin.
+//
+// WITHOUT IT THE JUMP LANDS BADLY, and specifically badly for THIS heading. The
+// blocky rule is painted as a background that hangs BELOW the lettering
+// (food/_rule.scss), and the punched lettering reads as raised partly because
+// there is paper above it. Scrolling a heading flush to the viewport edge cuts
+// the top of the letters and leaves the rule as the first thing you see, which
+// is the mark upside down. This is roughly the gap the heading would have had
+// if you had scrolled to it yourself.
+.recipe-section-heading {
+  scroll-margin-top: $space-xxl;
+}
+
+// "↑ top" beside a section heading. Body font, not the heading's Courier, and
+// no punched treatment: it is a control sitting next to a title, not a second
+// word in the title. Given the heading's own letter-spacing is inherited, the
+// resets here are load-bearing rather than tidy -- .btn-method-toggle needs the
+// same ones for the same reason, see its comment below.
+.cm-totop {
+  font-family: $font-body;
+  font-size: 0.72rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  color: $color-clear-text;
+  margin-left: $space-lg;
+  white-space: nowrap;
+  vertical-align: middle;
+
+  &:hover { color: $color-recipe-link; }
+}
+
 // --- Method Toggle Button ----------------------------------------------------
 // Matches .btn-clear-inline on the index page: Courier, 0.75rem, weight 800, scratchy.
 // Sans-serif, weight 600, no stroke -- deliberately matching article.recipe

@@ -54,6 +54,7 @@
     weight: root.querySelector("#ct-weight"),
     serve: root.querySelector("#ct-serve"),
     rest: root.querySelector("#ct-rest"),
+    table: root.querySelector("#ct-table"),
     out: root.querySelector("#ct-results"),
     summary: root.querySelector("#ct-summary")
   };
@@ -195,6 +196,7 @@
     var doneness = "rare";
 
     els.out.innerHTML = "";
+    els.table.innerHTML = "";
 
     if (!kg || kg <= 0) {
       els.summary.textContent = "Enter a weight to see how long each method takes.";
@@ -207,6 +209,29 @@
       els.protein.options[els.protein.selectedIndex].text.toLowerCase() +
       (serveAt === null ? ". Add a serving time for clock times." : ".") +
       (temp ? " <strong>Done at " + temp + "</strong>." : "");
+
+    /* --- the decision table ------------------------------------------------
+       The cards below answer "how long does this method take". They do not
+       answer "which method", which is the question you actually have first --
+       and seven cards, each with a time and a paragraph, is not something you
+       can compare at a glance. This is the same information at a length you can
+       scan: what you get, and what it costs you in time.
+
+       Table for choosing, cards for doing. Uses the site's existing table
+       styles (article.recipe .recipe-body-content table) and the .table-scroll
+       wrapper that already exists for wide tables -- no new CSS. */
+    var rows = protein.methods.map(function (method) {
+      var r = resolve(method, kg, doneness, protein.methods);
+      return "<tr>" +
+        "<td>" + method.name + "</td>" +
+        "<td>" + (method.outcome || "—") + "</td>" +
+        "<td>" + (r.ok ? span(r.lo, r.hi) : "<em>won’t guess</em>") + "</td>" +
+        "</tr>";
+    }).join("");
+
+    els.table.innerHTML =
+      "<table><thead><tr><th>Method</th><th>What you get</th><th>Time</th>" +
+      "</tr></thead><tbody>" + rows + "</tbody></table>";
 
     protein.methods.forEach(function (method) {
       var r = resolve(method, kg, doneness, protein.methods);
@@ -255,7 +280,12 @@
   }
 
   function fillProteins() {
-    Object.keys(METHODS).forEach(function (key) {
+    /* Alphabetical by the label you actually read, not by the data file's own
+       order -- sorted here rather than in the YAML so the data stays neutral
+       about presentation and the reference page can keep its own sequence. */
+    Object.keys(METHODS).sort(function (a, b) {
+      return METHODS[a].label.localeCompare(METHODS[b].label);
+    }).forEach(function (key) {
       var opt = document.createElement("option");
       opt.value = key;
       opt.textContent = METHODS[key].label;

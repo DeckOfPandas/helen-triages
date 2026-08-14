@@ -407,3 +407,147 @@ def test_oven_basis_is_recorded(cooking_methods):
         "these rows carry an oven temperature with no basis recorded:\n  "
         + "\n  ".join(missing)
     )
+
+
+# --- the notes themselves ----------------------------------------------------
+
+def test_notes_are_not_damaged(cooking_methods):
+    """Correction history is stripped from notes on the way out of the page.
+    The first implementation did it with `Corrected from[^.]*\\.?` — and `[^.]*`
+    stops at the FIRST period, which in "a 1.7–2 kg bird takes ~3 hrs" is the
+    one inside the number. Two notes ended up with a fragment welded on
+    ("…rather than throughout7–2 kg bird takes ~3 hrs at this temperature)") and
+    four more had a sentence fused onto the one before it.
+
+    It mattered more than a demo bug, because these notes now render the
+    published page. The generator splits on real sentence boundaries instead;
+    this is what stops the class of bug coming back by another route.
+
+    THE CHECKS ARE EXACT, NOT HEURISTIC, and that is deliberate. A first version
+    also flagged "a lowercase word, a space, then a capital" as a fused
+    sentence — which is genuinely the shape of the bug, and is also the shape of
+    every proper noun in the middle of a sentence. It failed on "the American
+    Lamb Board's own figures". A check that cries wolf on correct data gets
+    switched off, so it is gone: unbalanced brackets, a figure welded onto a
+    word, and a note that starts mid-sentence are all unambiguous.
+    """
+    import re as _re
+    damaged = []
+    for protein, m in _all_methods(cooking_methods):
+        for field in ("notes", "source_note"):
+            note = m.get(field)
+            if not note:
+                continue
+            where = f"{protein}/{m['id']}.{field}"
+            if note.count("(") != note.count(")"):
+                damaged.append(f"{where}: unbalanced brackets — {note[:70]!r}")
+            if _re.search(r"[a-z)]\d+\s*[–-]", note):
+                damaged.append(f"{where}: a figure welded onto a word — {note[:70]!r}")
+            if note[:1].islower():
+                damaged.append(f"{where}: starts mid-sentence — {note[:70]!r}")
+    assert not damaged, "\n  ".join(damaged)
+
+
+def test_every_method_has_a_short_outcome(cooking_methods):
+    """The calculator's decision table answers "which method", and it can only
+    do that if every row has something to say in the column. Length is the
+    point: a sentence there is just the note again, and you cannot scan a
+    column of sentences."""
+    problems = []
+    for protein, m in _all_methods(cooking_methods):
+        outcome = m.get("outcome")
+        if not outcome:
+            problems.append(f"{protein}/{m['id']}: no outcome")
+        elif len(outcome.split()) > 5:
+            problems.append(f"{protein}/{m['id']}: {len(outcome.split())} words — {outcome!r}")
+    assert not problems, "\n  ".join(problems)
+
+
+# --- the page renders from this data now -------------------------------------
+
+# Every column name _includes/food/method_table.html knows how to fill. A name
+# outside this set renders an EMPTY CELL rather than failing, so the test is the
+# only thing standing between a renamed column and a silently blank table.
+KNOWN_COLUMNS = {
+    "Method", "Oven temp", "Timing", "Timing (per kg)", "Temp change",
+    "Covering", "Temp/covering", "Liquid", "Weight range", "Notes",
+}
+
+
+def test_group_columns_are_all_renderable(cooking_methods):
+    unknown = []
+    for protein, node in cooking_methods.items():
+        for group in node.get("groups", []):
+            for column in group.get("columns") or []:
+                if column not in KNOWN_COLUMNS:
+                    unknown.append(f"{protein}/{group['name']!r}: column {column!r}")
+    assert not unknown, (
+        "these columns would render as empty cells — teach "
+        "_includes/food/method_table.html about them, or rename them:\n  "
+        + "\n  ".join(unknown)
+    )
+
+
+def test_every_method_belongs_to_a_declared_group(cooking_methods):
+    """The page renders a table per group and fills it by matching
+    `method.group` to `group.name`. A method whose group doesn't match any
+    declared one simply never appears — no error, no empty row, just a missing
+    cooking method on a published page."""
+    orphans = []
+    for protein, node in cooking_methods.items():
+        names = {g["name"] for g in node.get("groups", [])}
+        if not names:
+            continue
+        for m in node["methods"]:
+            if m.get("group") not in names:
+                orphans.append(f"{protein}/{m['id']}: group {m.get('group')!r} "
+                               f"not in {sorted(names)}")
+    assert not orphans, "\n  ".join(orphans)
+
+
+def test_prose_blocks_survived_the_move_into_data(cooking_methods):
+    """The eight timing sections' surrounding prose now lives in the data, in
+    ordered before/after lists. This asserts the count didn't quietly shrink:
+    30 paragraphs across 12 groups, being 12 sources notes and 18 others
+    (weight ranges, FOOD SAFETY flags, group intros, ham's Caveat)."""
+    total = sum(len(g.get("before", [])) + len(g.get("after", []))
+                for node in cooking_methods.values()
+                for g in node.get("groups", []))
+    sources = sum(1 for node in cooking_methods.values()
+                  for g in node.get("groups", [])
+                  for b in g.get("before", []) + g.get("after", [])
+                  if b["kind"] == "sources")
+    assert total == 30, f"expected 30 prose blocks, found {total}"
+    assert sources == 12, f"expected 12 sources notes, found {sources}"
+
+
+def test_outbound_links_are_still_in_the_data(cooking_methods):
+    """The page's only four outbound links live INSIDE recipe-source notes.
+    Flattening a source note to plain text would lose them without changing a
+    single visible word of prose, which is why they get their own assertion."""
+    blob = "".join(b["html"] for node in cooking_methods.values()
+                   for g in node.get("groups", [])
+                   for b in g.get("before", []) + g.get("after", []))
+    for domain in ("waitrose.com", "jamieoliver.com", "goodto.com"):
+        assert domain in blob, f"outbound link to {domain} has been lost"
+
+
+def test_the_data_file_is_not_empty(cooking_methods):
+    """A floor, and it exists because the floor gave way once.
+
+    tmp/emit_cooking_methods.py parses cooking-methods.html — and that page now
+    renders FROM this data file. Running the generator against the working copy
+    therefore made it its own consumer: it found no tables, wrote an empty data
+    file, and the page went blank. The generator is pinned to the pre-migration
+    commit now so it can't recur, but the more useful lesson is that almost
+    every test in this file passed on that empty file, vacuously, because
+    "for every method…" is trivially true of no methods.
+
+    So: assert the shape is there at all, before asserting things about it.
+    """
+    assert len(cooking_methods) == 8, (
+        f"expected 8 proteins with timings, found {len(cooking_methods)}: "
+        f"{sorted(cooking_methods)}"
+    )
+    total = sum(len(node["methods"]) for node in cooking_methods.values())
+    assert total == 66, f"expected 66 methods, found {total}"

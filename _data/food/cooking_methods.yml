@@ -26,881 +26,1163 @@
 #
 # internal_temp_ref points into internal_temperatures.yml, so a schedule can
 # finish on a thermometer figure rather than on a clock.
+#
+# `groups` carries the page furniture around each table: its subtitle, its
+# column names, and TWO ORDERED LISTS of prose -- `before` the table and
+# `after` it -- each item keeping its original class and inner HTML verbatim.
+#
+# Ordered lists rather than named fields (weight_note, safety_note, ...) so that
+# a kind of paragraph nobody anticipated still survives, in the right place,
+# with its markup. The `kind` label is a hint for styling, not a filter: an
+# unrecognised paragraph renders as `prose` rather than disappearing.
+#
+# Steak, fish and shellfish are absent by design -- no timings, so nothing to
+# reconcile, and the fish table's 11 rowspans don't survive a generic loop.
 
 chicken:
-  label: "Chicken"
+  label: Chicken
   internal_temp_ref: poultry.chicken
   methods:
-    - id: "standard_constant_roast"
-      name: "Standard constant roast"
-      shape: "rate"
-      timing: "~40 min/kg + 20 min"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "180°C fan"
-      oven_basis: "stated"
-      rate_min: 40
-      rate_max: 40
-      flat_add: 20
-      notes: "Simple, reliable; skin browns gradually. For 2.5 kg: ~2 hrs"
-    - id: "high_heat_start_then_reduce"
-      name: "High-heat start, then reduce"
-      shape: "rate"
-      timing: "~40 min/kg + 20 min total"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "One step down"
-      oven: "Start 220°C fan, drop to 180°C fan after 20 min"
-      oven_basis: "inferred"
-      rate_min: 40
-      rate_max: 40
-      flat_add: 20
-      notes: "Kickstarts crisp skin, then finishes gently so it doesn't dry out"
-    - id: "low_and_slow_high_heat_blast_at_end"
-      name: "Low and slow, high-heat blast at end"
-      shape: "rate"
-      timing: "~90–105 min/kg total"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered until final blast"
-      temp_change: "One step up near the end"
-      oven: "150–160°C fan for most of cook, then up to 220°C fan for last 15–20 min"
-      oven_basis: "inferred"
-      rate_min: 90
-      rate_max: 105
-      notes: "Very juicy meat; skin crisps at the very end rather than throughout7–2 kg bird takes ~3 hrs at this temperature)"
-    - id: "foil_tented_roast"
-      name: "Foil-tented roast"
-      shape: "rate"
-      timing: "~40 min/kg + 20 min"
-      group: "Whole bird, roasting methods"
-      covering: "Foil loosely over breast for first 2/3 of cook, removed for last 20–30 min"
-      temp_change: "None"
-      oven: "190–200°C fan"
-      oven_basis: "inferred"
-      rate_min: 40
-      rate_max: 40
-      flat_add: 20
-      notes: "Protects breast from drying/over-browning while legs catch up"
-    - id: "fully_foil_wrapped_steam_roast"
-      name: "Fully foil-wrapped (steam-roast)"
-      shape: "rate"
-      timing: "~40 min/kg + 20 min, foil removed for last 20–25 min"
-      group: "Whole bird, roasting methods"
-      covering: "Fully wrapped, then opened at the end"
-      temp_change: "None"
-      oven: "180°C fan"
-      oven_basis: "inferred"
-      rate_min: 40
-      rate_max: 40
-      flat_add: 20
-      notes: "Very moist, almost pot-roast texture; skin won't crisp until unwrapped"
-    - id: "roasting_bag"
-      name: "Roasting bag"
-      shape: "rate"
-      timing: "~33–44 min/kg (bags cook slightly faster than open roasting, but not as fast as this used to claim)"
-      group: "Whole bird, roasting methods"
-      covering: "Sealed in bag throughout, slit open for last 10–15 min if you want colour"
-      temp_change: "None"
-      oven: "190–200°C fan (check bag manufacturer's max)"
-      oven_basis: "inferred"
-      rate_min: 33
-      rate_max: 44
-      notes: "Fast, very moist, minimal oven mess; skin stays pale unless opened at the end"
-    - id: "spatchcocked_flattened"
-      name: "Spatchcocked (flattened)"
-      shape: "total"
-      timing: "~40 min total for a typical 1.5–2 kg bird"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "220°C fan"
-      oven_basis: "inferred"
-      total_min: 40
-      total_max: 40
-      notes: "Much faster and more even than trussed roasting; not \"whole\" in shape but often grouped with whole-bird methods. Given as a total time, not min/kg — flattening changes the geometry enough that a per-kg rate doesn't scale sensibly"
-
+  - id: standard_constant_roast
+    name: Standard constant roast
+    shape: rate
+    timing: ~40 min/kg + 20 min
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: None
+    outcome: Reliable default
+    oven: 180°C fan
+    oven_basis: stated
+    rate_min: 40
+    rate_max: 40
+    flat_add: 20
+    notes: Simple, reliable; skin browns gradually
+  - id: high_heat_start_then_reduce
+    name: High-heat start, then reduce
+    shape: rate
+    timing: ~40 min/kg + 20 min total
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: One step down
+    outcome: Crisp skin, moist meat
+    oven: Start 220°C fan, drop to 180°C fan after 20 min
+    oven_basis: inferred
+    rate_min: 40
+    rate_max: 40
+    flat_add: 20
+    notes: Kickstarts crisp skin, then finishes gently so it doesn't dry out
+  - id: low_and_slow_high_heat_blast_at_end
+    name: Low and slow, high-heat blast at end
+    shape: rate
+    timing: ~90–105 min/kg total
+    group: Whole bird, roasting methods
+    covering: Uncovered until final blast
+    temp_change: One step up near the end
+    outcome: Juiciest meat
+    oven: 150–160°C fan for most of cook, then up to 220°C fan for last 15–20 min
+    oven_basis: inferred
+    rate_min: 90
+    rate_max: 105
+    notes: Very juicy meat; skin crisps at the very end rather than throughout
+  - id: foil_tented_roast
+    name: Foil-tented roast
+    shape: rate
+    timing: ~40 min/kg + 20 min
+    group: Whole bird, roasting methods
+    covering: Foil loosely over breast for first 2/3 of cook, removed for last 20–30 min
+    temp_change: None
+    outcome: Protects the breast
+    oven: 190–200°C fan
+    oven_basis: inferred
+    rate_min: 40
+    rate_max: 40
+    flat_add: 20
+    notes: Protects breast from drying/over-browning while legs catch up
+  - id: fully_foil_wrapped_steam_roast
+    name: Fully foil-wrapped (steam-roast)
+    shape: rate
+    timing: ~40 min/kg + 20 min, foil removed for last 20–25 min
+    group: Whole bird, roasting methods
+    covering: Fully wrapped, then opened at the end
+    temp_change: None
+    outcome: Very moist, pale skin
+    oven: 180°C fan
+    oven_basis: inferred
+    rate_min: 40
+    rate_max: 40
+    flat_add: 20
+    notes: Very moist, almost pot-roast texture; skin won't crisp until unwrapped
+  - id: roasting_bag
+    name: Roasting bag
+    shape: rate
+    timing: ~33–44 min/kg (bags cook slightly faster than open roasting, but not as fast as this used to claim)
+    group: Whole bird, roasting methods
+    covering: Sealed in bag throughout, slit open for last 10–15 min if you want colour
+    temp_change: None
+    outcome: Fast, least mess
+    oven: 190–200°C fan (check bag manufacturer's max)
+    oven_basis: inferred
+    rate_min: 33
+    rate_max: 44
+    notes: Fast, very moist, minimal oven mess; skin stays pale unless opened at the end
+  - id: spatchcocked_flattened
+    name: Spatchcocked (flattened)
+    shape: total
+    timing: ~40 min total for a typical 1.5–2 kg bird
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: None
+    outcome: Fastest, most even
+    oven: 220°C fan
+    oven_basis: inferred
+    total_min: 40
+    total_max: 40
+    notes: Much faster and more even than trussed roasting; not "whole" in shape but often grouped with whole-bird methods
+  groups:
+  - name: Whole bird, roasting methods
+    columns:
+    - Method
+    - Oven temp
+    - Timing (per kg)
+    - Temp change
+    - Covering
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: <strong>Weight calculus:</strong> the "X min/kg + 20 min" formulas (standard, high-then-low, foil-tented, fully-wrapped) hold reliably for birds roughly <strong>1.3 kg to 3 kg</strong>. Below ~1.3 kg the flat +20 min addition becomes disproportionately large relative to cook time — use a flat total time (~1 hr to 1 hr 10 min) and check temperature. Above ~3 kg, heat penetration to the thigh becomes the bottleneck, so larger birds need a lower temperature (160–170°C) for a longer, gentler cook.
+    - kind: sources
+      html: 'Sources: standard/high-heat-start rates match BBC Good Food and Delia Smith''s common "20 min per 450g + 20 min" formula (≈44 min/kg+20min). Low-and-slow and roasting-bag corrections and the spatchcock rewrite are from Reynolds'' own oven-bag timing chart and comparable recipes (Bell &amp; Evans and others) for a whole spatchcocked bird at 220–230°C. Foil-tented/fully-wrapped weren''t specifically re-checked this pass — same weight-calculus caveat as everything above. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 turkey:
-  label: "Turkey"
+  label: Turkey
   internal_temp_ref: poultry.turkey
   methods:
-    - id: "standard_constant_roast"
-      name: "Standard constant roast"
-      shape: "rate"
-      timing: "~35–40 min/kg unstuffed"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "160–170°C fan"
-      oven_basis: "stated"
-      weight_min: 4
-      weight_max: 8
-      rate_min: 35
-      rate_max: 40
-    - id: "high_heat_start_then_reduce"
-      name: "High-heat start, then reduce"
-      shape: "rate"
-      timing: "~35–46 min/kg total after the initial blast"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "One step down"
-      oven: "Start 220°C fan for 20–30 min, drop to 160–170°C fan"
-      oven_basis: "inferred"
-      weight_min: 4
-      weight_max: 8
-      rate_min: 35
-      rate_max: 46
-      notes: "Browns skin early, then finishes gently"
-    - id: "foil_tented_throughout_removed_at_end"
-      name: "Foil-tented throughout, removed at end"
-      shape: "rate"
-      timing: "~30–35 min/kg (estimated by analogy to the standard rate above — not separately sourced)"
-      group: "Whole bird, roasting methods"
-      covering: "Loosely tented whole time, foil off for last 30–45 min"
-      temp_change: "None"
-      oven: "160–180°C fan"
-      oven_basis: "inferred"
-      weight_min: 4
-      weight_max: 10
-      rate_min: 30
-      rate_max: 35
-      notes: "Standard for larger birds; essential above ~6 kg"
-    - id: "fully_wrapped_steam_roast"
-      name: "Fully wrapped/steam-roast"
-      shape: "rate"
-      timing: "~25–30 min/kg, unwrapped for last 30–40 min (estimated — not separately sourced)"
-      group: "Whole bird, roasting methods"
-      covering: "Fully wrapped, opened at end"
-      temp_change: "None"
-      oven: "160–180°C fan"
-      oven_basis: "inferred"
-      weight_min: 4
-      weight_max: 8
-      rate_min: 25
-      rate_max: 30
-      notes: "Very moist; skin only crisps once unwrapped"
-    - id: "roasting_bag"
-      name: "Roasting bag"
-      shape: "rate"
-      timing: "~20–24 min/kg"
-      group: "Whole bird, roasting methods"
-      covering: "Sealed, slit open last 20–30 min for colour"
-      temp_change: "None"
-      oven: "180–190°C fan (check bag max)"
-      oven_basis: "inferred"
-      weight_min: 4
-      weight_max: 8
-      rate_min: 20
-      rate_max: 24
-      notes: "Faster and more even than open roasting — but this is the fastest of the enclosed methods, not the fastest thing on the page"
-    - id: "low_and_slow_blast_at_end"
-      name: "Low and slow, blast at end"
-      shape: "rate"
-      timing: "~45–55 min/kg total (estimated by analogy — chicken's low-and-slow row undershot by a similar margin; not directly sourced for turkey at this exact temperature)"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "One step up at the end"
-      oven: "120–140°C fan for most of cook, up to 220°C fan for final 20–30 min"
-      oven_basis: "inferred"
-      weight_min: 4
-      weight_max: 7
-      rate_min: 45
-      rate_max: 55
-      notes: "Very tender, but a long commitment"
-    - id: "spatchcocked"
-      name: "Spatchcocked"
-      shape: "rate"
-      timing: "~10–16 min/kg (much faster overall)"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "200–220°C fan"
-      oven_basis: "inferred"
-      weight_min: 3
-      weight_max: 6.5
-      rate_min: 10
-      rate_max: 16
-      notes: "Rarely done above ~6.5 kg — too large to lie flat in most ovens"
-
+  - id: standard_constant_roast
+    name: Standard constant roast
+    shape: rate
+    timing: ~35–40 min/kg unstuffed
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: None
+    outcome: Reliable default
+    oven: 160–170°C fan
+    oven_basis: stated
+    weight_range: 4–8 kg
+    weight_min: 4
+    weight_max: 8
+    rate_min: 35
+    rate_max: 40
+  - id: high_heat_start_then_reduce
+    name: High-heat start, then reduce
+    shape: rate
+    timing: ~35–46 min/kg total after the initial blast
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: One step down
+    outcome: Browned skin, gentle finish
+    oven: Start 220°C fan for 20–30 min, drop to 160–170°C fan
+    oven_basis: inferred
+    weight_range: 4–8 kg
+    weight_min: 4
+    weight_max: 8
+    rate_min: 35
+    rate_max: 46
+    notes: Browns skin early, then finishes gently
+  - id: foil_tented_throughout_removed_at_end
+    name: Foil-tented throughout, removed at end
+    shape: rate
+    timing: ~30–35 min/kg (estimated by analogy to the standard rate above — not separately sourced)
+    group: Whole bird, roasting methods
+    covering: Loosely tented whole time, foil off for last 30–45 min
+    temp_change: None
+    outcome: For the biggest birds
+    oven: 160–180°C fan
+    oven_basis: inferred
+    weight_range: 4–10 kg
+    weight_min: 4
+    weight_max: 10
+    rate_min: 30
+    rate_max: 35
+    notes: Standard for larger birds; essential above ~6 kg
+  - id: fully_wrapped_steam_roast
+    name: Fully wrapped/steam-roast
+    shape: rate
+    timing: ~25–30 min/kg, unwrapped for last 30–40 min (estimated — not separately sourced)
+    group: Whole bird, roasting methods
+    covering: Fully wrapped, opened at end
+    temp_change: None
+    outcome: Very moist, pale skin
+    oven: 160–180°C fan
+    oven_basis: inferred
+    weight_range: 4–8 kg
+    weight_min: 4
+    weight_max: 8
+    rate_min: 25
+    rate_max: 30
+    notes: Very moist; skin only crisps once unwrapped
+  - id: roasting_bag
+    name: Roasting bag
+    shape: rate
+    timing: ~20–24 min/kg
+    group: Whole bird, roasting methods
+    covering: Sealed, slit open last 20–30 min for colour
+    temp_change: None
+    outcome: Fastest enclosed method
+    oven: 180–190°C fan (check bag max)
+    oven_basis: inferred
+    weight_range: 4–8 kg
+    weight_min: 4
+    weight_max: 8
+    rate_min: 20
+    rate_max: 24
+    notes: Faster and more even than open roasting — but this is the fastest of the enclosed methods, not the fastest thing on the page
+  - id: low_and_slow_blast_at_end
+    name: Low and slow, blast at end
+    shape: rate
+    timing: ~45–55 min/kg total (estimated by analogy — chicken's low-and-slow row undershot by a similar margin; not directly sourced for turkey at this exact temperature)
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: One step up at the end
+    outcome: Most tender, long haul
+    oven: 120–140°C fan for most of cook, up to 220°C fan for final 20–30 min
+    oven_basis: inferred
+    weight_range: 4–7 kg
+    weight_min: 4
+    weight_max: 7
+    rate_min: 45
+    rate_max: 55
+    notes: Very tender, but a long commitment
+  - id: spatchcocked
+    name: Spatchcocked
+    shape: rate
+    timing: ~10–16 min/kg (much faster overall)
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: None
+    outcome: Fastest overall
+    oven: 200–220°C fan
+    oven_basis: inferred
+    weight_range: 3–6.5 kg
+    weight_min: 3
+    weight_max: 6.5
+    rate_min: 10
+    rate_max: 16
+    notes: Rarely done above ~6.5 kg — too large to lie flat in most ovens
+  groups:
+  - name: Whole bird, roasting methods
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp change
+    - Covering
+    - Weight range
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: <strong>Weight edge cases:</strong> below ~4 kg, treat like a very large chicken — check from the low end of the timing. Above ~10 kg, per-kg formulas break down; use a much lower oven temperature (140–150°C) and time by thermometer alone, checking from about two-thirds of the naive estimate onward.
+    - kind: sources
+      html: 'Sources: standard rate confirmed against four independent UK sources (Jamie Oliver, Delia Smith, BBC Good Food, Butterball/USDA) all converging on ~35–44 min/kg for a whole unstuffed bird — the old ~20 min/kg figure undercooked a 5 kg turkey by roughly an hour against your own recipe''s actual 2½ hr/30 min-per-kg result, which is itself a useful cross-check against this table. High-heat-start rate from Mary Berry''s method. Roasting-bag rate from Reynolds'' own oven-bag chart (the fastest of the enclosed methods, used as the anchor for the tented/wrapped estimates above it, which weren''t independently sourced). Spatchcock rate from Bon Appétit-style conversions. Tented/wrapped/low-and-slow rows are estimates by analogy, not independently confirmed — check these first if you cook a turkey this way. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 goose:
-  label: "Goose"
+  label: Goose
   internal_temp_ref: poultry.goose
   methods:
-    - id: "standard_constant_roast"
-      name: "Standard constant roast"
-      shape: "rate"
-      timing: "~30–40 min/kg"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "160–170°C fan"
-      oven_basis: "inferred"
-      weight_min: 3.5
-      weight_max: 6
-      rate_min: 30
-      rate_max: 40
-      notes: "Goose renders a lot of fat; draining the tray periodically is standard practice"
-    - id: "high_heat_start_then_reduce"
-      name: "High-heat start, then reduce"
-      shape: "rate"
-      timing: "~25–30 min/kg after initial blast"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "One step down"
-      oven: "Start 220°C fan for 20–30 min, drop to 170°C fan"
-      oven_basis: "inferred"
-      weight_min: 3.5
-      weight_max: 6
-      rate_min: 25
-      rate_max: 30
-      notes: "Crisps skin before the long, fatty render"
-    - id: "low_and_slow_blast_at_end"
-      name: "Low and slow, blast at end"
-      shape: "rate"
-      timing: "~40–50 min/kg total"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "One step up at the end"
-      oven: "140–150°C fan for bulk of cook, up to 220°C fan for last 20 min"
-      oven_basis: "inferred"
-      weight_min: 3.5
-      weight_max: 5.5
-      rate_min: 40
-      rate_max: 50
-      notes: "Common approach — long, gentle render of fat before final crisping"
-    - id: "foil_tented_removed_at_end"
-      name: "Foil-tented, removed at end"
-      shape: "rate"
-      timing: "~30–35 min/kg (estimated by analogy to the standard rate above — not separately sourced)"
-      group: "Whole bird, roasting methods"
-      covering: "Tented for first 2/3, off for last 30 min"
-      temp_change: "None"
-      oven: "160–170°C fan"
-      oven_basis: "inferred"
-      weight_min: 4
-      weight_max: 6.5
-      rate_min: 30
-      rate_max: 35
-      notes: "Less common than with turkey (goose skin needs open air to render fat), useful for very large birds"
-    - id: "steaming_parboil_assisted"
-      name: "Steaming/parboil-assisted"
-      shape: "rate"
-      timing: "~25–30 min/kg roasting time after initial steam (estimated by analogy — not separately sourced)"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered during roast"
-      temp_change: "None"
-      oven: "Steam or simmer briefly before roasting at 180–200°C fan"
-      oven_basis: "inferred"
-      weight_min: 3.5
-      weight_max: 5.5
-      rate_min: 25
-      rate_max: 30
-      notes: "Traditional method — renders fat and tightens skin before roasting"
-
+  - id: standard_constant_roast
+    name: Standard constant roast
+    shape: rate
+    timing: ~30–40 min/kg
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: None
+    outcome: Reliable default
+    oven: 160–170°C fan
+    oven_basis: inferred
+    weight_range: 3.5–6 kg
+    weight_min: 3.5
+    weight_max: 6
+    rate_min: 30
+    rate_max: 40
+    notes: Goose renders a lot of fat; draining the tray periodically is standard practice
+  - id: high_heat_start_then_reduce
+    name: High-heat start, then reduce
+    shape: rate
+    timing: ~25–30 min/kg after initial blast
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: One step down
+    outcome: Crisp skin first
+    oven: Start 220°C fan for 20–30 min, drop to 170°C fan
+    oven_basis: inferred
+    weight_range: 3.5–6 kg
+    weight_min: 3.5
+    weight_max: 6
+    rate_min: 25
+    rate_max: 30
+    notes: Crisps skin before the long, fatty render
+  - id: low_and_slow_blast_at_end
+    name: Low and slow, blast at end
+    shape: rate
+    timing: ~40–50 min/kg total
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: One step up at the end
+    outcome: Best fat render
+    oven: 140–150°C fan for bulk of cook, up to 220°C fan for last 20 min
+    oven_basis: inferred
+    weight_range: 3.5–5.5 kg
+    weight_min: 3.5
+    weight_max: 5.5
+    rate_min: 40
+    rate_max: 50
+    notes: Common approach — long, gentle render of fat before final crisping
+  - id: foil_tented_removed_at_end
+    name: Foil-tented, removed at end
+    shape: rate
+    timing: ~30–35 min/kg (estimated by analogy to the standard rate above — not separately sourced)
+    group: Whole bird, roasting methods
+    covering: Tented for first 2/3, off for last 30 min
+    temp_change: None
+    outcome: Protects the breast
+    oven: 160–170°C fan
+    oven_basis: inferred
+    weight_range: 4–6.5 kg
+    weight_min: 4
+    weight_max: 6.5
+    rate_min: 30
+    rate_max: 35
+    notes: Less common than with turkey (goose skin needs open air to render fat), useful for very large birds
+  - id: steaming_parboil_assisted
+    name: Steaming/parboil-assisted
+    shape: rate
+    timing: ~25–30 min/kg roasting time after initial steam (estimated by analogy — not separately sourced)
+    group: Whole bird, roasting methods
+    covering: Uncovered during roast
+    temp_change: None
+    outcome: Traditional, crispest skin
+    oven: Steam or simmer briefly before roasting at 180–200°C fan
+    oven_basis: inferred
+    weight_range: 3.5–5.5 kg
+    weight_min: 3.5
+    weight_max: 5.5
+    rate_min: 25
+    rate_max: 30
+    notes: Traditional method — renders fat and tightens skin before roasting
+  groups:
+  - name: Whole bird, roasting methods
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp change
+    - Covering
+    - Weight range
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: <strong>Weight edge cases:</strong> geese vary less in weight than turkeys (commercially usually 3.5–6.5 kg), so the per-kg formulas are reasonably reliable across the typical range. Below ~3.5 kg, treat like a very large duck and check earlier than the formula suggests.
+    - kind: sources
+      html: 'Sources: standard and high-heat-start rates from Delia Smith''s own goose recipe (5.4 kg bird, 30 min blast + 3 hrs at 180°C ≈ 39 min/kg), Gordon Ramsay''s recipe (220°C blast 25–30 min, drop to 170°C, then 30 min/kg), and Abel &amp; Cole (same pattern). Low-and-slow rate from genuine 150°C/300°F goose recipes running 3–4 hrs for a ~5 kg bird. Tented and steaming rows are estimates by analogy, not independently sourced. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 duck:
-  label: "Duck"
+  label: Duck
   internal_temp_ref: poultry.duck
   methods:
-    - id: "standard_constant_roast"
-      name: "Standard constant roast"
-      shape: "rate"
-      timing: "~35–40 min/kg + 20 min"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "200–220°C fan"
-      oven_basis: "inferred"
-      weight_min: 1.5
-      weight_max: 3
-      rate_min: 35
-      rate_max: 40
-      flat_add: 20
-      notes: "Temperature A true 180°C-throughout version would need longer than this; no source found for that specific combination, so it isn't listed as its own row"
-    - id: "high_heat_start_then_reduce"
-      name: "High-heat start, then reduce"
-      shape: "rate"
-      timing: "~35 min/kg after initial blast"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "One step down"
-      oven: "Start 220°C fan for 15–20 min, drop to 180°C fan"
-      oven_basis: "inferred"
-      weight_min: 1.5
-      weight_max: 3
-      rate_min: 35
-      rate_max: 35
-      notes: "Renders and crisps skin quickly before finishing. Rate roughly confirmed — a 2 kg duck at this rate (~100 min) matches Gressingham's own 220°C figure closely"
-    - id: "low_and_slow_blast_at_end"
-      name: "Low and slow, blast at end"
-      shape: "rate"
-      timing: "~70–90 min/kg total (widened from ~45–50 — see note)"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "One step up at the end"
-      oven: "150–160°C fan for bulk, up to 220°C fan for last 15 min"
-      oven_basis: "inferred"
-      weight_min: 1.5
-      weight_max: 2.5
-      rate_min: 70
-      rate_max: 90
-      notes: "Favoured for maximum fat render without drying the meat. Not directly sourced at this exact temperature — Nigella's genuine low-temp method runs hotter (170°C) and still takes ~120 min/kg for a similar-size duck, which suggests an even lower 150–160°C would need at least this long, possibly more"
-    - id: "steaming_parboil_assisted"
-      name: "Steaming/parboil-assisted"
-      shape: "rate"
-      timing: "~30–35 min/kg roasting time after steam (not independently confirmed either way)"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered during roast"
-      temp_change: "None"
-      oven: "Steam briefly, then roast at 200°C fan"
-      oven_basis: "inferred"
-      weight_min: 1.5
-      weight_max: 3
-      rate_min: 30
-      rate_max: 35
-      notes: "Classic technique for very crisp skin"
-    - id: "spatchcocked"
-      name: "Spatchcocked"
-      shape: "disputed"
-      timing: "~20–60 min/kg — genuinely conflicting sources, see note"
-      group: "Whole bird, roasting methods"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "200–220°C fan"
-      oven_basis: "inferred"
-      weight_min: 1.5
-      weight_max: 2.5
-      rate_min: 20
-      rate_max: 60
-      notes: "Good for smaller ducks where breast and leg doneness otherwise diverge. One US recipe (450°F) matches the fast end of this range; one UK recipe uses a gentler 160–180°C for 120 min on a 2 kg bird — nearly 3× longer. Use a thermometer rather than trusting either end"
-
+  - id: standard_constant_roast
+    name: Standard constant roast
+    shape: rate
+    timing: ~35–40 min/kg + 20 min
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: None
+    outcome: Reliable default
+    oven: 200–220°C fan
+    oven_basis: inferred
+    weight_range: 1.5–3 kg
+    weight_min: 1.5
+    weight_max: 3
+    rate_min: 35
+    rate_max: 40
+    flat_add: 20
+    notes: A true 180°C-throughout version would need longer than this; no source found for that specific combination, so it isn't listed as its own row
+  - id: high_heat_start_then_reduce
+    name: High-heat start, then reduce
+    shape: rate
+    timing: ~35 min/kg after initial blast
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: One step down
+    outcome: Fast crisp skin
+    oven: Start 220°C fan for 15–20 min, drop to 180°C fan
+    oven_basis: inferred
+    weight_range: 1.5–3 kg
+    weight_min: 1.5
+    weight_max: 3
+    rate_min: 35
+    rate_max: 35
+    notes: Renders and crisps skin quickly before finishing. Rate roughly confirmed — a 2 kg duck at this rate (~100 min) matches Gressingham's own 220°C figure closely
+  - id: low_and_slow_blast_at_end
+    name: Low and slow, blast at end
+    shape: rate
+    timing: ~70–90 min/kg total (widened from ~45–50 — see note)
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: One step up at the end
+    outcome: Maximum fat render
+    oven: 150–160°C fan for bulk, up to 220°C fan for last 15 min
+    oven_basis: inferred
+    weight_range: 1.5–2.5 kg
+    weight_min: 1.5
+    weight_max: 2.5
+    rate_min: 70
+    rate_max: 90
+    notes: Favoured for maximum fat render without drying the meat. Not directly sourced at this exact temperature — Nigella's genuine low-temp method runs hotter (170°C) and still takes ~120 min/kg for a similar-size duck, which suggests an even lower 150–160°C would need at least this long, possibly more
+  - id: steaming_parboil_assisted
+    name: Steaming/parboil-assisted
+    shape: rate
+    timing: ~30–35 min/kg roasting time after steam (not independently confirmed either way)
+    group: Whole bird, roasting methods
+    covering: Uncovered during roast
+    temp_change: None
+    outcome: Crispest skin
+    oven: Steam briefly, then roast at 200°C fan
+    oven_basis: inferred
+    weight_range: 1.5–3 kg
+    weight_min: 1.5
+    weight_max: 3
+    rate_min: 30
+    rate_max: 35
+    notes: Classic technique for very crisp skin
+  - id: spatchcocked
+    name: Spatchcocked
+    shape: disputed
+    timing: ~20–60 min/kg — genuinely conflicting sources, see note
+    group: Whole bird, roasting methods
+    covering: Uncovered
+    temp_change: None
+    outcome: Even breast and leg
+    oven: 200–220°C fan
+    oven_basis: inferred
+    weight_range: 1.5–2.5 kg
+    weight_min: 1.5
+    weight_max: 2.5
+    rate_min: 20
+    rate_max: 60
+    notes: Good for smaller ducks where breast and leg doneness otherwise diverge. One US recipe (450°F) matches the fast end of this range; one UK recipe uses a gentler 160–180°C for 120 min on a 2 kg bird — nearly 3× longer. Use a thermometer rather than trusting either end
+  groups:
+  - name: Whole bird, roasting methods
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp change
+    - Covering
+    - Weight range
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: <strong>Weight edge cases:</strong> most whole ducks sold are 1.5–2.5 kg. Below ~1.5 kg the flat +20 min addition becomes disproportionate — treat like a very large poussin and check early. Above ~3 kg is unusual for domestic duck; use a lower temperature (150–160°C) for longer to render fat fully without scorching the skin.
+    - kind: sources
+      html: 'Sources: Gressingham''s own roasting guide and Great British Chefs for the standard/high-heat rates. Nigella''s slow-roast duck method for the low-and-slow row (indirect comparison, different temperature — treat as a wide estimate, not a confirmed figure). Spatchcock range reflects genuinely conflicting US vs UK sources rather than one being simply wrong — this is the one row on this page where the disagreement is between real recipes, not a unit-conversion error. Duck is the protein least affected by the systematic error found elsewhere on this page. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 beef:
-  label: "Beef"
+  label: Beef
   internal_temp_ref: beef.tender_roast
   methods:
-    - id: "standard_constant_roast"
-      name: "Standard constant roast"
-      shape: "by_doneness"
-      timing: "~40 min/kg + 20 min for rare, ~50 min/kg + 25 min for medium"
-      group: "Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "160–180°C fan"
-      oven_basis: "inferred"
-      by_doneness:
-        rare:
-          rate_min: 40
-          rate_max: 40
-          flat_add: 20
-        medium:
-          rate_min: 50
-          rate_max: 50
-          flat_add: 25
-      notes: "Reliable, even results; use a thermometer"
-    - id: "high_heat_sear_then_reduce"
-      name: "High-heat sear, then reduce"
-      shape: "rate"
-      timing: "~33 min/kg (rare) to 44 min/kg (medium) after the sear"
-      group: "Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast"
-      covering: "Uncovered"
-      temp_change: "One step down"
-      oven: "Start 220–230°C fan for 20 min, drop to 160°C fan"
-      oven_basis: "inferred"
-      rate_min: 33
-      rate_max: 33
-      notes: "Builds a crust before the gentle finish; popular for rib roast Drop-to temperature confirmed — Delia's version uses 190°C at a similar rate, so 160°C and 190°C both seem to work"
-    - id: "low_temp_roast_reverse_method"
-      name: "Low-temp roast (reverse method)"
-      shape: "rate"
-      timing: "~55–75 min/kg (moderate confidence — see note)"
-      group: "Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "100–120°C fan throughout"
-      oven_basis: "inferred"
-      rate_min: 55
-      rate_max: 75
-      notes: "Extremely even edge-to-edge colour, minimal grey band6–5.4 kg); a smaller joint may run faster than this per-kg rate implies"
-    - id: "low_temp_roast_hot_blast_at_end"
-      name: "Low-temp roast + hot blast at end"
-      shape: "rate"
-      timing: "~55–75 min/kg + 10–15 min"
-      group: "Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast"
-      covering: "Uncovered"
-      temp_change: "One step up at the end"
-      oven: "100–120°C fan, then up to 230°C fan for last 10–15 min"
-      oven_basis: "inferred"
-      rate_min: 55
-      rate_max: 75
-      flat_add: 10
-      flat_add_max: 15
-      notes: "Combines even cook with a crisp exterior. Same base-rate correction as the row above"
-    - id: "closed_oven_off_method"
-      name: "Closed-oven-off method"
-      shape: "unparsed"
-      timing: "~1.5–3 hrs in residual heat, oven-dependent"
-      group: "Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast"
-      covering: "Uncovered"
-      temp_change: "Oven switched off"
-      oven: "Sear at 230°C fan for 20 min, turn oven off, leave door shut"
-      oven_basis: "inferred"
-      notes: "Old technique; timing is oven-dependent — confirm with thermometer"
-    - id: "oven_brisket_covered_no_liquid"
-      name: "Oven brisket, covered, no liquid"
-      shape: "rate"
-      timing: "~1–1.25 hrs/kg"
-      group: "Tough/working cuts — brisket, chuck, short rib, pot roast"
-      liquid: "None (self-bastes)"
-      covering: "Tightly foil-wrapped throughout"
-      oven: "150–160°C fan"
-      oven_basis: "inferred"
-      rate_min: 60
-      rate_max: 75
-      notes: "Simple; texture closer to roast than braise"
-    - id: "oven_brisket_low_and_slow"
-      name: "Oven brisket, low and slow"
-      shape: "rate"
-      timing: "~2.2–3.3 hrs/kg (widened from ~1.5–2, moderate confidence)"
-      group: "Tough/working cuts — brisket, chuck, short rib, pot roast"
-      liquid: "None or a splash of water/stock"
-      covering: "Covered (foil or lidded pan)"
-      oven: "120–140°C fan"
-      oven_basis: "inferred"
-      rate_min: 132
-      rate_max: 198
-      notes: "Very tender, more forgiving of timing. Widely-cited BBQ/oven guidance for brisket runs closer to 1–1.5 hr/lb at 250°F/121°C, which is this range once converted"
-    - id: "pot_roast_chuck_or_similar_braised"
-      name: "Pot roast (chuck or similar), braised"
-      shape: "rate"
-      timing: "~1–1.5 hrs/kg"
-      group: "Tough/working cuts — brisket, chuck, short rib, pot roast"
-      liquid: "Fully or half-submerged"
-      covering: "Covered (lidded pot)"
-      oven: "150–160°C fan"
-      oven_basis: "inferred"
-      rate_min: 60
-      rate_max: 90
-      notes: "A wet braise rather than a dry roast"
-    - id: "short_rib_braised"
-      name: "Short rib, braised"
-      shape: "total"
-      timing: "~2.5–3.5 hrs total (timed by piece, not weight)"
-      group: "Tough/working cuts — brisket, chuck, short rib, pot roast"
-      liquid: "Half-submerged"
-      covering: "Covered"
-      oven: "140–150°C fan"
-      oven_basis: "inferred"
-      total_min: 150
-      total_max: 210
-      notes: "Cook until meat pulls easily from bone"
-    - id: "chuck_roast_dry_covered_no_liquid"
-      name: "Chuck roast, dry-covered (no liquid)"
-      shape: "rate"
-      timing: "~1.25–1.5 hrs/kg"
-      group: "Tough/working cuts — brisket, chuck, short rib, pot roast"
-      liquid: "None"
-      covering: "Tightly covered"
-      oven: "140–150°C fan"
-      oven_basis: "inferred"
-      rate_min: 75
-      rate_max: 90
-      notes: "More roast-like (less shreddy) texture than a wet braise. Not independently re-checked this pass — the other rows here mostly held up, so this wasn't specifically flagged, but it wasn't specifically confirmed either"
-
+  - id: standard_constant_roast
+    name: Standard constant roast
+    shape: by_doneness
+    timing: ~40 min/kg + 20 min for rare, ~50 min/kg + 25 min for medium
+    group: Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast
+    covering: Uncovered
+    temp_change: None
+    outcome: Reliable default
+    oven: 160–180°C fan
+    oven_basis: inferred
+    by_doneness:
+      rare:
+        rate_min: 40
+        rate_max: 40
+        flat_add: 20
+      medium:
+        rate_min: 50
+        rate_max: 50
+        flat_add: 25
+    notes: Reliable, even results; use a thermometer
+  - id: high_heat_sear_then_reduce
+    name: High-heat sear, then reduce
+    shape: rate
+    timing: ~33 min/kg (rare) to 44 min/kg (medium) after the sear
+    group: Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast
+    covering: Uncovered
+    temp_change: One step down
+    outcome: Crusted outside
+    oven: Start 220–230°C fan for 20 min, drop to 160°C fan
+    oven_basis: inferred
+    rate_min: 33
+    rate_max: 33
+    notes: Builds a crust before the gentle finish; popular for rib roast
+    source_note: Drop-to temperature confirmed — Delia's version uses 190°C at a similar rate, so 160°C and 190°C both seem to work
+  - id: low_temp_roast_reverse_method
+    name: Low-temp roast (reverse method)
+    shape: rate
+    timing: ~55–75 min/kg (moderate confidence — see note)
+    group: Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast
+    covering: Uncovered
+    temp_change: None
+    outcome: Evenest colour throughout
+    oven: 100–120°C fan throughout
+    oven_basis: inferred
+    rate_min: 55
+    rate_max: 75
+    notes: Extremely even edge-to-edge colour, minimal grey band
+  - id: low_temp_roast_hot_blast_at_end
+    name: Low-temp roast + hot blast at end
+    shape: rate
+    timing: ~55–75 min/kg + 10–15 min
+    group: Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast
+    covering: Uncovered
+    temp_change: One step up at the end
+    outcome: Even, with a crust
+    oven: 100–120°C fan, then up to 230°C fan for last 10–15 min
+    oven_basis: inferred
+    rate_min: 55
+    rate_max: 75
+    flat_add: 10
+    flat_add_max: 15
+    notes: Combines even cook with a crisp exterior. Same base-rate correction as the row above
+  - id: closed_oven_off_method
+    name: Closed-oven-off method
+    shape: unparsed
+    timing: ~1.5–3 hrs in residual heat, oven-dependent
+    group: Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast
+    covering: Uncovered
+    temp_change: Oven switched off
+    outcome: Old trick, oven-dependent
+    oven: Sear at 230°C fan for 20 min, turn oven off, leave door shut
+    oven_basis: inferred
+    notes: Old technique; timing is oven-dependent — confirm with thermometer
+  - id: oven_brisket_covered_no_liquid
+    name: Oven brisket, covered, no liquid
+    shape: rate
+    timing: ~1–1.25 hrs/kg
+    group: Tough/working cuts — brisket, chuck, short rib, pot roast
+    liquid: None (self-bastes)
+    covering: Tightly foil-wrapped throughout
+    outcome: Roast-like brisket
+    oven: 150–160°C fan
+    oven_basis: inferred
+    rate_min: 60
+    rate_max: 75
+    notes: Simple; texture closer to roast than braise
+  - id: oven_brisket_low_and_slow
+    name: Oven brisket, low and slow
+    shape: rate
+    timing: ~2.2–3.3 hrs/kg (widened from ~1.5–2, moderate confidence)
+    group: Tough/working cuts — brisket, chuck, short rib, pot roast
+    liquid: None or a splash of water/stock
+    covering: Covered (foil or lidded pan)
+    outcome: Most tender brisket
+    oven: 120–140°C fan
+    oven_basis: inferred
+    rate_min: 132
+    rate_max: 198
+    notes: Very tender, more forgiving of timing
+    source_note: Widely-cited BBQ/oven guidance for brisket runs closer to 1–1.5 hr/lb at 250°F/121°C, which is this range once converted
+  - id: pot_roast_chuck_or_similar_braised
+    name: Pot roast (chuck or similar), braised
+    shape: rate
+    timing: ~1–1.5 hrs/kg
+    group: Tough/working cuts — brisket, chuck, short rib, pot roast
+    liquid: Fully or half-submerged
+    covering: Covered (lidded pot)
+    outcome: Wet braise
+    oven: 150–160°C fan
+    oven_basis: inferred
+    rate_min: 60
+    rate_max: 90
+    notes: A wet braise rather than a dry roast
+  - id: short_rib_braised
+    name: Short rib, braised
+    shape: total
+    timing: ~2.5–3.5 hrs total (timed by piece, not weight)
+    group: Tough/working cuts — brisket, chuck, short rib, pot roast
+    liquid: Half-submerged
+    covering: Covered
+    outcome: Falls off the bone
+    oven: 140–150°C fan
+    oven_basis: inferred
+    total_min: 150
+    total_max: 210
+    notes: Cook until meat pulls easily from bone
+  - id: chuck_roast_dry_covered_no_liquid
+    name: Chuck roast, dry-covered (no liquid)
+    shape: rate
+    timing: ~1.25–1.5 hrs/kg
+    group: Tough/working cuts — brisket, chuck, short rib, pot roast
+    liquid: None
+    covering: Tightly covered
+    outcome: Sliceable, not shreddy
+    oven: 140–150°C fan
+    oven_basis: inferred
+    rate_min: 75
+    rate_max: 90
+    notes: More roast-like (less shreddy) texture than a wet braise
+    source_note: Not independently re-checked this pass — the other rows here mostly held up, so this wasn't specifically flagged, but it wasn't specifically confirmed either
+  groups:
+  - name: Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp change
+    - Covering
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: '<strong>Weight range:</strong> formulas hold well for <strong>1–4 kg</strong>. Below 1 kg, treat like a large steak and check early. Above 4–5 kg, switch to thermometer-only timing. Doneness pull temps: see <a href="../internal-temperatures/#beef">internal temperatures</a>.'
+    - kind: sources
+      html: 'Sources: <a href="https://www.waitrose.com/ecom/content/inspiration/guides/roast-guide">Waitrose''s roast guide</a> (20 min/500g rare, 25 min/500g medium, at 160°C fan) and Certified Angus Beef for the standard/sear rates. River Cottage''s slow-roast method for the reverse-sear row (flagged moderate confidence — sourced for one joint size, not a range of weights). Closed-oven-off wasn''t re-checked; it was already appropriately hedged. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
+  - name: Tough/working cuts — brisket, chuck, short rib, pot roast
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp/covering
+    - Liquid
+    - Notes
+    before:
+    - kind: prose
+      html: Cooked low and slow until <em>tender</em>, not to a doneness temperature — timing below is a planning estimate only.
+    after:
+    - kind: weight
+      html: '<strong>Weight range:</strong> holds well <strong>1.5–4.5 kg</strong>. Below 1.5 kg, check early to avoid overshooting into dryness. Above 4.5–5 kg (full packer brisket), go by tenderness rather than extrapolating the formula. Endpoint temperature: see <a href="../internal-temperatures/#beef">internal temperatures</a>.'
+    - kind: sources
+      html: 'Sources: collagen-breakdown temperature (90–96°C, on the internal-temperatures page) and short rib/pot roast timings confirmed against standard BBQ/braise references — 195–205°F (90–96°C) is the widely-cited fall-apart range, and ~300°F/149°C for ~3 hrs matches typical short rib recipes. Brisket low-and-slow rate corrected against widely-cited BBQ/oven guidance for the same ~121°C bracket. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 pork:
-  label: "Pork"
+  label: Pork
   internal_temp_ref: pork.roasting
   methods:
-    - id: "standard_constant_roast_lean_loin_no_crackling"
-      name: "Standard constant roast — lean loin, no crackling"
-      shape: "rate"
-      timing: "~40 min/kg + 20 min"
-      group: "Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "175–180°C fan"
-      oven_basis: "inferred"
-      rate_min: 40
-      rate_max: 40
-      flat_add: 20
-      notes: "Reliable default for a boneless loin joint"
-    - id: "standard_constant_roast_leg_shoulder_with_crackling"
-      name: "Standard constant roast — leg/shoulder with crackling"
-      shape: "rate"
-      timing: "~60 min/kg"
-      group: "Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "180°C fan"
-      oven_basis: "inferred"
-      rate_min: 60
-      rate_max: 60
-      notes: "New row, split out from the old single \"loin or leg\" figure — a bone-in leg with crackling runs meaningfully slower than lean loin, not the same rate"
-    - id: "high_heat_start_then_reduce"
-      name: "High-heat start, then reduce"
-      shape: "rate"
-      timing: "~55–60 min/kg after the initial blast"
-      group: "Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin"
-      covering: "Uncovered"
-      temp_change: "One step down"
-      oven: "Start 220°C fan for 20–25 min, drop to 180°C fan"
-      oven_basis: "inferred"
-      rate_min: 55
-      rate_max: 60
-      notes: "Crisps crackling early if skin is scored, then finishes gently"
-    - id: "low_temp_roast_reverse_method"
-      name: "Low-temp roast (reverse method)"
-      shape: "rate"
-      timing: "~50–60 min/kg"
-      group: "Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "120–140°C fan throughout"
-      oven_basis: "inferred"
-      rate_min: 50
-      rate_max: 60
-      notes: "Very even, minimal grey band; slow and forgiving"
-    - id: "low_temp_roast_hot_blast_at_end"
-      name: "Low-temp roast + hot blast at end"
-      shape: "rate"
-      timing: "~50–60 min/kg + 15–20 min"
-      group: "Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin"
-      covering: "Uncovered"
-      temp_change: "One step up at the end"
-      oven: "120–140°C fan, then up to 230°C fan for last 15–20 min"
-      oven_basis: "inferred"
-      rate_min: 50
-      rate_max: 60
-      flat_add: 15
-      flat_add_max: 20
-      notes: "Combines even cooking with a crisp finish"
-    - id: "foil_tented_removed_at_end"
-      name: "Foil-tented, removed at end"
-      shape: "rate"
-      timing: "~35–40 min/kg + 20 min (not independently re-checked this pass)"
-      group: "Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin"
-      covering: "Loosely tented for first 2/3, off for last 25–30 min"
-      temp_change: "None"
-      oven: "180°C fan"
-      oven_basis: "inferred"
-      rate_min: 35
-      rate_max: 40
-      flat_add: 20
-      notes: "Useful for leg/ham to stop the outside drying before the centre catches up"
-    - id: "tenderloin_high_heat_throughout"
-      name: "Tenderloin, high heat throughout"
-      shape: "rate"
-      timing: "~40–60 min/kg (much faster than a leg or loin joint, but not as fast as this used to claim)"
-      group: "Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "200–220°C fan"
-      oven_basis: "inferred"
-      rate_min: 40
-      rate_max: 60
-      notes: "Cooks far quicker; easy to overshoot, check early"
-    - id: "shoulder_low_and_slow"
-      name: "Shoulder, low and slow"
-      shape: "rate"
-      timing: "~1–1.25 hrs/kg for a moderately tender result; real \"falls apart\" recipes at this temperature band run up to ~3–4 hrs/kg — the right number depends on how far you want to push it, not one fixed rate"
-      group: "Slow-cooked cuts — shoulder/pork butt, belly"
-      covering: "Uncovered (or loosely tented if browning too fast)"
-      oven: "140–150°C fan"
-      oven_basis: "inferred"
-      rate_min: 60
-      rate_max: 75
-      notes: "Classic \"pulled pork\" style cook. Widened from a single ~1–1.25 hrs/kg figure, which is plausible for a lighter result but understates genuine pulled-pork timing"
-    - id: "shoulder_very_low_and_slow"
-      name: "Shoulder, very low and slow"
-      shape: "rate"
-      timing: "~1.5–2 hrs/kg, though real examples at even lower temperatures (100°C, 12 hrs for a 1.6 kg shoulder ≈ 5.5 hrs/kg) suggest true low-temp fall-apart cooking runs considerably longer than this at the low end of the range — moderate-to-low confidence"
-      group: "Slow-cooked cuts — shoulder/pork butt, belly"
-      covering: "Uncovered"
-      oven: "110–120°C fan"
-      oven_basis: "inferred"
-      rate_min: 90
-      rate_max: 120
-      notes: "Maximises tenderness; very forgiving of timing"
-    - id: "shoulder_covered_then_uncovered"
-      name: "Shoulder, covered then uncovered"
-      shape: "rate"
-      timing: "~1–1.25 hrs/kg covered + final blast (not independently re-checked this pass)"
-      group: "Slow-cooked cuts — shoulder/pork butt, belly"
-      covering: "Covered for bulk of cook, uncovered at the end"
-      oven: "150°C fan covered, then 220°C fan uncovered for last 20–30 min"
-      oven_basis: "inferred"
-      rate_min: 60
-      rate_max: 75
-      notes: "Keeps meat moist, crisps skin only at the end"
-    - id: "belly_low_and_slow_then_blast"
-      name: "Belly, low and slow then blast"
-      shape: "rate"
-      timing: "~50–60 min/kg total (not independently re-checked this pass)"
-      group: "Slow-cooked cuts — shoulder/pork butt, belly"
-      covering: "Uncovered throughout"
-      oven: "140–150°C fan for bulk, up to 220°C fan for last 20–30 min"
-      oven_basis: "inferred"
-      rate_min: 50
-      rate_max: 60
-      notes: "High fat self-bastes; final blast essential for crackling"
-
+  - id: standard_constant_roast_lean_loin_no_crackling
+    name: Standard constant roast — lean loin, no crackling
+    shape: rate
+    timing: ~40 min/kg + 20 min
+    group: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
+    covering: Uncovered
+    temp_change: None
+    outcome: Reliable for loin
+    oven: 175–180°C fan
+    oven_basis: inferred
+    rate_min: 40
+    rate_max: 40
+    flat_add: 20
+    notes: Reliable default for a boneless loin joint
+  - id: standard_constant_roast_leg_shoulder_with_crackling
+    name: Standard constant roast — leg/shoulder with crackling
+    shape: rate
+    timing: ~60 min/kg
+    group: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
+    covering: Uncovered
+    temp_change: None
+    outcome: Leg with crackling
+    oven: 180°C fan
+    oven_basis: inferred
+    rate_min: 60
+    rate_max: 60
+    notes: New row, split out from the old single "loin or leg" figure — a bone-in leg with crackling runs meaningfully slower than lean loin, not the same rate
+  - id: high_heat_start_then_reduce
+    name: High-heat start, then reduce
+    shape: rate
+    timing: ~55–60 min/kg after the initial blast
+    group: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
+    covering: Uncovered
+    temp_change: One step down
+    outcome: Crackling early
+    oven: Start 220°C fan for 20–25 min, drop to 180°C fan
+    oven_basis: inferred
+    rate_min: 55
+    rate_max: 60
+    notes: Crisps crackling early if skin is scored, then finishes gently
+  - id: low_temp_roast_reverse_method
+    name: Low-temp roast (reverse method)
+    shape: rate
+    timing: ~50–60 min/kg
+    group: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
+    covering: Uncovered
+    temp_change: None
+    outcome: Evenest, most forgiving
+    oven: 120–140°C fan throughout
+    oven_basis: inferred
+    rate_min: 50
+    rate_max: 60
+    notes: Very even, minimal grey band; slow and forgiving
+  - id: low_temp_roast_hot_blast_at_end
+    name: Low-temp roast + hot blast at end
+    shape: rate
+    timing: ~50–60 min/kg + 15–20 min
+    group: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
+    covering: Uncovered
+    temp_change: One step up at the end
+    outcome: Even, with a crisp finish
+    oven: 120–140°C fan, then up to 230°C fan for last 15–20 min
+    oven_basis: inferred
+    rate_min: 50
+    rate_max: 60
+    flat_add: 15
+    flat_add_max: 20
+    notes: Combines even cooking with a crisp finish
+  - id: foil_tented_removed_at_end
+    name: Foil-tented, removed at end
+    shape: rate
+    timing: ~35–40 min/kg + 20 min (not independently re-checked this pass)
+    group: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
+    covering: Loosely tented for first 2/3, off for last 25–30 min
+    temp_change: None
+    outcome: Stops the outside drying
+    oven: 180°C fan
+    oven_basis: inferred
+    rate_min: 35
+    rate_max: 40
+    flat_add: 20
+    notes: Useful for leg/ham to stop the outside drying before the centre catches up
+  - id: tenderloin_high_heat_throughout
+    name: Tenderloin, high heat throughout
+    shape: rate
+    timing: ~40–60 min/kg (much faster than a leg or loin joint, but not as fast as this used to claim)
+    group: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
+    covering: Uncovered
+    temp_change: None
+    outcome: Quickest, easy to overshoot
+    oven: 200–220°C fan
+    oven_basis: inferred
+    rate_min: 40
+    rate_max: 60
+    notes: Cooks far quicker; easy to overshoot, check early
+  - id: shoulder_low_and_slow
+    name: Shoulder, low and slow
+    shape: rate
+    timing: ~1–1.25 hrs/kg for a moderately tender result; real "falls apart" recipes at this temperature band run up to ~3–4 hrs/kg — the right number depends on how far you want to push it, not one fixed rate
+    group: Slow-cooked cuts — shoulder/pork butt, belly
+    covering: Uncovered (or loosely tented if browning too fast)
+    outcome: Pulled pork
+    oven: 140–150°C fan
+    oven_basis: inferred
+    rate_min: 60
+    rate_max: 75
+    notes: Classic "pulled pork" style cook. Widened from a single ~1–1.25 hrs/kg figure, which is plausible for a lighter result but understates genuine pulled-pork timing
+  - id: shoulder_very_low_and_slow
+    name: Shoulder, very low and slow
+    shape: rate
+    timing: ~1.5–2 hrs/kg, though real examples at even lower temperatures (100°C, 12 hrs for a 1.6 kg shoulder ≈ 5.5 hrs/kg) suggest true low-temp fall-apart cooking runs considerably longer than this at the low end of the range — moderate-to-low confidence
+    group: Slow-cooked cuts — shoulder/pork butt, belly
+    covering: Uncovered
+    outcome: Most tender, most forgiving
+    oven: 110–120°C fan
+    oven_basis: inferred
+    rate_min: 90
+    rate_max: 120
+    notes: Maximises tenderness; very forgiving of timing
+  - id: shoulder_covered_then_uncovered
+    name: Shoulder, covered then uncovered
+    shape: rate
+    timing: ~1–1.25 hrs/kg covered + final blast (not independently re-checked this pass)
+    group: Slow-cooked cuts — shoulder/pork butt, belly
+    covering: Covered for bulk of cook, uncovered at the end
+    outcome: Moist, crisp at the end
+    oven: 150°C fan covered, then 220°C fan uncovered for last 20–30 min
+    oven_basis: inferred
+    rate_min: 60
+    rate_max: 75
+    notes: Keeps meat moist, crisps skin only at the end
+  - id: belly_low_and_slow_then_blast
+    name: Belly, low and slow then blast
+    shape: rate
+    timing: ~50–60 min/kg total (not independently re-checked this pass)
+    group: Slow-cooked cuts — shoulder/pork butt, belly
+    covering: Uncovered throughout
+    outcome: Crackling on belly
+    oven: 140–150°C fan for bulk, up to 220°C fan for last 20–30 min
+    oven_basis: inferred
+    rate_min: 50
+    rate_max: 60
+    notes: High fat self-bastes; final blast essential for crackling
+  groups:
+  - name: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp change
+    - Covering
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: '<strong>Weight range:</strong> holds well <strong>1.5–4.5 kg</strong> (loin/leg). Below 1.5 kg (or tenderloin generally), check well before the formula suggests. Above 4.5–5 kg, drop toward the low-temp end of the range. Doneness pull temps: see <a href="../internal-temperatures/#pork">internal temperatures</a>.'
+    - kind: safety
+      html: <strong>FOOD SAFETY:</strong> the doneness figures this timing table cooks toward (see <a href="../internal-temperatures/#pork">internal temperatures</a>) include a "medium, slightly pink" option at 60–62°C that does not clear the UK FSA's own core-temperature guidance for pork specifically — unlike beef or lamb, FSA doesn't treat pink pork the same as pink beef. Full detail on the internal-temperatures page; flagging here too since this is the page you'd actually be timing against mid-cook.
+    - kind: sources
+      html: 'Sources: <a href="https://www.goodto.com/food/how-to/how-to-roast-pork-294839">Good To Know</a> and Village Butchers for the leg/crackling rate (~30 min/500g = ~60 min/kg after a blast). US-style guidance (~40 min/kg at 175–180°C) for lean loin — kept as a separate row rather than overwriting the leg rate, since the two cuts genuinely cook at different speeds. <a href="https://www.waitrose.com/ecom/content/inspiration/guides/roast-guide/roast-pork">Waitrose''s roast guide</a> and a BBC pork fillet recipe for the tenderloin correction. Low-temp reverse-sear rate confirmed against Kenji López-Alt/Serious Eats practice, unchanged. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
+  - name: Slow-cooked cuts — shoulder/pork butt, belly
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Covering
+    - Notes
+    before:
+    - kind: prose
+      html: Cooked past the "done" temperature until fat and collagen render — timing by tenderness, not just weight.
+    after:
+    - kind: weight
+      html: <strong>Weight range:</strong> holds well <strong>2–5 kg</strong>. Below 2 kg, check earlier. Above 5–6 kg, go by tenderness rather than extrapolating.
+    - kind: sources
+      html: 'Sources: collagen breakdown at 90–95°C (internal-temperatures page) is the standard fall-apart range. The shoulder timing spread reflects real recipes at very different target textures rather than one being wrong — a 1.6 kg shoulder at 150°C for 6 hrs and a 100°C/12hr version were both used as reference points. Only the two "shoulder, low and slow" rows were re-checked this pass; covered/uncovered and belly weren''t specifically tested. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 lamb:
-  label: "Lamb"
+  label: Lamb
   internal_temp_ref: lamb.roasting
   methods:
-    - id: "standard_constant_roast"
-      name: "Standard constant roast"
-      shape: "rate"
-      timing: "~25–30 min/kg + 20 min (optimistic — not confirmed, see note)"
-      group: "Roasting cuts — leg, rack, saddle, loin"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "180°C fan"
-      oven_basis: "inferred"
-      rate_min: 25
-      rate_max: 30
-      flat_add: 20
-      notes: "Reliable default for leg. The American Lamb Board's own figures (15–25 min/lb ≈ 33–55 min/kg) are at a cooler 163°C, which should if anything cook slower than our hotter 180°C — but that's an indirect comparison at a different temperature, not a same-temperature check, so this row is flagged rather than changed outright"
-    - id: "high_heat_start_then_reduce"
-      name: "High-heat start, then reduce"
-      shape: "rate"
-      timing: "~20–25 min/kg after the initial blast"
-      group: "Roasting cuts — leg, rack, saddle, loin"
-      covering: "Uncovered"
-      temp_change: "One step down"
-      oven: "Start 220°C fan for 20 min, drop to 180°C fan"
-      oven_basis: "inferred"
-      rate_min: 20
-      rate_max: 25
-      notes: "Browns exterior early, finishes gently. Confirmed — Jamie Oliver's 2.4 kg leg recipe (220°C→180°C, medium doneness, 70 min cook) triangulates to ~21–23 min/kg after the blast"
-    - id: "low_temp_roast_reverse_method"
-      name: "Low-temp roast (reverse method)"
-      shape: "rate"
-      timing: "~40–50 min/kg (not independently re-checked this pass)"
-      group: "Roasting cuts — leg, rack, saddle, loin"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "120–140°C fan throughout"
-      oven_basis: "inferred"
-      rate_min: 40
-      rate_max: 50
-      notes: "Very even, minimal grey band"
-    - id: "low_temp_roast_hot_blast_at_end"
-      name: "Low-temp roast + hot blast at end"
-      shape: "rate"
-      timing: "~40–50 min/kg + 15 min"
-      group: "Roasting cuts — leg, rack, saddle, loin"
-      covering: "Uncovered"
-      temp_change: "One step up at the end"
-      oven: "120–140°C fan, then up to 230°C fan for last 15 min"
-      oven_basis: "inferred"
-      rate_min: 40
-      rate_max: 50
-      flat_add: 15
-      notes: "Combines even cooking with a crisp finish"
-    - id: "rack_high_heat_throughout"
-      name: "Rack, high heat throughout"
-      shape: "total"
-      timing: "~15–25 min total for a typical 400–600g rack"
-      group: "Roasting cuts — leg, rack, saddle, loin"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "200–220°C fan"
-      oven_basis: "inferred"
-      total_min: 15
-      total_max: 25
-      notes: "Cooks quickly; check early. Given as a total time, not min/kg — a rack is too small/thin for a per-kg rate to mean much; the old \"~15–20 min/kg\" here implied a much longer cook than any real rack recipe actually takes"
-    - id: "rack_sear_then_oven_finish"
-      name: "Rack, sear then oven finish"
-      shape: "total"
-      timing: "~10–15 min total oven time after searing"
-      group: "Roasting cuts — leg, rack, saddle, loin"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "Sear on stove, then 200°C fan oven"
-      oven_basis: "inferred"
-      total_min: 10
-      total_max: 15
-      notes: "Common restaurant method"
-    - id: "shoulder_low_and_slow"
-      name: "Shoulder, low and slow"
-      shape: "rate"
-      timing: "~1–1.25 hrs/kg for a moderately tender result; genuinely fall-apart shoulder recipes at this band run notably longer (a 2.5 kg shoulder at 160°C for 6 hrs ≈ 2.4 hrs/kg) — depends how far you want to push it, same pattern as pork shoulder above"
-      group: "Slow-cooked cuts — shoulder, breast"
-      covering: "Uncovered (or loosely tented if browning too fast)"
-      oven: "140–150°C fan"
-      oven_basis: "inferred"
-      rate_min: 60
-      rate_max: 75
-      notes: "Classic \"pulled lamb\" style cook. Widened from a single ~1–1.25 hrs/kg figure"
-    - id: "shoulder_very_low_and_slow"
-      name: "Shoulder, very low and slow"
-      shape: "rate"
-      timing: "~1.5–2 hrs/kg (not independently re-checked this pass)"
-      group: "Slow-cooked cuts — shoulder, breast"
-      covering: "Uncovered"
-      oven: "110–120°C fan"
-      oven_basis: "inferred"
-      rate_min: 90
-      rate_max: 120
-      notes: "Maximises tenderness; very forgiving"
-    - id: "shoulder_covered_then_uncovered"
-      name: "Shoulder, covered then uncovered"
-      shape: "rate"
-      timing: "~1–1.25 hrs/kg covered + final blast (not independently re-checked this pass)"
-      group: "Slow-cooked cuts — shoulder, breast"
-      covering: "Covered for bulk, uncovered at the end"
-      oven: "150°C fan covered, then 220°C fan uncovered for last 20–30 min"
-      oven_basis: "inferred"
-      rate_min: 60
-      rate_max: 75
-      notes: "Keeps meat moist, crisps exterior only at the end"
-    - id: "breast_low_and_slow_then_blast"
-      name: "Breast, low and slow then blast"
-      shape: "rate"
-      timing: "~1–1.25 hrs/kg total (not independently re-checked this pass)"
-      group: "Slow-cooked cuts — shoulder, breast"
-      covering: "Uncovered throughout"
-      oven: "140–150°C fan for bulk, up to 220°C fan for last 20 min"
-      oven_basis: "inferred"
-      rate_min: 60
-      rate_max: 75
-      notes: "High fat self-bastes; final blast crisps exterior"
-
+  - id: standard_constant_roast
+    name: Standard constant roast
+    shape: rate
+    timing: ~25–30 min/kg + 20 min (optimistic — not confirmed, see note)
+    group: Roasting cuts — leg, rack, saddle, loin
+    covering: Uncovered
+    temp_change: None
+    outcome: Reliable for leg
+    oven: 180°C fan
+    oven_basis: inferred
+    rate_min: 25
+    rate_max: 30
+    flat_add: 20
+    notes: Reliable default for leg. The American Lamb Board's own figures (15–25 min/lb ≈ 33–55 min/kg) are at a cooler 163°C, which should if anything cook slower than our hotter 180°C — but that's an indirect comparison at a different temperature, not a same-temperature check, so this row is flagged rather than changed outright
+  - id: high_heat_start_then_reduce
+    name: High-heat start, then reduce
+    shape: rate
+    timing: ~20–25 min/kg after the initial blast
+    group: Roasting cuts — leg, rack, saddle, loin
+    covering: Uncovered
+    temp_change: One step down
+    outcome: Browned early, gentle finish
+    oven: Start 220°C fan for 20 min, drop to 180°C fan
+    oven_basis: inferred
+    rate_min: 20
+    rate_max: 25
+    notes: Browns exterior early, finishes gently
+    source_note: Confirmed — Jamie Oliver's 2.4 kg leg recipe (220°C→180°C, medium doneness, 70 min cook) triangulates to ~21–23 min/kg after the blast
+  - id: low_temp_roast_reverse_method
+    name: Low-temp roast (reverse method)
+    shape: rate
+    timing: ~40–50 min/kg (not independently re-checked this pass)
+    group: Roasting cuts — leg, rack, saddle, loin
+    covering: Uncovered
+    temp_change: None
+    outcome: Evenest colour throughout
+    oven: 120–140°C fan throughout
+    oven_basis: inferred
+    rate_min: 40
+    rate_max: 50
+    notes: Very even, minimal grey band
+  - id: low_temp_roast_hot_blast_at_end
+    name: Low-temp roast + hot blast at end
+    shape: rate
+    timing: ~40–50 min/kg + 15 min
+    group: Roasting cuts — leg, rack, saddle, loin
+    covering: Uncovered
+    temp_change: One step up at the end
+    outcome: Even, with a crisp finish
+    oven: 120–140°C fan, then up to 230°C fan for last 15 min
+    oven_basis: inferred
+    rate_min: 40
+    rate_max: 50
+    flat_add: 15
+    notes: Combines even cooking with a crisp finish
+  - id: rack_high_heat_throughout
+    name: Rack, high heat throughout
+    shape: total
+    timing: ~15–25 min total for a typical 400–600g rack
+    group: Roasting cuts — leg, rack, saddle, loin
+    covering: Uncovered
+    temp_change: None
+    outcome: Quickest, for a rack
+    oven: 200–220°C fan
+    oven_basis: inferred
+    total_min: 15
+    total_max: 25
+    notes: Cooks quickly; check early. Given as a total time, not min/kg — a rack is too small/thin for a per-kg rate to mean much; the old "~15–20 min/kg" here implied a much longer cook than any real rack recipe actually takes
+  - id: rack_sear_then_oven_finish
+    name: Rack, sear then oven finish
+    shape: total
+    timing: ~10–15 min total oven time after searing
+    group: Roasting cuts — leg, rack, saddle, loin
+    covering: Uncovered
+    temp_change: None
+    outcome: Restaurant method
+    oven: Sear on stove, then 200°C fan oven
+    oven_basis: inferred
+    total_min: 10
+    total_max: 15
+    notes: Common restaurant method
+  - id: shoulder_low_and_slow
+    name: Shoulder, low and slow
+    shape: rate
+    timing: ~1–1.25 hrs/kg for a moderately tender result; genuinely fall-apart shoulder recipes at this band run notably longer (a 2.5 kg shoulder at 160°C for 6 hrs ≈ 2.4 hrs/kg) — depends how far you want to push it, same pattern as pork shoulder above
+    group: Slow-cooked cuts — shoulder, breast
+    covering: Uncovered (or loosely tented if browning too fast)
+    outcome: Pulled lamb
+    oven: 140–150°C fan
+    oven_basis: inferred
+    rate_min: 60
+    rate_max: 75
+    notes: Classic "pulled lamb" style cook. Widened from a single ~1–1.25 hrs/kg figure
+  - id: shoulder_very_low_and_slow
+    name: Shoulder, very low and slow
+    shape: rate
+    timing: ~1.5–2 hrs/kg (not independently re-checked this pass)
+    group: Slow-cooked cuts — shoulder, breast
+    covering: Uncovered
+    outcome: Most tender, most forgiving
+    oven: 110–120°C fan
+    oven_basis: inferred
+    rate_min: 90
+    rate_max: 120
+    notes: Maximises tenderness; very forgiving
+  - id: shoulder_covered_then_uncovered
+    name: Shoulder, covered then uncovered
+    shape: rate
+    timing: ~1–1.25 hrs/kg covered + final blast (not independently re-checked this pass)
+    group: Slow-cooked cuts — shoulder, breast
+    covering: Covered for bulk, uncovered at the end
+    outcome: Moist, crisp at the end
+    oven: 150°C fan covered, then 220°C fan uncovered for last 20–30 min
+    oven_basis: inferred
+    rate_min: 60
+    rate_max: 75
+    notes: Keeps meat moist, crisps exterior only at the end
+  - id: breast_low_and_slow_then_blast
+    name: Breast, low and slow then blast
+    shape: rate
+    timing: ~1–1.25 hrs/kg total (not independently re-checked this pass)
+    group: Slow-cooked cuts — shoulder, breast
+    covering: Uncovered throughout
+    outcome: Self-basting, crisp finish
+    oven: 140–150°C fan for bulk, up to 220°C fan for last 20 min
+    oven_basis: inferred
+    rate_min: 60
+    rate_max: 75
+    notes: High fat self-bastes; final blast crisps exterior
+  groups:
+  - name: Roasting cuts — leg, rack, saddle, loin
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp change
+    - Covering
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: '<strong>Weight range:</strong> holds well for leg roasts <strong>1.5–3.5 kg</strong>. Below 1.5 kg (or rack/saddle generally), check well before the formula suggests. Above 3.5–4 kg, drop toward the low-temp end. Doneness pull temps: see <a href="../internal-temperatures/#lamb">internal temperatures</a>.'
+    - kind: sources
+      html: 'Sources: <a href="https://www.jamieoliver.com/recipes/lamb/perfect-roast-leg-of-lamb/">Jamie Oliver''s roast leg of lamb</a> for the high-heat-start rate. American Lamb Board figures for the standard-roast caveat (indirect — different temperature, not a confirmed correction). Rack rewrite based on real 400–600g rack recipes running 15–25 min total regardless of the min/kg maths. Low-temp rows and doneness table weren''t flagged by research — doneness in particular tracks closely to Serious Eats'' figures. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
+  - name: Slow-cooked cuts — shoulder, breast
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Covering
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: <strong>Weight range:</strong> holds well <strong>1.5–3.5 kg</strong>. Below 1.5 kg, check earlier. Above 3.5–4 kg, go by tenderness rather than extrapolating.
+    - kind: sources
+      html: 'Sources: collagen breakdown at 90–95°C (internal-temperatures page) is standard. Shoulder timing spread reflects genuinely different target textures at comparable temperatures, same reasoning as pork shoulder''s own sources note above. Only the first "low and slow" row was re-checked this pass. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 ham:
-  label: "Ham"
+  label: Ham
   internal_temp_ref: ham.cured
   methods:
-    - id: "standard_constant_roast_plain"
-      name: "Standard constant roast, plain"
-      shape: "rate"
-      timing: "~35–40 min/kg + 20 min"
-      group: "Fresh (uncured, raw) ham — bone-in or boneless"
-      covering: "Uncovered"
-      temp_change: "None"
-      oven: "180°C fan"
-      oven_basis: "inferred"
-      rate_min: 35
-      rate_max: 40
-      flat_add: 20
-      notes: "Same base rate as pork leg — a fresh ham is pork leg"
-    - id: "high_heat_start_then_reduce_plain"
-      name: "High-heat start, then reduce, plain"
-      shape: "rate"
-      timing: "~30–35 min/kg after initial blast"
-      group: "Fresh (uncured, raw) ham — bone-in or boneless"
-      covering: "Uncovered"
-      temp_change: "One step down"
-      oven: "Start 220°C fan for 20–25 min, drop to 180°C fan"
-      oven_basis: "inferred"
-      rate_min: 30
-      rate_max: 35
-      notes: "Crisps skin/crackling early if scored"
-    - id: "low_and_slow_hot_blast_plain"
-      name: "Low and slow + hot blast, plain"
-      shape: "rate"
-      timing: "~50–60 min/kg + 15–20 min"
-      group: "Fresh (uncured, raw) ham — bone-in or boneless"
-      covering: "Uncovered"
-      temp_change: "One step up at the end"
-      oven: "120–140°C fan, then up to 230°C fan for last 15–20 min"
-      oven_basis: "inferred"
-      rate_min: 50
-      rate_max: 60
-      flat_add: 15
-      flat_add_max: 20
-      notes: "Very even, tender result"
-    - id: "sugar_rubbed_roast"
-      name: "Sugar-rubbed roast"
-      shape: "relative"
-      timing: "Same as plain equivalent"
-      group: "Fresh (uncured, raw) ham — bone-in or boneless"
-      covering: "Uncovered for final 20–30 min so sugar can caramelise"
-      temp_change: "As per chosen base method"
-      oven: "180°C fan, or 220°C fan then drop"
-      oven_basis: "inferred"
-      relative_to: "Same as plain equivalent"
-      notes: "Rub applied for the last third of cooking, not from the start, or it burns"
-    - id: "marmalade_or_treacle_glazed"
-      name: "Marmalade or treacle glazed"
-      shape: "relative"
-      timing: "Same as plain equivalent"
-      group: "Fresh (uncured, raw) ham — bone-in or boneless"
-      covering: "Glaze brushed on for last 20–30 min only, uncovered"
-      temp_change: "As per chosen base method"
-      oven: "180°C fan, or 220°C fan then drop"
-      oven_basis: "inferred"
-      relative_to: "Same as plain equivalent"
-      notes: "Sugar burns if applied too early; scoring fat first helps glaze adhere"
-    - id: "boneless_netted_rolled"
-      name: "Boneless, netted/rolled"
-      shape: "relative"
-      timing: "Add ~10% to time vs. same-weight bone-in"
-      group: "Fresh (uncured, raw) ham — bone-in or boneless"
-      covering: "Same as bone-in equivalents"
-      temp_change: "Same as bone-in equivalents"
-      oven: "Same as bone-in equivalents"
-      oven_basis: "inferred"
-      relative_to: "Add ~10% to time vs. same-weight bone-in"
-      notes: "Denser without the bone conducting heat"
-    - id: "boil_then_roast_plain"
-      name: "Boil then roast, plain"
-      shape: "staged"
-      timing: "Simmer ~45 min/kg, then roast ~15–20 min/kg"
-      group: "Cured (and/or smoked) whole ham — bone-in or boneless"
-      covering: "Uncovered during roast"
-      temp_change: "None during roast phase"
-      oven: "Simmer in water first, then oven at 180°C fan"
-      oven_basis: "inferred"
-      stages:
-        - name: "simmer"
-          rate_min: 45
-          rate_max: 45
-        - name: "roast"
-          rate_min: 15
-          rate_max: 20
-      notes: "Traditional — boiling removes excess surface salt; skin removed and scored before roasting. Simmer rate"
-    - id: "roast_only_plain"
-      name: "Roast only, plain"
-      shape: "rate"
-      timing: "~60 min/kg + 30 min"
-      group: "Cured (and/or smoked) whole ham — bone-in or boneless"
-      covering: "Loosely covered for the bulk, uncovered last 20–30 min"
-      temp_change: "None"
-      oven: "160–170°C fan"
-      oven_basis: "stated"
-      rate_min: 60
-      rate_max: 60
-      flat_add: 30
-      notes: "Slightly gentler and slower than fresh ham. Timing Temperature itself wasn't actually wrong — written out here as fan/conventional explicitly since a cited \"180°C\" source turned out to mean the same oven setting as our existing 160–170°C fan figure, not a different one"
-    - id: "sugar_rubbed_after_boil_or_roast_base"
-      name: "Sugar-rubbed (after boil or roast base)"
-      shape: "relative"
-      timing: "Base method + final uncovered stage"
-      group: "Cured (and/or smoked) whole ham — bone-in or boneless"
-      covering: "Uncovered for the sugar-crisping stage"
-      temp_change: "One step up at the very end"
-      oven: "As per base method, uncovered at 200–220°C fan for last 15–20 min"
-      oven_basis: "inferred"
-      relative_to: "Base method + final uncovered stage"
-      notes: "Applied only at the very end"
-    - id: "marmalade_or_treacle_glazed_after_boil_or_roast_base"
-      name: "Marmalade or treacle glazed (after boil or roast base)"
-      shape: "relative"
-      timing: "Base method + final glazing stage"
-      group: "Cured (and/or smoked) whole ham — bone-in or boneless"
-      covering: "Uncovered for the glazing stage"
-      temp_change: "One step up at the very end"
-      oven: "As per base method, uncovered at 200–220°C fan for last 15–20 min"
-      oven_basis: "inferred"
-      relative_to: "Base method + final glazing stage"
-      notes: "Glaze goes on right before the final high-heat stage"
-    - id: "boneless_netted_rolled_cured"
-      name: "Boneless, netted/rolled, cured"
-      shape: "relative"
-      timing: "Add ~10% to time vs. same-weight bone-in"
-      group: "Cured (and/or smoked) whole ham — bone-in or boneless"
-      covering: "Same as bone-in equivalents"
-      temp_change: "Same as bone-in equivalents"
-      oven: "Same as bone-in cured equivalents"
-      oven_basis: "inferred"
-      relative_to: "Add ~10% to time vs. same-weight bone-in"
-      notes: "Same adjustment as fresh ham"
+  - id: standard_constant_roast_plain
+    name: Standard constant roast, plain
+    shape: rate
+    timing: ~35–40 min/kg + 20 min
+    group: Fresh (uncured, raw) ham — bone-in or boneless
+    covering: Uncovered
+    temp_change: None
+    outcome: Reliable default
+    oven: 180°C fan
+    oven_basis: inferred
+    rate_min: 35
+    rate_max: 40
+    flat_add: 20
+    notes: Same base rate as pork leg — a fresh ham is pork leg
+  - id: high_heat_start_then_reduce_plain
+    name: High-heat start, then reduce, plain
+    shape: rate
+    timing: ~30–35 min/kg after initial blast
+    group: Fresh (uncured, raw) ham — bone-in or boneless
+    covering: Uncovered
+    temp_change: One step down
+    outcome: Crackling early
+    oven: Start 220°C fan for 20–25 min, drop to 180°C fan
+    oven_basis: inferred
+    rate_min: 30
+    rate_max: 35
+    notes: Crisps skin/crackling early if scored
+  - id: low_and_slow_hot_blast_plain
+    name: Low and slow + hot blast, plain
+    shape: rate
+    timing: ~50–60 min/kg + 15–20 min
+    group: Fresh (uncured, raw) ham — bone-in or boneless
+    covering: Uncovered
+    temp_change: One step up at the end
+    outcome: Evenest, most tender
+    oven: 120–140°C fan, then up to 230°C fan for last 15–20 min
+    oven_basis: inferred
+    rate_min: 50
+    rate_max: 60
+    flat_add: 15
+    flat_add_max: 20
+    notes: Very even, tender result
+  - id: sugar_rubbed_roast
+    name: Sugar-rubbed roast
+    shape: relative
+    timing: Same as plain equivalent
+    group: Fresh (uncured, raw) ham — bone-in or boneless
+    covering: Uncovered for final 20–30 min so sugar can caramelise
+    temp_change: As per chosen base method
+    outcome: Caramelised crust
+    oven: 180°C fan, or 220°C fan then drop
+    oven_basis: inferred
+    relative_to: Same as plain equivalent
+    notes: Rub applied for the last third of cooking, not from the start, or it burns
+  - id: marmalade_or_treacle_glazed
+    name: Marmalade or treacle glazed
+    shape: relative
+    timing: Same as plain equivalent
+    group: Fresh (uncured, raw) ham — bone-in or boneless
+    covering: Glaze brushed on for last 20–30 min only, uncovered
+    temp_change: As per chosen base method
+    outcome: Glazed finish
+    oven: 180°C fan, or 220°C fan then drop
+    oven_basis: inferred
+    relative_to: Same as plain equivalent
+    notes: Sugar burns if applied too early; scoring fat first helps glaze adhere
+  - id: boneless_netted_rolled
+    name: Boneless, netted/rolled
+    shape: relative
+    timing: Add ~10% to time vs. same-weight bone-in
+    group: Fresh (uncured, raw) ham — bone-in or boneless
+    covering: Same as bone-in equivalents
+    temp_change: Same as bone-in equivalents
+    outcome: Boneless, denser
+    oven: Same as bone-in equivalents
+    oven_basis: inferred
+    relative_to: Add ~10% to time vs. same-weight bone-in
+    notes: Denser without the bone conducting heat
+  - id: boil_then_roast_plain
+    name: Boil then roast, plain
+    shape: staged
+    timing: Simmer ~45 min/kg, then roast ~15–20 min/kg
+    group: Cured (and/or smoked) whole ham — bone-in or boneless
+    covering: Uncovered during roast
+    temp_change: None during roast phase
+    outcome: Less salty, traditional
+    oven: Simmer in water first, then oven at 180°C fan
+    oven_basis: inferred
+    stages:
+    - name: simmer
+      rate_min: 45
+      rate_max: 45
+    - name: roast
+      rate_min: 15
+      rate_max: 20
+    notes: Traditional — boiling removes excess surface salt; skin removed and scored before roasting
+  - id: roast_only_plain
+    name: Roast only, plain
+    shape: rate
+    timing: ~60 min/kg + 30 min
+    group: Cured (and/or smoked) whole ham — bone-in or boneless
+    covering: Loosely covered for the bulk, uncovered last 20–30 min
+    temp_change: None
+    outcome: Simplest for cured ham
+    oven: 160–170°C fan
+    oven_basis: stated
+    rate_min: 60
+    rate_max: 60
+    flat_add: 30
+    notes: Slightly gentler and slower than fresh ham
+    source_note: Temperature itself wasn't actually wrong — written out here as fan/conventional explicitly since a cited "180°C" source turned out to mean the same oven setting as our existing 160–170°C fan figure, not a different one
+  - id: sugar_rubbed_after_boil_or_roast_base
+    name: Sugar-rubbed (after boil or roast base)
+    shape: relative
+    timing: Base method + final uncovered stage
+    group: Cured (and/or smoked) whole ham — bone-in or boneless
+    covering: Uncovered for the sugar-crisping stage
+    temp_change: One step up at the very end
+    outcome: Caramelised crust
+    oven: As per base method, uncovered at 200–220°C fan for last 15–20 min
+    oven_basis: inferred
+    relative_to: Base method + final uncovered stage
+    notes: Applied only at the very end
+  - id: marmalade_or_treacle_glazed_after_boil_or_roast_base
+    name: Marmalade or treacle glazed (after boil or roast base)
+    shape: relative
+    timing: Base method + final glazing stage
+    group: Cured (and/or smoked) whole ham — bone-in or boneless
+    covering: Uncovered for the glazing stage
+    temp_change: One step up at the very end
+    outcome: Glazed finish
+    oven: As per base method, uncovered at 200–220°C fan for last 15–20 min
+    oven_basis: inferred
+    relative_to: Base method + final glazing stage
+    notes: Glaze goes on right before the final high-heat stage
+  - id: boneless_netted_rolled_cured
+    name: Boneless, netted/rolled, cured
+    shape: relative
+    timing: Add ~10% to time vs. same-weight bone-in
+    group: Cured (and/or smoked) whole ham — bone-in or boneless
+    covering: Same as bone-in equivalents
+    temp_change: Same as bone-in equivalents
+    outcome: Boneless, denser
+    oven: Same as bone-in cured equivalents
+    oven_basis: inferred
+    relative_to: Add ~10% to time vs. same-weight bone-in
+    notes: Same adjustment as fresh ham
+  groups:
+  - name: Fresh (uncured, raw) ham — bone-in or boneless
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp change
+    - Covering
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: '<strong>Weight range:</strong> holds for <strong>2–5 kg</strong> (bone-in) or <strong>1.8–4.5 kg</strong> (boneless). Doneness pull temps: see <a href="../internal-temperatures/#ham">internal temperatures</a>.'
+    - kind: safety
+      html: <strong>FOOD SAFETY:</strong> a fresh ham is pork leg, so the same flag applies as pork above — the "hint of pink" doneness option (60–62°C) on the <a href="../internal-temperatures/#ham">internal temperatures</a> page does not clear FSA's pork-specific guidance. The well-done option does.
+    - kind: sources
+      html: 'Sources: this table''s timing rates were mostly confirmed as-is against UK guides (~30–40 min/kg at 180°C is the common range; a 220–230°C blast for 20–30 min then 180°C at ~30–40 min/kg also matches typical practice) — no changes made here, unlike the cured table below. Checked once, 2026-08-12 — tidy/remove this note once you''ve confirmed a row yourself.'
+  - name: Cured (and/or smoked) whole ham — bone-in or boneless
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp change
+    - Covering
+    - Notes
+    before:
+    - kind: prose
+      html: 'Assumes a raw-cured ham that still needs cooking — check packaging first: "cook before eating" and "ready to eat" are handled differently.'
+    after:
+    - kind: weight
+      html: '<strong>Weight range:</strong> cured hams usually sold <strong>2–4.5 kg</strong> bone-in. Doneness pull temp: see <a href="../internal-temperatures/#ham">internal temperatures</a> (target corrected to 70–75°C — was 68–72°C, a touch under both Waitrose''s and FSA''s figures).'
+    - kind: caveat
+      html: <strong>Caveat:</strong> cured ham labelling varies a lot (unsmoked vs smoked, wet vs dry-cured, cook-before-eating vs ready-to-eat) — check packaging instructions against the thermometer reading rather than relying on generic figures.
+    - kind: sources
+      html: 'Sources: Waitrose, LovePork, Morrisons and flawlessfood all converge on the ~45 min/kg boil rate and ~60 min/kg + 30 min roast-only rate ("30 min per 500g plus 30" is the exact UK rule of thumb). This is the discrepancy that best matches your own memory of a lb/kg-style mix-up from an earlier pass — both figures here were roughly half the sourced rate, in exactly the shape a dropped unit conversion produces. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'

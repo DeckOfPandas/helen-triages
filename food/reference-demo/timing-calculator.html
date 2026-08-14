@@ -31,7 +31,7 @@ sitemap: false
   </div>
   <p class="recipe-tagline">The page currently prints “~40 min/kg + 20 min” and asks you to do the arithmetic holding a raw chicken.</p>
 
-  <div class="recipe-body-content about-page" data-cook-timer>
+  <div class="recipe-body-content" data-cook-timer>
 
     <div class="ct-form">
       <label class="ct-field">
@@ -56,6 +56,11 @@ sitemap: false
     </div>
 
     <p class="ct-summary" id="ct-summary" role="status"></p>
+
+    {% comment %} The decision table: which method, before how long. Populated
+       by cook-timer.js; .table-scroll is the site's existing wrapper for a
+       table too wide for the column. {% endcomment %}
+    <div class="table-scroll" id="ct-table"></div>
 
     <div class="ct-results" id="ct-results"></div>
 

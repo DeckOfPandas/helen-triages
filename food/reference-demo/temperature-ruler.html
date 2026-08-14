@@ -39,13 +39,13 @@ sitemap: false
   </div>
 {% endcapture %}
 
-<article class="recipe">
+<article class="recipe" id="top">
   <div class="recipe-title">
     <h1 class="recipe-main-title"><span class="recipe-title-text">Temperature ruler</span></h1>
   </div>
   <p class="recipe-tagline">The same numbers as the reference page, drawn on one scale instead of listed in five tables.</p>
 
-  <div class="recipe-body-content about-page">
+  <div class="recipe-body-content">
 
     <p class="tr-note">One axis, 40–100°C, shared by every protein — deliberately
       not one scale per protein. Letting each fill the full width looks tidier
@@ -60,27 +60,23 @@ sitemap: false
       <span><i class="tr-key-unsafe"></i> below the cited safety figure</span>
     </div>
 
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Poultry</span></h2>
-    <p class="recipe-section-subtitle">by the thigh, not the breast &mdash; it's the last part to come up</p>
+    {% comment %} Contents, following the pattern internal-temperatures.html
+       already uses -- an id on each h2 and a plain list of anchors. The
+       sections are alphabetical; the overview is last because it is a summary
+       of the others, not a protein of its own. {% endcomment %}
+    <ul class="tr-contents">
+      <li><a href="#beef-steak">Beef: steak</a></li>
+      <li><a href="#beef-tender-roasting-cuts">Beef: tender roasting cuts</a></li>
+      <li><a href="#beef-tough-cuts">Beef: tough cuts</a></li>
+      <li><a href="#fish-salmon">Fish: salmon</a></li>
+      <li><a href="#ham">Ham</a></li>
+      <li><a href="#lamb">Lamb</a></li>
+      <li><a href="#pork">Pork</a></li>
+      <li><a href="#poultry">Poultry</a></li>
+      <li><a href="#everything-one-scale">Everything, one scale</a></li>
+    </ul>
 
-    <div class="tr">
-      <div class="tr-plot">
-        {% comment %} Four of these five sit on top of each other at 74–75°C,
-           and that is worth SEEING rather than reading down a column of
-           identical cells: one endpoint covers every whole bird, and the
-           interesting row is the one that doesn't. Duck breast cooked on its
-           own comes off at 54–57°C, twenty degrees below the same bird roasted
-           whole -- which is the argument for jointing it, made visible. {% endcomment %}
-        {% for bird in t.poultry %}
-          {% assign label = bird[0] | replace: "_", " " | capitalize %}
-          {% assign spec = bird[1] %}
-          {% include food/temp_row.html label=label spec=spec %}
-        {% endfor %}
-      </div>
-      {{ axis }}
-    </div>
-
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Steak</span></h2>
+    <h2 class="recipe-section-heading" id="beef-steak"><span class="section-heading-text section-heading-text--reference">Beef: steak</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.steak.carryover }}</p>
 
     <div class="tr">
@@ -97,7 +93,35 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Salmon</span></h2>
+    <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">carryover {{ t.beef.tender_roast.carryover }} — the biggest on the page</p>
+
+    <div class="tr">
+      <div class="tr-plot">
+        {% for level in t.beef.tender_roast.doneness %}
+          {% comment %} spec is assigned first because Jekyll's include tag
+             rejects bracket indexing in a parameter -- `spec=level[1]` is a
+             build-crashing syntax error, not a silent nil. {% endcomment %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec tip="The dotted stretch is the carryover — widest here, because a large joint carries more hot mass out of the oven with it." %}
+        {% endfor %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">brisket, chuck, short rib, pot roast &mdash; not a doneness at all</p>
+
+    <div class="tr">
+      <div class="tr-plot">
+        {% assign tough = t.beef.tough_cuts %}
+        {% include food/temp_row.html label="Tough cuts" spec=tough tip="Brisket, chuck, short rib, pot roast. These pass through 60-70°C while still tough and only give up around 90-96°C -- which is why they sit so far right of every doneness figure above." %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.fish.salmon.carryover }}</p>
 
     <div class="tr">
@@ -123,33 +147,41 @@ sitemap: false
       flagged FSA gaps, which currently live only inside a
       <code>safety_note</code> string.</p>
 
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Beef, tender roasting cuts</span></h2>
-    <p class="recipe-section-subtitle">carryover {{ t.beef.tender_roast.carryover }} — the biggest on the page</p>
+    <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">fresh is pork leg; cured is a different animal, procedurally</p>
 
     <div class="tr">
       <div class="tr-plot">
-        {% for level in t.beef.tender_roast.doneness %}
-          {% comment %} spec is assigned first because Jekyll's include tag
-             rejects bracket indexing in a parameter -- `spec=level[1]` is a
-             build-crashing syntax error, not a silent nil. {% endcomment %}
+        <div class="tr-unsafe" style="--t:70;"></div>
+        <div class="tr-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
+        {% for level in t.ham.fresh.doneness %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
-          {% include food/temp_row.html label=label spec=spec tip="The dotted stretch is the carryover — widest here, because a large joint carries more hot mass out of the oven with it." %}
+          {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
+        {% assign cured = t.ham.cured %}
+        {% include food/temp_row.html label="Cured" spec=cured tip="Check the packaging first: 'cook before eating' and 'ready to eat' are handled differently, and this figure is for a raw-cured ham that still needs cooking." %}
       </div>
       {{ axis }}
     </div>
 
+    <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">carryover {{ t.lamb.roasting.carryover }} &mdash; no FSA gap here, UK guidance treats pink lamb like pink beef</p>
 
     <div class="tr">
       <div class="tr-plot">
-        {% assign tough = t.beef.tough_cuts %}
-        {% include food/temp_row.html label="Tough cuts" spec=tough tip="Brisket, chuck, short rib, pot roast. These pass through 60-70°C while still tough and only give up around 90-96°C -- which is why they sit so far right of every doneness figure above." %}
+        {% for level in t.lamb.roasting.doneness %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+        {% assign lslow = t.lamb.slow_cooked %}
+        {% include food/temp_row.html label="Slow-cooked" spec=lslow tip="Shoulder and breast. Same logic as pork's slow-cooked cuts -- tested by fork, not thermometer alone." %}
       </div>
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Pork</span></h2>
+    <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.pork.roasting.carryover }}</p>
 
     <div class="tr">
@@ -175,41 +207,27 @@ sitemap: false
 
     <p class="tr-note">{{ t.pork.roasting.safety_note | truncatewords: 45 }}</p>
 
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Lamb</span></h2>
-    <p class="recipe-section-subtitle">carryover {{ t.lamb.roasting.carryover }} &mdash; no FSA gap here, UK guidance treats pink lamb like pink beef</p>
+    <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">by the thigh, not the breast &mdash; it's the last part to come up</p>
 
     <div class="tr">
       <div class="tr-plot">
-        {% for level in t.lamb.roasting.doneness %}
-          {% assign label = level[0] | replace: "_", " " | capitalize %}
-          {% assign spec = level[1] %}
+        {% comment %} Four of these five sit on top of each other at 74–75°C,
+           and that is worth SEEING rather than reading down a column of
+           identical cells: one endpoint covers every whole bird, and the
+           interesting row is the one that doesn't. Duck breast cooked on its
+           own comes off at 54–57°C, twenty degrees below the same bird roasted
+           whole -- which is the argument for jointing it, made visible. {% endcomment %}
+        {% for bird in t.poultry %}
+          {% assign label = bird[0] | replace: "_", " " | capitalize %}
+          {% assign spec = bird[1] %}
           {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
-        {% assign lslow = t.lamb.slow_cooked %}
-        {% include food/temp_row.html label="Slow-cooked" spec=lslow tip="Shoulder and breast. Same logic as pork's slow-cooked cuts -- tested by fork, not thermometer alone." %}
       </div>
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Ham</span></h2>
-    <p class="recipe-section-subtitle">fresh is pork leg; cured is a different animal, procedurally</p>
-
-    <div class="tr">
-      <div class="tr-plot">
-        <div class="tr-unsafe" style="--t:70;"></div>
-        <div class="tr-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
-        {% for level in t.ham.fresh.doneness %}
-          {% assign label = level[0] | replace: "_", " " | capitalize %}
-          {% assign spec = level[1] %}
-          {% include food/temp_row.html label=label spec=spec %}
-        {% endfor %}
-        {% assign cured = t.ham.cured %}
-        {% include food/temp_row.html label="Cured" spec=cured tip="Check the packaging first: 'cook before eating' and 'ready to eat' are handled differently, and this figure is for a raw-cured ham that still needs cooking." %}
-      </div>
-      {{ axis }}
-    </div>
-
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Everything, one scale</span></h2>
+    <h2 class="recipe-section-heading" id="everything-one-scale"><span class="section-heading-text section-heading-text--reference">Everything, one scale</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
 
     <p class="tr-note">The view the five tables cannot produce at all: every
       protein's served range on the same axis. This is the argument for a shared
