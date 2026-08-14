@@ -20,3 +20,8 @@
 @import "shared/base";
 @import "shared/layout";
 @import "cocktails/decoration";
+// Print, last -- see shared/_print.scss's header for why last, and why all
+// three stylesheets take it rather than just the one whose pages prompted it
+// (#86). There is no cocktails/print partial: this site has no page anatomy
+// of its own yet, so the chrome rules are the whole of what applies.
+@import "shared/print";

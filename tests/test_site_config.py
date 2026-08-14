@@ -778,25 +778,72 @@ def test_sass_files_are_actually_found():
 
 
 def _top_level_blocks(text: str):
-    """Yield (selector, [declared properties]) for every zero-indent rule."""
+    """Yield (selector, [declared properties]) for every un-nested rule.
+
+    "Un-nested" rather than "zero-indent" since 2026-08-14: a rule sitting
+    inside an at-rule counts too, and carries that at-rule in its key --
+    `@media print .recipe-badges`, not `.recipe-badges`.
+
+    THIS USED TO SEE NOTHING INSIDE AN @media BLOCK, and that mattered the
+    moment the site got its first one. The old version matched a selector
+    only at zero indent, so every rule the print stylesheet declares
+    (_sass/shared/_print.scss and _sass/food/_print.scss, GitHub issue #86)
+    was invisible to test_no_selector_declares_the_same_property_twice below
+    while it went on reporting green -- the exact "test that cannot fail and
+    not notice" shape HANDOVER_v26.md §12 warns about, arriving with a
+    feature rather than with a file move.
+
+    THE AT-RULE HAS TO STAY IN THE KEY, not be folded away. A print rule and
+    the screen rule it overrides declare the same property for the same
+    selector deliberately -- that is what an override IS -- so keying both as
+    `.recipe-badges` would report every correct print rule as a clash. Only
+    two print rules fighting each other, or two screen rules, are a bug.
+
+    Line-oriented, like the version it replaces: it assumes this codebase's
+    own formatting, one opening brace at the end of its line and a closing
+    brace on a line of its own.
+    """
     depth = 0
+    at_rule = None          # the @media/@supports we are inside, if any
+    at_depth = None
     current = None
+    current_depth = None
     props: list[str] = []
+
     for line in text.split("\n"):
         code = line.split("//")[0]
-        if depth == 0:
-            match = re.match(r"^([.#%&][^{}/]*?)\s*\{", line)
-            if match:
-                current = " ".join(match.group(1).split())
+        stripped = code.strip()
+
+        if current is None:
+            at_match = re.match(r"^(@[a-z-][^{}/]*?)\s*\{", stripped)
+            sel_match = re.match(r"^([.#%&][^{}/]*?)\s*\{", stripped)
+            if at_match and at_rule is None:
+                at_rule = " ".join(at_match.group(1).split())
+                at_depth = depth
+            elif sel_match and (depth == 0
+                                or (at_rule is not None and depth == at_depth + 1)):
+                current = " ".join(sel_match.group(1).split())
+                if at_rule is not None:
+                    current = f"{at_rule} {current}"
+                current_depth = depth
                 props = []
-        elif depth == 1 and current:
-            decl = re.match(r"^\s{2}([a-z-]+)\s*:", line)
+        elif depth == current_depth + 1:
+            # Declarations of THIS rule only -- anything deeper belongs to a
+            # nested block (`&:hover`, a descendant selector) and is not a
+            # clash with its parent.
+            decl = re.match(r"^([a-z-]+)\s*:", stripped)
             if decl:
                 props.append(decl.group(1))
+
         depth += code.count("{") - code.count("}")
-        if depth == 0 and current and "}" in code:
+
+        if current is not None and depth == current_depth:
             yield current, props
             current = None
+            current_depth = None
+        if at_rule is not None and current is None and depth == at_depth:
+            at_rule = None
+            at_depth = None
 
 
 # --- the shared/forked SCSS boundary -----------------------------------------
@@ -915,6 +962,72 @@ def test_no_selector_declares_the_same_property_twice():
         + "\n  ".join(problems)
         + "\n\nThe later block wins, so editing the earlier one does nothing. "
           "Merge them, or move the property to whichever block owns that concern."
+    )
+
+
+# --- the print stylesheet keeps pointing at real markup ----------------------
+
+def _print_block_classes() -> list[tuple[str, str]]:
+    """(file, class) for every class named inside an `@media print` block."""
+    out = []
+    for path in sass_files():
+        text = path.read_text(encoding="utf-8")
+        for selector, _ in _top_level_blocks(text):
+            if not selector.startswith("@media print"):
+                continue
+            # Attribute selectors carry no class of their own, and a stray
+            # `[hidden]` would otherwise be parsed as part of the name.
+            bare = re.sub(r"\[[^\]]*\]", "", selector)
+            for cls in re.findall(r"\.([a-zA-Z][\w-]*)", bare):
+                out.append((path.name, cls))
+    return out
+
+
+def test_print_rules_target_classes_that_exist():
+    """GitHub issue #86. Every class the print stylesheet styles is emitted by
+    some template.
+
+    THE FAILURE THIS PREVENTS IS INVISIBLE BY CONSTRUCTION. Rename a class and
+    the screen rule that follows it goes wrong in front of you; the print rule
+    that did not follow it goes wrong on paper, which nobody looks at in
+    review, and which has no console, no layout shift and no error. A printout
+    that quietly regains the site header, or loses its page breaks, would
+    survive indefinitely.
+
+    Derived from both sides -- the classes come from whatever is currently
+    inside an `@media print` block, the markup from whatever the templates
+    currently emit -- so a print rule added tomorrow is covered tomorrow,
+    without this test being edited.
+
+    Not the reverse direction: a class with no print rule is the normal case,
+    since most of the page needs no different treatment on paper.
+    """
+    named = _print_block_classes()
+    assert named, (
+        "No classes found inside any `@media print` block. Either the print "
+        "stylesheet has gone (in which case delete this test and its helper) "
+        "or _top_level_blocks has stopped seeing into at-rules again -- and an "
+        "empty check passes."
+    )
+
+    html_files = (
+        sorted(ROOT.glob("_layouts/*.html"))
+        + sorted(ROOT.glob("_includes/**/*.html"))
+        + sorted(ROOT.glob("food/**/*.html"))
+        + sorted(ROOT.glob("cocktails/**/*.html"))
+        + [ROOT / "index.html"]
+    )
+    markup = "\n".join(p.read_text(encoding="utf-8") for p in html_files if p.exists())
+
+    missing = sorted({
+        f"{where_}: .{cls}" for where_, cls in named
+        if not re.search(rf'class="[^"]*\b{re.escape(cls)}\b', markup)
+    })
+    assert not missing, (
+        "Print rule(s) target a class no template emits:\n  " + "\n  ".join(missing)
+        + "\n\nEither the class was renamed and the print stylesheet did not "
+          "follow it, or the rule is left over from markup that has gone. A "
+          "print rule that matches nothing fails silently and on paper only."
     )
 
 

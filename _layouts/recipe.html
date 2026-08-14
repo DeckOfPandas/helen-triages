@@ -85,6 +85,29 @@ layout: default
   {% if page.source %}<p class="recipe-source">Source: {{ page.source }}</p>{% endif %}
   {% if page.meta.date_ingested %}<p class="recipe-source">Date added: {{ page.meta.date_ingested }}</p>{% endif %}
 
+  {% comment %} GitHub issue #86. Two ways of taking this recipe off the screen,
+     said as two separate things on purpose -- Helen: "one for print, one for
+     PDF, then the user knows exactly what to expect." One opens the print
+     dialogue on this page (the print stylesheet decides what comes out); the
+     other is a file that already exists, built at deploy time.
+
+     SHIPS HIDDEN, REVEALED BY JS. The button does nothing without
+     assets/js/print-link.js, and a control that silently fails is worse than
+     no control -- so the markup starts `hidden` and the script removes that
+     once it has something to attach. Same reasoning as .recipe-list starting
+     `visibility: hidden` on the index: CSS cannot ask whether JS ran, so the
+     markup assumes it did not. The PDF link beside it is an ordinary anchor
+     and needs none of this.
+
+     Placed here rather than beside the title: .recipe-main-title is capped at
+     70% width with the other 30% deliberately empty, which looks like the
+     obvious home for a control until a long title wraps into it. In flow,
+     right-aligned, it cannot collide with anything at any width -- and this
+     site has no media queries to fix it with if it did. {% endcomment %}
+  <div class="recipe-actions">
+    <button type="button" class="btn-print" hidden>print</button>
+  </div>
+
   <div class="recipe-badges">
     {% include recipe_badges.html recipe=page %}
   </div>
@@ -197,6 +220,12 @@ layout: default
   {% endif %}
 
   {% if has_short %}
+    {% comment %} Print only (issue #86) -- hidden on screen in
+       food/_recipe-ingredients-method.scss, shown in food/_print.scss. On
+       paper the full and short methods both print, one after the other, so the
+       second one needs saying what it is; on screen they are alternatives and
+       the toggle button already says it. {% endcomment %}
+    <h3 class="recipe-group-heading method-short-heading">In short:</h3>
     <div class="method-short" hidden>
       {% for step in page.method_short %}
         {{ step | markdownify }}
@@ -246,3 +275,4 @@ layout: default
 </article>
 
 <script src="{{ '/assets/js/method-toggle.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>

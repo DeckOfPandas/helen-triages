@@ -430,38 +430,39 @@ article.recipe a {
   &:hover { color: $color-recipe-link; }
 }
 
-// --- Method Toggle Button ----------------------------------------------------
-// Matches .btn-clear-inline on the index page: Courier, 0.75rem, weight 800, scratchy.
-// Sans-serif, weight 600, no stroke -- deliberately matching article.recipe
-// a exactly (Helen: "update the short method link to the sans serif font so
-// all links feel uniform"), not Courier's heading family. It no longer
-// shares anything with %heading-base (every property that extend supplied
-// was already being overridden below anyway), so the extend is gone too.
-// letter-spacing: 0 stays -- this button is a child of .recipe-section-
-// heading, which sets letter-spacing: 0.08em, and would otherwise inherit
-// it.
-.btn-method-toggle {
+// --- A button that looks like a body link ------------------------------------
+// Two consumers: .btn-method-toggle (below) and .btn-print (the print control,
+// GitHub issue #86). Both are <button> elements rather than links because they
+// DO something to this page rather than going anywhere, and both should be
+// indistinguishable from article.recipe a -- Helen's standing rule for anything
+// clickable in the recipe's own text: "update the short method link to the sans
+// serif font so all links feel uniform." Not Courier's heading family, and not
+// .btn-clear-inline on the index, which this used to be matched to.
+//
+// A body link has no font-size of its own; it inherits article.recipe's
+// $font-size-body-sm. Naming that token here, rather than a number picked to
+// look close, is what makes this an exact match instead of an approximation --
+// Helen: "match the look of the short method link exactly to body links like
+// Philosophy of Yum."
+//
+// THE THREE RESETS ARE THE LOAD-BEARING PART, and the main reason this is a
+// shared base rather than a second copy. .btn-method-toggle sits inside
+// .recipe-section-heading, which sets letter-spacing, -webkit-text-stroke and
+// (via punched(raised)) text-shadow -- all three inherit, so without resetting
+// them the button quietly wears the heading's emboss on top of its own
+// styling. Helen: "the PoY link text seems bouncier and maybe slightly
+// wider-spaced letters? And is it a shade lighter in colour?" -- all three
+// consistent with an inherited shadow+stroke neither of us had checked for
+// (dev tools greys inherited values out under Computed, easy to skim past).
+// See HANDOVER §12. .btn-print sits in no heading today; it carries the resets
+// anyway, so that moving one of these buttons somewhere that does cannot
+// reintroduce the bug.
+%link-button {
   font-family: $font-body;
-  // Was 0.75rem with an underline -- Helen: "match the look of the short
-  // method link exactly to body links like Philosophy of Yum." A body link
-  // has no font-size of its own; it inherits article.recipe's own
-  // $font-size-body-sm. Using that token directly here, rather than a
-  // number picked to look close, is what makes this an exact match instead
-  // of an approximation.
   font-size: $font-size-body-sm;
   font-weight: 600;
   text-transform: lowercase;
   letter-spacing: 0;
-  // Explicit resets, not decoration: this button is a child of
-  // .recipe-section-heading, which sets both of these (punched(raised) for
-  // text-shadow, -webkit-text-stroke directly) -- both properties inherit
-  // by default, so without resetting them the button was picking up the
-  // parent heading's emboss shadow and stroke on top of its own styling.
-  // Helen: "the PoY link text seems bouncier and maybe slightly
-  // wider-spaced letters? And is it a shade lighter in colour?" -- all
-  // three are consistent with an inherited shadow+stroke neither of us had
-  // actually checked for (dev tools shows inherited values greyed out
-  // under "Computed", easy to skim past).
   -webkit-text-stroke: 0;
   text-shadow: none;
   background: none;
@@ -469,22 +470,60 @@ article.recipe a {
   color: $color-recipe-link;
   padding: 0;
   cursor: pointer;
-  transition: opacity 0.1s ease-in-out;
   white-space: nowrap;
+
+  // Lighter on hover, same colour and direction as every other link on the
+  // page (see article.recipe a above -- $color-recipe-link-hover is measured
+  // for this, not a generic lighten()).
+  &:hover { color: $color-recipe-link-hover; }
+}
+
+// --- Method Toggle Button ----------------------------------------------------
+// Everything about how it LOOKS is %link-button above; what is left here is
+// where it sits -- pinned to the right-hand end of the METHOD heading, which is
+// why .recipe-section-heading carries position: relative.
+.btn-method-toggle {
+  @extend %link-button;
+  transition: opacity 0.1s ease-in-out;
   position: absolute;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
+  // No .active rule any more (was opacity: 0.7, toggled by method-toggle.js
+  // whenever short method is showing) -- Helen: the persistent "click for full
+  // method" button, when short method is active, should look like a normal
+  // resting link, not the dimmed/faded read opacity: 0.7 actually gave it.
+  // method-toggle.js still toggles the .active class every time it switches
+  // modes; it's just unstyled here on purpose now, not a leftover.
+}
 
-  // Lighter on hover, same colour and direction as every other link on the
-  // page. No .active rule any more (was opacity: 0.7, toggled by
-  // method-toggle.js whenever short method is showing) -- Helen: the
-  // persistent "click for full method" button, when short method is
-  // active, should look like a normal resting link, not the dimmed/faded
-  // read opacity: 0.7 actually gave it. method-toggle.js still toggles the
-  // .active class every time it switches modes; it's just unstyled here on
-  // purpose now, not a leftover.
-  &:hover { color: $color-recipe-link-hover; }
+// --- Print / PDF controls ----------------------------------------------------
+// GitHub issue #86. Two ways of taking the recipe off the screen, said as two
+// separate things because they behave differently -- one opens a dialogue, one
+// downloads a file.
+//
+// Right-aligned and in its own row rather than tucked beside the title: the
+// title is capped at 70% and the empty 30% beside it looks like the obvious
+// home for these until a long title wraps into it. This site has no media
+// queries to rescue that with, so the safe placement is the one that cannot
+// collide at any width.
+//
+// A <div>, not a <p>, and that matters: article.recipe p is capped at 65ch, so
+// a right-aligned paragraph would align these to the 65ch mark rather than to
+// the right edge of the column the metadata grid above already fills.
+//
+// The row itself is hidden on paper (food/_print.scss) -- by the time anyone
+// reads a printout, the button has already done the only thing it does.
+.recipe-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: $space-lg;
+  margin: 0 0 $spacing-block-gap 0;
+}
+
+.btn-print {
+  @extend %link-button;
 }
 
 // --- Recipe Badges on recipe page --------------------------------------------
