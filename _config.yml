@@ -42,6 +42,14 @@ show_unrewritten: false
 # link rendered nowhere you could actually look at it.
 pdf_downloads: true
 
+# The "click for short method" toggle and its "In short:" print/PDF section --
+# Helen, 2026-08-14: undeployed. Both beef-wellington.md and chocolate-mousse.md
+# render it oddly. Off everywhere (no _config_local.yml override, so this one
+# value covers jekyll-local, jekyll-prod and the deployed site alike) rather
+# than deleting page.method_short data or the rendering code -- flip this back
+# to true once the feature itself is fixed and she's happy with it again.
+short_method_enabled: false
+
 # --- Collections -------------------------------------------------------------
 # WHY THE SOURCE DIRECTORIES ARE AT THE REPO ROOT AND NOT INSIDE food/
 #

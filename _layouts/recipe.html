@@ -190,10 +190,18 @@ layout: default
     </ul>
   {% endfor %}
 
+  {% comment %} short_method_enabled (_config.yml) -- Helen, 2026-08-14: the
+     toggle and its print/PDF "In short:" section are both undeployed, off
+     regardless of what page.method_short actually holds. Gating has_short
+     itself rather than each render site separately means both the on-screen
+     button below and the print-only block further down go dark together,
+     with one flag to flip back on rather than two. {% endcomment %}
   {% assign has_short = false %}
-  {% for step in page.method_short %}
-    {% unless step == "QQ" or step == "" or step == blank %}{% assign has_short = true %}{% endunless %}
-  {% endfor %}
+  {% if site.short_method_enabled %}
+    {% for step in page.method_short %}
+      {% unless step == "QQ" or step == "" or step == blank %}{% assign has_short = true %}{% endunless %}
+    {% endfor %}
+  {% endif %}
 
   <div class="recipe-section-method">
     <h2 class="recipe-section-heading">
