@@ -122,18 +122,28 @@ article.recipe a {
 // the accent (the heart, the martini's contents) stays a fixed magenta
 // regardless of hover -- Helen's ask was to fill them in magenta, not to
 // make them react to hover.
+// A solid silhouette has no "line" of its own to thicken -- self-stroking
+// (stroke colour == fill colour) dilates the shape outward instead, which
+// reads as chunkier linework the same way bumping the martini's
+// stroke-width below does. Helen's ask, 2026-08-15.
 .cloche-body {
   fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
 }
 
 .cloche-heart {
   fill: $color-bright-magenta;
+  stroke: $color-bright-magenta;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
 }
 
 .martini-outline {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.8;
+  stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -145,7 +155,7 @@ article.recipe a {
 .martini-bowl {
   fill: $color-bright-magenta;
   stroke: currentColor;
-  stroke-width: 2.8;
+  stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
