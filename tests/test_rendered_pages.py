@@ -165,3 +165,67 @@ def test_the_chart_sits_below_notes_and_out_of_the_metadata(site):
     assert html.index('id="doneness"') > html.index("recipe-section-notes"), \
         "the chart has drifted above Notes"
     assert 'href="#doneness"' in html, "nothing links to the chart"
+
+
+# --- the class that isn't there ----------------------------------------------
+
+def test_every_class_we_emit_has_a_rule_in_the_stylesheet(site):
+    """A class in the markup with no rule behind it renders NOTHING and errors
+    NOWHERE. It is invisible to Liquid, to Sass, to the build and to every data
+    test in this suite.
+
+    This is not hypothetical. A regex renaming the data's `pull_*` fields to
+    `out_at_*` also matched `class="tc-pull"` -- `-` isn't a word character, so
+    the lookbehind meant to protect property accesses let it through. The markup
+    started emitting `tc-out_at` while the stylesheet still defined `.tc-pull`,
+    and every filled bar on the site silently lost its position, size and
+    colour. The data was correct throughout. Helen found it by looking at three
+    charts with no bars in them.
+
+    Scoped to the prefixes this project owns, so a class from somewhere else
+    isn't dragged in. Modifiers are checked as written (`tc-row--suggested`),
+    against the COMPILED css, where Sass's `&--suggested` has already been
+    resolved into a real selector.
+    """
+    OURS = ("tc-", "ct-", "doneness")
+    sources = (list(pathlib.Path("_includes").rglob("*.html"))
+               + list(pathlib.Path("_layouts").rglob("*.html"))
+               + list(pathlib.Path("food").rglob("*.html"))
+               + list(pathlib.Path("assets/js").rglob("*.js")))
+
+    emitted: dict[str, list[str]] = {}
+    for path in sources:
+        text = path.read_text(encoding="utf-8")
+        # class="a b" in markup, and class='a b' inside JS template strings.
+        for attr in re.findall(r"""class=['"]([^'"{}]+)['"]""", text):
+            for name in attr.split():
+                if name.startswith(OURS):
+                    emitted.setdefault(name, []).append(str(path))
+
+    css = (site / "assets" / "css" / "food.css").read_text(encoding="utf-8")
+    orphans = [f"{name} — emitted by {sorted(set(where))[0]}"
+               for name, where in sorted(emitted.items())
+               if f".{name}" not in css]
+
+    assert not orphans, (
+        "these classes are written into markup but styled nowhere, so they "
+        "render as unstyled elements:\n  " + "\n  ".join(orphans)
+    )
+
+
+def test_every_chart_row_draws_its_filled_bar(site):
+    """The gap in the rendered tests I wrote to catch exactly this.
+
+    They asserted on the row, the label, the value and the shaded zone -- the
+    things AROUND the measurement -- and never on the mark that carries it. So
+    when every filled bar vanished, six rendered tests still passed.
+    """
+    for url in ("/food/reference/temperatures/", "/food/recipes/roast-beef-fillet/"):
+        html = page(site, url)
+        fragment = chart_of(html) if "recipes" in url else html
+        row_count = len(re.findall(r'class="tc-row[ "]', fragment))
+        bars = len(re.findall(r'class="tc-out-at"', fragment))
+        assert row_count and bars == row_count, (
+            f"{url}: {row_count} chart rows but {bars} filled bars — "
+            f"every row must draw the figure it is about"
+        )

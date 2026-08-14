@@ -18,7 +18,7 @@
   it works whenever the page happens to have a variable of that name and breaks
   the moment it doesn't.
 
-  "OUT AT", NOT "PULL AT". Helen: "I don't love the word 'out_at'... mostly
+  "OUT AT", NOT "PULL AT". Helen: "I don't love the word 'pull'... mostly
   because it's American." Out at is shorter, reads as plain English, and stays
   true for a pan, a grill or a bain-marie where "out of the oven" wouldn't. It
   also matches the calculator, which says "in at 14:20, out at 17:05" -- so one
@@ -32,7 +32,7 @@
   pass still to do.
 
   THE CARRYOVER BAR IS ONLY DRAWN WHEN THERE IS A GAP TO DRAW. Salmon's
-  carryover is 1–2°C and its out_at and rested ranges overlap, so there is no
+  carryover is 1–2°C and its out-at and rested ranges overlap, so there is no
   clear space between them; a dotted connector there would be drawn on top of
   the bars it's meant to join and read as noise. Beef's 4–6°C carryover leaves a
   real gap, and that gap is the whole point of the chart.
@@ -44,7 +44,7 @@
   FOUR SHAPES, ONE ROW. internal_temperatures.yml deliberately isn't uniform
   (see its own header): a doneness level has pull/rested, a whole bird has an
   endpoint, a cured ham has a target, and a tough cut has tender_at and no
-  out_at temperature at all because collagen breakdown isn't a doneness.
+  out-at temperature at all because collagen breakdown isn't a doneness.
 
   Rather than four includes, this finds whichever figure the node actually
   carries. That follows the data file's own instruction to consumers -- "check
@@ -89,7 +89,7 @@
 <div class="tc-row{% if include.suggested %} tc-row--suggested{% endif %}">
   <div class="tc-row-label">{{ include.label }}{% if include.suggested %}<span class="tc-suggested" title="What this recipe suggests">this recipe</span>{% endif %}</div>
   <div class="tc-track">
-    <div class="tc-out_at" style="--a:{{ from }}; --b:{{ to }};"></div>
+    <div class="tc-out-at" style="--a:{{ from }}; --b:{{ to }};"></div>
 
     {% if has_rested and spec.rested_min > to %}
       <div class="tc-carry" style="--a:{{ to }}; --b:{{ spec.rested_min }};"></div>
