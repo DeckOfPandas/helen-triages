@@ -43,37 +43,48 @@ sitemap: false
        Helen: "it makes no sense where it is." {% endcomment %}
     <p class="ct-summary" id="ct-summary" role="status"></p>
 
-    <div class="ct-form">
-      <label class="ct-field">
-        <span>What</span>
-        <select id="ct-protein"></select>
-      </label>
+    {% comment %} The controls and the figure they produce are ONE band, and the
+       rule belongs to the band rather than sitting between its two halves.
+       Helen: "the done at line should be above the horizontal rule." She's
+       right, and it also explains why it read as lost: below the rule it was
+       grouped with the table, which it has nothing to do with. It answers the
+       four boxes above it.
 
-      <label class="ct-field">
-        <span>Weight (kg)</span>
-        <input id="ct-weight" type="number" min="0.3" max="15" step="0.1" value="2.4" inputmode="decimal">
-      </label>
+       The border lives on this wrapper, not on .ct-doneat, so the rule still
+       draws if a protein ever has no finishing temperature to show. {% endcomment %}
+    <div class="ct-controls">
+      <div class="ct-form">
+        <label class="ct-field">
+          <span>What</span>
+          <select id="ct-protein"></select>
+        </label>
 
-      <label class="ct-field ct-field--optional">
-        <span>Eating at <em>(optional)</em></span>
-        <input id="ct-serve" type="time" step="300">
-      </label>
+        <label class="ct-field">
+          <span>Weight (kg)</span>
+          <input id="ct-weight" type="number" min="0.3" max="15" step="0.1" value="2.4" inputmode="decimal">
+        </label>
 
-      {% comment %} No hard-coded 20 here any more: cook-timer.js fills the
-         value and the placeholder from the selected protein's own stated rest
-         time in internal_temperatures.yml. Beef, pork and lamb publish one in
-         their table headers; goose states one in its note. See the js. {% endcomment %}
-      <label class="ct-field ct-field--optional">
-        <span>Rest (min)</span>
-        <input id="ct-rest" type="number" min="0" max="60" step="5">
-      </label>
+        <label class="ct-field ct-field--optional">
+          <span>Eating at <em>(optional)</em></span>
+          <input id="ct-serve" type="time" step="300">
+        </label>
+
+        {% comment %} No hard-coded 20 here any more: cook-timer.js fills the
+           value and the placeholder from the selected protein's own stated rest
+           time in internal_temperatures.yml. Beef, pork and lamb publish one in
+           their table headers; goose states one in its note. See the js. {% endcomment %}
+        <label class="ct-field ct-field--optional">
+          <span>Rest (min)</span>
+          <input id="ct-rest" type="number" min="0" max="60" step="5">
+        </label>
+      </div>
+
+
+      {% comment %} The decision table: which method, before how long. Populated
+         by cook-timer.js; .table-scroll is the site's existing wrapper for a
+         table too wide for the column. {% endcomment %}
+      <p class="ct-doneat" id="ct-doneat"></p>
     </div>
-
-
-    {% comment %} The decision table: which method, before how long. Populated
-       by cook-timer.js; .table-scroll is the site's existing wrapper for a
-       table too wide for the column. {% endcomment %}
-    <p class="ct-doneat" id="ct-doneat"></p>
 
     <div class="table-scroll" id="ct-table"></div>
 

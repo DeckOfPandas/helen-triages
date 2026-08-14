@@ -394,8 +394,6 @@ $tc-label-gap: $space-xl;
   // Row gap between the labels and their inputs, column gap between fields.
   gap: $space-sm $space-xl;
   margin: 0 0 $spacing-block-gap 0;
-  padding: 0 0 $spacing-block-gap 0;
-  border-bottom: 1px solid $color-border;
 }
 
 .ct-field {
@@ -476,6 +474,16 @@ $tc-label-gap: $space-xl;
 // is the answer, one is an admission that this page shows a single doneness at
 // a time -- and pushing them apart stops the link reading as part of the
 // sentence.
+// Controls plus the figure they produce, as one band closed by a rule. The rule
+// used to sit between the two, which grouped the finishing temperature with the
+// table below -- something it has nothing to do with -- and is why it read as
+// lost rather than as an answer.
+.ct-controls {
+  padding: 0 0 $spacing-block-gap 0;
+  border-bottom: 1px solid $color-border;
+  margin: 0 0 $spacing-section-top 0;
+}
+
 .ct-doneat {
   display: flex;
   flex-wrap: wrap;
@@ -483,7 +491,9 @@ $tc-label-gap: $space-xl;
   justify-content: space-between;
   gap: $space-md;
   font-size: 1.06rem;
-  margin: 0 0 $spacing-block-gap 0;
+  // No margin of its own: it closes the band, and the wrapper owns the gap
+  // between that band and the table.
+  margin: 0;
 
   a {
     font-family: $font-body;
