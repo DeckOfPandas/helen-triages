@@ -3,7 +3,7 @@
 WHY THIS FILE EXISTS. _data/food/internal_temperatures.yml now holds every
 temperature TWICE: once as the display string the pages and a recipe's meta
 line print ("48–50°C"), and once as a numeric pair the temperature charts draws
-from (pull_min: 48, pull_max: 50).
+from (out_at_min: 48, out_at_max: 50).
 
 Duplicating a fact is normally the thing to avoid, and the alternative was
 considered: store numbers only and render the strings in Liquid. It was not
@@ -27,13 +27,13 @@ import re
 import pytest
 
 
-# Mirrors tmp/add_numbers.py's own parser, deliberately reimplemented rather
+# Mirrors scripts/build_cooking_methods.py's own parser, deliberately reimplemented rather
 # than imported: a test that shares its parser with the thing that generated
 # the data would agree with itself no matter how wrong both were.
 _RANGE = re.compile(r"^(\d+(?:\.\d+)?)\s*(?:°C)?\s*[–-]\s*(\d+(?:\.\d+)?)")
 _SINGLE = re.compile(r"^(\d+(?:\.\d+)?)")
 
-TEMP_KEYS = ("pull", "rested", "endpoint", "target", "tender_at", "carryover",
+TEMP_KEYS = ("out_at", "rested", "endpoint", "target", "tender_at", "carryover",
              "passes_through")
 
 
@@ -118,7 +118,7 @@ def test_ranges_are_the_right_way_round(internal_temperatures):
 
 
 def test_open_ended_figures_are_flagged(internal_temperatures):
-    """`70°C+` has no upper bound, and pull_max repeats pull_min to say so.
+    """`70°C+` has no upper bound, and out_at_max repeats out_at_min to say so.
 
     Without the flag a consumer can't tell "70 to 70" (a point) from "70 and
     up" (an open end), and the charts would draw a well-done steak as a 3px
@@ -139,7 +139,7 @@ def test_open_ended_figures_are_flagged(internal_temperatures):
 
 
 def test_carryover_moves_the_temperature_up(internal_temperatures):
-    """A rested figure below its own pull figure would be a transcription slip.
+    """A rested figure below its own out_at figure would be a transcription slip.
 
     Carryover only goes one way: meat keeps cooking after it leaves the heat.
     This is the check that would have caught a digit swap in any of the 30-odd
@@ -147,11 +147,11 @@ def test_carryover_moves_the_temperature_up(internal_temperatures):
     """
     wrong = []
     for path, node in _walk(internal_temperatures):
-        if "pull_min" in node and "rested_min" in node:
-            if node["rested_min"] < node["pull_min"]:
+        if "out_at_min" in node and "rested_min" in node:
+            if node["rested_min"] < node["out_at_min"]:
                 wrong.append(
                     f"{'.'.join(path)}: rests to {node['rested_min']:g}°C but "
-                    f"is pulled at {node['pull_min']:g}°C"
+                    f"is pulled at {node['out_at_min']:g}°C"
                 )
     assert not wrong, "\n  ".join(wrong)
 
@@ -229,8 +229,8 @@ def test_doneness_levels_ascend(internal_temperatures, protein):
     if not doneness:
         pytest.skip(f"{protein} has no doneness spectrum")
 
-    levels = [(name, spec["pull_min"]) for name, spec in doneness.items()
-              if "pull_min" in spec]
+    levels = [(name, spec["out_at_min"]) for name, spec in doneness.items()
+              if "out_at_min" in spec]
     ascending = all(levels[i][1] <= levels[i + 1][1]
                     for i in range(len(levels) - 1))
     assert ascending, (
@@ -242,7 +242,7 @@ def test_doneness_levels_ascend(internal_temperatures, protein):
 # =============================================================================
 # COOKING METHODS — the calculator's data layer
 # =============================================================================
-# Generated from cooking-methods.html by tmp/emit_cooking_methods.py rather than
+# Generated from cooking-methods.html by scripts/build_cooking_methods.py rather than
 # retyped. These tests are what makes that generation trustworthy: a parser that
 # quietly mis-reads one row in sixty-six produces a data file that looks
 # perfectly plausible and schedules someone's dinner wrong.
@@ -551,7 +551,7 @@ def test_outbound_links_are_still_in_the_data(cooking_methods):
 def test_the_data_file_is_not_empty(cooking_methods):
     """A floor, and it exists because the floor gave way once.
 
-    tmp/emit_cooking_methods.py parses cooking-methods.html — and that page now
+    scripts/build_cooking_methods.py parses cooking-methods.html — and that page now
     renders FROM this data file. Running the generator against the working copy
     therefore made it its own consumer: it found no tables, wrote an empty data
     file, and the page went blank. The generator is pinned to the pre-migration
@@ -611,7 +611,7 @@ def test_temperatures_written_into_method_text_match_the_data(internal_temperatu
             continue                    # other tests own an unresolvable ref
 
         allowed = set()
-        for k in ("pull", "rested", "endpoint", "target", "tender_at"):
+        for k in ("out_at", "rested", "endpoint", "target", "tender_at"):
             lo, hi = node.get(f"{k}_min"), node.get(f"{k}_max")
             if lo is not None:
                 allowed.add((lo, hi))
@@ -702,7 +702,7 @@ def test_a_threshold_actually_excludes_something(internal_temperatures):
         about temperature HELD, not passed through on the way down. That is why
         its safety_summary says so in words: a single figure can't express it,
         and this test isn't trying to.)"""
-        return max(spec.get("rested_max") or 0, spec.get("pull_max") or 0)
+        return max(spec.get("rested_max") or 0, spec.get("out_at_max") or 0)
 
     problems = []
     for path in SAFETY_THRESHOLDS:

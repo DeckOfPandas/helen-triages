@@ -1,6 +1,6 @@
 {% comment %}
   One summary row for the "everything, one scale" view: a single bar spanning a
-  protein's whole served range, from its coolest pull to its hottest rested
+  protein's whole served range, from its coolest out_at to its hottest rested
   figure.
 
   Parameters
@@ -8,9 +8,9 @@
     doneness  a doneness hash from _data/food/internal_temperatures.yml
     tip       hover text
 
-  WHY THIS ISN'T `| map: "pull_min" | sort | first`, WHICH IS THE OBVIOUS WAY.
+  WHY THIS ISN'T `| map: "out_at_min" | sort | first`, WHICH IS THE OBVIOUS WAY.
   `doneness` is a HASH, and iterating a hash in Liquid yields [key, value]
-  PAIRS — so `map: "pull_min"` asks a two-element array for a property it
+  PAIRS — so `map: "out_at_min"` asks a two-element array for a property it
   doesn't have and quietly returns a list of nils. `sort | first` on that gives
   nil, the coordinate renders as `--a:;`, and the bar silently collapses. It
   fails without erroring, which is the worst kind, and it was written that way
@@ -24,17 +24,17 @@
 {% assign lo = 999 %}
 {% assign hi = 0 %}
 {% for lvl in include.doneness %}
-  {% if lvl[1].pull_min and lvl[1].pull_min < lo %}{% assign lo = lvl[1].pull_min %}{% endif %}
+  {% if lvl[1].out_at_min and lvl[1].out_at_min < lo %}{% assign lo = lvl[1].out_at_min %}{% endif %}
   {% if lvl[1].rested_max and lvl[1].rested_max > hi %}{% assign hi = lvl[1].rested_max %}{% endif %}
-  {% comment %} Tuna has pull figures but no rested ones — fall back to the pull
+  {% comment %} Tuna has out_at figures but no rested ones — fall back to the out_at
      ceiling so its bar still reaches its own hottest level. {% endcomment %}
-  {% if lvl[1].pull_max and lvl[1].pull_max > hi %}{% assign hi = lvl[1].pull_max %}{% endif %}
+  {% if lvl[1].out_at_max and lvl[1].out_at_max > hi %}{% assign hi = lvl[1].out_at_max %}{% endif %}
 {% endfor %}
 
 <div class="tc-row">
   <div class="tc-row-label">{{ include.label }}</div>
   <div class="tc-track">
-    <div class="tc-pull" style="--a:{{ lo }}; --b:{{ hi }};"></div>
+    <div class="tc-out_at" style="--a:{{ lo }}; --b:{{ hi }};"></div>
     <div class="tc-value" style="--b:{{ hi }};">{{ lo }}–{{ hi }}°C</div>
     <div class="tc-hit" tabindex="0" style="--a:{{ lo }}; --b:{{ hi }};"
          data-tip="{{ include.label }}: {{ lo }}–{{ hi }}°C across every doneness level in the data.{% if include.tip %} {{ include.tip }}{% endif %}"></div>

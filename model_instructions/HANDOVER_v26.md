@@ -1898,10 +1898,63 @@ treats differently — `internal_temperatures.yml`'s `safety_note` fields on
 "corrected" to the well-done figure — whether to keep serving pork pink is
 Helen's call, not something to silently override.
 
+### Status, 2026-08-14 — the layer is wired in
+
+Issues #183, #189 and #202 are done. What changed, and what it means for
+anything you build on top:
+
+**The reference pages are `/food/reference/temperatures/` (charts) and
+`/food/reference/timings/` (a weight → schedule instrument), plus
+`cooking-methods.html`.** `internal-temperatures.html` is DELETED — it held the
+same figures as tables, and two pages showing one dataset is the duplication
+this layer exists to end. It was also the last place still saying "Pull at".
+
+**"Out at", never "pull at".** Helen's call, 2026-08-13: pull is American. The
+data fields are `out_at` / `out_at_min` / `out_at_max` / `out_at_open`, and
+`tests/test_style.py`'s `_INTERNAL_TEMP_RE` knows the phrase so a recipe writing
+it into a method step isn't flagged as an oven temperature missing its "fan".
+
+**Every figure is numeric as well as a display string.** `out_at: "48–50°C"`
+sits beside `out_at_min: 48`. Deliberate duplication, because the strings carry
+words numbers can't ("74–75°C in the thigh"), guarded by
+`tests/test_reference_data.py` — which also holds the axis bounds, the
+safety-threshold spec, and the note-integrity checks.
+
+**Recipes draw the whole doneness spectrum, below Notes, at `#doneness`.** The
+metadata grid carries no temperature — Helen: "it's nowhere in sight when you're
+actually cooking". 9 recipes are wired; `internal_temp_ref` plus an optional
+`doneness` naming which level the recipe suggests.
+
+**`safety_min` / `safety_label` / `safety_summary` shade everything below the
+cited guidance.** On `fish.salmon` (63°C), `pork.roasting` and `ham.fresh`
+(70°C) only. Beef, lamb and steak have none on purpose — UK guidance treats
+pink as fine. This was a hard-coded `--t:63` in one page's markup and therefore
+couldn't warn anywhere else; two guards now stop it going missing again.
+
+**`_data/food/cooking_methods.yml` is GENERATED** by `scripts/build_cooking_methods.py`
+then `scripts/build_cooking_methods_prose.py`. Both are pinned to commit
+`8bdbd27` — the last version of `cooking-methods.html` that still held the
+tables — because that page now renders FROM their output. Run them against the
+working copy and they find no tables and write an empty file. The pin has an
+assertion on the table count; don't remove it.
+
 ### What's not done
 
-No recipe currently links to any of these three pages — the original ask
-was "pages I can link to from recipes," and that link-back hasn't happened
-yet anywhere in `_food_recipes/`. Nothing systematic connects the wider
-~370-recipe collection to `internal_temp_ref` either; that rollout is
-still ahead, not started.
+**`food/reference/sustainability.html` is gitignored**, same as `about.html`:
+zero fact-checking, transcribed from the drafts and never verified. It builds
+locally and does not reach the public repo. `cooking-methods.html`'s two
+"See also: sustainability" links therefore 404 in production until it returns —
+known and accepted, the same trade the header's "?" link already makes.
+
+**Venison and braised/confit duck legs have no temperature data.** Four recipes
+want them and are deliberately unwired rather than pointed at an approximation:
+two venison, a duck-leg casserole and a confit. Roasted duck legs DO now use
+`poultry.duck` — Helen, 2026-08-14: the figure says "in the thigh", which is
+exactly what a leg is. Venison has its own issue.
+
+**Nothing links recipes to the timings or methods pages.** Temperatures are
+wired both ways; cooking methods are not wired to recipes at all.
+
+**`cooking-methods.html` and `/food/reference/timings/` overlap** — both render
+the same 65 methods from the same data, one as tables and one as an instrument.
+Merging them is open, not decided.

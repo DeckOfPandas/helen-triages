@@ -1,8 +1,9 @@
----
----
 // =============================================================================
-// THE TIMINGS AND METHODS PAGE — proposal, not part of the site
+// HELEN TRIAGES FOOD - THE TIMINGS AND METHODS PAGE
 // =============================================================================
+// Promoted out of assets/css/reference-demo.scss on 2026-08-14, when the page
+// stopped being a proposal. That stylesheet is gone: it existed to let two
+// demos be styled without touching the real site, and there are no demos left.
 // Loaded only by the pages under /food/reference-demo/. The temperature chart
 // styles that used to live here moved to _sass/food/_temperature-chart.scss on
 // 2026-08-14, when recipe pages started drawing doneness spectra too (#189):
@@ -322,44 +323,3 @@
   line-height: 1.5;
 }
 
-// --- Navigation ---------------------------------------------------------------
-// The charts runs to eight protein sections; without a contents list you scroll
-// past the one you want. Anchors follow the pattern internal-temperatures.html
-// already uses (an id on each h2, a plain list of links) rather than a new one.
-.tc-contents {
-  columns: 2;
-  column-gap: $space-xxl;
-  margin: 0 0 $spacing-section-gap 0;
-  max-width: 34rem;
-
-  li { break-inside: avoid; }
-}
-
-// SCROLL-MARGIN IS NOT COSMETIC HERE. There is no scroll-margin anywhere else on
-// this site, and jumping to an anchor lands the heading hard against the top of
-// the viewport -- which for these headings means the blocky rule, which hangs
-// BELOW the lettering, is the only part still visible above the fold, and the
-// punched lettering has nothing above it to read as raised against. The offset
-// is roughly the gap the heading would have had if you'd scrolled to it.
-article.recipe .recipe-section-heading {
-  scroll-margin-top: $space-xxl;
-}
-
-// "↑ top" beside each heading. Deliberately quiet and deliberately NOT in the
-// heading's own Courier: it is a control, not part of the title, and giving it
-// the punched treatment would make it look like a second word in the heading.
-.tc-totop {
-  font-family: $font-body;
-  font-size: 0.72rem;
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
-  -webkit-text-stroke: 0;
-  text-shadow: none;
-  color: $color-clear-text;
-  margin-left: $space-lg;
-  white-space: nowrap;
-  vertical-align: middle;
-
-  &:hover { color: $color-recipe-link; }
-}

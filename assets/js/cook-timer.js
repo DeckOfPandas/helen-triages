@@ -196,7 +196,7 @@
     if (node.target) return node.target;
     if (node.doneness) {
       var first = Object.keys(node.doneness)[0];
-      return node.doneness[first].pull + " (" + first.replace(/_/g, " ") + ")";
+      return node.doneness[first].out_at + " (" + first.replace(/_/g, " ") + ")";
     }
     return null;
   }
@@ -238,7 +238,7 @@
     els.doneat.innerHTML = temp
       ? "<strong>Done at " + temp + "</strong>" +
         (protein.chart_anchor
-          ? "<a href='../temperature-charts/#" + protein.chart_anchor +
+          ? "<a href='../temperatures/#" + protein.chart_anchor +
             "'>see other doneness</a>"
           : "")
       : "";
@@ -411,6 +411,15 @@
   }
 
   fillProteins();
+
+  /* ?protein=beef, so the temperature charts can link to the timings for the
+     protein you were just looking at rather than to whatever the dropdown
+     happens to open on. Ignored silently if it names something this page
+     doesn't have -- a bad query string is not worth an error message on a
+     page that works perfectly well without it. */
+  var wanted = (location.search.match(/[?&]protein=([a-z]+)/) || [])[1];
+  if (wanted && METHODS[wanted]) els.protein.value = wanted;
+
   applyRest(METHODS[els.protein.value]);
   ["input", "change"].forEach(function (evt) {
     root.addEventListener(evt, render);

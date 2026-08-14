@@ -1,26 +1,19 @@
 ---
 layout: default
-title: "Timings and Methods — proposal"
-permalink: /food/reference-demo/timings-and-methods/
-sitemap: false
+title: "Timings and Methods"
+permalink: /food/reference/timings/
 ---
 
 {% comment %}
-  PROPOSAL, NOT A REAL PAGE. Nothing links here.
-
   Every figure comes from _data/food/cooking_methods.yml, generated from
-  food/reference/cooking-methods.html's own tables — same numbers, same
-  wording, no re-research. The finishing temperatures come from
-  internal_temperatures.yml, which is where the two reference pages finally
-  join up: a schedule that ends on a clock is only half an answer.
+  food/reference/cooking-methods.html's own tables -- same numbers, same
+  wording. The finishing temperatures come from internal_temperatures.yml,
+  which is where the two halves of the reference layer join up: a schedule that
+  ends on a clock is only half an answer.
 
-  The data is handed to JS as two JSON blobs rather than being templated into
-  markup, because the answer changes on every keystroke and Liquid runs once at
-  build time. The page still says something useful with JS off — the form is
-  there, and the underlying tables remain on the real reference page.
+  Promoted out of /food/reference-demo/ on 2026-08-14, with the charts page.
 {% endcomment %}
 
-<link rel="stylesheet" href="{{ '/assets/css/reference-demo.css' | relative_url }}">
 
 <script type="application/json" id="ct-methods">{{ site.data.food.cooking_methods | jsonify }}</script>
 <script type="application/json" id="ct-temps">{{ site.data.food.internal_temperatures | jsonify }}</script>
@@ -98,7 +91,7 @@ sitemap: false
        go, other than see also." A card that says "Won't guess this one" and
        shows its own conflicting range needs no essay three screens below it.
        {% endcomment %}
-    <p class="ct-seealso">See also: <a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}">temperature charts for each protein</a>.</p>
+    <p class="ct-seealso">See also: <a href="{{ '/food/reference/temperatures/' | relative_url }}">temperature charts for each protein</a>.</p>
 
   </div>
 </article>
