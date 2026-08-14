@@ -22,7 +22,7 @@
 {% endcomment %}
 
 <div class="tc-key">
-  <span><i class="tc-key-pull"></i> {{ include.solid | default: "out at" }}</span>
+  <span><i class="tc-key-out-at"></i> {{ include.solid | default: "out at" }}</span>
   {% if include.carry %}<span><i class="tc-key-carry"></i> carryover</span>{% endif %}
   {% if include.rested %}<span><i class="tc-key-rested"></i> rests to</span>{% endif %}
   {% if include.unsafe %}<span><i class="tc-key-unsafe"></i> below the cited safety figure</span>{% endif %}

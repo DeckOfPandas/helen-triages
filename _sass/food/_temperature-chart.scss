@@ -149,7 +149,7 @@ $tc-threshold-height: 1.35rem;
 }
 
 // PULL: solid. This is the number you act on, so it is the heavier mark.
-.tc-pull {
+.tc-out-at {
   @include tc-span;
   top: calc(50% - #{$tc-bar-height * 0.5});
   height: $tc-bar-height;
@@ -346,7 +346,7 @@ $tc-threshold-height: 1.35rem;
     flex-shrink: 0;
   }
 
-  .tc-key-pull   { background: $tc-hue; }
+  .tc-key-out-at   { background: $tc-hue; }
   .tc-key-rested { border: 2px solid rgba($tc-hue, 0.55); }
   .tc-key-carry  {
     height: 2px;
@@ -398,7 +398,7 @@ $tc-threshold-height: 1.35rem;
 .tc-row--suggested {
   .tc-row-label { color: $color-text; }
 
-  .tc-pull {
+  .tc-out-at {
     // A ring rather than a different hue: same quantity, same meaning, just the
     // one this page recommends. A second colour would have said "different kind
     // of thing", which it isn't.
