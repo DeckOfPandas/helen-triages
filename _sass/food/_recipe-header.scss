@@ -133,9 +133,13 @@ article.recipe a {
   stroke-linejoin: round;
 }
 
+// Outline back to a fixed black ($color-text, the site's near-black) rather
+// than self-stroked magenta -- Helen's ask. Fixed, not currentColor: the
+// heart is a permanent two-tone accent (black line, magenta fill), not part
+// of the link's own hover colour shift the way cloche-body is.
 .cloche-heart {
   fill: $color-bright-magenta;
-  stroke: $color-bright-magenta;
+  stroke: $color-text;
   stroke-width: 1.5;
   stroke-linejoin: round;
 }
@@ -148,16 +152,22 @@ article.recipe a {
   stroke-linejoin: round;
 }
 
-// The bowl outline doubles as the fill boundary -- filling the same path
-// used for the stroke, rather than an approximate overlay shape, is what
-// keeps the magenta "contents" following the glass's actual curve at any
-// icon size Helen picks later.
+// Outline only now -- no fill. The "contents" are a separate, smaller
+// .martini-liquid path (see the SVG partial) scaled inward from this same
+// outline around its own centroid, so there's a visible gap between the
+// glass and the liquid rather than the fill touching the stroke edge to
+// edge. Helen's ask, matching the inset-fill convention she'd seen (and
+// wanted the technique from, if not the aesthetic) in other icon sets.
 .martini-bowl {
-  fill: $color-bright-magenta;
+  fill: none;
   stroke: currentColor;
   stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.martini-liquid {
+  fill: $color-bright-magenta;
 }
 
 // --- Title -------------------------------------------------------------------
