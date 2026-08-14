@@ -67,8 +67,19 @@ SCRATCH = ROOT / "tmp"
 VIRTUAL_TIME_BUDGET_MS = 15000
 
 
-def _chrome() -> str:
-    """The Chrome binary, or exit non-zero saying so."""
+def _chrome(explicit: str | None = None) -> str:
+    """The Chrome binary, or exit non-zero saying so.
+
+    `explicit` is --chrome, for a browser that is not on PATH under one of the
+    usual names. That is the normal case on this machine rather than an exotic
+    one: WSL has no Linux Chrome unless you install one, and the Windows
+    install next door is chrome.exe.
+    """
+    if explicit:
+        found = shutil.which(explicit) or (explicit if Path(explicit).exists() else None)
+        if not found:
+            sys.exit(f"--chrome {explicit!r} is not on PATH and is not a file.")
+        return found
     for name in ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser"):
         found = shutil.which(name)
         if found:
@@ -140,6 +151,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--site", default="_site", help="built site directory")
     parser.add_argument("--jobs", type=int, default=4, help="parallel renders")
+    parser.add_argument(
+        "--chrome",
+        help="browser to render with, if it is not on PATH as google-chrome/chromium",
+    )
     args = parser.parse_args()
 
     site = (ROOT / args.site).resolve()
@@ -147,7 +162,7 @@ def main() -> int:
         sys.exit(f"{site} does not exist -- run `jekyll build` first.")
 
     SCRATCH.mkdir(exist_ok=True)
-    chrome = _chrome()
+    chrome = _chrome(args.chrome)
 
     recipes = sorted(site.glob("food/recipes/*/index.html"))
     if not recipes:

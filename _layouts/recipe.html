@@ -106,15 +106,21 @@ layout: default
      site has no media queries to fix it with if it did. {% endcomment %}
   <div class="recipe-actions">
     <button type="button" class="btn-print" hidden>print</button>
-    {% comment %} PRODUCTION ONLY, and not a hedge -- the file genuinely is not
-       there in a local build. The PDFs are rendered from the finished _site by
-       scripts/generate_pdfs.py, which runs in the deploy workflow between
-       `jekyll build` and the artifact upload; nothing Jekyll does creates
-       them. Emitting the link locally would mean a permanent 404 in the one
-       view Helen actually works in, which is a good way to learn to ignore a
-       link. The trade is that this half of the pair can only be seen on the
-       live site. {% endcomment %}
-    {% if jekyll.environment == "production" %}
+    {% comment %} Config-gated, not environment-gated, and the difference is
+       the whole point. The PDFs are rendered from a finished build by
+       scripts/generate_pdfs.py -- nothing Jekyll does creates them -- so this
+       link would 404 in the jekyll-local working view, which is a good way to
+       learn to ignore a link. But `jekyll.environment` was the wrong lever for
+       that: jekyll-prod serves with --config _config.yml and no JEKYLL_ENV, so
+       it reads as "development" as well, and the link rendered NOWHERE Helen
+       could look at it -- found the first time she went looking, 2026-08-14.
+
+       site.pdf_downloads is true in _config.yml (deployed site, and the
+       localhost:4002 mockup that exists to show what deploys) and false in
+       _config_local.yml (localhost:4001). Same two-layer split the site
+       already uses for show_unrewritten, rather than a third idea of what
+       "production" means. {% endcomment %}
+    {% if site.pdf_downloads %}
       <a href="{{ '/food/recipes/' | append: page.slug | append: '.pdf' | relative_url }}">pdf</a>
     {% endif %}
   </div>
