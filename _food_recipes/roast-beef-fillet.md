@@ -4,7 +4,7 @@ tagline: "Seared and roasted beef fillet — simple, perfect, showstopper. Lovel
 source: "Adapted from Gordon Ramsay"
 serves: "4–6"
 prep_time: "20 mins"
-cook_time: "30 mins"
+cook_time: "40 mins for medium rare"
 main_ingredients: ["beef fillet"]
 star_ingredient: "beef"
 internal_temp_ref: beef.tender_roast

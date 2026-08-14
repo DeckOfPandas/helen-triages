@@ -7,6 +7,7 @@ prep_time: "30 mins"
 cook_time: "8 hrs"
 main_ingredients: ["Gressingham duck legs", "pearl barley", "red wine", "pancetta", "mushrooms", "carrots", "baby potatoes"]
 star_ingredient: "duck"
+internal_temp_ref: poultry.duck
 tags: ["freezable", "make-ahead", "one-handed food"]
 ingredient_groups:
   - items:
