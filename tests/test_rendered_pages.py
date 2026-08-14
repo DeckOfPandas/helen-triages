@@ -1,0 +1,167 @@
+"""Assertions about BUILT HTML, not about the data behind it.
+
+WHY THIS FILE EXISTS. Every other test in this suite reads YAML, front matter or
+SCSS source. Both of the worst bugs in the reference work got past all of them,
+because both lived in the gap between correct data and what Liquid actually
+emitted:
+
+  - `{% assign prefix %}` inside an include leaked into the PAGE's scope, so
+    "tender at" appeared in front of all 42 chart rows instead of 4. The data
+    was perfect. Every test passed. It was caught by reading built HTML by hand.
+  - The safety zone measured its width against a different element from the bars
+    it was warning about, so salmon's 63°C line drew at about 54°C. Caught by
+    Helen looking at a screenshot.
+
+A build is slow enough that it is worth one session-scoped fixture and no more,
+so this file stays deliberately small: a handful of assertions about the shapes
+that would have caught those two, on the pages most likely to break.
+
+It SKIPS rather than fails when Jekyll isn't available, so the rest of the suite
+still runs on a machine without the Ruby toolchain.
+"""
+from __future__ import annotations
+
+import pathlib
+import re
+import shutil
+import subprocess
+
+import pytest
+import yaml
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+BUILD_DIR = ROOT / "tmp" / "_test_site"
+
+
+@pytest.fixture(scope="session")
+def site() -> pathlib.Path:
+    """Build once per run, into the project's own tmp/ (never /tmp — CLAUDE.md).
+
+    Uses the local config as well as the production one, so drafts build and the
+    output matches what Helen actually looks at.
+    """
+    if shutil.which("bundle") is None:
+        pytest.skip("no bundler on this machine; skipping rendered-output tests")
+
+    result = subprocess.run(
+        ["bundle", "exec", "jekyll", "build",
+         "--config", "_config.yml,_config_local.yml",
+         "--destination", str(BUILD_DIR)],
+        cwd=ROOT, capture_output=True, text=True, timeout=600,
+    )
+    if result.returncode != 0:
+        pytest.fail(
+            "jekyll build failed, so nothing below can be trusted:\n"
+            + result.stdout[-2000:] + result.stderr[-2000:]
+        )
+    yield BUILD_DIR
+    shutil.rmtree(BUILD_DIR, ignore_errors=True)
+
+
+def page(site: pathlib.Path, url: str) -> str:
+    path = site / url.strip("/") / "index.html"
+    assert path.exists(), f"{url} did not build"
+    return path.read_text(encoding="utf-8")
+
+
+def temps() -> dict:
+    return yaml.safe_load(
+        (ROOT / "_data" / "food" / "internal_temperatures.yml").read_text(encoding="utf-8"))
+
+
+def chart_of(html: str) -> str:
+    """Just the doneness section of a recipe page."""
+    assert 'id="doneness"' in html, "this recipe rendered no doneness chart"
+    return html[html.index('id="doneness"'):]
+
+
+def rows(fragment: str) -> list[tuple[str, str]]:
+    """(label, value) for each chart row, in order."""
+    labels = [re.sub(r"<[^>]+>", "", l).strip()
+              for l in re.findall(r'class="tc-row-label">(.*?)</div>', fragment, re.S)]
+    values = [re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", v)).strip()
+              for v in re.findall(r'class="tc-value"[^>]*>(.*?)</div>', fragment, re.S)]
+    return list(zip(labels, values))
+
+
+# --- the leak ----------------------------------------------------------------
+
+def test_only_tough_cuts_are_labelled_tender_at(site):
+    """The `prefix` leak, as an assertion.
+
+    `{% assign %}` in a Jekyll include writes to the including PAGE's scope, so a
+    variable set on one row is still set on the next. Setting `prefix` only in
+    the tender_at branch put "tender at" in front of every row after the first
+    tough cut — whole birds, doneness ranges, all of it. Nothing but the rendered
+    output shows this.
+    """
+    html = page(site, "/food/reference/temperatures/")
+    labelled = [(l, v) for l, v in rows(html) if v.startswith("tender at")]
+    assert len(labelled) == 4, (
+        f"expected exactly 4 rows to say 'tender at' (beef's tough cuts, pork's "
+        f"and lamb's slow-cooked, and the All summary), found {len(labelled)}: "
+        f"{labelled}"
+    )
+
+
+# --- the safety zone ---------------------------------------------------------
+
+def test_the_safety_zone_renders_where_the_data_says(site):
+    """Present, and at the figure on the node rather than a number in markup.
+
+    The zone was a hard-coded `--t:63` in one page's HTML, which is why it
+    couldn't travel to the recipe pages that needed it and why salmon shipped
+    for a day showing 43°C as an unqualified option.
+    """
+    data = temps()
+    for url, node in (
+        ("/food/recipes/teriyaki-salmon/", data["fish"]["salmon"]),
+        ("/food/reference/temperatures/", data["pork"]["roasting"]),
+    ):
+        html = page(site, url)
+        fragment = chart_of(html) if "recipes" in url else html
+        found = re.findall(r'class="tc-unsafe" style="--t:(\d+);', fragment)
+        assert str(node["safety_min"]) in found, (
+            f"{url}: expected a shaded zone at {node['safety_min']}°C, found {found or 'none'}"
+        )
+
+
+def test_a_protein_with_no_threshold_shades_nothing(site):
+    """The inverse, and it matters as much: UK guidance treats pink beef as fine,
+    so a beef page implying otherwise would be its own kind of wrong."""
+    fragment = chart_of(page(site, "/food/recipes/roast-beef-fillet/"))
+    assert "tc-unsafe" not in fragment, "beef has no safety threshold and must not shade"
+
+
+# --- the chart says what the data says ---------------------------------------
+
+def test_a_recipe_chart_draws_every_level_once(site):
+    data = temps()
+    fragment = chart_of(page(site, "/food/recipes/roast-beef-fillet/"))
+    drawn = rows(fragment)
+    levels = data["beef"]["tender_roast"]["doneness"]
+    assert len(drawn) == len(levels), f"{len(levels)} levels in the data, {len(drawn)} drawn"
+    for (_, value), spec in zip(drawn, levels.values()):
+        assert spec["out_at"] in value, f"row {value!r} doesn't show its own out-at figure"
+
+
+def test_exactly_one_level_is_marked_as_the_recipes_own(site):
+    """`doneness:` in front matter decides which row is marked. A typo resolves
+    to nothing and the chart recommends nothing, silently — which is why
+    test_doneness_names_a_real_level exists, and this is the other half of it."""
+    fragment = chart_of(page(site, "/food/recipes/roast-beef-fillet/"))
+    marked = re.findall(r'class="tc-row tc-row--suggested"', fragment)
+    assert len(marked) == 1, f"expected 1 suggested row, found {len(marked)}"
+    assert "this recipe" in fragment
+
+
+# --- placement ---------------------------------------------------------------
+
+def test_the_chart_sits_below_notes_and_out_of_the_metadata(site):
+    """Helen, 2026-08-14: "it can't go above the fold", and "I don't like the
+    internal temperature featuring in the metadata"."""
+    html = page(site, "/food/recipes/roast-beef-fillet/")
+    assert "<strong>Internal temp</strong>" not in html, "the meta cell is back"
+    assert html.index('id="doneness"') > html.index("recipe-section-notes"), \
+        "the chart has drifted above Notes"
+    assert 'href="#doneness"' in html, "nothing links to the chart"

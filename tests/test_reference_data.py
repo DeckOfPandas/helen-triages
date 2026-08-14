@@ -760,3 +760,134 @@ def test_the_safety_zone_shares_the_bars_coordinate_space():
                 f"°C figure will land at a different place from theirs."
             )
     assert not problems, "\n  ".join(problems)
+
+
+# =============================================================================
+# DELIBERATELY NOT TESTED: cook_time against the method's own timings
+# =============================================================================
+# roast-beef-fillet said "30 mins" where its method adds up to nearer 40, and the
+# obvious response is a test that sums the times in each method and flags the
+# gap. Helen ruled it out on 2026-08-14, and the reasoning is better than the
+# test would have been: "if a recipe contains complicated meat, a nudge to the
+# temperature chart should catch most users."
+#
+# She is right that the drift is a symptom. A clock figure cannot answer "is it
+# done", so tightening it buys very little, while the ", but check cooking
+# temperatures" link in _layouts/recipe.html sends you to the thing that can.
+# The test would also be fuzzy in the worst way -- half these methods say "until
+# golden" -- so it would need an exception list longer than its own logic.
+#
+# Don't add it. If the arithmetic matters somewhere specific, fix that recipe.
+
+
+# =============================================================================
+# COVERAGE — the gap every other test in this file has
+# =============================================================================
+# Everything above validates recipes that OPTED IN. A recipe that should carry a
+# temperature and doesn't is invisible to all of it: roast turkey and roast goose
+# sat unwired for a day with 27 passing tests, because nothing was looking for
+# absence.
+#
+# So this is the inverse test. It names the proteins we hold data for, finds
+# published recipes whose main ingredients say one of them, and requires either
+# an internal_temp_ref or an entry below saying why not.
+#
+# THE OPT-OUT LIST IS THE POINT, not a way round the test. Each entry is a
+# decision with a reason attached, so "why doesn't the lamb one have a
+# temperature?" is answered in the repo rather than in someone's memory.
+PROTEIN_WORDS = {
+    "chicken": "poultry", "turkey": "poultry", "goose": "poultry", "duck": "poultry",
+    "beef": "beef", "steak": "beef", "oxtail": "beef", "brisket": "beef",
+    "pork": "pork", "gammon": "ham", "ham": "ham",
+    "lamb": "lamb", "salmon": "fish", "tuna": "fish", "trout": "fish",
+    "cod": "fish", "haddock": "fish", "mackerel": "fish", "sea bass": "fish",
+}
+
+NO_TEMPERATURE_BECAUSE = {
+    # Not the dish. The protein is a stock, a garnish or an accompaniment.
+    "cherry-glaze": "a glaze; poultry is what you'd put it on, not what you cook",
+    "plum-sauce-for-duck": "a sauce; beef stock is an ingredient",
+    "pancetta-white-bean-stew": "pancetta is cured and diced, not a cut cooked to a temperature",
+    "smoked-mackerel-pate": "the mackerel arrives smoked; nothing is cooked",
+
+    # A cut the data doesn't cover. These are the honest gaps -- each one names a
+    # real thing missing from internal_temperatures.yml rather than a chore.
+    "cumin-mint-lamb-skewers": "grilled shoulder chunks; lamb.roasting is joints and "
+                               "lamb.slow_cooked is a whole shoulder, neither is this",
+    "vietnamese-spiced-braised-venison-haunch": "venison isn't in the data at all — Helen "
+                                                "is raising an issue for it, 2026-08-14",
+
+    # Chicken pieces in a wet dish. poultry.chicken's endpoint is written for a
+    # WHOLE BIRD ("74–75°C in the thigh"), and a thigh in a stew reaches that
+    # long before the dish is finished, so quoting it would be technically true
+    # and useless. Helen's duck-leg reasoning (the figure says "in the thigh",
+    # so a leg takes it) applies to a ROASTED leg, where the temperature is what
+    # you stop at. Revisit if a pieces/braise figure is ever added.
+    "chicken-a-la-king": "diced breast in a sauce; no figure for pieces",
+    "chicken-cider-stew": "thighs and drumsticks braised; no figure for pieces",
+    "chicken-sorrel-potato-stew": "leg braised; no figure for pieces",
+    "indonesian-chicken-curry-gulai-ayam": "thighs in a curry; no figure for pieces",
+    "thai-green-chicken-curry": "chicken in a curry; no figure for pieces",
+}
+
+
+def test_every_recipe_with_a_known_protein_has_a_temperature_or_a_reason():
+    import re as _re
+    import yaml as _yaml
+
+    missing = []
+    for path in sorted(pathlib.Path("_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        if not raw.startswith("---"):
+            continue
+        fm = _yaml.safe_load(raw.split("---")[1]) or {}
+        if fm.get("internal_temp_ref") or path.stem in NO_TEMPERATURE_BECAUSE:
+            continue
+        mains = [str(x).lower() for x in (fm.get("main_ingredients") or [])]
+        hits = sorted({fam for word, fam in PROTEIN_WORDS.items()
+                       if any(_re.search(rf"\b{word}\b", m) for m in mains)})
+        if hits:
+            missing.append(f"{path.stem}: names {hits} — add an internal_temp_ref, "
+                           f"or an entry in NO_TEMPERATURE_BECAUSE saying why not")
+    assert not missing, "\n  ".join(missing)
+
+
+def test_the_opt_out_list_has_no_stale_entries():
+    """An opt-out for a recipe that has since been wired, renamed or deleted is
+    worse than no entry: it silently exempts nothing while looking like a
+    decision someone made."""
+    import yaml as _yaml
+    stale = []
+    for slug in NO_TEMPERATURE_BECAUSE:
+        path = pathlib.Path("_food_recipes") / f"{slug}.md"
+        if not path.exists():
+            stale.append(f"{slug}: no such recipe")
+            continue
+        fm = _yaml.safe_load(path.read_text(encoding="utf-8").split("---")[1]) or {}
+        if fm.get("internal_temp_ref"):
+            stale.append(f"{slug}: now wired to {fm['internal_temp_ref']}, so the opt-out is dead")
+    assert not stale, "\n  ".join(stale)
+
+
+def test_chart_anchors_point_at_sections_that_exist(internal_temperatures):
+    """Every chart_anchor has to match an id on the temperatures page.
+
+    A wrong one doesn't error anywhere: the recipe's "more meat temperatures"
+    link renders, resolves to a real page, and lands at the top of it. The only
+    symptom is arriving in the wrong place, which reads as a missing scroll
+    rather than a broken link — and it will happen the first time a section is
+    renamed, which has already happened twice this week (Steak -> Beef: steak,
+    Everything one scale -> All).
+    """
+    page = pathlib.Path("food/reference/temperatures.html")
+    if not page.exists():
+        pytest.skip("the temperatures page has moved; nothing to check against")
+    ids = set(re.findall(r'id="([^"]+)"', page.read_text(encoding="utf-8")))
+
+    broken = []
+    for path, node in _walk(internal_temperatures):
+        anchor = node.get("chart_anchor")
+        if anchor and anchor not in ids:
+            broken.append(f"{'.'.join(path)}: chart_anchor {anchor!r} — "
+                          f"the page has {sorted(i for i in ids if i != 'top')}")
+    assert not broken, "\n  ".join(broken)
