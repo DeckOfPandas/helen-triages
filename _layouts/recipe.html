@@ -54,7 +54,25 @@ layout: default
     {% if page.serves %}<li><strong>Serves</strong><span>{{ page.serves }}</span></li>{% endif %}
     {% if page.makes %}<li><strong>Makes</strong><span>{{ page.makes }}</span></li>{% endif %}
     {% if page.prep_time %}<li><strong>Prep</strong><span>{{ page.prep_time }}</span></li>{% endif %}
-    {% if page.cook_time %}<li><strong>Cook</strong><span>{{ page.cook_time }}</span></li>{% endif %}
+    {% comment %} A wired recipe's cook time hands off to its own temperatures
+       rather than pretending a single number settles it. Helen, on roast beef
+       fillet: "About 30 mins, but check beef cooking temperatures."
+
+       That is the right shape for the whole collection, not just that recipe.
+       The clock figure was doing two jobs badly -- planning ("when do I start?")
+       and doneness ("when is it ready?") -- and it can only ever do the first.
+       An earlier attempt loaded the second onto it as "40 mins for medium rare",
+       which Helen rejected: qualifying the number doesn't help, because the
+       number was never the answer to that question.
+
+       Added by the layout rather than typed into cook_time, so no markup lives
+       in a metadata field and every wired recipe says it the same way. {% endcomment %}
+    {% if page.cook_time %}
+      <li>
+        <strong>Cook</strong>
+        <span>{{ page.cook_time }}{% if _temp_spectrum or _internal_temp %}, but check <a href="#doneness">cooking temperatures</a>{% endif %}</span>
+      </li>
+    {% endif %}
     {% comment %} NO INTERNAL-TEMP CELL HERE ANY MORE. Helen: "I don't like the
        internal temperature featuring in the metadata -- it's ugly, it spoils
        the rule of 3, and it's nowhere in sight when you're actually cooking."
