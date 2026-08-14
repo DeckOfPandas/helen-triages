@@ -43,7 +43,6 @@ sitemap: false
   <div class="recipe-title">
     <h1 class="recipe-main-title"><span class="recipe-title-text">Temperature Charts</span></h1>
   </div>
-  <p class="recipe-tagline">The same numbers as the reference page, drawn on one scale instead of listed in five tables.</p>
 
   <div class="recipe-body-content">
 
@@ -102,7 +101,10 @@ sitemap: false
     <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">brisket, chuck, short rib, pot roast &mdash; not a doneness at all</p>
 
-    {% include food/temp_key.html solid="tender at" %}
+    {% comment %} No key on this chart. It draws one bar, and that bar's own
+       value now reads "tender at 90–96°C" -- a key saying "tender at" beside it
+       would be the same three words twice. Helen: "remove the key as it's not
+       helpful." {% endcomment %}
     <div class="tc">
       <div class="tc-plot">
         {% assign tough = t.beef.tough_cuts %}

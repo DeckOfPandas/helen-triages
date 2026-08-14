@@ -52,6 +52,15 @@
   from the protein name" -- and it means a shape added upstream draws itself
   here without this file being touched.
 {% endcomment %}
+{% comment %} RESET FIRST. Liquid's `assign` writes to the PAGE's scope, not the
+   include's, so a variable set inside one invocation is still set on the next
+   one — and the next row inherits it. Setting `prefix` only in the tender_at
+   branch put "tender at" in front of every subsequent row on the page,
+   including whole birds and doneness ranges. Same family of trap as reading a
+   parameter as a bare name instead of include.x, noted above: the include
+   looks self-contained and isn't. {% endcomment %}
+{% assign prefix = "" %}
+
 {% if spec.pull_min %}
   {% assign from = spec.pull_min %}{% assign to = spec.pull_max %}{% assign shown = spec.pull %}
 {% elsif spec.endpoint_min %}
@@ -60,6 +69,14 @@
   {% assign from = spec.target_min %}{% assign to = spec.target_max %}{% assign shown = spec.target %}
 {% elsif spec.tender_at_min %}
   {% assign from = spec.tender_at_min %}{% assign to = spec.tender_at_max %}{% assign shown = spec.tender_at %}
+  {% comment %} A tough cut's figure says what KIND of figure it is, in the
+     value itself. It is the one shape here that isn't a temperature you take
+     something off the heat at -- collagen breakdown, tested with a fork -- and
+     an unlabelled "90–96°C" sitting on the same axis as a doneness range reads
+     as one. The "All" chart already wrote this out by hand; deriving it from
+     the key the node actually carries means every tender_at row says it,
+     including pork's and lamb's slow-cooked rows. {% endcomment %}
+  {% assign prefix = "tender at " %}
 {% endif %}
 
 {% assign has_rested = false %}
@@ -83,7 +100,7 @@
     {% endif %}
 
     <div class="tc-value" style="--b:{{ right }};">
-      {{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
+      {{ prefix }}{{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
     </div>
 
     <div class="tc-hit" tabindex="0" style="--a:{{ from }}; --b:{{ right }};"

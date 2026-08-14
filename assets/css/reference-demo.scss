@@ -393,7 +393,7 @@ $tc-label-gap: $space-xl;
   grid-template-rows: auto auto;
   // Row gap between the labels and their inputs, column gap between fields.
   gap: $space-sm $space-xl;
-  margin: 0 0 $spacing-section-top 0;
+  margin: 0 0 $spacing-block-gap 0;
   padding: 0 0 $spacing-block-gap 0;
   border-bottom: 1px solid $color-border;
 }
@@ -464,30 +464,31 @@ $tc-label-gap: $space-xl;
 .ct-summary {
   font-size: 1.06rem;
   line-height: 1.5;
+  // Clear of the title above and of the controls below in its own right: it is
+  // the sentence that explains what the four boxes are for, and it only does
+  // that job if it isn't crowded onto them.
   margin: $space-xl 0 $spacing-section-top 0;
   max-width: 62ch;
 }
 
-// Two lines, and they are different kinds of thing: the first describes what
-// you are looking at, the second is a figure you act on at the end. Stacking
-// them is the whole point -- riding along at the tail of a sentence is how the
-// temperature got overlooked.
-.ct-summary-count,
-.ct-summary-temp {
-  display: block;
-}
+// The finishing temperature, now BELOW the controls because it is a result of
+// them. Figure left, way-out right: the two are different kinds of thing -- one
+// is the answer, one is an admission that this page shows a single doneness at
+// a time -- and pushing them apart stops the link reading as part of the
+// sentence.
+.ct-doneat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-md;
+  font-size: 1.06rem;
+  margin: 0 0 $spacing-block-gap 0;
 
-.ct-summary-temp {
-  margin-top: $space-xs;
-
-  // The way out to the rest of the spectrum. Body font and normal weight
-  // inside a bold line, so it reads as a link rather than as more of the
-  // heading it sits in.
   a {
     font-family: $font-body;
     font-weight: 600;
     font-size: 0.88rem;
-    margin-left: $space-sm;
     white-space: nowrap;
   }
 }

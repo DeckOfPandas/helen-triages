@@ -54,6 +54,7 @@
     weight: root.querySelector("#ct-weight"),
     serve: root.querySelector("#ct-serve"),
     rest: root.querySelector("#ct-rest"),
+    doneat: root.querySelector("#ct-doneat"),
     table: root.querySelector("#ct-table"),
     out: root.querySelector("#ct-results"),
     summary: root.querySelector("#ct-summary")
@@ -211,6 +212,7 @@
 
     els.out.innerHTML = "";
     els.table.innerHTML = "";
+    els.doneat.innerHTML = "";
 
     if (!kg || kg <= 0) {
       els.summary.textContent = "Enter a weight to see how long each method takes.";
@@ -225,21 +227,21 @@
     var temp = finishingTemp(protein.internal_temp_ref);
     var proteinName = els.protein.options[els.protein.selectedIndex].text.toLowerCase();
 
-    var lines =
-      "<span class='ct-summary-count'>" +
-        protein.methods.length + " ways to cook " + kg + " kg of " + proteinName +
-        (serveAt === null ? ". Add a serving time for clock times." : ".") +
-      "</span>";
+    /* TWO ELEMENTS, EITHER SIDE OF THE CONTROLS. The count is the reason the
+       boxes below it exist; the finishing temperature is something the boxes
+       produce, and sitting above them it answered a question nobody had asked.
+       Splitting them puts each on the side of the form it belongs to. */
+    els.summary.innerHTML =
+      protein.methods.length + " ways to cook " + kg + " kg of " + proteinName +
+      (serveAt === null ? ". Add a serving time for clock times." : ".");
 
-    if (temp) {
-      lines += "<strong class='ct-summary-temp'>Done at " + temp +
+    els.doneat.innerHTML = temp
+      ? "<strong>Done at " + temp + "</strong>" +
         (protein.chart_anchor
-          ? " <a href='../temperature-charts/#" + protein.chart_anchor +
+          ? "<a href='../temperature-charts/#" + protein.chart_anchor +
             "'>see other doneness</a>"
-          : "") +
-        "</strong>";
-    }
-    els.summary.innerHTML = lines;
+          : "")
+      : "";
 
     /* --- the decision table ------------------------------------------------
        The cards below answer "how long does this method take". They do not

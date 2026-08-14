@@ -37,6 +37,10 @@ sitemap: false
        sentence those inputs produce means the controls arrive as something you
        can already see the point of adjusting. It still updates live -- it is
        both the explanation and the answer. {% endcomment %}
+    {% comment %} The count sits above the controls -- it is the "why" for the
+       boxes below it. The finishing temperature does NOT: it is an OUTPUT, and
+       above the inputs it was answering a question nobody had asked yet.
+       Helen: "it makes no sense where it is." {% endcomment %}
     <p class="ct-summary" id="ct-summary" role="status"></p>
 
     <div class="ct-form">
@@ -69,6 +73,8 @@ sitemap: false
     {% comment %} The decision table: which method, before how long. Populated
        by cook-timer.js; .table-scroll is the site's existing wrapper for a
        table too wide for the column. {% endcomment %}
+    <p class="ct-doneat" id="ct-doneat"></p>
+
     <div class="table-scroll" id="ct-table"></div>
 
     <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Details</span></h2>
