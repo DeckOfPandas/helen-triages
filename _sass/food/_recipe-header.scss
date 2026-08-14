@@ -369,6 +369,30 @@ article.recipe a {
   @include overlapping-rule-double($color-aureolin, $color-section-underline-2);
 }
 
+// The REFERENCE pages' own variant: bright lime over the same violet, where a
+// recipe page uses spring green over it. Helen's ask, and the reasoning she
+// gave for it is the whole design -- "just for a suggestion of own identity".
+//
+// One thing changes and one thing only, exactly as with the about page's
+// aureolin above. Violet stays, so the mark is still recognisably the site's;
+// the top bar shifts hue, so you can tell at a glance which KIND of page you
+// are on without anything spelling it out. Three keys for three page types:
+// spring green (a recipe), aureolin (about), lime (reference).
+//
+// $color-pure-lime-green is not a new hue -- it is already the SEARCH
+// INGREDIENTS category root on the index. Spending an existing swatch rather
+// than a fifth is the same test _palette.scss's colour budget applies, and the
+// same way the about page's aureolin passed it.
+//
+// The two greens are close enough in name to be worth being explicit about:
+// spring green is #00FF9F (a cool, blue-leaning green) and lime is #8AE800 (a
+// warm, yellow-leaning one). Side by side they read as clearly different keys,
+// which is the point -- if they didn't, this would be a distinction nobody
+// could use.
+.section-heading-text.section-heading-text--reference {
+  @include overlapping-rule-double($color-pure-lime-green, $color-section-underline-2);
+}
+
 
 // --- Method Toggle Button ----------------------------------------------------
 // Matches .btn-clear-inline on the index page: Courier, 0.75rem, weight 800, scratchy.

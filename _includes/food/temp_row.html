@@ -1,0 +1,69 @@
+{% comment %}
+  One row of the temperature ruler, drawn from _data/food/internal_temperatures.yml.
+
+  Parameters
+    label   the row's name, already human-readable
+    spec    a node holding pull_min/pull_max, and optionally rested_min/max
+    tip     extra hover text (optional)
+
+  WHY AN INCLUDE. Every row is the same four marks at different coordinates, and
+  the arithmetic that turns °C into a position lives in the stylesheet, not
+  here — so this file's only job is to hand over numbers. That keeps the axis
+  re-scalable from one place (the $tr-min/$tr-max pair in
+  assets/css/reference-demo.scss) rather than from ~40 call sites.
+
+  PARAMETERS ARE READ AS include.x, NOT AS BARE NAMES. Jekyll only binds them
+  onto the `include` object; a bare {{ spec }} would silently resolve against
+  the including page's own scope instead — which is worse than failing, because
+  it works whenever the page happens to have a variable of that name and breaks
+  the moment it doesn't.
+
+  "OUT AT", NOT "PULL AT". Helen: "I don't love the word 'pull'... mostly
+  because it's American." Out at is shorter, reads as plain English, and stays
+  true for a pan, a grill or a bain-marie where "out of the oven" wouldn't. It
+  also matches the calculator, which says "in at 14:20, out at 17:05" -- so one
+  verb now carries the same meaning across both instruments, and the schedule
+  hands straight over to the thermometer figure.
+
+  The DATA still uses `pull_min`/`pull_max`, deliberately: renaming those keys
+  means touching _layouts/recipe.html, the reference page and the guard tests
+  at once, and the field name is nobody's reading experience. Display language
+  changed here; the existing pages' own "Pull at" column headings are a copy
+  pass still to do.
+
+  THE CARRYOVER BAR IS ONLY DRAWN WHEN THERE IS A GAP TO DRAW. Salmon's
+  carryover is 1–2°C and its pull and rested ranges overlap, so there is no
+  clear space between them; a dotted connector there would be drawn on top of
+  the bars it's meant to join and read as noise. Beef's 4–6°C carryover leaves a
+  real gap, and that gap is the whole point of the chart.
+{% endcomment %}
+
+{% assign spec = include.spec %}
+{% assign has_rested = false %}
+{% if spec.rested_min %}{% assign has_rested = true %}{% endif %}
+
+{% comment %} The rightmost point the row reaches — where the direct label hangs
+   and where the hover target ends. {% endcomment %}
+{% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = spec.pull_max %}{% endif %}
+
+<div class="tr-row">
+  <div class="tr-row-label">{{ include.label }}</div>
+  <div class="tr-track">
+    <div class="tr-pull" style="--a:{{ spec.pull_min }}; --b:{{ spec.pull_max }};"></div>
+
+    {% if has_rested and spec.rested_min > spec.pull_max %}
+      <div class="tr-carry" style="--a:{{ spec.pull_max }}; --b:{{ spec.rested_min }};"></div>
+    {% endif %}
+
+    {% if has_rested %}
+      <div class="tr-rested" style="--a:{{ spec.rested_min }}; --b:{{ spec.rested_max }};"></div>
+    {% endif %}
+
+    <div class="tr-value" style="--b:{{ right }};">
+      {{ spec.pull }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
+    </div>
+
+    <div class="tr-hit" tabindex="0" style="--a:{{ spec.pull_min }}; --b:{{ right }};"
+         data-tip="{{ include.label }}{% if spec.description %} — {{ spec.description }}{% endif %}. Out at {{ spec.pull }}{% if has_rested %}, rests to {{ spec.rested }}{% endif %}.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
+  </div>
+</div>
