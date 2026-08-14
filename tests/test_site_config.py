@@ -1070,9 +1070,16 @@ def test_print_neutralises_the_screen_page_background():
             else:
                 paints_ground.append(f"{path.name}: `{selector}`")
 
-    if not paints_ground:
-        return   # nothing paints a ground, so nothing needs neutralising
-
+    # NOT `if not paints_ground: return`. That was the first version, and it
+    # is how this test passed while checking nothing -- see the docstring.
+    # If one day genuinely nothing paints a ground, that is a real change to
+    # know about, not a reason to fall silent.
+    assert paints_ground, (
+        "Nothing in _sass/ paints a background on html or body, so this test "
+        "has nothing to check. Either the shared base stopped setting the page "
+        "ground (in which case delete this test with it) or the scan has "
+        "stopped finding it -- and a scan that finds nothing passes."
+    )
     assert print_override, (
         f"{paints_ground} paints the page ground for the screen, and no "
         f"`@media print` rule sets a background on html/body to replace it.\n"
