@@ -60,6 +60,26 @@ sitemap: false
       <span><i class="tr-key-unsafe"></i> below the cited safety figure</span>
     </div>
 
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Poultry</span></h2>
+    <p class="recipe-section-subtitle">by the thigh, not the breast &mdash; it's the last part to come up</p>
+
+    <div class="tr">
+      <div class="tr-plot">
+        {% comment %} Four of these five sit on top of each other at 74–75°C,
+           and that is worth SEEING rather than reading down a column of
+           identical cells: one endpoint covers every whole bird, and the
+           interesting row is the one that doesn't. Duck breast cooked on its
+           own comes off at 54–57°C, twenty degrees below the same bird roasted
+           whole -- which is the argument for jointing it, made visible. {% endcomment %}
+        {% for bird in t.poultry %}
+          {% assign label = bird[0] | replace: "_", " " | capitalize %}
+          {% assign spec = bird[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+      </div>
+      {{ axis }}
+    </div>
+
     <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Steak</span></h2>
     <p class="recipe-section-subtitle">carryover {{ t.steak.carryover }}</p>
 
@@ -116,6 +136,75 @@ sitemap: false
           {% assign spec = level[1] %}
           {% include food/temp_row.html label=label spec=spec tip="The dotted stretch is the carryover — widest here, because a large joint carries more hot mass out of the oven with it." %}
         {% endfor %}
+      </div>
+      {{ axis }}
+    </div>
+
+
+    <div class="tr">
+      <div class="tr-plot">
+        {% assign tough = t.beef.tough_cuts %}
+        {% include food/temp_row.html label="Tough cuts" spec=tough tip="Brisket, chuck, short rib, pot roast. These pass through 60-70°C while still tough and only give up around 90-96°C -- which is why they sit so far right of every doneness figure above." %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Pork</span></h2>
+    <p class="recipe-section-subtitle">carryover {{ t.pork.roasting.carryover }}</p>
+
+    <div class="tr">
+      <div class="tr-plot">
+        {% comment %} The FSA line at 70°C is the whole reason this section
+           earns a drawing. internal_temperatures.yml flags pork's "medium" as
+           not clearing UK guidance, in a safety_note nobody reads until after
+           they've cooked. Here the shading says it before the sentence does --
+           and note that medium's RESTED figure clears nothing either, because
+           FSA's table is about temperature HELD, not passed through. {% endcomment %}
+        <div class="tr-unsafe" style="--t:70;"></div>
+        <div class="tr-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
+        {% for level in t.pork.roasting.doneness %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+        {% assign slow = t.pork.slow_cooked %}
+        {% include food/temp_row.html label="Slow-cooked" spec=slow tip="Shoulder and belly, cooked well past done until fat and collagen render. Go by how easily a fork twists, not by a doneness figure." %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <p class="tr-note">{{ t.pork.roasting.safety_note | truncatewords: 45 }}</p>
+
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Lamb</span></h2>
+    <p class="recipe-section-subtitle">carryover {{ t.lamb.roasting.carryover }} &mdash; no FSA gap here, UK guidance treats pink lamb like pink beef</p>
+
+    <div class="tr">
+      <div class="tr-plot">
+        {% for level in t.lamb.roasting.doneness %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+        {% assign lslow = t.lamb.slow_cooked %}
+        {% include food/temp_row.html label="Slow-cooked" spec=lslow tip="Shoulder and breast. Same logic as pork's slow-cooked cuts -- tested by fork, not thermometer alone." %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Ham</span></h2>
+    <p class="recipe-section-subtitle">fresh is pork leg; cured is a different animal, procedurally</p>
+
+    <div class="tr">
+      <div class="tr-plot">
+        <div class="tr-unsafe" style="--t:70;"></div>
+        <div class="tr-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
+        {% for level in t.ham.fresh.doneness %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+        {% assign cured = t.ham.cured %}
+        {% include food/temp_row.html label="Cured" spec=cured tip="Check the packaging first: 'cook before eating' and 'ready to eat' are handled differently, and this figure is for a raw-cured ham that still needs cooking." %}
       </div>
       {{ axis }}
     </div>

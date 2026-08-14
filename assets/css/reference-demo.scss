@@ -430,7 +430,12 @@ $tr-label-gap: $space-xl;
 
 .ct-card {
   padding: $space-lg $space-xl;
-  background-color: rgba($color-box-tint, $box-tint-opacity);
+  // The violet wash, spelled out rather than borrowed. $color-box-tint and
+  // $box-tint-opacity live in food/_recipe-header.scss, which this standalone
+  // stylesheet deliberately does not import -- pulling that partial in to reach
+  // two variables would emit the whole recipe page's CSS alongside a demo. The
+  // values are the same 3% violet the note boxes and metadata grid use.
+  background-color: rgba($color-vibrant-violet, 0.03);
   border-radius: $radius-sm;
   // The violet edge is the same "this is structural" signal the ruler's bars
   // carry; a declined card drops it to grey, below, so refusal is visible

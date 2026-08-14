@@ -39,20 +39,43 @@
 {% endcomment %}
 
 {% assign spec = include.spec %}
+
+{% comment %}
+  FOUR SHAPES, ONE ROW. internal_temperatures.yml deliberately isn't uniform
+  (see its own header): a doneness level has pull/rested, a whole bird has an
+  endpoint, a cured ham has a target, and a tough cut has tender_at and no
+  pull temperature at all because collagen breakdown isn't a doneness.
+
+  Rather than four includes, this finds whichever figure the node actually
+  carries. That follows the data file's own instruction to consumers -- "check
+  which keys exist on the node it resolved to, rather than assuming a shape
+  from the protein name" -- and it means a shape added upstream draws itself
+  here without this file being touched.
+{% endcomment %}
+{% if spec.pull_min %}
+  {% assign from = spec.pull_min %}{% assign to = spec.pull_max %}{% assign shown = spec.pull %}
+{% elsif spec.endpoint_min %}
+  {% assign from = spec.endpoint_min %}{% assign to = spec.endpoint_max %}{% assign shown = spec.endpoint %}
+{% elsif spec.target_min %}
+  {% assign from = spec.target_min %}{% assign to = spec.target_max %}{% assign shown = spec.target %}
+{% elsif spec.tender_at_min %}
+  {% assign from = spec.tender_at_min %}{% assign to = spec.tender_at_max %}{% assign shown = spec.tender_at %}
+{% endif %}
+
 {% assign has_rested = false %}
 {% if spec.rested_min %}{% assign has_rested = true %}{% endif %}
 
 {% comment %} The rightmost point the row reaches — where the direct label hangs
    and where the hover target ends. {% endcomment %}
-{% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = spec.pull_max %}{% endif %}
+{% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = to %}{% endif %}
 
 <div class="tr-row">
   <div class="tr-row-label">{{ include.label }}</div>
   <div class="tr-track">
-    <div class="tr-pull" style="--a:{{ spec.pull_min }}; --b:{{ spec.pull_max }};"></div>
+    <div class="tr-pull" style="--a:{{ from }}; --b:{{ to }};"></div>
 
-    {% if has_rested and spec.rested_min > spec.pull_max %}
-      <div class="tr-carry" style="--a:{{ spec.pull_max }}; --b:{{ spec.rested_min }};"></div>
+    {% if has_rested and spec.rested_min > to %}
+      <div class="tr-carry" style="--a:{{ to }}; --b:{{ spec.rested_min }};"></div>
     {% endif %}
 
     {% if has_rested %}
@@ -60,10 +83,10 @@
     {% endif %}
 
     <div class="tr-value" style="--b:{{ right }};">
-      {{ spec.pull }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
+      {{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
     </div>
 
-    <div class="tr-hit" tabindex="0" style="--a:{{ spec.pull_min }}; --b:{{ right }};"
-         data-tip="{{ include.label }}{% if spec.description %} — {{ spec.description }}{% endif %}. Out at {{ spec.pull }}{% if has_rested %}, rests to {{ spec.rested }}{% endif %}.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
+    <div class="tr-hit" tabindex="0" style="--a:{{ from }}; --b:{{ right }};"
+         data-tip="{{ include.label }}{% if spec.description %} — {{ spec.description }}{% endif %}. {% if spec.pull %}Out at{% else %}Reaches{% endif %} {{ shown }}{% if has_rested %}, rests to {{ spec.rested }}{% endif %}.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
   </div>
 </div>
