@@ -42,7 +42,7 @@
 chicken:
   label: Chicken
   internal_temp_ref: poultry.chicken
-  ruler_anchor: poultry
+  chart_anchor: poultry
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -157,7 +157,7 @@ chicken:
 turkey:
   label: Turkey
   internal_temp_ref: poultry.turkey
-  ruler_anchor: poultry
+  chart_anchor: poultry
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -289,7 +289,7 @@ turkey:
 goose:
   label: Goose
   internal_temp_ref: poultry.goose
-  ruler_anchor: poultry
+  chart_anchor: poultry
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -390,7 +390,7 @@ goose:
 duck:
   label: Duck
   internal_temp_ref: poultry.duck
-  ruler_anchor: poultry
+  chart_anchor: poultry
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -492,7 +492,7 @@ duck:
 beef:
   label: Beef
   internal_temp_ref: beef.tender_roast
-  ruler_anchor: beef-tender-roasting-cuts
+  chart_anchor: beef-tender-roasting-cuts
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -657,7 +657,7 @@ beef:
 pork:
   label: Pork
   internal_temp_ref: pork.roasting
-  ruler_anchor: pork
+  chart_anchor: pork
   methods:
   - id: standard_constant_roast_lean_loin_no_crackling
     name: Standard constant roast — lean loin, no crackling
@@ -837,7 +837,7 @@ pork:
 lamb:
   label: Lamb
   internal_temp_ref: lamb.roasting
-  ruler_anchor: lamb
+  chart_anchor: lamb
   methods:
   - id: standard_constant_roast
     name: Standard constant roast
@@ -999,7 +999,7 @@ lamb:
 ham:
   label: Ham
   internal_temp_ref: ham.cured
-  ruler_anchor: ham
+  chart_anchor: ham
   methods:
   - id: standard_constant_roast_plain
     name: Standard constant roast, plain

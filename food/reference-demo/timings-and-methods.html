@@ -55,9 +55,13 @@ sitemap: false
         <input id="ct-serve" type="time" step="300">
       </label>
 
+      {% comment %} No hard-coded 20 here any more: cook-timer.js fills the
+         value and the placeholder from the selected protein's own stated rest
+         time in internal_temperatures.yml. Beef, pork and lamb publish one in
+         their table headers; goose states one in its note. See the js. {% endcomment %}
       <label class="ct-field ct-field--optional">
         <span>Rest (min)</span>
-        <input id="ct-rest" type="number" min="0" max="60" step="5" value="20">
+        <input id="ct-rest" type="number" min="0" max="60" step="5">
       </label>
     </div>
 
@@ -67,31 +71,17 @@ sitemap: false
        table too wide for the column. {% endcomment %}
     <div class="table-scroll" id="ct-table"></div>
 
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Every method in detail</span></h2>
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Details</span></h2>
 
     <div class="ct-results" id="ct-results"></div>
 
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Why some of them refuse</span></h2>
-
-    <p>52 of the 65 method rows in the data are a straight formula — minutes per
-      kilo, sometimes plus a flat addition — and multiplying is all they need.
-      The other 13 are five different shapes, and the tempting thing is to
-      coerce them into a number anyway so every row has an answer.</p>
-
-    <p>That would be the worst thing this could do. A confident <em>“out at
-      17:05”</em> derived from a row whose own sources disagree threefold isn’t
-      helpfulness, it’s laundering uncertainty into precision. So the ones that
-      can’t be computed say so, show their real range, and hand you back to the
-      thermometer — pick <strong>Duck</strong> above and look at the
-      spatchcocked row for the clearest case.</p>
-
-    <p>The rows that <em>can</em> be resolved but don’t own their figures — ham’s
-      sugar-rubbed and glazed variants, which the table defines as “same as plain
-      equivalent” — name the row they borrowed from, so the number stays
-      traceable.</p>
-
-    <p>See also: <a href="{{ '/food/reference-demo/temperature-ruler/' | relative_url }}">the temperature ruler</a>,
-      which is where every “done at” figure here comes from.</p>
+    {% comment %} The long explanation of why some rows decline used to live
+       here -- four paragraphs restating what the cards already say for
+       themselves at the moment it matters. Helen: "the whole bottom section can
+       go, other than see also." A card that says "Won't guess this one" and
+       shows its own conflicting range needs no essay three screens below it.
+       {% endcomment %}
+    <p class="ct-seealso">See also: <a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}">temperature charts for each protein</a>.</p>
 
   </div>
 </article>

@@ -53,6 +53,9 @@ poultry:
     carryover_max: 3
     note: "Also check the breast reaches at least 70°C."
   goose:
+    # Stated in this entry's own note below ("Rest a full 20–30 minutes
+    # regardless"), not in a table header like the roasting cuts.
+    rest_min: 20
     endpoint: "74–75°C in the thigh"
     endpoint_min: 74
     endpoint_max: 75
@@ -80,6 +83,13 @@ poultry:
 
 beef:
   tender_roast:
+    # Rest time as STATED by internal-temperatures.html's own table header
+    # ("After ~15–20 min rest"), so the timings page can default its rest box
+    # to the figure this data already publishes rather than to a round 20 that
+    # nobody wrote down. Only the four proteins whose rest time is actually
+    # stated carry this -- chicken, turkey, duck and ham have no published
+    # figure, and the page falls back rather than inventing one.
+    rest_min: 15
     carryover: "4–6°C"
     carryover_min: 4
     carryover_max: 6
@@ -122,6 +132,13 @@ beef:
 
 pork:
   roasting:
+    # Rest time as STATED by internal-temperatures.html's own table header
+    # ("After ~15 min rest"), so the timings page can default its rest box
+    # to the figure this data already publishes rather than to a round 20 that
+    # nobody wrote down. Only the four proteins whose rest time is actually
+    # stated carry this -- chicken, turkey, duck and ham have no published
+    # figure, and the page falls back rather than inventing one.
+    rest_min: 15
     carryover: "3–4°C"
     carryover_min: 3
     carryover_max: 4
@@ -149,6 +166,13 @@ pork:
 
 lamb:
   roasting:
+    # Rest time as STATED by internal-temperatures.html's own table header
+    # ("After ~15 min rest"), so the timings page can default its rest box
+    # to the figure this data already publishes rather than to a round 20 that
+    # nobody wrote down. Only the four proteins whose rest time is actually
+    # stated carry this -- chicken, turkey, duck and ham have no published
+    # figure, and the page falls back rather than inventing one.
+    rest_min: 15
     carryover: "3–4°C"
     carryover_min: 3
     carryover_max: 4
@@ -265,7 +289,7 @@ steak:
       pull_max: 70
       # The one open-ended figure in the file. "70°C+" has no upper bound, so
       # pull_max repeats pull_min and this flag is what stops a consumer
-      # drawing it as a range that stops at 70 -- the ruler renders an open
+      # drawing it as a range that stops at 70 -- the charts render an open
       # end instead. Any future "X°C+" needs the same flag; the guard test
       # checks the flag matches the string rather than trusting either alone.
       pull_open: true

@@ -233,8 +233,8 @@
 
     if (temp) {
       lines += "<strong class='ct-summary-temp'>Done at " + temp +
-        (protein.ruler_anchor
-          ? " <a href='../temperature-ruler/#" + protein.ruler_anchor +
+        (protein.chart_anchor
+          ? " <a href='../temperature-charts/#" + protein.chart_anchor +
             "'>see other doneness</a>"
           : "") +
         "</strong>";
@@ -362,6 +362,38 @@
     });
   }
 
+  /* --- rest time -----------------------------------------------------------
+     Filled from the selected protein's own entry rather than defaulted to a
+     round 20 nobody wrote down. Beef, pork and lamb publish a rest time in
+     internal-temperatures.html's own table headers ("After ~15–20 min rest");
+     goose states one in its note. Chicken, turkey, duck and ham publish none —
+     they fall back, and the placeholder says as much rather than inventing a
+     figure and presenting it with the same confidence as a cited one. */
+  var REST_FALLBACK = 20;
+
+  function statedRest(ref) {
+    if (!ref) return null;
+    var node = TEMPS;
+    ref.split(".").forEach(function (k) { node = node && node[k]; });
+    return node && node.rest_min != null ? node.rest_min : null;
+  }
+
+  function applyRest(protein) {
+    var stated = statedRest(protein.internal_temp_ref);
+    els.rest.placeholder = stated != null ? stated : REST_FALLBACK;
+    els.rest.value = stated != null ? stated : REST_FALLBACK;
+    els.rest.title = stated != null
+      ? "The rest time stated for this cut, from the temperature data."
+      : "No rest time is published for this one — " + REST_FALLBACK +
+        " minutes is a working default, not a cited figure.";
+  }
+
+  /* Changing protein reloads its stated rest; changing anything else leaves
+     whatever you typed alone. */
+  els.protein.addEventListener("change", function () {
+    applyRest(METHODS[els.protein.value]);
+  });
+
   function fillProteins() {
     /* Alphabetical by the label you actually read, not by the data file's own
        order -- sorted here rather than in the YAML so the data stays neutral
@@ -377,6 +409,7 @@
   }
 
   fillProteins();
+  applyRest(METHODS[els.protein.value]);
   ["input", "change"].forEach(function (evt) {
     root.addEventListener(evt, render);
   });

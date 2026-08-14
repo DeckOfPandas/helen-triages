@@ -31,12 +31,12 @@
   {% if lvl[1].pull_max and lvl[1].pull_max > hi %}{% assign hi = lvl[1].pull_max %}{% endif %}
 {% endfor %}
 
-<div class="tr-row">
-  <div class="tr-row-label">{{ include.label }}</div>
-  <div class="tr-track">
-    <div class="tr-pull" style="--a:{{ lo }}; --b:{{ hi }};"></div>
-    <div class="tr-value" style="--b:{{ hi }};">{{ lo }}–{{ hi }}°C</div>
-    <div class="tr-hit" tabindex="0" style="--a:{{ lo }}; --b:{{ hi }};"
+<div class="tc-row">
+  <div class="tc-row-label">{{ include.label }}</div>
+  <div class="tc-track">
+    <div class="tc-pull" style="--a:{{ lo }}; --b:{{ hi }};"></div>
+    <div class="tc-value" style="--b:{{ hi }};">{{ lo }}–{{ hi }}°C</div>
+    <div class="tc-hit" tabindex="0" style="--a:{{ lo }}; --b:{{ hi }};"
          data-tip="{{ include.label }}: {{ lo }}–{{ hi }}°C across every doneness level in the data.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
   </div>
 </div>

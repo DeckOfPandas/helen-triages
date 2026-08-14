@@ -1,5 +1,5 @@
 {% comment %}
-  One row of the temperature ruler, drawn from _data/food/internal_temperatures.yml.
+  One row of the temperature charts, drawn from _data/food/internal_temperatures.yml.
 
   Parameters
     label   the row's name, already human-readable
@@ -9,7 +9,7 @@
   WHY AN INCLUDE. Every row is the same four marks at different coordinates, and
   the arithmetic that turns °C into a position lives in the stylesheet, not
   here — so this file's only job is to hand over numbers. That keeps the axis
-  re-scalable from one place (the $tr-min/$tr-max pair in
+  re-scalable from one place (the $tc-min/$tc-max pair in
   assets/css/reference-demo.scss) rather than from ~40 call sites.
 
   PARAMETERS ARE READ AS include.x, NOT AS BARE NAMES. Jekyll only binds them
@@ -69,24 +69,24 @@
    and where the hover target ends. {% endcomment %}
 {% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = to %}{% endif %}
 
-<div class="tr-row">
-  <div class="tr-row-label">{{ include.label }}</div>
-  <div class="tr-track">
-    <div class="tr-pull" style="--a:{{ from }}; --b:{{ to }};"></div>
+<div class="tc-row">
+  <div class="tc-row-label">{{ include.label }}</div>
+  <div class="tc-track">
+    <div class="tc-pull" style="--a:{{ from }}; --b:{{ to }};"></div>
 
     {% if has_rested and spec.rested_min > to %}
-      <div class="tr-carry" style="--a:{{ to }}; --b:{{ spec.rested_min }};"></div>
+      <div class="tc-carry" style="--a:{{ to }}; --b:{{ spec.rested_min }};"></div>
     {% endif %}
 
     {% if has_rested %}
-      <div class="tr-rested" style="--a:{{ spec.rested_min }}; --b:{{ spec.rested_max }};"></div>
+      <div class="tc-rested" style="--a:{{ spec.rested_min }}; --b:{{ spec.rested_max }};"></div>
     {% endif %}
 
-    <div class="tr-value" style="--b:{{ right }};">
+    <div class="tc-value" style="--b:{{ right }};">
       {{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
     </div>
 
-    <div class="tr-hit" tabindex="0" style="--a:{{ from }}; --b:{{ right }};"
+    <div class="tc-hit" tabindex="0" style="--a:{{ from }}; --b:{{ right }};"
          data-tip="{{ include.label }}{% if spec.description %} — {{ spec.description }}{% endif %}. {% if spec.pull %}Out at{% else %}Reaches{% endif %} {{ shown }}{% if has_rested %}, rests to {{ spec.rested }}{% endif %}.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
   </div>
 </div>

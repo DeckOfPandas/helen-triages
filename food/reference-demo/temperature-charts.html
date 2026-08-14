@@ -1,7 +1,7 @@
 ---
 layout: default
-title: "Temperature ruler — proposal"
-permalink: /food/reference-demo/temperature-ruler/
+title: "Temperature Charts — proposal"
+permalink: /food/reference-demo/temperature-charts/
 sitemap: false
 ---
 
@@ -25,46 +25,46 @@ sitemap: false
 <link rel="stylesheet" href="{{ '/assets/css/reference-demo.css' | relative_url }}">
 
 {% capture axis %}
-  <div class="tr-axis">
+  <div class="tc-axis">
     <div></div>
-    <div class="tr-axis-scale">
-      <div class="tr-tick" style="--t:40;">40°C</div>
-      <div class="tr-tick" style="--t:50;">50</div>
-      <div class="tr-tick" style="--t:60;">60</div>
-      <div class="tr-tick" style="--t:70;">70</div>
-      <div class="tr-tick" style="--t:80;">80</div>
-      <div class="tr-tick" style="--t:90;">90</div>
-      <div class="tr-tick" style="--t:100;">100°C</div>
+    <div class="tc-axis-scale">
+      <div class="tc-tick" style="--t:40;">40°C</div>
+      <div class="tc-tick" style="--t:50;">50</div>
+      <div class="tc-tick" style="--t:60;">60</div>
+      <div class="tc-tick" style="--t:70;">70</div>
+      <div class="tc-tick" style="--t:80;">80</div>
+      <div class="tc-tick" style="--t:90;">90</div>
+      <div class="tc-tick" style="--t:100;">100°C</div>
     </div>
   </div>
 {% endcapture %}
 
 <article class="recipe" id="top">
   <div class="recipe-title">
-    <h1 class="recipe-main-title"><span class="recipe-title-text">Temperature ruler</span></h1>
+    <h1 class="recipe-main-title"><span class="recipe-title-text">Temperature Charts</span></h1>
   </div>
   <p class="recipe-tagline">The same numbers as the reference page, drawn on one scale instead of listed in five tables.</p>
 
   <div class="recipe-body-content">
 
-    <p class="tr-note">One axis, 40–100°C, shared by every protein — deliberately
+    <p class="tc-note">One axis, 40–100°C, shared by every protein — deliberately
       not one scale per protein. Letting each fill the full width looks tidier
       and throws away the only thing the drawing adds: that salmon is served at
       52°C where a chicken thigh has to reach 74°C, and pulled pork doesn't give
       up until 96°C.</p>
 
-    <div class="tr-legend">
-      <span><i class="tr-key-pull"></i> out at</span>
-      <span><i class="tr-key-carry"></i> carryover</span>
-      <span><i class="tr-key-rested"></i> rests to</span>
-      <span><i class="tr-key-unsafe"></i> below the cited safety figure</span>
+    <div class="tc-legend">
+      <span><i class="tc-key-pull"></i> out at</span>
+      <span><i class="tc-key-carry"></i> carryover</span>
+      <span><i class="tc-key-rested"></i> rests to</span>
+      <span><i class="tc-key-unsafe"></i> below the cited safety figure</span>
     </div>
 
     {% comment %} Contents, following the pattern internal-temperatures.html
        already uses -- an id on each h2 and a plain list of anchors. The
        sections are alphabetical; the overview is last because it is a summary
        of the others, not a protein of its own. {% endcomment %}
-    <ul class="tr-contents">
+    <ul class="tc-contents">
       <li><a href="#beef-steak">Beef: steak</a></li>
       <li><a href="#beef-tender-roasting-cuts">Beef: tender roasting cuts</a></li>
       <li><a href="#beef-tough-cuts">Beef: tough cuts</a></li>
@@ -76,11 +76,11 @@ sitemap: false
       <li><a href="#everything-one-scale">Everything, one scale</a></li>
     </ul>
 
-    <h2 class="recipe-section-heading" id="beef-steak"><span class="section-heading-text section-heading-text--reference">Beef: steak</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="beef-steak"><span class="section-heading-text section-heading-text--reference">Beef: steak</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.steak.carryover }}</p>
 
     <div class="tr">
-      <div class="tr-plot">
+      <div class="tc-plot">
         {% for level in t.steak.doneness %}
           {% comment %} spec is assigned first because Jekyll's include tag
              rejects bracket indexing in a parameter -- `spec=level[1]` is a
@@ -93,11 +93,11 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.beef.tender_roast.carryover }} — the biggest on the page</p>
 
     <div class="tr">
-      <div class="tr-plot">
+      <div class="tc-plot">
         {% for level in t.beef.tender_roast.doneness %}
           {% comment %} spec is assigned first because Jekyll's include tag
              rejects bracket indexing in a parameter -- `spec=level[1]` is a
@@ -110,24 +110,24 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">brisket, chuck, short rib, pot roast &mdash; not a doneness at all</p>
 
     <div class="tr">
-      <div class="tr-plot">
+      <div class="tc-plot">
         {% assign tough = t.beef.tough_cuts %}
         {% include food/temp_row.html label="Tough cuts" spec=tough tip="Brisket, chuck, short rib, pot roast. These pass through 60-70°C while still tough and only give up around 90-96°C -- which is why they sit so far right of every doneness figure above." %}
       </div>
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.fish.salmon.carryover }}</p>
 
     <div class="tr">
-      <div class="tr-plot">
-        <div class="tr-unsafe" style="--t:{{ t.fish.general.endpoint_min }};"></div>
-        <div class="tr-threshold-label" style="--t:{{ t.fish.general.endpoint_min }};">FSA/USDA {{ t.fish.general.endpoint_min }}°C &rarr;</div>
+      <div class="tc-plot">
+        <div class="tc-unsafe" style="--t:{{ t.fish.general.endpoint_min }};"></div>
+        <div class="tc-threshold-label" style="--t:{{ t.fish.general.endpoint_min }};">FSA/USDA {{ t.fish.general.endpoint_min }}°C &rarr;</div>
         {% for level in t.fish.salmon.doneness %}
           {% comment %} spec is assigned first because Jekyll's include tag
              rejects bracket indexing in a parameter -- `spec=level[1]` is a
@@ -140,20 +140,20 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <p class="tr-note">Note what the shaded zone does that no table on the
+    <p class="tc-note">Note what the shaded zone does that no table on the
       current page can: four of salmon's five doneness levels sit below the
       cited safety benchmark, visible in one look rather than inferred from a
       paragraph. The same device is what would carry pork's and fresh ham's
       flagged FSA gaps, which currently live only inside a
       <code>safety_note</code> string.</p>
 
-    <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">fresh is pork leg; cured is a different animal, procedurally</p>
 
     <div class="tr">
-      <div class="tr-plot">
-        <div class="tr-unsafe" style="--t:70;"></div>
-        <div class="tr-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
+      <div class="tc-plot">
+        <div class="tc-unsafe" style="--t:70;"></div>
+        <div class="tc-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
         {% for level in t.ham.fresh.doneness %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
@@ -165,11 +165,11 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.lamb.roasting.carryover }} &mdash; no FSA gap here, UK guidance treats pink lamb like pink beef</p>
 
     <div class="tr">
-      <div class="tr-plot">
+      <div class="tc-plot">
         {% for level in t.lamb.roasting.doneness %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
@@ -181,19 +181,19 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.pork.roasting.carryover }}</p>
 
     <div class="tr">
-      <div class="tr-plot">
+      <div class="tc-plot">
         {% comment %} The FSA line at 70°C is the whole reason this section
            earns a drawing. internal_temperatures.yml flags pork's "medium" as
            not clearing UK guidance, in a safety_note nobody reads until after
            they've cooked. Here the shading says it before the sentence does --
            and note that medium's RESTED figure clears nothing either, because
            FSA's table is about temperature HELD, not passed through. {% endcomment %}
-        <div class="tr-unsafe" style="--t:70;"></div>
-        <div class="tr-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
+        <div class="tc-unsafe" style="--t:70;"></div>
+        <div class="tc-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
         {% for level in t.pork.roasting.doneness %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
@@ -205,13 +205,13 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <p class="tr-note">{{ t.pork.roasting.safety_note | truncatewords: 45 }}</p>
+    <p class="tc-note">{{ t.pork.roasting.safety_note | truncatewords: 45 }}</p>
 
-    <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">by the thigh, not the breast &mdash; it's the last part to come up</p>
 
     <div class="tr">
-      <div class="tr-plot">
+      <div class="tc-plot">
         {% comment %} Four of these five sit on top of each other at 74–75°C,
            and that is worth SEEING rather than reading down a column of
            identical cells: one endpoint covers every whole bird, and the
@@ -227,15 +227,15 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading" id="everything-one-scale"><span class="section-heading-text section-heading-text--reference">Everything, one scale</span><a class="tr-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="everything-one-scale"><span class="section-heading-text section-heading-text--reference">Everything, one scale</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
 
-    <p class="tr-note">The view the five tables cannot produce at all: every
+    <p class="tc-note">The view the five tables cannot produce at all: every
       protein's served range on the same axis. This is the argument for a shared
       scale, in one picture — and probably the most useful single thing on the
       page for someone who cooks a lot and looks things up rarely.</p>
 
     <div class="tr">
-      <div class="tr-plot">
+      <div class="tc-plot">
         {% comment %} Every span below is COMPUTED from the data, not typed --
            see _includes/food/temp_span.html for why the obvious
            `| map: "pull_min" | sort | first` silently returns nils here. {% endcomment %}
@@ -246,42 +246,42 @@ sitemap: false
         {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness tip="UK guidance treats pink lamb like pink beef." %}
         {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness tip="The medium figure is the one flagged against FSA guidance." %}
 
-        <div class="tr-row">
-          <div class="tr-row-label">Fish, general</div>
-          <div class="tr-track">
-            <div class="tr-pull" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"></div>
-            <div class="tr-value" style="--b:{{ t.fish.general.endpoint_max }};">{{ t.fish.general.endpoint }}</div>
-            <div class="tr-hit" tabindex="0" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"
+        <div class="tc-row">
+          <div class="tc-row-label">Fish, general</div>
+          <div class="tc-track">
+            <div class="tc-pull" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"></div>
+            <div class="tc-value" style="--b:{{ t.fish.general.endpoint_max }};">{{ t.fish.general.endpoint }}</div>
+            <div class="tc-hit" tabindex="0" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"
                  data-tip="Everything that isn't salmon or tuna: one endpoint, {{ t.fish.general.endpoint }}. No doneness spectrum worth codifying."></div>
           </div>
         </div>
 
-        <div class="tr-row">
-          <div class="tr-row-label">Poultry</div>
-          <div class="tr-track">
-            <div class="tr-pull" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"></div>
-            <div class="tr-value" style="--b:{{ t.poultry.chicken.endpoint_max }};">{{ t.poultry.chicken.endpoint }}</div>
-            <div class="tr-hit" tabindex="0" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"
+        <div class="tc-row">
+          <div class="tc-row-label">Poultry</div>
+          <div class="tc-track">
+            <div class="tc-pull" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"></div>
+            <div class="tc-value" style="--b:{{ t.poultry.chicken.endpoint_max }};">{{ t.poultry.chicken.endpoint }}</div>
+            <div class="tc-hit" tabindex="0" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"
                  data-tip="Chicken, turkey, goose and whole duck all share one endpoint: {{ t.poultry.chicken.endpoint }} -- the thigh, not the breast, because it's the last part to come up."></div>
           </div>
         </div>
 
-        <div class="tr-row">
-          <div class="tr-row-label">Cured ham</div>
-          <div class="tr-track">
-            <div class="tr-pull" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"></div>
-            <div class="tr-value" style="--b:{{ t.ham.cured.target_max }};">{{ t.ham.cured.target }}</div>
-            <div class="tr-hit" tabindex="0" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"
+        <div class="tc-row">
+          <div class="tc-row-label">Cured ham</div>
+          <div class="tc-track">
+            <div class="tc-pull" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"></div>
+            <div class="tc-value" style="--b:{{ t.ham.cured.target_max }};">{{ t.ham.cured.target }}</div>
+            <div class="tc-hit" tabindex="0" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"
                  data-tip="Cured ham that still needs cooking: {{ t.ham.cured.target }}. Check the packaging first -- 'cook before eating' and 'ready to eat' are different things."></div>
           </div>
         </div>
 
-        <div class="tr-row">
-          <div class="tr-row-label">Slow-cooked</div>
-          <div class="tr-track">
-            <div class="tr-pull" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"></div>
-            <div class="tr-value" style="--b:{{ t.beef.tough_cuts.tender_at_max }};">tender at {{ t.beef.tough_cuts.tender_at }}</div>
-            <div class="tr-hit" tabindex="0" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"
+        <div class="tc-row">
+          <div class="tc-row-label">Slow-cooked</div>
+          <div class="tc-track">
+            <div class="tc-pull" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"></div>
+            <div class="tc-value" style="--b:{{ t.beef.tough_cuts.tender_at_max }};">tender at {{ t.beef.tough_cuts.tender_at }}</div>
+            <div class="tc-hit" tabindex="0" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"
                  data-tip="Brisket, chuck, short rib, pork shoulder, lamb shoulder. Not a pull temperature at all -- collagen breakdown. These pass through {{ t.beef.tough_cuts.passes_through }}. Test with a fork, not a thermometer alone."></div>
           </div>
         </div>
@@ -289,7 +289,7 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <p class="tr-note">The existing tables would stay underneath — a drawing is
+    <p class="tc-note">The existing tables would stay underneath — a drawing is
       a way in, not a replacement for the figures, and it's also the accessible
       fallback for anyone the picture doesn't serve.</p>
 

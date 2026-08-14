@@ -2,7 +2,7 @@
 
 WHY THIS FILE EXISTS. _data/food/internal_temperatures.yml now holds every
 temperature TWICE: once as the display string the pages and a recipe's meta
-line print ("48–50°C"), and once as a numeric pair the temperature ruler draws
+line print ("48–50°C"), and once as a numeric pair the temperature charts draws
 from (pull_min: 48, pull_max: 50).
 
 Duplicating a fact is normally the thing to avoid, and the alternative was
@@ -64,7 +64,7 @@ def _nodes_with_temps(data):
 
 
 def test_every_temperature_string_has_numbers(internal_temperatures):
-    """A figure the ruler can't draw is a figure that silently disappears.
+    """A figure the charts can't draw is a figure that silently disappears.
 
     The one legitimate exception is a field whose value is a sentence rather
     than a measurement -- tuna's carryover is prose about how hard to sear,
@@ -121,7 +121,7 @@ def test_open_ended_figures_are_flagged(internal_temperatures):
     """`70°C+` has no upper bound, and pull_max repeats pull_min to say so.
 
     Without the flag a consumer can't tell "70 to 70" (a point) from "70 and
-    up" (an open end), and the ruler would draw a well-done steak as a 3px
+    up" (an open end), and the charts would draw a well-done steak as a 3px
     tick. The flag and the string have to agree in both directions, so neither
     can be updated alone.
     """
@@ -156,10 +156,10 @@ def test_carryover_moves_the_temperature_up(internal_temperatures):
     assert not wrong, "\n  ".join(wrong)
 
 
-def test_every_temperature_fits_on_the_ruler_axis(internal_temperatures):
+def test_every_temperature_fits_on_the_chart_axis(internal_temperatures):
     """No figure may fall outside the chart's own axis.
 
-    This is a real bug caught the hard way, not a hypothetical. The ruler's axis
+    This is a real bug caught the hard way, not a hypothetical. The charts's axis
     ran 40–100°C while tuna's blue rare sits at 38°C, so that bar computed a
     NEGATIVE left offset, escaped its track and printed over the row label.
     Helen spotted it as a spacing problem ("the bar for tuna slightly obscures
@@ -178,16 +178,16 @@ def test_every_temperature_fits_on_the_ruler_axis(internal_temperatures):
     scss = (pathlib.Path(__file__).resolve().parent.parent
             / "assets" / "css" / "reference-demo.scss")
     if not scss.exists():
-        pytest.skip("the ruler stylesheet has gone; nothing to bound against")
+        pytest.skip("the charts stylesheet has gone; nothing to bound against")
 
     text = scss.read_text(encoding="utf-8")
     bounds = {}
-    for name in ("tr-min", "tr-max"):
+    for name in ("tc-min", "tc-max"):
         m = re.search(rf"^\${name}:\s*(-?\d+(?:\.\d+)?)\s*;", text, re.M)
         assert m, f"couldn't find ${name} in {scss.name}"
         bounds[name] = float(m.group(1))
 
-    lo, hi = bounds["tr-min"], bounds["tr-max"]
+    lo, hi = bounds["tc-min"], bounds["tc-max"]
     outside = []
     for dotted, node, key in _nodes_with_temps(internal_temperatures):
         # Carryover is a DIFFERENCE between two temperatures, not a temperature,
@@ -200,10 +200,10 @@ def test_every_temperature_fits_on_the_ruler_axis(internal_temperatures):
                 outside.append(f"{dotted}{suffix} = {value:g}°C")
 
     assert not outside, (
-        f"these figures fall outside the ruler's {lo:g}–{hi:g}°C axis, so their "
+        f"these figures fall outside the charts' {lo:g}–{hi:g}°C axis, so their "
         f"bars would be drawn off the end of the track:\n  "
         + "\n  ".join(outside)
-        + "\n\nWiden $tr-min/$tr-max in assets/css/reference-demo.scss."
+        + "\n\nWiden $tc-min/$tc-max in assets/css/reference-demo.scss."
     )
 
 
@@ -468,15 +468,15 @@ def test_every_method_has_a_short_outcome(cooking_methods):
 # Every column name _includes/food/method_table.html knows how to fill. A name
 # outside this set renders an EMPTY CELL rather than failing, so the test is the
 # only thing standing between a renamed column and a silently blank table.
-def test_every_protein_points_at_the_ruler(cooking_methods):
-    """Each protein carries `ruler_anchor`, the section of the temperature ruler
+def test_every_protein_points_at_the_charts(cooking_methods):
+    """Each protein carries `chart_anchor`, the section of the temperature charts
     holding its full doneness spectrum, so the "see other doneness" link has
     somewhere to go. Not derivable from internal_temp_ref: four birds share one
-    ruler section, and beef's ref points at tender_roast while the ruler splits
+    chart section, and beef's ref points at tender_roast while the charts split
     beef three ways. A missing anchor doesn't error — the link just isn't
     rendered, and the page quietly dead-ends on one doneness figure."""
-    missing = [p for p, node in cooking_methods.items() if not node.get("ruler_anchor")]
-    assert not missing, f"no ruler_anchor for: {missing}"
+    missing = [p for p, node in cooking_methods.items() if not node.get("chart_anchor")]
+    assert not missing, f"no chart_anchor for: {missing}"
 
 
 KNOWN_COLUMNS = {
