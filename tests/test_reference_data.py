@@ -570,3 +570,68 @@ def test_the_data_file_is_not_empty(cooking_methods):
         f"expected 65 methods, found {total} — 66 were migrated and beef's "
         f"closed-oven-off method was dropped on 2026-08-14 at Helen's request"
     )
+
+
+def test_temperatures_written_into_method_text_match_the_data(internal_temperatures):
+    """A figure typed into a method step has to agree with the data behind it.
+
+    Front matter is never Liquid-templated (HANDOVER §4), so a temperature a
+    cook needs mid-step can only be typed by hand — which re-creates exactly the
+    duplication internal_temperatures.yml was built to end. The compromise is
+    the one this project already makes elsewhere: duplicate, and guard it.
+
+    SCOPED TO STEPS THAT LINK TO THE CHART. A method step is full of oven
+    temperatures ("roast at 170-180°C fan"), and no parser can tell those from
+    an internal one by looking. A step carrying `(#doneness)` has declared what
+    its number means, so that link is the marker — which also means adding the
+    link is what opts a step into being checked, rather than something separate
+    to remember.
+    """
+    import pathlib as _p
+    import re as _re
+    import yaml as _yaml
+
+    problems = []
+    for path in sorted(_p.Path("_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        if "#doneness" not in raw:
+            continue
+        fm = _yaml.safe_load(raw.split("---")[1])
+        ref = fm.get("internal_temp_ref")
+        if not ref:
+            problems.append(f"{path.name}: links to #doneness with no internal_temp_ref")
+            continue
+
+        node = internal_temperatures
+        for key in ref.split("."):
+            node = node.get(key) if isinstance(node, dict) else None
+        if fm.get("doneness"):
+            node = (node or {}).get("doneness", {}).get(fm["doneness"])
+        if not node:
+            continue                    # other tests own an unresolvable ref
+
+        allowed = set()
+        for k in ("pull", "rested", "endpoint", "target", "tender_at"):
+            lo, hi = node.get(f"{k}_min"), node.get(f"{k}_max")
+            if lo is not None:
+                allowed.add((lo, hi))
+
+        for step in fm.get("method") or []:
+            text = step.get("step") if isinstance(step, dict) else str(step)
+            if "#doneness" not in text:
+                continue
+            # A linked step carries BOTH kinds of temperature -- "roast at
+            # 170-180°C fan ... take it out at 52–54°C" -- so the link alone
+            # isn't enough to tell them apart. House style is the discriminator:
+            # every oven temperature on this site says "fan" (§5, enforced for
+            # the methods data by test_every_oven_temperature_says_fan), and an
+            # internal one never does. Meat has no fan setting.
+            for lo, hi in _re.findall(r"(\d+)\s*[–-]\s*(\d+)\s*°C(?!\s*fan)", text):
+                if (float(lo), float(hi)) not in allowed:
+                    problems.append(
+                        f"{path.name}: step says {lo}–{hi}°C beside its "
+                        f"#doneness link, but {ref} offers "
+                        f"{sorted(allowed) or 'nothing'}"
+                    )
+
+    assert not problems, "\n  ".join(problems)

@@ -55,55 +55,17 @@ layout: default
     {% if page.makes %}<li><strong>Makes</strong><span>{{ page.makes }}</span></li>{% endif %}
     {% if page.prep_time %}<li><strong>Prep</strong><span>{{ page.prep_time }}</span></li>{% endif %}
     {% if page.cook_time %}<li><strong>Cook</strong><span>{{ page.cook_time }}</span></li>{% endif %}
-    {% if _internal_temp or _temp_spectrum %}
-      <li>
-        <strong>Internal temp</strong>
-        <span>
-          {% comment %} "Out at", not "pull at" -- Helen, 2026-08-13: "I don't
-             love the word pull... mostly because it's American." The charts and
-             the timings page changed the same day; this was the last place it
-             survived. {% endcomment %}
-          {% if _internal_temp.pull %}Out at {{ _internal_temp.pull }}{% if _internal_temp.rested %}, rests to {{ _internal_temp.rested }}{% endif %}
-          {% elsif _internal_temp.endpoint %}{{ _internal_temp.endpoint }}
-          {% elsif _internal_temp.target %}{{ _internal_temp.target }}
-          {% elsif _internal_temp.tender_at %}Tender at {{ _internal_temp.tender_at }}
-          {% elsif _temp_spectrum %}
-            {% comment %} A spectrum with no level chosen: give the span it
-               covers rather than nothing. Computed from the data's own first
-               and last levels, so adding a level upstream widens it here.
-               {% endcomment %}
-            {% assign _lo = 999 %}{% assign _hi = 0 %}
-            {% for _lvl in _temp_spectrum.doneness %}
-              {% if _lvl[1].pull_min and _lvl[1].pull_min < _lo %}{% assign _lo = _lvl[1].pull_min %}{% endif %}
-              {% if _lvl[1].rested_max and _lvl[1].rested_max > _hi %}{% assign _hi = _lvl[1].rested_max %}{% endif %}
-              {% if _lvl[1].pull_max and _lvl[1].pull_max > _hi %}{% assign _hi = _lvl[1].pull_max %}{% endif %}
-            {% endfor %}
-            {{ _lo }}–{{ _hi }}°C, by doneness
-          {% endif %}
-          {% comment %} Straight to this protein's own section of the charts,
-             not to the top of the old tables page -- which is where this link
-             used to land, on a page long enough that arriving at the top tells
-             you nothing. {% endcomment %}
-          {% if _temp_spectrum.chart_anchor or _temp_node.chart_anchor %}
-            (<a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}#{{ _temp_spectrum.chart_anchor | default: _temp_node.chart_anchor }}">chart</a>)
-          {% else %}
-            (<a href="{{ '/food/reference/internal-temperatures/' | relative_url }}">more</a>)
-          {% endif %}
-        </span>
-      </li>
-    {% endif %}
+    {% comment %} NO INTERNAL-TEMP CELL HERE ANY MORE. Helen: "I don't like the
+       internal temperature featuring in the metadata -- it's ugly, it spoils
+       the rule of 3, and it's nowhere in sight when you're actually cooking."
+       All three are true, and the last is the one that decides it: this grid is
+       read once, while deciding whether to cook the thing. A temperature is
+       read with a probe in your hand, twenty minutes in. It lives below Notes
+       now, and the method step that needs it links straight to it. {% endcomment %}
   </ul>
 
   {% if page.source %}<p class="recipe-source">Source: {{ page.source }}</p>{% endif %}
   {% if page.meta.date_ingested %}<p class="recipe-source">Date added: {{ page.meta.date_ingested }}</p>{% endif %}
-
-  {% comment %} The whole spectrum, for a protein where doneness is a choice
-     (#189). Below the meta grid because it elaborates the one figure up there,
-     and above the ingredients because it is still reference rather than
-     instruction. {% endcomment %}
-  {% if _temp_spectrum %}
-    {% include food/doneness_chart.html node=_temp_spectrum suggested=page.doneness %}
-  {% endif %}
 
   <div class="recipe-badges">
     {% include recipe_badges.html recipe=page %}
@@ -237,6 +199,24 @@ layout: default
         {% endif %}
       {% endfor %}
     </div>
+  {% endif %}
+
+  {% comment %} BELOW NOTES, and with an id, because it is a thing you are sent
+     to rather than a thing you scroll past. Helen: "I like including the image,
+     but it can't go above the fold." It was sitting between the metadata and the
+     ingredients, which put reference material in the middle of the decision to
+     cook at all.
+
+     Rendered for ANY wired recipe, not just the ones with a spectrum: with the
+     meta cell gone this is the only place a single figure appears, so a tough
+     cut's "tender at 90–96°C" would otherwise have nowhere to live. {% endcomment %}
+  {% if _temp_spectrum or _internal_temp %}
+    <div id="doneness" class="recipe-section-temp">
+      <h2 class="recipe-section-heading">
+        <span class="section-heading-text">{% if _temp_spectrum %}Doneness{% else %}Internal temp{% endif %}</span>
+      </h2>
+    </div>
+    {% include food/doneness_chart.html node=_temp_spectrum single=_internal_temp suggested=page.doneness %}
   {% endif %}
 
   {% if content != '' %}

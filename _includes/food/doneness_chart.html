@@ -19,11 +19,18 @@
   between "what this recipe says" and "what you want" is a real distance.
 {% endcomment %}
 
-{% if include.node.doneness %}
+{% if include.node.doneness or include.single %}
   <div class="doneness">
-    <h3 class="doneness-label">Doneness</h3>
     <div class="tc">
       <div class="tc-plot">
+        {% comment %} A single-figure node (a tough cut, a whole bird, cured
+           ham) draws one row rather than nothing. It has no doneness to choose
+           between -- that is the fact -- but it still has a figure, and since
+           the metadata cell was removed this chart is the only place it
+           appears. {% endcomment %}
+        {% unless include.node.doneness %}
+          {% include food/temp_row.html label=" " spec=include.single %}
+        {% endunless %}
         {% for level in include.node.doneness %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
@@ -34,8 +41,9 @@
       </div>
       {% include food/temp_axis.html %}
     </div>
-    {% if include.node.chart_anchor %}
-      <p class="doneness-more"><a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}#{{ include.node.chart_anchor }}">the full chart, with carryover and safety figures</a></p>
+    {% assign _anchor = include.node.chart_anchor | default: include.single.chart_anchor %}
+    {% if _anchor %}
+      <p class="doneness-more"><a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}#{{ _anchor }}">the full chart, with carryover and safety figures</a></p>
     {% endif %}
   </div>
 {% endif %}
