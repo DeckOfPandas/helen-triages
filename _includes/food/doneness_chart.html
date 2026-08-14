@@ -41,9 +41,31 @@
       </div>
       {% include food/temp_axis.html %}
     </div>
+
+    {% comment %} THE KEY, but only where there is a spectrum. Helen: "add the
+       key to this chart too (it's tiny)". A single-figure chart doesn't get one
+       -- it draws one bar whose own value already reads "tender at 90–96°C",
+       and a key saying "tender at" beside it would be the same three words
+       twice, which is exactly why the charts page's tough-cuts chart lost its
+       key too.
+
+       The flags are computed from the levels actually drawn rather than passed
+       in, so a chart can't claim a mark it doesn't show: `carry` is true only
+       where some level's rested range starts clear of its out-at range, which
+       is beef's 4–6°C but not salmon's 1–2°C. No `unsafe` at any point -- the
+       recipe chart doesn't draw the shaded zone; that stays on the reference
+       page, where there is room to explain it. {% endcomment %}
+    {% if include.node.doneness %}
+      {% assign _rested = false %}{% assign _carry = false %}
+      {% for level in include.node.doneness %}
+        {% if level[1].rested_min %}{% assign _rested = true %}{% endif %}
+        {% if level[1].rested_min and level[1].rested_min > level[1].pull_max %}{% assign _carry = true %}{% endif %}
+      {% endfor %}
+      {% include food/temp_key.html rested=_rested carry=_carry %}
+    {% endif %}
     {% assign _anchor = include.node.chart_anchor | default: include.single.chart_anchor %}
     {% if _anchor %}
-      <p class="doneness-more"><a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}#{{ _anchor }}">the full chart, with carryover and safety figures</a></p>
+      <p class="doneness-more"><a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}#{{ _anchor }}">more {% if _anchor contains "fish" %}fish{% else %}meat{% endif %} temperatures</a></p>
     {% endif %}
   </div>
 {% endif %}
