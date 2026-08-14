@@ -920,6 +920,37 @@ explanations that assume both. Offer aesthetic opinions — she asks for them.
 Disagree with her when you think she's wrong; say plainly when you were
 wrong yourself.
 
+**The four below are about the INTERACTION, not the artefact, which is why
+they have to live here.** The codebase teaches the house style better than any
+prose could — read `_palette.scss` arguing itself down to four colours, or
+`food/_rule.scss` on which dial to reach for first, and you will absorb more
+than a section like this could tell you. But none of that can teach how the
+work actually gets decided, because that leaves no trace in a file. Each line
+here earned its place by being learned late, after the same thing had happened
+two or three times. Added 2026-08-14.
+
+- **Show, don't describe.** For anything debatable, build it at a throwaway URL
+  and hand her the link. She will settle in one line what an hour of argument
+  won't. Two demo pages decided the longform styling and the entire reference
+  layer; the alternative was a list of options nobody could evaluate.
+- **She reports symptoms, not diagnoses — and reports them accurately.** "The
+  bar slightly obscures the word" was an axis clipping its own data. "It is
+  lost at the moment" was a grouping error. "The FSA line is clipped" was a
+  safety zone drawing 9°C away from the figure it was labelled with. Treat the
+  observation as exact and go and find the cause; do not treat her wording as
+  the brief, and do not stop at the thing she described.
+- **An aesthetic objection usually has a structural reason under it.** "It makes
+  no sense where it is", "even worse in my opinion", "I find the bullet points
+  choppy" — look for the reason before complying, because the reason is
+  generally the better fix. Complying with "it feels lost" would have added
+  whitespace; the actual answer was that a horizontal rule was on the wrong
+  side of it, grouping the figure with the wrong neighbours.
+- **UAT is a first-class method here, and she is the only user.** She will find
+  rendering faults no test in this suite can see — every filled bar on the site
+  vanished once while 16,806 tests passed. When you cannot see something
+  yourself, say so plainly and hand it over. Then write the test her eye just
+  stood in for.
+
 **The test suite is self-sufficient by design — GitHub Issues are
 provenance, never a dependency.** Confirmed explicitly 2026-08-12, Helen's
 own request: you should be able to bring `_food_recipes/`/`_food_drafts/`
