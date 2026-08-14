@@ -1,0 +1,29 @@
+{% comment %}
+  The key for ONE chart, sitting at its top right.
+
+  Parameters
+    solid    label for the filled bar ("out at", or "reaches" where the figure
+             is an endpoint rather than a moment you act on)
+    rested   true if this chart draws the open rested bar
+    carry    true if this chart draws the carryover connector
+    unsafe   true if this chart shades a zone below a safety figure
+
+  WHY IT MOVED OUT OF THE PAGE HEADER. There was one key at the top covering
+  every chart below it, which is the arrangement that requires the reader to
+  hold four definitions in their head while scrolling — and worse, to work out
+  for themselves which of the four apply to whichever chart they are looking at.
+  Poultry has no rested bar and no carryover; the overview has neither and no
+  safety zone either; only three charts shade anything. A key that lists marks a
+  chart doesn't contain is not a key, it's a glossary.
+
+  Helen, and she is right that this is the scientific convention: a figure
+  carries its own legend. Each chart now declares only what it draws, so a key
+  entry appearing at all is itself information.
+{% endcomment %}
+
+<div class="tc-key">
+  <span><i class="tc-key-pull"></i> {{ include.solid | default: "out at" }}</span>
+  {% if include.carry %}<span><i class="tc-key-carry"></i> carryover</span>{% endif %}
+  {% if include.rested %}<span><i class="tc-key-rested"></i> rests to</span>{% endif %}
+  {% if include.unsafe %}<span><i class="tc-key-unsafe"></i> below the cited safety figure</span>{% endif %}
+</div>

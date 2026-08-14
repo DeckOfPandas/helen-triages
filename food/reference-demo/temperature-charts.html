@@ -47,19 +47,6 @@ sitemap: false
 
   <div class="recipe-body-content">
 
-    <p class="tc-note">One axis, 40–100°C, shared by every protein — deliberately
-      not one scale per protein. Letting each fill the full width looks tidier
-      and throws away the only thing the drawing adds: that salmon is served at
-      52°C where a chicken thigh has to reach 74°C, and pulled pork doesn't give
-      up until 96°C.</p>
-
-    <div class="tc-legend">
-      <span><i class="tc-key-pull"></i> out at</span>
-      <span><i class="tc-key-carry"></i> carryover</span>
-      <span><i class="tc-key-rested"></i> rests to</span>
-      <span><i class="tc-key-unsafe"></i> below the cited safety figure</span>
-    </div>
-
     {% comment %} Contents, following the pattern internal-temperatures.html
        already uses -- an id on each h2 and a plain list of anchors. The
        sections are alphabetical; the overview is last because it is a summary
@@ -73,13 +60,14 @@ sitemap: false
       <li><a href="#lamb">Lamb</a></li>
       <li><a href="#pork">Pork</a></li>
       <li><a href="#poultry">Poultry</a></li>
-      <li><a href="#everything-one-scale">Everything, one scale</a></li>
+      <li><a href="#all">All</a></li>
     </ul>
 
     <h2 class="recipe-section-heading" id="beef-steak"><span class="section-heading-text section-heading-text--reference">Beef: steak</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.steak.carryover }}</p>
 
-    <div class="tr">
+    {% include food/temp_key.html rested=true carry=true %}
+    <div class="tc">
       <div class="tc-plot">
         {% for level in t.steak.doneness %}
           {% comment %} spec is assigned first because Jekyll's include tag
@@ -94,9 +82,10 @@ sitemap: false
     </div>
 
     <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
-    <p class="recipe-section-subtitle">carryover {{ t.beef.tender_roast.carryover }} — the biggest on the page</p>
+    <p class="recipe-section-subtitle">carryover {{ t.beef.tender_roast.carryover }}</p>
 
-    <div class="tr">
+    {% include food/temp_key.html rested=true carry=true %}
+    <div class="tc">
       <div class="tc-plot">
         {% for level in t.beef.tender_roast.doneness %}
           {% comment %} spec is assigned first because Jekyll's include tag
@@ -113,7 +102,8 @@ sitemap: false
     <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">brisket, chuck, short rib, pot roast &mdash; not a doneness at all</p>
 
-    <div class="tr">
+    {% include food/temp_key.html solid="tender at" %}
+    <div class="tc">
       <div class="tc-plot">
         {% assign tough = t.beef.tough_cuts %}
         {% include food/temp_row.html label="Tough cuts" spec=tough tip="Brisket, chuck, short rib, pot roast. These pass through 60-70°C while still tough and only give up around 90-96°C -- which is why they sit so far right of every doneness figure above." %}
@@ -124,7 +114,8 @@ sitemap: false
     <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.fish.salmon.carryover }}</p>
 
-    <div class="tr">
+    {% include food/temp_key.html rested=true unsafe=true %}
+    <div class="tc">
       <div class="tc-plot">
         <div class="tc-unsafe" style="--t:{{ t.fish.general.endpoint_min }};"></div>
         <div class="tc-threshold-label" style="--t:{{ t.fish.general.endpoint_min }};">FSA/USDA {{ t.fish.general.endpoint_min }}°C &rarr;</div>
@@ -140,17 +131,12 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <p class="tc-note">Note what the shaded zone does that no table on the
-      current page can: four of salmon's five doneness levels sit below the
-      cited safety benchmark, visible in one look rather than inferred from a
-      paragraph. The same device is what would carry pork's and fresh ham's
-      flagged FSA gaps, which currently live only inside a
-      <code>safety_note</code> string.</p>
+    <p class="tc-note">FSA advice is a minimum serving temperature of {{ t.fish.general.endpoint_min }}°C.</p>
 
     <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
-    <p class="recipe-section-subtitle">fresh is pork leg; cured is a different animal, procedurally</p>
 
-    <div class="tr">
+    {% include food/temp_key.html rested=true unsafe=true %}
+    <div class="tc">
       <div class="tc-plot">
         <div class="tc-unsafe" style="--t:70;"></div>
         <div class="tc-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
@@ -166,9 +152,10 @@ sitemap: false
     </div>
 
     <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
-    <p class="recipe-section-subtitle">carryover {{ t.lamb.roasting.carryover }} &mdash; no FSA gap here, UK guidance treats pink lamb like pink beef</p>
+    <p class="recipe-section-subtitle">carryover {{ t.lamb.roasting.carryover }}</p>
 
-    <div class="tr">
+    {% include food/temp_key.html rested=true carry=true %}
+    <div class="tc">
       <div class="tc-plot">
         {% for level in t.lamb.roasting.doneness %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
@@ -184,7 +171,8 @@ sitemap: false
     <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.pork.roasting.carryover }}</p>
 
-    <div class="tr">
+    {% include food/temp_key.html rested=true carry=true unsafe=true %}
+    <div class="tc">
       <div class="tc-plot">
         {% comment %} The FSA line at 70°C is the whole reason this section
            earns a drawing. internal_temperatures.yml flags pork's "medium" as
@@ -205,12 +193,20 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <p class="tc-note">{{ t.pork.roasting.safety_note | truncatewords: 45 }}</p>
+    {% comment %} The data's own safety_note runs to ~150 words, written for
+       someone auditing the figure. This is the version for someone cooking: the
+       FSA equivalences it turns on, and nothing else. HELD, not passed through
+       on the way past — which is exactly why the medium figure doesn't clear it,
+       and the one thing this sentence has to carry. "Pull" is gone with the rest
+       of that vocabulary. The full note stays in internal_temperatures.yml.
+       {% endcomment %}
+    <p class="tc-note">FSA wants pork <em>held</em> at 60°C for 45&nbsp;min, 65°C for 10&nbsp;min, 70°C for 2&nbsp;min, or 75°C for 30&nbsp;sec — held, not passed through as it cools. Only the well-done figure clears that.</p>
 
     <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
-    <p class="recipe-section-subtitle">by the thigh, not the breast &mdash; it's the last part to come up</p>
+    <p class="recipe-section-subtitle">by the thigh, not the breast</p>
 
-    <div class="tr">
+    {% include food/temp_key.html solid="reaches" %}
+    <div class="tc">
       <div class="tc-plot">
         {% comment %} Four of these five sit on top of each other at 74–75°C,
            and that is worth SEEING rather than reading down a column of
@@ -227,14 +223,10 @@ sitemap: false
       {{ axis }}
     </div>
 
-    <h2 class="recipe-section-heading" id="everything-one-scale"><span class="section-heading-text section-heading-text--reference">Everything, one scale</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="all"><span class="section-heading-text section-heading-text--reference">All</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
 
-    <p class="tc-note">The view the five tables cannot produce at all: every
-      protein's served range on the same axis. This is the argument for a shared
-      scale, in one picture — and probably the most useful single thing on the
-      page for someone who cooks a lot and looks things up rarely.</p>
-
-    <div class="tr">
+    {% include food/temp_key.html solid="served between" %}
+    <div class="tc">
       <div class="tc-plot">
         {% comment %} Every span below is COMPUTED from the data, not typed --
            see _includes/food/temp_span.html for why the obvious
@@ -288,10 +280,6 @@ sitemap: false
       </div>
       {{ axis }}
     </div>
-
-    <p class="tc-note">The existing tables would stay underneath — a drawing is
-      a way in, not a replacement for the figures, and it's also the accessible
-      fallback for anyone the picture doesn't serve.</p>
 
   </div>
 </article>

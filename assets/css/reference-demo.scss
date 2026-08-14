@@ -84,7 +84,7 @@ $tc-label-width: 9.5rem;
 // word naming it.
 $tc-label-gap: $space-xl;
 
-.tr {
+.tc {
   font-family: $font-body;
   font-weight: 300;
   color: $color-text;
@@ -297,15 +297,29 @@ $tc-label-gap: $space-xl;
   }
 }
 
-// --- Legend ------------------------------------------------------------------
-// Always present: two series, so identity must not rest on colour alone.
-.tc-legend {
+// --- Key, one per chart -----------------------------------------------------
+// Was a single legend at the top of the page covering nine charts below it,
+// which asked the reader to hold four definitions in their head while scrolling
+// AND to work out which of the four applied to whichever chart they had reached.
+// Poultry draws no rested bar and no carryover; the overview draws neither and
+// shades nothing; only three charts shade anything at all.
+//
+// Helen's instinct, and it is the scientific convention: a figure carries its
+// own legend. Each chart declares only the marks it actually draws, which makes
+// a key entry's PRESENCE informative rather than decorative — "carryover" only
+// appears where there is carryover to see.
+//
+// Right-aligned above the plot rather than absolutely positioned inside it: the
+// first row's own value label can sit far right on a hot protein, and a floating
+// key would land on top of it.
+.tc-key {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-xl;
+  justify-content: flex-end;
+  gap: $space-lg;
   align-items: center;
-  margin: 0 0 $space-lg 0;
-  font-size: 0.8rem;
+  margin: 0 0 $space-sm 0;
+  font-size: 0.72rem;
   color: $color-clear-text;
 
   span {
