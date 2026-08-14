@@ -32,6 +32,20 @@ jobs:
         env:
           JEKYLL_ENV: production
 
+      # GitHub issue #86. Renders every built recipe page to a PDF beside it,
+      # so /food/recipes/<slug>.pdf is a real file rather than something the
+      # browser is asked to make. Runs on the FINISHED _site, between the build
+      # and the upload -- Jekyll never sees the PDFs.
+      #
+      # No install step: Google Chrome and Python both ship with the ubuntu
+      # runner image (checked against actions/runner-images, not assumed). The
+      # script exits non-zero if either the browser or a single render is
+      # missing, which fails this job on purpose -- a deploy that quietly
+      # stopped producing PDFs would leave every "pdf" link on the site
+      # pointing at a 404, and nothing else would catch it.
+      - name: Render recipe PDFs
+        run: python3 scripts/generate_pdfs.py --site _site --jobs 4
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -1,0 +1,132 @@
+// =============================================================================
+// SHARED PRINT — the page shell, on paper
+// =============================================================================
+// GitHub issue #86. This is the site's FIRST media query, and it is the only
+// kind it is ever likely to want: the layout is fluid end to end and needs no
+// breakpoints (see tests/test_site_config.py's
+// test_no_element_can_force_horizontal_scroll, which stands in for a
+// responsive suite precisely because there are none). Paper is a different
+// medium, not a narrower screen, so it is the one case a query earns.
+//
+// IMPORTED LAST, BY ALL THREE STYLESHEETS, AND BOTH HALVES OF THAT MATTER.
+//
+// Last, because `@media print` adds no specificity of its own. `.recipe-badges
+// { display: none }` here and `.recipe-badges { display: flex }` in
+// food/_badges.scss are the same weight, so source order is the only thing
+// deciding which wins. Import this earlier and it silently stops working —
+// no error, just badges on the printout.
+//
+// All three, because this file styles the chrome every site renders, and
+// forgetting one is the trap HANDOVER §12 records twice already: food.scss,
+// cocktails.scss AND root.scss (the landing page, which belongs to neither
+// site and is the easy one to miss). Grep every `@import "shared/` site before
+// assuming you have them all.
+//
+// PALETTE CONTRACT applies here as everywhere in shared/: only the nine
+// variables every site's palette guarantees may be named. This file uses one,
+// $color-bg.
+
+@media print {
+
+  // --- Paper ------------------------------------------------------------
+  // A named margin on the sheet rather than padding on <main>, so the browser
+  // knows where the printable area actually is and can break pages against it.
+  @page {
+    margin: 15mm 14mm;
+  }
+
+  // --- THE ONE DECLARATION THIS WHOLE FEATURE DEPENDS ON -----------------
+  // Browsers strip background colours and images when printing, so that a
+  // dark-themed page does not cost half a cartridge. That default would take
+  // the site's entire visual identity with it: the blocky two-colour mark
+  // under every heading is a `linear-gradient` BACKGROUND, not a border and
+  // not a text-decoration (food/_rule.scss explains at length why it has to
+  // be), so an untreated printout loses every rule on the page while keeping
+  // the lettering that sits on it.
+  //
+  // Helen's explicit call, 2026-08-14, asked for the paper version to look
+  // like the site — marks and all — so the default is overridden here rather
+  // than designed around.
+  //
+  // The property is inherited, so declaring it once at the root reaches the
+  // marks, the metadata wash, the note boxes and the doneness chart's bars
+  // without any of them naming it. Unprefixed first, then the -webkit- form
+  // for Safari, which still only understands that one.
+  //
+  // NO PAGE BACKGROUND, and this is the deliberate half. $color-bg is a tint
+  // (#faf7f8), not white, so painting it here floods every sheet with a flat
+  // all-over wash -- an unreasonable amount of ink for a decorative ground,
+  // and on a home printer the kind of large flat fill that bands. Helen,
+  // 2026-08-14: "That's simply unfair." The paper IS the ground on paper.
+  //
+  // `transparent`, EXPLICITLY, AND THAT IS THE WHOLE FIX. The first attempt
+  // simply deleted this file's own `background: $color-bg` line, which changed
+  // nothing at all: shared/_base.scss sets `body { background: $color-bg }`
+  // for the screen, that rule is still in the cascade under @media print, and
+  // removing an override is not the same as overriding. The tint printed
+  // exactly as before and it took Helen looking at another preview to catch
+  // it. A print stylesheet has to say what it wants, never merely stop saying
+  // what it does not.
+  //
+  // Both html and body, because a body background propagates to the canvas:
+  // making body transparent alone hands the job to html, which then has to be
+  // transparent too for the paper to show through.
+  //
+  // Three things assume the ground is $color-bg and lose a little by this:
+  // $color-emboss-light (shared/_rule.scss) is $color-bg, so the highlight
+  // copy of the punched lettering no longer sits against a matching ground;
+  // .note-label's tab and the doneness chart's halos paint $color-bg to mask
+  // what is behind them. None of it is serious, and that is worth being
+  // precise about rather than hand-waving: #faf7f8 on white paper is a ~3%
+  // difference, so those three go from matching the ground to being
+  // near-invisible against it, and the emboss keeps its dark copy, which is
+  // the half that carries the raised read anyway. Helen's call, and the right
+  // one: "I don't care if my headings don't look like label tape."
+  html,
+  body {
+    background: transparent;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  // --- Chrome off -------------------------------------------------------
+  // The wordmark, the "?" and the footer are all ways of getting somewhere
+  // else. On paper there is nowhere else, and the header alone is ~140px of
+  // the first sheet.
+  .site-header,
+  .site-footer {
+    display: none;
+  }
+
+  // <main>'s padding holds the content off the window edge; @page's margin
+  // above does that job on paper, and keeping both would inset the text by
+  // roughly 30mm a side. The width cap goes for the same reason — the sheet
+  // is already the cap.
+  main {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  // --- Breaking ---------------------------------------------------------
+  // A heading stranded at the foot of a sheet with its own section overleaf
+  // is the single most common way a printed page reads as broken. `avoid` is
+  // a hint, not a guarantee — a browser will still break inside a heading
+  // taller than the page rather than loop forever — but it is honoured for
+  // anything of a sane size.
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+    break-inside: avoid;
+  }
+
+  // One trailing line of a paragraph alone at the top of a sheet, or one
+  // leading line alone at the bottom.
+  p,
+  li {
+    orphans: 2;
+    widows: 2;
+  }
+
+}

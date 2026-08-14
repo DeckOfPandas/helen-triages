@@ -757,6 +757,8 @@ from here.
 | `test_taxonomy.py` | Declared tags/stars, co-tags, links, spelling collisions |
 | `test_site_config.py` | Architecture guards, not recipes — every check exists because something went wrong at least once |
 | `test_drafts.py` | `_food_drafts/`-scoped subset of the structural/style rules above, via its own `draft` fixture — see its own module docstring for exactly which rules ported and which deliberately didn't |
+| `test_reference_data.py` | `_data/food/internal_temperatures.yml`'s own invariants — see §14 |
+| `test_suite_hygiene.py` | Tests about the tests: the one failure mode whose symptom is green (§12) |
 
 ### 10.1 The 2026-08-12 issue audit
 
@@ -920,6 +922,37 @@ explanations that assume both. Offer aesthetic opinions — she asks for them.
 Disagree with her when you think she's wrong; say plainly when you were
 wrong yourself.
 
+**The four below are about the INTERACTION, not the artefact, which is why
+they have to live here.** The codebase teaches the house style better than any
+prose could — read `_palette.scss` arguing itself down to four colours, or
+`food/_rule.scss` on which dial to reach for first, and you will absorb more
+than a section like this could tell you. But none of that can teach how the
+work actually gets decided, because that leaves no trace in a file. Each line
+here earned its place by being learned late, after the same thing had happened
+two or three times. Added 2026-08-14.
+
+- **Show, don't describe.** For anything debatable, build it at a throwaway URL
+  and hand her the link. She will settle in one line what an hour of argument
+  won't. Two demo pages decided the longform styling and the entire reference
+  layer; the alternative was a list of options nobody could evaluate.
+- **She reports symptoms, not diagnoses — and reports them accurately.** "The
+  bar slightly obscures the word" was an axis clipping its own data. "It is
+  lost at the moment" was a grouping error. "The FSA line is clipped" was a
+  safety zone drawing 9°C away from the figure it was labelled with. Treat the
+  observation as exact and go and find the cause; do not treat her wording as
+  the brief, and do not stop at the thing she described.
+- **An aesthetic objection usually has a structural reason under it.** "It makes
+  no sense where it is", "even worse in my opinion", "I find the bullet points
+  choppy" — look for the reason before complying, because the reason is
+  generally the better fix. Complying with "it feels lost" would have added
+  whitespace; the actual answer was that a horizontal rule was on the wrong
+  side of it, grouping the figure with the wrong neighbours.
+- **UAT is a first-class method here, and she is the only user.** She will find
+  rendering faults no test in this suite can see — every filled bar on the site
+  vanished once while 16,806 tests passed. When you cannot see something
+  yourself, say so plainly and hand it over. Then write the test her eye just
+  stood in for.
+
 **The test suite is self-sufficient by design — GitHub Issues are
 provenance, never a dependency.** Confirmed explicitly 2026-08-12, Helen's
 own request: you should be able to bring `_food_recipes/`/`_food_drafts/`
@@ -1066,6 +1099,48 @@ slash`'s regex considered at all, since both require a slug of exactly
 `[a-z0-9-]+` (fixed by `test_internal_links_are_well_formed`,
 `test_taxonomy.py`, 2026-08-10). **When you add a guard, break the thing it
 guards and watch it fail.**
+
+**The fifth, 2026-08-14, written by a session that had just read this
+paragraph.** Worth recording in full because it is the first one where the
+vacuous test was the GUARD ITSELF, not an older test going stale — and
+because the mistake looked like ordinary care at the time. Asked to stop the
+print stylesheet flooding every sheet with `$color-bg`, that session deleted
+the print block's own `background: $color-bg` line — which changed nothing,
+because `shared/_base.scss` sets `body { background: $color-bg }` for the
+screen and that rule is still in the cascade inside `@media print`.
+**Removing an override is not overriding.** Helen found the tint still
+printing.
+
+The fix came with a new guard, `test_print_neutralises_the_screen_page_
+background`, which asserts that whatever paints the ground for the screen is
+answered in print. It was broken on purpose to check it bit — **and it
+passed while broken**. `_top_level_blocks` matched only selectors starting
+with `.#%&`, so a bare `body` was invisible to it: the scan found nothing to
+neutralise, hit an `if not paints_ground: return`, and reported green. Two
+separate vacuity bugs stacked — a matcher that could not see the thing, and
+an early return that turned "found nothing" into "nothing wrong".
+
+Two things came out of it, and the second is the more useful:
+
+- `_top_level_blocks` now matches element selectors too. `body`, `a`,
+  `main` and `h1, h2, h3` — every bare element rule in `shared/` — had never
+  been seen by anything built on that helper, including
+  `test_no_selector_declares_the_same_property_twice`. Widening it surfaced
+  no pre-existing duplicates.
+- **Never `return` early because a scan came back empty. Assert it is
+  non-empty instead**, with a message saying what to do if the emptiness is
+  legitimate. This is the sharper form of the `assert js_files` /
+  `assert found_any` / `test_sass_files_are_actually_found` pattern already
+  used in several places. An early return *looks* like care — "nothing to
+  check, so nothing to fail" — and is precisely how a test stops testing
+  with no symptom. `tests/test_suite_hygiene.py` enforces it for any test
+  that is not parametrised per recipe/draft (a per-item test may return
+  early: the other 80 parametrisations still exercise the predicate). It
+  cannot see the subtler variant — a per-item test returning early because a
+  shared *reference* set is empty — which `test_accents_in_prose` was doing
+  until the same day, silently able to disable the accent rule across the
+  whole collection if `accented_words.yml` ever lost its `words:` key. Both
+  now assert.
 
 **You will assume "end of `<body>`" means "loads first".** It doesn't in a
 layout that renders `{{ content }}` above its own scripts — a page layout's

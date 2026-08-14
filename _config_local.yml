@@ -11,6 +11,17 @@
 # Show drafts and unrewritten recipes in the index, with their meta filters.
 show_unrewritten: true
 
+# No "pdf" link on the working view (GitHub issue #86). The PDFs are rendered
+# from a finished build by scripts/generate_pdfs.py -- nothing Jekyll does
+# creates them -- so the link would 404 here every time, which is how you learn
+# to ignore a link. It IS on at localhost:4002, which is meant to show exactly
+# what deploys; to make it work there as well as show, render into that build:
+#
+#   python3 scripts/generate_pdfs.py --site _site_prod
+#
+# (that needs a Chrome or Chromium on PATH -- see the script's --chrome flag).
+pdf_downloads: false
+
 collections:
   food_drafts:
     output: true

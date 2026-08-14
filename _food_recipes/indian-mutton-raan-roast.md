@@ -7,6 +7,7 @@ prep_time: "30 mins active, plus 48–72 hrs marinating"
 cook_time: "About 3 hrs"
 main_ingredients: ["mutton leg", "plain curd", "mustard oil", "ghee", "onions", "tomatoes", "garam masala powder", "black cardamom pod", "green cardamom pods", "star anise", "cinnamon sticks", "crispy fried onions"]
 star_ingredient: "lamb"
+internal_temp_ref: lamb.slow_cooked
 tags: ["showstopper", "make-ahead"]
 ingredient_groups:
   - name: mutton
@@ -106,7 +107,7 @@ method_groups:
       - step: "Place the mutton leg in a roasting tin. Fill the sides with the quartered onions and tomatoes, pour over the remaining marinade, then pour over the melted ghee."
         note: "It's tempting to YOLO and use more ghee — no one would know, right? — but last time I did this the mutton was almost floating by the end."
       - "Cover tightly with foil and roast at 140°C fan for 2½ hours."
-      - "Remove the foil and continue roasting at 140°C fan for a further 30 mins or until done according to an in-oven probe."
+      - "Remove the foil and continue roasting at 140°C fan for a further 30 mins, or until the thickest part reaches 90–95°C ([more](#doneness)) and a skewer twists freely in the meat."
       - "Leave to rest in the cooling oven for 15 mins before carving."
 method_short:
   - ""

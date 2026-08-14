@@ -53,3 +53,10 @@
 // it uses %heading-base's siblings and the punched mixin.
 @import "food/temperature-chart";
 @import "food/timings";
+// PRINT LAST, both of them, and the order is load-bearing rather than tidy:
+// `@media print` adds no specificity, so a print rule and the screen rule it
+// overrides are the same weight and source order is the only thing separating
+// them. shared/print before food/print, same shell-then-page order as every
+// other pair in this file. See shared/_print.scss's header (#86).
+@import "shared/print";
+@import "food/print";

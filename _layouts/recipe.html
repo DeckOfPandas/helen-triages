@@ -7,6 +7,50 @@ layout: default
     <h1 class="recipe-main-title">
       <span class="recipe-title-text">{{ page.title }}</span>
     </h1>
+
+    {% comment %} GitHub issue #86. Two ways of taking this recipe off the
+       screen, said as two separate things on purpose -- Helen: "one for print,
+       one for PDF, then the user knows exactly what to expect." One opens the print dialogue on
+       this page (the print stylesheet decides what comes out); the other is a
+       file that already exists, built at deploy time.
+
+       Beside the title, bottom-aligned, at Helen's ask (2026-08-14). They sat
+       under the source line first, on the reasoning that the empty 30% next to
+       a title capped at 70% looks like an obvious home for a control right up
+       until a long title wraps into it -- and this site has no media queries to
+       rescue that with. What makes it safe here is that .recipe-title is a flex
+       row rather than the absolute positioning that reasoning assumed: the two
+       boxes are laid out against each other, so a long title shortens the gap
+       instead of running underneath them.
+
+       SHIPS HIDDEN, REVEALED BY JS. The button does nothing without
+       assets/js/print-link.js, and a control that silently fails is worse than
+       no control -- so the markup starts `hidden` and the script removes that
+       once it has something to attach. Same reasoning as .recipe-list starting
+       `visibility: hidden` on the index: CSS cannot ask whether JS ran, so the
+       markup assumes it did not. The PDF link beside it is an ordinary anchor
+       and needs none of this. {% endcomment %}
+    <div class="recipe-actions">
+      <button type="button" class="btn-print" hidden>print</button>
+      {% comment %} Config-gated, not environment-gated, and the difference is
+         the whole point. The PDFs are rendered from a finished build by
+         scripts/generate_pdfs.py -- nothing Jekyll does creates them -- so this
+         link would 404 in the jekyll-local working view, which is a good way to
+         learn to ignore a link. But `jekyll.environment` was the wrong lever
+         for that: jekyll-prod serves with --config _config.yml and no
+         JEKYLL_ENV, so it reads as "development" as well, and the link rendered
+         NOWHERE Helen could look at it -- found the first time she went
+         looking, 2026-08-14.
+
+         site.pdf_downloads is true in _config.yml (deployed site, and the
+         localhost:4002 mockup that exists to show what deploys) and false in
+         _config_local.yml (localhost:4001). Same two-layer split the site
+         already uses for show_unrewritten, rather than a third idea of what
+         "production" means. {% endcomment %}
+      {% if site.pdf_downloads %}
+        <a href="{{ '/food/recipes/' | append: page.slug | append: '.pdf' | relative_url }}">pdf</a>
+      {% endif %}
+    </div>
   </div>
 
   {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
@@ -89,7 +133,12 @@ layout: default
     {% include recipe_badges.html recipe=page %}
   </div>
 
-  {% if page.ingredient_groups %}
+  {% comment %} `.size > 0` for the same reason the NOTES section below uses it:
+     an empty array is truthy in Liquid, so `ingredient_groups: []` would render
+     an INGREDIENTS heading with nothing beneath it. No file does that today --
+     this is the latent twin of a bug that was live on 49 drafts, fixed at the
+     same time rather than left to be found the same way. {% endcomment %}
+  {% if page.ingredient_groups.size > 0 %}
     <div class="recipe-section-ingredients">
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">Ingredients</span>
@@ -197,6 +246,12 @@ layout: default
   {% endif %}
 
   {% if has_short %}
+    {% comment %} Print only (issue #86) -- hidden on screen in
+       food/_recipe-ingredients-method.scss, shown in food/_print.scss. On
+       paper the full and short methods both print, one after the other, so the
+       second one needs saying what it is; on screen they are alternatives and
+       the toggle button already says it. {% endcomment %}
+    <h3 class="recipe-group-heading method-short-heading">In short:</h3>
     <div class="method-short" hidden>
       {% for step in page.method_short %}
         {{ step | markdownify }}
@@ -204,7 +259,19 @@ layout: default
     </div>
   {% endif %}
 
-  {% if page.notes %}
+  {% comment %} `.size > 0`, and NOT a bare truth test on page.notes itself. An
+     empty array is TRUTHY in Liquid -- only nil and false are falsy -- so
+     `notes: []` rendered the NOTES heading with an empty grid under it, on 49
+     drafts. Helen spotted it on sticky-tamarind-pork-ribs while checking the
+     print layout; it is not a print bug, it has been on screen the whole time.
+     `.size` on a nil is nil, and nil is not greater than 0, so this handles a
+     missing key too.
+
+     (Writing the bad version out longhand in this comment is what broke the
+     build the first time round: Liquid parses tag delimiters inside a comment
+     block, so a quoted `if` tag in here is a real tag as far as it is
+     concerned. Describe it, do not quote it.) {% endcomment %}
+  {% if page.notes.size > 0 %}
     <div class="recipe-section-notes">
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">Notes</span>
@@ -246,3 +313,4 @@ layout: default
 </article>
 
 <script src="{{ '/assets/js/method-toggle.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>

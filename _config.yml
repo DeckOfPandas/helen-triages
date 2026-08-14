@@ -29,6 +29,19 @@ baseurl: "/helen-triages"
 # Drafts and unrewritten recipes are never shown in production.
 show_unrewritten: false
 
+# Whether a recipe page offers its "pdf" link (GitHub issue #86). True here, so
+# it appears both on the deployed site and on the jekyll-prod mockup, which
+# exists precisely to show what deploys. _config_local.yml turns it off for the
+# jekyll-local working view, where the file genuinely is not there: the PDFs are
+# rendered from a finished build by scripts/generate_pdfs.py, so a link in the
+# view you work in all day would be a permanent 404.
+#
+# It used to be `{% if jekyll.environment == "production" %}` in the layout,
+# which was wrong in a way only testing found: jekyll-prod serves with
+# --config _config.yml and no JEKYLL_ENV, so it is "development" too, and the
+# link rendered nowhere you could actually look at it.
+pdf_downloads: true
+
 # --- Collections -------------------------------------------------------------
 # WHY THE SOURCE DIRECTORIES ARE AT THE REPO ROOT AND NOT INSIDE food/
 #

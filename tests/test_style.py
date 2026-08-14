@@ -888,8 +888,16 @@ def test_accents_in_prose(recipe):
     `source:`, where a citation is reproduced as the publication spells it.
     """
     words = _accented_words()
-    if not words:
-        return
+    # An `if not words: return` here (which is what this was until
+    # 2026-08-14) means an empty or mis-keyed accented_words.yml silences this
+    # check across every recipe in the collection, reporting green. The file
+    # missing entirely is a different thing and _accented_words() already
+    # skips on it; an empty map is a broken spec, not an absent one.
+    assert words, (
+        "_data/accented_words.yml has no `words:` map, so there is nothing to "
+        "check any recipe against. That file IS this test's specification -- "
+        "an empty one means the accent rule is unenforced, not satisfied."
+    )
     problems = _accent_problems(_accent_check_fields(recipe), words)
     assert not problems, (
         f"{where(recipe)} uses unaccented spelling(s):\n  " + "\n  ".join(problems)
@@ -910,8 +918,11 @@ def test_accents_in_drafts():
     from conftest import ALL_DRAFTS
 
     words = _accented_words()
-    if not words:
-        return
+    assert words, (
+        "_data/accented_words.yml has no `words:` map, so there is nothing to "
+        "check any draft against -- see test_accents_in_prose above for why "
+        "this asserts rather than returning quietly."
+    )
     problems = []
     for draft in ALL_DRAFTS:
         for p in _accent_problems(_accent_check_fields(draft), words):

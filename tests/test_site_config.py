@@ -778,25 +778,79 @@ def test_sass_files_are_actually_found():
 
 
 def _top_level_blocks(text: str):
-    """Yield (selector, [declared properties]) for every zero-indent rule."""
+    """Yield (selector, [declared properties]) for every un-nested rule.
+
+    "Un-nested" rather than "zero-indent" since 2026-08-14: a rule sitting
+    inside an at-rule counts too, and carries that at-rule in its key --
+    `@media print .recipe-badges`, not `.recipe-badges`.
+
+    ELEMENT SELECTORS COUNT TOO, also 2026-08-14. The pattern used to require
+    a leading `.#%&`, so `body`, `a`, `main` and `h1, h2, h3` -- every bare
+    element rule in shared/_base.scss and shared/_layout.scss -- were simply
+    not seen. That was invisible until a test built on this helper needed to
+    ask "does anything paint the page ground", got back nothing, and passed
+    while checking nothing at all.
+
+    THIS USED TO SEE NOTHING INSIDE AN @media BLOCK, and that mattered the
+    moment the site got its first one. The old version matched a selector
+    only at zero indent, so every rule the print stylesheet declares
+    (_sass/shared/_print.scss and _sass/food/_print.scss, GitHub issue #86)
+    was invisible to test_no_selector_declares_the_same_property_twice below
+    while it went on reporting green -- the exact "test that cannot fail and
+    not notice" shape HANDOVER_v26.md §12 warns about, arriving with a
+    feature rather than with a file move.
+
+    THE AT-RULE HAS TO STAY IN THE KEY, not be folded away. A print rule and
+    the screen rule it overrides declare the same property for the same
+    selector deliberately -- that is what an override IS -- so keying both as
+    `.recipe-badges` would report every correct print rule as a clash. Only
+    two print rules fighting each other, or two screen rules, are a bug.
+
+    Line-oriented, like the version it replaces: it assumes this codebase's
+    own formatting, one opening brace at the end of its line and a closing
+    brace on a line of its own.
+    """
     depth = 0
+    at_rule = None          # the @media/@supports we are inside, if any
+    at_depth = None
     current = None
+    current_depth = None
     props: list[str] = []
+
     for line in text.split("\n"):
         code = line.split("//")[0]
-        if depth == 0:
-            match = re.match(r"^([.#%&][^{}/]*?)\s*\{", line)
-            if match:
-                current = " ".join(match.group(1).split())
+        stripped = code.strip()
+
+        if current is None:
+            at_match = re.match(r"^(@[a-z-][^{}/]*?)\s*\{", stripped)
+            sel_match = re.match(r"^([.#%&a-zA-Z][^{}/]*?)\s*\{", stripped)
+            if at_match and at_rule is None:
+                at_rule = " ".join(at_match.group(1).split())
+                at_depth = depth
+            elif sel_match and (depth == 0
+                                or (at_rule is not None and depth == at_depth + 1)):
+                current = " ".join(sel_match.group(1).split())
+                if at_rule is not None:
+                    current = f"{at_rule} {current}"
+                current_depth = depth
                 props = []
-        elif depth == 1 and current:
-            decl = re.match(r"^\s{2}([a-z-]+)\s*:", line)
+        elif depth == current_depth + 1:
+            # Declarations of THIS rule only -- anything deeper belongs to a
+            # nested block (`&:hover`, a descendant selector) and is not a
+            # clash with its parent.
+            decl = re.match(r"^([a-z-]+)\s*:", stripped)
             if decl:
                 props.append(decl.group(1))
+
         depth += code.count("{") - code.count("}")
-        if depth == 0 and current and "}" in code:
+
+        if current is not None and depth == current_depth:
             yield current, props
             current = None
+            current_depth = None
+        if at_rule is not None and current is None and depth == at_depth:
+            at_rule = None
+            at_depth = None
 
 
 # --- the shared/forked SCSS boundary -----------------------------------------
@@ -915,6 +969,209 @@ def test_no_selector_declares_the_same_property_twice():
         + "\n  ".join(problems)
         + "\n\nThe later block wins, so editing the earlier one does nothing. "
           "Merge them, or move the property to whichever block owns that concern."
+    )
+
+
+# --- the print stylesheet keeps pointing at real markup ----------------------
+
+def _print_block_classes() -> list[tuple[str, str]]:
+    """(file, class) for every class named inside an `@media print` block."""
+    out = []
+    for path in sass_files():
+        text = path.read_text(encoding="utf-8")
+        for selector, _ in _top_level_blocks(text):
+            if not selector.startswith("@media print"):
+                continue
+            # Attribute selectors carry no class of their own, and a stray
+            # `[hidden]` would otherwise be parsed as part of the name.
+            bare = re.sub(r"\[[^\]]*\]", "", selector)
+            for cls in re.findall(r"\.([a-zA-Z][\w-]*)", bare):
+                out.append((path.name, cls))
+    return out
+
+
+def test_print_rules_target_classes_that_exist():
+    """GitHub issue #86. Every class the print stylesheet styles is emitted by
+    some template.
+
+    THE FAILURE THIS PREVENTS IS INVISIBLE BY CONSTRUCTION. Rename a class and
+    the screen rule that follows it goes wrong in front of you; the print rule
+    that did not follow it goes wrong on paper, which nobody looks at in
+    review, and which has no console, no layout shift and no error. A printout
+    that quietly regains the site header, or loses its page breaks, would
+    survive indefinitely.
+
+    Derived from both sides -- the classes come from whatever is currently
+    inside an `@media print` block, the markup from whatever the templates
+    currently emit -- so a print rule added tomorrow is covered tomorrow,
+    without this test being edited.
+
+    Not the reverse direction: a class with no print rule is the normal case,
+    since most of the page needs no different treatment on paper.
+    """
+    named = _print_block_classes()
+    assert named, (
+        "No classes found inside any `@media print` block. Either the print "
+        "stylesheet has gone (in which case delete this test and its helper) "
+        "or _top_level_blocks has stopped seeing into at-rules again -- and an "
+        "empty check passes."
+    )
+
+    html_files = (
+        sorted(ROOT.glob("_layouts/*.html"))
+        + sorted(ROOT.glob("_includes/**/*.html"))
+        + sorted(ROOT.glob("food/**/*.html"))
+        + sorted(ROOT.glob("cocktails/**/*.html"))
+        + [ROOT / "index.html"]
+    )
+    markup = "\n".join(p.read_text(encoding="utf-8") for p in html_files if p.exists())
+
+    missing = sorted({
+        f"{where_}: .{cls}" for where_, cls in named
+        if not re.search(rf'class="[^"]*\b{re.escape(cls)}\b', markup)
+    })
+    assert not missing, (
+        "Print rule(s) target a class no template emits:\n  " + "\n  ".join(missing)
+        + "\n\nEither the class was renamed and the print stylesheet did not "
+          "follow it, or the rule is left over from markup that has gone. A "
+          "print rule that matches nothing fails silently and on paper only."
+    )
+
+
+def test_print_neutralises_the_screen_page_background():
+    """Whatever paints the page ground for the screen must be overridden in
+    print, not merely left unmentioned there.
+
+    THIS IS THE BUG IT CAME FROM, and it is worth stating plainly because the
+    mistake is so easy to repeat. Asked to stop printing a page-wide tint, I
+    deleted the print stylesheet's own `background: $color-bg` line -- and
+    nothing changed, because shared/_base.scss sets `body { background:
+    $color-bg }` for the screen and that rule is still in the cascade inside
+    @media print. Removing an override is not the same as overriding.
+    $color-bg is a tint rather than white, so the symptom was every sheet
+    flooded with ink, and the only thing that caught it was Helen looking at
+    another print preview.
+
+    Derived from the stylesheets rather than hardcoded: if a future partial
+    starts painting the ground somewhere else, this asks for that to be
+    answered in print too.
+    """
+    paints_ground = []
+    print_override = False
+    for path in sass_files():
+        for selector, props in _top_level_blocks(path.read_text(encoding="utf-8")):
+            names = {s.strip() for s in selector.replace("@media print", "").split(",")}
+            if not ({"body", "html"} & names):
+                continue
+            if "background" not in props:
+                continue
+            if selector.startswith("@media print"):
+                print_override = True
+            else:
+                paints_ground.append(f"{path.name}: `{selector}`")
+
+    # NOT `if not paints_ground: return`. That was the first version, and it
+    # is how this test passed while checking nothing -- see the docstring.
+    # If one day genuinely nothing paints a ground, that is a real change to
+    # know about, not a reason to fall silent.
+    assert paints_ground, (
+        "Nothing in _sass/ paints a background on html or body, so this test "
+        "has nothing to check. Either the shared base stopped setting the page "
+        "ground (in which case delete this test with it) or the scan has "
+        "stopped finding it -- and a scan that finds nothing passes."
+    )
+    assert print_override, (
+        f"{paints_ground} paints the page ground for the screen, and no "
+        f"`@media print` rule sets a background on html/body to replace it.\n"
+        f"A print stylesheet has to SAY what it wants -- deleting its own "
+        f"declaration just leaves the screen rule in force, and if that "
+        f"colour is not white it prints as a flat wash over every sheet."
+    )
+
+
+def test_list_sections_are_conditioned_on_size_not_truthiness():
+    """An empty array is TRUTHY in Liquid, so a section guarded by a bare
+    truth test renders its heading with nothing underneath it.
+
+    Only nil and false are falsy. `notes: []` therefore drew the NOTES
+    heading and an empty grid on 49 drafts, unnoticed until Helen looked at
+    one while checking the print layout -- and the pages it affects are
+    exactly the ones nobody scrutinises, because a draft looking unfinished
+    is not a surprise.
+
+    Nothing else can catch this: the data is valid, the template is valid,
+    the build is clean, and the only symptom is a heading over blank space
+    on whichever files happen to hold an empty list today.
+
+    Scoped to the fields that are lists and that gate a whole section --
+    `.size > 0` is the fix, `.size > 1` and `.size == 1` are fine too since
+    they are already asking about length rather than existence.
+    """
+    layout = read("_layouts", "recipe.html")
+    # The comment blocks in this layout describe the bad pattern in prose
+    # rather than quoting it, precisely because Liquid parses tag delimiters
+    # inside a comment -- so there is nothing here to strip first.
+    bare = re.findall(
+        r"\{%-?\s*if\s+page\.(notes|ingredient_groups|method_short|tags|main_ingredients)"
+        r"\s*(?:%\}|-%\})",
+        layout,
+    )
+    assert not bare, (
+        f"_layouts/recipe.html gates a section on the bare truthiness of "
+        f"{sorted(set(bare))}. An empty array is truthy in Liquid, so that "
+        f"renders the section's heading over nothing whenever the list is "
+        f"empty. Test the length instead: `page.notes.size > 0`."
+    )
+
+
+def test_pdf_link_points_where_the_pdfs_are_written():
+    """GitHub issue #86. The "pdf" link on a recipe page and the file
+    scripts/generate_pdfs.py writes have to agree on one directory, and
+    nothing at either end would notice if they stopped.
+
+    Almost everything else about this feature fails loudly: no browser, a
+    crashed render, a build with no recipe pages in it all exit the workflow
+    non-zero. This one does not. Change the collection's permalink and the
+    script keeps working perfectly -- it globs whatever the build produced --
+    while every link in the markup goes on pointing at the old path. The
+    result is a deploy that succeeds, a site that looks right, and a link that
+    404s on every recipe.
+
+    So all three are read from where they actually live rather than restated
+    here: the permalink from _config.yml, the link from the layout, and the
+    write path from the script.
+    """
+    config = yaml.safe_load(read("_config.yml"))
+    permalink = ((config.get("collections") or {}).get("food_recipes") or {}).get("permalink")
+    assert permalink, (
+        "_config.yml declares no permalink for the food_recipes collection. "
+        "If the collection was renamed, this check no longer knows where "
+        "recipe pages live."
+    )
+    # "/food/recipes/:path/" -> "/food/recipes/"
+    expected = permalink.split(":")[0]
+
+    layout = read("_layouts", "recipe.html")
+    link = re.search(r"\{\{\s*'([^']+)'\s*\|\s*append:\s*page\.slug\s*\|\s*append:\s*'\.pdf'", layout)
+    assert link, (
+        "_layouts/recipe.html no longer builds the PDF link as "
+        "`'<dir>' | append: page.slug | append: '.pdf'`. If the link is built "
+        "another way now, this check needs to follow it -- it is the only "
+        "thing tying the link to where the files are written."
+    )
+    assert link.group(1) == expected, (
+        f"The PDF link points at {link.group(1)!r} but recipe pages are "
+        f"published under {expected!r} (from _config.yml's permalink), which "
+        f"is where scripts/generate_pdfs.py writes each PDF -- it puts "
+        f"<slug>.pdf beside the recipe's own output directory. One of the two "
+        f"has moved and the other has not."
+    )
+
+    script = read("scripts", "generate_pdfs.py")
+    assert 'glob("food/recipes/*/index.html")' in script, (
+        "scripts/generate_pdfs.py no longer globs food/recipes/*/index.html, "
+        "so it may be writing PDFs somewhere other than beside the recipe "
+        "pages this link points at."
     )
 
 

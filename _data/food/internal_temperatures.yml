@@ -250,6 +250,9 @@ lamb:
         rested_min: 71
         rested_max: 72
   slow_cooked:
+    # Which section of the temperature charts holds this figure, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: lamb
     tender_at: "90–95°C"
     tender_at_min: 90
     tender_at_max: 95
@@ -372,6 +375,9 @@ steak:
 # no rare/medium option worth codifying — `general` below covers those.
 fish:
   general:
+    # Which section of the temperature charts holds this figure, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: fish-salmon
     endpoint: "~63°C, opaque and flaking"
     endpoint_min: 63
     endpoint_max: 63
@@ -444,6 +450,9 @@ fish:
         description: "Fully opaque, creamy white throughout — clears the FSA/USDA ~63°C benchmark"
     safety_note: "Farmed salmon (most UK supermarket salmon) carries negligible parasite risk per FSA/EFSA and doesn't need pre-freezing to eat rare. Wild-caught salmon is the case where freezing first genuinely matters if serving it under well-done."
   tuna:
+    # Which section of the temperature charts holds this figure, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: fish-salmon
     carryover: "Often larger than other fish, given how hot the sear usually is — out_at 5–10°C below the target, more towards the low end for a very hot pan."
     doneness:
       blue_rare:

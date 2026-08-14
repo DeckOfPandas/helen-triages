@@ -18,3 +18,9 @@
 @import "shared/base";
 @import "shared/layout";
 @import "root/landing";
+// Print, last -- see shared/_print.scss's header. The landing page is the one
+// nobody is ever likely to print, and it takes this for exactly that reason:
+// it is the stylesheet that gets forgotten when a shared partial gains a
+// dependency (HANDOVER §12), so it is included by rule rather than by whether
+// anyone will notice (#86).
+@import "shared/print";
