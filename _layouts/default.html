@@ -96,18 +96,40 @@
 <body>
 
   <header class="site-header">
-  {% comment %} The small print / about link -- deliberately not spelled out
-     as "about" anywhere a nav shows it, Helen's explicit call. Omitted
-     entirely rather than linking nowhere when a site has no about_url yet
-     (cocktails, as of 2026-08-13) -- see sites.yml's own comment.
+  {% comment %} Header nav icons: a link back to this site's own home, a link
+     across to its sibling site, and the small print / about link -- in that
+     order, right to left, so "??" always sits at the outer edge. Each is
+     independently optional (see sites.yml's own comments on home_icon,
+     switch_site/switch_icon and about_url) so a site with none of these yet
+     renders no nav at all, rather than an empty row or a link to nowhere.
+
+     The about link is deliberately not spelled out as "about" anywhere a nav
+     shows it -- Helen's explicit call.
 
      .site-header-inner shares main's own max-width/margin:auto formula
-     (see _layout.scss) purely so the "?" can align with the right edge of
+     (see _layout.scss) purely so the nav can align with the right edge of
      the CONTENT column -- .site-header itself is edge-to-edge full width,
      with no column of its own to align against otherwise. {% endcomment %}
-  {% if this_site.about_url %}
+  {% if this_site.home_icon or this_site.switch_site or this_site.about_url %}
   <div class="site-header-inner">
-    <a href="{{ this_site.about_url | relative_url }}" class="site-about-link" aria-label="About this site">?</a>
+    <nav class="site-nav-icons">
+      {% if this_site.home_icon %}
+      <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-nav-icon-link" aria-label="{{ this_site.title }} home">
+        {% assign home_icon_file = "icons/" | append: this_site.home_icon | append: ".svg" %}
+        {% include {{ home_icon_file }} %}
+      </a>
+      {% endif %}
+      {% if this_site.switch_site %}
+      {% assign sibling_site = site.data.sites[this_site.switch_site] %}
+      <a href="{{ sibling_site.home | relative_url }}" class="site-nav-icon-link" aria-label="{{ sibling_site.title }}">
+        {% assign switch_icon_file = "icons/" | append: this_site.switch_icon | append: ".svg" %}
+        {% include {{ switch_icon_file }} %}
+      </a>
+      {% endif %}
+      {% if this_site.about_url %}
+      <a href="{{ this_site.about_url | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
+      {% endif %}
+    </nav>
   </div>
   {% endif %}
   <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">

@@ -74,25 +74,29 @@ main {
   position: relative;
 }
 
-// The small print / about link. Deliberately not spelled out as "about"
-// anywhere a nav shows it -- Helen's explicit call, and the about page's
-// own title ("???") echoes the same instinct. Deliberately bare -- Helen:
-// "much more minimalist... a naked ? in body font and style" -- no circle,
-// no border, no heading font: just a character sitting quietly in the
-// corner in the page's own body font, indistinguishable from ordinary text
-// until you're actually looking for it. Colour stays at this component's
-// shared default here (only $color-clear-text is guaranteed by every
-// site's palette, see _tokens.scss's palette contract); the hot-magenta
-// hover Helen actually asked for is food-specific
-// ($color-bright-magenta isn't one of the nine guaranteed variables), so
-// it lives as an override in food/_recipe-header.scss, not here.
-.site-about-link {
+// Header nav row -- home icon, sibling-site switch icon, about link, in that
+// order (see default.html's own comment). Absolutely positioned as a group
+// against .site-header-inner rather than each child positioning itself, so
+// they lay out left-to-right as one row pinned to the top-right corner.
+.site-nav-icons {
   position: absolute;
   top: 0;
   right: 0;
-  font-family: $font-body;
-  font-size: 1.1rem;
-  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+// Shared link styling for every item in the nav row -- icons and the "??"
+// text both use it, so one hover rule covers all of them. Colour stays at
+// this component's shared default here (only $color-clear-text is
+// guaranteed by every site's palette, see _tokens.scss's palette contract);
+// the hot-magenta hover Helen actually asked for is food-specific
+// ($color-bright-magenta isn't one of the nine guaranteed variables), so it
+// lives as an override in food/_recipe-header.scss, not here.
+.site-nav-icon-link {
+  display: inline-flex;
+  align-items: center;
   color: $color-clear-text;
   text-decoration: none;
 
@@ -100,6 +104,29 @@ main {
   &:focus-visible {
     color: $color-text;
   }
+}
+
+// Every icon partial under _includes/icons/ drops its own width/height so
+// this is the one place icon size is decided -- currently 36px, Helen's
+// call. Height-only: each icon keeps its own natural aspect ratio (the
+// cloche is wider than tall, the martini taller than wide) rather than
+// being squashed into a square.
+.nav-icon {
+  display: block;
+  height: 36px;
+  width: auto;
+}
+
+// The small print / about link. Deliberately not spelled out as "about"
+// anywhere a nav shows it -- Helen's explicit call, and the about page's
+// own title ("???") echoes the same instinct. Deliberately bare -- Helen:
+// "much more minimalist... a naked ? in body font and style" -- no circle,
+// no border, no heading font: just a character sitting quietly in the row,
+// in the page's own body font. Now "??", still Helen's call.
+.site-about-link {
+  font-family: $font-body;
+  font-size: 1.1rem;
+  font-weight: 400;
 }
 
 .site-footer {

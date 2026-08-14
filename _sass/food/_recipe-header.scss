@@ -97,15 +97,57 @@ article.recipe a {
   }
 }
 
-// The header's small print / about link (base styling in shared/_layout.scss,
-// .site-about-link) -- hot magenta on hover was Helen's explicit ask, but
+// The header nav row (base styling in shared/_layout.scss, .site-nav-icons /
+// .site-nav-icon-link) -- hot magenta on hover was Helen's explicit ask, but
 // $color-bright-magenta isn't one of the nine variables every site's
 // palette is guaranteed to define, so the shared file can't reference it
 // directly (see that rule's own comment). Food-only override; cocktails
 // gets a plainer hover from the shared default until it wants its own.
-.site-about-link:hover,
-.site-about-link:focus-visible {
+// Covers the "??" link and both nav icons -- one rule, since they share
+// .site-nav-icon-link.
+.site-nav-icon-link:hover,
+.site-nav-icon-link:focus-visible {
   color: $color-bright-magenta;
+}
+
+// --- Nav icon shapes -----------------------------------------------------
+// Icon sizing/positioning lives in shared/_layout.scss (.nav-icon,
+// .site-nav-icons); the shapes themselves -- and specifically which parts of
+// each are a fixed magenta accent vs. which follow the link's hover colour
+// -- are food-specific, since cocktails' own icons (not yet designed) won't
+// necessarily share these class names at all.
+//
+// Both icons split "outline" from "accent": the outline/body follows
+// currentColor so it inherits the link's own hover behaviour above, while
+// the accent (the heart, the martini's contents) stays a fixed magenta
+// regardless of hover -- Helen's ask was to fill them in magenta, not to
+// make them react to hover.
+.cloche-body {
+  fill: currentColor;
+}
+
+.cloche-heart {
+  fill: $color-bright-magenta;
+}
+
+.martini-outline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+// The bowl outline doubles as the fill boundary -- filling the same path
+// used for the stroke, rather than an approximate overlay shape, is what
+// keeps the magenta "contents" following the glass's actual curve at any
+// icon size Helen picks later.
+.martini-bowl {
+  fill: $color-bright-magenta;
+  stroke: currentColor;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 // --- Title -------------------------------------------------------------------
