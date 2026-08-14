@@ -107,6 +107,23 @@ $saturation-badge-bg:     0.1;
 $saturation-tag-pill-bg:         0.22;
 $saturation-tag-pill-bg-matched: 0.42;
 
+// --- Faux-bold stroke (Courier New has no weight above Bold) -----------------
+// Issue #193. Active filter buttons and matched recipe-row tags/badges get
+// their extra "selected" weight from a same-colour text stroke, because
+// font-weight: 900 already resolves to Bold with nothing heavier above it —
+// see HANDOVER §13.4.2 for the fuller writeup, including why this is NOT the
+// punched-tape emboss effect (that stroke is a lighter colour than the
+// letter; this one is the same colour, purely for weight).
+//
+// Was a flat 0.6px everywhere, absolute across type running 0.72rem-1rem, so
+// it landed heavier on a small badge than on a title-hit sitting on the same
+// row. 0.6px was tuned by eye against %btn-active-base (0.74rem) and the
+// matched badges (0.72rem) — both land at ~5.07-5.2% of their own font-size —
+// so this constant is that ratio, not a fresh guess, same self-scaling
+// technique $emboss-stroke uses (_sass/shared/_rule.scss) for the same
+// underlying problem in a different effect.
+$faux-bold-stroke: 0.05em;
+
 // --- Recipe Page Utilities ---------------------------------------------------
 $color-white:                #ffffff;
 // The soft edge on the index filter labels. Derived from the text it outlines

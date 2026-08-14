@@ -215,7 +215,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   //
   // No emboss/raised text-shadow here any more (dropped 2026-08-03, see the
   // comment above %tag-emboss-soft's old spot) — flat stroke only, same
-  // 0.6px for all three categories rather than a value per category, and
+  // $faux-bold-stroke for all three categories rather than a value per category, and
   // in $color-text (same dark colour as the letter itself) rather than the
   // category -active hue — Helen's correction once she saw it: the
   // category colour lived in .tag-shape already, and a stroke that matched
@@ -228,7 +228,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     background: none;
     color: $color-text;
     text-shadow: none;
-    -webkit-text-stroke: 0.6px $color-text;
+    -webkit-text-stroke: $faux-bold-stroke $color-text;
     .tag-shape { color: mix($color-star-root, $color-white, 82%); }
   }
 
@@ -237,7 +237,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     background: none;
     color: $color-text;
     text-shadow: none;
-    -webkit-text-stroke: 0.6px $color-text;
+    -webkit-text-stroke: $faux-bold-stroke $color-text;
     .tag-shape { color: mix($color-mood-root, $color-white, 82%); }
   }
 
@@ -246,7 +246,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     background: none;
     color: $color-text;
     text-shadow: none;
-    -webkit-text-stroke: 0.6px $color-text;
+    -webkit-text-stroke: $faux-bold-stroke $color-text;
     .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
   }
 

@@ -92,7 +92,7 @@
       background: none;
       color: $color-text;
       text-transform: uppercase;
-      -webkit-text-stroke: 0.6px $color-text;
+      -webkit-text-stroke: $faux-bold-stroke $color-text;
       // Was 0 0.25em -- a title hit usually lands mid-word (GRAndma's, not
       // a whole word on its own), so padding on BOTH sides reads as a
       // stray space where the highlighted part rejoins the rest of the
@@ -233,7 +233,7 @@
     // Landed on 500, still a real step up from the resting list's 350.
     font-weight: 500;
     letter-spacing: 0.01em;
-    -webkit-text-stroke: 0.6px $color-text;
+    -webkit-text-stroke: $faux-bold-stroke $color-text;
     padding: 0 0.4em;
     .tag-shape { color: mix($color-ingredient-root, $color-white, 82%); }
   }
