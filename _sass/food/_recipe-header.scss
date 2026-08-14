@@ -126,8 +126,28 @@ article.recipe a {
 // bottom aligned", and this is the layout that delivers that without a
 // collision the site has no media queries to fix.
 //
-// align-items: flex-end is the "bottom aligned" half: the controls' box sits on
-// the same bottom edge as the title's, however many lines the title runs to.
+// TWO `align-items` DECLARATIONS, ON PURPOSE -- do not delete the first one.
+// It is the standard CSS fallback pattern: a browser that cannot parse `last
+// baseline` drops that line and keeps `flex-end`, and one that can takes the
+// later declaration. (This is why it does not trip
+// test_no_selector_declares_the_same_property_twice, which looks for the same
+// property in two separate BLOCKS -- one block deliberately overriding itself
+// is a different thing.)
+//
+// `flex-end` alone was the first attempt at "bottom aligned" and Helen's read
+// was that the links sat too low. It was right about the BOXES and wrong about
+// the ink: the title's box does not end where its lettering does. The mark
+// hangs below the baseline (food/_rule.scss: the violet bar runs to 1.18em of a
+// ~1.13em content box), and beneath that sits the half-leading of an inherited
+// 1.65 line-height on 2.2rem type -- so aligning the two boxes' bottom edges
+// drops the links about a rem below the title's own baseline, with the bar
+// between them.
+//
+// `last baseline` aligns what you actually read: the links' baseline and the
+// title's, so the two sit on one line. LAST rather than plain `baseline`
+// because a title that wraps has two of them, and bottom-aligned means the
+// final line, not the first.
+//
 // justify-content: space-between is the "to the right" half, and it puts them
 // on the content column's own right edge -- the same edge the metadata grid
 // below already ends on, so they line up rather than nearly lining up.
@@ -140,7 +160,8 @@ article.recipe a {
 // measured against each other instead: a long title just narrows the gap.
 .recipe-title {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-end;      // fallback -- see above, keep both
+  align-items: last baseline;
   justify-content: space-between;
   gap: $space-xl;
   margin: $spacing-section-gap 0 1.25rem 0;
