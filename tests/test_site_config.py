@@ -784,6 +784,13 @@ def _top_level_blocks(text: str):
     inside an at-rule counts too, and carries that at-rule in its key --
     `@media print .recipe-badges`, not `.recipe-badges`.
 
+    ELEMENT SELECTORS COUNT TOO, also 2026-08-14. The pattern used to require
+    a leading `.#%&`, so `body`, `a`, `main` and `h1, h2, h3` -- every bare
+    element rule in shared/_base.scss and shared/_layout.scss -- were simply
+    not seen. That was invisible until a test built on this helper needed to
+    ask "does anything paint the page ground", got back nothing, and passed
+    while checking nothing at all.
+
     THIS USED TO SEE NOTHING INSIDE AN @media BLOCK, and that mattered the
     moment the site got its first one. The old version matched a selector
     only at zero indent, so every rule the print stylesheet declares
@@ -816,7 +823,7 @@ def _top_level_blocks(text: str):
 
         if current is None:
             at_match = re.match(r"^(@[a-z-][^{}/]*?)\s*\{", stripped)
-            sel_match = re.match(r"^([.#%&][^{}/]*?)\s*\{", stripped)
+            sel_match = re.match(r"^([.#%&a-zA-Z][^{}/]*?)\s*\{", stripped)
             if at_match and at_rule is None:
                 at_rule = " ".join(at_match.group(1).split())
                 at_depth = depth
@@ -1028,6 +1035,50 @@ def test_print_rules_target_classes_that_exist():
         + "\n\nEither the class was renamed and the print stylesheet did not "
           "follow it, or the rule is left over from markup that has gone. A "
           "print rule that matches nothing fails silently and on paper only."
+    )
+
+
+def test_print_neutralises_the_screen_page_background():
+    """Whatever paints the page ground for the screen must be overridden in
+    print, not merely left unmentioned there.
+
+    THIS IS THE BUG IT CAME FROM, and it is worth stating plainly because the
+    mistake is so easy to repeat. Asked to stop printing a page-wide tint, I
+    deleted the print stylesheet's own `background: $color-bg` line -- and
+    nothing changed, because shared/_base.scss sets `body { background:
+    $color-bg }` for the screen and that rule is still in the cascade inside
+    @media print. Removing an override is not the same as overriding.
+    $color-bg is a tint rather than white, so the symptom was every sheet
+    flooded with ink, and the only thing that caught it was Helen looking at
+    another print preview.
+
+    Derived from the stylesheets rather than hardcoded: if a future partial
+    starts painting the ground somewhere else, this asks for that to be
+    answered in print too.
+    """
+    paints_ground = []
+    print_override = False
+    for path in sass_files():
+        for selector, props in _top_level_blocks(path.read_text(encoding="utf-8")):
+            names = {s.strip() for s in selector.replace("@media print", "").split(",")}
+            if not ({"body", "html"} & names):
+                continue
+            if "background" not in props:
+                continue
+            if selector.startswith("@media print"):
+                print_override = True
+            else:
+                paints_ground.append(f"{path.name}: `{selector}`")
+
+    if not paints_ground:
+        return   # nothing paints a ground, so nothing needs neutralising
+
+    assert print_override, (
+        f"{paints_ground} paints the page ground for the screen, and no "
+        f"`@media print` rule sets a background on html/body to replace it.\n"
+        f"A print stylesheet has to SAY what it wants -- deleting its own "
+        f"declaration just leaves the screen rule in force, and if that "
+        f"colour is not white it prints as a flat wash over every sheet."
     )
 
 

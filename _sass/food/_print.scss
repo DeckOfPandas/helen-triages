@@ -95,6 +95,18 @@
     filter: none;
   }
 
+  // --- One thing that was masking the screen's ground ---------------------
+  // .note-label is the small tab sitting on a note box's 2px top border, and
+  // it works by painting $color-bg over the line behind it. That is exactly
+  // right on screen, where $color-bg IS the ground; on paper the ground is now
+  // the paper (shared/_print.scss), so the tab would print as a faint tinted
+  // patch on white instead of an invisible one. Same trick, correct colour for
+  // the medium -- it still has to paint something opaque, or the border runs
+  // straight through the label's own text.
+  .note-label {
+    background: $color-white;
+  }
+
   // --- Breaking ---------------------------------------------------------
   // One ingredient, one step, one note, one chart row: each is a single unit
   // of "look down, read one thing, look back at the pan", and splitting one

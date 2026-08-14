@@ -59,6 +59,19 @@
   // and on a home printer the kind of large flat fill that bands. Helen,
   // 2026-08-14: "That's simply unfair." The paper IS the ground on paper.
   //
+  // `transparent`, EXPLICITLY, AND THAT IS THE WHOLE FIX. The first attempt
+  // simply deleted this file's own `background: $color-bg` line, which changed
+  // nothing at all: shared/_base.scss sets `body { background: $color-bg }`
+  // for the screen, that rule is still in the cascade under @media print, and
+  // removing an override is not the same as overriding. The tint printed
+  // exactly as before and it took Helen looking at another preview to catch
+  // it. A print stylesheet has to say what it wants, never merely stop saying
+  // what it does not.
+  //
+  // Both html and body, because a body background propagates to the canvas:
+  // making body transparent alone hands the job to html, which then has to be
+  // transparent too for the paper to show through.
+  //
   // Three things assume the ground is $color-bg and lose a little by this:
   // $color-emboss-light (shared/_rule.scss) is $color-bg, so the highlight
   // copy of the punched lettering no longer sits against a matching ground;
@@ -71,6 +84,7 @@
   // one: "I don't care if my headings don't look like label tape."
   html,
   body {
+    background: transparent;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
