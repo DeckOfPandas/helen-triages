@@ -1,0 +1,287 @@
+---
+layout: default
+title: "Temperature Charts — proposal"
+permalink: /food/reference-demo/temperature-charts/
+sitemap: false
+---
+
+{% comment %}
+  PROPOSAL, NOT A REAL PAGE. Nothing links here.
+
+  EVERY NUMBER BELOW NOW COMES FROM _data/food/internal_temperatures.yml, via
+  the numeric fields added 2026-08-13 (pull_min/pull_max/rested_min/rested_max
+  alongside the display strings, with tests/test_reference_data.py asserting
+  the two agree). The first version of this page hard-coded its figures,
+  precisely to demonstrate that a drawing can't be built from strings like
+  "48–50°C", "70°C+" and "~63°C, opaque and flaking". That's fixed: change a
+  temperature in the data file and this page moves.
+
+  The doneness rows are LOOPS, not transcriptions — add a level to the data and
+  it appears here. That is the actual test of whether the split worked.
+{% endcomment %}
+
+{% assign t = site.data.food.internal_temperatures %}
+
+<link rel="stylesheet" href="{{ '/assets/css/reference-demo.css' | relative_url }}">
+
+{% capture axis %}
+  <div class="tc-axis">
+    <div></div>
+    <div class="tc-axis-scale">
+      <div class="tc-tick" style="--t:40;">40°C</div>
+      <div class="tc-tick" style="--t:50;">50</div>
+      <div class="tc-tick" style="--t:60;">60</div>
+      <div class="tc-tick" style="--t:70;">70</div>
+      <div class="tc-tick" style="--t:80;">80</div>
+      <div class="tc-tick" style="--t:90;">90</div>
+      <div class="tc-tick" style="--t:100;">100°C</div>
+    </div>
+  </div>
+{% endcapture %}
+
+<article class="recipe" id="top">
+  <div class="recipe-title">
+    <h1 class="recipe-main-title"><span class="recipe-title-text">Temperature Charts</span></h1>
+  </div>
+
+  <div class="recipe-body-content">
+
+    {% comment %} Contents, following the pattern internal-temperatures.html
+       already uses -- an id on each h2 and a plain list of anchors. The
+       sections are alphabetical; the overview is last because it is a summary
+       of the others, not a protein of its own. {% endcomment %}
+    <ul class="tc-contents">
+      <li><a href="#beef-steak">Beef: steak</a></li>
+      <li><a href="#beef-tender-roasting-cuts">Beef: tender roasting cuts</a></li>
+      <li><a href="#beef-tough-cuts">Beef: tough cuts</a></li>
+      <li><a href="#fish-salmon">Fish: salmon</a></li>
+      <li><a href="#ham">Ham</a></li>
+      <li><a href="#lamb">Lamb</a></li>
+      <li><a href="#pork">Pork</a></li>
+      <li><a href="#poultry">Poultry</a></li>
+      <li><a href="#all">All</a></li>
+    </ul>
+
+    <h2 class="recipe-section-heading" id="beef-steak"><span class="section-heading-text section-heading-text--reference">Beef: steak</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">carryover {{ t.steak.carryover }}</p>
+
+    {% include food/temp_key.html rested=true carry=true %}
+    <div class="tc">
+      <div class="tc-plot">
+        {% for level in t.steak.doneness %}
+          {% comment %} spec is assigned first because Jekyll's include tag
+             rejects bracket indexing in a parameter -- `spec=level[1]` is a
+             build-crashing syntax error, not a silent nil. {% endcomment %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">carryover {{ t.beef.tender_roast.carryover }}</p>
+
+    {% include food/temp_key.html rested=true carry=true %}
+    <div class="tc">
+      <div class="tc-plot">
+        {% for level in t.beef.tender_roast.doneness %}
+          {% comment %} spec is assigned first because Jekyll's include tag
+             rejects bracket indexing in a parameter -- `spec=level[1]` is a
+             build-crashing syntax error, not a silent nil. {% endcomment %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec tip="The dotted stretch is the carryover — widest here, because a large joint carries more hot mass out of the oven with it." %}
+        {% endfor %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">brisket, chuck, short rib, pot roast &mdash; not a doneness at all</p>
+
+    {% comment %} No key on this chart. It draws one bar, and that bar's own
+       value now reads "tender at 90–96°C" -- a key saying "tender at" beside it
+       would be the same three words twice. Helen: "remove the key as it's not
+       helpful." {% endcomment %}
+    <div class="tc">
+      <div class="tc-plot">
+        {% assign tough = t.beef.tough_cuts %}
+        {% include food/temp_row.html label="Tough cuts" spec=tough tip="Brisket, chuck, short rib, pot roast. These pass through 60-70°C while still tough and only give up around 90-96°C -- which is why they sit so far right of every doneness figure above." %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">carryover {{ t.fish.salmon.carryover }}</p>
+
+    {% include food/temp_key.html rested=true unsafe=true %}
+    <div class="tc">
+      <div class="tc-plot">
+        <div class="tc-unsafe" style="--t:{{ t.fish.general.endpoint_min }};"></div>
+        <div class="tc-threshold-label" style="--t:{{ t.fish.general.endpoint_min }};">FSA/USDA {{ t.fish.general.endpoint_min }}°C &rarr;</div>
+        {% for level in t.fish.salmon.doneness %}
+          {% comment %} spec is assigned first because Jekyll's include tag
+             rejects bracket indexing in a parameter -- `spec=level[1]` is a
+             build-crashing syntax error, not a silent nil. {% endcomment %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <p class="tc-note">FSA advice is a minimum serving temperature of {{ t.fish.general.endpoint_min }}°C.</p>
+
+    <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+
+    {% include food/temp_key.html rested=true unsafe=true %}
+    <div class="tc">
+      <div class="tc-plot">
+        <div class="tc-unsafe" style="--t:70;"></div>
+        <div class="tc-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
+        {% for level in t.ham.fresh.doneness %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+        {% assign cured = t.ham.cured %}
+        {% include food/temp_row.html label="Cured" spec=cured tip="Check the packaging first: 'cook before eating' and 'ready to eat' are handled differently, and this figure is for a raw-cured ham that still needs cooking." %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">carryover {{ t.lamb.roasting.carryover }}</p>
+
+    {% include food/temp_key.html rested=true carry=true %}
+    <div class="tc">
+      <div class="tc-plot">
+        {% for level in t.lamb.roasting.doneness %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+        {% assign lslow = t.lamb.slow_cooked %}
+        {% include food/temp_row.html label="Slow-cooked" spec=lslow tip="Shoulder and breast. Same logic as pork's slow-cooked cuts -- tested by fork, not thermometer alone." %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">carryover {{ t.pork.roasting.carryover }}</p>
+
+    {% include food/temp_key.html rested=true carry=true unsafe=true %}
+    <div class="tc">
+      <div class="tc-plot">
+        {% comment %} The FSA line at 70°C is the whole reason this section
+           earns a drawing. internal_temperatures.yml flags pork's "medium" as
+           not clearing UK guidance, in a safety_note nobody reads until after
+           they've cooked. Here the shading says it before the sentence does --
+           and note that medium's RESTED figure clears nothing either, because
+           FSA's table is about temperature HELD, not passed through. {% endcomment %}
+        <div class="tc-unsafe" style="--t:70;"></div>
+        <div class="tc-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
+        {% for level in t.pork.roasting.doneness %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+        {% assign slow = t.pork.slow_cooked %}
+        {% include food/temp_row.html label="Slow-cooked" spec=slow tip="Shoulder and belly, cooked well past done until fat and collagen render. Go by how easily a fork twists, not by a doneness figure." %}
+      </div>
+      {{ axis }}
+    </div>
+
+    {% comment %} The data's own safety_note runs to ~150 words, written for
+       someone auditing the figure. This is the version for someone cooking: the
+       FSA equivalences it turns on, and nothing else. HELD, not passed through
+       on the way past — which is exactly why the medium figure doesn't clear it,
+       and the one thing this sentence has to carry. "Pull" is gone with the rest
+       of that vocabulary. The full note stays in internal_temperatures.yml.
+       {% endcomment %}
+    <p class="tc-note">FSA wants pork <em>held</em> at 60°C for 45&nbsp;min, 65°C for 10&nbsp;min, 70°C for 2&nbsp;min, or 75°C for 30&nbsp;sec — held, not passed through as it cools. Only the well-done figure clears that.</p>
+
+    <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <p class="recipe-section-subtitle">by the thigh, not the breast</p>
+
+    {% include food/temp_key.html solid="reaches" %}
+    <div class="tc">
+      <div class="tc-plot">
+        {% comment %} Four of these five sit on top of each other at 74–75°C,
+           and that is worth SEEING rather than reading down a column of
+           identical cells: one endpoint covers every whole bird, and the
+           interesting row is the one that doesn't. Duck breast cooked on its
+           own comes off at 54–57°C, twenty degrees below the same bird roasted
+           whole -- which is the argument for jointing it, made visible. {% endcomment %}
+        {% for bird in t.poultry %}
+          {% assign label = bird[0] | replace: "_", " " | capitalize %}
+          {% assign spec = bird[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <h2 class="recipe-section-heading" id="all"><span class="section-heading-text section-heading-text--reference">All</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+
+    {% include food/temp_key.html solid="served between" %}
+    <div class="tc">
+      <div class="tc-plot">
+        {% comment %} Every span below is COMPUTED from the data, not typed --
+           see _includes/food/temp_span.html for why the obvious
+           `| map: "pull_min" | sort | first` silently returns nils here. {% endcomment %}
+        {% include food/temp_span.html label="Tuna" doneness=t.fish.tuna.doneness tip="The widest range of anything here, and served rare by default." %}
+        {% include food/temp_span.html label="Salmon" doneness=t.fish.salmon.doneness %}
+        {% include food/temp_span.html label="Steak" doneness=t.steak.doneness %}
+        {% include food/temp_span.html label="Beef roast" doneness=t.beef.tender_roast.doneness %}
+        {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness tip="UK guidance treats pink lamb like pink beef." %}
+        {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness tip="The medium figure is the one flagged against FSA guidance." %}
+
+        <div class="tc-row">
+          <div class="tc-row-label">Fish, general</div>
+          <div class="tc-track">
+            <div class="tc-pull" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"></div>
+            <div class="tc-value" style="--b:{{ t.fish.general.endpoint_max }};">{{ t.fish.general.endpoint }}</div>
+            <div class="tc-hit" tabindex="0" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"
+                 data-tip="Everything that isn't salmon or tuna: one endpoint, {{ t.fish.general.endpoint }}. No doneness spectrum worth codifying."></div>
+          </div>
+        </div>
+
+        <div class="tc-row">
+          <div class="tc-row-label">Poultry</div>
+          <div class="tc-track">
+            <div class="tc-pull" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"></div>
+            <div class="tc-value" style="--b:{{ t.poultry.chicken.endpoint_max }};">{{ t.poultry.chicken.endpoint }}</div>
+            <div class="tc-hit" tabindex="0" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"
+                 data-tip="Chicken, turkey, goose and whole duck all share one endpoint: {{ t.poultry.chicken.endpoint }} -- the thigh, not the breast, because it's the last part to come up."></div>
+          </div>
+        </div>
+
+        <div class="tc-row">
+          <div class="tc-row-label">Cured ham</div>
+          <div class="tc-track">
+            <div class="tc-pull" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"></div>
+            <div class="tc-value" style="--b:{{ t.ham.cured.target_max }};">{{ t.ham.cured.target }}</div>
+            <div class="tc-hit" tabindex="0" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"
+                 data-tip="Cured ham that still needs cooking: {{ t.ham.cured.target }}. Check the packaging first -- 'cook before eating' and 'ready to eat' are different things."></div>
+          </div>
+        </div>
+
+        <div class="tc-row">
+          <div class="tc-row-label">Slow-cooked</div>
+          <div class="tc-track">
+            <div class="tc-pull" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"></div>
+            <div class="tc-value" style="--b:{{ t.beef.tough_cuts.tender_at_max }};">tender at {{ t.beef.tough_cuts.tender_at }}</div>
+            <div class="tc-hit" tabindex="0" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"
+                 data-tip="Brisket, chuck, short rib, pork shoulder, lamb shoulder. Not a pull temperature at all -- collagen breakdown. These pass through {{ t.beef.tough_cuts.passes_through }}. Test with a fork, not a thermometer alone."></div>
+          </div>
+        </div>
+      </div>
+      {{ axis }}
+    </div>
+
+  </div>
+</article>

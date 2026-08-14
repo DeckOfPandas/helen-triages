@@ -1,0 +1,109 @@
+{% comment %}
+  One row of the temperature charts, drawn from _data/food/internal_temperatures.yml.
+
+  Parameters
+    label   the row's name, already human-readable
+    spec    a node holding pull_min/pull_max, and optionally rested_min/max
+    tip     extra hover text (optional)
+
+  WHY AN INCLUDE. Every row is the same four marks at different coordinates, and
+  the arithmetic that turns °C into a position lives in the stylesheet, not
+  here — so this file's only job is to hand over numbers. That keeps the axis
+  re-scalable from one place (the $tc-min/$tc-max pair in
+  assets/css/reference-demo.scss) rather than from ~40 call sites.
+
+  PARAMETERS ARE READ AS include.x, NOT AS BARE NAMES. Jekyll only binds them
+  onto the `include` object; a bare {{ spec }} would silently resolve against
+  the including page's own scope instead — which is worse than failing, because
+  it works whenever the page happens to have a variable of that name and breaks
+  the moment it doesn't.
+
+  "OUT AT", NOT "PULL AT". Helen: "I don't love the word 'pull'... mostly
+  because it's American." Out at is shorter, reads as plain English, and stays
+  true for a pan, a grill or a bain-marie where "out of the oven" wouldn't. It
+  also matches the calculator, which says "in at 14:20, out at 17:05" -- so one
+  verb now carries the same meaning across both instruments, and the schedule
+  hands straight over to the thermometer figure.
+
+  The DATA still uses `pull_min`/`pull_max`, deliberately: renaming those keys
+  means touching _layouts/recipe.html, the reference page and the guard tests
+  at once, and the field name is nobody's reading experience. Display language
+  changed here; the existing pages' own "Pull at" column headings are a copy
+  pass still to do.
+
+  THE CARRYOVER BAR IS ONLY DRAWN WHEN THERE IS A GAP TO DRAW. Salmon's
+  carryover is 1–2°C and its pull and rested ranges overlap, so there is no
+  clear space between them; a dotted connector there would be drawn on top of
+  the bars it's meant to join and read as noise. Beef's 4–6°C carryover leaves a
+  real gap, and that gap is the whole point of the chart.
+{% endcomment %}
+
+{% assign spec = include.spec %}
+
+{% comment %}
+  FOUR SHAPES, ONE ROW. internal_temperatures.yml deliberately isn't uniform
+  (see its own header): a doneness level has pull/rested, a whole bird has an
+  endpoint, a cured ham has a target, and a tough cut has tender_at and no
+  pull temperature at all because collagen breakdown isn't a doneness.
+
+  Rather than four includes, this finds whichever figure the node actually
+  carries. That follows the data file's own instruction to consumers -- "check
+  which keys exist on the node it resolved to, rather than assuming a shape
+  from the protein name" -- and it means a shape added upstream draws itself
+  here without this file being touched.
+{% endcomment %}
+{% comment %} RESET FIRST. Liquid's `assign` writes to the PAGE's scope, not the
+   include's, so a variable set inside one invocation is still set on the next
+   one — and the next row inherits it. Setting `prefix` only in the tender_at
+   branch put "tender at" in front of every subsequent row on the page,
+   including whole birds and doneness ranges. Same family of trap as reading a
+   parameter as a bare name instead of include.x, noted above: the include
+   looks self-contained and isn't. {% endcomment %}
+{% assign prefix = "" %}
+
+{% if spec.pull_min %}
+  {% assign from = spec.pull_min %}{% assign to = spec.pull_max %}{% assign shown = spec.pull %}
+{% elsif spec.endpoint_min %}
+  {% assign from = spec.endpoint_min %}{% assign to = spec.endpoint_max %}{% assign shown = spec.endpoint %}
+{% elsif spec.target_min %}
+  {% assign from = spec.target_min %}{% assign to = spec.target_max %}{% assign shown = spec.target %}
+{% elsif spec.tender_at_min %}
+  {% assign from = spec.tender_at_min %}{% assign to = spec.tender_at_max %}{% assign shown = spec.tender_at %}
+  {% comment %} A tough cut's figure says what KIND of figure it is, in the
+     value itself. It is the one shape here that isn't a temperature you take
+     something off the heat at -- collagen breakdown, tested with a fork -- and
+     an unlabelled "90–96°C" sitting on the same axis as a doneness range reads
+     as one. The "All" chart already wrote this out by hand; deriving it from
+     the key the node actually carries means every tender_at row says it,
+     including pork's and lamb's slow-cooked rows. {% endcomment %}
+  {% assign prefix = "tender at " %}
+{% endif %}
+
+{% assign has_rested = false %}
+{% if spec.rested_min %}{% assign has_rested = true %}{% endif %}
+
+{% comment %} The rightmost point the row reaches — where the direct label hangs
+   and where the hover target ends. {% endcomment %}
+{% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = to %}{% endif %}
+
+<div class="tc-row">
+  <div class="tc-row-label">{{ include.label }}</div>
+  <div class="tc-track">
+    <div class="tc-pull" style="--a:{{ from }}; --b:{{ to }};"></div>
+
+    {% if has_rested and spec.rested_min > to %}
+      <div class="tc-carry" style="--a:{{ to }}; --b:{{ spec.rested_min }};"></div>
+    {% endif %}
+
+    {% if has_rested %}
+      <div class="tc-rested" style="--a:{{ spec.rested_min }}; --b:{{ spec.rested_max }};"></div>
+    {% endif %}
+
+    <div class="tc-value" style="--b:{{ right }};">
+      {{ prefix }}{{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
+    </div>
+
+    <div class="tc-hit" tabindex="0" style="--a:{{ from }}; --b:{{ right }};"
+         data-tip="{{ include.label }}{% if spec.description %} — {{ spec.description }}{% endif %}. {% if spec.pull %}Out at{% else %}Reaches{% endif %} {{ shown }}{% if has_rested %}, rests to {{ spec.rested }}{% endif %}.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
+  </div>
+</div>

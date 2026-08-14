@@ -39,80 +39,264 @@
 poultry:
   chicken:
     endpoint: "74–75°C in the thigh"
+    endpoint_min: 74
+    endpoint_max: 75
     carryover: "1–3°C"
+    carryover_min: 1
+    carryover_max: 3
   turkey:
     endpoint: "74–75°C in the thickest part of the thigh, not touching bone"
+    endpoint_min: 74
+    endpoint_max: 75
     carryover: "1–3°C"
+    carryover_min: 1
+    carryover_max: 3
     note: "Also check the breast reaches at least 70°C."
   goose:
+    # Stated in this entry's own note below ("Rest a full 20–30 minutes
+    # regardless"), not in a table header like the roasting cuts.
+    rest_min: 20
     endpoint: "74–75°C in the thigh"
+    endpoint_min: 74
+    endpoint_max: 75
     carryover: "1–3°C"
+    carryover_min: 1
+    carryover_max: 3
     note: "Rest a full 20–30 minutes regardless — goose is fatty enough that this matters more than the temperature reading does."
   duck:
     endpoint: "74–75°C in the thigh"
+    endpoint_min: 74
+    endpoint_max: 75
     carryover: "1–3°C"
+    carryover_min: 1
+    carryover_max: 3
     note: "Cooking a whole duck as one piece means accepting the breast will be more well-done than it would be cooked alone."
   duck_breast_separate:
     endpoint: "54–57°C for pink meat, then rested"
+    endpoint_min: 54
+    endpoint_max: 57
     carryover: "1–3°C"
+    carryover_min: 1
+    carryover_max: 3
     note: "Only applies when a breast is cooked on its own, off the bone."
     sources: "America's Test Kitchen; ThermoWorks; Rouxbe — all centre on 54–57°C for pink medium-rare duck breast. Corrected 2026-08-12 from an original 57–60°C, which independent research found a touch high (nudges toward medium/well rather than pink). Checked once — remove this line once you've confirmed it yourself."
 
 beef:
   tender_roast:
+    # Rest time as STATED by internal-temperatures.html's own table header
+    # ("After ~15–20 min rest"), so the timings page can default its rest box
+    # to the figure this data already publishes rather than to a round 20 that
+    # nobody wrote down. Only the four proteins whose rest time is actually
+    # stated carry this -- chicken, turkey, duck and ham have no published
+    # figure, and the page falls back rather than inventing one.
+    rest_min: 15
     carryover: "4–6°C"
+    carryover_min: 4
+    carryover_max: 6
     doneness:
-      rare: { pull: "48–50°C", rested: "~52–54°C" }
-      medium_rare: { pull: "52–54°C", rested: "~56–58°C" }
-      medium: { pull: "58–60°C", rested: "~62–64°C" }
-      well_done: { pull: "68–70°C", rested: "~72°C" }
+      rare:
+        pull: "48–50°C"
+        pull_min: 48
+        pull_max: 50
+        rested: "~52–54°C"
+        rested_min: 52
+        rested_max: 54
+      medium_rare:
+        pull: "52–54°C"
+        pull_min: 52
+        pull_max: 54
+        rested: "~56–58°C"
+        rested_min: 56
+        rested_max: 58
+      medium:
+        pull: "58–60°C"
+        pull_min: 58
+        pull_max: 60
+        rested: "~62–64°C"
+        rested_min: 62
+        rested_max: 64
+      well_done:
+        pull: "68–70°C"
+        pull_min: 68
+        pull_max: 70
+        rested: "~72°C"
+        rested_min: 72
+        rested_max: 72
   tough_cuts:
     passes_through: "60–70°C while still tough"
+    passes_through_min: 60
+    passes_through_max: 70
     tender_at: "90–96°C"
+    tender_at_min: 90
+    tender_at_max: 96
 
 pork:
   roasting:
+    # Rest time as STATED by internal-temperatures.html's own table header
+    # ("After ~15 min rest"), so the timings page can default its rest box
+    # to the figure this data already publishes rather than to a round 20 that
+    # nobody wrote down. Only the four proteins whose rest time is actually
+    # stated carry this -- chicken, turkey, duck and ham have no published
+    # figure, and the page falls back rather than inventing one.
+    rest_min: 15
     carryover: "3–4°C"
+    carryover_min: 3
+    carryover_max: 4
     doneness:
-      medium: { pull: "60–62°C", rested: "~63–65°C", description: "slightly pink, standard for pork today" }
-      well_done: { pull: "68–70°C", rested: "~71–72°C" }
+      medium:
+        pull: "60–62°C"
+        pull_min: 60
+        pull_max: 62
+        rested: "~63–65°C"
+        rested_min: 63
+        rested_max: 65
+        description: "slightly pink, standard for pork today"
+      well_done:
+        pull: "68–70°C"
+        pull_min: 68
+        pull_max: 70
+        rested: "~71–72°C"
+        rested_min: 71
+        rested_max: 72
     safety_note: "FOOD SAFETY: the 'medium' pull temp above (60–62°C) does not clear the UK FSA's own core-temperature equivalence table for pork specifically (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec — held at that temperature, not passed through via carryover). FSA does not extend beef/lamb's 'pink is fine' reasoning to pork (hepatitis E risk cited). USDA's own standard is more permissive (145°F/62.8°C + 3min rest), but that's a different regulatory bar. The well-done option (68–70°C, clears 70°C at pull with margin) is the one that unambiguously satisfies FSA guidance. Flagging, not changing the medium figure — your call whether to keep it, since plenty of UK cooking still serves pork pink. Checked once, 2026-08-12 — remove this note once you've made your own call and confirmed the figure you want to keep."
   slow_cooked:
     tender_at: "90–95°C"
+    tender_at_min: 90
+    tender_at_max: 95
 
 lamb:
   roasting:
+    # Rest time as STATED by internal-temperatures.html's own table header
+    # ("After ~15 min rest"), so the timings page can default its rest box
+    # to the figure this data already publishes rather than to a round 20 that
+    # nobody wrote down. Only the four proteins whose rest time is actually
+    # stated carry this -- chicken, turkey, duck and ham have no published
+    # figure, and the page falls back rather than inventing one.
+    rest_min: 15
     carryover: "3–4°C"
+    carryover_min: 3
+    carryover_max: 4
     doneness:
-      rare: { pull: "50–52°C", rested: "~54–56°C" }
-      medium_rare: { pull: "54–57°C", rested: "~58–60°C" }
-      medium: { pull: "60–63°C", rested: "~63–65°C" }
-      well_done: { pull: "68–70°C", rested: "~71–72°C" }
+      rare:
+        pull: "50–52°C"
+        pull_min: 50
+        pull_max: 52
+        rested: "~54–56°C"
+        rested_min: 54
+        rested_max: 56
+      medium_rare:
+        pull: "54–57°C"
+        pull_min: 54
+        pull_max: 57
+        rested: "~58–60°C"
+        rested_min: 58
+        rested_max: 60
+      medium:
+        pull: "60–63°C"
+        pull_min: 60
+        pull_max: 63
+        rested: "~63–65°C"
+        rested_min: 63
+        rested_max: 65
+      well_done:
+        pull: "68–70°C"
+        pull_min: 68
+        pull_max: 70
+        rested: "~71–72°C"
+        rested_min: 71
+        rested_max: 72
   slow_cooked:
     tender_at: "90–95°C"
+    tender_at_min: 90
+    tender_at_max: 95
 
 ham:
   fresh:
     carryover: "3–4°C"
+    carryover_min: 3
+    carryover_max: 4
     doneness:
-      hint_of_pink: { pull: "60–62°C", rested: "~63–65°C" }
-      well_done: { pull: "68–70°C" }
+      hint_of_pink:
+        pull: "60–62°C"
+        pull_min: 60
+        pull_max: 62
+        rested: "~63–65°C"
+        rested_min: 63
+        rested_max: 65
+      well_done:
+        pull: "68–70°C"
+        pull_min: 68
+        pull_max: 70
     safety_note: "FOOD SAFETY: same issue as pork's medium doneness above (a fresh ham is pork leg) — 60–62°C doesn't clear the FSA's pork-specific core-temperature equivalence table (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec, held not passed-through). The well-done option (68–70°C) is the one that clears FSA guidance unambiguously. Flagging, not changing the hint-of-pink figure. Checked once, 2026-08-12 — remove once you've made your own call."
   cured:
     carryover: "3–4°C"
+    carryover_min: 3
+    carryover_max: 4
     target: "70–75°C at the thickest point"
+    target_min: 70
+    target_max: 75
     caveat: "Cured ham labelling varies a lot (unsmoked vs smoked, wet vs dry-cured, cook-before-eating vs ready-to-eat) — check packaging instructions against the thermometer reading rather than relying on this figure alone."
     sources: "Waitrose targets 75°C; FSA's general reference point is 70°C. Corrected 2026-08-12 from an original 68–72°C, which sat a little under both. Checked once — remove once confirmed."
 
 steak:
   carryover: "2–3°C"
+  carryover_min: 2
+  carryover_max: 3
   doneness:
-    blue_rare: { pull: "46–49°C", rested: "~49–50°C", description: "Cool red centre, barely warmed" }
-    rare: { pull: "50–52°C", rested: "~52–54°C", description: "Red centre, cool-warm" }
-    medium_rare: { pull: "54–57°C", rested: "~57–59°C", description: "Warm red-pink centre" }
-    medium: { pull: "60–63°C", rested: "~63–65°C", description: "Pink centre" }
-    medium_well: { pull: "65–68°C", rested: "~68–70°C", description: "Slight pink, mostly grey-brown" }
-    well_done: { pull: "70°C+", rested: "~72–74°C", description: "No pink" }
+    blue_rare:
+      pull: "46–49°C"
+      pull_min: 46
+      pull_max: 49
+      rested: "~49–50°C"
+      rested_min: 49
+      rested_max: 50
+      description: "Cool red centre, barely warmed"
+    rare:
+      pull: "50–52°C"
+      pull_min: 50
+      pull_max: 52
+      rested: "~52–54°C"
+      rested_min: 52
+      rested_max: 54
+      description: "Red centre, cool-warm"
+    medium_rare:
+      pull: "54–57°C"
+      pull_min: 54
+      pull_max: 57
+      rested: "~57–59°C"
+      rested_min: 57
+      rested_max: 59
+      description: "Warm red-pink centre"
+    medium:
+      pull: "60–63°C"
+      pull_min: 60
+      pull_max: 63
+      rested: "~63–65°C"
+      rested_min: 63
+      rested_max: 65
+      description: "Pink centre"
+    medium_well:
+      pull: "65–68°C"
+      pull_min: 65
+      pull_max: 68
+      rested: "~68–70°C"
+      rested_min: 68
+      rested_max: 70
+      description: "Slight pink, mostly grey-brown"
+    well_done:
+      pull: "70°C+"
+      pull_min: 70
+      pull_max: 70
+      # The one open-ended figure in the file. "70°C+" has no upper bound, so
+      # pull_max repeats pull_min and this flag is what stops a consumer
+      # drawing it as a range that stops at 70 -- the charts render an open
+      # end instead. Any future "X°C+" needs the same flag; the guard test
+      # checks the flag matches the string rather than trusting either alone.
+      pull_open: true
+      rested: "~72–74°C"
+      rested_min: 72
+      rested_max: 74
+      description: "No pink"
 
 # Only salmon and tuna get a doneness spectrum. Everything else on the
 # cooking-methods page (cod, haddock, sea bass, sea bream, trout, mackerel,
@@ -122,23 +306,80 @@ steak:
 fish:
   general:
     endpoint: "~63°C, opaque and flaking"
+    endpoint_min: 63
+    endpoint_max: 63
     carryover: "1–2°C"
+    carryover_min: 1
+    carryover_max: 2
     note: "The FSA/USDA food-safety benchmark for fish generally, and where most fish are conventionally taken in UK home cooking. cooking-methods.html's own rule of thumb used to say ~55–60°C, which sits below this and reflects chef/texture preference (many pull salmon and similar fish lower for a moister result) rather than the safety endpoint — both pages now say the same thing, reconciled 2026-08-12."
     sources: "USDA FSIS: 145°F/62.8°C. UK FSA points to ~63°C as the standard fish safety benchmark. Checked once — remove this note once you've confirmed it yourself."
   salmon:
     carryover: "1–2°C"
+    carryover_min: 1
+    carryover_max: 2
     doneness:
-      rare: { pull: "43–49°C", rested: "~45–50°C", description: "Very soft, translucent centre — sushi-grade fish only" }
-      medium_rare: { pull: "49–52°C", rested: "~50–54°C", description: "Slightly opaque, soft, still moist — a common restaurant 'just cooked' salmon" }
-      medium: { pull: "52–57°C", rested: "~54–59°C", description: "Flaky and moist — the most commonly recommended sweet spot" }
-      medium_well: { pull: "57–60°C", rested: "~59–62°C", description: "Firmer, lighter pink centre, less moist" }
-      well_done: { pull: "60–63°C", rested: "~62–65°C", description: "Fully opaque, creamy white throughout — clears the FSA/USDA ~63°C benchmark" }
+      rare:
+        pull: "43–49°C"
+        pull_min: 43
+        pull_max: 49
+        rested: "~45–50°C"
+        rested_min: 45
+        rested_max: 50
+        description: "Very soft, translucent centre — sushi-grade fish only"
+      medium_rare:
+        pull: "49–52°C"
+        pull_min: 49
+        pull_max: 52
+        rested: "~50–54°C"
+        rested_min: 50
+        rested_max: 54
+        description: "Slightly opaque, soft, still moist — a common restaurant 'just cooked' salmon"
+      medium:
+        pull: "52–57°C"
+        pull_min: 52
+        pull_max: 57
+        rested: "~54–59°C"
+        rested_min: 54
+        rested_max: 59
+        description: "Flaky and moist — the most commonly recommended sweet spot"
+      medium_well:
+        pull: "57–60°C"
+        pull_min: 57
+        pull_max: 60
+        rested: "~59–62°C"
+        rested_min: 59
+        rested_max: 62
+        description: "Firmer, lighter pink centre, less moist"
+      well_done:
+        pull: "60–63°C"
+        pull_min: 60
+        pull_max: 63
+        rested: "~62–65°C"
+        rested_min: 62
+        rested_max: 65
+        description: "Fully opaque, creamy white throughout — clears the FSA/USDA ~63°C benchmark"
     safety_note: "Farmed salmon (most UK supermarket salmon) carries negligible parasite risk per FSA/EFSA and doesn't need pre-freezing to eat rare. Wild-caught salmon is the case where freezing first genuinely matters if serving it under well-done."
   tuna:
     carryover: "Often larger than other fish, given how hot the sear usually is — pull 5–10°C below the target, more towards the low end for a very hot pan."
     doneness:
-      blue_rare: { pull: "38–41°C", description: "Seared exterior only, cool centre — essentially raw within" }
-      rare: { pull: "43–46°C", description: "Warm red centre — the standard way to serve a seared tuna steak" }
-      medium_rare: { pull: "49–52°C", description: "Pink centre, still soft" }
-      well_done: { pull: "60–65°C", description: "Cooked through, dry and firm — not traditional for tuna, but the figure to use for no pink at all" }
+      blue_rare:
+        pull: "38–41°C"
+        pull_min: 38
+        pull_max: 41
+        description: "Seared exterior only, cool centre — essentially raw within"
+      rare:
+        pull: "43–46°C"
+        pull_min: 43
+        pull_max: 46
+        description: "Warm red centre — the standard way to serve a seared tuna steak"
+      medium_rare:
+        pull: "49–52°C"
+        pull_min: 49
+        pull_max: 52
+        description: "Pink centre, still soft"
+      well_done:
+        pull: "60–65°C"
+        pull_min: 60
+        pull_max: 65
+        description: "Cooked through, dry and firm — not traditional for tuna, but the figure to use for no pink at all"
     safety_note: "Standard for sushi-grade tuna, which is typically previously frozen to kill parasites — a supplier/labelling fact, not something a thermometer confirms. Buy from a source that states it, same as for any fish eaten raw or rare."

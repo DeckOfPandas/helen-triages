@@ -1,0 +1,42 @@
+{% comment %}
+  One summary row for the "everything, one scale" view: a single bar spanning a
+  protein's whole served range, from its coolest pull to its hottest rested
+  figure.
+
+  Parameters
+    label     the protein's name
+    doneness  a doneness hash from _data/food/internal_temperatures.yml
+    tip       hover text
+
+  WHY THIS ISN'T `| map: "pull_min" | sort | first`, WHICH IS THE OBVIOUS WAY.
+  `doneness` is a HASH, and iterating a hash in Liquid yields [key, value]
+  PAIRS — so `map: "pull_min"` asks a two-element array for a property it
+  doesn't have and quietly returns a list of nils. `sort | first` on that gives
+  nil, the coordinate renders as `--a:;`, and the bar silently collapses. It
+  fails without erroring, which is the worst kind, and it was written that way
+  here first before the rendered output gave it away.
+  Looping over the pairs and comparing lvl[1] is the version that works.
+
+  Computed rather than typed so that adding a doneness level upstream reshapes
+  this bar too — the summary can't drift from the detail above it.
+{% endcomment %}
+
+{% assign lo = 999 %}
+{% assign hi = 0 %}
+{% for lvl in include.doneness %}
+  {% if lvl[1].pull_min and lvl[1].pull_min < lo %}{% assign lo = lvl[1].pull_min %}{% endif %}
+  {% if lvl[1].rested_max and lvl[1].rested_max > hi %}{% assign hi = lvl[1].rested_max %}{% endif %}
+  {% comment %} Tuna has pull figures but no rested ones — fall back to the pull
+     ceiling so its bar still reaches its own hottest level. {% endcomment %}
+  {% if lvl[1].pull_max and lvl[1].pull_max > hi %}{% assign hi = lvl[1].pull_max %}{% endif %}
+{% endfor %}
+
+<div class="tc-row">
+  <div class="tc-row-label">{{ include.label }}</div>
+  <div class="tc-track">
+    <div class="tc-pull" style="--a:{{ lo }}; --b:{{ hi }};"></div>
+    <div class="tc-value" style="--b:{{ hi }};">{{ lo }}–{{ hi }}°C</div>
+    <div class="tc-hit" tabindex="0" style="--a:{{ lo }}; --b:{{ hi }};"
+         data-tip="{{ include.label }}: {{ lo }}–{{ hi }}°C across every doneness level in the data.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
+  </div>
+</div>
