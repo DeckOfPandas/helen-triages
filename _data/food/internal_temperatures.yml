@@ -138,6 +138,20 @@ beef:
 
 pork:
   roasting:
+    # THE SAFETY THRESHOLD, as a figure rather than as prose. Every chart that
+    # draws this spectrum shades everything below it and labels the line, so a
+    # doneness level that doesn't clear the cited guidance can't be presented as
+    # an unqualified option.
+    #
+    # Added 2026-08-14 after the recipe-page chart shipped WITHOUT the shading:
+    # teriyaki salmon offered "rare, out at 43–49°C" with nothing to say that
+    # four of its five levels sit under the FSA benchmark. The reference page had
+    # the zone; the recipe page -- the one you actually cook from -- did not. It
+    # had been a hard-coded --t: on the charts page, which is why it couldn't
+    # travel.
+    safety_min: 70
+    safety_label: "FSA pork 70°C"
+    safety_summary: "FSA wants pork held at 70°C for 2 minutes — held, not passed through as it cools. Only well done clears it."
     # Which section of the temperature charts holds this spectrum, so a
     # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: pork
@@ -227,6 +241,20 @@ lamb:
 
 ham:
   fresh:
+    # THE SAFETY THRESHOLD, as a figure rather than as prose. Every chart that
+    # draws this spectrum shades everything below it and labels the line, so a
+    # doneness level that doesn't clear the cited guidance can't be presented as
+    # an unqualified option.
+    #
+    # Added 2026-08-14 after the recipe-page chart shipped WITHOUT the shading:
+    # teriyaki salmon offered "rare, out at 43–49°C" with nothing to say that
+    # four of its five levels sit under the FSA benchmark. The reference page had
+    # the zone; the recipe page -- the one you actually cook from -- did not. It
+    # had been a hard-coded --t: on the charts page, which is why it couldn't
+    # travel.
+    safety_min: 70
+    safety_label: "FSA pork 70°C"
+    safety_summary: "A fresh ham is pork leg, so the same FSA figures apply: held at 70°C for 2 minutes, not passed through. Only well done clears it."
     # Which section of the temperature charts holds this spectrum, so a
     # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: ham
@@ -338,6 +366,20 @@ fish:
     note: "The FSA/USDA food-safety benchmark for fish generally, and where most fish are conventionally taken in UK home cooking. cooking-methods.html's own rule of thumb used to say ~55–60°C, which sits below this and reflects chef/texture preference (many pull salmon and similar fish lower for a moister result) rather than the safety endpoint — both pages now say the same thing, reconciled 2026-08-12."
     sources: "USDA FSIS: 145°F/62.8°C. UK FSA points to ~63°C as the standard fish safety benchmark. Checked once — remove this note once you've confirmed it yourself."
   salmon:
+    # THE SAFETY THRESHOLD, as a figure rather than as prose. Every chart that
+    # draws this spectrum shades everything below it and labels the line, so a
+    # doneness level that doesn't clear the cited guidance can't be presented as
+    # an unqualified option.
+    #
+    # Added 2026-08-14 after the recipe-page chart shipped WITHOUT the shading:
+    # teriyaki salmon offered "rare, out at 43–49°C" with nothing to say that
+    # four of its five levels sit under the FSA benchmark. The reference page had
+    # the zone; the recipe page -- the one you actually cook from -- did not. It
+    # had been a hard-coded --t: on the charts page, which is why it couldn't
+    # travel.
+    safety_min: 63
+    safety_label: "FSA/USDA 63°C"
+    safety_summary: "FSA advice is a minimum serving temperature of 63°C — only well done clears it."
     # Which section of the temperature charts holds this spectrum, so a
     # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: fish-salmon

@@ -635,3 +635,87 @@ def test_temperatures_written_into_method_text_match_the_data(internal_temperatu
                     )
 
     assert not problems, "\n  ".join(problems)
+
+
+# The three nodes whose doneness levels include figures that do NOT clear the
+# guidance cited for them. Named explicitly rather than inferred: this is a
+# specification, not a heuristic, and it is the list that decides whether a
+# chart warns anybody.
+#
+# Beef, lamb and steak are deliberately absent -- UK guidance treats pink beef
+# and lamb as fine, so there is no line to draw. Tuna has a safety_note about
+# parasites and sourcing, which a thermometer can't confirm and a threshold on a
+# temperature axis can't express.
+SAFETY_THRESHOLDS = {
+    ("fish", "salmon"): 63,
+    ("pork", "roasting"): 70,
+    ("ham", "fresh"): 70,
+}
+
+
+def test_hazardous_spectra_carry_a_drawable_threshold(internal_temperatures):
+    """A doneness level below the cited guidance must never render unqualified.
+
+    THIS IS A REAL FAILURE, not a hypothetical. The recipe-page chart shipped
+    without the shading on 2026-08-14, on the reasoning that the reference page
+    had room to explain it. Teriyaki salmon then offered "rare, out at 43–49°C"
+    as one of five equal options, with nothing anywhere on the page to say that
+    four of the five sit under the FSA benchmark. Helen caught it.
+
+    The threshold was a hard-coded `--t:63` in the charts page's markup, which is
+    exactly why it couldn't travel to the second chart that needed it. It is a
+    figure on the node now, so anything drawing that node draws the warning.
+    """
+    missing = []
+    for path, expected in SAFETY_THRESHOLDS.items():
+        node = internal_temperatures
+        for key in path:
+            node = node.get(key, {})
+        ref = ".".join(path)
+        if node.get("safety_min") != expected:
+            missing.append(f"{ref}: safety_min is {node.get('safety_min')!r}, expected {expected}")
+        if not node.get("safety_label"):
+            missing.append(f"{ref}: no safety_label, so the line would be unlabelled")
+        if not node.get("safety_summary"):
+            missing.append(f"{ref}: no safety_summary — shading says 'below the line' "
+                           f"but not which levels clear it")
+    assert not missing, "\n  ".join(missing)
+
+
+def test_a_threshold_actually_excludes_something(internal_temperatures):
+    """A threshold no level falls below is decoration, and worse, it implies the
+    page checked and found nothing wrong. Each of the three must genuinely
+    exclude at least one doneness level, and must genuinely leave at least one
+    clearing it — a line everything fails is a broken figure, not a warning.
+    """
+    def reaches(spec):
+        """The highest temperature this level actually gets to.
+
+        "Clears the guidance" is a claim about the temperature the food REACHES,
+        not the one you take it out at -- salmon's well done comes out at
+        60–63°C and rests to 65, and it is the 65 that clears the 63 benchmark.
+        Comparing out-at figures instead said no salmon doneness clears it at
+        all, which is both wrong and the kind of wrong that would have had
+        someone "fix" the threshold rather than the test.
+
+        (Pork is the case where reaching isn't sufficient -- FSA's table is
+        about temperature HELD, not passed through on the way down. That is why
+        its safety_summary says so in words: a single figure can't express it,
+        and this test isn't trying to.)"""
+        return max(spec.get("rested_max") or 0, spec.get("pull_max") or 0)
+
+    problems = []
+    for path in SAFETY_THRESHOLDS:
+        node = internal_temperatures
+        for key in path:
+            node = node.get(key, {})
+        limit = node.get("safety_min")
+        levels = node.get("doneness") or {}
+        below = [n for n, s in levels.items() if reaches(s) < limit]
+        clears = [n for n, s in levels.items() if reaches(s) >= limit]
+        ref = ".".join(path)
+        if not below:
+            problems.append(f"{ref}: nothing falls below {limit}°C — why is the line there?")
+        if not clears:
+            problems.append(f"{ref}: NO level clears {limit}°C — the figure or the levels are wrong")
+    assert not problems, "\n  ".join(problems)

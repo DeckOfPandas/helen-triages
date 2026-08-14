@@ -396,3 +396,14 @@ $tc-label-gap: $space-xl;
   color: $color-recipe-link;
   line-height: 1.2;
 }
+
+// The threshold in words as well as in shading. A hatch can say "below the
+// line"; it can't say which levels clear it, or whose figure it is. On a recipe
+// page that second half matters more than on a reference page, because this is
+// the chart someone reads while deciding what to do with a fish.
+.doneness-safety {
+  font-size: 0.82rem;
+  color: $color-text;
+  margin: $space-md 0 0 0;
+  max-width: 62ch;
+}

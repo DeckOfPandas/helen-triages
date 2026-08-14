@@ -23,6 +23,17 @@
   <div class="doneness">
     <div class="tc">
       <div class="tc-plot">
+        {% comment %} THE SHADED ZONE IS NOT OPTIONAL ON A RECIPE PAGE. It was
+           left off when this chart shipped, on the reasoning that the reference
+           page had room to explain it -- which was wrong, and wrong in the one
+           direction that matters: teriyaki salmon then offered "rare, out at
+           43–49°C" as an unqualified choice, with nothing saying that four of
+           its five levels sit below the FSA benchmark. A chart you cook from
+           has to carry its own warning. {% endcomment %}
+        {% if include.node.safety_min %}
+          <div class="tc-unsafe" style="--t:{{ include.node.safety_min }};"></div>
+          <div class="tc-threshold-label" style="--t:{{ include.node.safety_min }};">{{ include.node.safety_label }} &rarr;</div>
+        {% endif %}
         {% comment %} A single-figure node (a tough cut, a whole bird, cured
            ham) draws one row rather than nothing. It has no doneness to choose
            between -- that is the fact -- but it still has a figure, and since
@@ -61,8 +72,15 @@
         {% if level[1].rested_min %}{% assign _rested = true %}{% endif %}
         {% if level[1].rested_min and level[1].rested_min > level[1].pull_max %}{% assign _carry = true %}{% endif %}
       {% endfor %}
-      {% include food/temp_key.html rested=_rested carry=_carry %}
+      {% include food/temp_key.html rested=_rested carry=_carry unsafe=include.node.safety_min %}
     {% endif %}
+    {% comment %} And in words as well as in shading -- a hatch says "below the
+       line", it can't say which levels clear it or what the figure is for.
+       {% endcomment %}
+    {% if include.node.safety_summary %}
+      <p class="doneness-safety">{{ include.node.safety_summary }}</p>
+    {% endif %}
+
     {% assign _anchor = include.node.chart_anchor | default: include.single.chart_anchor %}
     {% if _anchor %}
       <p class="doneness-more"><a href="{{ '/food/reference-demo/temperature-charts/' | relative_url }}#{{ _anchor }}">more {% if _anchor contains "fish" %}fish{% else %}meat{% endif %} temperatures</a></p>

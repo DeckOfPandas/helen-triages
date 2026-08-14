@@ -119,8 +119,8 @@ sitemap: false
     {% include food/temp_key.html rested=true unsafe=true %}
     <div class="tc">
       <div class="tc-plot">
-        <div class="tc-unsafe" style="--t:{{ t.fish.general.endpoint_min }};"></div>
-        <div class="tc-threshold-label" style="--t:{{ t.fish.general.endpoint_min }};">FSA/USDA {{ t.fish.general.endpoint_min }}°C &rarr;</div>
+        <div class="tc-unsafe" style="--t:{{ t.fish.salmon.safety_min }};"></div>
+        <div class="tc-threshold-label" style="--t:{{ t.fish.salmon.safety_min }};">{{ t.fish.salmon.safety_label }} &rarr;</div>
         {% for level in t.fish.salmon.doneness %}
           {% comment %} spec is assigned first because Jekyll's include tag
              rejects bracket indexing in a parameter -- `spec=level[1]` is a
@@ -140,8 +140,8 @@ sitemap: false
     {% include food/temp_key.html rested=true unsafe=true %}
     <div class="tc">
       <div class="tc-plot">
-        <div class="tc-unsafe" style="--t:70;"></div>
-        <div class="tc-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
+        <div class="tc-unsafe" style="--t:{{ t.ham.fresh.safety_min }};"></div>
+        <div class="tc-threshold-label" style="--t:{{ t.ham.fresh.safety_min }};">{{ t.ham.fresh.safety_label }} &rarr;</div>
         {% for level in t.ham.fresh.doneness %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
@@ -182,8 +182,8 @@ sitemap: false
            they've cooked. Here the shading says it before the sentence does --
            and note that medium's RESTED figure clears nothing either, because
            FSA's table is about temperature HELD, not passed through. {% endcomment %}
-        <div class="tc-unsafe" style="--t:70;"></div>
-        <div class="tc-threshold-label" style="--t:70;">FSA pork 70°C &rarr;</div>
+        <div class="tc-unsafe" style="--t:{{ t.pork.roasting.safety_min }};"></div>
+        <div class="tc-threshold-label" style="--t:{{ t.pork.roasting.safety_min }};">{{ t.pork.roasting.safety_label }} &rarr;</div>
         {% for level in t.pork.roasting.doneness %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
