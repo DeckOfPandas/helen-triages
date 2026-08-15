@@ -49,6 +49,7 @@ main {
 
 
 .site-header {
+  position: relative;   // anchors .site-header-inner's inset:0, below
   padding: $space-xl;
   border-bottom: 1px solid $color-border;
   background: $color-surface;
@@ -65,26 +66,49 @@ main {
 
 // .site-header itself is edge-to-edge, full viewport width -- it has no
 // content column of its own to align anything against. This shares main's
-// own max-width/margin:auto formula so the "?" lines up with the right
+// own max-width/margin:auto formula so the nav lines up with the right
 // edge of the actual content column beneath it, at every viewport width,
 // not just a fixed offset from the header's own edge.
+//
+// STRETCHED TO THE FULL HEADER HEIGHT, on purpose -- Helen wants the nav row
+// at the BOTTOM of the header now, not the top, and .site-header-inner used
+// to be a normal in-flow block sitting before the logo with no height of its
+// own (its only child was position:absolute, so it contributed nothing to
+// flow), which meant "bottom:0" and "top:0" resolved to the same point. Making
+// this itself position:absolute with inset:0 gives it the header's FULL
+// height -- .site-header needs position:relative for that to resolve against
+// it rather than the page -- while max-width/margin:auto still cap and centre
+// it to the content column exactly as before. .site-header's own $space-xl
+// padding is respected automatically: inset:0 on an absolutely positioned
+// child sits against the containing block's PADDING edge, not its outer edge.
+//
+// pointer-events:none is load-bearing. This box now overlaps the wordmark
+// below it, and an absolutely positioned box paints (and hit-tests) above
+// static in-flow content regardless of DOM order -- without this, the empty
+// area around the nav would swallow clicks meant for .site-title-link. auto
+// on .site-nav-icons hands hit-testing back for the row that actually needs it.
 .site-header-inner {
+  position: absolute;
+  inset: 0;
   max-width: $width-content;
   margin: 0 auto;
-  position: relative;
+  pointer-events: none;
 }
 
 // Header nav row -- home icon, sibling-site switch icon, about link, in that
 // order (see default.html's own comment). Absolutely positioned as a group
 // against .site-header-inner rather than each child positioning itself, so
-// they lay out left-to-right as one row pinned to the top-right corner.
+// they lay out left-to-right as one row pinned to the bottom-right corner
+// (was top-right -- Helen's ask). Gap trimmed alongside the smaller icon
+// size below, so the row still reads as snug rather than sparse.
 .site-nav-icons {
   position: absolute;
-  top: 0;
+  bottom: 0;
   right: 0;
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.5rem;
+  pointer-events: auto;
 }
 
 // Shared link styling for every item in the nav row -- icons and the "??"
@@ -107,13 +131,14 @@ main {
 }
 
 // Every icon partial under _includes/icons/ drops its own width/height so
-// this is the one place icon size is decided -- currently 36px, Helen's
-// call. Height-only: each icon keeps its own natural aspect ratio (the
+// this is the one place icon size is decided -- was 36px, shrunk to 22px
+// alongside the move to the bottom of the header (Helen's ask: smaller, and
+// lower). Height-only: each icon keeps its own natural aspect ratio (the
 // cloche is wider than tall, the martini taller than wide) rather than
 // being squashed into a square.
 .nav-icon {
   display: block;
-  height: 36px;
+  height: 22px;
   width: auto;
 }
 
@@ -122,11 +147,20 @@ main {
 // own title ("???") echoes the same instinct. Deliberately bare -- Helen:
 // "much more minimalist... a naked ? in body font and style" -- no circle,
 // no border, no heading font: just a character sitting quietly in the row,
-// in the page's own body font. Now "??", still Helen's call.
+// in the page's own body font. Now "??", still Helen's call. Shrunk from
+// 1.1rem to 0.8rem alongside the icons above, for the same reason.
+//
+// letter-spacing: normal is load-bearing, not decorative -- .site-header
+// carries 0.5em (meant for the all-caps wordmark elsewhere in the header)
+// and this link inherits it same as everything else in .site-header, which
+// on a two-character glyph like "??" reads as a huge gap between the two
+// question marks. Nothing else in the nav row needed this reset because
+// nothing else in the row is text -- the icons ignore letter-spacing entirely.
 .site-about-link {
   font-family: $font-body;
-  font-size: 1.1rem;
+  font-size: 0.8rem;
   font-weight: 400;
+  letter-spacing: normal;
 }
 
 .site-footer {
@@ -196,6 +230,24 @@ $tape-protrusion: 0.2rem;
   font-size: 2rem;
   font-weight: 1000;
   letter-spacing: 0.18em;
+  // Cancels the trailing letter-spacing gap `letter-spacing` adds after the
+  // LAST character too (the same trap food/_rule.scss's own inset comment
+  // documents) -- without this, HELEN TRIAGES's own box (width:max-content,
+  // above) is 0.18em wider than its visible glyphs, so justify-items:center
+  // on .site-logo centres that phantom trailing space along with the text,
+  // and the actual lettering sits visibly left of true centre. Helen spotted
+  // this by eye: "HELEN TRIAGES... not centred over [ FOOD ]."
+  //
+  // .site-logo-tape doesn't need the same fix -- its own trailing character
+  // is the closing "]", inside .site-logo-bracket, which already resets
+  // letter-spacing to 0 (see that rule below) for unrelated reasons and
+  // happens to leave that row with no phantom space to begin with. That
+  // asymmetry -- one row corrected, one row never broken -- is what made the
+  // two rows visibly disagree; margin, not padding, because padding here
+  // would ADD width instead of cancelling it (see .site-logo-top's own
+  // comment on cocktails, where padding-right made a mismatch worse, not
+  // better).
+  margin-right: -0.18em;
   color: $color-text;
   // Brought onto $emboss-stroke 2026-08-12 with every other heading on the
   // site. THIS IS THE CHANGE HERE MOST LIKELY TO WANT REVERTING, so: it was
