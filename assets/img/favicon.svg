@@ -1,8 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Helen Triages Food">
-  <!-- White H on black, issue #197. No brackets — the issue's own fallback,
-       taken deliberately: the wordmark's "[ H ]" brackets are thin strokes
-       that would turn to mud at 16-32px favicon sizes, same reasoning this
-       file's previous comment already gave for staying plain. Replace freely. -->
-  <rect width="64" height="64" rx="10" fill="#000000"/>
-  <path d="M18 14h7v14h14V14h7v36h-7V35H25v15h-7z" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Helen Triages">
+  <!-- Black H on white, issue #219 (inverted from the original white-on-black,
+       issue #197). No brackets — the issue's own fallback, taken deliberately:
+       the wordmark's "[ H ]" brackets are thin strokes that would turn to mud
+       at 16-32px favicon sizes, same reasoning this file's previous comment
+       already gave for staying plain. Replace freely. -->
+  <rect width="64" height="64" rx="10" fill="#FFFFFF"/>
+  <path d="M18 14h7v14h14V14h7v36h-7V35H25v15h-7z" fill="#000000"/>
 </svg>
