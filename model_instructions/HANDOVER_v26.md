@@ -85,16 +85,16 @@ _cocktail_recipes/   output: true    permalink /cocktails/recipes/:path/
 
 _layouts/     default.html (shared)   recipe.html (food)   cocktail.html (cocktails)
 _includes/    filter_group.html   recipe_badges.html
-_sass/        shared/{_tokens,_base,_layout}   food/   cocktails/   root/
+_sass/        shared/{_tokens,_base,_layout}   food/   cocktails/
 _data/        sites.yml   accented_words.yml   food/*.yml   cocktails/taxonomy.yml
-assets/css/   food.scss   cocktails.scss   root.scss
+assets/css/   food.scss   cocktails.scss
 assets/img/   favicon.svg   food/   cocktails/
 assets/js/    (shared — every script is site-agnostic)
 
 food/index.html        permalink /food/
 food/reference/*.html  permalink /food/reference/...   see §14
 cocktails/index.html   permalink /cocktails/
-index.html              permalink /        the landing page
+index.html              permalink /        a bare redirect to /food/
 ```
 
 `food/` and `cocktails/` hold each site's **pages**, not their collections.
@@ -129,13 +129,26 @@ the shared wordmark started using it; see §13.8); `_data/accented_words.yml`
 (house style, applies to cocktails too); `assets/js/*` (no script knows which
 site it's on); `assets/img/favicon.svg`.
 
-**Three stylesheets consume `shared/`, not two.** `assets/css/food.scss` and
-`cocktails.scss` are the obvious pair, but `root.scss` (the landing page,
-belonging to neither site) imports `shared/_layout.scss` as well. Add
-anything shared/`_layout.scss` depends on — a mixin, most likely — to
-`food.scss` and `cocktails.scss` and it's easy to forget `root.scss` exists
-at all. It does; a missing import there breaks the landing page specifically,
-which is easy to not notice you haven't visited.
+**Two stylesheets consume `shared/`, and that is now the whole list.**
+`assets/css/food.scss` and `cocktails.scss`. Add anything
+`shared/_layout.scss` depends on — a mixin, most likely — to both.
+
+**This used to be three, and the third was a genuine trap** worth knowing
+about because it is the shape of the problem rather than the specific file:
+`root.scss` styled the two-door landing page at `/`, belonged to neither
+site, and was therefore the one nobody thought to check. It broke exactly
+that way once, when the punched-tape mixin moved into `shared/_rule.scss`
+(§13.4.1) and the first pass updated food and cocktails only. A stylesheet
+that compiles for the two sites you look at and fails for the one you never
+visit fails silently until someone visits it.
+
+It is gone as of 2026-08-15, issue #204: the landing page is now a bare
+redirect to `/food/` with no layout and no stylesheet, so `root.scss` and
+`_sass/root/` were deleted with it and `PALETTE_OWNERS` in
+`test_site_config.py` is down to two. **The general lesson survives the
+specific file**: grep for every `@import "shared/` site before assuming you
+have covered them all, because the count is a fact about the repo today and
+not a constant.
 
 **Forked**, because cocktails is philosophically distinct, not a reskin:
 `_layouts/recipe.html` vs `cocktail.html` (food is a procedure — steps,
@@ -159,8 +172,13 @@ by name.
 
 `_config.yml`'s `defaults:` sets `site_key` per collection/directory. It keys
 into `_data/sites.yml` (title, wordmark, stylesheet, `home`, decoration) and
-`_data/<key>/` (vocabulary). A page with no `site_key` belongs to neither site
-— the landing page, which falls back to repo-level `title`/`description`.
+`_data/<key>/` (vocabulary). A page with no `site_key` belongs to neither
+site. **As of 2026-08-15 no such page exists** — the landing page that used
+to be the one example is now a bare redirect (§2.1) with no layout at all,
+so it never reaches this lookup. `default.html`'s fallback branch went with
+it: a future page with no `site_key` gets the repo-level
+`title`/`description` and **no stylesheet**, which is a thing to know before
+adding one rather than to discover afterwards.
 
 **Decoration is opt-in, absence is silent.** Food has `tape`/`tape_count`/
 `footer_svg` in `sites.yml`; cocktails has `tape` (a placeholder, see §9) but
@@ -508,9 +526,14 @@ or make a judgement? `1/2` → `½` does neither.
 
 ## 6. `main_ingredients`
 
-Unordered set in the data; ordering is presentation (`_data/food/
-common_ingredients.yml` sinks 34 pantry staples to the end, dimmed — exact,
-lowercase match, so `onion` demotes but `red onions` doesn't).
+Unordered set in the data; ordering is presentation (`_data/food/pantry.yml`
+sinks 34 pantry staples to the end, dimmed — exact, lowercase match, so
+`onion` demotes but `red onions` doesn't). **That file is a BARE LIST**, so
+the Liquid reads `site.data.food.pantry`, not `.pantry.pantry`: it was
+`common_ingredients.yml` wrapping a single `pantry:` key until 2026-08-15,
+issue #130, and the key was flattened out in the same pass rather than
+leave the rename reading badly. Adding a second top-level key means
+un-flattening this file and `food/index.html`'s `assign` together.
 
 **Sweet/baking — completeness test.** Everything whose absence breaks the
 recipe. No cap.
@@ -732,13 +755,15 @@ key doesn't need to change. See §13.8 for the sizing mechanism this feeds
 into, and the note at the top of `_sass/cocktails/_decoration.scss` for the
 same context in code.
 
-**Stale as of the 2026-08-10 tape redesign (§13.9): cocktails' copy is still
-the OLD 4-file set** (`tape_count: 4`), not the new 7-file one food shipped
-(`tape_count: 7`). Not an oversight to silently fix — copying the new set
-over is a real content decision (is food's redesigned artwork actually right
-as cocktails' placeholder, or should cocktails just stay on the old plainer
-files until it has its own?) that hasn't been asked yet — see §13.9's own
-closing note.
+**Cocktails is kept at PARITY with food's tape, deliberately** — Helen's
+call, 2026-08-15, issue #223. It drifted for five days after the
+2026-08-10 redesign (§13.9): food went to seven new files, cocktails sat
+on the old four, and nothing caught it except a note in this document.
+Both directories now hold the same seven and `tape_count: 7` on both.
+**Parity is the standing rule until cocktails has a visual language of
+its own** — regenerate food's set and copy it across in the same pass,
+rather than leaving them to drift again and relying on a handover note to
+notice.
 
 `tests/` is the FOOD suite (`conftest.py` says so). Cocktails gets its own
 test file once it has content to test against.
@@ -1160,17 +1185,22 @@ exists before anything else runs;
 `ingredient-search.js`/`recipe-list.js`-before-`filters.js` guards exist
 because this bit for real once, silently, for weeks.
 
-**You will forget `root.scss` exists when a shared partial gains a new
-dependency.** Three stylesheets import `shared/_layout.scss` —
-`food.scss`, `cocktails.scss`, and `root.scss` for the landing page, which
-belongs to neither site and is easy to not think about. Moving the
-punched-tape mixin into `shared/_rule.scss` (§13.8) needed a new `@import`
-added before `shared/_layout.scss` in all three; the first attempt updated
-food and cocktails and missed root, which doesn't fail loudly at compile
-time for the two you remembered — it fails the *next* time someone builds or
-visits the one you didn't, with a Sass error that names the mixin, not the
-missing import. Grep for every `@import "shared/` site before assuming
-you've covered all of them.
+**You will assume you know how many stylesheets import `shared/`.** Two, as
+of 2026-08-15 — `food.scss` and `cocktails.scss`. It was three until then,
+and the third is why this entry exists at all: `root.scss` styled the
+landing page, belonged to neither site, and was the one nobody thought
+about. Moving the punched-tape mixin into `shared/_rule.scss` (§13.8)
+needed a new `@import` before `shared/_layout.scss` in all three; the first
+attempt updated food and cocktails and missed root, which doesn't fail
+loudly at compile time for the two you remembered — it fails the *next*
+time someone builds or visits the one you didn't, with a Sass error that
+names the mixin, not the missing import.
+
+`root.scss` was deleted with the landing page (§2.2, issue #204), so that
+specific trap cannot fire again. **Keep the habit anyway**: grep for every
+`@import "shared/` site before assuming you've covered them. The number is
+a fact about the repo on the day you read this, and it has already changed
+twice.
 
 **You will move a colour and strand the numbers tuned against it.** A number
 tuned for a colour belongs to the colour, not the place it happens to be —
@@ -1401,11 +1431,14 @@ mechanism, and the trap in it, aren't visible from the compiled CSS.
 **Where it lives.** The mixin is `@include punched($style: raised)`, defined
 in `_sass/shared/_rule.scss`. It moved there from `_sass/food/_rule.scss` on
 2026-08-02 when the wordmark started using it — the wordmark lives in
-`shared/_layout.scss`, which all three of `food.scss`, `cocktails.scss` AND
-`root.scss` (the landing page) compile, and a mixin must be defined before
-the partial that calls it, so a food-only file could no longer hold it (see
-§2.2's note on three stylesheets, not two — the landing page was missed on
-the first pass of this exact move). It depends only on `$color-bg` and
+`shared/_layout.scss`, which every site stylesheet compiles, and a mixin
+must be defined before the partial that calls it, so a food-only file could
+no longer hold it. (At the time that meant three stylesheets, and the third,
+`root.scss` for the landing page, was missed on the first pass of this exact
+move — the origin of §2.2's and §12's warnings. It is two now, and both
+those entries have been rewritten; the history is kept because the failure
+mode was about *counting* the consumers, not about that one file.) It
+depends only on `$color-bg` and
 `$color-text`, which the palette contract guarantees every site defines, so
 nothing about the mixin itself ever assumed food. Two arguments exist and are
 both live: `raised` (default) reads as embossed, light falling from the
@@ -1853,16 +1886,16 @@ produced each, for anyone regenerating or swapping just one:
 All generated with `marks_seed` unset (defaults to `seed`) — see
 `scripts/generate_tape.py`'s own `generate()` signature.
 
-**If you're picking this up next, two things were raised but not decided:**
+**Two things were raised here. One is settled, one is still open:**
 
-1. **Cocktails' tape placeholder is now stale.** `assets/img/cocktails/tape/`
-   still holds the OLD 4-file set (§9), not food's new 7. Copying food's
-   redesigned set over is a genuine content decision, not a mechanical
-   sync — is food's artwork actually right as cocktails' placeholder, or
-   should cocktails stay on the old plainer files until it has its own
-   visual language? **Ask Helen before touching it either way**, same as
-   any other cocktails content call (§9).
-2. **`decorations.js`'s `tape()` still picks one of the N SVGs at random on
+1. **SETTLED, 2026-08-15, issue #223: cocktails stays at parity with food.**
+   `assets/img/cocktails/tape/` held the OLD 4-file set for five days after
+   this redesign shipped. Helen's answer to "is food's artwork right as
+   cocktails' placeholder, or should cocktails stay plainer until it has
+   its own language" was parity — both directories now hold the same seven,
+   `tape_count: 7` on both, and copying across is part of regenerating
+   food's set rather than a separate decision to re-take. See §9.
+2. **STILL OPEN. `decorations.js`'s `tape()` picks one of the N SVGs at random on
    every page load** (`data-tape-count`). This is the exact pattern §13.1
    documents as tried and rejected for the recipe/index section marks — "an
    identical, repeated mark becomes something you recognise rather than
