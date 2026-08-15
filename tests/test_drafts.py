@@ -16,12 +16,18 @@ them than a published recipe does. Every one of these was seeded from a
 real bug found by hand in the drafts folder on 2026-08-11 — see the
 individual docstrings for which file(s) caught it.
 
-Two tests here are deliberately allowed to start red, the same "standing
+Two tests here were deliberately allowed to start red, the same "standing
 checklist, not a guard that's expected to be green" shape
-test_oven_temperature_says_fan (test_style.py) already uses: an undeclared
-retired star_ingredient value and a leftover CLAUDE marker both need
-Helen's own judgement to resolve, not a mechanical fix — don't go near
-either unprompted, same rule as test_oven_temperature_says_fan.
+test_oven_temperature_says_fan (test_style.py) used: an undeclared retired
+star_ingredient value and a leftover CLAUDE marker both needed Helen's own
+judgement to resolve, not a mechanical fix. Both backlogs have since been
+worked through and both tests are green — see their own docstrings below.
+A checklist that has gone green has become a regression guard: a failure
+in either one now is a real problem to investigate, not a known backlog to
+wave past. Don't go near a future violation unprompted all the same — the
+judgement call that made these unsuitable for a mechanical fix in the
+first place is still real, it's just that there's currently nothing
+outstanding to apply it to.
 
 Deliberately NOT ported here, and why — don't add these without asking:
 
@@ -369,11 +375,13 @@ def test_tags_are_declared(draft, taxonomy):
 
 
 def test_star_ingredient_is_declared(draft, taxonomy):
-    """Deliberately allowed to start red -- see module docstring. Currently
-    fails on 8 drafts using the retired `eggs` value; Helen chose 2026-08-11
+    """Was deliberately allowed to start red -- see module docstring. Used to
+    fail on 8 drafts using the retired `eggs` value; Helen chose 2026-08-11
     to review that list herself rather than have it fixed for her (a genuine
     egg-forward dish would earn the star back, which isn't a call to make
-    mechanically). Don't touch those 8 unprompted.
+    mechanically). That backlog is now cleared and this test is green -- a
+    failure here is a real regression to investigate, not a known gap. Don't
+    touch a future violation unprompted; it still needs Helen's own call.
 
     The other retired value, `something unusual`, doesn't get this same
     standing-checklist treatment: Helen confirmed 2026-08-12 there's nothing
@@ -428,10 +436,12 @@ def test_no_cook_tag_implies_no_cook_time(draft):
 
 
 def test_no_claude_markers_left(draft):
-    """Deliberately allowed to start red -- see module docstring. Currently
-    fails on schmaltzy-lentils-chicken-lemon.md, which asks Helen to verify
-    a chicken breasts-vs-thighs discrepancy before the note is deleted --
-    not something to action or remove unprompted.
+    """Was deliberately allowed to start red -- see module docstring. Used to
+    fail on schmaltzy-lentils-chicken-lemon.md, which asked Helen to verify
+    a chicken breasts-vs-thighs discrepancy before the note was deleted. That
+    has since been resolved and this test is green -- a failure here now is
+    a real regression to investigate, not a known gap. A future marker still
+    isn't something to action or remove unprompted.
     """
     markers = re.findall(r"[^\"\n]{0,10}\bCLAUDE\b[^\"\n]{0,40}", draft.raw)
     assert not markers, (
