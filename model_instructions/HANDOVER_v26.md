@@ -801,10 +801,15 @@ against the actual test code before touching a single value) · #169
 `short_name` removed entirely (zero template/JS/SCSS references found
 before removal; see §4).
 
-**Deliberately standing checklists, not guards expected to be green** (same
-shape as `test_oven_temperature_says_fan`, §10 above) — these need Helen's
-own source material or judgement, not a guess: `test_milk_specifies_type`
-(#167, 9 recipes, don't bulk-convert to "whole milk" blind).
+**`test_milk_specifies_type` was a standing checklist, not a guard expected
+to be green** (same shape as `test_oven_temperature_says_fan`, §10 above,
+and now in the same state) — issue #167's 9-recipe backlog has since been
+worked through, the test passes, and a failure in it going forward is a
+real regression, not a known gap. The reason it was never a candidate for
+a bulk fix is still live: which milk a recipe actually used needed Helen's
+own source material or judgement, not a guess — "whole milk" could not be
+assumed blind for every unspecified case. If it goes red again, the same
+rule applies: it needs her judgement, not a mechanical fill-in.
 
 **Retired 2026-08-12, Helen's explicit call, not fixed by filling in
 values**: `test_bake_eggs_state_a_weight` (#145's second half — a bake
@@ -878,14 +883,18 @@ used to live in this list are all resolved (the last batch fixed
 but that recipe was promoted out of drafts 2026-08-09, so the link is no
 longer to a draft.
 
-**`test_oven_temperature_says_fan` currently fails on ~19 recipes, standing,
-not a regression.** Issue #146: house style is fan-only, but each of these
-recipes has a temperature with no "fan" beside it, and fixing one means
-confirming from the *original source* which figure is the fan one — they
-aren't always in the same order in a fan/conventional pair (§5), so this
-can't be guessed or bulk-fixed from the file alone. Don't attempt these
-blind; they need Helen's source material or her direct confirmation,
-recipe by recipe.
+**`test_oven_temperature_says_fan` was a standing checklist, not a guard
+expected to be green, from issue #146 until the ~19-recipe backlog was
+worked through by hand — it passes now, and a failure in it is a real
+regression to investigate, not a known backlog to wave past.** The
+reasoning that made it a checklist rather than a bulk-fix in the first
+place is still live and still worth knowing: house style is fan-only, and
+fixing one of these recipes meant confirming from the *original source*
+which figure was the fan one — they aren't always in the same order in a
+fan/conventional pair (§5), so it could never have been guessed or
+bulk-fixed from the file alone. If this test goes red again, treat it the
+same way: don't attempt a fix blind, get Helen's source material or her
+direct confirmation, recipe by recipe.
 
 **Exactly three checks read `_food_drafts/`** — everything else is
 `_food_recipes/` only:
@@ -1871,93 +1880,178 @@ cross-recipe reference material" §4.1 mentions was hypothetical until now.
 
 ### What exists
 
-`food/reference/` — four pages: `index.html` plus `internal-temperatures.html`,
-`cooking-methods.html`, `sustainability.html`. Same `site_key: food`
-inheritance as every other page under `food/` (§2.4). Content ingested from
-15 draft tables in `_food_drafts/reference-info/` (chicken/turkey/goose/duck
-roasting, beef/pork/lamb/ham roasting and slow-cooking, steak, fish and
-shellfish cooking, fish and shellfish sustainability, meat carbon, nut
-milks) — the drafts are done; this section is about what they became.
+`food/reference/` holds three pages, not four: `temperatures.html`
+(permalink `/food/reference/temperatures/`, the charts), `timings.html`
+(permalink `/food/reference/timings/`, a weight → schedule calculator),
+and `cooking-methods.html`. There is no `index.html` — deleted 2026-08-15,
+issue #218 — so there is no `/food/reference/` landing page, and there is
+no top-level nav link into this layer at all: Helen's own call, made the
+same day, closed issue #213 as won't-do-for-now. **That is a decision to
+record, not a plan to build towards** — she may revisit it — but as things
+stand nothing on the site points a visitor at these three pages except a
+direct URL or a link from inside one of them.
 
-**Page pattern**: reuses `.recipe`/`.recipe-body-content`, the same wrapper
-`food/about.html` already used for a prose page — no new page type
-invented. Tables are hand-authored `<table>` markup, not markdown pipe
-tables: `food/*.html` files aren't run through kramdown (only `.md` is), so
-a markdown table in one of them renders as literal pipe characters, not a
-table. No table CSS existed anywhere on the site before this —
-`article.recipe .recipe-body-content table`/`th`/`td` plus a
+`sustainability.html` does not exist, and never became a finished page.
+It was removed entirely 2026-08-15, issue #224 — the page, its two "See
+also: sustainability" links from `cooking-methods.html`, and every other
+reference to it. It went from ingest to deletion without ever being
+fact-checked (below); if a future session finds the old draft table and
+is tempted to rebuild the page from it, treat that as starting from
+scratch, not restoring something that was once verified.
+
+`internal-temperatures.html`, the original single page charting these
+figures, is also gone — split in two on 2026-08-14 (issues #183/#189/
+#202) into `temperatures.html` and `timings.html` above, because it had
+outgrown one page: one half is "what's the safe/target number", the
+other is "given a weight, when do I put this in and take it out", and
+conflating them made neither easy to scan.
+
+Same `site_key: food` inheritance as every other page under `food/`
+(§2.4). Content was originally ingested from 15 draft tables in
+`_food_drafts/reference-info/` (chicken/turkey/goose/duck roasting,
+beef/pork/lamb/ham roasting and slow-cooking, steak, fish and shellfish
+cooking, fish and shellfish sustainability, meat carbon, nut milks) — the
+sustainability table is part of that same original ingest, and is the one
+table that never became a surviving page; the rest of this section is
+about what the others became.
+
+**Page pattern**: reuses `.recipe`/`.recipe-body-content`, the same
+wrapper `food/about.html` already used for a prose page — no new page
+type invented. Tables are `<table>` markup, not markdown pipe tables:
+`food/*.html` files aren't run through kramdown (only `.md` is), so a
+markdown table in one of them renders as literal pipe characters, not a
+table. **`temperatures.html` holds no `<table>` at all** — checked, not
+assumed: every figure on it is a div-based chart drawn by
+`_includes/food/temp_row.html` from the data, which is why
+`tests/test_rendered_pages.py` asserts on `.tc-row`/`.tc-out-at` rather
+than on cells. `cooking-methods.html` is the mixed one: its eight timing
+sections render from data, and its three remaining `<table>`s — steak,
+fish and shellfish — stay hand-written on purpose, because they carry no
+timings to reconcile and the fish table's eleven rowspans would not
+survive a generic loop. No table CSS existed anywhere on the site before this
+— `article.recipe .recipe-body-content table`/`th`/`td` plus a
 `.table-scroll` horizontal-scroll wrapper, both in
 `_sass/food/_recipe-notes-body.scss`.
 
-### The data layer — internal temperatures only
+### The data layer — two datasets now, not one
 
-`_data/food/internal_temperatures.yml` is the single source for pull
+`_data/food/internal_temperatures.yml` is the single source for out-at
 temps, endpoints and carryover — VOCABULARY layer, same status as
-`taxonomy.yml` (§7). Read by two things: `internal-temperatures.html`
-(every number on the page is a Liquid lookup into this file, not a
-literal) and `recipe.html` (a recipe's own `internal_temp_ref` +
-`doneness` front matter, §4).
+`taxonomy.yml` (§7). Read by two things: `temperatures.html` (every
+number on the page is a Liquid lookup into this file, not a literal) and
+`recipe.html` (a recipe's own `internal_temp_ref` + `doneness` front
+matter, below). **"Out at", never "pull at"** — Helen's call, 2026-08-13:
+pull is American. The data fields are `out_at` / `out_at_min` /
+`out_at_max` / `out_at_open`, and `tests/test_style.py`'s
+`_INTERNAL_TEMP_RE` knows the phrase so a recipe writing it into a method
+step isn't flagged as an oven temperature missing its "fan". Every figure
+is numeric as well as a display string — `out_at: "48–50°C"` sits beside
+`out_at_min: 48` — deliberate duplication, because the display strings
+carry words a number can't ("74–75°C in the thigh"), guarded by
+`tests/test_reference_data.py`, which also holds the axis bounds, the
+safety-threshold spec and the note-integrity checks.
 
 Four shapes, because the source data wasn't uniform: `endpoint` +
 `carryover` (whole poultry — one figure, no doneness choice);
-`doneness: { level: {pull, rested} }` + `carryover` (beef/pork/lamb tender
-roasts, ham fresh, steak, salmon, tuna — a real doneness spectrum);
-`tender_at` alone (tough/slow-cooked cuts — collagen breakdown, not a pull
-temperature); `target` + `carryover` (cured ham — one figure, not a
-spectrum). A consumer checks which keys exist on the resolved node rather
-than assuming a shape from the protein name — see the file's own header
-comment.
+`doneness: { level: {out_at, rested} }` + `carryover` (beef/pork/lamb
+tender roasts, ham fresh, steak, salmon, tuna — a real doneness
+spectrum); `tender_at` alone (tough/slow-cooked cuts — collagen
+breakdown, not an out-at temperature); `target` + `carryover` (cured ham
+— one figure, not a spectrum). A consumer checks which keys exist on the
+resolved node rather than assuming a shape from the protein name — see
+the file's own header comment.
 
-**`cooking-methods.html` and `sustainability.html` are NOT in this data
-layer** — still static HTML, hand-corrected where research found errors
-(below) but with no structured backing data. Only internal temperatures
-moved, because that's what Helen asked for as the next step; don't assume
-the other two pages work the same way underneath.
+**`cooking-methods.html` now has a data layer of its own — it is no
+longer true that only internal temperatures are data-backed.**
+`_data/food/cooking_methods.yml` is GENERATED by
+`scripts/build_cooking_methods.py` then
+`scripts/build_cooking_methods_prose.py`, both pinned to commit
+`8bdbd27` — the last version of `cooking-methods.html` that still held
+its tables by hand — because the page now renders most of its tables
+FROM their output rather than the other way round. Running them against
+the working copy finds no tables and writes an empty file; the pin has an
+assertion on the table count, and that's why — don't remove the pin to
+"fix" the assertion. Steak, fish and shellfish stay hand-written tables
+deliberately: they carry no timings, so there's nothing in them to
+reconcile against the data, and fish's table uses eleven rowspans and
+several empty cells that a generic rows-loop would silently flatten into
+a different table. Only these two pages have moved to a generated/
+data-backed pattern; don't assume a future third reference page works the
+same way underneath just because these two do.
 
 ### Recipe wiring
 
 `internal_temp_ref` is a dot-path into the data file (`beef.tender_roast`);
 `doneness` (optional) picks a level within that entry's own `doneness` map
-(`medium_rare`). Resolved in `recipe.html` into a new "Internal temp" line
-in `recipe-meta`, alongside Serves/Prep/Cook.
+(`medium_rare`). Resolved in `recipe.html` — but **not into a metadata
+line any more**. It used to render an "Internal temp" line in
+`recipe-meta`, alongside Serves/Prep/Cook; Helen, 2026-08-14: "I don't
+like the internal temperature featuring in the metadata — it's ugly, it
+spoils the rule of 3, and it's nowhere in sight when you're actually
+cooking." All three were true, and the last is the one that decided it —
+that grid is read once, while deciding whether to cook the thing, while a
+temperature is read with a probe in your hand, twenty minutes in. The
+resolved figure (a doneness spectrum where the data has one, a single
+point otherwise) now renders below Notes, at `#doneness`, and the
+metadata grid carries nothing but a link: the Cook line reads something
+like "30 mins, but check cooking temperatures" rather than stating a
+figure inline.
 
-**Why it can only live in `recipe-meta`, never inline in a method step or
-note**: front matter is never Liquid-templated (§4) — a live number can
-only render somewhere the layout itself controls, not inside text the
+**Why a live number can only ever render somewhere the layout itself
+controls, never inline in a method step or note**: front matter is never
+Liquid-templated (§4) — a value from the data file can only appear
+somewhere `recipe.html` itself decides to put it, not inside text the
 recipe author typed. Real constraint, not a design choice; don't try to
 thread a live figure into a method sentence, it can't work without
-changing that rule.
+changing that rule. Only the *location* the layout chooses has moved
+(metadata line → below Notes) — the constraint that forces it to be
+layout-controlled at all hasn't.
 
-Opt-in, per recipe, not rolled out — a handful of recipes use it as of
-2026-08-12, added by more than one session working on this in parallel.
-Check a given recipe's own front matter rather than assuming a protein has
-or hasn't been wired.
+Opt-in, per recipe, not rolled out — 15 of 81 published recipes are wired
+as of 2026-08-15, added by more than one session working on this in
+parallel since 2026-08-12. Check a given recipe's own front matter rather
+than assuming a protein has or hasn't been wired. **A recipe that should
+be wired and isn't is a test failure, not a gap to notice by eye**:
+`test_every_recipe_with_a_known_protein_has_a_temperature_or_a_reason`
+(`test_reference_data.py`) demands either an `internal_temp_ref` or an
+entry in that file's `NO_TEMPERATURE_BECAUSE` dict giving a reason.
+Drafts are deliberately exempt — Helen, 2026-08-14: wiring one is wasted
+work until she's cooked it. The test catches each draft on the day it's
+promoted, which is the right moment.
 
-**Guard test**: `test_internal_temp_ref_resolves` (`test_front_matter.py`)
+**Guard tests**: `test_internal_temp_ref_resolves` (`test_front_matter.py`)
 + the `internal_temperatures` fixture (`conftest.py`) — same pattern as
 `test_tags_are_declared` (§7). Liquid's `hash[variable]` lookup has no
 equivalent of a KeyError, so a typo'd path doesn't error, it silently
-renders no "Internal temp" line at all; this is the only thing that
-catches that.
+renders no doneness section at all; this is the only thing that catches
+that. `tests/test_rendered_pages.py` asserts on BUILT HTML rather than on
+the data or the template source, and exists because the two worst bugs in
+this layer both lived in the gap between correct data and what Liquid
+actually emitted — a `{% assign %}` leaking out of an include onto all 42
+chart rows, and a safety zone drawing 9°C off its own label. Both had
+passed every data-level test. It skips without a bundler.
+
+**`safety_min` / `safety_label` / `safety_summary` shade everything below
+the cited guidance** on `fish.salmon` (63°C), `pork.roasting` and
+`ham.fresh` (70°C) only — beef, lamb and steak have none on purpose, since
+UK guidance treats pink as fine for those. This used to be a hard-coded
+`--t:63` in one page's markup, which meant it couldn't warn anywhere
+else; it's data-driven now, with two guards stopping it going missing
+again.
 
 ### Fact-checking status — read before trusting a number on either page
 
-Every figure on `internal-temperatures.html` and `cooking-methods.html`
-has been checked at least once against real sources (UK FSA, USDA FSIS,
-Waitrose, BBC Good Food, Delia Smith, Jamie Oliver, Gordon Ramsay and
-others — cited under each table via `<p class="recipe-source">`). A
-systematic error was found and corrected 2026-08-12: turkey, goose, beef's
-standard roast, pork's leg/tenderloin, lamb's rack, and cured ham's
-boil/roast timing were all roughly half the real rate. Helen's own
-recollection is that an earlier session muddled 500g/lb timings with 1kg
-timings when the drafts were first written, and the shape of the error
-(consistently ~2× too fast) matches that. If you find another row that
-looks suspiciously fast against a real recipe, this is the first thing to
-suspect.
-
-**`sustainability.html` has had zero fact-checking** — still exactly as
-transcribed from the original drafts. Don't assume it got the same
-treatment as the other two pages just because they're siblings.
+Every figure on `temperatures.html` and `cooking-methods.html` has been
+checked at least once against real sources (UK FSA, USDA FSIS, Waitrose,
+BBC Good Food, Delia Smith, Jamie Oliver, Gordon Ramsay and others — cited
+under each table via `<p class="recipe-source">`). A systematic error was
+found and corrected 2026-08-12: turkey, goose, beef's standard roast,
+pork's leg/tenderloin, lamb's rack, and cured ham's boil/roast timing were
+all roughly half the real rate. Helen's own recollection is that an
+earlier session muddled 500g/lb timings with 1kg timings when the drafts
+were first written, and the shape of the error (consistently ~2× too
+fast) matches that. If you find another row that looks suspiciously fast
+against a real recipe, this is the first thing to suspect.
 
 **The "checked once... remove once confirmed" notes under each table are
 Helen's own working scaffolding, not errors to fix.** She's verifying each
@@ -1969,80 +2063,29 @@ don't "helpfully" remove one unprompted.
 (60–62°C) and fresh ham's "hint of pink" doneness don't clear the UK FSA's
 pork-specific core-temperature guidance, unlike beef/lamb, which FSA
 treats differently — `internal_temperatures.yml`'s `safety_note` fields on
-`pork.roasting` and `ham.fresh` have the detail. Deliberately not
+`pork.roasting` and `ham.fresh` have the detail, and the same two entries
+carry the `safety_min`/`safety_label`/`safety_summary` fields that shade
+the chart past that line on `temperatures.html` (above). Deliberately not
 "corrected" to the well-done figure — whether to keep serving pork pink is
 Helen's call, not something to silently override.
 
-### Status, 2026-08-14 — the layer is wired in
-
-Issues #183, #189 and #202 are done. What changed, and what it means for
-anything you build on top:
-
-**The reference pages are `/food/reference/temperatures/` (charts) and
-`/food/reference/timings/` (a weight → schedule instrument), plus
-`cooking-methods.html`.** `internal-temperatures.html` is DELETED — it held the
-same figures as tables, and two pages showing one dataset is the duplication
-this layer exists to end. It was also the last place still saying "Pull at".
-
-**"Out at", never "pull at".** Helen's call, 2026-08-13: pull is American. The
-data fields are `out_at` / `out_at_min` / `out_at_max` / `out_at_open`, and
-`tests/test_style.py`'s `_INTERNAL_TEMP_RE` knows the phrase so a recipe writing
-it into a method step isn't flagged as an oven temperature missing its "fan".
-
-**Every figure is numeric as well as a display string.** `out_at: "48–50°C"`
-sits beside `out_at_min: 48`. Deliberate duplication, because the strings carry
-words numbers can't ("74–75°C in the thigh"), guarded by
-`tests/test_reference_data.py` — which also holds the axis bounds, the
-safety-threshold spec, and the note-integrity checks.
-
-**Recipes draw the whole doneness spectrum, below Notes, at `#doneness`.** The
-metadata grid carries no temperature — Helen: "it's nowhere in sight when you're
-actually cooking". 14 of 81 published recipes are wired -- `internal_temp_ref`
-plus an optional `doneness` naming which level the recipe suggests.
-
-**A recipe that SHOULD be wired and isn't is a test failure.**
-`test_every_recipe_with_a_known_protein_has_a_temperature_or_a_reason` demands
-either a ref or an entry in `NO_TEMPERATURE_BECAUSE` with a reason. Drafts are
-deliberately exempt -- Helen, 2026-08-14: wiring one is wasted work until she has
-cooked it. The test catches each draft on the day it is promoted, which is the
-right moment.
-
-**`tests/test_rendered_pages.py` asserts on BUILT HTML**, and exists because the
-two worst bugs here lived in the gap between correct data and what Liquid
-emitted -- a `{% assign %}` leaking out of an include onto all 42 chart rows,
-and a safety zone drawing 9°C off its own label. Both passed every data test.
-It skips without bundler.
-
-**`safety_min` / `safety_label` / `safety_summary` shade everything below the
-cited guidance.** On `fish.salmon` (63°C), `pork.roasting` and `ham.fresh`
-(70°C) only. Beef, lamb and steak have none on purpose — UK guidance treats
-pink as fine. This was a hard-coded `--t:63` in one page's markup and therefore
-couldn't warn anywhere else; two guards now stop it going missing again.
-
-**`_data/food/cooking_methods.yml` is GENERATED** by `scripts/build_cooking_methods.py`
-then `scripts/build_cooking_methods_prose.py`. Both are pinned to commit
-`8bdbd27` — the last version of `cooking-methods.html` that still held the
-tables — because that page now renders FROM their output. Run them against the
-working copy and they find no tables and write an empty file. The pin has an
-assertion on the table count; don't remove it.
-
 ### What's not done
 
-**`food/reference/sustainability.html` is gitignored**, same as `about.html`:
-zero fact-checking, transcribed from the drafts and never verified. It builds
-locally and does not reach the public repo. `cooking-methods.html`'s two
-"See also: sustainability" links therefore 404 in production until it returns —
-known and accepted, the same trade the header's "?" link already makes.
-
-**Venison and braised/confit duck legs have no temperature data.** Four recipes
-want them and are deliberately unwired rather than pointed at an approximation:
-two venison, a duck-leg casserole and a confit. Roasted duck legs DO now use
-`poultry.duck` — Helen, 2026-08-14: the figure says "in the thigh", which is
-exactly what a leg is. Venison has its own issue.
+**Venison and braised/confit duck legs have no temperature data.** Four
+recipes want them and are deliberately unwired rather than pointed at an
+approximation: two venison, a duck-leg casserole and a confit. Roasted
+duck legs DO now use `poultry.duck` — Helen, 2026-08-14: the figure says
+"in the thigh", which is exactly what a leg is. Venison has its own
+issue.
 
 **Nothing links recipes to the timings or methods pages.** Temperatures are
 wired both ways; cooking methods are not wired to recipes at all.
 
-**`cooking-methods.html` and `/food/reference/timings/` overlap** — both render
-the same 65 methods from the same data, one as tables and one as an instrument.
-Merging them is open, not decided.
+**`cooking-methods.html` and `/food/reference/timings/` overlap, and that is
+settled** — both render the same 65 methods from the same data, one as tables
+and one as an instrument. **Helen's call, 2026-08-15, issue #207: they do not
+merge.** The tables answer *what are my options*; the calculator answers *what
+time do I put it in*. That is the same split the index page and a recipe page
+already make — a control panel and a document — and it is the reason the
+duplication reads as two views of one dataset rather than two copies of one
+page. Don't re-open it; improve the crosslink between them instead.
