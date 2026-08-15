@@ -59,7 +59,11 @@ permalink: /food/reference/temperatures/
       <li><a href="#all">All</a></li>
     </ul>
 
-    <h2 class="recipe-section-heading" id="beef-steak"><span class="section-heading-text section-heading-text--reference">Beef: steak</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    {% comment %} Issue #209: the calculator reachable from the contents
+       list too, not just from inside each section. {% endcomment %}
+    <p class="tc-crosslink-standalone"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}">timings and cooking methods &rarr;</a></p>
+
+    <h2 class="recipe-section-heading" id="beef-steak"><span class="section-heading-text section-heading-text--reference">Beef: steak</span><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods/' | relative_url }}#steak">cooking methods for steak &rarr;</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.steak.carryover }}</p>
 
     {% include food/temp_key.html rested=true carry=true %}
@@ -76,10 +80,10 @@ permalink: /food/reference/temperatures/
       </div>
       {{ axis }}
     </div>
+    <a class="tc-totop" href="#top">&uarr; top</a>
 
-    <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=beef">timings and cooking methods &rarr;</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.beef.tender_roast.carryover }}</p>
-    <p class="tc-crosslink"><a href="{{ '/food/reference/timings/' | relative_url }}?protein=beef">timings and cooking methods &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -95,8 +99,9 @@ permalink: /food/reference/temperatures/
       </div>
       {{ axis }}
     </div>
+    <a class="tc-totop" href="#top">&uarr; top</a>
 
-    <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=beef">timings and cooking methods &rarr;</a></h2>
     <p class="recipe-section-subtitle">brisket, chuck, short rib, pot roast &mdash; not a doneness at all</p>
 
     {% comment %} No key on this chart. It draws one bar, and that bar's own
@@ -110,8 +115,9 @@ permalink: /food/reference/temperatures/
       </div>
       {{ axis }}
     </div>
+    <a class="tc-totop" href="#top">&uarr; top</a>
 
-    <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods/' | relative_url }}#fish">cooking methods for fish &rarr;</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.fish.salmon.carryover }}</p>
 
     {% include food/temp_key.html rested=true unsafe=true %}
@@ -132,9 +138,9 @@ permalink: /food/reference/temperatures/
     </div>
 
     <p class="tc-note">FSA advice is a minimum serving temperature of {{ t.fish.general.endpoint_min }}°C.</p>
+    <a class="tc-totop" href="#top">&uarr; top</a>
 
-    <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
-    <p class="tc-crosslink"><a href="{{ '/food/reference/timings/' | relative_url }}?protein=ham">timings and cooking methods &rarr;</a></p>
+    <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=ham">timings and cooking methods &rarr;</a></h2>
 
     {% include food/temp_key.html rested=true unsafe=true %}
     <div class="tc">
@@ -151,10 +157,10 @@ permalink: /food/reference/temperatures/
       </div>
       {{ axis }}
     </div>
+    <a class="tc-totop" href="#top">&uarr; top</a>
 
-    <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=lamb">timings and cooking methods &rarr;</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.lamb.roasting.carryover }}</p>
-    <p class="tc-crosslink"><a href="{{ '/food/reference/timings/' | relative_url }}?protein=lamb">timings and cooking methods &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -169,10 +175,10 @@ permalink: /food/reference/temperatures/
       </div>
       {{ axis }}
     </div>
+    <a class="tc-totop" href="#top">&uarr; top</a>
 
-    <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=pork">timings and cooking methods &rarr;</a></h2>
     <p class="recipe-section-subtitle">carryover {{ t.pork.roasting.carryover }}</p>
-    <p class="tc-crosslink"><a href="{{ '/food/reference/timings/' | relative_url }}?protein=pork">timings and cooking methods &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true unsafe=true %}
     <div class="tc">
@@ -204,10 +210,10 @@ permalink: /food/reference/temperatures/
        of that vocabulary. The full note stays in internal_temperatures.yml.
        {% endcomment %}
     <p class="tc-note">FSA wants pork <em>held</em> at 60°C for 45&nbsp;min, 65°C for 10&nbsp;min, 70°C for 2&nbsp;min, or 75°C for 30&nbsp;sec — held, not passed through as it cools. Only the well-done figure clears that.</p>
+    <a class="tc-totop" href="#top">&uarr; top</a>
 
-    <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=chicken">timings and cooking methods &rarr;</a></h2>
     <p class="recipe-section-subtitle">by the thigh, not the breast</p>
-    <p class="tc-crosslink"><a href="{{ '/food/reference/timings/' | relative_url }}?protein=chicken">timings and cooking methods &rarr;</a></p>
 
     {% include food/temp_key.html solid="reaches" %}
     <div class="tc">
@@ -226,8 +232,9 @@ permalink: /food/reference/temperatures/
       </div>
       {{ axis }}
     </div>
+    <a class="tc-totop" href="#top">&uarr; top</a>
 
-    <h2 class="recipe-section-heading" id="all"><span class="section-heading-text section-heading-text--reference">All</span><a class="tc-totop" href="#top">&uarr; top</a></h2>
+    <h2 class="recipe-section-heading" id="all"><span class="section-heading-text section-heading-text--reference">All</span><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}">timings and cooking methods &rarr;</a></h2>
 
     {% include food/temp_key.html solid="served between" %}
     <div class="tc">
@@ -284,6 +291,7 @@ permalink: /food/reference/temperatures/
       </div>
       {{ axis }}
     </div>
+    <a class="tc-totop" href="#top">&uarr; top</a>
 
   </div>
 </article>

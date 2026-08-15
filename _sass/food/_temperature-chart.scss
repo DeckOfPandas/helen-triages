@@ -455,10 +455,26 @@ article.recipe .recipe-section-heading {
   scroll-margin-top: $space-xxl;
 }
 
-// "↑ top" beside each heading. Deliberately quiet and deliberately NOT in the
-// heading's own Courier: it is a control, not part of the title, and giving it
-// the punched treatment would make it look like a second word in the heading.
+// "↑ top", now after the chart rather than beside the heading (issue #215
+// -- Helen: the control that gets a section's own contents was offered
+// before you'd read anything, buried in the one place you land first). Its
+// own margin is left at 0 deliberately: the chart above it already carries
+// $spacing-section-gap as ITS bottom margin (or, where a .tc-note follows
+// the chart instead, that note carries $space-xl), and the next heading
+// already carries $spacing-section-top as its own top margin. Adjacent
+// sibling margins collapse to the larger of the pair either side of this
+// link, so those two existing tokens are what actually place it -- adding a
+// margin here would only add a second, uncoordinated gap on top of them.
+//
+// Right-aligned with text-align rather than float or absolute positioning:
+// it is the only thing on its own line, so there is nothing to lay out
+// against, and the site's own preference (HANDOVER §13.3) is for the
+// simplest layout tool that reaches the result, not the most general one.
+// Font stays body, not the heading's Courier: it is a control, not a
+// second heading.
 .tc-totop {
+  display: block;
+  text-align: right;
   font-family: $font-body;
   font-size: 0.72rem;
   font-weight: 400;
@@ -467,9 +483,6 @@ article.recipe .recipe-section-heading {
   -webkit-text-stroke: 0;
   text-shadow: none;
   color: $color-clear-text;
-  margin-left: $space-lg;
-  white-space: nowrap;
-  vertical-align: middle;
 
   // Issue #199: was $color-recipe-link (the darker resting link colour) --
   // the one hover on the page going darker instead of lighter, against the
@@ -477,10 +490,57 @@ article.recipe .recipe-section-heading {
   &:hover { color: $color-recipe-link-hover; }
 }
 
-// Each protein's way through to its own timings. Sits under the subtitle and
-// above the chart, so the two reference pages are one step apart in both
-// directions rather than both hanging off a landing page nobody visits.
+// Each protein's way through to its own timings or methods table. Sits on
+// the right of the section's own heading now (issue #215) -- it used to be
+// a sibling paragraph below the subtitle, one scroll further down than the
+// heading it belongs to, which is why Helen's read was "it gets buried".
+// Issue #209 is the reason it now appears on EVERY heading rather than
+// five of nine: a chart with no way through to the calculator or the
+// methods table was simply missing one.
+//
+// The class sits on the <a> itself, not a wrapping <p> -- inside the
+// heading it has to be a direct child of .recipe-section-heading for the
+// flex rule below to find it, and giving the standalone instance
+// (.tc-crosslink-standalone below, and the copy under the contents list)
+// the same shape keeps this to one rule instead of two.
+//
+// RESETS. .recipe-section-heading (via %heading-base and punched(raised))
+// sets text-transform: uppercase, letter-spacing: 0.08em,
+// -webkit-text-stroke and text-shadow, and all four inherit -- see
+// HANDOVER §12. Left unreset, this link would render UPPERCASE (wrong
+// copy) wearing the heading's own emboss (wrong look). Colour and
+// font-weight need no reset: article.recipe a sets both directly on the
+// <a> itself, which beats inheritance regardless of nesting.
 .tc-crosslink {
+  font-family: $font-body;
   font-size: 0.8rem;
-  margin: 0 0 $space-lg 0;
+  text-transform: none;
+  letter-spacing: 0;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+// Puts the crosslink on the right of the heading's own line, flex with a
+// gap token rather than a float or absolute position -- HANDOVER §13.3.
+// Scoped with :has() to headings that actually carry one, so every other
+// .recipe-section-heading on the site (title span only, no second child)
+// is untouched. flex-wrap so a long heading plus a long link text drops to
+// two lines on a narrow viewport instead of overflowing.
+.recipe-section-heading:has(> .tc-crosslink) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-xs $space-lg;
+}
+
+// The one standalone instance: below the contents list, reaching the
+// calculator before any section at all (issue #209). Margin is 0 for the
+// same reason as .tc-totop above -- .tc-contents already carries
+// $spacing-section-gap as its own bottom margin, and the first heading
+// below carries $spacing-section-top as its own top margin, so adjacent
+// sibling collapsing does the placing without a third, competing value.
+.tc-crosslink-standalone {
+  margin: 0;
 }
