@@ -1,5 +1,5 @@
 /* =============================================================================
-   COOK TIMER — weight in, timings out
+   COOK TIMER — weight in, timings out (DOM wiring only)
    =============================================================================
    Reads _data/food/cooking_methods.yml (serialised into the page as JSON by
    Liquid) and _data/food/internal_temperatures.yml, and answers two questions:
@@ -15,12 +15,24 @@
    when you already know when you're eating.
 
    -----------------------------------------------------------------------------
+   THE ARITHMETIC IS NOT IN THIS FILE
+   -----------------------------------------------------------------------------
+   Every number — resolving a method to a range of minutes, rounding, the
+   backwards-from-the-plate clock maths, the temperature and rest-time lookups —
+   lives in assets/js/cook-schedule.js as HTF.cookSchedule, which touches no DOM
+   and is tested directly by tests/js/cook-schedule.test.js. That file must load
+   FIRST; tests/test_site_config.py has a guard.
+
+   What stays here is the wiring: reading the four boxes, ordering the cards,
+   building the markup, and the copy around a refusal.
+
+   -----------------------------------------------------------------------------
    THE HARD PART IS THE 21% OF ROWS THAT AREN'T A FORMULA
    -----------------------------------------------------------------------------
    52 of the 66 method rows are `rate` -- minutes per kg, sometimes plus a flat
    addition -- and multiplying is all they need. The other 14 are five different
    things, and the temptation is to coerce them into a number anyway so every
-   row has an answer. That would be the worst thing this file could do: a
+   row has an answer. That would be the worst thing this page could do: a
    confident "out at 17:05" derived from a row whose own sources disagree by 3:1
    is worse than no calculator, because it launders uncertainty into precision.
 
@@ -46,6 +58,8 @@
   var root = document.querySelector("[data-cook-timer]");
   if (!root) return;
 
+  var CS = window.HTF.cookSchedule;
+
   var METHODS = JSON.parse(document.getElementById("ct-methods").textContent);
   var TEMPS = JSON.parse(document.getElementById("ct-temps").textContent);
 
@@ -60,153 +74,12 @@
     summary: root.querySelector("#ct-summary")
   };
 
-  /* --- formatting ---------------------------------------------------------
-     Minutes are the working unit throughout and only ever become words at the
-     edge. "2 hrs 5 min" rather than "125 min": you read this while planning a
-     meal, not while timing an experiment. */
-  /* FIVE-MINUTE GRANULARITY, applied once here and reused by the clock
-     arithmetic below so a duration and the time it implies can never disagree.
-     Helen: "let's round cooking times to the nearest 5 mins to preserve
-     sanity." She's right, and not only about sanity: "1 hr 37 min" claims a
-     precision the underlying figure hasn't got — most of these rates are
-     themselves a range, and several are estimates by analogy. Rounding is
-     honesty about the input, not just tidiness in the output. */
-  function round5(mins) {
-    return Math.round(mins / 5) * 5;
-  }
-
-  function hhmm(mins) {
-    mins = round5(mins);
-    var h = Math.floor(mins / 60), m = mins % 60;
-    if (!h) return m + " min";
-    if (!m) return h + " hr" + (h > 1 ? "s" : "");
-    return h + " hr" + (h > 1 ? "s" : "") + " " + m + " min";
-  }
-
-  function span(lo, hi) {
-    /* Compared AFTER rounding: 95 and 97 minutes are one answer once you've
-       decided five minutes is the resolution, and printing "1 hr 35 – 1 hr 35"
-       would be the arithmetic showing through. */
-    return round5(lo) === round5(hi)
-      ? hhmm(lo) : hhmm(lo) + " – " + hhmm(hi);
-  }
-
-  /* Clock arithmetic in minutes-since-midnight, wrapping backwards over
-     midnight rather than producing a negative time — a 6 kg turkey for a 1pm
-     lunch genuinely does start the night before, and printing "-45:00" instead
-     of "22:15 (the day before)" would be a bug you'd only notice at Christmas. */
-  function clock(minsFromMidnight) {
-    var day = "";
-    while (minsFromMidnight < 0) { minsFromMidnight += 1440; day = " (the day before)"; }
-    var h = Math.floor(minsFromMidnight / 60) % 24, m = Math.round(minsFromMidnight) % 60;
-    return ("0" + h).slice(-2) + ":" + ("0" + m).slice(-2) + day;
-  }
-
-  function parseClock(value) {
-    var m = /^(\d{1,2}):(\d{2})$/.exec((value || "").trim());
-    if (!m) return null;
-    return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
-  }
-
-  /* --- resolving a method to minutes -------------------------------------- */
-
-  function baseFor(method, all) {
-    /* A `relative` row borrows another row's timing. The base is the first
-       straightforward `rate` row in the same group — "plain equivalent" in the
-       data's own words. Returned rather than applied silently so the caller can
-       name it in the output: a number you can't trace is a number you can't
-       check. */
-    for (var i = 0; i < all.length; i++) {
-      if (all[i].group === method.group && all[i].shape === "rate") return all[i];
-    }
-    return null;
-  }
-
-  function resolve(method, kg, doneness, all) {
-    var s = method.shape;
-
-    if (s === "rate") {
-      var lo = method.rate_min * kg + (method.flat_add || 0);
-      var hi = method.rate_max * kg + (method.flat_add_max || method.flat_add || 0);
-      return { ok: true, lo: lo, hi: hi };
-    }
-
-    if (s === "total") {
-      return {
-        ok: true, lo: method.total_min, hi: method.total_max,
-        aside: "Timed by the piece, not by weight — the weight box doesn't change this one."
-      };
-    }
-
-    if (s === "by_doneness") {
-      var d = method.by_doneness[doneness] || method.by_doneness.rare;
-      return {
-        ok: true,
-        lo: d.rate_min * kg + (d.flat_add || 0),
-        hi: d.rate_max * kg + (d.flat_add || 0),
-        aside: "Rate depends on doneness; showing " + doneness.replace(/_/g, " ") + "."
-      };
-    }
-
-    if (s === "staged") {
-      var stages = method.stages.map(function (st) {
-        return { name: st.name, lo: st.rate_min * kg, hi: st.rate_max * kg };
-      });
-      return {
-        ok: true,
-        lo: stages.reduce(function (a, b) { return a + b.lo; }, 0),
-        hi: stages.reduce(function (a, b) { return a + b.hi; }, 0),
-        stages: stages
-      };
-    }
-
-    if (s === "relative") {
-      var base = baseFor(method, all);
-      if (!base) return { ok: false, why: method.relative_to };
-      var pct = /add ~?(\d+)%/i.exec(method.relative_to);
-      var mult = pct ? 1 + parseInt(pct[1], 10) / 100 : 1;
-      var b = resolve(base, kg, doneness, all);
-      return {
-        ok: true, lo: b.lo * mult, hi: b.hi * mult,
-        aside: "Borrowed from “" + base.name + "”" +
-               (pct ? ", plus " + pct[1] + "%" : "") + " — this row has no timing of its own."
-      };
-    }
-
-    /* disputed / unparsed: the two that decline. */
-    return {
-      ok: false,
-      why: s === "disputed"
-        ? "Sources genuinely disagree on this one (" + method.timing + "), by enough " +
-          "that any single number would be invented. Use a thermometer."
-        : "No formula in the data — the timing is “" + method.timing + "”."
-    };
-  }
-
-  /* --- the finishing temperature ------------------------------------------
-     A schedule that ends on a clock is only half an answer; the oven doesn't
-     know how big your bird is. Every protein carries an internal_temp_ref, so
-     the last line of every card is the figure to actually check. */
-  function finishingTemp(ref) {
-    if (!ref) return null;
-    var node = TEMPS;
-    ref.split(".").forEach(function (k) { node = node && node[k]; });
-    if (!node) return null;
-    if (node.endpoint) return node.endpoint;
-    if (node.target) return node.target;
-    if (node.doneness) {
-      var first = Object.keys(node.doneness)[0];
-      return node.doneness[first].out_at + " (" + first.replace(/_/g, " ") + ")";
-    }
-    return null;
-  }
-
   /* --- render -------------------------------------------------------------- */
 
   function render() {
     var protein = METHODS[els.protein.value];
     var kg = parseFloat(els.weight.value);
-    var serveAt = parseClock(els.serve.value);
+    var serveAt = CS.parseClock(els.serve.value);
     var rest = parseInt(els.rest.value, 10) || 0;
     var doneness = "rare";
 
@@ -224,7 +97,7 @@
        how many methods there are. It gets its own line, and a way out to the
        rest of its own spectrum: this page can only show one doneness at a time,
        and "rare" is not an opinion anyone should be stuck with. */
-    var temp = finishingTemp(protein.internal_temp_ref);
+    var temp = CS.finishingTemp(TEMPS, protein.internal_temp_ref);
     var proteinName = els.protein.options[els.protein.selectedIndex].text.toLowerCase();
 
     /* TWO ELEMENTS, EITHER SIDE OF THE CONTROLS. The count is the reason the
@@ -252,30 +125,18 @@
 
        Table for choosing, cards for doing. Uses the site's existing table
        styles (article.recipe .recipe-body-content table) and the .table-scroll
-       wrapper that already exists for wide tables -- no new CSS. */
-    /* ONE ORDER FOR BOTH VIEWS, shortest first. Helen: "either order it by time
-       taken (lower bound) or alphabetically by method name, then same for the
-       cards." Time wins over alphabetical because it makes the table a ranking
-       rather than a list -- "what can I do in the time I have" is the question
-       a sorted column answers for free, and alphabetical answers nothing.
+       wrapper that already exists for wide tables -- no new CSS.
 
-       The two rows that decline to be timed sort last: they have no lower bound
-       to rank on, and an unanswerable row at the top of a table of times would
-       read as the fastest. */
-    var ordered = protein.methods.slice().sort(function (a, b) {
-      var ra = resolve(a, kg, doneness, protein.methods);
-      var rb = resolve(b, kg, doneness, protein.methods);
-      if (ra.ok !== rb.ok) return ra.ok ? -1 : 1;
-      if (!ra.ok) return a.name.localeCompare(b.name);
-      return ra.lo - rb.lo;
-    });
+       Shortest first, decliners last -- see HTF.cookSchedule.orderMethods for
+       why that order and not alphabetical. */
+    var ordered = CS.orderMethods(protein.methods, kg, doneness);
 
     var rows = ordered.map(function (method) {
-      var r = resolve(method, kg, doneness, protein.methods);
+      var r = CS.resolve(method, kg, doneness, protein.methods);
       return "<tr>" +
         "<td>" + method.name + "</td>" +
         "<td>" + (method.outcome || "—") + "</td>" +
-        "<td>" + (r.ok ? span(r.lo, r.hi) : "<em>won’t guess</em>") + "</td>" +
+        "<td>" + (r.ok ? CS.span(r.lo, r.hi) : "<em>won’t guess</em>") + "</td>" +
         "</tr>";
     }).join("");
 
@@ -284,7 +145,7 @@
       "</tr></thead><tbody>" + rows + "</tbody></table>";
 
     ordered.forEach(function (method) {
-      var r = resolve(method, kg, doneness, protein.methods);
+      var r = CS.resolve(method, kg, doneness, protein.methods);
       var card = document.createElement("div");
       card.className = "ct-card" + (r.ok ? "" : " ct-card--declined");
 
@@ -302,7 +163,7 @@
       var html =
         "<div class='ct-card-head'>" +
           "<h3 class='ct-card-name'>" + method.name + "</h3>" +
-          "<p class='ct-total'>" + (r.ok ? span(r.lo, r.hi) : "—") + "</p>" +
+          "<p class='ct-total'>" + (r.ok ? CS.span(r.lo, r.hi) : "—") + "</p>" +
         "</div>";
 
       /* NO `outcome` LINE ON THE CARD. It was here to "confirm" the choice you
@@ -325,7 +186,7 @@
 
         if (r.stages) {
           html += "<ul class='ct-stages'>" + r.stages.map(function (st) {
-            return "<li><span>" + st.name + "</span> " + span(st.lo, st.hi) + "</li>";
+            return "<li><span>" + st.name + "</span> " + CS.span(st.lo, st.hi) + "</li>";
           }).join("") + "</ul>";
         }
 
@@ -333,15 +194,14 @@
           /* Work backwards from the plate. The LONGER estimate drives the start
              time on purpose: being ready early and holding is recoverable,
              being late is not. */
-          var outAt = serveAt - rest;
-          var longest = round5(r.hi), shortest = round5(r.lo);
+          var s = CS.scheduleBack(r.lo, r.hi, serveAt, rest);
           html += "<ul class='ct-schedule'>" +
-            "<li><span>in at</span> " + clock(outAt - longest) +
-              (shortest !== longest
-                ? " <em>(or " + clock(outAt - shortest) + " if it runs to the quicker end)</em>" : "") +
+            "<li><span>in at</span> " + CS.clock(s.inAt) +
+              (s.hasRange
+                ? " <em>(or " + CS.clock(s.inAtQuicker) + " if it runs to the quicker end)</em>" : "") +
             "</li>" +
-            "<li><span>out at</span> " + clock(outAt) + "</li>" +
-            (rest ? "<li><span>rest until</span> " + clock(serveAt) + "</li>" : "") +
+            "<li><span>out at</span> " + CS.clock(s.outAt) + "</li>" +
+            (rest ? "<li><span>rest until</span> " + CS.clock(s.restUntil) + "</li>" : "") +
             "</ul>";
         }
 
@@ -366,25 +226,19 @@
 
   /* --- rest time -----------------------------------------------------------
      Filled from the selected protein's own entry rather than defaulted to a
-     round 20 nobody wrote down. Beef, pork and lamb publish a rest time in
-     internal-temperatures.html's own table headers ("After ~15–20 min rest");
-     goose states one in its note. Chicken, turkey, duck and ham publish none —
-     they fall back, and the placeholder says as much rather than inventing a
-     figure and presenting it with the same confidence as a cited one. */
+     round 20 nobody wrote down. The lookup is HTF.cookSchedule.restFor; the
+     fallback and the wording around it stay here, because "what to say when the
+     data is silent" is a page decision, not an arithmetic one. Chicken, turkey,
+     duck and ham publish no rest time — the placeholder says as much rather
+     than inventing a figure and presenting it with the same confidence as a
+     cited one. */
   var REST_FALLBACK = 20;
 
-  function statedRest(ref) {
-    if (!ref) return null;
-    var node = TEMPS;
-    ref.split(".").forEach(function (k) { node = node && node[k]; });
-    return node && node.rest_min != null ? node.rest_min : null;
-  }
-
   function applyRest(protein) {
-    var stated = statedRest(protein.internal_temp_ref);
-    els.rest.placeholder = stated != null ? stated : REST_FALLBACK;
-    els.rest.value = stated != null ? stated : REST_FALLBACK;
-    els.rest.title = stated != null
+    var rest = CS.restFor(TEMPS, protein.internal_temp_ref, REST_FALLBACK);
+    els.rest.placeholder = rest.mins;
+    els.rest.value = rest.mins;
+    els.rest.title = rest.stated
       ? "The rest time stated for this cut, from the temperature data."
       : "No rest time is published for this one — " + REST_FALLBACK +
         " minutes is a working default, not a cited figure.";
@@ -397,12 +251,7 @@
   });
 
   function fillProteins() {
-    /* Alphabetical by the label you actually read, not by the data file's own
-       order -- sorted here rather than in the YAML so the data stays neutral
-       about presentation and the reference page can keep its own sequence. */
-    Object.keys(METHODS).sort(function (a, b) {
-      return METHODS[a].label.localeCompare(METHODS[b].label);
-    }).forEach(function (key) {
+    CS.proteinOrder(METHODS).forEach(function (key) {
       var opt = document.createElement("option");
       opt.value = key;
       opt.textContent = METHODS[key].label;

@@ -123,6 +123,47 @@ def test_recipe_list_js_loads_before_filters_js():
     )
 
 
+def test_cook_schedule_js_loads_before_cook_timer_js():
+    """cook-timer.js reads HTF.cookSchedule at startup -- it must already exist.
+
+    Third of the same trap as ingredient-search.js and recipe-list.js above:
+    the arithmetic (resolving a method to minutes, the backwards-from-the-plate
+    clock maths, the rounding) lives in assets/js/cook-schedule.js, and
+    cook-timer.js grabs it into `CS` in its first few lines. Loaded the wrong
+    way round the timings page throws once, silently, and shows nothing but an
+    empty table -- there is no visible error to notice.
+    """
+    html = read("food", "reference", "timings.html")
+    schedule_tag = re.search(r"<script src=[^>]*cook-schedule\.js", html)
+    timer_tag = re.search(r"<script src=[^>]*cook-timer\.js", html)
+    assert schedule_tag, (
+        "food/reference/timings.html no longer loads assets/js/cook-schedule.js."
+    )
+    assert timer_tag, (
+        "food/reference/timings.html no longer loads assets/js/cook-timer.js."
+    )
+    assert schedule_tag.start() < timer_tag.start(), (
+        "cook-schedule.js must load BEFORE cook-timer.js, or "
+        "HTF.cookSchedule won't exist yet when cook-timer.js runs."
+    )
+
+
+def test_cook_timer_js_holds_no_schedule_arithmetic():
+    """The maths lives in cook-schedule.js, where tests/js can reach it.
+
+    cook-timer.js is DOM wiring. If a rate multiplication or a minutes-from-
+    midnight calculation reappears here it is, by construction, untested again --
+    which is the state GitHub issue #221 existed to end.
+    """
+    js = read("assets", "js", "cook-timer.js")
+    for fragment in ("rate_min", "* 1440", "+= 1440", "Math.round(mins / 5)"):
+        assert fragment not in js, (
+            f"assets/js/cook-timer.js contains `{fragment}`. Schedule arithmetic "
+            f"belongs in assets/js/cook-schedule.js (HTF.cookSchedule), covered by "
+            f"tests/js/cook-schedule.test.js."
+        )
+
+
 def test_filters_js_holds_no_ingredient_vocabulary():
     """Singulars and synonyms belong in YAML, not in the JavaScript."""
     js = read("assets", "js", "filters.js")
