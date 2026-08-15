@@ -241,7 +241,7 @@
     els.rest.title = rest.stated
       ? "The rest time stated for this cut, from the temperature data."
       : "No rest time is published for this one — " + REST_FALLBACK +
-        " minutes is a working default, not a cited figure.";
+        " mins is a working default, not a cited figure.";
   }
 
   /* Changing protein reloads its stated rest; changing anything else leaves

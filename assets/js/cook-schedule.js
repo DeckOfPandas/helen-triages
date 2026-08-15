@@ -24,12 +24,12 @@
 
   /* --- formatting ---------------------------------------------------------
      Minutes are the working unit throughout and only ever become words at the
-     edge. "2 hrs 5 min" rather than "125 min": you read this while planning a
+     edge. "2 hrs 5 mins" rather than "125 mins": you read this while planning a
      meal, not while timing an experiment. */
   /* FIVE-MINUTE GRANULARITY, applied once here and reused by the clock
      arithmetic below so a duration and the time it implies can never disagree.
      Helen: "let's round cooking times to the nearest 5 mins to preserve
-     sanity." She's right, and not only about sanity: "1 hr 37 min" claims a
+     sanity." She's right, and not only about sanity: "1 hr 37 mins" claims a
      precision the underlying figure hasn't got — most of these rates are
      themselves a range, and several are estimates by analogy. Rounding is
      honesty about the input, not just tidiness in the output. */
@@ -37,12 +37,18 @@
     return Math.round(mins / 5) * 5;
   }
 
+  /* "mins", never "min" -- HANDOVER §5. A numeric quantity takes the plural
+     form in both the metadata register (`mins`/`hrs`) and the prose one
+     (`mins`/`hours`); only a bare English "a minute" stays singular, and
+     there are none of those here. This emitted "45 min" and "2 hrs 5 min"
+     until 2026-08-15. `hrs` was right all along, which is probably why the
+     singular next to it never looked wrong. */
   function hhmm(mins) {
     mins = round5(mins);
     var h = Math.floor(mins / 60), m = mins % 60;
-    if (!h) return m + " min";
+    if (!h) return m + " mins";
     if (!m) return h + " hr" + (h > 1 ? "s" : "");
-    return h + " hr" + (h > 1 ? "s" : "") + " " + m + " min";
+    return h + " hr" + (h > 1 ? "s" : "") + " " + m + " mins";
   }
 
   function span(lo, hi) {
@@ -58,8 +64,16 @@
      lunch genuinely does start the night before, and printing "-45:00" instead
      of "22:15 (the day before)" would be a bug you'd only notice at Christmas. */
   function clock(minsFromMidnight) {
+    /* COUNT the wraps, don't just record that one happened. This loop used to
+       assign " (the day before)" on every pass, so a start time two days back
+       was labelled one day back -- and that is reachable from the page's own
+       inputs, not a theoretical case: beef's low-and-slow brisket at 13.2 kg
+       is a 29-43½ hour cook, which crosses midnight twice. Fixed 2026-08-15. */
+    var daysBack = 0;
+    while (minsFromMidnight < 0) { minsFromMidnight += 1440; daysBack += 1; }
     var day = "";
-    while (minsFromMidnight < 0) { minsFromMidnight += 1440; day = " (the day before)"; }
+    if (daysBack === 1) day = " (the day before)";
+    else if (daysBack > 1) day = " (" + daysBack + " days before)";
     var h = Math.floor(minsFromMidnight / 60) % 24, m = Math.round(minsFromMidnight) % 60;
     return ("0" + h).slice(-2) + ":" + ("0" + m).slice(-2) + day;
   }

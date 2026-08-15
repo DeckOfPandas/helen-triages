@@ -117,8 +117,8 @@ test('round5 rounds to the nearest five minutes, both directions', () => {
 });
 
 test('hhmm: under an hour is minutes alone, with no "0 hrs"', () => {
-  assert.strictEqual(CS.hhmm(44), '45 min');
-  assert.strictEqual(CS.hhmm(0), '0 min');
+  assert.strictEqual(CS.hhmm(44), '45 mins');
+  assert.strictEqual(CS.hhmm(0), '0 mins');
 });
 
 test('hhmm: a whole number of hours drops the minutes, and pluralises past one', () => {
@@ -128,19 +128,20 @@ test('hhmm: a whole number of hours drops the minutes, and pluralises past one',
   assert.strictEqual(CS.hhmm(62), '1 hr');
 });
 
-test('hhmm: hours and minutes together', () => {
-  // NOTE the singular "min" on the tail. House style (HANDOVER §5) is "mins"
-  // for a numeric quantity in both the metadata and the prose form, so this
-  // reads as a house-style violation — pinned here as-is because the split it
-  // was written for was a refactor. Reported, not fixed.
-  assert.strictEqual(CS.hhmm(125), '2 hrs 5 min');
-  assert.strictEqual(CS.hhmm(85), '1 hr 25 min');
+test('hhmm: hours and minutes together, and the tail is always "mins"', () => {
+  // The singular "min" was a real house-style violation (HANDOVER §5: a
+  // numeric quantity is "mins" in both the metadata and prose registers).
+  // Found by the refactor that extracted this module, fixed straight after it
+  // rather than inside it -- a behaviour change hidden in a commit claiming to
+  // make none is how a refactor stops being safe.
+  assert.strictEqual(CS.hhmm(125), '2 hrs 5 mins');
+  assert.strictEqual(CS.hhmm(85), '1 hr 25 mins');
 });
 
 test('span collapses to a single figure when the ends round together', () => {
   // 95 and 97 are one answer once you have decided five minutes is the
-  // resolution; "1 hr 35 min – 1 hr 35 min" would be the arithmetic showing.
-  assert.strictEqual(CS.span(95, 97), '1 hr 35 min');
+  // resolution; "1 hr 35 mins – 1 hr 35 mins" would be the arithmetic showing.
+  assert.strictEqual(CS.span(95, 97), '1 hr 35 mins');
 });
 
 test('span prints both ends when they genuinely differ', () => {
@@ -164,13 +165,17 @@ test('clock wraps backwards over midnight rather than printing a negative time',
   assert.strictEqual(CS.clock(-1), '23:59 (the day before)');
 });
 
-test('clock says "the day before" only ONCE however far back it wraps', () => {
-  // KNOWN BUG, pinned deliberately. -1500 minutes is two days back, not one,
-  // and the site's own inputs can reach it: 13 kg of brisket at the low-and-slow
-  // rate is a 43-hour cook, which the page will happily schedule and then label
-  // as starting "the day before". Reported, not fixed — fixing it inside a
-  // refactor would hide a behaviour change in a commit that claims to make none.
-  assert.strictEqual(CS.clock(-1500), '23:00 (the day before)');
+test('clock COUNTS the days it wraps back, rather than saying "the day before" once', () => {
+  // This was a real bug, found by the refactor that extracted this module and
+  // fixed straight after it. The loop assigned the label on every pass instead
+  // of counting, so anything more than 24 hours back was under-reported by a
+  // whole day -- and the page's own inputs reach it: 13.2 kg of brisket at the
+  // low-and-slow rate is a 29-43½ hour cook, which crosses midnight twice.
+  assert.strictEqual(CS.clock(-1500), '23:00 (2 days before)');
+  assert.strictEqual(CS.clock(-2880), '00:00 (2 days before)');
+  assert.strictEqual(CS.clock(-2881), '23:59 (3 days before)');
+  // The one-day case keeps its English rather than becoming "(1 days before)".
+  assert.strictEqual(CS.clock(-1440), '00:00 (the day before)');
 });
 
 test('parseClock reads what an <input type=time> gives, and rejects the rest', () => {
@@ -387,7 +392,7 @@ test('scheduleBack: the LONGER estimate drives the start time', () => {
 
 test('scheduleBack: no range to show when the two ends round together', () => {
   // Same five-minute rounding as the printed duration, so a card can never say
-  // "1 hr 35 min" above two start times that differ by two minutes.
+  // "1 hr 35 mins" above two start times that differ by two minutes.
   const s = CS.scheduleBack(95, 97, 840, 0);
   assert.strictEqual(s.hasRange, false);
   assert.strictEqual(s.inAt, s.inAtQuicker);
