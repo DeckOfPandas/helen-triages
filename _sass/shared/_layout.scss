@@ -99,15 +99,15 @@ main {
 // order (see default.html's own comment). Absolutely positioned as a group
 // against .site-header-inner rather than each child positioning itself, so
 // they lay out left-to-right as one row pinned to the bottom-right corner
-// (was top-right -- Helen's ask). Gap trimmed alongside the smaller icon
-// size below, so the row still reads as snug rather than sparse.
+// (was top-right -- Helen's ask), 1rem clear of the header's own bottom
+// edge rather than flush against it.
 .site-nav-icons {
   position: absolute;
-  bottom: 0;
+  bottom: 1rem;
   right: 0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1.4rem;
   pointer-events: auto;
 }
 
