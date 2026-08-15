@@ -1,9 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Helen Triages">
-  <!-- Black H on white, issue #219 (inverted from the original white-on-black,
-       issue #197). No brackets — the issue's own fallback, taken deliberately:
-       the wordmark's "[ H ]" brackets are thin strokes that would turn to mud
-       at 16-32px favicon sizes, same reasoning this file's previous comment
-       already gave for staying plain. Replace freely. -->
-  <rect width="64" height="64" rx="10" fill="#FFFFFF"/>
+  <!-- Black H on bright magenta, issue #219. Helen's call: the pink IS the
+       brand, so the favicon should carry it rather than stay monochrome.
+
+       BLACK RATHER THAN WHITE, and the reason is measurable rather than
+       aesthetic: against #FF00C8 black scores 6.1:1 and white 3.5:1. At the
+       16-32px this file actually renders at, nothing survives except
+       contrast, so the higher figure wins. White on magenta is a one-word
+       change if it ever looks better in a real tab strip than it does on
+       paper.
+
+       #FF00C8 is $color-bright-magenta from _sass/food/_palette.scss, written
+       here as a literal because an SVG cannot read a Sass variable. That is
+       the ONE hardcoded copy of a palette colour outside the palette, and it
+       is deliberate -- see the palette's own "Cross-recipe links" comment for
+       why magenta is the site's single branded/interactive hue. If the brand
+       magenta ever changes, this file will not follow it on its own.
+
+       Magenta is food's palette colour and this favicon is shared with
+       cocktails, which has its own (placeholder) palette. Taken anyway: this
+       is Helen Triages' brand pink at the repo level, not food's section
+       code. Revisit if cocktails ever gets a real palette that fights it.
+
+       No brackets -- the issue's own fallback, taken deliberately: the
+       wordmark's "[ H ]" brackets are thin strokes that would turn to mud at
+       favicon sizes. -->
+  <rect width="64" height="64" rx="10" fill="#FF00C8"/>
   <path d="M18 14h7v14h14V14h7v36h-7V35H25v15h-7z" fill="#000000"/>
 </svg>
