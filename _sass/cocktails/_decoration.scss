@@ -10,11 +10,19 @@
 // attempted for that and the console stays clean.
 //
 // The ONE exception, added 2026-08-02 at Helen's explicit call: `tape` in
-// _data/sites.yml now points at a direct COPY of food's tape-*.svg files
+// _data/sites.yml points at a direct COPY of food's tape-*.svg files
 // (assets/img/cocktails/tape/), reused as a placeholder rather than left
 // blank, "for now". When cocktails gets its own tape artwork, swap the files
 // in that directory and this override stays valid — nothing here assumes
 // which SVG is behind it.
+//
+// Kept in PARITY with food, deliberately — Helen's call, 2026-08-15, issue
+// #223. Food's tape was redesigned on 2026-08-10 (issue #122, seven files
+// with real corner geometry and an edge bevel, replacing four plain
+// polygons) and cocktails sat on the old four for five days. The two
+// directories now hold the same seven. Parity is the standing rule until
+// cocktails has a visual language of its own: if you regenerate food's set,
+// copy it across in the same pass rather than leaving them to drift again.
 //
 // When more artwork arrives it goes in assets/img/cocktails/, the keys go
 // back into _data/sites.yml, and the styling for it goes here. Colour comes
