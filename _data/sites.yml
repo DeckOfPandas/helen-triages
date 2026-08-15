@@ -27,9 +27,16 @@
 #               entirely for none. Absent means NO fetch is attempted, rather
 #               than a fetch that 404s and warns — which is what a site with no
 #               artwork yet needs.
-#   about_url   where the header's small "?" link goes. Omit entirely for no
-#               link — the "?" itself isn't rendered rather than pointing
+#   about_url   where the header's small "??" link goes. Omit entirely for no
+#               link — the "??" itself isn't rendered rather than pointing
 #               nowhere, same absent-means-nothing convention as footer_svg.
+#   home_icon   basename (no .svg) of an _includes/icons/ partial linking to
+#               this site's own home, shown in the header nav. Omit for none.
+#   switch_site the OTHER site's key in this file — shown in the header nav as
+#               an icon linking to that site's home. Omit for no switcher
+#               (e.g. a site with no sibling yet).
+#   switch_icon basename (no .svg) of an _includes/icons/ partial used for the
+#               switch_site link above. Required if switch_site is set.
 # =============================================================================
 
 food:
@@ -42,6 +49,9 @@ food:
   tape_count: 7
   footer_svg: hearts/site-footer-hearts.svg
   about_url: /food/about/
+  home_icon: food-cloche-heart
+  switch_site: cocktails
+  switch_icon: glass-martini
 
 cocktails:
   title: Helen Triages Cocktails

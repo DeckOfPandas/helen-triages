@@ -97,15 +97,78 @@ article.recipe a {
   }
 }
 
-// The header's small print / about link (base styling in shared/_layout.scss,
-// .site-about-link) -- hot magenta on hover was Helen's explicit ask, but
+// The header nav row (base styling in shared/_layout.scss, .site-nav-icons /
+// .site-nav-icon-link) -- hot magenta on hover was Helen's explicit ask, but
 // $color-bright-magenta isn't one of the nine variables every site's
 // palette is guaranteed to define, so the shared file can't reference it
 // directly (see that rule's own comment). Food-only override; cocktails
 // gets a plainer hover from the shared default until it wants its own.
-.site-about-link:hover,
-.site-about-link:focus-visible {
+// Covers the "??" link and both nav icons -- one rule, since they share
+// .site-nav-icon-link.
+.site-nav-icon-link:hover,
+.site-nav-icon-link:focus-visible {
   color: $color-bright-magenta;
+}
+
+// --- Nav icon shapes -----------------------------------------------------
+// Icon sizing/positioning lives in shared/_layout.scss (.nav-icon,
+// .site-nav-icons); the shapes themselves -- and specifically which parts of
+// each are a fixed magenta accent vs. which follow the link's hover colour
+// -- are food-specific, since cocktails' own icons (not yet designed) won't
+// necessarily share these class names at all.
+//
+// Both icons split "outline" from "accent": the outline/body follows
+// currentColor so it inherits the link's own hover behaviour above, while
+// the accent (the heart, the martini's contents) stays a fixed magenta
+// regardless of hover -- Helen's ask was to fill them in magenta, not to
+// make them react to hover.
+// A solid silhouette has no "line" of its own to thicken -- self-stroking
+// (stroke colour == fill colour) dilates the shape outward instead, which
+// reads as chunkier linework the same way bumping the martini's
+// stroke-width below does. Helen's ask, 2026-08-15.
+.cloche-body {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+// Outline back to a fixed black ($color-text, the site's near-black) rather
+// than self-stroked magenta -- Helen's ask. Fixed, not currentColor: the
+// heart is a permanent two-tone accent (black line, magenta fill), not part
+// of the link's own hover colour shift the way cloche-body is.
+.cloche-heart {
+  fill: $color-bright-magenta;
+  stroke: $color-text;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.martini-outline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+// Outline only now -- no fill. The "contents" are a separate, smaller
+// .martini-liquid path (see the SVG partial), a flat-topped wedge offset a
+// constant distance in from both walls (not a centroid-scaled copy of the
+// bowl -- that pinched the gap to nearly nothing right where the walls
+// meet the tip, which read as "still touching"). Helen's ask, matching the
+// inset-fill convention she'd seen (and wanted the technique from, if not
+// the aesthetic) in other icon sets.
+.martini-bowl {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.martini-liquid {
+  fill: $color-bright-magenta;
 }
 
 // --- Title -------------------------------------------------------------------
