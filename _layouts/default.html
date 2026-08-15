@@ -57,12 +57,17 @@
   {% comment %} Each site links only its own compiled stylesheet, so the two
      never share a class name they could fight over. assets/css/food.scss and
      assets/css/cocktails.scss import the same shared partials and their own
-     palette. The root landing page has no site, so it links the shared base
-     only — see assets/css/root.scss. {% endcomment %}
+     palette.
+
+     There is no `{% else %}` branch here any more (GitHub issue #204 deleted
+     the root landing page, assets/css/root.scss and _sass/root/ along with
+     it — this layout's only remaining callers both have a site_key). If a
+     future page is ever rendered through default.html with no site_key, it
+     will silently get NO stylesheet at all — this tag will simply not
+     render — rather than falling back to anything. That is worth knowing
+     before you add one. {% endcomment %}
   {% if this_site %}
   <link rel="stylesheet" href="{{ '/assets/css/' | append: this_site.css | append: '.css' | relative_url }}">
-  {% else %}
-  <link rel="stylesheet" href="{{ '/assets/css/root.css' | relative_url }}">
   {% endif %}
   <meta name="base-url" content="{{ '/' | relative_url }}">
   {% comment %} Read by assets.js only, which exposes it as HTF.site and builds

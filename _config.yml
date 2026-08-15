@@ -78,7 +78,10 @@ collections:
 # `site_key` is the one value that makes the shared layout site-aware. It keys
 # into _data/sites.yml for the wordmark, page title, stylesheet and footer
 # decoration, and into _data/<key>/ for that site's vocabulary. A page with no
-# site_key (the root landing page) falls back to the repo-level identity above.
+# site_key falls back to the repo-level identity above — in practice this is
+# only the root index.html, which since GitHub issue #204 is a bare redirect
+# to food/ rather than a rendered page, so the fallback is largely academic
+# now.
 defaults:
   - scope:
       path: ""

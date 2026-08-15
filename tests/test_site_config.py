@@ -216,10 +216,10 @@ def test_pantry_entries_are_actually_used():
     Matching is exact and lowercase, exactly as index.html does it.
     """
     from conftest import ALL_RECIPES, ALL_DRAFTS
-    path = DATA / "common_ingredients.yml"
+    path = DATA / "pantry.yml"
     if not path.exists():
-        pytest.skip("_data/food/common_ingredients.yml does not exist yet")
-    pantry = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("pantry") or []
+        pytest.skip("_data/food/pantry.yml does not exist yet")
+    pantry = yaml.safe_load(path.read_text(encoding="utf-8")) or []
 
     used = set()
     for r in ALL_RECIPES + ALL_DRAFTS:
@@ -228,7 +228,7 @@ def test_pantry_entries_are_actually_used():
 
     unused = [p for p in pantry if p.lower() not in used]
     assert not unused, (
-        f"_data/food/common_ingredients.yml lists {unused}, which match no "
+        f"_data/food/pantry.yml lists {unused}, which match no "
         f"main_ingredients entry anywhere.\n"
         f"Matching is exact — 'onion' does not demote 'red onions'. Either the "
         f"entry is a typo, or it is aspirational and should come out until "
@@ -243,14 +243,14 @@ def test_pantry_list_is_lowercase():
     cannot fail and not notice" failure mode HANDOVER_v26.md §12 warns about:
     green, no error, just an entry that's dead weight forever.
     """
-    path = DATA / "common_ingredients.yml"
+    path = DATA / "pantry.yml"
     if not path.exists():
-        pytest.skip("_data/food/common_ingredients.yml does not exist yet")
-    pantry = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("pantry") or []
+        pytest.skip("_data/food/pantry.yml does not exist yet")
+    pantry = yaml.safe_load(path.read_text(encoding="utf-8")) or []
 
     not_lower = [p for p in pantry if p != p.lower()]
     assert not not_lower, (
-        f"_data/food/common_ingredients.yml has non-lowercase entries: {not_lower}.\n"
+        f"_data/food/pantry.yml has non-lowercase entries: {not_lower}.\n"
         f"food/index.html compares `ing | downcase` against this list as-is -- an "
         f"uppercase entry here matches nothing, ever, and nothing will tell you."
     )
@@ -284,7 +284,7 @@ def test_main_ingredients_sink_pantry_to_the_end():
         "chicken", "lemon", "onion", "butter",
     ]
 
-    # Exact match only -- a variety naming itself is not demoted (§6/common_ingredients.yml).
+    # Exact match only -- a variety naming itself is not demoted (§6/pantry.yml).
     assert _sink_pantry(["red onions", "onion"], pantry) == ["red onions", "onion"]
 
     # Case-insensitive: `ing | downcase` in the template.
@@ -746,9 +746,11 @@ def sass_files() -> list[Path]:
 
     rglob, NOT glob. The partials used to sit flat in _sass/ and the three
     structural tests below globbed "*.scss"; the mono-repo split moved every one
-    of them into _sass/shared/, _sass/food/, _sass/cocktails/ and _sass/root/,
-    which would have left that pattern matching an empty set. The tests would
-    have gone on PASSING while checking nothing at all.
+    of them into _sass/shared/, _sass/food/ and _sass/cocktails/ (there used
+    also to be a _sass/root/, for the landing page's own styles — deleted by
+    GitHub issue #204 along with the landing page itself), which would have
+    left that pattern matching an empty set. The tests would have gone on
+    PASSING while checking nothing at all.
 
     That is not hypothetical. The same failure had already happened once in this
     file: JS_DIR pointed at _sass's sibling `js/` after the scripts moved to
@@ -863,9 +865,12 @@ SHARED_PALETTE_CONTRACT = [
     "font-body", "font-headings",
 ]
 
-# Directories holding a _palette.scss: the two sites plus the landing page,
-# which belongs to neither but renders the same shared chrome.
-PALETTE_OWNERS = ["food", "cocktails", "root"]
+# Directories holding a _palette.scss: the two sites. There used to be a
+# third, "root", for the landing page — which belonged to neither site but
+# rendered the same shared chrome and so needed the same nine variables. The
+# landing page and its palette were deleted by GitHub issue #204 in favour of
+# a bare redirect from the root to food/, which needs no palette at all.
+PALETTE_OWNERS = ["food", "cocktails"]
 
 
 @pytest.mark.parametrize("owner", PALETTE_OWNERS)
@@ -1244,10 +1249,13 @@ def test_no_decoration_slot_is_orphaned():
 
     The reverse direction — a script querying a slot no template emits — is NOT
     checked here, because several classes filters.js queries are ones it creates
-    itself and no template ever contains. It is worth knowing that
-    `decorations.js`'s `doodles()` is dead by that measure: nothing emits
-    `data-index-doodle`. That predates this branch (it is dead on origin/main
-    too) and is recorded rather than fixed.
+    itself and no template ever contains. `decorations.js` used to carry a
+    `doodles()` function in exactly that shape, querying `data-index-doodle`
+    for a slot no template had emitted in as long as git remembered — GitHub
+    issue #228 deleted it (and the function was already the only thing in the
+    file referencing that attribute, so nothing else needed to change). Recorded
+    here as history rather than as a live caveat, since there is no longer any
+    dead code of this kind for this test's coverage gap to be hiding.
     """
     html_files = (
         sorted(ROOT.glob("_layouts/*.html"))

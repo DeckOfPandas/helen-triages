@@ -8,7 +8,7 @@
 // responsive suite precisely because there are none). Paper is a different
 // medium, not a narrower screen, so it is the one case a query earns.
 //
-// IMPORTED LAST, BY ALL THREE STYLESHEETS, AND BOTH HALVES OF THAT MATTER.
+// IMPORTED LAST, BY BOTH STYLESHEETS, AND BOTH HALVES OF THAT MATTER.
 //
 // Last, because `@media print` adds no specificity of its own. `.recipe-badges
 // { display: none }` here and `.recipe-badges { display: flex }` in
@@ -16,11 +16,13 @@
 // deciding which wins. Import this earlier and it silently stops working —
 // no error, just badges on the printout.
 //
-// All three, because this file styles the chrome every site renders, and
-// forgetting one is the trap HANDOVER §12 records twice already: food.scss,
-// cocktails.scss AND root.scss (the landing page, which belongs to neither
-// site and is the easy one to miss). Grep every `@import "shared/` site before
-// assuming you have them all.
+// Both, because this file styles the chrome every site renders. There used to
+// be a third — root.scss, for the landing page, which belonged to neither
+// site and was the easy one to miss — but GitHub issue #204 deleted the
+// landing page (and root.scss with it) in favour of a bare redirect at the
+// root, so food.scss and cocktails.scss are the whole list now. Still worth
+// grepping every `@import "shared/` site before assuming you have them all,
+// in case a fourth stylesheet ever turns up.
 //
 // PALETTE CONTRACT applies here as everywhere in shared/: only the nine
 // variables every site's palette guarantees may be named. This file uses one,
