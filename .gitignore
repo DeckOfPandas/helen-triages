@@ -19,12 +19,6 @@ _cocktail_drafts/
 # switch (controls what Jekyll renders); it does nothing about git. This is
 # the entry that actually keeps the file off GitHub.
 # food/about.html
-# Zero fact-checking as of 2026-08-14 -- transcribed from the original drafts
-# and never verified, unlike internal-temperatures and cooking-methods, which
-# were both checked against real sources. Held back the same way about.html is:
-# it builds locally so it can be worked on, and doesn't reach the public repo
-# until its ratings have been confirmed. HANDOVER §14 has the detail.
-food/reference/sustainability.html
 
 # Ruby
 vendor/
