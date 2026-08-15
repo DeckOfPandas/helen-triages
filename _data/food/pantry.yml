@@ -5,6 +5,15 @@
 # Listed here so the index hint can sink them to the end of the line, leaving
 # the distinctive ingredients where the eye lands first.
 #
+# A BARE LIST, not a `pantry:` key wrapping one -- this file WAS named
+# common_ingredients.yml and held a single `pantry:` key (GitHub issue #130
+# renamed it). Jekyll would otherwise have exposed the rename as
+# `site.data.food.pantry.pantry`, which reads badly for no benefit -- the file
+# already has exactly one thing in it, so flattening it to a bare list makes
+# the access `site.data.food.pantry` instead. If this file ever needs a second
+# top-level key, it stops being a bare list and both the access path here and
+# food/index.html's `{% assign %}` need to change together.
+#
 # THIS DOES NOT CHANGE THE DATA. `main_ingredients` stays an unordered set in
 # the front matter; ordering happens at render time, in index.html only.
 # `main_ingredients` appears nowhere else — the recipe page uses
@@ -23,53 +32,52 @@
 # place at the front.
 # =============================================================================
 
-pantry:
-  # Fats
-  - butter
-  - salted butter
-  - unsalted butter
-  - olive oil
-  - extra-virgin olive oil
-  - vegetable oil
-  - sunflower oil
-  - groundnut oil
+# Fats
+- butter
+- salted butter
+- unsalted butter
+- olive oil
+- extra-virgin olive oil
+- vegetable oil
+- sunflower oil
+- groundnut oil
 
-  # Flours and raising agents
-  - flour
-  - plain flour
-  - self-raising flour
-  - cornflour
-  - baking powder
-  - bicarbonate of soda
+# Flours and raising agents
+- flour
+- plain flour
+- self-raising flour
+- cornflour
+- baking powder
+- bicarbonate of soda
 
-  # Sugars
-  - sugar
-  - caster sugar
-  - golden caster sugar
-  - icing sugar
-  - brown sugar
-  - dark brown soft sugar
-  - muscovado sugar
+# Sugars
+- sugar
+- caster sugar
+- golden caster sugar
+- icing sugar
+- brown sugar
+- dark brown soft sugar
+- muscovado sugar
 
-  # Dairy basics
-  - milk
-  - eggs
-  - egg
-  - egg whites
-  - egg yolks
+# Dairy basics
+- milk
+- eggs
+- egg
+- egg whites
+- egg yolks
 
-  # Aromatic base — the mirepoix you always have
-  - garlic
-  - onion
-  - onions
-  - shallots
+# Aromatic base — the mirepoix you always have
+- garlic
+- onion
+- onions
+- shallots
 
-  # Liquids you keep in a cupboard
-  - chicken stock
-  - vegetable stock
-  - beef stock
-  - water
+# Liquids you keep in a cupboard
+- chicken stock
+- vegetable stock
+- beef stock
+- water
 
-  # Seasoning
-  - salt
-  - sea salt
+# Seasoning
+- salt
+- sea salt

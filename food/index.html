@@ -137,12 +137,12 @@ permalink: /food/
         {% if recipe.main_ingredients and recipe.main_ingredients.size > 0 %}
         {% comment %} Order is a PRESENTATION concern — main_ingredients stays an
            unordered set in the front matter. Pantry staples listed in
-           _data/common_ingredients.yml sink to the end so the eye meets the
+           _data/food/pantry.yml sink to the end so the eye meets the
            distinctive ingredients first: identify, then warn, then trail off.
            Authored order is preserved within each half, and the data-ingredients
            attribute above is left untouched because filters.js reads it as a set.
         {% endcomment %}
-        {% assign _pantry = site.data.food.common_ingredients.pantry %}
+        {% assign _pantry = site.data.food.pantry %}
         {% assign _lead = "" %}
         {% assign _tail = "" %}
         {% for ing in recipe.main_ingredients %}
