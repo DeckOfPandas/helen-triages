@@ -147,21 +147,22 @@ article.recipe a {
 .martini-outline {
   fill: none;
   stroke: currentColor;
-  stroke-width: 4;
+  stroke-width: 6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 // Outline only now -- no fill. The "contents" are a separate, smaller
-// .martini-liquid path (see the SVG partial) scaled inward from this same
-// outline around its own centroid, so there's a visible gap between the
-// glass and the liquid rather than the fill touching the stroke edge to
-// edge. Helen's ask, matching the inset-fill convention she'd seen (and
-// wanted the technique from, if not the aesthetic) in other icon sets.
+// .martini-liquid path (see the SVG partial), a flat-topped wedge offset a
+// constant distance in from both walls (not a centroid-scaled copy of the
+// bowl -- that pinched the gap to nearly nothing right where the walls
+// meet the tip, which read as "still touching"). Helen's ask, matching the
+// inset-fill convention she'd seen (and wanted the technique from, if not
+// the aesthetic) in other icon sets.
 .martini-bowl {
   fill: none;
   stroke: currentColor;
-  stroke-width: 4;
+  stroke-width: 6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
