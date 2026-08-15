@@ -116,6 +116,12 @@ defaults:
 # Keep non-site files out of the build. Setting `exclude` REPLACES Jekyll's
 # defaults, so the standard entries are repeated here.
 exclude:
+  # Scratch space (CLAUDE.md: never machine /tmp, always this folder). Gitignored,
+  # so a CI build never sees it -- but a LOCAL build copied the whole thing into
+  # _site/tmp/, which is how a stray *.test.js backup there ended up being
+  # collected by `node --test` and failing against a path that doesn't resolve
+  # from its copied location. The scratch folder is not part of the site.
+  - tmp/
   - .jekyll-cache/
   - .sass-cache/
   - Gemfile
