@@ -172,6 +172,20 @@
   margin: 0 0 $spacing-section-top 0;
 }
 
+// The "What" selector, lifted out of .ct-controls by issue #253 to sit above
+// the heading it retitles. No border and no section-sized gap of its own: the
+// heading immediately below already brings $spacing-section-top with it, and a
+// second value here would fight one that is already correct -- the same
+// adjacent-margin reasoning .tc-totop and .tc-crosslink-line follow on the
+// temperature charts.
+//
+// It keeps .ct-field for the label-above-control shape, so the two boxes still
+// look like one family despite now sitting either side of a heading. If they
+// ever stop matching, that is the thing to preserve.
+.ct-protein-pick {
+  margin: 0;
+}
+
 // The count of methods, which now leads the TABLE rather than the page: it is
 // the sentence the rows below it are seven of. It opened the page while the
 // controls needed a "why" above them -- Helen: "otherwise you get some

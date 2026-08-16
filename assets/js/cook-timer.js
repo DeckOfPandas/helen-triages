@@ -111,13 +111,17 @@
       return;
     }
 
-    /* The count leads the table rather than the page: it is the sentence the
-       seven rows below it are seven of. Full stop and nothing else -- it used
-       to end "Add a serving time for clock times", which was an instruction
-       about a box that no longer exists. */
-    els.summary.textContent =
-      protein.methods.length + " ways to cook " + kg + " kg of " +
-      protein.label.toLowerCase() + ".";
+    /* CLEARED, not written. The count -- "7 ways to cook 2.4 kg of beef" --
+       went in issue #253: it sat directly above a table of exactly those
+       seven, so it announced what the next element already showed, in less
+       useful form. This element survives for the one thing the table cannot
+       say for itself, above: that there is no usable weight yet, at the
+       moment when the table is empty and silent about why.
+
+       Clearing it here matters. Leaving the previous prompt in place after a
+       weight is typed would strand "Enter a weight to see how long each
+       method takes" above a filled table. */
+    els.summary.textContent = "";
 
     /* --- the decision table ------------------------------------------------
        The cards below answer "how long does this method take". They do not
