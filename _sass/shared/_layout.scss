@@ -214,10 +214,16 @@ main {
   gap: $space-lg;
 }
 
-// Sits against the graphic rather than out at the page edge, so it reads as
-// attached to the footer's own centre of gravity.
+// Flush with where the page's own text starts, not tucked against the graphic
+// (Helen, 2026-08-16). No offset needed to achieve that: `main` and
+// .site-footer are both max-width: $width-content, margin: 0 auto, and both
+// pad their left edge by 1.5rem ($space-xl for main, a literal here), so
+// column one of this grid already begins on main's text edge. If either
+// padding changes, this alignment goes with it -- they are the same number by
+// coincidence rather than by a shared token, which is worth knowing before
+// editing one of them.
 .site-footer-ref {
-  justify-self: end;
+  justify-self: start;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -233,13 +239,18 @@ main {
   //
   // Font is inherited, not restated: .site-footer is already $font-headings at
   // 0.75rem in $color-clear-text, which is the Courier-not-heavy this wanted.
+  //
+  // THE RESTING COLOUR IS ALL THIS LAYER SETS. The hover/active colour is the
+  // site's own link colour, which is NOT in the nine-variable shared palette
+  // contract (test_every_palette_satisfies_the_shared_contract) -- naming
+  // $color-recipe-link-hover here would compile fine for food and break the
+  // cocktails build outright. So it lives in _sass/food/_footer.scss, and a
+  // site without that rule simply keeps the resting colour throughout.
   a {
     color: inherit;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
-
-    &:hover { color: $color-text; }
   }
 }
 
