@@ -498,19 +498,21 @@ article.recipe .recipe-section-heading {
 // five of nine: a chart with no way through to the calculator or the
 // methods table was simply missing one.
 //
-// The class sits on the <a> itself, not a wrapping <p> -- inside the
-// heading it has to be a direct child of .recipe-section-heading for the
-// flex rule below to find it, and giving the standalone instance
-// (.tc-crosslink-standalone below, and the copy under the contents list)
-// the same shape keeps this to one rule instead of two.
+// The class sits on the <a>, inside a .tc-crosslink-line paragraph.
 //
-// RESETS. .recipe-section-heading (via %heading-base and punched(raised))
-// sets text-transform: uppercase, letter-spacing: 0.08em,
-// -webkit-text-stroke and text-shadow, and all four inherit -- see
-// HANDOVER §12. Left unreset, this link would render UPPERCASE (wrong
-// copy) wearing the heading's own emboss (wrong look). Colour and
-// font-weight need no reset: article.recipe a sets both directly on the
-// <a> itself, which beats inheritance regardless of nesting.
+// THE RESETS BELOW ARE NOW BELT AND BRACES, and are kept deliberately.
+// While the link lived INSIDE .recipe-section-heading (issue #215, for one
+// day) it inherited text-transform: uppercase, letter-spacing: 0.08em,
+// -webkit-text-stroke and text-shadow from %heading-base and
+// punched(raised) -- so without these it rendered as uppercase heading copy
+// wearing the heading's own emboss. Issue #240 moved it out into its own
+// paragraph, where it inherits none of that.
+//
+// They stay because this link is one edit away from being inside a heading
+// again, the styling of that heading is not this file's to control, and a
+// reset that is currently redundant costs nothing while its absence is
+// invisible until someone moves the element. HANDOVER §12's entry on
+// inheriting from a punched-tape heading is the general form.
 .tc-crosslink {
   font-family: $font-body;
   font-size: 0.8rem;
@@ -521,26 +523,31 @@ article.recipe .recipe-section-heading {
   white-space: nowrap;
 }
 
-// Puts the crosslink on the right of the heading's own line, flex with a
-// gap token rather than a float or absolute position -- HANDOVER §13.3.
-// Scoped with :has() to headings that actually carry one, so every other
-// .recipe-section-heading on the site (title span only, no second child)
-// is untouched. flex-wrap so a long heading plus a long link text drops to
-// two lines on a narrow viewport instead of overflowing.
-.recipe-section-heading:has(> .tc-crosslink) {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: $space-xs $space-lg;
-}
-
-// The one standalone instance: below the contents list, reaching the
-// calculator before any section at all (issue #209). Margin is 0 for the
-// same reason as .tc-totop above -- .tc-contents already carries
-// $spacing-section-gap as its own bottom margin, and the first heading
-// below carries $spacing-section-top as its own top margin, so adjacent
-// sibling collapsing does the placing without a third, competing value.
-.tc-crosslink-standalone {
+// SUPERSEDED, kept as a note rather than as code. The crosslink sat on the
+// right of the heading's own line for a day (issue #215), scoped with :has()
+// so only headings carrying one became a flex row. Issue #240 moved it back
+// beneath the title -- Helen's call after looking at it: "an effort to reduce
+// visual confusion (mine)". Every crosslink is now a .tc-crosslink-line
+// paragraph directly under its heading, in the slot the carryover subtitles
+// used to occupy, so there is one placement rather than two.
+//
+// The old rule read:
+//   .recipe-section-heading:has(> .tc-crosslink) { display: flex; ... }
+// and is gone rather than left commented out. If it ever comes back, the
+// reason it needed :has() is that a bare .recipe-section-heading has one
+// child, and flexing all of them would have moved every heading on the site.
+// EVERY crosslink now sits in one of these, including the one below the
+// contents list that used to be the odd one out as .tc-crosslink-standalone
+// (issue #209). It stopped being standalone the moment #240 gave the other
+// eleven the same treatment, so the class carries the name of the shape
+// rather than of its former exception.
+//
+// Margin is 0 for the same reason .tc-totop's is: the heading above already
+// owns $spacing-section-top and the chart below owns its own gap, so adding
+// a third value here would fight two that already agree. This paragraph now
+// occupies the slot the carryover subtitles used to, and .recipe-section-
+// subtitle's own margins are what set the rhythm on the sections that still
+// have one.
+.tc-crosslink-line {
   margin: 0;
 }
