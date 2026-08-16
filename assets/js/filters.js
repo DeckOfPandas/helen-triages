@@ -493,7 +493,12 @@ function renderResultsPool() {
     document.querySelectorAll('.recipe-list .badge').forEach(function(badge) {
       var badgeTag = badge.dataset.tag;
       var badgeStar = badge.dataset.star;
-      badge.classList.remove('badge--matched', 'badge-ingredient-hit');
+      // 'badge-ingredient-hit' used to be removed here too. Nothing in the
+      // repo ever ADDED it -- it was removed on every pass and applied on
+      // none, so it could only ever be a no-op. Found when issue #237 deleted
+      // its last stylesheet rule and the class turned out to have no other
+      // reference anywhere. Gone with the rule.
+      badge.classList.remove('badge--matched');
       if ((badgeTag && activeTags.has(badgeTag)) || (badgeStar && activeStar === badgeStar)) {
         badge.classList.add('badge--matched');
       }
