@@ -86,8 +86,14 @@
   // (the darker -active hue), same two-tone split the rest of the page's
   // colour system already uses -- text needs to stay readable sitting on
   // top of the shape, not disappear into it.
+  // GitHub issue #40: these three are <a> elements now (see
+  // _includes/recipe_badges.html) and clicking one filters the index by it.
+  // A pointer cursor is the only resting affordance -- they already look
+  // distinct enough that adding an underline or a border would just make the
+  // row noisier for something you find by moving the mouse anyway.
   &-star, &-mood, &-practicalities {
     clip-path: none;
+    cursor: pointer;
   }
 
   // Resting pill shape, take two: rgba(..., 0.4) was still too loud (Helen,
@@ -114,6 +120,41 @@
     color: $color-practicalities-active;
     .tag-shape { color: mix($color-practicalities-root, $color-border, 35%); }
   }
+}
+
+// --- Badge hover (GitHub issue #40) ------------------------------------------
+// WHAT IT DOES: previews the matched state. The resting .tag-shape above is
+// the category hue mixed down into $color-border; on hover it goes to the same
+// lightened full-strength hue .badge--matched uses
+// (_active-filter-states.scss), so hovering shows you what clicking is about
+// to do to that badge. No new colour is introduced -- both ends of the move
+// are values the page already spends, which is what §13.5's five-hue code and
+// the palette's colour budget require.
+//
+// WHY EACH SELECTOR LEADS WITH `a`, AND WHY THAT IS NOT COSMETIC.
+// shared/_base.scss sets `a:hover { color: $color-mood-root }` -- (0,1,1),
+// which BEATS a bare `.badge-star` (0,1,0). Written as `.badge-star:hover`
+// these rules would set the shape colour and then lose the text colour, so
+// hovering a STAR or a PRACTICALITIES badge would turn its lettering MOOD's
+// cerulean: the category code saying the wrong thing, on hover only, on the
+// one page where the code is load-bearing. `a.badge-star:hover` is (0,1,2) and
+// wins on its own merits rather than on source order, which a partial in an
+// @import list can never safely rely on. The `color` line is therefore
+// deliberate and not a redundant restatement of the resting rule -- it is what
+// holds the category colour against the base stylesheet.
+a.badge-star:hover {
+  color: $color-star-active;
+  .tag-shape { color: mix($color-star-root, $color-white, 82%); }
+}
+
+a.badge-mood:hover {
+  color: $color-mood-active;
+  .tag-shape { color: mix($color-mood-root, $color-white, 82%); }
+}
+
+a.badge-practicalities:hover {
+  color: $color-practicalities-active;
+  .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
 }
 
 // The tape shape itself: absolutely positioned behind the badge/button text,

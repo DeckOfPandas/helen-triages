@@ -85,7 +85,14 @@ article.recipe .method-short {
 // font has real weight gradations (unlike Courier New, see §13.6 in
 // HANDOVER), so a heavier weight reads as "different and interactive"
 // without needing an underline too.
-article.recipe a {
+// `a:not(.badge)`, not a bare `a`, since GitHub issue #40 made the taxonomy
+// badges in .recipe-badges genuine links. Without the exclusion this rule
+// (0,1,1) beats .badge-star/.badge-mood/.badge-practicalities (0,1,0) and
+// repaints all three magenta, which would delete the whole category colour
+// code from the recipe page's badge row. `:not()` takes its argument's
+// specificity, so this is (0,2,1) -- still comfortably ahead of the shared
+// `a { color: $color-text }` it exists to beat, and the exclusion is free.
+article.recipe a:not(.badge) {
   color: $color-recipe-link;
   font-weight: 600;
 

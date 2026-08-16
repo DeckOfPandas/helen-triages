@@ -125,7 +125,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!recipeList) return;
     var byTier = { 0: [], 1: [], 2: [], 3: [] };
     items.forEach(function(li) {
-      var title = (li.querySelector('a') || {}).textContent || '';
+      // .recipe-title-link, not the first <a> in the row. It used to be
+      // querySelector('a'), which worked only by accident: the title link
+      // happened to be the first link in the <li>. GitHub issue #40 put
+      // badge links in the same <li>, at which point "the first <a>" is
+      // still the title today and stops being it the moment anything is
+      // added above it. Named, so it cannot drift.
+      var title = (li.querySelector('.recipe-title-link') || {}).textContent || '';
       var tier = HTF.recipeList.titleMatchTier(title, nameQuery, fold);
       byTier[tier].push(li);
     });
@@ -327,9 +333,62 @@ function renderResultsPool() {
   // to be right, and no way for the visual state and the announced state to
   // disagree.
   function syncAriaPressed() {
+    if (!matrix) return;
     matrix.querySelectorAll('.btn-star, .btn-tag, .btn-meta').forEach(function(btn) {
       btn.setAttribute('aria-pressed', btn.classList.contains('active') ? 'true' : 'false');
     });
+  }
+
+  // Paint .active on the filter buttons FROM STATE, rather than at each of
+  // the places state changes. Exactly the argument syncAriaPressed's own
+  // comment above makes, one layer down: .active used to be toggled inline at
+  // every toggle site, which was survivable while the only way to change a
+  // filter was to click its own button. Issue #40 adds a second way in (a
+  // badge on a recipe row), and a query string at load is a third -- and
+  // neither of those has a `target` button to reach for at all. One place to
+  // be right; the toggles below just change state and call update().
+  //
+  // .btn-ingredient is excluded deliberately: those buttons also carry
+  // .btn-tag, but their selected state is activeIngredient's, not
+  // activeTags', and it is maintained where they are built and clicked.
+  function syncFilterButtons() {
+    if (!matrix) return;
+    matrix.querySelectorAll('.btn-tag').forEach(function(btn) {
+      if (btn.classList.contains('btn-ingredient')) return;
+      btn.classList.toggle('active', activeTags.has(btn.dataset.tag));
+    });
+    matrix.querySelectorAll('.btn-star').forEach(function(btn) {
+      btn.classList.toggle('active', activeStar === btn.dataset.star);
+    });
+    matrix.querySelectorAll('.btn-meta').forEach(function(btn) {
+      btn.classList.toggle('active', activeMetaFilters.has(btn.dataset.meta));
+    });
+  }
+
+  // The three toggles, lifted out of the matrix click handler so a badge
+  // click (and, later, issue #52's exclusion) can be the SAME action rather
+  // than a second implementation of it. Note what they do not do: touch a
+  // button's classes. That is syncFilterButtons()' job now.
+  function toggleTag(value) {
+    if (!value) return;
+    if (activeTags.has(value)) activeTags.delete(value);
+    else activeTags.add(value);
+    update();
+  }
+
+  // Single-select, unlike tags: picking a second star replaces the first
+  // rather than adding to it, and picking the active one again clears it.
+  function toggleStar(value) {
+    if (!value) return;
+    activeStar = (activeStar === value) ? null : value;
+    update();
+  }
+
+  function toggleMeta(value) {
+    if (!value) return;
+    if (activeMetaFilters.has(value)) activeMetaFilters.delete(value);
+    else activeMetaFilters.add(value);
+    update();
   }
 
   function update(preservePage) {
@@ -367,7 +426,9 @@ function renderResultsPool() {
       if (activeStar && star !== activeStar) visible = false;
 
       if (nameQuery) {
-        var title = (li.querySelector('a') || {}).textContent || '';
+        // Named class, not querySelector('a') -- see reorderForTitleSearch()
+        // above for why that stopped being safe with issue #40's badge links.
+        var title = (li.querySelector('.recipe-title-link') || {}).textContent || '';
         if (HTF.ingredientSearch.fold(title.toLowerCase()).indexOf(nameQuery) === -1) visible = false;
       }
 
@@ -422,10 +483,18 @@ function renderResultsPool() {
       });
     }
 
+    // Matched by the badge's own data-tag/data-star, not by its text. The
+    // text comparison this replaces could not tell a MOOD badge from a STAR
+    // one: any badge whose words happened to equal the active star lit up as
+    // matched. Latent while the two vocabularies had no overlap, and no
+    // longer worth relying on now that issue #40 gives every badge the exact
+    // value it stands for. Meta/draft badges carry neither attribute, so
+    // they fall through both tests and are never matched, as before.
     document.querySelectorAll('.recipe-list .badge').forEach(function(badge) {
-      var text = badge.textContent.trim();
+      var badgeTag = badge.dataset.tag;
+      var badgeStar = badge.dataset.star;
       badge.classList.remove('badge--matched', 'badge-ingredient-hit');
-      if (activeTags.has(text) || activeStar === text) {
+      if ((badgeTag && activeTags.has(badgeTag)) || (badgeStar && activeStar === badgeStar)) {
         badge.classList.add('badge--matched');
       }
     });
@@ -470,8 +539,16 @@ function renderResultsPool() {
     });
     if (activeKey2 && window.HTF && HTF.tagShapes) HTF.tagShapes();
 
+    // Null-guarded like every other lookup in this function. It was the one
+    // exception among roughly fifteen, and the consequences were out of all
+    // proportion to the omission: on a page without this element update()
+    // threw HERE, three statements before updateInlineLabels(),
+    // syncAriaPressed() and updateIngredientClamp(), so three unrelated
+    // things silently stopped happening and nothing said why.
     var emptyMessage = document.querySelector('.recipe-list-empty');
-    emptyMessage.style.display = (!suppressList && visibleCount === 0) ? 'block' : 'none';
+    if (emptyMessage) {
+      emptyMessage.style.display = (!suppressList && visibleCount === 0) ? 'block' : 'none';
+    }
 
     var searchingMessage = document.querySelector('.recipe-list-searching');
     if (searchingMessage) searchingMessage.style.display = suppressList ? 'block' : 'none';
@@ -501,6 +578,9 @@ function renderResultsPool() {
       if (pageStatusEl) pageStatusEl.textContent = 'page ' + currentPage + ' of ' + totalPages;
     }
 
+    // Order matters between these two: syncAriaPressed() reads the .active
+    // class syncFilterButtons() has just painted.
+    syncFilterButtons();
     updateInlineLabels();
     updateIngredientClear();
     syncAriaPressed();
@@ -527,42 +607,17 @@ function renderResultsPool() {
       var target = e.target;
 
       if (target.classList.contains('btn-tag') && !target.classList.contains('btn-ingredient')) {
-        var tag = target.dataset.tag;
-        if (activeTags.has(tag)) {
-          activeTags.delete(tag);
-          target.classList.remove('active');
-        } else {
-          activeTags.add(tag);
-          target.classList.add('active');
-        }
-        update();
+        toggleTag(target.dataset.tag);
         return;
       }
 
       if (target.classList.contains('btn-star')) {
-        var starValue = target.dataset.star;
-        if (activeStar === starValue) {
-          activeStar = null;
-          target.classList.remove('active');
-        } else {
-          activeStar = starValue;
-          matrix.querySelectorAll('.btn-star').forEach(function(b) { b.classList.remove('active'); });
-          target.classList.add('active');
-        }
-        update();
+        toggleStar(target.dataset.star);
         return;
       }
 
       if (target.classList.contains('btn-meta')) {
-        var metaKey = target.dataset.meta;
-        if (activeMetaFilters.has(metaKey)) {
-          activeMetaFilters.delete(metaKey);
-          target.classList.remove('active');
-        } else {
-          activeMetaFilters.add(metaKey);
-          target.classList.add('active');
-        }
-        update();
+        toggleMeta(target.dataset.meta);
         return;
       }
 
@@ -571,11 +626,9 @@ function renderResultsPool() {
         if (row) {
           if (row.classList.contains('category--star')) {
             activeStar = null;
-            matrix.querySelectorAll('.btn-star').forEach(function(b) { b.classList.remove('active'); });
           } else {
             row.querySelectorAll('.btn-tag').forEach(function(b) {
               activeTags.delete(b.dataset.tag);
-              b.classList.remove('active');
             });
           }
           update();
@@ -608,6 +661,34 @@ function renderResultsPool() {
         update();
         return;
       }
+    });
+  }
+
+  // GitHub issue #40: a badge on a recipe row filters the list, and does
+  // EXACTLY what clicking that filter's own button does -- same toggle, same
+  // state, no second set of semantics to keep in step.
+  //
+  // Delegated on .recipe-list rather than bound per badge: there are eight
+  // hundred-odd badges on this page, and pagination hides rows rather than
+  // removing them, so a per-badge listener would be eight hundred listeners
+  // for one behaviour.
+  //
+  // preventDefault(), because the href is a genuine link (see
+  // _includes/recipe_badges.html) and following it would reload the index to
+  // do in-place what has just been done in place. The href still earns its
+  // keep: middle-click, ctrl/cmd-click and "open in new tab" never reach this
+  // handler at all, and on a recipe page nothing intercepts it.
+  if (recipeList) {
+    recipeList.addEventListener('click', function(e) {
+      if (!e.target || !e.target.closest) return;
+      // closest(), not a check on e.target itself: a badge contains a
+      // .tag-shape span with an injected <svg> inside it, so the click can
+      // land on a descendant.
+      var badge = e.target.closest('.badge[data-tag], .badge[data-star]');
+      if (!badge || !recipeList.contains(badge)) return;
+      e.preventDefault();
+      if (badge.dataset.star) toggleStar(badge.dataset.star);
+      else toggleTag(badge.dataset.tag);
     });
   }
 
@@ -649,11 +730,9 @@ function renderResultsPool() {
       if (nameSearchBox) nameSearchBox.value = '';
       if (nameSearchClear) nameSearchClear.style.visibility = 'hidden';
       if (resultsPool) resultsPool.innerHTML = '';
-      if (matrix) {
-        matrix.querySelectorAll('.btn-tag, .btn-star, .btn-meta').forEach(function(btn) {
-          btn.classList.remove('active');
-        });
-      }
+      // No button-class loop here any more: update() below calls
+      // syncFilterButtons(), which paints every filter button from the state
+      // this function has just emptied.
       // Reshuffles only here, on the deliberate "clear everything at once"
       // action — not on every incidental path back to zero active filters
       // (e.g. toggling the last individual tag off), which reads as an
@@ -702,8 +781,51 @@ function renderResultsPool() {
     resizeTimer = setTimeout(updateIngredientClamp, 120);
   });
 
-  // A fresh page load starts at "no filters active" too — the same state
-  // "clear all" produces — so it gets the same shuffle for the same reason.
+  // GitHub issue #40: `/food/?star=lamb&tag=soup` arrives already filtered.
+  // The grammar is assets/js/filter-state.js's; what belongs HERE is the
+  // validation, because only this file can see which filters the page
+  // actually offers.
+  //
+  // VALIDATED BY ITERATING THE BUTTONS AND COMPARING dataset, not by building
+  // a `[data-tag="..."]` attribute selector out of the query string. The value
+  // is arbitrary text off a URL, so a selector would raise the whole question
+  // of quoting and escaping (and throw a SyntaxError on the wrong answer) for
+  // no gain; a string comparison has no syntax to get wrong.
+  //
+  // Anything that survives parsing but matches no button is dropped in
+  // silence -- same policy cook-timer.js already applies to `?protein=beef`.
+  // A stale link to a retired tag lands on a perfectly good unfiltered index,
+  // which is a better outcome than an error on a page that works fine.
+  (function applyQueryString() {
+    if (!matrix || !window.HTF || !HTF.filterState) return;
+    var wanted = HTF.filterState.parseQuery(location.search);
+
+    function isOffered(selector, datasetKey, value) {
+      var found = false;
+      matrix.querySelectorAll(selector).forEach(function(btn) {
+        if (btn.classList.contains('btn-ingredient')) return;
+        if (btn.dataset[datasetKey] === value) found = true;
+      });
+      return found;
+    }
+
+    wanted.tag.forEach(function(value) {
+      if (isOffered('.btn-tag', 'tag', value)) activeTags.add(value);
+    });
+
+    // Single-select, so the last one NAMED IN THE URL wins -- consistent with
+    // clicking two star buttons in a row, where the second replaces the first.
+    // Driven off the parsed list rather than off the buttons for exactly that
+    // reason: iterating buttons would make DOM order, not the URL, decide.
+    wanted.star.forEach(function(value) {
+      if (isOffered('.btn-star', 'star', value)) activeStar = value;
+    });
+  })();
+
+  // A fresh page load starts from the same random base order "clear all"
+  // produces, for the same reason: no recipe should be permanently stuck at
+  // the bottom. That holds whether or not the query string above put a filter
+  // on -- a filter narrows which rows show, it doesn't decide their order.
   // .recipe-list starts visibility:hidden in CSS specifically so this can run
   // before anything is shown — revealing it only now means the shuffled order
   // is what paints, not the server-rendered alphabetical order flashing first.
