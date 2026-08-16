@@ -514,3 +514,59 @@ test('proteinOrder sorts by the label you read, not by the data file\'s key orde
   };
   assert.deepStrictEqual(CS.proteinOrder(methods), ['beef', 'ham', 'turkey']);
 });
+
+// =============================================================================
+// EVERY DONENESS LEVEL IS REACHABLE — GitHub issue #246
+// =============================================================================
+//
+// The timings page hard-wired `doneness` to "rare" and shipped no control, so
+// the medium rates in cooking_methods.yml could not be displayed by anything:
+// real, sourced data that no reader could reach. resolve() now returns every
+// level alongside the requested one, and the page renders them all.
+//
+// These assert the WHOLE SET, not just that medium exists. A test that only
+// checked `levels.length > 0` would pass on a resolve() that returned the
+// requested level twice.
+
+test('by_doneness: resolve returns every level, not only the one asked for', () => {
+  const r = CS.resolve(BY_DONENESS, 2, 'rare', [BY_DONENESS]);
+  assert.deepStrictEqual(
+    r.levels.map((l) => l.name),
+    Object.keys(BY_DONENESS.by_doneness),
+    'levels must name every doneness the data declares, in the data order'
+  );
+});
+
+test('by_doneness: each level carries its OWN figures, not the requested one repeated', () => {
+  const r = CS.resolve(BY_DONENESS, 2, 'rare', [BY_DONENESS]);
+  const seen = new Set(r.levels.map((l) => l.lo + '-' + l.hi));
+  assert.strictEqual(
+    seen.size, r.levels.length,
+    'two levels resolved to identical figures. The fixture states different ' +
+    'rates per level, so this means every level was computed from the ' +
+    'requested one -- the exact bug that made medium unreachable.'
+  );
+  r.levels.forEach((lv) => {
+    const d = BY_DONENESS.by_doneness[lv.name];
+    assert.strictEqual(lv.lo, d.rate_min * 2 + (d.flat_add || 0));
+    assert.strictEqual(lv.hi, d.rate_max * 2 + (d.flat_add_max || d.flat_add || 0));
+  });
+});
+
+test('by_doneness: flat_add_max is honoured per level, not just on the asked-for one', () => {
+  // The #245 bug (an asymmetric upper bound silently dropped) would otherwise
+  // be free to reappear inside `levels` while resolve's own lo/hi stayed right.
+  const r = CS.resolve(BY_DONENESS_WITH_MAX, 1, 'rare', [BY_DONENESS_WITH_MAX]);
+  r.levels.forEach((lv) => {
+    const d = BY_DONENESS_WITH_MAX.by_doneness[lv.name];
+    if (d.flat_add_max) {
+      assert.strictEqual(lv.hi, d.rate_max * 1 + d.flat_add_max);
+      assert.notStrictEqual(lv.hi, d.rate_max * 1 + (d.flat_add || 0));
+    }
+  });
+});
+
+test('a shape without doneness has no levels, so the page renders one figure', () => {
+  const r = CS.resolve(RATE_WITH_MAX, 2, 'rare', [RATE_WITH_MAX]);
+  assert.strictEqual(r.levels, undefined);
+});

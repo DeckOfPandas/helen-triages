@@ -81,6 +81,22 @@
 
   /* --- render -------------------------------------------------------------- */
 
+  /* One method's time, as the table cell and the card headline both want it.
+     A by_doneness method (issue #246) shows EVERY level rather than the one
+     the page happens to have asked for -- see HTF.cookSchedule.resolve for why
+     both figures and not a control. Everything else is a single span, exactly
+     as before. */
+  function timeHtml(r) {
+    if (!r.ok) return null;
+    if (!r.levels || r.levels.length < 2) return CS.span(r.lo, r.hi);
+    return "<span class='ct-doneness'>" + r.levels.map(function (lv) {
+      return "<span class='ct-doneness-level'>" +
+               "<span class='ct-doneness-label'>" + lv.label + "</span>" +
+               CS.span(lv.lo, lv.hi) +
+             "</span>";
+    }).join("") + "</span>";
+  }
+
   function render() {
     var protein = METHODS[els.protein.value];
     var kg = parseFloat(els.weight.value);
@@ -143,7 +159,7 @@
       return "<tr>" +
         "<td>" + method.name + "</td>" +
         "<td>" + (method.outcome || "—") + "</td>" +
-        "<td>" + (r.ok ? CS.span(r.lo, r.hi) : "<em>won’t guess</em>") + "</td>" +
+        "<td>" + (r.ok ? timeHtml(r) : "<em>won’t guess</em>") + "</td>" +
         "</tr>";
     }).join("");
 
@@ -170,7 +186,7 @@
       var html =
         "<div class='ct-card-head'>" +
           "<h3 class='ct-card-name'>" + method.name + "</h3>" +
-          "<p class='ct-total'>" + (r.ok ? CS.span(r.lo, r.hi) : "—") + "</p>" +
+          "<p class='ct-total'>" + (r.ok ? timeHtml(r) : "—") + "</p>" +
         "</div>";
 
       /* NO `outcome` LINE ON THE CARD. It was here to "confirm" the choice you
@@ -201,7 +217,11 @@
            boxes that fed it (#244). It was the only part of a card that needed
            to know what time you were eating. */
 
-        if (r.aside) asides.push(r.aside);
+        /* The doneness aside said "showing rare", which was the honest thing
+           to say while only one level was rendered. Both are on the card now
+           (issue #246), each labelled, so the sentence would contradict what
+           is directly above it. Every other aside is unaffected. */
+        if (r.aside && !(r.levels && r.levels.length > 1)) asides.push(r.aside);
       } else {
         html += "<p class='ct-declined'>Won’t guess this one.</p>" +
                 "<p class='ct-aside'>" + r.why + "</p>";

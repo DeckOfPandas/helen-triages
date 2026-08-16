@@ -279,6 +279,44 @@
   flex-shrink: 0;
 }
 
+// A method whose rate depends on doneness shows every level rather than one --
+// GitHub issue #246, beef's standard roast and venison's haunch, the only two
+// of 73 that have the shape. Stacked, because the two times are the same kind
+// of fact and a reader compares them vertically; the label is quiet because
+// the FIGURE is what the eye is here for, and "rare"/"medium" only has to say
+// which is which.
+//
+// `.ct-total` above is `white-space: nowrap` and stays that way: each figure
+// still must not break mid-span ("1 hr 40" split across two lines reads as two
+// numbers). The stacking here is between levels, not inside one.
+.ct-doneness {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $space-xxs;
+}
+
+.ct-doneness-level {
+  display: block;
+}
+
+.ct-doneness-label {
+  font-weight: 400;
+  color: $color-clear-text;
+  margin-right: $space-sm;
+  // Lighter than the figure it labels, but not so light it stops being
+  // readable against the card -- this is the word that says which time you
+  // are looking at, so it is not decoration.
+  font-size: 0.85em;
+}
+
+// In the decision table the same block sits in a cell that is NOT flex, so the
+// column alignment comes from the cell rather than from align-items above.
+.ct-table .ct-doneness,
+.table-scroll .ct-doneness {
+  align-items: flex-start;
+}
+
 // The two things you actually set: oven and covering, on one line, directly
 // under the head. `.ct-outcome` used to sit between them and is gone -- the
 // decision table three paragraphs up already says it, and repeating it opened
