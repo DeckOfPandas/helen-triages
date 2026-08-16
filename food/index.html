@@ -124,15 +124,17 @@ permalink: /food/
        in step by filters.js; the panel uses the `hidden` attribute rather than
        display:none in CSS, so while it is closed its input and buttons are out
        of the tab order too, and reachable in the ordinary way the moment it
-       opens.
+       opens. That only became TRUE on 2026-08-16: .exclude-panel's own
+       `display: flex` had been overriding the UA's [hidden] rule, so the panel
+       shipped permanently open whatever aria-expanded said. See the
+       .exclude-panel[hidden] rule in _sass/food/_search.scss.
 
-       THE DISMISS (#exclude-dismiss) MATCHES #exclude-search-clear'S OWN
-       IDIOM -- a .btn-clear-inline with its space reserved by
-       `visibility: hidden` rather than removed by `display: none`, toggled by
-       filters.js's setExcludeRevealed(). It sits beside the reveal button so
-       closing the panel and reopening it are the same size of action, in the
-       same place. Closing resets aria-expanded on #exclude-reveal and returns
-       focus there -- see setExcludeRevealed() and its click handler.
+       ONE CONTROL, NOT TWO. A separate "x hide" button sat beside this one
+       until Helen's second pass: "remove the hide link -- when the section is
+       shown, update the link text to (hide leave out)". Two controls for one
+       binary meant one was always the wrong thing to look at, and the closed
+       state offered a dismiss for a panel that wasn't there. The button's own
+       label is the state now; filters.js owns both strings.
 
        CLOSING KEEPS THE EXCLUSIONS. Disclosure is not filter state (the
        existing "clear all" comment lower in filters.js already establishes
@@ -151,7 +153,6 @@ permalink: /food/
     <div class="search--exclude">
       <div class="exclude-reveal-row">
         <button type="button" class="btn-reveal" id="exclude-reveal" aria-expanded="false" aria-controls="exclude-panel">I know what I don't want</button>
-        <button type="button" class="btn-clear-inline" id="exclude-dismiss" aria-controls="exclude-panel" style="visibility: hidden;">&times; hide</button>
       </div>
 
       <div class="exclude-panel" id="exclude-panel" hidden>

@@ -214,7 +214,10 @@
     padding: 0;
     font-family: $font-body;
     font-size: 0.78rem;
-    font-weight: 400;
+    // 350, not 400 -- Helen's 2026-08-16 pass, "lighten the weight". The same
+    // value .ingredient-list uses on the recipe rows, so this reads as the
+    // page's quiet register rather than as a third weight invented here.
+    font-weight: 350;
     letter-spacing: 0.02em;
     color: lighten($color-text, 12%);
     cursor: pointer;
@@ -257,10 +260,36 @@
     margin-top: $space-md;
   }
 
+  // `hidden` IS AN ATTRIBUTE, AND display BEATS IT. The UA stylesheet gives
+  // [hidden] { display: none }, which any explicit display on the element
+  // overrides -- so the flex above silently cancelled it and the panel was
+  // open from the moment the page loaded, whatever aria-expanded claimed.
+  // Helen: "should not be shown by default". Restated here at higher
+  // specificity (0,1,1 beats 0,1,0) rather than by swapping the attribute for
+  // a class, so the panel's contents stay out of the tab order while closed --
+  // which is the reason it uses `hidden` in the first place.
+  .exclude-panel[hidden] {
+    display: none;
+  }
+
   // OUTSIDE #exclude-panel on purpose (see food/index.html's comment on the
   // wrapper): #exclude-dismiss hides the panel but the exclusions themselves
   // stay applied, so this has to keep rendering — and stay clickable — while
   // .exclude-panel is `hidden`.
+  // NOTHING EXCLUDED, NOTHING TO SPACE. This div renders on every page load
+  // whether or not anything is in it -- it has to, because it lives outside
+  // #exclude-panel so the pills survive the panel closing. Empty it is
+  // zero-height, but it is still a flex CHILD of .category, so it was
+  // collecting a full $index-label-gap between the search box and the recipe
+  // list below for the majority of sessions that never open the panel at all.
+  // Helen: "reduce the amount of vertical space between LEAVE OUT and the
+  // recipe list." :empty is exact here -- filters.js appends element children
+  // when there is something to show and empties innerHTML when there is not,
+  // so there is never stray whitespace to defeat it.
+  .exclude-active:empty {
+    display: none;
+  }
+
   .exclude-active {
     width: 100%;
     display: flex;

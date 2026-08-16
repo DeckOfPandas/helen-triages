@@ -84,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // The dislike navigator (GitHub issue #52) -- see food/index.html's own
   // comment on the section for why it starts hidden.
   var excludeReveal = document.getElementById('exclude-reveal');
-  var excludeDismiss = document.getElementById('exclude-dismiss');
   var excludePanel = document.getElementById('exclude-panel');
   var excludeBox = document.getElementById('exclude-search-box');
   var excludeClear = document.getElementById('exclude-search-clear');
@@ -594,11 +593,23 @@ function renderResultsPool() {
   // than the row jumping width the instant the panel opens (see
   // #ingredient-search-box's comment in _search.scss for why that mattered
   // enough to fix once already).
+  /* ONE CONTROL, WHOSE LABEL REPORTS THE STATE. There was a second button, a
+     "x hide" beside this one, until Helen's 2026-08-16 pass: "remove the hide
+     link -- when the section is shown, update the link text". Two controls for
+     one binary meant one of them was always the wrong thing to look at, and
+     the closed state offered a dismiss for a panel that was not there.
+
+     The label is the disclosure's own state, which is also why aria-expanded
+     is not doing this work alone: a sighted reader gets the same information
+     the attribute gives a screen reader, from the same element. */
+  var EXCLUDE_LABEL_CLOSED = "I know what I don't want";
+  var EXCLUDE_LABEL_OPEN = '(hide leave out)';
+
   function setExcludeRevealed(open) {
     if (!excludeReveal || !excludePanel) return;
     excludeReveal.setAttribute('aria-expanded', open ? 'true' : 'false');
     excludePanel.hidden = !open;
-    if (excludeDismiss) excludeDismiss.style.visibility = open ? 'visible' : 'hidden';
+    excludeReveal.textContent = open ? EXCLUDE_LABEL_OPEN : EXCLUDE_LABEL_CLOSED;
   }
 
   if (excludeReveal && excludePanel) {
@@ -610,20 +621,6 @@ function renderResultsPool() {
     });
   }
 
-  if (excludeDismiss) {
-    excludeDismiss.addEventListener('click', function () {
-      // Closes the PANEL, not the exclusions -- state.excludedIngredients is
-      // untouched, same call clearAllFilters() already makes for "the panel
-      // stays open" the other way round (see its own comment below).
-      // #exclude-active lives outside #exclude-panel for exactly this reason,
-      // so the pills and the "hiding N recipes" count it painted stay on
-      // screen and clickable through the close.
-      setExcludeRevealed(false);
-      // Returns focus to the control that opened this, so a keyboard user
-      // isn't left in a spot the panel used to occupy.
-      excludeReveal.focus();
-    });
-  }
 
   if (excludeBox) {
     excludeBox.addEventListener('input', renderExcludePool);
