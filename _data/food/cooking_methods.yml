@@ -1196,3 +1196,150 @@ ham:
       html: <strong>Caveat:</strong> cured ham labelling varies a lot (unsmoked vs smoked, wet vs dry-cured, cook-before-eating vs ready-to-eat) — check packaging instructions against the thermometer reading rather than relying on generic figures.
     - kind: sources
       html: 'Sources: Waitrose, LovePork, Morrisons and flawlessfood all converge on the ~45 min/kg boil rate and ~60 min/kg + 30 min roast-only rate ("30 min per 500g plus 30" is the exact UK rule of thumb). This is the discrepancy that best matches your own memory of a lb/kg-style mix-up from an earlier pass — both figures here were roughly half the sourced rate, in exactly the shape a dropped unit conversion produces. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
+venison:
+  label: Venison
+  internal_temp_ref: venison.haunch
+  chart_anchor: venison-tender-roasting-cuts
+  methods:
+  - id: haunch_high_heat_start_then_reduce
+    name: Haunch, high-heat start then reduce
+    shape: by_doneness
+    timing: ~15–20 mins/kg + 20 mins for rare, ~20–30 mins/kg + 20 mins for medium
+    group: Roasting cuts — haunch, loin, saddle, rack
+    covering: Uncovered
+    temp_change: One step down
+    outcome: Crusted outside, pink centre
+    oven: Start 200°C fan for 20 mins, drop to 140–160°C fan
+    oven_basis: stated
+    by_doneness:
+      rare:
+        rate_min: 15
+        rate_max: 20
+        flat_add: 20
+      medium:
+        rate_min: 20
+        rate_max: 30
+        flat_add: 20
+    notes: The standard UK haunch method — a hard blast to seal a very lean joint, then a long gentle finish. For 1.8 kg, about 50 mins to 1 hr for rare, 1 hr to 1 hr 15 for medium.
+  - id: haunch_standard_constant_roast
+    name: Haunch, standard constant roast
+    shape: rate
+    timing: ~30 mins/kg
+    group: Roasting cuts — haunch, loin, saddle, rack
+    covering: Uncovered
+    temp_change: None
+    outcome: Simplest haunch roast
+    oven: 160°C fan
+    oven_basis: inferred
+    rate_min: 30
+    rate_max: 30
+    notes: 'One temperature from start to finish, and the least there is to get wrong. For 2 kg: ~1 hr.'
+  - id: haunch_foil_wrapped
+    name: Haunch, foil-wrapped
+    shape: rate
+    timing: ~33 mins/kg
+    group: Roasting cuts — haunch, loin, saddle, rack
+    covering: Wrapped in foil throughout, foil replaced to rest
+    temp_change: None
+    outcome: Moist, no crust
+    oven: 160°C fan
+    oven_basis: inferred
+    rate_min: 33
+    rate_max: 33
+    notes: 'The Wild Meat Company''s own instruction for a rolled haunch — wrapped, so it steams rather than roasts and never browns. Rest it still wrapped, about 11 mins per kg. For 1.5 kg: ~50 mins.'
+  - id: rack_high_heat_throughout
+    name: Rack, high heat throughout
+    shape: total
+    timing: ~10–15 mins total for a rack
+    group: Roasting cuts — haunch, loin, saddle, rack
+    covering: Uncovered
+    temp_change: None
+    outcome: Quickest, for a rack
+    oven: 200°C fan
+    oven_basis: inferred
+    total_min: 10
+    total_max: 15
+    notes: Timed by the piece rather than per kg, the same way this site's lamb rack rows are — a rack is too small and too thin for a per-kg rate to mean anything.
+  - id: loin_sear_then_oven_finish
+    name: Loin, sear then oven finish
+    shape: total
+    timing: ~5–7 mins total oven time after searing
+    group: Roasting cuts — haunch, loin, saddle, rack
+    covering: Uncovered
+    temp_change: None
+    outcome: Restaurant method, for loin
+    oven: Sear on the stove, then 160°C fan
+    oven_basis: inferred
+    total_min: 5
+    total_max: 7
+    notes: A hard sear for colour, then just long enough in the oven to bring the middle up. Easy to overshoot — a thermometer cut, not a clock one.
+  - id: shoulder_low_and_slow
+    name: Shoulder, low and slow
+    shape: rate
+    timing: ~1.3–1.6 hrs/kg
+    group: Slow-cooked cuts — shoulder, neck, shank
+    liquid: None or a splash of stock
+    covering: Covered for the whole cook
+    outcome: Pulled venison
+    oven: 150°C fan
+    oven_basis: stated
+    rate_min: 80
+    rate_max: 96
+    notes: 'The classic pulled-venison cook, covered the whole way because venison shoulder has nothing like pork shoulder''s fat to protect it. Done when it pulls apart with two forks, not when the clock says so. For 2.5 kg: ~4 hrs.'
+  - id: shoulder_pot_roast_braised
+    name: Shoulder, pot-roasted (braised)
+    shape: rate
+    timing: ~1–1.5 hrs/kg
+    group: Slow-cooked cuts — shoulder, neck, shank
+    liquid: Half-submerged
+    covering: Covered (lidded pot)
+    outcome: Wet braise
+    oven: 130°C fan
+    oven_basis: inferred
+    rate_min: 60
+    rate_max: 90
+    notes: 'Seared first, then braised in liquid rather than dry-roasted. Neck goes here too, on the same rate. For 2 kg: ~3 hrs.'
+  - id: shank_braised
+    name: Shank, braised
+    shape: total
+    timing: ~2–3 hrs total (timed by piece, not weight)
+    group: Slow-cooked cuts — shoulder, neck, shank
+    liquid: Half-submerged
+    covering: Covered (lid or foil)
+    outcome: Falls off the bone
+    oven: 130–160°C fan
+    oven_basis: inferred
+    total_min: 120
+    total_max: 180
+    notes: Venison osso buco. Shanks are sold by the piece and vary from muntjac-small to red-deer-large, so this is a total time like beef short rib rather than a rate. Done when the meat leaves the bone.
+  groups:
+  - name: Roasting cuts — haunch, loin, saddle, rack
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Temp change
+    - Covering
+    - Notes
+    before: []
+    after:
+    - kind: weight
+      html: '<strong>Weight range:</strong> holds well for haunches <strong>1.3–2.5 kg</strong>, which is most of what is sold. Below that, or for loin, saddle and rack generally, time by the piece and check early — venison is lean enough that the margin between pink and grey is a few minutes. Doneness temperatures: see <a href="../temperatures/#venison-tender-roasting-cuts">temperature charts</a>.'
+    - kind: sources
+      html: 'Sources: Sainsbury''s Magazine and Great British Recipes for the high-heat-start rates. That row is the one place on this table where the fan figure is stated rather than converted by us — Great British Recipes prints "200 FAN" then "160 FAN", Sainsbury''s Magazine prints "fan 200°C" then "fan 140°C", which is why the drop is given as a range rather than a single figure. Church Farm Oxford for the constant roast, the Wild Meat Company for the foil-wrapped row, and Farmfetch for the rack and the loin. Eversfield Organic''s 20 mins per 500 g is an outlier — roughly 1.6× the other three at the same oven temperature — so it is cited here rather than averaged in.'
+  - name: Slow-cooked cuts — shoulder, neck, shank
+    columns:
+    - Method
+    - Oven temp
+    - Timing
+    - Covering
+    - Liquid
+    - Notes
+    before:
+    - kind: prose
+      html: Cooked past any doneness temperature until the collagen gives way — the timing below is a planning estimate, not a target.
+    after:
+    - kind: weight
+      html: '<strong>Weight range:</strong> shoulders are usually <strong>1.5–3 kg</strong>. Shanks are sold by the piece and timed that way, so no per-kg rate applies to them. Endpoint temperature: see <a href="../temperatures/#venison-slow-cooked-cuts">temperature charts</a>.'
+    - kind: sources
+      html: 'Sources: the Wild Meat Company''s pulled venison for the low-and-slow row, with the Great British Food Awards for its oven temperature — it prints "170°C/Fan 150°C", so that is a stated fan figure rather than one we converted. Farmfetch for the pot roast. Shooting UK, Great British Chefs and the Wild Meat Company for the shanks: the 2–3 hr spread between them is real disagreement about how big a shank is, not a rounding of one figure. Neck has no row of its own because no UK source publishes a venison neck timing — every neck recipe found was American — so it is folded in with the shoulder rows, at the same rate, and the group name says so.'

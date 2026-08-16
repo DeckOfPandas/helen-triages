@@ -239,16 +239,16 @@ permalink: /food/reference/temperatures/
     </div>
     <a class="tc-totop" href="#top">&uarr; top</a>
 
-    {% comment %} VENISON'S CROSSLINKS GO TO THE COOKING-METHODS PAGE, NOT THE
-       CALCULATOR. Every other section here links to
-       /food/reference/timings/?protein=X, and venison has no entry in
-       _data/food/cooking_methods.yml yet -- so ?protein=venison would select
-       nothing and land you on a calculator with an empty protein. The link text
-       names where it actually goes, the way the steak and salmon sections
-       already do. Venison timings are their own piece of work. {% endcomment %}
+    {% comment %} VENISON'S CROSSLINKS REACH THE CALCULATOR NOW, like every
+       other section that has timings behind it. They used to stop at
+       /food/reference/cooking-methods/ because venison had no entry in
+       _data/food/cooking_methods.yml, so ?protein=venison would have selected
+       nothing and landed you on a calculator with an empty protein. Issue #205
+       added the entry -- eight methods across two groups -- so the link goes
+       where the rest go, with the wording the rest use. {% endcomment %}
 
     <h2 class="recipe-section-heading" id="venison-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Venison: tender roasting cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods/' | relative_url }}">cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=venison">timings and cooking methods &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
 
@@ -294,7 +294,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="venison-slow-cooked-cuts"><span class="section-heading-text section-heading-text--reference">Venison: slow-cooked cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods/' | relative_url }}">cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=venison">timings and cooking methods &rarr;</a></p>
     <p class="recipe-section-subtitle">shoulder, neck and shank</p>
 
     {% comment %} No key, for the same reason beef's tough cuts chart has none:
