@@ -23,7 +23,7 @@ method:
   - "Sprinkle more salt, garlic and thyme on top."
   - "Cover and leave in the fridge at least overnight."
   - "Spoon some duck fat into the bottom of the slow cooker."
-  - "Cook on low for 6 hours, skin side up."
+  - "Cook on low for 6 hours, skin side up (but check [cooking temperatures](#doneness))."
   - "Transfer legs into a loaf pan and cover with the rendered fat."
   - "Cook within a day or two, or longer if totally covered in fat."
   - step: "To finish: pan fry on medium-high heat in a cast iron skillet with no oil, until golden brown and crispy — 4–5 mins skin side, then 1–2 mins other side."

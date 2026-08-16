@@ -74,7 +74,7 @@ method_groups:
   - name: Cook and serve
     steps:
       - "Score the pastry lightly, making sure not to cut through, and brush again with egg wash."
-      - "Bake at 180°C fan for 15–20 mins until the pastry is golden brown. Rest for 10 mins before carving."
+      - "Bake at 180°C fan for 15–20 mins until the pastry is golden brown (but check [cooking temperatures](#doneness)). Rest for 10 mins before carving."
       - step: "Reheat the sauce and serve alongside the sliced Wellington."
         note: "Slice across the middle (across the grain) on a slight angle for maximal prettiness."
 method_short:

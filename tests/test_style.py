@@ -1037,6 +1037,21 @@ def test_oven_temperature_says_fan(recipe):
     """
     bad = []
     for step in recipe.method_steps:
+        # MARKDOWN LINKS ARE UNWRAPPED FIRST, and that is load-bearing rather
+        # than tidiness. _INTERNAL_TEMP_RE recognises an internal temperature by
+        # the words immediately before the figure ("reads", "out at", "internal
+        # temperature of"), so anything inserted between the phrase and the
+        # number blinds it -- and since issue #260 the site links temperatures
+        # in method steps, which puts a literal "[" in exactly that gap.
+        #
+        # "reads [74–75°C](#doneness)" therefore read as an OVEN temperature
+        # missing its "fan", on a step whose own link says it is a thermometer
+        # reading. Unwrapping to "reads 74–75°C" restores the adjacency the
+        # regex is looking for. It also stops this depending on where an author
+        # happens to open the bracket: "[internal temperature of 90–95°C](...)"
+        # passed only because the "[" landed before the phrase rather than
+        # inside it, which is luck, not a rule anyone could follow.
+        step = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", step)
         if not _OVEN_WORD_RE.search(step):
             continue
         for m in _OVEN_TEMP_RE.finditer(step):

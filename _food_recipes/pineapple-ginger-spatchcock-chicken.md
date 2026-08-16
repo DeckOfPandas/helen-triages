@@ -44,7 +44,7 @@ method_groups:
   - name: "Sear and roast"
     steps:
       - "Sear the chicken, breast-side-down, for about 5 mins until golden and crisp."
-      - "Put the remainder of the pineapple (half-mooned), ginger matchsticks, and the rest of the galangal in a roasting tin with 50 ml water. Sit the chicken on top, breast-side-up, and roast for 40–45 mins, until the thickest part of the thigh reads 74–75°C on a thermometer or the juices run clear. Rest for 5 mins."
+      - "Put the remainder of the pineapple (half-mooned), ginger matchsticks, and the rest of the galangal in a roasting tin with 50 ml water. Sit the chicken on top, breast-side-up, and roast for 40–45 mins, until the thickest part of the thigh reads [74–75°C](#doneness) on a thermometer or the juices run clear. Rest for 5 mins."
   - name: "Make the sauce and serve"
     steps:
       - "Bubble the used marinade in a pan for a few minutes, then stir in the chicken stock. Simmer gently for about 5 mins, then add the juices from the rested chicken."
