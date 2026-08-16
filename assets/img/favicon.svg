@@ -12,7 +12,7 @@
        #FF00C8 is $color-bright-magenta from _sass/food/_palette.scss, written
        here as a literal because an SVG cannot read a Sass variable. That is
        the ONE hardcoded copy of a palette colour outside the palette, and it
-       is deliberate -- see the palette's own "Cross-recipe links" comment for
+       is deliberate — see the palette's own "Cross-recipe links" comment for
        why magenta is the site's single branded/interactive hue. If the brand
        magenta ever changes, this file will not follow it on its own.
 
@@ -21,7 +21,7 @@
        is Helen Triages' brand pink at the repo level, not food's section
        code. Revisit if cocktails ever gets a real palette that fights it.
 
-       No brackets -- the issue's own fallback, taken deliberately: the
+       No brackets — the issue's own fallback, taken deliberately: the
        wordmark's "[ H ]" brackets are thin strokes that would turn to mud at
        favicon sizes. -->
   <rect width="64" height="64" rx="10" fill="#FF00C8"/>
