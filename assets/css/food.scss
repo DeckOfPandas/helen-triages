@@ -15,6 +15,10 @@
 @import "shared/rule";
 @import "shared/base";
 @import "shared/layout";
+
+// Food's colour for the shared footer reference block (see the partial for
+// why the colour cannot live in shared/layout). After it, so it overrides.
+@import "food/footer";
 // The blocky rule, before the index partials below — they use its mixin,
 // same reason.
 @import "food/rule";

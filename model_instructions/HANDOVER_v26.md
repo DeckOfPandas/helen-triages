@@ -1564,6 +1564,16 @@ Tried, cut. Brackets are the wordmark's own device — `[ FOOD ]` /
 `default.html`, not a decorative flourish available to reuse. Stroked caps
 pattern-match toward "wants brackets"; resist it.
 
+**The footer's reference block is the one other place the brackets appear,
+and it is the device rather than an exception to it** (added 2026-08-16,
+issue #272). It renders `[ {{ this_site.word }} ]` — the same value, from
+the same file — as a label saying which site those reference pages belong
+to, so cocktails' own block would read `[ COCKTAILS ]` the day it has one.
+It carries no `punched()` and no stroke, which is the part this rule
+actually forbids. The test to apply if a third use is ever proposed: is it
+naming a SITE, from `sites.yml`, or is it reaching for brackets because
+capitals look like they want some?
+
 **The wordmark WAS stroke-only, deliberately, until 2026-08-02 — this is now
 out of date if you find it repeated elsewhere.** An earlier version of this
 document said the wordmark demonstrated "the soft-edge, stroke-only look...

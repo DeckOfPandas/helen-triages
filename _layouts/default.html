@@ -162,9 +162,35 @@
   </main>
 
   <footer class="site-footer">
-    {% if this_site.footer_svg %}
-    <div class="site-footer-hearts" aria-hidden="true" data-footer-svg="{{ this_site.footer_svg }}"></div>
-    {% endif %}
+    {% comment %} A three-column grid so the hearts stay exactly where they have
+       always been -- page-centred -- while the reference block sits beside them.
+       Centring the PAIR instead would have moved the graphic, which is not what
+       was asked for and is a change to something already settled.
+
+       THE BRACKETED WORD IS this_site.word, NOT THE LITERAL "[ FOOD ]".
+       HANDOVER 13.4.1 says brackets are the wordmark's own device and not a
+       flourish to reuse -- and this is that device used for what it means: a
+       label saying which site these pages belong to, the same value from the
+       same file, so cocktails' own block would read [ COCKTAILS ] the day it
+       has one. It carries no punched-tape treatment, which is the part 13.4.1
+       actually forbids. That entry is updated rather than quietly contradicted.
+
+       Absent reference_links renders nothing at all, so cocktails gets no empty
+       heading -- same absent-means-nothing convention as footer_svg above.
+    {% endcomment %}
+    <div class="site-footer-top">
+      {% if this_site.reference_links %}
+      <nav class="site-footer-ref" aria-label="{{ this_site.title }} reference">
+        <span class="site-footer-ref-word">[ {{ this_site.word }} ]</span>
+        {% for link in this_site.reference_links %}
+        <a href="{{ link.url | relative_url }}">{{ link.text }}</a>
+        {% endfor %}
+      </nav>
+      {% endif %}
+      {% if this_site.footer_svg %}
+      <div class="site-footer-hearts" aria-hidden="true" data-footer-svg="{{ this_site.footer_svg }}"></div>
+      {% endif %}
+    </div>
     <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
   </footer>
 

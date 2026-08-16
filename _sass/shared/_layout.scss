@@ -198,6 +198,70 @@ main {
 // Heart doodle above the footer copyright line.
 // SVG is injected by js/decorations.js.
 // Width set here; height auto to preserve natural proportions.
+// The hearts and the reference block, side by side. THREE COLUMNS, with an
+// empty third, so the graphic stays page-centred exactly where it already was
+// -- a two-item flex row centred as a pair would have shifted it, which is a
+// change to something already settled and not what was asked for.
+//
+// The block is asymmetric on purpose for now. Helen, 2026-08-16: "if it looks
+// really silly without cocktail ref info to balance it out then we can think
+// again" -- so the empty right column is a deliberate placeholder for a
+// question that is still open, not an oversight.
+.site-footer-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: $space-lg;
+}
+
+// Flush with where the page's own text starts, not tucked against the graphic
+// (Helen, 2026-08-16). No offset needed to achieve that: `main` and
+// .site-footer are both max-width: $width-content, margin: 0 auto, and both
+// pad their left edge by 1.5rem ($space-xl for main, a literal here), so
+// column one of this grid already begins on main's text edge. If either
+// padding changes, this alignment goes with it -- they are the same number by
+// coincidence rather than by a shared token, which is worth knowing before
+// editing one of them.
+.site-footer-ref {
+  justify-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-xxs;
+  text-align: left;
+
+  // NO MAGENTA HERE. $color-recipe-link is the site's "this is interactive"
+  // colour and it belongs to the reading surfaces -- a footer wearing it would
+  // claim the same weight as a cross-recipe link mid-method. Helen: "the normal
+  // darkened magenta link colour we use across the site won't work here, but I
+  // think it'll be obvious enough that those things are links." So the signal
+  // is the underline and the pointer, and the colour stays the footer's own.
+  //
+  // Font is inherited, not restated: .site-footer is already $font-headings at
+  // 0.75rem in $color-clear-text, which is the Courier-not-heavy this wanted.
+  //
+  // THE RESTING COLOUR IS ALL THIS LAYER SETS. The hover/active colour is the
+  // site's own link colour, which is NOT in the nine-variable shared palette
+  // contract (test_every_palette_satisfies_the_shared_contract) -- naming
+  // $color-recipe-link-hover here would compile fine for food and break the
+  // cocktails build outright. So it lives in _sass/food/_footer.scss, and a
+  // site without that rule simply keeps the resting colour throughout.
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+}
+
+// The bracketed site word. Quieter than the links it heads -- it is a label
+// saying whose pages these are, not a thing to click.
+.site-footer-ref-word {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+
 .site-footer-hearts {
   display: flex;
   justify-content: center;
