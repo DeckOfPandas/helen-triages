@@ -129,6 +129,112 @@ measure_phrases:
   - a large handful of
   - a pat of
 
+# GitHub issue #281, 2026-08-16. The six above came from main_ingredients,
+# where a stray portion word is rare. These came from reading all 1421 DERIVED
+# entries -- the exclude picker's vocabulary, built from raw `item:` lines
+# written for a cook rather than for a filter -- and every one below has at
+# least one real entry behind it. Counts where they matter: "handful of" 20,
+# "pinch of" 14, "small bunch of" 10, "small handful of" 9.
+#
+# THE TRAPS ARE THE POINT. "bicarbonate of" (2 entries) and "cream of" (1) are
+# deliberately ABSENT: they end in "of" and lead an entry, and stripping them
+# would hand back "soda" and "tartar" -- the exact merge the section header
+# above warns about. Read the real list before adding to this one.
+  - a bunch of
+  - a handful of
+  - a knob of
+  - a pinch of
+  - a splash of
+  - balls of
+  - bunch of
+  - cloves of
+  - dash of
+  - drizzle of
+  - few dashes of
+  - fillets of
+  - glug of
+  - grated thumb-sized piece of
+  - grating of
+  - green tops of
+  - handful of
+  - handfuls of
+  - jar of
+  - knob of
+  - large knob of
+  - large sprig of
+  - leg of
+  - mixture of
+  - nests of
+  - pack of
+  - pats of
+  - piece of
+  - pinch of
+  - pinches of
+  - rashers of
+  - shoulder of
+  - slice of
+  - small bunch of
+  - small handful each of
+  - small handful of
+  - small pinch of
+  - splash of
+  - sprig of
+  - sprigs of
+  - squeeze of
+  - the rest of
+  - thumb-sized piece of
+  - tins of
+  - white ends of
+
+# The same habit without the "of": a container standing in for a quantity.
+# "can chickpeas" is chickpeas; "rashers smoked streaky bacon" is bacon. 44
+# derived entries read this way.
+#
+# SAFE BECAUSE stripMeasurePhrase MATCHES `phrase + ' '`: "can " cannot fire on
+# "cannellini beans", and bare "cloves" (the spice) is untouched because there
+# is no trailing space to match -- only "cloves garlic" strips. That trailing
+# space is load-bearing; a word-list version of this would destroy both.
+  - balls
+  - big sprigs
+  - bunch
+  - bushy sprigs
+  - can
+  - cans
+  - cloves
+  - fillets
+  - handful
+  - heads
+  - jar
+  - pack
+  - pinch
+  - rashers
+  - slice
+
+# A second pass over what survived the first (issue #281, same day). Mostly
+# the singular or "of"-less twin of a phrase already above -- "sprigs thyme"
+# beside "sprigs of thyme", "small bunch basil" beside "small bunch of basil".
+#
+# "a little" AND "a little extra" CARRY THEIR LEADING "a" FOR A REASON, and it
+# is the same trap as bicarbonate of soda: the collection contains "little gem
+# lettuce", "little gem lettuces" and "large little gem lettuce". A bare
+# "little" would strip all three down to "gem lettuce", inventing a vegetable.
+# The "a" is what makes the phrase mean "a small amount of" rather than an
+# adjective attached to the name.
+#
+# "a few tbsp" sits beside "a few" so the longest-match rule can take the whole
+# thing: "a few" alone would leave "tbsp chopped roasted pistachios".
+  - a few
+  - a few tbsp
+  - a little
+  - a little extra
+  - dash
+  - large handful of
+  - small bunch
+  - small handful
+  - sprig
+  - sprigs
+  - tin
+
 # -----------------------------------------------------------------------------
 # Trailing phrases — instructions to the cook that got written into `item:`
 # after the ingredient, stripped from the END. GitHub issue #273.
@@ -387,6 +493,89 @@ aliases:
   toasted sesame oil: sesame oil
   vegetable stock powder or 1 organic vegetable stock cube: vegetable stock
   woody herb sprigs such as thyme or rosemary: [thyme, rosemary]
+
+  # GitHub issue #281, 2026-08-16 -- the derived vocabulary, read end to end.
+  #
+  # COMPOUNDS, split only where BOTH halves are already a known ingredient
+  # somewhere in the collection. Helen's call, and the conservative half of a
+  # real choice: a blind split on " or " turns "a little red or purple food
+  # colouring" into "red", inventing an ingredient nobody wrote. 94 compounds
+  # are deliberately left whole for that reason and listed in the issue.
+  butter or olive oil: [butter, olive oil]
+  chicken or vegetable stock: [chicken, vegetable stock]
+  clotted cream or crème fraîche: [clotted cream, crème fraîche]
+  cottage cheese or crème fraîche: [cottage cheese, crème fraîche]
+  cream or 100 g mascarpone: [cream, mascarpone]
+  cream or custard: [cream, custard]
+  currants or raisins: [currants, raisins]
+  custard or cream: [custard, cream]
+  fine semolina or plain flour: [fine semolina, plain flour]
+  ghee or vegetable oil: [ghee, vegetable oil]
+  hummus or yoghurt: [hummus, yoghurt]
+  kale or cavolo nero: [kale, cavolo nero]
+  kosher salt or 4 tsp fine sea salt: [kosher salt, fine sea salt]
+  lamb or chicken stock: [lamb, chicken stock]
+  maple syrup or honey: [maple syrup, honey]
+  natural yoghurt or milk: [natural yoghurt, milk]
+  oil or butter: [oil, butter]
+  parmesan or pecorino: [parmesan, pecorino]
+  pecorino or parmesan: [pecorino, parmesan]
+  pork or turkey mince: [pork, turkey mince]
+  rice or cider vinegar: [rice, cider vinegar]
+  rock sugar or caster sugar: [rock sugar, caster sugar]
+  shallots or onions: [shallots, onions]
+  soy sauce or tamari: [soy sauce, tamari]
+  sugar or honey: [sugar, honey]
+  sunflower oil or butter: [sunflower oil, butter]
+  toasted sesame oil or vegetable oil: [sesame oil, vegetable oil]
+  vanilla bean paste or vanilla extract: [vanilla bean paste, vanilla extract]
+  vanilla or almond extract: [vanilla, almond extract]
+  whipped cream or crème fraîche: [whipped cream, crème fraîche]
+  white wine or cider vinegar: [white wine, cider vinegar]
+  white wine or stock: [white wine, stock]
+  white wine vinegar or cider vinegar: [white wine vinegar, cider vinegar]
+
+  # CITRUS BY WAY OF ITS JUICE OR ZEST. Helen's call: excluding "lemon" should
+  # hide a recipe that uses only its juice, because someone avoiding lemon
+  # means the flavour, not the fruit's physical body. Written out one entry at
+  # a time rather than as a "juice of" measure phrase, because measure phrases
+  # strip AFTER the quantity strip has already run -- "juice of 2 lemons" would
+  # be left as "2 lemons", which is worse than leaving it alone.
+  finely grated zest 1 orange: orange
+  finely grated zest and juice of ½ lime: lime
+  finely grated zest of 1 lemon: lemon
+  juice 1 lime: lime
+  juice and zest of ½ a lime: lime
+  juice of 1 lemon: lemon
+  juice of 2 limes: lime
+  juice of ½ lemon: lemon
+  zest and juice of 1 orange: orange
+  zest of 1 orange: orange
+  zest of 2 lemons: lemon
+  zest of ½ orange: orange
+
+  # Quantities the strip cannot reach, for the same ordering reason: a leading
+  # "about" blocks stripLeadingQuantity, and by the time a measure phrase could
+  # remove it the quantity strip has been and gone. Three entries, so they are
+  # named rather than given a mechanism.
+  about 2 tbsp vegetable oil: vegetable oil
+  about 200 g raw king prawns: king prawns
+  about 75 g seaweed: seaweed
+
+  # A clove of garlic is garlic. Ten spellings of the same thing, none of which
+  # a cook excluding garlic would want to hunt for separately. The spice
+  # "cloves" is NOT in this list and stays its own entry -- see the note on the
+  # trailing space in measure_phrases.
+  cloves garlic: garlic
+  crushed garlic clove: garlic
+  fresh garlic cloves: garlic
+  garlic clove: garlic
+  garlic cloves: garlic
+  large garlic clove: garlic
+  large garlic cloves: garlic
+  medium cloves garlic: garlic
+  small garlic clove: garlic
+  small garlic cloves: garlic
 
 # -----------------------------------------------------------------------------
 # Display names — the entry on the left (a master-list/alias TARGET, after
