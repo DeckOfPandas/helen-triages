@@ -316,15 +316,36 @@ def test_palette_is_the_only_place_hex_colours_are_written():
     keeps biting now that the bridge it guarded no longer exists. If a script
     ever needs a colour again, the answer is a CSS custom property read at
     runtime, not a literal here.
+
+    COMMENTS ARE STRIPPED FIRST -- BOTH KINDS, as of 2026-08-16. This used to
+    strip only `//` (`line.split("//")[0]`), which is every comment in most of
+    these scripts and almost none of the comments in cook-timer.js, where the
+    prose is written in `/* */` blocks. So `issue #244` in a block comment was
+    reported as a three-digit colour, and the same false positive was waiting
+    for every three- and six-digit issue number anyone might cite that way:
+    #139, #204, #221, #227, #241 are all live references in this codebase and
+    all read as hex.
+
+    That is not a cosmetic complaint. A check that cries wolf on correct code
+    gets switched off, or -- worse here -- gets worked around by writing the
+    reference wrongly, and the guard ends up shaping the prose instead of
+    guarding the palette. Same reasoning test_notes_are_not_damaged in
+    tests/test_reference_data.py gives for keeping its own checks exact rather
+    than heuristic, and it applies to the code this suite reads as much as to
+    the data.
+
+    _strip_js_comments (defined below, with the SVG guards) is line-preserving
+    for exactly this test's sake: the failure names `file:lineno`, so blanking a
+    block comment must leave its newlines behind.
     """
     js_files = sorted((ROOT / "assets" / "js").glob("*.js"))
     assert js_files, "No scripts found — this test would pass while checking nothing."
 
     offenders = []
     for path in js_files:
-        for i, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
-            code = line.split("//")[0]
-            for match in re.finditer(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b", code):
+        code = _strip_js_comments(path.read_text(encoding="utf-8"))
+        for i, line in enumerate(code.split("\n"), 1):
+            for match in re.finditer(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b", line):
                 offenders.append(f"{path.name}:{i} {match.group(0)}")
 
     assert not offenders, (
@@ -509,9 +530,21 @@ IMG_DIR = ROOT / "assets" / "img"
 
 
 def _strip_js_comments(text: str) -> str:
-    """Drop // and /* */ comments so a guard cannot match its own explanation."""
-    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
-    return re.sub(r"^\s*//.*$", "", text, flags=re.M)
+    """Blank // and /* */ comments so a guard cannot match its own explanation.
+
+    LINE NUMBERS SURVIVE, and that is the whole reason this replaces the comment
+    rather than deleting it: every caller reports `file:lineno`, and a block
+    comment removed outright takes its newlines with it, so every line number
+    after the first `/* */` in the file comes out short by however many lines
+    that comment ran to. A guard that names the wrong line is worse than one
+    that names none. Each stripped block leaves exactly the newlines it held.
+
+    Trailing `//` is stripped as well as a whole-line one -- a hex literal in an
+    end-of-line comment is a comment, wherever it sits on the line.
+    """
+    text = re.sub(r"/\*.*?\*/", lambda m: "\n" * m.group(0).count("\n"),
+                  text, flags=re.S)
+    return re.sub(r"//[^\n]*", "", text)
 
 
 def test_svg_injection_does_not_assume_a_space_after_the_svg_tag():

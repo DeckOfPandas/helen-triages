@@ -18,6 +18,35 @@
 //   - In the browser, as a plain <script> before cook-timer.js, attaching to
 //     window.HTF (the same namespace assets.js already establishes).
 //   - In Node, via require(), for tests.
+//
+// -----------------------------------------------------------------------------
+// FIVE FUNCTIONS HERE HAVE NO CALLER, ON PURPOSE AND FOR NOW — issue #244
+// -----------------------------------------------------------------------------
+// 2026-08-16: the timings page dropped its "eating at" and "rest" boxes, and
+// with them the only code that ever called
+//
+//     scheduleBack   parseClock   clock   statedRest   restFor
+//
+// Nothing in cook-timer.js reaches for any of the five today. They are kept
+// anyway, and so are their tests in tests/js/cook-schedule.test.js, at Helen's
+// explicit instruction: she wants to look at the new, simpler page before
+// deciding whether working backwards from a serving time comes back. Deleting
+// the arithmetic now would mean rewriting and re-testing the highest-
+// consequence maths on the site if it does.
+//
+// THIS IS A SUSPENSION OF THE HOUSE RULE, NOT AN OVERSIGHT. This repo deletes
+// orphaned code on sight — that is why there is no back-catalogue and no
+// commented-out block anywhere in it — so an uncalled function here would
+// normally be drift someone should remove. It is not. The next person to touch
+// this file should do one of exactly two things once Helen has decided:
+// reconnect these five to a page, or delete them together with their tests.
+// Leaving them uncalled and unexplained is the one option that isn't open.
+//
+// The other exports are all live: round5, hhmm and span format every duration
+// on the page, resolve/orderMethods/baseFor drive the table and the cards,
+// finishingTemp writes the "Done at" line under the protein heading, and
+// proteinOrder fills the dropdown. round5 is also called by scheduleBack, so it
+// is load-bearing in both halves.
 // =============================================================================
 (function (root) {
   'use strict';
