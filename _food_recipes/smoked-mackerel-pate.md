@@ -7,7 +7,7 @@ prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["smoked mackerel fillets", "cream cheese", "lemon juice"]
 star_ingredient: "oily fish"
-tags: ["nibbles", "starter", "no-cook"]
+tags: ["nibbles", "starter", "no-cook", "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "200 g"

@@ -7,7 +7,7 @@ prep_time: "15 mins"
 cook_time: "1 hr"
 main_ingredients: ["chicken thighs and drumsticks", "cider", "cooking apples", "crème fraîche", "turnip", "green beans"]
 star_ingredient: "poultry"
-tags: ["one-handed food", "virtuous", "freezable"]
+tags: ["one-handed food", "virtuous", "freezable", "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "1.5 kg"

@@ -7,7 +7,7 @@ prep_time: "15 mins"
 cook_time: "20-25 mins"
 main_ingredients: ["cauliflower", "cheddar", "lancashire cheese", "cheshire cheese", "breadcrumbs", "whole milk", "salted butter", "plain flour", "English mustard"]
 star_ingredient:
-tags: ["cheese-tastic", "one-handed food"]
+tags: ["cheese-tastic", "one-handed food", "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "1"
@@ -49,6 +49,8 @@ method_short:
 notes:
   - label: "Choice of cheese"
     text: "Most combinations of hard cheeses are fine. Brie or similar will take over, but maybe you're into that."
+  - label: "Ahead of time"
+    text: "Assemble it completely, up to the point of baking, and keep it covered in the fridge for a day. Bake it straight from cold and give it an extra 10 mins."
 meta:
   rewritten: true
   proofread: false

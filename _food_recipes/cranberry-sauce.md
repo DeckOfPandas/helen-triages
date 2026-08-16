@@ -7,7 +7,7 @@ prep_time: "2 mins"
 cook_time: "10 mins"
 main_ingredients: ["cranberries", "orange", "light brown muscovado sugar"]
 star_ingredient: "fruit"
-tags: ["extras", "festive", "make-ahead", "freezable"]
+tags: ["extras", "festive", "freezable"]
 ingredient_groups:
   - items:
     - amount: "100 g"
