@@ -96,50 +96,82 @@ permalink: /food/
       <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
       <button type="button" class="btn-clear-inline" id="name-search-clear" style="visibility: hidden;">&times; clear</button>
     </div>
-  </div>
 
-  {% comment %} THE DISLIKE NAVIGATOR -- GitHub issue #52. "I have invited
-     someone for dinner and they hate peas, so I want to see all recipes that
-     do NOT contain peas as an ingredient."
+    {% comment %} THE DISLIKE NAVIGATOR -- GitHub issue #52. "I have invited
+       someone for dinner and they hate peas, so I want to see all recipes that
+       do NOT contain peas as an ingredient."
 
-     PROGRESSIVE DISCLOSURE. It starts closed because most sessions never need
-     it, and because revealing it deliberately is what frames this as a dislike
-     navigator rather than a sixth filter everyone has to consider on the way
-     past. It sits directly under I KNOW WHAT I WANT because it is the same
-     sentence turned over.
+       PROGRESSIVE DISCLOSURE. It starts closed because most sessions never
+       need it, and because revealing it deliberately is what frames this as a
+       dislike navigator rather than a sixth filter everyone has to consider
+       on the way past.
 
-     A REAL <button>, not a span with a click handler. It toggles a region in
-     place -- a control, not a destination -- and
-     test_clear_controls_are_buttons exists because a span-with-a-handler
-     shipped here once and was unreachable by keyboard. aria-expanded is kept
-     in step by filters.js; the panel uses the `hidden` attribute rather than
-     display:none in CSS, so while it is closed its input and buttons are out
-     of the tab order too, and reachable in the ordinary way the moment it
-     opens.
+       A CHILD OF .search--name, NOT A SIBLING .category, since Helen's
+       2026-08-16 pass on the shipped filter: "closer to I KNOW WHAT I WANT",
+       centred under it. A sibling .category picks up
+       $index-section-gap (the gap BETWEEN sections) from the shared .category
+       rule in _category-labels.scss, which is exactly the wrong amount of
+       distance for something that is meant to read as attached to the search
+       above it rather than as a sixth filter category of its own -- so it
+       moved inside .search--name's own box instead, where the existing
+       .category { gap: $index-label-gap } already spaces it correctly, and
+       .search--exclude's own centred row in _search.scss does the rest.
 
-     No label of its own from _data/food/filter_sections.yml: the reveal
-     button IS this section's heading, and inventing a `label:` there would put
-     half the section's copy in one file and half in another.
-  {% endcomment %}
-  <div class="category search search--exclude">
-    <button type="button" class="btn-reveal" id="exclude-reveal" aria-expanded="false" aria-controls="exclude-panel">I know what I don't want</button>
+       A REAL <button>, not a span with a click handler. It toggles a region in
+       place -- a control, not a destination -- and
+       test_clear_controls_are_buttons exists because a span-with-a-handler
+       shipped here once and was unreachable by keyboard. aria-expanded is kept
+       in step by filters.js; the panel uses the `hidden` attribute rather than
+       display:none in CSS, so while it is closed its input and buttons are out
+       of the tab order too, and reachable in the ordinary way the moment it
+       opens.
 
-    <div class="exclude-panel" id="exclude-panel" hidden>
-      <div class="search-input">
-        <label class="category-label" for="exclude-search-box">
-          <span class="category-label-text">LEAVE OUT</span>
-        </label>
-        <input type="text" id="exclude-search-box" autocomplete="off" placeholder="ingredient name..." />
-        <button type="button" class="btn-clear-inline" id="exclude-search-clear" style="visibility: hidden;">&times; clear</button>
+       THE DISMISS (#exclude-dismiss) MATCHES #exclude-search-clear'S OWN
+       IDIOM -- a .btn-clear-inline with its space reserved by
+       `visibility: hidden` rather than removed by `display: none`, toggled by
+       filters.js's setExcludeRevealed(). It sits beside the reveal button so
+       closing the panel and reopening it are the same size of action, in the
+       same place. Closing resets aria-expanded on #exclude-reveal and returns
+       focus there -- see setExcludeRevealed() and its click handler.
+
+       CLOSING KEEPS THE EXCLUSIONS. Disclosure is not filter state (the
+       existing "clear all" comment lower in filters.js already establishes
+       this for the panel's open/closed state; the dismiss button is the same
+       call applied to the same state). #exclude-active therefore lives
+       OUTSIDE #exclude-panel, as this section's own third child -- not gated
+       by the panel's `hidden` -- so the "leaving out ..." pills and the
+       hiding-N-recipes count stay visible and still clickable with the panel
+       shut, rather than an active filter going dark with no way to see or
+       lift it short of reopening the whole picker.
+
+       No label of its own from _data/food/filter_sections.yml: the reveal
+       button IS this section's heading, and inventing a `label:` there would
+       put half the section's copy in one file and half in another.
+    {% endcomment %}
+    <div class="search--exclude">
+      <div class="exclude-reveal-row">
+        <button type="button" class="btn-reveal" id="exclude-reveal" aria-expanded="false" aria-controls="exclude-panel">I know what I don't want</button>
+        <button type="button" class="btn-clear-inline" id="exclude-dismiss" aria-controls="exclude-panel" style="visibility: hidden;">&times; hide</button>
       </div>
-      {% comment %} Populated by filters.js as you type, from the DERIVED
-         vocabulary (every data-all-ingredients entry on the page), not from
-         main_ingredients -- see the data-all-ingredients comment on the rows
-         below. Fuzzy on purpose: typing "pea" offering peas, peanut butter and
-         pearl barley is correct, because you then pick the one you meant, and
-         what gets picked is matched as a whole entry rather than as a
-         substring. {% endcomment %}
-      <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
+
+      <div class="exclude-panel" id="exclude-panel" hidden>
+        <div class="search-input">
+          <label class="category-label" for="exclude-search-box">
+            <span class="category-label-text">LEAVE OUT</span>
+          </label>
+          <input type="text" id="exclude-search-box" autocomplete="off" placeholder="ingredient name..." />
+          <button type="button" class="btn-clear-inline" id="exclude-search-clear" style="visibility: hidden;">&times; clear</button>
+        </div>
+        {% comment %} Populated by filters.js as you type, from the DERIVED
+           vocabulary (every data-all-ingredients entry on the page), not from
+           main_ingredients -- see the data-all-ingredients comment on the rows
+           below. Fuzzy on purpose: typing "pea" offering peas, peanut butter
+           and pearl barley is correct, because you then pick the one you
+           meant, and what gets picked is matched as a whole entry rather than
+           as a substring. {% endcomment %}
+        <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
+      </div>
+
       <div class="exclude-active" id="exclude-active" aria-live="polite"></div>
     </div>
   </div>

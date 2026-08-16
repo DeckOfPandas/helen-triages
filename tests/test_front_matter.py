@@ -8,6 +8,7 @@ from __future__ import annotations
 import re
 
 import pytest
+import yaml
 
 from conftest import where
 
@@ -131,6 +132,61 @@ def test_internal_temp_ref_resolves(recipe, internal_temperatures):
             f"internal_temp_ref: {ref} in "
             f"_data/food/internal_temperatures.yml."
         )
+
+
+# --- duplicate YAML keys are silent data loss ------------------------------
+
+class _StrictLoader(yaml.SafeLoader):
+    """A SafeLoader that refuses to quietly discard a repeated key."""
+
+
+def _no_duplicates(loader, node, deep=False):
+    seen = set()
+    for key_node, _ in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        if key in seen:
+            raise yaml.constructor.ConstructorError(
+                None, None, f"duplicate key {key!r}", key_node.start_mark
+            )
+        seen.add(key)
+    return yaml.SafeLoader.construct_mapping(loader, node, deep=deep)
+
+
+_StrictLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _no_duplicates
+)
+
+
+def test_front_matter_has_no_duplicate_keys(recipe):
+    """A repeated key in a YAML mapping is DISCARDED, silently, last one wins.
+
+    Found for real 2026-08-16 in indonesian-chicken-curry-gulai-ayam.md, which
+    had an ingredient entry declaring `item:` twice:
+
+        - amount: "200 ml"
+        - item: "flavourings to taste, like chicken stock cubes, fish sauce..."
+          item: coconut cream
+
+    The flavourings line was gone -- not just from the derived ingredient index
+    that surfaced it, but from the recipe page itself, for as long as it had
+    been there. Nothing could see it: the file parses, the build succeeds, the
+    page renders, and every other test in this suite reads the PARSED front
+    matter, which by then is missing the line entirely. The only symptom is an
+    ingredient that isn't there, on a page nobody re-reads once it is written.
+
+    yaml.safe_load accepts duplicates by specification, so catching this needs
+    a loader that refuses them. That is the whole test.
+    """
+    match = re.match(r"\A---\n(.*?\n)---", recipe.raw, re.S)
+    try:
+        yaml.load(match.group(1), Loader=_StrictLoader)
+    except yaml.constructor.ConstructorError as exc:
+        raise AssertionError(
+            f"{where(recipe)} has a duplicate key in its front matter: {exc}.\n"
+            f"YAML keeps only the last one, so whatever the earlier line said "
+            f"has already been thrown away -- check what is missing from the "
+            f"rendered page, not just what looks wrong in the file."
+        ) from None
 
 
 def test_no_retired_fields(recipe):

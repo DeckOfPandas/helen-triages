@@ -43,8 +43,8 @@ ingredient_groups:
     - amount: "2 tsp"
       item: tamarind paste
     - amount: "200 ml"
-    - item: "flavourings to taste, like chicken stock cubes, fish sauce, MSG or anything"
       item: coconut cream
+    - item: "flavourings to taste, like chicken stock cubes, fish sauce, MSG or anything"
     - item: "Steamed white or sticky rice, to serve"
       note: "I like sticky rice best here"
   - name: bumbu (spice paste)

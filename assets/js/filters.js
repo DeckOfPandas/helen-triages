@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // The dislike navigator (GitHub issue #52) -- see food/index.html's own
   // comment on the section for why it starts hidden.
   var excludeReveal = document.getElementById('exclude-reveal');
+  var excludeDismiss = document.getElementById('exclude-dismiss');
   var excludePanel = document.getElementById('exclude-panel');
   var excludeBox = document.getElementById('exclude-search-box');
   var excludeClear = document.getElementById('exclude-search-clear');
@@ -469,6 +470,29 @@ function renderResultsPool() {
     return btn;
   }
 
+  /* THE ACTIVE PILL, NOT makeExcludeButton -- it used to be one text node
+     ("peas ×") so .btn-exclude--active's line-through ran through the × as
+     well as the ingredient, which reads as "this control is disabled" rather
+     than "this ingredient is out". The name and the × are now separate
+     elements so _search.scss can strike only .btn-exclude-label; the × stays
+     plain. Still one clickable <button> throughout -- the × is not a second
+     control, same as before -- and the aria-label is unchanged. */
+  function makeActiveExcludeButton(value) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-tag btn-exclude btn-exclude--active';
+    btn.dataset.exclude = value;
+    btn.setAttribute('aria-label', 'stop leaving out ' + value);
+
+    var label = document.createElement('span');
+    label.className = 'btn-exclude-label';
+    label.textContent = value;
+    btn.appendChild(label);
+
+    btn.appendChild(document.createTextNode(' ×'));
+    return btn;
+  }
+
   /* The picker's own search is FUZZY, and that is correct. It runs
      HTF.ingredientSearch — folding, modifier-stripping, singulars, the lot —
      over the derived vocabulary, so typing "pea" offers peas, peanut butter
@@ -525,10 +549,7 @@ function renderResultsPool() {
       // the BUTTON comes off here -- "recipes that list chicken (all)" is not
       // a sentence. The pill keeps it, because there it is the control's name.
       names.push(value.replace(FAMILY_SUFFIX, ''));
-      var btn = makeExcludeButton(value, value + ' ×');
-      btn.className = 'btn-tag btn-exclude btn-exclude--active';
-      btn.setAttribute('aria-label', 'stop leaving out ' + value);
-      excludeActive.appendChild(btn);
+      excludeActive.appendChild(makeActiveExcludeButton(value));
     });
 
     var count = document.createElement('span');
@@ -568,10 +589,16 @@ function renderResultsPool() {
     update();
   }
 
+  // #exclude-dismiss follows #exclude-search-clear's own idiom -- visibility,
+  // not display, so its space is reserved beside the reveal button rather
+  // than the row jumping width the instant the panel opens (see
+  // #ingredient-search-box's comment in _search.scss for why that mattered
+  // enough to fix once already).
   function setExcludeRevealed(open) {
     if (!excludeReveal || !excludePanel) return;
     excludeReveal.setAttribute('aria-expanded', open ? 'true' : 'false');
     excludePanel.hidden = !open;
+    if (excludeDismiss) excludeDismiss.style.visibility = open ? 'visible' : 'hidden';
   }
 
   if (excludeReveal && excludePanel) {
@@ -580,6 +607,21 @@ function renderResultsPool() {
       // Focus follows the disclosure, so a keyboard user lands in the box
       // they just asked for rather than tabbing back through the panel.
       if (excludePanel.hidden === false && excludeBox) excludeBox.focus();
+    });
+  }
+
+  if (excludeDismiss) {
+    excludeDismiss.addEventListener('click', function () {
+      // Closes the PANEL, not the exclusions -- state.excludedIngredients is
+      // untouched, same call clearAllFilters() already makes for "the panel
+      // stays open" the other way round (see its own comment below).
+      // #exclude-active lives outside #exclude-panel for exactly this reason,
+      // so the pills and the "hiding N recipes" count it painted stay on
+      // screen and clickable through the close.
+      setExcludeRevealed(false);
+      // Returns focus to the control that opened this, so a keyboard user
+      // isn't left in a spot the panel used to occupy.
+      excludeReveal.focus();
     });
   }
 

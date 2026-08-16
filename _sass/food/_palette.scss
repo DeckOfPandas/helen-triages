@@ -242,15 +242,20 @@ $color-section-underline-2: $color-vibrant-violet;   // the second, lower rule
 // similar #0047AB ("cobalt blue") a first attempt used -- Helen asked for
 // the specific colour that used to exist in this project, not a same-name
 // pigment reference.
-// NOTHING READS THIS RIGHT NOW, 2026-08-13. Its one consumer was the about
-// page's FAQ heading, which went back to violet the day after it was restored
-// -- Helen: "I love colour, but even I need to accept that adding the cobalt
-// was too much." Kept anyway, against this file's own "a swatch nothing chooses
-// from is not a palette, it is a paint chart" rule, and the exception is
-// deliberate: this value has already been deleted once and recovered by hand
-// (see above), and deleting it a second time the day after it came back is
-// churn, not tidying. If it is still unread when the next palette pass happens,
-// that is the moment to take it out.
+// UNREAD FROM 2026-08-13 TO 2026-08-16. Its one consumer was the about page's
+// FAQ heading, which went back to violet the day after it was restored --
+// Helen: "I love colour, but even I need to accept that adding the cobalt was
+// too much." Kept anyway, against this file's own "a swatch nothing chooses
+// from is not a palette, it is a paint chart" rule, and the exception was
+// deliberate: this value had already been deleted once and recovered by hand
+// (see above), and deleting it a second time the day after it came back would
+// have been churn, not tidying.
+//
+// Now read by .search--exclude .category-label-text in
+// _sass/food/_category-labels.scss -- the LEAVE OUT heading's own double
+// rule, Helen's sixth deliberately-added section hue, 2026-08-16. See that
+// rule's own comment for why LEAVE OUT gets one when the picker beneath it
+// otherwise borrows none.
 $color-electric-cobalt: #0047FF;
 
 // Step numerals in the method, and the top-level bullets in the short method.
