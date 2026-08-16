@@ -4,47 +4,41 @@
 // How badges and the clear-all button behave once a filter is on.
 
 // --- Matched state badges (when a filter is active) --------------------------
-// Text colour added 2026-08-03, same reasoning as the active filter buttons
-// above: near-black reads better than the category -active hue sitting on
-// top of the full-colour tape shape. No emboss/raised text-shadow any more
-// either (same date, same rule as the buttons above) — flat stroke, same
-// $color-text (not a category hue) and same $faux-bold-stroke width as the buttons, so
-// the category identity lives only in .tag-shape's own fill, lightened
-// further again (mix with white, 12% -> 18%) to keep backing off the
-// loudness now that neither the shadow nor the stroke are carrying it.
+// ONLY THE SHAPE CHANGES. A matched badge keeps every typographic property of
+// the resting badge beside it: lowercase, weight 700, 0.02em, and its own
+// category -active text colour. What lights up is .tag-shape, from the dusty
+// mix($hue, $color-border, 35%) to the lightened mix($hue, $color-white, 82%).
+//
+// GitHub issue #237, and the reason is worth keeping because the old version
+// was a reasonable idea that turned out wrong. This rule used to restyle the
+// badge into the FILTER BUTTON's vocabulary -- uppercase, weight 900, 0.04em,
+// near-black text and a $faux-bold-stroke -- borrowed wholesale from
+// _category-labels.scss on the argument that "selected" should look the same
+// wherever it appears. Helen, after looking at it: a selected pill should be
+// styled "in a way compatible with other pills, not the same as the filter
+// section tags".
+//
+// She is right, and the structural reason is that the two live in different
+// company. A filter button sits in a grid of thirty-six other buttons, where
+// the only question is on or off, and the weight jump IS the answer -- it has
+// nothing else to be compared against. A badge sits on a recipe row among two
+// or three quiet siblings, in a list of twenty rows. Changing its case, weight
+// and letterform there does not read as "this one is selected"; it reads as a
+// different KIND of object appearing mid-row, and the eye stops to work out
+// what the new thing is. Same signal, different neighbours, opposite effect.
+//
+// This also makes the hover preview honest. _badges.scss's hover already moves
+// .tag-shape to exactly this value, on the stated reasoning that hovering
+// should show what clicking is about to do -- which was only ever half true
+// while clicking ALSO changed the case and the weight. Hover and matched are
+// now the same state, so the preview is the thing.
+//
+// No background-color: the SVG shape is the visible fill and a background sits
+// under it doing nothing. That was stale from before .tag-shape existed.
 .recipe-list .badge.badge--matched {
-  text-transform: uppercase;
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  padding: $space-xxs 0.65rem $space-xxs $space-sm;
-  color: $color-text;
-  text-shadow: none;
-
-  // .tag-shape back to (a lightened) full opacity (badge-star/mood/
-  // practicalities above tone the RESTING shape down to rgba(..., 0.4) —
-  // matching a filter still needs to pop against a page of otherwise-quiet
-  // pills). No more background-color: that was the pre-tape-shape fill,
-  // stale since the SVG shape itself is the visible fill now and sits
-  // UNDER it doing nothing.
-  &.badge-star           { -webkit-text-stroke: $faux-bold-stroke $color-text; .tag-shape { color: mix($color-star-root, $color-white, 82%); } }
-  &.badge-mood           { -webkit-text-stroke: $faux-bold-stroke $color-text; .tag-shape { color: mix($color-mood-root, $color-white, 82%); } }
-  &.badge-practicalities { -webkit-text-stroke: $faux-bold-stroke $color-text; .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); } }
-}
-
-// Layers on top of a badge-star/mood/practicalities that's ALSO an
-// ingredient-search hit — .tag-shape colour is already handled by that
-// category's own .badge--matched rule above, since this selector has no way
-// to know which category it is. Same text treatment as every other matched
-// state: near-black, flat stroke, no stale background-color.
-.recipe-list .badge.badge--matched.badge-ingredient-hit {
-  text-transform: uppercase;
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  color: $color-text;
-  text-shadow: none;
-  -webkit-text-stroke: $faux-bold-stroke $color-text;
+  &.badge-star           { .tag-shape { color: mix($color-star-root, $color-white, 82%); } }
+  &.badge-mood           { .tag-shape { color: mix($color-mood-root, $color-white, 82%); } }
+  &.badge-practicalities { .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); } }
 }
 
 // --- Global clear-all button (JS-created, prepended to .controls) -----
