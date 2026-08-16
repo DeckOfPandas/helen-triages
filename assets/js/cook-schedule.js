@@ -161,10 +161,39 @@
          effect with no error and no failing test. Keep this branch and the
          `rate` one in agreement. */
       var d = method.by_doneness[doneness] || method.by_doneness.rare;
+
+      /* EVERY LEVEL, not just the one asked for -- GitHub issue #246. The page
+         hard-wired `doneness` to "rare" and had no control, so the medium rates
+         in cooking_methods.yml were unreachable: real, sourced data that
+         nothing could display. Only two of 73 methods have this shape (beef's
+         standard roast, venison's haunch), which is why the fix is to show
+         both figures rather than to add a control that would do nothing for
+         seven of the nine proteins.
+
+         ADDITIVE ON PURPOSE. lo/hi and the aside still describe the single
+         requested level, so orderMethods -- which sorts on lo -- keeps sorting
+         on one consistent figure, and every existing caller and test sees
+         exactly what it saw before. A caller that wants the whole picture
+         reads `levels`; one that wants a number reads lo/hi as it always did.
+
+         Data order, not alphabetical: cooking_methods.yml lists rare before
+         medium, which is the order the rates rise in and the order a cook
+         thinks in. Alphabetical would put medium first and read as a default. */
+      var levels = Object.keys(method.by_doneness).map(function (name) {
+        var lv = method.by_doneness[name];
+        return {
+          name: name,
+          label: name.replace(/_/g, " "),
+          lo: lv.rate_min * kg + (lv.flat_add || 0),
+          hi: lv.rate_max * kg + (lv.flat_add_max || lv.flat_add || 0)
+        };
+      });
+
       return {
         ok: true,
         lo: d.rate_min * kg + (d.flat_add || 0),
         hi: d.rate_max * kg + (d.flat_add_max || d.flat_add || 0),
+        levels: levels,
         aside: "Rate depends on doneness; showing " + doneness.replace(/_/g, " ") + "."
       };
     }
