@@ -27,7 +27,7 @@ ingredient_groups:
 method:
   - "Season the short ribs comprehensively, then sear in a roasting pan for 10–15 mins to brown well on all sides."
   - "Add the halved garlic head cut side down, pushing it to the bottom of the pan. Add the tomato purée and heat for a minute or two to cook it out. Deglaze with the wine, scraping up the bits at the bottom. Bring to the boil and cook for 10–15 mins until reduced by half, then add stock to nearly cover the ribs. Bring to the boil again, basting the ribs with the juices."
-  - "Cover the roasting pan with foil and roast at 150°C fan for 3–4 hours, basting now and then, until the meat is tender and falling away from the bone."
+  - "Cover the roasting pan with foil and roast at 150°C fan for 3–4 hours, basting now and then, until the meat is tender and falling away from the bone (but check [cooking temperatures](#doneness))."
   - "Remove the ribs and transfer to a serving dish. Squeeze the garlic cloves from their skins and pass through a sieve. Spoon off excess fat from the cooking liquid, then strain through the sieve and mix with the garlic. If the sauce is too thin, reduce for a further 10–15 mins after straining."
   - "Serve with the sauce poured around and parsley scattered over."
 method_short:
