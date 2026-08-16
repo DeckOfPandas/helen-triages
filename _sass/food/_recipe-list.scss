@@ -59,7 +59,29 @@
                           // natural width, and the ingredient line's clamp/fade
                           // has nothing to clip against
 
-  a {
+  // .recipe-title-link, NOT a bare `a`. This rule is the recipe TITLE, and it
+  // was written when a row contained exactly one link, so `a` was an accurate
+  // way to say "the title". GitHub issue #40 made every tag badge an <a> in
+  // this same container, at which point `.recipe-row-content a` (0,1,1) started
+  // beating `.badge` (0,1,0) and every badge on the index silently rendered at
+  // 1rem in the heading font instead of its own 0.72rem body-font pill.
+  //
+  // That is issue #258, which reads as a styling preference ("make the pills
+  // smaller") and is actually this: the badges were never meant to be that
+  // size, and .badge's own rule was being outranked rather than being wrong.
+  //
+  // THE GUARD THAT EXISTS DOES NOT CATCH THIS, worth knowing before relying on
+  // it: test_every_class_we_emit_has_a_rule_in_the_stylesheet asks whether a
+  // class HAS a rule, not whether that rule WINS. A class whose declarations
+  // are all overridden by a more specific selector passes it happily.
+  //
+  // The same defect was fixed on the recipe page in the #40 pass
+  // (`article.recipe a` -> `article.recipe a:not(.badge)`, _recipe-header.scss)
+  // and missed here. Named class rather than `a:not(.badge)` because that is
+  // what the codebase already decided for exactly this element: filters.js's
+  // querySelector('a') became querySelector('.recipe-title-link') in the same
+  // issue, for the same reason -- "the only link in the row" stopped being true.
+  .recipe-title-link {
     font-family: $font-headings;
     font-size: 1rem;
     font-weight: 600;     // 400 and 500 render identically -- Courier New only
