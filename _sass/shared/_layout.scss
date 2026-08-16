@@ -99,11 +99,31 @@ main {
 // order (see default.html's own comment). Absolutely positioned as a group
 // against .site-header-inner rather than each child positioning itself, so
 // they lay out left-to-right as one row pinned to the bottom-right corner
-// (was top-right -- Helen's ask), 1rem clear of the header's own bottom
-// edge rather than flush against it.
+// (was top-right -- Helen's ask).
+//
+// bottom: 2rem, not the header's own $space-xl padding (1.5rem) -- issue
+// #236, Helen wanted the row raised to sit roughly level with the BOTTOM
+// EDGE OF THE BLACK TAPE rather than wherever "1.5rem clear of the header"
+// happened to land it. This is an eyeballed offset, not a mechanism: the
+// tape graphic (assets/img/food/tape/*.svg, viewBox 0 0 1400 170) doesn't
+// fill its own box -- the black polygon's visible bottom ink line sits at
+// y=148 of 170, i.e. about 9px shy of its box's own bottom edge, once that
+// box is .site-logo-tape's actual 70px height. .site-nav-icons' "bottom" is
+// measured from .site-header-inner's bottom edge, which itself sits exactly
+// $space-xl (1.5rem) below the wordmark's own bottom edge (.site-header's
+// padding-bottom) -- so 1.5rem + ~9px lands roughly on the ink line, hence
+// 2rem, rounded rather than chased to the pixel.
+//
+// Deliberately not chasing this further: the tape is rotated
+// (rotate(-1.75deg) on .site-logo-tape), it's a multi-icon ROW being lined
+// up against a tilted edge, and Helen's own call was "approximately level ...
+// does not need to change with different tape SVGs" -- so this is a single
+// hand-picked rem value, not a calc() tracking the SVG's geometry. If the
+// tape SVG's own margins change, or .site-logo-tape's 70px height changes,
+// re-eyeball this by hand rather than expecting it to follow automatically.
 .site-nav-icons {
   position: absolute;
-  bottom: 1rem;
+  bottom: 2rem;
   right: 0;
   display: flex;
   align-items: center;
