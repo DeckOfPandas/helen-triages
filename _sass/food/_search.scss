@@ -49,7 +49,12 @@
     }
   }
 
-  #ingredient-search-box {
+  // The exclude picker's box joins this rule rather than getting a third copy
+  // of it (the name search's own copy below is already one too many): it is the
+  // same control, in the same row shape, doing the same job in the opposite
+  // direction, and a fork would only ever drift.
+  #ingredient-search-box,
+  #exclude-search-box {
     font-family: $font-headings;
     font-size: 0.78rem;
     font-weight: 700;
@@ -98,7 +103,8 @@
   // unification silently had no effect here. Only margin-left survives:
   // genuine layout (spacing next to the search input), not typography the
   // class-based rule already owns.
-  #ingredient-search-clear {
+  #ingredient-search-clear,
+  #exclude-search-clear {
     margin-left: $space-md;
   }
 
@@ -150,6 +156,211 @@
   // Same duplicate-ID story as #ingredient-search-clear above.
   #name-search-clear {
     margin-left: $space-md;
+  }
+
+  // .search--exclude is a CHILD of this section now (Helen, 2026-08-16: put
+  // the reveal "closer to I KNOW WHAT I WANT" and centre it under that
+  // heading), not a sibling .category — see food/index.html's own comment on
+  // the wrapper for the full reasoning. This box just gives that child its
+  // width and its own internal stacking; .controls .search--exclude below
+  // still owns everything about how its contents look.
+  .search--exclude {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $index-label-gap;
+  }
+}
+
+// --- The dislike navigator (GitHub issue #52) --------------------------------
+// "I know what I don't want": the exclude picker, revealed by its own link
+// under I KNOW WHAT I WANT.
+//
+// IT BORROWS NO CATEGORY HUE, on purpose, the same call META FILTERS and the
+// results heading already made: it is not one of the five filter categories,
+// so it doesn't take one of their colours. Everything here is $color-text and
+// the neutral clear-link grey, which also keeps the pane visibly quieter than
+// the five sections above it — right for something you opened deliberately
+// rather than something the page is offering everyone.
+//
+// (The LEAVE OUT *label* is the one deliberate exception — it carries its own
+// cobalt double-rule, added in _category-labels.scss, not here. That is a
+// heading decoration, the sixth hue Helen asked for on this section
+// specifically; it has nothing to do with the buttons, links and pills below,
+// which stay neutral exactly as this comment already argues.)
+.controls .search--exclude {
+  // The reveal-and-dismiss pair sits centred under I KNOW WHAT I WANT, not
+  // left-aligned like the rest of the control panel — Helen, 2026-08-16: this
+  // row is the only thing on the page that reads as "attached to the section
+  // above" rather than as its own left-edge-anchored row, so it gets the one
+  // centred treatment on the page.
+  // ALIGNED UNDER THE HEADING, NOT CENTRED IN THE ROW -- Helen, 2026-08-16:
+  // "move the link left, to be centered under I KNOW WHAT I WANT". It was
+  // centred across the section's full width, which put it under the middle of
+  // the INPUT rather than anywhere near the label.
+  //
+  // flex-start, plus the same margin-right the label above carries, so the
+  // link starts exactly where "I KNOW WHAT I WANT" starts. Worth being
+  // straight about what that is and is not: the two strings are close enough
+  // in width that this reads as centred under the heading, but it is an
+  // ALIGNMENT, not a centring. Truly centring under a label whose width
+  // changes with its own text would mean making that label a shared grid
+  // column (the .site-logo max-content trick, HANDOVER 13.8) so both rows
+  // size to whichever is wider -- a bigger change, and only worth it if the
+  // approximation looks wrong once the label reads "(hide leave out)", which
+  // is much shorter than the heading.
+  .exclude-reveal-row {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: $space-md;
+  }
+
+  // The reveal is a link in appearance and a button in fact — see
+  // food/index.html and test_clear_controls_are_buttons. Matched to
+  // .btn-clear-inline (sans, regular, underline, colour-shift hover), which is
+  // this page's one inline-link design; NOT lowercased, because the words are
+  // Helen's own sentence rather than a filter label.
+  .btn-reveal {
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: $font-body;
+    font-size: 0.78rem;
+    // 350, not 400 -- Helen's 2026-08-16 pass, "lighten the weight". The same
+    // value .ingredient-list uses on the recipe rows, so this reads as the
+    // page's quiet register rather than as a third weight invented here.
+    font-weight: 350;
+    letter-spacing: 0.02em;
+    color: lighten($color-text, 12%);
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.1s ease-in-out;
+
+    // ONE TREATMENT FOR HOVER, CLICK AND KEYBOARD FOCUS -- Helen, 2026-08-16:
+    // "use the same link styling on mouseover and click". They were three
+    // different looks: hover darkened the text, focus painted a grey box
+    // behind it and removed the outline, and a click got whichever the
+    // browser decided applied. Now all three darken, and nothing else moves.
+    &:hover,
+    &:active,
+    &:focus-visible { color: $color-text; }
+
+    // The keyboard indicator stays, because a colour shift alone is not one --
+    // it is the same shift the mouse already causes, so it says "you are
+    // hovering", not "you are here". An outline rather than the old background
+    // fill: it does not change the element's apparent size or weight, so the
+    // focused link is still the same link.
+    &:focus-visible {
+      outline: 2px solid $color-exclude-active;
+      outline-offset: 2px;
+    }
+  }
+
+  // .search--exclude now lives inside .search--name (see the wrapper's own
+  // comment in food/index.html), so #exclude-search-clear and #exclude-dismiss
+  // are both descendants of .category.search--name as well as of this
+  // selector. Without this, _category-labels.scss's
+  // `&.search--name { .btn-clear-inline { color: $color-name-search-active } }`
+  // rule would reach in and paint them I KNOW WHAT I WANT's own hot orange —
+  // exactly the borrowed hue this section's own comment, three paragraphs up,
+  // says it refuses. Restated here at equal specificity (three classes deep
+  // either way) rather than left to depend on _search.scss importing after
+  // _category-labels.scss in food.scss, which happens to be true today but
+  // isn't what anyone reading this rule in isolation could tell.
+  .btn-clear-inline {
+    // $color-exclude-active, the same $darken-active treatment every other
+    // section's clear button gets from its own root hue -- Helen, 2026-08-16.
+    // This used to be `inherit`, which was the safe answer when the concern
+    // was only "don't let I KNOW WHAT I WANT's hot orange leak in through the
+    // nesting". Naming the colour outright settles that better than inherit
+    // did: it cannot be reached by the parent rule described above, and it
+    // says which hue this section owns instead of merely which one it refuses.
+    color: $color-exclude-active;
+
+    &:hover { color: $color-text; }
+  }
+
+  // `hidden` does the hiding (the attribute, from filters.js) so the closed
+  // panel is out of the tab order as well as off the screen. This only owns
+  // the layout of the open one.
+  .exclude-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: $index-label-gap;
+    margin-top: $space-md;
+  }
+
+  // `hidden` IS AN ATTRIBUTE, AND display BEATS IT. The UA stylesheet gives
+  // [hidden] { display: none }, which any explicit display on the element
+  // overrides -- so the flex above silently cancelled it and the panel was
+  // open from the moment the page loaded, whatever aria-expanded claimed.
+  // Helen: "should not be shown by default". Restated here at higher
+  // specificity (0,1,1 beats 0,1,0) rather than by swapping the attribute for
+  // a class, so the panel's contents stay out of the tab order while closed --
+  // which is the reason it uses `hidden` in the first place.
+  .exclude-panel[hidden] {
+    display: none;
+  }
+
+  // OUTSIDE #exclude-panel on purpose (see food/index.html's comment on the
+  // wrapper): #exclude-dismiss hides the panel but the exclusions themselves
+  // stay applied, so this has to keep rendering — and stay clickable — while
+  // .exclude-panel is `hidden`.
+  // NOTHING EXCLUDED, NOTHING TO SPACE. This div renders on every page load
+  // whether or not anything is in it -- it has to, because it lives outside
+  // #exclude-panel so the pills survive the panel closing. Empty it is
+  // zero-height, but it is still a flex CHILD of .category, so it was
+  // collecting a full $index-label-gap between the search box and the recipe
+  // list below for the majority of sessions that never open the panel at all.
+  // Helen: "reduce the amount of vertical space between LEAVE OUT and the
+  // recipe list." :empty is exact here -- filters.js appends element children
+  // when there is something to show and empties innerHTML when there is not,
+  // so there is never stray whitespace to defeat it.
+  .exclude-active:empty {
+    display: none;
+  }
+
+  .exclude-active {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-xs;
+  }
+
+  // "leaving out" and the count read as quiet prose either side of the pills,
+  // not as more controls — the pills are the only thing in this row you can
+  // click, and they should be the only thing that looks it.
+  .exclude-active-label,
+  .exclude-count {
+    font-family: $font-body;
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: lighten($color-clear-text, 10%);
+  }
+
+  // A chosen exclusion carries its own × and comes off with one click. It gets
+  // the resting .btn-tag treatment plus a stronger text colour rather than the
+  // full active tape-shape the STAR/MOOD buttons get: those say "this is what
+  // I want", and it would read oddly for the row of things being kept out to
+  // shout louder than the filters that are letting recipes in.
+  //
+  // The strike only runs through .btn-exclude-label, the ingredient name —
+  // filters.js splits the name and the × into separate elements now, because
+  // a single text node ("peas ×") struck the × through as well, which reads
+  // as "this control is disabled" rather than "this ingredient is out".
+  .btn-exclude--active {
+    color: $color-text;
+
+    .btn-exclude-label {
+      text-decoration: line-through;
+    }
+
+    &:hover .btn-exclude-label { text-decoration: none; }
   }
 }
 

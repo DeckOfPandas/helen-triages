@@ -393,3 +393,23 @@ $index-label-gap:   $space-md;   // a label to its own buttons
 .category--practicalities  .category-label-text { @include overlapping-rule-double($color-practicalities-root, $color-section-underline-2); }
 .search--ingredients       .category-label-text { @include overlapping-rule-double($color-ingredient-root,     $color-section-underline-2); }
 .search--name              .category-label-text { @include overlapping-rule-double($color-name-search-root,    $color-section-underline-2); }
+
+// A SIXTH hue, deliberately. HANDOVER §13.5 calls the five rules directly
+// above a CODE: colour on the index is tied to a section's own buttons,
+// active states, clear link and badges, not spent as decoration, which is
+// exactly why LEAVE OUT doesn't reuse one of them — it isn't one of the five
+// filter categories (see _search.scss's own "IT BORROWS NO CATEGORY HUE"
+// comment on .controls .search--exclude), so borrowing star/mood/
+// practicalities/ingredients/name-search would wrongly claim it as a sixth
+// member of a set it was deliberately kept out of. Helen added this heading
+// rule for LEAVE OUT specifically, 2026-08-16, because the panel earned a
+// heading of its own once it had a dismiss and a "stays applied" active-pill
+// row to sit next to — the label needed to look like the other section
+// headings on the page even though the picker beneath it still stays
+// neutral.
+//
+// $color-electric-cobalt over the shared violet: this exact colour lived here
+// once already, as $color-name-search-root, before hot orange took that root
+// over on 2026-08-01 — see _palette.scss's own note on it. A hue returning to
+// the system, not a new one being invented.
+.search--exclude           .category-label-text { @include overlapping-rule-double($color-electric-cobalt,     $color-section-underline-2); }

@@ -52,6 +52,28 @@
 // building a slot nothing fills (test_no_decoration_slot_is_orphaned, and
 // HANDOVER §12's `--annotation-gutter` cautionary tale). Add it the day
 // something calls it.
+//
+// -----------------------------------------------------------------------------
+// THE STATE SHAPE (GitHub issue #52, step one)
+// -----------------------------------------------------------------------------
+//
+// This file also owns WHAT THE INDEX'S FILTER STATE IS, as an enumerable table
+// rather than as six loose variables in filters.js's 894 lines of DOM wiring.
+//
+// It is here because of a bug that happened three times in two days, always
+// the same shape: clearAllFilters() emptied five things and the clear-button's
+// visibility predicate checked four, so the button hid while it still had work
+// to do. `nameQuery` was missed once; `isSearching` was missed once; before
+// that two rival copies of the predicate disagreed with each other. Every one
+// was found by eye, on the page, after shipping.
+//
+// The fix is not "be more careful". It is that the list of fields exists ONCE,
+// in FIELD_SPEC below, and BOTH the empty state and the "is anything set"
+// answer are computed BY ITERATING IT. Add a field to FIELD_SPEC and it is
+// cleared, and counted by the clear button, on the same line that declares it —
+// there is no second place to remember. tests/js/filter-state.test.js generates
+// its per-field cases from FIELDS for the same reason: a hand-written list of
+// cases has exactly the omission problem it is meant to catch.
 // =============================================================================
 (function (root) {
   'use strict';
@@ -108,7 +130,207 @@
     return out;
   }
 
-  var api = { KINDS: KINDS, EXCLUDE_PREFIX: EXCLUDE_PREFIX, parseQuery: parseQuery };
+  // ---------------------------------------------------------------------------
+  // THE STATE SHAPE
+  // ---------------------------------------------------------------------------
+
+  /* Every field the index's filter state has, and the only place the list is
+     written down. A field declares two things and nothing else:
+
+       empty   a FACTORY for this field's cleared value. A factory, not a
+               value, because two of them are Sets: a shared empty Set handed
+               out twice would be one Set mutated from two places.
+
+       narrows whether this field counts as "something is still narrowing the
+               list" — see hasNarrowingFilter below. It is stated per field
+               because it is genuinely per field, and the two fields that say
+               false each have a reason recorded here.
+
+     There is deliberately no per-field "is it set?" predicate: isFieldSet
+     below answers that generically from the value, so adding a field costs one
+     line and cannot half-arrive. */
+  var FIELD_SPEC = {
+    // The tag buttons (MOOD, PRACTICALITIES). Multi-select: every active tag
+    // must be present on a row for it to survive.
+    tags: { empty: function () { return new Set(); }, narrows: true },
+
+    // STAR INGREDIENT. Single-select — picking a second replaces the first.
+    star: { empty: function () { return null; }, narrows: true },
+
+    /* THE DISLIKE NAVIGATOR — GitHub issue #52's actual goal, in Helen's
+       words: "I have invited someone for dinner and they hate peas, so I want
+       to see all recipes that do NOT contain peas as an ingredient."
+
+       A Set of entries from the DERIVED ingredient index (food/index.html's
+       `data-all-ingredients`, built from every ingredient_groups item on the
+       row, incidentals included) — not from main_ingredients, which is a
+       deliberately partial hint and so is safe to include ON but dangerous to
+       exclude BY. Multi-select, like tags: a row is dropped if it lists ANY of
+       these.
+
+       Narrowing, and this is the one field where that is worth saying out
+       loud: an exclusion is a filter with no button of its own lit up
+       anywhere in the matrix, so if it did not count towards
+       hasAnythingToClear the clear-all button would hide while a filter was
+       still silently removing rows — the issue-#52 bug all over again, in the
+       feature issue #52 was actually about. Declaring it here is the entire
+       change: emptyState(), hasAnythingToClear(), hasNarrowingFilter() and
+       the generated per-field cases in tests/js/filter-state.test.js all pick
+       it up by iteration. */
+    excludedIngredients: { empty: function () { return new Set(); }, narrows: true },
+
+    /* The chosen ingredient-search result. NOT narrowing, deliberately:
+       filters.js's renderResultsPool() nulls it on every keystroke, so while
+       the ingredient box is being typed into it is always null, and including
+       it in hasNarrowingFilter would be a no-op dressed up as a rule. */
+    ingredient: { empty: function () { return null; }, narrows: false },
+
+    // The meta filters (rewrite/proofread/short/draft), local builds only.
+    meta: { empty: function () { return new Set(); }, narrows: true },
+
+    /* The title search, folded and lowercased by filters.js before it lands
+       here. NARROWING since 2026-08-16: a title search is a filter like any
+       other, and the rows it has left are meaningful, so hiding them behind
+       the "searching" message while you pick an ingredient threw away context
+       you had just asked for. A tag or a star already kept the list on screen;
+       nameQuery was the odd one out, and Helen's call was that it should
+       behave like the others. */
+    nameQuery: { empty: function () { return ''; }, narrows: true },
+
+    /* NOT A FILTER, and the one that keeps getting forgotten. It means "the
+       ingredient box has text in it and nothing has been chosen from the
+       results yet" — a half-finished search rather than an applied filter. It
+       is in this table because clear-all DOES clear it (it empties the box and
+       the results pool), so the clear button must offer itself while it is
+       set: type "chi", get a pool of results, and without this there is no way
+       to clear them but deleting the text by hand. Helen found that one.
+
+       It does not narrow anything — it is the very state hasNarrowingFilter
+       exists to ask a question ABOUT — so narrows is false. */
+    isSearching: { empty: function () { return false; }, narrows: false }
+  };
+
+  // Derived, never hand-maintained: these two are why adding a field to
+  // FIELD_SPEC is the whole change.
+  var FIELDS = Object.keys(FIELD_SPEC);
+  var NARROWING_FIELDS = FIELDS.filter(function (f) { return FIELD_SPEC[f].narrows; });
+
+  // A fresh, fully-cleared state. What clearAllFilters() assigns.
+  function emptyState() {
+    var state = {};
+    FIELDS.forEach(function (f) { state[f] = FIELD_SPEC[f].empty(); });
+    return state;
+  }
+
+  /* "Does this field hold anything?", answered from the VALUE rather than from
+     a per-field predicate, so a new field needs no predicate written for it.
+     Sets are asked for their size (duck-typed rather than `instanceof Set`,
+     which is false across a realm boundary — a Node test's Set is not a
+     browser frame's Set); strings and booleans and null answer for themselves.
+     Anything else is a value someone deliberately stored, so it counts. */
+  function isFieldSet(value) {
+    if (value === null || value === undefined || value === false || value === '') return false;
+    if (typeof value.size === 'number') return value.size > 0;
+    return true;
+  }
+
+  /* "Is there anything for the clear-all button to clear?" — purely the
+     button's visibility, and it must agree with what clear-all actually
+     clears, or the button hides while still having work to do. It agrees by
+     construction: clear-all assigns emptyState(), and both walk FIELDS. */
+  function hasAnythingToClear(state) {
+    return FIELDS.some(function (f) { return isFieldSet((state || {})[f]); });
+  }
+
+  function isEmpty(state) {
+    return !hasAnythingToClear(state);
+  }
+
+  /* ---------------------------------------------------------------------------
+     THE EXCLUSION RULE — GitHub issue #52
+     ---------------------------------------------------------------------------
+
+     "Does this row list anything the cook has ruled out?", answered against the
+     row's DERIVED ingredient entries (food/index.html's data-all-ingredients,
+     put through HTF.ingredientSearch.buildMasterList by filters.js so both
+     sides of the comparison have had the same normalisation).
+
+     SET MEMBERSHIP, NOT SUBSTRING, and this is the whole rule. The real
+     collection holds `peas`, `peanut butter`, `smooth peanut butter`,
+     `roasted peanuts` and `organic pearl barley`. A "contains" test for the
+     short things people type takes all five out at once; excluding peas would
+     silently lose the peanut butter cookies and the pearl barley casserole.
+     The picker hands back a REAL ENTRY, chosen from a list where all five were
+     offered side by side, so the row test compares whole entries and nothing
+     else. The fuzziness belongs in FINDING the entry, never in applying it.
+
+     A "(all)" family button (the picker offers "chicken (all)" over chicken
+     breast/thighs/stock) is the one umbrella, and it says so on its face.
+     Matching a family needs the ingredient vocabulary — singulars, synonyms,
+     modifier stripping — which this module deliberately does not have and is
+     not going to grow, so the caller passes `familyMatch(entries, key)` in.
+     With no familyMatch supplied, an "(all)" value falls through to the same
+     exact comparison as everything else and simply matches nothing: no
+     vocabulary, no umbrella, and never a silent substring rule sneaking in
+     through the back door. */
+  var FAMILY_SUFFIX = ' (all)';
+
+  function isFamilyValue(value) {
+    return typeof value === 'string' &&
+      value.length > FAMILY_SUFFIX.length &&
+      value.slice(-FAMILY_SUFFIX.length) === FAMILY_SUFFIX;
+  }
+
+  function familyKey(value) {
+    return value.slice(0, -FAMILY_SUFFIX.length).trim();
+  }
+
+  function excludesRow(entries, excluded, familyMatch) {
+    if (!excluded) return false;
+    var list = entries || [];
+    var values = typeof excluded.forEach === 'function' ? excluded : [];
+    var hit = false;
+    values.forEach(function (value) {
+      if (hit) return;
+      if (familyMatch && isFamilyValue(value)) {
+        if (familyMatch(list, familyKey(value))) hit = true;
+      } else if (list.indexOf(value) !== -1) {
+        hit = true;
+      }
+    });
+    return hit;
+  }
+
+  /* A DIFFERENT QUESTION, and it must stay different — GitHub issue #248.
+     There used to be three near-identical expressions in filters.js and the
+     issue read as "unify them"; unifying them would have been wrong, because
+     this one and hasAnythingToClear ask genuinely different things and
+     collapsing them trades a documented difference for a silent behaviour
+     change at whichever call site loses its own answer.
+
+     This one asks: "while the ingredient box is being typed into, is anything
+     ELSE still narrowing the list?" It is the one input to filters.js's
+     suppressList, which decides whether the list hides behind the "searching"
+     message. Hence NARROWING_FIELDS rather than FIELDS: see `ingredient` and
+     `isSearching` in FIELD_SPEC for why each is excluded. */
+  function hasNarrowingFilter(state) {
+    return NARROWING_FIELDS.some(function (f) { return isFieldSet((state || {})[f]); });
+  }
+
+  var api = {
+    KINDS: KINDS,
+    EXCLUDE_PREFIX: EXCLUDE_PREFIX,
+    parseQuery: parseQuery,
+    FIELDS: FIELDS,
+    NARROWING_FIELDS: NARROWING_FIELDS,
+    emptyState: emptyState,
+    isFieldSet: isFieldSet,
+    FAMILY_SUFFIX: FAMILY_SUFFIX,
+    excludesRow: excludesRow,
+    hasAnythingToClear: hasAnythingToClear,
+    isEmpty: isEmpty,
+    hasNarrowingFilter: hasNarrowingFilter
+  };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;

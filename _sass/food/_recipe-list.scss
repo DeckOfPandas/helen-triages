@@ -20,7 +20,18 @@
 // $spacing-section-top is the recipe page's own token, reused rather than
 // inventing a second "gap above a heading" value.
 .results-heading {
-  margin: $spacing-section-top 0 $space-lg;
+  // $spacing-section-gap (3rem) above, not $spacing-section-top (4.5rem).
+  // The 4.5 was chosen when the filter matrix ended on a row of buttons and
+  // the heading needed to read as "leaving the filters behind" -- the
+  // three-to-one rhythm this file's own comment below still describes. The
+  // matrix now ends on the leave-out row, which brings its own trailing
+  // space, so the two stacked to a gap Helen could see from across the page
+  // ("still a lot of space above the recipe list", 2026-08-16).
+  //
+  // Reduced here rather than by shrinking the token: $spacing-section-top is
+  // the recipe page's "gap above a heading" too, and this is a fact about
+  // THIS heading's neighbours, not about the scale.
+  margin: $spacing-section-gap 0 $space-lg;
   display: flex;
   // Was flex-end -- Helen, 2026-08-03: sitting alone at the right edge of
   // an otherwise left-aligned page, it read as stray rather than placed.

@@ -59,7 +59,7 @@ import re
 import pytest
 
 from conftest import where_draft, ALL_RECIPES, ALL_DRAFTS
-from test_front_matter import REQUIRED, RETIRED, MISPLACED_META
+from test_front_matter import REQUIRED, RETIRED, MISPLACED_META, _StrictLoader
 from test_style import TYPOGRAPHY, SPELLINGS
 from test_taxonomy import (
     MISSING_TRAILING_SLASH,
@@ -84,6 +84,31 @@ def test_required_field_key_present(draft, field):
         f"A draft can leave it blank/QQ, but the key itself should exist — "
         f"every other draft already has all of: {', '.join(REQUIRED)}."
     )
+
+
+def test_front_matter_has_no_duplicate_keys(draft):
+    """Same rule as the recipe version, and worth having here specifically
+    because a draft carries its front matter with it when it is promoted --
+    the same reasoning as test_no_main_ingredient_spelling_collisions. A key
+    silently discarded in a draft becomes a line silently missing from a
+    published recipe, and by then the evidence is gone: every other test
+    reads the PARSED front matter, which no longer contains it.
+
+    Clean across all 254 drafts when this was written, so it is a regression
+    guard rather than a checklist.
+    """
+    import re as _re
+    import yaml as _yaml
+    match = _re.match(r"\A---\n(.*?\n)---", draft.raw, _re.S)
+    try:
+        _yaml.load(match.group(1), Loader=_StrictLoader)
+    except _yaml.constructor.ConstructorError as exc:
+        raise AssertionError(
+            f"{where_draft(draft)} has a duplicate key in its front matter: "
+            f"{exc}.\nYAML keeps only the last one, so the earlier line's "
+            f"content is already gone -- fix it here, before promotion turns "
+            f"it into a missing ingredient on a live page."
+        ) from None
 
 
 def test_no_retired_fields(draft):

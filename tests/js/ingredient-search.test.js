@@ -32,7 +32,14 @@ const VOCAB = {
   modifiers: ['chopped'],
   never_family: [],
   family_exceptions: [],
-  stopwords: ['and']
+  stopwords: ['and'],
+  // GitHub issue #273 — the three strips the DERIVED vocabulary needs. Kept
+  // to the real lists' shape but not their full contents, same as every
+  // other list here: what's being checked is the algorithm, not which words
+  // happen to be in _data/food/ingredient_words.yml today.
+  quantity_units: ['g', 'kg', 'ml', 'tsp', 'tbsp', 'fl', 'oz'],
+  measure_phrases: ['a few sprigs of', 'a good pinch of', 'a pat of', 'a large handful of', 'a glass of'],
+  trailing_phrases: ['to taste', 'to serve', 'to glaze', 'to garnish']
 };
 
 const RAW_INGREDIENTS = [
@@ -204,6 +211,157 @@ test('a longer entry is never hidden behind a similar shorter one', () => {
   const found = result.results.map((r) => r.ing);
   assert.ok(found.includes('brown sugar'));
   assert.ok(found.includes('soft brown sugar'));
+});
+
+// =============================================================================
+// GitHub issue #273 — the derived vocabulary's three extra strips.
+//
+// The exclude picker's list is derived from `item:` free text rather than
+// from the curated main_ingredients, so it arrives carrying quantities,
+// portion phrasings and method notes. Each of the four tests below is a real
+// entry the live picker offered; the fifth is the one that matters most.
+// =============================================================================
+
+test('a leading quantity is stripped, unit and all', () => {
+  const master = matcher().buildMasterList([
+    '1 tsp salt', '150 g gruyère', '4–5.5 kg fresh goose',
+    '¼–½ tsp sea salt', '⅛ tsp vanilla essence', '3 fl oz milk'
+  ]);
+  // Every one of these is a real recipe that put its amount in `item:`
+  // instead of `amount:`. "3 fl oz" checks that a two-word unit goes in one
+  // pass rather than leaving "oz milk" behind.
+  assert.deepStrictEqual(master.sort(), [
+    'fresh goose', 'gruyère', 'milk', 'salt', 'sea salt', 'vanilla essence'
+  ].sort());
+});
+
+test('a first word that only looks numeric is left alone', () => {
+  // "3-bone" and "70%" carry a letter and a percent sign respectively, so
+  // neither is a bare number and neither is a quantity. Both are
+  // under-strips, on purpose: for an EXCLUDE filter, an entry that reads
+  // oddly is visible and annoying, while a wrong merge silently hides
+  // recipes the cook never meant to exclude.
+  const master = matcher().buildMasterList(['3-bone rib of beef', '70% dark chocolate']);
+  assert.deepStrictEqual(master.sort(), ['3-bone rib of beef', '70% dark chocolate']);
+});
+
+test('a quantity strip never eats the whole entry', () => {
+  // Nothing in the collection is written this way, but an entry reduced to
+  // the empty string would be an unnamed, unpickable button.
+  assert.deepStrictEqual(matcher().buildMasterList(['500 g']), ['g']);
+  assert.deepStrictEqual(matcher().buildMasterList(['200']), ['200']);
+});
+
+test('a measure phrase is stripped so the entry is the ingredient', () => {
+  const master = matcher().buildMasterList([
+    'a few sprigs of fresh thyme', 'a good pinch of salt', 'a pat of salted butter',
+    'a large handful of fresh coriander', 'a glass of robust red wine', 'salt'
+  ]);
+  // "a good pinch of salt" collapses onto the "salt" that was already there
+  // — one entry, not two spellings of the same avoidance.
+  assert.deepStrictEqual(master.sort(), [
+    'fresh coriander', 'fresh thyme', 'robust red wine', 'salt', 'salted butter'
+  ].sort());
+});
+
+test('a trailing method note is stripped from the end', () => {
+  const master = matcher().buildMasterList([
+    'herbs to taste', 'sriracha to serve', 'apricot jam to glaze', 'watercress to garnish'
+  ]);
+  assert.deepStrictEqual(master.sort(), ['apricot jam', 'herbs', 'sriracha', 'watercress']);
+});
+
+test('none of the new strips touch an ingredient whose name genuinely contains those words', () => {
+  // THE TEST THAT MATTERS. Under-stripping is visible and annoying;
+  // over-stripping is invisible and wrong — a rule that reduces
+  // "bicarbonate of soda" to "soda", or "apple cider vinegar" to "vinegar",
+  // silently merges two ingredients and hides recipes the cook never asked
+  // to hide. Every one of these six survived a real pass over the derived
+  // vocabulary and must keep surviving: three carry an "of" that a general
+  // measure rule would strip through, and three are long compounds that a
+  // general "strip the qualifier" rule would flatten.
+  const protectedEntries = [
+    'apple cider vinegar',
+    'bicarbonate of soda',
+    'black cardamom pods',
+    'coconut palm sugar',
+    'cream of tartar',
+    'chicken stock cube'
+  ];
+  const master = matcher().buildMasterList(protectedEntries);
+  assert.deepStrictEqual(master.slice().sort(), protectedEntries.slice().sort());
+});
+
+// =============================================================================
+// GitHub issue #273 — `aliases` in its list forms.
+//
+// The derived vocabulary also offered entries that name TWO ingredients at
+// once ("beef or venison stock") or none at all ("flavouring or fruit"), plus
+// preparation states the leading-word `modifiers` strip can't reach ("grated
+// parmesan"). All three are the job `aliases` already did for "five-spice
+// powder", so `aliases` took them rather than a second list being invented:
+// a NAME renames (tested above), a LIST splits, an EMPTY LIST drops. Named
+// phrases and never a rule, so nothing can fire on text nobody wrote.
+// =============================================================================
+
+const ALIAS_VOCAB = Object.assign({}, VOCAB, {
+  aliases: {
+    'grated parmesan': 'parmesan',
+    'beef or venison stock': ['beef stock', 'venison stock'],
+    'flavouring or fruit': [],
+    'sorrel or more': ['sorrel']
+  }
+});
+
+test('an alias written as a bare name still renames, list forms or not', () => {
+  const master = IS.create(ALIAS_VOCAB).buildMasterList(['grated parmesan', 'parmesan']);
+  // "grated" isn't in `modifiers` and can't be, because "grated coconut" is a
+  // different product from coconut — so this one phrase is named outright.
+  // Both spellings collapse onto the one entry, not two. The bare-name form
+  // is the original alias shape and must keep working beside the list ones.
+  assert.deepStrictEqual(master, ['parmesan']);
+});
+
+test('an alias written as a list splits one entry into all of them', () => {
+  const master = IS.create(ALIAS_VOCAB).buildMasterList(['beef or venison stock']);
+  // The picker has to offer each stock separately: a cook avoiding venison
+  // has no way to say so while the two are welded into one button.
+  assert.deepStrictEqual(master, ['beef stock', 'venison stock']);
+  assert.ok(!master.includes('beef or venison stock'), 'the compound entry should be gone');
+});
+
+test('an alias written as an empty list drops the entry entirely', () => {
+  const master = IS.create(ALIAS_VOCAB).buildMasterList(['flavouring or fruit', 'apples']);
+  // "flavouring or fruit" names no food, so there is nothing to offer to
+  // exclude — and an entry nobody could act on is worse than no entry.
+  assert.deepStrictEqual(master, ['apples']);
+});
+
+test('aliases match the POST-STRIP form of an entry, not the raw text', () => {
+  // "sorrel or more to taste" is not a key — "sorrel or more" is, because the
+  // trailing-phrase strip has already run by the time aliases are consulted.
+  // Keying the raw form would make the entry inert while looking correct.
+  const master = IS.create(ALIAS_VOCAB).buildMasterList(['sorrel or more to taste']);
+  assert.deepStrictEqual(master, ['sorrel']);
+});
+
+test('an entry `aliases` does not name is left exactly as it was', () => {
+  // THE TEST THAT MATTERS, again. The list's whole justification over a
+  // general "split on and/or" rule, or a general prep-word stripper, is that
+  // it cannot reach anything it doesn't name — so these must survive it
+  // verbatim. Three carry a connector word a general rule would cut them in
+  // half at; two are near-misses of real keys in the live list ("roasted
+  // peanuts" and "smoked mackerel fillets" ARE aliased there, "dry roasted
+  // peanuts" and "smoked haddock" are deliberately not).
+  const untouched = [
+    'almonds or whatever you prefer',
+    'bicarbonate of soda',
+    'chicken thighs and drumsticks',
+    'dry roasted peanuts',
+    'smoked haddock'
+  ];
+  const master = IS.create(ALIAS_VOCAB).buildMasterList(untouched);
+  assert.deepStrictEqual(master.slice().sort(), untouched.slice().sort());
 });
 
 test('within the non-prefix results, a real word match ranks above a family-only member', () => {
