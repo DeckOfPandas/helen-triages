@@ -207,7 +207,21 @@
 
        It does not narrow anything — it is the very state hasNarrowingFilter
        exists to ask a question ABOUT — so narrows is false. */
-    isSearching: { empty: function () { return false; }, narrows: false }
+    isSearching: { empty: function () { return false; }, narrows: false },
+
+    /* isSearching's sibling for the LEAVE OUT box (#exclude-search-box, GitHub
+       issue #52) — "the exclude box has text in it and nothing has been
+       chosen from its results yet". GitHub issue #274: this field simply did
+       not exist, so typing "pea" into the exclude box set no state at all,
+       hasAnythingToClear() correctly answered "nothing is set", and the clear
+       button stayed hidden beside a pool of results you had no other way to
+       dismiss but deleting the text by hand — the exact isSearching bug,
+       recurring because the exclude box's half-finished search had no field
+       of its own to be forgotten from. Same shape as isSearching for the same
+       reasons: clear-all DOES clear it (empties the box and its results pool,
+       see clearAllFilters()), so it must count towards hasAnythingToClear; it
+       does not narrow anything, so narrows is false. */
+    isExcludeSearching: { empty: function () { return false; }, narrows: false }
   };
 
   // Derived, never hand-maintained: these two are why adding a field to

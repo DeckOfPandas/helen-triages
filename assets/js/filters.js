@@ -33,7 +33,14 @@ document.addEventListener('DOMContentLoaded', function () {
        state.isSearching NOT A FILTER — "the ingredient box has text and
                          nothing is chosen yet". Clearable, so it counts
                          towards the clear button; not narrowing, so it does
-                         not count towards suppressList. */
+                         not count towards suppressList.
+       state.isExcludeSearching
+                         isSearching's sibling for the LEAVE OUT box
+                         (#exclude-search-box, issue #52). GitHub issue #274:
+                         this had no field at all, so a half-finished exclude
+                         search set no state, and the clear button stayed
+                         hidden beside a pool of results with no other way to
+                         dismiss them. Same treatment as isSearching. */
   var state = FilterState.emptyState();
 
   var PAGE_SIZE = 20;
@@ -503,7 +510,16 @@ function renderResultsPool() {
     var query = fold(excludeBox.value.trim().toLowerCase());
     excludePool.innerHTML = '';
     if (excludeClear) excludeClear.style.visibility = query ? 'visible' : 'hidden';
-    if (!query) return;
+    // isSearching's sibling for this box (GitHub issue #274) -- see its entry
+    // in FIELD_SPEC. Set here, in step with the pool it describes, rather
+    // than left for toggleExcluded/excludeClear alone to unset, so the clear
+    // button appears the instant a half-finished search puts a pool on
+    // screen and not only once something is picked out of it.
+    state.isExcludeSearching = !!query;
+    if (!query) {
+      update();
+      return;
+    }
 
     var result = IS.search(query, excludeMasterList);
     result.familyButtons.forEach(function (fw) {
@@ -518,6 +534,7 @@ function renderResultsPool() {
       if (result.familyButtons.indexOf(fold(r.ing.trim().toLowerCase())) !== -1) return;
       excludePool.appendChild(makeExcludeButton(r.ing, r.label || r.ing));
     });
+    update();
   }
 
   /* WHAT IS BEING LEFT OUT, painted from state rather than at each place state
@@ -584,6 +601,10 @@ function renderResultsPool() {
       if (excludeBox) excludeBox.value = '';
       if (excludePool) excludePool.innerHTML = '';
       if (excludeClear) excludeClear.style.visibility = 'hidden';
+      // isSearching's sibling -- a result was just chosen, so the box is no
+      // longer mid-search (renderResultsPool's own auto-select does the same
+      // for state.isSearching).
+      state.isExcludeSearching = false;
     }
     update();
   }
@@ -633,7 +654,10 @@ function renderResultsPool() {
       if (excludeBox) excludeBox.value = '';
       if (excludePool) excludePool.innerHTML = '';
       excludeClear.style.visibility = 'hidden';
+      // isSearching's sibling -- see ingredientClear's own handler below.
+      state.isExcludeSearching = false;
       if (excludeBox) excludeBox.focus();
+      update();
     });
   }
 

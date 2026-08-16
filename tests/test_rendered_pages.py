@@ -341,3 +341,66 @@ def test_every_chart_row_draws_its_filled_bar(site):
             f"{url}: {row_count} chart rows but {bars} filled bars — "
             f"every row must draw the figure it is about"
         )
+
+
+# =============================================================================
+# EVERY TEXT CONTROL MUST HAVE A PIECE OF STATE BEHIND IT — GitHub issue #274
+# =============================================================================
+#
+# The fourth instance of one bug: you type into a box, results appear, and the
+# clear-all link does not offer itself, so there is no way to dismiss them but
+# deleting the text by hand. nameQuery, then isSearching, then two rival
+# predicates, then the LEAVE OUT box.
+#
+# filter-state.test.js generates a case per field from FIELDS and is genuinely
+# load-bearing — but it can only prove that the predicate handles every field
+# FIELD_SPEC DECLARES. It cannot prove FIELD_SPEC declares every piece of state
+# the page actually holds, and that second claim is the one that keeps failing.
+# A control with no field is invisible to a sweep over fields.
+#
+# So this comes at it from the page instead: the ids are read out of the BUILT
+# html, and a control this test has never been told about is a failure. Adding
+# an input to the index page and no field to FIELD_SPEC now breaks the build
+# rather than shipping a dead clear button.
+CONTROL_STATE_FIELDS = {
+    "ingredient-search-box": "isSearching",
+    "name-search-box": "nameQuery",
+    "exclude-search-box": "isExcludeSearching",
+}
+
+
+def test_every_text_input_on_the_index_has_state_behind_it(site):
+    html = (site / "food" / "index.html").read_text(encoding="utf-8")
+    ids = set(re.findall(r'<input[^>]*type="text"[^>]*id="([^"]+)"', html))
+    assert ids, (
+        "no text inputs found on the built index page. Either the page lost its "
+        "search boxes or this regex stopped matching -- either way the check "
+        "below is now vacuous, which is exactly the trap it exists inside."
+    )
+
+    unknown = sorted(ids - set(CONTROL_STATE_FIELDS))
+    assert not unknown, (
+        f"the index page has text input(s) {unknown} that this test has never "
+        f"been told about. Every box a user can type into needs a field in "
+        f"FIELD_SPEC (assets/js/filter-state.js), or clear-all cannot see it and "
+        f"will not offer itself while the box holds a half-finished search -- "
+        f"GitHub issues #52, #274. Add the field, then name it here. Do not "
+        f"delete the id from this list to make the failure go away."
+    )
+
+    spec = (ROOT / "assets" / "js" / "filter-state.js").read_text(encoding="utf-8")
+    declared = set(re.findall(r"^\s{4}(\w+):\s*\{\s*empty:", spec, re.M))
+    wiring = (ROOT / "assets" / "js" / "filters.js").read_text(encoding="utf-8")
+
+    for box_id in sorted(ids):
+        field = CONTROL_STATE_FIELDS[box_id]
+        assert field in declared, (
+            f"#{box_id} is mapped to the state field '{field}', which "
+            f"FIELD_SPEC does not declare."
+        )
+        # Declared but never assigned is the same bug wearing a disguise: the
+        # field exists, the sweep covers it, and nothing ever sets it.
+        assert re.search(rf"state\.{re.escape(field)}\s*=", wiring), (
+            f"nothing in filters.js ever assigns state.{field}, so typing in "
+            f"#{box_id} leaves the state untouched and clear-all stays hidden."
+        )
