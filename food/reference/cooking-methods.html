@@ -5,7 +5,7 @@ permalink: /food/reference/cooking-methods/
 ---
 
 {% comment %}
-  THE EIGHT TIMING SECTIONS RENDER FROM _data/food/cooking_methods.yml, via
+  THE NINE TIMING SECTIONS RENDER FROM _data/food/cooking_methods.yml, via
   _includes/food/method_table.html. They used to be hand-written tables holding
   the same 66 rows as the data, and the two had begun to disagree: the data says
   "180°C fan" where this page said "180°C fan / 200°C conventional", and the
@@ -46,6 +46,7 @@ permalink: /food/reference/cooking-methods/
       <li><a href="#pork">Pork</a></li>
       <li><a href="#shellfish">Shellfish</a></li>
       <li><a href="#turkey">Turkey</a></li>
+      <li><a href="#venison">Venison</a></li>
     </ul>
 
     {% assign p = site.data.food.cooking_methods.beef %}
@@ -180,5 +181,7 @@ permalink: /food/reference/cooking-methods/
 
     {% assign p = site.data.food.cooking_methods.turkey %}
     {% include food/method_table.html id="turkey" label="Turkey" protein=p %}
+    {% assign p = site.data.food.cooking_methods.venison %}
+    {% include food/method_table.html id="venison" label="Venison" protein=p %}
   </div>
 </article>

@@ -558,10 +558,14 @@ def test_every_method_belongs_to_a_declared_group(cooking_methods):
 
 
 def test_prose_blocks_survived_the_move_into_data(cooking_methods):
-    """The eight timing sections' surrounding prose now lives in the data, in
+    """The nine timing sections' surrounding prose now lives in the data, in
     ordered before/after lists. This asserts the count didn't quietly shrink:
-    30 paragraphs across 12 groups, being 12 sources notes and 18 others
-    (weight ranges, FOOD SAFETY flags, group intros, ham's Caveat)."""
+    35 paragraphs across 14 groups, being 14 sources notes and 21 others
+    (weight ranges, FOOD SAFETY flags, group intros, ham's Caveat).
+
+    Was 30 across 12 groups until 2026-08-16, when venison arrived (issue #205)
+    with two groups and five blocks: a weight range and a sources note on each,
+    plus the slow-cooked group's intro line."""
     total = sum(len(g.get("before", [])) + len(g.get("after", []))
                 for node in cooking_methods.values()
                 for g in node.get("groups", []))
@@ -569,8 +573,8 @@ def test_prose_blocks_survived_the_move_into_data(cooking_methods):
                   for g in node.get("groups", [])
                   for b in g.get("before", []) + g.get("after", [])
                   if b["kind"] == "sources")
-    assert total == 30, f"expected 30 prose blocks, found {total}"
-    assert sources == 12, f"expected 12 sources notes, found {sources}"
+    assert total == 35, f"expected 35 prose blocks, found {total}"
+    assert sources == 14, f"expected 14 sources notes, found {sources}"
 
 
 def test_outbound_links_are_still_in_the_data(cooking_methods):
@@ -597,14 +601,18 @@ def test_the_data_file_is_not_empty(cooking_methods):
 
     So: assert the shape is there at all, before asserting things about it.
     """
-    assert len(cooking_methods) == 8, (
-        f"expected 8 proteins with timings, found {len(cooking_methods)}: "
+    assert len(cooking_methods) == 9, (
+        f"expected 9 proteins with timings, found {len(cooking_methods)}: "
         f"{sorted(cooking_methods)}"
     )
     total = sum(len(node["methods"]) for node in cooking_methods.values())
-    assert total == 65, (
-        f"expected 65 methods, found {total} — 66 were migrated and beef's "
-        f"closed-oven-off method was dropped on 2026-08-14 at Helen's request"
+    assert total == 73, (
+        f"expected 73 methods, found {total} — 66 were migrated, beef's "
+        f"closed-oven-off method was dropped on 2026-08-14 at Helen's request "
+        f"(65), and venison's eight arrived on 2026-08-16 with issue #205: "
+        f"five roasting rows (haunch three ways, rack, loin) and three "
+        f"slow-cooked ones (shoulder twice, shank). Neck is folded into the "
+        f"shoulder rows on purpose — no UK source publishes a neck timing"
     )
 
 
