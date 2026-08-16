@@ -186,8 +186,24 @@ def test_every_class_we_emit_has_a_rule_in_the_stylesheet(site):
     isn't dragged in. Modifiers are checked as written (`tc-row--suggested`),
     against the COMPILED css, where Sass's `&--suggested` has already been
     resolved into a real selector.
+
+    GitHub issue #227 added `site-`. The header nav classes from last week's
+    food/cocktails switcher -- `site-nav-icons`, `site-nav-icon-link`,
+    `site-about-link` in _layouts/default.html -- sat outside all three
+    original prefixes, so a typo in one of them would have rendered an
+    unstyled link and failed nothing. `site-` is scoped to exactly the site
+    chrome this project owns (header, nav, logo, footer -- everything
+    _layouts/default.html and _sass/shared/_layout.scss share between food
+    and cocktails), the same shape of boundary as `tc-`/`ct-`/`doneness`
+    scoping to one feature each, rather than a blanket match that would also
+    catch unrelated classes from elsewhere in the markup. Checked against
+    every `class="...site-...` in the templates before adding it: all twelve
+    existing site-* classes (site-header, site-header-inner, site-logo and
+    its four sub-parts, site-footer and site-footer-hearts, site-title-link,
+    plus the three nav ones above) already have a rule, so widening it adds
+    coverage without adding any new failures.
     """
-    OURS = ("tc-", "ct-", "doneness")
+    OURS = ("tc-", "ct-", "doneness", "site-")
     sources = (list(pathlib.Path("_includes").rglob("*.html"))
                + list(pathlib.Path("_layouts").rglob("*.html"))
                + list(pathlib.Path("food").rglob("*.html"))
