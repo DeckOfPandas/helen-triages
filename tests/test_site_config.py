@@ -188,6 +188,52 @@ def test_cook_timer_js_holds_no_schedule_arithmetic():
         )
 
 
+def test_filters_js_holds_no_loose_filter_state_variables():
+    """The filter state lives in filter-state.js, where tests/js can reach it.
+
+    Same spirit as test_cook_timer_js_holds_no_schedule_arithmetic above, and
+    for a sharper reason. GitHub issue #52, step one: filters.js used to hold
+    its filter state as six loose variables inside 900 lines of DOM wiring, and
+    three times in two days the same bug shipped -- clearAllFilters() emptied
+    N of them while the clear-all button's visibility predicate checked N-1, so
+    the button hid while it still had work to do. Each was found by eye.
+
+    The state is now ONE object whose fields, cleared value and both "is
+    anything set" answers are all derived by iterating FIELD_SPEC in
+    assets/js/filter-state.js, covered by the generated per-field cases in
+    tests/js/filter-state.test.js. If a loose variable reappears here it is, by
+    construction, outside that enumeration again -- and the generated test
+    cannot see it, because it generates from FIELDS.
+
+    Declarations only. The names are still perfectly good English and may well
+    appear in prose in a comment; what must not come back is filters.js owning
+    the value.
+    """
+    js = read("assets", "js", "filters.js")
+    for name in (
+        "activeTags",
+        "activeStar",
+        "activeIngredient",
+        "activeMetaFilters",
+        "nameQuery",
+        "isSearching",
+    ):
+        assert not re.search(rf"\bvar\s+{name}\b", js), (
+            f"assets/js/filters.js declares `var {name}`. The index's filter "
+            f"state belongs in assets/js/filter-state.js -- add the field to "
+            f"FIELD_SPEC there, where emptyState(), hasAnythingToClear() and "
+            f"hasNarrowingFilter() all pick it up at once and "
+            f"tests/js/filter-state.test.js generates a case for it."
+        )
+
+    assert "FilterState.emptyState()" in js, (
+        "assets/js/filters.js no longer builds its state from "
+        "HTF.filterState.emptyState(). clearAllFilters() must replace the "
+        "whole state object rather than empty it field by field, or the "
+        "clear-all button's predicate can drift from it again (issue #52)."
+    )
+
+
 # --- a badge is a control, not a caption -------------------------------------
 
 def test_recipe_badges_are_links_carrying_their_own_filter_value():
