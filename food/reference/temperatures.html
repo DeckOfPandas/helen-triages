@@ -56,6 +56,8 @@ permalink: /food/reference/temperatures/
       <li><a href="#lamb">Lamb</a></li>
       <li><a href="#pork">Pork</a></li>
       <li><a href="#poultry">Poultry</a></li>
+      <li><a href="#venison-tender-roasting-cuts">Venison: tender roasting cuts</a></li>
+      <li><a href="#venison-slow-cooked-cuts">Venison: slow-cooked cuts</a></li>
       <li><a href="#all">All</a></li>
     </ul>
 
@@ -234,6 +236,76 @@ permalink: /food/reference/temperatures/
     </div>
     <a class="tc-totop" href="#top">&uarr; top</a>
 
+    {% comment %} VENISON'S CROSSLINKS GO TO THE COOKING-METHODS PAGE, NOT THE
+       CALCULATOR. Every other section here links to
+       /food/reference/timings/?protein=X, and venison has no entry in
+       _data/food/cooking_methods.yml yet -- so ?protein=venison would select
+       nothing and land you on a calculator with an empty protein. The link text
+       names where it actually goes, the way the steak and salmon sections
+       already do. Venison timings are their own piece of work. {% endcomment %}
+
+    <h2 class="recipe-section-heading" id="venison-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Venison: tender roasting cuts</span><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods/' | relative_url }}">cooking methods &rarr;</a></h2>
+    <p class="recipe-section-subtitle">loin and haunch share their out-at figures &mdash; what differs is how far they drift after</p>
+
+    {% include food/temp_key.html rested=true carry=true %}
+
+    {% comment %} TWO CHARTS, ONE SECTION, and the second one is the argument
+       for drawing this at all. UK game sources publish core temperatures for
+       venison rather than per cut, so both charts start from the same out-at
+       ranges; the haunch's dotted stretches are visibly longer because a 1.8 kg
+       joint carries 4–6°C out of the oven where a 600 g loin carries 2–3. Same
+       numbers going in, different meat coming out. {% endcomment %}
+    <p class="recipe-section-subtitle">Loin and tenderloin &mdash; carryover {{ t.venison.loin.carryover }}</p>
+    <div class="tc">
+      <div class="tc-plot">
+        {% for level in t.venison.loin.doneness %}
+          {% comment %} spec is assigned first because Jekyll's include tag
+             rejects bracket indexing in a parameter -- `spec=level[1]` is a
+             build-crashing syntax error, not a silent nil. {% endcomment %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec tip="A loin is small and lean, so it carries very little heat off the pan -- and goes from rare to overcooked in a minute or two." %}
+        {% endfor %}
+      </div>
+      {{ axis }}
+    </div>
+
+    <p class="recipe-section-subtitle">Haunch &mdash; carryover {{ t.venison.haunch.carryover }}, rest {{ t.venison.haunch.rest_min }} minutes</p>
+    <div class="tc">
+      <div class="tc-plot">
+        {% for level in t.venison.haunch.doneness %}
+          {% assign label = level[0] | replace: "_", " " | capitalize %}
+          {% assign spec = level[1] %}
+          {% include food/temp_row.html label=label spec=spec tip="The dotted stretch is the carryover, and it is wider here than on the loin above for the same reason a beef joint's is wide: a big lean haunch takes a lot of hot mass out of the oven with it." %}
+        {% endfor %}
+      </div>
+      {{ axis }}
+    </div>
+
+    {% comment %} NO SHADED ZONE ON EITHER CHART, and that is a decision rather
+       than an omission -- FSA treats a whole cut of venison as it treats beef
+       and lamb, so there is no line to draw. The note below is the mince
+       exception, which is a different question and not one a thermometer
+       answers. {% endcomment %}
+    <p class="tc-note">Pink venison is fine for the same reason pink beef is: the bacteria are on the surface and the sear kills them. Venison <em>mince</em> is the exception &mdash; mincing moves the surface into the middle, and FSA's advice for a burger made from anything other than beef is to cook it through.</p>
+    <a class="tc-totop" href="#top">&uarr; top</a>
+
+    <h2 class="recipe-section-heading" id="venison-slow-cooked-cuts"><span class="section-heading-text section-heading-text--reference">Venison: slow-cooked cuts</span><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods/' | relative_url }}">cooking methods &rarr;</a></h2>
+    <p class="recipe-section-subtitle">shoulder, neck and shank &mdash; not a doneness at all</p>
+
+    {% comment %} No key, for the same reason beef's tough cuts chart has none:
+       one bar, whose own value already reads "tender at 90–95°C". Shoulder,
+       neck and shank all carry that one figure, so they draw as one row rather
+       than as three identical ones. {% endcomment %}
+    <div class="tc">
+      <div class="tc-plot">
+        {% assign vslow = t.venison.shoulder %}
+        {% include food/temp_row.html label="Slow-cooked" spec=vslow tip="Shoulder, neck and shank. Braised until the collagen gives, tested by fork rather than by thermometer alone -- no UK venison source publishes a figure for this at all, so 90-95°C is the same collagen figure this site uses for pork and lamb shoulder." %}
+      </div>
+      {{ axis }}
+    </div>
+    <a class="tc-totop" href="#top">&uarr; top</a>
+
     <h2 class="recipe-section-heading" id="all"><span class="section-heading-text section-heading-text--reference">All</span><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}">timings and cooking methods &rarr;</a></h2>
 
     {% include food/temp_key.html solid="served between" %}
@@ -246,6 +318,15 @@ permalink: /food/reference/temperatures/
         {% include food/temp_span.html label="Salmon" doneness=t.fish.salmon.doneness %}
         {% include food/temp_span.html label="Steak" doneness=t.steak.doneness %}
         {% include food/temp_span.html label="Beef roast" doneness=t.beef.tender_roast.doneness %}
+        {% comment %} ONE venison row, not two. Loin and haunch carry identical
+           out-at figures -- UK sources publish a core temperature for venison
+           generally rather than per cut -- and this chart plots out-at spans, so
+           a second row would draw a bar exactly on top of the first. What
+           actually separates the two cuts is carryover (2-3°C against 4-6°C),
+           which this overview doesn't show at all; the section above does, which
+           is where the tip sends you. Sits here because the list runs by lower
+           bound and venison's 48°C ties with beef's. {% endcomment %}
+        {% include food/temp_span.html label="Venison roast" doneness=t.venison.loin.doneness tip="Loin and haunch share these figures; what differs is carryover, so see the venison section for the two side by side. No shaded zone: FSA treats a whole cut of venison as it treats beef." %}
         {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness tip="UK guidance treats pink lamb like pink beef." %}
         {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness tip="The medium figure is the one flagged against FSA guidance." %}
 

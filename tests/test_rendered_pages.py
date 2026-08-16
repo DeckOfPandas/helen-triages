@@ -97,10 +97,10 @@ def test_only_tough_cuts_are_labelled_tender_at(site):
     """
     html = page(site, "/food/reference/temperatures/")
     labelled = [(l, v) for l, v in rows(html) if v.startswith("tender at")]
-    assert len(labelled) == 4, (
-        f"expected exactly 4 rows to say 'tender at' (beef's tough cuts, pork's "
-        f"and lamb's slow-cooked, and the All summary), found {len(labelled)}: "
-        f"{labelled}"
+    assert len(labelled) == 5, (
+        f"expected exactly 5 rows to say 'tender at' (beef's tough cuts, pork's, "
+        f"lamb's and venison's slow-cooked, and the All summary), found "
+        f"{len(labelled)}: {labelled}"
     )
 
 

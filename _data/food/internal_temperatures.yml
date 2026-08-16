@@ -476,3 +476,129 @@ fish:
         out_at_max: 65
         description: "Cooked through, dry and firm — not traditional for tuna, but the figure to use for no pink at all"
     safety_note: "Standard for sushi-grade tuna, which is typically previously frozen to kill parasites — a supplier/labelling fact, not something a thermometer confirms. Buy from a source that states it, same as for any fish eaten raw or rare."
+
+# Four cuts, in two shapes: the two tender cuts carry a doneness spectrum, the
+# two slow-cooked ones carry a tenderness threshold and no doneness at all.
+#
+# LOIN AND HAUNCH SHARE THEIR OUT-AT FIGURES, and that is a fact about the
+# sources rather than a shortcut -- UK game sources publish core temperatures
+# for venison, not per cut. What genuinely differs is the carryover: a 600 g
+# loin and a 1.8 kg haunch do not carry the same hot mass off the heat, so the
+# rested figures diverge even though the out-at ones don't.
+#
+# NO SAFETY THRESHOLD ANYWHERE IN HERE, deliberately. FSA treats a whole cut of
+# venison the way it treats beef and lamb -- surface bacteria, killed by the
+# sear -- so there is no line to draw and nothing to shade. See the safety_note
+# on loin and haunch for the one case that is different (mince).
+venison:
+  loin:
+    # Covers tenderloin/fillet as well as loin: same muscle group, same figures,
+    # and nothing in the sources separates them.
+    #
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: venison-tender-roasting-cuts
+    carryover: "2–3°C"
+    carryover_min: 2
+    carryover_max: 3
+    doneness:
+      rare:
+        out_at: "48–50°C"
+        out_at_min: 48
+        out_at_max: 50
+        rested: "~50–53°C"
+        rested_min: 50
+        rested_max: 53
+      medium_rare:
+        out_at: "52–57°C"
+        out_at_min: 52
+        out_at_max: 57
+        rested: "~54–60°C"
+        rested_min: 54
+        rested_max: 60
+      medium:
+        out_at: "58–62°C"
+        out_at_min: 58
+        out_at_max: 62
+        rested: "~60–65°C"
+        rested_min: 60
+        rested_max: 65
+      well_done:
+        out_at: "68–70°C"
+        out_at_min: 68
+        out_at_max: 70
+        rested: "~70–73°C"
+        rested_min: 70
+        rested_max: 73
+    safety_note: "Venison is a whole muscle, and FSA treats it the way it treats beef and lamb: the bacteria are on the surface, the sear kills them, and pink in the middle is fine. Mince is the exception. FSA's less-than-thoroughly-cooked guidance covers beef burgers only — its advice for a burger made from any other meat, venison included, is to cook it through. Mincing moves the surface into the middle, so a rare venison burger is a different question from a rare venison loin."
+    sources: "medium_rare 52–57°C is the strongest figure here: four independent UK game sources land inside it — Farmison 54°C, Wild Meat Company 'circa 55°C', Eversfield Organic 'at least 56°C', Church Farm Oxford 57°C. medium 58–62°C is Great British Recipes' haunch guide (58°C core rising to ~62°C rested). well_done 68–70°C matches UK game guidance ('70°C if you prefer it well done') and this site's own beef and lamb figures. rare 48–50°C is the WEAKEST of the four — no UK venison source publishes a rare figure at all, and this one sits between Wild Meat Company's 45–47°C 'rare, with resting' and Thomas Joseph Butchery's 50°C beef pull. The 2–3°C carryover is INFERRED from this site's own steak node rather than cited: a 600 g loin cannot carry the 5°C a 1.3 kg haunch does."
+  haunch:
+    # Which section of the temperature charts holds this spectrum, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: venison-tender-roasting-cuts
+    # Rest time in the sense the other entries use it -- a figure this data
+    # publishes so the timings page doesn't have to invent one. A haunch is a
+    # big lean joint carrying 4–6°C of carryover, and 20 minutes is what the
+    # carryover figure implies rather than a round number picked for it.
+    rest_min: 20
+    carryover: "4–6°C"
+    carryover_min: 4
+    carryover_max: 6
+    doneness:
+      rare:
+        out_at: "48–50°C"
+        out_at_min: 48
+        out_at_max: 50
+        rested: "~52–56°C"
+        rested_min: 52
+        rested_max: 56
+      medium_rare:
+        out_at: "52–57°C"
+        out_at_min: 52
+        out_at_max: 57
+        rested: "~56–63°C"
+        rested_min: 56
+        rested_max: 63
+      medium:
+        out_at: "58–62°C"
+        out_at_min: 58
+        out_at_max: 62
+        rested: "~62–68°C"
+        rested_min: 62
+        rested_max: 68
+      well_done:
+        out_at: "68–70°C"
+        out_at_min: 68
+        out_at_max: 70
+        rested: "~72–76°C"
+        rested_min: 72
+        rested_max: 76
+    # THE SAME NOTE AS LOIN'S, ON PURPOSE. A chart resolves one node at a time,
+    # so a note that only exists on loin is invisible to a haunch recipe -- the
+    # same reasoning that moved safety_min onto the node itself after the
+    # teriyaki-salmon failure.
+    safety_note: "Venison is a whole muscle, and FSA treats it the way it treats beef and lamb: the bacteria are on the surface, the sear kills them, and pink in the middle is fine. Mince is the exception. FSA's less-than-thoroughly-cooked guidance covers beef burgers only — its advice for a burger made from any other meat, venison included, is to cook it through. Mincing moves the surface into the middle, so a rare venison burger is a different question from a rare venison loin."
+    sources: "The out-at figures are venison.loin's, deliberately — UK sources publish core temperatures for venison generally, not per cut; see there for the four that agree on medium rare, and for how little the rare figure rests on. What is haunch's own is the carryover: 4–6°C comes from Great British Recipes' haunch guide, which takes a haunch out at 58°C and has it resting to ~62°C, and every rested figure above is that carryover applied to the shared out-at range."
+  shoulder:
+    # SHOULDER AND NECK BOTH. They are the same braising job on the same
+    # animal, they come off the same forequarter, and no source separates them.
+    #
+    # Which section of the temperature charts holds this figure, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: venison-slow-cooked-cuts
+    tender_at: "90–95°C"
+    tender_at_min: 90
+    tender_at_max: 95
+    sources: "90–95°C is this site's own collagen figure (see pork.slow_cooked and lamb.slow_cooked), applied to venison by chemistry rather than by citation: NO UK venison source publishes one. Every shoulder and neck recipe found ends 'until it falls off the bone' with no number in it at all. Collagen doesn't know which animal it came from, so the house figure is the honest answer — but it is an inference, and recorded as one."
+  shank:
+    # Same figure and same basis as shoulder above -- another collagen-heavy
+    # forequarter cut with no published venison-specific number behind it. Kept
+    # as its own node rather than folded into shoulder because a recipe naming
+    # a shank should be able to say so.
+    #
+    # Which section of the temperature charts holds this figure, so a
+    # recipe can link straight to it rather than to the top of a long page.
+    chart_anchor: venison-slow-cooked-cuts
+    tender_at: "90–95°C"
+    tender_at_min: 90
+    tender_at_max: 95
