@@ -206,7 +206,7 @@
   position: relative;
   transition: color 0.12s ease-in-out, font-weight 0.12s ease-in-out;
 
-  // Pantry staples (see _data/common_ingredients.yml) sink to the end of the
+  // Pantry staples (see _data/food/pantry.yml) sink to the end of the
   // line and recede, so the eye meets the distinctive ingredients first.
   // Declared BEFORE .ingredient-pill--matched: equal specificity, source order
   // wins, and a matched pantry staple should still light up.

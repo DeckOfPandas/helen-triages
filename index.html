@@ -1,29 +1,48 @@
 ---
-layout: default
 permalink: /
 ---
 
-{% comment %} ─────────────────────────────────────────────────────────────────
-  THE LANDING PAGE at /helen-triages/.
+{%- comment %} ─────────────────────────────────────────────────────────────────
+  THE SITE ROOT at /helen-triages/.
 
-  No `site_key`: this page belongs to neither site. default.html falls back to
-  the repo-level title and description, renders the wordmark with nothing taped
-  under it, and links assets/css/root.css instead of a site stylesheet.
+  GitHub issue #204: nobody arrives here on purpose. Helen's own reasoning —
+  "No user is going to end up at the root without having tried to, which would
+  be super weird. Everyone else will come in via food or drink" — so rather
+  than a two-door landing page asking a question nobody wants asked, this now
+  just forwards straight to food/.
 
-  The two doors are deliberately identical in weight. Food is the older and
-  larger site, and making it look primary here would be a decision nobody asked
-  for — this page's only job is to offer both.
-────────────────────────────────────────────────────────────────────────────{% endcomment %}
+  This used to be the landing page (layout: default, no site_key, a door each
+  for food and cocktails). That page, its styles (assets/css/root.scss and
+  _sass/root/) and the default.html branch that linked root.css are all gone —
+  see the commit that closed #204 if you want the history.
 
-<h1 class="visually-hidden">{{ site.title }} — {{ site.description }}</h1>
+  No `jekyll-redirect-from` plugin is installed (_config.yml lists only
+  jekyll-sitemap), so this is hand-rolled: a meta-refresh with no delay, a
+  canonical link pointing at the same place for anyone who follows a stale
+  bookmark straight past the redirect, and a visible fallback link for the
+  minority whose browser has meta-refresh disabled or blocked, or who is
+  reading this with JS/CSS off entirely.
 
-<div class="landing">
-  {% for entry in site.data.sites %}
-    {% assign key = entry[0] %}
-    {% assign s = entry[1] %}
-    <a class="landing-door" href="{{ s.home | relative_url }}">
-      <span class="landing-door-word"><span class="landing-door-bracket">[ </span>{{ s.word }}<span class="landing-door-bracket"> ]</span></span>
-      <span class="landing-door-line">{{ s.description }}</span>
-    </a>
-  {% endfor %}
-</div>
+  No `layout:` on purpose. default.html renders the two-site chrome (header,
+  nav icons, footer) built for a page that has content to show — wrong frame
+  for a redirect, which should show as little as possible before it leaves.
+
+  The target is built with `relative_url` rather than written as a literal
+  path, because this site's baseurl (`/helen-triages`) applies in production
+  but not when Jekyll serves locally at the filesystem root — a hardcoded
+  `/food/` would be correct on one and silently wrong on the other, and
+  nothing would tell you.
+────────────────────────────────────────────────────────────────────────────{% endcomment -%}
+{%- assign redirect_url = "/food/" | relative_url -%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0; url={{ redirect_url }}">
+  <link rel="canonical" href="{{ "/food/" | absolute_url }}">
+  <title>{{ site.title }}</title>
+</head>
+<body>
+  <p>Redirecting to <a href="{{ redirect_url }}">{{ site.title }} — Food</a>.</p>
+</body>
+</html>
