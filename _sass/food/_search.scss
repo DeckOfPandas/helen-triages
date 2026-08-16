@@ -122,58 +122,6 @@
 // `margin-top: $space-sm` used to sit here. It never did anything: adjacent
 // .category siblings collapse their margins and the larger wins, so
 // $index-section-gap always beat it.
-// TRUE CENTRING UNDER THE HEADING -- GitHub issue #275, and the change the
-// .exclude-reveal-row comment below predicted would be needed one day.
-//
-// THE PROBLEM CSS HAS HERE: "centre B under A" is only expressible if A and B
-// share a sizing context. I KNOW WHAT I WANT lives inside .search-input,
-// sharing that flex row with the search box, while the reveal link sits in a
-// row below -- one level deeper, so nothing in the lower row can know the
-// heading's width. That is why this was an alignment of left edges and said so.
-//
-// The fix is the wordmark's own mechanism (HANDOVER 13.8): one grid, a
-// `max-content` first column, and both the heading and the reveal row placed
-// in it, so the column becomes as wide as whichever needs more room and the
-// link can centre inside it. `display: contents` on the two wrappers is what
-// puts their children into that shared grid without changing the markup.
-//
-// ONE VISIBLE SIDE-EFFECT, deliberate and worth checking: the 620px cap that
-// made both search inputs end at the same point used to live on .search-input,
-// which no longer forms a box. It moves to the grid itself -- so the LEAVE OUT
-// panel, being inside that grid, is now capped at 620px too where it used to
-// run the full width of .controls. Easy to undo by moving the cap onto a row
-// rather than the grid, if the narrower results pool reads worse.
-.controls .search--name {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr) max-content;
-  column-gap: $space-md;
-  row-gap: $index-label-gap;
-  align-items: center;
-  max-width: 620px;
-
-  // The label, the input and its clear button become items of the grid above
-  // rather than of their own flex row; likewise the reveal row, the panel and
-  // the active list. Neither wrapper carried anything but layout, so nothing
-  // is lost -- the gaps they set are now the grid's own column and row gaps.
-  > .search-input,
-  > .search--exclude { display: contents; }
-
-  // Column one, the shared track: as wide as the heading, with the link
-  // centred in it. `width: auto` undoes the row's own `width: 100%`, which
-  // would otherwise stretch it across all three columns and centre the link
-  // under the whole search row instead of under the heading.
-  .exclude-reveal-row {
-    grid-column: 1;
-    justify-content: center;
-    width: auto;
-  }
-
-  // The picker itself is not centred on anything -- it is a panel, and it uses
-  // the full width the grid has.
-  .exclude-panel,
-  .exclude-active { grid-column: 1 / -1; }
-}
-
 // The name search box's own typography, unchanged by the grid above -- kept as
 // its own block so the structural rule and the type rule stay readable apart.
 .controls .search--name {
@@ -227,6 +175,103 @@
   }
 }
 
+
+// --- The reveal link, and the heading it is centred under --------------------
+// GitHub issue #275. These rules are NOT nested under .controls
+// .search--exclude, and that is not tidiness -- the button and its row now sit
+// inside .search-input, beside I KNOW WHAT I WANT, so a rule scoped to
+// .search--exclude would silently match nothing. That is exactly what happened
+// on the first attempt: the markup moved, the styles did not, and the button
+// shipped with no styling at all while the CSS still compiled cleanly.
+//
+// THE STACK IS THE WORDMARK'S MECHANISM (HANDOVER 13.8): one `max-content`
+// column with both rows in it, so the column takes the width of whichever line
+// is wider -- the heading -- and `justify-items: center` centres the narrower
+// one under it. No JS measurement, nothing to keep in sync when either string
+// changes.
+//
+// ONLY THESE TWO GO IN IT. The first attempt put the heading, the search
+// input, the exclude panel and the active list in one grid. The panel spanned
+// every column, and a spanning item still contributes to an intrinsic track's
+// size -- so the LEAVE OUT panel, not the heading, decided the width the link
+// was centred in: the column came out ~116px wider than the heading and shoved
+// the search input right by the same amount. Anything added to this stack will
+// do it again.
+.controls .search--name .name-heading-stack {
+  display: inline-grid;
+  grid-template-columns: max-content;
+  justify-items: center;
+  row-gap: $space-sm;
+  // Replaces the label as a flex item of .search-input, so it inherits the
+  // label's job: refuse to shrink, and let the INPUT absorb the squeeze rather
+  // than the heading wrapping to two lines.
+  flex-shrink: 0;
+}
+
+// Was `width: 100%` with `justify-content: flex-start`, which is what a
+// full-width row underneath the search needed. In the stack it must be exactly
+// as wide as its own text, or it fills the column and leaves justify-items
+// nothing to centre.
+.controls .search--name .exclude-reveal-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+}
+
+// The reveal is a link in appearance and a button in fact — see
+// food/index.html and test_clear_controls_are_buttons. Matched to
+// .btn-clear-inline (sans, regular, underline, colour-shift hover), which is
+// this page's one inline-link design; NOT lowercased, because the words are
+// Helen's own sentence rather than a filter label.
+.btn-reveal {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-family: $font-body;
+  font-size: 0.78rem;
+  // 350, not 400 -- Helen's 2026-08-16 pass, "lighten the weight". The same
+  // value .ingredient-list uses on the recipe rows, so this reads as the
+  // page's quiet register rather than as a third weight invented here.
+  font-weight: 350;
+  letter-spacing: 0.02em;
+  color: lighten($color-text, 12%);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.1s ease-in-out;
+
+  // ONE TREATMENT FOR HOVER, CLICK AND KEYBOARD FOCUS -- Helen, 2026-08-16:
+  // "use the same link styling on mouseover and click". They were three
+  // different looks: hover darkened the text, focus painted a grey box
+  // behind it and removed the outline, and a click got whichever the
+  // browser decided applied. Now all three darken, and nothing else moves.
+  // GitHub issue #277. These three already agreed with each other -- what
+  // they did not do was READ as a change: lighten($color-text, 12%) to
+  // $color-text is #3a3739 to #211f20, a pure lightness step of 12% on a
+  // 0.78rem line, and at that size a lightness step alone is invisible. The
+  // same mistake as the footer reference links the same day.
+  //
+  // Every other inline link in this section moves HUE on interaction -- the
+  // clear buttons sit at their section's darkened root and shift on hover --
+  // so this now lands on the cobalt this section owns rather than on a
+  // slightly darker grey. The resting colour is untouched: Helen asked for
+  // this one to be quiet ("lighten the weight") and #277 is about the
+  // mouseover and the click, not about the state it sits in.
+  &:hover,
+  &:active,
+  &:focus-visible { color: $color-exclude-active; }
+
+  // The keyboard indicator stays, because a colour shift alone is not one --
+  // it is the same shift the mouse already causes, so it says "you are
+  // hovering", not "you are here". An outline rather than the old background
+  // fill: it does not change the element's apparent size or weight, so the
+  // focused link is still the same link.
+  &:focus-visible {
+    outline: 2px solid $color-exclude-active;
+    outline-offset: 2px;
+  }
+}
+
 // --- The dislike navigator (GitHub issue #52) --------------------------------
 // "I know what I don't want": the exclude picker, revealed by its own link
 // under I KNOW WHAT I WANT.
@@ -244,87 +289,6 @@
 // specifically; it has nothing to do with the buttons, links and pills below,
 // which stay neutral exactly as this comment already argues.)
 .controls .search--exclude {
-  // The reveal-and-dismiss pair sits centred under I KNOW WHAT I WANT, not
-  // left-aligned like the rest of the control panel — Helen, 2026-08-16: this
-  // row is the only thing on the page that reads as "attached to the section
-  // above" rather than as its own left-edge-anchored row, so it gets the one
-  // centred treatment on the page.
-  // ALIGNED UNDER THE HEADING, NOT CENTRED IN THE ROW -- Helen, 2026-08-16:
-  // "move the link left, to be centered under I KNOW WHAT I WANT". It was
-  // centred across the section's full width, which put it under the middle of
-  // the INPUT rather than anywhere near the label.
-  //
-  // flex-start, plus the same margin-right the label above carries, so the
-  // link starts exactly where "I KNOW WHAT I WANT" starts. Worth being
-  // straight about what that is and is not: the two strings are close enough
-  // in width that this reads as centred under the heading, but it is an
-  // ALIGNMENT, not a centring. Truly centring under a label whose width
-  // changes with its own text would mean making that label a shared grid
-  // column (the .site-logo max-content trick, HANDOVER 13.8) so both rows
-  // size to whichever is wider -- a bigger change, and only worth it if the
-  // approximation looks wrong once the label reads "(hide leave out)", which
-  // is much shorter than the heading.
-  .exclude-reveal-row {
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: $space-md;
-  }
-
-  // The reveal is a link in appearance and a button in fact — see
-  // food/index.html and test_clear_controls_are_buttons. Matched to
-  // .btn-clear-inline (sans, regular, underline, colour-shift hover), which is
-  // this page's one inline-link design; NOT lowercased, because the words are
-  // Helen's own sentence rather than a filter label.
-  .btn-reveal {
-    border: 0;
-    background: none;
-    padding: 0;
-    font-family: $font-body;
-    font-size: 0.78rem;
-    // 350, not 400 -- Helen's 2026-08-16 pass, "lighten the weight". The same
-    // value .ingredient-list uses on the recipe rows, so this reads as the
-    // page's quiet register rather than as a third weight invented here.
-    font-weight: 350;
-    letter-spacing: 0.02em;
-    color: lighten($color-text, 12%);
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.1s ease-in-out;
-
-    // ONE TREATMENT FOR HOVER, CLICK AND KEYBOARD FOCUS -- Helen, 2026-08-16:
-    // "use the same link styling on mouseover and click". They were three
-    // different looks: hover darkened the text, focus painted a grey box
-    // behind it and removed the outline, and a click got whichever the
-    // browser decided applied. Now all three darken, and nothing else moves.
-    // GitHub issue #277. These three already agreed with each other -- what
-    // they did not do was READ as a change: lighten($color-text, 12%) to
-    // $color-text is #3a3739 to #211f20, a pure lightness step of 12% on a
-    // 0.78rem line, and at that size a lightness step alone is invisible. The
-    // same mistake as the footer reference links the same day.
-    //
-    // Every other inline link in this section moves HUE on interaction -- the
-    // clear buttons sit at their section's darkened root and shift on hover --
-    // so this now lands on the cobalt this section owns rather than on a
-    // slightly darker grey. The resting colour is untouched: Helen asked for
-    // this one to be quiet ("lighten the weight") and #277 is about the
-    // mouseover and the click, not about the state it sits in.
-    &:hover,
-    &:active,
-    &:focus-visible { color: $color-exclude-active; }
-
-    // The keyboard indicator stays, because a colour shift alone is not one --
-    // it is the same shift the mouse already causes, so it says "you are
-    // hovering", not "you are here". An outline rather than the old background
-    // fill: it does not change the element's apparent size or weight, so the
-    // focused link is still the same link.
-    &:focus-visible {
-      outline: 2px solid $color-exclude-active;
-      outline-offset: 2px;
-    }
-  }
-
   // .search--exclude now lives inside .search--name (see the wrapper's own
   // comment in food/index.html), so #exclude-search-clear and #exclude-dismiss
   // are both descendants of .category.search--name as well as of this

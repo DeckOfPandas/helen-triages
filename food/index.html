@@ -90,9 +90,38 @@ permalink: /food/
 
   <div class="category search search--name">
     <div class="search-input">
-      <label class="category-label" for="name-search-box">
-        <span class="category-label-text">{{ name_search_data.label }}</span>
-      </label>
+      {% comment %} THE HEADING AND THE REVEAL LINK ARE ONE STACK -- GitHub issue
+         #275, "centered under I KNOW WHAT I WANT".
+
+         The link used to live below, inside .search--exclude with the panel it
+         opens. Centring it under the heading from there is not something CSS
+         can express: "centre B under A" needs A and B in one sizing context,
+         and the heading sits inside .search-input while the link sat a level
+         deeper in a different wrapper.
+
+         Putting them in ONE grid was tried first and is instructive. The
+         panel and the active list are in that same wrapper, so they joined
+         the grid too, spanning every column -- and a spanning item still
+         contributes to an intrinsic track's size, so the LEAVE OUT panel
+         decided the width of the column the heading was meant to define. The
+         heading's column came out ~116px wider than the heading, and the
+         search input beside it moved right by the same amount.
+
+         So the stack holds ONLY the two things being centred on each other.
+         .name-heading-stack is the wordmark's own mechanism (HANDOVER 13.8):
+         one max-content column, both rows in it, the column as wide as the
+         wider of the two, the narrower centred. Nothing else can inflate it.
+
+         The button stays wired to the panel by aria-controls, which is
+         id-based and does not care that they are no longer siblings. {% endcomment %}
+      <div class="name-heading-stack">
+        <label class="category-label" for="name-search-box">
+          <span class="category-label-text">{{ name_search_data.label }}</span>
+        </label>
+        <div class="exclude-reveal-row">
+          <button type="button" class="btn-reveal" id="exclude-reveal" aria-expanded="false" aria-controls="exclude-panel">(I know what I don't want)</button>
+        </div>
+      </div>
       <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
       <button type="button" class="btn-clear-inline" id="name-search-clear" style="visibility: hidden;">&times; clear</button>
     </div>
@@ -151,9 +180,6 @@ permalink: /food/
        put half the section's copy in one file and half in another.
     {% endcomment %}
     <div class="search--exclude">
-      <div class="exclude-reveal-row">
-        <button type="button" class="btn-reveal" id="exclude-reveal" aria-expanded="false" aria-controls="exclude-panel">(I know what I don't want)</button>
-      </div>
 
       <div class="exclude-panel" id="exclude-panel" hidden>
         <div class="search-input">
