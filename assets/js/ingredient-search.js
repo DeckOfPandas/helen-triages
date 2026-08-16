@@ -123,15 +123,106 @@
       return words.join(' ');
     }
 
+    // --- GitHub issue #273: the derived vocabulary's three extra strips ------
+    //
+    // The exclude picker's vocabulary is derived from `item:` free text, not
+    // from the curated main_ingredients, so it arrives carrying quantities
+    // ("1 tsp salt"), portion phrasings ("a good pinch of salt") and method
+    // notes ("herbs to taste"). All three name a real ingredient with
+    // something in front of or behind it; none of them is a different
+    // ingredient. See _data/food/ingredient_words.yml for the word lists and
+    // for why each one is a list of literal phrases rather than a rule.
+    //
+    // Every one of these is a no-op on a clean entry, which is what lets
+    // buildMasterList stay the single door both vocabularies go through —
+    // the include picker runs over main_ingredients and comes out unchanged.
+
+    // A quantity token is digits and/or vulgar fractions and the characters
+    // that join them, and NOTHING else: "1", "¼–½", "4–5.5" qualify;
+    // "3-bone" and "70%" do not, because a letter or a percent sign means
+    // the token is part of the name. Deliberately conservative — see the
+    // `quantity_units` comment in the YAML.
+    var QUANTITY_TOKEN = /^[0-9¼-¾⅐-⅞./–—-]+$/;
+    var HAS_A_NUMBER = /[0-9¼-¾⅐-⅞]/;
+
+    var quantityUnitSet = new Set((vocabulary.quantity_units || []).map(function (w) {
+      return String(w).toLowerCase();
+    }));
+
+    function stripLeadingQuantity(ing) {
+      var words = ing.split(/\s+/);
+      var stripped = true;
+      while (stripped) {
+        stripped = false;
+        if (words.length > 1 && QUANTITY_TOKEN.test(words[0]) && HAS_A_NUMBER.test(words[0])) {
+          var rest = words.slice(1);
+          // Every consecutive unit word after the number, so "3 fl oz" goes
+          // in one pass. Never the last word standing: an entry always keeps
+          // something, even if the whole of it looked like a measurement.
+          while (rest.length > 1 && quantityUnitSet.has(rest[0].toLowerCase())) {
+            rest.shift();
+          }
+          words = rest;
+          stripped = true;
+        }
+      }
+      return words.join(' ');
+    }
+
+    // Longest first, so "a large handful of" wins over any shorter phrase it
+    // happens to contain rather than leaving half of itself behind.
+    function byLengthDescending(a, b) { return b.length - a.length; }
+
+    var measurePhrases = (vocabulary.measure_phrases || []).map(function (p) {
+      return String(p).toLowerCase();
+    }).sort(byLengthDescending);
+
+    function stripMeasurePhrase(ing) {
+      var lower = ing.toLowerCase();
+      for (var i = 0; i < measurePhrases.length; i++) {
+        var prefix = measurePhrases[i] + ' ';
+        if (lower.indexOf(prefix) === 0 && ing.length > prefix.length) {
+          return ing.slice(prefix.length).trim();
+        }
+      }
+      return ing;
+    }
+
+    var trailingPhrases = (vocabulary.trailing_phrases || []).map(function (p) {
+      return String(p).toLowerCase();
+    }).sort(byLengthDescending);
+
+    function stripTrailingPhrase(ing) {
+      var lower = ing.toLowerCase();
+      for (var i = 0; i < trailingPhrases.length; i++) {
+        var suffix = ' ' + trailingPhrases[i];
+        if (lower.length > suffix.length &&
+            lower.lastIndexOf(suffix) === lower.length - suffix.length) {
+          return ing.slice(0, ing.length - suffix.length).trim();
+        }
+      }
+      return ing;
+    }
+
+    // The one normalisation pipeline. Order is trailing-first so a strip at
+    // the end can never be confused by one at the front, then front-to-back:
+    // quantity, measure phrase, modifier — widest context to narrowest.
+    function normaliseEntry(ing) {
+      return stripModifiers(stripMeasurePhrase(stripLeadingQuantity(stripTrailingPhrase(ing))));
+    }
+
     function getMatchWords(ing) {
       return getWords(ing).filter(function (word) {
         return !stopwordSet.has(fold(word));
       });
     }
 
-    // Takes the raw main_ingredients strings as they appear on the page
-    // (one per recipe, comma-split already done by the caller), returns the
-    // deduplicated, modifier-stripped, alphabetically sorted master list.
+    // Takes the raw ingredient strings as they appear on the page (one per
+    // recipe, splitting already done by the caller), returns the
+    // deduplicated, normalised, alphabetically sorted master list. Both
+    // vocabularies come through here — main_ingredients for the include
+    // picker, the derived `item:` index for the exclude picker — and
+    // normaliseEntry is a no-op on the curated first one.
     //
     // A plain .sort() is case-sensitive — every capital letter sorts before
     // every lowercase one, so "Chinese five spice" would jump ahead of
@@ -140,7 +231,7 @@
     function buildMasterList(rawIngredientStrings) {
       var set = new Set();
       rawIngredientStrings.forEach(function (ing) {
-        set.add(applyAlias(stripModifiers(ing)));
+        set.add(applyAlias(normaliseEntry(ing)));
       });
       return Array.from(set).sort(function (a, b) {
         return a.toLowerCase().localeCompare(b.toLowerCase());

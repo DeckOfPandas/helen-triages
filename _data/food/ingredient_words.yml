@@ -56,6 +56,95 @@ modifiers:
   - gressingham
 
 # -----------------------------------------------------------------------------
+# Quantity units — the unit words that may follow a leading NUMBER in an
+# `item:` string, and are dropped with it. GitHub issue #273.
+#
+# The exclude filter's vocabulary is DERIVED from `item:` free text rather
+# than from the curated main_ingredients, so it inherits every way a recipe
+# happened to be written. Five recipes put the amount in `item:` instead of
+# `amount:` — "1 tsp salt", "150 g gruyère", "4–5.5 kg fresh goose" — and the
+# picker duly offered the quantity as if it were the ingredient's name. The
+# recipes are the real bug and are being reported separately; this makes the
+# picker survive them, because it will happen again.
+#
+# THE RULE IS DELIBERATELY NARROW, and narrower than it could be. Only a
+# leading token made ENTIRELY of digits, vulgar fractions and the characters
+# that join them (". / - – —") is treated as a quantity, and only the unit
+# words listed here are dropped after it. That means "3-bone rib of beef" and
+# "70% dark chocolate" keep their first word: both tokens carry a letter or a
+# percent sign, so neither is a bare number, and neither gets touched. Both
+# are under-strips, and that is the intended trade — for an EXCLUDE filter,
+# under-stripping is visible and annoying while over-stripping silently
+# merges two ingredients and hides recipes the cook never meant to exclude.
+#
+# Multi-word units are listed as their own single words ("fl", "oz"): the
+# strip drops every consecutive unit word after a number, so "3 fl oz" goes
+# in one pass without needing a phrase form. No unit here is also an
+# ingredient name anywhere in the collection — checked before adding, the
+# same way `modifiers` and `never_family` were.
+quantity_units:
+  - g
+  - kg
+  - mg
+  - ml
+  - cl
+  - l
+  - tsp
+  - tbsp
+  - fl
+  - oz
+  - lb
+
+# -----------------------------------------------------------------------------
+# Measure phrases — whole leading phrases meaning "some of", stripped so the
+# entry is the ingredient. GitHub issue #273.
+#
+# "a few sprigs of fresh thyme" is fresh thyme; "a good pinch of salt" is
+# salt. Seven derived entries were being offered as a portion size rather
+# than as a food.
+#
+# WHOLE PHRASES, NOT WORDS, and that is the whole point. A general rule —
+# strip anything before an "of" — would take "bicarbonate of soda" down to
+# "soda" and "cream of tartar" to "tartar", inventing merges the cook never
+# asked for. Each phrase here is matched literally at the front of the entry,
+# including its leading "a" and trailing "of", so it can only ever fire on
+# text that was actually written that way. Add to it by finding the real
+# entry that needs it, not by imagining phrases that might appear.
+#
+# Longest match wins, so a phrase that contains a shorter one still strips in
+# full. Never strips the entire entry: something always survives.
+measure_phrases:
+  - a few handfuls of
+  - a few sprigs of
+  - a glass of
+  - a good pinch of
+  - a large handful of
+  - a pat of
+
+# -----------------------------------------------------------------------------
+# Trailing phrases — instructions to the cook that got written into `item:`
+# after the ingredient, stripped from the END. GitHub issue #273.
+#
+# "herbs to taste" is herbs; "sriracha to serve" is sriracha. These are not
+# part of any ingredient's name — they say when or how much, which is a
+# method note that happens to have landed in the item string.
+#
+# Mirrors `measure_phrases` at the other end of the entry, and is a separate
+# list for the same reason `modifiers` and `stopwords` are separate: the
+# position is the rule. A word list stripped from anywhere would catch the
+# "to" in a name; these four phrases can only fire where they actually mean
+# what they say.
+#
+# "to glaze" has no live example in _food_recipes/ today — it is here at
+# Helen's call alongside the three that do, because the four are one habit
+# and a picker that handles three of them is a trap for the fourth.
+trailing_phrases:
+  - to taste
+  - to serve
+  - to glaze
+  - to garnish
+
+# -----------------------------------------------------------------------------
 # Stopwords — connector words that never count as a match target, wherever
 # they fall in an entry. "chicken thighs and drumsticks" contains "and", so
 # typing "a" matched it; "pork or turkey mince" contains "or", so typing "o"

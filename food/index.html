@@ -289,6 +289,27 @@ permalink: /food/
           {% else %}
             {% assign _raw = _item %}
           {% endif %}
+          {% comment %} A CROSS-RECIPE LINK IS NOT AN INGREDIENT -- GitHub issue
+             #273. Five items name another recipe instead of a food:
+             `item: "[grandma's lemon curd](../grandmas-lemon-curd/)"`. The
+             truncation below takes the name up to the first open bracket, which
+             is exactly right for "butter beans (drained)" and exactly wrong
+             here -- it yields `[grandma's lemon curd]`, square brackets and
+             all, and offered that as something to leave out.
+
+             DROPPED AT DERIVATION, not filtered later, because the square
+             brackets are the accident and not the reason: a link to another
+             recipe is a pointer to a whole other ingredient list, so there is
+             no single food here to avoid, and it should never enter the index
+             in the first place. Helen's call.
+
+             Tests the FIRST CHARACTER, not `contains "["`. A link may sit
+             mid-string ("chicken, marinated in [the paste](...)"), where the
+             comma truncation has already removed it and the real ingredient
+             name is what survives. The case handled here is the one where the
+             link IS the item's name. {% endcomment %}
+          {% assign _first_char = _raw | slice: 0 %}
+          {% if _first_char == "[" %}{% assign _raw = "" %}{% endif %}
           {% assign _name = _raw | split: "," | first | split: "(" | first | strip | downcase %}
           {% assign _probe = "|" | append: _name | append: "|" %}
           {% unless _name == "" or _all_ing contains _probe %}
