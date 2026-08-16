@@ -1,12 +1,25 @@
 # =============================================================================
 # COOKING METHODS — oven temperatures, timings and coverings, as DATA.
 # =============================================================================
-# GENERATED from food/reference/cooking-methods.html's own tables, which stay
-# the human-readable page. Every figure is transcribed by machine, not retyped,
-# so nothing has been re-researched and nothing has changed value. Correction
-# history has been dropped from the notes (Helen, 2026-08-13: "keep safety and
-# sources, drop correction history") -- that was scaffolding for a fact-check
-# pass that is finished.
+# THIS FILE IS THE SOURCE OF TRUTH, EDITED BY HAND. It is no longer generated
+# from the page. food/reference/cooking-methods.html now RENDERS FROM this
+# file, via _includes/food/method_table.html -- the page is the consumer, not
+# the source. To add a new protein or method, edit this file directly.
+#
+# scripts/build_cooking_methods.py and scripts/build_cooking_methods_prose.py
+# are MIGRATION TOOLS, not generators to re-run. They did the original
+# transcription and are pinned to commit 8bdbd27, the last version of the page
+# that still held the tables -- running either against the current working
+# tree finds no tables left to parse and would emit an empty data file, which
+# in turn blanks the page it feeds. That has already happened once. Leave
+# those scripts alone; edit this file, or the page's prose furniture in
+# `groups`, instead.
+#
+# The figures themselves were transcribed by machine, not retyped, when this
+# file was first built, so nothing was re-researched and nothing changed value
+# in the move from page to data. Correction history has been dropped from the
+# notes (Helen, 2026-08-13: "keep safety and sources, drop correction
+# history") -- that was scaffolding for a fact-check pass that is finished.
 #
 # `shape` IS THE FIELD THAT MATTERS, and it exists because a timing is not
 # always a formula. 52 of the 66 rows are `rate` and a calculator can just
