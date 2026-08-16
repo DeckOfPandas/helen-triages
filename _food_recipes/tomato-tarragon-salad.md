@@ -7,7 +7,7 @@ prep_time: "15 mins plus 20 mins chilling"
 cook_time: "None"
 main_ingredients: ["plum tomatoes", "tarragon", "flat-leaf parsley", "Worcestershire sauce", "balsamic vinegar", "Dijon mustard", "shallots"]
 star_ingredient:
-tags: ["extras", "no-cook", "make-ahead", "salad"]
+tags: ["extras", "no-cook", "salad"]
 ingredient_groups:
   - items:
     - amount: "500 g"

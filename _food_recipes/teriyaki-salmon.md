@@ -9,7 +9,7 @@ main_ingredients: ["salmon", "tamari", "mirin", "dark brown soft sugar", "honey"
 star_ingredient: "oily fish"
 internal_temp_ref: fish.salmon
 doneness: medium
-tags: ["fakeaway", "make-ahead"]
+tags: ["fakeaway"]
 ingredient_groups:
   - name: salmon
     items:

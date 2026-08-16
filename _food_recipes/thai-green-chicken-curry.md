@@ -7,7 +7,7 @@ prep_time: "15 mins"
 cook_time: "30 mins"
 main_ingredients: ["chicken", "Thai green curry paste", "coconut milk", "new potatoes", "green beans", "lemongrass paste", "tamarind paste", "lime", "fish sauce", "flaked almonds"]
 star_ingredient: "poultry"
-tags: ["fakeaway", "one-handed food", "freezable"]
+tags: ["fakeaway", "one-handed food", "freezable", "make-ahead"]
 ingredient_groups:
   - items:
     - amount: "½"

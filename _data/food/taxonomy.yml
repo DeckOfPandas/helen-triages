@@ -113,6 +113,44 @@ retired_star_ingredients:
 # nobody wakes up craving a starter, they're cooking for a dinner party and
 # need one. showstopper stayed in mood on the same test: it IS a craving, for
 # Helen specifically -- "let's make something unnecessarily complicated".
+#
+# -----------------------------------------------------------------------------
+# `make-ahead` -- DEFINED 2026-08-16, GitHub issue #216, Helen's own words:
+#
+#   "a substantial part -- or the entirety -- of the dish can be prepared well
+#   in advance of serving without losing quality, flavour or structural
+#   integrity."
+#
+# The definition alone did not settle the collection, because three large
+# groups of recipes can each be argued either way. Her rulings on all three,
+# recorded so the tag stays applied the same way next time:
+#
+#   A BAKE THAT MERELY KEEPS IS NOT MAKE-AHEAD. "Will keep for three days in an
+#   airtight tin" describes leftovers, not planning, and almost every cake in
+#   the collection says it -- so counting it would make the tag mean roughly
+#   "is a bake" and stop it narrowing anything. Same test that retired
+#   `one-pot` for honestly covering 57% of the collection. A bake DOES qualify
+#   when it is genuinely assembled ahead and finished later: a cheesecake set
+#   overnight, an arctic roll, anything that has to wait.
+#
+#   AN OVERNIGHT MARINADE IS NOT MAKE-AHEAD. Satay, char siu, buttermilk
+#   chicken: real advance work, but nothing is FINISHED ahead and the whole
+#   dish still has to be cooked at serving time. It is a constraint on your
+#   planning rather than a reduction in the work on the day, which is the
+#   opposite of what someone browsing this tag wants.
+#
+#   A BASE RECIPE OR CONDIMENT DOES NOT CARRY IT. A spice blend, a curry paste,
+#   a dukkah, a lemon curd, a cranberry sauce: these have no "serving" to be
+#   ahead of, so the tag tells you nothing you did not already know from what
+#   the thing is. Removed from the nine that had it.
+#
+# FREEZABLE AND MAKE-AHEAD ARE SEPARATE AXES, and deliberately NOT a co-tag.
+# Making freezable imply make-ahead was considered and rejected the same day:
+# it would have forced the tag onto 19 files, about 11 of them the very cakes
+# ruling A excludes, plus three freezable base recipes ruling C excludes --
+# a rule that quietly overturns two others is worse than no rule. `freezable`
+# answers "can I keep the leftovers", `make-ahead` answers "can I do this on
+# Saturday". A dish may be either, both or neither.
 # -----------------------------------------------------------------------------
 tags:
   mood:

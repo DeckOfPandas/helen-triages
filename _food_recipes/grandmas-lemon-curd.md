@@ -7,7 +7,7 @@ prep_time: "10 mins"
 cook_time: "20 mins"
 main_ingredients: ["lemons", "salted butter", "golden caster sugar", "eggs", "cornflour"]
 star_ingredient: "fruit"
-tags: ["extras", "make-ahead"]
+tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "3 oz"

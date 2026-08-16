@@ -7,7 +7,7 @@ prep_time: "5 mins"
 cook_time: "20 mins"
 main_ingredients: ["honey", "dark soy sauce", "red wine vinegar", "chicken stock", "cherries"]
 star_ingredient: "fruit"
-tags: ["make-ahead", "extras"]
+tags: ["extras"]
 ingredient_groups:
   - name: glaze
     items:

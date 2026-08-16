@@ -8,7 +8,7 @@ cook_time: "About 3 hrs"
 main_ingredients: ["mutton leg", "plain curd", "mustard oil", "ghee", "onions", "tomatoes", "garam masala powder", "black cardamom pod", "green cardamom pods", "star anise", "cinnamon sticks", "crispy fried onions"]
 star_ingredient: "lamb"
 internal_temp_ref: lamb.slow_cooked
-tags: ["showstopper", "make-ahead"]
+tags: ["showstopper"]
 ingredient_groups:
   - name: mutton
     items:
