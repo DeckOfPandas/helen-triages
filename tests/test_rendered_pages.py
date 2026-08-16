@@ -58,6 +58,102 @@ def site() -> pathlib.Path:
     shutil.rmtree(BUILD_DIR, ignore_errors=True)
 
 
+PROD_BUILD_DIR = ROOT / "tmp" / "_test_site_prod"
+
+
+@pytest.fixture(scope="session")
+def prod_site() -> pathlib.Path:
+    """A SECOND build, with the production config alone -- no _config_local.yml.
+
+    Worth the extra four seconds because the `site` fixture above cannot see
+    this entire class of bug, and one of them shipped. Locally, drafts have
+    `output: true`, so every link to one resolves and the page looks right. In
+    production `output: false`, and a link to a draft is a 404 that nothing on
+    a developer's machine can reproduce.
+
+    That is not hypothetical: GitHub issue #235. food/index.html tested
+    `{% if site.food_drafts %}` before concatenating drafts into the list --
+    which is a test of whether the collection is DECLARED, always true, rather
+    than whether it PUBLISHES. Ten drafts with meta.rewritten: true were listed
+    on the live index, each linking to /helen-triages/food_drafts/<slug>.html,
+    Jekyll's default URL for a document it never wrote. Helen found it by
+    looking at the production mockup on :4002.
+    """
+    if shutil.which("bundle") is None:
+        pytest.skip("no bundler on this machine; skipping rendered-output tests")
+
+    result = subprocess.run(
+        ["bundle", "exec", "jekyll", "build",
+         "--config", "_config.yml",
+         "--destination", str(PROD_BUILD_DIR)],
+        cwd=ROOT, capture_output=True, text=True, timeout=600,
+    )
+    if result.returncode != 0:
+        pytest.fail(
+            "production jekyll build failed:\n"
+            + result.stdout[-2000:] + result.stderr[-2000:]
+        )
+    yield PROD_BUILD_DIR
+    shutil.rmtree(PROD_BUILD_DIR, ignore_errors=True)
+
+
+def test_no_link_in_the_production_build_points_at_a_file_that_isnt_there(prod_site):
+    """Every internal link in the built PRODUCTION site resolves to something.
+
+    tests/test_page_links.py checks the same idea in the templates, but it can
+    only check what it can read: a link built in a loop from `recipe.url` is on
+    its TRUSTED_DYNAMIC list, on the reasoning that Jekyll computes .url from
+    the document's own permalink and it is therefore right by construction.
+    Issue #235 is the counter-example -- .url is computed for a document that
+    is never written, so it is a correct URL for a page that does not exist.
+    Only the built output can tell you that, and only the production build.
+
+    A .pdf link is skipped: scripts/generate_pdfs.py writes those onto the
+    finished site AFTER Jekyll, in the deploy workflow, so they are legitimately
+    absent here. test_pdf_link_points_where_the_pdfs_are_written owns that pair.
+    """
+    baseurl = "/helen-triages"
+    problems = []
+    checked = 0
+
+    for html_file in sorted(prod_site.rglob("*.html")):
+        text = html_file.read_text(encoding="utf-8", errors="replace")
+        page_url = "/" + str(html_file.relative_to(prod_site).parent).replace("\\", "/").strip(".") + "/"
+        for href in re.findall(r'<a\b[^>]*?\bhref="([^"]+)"', text, re.I):
+            href = href.strip()
+            if (href.startswith("#") or href.endswith(".pdf")
+                    or re.match(r"^(?:[a-zA-Z][a-zA-Z0-9+.\-]*:|//)", href)):
+                continue
+            path = href.split("#")[0].split("?")[0]
+            if not path:
+                continue
+            if not path.startswith("/"):
+                path = str(pathlib.PurePosixPath(page_url).joinpath(path))
+            if path.startswith(baseurl):
+                path = path[len(baseurl):]
+            path = str(pathlib.PurePosixPath(path))          # normalise ../
+            checked += 1
+            target = prod_site / path.lstrip("/")
+            if target.is_dir():
+                target = target / "index.html"
+            if not target.exists():
+                problems.append(
+                    f"{html_file.relative_to(prod_site)}: href=\"{href}\" -> "
+                    f"{path} does not exist in the production build"
+                )
+
+    assert checked, (
+        "No internal links found anywhere in the production build. Either the "
+        "site has no links, or the scan has stopped matching -- and a scan "
+        "that finds nothing passes."
+    )
+    assert not problems, (
+        f"{len(problems)} link(s) 404 in the PRODUCTION build (they may work "
+        f"locally, which is the whole point of this test):\n  "
+        + "\n  ".join(sorted(set(problems))[:20])
+    )
+
+
 def page(site: pathlib.Path, url: str) -> str:
     path = site / url.strip("/") / "index.html"
     assert path.exists(), f"{url} did not build"
