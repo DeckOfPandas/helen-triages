@@ -98,8 +98,53 @@ document.addEventListener('DOMContentLoaded', function () {
   var fold = HTF.ingredientSearch.fold;
   var getWords = HTF.ingredientSearch.getWords;
 
-  function hasActiveFilters() {
-    return activeTags.size > 0 || activeStar !== null || activeMetaFilters.size > 0;
+  /* TWO PREDICATES, NOT ONE, AND THEY ARE NOT THE SAME QUESTION -- GitHub
+     issue #248. There used to be three near-identical expressions scattered
+     through this file and the issue read as "unify them". Unifying them would
+     have been wrong: two of the three ask genuinely different things, and
+     collapsing them would have traded a documented difference for a silent
+     behaviour change in whichever call site lost its own answer.
+
+     What they actually ask:
+
+       hasNarrowingFilter()  "while the ingredient box is being typed into, is
+                             anything ELSE still narrowing the list?" -- the
+                             one input to suppressList, which decides whether
+                             the list hides behind the "searching" message.
+
+       hasAnythingToClear()  "is there anything for the clear-all button to
+                             clear?" -- purely the button's visibility, and it
+                             must agree with what clearAllFilters() actually
+                             clears, or the button hides while still having
+                             work to do.
+
+     The third expression, inline at the clear-button site, disagreed with
+     clearAllFilters() about nameQuery: clearing removed a title search, but
+     the button stayed hidden when a title search was the only thing active.
+     That was the real defect behind the issue, and it is fixed by
+     hasAnythingToClear() below being derived from the same five pieces of
+     state clearAllFilters() empties. */
+
+  /* Excludes activeIngredient, deliberately: renderResultsPool() nulls it on
+     every keystroke, so during a search it is always null and including it
+     would be a no-op dressed as a rule.
+
+     INCLUDES nameQuery, which it did not until 2026-08-16. A title search is
+     a filter like any other -- the rows it has left are still meaningful --
+     so hiding them behind the "searching" message while you pick an
+     ingredient threw away context you had just asked for. A tag or a star
+     already kept the list on screen; nameQuery was the odd one out, and
+     Helen's call was that it should behave like the others. */
+  function hasNarrowingFilter() {
+    return activeTags.size > 0 || activeStar !== null ||
+           activeMetaFilters.size > 0 || nameQuery !== '';
+  }
+
+  /* Every piece of state clearAllFilters() empties, so the two cannot drift.
+     If you add a filter kind, add it here and there together. */
+  function hasAnythingToClear() {
+    return activeTags.size > 0 || activeStar !== null || activeIngredient !== null ||
+           activeMetaFilters.size > 0 || nameQuery !== '';
   }
 
   // The shuffle itself is pure -- assets/js/recipe-list.js, tested directly
@@ -395,7 +440,7 @@ function renderResultsPool() {
     if (!preservePage) { currentPage = 1; showAll = false; }
     var visibleCount = 0;
     var totalPages = 1;
-    var suppressList = isSearching && !hasActiveFilters();
+    var suppressList = isSearching && !hasNarrowingFilter();
     if (recipeList) recipeList.style.display = suppressList ? 'none' : '';
 
     updateTitleHighlights();
@@ -559,7 +604,7 @@ function renderResultsPool() {
     if (searchingMessage) searchingMessage.style.display = suppressList ? 'block' : 'none';
 
     if (clearButtons.length) {
-      var clearVisibility = (activeTags.size > 0 || activeStar || activeIngredient || activeMetaFilters.size > 0) ? 'visible' : 'hidden';
+      var clearVisibility = hasAnythingToClear() ? 'visible' : 'hidden';
       clearButtons.forEach(function (btn) { btn.style.visibility = clearVisibility; });
       // visibility, not display -- same reasoning as ingredientClear above.
       if (nameSearchClear) nameSearchClear.style.visibility = nameQuery ? 'visible' : 'hidden';
