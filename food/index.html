@@ -18,8 +18,21 @@ permalink: /food/
   {% assign tag_groups = site.data.food.filter_sections.tag_groups %}
   {% assign name_search_data = site.data.food.filter_sections.name_search %}
 
+  {% comment %} DRAFTS JOIN THE LIST ONLY IF THEY ACTUALLY PUBLISH. `site.food_drafts`
+     is populated whenever the collection is DECLARED, which _config.yml does
+     unconditionally -- `output: false` stops Jekyll writing the pages, it does
+     not empty the collection. So testing `if site.food_drafts` was testing
+     "does this collection exist", which is always true, and the index listed
+     every draft with meta.rewritten anyway. In production those rows linked to
+     /helen-triages/food_drafts/<slug>.html -- Jekyll's default URL for a
+     document with no output -- and 404'd. Ten of them, live. GitHub issue #235.
+
+     Read from site.collections rather than a flag of our own, so this follows
+     _config_local.yml flipping output back on for the working view without a
+     second thing to keep in sync. {% endcomment %}
   {% assign all_recipes = site.food_recipes %}
-  {% if site.food_drafts %}
+  {% assign _drafts_collection = site.collections | where: "label", "food_drafts" | first %}
+  {% if _drafts_collection.output %}
     {% assign all_recipes = all_recipes | concat: site.food_drafts %}
   {% endif %}
   {% assign all_recipes = all_recipes | sort: "title" %}
