@@ -212,31 +212,67 @@ def test_every_temperature_fits_on_the_chart_axis(internal_temperatures):
     )
 
 
-@pytest.mark.parametrize("protein", ["beef", "pork", "lamb", "steak"])
+def _doneness_spectra(node, path=()):
+    """Every doneness map under a protein, with the dotted path that holds it.
+
+    FINDS THEM RATHER THAN GUESSING WHERE THEY LIVE. The first version of this
+    reached for a known sub-key -- `for key in ("roasting", "tender_roast")` --
+    which works for exactly the four proteins it was written against and
+    silently finds nothing for anything else. Walking means a protein that
+    keeps its spectrum under any other name (venison.loin, venison.haunch) is
+    checked the day it is added, without anyone remembering to teach this
+    function a fifth key.
+    """
+    if not isinstance(node, dict):
+        return
+    if isinstance(node.get("doneness"), dict):
+        yield path, node["doneness"]
+    for key, value in node.items():
+        if key != "doneness":
+            yield from _doneness_spectra(value, path + (key,))
+
+
+@pytest.mark.parametrize("protein", ["beef", "pork", "lamb", "steak", "venison"])
 def test_doneness_levels_ascend(internal_temperatures, protein):
     """Rare must be cooler than medium, which must be cooler than well done.
 
     Reads the levels in the order the file declares them, because that order is
     what every page renders — so this checks the data as published, not a
     sorted copy of it.
-    """
-    node = internal_temperatures[protein]
-    for key in ("roasting", "tender_roast"):
-        if key in node:
-            node = node[key]
-            break
-    doneness = node.get("doneness")
-    if not doneness:
-        pytest.skip(f"{protein} has no doneness spectrum")
 
-    levels = [(name, spec["out_at_min"]) for name, spec in doneness.items()
-              if "out_at_min" in spec]
-    ascending = all(levels[i][1] <= levels[i + 1][1]
-                    for i in range(len(levels) - 1))
-    assert ascending, (
-        f"{protein}'s doneness levels aren't in ascending temperature order "
-        f"as declared: {[(n, f'{t:g}°C') for n, t in levels]}"
+    THE TRAP HERE IS A SILENT SKIP, not a wrong number. This test used to walk
+    to a `roasting`/`tender_roast` sub-key and `pytest.skip` when it found no
+    `doneness` map underneath. Adding "venison" to the parametrize list would
+    then have LOOKED like coverage and been none at all: venison's spectra sit
+    on `loin` and `haunch`, neither key matched, the lookup returned None, and
+    the new parametrisation would have reported itself green while checking
+    nothing — the exact shape of failure HANDOVER §12 and tests/
+    test_suite_hygiene.py exist for. So there is no skip left in here: the
+    spectra are found by walking, and an empty result is a failure.
+    """
+    spectra = list(_doneness_spectra(internal_temperatures[protein]))
+    assert spectra, (
+        f"{protein} is in this test's parametrize list but no node under it "
+        f"carries a `doneness` map, so there is nothing to put in order. "
+        f"Either the data moved and this list is stale, or the protein never "
+        f"had a spectrum and doesn't belong here — don't skip past it."
     )
+
+    for path, doneness in spectra:
+        where = ".".join((protein,) + path)
+        levels = [(name, spec["out_at_min"]) for name, spec in doneness.items()
+                  if "out_at_min" in spec]
+        assert len(levels) > 1, (
+            f"{where} has {len(levels)} level(s) with an out_at_min — a "
+            f"one-level spectrum is trivially in order, which is the same "
+            f"nothing-checked result as the skip this test used to do"
+        )
+        ascending = all(levels[i][1] <= levels[i + 1][1]
+                        for i in range(len(levels) - 1))
+        assert ascending, (
+            f"{where}'s doneness levels aren't in ascending temperature order "
+            f"as declared: {[(n, f'{t:g}°C') for n, t in levels]}"
+        )
 
 
 # =============================================================================
@@ -642,10 +678,15 @@ def test_temperatures_written_into_method_text_match_the_data(internal_temperatu
 # specification, not a heuristic, and it is the list that decides whether a
 # chart warns anybody.
 #
-# Beef, lamb and steak are deliberately absent -- UK guidance treats pink beef
-# and lamb as fine, so there is no line to draw. Tuna has a safety_note about
-# parasites and sourcing, which a thermometer can't confirm and a threshold on a
-# temperature axis can't express.
+# Beef, lamb, steak and venison are deliberately absent -- UK guidance treats
+# pink beef and lamb as fine, so there is no line to draw. Venison is here for
+# the same reason and not by oversight: FSA treats a whole cut of venison the
+# way it treats beef and lamb, the bacteria are on the surface and the sear
+# kills them, so a safety_min on venison.loin or venison.haunch would be a line
+# with nothing behind it -- and this test would then demand one. Tuna has a
+# safety_note about parasites and sourcing, and venison's is about mince, both
+# of which a thermometer can't confirm and a threshold on a temperature axis
+# can't express.
 SAFETY_THRESHOLDS = {
     ("fish", "salmon"): 63,
     ("pork", "roasting"): 70,
@@ -806,12 +847,15 @@ def test_the_safety_zone_shares_the_bars_coordinate_space():
 # call that mutton files under lamb; the test just wasn't reading the field that
 # knew.
 #
-# Only families we actually hold data for are mapped. `game` and `shellfish` are
-# absent on purpose -- there is no venison or shellfish node, so demanding a ref
-# would be demanding something that doesn't exist. Add them here the day the
-# data does, and the test will start asking for them on its own.
+# Only families we actually hold data for are mapped. `game` was absent until
+# 2026-08-16 because there was no venison node to point at; issues #205 and #217
+# added one, so it joins the list and the test starts asking every game recipe
+# for a ref on its own -- which is what the note here always said would happen.
+# `shellfish` is still out for the original reason: no shellfish node exists, so
+# demanding a ref would be demanding something that doesn't exist. Add it the
+# day the data does.
 STAR_INGREDIENTS_WITH_DATA = {
-    "beef", "duck", "lamb", "pork", "poultry", "oily fish", "white fish",
+    "beef", "duck", "game", "lamb", "pork", "poultry", "oily fish", "white fish",
 }
 
 # The fallback, used ONLY when a recipe declares no star ingredient at all.
@@ -841,6 +885,15 @@ NO_TEMPERATURE_BECAUSE = {
     # real thing missing from internal_temperatures.yml rather than a chore.
     "cumin-mint-lamb-skewers": "grilled shoulder chunks; lamb.roasting is joints and "
                                "lamb.slow_cooked is a whole shoulder, neither is this",
+    "vietnamese-spiced-braised-venison-haunch": "a 1 kg boneless haunch BRAISED for two "
+                                                "hours, which is neither of the two "
+                                                "venison shapes we hold: venison.haunch "
+                                                "is a roasting spectrum and this joint "
+                                                "never stops at a doneness, while "
+                                                "venison.shoulder's 90–95°C is the right "
+                                                "physics under the wrong cut name. It "
+                                                "wants a braised-haunch figure, and "
+                                                "there isn't one",
 
     # Chicken pieces in a wet dish. poultry.chicken's endpoint is written for a
     # WHOLE BIRD ("74–75°C in the thigh"), and a thigh in a stew reaches that
