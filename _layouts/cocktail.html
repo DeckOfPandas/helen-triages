@@ -27,7 +27,27 @@ layout: default
 
 <article class="cocktail">
 
-  <h1 class="cocktail-title">{{ page.title }}</h1>
+  {% comment %} The glass icon sits with the title, looked up through
+     _data/cocktails/glasses.yml rather than guessed from the glass string —
+     the spreadsheet spells several glasses more than one way, and the map is
+     where that variance is handled.
+
+     A glass with no entry, or an entry naming a file that is not there,
+     renders NOTHING. That is deliberate and it is why `file_exists` is
+     checked as well as the lookup: `coupe` is the commonest glass in the
+     collection and has no icon yet, so the no-icon path is the normal case
+     today, not an edge one. Same absent-means-nothing convention as
+     footer_svg — a missing key must never become a broken image.
+  {% endcomment %}
+  {% assign glass_icon = site.data.cocktails.glasses.icons[page.glass] %}
+  {% capture glass_icon_file %}icons/glasses/{{ glass_icon }}.svg{% endcapture %}
+
+  <div class="cocktail-title-block">
+    {% if glass_icon %}
+      <span class="cocktail-glass-icon">{% include {{ glass_icon_file }} %}</span>
+    {% endif %}
+    <h1 class="cocktail-title">{{ page.title }}</h1>
+  </div>
 
   {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
