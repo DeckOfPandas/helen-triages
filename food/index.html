@@ -98,6 +98,52 @@ permalink: /food/
     </div>
   </div>
 
+  {% comment %} THE DISLIKE NAVIGATOR -- GitHub issue #52. "I have invited
+     someone for dinner and they hate peas, so I want to see all recipes that
+     do NOT contain peas as an ingredient."
+
+     PROGRESSIVE DISCLOSURE. It starts closed because most sessions never need
+     it, and because revealing it deliberately is what frames this as a dislike
+     navigator rather than a sixth filter everyone has to consider on the way
+     past. It sits directly under I KNOW WHAT I WANT because it is the same
+     sentence turned over.
+
+     A REAL <button>, not a span with a click handler. It toggles a region in
+     place -- a control, not a destination -- and
+     test_clear_controls_are_buttons exists because a span-with-a-handler
+     shipped here once and was unreachable by keyboard. aria-expanded is kept
+     in step by filters.js; the panel uses the `hidden` attribute rather than
+     display:none in CSS, so while it is closed its input and buttons are out
+     of the tab order too, and reachable in the ordinary way the moment it
+     opens.
+
+     No label of its own from _data/food/filter_sections.yml: the reveal
+     button IS this section's heading, and inventing a `label:` there would put
+     half the section's copy in one file and half in another.
+  {% endcomment %}
+  <div class="category search search--exclude">
+    <button type="button" class="btn-reveal" id="exclude-reveal" aria-expanded="false" aria-controls="exclude-panel">I know what I don't want</button>
+
+    <div class="exclude-panel" id="exclude-panel" hidden>
+      <div class="search-input">
+        <label class="category-label" for="exclude-search-box">
+          <span class="category-label-text">LEAVE OUT</span>
+        </label>
+        <input type="text" id="exclude-search-box" autocomplete="off" placeholder="ingredient name..." />
+        <button type="button" class="btn-clear-inline" id="exclude-search-clear" style="visibility: hidden;">&times; clear</button>
+      </div>
+      {% comment %} Populated by filters.js as you type, from the DERIVED
+         vocabulary (every data-all-ingredients entry on the page), not from
+         main_ingredients -- see the data-all-ingredients comment on the rows
+         below. Fuzzy on purpose: typing "pea" offering peas, peanut butter and
+         pearl barley is correct, because you then pick the one you meant, and
+         what gets picked is matched as a whole entry rather than as a
+         substring. {% endcomment %}
+      <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
+      <div class="exclude-active" id="exclude-active" aria-live="polite"></div>
+    </div>
+  </div>
+
   {% if site.show_unrewritten %}
   <div class="category category--meta">
     <div class="category-label-row">
@@ -142,7 +188,82 @@ permalink: /food/
           {% assign _has_short = true %}
         {% endunless %}
       {% endfor %}
-      <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}" data-meta-draft="{{ is_draft }}">
+      {% comment %} THE DERIVED INGREDIENT INDEX -- GitHub issue #52, the
+         "they hate peas" filter. Every ingredient_groups item on this recipe,
+         not main_ingredients.
+
+         WHY DERIVED, AND WHY NOT A NEW FRONT-MATTER ARRAY. main_ingredients is
+         a deliberately partial HINT: fine to include ON, dangerous to exclude
+         BY. Nine recipes list an olive oil in ingredient_groups and not one of
+         them names it in main_ingredients, so "no olives please" answered from
+         main_ingredients would hand back nine recipes containing the thing.
+         Same shape for coriander (3 vs 8) and mushrooms (3 vs 4). A parallel
+         hand-maintained array would duplicate a required field with nothing
+         able to verify the copy, so this reads the real list.
+
+         INCIDENTALS COUNT. `incidental: true` hides an item from
+         main_ingredients and from the recipe page's own Ingredients section
+         (see §4 of the handover), and that is right for "what is this dish
+         made of" -- but "we didn't itemise the frying oil" is not an answer to
+         someone avoiding it. No `unless item.incidental` here, deliberately.
+
+         THE NAME IS TAKEN UP TO THE FIRST COMMA OR OPEN BRACKET, so
+         "butter beans, drained" indexes as "butter beans" and matches the
+         "butter beans" in another recipe that happens to carry no preparation
+         note. Lowercased, and deduplicated within the row.
+
+         SEPARATED BY `|`, NOT BY COMMAS, unlike data-ingredients above. That
+         attribute joins main_ingredients, a curated vocabulary the taxonomy
+         tests already keep comma-free; these are arbitrary `item:` free text,
+         where the comma is the single commonest character (1,393 of the 3,751
+         item strings across recipes and drafts contain one) and is kept out of
+         the value only by the truncation two lines up -- a separator whose
+         safety depends on another rule in the same expression staying exactly
+         as it is. `|` appears in no item string anywhere in either collection,
+         and is already this file's chosen "cannot appear in the values"
+         separator just below, in the pantry ordering. Leading and trailing
+         `|` are deliberate: the value is self-delimiting, so filters.js's
+         split is exact and a substring probe cannot half-match an entry.
+      {% endcomment %}
+      {% assign _all_ing = "|" %}
+      {% for _group in recipe.ingredient_groups %}
+        {% for _item in _group.items %}
+          {% comment %} An item is USUALLY {amount, item, note} but is allowed to
+             be a bare string (tests/conftest.py's ingredient_items accepts
+             both), and there is currently one that is a dict with an `amount:`
+             and no `item:` at all -- indonesian-chicken-curry-gulai-ayam.md
+             line 45, an ingredient whose name was lost to a duplicate YAML key
+             on the line below it. `_item.item | default: _item` handled the
+             first two and turned the third into a vocabulary entry reading
+             `{"amount"=>"200 ml"}`, because Liquid stringifies the hash rather
+             than admitting there was nothing to take. Named cases instead: a
+             dict with a name uses it, a dict without one is skipped (there is
+             no ingredient there to avoid), and anything else is the bare-string
+             form.
+
+             The dict-without-a-name test asks about `amount`/`note` and
+             deliberately not about the incidental flag, even though that would
+             read as the more complete list: this loop must never mention
+             `incidental` at all, so that
+             test_the_derived_ingredient_index_counts_incidental_items can
+             assert exactly that and mean it. A dict carrying an incidental
+             flag and no name is not a thing that exists. {% endcomment %}
+          {% assign _raw = "" %}
+          {% if _item.item %}
+            {% assign _raw = _item.item %}
+          {% elsif _item.amount or _item.note %}
+            {% assign _raw = "" %}
+          {% else %}
+            {% assign _raw = _item %}
+          {% endif %}
+          {% assign _name = _raw | split: "," | first | split: "(" | first | strip | downcase %}
+          {% assign _probe = "|" | append: _name | append: "|" %}
+          {% unless _name == "" or _all_ing contains _probe %}
+            {% assign _all_ing = _all_ing | append: _name | append: "|" %}
+          {% endunless %}
+        {% endfor %}
+      {% endfor %}
+      <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}" data-meta-draft="{{ is_draft }}">
 
         <div class="recipe-row-content">
         <a class="recipe-title-link" href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>

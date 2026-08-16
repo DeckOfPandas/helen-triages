@@ -234,6 +234,127 @@ def test_filters_js_holds_no_loose_filter_state_variables():
     )
 
 
+# --- the derived ingredient index (the "they hate peas" filter) --------------
+
+def _derivation_block(html: str) -> str:
+    """The Liquid that builds `_all_ing` in food/index.html, on its own.
+
+    Grabbing the block rather than the whole file matters for the incidental
+    check below: the word "incidental" is free to appear anywhere else in the
+    template, and only its appearance INSIDE this loop would change what the
+    index contains. {% comment %} blocks come out for the same reason one step
+    down: the loop's own comment has to be able to say the word "incidental" in
+    order to explain why the code never says it.
+    """
+    start = html.find('{% assign _all_ing = "|" %}')
+    assert start != -1, (
+        'food/index.html no longer builds `_all_ing`. The derived ingredient '
+        'index is what the exclude filter matches against (GitHub issue #52) — '
+        'without it, "show me everything without peas" has nothing to read.'
+    )
+    end = html.find("data-all-ingredients", start)
+    assert end != -1, "the `_all_ing` accumulator is built but never emitted."
+    return re.sub(r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "", html[start:end], flags=re.S)
+
+
+def test_index_emits_the_derived_ingredient_index():
+    """GitHub issue #52: "they hate peas, show me everything without peas".
+
+    Answering that needs each row's COMPLETE ingredient list, not
+    main_ingredients. main_ingredients is a deliberately partial hint — fine to
+    include ON, dangerous to exclude BY. Nine recipes list an olive oil in
+    ingredient_groups and not one of them names it in main_ingredients, so an
+    exclusion answered from main_ingredients would hand back nine recipes
+    containing the thing the cook is avoiding; coriander is 3 against 8,
+    mushrooms 3 against 4. Hence a second, derived attribute rather than a
+    reuse of the first.
+    """
+    html = read("food", "index.html")
+    assert "data-all-ingredients=" in html, (
+        "food/index.html no longer emits data-all-ingredients on its recipe "
+        "rows. filters.js builds both the exclude picker's vocabulary and every "
+        "row's own entry set from that attribute, so without it the dislike "
+        "navigator offers nothing and excludes nothing."
+    )
+
+    block = _derivation_block(html)
+    assert "ingredient_groups" in block, (
+        "the derived index is no longer built from recipe.ingredient_groups. "
+        "That is the complete, required ingredient list; anything else "
+        "(main_ingredients above all) is a partial one, and a partial list is "
+        "precisely what makes an exclusion filter lie."
+    )
+
+    # The separator, and why it is not the comma data-ingredients uses. That
+    # attribute joins main_ingredients, a curated vocabulary the taxonomy tests
+    # already keep comma-free. These values are arbitrary `item:` free text
+    # where the comma is the commonest character there is, and it is kept out of
+    # the value only by the truncation in the same expression — a separator
+    # whose safety depends on another rule staying exactly as it is.
+    assert re.search(r'data-all-ingredients="\{\{\s*_all_ing', html), (
+        "data-all-ingredients is no longer emitting the `_all_ing` accumulator."
+    )
+    assert '| append: "|"' in block or "| append: '|'" in block, (
+        "the derived index is no longer joined on `|`.\n"
+        "Do not join it on commas: unlike main_ingredients, these values are "
+        "arbitrary `item:` free text (1,393 of the 3,751 item strings across "
+        "recipes and drafts contain a comma), and nothing validates them. Pick "
+        "a separator that cannot appear in the value rather than one that "
+        "happens not to today."
+    )
+
+
+def test_the_derived_ingredient_index_counts_incidental_items():
+    """`incidental: true` items are IN the index, deliberately.
+
+    The flag hides an item from main_ingredients and from the recipe page's own
+    Ingredients section, which is right for "what is this dish made of" — but
+    "we didn't itemise the frying oil" is not an answer to someone avoiding it.
+    Helen's call, GitHub issue #52.
+
+    Two halves, because either alone can go quiet: the template must not filter
+    the flag out, and the collection must still contain an example for that to
+    mean anything.
+    """
+    from conftest import ALL_RECIPES
+
+    block = _derivation_block(read("food", "index.html"))
+    assert "incidental" not in block, (
+        "food/index.html's derived ingredient index now skips `incidental: "
+        "true` items. Put them back: they are hidden from main_ingredients and "
+        "from the rendered ingredient list on purpose, but an exclusion filter "
+        'that quietly ignores the frying oil tells someone avoiding it "no '
+        'oil listed" about a recipe that fries in it.'
+    )
+
+    with_incidentals = [
+        (r.slug, item["item"])
+        for r in ALL_RECIPES
+        for group in (r.fm.get("ingredient_groups") or [])
+        for item in (group.get("items") or [])
+        if isinstance(item, dict) and item.get("incidental") and item.get("item")
+    ]
+    assert with_incidentals, (
+        "no recipe in _food_recipes/ uses `incidental: true` any more, so the "
+        "half of this test that checks real data is now checking nothing.\n"
+        "As of 2026-08-16 the live example was "
+        "vietnamese-spiced-braised-venison-haunch.md's 'neutral oil'. If it has "
+        "genuinely gone, point this at another one, or delete this half "
+        "deliberately — do not leave it passing over an empty list."
+    )
+
+    # The Liquid's own rule, mirrored: name up to the first comma or open
+    # bracket, lowercased. A PARALLEL implementation, not a render of the real
+    # template (same caveat as _sink_pantry above) — it guards the rule, not the
+    # template's fidelity to it.
+    for slug, item_text in with_incidentals:
+        name = re.split(r"[,(]", item_text)[0].strip().lower()
+        assert name, (
+            f"_food_recipes/{slug}.md has an incidental item ({item_text!r}) "
+            f"that derives to an empty index entry, so it can never be excluded."
+        )
+
+
 # --- a badge is a control, not a caption -------------------------------------
 
 def test_recipe_badges_are_links_carrying_their_own_filter_value():

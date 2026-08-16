@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
        state.star        string|null, single-select STAR INGREDIENT
        state.ingredient  string|null, the chosen ingredient-search result
        state.meta        Set, the local-only meta filters
+       state.excludedIngredients
+                         Set, the "they hate peas" exclusions (issue #52).
+                         Entries of the DERIVED ingredient index
+                         (data-all-ingredients), matched as whole entries, not
+                         as substrings -- see rowIsExcluded() below.
        state.nameQuery   the title search — folded (accents stripped,
                          HTF.ingredientSearch.fold) and lowercased, the same
                          treatment ingredient-search.js gives its own query.
@@ -75,6 +80,15 @@ document.addEventListener('DOMContentLoaded', function () {
   var ingredientClear = document.getElementById('ingredient-search-clear');
   var nameSearchBox = document.getElementById('name-search-box');
   var nameSearchClear = document.getElementById('name-search-clear');
+
+  // The dislike navigator (GitHub issue #52) -- see food/index.html's own
+  // comment on the section for why it starts hidden.
+  var excludeReveal = document.getElementById('exclude-reveal');
+  var excludePanel = document.getElementById('exclude-panel');
+  var excludeBox = document.getElementById('exclude-search-box');
+  var excludeClear = document.getElementById('exclude-search-clear');
+  var excludePool = document.getElementById('exclude-results-pool');
+  var excludeActive = document.getElementById('exclude-active');
 
   // ---------------------------------------------------------------------------
   // Ingredient vocabulary — read from _data/ingredient_words.yml, emitted as
@@ -231,6 +245,83 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   var masterIngredientsList = IS.buildMasterList(rawIngredientStrings);
 
+  // ---------------------------------------------------------------------------
+  // THE DERIVED INGREDIENT INDEX — GitHub issue #52's exclusions
+  // ---------------------------------------------------------------------------
+  //
+  // A SECOND vocabulary, over data-all-ingredients (every ingredient_groups
+  // item on the row, incidentals included) rather than over data-ingredients
+  // (main_ingredients). They are not interchangeable and the difference is the
+  // whole reason this feature is built on the derived list: main_ingredients is
+  // a deliberately partial hint, which is fine to include ON and dangerous to
+  // exclude BY. Nine rows list an olive oil in ingredient_groups and none of
+  // them names it in main_ingredients; coriander is 3 against 8, mushrooms 3
+  // against 4. "No olives, please" answered from main_ingredients hands back
+  // nine recipes containing the thing.
+  //
+  // Each row's own entries go through buildMasterList too, not just the
+  // corpus-wide list. That is what makes exact membership WORK: the picker
+  // offers "roasted peanuts" (buildMasterList strips the leading modifier from
+  // "chopped roasted peanuts"), so a row compared in its raw form would never
+  // match the entry the user was actually shown. One function, applied to both
+  // sides, and the two cannot drift.
+  var rowExcludeEntries = new Map();
+  var allDerivedEntries = [];
+  items.forEach(function (li) {
+    var entries = (li.dataset.allIngredients || '')
+      .split('|')
+      .map(function (s) { return s.trim(); })
+      .filter(Boolean);
+    entries.forEach(function (e) { allDerivedEntries.push(e); });
+    rowExcludeEntries.set(li, IS.buildMasterList(entries));
+  });
+  var excludeMasterList = IS.buildMasterList(allDerivedEntries);
+
+  var FAMILY_SUFFIX = FilterState.FAMILY_SUFFIX;
+
+  /* Does any entry in `list` match the picked ingredient key `key`, by the
+     rules ingredient search already uses — a curated synonym family matches on
+     containment of any of its words, anything else matches when every word of
+     the key prefixes some word of the entry?
+
+     Extracted rather than written twice: the ingredient INCLUDE filter in
+     update() and the "(all)" family case of the EXCLUDE filter are the same
+     question asked of two different lists, and two copies of a matching rule
+     this fiddly is how "chicken (all)" ends up meaning one thing when you
+     filter for it and another when you filter it out. */
+  function entriesMatchKey(list, key) {
+    var synonyms = IS.getSynonymWords(key);
+    if (synonyms) {
+      return list.some(function (entry) {
+        var lower = entry.toLowerCase();
+        return synonyms.some(function (syn) { return lower.indexOf(syn) !== -1; });
+      });
+    }
+    var keyWords = getWords(key).map(IS.normaliseIngredientWord);
+    return list.some(function (entry) {
+      var entryWords = getWords(entry).map(IS.normaliseIngredientWord);
+      return keyWords.every(function (kw) {
+        return entryWords.some(function (ew) { return ew.indexOf(kw) !== -1; });
+      });
+    });
+  }
+
+  /* The RULE itself — set membership, never substring — is
+     FilterState.excludesRow, next to the state it acts on and where
+     tests/js/filter-state.test.js can reach it without a DOM. Read its comment
+     before changing anything here: it is the line that stops "peas" taking the
+     peanut butter and the pearl barley with it.
+
+     This wrapper is the DOM half and nothing else: which entries this row has,
+     and the one thing the rule cannot know on its own — how to match a "(all)"
+     family button, which needs the ingredient vocabulary. */
+  function rowIsExcluded(li) {
+    if (!state.excludedIngredients.size) return false;
+    return FilterState.excludesRow(
+      rowExcludeEntries.get(li) || [], state.excludedIngredients, entriesMatchKey
+    );
+  }
+
   function makeIngredientButton(key, label, wordMatch) {
     var btn = document.createElement('button');
     btn.type = 'button';
@@ -365,6 +456,148 @@ function renderResultsPool() {
 
 
 
+  // ---------------------------------------------------------------------------
+  // THE DISLIKE NAVIGATOR — GitHub issue #52
+  // ---------------------------------------------------------------------------
+
+  function makeExcludeButton(value, label) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-tag btn-exclude';
+    btn.dataset.exclude = value;
+    btn.textContent = label;
+    return btn;
+  }
+
+  /* The picker's own search is FUZZY, and that is correct. It runs
+     HTF.ingredientSearch — folding, modifier-stripping, singulars, the lot —
+     over the derived vocabulary, so typing "pea" offers peas, peanut butter
+     AND pearl barley. All three are real entries in this collection; you pick
+     the one you meant, and what you picked is then matched as a whole entry
+     (rowIsExcluded above). Fuzzy to FIND, exact to FILTER. */
+  function renderExcludePool() {
+    if (!excludeBox || !excludePool) return;
+    var query = fold(excludeBox.value.trim().toLowerCase());
+    excludePool.innerHTML = '';
+    if (excludeClear) excludeClear.style.visibility = query ? 'visible' : 'hidden';
+    if (!query) return;
+
+    var result = IS.search(query, excludeMasterList);
+    result.familyButtons.forEach(function (fw) {
+      var label = fw + FAMILY_SUFFIX;
+      excludePool.appendChild(makeExcludeButton(label, label));
+    });
+    result.results.forEach(function (r) {
+      // Same "don't offer 'chicken' next to 'chicken (all)'" suppression
+      // renderResultsPool() applies, and for the same reason (issue #51):
+      // two adjacent buttons that look like the same answer make you check
+      // both.
+      if (result.familyButtons.indexOf(fold(r.ing.trim().toLowerCase())) !== -1) return;
+      excludePool.appendChild(makeExcludeButton(r.ing, r.label || r.ing));
+    });
+  }
+
+  /* WHAT IS BEING LEFT OUT, painted from state rather than at each place state
+     changes — the argument syncFilterButtons() already makes one layer up.
+     Clear-all reassigns the whole state object and never touches this markup,
+     so anything painted at click time would survive a clear that emptied the
+     state underneath it.
+
+     THE COPY IS ABOUT WHAT IS LISTED, never about what a recipe is free of.
+     This index is derived from what each recipe happens to write down, so
+     "hiding 1 recipe that lists peas" is a true statement about the data and
+     "1 pea-free recipe" is not a claim this page is in any position to make.
+     Helen will settle the fuller wording once she has seen it working — do not
+     grow this into a paragraph of caveats in the meantime. */
+  function renderExcludeActive(excludedCount) {
+    if (!excludeActive) return;
+    excludeActive.innerHTML = '';
+    if (!state.excludedIngredients.size) return;
+
+    var label = document.createElement('span');
+    label.className = 'exclude-active-label';
+    label.textContent = 'leaving out';
+    excludeActive.appendChild(label);
+
+    var names = [];
+    state.excludedIngredients.forEach(function (value) {
+      // The sentence reads about the ingredient, so the "(all)" that qualifies
+      // the BUTTON comes off here -- "recipes that list chicken (all)" is not
+      // a sentence. The pill keeps it, because there it is the control's name.
+      names.push(value.replace(FAMILY_SUFFIX, ''));
+      var btn = makeExcludeButton(value, value + ' ×');
+      btn.className = 'btn-tag btn-exclude btn-exclude--active';
+      btn.setAttribute('aria-label', 'stop leaving out ' + value);
+      excludeActive.appendChild(btn);
+    });
+
+    var count = document.createElement('span');
+    count.className = 'exclude-count';
+    var listed = names.join(' or ');
+    if (excludedCount === 0) {
+      /* Says nothing about the collection, deliberately. excludedCount counts
+         rows this exclusion removed FROM THE CURRENT RESULTS, so zero can mean
+         "nothing lists peas" or it can mean "the tag filter had already taken
+         the one that does" -- and "no recipe lists peas" would be a flat
+         untruth in the second case. */
+      count.textContent = 'hiding nothing from the recipes left';
+    } else if (excludedCount === 1) {
+      count.textContent = 'hiding 1 recipe that lists ' + listed;
+    } else {
+      count.textContent = 'hiding ' + excludedCount + ' recipes that list ' + listed;
+    }
+    excludeActive.appendChild(count);
+  }
+
+  // Multi-select, like the tag buttons and unlike the star: you can be cooking
+  // for someone who hates peas AND coriander, and a second pick that replaced
+  // the first would be useless for the one job this feature has.
+  function toggleExcluded(value) {
+    if (!value) return;
+    if (state.excludedIngredients.has(value)) {
+      state.excludedIngredients.delete(value);
+    } else {
+      state.excludedIngredients.add(value);
+      // Emptied on a pick rather than left standing: the next thing you want
+      // is to name the NEXT thing they hate, and the entry you just chose is
+      // now shown in the active list below anyway.
+      if (excludeBox) excludeBox.value = '';
+      if (excludePool) excludePool.innerHTML = '';
+      if (excludeClear) excludeClear.style.visibility = 'hidden';
+    }
+    update();
+  }
+
+  function setExcludeRevealed(open) {
+    if (!excludeReveal || !excludePanel) return;
+    excludeReveal.setAttribute('aria-expanded', open ? 'true' : 'false');
+    excludePanel.hidden = !open;
+  }
+
+  if (excludeReveal && excludePanel) {
+    excludeReveal.addEventListener('click', function () {
+      setExcludeRevealed(excludeReveal.getAttribute('aria-expanded') !== 'true');
+      // Focus follows the disclosure, so a keyboard user lands in the box
+      // they just asked for rather than tabbing back through the panel.
+      if (excludePanel.hidden === false && excludeBox) excludeBox.focus();
+    });
+  }
+
+  if (excludeBox) {
+    excludeBox.addEventListener('input', renderExcludePool);
+  }
+
+  if (excludeClear) {
+    excludeClear.addEventListener('click', function () {
+      // Clears the SEARCH, not the exclusions -- those come off one at a time
+      // by their own pills, or all at once with clear all.
+      if (excludeBox) excludeBox.value = '';
+      if (excludePool) excludePool.innerHTML = '';
+      excludeClear.style.visibility = 'hidden';
+      if (excludeBox) excludeBox.focus();
+    });
+  }
+
   if (searchBox) {
     searchBox.addEventListener('input', renderResultsPool);
   }
@@ -465,6 +698,7 @@ function renderResultsPool() {
     // rows while you're still picking an ingredient search result is a
     // separate, open design question Helen hasn't resolved yet.
     var matchingLis = [];
+    var excludedCount = 0;
 
     items.forEach(function(li) {
       var tags = (li.dataset.tags || '').split(',').filter(Boolean);
@@ -492,28 +726,24 @@ function renderResultsPool() {
       if (state.meta.has('draft') && li.dataset.metaDraft !== 'true') visible = false;
 
       if (state.ingredient) {
-        var hasMatch = false;
-        var activeKey = state.ingredient.replace(' (all)', '').trim();
-        var activeSynonyms = IS.getSynonymWords(activeKey);
-        if (activeSynonyms) {
-          // Synonym (all): match any ingredient containing any synonym word
-          for (var i = 0; i < ingList.length; i++) {
-            var ingLower2 = ingList[i].toLowerCase();
-            if (activeSynonyms.some(function(syn) { return ingLower2.indexOf(syn) !== -1; })) {
-              hasMatch = true; break;
-            }
-          }
-        } else {
-          var activeWords = getWords(activeKey).map(IS.normaliseIngredientWord);
-          for (var i = 0; i < ingList.length; i++) {
-            var ingWords2 = getWords(ingList[i]).map(IS.normaliseIngredientWord);
-            var allMatch = activeWords.every(function(aw) {
-              return ingWords2.some(function(iw) { return iw.indexOf(aw) !== -1; });
-            });
-            if (allMatch) { hasMatch = true; break; }
-          }
+        // The two branches this used to spell out inline (a curated synonym
+        // family by containment, anything else by per-word prefix) are
+        // entriesMatchKey() now -- same rule, one copy, shared with the
+        // exclusion filter below so an "(all)" button cannot come to mean one
+        // thing when you filter FOR it and another when you filter it OUT.
+        if (!entriesMatchKey(ingList, state.ingredient.replace(FAMILY_SUFFIX, '').trim())) {
+          visible = false;
         }
-        if (!hasMatch) visible = false;
+      }
+
+      /* LAST, deliberately. Everything above decides whether this row is one
+         you asked for; this decides whether it is one you can't serve. Running
+         it last is what makes excludedCount meaningful: it counts rows that
+         survived every other filter and were dropped only for what they list,
+         which is the number the panel reports back. */
+      if (visible && rowIsExcluded(li)) {
+        visible = false;
+        excludedCount += 1;
       }
 
       if (visible) matchingLis.push(li);
@@ -641,6 +871,7 @@ function renderResultsPool() {
     syncFilterButtons();
     updateInlineLabels();
     updateIngredientClear();
+    renderExcludeActive(excludedCount);
     syncAriaPressed();
     updateIngredientClamp();
   }
@@ -663,6 +894,18 @@ function renderResultsPool() {
   if (matrix) {
     matrix.addEventListener('click', function(e) {
       var target = e.target;
+
+      /* The exclude section is claimed whole, before any other branch. Its
+         buttons wear .btn-tag for their appearance, so without this they would
+         fall into the tag branch immediately below and toggle a MOOD tag
+         called "peas" -- which does not exist, so the visible result would be
+         a button that does nothing at all. The reveal button and the section's
+         own inline clear have their own listeners; this just declines to
+         second-guess them. */
+      if (target.closest && target.closest('.search--exclude')) {
+        if (target.classList.contains('btn-exclude')) toggleExcluded(target.dataset.exclude);
+        return;
+      }
 
       if (target.classList.contains('btn-tag') && !target.classList.contains('btn-ingredient')) {
         toggleTag(target.dataset.tag);
@@ -788,6 +1031,15 @@ function renderResultsPool() {
       if (nameSearchBox) nameSearchBox.value = '';
       if (nameSearchClear) nameSearchClear.style.visibility = 'hidden';
       if (resultsPool) resultsPool.innerHTML = '';
+      // The exclusions themselves are already gone -- emptyState() cleared the
+      // Set, and update() repaints the "leaving out" list from it. These three
+      // are the exclude picker's half-typed SEARCH, the same loose ends the
+      // ingredient box's own box/pool/clear are being tidied for two lines up.
+      // The panel is deliberately left open: revealing it was a decision about
+      // what this session is doing, not a filter.
+      if (excludeBox) excludeBox.value = '';
+      if (excludePool) excludePool.innerHTML = '';
+      if (excludeClear) excludeClear.style.visibility = 'hidden';
       // No button-class loop here any more: update() below calls
       // syncFilterButtons(), which paints every filter button from the state
       // this function has just emptied.

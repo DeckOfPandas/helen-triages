@@ -49,7 +49,12 @@
     }
   }
 
-  #ingredient-search-box {
+  // The exclude picker's box joins this rule rather than getting a third copy
+  // of it (the name search's own copy below is already one too many): it is the
+  // same control, in the same row shape, doing the same job in the opposite
+  // direction, and a fork would only ever drift.
+  #ingredient-search-box,
+  #exclude-search-box {
     font-family: $font-headings;
     font-size: 0.78rem;
     font-weight: 700;
@@ -98,7 +103,8 @@
   // unification silently had no effect here. Only margin-left survives:
   // genuine layout (spacing next to the search input), not typography the
   // class-based rule already owns.
-  #ingredient-search-clear {
+  #ingredient-search-clear,
+  #exclude-search-clear {
     margin-left: $space-md;
   }
 
@@ -150,6 +156,85 @@
   // Same duplicate-ID story as #ingredient-search-clear above.
   #name-search-clear {
     margin-left: $space-md;
+  }
+}
+
+// --- The dislike navigator (GitHub issue #52) --------------------------------
+// "I know what I don't want": the exclude picker, revealed by its own link
+// under I KNOW WHAT I WANT.
+//
+// IT BORROWS NO CATEGORY HUE, on purpose, the same call META FILTERS and the
+// results heading already made: it is not one of the five filter categories,
+// so it doesn't take one of their colours. Everything here is $color-text and
+// the neutral clear-link grey, which also keeps the pane visibly quieter than
+// the five sections above it — right for something you opened deliberately
+// rather than something the page is offering everyone.
+.controls .search--exclude {
+  // The reveal is a link in appearance and a button in fact — see
+  // food/index.html and test_clear_controls_are_buttons. Matched to
+  // .btn-clear-inline (sans, regular, underline, colour-shift hover), which is
+  // this page's one inline-link design; NOT lowercased, because the words are
+  // Helen's own sentence rather than a filter label.
+  .btn-reveal {
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: $font-body;
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: lighten($color-text, 12%);
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.1s ease-in-out;
+
+    &:hover { color: $color-text; }
+
+    &:focus-visible {
+      outline: none;
+      background-color: rgba($color-text, 0.15);
+    }
+  }
+
+  // `hidden` does the hiding (the attribute, from filters.js) so the closed
+  // panel is out of the tab order as well as off the screen. This only owns
+  // the layout of the open one.
+  .exclude-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: $index-label-gap;
+    margin-top: $space-md;
+  }
+
+  .exclude-active {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-xs;
+  }
+
+  // "leaving out" and the count read as quiet prose either side of the pills,
+  // not as more controls — the pills are the only thing in this row you can
+  // click, and they should be the only thing that looks it.
+  .exclude-active-label,
+  .exclude-count {
+    font-family: $font-body;
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: lighten($color-clear-text, 10%);
+  }
+
+  // A chosen exclusion carries its own × and comes off with one click. It gets
+  // the resting .btn-tag treatment plus a stronger text colour rather than the
+  // full active tape-shape the STAR/MOOD buttons get: those say "this is what
+  // I want", and it would read oddly for the row of things being kept out to
+  // shout louder than the filters that are letting recipes in.
+  .btn-exclude--active {
+    color: $color-text;
+    text-decoration: line-through;
+
+    &:hover { text-decoration: none; }
   }
 }
 

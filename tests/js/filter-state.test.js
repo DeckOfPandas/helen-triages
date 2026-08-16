@@ -262,6 +262,101 @@ test('emptyState hands out FRESH collections, never one shared Set', () => {
   });
 });
 
+// =============================================================================
+// THE EXCLUSION RULE — GitHub issue #52's actual goal
+// =============================================================================
+//
+// Helen's user story: "I have invited someone for dinner and they hate peas, so
+// I want to see all recipes that do NOT contain peas as an ingredient."
+//
+// The fixture below is not invented. All three entries are really in the
+// collection's derived ingredient index, which is exactly why this rule is
+// membership rather than containment: `pea` sits inside `peanut butter` and
+// inside `pearl barley`, and a "contains" rule would hand someone who dislikes
+// peas a list with the peanut butter cookies and the pearl barley casserole
+// removed from it for no reason they could see.
+//
+// Excluding is not including turned around, either. main_ingredients is a
+// deliberately partial hint — fine to include ON, unsafe to exclude BY — so
+// these entries come from the FULL derived list (every ingredient_groups item,
+// incidentals included), which is what data-all-ingredients carries.
+
+const PEAS_ROW = ['chicken', 'mushrooms', 'peas'];
+const PEANUT_ROW = ['peanut butter', 'plain flour', 'caster sugar'];
+const BARLEY_ROW = ['organic pearl barley', 'duck legs'];
+
+test('an exact entry excludes the row that lists it', () => {
+  assert.strictEqual(FS.excludesRow(PEAS_ROW, new Set(['peas'])), true);
+});
+
+test('excluding "peas" does NOT take peanut butter or pearl barley with it', () => {
+  const excluded = new Set(['peas']);
+  assert.strictEqual(
+    FS.excludesRow(PEANUT_ROW, excluded), false,
+    'a row listing "peanut butter" was excluded by "peas". The rule has become '
+    + 'a substring test somewhere — "pea" is inside "peanut butter". Membership '
+    + 'of the entry list is the whole rule; the fuzziness belongs in the '
+    + 'picker, which offers all three so you can pick the one you meant.'
+  );
+  assert.strictEqual(
+    FS.excludesRow(BARLEY_ROW, excluded), false,
+    'a row listing "organic pearl barley" was excluded by "peas" — same '
+    + 'substring collision, other direction.'
+  );
+});
+
+test('a partial entry excludes nothing -- "pea" is not "peas"', () => {
+  assert.strictEqual(FS.excludesRow(PEAS_ROW, new Set(['pea'])), false);
+});
+
+test('a row is excluded if it lists ANY of several exclusions', () => {
+  const excluded = new Set(['peas', 'plain flour']);
+  assert.strictEqual(FS.excludesRow(PEAS_ROW, excluded), true);
+  assert.strictEqual(FS.excludesRow(PEANUT_ROW, excluded), true);
+  assert.strictEqual(FS.excludesRow(BARLEY_ROW, excluded), false);
+});
+
+test('an empty exclusion set excludes nothing, and neither does a missing one', () => {
+  assert.strictEqual(FS.excludesRow(PEAS_ROW, new Set()), false);
+  assert.strictEqual(FS.excludesRow(PEAS_ROW, undefined), false);
+  assert.strictEqual(FS.excludesRow(undefined, new Set(['peas'])), false);
+});
+
+test('an array works as well as a Set -- the rule only needs forEach', () => {
+  assert.strictEqual(FS.excludesRow(PEAS_ROW, ['peas']), true);
+});
+
+// --- the one umbrella ---------------------------------------------------------
+// The picker also offers "chicken (all)", collapsing chicken breast/thighs/
+// stock. Matching a family needs the ingredient vocabulary, which filter-state
+// deliberately does not hold, so the caller passes the matcher in.
+
+test('an "(all)" value matches family-wise, using the matcher the caller passes', () => {
+  const seen = [];
+  const familyMatch = (entries, key) => {
+    seen.push(key);
+    return entries.some((e) => e.indexOf(key) !== -1);
+  };
+  assert.strictEqual(FS.excludesRow(PEAS_ROW, new Set(['chicken (all)']), familyMatch), true);
+  assert.deepStrictEqual(seen, ['chicken'], 'the " (all)" suffix should be stripped before matching');
+});
+
+test('with no matcher supplied, an "(all)" value falls back to exact membership', () => {
+  // Deliberate: no vocabulary means no umbrella. It must never quietly
+  // degrade into a substring rule, which is the one thing this must not be.
+  assert.strictEqual(FS.excludesRow(PEAS_ROW, new Set(['chicken (all)'])), false);
+});
+
+test('a plain entry is never sent to the family matcher', () => {
+  let called = false;
+  FS.excludesRow(PEAS_ROW, new Set(['peas']), () => { called = true; return true; });
+  assert.strictEqual(called, false);
+});
+
+test('FAMILY_SUFFIX is exported so filters.js and the tests agree on the spelling', () => {
+  assert.strictEqual(FS.FAMILY_SUFFIX, ' (all)');
+});
+
 // --- isFieldSet ----------------------------------------------------------------
 // The generic "does this field hold anything?" that means a new field needs no
 // predicate of its own.

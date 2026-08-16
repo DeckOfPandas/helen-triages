@@ -157,6 +157,28 @@
     // STAR INGREDIENT. Single-select — picking a second replaces the first.
     star: { empty: function () { return null; }, narrows: true },
 
+    /* THE DISLIKE NAVIGATOR — GitHub issue #52's actual goal, in Helen's
+       words: "I have invited someone for dinner and they hate peas, so I want
+       to see all recipes that do NOT contain peas as an ingredient."
+
+       A Set of entries from the DERIVED ingredient index (food/index.html's
+       `data-all-ingredients`, built from every ingredient_groups item on the
+       row, incidentals included) — not from main_ingredients, which is a
+       deliberately partial hint and so is safe to include ON but dangerous to
+       exclude BY. Multi-select, like tags: a row is dropped if it lists ANY of
+       these.
+
+       Narrowing, and this is the one field where that is worth saying out
+       loud: an exclusion is a filter with no button of its own lit up
+       anywhere in the matrix, so if it did not count towards
+       hasAnythingToClear the clear-all button would hide while a filter was
+       still silently removing rows — the issue-#52 bug all over again, in the
+       feature issue #52 was actually about. Declaring it here is the entire
+       change: emptyState(), hasAnythingToClear(), hasNarrowingFilter() and
+       the generated per-field cases in tests/js/filter-state.test.js all pick
+       it up by iteration. */
+    excludedIngredients: { empty: function () { return new Set(); }, narrows: true },
+
     /* The chosen ingredient-search result. NOT narrowing, deliberately:
        filters.js's renderResultsPool() nulls it on every keystroke, so while
        the ingredient box is being typed into it is always null, and including
@@ -224,6 +246,61 @@
     return !hasAnythingToClear(state);
   }
 
+  /* ---------------------------------------------------------------------------
+     THE EXCLUSION RULE — GitHub issue #52
+     ---------------------------------------------------------------------------
+
+     "Does this row list anything the cook has ruled out?", answered against the
+     row's DERIVED ingredient entries (food/index.html's data-all-ingredients,
+     put through HTF.ingredientSearch.buildMasterList by filters.js so both
+     sides of the comparison have had the same normalisation).
+
+     SET MEMBERSHIP, NOT SUBSTRING, and this is the whole rule. The real
+     collection holds `peas`, `peanut butter`, `smooth peanut butter`,
+     `roasted peanuts` and `organic pearl barley`. A "contains" test for the
+     short things people type takes all five out at once; excluding peas would
+     silently lose the peanut butter cookies and the pearl barley casserole.
+     The picker hands back a REAL ENTRY, chosen from a list where all five were
+     offered side by side, so the row test compares whole entries and nothing
+     else. The fuzziness belongs in FINDING the entry, never in applying it.
+
+     A "(all)" family button (the picker offers "chicken (all)" over chicken
+     breast/thighs/stock) is the one umbrella, and it says so on its face.
+     Matching a family needs the ingredient vocabulary — singulars, synonyms,
+     modifier stripping — which this module deliberately does not have and is
+     not going to grow, so the caller passes `familyMatch(entries, key)` in.
+     With no familyMatch supplied, an "(all)" value falls through to the same
+     exact comparison as everything else and simply matches nothing: no
+     vocabulary, no umbrella, and never a silent substring rule sneaking in
+     through the back door. */
+  var FAMILY_SUFFIX = ' (all)';
+
+  function isFamilyValue(value) {
+    return typeof value === 'string' &&
+      value.length > FAMILY_SUFFIX.length &&
+      value.slice(-FAMILY_SUFFIX.length) === FAMILY_SUFFIX;
+  }
+
+  function familyKey(value) {
+    return value.slice(0, -FAMILY_SUFFIX.length).trim();
+  }
+
+  function excludesRow(entries, excluded, familyMatch) {
+    if (!excluded) return false;
+    var list = entries || [];
+    var values = typeof excluded.forEach === 'function' ? excluded : [];
+    var hit = false;
+    values.forEach(function (value) {
+      if (hit) return;
+      if (familyMatch && isFamilyValue(value)) {
+        if (familyMatch(list, familyKey(value))) hit = true;
+      } else if (list.indexOf(value) !== -1) {
+        hit = true;
+      }
+    });
+    return hit;
+  }
+
   /* A DIFFERENT QUESTION, and it must stay different — GitHub issue #248.
      There used to be three near-identical expressions in filters.js and the
      issue read as "unify them"; unifying them would have been wrong, because
@@ -248,6 +325,8 @@
     NARROWING_FIELDS: NARROWING_FIELDS,
     emptyState: emptyState,
     isFieldSet: isFieldSet,
+    FAMILY_SUFFIX: FAMILY_SUFFIX,
+    excludesRow: excludesRow,
     hasAnythingToClear: hasAnythingToClear,
     isEmpty: isEmpty,
     hasNarrowingFilter: hasNarrowingFilter
