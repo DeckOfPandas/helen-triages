@@ -262,6 +262,12 @@ TRUSTED_DYNAMIC = (
     re.compile(r"^\{\{\s*this_site\.home\s*\|\s*default:\s*'/'\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*sibling_site\.home\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*this_site\.about_url\s*\|\s*relative_url\s*\}\}$"),
+    # The footer's reference links, added 2026-08-16. Same shape and same
+    # treatment as the three above: the value lives in _data/sites.yml, so this
+    # scanner cannot read it out of the template, and
+    # test_site_nav_links_resolve_to_real_pages checks every one of them
+    # against the published-page set instead.
+    re.compile(r"^\{\{\s*link\.url\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*(?:recipe|cocktail)\.url\s*\|\s*relative_url\s*\}\}$"),
 )
 
@@ -436,6 +442,17 @@ def test_site_nav_links_resolve_to_real_pages():
         about = site.get("about_url")
         if about and about not in PAGES:
             problems.append(f"sites.yml: {key}.about_url = {about!r}, no published page there")
+
+        # The footer reference block (2026-08-16). Absent is fine -- cocktails
+        # has none yet, and the template renders nothing rather than an empty
+        # heading -- but a link that IS listed has to go somewhere real.
+        for entry in site.get("reference_links") or []:
+            url = (entry or {}).get("url")
+            if url not in PAGES:
+                problems.append(
+                    f"sites.yml: {key}.reference_links entry {entry.get('text')!r} "
+                    f"points at {url!r}, which no published page serves"
+                )
 
         switch = site.get("switch_site")
         if switch:
