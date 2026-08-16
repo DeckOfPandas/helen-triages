@@ -40,6 +40,14 @@ search:
 # "almonds"/"ginger"/"pasta"/"porcini" with a different qualifier, so
 # stripping them loses no distinction the way stripping "whole" or "smoked"
 # would).
+#
+# Those rejections still stand AS BLANKET STRIPS, which is the only thing
+# this list can do: a word here fires on every entry that starts with it,
+# sight unseen, now and for every recipe added later. "smoked", "roasted" and
+# "toasted" are nonetheless collapsed for three SPECIFIC entries — see
+# `aliases` below, and Helen's reasoning there for why avoidance asks a
+# different question of them than searching does. A named phrase can be judged
+# one at a time; a word on this list cannot be judged at all.
 modifiers:
   - chopped
   - crispy
@@ -150,6 +158,13 @@ trailing_phrases:
 # typing "a" matched it; "pork or turkey mince" contains "or", so typing "o"
 # matched that and "leg of lamb" too. Neither is a real ingredient word.
 #
+# The first example is collapsed to "chicken" by `aliases` below and no longer
+# exists as an entry — the rule it illustrates does, for every compound
+# `aliases` doesn't name ("pork or turkey mince" and "leg of lamb" are both
+# still live) and for every one written into a recipe tomorrow. Aliases name
+# phrases one at a time; this list is what handles the ones nobody has looked
+# at yet.
+#
 # Different from `modifiers`: modifiers are stripped from the FRONT and
 # change the canonical entry ("chopped pistachios" becomes "pistachios"
 # everywhere, including the button label). Stopwords are invisible to
@@ -244,14 +259,30 @@ family_exceptions:
   - oyster mushrooms
 
 # -----------------------------------------------------------------------------
-# Aliases — whole-phrase entry on the left, the entry it collapses into on
-# the right. Different from `singulars`: singulars normalises one WORD for
-# MATCHING only ("chicken legs" still displays as "chicken legs", it just
-# also matches "chicken leg"). This collapses two whole master-list entries
-# into ONE, so only the right-hand form ever appears as a search result at
-# all — the same "duck leg"/"Gressingham duck legs" call already made for
-# `modifiers`' "gressingham" entry, just phrased for a trailing word instead
-# of a leading one.
+# Aliases — whole-phrase entry on the left, what it becomes on the right.
+# THREE FORMS, ONE MECHANISM:
+#
+#   a NAME        five-spice powder: five-spice
+#                 A RENAME. The entry collapses into that one, and only the
+#                 right-hand form ever appears as a search result.
+#
+#   a LIST        beef or venison stock: [beef stock, venison stock]
+#                 A SPLIT. One written item naming two foods becomes both,
+#                 so each can be picked on its own.
+#
+#   an EMPTY LIST flavouring or fruit: []
+#                 A DROP, for an entry that names no food at all and so can
+#                 never be a useful thing to search for or avoid.
+#
+# A single name and a one-item list mean the same thing; the bare name is
+# kept because it reads better and because it is what was already here.
+#
+# Different from `singulars`: singulars normalises one WORD for MATCHING only
+# ("chicken legs" still displays as "chicken legs", it just also matches
+# "chicken leg"). This collapses, splits or drops whole master-list entries —
+# the same "duck leg"/"Gressingham duck legs" call already made for
+# `modifiers`' "gressingham" entry, just phrased for a whole phrase instead
+# of a leading word.
 #
 # "five-spice" (five-spice-crispy-duck-legs.md) and "five-spice powder"
 # (gordons-christmas-five-spice-roast-goose.md) are the one product, written
@@ -264,12 +295,98 @@ family_exceptions:
 # only one entry left, "five (all)" no longer has 2+ members to group.
 #
 # Not a general "strip trailing powder" rule — "cocoa powder" stays as
-# written, the same way `modifiers` won't strip "smoked" or "roasted": most
-# "powder" entries mark a real product difference (chilli powder vs.
-# chilli), so this only ever collapses phrases explicitly listed here.
+# written: most "powder" entries mark a real product difference (chilli
+# powder vs. chilli), so this only ever collapses phrases explicitly listed
+# here.
+#
+# THAT IS THE PROPERTY THE WHOLE LIST RESTS ON, and it is why the thirty-four
+# entries added below for GitHub issue #273 are named one at a time instead of
+# derived by a rule. The exclude picker's vocabulary is built from `item:`
+# free text rather than from curated main_ingredients, so it inherits every
+# way a recipe happened to be written: items naming two foods at once ("beef
+# or venison stock"), items naming none ("seasoning and flavourings — see
+# note"), and preparation states the leading-word `modifiers` strip can't
+# reach ("boneless skinless chicken breast"). A general "split on and/or" rule
+# would coin an entry called "whatever you prefer" and would halve any name
+# with a connector inside it; a general prep-stripper would have to be trusted
+# never to reach "apple cider vinegar". A named phrase cannot reach anything
+# it does not name — which matters most for an EXCLUDE filter, where
+# under-stripping is visible and annoying while over-stripping silently merges
+# two ingredients and hides recipes the cook never meant to exclude.
+#
+# SMOKED, ROASTED AND TOASTED ARE IN THE LIST, and Helen's reasoning settles
+# the category rather than the three entries it names: "No one is going to
+# dislike sesame oil but not toasted sesame oil, and this isn't an allergen
+# avoider tool." The distinction those words mark is real when you are
+# SEARCHING — smoked haddock is a different thing to buy, which is exactly why
+# `modifiers` still refuses to strip them for everyone — but this vocabulary
+# serves AVOIDANCE, where the only question is "does this dish contain the
+# thing I don't like", and both forms answer yes. Named phrase by phrase here
+# rather than added to `modifiers`, because a modifier fires on every entry
+# beginning with the word, everywhere, while a named phrase reaches only
+# itself: "smoked haddock" and "dry roasted peanuts" are not keys and come
+# through exactly as written.
+#
+# FOUR OF THE #273 KEYS ALSO OCCUR IN main_ingredients, so the include picker
+# — which goes through the same buildMasterList — sees them too: "roasted
+# peanuts" becomes peanuts, "smoked mackerel fillets" becomes mackerel,
+# "chicken thighs and drumsticks" becomes chicken, "cooked chestnuts" becomes
+# chestnuts, in the include list as well as the exclude one. Recorded rather
+# than quietly accepted: the ruling above was made about avoidance, and
+# whether the same merge is right for the include picker is a separate
+# question nobody has been asked. If the answer turns out to be no, the fix is
+# to run this list over the derived vocabulary only.
+#
+# KEYS ARE THE POST-STRIP FORM — what an entry looks like once the quantity,
+# measure-phrase, trailing-phrase and modifier strips have run, because that
+# is the form applyAlias() is handed. "chopped almonds or whatever you prefer"
+# is keyed as "almonds or whatever you prefer"; "sorrel or more to taste" as
+# "sorrel or more". Every key below was checked against the real derived
+# vocabulary of a build — a key matching nothing would sit here inert while
+# looking like it was doing something.
+#
+# APPLIES TO BOTH SIDES. The picker's vocabulary and each recipe row's own
+# entries go through the one buildMasterList, so a row that lists "beef or
+# venison stock" carries beef stock and venison stock too — and exclusion,
+# being set membership, only works because both sides were rewritten.
 # -----------------------------------------------------------------------------
 aliases:
   five-spice powder: five-spice
+  # GitHub issue #273 — the derived vocabulary's compounds and prep states.
+  almonds or whatever you prefer: almonds
+  barley or brown rice miso: miso
+  beef or venison stock: [beef stock, venison stock]
+  black sesame seeds and fresh coriander leaves: [black sesame seeds, fresh coriander leaves]
+  bone-in chicken thighs: chicken thighs
+  boneless skinless chicken breast: chicken breast
+  chicken thighs and drumsticks: chicken
+  coconut oil or olive oil: [coconut oil, olive oil]
+  cooked and peeled beetroot: beetroot
+  cooked chestnuts: chestnuts
+  crème fraîche or double cream: [crème fraîche, double cream]
+  crème fraîche or single cream: [crème fraîche, single cream]
+  flatbreads or rice: [flatbreads, rice]
+  flavouring or fruit: []
+  fresh or frozen cranberries: cranberries
+  grated fresh galangal: fresh galangal
+  grated fresh ginger: fresh ginger
+  grated parmesan: parmesan
+  greens like broccoli and pak choi: [broccoli, pak choi]
+  groundnut or canola oil: [groundnut oil, canola oil]
+  handful of fresh chives and/or parsley: [fresh chives, parsley]
+  large handful each of tarragon and flat-leaf parsley: [tarragon, flat-leaf parsley]
+  lemon or 30 ml lemon juice: lemon
+  roasted peanuts: peanuts
+  salmon or trout fillets: [salmon, trout fillets]
+  salt and plenty of pepper: [salt, pepper]
+  sea salt and freshly ground black pepper: [sea salt, black pepper]
+  seasoning and flavourings — see note: []
+  smoked mackerel fillets: mackerel
+  sorrel or more: sorrel
+  steamed white or sticky rice: rice
+  toasted sesame oil: sesame oil
+  vegetable stock powder or 1 organic vegetable stock cube: vegetable stock
+  woody herb sprigs such as thyme or rosemary: [thyme, rosemary]
 
 # -----------------------------------------------------------------------------
 # Display names — the entry on the left (a master-list/alias TARGET, after

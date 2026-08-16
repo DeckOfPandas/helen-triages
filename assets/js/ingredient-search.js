@@ -92,15 +92,31 @@
       return fold(String(w).toLowerCase());
     }));
 
-    // Whole-phrase collapses ("five-spice powder" -> "five-spice") — folded
-    // keys so "Five-Spice Powder" still matches. See _data/ingredient_words.yml.
+    // Whole-phrase rewrites, in three forms — a name renames ("five-spice
+    // powder" -> "five-spice"), a list SPLITS ("beef or venison stock" ->
+    // beef stock + venison stock), an empty list DROPS. Folded keys, so
+    // "Five-Spice Powder" still matches. Normalised to a list here so there
+    // is one shape downstream and the YAML can keep writing a bare name where
+    // a bare name reads better. See _data/food/ingredient_words.yml for what
+    // is in it and, more importantly, for why it is a named list and not a
+    // rule.
     var aliasMap = {};
     Object.keys(vocabulary.aliases || {}).forEach(function (key) {
-      aliasMap[fold(key.toLowerCase())] = vocabulary.aliases[key];
+      var becomes = vocabulary.aliases[key];
+      aliasMap[fold(key.toLowerCase())] =
+        Array.isArray(becomes) ? becomes.map(String) : [String(becomes)];
     });
 
+    // Returns an ARRAY, always — an unaliased entry is itself, alone, which
+    // is what keeps this a no-op on every entry the list doesn't name. Both
+    // vocabularies are handed to it, so a phrase that appears in
+    // main_ingredients as well as in `item:` text is rewritten in the include
+    // picker too; the YAML names the four that currently do.
+    // hasOwnProperty rather than a truthiness test: an empty list is a real
+    // answer here (drop the entry), not a missing one.
     function applyAlias(ing) {
-      return aliasMap[fold(ing.toLowerCase())] || ing;
+      var key = fold(ing.toLowerCase());
+      return Object.prototype.hasOwnProperty.call(aliasMap, key) ? aliasMap[key] : [ing];
     }
 
     // Button label overrides, keyed by the match key they relabel — kept
@@ -123,19 +139,22 @@
       return words.join(' ');
     }
 
-    // --- GitHub issue #273: the derived vocabulary's three extra strips ------
+    // --- GitHub issue #273: what the DERIVED vocabulary needs extra ---------
     //
     // The exclude picker's vocabulary is derived from `item:` free text, not
     // from the curated main_ingredients, so it arrives carrying quantities
     // ("1 tsp salt"), portion phrasings ("a good pinch of salt") and method
     // notes ("herbs to taste"). All three name a real ingredient with
     // something in front of or behind it; none of them is a different
-    // ingredient. See _data/food/ingredient_words.yml for the word lists and
-    // for why each one is a list of literal phrases rather than a rule.
+    // ingredient. Three strips below. The entries that name TWO ingredients
+    // at once ("beef or venison stock") or none at all need naming rather
+    // than stripping, and are handled by `aliases` above — same mechanism as
+    // "five-spice powder", widened to take a list. See
+    // _data/food/ingredient_words.yml for the word lists and for why each one
+    // is literal phrases rather than a rule.
     //
     // Every one of these is a no-op on a clean entry, which is what lets
-    // buildMasterList stay the single door both vocabularies go through —
-    // the include picker runs over main_ingredients and comes out unchanged.
+    // buildMasterList stay the single door both vocabularies go through.
 
     // A quantity token is digits and/or vulgar fractions and the characters
     // that join them, and NOTHING else: "1", "¼–½", "4–5.5" qualify;
@@ -228,10 +247,18 @@
     // every lowercase one, so "Chinese five spice" would jump ahead of
     // "chai", "cheddar" and "cheese" instead of sitting between "chestnuts"
     // and "chives" where it belongs.
+    //
+    // One raw string can yield more than one entry, or none — an alias may be
+    // a split or a drop as well as a rename, so applyAlias returns a list and
+    // this flattens it. It runs AFTER the strips because its keys are the
+    // post-strip forms: "chopped almonds or whatever you prefer" is keyed as
+    // "almonds or whatever you prefer".
     function buildMasterList(rawIngredientStrings) {
       var set = new Set();
       rawIngredientStrings.forEach(function (ing) {
-        set.add(applyAlias(normaliseEntry(ing)));
+        applyAlias(normaliseEntry(ing)).forEach(function (entry) {
+          set.add(entry);
+        });
       });
       return Array.from(set).sort(function (a, b) {
         return a.toLowerCase().localeCompare(b.toLowerCase());
