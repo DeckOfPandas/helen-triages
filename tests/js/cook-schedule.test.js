@@ -23,11 +23,22 @@
 // real data through a stub-DOM harness either side of it; these tests are the
 // permanent record.
 //
-// SEVERAL TESTS PIN BEHAVIOUR THAT IS ARGUABLY WRONG, and say so in a comment
-// where they do. They were written during a refactor whose whole point was to
-// change nothing, so a known oddity is recorded here rather than quietly
-// corrected — a behaviour change hidden inside a refactor is exactly what makes
-// refactors dangerous.
+// THREE TESTS ONCE PINNED BEHAVIOUR THAT WAS WRONG, and none do now. They were
+// written during a refactor whose whole point was to change nothing, so each
+// oddity found on the way was recorded here rather than quietly corrected — a
+// behaviour change hidden inside a refactor is what makes refactors dangerous.
+// All three were then fixed in their own commits, and each of those tests now
+// asserts the corrected behaviour and says when it changed:
+//
+//   hhmm    emitted a singular "min" against house style          (2026-08-15)
+//   clock   said "the day before" however far back it wrapped     (2026-08-15)
+//   resolve dropped flat_add_max from by_doneness' upper bound    (#245)
+//
+// Kept as a list rather than deleted because the PATTERN is the useful part:
+// extracting a module is when you find out what it actually does, and the
+// discipline is to write the oddity down, ship the refactor, then fix it
+// separately. If you pin something new here, add it to this list so the next
+// person can tell a deliberate record from an accident.
 // =============================================================================
 'use strict';
 
@@ -45,6 +56,17 @@ const RATE = {
 const RATE_WITH_MAX = {
   id: 'lowslow', name: 'Low and slow', shape: 'rate', group: 'G',
   rate_min: 55, rate_max: 75, flat_add: 10, flat_add_max: 15
+};
+
+// Same job as RATE_WITH_MAX above, but for the by_doneness shape (GitHub
+// issue #245): the two branches are meant to agree on the flat_add_max /
+// flat_add / 0 fallback chain, so this fixture mirrors that one rather than
+// inventing a new shape for the same check.
+const BY_DONENESS_WITH_MAX = {
+  id: 'haunch', name: 'Haunch, high heat then reduce', shape: 'by_doneness', group: 'G',
+  by_doneness: {
+    rare: { rate_min: 55, rate_max: 75, flat_add: 10, flat_add_max: 15 }
+  }
 };
 
 const TOTAL = {
@@ -257,17 +279,19 @@ test('by_doneness: an unknown level falls back to rare rather than producing NaN
   assert.strictEqual(r.lo, 40 * 2 + 20);
 });
 
-test('by_doneness: the upper end uses flat_add, NOT flat_add_max', () => {
-  // Deliberately different from the `rate` branch above, and pinned here so the
-  // asymmetry is visible rather than latent. No by_doneness row in the data
-  // carries a flat_add_max today, so nothing on the page is currently wrong —
-  // but adding one would be ignored silently. Reported, not fixed.
-  const odd = {
-    shape: 'by_doneness',
-    by_doneness: { rare: { rate_min: 40, rate_max: 50, flat_add: 20, flat_add_max: 30 } }
-  };
-  const r = CS.resolve(odd, 1, 'rare', [odd]);
-  assert.strictEqual(r.hi, 50 + 20);
+test('by_doneness: flat_add_max applies to the upper end when the data states one', () => {
+  // GitHub issue #245. This used to add flat_add to BOTH ends and never look
+  // at flat_add_max, so an asymmetric upper bound was silently dropped — the
+  // same fixture as RATE_WITH_MAX above, on the by_doneness shape, because
+  // the two branches are meant to agree and this is the case that would have
+  // caught the divergence. Not theoretical: venison's haunch
+  // (haunch_high_heat_start_then_reduce in _data/food/cooking_methods.yml,
+  // mirrored by BY_DONENESS_WITH_MAX) is a live by_doneness row with
+  // flat_add on both its levels, and is the row most likely to gain an
+  // asymmetric flat_add_max next.
+  const r = CS.resolve(BY_DONENESS_WITH_MAX, 1, 'rare', [BY_DONENESS_WITH_MAX]);
+  assert.strictEqual(r.lo, 55 + 10);
+  assert.strictEqual(r.hi, 75 + 15);
 });
 
 test('by_doneness: underscores in the level become spaces in the aside', () => {
@@ -414,9 +438,11 @@ test('scheduleBack: eating at 00:30 means going in the PREVIOUS DAY', () => {
 });
 
 test('scheduleBack: a cook longer than a day still returns a real number of minutes', () => {
-  // 43 hours of brisket for a 2pm Sunday lunch starts on Friday evening. The
-  // arithmetic is right (-1720 minutes is Friday 19:20); it is clock() that
-  // then under-reports it as "the day before" — see the pinned bug above.
+  // 43 hours of brisket for a 2pm Sunday lunch starts on Friday evening, and
+  // this asserts the ARITHMETIC only: -1720 minutes. Turning that into words
+  // is clock()'s job, and it used to under-report anything past 24 hours as
+  // "the day before" — fixed, and covered by clock()'s own day-counting test
+  // above rather than restated here.
   const s = CS.scheduleBack(43 * 60, 43 * 60, 840, 20);
   assert.strictEqual(s.inAt, 820 - 43 * 60);
 });
