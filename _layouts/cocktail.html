@@ -3,85 +3,153 @@ layout: default
 ---
 
 {% comment %} ─────────────────────────────────────────────────────────────────
-  COCKTAIL PAGE — SKELETON. Deliberately not modelled on recipe.html.
+  COCKTAIL PAGE. Deliberately not modelled on recipe.html.
 
   A food recipe is a PROCEDURE: ordered steps, prep and cook time split, a
   short-method toggle, main_ingredients triaged by the substitution test. A
-  cocktail is closer to a FORMULA — ratio, glass, garnish, one line of method —
-  and forcing it into food's decision-support shape is the specific mistake the
-  architecture handover warns against.
+  cocktail is closer to a FORMULA — a spirit bill in fixed proportions, a
+  glass, a garnish, a short build — and forcing it into food's decision-support
+  shape is the specific mistake the architecture handover warns against.
 
-  So this renders the two fields already known to be real (glass, garnish), the
-  full untriaged ingredient list, and the body. It invents no schema beyond
-  that. `title` is the only field it assumes.
+  THE SCHEMA THIS RENDERS CAME OUT OF THREE REAL DRINKS (Julien Sorel,
+  Sazerac, Cobra's Fang), the way food's came out of real recipes — not from
+  general knowledge about cocktails. See HANDOVER's cocktails section for what
+  each field is for, what is settled and what is still open.
 
-  When the real recipes land, this is where their anatomy gets built — and the
-  argument about what a cocktail page should show belongs there, over real
-  drinks, the way main_ingredients was argued out over real recipes.
+  EMPTY ARRAY IS TRUTHY IN LIQUID. Only nil and false are falsy, so every
+  list-gated section below tests `.size > 0` rather than the bare value. This
+  is not hypothetical here: `garnish: []` is real, live data on sazerac.md
+  (the drink genuinely has no garnish), and a bare truth test would draw a
+  GARNISH heading over blank space. Same bug as the 49 food drafts with
+  `notes: []` — see tests/test_site_config.py's
+  test_list_sections_are_conditioned_on_size_not_truthiness.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
 <article class="cocktail">
 
   <h1 class="cocktail-title">{{ page.title }}</h1>
 
-  {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline }}</p>{% endif %}
+  {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
-  {% comment %} Glass and garnish are stated in the handover as real fields.
-     Rendered only when present, so a file that omits them is not broken.
+  {% comment %} Glass is a scalar; garnish is a LIST — Cobra's Fang carries a
+     mint sprig AND a lime wheel, so the single-value shape the first sketch
+     assumed was wrong the moment real data arrived.
   {% endcomment %}
-  {% if page.glass or page.garnish %}
+  {% if page.glass or page.garnish.size > 0 %}
     <ul class="cocktail-meta">
       {% if page.glass %}<li><strong>Glass</strong> <span>{{ page.glass }}</span></li>{% endif %}
-      {% if page.garnish %}<li><strong>Garnish</strong> <span>{{ page.garnish }}</span></li>{% endif %}
+      {% if page.garnish.size > 0 %}
+        <li><strong>Garnish</strong> <span>{{ page.garnish | join: ", " }}</span></li>
+      {% endif %}
     </ul>
   {% endif %}
 
   {% comment %} The ingredient list is FULL, not triaged the way food's
      main_ingredients is — no completeness/substitution split, no pantry
-     demotion. Both the flat `ingredients:` shape and food's grouped
-     `ingredient_groups:` shape are accepted for now, because which one real
-     cocktails need has not been settled.
+     demotion. Four keys, each earning its place from the real data:
+
+       amount     the quantity AS WRITTEN ("0.5 oz", "3 dashes") — the display
+                  string, which carries units a number cannot
+       ml         the same quantity in millilitres, for ratios and scaling.
+                  ABSENT on purpose where the unit is not volumetric — a dash
+                  is not 0.8 ml in any way worth writing down. Duplicated on
+                  purpose and guarded by a test, the same idiom
+                  internal_temperatures.yml uses for its display/numeric pairs.
+       item       what you actually pour, brand-led ("Appleton Estate Reserve")
+       generic    what you would ever FILTER by ("aged Jamaican rum"). Nothing
+                  reads it yet; it exists so that a future "what can I make
+                  tonight" is possible at all, since no rule can derive "dark
+                  rum" from "Skippers".
+       suggestion an alternative bottle or category, per ingredient
   {% endcomment %}
-  {% if page.ingredients %}
+  {% if page.ingredients.size > 0 %}
     <h2 class="cocktail-section-heading">Ingredients</h2>
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
         {% if item.item %}
-          <li>{% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span> {% endif %}{{ item.item }}</li>
+          <li>
+            {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span> {% endif %}
+            <span class="cocktail-item">{{ item.item }}</span>
+            {% if item.generic and item.generic != item.item %}
+              <span class="cocktail-generic">{{ item.generic }}</span>
+            {% endif %}
+            {% if item.suggestion %}
+              <span class="cocktail-suggestion">{{ item.suggestion }}</span>
+            {% endif %}
+          </li>
         {% else %}
-          <li>{{ item }}</li>
+          <li><span class="cocktail-item">{{ item }}</span></li>
         {% endif %}
       {% endfor %}
     </ul>
   {% endif %}
 
-  {% comment %} A cocktail method is usually one line, so `method:` is rendered
-     as prose when it is a string and as a list when it is a list. Which of the
-     two the schema settles on is a question for the real recipes.
+  {% comment %} Method is an ORDERED LIST, not the single line the original
+     scaffold assumed: the Sazerac's five steps are genuinely sequential
+     (coat the glass, shake the rest, discard the wash, strain in), and get
+     the wrong drink if reordered. The string form is still accepted for a
+     one-step build rather than forcing `- ` on a single line.
   {% endcomment %}
-  {% if page.method %}
+  {% if page.method.size > 0 and page.method.first %}
     <h2 class="cocktail-section-heading">Method</h2>
-    {% if page.method.first %}
-      <ol class="cocktail-method">
-        {% for step in page.method %}<li>{{ step }}</li>{% endfor %}
-      </ol>
-    {% else %}
-      <p class="cocktail-method">{{ page.method }}</p>
-    {% endif %}
+    <ol class="cocktail-method">
+      {% for step in page.method %}<li>{{ step | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endfor %}
+    </ol>
+  {% elsif page.method %}
+    <h2 class="cocktail-section-heading">Method</h2>
+    <p class="cocktail-method">{{ page.method | markdownify | remove: '<p>' | remove: '</p>' }}</p>
   {% endif %}
 
-  {% if page.notes %}
+  {% comment %} `to_serve` is PRESENTATION, not a further instruction —
+     "over crushed ice, with a straw" — Helen's call, 2026-08-16. Finishing
+     ACTIONS ("top with champagne", "squeeze the twist over the drink") are
+     method steps and live above, which is where the Sazerac's own data
+     already put them. None of the first three drinks has a real one.
+  {% endcomment %}
+  {% if page.to_serve %}
+    <h2 class="cocktail-section-heading">To serve</h2>
+    <p class="cocktail-to-serve">{{ page.to_serve | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+  {% endif %}
+
+  {% comment %} Notes take food's polymorphic shape — {label, text} or a bare
+     string — for the same reason: a note jotted while the drink is still a
+     draft does not have to carry a label yet.
+  {% endcomment %}
+  {% if page.notes.size > 0 %}
     <h2 class="cocktail-section-heading">Notes</h2>
-    {% for note in page.notes %}<p class="note">{{ note | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endfor %}
+    <div class="notes {% if page.notes.size == 1 %}notes--single{% endif %}">
+      {% for note in page.notes %}
+        <div class="note">
+          <span class="note-label">{% if note.label %}{{ note.label }}{% else %}note{% endif %}</span>
+          {% if note.text %}{{ note.text | markdownify }}{% else %}{{ note | markdownify }}{% endif %}
+        </div>
+      {% endfor %}
+    </div>
   {% endif %}
 
   {% if content != '' %}
     <div class="cocktail-body-content">{{ content }}</div>
   {% endif %}
 
-  {% if page.source %}
+  {% comment %} AN EMPTY STRING IS TRUTHY TOO, not just an empty array. All
+     three drinks carry source as a known-unfilled empty string, and gating
+     this footer on the bare value drew a "Source:" line with nothing after
+     it on every one of them. Test the value against "", not its existence.
+
+     This comment does not quote the bad Liquid, deliberately: tag delimiters
+     are PARSED inside a comment block, so writing the offending if-tag here
+     is itself a syntax error. It broke this build once, exactly as
+     _layouts/recipe.html's own comments warn.
+  {% endcomment %}
+  {% if page.source != "" or page.source_url != "" %}
     <div class="cocktail-footer">
-      <p class="cocktail-source">Source: {{ page.source }}</p>
+      <p class="cocktail-source">
+        {% if page.source_url %}
+          Source: <a href="{{ page.source_url }}">{{ page.source | default: page.source_url }}</a>
+        {% else %}
+          Source: {{ page.source }}
+        {% endif %}
+      </p>
     </div>
   {% endif %}
 
