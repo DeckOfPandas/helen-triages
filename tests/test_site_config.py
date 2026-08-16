@@ -572,6 +572,58 @@ def test_every_shipped_svg_is_matched_by_the_injection_pattern():
     )
 
 
+def test_every_shipped_svg_actually_parses():
+    """An SVG is XML, and a browser that cannot parse it renders NOTHING.
+
+    GitHub issue #241, and it is a good demonstration of why "the file looks
+    right" is not the same as "the file works". The favicon was changed to a
+    black H on the brand magenta, and the fill values were correct -- but the
+    comment explaining the choice used ` -- ` as a dash, the way a commit
+    message here does. A double hyphen is illegal inside an XML comment, so
+    the whole document failed to parse, every browser silently kept showing
+    the previously cached icon, and the change appeared simply not to have
+    happened. It was diagnosed only when Helen opened the .svg directly and
+    got a parser error page.
+
+    Nothing else could have caught it. The build does not parse SVGs, and
+    test_every_shipped_svg_is_matched_by_the_injection_pattern above reads
+    each file as TEXT, looking for an opening tag -- which a malformed file
+    still has.
+
+    HOUSE STYLE POINT worth keeping with the test: prose in this repo uses an
+    em dash (HANDOVER §5). The ASCII `--` exception is for COMMIT MESSAGES
+    specifically. Inside an SVG comment it is not merely off-style, it is a
+    parse error.
+
+    Covers _includes/icons/ as well as assets/img/: those partials are
+    inlined straight into the page by default.html, so a malformed one takes
+    the surrounding markup with it rather than just failing to draw.
+    """
+    import xml.dom.minidom
+
+    svgs = sorted(IMG_DIR.rglob("*.svg")) + sorted((ROOT / "_includes" / "icons").rglob("*.svg"))
+    assert svgs, (
+        f"No SVGs found under {IMG_DIR} or _includes/icons/ — either the "
+        f"artwork has moved, or this scan has stopped finding it, and a scan "
+        f"that finds nothing passes."
+    )
+
+    broken = []
+    for path in svgs:
+        try:
+            xml.dom.minidom.parse(str(path))
+        except Exception as exc:
+            broken.append(f"{path.relative_to(ROOT)}: {exc}")
+
+    assert not broken, (
+        "SVG(s) that are not well-formed XML, so a browser will render "
+        "nothing at all for them:\n  " + "\n  ".join(broken)
+        + "\n\nThe usual cause is `--` inside a <!-- comment -->, which is "
+          "illegal in XML. Use an em dash — in artwork comments; the ASCII "
+          "double hyphen is a commit-message convention only."
+    )
+
+
 def test_site_key_is_derived_in_exactly_one_place():
     """Same discipline as the base URL, for the same reason.
 
