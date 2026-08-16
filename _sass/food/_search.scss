@@ -195,10 +195,25 @@
   // row is the only thing on the page that reads as "attached to the section
   // above" rather than as its own left-edge-anchored row, so it gets the one
   // centred treatment on the page.
+  // ALIGNED UNDER THE HEADING, NOT CENTRED IN THE ROW -- Helen, 2026-08-16:
+  // "move the link left, to be centered under I KNOW WHAT I WANT". It was
+  // centred across the section's full width, which put it under the middle of
+  // the INPUT rather than anywhere near the label.
+  //
+  // flex-start, plus the same margin-right the label above carries, so the
+  // link starts exactly where "I KNOW WHAT I WANT" starts. Worth being
+  // straight about what that is and is not: the two strings are close enough
+  // in width that this reads as centred under the heading, but it is an
+  // ALIGNMENT, not a centring. Truly centring under a label whose width
+  // changes with its own text would mean making that label a shared grid
+  // column (the .site-logo max-content trick, HANDOVER 13.8) so both rows
+  // size to whichever is wider -- a bigger change, and only worth it if the
+  // approximation looks wrong once the label reads "(hide leave out)", which
+  // is much shorter than the heading.
   .exclude-reveal-row {
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     gap: $space-md;
   }
@@ -224,11 +239,23 @@
     text-decoration: underline;
     transition: color 0.1s ease-in-out;
 
-    &:hover { color: $color-text; }
+    // ONE TREATMENT FOR HOVER, CLICK AND KEYBOARD FOCUS -- Helen, 2026-08-16:
+    // "use the same link styling on mouseover and click". They were three
+    // different looks: hover darkened the text, focus painted a grey box
+    // behind it and removed the outline, and a click got whichever the
+    // browser decided applied. Now all three darken, and nothing else moves.
+    &:hover,
+    &:active,
+    &:focus-visible { color: $color-text; }
 
+    // The keyboard indicator stays, because a colour shift alone is not one --
+    // it is the same shift the mouse already causes, so it says "you are
+    // hovering", not "you are here". An outline rather than the old background
+    // fill: it does not change the element's apparent size or weight, so the
+    // focused link is still the same link.
     &:focus-visible {
-      outline: none;
-      background-color: rgba($color-text, 0.15);
+      outline: 2px solid $color-exclude-active;
+      outline-offset: 2px;
     }
   }
 
@@ -244,7 +271,14 @@
   // _category-labels.scss in food.scss, which happens to be true today but
   // isn't what anyone reading this rule in isolation could tell.
   .btn-clear-inline {
-    color: inherit;
+    // $color-exclude-active, the same $darken-active treatment every other
+    // section's clear button gets from its own root hue -- Helen, 2026-08-16.
+    // This used to be `inherit`, which was the safe answer when the concern
+    // was only "don't let I KNOW WHAT I WANT's hot orange leak in through the
+    // nesting". Naming the colour outright settles that better than inherit
+    // did: it cannot be reached by the parent rule described above, and it
+    // says which hue this section owns instead of merely which one it refuses.
+    color: $color-exclude-active;
 
     &:hover { color: $color-text; }
   }

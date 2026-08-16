@@ -258,6 +258,15 @@ $color-section-underline-2: $color-vibrant-violet;   // the second, lower rule
 // otherwise borrows none.
 $color-electric-cobalt: #0047FF;
 
+// The exclude section's own -active, on the same $darken-active every other
+// section's root hue gets. DECLARED HERE, not up with its five siblings,
+// because Sass resolves a file top to bottom: written beside them it referred
+// to $color-electric-cobalt 170 lines before this line defines it, and the
+// build died with "Undefined variable" pointing at the USE rather than at the
+// gap. The five siblings can sit together because their roots are declared
+// above them; this one cannot, and the split is the price of that.
+$color-exclude-active: darken($color-electric-cobalt, $darken-active);
+
 // Step numerals in the method, and the top-level bullets in the short method.
 // Body text colour, not a hue of their own. They were violet, then a darkened
 // cerulean; both spent colour on something that is already unmistakable by
