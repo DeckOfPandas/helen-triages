@@ -37,19 +37,33 @@
 // refuse to answer at all). Cards let a row say something different without
 // leaving a hole in a grid.
 
+// The page's opening sentence, under the title and above the first protein
+// heading. Measure-limited like every other run of prose here; the 4.5rem of
+// air below it belongs to .recipe-section-heading, which is what separates this
+// band from the calculator (see the template -- there is no <hr>).
+.ct-strapline {
+  font-size: 1.06rem;
+  line-height: 1.5;
+  max-width: 62ch;
+  margin: $space-xl 0 0 0;
+}
+
 // TWO GRID ROWS, NOT FOUR FLEX COLUMNS. Helen: "the time calculator box labels
 // are misaligned vertically." They were: the fields were flex columns aligned
 // at their BOTTOM edge, which lines the inputs up perfectly and lets the labels
 // float to wherever their own height puts them -- so "Eating at (optional)",
-// being the one label that wraps to two lines, sat a line higher than its
+// being the one label that wrapped to two lines, sat a line higher than its
 // neighbours.
 //
-// Fixing the symptom (a min-height on the label) would hold only until someone
-// wrote a longer label. A grid with an explicit label row and input row makes
-// the alignment structural: every label is in row 1 and every input in row 2,
-// however many lines either takes. `display: contents` on the field lets the
-// label and its input become grid items directly while keeping the <label>
-// wrapping its own <input>, so the two stay associated without a `for`.
+// That label is gone with its box (#244) and there are two fields left, both
+// one-liners, so nothing is currently misaligned -- but the grid stays. Fixing
+// the symptom (a min-height on the label) would only have held until someone
+// wrote a longer label, and that is still true of the next field anyone adds. A
+// grid with an explicit label row and input row makes the alignment structural:
+// every label is in row 1 and every input in row 2, however many lines either
+// takes. `display: contents` on the field lets the label and its input become
+// grid items directly while keeping the <label> wrapping its own <input>, so
+// the two stay associated without a `for`.
 .ct-form {
   display: grid;
   grid-auto-flow: column;
@@ -57,7 +71,9 @@
   grid-template-rows: auto auto;
   // Row gap between the labels and their inputs, column gap between fields.
   gap: $space-sm $space-xl;
-  margin: 0 0 $spacing-block-gap 0;
+  // No bottom margin: .ct-controls owns the gap between the last input and the
+  // rule that closes the band.
+  margin: 0;
 }
 
 .ct-field {
@@ -75,19 +91,6 @@
     color: $color-text;
     -webkit-text-stroke: $emboss-stroke $color-label-stroke;
     @include punched(raised);
-
-    // "(optional)" carries the one instruction that matters most about this
-    // form -- Helen: "don't enforce giving an end time". Set quieter than its
-    // label so the form reads as "weight, and optionally more" at a glance.
-    em {
-      font-family: $font-body;
-      font-style: italic;
-      text-transform: none;
-      letter-spacing: 0;
-      -webkit-text-stroke: 0;
-      text-shadow: none;
-      color: $color-clear-text;
-    }
   }
 
   input, select {
@@ -108,46 +111,20 @@
   }
 }
 
-// The answer to the question you just asked, so it gets room and a size --
-// Helen: "it could use some tasteful vertical space in the top sections, above
-// the cards." The page had form, summary, table and cards stacked at one
-// rhythm, which read as one undifferentiated column. Now there are three
-// bands: the controls, the answer and the table you choose from, and the cards
-// under their own heading.
-// THE TOP OF THE PAGE NEEDED AIR. Helen: "we need more vertical space at the
-// top... or at least some change to help me breathe." Title, summary, "Done
-// at", four labels and four inputs were arriving at one rhythm inside about
-// 300px, so nothing had a chance to read as a separate step.
+// THE FINISHING TEMPERATURE, DIRECTLY UNDER THE PROTEIN HEADING AND ABOVE THE
+// CONTROLS — the opposite of where this file put it until 2026-08-16, and the
+// note that used to sit here argued the opposite case. Worth being explicit
+// about why both were right in turn. Below the form it was an OUTPUT: the page
+// opened on a summary sentence, then this figure, then four boxes, and it was
+// answering a question nobody had asked yet (Helen: "it makes no sense where it
+// is"). Under a heading that reads BEEF it is a caption to the heading, not a
+// result of the form: the one figure that holds however you cook it and
+// whatever it weighs. Issue #243, Helen's sketch.
 //
-// The gaps now say what belongs to what: the two summary lines sit close
-// together because they are one answer, and the whole block is held well clear
-// of the controls beneath it — which is the junction that was tightest, the
-// bold "Done at" line landing directly on top of the WHAT label.
-.ct-summary {
-  font-size: 1.06rem;
-  line-height: 1.5;
-  // Clear of the title above and of the controls below in its own right: it is
-  // the sentence that explains what the four boxes are for, and it only does
-  // that job if it isn't crowded onto them.
-  margin: $space-xl 0 $spacing-section-top 0;
-  max-width: 62ch;
-}
-
-// The finishing temperature, now BELOW the controls because it is a result of
-// them. Figure left, way-out right: the two are different kinds of thing -- one
-// is the answer, one is an admission that this page shows a single doneness at
-// a time -- and pushing them apart stops the link reading as part of the
+// Figure left, way-out right: the two are different kinds of thing -- one is
+// the temperature, one is an admission that this page shows a single doneness
+// at a time -- and pushing them apart stops the link reading as part of the
 // sentence.
-// Controls plus the figure they produce, as one band closed by a rule. The rule
-// used to sit between the two, which grouped the finishing temperature with the
-// table below -- something it has nothing to do with -- and is why it read as
-// lost rather than as an answer.
-.ct-controls {
-  padding: 0 0 $spacing-block-gap 0;
-  border-bottom: 1px solid $color-border;
-  margin: 0 0 $spacing-section-top 0;
-}
-
 .ct-doneat {
   display: flex;
   flex-wrap: wrap;
@@ -155,9 +132,14 @@
   justify-content: space-between;
   gap: $space-md;
   font-size: 1.06rem;
-  // No margin of its own: it closes the band, and the wrapper owns the gap
-  // between that band and the table.
-  margin: 0;
+  // Close under the heading (whose own 2rem does that side), a block gap clear
+  // of the first label below.
+  margin: 0 0 $spacing-block-gap 0;
+
+  // A protein with no published finishing temperature renders this empty, and
+  // an empty <p> keeping its bottom margin would open a gap where the line
+  // isn't.
+  &:empty { display: none; }
 
   a {
     font-family: $font-body;
@@ -165,6 +147,56 @@
     font-size: 0.88rem;
     white-space: nowrap;
   }
+}
+
+// The calculator line, closed by a rule. This is the second of the two rules
+// issue #243's sketch asks for, and the only one drawn: the first, between the
+// strapline and the protein heading, is already carried by the heading's own
+// treatment. This one earns a line because it separates a band of INPUTS from
+// the answers below, which no heading is labelling -- a different job from
+// separating two titled sections.
+//
+// The border is on this wrapper rather than on .ct-form so it still draws
+// whatever the form ends up holding; that is how it survived losing two of its
+// four fields without moving.
+//
+// THE TOP OF THE PAGE NEEDED AIR. Helen: "we need more vertical space at the
+// top... or at least some change to help me breathe." Title, summary, "Done
+// at", four labels and four inputs used to arrive at one rhythm inside about
+// 300px, so nothing had a chance to read as a separate step. Two boxes fewer
+// and a heading in the middle of it help; the section-sized gap below the rule
+// is the rest of it.
+.ct-controls {
+  padding: 0 0 $spacing-block-gap 0;
+  border-bottom: 1px solid $color-border;
+  margin: 0 0 $spacing-section-top 0;
+}
+
+// The "What" selector, lifted out of .ct-controls by issue #253 to sit above
+// the heading it retitles. No border and no section-sized gap of its own: the
+// heading immediately below already brings $spacing-section-top with it, and a
+// second value here would fight one that is already correct -- the same
+// adjacent-margin reasoning .tc-totop and .tc-crosslink-line follow on the
+// temperature charts.
+//
+// It keeps .ct-field for the label-above-control shape, so the two boxes still
+// look like one family despite now sitting either side of a heading. If they
+// ever stop matching, that is the thing to preserve.
+.ct-protein-pick {
+  margin: 0;
+}
+
+// The count of methods, which now leads the TABLE rather than the page: it is
+// the sentence the rows below it are seven of. It opened the page while the
+// controls needed a "why" above them -- Helen: "otherwise you get some
+// selection boxes with no Why" -- and the strapline and protein heading carry
+// that now.
+.ct-summary {
+  font-size: 1.06rem;
+  line-height: 1.5;
+  // Tight to the table it introduces; the gap above it belongs to .ct-controls.
+  margin: 0 0 $space-xl 0;
+  max-width: 62ch;
 }
 
 #ct-table {
@@ -258,7 +290,13 @@
   margin: 0 0 $space-sm 0;
 }
 
-.ct-stages, .ct-schedule {
+// Was `.ct-stages, .ct-schedule`. .ct-schedule was the in-at / out-at /
+// rest-until list, which no card emits any more (#244), and a rule for a class
+// nothing writes is drift -- test_every_class_we_emit_has_a_rule_in_the_
+// stylesheet only checks the other direction, so this end is by hand. The `em`
+// inside the list went with it: it styled "(or 15:20 if it runs to the quicker
+// end)", and a stage row has no em.
+.ct-stages {
   list-style: none;
   padding: 0;
   margin: 0 0 $space-md 0;
@@ -281,11 +319,6 @@
       color: $color-clear-text;
       flex-shrink: 0;
     }
-
-    em {
-      font-size: 0.78rem;
-      color: $color-clear-text;
-    }
   }
 }
 
@@ -296,19 +329,11 @@
   margin: 0 0 $space-sm 0;
 }
 
-.ct-meta {
-  font-size: 0.8rem;
-  margin: 0 0 $space-xs 0;
-
-  span {
-    font-family: $font-headings;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: $letter-spacing-label;
-    color: $color-clear-text;
-    margin-right: $space-sm;
-  }
-}
+// .ct-meta was here: a label/value line on the card that no version of
+// cook-timer.js in this repo emits -- it predates the card's current head, and
+// went unnoticed because nothing checks the stylesheet for rules with no
+// markup. Removed 2026-08-16 while auditing this file for the same thing after
+// #244.
 
 // Caveats and notes, as ONE closing block rather than two paragraphs at full
 // spacing -- which gave a footnote the same presence as the answer above it.
