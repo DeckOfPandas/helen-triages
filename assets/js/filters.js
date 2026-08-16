@@ -141,10 +141,19 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   /* Every piece of state clearAllFilters() empties, so the two cannot drift.
-     If you add a filter kind, add it here and there together. */
+     If you add a filter kind, add it here and there together.
+
+     isSearching IS ONE OF THEM, and it is the easiest to forget because it is
+     the only one that isn't a filter. It means "the ingredient box has text in
+     it and nothing has been chosen from the results yet" -- a half-finished
+     search rather than an applied filter. clearAllFilters() empties the box
+     and resets the flag, so leaving it out here hid the button while it still
+     had work to do: type "chi", get a pool of results, and no way to clear
+     them except deleting the text by hand. Helen found it, and it is the same
+     defect as the nameQuery one directly above, one box over. */
   function hasAnythingToClear() {
     return activeTags.size > 0 || activeStar !== null || activeIngredient !== null ||
-           activeMetaFilters.size > 0 || nameQuery !== '';
+           activeMetaFilters.size > 0 || nameQuery !== '' || isSearching;
   }
 
   // The shuffle itself is pure -- assets/js/recipe-list.js, tested directly
