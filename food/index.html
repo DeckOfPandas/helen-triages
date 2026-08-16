@@ -206,4 +206,9 @@ permalink: /food/
 
 <script src="{{ '/assets/js/ingredient-search.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/recipe-list.js' | relative_url }}"></script>
+{% comment %} filter-state.js before filters.js, same trap as the two above:
+   filters.js reads HTF.filterState at startup to apply `?star=…&tag=…`
+   (GitHub issue #40). Guarded by
+   tests/test_site_config.py::test_filter_state_js_loads_before_filters_js. {% endcomment %}
+<script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/filters.js' | relative_url }}"></script>

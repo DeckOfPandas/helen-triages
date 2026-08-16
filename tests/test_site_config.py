@@ -123,6 +123,30 @@ def test_recipe_list_js_loads_before_filters_js():
     )
 
 
+def test_filter_state_js_loads_before_filters_js():
+    """filters.js reads HTF.filterState at startup -- it must already exist.
+
+    Same trap as ingredient-search.js and recipe-list.js above, and worth
+    stating again because of how it fails rather than because the shape is
+    new. GitHub issue #40 made every taxonomy badge a link into
+    `/food/?star=…&tag=…`, and filters.js applies that query string in its
+    last few lines via HTF.filterState.parseQuery. Loaded the wrong way round,
+    the call throws once and the whole DOMContentLoaded handler dies with it:
+    no shuffle, no filter buttons, and `.recipe-list` never has its
+    `visibility: hidden` lifted -- a blank page, with the only evidence in a
+    console nobody has open.
+    """
+    html = read("food", "index.html")
+    filter_state_tag = re.search(r"<script src=[^>]*filter-state\.js", html)
+    filters_tag = re.search(r"<script src=[^>]*filters\.js", html)
+    assert filter_state_tag, "food/index.html no longer loads assets/js/filter-state.js."
+    assert filters_tag, "food/index.html no longer loads assets/js/filters.js."
+    assert filter_state_tag.start() < filters_tag.start(), (
+        "filter-state.js must load BEFORE filters.js, or "
+        "HTF.filterState won't exist yet when filters.js runs."
+    )
+
+
 def test_cook_schedule_js_loads_before_cook_timer_js():
     """cook-timer.js reads HTF.cookSchedule at startup -- it must already exist.
 
@@ -161,6 +185,70 @@ def test_cook_timer_js_holds_no_schedule_arithmetic():
             f"assets/js/cook-timer.js contains `{fragment}`. Schedule arithmetic "
             f"belongs in assets/js/cook-schedule.js (HTF.cookSchedule), covered by "
             f"tests/js/cook-schedule.test.js."
+        )
+
+
+# --- a badge is a control, not a caption -------------------------------------
+
+def test_recipe_badges_are_links_carrying_their_own_filter_value():
+    """GitHub issue #40. Every taxonomy badge is an <a> with data-tag/data-star.
+
+    Three separate things all rest on this one line of markup, and none of
+    them fails loudly if it regresses to a <span>:
+
+      1. KEYBOARD REACH. A <span> with a click handler is invisible to the tab
+         key and to a screen reader's link list. An <a href> is focusable and
+         announced for free, with no roles or tabindex to remember.
+      2. THE HANDLER'S INPUT. filters.js reads `badge.dataset.tag` /
+         `badge.dataset.star` -- both to route a click and to decide which
+         badges get `.badge--matched`. It used to match on the badge's TEXT,
+         which could not tell a mood badge from a star one.
+      3. THE FALLBACK. The href is what makes middle-click, open-in-new-tab
+         and copy-link-address work, and it is the entire mechanism on a
+         recipe page, where no script intercepts anything.
+
+    Asserted against the template rather than the built site so it holds
+    without a build, and covers both include sites at once -- food/index.html
+    and _layouts/recipe.html share this one partial.
+    """
+    html = read("_includes", "recipe_badges.html")
+
+    assert "<span class=\"badge" not in html, (
+        "_includes/recipe_badges.html emits a taxonomy badge as a <span> "
+        "again. It must be an <a>: a span is unreachable by keyboard and "
+        "carries no href for middle-click or open-in-new-tab to use."
+    )
+
+    for attr, kind in (("data-star", "star ingredient"), ("data-tag", "tag")):
+        tag_match = re.search(
+            r'<a\s[^>]*class="badge[^"]*"[^>]*\b' + attr + r'="[^"]*"[^>]*href="[^"]*"',
+            html,
+        )
+        assert tag_match, (
+            f"_includes/recipe_badges.html no longer emits an <a class=\"badge…\" "
+            f"{attr}=\"…\" href=\"…\"> for the {kind}.\n"
+            f"filters.js routes a badge click by reading {attr} off the element "
+            f"it was clicked on, and paints .badge--matched from the same "
+            f"attribute. Without it a badge is a caption again."
+        )
+
+    # The query grammar's own shape, at the one place it is written into a URL.
+    # url_encode specifically: it is Ruby's CGI.escape, so it spells a space as
+    # `+`, and assets/js/filter-state.js's parseQuery is written to undo that.
+    # Swapping it for a filter that emits %20 would work; swapping it for no
+    # filter at all would break `oily fish` and five other real values.
+    assert "url_encode" in html, (
+        "_includes/recipe_badges.html builds a badge href without url_encode. "
+        "Six taxonomy values contain a space (oily fish, root veg, carbs "
+        "party, hot snack, ice cream, one-handed food) and would produce a "
+        "URL with a raw space in it."
+    )
+    for param in ("?star=", "?tag="):
+        assert param in html, (
+            f"_includes/recipe_badges.html no longer emits `{param}` in a badge "
+            f"href. The query grammar is documented in "
+            f"assets/js/filter-state.js's header -- one parameter per filter "
+            f"KIND -- and filters.js only knows how to read that one."
         )
 
 

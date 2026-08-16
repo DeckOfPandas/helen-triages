@@ -1,5 +1,28 @@
+{% comment %} GitHub issue #40 -- a badge is a LINK, in both of the two places
+   this partial is included (a recipe row on food/index.html, and the badge row
+   at the top of a recipe page via _layouts/recipe.html). One template change
+   serves both halves of the issue.
+
+   AN <a> WITH A REAL href, not a <button> that sets location. The href is what
+   makes middle-click, open-in-new-tab, copy-link-address and "where does this
+   go" on hover all work; a button plus location.href breaks every one of them.
+   On the index, filters.js intercepts the click (a delegated handler on
+   .recipe-list) and filters in place, so the URL is the fallback there rather
+   than the mechanism. On a recipe page nothing intercepts it and it is simply
+   a link to the index, pre-filtered.
+
+   THE QUERY GRAMMAR IS assets/js/filter-state.js's -- read its header, not
+   this comment, for the full rules. What matters here: one parameter per
+   filter KIND, and `url_encode` (Jekyll's CGI.escape) spells a space as `+`,
+   which parseQuery is written to undo. `oily fish`, `root veg`, `carbs
+   party`, `hot snack`, `ice cream` and `one-handed food` all depend on that.
+
+   data-star/data-tag carry the raw, unencoded value for the click handler, so
+   nothing on the JS side ever has to un-encode an href or read a badge's own
+   text back out of the DOM. {% endcomment %}
+
 {% if include.recipe.star_ingredient %}
-  <span class="badge badge-star"><span class="tag-shape" aria-hidden="true"></span>{{ include.recipe.star_ingredient }}</span>
+  <a class="badge badge-star" data-star="{{ include.recipe.star_ingredient }}" href="{{ '/food/' | relative_url }}?star={{ include.recipe.star_ingredient | url_encode }}"><span class="tag-shape" aria-hidden="true"></span>{{ include.recipe.star_ingredient }}</a>
 {% endif %}
 
 {% comment %} Group membership comes from _data/taxonomy.yml; the badge class is
@@ -14,7 +37,7 @@
 
   {% for tag in include.recipe.tags %}
     {% if group_tags contains tag %}
-      <span class="badge badge-{{ group.name }}"><span class="tag-shape" aria-hidden="true"></span>{{ tag }}</span>
+      <a class="badge badge-{{ group.name }}" data-tag="{{ tag }}" href="{{ '/food/' | relative_url }}?tag={{ tag | url_encode }}"><span class="tag-shape" aria-hidden="true"></span>{{ tag }}</a>
     {% endif %}
   {% endfor %}
 {% endfor %}
