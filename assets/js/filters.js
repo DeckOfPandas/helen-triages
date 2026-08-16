@@ -623,7 +623,14 @@ function renderResultsPool() {
      The label is the disclosure's own state, which is also why aria-expanded
      is not doing this work alone: a sighted reader gets the same information
      the attribute gives a screen reader, from the same element. */
-  var EXCLUDE_LABEL_CLOSED = "I know what I don't want";
+  /* BOTH STATES WEAR THEIR BRACKETS -- GitHub issue #275. The open label has
+     read "(hide leave out)" since the two-controls-into-one pass, so the closed
+     one was the odd state out: the same control changed punctuation as well as
+     words as you toggled it, which made the brackets look like they meant
+     something rather than being the control's own costume. The server-rendered
+     copy in food/index.html carries them too, so the button does not visibly
+     re-punctuate itself the first time filters.js touches it. */
+  var EXCLUDE_LABEL_CLOSED = "(I know what I don't want)";
   var EXCLUDE_LABEL_OPEN = '(hide leave out)';
 
   function setExcludeRevealed(open) {
