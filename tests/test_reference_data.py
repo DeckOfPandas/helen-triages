@@ -608,6 +608,86 @@ def test_the_data_file_is_not_empty(cooking_methods):
     )
 
 
+def test_a_method_step_naming_an_internal_temperature_is_wired_to_the_data():
+    """If a method step says "internal temperature", the recipe must have an
+    internal_temp_ref, and the step must actually state a figure.
+
+    THE BUG THIS COMES FROM shipped on a published page and read, in full:
+    "braise gently for about 90 mins, looking for an internal temperature of
+    X." A literal X. Not `QQ`, which test_no_qq_placeholder would have caught
+    on sight -- just an unfilled slot in a sentence, sitting on the live site.
+
+    Two separate holes let it through, and the pair is the point:
+
+      - The recipe carried no internal_temp_ref, so
+        test_temperatures_written_into_method_text_match_the_data below never
+        looked at it. That test is scoped to steps carrying a `#doneness`
+        link, deliberately -- a method step is full of oven temperatures and
+        no parser can tell those from an internal one. But that scoping means
+        a step which mentions an internal temperature and links to NOTHING is
+        invisible to it, which is exactly the state a half-finished sentence
+        is in.
+      - It was in NO_TEMPERATURE_BECAUSE, whose whole job is to record a
+        deliberate decision that a recipe needs no temperature. It said so
+        while the recipe's own method asked for one. The opt-out list is
+        honest about roasts and braises the data cannot serve; it cannot
+        notice a recipe contradicting it in prose.
+
+    So this is the inverse of the test below: that one checks a figure against
+    the data where a link declares what the figure means, and this one checks
+    that the claim exists at all.
+
+    DELIBERATELY NARROW. It fires only on the literal phrase "internal
+    temp...", which is unambiguous, rather than on any °C figure near a verb.
+    Sugar work reaches 118°C, a custard is held at 82°C and chocolate is
+    tempered at 31°C -- all real internal temperatures of a sort, none of them
+    a protein doneness this data layer holds, and a test that flagged them
+    would be a test someone switches off. Checked against the whole collection
+    when written: exactly three recipes say "internal temp" in a method step.
+    """
+    import re as _re
+    import yaml as _yaml
+
+    problems = []
+    checked = 0
+    for path in sorted(pathlib.Path("_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        fm = _yaml.safe_load(raw.split("---")[1]) or {}
+
+        steps = []
+        for step in fm.get("method") or []:
+            steps.append(step.get("step") if isinstance(step, dict) else step)
+        for group in fm.get("method_groups") or []:
+            for step in group.get("steps") or []:
+                steps.append(step.get("step") if isinstance(step, dict) else step)
+
+        for text in [s for s in steps if s]:
+            if not _re.search(r"internal temp", text, _re.I):
+                continue
+            checked += 1
+            if not fm.get("internal_temp_ref"):
+                problems.append(
+                    f"{path.name}: a method step says 'internal temperature' but the "
+                    f"recipe has no internal_temp_ref, so the figure in that sentence "
+                    f"is answerable to nothing. Wire it to a node in "
+                    f"internal_temperatures.yml, or reword the step."
+                )
+            if not _re.search(r"\d+\s*(?:[–-]\s*\d+)?\s*°C", text):
+                problems.append(
+                    f"{path.name}: a method step says 'internal temperature' but states "
+                    f"no °C figure -- {text.strip()[:90]!r}. An unfinished sentence like "
+                    f"'an internal temperature of X' publishes as written."
+                )
+
+    assert checked, (
+        "No method step anywhere says 'internal temperature'. That is possible "
+        "-- it was true of all but three recipes when this was written -- but "
+        "it means this test is checking nothing, so confirm it is real before "
+        "trusting the green."
+    )
+    assert not problems, "\n  ".join(problems)
+
+
 def test_temperatures_written_into_method_text_match_the_data(internal_temperatures):
     """A figure typed into a method step has to agree with the data behind it.
 
@@ -885,22 +965,6 @@ NO_TEMPERATURE_BECAUSE = {
     # real thing missing from internal_temperatures.yml rather than a chore.
     "cumin-mint-lamb-skewers": "grilled shoulder chunks; lamb.roasting is joints and "
                                "lamb.slow_cooked is a whole shoulder, neither is this",
-    "vietnamese-spiced-braised-venison-haunch": "a 1 kg boneless haunch BRAISED for two "
-                                                "hours, which is neither of the two "
-                                                "venison shapes we hold: venison.haunch "
-                                                "is a roasting spectrum and this joint "
-                                                "never stops at a doneness, while "
-                                                "venison.shoulder's 90–95°C is the right "
-                                                "physics under the wrong cut name. It "
-                                                "wants a braised-haunch figure, and "
-                                                "there isn't one",
-
-    # Chicken pieces in a wet dish. poultry.chicken's endpoint is written for a
-    # WHOLE BIRD ("74–75°C in the thigh"), and a thigh in a stew reaches that
-    # long before the dish is finished, so quoting it would be technically true
-    # and useless. Helen's duck-leg reasoning (the figure says "in the thigh",
-    # so a leg takes it) applies to a ROASTED leg, where the temperature is what
-    # you stop at. Revisit if a pieces/braise figure is ever added.
     "chicken-a-la-king": "diced breast in a sauce; no figure for pieces",
     "chicken-cider-stew": "thighs and drumsticks braised; no figure for pieces",
     "chicken-sorrel-potato-stew": "leg braised; no figure for pieces",

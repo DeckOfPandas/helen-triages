@@ -590,6 +590,25 @@ venison:
     tender_at_min: 90
     tender_at_max: 95
     sources: "90–95°C is this site's own collagen figure (see pork.slow_cooked and lamb.slow_cooked), applied to venison by chemistry rather than by citation: NO UK venison source publishes one. Every shoulder and neck recipe found ends 'until it falls off the bone' with no number in it at all. Collagen doesn't know which animal it came from, so the house figure is the honest answer — but it is an inference, and recorded as one."
+  braised:
+    # ANY VENISON CUT BRAISED TO TENDERNESS, and the only node here keyed by a
+    # METHOD rather than a cut. That is deliberate, and it is the file's own
+    # older pattern -- pork.roasting/slow_cooked and lamb.roasting/slow_cooked
+    # are method keys too.
+    #
+    # It exists because a braised HAUNCH had nowhere honest to point. venison.
+    # haunch is a roasting spectrum and a braise never stops at a doneness;
+    # venison.shoulder is the right physics under the wrong cut name. Collagen
+    # gives way at the same temperature whatever the cut, so the figure a
+    # braise needs is not about the cut at all -- which is exactly what this
+    # key says and the other two cannot.
+    #
+    # Same 90–95°C, same basis, same caveat as shoulder and shank below.
+    chart_anchor: venison-slow-cooked-cuts
+    tender_at: "90–95°C"
+    tender_at_min: 90
+    tender_at_max: 95
+    sources: "The house collagen figure again -- see venison.shoulder for why 90–95°C is an inference from chemistry rather than a citation, and treat it with the same caution. Nothing about braising changes that reasoning; it is the same connective tissue giving way at the same temperature."
   shank:
     # Same figure and same basis as shoulder above -- another collagen-heavy
     # forequarter cut with no published venison-specific number behind it. Kept
