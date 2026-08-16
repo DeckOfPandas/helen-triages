@@ -1295,6 +1295,37 @@ one line or several block-level children — stacks normally. Prefer this over
 flex for "a label plus arbitrary content" from the start, not just once
 something breaks it.
 
+**You will write a bare element selector inside a component, and it will
+capture something that doesn't exist yet.** Twice now, both times an `a`,
+both times because the container held exactly one link on the day the rule
+was written, so `a` was an accurate way to say "the title" or "the body
+link". Issue #40 then made every tag badge an `<a>`:
+
+- `article.recipe a` (recipe page) — caught during that work and fixed to
+  `article.recipe a:not(.badge)`.
+- `.recipe-row-content a` (index page) — the identical rule, one file over,
+  missed. Every badge on the index silently took the recipe title's 1rem
+  heading treatment instead of its own 0.72rem pill, and stayed that way
+  until Helen sent a screenshot (issue #258). It is `.recipe-title-link`
+  now, which is also what `filters.js`'s `querySelector('a')` had to become
+  in the same issue, for the same reason.
+
+**No test can catch this, and issue #259 was opened to build one and then
+closed rather than half-built.** `test_every_class_we_emit_has_a_rule_in_
+the_stylesheet` asks whether a class HAS a rule, not whether that rule
+WINS — a class whose every declaration is outranked passes it happily. A
+lint for "bare element selector inside a component" fires on
+`.recipe-body-content p`, `.method-full li` and `.tc-contents li a`, all
+legitimate; narrowing it to `a` still hits `.ct-doneat a`. Anything
+reliable needs real cascade resolution, i.e. a headless browser reading
+computed styles, which is a large slow dependency for a two-instance bug.
+
+So it is a habit rather than a guard: **when a component rule targets a
+bare element, ask whether the container will only ever hold one of them.**
+If the answer is "one today", name the class instead. The symptom when you
+get it wrong is not an error — it is a correct-looking rule that has
+stopped applying, which reads as a design decision nobody remembers making.
+
 **You will forget an element inherits from its parent when nesting inside a
 styled heading.** `.btn-method-toggle` sits inside `.recipe-section-heading`,
 which sets both `-webkit-text-stroke` and `text-shadow` (`punched()`) — both
