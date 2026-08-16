@@ -122,6 +122,60 @@
 // `margin-top: $space-sm` used to sit here. It never did anything: adjacent
 // .category siblings collapse their margins and the larger wins, so
 // $index-section-gap always beat it.
+// TRUE CENTRING UNDER THE HEADING -- GitHub issue #275, and the change the
+// .exclude-reveal-row comment below predicted would be needed one day.
+//
+// THE PROBLEM CSS HAS HERE: "centre B under A" is only expressible if A and B
+// share a sizing context. I KNOW WHAT I WANT lives inside .search-input,
+// sharing that flex row with the search box, while the reveal link sits in a
+// row below -- one level deeper, so nothing in the lower row can know the
+// heading's width. That is why this was an alignment of left edges and said so.
+//
+// The fix is the wordmark's own mechanism (HANDOVER 13.8): one grid, a
+// `max-content` first column, and both the heading and the reveal row placed
+// in it, so the column becomes as wide as whichever needs more room and the
+// link can centre inside it. `display: contents` on the two wrappers is what
+// puts their children into that shared grid without changing the markup.
+//
+// ONE VISIBLE SIDE-EFFECT, deliberate and worth checking: the 620px cap that
+// made both search inputs end at the same point used to live on .search-input,
+// which no longer forms a box. It moves to the grid itself -- so the LEAVE OUT
+// panel, being inside that grid, is now capped at 620px too where it used to
+// run the full width of .controls. Easy to undo by moving the cap onto a row
+// rather than the grid, if the narrower results pool reads worse.
+.controls .search--name {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  column-gap: $space-md;
+  row-gap: $index-label-gap;
+  align-items: center;
+  max-width: 620px;
+
+  // The label, the input and its clear button become items of the grid above
+  // rather than of their own flex row; likewise the reveal row, the panel and
+  // the active list. Neither wrapper carried anything but layout, so nothing
+  // is lost -- the gaps they set are now the grid's own column and row gaps.
+  > .search-input,
+  > .search--exclude { display: contents; }
+
+  // Column one, the shared track: as wide as the heading, with the link
+  // centred in it. `width: auto` undoes the row's own `width: 100%`, which
+  // would otherwise stretch it across all three columns and centre the link
+  // under the whole search row instead of under the heading.
+  .exclude-reveal-row {
+    grid-column: 1;
+    justify-content: center;
+    width: auto;
+  }
+
+  // The picker itself is not centred on anything -- it is a panel, and it uses
+  // the full width the grid has.
+  .exclude-panel,
+  .exclude-active { grid-column: 1 / -1; }
+}
+
+// The name search box's own typography, unchanged by the grid above -- kept as
+// its own block so the structural rule and the type rule stay readable apart.
 .controls .search--name {
   #name-search-box {
     font-family: $font-headings;
@@ -244,9 +298,21 @@
     // different looks: hover darkened the text, focus painted a grey box
     // behind it and removed the outline, and a click got whichever the
     // browser decided applied. Now all three darken, and nothing else moves.
+    // GitHub issue #277. These three already agreed with each other -- what
+    // they did not do was READ as a change: lighten($color-text, 12%) to
+    // $color-text is #3a3739 to #211f20, a pure lightness step of 12% on a
+    // 0.78rem line, and at that size a lightness step alone is invisible. The
+    // same mistake as the footer reference links the same day.
+    //
+    // Every other inline link in this section moves HUE on interaction -- the
+    // clear buttons sit at their section's darkened root and shift on hover --
+    // so this now lands on the cobalt this section owns rather than on a
+    // slightly darker grey. The resting colour is untouched: Helen asked for
+    // this one to be quiet ("lighten the weight") and #277 is about the
+    // mouseover and the click, not about the state it sits in.
     &:hover,
     &:active,
-    &:focus-visible { color: $color-text; }
+    &:focus-visible { color: $color-exclude-active; }
 
     // The keyboard indicator stays, because a colour shift alone is not one --
     // it is the same shift the mouse already causes, so it says "you are
