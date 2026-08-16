@@ -96,4 +96,9 @@ permalink: /food/reference/timings/
   </div>
 </article>
 
+{% comment %} cook-schedule.js FIRST: cook-timer.js reads HTF.cookSchedule at
+   startup, so the arithmetic module has to exist by then. Same trap as
+   ingredient-search.js/filters.js on the index; tests/test_site_config.py has a
+   guard for each. {% endcomment %}
+<script src="{{ '/assets/js/cook-schedule.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cook-timer.js' | relative_url }}"></script>
