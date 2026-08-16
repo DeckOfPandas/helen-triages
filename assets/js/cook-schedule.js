@@ -148,11 +148,23 @@
     }
 
     if (s === "by_doneness") {
+      /* Same fallback chain as `rate` above, on purpose (GitHub issue #245):
+         flat_add_max if the level states one, else flat_add, else nothing.
+         This used to add flat_add to both ends and never look at
+         flat_add_max, so an asymmetric upper bound would be silently
+         dropped -- not theoretical. Venison's haunch
+         (haunch_high_heat_start_then_reduce in
+         _data/food/cooking_methods.yml) is a live by_doneness row with
+         flat_add: 20 on both its rare and medium levels; it is symmetric
+         today, so nothing rendered wrong, but it is the row most likely to
+         gain an asymmetric flat_add_max next, and the bug would have taken
+         effect with no error and no failing test. Keep this branch and the
+         `rate` one in agreement. */
       var d = method.by_doneness[doneness] || method.by_doneness.rare;
       return {
         ok: true,
         lo: d.rate_min * kg + (d.flat_add || 0),
-        hi: d.rate_max * kg + (d.flat_add || 0),
+        hi: d.rate_max * kg + (d.flat_add_max || d.flat_add || 0),
         aside: "Rate depends on doneness; showing " + doneness.replace(/_/g, " ") + "."
       };
     }

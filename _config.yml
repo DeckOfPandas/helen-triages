@@ -133,6 +133,15 @@ exclude:
   - tests/
   - pytest.ini
   - requirements-test.txt
+  # Python build tooling (generate_pdfs.py, generate_tape.py,
+  # build_cooking_methods.py and the rest) — GitHub issue #247. Without this
+  # line it was copied whole into _site/scripts/ and served as ordinary
+  # static files: harmless, since nothing links to it, but not part of the
+  # site. generate_pdfs.py in particular runs from the repo checkout, not
+  # from _site, and reads the FINISHED _site as its input after the Jekyll
+  # build has already happened (.github/workflows/build-and-deploy.yml) —
+  # so excluding this directory from what Jekyll builds cannot touch it.
+  - scripts/
   # Project-local Node install for the JS tests. Dev-only, and large.
   - .node-runtime/
   # Working notes and agent instructions — never published
