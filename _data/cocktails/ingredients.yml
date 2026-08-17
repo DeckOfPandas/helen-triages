@@ -1,0 +1,82 @@
+# =============================================================================
+# COCKTAIL INGREDIENT VOCABULARY — the generic names a drink can be filtered by.
+# =============================================================================
+# A drink's `ingredients:` list carries what you actually pour (`item:`,
+# brand-led — "Appleton Estate Reserve") and what you would ever BROWSE by
+# (`generic:` — "jamaican, moderately aged"). No rule can derive the second
+# from the first: 46 of the 296 distinct ingredients in the collection carry no
+# category word at all (Cointreau, Amaretto, Carpano Antica, Batavia arrack,
+# Clairin Communal), which is why this file exists rather than a parser.
+#
+# Same contract as _data/food/taxonomy.yml: a value not declared here renders
+# nowhere and fails the suite. Adding one is a YAML edit, not a code edit.
+# =============================================================================
+
+# --- RUM ---------------------------------------------------------------------
+# GitHub issue #314, Helen's spec. Ten styles, and "light", "gold" and "dark"
+# are RETIRED — they were the spreadsheet's own shorthand, they describe colour
+# rather than production, and colour is the least reliable thing about a rum
+# (caramel is routinely added). Anything still carrying them needs re-typing
+# against this list, which is Helen's own knowledge and not inferable from the
+# bottle name.
+#
+# Rum is ~20% of the whole vocabulary — 58 of 296 distinct ingredients — and
+# is the only family that needed its own controlled list. Everything else is
+# a flat generic name.
+#
+# THREE THINGS #314 RULES OUT, worth stating because each looks like a gap:
+#   - there is NO "spiced" style. A spiced rum is typed by what it is
+#     underneath, case by case.
+#   - "navy" is not a style either. Helen: it "will often collapse into one of
+#     the Demeraras" -- case by case, so a navy rum stays QQ until she calls it.
+#   - cachaca is NOT a rum style. It is its own generic; see below.
+rum_styles:
+  - "jamaican, moderately aged"
+  - "jamaican, caramel forward"
+  - "lightly aged and filtered"
+  - "moderately aged"
+  - "demerara, aged"
+  - "demerara, overproof"
+  - "jamaican, overproof, unaged"
+  - "cane juice (agricole) rum, unaged"
+  - "cane juice (agricole) rum, aged"
+  - "blended multi-region rum, clear"
+
+# Named bottles that #314 permits WITHOUT a style, because they do not sit in
+# the ten: a pineapple-infused rum and an overproof blend are their own thing.
+# These are the only brand names allowed as a `generic:` value — everything
+# else generalises or it does not belong here.
+rum_untyped:
+  - "planteray stiggins' fancy"
+  - "planteray o.f.t.d. overproof"
+  - "malibu"
+  # Helen, #314: "treated more as a flavour modifier". Which is why it sits
+  # here rather than among the ten -- a blackstrap is not a style you would
+  # browse a drink by, it is a thing you add a spoonful of.
+  - "blackstrap"
+
+# Retired, and actively removed rather than merely deprecated — the same
+# treatment _data/food/taxonomy.yml gives retired_star_ingredients, and for the
+# same reason: a value that used to mean something silently blends into the
+# generic "not declared" pile unless something names it.
+retired_rum_styles:
+  light: >-
+    describes colour, not production, and colour is routinely adjusted with
+    caramel. Re-type against rum_styles — issue #314.
+  gold: >-
+    same reason as `light`. Almost always either "lightly aged and filtered"
+    or "moderately aged"; which one is Helen's call per drink.
+  dark: >-
+    same reason again, and the most misleading of the three: a dark rum may be
+    Jamaican caramel-forward, Demerara aged, or a blackstrap. Issue #314.
+
+# --- CANE SPIRITS THAT ARE NOT RUM -------------------------------------------
+# #314: "cachaca is its own generic". Same raw material as an agricole rhum --
+# fresh cane juice -- and a completely different product, so it is declared
+# apart from the rum styles rather than folded into them. The ingredient-name
+# regex that finds rums catches these too (it has to; the words overlap), so
+# the vocabulary is what tells them apart, not the pattern.
+cane_spirits:
+  # Accented, like every other vocabulary value on this site --
+  # _data/accented_words.yml is house style and applies to cocktails.
+  - "cachaça"
