@@ -1,6 +1,6 @@
 ---
 title: "Toad in the Hole"
-tagline: "Sausages baked into a giant Yorkshire pudding. The oven door stays shut until it's done."
+tagline: "Sausages baked into a giant Yorkshire pudding."
 source: "Adapted from Jamie Oliver"
 serves: "4"
 prep_time: "10 mins"
@@ -12,7 +12,7 @@ ingredient_groups:
   - name: sausages
     items:
     - amount: "8"
-      item: good-quality sausages
+      item: thick sausages
     - amount: "4 sprigs"
       item: "fresh rosemary"
     - amount: "2 large"
@@ -38,9 +38,9 @@ method_groups:
     steps:
     - Whisk the batter ingredients with a pinch of salt.
     - step: "Put 2 tbsp sunflower oil in a thin-walled baking tin, and heat in the oven at 220°C fan until sizzling."
-      note: "The thinner the pan, the crispier the batter."
+      note: "The thinner the pan, the crispier the batter, and the crispier the batter the better the batter."
     - "When up to temperature, roast the sausages in the tin until slightly golden, turning once or twice."
-    - "Pour the batter over the sausages (carefully because the oil will spit), and add the rosemary sprigs."
+    - "Pour the batter over the sausages (carefully because the oil will spit), add the rosemary sprigs, then oven."
     - "Don't open the oven for at least 20 mins. Remove when golden and crisp."
   - name: onion gravy
     steps:
@@ -55,7 +55,8 @@ notes:
     text: "Both need to be properly hot before the batter goes in otherwise you'll get marshmallow but not in a good way."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

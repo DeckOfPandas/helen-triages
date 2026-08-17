@@ -1,8 +1,8 @@
 ---
 title: "Gluten-Free Crumble Topping"
-tagline: "Surprisingly good."
+tagline: "Good for crumble, not just for gluten-free crumble!!s"
 source: "Henry"
-makes: "Enough to top a 1.5 l dish (22 x 17 cm) — about one food processor bowl full"
+makes: "Enough to top my 1.5-l Pyrex dish (22 x 17 cm) — about one food processor bowl full"
 prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["gluten-free flour", "rice flour", "ground almonds", "Demerara sugar", "unsalted butter"]
@@ -20,17 +20,19 @@ ingredient_groups:
       item: "ground almonds"
     - amount: "125 g"
       item: "Demerara sugar (or light brown soft sugar, or a half-and-half mix of the two)"
-    - item: "salt, to taste — don't hold back, you're more likely to under-do it than over-do it"
+    - item: "salt, to taste"
+      note: "don't hold back, more likely to under-do it than over-do it"
 method:
-  - "Blend everything together in a food processor, or rub the butter into the dry ingredients with your fingertips if for some reason you want to spend ages getting the same result."
+  - "Blend everything together in a food processor. Or rub the butter into the dry ingredients with your fingertips if for some reason you want to spend ages getting the same result."
 method_short:
   - ""
 notes:
-  - label: "Swapping flours"
+  - label: "Swapping flours is easy"
     text: "Just maintain the classic ratio."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-02"
 ---

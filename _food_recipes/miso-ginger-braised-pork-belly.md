@@ -1,6 +1,6 @@
 ---
 title: "Miso and Ginger Braised Pork Belly"
-tagline: "Only gets better the next day, so strategic over-catering is prudent."
+tagline: "Even better the next day, so strategically over-cater."
 source: "Adapted from Great British Chefs, recipe Shu Han Lee"
 serves: "4"
 prep_time: "20 mins"
@@ -40,7 +40,8 @@ method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

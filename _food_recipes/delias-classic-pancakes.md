@@ -24,11 +24,13 @@ method:
   - "Gently whisk the eggs, slowly incorporating the flour from the sides, adding some milk mixture when it gets too glue-like."
   - "Keep whisking until you have a plausible batter, but don't worry if there are still a few small lumps."
   - "Stir in the melted butter when you're ready to start cooking them, but not before."
+  - "Cook pancakes."
 method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: true
   cooked_before: true
   date_last_edited: "2026-07-25"
 

@@ -1,6 +1,6 @@
 ---
 title: "Chicken, Sorrel and Potato Stew with French Beans and Mustard"
-tagline: "Sorrel is just brilliant — all citrus and tang — and I buy it whenever I can."
+tagline: "Sorrel is just brilliant, all citrus and tang, and I buy it whenever I can."
 source: "Adapted from Riverford"
 serves: "2"
 prep_time: "5 mins"
@@ -38,7 +38,7 @@ method:
   - "Add the white wine without increasing the heat, leave for 2 mins, increase the heat, and let the wine bubble until almost all absorbed."
   - "Add the stock and potatoes, season, then low-boil for 5 mins."
   - "Add the chicken back to the pan, cover, and simmer for 5 mins, then add the beans, re-cover, and simmer for 5 mins more until the chicken and potatoes are cooked through."
-  - step: "Once cooked, add the mustard and sorrel. Don't hold back on the sorrel. Taste before adding more salt — the sorrel's tartness usually means it needs less than you'd think."
+  - step: "Once cooked, add the mustard and sorrel. Don't hold back on the sorrel. Taste carefully before seasoning further, because sorrel's tartness usually means less salt."
     note: Sorrel quickly loses its flavour if overcooked so add it near the end.
 method_short:
   - |
@@ -50,10 +50,11 @@ method_short:
     * Mustard, sorrel, seasoning
 notes:
   - label: "Freezing"
-    text: "Freeze the base before adding the mustard and sorrel, then stir both in fresh once reheated — the sorrel won't survive freezing and reheating."
+    text: "Freeze the base before adding the mustard and sorrel, then stir both in fresh once reheated. The sorrel won't survive freezing and reheating."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

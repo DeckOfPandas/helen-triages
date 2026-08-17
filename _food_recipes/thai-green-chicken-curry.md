@@ -38,9 +38,7 @@ ingredient_groups:
       item: flaked almonds
     - amount: "100 g"
       item: green beans
-    - amount: "1"
-      item: chicken stock cube
-    - item: "seasoning including mushroom ketchup, anchovy sauce, garlic powder, MSG"
+    - item: "seasonings and flavourings like chicken stock cubes, mushroom ketchup, anchovy sauce, garlic powder, MSG, lemon juice to brighten"
 method:
   - "Dice the onion and sweat in groundnut oil."
   - "Add chunks of potato and chicken when onions are about half done."
@@ -51,13 +49,14 @@ method:
 method_short:
   - ""
 notes:
-  - label: "Amounts"
-    text: "Amounts don't really matter — keep tasting."
+  - label: "YOLO"
+    text: "Amounts don't really matter, just keep tasting."
   - label: "Cooking time"
-    text: "Cooking time is very flexible; this dish is forgiving however long you leave it."
+    text: "Cooking time is very flexible."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-13"
 

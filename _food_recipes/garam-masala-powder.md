@@ -20,7 +20,7 @@ ingredient_groups:
       item: black peppercorns
     - amount: "3"
       item: "cinnamon sticks"
-      note: "prefer Ceylon cinnamon — cut the quantity in half if using cassia"
+      note: "Ceylon cinnamon, and cut the quantity in half if using cassia because of its coumarin content"
     - amount: "½ small"
       item: whole nutmeg
     - amount: "3"
@@ -43,7 +43,8 @@ method_short:
   - "Dry-fry then grind, sheesh."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-31"
 

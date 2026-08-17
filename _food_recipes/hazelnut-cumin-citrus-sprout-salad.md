@@ -7,7 +7,7 @@ prep_time: "10 mins plus chilling"
 cook_time: "10 mins"
 main_ingredients: ["Brussels sprouts", "pomegranate seeds", "hazelnuts", "orange", "cumin seeds", "lemon", "wholegrain mustard"]
 star_ingredient: "greens"
-tags: ["festive", "salad"]
+tags: ["festive", "salad", "virtuous"]
 ingredient_groups:
   - name: salad
     items:
@@ -40,17 +40,18 @@ ingredient_groups:
       item: wholegrain mustard
 method:
   - "Toast the hazelnuts in a frying pan until starting to golden, then set aside to cool. Toast the cumin seeds in the same pan until fragrant, then cool."
-  - "Whisk the dressing ingredients in the pan with the cumin seeds. Salt it properly because raw sprout is bitter. Add the onion and set aside."
-  - "Pour the dressing over the sprouts and toss very well, then set aside for at least 10 mins or chill for up to 1 hour."
+  - "Whisk the dressing ingredients in the pan with the cumin seeds. Salt it properly because raw, un-cured sprouts are bitter. Add the onion and set aside."
+  - "Pour the dressing over the sprouts and toss very well, then set aside for at least 10 mins to cure, or chill for up to 1 hour."
   - "Fold in the coriander, the pomegranate seeds and the roughly chopped hazelnuts before serving."
 method_short:
   - ""
 notes:
   - label: "one-pan dressing"
-    text: "Making the dressing in the same pan you toasted the cumin in picks up the toasted oil left behind."
+    text: "Making the dressing in the same pan the spices were toasted in picks up the tasty oil left behind."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

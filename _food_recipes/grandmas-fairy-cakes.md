@@ -1,6 +1,6 @@
 ---
 title: "Grandma's Fairy Cakes"
-tagline: "The ones Grandma used to make."
+tagline: "Exactly how they're supposed to be."
 source: "Grandma Kath"
 makes: "12 fairy cakes"
 prep_time: "10 mins"
@@ -33,7 +33,8 @@ method_short:
 #   -
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 

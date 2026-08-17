@@ -29,10 +29,8 @@ ingredient_groups:
       item: "egg, beaten"
   - name: "cranberry sauce"
     items:
-    - amount: "500 g"
-      item: "cranberries"
-    - amount: "175 g"
-      item: "golden caster sugar"
+    - amount: "2 lots"
+      item: "CLAUDE link to cranberry sauce recipe"
   - name: "parsnip topping"
     items:
     - amount: "550 g"
@@ -54,29 +52,29 @@ method_groups:
       - "Pulse the chestnuts in a food processor until chopped into small bits, then tip these into the bowl with the onions and repeat with the walnuts. Add the breadcrumbs, mace, beaten egg, 1 tsp salt and some pepper and mix everything together well."
   - name: "Make the cranberry sauce"
     steps:
-      - "Tip the cranberries and sugar into a pan and simmer for about 8–10 mins over a high heat. The sugar will melt and the cranberries will pop and become saucy — keep bubbling until sticky. Set aside to cool."
-      - "Grease a 900 g loaf tin, line with a long strip of baking parchment that covers the bottom and two ends, then grease this as well."
+      - "Make this: CLAUDE link to cranberry sauce recipe"
   - name: "Prepare the parsnips"
     steps:
-      - "Bring a large pan of salted water to the boil. Add the parsnips and boil for 3½ mins, then drain well."
-      - "From the thinner ends, cut off lengths of parsnip that fit widthways across the bottom of the loaf tin — keep going until you have enough to snugly line the base. Roughly chop all the leftover parsnip and mix into the nut mixture."
+      - "Boil the parsnips in salted water for 3½ mins, then drain well."
+      - "From the thinner ends, cut off lengths of parsnip that fit widthways across the bottom of the loaf tin. Keep going until the base is lined snugly. Take them back out. Roughly chop the rest of the parsnip (the bits that won't line the tin) and mix into the nut mixture."
   - name: "Layer and bake"
     steps:
-      - "Heat the oven to 160°C fan. Mix the parsnip lengths with the second 1 tbsp butter and the honey to coat, then fit them into the tin."
-      - "Top with a third of the nut mixture — pack it down well and smooth the surface. Spread a third of the cranberry sauce on top, leaving a small gap around the edges. Top with the remaining nut mixture and pack down as before."
-      - "Cover with foil and bake for 1 hour."
+      - "Coat the parsnip lengths with the honey and the rest of the butter to coat, melting the butter if needed, then fit them into the tin."
+      - "Top with a third of the nut mixture, packing it down well and smoothing the surface. Spread a third of the cranberry sauce on top, leaving a small gap around the edges. Top with the remaining nut mixture and pack down as before."
+      - "Cover with foil and bake at 160°C fan for 1 hour."
   - name: "Finish and serve"
     steps:
-      - "Melt the remaining 2 tbsp butter in a small pan and sizzle the reserved sage leaves for a minute. Splash water into the remaining cooked cranberries until saucy."
-      - "Loosen around the sides of the loaf with a round-bladed knife if needed, then turn out. Drizzle with the sage butter and leaves. Serve in slices with the extra cranberry sauce."
+      - "Melt the remaining 2 tbsp butter in a small pan and sizzle the reserved sage leaves for a minute. Splash water into the cooked cranberries until saucy."
+      - "Loosen loaf with a knife, then turn out. Drizzle with the sage butter and leaves. Serve in slices with the extra cranberry sauce."
 method_short:
   - ""
 notes:
   - label: "Make ahead"
-    text: "The loaf can be made up to 24 hours ahead to the end of the layering step, then covered and chilled before baking."
+    text: "The loaf can be made to the end of the layering step up to 24 hours ahead, then covered and chilled before baking."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: true
   cooked_before: true
   date_last_edited: "2026-08-09"
 ---

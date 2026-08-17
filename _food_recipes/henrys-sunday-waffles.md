@@ -1,8 +1,8 @@
 ---
 title: "Henry's Sunday Waffles"
-tagline: "I've tried a lot of waffle recipes. This one has been iterated and iterated until, well, perfection."
-source: "Adapted from Sunlight Cafe"
-makes: "4–6 waffles depending on your waffle iron"
+tagline: "I've absorbed a lot of waffle recipes. This is the iteration I'll put my name on."
+source: "Adapted from Mollie Katzen's Sunlight Cafe"
+makes: "4–6 waffles, depending on your waffle iron"
 prep_time: "5 mins"
 cook_time: "15 mins"
 main_ingredients: ["plain flour", "eggs", "whole milk", "groundnut oil", "salted butter"]
@@ -31,16 +31,17 @@ method:
   - "Beat the egg whites with a pinch of cream of tartar until stiff peaks form, but don't overbeat."
   - "Gently stir half the egg white into the milk mixture with a metal spoon to loosen it, then gently fold in the rest. It's fine to leave little wisps of egg white — definitely don't overmix."
   - Stir in the melted butter.
-  - Spoon into waffle iron and cook until golden. Add more melted butter to encourage browning if you want.
+  - Spoon into waffle iron and cook until golden. Add more melted butter to encourage browning.
   - "Serve with real maple syrup, sugar, lemon, berries, [chocolate ganache](../chocolate-ganache/) or whatever."
 method_short:
   - ""
 notes:
   - label: "Keeping"
-    text: "These don't keep at all — not even for five minutes while you're eating the first ones. If making a second batch while eating the first, prop them up in pairs like a house of cards to stop them going soggy."
+    text: "These don't keep at all, like, not even for five minutes while you're eating the first ones. If making a second batch while eating the first, prop spares up in pairs like a house of cards to stop them going soggy, but they will definitely be less good for it."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-13"
 ---

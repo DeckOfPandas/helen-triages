@@ -34,17 +34,17 @@ method:
   - step: "Scoop the mixture into a lined and sugared 7-inch round tin."
     note: "This is one of those times when you really do have to line and sugar the tin — the cake will never come out otherwise."
   - step: "Bake for about 40 mins at 160°C fan until springy and the sides have started to pull away, then leave to cool in the tin for 5 mins. Carefully transfer to a wire rack."
-    note: "The cake will be very delicate."
   - step: "Top with sugar stirred with lemon juice, scoring or pricking the cake first so it all seeps in."
-    note: "Also lovely with [lemon curd](../grandmas-lemon-curd/)."
+    note: "Also lovely with [Grandma's lemon curd](../grandmas-lemon-curd/)."
 method_short:
   - ""
 notes:
    - label: delight
-     text: "No real note other than to restate that this cake is a genuine delight."
+     text: "No real note. Just restating that this cake is a genuine delight."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 
