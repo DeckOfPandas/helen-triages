@@ -26,3 +26,6 @@ collections:
   food_drafts:
     output: true
     permalink: /food/drafts/:path/
+  cocktail_drafts:
+    output: true
+    permalink: /cocktails/drafts/:path/

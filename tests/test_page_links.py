@@ -269,6 +269,21 @@ TRUSTED_DYNAMIC = (
     # against the published-page set instead.
     re.compile(r"^\{\{\s*link\.url\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*(?:recipe|cocktail)\.url\s*\|\s*relative_url\s*\}\}$"),
+    # _layouts/cocktail.html's source link, added 2026-08-16 with the cocktail
+    # schema. DIFFERENT REASON FROM EVERY OTHER ENTRY ABOVE, and worth saying
+    # so plainly rather than letting it inherit their justification: the others
+    # are internal links this scanner cannot read but something else checks.
+    # `source_url` is an EXTERNAL address typed into a drink's front matter --
+    # a magazine, a bar's site, a video. It is out of scope for exactly the
+    # reason _scan() already skips a literal `http://` href: it points
+    # somewhere this site does not control.
+    #
+    # So it is UNCHECKED, not checked elsewhere. Nothing here or anywhere else
+    # verifies a source_url resolves, and a dead one will rot silently. If that
+    # ever matters, the answer is a link-rot checker run deliberately and
+    # offline, not a rule in this file -- which asserts about the site's own
+    # pages and would have to make a network call to say anything at all.
+    re.compile(r"^\{\{\s*page\.source_url\s*\}\}$"),
 )
 
 

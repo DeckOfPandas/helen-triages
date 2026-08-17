@@ -73,6 +73,15 @@ collections:
   cocktail_recipes:
     output: true
     permalink: /cocktails/recipes/:path/
+  cocktail_drafts:
+    # Same two-part protection as food_drafts, for the same reason: `output:
+    # false` stops Jekyll publishing them, and _cocktail_drafts/ being its own
+    # git repo (pushed to helen-triages-cocktails-private, gitignored here)
+    # stops the source reaching this public repo at all. Neither half is
+    # redundant -- GitHub issue #235 is the case where output: false held and
+    # the index still listed ten drafts, linking to URLs Jekyll never wrote.
+    # _config_local.yml flips this back to true so they are readable locally.
+    output: false
 
 # --- Defaults ----------------------------------------------------------------
 # `site_key` is the one value that makes the shared layout site-aware. It keys
@@ -102,6 +111,13 @@ defaults:
     values:
       layout: cocktail
       site_key: cocktails
+  - scope:
+      path: ""
+      type: cocktail_drafts
+    values:
+      layout: cocktail
+      site_key: cocktails
+      sitemap: false   # belt and braces: excluded even if output is ever flipped
   # Pages, by directory. These are ordinary pages rather than collection
   # documents, so they are scoped by path instead of by type.
   - scope:

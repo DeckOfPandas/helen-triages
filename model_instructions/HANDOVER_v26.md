@@ -152,8 +152,9 @@ not a constant.
 
 **Forked**, because cocktails is philosophically distinct, not a reskin:
 `_layouts/recipe.html` vs `cocktail.html` (food is a procedure — steps,
-prep/cook split, triaged ingredients; a cocktail is a formula — ratio, glass,
-garnish, one method line); `_data/food/*.yml` vs `_data/cocktails/*.yml`;
+prep/cook split, triaged ingredients; a cocktail is a formula plus a build —
+a full untriaged spirit bill, a glass, garnishes, an ordered method. **Not
+"one method line"**, as this said until 2026-08-16: see §9.6); `_data/food/*.yml` vs `_data/cocktails/*.yml`;
 `_sass/food/` vs `_sass/cocktails/`; `assets/img/food/` vs `/cocktails/`;
 `assets/css/food.scss` vs `cocktails.scss` (no shared class names to fight
 over).
@@ -773,34 +774,195 @@ phrase strips AFTER the quantity strip has already run. "juice of 2 lemons"
 therefore cannot be fixed with a `juice of` phrase — it would be left as "2
 lemons". Those go in `aliases`, whose keys are the post-strip forms.
 
-## 9. Cocktails — scaffolded, deliberately empty
+## 9. Cocktails
 
-Routing, styling hooks and the shared-layer contract exist. **No schema does,
-and you must not invent one.**
+**No longer scaffolded-and-empty.** The first three drinks were ingested
+2026-08-16 (Julien Sorel, Sazerac, Cobra's Fang) and a front matter schema
+was derived from them, the way food's was derived from real recipes rather
+than designed up front. Everything below dates from that session unless it
+says otherwise.
 
-`_cocktail_recipes/` declared and empty. `cocktails/index.html` shows an empty
-state, doesn't copy food's filter matrix. `_layouts/cocktail.html` renders
-`glass`, `garnish`, a full untriaged ingredient list, method as string or
-list. `_sass/cocktails/_palette.scss` has neutral placeholder values but
-satisfies the nine-variable contract.
+**Cocktails does not share food's data model and is not going to.** Read this
+section, not §4. A food recipe is a procedure; a cocktail is a formula plus a
+build. The two collections share the outer layout, the type scale, the palette
+contract and house style, and nothing else.
 
-Known from Helen, nothing more: no prep/cook time; ingredients list is full,
-not triaged; `glass`/`garnish` are real fields. **The schema must be derived
-from real cocktail recipes** — Helen will paste 5–10 in; propose front matter
-from what those actually need, not from abstract principle.
+### 9.1 Nothing about the DRINKS is public. The shell is.
+
+Two independent mechanisms, and neither is redundant:
+
+1. **`_cocktail_drafts/` is its own git repo**, pushed to
+   `helen-triages-cocktails-private`, and gitignored from this one. The source
+   never reaches a public repo whatever the build config says.
+2. **`output: false` in `_config.yml`, `output: true` in `_config_local.yml`.**
+   They render at `/cocktails/drafts/<slug>/` on :4001 and nowhere else.
+
+The second has failed before: issue #235 is the case where `output: false`
+held and `food/index.html` still listed ten drafts, linking to URLs Jekyll had
+never written. The config stopped the pages; the repo split stopped the
+source. Keep both.
+
+**What IS public**: `_layouts/cocktail.html`, `_sass/cocktails/`,
+`assets/css/cocktails.scss`, `cocktails/index.html`,
+`_data/cocktails/taxonomy.yml`, the tape artwork, and the `cocktails:` block
+in `sites.yml`. So the field NAMES and the tag vocabulary are visible even
+though no drink is. Helen accepted that trade explicitly, 2026-08-16, after
+the fully-private alternative was costed: it needs a single private clone
+plus symlinks into eight canonical paths, because Jekyll will only discover a
+collection at `_<name>` under the source root and a layout in `_layouts/`.
+
+**The naming trap fired immediately.** The directory was created as
+`_cocktails_drafts` (plural) and `.gitignore` line 14 says `_cocktail_drafts/`
+(singular, matching `cocktail_recipes`), so the drafts sat UNIGNORED and
+stageable in the public repo until it was spotted. This is §12's
+"rename something and silently un-ignore it" arriving on day one.
+`test_every_drafts_collection_is_gitignored` derives its patterns from
+`_config.yml`, so declaring the collection is what switched the guard on —
+it was broken on purpose to confirm it bites.
+
+`_cocktail_recipes/` is declared `output: true` but **does not exist on
+disk**. That is fine and deliberate: Jekyll builds the collection empty and
+`cocktails/index.html` shows its empty state. Nothing is promoted into it
+yet, and the promotion gate is the same as food's — Helen's own words, no
+lifted copy.
+
+### 9.2 The source data
+
+`tmp/2021-01-29 Cocktails - Book.csv` — **118 drinks over 656 rows**,
+gitignored and Jekyll-excluded. It is a starting point, not a source of
+truth, and it is not uniform; do not write a parser that assumes it is.
+
+Shape: **one row per ingredient**. Drink-level values sit on the drink's
+first row, EXCEPT multi-value ones (method, garnish, notes, serve), which
+spill down the following rows and still belong to the drink, not to the
+ingredient beside them. Columns, in order: (unnamed name), `Ingredients`,
+`Amount`, `Unit`, `Suggestion 1`, `Garnish`, `Method`, `Glass`, `Serve`,
+`Notes`, `Source`, `Source URL`, `Status`, `Ship?`.
+
+**Read it with a CSV parser, not by eye.** Pasted into a chat the empty tabs
+collapse and free text lands in the wrong column — that happened, and it put
+Cobra's Fang's "Honestly this just gets better and better" in `Notes` when
+the file has it in `Method`. It is kept as a note anyway, flagged rather than
+silently decided, because it plainly is not a step.
+
+Known defects in the source, to expect rather than be surprised by: the
+Sazerac's last method step is **truncated in the CSV itself** ("Strain the
+shaken drink into the absinthe-coated" — and stops), carried as a `QQ`;
+`Corvoisier` should be Courvoisier; `La Fee Parisienne` and
+`Creme de Pêche` are missing accents that `_data/accented_words.yml` covers
+(it lives at `_data/` root precisely because it is house style for both
+sites, and `crème` is its own worked example).
+
+### 9.3 Cocktail front matter
+
+```yaml
+title: "Sazerac"
+tagline: "QQ"                    # the one line of prose; QQ until written
+glass: "rocks"                   # scalar
+garnish: []                      # LIST — Cobra's Fang has two
+ingredients:                     # FULL list, untriaged, in build order
+  - amount: "0.5 oz"             # the quantity AS WRITTEN — display string
+    ml: 15                       # the same quantity numerically; see below
+    item: "Appleton Estate Reserve"   # what you actually pour, brand-led
+    generic: "aged Jamaican rum"      # what you would ever FILTER by
+    suggestion: "Pierre Ferrand ambre"  # alternative bottle or category
+method:                          # ORDERED LIST — the steps are sequential
+  - "Pour absinthe into ice-filled glass."
+to_serve: ""                     # PRESENTATION, not a further instruction
+notes:                           # {label, text} or a bare string, as food
+  - "This is much less sugar than many recipes"
+source: ""
+source_url: ""                   # external; nothing verifies it, see §9.6
+meta:
+  status: "parked"
+  ship: "oh gods yes"
+  date_last_edited: "2026-08-16"
+```
+
+**`amount` and `ml` are the same fact twice, on purpose, and want a guard.**
+Same idiom as `internal_temperatures.yml`'s display-string-beside-numeric-pair
+(§14): the string carries units a number cannot, the number makes ratios and
+scaling possible at all. **`ml` is ABSENT wherever the unit is not
+volumetric** — a dash is not 0.8 ml in any way worth writing down — so a
+consumer must check for the key rather than assume it. Conversions used:
+1 oz → 30 ml, 1 tsp → 5 ml. That is bar-standard rounding, not 29.5735;
+it keeps ratios clean and it is a decision, not an accident.
+
+**`item` versus `generic`.** `item` is the bottle: "Skippers dark rum",
+"Briottet Abricot". `generic` is the category: "dark rum", "apricot liqueur".
+No rule can derive the second from the first, which is why it is stored
+rather than computed. **Nothing reads `generic` yet** — it exists so that a
+future "what can I make tonight" is possible, and it is the cocktails
+analogue of food's `main_ingredients`, not a copy of it.
+
+### 9.4 Decided 2026-08-16 — do not re-litigate
+
+- **Ingredients are additive, never a choose-one.** The Sazerac really does
+  take cognac AND rye AND bourbon; it is not offering three bases. So a flat
+  list is enough, and the schema needs no "one of these" grouping. This was
+  asked directly because guessing wrong would have shaped the whole model.
+- **Store the quantity both ways** (as-written string plus numeric ml),
+  rather than canonicalising to ml or keeping free text only.
+- **`to_serve` is presentation, not steps** — "over crushed ice, with a
+  straw". Finishing ACTIONS ("top with champagne", "squeeze the twist over
+  the drink") are method steps. The CSV's `Serve` column holds actions, so
+  its contents move into `method` on ingest, and **none of the first three
+  drinks has a real `to_serve`**.
+- **Both brand and generic** are stored per ingredient.
+
+### 9.5 Open, and worth deciding out loud
+
+- **`garnish: []` versus stating "none".** The Sazerac's CSV row says `None`
+  deliberately, and that is information — "no garnish" is a decision, blank
+  is an unfilled field, exactly the distinction food's `cook_time: "None"`
+  preserves. Currently flattened to `[]`, which loses it. Putting `"none"`
+  in the list instead would pollute any future garnish vocabulary with a
+  fake member.
+- **`meta.status` and `meta.ship` have no vocabulary.** All three drinks say
+  `parked` / `oh gods yes`, so there is nothing to infer. Do not invent an
+  enum from a sample of one value.
+- **No tests exist for cocktails at all.** `tests/conftest.py` is explicitly
+  the FOOD suite. When a cocktails suite is written, the first thing it owes
+  is the `amount`/`ml` agreement guard above — and per
+  `test_suite_hygiene.py` it must ASSERT its corpus is non-empty rather than
+  skipping, or it passes vacuously on a clean checkout where
+  `_cocktail_drafts/` is not present.
+- `_data/cocktails/taxonomy.yml` is still empty. Three drinks is not enough
+  to argue a tag vocabulary out of.
+
+### 9.6 Two earlier claims in this document were wrong
+
+- **"a cocktail is… one method line"** (old §9, and §2.2's forked-layouts
+  paragraph). It is an ordered list. The Sazerac's five steps get a different
+  drink if reordered: coat the glass with absinthe, shake the rest, discard
+  the wash, strain in.
+- **`garnish` is not a scalar.** Cobra's Fang carries a mint sprig AND a lime
+  wheel. `_layouts/cocktail.html` assumed one value until real data arrived.
+
+### 9.7 Two traps this layout hit on its first day
+
+- **Liquid parses tag delimiters INSIDE a `comment` block.** Quoting an
+  if-tag in an explanatory comment is a build-breaking syntax error, not
+  documentation. `_layouts/recipe.html` already knew this and says so;
+  `cocktail.html` learned it the hard way. Describe the bad pattern in prose.
+- **An empty string is truthy, not just an empty array.** Every list-gated
+  section here tests `.size > 0`, which is the well-known half — but
+  `source: ""` is truthy too, and gating the footer on the bare value drew a
+  "Source:" line with nothing after it on all three drinks.
+
+### 9.8 What cocktails borrows, and the tape
 
 One deliberate borrowing: cocktails shares food's two font stacks. Colour and
 decoration are what separate the sites; typography is the family resemblance.
 
-**The wordmark tape is now the one exception to "cocktails has no
-decoration"**, added 2026-08-02 at Helen's explicit call: `assets/img/
-cocktails/tape/` holds a direct copy of food's tape files, wired via
-`tape`/`tape_count` in `sites.yml`, reused as a placeholder rather than
-leaving the wordmark bare while cocktails' own visual language is still
-undecided. Swap the files in that directory when real artwork arrives — the
-key doesn't need to change. See §13.8 for the sizing mechanism this feeds
-into, and the note at the top of `_sass/cocktails/_decoration.scss` for the
-same context in code.
+**The wordmark tape is the one exception to "cocktails has no decoration"**,
+added 2026-08-02 at Helen's explicit call: `assets/img/cocktails/tape/` holds
+a direct copy of food's tape files, wired via `tape`/`tape_count` in
+`sites.yml`, reused as a placeholder rather than leaving the wordmark bare
+while cocktails' own visual language is still undecided. Swap the files in
+that directory when real artwork arrives — the key doesn't need to change.
+See §13.8 for the sizing mechanism this feeds into, and the note at the top
+of `_sass/cocktails/_decoration.scss` for the same context in code.
 
 **Cocktails is kept at PARITY with food's tape, deliberately** — Helen's
 call, 2026-08-15, issue #223. It drifted for five days after the
@@ -811,9 +973,6 @@ Both directories now hold the same seven and `tape_count: 7` on both.
 its own** — regenerate food's set and copy it across in the same pass,
 rather than leaving them to drift again and relying on a handover note to
 notice.
-
-`tests/` is the FOOD suite (`conftest.py` says so). Cocktails gets its own
-test file once it has content to test against.
 
 ---
 
