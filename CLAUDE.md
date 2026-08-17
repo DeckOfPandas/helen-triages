@@ -25,8 +25,16 @@
 - Before creating a new branch, checkout out the main branch, then `git pull origin main`.
 - Commit freely without asking.
 - **NEVER commit or merge directly onto `main`, for any reason, even a one-line fix or an untangle/cleanup task.** The real workflow: work happens on a local branch; I push that branch myself; a PR is opened against `main`; I merge it (on GitHub); I pull `main` locally to update it. If you're on `main` and about to run `git commit` or `git merge`, stop and check out a branch first instead. `main` only ever moves via a pulled merge, never a direct local write.
+- **This applies to EVERY repo in the working tree, not just `helen-triages`.** The nested private drafts repos (`_food_drafts/`, `_cocktail_drafts/`) are separate repos with their own `main`, and the same rule governs them: branch, never commit to `main`. Got this wrong on 2026-08-17 -- four commits went straight onto `_cocktail_drafts`' `main` because the rule read as if there were only one repo. They were moved to a branch and `main` reset to `origin/main`; nothing had been pushed.
 - Never `git push` without my explicit confirmation first.
-- If a commit resolves a GitHub Issue, add a `Fixes #N` (or `Closes #N`) trailer to the commit message for every issue it resolves. GitHub auto-closes the issue once that commit reaches `main`. Never attempt to gain GitHub write access (`gh auth login` or similar) to close issues directly -- read-only access only, always. When summarising work, list the issue numbers involved so I can close anything the trailer mechanism didn't reach by hand.
+- If a commit resolves a GitHub Issue, add a `Fixes #N` (or `Closes #N`) trailer to the commit message for every issue it resolves. GitHub auto-closes the issue once that commit reaches `main`. When summarising work, list the issue numbers involved.
+
+## GitHub Issues -- read/write, and nothing else
+- **Changed 2026-08-17.** This used to say read-only, always. Claude may now READ, RAISE, CLOSE, REOPEN, COMMENT ON, LABEL and ASSIGN issues on `DeckOfPandas/helen-triages`, using the fine-grained token I supply via the `GH_TOKEN` environment variable.
+- **That is the entire permission.** Never push code, never open or merge a pull request, never change repository settings, secrets, Actions, webhooks or collaborators, and never act on any other repository. The token is scoped so these are impossible; do not treat a 403 as a problem to route around.
+- **Never attempt to broaden access.** No `gh auth login`, no requesting a wider token, no suggesting a classic token, no adding scopes. If something genuinely needs a permission the token lacks, say so and stop -- I will do it by hand.
+- **Never print, echo, log or commit the token**, and never write it into a file in this repo. Read it from the environment at the point of use.
+- Closing an issue is still a real action on a shared, outward-facing thing: say which issues you are about to close and why before doing it, unless I have just told you to close them.
 
 ## Normal workflow
 - If you need a scratch temporary folder, create one in this project folder and add it to .gitignore

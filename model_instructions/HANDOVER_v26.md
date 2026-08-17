@@ -842,7 +842,9 @@ issues closed 2026-08-10 through 2026-08-12, most had a matching test, but
 a real cluster didn't — closed by hand, correctly, with nothing guarding
 the fix afterward. Method: grepped every test file for `issue #NNN`
 citations, diffed that set against the closed-issue list pulled via
-`curl` to the GitHub API (read-only, no `gh auth` — see CLAUDE.md), then
+`curl` to the GitHub API (read-only at the time; **access changed
+2026-08-17** — Claude may now raise, close, comment on, label and assign
+issues via a fine-grained token, and nothing else. See CLAUDE.md), then
 checked each gap against the actual front matter before deciding whether it
 was a real gap, already-satisfied-but-untested, or a false alarm from a
 too-strict reading of the issue title.
