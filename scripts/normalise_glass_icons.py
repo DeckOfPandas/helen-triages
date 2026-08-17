@@ -33,7 +33,49 @@ DST = ROOT / "_includes" / "icons" / "glasses"
 # Not glasses. food-cloche-heart.svg is food's nav icon and already lives in
 # _includes/icons/; " - Copy" is a byte-identical duplicate (checked, not
 # assumed) of glass-old-fashioned.svg.
-SKIP = {"food-cloche-heart.svg", "glass-old-fashioned - Copy.svg"}
+#
+# The two rejected pineapples are kept in tmp/ rather than deleted, because the
+# choice between them was a judgement call and the losers are the evidence for
+# it. pineapple-1 is a 512x512 icon from a different family -- square canvas,
+# rounded-rectangle body, stubby leaves. pineapple-2-bad-trace is Inkscape's
+# Trace Bitmap output from the JPG, and it is bad for a structural reason worth
+# recording: Trace Bitmap produces a FILLED OUTLINE OF THE INK, one compound
+# path whose interior *is* the stroke, which is exactly why the edges looked
+# right but the contents were not editable. Centreline tracing is the tool that
+# would have given editable paths. Helen chose pineapple-3, 2026-08-17.
+#
+# THE GOBLET IS IN, AND IT IS DELIBERATELY AHEAD OF DEMAND. Nothing in the 117
+# drinks asks for a goblet or a chalice, so on the collection alone it would be
+# held back. Helen's call, 2026-08-17, and the reason is that the collection is
+# not the inventory: "I have lots of tiki recipes that aren't in the database I
+# gave you today, and given my rum obsession I bet we'll need it at some point."
+# The same spec-not-inventory principle as declaring Plymouth and Genever gin
+# while owning neither, and as `pudding in a glass` shipping with zero members.
+# Worth knowing when it is used: the drawing is a wine-style goblet -- thin stem,
+# small foot -- not the heavy-stemmed ceramic vessel "chalice" means in tiki, and
+# at icon size it reads close to `wine`.
+#
+# shot-2.svg was an accidental duplicate (Helen, 2026-08-17) and its source is
+# already gone from tmp/, so it simply stops being generated. No SKIP entry is
+# needed for a file that does not exist -- adding one would be a rule guarding
+# nothing, and the next person would go looking for the source it names.
+SKIP = {
+    "food-cloche-heart.svg",
+    "glass-old-fashioned - Copy.svg",
+    "glass-pineapple-1.svg",
+    "glass-pineapple-2-bad-trace.svg",
+}
+
+# FILL-BASED ARTWORK, WHICH THE REST OF THE SET IS NOT. Every glass is drawn as
+# open strokes with `fill: none`; the pineapple is a single compound path whose
+# lattice is negative space, so forcing the stroke class onto it would outline
+# the outline and produce mush. It gets its own class instead -- see
+# `.glass-icon-solid` in _sass/cocktails/_cocktail.scss -- which fills with
+# currentColor so the palette rule still holds and only the technique differs.
+SOLID = {"glass-pineapple-3.svg"}
+
+# Source name -> published name, where the export carries a working title.
+RENAME = {"pineapple-3": "pineapple"}
 
 
 # =============================================================================
@@ -68,14 +110,43 @@ SKIP = {"food-cloche-heart.svg", "glass-old-fashioned - Copy.svg"}
 # =============================================================================
 
 
+# A nested <g> may carry a leftover editing nudge -- Inkscape writes one when
+# you move a sub-selection. Dropping it moves that part of the artwork, which is
+# the thing this guard exists to prevent, so it is only tolerated when it CANNOT
+# matter: strictly a translate, and smaller than one user unit on every axis.
+# The smallest viewBox in the set is 28 units wide, so one unit is under 4% of
+# the narrowest icon and well under a pixel at any size the site renders. Louder
+# than a silent drop, and it still fails hard on a real transform.
+NEGLIGIBLE_UNITS = 1.0
+
+
+def _negligible_translate(t):
+    m = re.fullmatch(r"\s*translate\(\s*(-?[\d.]+)\s*(?:[, ]\s*(-?[\d.]+)\s*)?\)\s*", t)
+    if not m:
+        return None
+    dx = float(m.group(1))
+    dy = float(m.group(2)) if m.group(2) else 0.0
+    return (dx, dy) if abs(dx) < NEGLIGIBLE_UNITS and abs(dy) < NEGLIGIBLE_UNITS else None
+
+
 def check_nothing_was_dropped(source, out, paths, name):
     transforms = re.findall(r'\btransform="([^"]*)"', source)
     if len(transforms) > 1:
-        raise SystemExit(
-            f"{name}: {len(transforms)} transform attributes ({transforms}). "
-            f"This script re-emits exactly one, on one wrapping <g>, so the "
-            f"others would be silently dropped and the artwork would move."
-        )
+        # The first is the wrapping translate this script re-emits; any others
+        # must each be provably too small to see before they may be discarded.
+        offenders = [t for t in transforms[1:] if _negligible_translate(t) is None]
+        if offenders:
+            raise SystemExit(
+                f"{name}: {len(transforms)} transform attributes ({transforms}). "
+                f"This script re-emits exactly one, on one wrapping <g>, so "
+                f"{offenders} would be silently dropped and the artwork would "
+                f"move. Flatten them in Inkscape first (select all, then "
+                f"Object > Ungroup until only one group remains)."
+            )
+        for t in transforms[1:]:
+            dx, dy = _negligible_translate(t)
+            print(f"   note {name}: dropped nested {t} "
+                  f"({dx:+g},{dy:+g} units, under {NEGLIGIBLE_UNITS} -- invisible)")
     for d in paths:
         if re.sub(r"\s+", " ", d).strip() not in out:
             raise SystemExit(f"{name}: a <path d> did not survive normalisation")
@@ -91,7 +162,7 @@ def check_nothing_was_dropped(source, out, paths, name):
         )
 
 
-def normalise(text, name):
+def normalise(text, name, line_class="glass-icon-line"):
     vb = re.search(r'viewBox="([^"]+)"', text)
     if not vb:
         raise SystemExit(f"{name}: no viewBox, cannot scale without one")
@@ -124,7 +195,7 @@ def normalise(text, name):
         indent = "    "
     for d in paths:
         d = re.sub(r"\s+", " ", d).strip()
-        out.append(f'{indent}<path class="glass-icon-line" d="{d}" />')
+        out.append(f'{indent}<path class="{line_class}" d="{d}" />')
     if dx or dy:
         out.append("  </g>")
     out.append("</svg>")
@@ -142,8 +213,9 @@ def main():
     for p in sorted(SRC.glob("*.svg")):
         if p.name in SKIP:
             continue
-        name = p.stem.replace("glass-", "")
-        svg = normalise(p.read_text(encoding="utf-8"), name)
+        name = RENAME.get(p.stem.replace("glass-", ""), p.stem.replace("glass-", ""))
+        cls = "glass-icon-solid" if p.name in SOLID else "glass-icon-line"
+        svg = normalise(p.read_text(encoding="utf-8"), name, cls)
         target = DST / f"{name}.svg"
         target.write_text(svg, encoding="utf-8")
         xml.dom.minidom.parseString(svg)          # must be well-formed XML

@@ -70,6 +70,27 @@
   vector-effect: non-scaling-stroke;
 }
 
+// FILL-BASED ARTWORK, AND THE ONLY MEMBER OF THE SET THAT IS.
+//
+// Every glass is an open line drawing, so `fill: none` plus a stroke is the
+// right treatment. The pineapple is not a glass and is not drawn that way: it
+// is one compound path whose lattice is negative space. Forcing the stroke
+// class onto it outlines the outline and collapses to mush at icon size.
+//
+// So it fills with currentColor instead. Note what is preserved and what is
+// not: the PALETTE rule still holds -- the colour comes from the page's own ink
+// exactly as the stroked icons do -- while the TECHNIQUE differs. That is the
+// right trade, because the palette is the thing with a three-layer rule behind
+// it and the technique is not.
+//
+// There is no stroke-width here on purpose. `stroke-width` would do nothing to
+// a filled shape, and adding it "for consistency" would be a line of CSS that
+// looks load-bearing and is not.
+.glass-icon-solid {
+  fill: currentColor;
+  stroke: none;
+}
+
 // currentColor, so the icon takes the page's own ink and the palette stays the
 // only place a colour is written down (three-layer rule). The exported SVGs had
 // #4c4c4e baked into all 104 paths; that is stripped at normalisation, and an
