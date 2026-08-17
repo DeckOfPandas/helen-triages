@@ -155,11 +155,18 @@ other_base_spirits:
 liqueurs:
   # Orange, four ways -- Helen's call. Grand Marnier stays apart because its
   # cognac base genuinely changes a drink.
+  #
+  # CURAÇAO KEEPS ITS CAPITAL, Helen's call 2026-08-17, and it is a deliberate
+  # exception to the lowercase-the-commodity rule that keeps cognac, champagne
+  # and calvados lowercase. The distinction that justifies it: those three are
+  # protected appellations that have become common nouns in English, whereas
+  # curaçao is not protected and still reads as the island's name. Her own data
+  # writes it capitalised throughout, which is the stronger argument.
   - "triple sec"
-  - "orange curaçao"
-  - "dry orange curaçao"
+  - "orange Curaçao"
+  - "dry orange Curaçao"
   - "Grand Marnier"
-  - "blue curaçao"
+  - "blue Curaçao"
   # Rhum Clément Créole Shrubb. A rhum-based ORANGE LIQUEUR, and filed here
   # rather than under rum on Helen's question, 2026-08-17. The deciding case is
   # exclusion: under `rum` it would make "no rum tonight" wrongly drop Ginger
