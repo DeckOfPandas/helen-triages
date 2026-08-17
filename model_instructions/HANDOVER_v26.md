@@ -910,6 +910,33 @@ analogue of food's `main_ingredients`, not a copy of it.
   drinks has a real `to_serve`**.
 - **Both brand and generic** are stored per ingredient.
 
+### 9.4.1 The site is canon. Deviation happens in the kitchen.
+
+**Helen, 2026-08-17, and it settles a whole class of questions rather than
+one:** "With iPad in hand, I'd rather take the site as canon, then happily
+break rules from there."
+
+So a cocktail page states ONE figure. It does not model the fact that she
+sweetens to taste, that she "often like[s] different amounts of sugar
+depending on the weather", or that "some friends have a sweeter tooth than
+others". All of that is true and none of it belongs in the data.
+
+**This came up as a real proposal and was declined.** The sugar-syrup ratios
+are only stated on 2 of 27 entries, and the obvious response is to model
+adjustability — a range, a tolerance, an "approximate" flag. Her answer is
+that the page is the reference she deviates FROM, and a page that hedges is
+no longer a reference. Do not reintroduce it.
+
+**The generalisation, which is the useful part:** when a figure in this
+collection looks imprecise, the question is not "how do we capture the
+imprecision" but "what single figure is the right thing to print". A drink
+whose sugar is genuinely undecided gets a `QQ`, not a range.
+
+This is also why the syrup-to-citrus ratio (§9.5) can only ever FLAG, never
+classify — the variation it detects is often Helen adjusting a drink on
+purpose, which is indistinguishable from a transcription error by volume
+alone. See the note there.
+
 ### 9.5 Open, and worth deciding out loud
 
 - **`garnish: []` versus stating "none".** The Sazerac's CSV row says `None`
