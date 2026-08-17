@@ -726,6 +726,53 @@ rejected.
 
 ---
 
+### 8.1 Two pickers, one code path, very different input
+
+Asked directly, 2026-08-16 (issue #281): why are the exclude picker's words
+worse than the ingredient search's? **They are not two implementations.** Both
+call the same `IS.buildMasterList` with the same `ingredient_words.yml`. What
+differs is what is handed to it:
+
+- the **include** picker reads `data-ingredients` ← `main_ingredients`, a
+  curated list of clean single words;
+- the **exclude** picker reads `data-all-ingredients` ← every
+  `ingredient_groups` item, which is prose written for a cook — portions,
+  containers, brands, alternatives ("a knob of butter", "about 200 g raw king
+  prawns").
+
+Issue #52 chose that harder source deliberately and correctly, because
+`main_ingredients` is a partial hint: nine rows list an olive oil that none of
+them names in `main_ingredients`. So the answer is always to teach the
+vocabulary, never to fork the logic or change the source.
+
+**Measure production, not your local build.** The local build folds in ~254
+drafts and every unrewritten recipe. On 2026-08-16 the derived vocabulary read
+402 bad entries of 1421 locally against 28 of 348 in what actually ships, and
+all six source-data bugs found on the way (`"and ½ tsp sugar"`, `"or 300 ml
+soured cream"`, `"g-900 g damsons"` — continuation fragments that leaked into
+`item:`) were in `_food_drafts/`. Helen's call, and the right default: fix
+what ships, and revisit drafts as they are proofread, because a draft's
+`item:` lines are rewritten before publishing and a vocabulary entry aimed at
+one today is work done twice.
+
+**Read the whole list before adding to `measure_phrases`.** The section header
+in `ingredient_words.yml` already says to derive phrases from real entries;
+these are the traps that rule exists for. `bicarbonate of` and `cream of` both
+end in "of" and both lead real entries — stripping them yields "soda" and
+"tartar". A bare `little` would turn all three "little gem lettuce" entries
+into "gem lettuce", which is why `a little` and `a little extra` keep their
+article. The container words without an "of" ("can chickpeas") are only safe
+because **`stripMeasurePhrase` matches `phrase + ' '`**: `can ` cannot fire on
+"cannellini beans", and the spice `cloves` survives untouched because a bare
+entry has no trailing space to match, while `cloves garlic` strips correctly.
+That trailing space is load-bearing; a word-list version of this destroys both.
+
+**Order of operations decides whether a phrase or an alias is the right tool.**
+`normaliseEntry` runs trailing → quantity → measure → modifiers, so a measure
+phrase strips AFTER the quantity strip has already run. "juice of 2 lemons"
+therefore cannot be fixed with a `juice of` phrase — it would be left as "2
+lemons". Those go in `aliases`, whose keys are the post-strip forms.
+
 ## 9. Cocktails — scaffolded, deliberately empty
 
 Routing, styling hooks and the shared-layer contract exist. **No schema does,
@@ -1055,6 +1102,32 @@ End every commit:
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
 ```
 
+**Ask her the decisions as you hit them, not in a batch at the end.** Her own
+instruction, 2026-08-16: "Give me decisions to make as you go." It works
+because her answers are fast and they change what the next hour looks like —
+three rulings mid-way through the exclude vocabulary (collapse citrus to the
+fruit; strip container words; split only compounds whose halves are both known
+ingredients) each removed a class of guesswork rather than a single case.
+Bring her the fact that forces the decision, not the options in the abstract:
+"only 2 of 73 methods have this shape" settled the doneness UI in one reply.
+
+**One agent at a time in this working tree, and never one that switches
+branches.** 2026-08-16: a background agent was given issue #274, created its
+own branch, and was still working when Helen ran `git checkout main` and
+pulled. The checkout moved the tree out from under it, so it carried on
+editing on `main` — its branch left empty, its work stranded uncommitted on
+the branch it must never touch. Nothing was lost (the edits were sound and
+were moved onto a fresh branch), but the failure mode is silent and the tree
+is shared with a human who is also using git. Delegate the reading and the
+scanning; keep the branching in the foreground.
+
+**Put `Fixes #N` on the commit, or the issue stays open forever.** Four issues
+this session (#52, #273, and nearly #274/#281) shipped and merged with no
+trailer, so GitHub never closed them and they sat in the open list looking
+like outstanding work. Helen has read-only `gh` access by choice, so nobody
+can close them programmatically after the fact — she has to do it by hand.
+Check `git log main --grep="Fixes #N"` before reporting an issue as done.
+
 ### 11.1 A file with a colon in its name will crash the whole build
 
 WSL writes `<name>:Zone.Identifier` beside anything dragged in from Windows.
@@ -1339,6 +1412,48 @@ Any interactive element nested inside a punched-tape heading needs explicit
 to carry the effect too.
 
 ---
+
+**A rule nested under a parent is a bet on where the element lives, and
+moving the markup silently voids it.** 2026-08-16, issue #275. `.btn-reveal`
+and `.exclude-reveal-row` were nested under `.controls .search--exclude`. The
+reveal button was then moved into `.search-input` so it could share a grid
+column with the heading it sits under — and both rules stopped matching
+anything at all. The button shipped with no styling whatsoever: no font, no
+underline, no colour. **Sass compiled without a warning and all 17,170 tests
+stayed green**, because nothing in the suite can see that a selector now
+matches zero elements. Caught only by diffing the compiled selectors in
+`_site/assets/css/food.css` against the new markup. Nesting is fine; nesting
+plus a markup move is a silent break, so when you move an element, grep the
+compiled CSS for every rule that named its old ancestor. This is the same
+family as the "test that cannot fail" run above — a green suite proving
+nothing — but the vacuous thing is a CSS selector rather than a test.
+
+**A lightness-only colour change is not a state change at small type.** Twice
+in one day, 2026-08-16, both found by Helen on the page and neither visible to
+me in the source. The footer reference links moved `$color-clear-text` →
+`$color-text` on hover (#4f4e4a → #211f20) and the LEAVE OUT reveal link moved
+`lighten($color-text, 12%)` → `$color-text` (#3a3739 → #211f20). Both are real
+changes; both are invisible at 0.75–0.78rem. Her report was the same sentence
+each time: it "doesn't change on mouseover or click". **At small sizes the eye
+reads hue, not lightness** — every interaction state on this site that
+actually works moves hue (the clear buttons sit at their section's darkened
+root and shift; body links go to the core magenta). If you find yourself
+darkening a grey by 12% to signal a state, you have written a no-op.
+
+**A generated sweep over a table proves the predicate, not the table.**
+`tests/js/filter-state.test.js` generates one case per field from
+`FS.FIELDS`, and it is genuinely load-bearing — but it can only prove that
+`hasAnythingToClear()` handles every field `FIELD_SPEC` **declares**. It
+cannot prove `FIELD_SPEC` declares every piece of state the page holds, and
+that second claim is the one that keeps failing: `nameQuery`, then
+`isSearching`, then two rival predicates, then the LEAVE OUT box (#274,
+2026-08-16). A control with no field is invisible to a sweep over fields. The
+fix that closes the class rather than the instance comes at it from the page:
+`test_every_text_input_on_the_index_has_state_behind_it`
+(`tests/test_rendered_pages.py`) reads every `<input type="text">` id out of
+the BUILT index page and fails on any control it has not been told about.
+**When a generated test keeps missing the same bug, ask what its input list is
+generated FROM, and generate the next one from the other end.**
 
 ## 13. The site's visual design
 
@@ -1811,6 +1926,28 @@ the first time. Removed. See §12 for the general form of this trap — it will
 recur anywhere an element's width and its container's width are assumed to
 always be equal until one day they aren't.
 
+**The same mechanism, used for the index page's reveal link — and the way it
+fails.** 2026-08-16, issue #275: "(I know what I don't want)" had to centre
+under I KNOW WHAT I WANT, whose width changes with its own text. Same answer
+as above — `display: inline-grid; grid-template-columns: max-content;
+justify-items: center`, both rows in the one column (`.name-heading-stack`).
+
+The first attempt put the heading, the search input, the exclude panel and the
+active list into a single grid on `.search--name`, with the panel spanning
+every column. It came out ~116px too wide, and the reason is worth carrying:
+**a spanning grid item still contributes to an intrinsic track's size.** With
+`grid-template-columns: max-content minmax(0, 1fr) max-content`, an item
+spanning `1 / -1` pushes its contribution into the only intrinsic track it
+can — so the LEAVE OUT panel, not the heading, decided the width of the column
+the link was being centred in, and the search input beside it moved right by
+the same amount. Visible on the page as `recipe name...` no longer lining up
+with `ingredient name...` above it.
+
+So the shared column must contain **only** the two things being centred on
+each other. That is a real constraint on this trick, not a tidiness
+preference: anything else placed in that column, or spanning through it,
+becomes the thing that sizes it.
+
 ### 13.9 The tape background
 
 Redesigned 2026-08-10, issue #122 — replaced food's original 4 tape files
@@ -2007,6 +2144,22 @@ survive a generic loop. No table CSS existed anywhere on the site before this
 `.table-scroll` horizontal-scroll wrapper, both in
 `_sass/food/_recipe-notes-body.scss`.
 
+**How a reader reaches these pages.** Until 2026-08-16 they were reachable
+only from a recipe that happened to be wired to one, or from each other —
+nothing on the index or in the nav pointed at the reference layer at all.
+Issue #272 added two links in the footer ("internal temperatures", "times and
+methods") under the site's own bracketed word, driven by `reference_links` in
+`_data/sites.yml`; a site without that key renders nothing, the same
+absent-means-nothing convention `footer_svg` and `about_url` already use.
+
+Deliberately the footer and not the nav, and Helen's framing settled what had
+looked like a tension with "what to cook, not how to cook": these pages would
+not teach anyone to cook, they are look-up material for someone who already
+does — used "when I'm planning out what I've decided to cook, and when I'm in
+the kitchen about to be covered in raw chicken". A nav slot would have made
+the reference layer a peer of the two sites. The block is asymmetric (food has
+links, cocktails has none) and that is an open question, not an oversight.
+
 ### The data layer — two datasets now, not one
 
 `_data/food/internal_temperatures.yml` is the single source for out-at
@@ -2142,6 +2295,28 @@ carry the `safety_min`/`safety_label`/`safety_summary` fields that shade
 the chart past that line on `temperatures.html` (above). Deliberately not
 "corrected" to the well-done figure — whether to keep serving pork pink is
 Helen's call, not something to silently override.
+
+### The timings calculator and doneness
+
+`cook-schedule.js` has always taken a `doneness` argument; `cook-timer.js`
+opened `render()` with a literal `var doneness = "rare";` and shipped no
+control, so every `medium` rate in `cooking_methods.yml` was sourced, checked
+data that nothing could display (issue #246, fixed 2026-08-16).
+
+**Only 2 of 73 methods have the `by_doneness` shape** — beef's standard
+constant roast and venison's haunch — and that number decided the design. A
+rare/medium control would be a page-level widget that changes nothing for
+seven of the nine proteins, and a control that usually does nothing reads as
+broken. Helen's call: show both figures on those two cards, add no control.
+
+`resolve()` now returns a `levels` array alongside the existing `lo`/`hi` and
+aside, which still describe the single requested level — **additive on
+purpose**, so `orderMethods` keeps sorting on one consistent figure and every
+existing caller and test sees what it saw before. Levels come out in data
+order, not alphabetical: the yaml lists rare before medium, which is the order
+the rates rise in; alphabetical would put medium first and make it look like
+the default. If a third level is ever added to a row, it renders with no code
+change.
 
 ### What's not done
 
