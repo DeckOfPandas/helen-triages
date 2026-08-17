@@ -157,6 +157,13 @@ liqueurs:
   - "dry orange curaçao"
   - "grand marnier"
   - "blue curaçao"
+  # Rhum Clément Créole Shrubb. A rhum-based ORANGE LIQUEUR, and filed here
+  # rather than under rum on Helen's question, 2026-08-17. The deciding case is
+  # exclusion: under `rum` it would make "no rum tonight" wrongly drop Ginger
+  # Snap and Accoutrement, whose only rum-derived element is 15 ml of this.
+  # Stiggins' Fancy sits under rum because it genuinely IS rum; a shrubb is a
+  # sweetened orange liqueur that happens to be rhum-based.
+  - "créole shrubb"
   - "maraschino liqueur"
   # Each by flavour, deliberately: precision chosen over collapsing.
   - "crème de mûre"

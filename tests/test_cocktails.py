@@ -80,13 +80,30 @@ def _declared_generics(vocab):
 
 
 def _ingredients():
-    """(drink, item, generic) for every ingredient entry."""
-    return [
-        (slug, item.get("item") or "", item.get("generic"))
-        for slug, fm in _load()
-        for item in (fm.get("ingredients") or [])
-        if isinstance(item, dict)
-    ]
+    """(drink, item, generic) for every ingredient entry, one row per generic.
+
+    `generic` MAY BE A LIST, and that is deliberate rather than sloppy: two
+    ingredients in the collection genuinely offer alternatives in one cell --
+    "Demerara or dark Muscovado sugar" and "Grand Marnier / Cointreau / Triple
+    Sec". Helen, 2026-08-17: "What I have there is fine. I can do what I want on
+    the spot." So the item text stays as she wrote it and the generic carries
+    both, which is what `glass` and `garnish` already do for the same reason.
+
+    Flattened here so every check below sees one generic at a time and none of
+    them has to know about the list form. A list arriving somewhere that expects
+    a string is exactly how the `glass` scalar bug would have gone unnoticed.
+    """
+    out = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            name, generic = item.get("item") or "", item.get("generic")
+            if isinstance(generic, list):
+                out += [(slug, name, g) for g in generic]
+            else:
+                out.append((slug, name, generic))
+    return out
 
 
 # =============================================================================
@@ -306,8 +323,16 @@ def test_syrup_ratio_is_plausible_for_its_generic():
     checked = 0
     for slug, fm in _load():
         items = [i for i in (fm.get("ingredients") or []) if isinstance(i, dict)]
+        # `generic` may be a list -- see _ingredients() for why -- so normalise
+        # before matching. A bare .startswith() here raised AttributeError the
+        # moment the first list-valued generic landed, which is the good failure
+        # mode: loud, immediate, and at the one place that assumed a string.
+        def generics(entry):
+            g = entry.get("generic")
+            return g if isinstance(g, list) else [g] if g else []
+
         syrup = sum(i.get("ml") or 0 for i in items
-                    if (i.get("generic") or "").startswith("sugar syrup"))
+                    if any(str(g).startswith("sugar syrup") for g in generics(i)))
         sour = sum(i.get("ml") or 0 for i in items if citrus.search(i.get("item", "")))
         if not (syrup and sour):
             continue
