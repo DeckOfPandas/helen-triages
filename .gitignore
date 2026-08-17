@@ -47,6 +47,8 @@ Thumbs.db
 # Local workflow
 *Zone.Identifier
 tmp/
+htf-sublime.sublime-project
+htf-sublime.sublime-workspace
 
 # Claude
 .claude/settings.local.json
