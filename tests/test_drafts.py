@@ -62,10 +62,16 @@ from conftest import where_draft, ALL_RECIPES, ALL_DRAFTS
 from test_front_matter import REQUIRED, RETIRED, MISPLACED_META, _StrictLoader
 from test_style import TYPOGRAPHY, SPELLINGS
 from test_taxonomy import (
+
     MISSING_TRAILING_SLASH,
     ANY_RELATIVE_LINK,
     _WELL_FORMED_TARGET,
 )
+
+# Suite marker, so `pytest -m food` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one --
+# an unmarked file is silently missed by every filtered run.
+pytestmark = pytest.mark.food
 
 
 # --- front matter shape (test_front_matter.py, structural half only) --------

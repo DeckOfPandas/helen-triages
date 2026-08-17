@@ -1,37 +1,152 @@
 # =============================================================================
-# COCKTAILS TAXONOMY — the vocabulary layer. DELIBERATELY EMPTY.
+# COCKTAILS TAXONOMY — mood, and the chaos dial. Spec: GitHub issue #292.
 # =============================================================================
-# The food taxonomy in _data/food/taxonomy.yml was not designed up front. It
-# came out of arguing over real recipes — which is why `one-handed food` means
-# something you would not guess, and why `no-cook` is one-directional.
+# This file was a deliberately empty scaffold until 2026-08-17. Its own comment
+# said the schema should "arrive the same way [as food's], from the real
+# recipes rather than from general knowledge about cocktails". It did: every
+# mood below was tested against all 117 drinks before it was written down, and
+# three candidates were changed or dropped because the data said so.
 #
-# The cocktails schema is meant to arrive the same way, from the real recipes
-# rather than from general knowledge about cocktails. So the keys below are the
-# SHAPE this file will take, left empty on purpose. Filling them in with
-# plausible-looking guesses now would mean arguing later against a structure
-# nobody chose.
+# THERE IS NO STAR AXIS, AND THAT IS DELIBERATE. Food browses by star
+# ingredient; cocktails does not browse by spirit at all. Helen, 2026-08-17:
+# "I get really bored of cocktail bars that have enormous bible-like menus
+# sorted by spirit... I probably think browsing by spirit is basic." The spirit
+# families in _data/cocktails/ingredients.yml exist for SEARCH and EXCLUSION
+# only. Do not add a spirit filter to the index.
 #
-# The two things already known, from the architecture handover:
-#   - the ingredients list is FULL, not triaged the way food's
-#     `main_ingredients` is (no completeness/substitution split)
-#   - `glass` and `garnish` are real fields; prep/cook time are not
+# WHAT WAS LEARNED BY TESTING EACH CANDIDATE, kept because each is a trap that
+# would otherwise be re-entered:
 #
-# Nothing reads this file yet. cocktails/index.html renders whatever is here,
-# so adding a term is all that will be needed to make it real — the same
-# contract the food taxonomy has.
+#   - "fruity" first counted citrus juice and covered 51% of the collection --
+#     the same too-broad failure that retired food's `one-pot` at 57%. Citrus
+#     is the SOUR component, not the fruit. Excluding it gives 28%.
+#   - "sugar craving" defined as "has any sweetener" was 68%. Nearly every
+#     cocktail contains sugar; sweetening is construction, not craving. Narrowed
+#     to pudding flavours it is 11%.
+#   - The first pudding list wrongly included crème de violette and pulled in
+#     Aviation, which is floral and sharp. Fruit liqueurs came out too -- they
+#     belong to `fruity`.
+#   - 30% of drinks matched NO mood, and they turned out to be one genre: the
+#     classic short sour. That gap is what `short and sharp` exists to fill.
 # =============================================================================
 
-# The hero spirit or ingredient, if there is one. Food's equivalent
-# (star_ingredient) is blank on about a quarter of recipes, and that is correct
-# — expect the same here.
-star_ingredients: []
+# A drink may carry several. Order is not significance -- a mood list is a set.
+moods:
+  strong brown drink: >-
+    Spirit-forward and aged: at least 60% of the volume is a base spirit, and
+    the aged/amaro ingredients outnumber the clear ones. ONE mood rather than
+    `strong` and `brown` separately -- Helen's call, "strong brown drink" is a
+    single feeling. The cost, accepted knowingly: 18 drinks that are strong but
+    CLEAR (the Martini-shaped ones) carry no strength signal at all.
+    KNOWN DERIVATION FLAW: the volume fraction counts ingredients the drink
+    THROWS AWAY. The Sazerac -- the archetype of this mood -- scored 44%
+    because its 60 ml of chilled water is part of the absinthe rinse and is
+    discarded at method step 4. Its mood is set by hand. Any rinse-and-discard
+    drink will do the same, and detecting it reliably needs the method parsed
+    rather than pattern-matched, so it is recorded rather than fixed.
+  clear: >-
+    Transparent and, in Helen's definition, usually free of citrus. Not the
+    opposite of `strong brown drink` -- they are independent, and a drink can
+    be neither.
+  short and sharp: >-
+    The classic short sour: a base, a citrus, a sweetener, served up, three to
+    five ingredients. Aviation, Bee's Knees, Sidecar, Champs Élysées. Named by
+    Helen. It exists because this genre -- the largest in the book -- had no
+    mood at all, leaving 30% of drinks unbrowsable.
+  fruity: >-
+    Contains a non-citrus fruit: pineapple, passion fruit, berries, a crème de
+    or a fruit liqueur. CITRUS DOES NOT COUNT. It is the sour component and
+    nearly every drink has it; counting it made this cover half the collection.
+    Deliberately NOT fused with sweetness -- a third of these drinks carry no
+    sweetener and a third are actively sharp.
+  sugar craving: >-
+    Pudding flavours: coffee, cacao, amaretto, banana, menthe, coconut,
+    vanilla, cola, chocolate bitters. About what the drink TASTES of, not how
+    much sugar is in it -- "has a sweetener" covers 68% of the book and means
+    nothing.
+  pudding in a glass: >-
+    Rich and thick rather than merely sweet: cream, a whole egg, coconut cream.
+    A White Russian, a flip, an Alexander. DECLARED WITH ZERO MEMBERS ON
+    PURPOSE, the same choice as declaring Plymouth and Genever gin while owning
+    neither -- this is a spec, not an inventory. The collection genuinely has
+    none of these yet; see issue #337. The index must not render a button for a
+    mood with no drinks.
+  tiki: >-
+    Two or more tiki markers -- orgeat, falernum, passion fruit, pineapple,
+    cinnamon syrup, grenadine, an overproof or pineapple rum -- AND complexity,
+    measured two ways: six or more ingredients, OR two "loud" ingredients that
+    each carry a flavour layer on their own.
+    COMPLEXITY IS THE DEFINITION, not a filter on it. Helen: tiki is "a complex
+    drink with lots of ingredients and lots of taste layers which is why it's
+    not just a jar full of sugar". Ingredient COUNT alone got that wrong in
+    both directions -- it dropped Jungle Bird, Better and Better ("only three
+    ingredients, but they're bonkers") and Chartreuse Swizzle. Intensity
+    recovers all three and drags in nothing.
+    And it made the threshold FIRMER, which is counterintuitive: on markers
+    alone, 25 drinks sat one ingredient from flipping in; with both bars, one
+    does. Few drinks sit at two edges at once.
+  ice ice baby: >-
+    Wants a lot of ice -- crushed, swizzled, blended, or a big block. Read
+    inverted it is also the "I don't have much ice" constraint, which is the
+    same flag from the other side.
+    KNOWN SIMPLIFICATION: this fuses three different things. Frozen/blended (4
+    drinks) needs a blender, swizzled (10) needs crushed ice, a block (5) needs
+    planning -- and Helen specifically named wanting FROZEN drinks in summer as
+    its own craving. Four drinks is too thin to split today; split it when the
+    frozen set grows.
+  I want to faff: >-
+    Muddling, flaming, shells, blending, swizzling, or nine-plus ingredients.
+    Named to pair against `no juicing` as its other end.
+    Helen: "in the mood to faff" would be redundant -- the section IS mood.
+    Helen's own caveat, worth keeping: she sometimes wants to make something
+    complicated regardless of whether she wants the result -- so the faff can
+    be the point rather than a cost the drink repays.
+  no juicing: >-
+    No citrus juice at all. Helen's own framing, and better than the earlier
+    "can't be bothered to juice": it names "the urgh, juicing, urghh feeling
+    when you want a single drink on a weeknight without using 47 pieces of
+    equipment and making your worktops sticky". The low-effort end, 38 drinks.
+  on fire: >-
+    Something is set alight. Two drinks, and narrow is the point: a two-drink
+    answer to "something on fire" is a good answer, not a failed filter.
 
-# Grouped filter vocabulary. Food uses star / mood / practicalities; whether
-# cocktails wants the same three axes is exactly the question the real recipes
-# should answer.
-tags: {}
+# =============================================================================
+# APPETITE FOR CHAOS — how much risk you want tonight
+# =============================================================================
+# Helen's own axis, and the one she actually starts from with company. Built
+# from `meta.ship` and `meta.status`, which were already in the spreadsheet.
+#
+# Three buckets, revised from an earlier four: the duds fold into `YOLO`,
+# because remaking something you disliked IS a chaotic choice.
+chaos:
+  definitely good: "ship is yes or oh gods yes"
+  haven't tried: "status is never made or not started"
+  YOLO: "everything else, including the five drinks rated `not really`"
 
-# Tags that imply other tags. Food kept only one rule, on the test that an
-# implied tag is sound when it is a rollup or a genuine affordance, and unsound
-# when it is merely definitional. Same test should apply here.
-co_tags: {}
+# `who knows` is NOT on the ship scale -- Helen, 2026-08-17. It means "I have no
+# idea", which is an absence of verdict rather than a low one, so it belongs
+# with the unrated rather than between `not really` and `maybe`.
+#
+# EVERY VALUE QUOTED, and `yes` is why. YAML 1.1 parses a bare `yes` as the
+# BOOLEAN True, so this list came out as [..., 'sure', True, 'oh gods yes'] and
+# would have silently failed every comparison against `meta.ship`, which is the
+# string "yes" on 37 drinks. No error anywhere -- just a scale with a hole in
+# it. The mirror image of food's own note on `meta:` booleans, where quoting
+# `rewritten: true` would turn it into the STRING "true" and break every
+# `is True` check in the suite.
+ship_scale:
+  - "not really"
+  - "maybe"
+  - "okay"
+  - "sure"
+  - "yes"
+  - "oh gods yes"
+
+# =============================================================================
+# DELIBERATELY ABSENT
+# =============================================================================
+# star_ingredients: there is no star axis. See the header.
+# co_tags: food kept exactly one co-tag rule and the test for adding another is
+#   strict -- sound when a ROLLUP or a real AFFORDANCE, unsound when
+#   DEFINITIONAL. No cocktail mood has met it yet. `on fire` implies `worth the
+#   faff` in practice, but that is definitional, so it is not encoded.

@@ -24,9 +24,15 @@ from pathlib import Path
 import pytest
 import yaml
 
+# Suite marker, so `pytest -m cocktails` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one --
+# an unmarked file is silently missed by every filtered run.
+pytestmark = pytest.mark.cocktails
+
 ROOT = Path(__file__).resolve().parent.parent
 DRAFTS = ROOT / "_cocktail_drafts"
 VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"
+TAXONOMY = ROOT / "_data" / "cocktails" / "taxonomy.yml"
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
@@ -80,13 +86,30 @@ def _declared_generics(vocab):
 
 
 def _ingredients():
-    """(drink, item, generic) for every ingredient entry."""
-    return [
-        (slug, item.get("item") or "", item.get("generic"))
-        for slug, fm in _load()
-        for item in (fm.get("ingredients") or [])
-        if isinstance(item, dict)
-    ]
+    """(drink, item, generic) for every ingredient entry, one row per generic.
+
+    `generic` MAY BE A LIST, and that is deliberate rather than sloppy: two
+    ingredients in the collection genuinely offer alternatives in one cell --
+    "Demerara or dark Muscovado sugar" and "Grand Marnier / Cointreau / Triple
+    Sec". Helen, 2026-08-17: "What I have there is fine. I can do what I want on
+    the spot." So the item text stays as she wrote it and the generic carries
+    both, which is what `glass` and `garnish` already do for the same reason.
+
+    Flattened here so every check below sees one generic at a time and none of
+    them has to know about the list form. A list arriving somewhere that expects
+    a string is exactly how the `glass` scalar bug would have gone unnoticed.
+    """
+    out = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            name, generic = item.get("item") or "", item.get("generic")
+            if isinstance(generic, list):
+                out += [(slug, name, g) for g in generic]
+            else:
+                out.append((slug, name, generic))
+    return out
 
 
 # =============================================================================
@@ -306,8 +329,16 @@ def test_syrup_ratio_is_plausible_for_its_generic():
     checked = 0
     for slug, fm in _load():
         items = [i for i in (fm.get("ingredients") or []) if isinstance(i, dict)]
+        # `generic` may be a list -- see _ingredients() for why -- so normalise
+        # before matching. A bare .startswith() here raised AttributeError the
+        # moment the first list-valued generic landed, which is the good failure
+        # mode: loud, immediate, and at the one place that assumed a string.
+        def generics(entry):
+            g = entry.get("generic")
+            return g if isinstance(g, list) else [g] if g else []
+
         syrup = sum(i.get("ml") or 0 for i in items
-                    if (i.get("generic") or "").startswith("sugar syrup"))
+                    if any(str(g).startswith("sugar syrup") for g in generics(i)))
         sour = sum(i.get("ml") or 0 for i in items if citrus.search(i.get("item", "")))
         if not (syrup and sour):
             continue
@@ -329,4 +360,89 @@ def test_syrup_ratio_is_plausible_for_its_generic():
         + "\n\nThis is looking for a TRANSCRIPTION error, not a taste "
           "preference -- the bounds are wide on purpose. Check the source "
           "spreadsheet before changing the figure."
+    )
+
+
+# =============================================================================
+# MOOD -- the browsing vocabulary. Spec: _data/cocktails/taxonomy.yml, #292
+# =============================================================================
+
+def _taxonomy():
+    if not TAXONOMY.exists():
+        pytest.skip("_data/cocktails/taxonomy.yml does not exist yet.")
+    return yaml.safe_load(TAXONOMY.read_text(encoding="utf-8")) or {}
+
+
+def test_every_mood_is_declared():
+    """A drink's moods come from taxonomy.yml and nowhere else.
+
+    Moods are DERIVED at ingest and then written into the drink, so that Helen
+    can override one -- a drink she thinks is tiki is tiki, whatever the
+    ingredient count says. That is the point, and it is also the risk: a
+    hand-edited mood is free text, and a typo mints a category that renders as
+    a filter button nobody can ever match.
+    """
+    declared = set(_taxonomy().get("moods") or {})
+    assert declared, (
+        "_data/cocktails/taxonomy.yml declares no moods, so this check enforces "
+        "nothing. An empty set would pass every value."
+    )
+    bad = sorted({f"{slug}: {m!r}" for slug, fm in _load()
+                  for m in (fm.get("mood") or []) if m not in declared})
+    assert not bad, (
+        "Undeclared mood(s):\n  " + "\n  ".join(bad)
+        + f"\n\nDeclared: {sorted(declared)}."
+    )
+
+
+def test_mood_is_a_list():
+    """Never a bare string. A string would iterate as characters in Liquid and
+    render a filter match for every letter in it, which is the same class of
+    silent nonsense as the `glass` scalar.
+    """
+    bad = [f"{slug}: mood is a {type(fm['mood']).__name__}"
+           for slug, fm in _load()
+           if "mood" in fm and not isinstance(fm["mood"], list)]
+    assert not bad, "mood must be a list:\n  " + "\n  ".join(bad)
+
+
+def test_every_drink_carries_a_mood_key():
+    """Present even when empty, so "no mood yet" is visible rather than absent.
+
+    Same reasoning as the generic coverage check: an absent key reads as
+    "nothing to see", an empty list reads as "nothing matched". 17 drinks
+    currently have an empty list, mostly because their ingredients are still
+    QQ -- see #335 -- and that gap should be legible, not silent.
+    """
+    missing = [slug for slug, fm in _load() if "mood" not in fm]
+    assert not missing, (
+        f"{len(missing)} drink(s) carry no `mood` key at all: {missing[:10]}.\n"
+        f"Use `mood: []` for none. Absent is not the same as empty."
+    )
+
+
+def test_no_mood_covers_more_than_half_the_collection():
+    """A mood matching most drinks is not a filter, it is noise.
+
+    Food retired `one-pot` for exactly this -- it "would cover 57% of the
+    collection honestly tagged". Two cocktail moods were caught this way before
+    they were ever written down: `fruity` counting citrus reached 51%, and
+    `sugar craving` defined as "has any sweetener" reached 68%.
+
+    A guard rather than a note, because the failure mode is gradual: a mood
+    stays useful until the collection grows past it, and nobody re-measures.
+    """
+    drinks = _load()
+    counts = {}
+    for _, fm in drinks:
+        for m in (fm.get("mood") or []):
+            counts[m] = counts.get(m, 0) + 1
+    assert counts, "no drink carries any mood -- the derivation has stopped running."
+    broad = sorted(f"{m}: {n}/{len(drinks)} ({n * 100 // len(drinks)}%)"
+                   for m, n in counts.items() if n > len(drinks) / 2)
+    assert not broad, (
+        "Mood(s) covering more than half the collection:\n  " + "\n  ".join(broad)
+        + "\n\nNarrow the definition or drop the mood. A filter that matches "
+          "most of the book tells you nothing -- the reasoning that retired "
+          "food's `one-pot` tag."
     )

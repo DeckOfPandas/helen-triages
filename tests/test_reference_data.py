@@ -285,6 +285,11 @@ def test_doneness_levels_ascend(internal_temperatures, protein):
 
 import pytest as _pytest  # noqa: E402  (kept local to this appended section)
 
+# Suite marker, so `pytest -m food` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one --
+# an unmarked file is silently missed by every filtered run.
+pytestmark = pytest.mark.food
+
 SHAPES = {"rate", "total", "staged", "by_doneness", "relative",
           "disputed", "unparsed"}
 

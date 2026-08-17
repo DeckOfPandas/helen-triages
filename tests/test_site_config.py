@@ -14,6 +14,11 @@ from pathlib import Path
 import pytest
 import yaml
 
+# Suite marker, so `pytest -m shared` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one --
+# an unmarked file is silently missed by every filtered run.
+pytestmark = pytest.mark.shared
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "_data" / "food"
 
