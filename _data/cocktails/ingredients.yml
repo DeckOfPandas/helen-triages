@@ -24,9 +24,12 @@
 # is the only family that needed its own controlled list. Everything else is
 # a flat generic name.
 #
-# NOTE: #314 spells the third one "Lightly ages and filtered". Written here as
-# "lightly aged and filtered", which is plainly what was meant. Flagged rather
-# than silently corrected, in case the issue is the canonical text.
+# THREE THINGS #314 RULES OUT, worth stating because each looks like a gap:
+#   - there is NO "spiced" style. A spiced rum is typed by what it is
+#     underneath, case by case.
+#   - "navy" is not a style either. Helen: it "will often collapse into one of
+#     the Demeraras" -- case by case, so a navy rum stays QQ until she calls it.
+#   - cachaca is NOT a rum style. It is its own generic; see below.
 rum_styles:
   - "jamaican, moderately aged"
   - "jamaican, caramel forward"
@@ -46,6 +49,11 @@ rum_styles:
 rum_untyped:
   - "planteray stiggins' fancy"
   - "planteray o.f.t.d. overproof"
+  - "malibu"
+  # Helen, #314: "treated more as a flavour modifier". Which is why it sits
+  # here rather than among the ten -- a blackstrap is not a style you would
+  # browse a drink by, it is a thing you add a spoonful of.
+  - "blackstrap"
 
 # Retired, and actively removed rather than merely deprecated — the same
 # treatment _data/food/taxonomy.yml gives retired_star_ingredients, and for the
@@ -61,3 +69,14 @@ retired_rum_styles:
   dark: >-
     same reason again, and the most misleading of the three: a dark rum may be
     Jamaican caramel-forward, Demerara aged, or a blackstrap. Issue #314.
+
+# --- CANE SPIRITS THAT ARE NOT RUM -------------------------------------------
+# #314: "cachaca is its own generic". Same raw material as an agricole rhum --
+# fresh cane juice -- and a completely different product, so it is declared
+# apart from the rum styles rather than folded into them. The ingredient-name
+# regex that finds rums catches these too (it has to; the words overlap), so
+# the vocabulary is what tells them apart, not the pattern.
+cane_spirits:
+  # Accented, like every other vocabulary value on this site --
+  # _data/accented_words.yml is house style and applies to cocktails.
+  - "cachaça"

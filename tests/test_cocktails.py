@@ -114,7 +114,12 @@ def test_every_rum_generic_is_declared():
     declared, which is exactly how a typo mints a new category silently.
     """
     vocab = _vocab()
-    allowed = set(vocab.get("rum_styles") or []) | set(vocab.get("rum_untyped") or [])
+    # cane_spirits is in here because IS_RUM cannot tell a cachaca from a rum
+    # -- the words genuinely overlap, and #314 says cachaca is its own generic
+    # rather than a rum style. The vocabulary draws that line, not the regex.
+    allowed = (set(vocab.get("rum_styles") or [])
+               | set(vocab.get("rum_untyped") or [])
+               | set(vocab.get("cane_spirits") or []))
     assert allowed, "ingredients.yml declares no rum styles at all."
 
     found = _rum_generics()
