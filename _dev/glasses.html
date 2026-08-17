@@ -1,5 +1,6 @@
 ---
 layout: default
+site_key: cocktails
 title: Glasses swatch
 sitemap: false
 ---
@@ -7,60 +8,120 @@ sitemap: false
 {% comment %} ─────────────────────────────────────────────────────────────────
   GLASSES SWATCH — internal reference, never published.
 
+  `site_key: cocktails` IS LOAD-BEARING AND IS NOT COSMETIC. default.html picks
+  the stylesheet through `site.data.sites[page.site_key].css`, and its own
+  comment warns exactly what happens without one: "If a future page is ever
+  rendered through default.html with no site_key, it will silently get NO
+  stylesheet at all". This page was that future page. With no CSS there is no
+  `.glass-icon-line` rule, so every path fell back to the SVG default of
+  `fill: black, stroke: none` and the whole set rendered as silhouettes — with
+  compound paths subtracting from each other, which looked like broken artwork
+  rather than a missing stylesheet. Nothing was wrong with the icons.
+
+  THE LESSON, WHICH IS WHY THIS IS WRITTEN DOWN: the first version of this page
+  was checked against a Python renderer that applied the stroke treatment
+  ITSELF. It therefore looked perfect whether or not the site's CSS ever
+  arrived — a test that could not fail. The only honest check of how an icon
+  looks is the page the browser actually serves.
+
   NEVER PUBLISHED IS A CONFIG FACT, NOT A PROMISE MADE HERE. The `dev`
   collection is `output: false` in _config.yml and flipped to true only in
   _config_local.yml, so a production build gives this page no URL and no
-  sitemap entry. That mechanism, and not this comment, is what holds.
+  sitemap entry. Verified live: port 4002 returns 404 for /dev/glasses/ while
+  serving /food/ fine. Issue #276 deleted the last two swatch pages because
+  they were internal references that got published anyway — "unlinked" is not
+  "unpublished", and this is the mechanism that actually holds.
 
-  WHY IT IS A COLLECTION AND NOT A LOOSE PAGE: issue #276 deleted
-  food/swatch.html and food/swatch-scribbles.html because they were internal
-  reference pages that got PUBLISHED — linked from nowhere, and reachable
-  anyway through Jekyll's default permalink. "Unlinked" is not "unpublished",
-  and the only thing that had noticed was a test's PUBLISHED set picking them
-  up through that very fallback. This page exists to answer the same kind of
-  question those did, so it is built the one way that cannot repeat it.
-
-  EVERY NUMBER ON THIS PAGE IS COUNTED LIVE from site.cocktail_drafts, not
-  written down. A swatch page whose counts are stale is worse than no swatch
-  page: it looks like evidence.
+  EVERY NUMBER ON THIS PAGE IS COUNTED LIVE from site.cocktail_drafts, and
+  every viewBox is read from the SVG itself rather than written down. A swatch
+  page whose numbers are stale is worse than no swatch page: it looks like
+  evidence.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
 {% assign icon_map = site.data.cocktails.glasses.icons %}
 {% assign all_icons = site.data.cocktails.glasses.all_icons %}
+
+{% comment %} Tallest viewBox in the set, so the relative-scale view below can
+   be sized off it without a magic number. Read from the artwork, so it stays
+   right when a taller glass arrives. {% endcomment %}
+{% assign tallest = 0 %}
+{% for icon in all_icons %}
+  {% capture f %}icons/glasses/{{ icon }}.svg{% endcapture %}
+  {% capture raw %}{% include {{ f }} %}{% endcapture %}
+  {% assign vb = raw | split: 'viewBox="' | last | split: '"' | first | split: ' ' %}
+  {% assign vh = vb[3] | times: 1.0 %}
+  {% if vh > tallest %}{% assign tallest = vh %}{% endif %}
+{% endfor %}
 
 <article class="dev-swatch">
 
   <h1>Glasses</h1>
 
   <p class="dev-note">
-    Internal reference. {{ all_icons | size }} icons, and
-    {{ site.cocktail_drafts | size }} drinks in the collection.
-    Every count below is computed at build time.
+    Internal reference, never published. {{ all_icons | size }} icons,
+    {{ site.cocktail_drafts | size }} drinks. Tallest viewBox is
+    {{ tallest | round }} units. Every number here is computed at build time.
   </p>
 
-  {% comment %} ── the set, at the size it actually renders ─────────────── {% endcomment %}
-  <h2>At real size</h2>
+  {% comment %} ── 1. exactly as the site draws them ─────────────────────── {% endcomment %}
+  <h2>1. At real size &mdash; what a cocktail page actually shows</h2>
   <p class="dev-note">
-    The size a cocktail page actually draws them (2.6rem tall, sized by height
-    so the different proportions survive). This row is the honest test of
-    legibility — anything that turns to mush here is mush on the site.
+    2.6rem tall, width following the aspect ratio, capped at 3.2rem. This uses
+    the real <code>.cocktail-glass-icon</code> class, so it is the honest test
+    of legibility: anything that turns to mush here is mush on the site.
+    <strong>Every icon is the same height here</strong> &mdash; that is the
+    site's current behaviour, not a display choice of this page, and it is what
+    issue #298 is about.
   </p>
 
   <div class="dev-strip">
     {% for icon in all_icons %}
       {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
-      <span class="dev-strip-item">
-        <span class="cocktail-glass-icon">{% include {{ icon_file }} %}</span>
+      <span class="cocktail-glass-icon">{% include {{ icon_file }} %}</span>
+    {% endfor %}
+  </div>
+
+  {% comment %} ── 2. relative scale, the view #298/#299 actually need ───── {% endcomment %}
+  <h2>2. At relative scale &mdash; one scale factor for every icon</h2>
+  <p class="dev-note">
+    The same drawings sized by their own viewBox instead of forced to a common
+    height, sharing a single scale factor, standing on one baseline. This is
+    the view that shows whether the set is drawn to consistent proportions.
+    Read it as a shelf: a shot glass should look shorter than a sling.
+  </p>
+
+  <div class="dev-scale">
+    {% for icon in all_icons %}
+      {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
+      {% capture raw %}{% include {{ icon_file }} %}{% endcapture %}
+      {% assign vb = raw | split: 'viewBox="' | last | split: '"' | first | split: ' ' %}
+      {% assign vh = vb[3] | times: 1.0 %}
+      {% assign rem_h = vh | divided_by: tallest | times: 9.0 %}
+      <span class="dev-scale-item" title="{{ icon }} — viewBox height {{ vh | round }}">
+        <span class="dev-scale-art" style="height: {{ rem_h }}rem">
+          {% include {{ icon_file }} %}
+        </span>
+        <span class="dev-scale-label">{{ icon }}<br>{{ vh | round }}</span>
       </span>
     {% endfor %}
   </div>
 
-  {% comment %} ── one card per icon ─────────────────────────────────────── {% endcomment %}
-  <h2>One by one</h2>
+  {% comment %} ── 3. one card per icon ──────────────────────────────────── {% endcomment %}
+  <h2>3. One by one</h2>
 
   <div class="dev-grid">
     {% for icon in all_icons %}
       {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
+      {% capture raw %}{% include {{ icon_file }} %}{% endcapture %}
+      {% assign vb = raw | split: 'viewBox="' | last | split: '"' | first | split: ' ' %}
+      {% assign vw = vb[2] | times: 1.0 %}
+      {% assign vh = vb[3] | times: 1.0 %}
+      {% assign paths = raw | split: "<path" | size | minus: 1 %}
+      {% if raw contains "glass-icon-solid" %}
+        {% assign technique = "filled" %}
+      {% else %}
+        {% assign technique = "stroked" %}
+      {% endif %}
 
       {% comment %} Which written spellings reach this icon. {% endcomment %}
       {% assign spellings = "" %}
@@ -71,7 +132,7 @@ sitemap: false
       {% endfor %}
       {% assign spelling_list = spellings | split: "|" %}
 
-      {% comment %} How many drinks land on this icon, counted live. Matches the
+      {% comment %} How many drinks land on this icon, counted live. Mirrors the
          layout's own rule: the FIRST entry in a drink's glass list that has an
          icon is the one drawn, so a drink is counted once and only for that
          icon — not once per spelling it happens to mention. {% endcomment %}
@@ -89,28 +150,33 @@ sitemap: false
 
       <div class="dev-card{% if spelling_list.size == 0 %} dev-card--orphan{% endif %}">
         <div class="dev-card-art">
-          <span class="cocktail-glass-icon dev-card-big">{% include {{ icon_file }} %}</span>
+          <span class="dev-card-big">{% include {{ icon_file }} %}</span>
         </div>
         <h3>{{ icon }}</h3>
+        <p class="dev-card-meta">
+          {{ vw | round }}&times;{{ vh | round }} &middot;
+          {{ paths }} path{% unless paths == 1 %}s{% endunless %} &middot;
+          {{ technique }}
+        </p>
         <p class="dev-card-meta">
           {% if uses == 1 %}1 drink{% else %}{{ uses }} drinks{% endif %}
         </p>
         <p class="dev-card-meta">
           {% if spelling_list.size > 0 %}
-            reached by: {{ spelling_list | join: ", " }}
+            {{ spelling_list | join: ", " }}
           {% else %}
-            <strong>UNREACHABLE</strong> — no spelling maps here
+            <strong>UNREACHABLE</strong> &mdash; no spelling maps here
           {% endif %}
         </p>
       </div>
     {% endfor %}
   </div>
 
-  {% comment %} ── what the data says that nothing can draw ──────────────── {% endcomment %}
-  <h2>Values with no icon</h2>
+  {% comment %} ── 4. what the data says that nothing can draw ───────────── {% endcomment %}
+  <h2>4. Values with no icon</h2>
   <p class="dev-note">
     Glass values written on drinks that reach no artwork. Some are correct
-    (<code>any</code> means "no requirement"); the rest are the QQ pile.
+    (<code>any</code> means &ldquo;no requirement&rdquo;); the rest are the QQ pile.
   </p>
 
   <ul class="dev-list">
@@ -128,15 +194,12 @@ sitemap: false
       <li><code>{{ v }}</code></li>
     {% endfor %}
     {% if unmapped_list.size == 0 %}
-      <li>None — every written value reaches an icon.</li>
+      <li>None &mdash; every written value reaches an icon.</li>
     {% endif %}
   </ul>
 
-  {% comment %} Drinks carrying no glass at all. Counted separately because an
-     ABSENT glass and an UNMAPPED glass are different defects with different
-     fixes: one needs Helen to decide the serve, the other needs a key here. {% endcomment %}
   {% comment %} `drink.glass | size`, NOT `drink.glass.size`. For a drink with no
-     glass key at all the value is nil, and nil.size is nil rather than 0 -- so
+     glass key at all the value is nil, and nil.size is nil rather than 0 — so
      `.size == 0` is false for every one of them and this counter renders a
      confident 0 while 28 drinks sit unglassed. The `size` FILTER coerces nil to
      0. Same family as the empty-array-is-truthy trap the layout guards against,
@@ -148,8 +211,8 @@ sitemap: false
   {% endfor %}
   <p class="dev-note">
     <strong>{{ no_glass }}</strong> drinks carry no <code>glass:</code> at all.
-    That is a different defect from the list above — it needs a decision about
-    the serve, not a key in the map.
+    That is a different defect from the list above &mdash; it needs a decision
+    about the serve, not a key in the map.
   </p>
 
 </article>
@@ -157,34 +220,54 @@ sitemap: false
 <style>
   /* Scoped to this page and deliberately not in _sass: it is a dev tool, it is
      never served, and putting it in the pipeline would make it look like part
-     of the site's styling. Colours use the same currentColor-led approach as
-     the icons themselves so the swatch reads in whatever theme is loaded. */
-  .dev-swatch { max-width: 70rem; margin: 0 auto; }
-  .dev-note { opacity: 0.75; font-size: 0.9rem; }
+     of the site's styling.
+
+     NOTE WHAT IS *NOT* SET HERE. Nothing touches fill, stroke or colour — those
+     come from the real cocktails stylesheet via site_key, which is the whole
+     point of the page. If an icon looks wrong here, the artwork is wrong. */
+  .dev-swatch { max-width: 72rem; margin: 0 auto; }
+  .dev-note { opacity: 0.75; font-size: 0.9rem; max-width: 46rem; }
+
   .dev-strip {
     display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-end;
-    padding: 1.2rem; border: 1px solid currentColor; border-radius: 4px;
-    margin-bottom: 2rem;
+    padding: 1.2rem; border: 1px solid; border-radius: 4px; margin-bottom: 2.5rem;
   }
+
+  /* Baseline row: every icon standing on the same line, sized by its own
+     viewBox. align-items: flex-end is what makes it read as a shelf. */
+  .dev-scale {
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1.4rem;
+    padding: 1.4rem 1.2rem 0; border: 1px solid; border-radius: 4px;
+    margin-bottom: 2.5rem;
+  }
+  .dev-scale-item { display: flex; flex-direction: column; align-items: center; }
+  .dev-scale-art { display: flex; align-items: flex-end; }
+  /* height comes from the inline style, computed from the viewBox */
+  .dev-scale-art svg { height: 100%; width: auto; max-width: none; }
+  .dev-scale-label {
+    font-size: 0.65rem; opacity: 0.7; text-align: center; margin-top: 0.35rem;
+    border-top: 1px solid; padding-top: 0.2rem; min-width: 4rem;
+  }
+
   .dev-grid {
     display: grid; gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
   }
   .dev-card {
-    border: 1px solid currentColor; border-radius: 4px; padding: 0.8rem;
-    text-align: center;
+    border: 1px solid; border-radius: 4px; padding: 0.8rem; text-align: center;
   }
-  .dev-card--orphan { border-style: dashed; opacity: 0.65; }
+  .dev-card--orphan { border-style: dashed; opacity: 0.7; }
   .dev-card h3 { margin: 0.4rem 0 0.2rem; font-size: 1rem; }
-  .dev-card-meta { margin: 0.15rem 0; font-size: 0.78rem; opacity: 0.8; }
+  .dev-card-meta { margin: 0.15rem 0; font-size: 0.75rem; opacity: 0.8; }
   .dev-card-art {
     display: flex; align-items: flex-end; justify-content: center;
-    min-height: 6.5rem;
+    min-height: 7rem;
   }
-  /* Override the site's icon sizing for the big view only. The stroke is
-     non-scaling, so a bigger icon draws a PROPORTIONALLY THINNER line — that
-     is expected here and is exactly the effect to watch for if the real size
-     ever changes. */
-  .dev-card-big svg { height: 5.5rem; max-width: 7rem; }
+  /* The big view. The stroke is NON-SCALING, so a bigger icon draws a
+     proportionally thinner line — expected, and exactly the effect to watch
+     for if the site's real icon size ever changes. */
+  .dev-card-big { display: inline-flex; align-items: flex-end; }
+  .dev-card-big svg { height: 6rem; width: auto; max-width: none; }
+
   .dev-list { columns: 3; font-size: 0.85rem; }
 </style>
