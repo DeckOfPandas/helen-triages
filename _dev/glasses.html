@@ -1,0 +1,190 @@
+---
+layout: default
+title: Glasses swatch
+sitemap: false
+---
+
+{% comment %} ─────────────────────────────────────────────────────────────────
+  GLASSES SWATCH — internal reference, never published.
+
+  NEVER PUBLISHED IS A CONFIG FACT, NOT A PROMISE MADE HERE. The `dev`
+  collection is `output: false` in _config.yml and flipped to true only in
+  _config_local.yml, so a production build gives this page no URL and no
+  sitemap entry. That mechanism, and not this comment, is what holds.
+
+  WHY IT IS A COLLECTION AND NOT A LOOSE PAGE: issue #276 deleted
+  food/swatch.html and food/swatch-scribbles.html because they were internal
+  reference pages that got PUBLISHED — linked from nowhere, and reachable
+  anyway through Jekyll's default permalink. "Unlinked" is not "unpublished",
+  and the only thing that had noticed was a test's PUBLISHED set picking them
+  up through that very fallback. This page exists to answer the same kind of
+  question those did, so it is built the one way that cannot repeat it.
+
+  EVERY NUMBER ON THIS PAGE IS COUNTED LIVE from site.cocktail_drafts, not
+  written down. A swatch page whose counts are stale is worse than no swatch
+  page: it looks like evidence.
+────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+{% assign icon_map = site.data.cocktails.glasses.icons %}
+{% assign all_icons = site.data.cocktails.glasses.all_icons %}
+
+<article class="dev-swatch">
+
+  <h1>Glasses</h1>
+
+  <p class="dev-note">
+    Internal reference. {{ all_icons | size }} icons, and
+    {{ site.cocktail_drafts | size }} drinks in the collection.
+    Every count below is computed at build time.
+  </p>
+
+  {% comment %} ── the set, at the size it actually renders ─────────────── {% endcomment %}
+  <h2>At real size</h2>
+  <p class="dev-note">
+    The size a cocktail page actually draws them (2.6rem tall, sized by height
+    so the different proportions survive). This row is the honest test of
+    legibility — anything that turns to mush here is mush on the site.
+  </p>
+
+  <div class="dev-strip">
+    {% for icon in all_icons %}
+      {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
+      <span class="dev-strip-item">
+        <span class="cocktail-glass-icon">{% include {{ icon_file }} %}</span>
+      </span>
+    {% endfor %}
+  </div>
+
+  {% comment %} ── one card per icon ─────────────────────────────────────── {% endcomment %}
+  <h2>One by one</h2>
+
+  <div class="dev-grid">
+    {% for icon in all_icons %}
+      {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
+
+      {% comment %} Which written spellings reach this icon. {% endcomment %}
+      {% assign spellings = "" %}
+      {% for pair in icon_map %}
+        {% if pair[1] == icon %}
+          {% assign spellings = spellings | append: pair[0] | append: "|" %}
+        {% endif %}
+      {% endfor %}
+      {% assign spelling_list = spellings | split: "|" %}
+
+      {% comment %} How many drinks land on this icon, counted live. Matches the
+         layout's own rule: the FIRST entry in a drink's glass list that has an
+         icon is the one drawn, so a drink is counted once and only for that
+         icon — not once per spelling it happens to mention. {% endcomment %}
+      {% assign uses = 0 %}
+      {% for drink in site.cocktail_drafts %}
+        {% assign drawn = "" %}
+        {% for g in drink.glass %}
+          {% if drawn == "" %}
+            {% assign found = icon_map[g] %}
+            {% if found %}{% assign drawn = found %}{% endif %}
+          {% endif %}
+        {% endfor %}
+        {% if drawn == icon %}{% assign uses = uses | plus: 1 %}{% endif %}
+      {% endfor %}
+
+      <div class="dev-card{% if spelling_list.size == 0 %} dev-card--orphan{% endif %}">
+        <div class="dev-card-art">
+          <span class="cocktail-glass-icon dev-card-big">{% include {{ icon_file }} %}</span>
+        </div>
+        <h3>{{ icon }}</h3>
+        <p class="dev-card-meta">
+          {% if uses == 1 %}1 drink{% else %}{{ uses }} drinks{% endif %}
+        </p>
+        <p class="dev-card-meta">
+          {% if spelling_list.size > 0 %}
+            reached by: {{ spelling_list | join: ", " }}
+          {% else %}
+            <strong>UNREACHABLE</strong> — no spelling maps here
+          {% endif %}
+        </p>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% comment %} ── what the data says that nothing can draw ──────────────── {% endcomment %}
+  <h2>Values with no icon</h2>
+  <p class="dev-note">
+    Glass values written on drinks that reach no artwork. Some are correct
+    (<code>any</code> means "no requirement"); the rest are the QQ pile.
+  </p>
+
+  <ul class="dev-list">
+    {% assign unmapped = "" %}
+    {% for drink in site.cocktail_drafts %}
+      {% for g in drink.glass %}
+        {% assign found = icon_map[g] %}
+        {% unless found %}
+          {% assign unmapped = unmapped | append: g | append: "|" %}
+        {% endunless %}
+      {% endfor %}
+    {% endfor %}
+    {% assign unmapped_list = unmapped | split: "|" | uniq | sort %}
+    {% for v in unmapped_list %}
+      <li><code>{{ v }}</code></li>
+    {% endfor %}
+    {% if unmapped_list.size == 0 %}
+      <li>None — every written value reaches an icon.</li>
+    {% endif %}
+  </ul>
+
+  {% comment %} Drinks carrying no glass at all. Counted separately because an
+     ABSENT glass and an UNMAPPED glass are different defects with different
+     fixes: one needs Helen to decide the serve, the other needs a key here. {% endcomment %}
+  {% comment %} `drink.glass | size`, NOT `drink.glass.size`. For a drink with no
+     glass key at all the value is nil, and nil.size is nil rather than 0 -- so
+     `.size == 0` is false for every one of them and this counter renders a
+     confident 0 while 28 drinks sit unglassed. The `size` FILTER coerces nil to
+     0. Same family as the empty-array-is-truthy trap the layout guards against,
+     and just as silent: a wrong number, not a missing one. {% endcomment %}
+  {% assign no_glass = 0 %}
+  {% for drink in site.cocktail_drafts %}
+    {% assign n = drink.glass | size %}
+    {% if n == 0 %}{% assign no_glass = no_glass | plus: 1 %}{% endif %}
+  {% endfor %}
+  <p class="dev-note">
+    <strong>{{ no_glass }}</strong> drinks carry no <code>glass:</code> at all.
+    That is a different defect from the list above — it needs a decision about
+    the serve, not a key in the map.
+  </p>
+
+</article>
+
+<style>
+  /* Scoped to this page and deliberately not in _sass: it is a dev tool, it is
+     never served, and putting it in the pipeline would make it look like part
+     of the site's styling. Colours use the same currentColor-led approach as
+     the icons themselves so the swatch reads in whatever theme is loaded. */
+  .dev-swatch { max-width: 70rem; margin: 0 auto; }
+  .dev-note { opacity: 0.75; font-size: 0.9rem; }
+  .dev-strip {
+    display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-end;
+    padding: 1.2rem; border: 1px solid currentColor; border-radius: 4px;
+    margin-bottom: 2rem;
+  }
+  .dev-grid {
+    display: grid; gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  }
+  .dev-card {
+    border: 1px solid currentColor; border-radius: 4px; padding: 0.8rem;
+    text-align: center;
+  }
+  .dev-card--orphan { border-style: dashed; opacity: 0.65; }
+  .dev-card h3 { margin: 0.4rem 0 0.2rem; font-size: 1rem; }
+  .dev-card-meta { margin: 0.15rem 0; font-size: 0.78rem; opacity: 0.8; }
+  .dev-card-art {
+    display: flex; align-items: flex-end; justify-content: center;
+    min-height: 6.5rem;
+  }
+  /* Override the site's icon sizing for the big view only. The stroke is
+     non-scaling, so a bigger icon draws a PROPORTIONALLY THINNER line — that
+     is expected here and is exactly the effect to watch for if the real size
+     ever changes. */
+  .dev-card-big svg { height: 5.5rem; max-width: 7rem; }
+  .dev-list { columns: 3; font-size: 0.85rem; }
+</style>

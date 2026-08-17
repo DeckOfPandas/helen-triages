@@ -308,6 +308,86 @@ def test_glass_is_a_list():
     )
 
 
+def _glasses():
+    return yaml.safe_load(
+        (ROOT / "_data" / "cocktails" / "glasses.yml").read_text(encoding="utf-8")
+    )
+
+
+GLASS_ICON_DIR = ROOT / "_includes" / "icons" / "glasses"
+
+
+def test_every_mapped_glass_names_an_icon_that_exists():
+    """A key pointing at a missing file is worse than a missing key.
+
+    A MISSING KEY COSTS AN ICON AND NOTHING ELSE -- the layout's
+    absent-means-no-icon rule handles it, and the page renders fine without
+    one. A key naming a file that is NOT THERE is the dangerous direction: it
+    sets `glass_icon` to a non-empty string, so the layout takes the branch
+    that builds `icons/glasses/<name>.svg` and hands it to {% include %}. That
+    is a HARD BUILD FAILURE, not a blank space, and it has already happened
+    once here in its empty-string form -- `glass_icon = ""` produced
+    "File contains invalid characters or sequences: icons/glasses/.svg".
+
+    Checked against the filesystem rather than against all_icons, because
+    all_icons is itself a written-down list and could be wrong in the same way.
+    """
+    icons = _glasses()["icons"]
+    assert icons, "glasses.yml has no `icons:` map -- this test would pass vacuously."
+    missing = sorted(
+        f"{spelling!r} -> {stem}.svg"
+        for spelling, stem in icons.items()
+        if not (GLASS_ICON_DIR / f"{stem}.svg").is_file()
+    )
+    assert not missing, (
+        "glasses.yml maps a glass to an icon file that does not exist:\n  "
+        + "\n  ".join(missing)
+        + "\n\nThis is not a cosmetic gap. A non-empty name sends the layout "
+          "down the include branch and the BUILD FAILS. Either add the SVG to "
+          "_includes/icons/glasses/ or remove the key -- an unmapped glass "
+          "renders no icon, which is the intended fallback."
+    )
+
+
+def test_all_icons_matches_the_icon_directory():
+    """The written-down inventory must equal the directory, both directions.
+
+    all_icons EXISTS ONLY BECAUSE LIQUID CANNOT READ A DIRECTORY. `_includes/`
+    is never copied to the site, so it is not in `site.static_files` either,
+    and a template therefore has no way to ask what artwork exists -- it can
+    only look up what a key already names. That makes the most interesting
+    question invisible to the swatch page: which icons are UNREACHABLE.
+
+    Duplicating a directory listing into YAML is a rot risk taken deliberately,
+    and this test is the whole reason it is acceptable. It has to fail in BOTH
+    directions: an icon added without a list entry is invisible to the swatch
+    page (the failure the list exists to prevent), and a list entry whose file
+    has gone makes the swatch page ask {% include %} for a missing file, which
+    fails the build exactly as above.
+    """
+    listed = _glasses().get("all_icons") or []
+    assert listed, (
+        "glasses.yml has no `all_icons:` list. _dev/glasses.html iterates it "
+        "and would render an empty swatch page while passing every check."
+    )
+    on_disk = sorted(p.stem for p in GLASS_ICON_DIR.glob("*.svg"))
+    assert on_disk, (
+        f"No SVGs found in {GLASS_ICON_DIR.relative_to(ROOT)} -- this test "
+        f"would pass while checking nothing."
+    )
+    undeclared = sorted(set(on_disk) - set(listed))
+    phantom = sorted(set(listed) - set(on_disk))
+    assert not undeclared and not phantom, (
+        "glasses.yml `all_icons` has drifted from the icon directory.\n"
+        + (f"  on disk but not listed: {undeclared}\n" if undeclared else "")
+        + (f"  listed but not on disk: {phantom}\n" if phantom else "")
+        + "\nAdd or remove the entry. Icons are regenerated wholesale by "
+          "scripts/normalise_glass_icons.py from tmp/cocktail-glasses/, so a "
+          "drawing whose source is deleted disappears from here silently -- "
+          "which is how shot-2.svg went missing without a single test noticing."
+    )
+
+
 def test_syrup_ratio_is_plausible_for_its_generic():
     """FLAG ONLY. Never rewrite, and never fail on a deliberate choice.
 

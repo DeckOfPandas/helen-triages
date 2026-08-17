@@ -63,6 +63,22 @@ short_method_enabled: false
 # is what puts the output under /food/ or /cocktails/. The URLs are exactly the
 # ones agreed; only the on-disk location differs from the original sketch.
 collections:
+  dev:
+    # INTERNAL REFERENCE PAGES, AND THE REASON THIS IS A COLLECTION RATHER THAN
+    # A LOOSE .html SOMEWHERE.
+    #
+    # Issue #276 deleted food/swatch.html and food/swatch-scribbles.html for
+    # exactly the failure this avoids: they were internal colour references,
+    # linked from nowhere on the site, and they were PUBLISHED ANYWAY, because
+    # Jekyll gives any page it renders a default permalink whether or not an
+    # <a href> points at it. "Unlinked" is not "unpublished", and the only
+    # thing that had noticed was test_page_links.py's PUBLISHED set, which
+    # picked them up through that very fallback.
+    #
+    # `output: false` is the mechanism that actually holds -- the same one
+    # protecting both drafts collections -- so a dev page has no URL and no
+    # sitemap entry in a production build. _config_local.yml flips it to true.
+    output: false
   food_recipes:
     output: true
     permalink: /food/recipes/:path/
