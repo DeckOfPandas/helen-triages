@@ -10,7 +10,8 @@ star_ingredient:
 tags: ["dessert", "ice cream", "make-ahead"]
 ingredient_groups:
   - items:
-    - item: "[Ben & Jerry's Sweet Cream Base No. 1](../ben-jerrys-sweet-cream-base-1/)"
+    - amount: 1 lot
+      item: "[Ben & Jerry's Sweet Cream Base No. 1](../ben-jerrys-sweet-cream-base-1/)"
     - amount: "85 g"
       item: smooth peanut butter
     - amount: "65 g"
@@ -26,10 +27,11 @@ notes:
   - label: "Chocolate chip variant"
     text: "You know what to do."
   - label: "Fudge swirl variant"
-    text: "Melt, then see above."
+    text: "Melt, then see chocolate chip variant."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

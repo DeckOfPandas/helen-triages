@@ -1,6 +1,6 @@
 ---
 title: "Lemon Meringue Pie"
-tagline: "Fits inside my round white ceramic dish. Pastry recipe makes two lots — freeze the other half."
+tagline: "The perfect amount for my round white ceramic dish. This pastry recipe makes two lots because what else would one do with half an egg yolk, so ... make two???"
 source: "Grandma Kath"
 makes: "one pie"
 prep_time: "30 mins in stages"
@@ -44,8 +44,8 @@ method_groups:
       - "Beat the egg whites with a pinch of cream of tartar until soft peaks form."
       - "Beat in the sugar bit by bit until the mixture is stiff and shiny but not dry."
       - step: "Spread the meringue over the filling."
-        note: "Don't worry about smoothing it off too much — crests at different heights catch the heat differently to attractive effect."
-      - step: "Bake at 160°C fan for 25 mins, then take out of oven and leave to cool in the dish for at least 30 mins before eating."
+        note: "Don't smooth it off too much — crests at different heights catch the heat differently to attractive effect."
+      - step: "Bake at 160°C fan for 25 mins, then take out of the oven and leave to cool in the dish for at least 30 mins before eating."
         note: "Turn up to 180°C fan for the last 15-20 mins for more browning."
 method_short:
   - ""
@@ -53,7 +53,8 @@ method_short:
 #   -
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 

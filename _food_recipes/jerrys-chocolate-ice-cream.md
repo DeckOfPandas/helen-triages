@@ -1,6 +1,6 @@
 ---
 title: "Jerry's Chocolate Ice Cream"
-tagline: "Chocolate three ways, and no cooked-custard fuss."
+tagline: "Chocolate three ways, and you don't need to make custard."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
 prep_time: "10 mins"
@@ -39,6 +39,7 @@ method_short:
 meta:
   rewritten: true
   proofread: false
+  awaiting-fix: true
   cooked_before: true
   date_last_edited: "2026-08-11"
 

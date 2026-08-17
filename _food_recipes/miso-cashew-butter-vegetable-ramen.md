@@ -31,11 +31,11 @@ ingredient_groups:
   - name: to serve
     items:
     - amount: "2 large"
-      item: "soft-boiled eggs, halved (optional) — soy mirin eggs, ajitsuke tamago, are great"
+      item: "soft-boiled eggs, halved (optional) — soy mirin eggs, ajitsuke tamago (CLAUDE LINK PLEASE), are great"
     - amount: "2"
       item: "spring onions, finely sliced"
     - amount: "2 handfuls"
-      item: "frozen edamame (soya beans), defrosted"
+      item: "frozen edamame, defrosted"
     - amount: "1 small"
       item: "carrot, sliced into ribbons"
     - item: black sesame seeds and fresh coriander leaves (optional)
@@ -52,7 +52,8 @@ notes:
     text: "Make sure it's plain and unsweetened."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: true
   cooked_before: true
   date_last_edited: "2026-08-11"
 

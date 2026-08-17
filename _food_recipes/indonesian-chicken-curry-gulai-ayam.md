@@ -1,6 +1,6 @@
 ---
 title: "Indonesian Chicken Curry (Gulai Ayam)"
-tagline: "A proper fakeaway, and it freezes like a dream. The ingredient list is long, but there's no filler."
+tagline: "A proper fakeaway, and super freezable. Worth the long list of ingredients."
 source: "Adapted from Good Food, August 2024"
 serves: "4"
 prep_time: "20 mins plus marinating"
@@ -93,6 +93,7 @@ notes:
 meta:
   rewritten: true
   proofread: false
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

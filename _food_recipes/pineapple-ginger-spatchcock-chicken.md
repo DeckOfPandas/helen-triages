@@ -1,6 +1,6 @@
 ---
 title: "Pineapple and Ginger Spatchcock Chicken"
-tagline: "Pineapple and ginger instead of capsicum, with Szechuan pepper because we all love the pain."
+tagline: "Pineapple and ginger instead of the normal pimento and Scoth bonnets in jerk, with Szechuan pepper because we all need to feel something."
 source: "delicious. magazine"
 serves: "6"
 prep_time: "40 mins"
@@ -34,29 +34,29 @@ ingredient_groups:
 method_groups:
   - name: "Spatchcock the chicken"
     steps:
-      - "Put the chicken breast-side down on a board. Use a pair of kitchen scissors to remove the backbone by cutting along either side. Save, along with the cooked chicken carcass later, to make stock."
-      - "Flip the bird back over and, using the base of your palm, push down between the breasts to flatten it — you should hear a crack as the breastbone breaks."
+      - "Spatchcock the chicken."
   - name: "Marinate"
     steps:
-      - "Core and chop a third of the pineapple, then blend to a smooth paste with the grated ginger, garlic, sugar, black peppercorns, Szechuan peppercorns, half the galangal, cloves, and 2 tbsp vegetable oil."
+      - "Blend a third of the pineapple (cored and chopped), with the grated ginger, garlic, sugar, black peppercorns, Szechuan peppercorns, half the galangal, cloves, and 2 tbsp vegetable oil."
       - "Lay the chicken flat in a lidded container or foiled roasting tin, season with salt, then cover in the marinade and leave at room temperature for 30 mins."
-      - "Slice the remaining pineapple into half moons. Scrape most of the marinade off the chicken into a bowl."
+      - "Slice the rest of the pineapple into half moons. Scrape most of the marinade off the chicken into a bowl."
   - name: "Sear and roast"
     steps:
       - "Sear the chicken, breast-side-down, for about 5 mins until golden and crisp."
-      - "Put the remainder of the pineapple (half-mooned), ginger matchsticks, and the rest of the galangal in a roasting tin with 50 ml water. Sit the chicken on top, breast-side-up, and roast for 40–45 mins, until the thickest part of the thigh reads [74–75°C](#doneness) on a thermometer or the juices run clear. Rest for 5 mins."
+      - "Put the half-mooned pineapple, ginger matchsticks, and the rest of the galangal in a roasting tin with 50 ml water. Sit the chicken on top, breast-side-up, and roast for 40–45 mins, until the thickest part of the thigh reads [74–75°C](#doneness) on a thermometer or the juices run clear. Rest for 5 mins."
   - name: "Make the sauce and serve"
     steps:
-      - "Bubble the used marinade in a pan for a few minutes, then stir in the chicken stock. Simmer gently for about 5 mins, then add the juices from the rested chicken."
-      - "Bubble for another few minutes until glossy and thick enough to coat the back of a spoon, then season to taste."
+      - "Bubble the used marinade in a pan for a few minutes, then stir in the chicken stock. Simmer gently for about 5 mins, then add the chicken's resting juices."
+      - "Bubble for another few minutes until glossy, and thick enough to coat the back of a spoon, then season to taste."
 method_short:
   - ""
 notes:
   - label: "Make ahead"
-    text: "The marinade can be prepared in advance, but don't marinate the chicken for more than 30 mins as it will become tough due to the acid."
+    text: "The marinade can be prepared in advance, but don't marinate the chicken for more than 30 mins as the acid will make it tough."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

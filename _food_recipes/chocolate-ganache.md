@@ -11,12 +11,13 @@ tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "150 ml"
-      item: double cream with salt
+      item: double cream, with a good pinch of salt
     - amount: "150 g"
       item: "dark chocolate, 70% cacao"
     - amount: "1 tbsp"
       item: unsalted butter
-    - item: extra salt, to taste — don't be shy, as salt greatly enhances the chocolate flavour
+    - item: extra salt, to taste
+      note: to bring out the chocolate flavour
     - item: other flavourings, to taste
     - amount: "2 tbsp"
       item: icing sugar, optional
@@ -51,7 +52,8 @@ notes:
     text: "1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 
@@ -67,7 +69,7 @@ meta:
 <h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
 <p class="recipe-section-subtitle">a.k.a. ganache is the worst</p>
 
-Ganache is a fussy, implausible emulsion. Cocoa butter fat and dairy fat need to be persuaded into suspension in the water from the cream. Highly temperature-sensitive fats&nbsp;+&nbsp;highly moisture-sensitive sugar in the chocolate&nbsp;→&nbsp;a terrifying number of ways things can go wrong. 
+Ganache is a fussy, implausible emulsion. Cocoa butter fat and dairy fat must be persuaded into suspension in the water from the cream. Highly temperature-sensitive fats&nbsp;+&nbsp;highly moisture-sensitive sugar in the chocolate&nbsp;→&nbsp;a terrifying number of ways things can go wrong. 
 
 Here are four ways to accidentally not make ganache, with likely causes:
 
@@ -80,7 +82,7 @@ Here are four ways to accidentally not make ganache, with likely causes:
 3. **Seizing** *mixture resembling concrete; a dry, grainy paste that can't be stirred*
    - **Water got in**, so the chocolate's sugar crystals clumped immediately.
    - **Accidental whipping**, such as from using a balloon whisk, let moisture from the air sneak in.
-4. **Chaos** *that is, not following the recipe — see the source line above*
+4. **Chaos** *that is, not following the recipe — see source line above*
    - **Dropping cold pieces of chocolate into hot cream** is simply cold chunks floating in hot fat, like bad hotpot, which doesn't sound much like an emulsion to me.
    - **Pouring cold cream into melted chocolate** snap-freezes the cocoa butter out of the emulsion, and the sugars immediately make the most of the opportunity to clump...yum, curdled concrete.
 

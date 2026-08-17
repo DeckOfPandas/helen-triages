@@ -51,6 +51,7 @@ method_short:
 meta:
   rewritten: true
   proofread: false
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

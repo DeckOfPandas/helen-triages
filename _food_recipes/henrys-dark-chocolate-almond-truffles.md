@@ -1,6 +1,6 @@
 ---
 title: "Henry's Dark Chocolate Almond Truffles"
-tagline: "I've inflicted these on many Christmas parties over the years, and latterly they were even nice."
+tagline: "I've assaulted various Christmas parties with these over the years, and latterly they were even nice."
 source: "Megan"
 makes: "20–24 truffles"
 prep_time: "20 mins plus time to set"
@@ -13,13 +13,14 @@ ingredient_groups:
     - amount: "175 g"
       item: "dark chocolate, 70% cacao"
     - amount: "3 tbsp"
-      item: "flavouring to taste: Bailey's, orange liqueur, amaretto, or 3 drops ginger essence"
+      item: "flavouring to taste: Bailey's, orange liqueur, amaretto, ginger essence"
     - amount: "40 g"
       item: salted butter
     - amount: "80 g"
       item: icing sugar
     - amount: "50 g"
       item: ground almonds
+      note: coarsely ground is not only fine, it's better
     - item: "dusting as preferred: icing sugar, cocoa powder, nutmeg, cinnamon, or anything you fancy"
 method:
   - "Melt the chocolate over a bain-marie, then add any flavouring."
@@ -38,7 +39,8 @@ notes:
     text: "Every time I've dusted them with icing sugar then re-fridged, they suck the icing sugar in, making their surfaces look all weird. I now tend to leave them to their own devices, and dust as close to gifting as I can get away with."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-13"
 

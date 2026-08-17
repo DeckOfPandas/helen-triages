@@ -38,7 +38,7 @@ ingredient_groups:
     - item: "orange zest, to scatter"
     - item: "chopped pistachios, to scatter"
 method:
-  - "Finely grate the courgettes, then squeeze out as much liquid as possible so the cake isn't soggy."
+  - "Finely grate the courgettes, then squeeze out as much liquid as possible so the cake isn't accidental soup."
   - "Stir the courgettes with the sugar, sunflower oil, eggs, orange zest, vanilla and sultanas, then fold in the flour and baking powder."
   - "Coax the mixture into an oiled and lined 1-kg loaf tin and bake for about 50 mins at 160°C fan, until a skewer inserted into the centre comes out clean. Cool on a wire rack."
   - "Beat the cream cheese with the icing sugar then fridge for 30 mins. Spread over the cooled cake, then scatter with the zest and chopped pistachios."
@@ -48,10 +48,11 @@ notes:
   - label: "Storage"
     text: "Keep the cake in the fridge to stop it going soggy."
   - label: "Freezing"
-    text: "The cake freezes well without the frosting. The frosting doesn't freeze."
+    text: "The cake freezes well, but the frosting does not."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

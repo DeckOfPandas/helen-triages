@@ -1,6 +1,6 @@
 ---
 title: "Sticky Oxtail Stew"
-tagline: "Six hours in the oven breaks oxtail down into sticky heaven."
+tagline: "Five hours in the oven breaks oxtail down into sticky heaven."
 source: "Adapted from Jamie Oliver"
 serves: "8"
 prep_time: "30 mins"
@@ -12,7 +12,7 @@ tags: ["freezable", "make-ahead", "one-handed food"]
 ingredient_groups:
   - items:
     - amount: "2.5 kg"
-      item: "oxtail, chopped into 4 cm chunks (ask your butcher to do this)"
+      item: "oxtail, chopped into 4-cm chunks (easy for a butcher)"
     - amount: "2"
       item: leeks
     - amount: "2 stalks"
@@ -60,7 +60,8 @@ notes:
     text: "Also excellent stirred through pappardelle and served with grated Parmesan."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

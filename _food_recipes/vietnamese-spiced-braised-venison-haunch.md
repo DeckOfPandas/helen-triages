@@ -43,12 +43,12 @@ ingredient_groups:
       item: "spring onions, sliced, to serve"
     - item: "A large handful of fresh coriander, to serve"
 method:
-  - "Pat the joint very dry. Sear over high heat on all sides until deeply browned — don't rush this, it wants a good 8–10 mins total. Remove from the pan."
+  - "Pat the joint very dry. Sear over high heat on all sides until deeply browned. No rush, it wants a good 8–10 mins total. Remove from the pan."
   - "Reduce the heat and fry the lemongrass, garlic, and ginger for 3–4 mins until fragrant and beginning to colour, then add the star anise and cinnamon and stir for another minute."
-  - "Add the tomato purée and let it cook for a minute, until it caramelises slightly. Pour in the stock, fish sauce, soy sauce, and coconut palm sugar, stir to combine, and bring to a simmer. Add the pierced loomi."
-  - Return the venison. Top up the liquid if needed to reach half way up the meat. Cover with the lid slightly cocked and braise gently for about 90 mins, looking for an [internal temperature of 90–95°C](#doneness) — the point where the collagen gives way and it pulls apart rather than slicing.
-  - "Rest the venison, covered loosely with foil and towels. Sieve the pan sauce and discard the bits. Increase the heat, then reduce the sauce for 8–10 mins until glossy and slightly thickened. Taste and adjust with fish sauce or sugar or whatever it needs."
-  - "After at least 15 mins of resting the venison, remove the string and slice across the grain. Serve with the sauce ladled over, throwing spring onions and coriander over it. Try with rice noodles or jasmine rice."
+  - "Add the tomato purée and let it cook for a minute to caramelise. Pour in the stock, fish sauce, soy sauce, and coconut palm sugar, stir to combine, and bring to a simmer. Add the pierced loomi."
+  - Return the venison. Top up the liquid if needed to reach half way up the meat. Cover with the lid slightly cocked and braise gently for about 90 mins, looking for an [internal temperature of 90–95°C](#doneness).
+  - "Rest the venison, covered loosely with foil and towels. Sieve the pan sauce and discard the bits. Heat then reduce the sauce for 8–10 mins until glossy and slightly thickened. Taste and adjust with fish sauce or sugar or butter or whatever it needs."
+  - "After at least 15 mins of resting the venison, remove the string and slice across the grain. Serve with the sauce ladled over, with spring onions and coriander over it. Try with rice noodles or jasmine rice."
 method_short:
   - ""
 notes:
@@ -58,7 +58,8 @@ notes:
     text: "90 mins should leave the joint tender but still sliceable."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---
