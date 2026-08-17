@@ -45,7 +45,7 @@
 # FOOD'S FAMILY MECHANISM CANNOT DERIVE THESE. On the food site an `(all)`
 # button forms when entries share a head word after normalisation -- "cheese
 # (all)" from cheddar/feta/comte. These styles share NO common word:
-# "jamaican, moderately aged" and "demerara, aged" have nothing in common
+# "Jamaican, moderately aged" and "Demerara, aged" have nothing in common
 # textually. So the family has to be DECLARED, which is what `family_of` is.
 #
 # `fortified` exists because 19 drinks have no spirit at all -- Bamboo,
@@ -74,15 +74,18 @@ families:
 
 # GitHub issue #314. `light`, `gold` and `dark` are RETIRED -- see the bottom.
 rum_styles:
-  - "jamaican, moderately aged"
-  - "jamaican, caramel forward"
+  - "Jamaican, moderately aged"
+  - "Jamaican, caramel forward"
   - "lightly aged and filtered"
   - "moderately aged"
-  - "demerara, aged"
-  - "demerara, overproof"
-  - "jamaican, overproof, unaged"
+  - "Demerara, aged"
+  - "Demerara, overproof"
+  - "Jamaican, overproof, unaged"
   - "cane juice (agricole) rum, unaged"
   - "cane juice (agricole) rum, aged"
+  # Added to #314 after the first transcription. Haitian cane-juice spirit; a
+  # category like cachaca or mezcal, so lowercase under the proper-noun rule.
+  - "clairin"
   - "blended multi-region rum, clear"
 
 # Permitted WITHOUT a style per #314, because nothing generalises them.
@@ -90,15 +93,15 @@ rum_styles:
 # "treated more as a flavour modifier" -- not something you browse a drink by,
 # but a spoonful you add.
 rum_untyped:
-  - "planteray stiggins' fancy"
-  - "planteray o.f.t.d. overproof"
-  - "malibu"
+  - "Planteray Stiggins' Fancy"
+  - "Planteray O.F.T.D. Overproof"
+  - "Malibu"
   - "blackstrap"
 
 gin_styles:
-  - "london dry"
-  - "plymouth"
-  - "new western dry"
+  - "London dry"
+  - "Plymouth"
+  - "New Western dry"
   - "genever"
   - "flavoured"
   # Helen's own parenthesis: "not a gin though". Sloe gin lives here rather
@@ -109,10 +112,10 @@ gin_styles:
 whisky_styles:
   - "rye"
   - "bourbon"
-  - "peated scotch"
-  - "blended scotch"
-  - "irish"
-  - "japanese"
+  - "peated Scotch"
+  - "blended Scotch"
+  - "Irish"
+  - "Japanese"
 
 agave_styles:
   - "blanco tequila"
@@ -136,8 +139,8 @@ brandy_styles:
 # Ceylon arrack is coconut flower sap and shares only the name.
 cane_and_palm_spirits:
   - "cachaça"
-  - "batavia arrack"
-  - "ceylon arrack"
+  - "Batavia arrack"
+  - "Ceylon arrack"
 
 other_base_spirits:
   - "vodka"
@@ -155,7 +158,7 @@ liqueurs:
   - "triple sec"
   - "orange curaçao"
   - "dry orange curaçao"
-  - "grand marnier"
+  - "Grand Marnier"
   - "blue curaçao"
   # Rhum Clément Créole Shrubb. A rhum-based ORANGE LIQUEUR, and filed here
   # rather than under rum on Helen's question, 2026-08-17. The deciding case is
@@ -163,7 +166,7 @@ liqueurs:
   # Snap and Accoutrement, whose only rum-derived element is 15 ml of this.
   # Stiggins' Fancy sits under rum because it genuinely IS rum; a shrubb is a
   # sweetened orange liqueur that happens to be rhum-based.
-  - "créole shrubb"
+  - "Créole Shrubb"
   - "maraschino liqueur"
   # Each by flavour, deliberately: precision chosen over collapsing.
   - "crème de mûre"
@@ -189,30 +192,30 @@ liqueurs:
 # Own generics, family = `herbal`. Chartreuse is the BASE of Chartreuse
 # Swizzle, which is why these are not filed as mere modifiers.
 herbal_liqueurs:
-  - "green chartreuse"
-  - "yellow chartreuse"
-  - "bénédictine"
-  - "strega"
-  - "jägermeister"
+  - "green Chartreuse"
+  - "yellow Chartreuse"
+  - "Bénédictine"
+  - "Strega"
+  - "Jägermeister"
   - "liqueur de sapin"
-  - "swedish flaggpunsch"
+  - "Swedish flaggpunsch"
 
 # Separate generics, one family. Not substitutable for each other -- swapping
 # Campari for Fernet is a different drink, not a variation.
 amari:
-  - "campari"
-  - "aperol"
-  - "cynar"
+  - "Campari"
+  - "Aperol"
+  - "Cynar"
   - "fernet"
-  - "amaro nonino"
-  - "amaro ciociano"
+  - "Amaro Nonino"
+  - "Amaro Ciociano"
 
 fortified_and_aromatised:
   - "sweet vermouth"
   - "dry vermouth"
   - "blanc vermouth"
   # A vermouth-amaro hybrid; swapping it for sweet vermouth is audible.
-  - "punt e mes"
+  - "Punt e Mes"
   # Aperitif wines, not vermouths: Lillet, Cocchi Americano.
   - "quinquina"
   - "amontillado sherry"
@@ -228,7 +231,7 @@ wine_and_sparkling:
 bitters:
   - "aromatic bitters"
   - "orange bitters"
-  - "creole bitters"
+  - "Creole bitters"
   - "chocolate bitters"
   - "tiki bitters"
   - "lavender bitters"
@@ -328,35 +331,36 @@ other:
 # every other modifier -- nobody excludes "all juices". A BASE absent from here
 # is a gap, and `family_less` records a deliberate one with its reason.
 family_of:
-  "jamaican, moderately aged": rum
-  "jamaican, caramel forward": rum
+  "Jamaican, moderately aged": rum
+  "Jamaican, caramel forward": rum
   "lightly aged and filtered": rum
   "moderately aged": rum
-  "demerara, aged": rum
-  "demerara, overproof": rum
-  "jamaican, overproof, unaged": rum
+  "Demerara, aged": rum
+  "Demerara, overproof": rum
+  "Jamaican, overproof, unaged": rum
   "cane juice (agricole) rum, unaged": rum
   "cane juice (agricole) rum, aged": rum
+  "clairin": rum
   "blended multi-region rum, clear": rum
-  "planteray stiggins' fancy": rum
-  "planteray o.f.t.d. overproof": rum
-  "malibu": rum
+  "Planteray Stiggins' Fancy": rum
+  "Planteray O.F.T.D. Overproof": rum
+  "Malibu": rum
   "blackstrap": rum
   "cachaça": rum
-  "batavia arrack": rum
-  "london dry": gin
-  "plymouth": gin
-  "new western dry": gin
+  "Batavia arrack": rum
+  "London dry": gin
+  "Plymouth": gin
+  "New Western dry": gin
   "genever": gin
   "flavoured": gin
   "gin liqueur": gin
   "navy strength": gin
   "rye": whisky
   "bourbon": whisky
-  "peated scotch": whisky
-  "blended scotch": whisky
-  "irish": whisky
-  "japanese": whisky
+  "peated Scotch": whisky
+  "blended Scotch": whisky
+  "Irish": whisky
+  "Japanese": whisky
   "cognac": brandy
   "armagnac": brandy
   "calvados": brandy
@@ -369,34 +373,34 @@ family_of:
   "mezcal": agave
   "vodka": vodka
   "flavoured vodka": vodka
-  "campari": amaro
-  "aperol": amaro
-  "cynar": amaro
+  "Campari": amaro
+  "Aperol": amaro
+  "Cynar": amaro
   "fernet": amaro
-  "amaro nonino": amaro
-  "amaro ciociano": amaro
+  "Amaro Nonino": amaro
+  "Amaro Ciociano": amaro
   "sweet vermouth": fortified
   "dry vermouth": fortified
   "blanc vermouth": fortified
-  "punt e mes": fortified
+  "Punt e Mes": fortified
   "quinquina": fortified
   "amontillado sherry": fortified
   "tawny port": fortified
   "aquavit": aquavit
-  "green chartreuse": herbal
-  "yellow chartreuse": herbal
-  "bénédictine": herbal
-  "strega": herbal
-  "jägermeister": herbal
+  "green Chartreuse": herbal
+  "yellow Chartreuse": herbal
+  "Bénédictine": herbal
+  "Strega": herbal
+  "Jägermeister": herbal
   "liqueur de sapin": herbal
-  "swedish flaggpunsch": herbal
+  "Swedish flaggpunsch": herbal
 
 # Bases with NO family, deliberately. Same idea as
 # tests/test_reference_data.py's NO_TEMPERATURE_BECAUSE: a decision with its
 # reason attached, so "why is this not groupable?" is answered in the repo
 # rather than in someone's memory.
 family_less:
-  "ceylon arrack": >-
+  "Ceylon arrack": >-
     Coconut flower sap, sharing only a name with Batavia arrack. Used once, in
     Arrack Christmas Punch, where rum dominates by volume. Helen, 2026-08-17:
     "no idea what to do about Ceylon arrack, but I don't recall a drink where
