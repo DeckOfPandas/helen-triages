@@ -1,24 +1,24 @@
-"""The cocktails collection's own rules.
+"""The cocktails collection's own rules. Spec: GitHub issue #322.
 
 `tests/conftest.py` is explicitly the FOOD suite, and says so: the food schema
 does not apply to a cocktail. This is the sibling it anticipated.
 
-WHY THIS FILE SKIPS RATHER THAN FAILS ON AN EMPTY CORPUS, and why that is not
-the vacuity trap tests/test_suite_hygiene.py exists to catch. `_cocktail_drafts/`
-is its own private git repo, gitignored from this one, so on a clean checkout
-of the public repo the directory is genuinely ABSENT -- not empty, absent. That
-is a legitimate state and the right response is to skip loudly with a message
-saying so.
+WHY THIS FILE SKIPS RATHER THAN FAILS ON AN ABSENT COLLECTION, and why that is
+not the vacuity trap tests/test_suite_hygiene.py exists to catch.
+`_cocktail_drafts/` is its own private git repo, gitignored from this one, so on
+a clean checkout of the public repo the directory is genuinely ABSENT -- not
+empty, absent. That is a legitimate state and the right response is to skip
+loudly saying so.
 
 What is NOT legitimate is the directory being present and yielding nothing,
-which would mean the loader has gone stale. So: skip when the collection is
-not here, assert non-empty when it is. The distinction is the whole point --
-"this machine does not have the drinks" and "I looked and found nothing" must
-never produce the same green.
+which would mean the loader has gone stale. So: skip when the collection is not
+here, assert non-empty when it is. "This machine has no drinks" and "I looked
+and found nothing" must never produce the same green.
 """
 from __future__ import annotations
 
 import re
+import unicodedata
 from pathlib import Path
 
 import pytest
@@ -30,10 +30,10 @@ VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
-# The families #314 governs. A `generic` on one of these has to come from the
-# declared list; a `generic` on a lime juice does not, because the rest of the
-# ingredient vocabulary has not been argued out yet.
-IS_RUM = re.compile(r"\brum|\brhum|cacha|clairin", re.I)
+# Groups in ingredients.yml that are lists of generic VALUES. Everything else at
+# the top level is a mapping (family_of, family_less, retired_*) or the family
+# list itself, and must not be mistaken for declared generics.
+NOT_GENERIC_LISTS = {"families"}
 
 
 def _load():
@@ -52,8 +52,8 @@ def _load():
     assert out, (
         f"{DRAFTS.name}/ exists but yielded no parseable drinks. The directory "
         f"is here, so this is not the absent-collection case -- either every "
-        f"file lost its front matter, or this loader has gone stale. Do not "
-        f"let it report green."
+        f"file lost its front matter, or this loader has gone stale. Do not let "
+        f"it report green."
     )
     return out
 
@@ -64,83 +64,212 @@ def _vocab():
     return yaml.safe_load(VOCAB.read_text(encoding="utf-8")) or {}
 
 
-def _rum_generics():
-    """(drink, item, generic) for every rum-family ingredient carrying one."""
-    out = []
-    for slug, fm in _load():
-        for item in (fm.get("ingredients") or []):
-            if not isinstance(item, dict):
-                continue
-            name, generic = item.get("item") or "", item.get("generic")
-            if generic and IS_RUM.search(name):
-                out.append((slug, name, generic))
+def _declared_generics(vocab):
+    """Every declared generic value, from every list group in the file.
+
+    Derived from the file's own shape rather than a hardcoded list of group
+    names, so a group added tomorrow is covered tomorrow -- the same reasoning
+    test_every_drafts_collection_is_gitignored uses for reading _config.yml.
+    """
+    out = set()
+    for key, value in vocab.items():
+        if key in NOT_GENERIC_LISTS or not isinstance(value, list):
+            continue
+        out |= set(value)
     return out
 
 
-def test_no_drink_uses_a_retired_rum_style():
-    """`light`, `gold` and `dark` are retired by issue #314.
+def _ingredients():
+    """(drink, item, generic) for every ingredient entry."""
+    return [
+        (slug, item.get("item") or "", item.get("generic"))
+        for slug, fm in _load()
+        for item in (fm.get("ingredients") or [])
+        if isinstance(item, dict)
+    ]
 
-    Checked FIRST and separately from "not declared", the same way
-    test_star_ingredient_is_declared handles retired stars: a value that used
-    to mean something must fail with its retirement reason attached, not blend
-    into the generic not-declared pile where nobody learns why it went.
+
+# =============================================================================
+# 1 and 2 -- the vocabulary is closed, and retirements bite
+# =============================================================================
+
+def test_every_generic_is_declared():
+    """A `generic` is a declared value or the literal `QQ`. A third thing is how
+    a typo mints a category silently.
+
+    QQ is allowed here and nowhere near a published recipe: these are drafts,
+    and 70 of 594 entries genuinely need Helen's call.
+
+    THIS CAUGHT FIVE REAL ONES when it was written -- all in the three
+    hand-written schema examples, which predate the vocabulary: `Creole bitters`
+    (capitalised), `chartreuse` (which of the two?), `peach liqueur` (the
+    collection uses crème de pêche), `rye whiskey` (the style is `rye`) and
+    `sugar syrup` (1:1 or 2:1 is the whole distinction).
+    """
+    vocab = _vocab()
+    declared = _declared_generics(vocab)
+    assert declared, (
+        "_data/cocktails/ingredients.yml declares no generic values at all, so "
+        "this check has nothing to enforce. Either the file changed shape or "
+        "the groups were renamed -- an empty set would pass everything."
+    )
+    retired = set(vocab.get("retired_rum_styles") or {})
+    bad = sorted({
+        f"{slug}: {item!r} -> {generic!r}"
+        for slug, item, generic in _ingredients()
+        if generic and generic != "QQ" and generic not in declared
+        and generic not in retired
+    })
+    assert not bad, (
+        "Undeclared generic(s):\n  " + "\n  ".join(bad)
+        + "\n\nEither it is a typo, or the value is real and belongs in "
+          "_data/cocktails/ingredients.yml. Issue #322 is the spec."
+    )
+
+
+def test_no_drink_uses_a_retired_generic():
+    """Retired values fail with their retirement REASON attached.
+
+    Checked separately from "not declared", the same way food's
+    test_star_ingredient_is_declared handles retired stars: a value that used to
+    mean something must not blend into the generic not-declared pile, where
+    nobody learns why it went.
     """
     retired = _vocab().get("retired_rum_styles") or {}
     assert retired, (
-        "_data/cocktails/ingredients.yml declares no retired_rum_styles, so "
-        "this check has nothing to enforce. If the retirements were reversed, "
-        "delete this test deliberately rather than leaving it passing."
+        "No retired values declared, so this enforces nothing. If the "
+        "retirements were reversed, delete this test deliberately."
     )
-    offenders = [
-        f"{slug}: {name!r} -> {generic!r} ({retired[generic]})"
-        for slug, name, generic in _rum_generics()
+    bad = [
+        f"{slug}: {item!r} -> {generic!r} ({retired[generic]})"
+        for slug, item, generic in _ingredients()
         if generic in retired
     ]
-    assert not offenders, (
-        "Retired rum style(s) still in use:\n  " + "\n  ".join(offenders)
-        + "\n\nRe-type against rum_styles in _data/cocktails/ingredients.yml. "
-          "Which rum a drink actually wants is Helen's own knowledge and is "
-          "not recoverable from the spreadsheet -- use QQ, do not guess."
+    assert not bad, (
+        "Retired generic(s) still in use:\n  " + "\n  ".join(bad)
+        + "\n\nRe-type against the vocabulary. Which rum a drink wants is "
+          "Helen's own knowledge and is not recoverable from the spreadsheet -- "
+          "use QQ, do not guess."
     )
 
 
-def test_every_rum_generic_is_declared():
-    """A rum's `generic` is either a declared style, a permitted untyped
-    bottle, or the literal `QQ` meaning "not typed yet".
+# =============================================================================
+# 3 -- the family roll-up, which serves search and exclusion (NOT browsing)
+# =============================================================================
 
-    QQ is allowed here and nowhere near a published recipe: these are drafts,
-    and 32 of the 55 rums in the collection genuinely need Helen's call. What
-    is not allowed is a fourth thing -- a plausible-looking style nobody
-    declared, which is exactly how a typo mints a new category silently.
+def test_every_family_is_declared_and_bases_have_one():
+    """`family_of` maps base generics to a declared family, and every base
+    either has a family or an explicit reason for not having one.
+
+    NOT "every generic has a family" -- that would fail on `lime juice`, and
+    correctly so: nobody excludes "all juices". Only BASES roll up. The
+    distinction was a real bug in this test's own spec, caught before it was
+    written.
+
+    `family_less` is the exemption list, carrying a reason per entry, exactly as
+    tests/test_reference_data.py's NO_TEMPERATURE_BECAUSE does -- so "why is
+    this not groupable?" is answered in the repo rather than in someone's head.
     """
     vocab = _vocab()
-    # cane_spirits is in here because IS_RUM cannot tell a cachaca from a rum
-    # -- the words genuinely overlap, and #314 says cachaca is its own generic
-    # rather than a rum style. The vocabulary draws that line, not the regex.
-    allowed = (set(vocab.get("rum_styles") or [])
-               | set(vocab.get("rum_untyped") or [])
-               | set(vocab.get("cane_spirits") or []))
-    assert allowed, "ingredients.yml declares no rum styles at all."
+    families = set(vocab.get("families") or [])
+    family_of = vocab.get("family_of") or {}
+    family_less = vocab.get("family_less") or {}
+    declared = _declared_generics(vocab)
 
-    found = _rum_generics()
-    assert found, (
-        "No rum-family ingredient carries a `generic` at all. The collection "
-        "is rum-heavy, so this almost certainly means IS_RUM or the loader has "
-        "stopped matching rather than that the data changed."
-    )
-    retired = set(vocab.get("retired_rum_styles") or {})
-    unknown = sorted({
-        f"{slug}: {name!r} -> {generic!r}"
-        for slug, name, generic in found
-        if generic != "QQ" and generic not in allowed and generic not in retired
-    })
-    assert not unknown, (
-        "Undeclared rum style(s):\n  " + "\n  ".join(unknown)
-        + f"\n\nDeclared: {sorted(allowed)}.\n"
-          "Either it is a typo, or the style is real and belongs in "
-          "_data/cocktails/ingredients.yml -- issue #314 is the spec."
+    assert families and family_of, "families / family_of are missing or empty."
+
+    unknown_family = sorted({f"{g!r} -> {f!r}" for g, f in family_of.items()
+                             if f not in families})
+    assert not unknown_family, (
+        "family_of points at families that are not declared:\n  "
+        + "\n  ".join(unknown_family) + f"\n\nDeclared: {sorted(families)}."
     )
 
+    unknown_generic = sorted(set(family_of) - declared)
+    assert not unknown_generic, (
+        f"family_of names generics that are not declared anywhere: "
+        f"{unknown_generic}. A family mapping for a value nothing can use is "
+        f"dead weight -- and probably a typo."
+    )
+
+    # Every base style must be groupable or exempted. Bases are the style lists.
+    base_groups = ("rum_styles", "rum_untyped", "gin_styles", "whisky_styles",
+                   "agave_styles", "brandy_styles", "cane_and_palm_spirits",
+                   "other_base_spirits", "herbal_liqueurs", "amari",
+                   "fortified_and_aromatised")
+    bases = {g for group in base_groups for g in (vocab.get(group) or [])}
+    assert bases, "no base groups found -- have they been renamed?"
+    orphans = sorted(bases - set(family_of) - set(family_less))
+    assert not orphans, (
+        f"base generic(s) with no family and no exemption: {orphans}.\n"
+        f"Either map them in family_of, or record why not in family_less with a "
+        f"reason. An unexplained gap means 'no whisky tonight' silently misses "
+        f"a drink."
+    )
+
+
+# =============================================================================
+# 4 -- spelling collisions, the food test that actually fires in practice
+# =============================================================================
+
+def _fold(text):
+    stripped = "".join(c for c in unicodedata.normalize("NFD", text)
+                       if not unicodedata.combining(c))
+    return stripped.lower()
+
+
+def test_no_two_generics_differ_only_by_case_or_accent():
+    """The cocktails version of test_no_main_ingredient_spelling_collisions.
+
+    That is the food test that fires most often in real use, because two
+    spellings of one thing means two filter buttons each holding half the
+    drinks -- and the search layer folds accents when matching, so the collision
+    is invisible until someone browses the buttons.
+
+    Checked against the DECLARED vocabulary rather than the drinks, because the
+    vocabulary is what the buttons are built from.
+    """
+    vocab = _vocab()
+    seen = {}
+    collisions = []
+    for generic in sorted(_declared_generics(vocab)):
+        key = _fold(generic)
+        if key in seen and seen[key] != generic:
+            collisions.append(f"{seen[key]!r} vs {generic!r}")
+        seen[key] = generic
+    assert not collisions, (
+        "Declared generics differing only by case or accent:\n  "
+        + "\n  ".join(collisions)
+        + "\n\nPick one spelling. Two spellings of one thing means two buttons "
+          "each holding half the drinks."
+    )
+
+
+# =============================================================================
+# 5 -- coverage: an untyped ingredient must be VISIBLE, not absent
+# =============================================================================
+
+def test_every_ingredient_has_a_generic_or_a_qq():
+    """No ingredient may be silently untyped.
+
+    THIS IS THE GAP `Smith & Cross` FELL INTO. Written without the word "rum",
+    it matched no pattern, so it got no generic AND no QQ -- invisible to both
+    the declared-value check and the retirement check. An absent key reads as
+    "nothing to see"; a QQ reads as "not done yet". Only one of those is true.
+    """
+    missing = sorted({f"{slug}: {item!r}" for slug, item, generic
+                      in _ingredients() if item and not generic})
+    assert not missing, (
+        f"{len(missing)} ingredient(s) carry no `generic` key at all:\n  "
+        + "\n  ".join(missing[:15])
+        + "\n\nEvery ingredient needs a declared generic or the literal QQ. "
+          "Absent is not the same as unfinished."
+    )
+
+
+# =============================================================================
+# 6 and 7 -- shape guards on the drinks themselves
+# =============================================================================
 
 def test_glass_is_a_list():
     """`glass` became an ordered list on 2026-08-17 so a drink could name more
@@ -148,11 +277,56 @@ def test_glass_is_a_list():
     iterates a string's characters happily enough to produce nothing visible --
     so nothing else would catch one.
     """
-    offenders = [
-        f"{slug}: glass is a {type(fm['glass']).__name__}"
-        for slug, fm in _load()
-        if "glass" in fm and not isinstance(fm["glass"], list)
-    ]
-    assert not offenders, (
-        "glass must be a list, first entry preferred:\n  " + "\n  ".join(offenders)
+    bad = [f"{slug}: glass is a {type(fm['glass']).__name__}"
+           for slug, fm in _load()
+           if "glass" in fm and not isinstance(fm["glass"], list)]
+    assert not bad, (
+        "glass must be a list, first entry preferred:\n  " + "\n  ".join(bad)
+    )
+
+
+def test_syrup_ratio_is_plausible_for_its_generic():
+    """FLAG ONLY. Never rewrite, and never fail on a deliberate choice.
+
+    A 1:1 syrup is used at roughly twice the volume of a 2:1 for the same
+    sweetness, so syrup-against-citrus carries signal. But it CANNOT classify:
+    a declared 1:1 (Daisy de Santiago) and a declared 2:1 (Long Island) both sit
+    at 0.50, because Helen adjusts sugar deliberately -- by weather, by company,
+    and by halving it when she feels like it (HANDOVER §9.4.1: the site is canon
+    and she deviates in the kitchen).
+
+    So the bounds here are deliberately WIDE. This is looking for a
+    transcription error -- a figure off by a factor, not off by taste -- and a
+    test that fired on ordinary variation would be switched off, which is the
+    reasoning test_notes_are_not_damaged gives for keeping its own checks exact
+    rather than heuristic.
+    """
+    citrus = re.compile(r"lime juice|lemon juice|grapefruit juice", re.I)
+    problems = []
+    checked = 0
+    for slug, fm in _load():
+        items = [i for i in (fm.get("ingredients") or []) if isinstance(i, dict)]
+        syrup = sum(i.get("ml") or 0 for i in items
+                    if (i.get("generic") or "").startswith("sugar syrup"))
+        sour = sum(i.get("ml") or 0 for i in items if citrus.search(i.get("item", "")))
+        if not (syrup and sour):
+            continue
+        checked += 1
+        ratio = syrup / sour
+        if not 0.05 <= ratio <= 1.60:
+            problems.append(
+                f"{slug}: {syrup:g} ml syrup against {sour:g} ml citrus "
+                f"(ratio {ratio:.2f})"
+            )
+    assert checked, (
+        "No drink has both a sugar syrup and a citrus juice with ml figures, so "
+        "this check is vacuous. That is implausible for this collection -- the "
+        "generic prefix or the citrus pattern has probably gone stale."
+    )
+    assert not problems, (
+        "Syrup-to-citrus ratio outside anything a recipe would use:\n  "
+        + "\n  ".join(problems)
+        + "\n\nThis is looking for a TRANSCRIPTION error, not a taste "
+          "preference -- the bounds are wide on purpose. Check the source "
+          "spreadsheet before changing the figure."
     )

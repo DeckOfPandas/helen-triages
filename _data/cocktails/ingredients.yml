@@ -1,35 +1,78 @@
 # =============================================================================
-# COCKTAIL INGREDIENT VOCABULARY — the generic names a drink can be filtered by.
+# COCKTAIL INGREDIENT VOCABULARY. Spec: GitHub issue #322. Rum half: #314.
+# Index design that consumes this: #292.
 # =============================================================================
-# A drink's `ingredients:` list carries what you actually pour (`item:`,
-# brand-led — "Appleton Estate Reserve") and what you would ever BROWSE by
-# (`generic:` — "jamaican, moderately aged"). No rule can derive the second
-# from the first: 46 of the 296 distinct ingredients in the collection carry no
-# category word at all (Cointreau, Amaretto, Carpano Antica, Batavia arrack,
-# Clairin Communal), which is why this file exists rather than a parser.
+# TWO LAYERS, AND THE DISTINCTION IS THE WHOLE DESIGN.
 #
-# Same contract as _data/food/taxonomy.yml: a value not declared here renders
-# nowhere and fails the suite. Adding one is a YAML edit, not a code edit.
+#   `generic`  the precise ingredient category, on each `ingredients:` entry.
+#              Campari, Aperol, Cynar and Fernet are FOUR generics -- they
+#              taste nothing alike and are not substitutable.
+#   `family`   the roll-up, for SEARCH and EXCLUSION only. All four are
+#              `amaro`. See the families block below for why this is not a
+#              browse axis.
+#
+# ONLY BASES HAVE A FAMILY. `lime juice` has none and should not -- nobody
+# excludes "all juices". `family_of` maps the bases and nothing else, and
+# `family_less` records the bases that deliberately have none.
+#
+# `generic` IS STORED, NEVER DERIVED. 61 distinct ingredients in this
+# collection are named only by brand -- Campari, Cointreau, Cynar, Kahlua,
+# Carpano Antica, Rittenhouse, Roots Mastiha, Swedish Flaggpunsch -- affecting
+# 56 of the 109 drinks that have ingredients. No rule gets "rye whiskey" out of
+# "Ritthenhouse".
+#
+# A PREFERRED BOTTLE IS A `suggestion`, NEVER A `generic`. Helen, 2026-08-17,
+# on Cherry Heering: "I'd note my preference as the example not the category."
+# So Velvet Falernum -> falernum, Luxardo -> maraschino liqueur, Carpano Antica
+# -> sweet vermouth, with the bottle in `suggestion`. The only exceptions are
+# the brand names #314 permits AS generics, because nothing generalises them:
+# planteray stiggins' fancy, planteray o.f.t.d. overproof, malibu, blackstrap.
 # =============================================================================
 
-# --- RUM ---------------------------------------------------------------------
-# GitHub issue #314, Helen's spec. Ten styles, and "light", "gold" and "dark"
-# are RETIRED — they were the spreadsheet's own shorthand, they describe colour
-# rather than production, and colour is the least reliable thing about a rum
-# (caramel is routinely added). Anything still carrying them needs re-typing
-# against this list, which is Helen's own knowledge and not inferable from the
-# bottle name.
+# --- spirit families: FOR SEARCH AND EXCLUSION, NOT A BROWSE AXIS ------------
+# THIS IS NOT A "SORTED BY SPIRIT" MENU, and that is deliberate. Helen,
+# 2026-08-17: "I get really bored of cocktail bars that have enormous
+# bible-like menus sorted by spirit... I probably think browsing by spirit is
+# basic." Do not put a spirit filter on the index.
 #
-# Rum is ~20% of the whole vocabulary — 58 of 296 distinct ingredients — and
-# is the only family that needed its own controlled list. Everything else is
-# a flat generic name.
+# The families exist to serve two things in her actual index design:
+#   1. the ingredient search's `(all)` buttons -- typing toward "rum" offers
+#      "rum (all)" alongside "Havana Club Anejo 3 Anos", the same shape food's
+#      ingredient search already has;
+#   2. exclusion. "I don't like Scotch" is a family-level operation, and so is
+#      "no whisky tonight".
 #
-# THREE THINGS #314 RULES OUT, worth stating because each looks like a gap:
-#   - there is NO "spiced" style. A spiced rum is typed by what it is
-#     underneath, case by case.
-#   - "navy" is not a style either. Helen: it "will often collapse into one of
-#     the Demeraras" -- case by case, so a navy rum stays QQ until she calls it.
-#   - cachaca is NOT a rum style. It is its own generic; see below.
+# FOOD'S FAMILY MECHANISM CANNOT DERIVE THESE. On the food site an `(all)`
+# button forms when entries share a head word after normalisation -- "cheese
+# (all)" from cheddar/feta/comte. These styles share NO common word:
+# "jamaican, moderately aged" and "demerara, aged" have nothing in common
+# textually. So the family has to be DECLARED, which is what `family_of` is.
+#
+# `fortified` exists because 19 drinks have no spirit at all -- Bamboo,
+# Brooklyn, Toronto, Aperol Spritz, Lucien Gaudin, the Bellini, mulled wine --
+# and without it they cannot be excluded or searched as a group. `herbal`
+# exists because Chartreuse is the BASE of Chartreuse Swizzle, not merely a
+# modifier in it.
+families:
+  - rum
+  - gin
+  - whisky
+  - brandy
+  - agave
+  - vodka
+  - amaro
+  - fortified
+  - aquavit
+  - herbal
+
+# =============================================================================
+# BASE SPIRITS -- one style list per family, the pattern #314 set for rum
+# =============================================================================
+# Styles Helen does not currently own are declared anyway. This is a spec, not
+# an inventory: she chose that explicitly for gin, where Plymouth, New Western
+# and Genever are all absent from the collection.
+
+# GitHub issue #314. `light`, `gold` and `dark` are RETIRED -- see the bottom.
 rum_styles:
   - "jamaican, moderately aged"
   - "jamaican, caramel forward"
@@ -42,23 +85,325 @@ rum_styles:
   - "cane juice (agricole) rum, aged"
   - "blended multi-region rum, clear"
 
-# Named bottles that #314 permits WITHOUT a style, because they do not sit in
-# the ten: a pineapple-infused rum and an overproof blend are their own thing.
-# These are the only brand names allowed as a `generic:` value — everything
-# else generalises or it does not belong here.
+# Permitted WITHOUT a style per #314, because nothing generalises them.
+# Blackstrap sits here rather than among the ten for a stated reason -- Helen:
+# "treated more as a flavour modifier" -- not something you browse a drink by,
+# but a spoonful you add.
 rum_untyped:
   - "planteray stiggins' fancy"
   - "planteray o.f.t.d. overproof"
   - "malibu"
-  # Helen, #314: "treated more as a flavour modifier". Which is why it sits
-  # here rather than among the ten -- a blackstrap is not a style you would
-  # browse a drink by, it is a thing you add a spoonful of.
   - "blackstrap"
 
-# Retired, and actively removed rather than merely deprecated — the same
-# treatment _data/food/taxonomy.yml gives retired_star_ingredients, and for the
-# same reason: a value that used to mean something silently blends into the
-# generic "not declared" pile unless something names it.
+gin_styles:
+  - "london dry"
+  - "plymouth"
+  - "new western dry"
+  - "genever"
+  - "flavoured"
+  # Helen's own parenthesis: "not a gin though". Sloe gin lives here rather
+  # than hiding inside london dry.
+  - "gin liqueur"
+  - "navy strength"
+
+whisky_styles:
+  - "rye"
+  - "bourbon"
+  - "peated scotch"
+  - "blended scotch"
+  - "irish"
+  - "japanese"
+
+agave_styles:
+  - "blanco tequila"
+  - "reposado tequila"
+  - "añejo tequila"
+  - "mezcal"
+
+brandy_styles:
+  - "cognac"
+  - "armagnac"
+  - "calvados"
+  - "pisco"
+  - "grappa"
+  # The category term rather than one country's word for it, so a slivovitz or
+  # a framboise has somewhere to go. Cherry eau de vie is the live example.
+  - "eau de vie"
+
+# Cane and palm spirits that are NOT rum. #314: "cachaca is its own generic" --
+# same raw material as an agricole rhum, completely different product. Batavia
+# arrack is a cane-and-rice spirit and Helen's call is that it stars as `rum`.
+# Ceylon arrack is coconut flower sap and shares only the name.
+cane_and_palm_spirits:
+  - "cachaça"
+  - "batavia arrack"
+  - "ceylon arrack"
+
+other_base_spirits:
+  - "vodka"
+  - "flavoured vodka"
+  - "absinthe"
+  - "aquavit"
+
+# =============================================================================
+# MODIFIERS
+# =============================================================================
+
+liqueurs:
+  # Orange, four ways -- Helen's call. Grand Marnier stays apart because its
+  # cognac base genuinely changes a drink.
+  - "triple sec"
+  - "orange curaçao"
+  - "dry orange curaçao"
+  - "grand marnier"
+  - "blue curaçao"
+  - "maraschino liqueur"
+  # Each by flavour, deliberately: precision chosen over collapsing.
+  - "crème de mûre"
+  - "crème de cassis"
+  - "crème de pêche"
+  - "crème de banane"
+  - "crème de violette"
+  - "crème de cacao"
+  - "crème de menthe"
+  # Cherry: the distinction Helen believes in. A liqueur is sweetened, an eau
+  # de vie is not, and her own note says "Don't use plain kirsch". The eau de
+  # vie itself lives under brandy_styles.
+  - "cherry liqueur"
+  - "apricot liqueur"
+  - "coffee liqueur"
+  - "ginger liqueur"
+  - "passion fruit liqueur"
+  - "gentian liqueur"
+  - "mastiha liqueur"
+  - "tomato liqueur"
+  - "amaretto"
+
+# Own generics, family = `herbal`. Chartreuse is the BASE of Chartreuse
+# Swizzle, which is why these are not filed as mere modifiers.
+herbal_liqueurs:
+  - "green chartreuse"
+  - "yellow chartreuse"
+  - "bénédictine"
+  - "strega"
+  - "jägermeister"
+  - "liqueur de sapin"
+  - "swedish flaggpunsch"
+
+# Separate generics, one family. Not substitutable for each other -- swapping
+# Campari for Fernet is a different drink, not a variation.
+amari:
+  - "campari"
+  - "aperol"
+  - "cynar"
+  - "fernet"
+  - "amaro nonino"
+  - "amaro ciociano"
+
+fortified_and_aromatised:
+  - "sweet vermouth"
+  - "dry vermouth"
+  - "blanc vermouth"
+  # A vermouth-amaro hybrid; swapping it for sweet vermouth is audible.
+  - "punt e mes"
+  # Aperitif wines, not vermouths: Lillet, Cocchi Americano.
+  - "quinquina"
+  - "amontillado sherry"
+  - "tawny port"
+
+wine_and_sparkling:
+  - "champagne"
+  - "prosecco"
+  - "red wine"
+  - "cider"
+
+# Every flavour by name, Helen's call -- consistent with crème de X.
+bitters:
+  - "aromatic bitters"
+  - "orange bitters"
+  - "creole bitters"
+  - "chocolate bitters"
+  - "tiki bitters"
+  - "lavender bitters"
+  - "peppermint bitters"
+  - "wood smoke bitters"
+  - "spiced bitters"
+  - "margarita bitters"
+  - "pimento bitters"
+
+# =============================================================================
+# SWEETENERS, JUICES, FRUIT
+# =============================================================================
+
+# 1:1 AND 2:1 ARE SEPARATE GENERICS. "Simple syrup" means 1:1. Only 2 of 27
+# entries state a ratio, and syrup-to-citrus volume CANNOT tell them apart -- a
+# declared 1:1 (Daisy de Santiago) and a declared 2:1 (Long Island) both sit at
+# 0.50, because Helen adjusts sugar deliberately. See HANDOVER §9.4.1: the site
+# is canon and she deviates in the kitchen.
+syrups:
+  - "sugar syrup 1:1"
+  - "sugar syrup 2:1"
+  - "demerara syrup"
+  - "grenadine"
+  - "ginger syrup"
+  - "passion fruit syrup"
+  - "cinnamon syrup"
+  - "agave syrup"
+  - "vanilla syrup"
+  - "orgeat"
+  - "falernum"
+  - "lime cordial"
+  - "ginger and lemongrass cordial"
+
+# `honey water` is what other people call honey syrup. Helen makes no syrup, so
+# the word does not appear. Clover is a suggestion in a note, not a generic.
+honeys:
+  - "honey"
+  - "honey water"
+  - "acacia honey"
+
+# DELIBERATELY MIXES FORM WITH TYPE, and the reasoning is a browsing one rather
+# than a purity one -- Helen: "if I don't have a sugar cube I won't make a
+# Classic Champagne Cocktail". A cube can also be brown; Arrack Punch uses 16
+# demerara cubes. So form and type really are orthogonal here.
+# Her revisit clause: "if having this many turns out to feel mad once I'm using
+# the site, then we can revisit."
+sugars:
+  - "white sugar"
+  - "raw sugar"
+  - "molasses sugar"
+  - "palm sugar"
+  - "sugar cube"
+
+# "FRESH" IS NOT PART OF THE GENERIC. Freshly squeezed is implied for every
+# juice, and `lime cordial` being named separately is what makes the
+# implication safe. Helen is writing this up on an About page.
+juices:
+  - "lime juice"
+  - "lemon juice"
+  - "orange juice"
+  - "pineapple juice"
+  - "grapefruit juice"
+  - "cranberry juice"
+  - "apple juice"
+
+# FRUIT IS NOT JUICE. You muddle one and pour the other, and a Caipirinha made
+# with lime juice is a different drink.
+fruit_and_herbs:
+  - "lime"
+  - "pineapple"
+  - "passion fruit"
+  - "raspberries"
+  - "blackberries"
+  - "pear"
+  - "dried apricots"
+  - "lemon zest"
+  - "mint"
+  - "basil"
+  - "rosemary"
+  - "fruit purée"
+
+other:
+  - "soda water"
+  - "water"
+  - "black tea"
+  - "espresso"
+  - "cola"
+  - "coconut cream"
+  - "egg white"
+  - "salt"
+  - "cider vinegar"
+
+# =============================================================================
+# GENERIC -> FAMILY. Bases only.
+# =============================================================================
+# A generic absent from here has no family, which is correct for lime juice and
+# every other modifier -- nobody excludes "all juices". A BASE absent from here
+# is a gap, and `family_less` records a deliberate one with its reason.
+family_of:
+  "jamaican, moderately aged": rum
+  "jamaican, caramel forward": rum
+  "lightly aged and filtered": rum
+  "moderately aged": rum
+  "demerara, aged": rum
+  "demerara, overproof": rum
+  "jamaican, overproof, unaged": rum
+  "cane juice (agricole) rum, unaged": rum
+  "cane juice (agricole) rum, aged": rum
+  "blended multi-region rum, clear": rum
+  "planteray stiggins' fancy": rum
+  "planteray o.f.t.d. overproof": rum
+  "malibu": rum
+  "blackstrap": rum
+  "cachaça": rum
+  "batavia arrack": rum
+  "london dry": gin
+  "plymouth": gin
+  "new western dry": gin
+  "genever": gin
+  "flavoured": gin
+  "gin liqueur": gin
+  "navy strength": gin
+  "rye": whisky
+  "bourbon": whisky
+  "peated scotch": whisky
+  "blended scotch": whisky
+  "irish": whisky
+  "japanese": whisky
+  "cognac": brandy
+  "armagnac": brandy
+  "calvados": brandy
+  "pisco": brandy
+  "grappa": brandy
+  "eau de vie": brandy
+  "blanco tequila": agave
+  "reposado tequila": agave
+  "añejo tequila": agave
+  "mezcal": agave
+  "vodka": vodka
+  "flavoured vodka": vodka
+  "campari": amaro
+  "aperol": amaro
+  "cynar": amaro
+  "fernet": amaro
+  "amaro nonino": amaro
+  "amaro ciociano": amaro
+  "sweet vermouth": fortified
+  "dry vermouth": fortified
+  "blanc vermouth": fortified
+  "punt e mes": fortified
+  "quinquina": fortified
+  "amontillado sherry": fortified
+  "tawny port": fortified
+  "aquavit": aquavit
+  "green chartreuse": herbal
+  "yellow chartreuse": herbal
+  "bénédictine": herbal
+  "strega": herbal
+  "jägermeister": herbal
+  "liqueur de sapin": herbal
+  "swedish flaggpunsch": herbal
+
+# Bases with NO family, deliberately. Same idea as
+# tests/test_reference_data.py's NO_TEMPERATURE_BECAUSE: a decision with its
+# reason attached, so "why is this not groupable?" is answered in the repo
+# rather than in someone's memory.
+family_less:
+  "ceylon arrack": >-
+    Coconut flower sap, sharing only a name with Batavia arrack. Used once, in
+    Arrack Christmas Punch, where rum dominates by volume. Helen, 2026-08-17:
+    "no idea what to do about Ceylon arrack, but I don't recall a drink where
+    it's the star so maybe unimportant."
+  "absinthe": >-
+    Used in dashes and rinses throughout this collection, never as a base. If a
+    drink ever builds on it, give absinthe a family then.
+
+# =============================================================================
+# RETIRED -- removed actively, not merely deprecated
+# =============================================================================
+# Same treatment _data/food/taxonomy.yml gives retired_star_ingredients, and
+# for the same reason: a value that used to mean something silently blends into
+# the "not declared" pile unless something names it.
 retired_rum_styles:
   light: >-
     describes colour, not production, and colour is routinely adjusted with
@@ -69,14 +414,3 @@ retired_rum_styles:
   dark: >-
     same reason again, and the most misleading of the three: a dark rum may be
     Jamaican caramel-forward, Demerara aged, or a blackstrap. Issue #314.
-
-# --- CANE SPIRITS THAT ARE NOT RUM -------------------------------------------
-# #314: "cachaca is its own generic". Same raw material as an agricole rhum --
-# fresh cane juice -- and a completely different product, so it is declared
-# apart from the rum styles rather than folded into them. The ingredient-name
-# regex that finds rums catches these too (it has to; the words overlap), so
-# the vocabulary is what tells them apart, not the pattern.
-cane_spirits:
-  # Accented, like every other vocabulary value on this site --
-  # _data/accented_words.yml is house style and applies to cocktails.
-  - "cachaça"

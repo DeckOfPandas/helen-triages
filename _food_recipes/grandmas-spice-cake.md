@@ -44,7 +44,7 @@ notes:
     text: "If the top of the cake cracks, bake at a lower temperature."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 ---

@@ -42,7 +42,7 @@ method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-08-11"
 

@@ -44,7 +44,7 @@ notes:
      text: "No real note other than to restate that this cake is a genuine delight."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 

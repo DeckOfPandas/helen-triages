@@ -70,7 +70,7 @@ notes:
     text: "...goat's cheese and cherry tomato."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 

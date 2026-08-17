@@ -23,18 +23,15 @@ ingredient_groups:
 method_groups:
   - name: "Make the tea"
     steps:
-      - "Boil the water and add the tea leaves. Simmer until the colour turns deep, about 3 mins."
-      - "Add the milk and sugar. Bring to the boil and simmer for another 2–3 mins."
-      - "Add the chai spice and take off the heat. Rest for 3–4 mins."
+      - "Make the tea on the hob."
+      - "Add the milk and sugar. Bring to the boil again then simmer for another 2–3 mins."
+      - "Add the chai spice and take off the heat. Leave to infuse for 3–4 mins."
       - "Strain and serve."
 method_short:
   - ""
-notes:
-  - label: "Simmer"
-    text: "The tea gets a proper 3-minute simmer before the milk goes in, to pull the tannin out of the leaves."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   cooked_before: true
   date_last_edited: "2026-08-11"
 
