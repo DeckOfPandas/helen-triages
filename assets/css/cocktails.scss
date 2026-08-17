@@ -7,10 +7,11 @@
 // then the shared structural layer, then this site's own. What differs is only
 // which palette and which decoration — which is the whole point of the split.
 //
-// There is no `cocktails/layout` or `cocktails/cocktail` partial yet. The page
-// anatomy for a cocktail is meant to come from real recipes (formula, glass,
-// garnish, one-line method) rather than from food's decision-support shape, so
-// it is not sketched in advance.
+// `cocktails/cocktail` arrived 2026-08-16 with the first real drinks, and is
+// deliberately only the title block and its glass icon so far. The page anatomy
+// is meant to come from real recipes (formula, glass, garnish, an ordered
+// build) rather than from food's decision-support shape, so the rest is added
+// as each section earns a decision — see HANDOVER §9.
 @import "cocktails/palette";
 @import "shared/tokens";
 // The punched-tape mixin, before shared/layout — the wordmark uses it, and a
@@ -20,6 +21,7 @@
 @import "shared/base";
 @import "shared/layout";
 @import "cocktails/decoration";
+@import "cocktails/cocktail";
 // Print, last -- see shared/_print.scss's header for why last, and why all
 // three stylesheets take it rather than just the one whose pages prompted it
 // (#86). There is no cocktails/print partial: this site has no page anatomy

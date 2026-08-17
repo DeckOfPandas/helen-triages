@@ -27,7 +27,48 @@ layout: default
 
 <article class="cocktail">
 
-  <h1 class="cocktail-title">{{ page.title }}</h1>
+  {% comment %} The glass icon sits with the title, looked up through
+     _data/cocktails/glasses.yml rather than guessed from the glass string —
+     the spreadsheet spells several glasses more than one way, and the map is
+     where that variance is handled.
+
+     A glass with no entry, or an entry naming a file that is not there,
+     renders NOTHING. That is deliberate and it is why `file_exists` is
+     checked as well as the lookup: `coupe` is the commonest glass in the
+     collection and has no icon yet, so the no-icon path is the normal case
+     today, not an edge one. Same absent-means-nothing convention as
+     footer_svg — a missing key must never become a broken image.
+  {% endcomment %}
+  {% comment %} GLASS IS AN ORDERED LIST, FIRST IS PREFERRED. Helen's review of
+     the coupe phase (2026-08-17) settled it: three drinks name two acceptable
+     glasses, and Daisy de Santiago is "anything, but preferably a Collins".
+     The icon is drawn for the FIRST entry that has one, so a drink whose
+     preference has no artwork still gets its second choice rather than
+     nothing. "any" is a real member and deliberately has no icon.
+  {% endcomment %}
+  {% comment %} The accumulator starts as "" and the final test is against "",
+     NOT a bare truth test. An empty string is TRUTHY in Liquid, and 14 drinks
+     carry no glass at all, so the loop never runs for them and a bare test
+     sent an empty filename to the include tag — a hard build failure reading
+     "File contains invalid characters or sequences: icons/glasses/.svg".
+     Third time this one property has bitten this layout: empty array on the
+     list sections, empty string on the source footer, and now here.
+  {% endcomment %}
+  {% assign glass_icon = "" %}
+  {% for g in page.glass %}
+    {% if glass_icon == "" %}
+      {% assign found = site.data.cocktails.glasses.icons[g] %}
+      {% if found %}{% assign glass_icon = found %}{% endif %}
+    {% endif %}
+  {% endfor %}
+  {% capture glass_icon_file %}icons/glasses/{{ glass_icon }}.svg{% endcapture %}
+
+  <div class="cocktail-title-block">
+    {% if glass_icon != "" %}
+      <span class="cocktail-glass-icon">{% include {{ glass_icon_file }} %}</span>
+    {% endif %}
+    <h1 class="cocktail-title">{{ page.title }}</h1>
+  </div>
 
   {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
@@ -37,7 +78,14 @@ layout: default
   {% endcomment %}
   {% if page.glass or page.garnish.size > 0 %}
     <ul class="cocktail-meta">
-      {% if page.glass %}<li><strong>Glass</strong> <span>{{ page.glass }}</span></li>{% endif %}
+      {% comment %} `join` on the whole list, not the first entry plus a
+         separate "or" line: the alternatives are equally acceptable serves,
+         not a fallback. Liquid has no `shift`/`rest`, so an "or" line would
+         need slicing the array anyway, for no gain.
+      {% endcomment %}
+      {% if page.glass.size > 0 %}
+        <li><strong>Glass</strong> <span>{{ page.glass | join: " or " }}</span></li>
+      {% endif %}
       {% if page.garnish.size > 0 %}
         <li><strong>Garnish</strong> <span>{{ page.garnish | join: ", " }}</span></li>
       {% endif %}

@@ -1,0 +1,79 @@
+// =============================================================================
+// COCKTAILS — PAGE ANATOMY. First pass, 2026-08-16.
+// =============================================================================
+// Deliberately just the title block and its glass icon. The rest of the page
+// (ingredients, method, notes) is still rendering on shared/_base.scss defaults
+// while the schema settles — HANDOVER §9. Add to this file as each section
+// earns a decision, rather than sketching a whole anatomy in advance.
+// =============================================================================
+
+// The title and its glass icon on one line. `flex-end` rather than `baseline`:
+// the icon is a drawing with no text baseline to align to, so baseline
+// alignment puts it wherever its box happens to sit. Aligning the bottom of
+// the glass to the bottom of the lettering is the thing the eye actually reads
+// as "level".
+.cocktail-title-block {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin-bottom: $space-lg;
+
+  .cocktail-title {
+    margin: 0;
+  }
+}
+
+// SIZED BY HEIGHT, NEVER WIDTH, and this is the whole reason the icons keep
+// their own viewBoxes rather than being forced into a square one. The glasses
+// are genuinely different proportions — a flute is 27mm wide by 98 tall, a
+// punch bowl 105 by 70 — so a common WIDTH would render the flute enormous and
+// the punch bowl tiny. A common height, with the width left to follow the
+// aspect ratio, is what makes them read as one set.
+.cocktail-glass-icon {
+  display: inline-flex;
+  align-items: flex-end;
+  flex: none;
+
+  svg {
+    display: block;
+    height: 2.6rem;
+    width: auto;
+    // A tall narrow glass and a wide shallow one at the same height still
+    // differ a lot in width; this stops the widest (punch bowl, mule mug)
+    // pushing the title along.
+    max-width: 3.2rem;
+  }
+}
+
+// THE STROKE IS NON-SCALING, ON PURPOSE, AND IT IS NOT A DETAIL.
+//
+// Every icon is drawn at its own viewBox scale — 27 to 105 units wide — so at
+// a common rendered height each one is scaled by a different factor. A plain
+// `stroke-width` is in USER UNITS, so it gets multiplied by that factor: the
+// same 2.82 in the source renders as a visibly heavier line on a short-viewBox
+// glass than on a tall one, and the set stops looking like a set.
+//
+// This is the same trap HANDOVER §13.4.1 documents for -webkit-text-stroke and
+// text-shadow on type — an absolute length applied across a range of sizes is a
+// range of different results — arriving in a different property. The fix here
+// is `vector-effect: non-scaling-stroke`, which makes stroke-width resolve in
+// SCREEN units instead, so one value is one line weight on all 21 icons.
+//
+// Set the weight here and nowhere else. If a glass ever looks wrong, the
+// artwork is wrong, not this number.
+.glass-icon-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+// currentColor, so the icon takes the page's own ink and the palette stays the
+// only place a colour is written down (three-layer rule). The exported SVGs had
+// #4c4c4e baked into all 104 paths; that is stripped at normalisation, and an
+// inline fill would beat this rule anyway and make the palette look broken.
+.cocktail-glass-icon {
+  color: $color-clear-text;
+}

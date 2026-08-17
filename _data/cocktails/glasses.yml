@@ -1,0 +1,75 @@
+# =============================================================================
+# GLASS → ICON. The vocabulary layer for cocktail glassware.
+# =============================================================================
+# `_layouts/cocktail.html` renders the icon for a drink's `glass:` value by
+# looking it up here and inlining `_includes/icons/glasses/<icon>.svg`. Adding
+# a glass is a YAML edit, never a template edit — the same contract
+# _data/food/taxonomy.yml has.
+#
+# ABSENT MEANS NO ICON, not a broken one. A glass with no entry here (or an
+# entry pointing at a file that does not exist) renders no icon at all rather
+# than a 404 or an empty box — the same absent-means-nothing convention
+# `footer_svg` and `about_url` already use in _data/sites.yml.
+#
+# KEYS ARE THE GLASS STRING AS WRITTEN IN A DRINK'S FRONT MATTER, lowercased.
+# The spreadsheet spells several glasses more than one way and those spellings
+# are carried through the ingest verbatim rather than silently unified, so the
+# aliases are handled HERE, where the variance is visible, instead of being
+# tidied away in the data. If the drinks are ever normalised to one spelling
+# each, these alias lines are what to delete.
+# =============================================================================
+
+icons:
+  # --- one spelling, one icon ------------------------------------------------
+  # Coupe is the collection's commonest glass by a wide margin -- 37 drinks
+  # across the book. Helen drew it 2026-08-16; before that it was the one big
+  # gap here and every coupe drink rendered iconless.
+  coupe: coupe
+  # Helen's spreadsheet spells the coupe two other ways. "champage saucer"
+  # is her own typo, carried through the ingest verbatim rather than
+  # silently corrected, so it is mapped here alongside the correct spelling.
+  champagne saucer: coupe
+  champage saucer: coupe
+  sour: sour
+  collins: collins
+  flute: flute
+  highball: highball
+  hurricane: hurricane
+  nick and nora: nick-and-nora
+  punch bowl: punch-bowl
+  rocks: rocks
+  tiki mug: tiki-mug
+
+  # --- three spellings of one glass, all live in the data ---------------------
+  old-fashioned: old-fashioned
+  old fashioned: old-fashioned
+  old-fashioned glass: old-fashioned
+
+  # --- judgement calls, worth checking by eye before trusting -----------------
+  # A snifter IS a brandy balloon, so this one is safe.
+  snifter: brandy
+  # "Double rocks" is a taller rocks glass, which is what rocks-tall draws.
+  # Reasonable, but it is an inference from the name, not from the artwork.
+  double rocks: rocks-tall
+
+# =============================================================================
+# GLASSES IN THE DATA WITH NO ICON — deliberately unmapped, not forgotten.
+# =============================================================================
+# Listed rather than silently absent so the gap is a fact in the repo instead
+# of something to rediscover. Nothing reads this list; it is documentation.
+#
+#   any      NOT A GLASS AND MUST NEVER BE MAPPED. It is a real member of a
+#            drink's `glass:` list meaning "no requirement" -- Daisy de
+#            Santiago is "anything, but preferably a Collins". The layout
+#            takes the first entry that HAS an icon, so `[collins, any]`
+#            draws a Collins and `[any]` alone draws nothing, which is right.
+#   pilsner  1 drink. No pilsner icon exists.
+#   todo     1 drink, and it is literally the word "todo" — a placeholder in
+#            the source spreadsheet, not a glass. Do not map it to anything.
+#
+# UNUSED ICONS, the other side of the same ledger: brandy (used via `snifter`),
+# hot-toddy, julep-cup, margarita, martini, mule-mug, pina-colada, rocks-tall
+# (used via `double rocks`), sherry, shot, sling, sour. Several of these will
+# find a glass once the non-rum drinks are ingested — margarita, mule-mug and
+# julep-cup especially — so an unused icon is not evidence of a mistake.
+# =============================================================================

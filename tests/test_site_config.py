@@ -978,6 +978,51 @@ def test_every_drafts_collection_is_gitignored():
     )
 
 
+def test_every_glass_icon_named_in_the_data_exists():
+    """_data/cocktails/glasses.yml maps a drink's `glass:` to an SVG partial,
+    and _layouts/cocktail.html inlines it with `{% include %}`.
+
+    THE TWO FAILURE MODES ARE OPPOSITE AND ONLY ONE IS LOUD. A glass with no
+    entry in the map renders no icon, silently and correctly -- that is the
+    designed absent-means-nothing path, and it is the NORMAL case today, since
+    `coupe` is the commonest glass in the collection and has no artwork yet. But
+    an entry naming a file that is not there is a Jekyll build failure on every
+    drink using that glass, which is a bad way to find out you typed
+    `nick-and-nora` as `nick-and-norah`.
+
+    So the map is checked against the directory rather than the template being
+    made defensive: Liquid has no file-exists test, and adding one would mean
+    the layout silently swallowing a real mistake in the data.
+    """
+    path = ROOT / "_data" / "cocktails" / "glasses.yml"
+    if not path.exists():
+        pytest.skip("_data/cocktails/glasses.yml does not exist yet")
+    icons = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("icons") or {}
+    assert icons, (
+        "_data/cocktails/glasses.yml declares no `icons:` map, so this check "
+        "has nothing to verify. Either the file changed shape or the key was "
+        "renamed -- an empty map would make every glass iconless while looking "
+        "configured."
+    )
+
+    icon_dir = ROOT / "_includes" / "icons" / "glasses"
+    available = {p.stem for p in icon_dir.glob("*.svg")}
+    assert available, (
+        f"No SVGs found in {icon_dir.relative_to(ROOT)}, so every name in the "
+        f"map would fail. Has the artwork moved?"
+    )
+
+    missing = sorted({f"{glass!r} -> {icon}.svg" for glass, icon in icons.items()
+                      if icon not in available})
+    assert not missing, (
+        "glasses.yml names glass icon(s) that do not exist:\n  "
+        + "\n  ".join(missing)
+        + f"\n\nAvailable: {', '.join(sorted(available))}.\n"
+          "Jekyll's {% include %} fails the whole build on a missing partial, "
+          "so this would take down every drink using that glass."
+    )
+
+
 def test_page_has_a_description_and_link_preview():
     """A pasted recipe URL should show a title and a description, not a bare link."""
     html = read("_layouts", "default.html")
