@@ -72,8 +72,19 @@ moods:
     none of these yet; see issue #337. The index must not render a button for a
     mood with no drinks.
   tiki: >-
-    Two or more of: orgeat, falernum, passion fruit, pineapple, cinnamon syrup,
-    grenadine, an overproof or pineapple rum.
+    Two or more tiki markers -- orgeat, falernum, passion fruit, pineapple,
+    cinnamon syrup, grenadine, an overproof or pineapple rum -- AND complexity,
+    measured two ways: six or more ingredients, OR two "loud" ingredients that
+    each carry a flavour layer on their own.
+    COMPLEXITY IS THE DEFINITION, not a filter on it. Helen: tiki is "a complex
+    drink with lots of ingredients and lots of taste layers which is why it's
+    not just a jar full of sugar". Ingredient COUNT alone got that wrong in
+    both directions -- it dropped Jungle Bird, Better and Better ("only three
+    ingredients, but they're bonkers") and Chartreuse Swizzle. Intensity
+    recovers all three and drags in nothing.
+    And it made the threshold FIRMER, which is counterintuitive: on markers
+    alone, 25 drinks sat one ingredient from flipping in; with both bars, one
+    does. Few drinks sit at two edges at once.
   ice ice baby: >-
     Wants a lot of ice -- crushed, swizzled, blended, or a big block. Read
     inverted it is also the "I don't have much ice" constraint, which is the
