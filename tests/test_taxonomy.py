@@ -17,6 +17,11 @@ import pytest
 
 from conftest import ALL_RECIPES, where
 
+# Suite marker, so `pytest -m food` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one --
+# an unmarked file is silently missed by every filtered run.
+pytestmark = pytest.mark.food
+
 def test_star_ingredient_is_declared(recipe, taxonomy):
     star = recipe.fm.get("star_ingredient")
     if star in (None, ""):

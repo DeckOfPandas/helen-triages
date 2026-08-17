@@ -29,6 +29,11 @@ import subprocess
 import pytest
 import yaml
 
+# Suite marker, so `pytest -m shared` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one --
+# an unmarked file is silently missed by every filtered run.
+pytestmark = pytest.mark.shared
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BUILD_DIR = ROOT / "tmp" / "_test_site"
 

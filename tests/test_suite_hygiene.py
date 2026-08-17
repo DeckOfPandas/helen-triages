@@ -31,6 +31,14 @@ from __future__ import annotations
 
 import ast
 import pathlib
+import re
+
+import pytest
+
+# Suite marker, so `pytest -m shared` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one --
+# an unmarked file is silently missed by every filtered run.
+pytestmark = pytest.mark.shared
 
 TESTS_DIR = pathlib.Path(__file__).resolve().parent
 
@@ -48,6 +56,53 @@ def _test_functions():
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
                 yield path, node
+
+
+SUITE_MARKERS = {"food", "cocktails", "shared"}
+
+
+def test_every_test_module_declares_a_suite_marker():
+    """Every tests/test_*.py sets `pytestmark = pytest.mark.<suite>`.
+
+    THE FAILURE MODE IS A SILENT OMISSION, which is this file's whole subject.
+    `pytest -m food` and `pytest -m cocktails` exist so that Helen's in-progress
+    food QA and the cocktails work do not mask each other -- a red half hides a
+    real regression in the other half. But an UNMARKED module is deselected by
+    every filtered run: it reports nothing, fails nothing, and looks exactly
+    like a module with no problems.
+
+    So the marker is not optional bookkeeping. A new test file without one is
+    invisible to the only commands anyone actually runs day to day.
+
+    Checked by reading the source rather than by asking pytest, because pytest
+    can only tell us about markers on tests it has already collected -- which is
+    the same circularity as asking a deselected test whether it ran.
+    """
+    missing = []
+    checked = 0
+    for path in sorted(TESTS_DIR.glob("test_*.py")):
+        checked += 1
+        src = path.read_text(encoding="utf-8")
+        found = re.findall(r"^pytestmark = pytest\.mark\.(\w+)\s*$", src, re.M)
+        if not found:
+            missing.append(f"{path.name}: no pytestmark")
+        elif len(found) > 1:
+            missing.append(f"{path.name}: {len(found)} markers ({found})")
+        elif found[0] not in SUITE_MARKERS:
+            missing.append(f"{path.name}: unknown suite {found[0]!r}")
+
+    assert checked, (
+        "No test modules found at all -- this check would pass while checking "
+        "nothing, which is the exact thing this file exists to prevent."
+    )
+    assert not missing, (
+        "Test module(s) with a missing or wrong suite marker:\n  "
+        + "\n  ".join(missing)
+        + f"\n\nAdd `pytestmark = pytest.mark.<suite>` at module level, one of "
+          f"{sorted(SUITE_MARKERS)}, and register it in pytest.ini. Without one "
+          f"the module is deselected by every `pytest -m ...` run and its "
+          f"silence is indistinguishable from success."
+    )
 
 
 def test_no_whole_corpus_test_can_return_early():

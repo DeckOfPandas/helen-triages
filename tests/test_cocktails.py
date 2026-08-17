@@ -24,6 +24,11 @@ from pathlib import Path
 import pytest
 import yaml
 
+# Suite marker, so `pytest -m cocktails` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one --
+# an unmarked file is silently missed by every filtered run.
+pytestmark = pytest.mark.cocktails
+
 ROOT = Path(__file__).resolve().parent.parent
 DRAFTS = ROOT / "_cocktail_drafts"
 VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"

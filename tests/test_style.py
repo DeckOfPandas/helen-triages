@@ -17,6 +17,11 @@ import pytest
 
 from conftest import where
 
+# Suite marker, so `pytest -m food` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one --
+# an unmarked file is silently missed by every filtered run.
+pytestmark = pytest.mark.food
+
 TIME_FIELDS = ("prep_time", "cook_time")
 
 # Word forms that stay spelled out because a number does not precede them.
