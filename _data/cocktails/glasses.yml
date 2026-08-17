@@ -21,6 +21,16 @@
 
 icons:
   # --- one spelling, one icon ------------------------------------------------
+  # Coupe is the collection's commonest glass by a wide margin -- 37 drinks
+  # across the book. Helen drew it 2026-08-16; before that it was the one big
+  # gap here and every coupe drink rendered iconless.
+  coupe: coupe
+  # Helen's spreadsheet spells the coupe two other ways. "champage saucer"
+  # is her own typo, carried through the ingest verbatim rather than
+  # silently corrected, so it is mapped here alongside the correct spelling.
+  champagne saucer: coupe
+  champage saucer: coupe
+  sour: sour
   collins: collins
   flute: flute
   highball: highball
@@ -48,12 +58,11 @@ icons:
 # Listed rather than silently absent so the gap is a fact in the repo instead
 # of something to rediscover. Nothing reads this list; it is documentation.
 #
-#   coupe    THE BIG ONE — 37 drinks across the book, 16 in the rum set, and
-#            the single most common glass by a wide margin. There is no coupe
-#            icon. `sour.svg` and `nick-and-nora.svg` both draw a stemmed bowl
-#            and a coupe is arguably the same silhouette as a sour glass, but
-#            that is 37 drinks' worth of assumption and it is Helen's call,
-#            not an inference to make quietly.
+#   any      NOT A GLASS AND MUST NEVER BE MAPPED. It is a real member of a
+#            drink's `glass:` list meaning "no requirement" -- Daisy de
+#            Santiago is "anything, but preferably a Collins". The layout
+#            takes the first entry that HAS an icon, so `[collins, any]`
+#            draws a Collins and `[any]` alone draws nothing, which is right.
 #   pilsner  1 drink. No pilsner icon exists.
 #   todo     1 drink, and it is literally the word "todo" — a placeholder in
 #            the source spreadsheet, not a glass. Do not map it to anything.
