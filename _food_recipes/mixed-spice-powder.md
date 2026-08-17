@@ -21,7 +21,7 @@ ingredient_groups:
     - amount: ¾ tsp
       item: ground mace
 method:
-  - Dry roast the whole spices until aromatic.
+  - Dry fry the whole spices until aromatic.
   - Blend to a fine powder. 
 method_short:
   - ""

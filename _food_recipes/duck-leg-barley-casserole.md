@@ -65,7 +65,7 @@ notes:
     text: "Somehow even better after freezing."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 
