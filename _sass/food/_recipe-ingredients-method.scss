@@ -43,12 +43,29 @@
 // indent. A wrapped line therefore never lands at the same x as a grouped
 // ingredient, so a continuation can't be misread as a nested group -- the one
 // way this could trade a small ambiguity for a worse one.
+// REVERTED, and #345 is open again. The hanging indent above -- padding-left
+// plus a negative text-indent -- did what it was asked to and broke the
+// highlighter doing it: issue #391, "amount highlighting isn't over the amounts
+// -- it looks like the text has shifted left". It had. The yellow blob is an
+// SVG injected into .highlighter-slot inside .highlighted, and it did not move
+// with the text the negative indent pulled leftwards, so every amount on every
+// recipe sat off its own highlight.
+//
+// TEXT-INDENT INHERITS, which is the part that makes this more than a tweak. It
+// reaches every inline box inside the row, including the positioned wrapper the
+// blob is measured against, so "just zero it on the amount" is a guess at which
+// of several boxes is the one that matters -- and this is not a thing to guess
+// at without a browser to look in.
+//
+// So the row goes back to the behaviour that has always shipped, and the hanging
+// indent gets done as its own change with Helen watching it happen. The right
+// technique probably lays the row out rather than nudging its first line, and
+// #77's post-mortem in _recipe-annotations.scss is the other half of the
+// problem it has to satisfy.
 .ingredients li {
   margin-bottom: $space-md;
   line-height: 1.5;
   position: relative;
-  padding-left: $space-xl;
-  text-indent: -$space-xl;
 }
 
 // --- Group indent ------------------------------------------------------------

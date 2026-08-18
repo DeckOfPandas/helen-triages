@@ -375,10 +375,13 @@
     gap: $space-xs;
   }
 
-  // "leaving out" and the count read as quiet prose either side of the pills,
-  // not as more controls — the pills are the only thing in this row you can
-  // click, and they should be the only thing that looks it.
-  .exclude-active-label,
+  // The count reads as quiet prose after the pills, not as another control —
+  // the pills are the only thing in this row you can click, and they should be
+  // the only thing that looks it.
+  //
+  // `.exclude-active-label` was styled here too until issue #363 removed the
+  // "leaving out" words; the selector came out with them rather than being left
+  // behind to describe an element nothing emits.
   .exclude-count {
     font-family: $font-body;
     font-size: 0.78rem;
@@ -403,7 +406,39 @@
       text-decoration: line-through;
     }
 
-    &:hover .btn-exclude-label { text-decoration: none; }
+    // HOVER KEEPS THE STRIKE AND MOVES THE HUE INSTEAD. Issue #364.
+    //
+    // It used to drop the line-through on hover, which was the wrong signal in
+    // two ways at once: the strike is what says "this ingredient is out", so
+    // removing it on hover made the pill look momentarily un-excluded, and it
+    // did the moving with a text-decoration rather than a colour, which is the
+    // one property here that carries state rather than emphasis.
+    //
+    // $color-exclude-active is the section's own darkened cobalt -- the same
+    // value the section's other active controls take -- so a chosen exclusion
+    // deepens toward its section colour under the cursor while still reading as
+    // struck out. The pool candidates below go the other way, to the brighter
+    // cobalt, which keeps "considering" and "chosen" visually apart.
+    &:hover,
+    &:focus-visible {
+      color: $color-exclude-active;
+    }
+  }
+
+  // POOL CANDIDATES: the brighter cobalt, per issue #365 ("a shade of cobalt",
+  // and "if they already do, then a lighter shade"). They did not -- they took
+  // .btn-tag's generic $color-text hover, the same neutral darkening every
+  // other tag button in every other section gets, so nothing about hovering a
+  // candidate said which section it belonged to.
+  //
+  // :not(.btn-exclude--active) so this never reaches a chosen pill, which owns
+  // the darker value above. Both are cobalt; the lighter one is the one you are
+  // still deciding about.
+  .btn-exclude:not(.btn-exclude--active) {
+    &:hover,
+    &:focus-visible {
+      color: $color-electric-cobalt;
+    }
   }
 }
 

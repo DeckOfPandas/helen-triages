@@ -27,7 +27,7 @@ ingredient_groups:
       item: whole cloves
     - amount: "2 heaped tbsp"
       item: plain flour
-    - amount: "2 x 400 g tins"
+    - amount: "2 x 400-g tins"
       item: plum tomatoes
     - amount: "275 ml"
       item: porter
@@ -60,7 +60,7 @@ notes:
     text: "Also excellent stirred through pappardelle and served with grated Parmesan."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

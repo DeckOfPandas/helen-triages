@@ -529,11 +529,15 @@ function renderResultsPool() {
     excludeActive.innerHTML = '';
     if (!state.excludedIngredients.size) return;
 
-    var label = document.createElement('span');
-    label.className = 'exclude-active-label';
-    label.textContent = 'leaving out';
-    excludeActive.appendChild(label);
+    /* NO "leaving out" LABEL ANY MORE -- GitHub issue #363. The struck-through
+       pill already says it, and the count sentence after it ("hiding 1 recipe
+       that lists peas") says it again in full, so the words were the third
+       telling of the same fact and the only one that could not also be clicked.
 
+       The aria-label on each pill still says "stop leaving out <value>", and
+       that is deliberate rather than an oversight: a screen reader gets no
+       strikethrough, so for that reader the words were never redundant. What
+       came out is the redundant VISIBLE copy, not the accessible name. */
     var names = [];
     state.excludedIngredients.forEach(function (value) {
       // The sentence reads about the ingredient, so the "(all)" that qualifies
