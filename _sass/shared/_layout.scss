@@ -300,9 +300,18 @@ main {
   }
 }
 
+// Bigger, per issue #360. 1.1rem put the GitHub mark at roughly the height of
+// the licence text beneath it, so it read as punctuation rather than as the
+// one graphic element in the footer. 1.6rem is still below the footer hearts
+// and above the type, which is the order of prominence Helen's footer has.
+//
+// SHARED ON PURPOSE, unlike the magenta hover next to it in food/_footer.scss.
+// A size is not a palette value, both sites carry the same GitHub link to the
+// same repository, and letting them drift would mean two footers that are
+// almost-but-not-quite the same -- the thing #288 and #289 exist to stop.
 .footer-icon {
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1.6rem;
+  height: 1.6rem;
   fill: currentColor;
 }
 
