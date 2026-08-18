@@ -21,6 +21,7 @@ still runs on a machine without the Ruby toolchain.
 """
 from __future__ import annotations
 
+import os
 import pathlib
 import re
 import shutil
@@ -38,6 +39,27 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 BUILD_DIR = ROOT / "tmp" / "_test_site"
 
 
+# A SKIP IS A LIE IN CI. Locally, "no bundler on this machine" is a fair reason
+# to stand down: not every contributor has a Ruby toolchain, and the rest of the
+# suite is still worth running. In CI the toolchain is installed on purpose, so
+# a missing bundler means the setup step did not do its job -- and skipping
+# would report green for the two tests that are the only ones checking BUILT
+# output, including the production-only 404s that nothing local can reproduce.
+#
+# GitHub Actions sets CI=true. Fail there, skip here.
+def _require_bundler():
+    if shutil.which("bundle") is not None:
+        return
+    if os.environ.get("CI"):
+        pytest.fail(
+            "No bundler in CI. The Ruby setup step did not take effect, so the "
+            "rendered-output tests cannot build the site -- and skipping them "
+            "here would report green for the only tests that check what is "
+            "actually published."
+        )
+    pytest.skip("no bundler on this machine; skipping rendered-output tests")
+
+
 @pytest.fixture(scope="session")
 def site() -> pathlib.Path:
     """Build once per run, into the project's own tmp/ (never /tmp — CLAUDE.md).
@@ -45,8 +67,7 @@ def site() -> pathlib.Path:
     Uses the local config as well as the production one, so drafts build and the
     output matches what Helen actually looks at.
     """
-    if shutil.which("bundle") is None:
-        pytest.skip("no bundler on this machine; skipping rendered-output tests")
+    _require_bundler()
 
     result = subprocess.run(
         ["bundle", "exec", "jekyll", "build",
@@ -84,8 +105,7 @@ def prod_site() -> pathlib.Path:
     Jekyll's default URL for a document it never wrote. Helen found it by
     looking at the production mockup on :4002.
     """
-    if shutil.which("bundle") is None:
-        pytest.skip("no bundler on this machine; skipping rendered-output tests")
+    _require_bundler()
 
     result = subprocess.run(
         ["bundle", "exec", "jekyll", "build",

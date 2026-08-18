@@ -1808,3 +1808,60 @@ def test_deploy_workflow_still_runs_a_plugin_capable_build():
         "The deploy workflow passes --safe, which disables _plugins/ and so "
         "disables the awaiting-fix gate. Remove it, or replace the gate."
     )
+
+
+def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
+    """CI must run the suite, and refuse to build if it is red. Issue #369.
+
+    UNTIL 2026-08-18 IT DID NOT. The workflow checked out, built, rendered PDFs
+    and deployed, with no test step anywhere -- so every guard in this
+    repository protected a local run and nothing else. A push to `main` shipped
+    whatever was on `main` however red the suite was, including the
+    `awaiting-fix` publish gate (#331) whose entire job is to stop a flagged
+    recipe going live.
+
+    Four things are asserted, because dropping any one of them restores that
+    state quietly:
+
+      - a `test` job exists at all;
+      - `build` declares `needs: test`, without which the two jobs simply run
+        in parallel and a red suite deploys anyway;
+      - `fetch-depth: 0`, because actions/checkout is shallow by default and
+        #367's history-reading test would then examine nothing;
+      - the JS suite is invoked with a GLOB. `node --test tests/js/` treats the
+        directory as one test file and reports "tests 1, fail 1" -- it does not
+        run the 144 tests inside. Checked, not assumed.
+    """
+    wf = ROOT / ".github" / "workflows" / "build-and-deploy.yml"
+    src = wf.read_text(encoding="utf-8")
+    cfg = yaml.safe_load(src)
+    jobs = cfg.get("jobs") or {}
+
+    assert "test" in jobs, (
+        "The deploy workflow has no `test` job. Without one, nothing stops a "
+        "red suite from deploying -- which was the state this repository was "
+        "in until 2026-08-18 (#369)."
+    )
+    needs = jobs.get("build", {}).get("needs")
+    needs = [needs] if isinstance(needs, str) else (needs or [])
+    assert "test" in needs, (
+        "The `build` job does not declare `needs: test`. Without it the jobs "
+        "run in parallel and a failing suite deploys anyway -- the test job "
+        "becomes a report nobody is gated on."
+    )
+    steps = jobs["test"].get("steps") or []
+    checkout = [s for s in steps if "actions/checkout" in str(s.get("uses", ""))]
+    assert checkout, "The test job never checks the repository out."
+    assert checkout[0].get("with", {}).get("fetch-depth") == 0, (
+        "The test job's checkout is shallow. actions/checkout defaults to "
+        "depth 1, and `git log -- <file>` in a depth-1 clone reports the same "
+        "single commit for every file, so test_agent_edited_recipes_are_not_"
+        "marked_proofread (#367) would examine nothing and pass. Set "
+        "`fetch-depth: 0`."
+    )
+    assert "python3 -m pytest" in src, "The test job never runs pytest."
+    assert "node --test tests/js/*.test.js" in src, (
+        "The JS suite must be invoked with the glob. `node --test tests/js/` "
+        "treats the directory as a single test file and reports 'tests 1, "
+        "fail 1' without running the 144 tests inside it."
+    )
