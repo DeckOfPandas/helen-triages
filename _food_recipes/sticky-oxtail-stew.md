@@ -46,7 +46,7 @@ method_groups:
       - "Roughly chop the thyme and rosemary leaves, add them along with the bay, and cook for around 20 mins, until soft and sweet, stirring frequently."
       - "Remove the oxtail from the oven and set aside. Reduce the oven temperature to 160°C fan."
       - "Add the cloves and flour to the vegetables, stirring well to combine, then pour in the tomatoes and porter. Add the oxtail and any roasting juices, cover with the beef stock and stir well."
-      - "Bring to the boil, cover, then place in the hot oven for about 5 hours, or until the meat falls away from the bone, stirring every hour or so and adding a splash of water to loosen if needed (but check [cooking temperatures](#doneness))."
+      - "Bring to the boil, cover, then place in the hot oven for about 5 hours, or until the meat falls away from the bone, stirring every hour or so and adding a splash of water to loosen if needed (check [internal temperatures chart](#doneness))."
   - name: "Finish"
     steps:
       - "Cool for about 10 mins. Strip the meat from the bones and return it to the pan, discarding the bones."

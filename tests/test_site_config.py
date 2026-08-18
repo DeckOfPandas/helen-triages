@@ -1730,3 +1730,81 @@ def test_no_decoration_slot_is_orphaned():
           "out of the template. An empty aria-hidden span that no script names "
           "renders nothing and misleads the next person to read the file."
     )
+
+
+# =============================================================================
+# THE awaiting-fix PUBLISH GATE — GitHub issue #331
+# =============================================================================
+# `meta.awaiting-fix: true` means a page has a known, open problem and must not
+# reach the live site, while everything else still ships. The mechanism is
+# _plugins/hide_awaiting_fix.rb, which removes the document at :post_read so it
+# gets no URL and no sitemap entry.
+#
+# EVERY FAILURE MODE OF THIS GATE FAILS OPEN. Delete the plugin, flip one config
+# key, or switch the workflow to a build that ignores plugins, and flagged pages
+# publish -- with no error, no warning, and a green build. The page you have
+# explicitly marked as wrong is the one that goes live. That asymmetry is why
+# these are asserted rather than trusted.
+
+PLUGIN = ROOT / "_plugins" / "hide_awaiting_fix.rb"
+
+
+def test_awaiting_fix_plugin_exists_and_checks_the_flag():
+    """The gate's implementation is present and still reads the right key."""
+    assert PLUGIN.is_file(), (
+        f"{PLUGIN.relative_to(ROOT)} is missing. Without it every recipe "
+        f"flagged `meta.awaiting-fix: true` publishes normally -- silently, "
+        f"because nothing else in the build looks at that field."
+    )
+    src = PLUGIN.read_text(encoding="utf-8")
+    for needle in ("awaiting-fix", "show_awaiting_fix", "post_read"):
+        assert needle in src, (
+            f"{PLUGIN.name} no longer mentions {needle!r}. The gate is either "
+            f"reading a different field or hooking a different phase, and it "
+            f"fails open either way."
+        )
+
+
+def test_production_config_hides_awaiting_fix_and_local_shows_it():
+    """The two configs must disagree, and in the right direction.
+
+    Production hides flagged pages; local shows them, because locally they are
+    the pages being worked on. Setting `show_awaiting_fix: true` in _config.yml
+    would disable the gate everywhere while looking like a deliberate choice.
+    """
+    prod = yaml.safe_load((ROOT / "_config.yml").read_text(encoding="utf-8"))
+    local = yaml.safe_load((ROOT / "_config_local.yml").read_text(encoding="utf-8"))
+    assert prod.get("show_awaiting_fix") is False, (
+        "_config.yml must set `show_awaiting_fix: false`. Production is the "
+        "build that must not carry a page you have flagged as wrong; anything "
+        "other than an explicit false (including the key being absent, which "
+        "reads as nil and happens to work) leaves the gate undeclared."
+    )
+    assert local.get("show_awaiting_fix") is True, (
+        "_config_local.yml must set `show_awaiting_fix: true`. Hiding flagged "
+        "recipes locally hides the very pages you are trying to fix."
+    )
+
+
+def test_deploy_workflow_still_runs_a_plugin_capable_build():
+    """`bundle exec jekyll build`, not the github-pages gem's safe mode.
+
+    THIS IS THE QUIETEST WAY THE GATE COULD DIE. Jekyll's safe mode -- what a
+    Pages-native build uses -- ignores _plugins/ entirely. It does not warn and
+    it does not fail; the plugin simply never runs, and every flagged recipe
+    publishes. Nothing else in this suite would notice, because the repository
+    would be unchanged and correct.
+    """
+    wf = ROOT / ".github" / "workflows" / "build-and-deploy.yml"
+    assert wf.is_file(), f"{wf.relative_to(ROOT)} is missing."
+    src = wf.read_text(encoding="utf-8")
+    assert "bundle exec jekyll build" in src, (
+        "The deploy workflow no longer runs `bundle exec jekyll build`. If it "
+        "has moved to a Pages-native build, _plugins/ is silently ignored and "
+        "the awaiting-fix gate fails open -- flagged recipes publish with a "
+        "completely green build. Keep a full build, or replace the gate."
+    )
+    assert "--safe" not in src, (
+        "The deploy workflow passes --safe, which disables _plugins/ and so "
+        "disables the awaiting-fix gate. Remove it, or replace the gate."
+    )

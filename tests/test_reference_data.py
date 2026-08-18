@@ -675,7 +675,19 @@ def test_a_method_step_naming_an_internal_temperature_is_wired_to_the_data():
                 steps.append(step.get("step") if isinstance(step, dict) else step)
 
         for text in [s for s in steps if s]:
-            if not _re.search(r"internal temp", text, _re.I):
+            # THE CHART LINK IS A SIGNPOST, NOT A CLAIM. Issue #352 reworded
+            # every "(check [cooking temperatures](#doneness))" to "(check
+            # [internal temperatures chart](#doneness))", which put the literal
+            # phrase "internal temp..." into eight steps that state no figure
+            # and are not trying to. Left unhandled, this test fires on all of
+            # them and the obvious fix -- loosening the regex -- would blunt the
+            # guard that caught "an internal temperature of X" on a live page.
+            #
+            # So the link text is removed first and the ORIGINAL rule then runs
+            # on what remains. A step that both signposts the chart AND names a
+            # figure still gets checked, because the claim survives the strip.
+            probe = _re.sub(r"\[internal temperatures chart\]\(#doneness\)", "", text)
+            if not _re.search(r"internal temp", probe, _re.I):
                 continue
             checked += 1
             if not fm.get("internal_temp_ref"):

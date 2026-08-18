@@ -24,7 +24,7 @@ method:
   - "Rub each leg thoroughly with coarse salt, pushing it into all the scores and under every fold of skin."
   - "Arrange in a single layer, skin-side up, tucking bay leaves and thyme sprigs underneath and in between, then leave uncovered in the fridge for 8–12 hours so the skin dries out."
   - "Rub the salt off each leg thoroughly, and rub five-spice into each leg, again especially into all the scores and under every fold. Leave uncovered in the fridge for at least 2 hours."
-  - step: "Roast uncovered at 160°C fan for 75 mins to render the fat and cook the meat through (check [cooking temperatures](#doneness)). Baste gently with the rendered fat after 60 mins and again at 75 mins."
+  - step: "Roast uncovered at 160°C fan for 75 mins to render the fat and cook the meat through (check [internal temperatures chart](#doneness)). Baste gently with the rendered fat after 60 mins and again at 75 mins."
     note: A cast iron tray is great for rendering the fat evenly.
   - Blast at 220°C fan for 10–15 mins to crisp the skin.
   - step: "Rest, loosely covered, for at least 15 mins before serving."

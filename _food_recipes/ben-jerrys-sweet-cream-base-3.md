@@ -18,6 +18,9 @@ method:
   - "Whisk and freeze."
 method_short:
   - "W & F, tee hee"
+notes:
+  - label: "This is not ice cream"
+    text: "This is a base recipe used to build ice creams, not a standalone dessert."
 meta:
   rewritten: true
   proofread: true

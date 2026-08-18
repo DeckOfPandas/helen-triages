@@ -62,6 +62,16 @@ short_method_enabled: false
 # So the site each collection belongs to is carried in its NAME, and `permalink`
 # is what puts the output under /food/ or /cocktails/. The URLs are exactly the
 # ones agreed; only the on-disk location differs from the original sketch.
+# DO NOT PUBLISH A RECIPE WAITING ON A FIX. GitHub issue #331.
+# `meta.awaiting-fix: true` means a page has a known, open problem. false here
+# means production removes those pages entirely -- no URL, no sitemap entry --
+# via _plugins/hide_awaiting_fix.rb. _config_local.yml sets it true so you can
+# still see and fix them locally.
+#
+# The point of the flag is that ONE broken page does not hold the site back.
+# Flag it, ship everything else, fix it, unflag it.
+show_awaiting_fix: false
+
 collections:
   dev:
     # INTERNAL REFERENCE PAGES, AND THE REASON THIS IS A COLLECTION RATHER THAN

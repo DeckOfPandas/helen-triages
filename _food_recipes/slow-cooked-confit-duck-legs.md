@@ -23,7 +23,7 @@ method:
   - "Sprinkle more salt, garlic and thyme on top."
   - "Cover and leave in the fridge at least overnight."
   - "Spoon some duck fat into the bottom of the lidded casserole pan or slow cooker."
-  - "Cook on low for about 6 hours, skin side up (check [cooking temperatures](#doneness))."
+  - "Cook on low for about 6 hours, skin side up (check [internal temperatures chart](#doneness))."
   - "Transfer legs into a smaller pan and cover with the rendered fat."
   - "Cook within a day or two, or can be longer if totally covered in fat."
   - step: "To finish: pan fry on medium-high heat in a cast iron skillet with no oil, until golden brown and crispy — 4–5 mins skin side, then 1–2 mins other side."

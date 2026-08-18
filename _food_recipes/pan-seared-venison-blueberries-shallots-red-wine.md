@@ -31,7 +31,7 @@ ingredient_groups:
       item: "pats of salted butter"
 method:
   - "Crush the thyme and juniper berries with salt and pepper. Loosen with olive oil. Pat the venison dry and rub the oil mixture all over it."
-  - "Sear in a hot pan on all sides — roughly 6 mins for medium rare, 7–8 mins for medium (but check [cooking temperatures](#doneness)). Cover and rest on a plate."
+  - "Sear in a hot pan on all sides — roughly 6 mins for medium rare, 7–8 mins for medium (check [internal temperatures chart](#doneness)). Cover and rest on a plate."
   - "Reduce the heat, and fry the shallots and garlic in olive oil for around 3 mins until translucent and tender. Turn up the heat, add the wine and let it reduce by half."
   - "Add the blueberries and simmer slowly for 3–4 mins, then remove from the heat, and add the butter and swirl the pan so the sauce turns slightly opaque and shiny. Season to taste — venison is lean and hence bland if you're shy with the salt."
   - "Slice into 2-cm slices and serve. Add any resting juices to the sauce and spoon over."

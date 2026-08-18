@@ -41,7 +41,7 @@ method:
   - step: "Combine the marinade ingredients with 2 tbsp water in a large bowl. Pour half of the marinade into a smaller bowl, then add the salmon to the large bowl. Coat thoroughly."
     note: "Large bowl = raw fish-ed bowl, small bowl = clean bowl."
   - "Slice the sweet potatoes into ½-cm slices. Toss with oil and salt on a baking tray, then arrange in an even layer. Bake at 170°C fan for 15–20 mins until almost tender."
-  - step: "Add the salmon and greens to the tray. Sprinkle over the sesame seeds, drizzle over any marinade left in the large bowl and return to the oven for 11-14 mins, until the salmon flakes easily (but check [cooking temperatures](#doneness))."
+  - step: "Add the salmon and greens to the tray. Sprinkle over the sesame seeds, drizzle over any marinade left in the large bowl and return to the oven for 11-14 mins, until the salmon flakes easily (check [internal temperatures chart](#doneness))."
     note: "Raw fish-ed bowl marinade is fine here — it's getting back in the oven to cook off."
   - "Serve immediately, drizzling the salmon with the rest of the miso marinade from the clean bowl. Garnish with the spring onions."
 method_short:
