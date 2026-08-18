@@ -1,6 +1,6 @@
 ---
 title: "The One True Chocolate Brownies"
-tagline: "Foolproof."
+tagline: "Perfect and foolproof."
 source: "Adapted from Green & Black's recipe book"
 makes: "enough for that edge-brownie tin I made James buy me"
 prep_time: "10 mins"
@@ -29,8 +29,8 @@ method:
   - "Beat the eggs, sugar and vanilla extract together until pale, thick and doubled in volume."
   - Stir the egg mixture into the chocolate mixture in three additions, so it doesn't split.
   - step: "Fold in the flour and salt with a metal spoon until smooth, but don't knock the air out too much."
-    note: "You can add chunks of chocolate, dried fruit, Celebrations, whatever."
-  - "Persuade into the greased brownie tin and bake at 160°C fan for 20–25 mins, until a light-brown crust forms and starts to crack. The finished brownie should not wobble but will seem liquid inside if you stab it with a fork."
+  - Add chunks of chocolate, dried fruit, Celebrations, whatever.
+  - "Persuade into the greased brownie tin and bake at 160°C fan for 25–30 mins, until a light-brown crust forms and starts to crack. The finished brownie should not wobble but will seem liquid inside if stabbed with a fork."
   - step: Leave to cool in the tin for 30 mins.
     note: "If you don't wait for this you'll need a straw not a fork."
 method_short:
@@ -43,7 +43,7 @@ method_short:
     * Cool in the tin >30 mins
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

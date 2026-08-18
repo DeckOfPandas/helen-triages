@@ -25,7 +25,7 @@ ingredient_groups:
       item: whipping cream, about 38% fat
     - amount: "1 tsp"
       item: vanilla extract
-  - name: "variation: chocolate chocolate chip"
+  - name: "variation: chocolate chip"
     items:
     - amount: "120 g"
       item: dark chocolate chips
@@ -38,8 +38,8 @@ method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
-  awaiting-fix: true
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

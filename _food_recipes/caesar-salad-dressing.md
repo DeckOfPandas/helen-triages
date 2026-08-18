@@ -1,6 +1,6 @@
 ---
 title: "Caesar Salad Dressing"
-tagline: "Doesn't really keep, but very easy and quick."
+tagline: "Doesn't keep, but very easy and quick."
 source: "Stella"
 makes: "about 300 ml"
 prep_time: "5 mins"

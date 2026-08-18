@@ -16,16 +16,16 @@ ingredient_groups:
       item: "orange, zested and juiced"
     - amount: "250 g"
       item: "fresh or frozen cranberries"
-      note: "if using frozen, thaw first and drain away excess water, otherwise your sauce will be soup"
+      note: "if using frozen, thaw first and drain away excess water, otherwise the sauce will be soup"
 method:
   - "Heat the orange juice with the sugar."
   - "When it boils, add the cranberries."
-  - "Simmer until soft but still holding their shape — about 5 mins for frozen cranberries, 8–10 mins for fresh."
+  - "Simmer until soft but still holding their shape — about 5 mins for frozen cranberries, 8–10 mins for fresh. Some will pop, lovely."
 method_short:
   - ""
 notes:
   - label: "Butter"
-    text: "Reportedly some people add a knob of butter before serving. Don't add any if you're freezing this."
+    text: "Reportedly some people add a knob of butter before serving. But don't add any before freezing."
 meta:
   rewritten: true
   proofread: true

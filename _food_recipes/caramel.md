@@ -1,6 +1,6 @@
 ---
 title: "Caramel"
-tagline: "For topping, filling, millionaire's shortbread, or ...#WheresMySpoon."
+tagline: "For filling, topping, Millionaire's shortbread, or ...#WheresMySpoon."
 source: "Mrs Nicholson"
 makes: "I mean, who cares, make double anyway"
 prep_time: "5 mins"
@@ -25,15 +25,15 @@ ingredient_groups:
 method:
   - Combine the butter and sugar in a saucepan, then heat and stir until the sugar has completely dissolved.
   - step: "Stir in the cream."
-    note: "Do it quickly otherwise you'll get lumps."
-  - Stir in the condensed milk if using.
+    note: "Do it quickly otherwise lumps."
+  - step: "Stir in the condensed milk for Millionaire's."
 method_short:
   - ""
 notes:
   - label: "Salt"
-    text: The salt is crucial, and this can take a lot depending on your taste.
+    text: The salt is crucial, and this can take a lot to bring out the flavour.
   - label: "Hey Andrew"
-    text: If you make this for brother Andrew, take care to call it "sea-salted caramel".
+    text: When making this for brother Andrew, take care to call it "sea-salted caramel".
 meta:
   rewritten: true
   proofread: true

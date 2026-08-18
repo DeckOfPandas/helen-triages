@@ -61,12 +61,12 @@ ingredient_groups:
       note: "or 4 tsp paste from a jar"
     - amount: "10"
       item: macadamia nuts
-      note: "candlenuts would be ideal if you can get them"
+      note: "candlenuts are better but more effort to get"
 method_groups:
   - name: marinate
     steps:
     - step: "Put the chicken in a large bowl with the lime juice and zest, and some salt. Cover and leave for ≥2h."
-      note: "Don't skip the salt, it's part of the chemical process."
+      note: "Salt is part of the chemical process, not just a seasoning."
   - name: bumbu
     steps:
     - Blend the bumbu ingredients with some oil until smooth.
@@ -86,13 +86,11 @@ notes:
     text: "Much better to use whole spices throughout and grind them yourself after dry-roasting, if you've got the extra 5 mins."
   - label: "Scaling up"
     text: "Lemongrass stalks don't need to be scaled up linearly for larger batches."
-  - label: "Freezing"
-    text: "This freezes absolutely brilliantly."
   - label: "Flexible cooking time"
     text: "Can be simmered a little longer, but the chicken becomes tough and stringy if left too long."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

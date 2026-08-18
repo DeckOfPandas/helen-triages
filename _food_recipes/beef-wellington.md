@@ -35,7 +35,7 @@ ingredient_groups:
     items:
     - amount: "200 g"
       item: beef trimmings
-      note: "if buying in person, ask your butcher to reserve these when trimming the fillet"
+      note: "if buying in person, ask the butcher to reserve these when trimming the fillet"
     - amount: "4 large"
       item: "shallots, peeled and sliced"
     - amount: "12"
@@ -60,7 +60,7 @@ method_groups:
       - "Quickly sear the fillets in a very hot pan until browned all over and still rare in the middle, 30-60 seconds. Remove, brush with Dijon mustard, and leave to cool completely."
   - name: Make the duxelle
     steps:
-      - "Chop the mushrooms very finely and fry in a hot pan with the thyme leaves and some seasoning. Keep frying over high heat for 10 mins after the juices are released, until all excess moisture has evaporated and you have a dry mushroom paste. Leave to cool."
+      - "Chop the mushrooms very finely and fry in a hot pan with the thyme leaves and some seasoning. Keep frying over high heat for 10 mins after the juices are released, until all excess moisture has evaporated, leaving a dry mushroom paste. Leave to cool."
   - name: Assemble
     steps:
       - "Roll each piece of pastry on a lightly floured surface into a rectangle large enough to envelop one fillet. Fridge."
@@ -75,18 +75,17 @@ method_groups:
     steps:
       - "Score the pastry lightly, making sure not to cut through, and brush again with egg wash."
       - "Bake at 180°C fan for 15–20 mins until the pastry is golden brown (but check [cooking temperatures](#doneness)). Rest for 10 mins before carving."
-      - step: "Reheat the sauce and serve alongside the sliced Wellington."
-        note: "Slice across the middle (across the grain) on a slight angle for maximal prettiness."
+      - step: "Reheat the sauce and serve alongside the sliced Wellington. Slice across the middle (across the grain) on a slight angle for maximal prettiness."
 method_short:
   - "Wrap and chill, sear, duxelle, assemble, sauce, cook."
 notes:
   - label: "In-oven heat probe"
     text: "Do not attempt this without a meat thermometer unless you have deep pockets and nerves of steel. I use an in-oven meat probe."
   - label: "Portion size"
-    text: "In theory this serves 4, but fillet is rich...and also expensive. Two Wellingtons may feed 6 comfortably if there are generous sides. Helen, Simon, Patrick and Lauren once happily shared just one, but then there were two different kinds of potato Dauphinoise on the table so."
+    text: "In theory this serves 4, but fillet is rich...and also expensive. Two Wellingtons may feed 6 comfortably if there are generous sides. Helen, Simon, Patrick and Lauren once happily shared just one, but then there were two different kinds of potato Dauphinoise on the table at the time, so."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

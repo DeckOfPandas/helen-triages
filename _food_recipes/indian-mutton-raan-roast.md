@@ -79,8 +79,7 @@ ingredient_groups:
       item: "onions, quartered"
     - amount: "8 small"
       item: "tomatoes, quartered"
-    - amount: "1 tsp"
-      item: "salt, to adjust if needed"
+    - item: "salt, to adjust if needed"
     - amount: "50 ml"
       item: ghee
 method_groups:
@@ -96,29 +95,28 @@ method_groups:
     steps:
       - "Take out of the freezer at least 1 hour before marinading."
       - "Mix the plain curd, coriander powder, cumin powder, turmeric powder, garam masala powder, sugar, salt, crispy fried onions and mustard oil."
-      - "Apply half to the mutton leg, working it into the slits, and return the leg to the freezer for 8 hours. Keep the remaining marinade in the fridge."
+      - "Apply half to the mutton leg, working it into the slits, and return to the freezer for 8 hours. Keep the remaining marinade in the fridge."
   - name: Before roasting
     steps:
-      - "Take the mutton leg out of the freezer at least 1 hour before roasting."
-      - "Stir the ginger paste, garlic paste and crispy fried onions into the remaining marinade, then apply it to the leg, again working it into the slits."
+      - "Take out of the freezer at least 1 hour before roasting."
+      - "Stir the ginger paste, garlic paste and crispy fried onions into the remaining marinade, then apply, working it into the slits."
       - "Leave at room temperature for at least 1 hour, preferably 2, before roasting."
   - name: Roast
     steps:
-      - step: "Place the mutton leg in a roasting tin. Fill the sides with the quartered onions and tomatoes, pour over the remaining marinade, then pour over the melted ghee."
-        note: "It's tempting to YOLO and use more ghee — no one would know, right? — but last time I did this the mutton was almost floating by the end."
+      - step: "Place in a roasting tin. Fill the sides with the quartered onions and tomatoes, pour over the remaining marinade, then pour over the melted ghee."
       - "Cover tightly with foil and roast at 140°C fan for 2½ hours."
-      - "Remove the foil and continue roasting at 140°C fan for a further 30 mins, or until the thickest part reaches 90–95°C ([more](#doneness)) and a skewer twists freely in the meat."
+      - "Remove the foil and continue roasting at 140°C fan for a further 30 mins, or until the thickest part reaches 90–95°C ([see chart](#doneness)) and a skewer twists freely in the meat."
       - "Leave to rest in the cooling oven for 15 mins before carving."
 method_short:
   - ""
 notes:
   - label: "Leg size"
     text: "A whole mutton leg is generally 1.5–2.5 kg and will take at least 3 hours to roast."
-  - label: "Marination"
-    text: "Marination really matters. Don't scrimp."
+  - label: "Ghee"
+    text: "It's tempting to YOLO and use more ghee — no one would know, right? — but last time I did this the mutton was almost floating by the end, and the tomatoes were all weird and bubbly."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-31"

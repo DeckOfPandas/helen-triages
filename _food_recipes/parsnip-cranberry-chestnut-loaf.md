@@ -30,7 +30,7 @@ ingredient_groups:
   - name: "cranberry sauce"
     items:
     - amount: "2 lots"
-      item: "CLAUDE link to cranberry sauce recipe"
+      item: "[cranberry sauce](../cranberry-sauce/)"
   - name: "parsnip topping"
     items:
     - amount: "550 g"
@@ -52,7 +52,7 @@ method_groups:
       - "Pulse the chestnuts in a food processor until chopped into small bits, then tip these into the bowl with the onions and repeat with the walnuts. Add the breadcrumbs, mace, beaten egg, 1 tsp salt and some pepper and mix everything together well."
   - name: "Make the cranberry sauce"
     steps:
-      - "Make this: CLAUDE link to cranberry sauce recipe"
+      - "Make [cranberry sauce](../cranberry-sauce/)."
   - name: "Prepare the parsnips"
     steps:
       - "Boil the parsnips in salted water for 3½ mins, then drain well."
@@ -74,7 +74,7 @@ notes:
 meta:
   rewritten: true
   proofread: true
-  awaiting-fix: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-09"
 ---

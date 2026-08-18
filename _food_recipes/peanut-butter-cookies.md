@@ -28,7 +28,8 @@ ingredient_groups:
     - amount: "1 tsp"
       item: vanilla extract
     - item: Extra Demerara sugar to coat
-    - item: ¼–½ tsp sea salt, to taste
+    - amount: "¼–½ tsp"
+      item: sea salt, to taste
 method:
   - Sift the flour, baking powder and salt.
   - "Cream the butter with the sugars, then mix in the peanut butter, then the egg and vanilla extract."
@@ -42,8 +43,8 @@ method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
-  awaiting-fix: true
+  proofread: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
 

@@ -275,6 +275,37 @@ main {
   }
 }
 
+// Licence line and GitHub link, centred under the copyright line -- both
+// inherit .site-footer's own colour/size rather than setting their own.
+.site-footer-license {
+  margin-top: $space-xxs;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+}
+
+.site-footer-github {
+  display: inline-flex;
+  margin-top: $space-sm;
+  color: inherit;
+  opacity: 0.65;
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+  }
+}
+
+.footer-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+}
+
 // How far past the tape's CORE (see .site-logo-tape below) the tape graphic
 // itself is allowed to extend on each side. Small deliberately, and trimmed
 // smaller again on Helen's request (was 1.5rem, then 0.5rem): the current

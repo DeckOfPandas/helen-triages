@@ -33,9 +33,9 @@ method:
   - Add the butter.
   - Check salt. It will almost certainly need some, I promise.
   - Add any other flavourings, and optional icing sugar, and stir until just incorporated.
-  - Stop stirring as soon as you can.
+  - Stop stirring as soon as possible.
   - |
-    Leave to cool at room temperature to your working temperature:
+    Leave to cool at room temperature to the working temperature:
     - Pouring/glazing: 32–35°C
     - Drip cakes: 29–32°C
     - Piping/filling: 20–24°C
@@ -63,8 +63,8 @@ meta:
 
 - **Use perfectly clean and dry stainless steel bowls.** For even heating.
 - **Use a perfectly clean and dry silicone spatula.** It can create a tight seal against the bottom of the bowl, sweeping up melting pockets without whipping in air.
-- **Heat the cream in a pan.** For the best temperature control, unless you have literally perfect microwave-fu.
-- **Allow the ganache to cool slowly, and set at room temperature.** If you put it in the fridge, you'll need to stir more than you want to get the more-set and less-set bits to combine.
+- **Heat the cream in a pan.** For the best temperature control, unless literally perfect microwave-fu is available.
+- **Allow the ganache to cool slowly, and set at room temperature.** Putting it in the fridge means more stirring than ideal, to get the more-set and less-set bits to combine.
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
 <p class="recipe-section-subtitle">a.k.a. ganache is the worst</p>

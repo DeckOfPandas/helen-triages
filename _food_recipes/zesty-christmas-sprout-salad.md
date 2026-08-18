@@ -12,7 +12,7 @@ ingredient_groups:
   - name: salad
     items:
     - amount: "350 g"
-      item: brussels sprouts
+      item: Brussels sprouts
     - amount: "½"
       item: "red onion, finely sliced (¼ or skip is fine)"
     - amount: "1"
@@ -37,18 +37,18 @@ ingredient_groups:
     - amount: "2 tbsp"
       item: extra virgin olive oil
 method:
-  - "Mix the dressing in a bowl and salt like you intend to cure."
-  - "Halve and finely slice the sprouts using the slicing attachment on a food processor (or the adamantium index finger you must have if you want to do this by hand)."
+  - "Mix the dressing in a bowl and salt like curing is the plan."
+  - "Halve and finely slice the sprouts using the slicing attachment on a food processor (or an adamantium index finger, required for doing this by hand)."
   - "Toss the sprouts in the dressing with the onion, apple, pomegranate seeds, walnuts and mint."
-  - "Mix everything then leave to stand for at least 20 mins until the sprouts soften."
-  - "Go nuts with extra mint if wanted, then serve."
+  - "Mix everything then stand for at least 20 mins until the sprouts soften."
+  - "Go nuts with extra mint to serve."
 method_short:
   - ""
 # notes:
 #   -
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-29"

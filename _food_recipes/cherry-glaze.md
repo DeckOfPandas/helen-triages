@@ -17,7 +17,7 @@ ingredient_groups:
       item: dark soy sauce
     - amount: "3 tbsp"
       item: red wine vinegar
-    - amount: "6 oz"
+    - amount: "150 ml"
       item: chicken stock
     - amount: "1 cup"
       item: "cherries, pitted and halved"
@@ -33,7 +33,7 @@ notes:
     text: "If using frozen cherries, thaw and strain them ahead to get rid of the spare water."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

@@ -1,6 +1,6 @@
 ---
 title: "Smoked Mackerel Pâté"
-tagline: "Once impressed Grandma's local WI."
+tagline: "Once impressed Grandma Pam's WI."
 source: "Sue"
 serves: "Depends on appetite"
 prep_time: "5 mins"
@@ -16,16 +16,16 @@ ingredient_groups:
       item: cream cheese
     - amount: "45 ml"
       item: lemon juice
-    - item: Salt and pepper to taste
+    - item: plenty of salt and pepper
 method:
-  - Literally whizz it all until blended.
-  - Season to taste. Some people might add paprika.
-  - Chill before serving so it solidifies.
+  - Just whizz it all until blended.
+  - Season to taste. Some people add paprika.
+  - Chill before serving so it solidifies, making it easier to scoop with crackers or arrange on blinis.
 method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"

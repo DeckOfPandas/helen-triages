@@ -400,7 +400,7 @@ fish:
     # travel.
     safety_min: 63
     safety_label: "FSA/USDA 63°C"
-    safety_summary: "FSA advice is a minimum serving temperature of 63°C — only well done clears it."
+    safety_summary: "FSA advice is a minimum serving temperature of 63°C."
     # Which section of the temperature charts holds this spectrum, so a
     # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: fish-salmon
@@ -447,7 +447,7 @@ fish:
         rested: "~62–65°C"
         rested_min: 62
         rested_max: 65
-        description: "Fully opaque, creamy white throughout — clears the FSA/USDA ~63°C benchmark"
+        description: "Fully opaque. Clears the FSA/USDA ~63°C recommendation."
     safety_note: "Farmed salmon (most UK supermarket salmon) carries negligible parasite risk per FSA/EFSA and doesn't need pre-freezing to eat rare. Wild-caught salmon is the case where freezing first genuinely matters if serving it under well-done."
   tuna:
     # Which section of the temperature charts holds this figure, so a

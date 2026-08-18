@@ -21,8 +21,8 @@ ingredient_groups:
       item: egg yolks
     - amount: "4 tsp"
       item: cold water
-    - item: pinch of salt
-    - item: pinch of paprika
+    - item: salt
+    - item: pinch of paprika, unless feeding Helen
       note: fine to skip
   - name: filling
     items:
@@ -44,9 +44,9 @@ method_groups:
     steps:
     - "Mix the dry pastry ingredients with the salt, then rub in the butter lightly with fingertips."
     - "Add the egg yolks, then the water, then knead until smooth. Don't over-knead. Add all the water even if the pastry feels too wet."
-    - "Leave to rest wrapped in clingfilm in the fridge for about half an hour. Don't skip this otherwise the pastry won't stretch nicely into your dish, and it will shrink, bend and crack when you cook it."
-    - Press the pastry into a greased ceramic baking dish. Prick liberally all over with a fork.
-    - "Bake blind for 15 mins at 160°C fan, then 10 mins open at 180°C fan."
+    - "Leave to rest wrapped in clingfilm in the fridge for about half an hour. Don't skip this otherwise the pastry won't stretch nicely into the dish, and it will shrink, bend and crack in the oven."
+    - Press the pastry into a greased ceramic baking dish. Prick all over with a fork.
+    - "Bake blind at 160°C fan for 15 mins, then open at 180°C fan for 10 mins."
   - name: filling
     steps:
     - Sweat the onions in butter until soft and golden. This takes a weirdly long time.

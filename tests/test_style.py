@@ -363,6 +363,38 @@ def test_soy_sauce_specifies_dark_or_light(recipe):
     )
 
 
+def test_soy_sauce_as_tamari_alternative_specifies_dark_or_light(recipe):
+    """GitHub issue #142 follow-up, 2026-08-18. `_unqualified()` truncates
+    each value at the first comma or paren before checking whether the
+    target word is even present, so a soy sauce alternative tucked after
+    tamari -- "tamari (or low-sodium soy sauce)", "tamari or soy sauce" --
+    was invisible to test_soy_sauce_specifies_dark_or_light: the truncated
+    name was just "tamari", which never mentions soy sauce at all. Real
+    miss, caught 2026-08-18 when "tamari (or low-sodium soy sauce)" was
+    edited down to "tamari or soy sauce" in teriyaki-sauce.md -- removing
+    the parenthetical incidentally exposed it to the *other* test, but the
+    parenthetical form would have shipped unqualified regardless. Scans the
+    whole string instead of truncating, and fires only where tamari is the
+    ingredient being given a soy sauce alternative.
+    """
+    bad = []
+    for field, values in (
+        ("main_ingredients", [str(x) for x in (recipe.fm.get("main_ingredients") or [])]),
+        ("ingredient", recipe.ingredient_items),
+    ):
+        for v in values:
+            if not re.search(r"\btamari\b", v, re.I):
+                continue
+            for m in re.finditer(r"\bsoy sauce\b", v, re.I):
+                prefix = v[: m.start()]
+                if not re.search(r"\b(dark|light)\s*$", prefix, re.I):
+                    bad.append(f"{field} {v!r}")
+    assert not bad, (
+        f"{where(recipe)} offers soy sauce as a tamari alternative without "
+        f"saying dark or light: {bad!r}."
+    )
+
+
 def test_ginger_specifies_fresh_ground_or_paste(recipe):
     """GitHub issue #136. Checked in both fields, not just main_ingredients
     -- Helen's call: the ingredient list needs the literal word too, not

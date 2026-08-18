@@ -1,6 +1,6 @@
 ---
 title: "Macarons"
-tagline: "Really not as hard as you think."
+tagline: "Really not as hard as one might think."
 source: "Adapted from Gordon Ramsay's Desserts"
 makes: "64+ tiny macarons"
 prep_time: "30 mins plus 30 mins resting"
@@ -45,30 +45,34 @@ ingredient_groups:
       item: double cream
     - amount: "1 tbsp"
       item: icing sugar
+    - item: "gel- or paste-based colouring if wanted"
     - item: "flavouring or fruit, to taste"
-      note: "if you want colouring, use gel or paste — water-based will collapse the egg whites"
 method:
   - "Mix the dry ingredients and vanilla."
   - step: "Whisk the egg whites and cream of tartar to a firm and shiny foam."
-    note: "Eggs more than a week old work best, and the bowl must be perfectly clean and dry — wipe it out with lemon juice if in doubt."
-  - "Fold in the dry mixture using a metal spoon and bang the bowl down several times to release any air pockets."
-  - step: "Pipe into 2.5 cm mounds on a sheet"
-    note: "Or use a teaspoon, but, for once, piping is actually easier and less hassle."
+  - step: "Fold in the dry mixture using a metal spoon and bang the bowl down several times to release any air pockets."
+  - step: "Pipe into 2.5-cm mounds on a sheet"
+    note: "Or use a teaspoon, but, for once, piping is actually less hassle overall."
   - "Bang the sheet down several times carefully to release any bubbles."
   - "Leave for about 30 mins until a shiny skin forms on the tops."
-  - "Bake for about 20 mins at 130-140°C fan: they should be slightly crisp, but easily dentable."
+  - "Bake for about 20 mins at 130-140°C fan. They should be slightly crisp, but easily dentable."
   - "Leave to cool on the tray for 5 mins, then slide off onto a wire rack."
-  - "Whisk filling ingredients together, or make [chocolate ganache](../chocolate-ganache/)."
+  - "Whisk the filling ingredients together, or take a breath and attempt [chocolate ganache](../chocolate-ganache/)."
 method_short:
   - ""
 notes:
-  - label: "Chocolate version"
-    text: "The method above is primarily for the vanilla version — for chocolate, substitute accordingly using the chocolate biscuit ingredients."
   - label: "very finely ground almonds"
     text: "When I discovered I could buy ground almonds much more cheaply if they weren't in the baking section, I was jubilant. But jubilation ended at chewy sawdust batter and weirdly easy-grip macarons."
+  - label: "Water = bad"  
+    text: "For colouring, use gel or paste, because water-based will collapse the egg whites. Ask Kristian."
+  - label: "Chocolate version"
+    text: "The method above is primarily for the vanilla version — for chocolate, use those ingredients accordingly."
+  - label: "egg white best practice" 
+    text: "As for all egg-white recipe, eggs more than a week old work best. The bowl must be perfectly clean and dry before starting. Wipe it out with lemon juice if in doubt."
+
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
