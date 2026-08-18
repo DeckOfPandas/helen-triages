@@ -34,7 +34,7 @@ ingredient_groups:
 method:
   - "Boil the cauliflower florets for 4–5 mins until just tender. Drain and refresh in iced water, then drain again and lay out in an oven dish."
   - step: "Make the roux: melt the butter gently, then stir in the flour and mustard powder for a smooth paste. Then add the milk a little at a time, stirring/whisking continuously until completely smooth and almost shiny."
-    note: "Each of these stages takes longer than one might consider reasonable."
+    note: "Each of these stages takes longer than you think."
   - "Bring to the boil, then simmer for a few minutes, stirring continuously, until it thickens. Remove from the heat, add the English mustard powder, then any other flavourings (curry powder, Worcestershire sauce etc). Season with salt and pepper."
   - Grate the three cheeses together. Add half to the roux pan and stir until fully melted. Pour the sauce over the cauliflower.
   - "Add the breadcrumbs and thyme to the other half of the cheese, then tip evenly over the cauliflower dish."
@@ -48,7 +48,7 @@ method_short:
     * Bake 180°C fan 15–20 mins
 notes:
   - label: "Choice of cheese"
-    text: "Most combinations of hard cheeses are fine. Brie or similar will take over, but that might be the point."
+    text: "Most combinations of hard cheeses are fine. Brie or similar will take over, but maybe you're into that."
   - label: "Make ahead"
     text: "To make ahead, assemble the thing completely up to the point of baking, and keep it covered in the fridge for a day. Bake it straight from cold and give it an extra 10 mins in the oven."
 meta:

@@ -24,7 +24,7 @@ ingredient_groups:
       note: I like more than this, but apparently that's uncommon
 method:
   - step: Dry-fry the whole spices until aromatic and darkened.
-    note: "If you can't be bothered to do this then, honestly, just go shop-bought."
+    note: "If you can't be bothered to do this then, honestly, just don't make five-spice yourself."
   - Grind or crush to a fine powder.
 method_short:
   - Oh come on.

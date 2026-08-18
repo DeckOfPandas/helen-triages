@@ -34,7 +34,7 @@ method_short:
   - ""
 notes:
   - label: "Make-ahead"
-    text: "The fat will solidify on top if this is fridged, and it's much easier to lift off cold than to spoon off hot. Reheat gently."
+    text: "The fat will solidify on top if you fridge this, and it's much easier to lift off cold than to spoon off hot. Reheat gently."
 meta:
   rewritten: true
   proofread: true

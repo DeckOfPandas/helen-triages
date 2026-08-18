@@ -1,6 +1,6 @@
 ---
 title: "Double Chocolate Frap"
-tagline: "Nearly as good as Starbucks, but leaves room for dinner."
+tagline: "Nearly as good as Starbucks, but you can still fit in dinner."
 source: "Helen"
 serves: "2"
 prep_time: "5 mins"

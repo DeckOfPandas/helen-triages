@@ -29,7 +29,7 @@ method:
   - "Knead to form a dough."
   - "Divide into two rounds and cut an X into the top of each, cutting about halfway through the dough."
   - "Place on a greased baking sheet and bake at 170°C fan for 15–20 mins."
-  - "Cool for 5 mins on a wire rack before serving, as they won't be quite cooked through on coming out of the oven."
+  - "Cool for 5 mins on a wire rack before serving, as they won't be quite cooked through when you take them out of the oven."
 method_short:
   - ""
 # notes:

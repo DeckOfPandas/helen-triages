@@ -25,7 +25,7 @@ method:
   - Heat the milk to boiling with the vanilla.
   - Beat the egg yolks with the sugar and flour to a very pale fluffy mass.
   - step: Pour the nearly boiling milk over the egg mixture.
-    note: "Doing this the other way round gives scrambled eggs." 
+    note: "If you do this the other way round you'll get scrambled eggs." 
   - Rinse out the milk pan and make sure the bottom is clean.
   - Return everything to the rinsed-out pan and stir gently over a moderate heat.
   - When boiling, whisk more vigorously to stop the mixture sticking to the bottom of the pan. It should become thick and smooth.

@@ -55,12 +55,12 @@ method:
   - "Check the seasoning."
   - step: "Add the mushrooms 20 mins before the end."
     note: "Add them too early and they'll turn to mush."
-  - "At the end, the meat falls off the bones when they're lifted out."
+  - "At the end, the meat will fall off the bones when you remove them."
 method_short:
   - ""
 notes:
   - label: "Cooking time"
-    text: "Better the longer it cooks."
+    text: "Better the longer you cook it."
   - label: "Freezing"
     text: "Somehow even better after freezing."
 meta:

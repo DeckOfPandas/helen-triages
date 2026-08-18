@@ -33,12 +33,12 @@ method:
   - step: "Brush lightly with milk, then bake at 180°C fan for 15-20 mins."
     note: "If the edges brown too fast, either: a) live with it, because it's pretty, or b) eat this batch and turn the oven down by 10° for the next."
   - "Cool on a wire rack."
-  - "Sieve icing sugar attractively over them, and sprinkle orange zest too, to taste."
+  - "Sieve icing sugar attractively over them, and sprinkle orange zest too if you want."
 method_short:
   - ""
 notes:
   - label: "Chilling"
-    text: "If the pastry isn't chilled twice, the pies will crack and/or shrink. This isn't one of those things that chefs make up to amuse themselves."
+    text: "If you don't chill the pastry twice, the pies will crack and/or shrink. This isn't one of those things that chefs make up to amuse themselves."
   - label: "Mincemeat"
     text: "Robertson's mincemeat from a jar is absolutely fine. This is true because Grandma Kath told me."
 meta:

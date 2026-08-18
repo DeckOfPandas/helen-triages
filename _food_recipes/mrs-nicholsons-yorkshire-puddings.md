@@ -1,6 +1,6 @@
 ---
 title: "Mrs Nicholson's Yorkshire Puddings"
-tagline: "The only Yorkshire pudding recipe needed. Use an oil with a high smoke point and do not open the oven. DO NOT OPEN THE OVEN."
+tagline: "The only Yorkshire pudding recipe you need — use an oil with a high smoke point and do not open the oven. DO NOT OPEN THE OVEN."
 source: "Mrs Nicholson"
 makes: "12 normal Yorkshire puddings"
 prep_time: "10 mins"

@@ -185,13 +185,32 @@ def test_internal_links_have_trailing_slash(recipe):
 ANY_RELATIVE_LINK = re.compile(r"\]\(\.\./([^)]+)\)")
 _WELL_FORMED_TARGET = re.compile(r"^[a-z0-9-]+/?$")
 
+# A SECOND LEGITIMATE SHAPE, added 2026-08-18: a recipe linking OUT of
+# _food_recipes/ to a reference page, e.g. `](../../reference/timings/)` from
+# the Christmas turkey to the timing calculator. ANY_RELATIVE_LINK strips the
+# leading `../`, so what arrives here is `../reference/timings/`.
+#
+# WHY IT HAS TO BE RELATIVE, rather than the `{{ '/food/reference/timings/' |
+# relative_url }}` the reference pages themselves use: front matter is never
+# Liquid-templated (HANDOVER §4), and a method step lives in front matter. A
+# root-relative `/food/reference/timings/` would drop the `/helen-triages`
+# baseurl and 404 in production while working perfectly on localhost -- the
+# exact failure test_no_link_in_the_production_build_points_at_a_file_that_isnt_there
+# exists to catch. `../../` is baseurl-safe because it never names the root.
+#
+# Kept narrow on purpose: only `reference/`, only a slug, only with a trailing
+# slash. The bug this whole test was written for -- `](../garam-masala-powder.md)`
+# -- is still rejected, as is any other freehand path.
+_REFERENCE_TARGET = re.compile(r"^\.\./reference/[a-z0-9-]+/$")
+
 
 def test_internal_links_are_well_formed(recipe):
     """Anything `](../...)` that isn't a plain `slug` or `slug/` -- the two
     shapes test_internal_recipe_links_resolve and
     test_internal_links_have_trailing_slash already check between them.
     """
-    bad = [t for t in ANY_RELATIVE_LINK.findall(recipe.raw) if not _WELL_FORMED_TARGET.match(t)]
+    bad = [t for t in ANY_RELATIVE_LINK.findall(recipe.raw)
+           if not _WELL_FORMED_TARGET.match(t) and not _REFERENCE_TARGET.match(t)]
     assert not bad, (
         f"{where(recipe)} has internal link(s) in an unrecognised shape: "
         f"{bad!r}.\nCross-recipe links must be [text](../slug/) -- check "

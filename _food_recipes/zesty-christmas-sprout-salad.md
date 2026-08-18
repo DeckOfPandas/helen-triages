@@ -37,8 +37,8 @@ ingredient_groups:
     - amount: "2 tbsp"
       item: extra virgin olive oil
 method:
-  - "Mix the dressing in a bowl and salt like curing is the plan."
-  - "Halve and finely slice the sprouts using the slicing attachment on a food processor (or an adamantium index finger, required for doing this by hand)."
+  - "Mix the dressing in a bowl and salt like you intend to cure."
+  - "Halve and finely slice the sprouts using the slicing attachment on a food processor (or the adamantium index finger you must have if you want to do this by hand)."
   - "Toss the sprouts in the dressing with the onion, apple, pomegranate seeds, walnuts and mint."
   - "Mix everything then stand for at least 20 mins until the sprouts soften."
   - "Go nuts with extra mint to serve."

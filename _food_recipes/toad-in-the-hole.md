@@ -52,7 +52,7 @@ method_short:
   - ""
 notes:
   - label: "Hot oil, hot sausages"
-    text: "Both need to be properly hot before the batter goes in, otherwise it turns marshmallow, but not in a good way."
+    text: "Both need to be properly hot before the batter goes in otherwise you'll get marshmallow but not in a good way."
 meta:
   rewritten: true
   proofread: true

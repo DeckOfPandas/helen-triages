@@ -2,7 +2,7 @@
 title: "Slow Cooked Confit Duck Legs"
 tagline: "Duck legs cured overnight with salt, garlic and thyme, slow-cooked in their own fat, then finished in a hot pan."
 source: "Adapted from Pinch and Swirl"
-makes: "however many are made"
+makes: "however many you make"
 prep_time: "10 mins"
 cook_time: "6 hrs"
 main_ingredients: ["duck legs", "coarse sea salt", "fresh thyme", "garlic cloves", "duck fat"]

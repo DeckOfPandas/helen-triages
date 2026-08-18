@@ -35,7 +35,7 @@ method:
   - "Mix the flour and baking powder, then fold in with a metal spoon."
   - "Toss the cleaned, dried and quartered cherries in the ground almonds, then stir most of them in. Stir in the milk."
   - "Spoon into a lined and sugared 8-inch round tin, then sprinkle the rest of the cherries over the top and poke them in with a teaspoon."
-  - "Level the top carefully with the back of a spoon, then sprinkle the Demerara sugar evenly over the top — double the amount if wanted, no one's looking."
+  - "Level the top carefully with the back of a spoon, then sprinkle the Demerara sugar evenly over the top — double the amount if you like, no one's looking."
   - step: "Bake at 160°C fan for about 50 mins, then cover tightly with foil and bake for about ten more minutes."
     note: "So the sugar caramelises, but doesn't burn."
   - "Leave to cool in the tin for 15 mins, then turn out onto a wire rack."

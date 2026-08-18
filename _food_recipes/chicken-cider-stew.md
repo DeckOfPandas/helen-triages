@@ -15,7 +15,7 @@ ingredient_groups:
     - amount: "2 large"
       item: "onions, diced"
     - amount: "4 medium"
-      item: "carrots, diced, and extra in chunks if wanted"
+      item: "carrots, diced"
     - amount: "4"
       item: "stalks celery, diced"
     - amount: "4 cloves"

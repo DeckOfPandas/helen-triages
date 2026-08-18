@@ -42,7 +42,7 @@ ingredient_groups:
 method:
   - "Whisk the cashew butter, miso paste, soy sauce and rice vinegar into a smooth paste. Loosen enough to pour as a sauce."
   - "Cook the noodles per packet instructions. Quench, rinse and drain."
-  - "Fry the garlic and ginger in sesame oil for at least 30 seconds, ginger first to avoid burning the garlic."
+  - "Fry the garlic and ginger in sesame oil for at least 30 seconds, ginger first if you're prone to burning garlic."
   - "Add the sauce, cook for a minute, then add the rest of the stock. Simmer for a minute or two, until it coats the back of a spoon."
   - "Stir in the noodles to just warm through. Serve in two warm bowls, topping with the eggs, spring onions, edamame and carrot ribbons or anything else. Sprinkle with black sesame seeds and fresh coriander."
 method_short:

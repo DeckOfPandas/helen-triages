@@ -27,7 +27,7 @@ method:
   - "When the butter and sugar is hot, add the cornflour mixture slowly and stir well."
   - "When the texture changes, stir in the beaten eggs."
   - "Keep stirring continuously until it all thickens. DON'T LET IT BOIL, OTHERWISE YOU WILL END UP WITH SCRAMBLED EGGS."
-  - "Leave to cool in the pan. When no longer hot, stir through a knob of butter to taste."
+  - "Leave to cool in the pan. When no longer hot, stir through a knob of butter if you like."
   - "Leave to cool completely before putting in jars."
 method_short:
   - ""
