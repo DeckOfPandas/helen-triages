@@ -308,6 +308,132 @@ def test_glass_is_a_list():
     )
 
 
+def _glasses():
+    return yaml.safe_load(
+        (ROOT / "_data" / "cocktails" / "glasses.yml").read_text(encoding="utf-8")
+    )
+
+
+GLASS_ICON_DIR = ROOT / "_includes" / "icons" / "glasses"
+
+
+def test_every_mapped_glass_names_an_icon_that_exists():
+    """A key pointing at a missing file is worse than a missing key.
+
+    A MISSING KEY COSTS AN ICON AND NOTHING ELSE -- the layout's
+    absent-means-no-icon rule handles it, and the page renders fine without
+    one. A key naming a file that is NOT THERE is the dangerous direction: it
+    sets `glass_icon` to a non-empty string, so the layout takes the branch
+    that builds `icons/glasses/<name>.svg` and hands it to {% include %}. That
+    is a HARD BUILD FAILURE, not a blank space, and it has already happened
+    once here in its empty-string form -- `glass_icon = ""` produced
+    "File contains invalid characters or sequences: icons/glasses/.svg".
+
+    Checked against the filesystem rather than against all_icons, because
+    all_icons is itself a written-down list and could be wrong in the same way.
+    """
+    icons = _glasses()["icons"]
+    assert icons, "glasses.yml has no `icons:` map -- this test would pass vacuously."
+    missing = sorted(
+        f"{spelling!r} -> {stem}.svg"
+        for spelling, stem in icons.items()
+        if not (GLASS_ICON_DIR / f"{stem}.svg").is_file()
+    )
+    assert not missing, (
+        "glasses.yml maps a glass to an icon file that does not exist:\n  "
+        + "\n  ".join(missing)
+        + "\n\nThis is not a cosmetic gap. A non-empty name sends the layout "
+          "down the include branch and the BUILD FAILS. Either add the SVG to "
+          "_includes/icons/glasses/ or remove the key -- an unmapped glass "
+          "renders no icon, which is the intended fallback."
+    )
+
+
+def test_all_icons_matches_the_icon_directory():
+    """The written-down inventory must equal the directory, both directions.
+
+    all_icons EXISTS ONLY BECAUSE LIQUID CANNOT READ A DIRECTORY. `_includes/`
+    is never copied to the site, so it is not in `site.static_files` either,
+    and a template therefore has no way to ask what artwork exists -- it can
+    only look up what a key already names. That makes the most interesting
+    question invisible to the swatch page: which icons are UNREACHABLE.
+
+    Duplicating a directory listing into YAML is a rot risk taken deliberately,
+    and this test is the whole reason it is acceptable. It has to fail in BOTH
+    directions: an icon added without a list entry is invisible to the swatch
+    page (the failure the list exists to prevent), and a list entry whose file
+    has gone makes the swatch page ask {% include %} for a missing file, which
+    fails the build exactly as above.
+    """
+    listed = _glasses().get("all_icons") or []
+    assert listed, (
+        "glasses.yml has no `all_icons:` list. _dev/glasses.html iterates it "
+        "and would render an empty swatch page while passing every check."
+    )
+    on_disk = sorted(p.stem for p in GLASS_ICON_DIR.glob("*.svg"))
+    assert on_disk, (
+        f"No SVGs found in {GLASS_ICON_DIR.relative_to(ROOT)} -- this test "
+        f"would pass while checking nothing."
+    )
+    undeclared = sorted(set(on_disk) - set(listed))
+    phantom = sorted(set(listed) - set(on_disk))
+    assert not undeclared and not phantom, (
+        "glasses.yml `all_icons` has drifted from the icon directory.\n"
+        + (f"  on disk but not listed: {undeclared}\n" if undeclared else "")
+        + (f"  listed but not on disk: {phantom}\n" if phantom else "")
+        + "\nAdd or remove the entry. Icons are regenerated wholesale by "
+          "scripts/normalise_glass_icons.py from tmp/cocktail-glasses/, so a "
+          "drawing whose source is deleted disappears from here silently -- "
+          "which is how shot-2.svg went missing without a single test noticing."
+    )
+
+
+def test_every_icon_has_a_real_world_height():
+    """`heights_mm` must cover every icon, and name no icon that is not there.
+
+    THE FAILURE IS A SILENT ZERO, not an error. /dev/glasses/ sizes its
+    relative-scale view by these millimetres, and Liquid resolves a missing key
+    to nil; `nil | times: 1.0` is 0, so a glass with no height renders at zero
+    height -- an invisible gap in a row of glasses, with nothing to say why.
+    The same nil-arithmetic family as `drink.glass.size == 0` counting zero
+    unglassed drinks while 28 sat unglassed.
+
+    A phantom entry is milder but still wrong: it inflates the tallest-glass
+    figure the whole row is scaled against, so every icon silently shrinks.
+
+    These numbers are PROVISIONAL and Claude wrote them (2026-08-18). Issue #295
+    -- the glasses Helen owns, with volumes -- supersedes them. This test only
+    asserts coverage, never the values: a wrong height is a judgement to be
+    corrected by eye, not something a test can know.
+    """
+    g = _glasses()
+    heights = g.get("heights_mm") or {}
+    listed = g.get("all_icons") or []
+    assert heights, (
+        "glasses.yml has no `heights_mm:`. The relative-scale view on "
+        "/dev/glasses/ would render every icon at zero height."
+    )
+    assert listed, "glasses.yml has no `all_icons:` -- see the sibling test."
+    missing = sorted(set(listed) - set(heights))
+    phantom = sorted(set(heights) - set(listed))
+    assert not missing and not phantom, (
+        "glasses.yml `heights_mm` does not cover the icon set.\n"
+        + (f"  icons with no height: {missing}\n" if missing else "")
+        + (f"  heights for no icon:  {phantom}\n" if phantom else "")
+        + "\nAn icon with no height renders at ZERO height on /dev/glasses/ "
+          "-- an invisible gap, not an error. Add a typical height in mm; it "
+          "does not need to be exact, and #295 will replace the lot."
+    )
+    bad = sorted(f"{k}={v!r}" for k, v in heights.items()
+                 if not isinstance(v, (int, float)) or v <= 0)
+    assert not bad, (
+        "heights_mm values must be positive numbers, not strings:\n  "
+        + "\n  ".join(bad)
+        + "\n\nA quoted number is a string, and Liquid's `times` turns a "
+          "non-numeric string into 0 -- the same invisible-gap failure."
+    )
+
+
 def test_syrup_ratio_is_plausible_for_its_generic():
     """FLAG ONLY. Never rewrite, and never fail on a deliberate choice.
 

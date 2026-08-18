@@ -23,6 +23,11 @@ show_unrewritten: true
 pdf_downloads: false
 
 collections:
+  # Internal reference pages, readable only here. See _config.yml for why this
+  # is a collection and not a loose page (issue #276: unlinked got published).
+  dev:
+    output: true
+    permalink: /dev/:path/
   food_drafts:
     output: true
     permalink: /food/drafts/:path/

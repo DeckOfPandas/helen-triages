@@ -40,17 +40,56 @@ icons:
   rocks: rocks
   tiki mug: tiki-mug
 
+  # --- SIX DRINKS THAT WERE RENDERING NO ICON FOR NO REASON -------------------
+  # Found 2026-08-17 by checking every `glass:` value in the collection against
+  # this map, rather than by noticing a blank space on a page. Two shapes of
+  # miss, and both are silent by design -- "absent means no icon" is the right
+  # default and it cannot tell a deliberate gap from a forgotten one:
+  #
+  #   - martini and wine: the ARTWORK existed all along and simply had no key.
+  #   - pilsner: the artwork did not exist until today (#303).
+  #
+  # This is why tests/test_cocktails.py now asserts the map and the icon
+  # directory agree in both directions. A missing key costs an icon; a key
+  # naming a missing file is worse, because `glass_icon = ""` once sent
+  # `icons/glasses/.svg` to {% include %} and took the whole build down.
+  martini: martini
+  martini glass: martini
+  wine: wine
+  pilsner: pilsner
+  sling: sling
+
+  # --- icons added 2026-08-17, ahead of any drink asking for them -------------
+  # Spec, not inventory -- the same principle as declaring Plymouth and Genever
+  # gin while owning neither. Helen has tiki recipes not yet ingested.
+  absinthe: absinthe
+  goblet: goblet
+  chalice: goblet
+  pineapple: pineapple
+  hollowed pineapple: pineapple
+
   # --- three spellings of one glass, all live in the data ---------------------
   old-fashioned: old-fashioned
   old fashioned: old-fashioned
   old-fashioned glass: old-fashioned
 
   # --- judgement calls, worth checking by eye before trusting -----------------
-  # A snifter IS a brandy balloon, so this one is safe.
+  # `brandy glass` is the CANONICAL name and `snifter` is the alias, which is
+  # the opposite of the usual convention -- snifter is the commoner word behind
+  # a bar. Helen's call, 2026-08-17, and the reason is that she dislikes the
+  # word itself on synaesthetic grounds. Recorded because nobody would ever
+  # rediscover it, and a future tidy-up would otherwise "correct" it straight
+  # back to snifter.
+  brandy glass: brandy
   snifter: brandy
-  # "Double rocks" is a taller rocks glass, which is what rocks-tall draws.
-  # Reasonable, but it is an inference from the name, not from the artwork.
-  double rocks: rocks-tall
+  # `double rocks` now draws the DOUBLE OLD FASHIONED, not rocks-tall. The old
+  # mapping said so itself -- "an inference from the name, not from the
+  # artwork" -- and it was made when no double old fashioned existed. One does
+  # now (2026-08-17), drawn as what the name actually means: a wider, deeper
+  # tumbler, not a taller one.
+  double rocks: old-fashioned-double
+  double old fashioned: old-fashioned-double
+  double old-fashioned: old-fashioned-double
 
 # =============================================================================
 # GLASSES IN THE DATA WITH NO ICON — deliberately unmapped, not forgotten.
@@ -63,13 +102,157 @@ icons:
 #            Santiago is "anything, but preferably a Collins". The layout
 #            takes the first entry that HAS an icon, so `[collins, any]`
 #            draws a Collins and `[any]` alone draws nothing, which is right.
-#   pilsner  1 drink. No pilsner icon exists.
 #   todo     1 drink, and it is literally the word "todo" — a placeholder in
 #            the source spreadsheet, not a glass. Do not map it to anything.
+#   mug      1 drink. QQ — ambiguous between `mule mug` and `hot toddy`, which
+#            are both mugs and both in the set. Needs Helen, not a guess.
+#   long     1 drink. QQ — reads as "a long drink", which is a SERVE rather
+#            than a glass. Lands on collins or highball depending on the pour.
 #
-# UNUSED ICONS, the other side of the same ledger: brandy (used via `snifter`),
-# hot-toddy, julep-cup, margarita, martini, mule-mug, pina-colada, rocks-tall
-# (used via `double rocks`), sherry, shot, sling, sour. Several of these will
-# find a glass once the non-rum drinks are ingested — margarita, mule-mug and
-# julep-cup especially — so an unused icon is not evidence of a mistake.
+# UNUSED ICONS, the other side of the same ledger: hot-toddy, julep-cup,
+# margarita, mule-mug, pina-colada, rocks-tall, sherry, shot, plus the four
+# added ahead of demand (absinthe, goblet, pineapple, and old-fashioned-double
+# until a drink spells it that way). Several will find a glass once the non-rum
+# drinks are ingested — margarita, mule-mug and julep-cup especially — so an
+# unused icon is not evidence of a mistake.
+#
 # =============================================================================
+# THE CANONICAL VOCABULARY — Helen, 2026-08-17
+# =============================================================================
+# When two words mean one glass, these are the ones to prefer in new drinks.
+# The aliases above stay live regardless: the point of this file is that a
+# drink is never wrong for using the other word.
+#
+#   coupe                 not "champagne saucer"
+#   old fashioned         not "rocks"
+#   double old fashioned  not "double rocks"
+#   brandy glass          not "snifter"
+#
+# =============================================================================
+# QQ — TWO TUMBLER DRAWINGS ARE NOW HOMELESS, AND IT NEEDS AN EYE, NOT A RULE
+# =============================================================================
+# Choosing `old fashioned` over `rocks` as the canonical word left the ARTWORK
+# unresolved, because there are four tumbler icons and only two canonical
+# tumbler names:
+#
+#   old-fashioned.svg         plain tapered, heavy base  -> `old fashioned`
+#   old-fashioned-double.svg  same, wider and deeper     -> `double old fashioned`
+#   rocks.svg                 PANELLED (faceted sides)   -> reached only by `rocks`
+#   rocks-tall.svg            panelled, tall             -> reached by nothing
+#
+# So `rocks` and `old fashioned` are now two spellings of one glass pointing at
+# TWO DIFFERENT DRAWINGS. That is the actual defect here, and it is invisible on
+# any single page.
+#
+# The panelling is real, not decoration — Helen, 2026-08-17, on what those
+# internal lines are: "rounded glass markings like those classic bar tumblers
+# with 6-8 flattened sides". So rocks.svg is not a duplicate of
+# old-fashioned.svg; it is a different physical glass, drawn accurately.
+#
+# Three ways out, and _dev/glasses.html exists to make the choice by eye:
+#   (a) the panelled drawing wins — point `old fashioned` at rocks.svg and
+#       retire the plain pair;
+#   (b) the plain drawing wins — retire both panelled drawings;
+#   (c) they are genuinely different glasses Helen owns and want their own
+#       names, in which case rocks-tall needs one too.
+# =============================================================================
+
+# =============================================================================
+# EVERY ICON FILE, and yes this duplicates the directory listing on purpose.
+# =============================================================================
+# Liquid cannot read a directory. `_includes/` is not copied to the site, so it
+# is not in `site.static_files` either, which means a template has NO way to ask
+# "what icons exist?" — it can only look up the ones a key already names. That
+# makes the most interesting question invisible to the swatch page: which
+# artwork is UNREACHABLE, drawn and normalised and pointed at by nothing.
+#
+# So the inventory is written down, and tests/test_cocktails.py asserts it
+# matches the directory exactly, in both directions. The duplication is real but
+# it cannot drift: the test fails the moment an icon is added or removed without
+# this list following. Without the test this would be a lie waiting to happen,
+# which is the whole reason the assertion comes with it rather than after it.
+# =============================================================================
+# REAL-WORLD HEIGHTS IN MILLIMETRES — PROVISIONAL, AND HELEN'S TO CORRECT.
+# =============================================================================
+# THESE ARE NOT MEASURED. They are typical heights for each glass type, written
+# by Claude on 2026-08-18 so that the relative-scale view on /dev/glasses/ has
+# something honest to size from. Issue #295 is the real version of this list --
+# the glasses Helen actually owns, with their volumes -- and it SUPERSEDES every
+# number here the moment it exists.
+#
+# WHY THIS IS NOT THE viewBox HEIGHT, which is the obvious thing to use and is
+# wrong. A viewBox records how the artwork was DRAWN, not how big the glass IS,
+# and the two disagree badly: `shot` is drawn 77 units tall against `rocks` at
+# 68, so at viewBox scale a shot glass stands TALLER than a rocks glass. It is
+# about 60mm against 85mm in the real world. Same for `hot-toddy`, drawn
+# shortest of everything at 60 units and actually one of the taller vessels.
+# Helen, 2026-08-18: "Old fashioned glass needs to be smaller, and shot glass
+# much smaller".
+#
+# Separating the two also means the ARTWORK NEVER HAS TO BE REDRAWN to fix a
+# proportion: a wrong size is a number here, not an Inkscape session. That
+# matters because redrawing is how you lose a glass's character by accident.
+#
+# The site itself does NOT use these yet -- it renders every icon at a common
+# 2.6rem height. Issue #298 ("normalise glasses, but not all the same height")
+# is where that changes, and #299 is the proportion pass. This list is what
+# both will need.
+heights_mm:
+  shot: 60
+  old-fashioned: 85
+  rocks: 85
+  old-fashioned-double: 95
+  mule-mug: 105
+  julep-cup: 110
+  punch-bowl: 130
+  brandy: 130
+  hot-toddy: 140
+  nick-and-nora: 140
+  sour: 140
+  coupe: 150
+  sherry: 150
+  highball: 150
+  rocks-tall: 150
+  tiki-mug: 150
+  pineapple: 150
+  absinthe: 160
+  martini: 175
+  margarita: 175
+  goblet: 175
+  collins: 180
+  pina-colada: 180
+  wine: 200
+  hurricane: 200
+  sling: 200
+  pilsner: 220
+  flute: 230
+
+all_icons:
+  - absinthe
+  - brandy
+  - collins
+  - coupe
+  - flute
+  - goblet
+  - highball
+  - hot-toddy
+  - hurricane
+  - julep-cup
+  - margarita
+  - martini
+  - mule-mug
+  - nick-and-nora
+  - old-fashioned
+  - old-fashioned-double
+  - pilsner
+  - pina-colada
+  - pineapple
+  - punch-bowl
+  - rocks
+  - rocks-tall
+  - sherry
+  - shot
+  - sling
+  - sour
+  - tiki-mug
+  - wine
