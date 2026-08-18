@@ -15,7 +15,75 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # ===========================================================================
+  # TESTS GATE THE DEPLOY. GitHub issue #369.
+  # ===========================================================================
+  # Until 2026-08-18 this workflow checked out, built, rendered PDFs and
+  # deployed, with no test step anywhere. Every guard in the repository
+  # protected a local `pytest` run and nothing else, so a push to `main` shipped
+  # whatever was on `main` however red the suite was -- including, pointedly,
+  # the `awaiting-fix` publish gate (#331), whose whole job is to stop a flagged
+  # recipe going live.
+  #
+  # `build` now `needs: test`, so nothing is built and nothing is deployed
+  # unless this job is green.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # FULL HISTORY, AND THIS IS LOAD-BEARING. actions/checkout is shallow
+          # by default (depth 1), and in a depth-1 clone `git log -- <file>`
+          # reports the same single commit for every file. #367's test reads
+          # history to find who last touched each recipe, so on a shallow clone
+          # it would examine nothing and pass -- a green that means less than no
+          # result. It asserts the clone is not shallow for exactly that reason,
+          # so getting this wrong fails loudly rather than lying.
+          fetch-depth: 0
+
+      # Ruby, because the suite is not purely static: test_rendered_pages.py
+      # runs two real `jekyll build`s (one with the local config, one with
+      # production alone) and checks the OUTPUT. That is the only way to catch a
+      # link that resolves locally and 404s in production, which has shipped
+      # here before.
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: python3 -m pip install -r requirements-test.txt
+
+      - name: Python tests
+        run: python3 -m pytest -q
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      # THE GLOB IS NOT OPTIONAL. `node --test tests/js/` treats the DIRECTORY
+      # as a single test file: it reports "tests 1, fail 1" and tells you
+      # nothing about the 144 tests inside. The glob runs all of them. Checked,
+      # not assumed, on 2026-08-18 -- and worth knowing because the test files'
+      # own header comments suggest the directory form.
+      #
+      # `.node-runtime/` is gitignored, so CI uses its own Node rather than the
+      # vendored one. This suite has form for silently not running: it went
+      # weeks without executing because the vendored binary had lost its execute
+      # bit, and nothing said so.
+      - name: JavaScript tests
+        run: node --test tests/js/*.test.js
+
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
