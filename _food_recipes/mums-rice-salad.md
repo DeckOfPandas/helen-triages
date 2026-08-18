@@ -35,12 +35,12 @@ notes:
   - label: "Make ahead"
     text: "Make early to allow the sultanas time to soak up the liquid."
   - label: "Don't overcook the rice"
-    text: "Undercooked brown rice is nice and nutty."
-  - label: "Robbie is incorrect"
+    text: "Slightly undercooked brown rice is nutty and gorgeous."
+  - label: "Robbie must not be trusted"
     text: "Robbie thinks this salad is nice with added pineapple."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"

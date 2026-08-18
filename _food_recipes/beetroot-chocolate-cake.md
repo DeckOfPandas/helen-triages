@@ -34,7 +34,7 @@ method:
   - "Blend the beetroot in a food processor to a rough purée."
   - "Stir the butter into the chocolate in small pieces and leave to soften. Remove from the heat and allow to cool slightly."
   - "Whisk the egg yolks in a bowl until frothy. Stir the egg yolks into the chocolate and butter mixture, then fold in the beetroot."
-  - "Whisk the egg whites until stiff peaks form. Fold in the sugar with a clean, dry metal spoon."
+  - "Whisk the egg whites until stiff peaks form. Fold in the sugar with a clean, dry, metal spoon."
   - "Fold the egg white mixture into the chocolate mixture. Sift the flour, baking powder and cocoa powder together, and fold in."
   - "Pour the batter into the greased and lined tin and bake at 160°C fan for 40 mins."
   - "Allow to cool in the tin, then serve with crème fraîche or double cream."
@@ -47,7 +47,7 @@ notes:
     text: "Arguably better on day two than straight out of the tin."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

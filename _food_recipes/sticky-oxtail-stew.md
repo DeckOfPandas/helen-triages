@@ -31,10 +31,10 @@ ingredient_groups:
       item: plum tomatoes
     - amount: "275 ml"
       item: porter
-      note: use red wine if you prefer
+      note: use red wine if preferred
     - amount: "1 l"
       item: organic beef stock
-    - item: flavourings like Worcestershire sauce, English mustard powder, whatever you like
+    - item: flavourings like Worcestershire sauce, English mustard powder, whatever suits
 method_groups:
   - name: "Brown the oxtail"
     steps:
@@ -50,7 +50,7 @@ method_groups:
   - name: "Finish"
     steps:
       - "Cool for about 10 mins. Strip the meat from the bones and return it to the pan, discarding the bones."
-      - "Flavour with Worcestershire sauce and anything else you like. Taste before automatically adding salt — the stock and Worcestershire sauce are usually salty enough on their own."
+      - "Flavour with Worcestershire sauce and anything else that suits. Taste before automatically adding salt — the stock and Worcestershire sauce are usually salty enough on their own."
 method_short:
   - ""
 notes:

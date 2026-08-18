@@ -21,7 +21,7 @@ ingredient_groups:
     - amount: "50 g"
       item: ground almonds
       note: coarsely ground is not only fine, it's better
-    - item: "dusting as preferred: icing sugar, cocoa powder, nutmeg, cinnamon, or anything you fancy"
+    - item: "dusting as preferred: icing sugar, cocoa powder, nutmeg, cinnamon, or anything else that appeals"
 method:
   - "Melt the chocolate over a bain-marie, then add any flavouring."
   - "Stir in the butter until just melted then take off the heat."

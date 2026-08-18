@@ -3,7 +3,7 @@ title: "Cumin and Mint Lamb Skewers"
 tagline: "Much better than takeaway."
 source: "Adapted from Good Food"
 serves: "6"
-prep_time: "40 mins plus at least 2 hrs chilling"
+prep_time: "40 mins plus at least 2 hrs chilling, preferably overnight"
 cook_time: "30 mins"
 main_ingredients: ["lamb shoulder", "Greek yoghurt", "hummus", "pomegranate seeds", "garlic cloves", "coriander", "cumin", "turmeric", "fresh mint"]
 star_ingredient: "lamb"
@@ -44,14 +44,9 @@ method:
   - "Serve on hummus with flatbreads for scooping, or over cooked rice, scattering over the pomegranate, onion and herbs."
 method_short:
   - "Marinate overnight then grill 15 mins."
-notes:
-  - label: "hummus and not being optional"
-    text: "Here the hummus is the bottom of the plate. Omit with caution."
-  - label: "dried vs fresh mint"
-    text: "Dried mint in the marinade, fresh mint over the top. Different jobs."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

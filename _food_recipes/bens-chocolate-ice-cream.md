@@ -1,6 +1,6 @@
 ---
 title: "Ben's Chocolate Ice Cream"
-tagline: "As rich as they come, real chocolate and all the goodies."
+tagline: "Super rich. Real chocolate and all the goodies."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
 prep_time: "20 mins"
@@ -22,9 +22,9 @@ ingredient_groups:
       item: whipping cream, about 38% fat
     - amount: "1 tsp"
       item: vanilla extract
-    - amount: "1 pinch"
+    - amount: "some"
       item: salt
-      note: "you're more likely to under-salt than over-salt, and given that salt brings out chocolate flavour under-salting would be a crime"
+      note: "it's easier to under-salt than over-salt, and, given that salt brings out chocolate flavour, under-salting would be a crime"
 method:
   - "Melt the unsweetened chocolate in a bain-marie. Gradually whisk in the milk and heat, stirring constantly, until smooth. Let it cool."
   - "Whisk the eggs until light and fluffy, 1–2 mins. Whisk in the sugar gradually, then continue whisking until fully blended, about 1 min more. Add the cream, vanilla, and salt and whisk to blend."
@@ -37,7 +37,7 @@ notes:
     text: "Add 150 g roasted whole almonds (salted or unsalted) once the ice cream stiffens, about 2 mins before it's done."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

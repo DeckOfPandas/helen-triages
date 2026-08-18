@@ -38,7 +38,7 @@ ingredient_groups:
 method:
   - "Mix together the marinade ingredients, except for the cornstarch, until the sugar is dissolved. Marinate the salmon in a zip-lock bag and leave for 30 mins."
   - "Drain the marinade into a small saucepan and set aside. Bake at 170°C fan for 11–14 mins, until it starts to flake with a fork, or to an [internal temperature of 57°C](#doneness) at the thickest part."
-  - "Boil the reserved marinade, then simmer for 2–3 mins. Thicken with the cornstarch and simmer for another minute. Cool. Towards the end of the salmon's cooking time, brush with some of the sauce."
+  - "Boil the reserved marinade, then simmer for 2–3 mins. Thicken with the cornstarch, bring back to the boil while stirring, then lower and simmer for another minute. Cool. Towards the end of the salmon's cooking time, brush with some of the sauce."
   - "Serve immediately, with the remaining marinade on the side as a sauce."
 method_short:
   - ""
@@ -47,7 +47,7 @@ notes:
     text: "The [teriyaki sauce](../teriyaki-sauce/) recipe is this same sauce on its own —  it keeps in the fridge for about a week."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

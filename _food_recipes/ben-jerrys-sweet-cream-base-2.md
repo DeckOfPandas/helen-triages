@@ -1,6 +1,6 @@
 ---
 title: "Ben & Jerry's Sweet Cream Base No. 2"
-tagline: "The richest of the three bases from Ben & Jerry: no eggs, no milk, just cream and sugar. It doesn't keep particularly well, so best to eat it all up."
+tagline: "The richest of the three bases from Ben & Jerry. No eggs, no milk, just cream and sugar. It doesn't keep well, just saying."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 makes: "950 ml"
 prep_time: "5 mins"
@@ -12,7 +12,7 @@ ingredient_groups:
   - items:
     - amount: "480 ml"
       item: whipping cream, about 38% fat
-      note: swapped from the US request for "heavy cream", 36-40% fat
+      note: substituted for the US request for "heavy cream", 36-40% fat
     - amount: "160 ml"
       item: "single cream, about 18% fat"
     - amount: "150 g"
@@ -29,7 +29,7 @@ notes:
     text: "Strictly speaking, the perfect substitution for US \"half-and-half\" would be 100 ml whole milk with 60 ml single cream."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

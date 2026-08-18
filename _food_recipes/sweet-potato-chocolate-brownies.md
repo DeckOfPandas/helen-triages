@@ -4,7 +4,7 @@ tagline: "These don't exactly not taste like sweet potato, but they also taste o
 source: "Adapted from Healthier Baking"
 makes: "16 squares"
 prep_time: "15 mins plus cooling"
-cook_time: "1 hr 30 mins"
+cook_time: "1 hr 30 min, mostly baking the potatoes"
 main_ingredients: ["sweet potatoes", "almond butter", "cocoa powder", "dark chocolate", "maple syrup", "plain flour"]
 star_ingredient: "root veg"
 tags: ["bakes"]
@@ -27,14 +27,14 @@ ingredient_groups:
     - amount: "100 g"
       item: "dark chocolate, 70% cacao, roughly chopped"
 method:
-  - "Roast the sweet potato halves at 180°C fan for 40–50 mins until softened. Leave to cool, then transfer to a food processor and blitz until smooth."
-  - "Combine the puréed sweet potatoes with all the remaining ingredients, except the almonds and 50 g of the dark chocolate. Spoon the batter into a lined and greased 20-cm square tin. Scatter over the almonds or whatever you're using, then bake at 160°C fan for 30–40 mins, or until a skewer collects just a few crumbs. Leave to cool in the tin."
-  - "Melt the chocolate in a bain-marie then drizzle it over the brownies, and leave to cool before serving."
+  - "Roast the sweet potato halves at 180°C fan for 40–50 mins until softened. Leave to cool, then blitz until smooth."
+  - "Combine the puréed sweet potatoes with all the remaining ingredients, except the almonds and 50 g of the dark chocolate. Spoon the batter into a lined and greased 20-cm square tin. Scatter over the almonds or whatever, then bake at 160°C fan for 30–40 mins, or until a skewer collects just a few crumbs. Leave to cool in the tin."
+  - "Melt the chocolate in a bain-marie then drizzle it over the brownies. Leave to cool before serving."
 method_short:
   - ""
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-29"

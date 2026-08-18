@@ -1,6 +1,6 @@
 ---
 title: "Duck Leg and Barley Casserole"
-tagline: "This cooks beautifully in a 40-cm Le Creuset casserole pan (oval), with six duck legs forming one perfect layer."
+tagline: "This cooks beautifully in a 40-cm Le Creuset casserole pan (oval), with six legs forming one perfect duck-y layer."
 source: "Henry"
 serves: "12"
 prep_time: "30 mins"
@@ -55,12 +55,12 @@ method:
   - "Check the seasoning."
   - step: "Add the mushrooms 20 mins before the end."
     note: "Add them too early and they'll turn to mush."
-  - "At the end, the meat will fall off the bones when you remove them."
+  - "At the end, the meat falls off the bones when they're lifted out."
 method_short:
   - ""
 notes:
   - label: "Cooking time"
-    text: "Better the longer you cook it."
+    text: "Better the longer it cooks."
   - label: "Freezing"
     text: "Somehow even better after freezing."
 meta:

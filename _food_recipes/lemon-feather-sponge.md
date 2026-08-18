@@ -32,8 +32,8 @@ method:
   - "Add the lemon juice and zest."
   - "Whisk the egg whites until stiff and shiny but not dry, then fold in with a metal spoon."
   - step: "Scoop the mixture into a lined and sugared 7-inch round tin."
-    note: "This is one of those times when you really do have to line and sugar the tin — the cake will never come out otherwise."
-  - step: "Bake for about 40 mins at 160°C fan until springy and the sides have started to pull away, then leave to cool in the tin for 5 mins. Carefully transfer to a wire rack."
+    note: "This is one of those times when the tin really does have to be lined and sugared — the cake will never come out otherwise."
+  - step: "Bake at 160°C fan for about 40 mins until springy and the sides have started to pull away, then leave to cool in the tin for 5 mins. Carefully transfer to a wire rack."
   - step: "Top with sugar stirred with lemon juice, scoring or pricking the cake first so it all seeps in."
     note: "Also lovely with [Grandma's lemon curd](../grandmas-lemon-curd/)."
 method_short:

@@ -1,6 +1,6 @@
 ---
 title: "Double Chocolate Frap"
-tagline: "Nearly as good as Starbucks, but you can still fit in dinner."
+tagline: "Nearly as good as Starbucks, but leaves room for dinner."
 source: "Helen"
 serves: "2"
 prep_time: "5 mins"
@@ -22,7 +22,8 @@ ingredient_groups:
       item: xanthan gum
     - amount: "250 ml"
       item: whole milk
-    - item: ⅛ tsp vanilla essence
+    - amount: "⅛ tsp"
+      item: vanilla essence
 method:
   - Nutribullet.
 method_short:
@@ -35,7 +36,7 @@ notes:
 meta:
   rewritten: true
   proofread: true
-  awaiting-fix: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-29"
 

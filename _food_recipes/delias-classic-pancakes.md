@@ -15,22 +15,22 @@ ingredient_groups:
     - amount: "2 large"
       item: eggs
     - amount: "210 ml"
-      item: whole milk mixed with 90ml water
+      item: whole milk mixed with 90 ml water
     - amount: "2 tbsp"
       item: melted salted butter
 method:
   - step: "Sift the flour, then make a well in the middle and break the eggs into it."
-    note: This is one of those times when you actually have to sift the flour.
+    note: This is one of those times when the flour actually has to be sifted.
   - "Gently whisk the eggs, slowly incorporating the flour from the sides, adding some milk mixture when it gets too glue-like."
-  - "Keep whisking until you have a plausible batter, but don't worry if there are still a few small lumps."
-  - "Stir in the melted butter when you're ready to start cooking them, but not before."
+  - "Keep whisking until the batter looks plausible, but don't worry if there are still a few small lumps."
+  - "Stir in the melted butter just before cooking starts, not before."
   - "Cook pancakes."
 method_short:
   - ""
 meta:
   rewritten: true
   proofread: true
-  awaiting-fix: true
+  awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 

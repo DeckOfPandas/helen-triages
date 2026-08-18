@@ -18,13 +18,11 @@ ingredient_groups:
     - amount: "3–4"
       item: "whole cloves"
     - amount: "1–2"
-      item: "black peppercorns"
-      note: "optional, for extra heat"
+      item: "black peppercorns, for heat"
     - amount: "2.5-cm piece"
       item: "fresh ginger, thinly sliced"
     - amount: "2 tbsp"
-      item: "loose black tea leaves"
-      note: "preferably Assam or Darjeeling"
+      item: "loose black tea leaves, preferably Assam or Darjeeling"
     - amount: "460 ml"
       item: "whole milk"
       note: "almond and oat milk are good too"
@@ -32,8 +30,8 @@ ingredient_groups:
       item: "golden caster sugar, jaggery or any kind of honey, to taste"
 method:
   - "Put the cardamom, cinnamon, cloves, peppercorns, ginger and 460 ml water in a medium saucepan. Bring to the boil over a medium heat, then simmer for 5–7 mins, longer for stronger."
-  - "Add the tea leaves to the water. Stir well, then simmer for 2–3 mins. The tea will begin to darken and the flavour will start to infuse."
-  - "Pour in the milk and add any sweetener. Bring back to the boil, stirring occasionally so it doesn't boil over. Then reduce the heat and simmer for 2–3 more mins."
+  - "Add the tea leaves. Simmer for 2–3 mins, you know, like when you make, erm, tea."
+  - "Pour in the milk and add any sweetener. Bring back to the boil, stirring so it doesn't boil over. Then reduce the heat and simmer for 2–3 more mins."
   - "Remove from the heat and strain into cups or heatproof glasses using a fine mesh strainer, discarding the tea and spices."
 method_short:
   - ""
@@ -44,7 +42,7 @@ notes:
     text: "Don't over-boil the spices, because they turn bitter fast."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

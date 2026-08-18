@@ -20,7 +20,7 @@ ingredient_groups:
     - amount: "1 tsp"
       item: bicarbonate of soda
     - item: a good pinch of salt
-      note: "don't be shy with the salt — it brings chocolate out amazingly"
+      note: "don't be shy with the salt because it brings chocolate out amazingly"
     - amount: "200 ml"
       item: semi-skimmed milk
     - amount: "1 tbsp"
@@ -47,12 +47,12 @@ method_groups:
   - name: cake
     steps:
     - step: "Sift the flour, cocoa, baking powder and bicarbonate of soda together. Stir in the salt."
-      note: Actually do sift this time, Helen. Cocoa powder is sneaky and you're not above this.
+      note: Actually do sift this time, Helen. I can see you. Cocoa powder is sneaky and you're not above this.
     - Curdle the milk with the lemon juice. Leave it to stand for 5 mins until it thickens slightly.
     - "Cream the butter with the sugar until fluffy, then add some beaten egg, some flour mixture, then some milk mixture bit by bit until all combined. You might not need all the milk."
     - Add the vanilla extract last.
     - Divide the batter evenly between two greased 8-inch round tins — weigh them if you can be bothered — and smooth the tops with the back of a spoon.
-    - Bake for 20–25 mins at 160°C fan until the centres is springy and the sides begin to pull away from the tin.
+    - Bake at 160°C fan for 20–25 mins until the centres are springy and the sides begin to pull away from the tin.
     - step: "Leave to cool in the tins for a few mins, then turn out upside down on a wire rack and prick the bottoms all over with a fork."
       note: "Cooling upside down flattens the tops ready for stacking."
   - name: buttercream filling
@@ -77,7 +77,7 @@ notes:
     text: "Top with icing sugar. Or try [chocolate ganache](../chocolate-ganache/), or simply melted chocolate with salted butter 2:1."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

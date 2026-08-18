@@ -15,7 +15,7 @@ ingredient_groups:
     - amount: "2 large"
       item: "onions, diced"
     - amount: "4 medium"
-      item: "carrots, diced, and extra in chunks if you like them"
+      item: "carrots, diced, and extra in chunks if wanted"
     - amount: "4"
       item: "stalks celery, diced"
     - amount: "4 cloves"
@@ -37,10 +37,10 @@ ingredient_groups:
 method:
   - Toss the chicken in olive oil then season generously.
   - "Sear in batches, 2 mins per side. Remove from pan to rest."
-  - "Sweat onions, carrots and celery until soft and golden, then increase the heat to brown them. Add the garlic when you're 2 mins from done."
+  - "Sweat onions, carrots and celery until soft and golden, then increase the heat to brown them. Add the garlic when 2 mins from done."
   - Return the chicken to the pan.
   - "Add cider to deglaze, leave for 2 mins without increasing the heat, then add the tarragon and bring to the boil. Simmer gently for 40 mins."
-  - "Add more carrots if you like, and turnips and apples, then simmer for 10–15 mins."
+  - "Add more carrots if wanted, and turnips and apples, then simmer for 10–15 mins."
   - "Increase the heat, then add the beans and cook for 5 mins."
   - "Add the crème fraîche, stir to combine, and heat for another 2 mins."
   - Sprinkle the parsley and/or chives to serve.
@@ -59,7 +59,7 @@ notes:
     text: "I never bother peeling vegetables any more because they taste better skin-on. The last time I noticed I was peeling an apple I had an epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I did not continue peeling the apple."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

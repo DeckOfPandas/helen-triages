@@ -48,11 +48,11 @@ method_short:
   - ""
 notes:
    - label: "the importance of drizzle"
-     text: "Making double the marinade gives you extra for drizzling at the end"
+     text: "Making double the marinade leaves extra for drizzling at the end"
 
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

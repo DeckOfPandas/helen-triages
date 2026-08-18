@@ -1,6 +1,6 @@
 ---
 title: "Grandma's Spice Cake"
-tagline: "How can you beat this. Change the spices if you like, but this is the original recipe."
+tagline: "Unbeatable. Change the spices to taste, but this is the original recipe."
 source: "Grandma Kath"
 makes: "one 7-inch round cake"
 prep_time: "10 mins"
@@ -28,7 +28,7 @@ ingredient_groups:
       item: "mixed spice powder"
       note: "mixed spice isn't really sold like this any more, but my [mixed spice powder](../mixed-spice-powder/) is better anyway"
 method:
-  - Cream the butter and sugar thoroughly until fluffy. Longer than you think.
+  - Cream the butter and sugar thoroughly until fluffy — longer than expected.
   - Mix in the beaten egg a little at a time, then the syrup.
   - "Sift the spices with the flour, then fold in with a metal spoon."
   - Gently stir in the milk/bicarb mixture.
@@ -39,7 +39,7 @@ method_short:
   - ""
 notes:
   - label: "Sinking"
-    text: "If the cake sinks in the middle, you added too much syrup."
+    text: "If the cake sinks in the middle, too much syrup."
   - label: "Cracking"
     text: "If the top of the cake cracks, bake at a lower temperature."
 meta:
