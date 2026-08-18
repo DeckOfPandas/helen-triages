@@ -27,7 +27,7 @@ ingredient_groups:
       item: whole cloves
     - amount: "2 heaped tbsp"
       item: plain flour
-    - amount: "2 x 400 g tins"
+    - amount: "2 x 400-g tins"
       item: plum tomatoes
     - amount: "275 ml"
       item: porter
