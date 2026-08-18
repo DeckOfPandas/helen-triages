@@ -79,6 +79,32 @@ modifiers:
   - boneless
   - skinless
   - ready-rolled
+  # SIZE WORDS, added after Helen typed "carr" and got TEN candidates for one
+  # vegetable: carrot, carrots, baby carrots, large carrot, large carrots,
+  # medium carrot, medium-sized carrots, rainbow carrots, small carrots, and
+  # "parsley or carrot tops". Typing "lar" was worse -- thirty-odd entries, all
+  # of them "large something", and a `large (all)` family button offering to
+  # exclude everything big.
+  #
+  # These pass the test cleanly: nothing in the collection is distinguished from
+  # anything else by being large, and nobody excluding carrots means only the
+  # small ones. Size is the clearest case there is of a word that describes the
+  # instance rather than the ingredient.
+  #
+  # Safe on the MATCHING side as well as the display side, which is the thing to
+  # check before adding any modifier: filters.js puts each row's own entries
+  # through buildMasterList too (not just the master list), so "large carrots"
+  # collapses to "carrots" on both sides and excluding "carrots" still hides the
+  # row. A modifier that stripped in the picker but not in the matcher would
+  # silently stop hiding recipes, which is the worst failure this filter has.
+  #
+  # NOT added: "baby". "baby corn" and "corn" are genuinely different products
+  # on a shelf and in a stir-fry, which is the same reason "whole" and "smoked"
+  # were rejected above.
+  - large
+  - medium
+  - medium-sized
+  - small
 
   # "gressingham" is a different KIND of exception to the rest of this list —
   # it's a breed/brand qualifier, not a preparation state, so it doesn't pass
@@ -512,6 +538,9 @@ aliases:
   # from. Nobody excludes "boneless".
   boneless: []
   skinless: []
+  # Same orphan case, from a recipe whose `item:` reduced to a bare size word.
+  # Nobody excludes "large".
+  large: []
   # THE LAST FOUR COMPOUNDS THAT REACH THE LIVE SITE. Helen asked where "butter
   # and apricot jam" had come from; the answer turned out to be worth measuring
   # rather than guessing at, because the shape of the problem changes completely
@@ -544,7 +573,9 @@ aliases:
   all-butter puff pastry sheets: puff pastry
   filo pastry sheets: filo pastry
   lasagne sheets: lasagne
-  small pasta shells: pasta
+  # Keyed on the post-modifier form: `small` is a modifier now, so the raw
+  # "small pasta shells" is already "pasta shells" by the time aliases run.
+  pasta shells: pasta
   casarecce or similar pasta: pasta
   tamarind concentrate or paste: [tamarind concentrate, tamarind paste]
   lemongrass stalk: lemongrass
