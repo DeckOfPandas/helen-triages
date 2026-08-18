@@ -66,8 +66,26 @@
      will silently get NO stylesheet at all — this tag will simply not
      render — rather than falling back to anything. That is worth knowing
      before you add one. {% endcomment %}
+  {% comment %} CACHE-BUSTED ON THE BUILD TIME, and this is not a nicety.
+
+     The URL was a bare /assets/css/<site>.css, so a browser that had ever
+     loaded the page reused its stored copy across every subsequent CSS change.
+     On 2026-08-18 that cost three rounds on issue #333: the rule was correct in
+     the source, correct in the compiled file, and correct in what every local
+     server was serving, while Helen's browser kept painting the old stylesheet
+     — and the symptom was indistinguishable from a fix that had not worked.
+
+     `site.time` is the moment of the build, so it changes on every rebuild and
+     on nothing else. Jekyll's dev server rebuilds on save, so an edit reaches
+     the browser without a hard refresh; a deploy gets a fresh value for free.
+
+     A query string rather than a hashed filename because Jekyll has no asset
+     pipeline here and one is not worth adding for two stylesheets. The cost is
+     that the file is re-fetched after any rebuild even when its bytes are
+     identical — two stylesheets, cheap, and the alternative is what happened
+     above. {% endcomment %}
   {% if this_site %}
-  <link rel="stylesheet" href="{{ '/assets/css/' | append: this_site.css | append: '.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/' | append: this_site.css | append: '.css' | relative_url }}?v={{ site.time | date: '%s' }}">
   {% endif %}
   <meta name="base-url" content="{{ '/' | relative_url }}">
   {% comment %} Read by assets.js only, which exposes it as HTF.site and builds
