@@ -393,6 +393,30 @@ $tc-threshold-height: 1.35rem;
 //
 // text-align rather than a flex row: the <p> is already full width and holds
 // one inline link, so there is nothing to lay out, only something to push over.
+// MAX-WIDTH MUST BE CANCELLED OR text-align DOES NOTHING VISIBLE, and this took
+// three rounds to find because the symptom looks identical to the rule not
+// applying at all. `article.recipe p` sets `max-width: 65ch` -- a measure for
+// PROSE, and correct for every other paragraph in the article. This paragraph
+// is not prose: it is a single short link that belongs to the full width of the
+// chart above it.
+//
+// With the measure in place the <p> is about 400px wide inside a chart nearly
+// four times that, so `text-align: right` aligned the link perfectly -- to the
+// right edge of a box ending in the middle of the chart. Helen reported it
+// three times as "still not right-aligned", and she was right each time: the
+// rule was correct, the box was wrong. Served CSS, served HTML and the DOM
+// nesting all checked out, which is exactly why an inherited constraint from a
+// selector two files away is worth naming here.
+// SCOPED TO .doneness PURELY FOR SPECIFICITY, which is the second half of the
+// same bug. `article.recipe p` is (0,1,2) -- one class, two elements -- and a
+// bare `.doneness-more` is (0,1,0), so it LOSES and the measure stays. Writing
+// `max-width: none` on the bare class changes nothing at all, which would have
+// looked like yet another failed fix. `.doneness .doneness-more` is (0,2,0) and
+// wins on class count. Not !important: the cascade can express this properly.
+.doneness .doneness-more {
+  max-width: none;
+}
+
 .doneness-more {
   font-size: 0.78rem;
   margin: $space-sm 0 0 0;
