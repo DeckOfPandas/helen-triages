@@ -29,7 +29,7 @@ method:
   - "Season the cavity generously with salt, then rub the citrus mix well into the skin and sprinkle some inside. Stuff the zested fruit and a small handful of parsley, thyme and sage sprigs inside as well, and set aside for at least 15 mins."
   - "Brown in a large frying pan, pressing down on the breasts for good contact."
   - "Place the bird in an oven tray, then drizzle with the honey and sprinkle with thyme leaves."
-  - "Roast at 220°C fan for 10 mins, then reduce to 170°C fan for the rest of the calculated time (but check [cooking temperatures](#doneness)). Baste with the pan juices every 30 mins or so. Cover with foil if it starts to brown too much."
+  - "Roast at 220°C fan for 10 mins, then reduce to 170°C fan for the rest of the calculated time (check [internal temperatures chart](#doneness)). Baste with the pan juices every 30 mins or so. Cover with foil if it starts to brown too much."
   - "Remove to rest. Strain off the fat into a large heatproof bowl and retain for another time — at least 1 litre will come off."
   - step: "Rest for at least 30 mins, covered loosely with foil and towels."
     note: "Time to rest is not optional for goose."

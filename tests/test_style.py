@@ -1101,3 +1101,51 @@ def test_oven_temperature_says_fan(recipe):
         f"House style is fan-only -- confirm from the original recipe and "
         f"add \"fan\", e.g. \"180°C fan\"."
     )
+
+
+def test_no_recipe_says_cooking_temperatures(recipe):
+    """"internal temperatures chart", never "cooking temperatures". Issue #352.
+
+    Helen worked out why in #338: "It's not cooking temperatures, it's internal
+    temperatures." The chart measures the inside of the meat; the old phrase
+    named the oven instead, which is a different number and the wrong one to
+    check doneness against.
+
+    A copy rule rather than a data one, so nothing else would catch a
+    reintroduction -- the page builds, the anchor resolves, and the link works.
+    It would simply be wrong, quietly, on the recipes where being wrong matters
+    most: the ones with a meat temperature to check.
+    """
+    body = recipe.path.read_text(encoding="utf-8")
+    assert "cooking temperature" not in body.lower(), (
+        f"{where(recipe)} says 'cooking temperatures'. Use 'internal "
+        f"temperatures chart' -- '(check [internal temperatures chart]"
+        f"(#doneness))' in body copy, and the metadata box adds its own "
+        f"'but check ...' via _layouts/recipe.html. See #352 and #338."
+    )
+
+
+def test_ingredient_group_names_do_not_repeat_for_the(recipe):
+    """The layout supplies "For the ...", so a group must not supply it too.
+
+    Issue #329. `_layouts/recipe.html` renders `For the {{ group.name }}:`,
+    so a group named "for the sauce" becomes "For the for the sauce:". The
+    failure is pure duplication and only visible on a rendered page with more
+    than one ingredient group -- a single-group recipe prints no heading at
+    all, so the mistake can sit in the data indefinitely without showing.
+
+    A group named `variation: ...` is the deliberate exception and skips the
+    prefix entirely, because "For the ..." promises the reader something they
+    have to make. See #342: caramel's second group is the condensed milk for
+    Millionaire's shortbread, which most people making caramel never touch.
+    """
+    groups = recipe.fm.get("ingredient_groups") or []
+    bad = [g.get("name") for g in groups
+           if isinstance(g, dict) and isinstance(g.get("name"), str)
+           and g["name"].strip().lower().startswith("for the")]
+    assert not bad, (
+        f"{where(recipe)} has ingredient group name(s) starting with 'for "
+        f"the': {bad!r}. The layout already adds it, so this renders as 'For "
+        f"the for the ...'. Name the group for its part alone, or prefix it "
+        f"'variation: ' if it is optional (#329)."
+    )

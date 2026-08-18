@@ -48,7 +48,7 @@ method:
   - "Add the wine to deglaze, scrape the bottom of the pan thoroughly, and simmer until reduced by half."
   - "Add the stock and bouquet garni."
   - "Add the duck legs."
-  - "Cover and simmer for about 6 hours (but check [cooking temperatures](#doneness)), checking occasionally. Add more stock if needed."
+  - "Cover and simmer for about 6 hours (check [internal temperatures chart](#doneness)), checking occasionally. Add more stock if needed."
   - "Check the seasoning."
   - "Add the pearl barley."
   - "Cover and simmer again for about 1 hour, to taste."

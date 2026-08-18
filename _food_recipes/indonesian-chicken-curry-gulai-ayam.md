@@ -83,7 +83,7 @@ method_short:
   - ""
 notes:
   - label: "Whole vs ground spices"
-    text: "Much better to use whole spices throughout and grind them yourself after dry-roasting, if you've got the extra 5 mins."
+    text: "Much better to use whole spices throughout and grind them yourself after dry-frying, if you've got the extra 5 mins."
   - label: "Scaling up"
     text: "Lemongrass stalks don't need to be scaled up linearly for larger batches."
   - label: "Flexible cooking time"

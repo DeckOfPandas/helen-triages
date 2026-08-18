@@ -114,7 +114,18 @@ layout: default
     {% if page.cook_time %}
       <li>
         <strong>Cook</strong>
-        <span>{{ page.cook_time }}{% if _temp_spectrum or _internal_temp %}, but check <a href="#doneness">cooking temperatures</a>{% endif %}</span>
+        {% comment %} "internal temperatures chart", not "cooking temperatures"
+           -- issue #352, and #338 is where Helen worked out why the old wording
+           was wrong: "It's not cooking temperatures, it's internal
+           temperatures." The chart measures the inside of the meat, and the
+           old phrase named the oven instead.
+
+           The METADATA BOX keeps the "but check" hedge because it is
+           qualifying the cook time right next to it. Body copy uses the
+           shorter "(check internal temperatures chart)", because by then the
+           reader is mid-step and the contrast has already been made. Two
+           registers on purpose, per #352. {% endcomment %}
+        <span>{{ page.cook_time }}{% if _temp_spectrum or _internal_temp %}, but check <a href="#doneness">internal temperatures chart</a>{% endif %}</span>
       </li>
     {% endif %}
     {% comment %} NO INTERNAL-TEMP CELL HERE ANY MORE. Helen: "I don't like the
@@ -154,8 +165,23 @@ layout: default
 
   {% for group in page.ingredient_groups %}
     {% if multiple_ingredient_groups %}
+      {% comment %} A VARIATION IS NOT A PART OF THE RECIPE, and "For the ..."
+         says that it is. Issue #329: a group named `variation: chocolate chip`
+         renders without the "For the", because that phrasing promises the
+         reader something they must make. Caramel is the live case (#342) --
+         its second group is the condensed milk for Millionaire's shortbread,
+         which most people making caramel will never touch, and "For the
+         millionaire's filling:" reads as a required step.
+
+         No trailing colon on this one, deliberately. The others end in a colon
+         because they are a fragment introducing a list; "Variation: X:" would
+         carry two colons doing different jobs. {% endcomment %}
+      {% assign _is_variation = false %}
+      {% if group.name contains "variation:" %}{% assign _is_variation = true %}{% endif %}
       {% if group.name == "to serve" %}
         <h3 class="recipe-group-heading">To serve:</h3>
+      {% elsif _is_variation %}
+        <h3 class="recipe-group-heading">{{ group.name | capitalize }}</h3>
       {% elsif group.name %}
         <h3 class="recipe-group-heading">For the {{ group.name }}:</h3>
       {% else %}

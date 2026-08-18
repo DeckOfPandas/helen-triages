@@ -18,7 +18,7 @@ ingredient_groups:
     - amount: "3 tbsp"
       item: double cream
     - item: "coarse sea salt"
-  - name: "millionaire's filling"
+  - name: "variation: millionaire's filling"
     items:
     - amount: "200 ml"
       item: condensed milk
