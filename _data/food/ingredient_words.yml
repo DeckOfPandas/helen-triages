@@ -512,6 +512,34 @@ aliases:
   # from. Nobody excludes "boneless".
   boneless: []
   skinless: []
+  # THE LAST FOUR COMPOUNDS THAT REACH THE LIVE SITE. Helen asked where "butter
+  # and apricot jam" had come from; the answer turned out to be worth measuring
+  # rather than guessing at, because the shape of the problem changes completely
+  # depending on which build you look at:
+  #
+  #   local (drafts visible)   1501 candidates, 177 "X and/or Y" compounds
+  #   PRODUCTION                383 candidates,  28 compounds, 6 unaliased
+  #
+  # The picker is fed the DERIVED `item:` free text, and drafts are 253 files of
+  # less-polished prose that no reader ever sees. So the alarming pile is almost
+  # entirely local noise, and the real, live list is small enough to name one at
+  # a time -- which is why there is no general "split on and/or" rule here. Such
+  # a rule would have to handle "caster or granulated sugar" (splitting to
+  # "caster" invents an ingredient) and would be reasoning about 177 strings to
+  # fix 4. Same argument the `measure_phrases` header makes against a general
+  # "strip anything before an of" rule.
+  #
+  # Two of the six needed nothing: "chopped almonds or whatever you prefer"
+  # already resolves through `chopped` + an existing alias, and "sorrel or more
+  # to taste" through a trailing phrase. Checked by running them through the
+  # matcher, not by reading the file.
+  herb sprigs like thyme or rosemary: [thyme, rosemary]
+  plenty of salt and pepper: [salt, pepper]
+  seasonings and flavourings like chicken stock cubes: chicken stock
+  tamari or dark soy sauce: [tamari, dark soy sauce]
+  # Draft-only, so it never reaches the live picker -- aliased anyway because it
+  # is one line and the draft will be published one day.
+  butter and apricot jam: [butter, apricot jam]
   ready-rolled puff pastry: puff pastry
   all-butter puff pastry sheets: puff pastry
   filo pastry sheets: filo pastry
