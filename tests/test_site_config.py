@@ -543,6 +543,38 @@ def test_pantry_entries_are_actually_used():
         pytest.skip("_data/food/pantry.yml does not exist yet")
     pantry = yaml.safe_load(path.read_text(encoding="utf-8")) or []
 
+    # THIS TEST NEEDS THE DRAFTS, AND CI DOES NOT HAVE THEM. `_food_drafts/` is
+    # a separate PRIVATE repository, gitignored here, so a CI checkout contains
+    # the 82 published recipes and none of the 253 drafts.
+    #
+    # That is not a detail: 15 of the 36 pantry entries -- butter, olive oil,
+    # flour, sugar, garlic, water, sea salt among them -- are used ONLY by
+    # drafts. Run against published recipes alone, this test reports them as
+    # dead weight and fails, which is exactly what happened on the first CI run
+    # to gate a deploy (2026-08-18). Every entry was verified used at that
+    # point; none was a typo and none was aspirational. The data was right and
+    # the corpus was incomplete.
+    #
+    # So it skips rather than lying in either direction -- a pass would claim a
+    # check that did not happen, and a failure would blame correct data for the
+    # absence of a private repository. Conditioned on the DRAFTS being missing
+    # rather than on CI, so it runs anywhere the full collection exists and
+    # starts working in CI for free if the drafts ever become visible there.
+    #
+    # test_pantry_entries_are_well_formed below is what CI can still check.
+    if not ALL_DRAFTS:
+        pytest.skip(
+            "_food_drafts/ is absent (private, gitignored repo), so the "
+            "collection here is the 82 published recipes only. 15 pantry "
+            "entries are used exclusively by drafts, so this check cannot be "
+            "evaluated -- it would fail on correct data. Runs on a machine "
+            "with the drafts checked out."
+        )
+    assert ALL_RECIPES, (
+        "No published recipes found either, so there is no corpus at all and "
+        "this test would pass while checking nothing."
+    )
+
     used = set()
     for r in ALL_RECIPES + ALL_DRAFTS:
         for entry in (r.fm.get("main_ingredients") or []):
@@ -555,6 +587,51 @@ def test_pantry_entries_are_actually_used():
         f"Matching is exact — 'onion' does not demote 'red onions'. Either the "
         f"entry is a typo, or it is aspirational and should come out until "
         f"something actually uses it."
+    )
+
+
+def test_pantry_entries_are_well_formed():
+    """What CI can check about pantry.yml without the private drafts repo.
+
+    test_pantry_entries_are_actually_used above needs the full collection and
+    skips without it, which would otherwise leave this file completely
+    unguarded on the only machine that gates the deploy. These three properties
+    need no corpus at all, and each has real consequences in food/index.html,
+    which does a raw `contains` against this list:
+
+      - a DUPLICATE is silent -- the list still works, it is just wrong twice,
+        and the second copy will survive an edit that removes the first;
+      - SURROUNDING WHITESPACE never matches, because the comparison is against
+        a stripped ingredient string, so the entry is dead on arrival;
+      - an EMPTY entry matches nothing and reads as an editing accident.
+    """
+    path = DATA / "pantry.yml"
+    if not path.exists():
+        pytest.skip("_data/food/pantry.yml does not exist yet")
+    pantry = yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    assert pantry, (
+        "_data/food/pantry.yml is empty. Every main_ingredients entry would be "
+        "promoted, which is not a state to reach by accident."
+    )
+
+    problems = []
+    seen = set()
+    for entry in pantry:
+        text = str(entry)
+        if text != text.strip():
+            problems.append(f"{text!r} has surrounding whitespace")
+        if not text.strip():
+            problems.append("an empty entry")
+        key = text.strip().lower()
+        if key in seen:
+            problems.append(f"{text!r} is listed more than once")
+        seen.add(key)
+
+    assert not problems, (
+        "_data/food/pantry.yml:\n  " + "\n  ".join(problems)
+        + "\n\nfood/index.html matches these with a raw `contains` against a "
+          "stripped, lowercased ingredient, so any of these is an entry that "
+          "silently never fires."
     )
 
 
