@@ -171,6 +171,62 @@ icons:
 # it cannot drift: the test fails the moment an icon is added or removed without
 # this list following. Without the test this would be a lie waiting to happen,
 # which is the whole reason the assertion comes with it rather than after it.
+# =============================================================================
+# REAL-WORLD HEIGHTS IN MILLIMETRES — PROVISIONAL, AND HELEN'S TO CORRECT.
+# =============================================================================
+# THESE ARE NOT MEASURED. They are typical heights for each glass type, written
+# by Claude on 2026-08-18 so that the relative-scale view on /dev/glasses/ has
+# something honest to size from. Issue #295 is the real version of this list --
+# the glasses Helen actually owns, with their volumes -- and it SUPERSEDES every
+# number here the moment it exists.
+#
+# WHY THIS IS NOT THE viewBox HEIGHT, which is the obvious thing to use and is
+# wrong. A viewBox records how the artwork was DRAWN, not how big the glass IS,
+# and the two disagree badly: `shot` is drawn 77 units tall against `rocks` at
+# 68, so at viewBox scale a shot glass stands TALLER than a rocks glass. It is
+# about 60mm against 85mm in the real world. Same for `hot-toddy`, drawn
+# shortest of everything at 60 units and actually one of the taller vessels.
+# Helen, 2026-08-18: "Old fashioned glass needs to be smaller, and shot glass
+# much smaller".
+#
+# Separating the two also means the ARTWORK NEVER HAS TO BE REDRAWN to fix a
+# proportion: a wrong size is a number here, not an Inkscape session. That
+# matters because redrawing is how you lose a glass's character by accident.
+#
+# The site itself does NOT use these yet -- it renders every icon at a common
+# 2.6rem height. Issue #298 ("normalise glasses, but not all the same height")
+# is where that changes, and #299 is the proportion pass. This list is what
+# both will need.
+heights_mm:
+  shot: 60
+  old-fashioned: 85
+  rocks: 85
+  old-fashioned-double: 95
+  mule-mug: 105
+  julep-cup: 110
+  punch-bowl: 130
+  brandy: 130
+  hot-toddy: 140
+  nick-and-nora: 140
+  sour: 140
+  coupe: 150
+  sherry: 150
+  highball: 150
+  rocks-tall: 150
+  tiki-mug: 150
+  pineapple: 150
+  absinthe: 160
+  martini: 175
+  margarita: 175
+  goblet: 175
+  collins: 180
+  pina-colada: 180
+  wine: 200
+  hurricane: 200
+  sling: 200
+  pilsner: 220
+  flute: 230
+
 all_icons:
   - absinthe
   - brandy

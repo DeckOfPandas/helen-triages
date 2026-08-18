@@ -25,6 +25,7 @@ with a space after `<svg` anyway, since it costs nothing and the repo has
 been bitten by that assumption before.
 """
 import pathlib, re, shutil, xml.dom.minidom
+import xml.etree.ElementTree as ET
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "tmp" / "cocktail-glasses"   # drop new exports here
@@ -110,43 +111,68 @@ RENAME = {"pineapple-3": "pineapple"}
 # =============================================================================
 
 
-# A nested <g> may carry a leftover editing nudge -- Inkscape writes one when
-# you move a sub-selection. Dropping it moves that part of the artwork, which is
-# the thing this guard exists to prevent, so it is only tolerated when it CANNOT
-# matter: strictly a translate, and smaller than one user unit on every axis.
-# The smallest viewBox in the set is 28 units wide, so one unit is under 4% of
-# the narrowest icon and well under a pixel at any size the site renders. Louder
-# than a silent drop, and it still fails hard on a real transform.
-NEGLIGIBLE_UNITS = 1.0
+# =============================================================================
+# NESTED TRANSFORMS ARE PRESERVED, NOT DROPPED, AND THE SIZE OF ONE IS NOT THE
+# POINT. This was got wrong once, on 2026-08-17, and the wrong version shipped.
+#
+# glass-absinthe.svg wraps 2 of its 6 paths in a second
+# <g transform="translate(-0.3313235)">. The first fix allowed a nested
+# translate to be DISCARDED when it was smaller than one user unit, reasoning
+# that 0.33 units is 0.28px at render size and therefore invisible.
+#
+# That reasoning is wrong, and measurably so. A nested transform applies to a
+# SUBSET of the paths, so its entire purpose is to move that subset RELATIVE to
+# the rest. Absolute magnitude is the wrong test: what matters is that the
+# offset is differential. Those two paths are the small marks on the absinthe
+# glass's stem, and shifting them by a quarter of a pixel while the other four
+# stayed put moved them off-centre by unequal amounts.
+#
+# Measured, because "looks fine" is what produced the bug: mirror-symmetry
+# residual went from 0.27% in Helen's export -- the same as every other glass,
+# which sit between 0.37% and 0.96% -- to 7.60% after normalisation. Helen saw
+# it instantly on the page: "Absinthe glass is asymmetrical."
+#
+# So the group STRUCTURE is now re-emitted as it was found, nesting and all.
+# That is also simpler than the alternative of baking a translate into the path
+# data, which would need a real path parser -- the very thing the guard below
+# was written to avoid.
+# =============================================================================
 
 
-def _negligible_translate(t):
-    m = re.fullmatch(r"\s*translate\(\s*(-?[\d.]+)\s*(?:[, ]\s*(-?[\d.]+)\s*)?\)\s*", t)
-    if not m:
-        return None
-    dx = float(m.group(1))
-    dy = float(m.group(2)) if m.group(2) else 0.0
-    return (dx, dy) if abs(dx) < NEGLIGIBLE_UNITS and abs(dy) < NEGLIGIBLE_UNITS else None
+def _emit(el, out, indent, line_class, seen_paths):
+    """Re-emit the artwork tree, keeping <g transform> nesting exactly as found."""
+    for child in el:
+        tag = child.tag.split("}")[-1]
+        if tag == "g":
+            transform = child.get("transform")
+            if transform:
+                out.append(f'{indent}<g transform="{transform}">')
+                _emit(child, out, indent + "  ", line_class, seen_paths)
+                out.append(f"{indent}</g>")
+            else:
+                # A group with no transform carries no geometry; flatten it.
+                _emit(child, out, indent, line_class, seen_paths)
+        elif tag == "path":
+            d = re.sub(r"\s+", " ", child.get("d", "")).strip()
+            if d:
+                out.append(f'{indent}<path class="{line_class}" d="{d}" />')
+                seen_paths.append(d)
+        else:
+            # defs, sodipodi:namedview, metadata: no artwork, dropped on purpose.
+            _emit(child, out, indent, line_class, seen_paths)
 
 
 def check_nothing_was_dropped(source, out, paths, name):
-    transforms = re.findall(r'\btransform="([^"]*)"', source)
-    if len(transforms) > 1:
-        # The first is the wrapping translate this script re-emits; any others
-        # must each be provably too small to see before they may be discarded.
-        offenders = [t for t in transforms[1:] if _negligible_translate(t) is None]
-        if offenders:
-            raise SystemExit(
-                f"{name}: {len(transforms)} transform attributes ({transforms}). "
-                f"This script re-emits exactly one, on one wrapping <g>, so "
-                f"{offenders} would be silently dropped and the artwork would "
-                f"move. Flatten them in Inkscape first (select all, then "
-                f"Object > Ungroup until only one group remains)."
-            )
-        for t in transforms[1:]:
-            dx, dy = _negligible_translate(t)
-            print(f"   note {name}: dropped nested {t} "
-                  f"({dx:+g},{dy:+g} units, under {NEGLIGIBLE_UNITS} -- invisible)")
+    src_transforms = re.findall(r'\btransform="([^"]*)"', source)
+    out_transforms = re.findall(r'\btransform="([^"]*)"', out)
+    if len(src_transforms) != len(out_transforms):
+        raise SystemExit(
+            f"{name}: {len(src_transforms)} transform(s) in, "
+            f"{len(out_transforms)} out ({src_transforms} vs {out_transforms}). "
+            f"Every transform must survive -- a nested one moves a SUBSET of "
+            f"the paths relative to the rest, so dropping it breaks alignment "
+            f"no matter how small it looks. This is the absinthe bug."
+        )
     for d in paths:
         if re.sub(r"\s+", " ", d).strip() not in out:
             raise SystemExit(f"{name}: a <path d> did not survive normalisation")
@@ -154,11 +180,11 @@ def check_nothing_was_dropped(source, out, paths, name):
         raise SystemExit(
             f"{name}: {len(paths)} paths in, {out.count('<path')} out"
         )
-    if transforms and 'transform="' not in out:
+    if src_transforms and 'transform="' not in out:
         raise SystemExit(
-            f"{name}: source has transform {transforms[0]!r} and the output has "
-            f"none. This is the exact bug the guard exists for -- the artwork "
-            f"will draw outside its viewBox and the icon will render blank."
+            f"{name}: source has transform {src_transforms[0]!r} and the output "
+            f"has none. This is the exact bug the guard exists for -- the "
+            f"artwork will draw outside its viewBox and the icon renders blank."
         )
 
 
@@ -171,35 +197,34 @@ def normalise(text, name, line_class="glass-icon-line"):
     if not paths:
         raise SystemExit(f"{name}: no <path d=...> found -- has the export changed?")
 
-    # THE TRANSFORM IS LOAD-BEARING AND DROPPING IT BREAKS EVERY ICON SILENTLY.
+    # THE TRANSFORMS ARE LOAD-BEARING AND DROPPING ONE BREAKS AN ICON SILENTLY.
     # Inkscape writes its artwork at document coordinates and pulls it back into
     # the viewBox with a translate on a wrapping <g>. Keep the paths' own `d`
-    # untouched and re-emit that translate, rather than trying to rewrite ~104
-    # path strings by hand. The first version of this script dropped the <g>;
-    # every icon then drew hundreds of units outside its own viewBox and
-    # rendered as blank space, with no error from Jekyll, Sass or the browser.
-    g = re.search(r'<g\b[^>]*\btransform="translate\(\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\)"', text)
-    dx, dy = (float(g.group(1)), float(g.group(2))) if g else (0.0, 0.0)
-
-    # The guard for exactly that failure. A rendered icon must actually overlap
-    # the box it declares -- checked here, at generation, because nothing
-    # downstream can see it: the SVG is valid XML, the page builds, the CSS
-    # applies, and the only symptom is an empty gap next to the title.
+    # untouched and re-emit the group structure, rather than trying to rewrite
+    # ~104 path strings by hand. Two separate bugs have come from getting this
+    # wrong: dropping the OUTER <g> made every icon draw hundreds of units
+    # outside its viewBox and render as blank space, and dropping a NESTED one
+    # made the absinthe glass visibly asymmetrical. See the header above.
     out = [
         f'<svg viewBox="{vb.group(1)}" class="glass-icon glass-icon--{name}"',
         '     role="img" aria-hidden="true" focusable="false">',
     ]
-    indent = "  "
-    if dx or dy:
-        out.append(f'  <g transform="translate({dx:g},{dy:g})">')
-        indent = "    "
-    for d in paths:
-        d = re.sub(r"\s+", " ", d).strip()
-        out.append(f'{indent}<path class="{line_class}" d="{d}" />')
-    if dx or dy:
-        out.append("  </g>")
+    seen = []
+    _emit(ET.fromstring(text), out, "  ", line_class, seen)
     out.append("</svg>")
     result = "\n".join(out) + "\n"
+
+    # The guards. A rendered icon must actually carry the artwork it declares --
+    # checked here, at generation, because nothing downstream can see it: the
+    # SVG is valid XML, the page builds, the CSS applies, and the only symptom
+    # is an empty gap next to the title, or a drawing subtly out of true.
+    if len(seen) != len(paths):
+        raise SystemExit(
+            f"{name}: {len(paths)} <path d> in the source, {len(seen)} emitted."
+        )
+    for d in paths:
+        if re.sub(r"\s+", " ", d).strip() not in result:
+            raise SystemExit(f"{name}: a <path d> did not survive normalisation")
     check_nothing_was_dropped(text, result, paths, name)
     return result
 

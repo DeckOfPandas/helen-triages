@@ -388,6 +388,52 @@ def test_all_icons_matches_the_icon_directory():
     )
 
 
+def test_every_icon_has_a_real_world_height():
+    """`heights_mm` must cover every icon, and name no icon that is not there.
+
+    THE FAILURE IS A SILENT ZERO, not an error. /dev/glasses/ sizes its
+    relative-scale view by these millimetres, and Liquid resolves a missing key
+    to nil; `nil | times: 1.0` is 0, so a glass with no height renders at zero
+    height -- an invisible gap in a row of glasses, with nothing to say why.
+    The same nil-arithmetic family as `drink.glass.size == 0` counting zero
+    unglassed drinks while 28 sat unglassed.
+
+    A phantom entry is milder but still wrong: it inflates the tallest-glass
+    figure the whole row is scaled against, so every icon silently shrinks.
+
+    These numbers are PROVISIONAL and Claude wrote them (2026-08-18). Issue #295
+    -- the glasses Helen owns, with volumes -- supersedes them. This test only
+    asserts coverage, never the values: a wrong height is a judgement to be
+    corrected by eye, not something a test can know.
+    """
+    g = _glasses()
+    heights = g.get("heights_mm") or {}
+    listed = g.get("all_icons") or []
+    assert heights, (
+        "glasses.yml has no `heights_mm:`. The relative-scale view on "
+        "/dev/glasses/ would render every icon at zero height."
+    )
+    assert listed, "glasses.yml has no `all_icons:` -- see the sibling test."
+    missing = sorted(set(listed) - set(heights))
+    phantom = sorted(set(heights) - set(listed))
+    assert not missing and not phantom, (
+        "glasses.yml `heights_mm` does not cover the icon set.\n"
+        + (f"  icons with no height: {missing}\n" if missing else "")
+        + (f"  heights for no icon:  {phantom}\n" if phantom else "")
+        + "\nAn icon with no height renders at ZERO height on /dev/glasses/ "
+          "-- an invisible gap, not an error. Add a typical height in mm; it "
+          "does not need to be exact, and #295 will replace the lot."
+    )
+    bad = sorted(f"{k}={v!r}" for k, v in heights.items()
+                 if not isinstance(v, (int, float)) or v <= 0)
+    assert not bad, (
+        "heights_mm values must be positive numbers, not strings:\n  "
+        + "\n  ".join(bad)
+        + "\n\nA quoted number is a string, and Liquid's `times` turns a "
+          "non-numeric string into 0 -- the same invisible-gap failure."
+    )
+
+
 def test_syrup_ratio_is_plausible_for_its_generic():
     """FLAG ONLY. Never rewrite, and never fail on a deliberate choice.
 

@@ -41,16 +41,16 @@ sitemap: false
 {% assign icon_map = site.data.cocktails.glasses.icons %}
 {% assign all_icons = site.data.cocktails.glasses.all_icons %}
 
-{% comment %} Tallest viewBox in the set, so the relative-scale view below can
-   be sized off it without a magic number. Read from the artwork, so it stays
-   right when a taller glass arrives. {% endcomment %}
-{% assign tallest = 0 %}
+{% assign heights = site.data.cocktails.glasses.heights_mm %}
+
+{% comment %} Tallest REAL glass, so the relative-scale view can be sized off it
+   without a magic number. Deliberately NOT the tallest viewBox: a viewBox says
+   how the artwork was drawn, not how big the glass is, and the two disagree —
+   `shot` is drawn taller than `rocks` and is 25mm shorter in the world. {% endcomment %}
+{% assign tallest_mm = 0 %}
 {% for icon in all_icons %}
-  {% capture f %}icons/glasses/{{ icon }}.svg{% endcapture %}
-  {% capture raw %}{% include {{ f }} %}{% endcapture %}
-  {% assign vb = raw | split: 'viewBox="' | last | split: '"' | first | split: ' ' %}
-  {% assign vh = vb[3] | times: 1.0 %}
-  {% if vh > tallest %}{% assign tallest = vh %}{% endif %}
+  {% assign mm = heights[icon] | times: 1.0 %}
+  {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
 {% endfor %}
 
 <article class="dev-swatch">
@@ -82,26 +82,28 @@ sitemap: false
   </div>
 
   {% comment %} ── 2. relative scale, the view #298/#299 actually need ───── {% endcomment %}
-  <h2>2. At relative scale &mdash; one scale factor for every icon</h2>
+  <h2>2. At relative scale &mdash; sized by the real glass, not the drawing</h2>
   <p class="dev-note">
-    The same drawings sized by their own viewBox instead of forced to a common
-    height, sharing a single scale factor, standing on one baseline. This is
-    the view that shows whether the set is drawn to consistent proportions.
-    Read it as a shelf: a shot glass should look shorter than a sling.
+    Every icon scaled by its REAL height in millimetres, on one baseline. Read
+    it as a shelf. Sizing by viewBox instead would be wrong and visibly so:
+    <code>shot</code> is drawn 77 units tall against <code>rocks</code> at 68,
+    so the drawings alone stand a shot glass taller than a rocks glass.
+    <strong>The heights are provisional and not measured</strong> &mdash; typical
+    values, pending issue #295, which is the list of the glasses you actually
+    own. Correcting a proportion here is a number in
+    <code>_data/cocktails/glasses.yml</code>, never a redraw.
   </p>
 
   <div class="dev-scale">
     {% for icon in all_icons %}
       {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
-      {% capture raw %}{% include {{ icon_file }} %}{% endcapture %}
-      {% assign vb = raw | split: 'viewBox="' | last | split: '"' | first | split: ' ' %}
-      {% assign vh = vb[3] | times: 1.0 %}
-      {% assign rem_h = vh | divided_by: tallest | times: 9.0 %}
-      <span class="dev-scale-item" title="{{ icon }} — viewBox height {{ vh | round }}">
+      {% assign mm = heights[icon] | times: 1.0 %}
+      {% assign rem_h = mm | divided_by: tallest_mm | times: 9.0 %}
+      <span class="dev-scale-item" title="{{ icon }} — {{ mm | round }}mm">
         <span class="dev-scale-art" style="height: {{ rem_h }}rem">
           {% include {{ icon_file }} %}
         </span>
-        <span class="dev-scale-label">{{ icon }}<br>{{ vh | round }}</span>
+        <span class="dev-scale-label">{{ icon }}<br>{{ mm | round }}mm</span>
       </span>
     {% endfor %}
   </div>
@@ -154,9 +156,10 @@ sitemap: false
         </div>
         <h3>{{ icon }}</h3>
         <p class="dev-card-meta">
-          {{ vw | round }}&times;{{ vh | round }} &middot;
-          {{ paths }} path{% unless paths == 1 %}s{% endunless %} &middot;
-          {{ technique }}
+          {{ heights[icon] }}mm real &middot; drawn {{ vw | round }}&times;{{ vh | round }}
+        </p>
+        <p class="dev-card-meta">
+          {{ paths }} path{% unless paths == 1 %}s{% endunless %} &middot; {{ technique }}
         </p>
         <p class="dev-card-meta">
           {% if uses == 1 %}1 drink{% else %}{{ uses }} drinks{% endif %}
@@ -242,8 +245,20 @@ sitemap: false
   }
   .dev-scale-item { display: flex; flex-direction: column; align-items: center; }
   .dev-scale-art { display: flex; align-items: flex-end; }
-  /* height comes from the inline style, computed from the viewBox */
+  /* height comes from the inline style, computed from the real-world mm */
   .dev-scale-art svg { height: 100%; width: auto; max-width: none; }
+
+  /* THE STROKE MUST BE SCALED UP WITH THE ICON HERE, AND THIS IS NOT A DETAIL.
+     `vector-effect: non-scaling-stroke` holds the glasses at 1.6 SCREEN pixels
+     however large the icon is drawn — that is correct on the site, where every
+     icon renders at one size. Enlarge them without touching it and the glasses
+     stay hairline while the pineapple, whose lines are geometry rather than
+     stroke, scales normally. The set then looks mismatched and the pineapple
+     looks fat, which is exactly what Helen saw on 2026-08-18 and reported as a
+     pineapple problem. It was this page's problem: the artwork is fine.
+     Values are the site's 1.6 times each view's magnification over 2.6rem. */
+  .dev-scale-art .glass-icon-line { stroke-width: 4.6; }
+  .dev-card-big .glass-icon-line  { stroke-width: 3.7; }
   .dev-scale-label {
     font-size: 0.65rem; opacity: 0.7; text-align: center; margin-top: 0.35rem;
     border-top: 1px solid; padding-top: 0.2rem; min-width: 4rem;
