@@ -29,3 +29,34 @@
     color: $color-recipe-link-hover;
   }
 }
+
+// The licence links (#361) and the GitHub mark (#360) get the same treatment,
+// for the same reason: they are the only other interactive things down here,
+// and they were the only ones that did not move under the cursor. Resting
+// colour untouched -- Helen ruled out magenta AT REST for the footer when the
+// reference links were done, and that ruling covers these too.
+//
+// Same $color-recipe-link-hover rather than raw $color-bright-magenta, so all
+// four footer link types and every body link share one hover value. Living in
+// food/ and not shared/ is not tidiness: $color-recipe-link-hover is declared
+// in _sass/food/_palette.scss and is not one of the nine variables every
+// site's palette guarantees, so shared/_layout.scss cannot name it.
+.site-footer-license a {
+  &:hover,
+  &:focus-visible,
+  &:active {
+    color: $color-recipe-link-hover;
+  }
+}
+
+// The GitHub mark carries its own opacity fade rather than a colour, so the
+// hover has to lift BOTH -- magenta at 0.65 opacity is a muddy pink, not the
+// colour she asked for.
+.site-footer-github {
+  &:hover,
+  &:focus-visible,
+  &:active {
+    opacity: 1;
+    color: $color-recipe-link-hover;
+  }
+}

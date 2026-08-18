@@ -257,9 +257,22 @@
   // slightly darker grey. The resting colour is untouched: Helen asked for
   // this one to be quiet ("lighten the weight") and #277 is about the
   // mouseover and the click, not about the state it sits in.
+  // MAGENTA, NOT THE SECTION'S COBALT, and this reverses half of #277 on
+  // purpose. Issues #287 and #362 -- Helen asked twice, six weeks apart, for
+  // this one to "mouseover in our magenta same as for other links".
+  //
+  // #277 landed it on $color-exclude-active because everything in this section
+  // owns cobalt. That reasoning was about the SECTION; hers is about what the
+  // element IS. "(I know what I don't want)" is a link that opens a panel, and
+  // it reads as a link, so it should behave like every other link on the page.
+  // Cobalt stays where it belongs: the excluded INGREDIENTS inside the panel
+  // (#364, #365), which are results rather than navigation.
+  //
+  // $color-recipe-link-hover, not raw magenta, so it is literally the same
+  // value a link in a method step takes under the cursor.
   &:hover,
   &:active,
-  &:focus-visible { color: $color-exclude-active; }
+  &:focus-visible { color: $color-recipe-link-hover; }
 
   // The keyboard indicator stays, because a colour shift alone is not one --
   // it is the same shift the mouse already causes, so it says "you are
