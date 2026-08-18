@@ -301,17 +301,26 @@ main {
 }
 
 // Bigger, per issue #360. 1.1rem put the GitHub mark at roughly the height of
-// the licence text beneath it, so it read as punctuation rather than as the
-// one graphic element in the footer. 1.6rem is still below the footer hearts
-// and above the type, which is the order of prominence Helen's footer has.
+// the licence text beneath it, so it read as punctuation rather than as the one
+// graphic element in the footer.
+//
+// 1.6rem was the first attempt and was still too timid -- Helen, 2026-08-18,
+// looking at it deployed: it "has gone back to being small". It had not; the
+// deployed stylesheet was byte-identical to the branch. 25.6px simply is not a
+// large enough step from 17.6px to read as a deliberate change next to type
+// this size, which is worth recording because "nothing happened" and "the
+// change was too small to see" produce the same report.
+//
+// 2.2rem (35px) is roughly double the original, and still below the footer
+// heart graphic -- the order of prominence stays hearts, then mark, then type.
 //
 // SHARED ON PURPOSE, unlike the magenta hover next to it in food/_footer.scss.
 // A size is not a palette value, both sites carry the same GitHub link to the
 // same repository, and letting them drift would mean two footers that are
 // almost-but-not-quite the same -- the thing #288 and #289 exist to stop.
 .footer-icon {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 2.2rem;
+  height: 2.2rem;
   fill: currentColor;
 }
 
