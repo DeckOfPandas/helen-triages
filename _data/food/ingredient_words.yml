@@ -54,6 +54,32 @@ modifiers:
   - ground
   - dried
   - leftover
+  # GitHub issue #366. Three more preparation states, each checked against this
+  # list's own test: does stripping it merge two things a cook would treat as
+  # DIFFERENT when deciding what to leave out?
+  #
+  #   boneless / skinless — a butchery state, not a different ingredient. Someone
+  #     excluding chicken thighs means all chicken thighs. These were also the
+  #     worst offenders in the picker: "boneless" and "skinless" were being
+  #     offered as ingredients IN THEIR OWN RIGHT, alongside "boneless chicken
+  #     thighs", "boneless pork shoulder", "boneless skinless salmon fillets" and
+  #     "skinless chicken breasts" — five candidates where there are two
+  #     ingredients. There is already an alias for the single phrase "boneless
+  #     skinless chicken breast", which is the same fix applied one string at a
+  #     time; as modifiers they cover every combination without another entry.
+  #   ready-rolled — exactly like "chopped": a state the shop sold it in.
+  #
+  # NOT added, and deliberately: "free-range", "all-butter", "wholemeal",
+  # "wholewheat", "fresh". Each is a real product distinction someone might
+  # actually be choosing between, and the header above is explicit that
+  # over-stripping silently merges two ingredients and hides recipes the cook
+  # never meant to exclude. "gressingham" below stands as the one breed/brand
+  # exception, at Helen's explicit call, and it says in terms that it is not a
+  # precedent.
+  - boneless
+  - skinless
+  - ready-rolled
+
   # "gressingham" is a different KIND of exception to the rest of this list —
   # it's a breed/brand qualifier, not a preparation state, so it doesn't pass
   # the "no product distinction" test the others do. It's here anyway, at
@@ -458,6 +484,69 @@ family_exceptions:
 # -----------------------------------------------------------------------------
 aliases:
   five-spice powder: five-spice
+  # GitHub issue #366 — "not collapsing over synonyms". Helen sent three
+  # screenshots of the exclude picker; every entry below was a duplicate visible
+  # in one of them. Typing "past" offered FOUR ways to say vanilla paste and
+  # THREE ways to say puff pastry; typing "ss" offered five for lemongrass.
+  #
+  # Aliases rather than new `modifiers`, because each of these is a phrase, and a
+  # modifier is a WORD applied everywhere. "bean" is the clearest case: stripping
+  # it globally would collapse "vanilla bean paste" correctly and butter beans,
+  # broad beans and black beans catastrophically. The phrase is safe where the
+  # word is not.
+  #
+  # A LIST VALUE SPLITS A COMPOUND into its real ingredients, which is the
+  # existing convention here ("beef or venison stock"). Recipes written as "X or
+  # Y" are the underlying problem and are worth fixing in the data eventually,
+  # but the picker has to survive them because they will keep being written.
+  vanilla bean paste: vanilla paste
+  vanilla bean paste or extract: [vanilla paste, vanilla extract]
+  vanilla extract or paste: [vanilla extract, vanilla paste]
+  # AN EMPTY LIST DROPS AN ENTRY, and these two need dropping rather than
+  # renaming. "boneless" and "skinless" appear in the derived vocabulary as
+  # ingredients in their own right, because the upstream split breaks
+  # "boneless, skinless chicken thighs" at the comma and leaves the adjectives
+  # standing alone. Adding them to `modifiers` fixes the compound forms
+  # ("boneless chicken thighs" -> "chicken thighs") but cannot help here: a
+  # modifier is stripped FROM something, and there is nothing left to strip it
+  # from. Nobody excludes "boneless".
+  boneless: []
+  skinless: []
+  ready-rolled puff pastry: puff pastry
+  all-butter puff pastry sheets: puff pastry
+  filo pastry sheets: filo pastry
+  lasagne sheets: lasagne
+  small pasta shells: pasta
+  casarecce or similar pasta: pasta
+  tamarind concentrate or paste: [tamarind concentrate, tamarind paste]
+  lemongrass stalk: lemongrass
+  lemongrass stalks: lemongrass
+  stalks lemongrass: lemongrass
+  guinness or other stout: [guinness, stout]
+  camp coffee or espresso: [camp coffee, espresso]
+  espresso or 30 ml very strong coffee: espresso
+  espresso coffee: espresso
+  pure coconut or flavourless oil: [coconut oil, flavourless oil]
+  soda water if possible: soda water
+  each turmeric: turmeric
+  each ground cumin and ground turmeric: [cumin, turmeric]
+  turkey breast mince: turkey mince
+  mature cheddar cheese: mature cheddar
+  naturally brewed soy sauce: soy sauce
+  kale or cabbage or a mixture: [kale, cabbage]
+  natural/organic vegetable or chicken stock cube: [vegetable stock, chicken stock]
+  # The yoghurts collapse to one because the fat level and the culture are not
+  # what anyone is excluding — "no yoghurt" is the decision being made. Left
+  # deliberately as `natural yoghurt` rather than bare `yoghurt`, because the
+  # collection also has sweetened and flavoured yoghurts that ARE a different
+  # answer to "what do I not want".
+  full-fat natural bio yoghurt: natural yoghurt
+  full-fat natural yoghurt: natural yoghurt
+  low-fat natural yoghurt: natural yoghurt
+  natural bio yoghurt: natural yoghurt
+  thick natural yoghurt: natural yoghurt
+  unsweetened natural yoghurt: natural yoghurt
+  gel- or paste-based colouring if wanted: food colouring
   # GitHub issue #273 — the derived vocabulary's compounds and prep states.
   almonds or whatever you prefer: almonds
   barley or brown rice miso: miso
@@ -528,7 +617,11 @@ aliases:
   sugar or honey: [sugar, honey]
   sunflower oil or butter: [sunflower oil, butter]
   toasted sesame oil or vegetable oil: [sesame oil, vegetable oil]
-  vanilla bean paste or vanilla extract: [vanilla bean paste, vanilla extract]
+  # Targets `vanilla paste`, not `vanilla bean paste`: the latter is itself an
+  # alias source now (#366), and pointing one alias at another alias's KEY left
+  # a stray "vanilla bean paste" candidate beside the collapsed one. Aliases
+  # are applied once, not chased.
+  vanilla bean paste or vanilla extract: [vanilla paste, vanilla extract]
   vanilla or almond extract: [vanilla, almond extract]
   whipped cream or crème fraîche: [whipped cream, crème fraîche]
   white wine or cider vinegar: [white wine, cider vinegar]
