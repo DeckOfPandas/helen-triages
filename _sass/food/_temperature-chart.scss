@@ -385,9 +385,18 @@ $tc-threshold-height: 1.35rem;
   margin: 0 0 $space-md 0;
 }
 
+// RIGHT-ALIGNED, per issue #333. On a recipe page this link is the last thing
+// in the chart, and left-aligned it sat directly above the footer's own left-
+// aligned links -- Helen: "so it doesn't feel too close to the footer links".
+// Two left-aligned link lines a short gap apart read as one group, and this one
+// belongs to the chart above it rather than to the page furniture below.
+//
+// text-align rather than a flex row: the <p> is already full width and holds
+// one inline link, so there is nothing to lay out, only something to push over.
 .doneness-more {
   font-size: 0.78rem;
   margin: $space-sm 0 0 0;
+  text-align: right;
 }
 
 // THE RECIPE'S OWN SUGGESTION IS MARKED, NOT ISOLATED. It keeps its place on the

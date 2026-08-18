@@ -131,15 +131,26 @@ article.recipe .recipe-body-content {
   // and negative margins sum when they collapse, they don't take the max of
   // one positive and one negative).
   //
-  // Below: bumped from $space-lg (1rem, too tight -- read as the first line
-  // of the paragraph that followed) to $spacing-section-gap, matching the
-  // real tagline's gap to .recipe-meta exactly rather than a value picked
-  // to look roughly separated.
+  // Below: $space-xl, and it has now been wrong in BOTH directions, which is
+  // why the middle value is written down rather than re-derived next time.
+  // $space-lg (1rem) was too tight -- the subtitle read as the first line of
+  // the paragraph that followed. $spacing-section-gap (3rem) was reached for
+  // because it matches the real tagline's gap to .recipe-meta exactly, and
+  // overshot: issue #339, Helen -- "I think it's retaining the same gap as
+  // under the rest of the page's headings, but it isn't a heading so this gap
+  // feels like a yawning chasm."
+  //
+  // The tagline comparison was the flaw in that reasoning. A page tagline sits
+  // under the TITLE with the whole page below it, so 3rem reads as the end of
+  // a masthead. This one sits under a section heading with that section's own
+  // first paragraph directly beneath, and the same measurement reads as a
+  // missing paragraph. 1.5rem is clearly more than the line gap above it and
+  // clearly less than a section break.
   .recipe-section-subtitle {
     font-size: 0.9rem;
     font-style: italic;
     color: lighten($color-text, 20%);
-    margin: -0.75rem 0 $spacing-section-gap 0;
+    margin: -0.75rem 0 $space-xl 0;
   }
 
   // The quiet sub-level: the about page's FAQ questions, and any h3 a reference

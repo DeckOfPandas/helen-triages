@@ -22,10 +22,33 @@
 // line opens with its yellow-highlighted amount, so the highlights themselves
 // form the column your eye runs down — a marker that carries information rather
 // than one that only marks the start of a line.
+// HANGING INDENT, so a wrapped line does not restart under the amount column.
+// Issue #345: a long note wrapped to a second line that began flush left,
+// directly under the highlighted amount above it, so it read as the start of a
+// new ingredient rather than the continuation of the note.
+//
+// WHY THIS IS A FIXED INDENT AND NOT ALIGNED TO THE NOTE'S OWN START, which is
+// what #345 actually asked for. That was tried, as issue #77, and reverted --
+// the post-mortem is in _recipe-annotations.scss. `display: inline-block` on
+// the annotation makes it size shrink-to-fit against the full containing block
+// rather than the room left after the arrow, so a SHORT ingredient with a LONG
+// note computed a wide preferred width, no longer fitted on the current line,
+// and dropped the whole box to a fresh line with the arrow dangling above it.
+// Aligning to the note's start has no clean solution while the note flows
+// inline, because that start position differs on every row. Helen chose the
+// fixed indent over a two-column grid, 2026-08-18, the grid being a change to
+// the shape of the whole list rather than to the wrapping.
+//
+// $space-xl (1.5rem) DELIBERATELY SITS BELOW the $space-xxl (2rem) group
+// indent. A wrapped line therefore never lands at the same x as a grouped
+// ingredient, so a continuation can't be misread as a nested group -- the one
+// way this could trade a small ambiguity for a worse one.
 .ingredients li {
   margin-bottom: $space-md;
   line-height: 1.5;
   position: relative;
+  padding-left: $space-xl;
+  text-indent: -$space-xl;
 }
 
 // --- Group indent ------------------------------------------------------------
