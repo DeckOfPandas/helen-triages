@@ -131,9 +131,32 @@
       return displayNameMap[fold(ing.toLowerCase())] || ing;
     }
 
+    // A MODIFIER THAT IS HALF OF A COORDINATED PAIR IS NOT A LEADING MODIFIER,
+    // and stripping it leaves a fragment rather than an ingredient. GitHub
+    // issue #366.
+    //
+    // "fresh or frozen cranberries" means cranberries in either state. Take the
+    // "fresh" off and what is left is "or frozen cranberries", which is not a
+    // thing anyone can decide to exclude — it reads as an editing accident,
+    // because it is one. Same for "large or 2 small leeks".
+    //
+    // This only became reachable when `fresh`, `large` and `small` joined the
+    // modifier list: the original five (chopped, crispy, ground, dried,
+    // leftover) are states you would not write on one side of an "or". Eleven
+    // fragments appeared the moment they did.
+    //
+    // Leaving the phrase whole is the right answer rather than a fallback: it
+    // stays one candidate, it still reads as English, and if it deserves
+    // splitting into two ingredients that is what `aliases` is for — a named
+    // phrase judged one at a time, which is what the whole file prefers to a
+    // rule applied sight unseen.
+    var COORDINATOR = /^(?:or|and)$/i;
+
     function stripModifiers(ing) {
       var words = ing.split(/\s+/);
-      while (words.length > 1 && modifierSet.has(fold(words[0].toLowerCase()))) {
+      while (words.length > 1
+             && modifierSet.has(fold(words[0].toLowerCase()))
+             && !COORDINATOR.test(words[1])) {
         words.shift();
       }
       return words.join(' ');
