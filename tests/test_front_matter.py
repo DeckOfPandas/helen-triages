@@ -421,3 +421,104 @@ def test_scalar_fields_are_quoted(recipe):
         f"{where(recipe)} has unquoted scalar front-matter value(s): {bad!r}. "
         f'Wrap each in double quotes, e.g. title: "Beef Wellington".'
     )
+
+
+# =============================================================================
+# PROVENANCE: IF AN AGENT WAS LAST TO TOUCH A RECIPE, IT IS NOT PROOFREAD.
+# GitHub issue #367.
+# =============================================================================
+# Helen is the last human judgement before a recipe publishes. If Claude edited
+# a file after she blessed it, the blessing no longer covers what is in the
+# file -- so `meta.proofread` must go back to false in the same commit that
+# made the edit.
+#
+# WHY THIS IS A TEST AND NOT ONLY A WRITTEN RULE. A written rule works when the
+# agent reads and follows it, which is precisely what failed on 2026-08-18:
+# twelve proofread recipes were edited without their flags being touched, and
+# nothing anywhere noticed. The flag is the gate the whole publish decision
+# hangs off (#331), so it cannot depend on good intentions.
+#
+# GRANDFATHERED, ON PURPOSE. Everything up to and including the baseline commit
+# below is exempt. Helen's call, 2026-08-18: those 34 recipes include the 45
+# second-person changes she reviewed one at a time and decided personally, so
+# she WAS the last judgement even though an agent's commit wrote the bytes.
+# Flipping them would mean re-proofreading work she had just finished. The rule
+# applies from the baseline forward.
+#
+# Ancestry, not dates, decides what is grandfathered -- a rebase rewrites dates
+# but not the shape of history.
+import pathlib
+import subprocess
+
+from conftest import FRONT_MATTER
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+BASELINE_COMMIT = "dc2a7bf"   # (content) restore the voice where the "you" pass flattened it
+AGENT_TRAILER = "co-authored-by: claude"
+
+
+def _git(*args):
+    return subprocess.run(["git", *args], capture_output=True, text=True,
+                          cwd=ROOT).stdout
+
+
+def test_agent_edited_recipes_are_not_marked_proofread():
+    """A recipe whose newest commit is an agent's must have proofread: false."""
+    assert (ROOT / ".git").exists(), "Not a git checkout -- this test cannot run."
+    assert "true" not in _git("rev-parse", "--is-shallow-repository").lower(), (
+        "This is a SHALLOW clone, so `git log` cannot see who last touched each "
+        "recipe and this test would silently check almost nothing. Fetch full "
+        "history (actions/checkout needs `fetch-depth: 0`)."
+    )
+
+    # Newest commit per recipe, in one pass.
+    last: dict[str, str] = {}
+    sha = None
+    for line in _git("log", "--format=%H", "--name-only", "--", "_food_recipes/").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if len(line) == 40 and all(c in "0123456789abcdef" for c in line):
+            sha = line
+        elif line.endswith(".md"):
+            last.setdefault(line, sha)
+
+    assert last, (
+        "No recipe history found at all. This test would pass while checking "
+        "nothing, which is the failure mode tests/test_suite_hygiene.py exists "
+        "to prevent."
+    )
+
+    base = BASELINE_COMMIT
+    agent_commit: dict[str, bool] = {}
+    offenders, checked = [], 0
+
+    for relpath, commit in sorted(last.items()):
+        path = ROOT / relpath
+        if not path.exists():
+            continue                                  # renamed or deleted since
+        # Grandfathered: at or before the baseline.
+        if subprocess.run(["git", "merge-base", "--is-ancestor", commit, base],
+                          cwd=ROOT, capture_output=True).returncode == 0:
+            continue
+        if commit not in agent_commit:
+            body = _git("show", "-s", "--format=%B", commit).lower()
+            agent_commit[commit] = AGENT_TRAILER in body
+        if not agent_commit[commit]:
+            continue                                  # Helen's own commit
+        checked += 1
+        raw = path.read_text(encoding="utf-8")
+        match = FRONT_MATTER.match(raw)
+        meta = (yaml.safe_load(match.group(1)) or {}).get("meta", {}) or {}
+        if meta.get("proofread") is not False:
+            offenders.append(f"{relpath} (last touched by {commit[:8]})")
+
+    assert not offenders, (
+        "Recipe(s) last edited by an agent but still marked proofread:\n  "
+        + "\n  ".join(offenders)
+        + "\n\nAn agent editing a recipe invalidates Helen's proofread of it, so "
+          "the SAME commit must set `meta.proofread: false` (issue #367). If the "
+          "change was reviewed by Helen line by line, move BASELINE_COMMIT in "
+          "this file forward instead, and say so in the commit message."
+    )
