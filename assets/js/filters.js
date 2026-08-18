@@ -218,31 +218,6 @@ document.addEventListener('DOMContentLoaded', function () {
     items.forEach(function(li) { recipeList.appendChild(li); });
   }
 
-  // Whether a row's ingredient line is ACTUALLY truncated by its line-clamp,
-  // not just short. CSS has no selector for "this box's content overflowed
-  // it" — mask-image can't conditionally apply itself — so this measures
-  // scrollHeight against clientHeight directly and flags the ones that really
-  // are cut off. Hidden rows (display:none, offsetParent null) are skipped:
-  // they measure 0/0 either way, and get measured again once a filter or
-  // page change makes them visible, because this runs at the end of update().
-  //
-  // GitHub issue #93: Helen saw the fade on rows that read as fully visible,
-  // not just genuinely clamped ones -- "each recipe row", not "some". A
-  // -webkit-box + -webkit-line-clamp box's scrollHeight vs. clientHeight
-  // comparison is a known source of exactly this kind of false positive:
-  // sub-pixel line-height rounding can put scrollHeight a pixel or two above
-  // clientHeight even when nothing is actually cut off, especially at
-  // fractional device pixel ratios. +1 wasn't enough headroom; +3 is more
-  // forgiving of that rounding while still catching genuine overflow, which
-  // is never a near-miss (a whole clamped line is comfortably taller than a
-  // few px). Not fully verifiable without a browser -- please check locally.
-  function updateIngredientClamp() {
-    document.querySelectorAll('.recipe-list .ingredient-list').forEach(function(el) {
-      if (el.offsetParent === null) return;
-      el.classList.toggle('is-clamped', el.scrollHeight > el.clientHeight + 3);
-    });
-  }
-
   var rawIngredientStrings = [];
   items.forEach(function(li) {
     var rawIng = li.dataset.ingredients || '';
@@ -900,8 +875,8 @@ function renderResultsPool() {
     // Null-guarded like every other lookup in this function. It was the one
     // exception among roughly fifteen, and the consequences were out of all
     // proportion to the omission: on a page without this element update()
-    // threw HERE, three statements before updateInlineLabels(),
-    // syncAriaPressed() and updateIngredientClamp(), so three unrelated
+    // threw HERE, three statements before updateInlineLabels() and
+    // syncAriaPressed(), so two unrelated
     // things silently stopped happening and nothing said why.
     var emptyMessage = document.querySelector('.recipe-list-empty');
     if (emptyMessage) {
@@ -943,7 +918,6 @@ function renderResultsPool() {
     updateIngredientClear();
     renderExcludeActive(excludedCount);
     syncAriaPressed();
-    updateIngredientClamp();
   }
 
   function updateInlineLabels() {
@@ -1149,17 +1123,6 @@ function renderResultsPool() {
       update(true);
     });
   }
-
-  // Line-clamp changes from 1 line to 2 at the 600px breakpoint, so a resize
-  // can flip whether a row is genuinely overflowing. Debounced: resize fires
-  // continuously while dragging, and re-measuring every .ingredient-list on
-  // every one of those events is wasted work for a value that only matters
-  // once the drag settles.
-  var resizeTimer = null;
-  window.addEventListener('resize', function() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(updateIngredientClamp, 120);
-  });
 
   // GitHub issue #40: `/food/?star=lamb&tag=soup` arrives already filtered.
   // The grammar is assets/js/filter-state.js's; what belongs HERE is the

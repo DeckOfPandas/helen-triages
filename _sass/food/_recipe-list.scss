@@ -143,17 +143,25 @@
 // height instead of stacking to however many lines that recipe's ingredient
 // count happens to need. One line on wide screens; two on narrow ones, where a
 // single line holds too little to be useful for the recall-lookup case ("the
-// one with the sorrel") this list exists to serve. Faded rather than an
-// ellipsis, in the same spirit as the metadata tint: a soft edge rather than a
-// hard stop, so a clipped line doesn't read as an error.
+// one with the sorrel") this list exists to serve.
 //
-// The fade ONLY applies with .is-clamped, which filters.js sets by actually
-// measuring scrollHeight against clientHeight. A fixed always-on feather was
-// tried first and was visibly wrong: it faded the bottom of every row a
-// little whether or not that row was truncated, so a short, complete
-// ingredient list looked like it was fading out for no reason. CSS alone
-// can't tell "genuinely overflowing" from "short and done" -- there's no
-// selector for it -- so the measurement has to happen in JS.
+// THE VERTICAL FADE IS GONE. Issue #346 -- Helen: "main_ingredients line fades
+// out downwards, but should not do so."
+//
+// It was a `mask-image: linear-gradient(to bottom, ...)` applied when JS
+// measured the row as overflowing, and the intent was a soft edge rather than a
+// hard stop. The intent did not survive contact with `-webkit-line-clamp`,
+// which cuts at a LINE BOUNDARY and adds its own ellipsis. There is never a
+// half-visible line for a bottom fade to soften -- so all the mask could reach
+// was the bottom of the glyphs on the last full line, shaving the descenders
+// off a line that was not truncated vertically at all. The truncation it was
+// trying to signal is HORIZONTAL, and the ellipsis already signals it: the row
+// in Helen's screenshot ends "coriander, cumin,…".
+//
+// Removed rather than turned sideways. A `to right` fade would fight the
+// ellipsis for the same few pixels, and the ellipsis is the clearer of the two.
+// filters.js's .is-clamped measurement went with it: this rule was its only
+// consumer, and a class nothing reads is a measurement nobody can see.
 .ingredient-list {
   font-family: $font-body;
   font-size: 0.86rem;
@@ -165,11 +173,6 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-
-  &.is-clamped {
-    mask-image: linear-gradient(to bottom, black calc(100% - 7px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 7px), transparent 100%);
-  }
 
   @media (max-width: 600px) {
     -webkit-line-clamp: 2;
