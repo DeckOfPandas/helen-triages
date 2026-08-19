@@ -522,3 +522,62 @@ def test_agent_edited_recipes_are_not_marked_proofread():
           "change was reviewed by Helen line by line, move BASELINE_COMMIT in "
           "this file forward instead, and say so in the commit message."
     )
+
+
+# =============================================================================
+# THE PUBLISH GATE'S DATA SIDE — GitHub issue #331
+# =============================================================================
+# _plugins/hide_awaiting_fix.rb reads `meta.awaiting_fix` and drops the document
+# when it is exactly `true`. tests/test_site_config.py guards the MECHANISM
+# (plugin present, configs disagreeing correctly, workflow still plugin-capable).
+# These two guard the DATA the mechanism reads, and both failure modes are
+# silent: the page publishes, and nothing anywhere says why.
+
+def test_every_recipe_declares_awaiting_fix():
+    """The flag is present on every recipe, so its absence is never the answer.
+
+    An absent key reads as "not flagged" and publishes, which is the right
+    DEFAULT but the wrong way to arrive at it: you cannot tell a recipe nobody
+    has considered from one deliberately cleared. Helen sets this during
+    proofreading, and a recipe that never got the field never went through that.
+    """
+    missing = []
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        meta = (yaml.safe_load(FRONT_MATTER.match(raw).group(1)) or {}).get("meta", {}) or {}
+        if "awaiting_fix" not in meta:
+            missing.append(path.name)
+    assert not missing, (
+        "Recipe(s) with no `meta.awaiting_fix` key:\n  " + "\n  ".join(missing)
+        + "\n\nAdd `awaiting_fix: false`. Absent reads as not-flagged and "
+          "publishes, which is the right default reached the wrong way -- it "
+          "makes 'nobody considered this' indistinguishable from 'deliberately "
+          "cleared'."
+    )
+
+
+def test_awaiting_fix_is_a_real_boolean():
+    """`awaiting_fix: "true"` is a STRING and the gate ignores it.
+
+    THIS IS THE SILENT ONE. The plugin drops a document when
+    `meta["awaiting_fix"] == true` -- Ruby's `true`, not a truthy value. A
+    quoted "true", or YAML's `yes` resolving to a string in some parsers, is not
+    equal to it, so the page you flagged publishes and the build stays green.
+    You would only find out by looking at the live site.
+
+    Same family as _data/cocktails/taxonomy.yml's `ship_scale`, where a bare
+    `yes` parsed as the BOOLEAN True and silently failed every comparison
+    against the string "yes" -- the same trap pointing the other way.
+    """
+    bad = []
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        meta = (yaml.safe_load(FRONT_MATTER.match(raw).group(1)) or {}).get("meta", {}) or {}
+        if "awaiting_fix" in meta and not isinstance(meta["awaiting_fix"], bool):
+            bad.append(f"{path.name}: {meta['awaiting_fix']!r} ({type(meta['awaiting_fix']).__name__})")
+    assert not bad, (
+        "`meta.awaiting_fix` must be an unquoted true/false:\n  " + "\n  ".join(bad)
+        + "\n\nThe plugin compares with `== true`, so a string never matches "
+          "and the page publishes despite being flagged -- silently, with a "
+          "green build. Never quote this value."
+    )

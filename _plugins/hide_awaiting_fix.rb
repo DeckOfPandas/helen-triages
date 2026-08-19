@@ -1,7 +1,7 @@
 # =============================================================================
 # DO NOT PUBLISH A RECIPE THAT IS WAITING ON A FIX. GitHub issue #331.
 # =============================================================================
-# `meta.awaiting-fix: true` means "there is a known, open problem with this
+# `meta.awaiting_fix: true` means "there is a known, open problem with this
 # page". Such a page must not reach the live site -- but everything else must,
 # because the alternative is holding the whole site back until every open issue
 # is closed, which is how a site never ships.
@@ -25,7 +25,7 @@
 #
 # WHY A PLUGIN AND NOT `published: false` IN FRONT MATTER. Jekyll's own
 # `published` key would do this, but it is a SECOND field saying the same thing
-# as `meta.awaiting-fix`, and two fields that must agree will eventually
+# as `meta.awaiting_fix`, and two fields that must agree will eventually
 # disagree -- silently, and in the direction that publishes the broken page.
 # One field, enforced in one place.
 #
@@ -45,7 +45,7 @@ Jekyll::Hooks.register :site, :post_read do |site|
   site.collections.each_value do |collection|
     collection.docs.reject! do |doc|
       meta = doc.data["meta"]
-      flagged = meta.is_a?(Hash) && meta["awaiting-fix"] == true
+      flagged = meta.is_a?(Hash) && meta["awaiting_fix"] == true
       hidden << doc.relative_path if flagged
       flagged
     end
@@ -55,7 +55,7 @@ Jekyll::Hooks.register :site, :post_read do |site|
     # Announced, never silent. A page vanishing from a build is precisely the
     # kind of thing that should be impossible to do by accident, and the count
     # is the only evidence in the log that the gate did anything at all.
-    Jekyll.logger.info "awaiting-fix:", "held back #{hidden.length} page(s) " \
+    Jekyll.logger.info "awaiting_fix:", "held back #{hidden.length} page(s) " \
                                         "-- #{hidden.join(', ')}"
   end
 end

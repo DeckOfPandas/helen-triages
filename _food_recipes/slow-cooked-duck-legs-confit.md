@@ -1,5 +1,5 @@
 ---
-title: "Slow-Cooked Confit Duck Legs"
+title: "Slow-Cooked Duck Legs Confit"
 tagline: "Duck legs cured overnight with salt, garlic and thyme, slow-cooked in their own fat, then finished in a hot pan."
 source: "Adapted from Pinch and Swirl"
 makes: "however many you make"
@@ -35,7 +35,7 @@ method_short:
 meta:
   rewritten: true
   proofread: false
-  awaiting-fix: false
+  awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 

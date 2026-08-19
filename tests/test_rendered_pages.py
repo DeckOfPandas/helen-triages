@@ -429,3 +429,51 @@ def test_every_text_input_on_the_index_has_state_behind_it(site):
             f"nothing in filters.js ever assigns state.{field}, so typing in "
             f"#{box_id} leaves the state untouched and clear-all stays hidden."
         )
+
+
+def test_the_awaiting_fix_gate_fires_in_the_production_build(prod_site):
+    """Flagged recipes are absent from the production build; unflagged are present.
+
+    GitHub issue #331. tests/test_site_config.py checks the gate's PARTS exist
+    and tests/test_front_matter.py checks the DATA is well formed. This is the
+    only one that checks the gate actually does anything, against a real
+    production build -- the same place the swatch-page bug (#276) was invisible
+    until someone looked at the output rather than the source.
+
+    BOTH DIRECTIONS ON PURPOSE. The flagged half is the feature. The UNFLAGGED
+    half is what stops the fix being "hide everything": a plugin that dropped
+    every document would satisfy the flagged assertion perfectly and take the
+    site down, and with no recipe currently flagged that would be the only
+    assertion running.
+    """
+    import yaml as _yaml
+    import re as _re
+
+    flagged, clear = [], []
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        fm = _re.match(r"\A---\n(.*?)\n---", raw, _re.S)
+        meta = (_yaml.safe_load(fm.group(1)) or {}).get("meta", {}) or {}
+        (flagged if meta.get("awaiting_fix") is True else clear).append(path.stem)
+
+    assert clear, (
+        "No unflagged recipes at all -- this test would pass while checking "
+        "nothing, which is what tests/test_suite_hygiene.py exists to prevent."
+    )
+
+    published = [s for s in flagged if (prod_site / "food" / "recipes" / s / "index.html").exists()]
+    assert not published, (
+        "Recipe(s) flagged `meta.awaiting_fix: true` were PUBLISHED anyway:\n  "
+        + "\n  ".join(published)
+        + "\n\nThe gate has failed open. Check _plugins/hide_awaiting_fix.rb "
+          "still reads `awaiting_fix`, that _config.yml sets "
+          "`show_awaiting_fix: false`, and that the build is not running in "
+          "Jekyll's safe mode, which ignores _plugins/ without warning."
+    )
+
+    vanished = [s for s in clear if not (prod_site / "food" / "recipes" / s / "index.html").exists()]
+    assert not vanished, (
+        "Unflagged recipe(s) missing from the production build:\n  "
+        + "\n  ".join(vanished)
+        + "\n\nThe gate is over-firing, or something else is dropping documents."
+    )

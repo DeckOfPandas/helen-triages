@@ -264,7 +264,7 @@ notes:                           # always a list, never a blob
 meta:
   rewritten: false
   proofread: false               # false = Helen has not blessed THIS text
-  awaiting-fix: false            # true  = do not publish this page at all
+  awaiting_fix: false            # true  = do not publish this page at all
   cooked_before: false
   date_last_edited: "2026-07-29"
 ```
@@ -328,7 +328,7 @@ own uncommitted typo fixes on 2026-08-18, which put *her* edit inside an
 agent-co-authored commit and correctly tripped the rule. The repository cannot
 tell your edit from hers; only the staging can.
 
-**`awaiting-fix: true` means the page does not publish. At all.**
+**`awaiting_fix: true` means the page does not publish. At all.**
 
 `_plugins/hide_awaiting_fix.rb` removes the document from its collection at
 `:post_read`, so it gets no URL, no sitemap entry, and no place in
