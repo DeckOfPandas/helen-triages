@@ -2,9 +2,16 @@
 
 **Helen Triages** — a Jekyll mono-repo serving two personal decision-support
 sites. **Food** answers *what shall we cook*, not *how do I cook*. **Cocktails**
-is its sibling, scaffolded but not yet written. Written 2026-08-02. Supersedes
-v25 — deleted, not kept, per house practice: this file has no back-catalogue,
-only the current version.
+is its sibling: it has real drinks and a schema now, and almost no styling.
+Written 2026-08-02, revised 2026-08-19. Supersedes v25 — deleted, not kept, per
+house practice: this file has no back-catalogue, only the current version.
+
+**The 2026-08-19 revision is mostly §2.5**, which is new and is the biggest
+structural change since this file was written: the header and the footer stopped
+being per-site configuration and became one artefact. §2.2, §2.3, §9.8, §13.8
+and §13.9 all changed with it, and §12 gained three traps. If you are picking
+this up mid-stream, read §2.5 before touching anything in `_layouts/` or
+`_sass/shared/`.
 
 **This is a rewrite, not a revision**, at Helen's explicit request: "precise
 rather than verbose", "strongly consider deleting rather than automatically
@@ -125,13 +132,20 @@ report draft edits as uncommitted/at-risk work in this repo.
 `_sass/shared/_tokens.scss` (structural, never a palette reference);
 `_sass/shared/_base.scss`; `_sass/shared/_layout.scss` (default.html only);
 `_sass/shared/_rule.scss` (the punched-tape mixin — moved here 2026-08-02 once
-the shared wordmark started using it; see §13.8); `_data/accented_words.yml`
-(house style, applies to cocktails too); `assets/js/*` (no script knows which
-site it's on); `assets/img/favicon.svg`.
+the shared wordmark started using it; see §13.8); `_sass/shared/_chrome.scss`
+(the header and footer's colour — added 2026-08-19, see §2.5);
+`_data/accented_words.yml` (house style, applies to cocktails too);
+`assets/js/*` (no script knows which site it's on); `assets/img/favicon.svg`;
+`assets/img/chrome/` (the header and footer's artwork, §2.5); `about.html`.
 
-**Two stylesheets consume `shared/`, and that is now the whole list.**
-`assets/css/food.scss` and `cocktails.scss`. Add anything
-`shared/_layout.scss` depends on — a mixin, most likely — to both.
+**THREE files import `shared/`, not two.** `assets/css/food.scss`,
+`cocktails.scss`, and `assets/css/longform-demo.scss`. This section said "two,
+and that is now the whole list" until 2026-08-19, which was wrong — checked by
+grep, not by memory. The third is not a fourth site: it is an additive overlay
+`<link>`ed by the two `/food/longform-demo/` pages on top of `food.css`, and it
+takes only `shared/tokens` and `shared/rule`, no chrome. So it needed nothing
+when the chrome moved. **Grep before you assume the count**, which is what the
+next paragraph has always said and what nobody did.
 
 **This used to be three, and the third was a genuine trap** worth knowing
 about because it is the shape of the problem rather than the specific file:
@@ -162,12 +176,25 @@ over).
 ### 2.3 The palette contract
 
 Shared partials use palette variables **by name and never define them**.
-Every site palette owes all nine: `$color-bg $color-border $color-clear-text
-$color-mood-root $color-surface $color-text $color-white $font-body
-$font-headings`. Omit one and the build fails with "Undefined variable"
-pointing at `_sass/shared/`, not the palette that's short one — and it only
-breaks the site whose palette is short. `test_site_config.py` checks the list
-by name.
+Every site palette owes all TEN: `$color-accent $color-bg $color-border
+$color-clear-text $color-mood-root $color-surface $color-text $color-white
+$font-body $font-headings`. Omit one and the build fails with "Undefined
+variable" pointing at `_sass/shared/`, not the palette that's short one — and it
+only breaks the site whose palette is short. `test_site_config.py`'s
+`SHARED_PALETTE_CONTRACT` checks the list by name.
+
+**`$color-accent` is the tenth, added 2026-08-19 (§2.5), and it is what let the
+chrome stop being forked.** It means *this site's one "interactive / branded"
+colour*. Food's resolves to `$color-bright-magenta`, which HANDOVER §13.2
+already describes as exactly that job — the title rule, the toggle, every
+cross-recipe link and `$color-star-root` are one rhyme, not four coincidences —
+so naming it costs nothing and changed no pixel. Cocktails' is a documented
+placeholder: that palette is all neutrals until it is argued from real drinks,
+so its accent is grey on grey, which at footer size is the lightness-only no-op
+§12 warns about. Helen, asked directly: "Cocktail styling is almost totally
+unstarted, so this doesn't matter." **When cocktails gets a hue, that one line
+is where it goes**, and the footer and nav start working on that site the moment
+it does.
 
 ### 2.4 `site_key`
 
@@ -181,11 +208,115 @@ it: a future page with no `site_key` gets the repo-level
 `title`/`description` and **no stylesheet**, which is a thing to know before
 adding one rather than to discover afterwards.
 
-**Decoration is opt-in, absence is silent.** Food has `tape`/`tape_count`/
-`footer_svg` in `sites.yml`; cocktails has `tape` (a placeholder, see §9) but
-still no `footer_svg`, so `default.html` emits no footer-heart slot for it and
-`decorations.js` attempts no fetch for that one. Missing keys aren't 404s; a
-key pointing at missing artwork would be.
+**A PAGE WITH NO `site_key` GETS NO STYLESHEET, AND THIS BIT FOR REAL ON
+2026-08-19.** The paragraph above used to end "which is a thing to know before
+adding one rather than to discover afterwards". It was discovered afterwards,
+within one commit of a root-level page existing.
+
+`about.html` moved from `food/` to the repo root (§2.5), out of the
+`path: "food"` default that had been supplying its `site_key`. Its front matter
+carries a long comment explaining that the key must therefore be set by hand.
+**The line itself was never written.** `default.html` links the stylesheet
+inside `{% if this_site %}`, so the tag simply did not render: no fallback, no
+broken href, no warning. `/about/` published as raw unstyled HTML and 17,529
+checks passed over it, including a full production build and a scan of every
+link in that build.
+
+`test_every_published_page_links_a_stylesheet` (`test_rendered_pages.py`) is now
+looking, and the reason nothing was is worth carrying: every other assertion in
+that file asks about something INSIDE a page. None asked whether the page got
+dressed at all. **A root-level page must declare `site_key` in its own front
+matter** — the defaults assign it by directory, and there are only two.
+
+**Decoration is opt-in, absence is silent** — still true, but it is no longer
+the header and footer that demonstrate it, since those are unconditional now
+(§2.5). The live example is `_data/cocktails/glasses.yml`: a glass with no entry
+renders no icon rather than a broken one. Missing keys aren't 404s; a key
+pointing at missing artwork would be.
+
+---
+
+### 2.5 The shared chrome — one header, one footer
+
+**Settled 2026-08-19, issue #374** (closing #288 and #289 with it). Helen: *"I
+don't want parity between two footers — I want one footer for the whole site.
+And one header. Literally the same code and assets."*
+
+**That is a stronger claim than "both sites render the same partial", and the
+gap between the two is the whole point.** The chrome was already emitted by one
+shared template and was still three different things by the time it reached a
+page:
+
+- **Markup.** The nav was built from per-site keys (`home_icon`,
+  `switch_site`/`switch_icon`, `about_url`), each independently optional. Food
+  declared all of them; cocktails declared none, so **cocktails rendered no
+  header nav at all**, for weeks, with a green suite.
+- **Cascade, and this is the half nothing could see.** Rules for classes the
+  *shared* template emits lived in `_sass/food/`: the footer's four link
+  hovers, the nav row's hover, and the two nav **icon shapes**. So on every
+  cocktails page the cloche and the martini in the shared header had no rules
+  whatsoever and rendered as raw unstyled SVG. Each rule carried a comment
+  explaining why it had to be food-only, and each reason was true — they want
+  the hot magenta, which was not a contract variable. The conclusion drawn from
+  it ("cocktails gets a plainer version until it wants its own") was the bug.
+- **Assets.** `assets/img/food/tape/` and `assets/img/cocktails/tape/` held
+  seven byte-identical files, kept in step by hand as a standing rule after
+  they drifted for five days (#223).
+
+Where it all lives now:
+
+| Thing | Where |
+|---|---|
+| The one header and the one footer | `_layouts/default.html` — **no `site_key` branch anywhere in either** |
+| Their structure | `_sass/shared/_layout.scss` |
+| Their colour | `_sass/shared/_chrome.scss` — the only shared partial naming `$color-accent` |
+| Their artwork | `assets/img/chrome/` (`tape/`, `hearts/`) |
+| What is left of chrome config | `_data/chrome.yml` — which is `tape_count`, and nothing else |
+| How a script fetches it | `HTF.chromeAsset(path)`, a third helper beside `asset`/`siteAsset` (§3) |
+
+`_data/sites.yml` keeps only what says WHERE YOU ARE: `title`, `word`,
+`description`, `css`, `home`, `icon`, `reference_links`. **The test to apply
+before adding a key: does this say where you are, or does it say what the chrome
+is?** The second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
+`test_page_links.py` fails if any of the seven removed keys reappears, because
+the template no longer reads them — a silently-ignored key is worse than a
+missing one.
+
+**The nav is one row, the same everywhere**: one icon per site in `sites.yml`,
+in that file's own order, then the `??` about link at a literal `/about/`.
+Reordering `sites.yml` reorders the row; there is no second place to change.
+
+**The footer's reference block is a column PER SITE, gated on having material**
+— Helen's call, not "the current site's column". So food's two links appear in
+the footer of a cocktail page today, and a `[ COCKTAILS ]` column appears the
+day cocktails has reference pages of its own, with no template change. The
+hearts are pinned to grid column 2 for exactly this reason: under auto
+placement a second column would push the graphic out of the centre, which is a
+layout break arriving with a *data* edit.
+
+**Two guards, and neither substitutes for the other:**
+
+- `test_the_header_and_footer_are_identical_on_every_page` compares the
+  **rendered HTML** of the nav row and the whole footer across a food page, a
+  cocktails page and a recipe. Byte-identical, no normalisation — anything a
+  page may vary is by definition not chrome, so if this ever needs an exception
+  carved into it, that exception *is* a second header arriving.
+- `test_every_chrome_class_has_a_rule_in_every_site_stylesheet` compares the
+  **compiled CSS**, derived from the template *and* the icon `.svg` partials,
+  since five of the eight missing rules were inside those. It checks divergence
+  only, not "styled somewhere" — that is a different claim and would fire on
+  three BEM modifier hooks styled by nobody (#396).
+
+The markup guard would not have caught the cascade fork, and the CSS guard
+would not have caught the missing nav. **"Byte-identical" is a claim about the
+built output, not the source** — Jekyll runs the template once per page and
+writes ~90 separate files, so one template can still produce divergent pages,
+and the output is the only place that shows.
+
+**The one thing the chrome still varies is the wordmark**, which is its job:
+`[ FOOD ]` / `[ COCKTAILS ]` says where you are. It sits in `.site-title-link`,
+above the nav row, so it is already separated in the markup from everything the
+guards compare. See §13.8 for `wordmark_word`, the one page-level override.
 
 ---
 
@@ -222,11 +353,21 @@ do this now:
 | `assets/js/recipe-list.js` | Shuffle (Fisher-Yates) and pagination maths | `tests/js/recipe-list.test.js`, 9 checks |
 | `assets/js/filters.js` | DOM wiring for all of the above | Not directly tested; exercised by hand |
 
-`HTF.asset(path)` is for genuinely shared files; anything under a site's own
-image directory goes through `HTF.siteAsset(path)`, which builds the path
-from the page's site key and returns `null` on a page belonging to no site. A
-script may not know which site it's on — a test forbids reaching into
-`assets/img/food/` from JS directly.
+**Three asset helpers, and each name carries the claim it is making.**
+`HTF.asset(path)` is for genuinely shared files. Anything under a *site's own*
+image directory goes through `HTF.siteAsset(path)`, which builds the path from
+the page's site key and returns `null` on a page belonging to no site. The
+header and footer's artwork goes through `HTF.chromeAsset(path)` (added
+2026-08-19, §2.5), which never returns `null`, because chrome renders on every
+page including one belonging to no site.
+
+A script may not know which site it's on — a test forbids reaching into
+`assets/img/food/` from JS directly. `chromeAsset` is deliberately a third
+function rather than a call to `asset()`, so that
+`test_artwork_fetches_go_through_site_asset` can keep banning any image path
+built through `asset()`, with no exception carved out. (That test greps source
+text and cannot tell a comment from code, so a comment quoting the banned call
+literally will fail it. Ask how a guard works before rewording around it.)
 
 ---
 
@@ -1087,14 +1228,23 @@ alone. See the note there.
 - **`meta.status` and `meta.ship` have no vocabulary.** All three drinks say
   `parked` / `oh gods yes`, so there is nothing to infer. Do not invent an
   enum from a sample of one value.
-- **No tests exist for cocktails at all.** `tests/conftest.py` is explicitly
-  the FOOD suite. When a cocktails suite is written, the first thing it owes
-  is the `amount`/`ml` agreement guard above — and per
-  `test_suite_hygiene.py` it must ASSERT its corpus is non-empty rather than
-  skipping, or it passes vacuously on a clean checkout where
+- ~~**No tests exist for cocktails at all.**~~ **OUT OF DATE, corrected
+  2026-08-19.** `tests/test_cocktails.py` exists and is substantial — glasses,
+  generics, moods, methods, the `amount`/`ml` agreement guard this paragraph
+  asked for. `tests/conftest.py` is still explicitly the FOOD suite; the
+  cocktails module carries its own fixtures and its own `cocktails` marker.
+  The standing requirement is unchanged and still worth knowing: per
+  `test_suite_hygiene.py` a cocktails test must ASSERT its corpus is non-empty
+  rather than skipping, or it passes vacuously on a clean checkout where
   `_cocktail_drafts/` is not present.
-- `_data/cocktails/taxonomy.yml` is still empty. Three drinks is not enough
-  to argue a tag vocabulary out of.
+
+  **Left visible rather than silently rewritten, as a worked example of §11.2.**
+  This claim was wrong for some time, sat in the section a reader would go to
+  for exactly this question, and was found only by running `ls tests/`. Do not
+  trust this document over the code.
+- `_data/cocktails/taxonomy.yml` — check it before repeating this: it was
+  described here as "still empty", and moods and generics have since been
+  argued out and are enforced by tests.
 
 ### 9.6 Two earlier claims in this document were wrong
 
@@ -1121,24 +1271,24 @@ alone. See the note there.
 One deliberate borrowing: cocktails shares food's two font stacks. Colour and
 decoration are what separate the sites; typography is the family resemblance.
 
-**The wordmark tape is the one exception to "cocktails has no decoration"**,
-added 2026-08-02 at Helen's explicit call: `assets/img/cocktails/tape/` holds
-a direct copy of food's tape files, wired via `tape`/`tape_count` in
-`sites.yml`, reused as a placeholder rather than leaving the wordmark bare
-while cocktails' own visual language is still undecided. Swap the files in
-that directory when real artwork arrives — the key doesn't need to change.
-See §13.8 for the sizing mechanism this feeds into, and the note at the top
-of `_sass/cocktails/_decoration.scss` for the same context in code.
+**The tape is no longer cocktails' business at all, and neither is the
+footer.** Both are shared chrome as of 2026-08-19 (§2.5): one directory,
+`assets/img/chrome/`, for the whole repo, and `_layouts/default.html` draws
+the same wordmark tape on every page in either site.
 
-**Cocktails is kept at PARITY with food's tape, deliberately** — Helen's
-call, 2026-08-15, issue #223. It drifted for five days after the
-2026-08-10 redesign (§13.9): food went to seven new files, cocktails sat
-on the old four, and nothing caught it except a note in this document.
-Both directories now hold the same seven and `tape_count: 7` on both.
-**Parity is the standing rule until cocktails has a visual language of
-its own** — regenerate food's set and copy it across in the same pass,
-rather than leaving them to drift again and relying on a handover note to
-notice.
+This section used to set out a standing PARITY rule. `assets/img/cocktails/
+tape/` held a copy of food's seven files, and "regenerate food's set and copy
+it across in the same pass" was the instruction — written after the two
+directories drifted for five days with nothing but a note in this document
+watching (issue #223). **That rule is retired, and so is the chore.** One
+directory cannot drift from itself.
+
+The consequence for a future cocktails visual language is worth stating
+plainly, because it is a bigger decision than it was: giving cocktails its own
+tape now means giving it its own *header*, which is the thing #374 exists to
+prevent. Argue it out rather than adding a directory. See §13.9 for the
+generator, §13.8 for the sizing mechanism, and the note at the top of
+`_sass/cocktails/_decoration.scss` for the same context in code.
 
 ---
 
@@ -1181,6 +1331,16 @@ from here.
 | `test_drafts.py` | `_food_drafts/`-scoped subset of the structural/style rules above, via its own `draft` fixture — see its own module docstring for exactly which rules ported and which deliberately didn't |
 | `test_reference_data.py` | `_data/food/internal_temperatures.yml`'s own invariants — see §14 |
 | `test_suite_hygiene.py` | Tests about the tests: the one failure mode whose symptom is green (§12) |
+| `test_cocktails.py` | The drinks' own spec. **This table omitted it entirely until 2026-08-19**, and §9.5 still said "no tests exist for cocktails at all" — both written before it did |
+| `test_page_links.py` | Every `<a href>` in every template, traced to a literal path. Also omitted from this table until 2026-08-19 |
+| `test_rendered_pages.py` | Assertions about BUILT html, including the two chrome guards (§2.5) and `test_every_published_page_links_a_stylesheet` (§2.4) |
+
+`pytest.ini` declares three suite MARKERS, which this section never mentioned:
+`pytest -m food`, `-m cocktails`, `-m shared`. They exist for signal, not speed
+— while Helen is doing food QA by hand her in-progress edits make the food half
+red, and a red suite hides a real cocktails regression. `test_suite_hygiene.py`
+asserts every module declares one, because an unmarked file is silently missed
+by every filtered run.
 
 ### 10.1 The 2026-08-12 issue audit
 
@@ -1335,7 +1495,7 @@ whether the file is a draft Helen just added:**
 `find _food_drafts -name '*.md' -mmin -120`. Don't chase it, don't tidy a
 draft you weren't asked to tidy.
 
-### 10.1 Diagnosing decoration JS — the stub-DOM harness
+### 10.2 Diagnosing decoration JS — the stub-DOM harness
 
 `decorations.js` is an IIFE that touches the DOM directly and has no tests.
 When something in it misbehaves, write a throwaway script (scratchpad, not
@@ -1552,6 +1712,41 @@ registers, both deliberate:
 
 **You will flag `QQ` as an error.** It's Helen's deliberate placeholder.
 Never flag it, never fix it, never convert it.
+
+**You will WRITE DOWN a rule instead of following it, in the same file, in the
+same minute.** 2026-08-19, and it is the most humbling entry here. Moving
+`about.html` to the repo root took it out of the `_config.yml` default that
+supplied its `site_key`, so the key had to be set by hand. A comment was written
+into that file's front matter saying exactly this — four sentences, citing §2.4,
+naming the consequence — and the `site_key: food` line was never added. The page
+shipped with no stylesheet at all and the whole suite passed over it.
+
+The general form, which is worth more than the instance: **writing an
+explanation of a constraint feels like satisfying it.** The comment and the code
+are two separate acts and the first one is the one that feels like completion.
+If you find yourself documenting why something must be done, do it first, then
+write the comment — and if the constraint is worth four sentences, ask what
+would fail if it were violated, because that question is a test.
+
+**You will make markup shared and leave its CSS forked.** 2026-08-19, issue
+#374. The header and footer came from one shared template, and on cocktails the
+two nav icons rendered as raw unstyled SVG, because their rules lived in
+`_sass/food/`. Every check passed: the markup is shared, the classes have rules
+(in `food.css`, which is the only stylesheet
+`test_every_class_we_emit_has_a_rule_in_the_stylesheet` reads), every link
+resolves. **"Shared" is a claim about three layers, not one** — markup, cascade
+and assets — and it is only true when all three hold. See §2.5.
+
+**You will trust a corpus glob that names files instead of finding them.**
+`test_page_links.py`'s page list was `food/**`, `cocktails/**` and the literal
+`[ROOT / "index.html"]` — correct on the day it was written, when the redirect
+was the only root-level page there had ever been. `about.html` arrived beside it
+and was invisible: every link to `/about/` read as pointing at nothing
+published. That failure at least announced itself. **The mirror image is the one
+to fear** — a page the corpus cannot see is also a page whose own outbound links
+are never scanned, and that direction is silent. This is the same family as the
+stale `JS_DIR` and the non-recursive SCSS glob below, wearing a different mask:
+not a pattern that went stale, but a list that was never a pattern.
 
 **You will re-add a hardcoded search threshold.** It lives in
 `FAMILY_BUTTON_MIN_CHARS`, read from `ingredient_words.yml`'s
@@ -2228,6 +2423,30 @@ Redesigned 2026-08-02. HELEN TRIAGES and the bracketed site word (`[ FOOD ]`
 black tape behind the bracketed word is sized to the lettering rather than a
 hardcoded pixel value.
 
+**The wordmark is the ONE thing the chrome still varies per site, and that is
+its job** — it says where you are. Everything else in the header and footer is
+identical everywhere (§2.5). It sits in `.site-title-link`, above the nav row,
+so it is already separated in the markup from everything the chrome guards
+compare.
+
+**`wordmark_word` — one page overrides the word, added 2026-08-19.**
+`_layouts/default.html` reads `{{ page.wordmark_word | default: this_site.word }}`,
+and `about.html` sets it to `"???"`, so that page reads HELEN TRIAGES /
+`[ ??? ]`. Helen's idea. It is not decoration bolted on: `/about/` hangs off the
+shared header of BOTH sites at a site-neutral URL, while carrying
+`site_key: food` to get a stylesheet at all (§2.4), so without this it wore
+`[ FOOD ]` while speaking for the whole repo.
+
+§13.4.1's test for a new use of the brackets is *"is it naming a SITE, from
+`sites.yml`, or is it reaching for brackets because capitals look like they want
+some?"* **This is the first case genuinely in between**, and it passes on the
+reading that `???` in the site slot is how a page says it belongs to neither.
+The page's own `<h1>` is already `???` and the nav link that reaches it is `??`,
+so the voice was established before the wordmark joined it.
+
+Deliberately narrow: it overrides the WORD only. That page's title bar still
+reads "Helen Triages Food", which is the open half of issue #395.
+
 **The core sizing mechanism: whichever row is naturally wider defines the
 width, via CSS Grid, not JS.** `.site-logo` is `display: inline-grid;
 grid-template-columns: max-content;` with `justify-items: center`. Both
@@ -2327,8 +2546,16 @@ reading it before regenerating anything.
 
 ```
 python3 scripts/generate_tape.py --corner-mode both_acute --seed 30 \
-    --out assets/img/food/tape/tape-1.svg
+    --out assets/img/chrome/tape/tape-1.svg
 ```
+
+**The output directory moved out of `assets/img/food/` on 2026-08-19** (§2.5):
+the wordmark is shared chrome, so there is one tape set for the whole repo.
+Regenerating no longer has a "and copy it across to cocktails" step.
+`_data/chrome.yml`'s `tape_count` must match what the directory holds, and
+`test_tape_count_matches_the_tape_directory` checks both the count and that the
+run is gapless — `decorations.js` rolls a random n in 1..N and builds the
+filename from it, so a gap is an intermittent 404 rather than an error.
 
 `--seed` drives the corner shape; `--marks-seed` (defaults to `--seed`)
 drives the machine marks independently, so a shape you like can be paired
@@ -2432,15 +2659,12 @@ produced each, for anyone regenerating or swapping just one:
 All generated with `marks_seed` unset (defaults to `seed`) — see
 `scripts/generate_tape.py`'s own `generate()` signature.
 
-**Two things were raised here. One is settled, one is still open:**
+**One thing raised here is still open, and one has been overtaken:**
 
-1. **SETTLED, 2026-08-15, issue #223: cocktails stays at parity with food.**
-   `assets/img/cocktails/tape/` held the OLD 4-file set for five days after
-   this redesign shipped. Helen's answer to "is food's artwork right as
-   cocktails' placeholder, or should cocktails stay plainer until it has
-   its own language" was parity — both directories now hold the same seven,
-   `tape_count: 7` on both, and copying across is part of regenerating
-   food's set rather than a separate decision to re-take. See §9.
+1. **OVERTAKEN, 2026-08-19, issue #374.** This used to record a 2026-08-15
+   ruling (#223) that cocktails stays at PARITY with food's tape, with copying
+   across as part of regenerating food's set. There is one directory now, so
+   there is nothing to keep in parity and nothing to copy. See §2.5 and §9.8.
 2. **STILL OPEN. `decorations.js`'s `tape()` picks one of the N SVGs at random on
    every page load** (`data-tape-count`). This is the exact pattern §13.1
    documents as tried and rejected for the recipe/index section marks — "an
@@ -2456,6 +2680,29 @@ All generated with `marks_seed` unset (defaults to `seed`) — see
 
 Built 2026-08-11–12, at Helen's request — the "standalone page for
 cross-recipe reference material" §4.1 mentions was hypothetical until now.
+
+> ### ⚠ THIS SECTION IS ABOUT TO BE OVERTAKEN — read before acting on it
+>
+> Six open issues restructure this layer, and one of them reverses a decision
+> recorded further down as settled. As of 2026-08-19 none is done:
+>
+> - **#382** delete `food/reference/cooking-methods.html` entirely. Helen's
+>   call on the detail, taken 2026-08-19: **drop the steak table** ("I know how
+>   to cook steak"); **keep fish and shellfish** and move them onto the methods
+>   page, because they carry no target temperatures but they do carry methods.
+>   Its other nine sections are genuinely a duplicate of the timings page —
+>   both render from `cooking_methods.yml`.
+> - **#383** rename `/food/reference/timings/` → `/food/reference/cooking-methods-and-timings/`
+> - **#384** rename `/food/reference/temperatures/` → `/food/reference/internal-temperatures/`,
+>   and the h1 with it
+> - **#385, #386, #368** the crosslink and footer wording that goes with those
+>
+> **This overturns "they do not merge" at the very end of this section** (#207,
+> 2026-08-15). That ruling stands for the timings CALCULATOR versus the tables;
+> #382 is the newer call and it wins. The renames also break the note in
+> `timings.html`'s own header explaining why its permalink stayed put —
+> eleven crosslinks on the temperatures page point at it, several carrying
+> `?protein=`, and every one of them has to move in the same pass.
 
 ### What exists
 
