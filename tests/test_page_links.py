@@ -291,6 +291,13 @@ ASSIGN_LITERAL = re.compile(
 TRUSTED_DYNAMIC = (
     re.compile(r"^\{\{\s*this_site\.home\s*\|\s*default:\s*'/'\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*nav_site\.home\s*\|\s*relative_url\s*\}\}$"),
+    # The back arrow on a recipe/cocktail page (issue #387,
+    # _includes/back-to-index.html). Same shape and same treatment as the two
+    # above: the value is a site's `home` in _data/sites.yml, which
+    # test_site_nav_links_resolve_to_real_pages already checks against the
+    # published-page set for EVERY site, so this href is covered by that rather
+    # than being unchecked.
+    re.compile(r"^\{\{\s*back_site\.home\s*\|\s*relative_url\s*\}\}$"),
     # The footer's reference links, added 2026-08-16. Same shape and same
     # treatment as the three above: the value lives in _data/sites.yml, so this
     # scanner cannot read it out of the template, and

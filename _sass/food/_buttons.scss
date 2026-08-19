@@ -70,8 +70,32 @@
 // still applies to giving every one of forty results its own shape or its
 // own full-strength fill — that idea was raised and set aside for the same
 // reason.
+// ONE TREATMENT, TWO SECTIONS, TWO HUES -- issue #390, 2026-08-19.
+//
+// The rule below was written for the include picker and was the only one of its
+// kind; LEAVE OUT rendered every candidate identically. Helen: "leave out match
+// highlighting should match ingredient include search, but cobalt." So the
+// treatment is a mixin taking the section's own colour, rather than a second
+// rule that happens to look like the first -- the failure mode #374 documents
+// at length for the site chrome is the same one here at smaller scale, and a
+// copy is what drifts.
+//
+// The colour is each section's own active tone, from _palette.scss's one source
+// per section: lime green for SEARCH MAIN INGREDIENTS, electric cobalt for
+// LEAVE OUT. Not a new value for either.
+//
+// The 0.5px stroke stays an absolute length rather than moving to
+// $faux-bold-stroke's em. That constant is 0.05em and would be a visible
+// weight change on the include side, which nothing asked for; HANDOVER 13.4.2
+// already records that this family of strokes drifts across type sizes and
+// wants its own em constant one day. This is the third instance, noted rather
+// than fixed in a styling issue.
+@mixin word-match-emphasis($colour) {
+  color: $colour;
+  -webkit-text-stroke: 0.5px $colour;
+}
+
 .btn-ingredient--word-match {
-  color: $color-ingredient-active;
   // font-weight has nowhere left to go -- these are already font-weight:
   // 700 (the .btn-tag base above, applied uniformly, matched or not), and
   // Courier New only ships Regular and Bold as real static faces, so 700 is
@@ -84,5 +108,13 @@
   // stroke already use site-wide to read heavier than the font alone can
   // render. Same colour as the fill, not a separate darker value, so it
   // reads as "thicker green" rather than a mismatched outline.
-  -webkit-text-stroke: 0.5px $color-ingredient-active;
+  @include word-match-emphasis($color-ingredient-active);
+}
+
+// The same emphasis on the LEAVE OUT picker, in that section's own cobalt.
+// $color-exclude-active is the darkened tone, matching what the include side
+// uses -- the raw #0047FF is a filter-section ROOT, for rules and fills, and
+// reading it as small text is what $color-exclude-active exists to avoid.
+.btn-exclude--word-match {
+  @include word-match-emphasis($color-exclude-active);
 }

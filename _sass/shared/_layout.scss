@@ -164,9 +164,17 @@ main {
 // lower). Height-only: each icon keeps its own natural aspect ratio (the
 // cloche is wider than tall, the martini taller than wide) rather than
 // being squashed into a square.
+// 28px -- issue #388, 2026-08-19. Was 36px, shrunk to 22px when the row moved
+// to the bottom of the header, and back up to 28px now that Helen has lived
+// with it. Height-only: each icon keeps its own natural aspect ratio (the
+// cloche is wider than tall, the martini taller than wide) rather than being
+// squashed into a square.
+//
+// One value for the whole repo since #374 -- this row is shared chrome, so
+// both sites move together and there is no second number to keep in step.
 .nav-icon {
   display: block;
-  height: 22px;
+  height: 28px;
   width: auto;
 }
 

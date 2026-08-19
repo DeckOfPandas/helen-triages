@@ -2056,3 +2056,4 @@ def test_no_site_holds_a_copy_of_the_chrome_artwork():
           "or a second footer arriving one file at a time, and the copy that "
           "nobody looks at is the one that goes stale."
     )
+

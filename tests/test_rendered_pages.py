@@ -782,3 +782,142 @@ def test_every_published_page_links_a_stylesheet(prod_site):
           "`{% if this_site %}` and emits nothing when that is false -- there "
           "is no fallback and no warning."
     )
+
+
+def test_both_ingredient_pickers_mark_their_word_matches(site):
+    """The include and exclude pickers must agree on emphasising a real match.
+
+    HANDOVER 8.1: these are not two implementations. Both call
+    `IS.buildMasterList` and `IS.search`, get back the same ranked results with
+    the same `hasWordMatch` flag on each, and differ only in what corpus was fed
+    in. So a treatment that one applies and the other does not is drift, not a
+    design decision.
+
+    It was drift. Issue #390, found by Helen looking at the two boxes stacked on
+    one screen with the same three letters typed into both: SEARCH MAIN
+    INGREDIENTS picked out the genuine matches and LEAVE OUT rendered forty
+    candidates identically. `makeExcludeButton` took no `wordMatch` argument at
+    all, so `r.hasWordMatch` was computed, passed as far as the call site, and
+    dropped.
+
+    Nothing could see it. The classes are applied with `classList.add(...)`
+    rather than written into a `class="..."` attribute, so
+    test_every_class_we_emit_has_a_rule_in_the_stylesheet's scan does not reach
+    them (that gap is issue #396's neighbourhood, and is why this test checks
+    the stylesheet itself rather than assuming that one does).
+
+    Checks three things, because each fails on its own:
+      1. both builders apply a --word-match class;
+      2. both call sites pass the flag rather than dropping it;
+      3. both classes have a rule in the compiled CSS.
+    """
+    # COMMENTS STRIPPED BEFORE COUNTING, and this is not fastidiousness: the
+    # first version of this test counted `r.hasWordMatch` in the raw source,
+    # and the explanatory comment written directly above makeExcludeButton()
+    # names it twice. Deleting the argument from the call therefore left the
+    # count unchanged and the test green -- a guard defeated by the prose
+    # explaining the bug it guards against. Caught by breaking it on purpose,
+    # which is the only reason it was caught at all.
+    raw = (ROOT / "assets" / "js" / "filters.js").read_text(encoding="utf-8")
+    js = re.sub(r"//.*$", " ", re.sub(r"/\*.*?\*/", " ", raw, flags=re.S), flags=re.M)
+
+    problems = []
+    for builder, cls in (("makeIngredientButton", "btn-ingredient--word-match"),
+                         ("makeExcludeButton", "btn-exclude--word-match")):
+        if f"function {builder}(" not in js:
+            problems.append(f"{builder}() is gone or renamed — this test cannot see what it guards")
+            continue
+        if f"'{cls}'" not in js:
+            problems.append(f"{builder}() does not add .{cls}")
+
+    # Call sites, matched as calls rather than as mentions of a name.
+    calls = re.findall(r"make(?:Ingredient|Exclude)Button\(([^)]*)\)", js)
+    passing = [c for c in calls if "hasWordMatch" in c or "true" in c]
+
+    # The flag has to survive the call, not merely be a parameter nobody passes.
+    # Four call sites: an (all)-family button and a results button, per picker.
+    if len(passing) != 4:
+        problems.append(
+            f"{len(passing)} of {len(calls)} picker-button call sites pass a "
+            f"word-match argument; expected 4 (a family button and a results "
+            f"button, per picker). The exclude picker dropping it silently is "
+            f"exactly what issue #390 was: {calls}"
+        )
+
+    css = (site / "assets" / "css" / "food.css").read_text(encoding="utf-8")
+    for cls in ("btn-ingredient--word-match", "btn-exclude--word-match"):
+        if f".{cls}" not in css:
+            problems.append(f".{cls} is emitted by filters.js but styled nowhere")
+
+    assert not problems, (
+        "The two ingredient pickers have drifted apart:\n  " + "\n  ".join(problems)
+        + "\n\nThey share one code path and one set of ranked results (HANDOVER "
+          "8.1). A match treatment on one and not the other is drift. The shared "
+          "emphasis lives in _sass/food/_buttons.scss as @mixin "
+          "word-match-emphasis($colour); each picker passes its own section "
+          "colour."
+    )
+
+
+# Properties that change how much room a button takes up. A selected filter
+# button that declares one of these has moved every button after it on the row.
+LAYOUT_PROPERTIES = (
+    "font-size", "letter-spacing", "padding", "padding-left", "padding-right",
+    "margin", "margin-left", "margin-right", "border", "border-width",
+    "border-left-width", "border-right-width", "word-spacing", "width",
+)
+
+
+def test_no_active_filter_button_changes_its_own_width(site):
+    """Selecting a filter must not resize it. Issue #389.
+
+    Helen: "filter tags to the right of a selected one move to the right -- they
+    should stay in the same position." The cause was `%btn-active-base` setting
+    `font-size: 0.74rem` and `letter-spacing: 0.04em`, neither matching the
+    resting state it replaced -- so activating re-measured the button and slid
+    the rest of the row along. Letter-spacing did most of it: ~0.38px per
+    character, about 5.7px on `one-handed food`.
+
+    It was two bugs wearing one rule. Two different resting bases extend that
+    placeholder -- .btn-tag/.btn-star at 0.75rem with no letter-spacing, and
+    .btn-meta at 0.72rem with 0.02em -- so no single pair of values could have
+    agreed with both, and the fix was to declare neither.
+
+    THE POINT OF DOING THIS ON THE COMPILED CSS is that the trap is not the
+    placeholder, it is the IDEA that an active state may restyle type. That idea
+    can arrive in any of the five rules that extend it, or in a sixth written
+    next year, and the symptom -- a few pixels of drift on a row you were not
+    looking at -- is one nobody reports twice.
+
+    -webkit-text-stroke is deliberately NOT on the list: it paints outside the
+    glyph and occupies no space, which is exactly why it is the right lever for
+    a selected state and why it survived the fix (§13.4.2).
+    """
+    css = (site / "assets" / "css" / "food.css").read_text(encoding="utf-8")
+
+    # Rules whose selector says "a filter button in its selected state".
+    blocks = re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+    active = [(sel.strip(), body) for sel, body in blocks
+              if re.search(r"\.btn-(?:tag|star|meta|ingredient|exclude)[^,{]*\.active", sel)]
+    assert active, (
+        "No active filter-button rules found in the compiled CSS. Either the "
+        "class naming changed or this pattern went stale -- and a scan that "
+        "matches nothing passes while checking nothing."
+    )
+
+    offenders = []
+    for sel, body in active:
+        for decl in body.split(";"):
+            prop = decl.split(":")[0].strip().lower()
+            if prop in LAYOUT_PROPERTIES:
+                offenders.append(f"{sel} declares {decl.strip()}")
+
+    assert not offenders, (
+        "Active filter-button rule(s) declare a property that changes the "
+        "button's size:\n  " + "\n  ".join(sorted(set(offenders)))
+        + "\n\nThe button grows or shrinks the moment it is selected, and every "
+          "button after it on the row moves (issue #389). A selected state may "
+          "change colour, .tag-shape fill and -webkit-text-stroke, none of "
+          "which occupies space. If a metric genuinely must change, change the "
+          "RESTING state to match so the two agree."
+    )

@@ -442,10 +442,26 @@ function renderResultsPool() {
   // THE DISLIKE NAVIGATOR — GitHub issue #52
   // ---------------------------------------------------------------------------
 
-  function makeExcludeButton(value, label) {
+  /* `wordMatch` is the same flag makeIngredientButton() has always taken, and
+     the two pickers now agree on it -- issue #390. They did not: this builder
+     simply dropped `r.hasWordMatch` on the floor, so LEAVE OUT rendered every
+     candidate identically while SEARCH MAIN INGREDIENTS, one box above, picked
+     out the genuine matches. Same query, same ranked results, same code path
+     (HANDOVER 8.1) -- one of them just never used the answer.
+
+     What the flag means is worth restating here because it is the whole point
+     of the treatment: it is a WORD-PREFIX match, not a substring one. Typing
+     "pas" word-matches "anchovy paste" and "choux pastry", and does NOT match
+     "antipasti vegetables" -- which is in the list, correctly, on a substring
+     match. Nor does it match "farfalle" or "gnocchi", which are there as
+     members of the `pasta` family and contain no "pas" at all. So the styled
+     entries are the ones you meant, and the plain ones are the ones the
+     vocabulary brought along. */
+  function makeExcludeButton(value, label, wordMatch) {
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'btn-tag btn-exclude';
+    if (wordMatch) btn.classList.add('btn-exclude--word-match');
     btn.dataset.exclude = value;
     btn.textContent = label;
     return btn;
@@ -499,7 +515,10 @@ function renderResultsPool() {
     var result = IS.search(query, excludeMasterList);
     result.familyButtons.forEach(function (fw) {
       var label = fw + FAMILY_SUFFIX;
-      excludePool.appendChild(makeExcludeButton(label, label));
+      // Always a word match by construction, same as the include picker's
+      // (all) buttons: a family only ever forms when its word already starts
+      // with the query, so this is never in doubt.
+      excludePool.appendChild(makeExcludeButton(label, label, true));
     });
     result.results.forEach(function (r) {
       // Same "don't offer 'chicken' next to 'chicken (all)'" suppression
@@ -507,7 +526,7 @@ function renderResultsPool() {
       // two adjacent buttons that look like the same answer make you check
       // both.
       if (result.familyButtons.indexOf(fold(r.ing.trim().toLowerCase())) !== -1) return;
-      excludePool.appendChild(makeExcludeButton(r.ing, r.label || r.ing));
+      excludePool.appendChild(makeExcludeButton(r.ing, r.label || r.ing, r.hasWordMatch));
     });
     update();
   }

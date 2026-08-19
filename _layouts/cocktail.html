@@ -25,6 +25,8 @@ layout: default
   test_list_sections_are_conditioned_on_size_not_truthiness.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
+{% include back-to-index.html %}
+
 <article class="cocktail">
 
   {% comment %} The glass icon sits with the title, looked up through
@@ -205,3 +207,9 @@ layout: default
   {% endif %}
 
 </article>
+
+{% comment %} The back arrow's progressive enhancement -- see
+   _includes/back-to-index.html and assets/js/back-link.js. Loaded here, not in
+   default.html: the arrow is page furniture rather than site chrome, so a page
+   with no arrow loads no script for one. {% endcomment %}
+<script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
