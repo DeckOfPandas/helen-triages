@@ -163,7 +163,27 @@
       <div class="site-logo-top">HELEN TRIAGES</div>
       {% comment %} The bracketed word is the site's, from _data/sites.yml. On
          the landing page there is no site, so the wordmark is just HELEN
-         TRIAGES with nothing taped underneath it. {% endcomment %}
+         TRIAGES with nothing taped underneath it.
+
+         A PAGE MAY OVERRIDE THE WORD, and exactly one does: about.html sets
+         `wordmark_word: "???"`, so the wordmark reads HELEN TRIAGES / [ ??? ].
+         Helen's idea, 2026-08-19. It is not a joke bolted on -- it answers a
+         real problem opened by issue #374 and recorded as #395. That page is
+         reached from the shared header of BOTH sites and lives at a
+         site-neutral /about/, but it carries site_key: food to get a
+         stylesheet at all (see its own front matter), so without this it wore
+         [ FOOD ] while speaking for the whole repo.
+
+         HANDOVER 13.4.1's test for a new use of the brackets is "is it naming
+         a SITE, from sites.yml, or is it reaching for brackets because
+         capitals look like they want some?" This is the first thing to sit in
+         between: ??? is not a site, and putting it in the site slot is how the
+         page says it belongs to neither. The page's own <h1> and the nav link
+         that reaches it are already ??? and ??, so the voice is established.
+
+         Deliberately narrow: it overrides the WORD only. The title bar still
+         reads "Helen Triages Food", which is the rest of #395. {% endcomment %}
+      {% assign wordmark_word = page.wordmark_word | default: this_site.word %}
       {% if this_site %}
       <div class="site-logo-tape">
         {% comment %} One tape set for the whole repo, in assets/img/chrome/tape/.
@@ -173,7 +193,7 @@
            is chrome config, so it comes from _data/chrome.yml. {% endcomment %}
         <span class="tape-bg" aria-hidden="true"
               data-tape-count="{{ site.data.chrome.tape_count }}"></span>
-        <span class="site-logo-word"><span class="site-logo-bracket">[ </span>{{ this_site.word }}<span class="site-logo-bracket"> ]</span></span>
+        <span class="site-logo-word"><span class="site-logo-bracket">[ </span>{{ wordmark_word }}<span class="site-logo-bracket"> ]</span></span>
       </div>
       {% endif %}
     </div>

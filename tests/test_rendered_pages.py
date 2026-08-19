@@ -725,3 +725,60 @@ def test_every_chrome_class_has_a_rule_in_every_site_stylesheet(site):
           "If the rule needs a colour, use $color-accent: that is what the "
           "tenth palette-contract variable is for."
     )
+
+
+def test_every_published_page_links_a_stylesheet(prod_site):
+    """A page with no site_key renders completely unstyled, and says nothing.
+
+    _layouts/default.html links `assets/css/<this_site.css>.css` inside an
+    `{% if this_site %}`, and `this_site` is `site.data.sites[page.site_key]`.
+    So a page whose site_key is missing -- or misspelled, or lost when the page
+    moved out of the directory whose _config.yml default supplied it -- links NO
+    STYLESHEET AT ALL. Not a fallback, not a broken href: the tag simply does
+    not render. HANDOVER 2.4 records that this is the designed behaviour and
+    worth knowing before adding a root-level page.
+
+    IT THEN HAPPENED, IMMEDIATELY, IN THE COMMIT THAT ADDED THE FIRST ONE.
+    about.html moved from food/ to the repo root in issue #374, out of the
+    `path: "food"` default that had been supplying its site_key. Its front
+    matter carries a long comment explaining that site_key must therefore be set
+    by hand, and the line itself was never written. The page shipped unstyled,
+    and the entire suite -- 17,529 checks including a build of the production
+    site and a scan of every link in it -- passed.
+
+    Nothing was looking, because every other check in this file asks about
+    something INSIDE a page. This asks whether the page got dressed at all.
+
+    Reads the production build, so a page held back by the awaiting_fix gate is
+    correctly not examined: this is a question about what publishes.
+    """
+    pages = sorted(prod_site.rglob("index.html")) + [
+        p for p in prod_site.rglob("*.html") if p.name != "index.html"
+    ]
+    assert pages, (
+        f"No built pages found under {prod_site} -- the build produced nothing "
+        f"and an empty scan passes."
+    )
+
+    naked = []
+    for path in pages:
+        html = path.read_text(encoding="utf-8", errors="replace")
+        # The root redirect is a bare <meta http-equiv="refresh">, deliberately:
+        # issue #204 deleted its layout and stylesheet along with the landing
+        # page it used to be. It has no <body> content to style.
+        if "http-equiv=\"refresh\"" in html.replace("'", '"'):
+            continue
+        if 'rel="stylesheet"' not in html:
+            naked.append("/" + str(path.relative_to(prod_site).parent).replace("\\", "/") + "/")
+
+    assert not naked, (
+        "Published page(s) linking no stylesheet at all:\n  "
+        + "\n  ".join(sorted(naked))
+        + "\n\nThese render as unstyled HTML. The cause is almost always a "
+          "missing or wrong `site_key`: _config.yml assigns it by DIRECTORY, so "
+          "a page at the repo root, or one that has just moved between "
+          "directories, inherits none and must declare it in its own front "
+          "matter. _layouts/default.html links the stylesheet inside "
+          "`{% if this_site %}` and emits nothing when that is false -- there "
+          "is no fallback and no warning."
+    )
