@@ -830,18 +830,30 @@ def test_both_ingredient_pickers_mark_their_word_matches(site):
         if f"'{cls}'" not in js:
             problems.append(f"{builder}() does not add .{cls}")
 
-    # Call sites, matched as calls rather than as mentions of a name.
-    calls = re.findall(r"make(?:Ingredient|Exclude)Button\(([^)]*)\)", js)
-    passing = [c for c in calls if "hasWordMatch" in c or "true" in c]
+    # CALL SITES, matched as calls rather than as mentions of a name, and with
+    # the two function DEFINITIONS excluded by the lookbehind -- their parameter
+    # lists name `wordMatch` and would otherwise read as calls that pass it.
+    calls = re.findall(
+        r"(?<!function )make(?:Ingredient|Exclude)Button\(([^)]*)\)", js
+    )
+    dropped = [c for c in calls if "hasWordMatch" not in c and "true" not in c]
 
-    # The flag has to survive the call, not merely be a parameter nobody passes.
-    # Four call sites: an (all)-family button and a results button, per picker.
-    if len(passing) != 4:
+    # THE RULE, NOT A COUNT. This asserted "exactly 4 call sites pass the flag"
+    # until #387 added a fifth (restoreIndexMemory rebuilds the chosen
+    # ingredient's button when you come back to the index), and a correct change
+    # turned it red. A magic number makes every new call site a false alarm and
+    # teaches whoever meets it to edit the number, which is how a guard stops
+    # meaning anything. What actually matters is that NO call site drops the
+    # flag -- which is the shape #390 was.
+    assert calls, (
+        "No calls to the picker button builders found at all. Either they were "
+        "renamed or this pattern went stale, and a scan matching nothing passes."
+    )
+    if dropped:
         problems.append(
-            f"{len(passing)} of {len(calls)} picker-button call sites pass a "
-            f"word-match argument; expected 4 (a family button and a results "
-            f"button, per picker). The exclude picker dropping it silently is "
-            f"exactly what issue #390 was: {calls}"
+            f"{len(dropped)} of {len(calls)} picker-button call sites pass no "
+            f"word-match argument, so those buttons can never be marked as "
+            f"matches: {dropped}"
         )
 
     css = (site / "assets" / "css" / "food.css").read_text(encoding="utf-8")

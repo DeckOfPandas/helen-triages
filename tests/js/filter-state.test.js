@@ -377,3 +377,76 @@ test('a missing or undefined state is answered, not thrown at', () => {
   assert.strictEqual(FS.hasNarrowingFilter(undefined), false);
   assert.strictEqual(FS.hasAnythingToClear({}), false);
 });
+
+// =============================================================================
+// serialise / deserialise — GitHub issue #387
+// =============================================================================
+// The index remembers its list in sessionStorage so that going BACK restores
+// what you left. These two are why that is not just JSON.stringify.
+
+test('serialise turns Sets into arrays, because JSON silently will not', () => {
+  // JSON.stringify(new Set(['a'])) is "{}" -- not an error, not an empty array,
+  // just nothing. Three of the eight fields are Sets, so a state put through
+  // raw JSON comes back with its tags, exclusions and meta filters quietly
+  // emptied. That is the bug this function exists to prevent, and it is worth
+  // stating in a test because the naive version LOOKS like it works.
+  assert.strictEqual(JSON.stringify(new Set(['soup'])), '{}');
+
+  const state = FS.emptyState();
+  state.tags.add('soup');
+  state.tags.add('freezable');
+  const flat = FS.serialise(state);
+  assert.deepStrictEqual(flat.tags.sort(), ['freezable', 'soup']);
+});
+
+test('a full state survives a round trip through JSON', () => {
+  const state = FS.emptyState();
+  state.tags.add('soup');
+  state.star = 'beef';
+  state.excludedIngredients.add('peas');
+  state.meta.add('rewrite');
+  state.nameQuery = 'stew';
+  state.ingredient = 'cavolo nero';
+  state.isSearching = true;
+
+  const back = FS.deserialise(JSON.parse(JSON.stringify(FS.serialise(state))));
+
+  assert.deepStrictEqual([...back.tags], ['soup']);
+  assert.strictEqual(back.star, 'beef');
+  assert.deepStrictEqual([...back.excludedIngredients], ['peas']);
+  assert.deepStrictEqual([...back.meta], ['rewrite']);
+  assert.strictEqual(back.nameQuery, 'stew');
+  assert.strictEqual(back.ingredient, 'cavolo nero');
+  assert.strictEqual(back.isSearching, true);
+});
+
+test('every field in FIELD_SPEC round-trips, including any added later', () => {
+  // Generated from FIELDS rather than listed, so a field added to FIELD_SPEC is
+  // covered without anyone remembering to come here. HANDOVER 12 warns that a
+  // sweep like this proves the predicate and not the table -- true, and the
+  // table is the thing filter-state.js owns, so here it is the right end.
+  const empty = FS.emptyState();
+  const back = FS.deserialise(FS.serialise(empty));
+  FS.FIELDS.forEach((f) => {
+    assert.ok(f in back, `${f} vanished in a round trip`);
+    assert.strictEqual(
+      FS.isFieldSet(back[f]), false,
+      `${f} came back looking set when it started empty`
+    );
+  });
+});
+
+test('a malformed record falls back to empty rather than throwing', () => {
+  // Stored state is untrusted: a version behind, hand-edited, or left over from
+  // a build where a field meant something else. One unfiltered page is a much
+  // better outcome than a wrong-looking index with no way to tell why.
+  [null, undefined, 'nonsense', 42, [], {}, { tags: 'soup', star: 7 }].forEach((bad) => {
+    const back = FS.deserialise(bad);
+    assert.strictEqual(FS.hasAnythingToClear(back), false, `${JSON.stringify(bad)} restored as set`);
+  });
+});
+
+test('a Set field given a non-array is ignored, not coerced', () => {
+  const back = FS.deserialise({ tags: 'soup' });
+  assert.strictEqual(back.tags.size, 0);
+});

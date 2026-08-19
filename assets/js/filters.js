@@ -186,6 +186,138 @@ document.addEventListener('DOMContentLoaded', function () {
     items.forEach(function(li) { recipeList.appendChild(li); });
   }
 
+  // ---------------------------------------------------------------------------
+  // INDEX MEMORY — GitHub issue #387
+  // ---------------------------------------------------------------------------
+  // Going BACK to the index restores the list you left: same shuffle order,
+  // same filters, same page, same scroll position. Arriving any other way is
+  // untouched, so §13.7's rule that a fresh visit shuffles still holds exactly.
+  //
+  // WHY THIS EXISTS RATHER THAN JUST TRUSTING THE BROWSER. The first attempt at
+  // #387 leaned on the back/forward cache: go back, the browser restores the
+  // page without re-running anything, the order survives for free. It does not
+  // work. Jekyll's dev server sends `Cache-Control: ... no-store ...` (measured,
+  // not assumed -- curl -I against :4001), and no-store disqualifies a page from
+  // bfcache in Chrome and Firefox. So on the machine this site is actually
+  // developed on, bfcache can NEVER apply: the index re-renders and reshuffles,
+  // which is what Helen saw, with her own back button as well as the new arrow.
+  //
+  // The deeper problem is that bfcache is an optimisation a browser may decline
+  // for its own reasons. Building a feature on it means the feature works
+  // sometimes -- and worse here, it would likely work on the deployed site and
+  // never on :4001, so the page she looks at all day would disagree with the
+  // live one. That is issue #235's trap running backwards.
+  //
+  // performance navigation type is a FACT rather than an optimisation: it says
+  // whether this load was a back/forward navigation, and it says so whether or
+  // not bfcache was involved. Paired with sessionStorage it needs nothing from
+  // the browser's goodwill.
+  var MEMORY_KEY = 'htf-index-memory-v1';
+
+  // Rows carry no id of their own; the title link's href is the one thing on a
+  // row that is unique and stable. Named class, not querySelector('a') -- see
+  // reorderForTitleSearch() for why the first <a> stopped being the title.
+  function rowKey(li) {
+    var a = li.querySelector('.recipe-title-link');
+    return a ? a.getAttribute('href') : '';
+  }
+
+  function arrivedByGoingBack() {
+    try {
+      var nav = performance.getEntriesByType('navigation')[0];
+      return !!nav && nav.type === 'back_forward';
+    } catch (e) {
+      return false;    // no Navigation Timing: behave as a fresh visit
+    }
+  }
+
+  /* Saved on pagehide rather than on every update: it fires on the way out of
+     the page, including into bfcache, and unlike `unload` it does not itself
+     disqualify the page from bfcache -- which matters on the deployed site,
+     where bfcache DOES apply and this whole mechanism should stay out of its
+     way. Storage being full, disabled or blocked is not worth breaking a page
+     over; the fallback is a fresh list, which is what you had before. */
+  function saveIndexMemory() {
+    if (!recipeList) return;
+    try {
+      sessionStorage.setItem(MEMORY_KEY, JSON.stringify({
+        order: items.map(rowKey),
+        filters: FilterState.serialise(state),
+        // The chosen ingredient result's DISPLAY text, which is not its match
+        // key -- an aliased entry like "five-spice" shows as "Chinese five-spice
+        // powder" (see display_names in ingredient_words.yml). The box echoes
+        // what the button shows, so that is what has to come back.
+        ingredientLabel: searchBox ? searchBox.value : '',
+        page: currentPage,
+        showAll: showAll,
+        scrollY: window.scrollY || 0
+      }));
+    } catch (e) { /* nothing to be done, and nothing worth breaking for */ }
+  }
+
+  /* Returns the saved record when it restored, or null. Null means "carry on as
+     a fresh load" and every failure path returns it: not a back navigation,
+     nothing stored, unparseable, or a record whose shape does not fit. Stored
+     state is untrusted input -- see FilterState.deserialise's own note. */
+  function restoreIndexMemory() {
+    if (!recipeList || !arrivedByGoingBack()) return null;
+
+    var saved;
+    try {
+      saved = JSON.parse(sessionStorage.getItem(MEMORY_KEY));
+    } catch (e) {
+      return null;
+    }
+    if (!saved || !Array.isArray(saved.order)) return null;
+
+    // Reorder by the saved keys, then append anything the record did not know
+    // about. A recipe added since the record was written is new to the list and
+    // belongs at the end rather than being dropped -- and dropping it would be
+    // silent, which is the failure mode to avoid.
+    var byKey = {};
+    items.forEach(function (li) { byKey[rowKey(li)] = li; });
+    var ordered = [];
+    saved.order.forEach(function (key) {
+      if (byKey[key]) { ordered.push(byKey[key]); delete byKey[key]; }
+    });
+    items.forEach(function (li) { if (byKey[rowKey(li)]) ordered.push(li); });
+    items = ordered;
+    items.forEach(function (li) { recipeList.appendChild(li); });
+
+    state = FilterState.deserialise(saved.filters);
+
+    /* HALF-FINISHED SEARCHES ARE NOT RESTORED, deliberately. isSearching and
+       isExcludeSearching mean "there is text in that box and nothing chosen
+       from its results yet" -- a pool of candidates mid-thought, not a filter.
+       Rebuilding one would mean re-running a search to recreate buttons nobody
+       had picked, and getting it slightly wrong leaves a results pool that does
+       not match the text above it. A CHOSEN result is different and is restored
+       below: it is an applied filter. */
+    state.isSearching = false;
+    state.isExcludeSearching = false;
+
+    if (nameSearchBox) nameSearchBox.value = state.nameQuery || '';
+    if (excludeBox) excludeBox.value = '';
+    if (searchBox) searchBox.value = state.ingredient ? (saved.ingredientLabel || '') : '';
+
+    /* Rebuild the chosen ingredient's button exactly as clicking it leaves
+       things (see the .btn-ingredient branch of the matrix click handler): the
+       pool holds that one button, active, with its tape shape. Reproducing the
+       end state rather than replaying a search -- a replay would re-derive the
+       whole candidate pool to then throw all but one of it away. */
+    if (state.ingredient && resultsPool) {
+      resultsPool.innerHTML = '';
+      resultsPool.appendChild(makeIngredientButton(
+        state.ingredient, saved.ingredientLabel || state.ingredient, true
+      ));
+      ensureActiveIngredientShape();
+    }
+
+    currentPage = (typeof saved.page === 'number' && saved.page > 0) ? saved.page : 1;
+    showAll = !!saved.showAll;
+    return saved;
+  }
+
   // GitHub issues #63/#78: while a title search is active, matching rows
   // are grouped into three tiers (title starts with the query > some other
   // word in the title starts with it > query is only a mid-word substring
@@ -1199,7 +1331,21 @@ function renderResultsPool() {
   // .recipe-list starts visibility:hidden in CSS specifically so this can run
   // before anything is shown — revealing it only now means the shuffled order
   // is what paints, not the server-rendered alphabetical order flashing first.
-  shuffleRecipeList();
-  update();
+  //
+  // ARRIVING BY GOING BACK IS THE ONE EXCEPTION (issue #387): the list you left
+  // is restored instead, order and filters together, and the shuffle is skipped
+  // because reshuffling is precisely what you did not want. Every other way of
+  // reaching this page -- typed, bookmarked, followed, reloaded -- still
+  // shuffles, so the rule above is unchanged rather than weakened.
+  var restored = restoreIndexMemory();
+  if (!restored) shuffleRecipeList();
+  update(!!restored);          // preserve the restored page number
   if (recipeList) recipeList.style.visibility = 'visible';
+
+  // After the reveal, so the page has its real height to scroll within.
+  if (restored && typeof restored.scrollY === 'number') {
+    window.scrollTo(0, restored.scrollY);
+  }
+
+  window.addEventListener('pagehide', saveIndexMemory);
 });
