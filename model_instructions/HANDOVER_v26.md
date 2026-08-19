@@ -1563,6 +1563,7 @@ non-empty:
 | Shape | Caught |
 |---|---|
 | `git checkout -- <paths>`, `git checkout <ref> -- <paths>` | yes |
+| `git checkout <path>` — **no `--` at all** | yes, since 2026-08-19 |
 | `git checkout .` | yes |
 | `git reset --hard` | yes |
 | `git clean -f` / `-fd` / `-xfd` / `--force` | yes |
@@ -1584,9 +1585,25 @@ non-empty:
   `git commit -F` from a heredoc, and they quote these commands constantly —
   the `CLAUDE.md` entry being enforced names three of them.
 
-**Both of those last two were found by testing, not by thinking, and the second
-found the loudest way available: the hook blocked the very commit that
-introduced it.** A heredoc body is not quoted — it is data on stdin that merely
+**THE BARE-PATH FORM WAS MISSING FOR A DAY, AND IT COST WORK.** The first
+version patterned only the ` -- ` spelling. On 2026-08-19 a session ran
+`git checkout tests/test_style.py` — reflexively, to undo a test-break it had
+made itself, which is the exact scenario the hook exists for — and the hook
+allowed it, discarding that file's uncommitted changes. **The guard's own author
+fell into the hole the guard did not cover, hours after building it.**
+
+The fix could not be a pattern: `git checkout main` is harmless,
+`git checkout feat/some-branch` is harmless and looks exactly like a path, and
+`git checkout tests/foo.py` destroys work. It asks the filesystem instead — an
+argument naming a file that exists is a path, and nothing else is.
+
+**The general lesson is about how a guard gets tested.** Both times this hook was
+verified, the verification used the spellings its author had in mind. Enumerate
+how the dangerous thing can be SPELLED, not how you happen to write it.
+
+**Both quoted mentions and heredoc bodies were found by testing, not by
+thinking, and the second found the loudest way available: the hook blocked the
+very commit that introduced it.** A heredoc body is not quoted — it is data on stdin that merely
 *looks* like shell text — so the quote-stripping added for the first case did
 not reach it. If you extend this hook, extend the test sweep with it, and check
 the two failure directions that matter: a heredoc *followed* by a real

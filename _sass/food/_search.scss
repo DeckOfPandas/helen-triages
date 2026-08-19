@@ -425,19 +425,38 @@
     }
   }
 
-  // POOL CANDIDATES: the brighter cobalt, per issue #365 ("a shade of cobalt",
-  // and "if they already do, then a lighter shade"). They did not -- they took
-  // .btn-tag's generic $color-text hover, the same neutral darkening every
-  // other tag button in every other section gets, so nothing about hovering a
-  // candidate said which section it belonged to.
+  // POOL CANDIDATES: cobalt, and DARKER than they rest -- issues #365 then #403.
+  //
+  // #365 asked for cobalt rather than .btn-tag's generic $color-text hover, so
+  // that hovering a candidate said which section it belonged to, and asked for
+  // "a lighter shade" to keep "considering" and "chosen" apart. That is what
+  // this was until 2026-08-19.
+  //
+  // #403 supersedes the LIGHTER half, and #390 is why. Once matched candidates
+  // started resting at $color-exclude-active, a lighter hover meant the whole
+  // pool brightened under the cursor while every other filter section on the
+  // page darkens -- Helen: "should darken not lighten on hover, same as for the
+  // include filter". Her follow-up covered unmatched candidates too, so this is
+  // one value for the whole pool rather than a rule per state.
+  //
+  // $color-exclude-hover is darker than $color-exclude-active deliberately: a
+  // matched candidate already RESTS at the -active tone, so hovering it to that
+  // would change nothing whatsoever. The section identity #365 asked for
+  // survives -- it is still cobalt, just going the other way.
   //
   // :not(.btn-exclude--active) so this never reaches a chosen pill, which owns
-  // the darker value above. Both are cobalt; the lighter one is the one you are
-  // still deciding about.
+  // its own hover above.
   .btn-exclude:not(.btn-exclude--active) {
     &:hover,
     &:focus-visible {
-      color: $color-electric-cobalt;
+      color: $color-exclude-hover;
+      // The stroke follows the fill. A word-matched candidate carries a
+      // -webkit-text-stroke in its RESTING colour (@mixin word-match-emphasis,
+      // "same colour as the fill... rather than a mismatched outline") -- left
+      // alone, hovering would darken the letter and leave a lighter cobalt
+      // outline around it. Harmless on unmatched candidates, which have no
+      // stroke for this to colour.
+      -webkit-text-stroke-color: $color-exclude-hover;
     }
   }
 }

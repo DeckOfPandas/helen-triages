@@ -1228,8 +1228,18 @@ def test_the_method_is_called_method_everywhere():
 
 
 def test_no_recipe_uses_the_retired_instructions_field():
-    """The template fallback is gone, so a file using it would render no method."""
+    """The template fallback is gone, so a file using it would render no method.
+
+    PARTIAL IN CI, KNOWINGLY (#378). Reads drafts as well as recipes, and a CI
+    checkout has no drafts -- so there it means "no published recipe uses it".
+    Deliberately not skipped: the published half is the half that ships, and
+    losing it to report honestly about the other half would be a bad trade.
+    """
     from conftest import ALL_RECIPES, ALL_DRAFTS
+    assert ALL_RECIPES, (
+        "No published recipes loaded at all, so this check has nothing to scan "
+        "and would pass having examined nothing."
+    )
     offenders = [r.slug for r in ALL_RECIPES + ALL_DRAFTS if "instructions" in r.fm]
     assert not offenders, (
         f"These files still use an `instructions:` field: {offenders}.\n"

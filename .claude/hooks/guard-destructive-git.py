@@ -43,6 +43,7 @@ hook that requires a chmod to install would be self-defeating.
 from __future__ import annotations
 
 import json
+import pathlib
 import re
 import subprocess
 import sys
@@ -68,6 +69,39 @@ PATTERNS: list[tuple[re.Pattern[str], str]] = [
 # git restore is handled separately: `--staged` WITHOUT `--worktree` only
 # unstages, which leaves the working tree alone and is recoverable.
 RESTORE = re.compile(_GIT + r"restore\b([^|;&]*)")
+
+# `git checkout <path>` WITH NO `--`, which discards exactly as thoroughly as the
+# separator form and reads far more innocently. Added 2026-08-19 after the hook
+# failed to stop its own author doing precisely this: `git checkout
+# tests/test_style.py`, run reflexively to undo a deliberate test-break, took a
+# file's uncommitted work with it. The first version only patterned the ` -- `
+# form, so this walked straight past.
+#
+# TELLING A PATH FROM A BRANCH IS THE WHOLE DIFFICULTY, and it cannot be done by
+# regex: `git checkout main` switches branch and is harmless, `git checkout
+# tests/foo.py` destroys work, and `git checkout feat/some-branch` is harmless
+# despite looking exactly like a path. So this asks the filesystem -- an argument
+# naming a file that EXISTS is a path, and nothing else is. Branch names do not
+# usually name real files, and on the rare occasion one does, git itself calls it
+# ambiguous and blocking is the right answer anyway.
+CHECKOUT_ARGS = re.compile(_GIT + r"checkout\b([^|;&]*)")
+
+
+def _checkout_targets_a_real_file(command: str) -> bool:
+    match = CHECKOUT_ARGS.search(command)
+    if not match:
+        return False
+    for arg in match.group(1).split():
+        if arg.startswith("-"):
+            continue                     # a flag, not a path
+        if arg in ("--",):
+            continue
+        try:
+            if pathlib.Path(arg.strip("\"'")).exists():
+                return True
+        except OSError:
+            continue
+    return False
 
 # Quoted spans are stripped before matching, and this is not a nicety. Commit
 # messages and handover notes in this repository quote these commands by name
@@ -103,6 +137,8 @@ def _matched(command: str) -> str | None:
     for pattern, label in PATTERNS:
         if pattern.search(command):
             return label
+    if _checkout_targets_a_real_file(command):
+        return "git checkout <path>"
     m = RESTORE.search(command)
     if m:
         args = m.group(1)
