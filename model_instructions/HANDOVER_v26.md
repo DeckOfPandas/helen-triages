@@ -263,7 +263,8 @@ notes:                           # always a list, never a blob
     text: "If it sinks, you added too much syrup."
 meta:
   rewritten: false
-  proofread: false
+  proofread: false               # false = Helen has not blessed THIS text
+  awaiting_fix: false            # true  = do not publish this page at all
   cooked_before: false
   date_last_edited: "2026-07-29"
 ```
@@ -279,16 +280,154 @@ If you find yourself wanting a shortened display title somewhere, that's a
 real gap the field used to paper over without actually filling it — raise
 it fresh, don't resurrect the old field.
 
+### 4.0 The two gate flags — READ THIS BEFORE EDITING ANY RECIPE
+
+Both live under `meta:`. They look like bookkeeping. They are not: one decides
+what reaches the live site, the other decides whether Helen's judgement still
+covers what is in the file. Hardened 2026-08-18; issues #331, #367.
+
+---
+
+> ## THE RULE
+>
+> **If you edit a recipe file, set `meta.proofread: false` in the SAME commit.**
+>
+> Every edit. A typo, a hyphen, a wording tweak, a note, an ingredient group
+> rename. There is no "too small to matter" — the flag does not record how big
+> the change was, it records whether Helen has read what is now in the file.
+>
+> She is the last human judgement before a recipe publishes. The moment an agent
+> changes the bytes, her proofread describes a file that no longer exists.
+
+---
+
+**Why the rule needs stating this plainly:** on 2026-08-18 twelve proofread
+recipes were edited in one commit — a wording change to eight of them, a note
+added to two, an ingredient group renamed — and not one flag was touched. Every
+one of those edits was defensible. None of them was flagged, because each looked
+too small to bother with, and nothing was looking.
+
+`tests/test_front_matter.py::test_agent_edited_recipes_are_not_marked_proofread`
+is now looking. It reads git history: if a recipe's newest commit carries a
+`Co-Authored-By: Claude` trailer, that file must say `proofread: false`.
+
+Three things about it that will otherwise waste your time:
+
+- **It reads COMMITTED history**, so it fires on the run *after* your commit,
+  not before it. It will stop a bad merge; it will **not** stop you committing
+  the omission. Set the flag while you edit, not when the suite complains.
+- **`BASELINE_COMMIT` grandfathers everything up to `dc2a7bf`.** Those 34
+  recipes include 45 second-person edits Helen reviewed one at a time, so she
+  *was* the last judgement even though an agent's commit wrote the bytes.
+- **Moving that baseline forward is Helen's to grant, never yours.** If she has
+  reviewed a change line by line, move it and say so in the commit message.
+  Never move it to make a red test go green.
+
+**Stage explicitly. Never `git add -A`.** A sweeping add swept up one of Helen's
+own uncommitted typo fixes on 2026-08-18, which put *her* edit inside an
+agent-co-authored commit and correctly tripped the rule. The repository cannot
+tell your edit from hers; only the staging can.
+
+**A recipe publishes only if it says `awaiting_fix: false`. Nothing else
+publishes.**
+
+Not "true hides it" — **false is the only thing that lets it through.** The flag
+missing, the flag left under its old hyphenated name, the value quoted as a
+string: all held back. `_plugins/hide_awaiting_fix.rb` removes the document from
+its collection at `:post_read`, so it gets no URL, no sitemap entry and no place
+in `site.food_recipes`.
+
+**It fails CLOSED, and it used to fail open.** Helen's call, 2026-08-18. The
+first version hid a document only on an explicit `true`, which meant every way
+of getting the flag wrong ended with the page live — a missing key was
+indistinguishable from a deliberate clearance, and `awaiting_fix: "true"` is a
+string that never equals Ruby's `true`, so it published the page you had just
+flagged. This is the gate that decides what the world sees; the cost of failing
+closed is that a new recipe does not publish until someone writes
+`awaiting_fix: false`, and that is the right cost.
+
+**`GATED_COLLECTIONS` is `food_recipes` and `cocktail_recipes` only, and the
+scoping is not optional.** Fail-closed applied to every collection would delete
+the entire site: `dev` pages, cocktail pages and all 254 drafts carry no
+`meta.awaiting_fix` at all. Drafts and dev pages have their own `output: false`
+protection and need no gate.
+
+`_config.yml` sets `show_awaiting_fix: false`; `_config_local.yml` sets it
+`true`, so flagged pages stay visible while you work on them and vanish from
+production.
+
+The point is that **one broken page stops blocking the site**. Flag it, ship
+everything else, fix it, unflag it. Before this existed the field sat on all 82
+recipes and nothing read it, so the only way to hold one page back was to hold
+the whole site back.
+
+**It removes the document rather than hiding it from the index, and that is the
+whole feature.** Issue #276 is the precedent and it cost two pages:
+`food/swatch.html` and `food/swatch-scribbles.html` were linked from nowhere and
+were published anyway, because Jekyll gives every document it renders a URL
+whether or not an `<a href>` points at it. **Unlinked is not unpublished.** A
+recipe merely dropped from the index still sits at its permalink and still
+appears in `sitemap.xml` — the last place you want a page you have flagged as
+wrong.
+
+There is deliberately no second field. Jekyll's own `published: false` would do
+the same job, but two fields that must agree eventually disagree — silently, and
+in the direction that publishes the broken page.
+
+**THE HYPHEN WAS A HAZARD, WHICH IS WHY THE FIELD WAS RENAMED.** It was
+`awaiting-fix` until 2026-08-18. Ruby reads `meta["awaiting-fix"]` happily, so
+the plugin never minded — but **Liquid parses `page.meta.awaiting-fix` as
+SUBTRACTION.** The first template or index filter to ask whether a page was
+flagged would have got arithmetic instead of a boolean, evaluated it as false,
+and published the flagged page. `tests/test_front_matter.py` fails on the old
+spelling anywhere in `_food_recipes/`.
+
+**Six tests guard this, because every failure mode is silent** — the page
+publishes, the build is green, and nothing says why. Three on the mechanism
+(`tests/test_site_config.py`: the plugin exists and reads the right key; the two
+configs disagree in the right direction; the workflow still runs a
+plugin-capable build). Two on the data (`tests/test_front_matter.py`: every
+recipe declares the flag; the value is a real boolean, never a quoted string).
+One behavioural (`tests/test_rendered_pages.py`), which builds a real production
+site and asserts both directions — flagged absent AND unflagged present, because
+a plugin that dropped every document would satisfy the first assertion perfectly
+and take the site down. A seventh writes two throwaway recipes, one with no flag
+and one with the old spelling, and proves neither reaches the build.
+
+Since the suite gates the deploy (§10), every one of those is also a build stop
+rather than a report.
+
+The quietest mechanism failure is worth naming: Jekyll's safe mode — what a
+Pages-native build uses — ignores `_plugins/` entirely, without warning. The
+gate would be gone and the build green.
+
 **Easy to get wrong:**
 
 - `QQ` anywhere is Helen's placeholder. **Never flag it as an error.**
-  **When ingesting a recipe** (a magazine scan, a website, a transcript,
-  anything not already in Helen's own voice) and a method step or other
-  field is still the original source text rather than her rewrite, prefix
-  it with `QQ` — e.g. `QQ - rewrite: <original step text>` — so it's
-  visibly unfinished and `test_no_qq_placeholder` (§10) will catch it if it
-  ever reaches `_food_recipes/` un-rewritten. One marker, not two: don't
-  invent `PLACEHOLDER` or anything else for this. (This is the exact
+
+  **INGESTING A RECIPE THAT IS NOT IN HELEN'S OWN VOICE — a magazine scan, a
+  website, a transcript, anything transcribed rather than written — every
+  method step starts with `QQ PLACEHOLDER `.** Restated 2026-08-18 because
+  the practice had drifted: the prefix is `QQ PLACEHOLDER ` and it goes on
+  the METHOD STEPS, not just on the odd field somebody noticed was rough.
+
+      method:
+        - "QQ PLACEHOLDER Heat the oven to 180°C fan and grease a 20-cm tin."
+        - "QQ PLACEHOLDER Cream the butter and sugar until pale."
+
+  The point is that a transcribed step is not a finished step even when it
+  reads perfectly well. Helen rewrites every one into her own voice, and
+  ingested text that happens to scan cleanly is exactly the kind that slips
+  through un-rewritten — so the marker goes on at ingest time, on all of
+  them, and comes off one at a time as she rewrites.
+
+  `test_no_qq_placeholder` (§10) catches any that reach `_food_recipes/`.
+  Drafts may carry it indefinitely; that is what drafts are for.
+
+  One marker, not two. Older drafts (roughly 190 files, predating this
+  convention) say `PLACEHOLDER - rewrite: ...` instead — leave them alone,
+  see §12 on not tidying a draft unprompted, but write every new ingest as
+  `QQ PLACEHOLDER `. (This is the exact
   convention already in wide use across `_food_drafts/` — as of 2026-08-10
   it's still written there as `PLACEHOLDER - rewrite: ...` in roughly 190
   files, predating this paragraph existing at all. Those weren't
@@ -1005,6 +1144,31 @@ notice.
 
 ## 10. Validation — run `pytest`, don't read this
 
+**The suite gates the deploy now (2026-08-18, issue #369).** Until then the
+workflow checked out, built, rendered PDFs and deployed with no test step
+anywhere, so every guard in this repository protected a local run and nothing
+else. `.github/workflows/build-and-deploy.yml` has a `test` job and `build`
+declares `needs: test`. Three things about it are load-bearing:
+
+- **`fetch-depth: 0`.** `actions/checkout` is shallow by default, and in a
+  depth-1 clone `git log -- <file>` reports the same single commit for every
+  file — so §4.0's provenance test would examine nothing and pass.
+- **The JS suite needs a glob**: `node --test tests/js/*.test.js`. Passing the
+  DIRECTORY (`node --test tests/js/`) treats it as one test file and reports
+  "tests 1, fail 1" without running the 144 inside it.
+- **CI has no private drafts.** `_food_drafts/` and `_cocktail_drafts/` are
+  separate private repos, gitignored here, so a CI checkout has the 82
+  published recipes and none of the 253 drafts. Most draft-reading tests
+  therefore check *less* in CI rather than failing (#378). One inverted and
+  failed on correct data — `test_pantry_entries_are_actually_used`, where 15
+  pantry staples are used only by drafts — and now skips when the drafts are
+  absent.
+
+**Before pushing anything that CI will run, simulate it**: move both private
+draft directories aside, run the full suite, move them back. A green local run
+proves less than you think, because your machine always has the drafts.
+
+
 Counts move as recipes/guards are added — run the suites, don't quote numbers
 from here.
 
@@ -1185,6 +1349,22 @@ knowing the trick rather than re-deriving it.
 ---
 
 ## 11. Working practices
+
+**Never run `git reset --hard` without asking Helen first — every single time.**
+Same for `git checkout --`/`git restore` over a dirty tree and `git clean -fd`.
+They discard uncommitted work with no undo and nothing in the reflog to recover
+it from. Check `git status` first and say what it shows; if something must be
+discarded and she is not around, `git stash -u` instead, because that is
+reversible. This is written here because it happened on 2026-08-18: a
+`git reset --hard origin/main` run to move a stray commit off `main` also wiped
+a half-finished handover edit sitting uncommitted in the same tree. The commit
+survived. The uncommitted work did not.
+
+**Check `git branch --show-current` immediately before every commit**, not at
+the start of the task. Helen merges PRs and checks out `main` while you are
+working, so the branch you started on is not necessarily the branch you are on.
+Two commits landed directly on `main` this way on 2026-08-18.
+
 
 Helen writes no code by choice, has strong systems judgement, wants
 explanations that assume both. Offer aesthetic opinions — she asks for them.

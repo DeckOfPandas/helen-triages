@@ -1810,9 +1810,9 @@ def test_no_decoration_slot_is_orphaned():
 
 
 # =============================================================================
-# THE awaiting-fix PUBLISH GATE — GitHub issue #331
+# THE awaiting_fix PUBLISH GATE — GitHub issue #331
 # =============================================================================
-# `meta.awaiting-fix: true` means a page has a known, open problem and must not
+# `meta.awaiting_fix: true` means a page has a known, open problem and must not
 # reach the live site, while everything else still ships. The mechanism is
 # _plugins/hide_awaiting_fix.rb, which removes the document at :post_read so it
 # gets no URL and no sitemap entry.
@@ -1830,11 +1830,11 @@ def test_awaiting_fix_plugin_exists_and_checks_the_flag():
     """The gate's implementation is present and still reads the right key."""
     assert PLUGIN.is_file(), (
         f"{PLUGIN.relative_to(ROOT)} is missing. Without it every recipe "
-        f"flagged `meta.awaiting-fix: true` publishes normally -- silently, "
+        f"flagged `meta.awaiting_fix: true` publishes normally -- silently, "
         f"because nothing else in the build looks at that field."
     )
     src = PLUGIN.read_text(encoding="utf-8")
-    for needle in ("awaiting-fix", "show_awaiting_fix", "post_read"):
+    for needle in ("awaiting_fix", "show_awaiting_fix", "post_read"):
         assert needle in src, (
             f"{PLUGIN.name} no longer mentions {needle!r}. The gate is either "
             f"reading a different field or hooking a different phase, and it "
@@ -1878,12 +1878,12 @@ def test_deploy_workflow_still_runs_a_plugin_capable_build():
     assert "bundle exec jekyll build" in src, (
         "The deploy workflow no longer runs `bundle exec jekyll build`. If it "
         "has moved to a Pages-native build, _plugins/ is silently ignored and "
-        "the awaiting-fix gate fails open -- flagged recipes publish with a "
+        "the awaiting_fix gate fails open -- flagged recipes publish with a "
         "completely green build. Keep a full build, or replace the gate."
     )
     assert "--safe" not in src, (
         "The deploy workflow passes --safe, which disables _plugins/ and so "
-        "disables the awaiting-fix gate. Remove it, or replace the gate."
+        "disables the awaiting_fix gate. Remove it, or replace the gate."
     )
 
 
@@ -1894,7 +1894,7 @@ def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
     and deployed, with no test step anywhere -- so every guard in this
     repository protected a local run and nothing else. A push to `main` shipped
     whatever was on `main` however red the suite was, including the
-    `awaiting-fix` publish gate (#331) whose entire job is to stop a flagged
+    `awaiting_fix` publish gate (#331) whose entire job is to stop a flagged
     recipe going live.
 
     Four things are asserted, because dropping any one of them restores that

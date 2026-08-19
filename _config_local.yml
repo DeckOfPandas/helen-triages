@@ -22,7 +22,7 @@ show_unrewritten: true
 # (that needs a Chrome or Chromium on PATH -- see the script's --chrome flag).
 pdf_downloads: false
 
-# Show recipes flagged `meta.awaiting-fix: true`. Production hides them
+# Show recipes flagged `meta.awaiting_fix: true`. Production hides them
 # entirely (issue #331); locally they must be visible, because they are the
 # ones being worked on.
 show_awaiting_fix: true

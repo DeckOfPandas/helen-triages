@@ -454,7 +454,24 @@ from conftest import FRONT_MATTER
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-BASELINE_COMMIT = "dc2a7bf"   # (content) restore the voice where the "you" pass flattened it
+BASELINE_COMMIT = "9c70675"   # (refactor) awaiting-fix -> awaiting_fix
+#
+# MOVED 2026-08-18, WITH HELEN'S EXPLICIT PERMISSION, asked for before the
+# commit rather than after. The awaiting_fix rename touched all 82 recipes, so
+# every one of them has an agent commit as its newest -- and this rule would
+# have demanded proofread: false on all 82.
+#
+# That would have been the letter of the rule against its purpose. It exists so
+# her proofread never describes a file she has not read. A key name changing
+# from hyphen to underscore changes no word of any recipe, so her proofread
+# still describes every one of them exactly.
+#
+# The previous baseline was dc2a7bf, moved for the same kind of reason: 45
+# second-person edits she reviewed one at a time.
+#
+# NEVER MOVE THIS TO MAKE A RED TEST GREEN. It is Helen's to grant, and the
+# question to put to her is whether she has read what is now in the files --
+# not whether the change felt small.
 AGENT_TRAILER = "co-authored-by: claude"
 
 
@@ -521,4 +538,93 @@ def test_agent_edited_recipes_are_not_marked_proofread():
           "the SAME commit must set `meta.proofread: false` (issue #367). If the "
           "change was reviewed by Helen line by line, move BASELINE_COMMIT in "
           "this file forward instead, and say so in the commit message."
+    )
+
+
+# =============================================================================
+# THE PUBLISH GATE'S DATA SIDE — GitHub issue #331
+# =============================================================================
+# _plugins/hide_awaiting_fix.rb reads `meta.awaiting_fix` and drops the document
+# when it is exactly `true`. tests/test_site_config.py guards the MECHANISM
+# (plugin present, configs disagreeing correctly, workflow still plugin-capable).
+# These two guard the DATA the mechanism reads, and both failure modes are
+# silent: the page publishes, and nothing anywhere says why.
+
+def test_every_recipe_declares_awaiting_fix():
+    """The flag is present on every recipe, so its absence is never the answer.
+
+    An absent key reads as "not flagged" and publishes, which is the right
+    DEFAULT but the wrong way to arrive at it: you cannot tell a recipe nobody
+    has considered from one deliberately cleared. Helen sets this during
+    proofreading, and a recipe that never got the field never went through that.
+    """
+    missing = []
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        meta = (yaml.safe_load(FRONT_MATTER.match(raw).group(1)) or {}).get("meta", {}) or {}
+        if "awaiting_fix" not in meta:
+            missing.append(path.name)
+    assert not missing, (
+        "Recipe(s) with no `meta.awaiting_fix` key:\n  " + "\n  ".join(missing)
+        + "\n\nAdd `awaiting_fix: false`. Absent reads as not-flagged and "
+          "publishes, which is the right default reached the wrong way -- it "
+          "makes 'nobody considered this' indistinguishable from 'deliberately "
+          "cleared'."
+    )
+
+
+def test_awaiting_fix_is_a_real_boolean():
+    """`awaiting_fix: "true"` is a STRING and the gate ignores it.
+
+    THIS IS THE SILENT ONE. The plugin drops a document when
+    `meta["awaiting_fix"] == true` -- Ruby's `true`, not a truthy value. A
+    quoted "true", or YAML's `yes` resolving to a string in some parsers, is not
+    equal to it, so the page you flagged publishes and the build stays green.
+    You would only find out by looking at the live site.
+
+    Same family as _data/cocktails/taxonomy.yml's `ship_scale`, where a bare
+    `yes` parsed as the BOOLEAN True and silently failed every comparison
+    against the string "yes" -- the same trap pointing the other way.
+    """
+    bad = []
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        meta = (yaml.safe_load(FRONT_MATTER.match(raw).group(1)) or {}).get("meta", {}) or {}
+        if "awaiting_fix" in meta and not isinstance(meta["awaiting_fix"], bool):
+            bad.append(f"{path.name}: {meta['awaiting_fix']!r} ({type(meta['awaiting_fix']).__name__})")
+    assert not bad, (
+        "`meta.awaiting_fix` must be an unquoted true/false:\n  " + "\n  ".join(bad)
+        + "\n\nThe plugin compares with `== true`, so a string never matches "
+          "and the page publishes despite being flagged -- silently, with a "
+          "green build. Never quote this value."
+    )
+
+
+def test_no_recipe_uses_the_old_hyphenated_awaiting_fix_key():
+    """`awaiting-fix` was renamed to `awaiting_fix` on 2026-08-18. Nothing may
+    carry the old spelling, in any file, ever again.
+
+    THE HYPHEN IS A HAZARD, NOT A STYLE PREFERENCE, which is why this is a test
+    and not a note. Ruby reads `meta["awaiting-fix"]` happily, so the plugin
+    never minded -- but LIQUID PARSES `page.meta.awaiting-fix` AS SUBTRACTION.
+    Any template or index filter reading the publish gate through the hyphenated
+    name would evaluate it as false, i.e. "not flagged", i.e. publish the page
+    that was flagged. The failure is arithmetic silently standing in for a
+    boolean.
+
+    A recipe carrying only the old key also has no `awaiting_fix` at all, so the
+    plugin's fail-closed rule holds it back -- but silently. This makes it loud,
+    and because the suite gates the deploy (#369), loud means the build stops.
+    """
+    offenders = []
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        if "awaiting-fix" in raw:
+            offenders.append(path.name)
+    assert not offenders, (
+        "Recipe(s) still using the old hyphenated `awaiting-fix` key:\n  "
+        + "\n  ".join(offenders)
+        + "\n\nRename to `awaiting_fix`. Liquid reads the hyphenated form as a "
+          "subtraction, so a template asking whether the page is flagged gets "
+          "arithmetic instead of the flag."
     )

@@ -429,3 +429,112 @@ def test_every_text_input_on_the_index_has_state_behind_it(site):
             f"nothing in filters.js ever assigns state.{field}, so typing in "
             f"#{box_id} leaves the state untouched and clear-all stays hidden."
         )
+
+
+def test_the_awaiting_fix_gate_fires_in_the_production_build(prod_site):
+    """Flagged recipes are absent from the production build; unflagged are present.
+
+    GitHub issue #331. tests/test_site_config.py checks the gate's PARTS exist
+    and tests/test_front_matter.py checks the DATA is well formed. This is the
+    only one that checks the gate actually does anything, against a real
+    production build -- the same place the swatch-page bug (#276) was invisible
+    until someone looked at the output rather than the source.
+
+    BOTH DIRECTIONS ON PURPOSE. The flagged half is the feature. The UNFLAGGED
+    half is what stops the fix being "hide everything": a plugin that dropped
+    every document would satisfy the flagged assertion perfectly and take the
+    site down, and with no recipe currently flagged that would be the only
+    assertion running.
+    """
+    import yaml as _yaml
+    import re as _re
+
+    flagged, clear = [], []
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        fm = _re.match(r"\A---\n(.*?)\n---", raw, _re.S)
+        meta = (_yaml.safe_load(fm.group(1)) or {}).get("meta", {}) or {}
+        (flagged if meta.get("awaiting_fix") is True else clear).append(path.stem)
+
+    assert clear, (
+        "No unflagged recipes at all -- this test would pass while checking "
+        "nothing, which is what tests/test_suite_hygiene.py exists to prevent."
+    )
+
+    published = [s for s in flagged if (prod_site / "food" / "recipes" / s / "index.html").exists()]
+    assert not published, (
+        "Recipe(s) flagged `meta.awaiting_fix: true` were PUBLISHED anyway:\n  "
+        + "\n  ".join(published)
+        + "\n\nThe gate has failed open. Check _plugins/hide_awaiting_fix.rb "
+          "still reads `awaiting_fix`, that _config.yml sets "
+          "`show_awaiting_fix: false`, and that the build is not running in "
+          "Jekyll's safe mode, which ignores _plugins/ without warning."
+    )
+
+    vanished = [s for s in clear if not (prod_site / "food" / "recipes" / s / "index.html").exists()]
+    assert not vanished, (
+        "Unflagged recipe(s) missing from the production build:\n  "
+        + "\n  ".join(vanished)
+        + "\n\nThe gate is over-firing, or something else is dropping documents."
+    )
+
+
+def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
+    """A recipe with no `awaiting_fix`, or only the old `awaiting-fix`, does not
+    publish. GitHub issue #331, Helen's call 2026-08-18.
+
+    THE ORIGINAL RULE FAILED OPEN: it hid a document only on an explicit `true`,
+    so every way of getting the flag wrong ended with the page live -- a missing
+    key, the old hyphenated key, a quoted "true". The gate decides what the
+    world sees, so it now publishes only on an explicit `false`.
+
+    This builds its own site because the condition cannot exist in the real
+    collection: tests/test_front_matter.py forbids both a missing flag and the
+    old spelling, so by the time the suite is green there is nothing left to
+    observe. Two throwaway recipes are written, built, and removed.
+
+    The CONTROL matters as much as the two subjects. A build that fell over, or
+    a gate that hid everything, would satisfy "the flagged ones are absent"
+    perfectly -- so a known-good recipe must be present in the same output.
+    """
+    _require_bundler()
+    out = ROOT / "tmp" / "_test_site_failclosed"
+    made = []
+    body = ('---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+            'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
+            'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
+            'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+            '  proofread: false\n{flag}  cooked_before: false\n'
+            '  date_last_edited: "2026-08-18"\n---\n')
+    try:
+        cases = {
+            "zzz-gate-no-flag": "",                             # field absent entirely
+            "zzz-gate-old-key": "  awaiting-fix: false\n",      # only the old spelling
+        }
+        for slug, flag in cases.items():
+            p = ROOT / "_food_recipes" / f"{slug}.md"
+            p.write_text(body.format(t=slug, flag=flag), encoding="utf-8")
+            made.append(p)
+
+        result = subprocess.run(
+            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
+             "--destination", str(out)],
+            cwd=ROOT, capture_output=True, text=True, timeout=600,
+        )
+        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
+
+        published = [s for s in cases if (out / "food" / "recipes" / s / "index.html").exists()]
+        assert not published, (
+            "The gate FAILED OPEN for:\n  " + "\n  ".join(published)
+            + "\n\n_plugins/hide_awaiting_fix.rb must publish only on an "
+              "explicit `awaiting_fix: false`. A missing key and the old "
+              "hyphenated key must both hold the page back."
+        )
+        assert (out / "food" / "recipes" / "caramel" / "index.html").exists(), (
+            "The control recipe is missing too, so this build proves nothing "
+            "about the gate -- it either failed or is hiding everything."
+        )
+    finally:
+        for p in made:
+            p.unlink(missing_ok=True)
+        shutil.rmtree(out, ignore_errors=True)
