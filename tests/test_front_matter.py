@@ -598,3 +598,33 @@ def test_awaiting_fix_is_a_real_boolean():
           "and the page publishes despite being flagged -- silently, with a "
           "green build. Never quote this value."
     )
+
+
+def test_no_recipe_uses_the_old_hyphenated_awaiting_fix_key():
+    """`awaiting-fix` was renamed to `awaiting_fix` on 2026-08-18. Nothing may
+    carry the old spelling, in any file, ever again.
+
+    THE HYPHEN IS A HAZARD, NOT A STYLE PREFERENCE, which is why this is a test
+    and not a note. Ruby reads `meta["awaiting-fix"]` happily, so the plugin
+    never minded -- but LIQUID PARSES `page.meta.awaiting-fix` AS SUBTRACTION.
+    Any template or index filter reading the publish gate through the hyphenated
+    name would evaluate it as false, i.e. "not flagged", i.e. publish the page
+    that was flagged. The failure is arithmetic silently standing in for a
+    boolean.
+
+    A recipe carrying only the old key also has no `awaiting_fix` at all, so the
+    plugin's fail-closed rule holds it back -- but silently. This makes it loud,
+    and because the suite gates the deploy (#369), loud means the build stops.
+    """
+    offenders = []
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        raw = path.read_text(encoding="utf-8")
+        if "awaiting-fix" in raw:
+            offenders.append(path.name)
+    assert not offenders, (
+        "Recipe(s) still using the old hyphenated `awaiting-fix` key:\n  "
+        + "\n  ".join(offenders)
+        + "\n\nRename to `awaiting_fix`. Liquid reads the hyphenated form as a "
+          "subtraction, so a template asking whether the page is flagged gets "
+          "arithmetic instead of the flag."
+    )

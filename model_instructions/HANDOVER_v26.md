@@ -328,13 +328,33 @@ own uncommitted typo fixes on 2026-08-18, which put *her* edit inside an
 agent-co-authored commit and correctly tripped the rule. The repository cannot
 tell your edit from hers; only the staging can.
 
-**`awaiting_fix: true` means the page does not publish. At all.**
+**A recipe publishes only if it says `awaiting_fix: false`. Nothing else
+publishes.**
 
-`_plugins/hide_awaiting_fix.rb` removes the document from its collection at
-`:post_read`, so it gets no URL, no sitemap entry, and no place in
-`site.food_recipes`. `_config.yml` sets `show_awaiting_fix: false`;
-`_config_local.yml` sets it `true`, so flagged pages stay visible while you work
-on them and vanish from production.
+Not "true hides it" — **false is the only thing that lets it through.** The flag
+missing, the flag left under its old hyphenated name, the value quoted as a
+string: all held back. `_plugins/hide_awaiting_fix.rb` removes the document from
+its collection at `:post_read`, so it gets no URL, no sitemap entry and no place
+in `site.food_recipes`.
+
+**It fails CLOSED, and it used to fail open.** Helen's call, 2026-08-18. The
+first version hid a document only on an explicit `true`, which meant every way
+of getting the flag wrong ended with the page live — a missing key was
+indistinguishable from a deliberate clearance, and `awaiting_fix: "true"` is a
+string that never equals Ruby's `true`, so it published the page you had just
+flagged. This is the gate that decides what the world sees; the cost of failing
+closed is that a new recipe does not publish until someone writes
+`awaiting_fix: false`, and that is the right cost.
+
+**`GATED_COLLECTIONS` is `food_recipes` and `cocktail_recipes` only, and the
+scoping is not optional.** Fail-closed applied to every collection would delete
+the entire site: `dev` pages, cocktail pages and all 254 drafts carry no
+`meta.awaiting_fix` at all. Drafts and dev pages have their own `output: false`
+protection and need no gate.
+
+`_config.yml` sets `show_awaiting_fix: false`; `_config_local.yml` sets it
+`true`, so flagged pages stay visible while you work on them and vanish from
+production.
 
 The point is that **one broken page stops blocking the site**. Flag it, ship
 everything else, fix it, unflag it. Before this existed the field sat on all 82
@@ -354,13 +374,32 @@ There is deliberately no second field. Jekyll's own `published: false` would do
 the same job, but two fields that must agree eventually disagree — silently, and
 in the direction that publishes the broken page.
 
-**Every failure mode of this gate fails open**, which is why
-`tests/test_site_config.py` guards it three ways: the plugin exists and still
-reads the right key; `_config.yml` says false while `_config_local.yml` says
-true; and the deploy workflow still runs a plugin-capable build. That last is
-the quietest — Jekyll's safe mode (what a Pages-native build uses) ignores
-`_plugins/` entirely, without warning, and every flagged recipe would publish
-with a completely green build.
+**THE HYPHEN WAS A HAZARD, WHICH IS WHY THE FIELD WAS RENAMED.** It was
+`awaiting-fix` until 2026-08-18. Ruby reads `meta["awaiting-fix"]` happily, so
+the plugin never minded — but **Liquid parses `page.meta.awaiting-fix` as
+SUBTRACTION.** The first template or index filter to ask whether a page was
+flagged would have got arithmetic instead of a boolean, evaluated it as false,
+and published the flagged page. `tests/test_front_matter.py` fails on the old
+spelling anywhere in `_food_recipes/`.
+
+**Six tests guard this, because every failure mode is silent** — the page
+publishes, the build is green, and nothing says why. Three on the mechanism
+(`tests/test_site_config.py`: the plugin exists and reads the right key; the two
+configs disagree in the right direction; the workflow still runs a
+plugin-capable build). Two on the data (`tests/test_front_matter.py`: every
+recipe declares the flag; the value is a real boolean, never a quoted string).
+One behavioural (`tests/test_rendered_pages.py`), which builds a real production
+site and asserts both directions — flagged absent AND unflagged present, because
+a plugin that dropped every document would satisfy the first assertion perfectly
+and take the site down. A seventh writes two throwaway recipes, one with no flag
+and one with the old spelling, and proves neither reaches the build.
+
+Since the suite gates the deploy (§10), every one of those is also a build stop
+rather than a report.
+
+The quietest mechanism failure is worth naming: Jekyll's safe mode — what a
+Pages-native build uses — ignores `_plugins/` entirely, without warning. The
+gate would be gone and the build green.
 
 **Easy to get wrong:**
 

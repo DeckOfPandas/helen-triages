@@ -35,6 +35,11 @@
 # OPEN -- flagged recipes would publish with no error at all. tests/test_food.py
 # asserts the workflow still uses a plugin-capable build for that reason.
 # =============================================================================
+# The collections whose documents are gated. Everything else -- dev pages,
+# drafts, cocktail pages -- has its own `output: false` protection and carries
+# no flag, so gating them would simply delete them.
+GATED_COLLECTIONS = %w[food_recipes cocktail_recipes].freeze
+
 Jekyll::Hooks.register :site, :post_read do |site|
   # Locally the flagged pages must stay visible: they are the ones being
   # worked on, and hiding them is the opposite of useful. _config_local.yml
@@ -42,10 +47,31 @@ Jekyll::Hooks.register :site, :post_read do |site|
   next if site.config["show_awaiting_fix"]
 
   hidden = []
-  site.collections.each_value do |collection|
+  site.collections.each do |name, collection|
+    # SCOPED, and not scoping it would take the site down. The rule below is
+    # FAIL CLOSED -- publish only on an explicit `false` -- and `dev` pages,
+    # cocktail pages and every draft carry no `meta.awaiting_fix` at all, so an
+    # unscoped version would hold back every one of them. Only the collections
+    # that actually publish recipes are gated.
+    next unless GATED_COLLECTIONS.include?(name)
+
     collection.docs.reject! do |doc|
       meta = doc.data["meta"]
-      flagged = meta.is_a?(Hash) && meta["awaiting_fix"] == true
+      # PUBLISH ONLY ON AN EXPLICIT `false`. Anything else is held back: the
+      # flag set to true, the flag missing entirely, the flag left under its old
+      # hyphenated name, or a value that is a string rather than a boolean.
+      #
+      # Helen's call, 2026-08-18, and it inverts the original default. The first
+      # version published unless it saw `true`, which fails OPEN: every way of
+      # getting the flag wrong ended with the page live. A missing key and a
+      # deliberate `false` were indistinguishable, and `awaiting_fix: "true"`
+      # published the page you had just flagged.
+      #
+      # Failing closed makes every one of those loud instead. The cost is that a
+      # new recipe does not publish until someone writes `awaiting_fix: false`,
+      # which is the right cost: this is the gate that decides what the world
+      # sees.
+      flagged = !(meta.is_a?(Hash) && meta["awaiting_fix"] == false)
       hidden << doc.relative_path if flagged
       flagged
     end
