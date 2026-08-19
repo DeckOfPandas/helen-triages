@@ -1,6 +1,6 @@
 ---
 title: "Plum Sauce for Duck"
-tagline: "This is plum sauce...for duck. This recipe for [slow cooked confit duck legs](../slow-cooked-confit-duck-legs/) likes plum sauce."
+tagline: "This is plum sauce...for duck. This recipe for [slow-cooked confit duck legs](../slow-cooked-confit-duck-legs/) likes plum sauce."
 source: "Henry"
 serves: "2"
 prep_time: "5 mins"
@@ -29,12 +29,12 @@ method_short:
   - ""
 notes:
   - label: "Pairs with"
-    text: "Great with [slow cooked confit duck legs](../slow-cooked-confit-duck-legs/)."
+    text: "Great with [slow-cooked confit duck legs](../slow-cooked-confit-duck-legs/)."
   - label: "Freezing"
     text: "Freezable before the butter goes in."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting-fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
