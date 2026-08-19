@@ -26,7 +26,26 @@
      back to the site description. Set once here, reused by every meta tag below.
   {% endcomment %}
   {% assign page_title = site_title %}
-  {% if page.title %}{% assign page_title = page.title | append: " | " | append: site_title %}{% endif %}
+  {% comment %} A page may say it belongs to no site, and exactly one does:
+     about.html. It is reached from the shared header of BOTH sites at a
+     site-neutral /about/, so appending "Helen Triages Food" to its name put
+     one site's identity on a page that speaks for the repo -- issue #395.
+
+     Helen, settling it: "The name of that page is '??', so wherever a title
+     would appear it should read '??'." So the title is the page's own name,
+     with nothing appended. The same key drives the bracketed word on the tape
+     (see the wordmark below), which is what makes this ONE idea rather than a
+     second ad-hoc override sitting beside the first.
+
+     It cannot be inferred from site_key: that page still carries `site_key:
+     food` and must, because that is what gives it a stylesheet at all (see its
+     own front matter). Belonging to no site for DISPLAY and borrowing one
+     site's CSS are different claims, and only the first is declarable here.
+  {% endcomment %}
+  {% if page.title %}
+    {% if page.site_neutral %}{% assign page_title = page.title %}
+    {% else %}{% assign page_title = page.title | append: " | " | append: site_title %}{% endif %}
+  {% endif %}
   {% assign page_description = page.tagline | default: site_desc | strip_newlines %}
 
   <title>{{ page_title }}</title>

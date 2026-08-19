@@ -655,7 +655,7 @@ gate would be gone and the build green.
   (`.notes` grid, `_recipe.scss`) rather than stacked — a lone note stays
   full width (`.notes--single`). Nobody has needed more than 3 on one
   recipe; 4+ is the signal to write `{{ content }}` prose instead (§4.1),
-  the way `dark-chocolate-ganache.md`'s Troubleshooting section does.
+  the way `chocolate-ganache.md`'s Troubleshooting section does.
 - `internal_temp_ref` (+ optional `doneness`) is how a recipe pulls a live
   figure from `_data/food/internal_temperatures.yml` — see §14 for the
   mechanism and why it can only render in `recipe-meta`, never inline in a
@@ -676,10 +676,12 @@ gate would be gone and the build green.
 A recipe file's Markdown body — the content *after* the closing `---` — is
 not part of the schema above, but isn't ignored either: `_layouts/
 recipe.html` renders it verbatim (`{{ content }}`) inside `.recipe-body-
-content`, between Notes and the source footer, if it's non-empty. As of
-2026-08-02 exactly one file uses this, of ~370 recipes and drafts combined:
-`dark-chocolate-ganache.md` carries a substantial hand-written Tips and
-Troubleshooting section this way.
+content`, between Notes and the source footer, if it's non-empty. **Two
+published recipes use it**, checked 2026-08-20 rather than assumed:
+`chocolate-ganache.md` (~2,900 characters of Tips and Troubleshooting) and
+`henrys-quick-bulletproof-hollandaise-sauce.md` (~3,600). This said "exactly
+one file" and named the ganache by its old slug until then — it was renamed
+from `dark-chocolate-ganache.md` at some point and this file did not follow.
 
 **Decided 2026-08-02: this content continues the recipe, it does not become
 a blog post.** Helen considered three options — style it as a blog post with
@@ -779,7 +781,7 @@ at the border, so padding-left alone only moves where the text starts, never
 the number). Verified against `beef-wellington.md` (one of six recipes using
 `method_groups`) after this change, not assumed safe by inspection alone.
 
-`dark-chocolate-ganache.md`'s own cooling step is the first (only, as of
+`chocolate-ganache.md`'s own cooling step is the first (only, as of
 2026-08-02) real example.
 
 ---
@@ -1692,6 +1694,19 @@ Helen writes no code by choice, has strong systems judgement, wants
 explanations that assume both. Offer aesthetic opinions — she asks for them.
 Disagree with her when you think she's wrong; say plainly when you were
 wrong yourself.
+
+**Her hours are hers. Never remark on the time, suggest stopping, or wonder
+aloud whether something should wait until tomorrow.** Helen, 2026-08-20, after
+a session ended a summary with "it's half past midnight — that's a good place
+to stop": *"I am aware of the time. I keep my own hours. Please never tell me
+to stop or go to bed — those things are up to me."*
+
+She added *"I'm sure this used to be in the handover"* — it never was, under
+any phrasing, checked with `git log -S` across the whole tracked history of
+this file and `CLAUDE.md` including deleted versions. So it had been said in
+conversation and never written down, which is exactly what this section exists
+to stop: a preference that leaves no trace in a file gets rediscovered by
+annoying her with it again.
 
 **The four below are about the INTERACTION, not the artefact, which is why
 they have to live here.** The codebase teaches the house style better than any
