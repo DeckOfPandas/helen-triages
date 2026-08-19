@@ -6,12 +6,19 @@ is its sibling: it has real drinks and a schema now, and almost no styling.
 Written 2026-08-02, revised 2026-08-19. Supersedes v25 — deleted, not kept, per
 house practice: this file has no back-catalogue, only the current version.
 
-**The 2026-08-19 revision is mostly §2.5**, which is new and is the biggest
-structural change since this file was written: the header and the footer stopped
-being per-site configuration and became one artefact. §2.2, §2.3, §9.8, §13.8
-and §13.9 all changed with it, and §12 gained three traps. If you are picking
-this up mid-stream, read §2.5 before touching anything in `_layouts/` or
+**Two things are new on 2026-08-19, and you want both before you start.**
+
+**§2.5, the shared chrome** — the biggest structural change since this file was
+written: the header and the footer stopped being per-site configuration and
+became one artefact. §2.2, §2.3, §9.8, §13.8 and §13.9 all changed with it, and
+§12 gained three traps. Read it before touching anything in `_layouts/` or
 `_sass/shared/`.
+
+**§11.0, the destructive-git hook** — the first executable rule here that
+governs the AGENT rather than the site. `git reset --hard`, `git checkout --`,
+`git restore` and `git clean -f` are now REFUSED by a PreToolUse hook whenever
+the tree is dirty. You will meet it before you read about it if you are not
+careful, so read it first.
 
 **This is a rewrite, not a revision**, at Helen's explicit request: "precise
 rather than verbose", "strongly consider deleting rather than automatically
@@ -1520,10 +1527,102 @@ reversible. This is written here because it happened on 2026-08-18: a
 a half-finished handover edit sitting uncommitted in the same tree. The commit
 survived. The uncommitted work did not.
 
+**A hook enforces that rule now — added 2026-08-19, after the rule was read and
+broken the same day.** See §11.0 below. It is the first executable rule in this
+repo that is about the AGENT's behaviour rather than the site's content, so it
+is worth knowing exists before you meet it.
+
 **Check `git branch --show-current` immediately before every commit**, not at
 the start of the task. Helen merges PRs and checks out `main` while you are
 working, so the branch you started on is not necessarily the branch you are on.
-Two commits landed directly on `main` this way on 2026-08-18.
+Two commits landed directly on `main` this way on 2026-08-18 — **and the rule
+paid for itself again on 2026-08-19**: Helen merged a PR and pulled mid-task,
+which deleted the working branch out from under a session that had staged, but
+not yet committed, an unrelated change. The check caught it standing on `main`
+with three staged files. `git checkout -b <branch>` carries staged changes
+across, so the fix is to branch and commit, not to unstage anything.
+
+### 11.0 The destructive-git hook
+
+`.claude/hooks/guard-destructive-git.py`, wired as a **PreToolUse hook on
+`Bash`** in `.claude/settings.json` with `if: "Bash(git *)"` so it only wakes
+for git commands.
+
+**Why it exists, and why it is code.** The rule above had been in `CLAUDE.md`
+since 2026-08-18. On 2026-08-19 a session that had read it ran
+`git checkout -- <two files> 2>/dev/null || true` to undo an edit it had just
+made itself, and discarded work in the process. **A rule an agent reads and then
+breaks needs enforcement, not rewording.** That is the same conclusion this
+repository already reached twice, about `meta.awaiting_fix` and
+`meta.proofread`: both were documented at length long before anything checked
+them, and both were violated until something did.
+
+**What it refuses**, when — and only when — `git status --porcelain` is
+non-empty:
+
+| Shape | Caught |
+|---|---|
+| `git checkout -- <paths>`, `git checkout <ref> -- <paths>` | yes |
+| `git checkout .` | yes |
+| `git reset --hard` | yes |
+| `git clean -f` / `-fd` / `-xfd` / `--force` | yes |
+| `git restore`, `git restore --worktree` | yes |
+
+**What it deliberately allows, and the reasoning matters more than the list:**
+
+- **Everything, on a CLEAN tree.** These commands are no-ops with nothing
+  uncommitted. A guard that fires on harmless invocations is one you learn to
+  route around, and an agent trained to route around a safety rail is worse off
+  than one with no rail. The *combination* is the danger, so the combination is
+  what is checked.
+- **`git stash` / `git stash -u`**, which is the reversible answer the refusal
+  points you at.
+- **`git restore --staged`** on its own: that unstages and leaves the working
+  tree untouched. Add `--worktree` and it refuses.
+- **Quoted mentions**, e.g. `git commit -m "do not git checkout -- things"`.
+- **Heredoc bodies.** Commit messages here are written through
+  `git commit -F` from a heredoc, and they quote these commands constantly —
+  the `CLAUDE.md` entry being enforced names three of them.
+
+**Both of those last two were found by testing, not by thinking, and the second
+found the loudest way available: the hook blocked the very commit that
+introduced it.** A heredoc body is not quoted — it is data on stdin that merely
+*looks* like shell text — so the quote-stripping added for the first case did
+not reach it. If you extend this hook, extend the test sweep with it, and check
+the two failure directions that matter: a heredoc *followed* by a real
+destructive command must still block, and an *unterminated* heredoc must fail
+safe rather than swallowing the rest of the line. Both are covered today.
+
+**Why a hook rather than a `deny` entry in `permissions`.** A deny rule is a
+prefix match on the command string, and the command that got past the written
+rule was a compound line with a redirect and a fallback
+(`… 2>/dev/null || true`). The hook reads the whole command and then asks git
+whether anything would actually be lost. `CLAUDE.md` already notes that Bash
+cannot be reliably restricted by permission patterns; this is the general answer
+to that, not a special case.
+
+**`python3`, not `bash`** — there is no `jq` on this machine. It is invoked as
+`python3 <path>` so it needs **no execute bit**: `CLAUDE.md` forbids changing
+file permissions without asking every single time, and a guard that required a
+`chmod` to install would be self-defeating. Keep that property if you touch it.
+
+**Known limits, stated so they are not mistaken for coverage:**
+
+- It cannot see a `cd` earlier in the command line — it asks git about the
+  directory the hook itself runs in, so a command that changes directory first
+  may be judged against the wrong repository. Accepted: a wrong-but-loud block
+  is recoverable in a way a silent discard is not.
+- `bash -c "git reset --hard"` slips through, because the quote-stripping
+  removes it. That is deliberate evasion rather than the accident this exists to
+  catch, and no regex fixes it.
+- It counts UNTRACKED files as dirty. Right for `git clean`, conservative for
+  the others, and conservative is the correct direction here.
+
+**If it blocks you and you think it is wrong, read the refusal before working
+around it** — it names what is uncommitted. The commonest legitimate case is
+undoing an edit you just made yourself, and the answer there is to **re-edit the
+file**, not to reach for git. That is precisely the mistake that caused the hook
+to be written.
 
 
 Helen writes no code by choice, has strong systems judgement, wants
