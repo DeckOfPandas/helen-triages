@@ -22,13 +22,13 @@
   // "click for short method" beside a method that is already fully printed
   // below reads as an instruction rather than as a disabled control.
   //
-  // .cm-totop is the reference pages' "↑ top", not the recipe page's; it is
-  // covered here because it is the same kind of thing and this is the file
-  // that knows about it, not because reference pages are in scope for issue
-  // #86.
+  // .cm-totop, the reference pages' "↑ top", was hidden here too until
+  // 2026-08-19. It went with its last consumer (issue #382 -- see the note in
+  // _recipe-header.scss), and this rule had to go with it: a print rule
+  // matching nothing fails silently and on paper only, which is exactly what
+  // test_print_rules_target_classes_that_exist exists to catch. It did.
   .recipe-actions,
-  .btn-method-toggle,
-  .cm-totop {
+  .btn-method-toggle {
     display: none;
   }
 

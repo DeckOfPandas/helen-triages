@@ -1,0 +1,285 @@
+---
+layout: default
+title: "Cooking Methods and Timings"
+permalink: /food/reference/cooking-methods-and-timings/
+---
+
+{% comment %}
+  Every figure comes from _data/food/cooking_methods.yml, generated from
+  food/reference/cooking-methods.html's own tables -- same numbers, same
+  wording. The finishing temperatures come from internal_temperatures.yml,
+  which is where the two halves of the reference layer join up: a method that
+  ends on a time is only half an answer.
+
+  Promoted out of /food/reference-demo/ on 2026-08-14, with the charts page.
+
+  ONE QUESTION NOW, NOT TWO -- issue #244. The "eating at" and "rest" boxes are
+  gone, and so is everything that existed only to serve them: the
+  in-at/out-at/rest-until list on each card, and the rest box's tooltip about
+  whether the figure was cited or a working default. What is left answers "how
+  long does this take", not "what time do I put it in". Helen: "needs to be
+  much clearer for a user." The clock arithmetic itself is still in
+  assets/js/cook-schedule.js, unused and deliberately kept -- see the note at
+  the top of that file before deleting anything there.
+
+  THE TITLE CHANGED FIRST, THE PERMALINK FOLLOWED. "Cooking Methods and
+  Timings" is Helen's wording, from issue #243; this file used to explain at
+  length why the URL stayed /food/reference/timings/ anyway, on the reasoning
+  that eleven crosslinks pointed at it (several carrying ?protein=) and the URL
+  is the part of a reference page other pages depend on.
+
+  Issue #383 moved it on 2026-08-19. That reasoning was sound and it was an
+  argument for doing the rename CAREFULLY, not for never doing it: the
+  crosslinks are all in this repo, tests/test_page_links.py resolves every href
+  in every template back to a literal path, and tests/test_rendered_pages.py
+  scans the built production site again. There is no redirect from the old URL
+  -- see the note in internal-temperatures.html, renamed in the same pass.
+
+  THIS PAGE ALSO ABSORBED FISH AND SHELLFISH on 2026-08-19, issue #382, when
+  food/reference/cooking-methods.html was deleted. See the comment above those
+  two sections at the foot of the page.
+{% endcomment %}
+
+
+<script type="application/json" id="ct-methods">{{ site.data.food.cooking_methods | jsonify }}</script>
+<script type="application/json" id="ct-temps">{{ site.data.food.internal_temperatures | jsonify }}</script>
+
+<article class="recipe">
+  <div class="recipe-title">
+    <h1 class="recipe-main-title"><span class="recipe-title-text">Cooking Methods and Timings</span></h1>
+  </div>
+  <div class="recipe-body-content" data-cook-timer>
+
+    <p class="ct-strapline">Cooking methods and timings for proteins, by weight.</p>
+
+    {% comment %} NO HORIZONTAL RULE HERE, though issue #243's sketch draws one.
+       This site has no <hr> anywhere: what separates one band from the next is
+       the section heading itself -- $spacing-section-top (4.5rem) of air above
+       it and the lime-over-violet double rule painted under its lettering
+       (food/_rule.scss, .section-heading-text--reference). That treatment is
+       already a rule plus a label, and stacking a bare <hr> on top of it would
+       draw the same boundary twice in two different vocabularies.
+
+       THE HEADING IS THE SELECTED PROTEIN, filled by cook-timer.js and updated
+       whenever the dropdown changes -- so the band below reads as "BEEF: this
+       is what beef does", which is what makes the finishing temperature under
+       it work where it didn't before. Same treatment the temperature charts
+       use for their per-protein sections, deliberately: moving between the two
+       pages should feel like moving within one reference layer, and this page
+       inventing a third heading style would break that. Empty in the served
+       HTML because the protein list itself comes from the JSON above.
+       {% endcomment %}
+    {% comment %} THE "WHAT" SELECTOR SITS ABOVE THE HEADING IT CHANGES, which
+       is issue #253's own correction to #243 after Helen looked at the built
+       page. It reads as the control it is: you pick a protein, and everything
+       below re-titles itself. Underneath the heading it was the other way
+       round -- the page announced BEEF and then offered a box that turned out
+       to change what it had just announced.
+
+       It is deliberately NOT in .ct-controls with the weight any more. The two
+       boxes do different jobs now: this one chooses the subject, the weight
+       one refines the answer, and the heading between them is the seam.
+       {% endcomment %}
+    <div class="ct-protein-pick">
+      <label class="ct-field">
+        <span>What</span>
+        <select id="ct-protein"></select>
+      </label>
+    </div>
+
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference" id="ct-protein-name"></span></h2>
+
+    {% comment %} THE FINISHING TEMPERATURE SITS ABOVE THE CONTROLS, and this
+       reverses the arrangement this file argued for until 2026-08-16. The old
+       note here said it was an OUTPUT and that above the inputs it "was
+       answering a question nobody had asked yet" (Helen: "it makes no sense
+       where it is"), which was true of where it sat THEN: directly under a
+       summary sentence, with four unexplained boxes below it and nothing
+       saying what it was the temperature OF.
+
+       Under a protein heading it is a different statement. "Done at 52-54°C"
+       beneath BEEF reads as a property of the beef -- the one figure that
+       holds however you cook it and whatever it weighs -- rather than as
+       something the form below computed. That is why the same line works here
+       and read as lost there: it has stopped being an answer and become part
+       of the heading. Issue #243, Helen's own sketch.
+
+       The way out to the full spectrum stays with it. This page shows a single
+       doneness at a time and should say so where it says the figure.
+       {% endcomment %}
+    <p class="ct-doneat" id="ct-doneat"></p>
+
+    {% comment %} The calculator line: what, and how heavy. Two boxes now, and
+       the wrapper's bottom border is the second of the sketch's two rules --
+       kept because it closes a band of INPUTS before a band of answers, which
+       is a different job from separating two labelled sections. It lives on
+       the wrapper rather than on the form so the rule still draws whatever the
+       form ends up containing. {% endcomment %}
+    {% comment %} The weight, alone now, and its wrapper's bottom border is the
+       horizontal line issue #253 asks for after this field. Kept on the
+       wrapper rather than the form so the rule still draws whatever the form
+       ends up containing. {% endcomment %}
+    <div class="ct-controls">
+      <div class="ct-form">
+        <label class="ct-field">
+          <span>Weight (kg)</span>
+          <input id="ct-weight" type="number" min="0.3" max="15" step="0.1" value="2.4" inputmode="decimal">
+        </label>
+      </div>
+    </div>
+
+    {% comment %} One heading over both the table and the cards, replacing
+       "Details" -- issue #253. They are two views of one answer (scan to
+       choose, then read the one you chose), and giving the second its own
+       heading made them look like two topics.
+
+       #ct-summary is kept but no longer carries the count. "7 ways to cook
+       2.4 kg of beef" duplicated a table sitting immediately beneath it that
+       says the same thing at more use. What is left is the prompt when there
+       is no usable weight, which is the one thing the table cannot say for
+       itself -- it is empty at exactly that moment. role="status" so a
+       recalculation is announced rather than only seen. {% endcomment %}
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Cooking Methods</span></h2>
+
+    <p class="ct-summary" id="ct-summary" role="status"></p>
+
+    {% comment %} The decision table: which method, before how long. Populated
+       by cook-timer.js; .table-scroll is the site's existing wrapper for a
+       table too wide for the column. {% endcomment %}
+    <div class="table-scroll" id="ct-table"></div>
+
+    <div class="ct-results" id="ct-results"></div>
+
+    {% comment %} The long explanation of why some rows decline used to live
+       here -- four paragraphs restating what the cards already say for
+       themselves at the moment it matters. Helen: "the whole bottom section can
+       go, other than see also." A card that says "Won't guess this one" and
+       shows its own conflicting range needs no essay three screens below it.
+       {% endcomment %}
+
+    {% comment %} ── FISH AND SHELLFISH ──────────────────────────────────────
+       Moved here on 2026-08-19, issue #382, when food/reference/cooking-methods.html
+       was deleted. Nine of that page's twelve sections were a genuine duplicate
+       of the calculator above -- same data, same numbers, rendered as static
+       tables. These two were not: nothing else on the site holds them.
+
+       Helen's call on the third, steak, was to drop it outright: "I know how to
+       cook steak. I'm hovering over deleting fish and shellfish, because ditto,
+       but it's good to have the reminder about options of how to cook. Since
+       neither have target temperatures... they still have methods so they go on
+       the methods page."
+
+       THEY ARE DELIBERATELY NOT PART OF THE CALCULATOR, and the intro line
+       below says so. The protein dropdown lists nine roasting proteins and will
+       never list these: fish is governed by THICKNESS and shellfish by the
+       shell opening, so there is no weight-driven schedule to compute. Without
+       a line saying that, two tables sitting under an instrument read as a
+       section of it whose controls have gone missing.
+
+       The tables stay hand-written rather than moving into cooking_methods.yml.
+       They carry no timings to reconcile against the data, and fish's uses
+       eleven rowspans and several empty cells that a generic rows-loop would
+       flatten into a different table. Same reasoning as when they were left
+       hand-written on the old page.
+    {% endcomment %}
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">By species, not by weight</span></h2>
+
+    <p>Fish and shellfish are not in the calculator above and will not be: fish
+    is governed by its thickness and shellfish by the moment the shell opens, so
+    there is no weight to schedule from. What they do have is options, which is
+    what these two tables are for.</p>
+
+    <h2 class="recipe-section-heading" id="fish"><span class="section-heading-text section-heading-text--reference">Fish</span></h2>
+    <p class="recipe-section-subtitle">By species and form</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Fish</th><th>Form</th><th>Best methods</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td rowspan="3">Salmon</td><td>Fillet</td><td>Pan-fry (skin-down first); oven-roast</td><td>Fatty enough to tolerate most methods well</td></tr>
+          <tr><td>Whole</td><td>Whole roast; poach</td><td>Poaching a whole side is classic</td></tr>
+          <tr><td>Steak/cutlet</td><td>Poach; grill/BBQ; pan-fry</td><td></td></tr>
+          <tr><td rowspan="2">Cod / haddock</td><td>Fillet</td><td>Pan-fry with dredge (flour/breadcrumb); oven-bake; poach; steam</td><td>Thick fillets suit baking over pan-frying alone</td></tr>
+          <tr><td>Whole</td><td>Oven-bake (less common form for these species)</td><td></td></tr>
+          <tr><td rowspan="2">Sea bass</td><td>Whole</td><td>Roast; steam (esp. Chinese-style); grill/BBQ</td><td></td></tr>
+          <tr><td>Fillet</td><td>Pan-fry, skin-down</td><td>Skin crisps very well</td></tr>
+          <tr><td rowspan="2">Sea bream</td><td>Whole</td><td>Roast; grill/BBQ; salt-baked</td><td>Salt-crust baking is a well-known bream-specific method</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
+          <tr><td rowspan="2">Trout</td><td>Whole</td><td>Pan-fry (classic "amandine" style); oven-bake; grill/BBQ; poach</td><td>Whole pan-frying is unusually common for trout given its small size</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
+          <tr><td rowspan="2">Mackerel</td><td>Whole</td><td>Grill/BBQ (classic); oven-bake; smoke</td><td>Oily flesh copes well with fierce direct heat</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
+          <tr><td rowspan="3">Halibut / turbot</td><td>Steak</td><td>Pan-fry + oven finish; poach</td><td>Lean and dense — gentle finish avoids drying out</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry + oven finish; poach; oven-roast</td><td></td></tr>
+          <tr><td>Whole (turbot)</td><td>Whole roast</td><td>Large flatfish, roasted much like a small joint</td></tr>
+          <tr><td rowspan="2">Plaice / sole</td><td>Whole</td><td>Pan-fry, dredged ("meunière" style); grill</td><td>Classic preparation for both</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td>Cooks very quickly given thinness</td></tr>
+          <tr><td>Tuna</td><td>Steak</td><td>Sear (pan or grill), often left rare/blue centre</td><td>Intentionally undercooked in the centre — not a shortcut</td></tr>
+          <tr><td>Swordfish</td><td>Steak</td><td>Grill/BBQ; pan-fry + finish; sear</td><td>Dense, meaty — copes with high direct heat</td></tr>
+          <tr><td>Monkfish</td><td>Fillet/tail</td><td>Pan-fry + oven finish; roast whole tail; poach</td><td>Firm, meat-like texture</td></tr>
+          <tr><td rowspan="2">Red mullet</td><td>Whole</td><td>Pan-fry; grill/BBQ; oven-bake</td><td></td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
+          <tr><td rowspan="2">John Dory</td><td>Whole</td><td>Roast</td><td></td></tr>
+          <tr><td>Fillet</td><td>Pan-fry; steam</td><td>Delicate flesh, restrained methods preferred</td></tr>
+          <tr><td rowspan="2">Herring</td><td>Whole</td><td>Pan-fry (often dredged in oatmeal); grill/BBQ; soused/pickled (no heat)</td><td>Oily fish, similar logic to mackerel</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
+          <tr><td>Skate</td><td>Wing</td><td>Pan-fry; poach; steam</td><td>Its own cut — neither fillet nor steak</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>Cross-cutting methods</strong> (apply across several fish/forms above):</p>
+    <ul>
+      <li><strong>En papillote:</strong> most white fish fillets (cod, haddock, sea bass, sea bream, plaice)</li>
+      <li><strong>Deep-frying (battered):</strong> cod, haddock, plaice fillets</li>
+      <li><strong>Ceviche/raw:</strong> sea bass, sea bream, tuna</li>
+    </ul>
+
+    <p><strong>Timing rule of thumb</strong> (governed by thickness, not weight): pan-fry/grill ~3–4 min per cm thickness per side; oven-bake at 220–230°C ~4 min per cm thickness total (~10 min per <em>inch</em>). Endpoint is opaque and flaking — see the FOOD SAFETY note below on what temperature that actually corresponds to. Salmon and tuna are commonly taken out well before that for a rare or pink centre; see <a href="{{ '/food/reference/internal-temperatures/' | relative_url }}#all">internal temperatures</a> for both.</p>
+
+    <p><strong>Correction, 2026-08-12:</strong> the oven-bake rule used to say "~10 min per cm" — this looks like the well-known Canadian "10-minute rule" (10 min per <em>inch</em> of thickness at 450°F/232°C) with inches silently read as centimetres, which makes the old figure roughly 2.5× too long. A 3 cm fillet needs ~12 min by the correct rule, not ~30.</p>
+
+    <p><strong>FOOD SAFETY:</strong> the "opaque and flaking" endpoint most home cooks actually use is lower than the official benchmark — USDA gives 145°F/62.8°C, and UK FSA guidance points to the same ~63°C. Salmon taken out at 52–55°C for a moist centre (a common chef preference — see <a href="{{ '/food/reference/internal-temperatures/' | relative_url }}#fish-salmon">internal temperatures</a>) is below that mark; it's a texture choice, not the safety figure, and worth knowing the difference between the two rather than treating "looks done" as equivalent to "meets the guideline."</p>
+
+    <p class="recipe-source">Sources: pan-fry/grill rate broadly confirmed against UK fishmonger guidance (~2–3.3 min/cm/side for 2–3 cm portions — our figure sits at the high end but same order of magnitude). Oven-bake correction from the Canadian Dept. of Fisheries "10-Minute Rule," the widely-cited basis for most timing guidance of this kind. Safety endpoint from USDA FSIS and UK FSA. Species/method pairings (salt-baked bream, trout amandine, etc.) were all independently confirmed, no changes there. Checked once, 2026-08-12 — tidy/remove these notes once you've confirmed a row yourself.</p>
+
+    <h2 class="recipe-section-heading" id="shellfish"><span class="section-heading-text section-heading-text--reference">Shellfish</span></h2>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Shellfish</th><th>Best methods</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mussels</td><td>Steam (classic, e.g. white wine); pan-fry/sauté briefly</td><td>Cook just until shells open; discard any that stay shut</td></tr>
+          <tr><td>Clams</td><td>Steam; pan-fry/sauté briefly</td><td>Same open-shell rule as mussels</td></tr>
+          <tr><td>Oysters</td><td>Raw/shucked; grill/BBQ briefly; steam</td><td>Many prefer raw; if cooking, keep it brief to avoid toughening</td></tr>
+          <tr><td>Scallops</td><td>Pan-sear (very hot, short); grill/BBQ; poach</td><td>Sear only 1–2 min per side — easy to overcook to rubberiness</td></tr>
+          <tr><td>Prawns/shrimp</td><td>Pan-fry/sauté; grill/BBQ; poach/boil; steam</td><td>Cooks in minutes; ready when opaque and curled</td></tr>
+          <tr><td>Langoustine (Dublin Bay prawn/scampi)</td><td>Grill/BBQ; poach/boil; pan-fry</td><td>Often split and grilled in the shell for extra flavour</td></tr>
+          <tr><td>Crab</td><td>Boil whole, then pick; steam whole</td><td>Usually cooked whole first, then meat extracted</td></tr>
+          <tr><td>Lobster</td><td>Boil whole; steam whole; split and grill/BBQ; split and oven-roast</td><td>Often boiled/steamed first then finished on the grill or under a broiler</td></tr>
+          <tr><td>Squid</td><td>Pan-fry/sauté, very hot and fast; deep-fry (classic "calamari"); grill/BBQ; braise slowly</td><td>Two good zones only — very fast high heat, or long slow braise; the middle ground turns it rubbery</td></tr>
+          <tr><td>Octopus</td><td>Braise/simmer low and slow first, then char on a very hot grill/pan to finish</td><td>Almost always needs slow tenderising before a hot, fast finishing step</td></tr>
+          <tr><td>Cockles</td><td>Steam; boil briefly</td><td>Similar to mussels/clams, cooked until open</td></tr>
+          <tr><td>Winkles</td><td>Boil briefly, then pick out with a pin</td><td>Traditionally eaten cold after boiling</td></tr>
+          <tr><td>Crawfish</td><td>Boil (classic, often spiced); steam</td><td>Common in Cajun-style boils</td></tr>
+          <tr><td>Abalone</td><td>Pan-fry, briefly; braise slowly</td><td>Like squid, has a narrow window — quick sear or long slow cook, nothing in between</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <p class="ct-seealso">See also: <a href="{{ '/food/reference/internal-temperatures/' | relative_url }}">internal temperatures for each protein</a>.</p>
+
+  </div>
+</article>
+
+{% comment %} cook-schedule.js FIRST: cook-timer.js reads HTF.cookSchedule at
+   startup, so the arithmetic module has to exist by then. Same trap as
+   ingredient-search.js/filters.js on the index; tests/test_site_config.py has a
+   guard for each. {% endcomment %}
+<script src="{{ '/assets/js/cook-schedule.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/cook-timer.js' | relative_url }}"></script>

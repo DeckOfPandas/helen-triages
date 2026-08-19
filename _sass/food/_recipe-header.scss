@@ -462,29 +462,15 @@ article.recipe a:not(.badge) {
   scroll-margin-top: $space-xxl;
 }
 
-// "↑ top" beside a section heading. Body font, not the heading's Courier, and
-// no punched treatment: it is a control sitting next to a title, not a second
-// word in the title. Given the heading's own letter-spacing is inherited, the
-// resets here are load-bearing rather than tidy -- .btn-method-toggle needs the
-// same ones for the same reason, see its comment below.
-.cm-totop {
-  font-family: $font-body;
-  font-size: 0.72rem;
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
-  -webkit-text-stroke: 0;
-  text-shadow: none;
-  color: $color-clear-text;
-  margin-left: $space-lg;
-  white-space: nowrap;
-  vertical-align: middle;
-
-  // Issue #199: was $color-recipe-link (the darker resting link colour) --
-  // the one hover on the page going darker instead of lighter, against the
-  // "lighter on hover" rule article.recipe a and %link-button both follow.
-  &:hover { color: $color-recipe-link-hover; }
-}
+// ".cm-totop" -- the "↑ top" control beside a reference-page section heading --
+// used to be styled here. Deleted 2026-08-19 with its last consumer: issue #382
+// removed food/reference/cooking-methods.html, which was the only page with a
+// contents list and an `id="top"` to go back to. The fish and shellfish tables
+// that survived it moved onto the calculator page, which has neither, so the
+// links would have pointed nowhere.
+//
+// tests/test_site_config.py::test_print_rules_target_classes_that_exist is what
+// caught the matching print rule still being there -- see _print.scss.
 
 // --- A button that looks like a body link ------------------------------------
 // Two consumers: .btn-method-toggle (below) and .btn-print (the print control,

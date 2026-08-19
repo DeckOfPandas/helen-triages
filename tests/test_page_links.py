@@ -12,7 +12,9 @@ HTML template. Two real bugs got through that gap:
      and `../temperatures/#fish`, twice each. Those fragments never existed --
      the real ids are `#beef-steak` and `#fish-salmon`. A wrong fragment does
      not 404: the page loads and the browser lands at the top, so the symptom
-     reads as "the scroll doesn't work", not "the link is broken".
+     reads as "the scroll doesn't work", not "the link is broken". (That page
+     was deleted by #382 and the temperatures page renamed by #384; the bug is
+     kept because it is why fragments are checked at all.)
 
 WHAT THIS FILE SCANS. Every `<a href="...">` in food/**/*.html,
 cocktails/**/*.html, _layouts/*.html, _includes/**/*.html and the root
@@ -38,18 +40,22 @@ the identical typo happening in a same-page `href="#top"`, and the symptom
 (loads fine, scrolls nowhere) is identical either way. There is no principled
 reason to check a fragment only when it happens to follow a path.
 
-IDS INSIDE AN INCLUDE, AND INSIDE A LOOP. `_includes/food/method_table.html`
-emits `<h2 ... id="{{ include.id }}">` -- a Liquid parameter, not a literal,
-so scanning that file's own text finds no id there at all. Every call site
-passes a literal (`id="beef"`, `id="chicken"`, ...), so this file resolves
-that id by reading the literal argument at each `{% include %}` call site
-instead of trying to read the partial in isolation. The reverse problem
-happens too: that same partial's own `href="#top"` targets an id that lives
-not in its own text but in whichever page includes it
-(food/reference/cooking-methods.html's `<article id="top">`). So id
-resolution for any one file floods outward along both `{% include %}` edges
-(in either direction) and the `layout:` chain, rather than looking at a
-single file's text alone -- see `_ids_visible_from()`.
+IDS INSIDE AN INCLUDE, AND INSIDE A LOOP. The worked example below is history
+as of 2026-08-19 -- issue #382 deleted both the partial and the page -- but the
+MECHANISM it forced is live, general, and the reason `_ids_visible_from()` looks
+the way it does, so it is kept rather than replaced with a lesser example.
+
+`_includes/food/method_table.html` emitted `<h2 ... id="{{ include.id }}">` -- a
+Liquid parameter, not a literal, so scanning that file's own text found no id
+there at all. Every call site passed a literal (`id="beef"`, `id="chicken"`,
+...), so this file resolves such an id by reading the literal argument at each
+`{% include %}` call site instead of trying to read the partial in isolation.
+The reverse problem happened too: that same partial's own `href="#top"` targeted
+an id living not in its own text but in whichever page included it
+(food/reference/cooking-methods.html's `<article id="top">`). So id resolution
+for any one file floods outward along both `{% include %}` edges (in either
+direction) and the `layout:` chain, rather than looking at a single file's text
+alone -- see `_ids_visible_from()`.
 
 There is no id generated inside a genuine `{% for %}` loop that this file
 checks statically anywhere in this codebase today (checked by hand against
@@ -543,7 +549,7 @@ RETIRED_SITE_KEYS = {
 
 def test_chart_anchor_fragments_exist_on_the_temperatures_page():
     """_includes/food/doneness_chart.html links a recipe's 'more temperatures'
-    line to /food/reference/temperatures/#<chart_anchor>, where chart_anchor
+    line to /food/reference/internal-temperatures/#<chart_anchor>, where chart_anchor
     comes from that recipe's own internal_temp_ref resolving into
     _data/food/internal_temperatures.yml -- a fragment this test's generic
     scanner deliberately does not try to compute (it isn't a literal in any
@@ -557,14 +563,14 @@ def test_chart_anchor_fragments_exist_on_the_temperatures_page():
     anchors = sorted(set(re.findall(r"chart_anchor:\s*(\S+)", path.read_text(encoding="utf-8"))))
     assert anchors, f"No chart_anchor: values found in {path} -- has the field been renamed?"
 
-    temps_page = PAGES.get("/food/reference/temperatures/")
-    assert temps_page, "/food/reference/temperatures/ is not a published page any more."
+    temps_page = PAGES.get("/food/reference/internal-temperatures/")
+    assert temps_page, "/food/reference/internal-temperatures/ is not a published page any more."
 
     ids = _ids_visible_from(temps_page)
     missing = [a for a in anchors if a not in ids]
     assert not missing, (
         f"_data/food/internal_temperatures.yml declares chart_anchor value(s) "
-        f"{missing} with no matching id=\"...\" on food/reference/temperatures.html.\n"
+        f"{missing} with no matching id=\"...\" on food/reference/internal-temperatures.html.\n"
         f"_includes/food/doneness_chart.html links every wired recipe's 'more "
         f"temperatures' straight to that fragment, so a wrong or renamed anchor "
         f"here is a silent do-nothing link on a live recipe page, not a 404."

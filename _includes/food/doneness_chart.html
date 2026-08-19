@@ -83,7 +83,7 @@
 
     {% assign _anchor = include.node.chart_anchor | default: include.single.chart_anchor %}
     {% if _anchor %}
-      <p class="doneness-more"><a href="{{ '/food/reference/temperatures/' | relative_url }}#{{ _anchor }}">more {% if _anchor contains "fish" %}fish{% else %}meat{% endif %} temperatures &rarr;</a></p>
+      <p class="doneness-more"><a href="{{ '/food/reference/internal-temperatures/' | relative_url }}#{{ _anchor }}">more {% if _anchor contains "fish" %}fish{% else %}meat{% endif %} temperatures &rarr;</a></p>
     {% endif %}
   </div>
 {% endif %}
