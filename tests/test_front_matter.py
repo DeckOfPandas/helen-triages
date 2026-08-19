@@ -454,7 +454,24 @@ from conftest import FRONT_MATTER
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-BASELINE_COMMIT = "dc2a7bf"   # (content) restore the voice where the "you" pass flattened it
+BASELINE_COMMIT = "9c70675"   # (refactor) awaiting-fix -> awaiting_fix
+#
+# MOVED 2026-08-18, WITH HELEN'S EXPLICIT PERMISSION, asked for before the
+# commit rather than after. The awaiting_fix rename touched all 82 recipes, so
+# every one of them has an agent commit as its newest -- and this rule would
+# have demanded proofread: false on all 82.
+#
+# That would have been the letter of the rule against its purpose. It exists so
+# her proofread never describes a file she has not read. A key name changing
+# from hyphen to underscore changes no word of any recipe, so her proofread
+# still describes every one of them exactly.
+#
+# The previous baseline was dc2a7bf, moved for the same kind of reason: 45
+# second-person edits she reviewed one at a time.
+#
+# NEVER MOVE THIS TO MAKE A RED TEST GREEN. It is Helen's to grant, and the
+# question to put to her is whether she has read what is now in the files --
+# not whether the change felt small.
 AGENT_TRAILER = "co-authored-by: claude"
 
 
