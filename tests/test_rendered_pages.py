@@ -216,7 +216,7 @@ def test_only_tough_cuts_are_labelled_tender_at(site):
     tough cut — whole birds, doneness ranges, all of it. Nothing but the rendered
     output shows this.
     """
-    html = page(site, "/food/reference/temperatures/")
+    html = page(site, "/food/reference/internal-temperatures/")
     labelled = [(l, v) for l, v in rows(html) if v.startswith("tender at")]
     assert len(labelled) == 5, (
         f"expected exactly 5 rows to say 'tender at' (beef's tough cuts, pork's, "
@@ -237,7 +237,7 @@ def test_the_safety_zone_renders_where_the_data_says(site):
     data = temps()
     for url, node in (
         ("/food/recipes/teriyaki-salmon/", data["fish"]["salmon"]),
-        ("/food/reference/temperatures/", data["pork"]["roasting"]),
+        ("/food/reference/internal-temperatures/", data["pork"]["roasting"]),
     ):
         html = page(site, url)
         fragment = chart_of(html) if "recipes" in url else html
@@ -357,7 +357,7 @@ def test_every_chart_row_draws_its_filled_bar(site):
     things AROUND the measurement -- and never on the mark that carries it. So
     when every filled bar vanished, six rendered tests still passed.
     """
-    for url in ("/food/reference/temperatures/", "/food/recipes/roast-beef-fillet/"):
+    for url in ("/food/reference/internal-temperatures/", "/food/recipes/roast-beef-fillet/"):
         html = page(site, url)
         fragment = chart_of(html) if "recipes" in url else html
         row_count = len(re.findall(r'class="tc-row[ "]', fragment))

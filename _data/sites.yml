@@ -60,9 +60,12 @@ food:
   icon: food-cloche-heart
   reference_links:
     - text: internal temperatures
-      url: /food/reference/temperatures/
-    - text: times and methods
-      url: /food/reference/timings/
+      url: /food/reference/internal-temperatures/
+    # "methods and times", not "times and methods" -- issue #385, 2026-08-19,
+    # in the same pass that renamed the page to cooking-methods-and-timings.
+    # The wording follows the page rather than the other way round.
+    - text: methods and times
+      url: /food/reference/cooking-methods-and-timings/
 
 cocktails:
   title: Helen Triages Cocktails

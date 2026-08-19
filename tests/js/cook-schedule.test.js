@@ -1,6 +1,6 @@
 // =============================================================================
 // Tests for assets/js/cook-schedule.js — the arithmetic behind the cook timer
-// (food/reference/timings/), no DOM required.
+// (food/reference/cooking-methods-and-timings/), no DOM required.
 //
 // Run from the repo root, with the local Node runtime. No arguments — Node's
 // test runner auto-discovers *.test.js files from the current directory;

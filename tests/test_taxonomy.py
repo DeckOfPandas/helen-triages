@@ -186,14 +186,14 @@ ANY_RELATIVE_LINK = re.compile(r"\]\(\.\./([^)]+)\)")
 _WELL_FORMED_TARGET = re.compile(r"^[a-z0-9-]+/?$")
 
 # A SECOND LEGITIMATE SHAPE, added 2026-08-18: a recipe linking OUT of
-# _food_recipes/ to a reference page, e.g. `](../../reference/timings/)` from
+# _food_recipes/ to a reference page, e.g. `](../../reference/cooking-methods-and-timings/)` from
 # the Christmas turkey to the timing calculator. ANY_RELATIVE_LINK strips the
-# leading `../`, so what arrives here is `../reference/timings/`.
+# leading `../`, so what arrives here is `../reference/cooking-methods-and-timings/`.
 #
-# WHY IT HAS TO BE RELATIVE, rather than the `{{ '/food/reference/timings/' |
+# WHY IT HAS TO BE RELATIVE, rather than the `{{ '/food/reference/cooking-methods-and-timings/' |
 # relative_url }}` the reference pages themselves use: front matter is never
 # Liquid-templated (HANDOVER §4), and a method step lives in front matter. A
-# root-relative `/food/reference/timings/` would drop the `/helen-triages`
+# root-relative `/food/reference/cooking-methods-and-timings/` would drop the `/helen-triages`
 # baseurl and 404 in production while working perfectly on localhost -- the
 # exact failure test_no_link_in_the_production_build_points_at_a_file_that_isnt_there
 # exists to catch. `../../` is baseurl-safe because it never names the root.

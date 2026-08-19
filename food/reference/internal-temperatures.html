@@ -1,7 +1,7 @@
 ---
 layout: default
-title: "Temperature Charts"
-permalink: /food/reference/temperatures/
+title: "Internal Temperatures"
+permalink: /food/reference/internal-temperatures/
 ---
 
 {% comment %}
@@ -12,10 +12,19 @@ permalink: /food/reference/temperatures/
 
   Promoted out of /food/reference-demo/ on 2026-08-14: recipe pages link here
   now, and production content cannot depend on a page whose own front matter
-  says it isn't one. It replaces /food/reference/temperatures/, which
-  held the same figures as tables and has been deleted -- two pages showing one
-  dataset is the duplication this whole data layer exists to end, and the tables
-  version was also the last place still saying "Pull at".
+  says it isn't one. It replaced an earlier tables-only page holding the same
+  figures -- two pages showing one dataset is the duplication this whole data
+  layer exists to end, and the tables version was also the last place still
+  saying "Pull at".
+
+  RENAMED 2026-08-19, issue #384: /food/reference/temperatures/ ->
+  /food/reference/internal-temperatures/, and the h1 with it. There is no
+  redirect from the old URL -- Jekyll has no redirect plugin here and one was
+  not added for two renames. Nothing on the site points at the old path any
+  more (checked, not assumed: tests/test_page_links.py resolves every href in
+  every template, and the production build is scanned again in
+  tests/test_rendered_pages.py), but an external bookmark to the old address
+  will 404.
 {% endcomment %}
 
 {% assign t = site.data.food.internal_temperatures %}
@@ -38,7 +47,7 @@ permalink: /food/reference/temperatures/
 
 <article class="recipe" id="top">
   <div class="recipe-title">
-    <h1 class="recipe-main-title"><span class="recipe-title-text">Temperature Charts</span></h1>
+    <h1 class="recipe-main-title"><span class="recipe-title-text">Internal Temperatures</span></h1>
   </div>
 
   <div class="recipe-body-content">
@@ -61,12 +70,16 @@ permalink: /food/reference/temperatures/
       <li><a href="#all">All</a></li>
     </ul>
 
-    {% comment %} Issue #209: the calculator reachable from the contents
-       list too, not just from inside each section. {% endcomment %}
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}">timings and cooking methods &rarr;</a></p>
+    {% comment %} Issue #209 put a link to the calculator here, under the
+       contents list. Issue #368 took it out again on 2026-08-19: every section
+       below carries its own, so this one repeated at the top of the page what
+       the reader meets again the moment they arrive anywhere. {% endcomment %}
 
     <h2 class="recipe-section-heading" id="beef-steak"><span class="section-heading-text section-heading-text--reference">Beef: steak</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods/' | relative_url }}#steak">cooking methods &rarr;</a></p>
+    {% comment %} No "cooking methods" link here any more. Issue #382 deleted the
+       steak methods table outright -- Helen, 2026-08-19: "Drop steak. I know how
+       to cook steak." -- so this link had nowhere left to point. The doneness
+       chart below is the whole of what this page has to say about steak. {% endcomment %}
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -85,7 +98,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=beef">timings and cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -104,7 +117,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=beef">timings and cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a></p>
     <p class="recipe-section-subtitle">brisket, chuck, short rib, pot roast</p>
 
     {% comment %} No key on this chart. It draws one bar, and that bar's own
@@ -121,7 +134,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods/' | relative_url }}#fish">cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}#fish">cooking methods &rarr;</a></p>
 
     {% include food/temp_key.html rested=true unsafe=true %}
     <div class="tc">
@@ -144,7 +157,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=ham">timings and cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=ham">cooking methods and timings &rarr;</a></p>
 
     {% include food/temp_key.html rested=true unsafe=true %}
     <div class="tc">
@@ -164,7 +177,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=lamb">timings and cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=lamb">cooking methods and timings &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -182,7 +195,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=pork">timings and cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=pork">cooking methods and timings &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true unsafe=true %}
     <div class="tc">
@@ -217,7 +230,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=chicken">timings and cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=chicken">cooking methods and timings &rarr;</a></p>
     <p class="recipe-section-subtitle">by the thigh, not the breast</p>
 
     {% include food/temp_key.html solid="reaches" %}
@@ -241,14 +254,14 @@ permalink: /food/reference/temperatures/
 
     {% comment %} VENISON'S CROSSLINKS REACH THE CALCULATOR NOW, like every
        other section that has timings behind it. They used to stop at
-       /food/reference/cooking-methods/ because venison had no entry in
+       the cooking-methods page (deleted, #382) because venison had no entry in
        _data/food/cooking_methods.yml, so ?protein=venison would have selected
        nothing and landed you on a calculator with an empty protein. Issue #205
        added the entry -- eight methods across two groups -- so the link goes
        where the rest go, with the wording the rest use. {% endcomment %}
 
     <h2 class="recipe-section-heading" id="venison-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Venison: tender roasting cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=venison">timings and cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=venison">cooking methods and timings &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
 
@@ -294,7 +307,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="venison-slow-cooked-cuts"><span class="section-heading-text section-heading-text--reference">Venison: slow-cooked cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}?protein=venison">timings and cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=venison">cooking methods and timings &rarr;</a></p>
     <p class="recipe-section-subtitle">shoulder, neck and shank</p>
 
     {% comment %} No key, for the same reason beef's tough cuts chart has none:
@@ -311,7 +324,7 @@ permalink: /food/reference/temperatures/
     <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="all"><span class="section-heading-text section-heading-text--reference">All</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/timings/' | relative_url }}">timings and cooking methods &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}">cooking methods and timings &rarr;</a></p>
 
     {% include food/temp_key.html solid="served between" %}
     <div class="tc">

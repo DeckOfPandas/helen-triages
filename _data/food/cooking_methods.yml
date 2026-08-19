@@ -2,7 +2,7 @@
 # COOKING METHODS — oven temperatures, timings and coverings, as DATA.
 # =============================================================================
 # THIS FILE IS THE SOURCE OF TRUTH, EDITED BY HAND. It is no longer generated
-# from the page. food/reference/cooking-methods.html now RENDERS FROM this
+# from the page. food/reference/cooking-methods.html used to RENDER FROM this
 # file, via _includes/food/method_table.html -- the page is the consumer, not
 # the source. To add a new protein or method, edit this file directly.
 #

@@ -162,14 +162,14 @@ def test_cook_schedule_js_loads_before_cook_timer_js():
     way round the timings page throws once, silently, and shows nothing but an
     empty table -- there is no visible error to notice.
     """
-    html = read("food", "reference", "timings.html")
+    html = read("food", "reference", "cooking-methods-and-timings.html")
     schedule_tag = re.search(r"<script src=[^>]*cook-schedule\.js", html)
     timer_tag = re.search(r"<script src=[^>]*cook-timer\.js", html)
     assert schedule_tag, (
-        "food/reference/timings.html no longer loads assets/js/cook-schedule.js."
+        "food/reference/cooking-methods-and-timings.html no longer loads assets/js/cook-schedule.js."
     )
     assert timer_tag, (
-        "food/reference/timings.html no longer loads assets/js/cook-timer.js."
+        "food/reference/cooking-methods-and-timings.html no longer loads assets/js/cook-timer.js."
     )
     assert schedule_tag.start() < timer_tag.start(), (
         "cook-schedule.js must load BEFORE cook-timer.js, or "
