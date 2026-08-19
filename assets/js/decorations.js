@@ -70,22 +70,26 @@
   // ---------------------------------------------------------------------------
   // Masking tape behind the wordmark — one of N, at random.
   //
-  // Which directory and how many files both come from _data/sites.yml, via
-  // attributes on the slot. A site with no `tape:` key gets no .tape-bg element
-  // at all, so this returns at the guard below and attempts no fetch — an
-  // absent decoration must be silent, not a 404 with a console warning.
+  // The tape is HEADER CHROME, so there is one set of files for the whole repo
+  // (assets/img/chrome/tape/) rather than a copy per site. It used to be a copy
+  // per site, and keeping the two in step was a manual chore policed by a note
+  // in the handover: food's redesign shipped seven new files on 2026-08-10 and
+  // cocktails sat on the old four for five days before anyone noticed, which is
+  // issue #223. One directory cannot drift from itself.
+  //
+  // How many files there are still has to be told to this script — a directory
+  // listing is not a thing a browser can ask for — and it now comes from
+  // _data/chrome.yml, which is chrome config rather than site identity.
   // ---------------------------------------------------------------------------
   function tape() {
     var slot = document.querySelector('.tape-bg');
     if (!slot) return;
 
-    var dir   = slot.getAttribute('data-tape-dir');
     var count = parseInt(slot.getAttribute('data-tape-count'), 10);
-    if (!dir || !count) return;
+    if (!count) return;
 
     var n = Math.floor(Math.random() * count) + 1;
-    var url = HTF.siteAsset('/' + dir + '/tape-' + n + '.svg');
-    if (!url) return;
+    var url = HTF.chromeAsset('/tape/tape-' + n + '.svg');
     HTF.fetchSvg(url, function (svg) {
       // `<svg` + any whitespace, for the reason spelled out in brushes() above.
       // Today's tape files are space-style so the old literal worked, but
@@ -98,24 +102,23 @@
   // Footer decoration
   //
   // The artwork used to be a 2,500-character path string concatenated inside
-  // this file's predecessor. It is now a file under assets/img/<site>/ — for
-  // food, hearts/site-footer-hearts.svg — and takes its colour from
-  // `currentColor`, set on .site-footer-hearts in the site's palette, so no
-  // colour is written down here.
+  // this file's predecessor. It is now assets/img/chrome/hearts/
+  // site-footer-hearts.svg, and takes its colour from `currentColor`, set on
+  // .site-footer-hearts in _sass/shared/_footer.scss, so no colour is written
+  // down here.
   //
-  // WHICH file is a per-site decision, so it comes from _data/sites.yml
-  // (`footer_svg`) via a data attribute rather than being named here. A site
-  // with no footer_svg gets no element, and nothing is fetched.
+  // WHICH file used to be a per-site decision, carried on a `data-footer-svg`
+  // attribute fed by _data/sites.yml. It is not a decision any more: there is
+  // one footer for the whole repo, so there is one graphic, named here. A site
+  // that wants a different one is asking for a second footer, which is the
+  // thing this shape exists to prevent.
   // ---------------------------------------------------------------------------
   function footerDecoration() {
     var slot = document.querySelector('.site-footer-hearts');
     if (!slot) return;
 
-    var file = slot.getAttribute('data-footer-svg');
-    if (!file) return;
-
-    var url = HTF.siteAsset('/' + file);
-    if (url) HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
+    var url = HTF.chromeAsset('/hearts/site-footer-hearts.svg');
+    HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
   }
 
   // ---------------------------------------------------------------------------

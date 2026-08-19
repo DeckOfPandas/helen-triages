@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Generate a tape background SVG for assets/img/food/tape/ (issue #122).
+"""Generate a tape background SVG for assets/img/chrome/tape/ (issue #122).
+
+The output directory moved out of assets/img/food/ in issue #374: the wordmark
+is shared chrome, so there is one tape set for the whole repo rather than a copy
+per site. Regenerating no longer has a "and copy it across to cocktails" step --
+that chore, and the drift it was there to prevent, are both gone.
 
 WHAT THIS IS: the tool behind the current tape-1.svg..tape-7.svg. Each file
 is one polygon body (viewBox 0 0 1400 170, fill #0d0d0d) plus two kinds of
@@ -39,7 +44,7 @@ too wide or too narrow.
 HOW TO USE IT:
 
     python3 scripts/generate_tape.py --corner-mode both_acute --seed 30 \\
-        --out assets/img/food/tape/tape-1.svg
+        --out assets/img/chrome/tape/tape-1.svg
 
     # print to stdout instead of writing a file
     python3 scripts/generate_tape.py --corner-mode mixed --seed 99

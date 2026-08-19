@@ -937,8 +937,17 @@ def test_artwork_fetches_go_through_site_asset():
     be named in decorations.js. Artwork goes through HTF.siteAsset(), which
     builds the path from the page's site key.
 
-    assets/img/favicon.svg is the one genuinely shared image and is referenced
-    from the template, not from JS, so nothing here needs an exception.
+    assets/img/favicon.svg is the one genuinely shared image referenced from a
+    TEMPLATE, so it needs no exception here.
+
+    THE SHARED CHROME IS NOT AN EXCEPTION EITHER, and that is deliberate. The
+    header and footer artwork (assets/img/chrome/) belongs to no site, so it
+    genuinely cannot go through siteAsset -- but it does not get to reach for
+    HTF.asset either, because then this rule would have to allow
+    `HTF.asset('/assets/img/…')` in general and would stop catching the thing it
+    exists for. It goes through a third helper, HTF.chromeAsset, whose name
+    states the claim it is making. A script that wants a site's artwork and
+    reaches for chromeAsset is wrong in a way a reader can see.
     """
     pattern = re.compile(r"""HTF\.asset\(\s*['"]/assets/img/""")
     offenders = []
@@ -1365,9 +1374,15 @@ def _top_level_blocks(text: str):
 
 # --- the shared/forked SCSS boundary -----------------------------------------
 
-# Every variable _sass/shared/_base.scss and _sass/shared/_layout.scss use but
-# do not define. Each site palette owes all of them.
+# Every variable the shared partials -- _base.scss, _layout.scss and
+# _footer.scss -- use but do not define. Each site palette owes all of them.
+#
+# `color-accent` is the tenth, added with issue #374 when the footer's
+# interactive rules moved out of _sass/food/ and into shared/. It is each site's
+# one "this is interactive / branded" colour: food's magenta, and a placeholder
+# on cocktails until that palette is argued from real drinks.
 SHARED_PALETTE_CONTRACT = [
+    "color-accent",
     "color-bg", "color-border", "color-clear-text", "color-mood-root",
     "color-surface", "color-text", "color-white",
     "font-body", "font-headings",
@@ -1941,4 +1956,103 @@ def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
         "The JS suite must be invoked with the glob. `node --test tests/js/` "
         "treats the directory as a single test file and reports 'tests 1, "
         "fail 1' without running the 144 tests inside it."
+    )
+
+
+# =============================================================================
+# THE SHARED CHROME'S OWN ARTWORK — GitHub issue #374
+# =============================================================================
+
+def test_tape_count_matches_the_tape_directory():
+    """_data/chrome.yml's tape_count is what decorations.js picks from.
+
+    A browser cannot list a directory, so the number of tape SVGs has to be
+    written down somewhere and can therefore disagree with the files. Both
+    directions fail silently, which is why this is asserted rather than trusted:
+
+      - COUNT TOO HIGH and tape() rolls a number with no file behind it. The
+        wordmark renders with no tape at all, roughly one page load in N, with a
+        console warning nobody is watching for -- an intermittent missing
+        decoration is close to the hardest kind of bug to be told about.
+      - COUNT TOO LOW and the extra files are simply never dealt. Nothing breaks,
+        nothing warns, and the artwork you added does not appear.
+
+    This used to be `tape_count` in _data/sites.yml, once per site, pointing at
+    a directory per site holding byte-identical files -- so the same number had
+    to be right in two places against two directories. It is one number against
+    one directory now.
+    """
+    chrome = yaml.safe_load((ROOT / "_data" / "chrome.yml").read_text(encoding="utf-8")) or {}
+    declared = chrome.get("tape_count")
+    assert isinstance(declared, int) and declared > 0, (
+        f"_data/chrome.yml declares tape_count = {declared!r}. It must be a "
+        f"positive integer: assets/js/decorations.js parses it off the .tape-bg "
+        f"slot and picks a file from 1 to N."
+    )
+
+    tape_dir = ROOT / "assets" / "img" / "chrome" / "tape"
+    actual = sorted(tape_dir.glob("tape-*.svg"))
+    assert len(actual) == declared, (
+        f"_data/chrome.yml says tape_count: {declared}, but "
+        f"assets/img/chrome/tape/ holds {len(actual)} tape-*.svg files "
+        f"({[p.name for p in actual]}).\n"
+        f"Update the count, or add/remove the file. scripts/generate_tape.py "
+        f"makes new ones -- see its docstring, and HANDOVER 13.9 for how the "
+        f"shipped set was chosen."
+    )
+
+    # Named tape-1 .. tape-N with no gaps, because that is what decorations.js
+    # assumes when it rolls a random number in that range. Seven files named
+    # tape-1, tape-2 and tape-4..tape-8 would satisfy the count above and still
+    # 404 one load in seven.
+    expected = [f"tape-{n}.svg" for n in range(1, declared + 1)]
+    assert [p.name for p in actual] == expected, (
+        f"assets/img/chrome/tape/ is not a gapless tape-1..tape-{declared} run: "
+        f"{[p.name for p in actual]}.\n"
+        f"decorations.js picks a random n in that range and builds the filename "
+        f"from it, so a gap is an intermittent 404 rather than an error."
+    )
+
+
+def test_no_site_holds_a_copy_of_the_chrome_artwork():
+    """The header and footer artwork exists in exactly one place.
+
+    assets/img/food/tape/ and assets/img/cocktails/tape/ held the same seven
+    files, kept in step by hand, and had already drifted once for five days
+    (issue #223). They are one directory now, assets/img/chrome/. This fails if
+    a per-site copy comes back -- which is what "cocktails should have its own
+    tape one day" looks like on the way in, and is a decision to take
+    deliberately (it means a second header) rather than by adding a folder.
+
+    BY FILENAME, NOT BY DIRECTORY NAME, and the distinction earned itself
+    immediately: the first draft of this test banned any site directory called
+    `hearts`, and caught assets/img/food/hearts/, which holds seven
+    doodle-heart-path*.svg files that are not chrome at all. They are leftovers
+    -- b547aa7 deleted the swatch pages that were their last consumer and left
+    the artwork -- so the directory-name version was flagging dead files as a
+    drift risk while a copy under any other name would have walked past it.
+    What actually matters is a SECOND FILE WITH THE SAME NAME, because that is
+    the thing two directories can disagree about.
+    """
+    chrome_dir = ROOT / "assets" / "img" / "chrome"
+    chrome_names = {p.name for p in chrome_dir.rglob("*.svg")}
+    assert chrome_names, (
+        f"No SVGs under {chrome_dir.relative_to(ROOT)} -- either the shared "
+        f"chrome artwork moved again or this path is stale, and either way "
+        f"there is nothing here to compare against, which passes."
+    )
+
+    duplicates = []
+    for owner in PALETTE_OWNERS:
+        for path in (ROOT / "assets" / "img" / owner).rglob("*.svg"):
+            if path.name in chrome_names:
+                duplicates.append(str(path.relative_to(ROOT)))
+    assert not duplicates, (
+        "A site's image directory holds a file named the same as one in the "
+        "shared chrome set:\n  " + "\n  ".join(sorted(duplicates))
+        + "\n\nThe header and the footer are one artefact for the whole repo "
+          "(issue #374), so their artwork lives once in assets/img/chrome/ and "
+          "is fetched with HTF.chromeAsset. A per-site copy is a second header "
+          "or a second footer arriving one file at a time, and the copy that "
+          "nobody looks at is the one that goes stale."
     )

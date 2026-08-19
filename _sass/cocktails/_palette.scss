@@ -5,8 +5,8 @@
 // is a design decision yet — these are NEUTRALS, chosen so the scaffold renders
 // legibly and obviously unfinished rather than quietly borrowing food's look.
 //
-// The nine variables below are the contract every site palette owes the shared
-// partials (_sass/shared/_base.scss and _sass/shared/_layout.scss). Leaving one
+// The ten variables below are the contract every site palette owes the shared
+// partials (_sass/shared/_base.scss, _layout.scss and _footer.scss). Leaving one
 // out is a Sass compile error whose message points at the shared file rather
 // than at this one, so tests/test_site_config.py checks for them by name.
 //
@@ -21,7 +21,7 @@ $color-paper:        #fbfbfa;
 $color-grey-mid:     #6b6b70;
 $color-grey-light:   #e4e4e6;
 
-// --- The nine shared partials require ----------------------------------------
+// --- The ten shared partials require -----------------------------------------
 $color-bg:         $color-paper;
 $color-text:       $color-ink;
 $color-border:     $color-grey-light;
@@ -29,6 +29,20 @@ $color-surface:    #ffffff;
 $color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
 $color-white:      #ffffff;           // the wordmark sitting on its tape
 $color-mood-root:  $color-grey-mid;   // link hover; food uses its mood colour
+
+// The shared chrome's one accent -- the footer's link hovers and the hearts
+// (_sass/shared/_footer.scss). Added with the rest of the contract in issue
+// #374, 2026-08-19.
+//
+// KNOWN PLACEHOLDER, AND KNOWN TO BE A WEAK ONE. This palette is deliberately
+// all neutrals until cocktails is argued from real drinks, so there is no
+// accent hue to give it, and grey-mid on grey-mid text is the lightness-only
+// change HANDOVER 12 records as reading like nothing at all at footer size.
+// Helen, 2026-08-19, asked directly: "Cocktail styling is almost totally
+// unstarted, so this doesn't matter." Recorded rather than papered over -- when
+// cocktails gets a hue, this is the line that wants it, and the footer starts
+// working on this site the moment it does.
+$color-accent:     $color-grey-mid;
 
 $font-headings: "Courier New", "Courier", "Lucida Sans Typewriter", monospace;
 $font-body:     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

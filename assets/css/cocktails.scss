@@ -20,6 +20,12 @@
 @import "shared/rule";
 @import "shared/base";
 @import "shared/layout";
+// The chrome's coloured half -- issue #374. This import is the whole reason the
+// partial moved out of food/: the header and footer are chrome both sites
+// render, and until this line existed cocktails drew them with no hover states,
+// no heart colour, and TWO COMPLETELY UNSTYLED NAV ICONS. Same relative
+// position as food.scss, after the structure.
+@import "shared/chrome";
 @import "cocktails/decoration";
 @import "cocktails/cocktail";
 // Print, last -- see shared/_print.scss's header for why last, and why all

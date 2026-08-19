@@ -6,23 +6,23 @@
 // assets/js/heading-underline.js from assets/img/food/.
 //
 // Cocktails has none of that drawn for itself yet, and the scaffold does not
-// fake it — footer_svg is still omitted from _data/sites.yml, so no fetch is
-// attempted for that and the console stays clean.
+// fake it: this site's PAGE decoration is still empty, and nothing here
+// attempts a fetch, so the console stays clean.
 //
-// The ONE exception, added 2026-08-02 at Helen's explicit call: `tape` in
-// _data/sites.yml points at a direct COPY of food's tape-*.svg files
-// (assets/img/cocktails/tape/), reused as a placeholder rather than left
-// blank, "for now". When cocktails gets its own tape artwork, swap the files
-// in that directory and this override stays valid — nothing here assumes
-// which SVG is behind it.
+// THE TAPE AND THE FOOTER HEARTS ARE NOT THIS FILE'S BUSINESS ANY MORE — issue
+// #374, 2026-08-19. They are header and footer chrome, one set for the whole
+// repo, in assets/img/chrome/. This file used to explain at length that
+// assets/img/cocktails/tape/ held a direct COPY of food's seven tape SVGs,
+// kept in step by hand as a standing rule after the two drifted for five days
+// (issue #223) — that whole arrangement is gone, and with it the chore. There
+// is one directory; it cannot drift from itself.
 //
-// Kept in PARITY with food, deliberately — Helen's call, 2026-08-15, issue
-// #223. Food's tape was redesigned on 2026-08-10 (issue #122, seven files
-// with real corner geometry and an edge bevel, replacing four plain
-// polygons) and cocktails sat on the old four for five days. The two
-// directories now hold the same seven. Parity is the standing rule until
-// cocktails has a visual language of its own: if you regenerate food's set,
-// copy it across in the same pass rather than leaving them to drift again.
+// So "when cocktails gets its own tape artwork" is no longer a swap-the-files
+// operation. Helen, settling this: "I don't want parity between two footers —
+// I want one footer for the whole site. And one header." Giving cocktails its
+// own tape means giving it its own header, which is a decision to argue rather
+// than a directory to add. The override below stays valid either way; nothing
+// here assumes which SVG is behind it.
 //
 // When more artwork arrives it goes in assets/img/cocktails/, the keys go
 // back into _data/sites.yml, and the styling for it goes here. Colour comes

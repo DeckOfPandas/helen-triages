@@ -3,7 +3,7 @@
 # =============================================================================
 # Selected by `site_key`, which _config.yml's `defaults:` sets per collection
 # and per page directory. _layouts/default.html reads this and nothing else to
-# decide what the page calls itself and what it links.
+# decide what the page calls itself and what stylesheet it links.
 #
 # This is the VOCABULARY layer for the mono-repo, in exactly the sense the
 # three-layer rule means it: the shared layout knows a site has a wordmark and
@@ -11,32 +11,44 @@
 # Adding a third site should be an edit here plus a palette, not a template
 # change.
 #
+# WHAT IS NO LONGER HERE, AND WHY -- issue #374, 2026-08-19.
+# This file used to carry the header nav and the footer decoration as per-site
+# keys: home_icon, switch_site, switch_icon, about_url, footer_svg, tape,
+# tape_count. Every one of them was configuration for chrome that is meant to
+# be IDENTICAL on both sites, which meant "the same header" was something two
+# sets of data had to agree on rather than something the code guaranteed. They
+# did not agree: cocktails had none of the nav keys, so it rendered no header
+# nav at all, and its footer was food's minus three blocks. The tape was worse
+# -- two directories holding byte-identical artwork, kept in step by hand, which
+# had already drifted for five days (issue #223).
+#
+# Helen: "I don't want parity between two footers -- I want one footer for the
+# whole site. And one header. Literally the same code and assets." So the chrome
+# no longer asks this file anything about itself. What is left below is only
+# what genuinely differs, and the test to apply before adding a key is: does
+# this say WHERE YOU ARE, or does it say WHAT THE CHROME IS? The second belongs
+# in _data/chrome.yml, or nowhere.
+#
 # KEYS
 #   title       <title>, og:site_name, the footer, and the second half of the
 #               wordmark's accessible name
 #   word        the bracketed word on the taped strip: [ FOOD ]
 #   description fallback meta description for pages with no tagline of their own
 #   css         basename under assets/css/ — `food` means assets/css/food.scss
-#   home        where the wordmark links, relative to baseurl
-#   tape        subdirectory under assets/img/<key>/ holding the torn strips
-#               behind the wordmark, named tape-1.svg … tape-N.svg; omit for no
-#               tape. tape_count is N — it lives here rather than in the JS so
-#               a site can have a different number of them
-#   tape_count  how many tape-N.svg files that directory holds
-#   footer_svg  path under assets/img/<key>/ for the footer decoration; omit
-#               entirely for none. Absent means NO fetch is attempted, rather
-#               than a fetch that 404s and warns — which is what a site with no
-#               artwork yet needs.
-#   about_url   where the header's small "??" link goes. Omit entirely for no
-#               link — the "??" itself isn't rendered rather than pointing
-#               nowhere, same absent-means-nothing convention as footer_svg.
-#   home_icon   basename (no .svg) of an _includes/icons/ partial linking to
-#               this site's own home, shown in the header nav. Omit for none.
-#   switch_site the OTHER site's key in this file — shown in the header nav as
-#               an icon linking to that site's home. Omit for no switcher
-#               (e.g. a site with no sibling yet).
-#   switch_icon basename (no .svg) of an _includes/icons/ partial used for the
-#               switch_site link above. Required if switch_site is set.
+#   home        where this site's own nav icon links, relative to baseurl
+#   icon        basename (no .svg) of an _includes/icons/ partial standing for
+#               this site in the header nav. Every site gets one slot in that
+#               row, on every page, in the order they appear in this file --
+#               so the row is the same wherever you are, and the icon you are
+#               looking at is not the odd one out.
+#   reference_links
+#               reference pages belonging to THIS site, rendered in the shared
+#               footer as a column headed by this site's own bracketed word. The
+#               footer draws a column per site that has any and skips the ones
+#               that do not, so it is one footer everywhere while still saying
+#               truthfully which material is whose. Cocktails has no reference
+#               pages yet and so contributes no column -- the same
+#               absent-means-nothing convention used throughout this file.
 # =============================================================================
 
 food:
@@ -45,23 +57,12 @@ food:
   description: What to cook, not how to cook
   css: food
   home: /food/
-  tape: tape
-  tape_count: 7
-  footer_svg: hearts/site-footer-hearts.svg
-  about_url: /food/about/
-  # Reference pages worth reaching from anywhere, listed in the footer beside
-  # the heart graphic under this site's own bracketed word. Absent means the
-  # block isn't rendered at all -- the same convention footer_svg and about_url
-  # already use, so cocktails shows nothing here until it has reference pages
-  # of its own rather than showing an empty heading.
+  icon: food-cloche-heart
   reference_links:
     - text: internal temperatures
       url: /food/reference/temperatures/
     - text: times and methods
       url: /food/reference/timings/
-  home_icon: food-cloche-heart
-  switch_site: cocktails
-  switch_icon: glass-martini
 
 cocktails:
   title: Helen Triages Cocktails
@@ -69,14 +70,8 @@ cocktails:
   description: What to drink, not how to mix it
   css: cocktails
   home: /cocktails/
-  # tape points at assets/img/cocktails/tape/, which holds a direct COPY of
-  # food's current 7 tape-*.svg files (the redesigned set from issue #122,
-  # 2026-08-10) — kept in parity with food deliberately, at Helen's explicit
-  # call in issue #223 (2026-08-15), so the wordmark isn't bare while
-  # cocktails' own visual language is still undecided. When cocktails gets its
-  # own visual language, swap the files in that directory; this key doesn't
-  # need to change.
-  tape: tape
-  tape_count: 7
-  # footer_svg still omitted: nothing drawn for the footer yet, and an absent
-  # key means no fetch is attempted rather than one that 404s and warns.
+  icon: glass-martini
+  # No reference_links: cocktails has no reference pages yet, so the footer
+  # draws no [ COCKTAILS ] column. It gets one the day it has material, with no
+  # template change -- which is the whole point of the footer reading this file
+  # rather than naming food's pages directly.
