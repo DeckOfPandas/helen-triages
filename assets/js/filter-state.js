@@ -331,10 +331,75 @@
     return NARROWING_FIELDS.some(function (f) { return isFieldSet((state || {})[f]); });
   }
 
+  // ---------------------------------------------------------------------------
+  // SERIALISING THE STATE — GitHub issue #387
+  // ---------------------------------------------------------------------------
+  // For sessionStorage, so that returning to the index by going BACK restores
+  // the list you left rather than a fresh one. NOT for URLs: `toQuery()` above
+  // is still deliberately absent, because the thing that would have called it
+  // wants the shuffle ORDER too, which is not a filter and has no business in a
+  // filter grammar.
+  //
+  // WHY THIS IS NEEDED AT ALL, since it looks like something JSON already does:
+  // three of the eight fields are Sets, and `JSON.stringify(new Set())` is
+  // `{}` — not an error, not an empty array, just silently nothing. A state
+  // round-tripped through raw JSON comes back with its tags, its exclusions and
+  // its meta filters quietly emptied, and the symptom is "some of my filters
+  // came back and some didn't", which is a horrible thing to debug.
+  //
+  // DERIVED FROM FIELD_SPEC, like everything else here: a field added to that
+  // table is serialised, restored and defaulted with no change to this code.
+  // Each field's shape is read from its own `empty()` value rather than from a
+  // list of names — the same reasoning isFieldSet() already uses.
+  function serialise(state) {
+    var out = {};
+    FIELDS.forEach(function (f) {
+      var value = state ? state[f] : undefined;
+      // Duck-typed rather than `instanceof Set` — see isFieldSet() for why that
+      // is false across a realm boundary.
+      if (value && typeof value.forEach === 'function' && typeof value.size === 'number') {
+        var list = [];
+        value.forEach(function (v) { list.push(v); });
+        out[f] = list;
+      } else {
+        out[f] = value === undefined ? null : value;
+      }
+    });
+    return out;
+  }
+
+  /* The inverse, and deliberately forgiving: anything missing, malformed or the
+     wrong type falls back to that field's own empty value. Stored state is
+     UNTRUSTED INPUT — it can be a version behind, hand-edited in devtools, or
+     left from a build where a field meant something else — and the cost of a
+     bad restore is an index that looks wrong with no way to tell why, while the
+     cost of falling back is one unfiltered page. */
+  function deserialise(raw) {
+    var state = emptyState();
+    if (!raw || typeof raw !== 'object') return state;
+    FIELDS.forEach(function (f) {
+      if (!(f in raw)) return;
+      var blank = FIELD_SPEC[f].empty();
+      var value = raw[f];
+      if (blank instanceof Set) {
+        if (Array.isArray(value)) state[f] = new Set(value);
+      } else if (typeof blank === 'string') {
+        if (typeof value === 'string') state[f] = value;
+      } else if (typeof blank === 'boolean') {
+        state[f] = !!value;
+      } else if (typeof value === 'string' || value === null) {
+        state[f] = value;
+      }
+    });
+    return state;
+  }
+
   var api = {
     KINDS: KINDS,
     EXCLUDE_PREFIX: EXCLUDE_PREFIX,
     parseQuery: parseQuery,
+    serialise: serialise,
+    deserialise: deserialise,
     FIELDS: FIELDS,
     NARROWING_FIELDS: NARROWING_FIELDS,
     emptyState: emptyState,

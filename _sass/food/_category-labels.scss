@@ -15,11 +15,41 @@
 // Lives here rather than in shared/_tokens.scss because it reads $color-text
 // and $saturation-badge-bg. A "shared" token that depends on one site's palette
 // is not shared, and this was the only thing in that file that did.
+// THIS PLACEHOLDER MAY NOT DECLARE ANYTHING THAT CHANGES THE BUTTON'S WIDTH.
+// Issue #389, 2026-08-19. Helen: "filter tags to the right of a selected one
+// move to the right -- they should stay in the same position."
+//
+// It used to set `font-size: 0.74rem` and `letter-spacing: 0.04em`. Both are
+// layout properties, and neither matched the resting state they replaced, so
+// selecting a tag re-measured it and everything after it on the row slid along.
+//
+// The letter-spacing was the bulk of it: 0.04em on Courier adds that gap after
+// EVERY character including the last (the same trailing-gap fact §13.8's
+// wordmark trap turns on), so the button grew by roughly 0.38px per character
+// -- about 5.7px on `one-handed food`. The font-size drop pulled ~1.3% back the
+// other way, which is why the shift was small enough to live with for a while
+// rather than obvious.
+//
+// IT WAS TWO BUGS, NOT ONE, because two resting bases extend this:
+//   .btn-tag / .btn-star  0.75rem, no letter-spacing
+//   .btn-meta             0.72rem, letter-spacing 0.02em
+// One pair of values could not agree with both. Declaring NEITHER makes each
+// active button inherit its own resting metrics, so both families stop moving
+// -- which is why the fix is a deletion rather than a matching pair of numbers.
+//
+// What is left is safe by inspection: `text-transform` and `font-weight` cannot
+// change the width here. $font-headings is Courier New with a monospace
+// fallback, so every glyph has the same advance whatever its case; and Courier
+// New ships only Regular and Bold as static faces, so 900 resolves to the Bold
+// that 700 already selected (§13.6). The selected state still reads as selected
+// through colour, the .tag-shape fill and $faux-bold-stroke -- none of which
+// occupies space.
+//
+// Before adding a property here, ask whether it can change a box's size. If it
+// can, it belongs on the resting base as well or not at all.
 %btn-active-base {
   text-transform: uppercase;
-  font-size: 0.74rem;
   font-weight: 900;
-  letter-spacing: 0.04em;
   background-color: rgba($color-text, $saturation-badge-bg);
 }
 

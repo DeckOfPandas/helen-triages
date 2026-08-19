@@ -1836,6 +1836,21 @@ two nav icons rendered as raw unstyled SVG, because their rules lived in
 resolves. **"Shared" is a claim about three layers, not one** — markup, cascade
 and assets — and it is only true when all three hold. See §2.5.
 
+**A SOURCE-SCANNING GUARD WILL BE FOOLED BY THE PROSE EXPLAINING IT.** Twice
+in one day, 2026-08-19, in unrelated code. The destructive-git hook (§11.0)
+refused the commit that introduced it, because the message described the
+commands it blocks. Then `test_both_ingredient_pickers_mark_their_word_matches`
+counted `r.hasWordMatch` in `filters.js` and passed while broken, because the
+comment written directly above the function it guards names that flag twice.
+
+Both were caught only by breaking the thing on purpose and watching. **A test
+that greps source cannot tell code from commentary**, and the commentary
+explaining a rule is exactly where that rule's vocabulary is densest — so this
+is not a rare collision, it is the likely one. Strip comments and quoted spans
+before counting, or match a call shape rather than a name. And when you break a
+guard to prove it bites, read the output rather than the exit status: the first
+of these two printed nothing at all, which is what gave it away.
+
 **You will trust a corpus glob that names files instead of finding them.**
 `test_page_links.py`'s page list was `food/**`, `cocktails/**` and the literal
 `[ROOT / "index.html"]` — correct on the day it was written, when the redirect
@@ -2530,8 +2545,9 @@ compare.
 
 **`wordmark_word` — one page overrides the word, added 2026-08-19.**
 `_layouts/default.html` reads `{{ page.wordmark_word | default: this_site.word }}`,
-and `about.html` sets it to `"???"`, so that page reads HELEN TRIAGES /
-`[ ??? ]`. Helen's idea. It is not decoration bolted on: `/about/` hangs off the
+and `about.html` sets it to `"??"`, so that page reads HELEN TRIAGES / `[ ?? ]`
+— matching the nav link that reaches it rather than the page's own `???` title,
+Helen's correction in issue #398 once she had looked at it. Helen's idea. It is not decoration bolted on: `/about/` hangs off the
 shared header of BOTH sites at a site-neutral URL, while carrying
 `site_key: food` to get a stylesheet at all (§2.4), so without this it wore
 `[ FOOD ]` while speaking for the whole repo.

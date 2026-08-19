@@ -185,3 +185,44 @@
 .site-footer-hearts {
   color: $color-accent;
 }
+
+// ---------------------------------------------------------------------------
+// THE BACK ARROW — issue #387
+// ---------------------------------------------------------------------------
+// Rendered by _includes/back-to-index.html at the top of a recipe or cocktail
+// page. In shared/ rather than food/ because BOTH page layouts include it, and
+// the lesson of #374 is that a rule for markup both sites emit does not belong
+// in one site's directory -- that is precisely how the nav icons came to be
+// unstyled on cocktails. It names $color-accent, which every palette owes.
+//
+// Sits in the normal flow above the article rather than being pinned to the
+// viewport. A fixed-position arrow would follow you down a long method and
+// overlap the ingredients column on a narrow screen, and this is a control you
+// want when you have finished reading, not one you want in the way while you
+// are. `main`'s own padding puts it level with the content column's left edge,
+// so it needs no offset of its own.
+.back-to-index {
+  display: inline-block;
+  font-family: $font-headings;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: $color-clear-text;
+  text-decoration: none;
+  margin-bottom: $space-lg;
+
+  // Hue, not lightness. HANDOVER 12: at small sizes the eye reads hue, and a
+  // grey going slightly darker grey is the no-op Helen has reported twice.
+  &:hover,
+  &:focus-visible,
+  &:active {
+    color: $color-accent;
+  }
+}
+
+// Not on paper. Same reasoning as .recipe-actions and .btn-method-toggle in
+// food/_print.scss: a navigation control is either dead or actively misleading
+// once printed. Here rather than there because this element is shared, and a
+// print rule in food/ would leave it printing on every cocktail.
+@media print {
+  .back-to-index { display: none; }
+}

@@ -1,0 +1,35 @@
+{% comment %} ── BACK TO THE INDEX ─────────────────────────────────────────────
+  Issue #387. A small arrow at the top left of a recipe or cocktail page,
+  returning to the index it came from.
+
+  IT IS A REAL LINK FIRST, AND AN ENHANCEMENT SECOND, which is the whole design.
+  The href points at this site's own index (from _data/sites.yml, so a cocktail
+  goes back to /cocktails/ and a recipe to /food/) and works with no JavaScript,
+  from a bookmark, from a search result, anywhere. assets/js/back-link.js then
+  upgrades it to history.back() -- and ONLY when it can prove you actually
+  arrived from that index.
+
+  WHY history.back() RATHER THAN REBUILDING THE INDEX FROM A URL. Helen asked
+  whether this could avoid a refresh "so the index page has the same recipe list
+  I left it with", and the deciding fact is the shuffle: with no filters set the
+  index reshuffles on every fresh load (HANDOVER 13.7). So a link that rebuilds
+  the index from a query string -- even a perfect one carrying every filter --
+  hands back a correctly filtered list in a DIFFERENT ORDER, which is not the
+  list she left. Going back through history restores the page from the browser's
+  cache instead: filters, page number, shuffle order and scroll position all
+  intact, because the page was never re-rendered.
+
+  That is also why `toQuery()` in assets/js/filter-state.js is still unwritten.
+  Its own comment says to add it "the day something calls it"; this is not that
+  day, because the thing that would call it turns out not to want it.
+
+  The arrow is page furniture, not chrome: it lives in the two page layouts
+  rather than in default.html, because it is about where THIS page sits, not
+  about the site shell. See HANDOVER 2.5 for that boundary.
+{% endcomment %}
+{% assign back_site = site.data.sites[page.site_key] %}
+{% if back_site %}
+<a class="back-to-index" href="{{ back_site.home | relative_url }}" aria-label="Back to {{ back_site.title }}">
+  <span aria-hidden="true">&larr;</span>
+</a>
+{% endif %}
