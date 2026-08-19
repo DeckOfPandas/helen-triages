@@ -46,9 +46,11 @@ window.HTF = window.HTF || {};
   };
 
   // --- Site key --------------------------------------------------------------
-  // This repo serves two sites from one build. Artwork is not shared between
-  // them — assets/img/food/ and assets/img/cocktails/ are separate sets — so
-  // every decorative fetch needs to know which site it is on.
+  // This repo serves two sites from one build. A site's own PAGE artwork is not
+  // shared between them — assets/img/food/ and assets/img/cocktails/ are
+  // separate sets — so every decorative fetch inside a page needs to know which
+  // site it is on. (The header and footer are the exception and do not: their
+  // artwork lives in assets/img/chrome/ and goes through HTF.chromeAsset below.)
   //
   // Derived here for the same reason the base URL is: it is read from the page
   // by several scripts, it changes per page rather than per deployment, and a
@@ -63,7 +65,11 @@ window.HTF = window.HTF || {};
 
   /**
    * Build a URL for a file in THIS site's artwork set.
-   * siteAsset('/tape/tape-3.svg') -> '<base>/assets/img/food/tape/tape-3.svg'
+   * siteAsset('/highlighters/highlighter-3.svg')
+   *   -> '<base>/assets/img/food/highlighters/highlighter-3.svg'
+   *
+   * The example used to be the tape, which is no longer a per-site asset at
+   * all -- see HTF.chromeAsset below.
    *
    * Returns null when the page has no site key, so callers can skip the fetch
    * rather than request a path with a hole in it.
@@ -74,6 +80,30 @@ window.HTF = window.HTF || {};
   HTF.siteAsset = function (path) {
     if (!HTF.site) { return null; }
     return HTF.base + '/assets/img/' + HTF.site + path;
+  };
+
+  /**
+   * Build a URL for a file in the SHARED CHROME's artwork set.
+   * chromeAsset('/tape/tape-3.svg') -> '<base>/assets/img/chrome/tape/tape-3.svg'
+   *
+   * The header and the footer are one artefact for the whole repo, not two that
+   * are kept looking alike — so their artwork is one set, named by no site and
+   * needing no site key. It therefore never returns null: chrome renders on
+   * every page, including one belonging to no site.
+   *
+   * This is deliberately a THIRD helper rather than a call to the generic
+   * asset() above, so that test_artwork_fetches_go_through_site_asset can go on
+   * banning any image path built through that one, with no exception carved out.
+   * The ban is what stops a script hardcoding one site's directory; a shared
+   * directory is a different claim, and it gets to say so in the function name.
+   * (That test greps source text and cannot tell a comment from code, so this
+   * paragraph deliberately does not spell the banned call out literally.)
+   *
+   * @param {string} path - path under assets/img/chrome/, leading slash
+   * @returns {string}
+   */
+  HTF.chromeAsset = function (path) {
+    return HTF.base + '/assets/img/chrome' + path;
   };
 
   // --- SVG loading -----------------------------------------------------------

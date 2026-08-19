@@ -538,3 +538,190 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
         for p in made:
             p.unlink(missing_ok=True)
         shutil.rmtree(out, ignore_errors=True)
+
+
+# =============================================================================
+# ONE HEADER AND ONE FOOTER FOR THE WHOLE REPO — GitHub issue #374
+# =============================================================================
+# Helen, 2026-08-19: "I don't want parity between two footers -- I want one
+# footer for the whole site. And one header. Literally the same code and
+# assets."
+#
+# PARITY IS THE THING THIS REPLACES, and the difference is the whole point.
+# Parity is two artefacts a human keeps in step, and it had already failed here
+# twice by the time this test was written. The tape artwork sat in two
+# directories holding byte-identical files, and drifted for five days after
+# food's redesign because nothing but a handover note was watching (issue #223).
+# The header nav was built from three independently-optional per-site keys, food
+# declared all three and cocktails declared none, so cocktails rendered no nav
+# whatsoever -- for weeks, with a green suite, because "shared layout" was true
+# of the template and false of the output.
+#
+# Both are invisible to every other test in this suite. The markup is shared,
+# the SCSS partial is shared, the classes all have rules, every link resolves:
+# each half is individually correct while the two pages disagree. Only the built
+# output can see it, and only by looking at two pages at once.
+
+def _chrome_of(html: str) -> dict[str, str]:
+    """The two shared-chrome blocks, verbatim, out of one built page."""
+    nav = re.search(r'<nav class="site-nav-icons">.*?</nav>', html, re.S)
+    footer = re.search(r'<footer class="site-footer">.*?</footer>', html, re.S)
+    return {
+        "header nav": nav.group(0) if nav else "",
+        "footer": footer.group(0) if footer else "",
+    }
+
+
+def test_the_header_and_footer_are_identical_on_every_page(prod_site):
+    """The nav row and the whole footer are byte-identical across both sites.
+
+    Not "equivalent", not "both present" -- identical source text. Anything a
+    page is allowed to vary is by definition not part of the shared chrome, so
+    there is nothing here to normalise away and no tolerance to tune. If this
+    test ever needs an exception carved into it, that exception IS a second
+    header arriving, and it wants arguing rather than accommodating.
+
+    The wordmark is deliberately OUT of scope: `[ FOOD ]` versus
+    `[ COCKTAILS ]`, and the home link under it, say where you are, which is the
+    one job the chrome still does per-site. It lives in .site-title-link, above
+    the nav row this test reads, so the two are already separated in the markup.
+    """
+    pages = {
+        "/food/": prod_site / "food" / "index.html",
+        "/cocktails/": prod_site / "cocktails" / "index.html",
+        # A collection document as well as an ordinary page: a recipe reaches
+        # default.html through recipe.html, so its chrome arrives by a different
+        # route and is worth asserting on rather than assuming.
+        "/food/recipes/caramel/": prod_site / "food" / "recipes" / "caramel" / "index.html",
+    }
+    for url, path in pages.items():
+        assert path.exists(), (
+            f"{url} is not in the production build, so this test would compare "
+            f"fewer pages than it claims to -- and an empty comparison passes. "
+            f"If that page is genuinely gone, replace it here with one that "
+            f"still exists rather than dropping it."
+        )
+
+    chromes = {url: _chrome_of(p.read_text(encoding="utf-8")) for url, p in pages.items()}
+
+    for block in ("header nav", "footer"):
+        for url, chrome in chromes.items():
+            assert chrome[block], (
+                f"No {block} found in {url}. Either _layouts/default.html stopped "
+                f"emitting it, or its wrapper element was renamed -- and a test "
+                f"that finds nothing to compare passes while checking nothing."
+            )
+
+        reference_url, reference = next(iter(chromes.items()))
+        for url, chrome in chromes.items():
+            if chrome[block] == reference[block]:
+                continue
+            raise AssertionError(
+                f"The {block} differs between {reference_url} and {url}.\n\n"
+                f"{reference_url}:\n{reference[block]}\n\n"
+                f"{url}:\n{chrome[block]}\n\n"
+                f"There is ONE header and ONE footer in this repo (issue #374). "
+                f"A difference here means something in _layouts/default.html has "
+                f"started branching on site_key again, or a value it reads out of "
+                f"_data/sites.yml has become per-site when it should be in "
+                f"_data/chrome.yml. Both are how the two drifted apart before."
+            )
+
+
+def test_every_chrome_class_has_a_rule_in_every_site_stylesheet(site):
+    """A class the shared header or footer emits must be styled on BOTH sites.
+
+    test_every_class_we_emit_has_a_rule_in_the_stylesheet, above, asks whether a
+    class has a rule -- but only in food.css. That is right for the classes only
+    food's own pages emit, and it is exactly the wrong question for the chrome,
+    which every page in the repo renders. A chrome rule that lives in
+    _sass/food/ compiles into food.css, satisfies that test, and is simply
+    ABSENT on cocktails.
+
+    Which is what was happening, in three places, when issue #374 went looking:
+
+      - the footer's four link hovers (_sass/food/_footer.scss);
+      - the header nav's hover (_sass/food/_recipe-header.scss);
+      - .cloche-body, .cloche-heart, .martini-outline, .martini-bowl and
+        .martini-liquid, in the same file -- so the two icons in the shared
+        header rendered as raw unstyled SVG on every cocktails page.
+
+    Every one of those had a comment explaining that the colour it wanted was
+    not in the palette contract, so the rule had to be food-only and cocktails
+    would get a plainer version. That reasoning is how a header ends up shared
+    in the markup and forked in the cascade, and nothing in this suite could
+    see it: the markup is shared, the classes all have rules, every link
+    resolves, the build is green.
+
+    Derived from the template and the icon partials rather than from a list, so
+    a class added to the chrome tomorrow is covered without anyone remembering.
+    """
+    layout = ROOT / "_layouts" / "default.html"
+    sites = yaml.safe_load((ROOT / "_data" / "sites.yml").read_text(encoding="utf-8")) or {}
+
+    # default.html includes icons/github.svg literally, and icons/<icon>.svg for
+    # every site -- so the icon partials' own internal classes are chrome too.
+    # That is where five of the eight missing rules were.
+    icon_names = ["github"] + [(s or {}).get("icon") for s in sites.values()]
+    sources = [layout] + [
+        ROOT / "_includes" / "icons" / f"{n}.svg" for n in icon_names if n
+    ]
+    for path in sources:
+        assert path.exists(), (
+            f"{path.relative_to(ROOT)} does not exist, so this test would scan "
+            f"less chrome than it claims to. Check _data/sites.yml's `icon` "
+            f"values and _layouts/default.html's own includes."
+        )
+
+    emitted = set()
+    for path in sources:
+        for attr in re.findall(r"""class=['"]([^'"{}]+)['"]""", path.read_text(encoding="utf-8")):
+            emitted.update(attr.split())
+    assert emitted, (
+        "No classes found in the shared chrome at all. The template's class "
+        "attributes are built with Liquid now, or the pattern went stale -- "
+        "and a scan that finds nothing passes."
+    )
+
+    stylesheets = {
+        key: site / "assets" / "css" / f"{(cfg or {}).get('css', key)}.css"
+        for key, cfg in sites.items()
+    }
+    styled_in = {}
+    for key, css_path in stylesheets.items():
+        assert css_path.exists(), (
+            f"{key}'s stylesheet was not built at {css_path.name}. Check "
+            f"_data/sites.yml's `css` value against assets/css/."
+        )
+        css = css_path.read_text(encoding="utf-8")
+        styled_in[key] = {name for name in emitted if f".{name}" in css}
+
+    # DIVERGENCE ONLY: a class styled by at least one site must be styled by
+    # all of them. Deliberately NOT "every chrome class has a rule somewhere" --
+    # that is a different claim, it belongs to
+    # test_every_class_we_emit_has_a_rule_in_the_stylesheet above, and asserting
+    # it here would fire on .nav-icon--food, .nav-icon--martini and
+    # .footer-icon--github. Those three are BEM modifier hooks sitting beside
+    # bases that ARE styled (HANDOVER 11.3), styled by nobody, consistently, on
+    # both sites -- which is not a fork and is not what this test is about.
+    #
+    # (They are nonetheless invisible to the test that should own them, because
+    # its source list covers _includes/**/*.html and these live in .svg icon
+    # partials. Noted, not fixed here.)
+    everywhere = set().union(*styled_in.values()) if styled_in else set()
+    forked = []
+    for name in sorted(everywhere):
+        absent = sorted(k for k, styled in styled_in.items() if name not in styled)
+        if absent:
+            present = sorted(k for k, styled in styled_in.items() if name in styled)
+            forked.append(f".{name} — styled in {present}, missing from {absent}")
+
+    assert not forked, (
+        "Shared chrome class(es) styled on some sites and not others:\n  "
+        + "\n  ".join(forked)
+        + "\n\nThe header and the footer are one artefact (issue #374), so a "
+          "rule for one of their classes belongs in _sass/shared/_chrome.scss "
+          "or _sass/shared/_layout.scss -- never in a single site's directory. "
+          "If the rule needs a colour, use $color-accent: that is what the "
+          "tenth palette-contract variable is for."
+    )

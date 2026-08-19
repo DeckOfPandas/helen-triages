@@ -119,42 +119,45 @@
 <body>
 
   <header class="site-header">
-  {% comment %} Header nav icons: a link back to this site's own home, a link
-     across to its sibling site, and the small print / about link -- in that
-     order, right to left, so "??" always sits at the outer edge. Each is
-     independently optional (see sites.yml's own comments on home_icon,
-     switch_site/switch_icon and about_url) so a site with none of these yet
-     renders no nav at all, rather than an empty row or a link to nowhere.
+  {% comment %} ── ONE HEADER, NOT TWO THAT MATCH ──────────────────────────────
+     Issue #374, Helen 2026-08-19: "Literally the same code and assets."
+
+     This nav has NO branch on which site the page belongs to, and that is the
+     feature rather than a simplification. It emits one icon per site in
+     _data/sites.yml, in file order, then the about link -- so the row is
+     byte-identical on a recipe, on the index, and on a cocktail, and the icon
+     for the section you are currently in is simply one of the row rather than
+     a special case.
+
+     The version this replaced built the row from three per-site keys
+     (home_icon, switch_site/switch_icon, about_url), each independently
+     optional. Food declared all three; cocktails declared none, so cocktails
+     rendered no nav whatsoever and nothing failed -- "each is independently
+     optional" is exactly how a shared header comes to exist on one site only.
+
+     ORDER IS sites.yml's ORDER. Reordering that file reorders this row, which
+     is the intended knob; there is no second place to change.
 
      The about link is deliberately not spelled out as "about" anywhere a nav
-     shows it -- Helen's explicit call.
+     shows it -- Helen's explicit call. It is a literal /about/ now rather than
+     a per-site key: there is one about page for the whole repo (see about.html).
 
      .site-header-inner shares main's own max-width/margin:auto formula
      (see _layout.scss) purely so the nav can align with the right edge of
      the CONTENT column -- .site-header itself is edge-to-edge full width,
      with no column of its own to align against otherwise. {% endcomment %}
-  {% if this_site.home_icon or this_site.switch_site or this_site.about_url %}
   <div class="site-header-inner">
     <nav class="site-nav-icons">
-      {% if this_site.home_icon %}
-      <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-nav-icon-link" aria-label="{{ this_site.title }} home">
-        {% assign home_icon_file = "icons/" | append: this_site.home_icon | append: ".svg" %}
-        {% include {{ home_icon_file }} %}
+      {% for entry in site.data.sites %}
+      {% assign nav_site = entry[1] %}
+      <a href="{{ nav_site.home | relative_url }}" class="site-nav-icon-link" aria-label="{{ nav_site.title }}">
+        {% assign nav_icon_file = "icons/" | append: nav_site.icon | append: ".svg" %}
+        {% include {{ nav_icon_file }} %}
       </a>
-      {% endif %}
-      {% if this_site.switch_site %}
-      {% assign sibling_site = site.data.sites[this_site.switch_site] %}
-      <a href="{{ sibling_site.home | relative_url }}" class="site-nav-icon-link" aria-label="{{ sibling_site.title }}">
-        {% assign switch_icon_file = "icons/" | append: this_site.switch_icon | append: ".svg" %}
-        {% include {{ switch_icon_file }} %}
-      </a>
-      {% endif %}
-      {% if this_site.about_url %}
-      <a href="{{ this_site.about_url | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
-      {% endif %}
+      {% endfor %}
+      <a href="{{ '/about/' | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
     </nav>
   </div>
-  {% endif %}
   <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">
     <div class="site-logo">
       <div class="site-logo-top">HELEN TRIAGES</div>
@@ -163,11 +166,13 @@
          TRIAGES with nothing taped underneath it. {% endcomment %}
       {% if this_site %}
       <div class="site-logo-tape">
-        {% if this_site.tape %}
+        {% comment %} One tape set for the whole repo, in assets/img/chrome/tape/.
+           It used to be one directory per site holding byte-identical files, and
+           `tape`/`tape_count` in sites.yml chose between them -- see that file's
+           header, and issue #223, where the two drifted for five days. The count
+           is chrome config, so it comes from _data/chrome.yml. {% endcomment %}
         <span class="tape-bg" aria-hidden="true"
-              data-tape-dir="{{ this_site.tape }}"
-              data-tape-count="{{ this_site.tape_count }}"></span>
-        {% endif %}
+              data-tape-count="{{ site.data.chrome.tape_count }}"></span>
         <span class="site-logo-word"><span class="site-logo-bracket">[ </span>{{ this_site.word }}<span class="site-logo-bracket"> ]</span></span>
       </div>
       {% endif %}
@@ -180,34 +185,51 @@
   </main>
 
   <footer class="site-footer">
-    {% comment %} A three-column grid so the hearts stay exactly where they have
-       always been -- page-centred -- while the reference block sits beside them.
+    {% comment %} ── ONE FOOTER, NOT TWO THAT MATCH ──────────────────────────
+       Issue #374, same ruling as the header above. Nothing below reads
+       `this_site`: every page in the repo gets the same footer, and the only
+       thing that varies is which reference columns have material to show.
+
+       A three-column grid so the hearts stay exactly where they have always
+       been -- page-centred -- while the reference block sits beside them.
        Centring the PAIR instead would have moved the graphic, which is not what
        was asked for and is a change to something already settled.
 
-       THE BRACKETED WORD IS this_site.word, NOT THE LITERAL "[ FOOD ]".
+       THE REFERENCE BLOCK IS A COLUMN PER SITE, not the current site's column.
+       Helen, 2026-08-19: "Site-wide. Gate the [food] and [cocktails] columns to
+       only show if they have material." So a food recipe's footer and a
+       cocktail's footer both list food's two reference pages today, and both
+       will list cocktails' as well the day cocktails has any -- no template
+       change, because the loop already asks every site rather than one.
+
+       THE BRACKETED WORD IS the site's own `word`, NOT THE LITERAL "[ FOOD ]".
        HANDOVER 13.4.1 says brackets are the wordmark's own device and not a
        flourish to reuse -- and this is that device used for what it means: a
-       label saying which site these pages belong to, the same value from the
-       same file, so cocktails' own block would read [ COCKTAILS ] the day it
-       has one. It carries no punched-tape treatment, which is the part 13.4.1
-       actually forbids. That entry is updated rather than quietly contradicted.
+       label saying which site these pages belong to. With the columns now shown
+       side by side rather than one at a time, that label is doing more work
+       than it was, not less: it is the only thing saying that internal
+       temperatures are food's material. It carries no punched-tape treatment,
+       which is the part 13.4.1 actually forbids.
 
-       Absent reference_links renders nothing at all, so cocktails gets no empty
-       heading -- same absent-means-nothing convention as footer_svg above.
+       A site with no reference_links contributes no column at all, rather than
+       an empty heading -- the same absent-means-nothing convention sites.yml
+       uses throughout.
     {% endcomment %}
     <div class="site-footer-top">
-      {% if this_site.reference_links %}
-      <nav class="site-footer-ref" aria-label="{{ this_site.title }} reference">
-        <span class="site-footer-ref-word">[ {{ this_site.word }} ]</span>
-        {% for link in this_site.reference_links %}
+      {% for entry in site.data.sites %}
+      {% assign ref_site = entry[1] %}
+      {% if ref_site.reference_links %}
+      <nav class="site-footer-ref" aria-label="{{ ref_site.title }} reference">
+        <span class="site-footer-ref-word">[ {{ ref_site.word }} ]</span>
+        {% for link in ref_site.reference_links %}
         <a href="{{ link.url | relative_url }}">{{ link.text }}</a>
         {% endfor %}
       </nav>
       {% endif %}
-      {% if this_site.footer_svg %}
-      <div class="site-footer-hearts" aria-hidden="true" data-footer-svg="{{ this_site.footer_svg }}"></div>
-      {% endif %}
+      {% endfor %}
+      {% comment %} The hearts are chrome, so they are unconditional and named in
+         decorations.js rather than chosen by a per-site `footer_svg` key. {% endcomment %}
+      <div class="site-footer-hearts" aria-hidden="true"></div>
     </div>
     <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
     <p class="site-footer-license">

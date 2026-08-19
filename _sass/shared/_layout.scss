@@ -9,12 +9,16 @@
 //
 // PALETTE CONTRACT
 // The shared partials use palette variables by NAME and never define them.
-// Every site palette (_sass/<site>/_palette.scss) must declare all nine that
-// _base.scss and this file between them consume:
+// Every site palette (_sass/<site>/_palette.scss) must declare all ten that
+// _base.scss, this file and _chrome.scss between them consume:
 //
-//   $color-bg     $color-border   $color-clear-text  $color-mood-root
-//   $color-surface  $color-text   $color-white
+//   $color-accent $color-bg       $color-border      $color-clear-text
+//   $color-mood-root  $color-surface  $color-text    $color-white
 //   $font-body    $font-headings
+//
+// $color-accent is the newest (issue #374) and is the one that let the chrome
+// stop being forked: it is each site's own "this is interactive / branded"
+// colour, so shared/_chrome.scss can ask for one without naming food's magenta.
 //
 // tests/test_site_config.py enforces the list, because a missing variable is a
 // Sass compile error on the deploy build rather than something you notice
@@ -95,8 +99,10 @@ main {
   pointer-events: none;
 }
 
-// Header nav row -- home icon, sibling-site switch icon, about link, in that
-// order (see default.html's own comment). Absolutely positioned as a group
+// Header nav row -- one icon per site in _data/sites.yml, in that file's own
+// order, then the about link (see default.html's own comment). The SAME row on
+// every page since issue #374: it used to be built from per-site keys and so
+// rendered nothing at all on cocktails. Absolutely positioned as a group
 // against .site-header-inner rather than each child positioning itself, so
 // they lay out left-to-right as one row pinned to the bottom-right corner
 // (was top-right -- Helen's ask).
@@ -105,7 +111,7 @@ main {
 // #236, Helen wanted the row raised to sit roughly level with the BOTTOM
 // EDGE OF THE BLACK TAPE rather than wherever "1.5rem clear of the header"
 // happened to land it. This is an eyeballed offset, not a mechanism: the
-// tape graphic (assets/img/food/tape/*.svg, viewBox 0 0 1400 170) doesn't
+// tape graphic (assets/img/chrome/tape/*.svg, viewBox 0 0 1400 170) doesn't
 // fill its own box -- the black polygon's visible bottom ink line sits at
 // y=148 of 170, i.e. about 9px shy of its box's own bottom edge, once that
 // box is .site-logo-tape's actual 70px height. .site-nav-icons' "bottom" is
@@ -132,12 +138,14 @@ main {
 }
 
 // Shared link styling for every item in the nav row -- icons and the "??"
-// text both use it, so one hover rule covers all of them. Colour stays at
-// this component's shared default here (only $color-clear-text is
-// guaranteed by every site's palette, see _tokens.scss's palette contract);
-// the hot-magenta hover Helen actually asked for is food-specific
-// ($color-bright-magenta isn't one of the nine guaranteed variables), so it
-// lives as an override in food/_recipe-header.scss, not here.
+// text both use it, so one rule covers all of them. RESTING COLOUR ONLY; the
+// hover is in shared/_chrome.scss.
+//
+// That used to say the hover "lives as an override in food/_recipe-header.scss,
+// not here", because the magenta Helen asked for was not one of the guaranteed
+// palette variables. True, and it meant the shared nav had a hover on food and
+// not on cocktails -- issue #374. $color-accent exists so the hover can be
+// stated once, for both.
 .site-nav-icon-link {
   display: inline-flex;
   align-items: center;
@@ -214,6 +222,33 @@ main {
   gap: $space-lg;
 }
 
+// THE HEARTS ARE PLACED, NOT AUTO-FLOWED, and this is load-bearing rather than
+// explicit-for-its-own-sake. Issue #374 made the reference block a column PER
+// SITE rather than the current site's column, so this row holds one nav today
+// and two the day cocktails has reference pages of its own. Under auto
+// placement that second nav would take column 2 and shove the graphic into
+// column 3 -- the hearts stop being page-centred, which is the one thing the
+// three-column grid above exists to guarantee and was settled on 2026-08-16.
+//
+// Pinning the graphic to the middle track resolves it before auto-placement
+// runs, so the two navs flow into columns 1 and 3 around it and the centring
+// holds at either count. The failure it prevents is silent, arrives with a data
+// edit rather than a code change, and would land on every page at once.
+.site-footer-hearts {
+  grid-column: 2;
+}
+
+// The right-hand column reads outward from the centre, mirroring the left.
+// UNVERIFIED BY EYE: nothing renders a second column yet, so this is reasoning
+// about a layout rather than a judgement about one. Worth looking at properly
+// the day cocktails earns reference pages -- it may want to stay left-aligned
+// with its own bracketed word, which is a thing to see rather than argue.
+.site-footer-ref:nth-of-type(2) {
+  justify-self: end;
+  align-items: flex-end;
+  text-align: right;
+}
+
 // Flush with where the page's own text starts, not tucked against the graphic
 // (Helen, 2026-08-16). No offset needed to achieve that: `main` and
 // .site-footer are both max-width: $width-content, margin: 0 auto, and both
@@ -230,22 +265,24 @@ main {
   gap: $space-xxs;
   text-align: left;
 
-  // NO MAGENTA HERE. $color-recipe-link is the site's "this is interactive"
-  // colour and it belongs to the reading surfaces -- a footer wearing it would
-  // claim the same weight as a cross-recipe link mid-method. Helen: "the normal
-  // darkened magenta link colour we use across the site won't work here, but I
-  // think it'll be obvious enough that those things are links." So the signal
-  // is the underline and the pointer, and the colour stays the footer's own.
+  // NO ACCENT COLOUR AT REST. The site's "this is interactive" colour belongs
+  // to the reading surfaces -- a footer wearing it would claim the same weight
+  // as a cross-recipe link mid-method. Helen: "the normal darkened magenta link
+  // colour we use across the site won't work here, but I think it'll be obvious
+  // enough that those things are links." So the signal is the underline and the
+  // pointer, and the colour stays the footer's own.
   //
   // Font is inherited, not restated: .site-footer is already $font-headings at
   // 0.75rem in $color-clear-text, which is the Courier-not-heavy this wanted.
   //
-  // THE RESTING COLOUR IS ALL THIS LAYER SETS. The hover/active colour is the
-  // site's own link colour, which is NOT in the nine-variable shared palette
-  // contract (test_every_palette_satisfies_the_shared_contract) -- naming
-  // $color-recipe-link-hover here would compile fine for food and break the
-  // cocktails build outright. So it lives in _sass/food/_footer.scss, and a
-  // site without that rule simply keeps the resting colour throughout.
+  // THE RESTING COLOUR IS ALL THIS RULE SETS; the hover/active colour is in
+  // _sass/shared/_footer.scss. That used to say _sass/food/_footer.scss, and
+  // the reason given was that the hover colour was not in the palette contract
+  // so naming it here would break the cocktails build -- true, and the
+  // conclusion drawn from it was wrong. It meant the shared footer's hover
+  // states existed on food and nowhere else, silently, which is issue #374.
+  // The colour is now $color-accent, the tenth contract variable, so both sites
+  // owe one and neither can quietly go without.
   a {
     color: inherit;
     text-decoration: underline;
@@ -518,7 +555,7 @@ $tape-protrusion: 0.2rem;
   // became two pairs -- one tight/crisp right at the glyph edge (a cut
   // line), one wider/softer further out (the glow) -- same multi-copy
   // bevel logic as the tape's own edge highlight
-  // (assets/img/food/tape/*.svg), not a new effect invented for text.
+  // (assets/img/chrome/tape/*.svg), not a new effect invented for text.
   // Helen's own verdict after comparing a higher-contrast pull: this
   // lighter version read better -- less "realistic" contrast, more
   // effective as a label.

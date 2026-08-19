@@ -1,0 +1,27 @@
+# =============================================================================
+# SHARED CHROME — the header and the footer, which belong to no site.
+# =============================================================================
+# _data/sites.yml says what makes one site DIFFERENT from the other. This file
+# is the opposite: configuration for the parts that are the same everywhere,
+# whichever page you are on.
+#
+# Helen, 2026-08-19, settling issue #374: "I don't want parity between two
+# footers -- I want one footer for the whole site. And one header. Literally the
+# same code and assets."
+#
+# So there is no per-site override here and there must not become one. If a key
+# in this file ever grows a `food:`/`cocktails:` split, that is a second header
+# or a second footer arriving under a different name, and the thing to do is
+# argue it out rather than let the data shape decide it quietly. What legitimately
+# varies -- the bracketed word, the page title, the stylesheet -- stays in
+# sites.yml, because those say WHERE YOU ARE rather than what the chrome is.
+#
+# KEYS
+#   tape_count  how many tape-N.svg files assets/img/chrome/tape/ holds. A
+#               browser cannot list a directory, so the number has to be written
+#               down somewhere; decorations.js reads it off the slot rather than
+#               hardcoding it, so adding an eighth tape is a one-line data edit.
+#               tests/test_site_config.py checks it against the real directory.
+# =============================================================================
+
+tape_count: 7

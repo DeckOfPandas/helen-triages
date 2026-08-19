@@ -1,0 +1,187 @@
+// ============================================================================
+// SITE CHROME — THE HALF THAT NEEDS A COLOUR
+// ============================================================================
+// The header nav and the footer, in the one file, because they are one
+// artefact: issue #374, Helen 2026-08-19, "one footer for the whole site. And
+// one header. Literally the same code and assets."
+//
+// The STRUCTURE of both (the nav row's positioning, the footer's three-column
+// grid, the underline) is in shared/_layout.scss. This is the part that names
+// $color-accent, which is why it is a separate partial: a file naming a palette
+// variable has to be imported after the palette, and _layout.scss comes before.
+//
+// EVERY RULE BELOW WAS SITE-SPECIFIC UNTIL #374, AND THAT WAS THE BUG -- in
+// three places, found one at a time, each with its own perfectly reasonable
+// comment explaining why it had to be food-only:
+//
+//   - the footer's four link hovers, in _sass/food/_footer.scss;
+//   - the nav row's hover, in _sass/food/_recipe-header.scss;
+//   - the nav ICON SHAPES -- the cloche and the martini -- in the same file,
+//     which meant that on a cocktails page the two icons in the shared header
+//     had no rules whatsoever and rendered as raw unstyled SVG.
+//
+// The stated reason was the same each time and it was true: these want the
+// site's hot magenta, and $color-bright-magenta is not one of the variables
+// every palette is guaranteed to declare, so a shared partial may not name it.
+// The conclusion drawn from it was wrong. "So it lives in food/ and cocktails
+// gets a plainer version until it wants its own" is how a shared header comes
+// to be shared in the markup and forked in the cascade, invisibly, with a green
+// suite -- the exact shape of failure this repo keeps recording.
+//
+// The fix is $color-accent, the tenth palette-contract variable: each site's
+// one "this is interactive / branded" colour, which every palette now owes. On
+// food it resolves to precisely the magenta all of these rules already used, so
+// this refactor changes no pixel on food. On cocktails it is a documented
+// placeholder, because that palette has no accent hue yet. See both
+// _palette.scss files.
+//
+// The rule to apply before adding anything here: if _layouts/default.html
+// emits the class, its colour belongs in this file. If only one site's pages
+// emit it, it does not.
+//
+// tests/test_rendered_pages.py::test_every_chrome_class_has_a_rule_in_every_
+// site_stylesheet is what now catches a rule drifting back out of here.
+
+// ---------------------------------------------------------------------------
+// HEADER NAV
+// ---------------------------------------------------------------------------
+
+// Covers the "??" link and every site icon in the row -- one rule, since they
+// share .site-nav-icon-link. Hot magenta on food was Helen's explicit ask; the
+// resting colour and the layout are in shared/_layout.scss.
+.site-nav-icon-link:hover,
+.site-nav-icon-link:focus-visible {
+  color: $color-accent;
+}
+
+// --- Nav icon shapes -------------------------------------------------------
+// Sizing and positioning live in shared/_layout.scss (.nav-icon,
+// .site-nav-icons); these are the shapes' own fills and strokes.
+//
+// They were food-only on the reasoning that "cocktails' own icons, not yet
+// designed, won't necessarily share these class names at all" -- which stopped
+// being true the moment the nav started showing BOTH sites' icons on BOTH
+// sites. These exact two icons are now in the header of every page in the repo,
+// so they are chrome by definition, whatever cocktails draws for itself later.
+//
+// Both icons split "outline" from "accent": the outline/body follows
+// currentColor so it inherits the link's own hover behaviour above, while the
+// accent (the heart, the martini's contents) stays a fixed accent colour
+// regardless of hover -- Helen's ask was to fill them in, not to make them
+// react to hover.
+
+// A solid silhouette has no "line" of its own to thicken -- self-stroking
+// (stroke colour == fill colour) dilates the shape outward instead, which
+// reads as chunkier linework the same way bumping the martini's stroke-width
+// below does. Helen's ask, 2026-08-15.
+.cloche-body {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+// Outline back to a fixed near-black ($color-text) rather than self-stroked
+// accent -- Helen's ask. Fixed, not currentColor: the heart is a permanent
+// two-tone accent (black line, accent fill), not part of the link's own hover
+// colour shift the way cloche-body is.
+.cloche-heart {
+  fill: $color-accent;
+  stroke: $color-text;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.martini-outline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+// Outline only -- no fill. The "contents" are a separate, smaller
+// .martini-liquid path (see the SVG partial), a flat-topped wedge offset a
+// constant distance in from both walls (not a centroid-scaled copy of the
+// bowl -- that pinched the gap to nearly nothing right where the walls meet
+// the tip, which read as "still touching"). Helen's ask, matching the
+// inset-fill convention she'd seen (and wanted the technique from, if not the
+// aesthetic) in other icon sets.
+.martini-bowl {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.martini-liquid {
+  fill: $color-accent;
+}
+
+// ---------------------------------------------------------------------------
+// FOOTER
+// ---------------------------------------------------------------------------
+
+// "Those footer links don't change on mouseover or click -- please match
+// normal page links (not the colour of the unclicked link)" -- Helen,
+// 2026-08-16. So: the RESTING colour deliberately stays the footer's own
+// $color-clear-text (she ruled out the darkened accent for a footer), and
+// only the interaction borrows from body links, which is the half she asked
+// for.
+//
+// The previous rule moved to $color-text on hover -- a real change, but from
+// #4f4e4a to #211f20 at 0.75rem, which is why it read as no change at all.
+// Lightness alone is too quiet at this size; the hue shift is what registers.
+//
+// :active for the click, and :focus-visible so the same feedback reaches the
+// keyboard -- these are the last two links before the end of the document, so
+// they are genuinely reachable by tabbing to the bottom.
+.site-footer-ref a {
+  &:hover,
+  &:focus-visible,
+  &:active {
+    color: $color-accent;
+  }
+}
+
+// The licence links (#361) and the GitHub mark (#360) get the same treatment,
+// for the same reason: they are the only other interactive things down here,
+// and they were the only ones that did not move under the cursor. Resting
+// colour untouched -- Helen ruled out the accent AT REST for the footer when
+// the reference links were done, and that ruling covers these too.
+//
+// One value for all four footer link types and every body link, rather than a
+// raw hex here.
+.site-footer-license a {
+  &:hover,
+  &:focus-visible,
+  &:active {
+    color: $color-accent;
+  }
+}
+
+// The GitHub mark carries its own opacity fade rather than a colour, so the
+// hover has to lift BOTH -- the accent at 0.65 opacity is a muddy version of
+// itself, not the colour she asked for.
+.site-footer-github {
+  &:hover,
+  &:focus-visible,
+  &:active {
+    opacity: 1;
+    color: $color-accent;
+  }
+}
+
+// The footer hearts take their colour from currentColor, so the SVG asset
+// itself contains no colour. See assets/img/chrome/hearts/site-footer-hearts.svg.
+//
+// This rule lived in _sass/food/_palette.scss until issue #374 and was the
+// other half of the same problem: the graphic is chrome, so a site that did not
+// declare a colour for it would have drawn it in inherited body text. It takes
+// the same $color-accent as the links above -- one accent for the chrome, which
+// is what made the hearts, the recipe title's rule and every cross-recipe link
+// read as one device on food rather than as three coincidences (HANDOVER 13.2).
+.site-footer-hearts {
+  color: $color-accent;
+}

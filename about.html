@@ -1,7 +1,27 @@
 ---
 layout: default
 title: ???
-permalink: /food/about/
+permalink: /about/
+# ONE ABOUT PAGE FOR THE WHOLE REPO -- issue #374, and the reason this file sits
+# at the root rather than under food/. The header's "??" link is part of the
+# shared chrome, so it cannot point at a page that belongs to one site: it did,
+# and cocktails therefore had no "??" at all. This page moved from
+# /food/about/ on 2026-08-19.
+#
+# site_key IS SET BY HAND HERE, AND IT HAS TO BE. _config.yml's `defaults:`
+# assign site_key by directory -- "food" and "cocktails" -- so a page at the
+# root matches neither and would inherit none. HANDOVER 2.4: a page with no
+# site_key gets the repo-level title and NO STYLESHEET AT ALL, silently. That is
+# not a hypothetical here; it is what this file would have shipped as.
+#
+# `food` rather than a third value, deliberately. This page's longform styling
+# is _sass/food/_about.scss, sitting on .recipe-body-content, and food's is the
+# only finished palette in the repo. Giving /about/ its own stylesheet would
+# recreate assets/css/root.scss exactly -- the third consumer of shared/ that
+# belonged to neither site, that nobody thought to check, and that broke
+# silently for precisely that reason (HANDOVER 2.2, issue #204). The visible
+# cost is that /about/ says "Helen Triages Food" in its title bar and wears
+# [ FOOD ] on the tape. Flagged rather than hidden; see issue #376.
 ---
 
 <article class="recipe">

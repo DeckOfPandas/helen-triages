@@ -9,7 +9,9 @@
 # ABSENT MEANS NO ICON, not a broken one. A glass with no entry here (or an
 # entry pointing at a file that does not exist) renders no icon at all rather
 # than a 404 or an empty box — the same absent-means-nothing convention
-# `footer_svg` and `about_url` already use in _data/sites.yml.
+# `reference_links` already uses in _data/sites.yml. (It used to cite
+# `footer_svg` and `about_url`; both were retired by issue #374, when the header
+# and footer stopped being per-site configuration. The convention is unchanged.)
 #
 # KEYS ARE THE GLASS STRING AS WRITTEN IN A DRINK'S FRONT MATTER, lowercased.
 # The spreadsheet spells several glasses more than one way and those spellings

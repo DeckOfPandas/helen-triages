@@ -99,10 +99,20 @@ def front_matter(path: Path) -> dict:
 
 # --- the corpus of files whose <a href> we check ----------------------------
 
+# The two site page directories, plus every ordinary page at the repo root.
+#
+# THE ROOT LEVEL IS GLOBBED, NOT LISTED, and that is a fix rather than a style
+# preference. It was `[ROOT / "index.html"]` -- correct on the day it was
+# written, when the redirect was the only root-level page there had ever been.
+# Issue #374 added about.html beside it, and a named file cannot see a sibling:
+# every link to /about/ read as pointing at a page nothing published, because
+# this corpus simply did not contain the file that publishes it. The failure at
+# least announced itself; the mirror image is the one to fear, since a page this
+# list cannot see is also a page whose own outbound links go unscanned.
 PAGE_FILES = (
     sorted(ROOT.glob("food/**/*.html"))
     + sorted(ROOT.glob("cocktails/**/*.html"))
-    + [ROOT / "index.html"]
+    + sorted(ROOT.glob("*.html"))
 )
 LAYOUT_FILES = sorted(ROOT.glob("_layouts/*.html"))
 INCLUDE_FILES = sorted(ROOT.glob("_includes/**/*.html"))
@@ -249,12 +259,13 @@ ASSIGN_LITERAL = re.compile(
     r'\{%-?\s*assign\s+(\w+)\s*=\s*"([^"]+)"\s*\|[^%]*?relative_url[^%]*?-?%\}', re.S
 )
 
-# Header nav hrefs are built from `this_site`/`sibling_site` (Liquid
-# variables read from _data/sites.yml, resolved per page), and the two
-# per-item loop links are built from Jekyll's own `.url` on each document.
-# Neither is a literal this scanner can read out of the template text, so
-# both are resolved a different way instead of being silently skipped:
-#   - this_site.home / this_site.about_url / sibling_site.home ->
+# The wordmark and header-nav hrefs are built from Liquid variables read out of
+# _data/sites.yml (`this_site` for the page's own site, `nav_site` for each
+# entry in the shared nav's loop), and the two per-item loop links are built
+# from Jekyll's own `.url` on each document. Neither is a literal this scanner
+# can read out of the template text, so both are resolved a different way
+# instead of being silently skipped:
+#   - this_site.home / nav_site.home ->
 #     test_site_nav_links_resolve_to_real_pages, which reads sites.yml
 #     directly.
 #   - recipe.url / cocktail.url -> not checked at all, deliberately: Jekyll
@@ -263,10 +274,17 @@ ASSIGN_LITERAL = re.compile(
 # A new href this scanner can't trace to a literal, and that isn't one of
 # these, fails test_no_link_shape_is_silently_unresolved instead of quietly
 # passing.
+#
+# `sibling_site.home` and `this_site.about_url` were here until issue #374 and
+# are deliberately gone rather than left harmlessly. The header no longer asks
+# sites.yml which site it is on: it loops every site, and the about link is a
+# literal `/about/` that LIQUID_RELATIVE resolves and the ordinary published-page
+# check covers. A stale entry on this list is a hole -- it would trust a shape
+# nothing emits, and go on trusting the day something emits it again for a
+# different reason.
 TRUSTED_DYNAMIC = (
     re.compile(r"^\{\{\s*this_site\.home\s*\|\s*default:\s*'/'\s*\|\s*relative_url\s*\}\}$"),
-    re.compile(r"^\{\{\s*sibling_site\.home\s*\|\s*relative_url\s*\}\}$"),
-    re.compile(r"^\{\{\s*this_site\.about_url\s*\|\s*relative_url\s*\}\}$"),
+    re.compile(r"^\{\{\s*nav_site\.home\s*\|\s*relative_url\s*\}\}$"),
     # The footer's reference links, added 2026-08-16. Same shape and same
     # treatment as the three above: the value lives in _data/sites.yml, so this
     # scanner cannot read it out of the template, and
@@ -442,15 +460,22 @@ def test_no_link_shape_is_silently_unresolved():
 
 
 def test_site_nav_links_resolve_to_real_pages():
-    """_layouts/default.html's header nav builds its hrefs from
-    _data/sites.yml (this_site.home, this_site.about_url, sibling_site.home)
-    rather than a literal path in the template -- TRUSTED_DYNAMIC above only
-    records that this shape is accounted for, it does not check where the
-    values actually point. This reads sites.yml directly and checks each one.
+    """_layouts/default.html's header nav and footer reference block build their
+    hrefs from _data/sites.yml rather than from a literal path in the template
+    -- TRUSTED_DYNAMIC above only records that this shape is accounted for, it
+    does not check where the values actually point. This reads sites.yml
+    directly and checks each one.
+
+    Every site's `home` matters to EVERY page now, not just to its own. Since
+    issue #374 the header emits one icon per site on every page in the repo, so
+    a broken `home` on cocktails is a dead link on all 82 food recipes, not a
+    dead link on the cocktails index.
     """
     path = ROOT / "_data" / "sites.yml"
     sites = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     assert sites, f"{path} declares no sites -- nothing for the header nav to link to."
+
+    icons_dir = ROOT / "_includes" / "icons"
 
     problems = []
     for key, site in sites.items():
@@ -459,13 +484,26 @@ def test_site_nav_links_resolve_to_real_pages():
         if home not in PAGES:
             problems.append(f"sites.yml: {key}.home = {home!r}, no published page there")
 
-        about = site.get("about_url")
-        if about and about not in PAGES:
-            problems.append(f"sites.yml: {key}.about_url = {about!r}, no published page there")
+        # Every site owes the shared nav an icon, because the shared nav gives
+        # every site a slot whether or not it has declared one. A missing `icon`
+        # renders `{% include icons/.svg %}`, which is a BUILD FAILURE rather
+        # than a quiet gap -- caught here so the message names the site.
+        icon = site.get("icon")
+        if not icon:
+            problems.append(
+                f"sites.yml: {key} declares no `icon`. The header nav "
+                f"(_layouts/default.html) emits one icon per site on every page, "
+                f"so this is not optional -- it builds an include path from it."
+            )
+        elif not (icons_dir / f"{icon}.svg").exists():
+            problems.append(
+                f"sites.yml: {key}.icon = {icon!r}, but "
+                f"_includes/icons/{icon}.svg does not exist"
+            )
 
         # The footer reference block (2026-08-16). Absent is fine -- cocktails
-        # has none yet, and the template renders nothing rather than an empty
-        # heading -- but a link that IS listed has to go somewhere real.
+        # has none yet, and the template draws no column for a site with none --
+        # but a link that IS listed has to go somewhere real.
         for entry in site.get("reference_links") or []:
             url = (entry or {}).get("url")
             if url not in PAGES:
@@ -474,15 +512,33 @@ def test_site_nav_links_resolve_to_real_pages():
                     f"points at {url!r}, which no published page serves"
                 )
 
-        switch = site.get("switch_site")
-        if switch:
-            sibling_home = (sites.get(switch) or {}).get("home")
-            if not sibling_home or sibling_home not in PAGES:
+        # Keys the chrome used to read, removed by issue #374. Left here as an
+        # assertion rather than deleted, because re-adding one would look like
+        # configuration and would in fact do nothing at all: the template no
+        # longer asks. A key that is silently ignored is worse than one that is
+        # missing.
+        for retired, why in RETIRED_SITE_KEYS.items():
+            if retired in site:
                 problems.append(
-                    f"sites.yml: {key}.switch_site = {switch!r}, but "
-                    f"sites.yml[{switch!r}].home = {sibling_home!r} has no published page"
+                    f"sites.yml: {key}.{retired} is retired -- {why} "
+                    f"Nothing reads it, so setting it changes nothing."
                 )
+
     assert not problems, "Header nav link(s) resolve nowhere:\n  " + "\n  ".join(problems)
+
+
+# Chrome configuration that used to live per-site in _data/sites.yml, with what
+# replaced it. Issue #374: the header and the footer are one artefact for the
+# whole repo, so none of these is a per-site decision any more.
+RETIRED_SITE_KEYS = {
+    "home_icon": "renamed `icon`; the nav gives every site a slot, not just this one.",
+    "switch_site": "the nav loops every site in this file, so there is nothing to switch to.",
+    "switch_icon": "see switch_site; one `icon` per site covers both roles.",
+    "about_url": "there is one about page, at the literal /about/.",
+    "footer_svg": "the footer hearts are chrome, named in assets/js/decorations.js.",
+    "tape": "one tape set for the repo, at assets/img/chrome/tape/.",
+    "tape_count": "moved to _data/chrome.yml, which is chrome config rather than site identity.",
+}
 
 
 def test_chart_anchor_fragments_exist_on_the_temperatures_page():

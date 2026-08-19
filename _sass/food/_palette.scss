@@ -166,6 +166,24 @@ $color-label-stroke:         lighten($color-text, 20%);
 $color-recipe-link: $color-bright-magenta-dark;
 $color-recipe-link-hover: $color-bright-magenta;
 
+// --- The shared chrome's accent ----------------------------------------------
+// The TENTH palette-contract variable (issue #374, 2026-08-19): the one colour
+// _sass/shared/_footer.scss is allowed to name, covering the footer's four link
+// hovers and the hearts. Both sites owe it; see tests/test_site_config.py's
+// SHARED_PALETTE_CONTRACT.
+//
+// Magenta, and not a new hue, because magenta is ALREADY this site's one
+// "interactive / branded" colour -- it carries the title rule, the method
+// toggle, every cross-recipe link and $color-star-root, and HANDOVER 13.2 is
+// explicit that those are one rhyme rather than four coincidences. Naming that
+// job out loud costs nothing and gives the shared chrome something to ask for
+// that is not "food's magenta".
+//
+// It resolves to exactly what the two rules it replaced already used
+// ($color-recipe-link-hover for the links, $color-bright-magenta for the
+// hearts, which are the same value), so this refactor changes no pixel on food.
+$color-accent: $color-bright-magenta;
+
 // --- Reusable Structural Accents ---------------------------------------------
 // Nested bullets in the short method. Was cerulean-mixed; re-based on spring
 // green when cerulean left the recipe page entirely, so it stays a pale echo of
@@ -292,12 +310,8 @@ $color-step-number: $color-text;
   fill-opacity: var(--highlighter-opacity, 1);
 }
 
-// Footer hearts take their colour from currentColor, so the SVG asset itself
-// contains no colour. See assets/img/hearts/site-footer-hearts.svg.
-//
-// Magenta, to follow the recipe title. The footer is in the SHARED layout, so
-// this is the one change from the recipe-page redesign that reaches the index
-// as well — deliberately: one heart colour for the site.
-.site-footer-hearts {
-  color: $color-bright-magenta;
-}
+// The footer hearts rule used to live here. It is chrome, not food's, so it
+// moved to _sass/shared/_footer.scss with the rest of the footer in issue #374
+// — a site that did not declare a heart colour drew the graphic in inherited
+// body text, which is what cocktails was doing. It reads $color-accent, which
+// on this site is the same magenta this rule always used.
