@@ -122,6 +122,31 @@ def _load(directory: Path) -> list[Recipe]:
 ALL_RECIPES = _load(RECIPES_DIR)
 ALL_DRAFTS = _load(DRAFTS_DIR)
 
+# ARE THE PRIVATE DRAFTS EVEN HERE? -- GitHub issue #378.
+#
+# `_food_drafts/` is a separate, private, gitignored repository. A CI checkout
+# therefore has the ~82 published recipes and NONE of the ~290 drafts, so
+# ALL_DRAFTS is an empty list there and every draft-reading check silently
+# examines a fraction of what it does locally.
+#
+# That is this repository's own worst failure mode wearing a new hat (HANDOVER
+# 12): the tests do not fail, they find fewer offenders and report green. The
+# green is true of what they scanned and misleading about what they did not.
+#
+# Exposed as a value rather than left for each test to re-derive from
+# `if not ALL_DRAFTS`, so tests/test_suite_hygiene.py can insist every
+# draft-reading test makes a deliberate choice about it. See
+# test_every_draft_reading_test_says_what_it_does_without_drafts.
+DRAFTS_PRESENT = bool(ALL_DRAFTS)
+
+# Written once. A skip reported as bare "skipped" is barely better than a pass.
+NO_DRAFTS_REASON = (
+    "_food_drafts/ is absent -- it is a separate private repo, so a CI checkout "
+    "has none of it. This check reads drafts ONLY, so it has nothing to examine "
+    "and says so rather than passing: a pass would claim the drafts were "
+    "checked and found clean. Issue #378."
+)
+
 
 def pytest_generate_tests(metafunc):
     """Parametrise any test that asks for a `recipe` or `draft` argument.

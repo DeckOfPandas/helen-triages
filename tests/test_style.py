@@ -951,8 +951,14 @@ def test_accents_in_drafts():
     test_taxonomy.py: a draft carries its spelling forward when it's
     promoted to _food_recipes/, so it's worth catching before that happens
     rather than after.
+
+    SKIPS WITHOUT THE DRAFTS (#378). This reads _food_drafts/ and nothing else,
+    so in CI -- where that private repo is absent -- it would scan an empty list
+    and report a confident green having looked at nothing at all.
     """
-    from conftest import ALL_DRAFTS
+    from conftest import ALL_DRAFTS, DRAFTS_PRESENT, NO_DRAFTS_REASON
+    if not DRAFTS_PRESENT:
+        pytest.skip(NO_DRAFTS_REASON)
 
     words = _accented_words()
     assert words, (
@@ -1012,9 +1018,12 @@ def test_pan_and_ingredient_sizes_use_digits(recipe):
 
 def test_pan_and_ingredient_sizes_use_digits_in_drafts():
     """Same rule as test_pan_and_ingredient_sizes_use_digits, for
-    _food_drafts/ -- same reasoning as test_accents_in_drafts.
+    _food_drafts/ -- same reasoning as test_accents_in_drafts, including its
+    note on skipping when the private drafts are absent (#378).
     """
-    from conftest import ALL_DRAFTS
+    from conftest import ALL_DRAFTS, DRAFTS_PRESENT, NO_DRAFTS_REASON
+    if not DRAFTS_PRESENT:
+        pytest.skip(NO_DRAFTS_REASON)
 
     problems = []
     for draft in ALL_DRAFTS:

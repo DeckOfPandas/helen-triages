@@ -285,6 +285,17 @@ $color-electric-cobalt: #0047FF;
 // above them; this one cannot, and the split is the price of that.
 $color-exclude-active: darken($color-electric-cobalt, $darken-active);
 
+// The hover for LEAVE OUT's pool candidates -- issue #403, 2026-08-19. Darker
+// than $color-exclude-active, and it HAS to be: a word-matched candidate rests
+// at $color-exclude-active (see .btn-exclude--word-match), so hovering it to
+// that same value would be a literal no-op. Not the "lightness-only change at
+// small type" HANDOVER 12 warns about -- no change at all.
+//
+// $darken-active-extra rather than a fresh number: it is the deeper cut the
+// palette already uses where $darken-active is not enough, so this stays a
+// choice between two existing steps rather than a third value to maintain.
+$color-exclude-hover: darken($color-electric-cobalt, $darken-active-extra);
+
 // Step numerals in the method, and the top-level bullets in the short method.
 // Body text colour, not a hue of their own. They were violet, then a darkened
 // cerulean; both spent colour on something that is already unmistakable by

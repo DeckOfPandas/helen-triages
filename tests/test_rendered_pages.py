@@ -933,3 +933,61 @@ def test_no_active_filter_button_changes_its_own_width(site):
           "which occupies space. If a metric genuinely must change, change the "
           "RESTING state to match so the two agree."
     )
+
+
+def _luminance(css_colour):
+    """Relative luminance of an `rgb(r, g, b)` string, 0 (black) to 1 (white)."""
+    nums = [float(n) for n in re.findall(r"[\d.]+", css_colour)[:3]]
+    channels = []
+    for raw in nums:
+        c = raw / 255.0
+        channels.append(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)
+    r, g, b = channels
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def test_the_exclude_hover_is_actually_darker_than_the_state_it_replaces(site):
+    """A matched LEAVE OUT tag must visibly change when you hover it. Issue #403.
+
+    The trap is specific and it is one this palette walked into once already.
+    Word-matched candidates REST at $color-exclude-active (issue #390). The pool
+    hover therefore cannot be $color-exclude-active: hovering a matched tag
+    would change nothing whatsoever -- not the "lightness-only shift reads as
+    nothing at small type" of HANDOVER 12, which is at least a change, but a
+    literal no-op.
+
+    Helen's ask was that these DARKEN, "same as for the include filter", so the
+    direction is asserted too and not just the difference. Both values are
+    derived ($darken-active and $darken-active-extra off one root), so an edit
+    to either step, or a re-rooting of the cobalt, can quietly collapse them.
+
+    Compared on relative luminance rather than on the raw strings, because two
+    different strings can still be the same colour and because "darker" is the
+    actual claim being made.
+    """
+    css = (site / "assets" / "css" / "food.css").read_text(encoding="utf-8")
+
+    def colour_of(pattern, what):
+        match = re.search(pattern, css, re.S)
+        assert match, (
+            f"Could not find {what} in the compiled CSS. The selector was "
+            f"renamed or the rule is gone -- and a scan that finds nothing "
+            f"passes while checking nothing."
+        )
+        return match.group(1).strip()
+
+    resting = colour_of(r"\.btn-exclude--word-match \{[^}]*?color: ([^;]+);",
+                        "the resting colour of a matched LEAVE OUT candidate")
+    hover = colour_of(
+        r"\.btn-exclude:not\(\.btn-exclude--active\):hover[^{]*\{[^}]*?color: ([^;]+);",
+        "the hover colour of a LEAVE OUT pool candidate")
+
+    assert _luminance(hover) < _luminance(resting), (
+        f"Hovering a word-matched LEAVE OUT candidate does not darken it: it "
+        f"rests at {resting} and hovers to {hover}.\n"
+        f"Issue #403 asked for these to darken, like the include picker. If the "
+        f"two are equal the hover is a literal no-op and the tag does not "
+        f"respond to the cursor at all; if the hover is lighter, the pool "
+        f"brightens while every other filter section on the page darkens.\n"
+        f"$color-exclude-hover must stay a deeper cut than $color-exclude-active."
+    )

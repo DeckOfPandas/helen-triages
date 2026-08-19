@@ -1043,6 +1043,52 @@ what ships, and revisit drafts as they are proofread, because a draft's
 `item:` lines are rewritten before publishing and a vocabulary entry aimed at
 one today is work done twice.
 
+**RE-AFFIRMED 2026-08-20, and this is the paragraph to reach for when the
+exclude picker "breaks" again.** It will look broken, it will look like a
+regression, and it will not be one. Helen, seeing 73 candidates for `chi` in
+LEAVE OUT: "The synonym collapse on the exclude filter has gone wrong again...
+This was definitely working properly earlier today." She was right that it had
+been, and right that it was not the code:
+
+| | production (ships) | local (:4001) |
+|---|---|---|
+| rows | 82 | 369 |
+| raw `item:` entries | 719 | 3,973 |
+| derived vocabulary | 317 | 1,198 |
+| `chi` family buttons | 2 | 5 |
+| **`chi` candidates** | **10** | **73** |
+
+63 of the 73 were draft-only, and the worst of them are exactly what a draft's
+`item:` line looks like before it is rewritten: `chicken bouillon powder or ½
+tsp crumbled chicken stock cube`, `hot low-salt vegetable or chicken stock`,
+`large or 4 small chicken thighs`. **Nine drafts added at 22:06 and 22:54 that
+same evening supplied them** — which is precisely why it had been fine earlier
+in the session. The ruling above was upheld: cosmetic, local-only, leave it.
+
+**The ratio has moved a long way since the ruling was made** — 287 drafts to 82
+recipes, about 3.5:1, where §8.1 was written at roughly 3:1 with a much smaller
+absolute backlog. If the working view ever becomes genuinely unusable rather
+than merely noisy, the option that was costed and NOT taken is to build the
+picker's vocabulary from published recipes only, leaving draft rows in the list
+and still filterable. That is a real design change and needs Helen, not a
+session deciding the noise has finally got bad enough.
+
+**HOW TO MEASURE IT, so nobody re-derives this at midnight.** The vocabulary is
+emitted into the built page as JSON, and `ingredient-search.js` is a pure module
+Node can require — so both halves can be run outside a browser:
+
+```
+bundle exec jekyll build --config _config.yml               --destination tmp/prod
+bundle exec jekyll build --config _config.yml,_config_local.yml --destination tmp/local
+```
+
+then, for each build, pull `id="ingredient-vocabulary"`'s JSON and every
+`data-all-ingredients` attribute out of `food/index.html`, split the attribute
+on **`|`** (not a comma — filters.js does, and getting this wrong makes each
+whole row look like one entry and the numbers meaningless), and run
+`IS.create(vocab).search('chi', IS.buildMasterList(entries))`. Compare the two
+counts before concluding anything.
+
 **Read the whole list before adding to `measure_phrases`.** The section header
 in `ingredient_words.yml` already says to derive phrases from real entries;
 these are the traps that rule exists for. `bicarbonate of` and `cream of` both
@@ -1563,6 +1609,7 @@ non-empty:
 | Shape | Caught |
 |---|---|
 | `git checkout -- <paths>`, `git checkout <ref> -- <paths>` | yes |
+| `git checkout <path>` — **no `--` at all** | yes, since 2026-08-19 |
 | `git checkout .` | yes |
 | `git reset --hard` | yes |
 | `git clean -f` / `-fd` / `-xfd` / `--force` | yes |
@@ -1584,9 +1631,25 @@ non-empty:
   `git commit -F` from a heredoc, and they quote these commands constantly —
   the `CLAUDE.md` entry being enforced names three of them.
 
-**Both of those last two were found by testing, not by thinking, and the second
-found the loudest way available: the hook blocked the very commit that
-introduced it.** A heredoc body is not quoted — it is data on stdin that merely
+**THE BARE-PATH FORM WAS MISSING FOR A DAY, AND IT COST WORK.** The first
+version patterned only the ` -- ` spelling. On 2026-08-19 a session ran
+`git checkout tests/test_style.py` — reflexively, to undo a test-break it had
+made itself, which is the exact scenario the hook exists for — and the hook
+allowed it, discarding that file's uncommitted changes. **The guard's own author
+fell into the hole the guard did not cover, hours after building it.**
+
+The fix could not be a pattern: `git checkout main` is harmless,
+`git checkout feat/some-branch` is harmless and looks exactly like a path, and
+`git checkout tests/foo.py` destroys work. It asks the filesystem instead — an
+argument naming a file that exists is a path, and nothing else is.
+
+**The general lesson is about how a guard gets tested.** Both times this hook was
+verified, the verification used the spellings its author had in mind. Enumerate
+how the dangerous thing can be SPELLED, not how you happen to write it.
+
+**Both quoted mentions and heredoc bodies were found by testing, not by
+thinking, and the second found the loudest way available: the hook blocked the
+very commit that introduced it.** A heredoc body is not quoted — it is data on stdin that merely
 *looks* like shell text — so the quote-stripping added for the first case did
 not reach it. If you extend this hook, extend the test sweep with it, and check
 the two failure directions that matter: a heredoc *followed* by a real

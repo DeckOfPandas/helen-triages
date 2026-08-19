@@ -254,9 +254,24 @@ def test_no_main_ingredient_spelling_collisions():
 
     This test covers drafts as well as published recipes: a draft carries its
     spelling with it when it is promoted.
+
+    PARTIAL IN CI, KNOWINGLY (#378). `_food_drafts/` is a separate private repo,
+    so a CI checkout has the published recipes and none of the ~290 drafts. This
+    does NOT skip there, unlike the drafts-only checks in test_style.py: the
+    published half is real coverage and worth keeping. But the green it reports
+    in CI means "no collisions among the recipes", not "no collisions" -- and
+    the collision this test most wants to catch, a new draft clashing with a
+    published recipe, is exactly the one CI cannot see. Local runs and the
+    pre-push simulation (move the two draft repos aside, run, move back) are
+    where that gets caught.
     """
     from collections import defaultdict
     from conftest import ALL_RECIPES, ALL_DRAFTS
+
+    assert ALL_RECIPES, (
+        "No published recipes loaded at all, so this check has nothing to scan "
+        "and would pass having examined nothing."
+    )
 
     forms = defaultdict(set)
     sources = defaultdict(set)
