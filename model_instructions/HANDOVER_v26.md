@@ -398,7 +398,8 @@ literally will fail it. Ask how a guard works before rewording around it.)
 ```yaml
 title: "Lemony Cavolo Nero and Butter Bean Soup"
 tagline: "It's fun to have a one-pot stew that is bright and acidic..."
-source: "Adapted from Good Food, January 2026, page 41"
+source: "Adapted from Good Food, January 2026"
+source_type: publication              # required; see SOURCE_ATTRIBUTION_SPEC.md
 serves: 4                        # xor makes: — never both
 prep_time: "20 mins"
 cook_time: "1 hr 30 mins"
@@ -433,15 +434,32 @@ meta:
   date_last_edited: "2026-07-29"
 ```
 
+**`source_type` is required alongside `source` (issue #406) — the full contract
+is `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`, not repeated here.** One of
+exactly eight values (`publication`, `book`, `website`, `author`, `person`,
+`place`, `joke`, `unknown`), each dictating the exact shape `source` must take
+— page numbers, publisher parentheticals and series-name asides are never part
+of any shape, so don't add them. `source_type` renders nowhere — it's listed in
+`INVISIBLE_KEYS` (see §4.0), so setting or correcting it never invalidates
+`proofread`. **No test enforces any of this yet** — both the `_food_recipes/`
+and `_food_drafts/` sweeps that added the field everywhere applied the spec by
+judgement, once, not by a guard that would catch future drift. Check before
+relying on it.
+
 **`meta.claude_rewritten` (optional, issue #418) records that Claude took a tidy-up
 pass at a draft — suggesting `main_ingredients`, ingredient/method groups, and
 smoothing wording toward Helen's voice — not that the recipe is actually
 rewritten.** `meta.rewritten` is the real claim, and only Helen sets it true.
 Request a pass either directly ("tidy this one up for me") or by dropping
-drafts into `_food_drafts/to_rewrite/`, mirroring the informal `to_promote/`
-staging folder Helen already uses the same way — neither subfolder is read by
-the draft test suite (`_food_drafts/*.md` is top-level only), so files sitting
-there aren't "in the collection" yet. **`QQ PLACEHOLDER` survives a
+drafts into `_food_drafts/to-rewrite/`. Helen built out a full three-stage
+staging pipeline the same day this landed: `to-rewrite/` (waiting for a
+Claude pass) → `to-cook/` (tidied, good enough to actually cook from) →
+`to-promote/` (schema-clean, ready to move to `_food_recipes/`) — after
+finishing a pass, move the file into `to-cook/` yourself rather than leaving
+it in `to-rewrite/`. None of the three subfolders are read by the draft test
+suite (`_food_drafts/*.md` is top-level only), so files staged in any of them
+aren't "in the collection" yet — check compliance by hand, or copy back to
+top level to run the real suite against them. **`QQ PLACEHOLDER` survives a
 Claude-assisted pass.** Tidying structure and wording is not the same thing as
 Helen actually rewriting a step in her own voice — the marker only comes off
 once she says so, same reasoning as the `proofread` rule in §4.0. Considered
@@ -498,12 +516,25 @@ Three things about it that will otherwise waste your time:
 - **It reads COMMITTED history**, so it fires on the run *after* your commit,
   not before it. It will stop a bad merge; it will **not** stop you committing
   the omission. Set the flag while you edit, not when the suite complains.
-- **`BASELINE_COMMIT` grandfathers everything up to `dc2a7bf`.** Those 34
-  recipes include 45 second-person edits Helen reviewed one at a time, so she
-  *was* the last judgement even though an agent's commit wrote the bytes.
+- **`BASELINE_COMMIT` grandfathers everything up to and including itself** —
+  currently `366f392`, moved there 2026-08-20 (from `9c70675` before that, from
+  `dc2a7bf` before that — check the constant itself rather than trust a number
+  quoted here, it moves). Each move was Helen reviewing a sweeping, content-free
+  change herself and saying so.
 - **Moving that baseline forward is Helen's to grant, never yours.** If she has
   reviewed a change line by line, move it and say so in the commit message.
   Never move it to make a red test go green.
+- **Two narrower escape hatches exist besides the baseline, added #417.**
+  `INVISIBLE_KEYS` names front-matter keys nothing ever renders (`source_type`
+  is the one there today) — a commit that changes ONLY those keys, with the
+  body byte-identical, doesn't need `proofread: false`, and
+  `test_invisible_keys_are_really_invisible` greps the actual template source
+  to keep that claim honest rather than trusting it. `HELEN_CLEARED` names a
+  single recipe Helen has cleared by hand when the baseline would be too blunt
+  (it grandfathers everything, which is wrong when one recipe needs releasing
+  and others are deliberately still held). Both are for cases the baseline
+  doesn't fit, not a way round it — read the constants' own comments in
+  `tests/test_front_matter.py` before reaching for either.
 
 **Stage explicitly. Never `git add -A`.** A sweeping add swept up one of Helen's
 own uncommitted typo fixes on 2026-08-18, which put *her* edit inside an
