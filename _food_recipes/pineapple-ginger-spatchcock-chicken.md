@@ -2,7 +2,7 @@
 title: "Pineapple and Ginger Spatchcock Chicken"
 tagline: "Pineapple and ginger instead of the normal pimento and Scoth bonnets in jerk, with Szechuan pepper because we all need to feel something."
 source: "Adapted from delicious. magazine"
-source_type: publication
+source_type: website
 serves: "6"
 prep_time: "40 mins"
 cook_time: "45 mins"
@@ -56,7 +56,7 @@ notes:
     text: "The marinade can be prepared in advance, but don't marinate the chicken for more than 30 mins as the acid will make it tough."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

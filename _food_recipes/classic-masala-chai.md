@@ -2,7 +2,7 @@
 title: "Classic Masala Chai"
 tagline: "Just perfect."
 source: "Adapted from delicious. magazine"
-source_type: publication
+source_type: website
 serves: "4"
 prep_time: "5 mins"
 cook_time: "10 mins"
@@ -43,7 +43,7 @@ notes:
     text: "Don't over-boil the spices, because they turn bitter fast."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

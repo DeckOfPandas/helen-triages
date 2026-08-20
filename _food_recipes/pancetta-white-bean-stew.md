@@ -1,8 +1,8 @@
 ---
 title: "Pancetta and White Bean Stew"
 tagline: "Use whatever's lurking in the fridge."
-source: "QQ"
-source_type: unknown
+source: "Adapted from Good Food, 2025"
+source_type: publication
 serves: "4"
 prep_time: "15 mins"
 cook_time: "40 mins"
@@ -49,7 +49,7 @@ notes:
 
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
