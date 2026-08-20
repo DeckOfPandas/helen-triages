@@ -454,20 +454,45 @@ from conftest import FRONT_MATTER
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-BASELINE_COMMIT = "9c70675"   # (refactor) awaiting-fix -> awaiting_fix
+BASELINE_COMMIT = "366f392"   # (fix) the turkey's calculator link opens the turkey
 #
-# MOVED 2026-08-18, WITH HELEN'S EXPLICIT PERMISSION, asked for before the
-# commit rather than after. The awaiting_fix rename touched all 82 recipes, so
-# every one of them has an agent commit as its newest -- and this rule would
-# have demanded proofread: false on all 82.
+# MOVED 2026-08-20, WITH HELEN'S EXPLICIT PERMISSION, given IN ADVANCE and
+# unprompted -- she specified the change and then said, of it: "I trust you to
+# make that change without making others, so no need to flip the proofread flag
+# again." She is the author of that edit in every sense that matters here; the
+# agent only typed it.
 #
-# That would have been the letter of the rule against its purpose. It exists so
-# her proofread never describes a file she has not read. A key name changing
-# from hyphen to underscore changes no word of any recipe, so her proofread
-# still describes every one of them exactly.
+# WHAT THE MOVE ACTUALLY COVERS, measured rather than assumed. Before moving it,
+# the question "which recipes is this rule currently holding to proofread:false?"
+# was put to git, and the answer was NONE -- Helen's own c07104a had just
+# re-proofread the backlog of eight and set them back to true. So sliding the
+# baseline from 9c70675 to 366f392 stops checking exactly nothing. That is the
+# check to run before ever touching this line, and the reason the move is
+# defensible today when the identical move last week would not have been: a
+# baseline says "everything at or before here predates the rule", and moving it
+# over recipes that ARE being held quietly asserts something false about all of
+# them.
 #
-# The previous baseline was dc2a7bf, moved for the same kind of reason: 45
+# The previous entry, kept because the reasoning is the precedent:
+#
+#   9c70675 -- moved 2026-08-18, with Helen's explicit permission, asked for
+#   before the commit rather than after. The awaiting_fix rename touched all 82
+#   recipes, so every one of them has an agent commit as its newest -- and this
+#   rule would have demanded proofread: false on all 82.
+#
+#   That would have been the letter of the rule against its purpose. It exists
+#   so her proofread never describes a file she has not read. A key name changing
+#   from hyphen to underscore changes no word of any recipe, so her proofread
+#   still describes every one of them exactly.
+#
+# The one before that was dc2a7bf, moved for the same kind of reason: 45
 # second-person edits she reviewed one at a time.
+#
+# ORDERING MATTERS AND IS EASY TO GET BACKWARDS. Move the baseline BEFORE making
+# the next batch of agent edits, never after: a baseline moved afterwards sweeps
+# those edits up too, which is the exact accident this comment block exists to
+# prevent. The citation work of #406 lands after 366f392 for that reason, and is
+# still held to proofread: false like anything else.
 #
 # NEVER MOVE THIS TO MAKE A RED TEST GREEN. It is Helen's to grant, and the
 # question to put to her is whether she has read what is now in the files --
