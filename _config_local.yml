@@ -9,7 +9,7 @@
 # =============================================================================
 
 # Show drafts and unrewritten recipes in the index, with their meta filters.
-show_unrewritten: true
+show_source_wording: true
 
 # No "pdf" link on the working view (GitHub issue #86). The PDFs are rendered
 # from a finished build by scripts/generate_pdfs.py -- nothing Jekyll does
