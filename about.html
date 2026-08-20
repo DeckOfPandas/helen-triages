@@ -1,6 +1,6 @@
 ---
 layout: default
-title: ???
+title: "??"
 permalink: /about/
 # The word on the tape, overriding this site's own (see _layouts/default.html).
 # HELEN TRIAGES / [ ?? ] rather than / [ FOOD ]: this page is reached from the
@@ -8,6 +8,15 @@ permalink: /about/
 # site slot says so. Helen's idea, 2026-08-19; the h1 below and the "??" nav
 # link that reaches this page were already speaking in the same voice.
 wordmark_word: "??"
+# THIS PAGE BELONGS TO NO SITE, for display purposes -- issue #395. It suppresses
+# the "| Helen Triages Food" that _layouts/default.html appends to every other
+# page's <title>, so the browser tab reads "??" and not one site's name on a page
+# reached from both. Helen: "The name of that page is '??', so wherever a title
+# would appear it should read '??'."
+#
+# Display only. `site_key: food` below is unaffected and still required -- it is
+# what gives this page a stylesheet. Two different claims; see default.html.
+site_neutral: true
 # ONE ABOUT PAGE FOR THE WHOLE REPO -- issue #374, and the reason this file sits
 # at the root rather than under food/. The header's "??" link is part of the
 # shared chrome, so it cannot point at a page that belongs to one site: it did,
@@ -33,7 +42,7 @@ site_key: food
 
 <article class="recipe">
   <div class="recipe-title">
-    <h1 class="recipe-main-title"><span class="recipe-title-text">???</span></h1>
+    <h1 class="recipe-main-title"><span class="recipe-title-text">??</span></h1>
   </div>
 
   {% comment %} .about-page is what scopes _sass/food/_about.scss -- this page
@@ -54,18 +63,25 @@ site_key: food
       </li>
     </ol>
 
+    <p>If you reached this page from the cocktails site rather than the food site, then use your imagination. re: nouns, verbs and examples.</p>
+
     <hr>
 
-    <p>This site tells me what to cook. It does not tell me much about how to cook, because I can already cook. So if you want instructions on how to thicken a sauce, or how to sear meat properly, then I suggest you look elsewhere.</p>
+    <p>This site helps me triage my recipe options to match my mood and whims. It tells me what to cook. It does not tell me much about how to cook, because I already know how to cook. So if you want instructions beyond, for example, "spatchcock the chicken", then I suggest you look elsewhere.</p>
 
     {% comment %} Link text is a subset of each target's own title
        ("Henry's Quick and Bulletproof Hollandaise Sauce", "Chocolate Ganache"),
        which is the rule tests/test_taxonomy.py's
        test_internal_link_text_matches_target_title enforces on recipes. This
-       page isn't in that fixture, so nothing would catch a stale link here if
-       either recipe is renamed -- worth knowing rather than relying on.
+       page isn't in that fixture, so the TEXT rule does not reach it -- but the
+       HREF is checked: tests/test_page_links.py globs every root-level page
+       since issue #374, so a renamed recipe fails
+       test_internal_links_point_at_a_published_page naming this file. Verified
+       by pointing this link at the old dark-chocolate-ganache slug and watching
+       it fail. (The comment here used to say nothing would catch it, which was
+       true when it was written and stopped being true with that glob.)
        No styling needed: article.recipe a covers every link on the site. {% endcomment %}
-    <p>That said, a few recipes carry more troubleshooting than seems reasonable, for example <a href="{{ '/food/recipes/henrys-quick-bulletproof-hollandaise-sauce/' | relative_url }}">Hollandaise sauce</a> and <a href="{{ '/food/recipes/chocolate-ganache/' | relative_url }}">chocolate ganache</a>. The length of extra writing on any recipe page is proportional to how much that food has personally wronged me.</p>
+    <p>That said, a few recipes carry more troubleshooting than seems reasonable, like <a href="{{ '/food/recipes/henrys-quick-bulletproof-hollandaise-sauce/' | relative_url }}">Hollandaise sauce</a> and <a href="{{ '/food/recipes/chocolate-ganache/' | relative_url }}">chocolate ganache</a>. The length of extra writing on any recipe page is proportional to how much that food has personally wronged me.</p>
 
     <hr>
 
@@ -96,7 +112,7 @@ site_key: food
         
     <div class="about-faq-item">
       <h3>I have a great idea/recipe/criticism for your site. Will you build/try/hear it?</h3>
-      <p>No. I welcome pull requests with thanks. But I'm not interested in pleasing you, in the same way you're not interested in this one time I made courgette jam for a picnic, or memories evoked when my house smells of bread.</p>
+      <p>No. I welcome <a href="https://github.com/DeckOfPandas/helen-triages">pull requests</a> with thanks. But I'm not interested in pleasing you, in the same way you're not interested in this one time I made courgette jam for a picnic, or memories evoked when my house smells of bread.</p>
     </div>
 
     <div class="about-faq-item">
@@ -106,12 +122,12 @@ site_key: food
 
     <div class="about-faq-item">
       <h3>Did you write any of this code yourself directly?</h3>
-      <p>Absolutely not. Not one single line, for better or worse, mostly better. I certainly wouldn't have &gt;16,000 tests if left to my own devices. Every time I found myself about to read some YAML, I requested new tests instead. Obviously TDD has always been great, but I'm feeling particularly fond of it now I neither have to write the test nor implement the ask.</p>
+      <p>Absolutely not. Not one single line, for better or worse, mostly better. I could have written most of this myself the old-fashioned way...eventually. But I certainly wouldn't have &gt;17,000 tests were I left to my own devices. Every time I found myself about to edit some YAML, I requested new tests instead. Obviously TDD has always been great, but I'm feeling particularly fond of it now I neither have to write the test nor implement the ask.</p>
     </div>
 
     <div class="about-faq-item">
       <h3>Can you share the prompts or scripts or workflows you used to ingest and clean your recipe data?</h3>
-      <p>No. I didn't log these things or think them through that hard...welcome to the future: it looks Claude-y. I don't have Repeatable Analysis Pipelines, I have Claude Code, a comprehensive herd of tests, and slightly too much time on my hands at the moment (but still not enough to read YAML).</p>
+      <p>No. I didn't log these things or think them through that hard...welcome to the future: it looks Claude-y. I don't have Repeatable Analysis Pipelines, I have Claude Code, a comprehensive herd of tests, and slightly too much time on my hands at the moment (but still not enough to write YAML).</p>
     </div>
 
     <div class="about-faq-item">
