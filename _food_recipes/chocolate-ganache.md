@@ -1,6 +1,6 @@
 ---
 title: "Chocolate Ganache"
-tagline: "Ganache sometimes fails, and sometimes I am involved."
+tagline: "Ganache sometimes fails, and [sometimes I am involved](#tips)."
 source: "A lifetime of grainy, oily, solid, inedible regret."
 makes: "N/A, bring a spoon"
 prep_time: "5 mins"
@@ -52,14 +52,14 @@ notes:
     text: "1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
 
 ---
 
-<h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
+<h2 class="recipe-section-heading" id="tips"><span class="section-heading-text">Tips</span></h2>
 
 - **Use perfectly clean and dry stainless steel bowls.** For even heating.
 - **Use a perfectly clean and dry silicone spatula.** It can create a tight seal against the bottom of the bowl, sweeping up melting pockets without whipping in air.

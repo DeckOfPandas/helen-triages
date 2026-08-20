@@ -351,14 +351,29 @@ or impose anything on the data.* Manipulation belongs in another layer or the
 front end.
 
 **Split inside BEHAVIOUR, once a module gets non-trivial:** pure algorithm
-apart from DOM wiring, so it can be tested with Node directly. Three modules
-do this now:
+apart from DOM wiring, so it can be tested with Node directly. Counts move —
+run `.node-runtime/node/bin/node --test tests/js/*.test.js` rather than quoting
+from here.
 
 | Module | Holds | Tested by |
 |---|---|---|
-| `assets/js/ingredient-search.js` | The matching/ranking algorithm | `tests/js/ingredient-search.test.js`, 11 checks |
-| `assets/js/recipe-list.js` | Shuffle (Fisher-Yates) and pagination maths | `tests/js/recipe-list.test.js`, 9 checks |
+| `assets/js/ingredient-search.js` | The matching/ranking algorithm | `tests/js/ingredient-search.test.js` |
+| `assets/js/recipe-list.js` | Shuffle (Fisher-Yates) and pagination maths | `tests/js/recipe-list.test.js` |
+| `assets/js/filter-state.js` | What the index's filter state IS, and serialising it | `tests/js/filter-state.test.js` |
+| `assets/js/cook-schedule.js` | The timings arithmetic | `tests/js/cook-schedule.test.js` |
+| `assets/js/back-link.js` | Whether the back arrow may use history (§13.7) | `tests/js/back-link.test.js` |
 | `assets/js/filters.js` | DOM wiring for all of the above | Not directly tested; exercised by hand |
+
+**`back-link.js` is the clearest argument for this split in the repo**, and it
+earned the place within an hour of being written. Its whole content is one
+predicate — may this arrow call `history.back()`? — and the first version got
+the new-tab case wrong: a recipe opened in a new tab still carries the index as
+its referrer, so the check passed while the tab's history held one entry and
+`back()` did nothing at all. Invisible to every other kind of check here (the
+markup is right, the href resolves, the class has a rule, the build is green),
+and trivial to pose once the decision takes its inputs as arguments: "came from
+the index, but this tab has no history". A browser cannot be asked that
+question; a pure function can.
 
 **Three asset helpers, and each name carries the claim it is making.**
 `HTF.asset(path)` is for genuinely shared files. Anything under a *site's own*
@@ -1091,6 +1106,43 @@ whole row look like one entry and the numbers meaningless), and run
 `IS.create(vocab).search('chi', IS.buildMasterList(entries))`. Compare the two
 counts before concluding anything.
 
+**"ONE CODE PATH" IS A CLAIM ABOUT THE ALGORITHM, NOT ABOUT THE PICKERS.**
+Issue #390, 2026-08-19, and it is the counter-example this section needed.
+Everything above is true — same search, same ranked results, same
+`hasWordMatch` flag on each — and the two pickers still looked different,
+because `makeExcludeButton` took no `wordMatch` argument at all. The flag was
+computed, carried to the call site, and dropped on the floor. Helen found it by
+looking at the two boxes stacked on one screen with the same three letters in
+both: SEARCH MAIN INGREDIENTS picked out the genuine matches, LEAVE OUT rendered
+forty candidates identically.
+
+So the shared algorithm guarantees the same ANSWER, and guarantees nothing about
+what either picker does with it. `test_both_ingredient_pickers_mark_their_word_matches`
+now checks that both builders apply a class, both call sites pass the flag, and
+both classes have a rule in the compiled CSS.
+
+**What the emphasis means, because it is easy to misread as "matches".** It is a
+WORD-PREFIX match. Typing `pas` marks `anchovy paste` and `choux pastry`; it
+does not mark `antipasti vegetables`, which is correctly in the list on a
+substring match, nor `farfalle`, which is there as a member of the `pasta`
+family and contains no `pas` at all. Marked entries are the ones you meant; the
+plain ones are what the vocabulary brought along.
+
+**One treatment, two hues, via `@mixin word-match-emphasis($colour)` in
+`_sass/food/_buttons.scss`** — each picker passes its own section's active tone.
+A second rule that happened to look like the first is what drifts; §2.5 is the
+same lesson at chrome scale.
+
+**And the hover has to go the same way as everything else on the page.** Issue
+#403: once matched candidates rested at `$color-exclude-active`, the pool's
+existing bright-cobalt hover (asked for in #365, "a lighter shade") became a
+LIGHTENING while every other filter section darkens. `$color-exclude-hover` is
+a deeper cut than `$color-exclude-active` **deliberately** — hovering a matched
+candidate to the tone it already rests at is not §12's "lightness-only change
+reads as nothing", it is no change whatsoever. Guarded by comparing relative
+luminance of the two compiled colours, which asserts the DIRECTION and not
+merely that they differ.
+
 **Read the whole list before adding to `measure_phrases`.** The section header
 in `ingredient_words.yml` already says to derive phrases from real entries;
 these are the traps that rule exists for. `bicarbonate of` and `cream of` both
@@ -1361,13 +1413,31 @@ declares `needs: test`. Three things about it are load-bearing:
 - **The JS suite needs a glob**: `node --test tests/js/*.test.js`. Passing the
   DIRECTORY (`node --test tests/js/`) treats it as one test file and reports
   "tests 1, fail 1" without running the 144 inside it.
-- **CI has no private drafts.** `_food_drafts/` and `_cocktail_drafts/` are
-  separate private repos, gitignored here, so a CI checkout has the 82
-  published recipes and none of the 253 drafts. Most draft-reading tests
-  therefore check *less* in CI rather than failing (#378). One inverted and
-  failed on correct data — `test_pantry_entries_are_actually_used`, where 15
-  pantry staples are used only by drafts — and now skips when the drafts are
-  absent.
+- **CI has no private drafts, and every test that reads them now says what it
+  does about that.** `_food_drafts/` and `_cocktail_drafts/` are separate
+  private repos, gitignored here, so a CI checkout has the ~82 published recipes
+  and none of the ~290 drafts. Resolved 2026-08-20, issue #378, and split by
+  what each check actually reads:
+
+  - **Drafts only** — skips, with a reason, so the run reports "did not run"
+    rather than "checked and clean". `test_accents_in_drafts`,
+    `test_pan_and_ingredient_sizes_use_digits_in_drafts`,
+    `test_pantry_entries_are_actually_used`.
+  - **Recipes and drafts** — keeps running, because the published half is real
+    coverage and is the half that ships, and says in its own docstring what the
+    CI green does and does not mean.
+    `test_no_main_ingredient_spelling_collisions`,
+    `test_no_recipe_uses_the_retired_instructions_field`.
+
+  **The registries in `test_suite_hygiene.py` are the point**, not the five
+  fixes. `test_every_draft_reading_test_says_what_it_does_without_drafts`
+  derives the list from the source and fails on any draft-reading test that is
+  in neither set, and on a set member that does not match what the set claims.
+  Nothing about typing `for draft in ALL_DRAFTS` tells you the list is empty on
+  the machine that gates the deploy, so a sixth quiet test cannot be added by
+  accident. Per-draft parametrised tests are exempt and need no entry — pytest
+  already reports an empty parametrisation as a skip, which is the ~51 skips a
+  CI-shaped run shows.
 
 **Before pushing anything that CI will run, simulate it**: move both private
 draft directories aside, run the full suite, move them back. A green local run
@@ -1914,20 +1984,54 @@ two nav icons rendered as raw unstyled SVG, because their rules lived in
 resolves. **"Shared" is a claim about three layers, not one** — markup, cascade
 and assets — and it is only true when all three hold. See §2.5.
 
-**A SOURCE-SCANNING GUARD WILL BE FOOLED BY THE PROSE EXPLAINING IT.** Twice
-in one day, 2026-08-19, in unrelated code. The destructive-git hook (§11.0)
-refused the commit that introduced it, because the message described the
-commands it blocks. Then `test_both_ingredient_pickers_mark_their_word_matches`
-counted `r.hasWordMatch` in `filters.js` and passed while broken, because the
-comment written directly above the function it guards names that flag twice.
+**A SOURCE-SCANNING GUARD WILL BE FOOLED BY THE PROSE EXPLAINING IT.** FOUR
+times on 2026-08-19–20, in four unrelated places, which is what promotes this
+from an anecdote to a rule:
 
-Both were caught only by breaking the thing on purpose and watching. **A test
-that greps source cannot tell code from commentary**, and the commentary
-explaining a rule is exactly where that rule's vocabulary is densest — so this
-is not a rare collision, it is the likely one. Strip comments and quoted spans
-before counting, or match a call shape rather than a name. And when you break a
-guard to prove it bites, read the output rather than the exit status: the first
-of these two printed nothing at all, which is what gave it away.
+1. The destructive-git hook (§11.0) refused the commit that introduced it: the
+   message described the commands it blocks.
+2. `test_both_ingredient_pickers_mark_their_word_matches` counted
+   `r.hasWordMatch` in `filters.js` and passed while broken, because the comment
+   written directly above the function it guards names that flag twice.
+3. `test_every_draft_reading_test_says_what_it_does_without_drafts` flagged
+   ITSELF — a test about draft-reading tests necessarily writes the corpus name
+   in its own docstring and in the line that looks for it.
+4. That same test then misclassified two others, because "does it skip?" asked
+   whether the word "skip" appeared, and their docstrings explain that they
+   deliberately do not.
+
+**A test that greps source cannot tell code from commentary**, and the
+commentary explaining a rule is exactly where that rule's vocabulary is densest
+— so this is not a rare collision, it is the likely one. In ascending order of
+robustness: strip comments and quoted spans before counting; match a call SHAPE
+rather than a name; or parse the AST and ask the syntax tree, which is what (4)
+ended up doing and which cannot be fooled by prose at all.
+
+Every one was caught by breaking the thing on purpose and watching. **Read the
+output, not the exit status** — (2) printed nothing at all, which is the only
+reason it was noticed.
+
+**YOU WILL ADD A NEW LINK SHAPE AND NOTHING WILL BE WATCHING IT.** Recipes had
+two: `](../slug/)` and `](../reference/slug/)`, each with its own guard. Issue
+#353 added a third, `](#fragment)` — a tagline linking down into that page's own
+longform — and with the ganache tagline pointed at `#nonexistent-anchor` the
+whole suite passed. 18,886 green over a link that goes nowhere.
+
+**A wrong fragment does not 404**, which is why it needs a test at all: the page
+loads and the browser sits at the top, so it reads as "the scroll didn't work"
+or, worse, as a recipe with nothing further down — on a tagline that has just
+promised there is. This repo had already been bitten by that one shape over, and
+says so in `test_page_links.py`'s own docstring
+(`../temperatures/#steak` when the real id was `#beef-steak`) — but that scanner
+reads TEMPLATES, and a tagline is front matter, so it never looked.
+
+`test_same_page_fragment_links_land_somewhere` closes it. **Its obvious version
+was wrong and failed thirty recipes**: reading ids out of the recipe file is
+right for body headings, which are raw HTML (§4.1), and misses `#doneness`
+entirely — that id belongs to `_layouts/recipe.html`. Ids flood outward along
+the layout and include edges, which is the fact `_ids_visible_from()` in
+`test_page_links.py` already encodes; meeting it from the other direction cost
+two rounds.
 
 **You will trust a corpus glob that names files instead of finding them.**
 `test_page_links.py`'s page list was `food/**`, `cocktails/**` and the literal
@@ -2528,6 +2632,31 @@ on a `.title-hit` — two elements that sit on the same recipe row. If that gets
 fixed, it gets its own em constant with its own name, next to `$emboss-stroke`
 and explicitly not it. Open, not done.
 
+**THE STROKE IS THE RIGHT LEVER FOR A SELECTED STATE PRECISELY BECAUSE IT
+OCCUPIES NO SPACE**, and that is the useful half of issue #389 (2026-08-19).
+Helen: "filter tags to the right of a selected one move to the right — they
+should stay in the same position." It was not the stroke, which paints outside
+the glyph and cannot move anything. `%btn-active-base` was declaring
+`font-size: 0.74rem` and `letter-spacing: 0.04em`, neither matching the resting
+state it replaced, so selecting a tag re-measured it. Letter-spacing did most of
+it — 0.04em lands after every character including the last (the same trailing-gap
+fact §13.8's wordmark trap turns on), about 0.38px each, roughly 5.7px on
+`one-handed food`.
+
+**It was two bugs in one rule.** Two different resting bases extend that
+placeholder — `.btn-tag`/`.btn-star` at 0.75rem with no letter-spacing, and
+`.btn-meta` at 0.72rem with 0.02em — so no single pair of values could ever have
+agreed with both, and META filters were shifting by a different amount again.
+Declaring NEITHER lets each active button inherit its own resting metrics. The
+fix is a deletion.
+
+**So: an active filter rule may change colour, `.tag-shape` fill and
+`-webkit-text-stroke`, and nothing that changes a box's size.**
+`test_no_active_filter_button_changes_its_own_width` reads the COMPILED CSS and
+enforces it — on the compiled output because the trap is not that placeholder,
+it is the IDEA that a selected state may restyle type, which can arrive in any
+of the five rules that extend it or in a sixth written next year.
+
 ### 13.5 The colour contract, and why the two pages differ
 
 **Recipe page: five hues** (§13.2), colour as decoration, rationed.
@@ -2608,6 +2737,41 @@ alphabetical one and flipping — CSS can't detect "JS has finished", so this
 trades the visible flip for a brief blank instant instead, which is the
 actual fix, not a partial one.
 
+**ONE ARRIVAL IS EXEMPT: GOING BACK.** Issue #387, 2026-08-19. Arriving at the
+index by a back/forward navigation restores the list you left — shuffle order,
+filters, page number, see-all and scroll position — instead of shuffling. Every
+other way in (typed, bookmarked, followed, reloaded) still shuffles, so the rule
+above is unchanged rather than weakened.
+
+Saved to `sessionStorage` on `pagehide` and restored when
+`performance.getEntriesByType('navigation')[0].type` is `back_forward`. Half-
+finished searches are deliberately not restored (text typed with nothing chosen
+is candidates mid-thought, not a filter); a CHOSEN ingredient result is, rebuilt
+to the exact end state the click handler leaves.
+
+**IT WAS BUILT ON THE BACK/FORWARD CACHE FIRST, AND THAT WAS WRONG.** The
+reasoning was seductive: go back, the browser restores the page without
+re-running anything, the order survives for free. It cannot work here.
+`jekyll serve` sends `Cache-Control: … no-store …` (measured with `curl -I`, not
+assumed), and `no-store` disqualifies a page from bfcache in Chrome and Firefox
+— so on the machine this site is actually developed on, bfcache can NEVER apply.
+Helen saw the index reshuffle with her own back button, which is what proved it:
+a bug in the new arrow could not have done that.
+
+**The general lesson is worth more than the fix.** bfcache is an optimisation a
+browser may decline for its own reasons, so a feature resting on it works
+sometimes — and here it would likely have worked on the deployed site and never
+on :4001, so the page Helen looks at all day would have disagreed with the live
+one. That is issue #235's trap running backwards. The navigation TYPE is a fact
+rather than a favour: it reports a back/forward navigation whether or not
+bfcache was involved, which is why the fix rests on it instead.
+
+This is also why `toQuery()` in `filter-state.js` is still unwritten. Its own
+comment says to add it "the day something calls it"; the thing that would have
+called it turned out not to want it, because with no filters set the index
+reshuffles on load and a URL carrying every filter perfectly still hands back a
+differently ordered list.
+
 ### 13.8 The wordmark
 
 Redesigned 2026-08-02. HELEN TRIAGES and the bracketed site word (`[ FOOD ]`
@@ -2621,24 +2785,29 @@ identical everywhere (§2.5). It sits in `.site-title-link`, above the nav row,
 so it is already separated in the markup from everything the chrome guards
 compare.
 
-**`wordmark_word` — one page overrides the word, added 2026-08-19.**
-`_layouts/default.html` reads `{{ page.wordmark_word | default: this_site.word }}`,
-and `about.html` sets it to `"??"`, so that page reads HELEN TRIAGES / `[ ?? ]`
-— matching the nav link that reaches it rather than the page's own `???` title,
-Helen's correction in issue #398 once she had looked at it. Helen's idea. It is not decoration bolted on: `/about/` hangs off the
-shared header of BOTH sites at a site-neutral URL, while carrying
-`site_key: food` to get a stylesheet at all (§2.4), so without this it wore
-`[ FOOD ]` while speaking for the whole repo.
+**THE ABOUT PAGE BELONGS TO NO SITE, and says so twice.** Two front-matter keys
+on `about.html`, both read by `_layouts/default.html`:
+
+- **`wordmark_word: "??"`** — the bracketed word on the tape, so that page reads
+  HELEN TRIAGES / `[ ?? ]` instead of `[ FOOD ]` (issues #398, #395).
+- **`site_neutral: true`** — suppresses the `" | " + site_title` that every
+  other page appends, so the browser tab reads `??` and not one site's name.
+
+The page is called `??`: the `<h1>`, the front-matter title and the tab all say
+it, matching the `??` nav link that reaches it. Helen, settling #395: *"The name
+of that page is '??', so wherever a title would appear it should read '??'."*
+
+It needed both because `/about/` hangs off the shared header of BOTH sites at a
+site-neutral URL while carrying `site_key: food` — which it must, since that is
+what gives it a stylesheet at all (§2.4). **Belonging to no site for DISPLAY and
+borrowing one site's CSS are different claims**, and only the first is
+declarable; that is the honest wart in this arrangement and the reason
+`site_neutral` cannot simply be inferred from `site_key`.
 
 §13.4.1's test for a new use of the brackets is *"is it naming a SITE, from
 `sites.yml`, or is it reaching for brackets because capitals look like they want
 some?"* **This is the first case genuinely in between**, and it passes on the
-reading that `???` in the site slot is how a page says it belongs to neither.
-The page's own `<h1>` is already `???` and the nav link that reaches it is `??`,
-so the voice was established before the wordmark joined it.
-
-Deliberately narrow: it overrides the WORD only. That page's title bar still
-reads "Helen Triages Food", which is the open half of issue #395.
+reading that `??` in the site slot is how a page says it belongs to neither.
 
 **The core sizing mechanism: whichever row is naturally wider defines the
 width, via CSS Grid, not JS.** `.site-logo` is `display: inline-grid;
@@ -2959,7 +3128,7 @@ table that never became a surviving page; the rest of this section is
 about what the others became.
 
 **Page pattern**: reuses `.recipe`/`.recipe-body-content`, the same
-wrapper `food/about.html` already used for a prose page — no new page
+wrapper `about.html` already used for a prose page — no new page
 type invented. Tables are `<table>` markup, not markdown pipe tables:
 `food/*.html` files aren't run through kramdown (only `.md` is), so a
 markdown table in one of them renders as literal pipe characters, not a

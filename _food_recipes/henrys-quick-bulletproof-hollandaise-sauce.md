@@ -1,6 +1,6 @@
 ---
 title: "Henry's Quick and Bulletproof Hollandaise Sauce"
-tagline: "The search ends here. But read to the bottom to get it right."
+tagline: "The search ends here. But read on [past the recipe](#why-hollandaise-is-hard) for sympathy and advice."
 source: "Furious, split and curdled years of swearing at eggs"
 serves: "4, generously"
 prep_time: "15 mins"
@@ -36,13 +36,13 @@ notes:
 
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-07-13"
 ---
 
-<h2 class="recipe-section-heading"><span class="section-heading-text">Why Hollandaise is hard</span></h2>
+<h2 class="recipe-section-heading" id="why-hollandaise-is-hard"><span class="section-heading-text">Why Hollandaise is hard</span></h2>
 
 Hollandaise sauce is a metastable fat-in-water emulsion. You are forcing a preposterous amount of hot butter to suspend itself inside the water in the egg yolk and acids. There is an uncomfortably narrow margin for error.
 

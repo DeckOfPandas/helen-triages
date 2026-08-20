@@ -218,6 +218,88 @@ def test_internal_links_are_well_formed(recipe):
     )
 
 
+# A SAME-PAGE FRAGMENT LINK, e.g. [read to the bottom](#why-hollandaise-is-hard)
+# in a tagline. A third link shape, alongside the cross-recipe `](../slug/)` and
+# the reference-page `](../reference/slug/)` above -- GitHub issue #353, which
+# asked for the hollandaise and ganache taglines to link down into their own
+# longform sections.
+#
+# Matches a `](#...)` whose target is a bare fragment, i.e. no path in front of
+# the hash. A fragment hanging off a PATH is a different thing and belongs to the
+# cross-recipe rules above.
+SAME_PAGE_FRAGMENT = re.compile(r"\]\(#([^)]+)\)")
+
+BODY_ID = re.compile(r'id="([^"]+)"')
+
+
+def _ids_available_to_a_recipe(recipe):
+    """Every id a rendered recipe page can offer, which is NOT just its own.
+
+    THE OBVIOUS VERSION OF THIS IS WRONG, and it was wrong for about ninety
+    seconds: read the ids out of the recipe file. Body content is raw HTML
+    (HANDOVER §4.1 -- a peer heading is written longhand because kramdown gives
+    `## Heading` no class and no nested span), so a heading's id really is a
+    literal in the file, and that much is fine.
+
+    But thirty recipes link to `#doneness`, and that id belongs to
+    _layouts/recipe.html, not to any of them. Ids flood outward along the layout
+    and include edges -- the same fact tests/test_page_links.py encodes in
+    _ids_visible_from(), met here from the other direction.
+
+    Deliberately over-permissive: it takes every id in the recipe layout chain
+    and in _includes/, rather than resolving which includes recipe.html actually
+    reaches. The cost of being too generous is a broken fragment slipping
+    through when some unrelated include happens to define the same id; the cost
+    of being too strict is thirty false failures on correct pages. The first is
+    a scroll that does not scroll, the second is a suite nobody trusts.
+    """
+    from conftest import ROOT
+
+    ids = set(BODY_ID.findall(recipe.raw))
+    for path in [ROOT / "_layouts" / "recipe.html", ROOT / "_layouts" / "default.html"]:
+        if path.exists():
+            ids |= set(BODY_ID.findall(path.read_text(encoding="utf-8")))
+    for path in (ROOT / "_includes").rglob("*.html"):
+        ids |= set(BODY_ID.findall(path.read_text(encoding="utf-8")))
+    return ids
+
+
+def test_same_page_fragment_links_land_somewhere(recipe):
+    """A `](#fragment)` link must name an id that exists in the same recipe.
+
+    THE SYMPTOM IS NOT A 404, WHICH IS WHY THIS NEEDS A TEST. A wrong fragment
+    loads the page perfectly and leaves the browser at the top, so it reads as
+    "the scroll didn't work" rather than "the link is broken" -- and on a recipe
+    whose tagline promises to take you somewhere, the reader concludes the page
+    is short rather than that the link is wrong.
+
+    This repository has been bitten by exactly that before, one link shape over:
+    tests/test_page_links.py's docstring records cooking-methods.html pointing at
+    `../temperatures/#steak` and `../temperatures/#fish`, twice each, when the
+    real ids were `#beef-steak` and `#fish-salmon`. That scanner reads TEMPLATES
+    though, and a tagline lives in front matter, so it never looked here.
+
+    Written because the gap was demonstrated rather than suspected: with the
+    ganache tagline pointed at `#nonexistent-anchor`, all 18,886 checks passed.
+    """
+    ids = _ids_available_to_a_recipe(recipe)
+    assert ids, (
+        "No ids found anywhere in the recipe layout chain, which cannot be "
+        "right -- and an empty set would fail every fragment link rather than "
+        "check them."
+    )
+    broken = [f for f in SAME_PAGE_FRAGMENT.findall(recipe.raw) if f not in ids]
+    assert not broken, (
+        f"{where(recipe)} links to fragment(s) {broken!r} that no id in this "
+        f"file provides.\n"
+        f"Available ids here: {sorted(ids) or 'none at all'}.\n"
+        f"Add `id=\"...\"` to the target heading -- body headings are raw HTML "
+        f"(HANDOVER §4.1), so the id goes on the <h2> itself, which is also what "
+        f"gives it .recipe-section-heading's scroll-margin-top. Ids emitted by "
+        f"_layouts/recipe.html or an include (`#doneness`, for one) count too."
+    )
+
+
 def test_no_claude_markers_left(recipe):
     """A note addressed to me is an instruction for a future session, not
     content ready to publish -- in any form, not just the "QQ CLAUDE ..."
