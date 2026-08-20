@@ -25,6 +25,13 @@
             "if": "Bash(git *)",
             "timeout": 20,
             "statusMessage": "Checking for destructive git"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-main-branch.py\"",
+            "if": "Bash(git *)",
+            "timeout": 20,
+            "statusMessage": "Checking branch is not main"
           }
         ]
       }
