@@ -991,3 +991,62 @@ def test_the_exclude_hover_is_actually_darker_than_the_state_it_replaces(site):
         f"brightens while every other filter section on the page darkens.\n"
         f"$color-exclude-hover must stay a deeper cut than $color-exclude-active."
     )
+
+
+# The only files that belong at the root of the built site. Directories are not
+# checked -- those are pages, and every other test here is about pages.
+EXPECTED_ROOT_FILES = {
+    "index.html",     # the bare redirect to /food/ (issue #204)
+    "sitemap.xml",    # jekyll-sitemap
+    "robots.txt",
+    "README.md",      # deliberately published; it is the repo's front page
+    "LICENSE",
+}
+
+
+def test_the_built_site_root_holds_nothing_unexpected(prod_site):
+    """A file that lands at the site root without anyone deciding it should.
+
+    Jekyll copies the SOURCE DIRECTORY, and `.gitignore` governs what reaches a
+    CHECKOUT. Those are different questions, and the gap between them is the
+    whole reason this test exists: a file can be correctly ignored by git and
+    still be sitting in `_site/`, and a file can be tracked and still be
+    excluded from the build. Neither fact tells you the other.
+
+    _config.yml already knew this -- its `*Zone.Identifier` comment says
+    ".gitignore already covers these, but that only stops them being committed
+    -- Jekyll still reads the working directory" -- and issue #414 was opened
+    anyway, claiming two Sublime files were on the live site because they were
+    in a local build. They were not: they are untracked, so CI never sees them.
+    What they were doing was appearing in the jekyll-prod mockup, which exists
+    to show what deploys and was therefore misrepresenting it.
+
+    So this runs against the PRODUCTION build, which is the honest question, and
+    it catches the case #414 turned out not to be: a file that really is tracked
+    and really would ship.
+
+    Adding a legitimate root file means adding it to EXPECTED_ROOT_FILES, which
+    is thirty seconds and forces the question of whether it belongs there.
+    """
+    found = {p.name for p in prod_site.iterdir() if p.is_file()}
+    assert found, (
+        f"No files at all at the root of {prod_site} -- the build produced "
+        f"nothing, and an empty scan passes."
+    )
+
+    unexpected = found - EXPECTED_ROOT_FILES
+    assert not unexpected, (
+        "Unexpected file(s) at the root of the built site:\n  "
+        + "\n  ".join(sorted(unexpected))
+        + "\n\nEither add an `exclude:` entry in _config.yml, or -- if it really "
+          "should ship -- add it to EXPECTED_ROOT_FILES here with a note saying "
+          "what it is for."
+    )
+
+    missing = EXPECTED_ROOT_FILES - found
+    assert not missing, (
+        f"Expected root file(s) missing from the build: {sorted(missing)}.\n"
+        f"Either something stopped being published, or this list has gone stale "
+        f"-- and a stale allowlist is how this check would quietly stop meaning "
+        f"anything."
+    )

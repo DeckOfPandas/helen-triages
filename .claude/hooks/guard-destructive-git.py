@@ -131,6 +131,49 @@ HEREDOC = re.compile(
 )
 
 
+# DESTROYING A STASH IS A SECOND KIND OF LOSS, and it needs its own gate.
+#
+# Everything above is about the WORKING TREE, so it is correctly allowed when
+# the tree is clean -- there is nothing to lose. `git stash drop` and
+# `git stash clear` are not like that: what they destroy is the stash list, and
+# that is just as gone whether or not the tree happens to be dirty. Running the
+# clean-tree check against them would have waved them straight through.
+#
+# The irony is on the record: this hook's own refusal message recommends
+# `git stash -u` as the safe alternative, and until 2026-08-20 it would then
+# have permitted `git stash clear` without a murmur. Helen spotted the gap when
+# it was described to her. The lesson is the same one the bare-path `checkout`
+# hole taught -- enumerate what the dangerous ACT is, not the commands you
+# happen to picture.
+#
+# `git stash pop` is deliberately NOT here. It applies and then drops, so the
+# content lands in the working tree rather than vanishing, and on a conflict git
+# keeps the stash. Blocking it would be over-blocking a normal workflow, which
+# is how a guard teaches people to route around it.
+STASH_DESTRUCTIVE = re.compile(_GIT + r"stash\s+(drop|clear)\b")
+
+
+def _stash_entries() -> list[str]:
+    """`git stash list` lines, or [] if there are none or this is not a repo."""
+    try:
+        result = subprocess.run(
+            ["git", "stash", "list"],
+            capture_output=True, text=True, timeout=15,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return []
+    if result.returncode != 0:
+        return []
+    return [line for line in result.stdout.splitlines() if line.strip()]
+
+
+def _matched_stash(command: str) -> str | None:
+    command = HEREDOC.sub(" ", command)
+    command = QUOTED.sub(" ", command)
+    m = STASH_DESTRUCTIVE.search(command)
+    return f"git stash {m.group(1)}" if m else None
+
+
 def _matched(command: str) -> str | None:
     command = HEREDOC.sub(" ", command)
     command = QUOTED.sub(" ", command)
@@ -171,6 +214,37 @@ def main() -> int:
         return 0            # nothing to judge; never break the tool call
 
     command = (payload.get("tool_input") or {}).get("command") or ""
+
+    # The stash family first, because its gate is different: what is at risk is
+    # the stash list, not the working tree, so tree cleanliness says nothing.
+    stash_label = _matched_stash(command)
+    if stash_label:
+        entries = _stash_entries()
+        if not entries:
+            return 0        # nothing stashed, so nothing to lose
+        shown = "\n  ".join(entries[:10])
+        if len(entries) > 10:
+            shown += f"\n  ... and {len(entries) - 10} more"
+        return _deny(
+            f"BLOCKED: {stash_label} with {len(entries)} stash(es) that would go.\n\n"
+            f"  {shown}\n\n"
+            "A stash is where work goes to be SAFE -- this hook's own refusal "
+            "message recommends `git stash -u` for exactly that -- so destroying "
+            "one is the same loss as destroying the tree, and it does not matter "
+            "whether the tree is clean.\n\n"
+            "A dropped stash is not in `git stash list`, not in the tree, and not "
+            "anywhere obvious. It survives briefly as an unreachable commit and "
+            "can sometimes be found with `git fsck --unreachable`, which is a "
+            "rescue operation rather than a plan.\n\n"
+            "BEFORE DROPPING ANYTHING: record the SHAs (`git rev-parse "
+            "'stash@{N}'` for each), and check each stash against what is already "
+            "committed -- an old stash is usually redundant, and occasionally it "
+            "is the only copy of something. On 2026-08-20 nine stashes were "
+            "reviewed this way: seven were redundant, and two held work that had "
+            "never been applied, including a live config fix.\n\n"
+            "Ask Helen, name what would be lost, and wait."
+        )
+
     label = _matched(command)
     if not label:
         return 0
@@ -199,6 +273,10 @@ def main() -> int:
         "combination that is dangerous, not the command.)"
     )
 
+    return _deny(reason)
+
+
+def _deny(reason: str) -> int:
     print(json.dumps({
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
