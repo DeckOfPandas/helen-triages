@@ -1,7 +1,7 @@
 ---
 title: "Henry's Sunday Waffles"
 tagline: "I've absorbed a lot of waffle recipes. This is the iteration I'll put my name on."
-source: "Adapted from Mollie Katzen's Sunlight Cafe"
+source: "Adapted from Mollie Katzen's Sunlight Café"
 makes: "4–6 waffles, depending on your waffle iron"
 prep_time: "5 mins"
 cook_time: "15 mins"
@@ -40,7 +40,7 @@ notes:
     text: "These don't keep at all, like, not even for five minutes while you're eating the first ones. If making a second batch while eating the first, prop spares up in pairs like a house of cards to stop them going soggy, but they will definitely be less good for it."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-07-13"

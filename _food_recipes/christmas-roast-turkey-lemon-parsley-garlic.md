@@ -1,7 +1,7 @@
 ---
 title: "Christmas Roast Turkey with Lemon, Parsley and Garlic"
 tagline: "This is not a dish you get to redo, but how fun to try it anyway."
-source: "Adapted from Christmas by Gordon Ramsay"
+source: "Adapted from Christmas, Gordon Ramsay"
 serves: "8–10"
 prep_time: "30 mins"
 cook_time: "2 hrs 30 mins for a 5-kg bird"
@@ -56,7 +56,7 @@ notes:
     text: "The 45-minute rest is a requirement."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
