@@ -144,6 +144,19 @@ def test_meta_block_complete(draft):
     )
 
 
+def test_claude_rewritten_is_a_real_boolean(draft):
+    """Same trap as `awaiting_fix` -- a quoted "true" is truthy but not `is True`.
+    Optional and additive (issue #418), so most drafts won't have it at all.
+    """
+    meta = draft.fm.get("meta")
+    if not isinstance(meta, dict) or "claude_rewritten" not in meta:
+        return
+    assert isinstance(meta["claude_rewritten"], bool), (
+        f"{where_draft(draft)} has `meta.claude_rewritten: "
+        f"{meta['claude_rewritten']!r}`, not a real boolean. Never quote it."
+    )
+
+
 def test_serves_xor_makes(draft):
     """Draft version of the recipe rule keeps the same "exactly one, never
     both" bar — checked 2026-08-11: every current draft already has one or
