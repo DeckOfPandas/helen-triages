@@ -484,14 +484,28 @@ and rejected for now: renaming `rewritten` → `human_rewritten` for symmetry �
 would touch every file in `_food_recipes/` and interact with the
 `proofread`-invalidation rule.
 
-**`INVISIBLE_KEYS` does NOT make that rename cheap, contrary to what this
-paragraph and issue #418 both claimed.** `meta.rewritten` is read by
-`_layouts/recipe.html` and `assets/js/ingredient-search.js`, so declaring it
-invisible fails `test_invisible_keys_are_really_invisible` by construction —
-that test greps the render surface precisely to stop a read key being listed.
-The rename would still invalidate all 82 proofreads and would still need the
-`BASELINE_COMMIT` or `HELEN_CLEARED` route, both Helen's to grant. The cost
-hasn't gone away; only the reasoning about it has been corrected.
+**What actually blocks that rename is not what anyone has claimed, including
+twice on 2026-08-20.** Establish this by measurement before acting on it:
+
+- **Nothing reads `meta.rewritten`.** No layout, include, plugin or script.
+  It is genuinely render-inert, exactly like `source_type`, so on the merits it
+  belongs in `INVISIBLE_KEYS` and the rename would invalidate no proofread.
+- **`test_invisible_keys_are_really_invisible` would refuse it anyway**, because
+  it word-greps the render surface and one COMMENT in
+  `assets/js/ingredient-search.js` contains the English word "rewritten" —
+  about ingredient text being rewritten, nothing to do with the key.
+- So the blocker is the guard's bluntness, not the key's use. **That is the
+  fourth time prose has defeated a source-scanning guard in this repository**
+  (§12), and the escalation path is the same one that worked before: strip
+  comments and string literals before matching, or parse rather than grep.
+- `show_unrewritten` in `_config.yml` is an unrelated CONFIG flag that governs
+  whether unrewritten recipes publish at all. It shares a substring and nothing
+  else, and it is the obvious trap for anyone grepping this out.
+
+Two earlier accounts said this rename was cheap because `INVISIBLE_KEYS` exists
+(it was not, but not for the stated reason), then that `meta.rewritten` is read
+by two files (it is not — those were comments). Both were written confidently
+and neither was checked. If you pick this job up, run the greps yourself first.
 
 **`short_name` retired 2026-08-12, GitHub issue #169.** Confirmed zero
 references anywhere in `_layouts/`, `_includes/`, `assets/js/`, or `food/`
