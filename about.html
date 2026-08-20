@@ -34,9 +34,17 @@ site_neutral: true
 # only finished palette in the repo. Giving /about/ its own stylesheet would
 # recreate assets/css/root.scss exactly -- the third consumer of shared/ that
 # belonged to neither site, that nobody thought to check, and that broke
-# silently for precisely that reason (HANDOVER 2.2, issue #204). The visible
-# cost is that /about/ says "Helen Triages Food" in its title bar. The tape is
-# handled -- see wordmark_word above. Flagged rather than hidden; see #395, #376.
+# silently for precisely that reason (HANDOVER 2.2, issue #204).
+#
+# The cost this would have carried is that /about/ says "Helen Triages Food" in
+# its title bar. It does not: site_neutral above removes it from the <title>,
+# and wordmark_word handles the tape. See #395.
+#
+# DO NOT DELETE THE LINE BELOW. It has now gone missing twice. Without it this
+# page has no site_key, _layouts/default.html links no stylesheet at all, and
+# /about/ ships as raw unstyled HTML -- silently, because that is a missing tag
+# rather than a broken one. tests/test_rendered_pages.py::
+# test_every_published_page_links_a_stylesheet exists for exactly this.
 site_key: food
 ---
 
@@ -54,11 +62,11 @@ site_key: food
     <p>I built this site to solve two problems:</p>
 
     <ol class="about-enum">
-      <li>I want to cook something that I already know how to make, but scrolling through a list of files isn't that inspiring.</li>
+      <li>I want to cook something that I already know how to make, but scrolling through a list of files isn't inspiring.</li>
       <li>I want to browse recipes I haven't tried yet without having to
         <ul class="about-enum-sub">
           <li>be able to find a magazine/email/screenshot/bookmark or open tab, or</li>
-          <li>scroll through pages of boring nonsense about your favourite sauté pan or the blow-by-blow of your recent seaside trip that inexplicably precedes a recipe for beans on toast.</li>
+          <li>scroll through pages of boring nonsense about somebody's favourite sauté pan or the blow-by-blow of a recent seaside trip that inexplicably precedes a recipe for beans on toast.</li>
         </ul>
       </li>
     </ol>
@@ -76,27 +84,20 @@ site_key: food
        page isn't in that fixture, so the TEXT rule does not reach it -- but the
        HREF is checked: tests/test_page_links.py globs every root-level page
        since issue #374, so a renamed recipe fails
-       test_internal_links_point_at_a_published_page naming this file. Verified
-       by pointing this link at the old dark-chocolate-ganache slug and watching
-       it fail. (The comment here used to say nothing would catch it, which was
-       true when it was written and stopped being true with that glob.)
+       test_internal_links_point_at_a_published_page naming this file. 
        No styling needed: article.recipe a covers every link on the site. {% endcomment %}
-    <p>That said, a few recipes carry more troubleshooting than seems reasonable, like <a href="{{ '/food/recipes/henrys-quick-bulletproof-hollandaise-sauce/' | relative_url }}">Hollandaise sauce</a> and <a href="{{ '/food/recipes/chocolate-ganache/' | relative_url }}">chocolate ganache</a>. The length of extra writing on any recipe page is proportional to how much that food has personally wronged me.</p>
+    <p>That said, a few recipes carry more troubleshooting than seems reasonable, such as <a href="{{ '/food/recipes/henrys-quick-bulletproof-hollandaise-sauce/' | relative_url }}">Hollandaise sauce</a> and <a href="{{ '/food/recipes/chocolate-ganache/' | relative_url }}">chocolate ganache</a>. The length of extra writing on any recipe is proportional to how much that food has personally wronged me.</p>
 
     <hr>
 
     <p>Filter my recipes:</p>
-
-    {% comment %} The <ul> was nested INSIDE the <p> above, which no parser
-       allows -- every browser silently closes the paragraph before the list and
-       leaves a stray empty <p> after it. Same content, valid now. {% endcomment %}
     <ul class="about-ways">
       <li>by what you have in your hand,</li>
       <li>by what's lurking in your fridge and going off, or</li>
       <li>by being in the mood for a giant pile of cheese.</li>
     </ul>
 
-    <p>Honestly I don't care — this site is not for you. Now stop reading recipe websites and go and actually cook something.</p>
+    <p>Filter however you like; honestly, I don't care — this site is not for you.</p>
 
     <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--about-faq">FAQ</span></h2>
 
@@ -106,13 +107,13 @@ site_key: food
        question would break the column of marks the page is built on. {% endcomment %}
 
     <div class="about-faq-item">
-      <h3>Can I see your to-try recipes?</h3>
-      <p>No. They only build locally and are committed to a private repository. Three reasons. I don't want to break copyright. I don't want to disrespect authors. And, above all else, I don't want to put effort into rewriting a load of recipes I haven't tested because many will turn out to be terrible.</p>
-    </div>
-        
-    <div class="about-faq-item">
       <h3>I have a great idea/recipe/criticism for your site. Will you build/try/hear it?</h3>
-      <p>No. I welcome <a href="https://github.com/DeckOfPandas/helen-triages">pull requests</a> with thanks. But I'm not interested in pleasing you, in the same way you're not interested in this one time I made Emma wait over two hours for a quiche that in the end never set, or the Christmas 2024 <i>liaison dangereuse</i> between my then-94-year-old Grandmother and a 9-kg leg of ham that, unbeknownst to us, was cured rather than cooked.</p>
+      <p>No. I welcome <a href="https://github.com/DeckOfPandas/helen-triages">pull requests</a> with thanks. But I'm not interested in pleasing you, in the same way you're not interested in this one time I made Emma wait over two hours for a quiche that in the end never set. Or in the Christmas 2024 <i lang="fr">liaison dangereuse</i> between my then-94-year-old grandmother and a 9-kg leg of ham that, unbeknownst to us, was cured rather than cooked.</p>
+    </div>
+
+    <div class="about-faq-item">
+      <h3>Can I see your to-try recipes?</h3>
+      <p>No. They only build locally and are committed to a private repository. Two reasons. I don't want to break copyright or disrespect authors. But more importantly -- and please hear me when I say this -- I don't want to put effort into rewriting a load of recipes I haven't tested because many will turn out to be terrible.</p>
     </div>
 
     <div class="about-faq-item">
@@ -122,18 +123,20 @@ site_key: food
 
     <div class="about-faq-item">
       <h3>Did you write any of this code yourself directly?</h3>
-      <p>Absolutely not. Not one single line, for better or worse, mostly better. I could have written most of this myself the old-fashioned way...eventually. But I certainly wouldn't have &gt;18,000 tests were I left to my own devices. Every time I found myself about to edit some YAML, I requested new tests instead. Obviously TDD has always been great, but I'm feeling particularly fond of it now I neither have to write the test nor implement the ask.</p>
+      <p>Absolutely not. Not one single line, for better or worse, mostly better. I could have written most of this myself the old-fashioned way. Eventually. But I certainly wouldn't have &gt;18,000 tests were I left to my own devices. Every time I found myself about to edit some YAML, I requested new tests instead. Obviously TDD has always been great, but I'm feeling particularly fond of it now I have to neither write the test nor satisfy it.</p>
     </div>
 
     <div class="about-faq-item">
       <h3>Can you share the prompts or scripts or workflows you used to ingest and clean your recipe data?</h3>
-      <p>No. I didn't log these things or think them through that hard...welcome to the future: it looks Claude-y. I don't have Repeatable Analysis Pipelines, I have Claude Code, a comprehensive herd of tests that fail loudly, and slightly too much time on my hands at the moment (but still not enough to write YAML).</p>
+      <p>No. I didn't log these things or think them through that hard...welcome to the future: it looks Claude-y. I don't have Repeatable Analysis Pipelines. I do have Claude Code, a comprehensive herd of tests that fail loudly rather than admit broken code or poor formatting to my site, and slightly too much time on my hands at the moment (but still not enough to write YAML).</p>
     </div>
 
     <div class="about-faq-item">
       <h3>Can you write a blog post about what you learned about AI-assisted development?</h3>
       <p>Yes, I can. I expect that I will not.</p>
     </div>
+
+      <p>Now stop reading recipe websites and go and actually cook something.</p>
 
   </div>
 </article>
