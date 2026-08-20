@@ -201,7 +201,16 @@ _WELL_FORMED_TARGET = re.compile(r"^[a-z0-9-]+/?$")
 # Kept narrow on purpose: only `reference/`, only a slug, only with a trailing
 # slash. The bug this whole test was written for -- `](../garam-masala-powder.md)`
 # -- is still rejected, as is any other freehand path.
-_REFERENCE_TARGET = re.compile(r"^\.\./reference/[a-z0-9-]+/$")
+# An optional `?protein=` is allowed, and only that. cook-timer.js has read it
+# since issue #243 so the temperature charts could link to the timings for the
+# protein you were just looking at; a recipe deserves the same, and the
+# Christmas turkey now uses it (issue #406's neighbour, 2026-08-20).
+#
+# Deliberately narrow -- one known parameter, lowercase, nothing else. A general
+# "allow any query string" would wave through the typos this rule exists to
+# catch, and cook-timer.js ignores an unknown protein silently, so a wrong one
+# lands you on beef with no error anywhere.
+_REFERENCE_TARGET = re.compile(r"^\.\./reference/[a-z0-9-]+/(\?protein=[a-z-]+)?$")
 
 
 def test_internal_links_are_well_formed(recipe):
