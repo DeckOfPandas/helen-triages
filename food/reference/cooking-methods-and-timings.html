@@ -87,6 +87,13 @@ permalink: /food/reference/cooking-methods-and-timings/
       </label>
     </div>
 
+    {% comment %} EVERYTHING FROM HERE TO </div id=ct-calculator> IS THE
+       INSTRUMENT, and it is wrapped so the dropdown can put it away. Issue #412
+       gives fish and shellfish their own entry in that dropdown; picking it
+       swaps this whole block for the section below rather than showing a
+       weight box that cannot answer anything. The dropdown itself stays outside
+       the wrapper, because it is how you get back. {% endcomment %}
+    <div id="ct-calculator">
     <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference" id="ct-protein-name"></span></h2>
 
     {% comment %} THE FINISHING TEMPERATURE SITS ABOVE THE CONTROLS, and this
@@ -149,6 +156,7 @@ permalink: /food/reference/cooking-methods-and-timings/
     <div class="table-scroll" id="ct-table"></div>
 
     <div class="ct-results" id="ct-results"></div>
+    </div>{%- comment -%} /#ct-calculator {%- endcomment -%}
 
     {% comment %} The long explanation of why some rows decline used to live
        here -- four paragraphs restating what the cards already say for
@@ -182,15 +190,13 @@ permalink: /food/reference/cooking-methods-and-timings/
        flatten into a different table. Same reasoning as when they were left
        hand-written on the old page.
     {% endcomment %}
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">By species, not by weight</span></h2>
+    <div id="ct-fish-shellfish" hidden>
 
-    <p>Fish and shellfish are not in the calculator above and will not be: fish
-    is governed by its thickness and shellfish by the moment the shell opens, so
-    there is no weight to schedule from. What they do have is options, which is
-    what these two tables are for.</p>
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Fish and shellfish</span></h2>
+
+    <p>Not cooked by time.</p>
 
     <h2 class="recipe-section-heading" id="fish"><span class="section-heading-text section-heading-text--reference">Fish</span></h2>
-    <p class="recipe-section-subtitle">By species and form</p>
 
     <div class="table-scroll">
       <table>
@@ -198,52 +204,77 @@ permalink: /food/reference/cooking-methods-and-timings/
           <tr><th>Fish</th><th>Form</th><th>Best methods</th><th>Notes</th></tr>
         </thead>
         <tbody>
+          <tr><td rowspan="2">Cod / haddock</td><td>Fillet</td><td>Pan-fry with dredge (flour/breadcrumb); oven-bake; poach; steam</td><td>Thick fillets suit baking over pan-frying alone</td></tr>
+          <tr><td>Whole</td><td>Oven-bake (less common form for these species)</td><td></td></tr>
+          <tr><td rowspan="3">Halibut / turbot</td><td>Steak</td><td>Pan-fry + oven finish; poach</td><td>Lean and dense — gentle finish avoids drying out</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry + oven finish; poach; oven-roast</td><td></td></tr>
+          <tr><td>Whole (turbot)</td><td>Whole roast</td><td>Large flatfish, roasted much like a small joint</td></tr>
+          <tr><td rowspan="2">Herring</td><td>Whole</td><td>Pan-fry (often dredged in oatmeal); grill/BBQ; soused/pickled (no heat)</td><td>Oily fish, similar logic to mackerel</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
+          <tr><td rowspan="2">John Dory</td><td>Whole</td><td>Roast</td><td></td></tr>
+          <tr><td>Fillet</td><td>Pan-fry; steam</td><td>Delicate flesh, restrained methods preferred</td></tr>
+          <tr><td rowspan="2">Mackerel</td><td>Whole</td><td>Grill/BBQ (classic); oven-bake; smoke</td><td>Oily flesh copes well with fierce direct heat</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
+          <tr><td>Monkfish</td><td>Fillet/tail</td><td>Pan-fry + oven finish; roast whole tail; poach</td><td>Firm, meat-like texture</td></tr>
+          <tr><td rowspan="2">Plaice / sole</td><td>Whole</td><td>Pan-fry, dredged ("meunière" style); grill</td><td>Classic preparation for both</td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td>Cooks very quickly given thinness</td></tr>
+          <tr><td rowspan="2">Red mullet</td><td>Whole</td><td>Pan-fry; grill/BBQ; oven-bake</td><td></td></tr>
+          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
           <tr><td rowspan="3">Salmon</td><td>Fillet</td><td>Pan-fry (skin-down first); oven-roast</td><td>Fatty enough to tolerate most methods well</td></tr>
           <tr><td>Whole</td><td>Whole roast; poach</td><td>Poaching a whole side is classic</td></tr>
           <tr><td>Steak/cutlet</td><td>Poach; grill/BBQ; pan-fry</td><td></td></tr>
-          <tr><td rowspan="2">Cod / haddock</td><td>Fillet</td><td>Pan-fry with dredge (flour/breadcrumb); oven-bake; poach; steam</td><td>Thick fillets suit baking over pan-frying alone</td></tr>
-          <tr><td>Whole</td><td>Oven-bake (less common form for these species)</td><td></td></tr>
           <tr><td rowspan="2">Sea bass</td><td>Whole</td><td>Roast; steam (esp. Chinese-style); grill/BBQ</td><td></td></tr>
           <tr><td>Fillet</td><td>Pan-fry, skin-down</td><td>Skin crisps very well</td></tr>
           <tr><td rowspan="2">Sea bream</td><td>Whole</td><td>Roast; grill/BBQ; salt-baked</td><td>Salt-crust baking is a well-known bream-specific method</td></tr>
           <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
+          <tr><td>Skate</td><td>Wing</td><td>Pan-fry; poach; steam</td><td>Its own cut — neither fillet nor steak</td></tr>
+          <tr><td>Swordfish</td><td>Steak</td><td>Grill/BBQ; pan-fry + finish; sear</td><td>Dense, meaty — copes with high direct heat</td></tr>
           <tr><td rowspan="2">Trout</td><td>Whole</td><td>Pan-fry (classic "amandine" style); oven-bake; grill/BBQ; poach</td><td>Whole pan-frying is unusually common for trout given its small size</td></tr>
           <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
-          <tr><td rowspan="2">Mackerel</td><td>Whole</td><td>Grill/BBQ (classic); oven-bake; smoke</td><td>Oily flesh copes well with fierce direct heat</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
-          <tr><td rowspan="3">Halibut / turbot</td><td>Steak</td><td>Pan-fry + oven finish; poach</td><td>Lean and dense — gentle finish avoids drying out</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry + oven finish; poach; oven-roast</td><td></td></tr>
-          <tr><td>Whole (turbot)</td><td>Whole roast</td><td>Large flatfish, roasted much like a small joint</td></tr>
-          <tr><td rowspan="2">Plaice / sole</td><td>Whole</td><td>Pan-fry, dredged ("meunière" style); grill</td><td>Classic preparation for both</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td>Cooks very quickly given thinness</td></tr>
           <tr><td>Tuna</td><td>Steak</td><td>Sear (pan or grill), often left rare/blue centre</td><td>Intentionally undercooked in the centre — not a shortcut</td></tr>
-          <tr><td>Swordfish</td><td>Steak</td><td>Grill/BBQ; pan-fry + finish; sear</td><td>Dense, meaty — copes with high direct heat</td></tr>
-          <tr><td>Monkfish</td><td>Fillet/tail</td><td>Pan-fry + oven finish; roast whole tail; poach</td><td>Firm, meat-like texture</td></tr>
-          <tr><td rowspan="2">Red mullet</td><td>Whole</td><td>Pan-fry; grill/BBQ; oven-bake</td><td></td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
-          <tr><td rowspan="2">John Dory</td><td>Whole</td><td>Roast</td><td></td></tr>
-          <tr><td>Fillet</td><td>Pan-fry; steam</td><td>Delicate flesh, restrained methods preferred</td></tr>
-          <tr><td rowspan="2">Herring</td><td>Whole</td><td>Pan-fry (often dredged in oatmeal); grill/BBQ; soused/pickled (no heat)</td><td>Oily fish, similar logic to mackerel</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
-          <tr><td>Skate</td><td>Wing</td><td>Pan-fry; poach; steam</td><td>Its own cut — neither fillet nor steak</td></tr>
         </tbody>
       </table>
     </div>
 
-    <p><strong>Cross-cutting methods</strong> (apply across several fish/forms above):</p>
+    {% comment %} NO <strong> AT THE START OF THESE <li>s, and that is the whole
+       of "no courier font" in issue #412. _sass/food/_recipe-notes-body.scss has
+       `> ul > li:have(> strong:first-child)` -- written `:has()` in the file --
+       which promotes a leading bold run to a block-level label in $font-headings
+       for the longform Tips treatment. It fires on any such list anywhere in
+       .recipe-body-content, so a bold lead-in here was silently getting a label
+       treatment built for a different job. Plain text keeps the sans face.
+    {% endcomment %}
+    <p>Other methods:</p>
     <ul>
-      <li><strong>En papillote:</strong> most white fish fillets (cod, haddock, sea bass, sea bream, plaice)</li>
-      <li><strong>Deep-frying (battered):</strong> cod, haddock, plaice fillets</li>
-      <li><strong>Ceviche/raw:</strong> sea bass, sea bream, tuna</li>
+      <li>En papillote: most white fish fillets (cod, haddock, sea bass, sea bream, plaice)</li>
+      <li>Deep-frying (battered): cod, haddock, plaice fillets</li>
+      <li>Ceviche/raw: sea bass, sea bream, tuna</li>
     </ul>
 
-    <p><strong>Timing rule of thumb</strong> (governed by thickness, not weight): pan-fry/grill ~3–4 min per cm thickness per side; oven-bake at 220–230°C ~4 min per cm thickness total (~10 min per <em>inch</em>). Endpoint is opaque and flaking — see the FOOD SAFETY note below on what temperature that actually corresponds to. Salmon and tuna are commonly taken out well before that for a rare or pink centre; see <a href="{{ '/food/reference/internal-temperatures/' | relative_url }}#all">internal temperatures</a> for both.</p>
+    <p>Timing rule of thumb:</p>
+    <ul>
+      <li>Pan-fry/grill: ~3–4 min per cm thickness per side</li>
+      <li>Oven-bake at 220–230°C (fan) ~4 min per cm thickness total (~10 min per <em>inch</em>).</li>
+    </ul>
 
-    <p><strong>Correction, 2026-08-12:</strong> the oven-bake rule used to say "~10 min per cm" — this looks like the well-known Canadian "10-minute rule" (10 min per <em>inch</em> of thickness at 450°F/232°C) with inches silently read as centimetres, which makes the old figure roughly 2.5× too long. A 3 cm fillet needs ~12 min by the correct rule, not ~30.</p>
+    <p>Endpoint is opaque and flaking if not deliberately rare. See <a href="{{ '/food/reference/internal-temperatures/' | relative_url }}#all">internal temperatures</a> for salmon and tuna.</p>
 
-    <p><strong>FOOD SAFETY:</strong> the "opaque and flaking" endpoint most home cooks actually use is lower than the official benchmark — USDA gives 145°F/62.8°C, and UK FSA guidance points to the same ~63°C. Salmon taken out at 52–55°C for a moist centre (a common chef preference — see <a href="{{ '/food/reference/internal-temperatures/' | relative_url }}#fish-salmon">internal temperatures</a>) is below that mark; it's a texture choice, not the safety figure, and worth knowing the difference between the two rather than treating "looks done" as equivalent to "meets the guideline."</p>
+    {% comment %} THREE PARAGRAPHS WERE DELETED HERE on 2026-08-20, at Helen's
+       explicit instruction in issue #412 ("delete next three paragraphs"): a
+       2026-08-12 correction note about the oven-bake rate, a FOOD SAFETY note,
+       and the sources line.
 
-    <p class="recipe-source">Sources: pan-fry/grill rate broadly confirmed against UK fishmonger guidance (~2–3.3 min/cm/side for 2–3 cm portions — our figure sits at the high end but same order of magnitude). Oven-bake correction from the Canadian Dept. of Fisheries "10-Minute Rule," the widely-cited basis for most timing guidance of this kind. Safety endpoint from USDA FSIS and UK FSA. Species/method pairings (salt-baked bream, trout amandine, etc.) were all independently confirmed, no changes there. Checked once, 2026-08-12 — tidy/remove these notes once you've confirmed a row yourself.</p>
+       Worth recording rather than just doing, because two of them were the kind
+       this repo normally protects. HANDOVER §14 says the "checked once... remove
+       once confirmed" source notes are Helen's own scaffolding and must not be
+       tidied away unprompted -- this was prompted. And the safety note is not
+       lost so much as compressed: "if not deliberately rare" carries the
+       distinction it was making, and the link above goes to the chart that
+       holds salmon's own safety_min/safety_label shading (§14).
+
+       The correction note had done its job: it explained a fix to a figure that
+       has been correct for over a week, to nobody who was ever going to read it.
+    {% endcomment %}
 
     <h2 class="recipe-section-heading" id="shellfish"><span class="section-heading-text section-heading-text--reference">Shellfish</span></h2>
 
@@ -253,26 +284,32 @@ permalink: /food/reference/cooking-methods-and-timings/
           <tr><th>Shellfish</th><th>Best methods</th><th>Notes</th></tr>
         </thead>
         <tbody>
-          <tr><td>Mussels</td><td>Steam (classic, e.g. white wine); pan-fry/sauté briefly</td><td>Cook just until shells open; discard any that stay shut</td></tr>
-          <tr><td>Clams</td><td>Steam; pan-fry/sauté briefly</td><td>Same open-shell rule as mussels</td></tr>
-          <tr><td>Oysters</td><td>Raw/shucked; grill/BBQ briefly; steam</td><td>Many prefer raw; if cooking, keep it brief to avoid toughening</td></tr>
-          <tr><td>Scallops</td><td>Pan-sear (very hot, short); grill/BBQ; poach</td><td>Sear only 1–2 min per side — easy to overcook to rubberiness</td></tr>
-          <tr><td>Prawns/shrimp</td><td>Pan-fry/sauté; grill/BBQ; poach/boil; steam</td><td>Cooks in minutes; ready when opaque and curled</td></tr>
-          <tr><td>Langoustine (Dublin Bay prawn/scampi)</td><td>Grill/BBQ; poach/boil; pan-fry</td><td>Often split and grilled in the shell for extra flavour</td></tr>
-          <tr><td>Crab</td><td>Boil whole, then pick; steam whole</td><td>Usually cooked whole first, then meat extracted</td></tr>
-          <tr><td>Lobster</td><td>Boil whole; steam whole; split and grill/BBQ; split and oven-roast</td><td>Often boiled/steamed first then finished on the grill or under a broiler</td></tr>
-          <tr><td>Squid</td><td>Pan-fry/sauté, very hot and fast; deep-fry (classic "calamari"); grill/BBQ; braise slowly</td><td>Two good zones only — very fast high heat, or long slow braise; the middle ground turns it rubbery</td></tr>
-          <tr><td>Octopus</td><td>Braise/simmer low and slow first, then char on a very hot grill/pan to finish</td><td>Almost always needs slow tenderising before a hot, fast finishing step</td></tr>
-          <tr><td>Cockles</td><td>Steam; boil briefly</td><td>Similar to mussels/clams, cooked until open</td></tr>
-          <tr><td>Winkles</td><td>Boil briefly, then pick out with a pin</td><td>Traditionally eaten cold after boiling</td></tr>
-          <tr><td>Crawfish</td><td>Boil (classic, often spiced); steam</td><td>Common in Cajun-style boils</td></tr>
           <tr><td>Abalone</td><td>Pan-fry, briefly; braise slowly</td><td>Like squid, has a narrow window — quick sear or long slow cook, nothing in between</td></tr>
+          <tr><td>Clams</td><td>Steam; pan-fry/sauté briefly</td><td>Same open-shell rule as mussels</td></tr>
+          <tr><td>Cockles</td><td>Steam; boil briefly</td><td>Similar to mussels/clams, cooked until open</td></tr>
+          <tr><td>Crab</td><td>Boil whole, then pick; steam whole</td><td>Usually cooked whole first, then meat extracted</td></tr>
+          <tr><td>Crawfish</td><td>Boil (classic, often spiced); steam</td><td>Common in Cajun-style boils</td></tr>
+          <tr><td>Langoustine (Dublin Bay prawn/scampi)</td><td>Grill/BBQ; poach/boil; pan-fry</td><td>Often split and grilled in the shell for extra flavour</td></tr>
+          <tr><td>Lobster</td><td>Boil whole; steam whole; split and grill/BBQ; split and oven-roast</td><td>Often boiled/steamed first then finished on the grill or under a broiler</td></tr>
+          <tr><td>Mussels</td><td>Steam (classic, e.g. white wine); pan-fry/sauté briefly</td><td>Cook just until shells open; discard any that stay shut</td></tr>
+          <tr><td>Octopus</td><td>Braise/simmer low and slow first, then char on a very hot grill/pan to finish</td><td>Almost always needs slow tenderising before a hot, fast finishing step</td></tr>
+          <tr><td>Oysters</td><td>Raw/shucked; grill/BBQ briefly; steam</td><td>Many prefer raw; if cooking, keep it brief to avoid toughening</td></tr>
+          <tr><td>Prawns/shrimp</td><td>Pan-fry/sauté; grill/BBQ; poach/boil; steam</td><td>Cooks in minutes; ready when opaque and curled</td></tr>
+          <tr><td>Scallops</td><td>Pan-sear (very hot, short); grill/BBQ; poach</td><td>Sear only 1–2 min per side — easy to overcook to rubberiness</td></tr>
+          <tr><td>Squid</td><td>Pan-fry/sauté, very hot and fast; deep-fry (classic "calamari"); grill/BBQ; braise slowly</td><td>Two good zones only — very fast high heat, or long slow braise; the middle ground turns it rubbery</td></tr>
+          <tr><td>Winkles</td><td>Boil briefly, then pick out with a pin</td><td>Traditionally eaten cold after boiling</td></tr>
         </tbody>
       </table>
     </div>
 
-
-    <p class="ct-seealso">See also: <a href="{{ '/food/reference/internal-temperatures/' | relative_url }}">internal temperatures for each protein</a>.</p>
+    {% comment %} The bottom "See also: internal temperatures" line went with
+       issue #412. It is not the loss it looks like: the fish section above still
+       links the charts where it actually matters (salmon and tuna), and every
+       protein card the calculator renders carries its own "see other doneness"
+       link built by cook-timer.js. The crosslink §14 asks for is still there,
+       just attached to the thing it is about rather than trailing the page.
+    {% endcomment %}
+    </div>{%- comment -%} /#ct-fish-shellfish {%- endcomment -%}
 
   </div>
 </article>

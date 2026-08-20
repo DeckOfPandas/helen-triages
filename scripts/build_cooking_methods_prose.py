@@ -97,13 +97,29 @@ def drop_excluded(html):
 # the charts split beef three ways where the old tables had one #beef -- and it
 # still called the figures "pull temps", the word this reference layer stopped
 # using. Rewritten on the way through, so regenerating keeps it.
+#
+# THE PAGE IS CALLED internal-temperatures AGAIN, which makes this table read
+# oddly until you know the history. There have been two pages of that name: the
+# original tables page, retired 2026-08-14 when it was split into temperatures +
+# timings, and the CURRENT charts page, which issue #384 renamed from
+# `temperatures` back to `internal-temperatures` on 2026-08-19. So several
+# mappings below now have the same path on both sides and only change the
+# ANCHOR -- which is the part that still genuinely differs, because the charts
+# split beef three ways and salmon out of fish.
+#
+# The right-hand sides pointed at `../temperatures/` until 2026-08-20, i.e. at a
+# page deleted the day before, and regenerating would have re-broken ten links
+# in cooking_methods.yml. Nothing caught that: the links live inside a JSON blob
+# as escaped HTML, so neither the template scanner nor the built-html scanner in
+# tests/test_page_links.py can see them. test_links_built_outside_templates_
+# still_resolve now can.
 LINK_FIXES = [
-    ('../internal-temperatures/#beef"', '../temperatures/#beef-tender-roasting-cuts"'),
-    ('../internal-temperatures/#pork"', '../temperatures/#pork"'),
-    ('../internal-temperatures/#lamb"', '../temperatures/#lamb"'),
-    ('../internal-temperatures/#ham"', '../temperatures/#ham"'),
-    ('../internal-temperatures/#fish"', '../temperatures/#fish-salmon"'),
-    ('../internal-temperatures/"', '../temperatures/"'),
+    ('../internal-temperatures/#beef"', '../internal-temperatures/#beef-tender-roasting-cuts"'),
+    ('../internal-temperatures/#pork"', '../internal-temperatures/#pork"'),
+    ('../internal-temperatures/#lamb"', '../internal-temperatures/#lamb"'),
+    ('../internal-temperatures/#ham"', '../internal-temperatures/#ham"'),
+    ('../internal-temperatures/#fish"', '../internal-temperatures/#fish-salmon"'),
+    ('../internal-temperatures/"', '../internal-temperatures/"'),
     (">internal temperatures</a>", ">temperature charts</a>"),
     ("Doneness pull temps:", "Doneness temperatures:"),
     ("the internal-temperatures page", "the temperature charts"),

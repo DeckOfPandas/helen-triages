@@ -204,7 +204,12 @@
 .back-to-index {
   display: inline-block;
   font-family: $font-headings;
-  font-size: 1.1rem;
+  // 1.1rem -> 1.6rem, issue #411. Helen asked for it bigger without naming a
+  // size; this is the smallest step that reads as a deliberate control rather
+  // than a stray character, and it sits close to the 28px the nav icons took in
+  // #388, so the two bits of navigation furniture are of a weight. One number
+  // if it wants to be bigger or smaller again.
+  font-size: 1.6rem;
   line-height: 1;
   color: $color-clear-text;
   text-decoration: none;
