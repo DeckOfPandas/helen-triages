@@ -441,10 +441,21 @@ exactly eight values (`publication`, `book`, `website`, `author`, `person`,
 — page numbers, publisher parentheticals and series-name asides are never part
 of any shape, so don't add them. `source_type` renders nowhere — it's listed in
 `INVISIBLE_KEYS` (see §4.0), so setting or correcting it never invalidates
-`proofread`. **No test enforces any of this yet** — both the `_food_recipes/`
-and `_food_drafts/` sweeps that added the field everywhere applied the spec by
-judgement, once, not by a guard that would catch future drift. Check before
-relying on it.
+`proofread`.
+
+**Enforced since 2026-08-20 by `tests/test_source_attribution.py`** (this
+paragraph said "no test enforces any of this yet" until then, and that was the
+gap). Six rules, over all 82 recipes *and* all 314 drafts — drafts deliberately
+included, because a draft that drifts is a promotion that drifts. `source_type`
+is also in `REQUIRED`, so a recipe without one fails.
+
+The rule most likely to catch you out, and the only one worth repeating here:
+**the date is what separates a `publication` from a `website`.** A publication
+must carry a date; a website must not. A year alone is a complete date, because
+an online magazine has no publication schedule. `Good Food` is genuinely both —
+some drafts cite the October 2025 print issue, others the site with no date at
+all — so *if you have no date, it is the website*. Sixty-four drafts were
+retyped on that rule.
 
 **`meta.claude_rewritten` (optional, issue #418) records that Claude took a tidy-up
 pass at a draft — suggesting `main_ingredients`, ingredient/method groups, and
@@ -456,18 +467,31 @@ staging pipeline the same day this landed: `to-rewrite/` (waiting for a
 Claude pass) → `to-cook/` (tidied, good enough to actually cook from) →
 `to-promote/` (schema-clean, ready to move to `_food_recipes/`) — after
 finishing a pass, move the file into `to-cook/` yourself rather than leaving
-it in `to-rewrite/`. None of the three subfolders are read by the draft test
-suite (`_food_drafts/*.md` is top-level only), so files staged in any of them
-aren't "in the collection" yet — check compliance by hand, or copy back to
-top level to run the real suite against them. **`QQ PLACEHOLDER` survives a
+it in `to-rewrite/`. **All three subfolders ARE read by the draft test suite,
+since 2026-08-20.** `conftest._load` used `glob("*.md")`, which was right while
+`_food_drafts/` was flat and meant the staged files were silently unscanned the
+moment the pipeline existed — seven of them, and they are the ones *closest* to
+publication. It now uses `rglob`, so a staged draft is held to every draft rule
+like any other. Issue #418 says the opposite and predates the change; Helen's
+ruling on 2026-08-20: *"your system is fine with to-rewrite, and I'll use it
+properly"* — i.e. staged files are expected to be suite-clean, and anything too
+raw to pass stays out of the pipeline rather than the pipeline staying out of
+the suite. **`QQ PLACEHOLDER` survives a
 Claude-assisted pass.** Tidying structure and wording is not the same thing as
 Helen actually rewriting a step in her own voice — the marker only comes off
 once she says so, same reasoning as the `proofread` rule in §4.0. Considered
 and rejected for now: renaming `rewritten` → `human_rewritten` for symmetry —
 would touch every file in `_food_recipes/` and interact with the
-`proofread`-invalidation rule; cheap to revisit now that #417's `INVISIBLE_KEYS`
-mechanism exists to exempt a content-free rename like that from needing
-`proofread: false` on every recipe.
+`proofread`-invalidation rule.
+
+**`INVISIBLE_KEYS` does NOT make that rename cheap, contrary to what this
+paragraph and issue #418 both claimed.** `meta.rewritten` is read by
+`_layouts/recipe.html` and `assets/js/ingredient-search.js`, so declaring it
+invisible fails `test_invisible_keys_are_really_invisible` by construction —
+that test greps the render surface precisely to stop a read key being listed.
+The rename would still invalidate all 82 proofreads and would still need the
+`BASELINE_COMMIT` or `HELEN_CLEARED` route, both Helen's to grant. The cost
+hasn't gone away; only the reasoning about it has been corrected.
 
 **`short_name` retired 2026-08-12, GitHub issue #169.** Confirmed zero
 references anywhere in `_layouts/`, `_includes/`, `assets/js/`, or `food/`
@@ -517,10 +541,19 @@ Three things about it that will otherwise waste your time:
   not before it. It will stop a bad merge; it will **not** stop you committing
   the omission. Set the flag while you edit, not when the suite complains.
 - **`BASELINE_COMMIT` grandfathers everything up to and including itself** —
-  currently `366f392`, moved there 2026-08-20 (from `9c70675` before that, from
-  `dc2a7bf` before that — check the constant itself rather than trust a number
-  quoted here, it moves). Each move was Helen reviewing a sweeping, content-free
-  change herself and saying so.
+  currently `9306cef`, moved there 2026-08-20 (from `366f392` earlier the same
+  day, from `9c70675` before that, from `dc2a7bf` before that — check the
+  constant itself rather than trust a number quoted here, it moves and it has
+  moved four times). Each move was Helen reviewing the change herself and saying
+  so: the first three were sweeping and content-free, and the latest was the
+  opposite shape — she asked to be walked through a nine-recipe citation backlog
+  one file at a time, was shown the old line, the new line and the reason for
+  each, and answered each individually. Two she changed rather than approved.
+  **Measure before moving it.** The constant's own comment now insists on the
+  question "how many recipes is this rule currently holding at `proofread:
+  false`?" — the answer was zero both times on 2026-08-20, which is what made
+  the moves cheap; the identical move a week earlier, over eight held recipes,
+  would have quietly asserted something false about all eight.
 - **Moving that baseline forward is Helen's to grant, never yours.** If she has
   reviewed a change line by line, move it and say so in the commit message.
   Never move it to make a red test go green.
