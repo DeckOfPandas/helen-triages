@@ -1,7 +1,7 @@
 ---
 title: "Five-Spice Powder"
 tagline: "No capsicum here."
-source: ""
+source: "QQ"
 makes: "some"
 prep_time: "5 mins"
 cook_time: "2 mins"
@@ -30,7 +30,7 @@ method_short:
   - Oh come on.
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-07-25"
