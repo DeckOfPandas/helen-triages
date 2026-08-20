@@ -1,7 +1,7 @@
 ---
 title: "Indian Mutton Raan Roast"
 tagline: "Prep happens over days, but it's totally worth it. Uses [garam masala powder](../garam-masala-powder/)."
-source: "Debjani Chatterjee Alam, Debjanir Rannaghar"
+source: "Adapted from Debjanir Rannaghar, recipe Debjani Chatterjee Alam"
 serves: "10"
 prep_time: "30 mins active, plus 48–72 hrs marinating"
 cook_time: "About 3 hrs"
@@ -116,7 +116,7 @@ notes:
     text: "It's tempting to YOLO and use more ghee — no one would know, right? — but last time I did this the mutton was almost floating by the end, and the tomatoes were all weird and bubbly."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-07-31"

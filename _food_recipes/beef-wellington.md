@@ -1,7 +1,7 @@
 ---
 title: "Beef Wellington"
 tagline: "The ultimate showstopper. Two days of love for ten minutes of glory."
-source: "Adapted from Gordon Ramsay's Ultimate Cookery Course (Hodder & Stoughton)"
+source: "Adapted from Gordon Ramsay's Ultimate Cookery Course"
 serves: "4"
 prep_time: "1 hr 30 mins, plus overnight chilling"
 cook_time: "15–20 mins"
@@ -85,7 +85,7 @@ notes:
     text: "In theory this serves 4, but fillet is rich...and also expensive. Two Wellingtons may feed 6 comfortably if there are generous sides. Helen, Simon, Patrick and Lauren once happily shared just one, but then there were two different kinds of potato Dauphinoise on the table at the time, so."
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"
