@@ -2,6 +2,7 @@
 title: "Asparagus and Gruyère Quiche with Parmesan Crust"
 tagline: "As good hot, reheated, cold, or straight from the fridge with a guilty look on your face. Strategically over-cater to ensure leftovers."
 source: "Good friend Daniel"
+source_type: person
 serves: "4–6"
 prep_time: "30 mins plus 30 mins resting"
 cook_time: "1 hr"

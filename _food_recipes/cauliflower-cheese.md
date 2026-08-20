@@ -2,6 +2,7 @@
 title: "Cauliflower Cheese"
 tagline: "The cauliflower is really just a vehicle for the cheese sauce."
 source: "Adapted from Gordon Ramsay Restaurants"
+source_type: website
 serves: "5 (or...1)"
 prep_time: "15 mins"
 cook_time: "20-25 mins"

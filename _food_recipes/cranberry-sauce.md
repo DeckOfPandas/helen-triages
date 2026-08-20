@@ -2,6 +2,7 @@
 title: "Cranberry Sauce"
 tagline: "The simplest this could possibly be."
 source: "Experience"
+source_type: joke
 serves: "6–8 as a condiment"
 prep_time: "2 mins"
 cook_time: "10 mins"

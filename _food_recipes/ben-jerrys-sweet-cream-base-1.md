@@ -2,6 +2,7 @@
 title: "Ben & Jerry's Sweet Cream Base No. 1"
 tagline: "Ben & Jerry say this is their most popular base. No custard step, hurrah, even though it has eggs."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
+source_type: book
 makes: "950 ml"
 prep_time: "10 mins"
 cook_time: "none"

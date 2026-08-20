@@ -2,6 +2,7 @@
 title: "Caesar Salad Dressing"
 tagline: "Doesn't keep, but very easy and quick."
 source: "Stella"
+source_type: person
 makes: "about 300 ml"
 prep_time: "5 mins"
 cook_time: "None"

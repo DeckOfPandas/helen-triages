@@ -2,6 +2,7 @@
 title: "Pan-Seared Venison with Blueberries, Shallots and Red Wine"
 tagline: "Blueberries in a meat sauce sounds like a mistake until you taste it."
 source: "Adapted from Jamie Oliver"
+source_type: author
 serves: "4"
 prep_time: "10 mins"
 cook_time: "15 mins"

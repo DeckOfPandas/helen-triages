@@ -2,6 +2,7 @@
 title: "Delia's Classic Pancakes"
 tagline: "You don't need to make this batter beforehand like other recipes...amazing but true."
 source: "Adapted from Delia Smith"
+source_type: author
 makes: "about 8"
 prep_time: "10 mins"
 cook_time: "3–4 mins per pancake"

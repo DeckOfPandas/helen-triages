@@ -2,6 +2,7 @@
 title: "Garam Masala"
 tagline: "If you can't be bothered to make this from scratch, can you really be bothered to cook?"
 source: "Adapted from indianhealthyrecipes.com"
+source_type: website
 makes: "approx. 140 g"
 prep_time: "None"
 cook_time: "10 mins"

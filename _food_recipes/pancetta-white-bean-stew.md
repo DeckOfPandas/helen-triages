@@ -1,7 +1,8 @@
 ---
 title: "Pancetta and White Bean Stew"
 tagline: "Use whatever's lurking in the fridge."
-source: "Unknown"
+source: "QQ"
+source_type: unknown
 serves: "4"
 prep_time: "15 mins"
 cook_time: "40 mins"
@@ -48,7 +49,7 @@ notes:
 
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

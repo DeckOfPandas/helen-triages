@@ -2,6 +2,7 @@
 title: "Chai-Spiced Milk Tea"
 tagline: "Actual simmered chai, not a teabag dunked in hot milk. Use [chai spice powder](../chai-spice-powder/)."
 source: "Adapted from indianhealthyrecipes.com"
+source_type: website
 serves: "1"
 prep_time: "None"
 cook_time: "10 mins"

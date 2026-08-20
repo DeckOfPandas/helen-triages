@@ -2,6 +2,7 @@
 title: "Peanut Butter Cookies"
 tagline: "Dangerous."
 source: "Adapted from Preppy Kitchen, recipe John Kanell"
+source_type: website
 makes: "18 cookies"
 prep_time: "20 mins"
 cook_time: "10 mins"

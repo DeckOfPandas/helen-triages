@@ -2,6 +2,7 @@
 title: "Old-fashioned Cherry Cake"
 tagline: "This cake always goes down well, and keeps for ages. Grandpa loves it."
 source: "Adapted from Delia Smith"
+source_type: author
 makes: "one 8-inch round cake"
 prep_time: "10 mins"
 cook_time: "1 hr 30 mins"

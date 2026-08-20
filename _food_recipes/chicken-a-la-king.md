@@ -2,6 +2,7 @@
 title: "Chicken à la King"
 tagline: "American loveliness."
 source: "Adapted from The Cozy Cook"
+source_type: website
 serves: "6"
 prep_time: "15 mins"
 cook_time: "45 mins"

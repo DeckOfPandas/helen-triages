@@ -2,6 +2,7 @@
 title: "Moules Marinière"
 tagline: "Just five ingredients, and a robust mussel rejection system."
 source: "France"
+source_type: place
 serves: "4"
 prep_time: "15 mins"
 cook_time: "10 mins"

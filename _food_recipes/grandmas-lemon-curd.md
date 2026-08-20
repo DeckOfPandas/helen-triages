@@ -2,6 +2,7 @@
 title: "Grandma's Lemon Curd"
 tagline: "Good for jarring, cakes, or lemon meringue pie."
 source: "Grandma Kath"
+source_type: person
 makes: "Enough for one normal lemon meringue pie"
 prep_time: "10 mins"
 cook_time: "20 mins"

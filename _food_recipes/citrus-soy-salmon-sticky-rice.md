@@ -2,6 +2,7 @@
 title: "Citrus and Soy Salmon with Sticky Rice, Cucumber Salad and Edamame"
 tagline: "Tastes like more effort than it is."
 source: "Adapted from Good Food, May 2026"
+source_type: publication
 serves: "6"
 prep_time: "20 mins"
 cook_time: "30 mins"

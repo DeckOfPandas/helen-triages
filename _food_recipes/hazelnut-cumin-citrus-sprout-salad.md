@@ -2,6 +2,7 @@
 title: "Hazelnut, Cumin and Citrus Sprout Salad"
 tagline: "Raw shredded sprouts sound like a hard sell. Toasted hazelnuts, cumin and a citrus-mustard dressing should help."
 source: "Adapted from BBC Good Food, December 2017"
+source_type: publication
 serves: "4–6"
 prep_time: "10 mins plus chilling"
 cook_time: "10 mins"

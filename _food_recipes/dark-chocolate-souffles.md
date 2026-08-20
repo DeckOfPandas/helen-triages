@@ -1,7 +1,8 @@
 ---
 title: "Dark Chocolate Soufflés"
 tagline: "Easier than one might expect."
-source: "Adapted from Green & Black's recipe book."
+source: "Adapted from Green & Black's recipe book"
+source_type: book
 serves: "6"
 prep_time: "15 mins"
 cook_time: "10–15 mins"
@@ -34,7 +35,7 @@ method_short:
   - "Are you kidding...there is no short method for soufflé!"
 meta:
   rewritten: true
-  proofread: true
+  proofread: false
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

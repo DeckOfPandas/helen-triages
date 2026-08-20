@@ -2,6 +2,7 @@
 title: "Lemon Meringue Pie"
 tagline: "The perfect amount for my round white ceramic dish. This pastry recipe makes two lots because what else would one do with half an egg yolk, so ... make two???"
 source: "Grandma Kath"
+source_type: person
 makes: "one pie"
 prep_time: "30 mins in stages"
 cook_time: "55 mins plus cooling"

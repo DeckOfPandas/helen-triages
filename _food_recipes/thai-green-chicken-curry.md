@@ -2,6 +2,7 @@
 title: "Thai Green Chicken Curry"
 tagline: "Unfussy and forgiving."
 source: "Henry"
+source_type: person
 serves: "4"
 prep_time: "15 mins"
 cook_time: "30 mins"

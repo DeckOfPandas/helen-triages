@@ -2,6 +2,7 @@
 title: "Toad in the Hole"
 tagline: "Sausages baked into a giant Yorkshire pudding."
 source: "Adapted from Jamie Oliver"
+source_type: author
 serves: "4"
 prep_time: "10 mins"
 cook_time: "40 mins"

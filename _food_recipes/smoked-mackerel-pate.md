@@ -2,6 +2,7 @@
 title: "Smoked Mackerel Pâté"
 tagline: "Once impressed Grandma Pam's WI."
 source: "Sue"
+source_type: person
 serves: "Depends on appetite"
 prep_time: "5 mins"
 cook_time: "None"

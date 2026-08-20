@@ -2,6 +2,7 @@
 title: "Zesty Christmas Sprout Salad"
 tagline: "A citrus-cured sprout salad with a tahini dressing. This is now part of family Christmas dinner."
 source: "Adapted from Good Food, December 2025"
+source_type: publication
 serves: "4–6"
 prep_time: "20 mins"
 cook_time: "None"

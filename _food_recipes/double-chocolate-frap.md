@@ -2,6 +2,7 @@
 title: "Double Chocolate Frap"
 tagline: "Nearly as good as Starbucks, but you can still fit in dinner."
 source: "Helen"
+source_type: person
 serves: "2"
 prep_time: "5 mins"
 cook_time: "None"

@@ -2,6 +2,7 @@
 title: "Tomato and Tarragon Salad"
 tagline: "Salad that can also be used as a dressing. It works brilliantly with beef, like [roast beef fillet](../roast-beef-fillet/), but arguably goes with anything."
 source: "Adapted from GoodtoKnow, recipe Gordon Ramsay"
+source_type: website
 serves: "6"
 prep_time: "15 mins plus 20 mins chilling"
 cook_time: "None"
