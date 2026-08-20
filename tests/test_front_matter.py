@@ -534,6 +534,122 @@ def _git(*args):
                           cwd=ROOT).stdout
 
 
+# =============================================================================
+# KEYS THAT CHANGE NOTHING HELEN READS — the general answer, Helen 2026-08-20
+# =============================================================================
+# "Adding source_type to every recipe doesn't change how they render, so no need
+# to flip the proofread flag. Does this sound reasonable? Can we allow for this
+# formally so we don't keep asking the same question?"
+#
+# It is reasonable, and it is a better statement of the rule than the one it
+# replaces. Her proofread is of the WORDS ON THE PAGE. An agent editing a recipe
+# invalidates it because the words changed -- not because bytes changed. A front
+# matter key that no template, plugin or script ever reads renders nothing, so
+# the page she proofread is the page that is still there.
+#
+# This is the same reasoning that moved BASELINE_COMMIT to 9c70675 for the
+# awaiting_fix rename; the difference is that this does it by rule instead of by
+# asking her again each time, which is what she asked for.
+#
+# WHY THIS IS NOT THE USUAL "AN AGENT CAN JUST ADD AN ENTRY" HOLE. HELEN_CLEARED
+# above is protected only by being legible -- nothing can check whether she
+# really cleared a recipe. This list is different: the claim "no template reads
+# this key" is a FACT ABOUT THE REPOSITORY, and
+# test_invisible_keys_are_really_invisible checks it. A key cannot be added here
+# unless it is genuinely unread, and the day someone starts rendering one, that
+# test goes red and the entry has to come out. The guard is mechanical, not
+# social.
+#
+# WHAT IT DELIBERATELY DOES NOT COVER: the body text, and any key that IS read.
+# A commit qualifies only if every single difference between the two versions of
+# the file is confined to these keys and the body is byte-identical. Change one
+# word of a method in the same commit and the whole exemption is off.
+RENDER_SURFACE = ("_layouts", "_includes", "_plugins", "assets/js", "scripts")
+
+INVISIBLE_KEYS = {
+    "source_type": (
+        "Classifies a citation (publication / book / website / person / place / "
+        "unknown) so the source-shape tests can tell a dateless magazine from a "
+        "finished book citation -- `Adapted from Good Food` and `Adapted from "
+        "Gordon Ramsay's Ultimate Cookery Course` are the same string shape and "
+        "no regex separates them. Read by tests only. Issue #406."
+    ),
+}
+
+
+def test_invisible_keys_are_really_invisible():
+    """Every key in INVISIBLE_KEYS is read by nothing that builds a page.
+
+    This is the check that makes the exemption safe rather than merely stated.
+    If a key on this list is ever rendered, the recipes carrying it stopped
+    being unchanged-as-far-as-Helen-is-concerned, and the entry must go.
+    """
+    rendered = {}
+    for key in sorted(INVISIBLE_KEYS):
+        hits = subprocess.run(
+            ["grep", "-rlw", "--", key, *RENDER_SURFACE],
+            cwd=ROOT, capture_output=True, text=True,
+        ).stdout.split()
+        if hits:
+            rendered[key] = hits
+
+    assert not rendered, (
+        "INVISIBLE_KEYS names front matter key(s) that something actually "
+        "reads:\n  "
+        + "\n  ".join(f"{k}: {', '.join(v)}" for k, v in rendered.items())
+        + "\n\nThe whole basis for exempting these from the proofread rule is "
+          "that they render nothing, so a recipe carrying one shows Helen "
+          "exactly what she proofread. Once a key is rendered that is false. "
+          "Remove it from the list -- do not narrow this test."
+    )
+
+
+def _file_at(commit, relpath):
+    """(front matter mapping, body) for `relpath` at `commit`, or None."""
+    result = subprocess.run(["git", "show", f"{commit}:{relpath}"],
+                            cwd=ROOT, capture_output=True, text=True)
+    if result.returncode != 0:
+        return None
+    match = FRONT_MATTER.match(result.stdout)
+    if not match:
+        return None
+    try:
+        data = yaml.safe_load(match.group(1)) or {}
+    except yaml.YAMLError:
+        return None
+    return data, result.stdout[match.end():]
+
+
+def _only_invisible_keys_changed(commit, relpath):
+    """True if this commit touched `relpath` ONLY in keys that render nothing.
+
+    Compares the whole file against its state in the parent commit: every key
+    whose value differs must be in INVISIBLE_KEYS, and the body must be
+    identical. Anything it cannot read confidently -- a new file, a merge,
+    unparseable YAML -- returns False, so the proofread rule still applies.
+    """
+    after = _file_at(commit, relpath)
+    before = _file_at(f"{commit}^", relpath)
+    if after is None or before is None:
+        return False                      # new file, or nothing to compare with
+
+    (new_data, new_body), (old_data, old_body) = after, before
+    if new_body != old_body:
+        return False                      # the prose moved; nothing else matters
+
+    changed = {k for k in set(new_data) | set(old_data)
+               if new_data.get(k, object()) != old_data.get(k, object())}
+    # meta is a nested mapping, so compare it key by key rather than wholesale.
+    if changed == {"meta"}:
+        new_meta, old_meta = new_data.get("meta") or {}, old_data.get("meta") or {}
+        changed = {f"meta.{k}" for k in set(new_meta) | set(old_meta)
+                   if new_meta.get(k, object()) != old_meta.get(k, object())}
+        return bool(changed) and all(
+            k.split(".", 1)[1] in INVISIBLE_KEYS for k in changed)
+
+    return bool(changed) and changed <= set(INVISIBLE_KEYS)
+
+
 def test_every_cleared_recipe_still_exists():
     """A HELEN_CLEARED entry naming a file that is gone is a silent hole.
 
@@ -593,6 +709,8 @@ def test_agent_edited_recipes_are_not_marked_proofread():
             continue
         if relpath in HELEN_CLEARED:
             continue                                  # cleared by name, see above
+        if _only_invisible_keys_changed(commit, relpath):
+            continue                                  # renders nothing; see above
         if commit not in agent_commit:
             body = _git("show", "-s", "--format=%B", commit).lower()
             agent_commit[commit] = AGENT_TRAILER in body
@@ -609,9 +727,17 @@ def test_agent_edited_recipes_are_not_marked_proofread():
         "Recipe(s) last edited by an agent but still marked proofread:\n  "
         + "\n  ".join(offenders)
         + "\n\nAn agent editing a recipe invalidates Helen's proofread of it, so "
-          "the SAME commit must set `meta.proofread: false` (issue #367). If the "
-          "change was reviewed by Helen line by line, move BASELINE_COMMIT in "
-          "this file forward instead, and say so in the commit message."
+          "the SAME commit must set `meta.proofread: false` (issue #367).\n\n"
+          "There are three ways out, in order of how often they are the right "
+          "one:\n"
+          "  1. Set proofread: false. Almost always correct.\n"
+          "  2. If the commit changed ONLY keys that render nothing, add them to "
+          "INVISIBLE_KEYS -- but only if test_invisible_keys_are_really_"
+          "invisible still passes, which is the check that keeps this honest.\n"
+          "  3. If Helen reviewed the change herself, either name the recipe in "
+          "HELEN_CLEARED or, for a sweeping content-free change across many "
+          "recipes, move BASELINE_COMMIT forward. Both are hers to grant, and "
+          "the commit message must say she did."
     )
 
 
