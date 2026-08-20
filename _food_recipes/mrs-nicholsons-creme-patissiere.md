@@ -2,6 +2,7 @@
 title: "Mrs Nicholson's Crème Pâtissière"
 tagline: "Never-fail crème pat from someone who knows what they're doing."
 source: "Mrs Nicholson"
+source_type: person
 makes: "about 600 ml"
 prep_time: "20 mins"
 cook_time: "None"

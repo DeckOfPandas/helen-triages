@@ -2,6 +2,7 @@
 title: "The One True Chocolate Brownies"
 tagline: "Perfect and foolproof."
 source: "Adapted from Green & Black's recipe book"
+source_type: book
 makes: "enough for that edge-brownie tin I made James buy me"
 prep_time: "10 mins"
 cook_time: "20–25 mins"

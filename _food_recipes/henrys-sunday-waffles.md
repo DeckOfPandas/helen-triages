@@ -2,6 +2,7 @@
 title: "Henry's Sunday Waffles"
 tagline: "I've absorbed a lot of waffle recipes. This is the iteration I'll put my name on."
 source: "Adapted from Mollie Katzen's Sunlight Café"
+source_type: book
 makes: "4–6 waffles, depending on your waffle iron"
 prep_time: "5 mins"
 cook_time: "15 mins"

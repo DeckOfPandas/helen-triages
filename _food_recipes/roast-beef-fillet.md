@@ -2,6 +2,7 @@
 title: "Roast Beef Fillet"
 tagline: "Seared and roasted beef fillet, simple and perfect. Lovely with rocket, and this [tomato and tarragon salad](../tomato-tarragon-salad/)."
 source: "Adapted from Gordon Ramsay"
+source_type: author
 serves: "4–6"
 prep_time: "20 mins"
 cook_time: "About 30 mins"

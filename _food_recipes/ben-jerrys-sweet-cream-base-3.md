@@ -2,6 +2,7 @@
 title: "Ben & Jerry's Sweet Cream Base No. 3"
 tagline: "The sleekest of the three bases from Ben & Jerry. Less rich, and with a slightly \"cooked\" flavour from the condensed milk."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
+source_type: book
 makes: "950 ml"
 prep_time: "5 mins"
 cook_time: "None"

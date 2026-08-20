@@ -2,6 +2,7 @@
 title: "Pineapple and Ginger Spatchcock Chicken"
 tagline: "Pineapple and ginger instead of the normal pimento and Scoth bonnets in jerk, with Szechuan pepper because we all need to feel something."
 source: "Adapted from delicious. magazine"
+source_type: publication
 serves: "6"
 prep_time: "40 mins"
 cook_time: "45 mins"

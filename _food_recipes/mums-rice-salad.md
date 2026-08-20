@@ -2,6 +2,7 @@
 title: "Mum's Rice Salad"
 tagline: "Apparently other people add diced peppers to this."
 source: "Mum"
+source_type: person
 serves: "However many people want to eat 150 g rice"
 prep_time: "10 mins"
 cook_time: "20 mins"

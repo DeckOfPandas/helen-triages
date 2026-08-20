@@ -2,6 +2,7 @@
 title: "Duck Leg and Barley Casserole"
 tagline: "This cooks beautifully in a 40-cm Le Creuset casserole pan (oval), with six legs forming one perfect duck-y layer."
 source: "Henry"
+source_type: person
 serves: "12"
 prep_time: "30 mins"
 cook_time: "8 hrs"

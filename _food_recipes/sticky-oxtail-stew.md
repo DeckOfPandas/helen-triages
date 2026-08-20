@@ -2,6 +2,7 @@
 title: "Sticky Oxtail Stew"
 tagline: "Five hours in the oven breaks oxtail down into sticky heaven."
 source: "Adapted from Jamie Oliver"
+source_type: author
 serves: "8"
 prep_time: "30 mins"
 cook_time: "6 hrs"

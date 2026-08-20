@@ -2,6 +2,7 @@
 title: "Teriyaki Salmon"
 tagline: "It's teriyaki salmon."
 source: "Adapted from The Daring Gourmet, recipe Kimberly Killebrew"
+source_type: website
 serves: "4"
 prep_time: "10 mins plus at least 30 mins marinading"
 cook_time: "11–14 mins"

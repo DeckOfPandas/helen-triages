@@ -2,6 +2,7 @@
 title: "Classic Masala Chai"
 tagline: "Just perfect."
 source: "Adapted from delicious. magazine"
+source_type: publication
 serves: "4"
 prep_time: "5 mins"
 cook_time: "10 mins"

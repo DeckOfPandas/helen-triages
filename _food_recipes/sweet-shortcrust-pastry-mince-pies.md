@@ -2,6 +2,7 @@
 title: "Sweet Shortcrust Pastry / Mince Pies"
 tagline: "Foolproof sweet shortcrust for 12 mince pies with star hats. The mincemeat under the gaps becomes glorious under the direct heat."
 source: "Bitter experience"
+source_type: joke
 makes: "1 dozen mince pies"
 prep_time: "30 mins, plus 1 hr 30 mins chilling time"
 cook_time: "20 mins"

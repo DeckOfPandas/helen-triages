@@ -2,6 +2,7 @@
 title: "Dark Chocolate Soufflés"
 tagline: "Easier than one might expect."
 source: "Adapted from Green & Black's recipe book"
+source_type: book
 serves: "6"
 prep_time: "15 mins"
 cook_time: "10–15 mins"

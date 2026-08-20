@@ -2,6 +2,7 @@
 title: "Plum Sauce for Duck"
 tagline: "This is plum sauce...for duck. This recipe for [slow-cooked duck legs confit](../slow-cooked-duck-legs-confit/) likes plum sauce."
 source: "Henry"
+source_type: person
 serves: "2"
 prep_time: "5 mins"
 cook_time: "15 mins"

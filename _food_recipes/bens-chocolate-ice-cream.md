@@ -2,6 +2,7 @@
 title: "Ben's Chocolate Ice Cream"
 tagline: "Super rich. Real chocolate and all the goodies."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
+source_type: book
 makes: "950 ml"
 prep_time: "20 mins"
 cook_time: "None"

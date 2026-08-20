@@ -2,6 +2,7 @@
 title: "Ben & Jerry's Sweet Cream Base No. 2"
 tagline: "The richest of the three bases from Ben & Jerry. No eggs, no milk, just cream and sugar. It doesn't keep well, just saying."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
+source_type: book
 makes: "950 ml"
 prep_time: "5 mins"
 cook_time: "None"

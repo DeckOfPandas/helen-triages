@@ -2,6 +2,7 @@
 title: "Lemon Feather Sponge"
 tagline: "A genuine delight."
 source: "Adapted from Delia Smith's Book of Cakes"
+source_type: book
 makes: "one 7-inch round cake"
 prep_time: "10 mins"
 cook_time: "40 mins"

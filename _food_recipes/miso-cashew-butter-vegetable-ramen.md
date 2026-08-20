@@ -2,6 +2,7 @@
 title: "Miso and Cashew Butter Vegetable Ramen"
 tagline: "Cashew butter for texture. Whisk, simmer, done."
 source: "Adapted from BBC Food, recipe Rachel Phipps"
+source_type: website
 serves: "2"
 prep_time: "5 mins"
 cook_time: "10–30 mins"

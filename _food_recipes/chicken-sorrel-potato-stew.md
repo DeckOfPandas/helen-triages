@@ -2,6 +2,7 @@
 title: "Chicken, Sorrel and Potato Stew with French Beans and Mustard"
 tagline: "Sorrel is just brilliant, all citrus and tang, and I buy it whenever I can."
 source: "Adapted from Riverford"
+source_type: website
 serves: "2"
 prep_time: "5 mins"
 cook_time: "30 mins"

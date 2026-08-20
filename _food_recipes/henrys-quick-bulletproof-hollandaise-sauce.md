@@ -2,6 +2,7 @@
 title: "Henry's Quick and Bulletproof Hollandaise Sauce"
 tagline: "The search ends here. But read on [below the recipe](#why-hollandaise-is-hard) for sympathy and advice."
 source: "Furious, split and curdled years of swearing at eggs"
+source_type: joke
 serves: "4, generously"
 prep_time: "15 mins"
 cook_time: "10 mins"

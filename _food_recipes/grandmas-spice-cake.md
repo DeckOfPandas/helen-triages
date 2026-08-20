@@ -2,6 +2,7 @@
 title: "Grandma's Spice Cake"
 tagline: "How can you beat this. Change the spices if you like, but this is the original recipe."
 source: "Grandma Kath"
+source_type: person
 makes: "one 7-inch round cake"
 prep_time: "10 mins"
 cook_time: "35 mins"

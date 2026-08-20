@@ -2,6 +2,7 @@
 title: "Pancetta and White Bean Stew"
 tagline: "Use whatever's lurking in the fridge."
 source: "QQ"
+source_type: unknown
 serves: "4"
 prep_time: "15 mins"
 cook_time: "40 mins"

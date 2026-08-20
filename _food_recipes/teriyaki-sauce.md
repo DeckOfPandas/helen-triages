@@ -2,6 +2,7 @@
 title: "Teriyaki Sauce"
 tagline: "Shop-bought? What shop-bought? Never again."
 source: "Adapted from The Daring Gourmet, recipe Kimberly Killebrew"
+source_type: website
 makes: "about 300 ml"
 prep_time: "5 mins"
 cook_time: "5 mins"

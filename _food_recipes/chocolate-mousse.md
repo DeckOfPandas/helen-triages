@@ -2,6 +2,7 @@
 title: "Chocolate Mousse"
 tagline: "Less cream than a classic mousse, so richer, denser, and more intensely chocolate-y. Yes, that's a word."
 source: "Adapted from RecipeTin Eats, recipe Nagi"
+source_type: website
 serves: "4"
 prep_time: "20 mins"
 cook_time: "None"

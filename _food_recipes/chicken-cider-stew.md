@@ -2,6 +2,7 @@
 title: "Chicken and Cider Stew"
 tagline: "Comfort food, but light enough for summer."
 source: "Adapted from Riverford"
+source_type: website
 serves: "4"
 prep_time: "15 mins"
 cook_time: "1 hr"

@@ -2,6 +2,7 @@
 title: "Miso Salmon and Veg Traybake"
 tagline: "Sweet and sticky but still virtuous."
 source: "Adapted from Good Food 2026 calendar"
+source_type: publication
 serves: "2"
 prep_time: "10 mins"
 cook_time: "35 mins"

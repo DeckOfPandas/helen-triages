@@ -2,6 +2,7 @@
 title: "Best-Ever Chocolate Sponge Cake"
 tagline: "Needs no introduction. Stop the search."
 source: "Adapted from Green & Black's Chocolate Recipes"
+source_type: book
 makes: "one double-layer 8-inch cake"
 prep_time: "20 mins"
 cook_time: "20–25 mins"

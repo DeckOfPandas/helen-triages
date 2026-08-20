@@ -2,6 +2,7 @@
 title: "Mixed Spice Powder"
 tagline: "A capsicum-free version, which suffers not at all for the lack."
 source: "Henry"
+source_type: person
 makes: "slightly more than half as much as my spice blender will fit, hmph"
 prep_time: "5 mins"
 cook_time: "None"

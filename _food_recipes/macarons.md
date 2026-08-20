@@ -2,6 +2,7 @@
 title: "Macarons"
 tagline: "Really not as hard as you think."
 source: "Adapted from Gordon Ramsay's Desserts"
+source_type: book
 makes: "64+ tiny macarons"
 prep_time: "30 mins plus 30 mins resting"
 cook_time: "20 mins"

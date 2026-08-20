@@ -2,6 +2,7 @@
 title: "Gordon's Christmas Five-Spice Roast Goose"
 tagline: "Five-spice and citrus cut through goose fat beautifully."
 source: "Adapted from Gordon Ramsay"
+source_type: author
 serves: "6"
 prep_time: "35 mins"
 cook_time: "2–3 hrs depending on weight"

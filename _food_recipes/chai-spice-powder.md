@@ -2,6 +2,7 @@
 title: "Chai Spice Powder"
 tagline: "The best way to spicy bakes and [chai-spiced milk tea](../chai-spiced-milk-tea/)."
 source: "Adapted from indianhealthyrecipes.com"
+source_type: website
 makes: "approx. 75 g"
 prep_time: "2 mins"
 cook_time: "10 mins"

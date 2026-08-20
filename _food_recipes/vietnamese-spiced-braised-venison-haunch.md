@@ -2,6 +2,7 @@
 title: "Vietnamese-Spiced Braised Venison Haunch"
 tagline: "Yeah I know, I'd never seen those words before until now either."
 source: "Helen"
+source_type: person
 serves: "4"
 prep_time: "20 mins"
 cook_time: "2 hrs"

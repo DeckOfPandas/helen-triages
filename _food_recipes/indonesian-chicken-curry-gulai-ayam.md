@@ -2,6 +2,7 @@
 title: "Indonesian Chicken Curry (Gulai Ayam)"
 tagline: "A proper fakeaway, and super freezable. Worth the long list of ingredients."
 source: "Adapted from Good Food, August 2024"
+source_type: publication
 serves: "4"
 prep_time: "20 mins plus marinating"
 cook_time: "1 hr"

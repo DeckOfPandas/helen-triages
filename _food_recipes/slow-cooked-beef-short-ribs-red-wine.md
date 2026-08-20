@@ -2,6 +2,7 @@
 title: "Slow-Cooked Beef Short Ribs in Red Wine"
 tagline: "Sear it, get on with your life for a bit, then squeeze a whole head of roasted garlic all up in there."
 source: "Adapted from Gordon Ramsay's Ultimate Cookery Course"
+source_type: book
 serves: "4"
 prep_time: "20 mins"
 cook_time: "3 hrs 30 mins"

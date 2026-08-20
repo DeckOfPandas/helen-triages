@@ -2,6 +2,7 @@
 title: "Gluten-Free Crumble Topping"
 tagline: "Good for crumble, not just for gluten-free crumble."
 source: "Henry"
+source_type: person
 makes: "Enough to top my 1.5-l Pyrex dish (22 x 17 cm) — about one food processor bowl full"
 prep_time: "5 mins"
 cook_time: "None"
