@@ -56,7 +56,7 @@ notes:
     text: "The 45-minute rest is a requirement."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

@@ -5,7 +5,7 @@ source: "Adapted from The Flavor Bender, recipe Dini"
 makes: "4 eggs"
 prep_time: "10 mins"
 cook_time: "6–7 mins"
-main_ingredients: ["medium eggs", "mirin", "light soy sauce", "dark soy sauce"]
+main_ingredients: ["medium eggs", "mirin", "light soy sauce", "dark soy sauce", "fresh garlic", "fresh ginger", "star anise"]
 star_ingredient: "eggs"
 tags: ["extras"]
 ingredient_groups:
@@ -23,9 +23,8 @@ ingredient_groups:
     - amount: "60 ml"
       item: "dark soy sauce"
       note: "swap for mushroom dark soy sauce for extra umami and a deeper colour"
-    - item: "fresh garlic cloves, sliced ginger, star anise, to taste"
-      note: "infuse if using, see method"
-method_groups:
+    - item: "flavourings like fresh garlic cloves, sliced ginger, star anise, to taste"
+x method_groups:
   - name: "Cook the eggs"
     steps:
       - step: "Boil the eggs in a single layer, at a rolling boil."
@@ -35,10 +34,10 @@ method_groups:
   - name: "Make the marinade"
     steps:
       - "Whisk the mirin and soy sauces together."
-      - "Combine with 60 ml water and the chosen spices in a saucepan, bring to a simmer, then cool to room temperature."
+      - "Combine with 60 ml water and the chosen flavourings in a saucepan, bring to a simmer, then cool to room temperature."
   - name: "Marinate"
     steps:
-      - "Place the peeled eggs in the cooled marinade, in an airtight container where they sit in a single layer. Marinate for at least 2 hours, ideally 8–24 hours."
+      - "Sit the peeled eggs in a single layer in the cooled marinade, in an airtight container. Marinate for at least 2 hours, ideally 8–24 hours."
       - "Store in an airtight container in the fridge for up to 4 days. The marinade can be kept and used for up to 3 weeks."
 method_short:
   - ""
@@ -49,7 +48,7 @@ notes:
     text: "If marinating longer than a day, a splash of water in the marinade helps stop the eggs turning too salty."
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-09"
