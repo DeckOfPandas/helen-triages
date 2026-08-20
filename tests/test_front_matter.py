@@ -17,7 +17,14 @@ from conftest import where
 # an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.food
 
-REQUIRED = ["title", "tagline", "source", "main_ingredients",
+# `source_type` joined this list on 2026-08-20 (issue #406). It is not
+# decoration: nothing in a source STRING says whether it is a magazine or a
+# book -- `Adapted from Good Food` and `Adapted from Gordon Ramsay's Ultimate
+# Cookery Course` are the same shape -- so every rule in
+# tests/test_source_attribution.py reads the type rather than guessing. A recipe
+# without one is a recipe none of those rules can judge, which is worse than a
+# recipe that breaks them.
+REQUIRED = ["title", "tagline", "source", "source_type", "main_ingredients",
             "tags", "ingredient_groups", "method_short", "meta"]
 
 RETIRED = {

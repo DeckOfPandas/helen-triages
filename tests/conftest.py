@@ -114,9 +114,26 @@ class Recipe:
 
 
 def _load(directory: Path) -> list[Recipe]:
+    """Every .md at or below `directory`, recursively.
+
+    RECURSIVE SINCE 2026-08-20, AND IT MATTERS. This used to be `glob("*.md")`,
+    which was correct while `_food_drafts/` was flat. Helen then built a
+    three-stage staging pipeline -- `to-cook/`, `to-rewrite/`, `to-promote/` --
+    and moved drafts into it, at which point every draft test stopped seeing
+    them. Not failing on them: not looking at them, and reporting green.
+
+    That is the same failure `DRAFTS_PRESENT` below exists to prevent, arriving
+    through a new door: a suite that is honest about the files it read and
+    silent about the ones it never opened. The staged drafts are the ones
+    closest to publication, so they were precisely the wrong ones to stop
+    checking.
+
+    `sorted()` over `rglob` orders by full path, so a staged draft sorts under
+    its folder rather than among the flat ones. Ids still come from the stem.
+    """
     if not directory.is_dir():
         return []
-    return [Recipe(p) for p in sorted(directory.glob("*.md"))]
+    return [Recipe(p) for p in sorted(directory.rglob("*.md"))]
 
 
 ALL_RECIPES = _load(RECIPES_DIR)
