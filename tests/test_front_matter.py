@@ -499,10 +499,57 @@ BASELINE_COMMIT = "366f392"   # (fix) the turkey's calculator link opens the tur
 # not whether the change felt small.
 AGENT_TRAILER = "co-authored-by: claude"
 
+# RECIPES HELEN HAS CLEARED ONE AT A TIME, when the baseline is the wrong tool.
+#
+# The baseline is a blunt instrument: it grandfathers EVERYTHING at or before a
+# commit. That is right when the change was sweeping and content-free (a key
+# rename across all 82). It is wrong when a single recipe needs clearing and
+# other recipes are being held on purpose -- sliding the baseline forward to
+# reach the one would quietly release the others too.
+#
+# That case arrived on 2026-08-20. Helen asked for slow-cooked-duck-legs-confit
+# to go back to proofread: true ("this is an exception"), and the same commit
+# had to keep holding beef-wellington and indian-mutton-raan-roast at false,
+# because an agent had just rewritten their citation lines. One baseline cannot
+# express both. So: name the file, and leave the baseline alone.
+#
+# THIS HAS THE SAME WEAKNESS AS THE BASELINE and it is worth saying plainly --
+# an agent can add an entry here to turn a red test green, exactly as it could
+# move a SHA. What makes it better is legibility, not security: a diff that adds
+# a filename, a date and a sentence of reason is something Helen can review at a
+# glance, where a forty-character SHA changing is not. The protection is her
+# eyes on the diff, so make the entry easy to read and never add one she has not
+# asked for in words.
+HELEN_CLEARED: dict[str, str] = {
+    "_food_recipes/slow-cooked-duck-legs-confit.md":
+        "2026-08-20 -- the last of the eight-recipe backlog she re-proofread in "
+        "c07104a. She cleared the other seven in her own commit and this one by "
+        "instruction: 'Duck legs confit can go back to true, please, this is an "
+        "exception.'",
+}
+
 
 def _git(*args):
     return subprocess.run(["git", *args], capture_output=True, text=True,
                           cwd=ROOT).stdout
+
+
+def test_every_cleared_recipe_still_exists():
+    """A HELEN_CLEARED entry naming a file that is gone is a silent hole.
+
+    Renaming a recipe would leave its clearance behind, pointing at nothing --
+    and then the new name is held to the rule again with no sign that it was
+    ever cleared, or worse, a future recipe reusing the old slug inherits a
+    clearance nobody granted it. Cheap to check, so check it.
+    """
+    missing = sorted(p for p in HELEN_CLEARED if not (ROOT / p).exists())
+    assert not missing, (
+        "HELEN_CLEARED names recipe(s) that no longer exist:\n  "
+        + "\n  ".join(missing)
+        + "\n\nIf one was renamed, move its entry to the new path and keep the "
+          "reason. If it was deleted, delete the entry -- do not leave it to be "
+          "inherited by whatever takes the slug next."
+    )
 
 
 def test_agent_edited_recipes_are_not_marked_proofread():
@@ -544,6 +591,8 @@ def test_agent_edited_recipes_are_not_marked_proofread():
         if subprocess.run(["git", "merge-base", "--is-ancestor", commit, base],
                           cwd=ROOT, capture_output=True).returncode == 0:
             continue
+        if relpath in HELEN_CLEARED:
+            continue                                  # cleared by name, see above
         if commit not in agent_commit:
             body = _git("show", "-s", "--format=%B", commit).lower()
             agent_commit[commit] = AGENT_TRAILER in body
