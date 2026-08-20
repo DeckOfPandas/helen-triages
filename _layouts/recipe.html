@@ -47,7 +47,7 @@ layout: default
          site.pdf_downloads is true in _config.yml (deployed site, and the
          localhost:4002 mockup that exists to show what deploys) and false in
          _config_local.yml (localhost:4001). Same two-layer split the site
-         already uses for show_unrewritten, rather than a third idea of what
+         already uses for show_source_wording, rather than a third idea of what
          "production" means. {% endcomment %}
       {% if site.pdf_downloads %}
         <a href="{{ '/food/recipes/' | append: page.slug | append: '.pdf' | relative_url }}">pdf</a>

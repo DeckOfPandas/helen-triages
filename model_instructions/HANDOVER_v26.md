@@ -67,7 +67,7 @@ Local URL: `http://localhost:4001/helen-triages/`, then `/food/` or `/cocktails/
 startup — restart the server after any change to it, or you'll debug a site
 that's actually fine for an hour.
 
-`_config_local.yml` overrides two things: `show_unrewritten: true` and the
+`_config_local.yml` overrides two things: `show_source_wording: true` and the
 `food_drafts` collection. Never put a baseurl in it.
 
 **Never write to machine `/tmp`.** Use a `tmp/` folder inside this repo — it's
@@ -498,7 +498,7 @@ twice on 2026-08-20.** Establish this by measurement before acting on it:
   fourth time prose has defeated a source-scanning guard in this repository**
   (§12), and the escalation path is the same one that worked before: strip
   comments and string literals before matching, or parse rather than grep.
-- `show_unrewritten` in `_config.yml` is an unrelated CONFIG flag that governs
+- `show_source_wording` in `_config.yml` is an unrelated CONFIG flag that governs
   whether unrewritten recipes publish at all. It shares a substring and nothing
   else, and it is the obvious trap for anyone grepping this out.
 

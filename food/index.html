@@ -36,7 +36,7 @@ permalink: /food/
     {% assign all_recipes = all_recipes | concat: site.food_drafts %}
   {% endif %}
   {% assign all_recipes = all_recipes | sort: "title" %}
-  {% assign _rendered_recipes = all_recipes | where_exp: "r", "r.meta.rewritten or site.show_unrewritten" %}
+  {% assign _rendered_recipes = all_recipes | where_exp: "r", "r.meta.rewritten or site.show_source_wording" %}
 
   {% comment %} Stars are DECLARED in _data/taxonomy.yml, not derived from front
      matter. Deriving meant a typo silently minted a new star ingredient. {% endcomment %}
@@ -203,7 +203,7 @@ permalink: /food/
     </div>
   </div>
 
-  {% if site.show_unrewritten %}
+  {% if site.show_source_wording %}
   <div class="category category--meta">
     <div class="category-label-row">
       <span class="category-label"><span class="category-label-text">META FILTERS</span></span>
@@ -232,7 +232,7 @@ permalink: /food/
 
 <ul class="recipe-list">
   {% for recipe in all_recipes %}
-    {% if recipe.meta.rewritten or site.show_unrewritten %}
+    {% if recipe.meta.rewritten or site.show_source_wording %}
       {% assign is_draft = false %}
       {% if recipe.collection == "food_drafts" %}{% assign is_draft = true %}{% endif %}
 
@@ -381,7 +381,7 @@ permalink: /food/
             {% include recipe_badges.html recipe=recipe %}
           </div>
           <div class="badge-group-meta">
-            {% if site.show_unrewritten %}
+            {% if site.show_source_wording %}
               {% unless recipe.meta.rewritten %}<span class="badge badge-meta-rewrite">needs rewrite</span>{% endunless %}
               {% unless recipe.meta.proofread %}<span class="badge badge-meta-proofread">needs proofread</span>{% endunless %}
             {% endif %}

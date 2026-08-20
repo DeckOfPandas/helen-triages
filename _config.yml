@@ -37,8 +37,21 @@ description: What not How.
 url: "https://deckofpandas.github.io"
 baseurl: "/helen-triages"
 
-# Drafts and unrewritten recipes are never shown in production.
-show_unrewritten: false
+# Whether the index shows recipes still carrying the SOURCE'S wording -- ones
+# where `meta.rewritten` is false, so Helen hasn't yet put the prose in her own
+# voice. False here, so production shows only recipes she has rewritten;
+# _config_local.yml sets it true so you can see and work on the rest.
+#
+# RENAMED FROM `show_unrewritten` 2026-08-21, Helen's ask. "show" plus "un" is
+# two negations to hold at once, and the old name also read as though it were
+# about DRAFTS. It never was: drafts are hidden by `output: false` on the
+# collection, a completely separate mechanism, and someone flipping this hoping
+# to see drafts would get unrewritten recipes instead. The old comment here said
+# "Drafts and unrewritten recipes are never shown in production", which was true
+# of production but wrong about this flag, which governs only the second half.
+#
+# Read four times in food/index.html and nowhere else.
+show_source_wording: false
 
 # Whether a recipe page offers its "pdf" link (GitHub issue #86). True here, so
 # it appears both on the deployed site and on the jekyll-prod mockup, which
