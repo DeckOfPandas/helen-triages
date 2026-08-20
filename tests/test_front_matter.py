@@ -32,7 +32,8 @@ RETIRED = {
                   "2026-08-12; a leftover value is dead weight, not data",
 }
 
-MISPLACED_META = ["rewritten", "proofread", "cooked_before", "date_last_edited"]
+MISPLACED_META = ["rewritten", "proofread", "cooked_before", "date_last_edited",
+                   "claude_rewritten"]
 
 
 @pytest.mark.parametrize("field", REQUIRED)
@@ -221,6 +222,23 @@ def test_meta_block_complete(recipe):
         f"{where(recipe)} `meta:` is missing {missing}. "
         f"All three are booleans and all three must be present — a missing one "
         f"reads as false, which is indistinguishable from a deliberate false."
+    )
+
+
+def test_claude_rewritten_is_a_real_boolean(recipe):
+    """`meta.claude_rewritten` is optional and additive (issue #418) -- most
+    files won't have it, and that's fine, unlike `rewritten`/`proofread`/
+    `cooked_before` this doesn't gate anything today. But a quoted "true"
+    would be the same silent trap `awaiting_fix` already had, so it's worth
+    catching before anything ever comes to depend on the value being a real
+    bool rather than a truthy string.
+    """
+    meta = recipe.fm.get("meta")
+    if not isinstance(meta, dict) or "claude_rewritten" not in meta:
+        return
+    assert isinstance(meta["claude_rewritten"], bool), (
+        f"{where(recipe)} has `meta.claude_rewritten: {meta['claude_rewritten']!r}`, "
+        f"not a real boolean. Never quote it."
     )
 
 

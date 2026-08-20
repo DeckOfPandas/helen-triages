@@ -426,11 +426,30 @@ notes:                           # always a list, never a blob
     text: "If it sinks, you added too much syrup."
 meta:
   rewritten: false
+  claude_rewritten: false        # optional; see below — not the same claim as rewritten
   proofread: false               # false = Helen has not blessed THIS text
   awaiting_fix: false            # true  = do not publish this page at all
   cooked_before: false
   date_last_edited: "2026-07-29"
 ```
+
+**`meta.claude_rewritten` (optional, issue #418) records that Claude took a tidy-up
+pass at a draft — suggesting `main_ingredients`, ingredient/method groups, and
+smoothing wording toward Helen's voice — not that the recipe is actually
+rewritten.** `meta.rewritten` is the real claim, and only Helen sets it true.
+Request a pass either directly ("tidy this one up for me") or by dropping
+drafts into `_food_drafts/to_rewrite/`, mirroring the informal `to_promote/`
+staging folder Helen already uses the same way — neither subfolder is read by
+the draft test suite (`_food_drafts/*.md` is top-level only), so files sitting
+there aren't "in the collection" yet. **`QQ PLACEHOLDER` survives a
+Claude-assisted pass.** Tidying structure and wording is not the same thing as
+Helen actually rewriting a step in her own voice — the marker only comes off
+once she says so, same reasoning as the `proofread` rule in §4.0. Considered
+and rejected for now: renaming `rewritten` → `human_rewritten` for symmetry —
+would touch every file in `_food_recipes/` and interact with the
+`proofread`-invalidation rule; cheap to revisit now that #417's `INVISIBLE_KEYS`
+mechanism exists to exempt a content-free rename like that from needing
+`proofread: false` on every recipe.
 
 **`short_name` retired 2026-08-12, GitHub issue #169.** Confirmed zero
 references anywhere in `_layouts/`, `_includes/`, `assets/js/`, or `food/`
