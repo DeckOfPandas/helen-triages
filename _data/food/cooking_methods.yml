@@ -648,7 +648,7 @@ beef:
     before: []
     after:
     - kind: weight
-      html: '<strong>Weight range:</strong> formulas hold well for <strong>1–4 kg</strong>. Below 1 kg, treat like a large steak and check early. Above 4–5 kg, switch to thermometer-only timing. Doneness temperatures: see <a href="../temperatures/#beef-tender-roasting-cuts">temperature charts</a>.'
+      html: '<strong>Weight range:</strong> formulas hold well for <strong>1–4 kg</strong>. Below 1 kg, treat like a large steak and check early. Above 4–5 kg, switch to thermometer-only timing. Doneness temperatures: see <a href="../internal-temperatures/#beef-tender-roasting-cuts">temperature charts</a>.'
     - kind: sources
       html: 'Sources: <a href="https://www.waitrose.com/ecom/content/inspiration/guides/roast-guide">Waitrose''s roast guide</a> (20 min/500g rare, 25 min/500g medium, at 160°C fan) and Certified Angus Beef for the standard/sear rates. River Cottage''s slow-roast method for the reverse-sear row (flagged moderate confidence — sourced for one joint size, not a range of weights). Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
   - name: Tough/working cuts — brisket, chuck, short rib, pot roast
@@ -664,7 +664,7 @@ beef:
       html: Cooked low and slow until <em>tender</em>, not to a doneness temperature — timing below is a planning estimate only.
     after:
     - kind: weight
-      html: '<strong>Weight range:</strong> holds well <strong>1.5–4.5 kg</strong>. Below 1.5 kg, check early to avoid overshooting into dryness. Above 4.5–5 kg (full packer brisket), go by tenderness rather than extrapolating the formula. Endpoint temperature: see <a href="../temperatures/#beef-tender-roasting-cuts">temperature charts</a>.'
+      html: '<strong>Weight range:</strong> holds well <strong>1.5–4.5 kg</strong>. Below 1.5 kg, check early to avoid overshooting into dryness. Above 4.5–5 kg (full packer brisket), go by tenderness rather than extrapolating the formula. Endpoint temperature: see <a href="../internal-temperatures/#beef-tender-roasting-cuts">temperature charts</a>.'
     - kind: sources
       html: 'Sources: collagen-breakdown temperature (90–96°C, on the temperature charts) and short rib/pot roast timings confirmed against standard BBQ/braise references — 195–205°F (90–96°C) is the widely-cited fall-apart range, and ~300°F/149°C for ~3 hrs matches typical short rib recipes. Brisket low-and-slow rate corrected against widely-cited BBQ/oven guidance for the same ~121°C bracket. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 pork:
@@ -827,9 +827,9 @@ pork:
     before: []
     after:
     - kind: weight
-      html: '<strong>Weight range:</strong> holds well <strong>1.5–4.5 kg</strong> (loin/leg). Below 1.5 kg (or tenderloin generally), check well before the formula suggests. Above 4.5–5 kg, drop toward the low-temp end of the range. Doneness temperatures: see <a href="../temperatures/#pork">temperature charts</a>.'
+      html: '<strong>Weight range:</strong> holds well <strong>1.5–4.5 kg</strong> (loin/leg). Below 1.5 kg (or tenderloin generally), check well before the formula suggests. Above 4.5–5 kg, drop toward the low-temp end of the range. Doneness temperatures: see <a href="../internal-temperatures/#pork">temperature charts</a>.'
     - kind: safety
-      html: <strong>FOOD SAFETY:</strong> the doneness figures this timing table cooks toward (see <a href="../temperatures/#pork">temperature charts</a>) include a "medium, slightly pink" option at 60–62°C that does not clear the UK FSA's own core-temperature guidance for pork specifically — unlike beef or lamb, FSA doesn't treat pink pork the same as pink beef. Full detail on the temperature charts; flagging here too since this is the page you'd actually be timing against mid-cook.
+      html: <strong>FOOD SAFETY:</strong> the doneness figures this timing table cooks toward (see <a href="../internal-temperatures/#pork">temperature charts</a>) include a "medium, slightly pink" option at 60–62°C that does not clear the UK FSA's own core-temperature guidance for pork specifically — unlike beef or lamb, FSA doesn't treat pink pork the same as pink beef. Full detail on the temperature charts; flagging here too since this is the page you'd actually be timing against mid-cook.
     - kind: sources
       html: 'Sources: <a href="https://www.goodto.com/food/how-to/how-to-roast-pork-294839">Good To Know</a> and Village Butchers for the leg/crackling rate (~30 min/500g = ~60 min/kg after a blast). US-style guidance (~40 min/kg at 175–180°C) for lean loin — kept as a separate row rather than overwriting the leg rate, since the two cuts genuinely cook at different speeds. <a href="https://www.waitrose.com/ecom/content/inspiration/guides/roast-guide/roast-pork">Waitrose''s roast guide</a> and a BBC pork fillet recipe for the tenderloin correction. Low-temp reverse-sear rate confirmed against Kenji López-Alt/Serious Eats practice, unchanged. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
   - name: Slow-cooked cuts — shoulder/pork butt, belly
@@ -993,7 +993,7 @@ lamb:
     before: []
     after:
     - kind: weight
-      html: '<strong>Weight range:</strong> holds well for leg roasts <strong>1.5–3.5 kg</strong>. Below 1.5 kg (or rack/saddle generally), check well before the formula suggests. Above 3.5–4 kg, drop toward the low-temp end. Doneness temperatures: see <a href="../temperatures/#lamb">temperature charts</a>.'
+      html: '<strong>Weight range:</strong> holds well for leg roasts <strong>1.5–3.5 kg</strong>. Below 1.5 kg (or rack/saddle generally), check well before the formula suggests. Above 3.5–4 kg, drop toward the low-temp end. Doneness temperatures: see <a href="../internal-temperatures/#lamb">temperature charts</a>.'
     - kind: sources
       html: 'Sources: <a href="https://www.jamieoliver.com/recipes/lamb/perfect-roast-leg-of-lamb/">Jamie Oliver''s roast leg of lamb</a> for the high-heat-start rate. American Lamb Board figures for the standard-roast caveat (indirect — different temperature, not a confirmed correction). Rack rewrite based on real 400–600g rack recipes running 15–25 min total regardless of the min/kg maths. Low-temp rows and doneness table weren''t flagged by research — doneness in particular tracks closely to Serious Eats'' figures. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
   - name: Slow-cooked cuts — shoulder, breast
@@ -1173,9 +1173,9 @@ ham:
     before: []
     after:
     - kind: weight
-      html: '<strong>Weight range:</strong> holds for <strong>2–5 kg</strong> (bone-in) or <strong>1.8–4.5 kg</strong> (boneless). Doneness temperatures: see <a href="../temperatures/#ham">temperature charts</a>.'
+      html: '<strong>Weight range:</strong> holds for <strong>2–5 kg</strong> (bone-in) or <strong>1.8–4.5 kg</strong> (boneless). Doneness temperatures: see <a href="../internal-temperatures/#ham">temperature charts</a>.'
     - kind: safety
-      html: <strong>FOOD SAFETY:</strong> a fresh ham is pork leg, so the same flag applies as pork above — the "hint of pink" doneness option (60–62°C) on the <a href="../temperatures/#ham">temperature charts</a> page does not clear FSA's pork-specific guidance. The well-done option does.
+      html: <strong>FOOD SAFETY:</strong> a fresh ham is pork leg, so the same flag applies as pork above — the "hint of pink" doneness option (60–62°C) on the <a href="../internal-temperatures/#ham">temperature charts</a> page does not clear FSA's pork-specific guidance. The well-done option does.
     - kind: sources
       html: 'Sources: this table''s timing rates were mostly confirmed as-is against UK guides (~30–40 min/kg at 180°C is the common range; a 220–230°C blast for 20–30 min then 180°C at ~30–40 min/kg also matches typical practice) — no changes made here, unlike the cured table below. Checked once, 2026-08-12 — tidy/remove this note once you''ve confirmed a row yourself.'
   - name: Cured (and/or smoked) whole ham — bone-in or boneless
@@ -1191,7 +1191,7 @@ ham:
       html: 'Assumes a raw-cured ham that still needs cooking — check packaging first: "cook before eating" and "ready to eat" are handled differently.'
     after:
     - kind: weight
-      html: '<strong>Weight range:</strong> cured hams usually sold <strong>2–4.5 kg</strong> bone-in. Doneness pull temp: see <a href="../temperatures/#ham">temperature charts</a> (target corrected to 70–75°C — was 68–72°C, a touch under both Waitrose''s and FSA''s figures).'
+      html: '<strong>Weight range:</strong> cured hams usually sold <strong>2–4.5 kg</strong> bone-in. Doneness pull temp: see <a href="../internal-temperatures/#ham">temperature charts</a> (target corrected to 70–75°C — was 68–72°C, a touch under both Waitrose''s and FSA''s figures).'
     - kind: caveat
       html: <strong>Caveat:</strong> cured ham labelling varies a lot (unsmoked vs smoked, wet vs dry-cured, cook-before-eating vs ready-to-eat) — check packaging instructions against the thermometer reading rather than relying on generic figures.
     - kind: sources
@@ -1324,7 +1324,7 @@ venison:
     before: []
     after:
     - kind: weight
-      html: '<strong>Weight range:</strong> holds well for haunches <strong>1.3–2.5 kg</strong>, which is most of what is sold. Below that, or for loin, saddle and rack generally, time by the piece and check early — venison is lean enough that the margin between pink and grey is a few minutes. Doneness temperatures: see <a href="../temperatures/#venison-tender-roasting-cuts">temperature charts</a>.'
+      html: '<strong>Weight range:</strong> holds well for haunches <strong>1.3–2.5 kg</strong>, which is most of what is sold. Below that, or for loin, saddle and rack generally, time by the piece and check early — venison is lean enough that the margin between pink and grey is a few minutes. Doneness temperatures: see <a href="../internal-temperatures/#venison-tender-roasting-cuts">temperature charts</a>.'
     - kind: sources
       html: 'Sources: Sainsbury''s Magazine and Great British Recipes for the high-heat-start rates. That row is the one place on this table where the fan figure is stated rather than converted by us — Great British Recipes prints "200 FAN" then "160 FAN", Sainsbury''s Magazine prints "fan 200°C" then "fan 140°C", which is why the drop is given as a range rather than a single figure. Church Farm Oxford for the constant roast, the Wild Meat Company for the foil-wrapped row, and Farmfetch for the rack and the loin. Eversfield Organic''s 20 mins per 500 g is an outlier — roughly 1.6× the other three at the same oven temperature — so it is cited here rather than averaged in.'
   - name: Slow-cooked cuts — shoulder, neck, shank
@@ -1340,6 +1340,6 @@ venison:
       html: Cooked past any doneness temperature until the collagen gives way — the timing below is a planning estimate, not a target.
     after:
     - kind: weight
-      html: '<strong>Weight range:</strong> shoulders are usually <strong>1.5–3 kg</strong>. Shanks are sold by the piece and timed that way, so no per-kg rate applies to them. Endpoint temperature: see <a href="../temperatures/#venison-slow-cooked-cuts">temperature charts</a>.'
+      html: '<strong>Weight range:</strong> shoulders are usually <strong>1.5–3 kg</strong>. Shanks are sold by the piece and timed that way, so no per-kg rate applies to them. Endpoint temperature: see <a href="../internal-temperatures/#venison-slow-cooked-cuts">temperature charts</a>.'
     - kind: sources
       html: 'Sources: the Wild Meat Company''s pulled venison for the low-and-slow row, with the Great British Food Awards for its oven temperature — it prints "170°C/Fan 150°C", so that is a stated fan figure rather than one we converted. Farmfetch for the pot roast. Shooting UK, Great British Chefs and the Wild Meat Company for the shanks: the 2–3 hr spread between them is real disagreement about how big a shank is, not a rounding of one figure. Neck has no row of its own because no UK source publishes a venison neck timing — every neck recipe found was American — so it is folded in with the shoulder rows, at the same rate, and the group name says so.'

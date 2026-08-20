@@ -76,7 +76,10 @@
     doneat: root.querySelector("#ct-doneat"),
     table: root.querySelector("#ct-table"),
     out: root.querySelector("#ct-results"),
-    summary: root.querySelector("#ct-summary")
+    summary: root.querySelector("#ct-summary"),
+    // The two halves the dropdown swaps between -- issue #412.
+    calculator: root.querySelector("#ct-calculator"),
+    fish: root.querySelector("#ct-fish-shellfish")
   };
 
   /* --- render -------------------------------------------------------------- */
@@ -98,6 +101,16 @@
   }
 
   function render() {
+    /* THE SWAP, BEFORE ANYTHING ELSE. `protein` is undefined for the fish entry
+       -- it is not in METHODS by design -- so every line below would throw on
+       protein.label. Returning here is not an early-return-on-empty of the kind
+       HANDOVER §12 warns about: this is a different mode of the page, not an
+       absent value. */
+    var showingFish = els.protein.value === FISH_KEY;
+    if (els.calculator) els.calculator.hidden = showingFish;
+    if (els.fish) els.fish.hidden = !showingFish;
+    if (showingFish) return;
+
     var protein = METHODS[els.protein.value];
     var kg = parseFloat(els.weight.value);
     var doneness = "rare";
@@ -116,8 +129,20 @@
     var temp = CS.finishingTemp(TEMPS, protein.internal_temp_ref);
     els.doneat.innerHTML = temp
       ? "<strong>Done at " + temp + "</strong>" +
+        /* ../internal-temperatures/, renamed by issue #384. This link is BUILT
+           AT RUNTIME, which is why the rename missed it and why nothing caught
+           it: tests/test_page_links.py reads `<a href>` attributes out of
+           templates, and the production-build scanner reads static HTML, so a
+           link that does not exist until JS runs is invisible to both. It
+           pointed at a deleted page for a day.
+
+           Relative rather than root-relative, deliberately: JS has no Liquid
+           and so no `relative_url`, and a literal /food/... would drop the
+           /helen-triages baseurl and 404 in production while working perfectly
+           on localhost -- the same trap HANDOVER §4 records for front matter.
+           `../` resolves against the current page's URL, baseurl included. */
         (protein.chart_anchor
-          ? "<a href='../temperatures/#" + protein.chart_anchor +
+          ? "<a href='../internal-temperatures/#" + protein.chart_anchor +
             "'>see other doneness</a>"
           : "")
       : "";
@@ -251,6 +276,20 @@
      existed to reload the rest figure; the re-render is driven by the delegated
      input/change listeners at the bottom of this file, as it always was. */
 
+  /* FISH AND SHELLFISH ARE A DROPDOWN ENTRY, NOT A PROTEIN -- issue #412.
+     Picking it puts the calculator away and shows the static section instead.
+
+     The value is deliberately not a key in METHODS and never can be: every
+     entry there carries a weight-driven rate, and these two have none. Fish is
+     governed by thickness and shellfish by the moment the shell opens, so there
+     is nothing for a weight box to compute. Helen: "Not cooked by time."
+
+     It sits LAST in the list rather than alphabetically among the proteins,
+     because it is a different kind of answer -- the nine above all respond to
+     the weight box, and this one replaces it. */
+  var FISH_KEY = "fish-shellfish";
+  var FISH_LABEL = "Fish and shellfish";
+
   function fillProteins() {
     CS.proteinOrder(METHODS).forEach(function (key) {
       var opt = document.createElement("option");
@@ -258,6 +297,10 @@
       opt.textContent = METHODS[key].label;
       els.protein.appendChild(opt);
     });
+    var fish = document.createElement("option");
+    fish.value = FISH_KEY;
+    fish.textContent = FISH_LABEL;
+    els.protein.appendChild(fish);
   }
 
   fillProteins();

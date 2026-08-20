@@ -204,7 +204,12 @@
 .back-to-index {
   display: inline-block;
   font-family: $font-headings;
-  font-size: 1.1rem;
+  // 1.1rem -> 3rem, issue #411. I tried 1.6rem first, reasoning it should sit
+  // near the 28px the nav icons took in #388; Helen looked at it and asked for
+  // 3rem. Worth recording which of us was measuring and which was looking:
+  // matching the nav icons was the wrong target, because this is the only
+  // control on a recipe page and has no row of siblings to be consistent with.
+  font-size: 3rem;
   line-height: 1;
   color: $color-clear-text;
   text-decoration: none;

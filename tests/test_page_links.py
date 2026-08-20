@@ -585,3 +585,91 @@ def test_chart_anchor_fragments_exist_on_the_temperatures_page():
         f"temperatures' straight to that fragment, so a wrong or renamed anchor "
         f"here is a silent do-nothing link on a live recipe page, not a 404."
     )
+
+
+# Paths this file's other checks cannot see, because they do not exist until a
+# script runs. A quoted `../slug/` or `/food/...` inside assets/js/ is a real
+# link the moment the page is used, and is invisible to every scan above.
+JS_PATH_LITERAL = re.compile(r"""['"](\.\./[a-z0-9\-/]+/|/food/[a-z0-9\-/]+/)""")
+
+
+def test_links_built_outside_templates_still_resolve():
+    """A URL that is not an `<a href>` in a template is still a URL, and rots.
+
+    THIS WAS A LIVE BROKEN LINK FOR A DAY. Issue #384 renamed
+    /food/reference/temperatures/ to /food/reference/internal-temperatures/, and
+    every reference to it was updated except one: cook-timer.js builds the "see
+    other doneness" link by string concatenation, `"<a href='../temperatures/#"
+    + protein.chart_anchor`. It pointed at a deleted page on every visit to the
+    methods page.
+
+    NEITHER EXISTING CHECK COULD HAVE FOUND IT, and the reasons are worth
+    keeping because they are the shape of the hole rather than the instance:
+
+      - test_internal_links_point_at_a_published_page reads `<a href="...">`
+        attributes out of TEMPLATES. This link is a string in a .js file; there
+        is no attribute to match.
+      - test_no_link_in_the_production_build_points_at_a_file_that_isnt_there
+        reads the BUILT html. This link does not exist in the built html either
+        -- it is created at runtime, in the browser, from data.
+
+    So the rename was verified twice, thoroughly, by two scanners that between
+    them could not see the one place it was wrong.
+
+    IT WAS TEN MORE PLACES, in fact, and they hid better. `cooking_methods.yml`
+    carries per-method asides and safety notes as raw HTML strings, which the
+    page emits inside a `<script type="application/json">` blob. In the built
+    file those read `href=\\"../temperatures/#pork\\"` -- escaped, inside JSON,
+    inside a script tag -- so the built-html scanner's `<a href="...">` pattern
+    cannot match them either. They were rendered into live links by the
+    calculator on every visit.
+
+    `scripts/build_cooking_methods_prose.py` is not scanned directly: its
+    LINK_FIXES table rewrites these links on the way into the data, so a stale
+    entry there shows up as stale data, which IS scanned. Scanning the script as
+    well would flag the prose in its own comments, which is the trap HANDOVER
+    §12 records four times over.
+
+    Deliberately blunt: it matches quoted path-shaped literals in assets/js/ and
+    checks each against the published-page set, with no attempt to understand
+    the surrounding code. A false positive means a script holds a string that
+    looks like a site path and is not one, which is worth a comment and a moment
+    of thought rather than a cleverer regex.
+    """
+    sources = sorted((ROOT / "assets" / "js").glob("*.js")) + \
+              sorted((ROOT / "_data").rglob("*.yml"))
+    assert sources, (
+        "No scripts or data files found -- either they moved or these globs "
+        "went stale, and a scan that finds nothing passes."
+    )
+
+    problems = []
+    checked = 0
+    for path in sources:
+        for raw in JS_PATH_LITERAL.findall(path.read_text(encoding="utf-8")):
+            checked += 1
+            if raw.startswith("/food/"):
+                target = raw
+            else:
+                # `../slug/` in a script on a /food/reference/<page>/ URL. Only
+                # the reference pages build relative links today, so that is the
+                # base assumed; a script elsewhere doing this wants its own case
+                # here rather than a silent guess.
+                target = "/food/reference/" + raw[len("../"):]
+            if target not in PAGES:
+                problems.append(f"{path.name}: '{raw}' -> {target}, no published page there")
+
+    assert checked, (
+        "No path-shaped literals found in any script. Either none builds a URL "
+        "any more -- in which case delete this test -- or the pattern stopped "
+        "matching, which would leave it green and useless."
+    )
+    assert not problems, (
+        "Link(s) built in JavaScript point at pages that do not exist:\n  "
+        + "\n  ".join(problems)
+        + "\n\nThese are invisible to the template and built-html scanners in "
+          "this file, so nothing else will catch them. Keep them relative "
+          "(`../slug/`) rather than root-relative: a script has no Liquid, and "
+          "a literal /food/... drops the baseurl and 404s in production while "
+          "working on localhost."
+    )
