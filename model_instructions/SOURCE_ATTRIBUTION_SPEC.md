@@ -10,19 +10,25 @@ source: "Adapted from Gordon Ramsay's Ultimate Cookery Course"
 source_type: book
 ```
 
+**This is enforced.** `tests/test_source_attribution.py` checks every rule below
+against all 82 recipes and all 314 drafts. `source_type` is in `REQUIRED`, so a
+recipe without one fails too. You will not get a citation past the suite by
+being close enough.
+
 ---
 
 ## The eight types
 
-`source_type` is one of exactly these. It is not free text.
+`source_type` is one of exactly these. It is not free text. `magazine` is the
+near-miss that has already been typed once by hand — it is `publication`.
 
 | `source_type` | What it is | `source` shape | Example |
 |---|---|---|---|
-| `publication` | A magazine or periodical | `Adapted from <title>, <Month> <Year>` | `Adapted from Good Food, January 2026` |
-| `publication` | …with a named author | `Adapted from <title>, <Month> <Year>, <Firstname Lastname>` | `Adapted from Good Food, January 2026, Sarah Cook` |
+| `publication` | A print issue — **always dated** | `Adapted from <title>, <date>` | `Adapted from Good Food, January 2026` |
+| `publication` | …with a named author | `Adapted from <title>, <date>, <Firstname Lastname>` | `Adapted from Good Food, January 2026, Sarah Cook` |
 | `book` | A named book | `Adapted from <title>, <Firstname Lastname>` | `Adapted from French Provincial Cooking, Elizabeth David` |
 | `book` | …author not recorded | `Adapted from <title>` | `Adapted from Healthier Baking` |
-| `website` | A site or blog | `Adapted from <site>, recipe <Firstname Lastname>` | `Adapted from RecipeTin Eats, recipe Nagi` |
+| `website` | A site or blog — **never dated** | `Adapted from <site>, recipe <Firstname Lastname>` | `Adapted from RecipeTin Eats, recipe Nagi` |
 | `website` | …author not recorded | `Adapted from <site>` | `Adapted from indianhealthyrecipes.com` |
 | `author` | A published cook, work not recorded | `Adapted from <Name>` | `Adapted from Delia Smith` |
 | `person` | Someone Helen knows | a bare label | `Henry`, `Grandma Kath`, `Good friend Daniel` |
@@ -36,38 +42,52 @@ source_type: book
 
 **1. "Adapted from" prefixes published work, and only published work.**
 `publication`, `book`, `website` and `author` all take it. `person`, `place`,
-`joke` and `unknown` are bare labels and must **not** take it.
+`joke` and `unknown` are bare labels and must **not**.
 
-Helen's wording: *"Bare labels don't need 'adapted from', only work published by
-other people."* And, on why the prefix is always truthful for the rest: *"When
+Helen: *"Bare labels don't need 'adapted from', only work published by other
+people."* And on why the prefix is always truthful for the rest: *"When
 `rewritten == true`, we can always say 'adapted from' truthfully, so that should
 always be there."*
 
-**2. Website first, author second. Never the reverse.**
-`Adapted from <site>, recipe <person>`. The word `recipe` is the separator and
-is what distinguishes a `website` from a `book` — `Adapted from X, Y` is a book
-with an author; `Adapted from X, recipe Y` is a site with an author.
+**2. THE DATE IS WHAT SEPARATES A PUBLICATION FROM A WEBSITE.** This is the most
+important rule here and the one most likely to catch you out.
 
-**3. No publishers.** A citation names the source, not who printed it.
+- A `publication` **must** carry a date.
+- A `website` **must not**.
+
+A year on its own is a complete date — `Adapted from Good Food, 2025`. Helen:
+*"Online magazines don't have a publication schedule like print ones do."*
+
+This is not a fudge, it's the actual difference. `Good Food` is genuinely both:
+11 drafts cite the October 2025 print issue, and 31 cited the site with no date
+at all. **If you have no date, it is the website.** Sixty-four drafts were
+retyped on this rule.
+
+**3. Website first, author second, separated by `, recipe `.**
+`Adapted from <site>, recipe <person>`. That separator is load-bearing:
+`Adapted from X, Y` is a book and its author, `Adapted from X, recipe Y` is a
+site and the person who wrote the recipe on it. Without it the two shapes are
+identical.
+
+**4. Name a site by its bare domain or its name — not a full URL.**
+`kitchenofdebjani.com`, not `https://kitchenofdebjani.com/`. The source line
+renders as **plain text, not a link** (`_layouts/recipe.html:142`), so a
+protocol and trailing slash are just noise on the page.
+
+**5. No publishers.** A citation names the source, not who printed it.
 `(Hodder & Stoughton)` and anything like it comes out.
 
-**4. The date on a `publication` is highly preferred but strictly optional.**
-Include the month and year whenever you know them. A citation without one is
-legal — two exist (`Adapted from delicious. magazine`) — but see the ratchet
-below before adding another.
-
-**5. Jokes are exempt.** Four recipes cite the experience that produced them
-rather than a source. They are outside the spec, not in violation of it, and
+**6. Jokes are exempt.** Four recipes cite the experience that produced them
+rather than a source. They are outside the shapes, not in violation of them, and
 `source_type: joke` is what marks that. Do not "fix" them.
 
-**6. `QQ` means nobody has established it.** Not `Unknown`, not blank — those
+**7. `QQ` means nobody has established it.** Not `Unknown`, not blank — those
 read as a finished answer and as nothing-to-see respectively, and neither is
-true. **`QQ` deliberately fails `tests/test_style.py::test_no_qq_placeholder`
-and blocks the build.** That is the intended behaviour: an unfinished citation
-should be impossible to ignore. Helen: *"QQ should be allowed, but will break a
-test and block build, which is fine."*
+true. **`QQ` deliberately fails `test_no_qq_placeholder` and blocks the build.**
+That is intended: an unfinished citation should be impossible to ignore. Helen:
+*"QQ should be allowed, but will break a test and block build, which is fine."*
 
-**7. One work, one spelling.** `Sunlight Cafe` and `Sunlight Café` in two
+**8. One work, one spelling.** `Sunlight Cafe` and `Sunlight Café` in two
 recipes is a bug. So is a trailing full stop on one of a matched pair.
 
 ---
@@ -78,8 +98,8 @@ Because the string cannot be classified by pattern. These two are the same
 shape and different kinds of thing:
 
 ```
-Adapted from Good Food                               → publication, no date
-Adapted from Gordon Ramsay's Ultimate Cookery Course → book, complete
+Adapted from Good Food                               → the website
+Adapted from Gordon Ramsay's Ultimate Cookery Course → a book, complete
 ```
 
 No regex separates them. So the recipe declares its own type, and the tests read
@@ -87,37 +107,31 @@ that rather than guessing.
 
 **`source_type` renders nowhere.** No layout, include, plugin or script reads
 it — only tests do. It is listed in `INVISIBLE_KEYS` in
-`tests/test_front_matter.py`, which means **adding or changing it does not
+`tests/test_front_matter.py`, which means **adding or correcting it does not
 invalidate Helen's proofread and must not flip `meta.proofread`**. That
-exemption is verified, not merely asserted:
-`test_invisible_keys_are_really_invisible` greps the render surface and fails if
-anything starts reading the key.
+exemption is verified, not asserted: `test_invisible_keys_are_really_invisible`
+greps the render surface and fails if anything starts reading the key.
 
 Any *other* edit to a recipe still flips `meta.proofread: false` in the same
 commit. See CLAUDE.md.
 
 ---
 
-## The current corpus — 82 recipes
+## The current corpus
 
-| Count | `source_type` |
-|---|---|
-| 21 | `person` |
-| 20 | `website` |
-| 17 | `book` |
-| 9 | `publication` |
-| 8 | `author` |
-| 4 | `joke` |
-| 2 | `unknown` |
-| 1 | `place` |
+| `source_type` | Recipes | Drafts |
+|---|---|---|
+| `website` | 23 | 115 |
+| `person` | 22 | 2 |
+| `book` | 17 | 42 |
+| `author` | 8 | 7 |
+| `publication` | 7 | 82 |
+| `joke` | 4 | 3 |
+| `place` | 1 | 0 |
+| `unknown` | 0 | 63 |
+| **total** | **82** | **314** |
 
-Two `unknown` recipes (`five-spice-powder`, `pancetta-white-bean-stew`) are
-currently blocking the build by design.
-
-Three `publication` citations have no date: `Adapted from Good Food`
-(cumin-mint-lamb-skewers) and `Adapted from delicious. magazine` ×2. **If you
-are ingesting new recipes, do not add a fourth** — the count is ratcheted, and
-a new dateless publication citation fails the build.
+Zero violations in either collection.
 
 ---
 
@@ -126,8 +140,8 @@ a new dateless publication citation fails the build.
 1. Work out which of the eight types it is. If you cannot, use `QQ` /
    `unknown` — **do not guess.** A wrong citation is worse than an absent one,
    and the QQ is designed to be loud.
-2. Write `source` in that type's shape, and `source_type` beside it.
-3. Published work gets `Adapted from`. People, places, jokes and QQ do not.
-4. Site before person, separated by `, recipe `.
-5. No publishers.
-6. A magazine wants its month and year. Find them if you can.
+2. **Dated magazine → `publication`. Undated → `website`.** No exceptions.
+3. Write `source` in that type's shape, and `source_type` beside it.
+4. Published work gets `Adapted from`. People, places, jokes and QQ do not.
+5. Site before person, separated by `, recipe `. Bare domain, no `https://`.
+6. No publishers.

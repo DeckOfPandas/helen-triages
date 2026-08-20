@@ -35,7 +35,7 @@ method_short:
   - "Are you kidding...there is no short method for soufflé!"
 meta:
   rewritten: true
-  proofread: false
+  proofread: true
   awaiting_fix: false
   cooked_before: true
   date_last_edited: "2026-08-11"

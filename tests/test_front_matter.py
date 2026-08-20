@@ -17,7 +17,14 @@ from conftest import where
 # an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.food
 
-REQUIRED = ["title", "tagline", "source", "main_ingredients",
+# `source_type` joined this list on 2026-08-20 (issue #406). It is not
+# decoration: nothing in a source STRING says whether it is a magazine or a
+# book -- `Adapted from Good Food` and `Adapted from Gordon Ramsay's Ultimate
+# Cookery Course` are the same shape -- so every rule in
+# tests/test_source_attribution.py reads the type rather than guessing. A recipe
+# without one is a recipe none of those rules can judge, which is worse than a
+# recipe that breaks them.
+REQUIRED = ["title", "tagline", "source", "source_type", "main_ingredients",
             "tags", "ingredient_groups", "method_short", "meta"]
 
 RETIRED = {
@@ -472,13 +479,30 @@ from conftest import FRONT_MATTER
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-BASELINE_COMMIT = "366f392"   # (fix) the turkey's calculator link opens the turkey
+BASELINE_COMMIT = "9306cef"   # (copy) Helen's proofread of the citation backlog
 #
-# MOVED 2026-08-20, WITH HELEN'S EXPLICIT PERMISSION, given IN ADVANCE and
-# unprompted -- she specified the change and then said, of it: "I trust you to
-# make that change without making others, so no need to flip the proofread flag
-# again." She is the author of that edit in every sense that matters here; the
-# agent only typed it.
+# MOVED 2026-08-20 (second move that day), AND THIS IS THE CASE THE MECHANISM
+# WAS BUILT FOR -- the one the failure message describes as "reviewed by Helen
+# line by line". She was not told a summary and asked to bless it. She asked to
+# be taken through the backlog one recipe at a time, was shown the old line, the
+# new line and the reason for each, and answered each individually. Two she
+# changed rather than approved. So her proofread describes those files more
+# exactly than it describes most of the corpus.
+#
+# COST, MEASURED BEFORE MOVING, as the entry below insists: the number of
+# recipes correctly sitting at proofread:false that this move would release is
+# ZERO. The backlog is empty because she just emptied it. The 72 other recipes
+# whose newest commit is an agent's are held by INVISIBLE_KEYS instead, not by
+# the baseline, and that stays true after the move -- so this does not quietly
+# take over their protection either.
+#
+# The previous entry, kept because its reasoning is the precedent:
+#
+#   366f392 -- moved 2026-08-20, with Helen's explicit permission, given IN
+#   ADVANCE and unprompted: she specified the change and then said, of it, "I
+#   trust you to make that change without making others, so no need to flip the
+#   proofread flag again." She was the author of that edit in every sense that
+#   mattered; the agent only typed it.
 #
 # WHAT THE MOVE ACTUALLY COVERS, measured rather than assumed. Before moving it,
 # the question "which recipes is this rule currently holding to proofread:false?"

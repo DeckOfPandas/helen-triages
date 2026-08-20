@@ -2,7 +2,7 @@
 title: "Cumin and Mint Lamb Skewers"
 tagline: "Much better than takeaway."
 source: "Adapted from Good Food"
-source_type: publication
+source_type: website
 serves: "6"
 prep_time: "40 mins plus at least 2 hrs chilling, preferably overnight"
 cook_time: "30 mins"
