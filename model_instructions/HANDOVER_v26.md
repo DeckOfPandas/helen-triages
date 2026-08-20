@@ -1757,6 +1757,61 @@ not yet committed, an unrelated change. The check caught it standing on `main`
 with three staged files. `git checkout -b <branch>` carries staged changes
 across, so the fix is to branch and commit, not to unstage anything.
 
+### 11.-1 The branch workflow, and the second hook
+
+**Settled with Helen 2026-08-20. Four steps, and only one is hers.**
+
+1. Claude works on a branch and pushes it (with her confirmation — see
+   `CLAUDE.md`, the push rule is unchanged).
+2. **Helen opens the PR, reviews, merges. That is all she does.** No local
+   checkout, no pull.
+3. Claude runs **`git fetch origin main:main`** — which fast-forwards the local
+   `main` ref *without checking it out* — then deletes the merged branch local
+   and remote and branches afresh.
+4. Repeat.
+
+**The whole point of step 3 is that Claude is never standing on `main`**, so it
+cannot write there by accident. It also fails loudly rather than mangling
+anything if the update is not a clean fast-forward, which is the signal that
+someone has committed locally to `main`.
+
+The old pattern — `git checkout main && git pull origin main` — is what this
+replaced, and the gap it opens is exactly how a commit landed on `main` on
+2026-08-20. **`git fetch origin main:main` is the form to use.** It is not a
+stylistic preference.
+
+**`.claude/hooks/guard-main-branch.py`** is the backstop: a PreToolUse hook on
+`Bash` that refuses `git commit` and `git merge` when the target repo is on
+`main`. Two details worth knowing:
+
+- **It asks about the right repository.** It reads a leading `cd <path>` out of
+  the command, because the nested drafts repos are edited through
+  `cd _food_drafts && git ...` and four commits landed on `_cocktail_drafts`'
+  `main` on 2026-08-17 for want of exactly this.
+- **It strips quoted spans and heredoc bodies first**, like its sibling below,
+  so a commit message may discuss the commands it refuses.
+
+Everything else on `main` is allowed: reading, fetching, branching, checking
+out, pushing an existing commit. The hook is not a lock on `main`, only on
+writing history to it.
+
+**Why a hook and not a firmer sentence — the failure is worth reading.**
+`CLAUDE.md` already said to check `git branch --show-current` immediately before
+every commit. The agent that broke the rule on 2026-08-20 *ran the check*:
+
+```
+git branch --show-current      <- the check
+git add ...
+git commit -F ...              <- already done by the time it printed
+```
+
+All three in one shell call, so the check printed `main` in the output of the
+call that had already committed. **A check that cannot stop the thing it is
+checking is a narration, not a check.** Run it in its own tool call, read the
+answer, then decide — and note that this is the third time this repository has
+concluded that a rule which gets read and broken needs a mechanism rather than
+better wording.
+
 ### 11.0 The destructive-git hook
 
 `.claude/hooks/guard-destructive-git.py`, wired as a **PreToolUse hook on
