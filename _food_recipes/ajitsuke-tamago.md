@@ -2,10 +2,11 @@
 title: "Ajitsuke Tamago (Ramen Eggs)"
 tagline: "Sweet, salty, umami-rich marinated eggs for ramen or snacking."
 source: "Adapted from The Flavor Bender, recipe Dini"
+source_type: website
 makes: "4 eggs"
 prep_time: "10 mins"
 cook_time: "6–7 mins"
-main_ingredients: ["medium eggs", "mirin", "light soy sauce", "dark soy sauce", "fresh garlic", "fresh ginger", "star anise"]
+main_ingredients: ["medium eggs", "mirin", "light soy sauce", "dark soy sauce", "fresh garlic cloves", "fresh ginger", "star anise"]
 star_ingredient: "eggs"
 tags: ["extras"]
 ingredient_groups:
@@ -24,7 +25,7 @@ ingredient_groups:
       item: "dark soy sauce"
       note: "swap for mushroom dark soy sauce for extra umami and a deeper colour"
     - item: "flavourings like fresh garlic cloves, sliced ginger, star anise, to taste"
-x method_groups:
+method_groups:
   - name: "Cook the eggs"
     steps:
       - step: "Boil the eggs in a single layer, at a rolling boil."
