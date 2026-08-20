@@ -1,6 +1,6 @@
 ---
 title: "Henry's Quick and Bulletproof Hollandaise Sauce"
-tagline: "The search ends here. But [read to the bottom](#why-hollandaise-is-hard) to get it right."
+tagline: "The search ends here. But read on [past the recipe](#why-hollandaise-is-hard) for sympathy and advice."
 source: "Furious, split and curdled years of swearing at eggs"
 serves: "4, generously"
 prep_time: "15 mins"
