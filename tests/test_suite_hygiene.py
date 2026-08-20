@@ -175,6 +175,12 @@ SKIPS_WITHOUT_DRAFTS = {
 PARTIAL_IN_CI = {
     "test_no_main_ingredient_spelling_collisions",
     "test_no_recipe_uses_the_retired_instructions_field",
+    # Reads the published half from this repo's history and the draft half from
+    # _food_drafts/'s own. In CI the second half is absent, so it checks the 82
+    # recipes and none of the 314 drafts -- and the drafts are where the risk
+    # actually lives, since tidy-up passes happen there. Kept running anyway:
+    # the published half is the half that ships. See its docstring.
+    "test_no_agent_commit_claims_helens_rewrite",
 }
 
 

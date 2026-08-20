@@ -475,7 +475,7 @@ def test_scalar_fields_are_quoted(recipe):
 import pathlib
 import subprocess
 
-from conftest import FRONT_MATTER
+from conftest import FRONT_MATTER, DRAFTS_PRESENT, ALL_DRAFTS
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -690,6 +690,118 @@ def _only_invisible_keys_changed(commit, relpath):
             k.split(".", 1)[1] in INVISIBLE_KEYS for k in changed)
 
     return bool(changed) and changed <= set(INVISIBLE_KEYS)
+
+
+def _rewritten_at(repo, rev, relpath):
+    """`meta.rewritten` for a file at a revision, or None if unreadable."""
+    result = subprocess.run(["git", "show", f"{rev}:{relpath}"],
+                            cwd=repo, capture_output=True, text=True)
+    if result.returncode != 0:
+        return None
+    match = FRONT_MATTER.match(result.stdout)
+    if not match:
+        return None
+    try:
+        data = yaml.safe_load(match.group(1)) or {}
+    except yaml.YAMLError:
+        return None
+    return (data.get("meta") or {}).get("rewritten")
+
+
+def _agent_claimed_rewrites(repo, pathspec):
+    """Commits where an agent flipped `meta.rewritten` from false to true.
+
+    Narrowed with `-G` before doing any real work: only commits whose DIFF
+    touches a `rewritten:` line are candidates, so this stays a handful of
+    `git show` calls rather than a walk of the whole history.
+    """
+    shas = subprocess.run(
+        ["git", "log", "--format=%H", f"--grep={AGENT_TRAILER}", "-i",
+         "-G", r"rewritten:", "--", pathspec],
+        cwd=repo, capture_output=True, text=True,
+    ).stdout.split()
+
+    offenders = []
+    for sha in shas:
+        files = subprocess.run(
+            ["git", "show", "--name-only", "--format=", sha, "--", pathspec],
+            cwd=repo, capture_output=True, text=True,
+        ).stdout.split()
+        for relpath in files:
+            if not relpath.endswith(".md"):
+                continue
+            before = _rewritten_at(repo, f"{sha}^", relpath)
+            after = _rewritten_at(repo, sha, relpath)
+            if before is False and after is True:
+                offenders.append(f"{sha[:8]}  {relpath}")
+    return offenders
+
+
+def test_no_agent_commit_claims_helens_rewrite():
+    """`meta.rewritten` is Helen's claim. An agent must never set it true.
+
+    THE HOLE THIS CLOSES. `meta.claude_rewritten` was added (issue #418) exactly
+    so an assisted tidy-up pass -- main_ingredients, ingredient and method
+    groups, wording nudged toward her voice -- could be recorded WITHOUT being
+    mistaken for Helen's own rewrite. `meta.rewritten` stays the real claim:
+    that the prose is genuinely hers.
+
+    Nothing enforced that separation. The tests checked `rewritten` exists and
+    is nested under `meta:`, and nothing checked who set it or what it changed
+    from. A tidy-up pass could have set it true and the only thing that would
+    have caught it was Helen reading the diff. That is a documented convention
+    with nothing behind it, which in this repository has a perfect record of
+    eventually being broken -- see the destructive-git rule, `awaiting_fix`,
+    `proofread`, and the citation spec, all documented at length before anything
+    checked them.
+
+    Zero violations existed when this was written, in either repository. It is a
+    regression guard, not a backlog.
+
+    WHAT IT DELIBERATELY DOES NOT CATCH, said plainly rather than left to be
+    found: a file CREATED by an agent already saying `rewritten: true`. Only a
+    false-to-true transition is flagged, because `before` is also None for an
+    ordinary rename or a promotion moving a file between collections, and
+    failing those would be a false positive on Helen's own normal workflow.
+    Narrow and correct beats broad and noisy -- but it does mean a brand-new
+    file is on trust.
+
+    BOTH REPOSITORIES, because the drafts are where the risk actually lives:
+    tidy-up passes happen on drafts, and 15 of them already say true.
+    `_food_drafts/` is a separate private repo with its own history, so it is
+    asked separately.
+
+    WHAT A GREEN RUN IN CI MEANS, and it is less than it looks: `_food_drafts/`
+    is absent there (issue #378), so CI checks the 82 published recipes and NONE
+    of the 314 drafts. This does not skip, because the published half is the
+    half that ships and losing it to be honest about the other half would be a
+    bad trade -- but the half that matters most is the one CI cannot see. Run
+    the suite locally before believing this check has passed. Registered in
+    tests/test_suite_hygiene.py's PARTIAL_IN_CI for exactly this reason.
+    """
+    assert (ROOT / ".git").exists(), "Not a git checkout -- this test cannot run."
+
+    offenders = _agent_claimed_rewrites(ROOT, "_food_recipes/")
+
+    drafts = ROOT / "_food_drafts"
+    # Named so tests/test_suite_hygiene.py's registry can see this test reads
+    # drafts at all -- it generates its list from ALL_DRAFTS references, and a
+    # test reaching drafts by path alone would be invisible to it. That gap is
+    # called out in its own docstring; this opts in rather than widening it.
+    if DRAFTS_PRESENT and ALL_DRAFTS and (drafts / ".git").exists():
+        offenders += [f"_food_drafts/  {line}"
+                      for line in _agent_claimed_rewrites(drafts, ".")]
+
+    assert not offenders, (
+        "An agent commit set `meta.rewritten: true`, which is Helen's claim "
+        "and hers alone:\n  "
+        + "\n  ".join(offenders)
+        + "\n\n`meta.rewritten` means the prose is genuinely in her voice. An "
+          "assisted pass records itself with `meta.claude_rewritten: true` and "
+          "leaves `rewritten` alone -- tidying structure and wording is not the "
+          "same thing as her rewriting a step (issue #418). If she asked for "
+          "this herself, the commit is hers to make, not an agent's."
+    )
 
 
 def test_every_cleared_recipe_still_exists():
