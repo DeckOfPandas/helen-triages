@@ -24,8 +24,11 @@ in scope -- this is about navigation between the site's own pages.
 WHAT "PUBLISHED" MEANS, AND WHERE IT COMES FROM. Derived, not hardcoded, from
 the same two places Jekyll itself reads:
   - an ordinary page's own front matter `permalink:` (falling back to
-    Jekyll's own default, `/:path:output_ext`, for the couple of pages that
-    don't set one -- food/swatch.html, food/swatch-scribbles.html);
+    Jekyll's own default, `/:path:output_ext`, for any page that doesn't set
+    one -- food/swatch.html and food/swatch-scribbles.html used to be the
+    only examples this repo actually needed, until GitHub issue #276
+    deleted them; the fallback itself is still live code, exercised the day
+    the next permalink-less page shows up);
   - `_config.yml`'s `collections:` block, which gives each collection's
     `permalink:` pattern and whether it publishes at all (`output: true`) --
     `_food_drafts/` is `output: false` and is correctly NOT a valid link

@@ -17,8 +17,19 @@
 
 # The repo-level identity. Each site overrides this with its own entry in
 # _data/sites.yml — this is only what the root landing page shows.
+#
+# `description` IS CURRENTLY RENDERED NOWHERE, and that is worth knowing before
+# editing it and wondering why nothing changed. It is only ever a fallback:
+# default.html reads `this_site.description | default: site.description`, and
+# both sites declare their own in _data/sites.yml. The one page that could have
+# reached the fallback was the root landing page, which since issue #204 is a
+# bare redirect with no layout at all (§2.4). So it waits for a third site, or
+# for a page belonging to none.
+#
+# `title` is different and IS used: the footer's copyright line reads
+# `{{ site.title }}` on every page.
 title: Helen Triages
-description: Two decision-support tools. What to cook, and what to drink.
+description: What not How.
 
 # GitHub Pages project site. Repo is helen-triages, so the published URL is
 #   https://<your-github-username>.github.io/helen-triages/
@@ -205,6 +216,19 @@ exclude:
   # watch the other's output and rebuild in a loop.
   - _site/
   - _site_prod/
+  # Sublime's project and workspace files. SAME REASON AS *Zone.Identifier
+  # above, and worth reading that comment as one thought with this: .gitignore
+  # stops a file being COMMITTED, and Jekyll reads the WORKING DIRECTORY. Two
+  # different questions, and being ignored by one says nothing about the other.
+  #
+  # So these were never on the live site -- a CI checkout has only tracked
+  # files, and these are not tracked (verified with `git archive HEAD`, after
+  # issue #414 claimed otherwise on the strength of a local build). What they
+  # were doing was appearing in the jekyll-prod mockup on :4002, which exists
+  # precisely to show what deploys and was therefore lying about two files.
+  # Small, but that mockup's whole job is fidelity.
+  - htf-sublime.sublime-project
+  - htf-sublime.sublime-workspace
 
 sass:
   sass_dir: _sass
