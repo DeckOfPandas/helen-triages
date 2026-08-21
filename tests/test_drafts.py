@@ -55,24 +55,257 @@ Deliberately NOT ported here, and why — don't add these without asking:
 from __future__ import annotations
 
 import re
+import sys
 
 import pytest
 
-from conftest import where_draft, ALL_RECIPES, ALL_DRAFTS
-from test_front_matter import REQUIRED, RETIRED, MISPLACED_META, _StrictLoader
-from test_style import TYPOGRAPHY, SPELLINGS
-from test_taxonomy import (
+from conftest import where_draft, is_qq, ALL_RECIPES, ALL_DRAFTS
+import test_front_matter as _fm
+import test_style as _st
+import test_taxonomy as _tx
+from test_front_matter import REQUIRED
+from test_style import TYPOGRAPHY
 
-    MISSING_TRAILING_SLASH,
-    ANY_RELATIVE_LINK,
-    _WELL_FORMED_TARGET,
-)
+# =============================================================================
+# ONE RULE, ONE DEFINITION. 2026-08-21.
+# =============================================================================
+# Most of what follows is a two-line DELEGATION to the published-recipe version
+# of the same rule, not a second copy of it. That is the whole point of this
+# file's current shape, and it is worth knowing before you edit anything in it.
+#
+# WHAT IT REPLACED. This file used to re-implement each rule against the `draft`
+# fixture. Measured before the change: 28 test names existed in both this file
+# and the main suite, and comparing their ASSERTION LOGIC with fixture names and
+# message wording stripped out, 26 of the 28 were the identical rule re-typed.
+# 620 lines to express two real differences.
+#
+# THE DUPLICATION WAS NOT THE DANGEROUS PART. Nothing marked WHICH two differed
+# on purpose. A deliberate divergence and a re-typed copy looked exactly alike
+# on the page, so editing the recipe version and not this one -- or the reverse
+# -- was silent in both directions. The four genuine divergences are now
+# declared in DIVERGENT_ON_PURPOSE below, with a reason each, and everything
+# else delegates.
+#
+# WHY DELEGATION RATHER THAN A SHARED rules.py. Moving 24 implementations into a
+# new module would have moved their constants, their docstrings and their
+# module-local helpers with them, for no gain this design does not already
+# get: there is exactly one implementation either way. Delegation also keeps
+# every test ID byte-identical, which is what made the migration checkable --
+# `pytest --collect-only` before and after produced the same 25,178 IDs.
+#
+# WHAT MAKES IT SAFE. `Recipe` is the same class for both collections, and
+# `where()` derives its path from the file rather than assuming a directory
+# (conftest, 2026-08-21), so a draft passed to a recipe-side rule reports
+# `_food_drafts/...` correctly. The `QQ` exemption (#426) moved into conftest
+# and into the shared rules, having been measured as a no-op on published
+# recipes -- `test_no_qq_placeholder` forbids the marker there, so blanking QQ
+# lines changes nothing for a recipe and everything for a draft.
+#
+# TO ADD A RULE TO DRAFTS: write the two-line delegation. To NOT add one, put
+# its name in NOT_FOR_DRAFTS with a reason.
+# =============================================================================
+
+# The rules that are genuinely different for a draft, and why. A name here is a
+# claim that the recipe version would be WRONG applied to an unfinished file --
+# not that nobody has got round to sharing it.
+DIVERGENT_ON_PURPOSE = {
+    "test_method_xor_method_groups":
+        "a recipe must have exactly one; a draft may legitimately have NEITHER "
+        "yet, so this asserts 'not both' rather than xor",
+    "test_method_short_is_a_list":
+        "`method_short:` is required on a recipe and optional on a draft, so "
+        "this returns early when the key is absent",
+    "test_metadata_time_format":
+        "same rule, but a draft's value may be `QQ 30 minutes` rather than a "
+        "bare `QQ`, and the recipe version is parametrised per field while this "
+        "reports both fields in one message",
+    "test_no_ampersand_in_title":
+        "same rule; kept separate only because the draft corpus is where new "
+        "brand names arrive, and its message points at ampersand_proper_nouns "
+        "as the first thing to try rather than the last",
+    "test_meta_block_complete":
+        "TEMPORARY. Drafts still carry the pre-#429 meta contract -- all of "
+        "them have cooked_before/date_last_edited and two have no "
+        "awaiting_fix. Delete this entry and delegate once #429 reaches "
+        "_food_drafts/. Found by the delegation migration, not by reading",
+}
 
 # Suite marker, so `pytest -m food` can run this half alone.
 # tests/test_suite_hygiene.py asserts every module declares one --
 # an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.food
 
+
+# =============================================================================
+# RULES THAT ARE **NOT** APPLIED TO DRAFTS, AND WHY. 2026-08-21.
+# =============================================================================
+# Every per-recipe rule in the main suite is either delegated above or named
+# here. `test_every_recipe_rule_is_adopted_or_declined` enforces that, so a new
+# recipe rule cannot quietly skip the draft corpus the way fourteen of these
+# did -- including four that failed on the four recipes Helen promoted on
+# 2026-08-21, having sat unnoticed in the drafts folder for as long as the
+# drafts had.
+#
+# THE NUMBER ON EACH LINE IS A MEASUREMENT, not an estimate: how many of the
+# drafts fail that rule today, taken by running the real recipe-side function
+# over the whole draft corpus. Re-measure before acting on any of them; the
+# corpus changes daily.
+#
+# THE THREE CATEGORIES ARE A PROPOSAL FOR HELEN, not a settled ruling. The
+# split that matters is whether clearing the backlog needs her judgement or
+# only a text edit.
+NOT_FOR_DRAFTS = {
+    # -- Needs Helen's judgement or her source material, per recipe. These are
+    # the ones that were never candidates for a bulk pass, for the same reason
+    # test_milk_specifies_type never was: the answer is not in the file.
+    "test_butter_specifies_salted_or_unsalted": "content judgement; 92 drafts",
+    "test_cardamom_specifies_type": "content judgement; 17 drafts",
+    "test_chocolate_percentage_matches_type": "content judgement; 18 drafts",
+    "test_chocolate_specifies_type": "content judgement; 14 drafts",
+    "test_egg_size_is_stated": "content judgement; 103 drafts",
+    "test_flour_specifies_type": "content judgement; 30 drafts",
+    "test_garlic_specifies_form": "content judgement; 33 drafts",
+    "test_ginger_specifies_fresh_ground_or_paste": "content judgement; 58 drafts",
+    "test_homemade_pastry_has_salt": "content judgement; 4 drafts",
+    "test_loomi_specifies_colour": "content judgement; 1 draft",
+    "test_milk_specifies_type": "content judgement; 36 drafts -- the original "
+                                "of this category, issue #167",
+    "test_mixed_spice_and_five_spice_say_powder": "content judgement; 14 drafts",
+    "test_mustard_specifies_type": "content judgement; 9 drafts",
+    "test_nutmeg_cinnamon_cloves_vanilla_specify_type": "content judgement; 42 drafts",
+    "test_soy_sauce_specifies_dark_or_light": "content judgement; 24 drafts",
+    "test_soy_sauce_as_tamari_alternative_specifies_dark_or_light":
+        "content judgement; 4 drafts",
+    "test_sugar_specifies_type": "content judgement; 117 drafts",
+    "test_unsalted_butter_has_salt_or_a_note": "content judgement; 19 drafts",
+    "test_vinegar_specifies_type": "content judgement; 19 drafts",
+    "test_oven_temperature_says_fan":
+        "39 drafts, and NOT mechanically fixable -- which figure of a "
+        "fan/conventional pair is the fan one needs the original source, and "
+        "they are not always in the same order (HANDOVER 5)",
+    "test_no_estimated_timings":
+        "8 drafts. Helen's standing rule is that she replaces these by hand "
+        "rather than have them converted, so flagging them in drafts would be "
+        "asking her to do published-recipe work early",
+    "test_ingredient_notes_are_lowercase_fragments":
+        "9 drafts, and flag-only even for recipes -- Helen: 'I'll look at "
+        "violations myself because I care about tone of voice'",
+    "test_ingredient_group_order_matches_title": "6 drafts; flag-only for recipes too",
+    "test_spice_order_within_group": "16 drafts; content judgement, HANDOVER 10",
+    "test_no_oven_conversions":
+        "20 drafts, and it fires on exactly the un-rewritten QQ source text "
+        "the marker exists to protect -- stripping a gas mark there is editing "
+        "content, not formatting. The long-standing exclusion (#426 is the "
+        "same argument applied per line rather than per test)",
+
+    # -- Meaningless or wrong for an unfinished file. A draft IS the thing
+    # these rules describe the absence of.
+    "test_no_qq_placeholder":
+        "221 drafts, and correctly so: QQ is what a draft is for",
+    "test_tagline_is_not_blank":
+        "17 drafts. A blank tagline is normal here; only the KEY is required",
+    "test_required_field_present":
+        "the draft twin checks key presence only, deliberately, without the "
+        "'and it must be written' half",
+    "test_meta_block_is_exactly_the_three_flags_in_order":
+        "343 drafts -- #429 has not been propagated to _food_drafts/ yet. This "
+        "is the one entry here that is a TODO rather than a judgement",
+    "test_internal_temp_ref_resolves":
+        "wiring a temperature is wasted work until Helen has cooked it "
+        "(HANDOVER 14); the test catches each draft on the day it is promoted",
+    "test_doneness_names_a_real_level": "same reasoning as internal_temp_ref",
+    "test_no_recipe_says_cooking_temperatures":
+        "0 drafts; about a published page's own cross-link wording",
+
+    # -- WOULD APPLY CLEANLY. These are the real gaps: mechanical, no
+    # judgement needed, and every one is a tax paid at promotion instead.
+    # Phases 3 and 4 of the plan agreed 2026-08-21.
+    "test_scalar_fields_are_quoted": "GAP, mechanical; 295 drafts",
+    "test_main_ingredients_entries_are_quoted": "GAP, mechanical; 281 drafts",
+    "test_note_dicts_have_label_and_text": "GAP, mechanical; 256 drafts",
+    "test_tags_entries_are_quoted": "GAP, mechanical; 250 drafts",
+    "test_size_word_is_with_the_count_not_the_item": "GAP; 108 drafts",
+    "test_number_ranges_use_en_dashes": "GAP, mechanical; 58 drafts",
+    "test_title_and_slug_dont_diverge": "GAP; 20 drafts, one call each",
+    "test_internal_recipe_links_resolve": "GAP, mechanical; 7 drafts",
+    "test_main_ingredients_egg_count_agrees": "GAP; 3 drafts",
+
+    # -- Already clean across every draft. Twinning these is free and is the
+    # obvious first move of Phase 4: zero backlog, immediate regression cover.
+    "test_accents_in_prose": "0 drafts failing -- but test_accents_in_drafts "
+                             "already covers the corpus by another route",
+    "test_chocolate_main_ingredients_has_no_percentage": "0 drafts failing",
+    "test_ingredient_group_names_do_not_repeat_for_the": "0 drafts failing",
+    "test_internal_link_text_matches_target_title": "0 drafts failing",
+    "test_method_step_notes_are_sentences": "0 drafts failing",
+    "test_pan_and_ingredient_sizes_use_digits":
+        "0 drafts failing; test_pan_and_ingredient_sizes_use_digits_in_drafts "
+        "already covers the corpus by another route",
+    "test_same_page_fragment_links_land_somewhere":
+        "0 drafts failing; reads ids from layouts a draft never renders through",
+}
+
+
+def test_every_recipe_rule_is_adopted_or_declined():
+    """Every per-recipe rule either runs against drafts or says why it does not.
+
+    THE GAP THIS CLOSES IS THE ONE NOBODY WAS LOOKING AT. The duplication in
+    this file was visible; its mirror image was not. On 2026-08-21, 48 of the
+    main suite's 76 per-recipe rules had no draft counterpart, and nothing
+    anywhere recorded which of those were deliberate. Four of them failed on
+    the four recipes Helen promoted that day -- unquoted main_ingredients,
+    unquoted tags, a title/slug divergence -- every one of which had been
+    sitting in the drafts folder for as long as the drafts had.
+
+    A test with no draft twin is a rule whose cost is paid at promotion. That
+    may be right; it must be a decision.
+    """
+    import inspect
+    import test_front_matter, test_style, test_taxonomy
+
+    mine = {n for n, _ in inspect.getmembers(sys.modules[__name__],
+                                             inspect.isfunction)
+            if n.startswith("test_")}
+    rules = {}
+    for mod in (test_front_matter, test_style, test_taxonomy):
+        for name, fn in inspect.getmembers(mod, inspect.isfunction):
+            if not name.startswith("test_"):
+                continue
+            if getattr(fn, "__module__", "") != mod.__name__:
+                continue
+            if list(inspect.signature(fn).parameters)[:1] == ["recipe"]:
+                rules[name] = mod.__name__
+
+    assert rules, (
+        "No per-recipe rules were found in the main suite at all. Either they "
+        "moved, or this scan has stopped matching -- and an empty scan passes "
+        "while checking nothing (HANDOVER 12)."
+    )
+
+    undeclared = sorted(n for n in rules if n not in mine and n not in NOT_FOR_DRAFTS)
+    assert not undeclared, (
+        "Recipe rule(s) neither applied to drafts nor declined:\n  "
+        + "\n  ".join(f"{n}  ({rules[n]})" for n in undeclared)
+        + "\n\nAdd a two-line delegation above if it should hold for drafts "
+          "too, or an entry in NOT_FOR_DRAFTS saying why it should not. "
+          "Silence is the one option that is not available: a rule with no "
+          "draft twin is a cost paid at promotion instead, and until this test "
+          "existed nothing recorded whether that was on purpose."
+    )
+
+    stale = sorted(n for n in NOT_FOR_DRAFTS if n not in rules)
+    assert not stale, (
+        "NOT_FOR_DRAFTS names rule(s) that no longer exist:\n  "
+        + "\n  ".join(stale)
+        + "\n\nA declined rule that has been renamed or deleted leaves an "
+          "entry that excuses nothing, and the next real gap hides behind it."
+    )
+
+    both = sorted(set(NOT_FOR_DRAFTS) & mine & set(rules))
+    assert not both, (
+        "Rule(s) both delegated above AND listed in NOT_FOR_DRAFTS: "
+        + ", ".join(both) + ". Pick one."
+    )
 
 # --- front matter shape (test_front_matter.py, structural half only) --------
 
@@ -93,83 +326,45 @@ def test_required_field_key_present(draft, field):
 
 
 def test_front_matter_has_no_duplicate_keys(draft):
-    """Same rule as the recipe version, and worth having here specifically
-    because a draft carries its front matter with it when it is promoted --
-    the same reasoning as test_no_main_ingredient_spelling_collisions. A key
-    silently discarded in a draft becomes a line silently missing from a
-    published recipe, and by then the evidence is gone: every other test
-    reads the PARSED front matter, which no longer contains it.
-
-    Clean across all 254 drafts when this was written, so it is a regression
-    guard rather than a checklist.
-    """
-    import re as _re
-    import yaml as _yaml
-    match = _re.match(r"\A---\n(.*?\n)---", draft.raw, _re.S)
-    try:
-        _yaml.load(match.group(1), Loader=_StrictLoader)
-    except _yaml.constructor.ConstructorError as exc:
-        raise AssertionError(
-            f"{where_draft(draft)} has a duplicate key in its front matter: "
-            f"{exc}.\nYAML keeps only the last one, so the earlier line's "
-            f"content is already gone -- fix it here, before promotion turns "
-            f"it into a missing ingredient on a live page."
-        ) from None
+    _fm.test_front_matter_has_no_duplicate_keys(draft)
 
 
 def test_no_retired_fields(draft):
-    found = {f: why for f, why in RETIRED.items() if f in draft.fm}
-    assert not found, (
-        f"{where_draft(draft)} still has retired field(s): "
-        + "; ".join(f"`{f}` ({why})" for f, why in found.items())
-    )
+    _fm.test_no_retired_fields(draft)
 
 
 def test_meta_fields_are_nested_not_top_level(draft):
-    stray = [f for f in MISPLACED_META if f in draft.fm]
-    assert not stray, (
-        f"{where_draft(draft)} has {stray} at the top level. "
-        f"These belong inside the `meta:` block."
-    )
+    _fm.test_meta_fields_are_nested_not_top_level(draft)
 
 
 def test_meta_block_complete(draft):
+    """Drafts still carry the PRE-#429 meta contract, so this cannot delegate.
+
+    `_fm.test_meta_block_complete` requires rewritten/awaiting_fix/proofread,
+    which is the published contract as of 2026-08-21. Drafts have not been
+    migrated: all 343 still carry `cooked_before` and `date_last_edited`, and
+    two carry no `awaiting_fix` at all. Delegating today would fail those two
+    for a rename Helen has not asked to be propagated yet.
+
+    DELETE THIS AND DELEGATE the day #429 reaches `_food_drafts/`. It is the
+    only entry in DIVERGENT_ON_PURPOSE that is temporary rather than a real
+    statement about what a draft is, and it was found by the delegation
+    migration itself rather than by anyone reading the two files side by side.
+    """
     meta = draft.fm.get("meta")
     assert isinstance(meta, dict), (
         f"{where_draft(draft)} has no `meta:` block, or it is not a mapping."
     )
-    missing = [f for f in ("rewritten", "proofread", "cooked_before") if f not in meta]
-    assert not missing, (
-        f"{where_draft(draft)} `meta:` is missing {missing}."
-    )
+    missing = [f for f in ("rewritten", "proofread") if f not in meta]
+    assert not missing, f"{where_draft(draft)} `meta:` is missing {missing}."
 
 
 def test_claude_rewritten_is_a_real_boolean(draft):
-    """Same trap as `awaiting_fix` -- a quoted "true" is truthy but not `is True`.
-    Optional and additive (issue #418), so most drafts won't have it at all.
-    """
-    meta = draft.fm.get("meta")
-    if not isinstance(meta, dict) or "claude_rewritten" not in meta:
-        return
-    assert isinstance(meta["claude_rewritten"], bool), (
-        f"{where_draft(draft)} has `meta.claude_rewritten: "
-        f"{meta['claude_rewritten']!r}`, not a real boolean. Never quote it."
-    )
+    _fm.test_claude_rewritten_is_a_real_boolean(draft)
 
 
 def test_serves_xor_makes(draft):
-    """Draft version of the recipe rule keeps the same "exactly one, never
-    both" bar — checked 2026-08-11: every current draft already has one or
-    the other, so there's no legitimate "neither yet" state to carve out.
-    """
-    has_serves = "serves" in draft.fm
-    has_makes = "makes" in draft.fm
-    assert has_serves != has_makes, (
-        f"{where_draft(draft)} has "
-        + ("neither `serves:` nor `makes:`" if not (has_serves or has_makes)
-           else "both `serves:` and `makes:`")
-        + ". Exactly one, never both."
-    )
+    _fm.test_serves_xor_makes(draft)
 
 
 def test_method_xor_method_groups(draft):
@@ -187,54 +382,15 @@ def test_method_xor_method_groups(draft):
 
 
 def test_method_groups_have_name_and_steps(draft):
-    """Same key-typo trap as the recipe version — caught for real on
-    garam-masala-powder.md (a _food_recipes/ file, not a draft, but the
-    exact `step:`-singular-with-no-`name:` shape is just as silent here).
-    """
-    for i, group in enumerate(draft.fm.get("method_groups") or []):
-        assert group.get("name"), (
-            f"{where_draft(draft)} method_groups entry {i} has no `name`."
-        )
-        assert group.get("steps"), (
-            f"{where_draft(draft)} method_groups entry {i} "
-            f"({group.get('name')!r}) has no `steps` -- check for a "
-            f"`step:` (singular) typo."
-        )
+    _fm.test_method_groups_have_name_and_steps(draft)
 
 
 def test_method_produces_actual_steps(draft):
-    """Only fires when method/method_groups is DECLARED but produces zero
-    steps — a structural bug (a key typo, an empty `method:` with nothing
-    after it), not "hasn't been written yet" (which just omits the key
-    entirely and isn't tested). Caught for real on pizza-dough.md: `method:`
-    present with nothing after it because the source docx had quantities
-    only, no method — fixed with a QQ placeholder step, not left bare,
-    precisely so this stays a reliable guard against the typo case too.
-    """
-    if "method" not in draft.fm and "method_groups" not in draft.fm:
-        return
-    assert draft.method_steps, (
-        f"{where_draft(draft)} declares method/method_groups but produces "
-        f"zero actual steps. If there's genuinely no method to transcribe "
-        f"yet, use a QQ placeholder step rather than leaving `method:` bare "
-        f"-- an empty method is indistinguishable from this exact bug."
-    )
+    _fm.test_method_produces_actual_steps(draft)
 
 
 def test_notes_is_a_list(draft):
-    """Caught for real, 2026-08-11: 20 drafts had bare `notes:` with nothing
-    after it, which YAML parses as null, not a list -- easy to write by
-    accident (it's what you get from deleting every note but leaving the
-    key), easy to miss reading the file, since it looks like an intentional
-    "no notes yet" the same way `notes: []` does.
-    """
-    if "notes" not in draft.fm:
-        return
-    assert isinstance(draft.fm["notes"], list), (
-        f"{where_draft(draft)} has `notes:` as a "
-        f"{type(draft.fm['notes']).__name__}, not a list. Use `notes: []` "
-        f"for none, or a real list."
-    )
+    _fm.test_notes_is_a_list(draft)
 
 
 def test_note_dicts_have_label_and_text_when_dict(draft):
@@ -267,41 +423,15 @@ def test_method_short_is_a_list(draft):
 
 
 def test_method_short_uses_current_placeholder(draft):
-    ms = draft.fm.get("method_short") or []
-    retired = [s for s in ms if s in ("QQ", "none")]
-    assert not retired, (
-        f"{where_draft(draft)} uses retired method_short placeholder(s) "
-        f"{retired}. The current convention is a single empty string: "
-        f'method_short: [""]'
-    )
+    _fm.test_method_short_uses_current_placeholder(draft)
 
 
 def test_ingredient_groups_named_when_there_is_more_than_one(draft):
-    """Caught for real, 2026-08-11, in 4 files: a second/third named group
-    (dressing, marinade, sauce) alongside a first group with no `name:` at
-    all -- renders as an unlabelled block followed by labelled ones.
-    """
-    groups = draft.fm.get("ingredient_groups") or []
-    if len(groups) < 2:
-        return
-    unnamed = [i for i, g in enumerate(groups) if not (isinstance(g, dict) and g.get("name"))]
-    assert not unnamed, (
-        f"{where_draft(draft)} has {len(groups)} ingredient groups but "
-        f"group(s) {unnamed} have no `name:`."
-    )
+    _fm.test_ingredient_groups_named_when_there_is_more_than_one(draft)
 
 
 def test_group_names_omit_leading_article(draft):
-    offenders = []
-    for key in ("ingredient_groups", "method_groups"):
-        for group in draft.fm.get(key) or []:
-            name = group.get("name") if isinstance(group, dict) else None
-            if name and re.match(r"^(for the |for |the )", name, re.I):
-                offenders.append(f"{key}: {name!r}")
-    assert not offenders, (
-        f"{where_draft(draft)} has group name(s) with a leading article: "
-        f"{offenders}. The template supplies \"For the \" itself."
-    )
+    _fm.test_group_names_omit_leading_article(draft)
 
 
 # =============================================================================
@@ -375,12 +505,7 @@ def _checkable_prose(draft) -> list[tuple[str, str]]:
 @pytest.mark.parametrize("name,pattern,fix",
                          [(n, p, f) for n, p, f in TYPOGRAPHY if p])
 def test_typography(draft, name, pattern, fix):
-    hits = re.findall(pattern, _checkable_raw(draft))
-    assert not hits, (
-        f"{where_draft(draft)} contains {len(hits)} instance(s) of {name}: "
-        f"{sorted(set(h if isinstance(h, str) else h[0] for h in hits))[:5]}. "
-        f"Fix: {fix}."
-    )
+    _st.test_typography(draft, name, pattern, fix)
 
 
 def test_no_ampersand_in_title(draft, taxonomy):
@@ -407,30 +532,11 @@ def test_no_ampersand_in_title(draft, taxonomy):
 
 
 def test_spellings(draft):
-    problems = []
-    for pattern, correct in SPELLINGS.items():
-        if re.search(pattern, _checkable_raw(draft), re.I):
-            problems.append(f"{pattern.strip(chr(92) + 'b')} -> {correct}")
-    assert not problems, (
-        f"{where_draft(draft)} uses non-house spellings: " + "; ".join(problems)
-    )
+    _st.test_spellings(draft)
 
 
 def test_temperatures_use_degree_c(draft):
-    """Pure formatting, no information lost either way -- safe to enforce
-    even inside an un-rewritten `QQ`/`PLACEHOLDER` step, unlike
-    test_no_oven_conversions (see module docstring). Caught for real,
-    2026-08-11: 14 drafts wrote e.g. "180C" instead of "180°C".
-
-    THAT ARGUMENT NO LONGER REACHES `QQ` LINES, issue #426 -- see the block
-    above. The character is still harmless; editing an un-rewritten line to
-    place it is what stopped. Every rewritten step is checked exactly as before.
-    """
-    bad = re.findall(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)", _checkable_raw(draft))
-    assert not bad, (
-        f"{where_draft(draft)} writes temperature(s) {bad} without the "
-        f"degree sign. Always °C, e.g. 200°C."
-    )
+    _st.test_temperatures_use_degree_c(draft)
 
 
 def test_metadata_time_format(draft):
@@ -457,147 +563,41 @@ def test_metadata_time_format(draft):
 
 
 def test_prose_abbreviates_minutes_only(draft):
-    """Caught for real, 2026-08-11: 3 *-rewrite.md files wrote "N minutes"
-    in a method step or note where prose wants "N mins".
-    """
-    problems = []
-    for location, text in _checkable_prose(draft):
-        for match in re.finditer(r"(?<=[0-9])\s*(minutes?|hrs?|secs?)\b", text):
-            word = match.group(1)
-            wanted = {"minute": "min", "minutes": "mins",
-                      "hr": "hour", "hrs": "hours",
-                      "sec": "second", "secs": "seconds"}[word.lower()]
-            snippet = text[max(0, match.start() - 25):match.end() + 10]
-            problems.append(f"{location}: …{snippet}… — use '{wanted}'")
-    assert not problems, (
-        f"{where_draft(draft)} breaks the prose time convention:\n  "
-        + "\n  ".join(problems)
-    )
+    _st.test_prose_abbreviates_minutes_only(draft)
 
 
 # --- taxonomy and links (test_taxonomy.py) -----------------------------------
 
 def test_tags_are_declared(draft, taxonomy):
-    declared = set()
-    for group in (taxonomy.get("tags") or {}).values():
-        declared.update(group)
-    unknown = [t for t in (draft.fm.get("tags") or []) if t not in declared]
-    assert not unknown, (
-        f"{where_draft(draft)} uses undeclared tag(s) {unknown}. "
-        f"Declared tags: {', '.join(sorted(declared))}."
-    )
+    _tx.test_tags_are_declared(draft, taxonomy)
 
 
 def test_star_ingredient_is_declared(draft, taxonomy):
-    """Was deliberately allowed to start red -- see module docstring. Used to
-    fail on 8 drafts using the retired `eggs` value; Helen chose 2026-08-11
-    to review that list herself rather than have it fixed for her (a genuine
-    egg-forward dish would earn the star back, which isn't a call to make
-    mechanically). That backlog is now cleared and this test is green -- a
-    failure here is a real regression to investigate, not a known gap. Don't
-    touch a future violation unprompted; it still needs Helen's own call.
-
-    The other retired value, `something unusual`, doesn't get this same
-    standing-checklist treatment: Helen confirmed 2026-08-12 there's nothing
-    to reconsider there, so _data/food/taxonomy.yml's retired_star_
-    ingredients dict is checked FIRST and fails loudly with the retirement
-    reason rather than folding into the generic "not declared" message --
-    five drafts were still carrying it three days after retirement, only
-    found by reading test output rather than trusting a green run.
-    """
-    star = draft.fm.get("star_ingredient")
-    if star in (None, ""):
-        return
-    retired = taxonomy.get("retired_star_ingredients") or {}
-    if star in retired:
-        assert False, (
-            f"{where_draft(draft)} has `star_ingredient: {star!r}`, which "
-            f"was retired: {retired[star]}\n"
-            f"Blank the field rather than leaving the retired value in place."
-        )
-    declared = taxonomy.get("star_ingredients") or []
-    assert star in declared, (
-        f"{where_draft(draft)} has `star_ingredient: {star!r}`, which is "
-        f"not declared in _data/food/taxonomy.yml. Declared stars are: "
-        f"{', '.join(declared)}."
-    )
+    _tx.test_star_ingredient_is_declared(draft, taxonomy)
 
 
 def test_co_tag_rules(draft, taxonomy):
-    tags = draft.fm.get("tags") or []
-    problems = []
-    for trigger, required in (taxonomy.get("co_tags") or {}).items():
-        if trigger not in tags:
-            continue
-        missing = [t for t in required if t not in tags]
-        if missing:
-            problems.append(f"tagged `{trigger}` but missing {missing}")
-    assert not problems, (
-        f"{where_draft(draft)} breaks co-tag rule(s):\n  " + "\n  ".join(problems)
-    )
+    _tx.test_co_tag_rules(draft, taxonomy)
 
 
 def test_no_cook_tag_implies_no_cook_time(draft):
-    if "no-cook" not in (draft.fm.get("tags") or []):
-        return
-    cook = draft.fm.get("cook_time")
-    declared_none = isinstance(cook, str) and cook.strip().lower() == "none"
-    assert declared_none, (
-        f"{where_draft(draft)} is tagged `no-cook` but has "
-        f"`cook_time: {cook!r}`. Anything advertised as no-cook must say so "
-        f'in the data: cook_time: "None".'
-    )
+    _tx.test_no_cook_tag_implies_no_cook_time(draft)
 
 
 def test_no_claude_markers_left(draft):
-    """Was deliberately allowed to start red -- see module docstring. Used to
-    fail on schmaltzy-lentils-chicken-lemon.md, which asked Helen to verify
-    a chicken breasts-vs-thighs discrepancy before the note was deleted. That
-    has since been resolved and this test is green -- a failure here now is
-    a real regression to investigate, not a known gap. A future marker still
-    isn't something to action or remove unprompted.
-    """
-    markers = re.findall(r"[^\"\n]{0,10}\bCLAUDE\b[^\"\n]{0,40}", draft.raw)
-    assert not markers, (
-        f"{where_draft(draft)} still contains marker(s) {markers}."
-    )
+    _tx.test_no_claude_markers_left(draft)
 
 
 def test_incidental_not_in_main_ingredients(draft):
-    from test_taxonomy import _fold
-    main = {_fold(str(m)) for m in (draft.fm.get("main_ingredients") or [])}
-    if not main:
-        return
-    offenders = []
-    for group in draft.fm.get("ingredient_groups") or []:
-        for item in group.get("items") or []:
-            if not isinstance(item, dict) or not item.get("incidental"):
-                continue
-            name = _fold(str(item.get("item", "")).split(",")[0].strip())
-            hits = [m for m in main if name and (name in m or m in name)]
-            if hits:
-                offenders.append((item.get("item"), hits))
-    assert not offenders, (
-        f"{where_draft(draft)} marks ingredient(s) `incidental: true` that "
-        f"still appear in main_ingredients: {offenders}."
-    )
+    _tx.test_incidental_not_in_main_ingredients(draft)
 
 
 def test_internal_links_have_trailing_slash(draft):
-    hits = MISSING_TRAILING_SLASH.findall(draft.raw)
-    assert not hits, (
-        f"{where_draft(draft)} has {len(hits)} internal link(s) missing a "
-        f"trailing slash: {hits}. Cross-recipe links must be "
-        f"[text](../slug/), not [text](../slug)."
-    )
+    _tx.test_internal_links_have_trailing_slash(draft)
 
 
 def test_internal_links_are_well_formed(draft):
-    bad = [t for t in ANY_RELATIVE_LINK.findall(draft.raw) if not _WELL_FORMED_TARGET.match(t)]
-    assert not bad, (
-        f"{where_draft(draft)} has internal link(s) in an unrecognised "
-        f"shape: {bad!r}. Check for a stray file extension or typo."
-    )
+    _tx.test_internal_links_are_well_formed(draft)
 
 
 _ALL_SLUGS = {r.slug for r in ALL_RECIPES} | {d.slug for d in ALL_DRAFTS}

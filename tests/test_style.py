@@ -15,7 +15,7 @@ import re
 
 import pytest
 
-from conftest import where
+from conftest import where, checkable_raw, checkable_prose
 
 # Suite marker, so `pytest -m food` can run this half alone.
 # tests/test_suite_hygiene.py asserts every module declares one --
@@ -91,7 +91,7 @@ def test_metadata_time_format(recipe, field):
 def test_prose_abbreviates_minutes_only(recipe):
     """Prose uses `mins`, but `hours` and `seconds` spelled out."""
     problems = []
-    for location, text in recipe.prose:
+    for location, text in checkable_prose(recipe):
         for match in re.finditer(r"(?<=[0-9])\s*(minutes?|hrs?|secs?)\b", text):
             word = match.group(1)
             wanted = {"minute": "min", "minutes": "mins",
@@ -191,7 +191,7 @@ def test_number_ranges_use_en_dashes(recipe):
 @pytest.mark.parametrize("name,pattern,fix",
                          [(n, p, f) for n, p, f in TYPOGRAPHY if p])
 def test_typography(recipe, name, pattern, fix):
-    hits = re.findall(pattern, recipe.raw)
+    hits = re.findall(pattern, checkable_raw(recipe))
     assert not hits, (
         f"{where(recipe)} contains {len(hits)} instance(s) of {name}: "
         f"{sorted(set(h if isinstance(h, str) else h[0] for h in hits))[:5]}. "
@@ -239,7 +239,7 @@ SPELLINGS = {
 def test_spellings(recipe):
     problems = []
     for pattern, correct in SPELLINGS.items():
-        if re.search(pattern, recipe.raw, re.I):
+        if re.search(pattern, checkable_raw(recipe), re.I):
             problems.append(f"{pattern.strip(chr(92) + 'b')} -> {correct}")
     assert not problems, (
         f"{where(recipe)} uses non-house spellings: " + "; ".join(problems)
@@ -247,7 +247,7 @@ def test_spellings(recipe):
 
 
 def test_temperatures_use_degree_c(recipe):
-    bad = re.findall(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)", recipe.raw)
+    bad = re.findall(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)", checkable_raw(recipe))
     assert not bad, (
         f"{where(recipe)} writes temperature(s) {bad} without the degree sign. "
         f"Always °C, e.g. 200°C."
