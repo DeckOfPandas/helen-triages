@@ -1055,6 +1055,33 @@ NO_TEMPERATURE_BECAUSE = {
     "chicken-sorrel-potato-stew": "leg braised; no figure for pieces",
     "indonesian-chicken-curry-gulai-ayam": "thighs in a curry; no figure for pieces",
     "thai-green-chicken-curry": "chicken in a curry; no figure for pieces",
+
+    # A cut where the figure exists and still does not apply.
+    #
+    # youvetsi is the only entry of this third kind, and it is worth the extra
+    # words because it was WIRED TO beef.tough_cuts FIRST, on 2026-08-21, and
+    # that was defensible: the recipe said bone-in short rib, and tough_cuts is
+    # the collagen-breakdown figure (90–96°C) for exactly short rib and pot
+    # roast. Helen unwired it the same day, cooking the dish, having stopped
+    # taking the meat off the bones and braised the rib blocks whole:
+    #
+    #   "the end temperature matters even less, as it'll just fall off at the
+    #    end, being whatever temperature the pan sits at for 3 hours"
+    #
+    # THE POINT IS THE ONE THE DATA CANNOT SEE. A figure can be correct for the
+    # cut and useless in the method. Three hours in a covered casserole has no
+    # moment where anybody probes anything; the meat is done when it leaves the
+    # bone. Wiring a real temperature in would not have been WRONG, which is why
+    # nothing here caught it -- it would just have put a number on the page that
+    # no step ever asks the cook to take.
+    #
+    # The method may be rewritten around whole rib blocks once she has eaten it.
+    # If the recipe ever goes back to off-the-bone pieces, beef.tough_cuts is
+    # still the right reference and this entry should come out.
+    "youvetsi": "short rib blocks braised whole for 3 hrs; the meat is done when "
+                "it falls off the bone, and no step probes anything — "
+                "beef.tough_cuts is right about the cut and irrelevant to the "
+                "method",
 }
 
 
