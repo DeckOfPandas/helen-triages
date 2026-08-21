@@ -616,7 +616,109 @@ INVISIBLE_KEYS = {
         "Gordon Ramsay's Ultimate Cookery Course` are the same string shape and "
         "no regex separates them. Read by tests only. Issue #406."
     ),
+    "meta.rewritten": (
+        "Records that Helen has rewritten the source's wording in her own words, "
+        "rather than the draft still carrying the original text. Read by nothing "
+        "that builds a page -- the index badge and the publish gate hang off "
+        "meta.awaiting_fix and meta.proofread, not this. Listable only since the "
+        "scanner below learned to ignore comments: the sole match on the render "
+        "surface is an English sentence in assets/js/ingredient-search.js about "
+        "ingredient text being rewritten, which has nothing to do with the key. "
+        "Issues #418, #428."
+    ),
 }
+
+# ---------------------------------------------------------------------------
+# STRIPPING COMMENTS BEFORE MATCHING. Issue #428.
+#
+# The scan below used to be `grep -rlw <key>` over RENDER_SURFACE. A word-grep
+# cannot tell code from prose, so a key whose name is an ordinary English word
+# was reported as rendered the moment anyone used that word in a comment. That
+# is what kept `meta.rewritten` off the list above: one comment in
+# ingredient-search.js, about ingredient text, not about the key.
+#
+# THIS IS THE FOURTH TIME PROSE HAS DEFEATED A SOURCE-SCANNING GUARD here
+# (HANDOVER §12), and the escalation was already written down after the third:
+# strip comments before matching, or parse rather than grep.
+#
+# STRINGS ARE DELIBERATELY KEPT. The obvious companion move -- strip string
+# literals too -- would be a bug, because a string literal is exactly how a key
+# gets read: `page["source_type"]`, `data['meta']['rewritten']`. Stripping them
+# would turn a real read into a silent miss, which is the one direction this
+# guard must never fail in. So strings are tracked (a scanner that did not track
+# them would see the `//` in "https://..." as a comment and eat the rest of the
+# line, which fails the same dangerous way) but their contents are preserved.
+#
+# WHAT IT DOES NOT DO: it is not a parser. Liquid comments and HTML comments are
+# matched as blocks; a `<!--` inside a Liquid string would confuse it. That has
+# never happened, and the 90% is what the previous three instances all needed.
+LINE_COMMENT = {".js": "//", ".py": "#", ".rb": "#"}
+BLOCK_COMMENT = {".js": ("/*", "*/")}
+QUOTES = {".js": "\"'`", ".py": "\"'", ".rb": "\"'"}
+LIQUID_COMMENT = re.compile(r"\{%-?\s*comment\s*-?%\}.*?\{%-?\s*endcomment\s*-?%\}",
+                            re.S)
+HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
+
+
+def _strip_comments(text, suffix):
+    """`text` with its comments blanked out, keeping string literals intact."""
+    if suffix in (".html", ".svg", ".md", ".xml"):
+        return HTML_COMMENT.sub(" ", LIQUID_COMMENT.sub(" ", text))
+    if suffix not in LINE_COMMENT:
+        return text
+
+    line, block, quotes = LINE_COMMENT[suffix], BLOCK_COMMENT.get(suffix), QUOTES[suffix]
+    out, i, n = [], 0, len(text)
+    while i < n:
+        ch = text[i]
+        if ch in quotes:                     # a string: copy it out verbatim
+            out.append(ch)
+            i += 1
+            while i < n and text[i] != ch:
+                if text[i] == "\\":
+                    out.append(text[i])
+                    i += 1
+                    if i >= n:
+                        break
+                out.append(text[i])
+                i += 1
+            if i < n:
+                out.append(text[i])
+                i += 1
+        elif text.startswith(line, i):
+            i = text.find("\n", i)
+            if i == -1:
+                break
+        elif block and text.startswith(block[0], i):
+            end = text.find(block[1], i + len(block[0]))
+            i = n if end == -1 else end + len(block[1])
+            out.append(" ")
+        else:
+            out.append(ch)
+            i += 1
+    return "".join(out)
+
+
+def _render_surface_reads(key):
+    """Files on the render surface whose CODE (not comments) names `key`.
+
+    A dotted key is checked by its last segment: `meta.rewritten` is written
+    `page.meta.rewritten` in Liquid but reached as `["meta"]["rewritten"]`
+    elsewhere, and the leading `meta` is shared by every key under it.
+    """
+    word = re.compile(r"\b" + re.escape(key.rsplit(".", 1)[-1]) + r"\b")
+    hits = []
+    for root in RENDER_SURFACE:
+        for path in sorted((ROOT / root).rglob("*")):
+            if not path.is_file() or path.suffix == ".pyc":
+                continue
+            try:
+                text = path.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, OSError):
+                continue
+            if word.search(_strip_comments(text, path.suffix)):
+                hits.append(path.relative_to(ROOT).as_posix())
+    return hits
 
 
 def test_invisible_keys_are_really_invisible():
@@ -628,10 +730,7 @@ def test_invisible_keys_are_really_invisible():
     """
     rendered = {}
     for key in sorted(INVISIBLE_KEYS):
-        hits = subprocess.run(
-            ["grep", "-rlw", "--", key, *RENDER_SURFACE],
-            cwd=ROOT, capture_output=True, text=True,
-        ).stdout.split()
+        hits = _render_surface_reads(key)
         if hits:
             rendered[key] = hits
 
@@ -644,6 +743,53 @@ def test_invisible_keys_are_really_invisible():
           "exactly what she proofread. Once a key is rendered that is false. "
           "Remove it from the list -- do not narrow this test."
     )
+
+
+# The guard above is only as good as its scanner, and the scanner is the part
+# that has now been wrong four times. So the scanner gets tested too, on both
+# sides: prose must not register as a read, and a real read must not be lost.
+# The second half is the one that matters -- a false negative here would let a
+# genuinely rendered key sit on INVISIBLE_KEYS unnoticed. Issue #428.
+SCANNER_CASES = [
+    (".js", "// main_ingredients text is rewritten in the include", False),
+    (".js", "/* rewritten\n   across lines */", False),
+    (".js", "const x = 1; // rewritten", False),
+    (".js", 'fetch("https://example.com/a"); const y = r.rewritten;', True),
+    (".js", 'if (item["rewritten"]) render();', True),
+    (".js", 'const s = "not a // comment: rewritten";', True),
+    (".py", "# rewritten, but only in a comment", False),
+    (".py", 'KEYS = ["rewritten"]', True),
+    (".py", '"""A docstring mentioning rewritten."""', True),
+    (".rb", "# rewritten in prose", False),
+    (".rb", 'data.fetch("rewritten")', True),
+    (".html", "{% comment %} rewritten {% endcomment %}", False),
+    (".html", "{%- comment -%} rewritten {%- endcomment -%}", False),
+    (".html", "<!-- rewritten -->", False),
+    (".html", "{% if page.meta.rewritten %}yes{% endif %}", True),
+    (".svg", "<!-- rewritten --><title>x</title>", False),
+]
+
+
+@pytest.mark.parametrize("suffix,source,is_read", SCANNER_CASES,
+                         ids=[f"{s[1:]}:{t[:38]}" for s, t, _ in SCANNER_CASES])
+def test_the_invisible_keys_scanner_tells_code_from_prose(suffix, source, is_read):
+    found = re.search(r"\brewritten\b", _strip_comments(source, suffix)) is not None
+    assert found is is_read, (
+        f"_strip_comments({suffix}) got this backwards:\n    {source!r}\n"
+        + ("The key is genuinely read here and the scanner lost it -- a false "
+           "negative lets a rendered key sit on INVISIBLE_KEYS unnoticed, which "
+           "is the failure this whole mechanism exists to prevent."
+           if is_read else
+           "That is prose, not a read. Over-reporting is why meta.rewritten "
+           "could not be listed before #428.")
+    )
+
+
+# A docstring in .py is a string literal, and strings are kept on purpose -- so
+# the case above passes for the right reason but for the WRONG kind of file. A
+# Python docstring really is prose. It is left alone because telling a docstring
+# from `KEYS = ["rewritten"]` needs the AST, and no key on INVISIBLE_KEYS has
+# ever collided with one. If that day comes, the fix is ast.parse, not a regex.
 
 
 def _file_at(commit, relpath):
@@ -681,14 +827,26 @@ def _only_invisible_keys_changed(commit, relpath):
 
     changed = {k for k in set(new_data) | set(old_data)
                if new_data.get(k, object()) != old_data.get(k, object())}
-    # meta is a nested mapping, so compare it key by key rather than wholesale.
-    if changed == {"meta"}:
-        new_meta, old_meta = new_data.get("meta") or {}, old_data.get("meta") or {}
-        changed = {f"meta.{k}" for k in set(new_meta) | set(old_meta)
-                   if new_meta.get(k, object()) != old_meta.get(k, object())}
-        return bool(changed) and all(
-            k.split(".", 1)[1] in INVISIBLE_KEYS for k in changed)
 
+    # meta is a nested mapping, so compare it key by key rather than wholesale --
+    # otherwise a change to any key under it reads as "meta changed", which no
+    # entry in INVISIBLE_KEYS can ever match.
+    #
+    # EXPANDED UNCONDITIONALLY since 2026-08-21. This used to run only when meta
+    # was the SOLE difference, so a commit that set source_type AND flipped
+    # meta.rewritten fell through to the flat comparison, saw a bare "meta", and
+    # said no. That failed in the safe direction, but for the wrong reason: it
+    # was a gap in the comparison, not a judgement about the keys.
+    if "meta" in changed:
+        new_meta = new_data.get("meta") if isinstance(new_data.get("meta"), dict) else {}
+        old_meta = old_data.get("meta") if isinstance(old_data.get("meta"), dict) else {}
+        changed.discard("meta")
+        changed |= {f"meta.{k}" for k in set(new_meta) | set(old_meta)
+                    if new_meta.get(k, object()) != old_meta.get(k, object())}
+
+    # Keys are compared by their FULL DOTTED NAME. INVISIBLE_KEYS lists
+    # `meta.rewritten`, not `rewritten`, because the two are different keys and a
+    # top-level one must not be exempted by its namesake under meta.
     return bool(changed) and changed <= set(INVISIBLE_KEYS)
 
 
