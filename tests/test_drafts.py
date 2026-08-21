@@ -304,12 +304,78 @@ def test_group_names_omit_leading_article(draft):
     )
 
 
+# =============================================================================
+# UN-REWRITTEN `QQ` TEXT IS NOT CHECKED FOR HOUSE STYLE. Issue #426.
+# =============================================================================
+# Helen: "don't normalise oven temp, the dash, or 'minutes' -- ideally just skip
+# the whole line for simple normalisation tasks", of a step like
+#
+#     - step: "QQ bake at 150C for 30-40 minutes"
+#
+# `QQ` is her marker for "not rewritten yet" (HANDOVER_v26.md §4/§12): the line
+# is still the SOURCE's wording, sitting in the file waiting to be replaced
+# wholesale. Correcting its degree sign or its dash is tidying text that is
+# about to be deleted, and it does it by editing someone else's words -- which
+# is the one thing the marker exists to stop.
+#
+# THE SAME ARGUMENT IS ALREADY IN THIS MODULE'S DOCSTRING, for
+# test_no_oven_conversions, which was left out of this file entirely because it
+# "would fire on exactly the unrewritten `QQ`/`PLACEHOLDER` source text those
+# markers exist to protect". #426 is that judgement applied at the granularity
+# it should always have had: per LINE, not per test. A test can then keep
+# guarding every rewritten step in a file that still has un-rewritten ones,
+# instead of being dropped wholesale or firing wholesale.
+#
+# THIS OVERTURNS ONE EARLIER DECISION, explicitly rather than quietly.
+# test_temperatures_use_degree_c's docstring argued a degree sign is "pure
+# formatting, no information lost either way -- safe to enforce even inside an
+# un-rewritten `QQ`/`PLACEHOLDER` step". That is true about the character and
+# wrong about the line: the edit is safe, the habit of editing there is not, and
+# Helen has now ruled the other way. The 2026-08-11 bug it was seeded from --
+# 14 drafts writing "180C" -- is still caught everywhere it matters.
+#
+# WHAT IT IS WORTH, measured on the drafts present 2026-08-21: 66 of the 67
+# house-style violations in the whole drafts folder were inside QQ lines, and 29
+# of the 30 failing files failed for no other reason. The one real failure was
+# invisible underneath them.
+#
+# ONLY AT THE START OF THE VALUE, never anywhere in it. A rewritten step that
+# happens to mention QQ mid-sentence is finished prose and gets checked like any
+# other. The marker is a prefix, and treating it as a substring would let any
+# line opt out of house style by mentioning it.
+_QQ_LINE = re.compile(r"""^\s*             # indent
+                          (?:-\s*)?        # optional list dash
+                          (?:[a-z_]+:\s*)? # optional key, e.g. `step: `
+                          (?:['"])?        # optional opening quote
+                          QQ\b""", re.X)
+
+
+def _is_qq(value) -> bool:
+    """True if this scalar is un-rewritten source text."""
+    return isinstance(value, str) and value.lstrip().startswith("QQ")
+
+
+def _checkable_raw(draft) -> str:
+    """`draft.raw` with every un-rewritten `QQ` line blanked.
+
+    Blanked rather than dropped so line COUNT is preserved: these strings feed
+    failure messages, and a report whose line numbers are off by however many
+    QQ lines happened to precede it is worse than no line numbers at all.
+    """
+    return "\n".join("" if _QQ_LINE.match(line) else line
+                     for line in draft.raw.split("\n"))
+
+
+def _checkable_prose(draft) -> list[tuple[str, str]]:
+    return [(loc, text) for loc, text in draft.prose if not _is_qq(text)]
+
+
 # --- house style (test_style.py) ---------------------------------------------
 
 @pytest.mark.parametrize("name,pattern,fix",
                          [(n, p, f) for n, p, f in TYPOGRAPHY if p])
 def test_typography(draft, name, pattern, fix):
-    hits = re.findall(pattern, draft.raw)
+    hits = re.findall(pattern, _checkable_raw(draft))
     assert not hits, (
         f"{where_draft(draft)} contains {len(hits)} instance(s) of {name}: "
         f"{sorted(set(h if isinstance(h, str) else h[0] for h in hits))[:5]}. "
@@ -343,7 +409,7 @@ def test_no_ampersand_in_title(draft, taxonomy):
 def test_spellings(draft):
     problems = []
     for pattern, correct in SPELLINGS.items():
-        if re.search(pattern, draft.raw, re.I):
+        if re.search(pattern, _checkable_raw(draft), re.I):
             problems.append(f"{pattern.strip(chr(92) + 'b')} -> {correct}")
     assert not problems, (
         f"{where_draft(draft)} uses non-house spellings: " + "; ".join(problems)
@@ -355,8 +421,12 @@ def test_temperatures_use_degree_c(draft):
     even inside an un-rewritten `QQ`/`PLACEHOLDER` step, unlike
     test_no_oven_conversions (see module docstring). Caught for real,
     2026-08-11: 14 drafts wrote e.g. "180C" instead of "180°C".
+
+    THAT ARGUMENT NO LONGER REACHES `QQ` LINES, issue #426 -- see the block
+    above. The character is still harmless; editing an un-rewritten line to
+    place it is what stopped. Every rewritten step is checked exactly as before.
     """
-    bad = re.findall(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)", draft.raw)
+    bad = re.findall(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)", _checkable_raw(draft))
     assert not bad, (
         f"{where_draft(draft)} writes temperature(s) {bad} without the "
         f"degree sign. Always °C, e.g. 200°C."
@@ -374,7 +444,7 @@ def test_metadata_time_format(draft):
         value = draft.fm.get(field)
         if not isinstance(value, str) or not value.strip():
             continue
-        if value.strip() in ("QQ", "None", "Until done"):
+        if _is_qq(value) or value.strip() in ("None", "Until done"):
             continue
         bad_units = re.findall(r"(?<=[0-9])\s*(minutes?|hours?|h)\b", value)
         if bad_units:
@@ -391,7 +461,7 @@ def test_prose_abbreviates_minutes_only(draft):
     in a method step or note where prose wants "N mins".
     """
     problems = []
-    for location, text in draft.prose:
+    for location, text in _checkable_prose(draft):
         for match in re.finditer(r"(?<=[0-9])\s*(minutes?|hrs?|secs?)\b", text):
             word = match.group(1)
             wanted = {"minute": "min", "minutes": "mins",
