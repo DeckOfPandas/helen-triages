@@ -230,6 +230,83 @@ def internal_temperatures() -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
+# =============================================================================
+# UN-REWRITTEN `QQ` TEXT IS NOT CHECKED FOR HOUSE STYLE. Issue #426.
+# =============================================================================
+# Helen: "don't normalise oven temp, the dash, or 'minutes' -- ideally just skip
+# the whole line for simple normalisation tasks", of a step like
+#
+#     - step: "QQ bake at 150C for 30-40 minutes"
+#
+# `QQ` is her marker for "not rewritten yet" (HANDOVER_v26.md §4/§12): the line
+# is still the SOURCE's wording, sitting in the file waiting to be replaced
+# wholesale. Correcting its degree sign or its dash is tidying text that is
+# about to be deleted, and it does it by editing someone else's words -- which
+# is the one thing the marker exists to stop.
+#
+# THE SAME ARGUMENT IS ALREADY IN THIS MODULE'S DOCSTRING, for
+# test_no_oven_conversions, which was left out of this file entirely because it
+# "would fire on exactly the unrewritten `QQ`/`PLACEHOLDER` source text those
+# markers exist to protect". #426 is that judgement applied at the granularity
+# it should always have had: per LINE, not per test. A test can then keep
+# guarding every rewritten step in a file that still has un-rewritten ones,
+# instead of being dropped wholesale or firing wholesale.
+#
+# THIS OVERTURNS ONE EARLIER DECISION, explicitly rather than quietly.
+# test_temperatures_use_degree_c's docstring argued a degree sign is "pure
+# formatting, no information lost either way -- safe to enforce even inside an
+# un-rewritten `QQ`/`PLACEHOLDER` step". That is true about the character and
+# wrong about the line: the edit is safe, the habit of editing there is not, and
+# Helen has now ruled the other way. The 2026-08-11 bug it was seeded from --
+# 14 drafts writing "180C" -- is still caught everywhere it matters.
+#
+# WHAT IT IS WORTH, measured on the drafts present 2026-08-21: 66 of the 67
+# house-style violations in the whole drafts folder were inside QQ lines, and 29
+# of the 30 failing files failed for no other reason. The one real failure was
+# invisible underneath them.
+#
+# ONLY AT THE START OF THE VALUE, never anywhere in it. A rewritten step that
+# happens to mention QQ mid-sentence is finished prose and gets checked like any
+# other. The marker is a prefix, and treating it as a substring would let any
+# line opt out of house style by mentioning it.
+# LIVES IN conftest, NOT IN test_drafts.py, SINCE 2026-08-21 -- and the move is
+# what let the draft/recipe rule duplication collapse. These read a `Recipe`,
+# and `Recipe` is the same class for both collections, so the natural home is
+# beside it.
+#
+# APPLYING THEM TO A PUBLISHED RECIPE IS A NO-OP, measured before relying on it:
+# across every file in `_food_recipes/`, `checkable_raw(r) == r.raw` and
+# `checkable_prose(r) == r.prose`, because `test_no_qq_placeholder` forbids the
+# marker there at all. That is what makes it safe for ONE shared rule to blank
+# QQ lines unconditionally and be correct for both collections -- rather than
+# two copies of the rule differing by a call nobody can tell is deliberate.
+_QQ_LINE = re.compile(r"""^\s*             # indent
+                          (?:-\s*)?        # optional list dash
+                          (?:[a-z_]+:\s*)? # optional key, e.g. `step: `
+                          (?:['"])?        # optional opening quote
+                          QQ\b""", re.X)
+
+
+def is_qq(value) -> bool:
+    """True if this scalar is un-rewritten source text."""
+    return isinstance(value, str) and value.lstrip().startswith("QQ")
+
+
+def checkable_raw(recipe) -> str:
+    """`recipe.raw` with every un-rewritten `QQ` line blanked.
+
+    Blanked rather than dropped so line COUNT is preserved: these strings feed
+    failure messages, and a report whose line numbers are off by however many
+    QQ lines happened to precede it is worse than no line numbers at all.
+    """
+    return "\n".join("" if _QQ_LINE.match(line) else line
+                     for line in recipe.raw.split("\n"))
+
+
+def checkable_prose(recipe) -> list[tuple[str, str]]:
+    return [(loc, text) for loc, text in recipe.prose if not is_qq(text)]
+
+
 def _relative(recipe: Recipe) -> str:
     """The file's real path from the repo root.
 
