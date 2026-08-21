@@ -103,7 +103,7 @@ chicken:
     shape: rate
     timing: ~40 min/kg + 20 min
     group: Whole bird, roasting methods
-    covering: Foil loosely over breast for first 2/3 of cook, removed for last 20–30 min
+    covering: Foil loosely over breast for first ⅔ of cook, removed for last 20–30 min
     temp_change: None
     outcome: Protects the breast
     oven: 190–200°C fan
@@ -357,7 +357,7 @@ goose:
     shape: rate
     timing: ~30–35 min/kg (estimated by analogy to the standard rate above — not separately sourced)
     group: Whole bird, roasting methods
-    covering: Tented for first 2/3, off for last 30 min
+    covering: Tented for first ⅔, off for last 30 min
     temp_change: None
     outcome: Protects the breast
     oven: 160–170°C fan
@@ -745,7 +745,7 @@ pork:
     shape: rate
     timing: ~35–40 min/kg + 20 min (not independently re-checked this pass)
     group: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
-    covering: Loosely tented for first 2/3, off for last 25–30 min
+    covering: Loosely tented for first ⅔, off for last 25–30 min
     temp_change: None
     outcome: Stops the outside drying
     oven: 180°C fan
