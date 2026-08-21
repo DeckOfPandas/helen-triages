@@ -608,7 +608,7 @@ venison:
     tender_at: "90–95°C"
     tender_at_min: 90
     tender_at_max: 95
-    sources: "The house collagen figure again -- see venison.shoulder for why 90–95°C is an inference from chemistry rather than a citation, and treat it with the same caution. Nothing about braising changes that reasoning; it is the same connective tissue giving way at the same temperature."
+    sources: "The house collagen figure again — see venison.shoulder for why 90–95°C is an inference from chemistry rather than a citation, and treat it with the same caution. Nothing about braising changes that reasoning; it is the same connective tissue giving way at the same temperature."
   shank:
     # Same figure and same basis as shoulder above -- another collagen-heavy
     # forequarter cut with no published venison-specific number behind it. Kept

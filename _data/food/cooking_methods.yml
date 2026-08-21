@@ -12,8 +12,7 @@
 # that still held the tables -- running either against the current working
 # tree finds no tables left to parse and would emit an empty data file, which
 # in turn blanks the page it feeds. That has already happened once. Leave
-# those scripts alone; edit this file, or the page's prose furniture in
-# `groups`, instead.
+# those scripts alone; edit this file instead.
 #
 # The figures themselves were transcribed by machine, not retyped, when this
 # file was first built, so nothing was re-researched and nothing changed value
@@ -40,17 +39,21 @@
 # internal_temp_ref points into internal_temperatures.yml, so a schedule can
 # finish on a thermometer figure rather than on a clock.
 #
-# `groups` carries the page furniture around each table: its subtitle, its
-# column names, and TWO ORDERED LISTS of prose -- `before` the table and
-# `after` it -- each item keeping its original class and inner HTML verbatim.
+# `groups` USED TO LIVE HERE AND IS GONE, 2026-08-21, issue #400. It held the
+# page furniture from before the migration: each table's subtitle, its column
+# names, and two ordered lists of the prose that sat before and after it. The
+# rebuilt page never rendered any of it, so for eight days it was 35 paragraphs
+# of invisible text making up 30% of the 58 KB JSON blob this file is
+# serialised into and shipped to every visitor's browser.
 #
-# Ordered lists rather than named fields (weight_note, safety_note, ...) so that
-# a kind of paragraph nobody anticipated still survives, in the right place,
-# with its markup. The `kind` label is a hint for styling, not a filter: an
-# unrecognised paragraph renders as `prose` rather than disappearing.
-#
-# Steak, fish and shellfish are absent by design -- no timings, so nothing to
-# reconcile, and the fish table's 11 rowspans don't survive a generic loop.
+# IT WAS NOT DELETED, IT WAS MOVED. Fourteen of those paragraphs are sourcing
+# notes recording where each timing figure came from -- Delia Smith, Waitrose,
+# Gressingham, the American Lamb Board -- which is original research that
+# exists nowhere else, and #400's description of this as dead data was right
+# about the rendering and wrong about the content. It now lives in
+# food/reference/cooking-methods-prose-archive.html, committed but not built,
+# complete and verbatim including the 14 outbound links buried inside those
+# notes. Read it there before assuming any timing here is unsourced.
 
 chicken:
   label: Chicken
@@ -103,7 +106,7 @@ chicken:
     shape: rate
     timing: ~40 min/kg + 20 min
     group: Whole bird, roasting methods
-    covering: Foil loosely over breast for first 2/3 of cook, removed for last 20–30 min
+    covering: Foil loosely over breast for first ⅔ of cook, removed for last 20–30 min
     temp_change: None
     outcome: Protects the breast
     oven: 190–200°C fan
@@ -152,21 +155,6 @@ chicken:
     total_min: 40
     total_max: 40
     notes: Much faster and more even than trussed roasting; not "whole" in shape but often grouped with whole-bird methods
-  groups:
-  - name: Whole bird, roasting methods
-    columns:
-    - Method
-    - Oven temp
-    - Timing (per kg)
-    - Temp change
-    - Covering
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: <strong>Weight calculus:</strong> the "X min/kg + 20 min" formulas (standard, high-then-low, foil-tented, fully-wrapped) hold reliably for birds roughly <strong>1.3 kg to 3 kg</strong>. Below ~1.3 kg the flat +20 min addition becomes disproportionately large relative to cook time — use a flat total time (~1 hr to 1 hr 10 min) and check temperature. Above ~3 kg, heat penetration to the thigh becomes the bottleneck, so larger birds need a lower temperature (160–170°C) for a longer, gentler cook.
-    - kind: sources
-      html: 'Sources: standard/high-heat-start rates match BBC Good Food and Delia Smith''s common "20 min per 450g + 20 min" formula (≈44 min/kg+20min). Low-and-slow and roasting-bag corrections and the spatchcock rewrite are from Reynolds'' own oven-bag timing chart and comparable recipes (Bell &amp; Evans and others) for a whole spatchcocked bird at 220–230°C. Foil-tented/fully-wrapped weren''t specifically re-checked this pass — same weight-calculus caveat as everything above. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 turkey:
   label: Turkey
   internal_temp_ref: poultry.turkey
@@ -283,22 +271,6 @@ turkey:
     rate_min: 10
     rate_max: 16
     notes: Rarely done above ~6.5 kg — too large to lie flat in most ovens
-  groups:
-  - name: Whole bird, roasting methods
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp change
-    - Covering
-    - Weight range
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: <strong>Weight edge cases:</strong> below ~4 kg, treat like a very large chicken — check from the low end of the timing. Above ~10 kg, per-kg formulas break down; use a much lower oven temperature (140–150°C) and time by thermometer alone, checking from about two-thirds of the naive estimate onward.
-    - kind: sources
-      html: 'Sources: standard rate confirmed against four independent UK sources (Jamie Oliver, Delia Smith, BBC Good Food, Butterball/USDA) all converging on ~35–44 min/kg for a whole unstuffed bird — the old ~20 min/kg figure undercooked a 5 kg turkey by roughly an hour against your own recipe''s actual 2½ hr/30 min-per-kg result, which is itself a useful cross-check against this table. High-heat-start rate from Mary Berry''s method. Roasting-bag rate from Reynolds'' own oven-bag chart (the fastest of the enclosed methods, used as the anchor for the tented/wrapped estimates above it, which weren''t independently sourced). Spatchcock rate from Bon Appétit-style conversions. Tented/wrapped/low-and-slow rows are estimates by analogy, not independently confirmed — check these first if you cook a turkey this way. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 goose:
   label: Goose
   internal_temp_ref: poultry.goose
@@ -357,7 +329,7 @@ goose:
     shape: rate
     timing: ~30–35 min/kg (estimated by analogy to the standard rate above — not separately sourced)
     group: Whole bird, roasting methods
-    covering: Tented for first 2/3, off for last 30 min
+    covering: Tented for first ⅔, off for last 30 min
     temp_change: None
     outcome: Protects the breast
     oven: 160–170°C fan
@@ -384,22 +356,6 @@ goose:
     rate_min: 25
     rate_max: 30
     notes: Traditional method — renders fat and tightens skin before roasting
-  groups:
-  - name: Whole bird, roasting methods
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp change
-    - Covering
-    - Weight range
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: <strong>Weight edge cases:</strong> geese vary less in weight than turkeys (commercially usually 3.5–6.5 kg), so the per-kg formulas are reasonably reliable across the typical range. Below ~3.5 kg, treat like a very large duck and check earlier than the formula suggests.
-    - kind: sources
-      html: 'Sources: standard and high-heat-start rates from Delia Smith''s own goose recipe (5.4 kg bird, 30 min blast + 3 hrs at 180°C ≈ 39 min/kg), Gordon Ramsay''s recipe (220°C blast 25–30 min, drop to 170°C, then 30 min/kg), and Abel &amp; Cole (same pattern). Low-and-slow rate from genuine 150°C/300°F goose recipes running 3–4 hrs for a ~5 kg bird. Tented and steaming rows are estimates by analogy, not independently sourced. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 duck:
   label: Duck
   internal_temp_ref: poultry.duck
@@ -486,22 +442,6 @@ duck:
     rate_min: 20
     rate_max: 60
     notes: Good for smaller ducks where breast and leg doneness otherwise diverge. One US recipe (450°F) matches the fast end of this range; one UK recipe uses a gentler 160–180°C for 120 min on a 2 kg bird — nearly 3× longer. Use a thermometer rather than trusting either end
-  groups:
-  - name: Whole bird, roasting methods
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp change
-    - Covering
-    - Weight range
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: <strong>Weight edge cases:</strong> most whole ducks sold are 1.5–2.5 kg. Below ~1.5 kg the flat +20 min addition becomes disproportionate — treat like a very large poussin and check early. Above ~3 kg is unusual for domestic duck; use a lower temperature (150–160°C) for longer to render fat fully without scorching the skin.
-    - kind: sources
-      html: 'Sources: Gressingham''s own roasting guide and Great British Chefs for the standard/high-heat rates. Nigella''s slow-roast duck method for the low-and-slow row (indirect comparison, different temperature — treat as a wide estimate, not a confirmed figure). Spatchcock range reflects genuinely conflicting US vs UK sources rather than one being simply wrong — this is the one row on this page where the disagreement is between real recipes, not a unit-conversion error. Duck is the protein least affected by the systematic error found elsewhere on this page. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 beef:
   label: Beef
   internal_temp_ref: beef.tender_roast
@@ -636,37 +576,6 @@ beef:
     rate_max: 90
     notes: More roast-like (less shreddy) texture than a wet braise
     source_note: Not independently re-checked this pass — the other rows here mostly held up, so this wasn't specifically flagged, but it wasn't specifically confirmed either
-  groups:
-  - name: Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin roast
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp change
-    - Covering
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: '<strong>Weight range:</strong> formulas hold well for <strong>1–4 kg</strong>. Below 1 kg, treat like a large steak and check early. Above 4–5 kg, switch to thermometer-only timing. Doneness temperatures: see <a href="../internal-temperatures/#beef-tender-roasting-cuts">temperature charts</a>.'
-    - kind: sources
-      html: 'Sources: <a href="https://www.waitrose.com/ecom/content/inspiration/guides/roast-guide">Waitrose''s roast guide</a> (20 min/500g rare, 25 min/500g medium, at 160°C fan) and Certified Angus Beef for the standard/sear rates. River Cottage''s slow-roast method for the reverse-sear row (flagged moderate confidence — sourced for one joint size, not a range of weights). Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
-  - name: Tough/working cuts — brisket, chuck, short rib, pot roast
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp/covering
-    - Liquid
-    - Notes
-    before:
-    - kind: prose
-      html: Cooked low and slow until <em>tender</em>, not to a doneness temperature — timing below is a planning estimate only.
-    after:
-    - kind: weight
-      html: '<strong>Weight range:</strong> holds well <strong>1.5–4.5 kg</strong>. Below 1.5 kg, check early to avoid overshooting into dryness. Above 4.5–5 kg (full packer brisket), go by tenderness rather than extrapolating the formula. Endpoint temperature: see <a href="../internal-temperatures/#beef-tender-roasting-cuts">temperature charts</a>.'
-    - kind: sources
-      html: 'Sources: collagen-breakdown temperature (90–96°C, on the temperature charts) and short rib/pot roast timings confirmed against standard BBQ/braise references — 195–205°F (90–96°C) is the widely-cited fall-apart range, and ~300°F/149°C for ~3 hrs matches typical short rib recipes. Brisket low-and-slow rate corrected against widely-cited BBQ/oven guidance for the same ~121°C bracket. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 pork:
   label: Pork
   internal_temp_ref: pork.roasting
@@ -745,7 +654,7 @@ pork:
     shape: rate
     timing: ~35–40 min/kg + 20 min (not independently re-checked this pass)
     group: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
-    covering: Loosely tented for first 2/3, off for last 25–30 min
+    covering: Loosely tented for first ⅔, off for last 25–30 min
     temp_change: None
     outcome: Stops the outside drying
     oven: 180°C fan
@@ -815,38 +724,6 @@ pork:
     rate_min: 50
     rate_max: 60
     notes: High fat self-bastes; final blast essential for crackling
-  groups:
-  - name: Roasting cuts — loin, leg/fresh ham, rack/crown roast, tenderloin
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp change
-    - Covering
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: '<strong>Weight range:</strong> holds well <strong>1.5–4.5 kg</strong> (loin/leg). Below 1.5 kg (or tenderloin generally), check well before the formula suggests. Above 4.5–5 kg, drop toward the low-temp end of the range. Doneness temperatures: see <a href="../internal-temperatures/#pork">temperature charts</a>.'
-    - kind: safety
-      html: <strong>FOOD SAFETY:</strong> the doneness figures this timing table cooks toward (see <a href="../internal-temperatures/#pork">temperature charts</a>) include a "medium, slightly pink" option at 60–62°C that does not clear the UK FSA's own core-temperature guidance for pork specifically — unlike beef or lamb, FSA doesn't treat pink pork the same as pink beef. Full detail on the temperature charts; flagging here too since this is the page you'd actually be timing against mid-cook.
-    - kind: sources
-      html: 'Sources: <a href="https://www.goodto.com/food/how-to/how-to-roast-pork-294839">Good To Know</a> and Village Butchers for the leg/crackling rate (~30 min/500g = ~60 min/kg after a blast). US-style guidance (~40 min/kg at 175–180°C) for lean loin — kept as a separate row rather than overwriting the leg rate, since the two cuts genuinely cook at different speeds. <a href="https://www.waitrose.com/ecom/content/inspiration/guides/roast-guide/roast-pork">Waitrose''s roast guide</a> and a BBC pork fillet recipe for the tenderloin correction. Low-temp reverse-sear rate confirmed against Kenji López-Alt/Serious Eats practice, unchanged. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
-  - name: Slow-cooked cuts — shoulder/pork butt, belly
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Covering
-    - Notes
-    before:
-    - kind: prose
-      html: Cooked past the "done" temperature until fat and collagen render — timing by tenderness, not just weight.
-    after:
-    - kind: weight
-      html: <strong>Weight range:</strong> holds well <strong>2–5 kg</strong>. Below 2 kg, check earlier. Above 5–6 kg, go by tenderness rather than extrapolating.
-    - kind: sources
-      html: 'Sources: collagen breakdown at 90–95°C (temperature charts page) is the standard fall-apart range. The shoulder timing spread reflects real recipes at very different target textures rather than one being wrong — a 1.6 kg shoulder at 150°C for 6 hrs and a 100°C/12hr version were both used as reference points. Only the two "shoulder, low and slow" rows were re-checked this pass; covered/uncovered and belly weren''t specifically tested. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 lamb:
   label: Lamb
   internal_temp_ref: lamb.roasting
@@ -981,34 +858,6 @@ lamb:
     rate_min: 60
     rate_max: 75
     notes: High fat self-bastes; final blast crisps exterior
-  groups:
-  - name: Roasting cuts — leg, rack, saddle, loin
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp change
-    - Covering
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: '<strong>Weight range:</strong> holds well for leg roasts <strong>1.5–3.5 kg</strong>. Below 1.5 kg (or rack/saddle generally), check well before the formula suggests. Above 3.5–4 kg, drop toward the low-temp end. Doneness temperatures: see <a href="../internal-temperatures/#lamb">temperature charts</a>.'
-    - kind: sources
-      html: 'Sources: <a href="https://www.jamieoliver.com/recipes/lamb/perfect-roast-leg-of-lamb/">Jamie Oliver''s roast leg of lamb</a> for the high-heat-start rate. American Lamb Board figures for the standard-roast caveat (indirect — different temperature, not a confirmed correction). Rack rewrite based on real 400–600g rack recipes running 15–25 min total regardless of the min/kg maths. Low-temp rows and doneness table weren''t flagged by research — doneness in particular tracks closely to Serious Eats'' figures. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
-  - name: Slow-cooked cuts — shoulder, breast
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Covering
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: <strong>Weight range:</strong> holds well <strong>1.5–3.5 kg</strong>. Below 1.5 kg, check earlier. Above 3.5–4 kg, go by tenderness rather than extrapolating.
-    - kind: sources
-      html: 'Sources: collagen breakdown at 90–95°C (temperature charts page) is standard. Shoulder timing spread reflects genuinely different target textures at comparable temperatures, same reasoning as pork shoulder''s own sources note above. Only the first "low and slow" row was re-checked this pass. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 ham:
   label: Ham
   internal_temp_ref: ham.cured
@@ -1161,41 +1010,6 @@ ham:
     oven_basis: inferred
     relative_to: Add ~10% to time vs. same-weight bone-in
     notes: Same adjustment as fresh ham
-  groups:
-  - name: Fresh (uncured, raw) ham — bone-in or boneless
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp change
-    - Covering
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: '<strong>Weight range:</strong> holds for <strong>2–5 kg</strong> (bone-in) or <strong>1.8–4.5 kg</strong> (boneless). Doneness temperatures: see <a href="../internal-temperatures/#ham">temperature charts</a>.'
-    - kind: safety
-      html: <strong>FOOD SAFETY:</strong> a fresh ham is pork leg, so the same flag applies as pork above — the "hint of pink" doneness option (60–62°C) on the <a href="../internal-temperatures/#ham">temperature charts</a> page does not clear FSA's pork-specific guidance. The well-done option does.
-    - kind: sources
-      html: 'Sources: this table''s timing rates were mostly confirmed as-is against UK guides (~30–40 min/kg at 180°C is the common range; a 220–230°C blast for 20–30 min then 180°C at ~30–40 min/kg also matches typical practice) — no changes made here, unlike the cured table below. Checked once, 2026-08-12 — tidy/remove this note once you''ve confirmed a row yourself.'
-  - name: Cured (and/or smoked) whole ham — bone-in or boneless
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp change
-    - Covering
-    - Notes
-    before:
-    - kind: prose
-      html: 'Assumes a raw-cured ham that still needs cooking — check packaging first: "cook before eating" and "ready to eat" are handled differently.'
-    after:
-    - kind: weight
-      html: '<strong>Weight range:</strong> cured hams usually sold <strong>2–4.5 kg</strong> bone-in. Doneness pull temp: see <a href="../internal-temperatures/#ham">temperature charts</a> (target corrected to 70–75°C — was 68–72°C, a touch under both Waitrose''s and FSA''s figures).'
-    - kind: caveat
-      html: <strong>Caveat:</strong> cured ham labelling varies a lot (unsmoked vs smoked, wet vs dry-cured, cook-before-eating vs ready-to-eat) — check packaging instructions against the thermometer reading rather than relying on generic figures.
-    - kind: sources
-      html: 'Sources: Waitrose, LovePork, Morrisons and flawlessfood all converge on the ~45 min/kg boil rate and ~60 min/kg + 30 min roast-only rate ("30 min per 500g plus 30" is the exact UK rule of thumb). This is the discrepancy that best matches your own memory of a lb/kg-style mix-up from an earlier pass — both figures here were roughly half the sourced rate, in exactly the shape a dropped unit conversion produces. Checked once, 2026-08-12 — tidy/remove these notes once you''ve confirmed a row yourself.'
 venison:
   label: Venison
   internal_temp_ref: venison.haunch
@@ -1312,34 +1126,3 @@ venison:
     total_min: 120
     total_max: 180
     notes: Venison osso buco. Shanks are sold by the piece and vary from muntjac-small to red-deer-large, so this is a total time like beef short rib rather than a rate. Done when the meat leaves the bone.
-  groups:
-  - name: Roasting cuts — haunch, loin, saddle, rack
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Temp change
-    - Covering
-    - Notes
-    before: []
-    after:
-    - kind: weight
-      html: '<strong>Weight range:</strong> holds well for haunches <strong>1.3–2.5 kg</strong>, which is most of what is sold. Below that, or for loin, saddle and rack generally, time by the piece and check early — venison is lean enough that the margin between pink and grey is a few minutes. Doneness temperatures: see <a href="../internal-temperatures/#venison-tender-roasting-cuts">temperature charts</a>.'
-    - kind: sources
-      html: 'Sources: Sainsbury''s Magazine and Great British Recipes for the high-heat-start rates. That row is the one place on this table where the fan figure is stated rather than converted by us — Great British Recipes prints "200 FAN" then "160 FAN", Sainsbury''s Magazine prints "fan 200°C" then "fan 140°C", which is why the drop is given as a range rather than a single figure. Church Farm Oxford for the constant roast, the Wild Meat Company for the foil-wrapped row, and Farmfetch for the rack and the loin. Eversfield Organic''s 20 mins per 500 g is an outlier — roughly 1.6× the other three at the same oven temperature — so it is cited here rather than averaged in.'
-  - name: Slow-cooked cuts — shoulder, neck, shank
-    columns:
-    - Method
-    - Oven temp
-    - Timing
-    - Covering
-    - Liquid
-    - Notes
-    before:
-    - kind: prose
-      html: Cooked past any doneness temperature until the collagen gives way — the timing below is a planning estimate, not a target.
-    after:
-    - kind: weight
-      html: '<strong>Weight range:</strong> shoulders are usually <strong>1.5–3 kg</strong>. Shanks are sold by the piece and timed that way, so no per-kg rate applies to them. Endpoint temperature: see <a href="../internal-temperatures/#venison-slow-cooked-cuts">temperature charts</a>.'
-    - kind: sources
-      html: 'Sources: the Wild Meat Company''s pulled venison for the low-and-slow row, with the Great British Food Awards for its oven temperature — it prints "170°C/Fan 150°C", so that is a stated fan figure rather than one we converted. Farmfetch for the pot roast. Shooting UK, Great British Chefs and the Wild Meat Company for the shanks: the 2–3 hr spread between them is real disagreement about how big a shank is, not a rounding of one figure. Neck has no row of its own because no UK source publishes a venison neck timing — every neck recipe found was American — so it is folded in with the shoulder rows, at the same rate, and the group name says so.'

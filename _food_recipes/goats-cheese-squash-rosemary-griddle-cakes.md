@@ -34,7 +34,7 @@ method:
   - "Whisk in the melted butter to make a thick, smooth batter, then fridge."
   - "Sauté the squash in butter for about 10 mins until a knife goes in easily, turning up the heat a little at the end to brown the edges."
   - "Carefully fold the squash and cheese into the batter, being careful not to squash the squash."
-  - "Fry in small, thick pancakes with butter, 3-4 mins per side, flipping once the underside is deep golden."
+  - "Fry in small, thick pancakes with butter, 3–4 mins per side, flipping once the underside is deep golden."
 method_short:
   - ""
 meta:

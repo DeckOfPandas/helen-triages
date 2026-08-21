@@ -48,7 +48,11 @@ OUT = pathlib.Path("_data/food/cooking_methods.yml")
 # So this is a MIGRATION TOOL, run against the last version of the page that
 # still held the tables. Re-running it reproduces that migration exactly rather
 # than reflecting whatever the page says today. The data file is the source of
-# truth from here on; edit it directly, or edit this script and re-run.
+# truth from here on. EDIT IT DIRECTLY. Do NOT edit this script and re-run:
+# the data file has been hand-edited since the migration -- the venison section
+# and its own header were both written by hand and exist nowhere in the pinned
+# page -- so a re-run does not regenerate it, it OVERWRITES it, dropping 166
+# lines. Verified by measurement on 2026-08-21, after nearly doing it.
 PRE_MIGRATION = "8bdbd27"
 html = subprocess.run(
     ["git", "show", f"{PRE_MIGRATION}:food/reference/cooking-methods.html"],

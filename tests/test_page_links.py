@@ -118,11 +118,35 @@ def front_matter(path: Path) -> dict:
 # this corpus simply did not contain the file that publishes it. The failure at
 # least announced itself; the mirror image is the one to fear, since a page this
 # list cannot see is also a page whose own outbound links go unscanned.
-PAGE_FILES = (
-    sorted(ROOT.glob("food/**/*.html"))
-    + sorted(ROOT.glob("cocktails/**/*.html"))
-    + sorted(ROOT.glob("*.html"))
-)
+#
+# `published: false` PAGES ARE EXCLUDED, and this is not a loophole. Jekyll does
+# not build them: they get no URL, so they have no base for a relative href to
+# resolve against and nothing to publish for anyone to link to. Scanning one
+# produces confident nonsense -- food/reference/cooking-methods-prose-archive
+# .html (issue #400) has fourteen `../internal-temperatures/#anchor` links that
+# were correct on the page they came from, and resolving them against a URL that
+# does not exist reported all fourteen as broken.
+#
+# The exclusion is narrow on purpose: it drops a file from BOTH sides at once,
+# so an unpublished page neither has its own links checked nor counts as a link
+# target. That second half is the important one -- if this only stopped scanning
+# them, an unpublished page would still look like a valid destination and every
+# link into it would pass while 404ing in production.
+_PUBLISHED_FALSE = re.compile(
+    r"\A---\n(?:.*\n)*?published:\s*false\s*(?:#.*)?\n(?:.*\n)*?---\n", re.M)
+
+
+def _is_published(path):
+    return not _PUBLISHED_FALSE.match(path.read_text(encoding="utf-8"))
+
+
+PAGE_FILES = [
+    p for p in (
+        sorted(ROOT.glob("food/**/*.html"))
+        + sorted(ROOT.glob("cocktails/**/*.html"))
+        + sorted(ROOT.glob("*.html"))
+    ) if _is_published(p)
+]
 LAYOUT_FILES = sorted(ROOT.glob("_layouts/*.html"))
 INCLUDE_FILES = sorted(ROOT.glob("_includes/**/*.html"))
 ALL_TEMPLATE_FILES = PAGE_FILES + LAYOUT_FILES + INCLUDE_FILES

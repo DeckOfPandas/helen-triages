@@ -17,9 +17,9 @@ ingredient_groups:
       item: "prime beef fillet, in one piece, cut from the thick end"
     - item: "a few handfuls of wild rocket leaves"
 method:
-  - "Take the fillet out of the fridge at least 30 mins before cooking. Pre-heat the roasting pan at 170-180°C fan."
+  - "Take the fillet out of the fridge at least 30 mins before cooking. Pre-heat the roasting pan at 170–180°C fan."
   - "Trim any fat or sinew from the fillet and season all over. Sear the beef very quickly for 1½–2 mins on each sides, aiming for an even crust."
-  - "Transfer to the hot roasting pan and roast at 170-180°C fan depending on thickness. Take it out at 52–54°C for medium rare ([more donenesses](#doneness)), about 25 mins, when it should feel a little springy. Rest for 10 mins."
+  - "Transfer to the hot roasting pan and roast at 170–180°C fan depending on thickness. Take it out at 52–54°C for medium rare ([more donenesses](#doneness)), about 25 mins, when it should feel a little springy. Rest for 10 mins."
   - "Slice thickly and overlap on a serving platter."
 method_short:
   - ""

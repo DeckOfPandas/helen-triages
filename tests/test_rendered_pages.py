@@ -350,6 +350,77 @@ def test_every_class_we_emit_has_a_rule_in_the_stylesheet(site):
     )
 
 
+def test_every_icon_partial_class_has_a_styled_base(site):
+    """Classes inside `_includes/icons/**/*.svg` must resolve to a real rule.
+
+    GitHub issue #396. The test above builds its list from `*.html` and `*.js`,
+    so the icon partials — which are `.svg` — have never been looked at. That is
+    31 files including the whole `glasses/` set, and a typo'd class in any of
+    them renders an unstyled shape and fails nothing. Same shape as the stale
+    globs in HANDOVER §12: not a scan that matched nothing, but a source list
+    that quietly stopped covering the files.
+
+    WHY THIS IS A SEPARATE TEST WITH A DIFFERENT RULE, rather than four more
+    paths added to the glob above. Measured before writing: of 41 classes in
+    those partials, 10 are styled and **all 31 unstyled ones are BEM
+    modifiers whose base is styled** — `glass-icon--rocks` beside
+    `.glass-icon`, `nav-icon--food` beside `.nav-icon`. Not one modifier is
+    styled anywhere in either stylesheet. So modifiers here are hooks, exactly
+    as HANDOVER 11.3 describes, and demanding a rule for each would report 31
+    failures that are all correct code. The rule that actually catches bugs is
+    that the BASE resolves.
+
+    Both stylesheets, because the glasses are cocktails' and the cloche is
+    food's, and an icon shared by the chrome is in neither one's alone.
+
+    WHAT IT CANNOT SEE, stated rather than left to be found: a typo in the
+    MODIFIER half. `glass-icon--rocsk` has a styled base and passes. That is
+    tolerable only because no modifier in these files is styled at all today —
+    they carry no rules, so a misspelt one changes nothing. **If a modifier ever
+    gains a rule, this limit stops being harmless** and the check needs to
+    demand exact matches for modifiers that are styled elsewhere in the set.
+    """
+    partials = sorted(pathlib.Path("_includes").rglob("*.svg"))
+    assert partials, (
+        "No .svg partials found under _includes/ — this check would pass while "
+        "examining nothing, which is the failure mode it was written to fix. "
+        "If the icons genuinely moved, point this at their new home."
+    )
+
+    css = ""
+    for sheet in ("food.css", "cocktails.css"):
+        path = site / "assets" / "css" / sheet
+        assert path.exists(), f"{sheet} was not built — cannot judge coverage."
+        css += path.read_text(encoding="utf-8")
+
+    emitted: dict[str, list[str]] = {}
+    for path in partials:
+        for attr in re.findall(r"""class=['"]([^'"{}]+)['"]""",
+                               path.read_text(encoding="utf-8")):
+            for name in attr.split():
+                emitted.setdefault(name, []).append(str(path))
+
+    assert emitted, (
+        "No classes found in any icon partial. Either they stopped using "
+        "classes — in which case delete this test rather than let it pass "
+        "silently — or the attribute pattern has stopped matching."
+    )
+
+    orphans = []
+    for name, where in sorted(emitted.items()):
+        base = name.split("--", 1)[0]
+        if f".{base}" not in css:
+            orphans.append(f"{name} (base .{base}) — in {sorted(set(where))[0]}")
+
+    assert not orphans, (
+        "Icon classes whose base has no rule in either stylesheet, so they "
+        "render as unstyled shapes:\n  " + "\n  ".join(orphans)
+        + "\n\nA BEM modifier with a styled base is fine — an unused hook, "
+          "HANDOVER 11.3. A base with no rule at all is a typo or a deletion "
+          "that took the rule and left the markup."
+    )
+
+
 def test_every_chart_row_draws_its_filled_bar(site):
     """The gap in the rendered tests I wrote to catch exactly this.
 

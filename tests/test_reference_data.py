@@ -21,6 +21,7 @@ proves consistent is a cache; a duplicate nothing checks is a bug waiting.
 IF THE DERIVED VERSION IS EVER BUILT, delete this file with it -- it is
 scaffolding for the duplication, not a rule about temperatures.
 """
+import html
 import pathlib
 import re
 
@@ -543,56 +544,112 @@ def test_every_protein_points_at_the_charts(cooking_methods):
     assert not missing, f"no chart_anchor for: {missing}"
 
 
-def test_every_method_belongs_to_a_declared_group(cooking_methods):
-    """A method whose `group` matches no declared `group.name` is orphaned.
+# =============================================================================
+# THE ARCHIVE IS NOW THE DECLARATION OF RECORD. Issue #400, 2026-08-21.
+# =============================================================================
+# The three tests below used to read `groups` out of cooking_methods.yml. That
+# key held 35 paragraphs the rebuilt page never rendered, 30% of the JSON blob
+# shipped to every visitor, and it has moved -- complete and verbatim -- to
+# food/reference/cooking-methods-prose-archive.html, committed but not built.
+#
+# THEY FOLLOW THE CONTENT RATHER THAN BEING RETIRED WITH IT, and that is the
+# whole point. Two of these three went red the moment `groups` came out, which
+# is them doing their job: they are the reason it was possible to check that
+# nothing was lost. Deleting a guard because the thing it guards moved is how
+# content goes missing quietly six months later.
+#
+# The third, test_every_method_belongs_to_a_declared_group, did something worse
+# than fail: it PASSED, vacuously, because it skipped any protein with no
+# declared groups and suddenly no protein had any. A test that reports green
+# having checked nothing is the failure mode this file's own
+# test_the_data_file_is_not_empty was written about. Pointing it at the archive
+# gives it something real to compare against again, and ties the archive to the
+# live data so it cannot silently rot.
+from conftest import ROOT  # noqa: E402
 
-    This used to say "the page renders a table per group" -- that page is gone
-    (#382). The check survives it because `method.group` is still read, by
-    assets/js/cook-schedule.js, while the `groups` array that declares the
-    names is now read by nothing. So this guards data-internal consistency
-    rather than a rendering path, which is weaker than it was and is why the
-    stranded `groups` data is on the issue tracker rather than quietly kept."""
+ARCHIVE = ROOT / "food" / "reference" / "cooking-methods-prose-archive.html"
+
+
+def _archive():
+    assert ARCHIVE.exists(), (
+        f"{ARCHIVE.relative_to(ROOT)} is missing. It holds the 35 prose blocks "
+        f"and 14 sourcing notes that used to live in cooking_methods.yml's "
+        f"`groups` key (#400). Nothing else has them."
+    )
+    return ARCHIVE.read_text(encoding="utf-8")
+
+
+def _archive_group_headings():
+    """Every group heading in document order — 14 of them, 11 distinct.
+
+    THE DUPLICATES ARE REAL AND MUST NOT BE COLLAPSED AWAY. Three group names
+    are shared by two proteins each ("Roasting cuts — ...", and the pair of ham
+    headings), so a set has 11 members while the page has 14 headings. Counting
+    the set would have silently accepted losing three whole groups.
+    """
+    return [html.unescape(m) for m in re.findall(r"<h3>(.*?)</h3>", _archive())]
+
+
+def test_every_method_belongs_to_a_declared_group(cooking_methods):
+    """A method whose `group` matches no group name on record is orphaned.
+
+    `method.group` is read by assets/js/cook-schedule.js and is live data. The
+    names it must match were declared by the `groups` array until #400 moved it
+    to the archive, so the archive is what it is checked against now -- which
+    also means a group quietly renamed in the data breaks this test rather than
+    stranding the archive's copy of its prose under a heading nothing uses.
+    """
+    headings = _archive_group_headings()
+    assert len(headings) == 14, (
+        f"expected 14 group headings in the archive, found {len(headings)}"
+    )
+    declared = set(headings)
     orphans = []
     for protein, node in cooking_methods.items():
-        names = {g["name"] for g in node.get("groups", [])}
-        if not names:
-            continue
         for m in node["methods"]:
-            if m.get("group") not in names:
-                orphans.append(f"{protein}/{m['id']}: group {m.get('group')!r} "
-                               f"not in {sorted(names)}")
+            if m.get("group") and m["group"] not in declared:
+                orphans.append(f"{protein}/{m['id']}: group {m['group']!r} "
+                               f"is on no method group heading in the archive")
     assert not orphans, "\n  ".join(orphans)
 
 
-def test_prose_blocks_survived_the_move_into_data(cooking_methods):
-    """The nine timing sections' surrounding prose now lives in the data, in
-    ordered before/after lists. This asserts the count didn't quietly shrink:
-    35 paragraphs across 14 groups, being 14 sources notes and 21 others
-    (weight ranges, FOOD SAFETY flags, group intros, ham's Caveat).
+def test_prose_blocks_survived_the_move_to_the_archive():
+    """The count must not quietly shrink: 35 paragraphs, 14 of them sources.
 
-    Was 30 across 12 groups until 2026-08-16, when venison arrived (issue #205)
-    with two groups and five blocks: a weight range and a sources note on each,
-    plus the slow-cooked group's intro line."""
-    total = sum(len(g.get("before", [])) + len(g.get("after", []))
-                for node in cooking_methods.values()
-                for g in node.get("groups", []))
-    sources = sum(1 for node in cooking_methods.values()
-                  for g in node.get("groups", [])
-                  for b in g.get("before", []) + g.get("after", [])
-                  if b["kind"] == "sources")
-    assert total == 35, f"expected 35 prose blocks, found {total}"
+    The other 21 are weight ranges, FOOD SAFETY flags, group intros and ham's
+    Caveat. Was 30 across 12 groups until 2026-08-16, when venison arrived
+    (issue #205) with two groups and five blocks: a weight range and a sources
+    note on each, plus the slow-cooked group's intro line.
+
+    THE NUMBERS ARE UNCHANGED ACROSS THE MOVE TO THE ARCHIVE, on purpose. This
+    test read cooking_methods.yml until #400 and reads the archive now; that it
+    still says 35 and 14 is the evidence that the move lost nothing, and it is
+    worth strictly more here than it was there -- in the data these paragraphs
+    were rendered by nothing, so a loss would have been invisible in every
+    other way.
+    """
+    text = _archive()
+    total = len(re.findall(r'class="archive-prose"', text))
+    sources = text.count('data-kind="sources"')
+    assert total == 35, f"expected 35 prose blocks in the archive, found {total}"
     assert sources == 14, f"expected 14 sources notes, found {sources}"
 
 
-def test_outbound_links_are_still_in_the_data(cooking_methods):
-    """The page's only four outbound links live INSIDE recipe-source notes.
+def test_outbound_links_are_still_in_the_archive():
+    """The only outbound links live INSIDE the recipe-source notes.
+
     Flattening a source note to plain text would lose them without changing a
-    single visible word of prose, which is why they get their own assertion."""
-    blob = "".join(b["html"] for node in cooking_methods.values()
-                   for g in node.get("groups", [])
-                   for b in g.get("before", []) + g.get("after", []))
+    single visible word of prose, which is why they get their own assertion --
+    and why the move to the archive was checked link by link rather than by
+    eye. Four domains named here; 14 anchors in total.
+    """
+    text = _archive()
     for domain in ("waitrose.com", "jamieoliver.com", "goodto.com"):
-        assert domain in blob, f"outbound link to {domain} has been lost"
+        assert domain in text, (
+            f"outbound link to {domain} has been lost from "
+            f"{ARCHIVE.relative_to(ROOT)} — it exists nowhere else")
+    anchors = text.count("<a ")
+    assert anchors == 14, f"expected 14 links in the archive, found {anchors}"
 
 
 def test_the_data_file_is_not_empty(cooking_methods):

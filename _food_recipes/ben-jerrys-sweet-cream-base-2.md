@@ -13,7 +13,7 @@ ingredient_groups:
   - items:
     - amount: "480 ml"
       item: whipping cream, about 38% fat
-      note: substituted for the US request for "heavy cream", 36-40% fat
+      note: substituted for the US request for "heavy cream", 36–40% fat
     - amount: "160 ml"
       item: "single cream, about 18% fat"
     - amount: "150 g"
