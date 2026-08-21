@@ -230,9 +230,23 @@ def internal_temperatures() -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
+def _relative(recipe: Recipe) -> str:
+    """The file's real path from the repo root.
+
+    REBUILT FROM recipe.path, NOT FROM THE SLUG, since 2026-08-21. These used to
+    return f"{collection}/{slug}.md", which was true while both collections were
+    flat. `_load` went recursive on 2026-08-20 to pick up Helen's staging
+    subfolders, and from that moment a failure in `to-promote/foo.md` reported
+    itself as `_food_drafts/foo.md` -- a path with no file at it. You cannot open
+    what the message names, and the one place it matters is the moment you are
+    trying to fix a red test.
+    """
+    return recipe.path.resolve().relative_to(ROOT).as_posix()
+
+
 def where(recipe: Recipe, detail: str = "") -> str:
     """Consistent location prefix for failure messages."""
-    return f"_food_recipes/{recipe.slug}.md" + (f" — {detail}" if detail else "")
+    return _relative(recipe) + (f" — {detail}" if detail else "")
 
 
 def where_draft(draft: Recipe, detail: str = "") -> str:
@@ -240,4 +254,4 @@ def where_draft(draft: Recipe, detail: str = "") -> str:
     never confused in a failure message even though they share the Recipe
     class.
     """
-    return f"_food_drafts/{draft.slug}.md" + (f" — {detail}" if detail else "")
+    return _relative(draft) + (f" — {detail}" if detail else "")
