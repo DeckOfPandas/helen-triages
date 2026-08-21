@@ -58,7 +58,7 @@ method_groups:
       - "Wrap each beef fillet tightly in a triple layer of cling film to set its shape. Fridge overnight."
   - name: "On the day: sear and cool"
     steps:
-      - "Quickly sear the fillets in a very hot pan until browned all over and still rare in the middle, 30-60 seconds. Remove, brush with Dijon mustard, and leave to cool completely."
+      - "Quickly sear the fillets in a very hot pan until browned all over and still rare in the middle, 30–60 seconds. Remove, brush with Dijon mustard, and leave to cool completely."
   - name: Make the duxelle
     steps:
       - "Chop the mushrooms very finely and fry in a hot pan with the thyme leaves and some seasoning. Keep frying over high heat for 10 mins after the juices are released, until all excess moisture has evaporated, leaving a dry mushroom paste. Leave to cool."

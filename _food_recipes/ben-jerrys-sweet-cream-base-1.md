@@ -17,7 +17,7 @@ ingredient_groups:
       item: golden caster sugar
     - amount: "480 ml"
       item: whipping cream, about 38% fat
-      note: swapped from the US request for "heavy cream", 36-40% fat
+      note: swapped from the US request for "heavy cream", 36–40% fat
     - amount: "240 ml"
       item: whole milk
 method:

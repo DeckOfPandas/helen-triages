@@ -38,7 +38,7 @@ ingredient_groups:
       note: "or ¾–1 tsp Barts cardamom powder to taste"
     - amount: "½"
       item: whole nutmeg
-      note: "12-15 passes across a microplane grater, or 1 tsp ground nutmeg"
+      note: "12–15 passes across a microplane grater, or 1 tsp ground nutmeg"
     - amount: "50 g"
       item: coconut palm sugar
     - amount: "2 tsp"

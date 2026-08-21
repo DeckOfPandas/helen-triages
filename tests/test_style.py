@@ -150,6 +150,43 @@ TYPOGRAPHY = [
     ("ampersand in title", None, None),  # handled separately below
 ]
 
+# --- en dashes in number ranges ----------------------------------------------
+# Issue #413, Helen 2026-08-21. Ranges on this site are written `48–50°C`,
+# `3–4 mins`, `1.6–1.8 kg` -- en dash, and correctly so almost everywhere --
+# but nothing enforced it, so a hyphenated range passed. Fourteen were found
+# across thirteen recipes, several sitting one line from a correct one:
+# roast-beef-fillet had `1½–2 mins` and `52–54°C` right beside two `170-180°C`.
+#
+# ISO DATES ARE BLANKED FIRST, not excluded by a cleverer pattern. `2026-08-12`
+# is three number pairs joined by hyphens and matches a range rule perfectly;
+# it accounted for all 24 "violations" in the first measurement of the data
+# files. Blanking is legible where a lookaround doing the same job would not be.
+#
+# WHY A DIGIT ON BOTH SIDES AND NOTHING CLEVERER. It deliberately does not fire
+# on `1-inch balls`, `criss-cross`, `half- or quarter-cylinder` or any other
+# ordinary hyphen -- only on `<number>-<number>`, which on this site is always a
+# range. Scoped that narrowly, it found no false positives at all across 82
+# recipes, both reference pages and the reference data.
+ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+NUMBER_RANGE = re.compile(r"(?<![\d.])\d+(?:\.\d+)?\s*-\s*\d+(?:\.\d+)?(?![\d.])")
+
+
+def test_number_ranges_use_en_dashes(recipe):
+    """`3–4 mins`, not `3-4 mins`.
+
+    Checked over the whole file rather than .prose, on Helen's ruling about
+    cauliflower-cheese's `cook_time: "20-25 mins"`: "These still render to the
+    user, so correct to en dash please." The test is scoped by what a reader
+    sees, not by whether a field is prose -- and a metadata time, an ingredient
+    amount and a method step all reach the page.
+    """
+    hits = NUMBER_RANGE.findall(ISO_DATE.sub(" ", recipe.raw))
+    assert not hits, (
+        f"{where(recipe)} writes {len(hits)} number range(s) with a hyphen: "
+        f"{sorted(set(hits))[:5]}. Ranges take an en dash — 3–4 mins, "
+        f"170–180°C, 36–40% fat."
+    )
+
 
 @pytest.mark.parametrize("name,pattern,fix",
                          [(n, p, f) for n, p, f in TYPOGRAPHY if p])

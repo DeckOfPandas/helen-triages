@@ -123,12 +123,10 @@ def page_title(raw: str) -> str:
 
 # --- the rules ---------------------------------------------------------------
 #
-# EN DASHES ARE NOT HERE YET, deliberately. Helen asked for a number-range rule
-# (`48–50°C`, not `48-50°C`) and the prose pages and reference data already pass
-# it -- but 13 recipes do not, and fixing a recipe means flipping its proofread
-# flag. That is a decision about 13 of her proofreads, not a typography fix, so
-# it waits for her word rather than landing red or landing silently. Measured
-# 2026-08-21; the list is in the branch's report.
+# The en-dash rule is shared with test_style.py rather than restated here, so
+# the two surfaces cannot drift into disagreeing about what a range looks like.
+# Helen reviewed the recipe backlog line by line on 2026-08-21 and cleared it;
+# these pages and the reference data were already clean.
 TYPOGRAPHY = [
     ("slash fractions",
      r"(?<![\d/])(?:1/2|1/4|3/4|1/3|2/3|1/8|3/8|5/8|7/8)(?![\d/])",
@@ -139,9 +137,16 @@ TYPOGRAPHY = [
      "always °C, e.g. 200°C"),
 ]
 
-# Shared with test_style.py's recipe rule rather than restated, so the two can
-# never drift into disagreeing about how a word is spelled.
-from test_style import SPELLINGS, _accent_problems, _accented_words  # noqa: E402
+# Shared with test_style.py's recipe rules rather than restated, so the two can
+# never drift into disagreeing about how a word is spelled or a range written.
+from test_style import (  # noqa: E402
+    NUMBER_RANGE, SPELLINGS, _accent_problems, _accented_words,
+)
+
+TYPOGRAPHY.append(
+    ("hyphenated number range", NUMBER_RANGE.pattern,
+     "ranges take an en dash — 3–4 mins, 170–180°C")
+)
 
 
 def _relative(path):

@@ -21,7 +21,7 @@ ingredient_groups:
       item: pancetta
     - amount: "9 cloves"
       item: "garlic, diced"
-    - amount: "6-9"
+    - amount: "6–9"
       item: "rainbow carrots, chopped into half- or quarter-cylinder chunks"
     - amount: "300 g"
       item: "baby potatoes, quartered"

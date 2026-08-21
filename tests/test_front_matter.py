@@ -568,6 +568,59 @@ HELEN_CLEARED: dict[str, str] = {
         "c07104a. She cleared the other seven in her own commit and this one by "
         "instruction: 'Duck legs confit can go back to true, please, this is an "
         "exception.'",
+
+    # --- the en-dash pass, 2026-08-21 (issue #413) ---------------------------
+    #
+    # THIRTEEN ENTRIES FROM ONE SESSION, WHICH IS WORTH EXPLAINING, because a
+    # block this size is exactly the shape of an agent quietly clearing its own
+    # work. It is not. Helen asked to see the lines individually -- "Show me the
+    # lines here one by one, then I can't miss anything, and we can agree
+    # together. This means the proofread flag can stay true." -- and then read
+    # and confirmed all fourteen, one message at a time, before any edit was
+    # made. She was the last judgement on every one of them.
+    #
+    # WHY NOT MOVE THE BASELINE. It would have been one line instead of
+    # thirteen, and it would have been wrong: a baseline grandfathers
+    # EVERYTHING at or before a commit, and the citation work of #406 is sitting
+    # behind this point being held at proofread: false on purpose. Sliding past
+    # it to reach these thirteen would have released those too, silently. That
+    # is the case HELEN_CLEARED exists for.
+    #
+    # WHAT SHE ACTUALLY APPROVED, so this is checkable rather than asserted: one
+    # ASCII hyphen became an en dash in a number range, on one line per file
+    # (two in roast-beef-fillet). No word changed, in any file. The full list
+    # with line numbers is in the commit message.
+    #
+    # Her ruling on the one that was not prose, cauliflower-cheese's cook_time
+    # metadata field: "These still render to the user, so correct to en dash
+    # please." The test that followed is scoped by that principle -- what a
+    # reader sees -- rather than by whether a field is prose.
+    "_food_recipes/beef-wellington.md":
+        "2026-08-21 -- en-dash pass, `30-60 seconds` in a method step.",
+    "_food_recipes/ben-jerrys-sweet-cream-base-1.md":
+        "2026-08-21 -- en-dash pass, `36-40% fat` in an ingredient note.",
+    "_food_recipes/ben-jerrys-sweet-cream-base-2.md":
+        "2026-08-21 -- en-dash pass, `36-40% fat` in an ingredient note.",
+    "_food_recipes/cauliflower-cheese.md":
+        "2026-08-21 -- en-dash pass, `20-25 mins` in the cook_time field.",
+    "_food_recipes/duck-leg-barley-casserole.md":
+        "2026-08-21 -- en-dash pass, `6-9` in an ingredient amount.",
+    "_food_recipes/goats-cheese-squash-rosemary-griddle-cakes.md":
+        "2026-08-21 -- en-dash pass, `3-4 mins` in a method step.",
+    "_food_recipes/indonesian-chicken-curry-gulai-ayam.md":
+        "2026-08-21 -- en-dash pass, `12-15 passes` in an ingredient note.",
+    "_food_recipes/lemon-meringue-pie.md":
+        "2026-08-21 -- en-dash pass, `15-20 mins` in a method step note.",
+    "_food_recipes/macarons.md":
+        "2026-08-21 -- en-dash pass, `130-140°C` in a method step.",
+    "_food_recipes/miso-salmon-veg-traybake.md":
+        "2026-08-21 -- en-dash pass, `11-14 mins` in a method step.",
+    "_food_recipes/peanut-butter-cookies.md":
+        "2026-08-21 -- en-dash pass, `8-12 mins` in a method step.",
+    "_food_recipes/roast-beef-fillet.md":
+        "2026-08-21 -- en-dash pass, `170-180°C` in two method steps.",
+    "_food_recipes/sweet-shortcrust-pastry-mince-pies.md":
+        "2026-08-21 -- en-dash pass, `15-20 mins` in a method step.",
 }
 
 

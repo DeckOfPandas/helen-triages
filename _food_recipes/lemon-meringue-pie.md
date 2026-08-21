@@ -47,7 +47,7 @@ method_groups:
       - step: "Spread the meringue over the filling."
         note: "Don't smooth it off too much — crests at different heights catch the heat differently to attractive effect."
       - step: "Bake at 160°C fan for 25 mins, then take out of the oven and leave to cool in the dish for at least 30 mins before eating."
-        note: "Turn up to 180°C fan for the last 15-20 mins for more browning."
+        note: "Turn up to 180°C fan for the last 15–20 mins for more browning."
 method_short:
   - ""
 # notes:

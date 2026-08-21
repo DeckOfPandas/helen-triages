@@ -31,7 +31,7 @@ method:
   - "Blend the flour, sugar, almonds, salt and butter in a food processor until the mixture resembles breadcrumbs, then slowly add the egg. Or, to achieve the same result after much more time and effort, rub the butter into the dry ingredients with fingertips, then stir in the egg."
   - "Wrap in cling film and chill for 1 hour. See Note."
   - "Cut out circles and stars or squares or triangles and whatever, assemble the pies, then chill for another 30 mins. See Note."
-  - step: "Brush lightly with milk, then bake at 180°C fan for 15-20 mins."
+  - step: "Brush lightly with milk, then bake at 180°C fan for 15–20 mins."
     note: "If the edges brown too fast, either: a) live with it, because it's pretty, or b) eat this batch and turn the oven down by 10° for the next."
   - "Cool on a wire rack."
   - "Sieve icing sugar attractively over them, and sprinkle orange zest too if you want."
