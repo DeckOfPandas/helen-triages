@@ -32,9 +32,7 @@ notes:
     text: "Do not use olive oil. Kristian once used olive oil, and after we re-entered the evacuated house we found him lying on the kitchen floor with a wet towel over his face."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-13"
+  proofread: true
 
 ---

@@ -41,9 +41,7 @@ notes:
     text: "Robbie thinks this salad is nice with added pineapple."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-25"
+  proofread: true
 
 ---

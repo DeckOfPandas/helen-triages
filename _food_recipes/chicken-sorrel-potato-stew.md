@@ -54,9 +54,7 @@ notes:
     text: "Freeze the base before adding the mustard and sorrel, then stir both in fresh once reheated. The sorrel won't survive freezing and reheating."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

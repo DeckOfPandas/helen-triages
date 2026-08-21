@@ -91,9 +91,7 @@ notes:
     text: "Can be simmered a little longer, but the chicken becomes tough and stringy if left too long."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

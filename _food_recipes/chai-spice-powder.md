@@ -58,9 +58,7 @@ notes:
     text: "For bakes, increase the cinnamon to 12 g (1½ to 2 sticks)."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

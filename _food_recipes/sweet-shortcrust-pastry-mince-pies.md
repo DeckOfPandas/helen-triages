@@ -44,8 +44,6 @@ notes:
     text: "Robertson's mincemeat from a jar is absolutely fine. This is true because Grandma Kath told me."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-25"
+  proofread: true
 ---

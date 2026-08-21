@@ -40,9 +40,7 @@ notes:
     text: "It may need a quick whisk before using as it could look a little lumpy, but generally nobody notices."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-25"
+  proofread: true
 
 ---

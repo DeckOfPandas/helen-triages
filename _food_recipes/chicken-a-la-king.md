@@ -57,9 +57,7 @@ notes:
     text: "Button mushrooms are always fun to eat in one-handed food, especially if you don't halve them, because then you get to chase them around your plate."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

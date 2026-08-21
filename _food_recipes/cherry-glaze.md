@@ -34,9 +34,7 @@ notes:
     text: "If using frozen cherries, thaw and strain them ahead to get rid of the spare water."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

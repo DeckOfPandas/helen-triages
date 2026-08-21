@@ -37,10 +37,22 @@ RETIRED = {
     "short_name": "removed from the schema, GitHub issue #169 -- confirmed "
                   "zero references in any template/JS/SCSS before removal, "
                   "2026-08-12; a leftover value is dead weight, not data",
+    "cooked_before": "removed from the schema, GitHub issue #429 -- it lived "
+                     "under meta: and was read by nothing",
+    "date_last_edited": "removed from the schema, GitHub issue #429 -- a "
+                        "hand-maintained date that git already knows exactly",
 }
 
-MISPLACED_META = ["rewritten", "proofread", "cooked_before", "date_last_edited",
-                   "claude_rewritten"]
+# Fields that belong under `meta:` and are silently ignored at the top level.
+#
+# cooked_before and date_last_edited CAME OFF THIS LIST on 2026-08-21 (#429) and
+# went onto RETIRED instead. They are still caught if someone writes one at the
+# top level -- the advice just changed from "move it into meta" to "this field
+# is gone", which is the true answer now. RETIRED is checked against the TOP
+# LEVEL only, which is what makes this safe for the drafts that share it:
+# _food_drafts/ still carries both keys, all 344 of them inside `meta:`, so not
+# one draft is touched by the move.
+MISPLACED_META = ["rewritten", "proofread", "claude_rewritten"]
 
 
 @pytest.mark.parametrize("field", REQUIRED)
@@ -224,11 +236,37 @@ def test_meta_block_complete(recipe):
     assert isinstance(meta, dict), (
         f"{where(recipe)} has no `meta:` block, or it is not a mapping."
     )
-    missing = [f for f in ("rewritten", "proofread", "cooked_before") if f not in meta]
+    missing = [f for f in ("rewritten", "awaiting_fix", "proofread") if f not in meta]
     assert not missing, (
         f"{where(recipe)} `meta:` is missing {missing}. "
         f"All three are booleans and all three must be present — a missing one "
         f"reads as false, which is indistinguishable from a deliberate false."
+    )
+
+
+# The order is the point, not a tidiness preference. Helen, issue #429: the three
+# flags are meant to be read together at a glance, and `rewritten -> awaiting_fix
+# -> proofread` is the order the recipe actually moves through. A file that keeps
+# the same three keys in a different order reads as a different kind of file when
+# you are scanning 86 of them.
+#
+# CHEAP TO OBEY, WHICH IS WHY IT CAN BE ENFORCED. Reordering a meta block changes
+# no value, so _only_invisible_keys_changed treats it as invisible and fixing a
+# failure here costs no proofread. That was not true until #429 -- the exemption
+# read an empty change set as "unknown" rather than "nothing a reader can see",
+# so this test could not have existed without demanding 86 re-proofreads to
+# satisfy it.
+META_ORDER = ["rewritten", "awaiting_fix", "proofread"]
+
+
+def test_meta_block_is_exactly_the_three_flags_in_order(recipe):
+    meta = recipe.fm.get("meta")
+    assert isinstance(meta, dict), f"{where(recipe)} has no `meta:` mapping."
+    assert list(meta) == META_ORDER, (
+        f"{where(recipe)} `meta:` is {list(meta)}, expected exactly "
+        f"{META_ORDER}.\nThe three flags are read together and in the order a "
+        f"recipe moves through them. cooked_before and date_last_edited were "
+        f"retired by #429 — if one is back, it is dead weight, not data."
     )
 
 
@@ -249,21 +287,55 @@ def test_claude_rewritten_is_a_real_boolean(recipe):
     )
 
 
-def test_cooked_before_is_true(recipe):
-    """`_food_recipes/` is the published collection (`output: true` in
-    _config.yml) — every file in it gets a live URL unconditionally. Helen:
-    "I never want to publish anything I haven't tested." A recipe she's
-    still collecting but hasn't cooked yet belongs in `_food_drafts/`
-    (`output: false`, no URL) until `meta.cooked_before` is genuinely true.
-    """
-    meta = recipe.fm.get("meta")
-    if not isinstance(meta, dict):
-        return  # test_meta_block_complete already reports the missing block
-    assert meta.get("cooked_before") is True, (
-        f"{where(recipe)} has `meta.cooked_before: {meta.get('cooked_before')!r}`. "
-        f"Either cook it and flip this to true, or move the file back to "
-        f"_food_drafts/ until you have."
-    )
+# =============================================================================
+# GONE WITH THE FIELD: test_cooked_before_is_true. Issue #429, 2026-08-21.
+# =============================================================================
+# THIS IS A TOMBSTONE, NOT A TIDY-UP, because a real guarantee died here and the
+# next person to wonder where it went deserves the whole story rather than a
+# blank space in the file.
+#
+# It read `meta.cooked_before` and required it to be True on every published
+# recipe. `_food_recipes/` is `output: true`, so every file in it gets a live
+# URL unconditionally, and Helen's rule is "I never want to publish anything I
+# haven't tested." A recipe she is still collecting belongs in `_food_drafts/`
+# (`output: false`, no URL) until she has actually cooked it.
+#
+# IT LOOKED LIKE A TEST THAT ASSERTED A CONSTANT, and it was not. All 82 tracked
+# recipes said `true`, so it had never once fired -- but 330 of the 344 drafts
+# say `false`, and the check sat exactly on the boundary those files cross. It
+# was a promotion gate: promote a draft you have not cooked, and it went red.
+# Measured both sides before removing it rather than inferring "never fired,
+# therefore useless", which is the reasoning that quietly deletes real guards.
+#
+# WHAT NOW ENFORCES IT: Helen, and she is the right enforcement. Asked directly
+# whether losing the gate mattered, 2026-08-21, she gave the reason the field
+# should never have existed -- promotion is not a step where the question can be
+# open. Every recipe is one of three things:
+#
+#   a) cooked, liked -> she promotes it from drafts to recipes
+#   b) cooked, disliked -> she deletes it
+#   c) not cooked -> "why would I put it on my battle tested site?"
+#
+# There is no fourth case, and no path into `_food_recipes/` that does not go
+# through her deciding between them. `cooked_before` was a field recording an
+# answer that promotion itself already gives: true on all 82 published recipes
+# because it could not have been anything else. The test was not guarding the
+# boundary, it was restating it.
+#
+# THE DRAFT-SIDE MEASUREMENT ABOVE STAYS ON THE RECORD ANYWAY, because it was
+# the honest reading of the evidence available before asking her, and the next
+# person to find 330 `false` values in the drafts folder will have exactly the
+# same worry. The answer is that those 330 are the "not cooked yet" pile, which
+# is what a drafts folder IS -- not a queue of things at risk of slipping past a
+# missing check.
+#
+# TO RESTORE IT: put `cooked_before` back in META_ORDER and INVISIBLE_KEYS, undo
+# its RETIRED entry, and bring this test back. The draft side never lost the
+# field -- all 344 still carry it -- so a promotion-time check remains possible
+# without re-adding anything to the published recipes, if a cleverer version is
+# ever wanted. It would have to cope with `_food_drafts/` being absent in CI
+# (#378), which is why it is not being attempted here on the way past.
+# =============================================================================
 
 
 def test_serves_xor_makes(recipe):
@@ -679,6 +751,19 @@ INVISIBLE_KEYS = {
         "ingredient text being rewritten, which has nothing to do with the key. "
         "Issues #418, #428."
     ),
+    "meta.cooked_before": (
+        "Retired 2026-08-21, issue #429. Recorded whether Helen had cooked the "
+        "recipe before; read by no layout, include, plugin or script, and "
+        "listed here so REMOVING it from all 86 recipes does not invalidate 86 "
+        "proofreads. Kept on the list after removal rather than deleted with "
+        "it: the entry is what makes the removal commit exempt, and a future "
+        "commit re-adding the key would be exempt for the same honest reason."
+    ),
+    "meta.date_last_edited": (
+        "Retired 2026-08-21, issue #429. A hand-maintained date that git "
+        "already knows exactly and nothing rendered -- see meta.cooked_before "
+        "above for why the entry outlives the key."
+    ),
 }
 
 # ---------------------------------------------------------------------------
@@ -900,7 +985,25 @@ def _only_invisible_keys_changed(commit, relpath):
     # Keys are compared by their FULL DOTTED NAME. INVISIBLE_KEYS lists
     # `meta.rewritten`, not `rewritten`, because the two are different keys and a
     # top-level one must not be exempted by its namesake under meta.
-    return bool(changed) and changed <= set(INVISIBLE_KEYS)
+    #
+    # AN EMPTY `changed` MEANS EXEMPT, NOT UNKNOWN. Issue #429, 2026-08-21. This
+    # used to read `bool(changed) and changed <= ...`, so a commit that changed
+    # no value at all fell to False and the proofread rule applied in full. That
+    # conflated two opposite situations: "I could not tell what changed", which
+    # must fail closed, and "nothing changed that a reader could see", which is
+    # the exemption's entire purpose.
+    #
+    # It matters for the case Helen asked about directly, of reordering the meta
+    # block for legibility: YAML key order is not a value, so a pure reorder
+    # produces an empty set here. Under the old line that would have demanded
+    # `proofread: false` on all 86 recipes for moving two lines up the page.
+    #
+    # It cannot swallow a real edit. The body is compared byte-for-byte above and
+    # returns early, and any front matter value that actually differs lands in
+    # `changed` and is checked against the list as before. What reaches this line
+    # with an empty set has an identical body and identical values in every key:
+    # the same file, spelled differently.
+    return changed <= set(INVISIBLE_KEYS)
 
 
 def _rewritten_at(repo, rev, relpath):

@@ -52,9 +52,7 @@ method_short:
     * Portion, fridge >6h
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

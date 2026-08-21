@@ -74,8 +74,6 @@ notes:
     text: "The loaf can be made to the end of the layering step up to 24 hours ahead, then covered and chilled before baking."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-09"
+  proofread: true
 ---

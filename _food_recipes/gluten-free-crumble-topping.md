@@ -32,8 +32,6 @@ notes:
     text: "Just maintain the classic ratio."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-02"
+  proofread: true
 ---

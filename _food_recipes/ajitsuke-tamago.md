@@ -49,8 +49,6 @@ notes:
     text: "If marinating longer than a day, a splash of water in the marinade helps stop the eggs turning too salty."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-09"
+  proofread: true
 ---

@@ -47,9 +47,7 @@ notes:
     text: "Keeps for ages wrapped in foil or in a tin."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-13"
+  proofread: true
 
 ---
