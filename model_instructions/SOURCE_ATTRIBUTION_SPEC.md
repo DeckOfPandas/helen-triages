@@ -27,7 +27,7 @@ near-miss that has already been typed once by hand — it is `publication`.
 | `publication` | A print issue — **always dated** | `Adapted from <title>, <date>` | `Adapted from Good Food, January 2026` |
 | `publication` | …with a named author | `Adapted from <title>, <date>, <Firstname Lastname>` | `Adapted from Good Food, January 2026, Sarah Cook` |
 | `book` | A named book | `Adapted from <title>, <Firstname Lastname>` | `Adapted from French Provincial Cooking, Elizabeth David` |
-| `book` | …author not recorded | `Adapted from <title>` | `Adapted from Healthier Baking` |
+| `book` | …whose author owns the title | `Adapted from <Author>'s <title>` | `Adapted from Delia Smith's Book of Cakes` |
 | `website` | A site or blog — **never dated** | `Adapted from <site>, recipe <Firstname Lastname>` | `Adapted from RecipeTin Eats, recipe Nagi` |
 | `website` | …author not recorded | `Adapted from <site>` | `Adapted from indianhealthyrecipes.com` |
 | `author` | A published cook, work not recorded | `Adapted from <Name>` | `Adapted from Delia Smith` |
@@ -35,6 +35,45 @@ near-miss that has already been typed once by hand — it is `publication`.
 | `place` | A place | a bare label | `France` |
 | `joke` | The experience that produced the recipe | free text, exempt from every shape | `Bitter experience` |
 | `unknown` | Nobody has established it yet | exactly `QQ` | `QQ` |
+
+---
+
+### A book must name its author, in one shape or the other
+
+**Added 2026-08-21, after the spec's own gap put two wrong citations on the live
+site.** There are two shapes, not one, and BOTH carry the author:
+
+    Adapted from Feed Your Soul, Wagamama          title, then author
+    Adapted from Delia Smith's Book of Cakes       author, possessively, then title
+
+The possessive form is not a variant to tolerate — it is the more common of the
+two here (44 of 89 book citations) and it is ordinary English. Rewriting
+`Delia Smith's Book of Cakes` as `Book of Cakes, Delia Smith` would be worse
+prose to satisfy a rule, so the rule accommodates it instead.
+
+**WHY THIS HAD TO BE WRITTEN DOWN, and the failure is instructive.** The spec
+described only the comma form plus an "author not recorded" fallback that
+accepts ANY string. So all 44 possessive citations were passing through the
+fallback, which made the fallback look load-bearing when nothing real used it —
+and, worse, made the book rule unfalsifiable. `Adapted from Wagamama Feed Your
+Soul` is a publisher's name glued to a title with the author nowhere, and it
+passed as "a title with no author", on two published pages, until Helen asked
+why the rule allowed it.
+
+**A rule that accepts everything is not a lenient rule, it is an absent one.**
+
+**THE RULE IS UNCONDITIONAL: there is no authorless-book form.** Helen,
+2026-08-21: *"I can't imagine knowing the name of a book but not its author."*
+Exactly one citation appeared to contradict her — `Adapted from Healthier
+Baking`, on `sweet-potato-chocolate-brownies.md` — and it was about to be
+written down as a declared exception when she recognised it: *"it's from Good
+Food, from a special one-off section."* Not a book. Retyped as a dateless
+`website`, and the exception was deleted before it existed.
+
+**An exception list with one entry is worse than no list.** It looks like
+diligence and reads, six months later, as proof that the rule has legitimate
+exceptions — so the next awkward case gets added instead of questioned. The one
+candidate here was a misfiled citation, and asking beat accommodating.
 
 ---
 
