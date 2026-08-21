@@ -32,9 +32,7 @@ notes:
     text: "Strictly speaking, the perfect substitution for US \"half-and-half\" would be 100 ml whole milk with 60 ml single cream."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

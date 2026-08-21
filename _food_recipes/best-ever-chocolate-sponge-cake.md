@@ -78,9 +78,7 @@ notes:
     text: "Top with icing sugar. Or try [chocolate ganache](../chocolate-ganache/), or simply melted chocolate with salted butter 2:1."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

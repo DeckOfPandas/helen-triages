@@ -117,9 +117,7 @@ notes:
     text: "It's tempting to YOLO and use more ghee — no one would know, right? — but last time I did this the mutton was almost floating by the end, and the tomatoes were all weird and bubbly."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-31"
+  proofread: true
 
 ---

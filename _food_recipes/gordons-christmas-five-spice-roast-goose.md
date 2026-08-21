@@ -43,9 +43,7 @@ notes:
     text: "Roast potatoes. Adjective and imperative."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

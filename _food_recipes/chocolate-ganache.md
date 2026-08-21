@@ -53,10 +53,8 @@ notes:
     text: "1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-25"
+  proofread: true
 
 ---
 

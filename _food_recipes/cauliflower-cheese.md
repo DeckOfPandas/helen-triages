@@ -54,9 +54,7 @@ notes:
     text: "To make ahead, assemble the thing completely up to the point of baking, and keep it covered in the fridge for a day. Bake it straight from cold and give it an extra 10 mins in the oven."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

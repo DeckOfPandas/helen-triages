@@ -37,10 +37,8 @@ notes:
 
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-13"
+  proofread: true
 ---
 
 <h2 class="recipe-section-heading" id="why-hollandaise-is-hard"><span class="section-heading-text">Why Hollandaise is hard</span></h2>

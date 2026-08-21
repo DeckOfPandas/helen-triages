@@ -60,9 +60,7 @@ notes:
     text: "I never bother peeling vegetables any more because they taste better skin-on. The last time I noticed I was peeling an apple I had an epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I did not continue peeling the apple."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

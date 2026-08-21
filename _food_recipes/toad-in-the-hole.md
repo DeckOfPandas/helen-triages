@@ -56,9 +56,7 @@ notes:
     text: "Both need to be properly hot before the batter goes in otherwise you'll get marshmallow but not in a good way."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

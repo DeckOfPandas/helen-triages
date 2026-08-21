@@ -36,9 +36,7 @@ notes:
     text: I used to add grated chocolate to this but it goes weird when frozen so now I don't.
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-29"
+  proofread: true
 
 ---

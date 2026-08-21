@@ -56,9 +56,7 @@ notes:
     text: "The marinade can be prepared in advance, but don't marinate the chicken for more than 30 mins as the acid will make it tough."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-08-11"
+  proofread: true
 
 ---

@@ -59,8 +59,6 @@ notes:
     text: "90 mins should leave the joint tender but still sliceable."
 meta:
   rewritten: true
-  proofread: true
   awaiting_fix: false
-  cooked_before: true
-  date_last_edited: "2026-07-25"
+  proofread: true
 ---
