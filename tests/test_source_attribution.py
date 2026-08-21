@@ -201,6 +201,70 @@ def _bad_publisher(source, kind):
     return None
 
 
+# --- a book names its author, in one shape or the other ----------------------
+# Added 2026-08-21, after the spec's own gap put two wrong citations live.
+#
+# TWO SHAPES, BOTH CARRYING THE AUTHOR:
+#
+#     Adapted from Feed Your Soul, Wagamama        title, then author
+#     Adapted from Delia Smith's Book of Cakes     author possessively, then title
+#
+# The possessive is the MORE COMMON of the two here -- 44 of 89 book citations --
+# and it is ordinary English. Requiring a comma everywhere would have produced
+# "Delia Smith's Book of Cakes, Delia Smith", which is why this accommodates the
+# shape rather than the corpus accommodating the rule.
+#
+# WHAT IT REPLACES WAS UNFALSIFIABLE. The spec offered the comma form plus an
+# "author not recorded" fallback that accepts ANY string, so all 44 possessive
+# citations were passing through the fallback and the rule could not reject
+# anything at all. `Adapted from Wagamama Feed Your Soul` -- a publisher glued to
+# a title, author nowhere -- passed on two published pages until Helen asked why
+# it was allowed. A rule that accepts everything is not lenient, it is absent.
+#
+# THE HEURISTIC FAILS TOWARDS ACCEPTING, deliberately and knowably: a title that
+# merely CONTAINS a possessive ("The Baker's Year") would satisfy it without
+# naming an author. That is a missed flag, not a false alarm, and a false alarm
+# here would be worse -- it would push someone to mangle correct prose.
+COMMA_AUTHOR = re.compile(r",\s*\S")
+POSSESSIVE_AUTHOR = re.compile(r"\b\w[\w&.\-]*(?:\s+[\w&.\-]+)*'s\s+\S")
+
+# NO BOOK MAY OMIT ITS AUTHOR. There is no exception list, and there was very
+# nearly one.
+#
+# Helen, 2026-08-21: "I can't imagine knowing the name of a book but not its
+# author." A single citation appeared to contradict her --
+# sweet-potato-chocolate-brownies.md, `Adapted from Healthier Baking` -- and it
+# was about to be added to a declared-exceptions set when she recognised it:
+# not a book at all, but a one-off section in Good Food magazine. Retyped as a
+# dateless `website` (the date discriminator, above), and the exception set was
+# deleted before it ever held anything.
+#
+# THE NEAR-MISS IS THE POINT. An exception list with one entry looks like
+# diligence and reads, later, as evidence that the rule has legitimate
+# exceptions -- and the next odd case gets added to it rather than questioned.
+# The one entry here was a misfiled citation, and asking a person beat
+# accommodating it. If a genuine authorless book ever turns up, add the list
+# back deliberately, with the recipe named beside it.
+
+
+def _bad_book_author(source, kind):
+    if kind != "book":
+        return None
+    body = source[len(PREFIX):] if source.startswith(PREFIX) else source
+    if COMMA_AUTHOR.search(body) or POSSESSIVE_AUTHOR.search(body):
+        return None
+    return (
+        f"A `book` names its author, and this one names nobody.\n"
+        f"  source: {source!r}\n"
+        f"Two shapes are accepted: `Adapted from <title>, <Author>` or "
+        f"`Adapted from <Author>'s <title>`. Prefer whichever reads as English "
+        f"-- `Delia Smith's Book of Cakes`, not `Book of Cakes, Delia Smith`.\n"
+        f"If you believe a book genuinely has no findable author, check first "
+        f"that it is a book -- the one candidate this rule ever had turned out "
+        f"to be a magazine section. See {SPEC}."
+    )
+
+
 RULES = [
     ("source_type is one of the eight", _bad_type),
     ("published work says 'Adapted from'", _bad_prefix),
@@ -208,6 +272,7 @@ RULES = [
     ("a publication is dated and a website is not", _bad_date),
     ("a website names its author with 'recipe'", _bad_author_separator),
     ("no publisher in a citation", _bad_publisher),
+    ("a book names its author", _bad_book_author),
 ]
 
 RULE_IDS = [name for name, _ in RULES]

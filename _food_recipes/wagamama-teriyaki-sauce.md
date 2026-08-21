@@ -1,7 +1,7 @@
 ---
 title: "Wagamama Teriyaki Sauce"
 tagline: "Great as a marinade, a garnish or a dip."
-source: "Adapted from Wagamama Feed Your Soul"
+source: "Adapted from Feed Your Soul, Wagamama"
 source_type: book
 makes: "125 ml"
 prep_time: "2 mins"

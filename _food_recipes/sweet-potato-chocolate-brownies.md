@@ -1,8 +1,8 @@
 ---
 title: "Sweet Potato Chocolate Brownies"
 tagline: "These don't exactly not taste like sweet potato, but they also taste of chocolate brownie, and they're fun to eat."
-source: "Adapted from Healthier Baking"
-source_type: book
+source: "Adapted from Good Food"
+source_type: website
 makes: "16 squares"
 prep_time: "15 mins plus cooling"
 cook_time: "1 hr 30 min, mostly baking the potatoes"
@@ -36,6 +36,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---
