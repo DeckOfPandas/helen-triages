@@ -98,6 +98,19 @@ rum_untyped:
   - "Malibu"
   - "blackstrap"
 
+# CHARACTER: a separate, optional field, not `generic`. Some rums have a
+# `generic` style (or none decided yet) but also carry a distinctive flavour
+# marker worth recording on its own -- e.g. Ron del Barrito is "moderately
+# aged" generically, but its defining trait is a sherry-cask, Spanish-style
+# tradition rather than a Jamaican or Demerara profile. `blackstrap` can be
+# EITHER a `generic` (per rum_untyped above, when that's all a rum is) OR a
+# `character` alongside another rum's own generic style -- the two fields
+# aren't mutually exclusive.
+rum_characters:
+  - "blackstrap"
+  - "sherry"
+  - "Spanish-style"
+
 gin_styles:
   - "London dry"
   - "Plymouth"
@@ -242,9 +255,11 @@ bitters:
   - "chocolate bitters"
   - "tiki bitters"
   - "lavender bitters"
+  - "Lavender-forward bitters"
   - "peppermint bitters"
   - "wood smoke bitters"
   - "spiced bitters"
+  - "Warm-spiced bitters"
   - "margarita bitters"
   - "pimento bitters"
 
