@@ -98,6 +98,19 @@ rum_untyped:
   - "Malibu"
   - "blackstrap"
 
+# CHARACTER: a separate, optional field, not `generic`. Some rums have a
+# `generic` style (or none decided yet) but also carry a distinctive flavour
+# marker worth recording on its own -- e.g. Ron del Barrito is "moderately
+# aged" generically, but its defining trait is a sherry-cask, Spanish-style
+# tradition rather than a Jamaican or Demerara profile. `blackstrap` can be
+# EITHER a `generic` (per rum_untyped above, when that's all a rum is) OR a
+# `character` alongside another rum's own generic style -- the two fields
+# aren't mutually exclusive.
+rum_characters:
+  - "blackstrap"
+  - "sherry"
+  - "Spanish-style"
+
 gin_styles:
   - "London dry"
   - "Plymouth"
@@ -146,6 +159,7 @@ other_base_spirits:
   - "vodka"
   - "flavoured vodka"
   - "absinthe"
+  - "pastis"
   - "aquavit"
 
 # =============================================================================
@@ -192,6 +206,7 @@ liqueurs:
   - "ginger liqueur"
   - "passion fruit liqueur"
   - "gentian liqueur"
+  - "apple schnapps"
   - "mastiha liqueur"
   - "tomato liqueur"
   - "amaretto"
@@ -202,6 +217,7 @@ herbal_liqueurs:
   - "green Chartreuse"
   - "yellow Chartreuse"
   - "Bénédictine"
+  - "Galliano"
   - "Strega"
   - "Jägermeister"
   - "liqueur de sapin"
@@ -226,6 +242,7 @@ fortified_and_aromatised:
   # Aperitif wines, not vermouths: Lillet, Cocchi Americano.
   - "quinquina"
   - "amontillado sherry"
+  - "oloroso sherry"
   - "tawny port"
 
 wine_and_sparkling:
@@ -242,9 +259,11 @@ bitters:
   - "chocolate bitters"
   - "tiki bitters"
   - "lavender bitters"
+  - "Lavender-forward bitters"
   - "peppermint bitters"
   - "wood smoke bitters"
   - "spiced bitters"
+  - "Warm-spiced bitters"
   - "margarita bitters"
   - "pimento bitters"
 
@@ -392,6 +411,7 @@ family_of:
   "Punt e Mes": fortified
   "quinquina": fortified
   "amontillado sherry": fortified
+  "oloroso sherry": fortified
   "tawny port": fortified
   "aquavit": aquavit
   "green Chartreuse": herbal
