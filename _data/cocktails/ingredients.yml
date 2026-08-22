@@ -206,6 +206,7 @@ liqueurs:
   - "ginger liqueur"
   - "passion fruit liqueur"
   - "gentian liqueur"
+  - "apple schnapps"
   - "mastiha liqueur"
   - "tomato liqueur"
   - "amaretto"
@@ -216,6 +217,7 @@ herbal_liqueurs:
   - "green Chartreuse"
   - "yellow Chartreuse"
   - "Bénédictine"
+  - "Galliano"
   - "Strega"
   - "Jägermeister"
   - "liqueur de sapin"
@@ -240,6 +242,7 @@ fortified_and_aromatised:
   # Aperitif wines, not vermouths: Lillet, Cocchi Americano.
   - "quinquina"
   - "amontillado sherry"
+  - "oloroso sherry"
   - "tawny port"
 
 wine_and_sparkling:
@@ -408,6 +411,7 @@ family_of:
   "Punt e Mes": fortified
   "quinquina": fortified
   "amontillado sherry": fortified
+  "oloroso sherry": fortified
   "tawny port": fortified
   "aquavit": aquavit
   "green Chartreuse": herbal
