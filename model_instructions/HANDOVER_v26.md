@@ -1467,18 +1467,26 @@ sites, and `crème` is its own worked example).
 ```yaml
 title: "Sazerac"
 tagline: "QQ"                    # the one line of prose; QQ until written
-glass: "rocks"                   # scalar
+glass:                           # LIST, not scalar — corrected 2026-08-17
+  - "rocks"
 garnish: []                      # LIST — Cobra's Fang has two
 ingredients:                     # FULL list, untriaged, in build order
   - amount: "0.5 oz"             # the quantity AS WRITTEN — display string
     ml: 15                       # the same quantity numerically; see below
     item: "Appleton Estate Reserve"   # what you actually pour, brand-led
-    generic: "aged Jamaican rum"      # what you would ever FILTER by
+    generic: "Jamaican, moderately aged"  # the #314 vocabulary; see §9.3.1
     suggestion: "Pierre Ferrand ambre"  # alternative bottle or category
+  - amount: "15 ml"
+    ml: 15
+    item: "Light aged rum"       # the source genuinely doesn't name a bottle
+    generic:                     # a LIST means "or", never "and" — §9.3.1
+      - "lightly aged and filtered"
+      - "blended multi-region rum, clear"
+    suggestion: "Havana 3"
 method:                          # ORDERED LIST — the steps are sequential
   - "Pour absinthe into ice-filled glass."
 to_serve: ""                     # PRESENTATION, not a further instruction
-notes:                           # {label, text} or a bare string, as food
+notes:                           # bare strings, as food
   - "This is much less sugar than many recipes"
 source: ""
 source_url: ""                   # external; nothing verifies it, see §9.6
@@ -1498,11 +1506,85 @@ consumer must check for the key rather than assume it. Conversions used:
 it keeps ratios clean and it is a decision, not an accident.
 
 **`item` versus `generic`.** `item` is the bottle: "Skippers dark rum",
-"Briottet Abricot". `generic` is the category: "dark rum", "apricot liqueur".
-No rule can derive the second from the first, which is why it is stored
-rather than computed. **Nothing reads `generic` yet** — it exists so that a
-future "what can I make tonight" is possible, and it is the cocktails
-analogue of food's `main_ingredients`, not a copy of it.
+"Briottet Abricot". `generic` is the category: "Demerara, aged", "apricot
+liqueur". No rule can derive the second from the first, which is why it is
+stored rather than computed.
+
+~~**Nothing reads `generic` yet.**~~ **OUT OF DATE — corrected 2026-08-22.**
+This was true when written and has not been true since #322/#314 landed.
+`generic` now has a real, tested, growing vocabulary
+(`_data/cocktails/ingredients.yml`, §9.3.1) and 526+ of 594 ingredient
+entries are typed against it (#335 tracks the rest). It is still the
+cocktails analogue of food's `main_ingredients`, not a copy of it, and
+nothing browses by it yet (§9.1's "no star axis" rule still holds) — but
+it is a live, populated field, not an aspiration.
+
+### 9.3.1 The ingredient vocabulary — `_data/cocktails/ingredients.yml`
+
+Spec: #322 (closed once delivered — the spec/backlog split, same shape as
+food's taxonomy work). Rum half: #314. This file is the actual source of
+truth for what a `generic` is allowed to be; treat it as more current than
+this document if the two ever disagree.
+
+**Two layers, and the distinction is the whole design.** `generic` is the
+precise category on each ingredient entry — Campari, Aperol, Cynar and
+Fernet are four generics, not one "amaro", because they taste nothing alike
+and are not substitutable. `family` is a roll-up used ONLY for search and
+exclusion ("no whisky tonight"), never a browse axis — see the file's own
+comment for why food's family-derivation mechanism can't be reused here
+(the rum styles share no common word to derive an `(all)` button from).
+
+**`generic` IS STORED, NEVER DERIVED.** 61+ ingredients in the collection
+are named only by brand (Campari, Cointreau, Kahlua…) with no rule able to
+recover the category from the name.
+
+**A preferred bottle is a `suggestion`, never a `generic`.** Helen,
+2026-08-17, on Cherry Heering: "I'd note my preference as the example not
+the category." So Velvet Falernum → `falernum`, Luxardo → `maraschino
+liqueur`, with the bottle in `suggestion`. `suggestion` can also be a LIST
+when there's more than one live candidate (e.g. Cynar Toronto's bitters:
+`["(Mrs Betters Lime Leaf bitters)", "Bob's Margarita bitters"]` before it
+was resolved) — this is presentation, not a filter, so it has no
+disjunctive/conjunctive rule the way `generic` does.
+
+**`generic` as a list means OR, and ONLY or — settled by #441, 2026-08-21.**
+This mattered enough to need its own issue because the same YAML shape
+(`generic:` followed by a list) was about to mean two different things:
+
+| | means | exclusion should |
+|---|---|---|
+| a genuinely interchangeable rum (Daisy de Santiago: Havana 3 **or** Clément Agricole Blanc) | either bottle makes the drink | **not** drop the drink — pour the other one |
+| Gosling's Black Seal: `moderately aged` **and** blackstrap | one bottle, two properties at once | **drop** the drink — there is no escape route |
+
+The fix: `generic` stays disjunctive-only. A list is always "any of these
+would do." A single bottle that carries an extra flavour property alongside
+its style (blackstrap, a sherry-cask character) does NOT go in `generic` —
+that's `character`, and **where `character` belongs is still open**, see
+below. Getting this distinction right the first time mattered because #292's
+exclusion logic ("no whisky tonight") would silently misbehave on whichever
+one was encoded wrong.
+
+**`character` — settled in principle, NOT settled in practice. Read #441
+before adding one.** The issue's own ruling: `character` "must not be
+repeated across 594 recipe entries" — it belongs on a bottle dictionary
+(name → generic, ABV, character) that **does not exist yet** (three other
+open issues want the same missing table: #297 for ABV, #295 for glass
+volumes, this one for character). Until that table exists, the documented
+interim is a plain text NOTE on the recipe, not a field — Georgetown Punch
+does this correctly ("Its blackstrap side becomes a `character` once that
+layer exists"). **2026-08-22: this got violated within the same session
+that read this rule.** Airmail's Ron del Barrito was given a structured
+`character: [sherry, "Spanish-style"]` field plus a new `rum_characters`
+vocabulary list in `ingredients.yml`, before the issue was re-read. Flagged
+to Helen and logged as a comment on #441 rather than silently reverted —
+check that issue's state before adding another `character` anywhere; the
+two live conventions (Airmail's field vs. Georgetown Punch's note) had not
+been reconciled as of this writing.
+
+**Disjunctive `generic` has an agreed threshold, not a free-for-all.**
+Helen, 2026-08-21: multi-value only when both bottles can actually be named
+and a reason given for each — "I don't know which" stays a plain `QQ`, it
+does not become a two-item guess.
 
 ### 9.4 Decided 2026-08-16 — do not re-litigate
 
@@ -2673,6 +2755,28 @@ recipe-to-photo mapping by actually opening the photo, not by trusting a
 prior pass's count or an assumed shared source for a whole folder** — cheap
 per photo, and the alternative is silent overwrites or gaps that only surface
 when someone later reads the file.
+
+**"Lost work" after a disconnect may just be sitting in a `git worktree` you
+haven't looked in.** 2026-08-22, `_cocktail_drafts`. Helen described a whole
+prior session's rum-typing work (Milliners Punch, Anita's, Zombie Intoxica,
+20+ generics, the Lemon Daiquiri drop — 8 commits) after a Windows Terminal
+crash. The plain `_cocktail_drafts` checkout showed none of it — `git log`
+there stopped well before it, and it looked exactly like genuinely lost
+work. It wasn't: `git branch -a -v` showed a local-only branch
+(`data/type-rum-generics`, never pushed) already checked out in a SEPARATE
+worktree at `.claude/worktrees/cocktails-rum/_cocktail_drafts` — `git
+worktree list` names the path directly, and `git switch <branch>` fails
+loudly ("already used by worktree at …") rather than silently, which is the
+tell. All 8 commits were there, clean, untouched. **Before reporting
+anything as lost from a disconnected session, run `git branch -a -v` and
+`git worktree list` in the relevant repo** — a branch that exists locally
+but not on any remote, or a worktree at a path you didn't expect, means the
+work survived, just not in the directory you happened to be standing in.
+Git stashes are shared across a repo's worktrees (branches are not), so once
+found, `git stash` moves uncommitted edits from one checkout into the other
+without needing to redo them by hand — expect `git stash pop` to conflict if
+both sides touched the same lines, and resolve to the known-correct state
+rather than fighting the merge markers.
 
 ## 13. The site's visual design
 
