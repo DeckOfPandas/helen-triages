@@ -145,6 +145,10 @@ brandy_styles:
   # The category term rather than one country's word for it, so a slivovitz or
   # a framboise has somewhere to go. Cherry eau de vie is the live example.
   - "eau de vie"
+  # Helen, 2026-08-22, on Bali Hai's Aguardiente brandy, "for now" -- this
+  # may turn out to just be `eau de vie` once revisited; kept separate
+  # rather than assumed identical.
+  - "Full-strength clear fruit brandy"
 
 # Cane and palm spirits that are NOT rum. #314: "cachaca is its own generic" --
 # same raw material as an agricole rhum, completely different product. Batavia
@@ -296,6 +300,7 @@ syrups:
 honeys:
   - "honey"
   - "honey water"
+  - "Honey water 2:1"
   - "acacia honey"
 
 # DELIBERATELY MIXES FORM WITH TYPE, and the reasoning is a browsing one rather
@@ -393,6 +398,7 @@ family_of:
   "pisco": brandy
   "grappa": brandy
   "eau de vie": brandy
+  "Full-strength clear fruit brandy": brandy
   "blanco tequila": agave
   "reposado tequila": agave
   "añejo tequila": agave
@@ -421,6 +427,7 @@ family_of:
   "Jägermeister": herbal
   "liqueur de sapin": herbal
   "Swedish flaggpunsch": herbal
+  "Galliano": herbal
 
 # Bases with NO family, deliberately. Same idea as
 # tests/test_reference_data.py's NO_TEMPERATURE_BECAUSE: a decision with its
@@ -435,6 +442,10 @@ family_less:
   "absinthe": >-
     Used in dashes and rinses throughout this collection, never as a base. If a
     drink ever builds on it, give absinthe a family then.
+  "pastis": >-
+    Same role as absinthe above -- Swizzle uses 6 drops of Pernod or absinthe,
+    never as a base. Same reasoning: give it a family if a drink ever builds
+    on it.
 
 # =============================================================================
 # RETIRED -- removed actively, not merely deprecated
