@@ -270,7 +270,10 @@ main {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: $space-xxs;
+  // $space-xxs (0.15rem) was too tight to read as separate lines once the
+  // links carry underlines -- Helen, 2026-08-23, from a phone. $space-sm is
+  // still small enough that the column reads as one block, not a list.
+  gap: $space-sm;
   text-align: left;
 
   // NO ACCENT COLOUR AT REST. The site's "this is interactive" colour belongs
@@ -315,13 +318,35 @@ main {
 
   svg {
     display: block;
-    width: 240px;   // ~60% of natural rendered size
+    // ~60% of natural rendered size, but never more than a share of the
+    // viewport. At a flat 240px this sat in the middle column of a
+    // `1fr auto 1fr` grid and refused to give any of it back, so on a phone
+    // the two reference columns were squeezed to a few characters each and
+    // nothing could centre -- Helen, 2026-08-23. Note this is exactly the
+    // failure test_no_element_can_force_horizontal_scroll does NOT catch: at
+    // 240px it never overflowed, it just crowded everything else out.
+    width: min(240px, 45vw);
     height: auto;
   }
 }
 
 // Licence line and GitHub link, centred under the copyright line -- both
 // inherit .site-footer's own colour/size rather than setting their own.
+// The about link's own line. Underlined like every other footer link rather
+// than styled as a button -- it is one of the boring links, which is the whole
+// reason it is down here as well as up in the header (see default.html).
+// Font, size and colour are inherited from .site-footer, same as .site-footer-ref.
+.site-footer-about {
+  margin-top: $space-md;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+}
+
 .site-footer-license {
   margin-top: $space-xxs;
 
@@ -576,4 +601,92 @@ $tape-protrusion: 0.2rem;
   .site-logo-bracket {
     letter-spacing: 0;
   }
+}
+
+
+// =============================================================================
+// NARROW VIEWPORTS — the two places the chrome stops working on a phone
+// =============================================================================
+// Helen cooked from her phone for the first time on 2026-08-23 and found both
+// of these. They are the only two, and each is a LAYOUT failure rather than a
+// sizing one, which is why neither showed up in
+// test_no_element_can_force_horizontal_scroll: nothing here overflows, it just
+// lands on top of something else or crowds it out.
+//
+// 600px matches the one breakpoint the site already had
+// (food/_recipe-list.scss) rather than introducing a second number. The
+// docstring on that test still says the site has no media queries; it has had
+// one since before this file did, and this block makes it two.
+
+@media (max-width: 600px) {
+
+  // --- 1. The nav icons were underneath the tape ---------------------------
+  // .site-nav-icons is absolutely positioned into the header's bottom-right
+  // corner, which is empty on a wide screen. .site-logo-tape carries BOTH
+  // `position: relative` and `transform: rotate(-1.75deg)`, so it paints in
+  // the positioned layer too -- and it comes later in the DOM with the same
+  // auto z-index, so it wins. On a wide header the tape never reaches that
+  // corner and the two never meet. On a phone the wordmark spans nearly the
+  // full width, so the tape lands squarely on the icons: they were painted
+  // over AND their clicks were swallowed, which is exactly what Helen saw.
+  //
+  // Raising the nav's z-index would put the icons back on top of the tape,
+  // which is not what anyone wants to look at. Helen's own suggestion is the
+  // structural fix and the right one -- give the row its own line underneath,
+  // so there is no overlap left to resolve.
+  //
+  // `order` rather than a DOM change: the nav is FIRST in the markup (it is
+  // first in the tab order on purpose, and it stays that way), so it has to be
+  // moved visually rather than physically.
+  .site-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-lg;
+  }
+
+  .site-title-link {
+    order: 1;
+  }
+
+  // position: static is what actually releases it -- `inset` and `bottom`
+  // below are inert on a static box, so neither needs unsetting by hand.
+  .site-header-inner {
+    order: 2;
+    position: static;
+    max-width: none;
+    pointer-events: auto;   // no longer overlapping anything to protect
+  }
+
+  .site-nav-icons {
+    position: static;
+    justify-content: center;
+  }
+
+  // --- 2. The footer could not centre anything -----------------------------
+  // `1fr auto 1fr` gives the middle column whatever it asks for and splits
+  // what is left. The hearts asked for a flat 240px, so on a 360px phone the
+  // two reference columns got a few characters each and the row read as
+  // lopsided rather than centred. The width cap up at .site-footer-hearts is
+  // half the fix; this is the other half, because three columns is the wrong
+  // shape for this width whatever the middle one costs.
+  .site-footer-top {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: $space-lg;
+  }
+
+  // Both reference columns, including the one that flips itself right-aligned
+  // at wide sizes. Stated together so a third site inherits it too.
+  .site-footer-ref,
+  .site-footer-ref:nth-of-type(2) {
+    justify-self: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .site-footer-hearts {
+    grid-column: 1;
+  }
+
 }

@@ -270,6 +270,23 @@
          decorations.js rather than chosen by a per-site `footer_svg` key. {% endcomment %}
       <div class="site-footer-hearts" aria-hidden="true"></div>
     </div>
+    {% comment %} The about page, reachable from the footer as well as the header
+       -- Helen's ask, 2026-08-23, after cooking from her phone, where the header
+       nav is the harder of the two to hit.
+
+       IT IS SPELLED OUT HERE, WHICH THE HEADER DELIBERATELY DOES NOT DO. The
+       header's own comment records that call: the "??" is bare on purpose and
+       "about" is not written anywhere a nav shows it. A footer is a different
+       job from a nav icon row -- it is where you go looking for the boring
+       links, and an unlabelled one there would be a link to nowhere in
+       particular. Flagged rather than assumed; if Helen would rather it read
+       "???" to match the page's own wordmark, that is a one-word change.
+
+       Site-neutral, so it sits on its own line rather than inside
+       .site-footer-top, whose columns each belong to a site. {% endcomment %}
+    <nav class="site-footer-about" aria-label="About this site">
+      <a href="{{ '/about/' | relative_url }}">about</a>
+    </nav>
     <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
     <p class="site-footer-license">
       Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.
