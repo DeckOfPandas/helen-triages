@@ -114,13 +114,17 @@ moods:
 # APPETITE FOR CHAOS — how much risk you want tonight
 # =============================================================================
 # Helen's own axis, and the one she actually starts from with company. Built
-# from `meta.ship` and `meta.status`, which were already in the spreadsheet.
+# from `meta.ship`, which was already in the spreadsheet.
 #
-# Three buckets, revised from an earlier four: the duds fold into `YOLO`,
-# because remaking something you disliked IS a chaotic choice.
+# Two buckets, revised down from three, 2026-08-23: `meta.status` is
+# retired (below) and its only job here was defining `haven't tried` --
+# and a drink Helen hasn't tried never gets published anyway, since she
+# keeps track of that herself rather than in the data, so the bucket had
+# nothing left to hold. Duds still fold into `YOLO` -- remaking something
+# you disliked IS a chaotic choice -- unchanged from the earlier
+# three-from-four revision.
 chaos:
   definitely good: "ship is yes or oh gods yes"
-  haven't tried: "status is never made or not started"
   YOLO: "everything else, including the five drinks rated `not really`"
 
 # `who knows` is NOT on the ship scale -- Helen, 2026-08-17. It means "I have no
