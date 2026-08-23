@@ -332,6 +332,14 @@ TRUSTED_DYNAMIC = (
     # against the published-page set instead.
     re.compile(r"^\{\{\s*link\.url\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*(?:recipe|cocktail)\.url\s*\|\s*relative_url\s*\}\}$"),
+    # The cocktails index's draft cards, added 2026-08-23. Provably correct
+    # for the same reason as recipe.url/cocktail.url on the line above --
+    # Jekyll computes `url` from the document's own permalink, so it cannot
+    # point at a page that does not exist. Note these are DRAFTS, which have
+    # no published URL at all in production: the loop that emits them is
+    # gated on `site.show_drafts`, a key only _config_local.yml declares, so
+    # the href never reaches a production build. See cocktails/index.html.
+    re.compile(r"^\{\{\s*drink\.url\s*\|\s*relative_url\s*\}\}$"),
     # _layouts/cocktail.html's source link, added 2026-08-16 with the cocktail
     # schema. DIFFERENT REASON FROM EVERY OTHER ENTRY ABOVE, and worth saying
     # so plainly rather than letting it inherit their justification: the others
