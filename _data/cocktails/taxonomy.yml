@@ -129,7 +129,11 @@ chaos:
 
 # `who knows` is NOT on the ship scale -- Helen, 2026-08-17. It means "I have no
 # idea", which is an absence of verdict rather than a low one, so it belongs
-# with the unrated rather than between `not really` and `maybe`.
+# with the unrated rather than as a low rung on the scale.
+#
+# `maybe` and `okay` collapsed into `meh`, 2026-08-23 -- Helen: the two only
+# ever meant the same shrug, unlike `okay`/`sure`, which stayed distinct
+# because `sure` is a genuinely more positive verdict.
 #
 # EVERY VALUE QUOTED, and `yes` is why. YAML 1.1 parses a bare `yes` as the
 # BOOLEAN True, so this list came out as [..., 'sure', True, 'oh gods yes'] and
@@ -140,8 +144,7 @@ chaos:
 # `is True` check in the suite.
 ship_scale:
   - "not really"
-  - "maybe"
-  - "okay"
+  - "meh"
   - "sure"
   - "yes"
   - "oh gods yes"
