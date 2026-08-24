@@ -13,6 +13,7 @@
 // build) rather than from food's decision-support shape, so the rest is added
 // as each section earns a decision — see HANDOVER §9.
 @import "cocktails/palette";
+@import "shared/fonts";
 @import "shared/tokens";
 // The punched-tape mixin, before shared/layout — the wordmark uses it, and a
 // mixin must be defined before the partial that calls it. Same reason food.scss

@@ -68,7 +68,23 @@
 // document says it is. Since that rule is what makes the treatment reach EVERY
 // heading rather than a list of them, em wins on both counts: it does more and
 // it can't drift.
-$emboss-stroke: 0.014em;       // 1.4% of font-size, self-scaling
+// 1.0% of font-size, self-scaling. WAS 1.4%, REDUCED FOR COURIER PRIME on
+// 2026-08-24, and the reasoning is worth keeping because the obvious guess is
+// backwards. The stroke is an `em`, so swapping the font did NOT change how
+// thick this rim is -- it is the same width on both faces at the same size.
+// What changed is what it sits on. Courier Prime is a Courier redesign that
+// deliberately fixes Courier New's spindliness, so its stems are heavier and
+// its counters tighter, and the same rim therefore (a) fills more of each
+// counter and (b) contrasts less against a darker letter and more against the
+// paper. The result reads as blur rather than as an edge, which is the failure
+// the "about 3% of the type size" ceiling above describes, reached at a lower
+// number than before because the letterform got there first.
+//
+// The SHADOW is untouched, and that is deliberate: direction is what makes a
+// letter read as raised, and a heavier face casts it better, not worse. Only
+// the edge weight needed to come down. If this still looks soft, this is the
+// dial -- and the one to move next is the title's font-weight, not this.
+$emboss-stroke: 0.010em;
 $emboss-offset-ratio: 0.065;   // 6.5% of font-size -- see the two values below
 
 // The offset stays a WHOLE PIXEL rather than a computed proportion, unlike the
