@@ -1482,17 +1482,24 @@ ingredients:                     # FULL list, untriaged, in build order
     generic:                     # a LIST means "or", never "and" — §9.3.1
       - "lightly aged and filtered"
       - "blended multi-region rum, clear"
-    suggestion: "Havana 3"
+    suggestion: "Havana 3"       # bottle NAME(S) ONLY — never reasoning, §9.3.1
+    note: "Whichever you prefer or are trying to use up"   # the REASON, resolving #457
+  - amount: "15 ml"
+    ml: 15
+    item: "Black rum"
+    generic: "moderately aged"
+    character:                   # a property of THIS RECIPE'S use of the
+      - "blackstrap"             # bottle, not of the bottle in the abstract — #441, §9.3.1
+    suggestion: "Gosling's"
 method:                          # ORDERED LIST — the steps are sequential
   - "Pour absinthe into ice-filled glass."
 to_serve: ""                     # PRESENTATION, not a further instruction
-notes:                           # bare strings, as food
+notes:                           # bare strings, as food — DRINK-level, not per-ingredient
   - "This is much less sugar than many recipes"
 source: ""
 source_url: ""                   # external; nothing verifies it, see §9.6
 meta:
-  status: "parked"
-  ship: "oh gods yes"
+  ship: "oh gods yes"            # a real ordered vocabulary now — see §9.5
   date_last_edited: "2026-08-16"
 ```
 
@@ -1564,22 +1571,59 @@ below. Getting this distinction right the first time mattered because #292's
 exclusion logic ("no whisky tonight") would silently misbehave on whichever
 one was encoded wrong.
 
-**`character` — settled in principle, NOT settled in practice. Read #441
-before adding one.** The issue's own ruling: `character` "must not be
-repeated across 594 recipe entries" — it belongs on a bottle dictionary
-(name → generic, ABV, character) that **does not exist yet** (three other
-open issues want the same missing table: #297 for ABV, #295 for glass
-volumes, this one for character). Until that table exists, the documented
-interim is a plain text NOTE on the recipe, not a field — Georgetown Punch
-does this correctly ("Its blackstrap side becomes a `character` once that
-layer exists"). **2026-08-22: this got violated within the same session
-that read this rule.** Airmail's Ron del Barrito was given a structured
-`character: [sherry, "Spanish-style"]` field plus a new `rum_characters`
-vocabulary list in `ingredients.yml`, before the issue was re-read. Flagged
-to Helen and logged as a comment on #441 rather than silently reverted —
-check that issue's state before adding another `character` anywhere; the
-two live conventions (Airmail's field vs. Georgetown Punch's note) had not
-been reconciled as of this writing.
+**`character` — RESOLVED, #441, 2026-08-23. It lives on the recipe, not a
+bottle dictionary.** The issue's first draft argued the opposite — a shared
+bottle table (name → generic, ABV, character), because `character` "must
+not be repeated across 594 recipe entries." Helen, walked through from
+scratch, overturned that premise: `character` isn't a bottle-invariant fact
+the way ABV genuinely is — it's *why this drink wants this bottle*, which is
+inherently a property of the recipe's use of it. So restating it across
+recipes that happen to suggest the same bottle for the same reason isn't
+duplication of one fact, it's each recipe independently and correctly
+stating its own reasoning. Airmail's original structured field —
+`character: [sherry, "Spanish-style"]`, plus `rum_characters` in
+`ingredients.yml` — was therefore right; Georgetown Punch and Don's Own
+Grog's plain-note interim ("becomes a `character` once that layer exists")
+was the thing that got fixed, brought in line with Airmail's shape. #297
+(ABV) and #295 (glass volumes) explicitly do NOT get the same free pass —
+they're genuinely bottle-invariant, so this reasoning doesn't extend to
+them.
+
+**The governing principle behind that call, #459**: "everything we do is
+focused on the user (i.e. Helen), and making sure the user gets the drink
+she wants. Being an encyclopaedia of drinks sounds like busywork and it's
+not for me." A shared bottle-reference table would have been exactly that
+busywork. Apply the same test forward, to any future feature that describes
+a bottle or spirit in the abstract rather than in service of one recipe
+decision.
+
+**`suggestion` vs. a new per-ingredient `note` — RESOLVED, #457,
+2026-08-23.** Six suggestions had drifted into full sentences carrying
+reasoning ("Beefeater is nice for a brighter drink against the mint"), not
+just a bottle name. Same argument as `character`: the reasoning belongs on
+the recipe, but not smuggled into `suggestion` — it gets its own `note` key
+per ingredient, mirroring food's existing `item.note`
+(`_layouts/recipe.html`, rendered inline with a small annotation mark).
+`suggestion` goes back to being name(s) only, string or list. One
+exception: Caipirinha's cachaça ranking ("Sagatiba = Leblon > Viero
+Barriero > Abelho > Yaguara Organic") stayed a single string rather than
+being forced into the list shape, because the `=`/`>` notation IS the
+content, not decoration on top of a name — `suggestion` became the tied
+top pick (`[Sagatiba, Leblon]`) and the full ranking moved to a drink-level
+note verbatim, no explanation added, at Helen's explicit request ("Future
+Helen will know exactly what I mean").
+
+**Neither `character` nor `note` render on the page yet, and neither does
+a list-form `generic`/`suggestion` — #460.** The cocktail page has never
+actually been designed (`_layouts/cocktail.html` predates all of this);
+`{{ item.generic }}` / `{{ item.suggestion }}` are bare string
+interpolations that mash a list together with no separator. 10+ drinks
+carry a list-form `generic`, 6+ a list-form `suggestion`, as of
+2026-08-23. Page design is deliberately backend-first this round — Helen:
+"given the low cost of asking Claude to turn everything inside out
+compared with having to do it all myself" — so this is a known, accepted
+gap, not an oversight to sneak-fix; #460 is the checklist for whenever
+that design pass happens.
 
 **Disjunctive `generic` has an agreed threshold, not a free-for-all.**
 Helen, 2026-08-21: multi-value only when both bottles can actually be named
@@ -1636,9 +1680,17 @@ alone. See the note there.
   preserves. Currently flattened to `[]`, which loses it. Putting `"none"`
   in the list instead would pollute any future garnish vocabulary with a
   fake member.
-- **`meta.status` and `meta.ship` have no vocabulary.** All three drinks say
-  `parked` / `oh gods yes`, so there is nothing to infer. Do not invent an
-  enum from a sample of one value.
+- ~~**`meta.status` and `meta.ship` have no vocabulary.**~~ **OUT OF DATE,
+  2026-08-23.** `meta.status` is retired entirely — Helen: "I am perfectly
+  well aware of how much work I have done on each drink... it's easy to keep
+  track of" — its only consumer anywhere in the codebase was `chaos`'s
+  `haven't tried` bucket, which is dropped rather than redefined, since an
+  untried drink never publishes. `meta.ship` has a real, ordered, tested
+  vocabulary, `ship_scale` in `_data/cocktails/taxonomy.yml`: `not really` <
+  `meh` < `sure` < `yes` < `oh gods yes` (`meh` replaced `maybe`/`okay`, which
+  "only ever meant the same shrug"). `who knows` and `QQ` are deliberately
+  OFF that scale — see the file's own comment. §9.9 is where this vocabulary
+  turned into an actual feature.
 - ~~**No tests exist for cocktails at all.**~~ **OUT OF DATE, corrected
   2026-08-19.** `tests/test_cocktails.py` exists and is substantial — glasses,
   generics, moods, methods, the `amount`/`ml` agreement guard this paragraph
@@ -1708,10 +1760,25 @@ generator, §13.8 for the sizing mechanism, and the note at the top of
 2026-08-23. Helen asked for "filter buttons on the front page to show me a list
 of recipes by goodness, e.g. 'oh gods yes'." The field already existed. `meta.ship`
 is not a yes/no publish flag despite the name — it holds her own verdict, in her
-own words, and "oh gods yes" was already on 18 drinks. The distribution:
+own words, and "oh gods yes" was already on 18 drinks. The distribution when this
+was built (`okay`/`maybe` collapsed into `meh` in the same session, just after):
 
-    yes 37 · QQ 19 · oh gods yes 18 · okay 14 · who knows 12 · sure 6 ·
-    not really 5 · maybe 3
+    yes 37 · QQ 19 · oh gods yes 18 · meh 17 (was okay 14 + maybe 3) ·
+    who knows 12 · sure 6 · not really 5
+
+**The template's own ordering list went stale within the same day.** It
+hardcoded `"oh gods yes,yes,sure,okay,maybe,not really,who knows,QQ"` — and
+the `meh` collapse landed in a *different, still-unmerged* PR at the same
+time. Nothing crashed (an unlisted value "just sorts last", by the page's
+own design), but it meant 17 drinks — the single biggest bucket after
+yes/QQ/oh-gods-yes — would have silently sorted dead last instead of between
+`sure` and `not really` the moment both PRs merged. Caught by rebuilding the
+combined state of both pending branches locally before trusting either one
+was done; neither branch's own tests could have caught it, because each was
+green in isolation. Fixed to `"oh gods yes,yes,sure,meh,not really,who
+knows,QQ"`. **Whenever a hardcoded value list and a vocabulary it enumerates
+live in different files (worse, different repos), a change to one is a
+silent break in the other until someone rebuilds both together.**
 
 **Look for the vocabulary before inventing one.** The whole feature was a
 template and a stylesheet; no new field, no migration, and nothing for Helen to
@@ -2825,6 +2892,25 @@ found, `git stash` moves uncommitted edits from one checkout into the other
 without needing to redo them by hand — expect `git stash pop` to conflict if
 both sides touched the same lines, and resolve to the known-correct state
 rather than fighting the merge markers.
+
+**A `Fixes owner/repo#N` trailer in a PRIVATE repo's commit does not close,
+comment on, or even cross-reference the issue — checked by measurement, not
+assumed.** 2026-08-22, `_cocktail_drafts` (private) vs. `helen-triages`
+(public). Dozens of commits over the day carried correctly-formed trailers
+(`Towards DeckOfPandas/helen-triages#335`, `Fixes
+DeckOfPandas/helen-triages#442` etc.) — the right syntax per CLAUDE.md's own
+"a bare #N only resolves within its own repository" rule. Pulling #335's
+full timeline via the GitHub API afterwards showed **zero** cross-reference
+events from any of them; the only "referenced" event with a real commit
+attached was a commit that happened to live in the public repo itself.
+GitHub appears to deliberately suppress cross-repo reference/close events
+originating from a private repository, presumably so a private repo's
+existence and commit messages can't leak onto a public issue page for
+someone without access to it. **The trailer is still worth writing** — it's
+correct, self-documenting `git log` history in the repo that has it — but
+treat closing or commenting on the public issue as a separate, deliberate
+step you do by hand (comment with the commit SHA, then close), never
+something the commit message will do for you across that boundary.
 
 **YOU WILL LOOP A COLLECTION THAT `output: false` DID NOT EMPTY.** `output:
 false` stops Jekyll *writing* a document. It does **not** remove it from
