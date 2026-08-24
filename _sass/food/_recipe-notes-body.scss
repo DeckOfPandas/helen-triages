@@ -111,7 +111,7 @@ article.recipe .recipe-body-content {
     font-size: 1rem;
     letter-spacing: $letter-spacing-label;
     color: $color-text;
-    -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
     @include punched(raised);
     margin: $spacing-section-gap 0 $space-md 0;
   }
@@ -169,7 +169,7 @@ article.recipe .recipe-body-content {
     font-size: 0.78rem;
     letter-spacing: 0.08em;
     color: lighten($color-clear-text, 10%);
-    -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
     margin: $space-xl 0 $space-sm 0;
   }
 
@@ -308,7 +308,7 @@ article.recipe .recipe-body-content {
       // whether she was imagining it. Now expressed through the function like
       // everything else -- $emboss-stroke on 0.92rem is 0.206px, which is the
       // 0.2px this was hand-set to.
-      -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+      -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
       @include punched(raised);
       margin-bottom: $space-xs;
       // Shorter than the prose it labels, so a long label wraps before the
@@ -392,7 +392,7 @@ article.recipe .recipe-body-content {
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: $color-text;
-        -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+        -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
         @include punched(raised);
         @include overlapping-rule-single($color-section-underline-2);
       }
@@ -508,7 +508,7 @@ article.recipe .recipe-body-content {
   // Raised label-tape lettering (HANDOVER_v26.md §13.4.1). Stroke was
   // $stroke-light's flat 0.5px, i.e. 3.1% of this element's own 1rem -- same
   // swallowing problem the meta labels had, see food/_recipe-header.scss.
-  -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
   @include punched(raised);
   line-height: 1.4;
 }

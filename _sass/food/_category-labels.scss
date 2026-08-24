@@ -124,7 +124,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     // which was a grey with no relationship to the letter it outlined.
     // This is half the effect; @include punched() below is the other half, and
     // the two are independent. See the long note in _sass/food/_rule.scss.
-    -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
     // 1.35rem sits between the two offset values (it wants 1.4px). Staying at
     // 1px rather than rounding up to 2: this is a control-panel label with
     // five of them stacked in a screenful, not a landmark, and the ratio

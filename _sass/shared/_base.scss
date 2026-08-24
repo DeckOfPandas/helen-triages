@@ -53,7 +53,15 @@ h1, h2, h3 {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-top: 0;
-  -webkit-text-stroke: $emboss-stroke $color-text;
+  // Width from the custom property so `.on-dark` reaches it; COLOUR left as
+  // $color-text on purpose. This is the harder edge, and food overrides it with
+  // the softer $color-label-stroke on every component that matters (see
+  // _recipe-notes-body.scss:164) -- so in practice this colour is only ever seen
+  // on a heading nobody has styled. KNOWN GAP: such a heading inside `.on-dark`
+  // would get a near-black stroke on a dark ground. There is no dark section on
+  // the site yet, so this is a note rather than a bug; fix it by giving this a
+  // property of its own at the point one exists.
+  -webkit-text-stroke: var(--emboss-stroke-w) $color-text;
   @include punched(raised);
 }
 

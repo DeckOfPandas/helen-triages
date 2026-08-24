@@ -89,7 +89,7 @@
     text-transform: uppercase;
     letter-spacing: $letter-spacing-label;
     color: $color-text;
-    -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
     @include punched(raised);
   }
 
@@ -270,7 +270,7 @@
 
 .ct-card-name {
   letter-spacing: 0.02em;
-  -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
   @include punched(raised);
 }
 

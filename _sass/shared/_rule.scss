@@ -133,12 +133,92 @@ $color-emboss-shadow: rgba($color-text, 0.68);  // where it does not -- was 0.38
 // $style: raised   letters standing proud of the tape  (light from top-left)
 //         pressed  letters punched down into it        (the same light, inverted)
 // $offset          $emboss-offset-large on display type; see the note above
-@mixin punched($style: raised, $offset: $emboss-offset) {
+// =============================================================================
+// THE TWO GROUNDS, AND WHY THIS IS CUSTOM PROPERTIES RATHER THAN SASS
+// =============================================================================
+// Helen tuned the emboss twice on 2026-08-24, once for dark type on the page
+// ground and once for light type on a dark one, and the two sets disagreed on
+// every single value:
+//
+//                          dark-on-light      light-on-dark
+//   stroke                 0.016em            0.010em
+//   offset, display        1px                2px
+//   shadow alpha           0.68               0.06
+//   stroke lightness       +30%               +40%
+//
+// THAT IS NOT INDECISION, IT IS THE PHYSICS OF THE TWO CASES. On a light ground
+// the highlight has ~3% of headroom above the paper and the SHADOW does the
+// raised work -- hence 0.68. On a dark ground it inverts completely: a dark
+// shadow on dark is invisible, so the shadow goes to nearly nothing and the
+// LIGHT copy does everything. Two inverse problems, and one set of Sass
+// variables can only ever serve one of them. It is the same reason
+// .site-logo-word had to be excused from this treatment entirely back in
+// August: it is the site's only light-on-dark lettering.
+//
+// SO THE VALUES ARE CUSTOM PROPERTIES AND THE INVERSION IS A CLASS. Sass
+// variables are resolved at compile time and cannot be overridden by context;
+// custom properties inherit, so `.on-dark` redefines six values once and every
+// rule that reads them -- at any nesting depth, in any partial, including ones
+// written later -- picks up the inversion with no specificity fight and no list
+// of selectors to maintain. A `.on-dark h1 { ... }` block would have had to
+// out-specify thirteen existing component rules and would have silently missed
+// the fourteenth.
+//
+// The Sass variables below are still the single source of the DEFAULTS. Nothing
+// else in the codebase should read the custom properties' fallbacks.
+
+// EMITTED ONCE, EVEN THOUGH THIS FILE IS IMPORTED TWICE. food/_timings.scss
+// imports `shared/rule` and `food/rule` again for its own use, which was free
+// for as long as these were pure DEFINITION files -- variables and a mixin emit
+// nothing, so importing them twice cost nothing. The moment this file started
+// emitting real CSS that stopped being true: food.css carried two copies of the
+// block, and the only reason the right value survived was the accident of which
+// copy landed last. A guard rather than untangling the import, because the
+// double import is deliberate on timings.scss's side and this file should stay
+// safe to import from anywhere.
+$emboss-vars-emitted: false !default;
+@if not $emboss-vars-emitted {
+  :root {
+    --emboss-stroke-w:    #{$emboss-stroke};
+    // $color-text, NOT food's softer $color-label-stroke -- that is not one of
+    // the ten the palette CONTRACT guarantees, and naming it here broke the
+    // cocktails build outright the moment this block was written. Shared may only
+    // ask for what every palette promises. Food re-points this to its own softer
+    // value in food/_rule.scss, which is imported after this file.
+    --emboss-stroke-c:    #{$color-text};
+    --emboss-light:       #{$color-emboss-light};
+    --emboss-shadow:      #{$color-emboss-shadow};
+    --emboss-offset:      #{$emboss-offset};
+    --emboss-offset-lg:   #{$emboss-offset-large};
+  }
+
+  // Put this on any SECTION whose type is light on a dark ground. It is a
+  // context, not a component: it styles nothing itself, it only re-points the
+  // six values every punched rule already reads.
+  //
+  // NOTE FOR WHOEVER ADDS THE FIRST REAL ONE. As of 2026-08-24 the site has no
+  // dark section at all -- these numbers were tuned against a swatch on
+  // /dev/emboss/, which is the only consumer. They are a considered starting
+  // point, not a verified result, and the honest thing is to re-eyeball them
+  // against real content rather than trust them because they are written down.
+  // This is NOT dark mode, which is a separate and much larger question Helen has
+  // explicitly deferred.
+  .on-dark {
+    --emboss-stroke-w:  0.010em;
+    --emboss-stroke-c:  #{lighten($color-text, 40%)};
+    --emboss-shadow:    #{rgba($color-text, 0.06)};
+    --emboss-offset-lg: 2px;
+  }
+  $emboss-vars-emitted: true !global;
+}
+
+@mixin punched($style: raised, $offset: var(--emboss-offset)) {
+  $neg: calc(#{$offset} * -1);
   @if $style == raised {
-    text-shadow: (-$offset) (-$offset) 0 $color-emboss-light,
-                 $offset    $offset    0 $color-emboss-shadow;
+    text-shadow: #{$neg} #{$neg} 0 var(--emboss-light),
+                 #{$offset} #{$offset} 0 var(--emboss-shadow);
   } @else {
-    text-shadow: $offset    $offset    0 $color-emboss-light,
-                 (-$offset) (-$offset) 0 $color-emboss-shadow;
+    text-shadow: #{$offset} #{$offset} 0 var(--emboss-light),
+                 #{$neg} #{$neg} 0 var(--emboss-shadow);
   }
 }
