@@ -72,3 +72,23 @@ $font-dir: "../fonts";
     src: url("#{$font-dir}/courier-prime-#{$weight}.woff2") format("woff2");
   }
 }
+
+// A THIRD FAMILY, FOR EXACTLY ONE CLASS. Helen, 2026-08-24: "how about trying
+// IBM Plex Mono for the recipe-title-link class? ... I suspect the slightly
+// different proportions will help the recipe titles stand out."
+//
+// ONE WEIGHT ONLY, and that is the whole point of the restraint: .recipe-title-link
+// is the sole consumer, it asks for 600 and nothing nested inside it asks for
+// anything else, so 600 is the entire requirement. 15 KB. Adding the other four
+// faces would quadruple that for nothing, and would also make it far too easy
+// for this to quietly become a second heading font.
+//
+// THE FALLBACK IS COURIER PRIME, not Courier New: if this file fails to load,
+// the titles should land on the site's own mono rather than on a system one.
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("#{$font-dir}/ibm-plex-mono-600.woff2") format("woff2");
+}

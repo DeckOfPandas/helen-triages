@@ -93,11 +93,22 @@
   // querySelector('a') became querySelector('.recipe-title-link') in the same
   // issue, for the same reason -- "the only link in the row" stopped being true.
   .recipe-title-link {
-    font-family: $font-headings;
+    font-family: $font-recipe-title;
     font-size: 1rem;
-    font-weight: 600;     // 400 and 500 render identically -- Courier New only
-                           // ships Regular and Bold, so anything <=500 resolves
-                           // to Regular and anything >500 jumps straight to Bold
+    // 600 IS A REAL FACE HERE, AND IT IS THE ONLY PLACE ON THE SITE THAT IS TRUE.
+    // This comment used to explain the opposite: that 400 and 500 rendered
+    // identically because Courier New ships only Regular and Bold, so anything
+    // <=500 resolved to Regular and anything >500 jumped straight to Bold -- and
+    // 600 was chosen to mean "bold". That still holds everywhere else, Courier
+    // Prime having the same two faces. It stopped holding HERE on 2026-08-24,
+    // when this one class moved to IBM Plex Mono, which ships a genuine SemiBold.
+    //
+    // So this 600 now renders LIGHTER than it used to, not merely differently
+    // proportioned. That is a visible change and an intended one -- a title that
+    // differs from its surroundings in weight as well as in shape -- but if the
+    // titles want their old heft back, this becomes 700 and the 700 face has to
+    // be shipped alongside the 600.
+    font-weight: 600;
     text-transform: lowercase;
     letter-spacing: 0.05em;
     color: $color-text;

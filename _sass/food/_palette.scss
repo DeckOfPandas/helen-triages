@@ -32,6 +32,12 @@ $color-surface:   #fdfbfe; // Ultra-soft milk white component surface fill
 
 // --- Typography Stacks -------------------------------------------------------
 $font-headings: "Courier Prime", "Courier New", "Courier", monospace;
+// The recipe INDEX titles only -- see _recipe-list.scss. A different mono with
+// noticeably different proportions, so a title reads as a title rather than as
+// more of the same monospace. Deliberately NOT $font-headings: this is one
+// element, and the moment a second thing wants it, ask whether it should
+// instead be $font-headings for the whole site.
+$font-recipe-title: "IBM Plex Mono", "Courier Prime", monospace;
 $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;
 
 // --- Category colours --------------------------------------------------------
