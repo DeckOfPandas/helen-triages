@@ -39,3 +39,12 @@ collections:
   cocktail_drafts:
     output: true
     permalink: /cocktails/drafts/:path/
+
+# Show cocktail drafts on the cocktails index. LOCAL ONLY, AND THAT IS THE
+# WHOLE POINT: `output: false` stops Jekyll writing a draft but does NOT take
+# it out of site.cocktail_drafts, so a template looping the collection prints
+# private drink names into public HTML and links them to URLs that were never
+# written -- issue #235. Production declares no such key, so the condition in
+# cocktails/index.html is false there and the page falls back to its empty
+# state. Never move this into _config.yml.
+show_drafts: true

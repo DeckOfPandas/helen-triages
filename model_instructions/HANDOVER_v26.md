@@ -1703,6 +1703,31 @@ generator, §13.8 for the sizing mechanism, and the note at the top of
 
 ---
 
+### 9.9 The index browses by goodness, and `meta.ship` IS the rating
+
+2026-08-23. Helen asked for "filter buttons on the front page to show me a list
+of recipes by goodness, e.g. 'oh gods yes'." The field already existed. `meta.ship`
+is not a yes/no publish flag despite the name — it holds her own verdict, in her
+own words, and "oh gods yes" was already on 18 drinks. The distribution:
+
+    yes 37 · QQ 19 · oh gods yes 18 · okay 14 · who knows 12 · sure 6 ·
+    not really 5 · maybe 3
+
+**Look for the vocabulary before inventing one.** The whole feature was a
+template and a stylesheet; no new field, no migration, and nothing for Helen to
+fill in. A rating scale designed from scratch would have been worse AND would
+have needed 115 decisions from her.
+
+**The index reads DRAFTS, not recipes**, and this is not a shortcut: there are
+115 cocktail drafts and **zero** promoted cocktail recipes, so the previous
+index — a bare `<ul>` over `site.cocktail_recipes` — was looping an empty
+collection and had been since it was written.
+
+Ordering is declared in the template, not derived. Nothing about the strings
+says "oh gods yes" beats "sure". Any value not in the declared list still
+renders and still filters, so a word Helen invents mid-session sorts last
+rather than vanishing.
+
 ## 10. Validation — run `pytest`, don't read this
 
 **The suite gates the deploy now (2026-08-18, issue #369).** Until then the
@@ -2289,6 +2314,29 @@ without waiting for Helen.
 have their own empty trackers, so a cross-repo reference needs the full
 `DeckOfPandas/helen-triages#N` form.
 
+### 11.0.1 More than one agent now shares this checkout — use a worktree
+
+2026-08-23. A session went to branch and found the working tree already on
+someone else's branch with an uncommitted file in it. **Do not stash, move or
+commit another agent's uncommitted work**, and do not switch branches out from
+under it. Take a worktree instead:
+
+    git worktree add .claude/worktrees/<name> -b <branch> main
+
+That gives a clean checkout of `main` in its own directory, leaves the shared
+tree completely untouched, and is removed with `git worktree remove` once the
+branch is merged. `.claude/worktrees/` already holds others.
+
+**One catch, and it will look like the drafts have vanished.** The nested
+private drafts repos (`_food_drafts/`, `_cocktail_drafts/`) are gitignored here,
+so a fresh worktree does not contain them and a build from it renders an empty
+index. Symlink the one you need:
+
+    ln -s /home/helen/projects/helen-triages/_cocktail_drafts _cocktail_drafts
+
+The symlink is itself covered by `.gitignore`, so it cannot be committed by
+accident.
+
 ### 11.1 A file with a colon in its name will crash the whole build
 
 WSL writes `<name>:Zone.Identifier` beside anything dragged in from Windows.
@@ -2777,6 +2825,49 @@ found, `git stash` moves uncommitted edits from one checkout into the other
 without needing to redo them by hand — expect `git stash pop` to conflict if
 both sides touched the same lines, and resolve to the known-correct state
 rather than fighting the merge markers.
+
+**YOU WILL LOOP A COLLECTION THAT `output: false` DID NOT EMPTY.** `output:
+false` stops Jekyll *writing* a document. It does **not** remove it from
+`site.<collection>`. So a template that loops `site.cocktail_drafts`
+unconditionally prints 115 private drink names into public HTML and links them
+at URLs that were never written — and every test passes, because the links are
+"valid" and nothing is checking the index for things that should not be on it.
+This is issue #235, and it has now been available to happen twice.
+
+The guard is a config key that exists **only** in `_config_local.yml`
+(`show_drafts`), so production declares nothing and the condition is false
+there. **Do not replace it with a check on whether the collection is
+non-empty** — that is true in production too, which is the entire trap.
+And verify it by BUILDING BOTH WAYS rather than by reading the template:
+`--config _config.yml` alone must yield zero cards and zero drink names.
+
+**YOU WILL CHECK ONE ELEMENT'S WIDTH AND CALL THE ROW SAFE.**
+`test_no_element_can_force_horizontal_scroll` looks for a single `width: Npx`
+above 320 with nothing clamping it. The footer overflowed a phone anyway, and
+every element in it was under the threshold: a `1fr` track will not shrink
+below min-content, so the row's floor was "temperatures" (~120px) plus the
+hearts' flat 240px plus 2rem of gaps ≈ 392px against a ~360px viewport.
+**Overflow is a property of the ROW, not of any element in it.** Three
+sub-320px tracks side by side overflow a phone perfectly well.
+
+That test's docstring also still says "the site has no media queries and does
+not need any". It has had one in `food/_recipe-list.scss` for a long time, and
+`shared/_layout.scss` added a second on 2026-08-23. Three counting print.
+
+**YOU WILL ASSUME DOM ORDER DECIDES WHAT PAINTS ON TOP.** It decides only among
+peers at the same level. `.site-nav-icons` is absolutely positioned into the
+header's bottom-right corner and was invisible and unclickable on a phone —
+not because of a z-index anyone set, but because `.site-logo-tape` carries BOTH
+`position: relative` AND `transform: rotate(-1.75deg)`. Either one promotes it
+into the positioned layer; being later in the DOM with the same `auto` z-index
+then wins outright. On a wide header the two never meet, so this is invisible
+until someone opens the site on a phone.
+
+**The fix was structural, not a z-index.** Raising the nav above the tape puts
+icons on top of artwork, which is not what anyone wants to look at. Below 600px
+the row now gets its own line beneath the wordmark, so there is no overlap left
+to resolve. Reach for `order` rather than moving markup when the DOM order is
+carrying something else — here, the nav is first for tab order and stays first.
 
 ## 13. The site's visual design
 
@@ -3501,6 +3592,59 @@ All generated with `marks_seed` unset (defaults to `seed`) — see
    pass. Worth deciding out loud, not by default either way.
 
 ---
+
+### 13.10 Typography — the site currently has no fonts of its own
+
+**Nothing is self-hosted. There is no `@font-face` anywhere and no font file in
+the repo.** Both stacks name only fonts that happen to be installed on desktop
+operating systems:
+
+    $font-headings: "Courier New", "Courier", "Lucida Sans Typewriter", monospace;
+    $font-body:     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+**This is why the PDFs look wrong (issue #373), and it is not a print-stylesheet
+bug.** `scripts/generate_pdfs.py` renders with headless Chrome, and CI runs it
+on `ubuntu-latest`, where Courier New, Segoe UI and Roboto are all absent —
+measured, not assumed. Everything falls to the generic, `sans-serif` resolves to
+DejaVu Sans and `monospace` to DejaVu Sans Mono. The PDF also loses the 300/350
+lightness, because DejaVu ships no Light face. So the printout is in the wrong
+faces *and* uniformly heavier than the screen.
+
+The sharper framing: **the site already renders in three different typefaces
+depending on the reader's OS.** The PDF is only where it became visible.
+
+**The weight scale is Segoe UI's face set, and that is not a coincidence.**
+The CSS asks for 300, 350, 400, 500, 600, 700, 900 and 1000. On `$font-body`
+those are real — Segoe ships Light and Semilight, so 300 and 350 genuinely
+differ on Windows. On `$font-headings` they are not: **Courier New has two
+faces**, so everything ≤500 is Regular and everything >500 is Bold, and at
+least four places compensate with strokes rather than weight
+(`_recipe-list.scss:98`, `_recipe-header.scss:237`, `_palette.scss:113`,
+`_buttons.scss:101`). Before changing the mono, read those four.
+
+**Chosen 2026-08-23, by looking rather than arguing: Selawik (body) and
+Courier Prime (mono).** Selawik is Microsoft's own OFL-licensed,
+metric-compatible substitute for Segoe UI, and ships exactly five faces —
+Light, Semilight, Regular, Semibold, Bold — which is precisely the
+300/350/400/600/700 Helen independently settled on. Rejected: Open Sans
+("aggressively blah"), Cousine (metrically Courier New, but built on Liberation
+Mono, so it has the measurements without the typewriter character), Myriad Pro
+(commercial Adobe; cannot legally be self-hosted in a public repo).
+
+**Still open: the emboss needs re-tuning for Courier Prime.** Courier Prime was
+drawn to fix Courier's spindliness, so it has thicker stems and tighter
+counters, and `$emboss-stroke`'s 1.4% gets swallowed — exactly the failure
+`shared/_rule.scss` already documents ("the shadow has to clear the stroke to be
+seen at all"). Likely first lever is the title weight, not the stroke: Courier
+Prime 400 is roughly as dark as Courier New 700. **The emboss is stroke AND a
+two-copy directional shadow; the stroke alone reads as a soft edge, never as
+raised.** A specimen built with only the stroke will mislead you — it did.
+
+Sizes, latin subset, before further subsetting: Inter 47 KB (one variable file,
+all weights), Selawik 72 KB (5), Courier Prime 37 KB (2), IBM Plex Mono 73 KB
+(5), Cousine 30 KB (2). A realistic pair is 85–145 KB — less than one
+photograph, which is the argument for keeping the no-images principle and
+spending the bytes here instead.
 
 ## 14. Reference pages and the internal-temperatures data layer
 

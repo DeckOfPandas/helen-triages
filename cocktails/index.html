@@ -9,30 +9,109 @@ permalink: /cocktails/
 <h1 class="visually-hidden">{{ this_site.title }} — {{ this_site.description }}</h1>
 
 {% comment %} ─────────────────────────────────────────────────────────────────
-  COCKTAILS INDEX — SKELETON.
+  COCKTAILS INDEX — BROWSE BY GOODNESS.
 
-  Food's index is a filter matrix: star ingredient, mood, practicalities,
-  ingredient search, name search. That shape came out of a real question —
-  "I want something cheesy and one-handed for the sofa tonight" — and it should
-  NOT be copied here on the assumption cocktails asks the same kind of question.
-  What a cocktails index is for is still open.
+  Helen, 2026-08-23, twenty minutes before friends arrived: "put filter buttons
+  on the front page to show me a list of recipes by goodness, e.g. 'oh gods
+  yes'." That phrase is not an invention -- `meta.ship` already holds it, on 18
+  drinks. So this needs no new vocabulary and no new field: `ship` IS the
+  goodness rating, and has been all along.
 
-  So this lists what exists and nothing more. The filter vocabulary in
-  _data/cocktails/taxonomy.yml is empty on purpose; when it fills up, the
-  controls that read it get built here.
+  IT READS DRAFTS, NOT RECIPES, and that is not a shortcut. There are 115
+  cocktail drafts and ZERO promoted cocktail recipes -- an index over
+  site.cocktail_recipes is an index over nothing, which is what this page was
+  before.
+
+  THE GUARD MATTERS MORE THAN THE PAGE. `output: false` stops Jekyll WRITING a
+  draft; it does NOT remove it from site.cocktail_drafts, so a template that
+  loops the collection unconditionally will happily print 115 private drink
+  names into public HTML and link them to URLs that were never written. That is
+  issue #235, exactly, and it is why this is gated on `site.show_drafts` --
+  a key that exists ONLY in _config_local.yml. Production has no such key, the
+  condition is false, and the whole block collapses to the empty state.
+  Do not replace this with a check on whether the collection is non-empty.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
-{% if site.cocktail_recipes.size > 0 %}
-  <ul class="recipe-list">
-    {% assign all_cocktails = site.cocktail_recipes | sort: "title" %}
-    {% for cocktail in all_cocktails %}
-      <li>
-        <a href="{{ cocktail.url | relative_url }}">{{ cocktail.title }}</a>
+{% if site.show_drafts and site.cocktail_drafts.size > 0 %}
+
+  {% comment %} Order is best-first, and it is stated here rather than derived:
+     these are Helen's own words in her own ranking, and nothing about the
+     strings themselves says "oh gods yes" beats "sure". Any ship value not in
+     this list still renders -- it just sorts last, under "everything else" --
+     so a new word she invents mid-session never silently vanishes. {% endcomment %}
+  {% assign goodness_order = "oh gods yes,yes,sure,okay,maybe,not really,who knows,QQ" | split: "," %}
+
+  <nav class="goodness-filters" aria-label="Filter by goodness">
+    <button type="button" class="goodness-btn is-on" data-ship="all" aria-pressed="true">
+      everything <span class="goodness-count">{{ site.cocktail_drafts.size }}</span>
+    </button>
+    {% for level in goodness_order %}
+      {% assign matching = site.cocktail_drafts | where_exp: "d", "d.meta.ship == level" %}
+      {% if matching.size > 0 %}
+        <button type="button" class="goodness-btn" data-ship="{{ level }}" aria-pressed="false">
+          {{ level }} <span class="goodness-count">{{ matching.size }}</span>
+        </button>
+      {% endif %}
+    {% endfor %}
+  </nav>
+
+  <ul class="drink-cards">
+    {% comment %} Sorted by title within the page; the buttons do the ranking.
+       A drink with no ship value gets "who knows" as its bucket rather than
+       being unfilterable. {% endcomment %}
+    {% assign all_drinks = site.cocktail_drafts | sort: "title" %}
+    {% for drink in all_drinks %}
+      {% assign ship = drink.meta.ship | default: "who knows" %}
+      <li class="drink-card" data-ship="{{ ship }}">
+        <a class="drink-card-name" href="{{ drink.url | relative_url }}">{{ drink.title }}</a>
+        <span class="drink-card-ship">{{ ship }}</span>
+        {% if drink.ingredients.size > 0 %}
+          {% comment %} The whole point of the card: enough to get the vibe
+             without opening it. Items only -- amounts are noise at this
+             distance, and Helen knows how to make drinks. {% endcomment %}
+          <p class="drink-card-ingredients">
+            {% for ing in drink.ingredients %}{% if ing.item %}{{ ing.item }}{% unless forloop.last %} · {% endunless %}{% endif %}{% endfor %}
+          </p>
+        {% endif %}
       </li>
     {% endfor %}
   </ul>
+
+  <p class="drink-none" hidden>Nothing that good, sorry.</p>
+
 {% else %}
   <p class="cocktails-empty" align="center">
     Nothing to see here yet.
   </p>
 {% endif %}
+
+<script>
+/* Filter by goodness. Everything is already in the DOM -- 115 drinks is
+   nothing -- so this only toggles [hidden], which means no reflow of the
+   cards themselves and no dependency on any of the site's other JS. */
+(function () {
+  var buttons = document.querySelectorAll('.goodness-btn');
+  var cards   = document.querySelectorAll('.drink-card');
+  var none    = document.querySelector('.drink-none');
+  if (!buttons.length) return;
+
+  function show(want) {
+    var shown = 0;
+    cards.forEach(function (card) {
+      var match = want === 'all' || card.dataset.ship === want;
+      card.hidden = !match;
+      if (match) shown++;
+    });
+    if (none) none.hidden = shown > 0;
+    buttons.forEach(function (b) {
+      var on = b.dataset.ship === want;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { show(b.dataset.ship); });
+  });
+})();
+</script>

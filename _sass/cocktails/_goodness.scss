@@ -1,0 +1,108 @@
+// =============================================================================
+// COCKTAILS INDEX — BROWSE BY GOODNESS
+// =============================================================================
+// Helen, 2026-08-23, with twenty minutes and friends on the way: filter the
+// index by `meta.ship`, and show enough of each drink to get the vibe without
+// opening it. Deliberately plain -- her words: "I don't care what it looks
+// like". So this is layout and legibility only, and no decoration at all: the
+// cocktails palette's identity work lives in _decoration.scss and is not
+// something a list of 115 drinks should be competing with.
+//
+// PALETTE CONTRACT: only the shared ten are named here (see shared/_layout.scss).
+
+.goodness-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm;
+  margin: 0 0 $space-xl;
+}
+
+// The buttons carry Helen's own words, so they are set in the body font rather
+// than the heading font -- "oh gods yes" in monospace small-caps reads as a
+// system state, which is the opposite of what it is.
+.goodness-btn {
+  font-family: $font-body;
+  font-size: 0.85rem;
+  padding: $space-xs $space-md;
+  border: 1.5px solid $color-border;
+  border-radius: 2rem;
+  background: $color-surface;
+  color: $color-text;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $color-text;
+  }
+
+  // The selected state has to survive being the only one selected, so it is a
+  // fill rather than a border change -- with eight of these in a row, a 1px
+  // border difference is not findable at a glance.
+  &.is-on {
+    background: $color-text;
+    border-color: $color-text;
+    color: $color-bg;
+  }
+}
+
+.goodness-count {
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
+
+.drink-cards {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  // Cards, not rows -- Helen's bonus (a). auto-fill rather than a fixed count
+  // so this needs no breakpoint: one column on a phone, as many as fit on a
+  // laptop. minmax's floor is what stops a third column appearing at a width
+  // where the ingredient line would go to five lines.
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: $space-lg;
+}
+
+.drink-card {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  padding: $space-md;
+  border: 1px solid $color-border;
+  background: $color-surface;
+}
+
+.drink-card-name {
+  font-family: $font-headings;
+  font-size: 1rem;
+  font-weight: 700;
+  color: $color-text;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
+.drink-card-ship {
+  font-family: $font-body;
+  font-size: 0.75rem;
+  color: $color-clear-text;
+}
+
+// Bonus (b): the ingredients, so a drink can be judged from the index. Items
+// only, no amounts -- Helen: "I know how to make drinks really".
+.drink-card-ingredients {
+  margin: 0;
+  font-family: $font-body;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: $color-text;
+}
+
+.drink-none {
+  font-family: $font-body;
+  text-align: center;
+  color: $color-clear-text;
+}
