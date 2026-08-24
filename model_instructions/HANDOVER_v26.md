@@ -2314,6 +2314,27 @@ without waiting for Helen.
 have their own empty trackers, so a cross-repo reference needs the full
 `DeckOfPandas/helen-triages#N` form.
 
+### 11.0.0 Prefer LARGER pull requests -- every merge is a deploy
+
+Helen, 2026-08-24: "I have a soft limit on deploys per hour, so I prefer larger
+pull requests where that's practical."
+
+Every merge to `main` triggers `.github/workflows/build-and-deploy.yml`, so the
+cost is per PR, not per commit. A run of tidy single-concern branches -- the
+habit the branch workflow below otherwise encourages -- burns that allowance
+fast for no benefit to her.
+
+**So: accumulate related work on one branch and push once.** Fold small things
+into whatever branch is already open rather than raising one of their own: a
+handover note, a stray fix spotted in passing, a follow-up to something already
+on the branch. **Keep separate COMMITS per concern**, so review stays readable
+and any one thing can still be reverted alone. It is the PR count that costs.
+
+Do not batch when batching is wrong. An urgent fix should not wait behind
+unfinished work; genuinely unrelated changes that need independent review, or
+that touch another agent's area, are still worth their own PR. **Say what is
+being held back**, so she can ask for it sooner if she wants it.
+
 ### 11.0.1 More than one agent now shares this checkout — use a worktree
 
 2026-08-23. A session went to branch and found the working tree already on
