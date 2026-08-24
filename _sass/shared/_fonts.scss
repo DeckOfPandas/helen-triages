@@ -85,10 +85,16 @@ $font-dir: "../fonts";
 //
 // THE FALLBACK IS COURIER PRIME, not Courier New: if this file fails to load,
 // the titles should land on the site's own mono rather than on a system one.
-@font-face {
-  font-family: "IBM Plex Mono";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("#{$font-dir}/ibm-plex-mono-600.woff2") format("woff2");
+// 600 for .recipe-title-link and .ingredient-amount; 700 for .note-label, which
+// is 700 already. The 700 is here so that changing the LABEL's face changes only
+// its face: without it the browser would match 600 and synthesise a fake bold,
+// and Helen would have been judging a rendering artefact rather than a typeface.
+@each $weight in (600, 700) {
+  @font-face {
+    font-family: "IBM Plex Mono";
+    font-style: normal;
+    font-weight: $weight;
+    font-display: swap;
+    src: url("#{$font-dir}/ibm-plex-mono-#{$weight}.woff2") format("woff2");
+  }
 }
