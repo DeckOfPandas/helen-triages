@@ -84,7 +84,7 @@
 // letter read as raised, and a heavier face casts it better, not worse. Only
 // the edge weight needed to come down. If this still looks soft, this is the
 // dial -- and the one to move next is the title's font-weight, not this.
-$emboss-stroke: 0.010em;
+$emboss-stroke: 0.016em;
 $emboss-offset-ratio: 0.065;   // 6.5% of font-size -- see the two values below
 
 // The offset stays a WHOLE PIXEL rather than a computed proportion, unlike the
@@ -100,10 +100,35 @@ $emboss-offset-ratio: 0.065;   // 6.5% of font-size -- see the two values below
 //
 // A size in between (the index's 1.35rem .category-label, which wants 1.4px)
 // takes whichever of the two looks right rather than a half pixel.
+// BOTH ARE 1px SINCE 2026-08-24, which makes the two-tier arithmetic above
+// history rather than instruction -- left standing because it explains where
+// the 6.5% ratio came from, but it is no longer what these values do. Helen
+// tuned the h1 by eye against Courier Prime at /dev/emboss/ and 2px on display
+// sizes was too much for the heavier letterform: the wider offset stopped
+// reading as one raised letter and started reading as two. The variables stay
+// separate rather than collapsing into one, because she is tuning the smaller
+// type levels next and they may yet diverge again.
 $emboss-offset:       1px;                      // hard, not blurred
-$emboss-offset-large: 2px;                      // the same, on display sizes
-$color-emboss-light:  $color-bg;                // the paper catching the light
-$color-emboss-shadow: rgba($color-text, 0.38);  // where it does not
+$emboss-offset-large: 1px;                      // was 2px -- see above
+
+// THE HIGHLIGHT NEEDS HEADROOM ABOVE THE GROUND, AND ON THIS SITE IT BARELY HAS
+// ANY. This was $color-bg -- the paper catching the light -- which is exactly
+// right as a model and invisible in practice on a page whose ground IS
+// $color-bg: a copy painted in the background colour, offset over the
+// background, cannot be seen. It earns its keep only where a heading sits on
+// something else (the metadata wash, a note box), where it reads as a cut line.
+//
+// Helen, 2026-08-24, comparing a heading against the header wordmark: "we're
+// still missing the white up and left from the simulated light source". Correct,
+// and the wordmark is the reason it looks achievable -- .site-logo-word is LIGHT
+// TYPE ON BLACK TAPE, so it has the whole brightness range to play with. Dark
+// type on #faf7f8 has about 3% of headroom and no more.
+//
+// $color-white is that 3%, which is the entire available budget. It is a real
+// improvement and a small one; anything stronger would need the ground behind
+// headings to be darker, which is a different design.
+$color-emboss-light:  $color-white;             // the paper catching the light
+$color-emboss-shadow: rgba($color-text, 0.68);  // where it does not -- was 0.38
 
 // $style: raised   letters standing proud of the tape  (light from top-left)
 //         pressed  letters punched down into it        (the same light, inverted)

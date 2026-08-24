@@ -130,7 +130,7 @@ $color-white:                #ffffff;
 // rather than a standalone grey, so it stays related to it: the wordmark's
 // rgba(230,230,230,0.9) against white letters and this against dark ones are
 // the same idea, and were two unrelated magic numbers.
-$color-label-stroke:         lighten($color-text, 20%);
+$color-label-stroke:         lighten($color-text, 30%);   // 20% -> 30%, Helen, 2026-08-24
 
 // --- Cross-recipe links --------------------------------------------------
 // Added 2026-08-02: links were inheriting the shared a { color: $color-text }
