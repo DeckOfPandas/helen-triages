@@ -9,10 +9,30 @@
 // --- Ingredient amount highlights -------------------------------------------
 // Inline highlight behind the quantity portion of an ingredient line.
 // Highlighter blob injected by highlighter.js into .highlighter-slot.
+// THE SAME TREATMENT THE INDEX TITLES GOT, on Helen's ask (2026-08-24), and it
+// buys something here that it does not buy there. IBM Plex Mono is MONOSPACED,
+// so "200 g", "1 heaped tsp" and "4 tbsp" put their digits on the same grid --
+// the amounts column now literally lines up, which is the job
+// _recipe-ingredients-method.scss already says the yellow highlighters exist to
+// do ("the column of highlights IS how you scan an ingredient list for
+// amounts"). The face and the highlighter are now doing the same work.
+//
+// THE WEIGHT IS A REAL CHANGE AND LOOKS LIKE A SMALL ONE. This said 500, which
+// has never rendered as 500: it inherited $font-body, and neither Segoe UI nor
+// Selawik ships a 500, so CSS font matching fell to 400 and these have always
+// been Regular. Plex Mono's 600 is a genuine SemiBold, so the amounts get
+// heavier as well as narrower. That is wanted -- an amount should out-weigh the
+// ingredient beside it -- but it is a bigger jump than "500 to 600" suggests.
+//
+// letter-spacing matches .recipe-title-link's 0.05em so the two uses of this
+// face agree. The highlighter does not care how wide this gets: its SVG is
+// position:absolute, left:-4px, width:calc(100% + 8px), so it tracks the box.
 .ingredient-amount {
   display: inline;
   margin-right: 0.15em;
-  font-weight: 500;
+  font-family: $font-recipe-title;
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
 // Was number-only, unit left plain outside the highlight -- Helen,
