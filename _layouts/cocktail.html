@@ -99,7 +99,7 @@ layout: default
 
   {% comment %} The ingredient list is FULL, not triaged the way food's
      main_ingredients is — no completeness/substitution split, no pantry
-     demotion. Four keys, each earning its place from the real data:
+     demotion. Keys, each earning its place from the real data:
 
        amount     the quantity AS WRITTEN ("0.5 oz", "3 dashes") — the display
                   string, which carries units a number cannot
@@ -108,26 +108,103 @@ layout: default
                   is not 0.8 ml in any way worth writing down. Duplicated on
                   purpose and guarded by a test, the same idiom
                   internal_temperatures.yml uses for its display/numeric pairs.
-       item       what you actually pour, brand-led ("Appleton Estate Reserve")
-       generic    what you would ever FILTER by ("aged Jamaican rum"). Nothing
-                  reads it yet; it exists so that a future "what can I make
-                  tonight" is possible at all, since no rule can derive "dark
-                  rum" from "Skippers".
-       suggestion an alternative bottle or category, per ingredient
+       item       what the source calls it, brand-led when the source names a
+                  bottle ("Appleton Estate Reserve")
+       generic    what you would ever FILTER by ("Jamaican, moderately aged").
+                  STRING OR LIST — a list means "either would do", never "and".
+       character  a property of THIS RECIPE'S use of the bottle, not of the
+                  bottle in the abstract (#441) — e.g. blackstrap. LIST.
+       suggestion the bottle NAME(S) ONLY, never reasoning (#457). STRING OR
+                  LIST.
+       note       the reasoning that used to get smuggled into `suggestion`
+                  (#457) — its own line, always visible, no interaction.
+
+     HEADLINE, CLASS LINE, CHARACTER, NOTE — settled 2026-08-24 after a design
+     pass on #465/#460. The headline is `suggestion` when present (you shop by
+     bottle name), falling back to `item`. The class line is `generic`;
+     `character` folds onto it as a labelled parenthetical, never a sibling
+     fact, because "moderately aged rum (blackstrap)" reads as if blackstrap
+     were a TYPE of moderately-aged rum — real, live confusion with actual
+     black rum — so it says "(character: blackstrap)" instead.
+
+     `generic`/`suggestion` CAN BE A STRING OR A LIST, and Liquid's `for`
+     quietly treats a bare string as a one-item sequence (verified against the
+     real `liquid` gem, not assumed), so the same oxford-join loop handles
+     both shapes with no type check anywhere. A rum-family style name (looked
+     up via `ingredients.family_of`) gets a blockier monospace treatment with
+     a quiet italic "or" between options — the internal commas in names like
+     "Demerara, aged" collide with a plain list-join comma otherwise, and this
+     is only true for rum (a name like "cognac" has no such collision, so it
+     stays plain). NOT SOLVED HERE, deliberately: no spirit-word ("rum",
+     "gin") is appended after a bare style name, because several families
+     already bake their spirit into the string ("blanco tequila") and others
+     don't ("bourbon" needs no suffix, "London dry" does) — auditing all of
+     that is real, separate work, not a template one-liner.
   {% endcomment %}
+  {% assign family_of = site.data.cocktails.ingredients.family_of %}
   {% if page.ingredients.size > 0 %}
     <h2 class="cocktail-section-heading">Ingredients</h2>
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
         {% if item.item %}
-          <li>
-            {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span> {% endif %}
-            <span class="cocktail-item">{{ item.item }}</span>
-            {% if item.generic and item.generic != item.item %}
-              <span class="cocktail-generic">{{ item.generic }}</span>
+          {% comment %} headline: suggestion, oxford-joined, else item {% endcomment %}
+          {% assign s_count = 0 %}
+          {% for s in item.suggestion %}{% assign s_count = s_count | plus: 1 %}{% endfor %}
+          {% if s_count == 0 %}
+            {% assign headline = item.item %}
+          {% else %}
+            {% assign s_i = 0 %}
+            {% for s in item.suggestion %}
+              {% assign s_i = s_i | plus: 1 %}
+              {% if s_i == 1 %}
+                {% assign headline = s %}
+              {% elsif s_i == s_count and s_count == 2 %}
+                {% assign headline = headline | append: " or " | append: s %}
+              {% elsif s_i == s_count %}
+                {% assign headline = headline | append: ", or " | append: s %}
+              {% else %}
+                {% assign headline = headline | append: ", " | append: s %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% comment %} class line: generic, oxford-joined, rum styles blocked {% endcomment %}
+          {% assign class_html = "" %}
+          {% if item.generic and item.generic != item.item %}
+            {% assign g_i = 0 %}
+            {% for g in item.generic %}
+              {% assign g_i = g_i | plus: 1 %}
+              {% assign fam = family_of[g] %}
+              {% if fam == "rum" %}
+                {% capture g_chunk %}<span class="cocktail-style-name">{{ g }}</span>{% endcapture %}
+              {% else %}
+                {% assign g_chunk = g %}
+              {% endif %}
+              {% if g_i == 1 %}
+                {% assign class_html = g_chunk %}
+              {% else %}
+                {% capture class_html %}{{ class_html }}<span class="cocktail-style-or">or</span>{{ g_chunk }}{% endcapture %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% comment %} character folds onto the class line as a labelled
+             parenthetical, LIST joined with commas {% endcomment %}
+          {% if item.character %}
+            {% assign character_joined = item.character | join: ", " %}
+            {% capture class_html %}{{ class_html }} <span class="cocktail-character">(character: {{ character_joined }})</span>{% endcapture %}
+          {% endif %}
+
+          <li class="cocktail-ingredient">
+            <div class="cocktail-ingredient-top">
+              {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}
+              <span class="cocktail-item">{{ headline }}</span>
+            </div>
+            {% if class_html != "" %}
+              <p class="cocktail-type-line">{{ class_html }}</p>
             {% endif %}
-            {% if item.suggestion %}
-              <span class="cocktail-suggestion">{{ item.suggestion }}</span>
+            {% if item.note %}
+              <p class="cocktail-note">{{ item.note }}</p>
             {% endif %}
           </li>
         {% else %}

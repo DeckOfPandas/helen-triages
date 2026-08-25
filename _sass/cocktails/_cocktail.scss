@@ -98,3 +98,89 @@
 .cocktail-glass-icon {
   color: $color-clear-text;
 }
+
+// =============================================================================
+// INGREDIENT LINE — three parts, settled 2026-08-24 after a design pass on
+// #465/#460: amount+headline / class(+character) / note. No colour decision
+// here — the palette is still the placeholder monochrome from _palette.scss,
+// argued nowhere yet. This is information hierarchy only.
+// =============================================================================
+
+.cocktail-ingredients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cocktail-ingredient {
+  padding: $space-md 0;
+  border-bottom: 1px solid $color-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.cocktail-ingredient-top {
+  display: flex;
+  align-items: baseline;
+  gap: $space-sm;
+}
+
+.cocktail-amount {
+  font-variant-numeric: tabular-nums;
+  color: $color-clear-text;
+  font-size: $font-size-body-sm;
+}
+
+.cocktail-item {
+  font-weight: 600;
+}
+
+// The class line: `generic`, oxford-joined if a list, plus `character` as a
+// trailing parenthetical. Deliberately quiet — this is a gloss on the
+// headline, not a second headline.
+.cocktail-type-line {
+  color: $color-clear-text;
+  font-size: $font-size-body-sm;
+  margin: $space-xs 0 0;
+}
+
+// A rum-family style name gets the site's heading face — blockier, so the
+// internal comma in a name like "Demerara, aged" doesn't collide visually
+// with the comma that would otherwise separate it from a joined "or"
+// alternative. Scoped to rum on purpose: "cognac" or "bourbon" have no such
+// collision and stay plain (_layouts/cocktail.html decides the family via
+// `ingredients.family_of`, not this file).
+.cocktail-style-name {
+  font-family: $font-headings;
+  color: $color-text;
+}
+
+.cocktail-style-or {
+  font-style: italic;
+  color: $color-clear-text;
+  margin: 0 0.5em;
+  display: inline-block;
+}
+
+// Character is a property of THIS RECIPE'S use of the bottle, not the bottle
+// in the abstract (#441) — folded onto the class line, never its own line.
+// The explicit "character:" label is load-bearing, not decoration: a bare
+// parenthetical like "moderately aged rum (blackstrap)" reads as if
+// blackstrap were a TYPE of moderately-aged rum, which is real, live
+// confusion with actual black rum.
+.cocktail-character {
+  color: $color-clear-text;
+}
+
+// The note — #457's fix for reasoning that used to get smuggled into
+// `suggestion`. Always visible, no interaction, left-aligned like ordinary
+// prose (right-alignment was tried and dropped — it read as competing with
+// the class line above it rather than as a quiet aside).
+.cocktail-note {
+  color: $color-clear-text;
+  font-size: $font-size-body-sm;
+  font-style: italic;
+  margin: $space-xs 0 0;
+}
