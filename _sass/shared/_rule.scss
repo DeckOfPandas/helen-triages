@@ -68,46 +68,32 @@
 // document says it is. Since that rule is what makes the treatment reach EVERY
 // heading rather than a list of them, em wins on both counts: it does more and
 // it can't drift.
-// 1.0% of font-size, self-scaling. WAS 1.4%, REDUCED FOR COURIER PRIME on
-// 2026-08-24, and the reasoning is worth keeping because the obvious guess is
-// backwards. The stroke is an `em`, so swapping the font did NOT change how
-// thick this rim is -- it is the same width on both faces at the same size.
-// What changed is what it sits on. Courier Prime is a Courier redesign that
-// deliberately fixes Courier New's spindliness, so its stems are heavier and
-// its counters tighter, and the same rim therefore (a) fills more of each
-// counter and (b) contrasts less against a darker letter and more against the
-// paper. The result reads as blur rather than as an edge, which is the failure
-// the "about 3% of the type size" ceiling above describes, reached at a lower
-// number than before because the letterform got there first.
+// 1.6% of font-size, self-scaling. Tuned by Helen at /dev/emboss/ against
+// Courier Prime, having been 1.4% against Courier New.
 //
-// The SHADOW is untouched, and that is deliberate: direction is what makes a
-// letter read as raised, and a heavier face casts it better, not worse. Only
-// the edge weight needed to come down. If this still looks soft, this is the
-// dial -- and the one to move next is the title's font-weight, not this.
+// It went DOWN to 1.0% first, on the reasoning that Courier Prime's heavier
+// stems and tighter counters would let the same rim fill more counter and read
+// as blur -- and that was wrong, or at least not what she wanted. Looking at it
+// went the other way: a heavier letterform can carry MORE edge, not less, and
+// the value ended up above where it started. Recorded because the argument was
+// plausible, produced a number, and lost to somebody looking at the thing.
 $emboss-stroke: 0.016em;
-$emboss-offset-ratio: 0.065;   // 6.5% of font-size -- see the two values below
-
 // The offset stays a WHOLE PIXEL rather than a computed proportion, unlike the
-// stroke, and the difference is deliberate: a fractional stroke width is
-// already normal here and antialiases harmlessly along a letterform's edge,
-// but a fractional shadow offset antialiases the whole duplicate glyph, which
-// is the soft, floating read the "no blur" rule above exists to avoid. Two
-// values cover every size on the site at close enough to 6.5% -- so they are
-// two hard values, with the arithmetic written down rather than performed.
+// stroke, and the difference is deliberate: a fractional stroke width is already
+// normal here and antialiases harmlessly along a letterform's edge, but a
+// fractional shadow offset antialiases the whole duplicate glyph, which is the
+// soft, floating read the "no blur" rule above exists to avoid.
 //
-//   1px    up to ~1.2rem   (0.85rem meta label = 7.4%, 1rem = 6.3%)
-//   2px    from ~1.6rem    (1.8rem section heading = 6.9%, 2.2rem title = 5.7%)
+// BOTH ARE 1px. There used to be a two-tier rule here -- 1px on small type, 2px
+// on display sizes, both landing near 6.5% of the font-size -- with the
+// arithmetic for four elements written out. It is gone rather than marked
+// historical: it described a ratio nothing now follows, and a paragraph of
+// reasoning for numbers that are equal is worse than no paragraph. Helen tuned
+// the h1 against Courier Prime and 2px read as two letters rather than one
+// raised one.
 //
-// A size in between (the index's 1.35rem .category-label, which wants 1.4px)
-// takes whichever of the two looks right rather than a half pixel.
-// BOTH ARE 1px SINCE 2026-08-24, which makes the two-tier arithmetic above
-// history rather than instruction -- left standing because it explains where
-// the 6.5% ratio came from, but it is no longer what these values do. Helen
-// tuned the h1 by eye against Courier Prime at /dev/emboss/ and 2px on display
-// sizes was too much for the heavier letterform: the wider offset stopped
-// reading as one raised letter and started reading as two. The variables stay
-// separate rather than collapsing into one, because she is tuning the smaller
-// type levels next and they may yet diverge again.
+// The two variables stay separate anyway, because the smaller type levels have
+// not been tuned yet and may want to diverge again.
 $emboss-offset:       1px;                      // hard, not blurred
 $emboss-offset-large: 1px;                      // was 2px -- see above
 

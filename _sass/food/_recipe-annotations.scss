@@ -9,23 +9,26 @@
 // --- Ingredient amount highlights -------------------------------------------
 // Inline highlight behind the quantity portion of an ingredient line.
 // Highlighter blob injected by highlighter.js into .highlighter-slot.
-// THE SAME TREATMENT THE INDEX TITLES GOT, on Helen's ask (2026-08-24), and it
-// buys something here that it does not buy there. IBM Plex Mono is MONOSPACED,
-// so "200 g", "1 heaped tsp" and "4 tbsp" put their digits on the same grid --
-// the amounts column now literally lines up, which is the job
+// $font-label, ONE OF ONLY TWO PLACES ON THE SITE THAT USES IT (the other is
+// .note-label). Added 2026-08-24 as "the same treatment the index titles got";
+// the titles went back to Courier two days later and this stayed, which is what
+// left the rule where it is -- Plex Mono on recipe pages, Courier on the index.
+//
+// IT EARNS ITS PLACE HERE FOR A REASON THE TITLES NEVER HAD. Plex Mono is
+// MONOSPACED, so "200 g", "1 heaped tsp" and "4 tbsp" put their digits on the
+// same grid and the amounts column literally lines up -- the job
 // _recipe-ingredients-method.scss already says the yellow highlighters exist to
 // do ("the column of highlights IS how you scan an ingredient list for
-// amounts"). The face and the highlighter are now doing the same work.
+// amounts"). The face and the highlighter pull the same direction.
 //
 // THE WEIGHT IS A REAL CHANGE AND LOOKS LIKE A SMALL ONE. This said 500, which
 // has never rendered as 500: it inherited $font-body, and neither Segoe UI nor
-// Selawik ships a 500, so CSS font matching fell to 400 and these have always
-// been Regular. Plex Mono's 600 is a genuine SemiBold, so the amounts get
-// heavier as well as narrower. That is wanted -- an amount should out-weigh the
-// ingredient beside it -- but it is a bigger jump than "500 to 600" suggests.
+// Selawik ships a 500, so CSS font matching fell to 400 and these had always
+// been Regular. Plex Mono's 600 is a genuine SemiBold, so the amounts got
+// heavier as well as narrower -- wanted, since an amount should out-weigh the
+// ingredient beside it, but a bigger jump than "500 to 600" suggests.
 //
-// letter-spacing matches .recipe-title-link's 0.05em so the two uses of this
-// face agree. The highlighter does not care how wide this gets: its SVG is
+// The highlighter does not care how wide this gets: its SVG is
 // position:absolute, left:-4px, width:calc(100% + 8px), so it tracks the box.
 .ingredient-amount {
   display: inline;
