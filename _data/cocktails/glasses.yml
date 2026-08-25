@@ -204,6 +204,11 @@ icons:
 heights_mm:
   shot: 60
   old-fashioned: 85
+  # TEMPORARY, comparison-only, 2026-08-25 -- the other candidate that didn't
+  # become the live `old-fashioned.svg`, added here purely so section 2 of
+  # the dev page shows both at real relative height. Same real glass, same
+  # mm. Remove this line and the file the day Helen picks between them.
+  old-fashioned-3: 85
   mule-mug: 105
   julep-cup: 110
   punch-bowl: 130
@@ -244,6 +249,7 @@ all_icons:
   - mule-mug
   - nick-and-nora
   - old-fashioned
+  - old-fashioned-3
   - pilsner
   - pina-colada
   - pineapple
