@@ -63,7 +63,7 @@
   position: absolute;
   top: -0.65rem;
   left: 1.1rem;
-  // $font-recipe-title, not $font-headings, since 2026-08-24. Helen: "our
+  // $font-label, not $font-headings, since 2026-08-24. Helen: "our
   // styling for the notes box labels is a little unloved... I'm wondering about
   // trying our new Plex Mono there."
   //
@@ -73,7 +73,7 @@
   // counters than Courier Prime. A Courier at 0.62rem is thin and closes up; a
   // Plex at 0.62rem stays readable. The label was "unloved" partly because the
   // face was working against the size it was being asked to hold.
-  font-family: $font-recipe-title;
+  font-family: $font-label;
   font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;

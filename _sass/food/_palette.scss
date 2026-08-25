@@ -32,12 +32,27 @@ $color-surface:   #fdfbfe; // Ultra-soft milk white component surface fill
 
 // --- Typography Stacks -------------------------------------------------------
 $font-headings: "Courier Prime", "Courier New", "Courier", monospace;
-// The recipe INDEX titles only -- see _recipe-list.scss. A different mono with
-// noticeably different proportions, so a title reads as a title rather than as
-// more of the same monospace. Deliberately NOT $font-headings: this is one
-// element, and the moment a second thing wants it, ask whether it should
-// instead be $font-headings for the whole site.
-$font-recipe-title: "IBM Plex Mono", "Courier Prime", monospace;
+// THE LABEL VOICE. Renamed from $font-recipe-title on 2026-08-25, when it
+// stopped being one element and became a rule.
+//
+// COURIER PRIME SPEAKS, PLEX MONO LABELS. Courier Prime carries the site's
+// identity -- the punched-tape lettering, headings, the wordmark, anything the
+// page says in its own voice. This is for the things you SCAN rather than read:
+// a recipe title in a list, an ingredient amount, a note's label tab, a badge, a
+// tag button, a category label. All small, all sitting INSIDE Courier Prime
+// rather than replacing it.
+//
+// The clash is the point, and it only works while it is a minority. Plex Mono's
+// slightly rounder, wider proportions read as a different kind of thing next to
+// Courier; if it spreads far enough to stop being the exception, it stops doing
+// the job it was brought in for. So the test for a new consumer is not "would
+// this look nice in Plex" -- it is "is this something the reader scans for
+// rather than reads?" If the answer needs an argument, the answer is no.
+//
+// DELIBERATELY NOT MOVED: the recipe title and section headings, the wordmark,
+// the footer, h1/h2/h3, the about page, and the recipe meta line -- Helen, of
+// the meta: "doesn't matter, it's only for me".
+$font-label: "IBM Plex Mono", "Courier Prime", monospace;
 $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;
 
 // --- Category colours --------------------------------------------------------

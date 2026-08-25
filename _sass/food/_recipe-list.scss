@@ -93,7 +93,7 @@
   // querySelector('a') became querySelector('.recipe-title-link') in the same
   // issue, for the same reason -- "the only link in the row" stopped being true.
   .recipe-title-link {
-    font-family: $font-recipe-title;
+    font-family: $font-label;
     font-size: 1rem;
     // 600 IS A REAL FACE HERE, AND IT IS THE ONLY PLACE ON THE SITE THAT IS TRUE.
     // This comment used to explain the opposite: that 400 and 500 rendered
