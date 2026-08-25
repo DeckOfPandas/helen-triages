@@ -57,6 +57,21 @@
   // adds the weight (issue #193).
   text-transform: uppercase;
   font-weight: 900;
+
+  // COLOUR AND STROKE MUST BE THE SAME COLOUR, and this is the whole of what
+  // was wrong on first attempt. $faux-bold-stroke is not an outline -- it is
+  // extra WEIGHT, painted in the letter's own colour (_palette.scss says so
+  // where it is defined: "the same colour as the letter; purely for weight").
+  // Adding the stroke while leaving the fill as .badge-star's $color-star-active
+  // gave a near-black rim around a dark-magenta letter, i.e. an outlined
+  // letterform, which is exactly what Helen photographed.
+  //
+  // The active BUTTON has always set both -- `color: $color-text` alongside the
+  // stroke -- and the badge has to do the same to get the same result. text-shadow
+  // is cleared for the same reason it is on the buttons: the emboss is a THIRD
+  // copy of the glyph and fights a stroke this heavy.
+  color: $color-text;
+  text-shadow: none;
   -webkit-text-stroke: $faux-bold-stroke $color-text;
 
   &.badge-star           { .tag-shape { color: mix($color-star-root, $color-white, 82%); } }
@@ -112,13 +127,16 @@
 // saying the same thing in a different voice made them read as system messages
 // about the list rather than as the list's own contents.
 //
-// Matches .recipe-title-link's type treatment exactly: $font-label at 1rem/600,
-// lowercase, 0.05em. NOT its colour -- these keep $color-clear-text, because a
-// row title is a link you are meant to reach for and these are not. If they
-// should be full strength too, that is one line.
+// Matches .recipe-title-link's type treatment exactly, at 1rem/600,
+// lowercase, 0.05em -- INCLUDING ITS FONT, which is why these followed the
+// titles back to Courier Prime on 2026-08-26 rather than staying in Plex. "The
+// same as the titles" is the whole instruction here, so it has to keep meaning
+// that when the titles move, or these quietly become the odd one out in the very
+// list they stand in for. NOT its colour -- these keep $color-clear-text,
+// because a row title is a link you are meant to reach for and these are not.
 .recipe-list-empty,
 .recipe-list-searching {
-  font-family: $font-label;
+  font-family: $font-headings;
   font-size: 1rem;
   font-weight: 600;
   text-transform: lowercase;

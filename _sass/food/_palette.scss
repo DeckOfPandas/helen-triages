@@ -32,49 +32,43 @@ $color-surface:   #fdfbfe; // Ultra-soft milk white component surface fill
 
 // --- Typography Stacks -------------------------------------------------------
 $font-headings: "Courier Prime", "Courier New", "Courier", monospace;
-// THE LABEL VOICE. Renamed from $font-recipe-title on 2026-08-25, when it
-// stopped being one element and became a rule.
+// THE SECOND VOICE, and after a week of Helen looking at it, a much smaller and
+// much clearer job than the one it was given.
 //
-// COURIER PRIME SPEAKS, PLEX MONO LABELS. Courier Prime carries the site's
-// identity -- the punched-tape lettering, headings, the wordmark, anything the
-// page says in its own voice. This is for the things you SCAN rather than read:
-// a recipe title in a list, an ingredient amount, a note's label tab, a badge, a
-// tag button, a category label. All small, all sitting INSIDE Courier Prime
-// rather than replacing it.
+// THE INDEX IS ENTIRELY COURIER PRIME. THIS FONT APPEARS ONLY ON RECIPE PAGES,
+// on exactly two things: the ingredient AMOUNTS and the note LABELS.
 //
-// The clash is the point, and it only works while it is a minority. Plex Mono's
-// slightly rounder, wider proportions read as a different kind of thing next to
-// Courier; if it spreads far enough to stop being the exception, it stops doing
-// the job it was brought in for. So the test for a new consumer is not "would
-// this look nice in Plex" -- it is "is this something the reader scans for
-// rather than reads?" If the answer needs an argument, the answer is no.
+// That is the rule. It is short because it is what survived, not what was
+// designed -- this variable was called $font-recipe-title, then briefly owned
+// badges, tag buttons, category labels, filter states and two status messages,
+// and every one of those came back. Reading the returns in order is more useful
+// than the rule itself:
 //
-// DELIBERATELY NOT MOVED: the recipe title and section headings, the wordmark,
-// the footer, h1/h2/h3, the about page, and the recipe meta line -- Helen, of
-// the meta: "doesn't matter, it's only for me".
+//   .category-label      failed on SIZE. At 1.35rem it was the largest thing
+//                        wearing this face, and Plex at display size reads as a
+//                        heading font, which is the one thing it must not do.
+//   .btn-tag/-star/-meta failed on PAIRING. A filter tag and the same word on a
+//                        recipe row are one idea twice; they have to match, and
+//                        the ingredient search input is Courier as well.
+//   .badge               same, once Helen saw it -- a badge pairs with the
+//                        filter button that matched it.
+//   .recipe-title-link   failed on nothing measurable. Helen: "I could justify
+//                        it intellectually by counting font groups, but it could
+//                        well be that I got used to seeing the typewriter effect
+//                        and now I miss it." She was right anyway, and the
+//                        justification turned out to be the good one: with the
+//                        titles back, the index has one voice and the split
+//                        falls on BROWSING versus COOKING rather than on any
+//                        property of the elements.
 //
-// PULLED BACK OUT ON 2026-08-26, after Helen looked at the whole index at once.
-// The rule survived; two of its readings did not.
+// SO THE TEST FOR A NEW CONSUMER IS NOT "is this a label". Every returned
+// element above was a label. It is: is this on a RECIPE PAGE, and is it
+// something you look at with your hands full? Amounts and note labels are; that
+// may well be the complete list. My own rule -- "things you scan" -- was about
+// what an element IS, and lost four times to what an element must AGREE WITH.
 //
-//   .category-label -- the filter SECTION TITLES. "Should remain in our
-//   courier-like font. Please change it back immediately." These are headings
-//   for the panel, not things you scan within it, and at 1.35rem they were the
-//   largest thing wearing this face -- which made Plex read as a heading font
-//   rather than a label one and undercut the whole distinction.
-//
-//   .btn-tag / .btn-star / .btn-meta -- the filter TAGS. The failure was
-//   consistency, not looks: "I like the way the tags look on their own, but the
-//   tags for ingredients being in a different font to the ingredients in the
-//   list on each recipe row feels inconsistent... This actually seemed fine when
-//   the fonts were more different." A tag naming an ingredient and a recipe row
-//   naming the same ingredient have to agree, and the ingredient search input is
-//   Courier too. So the filter panel stays one voice throughout.
-//
-// THE LESSON, WHICH IS SHARPER THAN THE RULE. "Is this scanned rather than
-// read?" was true of the filter tags and still gave the wrong answer, because
-// it only looks at the element. A tag is also half of a PAIR -- the other half
-// being the same word on a recipe row -- and a pair has to match. Ask what an
-// element must agree with before asking what it is.
+// The clash only works while this is the minority, and two consumers is a very
+// comfortable minority.
 $font-label: "IBM Plex Mono", "Courier Prime", monospace;
 $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;
 
