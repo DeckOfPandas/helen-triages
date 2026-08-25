@@ -27,8 +27,14 @@
 // their own viewBoxes rather than being forced into a square one. The glasses
 // are genuinely different proportions — a flute is 27mm wide by 98 tall, a
 // punch bowl 105 by 70 — so a common WIDTH would render the flute enormous and
-// the punch bowl tiny. A common height, with the width left to follow the
-// aspect ratio, is what makes them read as one set.
+// the punch bowl tiny. A height following the REAL glass, with the width left
+// to follow the aspect ratio, is what makes them read as one set.
+//
+// `--glass-icon-height` is set inline by the layout, computed from
+// `heights_mm` against the tallest real glass — #298, 2026-08-25. 2.6rem is
+// only the FALLBACK, for a glass with no heights_mm entry; every icon that
+// has one now renders at its own real relative height instead of the old
+// flat 2.6rem every icon shared.
 .cocktail-glass-icon {
   display: inline-flex;
   align-items: flex-end;
@@ -36,7 +42,7 @@
 
   svg {
     display: block;
-    height: 2.6rem;
+    height: var(--glass-icon-height, 2.6rem);
     width: auto;
     // A tall narrow glass and a wide shallow one at the same height still
     // differ a lot in width; this stops the widest (punch bowl, mule mug)

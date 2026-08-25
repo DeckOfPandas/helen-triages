@@ -68,9 +68,33 @@ layout: default
   {% endfor %}
   {% capture glass_icon_file %}icons/glasses/{{ glass_icon }}.svg{% endcapture %}
 
+  {% comment %} SIZED BY REAL HEIGHT NOW, NOT A COMMON RENDERED HEIGHT — #298,
+     2026-08-25. Every icon used to render at a flat 2.6rem regardless of the
+     actual glass, which is why a 60mm shot glass and a 230mm flute stood
+     equally tall. `heights_mm` (glasses.yml) already existed for exactly
+     this — its own comment said "the site itself does NOT use these yet" —
+     and `_dev/glasses.html`'s "relative scale" view already proved the
+     calculation looks right; this just brings it to the real page.
+     `tallest_mm` is COUNTED LIVE, not hardcoded, so a new glass with a
+     bigger heights_mm value doesn't need this template touched — same
+     rigor the dev page already holds itself to. A glass with no heights_mm
+     entry falls back to the SCSS default (2.6rem) via the custom property's
+     own fallback, so this can never send a blank height to the page. {% endcomment %}
+  {% assign heights_mm = site.data.cocktails.glasses.heights_mm %}
+  {% assign tallest_mm = 0 %}
+  {% for icon in site.data.cocktails.glasses.all_icons %}
+    {% assign mm = heights_mm[icon] | times: 1.0 %}
+    {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
+  {% endfor %}
+  {% assign icon_mm = heights_mm[glass_icon] %}
+  {% if icon_mm and tallest_mm > 0 %}
+    {% assign icon_rem = icon_mm | times: 1.0 | divided_by: tallest_mm | times: 2.6 %}
+    {% capture glass_icon_style %} style="--glass-icon-height: {{ icon_rem }}rem;"{% endcapture %}
+  {% endif %}
+
   <div class="cocktail-title-block">
     {% if glass_icon != "" %}
-      <span class="cocktail-glass-icon">{% include {{ glass_icon_file }} %}</span>
+      <span class="cocktail-glass-icon"{{ glass_icon_style }}>{% include {{ glass_icon_file }} %}</span>
     {% endif %}
     <h1 class="cocktail-title">{{ page.title }}</h1>
   </div>

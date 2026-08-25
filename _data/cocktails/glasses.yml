@@ -196,10 +196,11 @@ icons:
 # proportion: a wrong size is a number here, not an Inkscape session. That
 # matters because redrawing is how you lose a glass's character by accident.
 #
-# The site itself does NOT use these yet -- it renders every icon at a common
-# 2.6rem height. Issue #298 ("normalise glasses, but not all the same height")
-# is where that changes, and #299 is the proportion pass. This list is what
-# both will need.
+# The real site uses these now, 2026-08-25 (#298) -- `_layouts/cocktail.html`
+# scales `--glass-icon-height` from this list against the tallest real glass,
+# the same calculation `_dev/glasses.html`'s relative-scale view already
+# proved out. #299, the proportion pass (fixing individual drawings once this
+# exposes one that looks wrong at its real height), is still open.
 heights_mm:
   shot: 60
   old-fashioned: 85
