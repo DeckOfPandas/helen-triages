@@ -39,7 +39,6 @@ icons:
   hurricane: hurricane
   nick and nora: nick-and-nora
   punch bowl: punch-bowl
-  rocks: rocks
   tiki mug: tiki-mug
 
   # --- SIX DRINKS THAT WERE RENDERING NO ICON FOR NO REASON -------------------
@@ -70,10 +69,15 @@ icons:
   pineapple: pineapple
   hollowed pineapple: pineapple
 
-  # --- three spellings of one glass, all live in the data ---------------------
+  # --- four spellings of one glass, all live in the data -----------------------
+  # `rocks` used to point at a genuinely different (panelled) drawing -- see
+  # the retirement note below. It is an alias now, matching the canonical
+  # vocabulary rule ("old fashioned, not rocks") for real rather than in name
+  # only.
   old-fashioned: old-fashioned
   old fashioned: old-fashioned
   old-fashioned glass: old-fashioned
+  rocks: old-fashioned
 
   # --- judgement calls, worth checking by eye before trusting -----------------
   # `brandy glass` is the CANONICAL name and `snifter` is the alias, which is
@@ -84,14 +88,12 @@ icons:
   # back to snifter.
   brandy glass: brandy
   snifter: brandy
-  # `double rocks` now draws the DOUBLE OLD FASHIONED, not rocks-tall. The old
-  # mapping said so itself -- "an inference from the name, not from the
-  # artwork" -- and it was made when no double old fashioned existed. One does
-  # now (2026-08-17), drawn as what the name actually means: a wider, deeper
-  # tumbler, not a taller one.
-  double rocks: old-fashioned-double
-  double old fashioned: old-fashioned-double
-  double old-fashioned: old-fashioned-double
+  # `double rocks`/`double old fashioned` are DELIBERATELY UNMAPPED as of
+  # 2026-08-25, not forgotten. `old-fashioned-double.svg` was retired along
+  # with `rocks.svg` and `rocks-tall.svg` -- see the retirement note below --
+  # and Helen is redrawing the double once the new single old-fashioned is
+  # settled. Re-add these three spellings pointing at the new file the day it
+  # exists; until then "absent means no icon" is the honest state, not a bug.
 
 # =============================================================================
 # GLASSES IN THE DATA WITH NO ICON — deliberately unmapped, not forgotten.
@@ -110,13 +112,20 @@ icons:
 #            are both mugs and both in the set. Needs Helen, not a guess.
 #   long     1 drink. QQ — reads as "a long drink", which is a SERVE rather
 #            than a glass. Lands on collins or highball depending on the pour.
+#   double rocks / double old fashioned
+#            3 drinks currently use only these two spellings with no fallback
+#            (Fancy-Free, Vieux Carré, Ti Punch — "double rocks"), so those
+#            three render with NO glass icon as of 2026-08-25. TEMPORARY, not
+#            a defect to fix here: `old-fashioned-double.svg` was retired
+#            along with `rocks.svg`/`rocks-tall.svg` (see the retirement note
+#            below) and Helen is redrawing it. Re-add these spellings pointing
+#            at the new file the day it exists.
 #
 # UNUSED ICONS, the other side of the same ledger: hot-toddy, julep-cup,
-# margarita, mule-mug, pina-colada, rocks-tall, sherry, shot, plus the four
-# added ahead of demand (absinthe, goblet, pineapple, and old-fashioned-double
-# until a drink spells it that way). Several will find a glass once the non-rum
-# drinks are ingested — margarita, mule-mug and julep-cup especially — so an
-# unused icon is not evidence of a mistake.
+# margarita, mule-mug, pina-colada, sherry, shot, plus the three added ahead
+# of demand (absinthe, goblet, pineapple). Several will find a glass once the
+# non-rum drinks are ingested — margarita, mule-mug and julep-cup especially —
+# so an unused icon is not evidence of a mistake.
 #
 # =============================================================================
 # THE CANONICAL VOCABULARY — Helen, 2026-08-17
@@ -131,32 +140,24 @@ icons:
 #   brandy glass          not "snifter"
 #
 # =============================================================================
-# QQ — TWO TUMBLER DRAWINGS ARE NOW HOMELESS, AND IT NEEDS AN EYE, NOT A RULE
+# RESOLVED 2026-08-25 — the four-tumbler-icon problem this section used to
+# document.
 # =============================================================================
 # Choosing `old fashioned` over `rocks` as the canonical word left the ARTWORK
-# unresolved, because there are four tumbler icons and only two canonical
-# tumbler names:
+# unresolved for a while: four tumbler icons (plain old-fashioned, its double,
+# panelled rocks, panelled rocks-tall) against two canonical names, with
+# `rocks` and `old fashioned` pointing at two different drawings — invisible
+# on any single page, real the moment you looked at the whole set together
+# (`_dev/glasses.html`, built for exactly this).
 #
-#   old-fashioned.svg         plain tapered, heavy base  -> `old fashioned`
-#   old-fashioned-double.svg  same, wider and deeper     -> `double old fashioned`
-#   rocks.svg                 PANELLED (faceted sides)   -> reached only by `rocks`
-#   rocks-tall.svg            panelled, tall             -> reached by nothing
-#
-# So `rocks` and `old fashioned` are now two spellings of one glass pointing at
-# TWO DIFFERENT DRAWINGS. That is the actual defect here, and it is invisible on
-# any single page.
-#
-# The panelling is real, not decoration — Helen, 2026-08-17, on what those
-# internal lines are: "rounded glass markings like those classic bar tumblers
-# with 6-8 flattened sides". So rocks.svg is not a duplicate of
-# old-fashioned.svg; it is a different physical glass, drawn accurately.
-#
-# Three ways out, and _dev/glasses.html exists to make the choice by eye:
-#   (a) the panelled drawing wins — point `old fashioned` at rocks.svg and
-#       retire the plain pair;
-#   (b) the plain drawing wins — retire both panelled drawings;
-#   (c) they are genuinely different glasses Helen owns and want their own
-#       names, in which case rocks-tall needs one too.
+# Helen's call, having looked: none of the three options originally floated
+# here (panelled wins / plain wins / keep both as different named glasses).
+# Instead, `old-fashioned.svg` itself got a fresh redraw, and `rocks.svg` /
+# `rocks-tall.svg` / the old `old-fashioned-double.svg` are all retired.
+# `rocks` is now a plain alias to `old-fashioned` (see the canonical-vocabulary
+# mapping above) rather than its own drawing. The double variant is being
+# redrawn to match the new single glass — until then, `double rocks` / `double
+# old fashioned` are deliberately unmapped, see the no-icon list above.
 # =============================================================================
 
 # =============================================================================
@@ -202,8 +203,6 @@ icons:
 heights_mm:
   shot: 60
   old-fashioned: 85
-  rocks: 85
-  old-fashioned-double: 95
   mule-mug: 105
   julep-cup: 110
   punch-bowl: 130
@@ -214,7 +213,6 @@ heights_mm:
   coupe: 150
   sherry: 150
   highball: 150
-  rocks-tall: 150
   tiki-mug: 150
   pineapple: 150
   absinthe: 160
@@ -245,13 +243,10 @@ all_icons:
   - mule-mug
   - nick-and-nora
   - old-fashioned
-  - old-fashioned-double
   - pilsner
   - pina-colada
   - pineapple
   - punch-bowl
-  - rocks
-  - rocks-tall
   - sherry
   - shot
   - sling
