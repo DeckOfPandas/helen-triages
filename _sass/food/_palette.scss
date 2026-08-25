@@ -52,6 +52,29 @@ $font-headings: "Courier Prime", "Courier New", "Courier", monospace;
 // DELIBERATELY NOT MOVED: the recipe title and section headings, the wordmark,
 // the footer, h1/h2/h3, the about page, and the recipe meta line -- Helen, of
 // the meta: "doesn't matter, it's only for me".
+//
+// PULLED BACK OUT ON 2026-08-26, after Helen looked at the whole index at once.
+// The rule survived; two of its readings did not.
+//
+//   .category-label -- the filter SECTION TITLES. "Should remain in our
+//   courier-like font. Please change it back immediately." These are headings
+//   for the panel, not things you scan within it, and at 1.35rem they were the
+//   largest thing wearing this face -- which made Plex read as a heading font
+//   rather than a label one and undercut the whole distinction.
+//
+//   .btn-tag / .btn-star / .btn-meta -- the filter TAGS. The failure was
+//   consistency, not looks: "I like the way the tags look on their own, but the
+//   tags for ingredients being in a different font to the ingredients in the
+//   list on each recipe row feels inconsistent... This actually seemed fine when
+//   the fonts were more different." A tag naming an ingredient and a recipe row
+//   naming the same ingredient have to agree, and the ingredient search input is
+//   Courier too. So the filter panel stays one voice throughout.
+//
+// THE LESSON, WHICH IS SHARPER THAN THE RULE. "Is this scanned rather than
+// read?" was true of the filter tags and still gave the wrong answer, because
+// it only looks at the element. A tag is also half of a PAIR -- the other half
+// being the same word on a recipe row -- and a pair has to match. Ask what an
+// element must agree with before asking what it is.
 $font-label: "IBM Plex Mono", "Courier Prime", monospace;
 $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;
 

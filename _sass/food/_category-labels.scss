@@ -114,7 +114,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // left to the absence of a matching rule -- see .results-heading
   // .category-label directly below.
   .category-label {
-    font-family: $font-label;
+    font-family: $font-headings;   // NOT $font-label -- see _palette.scss
     text-transform: uppercase;
     font-size: 1.35rem;
     font-weight: 700;
@@ -349,7 +349,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
 }
 
 .btn-meta {
-  font-family: $font-label;
+  font-family: $font-headings;   // NOT $font-label -- see _palette.scss
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: lowercase;
