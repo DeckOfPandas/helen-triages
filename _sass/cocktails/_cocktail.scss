@@ -129,9 +129,23 @@ $rule-ingredient: 46%;
 //
 // `balance` is food's, and its note explains it: it keeps the lines a title
 // wraps to a similar length, so none ends up carrying a stub.
+// THE LINE-HEIGHT IS THE VERTICAL OFFSET, all of it — #520. Both titles are
+// Courier Prime at 2.2rem, so the glyphs are identical; what differed was the
+// BOX around them. Food's title inherits `line-height: $line-height-body`
+// (1.65) from `article.recipe` and this was 1.1, so food's line box is 3.63rem
+// against 2.42rem and its half-leading drops the lettering about 0.55rem
+// further down. Food's own file names the number, in the note explaining why
+// its title row aligns on `last baseline`: "the half-leading of an inherited
+// 1.65 line-height on 2.2rem type".
+//
+// Declared here rather than inherited from an `article.cocktail` rule, which
+// is how food gets it. That would match food's mechanism as well as its
+// result, and would also change the font-size and weight of every paragraph on
+// the page — a much larger change than the one being asked for, and one that
+// would quietly undo sizes chosen deliberately this evening.
 .cocktail-title {
   font-size: 2.2rem;
-  line-height: 1.1;
+  line-height: $line-height-body;
   letter-spacing: 0.04em;
   max-width: $width-content * 0.7;
   text-wrap: balance;
