@@ -141,57 +141,92 @@ drinks:
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
   <section class="dsn-section">
     <h2 class="dsn-h2">1. Palette</h2>
+
     <p class="dsn-note">
-      Near-monochrome, one accent. The accent is two tones because one cannot do
-      both jobs: at the saturation that makes a nice fill, green is nowhere near
-      readable as small text on paper.
+      Near-monochrome neutrals, one accent. The accent is always TWO tones,
+      because one cannot do both jobs: at the saturation that makes a good fill,
+      green is nowhere near readable as small text on paper.
     </p>
 
     <ul class="dsn-swatches">
       <li class="dsn-swatch">
-        <span class="dsn-chip" style="background:#fbfbfa; border-color:#e4e4e6;"></span>
+        <span class="dsn-chip" style="background:#fbfbfa; border-color:#d8d8da;"></span>
         <code>#fbfbfa</code>
-        <span class="dsn-swatch-role">paper — the ground, unchanged from the scaffold</span>
+        <span class="dsn-swatch-role">paper — the ground</span>
       </li>
       <li class="dsn-swatch">
         <span class="dsn-chip" style="background:#1b1b1f;"></span>
         <code>#1b1b1f</code>
-        <span class="dsn-swatch-role">ink — type, and the glass drawings on a drink page</span>
+        <span class="dsn-swatch-role">ink — type, and the glass on a drink page</span>
       </li>
       <li class="dsn-swatch">
         <span class="dsn-chip" style="background:#6b6b70;"></span>
         <code>#6b6b70</code>
-        <span class="dsn-swatch-role">grey — taglines, ingredient lines, de-emphasised UI</span>
+        <span class="dsn-swatch-role">grey — taglines, ingredient lines, quiet UI</span>
       </li>
       <li class="dsn-swatch">
         <span class="dsn-chip" style="background:#e4e4e6;"></span>
         <code>#e4e4e6</code>
         <span class="dsn-swatch-role">line — card borders, rules</span>
       </li>
-      <li class="dsn-swatch">
-        <span class="dsn-chip" style="background:#9CB43C;"></span>
-        <code>#9CB43C</code>
-        <span class="dsn-swatch-role">
-          <strong>absinthe verte</strong> — 2.25:1 on paper. Fills, active button
-          backgrounds, the glass wash, the ship dot. <em>Never text.</em>
-        </span>
-      </li>
-      <li class="dsn-swatch">
-        <span class="dsn-chip" style="background:#5C7A1E;"></span>
-        <code>#5C7A1E</code>
-        <span class="dsn-swatch-role">
-          <strong>deep herbal</strong> — 4.76:1 on paper, clears the 4.5:1 body-text
-          floor. Links, active labels, the search-hit mark, the footer accent the
-          palette file has been asking for.
-        </span>
-      </li>
     </ul>
 
+    {% comment %} ── THE HUE PICKER ──────────────────────────────────────────
+       Helen, 2026-08-26: "I like the green. I'd like to see some other greens,
+       different hues." So this is not a swatch chart — pressing one retints
+       the WHOLE page, every card, button, chip and mark below. A green is not
+       judgeable as a 40px square; it is judgeable as the thing the cards
+       actually wear.
+
+       EACH PAIR IS SOLVED PER HUE, NOT SHARED. Equal lightness across hues is
+       not equal contrast — the olive and the blue-green are nearly 20 points
+       of lightness apart at the same measured ratio. This is the same fact
+       food's palette hit with its two yellow-greens, where $darken-active-lime
+       exists precisely because one shared darkening step did not hold. Every
+       fill below lands within 0.02 of 2.30:1 on paper and every text tone
+       within 0.03 of 4.75:1, solved rather than eyeballed.
+    ────────────────────────────────────────────────────────────────────{% endcomment %}
+    <p class="dsn-field-label dsn-field-label--pick">Pick a green — the page follows</p>
+    <div class="dsn-hues" id="dsn-hues">
+      <button type="button" class="dsn-hue is-on" data-fill="#95B33C" data-deep="#647828">
+        <span class="dsn-hue-chips"><i style="background:#95B33C"></i><i style="background:#647828"></i></span>
+        <span class="dsn-hue-name">absinthe verte</span>
+        <span class="dsn-hue-hex">#95B33C · #647828</span>
+      </button>
+      <button type="button" class="dsn-hue" data-fill="#AAAE37" data-deep="#727425">
+        <span class="dsn-hue-chips"><i style="background:#AAAE37"></i><i style="background:#727425"></i></span>
+        <span class="dsn-hue-name">wormwood olive</span>
+        <span class="dsn-hue-hex">#AAAE37 · #727425</span>
+      </button>
+      <button type="button" class="dsn-hue" data-fill="#73BA41" data-deep="#4D7D2C">
+        <span class="dsn-hue-chips"><i style="background:#73BA41"></i><i style="background:#4D7D2C"></i></span>
+        <span class="dsn-hue-name">crisp leaf</span>
+        <span class="dsn-hue-hex">#73BA41 · #4D7D2C</span>
+      </button>
+      <button type="button" class="dsn-hue" data-fill="#4FBE5D" data-deep="#2F803A">
+        <span class="dsn-hue-chips"><i style="background:#4FBE5D"></i><i style="background:#2F803A"></i></span>
+        <span class="dsn-hue-name">bottle green</span>
+        <span class="dsn-hue-hex">#4FBE5D · #2F803A</span>
+      </button>
+      <button type="button" class="dsn-hue" data-fill="#51BB86" data-deep="#317E58">
+        <span class="dsn-hue-chips"><i style="background:#51BB86"></i><i style="background:#317E58"></i></span>
+        <span class="dsn-hue-name">crème de menthe</span>
+        <span class="dsn-hue-hex">#51BB86 · #317E58</span>
+      </button>
+      <button type="button" class="dsn-hue" data-fill="#4CB9A3" data-deep="#317D6E">
+        <span class="dsn-hue-chips"><i style="background:#4CB9A3"></i><i style="background:#317D6E"></i></span>
+        <span class="dsn-hue-name">pine, blue-green</span>
+        <span class="dsn-hue-hex">#4CB9A3 · #317D6E</span>
+      </button>
+    </div>
+
     <p class="dsn-note dsn-note--aside">
-      This retires the placeholder <code>$color-accent: $color-grey-mid</code> in
-      <code>_sass/cocktails/_palette.scss</code>, whose own comment records that
-      grey-on-grey "reads like nothing at all at footer size". Deep herbal on the
-      footer's grey is a hue change, not a lightness one.
+      The left chip of each pair is the FILL — active buttons, the search-hit
+      mark, the goodness square, the glass wash. It is never text. The right
+      chip is the one you read. Whichever wins also retires the placeholder
+      <code>$color-accent: $color-grey-mid</code> in
+      <code>_sass/cocktails/_palette.scss</code>, whose own comment records
+      grey-on-grey as "reading like nothing at all at footer size".
     </p>
   </section>
 
@@ -301,19 +336,32 @@ drinks:
      information the drawings carry.
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
   <section class="dsn-section">
-    <h2 class="dsn-h2">4. Cards — oversized, bleeding <span class="dsn-h2-tag">treatment A</span></h2>
+    <h2 class="dsn-h2">4. Cards — pale wash <span class="dsn-h2-tag">treatment A</span></h2>
     <p class="dsn-note">
-      Pale absinthe, hairline stroke, cropped top and bottom. Reads as a
-      designed surface rather than a list. The risk is legibility of the
-      silhouette — a cropped glass is harder to identify than a whole one.
+      Pale accent, hairline stroke, sitting in its own column. Smaller than the
+      first pass, which was zoomed in far enough to crop every tall glass —
+      Helen was not sold on that, so the slider below starts at a size where
+      almost nothing crops and goes back up to where everything does. Drag it
+      and see where it stops being decoration and starts being a picture.
     </p>
 
-    <ul class="dsn-cards dsn-cards--bleed">
+    <div class="dsn-slider">
+      <label for="dsn-scale-a">glass size</label>
+      <input type="range" id="dsn-scale-a" min="5" max="22" step="0.5" value="12"
+             data-target="dsn-cards-a" />
+      <output id="dsn-scale-a-out">12rem</output>
+      <span class="dsn-slider-hint">tallest glass; the rest scale off it</span>
+    </div>
+
+    <ul class="dsn-cards dsn-cards--wash" id="dsn-cards-a" style="--dsn-glass-scale: 12rem;">
       {% for drink in page.drinks %}
+        {% comment %} The card carries the RATIO, not a finished height, so one
+           slider can rescale all eight without the template being rebuilt —
+           and true-relative height survives every position of it. {% endcomment %}
         {% assign mm = heights[drink.glass] | times: 1.0 %}
-        {% assign h = mm | divided_by: tallest_mm | times: 20.0 %}
-        <li class="dsn-card">
-          <span class="dsn-card-glass" style="--dsn-glass-h: {{ h }}rem;">
+        {% assign ratio = mm | divided_by: tallest_mm %}
+        <li class="dsn-card" style="--dsn-ratio: {{ ratio }};">
+          <span class="dsn-card-glass">
             {% capture f %}icons/glasses/{{ drink.glass }}.svg{% endcapture %}
             {% include {{ f }} %}
           </span>
@@ -323,10 +371,12 @@ drinks:
             <p class="dsn-card-items">
               {% for item in drink.items %}{% if item == drink.hit %}<mark class="dsn-hit">{{ item }}</mark>{% else %}{{ item }}{% endif %}{% unless forloop.last %} <span class="dsn-dot">·</span> {% endunless %}{% endfor %}
             </p>
-            <p class="dsn-card-foot">
+          </div>
+          <div class="dsn-card-foot">
+            <span class="dsn-card-moods">
               {% for m in drink.moods %}<span class="dsn-mood-chip">{{ m }}</span>{% endfor %}
-              <span class="dsn-ship {% if drink.ship == 'oh gods yes' or drink.ship == 'yes' %}dsn-ship--good{% endif %}">{{ drink.ship }}</span>
-            </p>
+            </span>
+            <span class="dsn-ship {% if drink.ship == 'oh gods yes' or drink.ship == 'yes' %}dsn-ship--good{% endif %}">{{ drink.ship }}</span>
           </div>
         </li>
       {% endfor %}
@@ -348,12 +398,20 @@ drinks:
       more obviously a list.
     </p>
 
-    <ul class="dsn-cards dsn-cards--contained">
+    <div class="dsn-slider">
+      <label for="dsn-scale-b">glass size</label>
+      <input type="range" id="dsn-scale-b" min="3" max="12" step="0.25" value="5.4"
+             data-target="dsn-cards-b" />
+      <output id="dsn-scale-b-out">5.4rem</output>
+      <span class="dsn-slider-hint">tallest glass; the rest scale off it</span>
+    </div>
+
+    <ul class="dsn-cards dsn-cards--ink" id="dsn-cards-b" style="--dsn-glass-scale: 5.4rem;">
       {% for drink in page.drinks %}
         {% assign mm = heights[drink.glass] | times: 1.0 %}
-        {% assign h = mm | divided_by: tallest_mm | times: 5.4 %}
-        <li class="dsn-card">
-          <span class="dsn-card-glass" style="--dsn-glass-h: {{ h }}rem;">
+        {% assign ratio = mm | divided_by: tallest_mm %}
+        <li class="dsn-card" style="--dsn-ratio: {{ ratio }};">
+          <span class="dsn-card-glass">
             {% capture f %}icons/glasses/{{ drink.glass }}.svg{% endcapture %}
             {% include {{ f }} %}
           </span>
@@ -363,10 +421,12 @@ drinks:
             <p class="dsn-card-items">
               {% for item in drink.items %}{% if item == drink.hit %}<mark class="dsn-hit">{{ item }}</mark>{% else %}{{ item }}{% endif %}{% unless forloop.last %} <span class="dsn-dot">·</span> {% endunless %}{% endfor %}
             </p>
-            <p class="dsn-card-foot">
+          </div>
+          <div class="dsn-card-foot">
+            <span class="dsn-card-moods">
               {% for m in drink.moods %}<span class="dsn-mood-chip">{{ m }}</span>{% endfor %}
-              <span class="dsn-ship {% if drink.ship == 'oh gods yes' or drink.ship == 'yes' %}dsn-ship--good{% endif %}">{{ drink.ship }}</span>
-            </p>
+            </span>
+            <span class="dsn-ship {% if drink.ship == 'oh gods yes' or drink.ship == 'yes' %}dsn-ship--good{% endif %}">{{ drink.ship }}</span>
           </div>
         </li>
       {% endfor %}
@@ -552,6 +612,34 @@ drinks:
 }
 .dsn-swatch-role { color: var(--dsn-grey); line-height: 1.5; }
 
+.dsn-field-label--pick { margin-top: 2rem; }
+.dsn-hues {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.5rem;
+}
+.dsn-hue {
+  font-family: inherit;
+  text-align: left;
+  background: #fff;
+  border: 1.5px solid var(--dsn-line);
+  padding: 0.6rem 0.7rem;
+  cursor: pointer;
+  display: block;
+}
+.dsn-hue:hover { border-color: var(--dsn-deep); }
+.dsn-hue.is-on { border-color: var(--dsn-deep); border-width: 1.5px; box-shadow: inset 0 0 0 1.5px var(--dsn-deep); }
+.dsn-hue-chips { display: flex; margin-bottom: 0.5rem; }
+.dsn-hue-chips i { display: block; width: 50%; height: 1.6rem; }
+.dsn-hue-name { display: block; font-size: 0.86rem; color: var(--dsn-ink); }
+.dsn-hue-hex {
+  display: block;
+  font-family: "Courier Prime", monospace;
+  font-size: 0.66rem;
+  color: var(--dsn-grey);
+  margin-top: 0.15rem;
+}
+
 /* --- 2. type ------------------------------------------------------------- */
 .dsn-type-specimens { border-left: 2px solid var(--dsn-line); padding-left: 1.2rem; }
 .dsn-spec-title {
@@ -585,8 +673,11 @@ drinks:
   font-family: inherit;
   font-size: 0.85rem;
   padding: 0.34rem 0.8rem;
+  /* Square corners throughout — Helen, 2026-08-26, straight edges over
+     rounded. The pill button was the scaffold's own habit, borrowed from
+     _sass/cocktails/_goodness.scss's 2rem radius, not a decision this design
+     ever made. */
   border: 1.5px solid var(--dsn-line);
-  border-radius: 2rem;
   background: #fff;
   color: var(--dsn-ink);
   cursor: pointer;
@@ -655,7 +746,26 @@ drinks:
 }
 .dsn-count strong { color: var(--dsn-ink); font-size: 1rem; }
 
-/* --- 4 & 5. cards -------------------------------------------------------- */
+/* --- 4 & 5. cards --------------------------------------------------------
+   EVERY ANCHOR IS FIXED. Helen, 2026-08-26: the title starts in the same place
+   relative to the top and sides on every card, and the goodness mark sits in
+   the bottom-right corner in exactly the same spot every time.
+
+   That rules out the obvious layout. A card whose height is set by its content
+   puts the foot somewhere different on every card, and a vertically-centred
+   text block moves the title too — the first pass did both. So: the card has a
+   FIXED HEIGHT, the body is anchored to the top-left of the content box, and
+   the foot is taken out of flow and pinned to the bottom.
+
+   The cost, and it is a real one: content that does not fit has to be cut
+   rather than allowed to push. Cobra's Fang has eight ingredients and three
+   moods. The ingredient line and the tagline clamp to two lines each, and the
+   mood row truncates before it can reach the goodness mark's slot. A rigid
+   grid buys its rigidity with clamping; there is no version where both hold.
+
+   --dsn-text-x is the single source of the title's left edge: the glass column
+   is exactly that wide, and the body and the foot both start there. One value
+   moves all three together and they cannot drift apart. */
 .dsn-cards {
   list-style: none; margin: 0; padding: 0;
   display: grid;
@@ -664,11 +774,11 @@ drinks:
 }
 .dsn-card {
   position: relative;
-  display: grid;
-  align-items: center;
+  height: 11.25rem;
   border: 1px solid var(--dsn-line);
   background: #fff;
   overflow: hidden;
+  padding: 1.05rem 1.15rem 1.05rem var(--dsn-text-x);
 }
 .dsn-card-body { min-width: 0; }
 .dsn-card-name {
@@ -677,9 +787,20 @@ drinks:
   letter-spacing: 0.03em;
   text-transform: uppercase;
   margin: 0 0 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.dsn-card-tagline { font-style: italic; font-size: 0.86rem; color: var(--dsn-grey); margin: 0 0 0.7rem; line-height: 1.45; }
-.dsn-card-items { font-size: 0.82rem; line-height: 1.55; color: var(--dsn-ink); margin: 0 0 0.8rem; }
+/* Two lines each, clamped. See the note above on why this is not optional. */
+.dsn-card-tagline,
+.dsn-card-items {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.dsn-card-tagline { font-style: italic; font-size: 0.86rem; color: var(--dsn-grey); margin: 0 0 0.55rem; line-height: 1.4; }
+.dsn-card-items { font-size: 0.82rem; line-height: 1.5; color: var(--dsn-ink); margin: 0; }
 .dsn-dot { color: #c2c2c6; }
 .dsn-hit {
   background: var(--dsn-absinthe);
@@ -687,17 +808,36 @@ drinks:
   padding: 0.05em 0.3em;
   font-weight: 600;
 }
-.dsn-card-foot { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin: 0; }
+
+/* The foot: pinned, never in flow. Two columns — moods take the slack, the
+   goodness mark takes exactly what it needs — so the mark's right edge is the
+   card's padding edge on every card regardless of how many moods there are. */
+.dsn-card-foot {
+  position: absolute;
+  left: var(--dsn-text-x);
+  right: 1.15rem;
+  bottom: 0.95rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+.dsn-card-moods {
+  display: flex;
+  gap: 0.3rem;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
 .dsn-mood-chip {
   font-size: 0.68rem;
   letter-spacing: 0.02em;
   color: var(--dsn-grey);
   border: 1px solid var(--dsn-line);
-  border-radius: 2rem;
-  padding: 0.1rem 0.5rem;
+  padding: 0.12rem 0.45rem;
+  flex: none;
 }
 .dsn-ship {
-  margin-left: auto;
   font-family: "Courier Prime", monospace;
   font-size: 0.68rem;
   text-transform: uppercase;
@@ -705,58 +845,65 @@ drinks:
   color: var(--dsn-grey);
   white-space: nowrap;
 }
+/* Square, not a dot — straight edges throughout, Helen's call. */
 .dsn-ship::before {
   content: "";
   display: inline-block;
-  width: 0.45rem; height: 0.45rem;
-  border-radius: 50%;
+  width: 0.5rem; height: 0.5rem;
   border: 1.5px solid var(--dsn-grey);
-  margin-right: 0.35rem;
-  vertical-align: 0.02rem;
+  margin-right: 0.4rem;
+  vertical-align: 0.01rem;
 }
 .dsn-ship--good { color: var(--dsn-deep); }
 .dsn-ship--good::before { background: var(--dsn-absinthe); border-color: var(--dsn-deep); }
 
-.dsn-card-glass { display: block; }
-.dsn-card-glass svg { display: block; height: var(--dsn-glass-h, 4rem); width: auto; overflow: visible; }
-
-/* TREATMENT A — oversized, bleeding.
-   The glass is taken out of flow so the card's height is set by the TEXT, not
-   by a 15rem drawing; the card then crops it. `--dsn-glass-h` is still the
-   true-relative height, so a hurricane crops more than an old-fashioned. */
-.dsn-cards--bleed .dsn-card { grid-template-columns: 1fr; padding: 1.15rem 1.25rem 1.15rem 8.5rem; min-height: 9.5rem; }
-.dsn-cards--bleed .dsn-card-glass {
+/* The glass column. Its width IS --dsn-text-x, so the drawing can never push
+   the title along — the failure the real cocktail page's 3.2rem max-width
+   guard exists to prevent, at a bigger scale. Height is the true-relative
+   ratio times one scale, so the slider rescales the whole set at once and the
+   relative heights survive every position of it. */
+.dsn-card-glass {
   position: absolute;
-  left: -1.2rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--dsn-absinthe);
-  opacity: 0.55;
+  left: 0; top: 0; bottom: 0;
+  width: var(--dsn-text-x);
+  display: flex;
+  justify-content: center;
   pointer-events: none;
 }
-.dsn-cards--bleed .dsn-card-glass .glass-icon-line { stroke-width: 1; }
-/* The widest glasses (punch bowl, mule mug) are as wide as they are tall, and
-   at this oversize factor that would walk straight into the text column. Same
-   problem _sass/cocktails/_cocktail.scss already solves with its 3.2rem cap,
-   at a different scale. */
-.dsn-cards--bleed .dsn-card-glass svg { max-width: 8.6rem; }
+.dsn-card-glass svg {
+  display: block;
+  height: calc(var(--dsn-ratio) * var(--dsn-glass-scale));
+  width: auto;
+  max-width: calc(var(--dsn-text-x) - 1.3rem);
+  overflow: visible;
+}
 
-/* TREATMENT B — contained, whole, on the baseline. */
-.dsn-cards--contained .dsn-card {
-  grid-template-columns: 4.6rem 1fr;
-  gap: 1.1rem;
-  padding: 1.15rem 1.25rem;
-  align-items: end;
-}
-.dsn-cards--contained .dsn-card-glass {
-  color: var(--dsn-grey);
+/* TREATMENT A — pale wash, centred in its column. */
+.dsn-cards--wash { --dsn-text-x: 7.6rem; }
+.dsn-cards--wash .dsn-card-glass { align-items: center; color: var(--dsn-absinthe); opacity: 0.55; }
+.dsn-cards--wash .dsn-card-glass .glass-icon-line { stroke-width: 1; }
+
+/* TREATMENT B — grey ink, bottom-aligned. Bottom-aligning is the same
+   instinct as the pinned foot: every glass stands on one line across the row,
+   so the height difference reads as height rather than as drift. */
+.dsn-cards--ink { --dsn-text-x: 6.2rem; }
+.dsn-cards--ink .dsn-card-glass { align-items: flex-end; padding-bottom: 0.9rem; color: var(--dsn-grey); }
+
+/* --- the size sliders ----------------------------------------------------- */
+.dsn-slider {
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  height: 100%;
-  padding-bottom: 0.1rem;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 1rem;
+  font-family: "Courier Prime", monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dsn-grey);
 }
-.dsn-cards--contained .dsn-card-glass svg { max-width: 4.4rem; }
+.dsn-slider input[type="range"] { width: 14rem; accent-color: var(--dsn-deep); }
+.dsn-slider output { color: var(--dsn-ink); min-width: 4rem; }
+.dsn-slider-hint { text-transform: none; letter-spacing: 0; font-family: inherit; font-size: 0.78rem; color: #9a9a9f; }
 
 /* --- 6. the drink page --------------------------------------------------- */
 .dsn-drink-toggle-row { display: flex; justify-content: flex-end; margin-bottom: 0.5rem; }
@@ -854,6 +1001,39 @@ drinks:
     var making = drink.classList.toggle('is-making');
     btn.classList.toggle('is-on', making);
     btn.textContent = making ? 'read about it' : 'make it';
+  });
+})();
+
+/* The hue picker. Sets the two accent custom properties on the .dsn root, so
+   every card, button, chip, mark and rule below retints at once — the whole
+   point of it being a picker rather than a swatch chart. */
+(function () {
+  var root = document.querySelector('.dsn');
+  var wrap = document.getElementById('dsn-hues');
+  if (!root || !wrap) return;
+  wrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.dsn-hue');
+    if (!btn) return;
+    root.style.setProperty('--dsn-absinthe', btn.dataset.fill);
+    root.style.setProperty('--dsn-deep', btn.dataset.deep);
+    wrap.querySelectorAll('.dsn-hue').forEach(function (b) {
+      b.classList.toggle('is-on', b === btn);
+    });
+  });
+})();
+
+/* The glass-size sliders. Each sets --dsn-glass-scale on its own grid; the
+   per-card --dsn-ratio does the rest, so relative height is preserved at
+   every position and nothing needs recomputing per card. */
+(function () {
+  document.querySelectorAll('.dsn-slider input[type="range"]').forEach(function (input) {
+    var grid = document.getElementById(input.dataset.target);
+    var out  = document.getElementById(input.id + '-out');
+    if (!grid) return;
+    input.addEventListener('input', function () {
+      grid.style.setProperty('--dsn-glass-scale', input.value + 'rem');
+      if (out) out.textContent = input.value + 'rem';
+    });
   });
 })();
 </script>
