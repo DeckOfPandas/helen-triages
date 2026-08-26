@@ -543,6 +543,49 @@ def _glasses():
 GLASS_ICON_DIR = ROOT / "_includes" / "icons" / "glasses"
 
 
+def test_drinks_use_the_canonical_glass_spelling():
+    """A drink must write the canonical name, not one of its aliases.
+
+    THIS REVERSES A RULE THIS FILE USED TO STATE. glasses.yml said outright
+    that "a drink is never wrong for using the other word", and for nine months
+    that was the design. Helen retired it on 2026-08-26: "I decided to go with
+    old fashioned rather than rocks as the canonical name, so recipes that
+    still have rocks are fine to break a test."
+
+    THE ALIAS MAP IN `icons:` IS UNAFFECTED, and keeping both is not a
+    contradiction. The aliases do two jobs a rule cannot: they keep a drink
+    rendering if one slips through, and they absorb the spreadsheet's own
+    spellings on ingest, where the variance arrives whether or not the repo
+    approves of it. This rule governs what is WRITTEN into a drink; the alias
+    map governs what can be READ.
+
+    The vocabulary comes entirely from `canonical_glasses`, so adding a pair
+    there is what makes it enforced -- there is no second list here to keep in
+    step. An alias absent from that map is permitted, which is why `martini` /
+    `martini glass` does not fail: it is undecided, not blessed.
+    """
+    canonical = _glasses().get("canonical_glasses") or {}
+    assert canonical, (
+        "glasses.yml has no `canonical_glasses:` map, so this check enforces "
+        "nothing. If the canonical vocabulary was abandoned, delete this test "
+        "deliberately rather than letting it pass while checking nothing."
+    )
+    bad = []
+    for slug, fm in _load():
+        for value in (fm.get("glass") or []):
+            want = canonical.get(str(value).lower())
+            if want and str(value) != want:
+                bad.append(f"{slug}: {value!r} -> should be {want!r}")
+    assert not bad, (
+        f"{len(bad)} drink(s) using a non-canonical glass spelling:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nThese all render the correct icon -- the alias map sees to "
+          "that -- so this is about what the data SAYS, not what it draws. "
+          "Retype the drink; do not add the alias to `canonical_glasses` to "
+          "make this pass."
+    )
+
+
 def test_every_mapped_glass_names_an_icon_that_exists():
     """A key pointing at a missing file is worse than a missing key.
 

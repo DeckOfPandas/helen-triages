@@ -148,16 +148,65 @@ icons:
 # a decision. If a new unmappable value arrives, add it here with its reason.
 #
 # =============================================================================
-# THE CANONICAL VOCABULARY — Helen, 2026-08-17
+# THE CANONICAL VOCABULARY — Helen, 2026-08-17, ENFORCED from 2026-08-26
 # =============================================================================
-# When two words mean one glass, these are the ones to prefer in new drinks.
-# The aliases above stay live regardless: the point of this file is that a
-# drink is never wrong for using the other word.
+# When two words mean one glass, these are the ones to use in a drink.
 #
 #   coupe                 not "champagne saucer"
 #   old fashioned         not "rocks"
 #   double old fashioned  not "double rocks"
 #   brandy glass          not "snifter"
+#
+# THIS USED TO BE A PREFERENCE AND IS NOW A RULE. The line here read "the
+# aliases above stay live regardless: the point of this file is that a drink is
+# never wrong for using the other word." Helen retired that on 2026-08-26 —
+# "I decided to go with old fashioned rather than rocks as the canonical name,
+# so recipes that still have rocks are fine to break a test." So
+# `canonical_glasses` below is enforced by
+# tests/test_cocktails.py::test_drinks_use_the_canonical_glass_spelling, and 17
+# drinks were retyped in the same commit rather than left failing.
+#
+# WHY IT WAS SAFE TO RETYPE ALL SEVENTEEN AT ONCE: `rocks` has been a plain
+# ALIAS to `old-fashioned` since #347 was resolved — one drawing, not two — so
+# the change carries no meaning whatsoever, only spelling. Every one of those
+# drinks rendered the same icon before and after. That would NOT have been true
+# before #347, when the two names pointed at genuinely different artwork.
+#
+# THE ALIASES IN `icons:` STAY LIVE, and that is not a contradiction. They do
+# two jobs a rule cannot: they keep a drink rendering if one slips through, and
+# they absorb the spreadsheet's spellings on ingest, where the variance is real
+# and arrives whether or not this file disapproves. The rule governs what is
+# WRITTEN into a drink; the alias map governs what can be READ.
+#
+# `martini` vs `martini glass` is deliberately NOT here — see the note on
+# `canonical_glasses`.
+
+# ALIAS (as it may appear in a drink) -> the spelling a drink must use.
+# The test derives its whole vocabulary from this map, so adding a pair here is
+# what makes it enforced; there is no second list to keep in step.
+canonical_glasses:
+  "rocks": "old fashioned"
+  "old-fashioned": "old fashioned"
+  "old-fashioned glass": "old fashioned"
+  "double rocks": "double old fashioned"
+  "double old-fashioned": "double old fashioned"
+  "champagne saucer": "coupe"
+  "champage saucer": "coupe"
+  "snifter": "brandy glass"
+
+# NOT IN THE MAP, ON PURPOSE, 2026-08-26:
+#
+#   martini / martini glass   3 drinks split 1-2 (tomato-martini says
+#                             `martini`, espresso-martini and porn-star-martini
+#                             say `martini glass`). Helen's 2026-08-17
+#                             canonical list names four pairs and this is not
+#                             one of them, so there is no decision to enforce
+#                             yet. Both spellings render the same icon.
+#                             Adding a line above is all it takes once decided.
+#
+# An alias absent from the map is permitted in a drink. That is the honest
+# default: this map records DECISIONS, and silence means the question has not
+# been asked rather than that either form is blessed.
 #
 # =============================================================================
 # RESOLVED 2026-08-25 — the four-tumbler-icon problem this section used to
