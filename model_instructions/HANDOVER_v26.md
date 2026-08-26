@@ -1872,11 +1872,12 @@ rediscovered from scratch later.
 the three ways originally floated.** `old-fashioned.svg`, `rocks.svg`,
 `rocks-tall.svg` and the old `old-fashioned-double.svg` all got replaced by
 one fresh redraw; `rocks` is now a plain alias to `old-fashioned` rather than
-its own drawing. The double variant is being redrawn to match; until then
-`double rocks`/`double old fashioned` are deliberately unmapped (3 drinks —
-Fancy-Free, Vieux Carré, Ti Punch — render with no glass icon, verified
-against a build). Full story is in `glasses.yml`'s own retirement note —
-treat that file as more current than this paragraph if they disagree.
+its own drawing. The double variant followed on 2026-08-26 —
+`old-fashioned-double.svg` redrawn as the same body, uniformly scaled up —
+and `double rocks`/`double old fashioned`/`double old-fashioned` are mapped
+to it now, so Fancy-Free, Vieux Carré and Ti Punch render an icon again
+(verified against a build). Full story is in `glasses.yml`'s own retirement
+note — treat that file as more current than this paragraph if they disagree.
 
 **A root `<svg>` element defaults to `overflow: hidden` in every browser's
 own UA stylesheet — not a CSS property default, a default for that specific
