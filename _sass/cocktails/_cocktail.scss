@@ -40,8 +40,8 @@
   display: flex;
   align-items: flex-end;
   gap: 1.7rem;
-  margin-bottom: $spacing-block-gap;
-  padding-bottom: $space-xl;
+  margin-bottom: 2.4rem;
+  padding-bottom: 1.4rem;
   border-bottom: 2px solid $color-menthe;
 }
 
@@ -52,11 +52,18 @@
   min-width: 0;
 }
 
+// h1 already carries `punched(raised)` from shared/_base.scss, at the SMALL
+// offset. Restated at the large one deliberately: this is display type, and
+// _sass/shared/_rule.scss's own note records that a fixed offset is ~7% of a
+// 0.9rem label and ~3% of a 1.8rem heading, so the effect is at full strength
+// on the smallest type and half-swallowed on the biggest — backwards from how
+// it reads in the file. At 2.5rem this is the biggest type on the site.
 .cocktail-title {
   font-size: 2.5rem;
   line-height: 1.02;
   letter-spacing: 0.02em;
   margin: 0 0 $space-sm;
+  @include punched(raised, var(--emboss-offset-lg));
 }
 
 // The one place this site has a voice. Measure capped, because a tagline
@@ -104,8 +111,12 @@
   font-size: 1.35rem;
   letter-spacing: 0.1em;
   color: $color-text;
-  margin: $spacing-section-top 0 $space-lg;
-  padding-bottom: $space-xs;
+  // 2.8rem, not $spacing-section-top's 4.5rem. That token was tuned for food's
+  // recipe page, where a heading carries the whole separation on its own with
+  // no rule in the gap; these headings have a 2px violet rule under them doing
+  // half that work, and at 4.5rem the sections drifted apart.
+  margin: 2.8rem 0 $space-lg;
+  padding-bottom: 0.45rem;
   border-bottom: 2px solid $color-violet;
   @include punched(raised, var(--emboss-offset-lg));
 }
@@ -210,10 +221,33 @@
 
 // =============================================================================
 // INGREDIENT LINE — three parts, settled 2026-08-24 after a design pass on
-// #465/#460: amount+headline / class(+character) / note. No colour decision
-// here — the palette is still the placeholder monochrome from _palette.scss,
-// argued nowhere yet. This is information hierarchy only.
+// #465/#460: amount+headline / class(+character) / note.
+//
+// RESTYLED 2026-08-26 to the design page's version. The 2026-08-24 rules were
+// information hierarchy only, written while "the palette is still the
+// placeholder monochrome" — that is no longer true, and more importantly the
+// amount had no column of its own. Three things changed and each has a reason:
+//
+//   1. THE AMOUNT IS SET IN THE HEADING FACE. It is the one thing on this page
+//      you read across a room with your hands full, and the only place mono
+//      earns its keep on a drink page. Food reached the same conclusion about
+//      the same element and its palette file argues it at length: amounts and
+//      note labels are what you look at while cooking.
+//   2. THE AMOUNT HAS A FIXED COLUMN, so the amounts form a straight edge you
+//      can run your eye down instead of stepping in and out with the length of
+//      each number. $amount-col and $amount-gap are named because the class
+//      line and the note both indent past them; three values that must agree
+//      are one value plus arithmetic.
+//   3. IT IS INK, NOT GREY, and the item is no longer bold. Those were the
+//      wrong way round: the amount is the thing you re-read, the item name is
+//      the thing you already know.
 // =============================================================================
+
+// The amount column, and the gap after it. The sub-lines below hang past both,
+// derived rather than written down, so they cannot drift out of alignment.
+$amount-col: 5.4rem;
+$amount-gap: 1rem;
+$amount-indent: $amount-col + $amount-gap;
 
 .cocktail-ingredients {
   list-style: none;
@@ -233,26 +267,30 @@
 .cocktail-ingredient-top {
   display: flex;
   align-items: baseline;
-  gap: $space-sm;
+  gap: $amount-gap;
 }
 
 .cocktail-amount {
+  font-family: $font-headings;
+  font-size: 0.95rem;
+  min-width: $amount-col;
+  flex: none;
+  color: $color-text;
   font-variant-numeric: tabular-nums;
-  color: $color-clear-text;
-  font-size: $font-size-body-sm;
 }
 
 .cocktail-item {
-  font-weight: 600;
+  font-size: 1rem;
 }
 
 // The class line: `generic`, oxford-joined if a list, plus `character` as a
 // trailing parenthetical. Deliberately quiet — this is a gloss on the
-// headline, not a second headline.
+// headline, not a second headline — and indented past the amount column so
+// the amounts keep their clean left edge.
 .cocktail-type-line {
   color: $color-clear-text;
-  font-size: $font-size-body-sm;
-  margin: $space-xs 0 0;
+  font-size: 0.84rem;
+  margin: 0.3rem 0 0 $amount-indent;
 }
 
 // A rum-family style name gets the site's heading face — blockier, so the
@@ -279,8 +317,10 @@
 // parenthetical like "moderately aged rum (blackstrap)" reads as if
 // blackstrap were a TYPE of moderately-aged rum, which is real, live
 // confusion with actual black rum.
+// A step quieter than the class line it sits inside, so the parenthetical
+// reads as an aside within an aside rather than as a second fact.
 .cocktail-character {
-  color: $color-clear-text;
+  color: mix($color-clear-text, $color-bg, 70%);
 }
 
 // The note — #457's fix for reasoning that used to get smuggled into
@@ -289,9 +329,10 @@
 // the class line above it rather than as a quiet aside).
 .cocktail-note {
   color: $color-clear-text;
-  font-size: $font-size-body-sm;
+  font-size: 0.84rem;
   font-style: italic;
-  margin: $space-xs 0 0;
+  line-height: 1.55;
+  margin: 0.25rem 0 0 $amount-indent;
 }
 
 // =============================================================================
