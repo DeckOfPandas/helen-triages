@@ -145,10 +145,18 @@ drinks:
   survives here is not the COUNT, it is that every colour has a job and the
   jobs are different axes:
 
-      green   MATCHING   active filters, the search hit, the glass wash
+      green   MOOD       the mood filters and the glass wash
       amber   GOODNESS   the ship square, the chaos buttons, and (Helen's
                          "more of it") the structural rules and counts
-      violet  EXCLUDED   the leave-out field, its chips, its label
+      violet  ASKED FOR  the has-to-have field, its chips, and the matching
+                         ingredient they light up on a card
+
+  Violet spent one revision on LEAVE OUT and came straight back off it: "suddenly
+  busy, and jarring". Exclusion is a distinct axis, but it is RARE and its
+  control is LARGE, so the least-used thing below the fold became the loudest.
+  Colour weight tracks how much of the page a thing occupies, not how
+  semantically distinct it is. Exclusion is struck-through and dashed, and
+  costs nothing.
 
   A drink can match your mood, be rated `meh`, and contain something you asked
   to leave out. Three facts, three colours, and no two of them ever mean the
@@ -181,18 +189,6 @@ drinks:
 
 <article class="dsn">
 
-  <header class="dsn-head">
-    <h1 class="dsn-h1">Cocktails — design vision</h1>
-    <p class="dsn-note">
-      Internal reference, never published. Ink, paper and glass; menthe, amber
-      and violet; mood and chaos above the fold. The glass drawings, the {{ all_icons | size }}
-      heights and the {{ moods | size }} moods are read from
-      <code>_data/cocktails/</code> at build time. <strong>The drinks are
-      placeholder specs</strong> — real names, standard recipes — because the
-      drafts repo is not in this worktree.
-    </p>
-  </header>
-
   {% comment %} ── 1. THE PALETTE ──────────────────────────────────────────────
      Two tones, not one, on exactly the pattern food's palette already uses: a
      root hue for fills and marks, and a darkened tone for anything you have to
@@ -200,36 +196,8 @@ drinks:
      measured rather than eyeballed, the way food's five were.
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
   <section class="dsn-section">
-    <h2 class="dsn-h2">1. Palette</h2>
 
-    <p class="dsn-note">
-      Near-monochrome neutrals, one accent. The accent is always TWO tones,
-      because one cannot do both jobs: at the saturation that makes a good fill,
-      green is nowhere near readable as small text on paper.
-    </p>
 
-    <ul class="dsn-swatches">
-      <li class="dsn-swatch">
-        <span class="dsn-chip" style="background:#fbfbfa; border-color:#d8d8da;"></span>
-        <code>#fbfbfa</code>
-        <span class="dsn-swatch-role">paper — the ground</span>
-      </li>
-      <li class="dsn-swatch">
-        <span class="dsn-chip" style="background:#1b1b1f;"></span>
-        <code>#1b1b1f</code>
-        <span class="dsn-swatch-role">ink — type, and the glass on a drink page</span>
-      </li>
-      <li class="dsn-swatch">
-        <span class="dsn-chip" style="background:#6b6b70;"></span>
-        <code>#6b6b70</code>
-        <span class="dsn-swatch-role">grey — taglines, ingredient lines, quiet UI</span>
-      </li>
-      <li class="dsn-swatch">
-        <span class="dsn-chip" style="background:#e4e4e6;"></span>
-        <code>#e4e4e6</code>
-        <span class="dsn-swatch-role">line — card borders, rules</span>
-      </li>
-    </ul>
 
     {% comment %} ── THE HUE PICKER ──────────────────────────────────────────
        Helen, 2026-08-26: "I like the green. I'd like to see some other greens,
@@ -280,14 +248,6 @@ drinks:
       </button>
     </div>
 
-    <p class="dsn-note dsn-note--aside">
-      The left chip of each pair is the FILL — active buttons, the search-hit
-      mark, the glass wash. It is never text. The right chip is the one you
-      read. Whichever wins also retires the placeholder
-      <code>$color-accent: $color-grey-mid</code> in
-      <code>_sass/cocktails/_palette.scss</code>, whose own comment records
-      grey-on-grey as "reading like nothing at all at footer size".
-    </p>
 
     {% comment %} ── THE SECOND ACCENT ───────────────────────────────────────
        Helen, 2026-08-26: "Can we try one more accent colour, taking us to two?
@@ -331,15 +291,6 @@ drinks:
       </button>
     </div>
 
-    <p class="dsn-note dsn-note--aside">
-      <strong>Campari red and bitter orange are gone, not hidden.</strong> Helen
-      called them "too red-green and inaccessible" and the simulation agrees:
-      against menthe, campari falls to <strong>24.5 dE under protanopia</strong>
-      while reading 101 apart to normal vision — the exact failure where a
-      palette looks fine to the person choosing it. Menthe/amber never drops
-      below 31 in any of the three simulations. Vermouth rouge went with them
-      as another red. Leaving a measured failure in a picker invites it back.
-    </p>
 
     {% comment %} ── THE THIRD ACCENT ────────────────────────────────────────
        Helen, 2026-08-26: "I'm interested in adding a third too. I know this is
@@ -390,40 +341,6 @@ drinks:
       </button>
     </div>
 
-    <p class="dsn-note dsn-note--aside">
-      Where to look: the goodness squares on the cards and the chaos buttons
-      carry <strong>amber</strong>; the section rules, the count bar and the
-      fold line carry it too, which is the "more of it, because it's pretty"
-      — structure rather than new meaning, so it gets presence without a
-      fourth axis. The <strong>HAS TO HAVE</strong> field and chips in §3 carry
-      violet, and so does the matched ingredient on every card — one fact, one
-      colour, in the two places you see it. Green now holds the mood filters
-      and the glass wash.
-    </p>
-  </section>
-
-  {% comment %} ── 2. TYPE ─────────────────────────────────────────────────────
-     Unchanged from the scaffold, and that is the decision rather than the
-     absence of one: _palette.scss already argues that the typographic voice is
-     the family resemblance between the two sites, and colour and drawing are
-     what separate them. Cocktails now has a drawing language food does not
-     have, which is enough separation without a second typeface.
-  ────────────────────────────────────────────────────────────────────────{% endcomment %}
-  <section class="dsn-section">
-    <h2 class="dsn-h2">2. Type</h2>
-    <div class="dsn-type-specimens">
-      <p class="dsn-spec-title">JULIEN SOREL</p>
-      <p class="dsn-note">Courier Prime, uppercase, tight tracking — drink names, section labels, amounts.</p>
-      <p class="dsn-spec-tagline">A sharp, herbal cognac sour.</p>
-      <p class="dsn-note">Selawik italic, grey — taglines only. The one place the site has a voice.</p>
-      <p class="dsn-spec-body">Shake hard with cubed ice, then double-strain into a chilled coupe. No garnish; the absinthe is the aromatic.</p>
-      <p class="dsn-note">Selawik roman — method, notes, everything you read at length.</p>
-    </div>
-    <p class="dsn-note dsn-note--aside">
-      No <code>$font-label</code> here. On food that face earned two jobs by
-      surviving four returns; borrowing the survivor of someone else's argument
-      is not the same as having made one.
-    </p>
   </section>
 
   {% comment %} ── 3. THE INDEX ────────────────────────────────────────────────
@@ -438,7 +355,6 @@ drinks:
      below skips it by name rather than pretending it has drinks.
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
   <section class="dsn-section">
-    <h2 class="dsn-h2">3. The index, above the fold</h2>
 
     <div class="dsn-frame">
 
@@ -461,7 +377,6 @@ drinks:
         </div>
       </div>
 
-      <p class="dsn-fold"><span>the fold</span></p>
 
       <div class="dsn-index-secondary">
         <div class="dsn-search dsn-search--include">
@@ -487,13 +402,6 @@ drinks:
       <p class="dsn-count"><strong>2</strong> drinks</p>
     </div>
 
-    <p class="dsn-note dsn-note--aside">
-      Include and exclude read as one pair — same input, same pool of
-      candidates — with the exclude side inverted (struck through, hollow) so
-      you can tell at a glance which half of the sentence a chip belongs to.
-      That is one hue doing both jobs rather than food's cobalt-for-exclude,
-      which is a second decision this site has not earned yet.
-    </p>
   </section>
 
   {% comment %} ── 4. CARDS, TREATMENT A ───────────────────────────────────────
@@ -508,14 +416,6 @@ drinks:
      information the drawings carry.
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
   <section class="dsn-section">
-    <h2 class="dsn-h2">4. Cards</h2>
-    <p class="dsn-note">
-      Pale accent, hairline stroke, sitting in its own column. Smaller than the
-      first pass, which was zoomed in far enough to crop every tall glass —
-      Helen was not sold on that, so the slider below starts at a size where
-      almost nothing crops and goes back up to where everything does. Drag it
-      and see where it stops being decoration and starts being a picture.
-    </p>
 
     <div class="dsn-slider">
       <label for="dsn-scale-a">glass size</label>
@@ -608,7 +508,6 @@ drinks:
      parenthetical / note. Julien Sorel's values are invented; the SHAPE is not.
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
   <section class="dsn-section">
-    <h2 class="dsn-h2">5. The drink page — two states</h2>
 
     <div class="dsn-frame">
       <div class="dsn-drink" id="dsn-drink">
@@ -683,86 +582,6 @@ drinks:
       </div>
     </div>
 
-    <p class="dsn-note dsn-note--aside">
-      Press <strong>make it</strong>. The tagline, class lines, characters and
-      notes go; the amounts and method grow; the glass drops from hero to mark.
-      Same page, same DOM, one class.
-    </p>
-  </section>
-
-  {% comment %} ── 6. WHAT IS STILL OPEN ───────────────────────────────────────
-     Written down rather than quietly decided, because every one of these is a
-     real choice and none of them was in the four questions Helen answered.
-  ────────────────────────────────────────────────────────────────────────{% endcomment %}
-  {% comment %} ── 6. THE TIKI MUG ─────────────────────────────────────────────
-     Fixed, and honest about what the fix does not give her.
-  ────────────────────────────────────────────────────────────────────────{% endcomment %}
-  <section class="dsn-section">
-    <h2 class="dsn-h2">6. The tiki mug</h2>
-
-    <p class="dsn-note">
-      Redrawn, so it is now a line drawing like the other 24 and takes the same
-      stroke weight from the same one place in CSS. It is beside a coupe below
-      at the same height; they should read as one set.
-    </p>
-
-    <div class="dsn-tiki">
-      <figure class="dsn-tiki-fig">
-        <span class="dsn-tiki-glass">{% include icons/glasses/tiki-mug.svg %}</span>
-        <figcaption>tiki mug, redrawn</figcaption>
-      </figure>
-      <figure class="dsn-tiki-fig">
-        <span class="dsn-tiki-glass">{% include icons/glasses/coupe.svg %}</span>
-        <figcaption>coupe, for weight</figcaption>
-      </figure>
-      <figure class="dsn-tiki-fig">
-        <span class="dsn-tiki-glass dsn-tiki-glass--small">{% include icons/glasses/tiki-mug.svg %}</span>
-        <figcaption>at its real page size</figcaption>
-      </figure>
-    </div>
-
-    <p class="dsn-note dsn-note--aside">
-      <strong>What was wrong, and why filling it was only half a fix.</strong>
-      The old artwork had no lines in it at all: its source is fill-only —
-      one rule, <code>.a{fill:#231f20;}</code>, not a single stroke — so the
-      published icon was stroking the <em>outline of the ink</em>, which is the
-      hollow double line with gaps you saw. Filling it instead rendered
-      correctly but left the mug with no stroke width to control, reading about
-      2.8&times; heavier than every glass beside it and getting heavier as it
-      grew while theirs stayed put.
-    </p>
-
-    <p class="dsn-note dsn-note--aside">
-      <strong>The redraw.</strong> Twelve centrelines on the same viewBox, so
-      <code>heights_mm</code> and every relative-scale calculation on the site
-      are untouched. Kept plain on purpose: the third figure is the size it
-      actually ships at on a drink page (150&nbsp;mm of a 230&nbsp;mm tallest),
-      and the old mug's spiral, straw, banding and modelled cheeks were all
-      mush at that size. Rim, body, base, brow, eyes, nose, mouth, teeth. The
-      fill-only original is kept in <code>_design_sources/</code> as the record
-      and is skipped by the normalise script rather than deleted.
-    </p>
-  </section>
-
-  <section class="dsn-section">
-    <h2 class="dsn-h2">7. Still open</h2>
-    <p class="dsn-note">
-      All six are now GitHub issues (<a href="https://github.com/DeckOfPandas/helen-triages/issues/478">#478</a>–<a href="https://github.com/DeckOfPandas/helen-triages/issues/483">#483</a>),
-      raised 2026-08-26 — they are functionality questions rather than design
-      ones, and this page is not where they get answered. Kept here because the
-      design decisions above are what make each of them a live question.
-      <a href="https://github.com/DeckOfPandas/helen-triages/issues/484">#484</a>
-      is a seventh, found while wiring up the new glass drawings: it is not
-      from this list, and it is a possible defect rather than a decision.
-    </p>
-    <ul class="dsn-open">
-      <li><strong>Mood combination.</strong> Two moods selected — AND or OR? Food's answer may not be the right one here; "tiki AND no juicing" is nearly empty, "tiki OR no juicing" is half the book.</li>
-      <li><strong>Sort order.</strong> Alphabetical, by ship, or by how well a drink matches the filters. The chaos filter implies ship already matters.</li>
-      <li><strong>Does chaos filter, or sort?</strong> "Definitely good" as a hard filter hides drinks; as a sort it floats them. Different feelings.</li>
-      <li><strong>The empty state.</strong> "Nothing that good, sorry" is the current one, and it is good. Does it get a drawing?</li>
-      <li><strong>Print.</strong> A drink page in the "make it" state is what you would print. Worth confirming that is the printed form.</li>
-      <li><strong>The glass column on narrow screens.</strong> Treatment A crops harder as the card narrows; at phone width the card may need to stack.</li>
-    </ul>
   </section>
 
 </article>
@@ -796,57 +615,10 @@ drinks:
   margin: 0 auto;
 }
 
-.dsn-head { margin-bottom: 3rem; }
-.dsn-h1 { font-family: "Courier Prime", monospace; font-size: 1.9rem; margin: 0 0 0.6rem; }
-.dsn-h2 {
-  font-family: "Courier Prime", monospace;
-  font-size: 1.15rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin: 0 0 0.5rem;
-  padding-bottom: 0.4rem;
-  /* Amber, not green: this is STRUCTURE, and green is reserved for matching.
-     Part of Helen's "more of the second colour" — presence without a new
-     meaning, which is the only way to spend more of a colour without spending
-     another axis. */
-  border-bottom: 2px solid var(--dsn-accent2);
-}
-.dsn-h2-tag {
-  float: right;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  color: var(--dsn-grey);
-  padding-top: 0.3rem;
-}
 .dsn-section { margin-bottom: 4rem; }
-.dsn-note { font-size: 0.88rem; line-height: 1.6; color: var(--dsn-grey); margin: 0 0 1.2rem; }
-.dsn-note--aside {
-  border-left: 2px solid var(--dsn-line);
-  padding-left: 0.9rem;
-  margin-top: 1.4rem;
-  font-size: 0.83rem;
-}
 .dsn code { font-family: "Courier Prime", monospace; font-size: 0.85em; }
 
 /* --- 1. palette ---------------------------------------------------------- */
-.dsn-swatches { list-style: none; margin: 0; padding: 0; }
-.dsn-swatch {
-  display: grid;
-  grid-template-columns: 2.4rem 5.5rem 1fr;
-  gap: 0.9rem;
-  align-items: baseline;
-  padding: 0.55rem 0;
-  border-bottom: 1px solid var(--dsn-line);
-  font-size: 0.85rem;
-}
-.dsn-chip {
-  display: block;
-  width: 2.4rem; height: 1.5rem;
-  border: 1px solid rgba(0,0,0,0.12);
-  align-self: center;
-}
-.dsn-swatch-role { color: var(--dsn-grey); line-height: 1.5; }
-
 .dsn-field-label--pick { margin-top: 2rem; }
 .dsn-hues {
   display: grid;
@@ -876,16 +648,6 @@ drinks:
 }
 
 /* --- 2. type ------------------------------------------------------------- */
-.dsn-type-specimens { border-left: 2px solid var(--dsn-line); padding-left: 1.2rem; }
-.dsn-spec-title {
-  font-family: "Courier Prime", monospace;
-  font-size: 1.6rem; letter-spacing: 0.04em;
-  margin: 0 0 0.2rem; color: var(--dsn-ink);
-}
-.dsn-spec-tagline { font-style: italic; font-size: 1.05rem; color: var(--dsn-grey); margin: 1.4rem 0 0.2rem; }
-.dsn-spec-body { font-size: 0.95rem; line-height: 1.7; margin: 1.4rem 0 0.2rem; }
-
-/* --- 3. the index -------------------------------------------------------- */
 .dsn-frame {
   border: 1px solid var(--dsn-line);
   background: #fff;
@@ -957,23 +719,6 @@ drinks:
   border-style: dashed;
 }
 .dsn-btn--exclude:hover { color: var(--dsn-ink); border-color: var(--dsn-ink); }
-
-.dsn-fold {
-  border-top: 1px dashed #c9c9cc;
-  text-align: center;
-  margin: 2.2rem 0 1.6rem;
-  height: 0;
-}
-.dsn-fold span {
-  position: relative; top: -0.62rem;
-  background: #fff;
-  padding: 0 0.6rem;
-  font-family: "Courier Prime", monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #b4b4b8;
-}
 
 .dsn-index-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
 .dsn-input {
@@ -1166,32 +911,58 @@ drinks:
 /* TREATMENT A — pale wash, centred in its column. */
 .dsn-cards--wash { --dsn-text-x: 7.6rem; }
 /* 0.65, Helen's number, 2026-08-26 — up from 0.55. */
-.dsn-cards--wash .dsn-card-glass { align-items: center; color: var(--dsn-absinthe); opacity: 0.65; }
+/* 0.85, Helen, 2026-08-26 — 0.55, then 0.65, now here. */
+.dsn-cards--wash .dsn-card-glass { align-items: center; color: var(--dsn-absinthe); opacity: 0.85; }
 .dsn-cards--wash .dsn-card-glass .glass-icon-line { stroke-width: 1; }
 
 /* --- the size sliders ----------------------------------------------------- */
+/* THE CONTROLS ARE INSTRUMENTS, NOT DESIGN, and they are the last thing on the
+   page that is not a candidate for the real site — so they are deliberately
+   grey and quiet. Helen: "make those latter quiet and grey please."
+   Two reasons beyond taste. A control wearing an accent competes with the
+   thing it is adjusting, which is the one thing it must never do; and a grey
+   control is obviously scaffolding, so nothing here can be mistaken for a
+   decision that has been made. */
 .dsn-slider {
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  margin: 0 0 1rem;
+  margin: 0 0 0.55rem;
   font-family: "Courier Prime", monospace;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--dsn-grey);
+  letter-spacing: 0.09em;
+  color: #a2a2a7;
 }
-.dsn-slider input[type="range"] { width: 14rem; accent-color: var(--dsn-deep); }
-.dsn-slider output { color: var(--dsn-ink); min-width: 4rem; }
-.dsn-slider-hint { text-transform: none; letter-spacing: 0; font-family: inherit; font-size: 0.78rem; color: #9a9a9f; }
-.dsn-cheats { display: inline-flex; gap: 0.25rem; }
+.dsn-slider label { min-width: 8.5rem; }
+.dsn-slider input[type="range"] {
+  width: 12rem;
+  accent-color: #a2a2a7;   /* never an accent colour */
+  height: 1rem;
+}
+.dsn-slider output { color: #7d7d82; min-width: 4rem; }
+.dsn-slider-hint { text-transform: none; letter-spacing: 0; font-family: inherit; font-size: 0.74rem; color: #b6b6ba; }
+.dsn-cheats { display: inline-flex; gap: 0.2rem; }
 .dsn-btn--cheat {
   font-family: "Courier Prime", monospace;
-  font-size: 0.72rem;
-  padding: 0.2rem 0.5rem;
+  font-size: 0.68rem;
+  padding: 0.14rem 0.42rem;
   letter-spacing: 0.04em;
+  color: #8e8e93;
+  border-color: #e0e0e2;
+  border-width: 1px;
 }
-.dsn-btn--cheat.is-on { background: var(--dsn-accent2); border-color: var(--dsn-accent2-deep); color: #2a1c05; }
+.dsn-btn--cheat:hover { color: #4a4a4f; border-color: #b6b6ba; }
+.dsn-btn--cheat.is-on {
+  background: #ebebed;
+  border-color: #a2a2a7;
+  color: #35353a;
+}
+
+/* The last of the scaffolding: a hairline box round the two mocks so an index
+   and a drink page do not run into each other. Grey for the same reason the
+   controls are. */
+.dsn-controls { margin-bottom: 1.1rem; }
 
 /* --- 5. the drink page --------------------------------------------------- */
 .dsn-drink-toggle-row { display: flex; justify-content: flex-end; margin-bottom: 0.5rem; }
@@ -1274,27 +1045,6 @@ drinks:
    stroke over the fill, which meant an icon that had to know its own
    background and a weight that only matched the set at exactly one size.
    Real centrelines need neither. */
-.dsn-tiki { display: flex; gap: 2.5rem; align-items: flex-end; padding: 1.5rem 0; }
-.dsn-tiki-fig { margin: 0; text-align: center; }
-.dsn-tiki-glass { display: block; color: var(--dsn-ink); }
-.dsn-tiki-glass svg { display: block; height: 14rem; width: auto; overflow: visible; }
-/* 150mm of the 230mm tallest, on the real page's 2.6rem scale. The size the
-   drawing has to survive, shown next to the size it is being judged at. */
-.dsn-tiki-glass--small svg { height: 1.7rem; }
-.dsn-tiki-fig figcaption {
-  font-family: "Courier Prime", monospace;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--dsn-grey);
-  margin-top: 0.7rem;
-}
-
-/* --- 7. open ------------------------------------------------------------- */
-.dsn-open { font-size: 0.88rem; line-height: 1.65; padding-left: 1.1rem; }
-.dsn-open li { margin-bottom: 0.6rem; }
-.dsn-open strong { font-family: "Courier Prime", monospace; font-size: 0.86rem; }
-
 @media (max-width: 720px) {
   .dsn-index-secondary { grid-template-columns: 1fr; gap: 1.4rem; }
   .dsn-cards { grid-template-columns: 1fr; }
