@@ -68,6 +68,7 @@
 // document says it is. Since that rule is what makes the treatment reach EVERY
 // heading rather than a list of them, em wins on both counts: it does more and
 // it can't drift.
+
 // 1.6% of font-size, self-scaling. Tuned by Helen at /dev/emboss/ against
 // Courier Prime, having been 1.4% against Courier New.
 //
@@ -78,6 +79,7 @@
 // the value ended up above where it started. Recorded because the argument was
 // plausible, produced a number, and lost to somebody looking at the thing.
 $emboss-stroke: 0.016em;
+
 // The offset stays a WHOLE PIXEL rather than a computed proportion, unlike the
 // stroke, and the difference is deliberate: a fractional stroke width is already
 // normal here and antialiases harmlessly along a letterform's edge, but a
@@ -182,13 +184,21 @@ $emboss-vars-emitted: false !default;
   // context, not a component: it styles nothing itself, it only re-points the
   // six values every punched rule already reads.
   //
-  // NOTE FOR WHOEVER ADDS THE FIRST REAL ONE. As of 2026-08-24 the site has no
-  // dark section at all -- these numbers were tuned against a swatch on
-  // /dev/emboss/, which is the only consumer. They are a considered starting
-  // point, not a verified result, and the honest thing is to re-eyeball them
-  // against real content rather than trust them because they are written down.
-  // This is NOT dark mode, which is a separate and much larger question Helen has
-  // explicitly deferred.
+  // NOTE FOR WHOEVER ADDS THE FIRST REAL ONE, AND IT IS NOT GOOD NEWS. This
+  // class has NO CONSUMER ANYWHERE. It had exactly one -- a swatch on
+  // /dev/emboss/ -- and that went on 2026-08-26 when the heading dials were
+  // deleted from that page, so these numbers are now live CSS that nothing
+  // renders and nobody can see without re-adding a swatch. They were tuned
+  // against that swatch rather than against real content, so they were a
+  // considered starting point and not a verified result even while it existed.
+  //
+  // Kept rather than deleted because the reasoning above took a real
+  // conversation to reach and issue #469 tracks it. If you are reading this and
+  // there is still no dark section, deleting the whole block is a reasonable
+  // call -- the comment is the valuable part, and git keeps it.
+  //
+  // This is NOT dark mode, which is a separate and much larger question Helen
+  // has explicitly deferred.
   .on-dark {
     --emboss-stroke-w:  0.010em;
     --emboss-stroke-c:  #{lighten($color-text, 40%)};

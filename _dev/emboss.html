@@ -6,27 +6,30 @@ sitemap: false
 ---
 
 {% comment %} ─────────────────────────────────────────────────────────────────
-  EMBOSS TUNING — a served page, not a mock.
+  THE TAPE WORDMARK'S BEVEL — issue #470. Local only (_dev/, output: false).
 
-  The difference matters and is why tmp/type-playground.html was retired for
-  this job. That page reproduced the treatment by hand, and got it wrong in a
-  way that misled Helen for a whole exchange: it applied the STROKE only, with
-  no shadow, so Courier Prime looked flat and the fault looked like the font's.
-  The emboss is stroke AND a two-copy directional shadow, and a reproduction is
-  a second thing to keep in step with the first.
+  THIS TUNES THE REAL ELEMENT. .site-logo-word lives in the shared header, which
+  this page renders like any other, so the dials override the live wordmark at
+  the top of this page rather than a copy of it. That is the whole design of
+  this page and the reason it is worth having: its predecessor, a standalone
+  file in tmp/, REPRODUCED the treatment by hand and got it wrong -- stroke with
+  no shadow -- so Courier Prime looked flat and the fault looked like the
+  font's. A reproduction is a second thing to keep in step with the first.
 
-  So this page carries no styling of its own for the effect. The headings below
-  are ordinary h1/h2/h3, which pick up shared/_base.scss's real rule through
-  the real cascade with the real fonts loaded. What the dials do is INJECT AN
-  OVERRIDE into #tune-sheet — so what you are looking at is the site's own
-  treatment with different numbers in it, not an imitation of it.
+  THE HEADING DIALS USED TO BE HERE TOO and were deleted on 2026-08-26, at
+  Helen's ask: with both panels stacked she could not get the wordmark and its
+  own controls on screen together, which for a look-at-it page is the only thing
+  that matters. Recover them from git history if the smaller type levels ever
+  want tuning; the heading emboss values themselves are settled and live in
+  _sass/shared/_rule.scss.
 
-  Lives in _dev/ for the reason issue #276 exists: `output: false` in
-  production, so this has no URL and no sitemap entry on the deployed site.
-  Local only, at /dev/emboss/.
+  WHAT THIS IS NOT. A light copy offset up-and-left reads as a highlight only on
+  DARK type over a LIGHT ground. This is light type on black tape, where the
+  constraint inverts: there is no headroom above pure white, so the fill is
+  pulled DOWN to #e7e2e3 to make room for a brighter copy above it. That is why
+  it has four copies and its own numbers, and why shared/_layout.scss says not
+  to "fix" it with @include punched(). See HANDOVER §13.4.1.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
-
-<style id="tune-sheet"></style>
 
 <style>
   /* Chrome for the dials only. Nothing here touches the specimens. */
@@ -47,109 +50,94 @@ sitemap: false
     font-family: "Courier Prime", monospace; font-size: 0.72rem;
     white-space: pre; overflow-x: auto;
   }
-  .tune-swatch { padding: 1.5rem 0; border-top: 1px dashed #ebdbe0; }
-  .tune-swatch--dark { background: #211f20; padding: 1.5rem; }
-  .tune-swatch--dark h2 { color: #e7e2e3; }
   .tune-note { font-family: "Selawik", sans-serif; font-size: 0.85rem; color: #5a5558; }
 </style>
 
+
+<style id="wordmark-sheet"></style>
+
+
+
 <div class="tune-panel">
   <div class="tune-dial">
-    <label>stroke <b id="v-stroke"></b></label>
-    <input type="range" id="d-stroke" min="0" max="0.03" step="0.001" value="0.010">
+    <label>wordmark fill <b id="v-fill"></b></label>
+    <input type="range" id="d-fill" min="70" max="100" step="1" value="91">
   </div>
   <div class="tune-dial">
-    <label>offset, display sizes <b id="v-big"></b></label>
-    <input type="range" id="d-big" min="0" max="5" step="1" value="2">
+    <label>tight offset <b id="v-tight"></b></label>
+    <input type="range" id="d-tight" min="0" max="2" step="0.1" value="0.6">
   </div>
   <div class="tune-dial">
-    <label>offset, small type <b id="v-small"></b></label>
-    <input type="range" id="d-small" min="0" max="4" step="1" value="1">
+    <label>wide offset <b id="v-wide"></b></label>
+    <input type="range" id="d-wide" min="0" max="4" step="0.1" value="2.2">
   </div>
   <div class="tune-dial">
-    <label>shadow darkness <b id="v-dark"></b></label>
-    <input type="range" id="d-dark" min="0" max="0.8" step="0.02" value="0.38">
+    <label>wide highlight <b id="v-wlight"></b></label>
+    <input type="range" id="d-wlight" min="0" max="1" step="0.05" value="0.55">
   </div>
   <div class="tune-dial">
-    <label>stroke lightness <b id="v-light"></b></label>
-    <input type="range" id="d-light" min="0" max="60" step="2" value="20">
+    <label>tight shadow <b id="v-tdark"></b></label>
+    <input type="range" id="d-tdark" min="0" max="1" step="0.05" value="0.9">
   </div>
-  <pre class="tune-out" id="out"></pre>
+  <div class="tune-dial">
+    <label>wide shadow <b id="v-wdark"></b></label>
+    <input type="range" id="d-wdark" min="0" max="1" step="0.05" value="0.45">
+  </div>
+  <pre class="tune-out" id="out-wordmark"></pre>
 </div>
 
-<p class="tune-note">Real h1/h2/h3, real stylesheet, real Courier Prime. The dials
-override <code>-webkit-text-stroke</code> and <code>text-shadow</code> in place —
-they are not reproducing the effect, they are re-numbering it. Shipped values are
-the starting positions.</p>
-
-<h1>Beetroot Chocolate Cake</h1>
-<div class="tune-swatch">
-  <h2>Ingredients</h2>
-  <h3>For the topping</h3>
-</div>
-
-<div class="tune-swatch tune-swatch--dark on-dark">
-  <h2>Light type on dark</h2>
-  <p class="tune-note" style="color:#9a9496">This block carries
-  <code>.on-dark</code>, and is currently the ONLY thing on the site that does —
-  there is no dark section anywhere in food, shared or cocktails. So this is a
-  demo, not a preview of a real page. The class re-points the six emboss custom
-  properties, so every punched rule inside it inverts with no per-selector
-  overrides. Note the dials above still drive the LIGHT-ground values, so this
-  swatch shows the committed <code>.on-dark</code> numbers rather than following
-  the sliders. Not to be confused with <code>.site-logo-word</code>, which is
-  light-on-dark too but is a permanent exception with its own four-copy bevel.</p>
-</div>
+<p class="tune-note"><strong>The wordmark is at the top of this page.</strong>
+Scroll up to watch it. Starting positions are the shipped values, tuned against
+Courier New in the issue #122 pass; the face underneath them is Courier Prime
+now, whose stems are heavier and counters tighter.</p>
 
 <script>
 (function () {
-  var sheet = document.getElementById('tune-sheet');
-  var out   = document.getElementById('out');
-  var dials = ['stroke', 'big', 'small', 'dark', 'light'];
-  var el = {};
-  dials.forEach(function (k) {
+  var sheet = document.getElementById('wordmark-sheet');
+  var out   = document.getElementById('out-wordmark');
+  var ids   = ['fill', 'tight', 'wide', 'wlight', 'tdark', 'wdark'];
+  var el    = {};
+  ids.forEach(function (k) {
     el[k] = document.getElementById('d-' + k);
-    el[k].addEventListener('input', apply);
+    if (el[k]) el[k].addEventListener('input', apply);
   });
-
-  /* $color-label-stroke is lighten($color-text, N%) in Sass. Reproducing that
-     in JS would be a second definition to keep in step, so this walks the same
-     HSL lightness the Sass function does, from the same #211f20. */
-  function strokeColour(pct) {
-    return 'hsl(330 3% ' + (12.5 + Number(pct)) + '%)';
-  }
+  if (!el.fill) return;
 
   function apply() {
-    var stroke = Number(el.stroke.value).toFixed(3);
-    var big    = el.big.value, small = el.small.value;
-    var dark   = Number(el.dark.value).toFixed(2);
-    var light  = el.light.value;
-    var col    = strokeColour(light);
-    var shadow = function (o) {
-      return '-' + o + 'px -' + o + 'px 0 #faf7f8, ' +
-             o + 'px ' + o + 'px 0 rgba(33,31,32,' + dark + ')';
-    };
+    var fillPct = Number(el.fill.value);
+    var fill    = 'hsl(340 6% ' + fillPct + '%)';
+    var t       = Number(el.tight.value).toFixed(1);
+    var w       = Number(el.wide.value).toFixed(1);
+    var wl      = Number(el.wlight.value).toFixed(2);
+    var td      = Number(el.tdark.value).toFixed(2);
+    var wd      = Number(el.wdark.value).toFixed(2);
+
+    var shadow =
+      '-' + t + 'px -' + t + 'px 0 #fdfbfe, ' +
+      '-' + w + 'px -' + w + 'px 0 rgba(253,251,254,' + wl + '), ' +
+      t + 'px ' + t + 'px 0 rgba(5,5,5,' + td + '), ' +
+      w + 'px ' + w + 'px 0 rgba(5,5,5,' + wd + ')';
 
     sheet.textContent =
-      'h1,h2,h3{-webkit-text-stroke:' + stroke + 'em ' + col + ';}' +
-      'h1{text-shadow:' + shadow(big) + ';}' +
-      'h2,h3{text-shadow:' + shadow(small) + ';}';
+      '.site-logo-word{color:' + fill + ';text-shadow:' + shadow + ';}';
 
-    ['stroke','big','small','dark','light'].forEach(function (k, i) {
-      document.getElementById('v-' + k).textContent =
-        [stroke + 'em', big + 'px', small + 'px', dark, light + '%'][i];
-    });
+    document.getElementById('v-fill').textContent   = fillPct + '%';
+    document.getElementById('v-tight').textContent  = t + 'px';
+    document.getElementById('v-wide').textContent   = w + 'px';
+    document.getElementById('v-wlight').textContent = wl;
+    document.getElementById('v-tdark').textContent  = td;
+    document.getElementById('v-wdark').textContent  = wd;
 
     out.textContent =
-      '// _sass/shared/_rule.scss\n' +
-      '$emboss-stroke:       ' + stroke + 'em;\n' +
-      '$emboss-offset:       ' + small + 'px;\n' +
-      '$emboss-offset-large: ' + big + 'px;\n' +
-      '$color-emboss-shadow: rgba($color-text, ' + dark + ');\n' +
-      '// _sass/food/_palette.scss\n' +
-      '$color-label-stroke:  lighten($color-text, ' + light + '%);';
+      '// _sass/shared/_layout.scss, .site-logo-word\n' +
+      'color: ' + fill + ';\n' +
+      'text-shadow: -' + t + 'px -' + t + 'px 0 #fdfbfe,\n' +
+      '             -' + w + 'px -' + w + 'px 0 rgba(253, 251, 254, ' + wl + '),\n' +
+      '              ' + t + 'px  ' + t + 'px 0 rgba(5, 5, 5, ' + td + '),\n' +
+      '              ' + w + 'px  ' + w + 'px 0 rgba(5, 5, 5, ' + wd + ');';
   }
 
+  document.fonts.ready.then(apply);
   apply();
 })();
 </script>

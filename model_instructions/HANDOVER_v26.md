@@ -1872,11 +1872,12 @@ rediscovered from scratch later.
 the three ways originally floated.** `old-fashioned.svg`, `rocks.svg`,
 `rocks-tall.svg` and the old `old-fashioned-double.svg` all got replaced by
 one fresh redraw; `rocks` is now a plain alias to `old-fashioned` rather than
-its own drawing. The double variant is being redrawn to match; until then
-`double rocks`/`double old fashioned` are deliberately unmapped (3 drinks —
-Fancy-Free, Vieux Carré, Ti Punch — render with no glass icon, verified
-against a build). Full story is in `glasses.yml`'s own retirement note —
-treat that file as more current than this paragraph if they disagree.
+its own drawing. The double variant followed on 2026-08-26 —
+`old-fashioned-double.svg` redrawn as the same body, uniformly scaled up —
+and `double rocks`/`double old fashioned`/`double old-fashioned` are mapped
+to it now, so Fancy-Free, Vieux Carré and Ti Punch render an icon again
+(verified against a build). Full story is in `glasses.yml`'s own retirement
+note — treat that file as more current than this paragraph if they disagree.
 
 **A root `<svg>` element defaults to `overflow: hidden` in every browser's
 own UA stylesheet — not a CSS property default, a default for that specific
@@ -1891,6 +1892,33 @@ scale/card rules). Worth remembering generally: an inline `<svg>` clips its
 own content by default, the same way `overflow: hidden` on any other element
 would, and it is not obvious from reading the SVG or the surrounding layout
 CSS that this is happening — only from a stroke that touches the edge.
+
+**Helen's raw Inkscape sources are backed up in git now, at
+`_design_sources/cocktails/glasses/`, committed as-is.** Before this they only
+existed in `tmp/inbox-cocktail-glasses/`, which is gitignored — every
+normalised production icon was tracked, but the drawings behind them had no
+backup at all. Underscore-prefixed on purpose, the same reason `_includes`/
+`_data`/`_sass` are excluded from the build by default; it is not `assets/`
+because that directory IS copied into `_site/`, and a folder of un-served
+Inkscape XML with full editor metadata has no business in the deployed site.
+Nothing reads this directory and nothing should point a template at a file in
+it — nor is it kept in sync automatically: when a drawing here gets adopted,
+normalising it into `_includes/icons/glasses/` is still a manual step. It also
+holds superseded options and rejects (old candidate old-fashioneds, the
+pre-fix collins/coupe), not the current state of any one glass — that's what
+`glasses.yml` is for.
+
+**Two of the "genuinely differ" stemmed glasses got redrawn anyway, 2026-08-26,
+despite the proportion PASS staying parked.** Goblet and nick-and-nora both
+have new bowl proportions from Helen — goblet narrower and shorter
+(viewBox 68.5×90.5 → 54.4×82.2), nick-and-nora wider (37.3×91.0 → 44.9×90.7).
+This is not #299 reopening: it's Helen fixing individual drawings she wasn't
+happy with, same as the old-fashioned/collins/coupe redraws earlier in this
+same arc, and #299's own systematic "make every stem/base consistent" pass is
+still exactly as parked as the paragraph above says. Worth noting because
+goblet was one of the two examples that paragraph names — if a proportion
+complaint about goblet specifically resurfaces, check whether this redraw
+already addressed it before assuming #299 needs unparking.
 
 ## 10. Validation — run `pytest`, don't read this
 
@@ -3294,6 +3322,13 @@ The fix pulled the fill off pure white to `#e7e2e3` so a brighter copy has
 somewhere to exist, and split one shadow pair into two so the letter gets both
 a cut line and a glow.
 
+**Re-tuned 2026-08-26 for Courier Prime (issue #470).** The mechanism is
+unchanged — still four copies, still a fill below white — but every number moved:
+fill `#ECE9EA`, offsets `1.0px` / `1.8px`, outer highlight `0.75`. The two copies
+came *towards* each other, the gap narrowing from 1.6px to 0.8px, so the bevel is
+tighter and better defined rather than spread. A heavier letterform has more ink
+of its own for the copies to sit against.
+
 Applying `$emboss-stroke` or `punched()` here would undo that. Its sibling
 `.site-logo-top` (HELEN TRIAGES) is a normal consumer and *was* brought onto
 the ratios on 2026-08-12; the two halves of the lockup have always been
@@ -3777,7 +3812,8 @@ pick, so it's recorded here instead:**
   you know, accurate" — B's flat fill plus stepped shadow read more
   dynamic than the more literally physical combined version.
 - Higher-contrast pulls of B's fill (`#a8a2a3`, `#8a8384`, pulling further
-  from white than the shipped `#e7e2e3`) — more headroom for the highlight,
+  from white than the then-shipped `#e7e2e3`; the fill is `#ECE9EA` since
+  #470, one step lighter again) — more headroom for the highlight,
   in principle more "accurate", but rejected in a direct side-by-side: the
   lighter, less contrasty version was the one that actually read as raised.
 
@@ -3920,16 +3956,30 @@ and would have missed the fourteenth. **Both `shared/_rule.scss` and
 `food/_timings.scss` imports them again — free while they were pure definition
 files, not free once they emitted CSS.
 
-**Nothing on the site uses `.on-dark` yet.** `/dev/emboss/` is its only consumer.
-Those numbers are a considered starting point, not a verified result. This is
+**Nothing on the site uses `.on-dark` at all.** It had one consumer, a swatch on
+`/dev/emboss/`, and that went when the heading dials did on 2026-08-26 — so the
+class is now live CSS with no user anywhere, and its numbers cannot be seen
+without re-adding a swatch. They were a considered starting point rather than a
+verified result even then. Kept rather than deleted because the reasoning behind
+it took a real conversation to reach and issue #469 tracks it; delete it instead
+if a dark section still has not appeared by the time anyone reads this. This is
 *not* dark mode, which Helen has explicitly deferred.
 
 #### 13.10.3 `/dev/emboss/` — tune here, not in a mock
 
-Local only (`_dev/`, `output: false` in production). The specimens are ordinary
-`h1/h2/h3` picking up the real cascade; the dials **inject an override** rather
-than reproducing the effect, and the panel writes the settled values out as real
-SCSS with the actual variable names.
+Local only (`_dev/`, `output: false` in production). **It tunes the tape
+wordmark now, not the headings** — `.site-logo-word` lives in the shared header,
+which this page renders like any other, so the dials override the live element at
+the top of the page rather than a copy of it. The panel writes the settled values
+out as real SCSS.
+
+The heading dials were here too until 2026-08-26 and were deleted at Helen's ask:
+with both panels stacked she could not get the wordmark and its own controls on
+screen together, which for a look-at-it page is the only thing that matters.
+Recover them from git history if the smaller type levels ever want tuning — the
+heading emboss values themselves are settled, in `_sass/shared/_rule.scss`.
+
+Deleting them also took `.on-dark`'s only consumer with it; see §13.10.2.
 
 That distinction is load-bearing. Its predecessor, a standalone file in `tmp/`,
 reproduced the treatment by hand and applied the **stroke only, with no shadow** —
