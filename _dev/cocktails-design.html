@@ -21,6 +21,13 @@ sitemap: false
 # Glasses chosen to span the height range on purpose — old-fashioned is 85mm and
 # hurricane is 200mm, so the card treatment below is being judged against the
 # real spread rather than a flattering slice of it.
+#
+# AND THE `ship` VALUES SPAN THE WHOLE SCALE for the same reason, which is why
+# the Hurricane is `meh` and the Bee's Knees is `not really` — no comment on
+# either drink, they are placeholders like everything else here. Before this,
+# the eight drinks between them used three of the five rungs, so the goodness
+# tint could only be judged over the top half of its own range. A control
+# surface that cannot show its own extremes is not showing you the decision.
 # =============================================================================
 # =============================================================================
 # PER-GLASS DISPLAY TWEAKS — the cheat, kept visible and kept in data.
@@ -47,7 +54,36 @@ sitemap: false
 # both mechanisms are visible side by side.
 glass_tweaks:
   collins: 0.82
-  hurricane: 0.82
+  hurricane: 0.74
+
+# =============================================================================
+# THE GOODNESS SCALE, as tint percentages of the second accent.
+# =============================================================================
+# `ship_scale` in _data/cocktails/taxonomy.yml has five rungs, low to high:
+# not really / meh / sure / yes / oh gods yes. Helen, 2026-08-26: the top two
+# are BOTH full colour and `not really` is white.
+#
+# So this is not a linear ramp over five points, and it should not be made into
+# one. The scale is lopsided because her verdicts are: `yes` and `oh gods yes`
+# both mean "make this", and the difference between them is enthusiasm rather
+# than decision. Flattening that into 100/75/50/25/0 would invent a distinction
+# the data does not carry.
+#
+# `who knows` is NOT on the scale -- taxonomy.yml says so outright, it means "I
+# have no idea", an absence of verdict rather than a low one -- so it draws the
+# same empty mark as `not really` and is told apart by its label. That is also
+# why the mark keeps its border at every tint: an empty square still reads as a
+# rating given, where a vanished square would read as data missing.
+#
+# WHEN THIS SHIPS IT BELONGS IN taxonomy.yml, beside `ship_scale`. The scale and
+# how it is drawn are one decision and should not end up in two files.
+ship_tints:
+  "not really": 0
+  "meh": 30
+  "sure": 62
+  "yes": 100
+  "oh gods yes": 100
+  "who knows": 0
 
 drinks:
   - title: "Julien Sorel"
@@ -73,7 +109,7 @@ drinks:
     glass: nick-and-nora
     tagline: "Floral, sharp, and faintly violet."
     moods: ["short and sharp", "clear"]
-    ship: "yes"
+    ship: "sure"
     items: ["gin", "maraschino", "crème de violette", "lemon"]
   - title: "Jungle Bird"
     glass: old-fashioned
@@ -92,13 +128,13 @@ drinks:
     glass: hurricane
     tagline: "Passion fruit and a frankly unreasonable amount of rum."
     moods: ["fruity", "tiki"]
-    ship: "sure"
+    ship: "meh"
     items: ["dark rum", "white rum", "passion fruit", "lemon", "grenadine"]
   - title: "Bee's Knees"
     glass: coupe
     tagline: "Gin, honey, lemon. Three things."
     moods: ["short and sharp"]
-    ship: "sure"
+    ship: "not really"
     items: ["gin", "honey syrup", "lemon"]
 ---
 
@@ -172,6 +208,9 @@ drinks:
   menthe under tritanopia (slate blue 5.6, ink teal 6.3) or against amber
   (aubergine 12.9). See tmp/cvd.py for the method.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+{% assign ship_tints = page.ship_tints %}
+{% assign active_mood = "no juicing" %}
 
 {% assign heights = site.data.cocktails.glasses.heights_mm %}
 {% assign all_icons = site.data.cocktails.glasses.all_icons %}
@@ -419,9 +458,9 @@ drinks:
 
     <div class="dsn-slider">
       <label for="dsn-scale-a">glass size</label>
-      <input type="range" id="dsn-scale-a" min="5" max="22" step="0.5" value="14"
+      <input type="range" id="dsn-scale-a" min="5" max="22" step="0.5" value="13"
              data-target="dsn-cards-a" />
-      <output id="dsn-scale-a-out">14rem</output>
+      <output id="dsn-scale-a-out">13rem</output>
       <span class="dsn-slider-hint">tallest glass; the rest scale off it</span>
     </div>
 
@@ -447,20 +486,29 @@ drinks:
        steps rather than a slider, because this is a value that has to be
        WRITTEN DOWN in glasses.yml at the end, and a slider invites landing on
        0.6743. Each button is a candidate you could commit. {% endcomment %}
+    {% comment %} The numeric options did their job and Helen picked: collins
+       0.82, hurricane 0.74, in the front matter. What is left is on/off, so
+       the cheat can still be SEEN rather than only trusted. {% endcomment %}
     <div class="dsn-slider">
-      <label>collins &amp; hurricane</label>
+      <label>per-glass cheat</label>
       <span class="dsn-cheats" id="dsn-cheats">
-        <button type="button" class="dsn-btn dsn-btn--cheat" data-cheat="1">off</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat is-on" data-cheat="0.82">0.82</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat" data-cheat="0.74">0.74</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat" data-cheat="0.66">0.66</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat" data-cheat="0.58">0.58</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat" data-cheat="0.50">0.50</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat is-on" data-cheat="on">on</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-cheat="off">off</button>
       </span>
-      <span class="dsn-slider-hint">at 14rem: 0.82 &rarr; 10.0rem tall, 0.50 &rarr; 6.1rem</span>
+      <span class="dsn-slider-hint">collins 0.82 &middot; hurricane 0.74</span>
     </div>
 
-    <ul class="dsn-cards dsn-cards--wash" id="dsn-cards-a" style="--dsn-glass-scale: 14rem;">
+    <div class="dsn-slider">
+      <label>card frame</label>
+      <span class="dsn-cheats" id="dsn-frames">
+        <button type="button" class="dsn-btn dsn-btn--cheat is-on" data-frame="hairline">hairline</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="menthe">soft menthe</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="edge">menthe edge</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="paper">tinted paper</button>
+      </span>
+    </div>
+
+    <ul class="dsn-cards dsn-cards--wash dsn-cards--frame-hairline" id="dsn-cards-a" style="--dsn-glass-scale: 13rem;">
       {% for drink in page.drinks %}
         {% comment %} The card carries the RATIO, not a finished height, so one
            slider can rescale all eight without the template being rebuilt —
@@ -483,9 +531,24 @@ drinks:
           </div>
           <div class="dsn-card-foot">
             <span class="dsn-card-moods">
-              {% for m in drink.moods %}<span class="dsn-mood-chip">{{ m }}</span>{% endfor %}
+              {% comment %} A chip matching the active mood filter lights up, the
+                 same way a searched-for ingredient does in the line above —
+                 but in GREEN, because the mood filter is green and the
+                 ingredient field is violet. The card is answering "why is this
+                 here", and it should answer in the colour of whichever control
+                 put it here. {% endcomment %}
+              {% for m in drink.moods %}<span class="dsn-mood-chip{% if m == active_mood %} is-match{% endif %}">{{ m }}</span>{% endfor %}
             </span>
-            <span class="dsn-ship {% if drink.ship == 'oh gods yes' or drink.ship == 'yes' %}dsn-ship--good{% endif %}">{{ drink.ship }}</span>
+            {% comment %} The goodness mark is a TINT along the ship scale, not
+               a binary good/not — Helen, 2026-08-26. Full at the top two, white
+               at the bottom. The border never changes, so the mark is always
+               present and only its fill carries the verdict; a mark that
+               disappeared entirely would read as missing data rather than as a
+               low score, and `who knows` (which is genuinely absent data, not a
+               low rung — taxonomy.yml is explicit) needs to stay tellable from
+               `not really`. {% endcomment %}
+            {% assign tint = ship_tints[drink.ship] | default: "0" %}
+            <span class="dsn-ship" style="--dsn-ship-tint: {{ tint }}%;">{{ drink.ship }}</span>
           </div>
         </li>
       {% endfor %}
@@ -520,7 +583,7 @@ drinks:
           <span class="dsn-drink-glass">
             {% include icons/glasses/coupe.svg %}
           </span>
-          <div>
+          <div class="dsn-drink-words">
             <h3 class="dsn-drink-title">Julien Sorel</h3>
             <p class="dsn-drink-tagline dsn-editorial-only">A sharp, herbal cognac sour — the absinthe does the work a garnish usually does.</p>
             <ul class="dsn-drink-meta">
@@ -785,11 +848,27 @@ drinks:
 .dsn-card {
   position: relative;
   height: 11.25rem;
-  border: 1px solid var(--dsn-line);
-  background: #fff;
+  border: 1px solid var(--dsn-frame-c, var(--dsn-line));
+  border-left-width: var(--dsn-frame-l, 1px);
+  border-left-color: var(--dsn-frame-lc, var(--dsn-frame-c, var(--dsn-line)));
+  background: var(--dsn-card-bg, #fff);
   overflow: hidden;
   padding: 1.05rem 1.15rem 1.05rem var(--dsn-text-x);
 }
+
+/* FOUR WAYS TO FRAME A CARD, because Helen asked what I thought and the honest
+   answer is worth less than four minutes of looking.
+   My reading, for what it is worth: a soft menthe outline on EVERY card spends
+   the matching colour on something that does not match anything, and green
+   already means "this is what you asked for" in three other places on the
+   page. The edge rule keeps the colour but spends it on one small mark instead
+   of a whole perimeter; the tinted paper gives the framing with no colour at
+   all. But this is exactly the kind of call that argument loses and looking
+   wins, so all four are here. */
+.dsn-cards--frame-hairline { --dsn-frame-c: var(--dsn-line); }
+.dsn-cards--frame-menthe   { --dsn-frame-c: color-mix(in srgb, var(--dsn-absinthe) 45%, #ffffff); }
+.dsn-cards--frame-edge     { --dsn-frame-c: var(--dsn-line); --dsn-frame-l: 3px; --dsn-frame-lc: var(--dsn-absinthe); }
+.dsn-cards--frame-paper    { --dsn-frame-c: transparent; --dsn-card-bg: color-mix(in srgb, var(--dsn-absinthe) 7%, #ffffff); }
 .dsn-card-body { min-width: 0; }
 .dsn-card-name {
   font-family: "Courier Prime", monospace;
@@ -851,6 +930,18 @@ drinks:
   padding: 0.12rem 0.45rem;
   flex: none;
 }
+/* A chip matching the active mood filter fills, the same treatment the matched
+   ingredient gets in the line above — but GREEN, because the mood filter is
+   green and the ingredient field is violet. The card is answering "why am I
+   here", and it should answer in the colour of the control that put it there. */
+.dsn-mood-chip.is-match {
+  background: var(--dsn-absinthe);
+  border-color: var(--dsn-deep);
+  color: #0d2118;
+  font-weight: 600;
+}
+/* The label stays one quiet grey at every rung. The SQUARE carries the scale —
+   two things both encoding the rating would just be louder, not clearer. */
 .dsn-ship {
   font-family: "Courier Prime", monospace;
   font-size: 0.68rem;
@@ -866,22 +957,19 @@ drinks:
    to be findable without reading moved from card to card. After the text it
    sits against the card's right padding edge, which is fixed — the same
    argument as the pinned foot, applied one level down. */
+/* The goodness square wears the SECOND accent, tinted along the ship scale:
+   full at `yes` and `oh gods yes`, paper-white at `not really`.
+   THE BORDER DOES NOT CHANGE. An empty square still says "rated, and rated
+   low"; a square that faded away entirely would say "no rating", which is a
+   different fact and one the scale already has a value for. */
 .dsn-ship::after {
   content: "";
   display: inline-block;
   width: 0.5rem; height: 0.5rem;
-  border: 1.5px solid var(--dsn-grey);
+  background: color-mix(in srgb, var(--dsn-accent2) var(--dsn-ship-tint, 0%), #ffffff);
+  border: 1.5px solid var(--dsn-accent2-deep);
   margin-left: 0.4rem;
   vertical-align: 0.01rem;
-}
-/* The goodness square wears the SECOND accent, which is the whole point of
-   there being one: matching is green, being good is not. --dsn-accent2 falls
-   back to the green pair, so "none" in the picker is a real palette rather
-   than a broken one. */
-.dsn-ship--good { color: var(--dsn-accent2-deep, var(--dsn-deep)); }
-.dsn-ship--good::after {
-  background: var(--dsn-accent2, var(--dsn-absinthe));
-  border-color: var(--dsn-accent2-deep, var(--dsn-deep));
 }
 
 /* The glass column. Its width IS --dsn-text-x, so the drawing can never push
@@ -976,68 +1064,107 @@ drinks:
 }
 .dsn-btn--toggle.is-on { background: var(--dsn-absinthe); color: #16210a; }
 
-.dsn-drink-head { display: flex; gap: 1.6rem; align-items: flex-end; margin-bottom: 2.2rem; }
-.dsn-drink-glass { flex: none; color: var(--dsn-ink); }
-.dsn-drink-glass svg { display: block; height: 7rem; width: auto; overflow: visible; transition: height 0.18s ease; }
-.dsn-drink-title { font-family: "Courier Prime", monospace; font-size: 1.9rem; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 0.4rem; }
-.dsn-drink-tagline { font-style: italic; font-size: 1.02rem; color: var(--dsn-grey); margin: 0 0 0.8rem; }
-.dsn-drink-meta { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.6rem; font-size: 0.82rem; }
+/* THE HEAD IS A TWO-COLUMN BLOCK, glass and words, and the two are tied
+   together by height rather than by a number. `align-items: stretch` plus a
+   percentage height on the svg means the drawing is exactly as tall as
+   whatever the text column happens to be — which is what makes the make-it
+   state work without a second magic number. */
+.dsn-drink-head {
+  display: flex;
+  gap: 1.7rem;
+  align-items: stretch;
+  margin-bottom: 2.4rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 2px solid var(--dsn-accent2);
+}
+.dsn-drink-glass { flex: none; color: var(--dsn-ink); display: flex; align-items: flex-end; }
+.dsn-drink-glass svg { display: block; height: 8.5rem; width: auto; overflow: visible; }
+.dsn-drink-words { display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; }
+.dsn-drink-title {
+  font-family: "Courier Prime", monospace;
+  font-size: 2.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  margin: 0 0 0.5rem;
+}
+.dsn-drink-tagline { font-style: italic; font-size: 1.05rem; line-height: 1.5; color: var(--dsn-grey); margin: 0 0 0.9rem; max-width: 34ch; }
+.dsn-drink-meta { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.8rem; font-size: 0.86rem; }
 .dsn-drink-meta span {
   font-family: "Courier Prime", monospace;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 0.7rem;
-  color: var(--dsn-grey);
-  margin-right: 0.4rem;
+  font-size: 0.66rem;
+  color: #9a9a9f;
+  display: block;
+  margin-bottom: 0.1rem;
 }
 .dsn-drink-heading {
   font-family: "Courier Prime", monospace;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   color: var(--dsn-grey);
-  margin: 2rem 0 0.6rem;
-  padding-bottom: 0.35rem;
+  margin: 2.4rem 0 0.9rem;
+  padding-bottom: 0.4rem;
   border-bottom: 1px solid var(--dsn-line);
 }
 .dsn-ing { list-style: none; margin: 0; padding: 0; }
-.dsn-ing-row { padding: 0.7rem 0; border-bottom: 1px solid var(--dsn-line); }
+.dsn-ing-row { padding: 0.75rem 0; border-bottom: 1px solid var(--dsn-line); }
 .dsn-ing-row:last-child { border-bottom: none; }
-.dsn-ing-top { display: flex; gap: 0.9rem; align-items: baseline; }
+.dsn-ing-top { display: flex; gap: 1rem; align-items: baseline; }
+/* The amount is the one thing on this page you read across a room, and it is
+   the only place the mono face earns its keep on a drink page. */
 .dsn-amount {
   font-family: "Courier Prime", monospace;
   font-size: 0.95rem;
-  min-width: 5rem;
+  min-width: 5.4rem;
+  flex: none;
   color: var(--dsn-ink);
-  transition: font-size 0.18s ease;
+  font-variant-numeric: tabular-nums;
 }
-.dsn-item { font-size: 0.98rem; }
-.dsn-ing-class { font-size: 0.82rem; color: var(--dsn-grey); margin: 0.25rem 0 0 5.9rem; }
-.dsn-character { color: #8d8d92; }
-.dsn-ing-note { font-size: 0.82rem; color: var(--dsn-grey); font-style: italic; margin: 0.2rem 0 0 5.9rem; }
-.dsn-method { margin: 0; padding-left: 1.3rem; font-size: 0.95rem; line-height: 1.75; }
-.dsn-method li { margin-bottom: 0.3rem; }
-.dsn-notes { border-left: 2px solid var(--dsn-absinthe); padding-left: 1rem; }
+.dsn-item { font-size: 1rem; }
+/* The class line and the note both hang under the item, indented past the
+   amount column so the amounts stay a clean edge you can run your eye down. */
+.dsn-ing-class { font-size: 0.84rem; color: var(--dsn-grey); margin: 0.3rem 0 0 6.4rem; }
+.dsn-character { color: #9a9a9f; }
+.dsn-ing-note { font-size: 0.84rem; color: var(--dsn-grey); font-style: italic; margin: 0.25rem 0 0 6.4rem; line-height: 1.55; }
+.dsn-method { margin: 0; padding-left: 1.4rem; font-size: 0.97rem; line-height: 1.8; }
+.dsn-method li { margin-bottom: 0.45rem; padding-left: 0.3rem; }
+.dsn-method li::marker { font-family: "Courier Prime", monospace; color: var(--dsn-accent2-deep); }
+/* Amber, like every other structural rule on the page. */
+.dsn-notes { border-left: 2px solid var(--dsn-accent2); padding-left: 1.1rem; }
 .dsn-note-label {
   font-family: "Courier Prime", monospace;
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--dsn-deep);
+  color: var(--dsn-accent2-deep);
   display: block;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.25rem;
 }
 .dsn-notes p { margin: 0; font-size: 0.9rem; line-height: 1.65; }
 
 /* MAKE-IT STATE. One class on the container. Nothing leaves the DOM, so the
-   page still prints and still works with JS off. */
+   page still prints and still works with JS off.
+
+   THE GLASS MATCHES THE HEAD BLOCK'S HEIGHT rather than taking a size of its
+   own — Helen, 2026-08-26: "when the glass shrinks in make it, please let it
+   remain the same height (or as close as you can) as the title, tagline and
+   meta block." So it is `height: 100%` against a stretched flex row, and the
+   text decides. Editorial: title + tagline + meta, and the glass is tall.
+   Make it: the tagline is hidden, the block shrinks, and the glass shrinks
+   with it exactly. No second number to keep in step, and it stays true if the
+   title wraps to two lines on a narrow screen. */
 .dsn-drink.is-making .dsn-editorial-only { display: none; }
-.dsn-drink.is-making .dsn-drink-glass svg { height: 3rem; }
+.dsn-drink.is-making .dsn-drink-glass { align-self: stretch; }
+.dsn-drink.is-making .dsn-drink-glass svg { height: 100%; }
 .dsn-drink.is-making .dsn-amount { font-size: 1.3rem; font-weight: 700; }
 .dsn-drink.is-making .dsn-item { font-size: 1.15rem; }
 .dsn-drink.is-making .dsn-ing-row { padding: 0.95rem 0; }
 .dsn-drink.is-making .dsn-method { font-size: 1.1rem; line-height: 1.85; }
-.dsn-drink.is-making .dsn-drink-title { font-size: 1.4rem; }
+.dsn-drink.is-making .dsn-drink-title { font-size: 1.5rem; }
+.dsn-drink.is-making .dsn-drink-head { padding-bottom: 1rem; margin-bottom: 1.8rem; }
 
 /* --- 6. the tiki mug ------------------------------------------------------ */
 /* The erosion hack that used to live here is GONE, and its removal is the
@@ -1145,17 +1272,16 @@ drinks:
   var cards  = document.querySelectorAll('.dsn-card[data-ratio]');
   if (!spread || !cards.length) return;
 
-  var cheat = 0.82;
+  var cheatOn = true;
 
   function apply() {
     var g = parseFloat(spread.value);
     cards.forEach(function (card) {
       var r = parseFloat(card.dataset.ratio);
       card.style.setProperty('--dsn-ratio', Math.pow(r, g).toFixed(4));
-      // A card whose front matter gave it no tweak is always 1: the buttons
-      // move the two awkward glasses, not the whole set.
-      var tweaked = parseFloat(card.dataset.tweak) !== 1;
-      card.style.setProperty('--dsn-tweak', tweaked ? cheat : 1);
+      // Each card's own value, from the front matter — collins and hurricane
+      // no longer share one number.
+      card.style.setProperty('--dsn-tweak', cheatOn ? card.dataset.tweak : 1);
     });
     if (out) out.textContent = g.toFixed(2);
   }
@@ -1165,12 +1291,30 @@ drinks:
     cheats.addEventListener('click', function (e) {
       var btn = e.target.closest('.dsn-btn--cheat');
       if (!btn) return;
-      cheat = parseFloat(btn.dataset.cheat);
+      cheatOn = btn.dataset.cheat === 'on';
       cheats.querySelectorAll('.dsn-btn--cheat').forEach(function (b) {
         b.classList.toggle('is-on', b === btn);
       });
       apply();
     });
   }
+})();
+
+/* Card framing. Swaps one class on the grid; each frame is a set of custom
+   properties, so the card rule itself never learns about the options. */
+(function () {
+  var wrap = document.getElementById('dsn-frames');
+  var grid = document.getElementById('dsn-cards-a');
+  if (!wrap || !grid) return;
+  wrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.dsn-btn--cheat');
+    if (!btn) return;
+    ['hairline', 'menthe', 'edge', 'paper'].forEach(function (f) {
+      grid.classList.toggle('dsn-cards--frame-' + f, f === btn.dataset.frame);
+    });
+    wrap.querySelectorAll('.dsn-btn--cheat').forEach(function (b) {
+      b.classList.toggle('is-on', b === btn);
+    });
+  });
 })();
 </script>
