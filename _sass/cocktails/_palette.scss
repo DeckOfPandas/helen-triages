@@ -111,6 +111,15 @@ $color-mood-root:  $color-menthe-deep;
 // drink; it has no business on a nav icon.
 $color-accent:     $color-menthe-deep;
 
+// The heading outline. Food has had `$color-label-stroke` since long before
+// this site existed; cocktails never declared an equivalent, so every heading
+// here fell through to the shared default of full ink — see _rule.scss for
+// what that looked like and why it was never a decision.
+//
+// Same derivation as food's: the text colour lightened, so it stays related to
+// the letters it outlines rather than being a standalone grey.
+$color-label-stroke: lighten($color-ink, 30%);
+
 // --- Typography --------------------------------------------------------------
 // UNCHANGED FROM THE SCAFFOLD, AND THAT IS THE DECISION RATHER THAN THE ABSENCE
 // OF ONE. The scaffold's own note said the typographic voice is the family

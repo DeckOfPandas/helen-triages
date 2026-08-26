@@ -24,6 +24,11 @@
 // mixin must be defined before the partial that calls it. Same reason food.scss
 // imports it in the same relative position.
 @import "shared/rule";
+// This site's own emboss value, after the shared one so it wins -- the same
+// position and the same reason food.scss imports food/rule. Without it every
+// heading here takes the shared default outline colour, which shared/_base.scss
+// itself describes as the value only ever seen on an unstyled heading.
+@import "cocktails/rule";
 @import "shared/base";
 @import "shared/layout";
 // The chrome's coloured half -- issue #374. This import is the whole reason the

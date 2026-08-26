@@ -1,0 +1,39 @@
+// =============================================================================
+// COCKTAILS — the one emboss value this site chooses for itself.
+// =============================================================================
+// Mirrors _sass/food/_rule.scss, and exists for the same reason: the softer
+// heading outline is derived from a palette variable that is NOT one of the ten
+// the shared contract guarantees, so it cannot live in shared/_rule.scss.
+// Imported after it (see assets/css/cocktails.scss), so this wins.
+//
+// WHY IT EXISTS AT ALL, 2026-08-26. Helen, comparing a cocktail title against a
+// food ingredient-group heading: "they don't all need to be identical, but I
+// don't remember which I actively chose, and I'm concerned some may have been
+// automatically swept in."
+//
+// She had it exactly right, and the answer was that COCKTAILS was the swept-in
+// one, not food. Food re-points `--emboss-stroke-c` to its own
+// $color-label-stroke and its comment records that doing so replaced the value
+// being restated at thirteen separate call sites — a decision, made twice over.
+// Cocktails declared no equivalent, so every heading on this site fell through
+// to the shared default of `$color-text`: near-black, at full strength, on the
+// outline of every title and section heading.
+//
+// shared/_base.scss describes that default in its own words as the value that
+// "in practice is only ever seen on a heading nobody has styled". Cocktails'
+// headings were precisely those headings.
+//
+// AND IT EXPLAINS A SECOND SYMPTOM, which is what makes it worth this file
+// rather than a one-line override. The punched effect paints a white highlight
+// one pixel up and left of the glyph. With a soft grey outline that highlight
+// reads; with a near-black outline sitting in exactly the same place, it is
+// drowned — so cocktail headings showed the shadow half of the emboss and none
+// of the light, while food's showed both. One wrong value, two symptoms, and
+// the light looked like the missing thing when the stroke was.
+$emboss-cocktails-vars-emitted: false !default;
+@if not $emboss-cocktails-vars-emitted {
+  :root {
+    --emboss-stroke-c: #{$color-label-stroke};
+  }
+  $emboss-cocktails-vars-emitted: true !global;
+}
