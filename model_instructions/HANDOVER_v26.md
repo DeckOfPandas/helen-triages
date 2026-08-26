@@ -3294,6 +3294,13 @@ The fix pulled the fill off pure white to `#e7e2e3` so a brighter copy has
 somewhere to exist, and split one shadow pair into two so the letter gets both
 a cut line and a glow.
 
+**Re-tuned 2026-08-26 for Courier Prime (issue #470).** The mechanism is
+unchanged — still four copies, still a fill below white — but every number moved:
+fill `#ECE9EA`, offsets `1.0px` / `1.8px`, outer highlight `0.75`. The two copies
+came *towards* each other, the gap narrowing from 1.6px to 0.8px, so the bevel is
+tighter and better defined rather than spread. A heavier letterform has more ink
+of its own for the copies to sit against.
+
 Applying `$emboss-stroke` or `punched()` here would undo that. Its sibling
 `.site-logo-top` (HELEN TRIAGES) is a normal consumer and *was* brought onto
 the ratios on 2026-08-12; the two halves of the lockup have always been
@@ -3777,7 +3784,8 @@ pick, so it's recorded here instead:**
   you know, accurate" — B's flat fill plus stepped shadow read more
   dynamic than the more literally physical combined version.
 - Higher-contrast pulls of B's fill (`#a8a2a3`, `#8a8384`, pulling further
-  from white than the shipped `#e7e2e3`) — more headroom for the highlight,
+  from white than the then-shipped `#e7e2e3`; the fill is `#ECE9EA` since
+  #470, one step lighter again) — more headroom for the highlight,
   in principle more "accurate", but rejected in a direct side-by-side: the
   lighter, less contrasty version was the one that actually read as raised.
 
@@ -3920,16 +3928,30 @@ and would have missed the fourteenth. **Both `shared/_rule.scss` and
 `food/_timings.scss` imports them again — free while they were pure definition
 files, not free once they emitted CSS.
 
-**Nothing on the site uses `.on-dark` yet.** `/dev/emboss/` is its only consumer.
-Those numbers are a considered starting point, not a verified result. This is
+**Nothing on the site uses `.on-dark` at all.** It had one consumer, a swatch on
+`/dev/emboss/`, and that went when the heading dials did on 2026-08-26 — so the
+class is now live CSS with no user anywhere, and its numbers cannot be seen
+without re-adding a swatch. They were a considered starting point rather than a
+verified result even then. Kept rather than deleted because the reasoning behind
+it took a real conversation to reach and issue #469 tracks it; delete it instead
+if a dark section still has not appeared by the time anyone reads this. This is
 *not* dark mode, which Helen has explicitly deferred.
 
 #### 13.10.3 `/dev/emboss/` — tune here, not in a mock
 
-Local only (`_dev/`, `output: false` in production). The specimens are ordinary
-`h1/h2/h3` picking up the real cascade; the dials **inject an override** rather
-than reproducing the effect, and the panel writes the settled values out as real
-SCSS with the actual variable names.
+Local only (`_dev/`, `output: false` in production). **It tunes the tape
+wordmark now, not the headings** — `.site-logo-word` lives in the shared header,
+which this page renders like any other, so the dials override the live element at
+the top of the page rather than a copy of it. The panel writes the settled values
+out as real SCSS.
+
+The heading dials were here too until 2026-08-26 and were deleted at Helen's ask:
+with both panels stacked she could not get the wordmark and its own controls on
+screen together, which for a look-at-it page is the only thing that matters.
+Recover them from git history if the smaller type levels ever want tuning — the
+heading emboss values themselves are settled, in `_sass/shared/_rule.scss`.
+
+Deleting them also took `.on-dark`'s only consumer with it; see §13.10.2.
 
 That distinction is load-bearing. Its predecessor, a standalone file in `tmp/`,
 reproduced the treatment by hand and applied the **stroke only, with no shadow** —
