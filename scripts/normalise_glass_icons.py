@@ -92,6 +92,18 @@ SKIP = {
     # adopted and would otherwise publish an old-fashioned-3.svg nothing uses.
     "glass-old-fashioned.svg",
     "glass-old-fashioned-3.svg",
+    # THE DOUBLE IS AN UNSETTLED CHOICE, and these two lines are the switch.
+    # `-2` is Helen's 2026-08-26 redraw and is what publishes today, so the
+    # BASE name is skipped. It renders at 0.90x the single rather than the
+    # 1.176x heights_mm asks for, because its ink fills 76% of its viewBox
+    # against the single's 99% -- see /dev/glasses/ section 5, which shows the
+    # two at true relative height.
+    #
+    # TO GO BACK TO THE PREVIOUS DRAWING: delete this line, and delete the
+    # "old-fashioned-double-2" entry from RENAME below. Nothing else changes.
+    # Both drawings stay on disk either way, which is the point of keeping
+    # both rather than overwriting one with the other.
+    "glass-old-fashioned-double.svg",
 }
 
 # FILL-BASED ARTWORK, WHICH THE REST OF THE SET IS NOT. Every glass is drawn as
@@ -136,6 +148,7 @@ RENAME = {
     "hurricane-2": "hurricane",
     "tiki-mug-2": "tiki-mug",
     "old-fashioned-2": "old-fashioned",
+    "old-fashioned-double-2": "old-fashioned-double",
 }
 
 

@@ -255,14 +255,24 @@ sitemap: false
   <p class="dev-note">
     Sized by <code>heights_mm</code> against the tallest glass, exactly as
     &sect;1 is: single 85&nbsp;mm, double 100&nbsp;mm, so the double should
-    stand <strong>1.18&times;</strong> the single. <strong>The new drawing does
-    not</strong> &mdash; its ink fills 76% of its viewBox height where the
-    single's fills 99%, so it renders at <strong>0.90&times;</strong> the
+    stand <strong>1.18&times;</strong> the single. <code>old-fashioned-double</code>
+    is the drawing Helen had before; <code>-2</code> is the 2026-08-26 redraw
+    and is the one currently published.
+    <strong>The redraw does not stand 1.18&times;</strong> &mdash; its ink
+    fills 76% of its viewBox height where the single's and the previous
+    drawing's both fill 99%, so it renders at <strong>0.90&times;</strong> the
     single and a double old-fashioned looks smaller than a single. The margin
-    is inside the artwork, not in the data.
+    is inside the artwork, not in the data, so no <code>heights_mm</code>
+    change fixes it.
   </p>
 
-  {% assign double_row = "old-fashioned|85,old-fashioned-double-previous|100,old-fashioned-double|100" | split: "," %}
+  {% comment %} BOTH DOUBLES ARE REAL SOURCE FILES NOW, not one file and one
+     git recovery: `old-fashioned-double` is the drawing Helen had before and
+     `-2` is the 2026-08-26 redraw, following the same base-name/numeric-suffix
+     convention as coupe-3, hurricane-2 and tiki-mug-2. The `-2` is what
+     publishes today; scripts/normalise_glass_icons.py names the two lines to
+     swap to change that. {% endcomment %}
+  {% assign double_row = "old-fashioned|85,old-fashioned-double|100,old-fashioned-double-2|100" | split: "," %}
   <div class="dev-scale">
     {% for entry in double_row %}
       {% assign bits = entry | split: "|" %}

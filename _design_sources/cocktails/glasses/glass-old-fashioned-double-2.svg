@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="86.017433mm"
-   height="94.545998mm"
-   viewBox="0 0 86.017434 94.545998"
+   width="99.376083mm"
+   height="109.22915mm"
+   viewBox="0 0 99.376084 109.22915"
    version="1.1"
    id="svg1"
    inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.56063608"
-     inkscape:cx="256.85111"
-     inkscape:cy="228.3121"
+     inkscape:zoom="0.79285915"
+     inkscape:cx="394.77378"
+     inkscape:cy="283.78307"
      inkscape:window-width="1280"
      inkscape:window-height="730"
      inkscape:window-x="-6"
@@ -38,24 +38,26 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-19.696305,-113.89907)">
+     transform="translate(-19.696306,-99.215923)">
     <g
        id="g2"
-       transform="matrix(1.1296964,0,0,1.1296964,-2.5545396,-27.034571)">
+       transform="matrix(1.3051401,0,0,1.3051401,-6.0101317,-63.604938)"
+       style="stroke-width:2.16221998;stroke-dasharray:none">
       <path
          id="path16"
          d="M 22.811367,187.30893 21.107301,126.16455 H 94.42739 l -1.704064,61.14438 -0.791038,15.11911 c -0.424737,2.63704 -4.68809,4.60602 -7.916101,4.60602 H 31.518506 c -3.228013,0 -7.491365,-1.96898 -7.916105,-4.60602 z"
-         style="fill:none;stroke:#4c4c4e;stroke-width:2.822;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;stroke:#4c4c4e;stroke-width:2.16221998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
          sodipodi:nodetypes="cccccsscc" />
       <path
          id="path17"
          d="m 92.621789,186.31958 c -0.67028,5.2564 -11.006667,9.2075 -16.298333,9.2075 h -37.11222 c -5.291667,0 -15.628056,-3.9511 -16.298333,-9.2075"
-         style="fill:none;stroke:#4c4c4e;stroke-width:2.822;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;stroke:#4c4c4e;stroke-width:2.16221998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
          sodipodi:nodetypes="cssc" />
     </g>
     <g
        id="g1"
-       transform="translate(4.5231901)">
+       transform="translate(11.202515,-3.1750001)"
+       style="stroke-width:2.822;stroke-dasharray:none">
       <path
          id="path77"
          d="m 49.612446,158.91643 v 30.2253"
