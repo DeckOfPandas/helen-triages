@@ -1,0 +1,133 @@
+---
+layout: default
+---
+
+{% comment %} THE MAGIC BAG -- a dish Helen makes without a recipe.
+
+   This is deliberately NOT _layouts/recipe.html with bits switched off. A
+   magic-bag entry is a different kind of thing, and the page should read like
+   one the moment it loads: no method, no times, no source, no serves, no
+   print/PDF actions (scripts/generate_pdfs.py renders recipes, and a link to a
+   file that was never built is how you learn to ignore links -- see the
+   recipe layout's own note on that). What it has is a name, a jog to the
+   memory, and a partial list.
+
+   IT REUSES THE RECIPE PAGE'S CLASSES ON PURPOSE. `.recipe`, the title block,
+   `.recipe-tagline`, `.recipe-section-heading` and `.ingredients` all render
+   identically here, so a magic-bag page sits in the same visual family as
+   everything else on the site rather than looking like a different website.
+   The ONE thing that marks it out is the caveat below, which is the one thing
+   that actually differs. {% endcomment %}
+
+{% include back-to-index.html %}
+
+<article class="recipe recipe--magic-bag">
+  <div class="recipe-title">
+    <h1 class="recipe-main-title">
+      <span class="recipe-title-text">{{ page.title }}</span>
+    </h1>
+  </div>
+
+  {% comment %} Optional, and always present as an empty string in the front
+     matter so there is a line to fill in rather than a field to remember --
+     the same convention as `method_short: [""]` meaning "not written". An
+     empty string is falsy in Liquid, so a blank tagline renders nothing at all
+     rather than an empty paragraph.
+
+     NO TAG SYNTAX IN THIS COMMENT, and that is not fussiness. Liquid TOKENISES
+     tags inside a comment block rather than treating the body as text, so an
+     illustrative bare `if` tag written out in full here is a real parse error
+     that takes the whole build down. It did, the first time this file was
+     written. {% endcomment %}
+  {% if page.tagline and page.tagline != "" %}
+    <p class="recipe-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+  {% endif %}
+
+  <div class="recipe-badges">
+    {% include recipe_badges.html recipe=page %}
+  </div>
+
+  {% comment %} THE STANDING CAVEAT, AND WHY IT IS HERE RATHER THAN IN THE
+     FRONT MATTER. Helen's ask, 2026-08-26: "I should dash off ingredients
+     lists, promising future Helen that they're not complete."
+
+     A promise you have to retype on every file is a promise you will skip on
+     the day you are in a hurry -- which is precisely the day you are dashing
+     one of these off. So the collection makes the promise instead, in the same
+     words every time, and there is no per-file field to forget. It sits ABOVE
+     the ingredients because its whole job is to set the expectation before the
+     list is read, not to apologise for it afterwards.
+
+     If an entry ever genuinely IS complete, the fix is an opt-in
+     `ingredients_complete: true` and a second branch here. Not built: no entry
+     has wanted it yet, and the default has to stay "incomplete" regardless.
+  {% endcomment %}
+  <p class="magic-bag-caveat">
+    Out of the magic bag: I make this one from memory, so there is no method,
+    and the list below is whatever I remembered on the day. Assume it is
+    incomplete.
+  </p>
+
+  {% comment %} `.size > 0` rather than a bare truthiness test, for the reason
+     _layouts/recipe.html gives at its own Ingredients heading: an empty array
+     is truthy in Liquid, so `ingredients: []` would render the heading with
+     nothing under it. tests/test_magic_bag.py requires a non-empty list, so
+     this is the latent-twin guard rather than a live case. {% endcomment %}
+  {% if page.ingredients.size > 0 %}
+    <div class="recipe-section-ingredients">
+      <h2 class="recipe-section-heading">
+        <span class="section-heading-text">Ingredients</span>
+      </h2>
+    </div>
+
+    <ul class="ingredients">
+      {% for item in page.ingredients %}
+        {% comment %} Bare string OR {item, note}, the same polymorphism
+           `method:`, `notes:` and recipe ingredient items already use
+           (tests/conftest.py's accessors accept both). The bare string is the
+           form that matters here -- the point of this collection is that a
+           list can be dashed off -- and the dict exists for the one line you
+           want to say something about. No `amount:`: quantities are what you
+           do not remember about a dish you make by eye. {% endcomment %}
+        <li class="ingredient">
+          {% if item.item %}
+            <span class="ingredient-text">{{ item.item }}</span>
+            {% if item.note %}<span class="step-annotation"><span class="annotation-mark" aria-hidden="true"></span>{{ item.note | markdownify | remove: '<p>' | remove: '</p>' }}</span>{% endif %}
+          {% else %}
+            <span class="ingredient-text">{{ item }}</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% comment %} Notes are optional and shaped exactly as a recipe's are, so the
+     two render through the same markup and the same grid. See §4 of the
+     handover for the {label, text} contract. {% endcomment %}
+  {% if page.notes.size > 0 %}
+    <div class="recipe-section-notes">
+      <h2 class="recipe-section-heading">
+        <span class="section-heading-text">Notes</span>
+      </h2>
+    </div>
+    <div class="notes{% if page.notes.size == 1 %} notes--single{% endif %}">
+      {% for note in page.notes %}
+        {% if note.text %}
+          <p class="note"><span class="note-label">{{ note.label | default: "note" }}</span>{{ note.text | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+        {% else %}
+          <p class="note"><span class="note-label">note</span>{{ note | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% comment %} Body content, same as a recipe's (§4.1) -- rare, but if one of
+     these ever grows a paragraph about how it actually goes, it renders here
+     rather than being lost. If it grows a METHOD, it has stopped being a
+     magic-bag entry and tests/test_magic_bag.py says so. {% endcomment %}
+  {% if content != '' %}
+    <div class="recipe-body-content">
+      {{ content }}
+    </div>
+  {% endif %}
+</article>

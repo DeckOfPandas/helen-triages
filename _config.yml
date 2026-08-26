@@ -116,6 +116,36 @@ collections:
   food_recipes:
     output: true
     permalink: /food/recipes/:path/
+  food_magic_bag:
+    # THE MAGIC BAG -- dishes Helen makes without a recipe. Helen's own name for
+    # her brain, and the collection is named after it because that is genuinely
+    # where these live: in her head, not on the site.
+    #
+    # A magic-bag entry is NOT a recipe and must never be mistaken for one. It
+    # has no method, no times, no source, and an ingredients list that is
+    # explicitly INCOMPLETE -- whatever she remembered when she jotted it down.
+    # Its whole job is the README's problem #1, "what shall I cook, out of
+    # everything I already know how to make?", for the dishes that never got
+    # written down and never will.
+    #
+    # WHY A SEPARATE COLLECTION rather than a `kind:` field inside
+    # _food_recipes/. Every structural guard in tests/test_front_matter.py is
+    # unconditional, and that is what makes them worth having --
+    # test_method_xor_method_groups treats "neither" as an error, which is a real
+    # catch across the 86 published recipes. A magic-bag entry has no method BY
+    # DEFINITION, so folding it in would force that guard (and the required-field
+    # list, and the source-attribution rules) to grow an `if`. Weakening a live
+    # guard to admit a new shape is the wrong trade: the recipe rules stay
+    # absolute, and the new shape gets rules that actually fit it, in
+    # tests/test_magic_bag.py.
+    #
+    # THE INCOMPLETENESS IS THE COLLECTION'S PROMISE, NOT A PER-FILE FIELD.
+    # _layouts/magic_bag.html states it on every page in the same words, so Helen
+    # never types the caveat and can never forget it. That is the whole reason
+    # the metaphor earns its place: a bag you pull things out of from memory
+    # obviously does not hand you everything.
+    output: true
+    permalink: /food/magic-bag/:path/
   food_drafts:
     # output: false means drafts get NO public URL and are NOT in the sitemap.
     # _config_local.yml flips this back to true so you can still read them locally.
@@ -147,6 +177,12 @@ defaults:
       type: food_recipes
     values:
       layout: recipe
+      site_key: food
+  - scope:
+      path: ""
+      type: food_magic_bag
+    values:
+      layout: magic_bag
       site_key: food
   - scope:
       path: ""

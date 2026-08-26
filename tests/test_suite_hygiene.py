@@ -47,7 +47,7 @@ TESTS_DIR = pathlib.Path(__file__).resolve().parent
 # check HERE" is fine, because the other ~80 parametrisations still exercise
 # the predicate. The dangerous case is a whole-corpus scan, where one early
 # return silences the entire check.
-PER_ITEM_FIXTURES = {"recipe", "draft"}
+PER_ITEM_FIXTURES = {"recipe", "draft", "magic_bag"}
 
 
 def _test_functions():
