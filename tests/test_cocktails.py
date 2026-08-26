@@ -39,7 +39,16 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 # Groups in ingredients.yml that are lists of generic VALUES. Everything else at
 # the top level is a mapping (family_of, family_less, retired_*) or the family
 # list itself, and must not be mistaken for declared generics.
-NOT_GENERIC_LISTS = {"families"}
+#
+# `rum_characters` JOINED THIS SET ON 2026-08-26, AND ITS ABSENCE WAS A REAL
+# HOLE. A character is not a generic -- separating them is the entire content of
+# #441 -- but this exclusion list named only `families`, so every value in
+# `rum_characters` was ALSO a permitted generic. `sherry` and `Spanish-style`
+# would have passed silently on any ingredient, and Helen's #314 ruling that
+# `blackstrap` is only ever a character could not be enforced while this list
+# still declared it a generic. The guard meant to keep the two fields apart was
+# quietly putting them back together.
+NOT_GENERIC_LISTS = {"families", "rum_characters"}
 
 
 def _load():
@@ -68,6 +77,24 @@ def _vocab():
     if not VOCAB.exists():
         pytest.skip("_data/cocktails/ingredients.yml does not exist yet.")
     return yaml.safe_load(VOCAB.read_text(encoding="utf-8")) or {}
+
+
+def _retired(vocab):
+    """Every retired generic -> its reason, from every `retired_*` mapping.
+
+    DERIVED FROM THE PREFIX, not from a list of block names, and the reason is
+    the same one _declared_generics gives for deriving from the file's shape: a
+    block added tomorrow is covered tomorrow. This was a hardcoded
+    `retired_rum_styles` until 2026-08-26, which meant `retired_gin_styles`
+    landed invisible to both retirement checks -- a drink still saying
+    `flavoured` would have failed as "undeclared generic", with no reason
+    attached, which is the precise failure these blocks exist to prevent.
+    """
+    out = {}
+    for key, value in vocab.items():
+        if key.startswith("retired_") and isinstance(value, dict):
+            out.update(value)
+    return out
 
 
 def _declared_generics(vocab):
@@ -136,7 +163,7 @@ def test_every_generic_is_declared():
         "this check has nothing to enforce. Either the file changed shape or "
         "the groups were renamed -- an empty set would pass everything."
     )
-    retired = set(vocab.get("retired_rum_styles") or {})
+    retired = set(_retired(vocab))
     bad = sorted({
         f"{slug}: {item!r} -> {generic!r}"
         for slug, item, generic in _ingredients()
@@ -158,7 +185,7 @@ def test_no_drink_uses_a_retired_generic():
     mean something must not blend into the generic not-declared pile, where
     nobody learns why it went.
     """
-    retired = _vocab().get("retired_rum_styles") or {}
+    retired = _retired(_vocab())
     assert retired, (
         "No retired values declared, so this enforces nothing. If the "
         "retirements were reversed, delete this test deliberately."
@@ -287,6 +314,64 @@ def test_every_ingredient_has_a_generic_or_a_qq():
         + "\n  ".join(missing[:15])
         + "\n\nEvery ingredient needs a declared generic or the literal QQ. "
           "Absent is not the same as unfinished."
+    )
+
+
+# =============================================================================
+# 5a -- the one generic that cannot stand on its own
+# =============================================================================
+
+# Helen, 2026-08-26: "speciality should always carry a character field."
+# A pair rather than a bare string so a second such generic is one line, not a
+# rewrite -- gin is simply the only family with one today.
+GENERICS_REQUIRING_A_CHARACTER = ("speciality",)
+
+
+def test_speciality_gin_declares_a_character():
+    """`speciality` names a gin by what it is NOT (juniper-led) and stops there.
+
+    It replaced `flavoured`, which was retired for covering sloe, rhubarb and
+    cucumber alike -- three gins nobody would swap for each other. Renaming it
+    fixes the label and none of the underlying problem: the word still doesn't
+    say what went in the still. `character` is what carries that, so on this
+    generic it is required rather than optional.
+
+    CHARACTER IS FREE TEXT HERE, deliberately, and this test does not check its
+    value -- Helen's call, 2026-08-26. Rum's characters close into a list
+    because they come from a handful of production traits; a gin's is whatever
+    the distiller reached for, and a closed list would mean a vocabulary edit
+    per bottle. So: present and non-empty, never a declared member.
+
+    VACUOUS TODAY, AND LEGITIMATELY SO -- no drink carries `speciality` yet,
+    because the generic was minted in the same commit as this test. That is the
+    honest kind of empty (a guard waiting for its first case), not the kind
+    test_suite_hygiene.py exists to catch (a check that silently stopped
+    matching anything it used to). It needs no non-empty assertion for the same
+    reason `pudding in a glass` is declared with zero members.
+    """
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            if not any(g in GENERICS_REQUIRING_A_CHARACTER for g in generics):
+                continue
+            character = item.get("character")
+            # A bare string is as good as a list -- Liquid iterates either, and
+            # `generic`/`suggestion` already accept both shapes for this reason.
+            if isinstance(character, str):
+                character = [character] if character.strip() else []
+            if not character:
+                bad.append(f"{slug}: {item.get('item') or '?'!r}")
+    assert not bad, (
+        f"{len(bad)} ingredient(s) typed as a generic that requires a "
+        f"`character`, without one:\n  " + "\n  ".join(bad)
+        + "\n\nA `speciality` gin is defined by the botanical it pushes -- "
+          "cucumber, rose, rhubarb, lemon. Without that the generic says only "
+          "'not a London dry', which is what got `flavoured` retired. Free "
+          "text: name the thing, no vocabulary to match."
     )
 
 
