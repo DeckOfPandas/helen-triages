@@ -82,28 +82,19 @@ SKIP = {
     "glass-coupe-2.svg",
     "glass-hurricane.svg",
     "glass-tiki-mug.svg",
-    # THE OLD-FASHIONED CASE PREDATES THE OTHERS AND WAS ALREADY BROKEN, #484.
-    # Commit 14eab is titled "settle on old-fashioned-2" but nothing mapped it,
-    # so the settled drawing was live only because it happened to have been
-    # written by hand. Verified 2026-08-26 by comparing geometry: the published
-    # old-fashioned.svg IS glass-old-fashioned-2.svg, and glass-old-fashioned
-    # .svg is a 2-path early version that sorts last and would have replaced it
-    # on the next full regeneration. -3 is a 12-path candidate that was never
-    # adopted and would otherwise publish an old-fashioned-3.svg nothing uses.
-    "glass-old-fashioned.svg",
-    "glass-old-fashioned-3.svg",
-    # THE DOUBLE IS AN UNSETTLED CHOICE, and these two lines are the switch.
-    # `-2` is Helen's 2026-08-26 redraw and is what publishes today, so the
-    # BASE name is skipped. It renders at 0.90x the single rather than the
-    # 1.176x heights_mm asks for, because its ink fills 76% of its viewBox
-    # against the single's 99% -- see /dev/glasses/ section 5, which shows the
-    # two at true relative height.
+    # NO OLD-FASHIONED ENTRIES HERE ANY MORE, and their absence is the fix.
+    # This set briefly held four of them: two version suffixes, a 2-path early
+    # draft, and a never-adopted 12-path candidate, plus a RENAME pointing at
+    # whichever double was live. That machinery was correct and it was
+    # machinery -- #484 exists because a reader could not tell which drawing
+    # published without simulating `sorted()`.
     #
-    # TO GO BACK TO THE PREVIOUS DRAWING: delete this line, and delete the
-    # "old-fashioned-double-2" entry from RENAME below. Nothing else changes.
-    # Both drawings stay on disk either way, which is the point of keeping
-    # both rather than overwriting one with the other.
-    "glass-old-fashioned-double.svg",
+    # Helen collapsed it on 2026-08-26: "I have the two files I want to use...
+    # delete all other versions of old fashioned (and rocks) glasses you have
+    # anywhere, then add just these two." Seven sources went, two arrived under
+    # plain names, and with one file per glass there is nothing to skip and
+    # nothing to rename. The best answer to a disambiguation rule is not having
+    # anything to disambiguate.
 }
 
 # FILL-BASED ARTWORK, WHICH THE REST OF THE SET IS NOT. Every glass is drawn as
@@ -164,8 +155,6 @@ RENAME = {
     "coupe-3": "coupe",
     "hurricane-2": "hurricane",
     "tiki-mug-2": "tiki-mug",
-    "old-fashioned-2": "old-fashioned",
-    "old-fashioned-double-2": "old-fashioned-double",
     "mule-mug": "mug",
 }
 
