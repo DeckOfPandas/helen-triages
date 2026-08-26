@@ -1613,17 +1613,12 @@ top pick (`[Sagatiba, Leblon]`) and the full ranking moved to a drink-level
 note verbatim, no explanation added, at Helen's explicit request ("Future
 Helen will know exactly what I mean").
 
-**Neither `character` nor `note` render on the page yet, and neither does
-a list-form `generic`/`suggestion` — #460.** The cocktail page has never
-actually been designed (`_layouts/cocktail.html` predates all of this);
-`{{ item.generic }}` / `{{ item.suggestion }}` are bare string
-interpolations that mash a list together with no separator. 10+ drinks
-carry a list-form `generic`, 6+ a list-form `suggestion`, as of
-2026-08-23. Page design is deliberately backend-first this round — Helen:
-"given the low cost of asking Claude to turn everything inside out
-compared with having to do it all myself" — so this is a known, accepted
-gap, not an oversight to sneak-fix; #460 is the checklist for whenever
-that design pass happens.
+~~**Neither `character` nor `note` render on the page yet, and neither
+does a list-form `generic`/`suggestion` — #460.**~~ **RESOLVED,
+2026-08-25.** `_layouts/cocktail.html` now renders all four correctly —
+see §9.10 for the shape. #460 stays open for the REST of the page (method,
+notes, meta), which still hasn't had a design pass — this was the
+ingredient list specifically.
 
 **Disjunctive `generic` has an agreed threshold, not a free-for-all.**
 Helen, 2026-08-21: multi-value only when both bottles can actually be named
@@ -1794,6 +1789,108 @@ Ordering is declared in the template, not derived. Nothing about the strings
 says "oh gods yes" beats "sure". Any value not in the declared list still
 renders and still filters, so a word Helen invents mid-session sorts last
 rather than vanishing.
+
+---
+
+### 9.10 The ingredient line, for real — #465/#457/#460, 2026-08-25
+
+`_layouts/cocktail.html` renders each ingredient as three parts: **amount +
+headline** / **class line, with character folded on** / **note**. Settled by
+walking real drink data against "does this get Helen the drink she wants"
+(#459) rather than designed up front.
+
+- **Headline** is `suggestion` when present (oxford-joined if a list —
+  "Planteray 3, El Dorado 3, or Havana 3"), else `item`. You shop by bottle
+  name; an item with no suggestion falls back to itself.
+- **Class line** is `generic`, oxford-joined if a list. A rum-family style
+  name (looked up live via `ingredients.family_of`, not hardcoded) gets the
+  site's heading face — blockier, so the internal comma in "Demerara, aged"
+  doesn't collide with a plain list-join comma — with a quiet italic "or"
+  between disjunctive options. Scoped to rum on purpose: "cognac" has no such
+  collision and stays plain.
+- **Character** folds onto the class line as `(character: blackstrap)`, a
+  LABELLED parenthetical, never a bare one — "moderately aged rum
+  (blackstrap)" reads as if blackstrap were a TYPE of moderately-aged rum,
+  real confusion with actual black rum. Never its own line: #441 settled that
+  character is a property of THIS recipe's use of a bottle, not the bottle in
+  the abstract.
+- **Note** is its own line, always visible, no interaction — #457's fix for
+  reasoning that used to get smuggled into `suggestion`. Right-alignment was
+  tried and dropped: read as competing with the class line above it.
+
+**`generic`/`suggestion` can be a string or a list, and Liquid's `for` quietly
+treats a bare string as a one-item sequence** — checked against the real
+`liquid` gem before relying on it, not assumed. One oxford-join loop handles
+both shapes with no type-detection anywhere in the template.
+
+**Deliberately not solved**: no spirit-word ("rum", "gin") is appended after
+a bare style name. Several families already bake their spirit into the
+string ("blanco tequila") and others don't ("bourbon" needs no suffix,
+"London dry" does) — auditing all of that is real, separate work, not a
+template one-liner. No colour decision either — the placeholder monochrome
+palette is untouched, unargued on purpose (§9.3.1).
+
+### 9.11 Glass icons — real relative height, and a UA-stylesheet trap
+
+**Sized by real height, not a common rendered height, since 2026-08-25
+(#298).** `_layouts/cocktail.html` computes `--glass-icon-height` per drink
+from `_data/cocktails/glasses.yml`'s `heights_mm` against the tallest real
+glass (counted live every render, not hardcoded), and
+`_sass/cocktails/_cocktail.scss` consumes it with 2.6rem as the fallback for
+a glass with no entry. `_dev/glasses.html`'s section 2 proved the calculation
+out before it reached the real page; section 1 is now the honest "as the
+site actually shows it" view, height AND the real 3.2rem width cap together
+— it was quietly stale for a day, still claiming "every icon is the same
+height here" after #298 shipped, a live instance of §11.2.
+
+**The width cap matters as much as the height, and can make a correctly-sized
+glass look wrong without it.** Helen, 2026-08-26, on `_dev/glasses.html`
+section 2 (which has no width cap): goblet and mule-mug both looked
+oversized. Mule-mug's own drawing is wider than tall (1.25:1 viewBox); at
+section 2's uncapped 9rem scale its natural width would be ~5.1rem, half
+again over the real site's 3.2rem cap — a size it never actually reaches at
+the real 2.6rem scale. Some of what looks like a bad proportion on an
+uncapped comparison page is really just that page choosing not to show the
+constraint the real site always applies.
+
+**`heights_mm` is unmeasured, and it shows.** Its own comment already said
+so ("typical values... pending issue #295"); #295 is still open. A capacity
+(volume) based scaling was floated as an alternative and shelved for the
+identical reason — no real numbers exist for either axis yet, so it would
+trade one set of guesses for another, not fix anything.
+
+**Stem/base proportions genuinely differ glass to glass** — confirmed by
+screenshot, martini vs. goblet, each hand-drawn with its own stem length and
+base-flare ratio. Real vector work to fix (pick one drawing as canonical,
+adapt it to each glass's own bowl width across ~7 stemmed glasses), not a
+data or CSS change. **Deliberately parked, 2026-08-26** — Helen: "these
+graphics are the thing on the site that the least serves function over
+form... let's leave things as they are." Logged on #299 so it isn't
+rediscovered from scratch later.
+
+**The four-tumbler-icon problem (#347) is resolved, differently than any of
+the three ways originally floated.** `old-fashioned.svg`, `rocks.svg`,
+`rocks-tall.svg` and the old `old-fashioned-double.svg` all got replaced by
+one fresh redraw; `rocks` is now a plain alias to `old-fashioned` rather than
+its own drawing. The double variant is being redrawn to match; until then
+`double rocks`/`double old fashioned` are deliberately unmapped (3 drinks —
+Fancy-Free, Vieux Carré, Ti Punch — render with no glass icon, verified
+against a build). Full story is in `glasses.yml`'s own retirement note —
+treat that file as more current than this paragraph if they disagree.
+
+**A root `<svg>` element defaults to `overflow: hidden` in every browser's
+own UA stylesheet — not a CSS property default, a default for that specific
+element.** Found 2026-08-26: a stroke whose rounded join or cap sits right on
+the viewBox edge (a glass belly, a stemmed glass's top corners) was getting
+silently sheared off, on the real site as well as the dev page — `.dev-strip`
+and `.dev-card-big` on `_dev/glasses.html` had it too, it just took a
+side-by-side comparison to notice. Fixed with an explicit
+`overflow: visible` everywhere an icon renders (`.cocktail-glass-icon` in
+`_cocktail.scss`, so every real cocktail page, plus the dev page's own
+scale/card rules). Worth remembering generally: an inline `<svg>` clips its
+own content by default, the same way `overflow: hidden` on any other element
+would, and it is not obvious from reading the SVG or the surrounding layout
+CSS that this is happening — only from a stroke that touches the edge.
 
 ## 10. Validation — run `pytest`, don't read this
 
@@ -2975,6 +3072,16 @@ icons on top of artwork, which is not what anyone wants to look at. Below 600px
 the row now gets its own line beneath the wordmark, so there is no overlap left
 to resolve. Reach for `order` rather than moving markup when the DOM order is
 carrying something else — here, the nav is first for tab order and stays first.
+
+**AN INLINE `<svg>` CLIPS ITS OWN CONTENT BY DEFAULT.** Every browser's UA
+stylesheet sets `overflow: hidden` on the root `svg` element specifically —
+not a CSS property default, a default for that element — so a stroke whose
+rounded join or cap sits right on the viewBox edge gets silently sheared off,
+with nothing in the SVG source or the surrounding layout CSS suggesting why.
+Found on the cocktails glass icons, 2026-08-26 (§9.11), on the real site as
+well as a dev-only comparison page — fixed everywhere with an explicit
+`overflow: visible`. Worth checking on ANY inline SVG icon that touches its
+own edges, not just glasses.
 
 ## 13. The site's visual design
 

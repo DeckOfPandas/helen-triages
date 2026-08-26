@@ -66,18 +66,22 @@ sitemap: false
   {% comment %} ── 1. exactly as the site draws them ─────────────────────── {% endcomment %}
   <h2>1. At real size &mdash; what a cocktail page actually shows</h2>
   <p class="dev-note">
-    2.6rem tall, width following the aspect ratio, capped at 3.2rem. This uses
-    the real <code>.cocktail-glass-icon</code> class, so it is the honest test
-    of legibility: anything that turns to mush here is mush on the site.
-    <strong>Every icon is the same height here</strong> &mdash; that is the
-    site's current behaviour, not a display choice of this page, and it is what
-    issue #298 is about.
+    Real relative height (2.6rem for the tallest, others scaled down against
+    it) AND width capped at 3.2rem, exactly the same
+    <code>--glass-icon-height</code> calculation and the same
+    <code>.cocktail-glass-icon</code> class a real cocktail page uses (#298) --
+    this is the honest "how does this actually look in situ" view, not a
+    display choice of this page. <strong>OUT OF DATE UNTIL 2026-08-26</strong>:
+    this used to render every icon at the same flat height, which was true of
+    the site until #298 landed and stopped being true of this paragraph.
   </p>
 
   <div class="dev-strip">
     {% for icon in all_icons %}
       {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
-      <span class="cocktail-glass-icon">{% include {{ icon_file }} %}</span>
+      {% assign mm = heights[icon] | times: 1.0 %}
+      {% assign icon_rem = mm | divided_by: tallest_mm | times: 2.6 %}
+      <span class="cocktail-glass-icon" style="--glass-icon-height: {{ icon_rem }}rem" title="{{ icon }} — {{ mm | round }}mm">{% include {{ icon_file }} %}</span>
     {% endfor %}
   </div>
 
@@ -244,9 +248,16 @@ sitemap: false
     margin-bottom: 2.5rem;
   }
   .dev-scale-item { display: flex; flex-direction: column; align-items: center; }
-  .dev-scale-art { display: flex; align-items: flex-end; }
-  /* height comes from the inline style, computed from the real-world mm */
-  .dev-scale-art svg { height: 100%; width: auto; max-width: none; }
+  .dev-scale-art { display: flex; align-items: flex-end; overflow: visible; }
+  /* height comes from the inline style, computed from the real-world mm.
+     overflow:visible on the svg matters because the default UA stylesheet
+     sets `overflow: hidden` on the root <svg> element -- not a CSS default,
+     a browser-specific one for the element itself -- so a stroke whose
+     rounded join or cap sits right on the viewBox edge (a glass belly, a
+     stemmed glass's top corners) gets sheared off. 2026-08-26, Helen: "the
+     tops of nick and nora, one side of the new collins glass, and the outer
+     edges of the brandy glass belly" were all this, not the artwork. */
+  .dev-scale-art svg { height: 100%; width: auto; max-width: none; overflow: visible; }
 
   /* THE STROKE MUST BE SCALED UP WITH THE ICON HERE, AND THIS IS NOT A DETAIL.
      `vector-effect: non-scaling-stroke` holds the glasses at 1.6 SCREEN pixels
@@ -281,8 +292,8 @@ sitemap: false
   /* The big view. The stroke is NON-SCALING, so a bigger icon draws a
      proportionally thinner line — expected, and exactly the effect to watch
      for if the site's real icon size ever changes. */
-  .dev-card-big { display: inline-flex; align-items: flex-end; }
-  .dev-card-big svg { height: 6rem; width: auto; max-width: none; }
+  .dev-card-big { display: inline-flex; align-items: flex-end; overflow: visible; }
+  .dev-card-big svg { height: 6rem; width: auto; max-width: none; overflow: visible; }
 
   .dev-list { columns: 3; font-size: 0.85rem; }
 </style>

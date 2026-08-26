@@ -27,21 +27,36 @@
 // their own viewBoxes rather than being forced into a square one. The glasses
 // are genuinely different proportions — a flute is 27mm wide by 98 tall, a
 // punch bowl 105 by 70 — so a common WIDTH would render the flute enormous and
-// the punch bowl tiny. A common height, with the width left to follow the
-// aspect ratio, is what makes them read as one set.
+// the punch bowl tiny. A height following the REAL glass, with the width left
+// to follow the aspect ratio, is what makes them read as one set.
+//
+// `--glass-icon-height` is set inline by the layout, computed from
+// `heights_mm` against the tallest real glass — #298, 2026-08-25. 2.6rem is
+// only the FALLBACK, for a glass with no heights_mm entry; every icon that
+// has one now renders at its own real relative height instead of the old
+// flat 2.6rem every icon shared.
 .cocktail-glass-icon {
   display: inline-flex;
   align-items: flex-end;
   flex: none;
 
+  // The default UA stylesheet sets `overflow: hidden` on a root <svg>
+  // element -- a browser default for the element, not a CSS property
+  // default -- so a stroke whose rounded join or cap sits right on the
+  // viewBox edge (a glass belly, a stemmed glass's top corners) gets sheared
+  // off. Found on _dev/glasses.html, 2026-08-26, but it was never page-page
+  // specific: every real cocktail page had the same silent clip.
+  overflow: visible;
+
   svg {
     display: block;
-    height: 2.6rem;
+    height: var(--glass-icon-height, 2.6rem);
     width: auto;
     // A tall narrow glass and a wide shallow one at the same height still
     // differ a lot in width; this stops the widest (punch bowl, mule mug)
     // pushing the title along.
     max-width: 3.2rem;
+    overflow: visible;
   }
 }
 
@@ -57,7 +72,9 @@
 // text-shadow on type — an absolute length applied across a range of sizes is a
 // range of different results — arriving in a different property. The fix here
 // is `vector-effect: non-scaling-stroke`, which makes stroke-width resolve in
-// SCREEN units instead, so one value is one line weight on all 21 icons.
+// SCREEN units instead, so one value is one line weight across every icon —
+// deliberately not a count here, since it only goes stale (last wrong at 21;
+// `_data/cocktails/glasses.yml`'s `all_icons` is the live one).
 //
 // Set the weight here and nowhere else. If a glass ever looks wrong, the
 // artwork is wrong, not this number.
@@ -97,4 +114,90 @@
 // inline fill would beat this rule anyway and make the palette look broken.
 .cocktail-glass-icon {
   color: $color-clear-text;
+}
+
+// =============================================================================
+// INGREDIENT LINE — three parts, settled 2026-08-24 after a design pass on
+// #465/#460: amount+headline / class(+character) / note. No colour decision
+// here — the palette is still the placeholder monochrome from _palette.scss,
+// argued nowhere yet. This is information hierarchy only.
+// =============================================================================
+
+.cocktail-ingredients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cocktail-ingredient {
+  padding: $space-md 0;
+  border-bottom: 1px solid $color-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.cocktail-ingredient-top {
+  display: flex;
+  align-items: baseline;
+  gap: $space-sm;
+}
+
+.cocktail-amount {
+  font-variant-numeric: tabular-nums;
+  color: $color-clear-text;
+  font-size: $font-size-body-sm;
+}
+
+.cocktail-item {
+  font-weight: 600;
+}
+
+// The class line: `generic`, oxford-joined if a list, plus `character` as a
+// trailing parenthetical. Deliberately quiet — this is a gloss on the
+// headline, not a second headline.
+.cocktail-type-line {
+  color: $color-clear-text;
+  font-size: $font-size-body-sm;
+  margin: $space-xs 0 0;
+}
+
+// A rum-family style name gets the site's heading face — blockier, so the
+// internal comma in a name like "Demerara, aged" doesn't collide visually
+// with the comma that would otherwise separate it from a joined "or"
+// alternative. Scoped to rum on purpose: "cognac" or "bourbon" have no such
+// collision and stay plain (_layouts/cocktail.html decides the family via
+// `ingredients.family_of`, not this file).
+.cocktail-style-name {
+  font-family: $font-headings;
+  color: $color-text;
+}
+
+.cocktail-style-or {
+  font-style: italic;
+  color: $color-clear-text;
+  margin: 0 0.5em;
+  display: inline-block;
+}
+
+// Character is a property of THIS RECIPE'S use of the bottle, not the bottle
+// in the abstract (#441) — folded onto the class line, never its own line.
+// The explicit "character:" label is load-bearing, not decoration: a bare
+// parenthetical like "moderately aged rum (blackstrap)" reads as if
+// blackstrap were a TYPE of moderately-aged rum, which is real, live
+// confusion with actual black rum.
+.cocktail-character {
+  color: $color-clear-text;
+}
+
+// The note — #457's fix for reasoning that used to get smuggled into
+// `suggestion`. Always visible, no interaction, left-aligned like ordinary
+// prose (right-alignment was tried and dropped — it read as competing with
+// the class line above it rather than as a quiet aside).
+.cocktail-note {
+  color: $color-clear-text;
+  font-size: $font-size-body-sm;
+  font-style: italic;
+  margin: $space-xs 0 0;
 }
