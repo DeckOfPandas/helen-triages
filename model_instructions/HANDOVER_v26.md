@@ -2168,6 +2168,96 @@ everything classifies as a junction — that version returned 2,966 polylines fo
 a thirty-stroke drawing. Walk greedily, preferring the neighbour that best
 continues the current direction, so strokes run straight THROUGH crossings.
 
+---
+
+### 9.13 `heights_mm` sizes the CANVAS, so margin inside a drawing costs you
+
+**2026-08-26, found by measurement after two glasses looked wrong side by
+side.** An icon renders at the height `heights_mm` gives its **viewBox**. The
+glass inside that viewBox is whatever fraction of it the artwork occupies — so
+a drawing with empty margin renders SMALLER than one without, at the same
+`heights_mm`, and no data change fixes it.
+
+The case that surfaced it: Helen's redrawn double old-fashioned.
+
+| | ink fills viewBox height | renders, vs the single |
+|---|---|---|
+| `old-fashioned` (85 mm) | 99.0% | — |
+| `old-fashioned-double` previous (100 mm) | 99% | 1.18× ✓ |
+| `old-fashioned-double-2` (100 mm) | **75.7%** | **0.90×** ✗ |
+
+`heights_mm` says the double should stand 1.176× the single. The redraw stands
+0.90× — a double old-fashioned that draws smaller than a single — because a
+quarter of its canvas is air. **The viewBox being BIGGER is not the same as the
+glass being bigger, and it is easy to check the wrong one:** the redraw's
+viewBox is 1.29× the single's, which looks like confirmation and is not.
+
+**How to check.** Render, then measure the ink's bounding box as a fraction of
+the canvas. Reasoning from viewBox numbers and internal matrix scales gave the
+wrong answer here; the render did not. There is no rasteriser in this
+environment — see §9.12 on the one written for the tiki mug, which does this
+job too.
+
+**Worth a guard eventually**, and it is not built: a test that renders each
+icon and flags any whose ink-fill fraction is an outlier would catch this class
+at the point a drawing lands, rather than when someone notices two glasses look
+wrong together.
+
+### 9.14 Never save a redraw over its predecessor
+
+**The rule, and it now has a mechanism behind it.** `_design_sources/` is the
+record of what was tried. A record you can overwrite is not one.
+
+Helen dropped a corrected double old-fashioned, it was copied over the file it
+replaced, and for one commit the only surviving copy of the previous drawing
+was in git history. `/dev/glasses/` recovered it with `git show`, which worked
+and was the wrong shape: the whole job of comparing a redraw against what it
+replaces cannot rest on archaeology that a squash, rebase or shallow clone
+removes.
+
+**The convention** — already in use for `coupe-3`, `hurricane-2`, `tiki-mug-2`,
+`old-fashioned-2`, and now applied to the double: base name is the original, a
+numeric suffix is the redraw. Both stay on disk.
+
+**Which one publishes is then a NAMED SWITCH, not an accident.** In
+`scripts/normalise_glass_icons.py`, a `RENAME` entry points the suffixed name
+at the published name and a `SKIP` entry holds back the one it supersedes, with
+a comment saying which two lines to delete to reverse it. That is how an
+undecided choice should sit in a repo: both options present, one live, and the
+change a deletion rather than a reconstruction.
+
+**VERIFY BY RESOLUTION, NOT BY INSPECTION.** After changing that switch, re-run
+the normaliser's own skip/strip/rename logic and assert exactly one source
+resolves to the published name, then regenerate and confirm the output matches
+what is on disk. Issue #484 is what happens without this: the published
+old-fashioned was correct only because someone had written it by hand, and the
+`sorted()` ordering meant a regeneration would have silently replaced it with a
+superseded 2-path draft. `-` is 0x2D and `.` is 0x2E, so every suffixed name
+sorts BEFORE the bare one, and the bare one wins by being written last.
+
+### 9.15 The candidate drawer — `/dev/glasses/` sections 5 and 6
+
+Every drawing in `_design_sources/cocktails/glasses/`, normalised into
+`_includes/icons/glass-candidates/` and listed in
+`_data/dev_glass_candidates.yml`, both written by
+`scripts/build_glass_candidates.py`. Rejects and superseded options included:
+this is the drawer, not the shelf.
+
+Three constraints shaped it, and all three are in the script:
+
+- **Jekyll cannot reach `_design_sources/`.** `include` reads only from
+  `_includes/`, and no plugin here loads an arbitrary path.
+- **The copies cannot live in `_includes/icons/glasses/`.** That is the
+  published set and `test_all_icons_matches_the_icon_directory` asserts it
+  matches `all_icons` in both directions. A sibling directory is invisible to
+  it, because that test globs non-recursively.
+- **Jekyll cannot enumerate a directory**, so the names are handed to the page
+  as data — written in the same run as the copies, so they cannot drift.
+
+The list is deliberately NOT in `_data/cocktails/`, which is the site's
+vocabulary. Scaffolding for one dev page does not belong beside three files the
+whole site reads.
+
 ## 10. Validation — run `pytest`, don't read this
 
 **The suite gates the deploy now (2026-08-18, issue #369).** Until then the

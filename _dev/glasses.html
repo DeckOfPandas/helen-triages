@@ -87,7 +87,12 @@ sitemap: false
     {% for icon in all_icons %}
       {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
       {% assign mm = heights[icon] | times: 1.0 %}
-      {% assign icon_rem = mm | divided_by: tallest_mm | times: 2.6 %}
+      {% comment %} 10.4, matching _layouts/cocktail.html. This read 2.6 for
+         half a day after the prose above was updated to say 10.4 -- the words
+         changed and the arithmetic did not, which is precisely the failure
+         that paragraph is complaining about. If you edit one, edit both.
+      {% endcomment %}
+      {% assign icon_rem = mm | divided_by: tallest_mm | times: 10.4 %}
       <span class="cocktail-glass-icon" style="--glass-icon-height: {{ icon_rem }}rem" title="{{ icon }} — {{ mm | round }}mm">{% include {{ icon_file }} %}</span>
     {% endfor %}
   </div>
