@@ -35,10 +35,13 @@ layout: default
      where that variance is handled.
 
      A glass with no entry, or an entry naming a file that is not there,
-     renders NOTHING. That is deliberate and it is why `file_exists` is
-     checked as well as the lookup: `coupe` is the commonest glass in the
-     collection and has no icon yet, so the no-icon path is the normal case
-     today, not an edge one. Same absent-means-nothing convention as
+     renders NOTHING. That is deliberate. This used to add that `coupe` had no
+     artwork and so the no-icon path was "the normal case today, not an edge
+     one" — the coupe has been drawn since 2026-08-16 and redrawn twice since,
+     so that is no longer true and the path is a genuine edge case again. It
+     still fires: 14 drinks carry no glass at all, and `any` is a real member
+     of the vocabulary with deliberately no icon. Same absent-means-nothing
+     convention as
      _data/sites.yml's `reference_links` — a missing key must never become a
      broken image. (This used to cite `footer_svg`, retired by issue #374 when
      the footer became one artefact for the whole repo; the convention it stood

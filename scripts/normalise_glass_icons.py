@@ -82,6 +82,16 @@ SKIP = {
     "glass-coupe-2.svg",
     "glass-hurricane.svg",
     "glass-tiki-mug.svg",
+    # THE OLD-FASHIONED CASE PREDATES THE OTHERS AND WAS ALREADY BROKEN, #484.
+    # Commit 14eab is titled "settle on old-fashioned-2" but nothing mapped it,
+    # so the settled drawing was live only because it happened to have been
+    # written by hand. Verified 2026-08-26 by comparing geometry: the published
+    # old-fashioned.svg IS glass-old-fashioned-2.svg, and glass-old-fashioned
+    # .svg is a 2-path early version that sorts last and would have replaced it
+    # on the next full regeneration. -3 is a 12-path candidate that was never
+    # adopted and would otherwise publish an old-fashioned-3.svg nothing uses.
+    "glass-old-fashioned.svg",
+    "glass-old-fashioned-3.svg",
 }
 
 # FILL-BASED ARTWORK, WHICH THE REST OF THE SET IS NOT. Every glass is drawn as
@@ -125,6 +135,7 @@ RENAME = {
     "coupe-3": "coupe",
     "hurricane-2": "hurricane",
     "tiki-mug-2": "tiki-mug",
+    "old-fashioned-2": "old-fashioned",
 }
 
 

@@ -70,7 +70,9 @@ moods:
     PURPOSE, the same choice as declaring Plymouth and Genever gin while owning
     neither -- this is a spec, not an inventory. The collection genuinely has
     none of these yet; see issue #337. The index must not render a button for a
-    mood with no drinks.
+    mood with no drinks — ENFORCED since 2026-08-26: cocktails/index.html counts
+    each mood's members and skips the empty ones, rather than naming this one as
+    an exception, so the rule holds for whichever mood is empty next.
   tiki: >-
     Two or more tiki markers -- orgeat, falernum, passion fruit, pineapple,
     cinnamon syrup, grenadine, an overproof or pineapple rum -- AND complexity,

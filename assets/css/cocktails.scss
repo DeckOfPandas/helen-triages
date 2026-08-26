@@ -38,6 +38,11 @@
 @import "cocktails/filters";
 // Print, last -- see shared/_print.scss's header for why last, and why all
 // three stylesheets take it rather than just the one whose pages prompted it
-// (#86). There is no cocktails/print partial: this site has no page anatomy
-// of its own yet, so the chrome rules are the whole of what applies.
+// (#86). There is still no cocktails/print partial, but the REASON has
+// expired: this said "this site has no page anatomy of its own yet", and since
+// 2026-08-26 it has a full one. What a drink page should print is now a real
+// question with a real answer available — almost certainly the `make it`
+// state, which is the version you would have beside you — and it is issue
+// #482. Until that lands, the shared chrome rules are the whole of what
+// applies, which is a gap rather than a decision.
 @import "shared/print";
