@@ -238,19 +238,33 @@ $rule-ingredient: 46%;
   gap: $spacing-section-gap;
   font-size: 0.92rem;
 
+  // MENTHE, AND ALWAYS — Helen saw it in `make it` mode and wanted it kept.
+  // It fits the page's own logic rather than only being liked: on a drink page
+  // menthe is the HEAD's colour (it rules the title), violet the sections, and
+  // amber the structural marks. GLASS and GARNISH live in the head, so this is
+  // the head's colour reaching the head's other two facts.
+  //
+  // HEAVIER, at 700 rather than 400. Courier Prime ships Regular and Bold and
+  // nothing between (see the @font-face block in shared/_fonts.scss), so 700
+  // is the only step up available and it is a real face rather than a
+  // synthesised one.
+  //
+  // NOT PUNCHED, and this is a measurement rather than a preference. The
+  // emboss stroke is 1.6% of font-size, so at this size it resolves to about
+  // 0.19px — the same arithmetic that made the section headings need 1.8rem
+  // before the effect meant anything. Punching these would cost the crispness
+  // of the letterforms and give back a fifth of a pixel of edge. If they
+  // should be punched, they need to be about 1rem first, at which point they
+  // are as large as the values beneath them and the hierarchy inverts.
   strong {
     display: block;
     font-family: $font-headings;
-    font-weight: 400;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: $letter-spacing-label;
-    // Bigger and darker. These were 0.66rem at 70% of grey-on-paper, which is
-    // metadata styling, and Helen was right that it read as too pale: GLASS
-    // and GARNISH are the two things on this page you act on before you have
-    // read anything else.
-    font-size: 0.72rem;
-    color: $color-clear-text;
-    margin-bottom: 0.15rem;
+    letter-spacing: 0.14em;
+    font-size: 0.74rem;
+    color: $color-menthe-deep;
+    margin-bottom: 0.2rem;
   }
 }
 
@@ -703,16 +717,20 @@ $amount-indent: $amount-col + $amount-gap;
   // them from the title block they belong to, and it makes the two states
   // structurally different pages rather than one page with things hidden —
   // which is the contract that keeps this printable and JS-free.
+  // ONLY THE VALUES CHANGE NOW. This block used to restate the labels' colour,
+  // letter-spacing and gap as well — all of which the default owns since the
+  // menthe treatment moved out of this state and into the base rule, which is
+  // where Helen wanted it after seeing it here.
+  //
+  // Left alone, one of those restatements had already gone wrong in the way
+  // the note further up this file predicts: it pinned the labels to 0.7rem,
+  // which is now SMALLER than the 0.74rem default, so pressing `make it` would
+  // have quietly shrunk the two labels this state exists to shout with. A
+  // state modifier only renders when someone presses something, so a stale
+  // copy inside one is invisible until it is embarrassing.
   .cocktail-meta {
-    gap: $spacing-section-gap;
     font-size: 1.05rem;
     font-weight: 600;
-
-    strong {
-      font-size: 0.7rem;
-      color: $color-menthe-deep;
-      letter-spacing: 0.14em;
-    }
   }
 
   // What you read with your hands full.
