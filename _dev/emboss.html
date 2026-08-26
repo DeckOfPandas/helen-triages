@@ -1,0 +1,155 @@
+---
+layout: default
+site_key: food
+title: Emboss tuning
+sitemap: false
+---
+
+{% comment %} ─────────────────────────────────────────────────────────────────
+  EMBOSS TUNING — a served page, not a mock.
+
+  The difference matters and is why tmp/type-playground.html was retired for
+  this job. That page reproduced the treatment by hand, and got it wrong in a
+  way that misled Helen for a whole exchange: it applied the STROKE only, with
+  no shadow, so Courier Prime looked flat and the fault looked like the font's.
+  The emboss is stroke AND a two-copy directional shadow, and a reproduction is
+  a second thing to keep in step with the first.
+
+  So this page carries no styling of its own for the effect. The headings below
+  are ordinary h1/h2/h3, which pick up shared/_base.scss's real rule through
+  the real cascade with the real fonts loaded. What the dials do is INJECT AN
+  OVERRIDE into #tune-sheet — so what you are looking at is the site's own
+  treatment with different numbers in it, not an imitation of it.
+
+  Lives in _dev/ for the reason issue #276 exists: `output: false` in
+  production, so this has no URL and no sitemap entry on the deployed site.
+  Local only, at /dev/emboss/.
+────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+<style id="tune-sheet"></style>
+
+<style>
+  /* Chrome for the dials only. Nothing here touches the specimens. */
+  .tune-panel {
+    position: sticky; top: 0; z-index: 5;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.75rem 1.5rem;
+    padding: 1rem; margin: 0 0 2.5rem;
+    background: #fff; border: 2px solid #211f20;
+    font-family: "Selawik", sans-serif; font-size: 0.8rem;
+  }
+  .tune-dial label { display: block; margin-bottom: 0.15rem; }
+  .tune-dial input { width: 100%; }
+  .tune-dial b { color: #c4009a; font-variant-numeric: tabular-nums; }
+  .tune-out {
+    grid-column: 1 / -1; margin: 0; padding: 0.6rem;
+    background: #faf7f8; border: 1px solid #ebdbe0;
+    font-family: "Courier Prime", monospace; font-size: 0.72rem;
+    white-space: pre; overflow-x: auto;
+  }
+  .tune-swatch { padding: 1.5rem 0; border-top: 1px dashed #ebdbe0; }
+  .tune-swatch--dark { background: #211f20; padding: 1.5rem; }
+  .tune-swatch--dark h2 { color: #e7e2e3; }
+  .tune-note { font-family: "Selawik", sans-serif; font-size: 0.85rem; color: #5a5558; }
+</style>
+
+<div class="tune-panel">
+  <div class="tune-dial">
+    <label>stroke <b id="v-stroke"></b></label>
+    <input type="range" id="d-stroke" min="0" max="0.03" step="0.001" value="0.010">
+  </div>
+  <div class="tune-dial">
+    <label>offset, display sizes <b id="v-big"></b></label>
+    <input type="range" id="d-big" min="0" max="5" step="1" value="2">
+  </div>
+  <div class="tune-dial">
+    <label>offset, small type <b id="v-small"></b></label>
+    <input type="range" id="d-small" min="0" max="4" step="1" value="1">
+  </div>
+  <div class="tune-dial">
+    <label>shadow darkness <b id="v-dark"></b></label>
+    <input type="range" id="d-dark" min="0" max="0.8" step="0.02" value="0.38">
+  </div>
+  <div class="tune-dial">
+    <label>stroke lightness <b id="v-light"></b></label>
+    <input type="range" id="d-light" min="0" max="60" step="2" value="20">
+  </div>
+  <pre class="tune-out" id="out"></pre>
+</div>
+
+<p class="tune-note">Real h1/h2/h3, real stylesheet, real Courier Prime. The dials
+override <code>-webkit-text-stroke</code> and <code>text-shadow</code> in place —
+they are not reproducing the effect, they are re-numbering it. Shipped values are
+the starting positions.</p>
+
+<h1>Beetroot Chocolate Cake</h1>
+<div class="tune-swatch">
+  <h2>Ingredients</h2>
+  <h3>For the topping</h3>
+</div>
+
+<div class="tune-swatch tune-swatch--dark on-dark">
+  <h2>Light type on dark</h2>
+  <p class="tune-note" style="color:#9a9496">This block carries
+  <code>.on-dark</code>, and is currently the ONLY thing on the site that does —
+  there is no dark section anywhere in food, shared or cocktails. So this is a
+  demo, not a preview of a real page. The class re-points the six emboss custom
+  properties, so every punched rule inside it inverts with no per-selector
+  overrides. Note the dials above still drive the LIGHT-ground values, so this
+  swatch shows the committed <code>.on-dark</code> numbers rather than following
+  the sliders. Not to be confused with <code>.site-logo-word</code>, which is
+  light-on-dark too but is a permanent exception with its own four-copy bevel.</p>
+</div>
+
+<script>
+(function () {
+  var sheet = document.getElementById('tune-sheet');
+  var out   = document.getElementById('out');
+  var dials = ['stroke', 'big', 'small', 'dark', 'light'];
+  var el = {};
+  dials.forEach(function (k) {
+    el[k] = document.getElementById('d-' + k);
+    el[k].addEventListener('input', apply);
+  });
+
+  /* $color-label-stroke is lighten($color-text, N%) in Sass. Reproducing that
+     in JS would be a second definition to keep in step, so this walks the same
+     HSL lightness the Sass function does, from the same #211f20. */
+  function strokeColour(pct) {
+    return 'hsl(330 3% ' + (12.5 + Number(pct)) + '%)';
+  }
+
+  function apply() {
+    var stroke = Number(el.stroke.value).toFixed(3);
+    var big    = el.big.value, small = el.small.value;
+    var dark   = Number(el.dark.value).toFixed(2);
+    var light  = el.light.value;
+    var col    = strokeColour(light);
+    var shadow = function (o) {
+      return '-' + o + 'px -' + o + 'px 0 #faf7f8, ' +
+             o + 'px ' + o + 'px 0 rgba(33,31,32,' + dark + ')';
+    };
+
+    sheet.textContent =
+      'h1,h2,h3{-webkit-text-stroke:' + stroke + 'em ' + col + ';}' +
+      'h1{text-shadow:' + shadow(big) + ';}' +
+      'h2,h3{text-shadow:' + shadow(small) + ';}';
+
+    ['stroke','big','small','dark','light'].forEach(function (k, i) {
+      document.getElementById('v-' + k).textContent =
+        [stroke + 'em', big + 'px', small + 'px', dark, light + '%'][i];
+    });
+
+    out.textContent =
+      '// _sass/shared/_rule.scss\n' +
+      '$emboss-stroke:       ' + stroke + 'em;\n' +
+      '$emboss-offset:       ' + small + 'px;\n' +
+      '$emboss-offset-large: ' + big + 'px;\n' +
+      '$color-emboss-shadow: rgba($color-text, ' + dark + ');\n' +
+      '// _sass/food/_palette.scss\n' +
+      '$color-label-stroke:  lighten($color-text, ' + light + '%);';
+  }
+
+  apply();
+})();
+</script>

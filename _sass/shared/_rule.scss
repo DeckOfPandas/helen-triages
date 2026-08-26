@@ -68,36 +68,143 @@
 // document says it is. Since that rule is what makes the treatment reach EVERY
 // heading rather than a list of them, em wins on both counts: it does more and
 // it can't drift.
-$emboss-stroke: 0.014em;       // 1.4% of font-size, self-scaling
-$emboss-offset-ratio: 0.065;   // 6.5% of font-size -- see the two values below
-
+// 1.6% of font-size, self-scaling. Tuned by Helen at /dev/emboss/ against
+// Courier Prime, having been 1.4% against Courier New.
+//
+// It went DOWN to 1.0% first, on the reasoning that Courier Prime's heavier
+// stems and tighter counters would let the same rim fill more counter and read
+// as blur -- and that was wrong, or at least not what she wanted. Looking at it
+// went the other way: a heavier letterform can carry MORE edge, not less, and
+// the value ended up above where it started. Recorded because the argument was
+// plausible, produced a number, and lost to somebody looking at the thing.
+$emboss-stroke: 0.016em;
 // The offset stays a WHOLE PIXEL rather than a computed proportion, unlike the
-// stroke, and the difference is deliberate: a fractional stroke width is
-// already normal here and antialiases harmlessly along a letterform's edge,
-// but a fractional shadow offset antialiases the whole duplicate glyph, which
-// is the soft, floating read the "no blur" rule above exists to avoid. Two
-// values cover every size on the site at close enough to 6.5% -- so they are
-// two hard values, with the arithmetic written down rather than performed.
+// stroke, and the difference is deliberate: a fractional stroke width is already
+// normal here and antialiases harmlessly along a letterform's edge, but a
+// fractional shadow offset antialiases the whole duplicate glyph, which is the
+// soft, floating read the "no blur" rule above exists to avoid.
 //
-//   1px    up to ~1.2rem   (0.85rem meta label = 7.4%, 1rem = 6.3%)
-//   2px    from ~1.6rem    (1.8rem section heading = 6.9%, 2.2rem title = 5.7%)
+// BOTH ARE 1px. There used to be a two-tier rule here -- 1px on small type, 2px
+// on display sizes, both landing near 6.5% of the font-size -- with the
+// arithmetic for four elements written out. It is gone rather than marked
+// historical: it described a ratio nothing now follows, and a paragraph of
+// reasoning for numbers that are equal is worse than no paragraph. Helen tuned
+// the h1 against Courier Prime and 2px read as two letters rather than one
+// raised one.
 //
-// A size in between (the index's 1.35rem .category-label, which wants 1.4px)
-// takes whichever of the two looks right rather than a half pixel.
+// The two variables stay separate anyway, because the smaller type levels have
+// not been tuned yet and may want to diverge again.
 $emboss-offset:       1px;                      // hard, not blurred
-$emboss-offset-large: 2px;                      // the same, on display sizes
-$color-emboss-light:  $color-bg;                // the paper catching the light
-$color-emboss-shadow: rgba($color-text, 0.38);  // where it does not
+$emboss-offset-large: 1px;                      // was 2px -- see above
+
+// THE HIGHLIGHT NEEDS HEADROOM ABOVE THE GROUND, AND ON THIS SITE IT BARELY HAS
+// ANY. This was $color-bg -- the paper catching the light -- which is exactly
+// right as a model and invisible in practice on a page whose ground IS
+// $color-bg: a copy painted in the background colour, offset over the
+// background, cannot be seen. It earns its keep only where a heading sits on
+// something else (the metadata wash, a note box), where it reads as a cut line.
+//
+// Helen, 2026-08-24, comparing a heading against the header wordmark: "we're
+// still missing the white up and left from the simulated light source". Correct,
+// and the wordmark is the reason it looks achievable -- .site-logo-word is LIGHT
+// TYPE ON BLACK TAPE, so it has the whole brightness range to play with. Dark
+// type on #faf7f8 has about 3% of headroom and no more.
+//
+// $color-white is that 3%, which is the entire available budget. It is a real
+// improvement and a small one; anything stronger would need the ground behind
+// headings to be darker, which is a different design.
+$color-emboss-light:  $color-white;             // the paper catching the light
+$color-emboss-shadow: rgba($color-text, 0.68);  // where it does not -- was 0.38
 
 // $style: raised   letters standing proud of the tape  (light from top-left)
 //         pressed  letters punched down into it        (the same light, inverted)
 // $offset          $emboss-offset-large on display type; see the note above
-@mixin punched($style: raised, $offset: $emboss-offset) {
+// =============================================================================
+// THE TWO GROUNDS, AND WHY THIS IS CUSTOM PROPERTIES RATHER THAN SASS
+// =============================================================================
+// Helen tuned the emboss twice on 2026-08-24, once for dark type on the page
+// ground and once for light type on a dark one, and the two sets disagreed on
+// every single value:
+//
+//                          dark-on-light      light-on-dark
+//   stroke                 0.016em            0.010em
+//   offset, display        1px                2px
+//   shadow alpha           0.68               0.06
+//   stroke lightness       +30%               +40%
+//
+// THAT IS NOT INDECISION, IT IS THE PHYSICS OF THE TWO CASES. On a light ground
+// the highlight has ~3% of headroom above the paper and the SHADOW does the
+// raised work -- hence 0.68. On a dark ground it inverts completely: a dark
+// shadow on dark is invisible, so the shadow goes to nearly nothing and the
+// LIGHT copy does everything. Two inverse problems, and one set of Sass
+// variables can only ever serve one of them. It is the same reason
+// .site-logo-word had to be excused from this treatment entirely back in
+// August: it is the site's only light-on-dark lettering.
+//
+// SO THE VALUES ARE CUSTOM PROPERTIES AND THE INVERSION IS A CLASS. Sass
+// variables are resolved at compile time and cannot be overridden by context;
+// custom properties inherit, so `.on-dark` redefines six values once and every
+// rule that reads them -- at any nesting depth, in any partial, including ones
+// written later -- picks up the inversion with no specificity fight and no list
+// of selectors to maintain. A `.on-dark h1 { ... }` block would have had to
+// out-specify thirteen existing component rules and would have silently missed
+// the fourteenth.
+//
+// The Sass variables below are still the single source of the DEFAULTS. Nothing
+// else in the codebase should read the custom properties' fallbacks.
+
+// EMITTED ONCE, EVEN THOUGH THIS FILE IS IMPORTED TWICE. food/_timings.scss
+// imports `shared/rule` and `food/rule` again for its own use, which was free
+// for as long as these were pure DEFINITION files -- variables and a mixin emit
+// nothing, so importing them twice cost nothing. The moment this file started
+// emitting real CSS that stopped being true: food.css carried two copies of the
+// block, and the only reason the right value survived was the accident of which
+// copy landed last. A guard rather than untangling the import, because the
+// double import is deliberate on timings.scss's side and this file should stay
+// safe to import from anywhere.
+$emboss-vars-emitted: false !default;
+@if not $emboss-vars-emitted {
+  :root {
+    --emboss-stroke-w:    #{$emboss-stroke};
+    // $color-text, NOT food's softer $color-label-stroke -- that is not one of
+    // the ten the palette CONTRACT guarantees, and naming it here broke the
+    // cocktails build outright the moment this block was written. Shared may only
+    // ask for what every palette promises. Food re-points this to its own softer
+    // value in food/_rule.scss, which is imported after this file.
+    --emboss-stroke-c:    #{$color-text};
+    --emboss-light:       #{$color-emboss-light};
+    --emboss-shadow:      #{$color-emboss-shadow};
+    --emboss-offset:      #{$emboss-offset};
+    --emboss-offset-lg:   #{$emboss-offset-large};
+  }
+
+  // Put this on any SECTION whose type is light on a dark ground. It is a
+  // context, not a component: it styles nothing itself, it only re-points the
+  // six values every punched rule already reads.
+  //
+  // NOTE FOR WHOEVER ADDS THE FIRST REAL ONE. As of 2026-08-24 the site has no
+  // dark section at all -- these numbers were tuned against a swatch on
+  // /dev/emboss/, which is the only consumer. They are a considered starting
+  // point, not a verified result, and the honest thing is to re-eyeball them
+  // against real content rather than trust them because they are written down.
+  // This is NOT dark mode, which is a separate and much larger question Helen has
+  // explicitly deferred.
+  .on-dark {
+    --emboss-stroke-w:  0.010em;
+    --emboss-stroke-c:  #{lighten($color-text, 40%)};
+    --emboss-shadow:    #{rgba($color-text, 0.06)};
+    --emboss-offset-lg: 2px;
+  }
+  $emboss-vars-emitted: true !global;
+}
+
+@mixin punched($style: raised, $offset: var(--emboss-offset)) {
+  $neg: calc(#{$offset} * -1);
   @if $style == raised {
-    text-shadow: (-$offset) (-$offset) 0 $color-emboss-light,
-                 $offset    $offset    0 $color-emboss-shadow;
+    text-shadow: #{$neg} #{$neg} 0 var(--emboss-light),
+                 #{$offset} #{$offset} 0 var(--emboss-shadow);
   } @else {
-    text-shadow: $offset    $offset    0 $color-emboss-light,
-                 (-$offset) (-$offset) 0 $color-emboss-shadow;
+    text-shadow: #{$offset} #{$offset} 0 var(--emboss-light),
+                 #{$neg} #{$neg} 0 var(--emboss-shadow);
   }
 }

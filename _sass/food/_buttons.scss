@@ -19,7 +19,7 @@
 .btn-star {
   position: relative;
   display: inline-block;
-  font-family: $font-headings;
+  font-family: $font-headings;   // NOT $font-label -- see _palette.scss
   white-space: nowrap;
   text-transform: lowercase;
   font-weight: 700;

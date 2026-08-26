@@ -36,6 +36,44 @@
 // No background-color: the SVG shape is the visible fill and a background sits
 // under it doing nothing. That was stale from before .tag-shape existed.
 .recipe-list .badge.badge--matched {
+  // THE SAME THREE PROPERTIES %btn-active-base GIVES AN ACTIVE FILTER BUTTON,
+  // plus the same faux-bold stroke those buttons carry. Helen, 2026-08-26: "I
+  // think the active styling should be the same, so capital letters and the
+  // heavier +- stroked font."
+  //
+  // This is the pairing rule from _palette.scss doing its second piece of work.
+  // A badge on a recipe row and the filter button that matched it are the same
+  // word twice; they already agreed on FONT, and from here they agree on state
+  // too, so "this row matched because of this tag" is one visual idea rather
+  // than two that happen to co-occur.
+  //
+  // Stated rather than @extend-ed, deliberately: %btn-active-base also sets a
+  // background, which the buttons immediately override with `background: none`
+  // and which a badge has no use for at all. Extending it here would inherit a
+  // declaration whose only purpose is to be cancelled.
+  //
+  // font-weight: 900 resolves to Bold, Courier Prime having two faces -- exactly
+  // as it does on the buttons, which is the point. The stroke is what actually
+  // adds the weight (issue #193).
+  text-transform: uppercase;
+  font-weight: 900;
+
+  // COLOUR AND STROKE MUST BE THE SAME COLOUR, and this is the whole of what
+  // was wrong on first attempt. $faux-bold-stroke is not an outline -- it is
+  // extra WEIGHT, painted in the letter's own colour (_palette.scss says so
+  // where it is defined: "the same colour as the letter; purely for weight").
+  // Adding the stroke while leaving the fill as .badge-star's $color-star-active
+  // gave a near-black rim around a dark-magenta letter, i.e. an outlined
+  // letterform, which is exactly what Helen photographed.
+  //
+  // The active BUTTON has always set both -- `color: $color-text` alongside the
+  // stroke -- and the badge has to do the same to get the same result. text-shadow
+  // is cleared for the same reason it is on the buttons: the emboss is a THIRD
+  // copy of the glyph and fights a stroke this heavy.
+  color: $color-text;
+  text-shadow: none;
+  -webkit-text-stroke: $faux-bold-stroke $color-text;
+
   &.badge-star           { .tag-shape { color: mix($color-star-root, $color-white, 82%); } }
   &.badge-mood           { .tag-shape { color: mix($color-mood-root, $color-white, 82%); } }
   &.badge-practicalities { .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); } }
@@ -83,13 +121,26 @@
   margin: $spacing-block-gap 0 0 auto;
 }
 
+// "Nothing to see here." and "Select something to see a list." -- Helen,
+// 2026-08-26: both are "doing the same job" as a recipe row title, so they are
+// typed as one. Each stands exactly where the list of titles would be, and
+// saying the same thing in a different voice made them read as system messages
+// about the list rather than as the list's own contents.
+//
+// Matches .recipe-title-link's type treatment exactly, at 1rem/600,
+// lowercase, 0.05em -- INCLUDING ITS FONT, which is why these followed the
+// titles back to Courier Prime on 2026-08-26 rather than staying in Plex. "The
+// same as the titles" is the whole instruction here, so it has to keep meaning
+// that when the titles move, or these quietly become the odd one out in the very
+// list they stand in for. NOT its colour -- these keep $color-clear-text,
+// because a row title is a link you are meant to reach for and these are not.
 .recipe-list-empty,
 .recipe-list-searching {
   font-family: $font-headings;
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
   color: $color-clear-text;
   text-align: center;
   padding: $space-xxl 0;

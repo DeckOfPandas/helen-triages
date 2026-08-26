@@ -184,3 +184,22 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
     #{$rule-under-indent} #{$rule-under-drop},
     #{$rule-indent}       #{$rule-drop};
 }
+
+
+// Food's headings take a SOFTER stroke than the shared default -- see
+// _recipe-notes-body.scss:164. This used to be restated at thirteen call sites
+// as `-webkit-text-stroke: $emboss-stroke $color-label-stroke`; now those all
+// read `var(--emboss-stroke-c)` and this is the one place the value is chosen.
+//
+// It lives here rather than in shared/_rule.scss because $color-label-stroke is
+// food's own, not one of the ten the palette contract guarantees. Imported
+// after shared/rule (see assets/css/food.scss), so this wins.
+// Emitted once -- same reason as shared/_rule.scss's own guard: this file is
+// imported again by food/_timings.scss.
+$emboss-food-vars-emitted: false !default;
+@if not $emboss-food-vars-emitted {
+  :root {
+    --emboss-stroke-c: #{$color-label-stroke};
+  }
+  $emboss-food-vars-emitted: true !global;
+}

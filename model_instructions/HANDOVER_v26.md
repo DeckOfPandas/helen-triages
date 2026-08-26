@@ -2381,6 +2381,27 @@ without waiting for Helen.
 have their own empty trackers, so a cross-repo reference needs the full
 `DeckOfPandas/helen-triages#N` form.
 
+### 11.0.0 Prefer LARGER pull requests -- every merge is a deploy
+
+Helen, 2026-08-24: "I have a soft limit on deploys per hour, so I prefer larger
+pull requests where that's practical."
+
+Every merge to `main` triggers `.github/workflows/build-and-deploy.yml`, so the
+cost is per PR, not per commit. A run of tidy single-concern branches -- the
+habit the branch workflow below otherwise encourages -- burns that allowance
+fast for no benefit to her.
+
+**So: accumulate related work on one branch and push once.** Fold small things
+into whatever branch is already open rather than raising one of their own: a
+handover note, a stray fix spotted in passing, a follow-up to something already
+on the branch. **Keep separate COMMITS per concern**, so review stays readable
+and any one thing can still be reverted alone. It is the PR count that costs.
+
+Do not batch when batching is wrong. An urgent fix should not wait behind
+unfinished work; genuinely unrelated changes that need independent review, or
+that touch another agent's area, are still worth their own PR. **Say what is
+being held back**, so she can ask for it sooner if she wants it.
+
 ### 11.0.1 More than one agent now shares this checkout — use a worktree
 
 2026-08-23. A session went to branch and found the working tree already on
@@ -3246,13 +3267,16 @@ a mis-tuned punched-tape edge:
 - **The same colour as the letter** (`$color-text`) → it's a **faux-bold**,
   and has nothing to do with the punched effect. Wants to stay heavy.
 
-The faux-bold exists because **Courier New ships only Regular and Bold as
-static faces**, so `font-weight: 900` already resolves to Bold and there is
-nothing above it. Thickening the glyph with a stroke in its own colour is the
+The faux-bold exists because **the headings font ships only Regular and Bold as
+static faces** — Courier Prime now, Courier New before it, which is one of the
+reasons that swap was safe — so `font-weight: 900` already resolves to Bold and
+there is nothing above it. Thickening the glyph with a stroke in its own colour is the
 only way to get "heavier than bold" — which is what an *active* filter button
 needs, since the whole signal is that it looks heavier than the ones next to
 it. It's used at ~0.6px by the active states of the filter buttons
-(`_category-labels.scss`, `_search.scss`, `_active-filter-states.scss`) and by
+(`_category-labels.scss`, `_search.scss`, `_active-filter-states.scss`), by
+`.badge--matched` on a recipe row — added 2026-08-26 so a matched badge and the
+filter button that matched it read as one idea rather than two — and by
 the matched tags, title hits and ingredient hits on a recipe row
 (`_recipe-list.scss`).
 
@@ -3323,10 +3347,14 @@ override.
 Each row: title, ingredient line, then pills — in that order, deliberately
 (§13.6.1).
 
-**Title** is `$font-headings` (Courier), lowercase, weight 600, 1rem. Weight
-400 and 500 render *identically* — Courier New only ships Regular and Bold as
-static faces, so any request ≤500 resolves to Regular and only >500 jumps to
-Bold. If a future weight change appears to do nothing, this is why.
+**Title** is `$font-headings` (Courier Prime), lowercase, weight 600, 1rem.
+Weight 400 and 500 render *identically* — Courier Prime, like Courier New before
+it, ships only Regular and Bold as static faces, so any request ≤500 resolves to
+Regular and only >500 jumps to Bold. If a future weight change appears to do
+nothing, this is why.
+
+It spent 2026-08-24 to 08-26 in IBM Plex Mono and came back; see §13.10.1, which
+is the more useful read, because *why* it came back is the rule.
 
 **Ingredient line** is clamped, not left to wrap freely — one line on wide
 screens, two below 600px (a narrower column holds too little on one line to
@@ -3679,58 +3707,130 @@ All generated with `marks_seed` unset (defaults to `seed`) — see
 
 ---
 
-### 13.10 Typography — the site currently has no fonts of its own
+### 13.10 Typography — three fonts, and the rule for which goes where
 
-**Nothing is self-hosted. There is no `@font-face` anywhere and no font file in
-the repo.** Both stacks name only fonts that happen to be installed on desktop
-operating systems:
+**The site self-hosts everything and names no system font as a first choice.**
+`_sass/shared/_fonts.scss` declares nine faces, 152 KB, latin subset, served from
+`assets/fonts/` with relative urls (which resolve against the compiled
+stylesheet's own location, so they survive any baseurl — a `{{ site.baseurl }}`
+would not work at all, Sass not being run through Liquid).
 
-    $font-headings: "Courier New", "Courier", "Lucida Sans Typewriter", monospace;
-    $font-body:     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    Selawik        300 350 400 600 700    $font-body
+    Courier Prime  400 700                $font-headings
+    IBM Plex Mono  600 700                $font-label
 
-**This is why the PDFs look wrong (issue #373), and it is not a print-stylesheet
-bug.** `scripts/generate_pdfs.py` renders with headless Chrome, and CI runs it
-on `ubuntu-latest`, where Courier New, Segoe UI and Roboto are all absent —
-measured, not assumed. Everything falls to the generic, `sans-serif` resolves to
-DejaVu Sans and `monospace` to DejaVu Sans Mono. The PDF also loses the 300/350
-lightness, because DejaVu ships no Light face. So the printout is in the wrong
-faces *and* uniformly heavier than the screen.
+Every stack keeps the old system font as its fallback, so a failed woff2 degrades
+to what the site looked like before rather than to a generic.
 
-The sharper framing: **the site already renders in three different typefaces
-depending on the reader's OS.** The PDF is only where it became visible.
+**WHY, and it was never really about PDFs.** Issue #373 reported "PDFs on prod
+have surprising fonts". The cause was that there was no `@font-face` anywhere and
+both stacks named only desktop-installed fonts: `scripts/generate_pdfs.py`
+renders with headless Chrome on `ubuntu-latest`, where Courier New, Segoe UI and
+Roboto are all absent — measured, not assumed — so everything fell to DejaVu and
+lost the 300/350 weights too, DejaVu having no Light face. But the same was true
+of every reader: the site rendered in a different typeface on Windows, on a Mac
+and on Linux. **The PDF was only where it became visible.**
 
-**The weight scale is Segoe UI's face set, and that is not a coincidence.**
-The CSS asks for 300, 350, 400, 500, 600, 700, 900 and 1000. On `$font-body`
-those are real — Segoe ships Light and Semilight, so 300 and 350 genuinely
-differ on Windows. On `$font-headings` they are not: **Courier New has two
-faces**, so everything ≤500 is Regular and everything >500 is Bold, and at
-least four places compensate with strokes rather than weight
-(`_recipe-list.scss:98`, `_recipe-header.scss:237`, `_palette.scss:113`,
-`_buttons.scss:101`). Before changing the mono, read those four.
+**Why these three.** Selawik is Microsoft's own OFL-licensed, metric-compatible
+substitute for Segoe UI, so no measurement moved — and its five faces are exactly
+the five weights the CSS already asked for, because the scale grew up against
+Segoe UI in the first place. Courier Prime ships **two** weights exactly as
+Courier New did, which is what made it a safe swap: everything ≤500 still
+resolves to Regular and >500 still jumps to Bold, so the four places that
+compensate for that with a stroke rather than a weight (`_recipe-list.scss:98`,
+`_recipe-header.scss:237`, `_palette.scss:113`, `_buttons.scss:101`) kept working
+untouched. Rejected: Open Sans (Helen: "aggressively blah"), Cousine (Courier
+New's metrics on Liberation Mono — the measurements without the character),
+Myriad Pro (commercial Adobe, cannot be self-hosted in a public repo).
 
-**Chosen 2026-08-23, by looking rather than arguing: Selawik (body) and
-Courier Prime (mono).** Selawik is Microsoft's own OFL-licensed,
-metric-compatible substitute for Segoe UI, and ships exactly five faces —
-Light, Semilight, Regular, Semibold, Bold — which is precisely the
-300/350/400/600/700 Helen independently settled on. Rejected: Open Sans
-("aggressively blah"), Cousine (metrically Courier New, but built on Liberation
-Mono, so it has the measurements without the typewriter character), Myriad Pro
-(commercial Adobe; cannot legally be self-hosted in a public repo).
+#### 13.10.1 `$font-label` — the rule, and the four elements that failed it
 
-**Still open: the emboss needs re-tuning for Courier Prime.** Courier Prime was
-drawn to fix Courier's spindliness, so it has thicker stems and tighter
-counters, and `$emboss-stroke`'s 1.4% gets swallowed — exactly the failure
-`shared/_rule.scss` already documents ("the shadow has to clear the stroke to be
-seen at all"). Likely first lever is the title weight, not the stroke: Courier
-Prime 400 is roughly as dark as Courier New 700. **The emboss is stroke AND a
-two-copy directional shadow; the stroke alone reads as a soft edge, never as
-raised.** A specimen built with only the stroke will mislead you — it did.
+**The index is entirely Courier Prime. IBM Plex Mono appears only on recipe
+pages, on two things: `.ingredient-amount` and `.note-label`.** That is the whole
+rule. The split falls on **browsing versus cooking**, not on any property of the
+elements.
 
-Sizes, latin subset, before further subsetting: Inter 47 KB (one variable file,
-all weights), Selawik 72 KB (5), Courier Prime 37 KB (2), IBM Plex Mono 73 KB
-(5), Cousine 30 KB (2). A realistic pair is 85–145 KB — less than one
-photograph, which is the argument for keeping the no-images principle and
-spending the bytes here instead.
+It is short because it is what survived. This variable was `$font-recipe-title`,
+then over three days owned badges, tag buttons, category labels, filter states,
+two status messages and the index titles. **Every one came back**, and the
+returns are worth more than the rule:
+
+- `.category-label` failed on **size**. At 1.35rem it was the largest thing
+  wearing the face, and Plex at display size reads as a *heading* font — the one
+  thing it must not do.
+- `.btn-tag` / `.btn-star` / `.btn-meta` failed on **pairing**. A filter tag and
+  the same word on a recipe row are one idea twice and must match; the ingredient
+  search input is Courier as well. Helen's diagnosis is the sharp one: "this
+  actually seemed fine when the fonts were more different." Courier New and Plex
+  Mono were far enough apart to read as deliberate. Courier Prime and Plex Mono
+  are close enough that the same difference reads as an accident.
+- `.badge` failed the same way, pairing with the filter button that matched it.
+- `.recipe-title-link` failed on **nothing measurable**. Helen, after two days:
+  "I could justify it intellectually by counting font groups, but it could well
+  be that I got used to seeing the typewriter effect and now I miss it." The
+  justification turned out to be the good one.
+
+**So the test for a new consumer is not "is this a label".** Every returned
+element was a label. It is: *is this on a recipe page, and something you look at
+with your hands full?* The rule that lost four times — "things you scan" — asked
+what an element **is**. The rule that works asks what it must **agree with**.
+
+The clash only works while Plex Mono is the minority. Two consumers is a
+comfortable minority; five was not.
+
+#### 13.10.2 The emboss, and the ceiling on the highlight
+
+Values live in `_sass/shared/_rule.scss` and were tuned by eye at `/dev/emboss/`,
+not argued for:
+
+    $emboss-stroke        0.016em      (was 0.014em against Courier New)
+    $emboss-offset        1px
+    $emboss-offset-large  1px          (was 2px; 2px read as two letters)
+    $color-emboss-shadow  rgba($color-text, 0.68)   (was 0.38)
+    $color-label-stroke   lighten($color-text, 30%) (was 20%)
+
+**`$color-emboss-light` is `$color-white`, and the reason is a ceiling.** It used
+to be `$color-bg` — "the paper catching the light", right as a model and
+*invisible in practice*, because a copy painted in the background colour and
+offset over the background cannot be seen. It only ever did visible work where a
+heading sits on something else. Helen, comparing against the header wordmark:
+"we're still missing the white up and left from the simulated light source." She
+was right and it was never going to appear: `.site-logo-word` is light type on
+black tape and has the whole brightness range; **dark type on #faf7f8 has about
+3% of headroom and no more.** `$color-white` spends all of it. A stronger
+highlight needs a darker ground, not a bigger number — so on a light ground the
+raised read has to come from the *shadow*, which is what 0.38 → 0.68 did.
+
+**`.on-dark` inverts the whole thing, and it is custom properties for a reason.**
+The two grounds disagreed on every value, because they are inverse problems: on
+dark, a dark shadow is invisible and the *light* copy does everything. Sass
+variables resolve at compile time and cannot be overridden by context, so the six
+values are custom properties on `:root` and `.on-dark` re-points them — reaching
+any nesting depth, in any partial, including ones written later. A
+`.on-dark h1 { … }` block would have had to out-specify thirteen component rules
+and would have missed the fourteenth. **Both `shared/_rule.scss` and
+`food/_rule.scss` emit their blocks behind an emit-once guard**, because
+`food/_timings.scss` imports them again — free while they were pure definition
+files, not free once they emitted CSS.
+
+**Nothing on the site uses `.on-dark` yet.** `/dev/emboss/` is its only consumer.
+Those numbers are a considered starting point, not a verified result. This is
+*not* dark mode, which Helen has explicitly deferred.
+
+#### 13.10.3 `/dev/emboss/` — tune here, not in a mock
+
+Local only (`_dev/`, `output: false` in production). The specimens are ordinary
+`h1/h2/h3` picking up the real cascade; the dials **inject an override** rather
+than reproducing the effect, and the panel writes the settled values out as real
+SCSS with the actual variable names.
+
+That distinction is load-bearing. Its predecessor, a standalone file in `tmp/`,
+reproduced the treatment by hand and applied the **stroke only, with no shadow** —
+so Courier Prime looked flat and the fault looked like the font's. It cost an
+exchange. **The emboss is stroke *and* a two-copy directional shadow**; the
+stroke sets the weight of the edge, the shadow sets its direction, and a
+reproduction is a second thing to keep in step with the first.
+
 
 ## 14. Reference pages and the internal-temperatures data layer
 

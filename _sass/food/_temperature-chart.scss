@@ -103,7 +103,7 @@ $tc-threshold-height: 1.35rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: $color-text;
-  -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
   @include punched(raised);
   text-align: right;
   line-height: 1.3;
@@ -380,7 +380,7 @@ $tc-threshold-height: 1.35rem;
   font-size: 0.7rem;
   letter-spacing: $letter-spacing-label;
   color: $color-text;
-  -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
   @include punched(raised);
   margin: 0 0 $space-md 0;
 }

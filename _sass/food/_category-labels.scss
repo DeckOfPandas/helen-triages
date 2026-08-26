@@ -114,7 +114,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // left to the absence of a matching rule -- see .results-heading
   // .category-label directly below.
   .category-label {
-    font-family: $font-headings;
+    font-family: $font-headings;   // NOT $font-label -- see _palette.scss
     text-transform: uppercase;
     font-size: 1.35rem;
     font-weight: 700;
@@ -124,7 +124,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     // which was a grey with no relationship to the letter it outlined.
     // This is half the effect; @include punched() below is the other half, and
     // the two are independent. See the long note in _sass/food/_rule.scss.
-    -webkit-text-stroke: $emboss-stroke $color-label-stroke;
+    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
     // 1.35rem sits between the two offset values (it wants 1.4px). Staying at
     // 1px rather than rounding up to 2: this is a control-panel label with
     // five of them stacked in a screenful, not a landmark, and the ratio
@@ -349,7 +349,7 @@ $index-label-gap:   $space-md;   // a label to its own buttons
 }
 
 .btn-meta {
-  font-family: $font-headings;
+  font-family: $font-headings;   // NOT $font-label -- see _palette.scss
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: lowercase;

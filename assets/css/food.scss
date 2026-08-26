@@ -9,6 +9,7 @@
 // shared/ is imported by both sites and may not name either. food/ may assume
 // anything it likes. Nothing in shared/ imports anything from food/.
 @import "food/palette";
+@import "shared/fonts";
 @import "shared/tokens";
 // The punched-tape mixin, before shared/layout — the wordmark uses it, and a
 // mixin must be defined before the partial that calls it.

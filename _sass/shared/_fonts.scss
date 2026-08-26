@@ -1,0 +1,100 @@
+// =============================================================================
+// THE SITE'S OWN FONTS
+// =============================================================================
+// Until 2026-08-24 this file did not exist and neither did any @font-face: both
+// stacks named only fonts that happen to be installed on desktop operating
+// systems. That had one loud symptom and one quiet one.
+//
+// LOUD (issue #373): scripts/generate_pdfs.py renders with headless Chrome, and
+// CI runs it on ubuntu-latest, where Courier New, Segoe UI and Roboto are all
+// absent -- measured, not assumed. Everything fell through to the generic, so
+// every PDF came out in DejaVu Sans / DejaVu Sans Mono. It also lost the 300 and
+// 350 weights entirely, DejaVu having no Light face, so the printout was in the
+// wrong faces AND uniformly heavier than the screen.
+//
+// QUIET: the same is true of every reader. The site rendered in one typeface on
+// Helen's Windows machine, another on a Mac, another on Linux. The PDF was
+// simply where it became visible.
+//
+// WHY THESE TWO
+//
+// Selawik is Microsoft's own OFL-licensed, metric-compatible substitute for
+// Segoe UI -- built for exactly this, so the body text keeps the shape the site
+// was designed against and no measurement moves. It ships five faces, and they
+// are precisely the five weights the CSS already asks for (300 Light, 350
+// Semilight, 400 Regular, 600 Semibold, 700 Bold). That is not luck: the scale
+// grew up against Segoe UI, so Selawik's face set IS the scale.
+//
+// Courier Prime is a deliberate Courier redesign, and it fixes the flaw that
+// mattered here -- Courier New is spindly and prints too light. It ships TWO
+// weights, exactly as Courier New does, which is the reason it is a safe swap:
+// everything <=500 still resolves to Regular and everything >500 still jumps to
+// Bold, so the four places that compensate for that with a stroke rather than a
+// weight (_recipe-list.scss:98, _recipe-header.scss:237, _palette.scss:113,
+// _buttons.scss:101) keep working unchanged. A mono with a real weight range
+// would have silently changed all four.
+//
+// Rejected: Open Sans (Helen: "aggressively blah"), Cousine (metrically Courier
+// New but built on Liberation Mono -- the measurements without the typewriter
+// character), Myriad Pro (commercial Adobe, cannot be self-hosted in a public
+// repo whatever a download site offers).
+//
+// RELATIVE URLS, DELIBERATELY. These resolve against the compiled stylesheet's
+// own location (assets/css/*.css), so `../fonts/` is correct under any baseurl
+// without Liquid having to be involved. A `{{ site.baseurl }}` here would not
+// work at all -- Sass files are not run through Liquid.
+//
+// THE FALLBACKS ARE THE OLD STACKS, on purpose: if a woff2 fails to load the
+// page degrades to exactly what it looked like before this file existed, rather
+// than to a generic.
+//
+// 152 KB for all nine faces, latin subset. Less than one photograph -- which is
+// the whole argument for keeping the no-images principle and spending here.
+
+$font-dir: "../fonts";
+
+@each $weight in (300, 350, 400, 600, 700) {
+  @font-face {
+    font-family: "Selawik";
+    font-style: normal;
+    font-weight: $weight;
+    font-display: swap;
+    src: url("#{$font-dir}/selawik-#{$weight}.woff2") format("woff2");
+  }
+}
+
+@each $weight in (400, 700) {
+  @font-face {
+    font-family: "Courier Prime";
+    font-style: normal;
+    font-weight: $weight;
+    font-display: swap;
+    src: url("#{$font-dir}/courier-prime-#{$weight}.woff2") format("woff2");
+  }
+}
+
+// A THIRD FAMILY, FOR EXACTLY ONE CLASS. Helen, 2026-08-24: "how about trying
+// IBM Plex Mono for the recipe-title-link class? ... I suspect the slightly
+// different proportions will help the recipe titles stand out."
+//
+// ONE WEIGHT ONLY, and that is the whole point of the restraint: .recipe-title-link
+// is the sole consumer, it asks for 600 and nothing nested inside it asks for
+// anything else, so 600 is the entire requirement. 15 KB. Adding the other four
+// faces would quadruple that for nothing, and would also make it far too easy
+// for this to quietly become a second heading font.
+//
+// THE FALLBACK IS COURIER PRIME, not Courier New: if this file fails to load,
+// the titles should land on the site's own mono rather than on a system one.
+// 600 for .recipe-title-link and .ingredient-amount; 700 for .note-label, which
+// is 700 already. The 700 is here so that changing the LABEL's face changes only
+// its face: without it the browser would match 600 and synthesise a fake bold,
+// and Helen would have been judging a rendering artefact rather than a typeface.
+@each $weight in (600, 700) {
+  @font-face {
+    font-family: "IBM Plex Mono";
+    font-style: normal;
+    font-weight: $weight;
+    font-display: swap;
+    src: url("#{$font-dir}/ibm-plex-mono-#{$weight}.woff2") format("woff2");
+  }
+}

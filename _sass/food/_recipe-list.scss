@@ -93,11 +93,22 @@
   // querySelector('a') became querySelector('.recipe-title-link') in the same
   // issue, for the same reason -- "the only link in the row" stopped being true.
   .recipe-title-link {
+    // BACK IN COURIER PRIME since 2026-08-26. These spent two days in IBM Plex
+    // Mono -- they were the first thing $font-label was built for -- and Helen
+    // returned them: "I think I preferred the recipe list titles in Courier. I
+    // could justify it intellectually by counting font groups, but it could well
+    // be that I got used to seeing the typewriter effect and now I miss it."
+    //
+    // The intellectual half is the one worth keeping, because it is checkable:
+    // with these back, THE INDEX IS ENTIRELY COURIER and Plex Mono appears only
+    // on recipe pages. That is a cleaner line than anything we reached by
+    // arguing about individual elements, and it was found by looking.
     font-family: $font-headings;
     font-size: 1rem;
-    font-weight: 600;     // 400 and 500 render identically -- Courier New only
-                           // ships Regular and Bold, so anything <=500 resolves
-                           // to Regular and anything >500 jumps straight to Bold
+    font-weight: 600;     // 400 and 500 render identically -- Courier Prime, like
+                           // Courier New before it, ships only Regular and Bold,
+                           // so anything <=500 resolves to Regular and anything
+                           // >500 jumps straight to Bold
     text-transform: lowercase;
     letter-spacing: 0.05em;
     color: $color-text;
