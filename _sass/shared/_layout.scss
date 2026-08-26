@@ -592,11 +592,39 @@ $tape-protrusion: 0.2rem;
   // Helen's own verdict after comparing a higher-contrast pull: this
   // lighter version read better -- less "realistic" contrast, more
   // effective as a label.
-  color: #e7e2e3;
-  text-shadow: -0.6px -0.6px 0 #fdfbfe,
-               -2.2px -2.2px 0 rgba(253, 251, 254, 0.55),
-                0.6px  0.6px 0 rgba(5, 5, 5, 0.9),
-                2.2px  2.2px 0 rgba(5, 5, 5, 0.45);
+  // RE-TUNED 2026-08-26 FOR COURIER PRIME (issue #470), by Helen at
+  // /dev/emboss/, which overrides this live element rather than a copy of it.
+  // Was #e7e2e3 with offsets 0.6px / 2.2px and the outer highlight at 0.55.
+  //
+  // THE TWO COPIES MOVED TOWARDS EACH OTHER. Tight went UP 0.6 -> 1.0 and wide
+  // came DOWN 2.2 -> 1.8, narrowing the gap between them from 1.6px to 0.8px,
+  // with the outer highlight strengthened 0.55 -> 0.75 to keep its presence at
+  // the shorter throw. The bevel is tighter and better defined rather than
+  // spread -- which is what a heavier letterform wants, having more ink of its
+  // own for the copies to sit against.
+  //
+  // HALF OF THAT WAS PREDICTED AND HALF WAS BACKWARDS, and the backwards half is
+  // the one worth writing down. The wide offset coming down was expected: it is
+  // the same move $emboss-offset-large made (2px -> 1px) on the same face, for
+  // the same reason -- a wide copy on heavy stems reads as two overlapping
+  // letters rather than one raised one. The TIGHT offset was predicted to stay,
+  // on the grounds that it is a proportion of the edge rather than of the
+  // letterform. It went up by two thirds. A 0.6px cut line on a thicker stem is
+  // proportionally less visible, so it needed more.
+  //
+  // That is now twice that a reasoned "the heavier face needs LESS" lost to
+  // looking at it -- $emboss-stroke went 0.014 -> 0.016 the same way. THE EDGE
+  // TREATMENTS ON THIS FACE WANT MORE, NOT LESS. Assume that next time.
+  //
+  // The fill is #ECE9EA, one step lighter than before (Helen's dial read
+  // hsl(340 6% 92%); written as hex to match its neighbours). It still has to
+  // sit BELOW pure white -- see the paragraph above about headroom, which is the
+  // whole reason this element does not use @include punched().
+  color: #ECE9EA;
+  text-shadow: -1.0px -1.0px 0 #fdfbfe,
+               -1.8px -1.8px 0 rgba(253, 251, 254, 0.75),
+                1.0px  1.0px 0 rgba(5, 5, 5, 0.90),
+                1.8px  1.8px 0 rgba(5, 5, 5, 0.45);
 
   .site-logo-bracket {
     letter-spacing: 0;
