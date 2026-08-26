@@ -485,6 +485,59 @@ def test_glass_is_a_list():
     )
 
 
+def test_every_glass_value_is_in_the_vocabulary():
+    """A drink naming a glass `glasses.yml` has never heard of renders NOTHING.
+
+    #500. The glass layer is guarded thoroughly in one direction -- every
+    mapped glass names a real icon, `all_icons` matches the directory both
+    ways, every icon has a height. All of that guards glasses.yml against
+    itself. Nothing guarded the DRINKS against glasses.yml, so a typo produced
+    a drink with no glass drawing and no complaint from anywhere.
+
+    THE SILENCE IS BY DESIGN, WHICH IS WHY IT NEEDS A TEST RATHER THAN A FIX.
+    "Absent means no icon" is the correct default -- it is what stops a missing
+    key becoming a broken image, and glasses.yml's own header says so -- but it
+    cannot tell a deliberate gap from a mistake. That was a fair trade while
+    three values were deliberately unmapped. It is a bad one now `any` is the
+    last of them: an unrecognised glass is far likelier to be a typo than a
+    decision.
+
+    `any` IS THE ONE EXEMPTION AND MUST STAY UNMAPPED. It is a real member of a
+    drink's `glass:` list meaning "no requirement" -- Daisy de Santiago is
+    "anything, but preferably a Collins" -- so mapping it to an icon would draw
+    a glass for a drink that deliberately does not specify one. Listing it here
+    rather than in `icons:` is the whole point.
+
+    Passes on arrival: all 19 distinct values in the collection are known
+    today. That is what makes it worth adding now -- it costs nothing to
+    introduce and catches the next one for free.
+    """
+    g = _glasses()
+    icons = g.get("icons") or {}
+    assert icons, "glasses.yml has no `icons:` -- see the sibling tests."
+
+    deliberately_unmapped = {"any"}
+
+    unknown = {}
+    for slug, fm in _load():
+        for value in fm.get("glass") or []:
+            key = str(value).strip().lower()
+            if key in icons or key in deliberately_unmapped:
+                continue
+            unknown.setdefault(key, []).append(slug)
+
+    assert not unknown, (
+        "glass value(s) not in _data/cocktails/glasses.yml `icons:`:\n  "
+        + "\n  ".join(f"{v!r} -- {', '.join(sorted(d))}"
+                      for v, d in sorted(unknown.items()))
+        + "\n\nThe drink renders NO glass icon, silently. Either it is a typo "
+          "and the drink should be retyped, or it is a real glass and needs a "
+          "key in `icons:` (and artwork, and a heights_mm entry -- the sibling "
+          "tests will say so). If it is genuinely 'no requirement', the word "
+          "is `any`."
+    )
+
+
 def test_garnish_is_a_list():
     """Same reasoning as `glass` and `mood`: a bare string iterates in Liquid as
     its own characters, which renders as nothing visible rather than as an

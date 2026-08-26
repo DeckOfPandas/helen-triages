@@ -495,35 +495,50 @@ $tape-protrusion: 0.2rem;
 }
 
 // =============================================================================
-// #477, AS A COMPARISON SWITCH: the wordmark on the shared emboss values.
+// #477 IS SETTLED: THIS ELEMENT DOES NOT MATCH PAGE HEADINGS, ON PURPOSE.
 // =============================================================================
-// Helen: "the HELEN TRIAGES part of the wordmark looks different to page
-// headings now -- maybe it wasn't updated in our typography pass". It was not,
-// and it could not have been: the rule above reads `$emboss-stroke` as a SASS
-// variable and then overrides `punched()` with a literal text-shadow, so it
-// sits outside the custom-property system the pass moved everything else onto.
-// It differs from a heading in all four properties -- stroke colour, offset,
-// highlight and shadow.
+// Read this before "fixing" the values above. They are the pre-#470 numbers
+// and they are staying.
 //
-// THE PREDICTION WORTH TESTING, and the reason this is a switch rather than a
-// patch. The file above records that 2px exists because "the default 1px
-// emboss offset was getting swallowed by this element's own heavy 1.2px
-// stroke". That is the identical chain found on cocktail headings on
-// 2026-08-26: a heavy stroke drowning the effect, then a second value bumped
-// to compensate for the first. Soften the stroke and the offset should not
-// need to be double. If that holds, the two differences are really one.
+// WHAT WAS FOUND, 2026-08-26. Helen: "the HELEN TRIAGES part of the wordmark
+// looks different to page headings now -- maybe it wasn't updated in our
+// typography pass." It was not, and it could not have been: the rule above
+// reads `$emboss-stroke` as a SASS variable and then overrides `punched()`
+// with a literal text-shadow, so it sits outside the custom-property system
+// that pass moved everything else onto. Nothing touching those properties
+// could reach it. It differs from a heading in all four:
 //
-// IT ADAPTS PER SITE FOR FREE, which a literal never could: `--emboss-stroke-c`
-// resolves to food's $color-label-stroke on food and cocktails' on cocktails,
-// so each site's wordmark matches ITS OWN headings rather than one site's.
+//     stroke colour   rgba(ink, 0.8)   vs  lighten(ink, 30%)
+//     offset          2px              vs  1px
+//     highlight       #dad7d8          vs  #ffffff
+//     shadow          rgba(ink, 0.5)   vs  rgba(ink, 0.68)
 //
-// Two classes, so this beats the rule above on specificity regardless of order.
-// `?wordmark=match` on any page of either site; see assets/js/wordmark-switch.js.
-// Delete this block, the script and its include together once #477 is settled.
-.site-logo-top.wordmark--match {
-  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-  @include punched(raised);
-}
+// The evidence that it was an oversight is as strong as it gets: `.site-logo-
+// word`, the tape line of the SAME component a hundred lines below, WAS
+// re-tuned for Courier Prime under #470, by Helen at /dev/emboss/. Two lines
+// of one wordmark, one moved and one did not.
+//
+// AND IT STAYS ANYWAY. A switch was built to see it matched -- both sites,
+// reading the shared custom properties so each wordmark took its own site's
+// heading values -- and Helen looked at it and kept the old one: "I prefer the
+// old HELEN TRIAGES, even though it's on its own in terms of styling. I like
+// the drama." The switch is deleted; being able to flip it was worth building
+// and worth removing once it had answered.
+//
+// SO THE DIFFERENCE IS NOW A DECISION, AND THAT IS THE POINT OF THIS COMMENT.
+// A wordmark is not a heading: it is a logo, it is the one piece of furniture
+// both sites share, and looking like an h1 is not a goal it has. The values
+// above were hand-tuned -- the highlight is recorded a few lines up as
+// "finalised by Helen at a literal #dad7d8" -- and the heavier stroke with the
+// wider offset is what carries the drama she kept it for.
+//
+// THE STRUCTURAL COMPLAINT IS SEPARATE AND STILL FAIR: this element cannot be
+// reached by `.on-dark`, because its stroke width is a Sass value rather than
+// `var(--emboss-stroke-w)`. Nothing renders on a dark ground today so nothing
+// is broken, but a future dark section would leave the wordmark behind.
+// Adopting the WIDTH variable while keeping every tuned value is a change with
+// no visual effect and is not made here, because "no visual effect" is a claim
+// best made in a commit that can be reverted on its own.
 
 .site-logo-tape {
   grid-column: 1;
