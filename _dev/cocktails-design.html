@@ -518,10 +518,27 @@ drinks:
         <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="panel">panel</button>
         <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="panelbare">panel, no edge</button>
         <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="panelsoft">panel, soft edge</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat is-on" data-frame="panelunder">panel + soft under</button>
       </span>
     </div>
 
-    <ul class="dsn-cards dsn-cards--wash dsn-cards--frame-edge" id="dsn-cards-a" style="--dsn-glass-scale: 13rem;">
+    {% comment %} HOVER. Helen asked for "a very subtle lightening of the white
+       part of the background", and white cannot be lightened — the card is
+       already #fff on a #fbfbfa page, so it is the brightest thing there. So
+       these are the nearest available readings of the same idea, and one of
+       them is literally it: `panel clears` lightens the TINTED part toward
+       white, which is the only part with anywhere to go. {% endcomment %}
+    <div class="dsn-slider">
+      <label>card hover</label>
+      <span class="dsn-cheats" id="dsn-hovers">
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-hover="none">none</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat is-on" data-hover="clear">panel clears</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-hover="wash">faint wash</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-hover="mark">mark brightens</button>
+      </span>
+    </div>
+
+    <ul class="dsn-cards dsn-cards--wash dsn-cards--frame-panelunder dsn-cards--hover-clear" id="dsn-cards-a" style="--dsn-glass-scale: 13rem;">
       {% for drink in page.drinks %}
         {% comment %} The card carries the RATIO, not a finished height, so one
            slider can rescale all eight without the template being rebuilt —
@@ -916,6 +933,17 @@ drinks:
                              --dsn-underline-bottom: -1px;
                              --dsn-underline-w: var(--dsn-text-x);
                              --dsn-underline-h: 3px; }
+/* (2a) panel + a soft under edge, and no left edge at all. Helen's own
+   combination: the tint gives the framing, and one softened mark along the
+   bottom of the glass column gives it a foot to sit on, without a vertical
+   rule competing with eight others down the page. */
+.dsn-cards--frame-panelunder { --dsn-frame-c: var(--dsn-line);
+                               --dsn-panel-bg: color-mix(in srgb, var(--dsn-absinthe) 9%, #ffffff);
+                               --dsn-underline: color-mix(in srgb, var(--dsn-absinthe) 55%, #ffffff);
+                               --dsn-underline-left: -1px;
+                               --dsn-underline-bottom: -1px;
+                               --dsn-underline-w: var(--dsn-text-x);
+                               --dsn-underline-h: 3px; }
 /* (1d) the fade turned through 90 degrees. NOT the 3px strip faded sideways --
    that would be a gradient across three pixels, i.e. nothing. Read as intended
    it is a wash entering from the left edge and gone by the time it reaches the
@@ -925,6 +953,37 @@ drinks:
                                color-mix(in srgb, var(--dsn-absinthe) 42%, #ffffff) 0%,
                                color-mix(in srgb, var(--dsn-absinthe) 12%, #ffffff) 38%,
                                #ffffff 72%); }
+
+/* HOVER. Three readings of "a very subtle lightening", because the literal one
+   is not available: the card is #fff on a #fbfbfa page, so its white is
+   already the brightest thing on screen and has nowhere lighter to go.
+
+     clear   the TINTED column lightens toward white. The only part of the card
+             with headroom, so this is the actual gesture asked for, applied to
+             the only surface that can carry it. Wants the panel variants.
+     wash    a 3% menthe over the whole card — the opposite direction, but the
+             one that works on any framing, tinted column or not.
+     mark    the framing mark goes to full strength and everything else holds
+             still. The quietest, and the only one that moves no large area.
+
+   All three are transitions on colour alone: nothing moves, nothing resizes,
+   no shadow appears. A card that lifts or grows on hover would break the fixed
+   anchors the whole layout is built on, and eight of them twitching down a
+   page is not subtle whatever the values say. */
+.dsn-card { transition: background-color 0.12s ease, border-color 0.12s ease; }
+.dsn-card-glass { transition: background-color 0.12s ease; }
+.dsn-card::after { transition: background 0.12s ease; }
+
+.dsn-cards--hover-clear .dsn-card:hover .dsn-card-glass {
+  background: color-mix(in srgb, var(--dsn-absinthe) 3%, #ffffff);
+}
+.dsn-cards--hover-wash .dsn-card:hover {
+  background: color-mix(in srgb, var(--dsn-absinthe) 3%, #ffffff);
+}
+.dsn-cards--hover-mark .dsn-card:hover {
+  --dsn-underline: var(--dsn-absinthe);
+  --dsn-frame-lc: var(--dsn-absinthe);
+}
 
 /* The edge as a painted strip, for the variants a border cannot express. */
 .dsn-card::before {
@@ -1274,7 +1333,11 @@ drinks:
 .dsn-ing-note { font-size: 0.84rem; color: var(--dsn-grey); font-style: italic; margin: 0.25rem 0 0 6.4rem; line-height: 1.55; }
 .dsn-method { margin: 0; padding-left: 1.4rem; font-size: 0.97rem; line-height: 1.8; }
 .dsn-method li { margin-bottom: 0.45rem; padding-left: 0.3rem; }
-.dsn-method li::marker { font-family: "Courier Prime", monospace; color: var(--dsn-accent2-deep); }
+/* Violet, not amber — Helen, 2026-08-26: "to allow the hierarchy support the
+   content". The step numbers now match the rule over METHOD rather than the
+   note bar, so violet reads as "this section and its contents" throughout and
+   amber is left doing structure. */
+.dsn-method li::marker { font-family: "Courier Prime", monospace; color: var(--dsn-accent3-deep); }
 /* Amber, like every other structural rule on the page. */
 .dsn-notes { border-left: 2px solid var(--dsn-accent2); padding-left: 1.1rem; }
 .dsn-note-label {
@@ -1442,6 +1505,23 @@ drinks:
   }
 })();
 
+/* Card hover. Same shape as the framing picker: one class on the grid. */
+(function () {
+  var wrap = document.getElementById('dsn-hovers');
+  var grid = document.getElementById('dsn-cards-a');
+  if (!wrap || !grid) return;
+  wrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.dsn-btn--cheat');
+    if (!btn) return;
+    ['none', 'clear', 'wash', 'mark'].forEach(function (h) {
+      grid.classList.toggle('dsn-cards--hover-' + h, h === btn.dataset.hover);
+    });
+    wrap.querySelectorAll('.dsn-btn--cheat').forEach(function (b) {
+      b.classList.toggle('is-on', b === btn);
+    });
+  });
+})();
+
 /* Card framing. Swaps one class on the grid; each frame is a set of custom
    properties, so the card rule itself never learns about the options. */
 (function () {
@@ -1452,7 +1532,7 @@ drinks:
     var btn = e.target.closest('.dsn-btn--cheat');
     if (!btn) return;
     ['hairline', 'edge', 'soft', 'fade', 'short', 'under', 'underbox', 'fadex',
-     'panel', 'panelbare', 'panelsoft'].forEach(function (f) {
+     'panel', 'panelbare', 'panelsoft', 'panelunder'].forEach(function (f) {
       grid.classList.toggle('dsn-cards--frame-' + f, f === btn.dataset.frame);
     });
     wrap.querySelectorAll('.dsn-btn--cheat').forEach(function (b) {
