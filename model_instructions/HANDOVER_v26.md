@@ -1589,6 +1589,27 @@ was the thing that got fixed, brought in line with Airmail's shape. #297
 they're genuinely bottle-invariant, so this reasoning doesn't extend to
 them.
 
+**`blackstrap` IS A CHARACTER AND NEVER A GENERIC — #314, Helen,
+2026-08-24.** "Blackstrap is only ever given as a character for another rum,
+like this: Moderately aged (character: blackstrap)." So the rum still needs a
+real style of its own and blackstrap rides alongside it. This took two days to
+reach the vocabulary: `ingredients.yml` was written 2026-08-22 and listed
+blackstrap under `rum_untyped` with a comment saying it could be **either**
+field. Applied 2026-08-26, along with Jungle Bird — the one drink using it as
+a generic. Don's Own Grog, Georgetown Punch and Jungle Bird now all carry
+`moderately aged` + `character: [blackstrap]` + Gosling's.
+
+**And until the same day, `character` WAS GUARDED BY NOTHING.** Every check in
+`tests/test_cocktails.py` pointed at `generic`, so a typo in the field this
+whole section exists to separate out minted a value in silence. Worse, the
+excluding of `rum_characters` from the declared-generic set — correct in
+itself, since `sherry` and `Spanish-style` had been silently passing AS
+generics on any ingredient — left that list declared and consumed by nothing
+at all. `test_rum_character_is_declared` closes it. **Only rum's characters
+are checked**: gin's are free text by Helen's explicit call, because a rum's
+come from a handful of production traits and close into a list while a gin's
+is whatever the distiller reached for.
+
 **The governing principle behind that call, #459**: "everything we do is
 focused on the user (i.e. Helen), and making sure the user gets the drink
 she wants. Being an encyclopaedia of drinks sounds like busywork and it's
@@ -1636,8 +1657,18 @@ does not become a two-item guess.
 - **`to_serve` is presentation, not steps** — "over crushed ice, with a
   straw". Finishing ACTIONS ("top with champagne", "squeeze the twist over
   the drink") are method steps. The CSV's `Serve` column holds actions, so
-  its contents move into `method` on ingest, and **none of the first three
-  drinks has a real `to_serve`**.
+  its contents move into `method` on ingest.
+
+  **LIVE SINCE 2026-08-26, AND EMPTY ON EVERY DRINK BEFORE THAT.** This bullet
+  used to end "none of the first three drinks has a real `to_serve`" — true,
+  and it stayed true for all 115: not one drink set the field until #291's
+  three fragments moved into it (Caipirinha "Stirrer.", Mastiha Mojito
+  "Straw.", Gin Sour "Without ice."). Check `_layouts/cocktail.html` renders
+  it before moving anything else in — it does, but a field documented for ten
+  days and used by nothing is exactly the kind that turns out not to.
+  `test_to_serve_is_a_string` now guards the shape, which nothing did while
+  there was no data: a list would NOT fail loudly, because the layout pipes it
+  through `markdownify`, which stringifies rather than raises.
 - **Both brand and generic** are stored per ingredient.
 
 ### 9.4.1 The site is canon. Deviation happens in the kitchen.
@@ -1857,7 +1888,8 @@ height here" after #298 shipped, a live instance of §11.2.
 
 **The width cap matters as much as the height, and can make a correctly-sized
 glass look wrong without it.** Helen, 2026-08-26, on `_dev/glasses.html`
-section 2 (which has no width cap): goblet and mule-mug both looked
+section 2 (which has no width cap): goblet and mule-mug (renamed `mug`
+2026-08-26, see below) both looked
 oversized. Mule-mug's own drawing is wider than tall (1.25:1 viewBox); at
 section 2's uncapped 9rem scale its natural width would be ~5.1rem, half
 again over the real site's 3.2rem cap — a size it never actually reaches at
@@ -1931,6 +1963,128 @@ still exactly as parked as the paragraph above says. Worth noting because
 goblet was one of the two examples that paragraph names — if a proportion
 complaint about goblet specifically resurfaces, check whether this redraw
 already addressed it before assuming #299 needs unparking.
+
+**`mule-mug.svg` is `mug.svg` now, 2026-08-26, and no new drawing was needed.**
+Apple and Ginger Mulled Wine's glass was the bare word `mug`, which
+`glasses.yml` had flagged QQ between `mule mug` and `hot toddy`. Helen, asked
+whether to draw a third: "I actually use a mug for this like I do for tea!" —
+and the mule mug's drawing already IS a plain tapered mug with a handle. The
+only thing that ever made it a *Moscow Mule's* is that a real one is copper,
+which a monochrome line icon cannot say. It had no drink using it, so the
+rename cost nothing; `mule mug` stays as an alias for the Mule that will want
+it one day. `hot-toddy` was considered and rejected — that drawing is a footed
+handled glass, not a mug.
+
+**The load-bearing half was the SCRIPT, not the `git mv`.**
+`scripts/normalise_glass_icons.py` regenerates icons wholesale from
+`tmp/cocktail-glasses/`, so renaming only the published file would have
+resurrected `mule-mug.svg` on the next run and taken `mug.svg` with it. The
+pair went into that script's existing `RENAME` map, beside `pineapple-3`.
+**Generalise this**: any rename under `_includes/icons/glasses/` is two edits,
+and the filesystem one is the one that does not stick.
+
+**All three of `glasses.yml`'s own QQ glasses were resolved the same day** —
+`todo` (Coney Park Swizzle) and `long` (Long Island Iced Tea) both turned out
+to be placeholder words rather than glasses, and both became `highball`. Helen
+moved every swizzle onto highball at once. `any` is now the ONLY deliberately
+unmapped value, and that changes the safety of the old default: "absent means
+no icon" was sound while three real gaps existed, but an unmapped glass is now
+far likelier to be a typo than a decision. #500 tracks the flag-only test.
+
+### 9.11.1 The canonical glass vocabulary is a RULE now, not a preference
+
+**2026-08-26, and it reverses what `glasses.yml` said for nine days.** That
+file stated outright that "the aliases above stay live regardless: the point of
+this file is that a drink is never wrong for using the other word." Helen: "I
+decided to go with old fashioned rather than rocks as the canonical name, so
+recipes that still have rocks are fine to break a test."
+
+So there is a `canonical_glasses` map (alias → the spelling a drink must use)
+and `test_drinks_use_the_canonical_glass_spelling` reads its whole vocabulary
+from it. **Adding a pair there is what makes it enforced** — no second list.
+
+**The aliases in `icons:` stay, and that is not a contradiction.** They do two
+jobs a rule cannot: keep a drink rendering if one slips through, and absorb the
+spreadsheet's own spellings on ingest, where the variance arrives whether or
+not this repo approves. The rule governs what is WRITTEN into a drink; the
+alias map governs what can be READ. Deleting the aliases to "finish the job"
+would break every drink the rule had not reached.
+
+17 drinks were retyped in the same commit rather than left failing — `rocks`→
+`old fashioned` (9), `double rocks`→`double old fashioned` (3), plus
+`old-fashioned glass`, `old-fashioned`, `champagne saucer` and `snifter`. The
+invitation was to break a test, but **the suite gates the deploy (#369), so a
+red `main` stops the build rather than merely reporting**.
+
+**Why all 17 at once was safe, and would NOT have been before #347**: `rocks`
+has been a plain alias to `old-fashioned` since that issue resolved — one
+drawing, not two — so the change carries no meaning, only spelling, and every
+drink rendered the identical icon before and after. Earlier, the two names
+pointed at genuinely different artwork and this same edit would have silently
+restyled nine drinks.
+
+`martini` vs `martini glass` is deliberately NOT in the map: it splits 1–2
+across three drinks and Helen's four canonical pairs do not include it. **An
+alias absent from the map is permitted**, so silence means "not asked yet"
+rather than "either is blessed".
+
+### 9.12 The method-step dictionary — `_data/cocktails/methods.yml`, #290
+
+**Added 2026-08-26. A closed vocabulary for the mechanical spine, free text for
+everything else.** The argument for it is not tidiness, it is #290's own, and
+it is the same one §13.1 makes about the punched-tape mark beating the
+watercolour washes: a shape that changes every time has to be RE-READ, an
+identical repeated one becomes something you RECOGNISE. That is exactly the
+difference between a canonical "Shake all ingredients with ice." and thirteen
+near-variants of it, and it matters most in the situation Helen named — people
+in the house, and thirsty.
+
+**The test for whether a step belongs in the dictionary: does its phrasing
+carry information?** "with ice" versus "over ice" carries none. "other than the
+champagne" carries all of it. The tail is deliberately NOT canonicalised and
+never will be — "Muddle the lime chunks hard with the sugar in the bottom of a
+shaker until the sugar has dissolved" cannot be collapsed without losing the
+drink.
+
+The census that produced it: **277 steps across 105 drinks, 144 distinct.** One
+instruction accounted for 43 uses written three ways; Stir the same for 17;
+Strain alone had eleven forms.
+
+**NOTHING IS APPLIED TO A DRINK, and that is Helen's explicit design.** "Prefer
+both, leaving my original too, then I delete whatever I don't want." So
+`proposals:` holds her exact existing string on the left and the suggested
+canonical form on the right — 26 rows, 6 of them `QQ`. **Deleting a row is how
+a suggestion gets rejected**, and a later pass applies only what survives. Do
+not turn this into an enforcing test without asking; a check that failed on a
+non-canonical step would be enforcing a decision she has not made.
+
+**The six QQs are where a naive collapse would have changed a drink**, and they
+are the case against the fuzzy matcher that is the obvious alternative here.
+"Shake with ice.", "Shake the rest with ice." and "Stir with ice." each follow
+an earlier build step, so they mean *shake what is in the shaker*, not *shake
+all ingredients*. Normalisation cannot see the preceding step and would have
+collapsed all three, silently altering three recipes.
+
+**Naming the glass in a strain step is the one variance that looks informative
+and is not** — `glass:` already carries it and draws the icon, so "Fine strain
+into a chilled coupe" says coupe twice.
+
+Three tests guard the map without touching a single method: a proposal must
+point at a real canonical step, nothing may be both canonical and
+something-to-replace, and every left-hand string must still exist in the
+collection — because **a proposal whose work is already done reads as
+outstanding**, which is the one thing this file must not get wrong. Same
+bargain `all_icons` strikes: duplicate live data only alongside the test that
+keeps the duplicate honest.
+
+**What the census found besides variance**, all fixed or flagged the same day:
+three TRUNCATED steps (Between the Sheets, Espresso Martini, and Chartreuse
+Swizzle — whose truncation is its FIRST step, so the whole build is missing),
+two typos, three notes filed as method steps, and four steps that were one
+instruction split across two lines ("Strain." + "Into a chilled glass."). Only
+three fragments were genuinely presentation, and those went to `to_serve`
+(§9.4). Truncations are flagged, never reconstructed: a plausible guess is
+still an agent writing Helen's recipe.
 
 ## 10. Validation — run `pytest`, don't read this
 
