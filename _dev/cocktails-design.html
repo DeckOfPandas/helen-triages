@@ -501,14 +501,17 @@ drinks:
     <div class="dsn-slider">
       <label>card frame</label>
       <span class="dsn-cheats" id="dsn-frames">
-        <button type="button" class="dsn-btn dsn-btn--cheat is-on" data-frame="hairline">hairline</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="menthe">soft menthe</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="edge">menthe edge</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="paper">tinted paper</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="hairline">hairline</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat is-on" data-frame="edge">edge</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="soft">soft</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="fade">fade</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="short">short</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="under">under glass</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="panel">panel</button>
       </span>
     </div>
 
-    <ul class="dsn-cards dsn-cards--wash dsn-cards--frame-hairline" id="dsn-cards-a" style="--dsn-glass-scale: 13rem;">
+    <ul class="dsn-cards dsn-cards--wash dsn-cards--frame-edge" id="dsn-cards-a" style="--dsn-glass-scale: 13rem;">
       {% for drink in page.drinks %}
         {% comment %} The card carries the RATIO, not a finished height, so one
            slider can rescale all eight without the template being rebuilt —
@@ -584,7 +587,7 @@ drinks:
             {% include icons/glasses/coupe.svg %}
           </span>
           <div class="dsn-drink-words">
-            <h3 class="dsn-drink-title">Julien Sorel</h3>
+            <h3 class="dsn-drink-title dsn-punched">Julien Sorel</h3>
             <p class="dsn-drink-tagline dsn-editorial-only">A sharp, herbal cognac sour — the absinthe does the work a garnish usually does.</p>
             <ul class="dsn-drink-meta">
               <li><span>Glass</span> coupe</li>
@@ -593,7 +596,7 @@ drinks:
           </div>
         </div>
 
-        <h4 class="dsn-drink-heading">Ingredients</h4>
+        <h4 class="dsn-drink-heading dsn-punched">Ingredients</h4>
         <ul class="dsn-ing">
           <li class="dsn-ing-row">
             <div class="dsn-ing-top">
@@ -625,7 +628,7 @@ drinks:
           </li>
         </ul>
 
-        <h4 class="dsn-drink-heading">Method</h4>
+        <h4 class="dsn-drink-heading dsn-punched">Method</h4>
         <ol class="dsn-method">
           <li>Chill a coupe.</li>
           <li>Shake everything hard with cubed ice.</li>
@@ -633,7 +636,7 @@ drinks:
         </ol>
 
         <div class="dsn-editorial-only">
-          <h4 class="dsn-drink-heading">Notes</h4>
+          <h4 class="dsn-drink-heading dsn-punched">Notes</h4>
           <div class="dsn-notes">
             <div class="dsn-note-block">
               <span class="dsn-note-label">balance</span>
@@ -856,19 +859,58 @@ drinks:
   padding: 1.05rem 1.15rem 1.05rem var(--dsn-text-x);
 }
 
-/* FOUR WAYS TO FRAME A CARD, because Helen asked what I thought and the honest
-   answer is worth less than four minutes of looking.
-   My reading, for what it is worth: a soft menthe outline on EVERY card spends
-   the matching colour on something that does not match anything, and green
-   already means "this is what you asked for" in three other places on the
-   page. The edge rule keeps the colour but spends it on one small mark instead
-   of a whole perimeter; the tinted paper gives the framing with no colour at
-   all. But this is exactly the kind of call that argument loses and looking
-   wins, so all four are here. */
+/* WAYS TO FRAME A CARD. The full menthe outline is gone -- Helen: "you're
+   right, the full menthe outline is horrible!" -- and the edge rule is the one
+   that landed, with the caveat that eight of them at once is a lot of signal
+   for something that is only decoration. These are the ways to turn it down.
+
+   The last four cannot be borders. A border is one flat colour for a whole
+   side, so a fade, a partial-length rule, a rule under one column, and a
+   tinted panel all need a pseudo-element or a background instead. That is why
+   the card carries `--dsn-edge-*` as well as the border properties. */
 .dsn-cards--frame-hairline { --dsn-frame-c: var(--dsn-line); }
-.dsn-cards--frame-menthe   { --dsn-frame-c: color-mix(in srgb, var(--dsn-absinthe) 45%, #ffffff); }
 .dsn-cards--frame-edge     { --dsn-frame-c: var(--dsn-line); --dsn-frame-l: 3px; --dsn-frame-lc: var(--dsn-absinthe); }
-.dsn-cards--frame-paper    { --dsn-frame-c: transparent; --dsn-card-bg: color-mix(in srgb, var(--dsn-absinthe) 7%, #ffffff); }
+/* (a) softer, by colour: the same rule mixed halfway to paper */
+.dsn-cards--frame-soft     { --dsn-frame-c: var(--dsn-line); --dsn-frame-l: 3px;
+                             --dsn-frame-lc: color-mix(in srgb, var(--dsn-absinthe) 55%, #ffffff); }
+/* (a) softer, by fade: full strength at the top, gone by the foot */
+.dsn-cards--frame-fade     { --dsn-frame-c: var(--dsn-line); --dsn-edge: linear-gradient(to bottom,
+                               var(--dsn-absinthe) 0%,
+                               color-mix(in srgb, var(--dsn-absinthe) 40%, #ffffff) 55%,
+                               transparent 100%); }
+/* (b) only as tall as the glass column's drawing, not the whole card */
+.dsn-cards--frame-short    { --dsn-frame-c: var(--dsn-line); --dsn-edge: var(--dsn-absinthe);
+                             --dsn-edge-top: 2.6rem; --dsn-edge-bottom: 2.6rem; }
+/* (b) read the other way: a rule UNDER the glass column rather than beside it */
+.dsn-cards--frame-under    { --dsn-frame-c: var(--dsn-line); --dsn-underline: var(--dsn-absinthe); }
+/* (c) edge kept, glass column tinted, text left on white */
+.dsn-cards--frame-panel    { --dsn-frame-c: var(--dsn-line); --dsn-frame-l: 3px;
+                             --dsn-frame-lc: var(--dsn-absinthe);
+                             --dsn-panel-bg: color-mix(in srgb, var(--dsn-absinthe) 9%, #ffffff); }
+
+/* The edge as a painted strip, for the variants a border cannot express. */
+.dsn-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: var(--dsn-edge-top, 0);
+  bottom: var(--dsn-edge-bottom, 0);
+  width: 3px;
+  background: var(--dsn-edge, transparent);
+  pointer-events: none;
+}
+/* A rule under the glass column only, its width tied to --dsn-text-x so it
+   cannot drift away from the column it belongs to. */
+.dsn-card::after {
+  content: "";
+  position: absolute;
+  left: 1.15rem;
+  bottom: 0.95rem;
+  width: calc(var(--dsn-text-x) - 2.3rem);
+  height: 3px;
+  background: var(--dsn-underline, transparent);
+  pointer-events: none;
+}
 .dsn-card-body { min-width: 0; }
 .dsn-card-name {
   font-family: "Courier Prime", monospace;
@@ -984,6 +1026,14 @@ drinks:
   display: flex;
   justify-content: center;
   pointer-events: none;
+  /* The panel tint. NOTE ON "leave the glasses full of white": not possible
+     with this artwork. Every glass is an OPEN line drawing -- no closed
+     silhouette anywhere in the set -- so there is no shape to fill white, and
+     whatever is behind the column shows through the glass as its contents.
+     Tinting the panel therefore tints the insides too, necessarily. Filling
+     them white would mean each glass carrying a second, closed body path
+     drawn behind its strokes: real artwork, on 25 files. */
+  background: var(--dsn-panel-bg, transparent);
 }
 .dsn-card-glass svg {
   display: block;
@@ -1075,18 +1125,39 @@ drinks:
   align-items: stretch;
   margin-bottom: 2.4rem;
   padding-bottom: 1.4rem;
-  border-bottom: 2px solid var(--dsn-accent2);
+  /* Menthe under the title, amber elsewhere — Helen, 2026-08-26. */
+  border-bottom: 2px solid var(--dsn-absinthe);
 }
 .dsn-drink-glass { flex: none; color: var(--dsn-ink); display: flex; align-items: flex-end; }
 .dsn-drink-glass svg { display: block; height: 8.5rem; width: auto; overflow: visible; }
 .dsn-drink-words { display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; }
+/* THE PUNCHED EFFECT, READ FROM THE REAL VARIABLES rather than copied.
+   `_sass/shared/_rule.scss` emits --emboss-stroke-w / -c, --emboss-light,
+   --emboss-shadow and --emboss-offset-lg on :root, and the cocktails
+   stylesheet imports it, so those values are already on this page. Restating
+   the numbers locally would be a second copy to keep in step with Helen's
+   tuning — she tuned these at /dev/emboss/ against Courier Prime, and the note
+   in that file records the stroke going UP after an argument said it should go
+   down. Read them, never re-derive them.
+
+   `h1, h2, h3` in shared/_base.scss already carries this, so the drink title
+   (an h3) inherits it. It is restated here anyway to take the LARGE offset
+   deliberately rather than by accident, and because this element sets its own
+   font-size, which is what the em-based stroke resolves against. */
+.dsn-punched {
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+  text-shadow:
+    calc(var(--emboss-offset-lg) * -1) calc(var(--emboss-offset-lg) * -1) 0 var(--emboss-light),
+    var(--emboss-offset-lg) var(--emboss-offset-lg) 0 var(--emboss-shadow);
+}
+
 .dsn-drink-title {
   font-family: "Courier Prime", monospace;
-  font-size: 2.1rem;
+  font-size: 2.5rem;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  line-height: 1.05;
-  margin: 0 0 0.5rem;
+  line-height: 1.02;
+  margin: 0 0 0.55rem;
 }
 .dsn-drink-tagline { font-style: italic; font-size: 1.05rem; line-height: 1.5; color: var(--dsn-grey); margin: 0 0 0.9rem; max-width: 34ch; }
 .dsn-drink-meta { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.8rem; font-size: 0.86rem; }
@@ -1099,15 +1170,22 @@ drinks:
   display: block;
   margin-bottom: 0.1rem;
 }
+/* LOUDER. These were 0.76rem grey small-caps — a caption, not a heading, and
+   at that size the punched effect has nothing to work with: the stroke is
+   1.6% of font-size, so on 0.76rem it is a fifth of a pixel. Tripled in size
+   and taken to full ink, which is what makes the emboss legible at all.
+   The rule under them is VIOLET while the title's is menthe, so the page has a
+   hierarchy you can read from across the room without reading a word of it. */
 .dsn-drink-heading {
   font-family: "Courier Prime", monospace;
-  font-size: 0.76rem;
+  font-size: 1.35rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--dsn-grey);
-  margin: 2.4rem 0 0.9rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--dsn-line);
+  letter-spacing: 0.1em;
+  color: var(--dsn-ink);
+  margin: 2.8rem 0 1rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 2px solid var(--dsn-accent3);
 }
 .dsn-ing { list-style: none; margin: 0; padding: 0; }
 .dsn-ing-row { padding: 0.75rem 0; border-bottom: 1px solid var(--dsn-line); }
@@ -1148,17 +1226,16 @@ drinks:
 /* MAKE-IT STATE. One class on the container. Nothing leaves the DOM, so the
    page still prints and still works with JS off.
 
-   THE GLASS MATCHES THE HEAD BLOCK'S HEIGHT rather than taking a size of its
-   own — Helen, 2026-08-26: "when the glass shrinks in make it, please let it
-   remain the same height (or as close as you can) as the title, tagline and
-   meta block." So it is `height: 100%` against a stretched flex row, and the
-   text decides. Editorial: title + tagline + meta, and the glass is tall.
-   Make it: the tagline is hidden, the block shrinks, and the glass shrinks
-   with it exactly. No second number to keep in step, and it stays true if the
-   title wraps to two lines on a narrow screen. */
+   THE HEIGHT-MATCHING ATTEMPT IS PARKED — issue #485, Helen's call. The idea
+   was `align-self: stretch` plus `height: 100%` so the text block's height
+   decided the glass's. It does not work, and the reason is circular sizing:
+   the row's height comes from its tallest item, the glass is one of those
+   items, and a percentage height resolved against an indefinite height falls
+   back to auto — so the glass sizes itself from its own intrinsic aspect and
+   then helps decide the height it was supposed to be reading. A fixed size is
+   back in the meantime, so this state looks deliberate rather than broken. */
 .dsn-drink.is-making .dsn-editorial-only { display: none; }
-.dsn-drink.is-making .dsn-drink-glass { align-self: stretch; }
-.dsn-drink.is-making .dsn-drink-glass svg { height: 100%; }
+.dsn-drink.is-making .dsn-drink-glass svg { height: 3.4rem; }
 .dsn-drink.is-making .dsn-amount { font-size: 1.3rem; font-weight: 700; }
 .dsn-drink.is-making .dsn-item { font-size: 1.15rem; }
 .dsn-drink.is-making .dsn-ing-row { padding: 0.95rem 0; }
@@ -1309,7 +1386,7 @@ drinks:
   wrap.addEventListener('click', function (e) {
     var btn = e.target.closest('.dsn-btn--cheat');
     if (!btn) return;
-    ['hairline', 'menthe', 'edge', 'paper'].forEach(function (f) {
+    ['hairline', 'edge', 'soft', 'fade', 'short', 'under', 'panel'].forEach(function (f) {
       grid.classList.toggle('dsn-cards--frame-' + f, f === btn.dataset.frame);
     });
     wrap.querySelectorAll('.dsn-btn--cheat').forEach(function (b) {
