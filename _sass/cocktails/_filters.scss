@@ -219,14 +219,27 @@
   .drink-field-label { color: $color-clear-text; }
   .drink-search-input { border-bottom-style: dashed; border-bottom-color: $color-border; }
 
+  // THE STRIKETHROUGH IS A STATE, NOT A DECORATION — #522, and it was more
+  // than cosmetic. Every candidate in this pool rendered pre-struck, so a
+  // word you had merely typed towards looked like a word you had already
+  // excluded: the control was reporting an action you had not taken. The
+  // dashed border still marks the whole section as the negative one.
   .btn-pool {
-    text-decoration: line-through;
     color: $color-clear-text;
     border-style: dashed;
 
     &:hover,
     &:focus-visible { color: $color-text; border-color: $color-text; }
-    &.is-on { background: transparent; border-color: $color-text; color: $color-text; font-weight: 600; }
+
+    // Struck through only once chosen, which is also the moment it becomes
+    // literally true of the results.
+    &.is-on {
+      background: transparent;
+      border-color: $color-text;
+      color: $color-text;
+      font-weight: 600;
+      text-decoration: line-through;
+    }
   }
 }
 

@@ -211,9 +211,13 @@ permalink: /cocktails/
           <p class="drink-card-name">
             <a href="{{ drink.url | relative_url }}">{{ drink.title }}</a>
           </p>
-          {% if drink.tagline %}
-            <p class="drink-card-tagline">{{ drink.tagline }}</p>
-          {% endif %}
+          {% comment %} NO TAGLINE HERE — #512. It was two clamped lines of
+             italic between the name and the ingredients, and the ingredients
+             are what the card is for: they tell you what the drink IS and they
+             are what the search matches against. The tagline is the drink
+             page's voice and reads as preamble at card size. Removed from the
+             MARKUP rather than hidden in CSS, so the clamped text is not
+             sitting in the DOM of 115 cards being ignored. {% endcomment %}
           {% if drink.ingredients.size > 0 %}
             {% comment %} Items only. Amounts are noise at this distance, and
                Helen knows how to make drinks. {% endcomment %}

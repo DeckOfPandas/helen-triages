@@ -615,11 +615,28 @@ $amount-indent: $amount-col + $amount-gap;
 // italic word between alternatives rather than punctuation, so there is no
 // second comma to confuse with the first. That was always the stronger half.
 
+// BREAKS THE LINE AFTER ITSELF — #518. Two generics used to run on as one
+// wrapped paragraph, so "lightly aged and filtered or blended multi-region
+// rum, clear" broke wherever the measure happened to run out and the
+// alternatives had to be picked apart by reading. One per line makes the
+// choice visible at a glance, which is the entire job of this field.
+//
+// `::after { content: "\A"; white-space: pre }` rather than making this a
+// block. Two reasons. A block would push the "or" onto a line of its own, and
+// the word belongs to the option BEFORE it, not between them like a bullet.
+// And carrying `white-space` on the pseudo-element keeps the whole mechanism
+// here — the parent needs no `pre-line`, so a line-break rule cannot be
+// undone by someone restyling `.cocktail-type-line` without knowing this
+// depends on it.
 .cocktail-style-or {
   font-style: italic;
   color: $color-clear-text;
-  margin: 0 0.5em;
-  display: inline-block;
+  margin: 0 0 0 0.5em;
+
+  &::after {
+    content: "\A";
+    white-space: pre;
+  }
 }
 
 // Character is a property of THIS RECIPE'S use of the bottle, not the bottle
@@ -683,8 +700,27 @@ $amount-indent: $amount-col + $amount-gap;
   margin: 0;
 }
 
-// Amber, like every other structural mark on the page.
+// ONE BAR PER NOTE, NOT ONE PER SECTION — #515. The amber bar was on the
+// WRAPPER, so however many notes a drink had, they shared a single unbroken
+// line down the left and read as one long note with bold words in it. Helen:
+// "for pages with multiple notes, add space between notes so the left edges
+// don't just form one continuous line."
+//
+// Moving the bar onto each note is the fix rather than adding margins to the
+// wrapper's children, because the bar IS the thing that was lying: a
+// continuous rule says "one block" no matter how much air is between the
+// paragraphs it runs past.
+//
+// `.notes--single` is left alone. It exists in the markup and now needs no
+// rule of its own — with the bar per note, one note and three notes are the
+// same construction, which is what a modifier should stop being necessary for.
 .cocktail .notes {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-block-gap;
+}
+
+.cocktail .note {
   border-left: 2px solid $color-amber;
   padding-left: $space-lg;
 }
