@@ -76,6 +76,62 @@ $rule-ingredient: 46%;
   border-bottom: 2px solid $color-menthe;
 }
 
+// =============================================================================
+// OPTION 1: THE GLASS IN THE LEFT MARGIN. Opt-in, and nothing below is
+// touched by it.
+// =============================================================================
+// Helen, 2026-08-26, having had the cocktail and food titles put on the same
+// baseline: the horizontal difference remains, because the glass column sits
+// where food's title starts. She is "interested in 1, but currently predict
+// I'll want to stick with 4" -- so this is built to be LOOKED at and thrown
+// away, not switched to.
+//
+// The idea: the content column is 900px inside a much wider viewport, so the
+// drawing can hang in the margin OUTSIDE it. The title then starts at exactly
+// food's left edge, the two sites' recipe pages line up completely, and the
+// glass gets more room rather than less.
+//
+// HOW TO SEE IT: add `?glass=margin` to any drink page URL. The class is added
+// by assets/js/cocktail-glass-margin.js, which is only included when
+// `site.show_drafts` is true -- so it exists locally and cannot reach
+// production, the same guard the index's draft listing uses.
+//
+// A QUERY PARAMETER RATHER THAN A BUILD FLAG, deliberately: a flag means an
+// edit and a rebuild between each look, and comparing two layouts you cannot
+// put side by side is exactly when that friction stops you comparing properly.
+//
+// WHAT TO WATCH FOR, because it is the reason this may lose:
+//   - at narrow viewports there IS no margin, so the glass has to come back
+//     inside; the media query below does that, and the layout changes shape
+//     as the window narrows, which the current one never does.
+//   - the drawing stops being adjacent to the words it describes. Whether it
+//     reads as "belonging to this drink" or as loose furniture beside the page
+//     is the whole question, and it cannot be answered from the CSS.
+.cocktail--glass-margin {
+  .cocktail-title-block {
+    // The glass leaves the flex row entirely, so the words start at the
+    // container's left edge -- the same edge food's title starts on.
+    position: relative;
+    display: block;
+  }
+
+  .cocktail-glass-icon {
+    position: absolute;
+    // Out into the margin: its own width plus a gap, to the left of the column.
+    right: calc(100% + #{$spacing-section-gap});
+    bottom: 0;
+    align-self: auto;
+  }
+
+  // Below this the viewport has no margin to hang anything in, so the glass
+  // comes back inside and the layout reverts to the shipped one. The threshold
+  // is the content column plus room for the widest glass on both sides.
+  @media (max-width: 1180px) {
+    .cocktail-title-block { display: flex; }
+    .cocktail-glass-icon { position: static; align-self: center; }
+  }
+}
+
 // The title and the make-it toggle on one line, which is food's
 // `.recipe-title` exactly: flex, last-baseline, space-between. `last baseline`
 // with `flex-end` kept beneath it as the fallback — food carries the same pair
@@ -610,8 +666,27 @@ $amount-indent: $amount-col + $amount-gap;
   .notes,
   .cocktail-body-content { display: none; }
 
-  .cocktail-title { font-size: 1.5rem; }
-  .cocktail-title-block { padding-bottom: $space-lg; margin-bottom: $space-xl; }
+  // THE HEAD DOES NOT CHANGE ANY MORE, and removing three lines is the fix.
+  // This state used to shrink the title to 1.5rem and tighten the block's
+  // padding and margin — written when the title was 2.5rem and its own thing.
+  // The title is now 2.2rem at 1.65 to match food exactly (#519, #520), so
+  // those overrides did not just look different, they reverted the page to
+  // its pre-match typography the moment you pressed the button. Helen:
+  // "clicking MAKE IT makes the fonts and spacings go back to before your
+  // last victory."
+  //
+  // AND THE TITLE HAD NO BUSINESS SHRINKING. What `make it` is for is
+  // stripping what you do not need with your hands full and enlarging what you
+  // do. The drink's name is neither: it does not compete with the spec, and a
+  // page whose title resizes when you press a button reads as a different page
+  // rather than the same one in a different mode.
+  //
+  // A GENERAL POINT WORTH THE PARAGRAPH: any rule that restates a value
+  // belonging to another rule is a copy that has to be maintained, and a state
+  // modifier is the easiest place to leave one behind — it only renders when
+  // someone presses something, so it goes stale unwatched. The overrides that
+  // survive below all CHANGE something for a reason; none of them restates a
+  // number the default already owns.
   .cocktail-glass-icon svg { height: 4.1rem; }
 
   // GLASS AND GARNISH GET LOUDER, NOT QUIETER — #493, Helen: "including moving

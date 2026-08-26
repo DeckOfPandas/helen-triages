@@ -368,3 +368,13 @@ layout: default
    with no arrow loads no script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>
+{% comment %} A comparison switch for the glass-in-the-margin layout, gated on
+   the same `site.show_drafts` key the index uses, so no production page loads
+   it. The FILE is still copied — Jekyll copies everything under assets/,
+   linked or not, which is issue #276's lesson — but nothing references it and
+   it does nothing without the query parameter. Add `?glass=margin` to any
+   drink URL. Delete this block and the file together once the layout question
+   is settled either way. {% endcomment %}
+{% if site.show_drafts %}
+  <script src="{{ '/assets/js/cocktail-glass-margin.js' | relative_url }}"></script>
+{% endif %}
