@@ -73,10 +73,34 @@ SKIP = {
 # the outline and produce mush. It gets its own class instead -- see
 # `.glass-icon-solid` in _sass/cocktails/_cocktail.scss -- which fills with
 # currentColor so the palette rule still holds and only the technique differs.
-SOLID = {"glass-pineapple-3.svg"}
+#
+# THE TIKI MUG JOINED IT 2026-08-26, and it was always this case -- nobody had
+# looked. Its source is fill-only in exactly the pineapple's way: one style
+# rule, `.a{fill:#231f20;}`, and not a single stroke in the file (it is a stock
+# icon, <title>100icons20172</title>). Published with the stroke class, all 27
+# paths drew the OUTLINE OF THE INK -- a hollow double line around every
+# stroke. Helen spotted it on the design page: "the lines outline the shape of
+# the mug as enclosed areas, but they're not filled."
+#
+# LISTING IT HERE IS WHAT MAKES THE FIX SURVIVE. The published icon was edited
+# by hand the same day, and a hand edit to a GENERATED file is undone the next
+# time this script runs, silently and with no diff to notice. The set is now
+# two.
+SOLID = {"glass-pineapple-3.svg", "glass-tiki-mug.svg"}
 
 # Source name -> published name, where the export carries a working title.
-RENAME = {"pineapple-3": "pineapple"}
+#
+# The numbered ones are Helen's redraws: she saves a new attempt beside the old
+# rather than over it, so the source that WINS carries a version suffix the
+# published icon must not. Deliberately not automated by stripping a trailing
+# `-<n>`: `pineapple-3` beat `pineapple-1` on a judgement call and the losers
+# are kept as the evidence for it, so which numbered file is current is a fact
+# about this repo's history, not a pattern.
+RENAME = {
+    "pineapple-3": "pineapple",
+    "coupe-3": "coupe",
+    "hurricane-2": "hurricane",
+}
 
 
 # =============================================================================
@@ -254,4 +278,14 @@ def main():
     print(f"\n   total {before} -> {after} bytes ({100 - after * 100 // before}% smaller)")
 
 
-main()
+# THE GUARD IS NOT TIDINESS. A bare `main()` here means IMPORTING this module
+# runs it, and the first thing main() does is `shutil.rmtree(DST)` -- so
+# `import normalise_glass_icons`, to reuse normalise() on a single new drawing,
+# deletes all 26 published icons before the importer's first line executes.
+# That happened on 2026-08-26, from a script whose whole purpose was to avoid
+# regenerating the set. Recoverable, since everything in DST is committed, but
+# silent and instant, and nothing about the traceback points at the import.
+#
+# Reuse the functions freely now: importing this module does nothing on its own.
+if __name__ == "__main__":
+    main()
