@@ -114,10 +114,12 @@ the routing:
 
 ```
 _food_recipes/       output: true    permalink /food/recipes/:path/
+_food_magic_bag/     output: true    permalink /food/magic-bag/:path/   see §4.3
 _food_drafts/        output: false   permalink /food/drafts/:path/  (local only)
 _cocktail_recipes/   output: true    permalink /cocktails/recipes/:path/
 
 _layouts/     default.html (shared)   recipe.html (food)   cocktail.html (cocktails)
+              magic_bag.html (food, §4.3)
 _includes/    filter_group.html   recipe_badges.html
 _sass/        shared/{_tokens,_base,_layout}   food/   cocktails/
 _data/        sites.yml   accented_words.yml   food/*.yml   cocktails/taxonomy.yml
@@ -881,6 +883,13 @@ gate would be gone and the build green.
 
 **Cocktails front matter does not exist yet and must not be invented.** See §9.
 
+**This is not the only shape a food document can take.** `_food_magic_bag/`
+(§4.3, added 2026-08-26) holds dishes Helen makes without a recipe — no method,
+no source, an explicitly incomplete ingredient list. Everything above applies to
+`_food_recipes/` and `_food_drafts/` and none of it applies there; the two
+schemas are deliberately separate so the rules on this page can stay
+unconditional.
+
 ### 4.1 Body content below the front matter (rare)
 
 A recipe file's Markdown body — the content *after* the closing `---` — is
@@ -993,6 +1002,141 @@ the number). Verified against `beef-wellington.md` (one of six recipes using
 
 `chocolate-ganache.md`'s own cooling step is the first (only, as of
 2026-08-02) real example.
+
+### 4.3 The magic bag — dishes with no recipe
+
+**A separate collection, `_food_magic_bag/`, added 2026-08-26.** Helen's own
+name for her brain, and the collection is named after it because that is
+genuinely where these live: in her head, not on the site. A magic-bag entry is
+a dish she cooks from memory and has no intention of writing up.
+
+This answers the README's problem #1 — *"what shall I cook, out of everything I
+already know how to make?"* — for the half of that set the site could not hold,
+because those dishes were never written down and never will be.
+
+```yaml
+title: "Fridge-end fried rice"
+tagline: "The thing that happens to yesterday's rice."   # key required, value may be ""
+main_ingredients: ["rice", "eggs", "spring onions"]      # what makes it findable
+tags: ["fakeaway"]                                        # OPTIONAL here, unlike a recipe
+ingredients:                                              # flat, bare strings, INCOMPLETE
+  - "cold cooked rice"
+  - item: "dark soy sauce"
+    note: "Light soy makes it taste thin."
+notes:                                                    # optional, {label, text} as a recipe
+  - label: "Rice"
+    text: "Has to be cold and a day old."
+meta:
+  awaiting_fix: false                                     # the publish gate, and nothing else
+---
+```
+
+**It is NOT a variant of the recipe schema, and that was the whole design
+decision.** Every structural guard in `test_front_matter.py` is unconditional,
+which is what makes them worth having — `test_method_xor_method_groups` treats
+"neither" as an error, a real catch across 86 recipes. A magic-bag entry has no
+method *by definition*, so folding it in would have forced that guard, the
+required-field list and every source-attribution rule to grow an `if`.
+Weakening a live guard to admit a new shape is the wrong trade. The recipe
+rules stay absolute; the new shape gets `tests/test_magic_bag.py`.
+
+**The required set is five keys and the shortness is the feature.** Capturing a
+dish has to be nearly free, or Helen won't, and the collection stays empty.
+`tags` is *not* required, unlike on a recipe: a magic-bag dish is found by its
+ingredients, and forcing a taxonomy decision at jot-down time is exactly the
+friction that stops the note being written. Tags are validated when present.
+
+**`meta:` is ONE flag here, not three.** `rewritten` and `proofread` are recipe
+flags with no meaning for a dish that has no source and never left Helen's own
+head — and a flag that can only ever hold one value is precisely what
+`test_front_matter.py`'s `cooked_before` tombstone warns against. `awaiting_fix`
+stays, and `food_magic_bag` is in the plugin's `GATED_COLLECTIONS`, because the
+collection is `output: true` and the gate is about what the world sees.
+
+**The incompleteness is enforced by the schema, not announced on the page.**
+There is nowhere in this shape to put a method and `test_no_recipe_only_keys`
+rejects one, so a magic-bag list is one that *cannot* be completed there —
+a stronger statement than prose saying it might not be. A standing caveat WAS
+rendered on every page for about an hour on the day this was built, and Helen
+had it removed on sight: *"I am the user, and I know exactly what is going
+on."* It explained the collection to a reader who does not exist on this site.
+Don't reinstate it on the reasoning that the pages should explain themselves.
+
+#### Four things in `food/index.html` needed handling, and three fail SILENTLY
+
+This is the part worth reading before touching the index again.
+
+- **The `meta.rewritten` gate.** Every row is gated on `recipe.meta.rewritten or
+  site.show_source_wording`, and that config flag is `true` in
+  `_config_local.yml` and `false` in `_config.yml`. So an entry without
+  `meta.rewritten` renders perfectly while you build it and **vanishes when it
+  deploys**, green build, nothing in the log. The magic bag is exempted in both
+  places that apply the gate — the row `if` and the `_rendered_recipes`
+  `where_exp` that feeds the survivor count. Exempted rather than papered over
+  with `rewritten: true`: that gate exists because an un-rewritten recipe still
+  carries someone else's words, and these have no source to rewrite from.
+- **The derived ingredient index** (the "they hate peas" exclude filter, #52)
+  reads `ingredient_groups`, which these don't have — so their vocabulary would
+  have been empty, and an empty vocabulary means *"no mushrooms please"* hands
+  back every magic-bag dish containing mushrooms. That loop's own comment states
+  the rule it would have broken: **fine to include ON, dangerous to exclude BY.**
+  A second loop reads `ingredients`. There is deliberately no branch on the
+  collection — a recipe has no `ingredients` and an entry has no
+  `ingredient_groups`, so each loop is simply a no-op for the other shape.
+- **The three meta filters.** "needs rewrite", "needs proofread" and "no short
+  method" all mean *this recipe isn't finished yet*. On the defaults an entry
+  answers true to all three and pads every one of those working lists with
+  dishes that can never leave them. `data-meta-short` is **three-valued now** —
+  `'true'`, `'false'`, `'n/a'` — because that filter is a PAIR whose halves want
+  opposite answers, and only a third value fails both. `filters.js`'s no-short
+  branch requires an explicit `'false'`; reading it as `!== 'true'` is the
+  natural spelling and is the bug.
+- **A `magic bag` badge on the row, shown in production** unlike the two
+  work-state badges. Without it a magic-bag row is indistinguishable from a
+  recipe row until the page loads and there is no method on it.
+
+**Not covered by any test: `filters.js`.** That file has no unit tests at all
+(§3's table says "exercised by hand"), so the three-valued change is reasoned
+and hand-checked, not exercised — a production build emits the values in the
+right proportions (67 `false`, 19 `true`, 1 `n/a`) but the branch itself has
+never been executed by a test. **Issue #506**, which proposes the §3 split:
+pull the predicate out as a pure function and test that, leaving the DOM wiring
+behind. Exactly the `back-link.js` argument.
+
+**A trap paid for while building it:** Liquid **tokenises tags inside a
+`{% comment %}` block** rather than treating the body as text, so an
+illustrative bare `if` tag written out in full inside a comment is a real parse
+error that takes the whole build down. It did. This is the same family as §12's
+"prose defeats a source-scanning guard", from the other direction: here the
+parser reads documentation as code.
+
+**Promotion is a real path, not a dead end.** A dish that earns a full write-up
+moves to `_food_drafts/` and takes the recipe schema. `test_no_recipe_only_keys`
+exists to catch the halfway state — the realistic failure is not a stray key but
+Helen starting to write one up in place, until the file is a recipe living in
+the wrong collection rendered by a layout that shows none of it. Its failure
+message says "promote it", because wanting to write one up is a good outcome
+that has outgrown the shape.
+
+**Open, and deliberately not decided on the way past:** whether the index needs
+a way to include or exclude the magic bag in production (**#507** — note the
+META FILTERS block is local-only, and "has a written method" is a fact about a
+dish rather than a state of completion, so it may not belong there at all);
+whether `magic bag` is the right reader-facing word, in the badge and in the
+`/food/magic-bag/` permalink (**#508** — the permalink is the half worth
+settling early, since changing it later breaks shared links); and the README,
+which still describes two collections (**#509**, and it wants Helen's own voice,
+not an imitation of it).
+
+**`.recipe--magic-bag`** exists for exactly one spacing consequence and nothing
+else. `.recipe-tagline` deliberately carries no margins (§13.3's reasoning: the
+gap beneath it comes from `.recipe-meta`, which is what keeps title-to-meta
+distance constant whether or not a tagline exists), and a magic-bag page has no
+metadata grid — so its badges sat against the tagline. The margin is on
+`.recipe-badges`, scoped, so no recipe page moves; and on the badges rather than
+the tagline because the tagline is optional here and an empty one renders
+nothing at all, which would drop the gap exactly when it is still needed. It is
+not a hook for making these pages look different on purpose.
 
 ---
 
@@ -2320,6 +2464,7 @@ from here.
 | `test_rendered_pages.py` | Assertions about BUILT html, including the two chrome guards (§2.5), `test_every_published_page_links_a_stylesheet` (§2.4), and `test_every_icon_partial_class_has_a_styled_base` (#396) |
 | `test_source_attribution.py` | The six citation rules, over recipes and drafts — see `SOURCE_ATTRIBUTION_SPEC.md` (§4). Omitted from this table until 2026-08-21 |
 | `test_prose_pages.py` | House typography on the pages that are NOT recipes, and on the reference data that supplies their words (§5, #413) |
+| `test_magic_bag.py` | `_food_magic_bag/`'s own schema, via its own `magic_bag` fixture — a much shorter spec than a recipe's, and deliberately so (§4.3) |
 
 `pytest.ini` declares three suite MARKERS, which this section never mentioned:
 `pytest -m food`, `-m cocktails`, `-m shared`. They exist for signal, not speed
@@ -3018,6 +3163,19 @@ to strip.**
 Every one was caught by breaking the thing on purpose and watching. **Read the
 output, not the exit status** — (2) printed nothing at all, which is the only
 reason it was noticed.
+
+**AND THE SAME COLLISION RUNS THE OTHER WAY: A PARSER WILL READ YOUR
+DOCUMENTATION AS CODE.** 2026-08-26, building the magic bag (§4.3). Liquid
+**tokenises tags inside a `{% comment %}` block** rather than treating the body
+as text, so a comment that quotes a bare `if` tag in full — written to explain
+what the code below it does — is a real syntax error that takes the entire
+build down. Everything above is about prose being mistaken for code by a guard
+that greps; this is prose being mistaken for code by the actual parser, and it
+fails immediately and loudly rather than silently, which is the one mercy.
+**In a Liquid comment, name a tag rather than writing it out** (`an include
+tag`, not the tag itself); `{% raw %}` works but is easy to forget when you are
+mid-sentence. The general form: before quoting syntax inside a comment, ask
+whether the thing that reads this file parses comments or skips them.
 
 **YOU WILL ADD A NEW LINK SHAPE AND NOTHING WILL BE WATCHING IT.** Recipes had
 two: `](../slug/)` and `](../reference/slug/)`, each with its own guard. Issue

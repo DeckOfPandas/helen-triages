@@ -271,6 +271,27 @@ article.recipe a:not(.badge) {
   text-align: left;
 }
 
+// THE MAGIC BAG HAS NO METADATA GRID, SO THE BADGES NEED THEIR OWN GAP.
+//
+// .recipe-tagline above deliberately carries no margins: on a recipe page the
+// gap beneath it comes from .recipe-meta, which is what lets a recipe with no
+// tagline keep the same title-to-meta distance as one with a tagline. A
+// magic-bag entry has no .recipe-meta and no .recipe-source, so its badges sat
+// directly against the tagline with nothing between them.
+//
+// PUT ON THE BADGES, NOT ON THE TAGLINE, and scoped to this collection so no
+// recipe page moves by a pixel. Two reasons for choosing the badges as the
+// anchor: the tagline is OPTIONAL here (an empty `tagline: ""` renders nothing
+// at all), so a margin hung on it would vanish exactly when it is still needed
+// — the badges would then sit against the title instead. And a margin on the
+// tagline would have to be undone for the recipe pages that already get their
+// gap from the metadata grid, which is the alteration this must not make.
+//
+// Matches the badges' existing bottom margin, so the row sits in equal space.
+.recipe--magic-bag .recipe-badges {
+  margin-top: $spacing-block-gap;
+}
+
 // --- Meta Grid ---------------------------------------------------------------
 .recipe-meta {
   list-style: none;

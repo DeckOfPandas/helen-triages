@@ -31,6 +31,21 @@ ROOT = Path(__file__).resolve().parent.parent
 RECIPES_DIR = ROOT / "_food_recipes"
 DRAFTS_DIR = ROOT / "_food_drafts"
 
+# THE MAGIC BAG — dishes Helen makes without a recipe, added 2026-08-26.
+#
+# A THIRD COLLECTION AND A THIRD FIXTURE, not a widening of `recipe`. Every
+# structural rule in test_front_matter.py is unconditional on purpose, and
+# folding these in would force each one to grow an `if` — a magic-bag entry has
+# no method, no source and no method_short, all of which a recipe MUST have. The
+# separate list keeps the recipe rules absolute and gives the new shape its own
+# spec in test_magic_bag.py, exactly as the `recipe`/`draft` split already does.
+#
+# IT IS IN THIS PUBLIC REPO, unlike _food_drafts/, so DRAFTS_PRESENT has no
+# equivalent here: CI sees the whole collection. If that ever changes, this
+# needs the same treatment issue #378 gave drafts, and test_suite_hygiene.py's
+# registries are where it would have to be declared.
+MAGIC_BAG_DIR = ROOT / "_food_magic_bag"
+
 # Food's own vocabulary: taxonomy, filter sections, pantry, ingredient words.
 DATA_DIR = ROOT / "_data" / "food"
 
@@ -71,6 +86,20 @@ class Recipe:
                     out.append(item["item"])
                 elif isinstance(item, str):
                     out.append(item)
+        # THE MAGIC BAG'S FLAT `ingredients:` LIST, added 2026-08-26. A recipe
+        # carries `ingredient_groups` and no `ingredients`; a magic-bag entry
+        # carries `ingredients` and no `ingredient_groups`, and both halves are
+        # enforced (test_front_matter.py, test_magic_bag.py). So this branch is
+        # a no-op on every recipe rather than a behaviour change to them, and
+        # the ingredient-vocabulary rules — salted vs unsalted butter, which
+        # soy, which sugar — reach the new collection without being rewritten
+        # for it. Those rules are about the WORDS, and a magic-bag entry's words
+        # go on the page like any other.
+        for item in self.fm.get("ingredients") or []:
+            if isinstance(item, dict) and item.get("item"):
+                out.append(item["item"])
+            elif isinstance(item, str):
+                out.append(item)
         return out
 
     @property
@@ -110,6 +139,12 @@ class Recipe:
             for item in group.get("items") or []:
                 if isinstance(item, dict) and item.get("note"):
                     out.append((f"note on '{item.get('item')}'", item["note"]))
+        # Magic-bag ingredient notes — see ingredient_items above for why this
+        # is a no-op on a recipe. A note here renders exactly as a recipe's
+        # does, so it is held to the same typography and house style.
+        for item in self.fm.get("ingredients") or []:
+            if isinstance(item, dict) and item.get("note"):
+                out.append((f"note on '{item.get('item')}'", item["note"]))
         return out
 
 
@@ -138,6 +173,7 @@ def _load(directory: Path) -> list[Recipe]:
 
 ALL_RECIPES = _load(RECIPES_DIR)
 ALL_DRAFTS = _load(DRAFTS_DIR)
+ALL_MAGIC_BAG = _load(MAGIC_BAG_DIR)
 
 # ARE THE PRIVATE DRAFTS EVEN HERE? -- GitHub issue #378.
 #
@@ -189,6 +225,9 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("recipe", ALL_RECIPES, ids=[r.slug for r in ALL_RECIPES])
     if "draft" in metafunc.fixturenames:
         metafunc.parametrize("draft", ALL_DRAFTS, ids=[d.slug for d in ALL_DRAFTS])
+    if "magic_bag" in metafunc.fixturenames:
+        metafunc.parametrize("magic_bag", ALL_MAGIC_BAG,
+                             ids=[m.slug for m in ALL_MAGIC_BAG])
 
 
 @pytest.fixture(scope="session")

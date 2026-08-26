@@ -31,12 +31,33 @@ permalink: /food/
      _config_local.yml flipping output back on for the working view without a
      second thing to keep in sync. {% endcomment %}
   {% assign all_recipes = site.food_recipes %}
+  {% comment %} THE MAGIC BAG JOINS UNCONDITIONALLY, unlike drafts. It is
+     `output: true`, so its entries have real URLs in every build, and the
+     entire point of the collection is that these dishes show up when Helen is
+     browsing for something to cook -- a magic-bag entry hidden from the index
+     is a dish she has forgotten about, which is the problem it exists to
+     solve. See _config.yml's `food_magic_bag` comment. {% endcomment %}
+  {% assign all_recipes = all_recipes | concat: site.food_magic_bag %}
   {% assign _drafts_collection = site.collections | where: "label", "food_drafts" | first %}
   {% if _drafts_collection.output %}
     {% assign all_recipes = all_recipes | concat: site.food_drafts %}
   {% endif %}
   {% assign all_recipes = all_recipes | sort: "title" %}
-  {% assign _rendered_recipes = all_recipes | where_exp: "r", "r.meta.rewritten or site.show_source_wording" %}
+  {% comment %} THE `meta.rewritten` GATE DOES NOT APPLY TO THE MAGIC BAG, and
+     leaving it out would have been a silent production-only bug -- the exact
+     shape HANDOVER §12 is full of. `show_source_wording` is true in
+     _config_local.yml and false in _config.yml, so an entry without
+     `meta.rewritten: true` renders perfectly while you build it and VANISHES
+     when it deploys, with a green build and nothing in the log.
+
+     The right fix is the exemption, not `rewritten: true` on every entry. That
+     gate exists because an un-rewritten recipe still carries someone else's
+     words, which is a copyright question (README, and §4's QQ PLACEHOLDER
+     rule). A magic-bag dish has no source to rewrite FROM -- it is Helen's own,
+     out of her own head -- so the concern does not apply and neither should the
+     gate. `meta.rewritten` is not part of the magic-bag schema at all;
+     tests/test_magic_bag.py rejects it. {% endcomment %}
+  {% assign _rendered_recipes = all_recipes | where_exp: "r", "r.meta.rewritten or site.show_source_wording or r.collection == 'food_magic_bag'" %}
 
   {% comment %} Stars are DECLARED in _data/taxonomy.yml, not derived from front
      matter. Deriving meant a typo silently minted a new star ingredient. {% endcomment %}
@@ -232,21 +253,42 @@ permalink: /food/
 
 <ul class="recipe-list">
   {% for recipe in all_recipes %}
-    {% if recipe.meta.rewritten or site.show_source_wording %}
+    {% assign is_magic_bag = false %}
+    {% if recipe.collection == "food_magic_bag" %}{% assign is_magic_bag = true %}{% endif %}
+
+    {% if recipe.meta.rewritten or site.show_source_wording or is_magic_bag %}
       {% assign is_draft = false %}
       {% if recipe.collection == "food_drafts" %}{% assign is_draft = true %}{% endif %}
 
+      {% comment %} THE THREE META FILTERS ARE RECIPE-ONLY, and a magic-bag row
+         must fail all of them rather than default into them. They are working
+         tools -- "needs rewrite", "needs proofread", "no short method" all mean
+         "this recipe is not finished yet" -- and a magic-bag entry has no
+         rewrite to do, no proofread to grant and no short method it will ever
+         have. Left to the defaults it would answer TRUE to all three (no
+         `meta.rewritten`, no `meta.proofread`, no `method_short`) and quietly
+         pad every one of those lists with dishes that can never leave them.
+
+         `n/a` rather than `false` for the short-method one, because that filter
+         is a PAIR and the two halves want opposite answers: `false` would
+         correctly drop the row from "has short method" and wrongly add it to
+         "no short method". A third value is the only thing that fails both, and
+         filters.js reads it as "not an answer to this question" -- see its
+         no-short branch, which now requires an explicit `false`. {% endcomment %}
       {% assign _needs_rewrite = false %}
       {% assign _needs_proofread = false %}
-      {% unless recipe.meta.rewritten %}{% assign _needs_rewrite = true %}{% endunless %}
-      {% unless recipe.meta.proofread %}{% assign _needs_proofread = true %}{% endunless %}
-      {% assign _has_short = false %}
-      {% for step in recipe.method_short %}
-        {% assign _s = step | strip %}
-        {% unless _s == "" or _s == "QQ" or _s == "none" %}
-          {% assign _has_short = true %}
-        {% endunless %}
-      {% endfor %}
+      {% assign _has_short = "n/a" %}
+      {% unless is_magic_bag %}
+        {% unless recipe.meta.rewritten %}{% assign _needs_rewrite = true %}{% endunless %}
+        {% unless recipe.meta.proofread %}{% assign _needs_proofread = true %}{% endunless %}
+        {% assign _has_short = false %}
+        {% for step in recipe.method_short %}
+          {% assign _s = step | strip %}
+          {% unless _s == "" or _s == "QQ" or _s == "none" %}
+            {% assign _has_short = true %}
+          {% endunless %}
+        {% endfor %}
+      {% endunless %}
       {% comment %} THE DERIVED INGREDIENT INDEX -- GitHub issue #52, the
          "they hate peas" filter. Every ingredient_groups item on this recipe,
          not main_ingredients.
@@ -343,6 +385,50 @@ permalink: /food/
           {% endunless %}
         {% endfor %}
       {% endfor %}
+
+      {% comment %} THE MAGIC BAG'S OWN INGREDIENTS FEED THE SAME INDEX, and
+         this is the one place where getting it wrong would be a correctness
+         bug rather than a cosmetic one. The comment above states the rule:
+         main_ingredients is fine to include ON and dangerous to exclude BY.
+         A magic-bag entry has no `ingredient_groups`, so without this loop its
+         derived vocabulary would be EMPTY -- and an empty vocabulary means "no
+         mushrooms please" hands back every magic-bag dish containing mushrooms.
+         Silent, and in the direction that serves you the thing you are
+         avoiding.
+
+         NO BRANCH ON THE COLLECTION, deliberately. A recipe has
+         `ingredient_groups` and no `ingredients`; a magic-bag entry has
+         `ingredients` and no `ingredient_groups`, and tests/test_magic_bag.py
+         plus tests/test_front_matter.py hold both halves of that. So each loop
+         is simply a no-op for the other shape, and the dedupe probe below keeps
+         it correct even if a file somehow carried both.
+
+         The normalisation is duplicated rather than shared because Liquid has
+         no functions, and an include tag called once per ingredient across the
+         whole corpus is the slow way to avoid eight lines. The two must stay in
+         step: comma/bracket truncation, the leading-`[` cross-link drop (#273),
+         downcase, dedupe.
+
+         An `incidental:` flag is not read here for the same reason it is not
+         read above -- and the magic-bag schema has no such key anyway.
+      {% endcomment %}
+      {% for _item in recipe.ingredients %}
+        {% assign _raw = "" %}
+        {% if _item.item %}
+          {% assign _raw = _item.item %}
+        {% elsif _item.note %}
+          {% assign _raw = "" %}
+        {% else %}
+          {% assign _raw = _item %}
+        {% endif %}
+        {% assign _first_char = _raw | slice: 0 %}
+        {% if _first_char == "[" %}{% assign _raw = "" %}{% endif %}
+        {% assign _name = _raw | split: "," | first | split: "(" | first | strip | downcase %}
+        {% assign _probe = "|" | append: _name | append: "|" %}
+        {% unless _name == "" or _all_ing contains _probe %}
+          {% assign _all_ing = _all_ing | append: _name | append: "|" %}
+        {% endunless %}
+      {% endfor %}
       <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}" data-meta-draft="{{ is_draft }}">
 
         <div class="recipe-row-content">
@@ -381,10 +467,21 @@ permalink: /food/
             {% include recipe_badges.html recipe=recipe %}
           </div>
           <div class="badge-group-meta">
-            {% if site.show_source_wording %}
+            {% comment %} The two work-state badges are recipe-only, same
+               reasoning as the meta filters above: a magic-bag entry has no
+               rewrite to do and no proofread to grant, so labelling it "needs"
+               either would be asking for work that does not exist. {% endcomment %}
+            {% if site.show_source_wording and is_magic_bag == false %}
               {% unless recipe.meta.rewritten %}<span class="badge badge-meta-rewrite">needs rewrite</span>{% endunless %}
               {% unless recipe.meta.proofread %}<span class="badge badge-meta-proofread">needs proofread</span>{% endunless %}
             {% endif %}
+            {% comment %} SHOWN IN PRODUCTION, unlike the two above. This one is
+               not a note about unfinished work -- it tells you what you are
+               about to click. Without it a magic-bag row is indistinguishable
+               from a recipe row until the page loads and there is no method on
+               it, which is a small betrayal of the site's one promise: it tells
+               you what to cook. {% endcomment %}
+            {% if is_magic_bag %}<span class="badge badge-magic-bag">magic bag</span>{% endif %}
             {% if is_draft %}<span class="badge badge-draft">draft</span>{% endif %}
           </div>
         </div>

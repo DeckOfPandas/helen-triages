@@ -357,16 +357,22 @@ def test_no_main_ingredient_spelling_collisions():
     where that gets caught.
     """
     from collections import defaultdict
-    from conftest import ALL_RECIPES, ALL_DRAFTS
+    from conftest import ALL_RECIPES, ALL_DRAFTS, ALL_MAGIC_BAG
 
     assert ALL_RECIPES, (
         "No published recipes loaded at all, so this check has nothing to scan "
         "and would pass having examined nothing."
     )
 
+    # THE MAGIC BAG IS IN THIS CORPUS TOO, added with the collection on
+    # 2026-08-26. Its entries carry main_ingredients and render the same filter
+    # buttons from them, so a `spring onion`/`spring onions` split costs exactly
+    # what it costs anywhere else -- two buttons for one thing, each holding
+    # half the dishes. Unlike the drafts half this is never partial in CI: the
+    # collection lives in this public repo.
     forms = defaultdict(set)
     sources = defaultdict(set)
-    for r in ALL_RECIPES + ALL_DRAFTS:
+    for r in ALL_RECIPES + ALL_DRAFTS + ALL_MAGIC_BAG:
         for entry in (r.fm.get("main_ingredients") or []):
             entry = str(entry)
             forms[_fold(entry)].add(entry)

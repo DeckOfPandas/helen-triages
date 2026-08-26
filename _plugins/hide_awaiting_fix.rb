@@ -38,7 +38,15 @@
 # The collections whose documents are gated. Everything else -- dev pages,
 # drafts, cocktail pages -- has its own `output: false` protection and carries
 # no flag, so gating them would simply delete them.
-GATED_COLLECTIONS = %w[food_recipes cocktail_recipes].freeze
+#
+# food_magic_bag joined on 2026-08-26 with the collection itself. It is
+# `output: true`, so every entry gets a real URL and a sitemap entry the moment
+# the file exists -- which is exactly the condition this gate is for, and the
+# reason "it's only a short one, it can't really be broken" is not an argument
+# for leaving it out. A magic-bag entry declares `meta.awaiting_fix` like a
+# recipe and is held back on anything other than an explicit `false`, same as
+# everything else here.
+GATED_COLLECTIONS = %w[food_recipes food_magic_bag cocktail_recipes].freeze
 
 Jekyll::Hooks.register :site, :post_read do |site|
   # Locally the flagged pages must stay visible: they are the ones being
