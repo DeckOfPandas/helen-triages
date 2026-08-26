@@ -305,6 +305,36 @@ heights_mm:
   pilsner: 220
   flute: 230
 
+# =============================================================================
+# DISPLAY SCALE — the cheat, and it is a cheat on purpose.
+# =============================================================================
+# A multiplier applied to a glass's true-relative height when it is DRAWN on a
+# card. Absent means 1, which is almost every glass.
+#
+# WHY IT EXISTS. Helen, 2026-08-26, looking at the card grid: coupe,
+# nick-and-nora and tiki mug look right at the card's size, but "Collins and
+# hurricane are so tall that their proportions aren't right". True relative
+# height is correct information and, past a certain point, a bad drawing: a
+# 180mm Collins next to an 85mm old-fashioned is accurate and reads as a stripe.
+#
+# A MULTIPLIER RATHER THAN PADDING, which was the first suggestion. Padding
+# moves a glass's baseline while leaving it exactly as tall as it was; what is
+# wrong at this size is the SIZE, so the size is what gives.
+#
+# IT IS DATA RATHER THAN CSS because every value is a judgement about ONE
+# drawing rather than a fact about glassware, and the honest place for a set of
+# per-item judgements is somewhere you can see all of them at once. This file
+# already holds the other per-glass judgement (`heights_mm`), so this is its
+# neighbour rather than a new idea.
+#
+# TRY THE GLOBAL CURVE FIRST if a third glass ever wants a line here. The card
+# template raises every ratio to a power before applying it, so compressing the
+# whole range is one number and does not need a per-glass exception. These two
+# are here because the curve that fixed them flattened everything else.
+display_scale:
+  collins: 0.82
+  hurricane: 0.74
+
 all_icons:
   - absinthe
   - brandy

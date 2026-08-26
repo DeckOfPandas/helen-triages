@@ -66,21 +66,33 @@ sitemap: false
   {% comment %} ── 1. exactly as the site draws them ─────────────────────── {% endcomment %}
   <h2>1. At real size &mdash; what a cocktail page actually shows</h2>
   <p class="dev-note">
-    Real relative height (2.6rem for the tallest, others scaled down against
-    it) AND width capped at 3.2rem, exactly the same
+    Real relative height (<strong>10.4rem</strong> for the tallest, others
+    scaled down against it) AND width capped at 12.8rem, exactly the same
     <code>--glass-icon-height</code> calculation and the same
     <code>.cocktail-glass-icon</code> class a real cocktail page uses (#298) --
     this is the honest "how does this actually look in situ" view, not a
-    display choice of this page. <strong>OUT OF DATE UNTIL 2026-08-26</strong>:
-    this used to render every icon at the same flat height, which was true of
-    the site until #298 landed and stopped being true of this paragraph.
+    display choice of this page.
+    <strong>This paragraph has now been wrong twice.</strong> It claimed a flat
+    height for every icon until #298 landed, and it claimed 2.6rem / 3.2rem
+    until 2026-08-26, when the glass stopped being an icon beside a title and
+    became the drink page's hero. Both times the SITE changed and the sentence
+    describing it did not. If you are reading this and the numbers look
+    suspicious, trust <code>_sass/cocktails/_cocktail.scss</code> and
+    <code>_layouts/cocktail.html</code> over this line, and then fix the line.
+    Note the CARD scale is a different number again (13rem) and applies
+    <code>display_scale</code> on top; a drink page deliberately does not.
   </p>
 
   <div class="dev-strip">
     {% for icon in all_icons %}
       {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
       {% assign mm = heights[icon] | times: 1.0 %}
-      {% assign icon_rem = mm | divided_by: tallest_mm | times: 2.6 %}
+      {% comment %} 10.4, matching _layouts/cocktail.html. This read 2.6 for
+         half a day after the prose above was updated to say 10.4 -- the words
+         changed and the arithmetic did not, which is precisely the failure
+         that paragraph is complaining about. If you edit one, edit both.
+      {% endcomment %}
+      {% assign icon_rem = mm | divided_by: tallest_mm | times: 10.4 %}
       <span class="cocktail-glass-icon" style="--glass-icon-height: {{ icon_rem }}rem" title="{{ icon }} — {{ mm | round }}mm">{% include {{ icon_file }} %}</span>
     {% endfor %}
   </div>
@@ -222,6 +234,88 @@ sitemap: false
     about the serve, not a key in the map.
   </p>
 
+  {% comment %} ── 5. THE DOUBLE OLD-FASHIONED, AND EVERY CANDIDATE ────────────
+     Added 2026-08-26. Helen dropped a corrected `glass-old-fashioned-double`
+     after saving one file over another, then: "It's possible I'll prefer the
+     original one, the one I thought I'd lost. Could you update the glass
+     swatch page we used earlier with all?"
+
+     THE DOUBLE ROW IS AT TRUE RELATIVE HEIGHT, deliberately, because that is
+     where the difference between the two lives. Canvas size is not what you
+     see: an icon renders at the height `heights_mm` gives it, so a drawing
+     with empty margin inside its viewBox renders SMALLER even though its
+     viewBox is bigger. Measured on the two files -- the previous double's ink
+     fills 99% of its canvas height, the new one's fills 76%.
+
+     Everything below the double row is every drawing in
+     _design_sources/cocktails/glasses/, normalised into
+     _includes/icons/glass-candidates/ by tmp/build_candidates.py. They are
+     VIEWING COPIES for this page and nothing else: not published icons, not
+     in `all_icons`, and in a sibling directory so the icon-set tests cannot
+     see them. Includes the rejects and the superseded options, which is the
+     point -- this is the drawer, not the shelf.
+  ────────────────────────────────────────────────────────────────────{% endcomment %}
+
+  <h2>5. The double old-fashioned &mdash; at the size the site draws it</h2>
+  <p class="dev-note">
+    Sized by <code>heights_mm</code> against the tallest glass, exactly as
+    &sect;1 is: single 85&nbsp;mm, double 100&nbsp;mm, so the double should
+    stand <strong>1.18&times;</strong> the single. <code>old-fashioned-double</code>
+    is the drawing Helen had before; <code>-2</code> is the 2026-08-26 redraw
+    and is the one currently published.
+    <strong>The redraw does not stand 1.18&times;</strong> &mdash; its ink
+    fills 76% of its viewBox height where the single's and the previous
+    drawing's both fill 99%, so it renders at <strong>0.90&times;</strong> the
+    single and a double old-fashioned looks smaller than a single. The margin
+    is inside the artwork, not in the data, so no <code>heights_mm</code>
+    change fixes it.
+  </p>
+
+  {% comment %} BOTH DOUBLES ARE REAL SOURCE FILES NOW, not one file and one
+     git recovery: `old-fashioned-double` is the drawing Helen had before and
+     `-2` is the 2026-08-26 redraw, following the same base-name/numeric-suffix
+     convention as coupe-3, hurricane-2 and tiki-mug-2. The `-2` is what
+     publishes today; scripts/normalise_glass_icons.py names the two lines to
+     swap to change that. {% endcomment %}
+  {% assign double_row = "old-fashioned|85,old-fashioned-double|100,old-fashioned-double-2|100" | split: "," %}
+  <div class="dev-scale">
+    {% for entry in double_row %}
+      {% assign bits = entry | split: "|" %}
+      {% assign nm = bits[0] %}
+      {% assign mm = bits[1] | times: 1.0 %}
+      {% assign rem = mm | divided_by: tallest_mm | times: 10.4 %}
+      <div class="dev-scale-item">
+        <span class="dev-scale-art" style="height: {{ rem }}rem;">
+          {% include icons/glass-candidates/{{ nm }}.svg %}
+        </span>
+        <span class="dev-scale-label">{{ nm }}<br>{{ bits[1] }}mm</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <h2>6. Every candidate drawing &mdash; the drawer, not the shelf</h2>
+  <p class="dev-note">
+    All {{ site.data.dev_glass_candidates | size }} drawings in
+    <code>_design_sources/cocktails/glasses/</code>, at one common height so
+    shapes can be compared directly &mdash; superseded options and outright
+    rejects included. <strong>These are not published icons.</strong> A name
+    here with no counterpart in &sect;1 is a drawing nothing uses. Regenerate
+    with <code>tmp/build_candidates.py</code> after adding to
+    <code>_design_sources/</code>.
+  </p>
+
+  {% assign candidates = site.data.dev_glass_candidates %}
+  <div class="dev-strip dev-candidates">
+    {% for nm in candidates %}
+      <div class="dev-scale-item">
+        <span class="dev-candidate-art">
+          {% include icons/glass-candidates/{{ nm }}.svg %}
+        </span>
+        <span class="dev-scale-label">{{ nm }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
 </article>
 
 <style>
@@ -248,6 +342,15 @@ sitemap: false
     margin-bottom: 2.5rem;
   }
   .dev-scale-item { display: flex; flex-direction: column; align-items: center; }
+
+  /* The candidate drawer: one common height so SHAPES compare, which is the
+     opposite of the relative-scale view above it and is the right choice here
+     -- these are drawings being judged against each other, not glasses being
+     judged against the collection. Width capped so a punch bowl does not take
+     a whole row. */
+  .dev-candidates { align-items: flex-end; gap: 1.6rem 1.4rem; }
+  .dev-candidate-art { display: flex; align-items: flex-end; overflow: visible; }
+  .dev-candidate-art svg { height: 5.4rem; width: auto; max-width: 6.5rem; overflow: visible; }
   .dev-scale-art { display: flex; align-items: flex-end; overflow: visible; }
   /* height comes from the inline style, computed from the real-world mm.
      overflow:visible on the svg matters because the default UA stylesheet
@@ -267,7 +370,14 @@ sitemap: false
      stroke, scales normally. The set then looks mismatched and the pineapple
      looks fat, which is exactly what Helen saw on 2026-08-18 and reported as a
      pineapple problem. It was this page's problem: the artwork is fine.
-     Values are the site's 1.6 times each view's magnification over 2.6rem. */
+     Values are the site's 1.6 times each view's magnification over 2.6rem --
+     and 2.6rem is the OLD drink-page scale, replaced by 10.4rem on 2026-08-26.
+     The two numbers below are left exactly as they were rather than
+     recomputed: they were tuned by eye against these views' own
+     magnifications, and this page's views did not change, only the site's
+     baseline did. So the arithmetic in this sentence no longer reconstructs
+     them. Re-derive from the views if they ever look wrong; do not trust the
+     formula. */
   .dev-scale-art .glass-icon-line { stroke-width: 4.6; }
   .dev-card-big .glass-icon-line  { stroke-width: 3.7; }
   .dev-scale-label {

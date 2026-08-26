@@ -70,7 +70,9 @@ moods:
     PURPOSE, the same choice as declaring Plymouth and Genever gin while owning
     neither -- this is a spec, not an inventory. The collection genuinely has
     none of these yet; see issue #337. The index must not render a button for a
-    mood with no drinks.
+    mood with no drinks — ENFORCED since 2026-08-26: cocktails/index.html counts
+    each mood's members and skips the empty ones, rather than naming this one as
+    an exception, so the rule holds for whichever mood is empty next.
   tiki: >-
     Two or more tiki markers -- orgeat, falernum, passion fruit, pineapple,
     cinnamon syrup, grenadine, an overproof or pineapple rum -- AND complexity,
@@ -148,6 +150,40 @@ ship_scale:
   - "sure"
   - "yes"
   - "oh gods yes"
+
+# =============================================================================
+# HOW THE SCALE IS DRAWN — the goodness mark's tint, as a percentage of the
+# second accent. Settled with Helen on the design page, 2026-08-26.
+# =============================================================================
+# The mark on a cocktail card is a small square filled with this much accent
+# and the rest paper. It lives HERE rather than in the stylesheet because the
+# scale and how the scale is drawn are one decision, and splitting them across
+# two files means a sixth rung could be added to `ship_scale` above and render
+# as blank paper with nothing to say why.
+#
+# IT IS NOT A LINEAR RAMP AND MUST NOT BE MADE INTO ONE. `yes` and `oh gods
+# yes` are BOTH 100, because both mean "make this" -- the difference between
+# them is enthusiasm, not decision, and spacing them evenly would invent a
+# distinction Helen's verdicts do not carry. The whole range is spent on the
+# gap that matters: between "make this" and everything below it.
+#
+# `sure` and `meh` were 62 and 30 for one afternoon and are 42 and 16 now. At
+# 62 a `sure` was near enough a `yes` to be mistaken for one at a glance, which
+# is the one thing a scale exists to prevent.
+#
+# `who knows` IS NOT ON THE SHIP SCALE -- see the note above; it means "I have
+# no idea", an absence of verdict rather than a low one. It draws the same
+# empty mark as `not really` and is told apart by its label. That is also why
+# the mark keeps its BORDER at every rung: an empty square reads as "rated, and
+# rated low", where a square that vanished would read as "not rated", which is
+# a different fact this scale already holds separately.
+ship_tints:
+  "not really": 0
+  "meh": 16
+  "sure": 42
+  "yes": 100
+  "oh gods yes": 100
+  "who knows": 0
 
 # =============================================================================
 # DELIBERATELY ABSENT

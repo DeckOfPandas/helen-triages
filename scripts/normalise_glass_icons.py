@@ -60,11 +60,50 @@ DST = ROOT / "_includes" / "icons" / "glasses"
 # already gone from tmp/, so it simply stops being generated. No SKIP entry is
 # needed for a file that does not exist -- adding one would be a rule guarding
 # nothing, and the next person would go looking for the source it names.
+#
+# THE SECOND GROUP IS A COLLISION GUARD, added 2026-08-26 with the RENAME
+# entries below, and it is not optional. Once `coupe-3` is renamed to `coupe`,
+# TWO sources want to write coupe.svg -- and `sorted()` decides which wins,
+# on a subtlety: '-' (0x2D) sorts before '.' (0x2E), so glass-coupe-2.svg and
+# glass-coupe-3.svg both come BEFORE glass-coupe.svg, and the superseded
+# original would be written last and win. The new drawing would vanish on the
+# next full regeneration, silently, with the git diff blaming this script.
+#
+# So every source a RENAME supersedes is skipped by name. They stay on disk as
+# the record of what was tried -- that is what _design_sources/ is for -- they
+# are simply no longer published.
 SKIP = {
     "food-cloche-heart.svg",
     "glass-old-fashioned - Copy.svg",
     "glass-pineapple-1.svg",
     "glass-pineapple-2-bad-trace.svg",
+    # superseded by a RENAME target below
+    "glass-coupe.svg",
+    "glass-coupe-2.svg",
+    "glass-hurricane.svg",
+    "glass-tiki-mug.svg",
+    # THE OLD-FASHIONED CASE PREDATES THE OTHERS AND WAS ALREADY BROKEN, #484.
+    # Commit 14eab is titled "settle on old-fashioned-2" but nothing mapped it,
+    # so the settled drawing was live only because it happened to have been
+    # written by hand. Verified 2026-08-26 by comparing geometry: the published
+    # old-fashioned.svg IS glass-old-fashioned-2.svg, and glass-old-fashioned
+    # .svg is a 2-path early version that sorts last and would have replaced it
+    # on the next full regeneration. -3 is a 12-path candidate that was never
+    # adopted and would otherwise publish an old-fashioned-3.svg nothing uses.
+    "glass-old-fashioned.svg",
+    "glass-old-fashioned-3.svg",
+    # THE DOUBLE IS AN UNSETTLED CHOICE, and these two lines are the switch.
+    # `-2` is Helen's 2026-08-26 redraw and is what publishes today, so the
+    # BASE name is skipped. It renders at 0.90x the single rather than the
+    # 1.176x heights_mm asks for, because its ink fills 76% of its viewBox
+    # against the single's 99% -- see /dev/glasses/ section 5, which shows the
+    # two at true relative height.
+    #
+    # TO GO BACK TO THE PREVIOUS DRAWING: delete this line, and delete the
+    # "old-fashioned-double-2" entry from RENAME below. Nothing else changes.
+    # Both drawings stay on disk either way, which is the point of keeping
+    # both rather than overwriting one with the other.
+    "glass-old-fashioned-double.svg",
 }
 
 # FILL-BASED ARTWORK, WHICH THE REST OF THE SET IS NOT. Every glass is drawn as
@@ -73,24 +112,62 @@ SKIP = {
 # the outline and produce mush. It gets its own class instead -- see
 # `.glass-icon-solid` in _sass/cocktails/_cocktail.scss -- which fills with
 # currentColor so the palette rule still holds and only the technique differs.
+#
+# THE TIKI MUG JOINED IT 2026-08-26, and it was always this case -- nobody had
+# looked. Its source is fill-only in exactly the pineapple's way: one style
+# rule, `.a{fill:#231f20;}`, and not a single stroke in the file (it is a stock
+# icon, <title>100icons20172</title>). Published with the stroke class, all 27
+# paths drew the OUTLINE OF THE INK -- a hollow double line around every
+# stroke. Helen spotted it on the design page: "the lines outline the shape of
+# the mug as enclosed areas, but they're not filled."
+#
+# AND THEN IT LEFT AGAIN, the same day. Filling was the right fix for the
+# artwork that existed, but it could not give the mug a stroke WIDTH -- there
+# was no centreline to give a width to -- so it read about 2.8x heavier than
+# every stroked glass beside it and got heavier as it grew, while theirs stayed
+# put. Helen: "The tiki mug has lots of gaps in its lines. Are you able to
+# redraw it?"
+#
+# glass-tiki-mug-2.svg is that redraw: real centrelines, twelve of them, same
+# viewBox, so the mug rejoins the set on one weight set once in CSS. The
+# fill-based original is kept in _design_sources as the record and is SKIPped
+# above. The set is back to one member.
 SOLID = {"glass-pineapple-3.svg"}
 
 # Source name -> published name, where the export carries a working title.
 #
-# `mule-mug` -> `mug`, 2026-08-26. The drawing is a plain tapered mug with a
-# handle, and the ONLY thing that ever made it a Moscow Mule's mug is that a
-# real one is copper -- which a monochrome line icon cannot say. It had no
-# drink using it, and Apple and Ginger Mulled Wine wanted exactly this shape:
-# Helen, asked whether to draw a new one, "I actually use a mug for this like I
-# do for tea!". One drawing serves both, since a Mule in line art is also just
-# a mug.
+# TWO KINDS OF ENTRY LIVE HERE, and they arrived from two branches on the same
+# day. Keeping both comments because they answer different questions.
 #
-# THIS ENTRY IS THE POINT, not the git mv that went with it. Icons are
-# regenerated WHOLESALE from tmp/cocktail-glasses/, so renaming only the
-# published file would have resurrected `mule-mug.svg` the next time this
-# script ran -- and `mug.svg` would have vanished with nothing to say why.
-# Rename here, where the mapping survives a regeneration.
-RENAME = {"pineapple-3": "pineapple", "mule-mug": "mug"}
+# 1. VERSIONED REDRAWS. Helen saves a new attempt beside the old rather than
+#    over it, so the source that WINS carries a version suffix the published
+#    icon must not. Deliberately not automated by stripping a trailing `-<n>`:
+#    `pineapple-3` beat `pineapple-1` on a judgement call and the losers are
+#    kept as the evidence for it, so which numbered file is current is a fact
+#    about this repo's history, not a pattern.
+#
+# 2. A RENAMED GLASS. `mule-mug` -> `mug`, 2026-08-26. The drawing is a plain
+#    tapered mug with a handle, and the ONLY thing that ever made it a Moscow
+#    Mule's mug is that a real one is copper -- which a monochrome line icon
+#    cannot say. It had no drink using it, and Apple and Ginger Mulled Wine
+#    wanted exactly this shape: Helen, asked whether to draw a new one, "I
+#    actually use a mug for this like I do for tea!". One drawing serves both,
+#    since a Mule in line art is also just a mug.
+#
+#    THAT ENTRY IS THE POINT, not the git mv that went with it. Icons are
+#    regenerated WHOLESALE, so renaming only the published file would have
+#    resurrected `mule-mug.svg` the next time this script ran -- and `mug.svg`
+#    would have vanished with nothing to say why. Rename here, where the
+#    mapping survives a regeneration.
+RENAME = {
+    "pineapple-3": "pineapple",
+    "coupe-3": "coupe",
+    "hurricane-2": "hurricane",
+    "tiki-mug-2": "tiki-mug",
+    "old-fashioned-2": "old-fashioned",
+    "old-fashioned-double-2": "old-fashioned-double",
+    "mule-mug": "mug",
+}
 
 
 # =============================================================================
@@ -268,4 +345,14 @@ def main():
     print(f"\n   total {before} -> {after} bytes ({100 - after * 100 // before}% smaller)")
 
 
-main()
+# THE GUARD IS NOT TIDINESS. A bare `main()` here means IMPORTING this module
+# runs it, and the first thing main() does is `shutil.rmtree(DST)` -- so
+# `import normalise_glass_icons`, to reuse normalise() on a single new drawing,
+# deletes all 26 published icons before the importer's first line executes.
+# That happened on 2026-08-26, from a script whose whole purpose was to avoid
+# regenerating the set. Recoverable, since everything in DST is committed, but
+# silent and instant, and nothing about the traceback points at the import.
+#
+# Reuse the functions freely now: importing this module does nothing on its own.
+if __name__ == "__main__":
+    main()

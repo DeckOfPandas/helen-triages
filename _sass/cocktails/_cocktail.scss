@@ -1,26 +1,124 @@
 // =============================================================================
-// COCKTAILS — PAGE ANATOMY. First pass, 2026-08-16.
+// COCKTAILS — PAGE ANATOMY. Designed 2026-08-26, on /dev/cocktails-design/.
 // =============================================================================
-// Deliberately just the title block and its glass icon. The rest of the page
-// (ingredients, method, notes) is still rendering on shared/_base.scss defaults
-// while the schema settles — HANDOVER §9. Add to this file as each section
-// earns a decision, rather than sketching a whole anatomy in advance.
+// This file said "deliberately just the title block and its glass icon" for ten
+// days, with the instruction to add to it as each section earned a decision.
+// They have now all earned one, in one sitting with Helen looking at a mockup,
+// so the whole anatomy arrives together rather than a section at a time.
+//
+// THE PAGE HAS TWO STATES ON ONE PAGE. It reads editorially by default — glass
+// large, tagline leading, bottle suggestions and notes visible — and a "make
+// it" toggle strips it to a bar-side spec: no tagline, no class lines, no
+// character parentheticals, no notes, bigger amounts, bigger method, small
+// glass. The same browsing-versus-cooking split food draws with its
+// short-method toggle.
+//
+// NOTHING LEAVES THE DOM. `make it` adds one class and the rules below hide
+// what the state does not want, so the page still prints and still reads with
+// JavaScript off — the same progressive-enhancement contract as the back
+// arrow.
+//
+// THREE COLOURS, THREE JOBS, and on this page the split is what makes the
+// hierarchy readable without reading a word: MENTHE rules the title, VIOLET
+// rules the section headings and numbers their method steps, AMBER does
+// structure — the note bar and its label. See _palette.scss.
 // =============================================================================
 
-// The title and its glass icon on one line. `flex-end` rather than `baseline`:
-// the icon is a drawing with no text baseline to align to, so baseline
-// alignment puts it wherever its box happens to sit. Aligning the bottom of
-// the glass to the bottom of the lettering is the thing the eye actually reads
-// as "level".
+// The head: glass and words side by side, the drawing aligned to the bottom of
+// the text rather than to a baseline. `flex-end` not `baseline`, because the
+// icon is a drawing with no text baseline to align to, so baseline alignment
+// puts it wherever its box happens to sit.
+//
+// THE TWO HEIGHTS BELOW ARE HAND-TUNED AND THAT IS A KNOWN COMPROMISE — issue
+// #485. What is wanted is the glass matching the height of the text column
+// beside it, so the state change needs no second number; the CSS-only version
+// of that is circular (the row's height comes from its tallest item, the glass
+// is one of those items, and a percentage height against an indefinite height
+// falls back to auto) and the fix is to take the glass out of flow. Until then
+// these are two numbers that have to be kept in step with the type by hand.
 .cocktail-title-block {
   display: flex;
   align-items: flex-end;
-  gap: 0.6rem;
-  margin-bottom: $space-lg;
+  gap: 1.7rem;
+  margin-bottom: 2.4rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 2px solid $color-menthe;
+}
 
-  .cocktail-title {
-    margin: 0;
+.cocktail-head-words {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+// h1 already carries `punched(raised)` from shared/_base.scss, at the SMALL
+// offset. Restated at the large one deliberately: this is display type, and
+// _sass/shared/_rule.scss's own note records that a fixed offset is ~7% of a
+// 0.9rem label and ~3% of a 1.8rem heading, so the effect is at full strength
+// on the smallest type and half-swallowed on the biggest — backwards from how
+// it reads in the file. At 2.5rem this is the biggest type on the site.
+.cocktail-title {
+  font-size: 2.5rem;
+  line-height: 1.02;
+  letter-spacing: 0.02em;
+  margin: 0 0 $space-sm;
+  @include punched(raised, var(--emboss-offset-lg));
+}
+
+// The one place this site has a voice. Measure capped, because a tagline
+// running the full width of a wide screen stops reading as an aside.
+.cocktail-tagline {
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: $color-clear-text;
+  margin: 0 0 $space-md;
+  max-width: 34ch;
+}
+
+.cocktail-meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: $spacing-block-gap;
+  font-size: 0.86rem;
+
+  strong {
+    display: block;
+    font-family: $font-headings;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-label;
+    font-size: 0.66rem;
+    color: mix($color-clear-text, $color-bg, 70%);
+    margin-bottom: 0.1rem;
   }
+}
+
+// --- section headings ---------------------------------------------------------
+// LOUD, AND THE SIZE IS LOAD-BEARING. These were going to be 0.76rem grey
+// small-caps until Helen asked for "louder typography for the section titles",
+// and the size turned out to matter for more than volume: $emboss-stroke is
+// 1.6% of font-size, so at 0.76rem the punched effect resolves to about a
+// fifth of a pixel and may as well not be applied. The effect needs the size
+// before it means anything.
+//
+// h2 already carries `punched(raised)` from shared/_base.scss; restated here
+// only to take the LARGE offset deliberately rather than by accident.
+.cocktail-section-heading {
+  font-size: 1.35rem;
+  letter-spacing: 0.1em;
+  color: $color-text;
+  // 2.8rem, not $spacing-section-top's 4.5rem. That token was tuned for food's
+  // recipe page, where a heading carries the whole separation on its own with
+  // no rule in the gap; these headings have a 2px violet rule under them doing
+  // half that work, and at 4.5rem the sections drifted apart.
+  margin: 2.8rem 0 $space-lg;
+  padding-bottom: 0.45rem;
+  border-bottom: 2px solid $color-violet;
+  @include punched(raised, var(--emboss-offset-lg));
 }
 
 // SIZED BY HEIGHT, NEVER WIDTH, and this is the whole reason the icons keep
@@ -31,10 +129,15 @@
 // to follow the aspect ratio, is what makes them read as one set.
 //
 // `--glass-icon-height` is set inline by the layout, computed from
-// `heights_mm` against the tallest real glass — #298, 2026-08-25. 2.6rem is
-// only the FALLBACK, for a glass with no heights_mm entry; every icon that
-// has one now renders at its own real relative height instead of the old
-// flat 2.6rem every icon shared.
+// `heights_mm` against the tallest real glass — #298, 2026-08-25. The fallback
+// below is for a glass with no heights_mm entry; every icon that has one
+// renders at its own real relative height.
+//
+// THE SCALE WENT FROM 2.6rem TO 10.4rem on 2026-08-26, when the glass stopped
+// being an icon beside a title and became the page's hero. The width cap moved
+// with it, in the same proportion (3.2 : 2.6 became 12.8 : 10.4) rather than
+// being re-guessed — it exists so a wide glass (punch bowl, mug) cannot
+// shoulder the title along, and that job is unchanged, only its scale.
 .cocktail-glass-icon {
   display: inline-flex;
   align-items: flex-end;
@@ -50,12 +153,12 @@
 
   svg {
     display: block;
-    height: var(--glass-icon-height, 2.6rem);
+    height: var(--glass-icon-height, 10.4rem);
     width: auto;
     // A tall narrow glass and a wide shallow one at the same height still
     // differ a lot in width; this stops the widest (punch bowl, mug)
     // pushing the title along.
-    max-width: 3.2rem;
+    max-width: 12.8rem;
     overflow: visible;
   }
 }
@@ -118,10 +221,33 @@
 
 // =============================================================================
 // INGREDIENT LINE — three parts, settled 2026-08-24 after a design pass on
-// #465/#460: amount+headline / class(+character) / note. No colour decision
-// here — the palette is still the placeholder monochrome from _palette.scss,
-// argued nowhere yet. This is information hierarchy only.
+// #465/#460: amount+headline / class(+character) / note.
+//
+// RESTYLED 2026-08-26 to the design page's version. The 2026-08-24 rules were
+// information hierarchy only, written while "the palette is still the
+// placeholder monochrome" — that is no longer true, and more importantly the
+// amount had no column of its own. Three things changed and each has a reason:
+//
+//   1. THE AMOUNT IS SET IN THE HEADING FACE. It is the one thing on this page
+//      you read across a room with your hands full, and the only place mono
+//      earns its keep on a drink page. Food reached the same conclusion about
+//      the same element and its palette file argues it at length: amounts and
+//      note labels are what you look at while cooking.
+//   2. THE AMOUNT HAS A FIXED COLUMN, so the amounts form a straight edge you
+//      can run your eye down instead of stepping in and out with the length of
+//      each number. $amount-col and $amount-gap are named because the class
+//      line and the note both indent past them; three values that must agree
+//      are one value plus arithmetic.
+//   3. IT IS INK, NOT GREY, and the item is no longer bold. Those were the
+//      wrong way round: the amount is the thing you re-read, the item name is
+//      the thing you already know.
 // =============================================================================
+
+// The amount column, and the gap after it. The sub-lines below hang past both,
+// derived rather than written down, so they cannot drift out of alignment.
+$amount-col: 5.4rem;
+$amount-gap: 1rem;
+$amount-indent: $amount-col + $amount-gap;
 
 .cocktail-ingredients {
   list-style: none;
@@ -141,26 +267,30 @@
 .cocktail-ingredient-top {
   display: flex;
   align-items: baseline;
-  gap: $space-sm;
+  gap: $amount-gap;
 }
 
 .cocktail-amount {
+  font-family: $font-headings;
+  font-size: 0.95rem;
+  min-width: $amount-col;
+  flex: none;
+  color: $color-text;
   font-variant-numeric: tabular-nums;
-  color: $color-clear-text;
-  font-size: $font-size-body-sm;
 }
 
 .cocktail-item {
-  font-weight: 600;
+  font-size: 1rem;
 }
 
 // The class line: `generic`, oxford-joined if a list, plus `character` as a
 // trailing parenthetical. Deliberately quiet — this is a gloss on the
-// headline, not a second headline.
+// headline, not a second headline — and indented past the amount column so
+// the amounts keep their clean left edge.
 .cocktail-type-line {
   color: $color-clear-text;
-  font-size: $font-size-body-sm;
-  margin: $space-xs 0 0;
+  font-size: 0.84rem;
+  margin: 0.3rem 0 0 $amount-indent;
 }
 
 // A rum-family style name gets the site's heading face — blockier, so the
@@ -187,8 +317,10 @@
 // parenthetical like "moderately aged rum (blackstrap)" reads as if
 // blackstrap were a TYPE of moderately-aged rum, which is real, live
 // confusion with actual black rum.
+// A step quieter than the class line it sits inside, so the parenthetical
+// reads as an aside within an aside rather than as a second fact.
 .cocktail-character {
-  color: $color-clear-text;
+  color: mix($color-clear-text, $color-bg, 70%);
 }
 
 // The note — #457's fix for reasoning that used to get smuggled into
@@ -197,7 +329,119 @@
 // the class line above it rather than as a quiet aside).
 .cocktail-note {
   color: $color-clear-text;
-  font-size: $font-size-body-sm;
+  font-size: 0.84rem;
   font-style: italic;
-  margin: $space-xs 0 0;
+  line-height: 1.55;
+  margin: 0.25rem 0 0 $amount-indent;
+}
+
+// =============================================================================
+// METHOD, TO SERVE, NOTES
+// =============================================================================
+
+// The numerals are VIOLET, matching the rule over METHOD rather than the note
+// bar below. Helen, 2026-08-26: "to allow the hierarchy support the content."
+// It is the change that makes the three colours read as a system — violet means
+// "this section and the content inside it" throughout, and amber is left doing
+// structure alone.
+.cocktail-method {
+  margin: 0;
+  padding-left: 1.4rem;
+  font-size: 0.97rem;
+  line-height: 1.8;
+
+  li {
+    margin-bottom: $space-xs;
+    padding-left: 0.3rem;
+    &::marker {
+      font-family: $font-headings;
+      color: $color-violet-deep;
+    }
+  }
+}
+
+.cocktail-to-serve {
+  font-size: 0.97rem;
+  line-height: $line-height-body;
+  margin: 0;
+}
+
+// Amber, like every other structural mark on the page.
+.cocktail .notes {
+  border-left: 2px solid $color-amber;
+  padding-left: $space-lg;
+}
+
+.cocktail .note-label {
+  display: block;
+  font-family: $font-headings;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $color-amber-deep;
+  margin-bottom: $space-xxs;
+}
+
+.cocktail-body-content { font-size: 0.97rem; line-height: $line-height-body; }
+
+.cocktail-footer {
+  margin-top: $spacing-section-gap;
+  padding-top: $space-lg;
+  border-top: 1px solid $color-border;
+}
+
+.cocktail-source {
+  font-size: 0.82rem;
+  color: $color-clear-text;
+  margin: 0;
+}
+
+// =============================================================================
+// THE MAKE-IT TOGGLE, AND THE STATE IT SWITCHES TO
+// =============================================================================
+.cocktail-make-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: $space-sm;
+}
+
+.btn-make {
+  font-family: $font-headings;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  padding: $space-xs $space-md;
+  border: 1.5px solid $color-menthe-deep;
+  background: $color-surface;
+  color: $color-menthe-deep;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { background: mix($color-menthe, $color-surface, 18%); }
+  &.is-on {
+    background: $color-menthe;
+    color: darken($color-menthe-deep, 22%);
+    font-weight: 600;
+  }
+}
+
+// One class, and everything below follows from it. `is-making` is set by
+// assets/js/cocktail-make.js; with JS off the page simply stays editorial,
+// which is the state that carries the most information.
+.cocktail.is-making {
+  .cocktail-tagline,
+  .cocktail-type-line,
+  .cocktail-note,
+  .notes,
+  .cocktail-body-content { display: none; }
+
+  .cocktail-title { font-size: 1.5rem; }
+  .cocktail-title-block { padding-bottom: $space-lg; margin-bottom: $space-xl; }
+  .cocktail-glass-icon svg { height: 4.1rem; }
+
+  // What you read with your hands full.
+  .cocktail-amount { font-size: 1.3rem; font-weight: 700; }
+  .cocktail-item { font-size: 1.15rem; }
+  .cocktail-ingredient { padding: $space-md 0; }
+  .cocktail-method { font-size: 1.1rem; line-height: 1.85; }
 }

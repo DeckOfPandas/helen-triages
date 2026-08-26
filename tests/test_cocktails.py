@@ -703,6 +703,89 @@ def test_every_icon_has_a_real_world_height():
     )
 
 
+def test_display_scale_names_only_real_icons():
+    """`display_scale` is a per-glass cheat and a phantom key does nothing.
+
+    Added with the cheat itself, 2026-08-26. It multiplies a glass's drawn
+    height on a CARD, and the failure mode is the quiet one: a key naming a
+    glass that does not exist -- a typo, or an icon later renamed -- has no
+    effect at all, so the glass it was meant to shrink goes on being wrong and
+    the line in the data file looks like it is handling it.
+
+    Coverage is NOT asserted in the other direction: absent means 1, and almost
+    every glass is absent on purpose. Only two glasses have ever needed this.
+    """
+    g = _glasses()
+    scale = g.get("display_scale") or {}
+    listed = g.get("all_icons") or []
+    assert listed, "glasses.yml has no `all_icons:` -- see the sibling test."
+
+    phantom = sorted(set(scale) - set(listed))
+    assert not phantom, (
+        f"glasses.yml `display_scale` names glasses that are not icons: "
+        f"{phantom}\n\nA phantom key is silently ignored -- the glass it was "
+        f"meant to shrink keeps rendering at full height and the data file "
+        f"looks like it is handling it. Keys must be ICON names (the value "
+        f"side of `icons:`), not the spellings a drink's front matter uses."
+    )
+    bad = sorted(f"{k}={v!r}" for k, v in scale.items()
+                 if not isinstance(v, (int, float)) or not 0 < v <= 1)
+    assert not bad, (
+        "display_scale values must be numbers greater than 0 and at most 1:\n  "
+        + "\n  ".join(bad)
+        + "\n\nIt is a multiplier on true relative height, so above 1 is a "
+          "glass drawn LARGER than its real proportions, which defeats the "
+          "point of heights_mm. A quoted number is a string and Liquid's "
+          "`times` turns it into 0 -- an invisible glass."
+    )
+
+
+def test_every_ship_rung_has_a_tint():
+    """`ship_tints` must cover `ship_scale`, plus the two off-scale values.
+
+    Added 2026-08-26 with the goodness mark. The mark on a cocktail card fills
+    with this percentage of the second accent, and Liquid resolves a missing
+    key to nil -- which the template defaults to 0, i.e. an EMPTY square. So a
+    sixth rung added to `ship_scale` without a tint does not error: it renders
+    as the lowest possible rating, silently, which is worse than rendering
+    nothing.
+
+    `who knows` and `QQ` are deliberately off the ship scale (see the file's
+    own comment) but still reach a card, so they are checked too.
+    """
+    taxonomy = _taxonomy()
+    scale = taxonomy.get("ship_scale") or []
+    tints = taxonomy.get("ship_tints") or {}
+    assert scale, "taxonomy.yml has no `ship_scale:`."
+    assert tints, (
+        "taxonomy.yml has no `ship_tints:`. Every goodness mark on the index "
+        "would render as an empty square -- the `not really` treatment -- "
+        "whatever the drink is rated."
+    )
+
+    missing = [r for r in scale if r not in tints]
+    assert not missing, (
+        f"`ship_tints` does not cover every rung of `ship_scale`: {missing}\n\n"
+        f"A rung with no tint renders as an EMPTY square, which is the visual "
+        f"for `not really`. It does not error and it does not look broken -- "
+        f"it looks like a bad drink."
+    )
+    for off_scale in ("who knows",):
+        assert off_scale in tints, (
+            f"`ship_tints` has no entry for {off_scale!r}. It is deliberately "
+            f"not on `ship_scale` -- it means 'I have no idea', an absence of "
+            f"verdict rather than a low one -- but it still reaches a card and "
+            f"still needs a value."
+        )
+
+    bad = sorted(f"{k}={v!r}" for k, v in tints.items()
+                 if not isinstance(v, (int, float)) or not 0 <= v <= 100)
+    assert not bad, (
+        "ship_tints values are percentages: numbers from 0 to 100.\n  "
+        + "\n  ".join(bad)
+    )
+
+
 def test_syrup_ratio_is_plausible_for_its_generic():
     """FLAG ONLY. Never rewrite, and never fail on a deliberate choice.
 
