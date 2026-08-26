@@ -119,9 +119,17 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // TALLEST glass fills it and the rest are a fraction of it — `--glass-fill`,
 // still the 0.32–1.0 compression — and they are TOP-ALIGNED, so the stable
 // edge Helen asked for is stable for every glass and not just the tall ones.
+// SHIPPED: the glass hangs in the page's LEFT MARGIN, outside the content
+// column, and the title starts on exactly the same left edge as a food recipe
+// page. Helen chose it against the in-column layout after seeing both:
+// "glass in the margin and top aligned, ship it".
+//
+// It was built as a `?glass=margin` switch and is now simply the layout; the
+// switch, its stylesheet variant and the script that set it are all deleted.
+// A comparison tool that survives the comparison becomes a second way for the
+// page to render that nobody is looking at.
 .cocktail-title-block {
   position: relative;
-  padding-left: $glass-col + $glass-gap;
   // MATCHED TO FOOD'S RECIPE PAGE, which opens on $spacing-section-gap above
   // its title (.recipe-title). The two sites' recipe pages should start the
   // same distance down the page; they are the same kind of page.
@@ -130,83 +138,30 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   border-bottom: 2px solid $color-menthe;
 }
 
-// A drink with no glass gets no reservation — 17 of them have none, and an
-// empty 9rem gutter beside the title would read as a missing image rather than
-// as a drink that never named a glass. See #491.
+// BELOW 1180px THERE IS NO MARGIN to hang a drawing in, so the glass comes
+// back inside the column and the head reserves room for it. The threshold is
+// the content column plus a glass on each side.
 //
-// A CLASS FROM THE TEMPLATE, NOT `:has()`. The selector version worked and was
-// worse: the template already knows whether it drew a glass, so asking the
-// browser to work it back out from the DOM is inferring a fact we were holding
-// a moment earlier. It also degrades badly where `:has()` is unsupported —
-// every glassless drink would get the empty gutter, which is precisely the
-// case this rule exists for.
-.cocktail-title-block--no-glass {
-  padding-left: 0;
-}
+// Helen, on seeing this behaviour: "you're very smart to make it tuck inline
+// as the screen shrinks". It is also the part of this layout least verified —
+// it has only been seen by narrowing a desktop window, and an iPad sits near
+// enough to the threshold to be the real test.
+@media (max-width: 1180px) {
+  .cocktail-title-block { padding-left: $glass-col + $glass-gap; }
+  .cocktail-glass-icon  { left: 0; right: auto; }
 
-// =============================================================================
-// OPTION 1: THE GLASS IN THE LEFT MARGIN. Opt-in, and nothing below is
-// touched by it.
-// =============================================================================
-// Helen, 2026-08-26, having had the cocktail and food titles put on the same
-// baseline: the horizontal difference remains, because the glass column sits
-// where food's title starts. She is "interested in 1, but currently predict
-// I'll want to stick with 4" -- so this is built to be LOOKED at and thrown
-// away, not switched to.
-//
-// The idea: the content column is 900px inside a much wider viewport, so the
-// drawing can hang in the margin OUTSIDE it. The title then starts at exactly
-// food's left edge, the two sites' recipe pages line up completely, and the
-// glass gets more room rather than less.
-//
-// HOW TO SEE IT: add `?glass=margin` to any drink page URL. The class is added
-// by assets/js/cocktail-glass-margin.js, which is only included when
-// `site.show_drafts` is true -- so it exists locally and cannot reach
-// production, the same guard the index's draft listing uses.
-//
-// A QUERY PARAMETER RATHER THAN A BUILD FLAG, deliberately: a flag means an
-// edit and a rebuild between each look, and comparing two layouts you cannot
-// put side by side is exactly when that friction stops you comparing properly.
-//
-// WHAT TO WATCH FOR, because it is the reason this may lose:
-//   - at narrow viewports there IS no margin, so the glass has to come back
-//     inside; the media query below does that, and the layout changes shape
-//     as the window narrows, which the current one never does.
-//   - the drawing stops being adjacent to the words it describes. Whether it
-//     reads as "belonging to this drink" or as loose furniture beside the page
-//     is the whole question, and it cannot be answered from the CSS.
-// THE OTHER HALF OF HELEN'S RAMBLE, as a switch: short glasses hang from the
-// top edge and stop where they stop, instead of floating centred. Every glass
-// on every drink then starts at the same y, which is the strongest possible
-// version of the stable top edge — at the cost of a hole under the short ones.
-//
-// `?align=top` on any drink URL. One property, because that is genuinely all
-// that differs; a tall glass fills the box in both.
-.cocktail--glass-top .cocktail-glass-icon {
-  align-items: flex-start;
-}
-
-// SIMPLER THAN IT WAS, because the base layout came to meet it. The glass is
-// absolutely positioned in both, so this variant only has to move it: out of
-// the column's left padding and into the margin beside it, and drop the
-// padding that was reserving room.
-.cocktail--glass-margin {
-  .cocktail-title-block {
-    padding-left: 0;
-  }
-
-  .cocktail-glass-icon {
-    left: auto;
-    right: calc(100% + #{$glass-gap});
-  }
-
-  // Below this the viewport has no margin to hang anything in, so the glass
-  // comes back inside and the layout reverts to the shipped one. The threshold
-  // is the content column plus room for the widest glass on both sides.
-  @media (max-width: 1180px) {
-    .cocktail-title-block { padding-left: $glass-col + $glass-gap; }
-    .cocktail-glass-icon { left: 0; right: auto; }
-  }
+  // A drink with no glass gets no reservation — 17 of them have none, and an
+  // empty 9rem gutter beside the title would read as a missing image rather
+  // than as a drink that never named a glass. See #491. Only needed here:
+  // above the threshold nothing reserves anything, because the drawing is
+  // outside the column entirely.
+  //
+  // A CLASS FROM THE TEMPLATE, NOT `:has()`. The selector version worked and
+  // was worse: the template already knows whether it drew a glass, so asking
+  // the browser to work it back out from the DOM discards a fact we were
+  // holding. It also degrades into exactly the empty gutter this rule exists
+  // to prevent, wherever `:has()` is unsupported.
+  .cocktail-title-block--no-glass { padding-left: 0; }
 }
 
 // The title and the make-it toggle on one line, which is food's
@@ -423,19 +378,19 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // Out of flow, spanning the words' full extent: top of the title to the
   // bottom of the metadata, stopping short of the menthe rule.
   position: absolute;
-  left: 0;
+  // Out in the margin, its own width plus a gap to the left of the column.
+  right: calc(100% + #{$glass-gap});
   // Cap height of the title, not the top of its line box. See $glass-top.
   top: $glass-top;
   bottom: $head-pad-bottom;
   width: $glass-col;
   display: flex;
-  // CENTRED, so a short glass sits in the middle of the block rather than
-  // hanging from the top with a growing hole beneath it. Helen's call, with
-  // the caveat that she may prefer the other one once she has seen both — the
-  // top-aligned version is `?align=top`, and the only thing that changes is
-  // this line. A tall glass fills the box either way, so the two differ only
-  // on the short ones.
-  align-items: center;
+  // TOP-ALIGNED, shipped. Helen looked at this against centred and chose it:
+  // every glass on every drink now starts at the same y, level with the title
+  // it belongs to, and a short one simply stops where it stops. The hole
+  // beneath a short glass was the argument for centring and turned out not to
+  // matter — the top edge is what the eye tracks when you move between drinks.
+  align-items: flex-start;
   justify-content: center;
 
   // The default UA stylesheet sets `overflow: hidden` on a root <svg>

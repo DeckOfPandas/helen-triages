@@ -383,17 +383,10 @@ layout: default
    with no arrow loads no script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>
-{% comment %} Comparison switches for the two open glass-layout questions,
-   gated on the same `site.show_drafts` key the index uses, so no production
-   page loads them. The FILE is still copied — Jekyll copies everything under
-   assets/, linked or not, which is issue #276's lesson — but nothing
-   references it and it does nothing without a query parameter.
-
-     ?glass=margin   drawing out in the page margin, title at food's left edge
-     ?align=top      short glasses hang from the top edge instead of centring
-
-   Combine them freely. Delete this block and the file together once both
-   questions are settled. {% endcomment %}
-{% if site.show_drafts %}
-  <script src="{{ '/assets/js/cocktail-glass-switches.js' | relative_url }}"></script>
-{% endif %}
+{% comment %} The glass-layout comparison switches lived here and are gone,
+   along with their script: both questions are settled (margin, top-aligned)
+   and the answers are the plain layout now. Deleted rather than left in
+   place — a comparison tool that survives the comparison is a second way for
+   the page to render that nobody is watching, which is the same reason
+   _dev/cocktails-design.html was deleted once its candidates had lost.
+{% endcomment %}
