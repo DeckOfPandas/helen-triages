@@ -24,6 +24,27 @@
 // structure — the note bar and its label. See _palette.scss.
 // =============================================================================
 
+// =============================================================================
+// RULE LENGTH IS THE HIERARCHY. Three levels, three lengths, one system.
+// =============================================================================
+// The page has three horizontal rules and they were arrived at separately: the
+// menthe one under the title, the violet ones under section headings, and the
+// hairlines between ingredients. Given a length each, they stop being three
+// decisions and become one — you can see how deep you are in the page without
+// reading a word of it, which is the same job the three COLOURS already do.
+//
+//   100%   title          menthe    the page is about this
+//   62%    section        violet    a section of it
+//   34%    ingredient     border    one line within a section
+//
+// The two below are proportions rather than rem, so they hold their
+// relationship at any content width. 62% is Helen's "halfway between the
+// heading's own width and the end of the menthe rule"; 34% is deliberately
+// well short of it, because an ingredient separator that nearly matched a
+// section rule would read as a section break every few lines.
+$rule-section:    62%;
+$rule-ingredient: 34%;
+
 // The head: glass and words side by side, the drawing aligned to the bottom of
 // the text rather than to a baseline. `flex-end` not `baseline`, because the
 // icon is a drawing with no text baseline to align to, so baseline alignment
@@ -116,14 +137,16 @@
   // no rule in the gap; these headings have a 2px violet rule under them doing
   // half that work, and at 4.5rem the sections drifted apart.
   margin: 2.8rem 0 $space-lg;
-  // #492: the rule sits under the WORD, not the column. A full-width rule
-  // reads as a divider between sections; a rule the width of its heading reads
-  // as part of the heading, which is what it is. `fit-content` rather than an
-  // inline-block heading, because an inline-block h2 would stop being a full
-  // line box and take its margins differently.
-  width: fit-content;
+  // #492: not full width. A full-width rule reads as a divider BETWEEN
+  // sections; a shorter one reads as part of the heading, which is what it is.
+  //
+  // First pass used `fit-content`, so each rule stopped at its own word. Helen,
+  // 2026-08-26: "they can be longer, maybe half way between current length and
+  // the end of the menthe rule." $rule-section is that halfway point — and a
+  // single width for all three rather than one per word, so they line up down
+  // the page instead of stepping in and out with the length of a heading.
+  width: $rule-section;
   padding-bottom: 0.45rem;
-  padding-right: $space-lg;
   border-bottom: 2px solid $color-violet;
   @include punched(raised, var(--emboss-offset-lg));
 }
@@ -262,13 +285,24 @@ $amount-indent: $amount-col + $amount-gap;
   padding: 0;
 }
 
+// The separator is a pseudo-element rather than a border, because a border-
+// bottom is always the full width of its box and this one is not. Same reason
+// the card's panel edges are painted strips.
 .cocktail-ingredient {
+  position: relative;
   padding: $space-md 0;
-  border-bottom: 1px solid $color-border;
 
-  &:last-child {
-    border-bottom: none;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: $rule-ingredient;
+    height: 1px;
+    background: $color-border;
   }
+
+  &:last-child::after { content: none; }
 }
 
 .cocktail-ingredient-top {
