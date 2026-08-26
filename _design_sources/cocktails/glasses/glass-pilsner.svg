@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="41.383842mm"
+   height="98.072227mm"
+   viewBox="0 0 41.383842 98.072227"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   sodipodi:docname="glass-pilsner.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2.2425443"
+     inkscape:cx="64.212778"
+     inkscape:cy="183.71989"
+     inkscape:window-width="1920"
+     inkscape:window-height="1112"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-36.899096,-133.08526)">
+    <path
+       id="path3"
+       d="M 43.479902,134.49638 H 71.702128"
+       style="fill:none;stroke:#4c4c4e;stroke-width:2.82223;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       id="path4"
+       d="m 43.667432,134.75424 -4.838446,37.48212 c -0.243662,1.82591 -0.382897,3.70258 -0.382897,5.62992 0,15.41894 8.563002,27.89606 19.144923,27.89606 10.581926,0 19.144932,-12.47712 19.144932,-27.89606 0,-1.92734 -0.139235,-3.80401 -0.3829,-5.62992 l -4.838446,-37.48212"
+       style="fill:none;stroke:#4c4c4e;stroke-width:2.822;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       id="path5"
+       d="m 57.591012,212.77778 c 0,7.86694 5.468055,14.64027 13.123339,16.36887 l 2.751668,0.59973 H 41.716012 l 2.751667,-0.59973 c 7.655277,-1.7286 13.123333,-8.50193 13.123333,-16.36887 z"
+       style="fill:none;stroke:#4c4c4e;stroke-width:2.82223;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       id="path6"
+       d="m 57.591012,214.06854 v -8.12225"
+       style="fill:none;stroke:#4c4c4e;stroke-width:2.822;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+</svg>
