@@ -49,6 +49,16 @@
 // early.
 $rule-ingredient: 46%;
 
+// Uppercase Courier, the face every heading-ish thing on this site shares.
+// Food has `%heading-base` for exactly this and cocktails kept restating the
+// three declarations; this is the same idea under a site-scoped name, so the
+// two files can diverge without one silently changing the other.
+%cocktail-heading-face {
+  font-family: $font-headings;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 // The head: glass and words side by side, the drawing aligned to the bottom of
 // the text rather than to a baseline. `flex-end` not `baseline`, because the
 // icon is a drawing with no text baseline to align to, so baseline alignment
@@ -236,7 +246,19 @@ $rule-ingredient: 46%;
   // existing token for "these are separate things", which is what glass and
   // garnish are: two independent facts, not a list.
   gap: $spacing-section-gap;
-  font-size: 0.92rem;
+  // 0.88rem at 300, matching food's `.recipe-meta span`. Food gets the weight
+  // by inheritance — `article.recipe` sets `font-weight: 300` for the whole
+  // page — and this states it, because cocktails has no article-level rule and
+  // adding one to borrow a single value would restyle every paragraph on the
+  // page to get it.
+  //
+  // Helen, on why the top matter specifically: "I truly don't want to just
+  // replicate all the styling for the food pages, but I think the top matter
+  // works well and training some consistency there buys us some identity."
+  // Worth recording, because it is the line this file should keep being held
+  // to — the head converges, the body does not.
+  font-size: 0.88rem;
+  font-weight: 300;
 
   // MENTHE, AND ALWAYS — Helen saw it in `make it` mode and wanted it kept.
   // It fits the page's own logic rather than only being liked: on a drink page
@@ -249,22 +271,35 @@ $rule-ingredient: 46%;
   // is the only step up available and it is a real face rather than a
   // synthesised one.
   //
-  // NOT PUNCHED, and this is a measurement rather than a preference. The
-  // emboss stroke is 1.6% of font-size, so at this size it resolves to about
-  // 0.19px — the same arithmetic that made the section headings need 1.8rem
-  // before the effect meant anything. Punching these would cost the crispness
-  // of the letterforms and give back a fifth of a pixel of edge. If they
-  // should be punched, they need to be about 1rem first, at which point they
-  // are as large as the values beneath them and the hierarchy inverts.
+  // PUNCHED AFTER ALL, and the steer against it was wrong. I argued the emboss
+  // could not register at this size because the STROKE is 1.6% of font-size,
+  // about 0.19px — true, and answering the wrong question. `punched()` is a
+  // TEXT-SHADOW at a fixed 1px offset: it does not scale with type, so it is
+  // proportionally MORE prominent on small lettering, not less.
+  //
+  // Food's own metadata label says so, and it is the element Helen sent:
+  // "Offset was already fine here (1px on 0.85rem is 7.4%); it's the stroke
+  // that was swallowing it." That whole 2026-08-12 emboss pass came out of
+  // this exact element, at this exact size, for this exact reason.
+  //
+  // So: matched to `.recipe-meta strong` — 0.85rem, $letter-spacing-label, the
+  // stroke read from the custom property, and punched at the SMALL offset
+  // (food uses the plain `punched(raised)` here; the large one is for display
+  // type). The stroke has to be stated explicitly because this is a `strong`,
+  // not a heading, so cocktails/_rule.scss's h1/h2/h3 rule does not reach it.
+  //
+  // MENTHE IS THE ONE DEPARTURE. Food's is $color-text; Helen chose menthe and
+  // it is the head's colour on this page. The emboss still works over it — the
+  // highlight and shadow are white and ink, independent of the letter colour.
   strong {
+    @extend %cocktail-heading-face;
     display: block;
-    font-family: $font-headings;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.74rem;
+    font-size: 0.85rem;
+    letter-spacing: $letter-spacing-label;
     color: $color-menthe-deep;
-    margin-bottom: 0.2rem;
+    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+    @include punched(raised);
+    margin-bottom: $space-xs;
   }
 }
 
