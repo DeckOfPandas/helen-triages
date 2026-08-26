@@ -161,6 +161,25 @@
   }
 }
 
+// AND THE ABOUT LINK, #516 -- the last footer link that did not move under the
+// cursor. The comment above says "all four footer link types" and there were
+// five: the reference links, the licence links, the GitHub mark, and this,
+// which had styling for its underline and nothing for its hover. It is easy to
+// see why it was missed -- it sits in its own <nav> outside .site-footer-top,
+// because it is the one thing down here that belongs to neither site -- and
+// that is exactly what kept it out of the sweep that caught the others.
+//
+// Same $color-accent as every other link on the page, which now means menthe on
+// cocktails and magenta on food, so this follows each site's own core colour
+// without naming either.
+.site-footer-about a {
+  &:hover,
+  &:focus-visible,
+  &:active {
+    color: $color-accent;
+  }
+}
+
 // The GitHub mark carries its own opacity fade rather than a colour, so the
 // hover has to lift BOTH -- the accent at 0.65 opacity is a muddy version of
 // itself, not the colour she asked for.

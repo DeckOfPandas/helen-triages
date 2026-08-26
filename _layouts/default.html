@@ -284,14 +284,23 @@
 
        Site-neutral, so it sits on its own line rather than inside
        .site-footer-top, whose columns each belong to a site. {% endcomment %}
-    <nav class="site-footer-about" aria-label="About this site">
-      <a href="{{ '/about/' | relative_url }}">about</a>
-    </nav>
     <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
     <p class="site-footer-license">
       Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.
       Recipes and writing: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
     </p>
+    {% comment %} BELOW THE LICENCES, #517. It sat above the copyright line,
+       which put the one link a reader might actually want at the top of a
+       block of boilerplate they do not -- so it read as part of the small
+       print rather than as a way out of the page.
+
+       Still its own <nav> outside .site-footer-top: it is the one thing down
+       here belonging to neither site, which is why it is a sibling of the
+       licence paragraph rather than a column beside the reference links.
+    {% endcomment %}
+    <nav class="site-footer-about" aria-label="About this site">
+      <a href="{{ '/about/' | relative_url }}">about</a>
+    </nav>
     <a class="site-footer-github" href="https://github.com/DeckOfPandas/helen-triages" aria-label="Source on GitHub">
       {% include icons/github.svg %}
     </a>
