@@ -72,7 +72,9 @@
 // text-shadow on type — an absolute length applied across a range of sizes is a
 // range of different results — arriving in a different property. The fix here
 // is `vector-effect: non-scaling-stroke`, which makes stroke-width resolve in
-// SCREEN units instead, so one value is one line weight on all 21 icons.
+// SCREEN units instead, so one value is one line weight across every icon —
+// deliberately not a count here, since it only goes stale (last wrong at 21;
+// `_data/cocktails/glasses.yml`'s `all_icons` is the live one).
 //
 // Set the weight here and nowhere else. If a glass ever looks wrong, the
 // artwork is wrong, not this number.
