@@ -60,11 +60,28 @@ DST = ROOT / "_includes" / "icons" / "glasses"
 # already gone from tmp/, so it simply stops being generated. No SKIP entry is
 # needed for a file that does not exist -- adding one would be a rule guarding
 # nothing, and the next person would go looking for the source it names.
+#
+# THE SECOND GROUP IS A COLLISION GUARD, added 2026-08-26 with the RENAME
+# entries below, and it is not optional. Once `coupe-3` is renamed to `coupe`,
+# TWO sources want to write coupe.svg -- and `sorted()` decides which wins,
+# on a subtlety: '-' (0x2D) sorts before '.' (0x2E), so glass-coupe-2.svg and
+# glass-coupe-3.svg both come BEFORE glass-coupe.svg, and the superseded
+# original would be written last and win. The new drawing would vanish on the
+# next full regeneration, silently, with the git diff blaming this script.
+#
+# So every source a RENAME supersedes is skipped by name. They stay on disk as
+# the record of what was tried -- that is what _design_sources/ is for -- they
+# are simply no longer published.
 SKIP = {
     "food-cloche-heart.svg",
     "glass-old-fashioned - Copy.svg",
     "glass-pineapple-1.svg",
     "glass-pineapple-2-bad-trace.svg",
+    # superseded by a RENAME target below
+    "glass-coupe.svg",
+    "glass-coupe-2.svg",
+    "glass-hurricane.svg",
+    "glass-tiki-mug.svg",
 }
 
 # FILL-BASED ARTWORK, WHICH THE REST OF THE SET IS NOT. Every glass is drawn as
@@ -82,11 +99,18 @@ SKIP = {
 # stroke. Helen spotted it on the design page: "the lines outline the shape of
 # the mug as enclosed areas, but they're not filled."
 #
-# LISTING IT HERE IS WHAT MAKES THE FIX SURVIVE. The published icon was edited
-# by hand the same day, and a hand edit to a GENERATED file is undone the next
-# time this script runs, silently and with no diff to notice. The set is now
-# two.
-SOLID = {"glass-pineapple-3.svg", "glass-tiki-mug.svg"}
+# AND THEN IT LEFT AGAIN, the same day. Filling was the right fix for the
+# artwork that existed, but it could not give the mug a stroke WIDTH -- there
+# was no centreline to give a width to -- so it read about 2.8x heavier than
+# every stroked glass beside it and got heavier as it grew, while theirs stayed
+# put. Helen: "The tiki mug has lots of gaps in its lines. Are you able to
+# redraw it?"
+#
+# glass-tiki-mug-2.svg is that redraw: real centrelines, twelve of them, same
+# viewBox, so the mug rejoins the set on one weight set once in CSS. The
+# fill-based original is kept in _design_sources as the record and is SKIPped
+# above. The set is back to one member.
+SOLID = {"glass-pineapple-3.svg"}
 
 # Source name -> published name, where the export carries a working title.
 #
@@ -100,6 +124,7 @@ RENAME = {
     "pineapple-3": "pineapple",
     "coupe-3": "coupe",
     "hurricane-2": "hurricane",
+    "tiki-mug-2": "tiki-mug",
 }
 
 
