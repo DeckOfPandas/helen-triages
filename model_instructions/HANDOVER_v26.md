@@ -1893,6 +1893,33 @@ own content by default, the same way `overflow: hidden` on any other element
 would, and it is not obvious from reading the SVG or the surrounding layout
 CSS that this is happening — only from a stroke that touches the edge.
 
+**Helen's raw Inkscape sources are backed up in git now, at
+`_design_sources/cocktails/glasses/`, committed as-is.** Before this they only
+existed in `tmp/inbox-cocktail-glasses/`, which is gitignored — every
+normalised production icon was tracked, but the drawings behind them had no
+backup at all. Underscore-prefixed on purpose, the same reason `_includes`/
+`_data`/`_sass` are excluded from the build by default; it is not `assets/`
+because that directory IS copied into `_site/`, and a folder of un-served
+Inkscape XML with full editor metadata has no business in the deployed site.
+Nothing reads this directory and nothing should point a template at a file in
+it — nor is it kept in sync automatically: when a drawing here gets adopted,
+normalising it into `_includes/icons/glasses/` is still a manual step. It also
+holds superseded options and rejects (old candidate old-fashioneds, the
+pre-fix collins/coupe), not the current state of any one glass — that's what
+`glasses.yml` is for.
+
+**Two of the "genuinely differ" stemmed glasses got redrawn anyway, 2026-08-26,
+despite the proportion PASS staying parked.** Goblet and nick-and-nora both
+have new bowl proportions from Helen — goblet narrower and shorter
+(viewBox 68.5×90.5 → 54.4×82.2), nick-and-nora wider (37.3×91.0 → 44.9×90.7).
+This is not #299 reopening: it's Helen fixing individual drawings she wasn't
+happy with, same as the old-fashioned/collins/coupe redraws earlier in this
+same arc, and #299's own systematic "make every stem/base consistent" pass is
+still exactly as parked as the paragraph above says. Worth noting because
+goblet was one of the two examples that paragraph names — if a proportion
+complaint about goblet specifically resurfaces, check whether this redraw
+already addressed it before assuming #299 needs unparking.
+
 ## 10. Validation — run `pytest`, don't read this
 
 **The suite gates the deploy now (2026-08-18, issue #369).** Until then the
