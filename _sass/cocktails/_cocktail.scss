@@ -78,6 +78,22 @@ $glass-col: 9rem;
 $glass-gap: $spacing-section-gap;
 $head-pad-bottom: 1.4rem;
 
+// WHERE THE GLASS STARTS, and why it is not zero. The block's top is the top
+// of the title's LINE BOX, which sits well above the printed capitals: the
+// title runs at $line-height-body on 2.2rem type, so there is half a leading's
+// worth of air before the lettering begins. Starting the glass at zero
+// therefore starts it above the title, which is what Helen's screenshot of
+// Bee's Knees is complaining about — the coupe's rim floats over the B.
+//
+// Derived rather than eyeballed, so it tracks if the title's size or leading
+// changes. Half-leading is exact arithmetic; the second term is the remaining
+// gap between the em box and the cap height, which depends on the font's own
+// metrics and is measured. Named separately so it is obvious which is which.
+$title-size:         2.2rem;
+$title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;  // 0.715rem
+$title-cap-inset:    0.14rem;   // em box top -> cap top, Courier Prime
+$glass-top:          $title-half-leading + $title-cap-inset;
+
 // THE GLASS IS AS TALL AS THE TITLE BLOCK, and this is #485's fix arriving for
 // a different reason than #485 expected.
 //
@@ -159,6 +175,17 @@ $head-pad-bottom: 1.4rem;
 //   - the drawing stops being adjacent to the words it describes. Whether it
 //     reads as "belonging to this drink" or as loose furniture beside the page
 //     is the whole question, and it cannot be answered from the CSS.
+// THE OTHER HALF OF HELEN'S RAMBLE, as a switch: short glasses hang from the
+// top edge and stop where they stop, instead of floating centred. Every glass
+// on every drink then starts at the same y, which is the strongest possible
+// version of the stable top edge — at the cost of a hole under the short ones.
+//
+// `?align=top` on any drink URL. One property, because that is genuinely all
+// that differs; a tall glass fills the box in both.
+.cocktail--glass-top .cocktail-glass-icon {
+  align-items: flex-start;
+}
+
 // SIMPLER THAN IT WAS, because the base layout came to meet it. The glass is
 // absolutely positioned in both, so this variant only has to move it: out of
 // the column's left padding and into the margin beside it, and drop the
@@ -397,14 +424,18 @@ $head-pad-bottom: 1.4rem;
   // bottom of the metadata, stopping short of the menthe rule.
   position: absolute;
   left: 0;
-  top: 0;
+  // Cap height of the title, not the top of its line box. See $glass-top.
+  top: $glass-top;
   bottom: $head-pad-bottom;
   width: $glass-col;
   display: flex;
-  // TOP-aligned, not centred. Centring was right when the glass had a height
-  // of its own; now the top edge is the thing being held still, so a shorter
-  // glass has to hang from it rather than float in the middle of it.
-  align-items: flex-start;
+  // CENTRED, so a short glass sits in the middle of the block rather than
+  // hanging from the top with a growing hole beneath it. Helen's call, with
+  // the caveat that she may prefer the other one once she has seen both — the
+  // top-aligned version is `?align=top`, and the only thing that changes is
+  // this line. A tall glass fills the box either way, so the two differ only
+  // on the short ones.
+  align-items: center;
   justify-content: center;
 
   // The default UA stylesheet sets `overflow: hidden` on a root <svg>

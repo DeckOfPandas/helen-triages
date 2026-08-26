@@ -1,11 +1,19 @@
 /* =============================================================================
-   A LOOK-AT-IT SWITCH, not a feature. Local builds only.
+   LOOK-AT-IT SWITCHES, not features. Local builds only.
    =============================================================================
-   Adds `.cocktail--glass-margin` to the article when the URL carries
-   `?glass=margin`, which moves the glass drawing out of the flex row and into
-   the page's left margin, so the title starts on exactly the same left edge as
-   a food recipe page. See _sass/cocktails/_cocktail.scss for the layout and
-   for what to watch for while judging it.
+   Two open questions about where the glass drawing sits, each behind its own
+   query parameter so they can be judged separately or together:
+
+     ?glass=margin   the drawing moves out into the page's left margin, so the
+                     title starts on exactly the same left edge as a food
+                     recipe page.
+     ?align=top      a SHORT glass hangs from the top edge and stops where it
+                     stops, instead of sitting centred in the block. A tall
+                     glass fills the block either way, so this shows only on
+                     the short ones.
+
+   See _sass/cocktails/_cocktail.scss for both layouts and for what to watch
+   for while judging them.
 
    Helen is comparing this against the shipped layout and expects to keep the
    shipped one. So it is built to be deleted: one class, one query parameter,
@@ -31,8 +39,18 @@
   var article = document.querySelector('article.cocktail');
   if (!article) return;
 
-  var wants = new URLSearchParams(window.location.search).get('glass');
-  if (wants === 'margin') {
+  var params = new URLSearchParams(window.location.search);
+
+  /* Two switches, deliberately on separate parameters because they are
+     independent questions: `glass` is where the drawing sits HORIZONTALLY
+     (in the column, or out in the page margin), `align` is how a SHORT glass
+     sits vertically (centred in the block, or hanging from its top edge). A
+     tall glass fills the block either way, so `align` only shows on the short
+     ones. Combine them freely: ?glass=margin&align=top. */
+  if (params.get('glass') === 'margin') {
     article.classList.add('cocktail--glass-margin');
+  }
+  if (params.get('align') === 'top') {
+    article.classList.add('cocktail--glass-top');
   }
 })();
