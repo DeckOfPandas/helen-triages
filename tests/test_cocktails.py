@@ -342,12 +342,12 @@ def test_speciality_gin_declares_a_character():
     the distiller reached for, and a closed list would mean a vocabulary edit
     per bottle. So: present and non-empty, never a declared member.
 
-    VACUOUS TODAY, AND LEGITIMATELY SO -- no drink carries `speciality` yet,
-    because the generic was minted in the same commit as this test. That is the
-    honest kind of empty (a guard waiting for its first case), not the kind
-    test_suite_hygiene.py exists to catch (a check that silently stopped
-    matching anything it used to). It needs no non-empty assertion for the same
-    reason `pudding in a glass` is declared with zero members.
+    ONE REAL CASE TODAY: Spiced Negroni's Ophir, cardamom / cubeb pepper /
+    black pepper. (An earlier version of this docstring claimed the test was
+    vacuous -- it was written alongside the retyping that gave it its first
+    case, and was wrong the moment it was committed. Corrected 2026-08-26,
+    which is exactly the §11.2 failure this repo keeps re-learning: a
+    docstring is a claim about the code and rots like any other.)
     """
     bad = []
     for slug, fm in _load():
@@ -378,6 +378,98 @@ def test_speciality_gin_declares_a_character():
 # =============================================================================
 # 6 and 7 -- shape guards on the drinks themselves
 # =============================================================================
+
+def test_rum_character_is_declared():
+    """A RUM's `character` must be a declared `rum_characters` value.
+
+    THIS HOLE WAS OPEN UNTIL 2026-08-26 AND NOTHING WAS WATCHING IT.
+    `character` is the field #441 spent an entire issue separating from
+    `generic`, and #314's ruling on blackstrap turns on that separation -- yet
+    every guard in this file pointed at `generic`. A typo in `character` minted
+    a value in silence, which is precisely the failure
+    test_every_generic_is_declared exists to prevent one field over.
+
+    It got worse, not better, when `rum_characters` was excluded from the
+    declared-generic set in that same session: correct, but it left the list
+    declared and consumed by absolutely nothing. A vocabulary nothing checks
+    against is decoration.
+
+    NOT EVERY CHARACTER -- ONLY RUM'S, and the asymmetry is deliberate rather
+    than an oversight to tidy up later. Helen, 2026-08-26, on gin: character
+    there is FREE TEXT, because a rum's comes from a handful of production
+    traits and closes into a list while a gin's is whatever the distiller
+    reached for. So Spiced Negroni's cardamom is correctly undeclared and this
+    test must not fire on it.
+
+    Rum-ness is derived through `family_of`, not pattern-matched on the item
+    name -- 61 ingredients in this collection are named only by brand, which is
+    the same reason `generic` is stored rather than computed.
+    """
+    vocab = _vocab()
+    declared = set(vocab.get("rum_characters") or [])
+    family_of = vocab.get("family_of") or {}
+    assert declared, (
+        "ingredients.yml declares no `rum_characters`, so this check enforces "
+        "nothing. An empty set would pass every value."
+    )
+    bad, checked = [], 0
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            if not any(family_of.get(g) == "rum" for g in generics):
+                continue
+            character = item.get("character")
+            if not character:
+                continue
+            for value in (character if isinstance(character, list) else [character]):
+                checked += 1
+                if value not in declared:
+                    bad.append(f"{slug}: {item.get('item') or '?'!r} -> {value!r}")
+    # The rum-ness test above is a two-step lookup (generic -> family_of ->
+    # "rum"), and EITHER step going stale would leave this test green while
+    # checking nothing -- a renamed generic, a dropped family mapping. The
+    # collection has four rums carrying a character today; zero means the
+    # derivation broke, not that the data got tidier.
+    assert checked, (
+        "No rum ingredient carries a `character`, so this check is vacuous. "
+        "That is implausible for this collection -- blackstrap alone is on "
+        "three drinks. Either `family_of` no longer maps the rum styles, or a "
+        "generic was renamed without this following."
+    )
+    assert not bad, (
+        "Undeclared character(s) on a rum:\n  " + "\n  ".join(sorted(bad))
+        + f"\n\nDeclared: {sorted(declared)}.\nEither it is a typo, or the "
+          "value is real and belongs in `rum_characters`. A character is not a "
+          "generic -- #441 -- but it is just as much a vocabulary."
+    )
+
+
+def test_to_serve_is_a_string():
+    """`to_serve` is one line of presentation, never a list.
+
+    NEW FIELD, NEW RISK. Not a single drink set `to_serve` until 2026-08-26,
+    when #291's three fragments moved into it -- so this field went from
+    documented-but-unused to live, with nothing checking its shape.
+
+    A LIST DOES NOT FAIL LOUDLY HERE. `_layouts/cocktail.html` renders it as
+    `{{ page.to_serve | markdownify | remove: '<p>' }}`, and Liquid will
+    happily stringify a list into that filter chain rather than raise -- the
+    same class of quiet nonsense as the `glass` scalar iterating as characters.
+    `glass`, `garnish` and `mood` each have a shape guard for exactly this
+    reason; this field had none because it had no data.
+    """
+    bad = [f"{slug}: to_serve is a {type(fm['to_serve']).__name__}"
+           for slug, fm in _load()
+           if "to_serve" in fm and not isinstance(fm["to_serve"], str)]
+    assert not bad, (
+        "to_serve must be a string:\n  " + "\n  ".join(bad)
+        + "\n\nIt is ONE line of presentation -- \"over crushed ice, with a "
+          "straw\" -- not an ordered list of steps. Steps are `method`."
+    )
+
 
 def test_glass_is_a_list():
     """`glass` became an ordered list on 2026-08-17 so a drink could name more
