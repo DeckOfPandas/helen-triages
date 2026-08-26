@@ -115,12 +115,27 @@ layout: default
      0.32 and 0.68 are not tuned constants to preserve — they are simply what
      puts the shortest real glass (shot, 60mm of a 230mm tallest) at about half
      the block. If the tallest or shortest glass changes, they still hold. {% endcomment %}
+  {% comment %} A FRACTION NOW, NOT A HEIGHT. The glass is drawn against the
+     title block rather than against a fixed scale — Helen, 2026-08-26: "try
+     drawing the glass as large as the whole title block, including the title
+     line itself. I think the stability of the top edge will help the switch to
+     MAKE IT mode feel less jarring."
+
+     So the template's job is no longer "how many rem" but "what fraction of
+     the block", and the block's own height decides the rest. That is what
+     makes the two states agree: pressing `make it` hides the tagline, the
+     block gets shorter, and the glass shrinks with it from a top edge that
+     never moves.
+
+     The compression is unchanged (0.32–1.0), so the TALLEST glass fills the
+     block and a shot fills about half of it — relative height survives, which
+     it would not if every glass simply filled the box. See _cocktail.scss for
+     why that trade went this way. {% endcomment %}
   {% assign icon_mm = heights_mm[glass_icon] %}
   {% if icon_mm and tallest_mm > 0 %}
     {% assign ratio = icon_mm | times: 1.0 | divided_by: tallest_mm %}
     {% assign compressed = ratio | times: 0.68 | plus: 0.32 %}
-    {% assign icon_rem = compressed | times: 10.4 %}
-    {% capture glass_icon_style %} style="--glass-icon-height: {{ icon_rem }}rem;"{% endcapture %}
+    {% capture glass_icon_style %} style="--glass-fill: {{ compressed }};"{% endcapture %}
   {% endif %}
 
   {% comment %} TWO STATES, ONE PAGE. The button adds `is-making` to the
@@ -128,7 +143,7 @@ layout: default
      the DOM, so this page still prints and still reads with JS off, in the
      editorial state, which is the one carrying the most information. Same
      progressive-enhancement contract as the back arrow. {% endcomment %}
-  <div class="cocktail-title-block">
+  <div class="cocktail-title-block{% if glass_icon == "" %} cocktail-title-block--no-glass{% endif %}">
     {% if glass_icon != "" %}
       <span class="cocktail-glass-icon"{{ glass_icon_style }}>{% include {{ glass_icon_file }} %}</span>
     {% endif %}

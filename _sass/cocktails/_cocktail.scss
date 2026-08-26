@@ -71,19 +71,61 @@ $rule-ingredient: 46%;
 // is one of those items, and a percentage height against an indefinite height
 // falls back to auto) and the fix is to take the glass out of flow. Until then
 // these are two numbers that have to be kept in step with the type by hand.
+// The glass column: wide enough for the widest drawing at full block height.
+// A fixed reservation rather than a flex track, because the glass is out of
+// flow now (see below) and cannot push anything.
+$glass-col: 9rem;
+$glass-gap: $spacing-section-gap;
+$head-pad-bottom: 1.4rem;
+
+// THE GLASS IS AS TALL AS THE TITLE BLOCK, and this is #485's fix arriving for
+// a different reason than #485 expected.
+//
+// It was a flex row with the glass as one of its items, which meant the row's
+// height came partly from the glass — so asking the glass to match the row was
+// circular, and the CSS silently fell back to the drawing's intrinsic size.
+// That is what #485 diagnosed and parked.
+//
+// Taking the glass OUT OF FLOW breaks the circle: the block's height is now
+// decided entirely by the words, and the glass is measured against a height it
+// no longer contributes to. `top: 0` and a `bottom` clear of the rule give it
+// exactly the words' extent, title line included.
+//
+// WHICH IS THE POINT, per Helen: "the stability of the top edge will help the
+// switch to MAKE IT mode feel less jarring." In `make it` the tagline hides,
+// the block gets shorter, and the glass shrinks with it from a top edge that
+// does not move. Nothing has to know which state it is in.
+//
+// RELATIVE HEIGHT SURVIVES, and that was the one real trade here. "As large as
+// the whole title block" read literally means every glass fills the box, which
+// would make a shot and a hurricane the same size and quietly throw away
+// `heights_mm`, `display_scale` and the argument behind both. Instead the
+// TALLEST glass fills it and the rest are a fraction of it — `--glass-fill`,
+// still the 0.32–1.0 compression — and they are TOP-ALIGNED, so the stable
+// edge Helen asked for is stable for every glass and not just the tall ones.
 .cocktail-title-block {
-  display: flex;
-  align-items: flex-end;
-  // 3rem, up from 1.7 — Helen asked for space between the drawing and the
-  // words. The glass is a picture rather than a column of text, and at 1.7 it
-  // read as a bullet on the title instead of a thing beside it.
-  gap: $spacing-section-gap;
+  position: relative;
+  padding-left: $glass-col + $glass-gap;
   // MATCHED TO FOOD'S RECIPE PAGE, which opens on $spacing-section-gap above
   // its title (.recipe-title). The two sites' recipe pages should start the
   // same distance down the page; they are the same kind of page.
   margin: $spacing-section-gap 0 2.4rem;
-  padding-bottom: 1.4rem;
+  padding-bottom: $head-pad-bottom;
   border-bottom: 2px solid $color-menthe;
+}
+
+// A drink with no glass gets no reservation — 17 of them have none, and an
+// empty 9rem gutter beside the title would read as a missing image rather than
+// as a drink that never named a glass. See #491.
+//
+// A CLASS FROM THE TEMPLATE, NOT `:has()`. The selector version worked and was
+// worse: the template already knows whether it drew a glass, so asking the
+// browser to work it back out from the DOM is inferring a fact we were holding
+// a moment earlier. It also degrades badly where `:has()` is unsupported —
+// every glassless drink would get the empty gutter, which is precisely the
+// case this rule exists for.
+.cocktail-title-block--no-glass {
+  padding-left: 0;
 }
 
 // =============================================================================
@@ -117,28 +159,26 @@ $rule-ingredient: 46%;
 //   - the drawing stops being adjacent to the words it describes. Whether it
 //     reads as "belonging to this drink" or as loose furniture beside the page
 //     is the whole question, and it cannot be answered from the CSS.
+// SIMPLER THAN IT WAS, because the base layout came to meet it. The glass is
+// absolutely positioned in both, so this variant only has to move it: out of
+// the column's left padding and into the margin beside it, and drop the
+// padding that was reserving room.
 .cocktail--glass-margin {
   .cocktail-title-block {
-    // The glass leaves the flex row entirely, so the words start at the
-    // container's left edge -- the same edge food's title starts on.
-    position: relative;
-    display: block;
+    padding-left: 0;
   }
 
   .cocktail-glass-icon {
-    position: absolute;
-    // Out into the margin: its own width plus a gap, to the left of the column.
-    right: calc(100% + #{$spacing-section-gap});
-    bottom: 0;
-    align-self: auto;
+    left: auto;
+    right: calc(100% + #{$glass-gap});
   }
 
   // Below this the viewport has no margin to hang anything in, so the glass
   // comes back inside and the layout reverts to the shipped one. The threshold
   // is the content column plus room for the widest glass on both sides.
   @media (max-width: 1180px) {
-    .cocktail-title-block { display: flex; }
-    .cocktail-glass-icon { position: static; align-self: center; }
+    .cocktail-title-block { padding-left: $glass-col + $glass-gap; }
+    .cocktail-glass-icon { left: 0; right: auto; }
   }
 }
 
@@ -154,18 +194,13 @@ $rule-ingredient: 46%;
   gap: $space-xl;
 }
 
-// FILLS THE REMAINING WIDTH, and this is what put the toggle in the wrong
-// place. A flex child defaults to `flex: 0 1 auto`, so this column was sized to
-// its content — which meant `justify-content: space-between` in the title row
-// pushed the button to the right edge of the TEXT, not of the page, and it
-// floated in the middle of the article with the menthe rule running on past it.
-// `flex: 1` makes the column reach the container's right edge, which is where
-// food's `print` sits and where the rule ends.
+// A PLAIN BLOCK NOW. This was a flex column that had to declare `flex: 1` to
+// reach the container's right edge, back when it was one item in a row beside
+// the glass — without it, `space-between` in the title row pushed the toggle
+// to the right edge of the TEXT rather than of the page. With the glass out of
+// flow the words are the block's only content and fill it by default, so the
+// flex machinery and the bug it was fixing both go.
 .cocktail-head-words {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  flex: 1;
   min-width: 0;
 }
 
@@ -297,8 +332,12 @@ $rule-ingredient: 46%;
     font-size: 0.85rem;
     letter-spacing: $letter-spacing-label;
     color: $color-menthe-deep;
-    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-    @include punched(raised);
+    // NO EMBOSS. Tried, looked at, dropped -- Helen: "having seen it, it's too
+    // much." The size, tracking and menthe stay; only the shadow and its
+    // stroke go. The stroke goes WITH it rather than being left behind: at
+    // 0.19px it was doing nothing visible on its own, and it only earned its
+    // place as the crisp edge the emboss copies sat against. With no copies to
+    // sit against it is wiring nothing reads.
     margin-bottom: $space-xs;
   }
 }
@@ -354,14 +393,19 @@ $rule-ingredient: 46%;
 // being re-guessed — it exists so a wide glass (punch bowl, mug) cannot
 // shoulder the title along, and that job is unchanged, only its scale.
 .cocktail-glass-icon {
-  display: inline-flex;
-  align-items: flex-end;
-  flex: none;
-  // CENTRED ON THE TITLE BLOCK, at every height — Helen, 2026-08-26. The row
-  // aligns its text to the bottom, and a glass doing the same sat low and left
-  // a growing gap above it as the drawing got shorter. Centred, a short glass
-  // reads as sitting IN the block rather than fallen to the floor of it.
-  align-self: center;
+  // Out of flow, spanning the words' full extent: top of the title to the
+  // bottom of the metadata, stopping short of the menthe rule.
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: $head-pad-bottom;
+  width: $glass-col;
+  display: flex;
+  // TOP-aligned, not centred. Centring was right when the glass had a height
+  // of its own; now the top edge is the thing being held still, so a shorter
+  // glass has to hang from it rather than float in the middle of it.
+  align-items: flex-start;
+  justify-content: center;
 
   // The default UA stylesheet sets `overflow: hidden` on a root <svg>
   // element -- a browser default for the element, not a CSS property
@@ -373,12 +417,19 @@ $rule-ingredient: 46%;
 
   svg {
     display: block;
-    height: var(--glass-icon-height, 10.4rem);
+    // A FRACTION OF THE BLOCK, not a length. The container's height is
+    // definite — top and bottom are both set on an absolutely positioned box
+    // — so a percentage here resolves cleanly, which is exactly what it could
+    // not do while the glass was a flex item contributing to the height it
+    // was trying to measure.
+    height: calc(var(--glass-fill, 1) * 100%);
     width: auto;
     // A tall narrow glass and a wide shallow one at the same height still
-    // differ a lot in width; this stops the widest (punch bowl, mug)
-    // pushing the title along.
-    max-width: 12.8rem;
+    // differ a lot in width. The cap is the column itself now: a punch bowl
+    // hits it and gives up some height rather than spilling into the title,
+    // which is the right trade — it is the widest drawing in the set and the
+    // one least able to afford being full height.
+    max-width: 100%;
     overflow: visible;
   }
 }
@@ -736,7 +787,11 @@ $amount-indent: $amount-col + $amount-gap;
   // someone presses something, so it goes stale unwatched. The overrides that
   // survive below all CHANGE something for a reason; none of them restates a
   // number the default already owns.
-  .cocktail-glass-icon svg { height: 4.1rem; }
+  // NOTHING SIZES THE GLASS HERE ANY MORE, and its absence is the feature.
+  // This used to pin it to 4.1rem, a second number kept in step with the head
+  // by hand. The glass is now a fraction of the block, and hiding the tagline
+  // shortens the block, so it shrinks by itself — from a top edge that does
+  // not move, which is the whole reason Helen asked for this.
 
   // GLASS AND GARNISH GET LOUDER, NOT QUIETER — #493, Helen: "including moving
   // glass and garnish somewhere more prominent."
