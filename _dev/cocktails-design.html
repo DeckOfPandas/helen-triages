@@ -77,10 +77,16 @@ glass_tweaks:
 #
 # WHEN THIS SHIPS IT BELONGS IN taxonomy.yml, beside `ship_scale`. The scale and
 # how it is drawn are one decision and should not end up in two files.
+#
+# `sure` and `meh` dropped further from the top, 2026-08-26 -- they were 62 and
+# 30, and at 62 a `sure` was near enough a `yes` to be mistaken for one at a
+# glance, which defeats the point of a scale. The gap between "make this" and
+# everything below it is the one distinction the mark has to carry, so it gets
+# most of the range.
 ship_tints:
   "not really": 0
-  "meh": 30
-  "sure": 62
+  "meh": 16
+  "sure": 42
   "yes": 100
   "oh gods yes": 100
   "who knows": 0
@@ -507,7 +513,11 @@ drinks:
         <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="fade">fade</button>
         <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="short">short</button>
         <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="under">under glass</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="underbox">under box</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="fadex">fade &rarr;</button>
         <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="panel">panel</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="panelbare">panel, no edge</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-frame="panelsoft">panel, soft edge</button>
       </span>
     </div>
 
@@ -850,7 +860,9 @@ drinks:
 }
 .dsn-card {
   position: relative;
-  height: 11.25rem;
+  /* 11.25rem until the foot became two rows; the extra 1.65rem is the second
+     chip row plus the gap above the goodness line. */
+  height: 12.9rem;
   border: 1px solid var(--dsn-frame-c, var(--dsn-line));
   border-left-width: var(--dsn-frame-l, 1px);
   border-left-color: var(--dsn-frame-lc, var(--dsn-frame-c, var(--dsn-line)));
@@ -887,6 +899,32 @@ drinks:
 .dsn-cards--frame-panel    { --dsn-frame-c: var(--dsn-line); --dsn-frame-l: 3px;
                              --dsn-frame-lc: var(--dsn-absinthe);
                              --dsn-panel-bg: color-mix(in srgb, var(--dsn-absinthe) 9%, #ffffff); }
+/* (1a) the panel with no edge at all */
+.dsn-cards--frame-panelbare { --dsn-frame-c: var(--dsn-line);
+                              --dsn-panel-bg: color-mix(in srgb, var(--dsn-absinthe) 9%, #ffffff); }
+/* (1b) the panel with the edge turned down rather than off */
+.dsn-cards--frame-panelsoft { --dsn-frame-c: var(--dsn-line); --dsn-frame-l: 3px;
+                              --dsn-frame-lc: color-mix(in srgb, var(--dsn-absinthe) 50%, #ffffff);
+                              --dsn-panel-bg: color-mix(in srgb, var(--dsn-absinthe) 9%, #ffffff); }
+/* (1c) "under glass", but colouring the CARD'S OWN BOTTOM EDGE for the width
+   of the glass column instead of drawing a second line inside it. One mark
+   rather than two, and it reads as part of the box. The strip is offset by the
+   border width so it lands exactly ON the border rather than beside it. */
+.dsn-cards--frame-underbox { --dsn-frame-c: var(--dsn-line);
+                             --dsn-underline: var(--dsn-absinthe);
+                             --dsn-underline-left: -1px;
+                             --dsn-underline-bottom: -1px;
+                             --dsn-underline-w: var(--dsn-text-x);
+                             --dsn-underline-h: 3px; }
+/* (1d) the fade turned through 90 degrees. NOT the 3px strip faded sideways --
+   that would be a gradient across three pixels, i.e. nothing. Read as intended
+   it is a wash entering from the left edge and gone by the time it reaches the
+   text, which is the same gesture at a scale you can actually see. */
+.dsn-cards--frame-fadex    { --dsn-frame-c: var(--dsn-line);
+                             --dsn-card-bg: linear-gradient(to right,
+                               color-mix(in srgb, var(--dsn-absinthe) 42%, #ffffff) 0%,
+                               color-mix(in srgb, var(--dsn-absinthe) 12%, #ffffff) 38%,
+                               #ffffff 72%); }
 
 /* The edge as a painted strip, for the variants a border cannot express. */
 .dsn-card::before {
@@ -904,10 +942,10 @@ drinks:
 .dsn-card::after {
   content: "";
   position: absolute;
-  left: 1.15rem;
-  bottom: 0.95rem;
-  width: calc(var(--dsn-text-x) - 2.3rem);
-  height: 3px;
+  left: var(--dsn-underline-left, 1.15rem);
+  bottom: var(--dsn-underline-bottom, 0.95rem);
+  width: var(--dsn-underline-w, calc(var(--dsn-text-x) - 2.3rem));
+  height: var(--dsn-underline-h, 3px);
   background: var(--dsn-underline, transparent);
   pointer-events: none;
 }
@@ -944,32 +982,50 @@ drinks:
   font-weight: 600;
 }
 
-/* The foot: pinned, never in flow. Two columns — moods take the slack, the
-   goodness mark takes exactly what it needs — so the mark's right edge is the
-   card's padding edge on every card regardless of how many moods there are. */
+/* THE FOOT IS TWO ROWS NOW, chips above and the goodness line below — Helen,
+   2026-08-26: "put the goodness words and mark one line further down, so chips
+   don't clip."
+
+   Side by side, the chips and the mark were competing for one line, and the
+   chip row lost: it was truncating on any card with three moods. Stacking them
+   gives the chips the full width and lets them wrap.
+
+   THE MARK DOES NOT MOVE, which was the whole point of pinning the foot in the
+   first place. The container is anchored to the BOTTOM, and the goodness line
+   is its last child at a fixed line-height — so the mark sits in the same spot
+   whether the chips take one row or two, and the chips grow upward into the
+   card instead of pushing it down.
+
+   CAPPED AT TWO ROWS. Helen: "there really shouldn't be more than one and a
+   half lines." Two is the honest cap for a rule expressed in whole rows, and
+   the card grew to 12.9rem to hold it. That costs the proportion, and she
+   named the trade before I did -- "it's a shame to lose the card proportion
+   but I can't think of another way." Nor can I: the alternatives are
+   truncating (what we had), a card whose height varies with mood count (which
+   unpins every anchor on it), or moods that do not appear on cards at all. */
 .dsn-card-foot {
   position: absolute;
   left: var(--dsn-text-x);
   right: 1.15rem;
   bottom: 0.95rem;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 0.6rem;
 }
 .dsn-card-moods {
   display: flex;
-  gap: 0.3rem;
+  flex-wrap: wrap;
+  gap: 0.28rem;
   min-width: 0;
+  /* two rows of chip (line-height 1.15rem) plus the one gap between them */
+  max-height: 2.58rem;
   overflow: hidden;
-  white-space: nowrap;
+  margin-bottom: 0.45rem;
 }
 .dsn-mood-chip {
   font-size: 0.68rem;
+  line-height: 1.15rem;
   letter-spacing: 0.02em;
   color: var(--dsn-grey);
   border: 1px solid var(--dsn-line);
-  padding: 0.12rem 0.45rem;
+  padding: 0 0.45rem;
   flex: none;
 }
 /* A chip matching the active mood filter fills, the same treatment the matched
@@ -985,8 +1041,11 @@ drinks:
 /* The label stays one quiet grey at every rung. The SQUARE carries the scale —
    two things both encoding the rating would just be louder, not clearer. */
 .dsn-ship {
+  display: block;
+  text-align: right;
   font-family: "Courier Prime", monospace;
   font-size: 0.68rem;
+  line-height: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--dsn-grey);
@@ -1128,8 +1187,14 @@ drinks:
   /* Menthe under the title, amber elsewhere — Helen, 2026-08-26. */
   border-bottom: 2px solid var(--dsn-absinthe);
 }
+/* HEIGHTS ARE HAND-TUNED STAND-INS, per Helen — "let the glass be the full
+   height of the title section, as a stand-in until we work it out properly."
+   The proper version reads the text column's height instead of guessing at it,
+   and is issue #485; these two numbers are what has to be kept in step with
+   the type until it lands, which is exactly the maintenance burden #485 exists
+   to remove. Editorial is title + tagline + meta; make-it is title + meta. */
 .dsn-drink-glass { flex: none; color: var(--dsn-ink); display: flex; align-items: flex-end; }
-.dsn-drink-glass svg { display: block; height: 8.5rem; width: auto; overflow: visible; }
+.dsn-drink-glass svg { display: block; height: 10.4rem; width: auto; overflow: visible; }
 .dsn-drink-words { display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; }
 /* THE PUNCHED EFFECT, READ FROM THE REAL VARIABLES rather than copied.
    `_sass/shared/_rule.scss` emits --emboss-stroke-w / -c, --emboss-light,
@@ -1235,7 +1300,7 @@ drinks:
    then helps decide the height it was supposed to be reading. A fixed size is
    back in the meantime, so this state looks deliberate rather than broken. */
 .dsn-drink.is-making .dsn-editorial-only { display: none; }
-.dsn-drink.is-making .dsn-drink-glass svg { height: 3.4rem; }
+.dsn-drink.is-making .dsn-drink-glass svg { height: 4.1rem; }
 .dsn-drink.is-making .dsn-amount { font-size: 1.3rem; font-weight: 700; }
 .dsn-drink.is-making .dsn-item { font-size: 1.15rem; }
 .dsn-drink.is-making .dsn-ing-row { padding: 0.95rem 0; }
@@ -1386,7 +1451,8 @@ drinks:
   wrap.addEventListener('click', function (e) {
     var btn = e.target.closest('.dsn-btn--cheat');
     if (!btn) return;
-    ['hairline', 'edge', 'soft', 'fade', 'short', 'under', 'panel'].forEach(function (f) {
+    ['hairline', 'edge', 'soft', 'fade', 'short', 'under', 'underbox', 'fadex',
+     'panel', 'panelbare', 'panelsoft'].forEach(function (f) {
       grid.classList.toggle('dsn-cards--frame-' + f, f === btn.dataset.frame);
     });
     wrap.querySelectorAll('.dsn-btn--cheat').forEach(function (b) {
