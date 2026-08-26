@@ -22,9 +22,12 @@ oversight:
     test_no_recipe_only_keys below, which actively rejects it.
   - no `meta.proofread`. That flag records Helen being the last judgement before
     someone else's words publish. These words are hers on the way in.
-  - no completeness rule on `ingredients`. The list is incomplete BY DEFINITION
-    and _layouts/magic_bag.html says so on every page. A test asserting it were
-    complete would contradict the collection.
+  - no completeness rule on `ingredients`. The list is incomplete BY DEFINITION,
+    and this module is what makes that true rather than merely stated: there is
+    nowhere to put a method and test_no_recipe_only_keys rejects one. A test
+    asserting the list were complete would contradict the collection. (A caveat
+    saying so was rendered on every page briefly on 2026-08-26 and removed at
+    Helen's ask -- she is the only reader and knows what the collection is.)
   - no ingredient-QUALIFICATION rules (salted vs unsalted butter, dark vs light
     soy, which sugar). test_style.py holds recipes to those and this module
     deliberately does not, on the friction argument above: they are questions
@@ -192,9 +195,8 @@ def test_ingredients_is_a_non_empty_list(magic_bag):
     """An entry with no ingredients is just a title in a list.
 
     Helen's own minimum. The list is explicitly allowed to be INCOMPLETE — that
-    is the collection's whole premise and the layout says so on every page — but
-    "incomplete" and "absent" are different things, and only one of them is a
-    reminder of how the dish goes.
+    is the collection's whole premise — but "incomplete" and "absent" are
+    different things, and only one of them is a reminder of how the dish goes.
     """
     items = magic_bag.fm.get("ingredients")
     assert isinstance(items, list) and items, (

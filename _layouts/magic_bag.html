@@ -16,8 +16,12 @@ layout: default
    `.recipe-tagline`, `.recipe-section-heading` and `.ingredients` all render
    identically here, so a magic-bag page sits in the same visual family as
    everything else on the site rather than looking like a different website.
-   The ONE thing that marks it out is the caveat below, which is the one thing
-   that actually differs. {% endcomment %}
+
+   WHAT MARKS IT OUT IS WHAT IS ABSENT, which is the whole point: no method, no
+   metadata grid, no source line. `.recipe--magic-bag` exists for the one
+   spacing consequence of that (the badges have no metadata grid above them to
+   sit under -- see _sass/food/_recipe-header.scss) and for nothing else. It is
+   not a hook for making these pages look different on purpose. {% endcomment %}
 
 {% include back-to-index.html %}
 
@@ -47,26 +51,29 @@ layout: default
     {% include recipe_badges.html recipe=page %}
   </div>
 
-  {% comment %} THE STANDING CAVEAT, AND WHY IT IS HERE RATHER THAN IN THE
-     FRONT MATTER. Helen's ask, 2026-08-26: "I should dash off ingredients
-     lists, promising future Helen that they're not complete."
+  {% comment %} NO STANDING CAVEAT ON THE PAGE, AND THAT WAS A DECISION.
+     Removed 2026-08-26, the day it was built, at Helen's ask on seeing it:
+     "Delete the note at the top about the magic bag -- I am the user, and I
+     know exactly what is going on."
 
-     A promise you have to retype on every file is a promise you will skip on
-     the day you are in a hurry -- which is precisely the day you are dashing
-     one of these off. So the collection makes the promise instead, in the same
-     words every time, and there is no per-file field to forget. It sits ABOVE
-     the ingredients because its whole job is to set the expectation before the
-     list is read, not to apologise for it afterwards.
+     Worth recording because the reasoning for adding it was not wrong, it was
+     aimed at the wrong reader. Her original ask was to promise future Helen
+     that these lists are incomplete, and a caveat rendered on every page is a
+     good way to make a promise you cannot forget to type. But it explains the
+     collection to somebody who does not know what it is, and on this site that
+     person does not exist -- the README is explicit that it is not written for
+     anyone else. She knows a magic-bag page has no method because she knows
+     what the magic bag is; the collection's name is already carrying it.
 
-     If an entry ever genuinely IS complete, the fix is an opt-in
-     `ingredients_complete: true` and a second branch here. Not built: no entry
-     has wanted it yet, and the default has to stay "incomplete" regardless.
-  {% endcomment %}
-  <p class="magic-bag-caveat">
-    Out of the magic bag: I make this one from memory, so there is no method,
-    and the list below is whatever I remembered on the day. Assume it is
-    incomplete.
-  </p>
+     THE PROMISE ITSELF IS NOT GONE, it just is not written on the page. It is
+     in the schema: there is nowhere to put a method, and tests/test_magic_bag.py
+     actively rejects one. A list that CANNOT be completed here is a stronger
+     statement than a paragraph saying it might not be.
+
+     So do not reinstate this on the reasoning that the pages "should explain
+     themselves". If an entry ever genuinely IS complete and wants to say so,
+     that is an opt-in `ingredients_complete: true` -- a fact about one dish,
+     not a standing note about the collection. {% endcomment %}
 
   {% comment %} `.size > 0` rather than a bare truthiness test, for the reason
      _layouts/recipe.html gives at its own Ingredients heading: an empty array

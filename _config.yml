@@ -139,11 +139,16 @@ collections:
     # absolute, and the new shape gets rules that actually fit it, in
     # tests/test_magic_bag.py.
     #
-    # THE INCOMPLETENESS IS THE COLLECTION'S PROMISE, NOT A PER-FILE FIELD.
-    # _layouts/magic_bag.html states it on every page in the same words, so Helen
-    # never types the caveat and can never forget it. That is the whole reason
-    # the metaphor earns its place: a bag you pull things out of from memory
-    # obviously does not hand you everything.
+    # THE INCOMPLETENESS IS ENFORCED BY THE SCHEMA, NOT ANNOUNCED ON THE PAGE.
+    # There is nowhere in this shape to put a method and tests/test_magic_bag.py
+    # rejects one outright, so a magic-bag list is one that CANNOT be completed
+    # here -- a stronger statement than any paragraph saying it might not be.
+    #
+    # A standing caveat WAS rendered on every page for about an hour on
+    # 2026-08-26, and Helen had it removed the moment she saw it: "I am the
+    # user, and I know exactly what is going on." It explained the collection to
+    # a reader who does not exist on this site (see the README, which is blunt
+    # about who it is not for). The name is already carrying the meaning.
     output: true
     permalink: /food/magic-bag/:path/
   food_drafts:
