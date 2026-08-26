@@ -532,13 +532,13 @@ drinks:
       <label>card hover</label>
       <span class="dsn-cheats" id="dsn-hovers">
         <button type="button" class="dsn-btn dsn-btn--cheat" data-hover="none">none</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat is-on" data-hover="clear">panel clears</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat" data-hover="clear">panel clears</button>
         <button type="button" class="dsn-btn dsn-btn--cheat" data-hover="wash">faint wash</button>
-        <button type="button" class="dsn-btn dsn-btn--cheat" data-hover="mark">mark brightens</button>
+        <button type="button" class="dsn-btn dsn-btn--cheat is-on" data-hover="mark">mark brightens</button>
       </span>
     </div>
 
-    <ul class="dsn-cards dsn-cards--wash dsn-cards--frame-panelunder dsn-cards--hover-clear" id="dsn-cards-a" style="--dsn-glass-scale: 13rem;">
+    <ul class="dsn-cards dsn-cards--wash dsn-cards--frame-panelunder dsn-cards--hover-mark" id="dsn-cards-a" style="--dsn-glass-scale: 13rem;">
       {% for drink in page.drinks %}
         {% comment %} The card carries the RATIO, not a finished height, so one
            slider can rescale all eight without the template being rebuilt —
@@ -983,6 +983,11 @@ drinks:
 .dsn-cards--hover-mark .dsn-card:hover {
   --dsn-underline: var(--dsn-absinthe);
   --dsn-frame-lc: var(--dsn-absinthe);
+  /* The panel's TOP edge joins in — Helen, 2026-08-26. With the under mark
+     already there, lighting the top as well brackets the glass column top and
+     bottom, so the hover reads as "this panel" rather than as a line that
+     happened to get brighter. */
+  --dsn-panel-top: var(--dsn-absinthe);
 }
 
 /* The edge as a painted strip, for the variants a border cannot express. */
@@ -1152,6 +1157,21 @@ drinks:
      them white would mean each glass carrying a second, closed body path
      drawn behind its strokes: real artwork, on 25 files. */
   background: var(--dsn-panel-bg, transparent);
+}
+/* The panel's top edge, as a painted strip rather than a border: a border-top
+   would eat 3px of the column's fixed height and nudge the glass down on
+   hover, and the one rule this hover has is that nothing moves. Offset -1px on
+   two sides so it lands ON the card's border, mirroring the under mark
+   exactly. */
+.dsn-card-glass::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  width: var(--dsn-text-x);
+  height: 3px;
+  background: var(--dsn-panel-top, transparent);
+  transition: background 0.12s ease;
 }
 .dsn-card-glass svg {
   display: block;
