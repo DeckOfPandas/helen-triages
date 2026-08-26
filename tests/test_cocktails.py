@@ -393,6 +393,55 @@ def test_glass_is_a_list():
     )
 
 
+def test_garnish_is_a_list():
+    """Same reasoning as `glass` and `mood`: a bare string iterates in Liquid as
+    its own characters, which renders as nothing visible rather than as an
+    error. Cobra's Fang is why `garnish` is a list at all -- a mint sprig AND a
+    lime wheel -- and a leftover scalar would go unnoticed.
+    """
+    bad = [f"{slug}: garnish is a {type(fm['garnish']).__name__}"
+           for slug, fm in _load()
+           if "garnish" in fm and not isinstance(fm["garnish"], list)]
+    assert not bad, "garnish must be a list:\n  " + "\n  ".join(bad)
+
+
+def test_no_garnish_is_stated_as_none_and_nothing_else():
+    """`["none"]` means DECIDED: this drink takes no garnish. `[]` means nobody
+    has filled it in. Helen settled that convention on 2026-08-26, and the
+    collection already followed it -- 15 drinks say `none` (the Sazerac among
+    them, deliberately, from its own source row) against 18 genuinely empty.
+
+    HANDOVER §9.5 SAYS THE OPPOSITE, claiming both cases are "currently
+    flattened to []" and listing the choice as an open question. That was true
+    once and has not been for some time; the file it describes is the authority,
+    per §11.2. This test is what stops the two conventions drifting apart again.
+
+    WHAT IT ACTUALLY GUARDS is the risk §9.5 correctly identified: that `none`
+    "would pollute any future garnish vocabulary with a fake member". It cannot
+    now, because it may only ever appear ALONE. A drink with `["none", "lime
+    wheel"]` is a contradiction, and a drink with `["None"]` is a second
+    spelling that any future vocabulary would have to carry twice.
+    """
+    bad = []
+    for slug, fm in _load():
+        garnish = fm.get("garnish")
+        if not isinstance(garnish, list):
+            continue          # test_garnish_is_a_list owns that failure
+        lowered = [str(g).strip().lower() for g in garnish]
+        if "none" not in lowered:
+            continue
+        if len(garnish) > 1:
+            bad.append(f"{slug}: {garnish!r} -- `none` alongside a real garnish")
+        elif garnish[0] != "none":
+            bad.append(f"{slug}: {garnish[0]!r} -- must be exactly \"none\"")
+    assert not bad, (
+        "Garnish problems:\n  " + "\n  ".join(bad)
+        + "\n\n`none` states a DECISION and must stand alone, lowercase. Use "
+          "`[]` for a garnish nobody has chosen yet -- absent is not the same "
+          "as deliberately nothing."
+    )
+
+
 def _glasses():
     return yaml.safe_load(
         (ROOT / "_data" / "cocktails" / "glasses.yml").read_text(encoding="utf-8")

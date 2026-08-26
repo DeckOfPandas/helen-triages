@@ -365,6 +365,12 @@ honeys:
 sugars:
   - "white sugar"
   - "raw sugar"
+  # Added 2026-08-26. The Pear/Apricot Bellini was typed `molasses sugar`,
+  # which is nearly muscovado -- a long way from a light unrefined caster, and
+  # it would have coloured a pale fruit syrup wrong. Helen's call was its own
+  # generic rather than folding it into `raw sugar`, which is consistent with
+  # this list's stated willingness to mix form with type.
+  - "golden caster sugar"
   - "molasses sugar"
   - "palm sugar"
   - "sugar cube"

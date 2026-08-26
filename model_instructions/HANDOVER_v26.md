@@ -1669,12 +1669,24 @@ alone. See the note there.
 
 ### 9.5 Open, and worth deciding out loud
 
-- **`garnish: []` versus stating "none".** The Sazerac's CSV row says `None`
-  deliberately, and that is information — "no garnish" is a decision, blank
-  is an unfilled field, exactly the distinction food's `cook_time: "None"`
-  preserves. Currently flattened to `[]`, which loses it. Putting `"none"`
-  in the list instead would pollute any future garnish vocabulary with a
-  fake member.
+- ~~**`garnish: []` versus stating "none".**~~ **SETTLED 2026-08-26, and this
+  paragraph was WRONG about the data before it was settled.** It claimed a
+  deliberate "None" was "currently flattened to `[]`, which loses it". It is
+  not and was not: **15 drinks carry `garnish: ["none"]`**, the Sazerac among
+  them, against 18 that are genuinely empty. Both conventions were live and
+  this section — the one place a reader would check — said only one was.
+  Another worked example of §11.2, found the same way as the last one: by
+  looking at the files rather than at this document.
+
+  Helen's call, asked with the count in front of her, is the convention the
+  data already used: **`["none"]` means DECIDED, `[]` means unfilled.** Same
+  distinction food's `cook_time: "None"` preserves.
+
+  The risk this paragraph correctly identified — that `none` "would pollute
+  any future garnish vocabulary with a fake member" — is now closed by
+  `test_no_garnish_is_stated_as_none_and_nothing_else`, which allows `none`
+  only ALONE and only lowercase. It cannot become one member of a list beside
+  a real garnish, and it cannot acquire a second spelling.
 - ~~**`meta.status` and `meta.ship` have no vocabulary.**~~ **OUT OF DATE,
   2026-08-23.** `meta.status` is retired entirely — Helen: "I am perfectly
   well aware of how much work I have done on each drink... it's easy to keep
