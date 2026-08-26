@@ -88,10 +88,18 @@ $rule-ingredient: 46%;
   gap: $space-xl;
 }
 
+// FILLS THE REMAINING WIDTH, and this is what put the toggle in the wrong
+// place. A flex child defaults to `flex: 0 1 auto`, so this column was sized to
+// its content — which meant `justify-content: space-between` in the title row
+// pushed the button to the right edge of the TEXT, not of the page, and it
+// floated in the middle of the article with the menthe rule running on past it.
+// `flex: 1` makes the column reach the container's right edge, which is where
+// food's `print` sits and where the rule ends.
 .cocktail-head-words {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  flex: 1;
   min-width: 0;
 }
 
@@ -107,14 +115,25 @@ $rule-ingredient: 46%;
 // family resemblance between them (see _palette.scss), so a title set at a
 // different size on each site was the one place that resemblance broke.
 //
-// The 70% is what leaves room for the toggle on the same line, and food's own
-// note explains `balance`: it keeps whatever lines a title wraps to a similar
-// length, so no line ends up carrying a stub.
+// THE WIDTHS ARE DERIVED FROM $width-content, NOT PERCENTAGES, and that is the
+// fix rather than a preference. Food's 70% and 60% are percentages of the
+// 900px recipe column. Copying the percentages copied the wrong thing: here
+// they resolved against the WORDS column, which the glass has already taken a
+// bite out of, so the title wrapped after two words and the tagline was
+// narrower still. Same numbers, a fraction of a smaller box.
+//
+// 70% and 60% OF $width-content give food's actual measures — 630px and 540px
+// — whatever the glass does to the column beside them. Where the glass leaves
+// less room than that, the max-width simply stops applying and the column
+// governs, which is the correct fallback.
+//
+// `balance` is food's, and its note explains it: it keeps the lines a title
+// wraps to a similar length, so none ends up carrying a stub.
 .cocktail-title {
   font-size: 2.2rem;
   line-height: 1.1;
   letter-spacing: 0.04em;
-  max-width: 70%;
+  max-width: $width-content * 0.7;
   text-wrap: balance;
   margin: 0 0 $space-sm;
   @include punched(raised, var(--emboss-offset-lg));
@@ -134,7 +153,7 @@ $rule-ingredient: 46%;
   line-height: 1.5;
   color: $color-clear-text;
   margin: 0 0 $space-md;
-  max-width: 60%;
+  max-width: $width-content * 0.6;
 }
 
 .cocktail-meta {
