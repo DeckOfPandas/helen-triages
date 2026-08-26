@@ -1,55 +1,120 @@
 // =============================================================================
-// HELEN TRIAGES COCKTAILS — PALETTE. PLACEHOLDER VALUES, REAL STRUCTURE.
+// HELEN TRIAGES COCKTAILS — PALETTE. Argued from real drinks, 2026-08-26.
 // =============================================================================
-// Cocktails is a separate visual language from food, not a reskin. Nothing here
-// is a design decision yet — these are NEUTRALS, chosen so the scaffold renders
-// legibly and obviously unfinished rather than quietly borrowing food's look.
+// This file was placeholder neutrals for three weeks, with its own instruction:
+// "When the real palette arrives, replace the values. Do not remove the names."
+// That is what this is. The ten contract names are unchanged; every value is a
+// decision, and the decisions were made by looking at cards on
+// /dev/cocktails-design/ rather than at swatches.
 //
-// The ten variables below are the contract every site palette owes the shared
-// partials (_sass/shared/_base.scss, _layout.scss and _footer.scss). Leaving one
-// out is a Sass compile error whose message points at the shared file rather
-// than at this one, so tests/test_site_config.py checks for them by name.
+// INK, PAPER AND GLASS. Helen's phrase and the whole idea: a light, nearly
+// monochrome ground where the 25 glass drawings carry the personality that
+// food gets from colour. Food leads with ten saturated brights; this site
+// leads with line work and spends colour sparingly on top of it.
 //
-// When the real palette arrives, replace the values. Do not remove the names.
+// THREE ACCENTS, AND THE COUNT WENT UP KNOWINGLY. It was "near-monochrome, one
+// accent" on the morning of 2026-08-26 and three by that evening. Helen, naming
+// the reversal rather than letting it drift: "I'm breaking rules, but I'd like
+// more of the second colour... because it's pretty. I'm interested in adding a
+// third too. I know this is going against what I said earlier, but I had no
+// vision then and we're getting closer now."
+//
+// Recorded because food's palette argues the opposite at length -- its recipe
+// page spends four colours and "the count IS the design". The two sites are
+// allowed to disagree; they are not allowed to disagree by accident. What
+// survives here is not the count but the rule underneath it: every colour has
+// a job, and the jobs are different AXES.
+//
+//     menthe   MOOD        the mood filters, and the glass wash on a card
+//     amber    GOODNESS    the ship mark, the chaos buttons, and the
+//                          structural rules and counts
+//     violet   ASKED FOR   the has-to-have field, its chips, the matching
+//                          ingredient on a card, and a method step's numeral
+//
+// A drink can match your mood, be rated `meh`, and contain something you asked
+// for. Three facts, three colours, and no two of them ever mean the same kind
+// of thing. Violet spent one revision on LEAVE OUT and came straight off it --
+// Helen: "suddenly busy, and jarring" -- because exclusion is RARE and its
+// control is LARGE, so the least-used thing below the fold became the loudest.
+// Colour weight tracks how much of the page something occupies, not how
+// semantically distinct it is. Exclusion is struck-through and dashed, and
+// costs nothing.
+//
+// EVERY PAIR IS TWO TONES, SOLVED, NOT ONE VALUE DARKENED BY A SHARED STEP.
+// At the saturation that makes a good fill, none of these is readable as small
+// text on paper. So each accent is a FILL (~2.30:1, never text) and a TEXT tone
+// (~4.75:1, clearing the 4.5:1 body floor), and the lightness that hits those
+// numbers is a property of the HUE: menthe and amber are far apart in lightness
+// at identical measured contrast. Food learned the same thing the hard way and
+// carries $darken-active-lime because one shared darkening step did not hold
+// across two yellow-greens. Here there is no shared step at all.
+//
+// THE HUES WERE CHOSEN BY COLOUR-BLIND SEPARATION, NOT ONLY BY TASTE. Helen
+// rejected campari red and bitter orange as "too red-green and inaccessible",
+// and simulation agrees exactly: against menthe, campari falls to 24.5 dE under
+// protanopia while reading 101 apart to normal vision -- the failure mode where
+// a palette looks fine to whoever picked it. Menthe/amber never drops below 31
+// across protanopia, deuteranopia and tritanopia. Violet beat slate blue, ink
+// teal and aubergine as the only third staying clear of BOTH under all three;
+// the others collapse against menthe under tritanopia (slate blue 5.6, ink teal
+// 6.3) or against amber (aubergine 12.9).
+//
+// IF A FOURTH ACCENT IS EVER PROPOSED, that is the point to stop and ask what
+// AXIS it names, and then to run the separation check before choosing its hue.
 // =============================================================================
 
 // --- Raw palette -------------------------------------------------------------
-// Deliberately monochrome. Food's palette leads with ten saturated brights; the
-// cocktails equivalent should be argued from real drinks, the way food's was.
 $color-ink:          #1b1b1f;
 $color-paper:        #fbfbfa;
 $color-grey-mid:     #6b6b70;
 $color-grey-light:   #e4e4e6;
 
-// --- The ten shared partials require -----------------------------------------
+// MOOD. Crème de menthe.
+$color-menthe:       #51BB86;   // fill    2.30:1 on paper — never text
+$color-menthe-deep:  #317E58;   // text    4.75:1 on paper
+
+// GOODNESS. Aged amber.
+$color-amber:        #DD9C2C;   // fill    2.30:1
+$color-amber-deep:   #966818;   // text    4.73:1
+
+// ASKED FOR. Deep violet.
+$color-violet:       #B29AD4;   // fill    2.39:1
+$color-violet-deep:  #845EBA;   // text    4.74:1
+
+// --- The ten the shared partials require -------------------------------------
 $color-bg:         $color-paper;
 $color-text:       $color-ink;
 $color-border:     $color-grey-light;
 $color-surface:    #ffffff;
 $color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
 $color-white:      #ffffff;           // the wordmark sitting on its tape
-$color-mood-root:  $color-grey-mid;   // link hover; food uses its mood colour
 
-// The shared chrome's one accent -- the footer's link hovers and the hearts
-// (_sass/shared/_footer.scss). Added with the rest of the contract in issue
-// #374, 2026-08-19.
+// The shared chrome reads this for link hovers and section colouring. Menthe,
+// because on this site the interactive/branded colour is the one that means
+// "this matches what you asked for", and a nav link is that.
+$color-mood-root:  $color-menthe-deep;
+
+// THE PLACEHOLDER THIS REPLACES WAS THE WEAKEST LINE IN THE FILE, and it said
+// so itself: $color-accent was $color-grey-mid, and the comment recorded that
+// grey-mid on grey-mid "is the lightness-only change HANDOVER 12 records as
+// reading like nothing at all at footer size". Helen, 2026-08-19, asked
+// directly: "Cocktail styling is almost totally unstarted, so this doesn't
+// matter." It matters now. Amber against the footer's grey is a hue change,
+// not a lightness one, and the footer starts working on this site the moment
+// this line lands.
+$color-accent:     $color-amber-deep;
+
+// --- Typography --------------------------------------------------------------
+// UNCHANGED FROM THE SCAFFOLD, AND THAT IS THE DECISION RATHER THAN THE ABSENCE
+// OF ONE. The scaffold's own note said the typographic voice is the family
+// resemblance between the two sites while colour and decoration are what
+// separate them, and asked that any change here be made as a decision rather
+// than by drift. Cocktails now has a drawing language food does not have, which
+// is separation enough without a second typeface.
 //
-// KNOWN PLACEHOLDER, AND KNOWN TO BE A WEAK ONE. This palette is deliberately
-// all neutrals until cocktails is argued from real drinks, so there is no
-// accent hue to give it, and grey-mid on grey-mid text is the lightness-only
-// change HANDOVER 12 records as reading like nothing at all at footer size.
-// Helen, 2026-08-19, asked directly: "Cocktail styling is almost totally
-// unstarted, so this doesn't matter." Recorded rather than papered over -- when
-// cocktails gets a hue, this is the line that wants it, and the footer starts
-// working on this site the moment it does.
-$color-accent:     $color-grey-mid;
-
+// No $font-label. On food that face earned two jobs by surviving four returns
+// (see food/_palette.scss for the list); borrowing the survivor of someone
+// else's argument is not the same as having made one. The one thing on a drink
+// page set in mono for a reason is the AMOUNT, and it uses $font-headings.
 $font-headings: "Courier Prime", "Courier New", "Courier", monospace;
 $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;
-
-// NOTE ON THE TWO FONT STACKS
-// These match food's exactly, and that is the one borrowing done on purpose:
-// the typographic voice is the family resemblance between the two sites, while
-// colour and decoration are what separate them. If cocktails should not sound
-// like food either, this is the place to change it — but change it as a
-// decision, not by drift.
