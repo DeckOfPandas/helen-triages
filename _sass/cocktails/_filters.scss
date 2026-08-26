@@ -1,0 +1,195 @@
+// =============================================================================
+// COCKTAILS INDEX — THE CONTROLS. Settled with Helen, 2026-08-26.
+// =============================================================================
+// Mood and chaos above the fold, ingredient include then exclude below. Her
+// words, and the order is the design: the first question is what you feel like,
+// and what you have in the cupboard is a constraint you apply afterwards.
+//
+// THERE IS NO GLASS FILTER AND THERE MUST NOT BE ONE. The glass drawings are
+// this site's identity, not an axis to browse by. That sits alongside
+// taxonomy.yml's existing and much stronger ruling that there is no SPIRIT
+// filter either -- Helen: "I get really bored of cocktail bars that have
+// enormous bible-like menus sorted by spirit... I probably think browsing by
+// spirit is basic."
+//
+// STRAIGHT EDGES THROUGHOUT. No border-radius anywhere in this file. The pill
+// buttons this replaces came from the twenty-minute goodness scaffold and were
+// its habit rather than a decision anyone made.
+// =============================================================================
+
+.drink-filters { margin: 0 0 $spacing-section-gap; }
+
+// The section labels: MOOD, CHAOS, HAS TO HAVE, LEAVE OUT.
+.drink-field-label {
+  display: block;
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+  color: $color-clear-text;
+  margin: 0 0 $space-md;
+}
+
+.drink-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm;
+}
+
+// --- the buttons -------------------------------------------------------------
+// The mood buttons carry Helen's own words -- "no juicing", "I want to faff" --
+// so they are set in the BODY font, not the heading mono. The goodness
+// scaffold worked this out first and the reasoning holds: her phrasing in
+// monospace small-caps reads as a system state, which is the opposite of what
+// it is.
+%drink-btn-base {
+  font-family: $font-body;
+  font-size: 0.85rem;
+  padding: $space-xs $space-md;
+  border: 1.5px solid $color-border;
+  background: $color-surface;
+  color: $color-text;
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.btn-mood {
+  @extend %drink-btn-base;
+  font-size: 0.92rem;
+  padding: 0.42rem 0.95rem;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $color-menthe-deep;
+    color: $color-menthe-deep;
+  }
+
+  // A fill, not a border change: with ten of these in a row a 1px border
+  // difference is not findable at a glance. Same conclusion the goodness
+  // scaffold reached about its own buttons.
+  &.is-on {
+    background: $color-menthe;
+    border-color: $color-menthe-deep;
+    color: darken($color-menthe-deep, 22%);
+    font-weight: 600;
+  }
+}
+
+// Chaos is a goodness question, so it wears goodness's colour -- the same
+// amber as the mark on every card.
+.btn-chaos {
+  @extend %drink-btn-base;
+  font-family: $font-headings;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $color-amber-deep;
+    color: $color-amber-deep;
+  }
+
+  &.is-on {
+    background: $color-amber;
+    border-color: $color-amber-deep;
+    color: darken($color-amber-deep, 22%);
+    font-weight: 600;
+  }
+}
+
+// --- the two ingredient fields -----------------------------------------------
+.drink-searches {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-block-gap;
+  margin-top: $spacing-block-gap;
+  padding-top: $spacing-block-gap;
+  border-top: 1px solid $color-border;
+}
+
+.drink-search-input {
+  font-family: $font-body;
+  font-size: 0.9rem;
+  width: 100%;
+  padding: $space-xs 0.1rem;
+  border: none;
+  border-bottom: 1.5px solid $color-violet;
+  background: transparent;
+  margin-bottom: $space-md;
+
+  &:focus {
+    outline: none;
+    border-bottom-color: $color-violet-deep;
+  }
+}
+
+.drink-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xs;
+}
+
+.btn-pool {
+  @extend %drink-btn-base;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.65rem;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $color-violet-deep;
+    color: $color-violet-deep;
+  }
+
+  &.is-on {
+    background: $color-violet;
+    border-color: $color-violet-deep;
+    color: darken($color-violet-deep, 25%);
+    font-weight: 600;
+  }
+}
+
+// LEAVE OUT IS DELIBERATELY COLOURLESS. Violet lived here for one revision and
+// came off: exclusion is a genuinely distinct axis, but it is RARE and its
+// control is LARGE, so the least-used thing below the fold became the loudest
+// on the page. Helen: "suddenly busy, and jarring." Struck-through and dashed
+// says "not this" for free.
+.drink-search--exclude {
+  .drink-field-label { color: $color-clear-text; }
+  .drink-search-input { border-bottom-style: dashed; border-bottom-color: $color-border; }
+
+  .btn-pool {
+    text-decoration: line-through;
+    color: $color-clear-text;
+    border-style: dashed;
+
+    &:hover,
+    &:focus-visible { color: $color-text; border-color: $color-text; }
+    &.is-on { background: transparent; border-color: $color-text; color: $color-text; font-weight: 600; }
+  }
+}
+
+// --- the count ---------------------------------------------------------------
+.drink-count {
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  letter-spacing: $letter-spacing-label;
+  text-transform: uppercase;
+  color: $color-clear-text;
+  margin: $spacing-block-gap 0 $space-xl;
+  padding-top: $space-md;
+  border-top: 2px solid $color-amber;
+
+  strong { color: $color-text; font-size: 1rem; }
+}
+
+.drink-none {
+  font-family: $font-body;
+  color: $color-clear-text;
+  margin: $spacing-section-gap 0;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .drink-searches { grid-template-columns: 1fr; gap: $space-xl; }
+}

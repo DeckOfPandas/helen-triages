@@ -1752,6 +1752,19 @@ generator, §13.8 for the sizing mechanism, and the note at the top of
 
 ### 9.9 The index browses by goodness, and `meta.ship` IS the rating
 
+> **SUPERSEDED AS A DESCRIPTION OF THE INDEX, 2026-08-26 — see §9.12.** The
+> goodness-only filter described below was a twenty-minute build with friends
+> arriving, and it has been replaced by a designed index: mood and chaos above
+> the fold, ingredient include then exclude below, cards rather than a list.
+> `_sass/cocktails/_goodness.scss` is deleted.
+>
+> **Everything below about the VOCABULARY still holds and is why the new index
+> was cheap.** `meta.ship` is still the rating, `ship_scale` is still its
+> order, and the lesson in the stale-ordering-list paragraph is now enforced
+> rather than remembered: the new index derives chaos buckets and the goodness
+> tint from `_data/cocktails/taxonomy.yml` instead of hardcoding a value list
+> in the template, which is exactly the failure that paragraph describes.
+
 2026-08-23. Helen asked for "filter buttons on the front page to show me a list
 of recipes by goodness, e.g. 'oh gods yes'." The field already existed. `meta.ship`
 is not a yes/no publish flag despite the name — it holds her own verdict, in her
@@ -1827,8 +1840,14 @@ both shapes with no type-detection anywhere in the template.
 a bare style name. Several families already bake their spirit into the
 string ("blanco tequila") and others don't ("bourbon" needs no suffix,
 "London dry" does) — auditing all of that is real, separate work, not a
-template one-liner. No colour decision either — the placeholder monochrome
-palette is untouched, unargued on purpose (§9.3.1).
+template one-liner.
+
+~~No colour decision either — the placeholder monochrome palette is untouched,
+unargued on purpose.~~ **Superseded 2026-08-26**: the palette is argued and
+real, and this line is the ingredient list's own restyle waiting to happen —
+see §9.12. The amount now sets in the heading face in a fixed column, the class
+line and note hang past it, and `character` drops a step quieter than the class
+line it sits inside.
 
 ### 9.11 Glass icons — real relative height, and a UA-stylesheet trap
 
@@ -1836,8 +1855,14 @@ palette is untouched, unargued on purpose (§9.3.1).
 (#298).** `_layouts/cocktail.html` computes `--glass-icon-height` per drink
 from `_data/cocktails/glasses.yml`'s `heights_mm` against the tallest real
 glass (counted live every render, not hardcoded), and
-`_sass/cocktails/_cocktail.scss` consumes it with 2.6rem as the fallback for
-a glass with no entry. `_dev/glasses.html`'s section 2 proved the calculation
+`_sass/cocktails/_cocktail.scss` consumes it with a fallback for a glass with
+no entry. **The scale was 2.6rem and is 10.4rem since 2026-08-26**, when the
+glass stopped being an icon beside a title and became the drink page's hero;
+the width cap moved with it in the same proportion (3.2 : 2.6 became 12.8 :
+10.4) rather than being re-guessed, since its job — stopping a punch bowl
+shouldering the title along — is unchanged. The CARD uses the same calculation
+at its own scale, plus `display_scale` (§9.12); a drink page deliberately does
+not apply `display_scale`. `_dev/glasses.html`'s section 2 proved the calculation
 out before it reached the real page; section 1 is now the honest "as the
 site actually shows it" view, height AND the real 3.2rem width cap together
 — it was quietly stale for a day, still claiming "every icon is the same
@@ -1919,6 +1944,319 @@ still exactly as parked as the paragraph above says. Worth noting because
 goblet was one of the two examples that paragraph names — if a proportion
 complaint about goblet specifically resurfaces, check whether this redraw
 already addressed it before assuming #299 needs unparking.
+
+---
+
+### 9.12 The cocktails visual language, and the index and drink page built from it
+
+**2026-08-26, one sitting with Helen against a mockup.** Everything in this
+section was decided by her LOOKING at candidates on a dev page, not by
+argument. That page (`_dev/cocktails-design.html`) is deleted; it held eleven
+card framings, four hovers, six greens, five second accents and three thirds,
+and exactly one of each won. Deleting it was deliberate — a page of rejected
+candidates that nothing renders is issue #276's trap exactly: it looks like
+evidence, goes stale silently, and the next reader cannot tell which of the
+eleven shipped. Recover it from git if you need the losers.
+
+**"Ink, paper and glass."** Helen's phrase and the whole idea: a light,
+near-monochrome ground where the glass drawings carry the personality food gets
+from colour. Food leads with ten saturated brights; this site leads with line
+work and spends colour sparingly on top of it.
+
+#### The three accents, and why the count went up
+
+It was "near-monochrome, ONE accent" in the morning and three by the evening.
+Helen named the reversal herself rather than letting it drift: *"I'm breaking
+rules, but I'd like more of the second colour… because it's pretty. I'm
+interested in adding a third too. I know this is going against what I said
+earlier, but I had no vision then and we're getting closer now."*
+
+Worth recording because food's palette argues the opposite at length — its
+recipe page spends four colours and "the count IS the design" (§13). The two
+sites are allowed to disagree; they are not allowed to disagree by accident.
+**What survives is not the count but the rule underneath it: every colour has a
+job, and the jobs are different AXES.**
+
+| | | |
+|---|---|---|
+| menthe `#51BB86` / `#317E58` | MOOD | mood filters, the glass wash on a card |
+| amber `#DD9C2C` / `#966818` | GOODNESS | the ship mark, chaos buttons, structural rules and counts |
+| violet `#B29AD4` / `#845EBA` | ASKED FOR | has-to-have field and chips, the matching ingredient on a card, method numerals |
+
+A drink can match your mood, be rated `meh`, and contain something you asked
+for. Three facts, three colours, none meaning the same kind of thing.
+
+**Violet spent one revision on LEAVE OUT and came straight off it.** Helen:
+"suddenly busy, and jarring". Exclusion IS a distinct axis and food spent a
+whole hue on it (electric cobalt) — but exclusion is RARE and its control is
+LARGE, so the least-used thing below the fold became the loudest on the page.
+**Colour weight tracks how much of the page something occupies, not how
+semantically distinct it is.** Exclusion is struck-through and dashed, and
+costs nothing. This is the most transferable thing in this section.
+
+**Every pair is solved, not darkened by a shared step.** Fill ≈2.30:1 on paper
+(never text), text ≈4.75:1 (clears the body floor). The lightness that hits
+those numbers is a property of the HUE — menthe and amber are far apart in
+lightness at identical measured contrast. Food carries `$darken-active-lime`
+because one shared step did not hold across two yellow-greens; here there is no
+shared step at all.
+
+**The hues were chosen by colour-blind separation, not only taste.** Helen
+rejected campari red and bitter orange as "too red-green and inaccessible", and
+simulation agreed exactly: against menthe, campari falls to **24.5 dE under
+protanopia** while reading 101 apart to normal vision — the failure mode where
+a palette looks fine to whoever picked it. Menthe/amber never drops below 31
+across protanopia, deuteranopia and tritanopia. Violet beat slate blue, ink
+teal and aubergine as the only third staying clear of BOTH under all three; the
+others collapse against menthe under tritanopia (slate blue 5.6, ink teal 6.3)
+or against amber (aubergine 12.9). **If a fourth accent is ever proposed: name
+its axis first, then run the separation check before choosing a hue.**
+
+#### The index — `cocktails/index.html`, `_filters.scss`, `assets/js/cocktail-index.js`
+
+Mood and chaos above the fold, ingredient include then exclude below. The order
+is the design: the first question is what you feel like; what is in the cupboard
+is a constraint you apply afterwards.
+
+**There is NO GLASS FILTER and there must not be one.** The drawings are the
+site's identity, not an axis. This sits alongside taxonomy.yml's older and
+stronger ruling that there is no SPIRIT filter either.
+
+**It reads DRAFTS**, on Helen's explicit call: *"for food, we build drafts
+locally only, so let's do the same."* The `site.show_drafts` gate and its reason
+are unchanged from the page it replaced — see §9.9 and issue #235.
+
+**A mood with no drinks renders no button**, counted rather than listed as an
+exception, so the rule holds for whichever mood is empty next. Today that is
+`pudding in a glass`; ten of the eleven render.
+
+**Filtering reads data- attributes, never rendered text.** Moods, chaos bucket
+and a pre-lowercased ingredient string are all written at build time. A filter
+that reads `textContent` breaks the first time somebody restyles a card.
+
+**How the axes combine is a decision, not a default** (issue #478, and the line
+to change is marked in the script): **OR within a section, AND between
+sections.** Two moods means "either", because AND across moods is nearly always
+empty — `tiki` AND `no juicing` is a handful of drinks. Include chips are AND,
+because adding an ingredient means "and this one too", which is how a cupboard
+works.
+
+#### The card — `_cards.scss`
+
+Horizontal: the glass drawn large and pale down a fixed left column, words
+beside it. Chosen over a vertical card and over a typographic tile because it is
+the only one with room for a full ingredient line, which the index needs — you
+can search by ingredient, so a card must be able to show why it matched.
+
+**Every anchor is fixed, and that is the design rather than a side effect.**
+Helen: the title starts in the same place on every card, and the goodness mark
+sits in the bottom-right corner in exactly the same spot every time. That rules
+out the obvious layout twice: a card whose height comes from its content puts
+the foot somewhere different on every card, and a vertically-centred text block
+moves the title. So: fixed height, body anchored top-left, foot pinned to the
+bottom and out of flow.
+
+**The cost is clamping and it is not avoidable.** Two lines each for tagline and
+ingredients, two rows of mood chip. A rigid grid buys its rigidity with
+clamping; the alternatives are a card whose height varies with mood count
+(unpinning every anchor) or no moods on cards. Helen named the trade first:
+"it's a shame to lose the card proportion but I can't think of another way."
+
+`$card-text-x` is the single source of the title's left edge — the glass column
+is exactly that wide, and the body, the foot and the under-mark all derive from
+it. One value moves four things together and they cannot drift apart.
+
+**The framing and the hover took eleven and four candidates respectively.** What
+won: a tinted glass column with a softened menthe rule along its bottom edge, no
+vertical rule (eight of those down a page is a lot of signal for decoration);
+and on hover, that rule plus the panel's top edge going to full strength, so the
+column is bracketed. **Both hover marks are painted strips, not borders** — a
+border would eat into the column's fixed height and nudge the glass, and the one
+rule the hover has is that nothing moves.
+
+**Helen asked for "a very subtle lightening of the white part of the background"
+and that is not available**: a card is `$color-surface` on `$color-paper`, so
+its white is already the brightest thing on screen with nowhere lighter to go.
+Worth knowing before promising it on any light-ground design.
+
+#### The goodness mark
+
+A small square, tinted along `ship_tints` in `_data/cocktails/taxonomy.yml`.
+**Not a linear ramp and it must not be made into one**: `yes` and `oh gods yes`
+are both 100 because both mean "make this" — the difference is enthusiasm, not
+decision — and the whole range is spent on the gap that matters. `sure` and
+`meh` were 62 and 30 for one afternoon; at 62 a `sure` was mistakable for a
+`yes` at a glance, which is the one thing a scale exists to prevent.
+
+**The border never changes at any rung.** An empty square reads as "rated, and
+rated low"; a square that faded out entirely would read as "not rated", which is
+a different fact the scale already holds separately as `who knows`.
+
+**It sits AFTER the label, not before.** Before it, the square's x position
+depended on the length of the rating word, so the one mark meant to be findable
+without reading moved from card to card.
+
+#### `display_scale` — the per-glass cheat, in `glasses.yml`
+
+A multiplier on true relative height when a glass is drawn ON A CARD. Absent
+means 1. Collins 0.82, hurricane 0.74. True relative height is correct
+information and, past a point, a bad drawing: a 180mm Collins beside an 85mm
+old-fashioned is accurate and reads as a stripe.
+
+A multiplier rather than padding — padding moves a baseline while leaving the
+glass as tall as it was, and the size is what is wrong. Data rather than CSS
+because each value is a judgement about ONE drawing, and this file already holds
+the other per-glass judgement. **Try the global curve first if a third glass
+ever wants a line here**: the card template raises every ratio to a power, so
+compressing the whole range is one number.
+
+#### The drink page — two states, one page
+
+Editorial by default; a `make it` toggle strips to a bar-side spec — no tagline,
+class lines, characters or notes; bigger amounts and method; small glass. The
+same browsing-versus-cooking split food draws with its short-method toggle.
+
+**Nothing leaves the DOM.** One class, and the stylesheet hides what the state
+does not want, so the page prints whole and reads whole with the script blocked
+— **in the editorial state, deliberately the one carrying more.**
+
+Three colours doing three levels so the hierarchy reads without reading a word:
+menthe under the title, violet under the section headings and on the method
+numerals, amber on the note bar and its label.
+
+**Section headings are 1.35rem and the size is load-bearing, not loud.**
+`$emboss-stroke` is 1.6% of font-size, so at the 0.76rem they nearly were, the
+punched effect resolves to about a fifth of a pixel. **The effect needs the size
+before it means anything** — worth knowing anywhere the punched treatment is
+applied to small type.
+
+**Known compromise, issue #485:** the glass heights in both states are
+hand-tuned numbers. What is wanted is the glass matching the text column beside
+it; the CSS-only version is circular (the row's height comes from its tallest
+item, the glass is one of those items, and a percentage height against an
+indefinite height falls back to auto) and the fix is to take the glass out of
+flow, as the cards already do.
+
+#### A technique worth keeping: tracing a filled icon into strokes
+
+The tiki mug had no lines in it. Its source is fill-only stock artwork — one
+rule, `.a{fill:#231f20;}` — so publishing it with `glass-icon-line` stroked the
+OUTLINE of the ink and drew a hollow double line. Filling it instead rendered
+correctly but left no stroke width to control: it read ~2.8× heavier than every
+glass beside it and got heavier as it grew, while theirs stayed put.
+
+Helen searched and found no stroked tiki mug SVG anywhere. **Three hand-redraws
+missed**, and the problem was method, not care — eyeballing a thirty-stroke
+drawing reproduces what you notice and normalises what you do not. What worked:
+rasterise the original FILLED, thin it to a one-pixel skeleton (Zhang-Suen),
+walk that into strokes, simplify, emit. 103,817 ink pixels → 7,073 skeleton
+pixels → 46 strokes. An overlay check (original in grey, traced lines in black)
+showed essentially no grey.
+
+**This is valid whenever the artwork is UNIFORM WIDTH** — every cap in that file
+is a 0.85 radius arc, so the ink is 1.7 units throughout, and the medial axis of
+a constant-width stroke is its centreline. It would not be valid on artwork with
+varying weight.
+
+Two traps if it is ever rebuilt. There is no rasteriser in this environment, so
+one was written (path flattening, scanline fill, PNG out) — validated against
+three known-good icons before being trusted on anything new. And the obvious
+skeleton-walking algorithm does not work: splitting the graph wherever a pixel's
+degree is not 2 assumes 4-connectivity, but a Zhang-Suen skeleton is
+8-connected, so a pixel on a plain diagonal has three neighbours and nearly
+everything classifies as a junction — that version returned 2,966 polylines for
+a thirty-stroke drawing. Walk greedily, preferring the neighbour that best
+continues the current direction, so strokes run straight THROUGH crossings.
+
+---
+
+### 9.13 `heights_mm` sizes the CANVAS, so margin inside a drawing costs you
+
+**2026-08-26, found by measurement after two glasses looked wrong side by
+side.** An icon renders at the height `heights_mm` gives its **viewBox**. The
+glass inside that viewBox is whatever fraction of it the artwork occupies — so
+a drawing with empty margin renders SMALLER than one without, at the same
+`heights_mm`, and no data change fixes it.
+
+The case that surfaced it: Helen's redrawn double old-fashioned.
+
+| | ink fills viewBox height | renders, vs the single |
+|---|---|---|
+| `old-fashioned` (85 mm) | 99.0% | — |
+| `old-fashioned-double` previous (100 mm) | 99% | 1.18× ✓ |
+| `old-fashioned-double-2` (100 mm) | **75.7%** | **0.90×** ✗ |
+
+`heights_mm` says the double should stand 1.176× the single. The redraw stands
+0.90× — a double old-fashioned that draws smaller than a single — because a
+quarter of its canvas is air. **The viewBox being BIGGER is not the same as the
+glass being bigger, and it is easy to check the wrong one:** the redraw's
+viewBox is 1.29× the single's, which looks like confirmation and is not.
+
+**How to check.** Render, then measure the ink's bounding box as a fraction of
+the canvas. Reasoning from viewBox numbers and internal matrix scales gave the
+wrong answer here; the render did not. There is no rasteriser in this
+environment — see §9.12 on the one written for the tiki mug, which does this
+job too.
+
+**Worth a guard eventually**, and it is not built: a test that renders each
+icon and flags any whose ink-fill fraction is an outlier would catch this class
+at the point a drawing lands, rather than when someone notices two glasses look
+wrong together.
+
+### 9.14 Never save a redraw over its predecessor
+
+**The rule, and it now has a mechanism behind it.** `_design_sources/` is the
+record of what was tried. A record you can overwrite is not one.
+
+Helen dropped a corrected double old-fashioned, it was copied over the file it
+replaced, and for one commit the only surviving copy of the previous drawing
+was in git history. `/dev/glasses/` recovered it with `git show`, which worked
+and was the wrong shape: the whole job of comparing a redraw against what it
+replaces cannot rest on archaeology that a squash, rebase or shallow clone
+removes.
+
+**The convention** — already in use for `coupe-3`, `hurricane-2`, `tiki-mug-2`,
+`old-fashioned-2`, and now applied to the double: base name is the original, a
+numeric suffix is the redraw. Both stay on disk.
+
+**Which one publishes is then a NAMED SWITCH, not an accident.** In
+`scripts/normalise_glass_icons.py`, a `RENAME` entry points the suffixed name
+at the published name and a `SKIP` entry holds back the one it supersedes, with
+a comment saying which two lines to delete to reverse it. That is how an
+undecided choice should sit in a repo: both options present, one live, and the
+change a deletion rather than a reconstruction.
+
+**VERIFY BY RESOLUTION, NOT BY INSPECTION.** After changing that switch, re-run
+the normaliser's own skip/strip/rename logic and assert exactly one source
+resolves to the published name, then regenerate and confirm the output matches
+what is on disk. Issue #484 is what happens without this: the published
+old-fashioned was correct only because someone had written it by hand, and the
+`sorted()` ordering meant a regeneration would have silently replaced it with a
+superseded 2-path draft. `-` is 0x2D and `.` is 0x2E, so every suffixed name
+sorts BEFORE the bare one, and the bare one wins by being written last.
+
+### 9.15 The candidate drawer — `/dev/glasses/` sections 5 and 6
+
+Every drawing in `_design_sources/cocktails/glasses/`, normalised into
+`_includes/icons/glass-candidates/` and listed in
+`_data/dev_glass_candidates.yml`, both written by
+`scripts/build_glass_candidates.py`. Rejects and superseded options included:
+this is the drawer, not the shelf.
+
+Three constraints shaped it, and all three are in the script:
+
+- **Jekyll cannot reach `_design_sources/`.** `include` reads only from
+  `_includes/`, and no plugin here loads an arbitrary path.
+- **The copies cannot live in `_includes/icons/glasses/`.** That is the
+  published set and `test_all_icons_matches_the_icon_directory` asserts it
+  matches `all_icons` in both directions. A sibling directory is invisible to
+  it, because that test globs non-recursively.
+- **Jekyll cannot enumerate a directory**, so the names are handed to the page
+  as data — written in the same run as the copies, so they cannot drift.
+
+The list is deliberately NOT in `_data/cocktails/`, which is the site's
+vocabulary. Scaffolding for one dev page does not belong beside three files the
+whole site reads.
 
 ## 10. Validation — run `pytest`, don't read this
 

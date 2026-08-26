@@ -35,10 +35,13 @@ layout: default
      where that variance is handled.
 
      A glass with no entry, or an entry naming a file that is not there,
-     renders NOTHING. That is deliberate and it is why `file_exists` is
-     checked as well as the lookup: `coupe` is the commonest glass in the
-     collection and has no icon yet, so the no-icon path is the normal case
-     today, not an edge one. Same absent-means-nothing convention as
+     renders NOTHING. That is deliberate. This used to add that `coupe` had no
+     artwork and so the no-icon path was "the normal case today, not an edge
+     one" — the coupe has been drawn since 2026-08-16 and redrawn twice since,
+     so that is no longer true and the path is a genuine edge case again. It
+     still fires: 14 drinks carry no glass at all, and `any` is a real member
+     of the vocabulary with deliberately no icon. Same absent-means-nothing
+     convention as
      _data/sites.yml's `reference_links` — a missing key must never become a
      broken image. (This used to cite `footer_svg`, retired by issue #374 when
      the footer became one artefact for the whole repo; the convention it stood
@@ -86,20 +89,36 @@ layout: default
     {% assign mm = heights_mm[icon] | times: 1.0 %}
     {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
   {% endfor %}
+  {% comment %} THE SCALE IS 10.4rem, NOT 2.6rem, since 2026-08-26 — the glass
+     stopped being an icon beside a title and became the page's hero. It is
+     still the same calculation against the same live-counted tallest glass;
+     only the constant moved. `display_scale` from glasses.yml is deliberately
+     NOT applied here: it exists because true relative height reads badly at
+     CARD size, where a Collins is a stripe beside an old-fashioned. At this
+     size the real proportions are the point. {% endcomment %}
   {% assign icon_mm = heights_mm[glass_icon] %}
   {% if icon_mm and tallest_mm > 0 %}
-    {% assign icon_rem = icon_mm | times: 1.0 | divided_by: tallest_mm | times: 2.6 %}
+    {% assign icon_rem = icon_mm | times: 1.0 | divided_by: tallest_mm | times: 10.4 %}
     {% capture glass_icon_style %} style="--glass-icon-height: {{ icon_rem }}rem;"{% endcapture %}
   {% endif %}
+
+  {% comment %} TWO STATES, ONE PAGE. The button adds `is-making` to the
+     article and _sass/cocktails/_cocktail.scss does the rest — nothing leaves
+     the DOM, so this page still prints and still reads with JS off, in the
+     editorial state, which is the one carrying the most information. Same
+     progressive-enhancement contract as the back arrow. {% endcomment %}
+  <div class="cocktail-make-row">
+    <button type="button" class="btn-make" id="cocktail-make" aria-pressed="false">make it</button>
+  </div>
 
   <div class="cocktail-title-block">
     {% if glass_icon != "" %}
       <span class="cocktail-glass-icon"{{ glass_icon_style }}>{% include {{ glass_icon_file }} %}</span>
     {% endif %}
-    <h1 class="cocktail-title">{{ page.title }}</h1>
-  </div>
+    <div class="cocktail-head-words">
+      <h1 class="cocktail-title">{{ page.title }}</h1>
 
-  {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
+      {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
   {% comment %} Glass is a scalar; garnish is a LIST — Cobra's Fang carries a
      mint sprig AND a lime wheel, so the single-value shape the first sketch
@@ -120,6 +139,8 @@ layout: default
       {% endif %}
     </ul>
   {% endif %}
+    </div>
+  </div>
 
   {% comment %} The ingredient list is FULL, not triaged the way food's
      main_ingredients is — no completeness/substitution split, no pantry
@@ -314,3 +335,4 @@ layout: default
    default.html: the arrow is page furniture rather than site chrome, so a page
    with no arrow loads no script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>

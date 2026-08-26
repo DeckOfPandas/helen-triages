@@ -1,0 +1,267 @@
+// =============================================================================
+// COCKTAIL CARDS — the index's whole vocabulary. Settled 2026-08-26.
+// =============================================================================
+// A card is horizontal: the glass drawn large and pale down a fixed left
+// column, the words beside it. Helen chose this over a vertical card with the
+// glass on top, and over a purely typographic tile, because it is the only one
+// of the three with room for a full ingredient line — which the index needs,
+// since you can search by ingredient and the card has to be able to show you
+// why it matched.
+//
+// EVERY ANCHOR IS FIXED, AND THAT IS THE DESIGN RATHER THAN A SIDE EFFECT.
+// Helen: the title starts in the same place relative to the top and sides on
+// every card, and the goodness mark sits in the bottom-right corner in exactly
+// the same spot every time. That rules out the obvious layout twice over — a
+// card whose height comes from its content puts the foot somewhere different
+// on every card, and a vertically-centred text block moves the title. So the
+// card has a FIXED HEIGHT, the body is anchored to the top-left of the content
+// box, and the foot is taken out of flow and pinned to the bottom.
+//
+// THE COST IS CLAMPING AND IT IS NOT AVOIDABLE. Content that does not fit is
+// cut rather than allowed to push: two lines each for the tagline and the
+// ingredient line, two rows of mood chip. A rigid grid buys its rigidity with
+// clamping, and the alternatives are a card whose height varies with mood count
+// (which unpins every anchor on it) or no moods on cards at all. Helen named
+// the trade before I did: "it's a shame to lose the card proportion but I can't
+// think of another way."
+//
+// $card-text-x IS THE SINGLE SOURCE OF THE TITLE'S LEFT EDGE. The glass column
+// is exactly that wide, and the body, the foot and the under-mark all start
+// from it. One value moves all four together and they cannot drift apart.
+// =============================================================================
+
+$card-height:   12.9rem;
+$card-text-x:   7.6rem;
+$card-pad-x:    1.15rem;
+$card-pad-y:    1.05rem;
+$card-foot-y:   0.95rem;
+$chip-line:     1.15rem;
+
+// The tallest glass, in the card grid's own units. Every glass is drawn at its
+// true height relative to this — see the template, which counts the tallest
+// live from glasses.yml rather than hardcoding one.
+$card-glass-scale: 13rem;
+
+.drink-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+  gap: $space-lg;
+}
+
+.drink-card {
+  position: relative;
+  height: $card-height;
+  overflow: hidden;
+  padding: $card-pad-y $card-pad-x $card-pad-y $card-text-x;
+  background: $color-surface;
+  border: 1px solid $color-border;
+
+  // Colour only, and nothing moves. A card that lifts, grows or gains a shadow
+  // on hover would break the fixed anchors this whole file is built on, and
+  // eight of them twitching down a page is not subtle whatever the values say.
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+// --- the glass column --------------------------------------------------------
+// PALE, LARGE, AND TINTED BEHIND. Its width IS $card-text-x, so the drawing can
+// never push the title along — the same failure _cocktail.scss's 3.2rem cap
+// prevents on a drink page, at a much bigger scale.
+.drink-card-glass {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: $card-text-x;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: mix($color-menthe, $color-surface, 9%);
+  transition: background-color 0.12s ease;
+
+  svg {
+    display: block;
+    // The ratio comes from the template (true relative height, from
+    // heights_mm), the cheat from glasses.yml's display_scale. Three separate
+    // decisions, three separate multipliers, none baked into the others.
+    height: calc(var(--glass-ratio, 1) * var(--glass-cheat, 1) * #{$card-glass-scale});
+    width: auto;
+    max-width: $card-text-x - 1.3rem;
+    overflow: visible;
+  }
+
+  // A lighter stroke than a drink page's: this is a wash behind type, and the
+  // page's own weight would read as a second drawing competing with the words.
+  .glass-icon-line { stroke-width: 1; }
+}
+
+// The panel's top and bottom edges. Painted strips rather than borders,
+// because a border would eat into the column's fixed height and nudge the
+// glass — and the one rule the hover has is that nothing moves. Offset -1px so
+// they land ON the card's own border rather than inside it.
+.drink-card-glass::after,
+.drink-card::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  width: $card-text-x;
+  height: 3px;
+  pointer-events: none;
+  transition: background-color 0.12s ease;
+}
+.drink-card-glass::after { top: -1px; background: transparent; }
+.drink-card::after       { bottom: -1px; background: mix($color-menthe, $color-surface, 55%); }
+
+// HOVER: the two marks bracket the glass column, top and bottom.
+// Helen asked for "a very subtle lightening of the white part of the
+// background", which is not available — a card is $color-surface on
+// $color-paper, so its white is already the brightest thing on screen with
+// nowhere lighter to go. Brightening the marks instead says the same thing and
+// moves no large area at all.
+.drink-card:hover {
+  &::after { background: $color-menthe; }
+  .drink-card-glass::after { background: $color-menthe; }
+}
+
+// --- the words ---------------------------------------------------------------
+.drink-card-body { min-width: 0; }
+
+.drink-card-name {
+  font-family: $font-headings;
+  font-size: 1.08rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0 0 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  a {
+    color: $color-text;
+    text-decoration: none;
+    &:hover { color: $color-menthe-deep; }
+  }
+}
+
+// Two lines each. See the note at the top on why this is not optional.
+.drink-card-tagline,
+.drink-card-ingredients {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.drink-card-tagline {
+  font-style: italic;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: $color-clear-text;
+  margin: 0 0 0.55rem;
+}
+
+.drink-card-ingredients {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: $color-text;
+  margin: 0;
+}
+
+.drink-card-sep { color: mix($color-text, $color-surface, 25%); }
+
+// The matched ingredient, in the colour of the field that matched it.
+.drink-card-hit {
+  background: $color-violet;
+  color: darken($color-violet-deep, 25%);
+  padding: 0.05em 0.3em;
+  font-weight: 600;
+}
+
+// --- the foot ----------------------------------------------------------------
+// TWO ROWS: chips above, the goodness line below. Side by side they competed
+// for one line and the chips lost, truncating on any three-mood drink.
+//
+// THE MARK STILL DOES NOT MOVE, which is the point of pinning the foot at all:
+// the container is anchored to the BOTTOM and the goodness line is its last
+// child at a fixed line-height, so the mark sits in the same place whether the
+// chips take one row or two. Chips grow upward into the card.
+.drink-card-foot {
+  position: absolute;
+  left: $card-text-x;
+  right: $card-pad-x;
+  bottom: $card-foot-y;
+}
+
+.drink-card-moods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  min-width: 0;
+  // two chip rows plus the single gap between them
+  max-height: ($chip-line * 2) + 0.28rem;
+  overflow: hidden;
+  margin-bottom: 0.45rem;
+}
+
+.drink-card-mood {
+  font-size: 0.68rem;
+  line-height: $chip-line;
+  letter-spacing: 0.02em;
+  color: $color-clear-text;
+  border: 1px solid $color-border;
+  padding: 0 0.45rem;
+  flex: none;
+
+  // A chip matching an active mood filter fills, the same treatment a matched
+  // ingredient gets — but in MENTHE, because the mood filter is menthe and the
+  // ingredient field is violet. The card is answering "why am I here", and it
+  // answers in the colour of the control that put it there.
+  &.is-match {
+    background: $color-menthe;
+    border-color: $color-menthe-deep;
+    color: darken($color-menthe-deep, 22%);
+    font-weight: 600;
+  }
+}
+
+// --- the goodness mark -------------------------------------------------------
+// The label stays one quiet grey at every rung; the SQUARE carries the scale.
+// Two things both encoding the rating would be louder, not clearer.
+.drink-card-ship {
+  display: block;
+  text-align: right;
+  font-family: $font-headings;
+  font-size: 0.68rem;
+  line-height: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $color-clear-text;
+  white-space: nowrap;
+
+  // AFTER the text, not before: before it, the square's x position depended on
+  // the length of the rating word, so the one mark meant to be findable
+  // without reading moved from card to card. After it, the square sits against
+  // the card's right padding edge, which is fixed.
+  //
+  // --ship-tint comes from taxonomy.yml via the template. The BORDER does not
+  // change at any rung: an empty square reads as "rated, and rated low", where
+  // a square that faded out entirely would read as "not rated" — a different
+  // fact the scale already holds separately as `who knows`.
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: color-mix(in srgb, #{$color-amber} var(--ship-tint, 0%), #{$color-surface});
+    border: 1.5px solid $color-amber-deep;
+    margin-left: 0.4rem;
+    vertical-align: 0.01rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .drink-cards { grid-template-columns: 1fr; }
+}

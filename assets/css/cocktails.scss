@@ -7,11 +7,16 @@
 // then the shared structural layer, then this site's own. What differs is only
 // which palette and which decoration — which is the whole point of the split.
 //
-// `cocktails/cocktail` arrived 2026-08-16 with the first real drinks, and is
-// deliberately only the title block and its glass icon so far. The page anatomy
-// is meant to come from real recipes (formula, glass, garnish, an ordered
-// build) rather than from food's decision-support shape, so the rest is added
-// as each section earns a decision — see HANDOVER §9.
+// `cocktails/cocktail` arrived 2026-08-16 as the title block and its glass
+// icon alone, with the rest to be added as each section earned a decision. It
+// is a whole page anatomy now — designed on /dev/cocktails-design/ with Helen,
+// 2026-08-26 — and `cards` and `filters` join it for the index.
+//
+// `cocktails/goodness` is gone. It was the twenty-minute filter-by-ship
+// scaffold from 2026-08-23 ("I don't care what it looks like"), and every job
+// it did is now done properly: its buttons by `filters`, its cards by `cards`.
+// Deleted rather than left importing nothing, so there is no second place to
+// look for a button style.
 @import "cocktails/palette";
 @import "shared/fonts";
 @import "shared/tokens";
@@ -29,9 +34,15 @@
 @import "shared/chrome";
 @import "cocktails/decoration";
 @import "cocktails/cocktail";
-@import "cocktails/goodness";
+@import "cocktails/cards";
+@import "cocktails/filters";
 // Print, last -- see shared/_print.scss's header for why last, and why all
 // three stylesheets take it rather than just the one whose pages prompted it
-// (#86). There is no cocktails/print partial: this site has no page anatomy
-// of its own yet, so the chrome rules are the whole of what applies.
+// (#86). There is still no cocktails/print partial, but the REASON has
+// expired: this said "this site has no page anatomy of its own yet", and since
+// 2026-08-26 it has a full one. What a drink page should print is now a real
+// question with a real answer available — almost certainly the `make it`
+// state, which is the version you would have beside you — and it is issue
+// #482. Until that lands, the shared chrome rules are the whole of what
+// applies, which is a gap rather than a decision.
 @import "shared/print";

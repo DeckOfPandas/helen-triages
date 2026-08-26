@@ -1,11 +1,11 @@
-<svg viewBox="0 0 99.376084 109.22915" class="glass-icon glass-icon--old-fashioned-double"
+<svg viewBox="0 0 86.017434 94.545998" class="glass-icon glass-icon--old-fashioned-double"
      role="img" aria-hidden="true" focusable="false">
-  <g transform="translate(-19.696306,-99.215923)">
-    <g transform="matrix(1.3051401,0,0,1.3051401,-6.0101317,-63.604938)">
+  <g transform="translate(-19.696305,-113.89907)">
+    <g transform="matrix(1.1296964,0,0,1.1296964,-2.5545396,-27.034571)">
       <path class="glass-icon-line" d="M 22.811367,187.30893 21.107301,126.16455 H 94.42739 l -1.704064,61.14438 -0.791038,15.11911 c -0.424737,2.63704 -4.68809,4.60602 -7.916101,4.60602 H 31.518506 c -3.228013,0 -7.491365,-1.96898 -7.916105,-4.60602 z" />
       <path class="glass-icon-line" d="m 92.621789,186.31958 c -0.67028,5.2564 -11.006667,9.2075 -16.298333,9.2075 h -37.11222 c -5.291667,0 -15.628056,-3.9511 -16.298333,-9.2075" />
     </g>
-    <g transform="translate(11.202515,-3.1750001)">
+    <g transform="translate(4.5231901)">
       <path class="glass-icon-line" d="m 49.612446,158.91643 v 30.2253" />
       <path class="glass-icon-line" d="m 32.473672,158.91643 v 30.2253" />
       <path class="glass-icon-line" d="m 83.889993,158.91643 v 30.2253" />
