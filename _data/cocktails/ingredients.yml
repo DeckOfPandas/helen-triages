@@ -176,7 +176,7 @@ brandy_styles:
   # Helen, 2026-08-22, on Bali Hai's Aguardiente brandy, "for now" -- this
   # may turn out to just be `eau de vie` once revisited; kept separate
   # rather than assumed identical.
-  - "Full-strength clear fruit brandy"
+  - "full-strength clear fruit brandy"
 
 # Cane and palm spirits that are NOT rum. #314: "cachaca is its own generic" --
 # same raw material as an agricole rhum, completely different product. Batavia
@@ -284,16 +284,31 @@ wine_and_sparkling:
   - "cider"
 
 # Every flavour by name, Helen's call -- consistent with crème de X.
+#
+# LOWERCASED 2026-08-26. `Lavender-forward` and `Warm-spiced` were the only
+# two capitalised descriptive bitters, sitting among nine lowercase ones. Same
+# rule Helen applied to the gin styles the same day: a proper noun keeps its
+# capital (Creole does), a description does not.
+#
+# TWO LAVENDERS, DELIBERATELY, and this partly reverses #451's recorded
+# resolution -- Helen, 2026-08-26: "lavender bitters is fine". #451 had merged
+# Bee's Knees' plain lavender bitters into `lavender-forward bitters`, but the
+# reason it gave for keeping the SUGGESTIONS apart is the reason to keep the
+# generics apart too: Bob's Margarita bitters "is very much its own thing and
+# putting it in a Bee's Knees isn't right, because it adds mint and liquorice".
+# Not substitutable, so not one category -- the same test that makes Campari,
+# Aperol, Cynar and fernet four generics rather than one amaro.
 bitters:
   - "aromatic bitters"
   - "orange bitters"
   - "Creole bitters"
   - "chocolate bitters"
   - "tiki bitters"
-  - "Lavender-forward bitters"
+  - "lavender bitters"
+  - "lavender-forward bitters"
   - "peppermint bitters"
   - "wood smoke bitters"
-  - "Warm-spiced bitters"
+  - "warm-spiced bitters"
   - "margarita bitters"
   - "pimento bitters"
 
@@ -436,7 +451,7 @@ family_of:
   "pisco": brandy
   "grappa": brandy
   "eau de vie": brandy
-  "Full-strength clear fruit brandy": brandy
+  "full-strength clear fruit brandy": brandy
   "blanco tequila": agave
   "reposado tequila": agave
   "añejo tequila": agave
