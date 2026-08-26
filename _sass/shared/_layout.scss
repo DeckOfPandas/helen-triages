@@ -494,6 +494,37 @@ $tape-protrusion: 0.2rem;
                 2px  2px 0 rgba($color-text, 0.5);
 }
 
+// =============================================================================
+// #477, AS A COMPARISON SWITCH: the wordmark on the shared emboss values.
+// =============================================================================
+// Helen: "the HELEN TRIAGES part of the wordmark looks different to page
+// headings now -- maybe it wasn't updated in our typography pass". It was not,
+// and it could not have been: the rule above reads `$emboss-stroke` as a SASS
+// variable and then overrides `punched()` with a literal text-shadow, so it
+// sits outside the custom-property system the pass moved everything else onto.
+// It differs from a heading in all four properties -- stroke colour, offset,
+// highlight and shadow.
+//
+// THE PREDICTION WORTH TESTING, and the reason this is a switch rather than a
+// patch. The file above records that 2px exists because "the default 1px
+// emboss offset was getting swallowed by this element's own heavy 1.2px
+// stroke". That is the identical chain found on cocktail headings on
+// 2026-08-26: a heavy stroke drowning the effect, then a second value bumped
+// to compensate for the first. Soften the stroke and the offset should not
+// need to be double. If that holds, the two differences are really one.
+//
+// IT ADAPTS PER SITE FOR FREE, which a literal never could: `--emboss-stroke-c`
+// resolves to food's $color-label-stroke on food and cocktails' on cocktails,
+// so each site's wordmark matches ITS OWN headings rather than one site's.
+//
+// Two classes, so this beats the rule above on specificity regardless of order.
+// `?wordmark=match` on any page of either site; see assets/js/wordmark-switch.js.
+// Delete this block, the script and its include together once #477 is settled.
+.site-logo-top.wordmark--match {
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+  @include punched(raised);
+}
+
 .site-logo-tape {
   grid-column: 1;
   // No explicit width here — deliberately. An earlier version set width:100%,
