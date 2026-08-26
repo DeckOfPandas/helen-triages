@@ -89,38 +89,66 @@ rum_styles:
   - "blended multi-region rum, clear"
 
 # Permitted WITHOUT a style per #314, because nothing generalises them.
-# Blackstrap sits here rather than among the ten for a stated reason -- Helen:
-# "treated more as a flavour modifier" -- not something you browse a drink by,
-# but a spoonful you add.
+#
+# BLACKSTRAP USED TO BE HERE AND IS NOT ANY MORE. Helen closed the question on
+# #314, 2026-08-24: "blackstrap is only ever given as a character for another
+# rum, like this: Moderately aged (character: blackstrap)". It is in
+# rum_characters below, in retired_rum_styles at the bottom, and nowhere else.
 rum_untyped:
   - "Planteray Stiggins' Fancy"
   - "Planteray O.F.T.D. Overproof"
   - "Malibu"
-  - "blackstrap"
 
 # CHARACTER: a separate, optional field, not `generic`. Some rums have a
 # `generic` style (or none decided yet) but also carry a distinctive flavour
 # marker worth recording on its own -- e.g. Ron del Barrito is "moderately
 # aged" generically, but its defining trait is a sherry-cask, Spanish-style
-# tradition rather than a Jamaican or Demerara profile. `blackstrap` can be
-# EITHER a `generic` (per rum_untyped above, when that's all a rum is) OR a
-# `character` alongside another rum's own generic style -- the two fields
-# aren't mutually exclusive.
+# tradition rather than a Jamaican or Demerara profile.
+#
+# THESE ARE NOT GENERICS AND MUST NEVER BE USED AS ONE. This list read as a
+# declared generic vocabulary until 2026-08-26, because tests/test_cocktails.py
+# derives the permitted generics from every top-level LIST in this file and
+# excluded only `families`. So `sherry` and `Spanish-style` silently passed as
+# generics on any ingredient, and Helen's #314 decision below could not be
+# enforced at all -- dropping `blackstrap` from rum_untyped would have changed
+# nothing while this list still declared it. `NOT_GENERIC_LISTS` now names this
+# group too. The whole point of #441 was to separate these two fields; the
+# guard was quietly merging them back.
 rum_characters:
   - "blackstrap"
   - "sherry"
   - "Spanish-style"
 
+# Helen's own list, 2026-08-26, given in full when `flavoured` was queried:
+# "London Dry, Old Tom, Plymouth, Navy strength, Genever and speciality, where
+# speciality should always carry a character field." Written lowercase here at
+# her direction -- the file's commodity-lowercasing rule wins over the way a
+# style gets capitalised in prose, so `blended Scotch` and `Demerara, aged`
+# keep their shape too.
 gin_styles:
   - "London dry"
+  - "Old Tom"
   - "Plymouth"
   - "New Western dry"
   - "genever"
-  - "flavoured"
-  # Helen's own parenthesis: "not a gin though". Sloe gin lives here rather
-  # than hiding inside london dry.
-  - "gin liqueur"
   - "navy strength"
+  # REPLACES `flavoured`, which is retired -- see retired_gin_styles. A gin
+  # whose point is a botanical other than juniper: Hendrick's cucumber and
+  # rose, Malfy's lemon, a rhubarb gin. The style name alone says nothing
+  # useful, which is why Helen's rule is that this generic ALWAYS carries a
+  # `character` naming what the gin actually pushes. Enforced by
+  # tests/test_cocktails.py::test_speciality_gin_declares_a_character.
+  #
+  # Character is FREE TEXT here, unlike rum's -- Helen's call, 2026-08-26. A
+  # rum's character comes from a handful of production traits and closes into a
+  # list; a gin's is whatever went in the still, and closing that list would
+  # mean a vocabulary edit for every new bottle.
+  - "speciality"
+  # Helen's own parenthesis: "not a gin though". Sloe gin lives here rather
+  # than hiding inside london dry. Deliberately NOT one of the styles above --
+  # her 2026-08-26 list is types of GIN, and this is not one; it sits in this
+  # group so that `family_of` can still roll it up to gin for exclusion.
+  - "gin liqueur"
 
 whisky_styles:
   - "rye"
@@ -148,7 +176,7 @@ brandy_styles:
   # Helen, 2026-08-22, on Bali Hai's Aguardiente brandy, "for now" -- this
   # may turn out to just be `eau de vie` once revisited; kept separate
   # rather than assumed identical.
-  - "Full-strength clear fruit brandy"
+  - "full-strength clear fruit brandy"
 
 # Cane and palm spirits that are NOT rum. #314: "cachaca is its own generic" --
 # same raw material as an agricole rhum, completely different product. Batavia
@@ -256,16 +284,31 @@ wine_and_sparkling:
   - "cider"
 
 # Every flavour by name, Helen's call -- consistent with crème de X.
+#
+# LOWERCASED 2026-08-26. `Lavender-forward` and `Warm-spiced` were the only
+# two capitalised descriptive bitters, sitting among nine lowercase ones. Same
+# rule Helen applied to the gin styles the same day: a proper noun keeps its
+# capital (Creole does), a description does not.
+#
+# TWO LAVENDERS, DELIBERATELY, and this partly reverses #451's recorded
+# resolution -- Helen, 2026-08-26: "lavender bitters is fine". #451 had merged
+# Bee's Knees' plain lavender bitters into `lavender-forward bitters`, but the
+# reason it gave for keeping the SUGGESTIONS apart is the reason to keep the
+# generics apart too: Bob's Margarita bitters "is very much its own thing and
+# putting it in a Bee's Knees isn't right, because it adds mint and liquorice".
+# Not substitutable, so not one category -- the same test that makes Campari,
+# Aperol, Cynar and fernet four generics rather than one amaro.
 bitters:
   - "aromatic bitters"
   - "orange bitters"
   - "Creole bitters"
   - "chocolate bitters"
   - "tiki bitters"
-  - "Lavender-forward bitters"
+  - "lavender bitters"
+  - "lavender-forward bitters"
   - "peppermint bitters"
   - "wood smoke bitters"
-  - "Warm-spiced bitters"
+  - "warm-spiced bitters"
   - "margarita bitters"
   - "pimento bitters"
 
@@ -295,11 +338,23 @@ syrups:
 
 # `honey water` is what other people call honey syrup. Helen makes no syrup, so
 # the word does not appear. Clover is a suggestion in a note, not a generic.
+#
+# THE RATIO IS ALWAYS STATED, exactly as the syrups above -- Helen, 2026-08-26,
+# asked directly. There is deliberately no bare `honey water` to fall back on:
+# a diluted honey and a twice-as-concentrated one are used at different volumes
+# for the same sweetness, which is the whole reason `sugar syrup 1:1` and
+# `sugar syrup 2:1` are two generics rather than one.
+#
+# `acacia honey` IS GONE, folded into plain `honey` with acacia as a
+# `suggestion` -- Helen, 2026-08-26. It was a varietal preference wearing a
+# category's clothes, which is precisely what this file's own rule forbids
+# ("a preferred bottle is a suggestion, never a generic"). The distinction
+# worth keeping is neat honey versus honey diluted with water; acacia versus
+# clover is a bottle on the shelf.
 honeys:
   - "honey"
-  - "honey water"
-  - "Honey water 2:1"
-  - "acacia honey"
+  - "honey water 1:1"
+  - "honey water 2:1"
 
 # DELIBERATELY MIXES FORM WITH TYPE, and the reasoning is a browsing one rather
 # than a purity one -- Helen: "if I don't have a sugar cube I won't make a
@@ -310,6 +365,12 @@ honeys:
 sugars:
   - "white sugar"
   - "raw sugar"
+  # Added 2026-08-26. The Pear/Apricot Bellini was typed `molasses sugar`,
+  # which is nearly muscovado -- a long way from a light unrefined caster, and
+  # it would have coloured a pale fruit syrup wrong. Helen's call was its own
+  # generic rather than folding it into `raw sugar`, which is consistent with
+  # this list's stated willingness to mix form with type.
+  - "golden caster sugar"
   - "molasses sugar"
   - "palm sugar"
   - "sugar cube"
@@ -374,14 +435,14 @@ family_of:
   "Planteray Stiggins' Fancy": rum
   "Planteray O.F.T.D. Overproof": rum
   "Malibu": rum
-  "blackstrap": rum
   "cachaça": rum
   "Batavia arrack": rum
   "London dry": gin
+  "Old Tom": gin
   "Plymouth": gin
   "New Western dry": gin
   "genever": gin
-  "flavoured": gin
+  "speciality": gin
   "gin liqueur": gin
   "navy strength": gin
   "rye": whisky
@@ -396,7 +457,7 @@ family_of:
   "pisco": brandy
   "grappa": brandy
   "eau de vie": brandy
-  "Full-strength clear fruit brandy": brandy
+  "full-strength clear fruit brandy": brandy
   "blanco tequila": agave
   "reposado tequila": agave
   "añejo tequila": agave
@@ -451,6 +512,14 @@ family_less:
 # Same treatment _data/food/taxonomy.yml gives retired_star_ingredients, and
 # for the same reason: a value that used to mean something silently blends into
 # the "not declared" pile unless something names it.
+#
+# EVERY `retired_*` MAPPING IN THIS FILE IS READ, not just the rum one.
+# tests/test_cocktails.py used to name `retired_rum_styles` literally, so this
+# second block would have been invisible to it and a drink still saying
+# `flavoured` would have failed as "undeclared generic" -- exactly the silent
+# blending-in that these blocks exist to prevent, arriving through the test
+# rather than the data. The tests now derive the set from the `retired_`
+# prefix, the same way `_declared_generics` derives from the file's shape.
 retired_rum_styles:
   light: >-
     describes colour, not production, and colour is routinely adjusted with
@@ -461,3 +530,33 @@ retired_rum_styles:
   dark: >-
     same reason again, and the most misleading of the three: a dark rum may be
     Jamaican caramel-forward, Demerara aged, or a blackstrap. Issue #314.
+  blackstrap: >-
+    NOT retired as a word -- MOVED, from `generic` to `character`. Helen,
+    #314, 2026-08-24: "blackstrap is only ever given as a character for
+    another rum, like this: Moderately aged (character: blackstrap)". So the
+    rum still needs a real style of its own, and blackstrap rides alongside
+    it. Don's Own Grog and Georgetown Punch already have this shape.
+
+retired_honeys:
+  "honey water": >-
+    the ratio is now always stated, as it always was for sugar syrup. A bare
+    `honey water` cannot say whether it is used at 22.5 ml or 15 ml for the
+    same sweetness. Re-type as `honey water 1:1` or `honey water 2:1`. Helen,
+    2026-08-26.
+  "Honey water 2:1": >-
+    capitalisation only -- it is `honey water 2:1` now, matching `sugar syrup
+    2:1` and every other lowercase commodity in this file. It sat two lines
+    below a lowercase `honey water` meaning very nearly the same thing, and
+    test_no_two_generics_differ_only_by_case_or_accent could not see the
+    collision because the `2:1` made them differ by more than case.
+  "acacia honey": >-
+    a varietal, not a category. Folded into `honey`, with acacia carried as a
+    `suggestion` -- the file's own rule that a preferred bottle is a
+    suggestion and never a generic. Helen, 2026-08-26.
+
+retired_gin_styles:
+  flavoured: >-
+    covered everything from sloe to rhubarb to cucumber, which are not
+    substitutable for each other, so as a filter button it read simply
+    "flavoured" and told you nothing. Replaced by `speciality`, which carries a
+    `character` naming the actual botanical. Helen, 2026-08-26.

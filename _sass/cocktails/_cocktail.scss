@@ -136,7 +136,7 @@
 // THE SCALE WENT FROM 2.6rem TO 10.4rem on 2026-08-26, when the glass stopped
 // being an icon beside a title and became the page's hero. The width cap moved
 // with it, in the same proportion (3.2 : 2.6 became 12.8 : 10.4) rather than
-// being re-guessed — it exists so a wide glass (punch bowl, mule mug) cannot
+// being re-guessed — it exists so a wide glass (punch bowl, mug) cannot
 // shoulder the title along, and that job is unchanged, only its scale.
 .cocktail-glass-icon {
   display: inline-flex;
@@ -156,7 +156,7 @@
     height: var(--glass-icon-height, 10.4rem);
     width: auto;
     // A tall narrow glass and a wide shallow one at the same height still
-    // differ a lot in width; this stops the widest (punch bowl, mule mug)
+    // differ a lot in width; this stops the widest (punch bowl, mug)
     // pushing the title along.
     max-width: 12.8rem;
     overflow: visible;

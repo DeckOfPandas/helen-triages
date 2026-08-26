@@ -1,0 +1,144 @@
+# =============================================================================
+# COCKTAIL METHOD STEPS. Spec: GitHub issue #290.
+# =============================================================================
+# A CLOSED VOCABULARY FOR THE MECHANICAL SPINE, FREE TEXT FOR THE REST. The
+# argument for it is not tidiness, it is #290's own: the same one §13.1 makes
+# about the punched-tape mark beating the watercolour washes. A shape that
+# changes every time has to be RE-READ; an identical repeated one becomes
+# something you RECOGNISE. That is exactly the difference between a canonical
+# "Shake all ingredients with ice." and thirteen near-variants of it, and it
+# matters most in the situation Helen named -- people in the house, and thirsty.
+#
+# THE TEST FOR WHETHER A STEP BELONGS HERE: does its phrasing carry
+# information? "with ice" versus "over ice" carries none. "other than the
+# champagne" carries all of it. So the tail is deliberately NOT canonicalised
+# and never will be -- "Muddle the lime chunks hard with the sugar in the
+# bottom of a shaker until the sugar has dissolved" cannot be collapsed
+# without losing the drink.
+#
+# WHAT THE DATA LOOKED LIKE WHEN THIS WAS WRITTEN, 2026-08-26: 277 steps
+# across 105 drinks, 144 of them distinct. One instruction accounted for 42
+# uses written three ways, and Strain alone had eleven forms.
+#
+# THIS FILE DOES NOT REWRITE ANY DRINK, and nothing here is enforced against
+# the collection. Helen, 2026-08-26, asked for the choice to be recorded
+# rather than taken: "Prefer both, leaving my original too, then I delete
+# whatever I don't want." So `proposals` below holds HER EXACT EXISTING STRING
+# on the left and the suggested canonical form on the right. Deleting a row is
+# how a suggestion gets rejected. Nothing touches a recipe until the map has
+# been pruned -- and a later pass applies only what survives.
+# =============================================================================
+
+# --- THE SPINE ---------------------------------------------------------------
+# Grouped by verb for reading only. tests/test_cocktails.py derives the flat
+# set from this mapping's shape, so a group added tomorrow is covered
+# tomorrow -- the same reasoning `_declared_generics` uses on ingredients.yml.
+canonical:
+
+  shake:
+    - "Shake all ingredients with ice."
+    - "Shake all ingredients hard with ice."
+    # The champagne exclusion is standardised because it is frequent -- eight
+    # uses across shake and stir. The rest of the exclusion tail (Prosecco,
+    # soda, bitters, a named rum) is open-ended and stays free text, which is
+    # why there is no attempt at a general form here.
+    - "Shake all ingredients other than the champagne with ice."
+
+  stir:
+    - "Stir all ingredients with ice."
+    - "Stir all ingredients other than the champagne with ice."
+    - "Stir until cold."
+    - "Stir."
+
+  blend_and_swizzle:
+    - "Blend all ingredients until smooth."
+    - "Swizzle until the glass frosts."
+
+  # STRAIN IS WHERE THE SPRAWL WAS -- eleven distinct forms for what is really
+  # four decisions: how fine, and into what. Note that NAMING THE GLASS is
+  # duplication, not information: the glass is already in the drink's `glass:`
+  # field and renders as an icon. "Fine strain into a chilled coupe" says
+  # coupe twice.
+  strain:
+    - "Strain."
+    - "Double strain."
+    - "Fine strain."
+    - "Strain into a chilled glass."
+    - "Double strain into a chilled glass."
+    - "Fine strain into a chilled glass."
+    - "Strain into an ice-filled glass."
+    - "Fine strain into an ice-filled glass."
+    - "Strain over ice."
+    - "Strain over crushed ice."
+
+  build:
+    - "Add the remaining ingredients."
+    - "Fill the pitcher half full with ice cubes."
+    - "Fill with crushed ice."
+    - "Top with champagne."
+    - "Top with more crushed ice."
+
+# =============================================================================
+# PROPOSALS -- both halves kept, so the choice is Helen's and not mine
+# =============================================================================
+# LEFT: the string exactly as it appears in a drink today.
+# RIGHT: the canonical form it would become, or `QQ` where there isn't a clean
+#        one and a judgement is needed.
+#
+# `QQ` here means the SAME thing it means on an ingredient: unfinished, not
+# absent. A QQ row is a step whose variance might be real, so it is listed
+# rather than quietly collapsed.
+#
+# THE DANGEROUS ONES ARE THE SHORT ONES, and they are all QQ for one reason:
+# "Shake with ice.", "Shake the rest with ice." and "Stir with ice." follow an
+# earlier build step, so they mean shake WHAT IS IN THE SHAKER, not shake all
+# ingredients. Collapsing them into the plain canonical form would silently
+# change the drink. This is the trap that makes a fuzzy matcher the wrong tool
+# here and an explicit map the right one.
+proposals:
+
+  # --- pure variance: "with" vs "over", an article, a stray word ------------
+  "Shake all the ingredients over ice.": "Shake all ingredients with ice."
+  "Shake all ingredients over ice.": "Shake all ingredients with ice."
+  "Shake all the ingredients hard over ice.": "Shake all ingredients hard with ice."
+  "Stir all the ingredients with ice.": "Stir all ingredients with ice."
+  "Stir all the ingredients over ice.": "Stir all ingredients with ice."
+  "Stir all ingredients over ice.": "Stir all ingredients with ice."
+  "Strain into chilled glass.": "Strain into a chilled glass."
+  "Strain into ice-filled glass.": "Strain into an ice-filled glass."
+  "Fine strain into chilled glass.": "Fine strain into a chilled glass."
+  "Fine strain into ice-filled glass.": "Fine strain into an ice-filled glass."
+  "Blend all ingredients together until smooth.": "Blend all ingredients until smooth."
+  "Add remaining ingredients.": "Add the remaining ingredients."
+  "Fill a pitcher half full of ice cubes.": "Fill the pitcher half full with ice cubes."
+
+  # --- the glass named twice -------------------------------------------------
+  # `glass:` already carries it, and it draws the icon. Naming it in the step
+  # as well is the one case here where the phrasing looks informative and
+  # isn't.
+  "Fine strain into a chilled coupe.": "Fine strain into a chilled glass."
+  "Double strain into glass.": "Double strain."
+  "Strain into glass filled with crushed ice.": "Strain over crushed ice."
+  "Strain into a glass filled with crushed ice.": "Strain over crushed ice."
+
+  # --- one exclusion word, two spellings -------------------------------------
+  # "other than" wins on frequency: it is what the open-ended exclusions
+  # already use (the Prosecco, the bitters, the light aged overproof rum).
+  "Shake all the ingredients over ice, other than the champagne.": "Shake all ingredients other than the champagne with ice."
+  "Shake all the ingredients over ice, except for the champagne.": "Shake all ingredients other than the champagne with ice."
+  "Stir all the ingredients with ice, except for the champagne.": "Stir all ingredients other than the champagne with ice."
+
+  # --- QQ: shake WHAT? These follow a build step ----------------------------
+  "Shake with ice.": "QQ"
+  "Shake the rest with ice.": "QQ"
+  "Stir with ice.": "QQ"
+
+  # --- QQ: genuinely unclear -------------------------------------------------
+  "Fine strain with ice.": "QQ"
+
+  # --- QQ: these are presentation, and belong to #291 rather than here -------
+  # Same shape as the three moved to `to_serve` on 2026-08-26 ("Straw.",
+  # "Stirrer.", "Without ice."), but written as full sentences, so moving them
+  # is a wording decision rather than a relocation.
+  "Serve with a straw.": "QQ"
+  "Serve with two straws.": "QQ"

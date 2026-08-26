@@ -136,12 +136,29 @@ SOLID = {"glass-pineapple-3.svg"}
 
 # Source name -> published name, where the export carries a working title.
 #
-# The numbered ones are Helen's redraws: she saves a new attempt beside the old
-# rather than over it, so the source that WINS carries a version suffix the
-# published icon must not. Deliberately not automated by stripping a trailing
-# `-<n>`: `pineapple-3` beat `pineapple-1` on a judgement call and the losers
-# are kept as the evidence for it, so which numbered file is current is a fact
-# about this repo's history, not a pattern.
+# TWO KINDS OF ENTRY LIVE HERE, and they arrived from two branches on the same
+# day. Keeping both comments because they answer different questions.
+#
+# 1. VERSIONED REDRAWS. Helen saves a new attempt beside the old rather than
+#    over it, so the source that WINS carries a version suffix the published
+#    icon must not. Deliberately not automated by stripping a trailing `-<n>`:
+#    `pineapple-3` beat `pineapple-1` on a judgement call and the losers are
+#    kept as the evidence for it, so which numbered file is current is a fact
+#    about this repo's history, not a pattern.
+#
+# 2. A RENAMED GLASS. `mule-mug` -> `mug`, 2026-08-26. The drawing is a plain
+#    tapered mug with a handle, and the ONLY thing that ever made it a Moscow
+#    Mule's mug is that a real one is copper -- which a monochrome line icon
+#    cannot say. It had no drink using it, and Apple and Ginger Mulled Wine
+#    wanted exactly this shape: Helen, asked whether to draw a new one, "I
+#    actually use a mug for this like I do for tea!". One drawing serves both,
+#    since a Mule in line art is also just a mug.
+#
+#    THAT ENTRY IS THE POINT, not the git mv that went with it. Icons are
+#    regenerated WHOLESALE, so renaming only the published file would have
+#    resurrected `mule-mug.svg` the next time this script ran -- and `mug.svg`
+#    would have vanished with nothing to say why. Rename here, where the
+#    mapping survives a regeneration.
 RENAME = {
     "pineapple-3": "pineapple",
     "coupe-3": "coupe",
@@ -149,6 +166,7 @@ RENAME = {
     "tiki-mug-2": "tiki-mug",
     "old-fashioned-2": "old-fashioned",
     "old-fashioned-double-2": "old-fashioned-double",
+    "mule-mug": "mug",
 }
 
 

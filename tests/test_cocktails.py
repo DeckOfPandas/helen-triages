@@ -39,7 +39,16 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 # Groups in ingredients.yml that are lists of generic VALUES. Everything else at
 # the top level is a mapping (family_of, family_less, retired_*) or the family
 # list itself, and must not be mistaken for declared generics.
-NOT_GENERIC_LISTS = {"families"}
+#
+# `rum_characters` JOINED THIS SET ON 2026-08-26, AND ITS ABSENCE WAS A REAL
+# HOLE. A character is not a generic -- separating them is the entire content of
+# #441 -- but this exclusion list named only `families`, so every value in
+# `rum_characters` was ALSO a permitted generic. `sherry` and `Spanish-style`
+# would have passed silently on any ingredient, and Helen's #314 ruling that
+# `blackstrap` is only ever a character could not be enforced while this list
+# still declared it a generic. The guard meant to keep the two fields apart was
+# quietly putting them back together.
+NOT_GENERIC_LISTS = {"families", "rum_characters"}
 
 
 def _load():
@@ -68,6 +77,24 @@ def _vocab():
     if not VOCAB.exists():
         pytest.skip("_data/cocktails/ingredients.yml does not exist yet.")
     return yaml.safe_load(VOCAB.read_text(encoding="utf-8")) or {}
+
+
+def _retired(vocab):
+    """Every retired generic -> its reason, from every `retired_*` mapping.
+
+    DERIVED FROM THE PREFIX, not from a list of block names, and the reason is
+    the same one _declared_generics gives for deriving from the file's shape: a
+    block added tomorrow is covered tomorrow. This was a hardcoded
+    `retired_rum_styles` until 2026-08-26, which meant `retired_gin_styles`
+    landed invisible to both retirement checks -- a drink still saying
+    `flavoured` would have failed as "undeclared generic", with no reason
+    attached, which is the precise failure these blocks exist to prevent.
+    """
+    out = {}
+    for key, value in vocab.items():
+        if key.startswith("retired_") and isinstance(value, dict):
+            out.update(value)
+    return out
 
 
 def _declared_generics(vocab):
@@ -136,7 +163,7 @@ def test_every_generic_is_declared():
         "this check has nothing to enforce. Either the file changed shape or "
         "the groups were renamed -- an empty set would pass everything."
     )
-    retired = set(vocab.get("retired_rum_styles") or {})
+    retired = set(_retired(vocab))
     bad = sorted({
         f"{slug}: {item!r} -> {generic!r}"
         for slug, item, generic in _ingredients()
@@ -158,7 +185,7 @@ def test_no_drink_uses_a_retired_generic():
     mean something must not blend into the generic not-declared pile, where
     nobody learns why it went.
     """
-    retired = _vocab().get("retired_rum_styles") or {}
+    retired = _retired(_vocab())
     assert retired, (
         "No retired values declared, so this enforces nothing. If the "
         "retirements were reversed, delete this test deliberately."
@@ -291,8 +318,158 @@ def test_every_ingredient_has_a_generic_or_a_qq():
 
 
 # =============================================================================
+# 5a -- the one generic that cannot stand on its own
+# =============================================================================
+
+# Helen, 2026-08-26: "speciality should always carry a character field."
+# A pair rather than a bare string so a second such generic is one line, not a
+# rewrite -- gin is simply the only family with one today.
+GENERICS_REQUIRING_A_CHARACTER = ("speciality",)
+
+
+def test_speciality_gin_declares_a_character():
+    """`speciality` names a gin by what it is NOT (juniper-led) and stops there.
+
+    It replaced `flavoured`, which was retired for covering sloe, rhubarb and
+    cucumber alike -- three gins nobody would swap for each other. Renaming it
+    fixes the label and none of the underlying problem: the word still doesn't
+    say what went in the still. `character` is what carries that, so on this
+    generic it is required rather than optional.
+
+    CHARACTER IS FREE TEXT HERE, deliberately, and this test does not check its
+    value -- Helen's call, 2026-08-26. Rum's characters close into a list
+    because they come from a handful of production traits; a gin's is whatever
+    the distiller reached for, and a closed list would mean a vocabulary edit
+    per bottle. So: present and non-empty, never a declared member.
+
+    ONE REAL CASE TODAY: Spiced Negroni's Ophir, cardamom / cubeb pepper /
+    black pepper. (An earlier version of this docstring claimed the test was
+    vacuous -- it was written alongside the retyping that gave it its first
+    case, and was wrong the moment it was committed. Corrected 2026-08-26,
+    which is exactly the §11.2 failure this repo keeps re-learning: a
+    docstring is a claim about the code and rots like any other.)
+    """
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            if not any(g in GENERICS_REQUIRING_A_CHARACTER for g in generics):
+                continue
+            character = item.get("character")
+            # A bare string is as good as a list -- Liquid iterates either, and
+            # `generic`/`suggestion` already accept both shapes for this reason.
+            if isinstance(character, str):
+                character = [character] if character.strip() else []
+            if not character:
+                bad.append(f"{slug}: {item.get('item') or '?'!r}")
+    assert not bad, (
+        f"{len(bad)} ingredient(s) typed as a generic that requires a "
+        f"`character`, without one:\n  " + "\n  ".join(bad)
+        + "\n\nA `speciality` gin is defined by the botanical it pushes -- "
+          "cucumber, rose, rhubarb, lemon. Without that the generic says only "
+          "'not a London dry', which is what got `flavoured` retired. Free "
+          "text: name the thing, no vocabulary to match."
+    )
+
+
+# =============================================================================
 # 6 and 7 -- shape guards on the drinks themselves
 # =============================================================================
+
+def test_rum_character_is_declared():
+    """A RUM's `character` must be a declared `rum_characters` value.
+
+    THIS HOLE WAS OPEN UNTIL 2026-08-26 AND NOTHING WAS WATCHING IT.
+    `character` is the field #441 spent an entire issue separating from
+    `generic`, and #314's ruling on blackstrap turns on that separation -- yet
+    every guard in this file pointed at `generic`. A typo in `character` minted
+    a value in silence, which is precisely the failure
+    test_every_generic_is_declared exists to prevent one field over.
+
+    It got worse, not better, when `rum_characters` was excluded from the
+    declared-generic set in that same session: correct, but it left the list
+    declared and consumed by absolutely nothing. A vocabulary nothing checks
+    against is decoration.
+
+    NOT EVERY CHARACTER -- ONLY RUM'S, and the asymmetry is deliberate rather
+    than an oversight to tidy up later. Helen, 2026-08-26, on gin: character
+    there is FREE TEXT, because a rum's comes from a handful of production
+    traits and closes into a list while a gin's is whatever the distiller
+    reached for. So Spiced Negroni's cardamom is correctly undeclared and this
+    test must not fire on it.
+
+    Rum-ness is derived through `family_of`, not pattern-matched on the item
+    name -- 61 ingredients in this collection are named only by brand, which is
+    the same reason `generic` is stored rather than computed.
+    """
+    vocab = _vocab()
+    declared = set(vocab.get("rum_characters") or [])
+    family_of = vocab.get("family_of") or {}
+    assert declared, (
+        "ingredients.yml declares no `rum_characters`, so this check enforces "
+        "nothing. An empty set would pass every value."
+    )
+    bad, checked = [], 0
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            if not any(family_of.get(g) == "rum" for g in generics):
+                continue
+            character = item.get("character")
+            if not character:
+                continue
+            for value in (character if isinstance(character, list) else [character]):
+                checked += 1
+                if value not in declared:
+                    bad.append(f"{slug}: {item.get('item') or '?'!r} -> {value!r}")
+    # The rum-ness test above is a two-step lookup (generic -> family_of ->
+    # "rum"), and EITHER step going stale would leave this test green while
+    # checking nothing -- a renamed generic, a dropped family mapping. The
+    # collection has four rums carrying a character today; zero means the
+    # derivation broke, not that the data got tidier.
+    assert checked, (
+        "No rum ingredient carries a `character`, so this check is vacuous. "
+        "That is implausible for this collection -- blackstrap alone is on "
+        "three drinks. Either `family_of` no longer maps the rum styles, or a "
+        "generic was renamed without this following."
+    )
+    assert not bad, (
+        "Undeclared character(s) on a rum:\n  " + "\n  ".join(sorted(bad))
+        + f"\n\nDeclared: {sorted(declared)}.\nEither it is a typo, or the "
+          "value is real and belongs in `rum_characters`. A character is not a "
+          "generic -- #441 -- but it is just as much a vocabulary."
+    )
+
+
+def test_to_serve_is_a_string():
+    """`to_serve` is one line of presentation, never a list.
+
+    NEW FIELD, NEW RISK. Not a single drink set `to_serve` until 2026-08-26,
+    when #291's three fragments moved into it -- so this field went from
+    documented-but-unused to live, with nothing checking its shape.
+
+    A LIST DOES NOT FAIL LOUDLY HERE. `_layouts/cocktail.html` renders it as
+    `{{ page.to_serve | markdownify | remove: '<p>' }}`, and Liquid will
+    happily stringify a list into that filter chain rather than raise -- the
+    same class of quiet nonsense as the `glass` scalar iterating as characters.
+    `glass`, `garnish` and `mood` each have a shape guard for exactly this
+    reason; this field had none because it had no data.
+    """
+    bad = [f"{slug}: to_serve is a {type(fm['to_serve']).__name__}"
+           for slug, fm in _load()
+           if "to_serve" in fm and not isinstance(fm["to_serve"], str)]
+    assert not bad, (
+        "to_serve must be a string:\n  " + "\n  ".join(bad)
+        + "\n\nIt is ONE line of presentation -- \"over crushed ice, with a "
+          "straw\" -- not an ordered list of steps. Steps are `method`."
+    )
+
 
 def test_glass_is_a_list():
     """`glass` became an ordered list on 2026-08-17 so a drink could name more
@@ -308,6 +485,55 @@ def test_glass_is_a_list():
     )
 
 
+def test_garnish_is_a_list():
+    """Same reasoning as `glass` and `mood`: a bare string iterates in Liquid as
+    its own characters, which renders as nothing visible rather than as an
+    error. Cobra's Fang is why `garnish` is a list at all -- a mint sprig AND a
+    lime wheel -- and a leftover scalar would go unnoticed.
+    """
+    bad = [f"{slug}: garnish is a {type(fm['garnish']).__name__}"
+           for slug, fm in _load()
+           if "garnish" in fm and not isinstance(fm["garnish"], list)]
+    assert not bad, "garnish must be a list:\n  " + "\n  ".join(bad)
+
+
+def test_no_garnish_is_stated_as_none_and_nothing_else():
+    """`["none"]` means DECIDED: this drink takes no garnish. `[]` means nobody
+    has filled it in. Helen settled that convention on 2026-08-26, and the
+    collection already followed it -- 15 drinks say `none` (the Sazerac among
+    them, deliberately, from its own source row) against 18 genuinely empty.
+
+    HANDOVER §9.5 SAYS THE OPPOSITE, claiming both cases are "currently
+    flattened to []" and listing the choice as an open question. That was true
+    once and has not been for some time; the file it describes is the authority,
+    per §11.2. This test is what stops the two conventions drifting apart again.
+
+    WHAT IT ACTUALLY GUARDS is the risk §9.5 correctly identified: that `none`
+    "would pollute any future garnish vocabulary with a fake member". It cannot
+    now, because it may only ever appear ALONE. A drink with `["none", "lime
+    wheel"]` is a contradiction, and a drink with `["None"]` is a second
+    spelling that any future vocabulary would have to carry twice.
+    """
+    bad = []
+    for slug, fm in _load():
+        garnish = fm.get("garnish")
+        if not isinstance(garnish, list):
+            continue          # test_garnish_is_a_list owns that failure
+        lowered = [str(g).strip().lower() for g in garnish]
+        if "none" not in lowered:
+            continue
+        if len(garnish) > 1:
+            bad.append(f"{slug}: {garnish!r} -- `none` alongside a real garnish")
+        elif garnish[0] != "none":
+            bad.append(f"{slug}: {garnish[0]!r} -- must be exactly \"none\"")
+    assert not bad, (
+        "Garnish problems:\n  " + "\n  ".join(bad)
+        + "\n\n`none` states a DECISION and must stand alone, lowercase. Use "
+          "`[]` for a garnish nobody has chosen yet -- absent is not the same "
+          "as deliberately nothing."
+    )
+
+
 def _glasses():
     return yaml.safe_load(
         (ROOT / "_data" / "cocktails" / "glasses.yml").read_text(encoding="utf-8")
@@ -315,6 +541,49 @@ def _glasses():
 
 
 GLASS_ICON_DIR = ROOT / "_includes" / "icons" / "glasses"
+
+
+def test_drinks_use_the_canonical_glass_spelling():
+    """A drink must write the canonical name, not one of its aliases.
+
+    THIS REVERSES A RULE THIS FILE USED TO STATE. glasses.yml said outright
+    that "a drink is never wrong for using the other word", and for nine months
+    that was the design. Helen retired it on 2026-08-26: "I decided to go with
+    old fashioned rather than rocks as the canonical name, so recipes that
+    still have rocks are fine to break a test."
+
+    THE ALIAS MAP IN `icons:` IS UNAFFECTED, and keeping both is not a
+    contradiction. The aliases do two jobs a rule cannot: they keep a drink
+    rendering if one slips through, and they absorb the spreadsheet's own
+    spellings on ingest, where the variance arrives whether or not the repo
+    approves of it. This rule governs what is WRITTEN into a drink; the alias
+    map governs what can be READ.
+
+    The vocabulary comes entirely from `canonical_glasses`, so adding a pair
+    there is what makes it enforced -- there is no second list here to keep in
+    step. An alias absent from that map is permitted, which is why `martini` /
+    `martini glass` does not fail: it is undecided, not blessed.
+    """
+    canonical = _glasses().get("canonical_glasses") or {}
+    assert canonical, (
+        "glasses.yml has no `canonical_glasses:` map, so this check enforces "
+        "nothing. If the canonical vocabulary was abandoned, delete this test "
+        "deliberately rather than letting it pass while checking nothing."
+    )
+    bad = []
+    for slug, fm in _load():
+        for value in (fm.get("glass") or []):
+            want = canonical.get(str(value).lower())
+            if want and str(value) != want:
+                bad.append(f"{slug}: {value!r} -> should be {want!r}")
+    assert not bad, (
+        f"{len(bad)} drink(s) using a non-canonical glass spelling:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nThese all render the correct icon -- the alias map sees to "
+          "that -- so this is about what the data SAYS, not what it draws. "
+          "Retype the drink; do not add the alias to `canonical_glasses` to "
+          "make this pass."
+    )
 
 
 def test_every_mapped_glass_names_an_icon_that_exists():
@@ -569,6 +838,123 @@ def test_syrup_ratio_is_plausible_for_its_generic():
         + "\n\nThis is looking for a TRANSCRIPTION error, not a taste "
           "preference -- the bounds are wide on purpose. Check the source "
           "spreadsheet before changing the figure."
+    )
+
+
+# =============================================================================
+# METHOD STEPS -- the dictionary, and NOT an enforcement layer. Spec: #290
+# =============================================================================
+# NOTHING HERE CHECKS A DRINK'S METHOD, deliberately. Helen, 2026-08-26, asked
+# for the choice to be recorded rather than taken -- "Prefer both, leaving my
+# original too, then I delete whatever I don't want" -- so methods.yml carries
+# her existing string beside the suggested canonical one, and a later pass
+# applies whatever survives her pruning. A test that failed on a
+# non-canonical step today would be enforcing a decision she has not made yet.
+#
+# What these DO check is that the map cannot rot into a lie: that it proposes
+# only real canonical forms, and that every string it claims to have found is
+# still out there. Both are the failure mode a written-down duplicate of live
+# data always has -- the same reason `all_icons` comes with a test rather than
+# after one.
+
+METHODS = ROOT / "_data" / "cocktails" / "methods.yml"
+
+
+def _methods():
+    if not METHODS.exists():
+        pytest.skip("_data/cocktails/methods.yml does not exist yet.")
+    return yaml.safe_load(METHODS.read_text(encoding="utf-8")) or {}
+
+
+def _canonical_steps(spec):
+    """Every canonical step, flattened from the verb groups.
+
+    Derived from the mapping's shape, not a hardcoded group list -- same
+    reasoning as _declared_generics on ingredients.yml.
+    """
+    out = set()
+    for value in (spec.get("canonical") or {}).values():
+        if isinstance(value, list):
+            out |= set(value)
+    return out
+
+
+def _all_method_steps():
+    return [(slug, s) for slug, fm in _load()
+            for s in (fm.get("method") or [])]
+
+
+def test_every_proposal_names_a_real_canonical_step():
+    """The right-hand side is a declared canonical form, or the literal QQ.
+
+    A proposal pointing at a step that does not exist is worse than no
+    proposal: it reads as a settled decision and would introduce a brand new
+    variant the moment anyone applied it -- minting exactly the sprawl this
+    file exists to close.
+    """
+    spec = _methods()
+    canonical = _canonical_steps(spec)
+    assert canonical, (
+        "methods.yml declares no canonical steps, so this check has nothing to "
+        "enforce. Either the file changed shape or `canonical` was renamed."
+    )
+    bad = sorted(f"{k!r} -> {v!r}" for k, v in (spec.get("proposals") or {}).items()
+                 if v != "QQ" and v not in canonical)
+    assert not bad, (
+        "Proposal(s) pointing at a step that is not declared under "
+        "`canonical`:\n  " + "\n  ".join(bad)
+        + "\n\nEither it is a typo, or the target is real and belongs in the "
+          "canonical list."
+    )
+
+
+def test_no_proposal_rewrites_a_step_that_is_already_canonical():
+    """A canonical step must not also appear as something to replace.
+
+    A string on both sides is a contradiction the file cannot resolve -- it
+    would say a step is both the destination and the thing being retired. This
+    is the shape a careless merge produces when two people canonicalise the
+    same cluster differently.
+    """
+    spec = _methods()
+    canonical = _canonical_steps(spec)
+    overlap = sorted(set(spec.get("proposals") or {}) & canonical)
+    assert not overlap, (
+        "Step(s) listed as BOTH canonical and as a proposal to be replaced:\n  "
+        + "\n  ".join(repr(s) for s in overlap)
+        + "\n\nPick one. A canonical step is the destination, never the source."
+    )
+
+
+def test_every_proposal_still_matches_a_real_step():
+    """The left-hand side must still exist in the collection.
+
+    THE WHOLE FILE IS A WRITTEN-DOWN COPY OF LIVE DATA, which is a rot risk
+    taken deliberately -- and this test is what makes it acceptable, exactly as
+    test_all_icons_matches_the_icon_directory is for `all_icons`. Once a
+    proposal is applied, or Helen rewrites the step herself, the row is spent:
+    it describes a string nothing says any more. Left in place it reads as
+    outstanding work that has in fact been done.
+
+    NOT the reverse direction. A method step with no proposal is the normal
+    case -- it is either already canonical or part of the informative tail that
+    #290 explicitly does not touch.
+    """
+    spec = _methods()
+    proposals = spec.get("proposals") or {}
+    assert proposals, (
+        "methods.yml lists no proposals. If every one has been applied and "
+        "pruned, delete this test deliberately rather than letting it pass "
+        "while checking nothing."
+    )
+    live = {s for _, s in _all_method_steps()}
+    assert live, "no drink has a method -- the loader has gone stale."
+    spent = sorted(set(proposals) - live)
+    assert not spent, (
+        f"{len(spent)} proposal(s) name a step no drink uses any more:\n  "
+        + "\n  ".join(repr(s) for s in spent)
+        + "\n\nThe work is done -- delete the row. A spent proposal reads as "
+          "outstanding, which is the one thing this file must not get wrong."
     )
 
 
