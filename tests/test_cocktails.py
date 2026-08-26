@@ -575,6 +575,123 @@ def test_syrup_ratio_is_plausible_for_its_generic():
 
 
 # =============================================================================
+# METHOD STEPS -- the dictionary, and NOT an enforcement layer. Spec: #290
+# =============================================================================
+# NOTHING HERE CHECKS A DRINK'S METHOD, deliberately. Helen, 2026-08-26, asked
+# for the choice to be recorded rather than taken -- "Prefer both, leaving my
+# original too, then I delete whatever I don't want" -- so methods.yml carries
+# her existing string beside the suggested canonical one, and a later pass
+# applies whatever survives her pruning. A test that failed on a
+# non-canonical step today would be enforcing a decision she has not made yet.
+#
+# What these DO check is that the map cannot rot into a lie: that it proposes
+# only real canonical forms, and that every string it claims to have found is
+# still out there. Both are the failure mode a written-down duplicate of live
+# data always has -- the same reason `all_icons` comes with a test rather than
+# after one.
+
+METHODS = ROOT / "_data" / "cocktails" / "methods.yml"
+
+
+def _methods():
+    if not METHODS.exists():
+        pytest.skip("_data/cocktails/methods.yml does not exist yet.")
+    return yaml.safe_load(METHODS.read_text(encoding="utf-8")) or {}
+
+
+def _canonical_steps(spec):
+    """Every canonical step, flattened from the verb groups.
+
+    Derived from the mapping's shape, not a hardcoded group list -- same
+    reasoning as _declared_generics on ingredients.yml.
+    """
+    out = set()
+    for value in (spec.get("canonical") or {}).values():
+        if isinstance(value, list):
+            out |= set(value)
+    return out
+
+
+def _all_method_steps():
+    return [(slug, s) for slug, fm in _load()
+            for s in (fm.get("method") or [])]
+
+
+def test_every_proposal_names_a_real_canonical_step():
+    """The right-hand side is a declared canonical form, or the literal QQ.
+
+    A proposal pointing at a step that does not exist is worse than no
+    proposal: it reads as a settled decision and would introduce a brand new
+    variant the moment anyone applied it -- minting exactly the sprawl this
+    file exists to close.
+    """
+    spec = _methods()
+    canonical = _canonical_steps(spec)
+    assert canonical, (
+        "methods.yml declares no canonical steps, so this check has nothing to "
+        "enforce. Either the file changed shape or `canonical` was renamed."
+    )
+    bad = sorted(f"{k!r} -> {v!r}" for k, v in (spec.get("proposals") or {}).items()
+                 if v != "QQ" and v not in canonical)
+    assert not bad, (
+        "Proposal(s) pointing at a step that is not declared under "
+        "`canonical`:\n  " + "\n  ".join(bad)
+        + "\n\nEither it is a typo, or the target is real and belongs in the "
+          "canonical list."
+    )
+
+
+def test_no_proposal_rewrites_a_step_that_is_already_canonical():
+    """A canonical step must not also appear as something to replace.
+
+    A string on both sides is a contradiction the file cannot resolve -- it
+    would say a step is both the destination and the thing being retired. This
+    is the shape a careless merge produces when two people canonicalise the
+    same cluster differently.
+    """
+    spec = _methods()
+    canonical = _canonical_steps(spec)
+    overlap = sorted(set(spec.get("proposals") or {}) & canonical)
+    assert not overlap, (
+        "Step(s) listed as BOTH canonical and as a proposal to be replaced:\n  "
+        + "\n  ".join(repr(s) for s in overlap)
+        + "\n\nPick one. A canonical step is the destination, never the source."
+    )
+
+
+def test_every_proposal_still_matches_a_real_step():
+    """The left-hand side must still exist in the collection.
+
+    THE WHOLE FILE IS A WRITTEN-DOWN COPY OF LIVE DATA, which is a rot risk
+    taken deliberately -- and this test is what makes it acceptable, exactly as
+    test_all_icons_matches_the_icon_directory is for `all_icons`. Once a
+    proposal is applied, or Helen rewrites the step herself, the row is spent:
+    it describes a string nothing says any more. Left in place it reads as
+    outstanding work that has in fact been done.
+
+    NOT the reverse direction. A method step with no proposal is the normal
+    case -- it is either already canonical or part of the informative tail that
+    #290 explicitly does not touch.
+    """
+    spec = _methods()
+    proposals = spec.get("proposals") or {}
+    assert proposals, (
+        "methods.yml lists no proposals. If every one has been applied and "
+        "pruned, delete this test deliberately rather than letting it pass "
+        "while checking nothing."
+    )
+    live = {s for _, s in _all_method_steps()}
+    assert live, "no drink has a method -- the loader has gone stale."
+    spent = sorted(set(proposals) - live)
+    assert not spent, (
+        f"{len(spent)} proposal(s) name a step no drink uses any more:\n  "
+        + "\n  ".join(repr(s) for s in spent)
+        + "\n\nThe work is done -- delete the row. A spent proposal reads as "
+          "outstanding, which is the one thing this file must not get wrong."
+    )
+
+
+# =============================================================================
 # MOOD -- the browsing vocabulary. Spec: _data/cocktails/taxonomy.yml, #292
 # =============================================================================
 
