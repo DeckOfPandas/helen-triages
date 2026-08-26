@@ -25,25 +25,29 @@
 // =============================================================================
 
 // =============================================================================
-// RULE LENGTH IS THE HIERARCHY. Three levels, three lengths, one system.
+// RULE LENGTHS, and one idea that did not survive contact with the page.
 // =============================================================================
-// The page has three horizontal rules and they were arrived at separately: the
-// menthe one under the title, the violet ones under section headings, and the
-// hairlines between ingredients. Given a length each, they stop being three
-// decisions and become one — you can see how deep you are in the page without
-// reading a word of it, which is the same job the three COLOURS already do.
+// I built these as a three-level system — 100% title / 62% section / 34%
+// ingredient — so that rule LENGTH encoded depth the way rule COLOUR already
+// does. It was tidy and Helen looked at it and reversed the middle one the
+// same evening: "I was wrong about the violet section underlines -- please
+// return them to full width."
 //
-//   100%   title          menthe    the page is about this
-//   62%    section        violet    a section of it
-//   34%    ingredient     border    one line within a section
+// Recorded rather than quietly deleted, because the argument was good and lost
+// anyway, and the reason is worth having. A section heading's rule is not
+// decoration attached to a word; on a page this short it is the only thing
+// separating INGREDIENTS from the drink above it, so it has a structural job
+// that a shortened rule stops doing. Two levels do the work three were trying
+// to:
 //
-// The two below are proportions rather than rem, so they hold their
-// relationship at any content width. 62% is Helen's "halfway between the
-// heading's own width and the end of the menthe rule"; 34% is deliberately
-// well short of it, because an ingredient separator that nearly matched a
-// section rule would read as a section break every few lines.
-$rule-section:    62%;
-$rule-ingredient: 34%;
+//   100%   title and section   they divide the page
+//    46%   ingredient          it separates lines within a division
+//
+// $rule-ingredient also bounds the NOTES, so a note wraps at the rule rather
+// than running past it — Helen, same pass. That is what makes the short rule
+// read as the right-hand edge of a column rather than as a rule that stops
+// early.
+$rule-ingredient: 46%;
 
 // The head: glass and words side by side, the drawing aligned to the bottom of
 // the text rather than to a baseline. `flex-end` not `baseline`, because the
@@ -103,8 +107,12 @@ $rule-ingredient: 34%;
   margin: 0;
   padding: 0;
   display: flex;
-  gap: $spacing-block-gap;
-  font-size: 0.86rem;
+  // Was $spacing-block-gap (1.75rem) and read as cramped once the labels grew
+  // — Helen asked for garnish further right. $spacing-section-gap is the
+  // existing token for "these are separate things", which is what glass and
+  // garnish are: two independent facts, not a list.
+  gap: $spacing-section-gap;
+  font-size: 0.92rem;
 
   strong {
     display: block;
@@ -112,9 +120,13 @@ $rule-ingredient: 34%;
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: $letter-spacing-label;
-    font-size: 0.66rem;
-    color: mix($color-clear-text, $color-bg, 70%);
-    margin-bottom: 0.1rem;
+    // Bigger and darker. These were 0.66rem at 70% of grey-on-paper, which is
+    // metadata styling, and Helen was right that it read as too pale: GLASS
+    // and GARNISH are the two things on this page you act on before you have
+    // read anything else.
+    font-size: 0.72rem;
+    color: $color-clear-text;
+    margin-bottom: 0.15rem;
   }
 }
 
@@ -137,15 +149,11 @@ $rule-ingredient: 34%;
   // no rule in the gap; these headings have a 2px violet rule under them doing
   // half that work, and at 4.5rem the sections drifted apart.
   margin: 2.8rem 0 $space-lg;
-  // #492: not full width. A full-width rule reads as a divider BETWEEN
-  // sections; a shorter one reads as part of the heading, which is what it is.
-  //
-  // First pass used `fit-content`, so each rule stopped at its own word. Helen,
-  // 2026-08-26: "they can be longer, maybe half way between current length and
-  // the end of the menthe rule." $rule-section is that halfway point — and a
-  // single width for all three rather than one per word, so they line up down
-  // the page instead of stepping in and out with the length of a heading.
-  width: $rule-section;
+  // FULL WIDTH, and it went the long way round: fit-content, then 62%, then
+  // back here on Helen's call. #492 asked for it shortened and the answer
+  // turned out to be no — see the note on rule lengths at the top of this
+  // file. Nothing sets `width` now, deliberately, so it is a plain block rule
+  // and there is no number here for anyone to tune.
   padding-bottom: 0.45rem;
   border-bottom: 2px solid $color-violet;
   @include punched(raised, var(--emboss-offset-lg));
@@ -172,6 +180,11 @@ $rule-ingredient: 34%;
   display: inline-flex;
   align-items: flex-end;
   flex: none;
+  // CENTRED ON THE TITLE BLOCK, at every height — Helen, 2026-08-26. The row
+  // aligns its text to the bottom, and a glass doing the same sat low and left
+  // a growing gap above it as the drawing got shorter. Centred, a short glass
+  // reads as sitting IN the block rather than fallen to the floor of it.
+  align-self: center;
 
   // The default UA stylesheet sets `overflow: hidden` on a root <svg>
   // element -- a browser default for the element, not a CSS property
@@ -275,7 +288,21 @@ $rule-ingredient: 34%;
 
 // The amount column, and the gap after it. The sub-lines below hang past both,
 // derived rather than written down, so they cannot drift out of alignment.
-$amount-col: 5.4rem;
+// 6.6rem, up from 5.4rem, AND A HARD WIDTH RATHER THAN A MINIMUM — Helen:
+// "when ingredient amounts are a little longer, they push into the
+// ingredient."
+//
+// A `min-width` was never going to fix this, and the screenshot she sent is
+// why: the Airmail's amount is "Top (30-45) ml". No column width sensible for
+// "15 ml" accommodates that, so widening alone just moves the breaking point.
+// With a fixed width the amount WRAPS inside its own column instead of growing
+// past it, and the item name starts at the same x on every row regardless —
+// which is the entire reason the column exists.
+//
+// The alternative, sizing the column to the longest amount in the collection,
+// would set every row's indent by one outlier and leave "15 ml" stranded in
+// nine rem of white space.
+$amount-col: 6.6rem;
 $amount-gap: 1rem;
 $amount-indent: $amount-col + $amount-gap;
 
@@ -314,10 +341,14 @@ $amount-indent: $amount-col + $amount-gap;
 .cocktail-amount {
   font-family: $font-headings;
   font-size: 0.95rem;
-  min-width: $amount-col;
+  width: $amount-col;
   flex: none;
   color: $color-text;
   font-variant-numeric: tabular-nums;
+  // A long amount wraps inside the column rather than shoving the item name
+  // along. `break-word` as the backstop for a single unbroken token longer
+  // than the column, which no current amount is but "1½barspoons" would be.
+  overflow-wrap: break-word;
 }
 
 .cocktail-item {
@@ -332,16 +363,25 @@ $amount-indent: $amount-col + $amount-gap;
   color: $color-clear-text;
   font-size: 0.84rem;
   margin: 0.3rem 0 0 $amount-indent;
+  max-width: calc(#{$rule-ingredient} - #{$amount-indent});
 }
 
-// A rum-family style name gets the site's heading face — blockier, so the
-// internal comma in a name like "Demerara, aged" doesn't collide visually
-// with the comma that would otherwise separate it from a joined "or"
-// alternative. Scoped to rum on purpose: "cognac" or "bourbon" have no such
-// collision and stay plain (_layouts/cocktail.html decides the family via
-// `ingredients.family_of`, not this file).
+// THE MONO IS GONE, 2026-08-26. Helen: "some of the ingredient generics are in
+// courier, then the rest are in sans serif."
+//
+// The reason it existed was real: a rum style name can contain its own comma
+// ("Demerara, aged"), which collides with the comma joining it to an
+// alternative, and a blockier face separated the two. But the cost was paid on
+// EVERY rum drink and the benefit only landed on the few with both a comma and
+// an alternative — so what a reader mostly saw was one ingredient in a
+// different typeface from its neighbours for no reason they could detect.
+//
+// The collision is still handled, by `.cocktail-style-or` below: a joined
+// alternative is separated by an italic word rather than by punctuation, so
+// there is no second comma to confuse with the first. That was always the
+// stronger half of the fix; this was belt and braces, and the belt was
+// visible.
 .cocktail-style-name {
-  font-family: $font-headings;
   color: $color-text;
 }
 
@@ -368,12 +408,18 @@ $amount-indent: $amount-col + $amount-gap;
 // `suggestion`. Always visible, no interaction, left-aligned like ordinary
 // prose (right-alignment was tried and dropped — it read as competing with
 // the class line above it rather than as a quiet aside).
+// Bounded by the separator, so a note wraps at the rule rather than running
+// past it — Helen, 2026-08-26. The rule is a percentage of the list and the
+// indent is a rem, hence the calc: the note starts after the amount column and
+// ends where the rule does, which is what makes the rule read as a column edge
+// rather than as a line that stops early.
 .cocktail-note {
   color: $color-clear-text;
   font-size: 0.84rem;
   font-style: italic;
   line-height: 1.55;
   margin: 0.25rem 0 0 $amount-indent;
+  max-width: calc(#{$rule-ingredient} - #{$amount-indent});
 }
 
 // =============================================================================

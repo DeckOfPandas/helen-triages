@@ -96,9 +96,30 @@ layout: default
      NOT applied here: it exists because true relative height reads badly at
      CARD size, where a Collins is a stripe beside an old-fashioned. At this
      size the real proportions are the point. {% endcomment %}
+  {% comment %} THE HEIGHT IS COMPRESSED, NOT PROPORTIONAL — Helen, 2026-08-26:
+     "let the height of the glass be more similar to the title block, if the
+     glass is tall. For shorter glasses, try half height."
+
+     True relative height is correct information and, on a page with one glass
+     on it, poor drawing: a 60mm shot rendered at 26% of a flute is a stamp
+     beside a paragraph. So the ratio is mapped onto the range 0.32–1.0 rather
+     than 0–1: the tallest glass fills the title block, the shortest lands near
+     half of it, and the ORDER is untouched — a shot is still shorter than a
+     Collins, just not four times shorter.
+
+     This is the same compression the card grid applies with its `spread`
+     curve, at a different strength, and for the same reason. Note the CARD
+     also applies `display_scale`; a drink page deliberately does not, because
+     that cheat exists for a size this page does not render at.
+
+     0.32 and 0.68 are not tuned constants to preserve — they are simply what
+     puts the shortest real glass (shot, 60mm of a 230mm tallest) at about half
+     the block. If the tallest or shortest glass changes, they still hold. {% endcomment %}
   {% assign icon_mm = heights_mm[glass_icon] %}
   {% if icon_mm and tallest_mm > 0 %}
-    {% assign icon_rem = icon_mm | times: 1.0 | divided_by: tallest_mm | times: 10.4 %}
+    {% assign ratio = icon_mm | times: 1.0 | divided_by: tallest_mm %}
+    {% assign compressed = ratio | times: 0.68 | plus: 0.32 %}
+    {% assign icon_rem = compressed | times: 10.4 %}
     {% capture glass_icon_style %} style="--glass-icon-height: {{ icon_rem }}rem;"{% endcapture %}
   {% endif %}
 
