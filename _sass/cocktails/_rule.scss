@@ -1,0 +1,68 @@
+// =============================================================================
+// COCKTAILS — the one emboss value this site chooses for itself.
+// =============================================================================
+// Mirrors _sass/food/_rule.scss, and exists for the same reason: the softer
+// heading outline is derived from a palette variable that is NOT one of the ten
+// the shared contract guarantees, so it cannot live in shared/_rule.scss.
+// Imported after it (see assets/css/cocktails.scss), so this wins.
+//
+// WHY IT EXISTS AT ALL, 2026-08-26. Helen, comparing a cocktail title against a
+// food ingredient-group heading: "they don't all need to be identical, but I
+// don't remember which I actively chose, and I'm concerned some may have been
+// automatically swept in."
+//
+// She had it exactly right, and the answer was that COCKTAILS was the swept-in
+// one, not food. Food re-points `--emboss-stroke-c` to its own
+// $color-label-stroke and its comment records that doing so replaced the value
+// being restated at thirteen separate call sites — a decision, made twice over.
+// Cocktails declared no equivalent, so every heading on this site fell through
+// to the shared default of `$color-text`: near-black, at full strength, on the
+// outline of every title and section heading.
+//
+// shared/_base.scss describes that default in its own words as the value that
+// "in practice is only ever seen on a heading nobody has styled". Cocktails'
+// headings were precisely those headings.
+//
+// AND IT EXPLAINS A SECOND SYMPTOM, which is what makes it worth this file
+// rather than a one-line override. The punched effect paints a white highlight
+// one pixel up and left of the glyph. With a soft grey outline that highlight
+// reads; with a near-black outline sitting in exactly the same place, it is
+// drowned — so cocktail headings showed the shadow half of the emboss and none
+// of the light, while food's showed both. One wrong value, two symptoms, and
+// the light looked like the missing thing when the stroke was.
+$emboss-cocktails-vars-emitted: false !default;
+@if not $emboss-cocktails-vars-emitted {
+  :root {
+    --emboss-stroke-c: #{$color-label-stroke};
+  }
+  $emboss-cocktails-vars-emitted: true !global;
+}
+
+// SETTING THE VARIABLE IS NOT ENOUGH, and the first version of this file was
+// inert because of it. `shared/_base.scss` styles h1/h2/h3 with
+//
+//     -webkit-text-stroke: var(--emboss-stroke-w) $color-text;
+//
+// taking the WIDTH from a custom property and hardcoding the COLOUR. Its own
+// comment explains why -- $color-label-stroke is not one of the ten the
+// palette contract guarantees, so shared cannot name it -- and adds that
+// "food overrides it with the softer $color-label-stroke on every component
+// that matters". Food does exactly that, restating the stroke on each
+// component; cocktails restated it nowhere, so every heading kept the hard
+// default and the variable above was read by nothing at all.
+//
+// ONE RULE RATHER THAN FOOD'S PER-COMPONENT RESTATEMENT, which is the lesson
+// food's own file records: it carried this at THIRTEEN call sites before they
+// were unified onto the custom property, and the unification is described
+// there as the improvement. Starting at thirteen in order to arrive at one
+// would be copying the history instead of the conclusion.
+//
+// This is safe to apply site-wide precisely because the stylesheet is
+// per-site: assets/css/cocktails.css is linked only by pages whose site_key is
+// `cocktails`, so a bare element selector here cannot reach food.
+//
+// IMPORTED AFTER shared/base FOR THIS RULE TO WIN -- same specificity, so
+// order decides. See assets/css/cocktails.scss.
+h1, h2, h3 {
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+}

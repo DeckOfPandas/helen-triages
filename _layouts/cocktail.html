@@ -96,10 +96,46 @@ layout: default
      NOT applied here: it exists because true relative height reads badly at
      CARD size, where a Collins is a stripe beside an old-fashioned. At this
      size the real proportions are the point. {% endcomment %}
+  {% comment %} THE HEIGHT IS COMPRESSED, NOT PROPORTIONAL — Helen, 2026-08-26:
+     "let the height of the glass be more similar to the title block, if the
+     glass is tall. For shorter glasses, try half height."
+
+     True relative height is correct information and, on a page with one glass
+     on it, poor drawing: a 60mm shot rendered at 26% of a flute is a stamp
+     beside a paragraph. So the ratio is mapped onto the range 0.32–1.0 rather
+     than 0–1: the tallest glass fills the title block, the shortest lands near
+     half of it, and the ORDER is untouched — a shot is still shorter than a
+     Collins, just not four times shorter.
+
+     This is the same compression the card grid applies with its `spread`
+     curve, at a different strength, and for the same reason. Note the CARD
+     also applies `display_scale`; a drink page deliberately does not, because
+     that cheat exists for a size this page does not render at.
+
+     0.32 and 0.68 are not tuned constants to preserve — they are simply what
+     puts the shortest real glass (shot, 60mm of a 230mm tallest) at about half
+     the block. If the tallest or shortest glass changes, they still hold. {% endcomment %}
+  {% comment %} A FRACTION NOW, NOT A HEIGHT. The glass is drawn against the
+     title block rather than against a fixed scale — Helen, 2026-08-26: "try
+     drawing the glass as large as the whole title block, including the title
+     line itself. I think the stability of the top edge will help the switch to
+     MAKE IT mode feel less jarring."
+
+     So the template's job is no longer "how many rem" but "what fraction of
+     the block", and the block's own height decides the rest. That is what
+     makes the two states agree: pressing `make it` hides the tagline, the
+     block gets shorter, and the glass shrinks with it from a top edge that
+     never moves.
+
+     The compression is unchanged (0.32–1.0), so the TALLEST glass fills the
+     block and a shot fills about half of it — relative height survives, which
+     it would not if every glass simply filled the box. See _cocktail.scss for
+     why that trade went this way. {% endcomment %}
   {% assign icon_mm = heights_mm[glass_icon] %}
   {% if icon_mm and tallest_mm > 0 %}
-    {% assign icon_rem = icon_mm | times: 1.0 | divided_by: tallest_mm | times: 10.4 %}
-    {% capture glass_icon_style %} style="--glass-icon-height: {{ icon_rem }}rem;"{% endcapture %}
+    {% assign ratio = icon_mm | times: 1.0 | divided_by: tallest_mm %}
+    {% assign compressed = ratio | times: 0.68 | plus: 0.32 %}
+    {% capture glass_icon_style %} style="--glass-fill: {{ compressed }};"{% endcapture %}
   {% endif %}
 
   {% comment %} TWO STATES, ONE PAGE. The button adds `is-making` to the
@@ -107,16 +143,20 @@ layout: default
      the DOM, so this page still prints and still reads with JS off, in the
      editorial state, which is the one carrying the most information. Same
      progressive-enhancement contract as the back arrow. {% endcomment %}
-  <div class="cocktail-make-row">
-    <button type="button" class="btn-make" id="cocktail-make" aria-pressed="false">make it</button>
-  </div>
-
-  <div class="cocktail-title-block">
+  <div class="cocktail-title-block{% if glass_icon == "" %} cocktail-title-block--no-glass{% endif %}">
     {% if glass_icon != "" %}
       <span class="cocktail-glass-icon"{{ glass_icon_style }}>{% include {{ glass_icon_file }} %}</span>
     {% endif %}
     <div class="cocktail-head-words">
-      <h1 class="cocktail-title">{{ page.title }}</h1>
+      {% comment %} The toggle sits ON the title's line, right-aligned, exactly
+         where food's recipe pages put `print` — Helen, 2026-08-26. It had its
+         own row above the title, which spent a whole line on one control and
+         made the two sites' recipe pages open differently for no reason. The
+         title wraps before the full width to leave room for it. {% endcomment %}
+      <div class="cocktail-title-row">
+        <h1 class="cocktail-title">{{ page.title }}</h1>
+        <button type="button" class="btn-make" id="cocktail-make" aria-pressed="false">make it</button>
+      </div>
 
       {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
@@ -175,18 +215,21 @@ layout: default
      `generic`/`suggestion` CAN BE A STRING OR A LIST, and Liquid's `for`
      quietly treats a bare string as a one-item sequence (verified against the
      real `liquid` gem, not assumed), so the same oxford-join loop handles
-     both shapes with no type check anywhere. A rum-family style name (looked
-     up via `ingredients.family_of`) gets a blockier monospace treatment with
-     a quiet italic "or" between options — the internal commas in names like
-     "Demerara, aged" collide with a plain list-join comma otherwise, and this
-     is only true for rum (a name like "cognac" has no such collision, so it
-     stays plain). NOT SOLVED HERE, deliberately: no spirit-word ("rum",
+     both shapes with no type check anywhere. Options are separated by a quiet
+     italic "or" rather than a comma, because the internal commas in names like
+     "Demerara, aged" collide with a plain list-join comma. That used to be
+     belt and braces — rum-family names also took a monospace face — and the
+     braces went on 2026-08-26 when Helen asked why some generics were in
+     Courier. The "or" was always the half doing the work.
+     NOT SOLVED HERE, deliberately: no spirit-word ("rum",
      "gin") is appended after a bare style name, because several families
      already bake their spirit into the string ("blanco tequila") and others
      don't ("bourbon" needs no suffix, "London dry" does) — auditing all of
      that is real, separate work, not a template one-liner.
   {% endcomment %}
-  {% assign family_of = site.data.cocktails.ingredients.family_of %}
+  {% comment %} `family_of` used to be assigned here for the rum special case
+     below. That case is gone and so is the assignment — an unread variable is
+     the template equivalent of the dead selector it went with. {% endcomment %}
   {% if page.ingredients.size > 0 %}
     <h2 class="cocktail-section-heading">Ingredients</h2>
     <ul class="cocktail-ingredients">
@@ -218,13 +261,17 @@ layout: default
           {% if item.generic and item.generic != item.item %}
             {% assign g_i = 0 %}
             {% for g in item.generic %}
+              {% comment %} No rum-family special case any more. It wrapped a
+                 rum style name in `.cocktail-style-name` to give it the
+                 heading face, so its internal comma ("Demerara, aged") did not
+                 collide with the comma joining it to an alternative. Helen
+                 removed the mono on 2026-08-26 and the class line then went
+                 violet, which left that span styling nothing and emitting
+                 markup for a selector that no longer exists. The collision is
+                 handled by the italic "or" below instead — which is why
+                 `family_of` is no longer looked up here at all. {% endcomment %}
               {% assign g_i = g_i | plus: 1 %}
-              {% assign fam = family_of[g] %}
-              {% if fam == "rum" %}
-                {% capture g_chunk %}<span class="cocktail-style-name">{{ g }}</span>{% endcapture %}
-              {% else %}
-                {% assign g_chunk = g %}
-              {% endif %}
+              {% assign g_chunk = g %}
               {% if g_i == 1 %}
                 {% assign class_html = g_chunk %}
               {% else %}
@@ -336,3 +383,10 @@ layout: default
    with no arrow loads no script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>
+{% comment %} The glass-layout comparison switches lived here and are gone,
+   along with their script: both questions are settled (margin, top-aligned)
+   and the answers are the plain layout now. Deleted rather than left in
+   place — a comparison tool that survives the comparison is a second way for
+   the page to render that nobody is watching, which is the same reason
+   _dev/cocktails-design.html was deleted once its candidates had lost.
+{% endcomment %}

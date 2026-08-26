@@ -58,7 +58,14 @@ permalink: /cocktails/
 
   <div class="drink-filters">
 
-    <p class="drink-field-label">What do you fancy?</p>
+    {% comment %} Each section clears only itself — #488. The buttons are real
+       <button>s and start hidden; the script shows one the moment its own
+       filter has something in it. {% endcomment %}
+    <div class="drink-filter--mood">
+    <div class="drink-label-row">
+      <p class="drink-field-label">What do you fancy?</p>
+      <button type="button" class="btn-clear-filter" id="clear-mood" hidden>&times; clear</button>
+    </div>
     <div class="drink-btns">
       {% comment %} A MOOD WITH NO DRINKS RENDERS NO BUTTON. taxonomy.yml says
          so outright about `pudding in a glass`, which is declared with zero
@@ -76,7 +83,13 @@ permalink: /cocktails/
       {% endfor %}
     </div>
 
-    <p class="drink-field-label" style="margin-top: 1.5rem;">How much chaos?</p>
+    </div>
+
+    <div class="drink-filter--chaos">
+    <div class="drink-label-row" style="margin-top: 1.5rem;">
+      <p class="drink-field-label">How much chaos?</p>
+      <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
+    </div>
     <div class="drink-btns">
       {% comment %} Two buckets, from taxonomy.yml's `chaos`: `definitely good`
          is ship yes or oh gods yes, `YOLO` is everything else. Written as a
@@ -85,17 +98,24 @@ permalink: /cocktails/
       <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false">definitely good</button>
       <button type="button" class="btn-chaos" data-chaos="yolo" aria-pressed="false">YOLO</button>
     </div>
+    </div>
 
     <div class="drink-searches">
-      <div class="drink-search">
-        <label class="drink-field-label" for="drink-include">Has to have</label>
+      <div class="drink-search drink-search--include">
+        <div class="drink-label-row">
+          <label class="drink-field-label" for="drink-include">Has to have</label>
+          <button type="button" class="btn-clear-filter" id="clear-include" hidden>&times; clear</button>
+        </div>
         <input class="drink-search-input" type="text" id="drink-include"
                autocomplete="off" placeholder="ingredient name…" />
         <div class="drink-pool" id="drink-include-pool" aria-live="polite"></div>
       </div>
 
       <div class="drink-search drink-search--exclude">
-        <label class="drink-field-label" for="drink-exclude">Leave out</label>
+        <div class="drink-label-row">
+          <label class="drink-field-label" for="drink-exclude">Leave out</label>
+          <button type="button" class="btn-clear-filter" id="clear-exclude" hidden>&times; clear</button>
+        </div>
         <input class="drink-search-input" type="text" id="drink-exclude"
                autocomplete="off" placeholder="ingredient name…" />
         <div class="drink-pool" id="drink-exclude-pool" aria-live="polite"></div>
@@ -103,7 +123,14 @@ permalink: /cocktails/
     </div>
   </div>
 
-  <p class="drink-count"><strong id="drink-count-n">{{ site.cocktail_drafts.size }}</strong> drinks</p>
+  {% comment %} "survivors", matching food's own results heading — #489. The
+     pluralisation is Liquid's for the FIRST render only; the script rewrites
+     both the number and the word as filters change, so the two have to agree
+     on the rule. See assets/js/cocktail-index.js. {% endcomment %}
+  <p class="drink-count">
+    <strong id="drink-count-n">{{ site.cocktail_drafts.size }}</strong>
+    <span id="drink-count-word">survivor{% unless site.cocktail_drafts.size == 1 %}s{% endunless %}</span>
+  </p>
 
   <ul class="drink-cards">
     {% assign all_drinks = site.cocktail_drafts | sort: "title" %}
@@ -184,9 +211,13 @@ permalink: /cocktails/
           <p class="drink-card-name">
             <a href="{{ drink.url | relative_url }}">{{ drink.title }}</a>
           </p>
-          {% if drink.tagline %}
-            <p class="drink-card-tagline">{{ drink.tagline }}</p>
-          {% endif %}
+          {% comment %} NO TAGLINE HERE — #512. It was two clamped lines of
+             italic between the name and the ingredients, and the ingredients
+             are what the card is for: they tell you what the drink IS and they
+             are what the search matches against. The tagline is the drink
+             page's voice and reads as preamble at card size. Removed from the
+             MARKUP rather than hidden in CSS, so the clamped text is not
+             sitting in the DOM of 115 cards being ignored. {% endcomment %}
           {% if drink.ingredients.size > 0 %}
             {% comment %} Items only. Amounts are noise at this distance, and
                Helen knows how to make drinks. {% endcomment %}
@@ -206,7 +237,10 @@ permalink: /cocktails/
     {% endfor %}
   </ul>
 
-  <p class="drink-none" hidden>Nothing that good, sorry.</p>
+  {% comment %} #496. "Nothing that good, sorry" was written when the only
+     filter was goodness, so the joke was about the drinks. With four filters
+     it lands as an insult to a search that was simply too narrow. {% endcomment %}
+  <p class="drink-none" hidden>Blank canvas.</p>
 
   <script src="{{ '/assets/js/cocktail-index.js' | relative_url }}"></script>
 

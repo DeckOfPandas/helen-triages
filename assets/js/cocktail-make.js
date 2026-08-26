@@ -17,10 +17,19 @@
   var article = document.querySelector('article.cocktail');
   if (!btn || !article) return;
 
+  /* THE LABEL DOES NOT CHANGE, and that is the fix -- #494. It used to swap to
+     "read about it" when on, which is the classic ambiguous toggle: the reader
+     cannot tell whether the label describes the STATE they are in or the
+     ACTION the button will take. "read about it" could equally mean "you are
+     reading about it" or "press to read about it", and the two are opposites.
+
+     Helen: "Maybe just 'make it' as a toggle, obvious whether it's on or off."
+     So the label is constant and always names the action, and the STATE is
+     carried by the fill and by aria-pressed -- which is what a screen reader
+     was already being told, and was the only part that had it right. */
   btn.addEventListener('click', function () {
     var making = article.classList.toggle('is-making');
     btn.classList.toggle('is-on', making);
     btn.setAttribute('aria-pressed', making ? 'true' : 'false');
-    btn.textContent = making ? 'read about it' : 'make it';
   });
 })();

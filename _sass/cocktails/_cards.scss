@@ -32,6 +32,13 @@
 
 $card-height:   12.9rem;
 $card-text-x:   7.6rem;
+// #490. The glass column is exactly $card-text-x wide, so text starting at
+// $card-text-x began flush against the tinted panel's edge with nothing
+// between them. This is that gutter, and it is a SEPARATE value rather than a
+// bigger $card-text-x on purpose: $card-text-x is the panel's width, and the
+// panel's under-mark is derived from it. Widening it to buy text margin would
+// have silently lengthened the mark too.
+$card-gutter:   0.95rem;
 $card-pad-x:    1.15rem;
 $card-pad-y:    1.05rem;
 $card-foot-y:   0.95rem;
@@ -55,7 +62,7 @@ $card-glass-scale: 13rem;
   position: relative;
   height: $card-height;
   overflow: hidden;
-  padding: $card-pad-y $card-pad-x $card-pad-y $card-text-x;
+  padding: $card-pad-y $card-pad-x $card-pad-y ($card-text-x + $card-gutter);
   background: $color-surface;
   border: 1px solid $color-border;
 
@@ -146,28 +153,26 @@ $card-glass-scale: 13rem;
   }
 }
 
-// Two lines each. See the note at the top on why this is not optional.
-.drink-card-tagline,
+// THE TAGLINE IS GONE FROM CARDS — #512 — and its rules go with it rather
+// than lingering for a class nothing emits.
+//
+// The clamp survives, now on one element instead of two. See the note at the
+// top of this file on why clamping is not optional: the card has fixed anchors
+// and content that does not fit has to be cut rather than allowed to push.
+//
+// FOUR LINES OF ROOM CAME BACK and the card is NOT shortened to reclaim them.
+// The fixed height is what keeps the goodness mark in the same corner on every
+// card, and Cobra's Fang still needs two rows of mood chip. Spending the
+// recovered space on air around the ingredients is the better use of it.
 .drink-card-ingredients {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.drink-card-tagline {
-  font-style: italic;
-  font-size: 0.86rem;
-  line-height: 1.4;
-  color: $color-clear-text;
-  margin: 0 0 0.55rem;
-}
-
-.drink-card-ingredients {
   font-size: 0.82rem;
   line-height: 1.5;
   color: $color-text;
-  margin: 0;
+  margin: 0.5rem 0 0;
 }
 
 .drink-card-sep { color: mix($color-text, $color-surface, 25%); }
@@ -190,7 +195,10 @@ $card-glass-scale: 13rem;
 // chips take one row or two. Chips grow upward into the card.
 .drink-card-foot {
   position: absolute;
-  left: $card-text-x;
+  // Same gutter as the body above, so the title and the foot share one left
+  // edge. They are two separate rules and drifting apart is exactly what the
+  // fixed-anchor design exists to prevent.
+  left: $card-text-x + $card-gutter;
   right: $card-pad-x;
   bottom: $card-foot-y;
 }

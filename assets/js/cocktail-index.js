@@ -29,6 +29,7 @@
   var incPool   = document.getElementById('drink-include-pool');
   var excPool   = document.getElementById('drink-exclude-pool');
   var countEl   = document.getElementById('drink-count-n');
+  var wordEl    = document.getElementById('drink-count-word');
   var noneEl    = document.querySelector('.drink-none');
 
   var chosenMoods = [];
@@ -53,6 +54,26 @@
   function cardMoods(card) {
     return (card.dataset.moods || '').split('|').filter(Boolean);
   }
+
+  function showClear(id, active) {
+    var el = document.getElementById(id);
+    if (el) el.hidden = !active;
+  }
+
+  /* Does the query start a WORD inside this entry, rather than merely appear
+     in it? "rum" starts a word in "Jamaican rum" and does not in "plumbago".
+     Punctuation counts as a boundary as well as space, because the vocabulary
+     contains things like "sugar syrup 2:1" and "demerara, aged". */
+  function wordStarts(haystack, needle) {
+    var at = haystack.indexOf(needle);
+    while (at !== -1) {
+      if (at === 0 || /[^a-z0-9]/.test(haystack.charAt(at - 1))) return true;
+      at = haystack.indexOf(needle, at + 1);
+    }
+    return false;
+  }
+
+  var POOL_CAP = 8;
 
   function matches(card) {
     /* mood: OR within the section. Change `.some` to `.every` for AND — see
@@ -98,7 +119,19 @@
       });
     });
 
+    /* Each clear appears only when its own section has something to clear.
+       Driven from the same pass that filters, so a clear can never be visible
+       for a filter that is already empty. */
+    showClear('clear-mood', chosenMoods.length > 0);
+    showClear('clear-chaos', chosenChaos !== null);
+    showClear('clear-include', include.length > 0 || incInput.value !== '');
+    showClear('clear-exclude', exclude.length > 0 || excInput.value !== '');
+
     if (countEl) countEl.textContent = shown;
+    /* The word has to move with the number or "1 survivors" appears the first
+       time a filter narrows to one drink. The Liquid in the template does the
+       first render; this does every one after it, on the same rule. */
+    if (wordEl) wordEl.textContent = 'survivor' + (shown === 1 ? '' : 's');
     if (noneEl) noneEl.hidden = shown > 0;
   }
 
@@ -143,12 +176,47 @@
       });
 
       if (typed.length < 2) { return; }
-      vocabulary
-        .filter(function (w) { return w.indexOf(typed) !== -1 && chosen.indexOf(w) === -1; })
-        .slice(0, 8)   /* capped, and the cap is visible: a pool longer than
-                          this stops being a shortlist and becomes a second
-                          index to read. */
+
+      /* THREE BANDS, MATCHING FOOD — #497. assets/js/ingredient-search.js
+         orders its candidates the same way and its comment explains why: an
+         entry STARTING with the query outranks everything else, full stop;
+         below that a genuine word match outranks a merely-contains match, and
+         is deliberately not promoted into the prefix tier, or a mid-word
+         coincidence ranks alongside the thing you were obviously typing.
+         Alphabetical within each band, which comes free because `vocabulary`
+         is already sorted and filtering preserves order.
+
+         Cocktails has no synonym or family layer, so food's third band
+         (family-only members) has no equivalent here; its place is taken by
+         the merely-contains matches. Two real bands and a tail, against
+         food's two and a tail. */
+      var pending = vocabulary.filter(function (w) {
+        return w.indexOf(typed) !== -1 && chosen.indexOf(w) === -1;
+      });
+
+      var prefix = pending.filter(function (w) { return w.indexOf(typed) === 0; });
+      var wordly = pending.filter(function (w) {
+        return w.indexOf(typed) !== 0 && wordStarts(w, typed);
+      });
+      var rest = pending.filter(function (w) {
+        return w.indexOf(typed) !== 0 && !wordStarts(w, typed);
+      });
+
+      prefix.concat(wordly, rest)
+        .slice(0, POOL_CAP)
         .forEach(function (w) { pool.appendChild(chip(w, false)); });
+
+      /* THE CAP IS STATED, NOT SILENT. A pool that quietly stops at eight
+         looks like a complete answer, and the one you wanted may be the
+         ninth. Food's own rule elsewhere in this repo: never truncate
+         without saying so. */
+      var hidden = prefix.length + wordly.length + rest.length - POOL_CAP;
+      if (hidden > 0) {
+        var more = document.createElement('span');
+        more.className = 'drink-pool-more';
+        more.textContent = '+' + hidden + ' more — keep typing';
+        pool.appendChild(more);
+      }
     }
 
     function chip(word, on) {
@@ -172,6 +240,47 @@
 
   wireSearch(incInput, incPool, include);
   wireSearch(excInput, excPool, exclude);
+
+  /* --- the four clears ----------------------------------------------------- */
+  /* Each resets ONE section and nothing else. Deliberately four separate
+     controls rather than one "clear all": with four axes, the filter you want
+     to drop is almost never all of them -- you have found the mood and are now
+     arguing with the cupboard. */
+  function wireClear(id, reset) {
+    var btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', function () { reset(); apply(); });
+  }
+
+  wireClear('clear-mood', function () {
+    chosenMoods.length = 0;
+    moodBtns.forEach(function (b) {
+      b.classList.remove('is-on');
+      b.setAttribute('aria-pressed', 'false');
+    });
+  });
+
+  wireClear('clear-chaos', function () {
+    chosenChaos = null;
+    chaosBtns.forEach(function (b) {
+      b.classList.remove('is-on');
+      b.setAttribute('aria-pressed', 'false');
+    });
+  });
+
+  /* The input is cleared as well as the chips. Leaving the typed text behind
+     would redraw its candidate pool on the next keystroke and look like the
+     clear had partly failed. */
+  wireClear('clear-include', function () {
+    include.length = 0;
+    incInput.value = '';
+    incInput.dispatchEvent(new Event('input'));
+  });
+
+  wireClear('clear-exclude', function () {
+    exclude.length = 0;
+    excInput.value = '';
+    excInput.dispatchEvent(new Event('input'));
+  });
 
   apply();
 })();

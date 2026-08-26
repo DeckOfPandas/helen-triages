@@ -24,6 +24,41 @@
 // structure — the note bar and its label. See _palette.scss.
 // =============================================================================
 
+// =============================================================================
+// RULE LENGTHS, and one idea that did not survive contact with the page.
+// =============================================================================
+// I built these as a three-level system — 100% title / 62% section / 34%
+// ingredient — so that rule LENGTH encoded depth the way rule COLOUR already
+// does. It was tidy and Helen looked at it and reversed the middle one the
+// same evening: "I was wrong about the violet section underlines -- please
+// return them to full width."
+//
+// Recorded rather than quietly deleted, because the argument was good and lost
+// anyway, and the reason is worth having. A section heading's rule is not
+// decoration attached to a word; on a page this short it is the only thing
+// separating INGREDIENTS from the drink above it, so it has a structural job
+// that a shortened rule stops doing. Two levels do the work three were trying
+// to:
+//
+//   100%   title and section   they divide the page
+//    46%   ingredient          it separates lines within a division
+//
+// $rule-ingredient also bounds the NOTES, so a note wraps at the rule rather
+// than running past it — Helen, same pass. That is what makes the short rule
+// read as the right-hand edge of a column rather than as a rule that stops
+// early.
+$rule-ingredient: 46%;
+
+// Uppercase Courier, the face every heading-ish thing on this site shares.
+// Food has `%heading-base` for exactly this and cocktails kept restating the
+// three declarations; this is the same idea under a site-scoped name, so the
+// two files can diverge without one silently changing the other.
+%cocktail-heading-face {
+  font-family: $font-headings;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 // The head: glass and words side by side, the drawing aligned to the bottom of
 // the text rather than to a baseline. `flex-end` not `baseline`, because the
 // icon is a drawing with no text baseline to align to, so baseline alignment
@@ -36,19 +71,118 @@
 // is one of those items, and a percentage height against an indefinite height
 // falls back to auto) and the fix is to take the glass out of flow. Until then
 // these are two numbers that have to be kept in step with the type by hand.
+// The glass column: wide enough for the widest drawing at full block height.
+// A fixed reservation rather than a flex track, because the glass is out of
+// flow now (see below) and cannot push anything.
+$glass-col: 9rem;
+$glass-gap: $spacing-section-gap;
+$head-pad-bottom: 1.4rem;
+
+// WHERE THE GLASS STARTS, and why it is not zero. The block's top is the top
+// of the title's LINE BOX, which sits well above the printed capitals: the
+// title runs at $line-height-body on 2.2rem type, so there is half a leading's
+// worth of air before the lettering begins. Starting the glass at zero
+// therefore starts it above the title, which is what Helen's screenshot of
+// Bee's Knees is complaining about — the coupe's rim floats over the B.
+//
+// Derived rather than eyeballed, so it tracks if the title's size or leading
+// changes. Half-leading is exact arithmetic; the second term is the remaining
+// gap between the em box and the cap height, which depends on the font's own
+// metrics and is measured. Named separately so it is obvious which is which.
+$title-size:         2.2rem;
+$title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;  // 0.715rem
+$title-cap-inset:    0.14rem;   // em box top -> cap top, Courier Prime
+$glass-top:          $title-half-leading + $title-cap-inset;
+
+// THE GLASS IS AS TALL AS THE TITLE BLOCK, and this is #485's fix arriving for
+// a different reason than #485 expected.
+//
+// It was a flex row with the glass as one of its items, which meant the row's
+// height came partly from the glass — so asking the glass to match the row was
+// circular, and the CSS silently fell back to the drawing's intrinsic size.
+// That is what #485 diagnosed and parked.
+//
+// Taking the glass OUT OF FLOW breaks the circle: the block's height is now
+// decided entirely by the words, and the glass is measured against a height it
+// no longer contributes to. `top: 0` and a `bottom` clear of the rule give it
+// exactly the words' extent, title line included.
+//
+// WHICH IS THE POINT, per Helen: "the stability of the top edge will help the
+// switch to MAKE IT mode feel less jarring." In `make it` the tagline hides,
+// the block gets shorter, and the glass shrinks with it from a top edge that
+// does not move. Nothing has to know which state it is in.
+//
+// RELATIVE HEIGHT SURVIVES, and that was the one real trade here. "As large as
+// the whole title block" read literally means every glass fills the box, which
+// would make a shot and a hurricane the same size and quietly throw away
+// `heights_mm`, `display_scale` and the argument behind both. Instead the
+// TALLEST glass fills it and the rest are a fraction of it — `--glass-fill`,
+// still the 0.32–1.0 compression — and they are TOP-ALIGNED, so the stable
+// edge Helen asked for is stable for every glass and not just the tall ones.
+// SHIPPED: the glass hangs in the page's LEFT MARGIN, outside the content
+// column, and the title starts on exactly the same left edge as a food recipe
+// page. Helen chose it against the in-column layout after seeing both:
+// "glass in the margin and top aligned, ship it".
+//
+// It was built as a `?glass=margin` switch and is now simply the layout; the
+// switch, its stylesheet variant and the script that set it are all deleted.
+// A comparison tool that survives the comparison becomes a second way for the
+// page to render that nobody is looking at.
 .cocktail-title-block {
-  display: flex;
-  align-items: flex-end;
-  gap: 1.7rem;
-  margin-bottom: 2.4rem;
-  padding-bottom: 1.4rem;
+  position: relative;
+  // MATCHED TO FOOD'S RECIPE PAGE, which opens on $spacing-section-gap above
+  // its title (.recipe-title). The two sites' recipe pages should start the
+  // same distance down the page; they are the same kind of page.
+  margin: $spacing-section-gap 0 2.4rem;
+  padding-bottom: $head-pad-bottom;
   border-bottom: 2px solid $color-menthe;
 }
 
-.cocktail-head-words {
+// BELOW 1180px THERE IS NO MARGIN to hang a drawing in, so the glass comes
+// back inside the column and the head reserves room for it. The threshold is
+// the content column plus a glass on each side.
+//
+// Helen, on seeing this behaviour: "you're very smart to make it tuck inline
+// as the screen shrinks". It is also the part of this layout least verified —
+// it has only been seen by narrowing a desktop window, and an iPad sits near
+// enough to the threshold to be the real test.
+@media (max-width: 1180px) {
+  .cocktail-title-block { padding-left: $glass-col + $glass-gap; }
+  .cocktail-glass-icon  { left: 0; right: auto; }
+
+  // A drink with no glass gets no reservation — 17 of them have none, and an
+  // empty 9rem gutter beside the title would read as a missing image rather
+  // than as a drink that never named a glass. See #491. Only needed here:
+  // above the threshold nothing reserves anything, because the drawing is
+  // outside the column entirely.
+  //
+  // A CLASS FROM THE TEMPLATE, NOT `:has()`. The selector version worked and
+  // was worse: the template already knows whether it drew a glass, so asking
+  // the browser to work it back out from the DOM discards a fact we were
+  // holding. It also degrades into exactly the empty gutter this rule exists
+  // to prevent, wherever `:has()` is unsupported.
+  .cocktail-title-block--no-glass { padding-left: 0; }
+}
+
+// The title and the make-it toggle on one line, which is food's
+// `.recipe-title` exactly: flex, last-baseline, space-between. `last baseline`
+// with `flex-end` kept beneath it as the fallback — food carries the same pair
+// and its comment says to keep both.
+.cocktail-title-row {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  align-items: flex-end;
+  align-items: last baseline;
+  justify-content: space-between;
+  gap: $space-xl;
+}
+
+// A PLAIN BLOCK NOW. This was a flex column that had to declare `flex: 1` to
+// reach the container's right edge, back when it was one item in a row beside
+// the glass — without it, `space-between` in the title row pushed the toggle
+// to the right edge of the TEXT rather than of the page. With the glass out of
+// flow the words are the block's only content and fill it by default, so the
+// flex machinery and the bug it was fixing both go.
+.cocktail-head-words {
   min-width: 0;
 }
 
@@ -58,23 +192,65 @@
 // 0.9rem label and ~3% of a 1.8rem heading, so the effect is at full strength
 // on the smallest type and half-swallowed on the biggest — backwards from how
 // it reads in the file. At 2.5rem this is the biggest type on the site.
+// MATCHED TO FOOD'S `.recipe-title-text`: 2.2rem, 0.04em, and its 70% wrap
+// width with `text-wrap: balance`. Helen asked for the two sites' recipe
+// typography to agree, and it should — the fonts were always the deliberate
+// family resemblance between them (see _palette.scss), so a title set at a
+// different size on each site was the one place that resemblance broke.
+//
+// THE WIDTHS ARE DERIVED FROM $width-content, NOT PERCENTAGES, and that is the
+// fix rather than a preference. Food's 70% and 60% are percentages of the
+// 900px recipe column. Copying the percentages copied the wrong thing: here
+// they resolved against the WORDS column, which the glass has already taken a
+// bite out of, so the title wrapped after two words and the tagline was
+// narrower still. Same numbers, a fraction of a smaller box.
+//
+// 70% and 60% OF $width-content give food's actual measures — 630px and 540px
+// — whatever the glass does to the column beside them. Where the glass leaves
+// less room than that, the max-width simply stops applying and the column
+// governs, which is the correct fallback.
+//
+// `balance` is food's, and its note explains it: it keeps the lines a title
+// wraps to a similar length, so none ends up carrying a stub.
+// THE LINE-HEIGHT IS THE VERTICAL OFFSET, all of it — #520. Both titles are
+// Courier Prime at 2.2rem, so the glyphs are identical; what differed was the
+// BOX around them. Food's title inherits `line-height: $line-height-body`
+// (1.65) from `article.recipe` and this was 1.1, so food's line box is 3.63rem
+// against 2.42rem and its half-leading drops the lettering about 0.55rem
+// further down. Food's own file names the number, in the note explaining why
+// its title row aligns on `last baseline`: "the half-leading of an inherited
+// 1.65 line-height on 2.2rem type".
+//
+// Declared here rather than inherited from an `article.cocktail` rule, which
+// is how food gets it. That would match food's mechanism as well as its
+// result, and would also change the font-size and weight of every paragraph on
+// the page — a much larger change than the one being asked for, and one that
+// would quietly undo sizes chosen deliberately this evening.
 .cocktail-title {
-  font-size: 2.5rem;
-  line-height: 1.02;
-  letter-spacing: 0.02em;
+  font-size: 2.2rem;
+  line-height: $line-height-body;
+  letter-spacing: 0.04em;
+  max-width: $width-content * 0.7;
+  text-wrap: balance;
   margin: 0 0 $space-sm;
   @include punched(raised, var(--emboss-offset-lg));
 }
 
 // The one place this site has a voice. Measure capped, because a tagline
 // running the full width of a wide screen stops reading as an aside.
+// 60%, matching food's `.recipe-tagline`, and its 0.95rem and line-height too.
+// It was 34ch, which is a MEASURE — sound typography in the abstract and wrong
+// here, because it made the tagline much narrower than the title above it and
+// the two stopped sharing a right edge. Food's own comment on this element:
+// "a left-aligned title above a centred tagline reads as a mistake", and a
+// title 70% wide above a tagline 40% wide reads the same way.
 .cocktail-tagline {
   font-style: italic;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   line-height: 1.5;
   color: $color-clear-text;
   margin: 0 0 $space-md;
-  max-width: 34ch;
+  max-width: $width-content * 0.6;
 }
 
 .cocktail-meta {
@@ -82,18 +258,69 @@
   margin: 0;
   padding: 0;
   display: flex;
-  gap: $spacing-block-gap;
-  font-size: 0.86rem;
+  // Was $spacing-block-gap (1.75rem) and read as cramped once the labels grew
+  // — Helen asked for garnish further right. $spacing-section-gap is the
+  // existing token for "these are separate things", which is what glass and
+  // garnish are: two independent facts, not a list.
+  gap: $spacing-section-gap;
+  // 0.88rem at 300, matching food's `.recipe-meta span`. Food gets the weight
+  // by inheritance — `article.recipe` sets `font-weight: 300` for the whole
+  // page — and this states it, because cocktails has no article-level rule and
+  // adding one to borrow a single value would restyle every paragraph on the
+  // page to get it.
+  //
+  // Helen, on why the top matter specifically: "I truly don't want to just
+  // replicate all the styling for the food pages, but I think the top matter
+  // works well and training some consistency there buys us some identity."
+  // Worth recording, because it is the line this file should keep being held
+  // to — the head converges, the body does not.
+  font-size: 0.88rem;
+  font-weight: 300;
 
+  // MENTHE, AND ALWAYS — Helen saw it in `make it` mode and wanted it kept.
+  // It fits the page's own logic rather than only being liked: on a drink page
+  // menthe is the HEAD's colour (it rules the title), violet the sections, and
+  // amber the structural marks. GLASS and GARNISH live in the head, so this is
+  // the head's colour reaching the head's other two facts.
+  //
+  // HEAVIER, at 700 rather than 400. Courier Prime ships Regular and Bold and
+  // nothing between (see the @font-face block in shared/_fonts.scss), so 700
+  // is the only step up available and it is a real face rather than a
+  // synthesised one.
+  //
+  // PUNCHED AFTER ALL, and the steer against it was wrong. I argued the emboss
+  // could not register at this size because the STROKE is 1.6% of font-size,
+  // about 0.19px — true, and answering the wrong question. `punched()` is a
+  // TEXT-SHADOW at a fixed 1px offset: it does not scale with type, so it is
+  // proportionally MORE prominent on small lettering, not less.
+  //
+  // Food's own metadata label says so, and it is the element Helen sent:
+  // "Offset was already fine here (1px on 0.85rem is 7.4%); it's the stroke
+  // that was swallowing it." That whole 2026-08-12 emboss pass came out of
+  // this exact element, at this exact size, for this exact reason.
+  //
+  // So: matched to `.recipe-meta strong` — 0.85rem, $letter-spacing-label, the
+  // stroke read from the custom property, and punched at the SMALL offset
+  // (food uses the plain `punched(raised)` here; the large one is for display
+  // type). The stroke has to be stated explicitly because this is a `strong`,
+  // not a heading, so cocktails/_rule.scss's h1/h2/h3 rule does not reach it.
+  //
+  // MENTHE IS THE ONE DEPARTURE. Food's is $color-text; Helen chose menthe and
+  // it is the head's colour on this page. The emboss still works over it — the
+  // highlight and shadow are white and ink, independent of the letter colour.
   strong {
+    @extend %cocktail-heading-face;
     display: block;
-    font-family: $font-headings;
-    font-weight: 400;
-    text-transform: uppercase;
+    font-size: 0.85rem;
     letter-spacing: $letter-spacing-label;
-    font-size: 0.66rem;
-    color: mix($color-clear-text, $color-bg, 70%);
-    margin-bottom: 0.1rem;
+    color: $color-menthe-deep;
+    // NO EMBOSS. Tried, looked at, dropped -- Helen: "having seen it, it's too
+    // much." The size, tracking and menthe stay; only the shadow and its
+    // stroke go. The stroke goes WITH it rather than being left behind: at
+    // 0.19px it was doing nothing visible on its own, and it only earned its
+    // place as the crisp edge the emboss copies sat against. With no copies to
+    // sit against it is wiring nothing reads.
+    margin-bottom: $space-xs;
   }
 }
 
@@ -107,15 +334,24 @@
 //
 // h2 already carries `punched(raised)` from shared/_base.scss; restated here
 // only to take the LARGE offset deliberately rather than by accident.
+// 1.8rem, food's `.recipe-section-heading`. It was 1.35 — chosen only because
+// the punched effect needs size to register at all, which 1.35 satisfied and
+// then stopped there. Matching food gives the same answer for a better reason,
+// and keeps the h1/h2 relationship (2.2 over 1.8) identical on both sites.
 .cocktail-section-heading {
-  font-size: 1.35rem;
-  letter-spacing: 0.1em;
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
   color: $color-text;
   // 2.8rem, not $spacing-section-top's 4.5rem. That token was tuned for food's
   // recipe page, where a heading carries the whole separation on its own with
   // no rule in the gap; these headings have a 2px violet rule under them doing
   // half that work, and at 4.5rem the sections drifted apart.
   margin: 2.8rem 0 $space-lg;
+  // FULL WIDTH, and it went the long way round: fit-content, then 62%, then
+  // back here on Helen's call. #492 asked for it shortened and the answer
+  // turned out to be no — see the note on rule lengths at the top of this
+  // file. Nothing sets `width` now, deliberately, so it is a plain block rule
+  // and there is no number here for anyone to tune.
   padding-bottom: 0.45rem;
   border-bottom: 2px solid $color-violet;
   @include punched(raised, var(--emboss-offset-lg));
@@ -139,9 +375,23 @@
 // being re-guessed — it exists so a wide glass (punch bowl, mug) cannot
 // shoulder the title along, and that job is unchanged, only its scale.
 .cocktail-glass-icon {
-  display: inline-flex;
-  align-items: flex-end;
-  flex: none;
+  // Out of flow, spanning the words' full extent: top of the title to the
+  // bottom of the metadata, stopping short of the menthe rule.
+  position: absolute;
+  // Out in the margin, its own width plus a gap to the left of the column.
+  right: calc(100% + #{$glass-gap});
+  // Cap height of the title, not the top of its line box. See $glass-top.
+  top: $glass-top;
+  bottom: $head-pad-bottom;
+  width: $glass-col;
+  display: flex;
+  // TOP-ALIGNED, shipped. Helen looked at this against centred and chose it:
+  // every glass on every drink now starts at the same y, level with the title
+  // it belongs to, and a short one simply stops where it stops. The hole
+  // beneath a short glass was the argument for centring and turned out not to
+  // matter — the top edge is what the eye tracks when you move between drinks.
+  align-items: flex-start;
+  justify-content: center;
 
   // The default UA stylesheet sets `overflow: hidden` on a root <svg>
   // element -- a browser default for the element, not a CSS property
@@ -153,12 +403,19 @@
 
   svg {
     display: block;
-    height: var(--glass-icon-height, 10.4rem);
+    // A FRACTION OF THE BLOCK, not a length. The container's height is
+    // definite — top and bottom are both set on an absolutely positioned box
+    // — so a percentage here resolves cleanly, which is exactly what it could
+    // not do while the glass was a flex item contributing to the height it
+    // was trying to measure.
+    height: calc(var(--glass-fill, 1) * 100%);
     width: auto;
     // A tall narrow glass and a wide shallow one at the same height still
-    // differ a lot in width; this stops the widest (punch bowl, mug)
-    // pushing the title along.
-    max-width: 12.8rem;
+    // differ a lot in width. The cap is the column itself now: a punch bowl
+    // hits it and gives up some height rather than spilling into the title,
+    // which is the right trade — it is the widest drawing in the set and the
+    // one least able to afford being full height.
+    max-width: 100%;
     overflow: visible;
   }
 }
@@ -245,7 +502,21 @@
 
 // The amount column, and the gap after it. The sub-lines below hang past both,
 // derived rather than written down, so they cannot drift out of alignment.
-$amount-col: 5.4rem;
+// 6.6rem, up from 5.4rem, AND A HARD WIDTH RATHER THAN A MINIMUM — Helen:
+// "when ingredient amounts are a little longer, they push into the
+// ingredient."
+//
+// A `min-width` was never going to fix this, and the screenshot she sent is
+// why: the Airmail's amount is "Top (30-45) ml". No column width sensible for
+// "15 ml" accommodates that, so widening alone just moves the breaking point.
+// With a fixed width the amount WRAPS inside its own column instead of growing
+// past it, and the item name starts at the same x on every row regardless —
+// which is the entire reason the column exists.
+//
+// The alternative, sizing the column to the longest amount in the collection,
+// would set every row's indent by one outlier and leave "15 ml" stranded in
+// nine rem of white space.
+$amount-col: 6.6rem;
 $amount-gap: 1rem;
 $amount-indent: $amount-col + $amount-gap;
 
@@ -255,13 +526,24 @@ $amount-indent: $amount-col + $amount-gap;
   padding: 0;
 }
 
+// The separator is a pseudo-element rather than a border, because a border-
+// bottom is always the full width of its box and this one is not. Same reason
+// the card's panel edges are painted strips.
 .cocktail-ingredient {
+  position: relative;
   padding: $space-md 0;
-  border-bottom: 1px solid $color-border;
 
-  &:last-child {
-    border-bottom: none;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: $rule-ingredient;
+    height: 1px;
+    background: $color-border;
   }
+
+  &:last-child::after { content: none; }
 }
 
 .cocktail-ingredient-top {
@@ -273,10 +555,14 @@ $amount-indent: $amount-col + $amount-gap;
 .cocktail-amount {
   font-family: $font-headings;
   font-size: 0.95rem;
-  min-width: $amount-col;
+  width: $amount-col;
   flex: none;
   color: $color-text;
   font-variant-numeric: tabular-nums;
+  // A long amount wraps inside the column rather than shoving the item name
+  // along. `break-word` as the backstop for a single unbroken token longer
+  // than the column, which no current amount is but "1½barspoons" would be.
+  overflow-wrap: break-word;
 }
 
 .cocktail-item {
@@ -287,28 +573,70 @@ $amount-indent: $amount-col + $amount-gap;
 // trailing parenthetical. Deliberately quiet — this is a gloss on the
 // headline, not a second headline — and indented past the amount column so
 // the amounts keep their clean left edge.
+// VIOLET, and it is the palette's own logic rather than decoration — Helen,
+// 2026-08-26: "I'm aiming to make the list more fun to read, but also to tie
+// the ingredients back to the index page a little."
+//
+// It ties back exactly. Violet means ASKED FOR: it is the has-to-have field,
+// its chips, and the ingredient it lights up on a card. The generic is the
+// string that field matches against — `cognac`, not "Pierre Ferrand 1840" —
+// so a generic on a drink page and a violet chip on the index are literally
+// the same value in two places, and now they look it. The class line was grey
+// only because it was written before the palette existed.
+//
+// The DEEP tone, not the fill: this is text at 0.84rem and the fill tone is
+// 2.30:1 on paper, nowhere near readable. See _palette.scss.
 .cocktail-type-line {
-  color: $color-clear-text;
+  color: $color-violet-deep;
   font-size: 0.84rem;
   margin: 0.3rem 0 0 $amount-indent;
+  max-width: calc(#{$rule-ingredient} - #{$amount-indent});
 }
 
-// A rum-family style name gets the site's heading face — blockier, so the
-// internal comma in a name like "Demerara, aged" doesn't collide visually
-// with the comma that would otherwise separate it from a joined "or"
-// alternative. Scoped to rum on purpose: "cognac" or "bourbon" have no such
-// collision and stay plain (_layouts/cocktail.html decides the family via
-// `ingredients.family_of`, not this file).
-.cocktail-style-name {
-  font-family: $font-headings;
-  color: $color-text;
-}
+// THE MONO IS GONE, 2026-08-26. Helen: "some of the ingredient generics are in
+// courier, then the rest are in sans serif."
+//
+// The reason it existed was real: a rum style name can contain its own comma
+// ("Demerara, aged"), which collides with the comma joining it to an
+// alternative, and a blockier face separated the two. But the cost was paid on
+// EVERY rum drink and the benefit only landed on the few with both a comma and
+// an alternative — so what a reader mostly saw was one ingredient in a
+// different typeface from its neighbours for no reason they could detect.
+//
+// AND THEN THE RULE ITSELF WENT, the same evening. With the face removed it
+// set only a colour, and when the class line went violet that colour was
+// actively fighting it — a rum style name would have been the one generic on
+// the page still rendering in ink. Deleted rather than left as an empty hook,
+// and the span deleted from the template with it: a selector nothing styles,
+// plus markup emitted to match it, is the dead wiring _palette.scss's own
+// highlighter block was pruned for.
+//
+// The comma collision is still handled by `.cocktail-style-or` below — an
+// italic word between alternatives rather than punctuation, so there is no
+// second comma to confuse with the first. That was always the stronger half.
 
+// BREAKS THE LINE AFTER ITSELF — #518. Two generics used to run on as one
+// wrapped paragraph, so "lightly aged and filtered or blended multi-region
+// rum, clear" broke wherever the measure happened to run out and the
+// alternatives had to be picked apart by reading. One per line makes the
+// choice visible at a glance, which is the entire job of this field.
+//
+// `::after { content: "\A"; white-space: pre }` rather than making this a
+// block. Two reasons. A block would push the "or" onto a line of its own, and
+// the word belongs to the option BEFORE it, not between them like a bullet.
+// And carrying `white-space` on the pseudo-element keeps the whole mechanism
+// here — the parent needs no `pre-line`, so a line-break rule cannot be
+// undone by someone restyling `.cocktail-type-line` without knowing this
+// depends on it.
 .cocktail-style-or {
   font-style: italic;
   color: $color-clear-text;
-  margin: 0 0.5em;
-  display: inline-block;
+  margin: 0 0 0 0.5em;
+
+  &::after {
+    content: "\A";
+    white-space: pre;
+  }
 }
 
 // Character is a property of THIS RECIPE'S use of the bottle, not the bottle
@@ -327,12 +655,18 @@ $amount-indent: $amount-col + $amount-gap;
 // `suggestion`. Always visible, no interaction, left-aligned like ordinary
 // prose (right-alignment was tried and dropped — it read as competing with
 // the class line above it rather than as a quiet aside).
+// Bounded by the separator, so a note wraps at the rule rather than running
+// past it — Helen, 2026-08-26. The rule is a percentage of the list and the
+// indent is a rem, hence the calc: the note starts after the amount column and
+// ends where the rule does, which is what makes the rule read as a column edge
+// rather than as a line that stops early.
 .cocktail-note {
   color: $color-clear-text;
   font-size: 0.84rem;
   font-style: italic;
   line-height: 1.55;
   margin: 0.25rem 0 0 $amount-indent;
+  max-width: calc(#{$rule-ingredient} - #{$amount-indent});
 }
 
 // =============================================================================
@@ -366,8 +700,27 @@ $amount-indent: $amount-col + $amount-gap;
   margin: 0;
 }
 
-// Amber, like every other structural mark on the page.
+// ONE BAR PER NOTE, NOT ONE PER SECTION — #515. The amber bar was on the
+// WRAPPER, so however many notes a drink had, they shared a single unbroken
+// line down the left and read as one long note with bold words in it. Helen:
+// "for pages with multiple notes, add space between notes so the left edges
+// don't just form one continuous line."
+//
+// Moving the bar onto each note is the fix rather than adding margins to the
+// wrapper's children, because the bar IS the thing that was lying: a
+// continuous rule says "one block" no matter how much air is between the
+// paragraphs it runs past.
+//
+// `.notes--single` is left alone. It exists in the markup and now needs no
+// rule of its own — with the bar per note, one note and three notes are the
+// same construction, which is what a modifier should stop being necessary for.
 .cocktail .notes {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-block-gap;
+}
+
+.cocktail .note {
   border-left: 2px solid $color-amber;
   padding-left: $space-lg;
 }
@@ -435,9 +788,62 @@ $amount-indent: $amount-col + $amount-gap;
   .notes,
   .cocktail-body-content { display: none; }
 
-  .cocktail-title { font-size: 1.5rem; }
-  .cocktail-title-block { padding-bottom: $space-lg; margin-bottom: $space-xl; }
-  .cocktail-glass-icon svg { height: 4.1rem; }
+  // THE HEAD DOES NOT CHANGE ANY MORE, and removing three lines is the fix.
+  // This state used to shrink the title to 1.5rem and tighten the block's
+  // padding and margin — written when the title was 2.5rem and its own thing.
+  // The title is now 2.2rem at 1.65 to match food exactly (#519, #520), so
+  // those overrides did not just look different, they reverted the page to
+  // its pre-match typography the moment you pressed the button. Helen:
+  // "clicking MAKE IT makes the fonts and spacings go back to before your
+  // last victory."
+  //
+  // AND THE TITLE HAD NO BUSINESS SHRINKING. What `make it` is for is
+  // stripping what you do not need with your hands full and enlarging what you
+  // do. The drink's name is neither: it does not compete with the spec, and a
+  // page whose title resizes when you press a button reads as a different page
+  // rather than the same one in a different mode.
+  //
+  // A GENERAL POINT WORTH THE PARAGRAPH: any rule that restates a value
+  // belonging to another rule is a copy that has to be maintained, and a state
+  // modifier is the easiest place to leave one behind — it only renders when
+  // someone presses something, so it goes stale unwatched. The overrides that
+  // survive below all CHANGE something for a reason; none of them restates a
+  // number the default already owns.
+  // NOTHING SIZES THE GLASS HERE ANY MORE, and its absence is the feature.
+  // This used to pin it to 4.1rem, a second number kept in step with the head
+  // by hand. The glass is now a fraction of the block, and hiding the tagline
+  // shortens the block, so it shrinks by itself — from a top edge that does
+  // not move, which is the whole reason Helen asked for this.
+
+  // GLASS AND GARNISH GET LOUDER, NOT QUIETER — #493, Helen: "including moving
+  // glass and garnish somewhere more prominent."
+  //
+  // They were the quietest thing in the head: 0.66rem grey labels over 0.86rem
+  // values, sized as metadata. That is right while you are reading ABOUT a
+  // drink and exactly wrong once you are making one — the glass is the first
+  // thing you reach for and the garnish is the thing you forget. In this state
+  // they are the only two facts in the head that are instructions.
+  //
+  // Promoted in place rather than moved. Relocating them under METHOD was the
+  // obvious reading of "somewhere more prominent" and is worse: it separates
+  // them from the title block they belong to, and it makes the two states
+  // structurally different pages rather than one page with things hidden —
+  // which is the contract that keeps this printable and JS-free.
+  // ONLY THE VALUES CHANGE NOW. This block used to restate the labels' colour,
+  // letter-spacing and gap as well — all of which the default owns since the
+  // menthe treatment moved out of this state and into the base rule, which is
+  // where Helen wanted it after seeing it here.
+  //
+  // Left alone, one of those restatements had already gone wrong in the way
+  // the note further up this file predicts: it pinned the labels to 0.7rem,
+  // which is now SMALLER than the 0.74rem default, so pressing `make it` would
+  // have quietly shrunk the two labels this state exists to shout with. A
+  // state modifier only renders when someone presses something, so a stale
+  // copy inside one is invisible until it is embarrassing.
+  .cocktail-meta {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
 
   // What you read with your hands full.
   .cocktail-amount { font-size: 1.3rem; font-weight: 700; }
