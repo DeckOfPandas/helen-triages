@@ -244,9 +244,16 @@ sitemap: false
     margin-bottom: 2.5rem;
   }
   .dev-scale-item { display: flex; flex-direction: column; align-items: center; }
-  .dev-scale-art { display: flex; align-items: flex-end; }
-  /* height comes from the inline style, computed from the real-world mm */
-  .dev-scale-art svg { height: 100%; width: auto; max-width: none; }
+  .dev-scale-art { display: flex; align-items: flex-end; overflow: visible; }
+  /* height comes from the inline style, computed from the real-world mm.
+     overflow:visible on the svg matters because the default UA stylesheet
+     sets `overflow: hidden` on the root <svg> element -- not a CSS default,
+     a browser-specific one for the element itself -- so a stroke whose
+     rounded join or cap sits right on the viewBox edge (a glass belly, a
+     stemmed glass's top corners) gets sheared off. 2026-08-26, Helen: "the
+     tops of nick and nora, one side of the new collins glass, and the outer
+     edges of the brandy glass belly" were all this, not the artwork. */
+  .dev-scale-art svg { height: 100%; width: auto; max-width: none; overflow: visible; }
 
   /* THE STROKE MUST BE SCALED UP WITH THE ICON HERE, AND THIS IS NOT A DETAIL.
      `vector-effect: non-scaling-stroke` holds the glasses at 1.6 SCREEN pixels
@@ -281,8 +288,8 @@ sitemap: false
   /* The big view. The stroke is NON-SCALING, so a bigger icon draws a
      proportionally thinner line — expected, and exactly the effect to watch
      for if the site's real icon size ever changes. */
-  .dev-card-big { display: inline-flex; align-items: flex-end; }
-  .dev-card-big svg { height: 6rem; width: auto; max-width: none; }
+  .dev-card-big { display: inline-flex; align-items: flex-end; overflow: visible; }
+  .dev-card-big svg { height: 6rem; width: auto; max-width: none; overflow: visible; }
 
   .dev-list { columns: 3; font-size: 0.85rem; }
 </style>

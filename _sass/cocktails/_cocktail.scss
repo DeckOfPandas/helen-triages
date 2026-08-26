@@ -40,6 +40,14 @@
   align-items: flex-end;
   flex: none;
 
+  // The default UA stylesheet sets `overflow: hidden` on a root <svg>
+  // element -- a browser default for the element, not a CSS property
+  // default -- so a stroke whose rounded join or cap sits right on the
+  // viewBox edge (a glass belly, a stemmed glass's top corners) gets sheared
+  // off. Found on _dev/glasses.html, 2026-08-26, but it was never page-page
+  // specific: every real cocktail page had the same silent clip.
+  overflow: visible;
+
   svg {
     display: block;
     height: var(--glass-icon-height, 2.6rem);
@@ -48,6 +56,7 @@
     // differ a lot in width; this stops the widest (punch bowl, mule mug)
     // pushing the title along.
     max-width: 3.2rem;
+    overflow: visible;
   }
 }
 
