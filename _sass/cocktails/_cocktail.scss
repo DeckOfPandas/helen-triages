@@ -64,10 +64,28 @@ $rule-ingredient: 46%;
 .cocktail-title-block {
   display: flex;
   align-items: flex-end;
-  gap: 1.7rem;
-  margin-bottom: 2.4rem;
+  // 3rem, up from 1.7 — Helen asked for space between the drawing and the
+  // words. The glass is a picture rather than a column of text, and at 1.7 it
+  // read as a bullet on the title instead of a thing beside it.
+  gap: $spacing-section-gap;
+  // MATCHED TO FOOD'S RECIPE PAGE, which opens on $spacing-section-gap above
+  // its title (.recipe-title). The two sites' recipe pages should start the
+  // same distance down the page; they are the same kind of page.
+  margin: $spacing-section-gap 0 2.4rem;
   padding-bottom: 1.4rem;
   border-bottom: 2px solid $color-menthe;
+}
+
+// The title and the make-it toggle on one line, which is food's
+// `.recipe-title` exactly: flex, last-baseline, space-between. `last baseline`
+// with `flex-end` kept beneath it as the fallback — food carries the same pair
+// and its comment says to keep both.
+.cocktail-title-row {
+  display: flex;
+  align-items: flex-end;
+  align-items: last baseline;
+  justify-content: space-between;
+  gap: $space-xl;
 }
 
 .cocktail-head-words {
@@ -83,23 +101,40 @@ $rule-ingredient: 46%;
 // 0.9rem label and ~3% of a 1.8rem heading, so the effect is at full strength
 // on the smallest type and half-swallowed on the biggest — backwards from how
 // it reads in the file. At 2.5rem this is the biggest type on the site.
+// MATCHED TO FOOD'S `.recipe-title-text`: 2.2rem, 0.04em, and its 70% wrap
+// width with `text-wrap: balance`. Helen asked for the two sites' recipe
+// typography to agree, and it should — the fonts were always the deliberate
+// family resemblance between them (see _palette.scss), so a title set at a
+// different size on each site was the one place that resemblance broke.
+//
+// The 70% is what leaves room for the toggle on the same line, and food's own
+// note explains `balance`: it keeps whatever lines a title wraps to a similar
+// length, so no line ends up carrying a stub.
 .cocktail-title {
-  font-size: 2.5rem;
-  line-height: 1.02;
-  letter-spacing: 0.02em;
+  font-size: 2.2rem;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  max-width: 70%;
+  text-wrap: balance;
   margin: 0 0 $space-sm;
   @include punched(raised, var(--emboss-offset-lg));
 }
 
 // The one place this site has a voice. Measure capped, because a tagline
 // running the full width of a wide screen stops reading as an aside.
+// 60%, matching food's `.recipe-tagline`, and its 0.95rem and line-height too.
+// It was 34ch, which is a MEASURE — sound typography in the abstract and wrong
+// here, because it made the tagline much narrower than the title above it and
+// the two stopped sharing a right edge. Food's own comment on this element:
+// "a left-aligned title above a centred tagline reads as a mistake", and a
+// title 70% wide above a tagline 40% wide reads the same way.
 .cocktail-tagline {
   font-style: italic;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   line-height: 1.5;
   color: $color-clear-text;
   margin: 0 0 $space-md;
-  max-width: 34ch;
+  max-width: 60%;
 }
 
 .cocktail-meta {
@@ -140,9 +175,13 @@ $rule-ingredient: 46%;
 //
 // h2 already carries `punched(raised)` from shared/_base.scss; restated here
 // only to take the LARGE offset deliberately rather than by accident.
+// 1.8rem, food's `.recipe-section-heading`. It was 1.35 — chosen only because
+// the punched effect needs size to register at all, which 1.35 satisfied and
+// then stopped there. Matching food gives the same answer for a better reason,
+// and keeps the h1/h2 relationship (2.2 over 1.8) identical on both sites.
 .cocktail-section-heading {
-  font-size: 1.35rem;
-  letter-spacing: 0.1em;
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
   color: $color-text;
   // 2.8rem, not $spacing-section-top's 4.5rem. That token was tuned for food's
   // recipe page, where a heading carries the whole separation on its own with
@@ -359,8 +398,21 @@ $amount-indent: $amount-col + $amount-gap;
 // trailing parenthetical. Deliberately quiet — this is a gloss on the
 // headline, not a second headline — and indented past the amount column so
 // the amounts keep their clean left edge.
+// VIOLET, and it is the palette's own logic rather than decoration — Helen,
+// 2026-08-26: "I'm aiming to make the list more fun to read, but also to tie
+// the ingredients back to the index page a little."
+//
+// It ties back exactly. Violet means ASKED FOR: it is the has-to-have field,
+// its chips, and the ingredient it lights up on a card. The generic is the
+// string that field matches against — `cognac`, not "Pierre Ferrand 1840" —
+// so a generic on a drink page and a violet chip on the index are literally
+// the same value in two places, and now they look it. The class line was grey
+// only because it was written before the palette existed.
+//
+// The DEEP tone, not the fill: this is text at 0.84rem and the fill tone is
+// 2.30:1 on paper, nowhere near readable. See _palette.scss.
 .cocktail-type-line {
-  color: $color-clear-text;
+  color: $color-violet-deep;
   font-size: 0.84rem;
   margin: 0.3rem 0 0 $amount-indent;
   max-width: calc(#{$rule-ingredient} - #{$amount-indent});
@@ -376,14 +428,17 @@ $amount-indent: $amount-col + $amount-gap;
 // an alternative — so what a reader mostly saw was one ingredient in a
 // different typeface from its neighbours for no reason they could detect.
 //
-// The collision is still handled, by `.cocktail-style-or` below: a joined
-// alternative is separated by an italic word rather than by punctuation, so
-// there is no second comma to confuse with the first. That was always the
-// stronger half of the fix; this was belt and braces, and the belt was
-// visible.
-.cocktail-style-name {
-  color: $color-text;
-}
+// AND THEN THE RULE ITSELF WENT, the same evening. With the face removed it
+// set only a colour, and when the class line went violet that colour was
+// actively fighting it — a rum style name would have been the one generic on
+// the page still rendering in ink. Deleted rather than left as an empty hook,
+// and the span deleted from the template with it: a selector nothing styles,
+// plus markup emitted to match it, is the dead wiring _palette.scss's own
+// highlighter block was pruned for.
+//
+// The comma collision is still handled by `.cocktail-style-or` below — an
+// italic word between alternatives rather than punctuation, so there is no
+// second comma to confuse with the first. That was always the stronger half.
 
 .cocktail-style-or {
   font-style: italic;

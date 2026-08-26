@@ -128,16 +128,20 @@ layout: default
      the DOM, so this page still prints and still reads with JS off, in the
      editorial state, which is the one carrying the most information. Same
      progressive-enhancement contract as the back arrow. {% endcomment %}
-  <div class="cocktail-make-row">
-    <button type="button" class="btn-make" id="cocktail-make" aria-pressed="false">make it</button>
-  </div>
-
   <div class="cocktail-title-block">
     {% if glass_icon != "" %}
       <span class="cocktail-glass-icon"{{ glass_icon_style }}>{% include {{ glass_icon_file }} %}</span>
     {% endif %}
     <div class="cocktail-head-words">
-      <h1 class="cocktail-title">{{ page.title }}</h1>
+      {% comment %} The toggle sits ON the title's line, right-aligned, exactly
+         where food's recipe pages put `print` — Helen, 2026-08-26. It had its
+         own row above the title, which spent a whole line on one control and
+         made the two sites' recipe pages open differently for no reason. The
+         title wraps before the full width to leave room for it. {% endcomment %}
+      <div class="cocktail-title-row">
+        <h1 class="cocktail-title">{{ page.title }}</h1>
+        <button type="button" class="btn-make" id="cocktail-make" aria-pressed="false">make it</button>
+      </div>
 
       {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
@@ -196,18 +200,21 @@ layout: default
      `generic`/`suggestion` CAN BE A STRING OR A LIST, and Liquid's `for`
      quietly treats a bare string as a one-item sequence (verified against the
      real `liquid` gem, not assumed), so the same oxford-join loop handles
-     both shapes with no type check anywhere. A rum-family style name (looked
-     up via `ingredients.family_of`) gets a blockier monospace treatment with
-     a quiet italic "or" between options — the internal commas in names like
-     "Demerara, aged" collide with a plain list-join comma otherwise, and this
-     is only true for rum (a name like "cognac" has no such collision, so it
-     stays plain). NOT SOLVED HERE, deliberately: no spirit-word ("rum",
+     both shapes with no type check anywhere. Options are separated by a quiet
+     italic "or" rather than a comma, because the internal commas in names like
+     "Demerara, aged" collide with a plain list-join comma. That used to be
+     belt and braces — rum-family names also took a monospace face — and the
+     braces went on 2026-08-26 when Helen asked why some generics were in
+     Courier. The "or" was always the half doing the work.
+     NOT SOLVED HERE, deliberately: no spirit-word ("rum",
      "gin") is appended after a bare style name, because several families
      already bake their spirit into the string ("blanco tequila") and others
      don't ("bourbon" needs no suffix, "London dry" does) — auditing all of
      that is real, separate work, not a template one-liner.
   {% endcomment %}
-  {% assign family_of = site.data.cocktails.ingredients.family_of %}
+  {% comment %} `family_of` used to be assigned here for the rum special case
+     below. That case is gone and so is the assignment — an unread variable is
+     the template equivalent of the dead selector it went with. {% endcomment %}
   {% if page.ingredients.size > 0 %}
     <h2 class="cocktail-section-heading">Ingredients</h2>
     <ul class="cocktail-ingredients">
@@ -239,13 +246,17 @@ layout: default
           {% if item.generic and item.generic != item.item %}
             {% assign g_i = 0 %}
             {% for g in item.generic %}
+              {% comment %} No rum-family special case any more. It wrapped a
+                 rum style name in `.cocktail-style-name` to give it the
+                 heading face, so its internal comma ("Demerara, aged") did not
+                 collide with the comma joining it to an alternative. Helen
+                 removed the mono on 2026-08-26 and the class line then went
+                 violet, which left that span styling nothing and emitting
+                 markup for a selector that no longer exists. The collision is
+                 handled by the italic "or" below instead — which is why
+                 `family_of` is no longer looked up here at all. {% endcomment %}
               {% assign g_i = g_i | plus: 1 %}
-              {% assign fam = family_of[g] %}
-              {% if fam == "rum" %}
-                {% capture g_chunk %}<span class="cocktail-style-name">{{ g }}</span>{% endcapture %}
-              {% else %}
-                {% assign g_chunk = g %}
-              {% endif %}
+              {% assign g_chunk = g %}
               {% if g_i == 1 %}
                 {% assign class_html = g_chunk %}
               {% else %}
