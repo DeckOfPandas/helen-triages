@@ -229,6 +229,78 @@ sitemap: false
     about the serve, not a key in the map.
   </p>
 
+  {% comment %} ── 5. THE DOUBLE OLD-FASHIONED, AND EVERY CANDIDATE ────────────
+     Added 2026-08-26. Helen dropped a corrected `glass-old-fashioned-double`
+     after saving one file over another, then: "It's possible I'll prefer the
+     original one, the one I thought I'd lost. Could you update the glass
+     swatch page we used earlier with all?"
+
+     THE DOUBLE ROW IS AT TRUE RELATIVE HEIGHT, deliberately, because that is
+     where the difference between the two lives. Canvas size is not what you
+     see: an icon renders at the height `heights_mm` gives it, so a drawing
+     with empty margin inside its viewBox renders SMALLER even though its
+     viewBox is bigger. Measured on the two files -- the previous double's ink
+     fills 99% of its canvas height, the new one's fills 76%.
+
+     Everything below the double row is every drawing in
+     _design_sources/cocktails/glasses/, normalised into
+     _includes/icons/glass-candidates/ by tmp/build_candidates.py. They are
+     VIEWING COPIES for this page and nothing else: not published icons, not
+     in `all_icons`, and in a sibling directory so the icon-set tests cannot
+     see them. Includes the rejects and the superseded options, which is the
+     point -- this is the drawer, not the shelf.
+  ────────────────────────────────────────────────────────────────────{% endcomment %}
+
+  <h2>5. The double old-fashioned &mdash; at the size the site draws it</h2>
+  <p class="dev-note">
+    Sized by <code>heights_mm</code> against the tallest glass, exactly as
+    &sect;1 is: single 85&nbsp;mm, double 100&nbsp;mm, so the double should
+    stand <strong>1.18&times;</strong> the single. <strong>The new drawing does
+    not</strong> &mdash; its ink fills 76% of its viewBox height where the
+    single's fills 99%, so it renders at <strong>0.90&times;</strong> the
+    single and a double old-fashioned looks smaller than a single. The margin
+    is inside the artwork, not in the data.
+  </p>
+
+  {% assign double_row = "old-fashioned|85,old-fashioned-double-previous|100,old-fashioned-double|100" | split: "," %}
+  <div class="dev-scale">
+    {% for entry in double_row %}
+      {% assign bits = entry | split: "|" %}
+      {% assign nm = bits[0] %}
+      {% assign mm = bits[1] | times: 1.0 %}
+      {% assign rem = mm | divided_by: tallest_mm | times: 10.4 %}
+      <div class="dev-scale-item">
+        <span class="dev-scale-art" style="height: {{ rem }}rem;">
+          {% include icons/glass-candidates/{{ nm }}.svg %}
+        </span>
+        <span class="dev-scale-label">{{ nm }}<br>{{ bits[1] }}mm</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <h2>6. Every candidate drawing &mdash; the drawer, not the shelf</h2>
+  <p class="dev-note">
+    All {{ site.data.dev_glass_candidates | size }} drawings in
+    <code>_design_sources/cocktails/glasses/</code>, at one common height so
+    shapes can be compared directly &mdash; superseded options and outright
+    rejects included. <strong>These are not published icons.</strong> A name
+    here with no counterpart in &sect;1 is a drawing nothing uses. Regenerate
+    with <code>tmp/build_candidates.py</code> after adding to
+    <code>_design_sources/</code>.
+  </p>
+
+  {% assign candidates = site.data.dev_glass_candidates %}
+  <div class="dev-strip dev-candidates">
+    {% for nm in candidates %}
+      <div class="dev-scale-item">
+        <span class="dev-candidate-art">
+          {% include icons/glass-candidates/{{ nm }}.svg %}
+        </span>
+        <span class="dev-scale-label">{{ nm }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
 </article>
 
 <style>
@@ -255,6 +327,15 @@ sitemap: false
     margin-bottom: 2.5rem;
   }
   .dev-scale-item { display: flex; flex-direction: column; align-items: center; }
+
+  /* The candidate drawer: one common height so SHAPES compare, which is the
+     opposite of the relative-scale view above it and is the right choice here
+     -- these are drawings being judged against each other, not glasses being
+     judged against the collection. Width capped so a punch bowl does not take
+     a whole row. */
+  .dev-candidates { align-items: flex-end; gap: 1.6rem 1.4rem; }
+  .dev-candidate-art { display: flex; align-items: flex-end; overflow: visible; }
+  .dev-candidate-art svg { height: 5.4rem; width: auto; max-width: 6.5rem; overflow: visible; }
   .dev-scale-art { display: flex; align-items: flex-end; overflow: visible; }
   /* height comes from the inline style, computed from the real-world mm.
      overflow:visible on the svg matters because the default UA stylesheet
