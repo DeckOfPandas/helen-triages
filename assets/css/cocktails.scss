@@ -24,12 +24,15 @@
 // mixin must be defined before the partial that calls it. Same reason food.scss
 // imports it in the same relative position.
 @import "shared/rule";
-// This site's own emboss value, after the shared one so it wins -- the same
-// position and the same reason food.scss imports food/rule. Without it every
-// heading here takes the shared default outline colour, which shared/_base.scss
-// itself describes as the value only ever seen on an unstyled heading.
-@import "cocktails/rule";
 @import "shared/base";
+// This site's own emboss outline, AFTER shared/base rather than after
+// shared/rule, and the order is load-bearing. shared/_base.scss styles
+// h1/h2/h3 with the stroke colour HARDCODED (it may only name the ten
+// variables the palette contract guarantees, and this is not one of them), so
+// cocktails/rule has to come later to override it -- same specificity, so
+// order decides. Imported before shared/base it set a custom property that
+// nothing on the site read, which is how it shipped for one commit.
+@import "cocktails/rule";
 @import "shared/layout";
 // The chrome's coloured half -- issue #374. This import is the whole reason the
 // partial moved out of food/: the header and footer are chrome both sites

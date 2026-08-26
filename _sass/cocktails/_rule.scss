@@ -37,3 +37,32 @@ $emboss-cocktails-vars-emitted: false !default;
   }
   $emboss-cocktails-vars-emitted: true !global;
 }
+
+// SETTING THE VARIABLE IS NOT ENOUGH, and the first version of this file was
+// inert because of it. `shared/_base.scss` styles h1/h2/h3 with
+//
+//     -webkit-text-stroke: var(--emboss-stroke-w) $color-text;
+//
+// taking the WIDTH from a custom property and hardcoding the COLOUR. Its own
+// comment explains why -- $color-label-stroke is not one of the ten the
+// palette contract guarantees, so shared cannot name it -- and adds that
+// "food overrides it with the softer $color-label-stroke on every component
+// that matters". Food does exactly that, restating the stroke on each
+// component; cocktails restated it nowhere, so every heading kept the hard
+// default and the variable above was read by nothing at all.
+//
+// ONE RULE RATHER THAN FOOD'S PER-COMPONENT RESTATEMENT, which is the lesson
+// food's own file records: it carried this at THIRTEEN call sites before they
+// were unified onto the custom property, and the unification is described
+// there as the improvement. Starting at thirteen in order to arrive at one
+// would be copying the history instead of the conclusion.
+//
+// This is safe to apply site-wide precisely because the stylesheet is
+// per-site: assets/css/cocktails.css is linked only by pages whose site_key is
+// `cocktails`, so a bare element selector here cannot reach food.
+//
+// IMPORTED AFTER shared/base FOR THIS RULE TO WIN -- same specificity, so
+// order decides. See assets/css/cocktails.scss.
+h1, h2, h3 {
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+}
