@@ -1,0 +1,859 @@
+---
+layout: default
+site_key: cocktails
+title: Cocktails design vision
+sitemap: false
+
+# =============================================================================
+# SAMPLE DRINKS — PLACEHOLDER DATA, AND SAYING SO IS THE POINT.
+# =============================================================================
+# _cocktail_drafts/ is a separate private repo and is not in this worktree, so
+# there is no real drink data to render. These eight are real drinks from
+# Helen's collection (every one of them is named in a comment somewhere in
+# _data/cocktails/ or _layouts/cocktail.html) but the SPECS BELOW ARE STANDARD
+# RECIPES, not hers. Do not read a number here as data.
+#
+# What IS real on this page: every glass drawing, every heights_mm value, every
+# mood name, and the ship scale. Those come from _data/cocktails/ at build time,
+# so the relative glass heights and the mood vocabulary are honest even though
+# the drinks are not.
+#
+# Glasses chosen to span the height range on purpose — old-fashioned is 85mm and
+# hurricane is 200mm, so the two card treatments below are being judged against
+# the real spread rather than a flattering slice of it.
+# =============================================================================
+drinks:
+  - title: "Julien Sorel"
+    glass: coupe
+    tagline: "A sharp, herbal cognac sour."
+    moods: ["short and sharp"]
+    ship: "oh gods yes"
+    items: ["cognac", "absinthe", "lemon", "sugar"]
+    hit: "cognac"
+  - title: "Sazerac"
+    glass: old-fashioned
+    tagline: "Rye, sugar, bitters, and a glass rinsed in absinthe."
+    moods: ["strong brown drink", "no juicing"]
+    ship: "oh gods yes"
+    items: ["rye", "absinthe", "demerara syrup", "Peychaud's bitters"]
+  - title: "Cobra's Fang"
+    glass: tiki-mug
+    tagline: "Eight ingredients and not one of them is quiet."
+    moods: ["tiki", "I want to faff", "fruity"]
+    ship: "yes"
+    items: ["Jamaican rum", "overproof rum", "falernum", "lime", "orange", "passion fruit", "absinthe", "grenadine"]
+  - title: "Aviation"
+    glass: nick-and-nora
+    tagline: "Floral, sharp, and faintly violet."
+    moods: ["short and sharp", "clear"]
+    ship: "yes"
+    items: ["gin", "maraschino", "crème de violette", "lemon"]
+  - title: "Jungle Bird"
+    glass: old-fashioned
+    tagline: "Campari and pineapple, which has no business working."
+    moods: ["tiki", "fruity"]
+    ship: "oh gods yes"
+    items: ["Jamaican rum", "Campari", "pineapple", "lime", "sugar"]
+  - title: "Chartreuse Swizzle"
+    glass: collins
+    tagline: "A green blizzard of crushed ice."
+    moods: ["tiki", "ice ice baby", "I want to faff"]
+    ship: "yes"
+    items: ["green Chartreuse", "pineapple", "lime", "falernum"]
+    hit: "green Chartreuse"
+  - title: "Hurricane"
+    glass: hurricane
+    tagline: "Passion fruit and a frankly unreasonable amount of rum."
+    moods: ["fruity", "tiki"]
+    ship: "sure"
+    items: ["dark rum", "white rum", "passion fruit", "lemon", "grenadine"]
+  - title: "Bee's Knees"
+    glass: coupe
+    tagline: "Gin, honey, lemon. Three things."
+    moods: ["short and sharp"]
+    ship: "sure"
+    items: ["gin", "honey syrup", "lemon"]
+---
+
+{% comment %} ─────────────────────────────────────────────────────────────────
+  COCKTAILS DESIGN VISION — internal reference, never published.
+
+  A MOCKUP, NOT AN IMPLEMENTATION. Everything visual on this page is in the
+  <style> block at the bottom, scoped under `.dsn-`, and NOTHING here touches
+  _sass/cocktails/. That is deliberate: the design is being looked at, not
+  shipped, and a mockup that has already edited the real cascade cannot be
+  thrown away cheaply. When a treatment is settled it moves into the partials
+  and the corresponding block here is deleted.
+
+  THE ONE EXCEPTION IS THE GLASS ARTWORK, which uses the real
+  `.glass-icon-line` rule from _sass/cocktails/_cocktail.scss — stroke-width
+  1.6, non-scaling — because the whole question being asked here is what those
+  drawings look like at size, and re-declaring the stroke locally would be
+  testing a copy rather than the thing.
+
+  WHAT IS SETTLED, from Helen, 2026-08-26:
+    1. Ink, paper and glass — light ground, near-monochrome, ONE accent, and
+       the 25 glass drawings carrying the personality rather than colour.
+    2. Index: mood and chaos above the fold, ingredient include then exclude
+       below. NO GLASS FILTER — the drawings are identity, not an axis.
+    3. Card: glass beside the text, horizontal, text block to its right.
+    4. Glass treatment: TRY oversized-and-bleeding (§4) first; fall back to
+       contained-at-true-height (§5) if it does not work. Both are built below
+       so the choice is made by looking.
+    5. Accent: absinthe green.
+    6. Drink page: editorial by default, with a "make it" toggle to a bar-side
+       spec. Both states are on one page (§6).
+────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+{% assign heights = site.data.cocktails.glasses.heights_mm %}
+{% assign all_icons = site.data.cocktails.glasses.all_icons %}
+{% assign moods = site.data.cocktails.taxonomy.moods %}
+
+{% comment %} Tallest glass counted live, never hardcoded — same rigour
+   _layouts/cocktail.html and _dev/glasses.html already hold themselves to. A
+   new glass with a bigger heights_mm value must not need this page edited.
+{% endcomment %}
+{% assign tallest_mm = 0 %}
+{% for icon in all_icons %}
+  {% assign mm = heights[icon] | times: 1.0 %}
+  {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
+{% endfor %}
+
+<article class="dsn">
+
+  <header class="dsn-head">
+    <h1 class="dsn-h1">Cocktails — design vision</h1>
+    <p class="dsn-note">
+      Internal reference, never published. Ink, paper and glass; absinthe green;
+      mood and chaos above the fold. The glass drawings, the {{ all_icons | size }}
+      heights and the {{ moods | size }} moods are read from
+      <code>_data/cocktails/</code> at build time. <strong>The drinks are
+      placeholder specs</strong> — real names, standard recipes — because the
+      drafts repo is not in this worktree.
+    </p>
+  </header>
+
+  {% comment %} ── 1. THE PALETTE ──────────────────────────────────────────────
+     Two tones, not one, on exactly the pattern food's palette already uses: a
+     root hue for fills and marks, and a darkened tone for anything you have to
+     READ. Food arrives at that with $darken-active; the numbers below were
+     measured rather than eyeballed, the way food's five were.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  <section class="dsn-section">
+    <h2 class="dsn-h2">1. Palette</h2>
+    <p class="dsn-note">
+      Near-monochrome, one accent. The accent is two tones because one cannot do
+      both jobs: at the saturation that makes a nice fill, green is nowhere near
+      readable as small text on paper.
+    </p>
+
+    <ul class="dsn-swatches">
+      <li class="dsn-swatch">
+        <span class="dsn-chip" style="background:#fbfbfa; border-color:#e4e4e6;"></span>
+        <code>#fbfbfa</code>
+        <span class="dsn-swatch-role">paper — the ground, unchanged from the scaffold</span>
+      </li>
+      <li class="dsn-swatch">
+        <span class="dsn-chip" style="background:#1b1b1f;"></span>
+        <code>#1b1b1f</code>
+        <span class="dsn-swatch-role">ink — type, and the glass drawings on a drink page</span>
+      </li>
+      <li class="dsn-swatch">
+        <span class="dsn-chip" style="background:#6b6b70;"></span>
+        <code>#6b6b70</code>
+        <span class="dsn-swatch-role">grey — taglines, ingredient lines, de-emphasised UI</span>
+      </li>
+      <li class="dsn-swatch">
+        <span class="dsn-chip" style="background:#e4e4e6;"></span>
+        <code>#e4e4e6</code>
+        <span class="dsn-swatch-role">line — card borders, rules</span>
+      </li>
+      <li class="dsn-swatch">
+        <span class="dsn-chip" style="background:#9CB43C;"></span>
+        <code>#9CB43C</code>
+        <span class="dsn-swatch-role">
+          <strong>absinthe verte</strong> — 2.25:1 on paper. Fills, active button
+          backgrounds, the glass wash, the ship dot. <em>Never text.</em>
+        </span>
+      </li>
+      <li class="dsn-swatch">
+        <span class="dsn-chip" style="background:#5C7A1E;"></span>
+        <code>#5C7A1E</code>
+        <span class="dsn-swatch-role">
+          <strong>deep herbal</strong> — 4.76:1 on paper, clears the 4.5:1 body-text
+          floor. Links, active labels, the search-hit mark, the footer accent the
+          palette file has been asking for.
+        </span>
+      </li>
+    </ul>
+
+    <p class="dsn-note dsn-note--aside">
+      This retires the placeholder <code>$color-accent: $color-grey-mid</code> in
+      <code>_sass/cocktails/_palette.scss</code>, whose own comment records that
+      grey-on-grey "reads like nothing at all at footer size". Deep herbal on the
+      footer's grey is a hue change, not a lightness one.
+    </p>
+  </section>
+
+  {% comment %} ── 2. TYPE ─────────────────────────────────────────────────────
+     Unchanged from the scaffold, and that is the decision rather than the
+     absence of one: _palette.scss already argues that the typographic voice is
+     the family resemblance between the two sites, and colour and drawing are
+     what separate them. Cocktails now has a drawing language food does not
+     have, which is enough separation without a second typeface.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  <section class="dsn-section">
+    <h2 class="dsn-h2">2. Type</h2>
+    <div class="dsn-type-specimens">
+      <p class="dsn-spec-title">JULIEN SOREL</p>
+      <p class="dsn-note">Courier Prime, uppercase, tight tracking — drink names, section labels, amounts.</p>
+      <p class="dsn-spec-tagline">A sharp, herbal cognac sour.</p>
+      <p class="dsn-note">Selawik italic, grey — taglines only. The one place the site has a voice.</p>
+      <p class="dsn-spec-body">Shake hard with cubed ice, then double-strain into a chilled coupe. No garnish; the absinthe is the aromatic.</p>
+      <p class="dsn-note">Selawik roman — method, notes, everything you read at length.</p>
+    </div>
+    <p class="dsn-note dsn-note--aside">
+      No <code>$font-label</code> here. On food that face earned two jobs by
+      surviving four returns; borrowing the survivor of someone else's argument
+      is not the same as having made one.
+    </p>
+  </section>
+
+  {% comment %} ── 3. THE INDEX ────────────────────────────────────────────────
+     Mood and chaos above the fold, ingredient include then exclude below.
+     Helen, 2026-08-26. No glass filter.
+
+     THE COUNTS ARE FAKE AND ONLY THE COUNTS. Mood membership needs the drafts
+     repo, which is not here; the mood NAMES are read live from taxonomy.yml so
+     the vocabulary on screen is the real one. A mood with no members must not
+     render a button at all — taxonomy.yml says so explicitly about `pudding in
+     a glass`, which is declared with zero members on purpose — so the loop
+     below skips it by name rather than pretending it has drinks.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  <section class="dsn-section">
+    <h2 class="dsn-h2">3. The index, above the fold</h2>
+
+    <div class="dsn-frame">
+
+      <div class="dsn-index-primary">
+        <p class="dsn-field-label">What do you fancy?</p>
+        <div class="dsn-moods">
+          {% for mood in moods %}
+            {% unless mood[0] == "pudding in a glass" %}
+              <button type="button" class="dsn-btn dsn-btn--mood{% if mood[0] == 'no juicing' %} is-on{% endif %}">
+                {{ mood[0] }}
+              </button>
+            {% endunless %}
+          {% endfor %}
+        </div>
+
+        <p class="dsn-field-label dsn-field-label--second">How much chaos?</p>
+        <div class="dsn-chaos">
+          <button type="button" class="dsn-btn dsn-btn--chaos">definitely good</button>
+          <button type="button" class="dsn-btn dsn-btn--chaos">YOLO</button>
+        </div>
+      </div>
+
+      <p class="dsn-fold"><span>the fold</span></p>
+
+      <div class="dsn-index-secondary">
+        <div class="dsn-search">
+          <label class="dsn-field-label" for="dsn-inc">Has to have</label>
+          <input class="dsn-input" id="dsn-inc" type="text" placeholder="ingredient name…" value="cognac" readonly />
+          <div class="dsn-pool">
+            <button type="button" class="dsn-btn dsn-btn--pool is-on">cognac</button>
+            <button type="button" class="dsn-btn dsn-btn--pool">cognac, VSOP</button>
+            <button type="button" class="dsn-btn dsn-btn--pool">crème de cacao</button>
+          </div>
+        </div>
+
+        <div class="dsn-search dsn-search--exclude">
+          <label class="dsn-field-label" for="dsn-exc">Leave out</label>
+          <input class="dsn-input" id="dsn-exc" type="text" placeholder="ingredient name…" readonly />
+          <div class="dsn-pool">
+            <button type="button" class="dsn-btn dsn-btn--pool dsn-btn--exclude">cream</button>
+            <button type="button" class="dsn-btn dsn-btn--pool dsn-btn--exclude">egg</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="dsn-count"><strong>2</strong> drinks</p>
+    </div>
+
+    <p class="dsn-note dsn-note--aside">
+      Include and exclude read as one pair — same input, same pool of
+      candidates — with the exclude side inverted (struck through, hollow) so
+      you can tell at a glance which half of the sentence a chip belongs to.
+      That is one hue doing both jobs rather than food's cobalt-for-exclude,
+      which is a second decision this site has not earned yet.
+    </p>
+  </section>
+
+  {% comment %} ── 4. CARDS, TREATMENT A ───────────────────────────────────────
+     Oversized and bleeding. The glass is drawn far larger than an icon, pale
+     absinthe, cropped by the card's top and bottom edges — pattern rather than
+     information. Helen's first choice, to be looked at before §5.
+
+     THE HEIGHT IS STILL TRUE-RELATIVE. Bleeding is a treatment, not an excuse
+     to stop caring: every glass is scaled off the same tallest_mm counted at
+     the top of the page, then multiplied by one oversize factor. So an
+     old-fashioned still crops less than a hurricane, and the row keeps the
+     information the drawings carry.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  <section class="dsn-section">
+    <h2 class="dsn-h2">4. Cards — oversized, bleeding <span class="dsn-h2-tag">treatment A</span></h2>
+    <p class="dsn-note">
+      Pale absinthe, hairline stroke, cropped top and bottom. Reads as a
+      designed surface rather than a list. The risk is legibility of the
+      silhouette — a cropped glass is harder to identify than a whole one.
+    </p>
+
+    <ul class="dsn-cards dsn-cards--bleed">
+      {% for drink in page.drinks %}
+        {% assign mm = heights[drink.glass] | times: 1.0 %}
+        {% assign h = mm | divided_by: tallest_mm | times: 20.0 %}
+        <li class="dsn-card">
+          <span class="dsn-card-glass" style="--dsn-glass-h: {{ h }}rem;">
+            {% capture f %}icons/glasses/{{ drink.glass }}.svg{% endcapture %}
+            {% include {{ f }} %}
+          </span>
+          <div class="dsn-card-body">
+            <p class="dsn-card-name">{{ drink.title }}</p>
+            <p class="dsn-card-tagline">{{ drink.tagline }}</p>
+            <p class="dsn-card-items">
+              {% for item in drink.items %}{% if item == drink.hit %}<mark class="dsn-hit">{{ item }}</mark>{% else %}{{ item }}{% endif %}{% unless forloop.last %} <span class="dsn-dot">·</span> {% endunless %}{% endfor %}
+            </p>
+            <p class="dsn-card-foot">
+              {% for m in drink.moods %}<span class="dsn-mood-chip">{{ m }}</span>{% endfor %}
+              <span class="dsn-ship {% if drink.ship == 'oh gods yes' or drink.ship == 'yes' %}dsn-ship--good{% endif %}">{{ drink.ship }}</span>
+            </p>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {% comment %} ── 5. CARDS, TREATMENT B ───────────────────────────────────────
+     Contained, at true relative height, in full ink. The fallback Helen asked
+     for if A does not work. Same card skeleton, same text block — only the
+     glass column differs, which is what makes this a fair comparison rather
+     than two different cards.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  <section class="dsn-section">
+    <h2 class="dsn-h2">5. Cards — contained, true height <span class="dsn-h2-tag">treatment B</span></h2>
+    <p class="dsn-note">
+      Whole glass, grey ink, sitting on the card's baseline. Every silhouette is
+      identifiable and the height difference between an old-fashioned (85&nbsp;mm)
+      and a hurricane (200&nbsp;mm) does real work down the column. Quieter, and
+      more obviously a list.
+    </p>
+
+    <ul class="dsn-cards dsn-cards--contained">
+      {% for drink in page.drinks %}
+        {% assign mm = heights[drink.glass] | times: 1.0 %}
+        {% assign h = mm | divided_by: tallest_mm | times: 5.4 %}
+        <li class="dsn-card">
+          <span class="dsn-card-glass" style="--dsn-glass-h: {{ h }}rem;">
+            {% capture f %}icons/glasses/{{ drink.glass }}.svg{% endcapture %}
+            {% include {{ f }} %}
+          </span>
+          <div class="dsn-card-body">
+            <p class="dsn-card-name">{{ drink.title }}</p>
+            <p class="dsn-card-tagline">{{ drink.tagline }}</p>
+            <p class="dsn-card-items">
+              {% for item in drink.items %}{% if item == drink.hit %}<mark class="dsn-hit">{{ item }}</mark>{% else %}{{ item }}{% endif %}{% unless forloop.last %} <span class="dsn-dot">·</span> {% endunless %}{% endfor %}
+            </p>
+            <p class="dsn-card-foot">
+              {% for m in drink.moods %}<span class="dsn-mood-chip">{{ m }}</span>{% endfor %}
+              <span class="dsn-ship {% if drink.ship == 'oh gods yes' or drink.ship == 'yes' %}dsn-ship--good{% endif %}">{{ drink.ship }}</span>
+            </p>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {% comment %} ── 6. THE DRINK PAGE ───────────────────────────────────────────
+     Two states, one page. Editorial by default; "make it" strips to the
+     bar-side spec.
+
+     WHAT THE TOGGLE ACTUALLY DOES, because "strips down" is not a spec: it
+     hides the tagline, the class lines, the character parentheticals and the
+     notes; it enlarges the amounts and the method; and it shrinks the glass
+     drawing from the page's hero to a small identifying mark. Nothing is
+     REMOVED from the DOM, so the page still prints and still reads with JS off
+     — the same progressive-enhancement contract as the back arrow.
+
+     The ingredient rows below use the real schema from _layouts/cocktail.html:
+     amount / suggestion-or-item headline / generic class line / character
+     parenthetical / note. Julien Sorel's values are invented; the SHAPE is not.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  <section class="dsn-section">
+    <h2 class="dsn-h2">6. The drink page — two states</h2>
+
+    <div class="dsn-frame">
+      <div class="dsn-drink" id="dsn-drink">
+
+        <div class="dsn-drink-toggle-row">
+          <button type="button" class="dsn-btn dsn-btn--toggle" id="dsn-make">make it</button>
+        </div>
+
+        <div class="dsn-drink-head">
+          <span class="dsn-drink-glass">
+            {% include icons/glasses/coupe.svg %}
+          </span>
+          <div>
+            <h3 class="dsn-drink-title">Julien Sorel</h3>
+            <p class="dsn-drink-tagline dsn-editorial-only">A sharp, herbal cognac sour — the absinthe does the work a garnish usually does.</p>
+            <ul class="dsn-drink-meta">
+              <li><span>Glass</span> coupe</li>
+              <li><span>Garnish</span> none</li>
+            </ul>
+          </div>
+        </div>
+
+        <h4 class="dsn-drink-heading">Ingredients</h4>
+        <ul class="dsn-ing">
+          <li class="dsn-ing-row">
+            <div class="dsn-ing-top">
+              <span class="dsn-amount">50 ml</span>
+              <span class="dsn-item">Pierre Ferrand 1840</span>
+            </div>
+            <p class="dsn-ing-class dsn-editorial-only">cognac <span class="dsn-character">(character: dry, high-proof)</span></p>
+            <p class="dsn-ing-note dsn-editorial-only">A softer VS disappears under the absinthe; this one does not.</p>
+          </li>
+          <li class="dsn-ing-row">
+            <div class="dsn-ing-top">
+              <span class="dsn-amount">20 ml</span>
+              <span class="dsn-item">lemon juice</span>
+            </div>
+          </li>
+          <li class="dsn-ing-row">
+            <div class="dsn-ing-top">
+              <span class="dsn-amount">15 ml</span>
+              <span class="dsn-item">sugar syrup</span>
+            </div>
+            <p class="dsn-ing-class dsn-editorial-only">2:1 rich syrup</p>
+          </li>
+          <li class="dsn-ing-row">
+            <div class="dsn-ing-top">
+              <span class="dsn-amount">2 dashes</span>
+              <span class="dsn-item">absinthe</span>
+            </div>
+            <p class="dsn-ing-note dsn-editorial-only">Dashed in, not rinsed — this is not a Sazerac.</p>
+          </li>
+        </ul>
+
+        <h4 class="dsn-drink-heading">Method</h4>
+        <ol class="dsn-method">
+          <li>Chill a coupe.</li>
+          <li>Shake everything hard with cubed ice.</li>
+          <li>Double-strain into the chilled glass.</li>
+        </ol>
+
+        <div class="dsn-editorial-only">
+          <h4 class="dsn-drink-heading">Notes</h4>
+          <div class="dsn-notes">
+            <div class="dsn-note-block">
+              <span class="dsn-note-label">balance</span>
+              <p>Sharper than a Sidecar and drier than a Champs Élysées, which is the whole point of it.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="dsn-note dsn-note--aside">
+      Press <strong>make it</strong>. The tagline, class lines, characters and
+      notes go; the amounts and method grow; the glass drops from hero to mark.
+      Same page, same DOM, one class.
+    </p>
+  </section>
+
+  {% comment %} ── 7. WHAT IS STILL OPEN ───────────────────────────────────────
+     Written down rather than quietly decided, because every one of these is a
+     real choice and none of them was in the four questions Helen answered.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  <section class="dsn-section">
+    <h2 class="dsn-h2">7. Still open</h2>
+    <ul class="dsn-open">
+      <li><strong>Mood combination.</strong> Two moods selected — AND or OR? Food's answer may not be the right one here; "tiki AND no juicing" is nearly empty, "tiki OR no juicing" is half the book.</li>
+      <li><strong>Sort order.</strong> Alphabetical, by ship, or by how well a drink matches the filters. The chaos filter implies ship already matters.</li>
+      <li><strong>Does chaos filter, or sort?</strong> "Definitely good" as a hard filter hides drinks; as a sort it floats them. Different feelings.</li>
+      <li><strong>The empty state.</strong> "Nothing that good, sorry" is the current one, and it is good. Does it get a drawing?</li>
+      <li><strong>Print.</strong> A drink page in the "make it" state is what you would print. Worth confirming that is the printed form.</li>
+      <li><strong>The glass column on narrow screens.</strong> Treatment A crops harder as the card narrows; at phone width the card may need to stack.</li>
+    </ul>
+  </section>
+
+</article>
+
+<style>
+/* ===========================================================================
+   MOCKUP STYLES — scoped under .dsn, thrown away when a treatment is settled.
+   Nothing here belongs in _sass/cocktails/ until Helen has looked at it.
+   =========================================================================== */
+.dsn {
+  --dsn-ink:      #1b1b1f;
+  --dsn-paper:    #fbfbfa;
+  --dsn-grey:     #6b6b70;
+  --dsn-line:     #e4e4e6;
+  --dsn-absinthe: #9CB43C;
+  --dsn-deep:     #5C7A1E;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dsn-head { margin-bottom: 3rem; }
+.dsn-h1 { font-family: "Courier Prime", monospace; font-size: 1.9rem; margin: 0 0 0.6rem; }
+.dsn-h2 {
+  font-family: "Courier Prime", monospace;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--dsn-absinthe);
+}
+.dsn-h2-tag {
+  float: right;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--dsn-grey);
+  padding-top: 0.3rem;
+}
+.dsn-section { margin-bottom: 4rem; }
+.dsn-note { font-size: 0.88rem; line-height: 1.6; color: var(--dsn-grey); margin: 0 0 1.2rem; }
+.dsn-note--aside {
+  border-left: 2px solid var(--dsn-line);
+  padding-left: 0.9rem;
+  margin-top: 1.4rem;
+  font-size: 0.83rem;
+}
+.dsn code { font-family: "Courier Prime", monospace; font-size: 0.85em; }
+
+/* --- 1. palette ---------------------------------------------------------- */
+.dsn-swatches { list-style: none; margin: 0; padding: 0; }
+.dsn-swatch {
+  display: grid;
+  grid-template-columns: 2.4rem 5.5rem 1fr;
+  gap: 0.9rem;
+  align-items: baseline;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--dsn-line);
+  font-size: 0.85rem;
+}
+.dsn-chip {
+  display: block;
+  width: 2.4rem; height: 1.5rem;
+  border: 1px solid rgba(0,0,0,0.12);
+  align-self: center;
+}
+.dsn-swatch-role { color: var(--dsn-grey); line-height: 1.5; }
+
+/* --- 2. type ------------------------------------------------------------- */
+.dsn-type-specimens { border-left: 2px solid var(--dsn-line); padding-left: 1.2rem; }
+.dsn-spec-title {
+  font-family: "Courier Prime", monospace;
+  font-size: 1.6rem; letter-spacing: 0.04em;
+  margin: 0 0 0.2rem; color: var(--dsn-ink);
+}
+.dsn-spec-tagline { font-style: italic; font-size: 1.05rem; color: var(--dsn-grey); margin: 1.4rem 0 0.2rem; }
+.dsn-spec-body { font-size: 0.95rem; line-height: 1.7; margin: 1.4rem 0 0.2rem; }
+
+/* --- 3. the index -------------------------------------------------------- */
+.dsn-frame {
+  border: 1px solid var(--dsn-line);
+  background: #fff;
+  padding: 2rem 1.8rem 1.6rem;
+}
+.dsn-field-label {
+  font-family: "Courier Prime", monospace;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--dsn-grey);
+  margin: 0 0 0.7rem;
+  display: block;
+}
+.dsn-field-label--second { margin-top: 1.6rem; }
+
+.dsn-moods, .dsn-chaos, .dsn-pool { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+
+.dsn-btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.34rem 0.8rem;
+  border: 1.5px solid var(--dsn-line);
+  border-radius: 2rem;
+  background: #fff;
+  color: var(--dsn-ink);
+  cursor: pointer;
+  line-height: 1.3;
+}
+.dsn-btn:hover { border-color: var(--dsn-deep); color: var(--dsn-deep); }
+.dsn-btn.is-on {
+  background: var(--dsn-absinthe);
+  border-color: var(--dsn-deep);
+  color: #16210a;
+  font-weight: 600;
+}
+.dsn-btn--mood { font-size: 0.92rem; padding: 0.42rem 0.95rem; }
+.dsn-btn--chaos {
+  font-family: "Courier Prime", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+.dsn-btn--pool { font-size: 0.8rem; padding: 0.25rem 0.65rem; }
+.dsn-btn--exclude {
+  text-decoration: line-through;
+  color: var(--dsn-grey);
+  border-style: dashed;
+}
+.dsn-btn--exclude:hover { color: var(--dsn-deep); }
+
+.dsn-fold {
+  border-top: 1px dashed #c9c9cc;
+  text-align: center;
+  margin: 2.2rem 0 1.6rem;
+  height: 0;
+}
+.dsn-fold span {
+  position: relative; top: -0.62rem;
+  background: #fff;
+  padding: 0 0.6rem;
+  font-family: "Courier Prime", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b4b4b8;
+}
+
+.dsn-index-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.dsn-input {
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 100%;
+  padding: 0.4rem 0.1rem;
+  border: none;
+  border-bottom: 1.5px solid var(--dsn-line);
+  background: transparent;
+  margin-bottom: 0.7rem;
+}
+.dsn-search--exclude .dsn-input { border-bottom-style: dashed; }
+.dsn-count {
+  font-family: "Courier Prime", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dsn-grey);
+  margin: 1.8rem 0 0;
+  padding-top: 0.8rem;
+  border-top: 2px solid var(--dsn-absinthe);
+}
+.dsn-count strong { color: var(--dsn-ink); font-size: 1rem; }
+
+/* --- 4 & 5. cards -------------------------------------------------------- */
+.dsn-cards {
+  list-style: none; margin: 0; padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+  gap: 1rem;
+}
+.dsn-card {
+  position: relative;
+  display: grid;
+  align-items: center;
+  border: 1px solid var(--dsn-line);
+  background: #fff;
+  overflow: hidden;
+}
+.dsn-card-body { min-width: 0; }
+.dsn-card-name {
+  font-family: "Courier Prime", monospace;
+  font-size: 1.08rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0 0 0.3rem;
+}
+.dsn-card-tagline { font-style: italic; font-size: 0.86rem; color: var(--dsn-grey); margin: 0 0 0.7rem; line-height: 1.45; }
+.dsn-card-items { font-size: 0.82rem; line-height: 1.55; color: var(--dsn-ink); margin: 0 0 0.8rem; }
+.dsn-dot { color: #c2c2c6; }
+.dsn-hit {
+  background: var(--dsn-absinthe);
+  color: #16210a;
+  padding: 0.05em 0.3em;
+  font-weight: 600;
+}
+.dsn-card-foot { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin: 0; }
+.dsn-mood-chip {
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: var(--dsn-grey);
+  border: 1px solid var(--dsn-line);
+  border-radius: 2rem;
+  padding: 0.1rem 0.5rem;
+}
+.dsn-ship {
+  margin-left: auto;
+  font-family: "Courier Prime", monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dsn-grey);
+  white-space: nowrap;
+}
+.dsn-ship::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem; height: 0.45rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--dsn-grey);
+  margin-right: 0.35rem;
+  vertical-align: 0.02rem;
+}
+.dsn-ship--good { color: var(--dsn-deep); }
+.dsn-ship--good::before { background: var(--dsn-absinthe); border-color: var(--dsn-deep); }
+
+.dsn-card-glass { display: block; }
+.dsn-card-glass svg { display: block; height: var(--dsn-glass-h, 4rem); width: auto; overflow: visible; }
+
+/* TREATMENT A — oversized, bleeding.
+   The glass is taken out of flow so the card's height is set by the TEXT, not
+   by a 15rem drawing; the card then crops it. `--dsn-glass-h` is still the
+   true-relative height, so a hurricane crops more than an old-fashioned. */
+.dsn-cards--bleed .dsn-card { grid-template-columns: 1fr; padding: 1.15rem 1.25rem 1.15rem 8.5rem; min-height: 9.5rem; }
+.dsn-cards--bleed .dsn-card-glass {
+  position: absolute;
+  left: -1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--dsn-absinthe);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.dsn-cards--bleed .dsn-card-glass .glass-icon-line { stroke-width: 1; }
+/* The widest glasses (punch bowl, mule mug) are as wide as they are tall, and
+   at this oversize factor that would walk straight into the text column. Same
+   problem _sass/cocktails/_cocktail.scss already solves with its 3.2rem cap,
+   at a different scale. */
+.dsn-cards--bleed .dsn-card-glass svg { max-width: 8.6rem; }
+
+/* TREATMENT B — contained, whole, on the baseline. */
+.dsn-cards--contained .dsn-card {
+  grid-template-columns: 4.6rem 1fr;
+  gap: 1.1rem;
+  padding: 1.15rem 1.25rem;
+  align-items: end;
+}
+.dsn-cards--contained .dsn-card-glass {
+  color: var(--dsn-grey);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+  padding-bottom: 0.1rem;
+}
+.dsn-cards--contained .dsn-card-glass svg { max-width: 4.4rem; }
+
+/* --- 6. the drink page --------------------------------------------------- */
+.dsn-drink-toggle-row { display: flex; justify-content: flex-end; margin-bottom: 0.5rem; }
+.dsn-btn--toggle {
+  font-family: "Courier Prime", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  border-color: var(--dsn-deep);
+  color: var(--dsn-deep);
+}
+.dsn-btn--toggle.is-on { background: var(--dsn-absinthe); color: #16210a; }
+
+.dsn-drink-head { display: flex; gap: 1.6rem; align-items: flex-end; margin-bottom: 2.2rem; }
+.dsn-drink-glass { flex: none; color: var(--dsn-ink); }
+.dsn-drink-glass svg { display: block; height: 7rem; width: auto; overflow: visible; transition: height 0.18s ease; }
+.dsn-drink-title { font-family: "Courier Prime", monospace; font-size: 1.9rem; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 0.4rem; }
+.dsn-drink-tagline { font-style: italic; font-size: 1.02rem; color: var(--dsn-grey); margin: 0 0 0.8rem; }
+.dsn-drink-meta { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.6rem; font-size: 0.82rem; }
+.dsn-drink-meta span {
+  font-family: "Courier Prime", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  color: var(--dsn-grey);
+  margin-right: 0.4rem;
+}
+.dsn-drink-heading {
+  font-family: "Courier Prime", monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--dsn-grey);
+  margin: 2rem 0 0.6rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--dsn-line);
+}
+.dsn-ing { list-style: none; margin: 0; padding: 0; }
+.dsn-ing-row { padding: 0.7rem 0; border-bottom: 1px solid var(--dsn-line); }
+.dsn-ing-row:last-child { border-bottom: none; }
+.dsn-ing-top { display: flex; gap: 0.9rem; align-items: baseline; }
+.dsn-amount {
+  font-family: "Courier Prime", monospace;
+  font-size: 0.95rem;
+  min-width: 5rem;
+  color: var(--dsn-ink);
+  transition: font-size 0.18s ease;
+}
+.dsn-item { font-size: 0.98rem; }
+.dsn-ing-class { font-size: 0.82rem; color: var(--dsn-grey); margin: 0.25rem 0 0 5.9rem; }
+.dsn-character { color: #8d8d92; }
+.dsn-ing-note { font-size: 0.82rem; color: var(--dsn-grey); font-style: italic; margin: 0.2rem 0 0 5.9rem; }
+.dsn-method { margin: 0; padding-left: 1.3rem; font-size: 0.95rem; line-height: 1.75; }
+.dsn-method li { margin-bottom: 0.3rem; }
+.dsn-notes { border-left: 2px solid var(--dsn-absinthe); padding-left: 1rem; }
+.dsn-note-label {
+  font-family: "Courier Prime", monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--dsn-deep);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+.dsn-notes p { margin: 0; font-size: 0.9rem; line-height: 1.65; }
+
+/* MAKE-IT STATE. One class on the container. Nothing leaves the DOM, so the
+   page still prints and still works with JS off. */
+.dsn-drink.is-making .dsn-editorial-only { display: none; }
+.dsn-drink.is-making .dsn-drink-glass svg { height: 3rem; }
+.dsn-drink.is-making .dsn-amount { font-size: 1.3rem; font-weight: 700; }
+.dsn-drink.is-making .dsn-item { font-size: 1.15rem; }
+.dsn-drink.is-making .dsn-ing-row { padding: 0.95rem 0; }
+.dsn-drink.is-making .dsn-method { font-size: 1.1rem; line-height: 1.85; }
+.dsn-drink.is-making .dsn-drink-title { font-size: 1.4rem; }
+
+/* --- 7. open ------------------------------------------------------------- */
+.dsn-open { font-size: 0.88rem; line-height: 1.65; padding-left: 1.1rem; }
+.dsn-open li { margin-bottom: 0.6rem; }
+.dsn-open strong { font-family: "Courier Prime", monospace; font-size: 0.86rem; }
+
+@media (max-width: 720px) {
+  .dsn-index-secondary { grid-template-columns: 1fr; gap: 1.4rem; }
+  .dsn-cards { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+/* The make-it toggle. Adds one class; the CSS above does the rest. */
+(function () {
+  var btn   = document.getElementById('dsn-make');
+  var drink = document.getElementById('dsn-drink');
+  if (!btn || !drink) return;
+  btn.addEventListener('click', function () {
+    var making = drink.classList.toggle('is-making');
+    btn.classList.toggle('is-on', making);
+    btn.textContent = making ? 'read about it' : 'make it';
+  });
+})();
+</script>
