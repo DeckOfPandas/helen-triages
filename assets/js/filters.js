@@ -922,6 +922,10 @@ function renderResultsPool() {
       if (state.meta.has('rewrite') && li.dataset.metaRewrite !== 'true') visible = false;
       if (state.meta.has('proofread') && li.dataset.metaProofread !== 'true') visible = false;
       // THREE-VALUED, NOT BOOLEAN, since the magic bag landed. data-meta-short
+      // NOT COVERED BY A TEST — this file has none at all (HANDOVER 3's table:
+      // "exercised by hand"), so the branch below is reasoned and hand-checked
+      // rather than executed. Issue #506 proposes lifting it into a pure
+      // predicate that Node can test, same argument as back-link.js.
       // is 'true', 'false', or 'n/a' -- the last for a row that is not a recipe
       // and so has no answer to "does it have a short method?". Both halves of
       // this filter pair now require their explicit value rather than treating
