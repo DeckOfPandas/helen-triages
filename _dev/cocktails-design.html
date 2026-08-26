@@ -22,6 +22,33 @@ sitemap: false
 # hurricane is 200mm, so the two card treatments below are being judged against
 # the real spread rather than a flattering slice of it.
 # =============================================================================
+# =============================================================================
+# PER-GLASS DISPLAY TWEAKS — the cheat, kept visible and kept in data.
+# =============================================================================
+# Helen, 2026-08-26: coupe, nick-and-nora and tiki mug look great at 14rem, but
+# "Collins and hurricane are so tall that their proportions aren't right... we
+# might need to cheat and force some padding top and bottom".
+#
+# This is that cheat, and it is a MULTIPLIER on the true-relative height rather
+# than literal padding, because padding would move the glass's baseline while
+# leaving its size alone -- the drawing would still be as tall as it is, just
+# pushed off centre. A multiplier shrinks it, which is what "its proportions
+# are wrong at this height" actually asks for.
+#
+# IT IS DATA, NOT A RULE IN A STYLESHEET, on purpose. Every one of these is a
+# judgement about one drawing rather than a fact about glassware, and the
+# honest place for a per-item judgement is somewhere you can see all of them at
+# once. If this survives into the real site it belongs beside heights_mm in
+# _data/cocktails/glasses.yml, for the same reason that file exists.
+#
+# Try the SPREAD slider on the page before adding a line here: it compresses
+# the whole height range at once, and if a global curve fixes the two tall
+# glasses then no per-glass cheat is needed at all. These two are seeded so
+# both mechanisms are visible side by side.
+glass_tweaks:
+  collins: 0.82
+  hurricane: 0.82
+
 drinks:
   - title: "Julien Sorel"
     glass: coupe
@@ -222,11 +249,77 @@ drinks:
 
     <p class="dsn-note dsn-note--aside">
       The left chip of each pair is the FILL — active buttons, the search-hit
-      mark, the goodness square, the glass wash. It is never text. The right
-      chip is the one you read. Whichever wins also retires the placeholder
+      mark, the glass wash. It is never text. The right chip is the one you
+      read. Whichever wins also retires the placeholder
       <code>$color-accent: $color-grey-mid</code> in
       <code>_sass/cocktails/_palette.scss</code>, whose own comment records
       grey-on-grey as "reading like nothing at all at footer size".
+    </p>
+
+    {% comment %} ── THE SECOND ACCENT ───────────────────────────────────────
+       Helen, 2026-08-26: "Can we try one more accent colour, taking us to two?
+       I'm trying to like this, and I really do, but I'm not quite there."
+
+       A SECOND COLOUR NEEDS A SECOND JOB, or it is decoration and the page
+       gets muddier rather than better. Food's palette is explicit about this —
+       its recipe page spends four colours and the count IS the design, with
+       magenta carrying three jobs precisely because they are one idea
+       (interactive/branded) rather than three coincidences.
+
+       So the split here is by AXIS, not by prettiness:
+
+         green    — matching. Active filters, the search-hit mark, the glass
+                    wash. "This one fits what you asked for."
+         second   — goodness. The ship square on a card, the chaos buttons.
+                    "This one is good." Helen's own verdict, not a filter
+                    state.
+
+       That is a real distinction on the index: you can be looking at a drink
+       that matches your mood (green) and is rated `meh` (second, hollow), and
+       the two facts should not wear the same colour.
+
+       EVERY CANDIDATE IS WARM, and that is the reasoning rather than taste:
+       the green already means "matched", so a second cool hue would read as
+       another state of the same thing. Warm against green reads as a different
+       axis before you have worked out what it means. Same two-tone contract,
+       solved per hue.
+    ────────────────────────────────────────────────────────────────────{% endcomment %}
+    <p class="dsn-field-label dsn-field-label--pick">And a second accent — this one carries goodness</p>
+    <div class="dsn-hues dsn-hues--second" id="dsn-hues-2">
+      <button type="button" class="dsn-hue is-on" data-fill="" data-deep="">
+        <span class="dsn-hue-chips"><i style="background:#e4e4e6"></i><i style="background:#c9c9cc"></i></span>
+        <span class="dsn-hue-name">none — one accent</span>
+        <span class="dsn-hue-hex">goodness stays grey/green</span>
+      </button>
+      <button type="button" class="dsn-hue" data-fill="#EB8A83" data-deep="#D52F23">
+        <span class="dsn-hue-chips"><i style="background:#EB8A83"></i><i style="background:#D52F23"></i></span>
+        <span class="dsn-hue-name">campari red</span>
+        <span class="dsn-hue-hex">#EB8A83 · #D52F23</span>
+      </button>
+      <button type="button" class="dsn-hue" data-fill="#EB925E" data-deep="#B85217">
+        <span class="dsn-hue-chips"><i style="background:#EB925E"></i><i style="background:#B85217"></i></span>
+        <span class="dsn-hue-name">bitter orange</span>
+        <span class="dsn-hue-hex">#EB925E · #B85217</span>
+      </button>
+      <button type="button" class="dsn-hue" data-fill="#DD9C2C" data-deep="#966818">
+        <span class="dsn-hue-chips"><i style="background:#DD9C2C"></i><i style="background:#966818"></i></span>
+        <span class="dsn-hue-name">amber, aged</span>
+        <span class="dsn-hue-hex">#DD9C2C · #966818</span>
+      </button>
+      <button type="button" class="dsn-hue" data-fill="#DF909D" data-deep="#C73F56">
+        <span class="dsn-hue-chips"><i style="background:#DF909D"></i><i style="background:#C73F56"></i></span>
+        <span class="dsn-hue-name">vermouth rouge</span>
+        <span class="dsn-hue-hex">#DF909D · #C73F56</span>
+      </button>
+    </div>
+
+    <p class="dsn-note dsn-note--aside">
+      Watch the goodness squares on the cards below and the two chaos buttons
+      in §3 — those are the only things that change. If a second colour is not
+      earning its place, that is where it will show: too loud and the cards
+      start shouting their ratings over their names, too quiet and you have
+      spent a colour on nothing. <strong>none</strong> is a real option and is
+      the one to beat.
     </p>
   </section>
 
@@ -284,7 +377,7 @@ drinks:
 
         <p class="dsn-field-label dsn-field-label--second">How much chaos?</p>
         <div class="dsn-chaos">
-          <button type="button" class="dsn-btn dsn-btn--chaos">definitely good</button>
+          <button type="button" class="dsn-btn dsn-btn--chaos is-on">definitely good</button>
           <button type="button" class="dsn-btn dsn-btn--chaos">YOLO</button>
         </div>
       </div>
@@ -347,20 +440,45 @@ drinks:
 
     <div class="dsn-slider">
       <label for="dsn-scale-a">glass size</label>
-      <input type="range" id="dsn-scale-a" min="5" max="22" step="0.5" value="12"
+      <input type="range" id="dsn-scale-a" min="5" max="22" step="0.5" value="14"
              data-target="dsn-cards-a" />
-      <output id="dsn-scale-a-out">12rem</output>
+      <output id="dsn-scale-a-out">14rem</output>
       <span class="dsn-slider-hint">tallest glass; the rest scale off it</span>
     </div>
 
-    <ul class="dsn-cards dsn-cards--wash" id="dsn-cards-a" style="--dsn-glass-scale: 12rem;">
+    {% comment %} SPREAD is the global answer to the same problem the per-glass
+       tweaks solve locally, and it is worth trying first. It raises every
+       ratio to a power: at 1 the heights are exactly true-relative (a 60mm
+       shot is 26% of a 230mm flute), at 0 every glass is the same height, and
+       in between the range compresses while the ORDER is untouched — a shot is
+       always shorter than a flute, it just stops being four times shorter.
+
+       This is the honest dial for "real height matters, but not this much".
+       If a curve alone fixes Collins and hurricane, the two per-glass cheats
+       in the front matter can go. {% endcomment %}
+    <div class="dsn-slider">
+      <label for="dsn-spread">height spread</label>
+      <input type="range" id="dsn-spread" min="0" max="1" step="0.05" value="1" />
+      <output id="dsn-spread-out">1.00</output>
+      <span class="dsn-slider-hint">1 = true relative · 0 = all the same</span>
+    </div>
+
+    <div class="dsn-slider">
+      <label for="dsn-tweaks">per-glass cheat</label>
+      <input type="checkbox" id="dsn-tweaks" checked />
+      <span class="dsn-slider-hint">collins and hurricane at 0.82, from the front matter</span>
+    </div>
+
+    <ul class="dsn-cards dsn-cards--wash" id="dsn-cards-a" style="--dsn-glass-scale: 14rem;">
       {% for drink in page.drinks %}
         {% comment %} The card carries the RATIO, not a finished height, so one
            slider can rescale all eight without the template being rebuilt —
            and true-relative height survives every position of it. {% endcomment %}
         {% assign mm = heights[drink.glass] | times: 1.0 %}
         {% assign ratio = mm | divided_by: tallest_mm %}
-        <li class="dsn-card" style="--dsn-ratio: {{ ratio }};">
+        {% assign tweak = page.glass_tweaks[drink.glass] | default: 1.0 %}
+        <li class="dsn-card" data-ratio="{{ ratio }}" data-tweak="{{ tweak }}"
+            style="--dsn-ratio: {{ ratio }}; --dsn-tweak: {{ tweak }};">
           <span class="dsn-card-glass">
             {% capture f %}icons/glasses/{{ drink.glass }}.svg{% endcapture %}
             {% include {{ f }} %}
@@ -410,7 +528,9 @@ drinks:
       {% for drink in page.drinks %}
         {% assign mm = heights[drink.glass] | times: 1.0 %}
         {% assign ratio = mm | divided_by: tallest_mm %}
-        <li class="dsn-card" style="--dsn-ratio: {{ ratio }};">
+        {% assign tweak = page.glass_tweaks[drink.glass] | default: 1.0 %}
+        <li class="dsn-card" data-ratio="{{ ratio }}" data-tweak="{{ tweak }}"
+            style="--dsn-ratio: {{ ratio }}; --dsn-tweak: {{ tweak }};">
           <span class="dsn-card-glass">
             {% capture f %}icons/glasses/{{ drink.glass }}.svg{% endcapture %}
             {% include {{ f }} %}
@@ -535,8 +655,65 @@ drinks:
      Written down rather than quietly decided, because every one of these is a
      real choice and none of them was in the four questions Helen answered.
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  {% comment %} ── 7. THE TIKI MUG ─────────────────────────────────────────────
+     Fixed, and honest about what the fix does not give her.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
   <section class="dsn-section">
-    <h2 class="dsn-h2">7. Still open</h2>
+    <h2 class="dsn-h2">7. The tiki mug</h2>
+
+    <p class="dsn-note">
+      Diagnosed and fixed, but not the way it was asked for, so here it is
+      beside a stroked glass at the same height. The mug's paths were never
+      lines: its source
+      (<code>_design_sources/cocktails/glasses/glass-tiki-mug.svg</code>) is
+      fill-only artwork — one style rule, <code>.a{fill:#231f20;}</code>, and
+      not a single stroke in the file. The normalise script gave all 27 paths
+      <code>glass-icon-line</code>, which is <code>fill:none</code> plus a
+      stroke, so the browser was drawing the <em>outline of the ink</em>. That
+      is the hollow double line.
+    </p>
+
+    <div class="dsn-tiki">
+      <figure class="dsn-tiki-fig">
+        <span class="dsn-tiki-glass dsn-tiki-glass--broken">{% include icons/glasses/tiki-mug.svg %}</span>
+        <figcaption>before — ink outlined</figcaption>
+      </figure>
+      <figure class="dsn-tiki-fig">
+        <span class="dsn-tiki-glass">{% include icons/glasses/tiki-mug.svg %}</span>
+        <figcaption>after — ink filled</figcaption>
+      </figure>
+      <figure class="dsn-tiki-fig">
+        <span class="dsn-tiki-glass">{% include icons/glasses/coupe.svg %}</span>
+        <figcaption>coupe, for weight</figcaption>
+      </figure>
+    </div>
+
+    <p class="dsn-note dsn-note--aside">
+      <strong>Why it cannot have a stroke width.</strong> There is no centreline
+      in the file to give a width to — the drawing is the ink itself, so
+      "convert the lines to real strokes" has nothing to convert. The pineapple
+      is the same case and <code>_sass/cocktails/_cocktail.scss</code> already
+      carries the class for it, with a comment explaining that stroking such a
+      path "outlines the outline and collapses to mush at icon size".
+    </p>
+
+    <p class="dsn-note dsn-note--aside">
+      <strong>And the cost, which you should look at.</strong> The mug's ink is
+      1.7 user units wide on an 83.7-unit viewBox. At 14rem that renders about
+      4.5&nbsp;px, against the 1.6&nbsp;px every stroked glass uses — so the mug
+      reads roughly <strong>2.8&times; heavier</strong> than its siblings, and it
+      gets heavier as the icon grows while theirs stay put (that is what
+      <code>non-scaling-stroke</code> buys the rest of the set). Compare the
+      middle and right figures above. Getting real weight control means
+      redrawing the mug with strokes, or centreline-tracing it — Inkscape's
+      Trace Bitmap has a centreline mode, and the normalise script's own
+      comment already records that ordinary Trace Bitmap produces exactly this
+      filled-outline problem.
+    </p>
+  </section>
+
+  <section class="dsn-section">
+    <h2 class="dsn-h2">8. Still open</h2>
     <ul class="dsn-open">
       <li><strong>Mood combination.</strong> Two moods selected — AND or OR? Food's answer may not be the right one here; "tiki AND no juicing" is nearly empty, "tiki OR no juicing" is half the book.</li>
       <li><strong>Sort order.</strong> Alphabetical, by ship, or by how well a drink matches the filters. The chaos filter implies ship already matters.</li>
@@ -691,11 +868,21 @@ drinks:
   font-weight: 600;
 }
 .dsn-btn--mood { font-size: 0.92rem; padding: 0.42rem 0.95rem; }
+/* Chaos is a goodness question, so the chaos buttons take the second accent
+   too — the same axis as the card's goodness square, wearing the same colour. */
 .dsn-btn--chaos {
   font-family: "Courier Prime", monospace;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.78rem;
+}
+.dsn-btn--chaos:hover {
+  border-color: var(--dsn-accent2-deep, var(--dsn-deep));
+  color: var(--dsn-accent2-deep, var(--dsn-deep));
+}
+.dsn-btn--chaos.is-on {
+  background: var(--dsn-accent2, var(--dsn-absinthe));
+  border-color: var(--dsn-accent2-deep, var(--dsn-deep));
 }
 .dsn-btn--pool { font-size: 0.8rem; padding: 0.25rem 0.65rem; }
 .dsn-btn--exclude {
@@ -854,8 +1041,15 @@ drinks:
   margin-right: 0.4rem;
   vertical-align: 0.01rem;
 }
-.dsn-ship--good { color: var(--dsn-deep); }
-.dsn-ship--good::before { background: var(--dsn-absinthe); border-color: var(--dsn-deep); }
+/* The goodness square wears the SECOND accent, which is the whole point of
+   there being one: matching is green, being good is not. --dsn-accent2 falls
+   back to the green pair, so "none" in the picker is a real palette rather
+   than a broken one. */
+.dsn-ship--good { color: var(--dsn-accent2-deep, var(--dsn-deep)); }
+.dsn-ship--good::before {
+  background: var(--dsn-accent2, var(--dsn-absinthe));
+  border-color: var(--dsn-accent2-deep, var(--dsn-deep));
+}
 
 /* The glass column. Its width IS --dsn-text-x, so the drawing can never push
    the title along — the failure the real cocktail page's 3.2rem max-width
@@ -872,7 +1066,10 @@ drinks:
 }
 .dsn-card-glass svg {
   display: block;
-  height: calc(var(--dsn-ratio) * var(--dsn-glass-scale));
+  /* ratio (true relative, possibly spread-compressed by the slider) x the
+     per-glass cheat x one scale. Three separate decisions, three separate
+     multipliers, none of them baked into the others. */
+  height: calc(var(--dsn-ratio) * var(--dsn-tweak, 1) * var(--dsn-glass-scale));
   width: auto;
   max-width: calc(var(--dsn-text-x) - 1.3rem);
   overflow: visible;
@@ -980,7 +1177,31 @@ drinks:
 .dsn-drink.is-making .dsn-method { font-size: 1.1rem; line-height: 1.85; }
 .dsn-drink.is-making .dsn-drink-title { font-size: 1.4rem; }
 
-/* --- 7. open ------------------------------------------------------------- */
+/* --- 7. the tiki mug ------------------------------------------------------ */
+.dsn-tiki { display: flex; gap: 2.5rem; align-items: flex-end; padding: 1.5rem 0; }
+.dsn-tiki-fig { margin: 0; text-align: center; }
+.dsn-tiki-glass { display: block; color: var(--dsn-ink); }
+.dsn-tiki-glass svg { display: block; height: 14rem; width: auto; overflow: visible; }
+/* The "before" figure re-creates the bug locally rather than describing it:
+   the same class the icon used to carry, on the same artwork. */
+.dsn-tiki-glass--broken .glass-icon-solid {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.dsn-tiki-fig figcaption {
+  font-family: "Courier Prime", monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dsn-grey);
+  margin-top: 0.7rem;
+}
+
+/* --- 8. open ------------------------------------------------------------- */
 .dsn-open { font-size: 0.88rem; line-height: 1.65; padding-left: 1.1rem; }
 .dsn-open li { margin-bottom: 0.6rem; }
 .dsn-open strong { font-family: "Courier Prime", monospace; font-size: 0.86rem; }
@@ -1022,11 +1243,35 @@ drinks:
   });
 })();
 
+/* The second accent. Empty data- values mean "none", which REMOVES the
+   properties rather than setting them to something — the CSS falls back to the
+   green pair on its own, so one accent is a real state and not a special case
+   anyone has to code around. */
+(function () {
+  var root = document.querySelector('.dsn');
+  var wrap = document.getElementById('dsn-hues-2');
+  if (!root || !wrap) return;
+  wrap.addEventListener('click', function (e) {
+    var btn = e.target.closest('.dsn-hue');
+    if (!btn) return;
+    if (btn.dataset.fill) {
+      root.style.setProperty('--dsn-accent2', btn.dataset.fill);
+      root.style.setProperty('--dsn-accent2-deep', btn.dataset.deep);
+    } else {
+      root.style.removeProperty('--dsn-accent2');
+      root.style.removeProperty('--dsn-accent2-deep');
+    }
+    wrap.querySelectorAll('.dsn-hue').forEach(function (b) {
+      b.classList.toggle('is-on', b === btn);
+    });
+  });
+})();
+
 /* The glass-size sliders. Each sets --dsn-glass-scale on its own grid; the
    per-card --dsn-ratio does the rest, so relative height is preserved at
    every position and nothing needs recomputing per card. */
 (function () {
-  document.querySelectorAll('.dsn-slider input[type="range"]').forEach(function (input) {
+  document.querySelectorAll('.dsn-slider input[type="range"][data-target]').forEach(function (input) {
     var grid = document.getElementById(input.dataset.target);
     var out  = document.getElementById(input.id + '-out');
     if (!grid) return;
@@ -1035,5 +1280,32 @@ drinks:
       if (out) out.textContent = input.value + 'rem';
     });
   });
+})();
+
+/* SPREAD and the per-glass cheat, both rewriting the same two custom
+   properties on every card. CSS has no pow(), so the curve is applied here;
+   the true ratio stays on the element as data-ratio and is never overwritten,
+   so moving the slider back to 1 restores exact true-relative height rather
+   than an accumulation of roundings. */
+(function () {
+  var spread = document.getElementById('dsn-spread');
+  var out    = document.getElementById('dsn-spread-out');
+  var cheat  = document.getElementById('dsn-tweaks');
+  var cards  = document.querySelectorAll('.dsn-card[data-ratio]');
+  if (!spread || !cards.length) return;
+
+  function apply() {
+    var g = parseFloat(spread.value);
+    var useCheat = !cheat || cheat.checked;
+    cards.forEach(function (card) {
+      var r = parseFloat(card.dataset.ratio);
+      card.style.setProperty('--dsn-ratio', Math.pow(r, g).toFixed(4));
+      card.style.setProperty('--dsn-tweak', useCheat ? card.dataset.tweak : 1);
+    });
+    if (out) out.textContent = g.toFixed(2);
+  }
+
+  spread.addEventListener('input', apply);
+  if (cheat) cheat.addEventListener('change', apply);
 })();
 </script>
