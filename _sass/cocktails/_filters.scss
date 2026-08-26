@@ -36,6 +36,57 @@
   gap: $space-sm;
 }
 
+// --- the four clears ----------------------------------------------------------
+// #488. One per filter, beside its own label, and each one clears ONLY its own
+// section. Matched to food's `.btn-clear-inline` -- a real <button> stripped of
+// its chrome, sans, lowercase, underlined, colour-shifting on hover -- because
+// this is the same control doing the same job on the sibling site, and food
+// already settled the typography after trying a distinct design that competed
+// with everything around it.
+//
+// COLOURED BY SECTION, like food's, and here that falls out of the palette:
+// mood clears in menthe, chaos in amber, has-to-have in violet. LEAVE OUT is
+// the exception and clears in ink, because that section deliberately spends no
+// colour at all.
+//
+// HIDDEN UNTIL THERE IS SOMETHING TO CLEAR. `hidden` rather than
+// `visibility: hidden` -- food uses the latter on its two search clears to stop
+// the input jumping when the button appears, but these sit on a label line
+// whose height is fixed by the text beside them, so there is nothing to
+// reserve space for and a permanently-present "clear" that does nothing is
+// worse than one that arrives.
+.drink-label-row {
+  display: flex;
+  align-items: baseline;
+  gap: $space-md;
+  margin: 0 0 $space-md;
+
+  .drink-field-label { margin: 0; }
+}
+
+.btn-clear-filter {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-family: $font-body;
+  font-size: 0.78rem;
+  font-weight: 400;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.1s ease-in-out;
+  white-space: nowrap;
+  color: $color-clear-text;
+
+  &[hidden] { display: none; }
+}
+
+.drink-filter--mood    .btn-clear-filter { color: $color-menthe-deep; &:hover { color: $color-menthe; } }
+.drink-filter--chaos   .btn-clear-filter { color: $color-amber-deep;  &:hover { color: $color-amber; } }
+.drink-search--include .btn-clear-filter { color: $color-violet-deep; &:hover { color: $color-violet; } }
+.drink-search--exclude .btn-clear-filter { color: $color-text;        &:hover { color: $color-clear-text; } }
+
 // --- the buttons -------------------------------------------------------------
 // The mood buttons carry Helen's own words -- "no juicing", "I want to faff" --
 // so they are set in the BODY font, not the heading mono. The goodness
@@ -128,6 +179,16 @@
   display: flex;
   flex-wrap: wrap;
   gap: $space-xs;
+  align-items: center;
+}
+
+// The "+N more" note. Quiet, and not a button: it is telling you the pool is
+// truncated, not offering to untruncate it — the way to see the rest is to
+// type another letter, which is what it says.
+.drink-pool-more {
+  font-size: 0.74rem;
+  color: $color-clear-text;
+  font-style: italic;
 }
 
 .btn-pool {

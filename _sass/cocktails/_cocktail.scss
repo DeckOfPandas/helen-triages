@@ -116,7 +116,14 @@
   // no rule in the gap; these headings have a 2px violet rule under them doing
   // half that work, and at 4.5rem the sections drifted apart.
   margin: 2.8rem 0 $space-lg;
+  // #492: the rule sits under the WORD, not the column. A full-width rule
+  // reads as a divider between sections; a rule the width of its heading reads
+  // as part of the heading, which is what it is. `fit-content` rather than an
+  // inline-block heading, because an inline-block h2 would stop being a full
+  // line box and take its margins differently.
+  width: fit-content;
   padding-bottom: 0.45rem;
+  padding-right: $space-lg;
   border-bottom: 2px solid $color-violet;
   @include punched(raised, var(--emboss-offset-lg));
 }
@@ -438,6 +445,32 @@ $amount-indent: $amount-col + $amount-gap;
   .cocktail-title { font-size: 1.5rem; }
   .cocktail-title-block { padding-bottom: $space-lg; margin-bottom: $space-xl; }
   .cocktail-glass-icon svg { height: 4.1rem; }
+
+  // GLASS AND GARNISH GET LOUDER, NOT QUIETER — #493, Helen: "including moving
+  // glass and garnish somewhere more prominent."
+  //
+  // They were the quietest thing in the head: 0.66rem grey labels over 0.86rem
+  // values, sized as metadata. That is right while you are reading ABOUT a
+  // drink and exactly wrong once you are making one — the glass is the first
+  // thing you reach for and the garnish is the thing you forget. In this state
+  // they are the only two facts in the head that are instructions.
+  //
+  // Promoted in place rather than moved. Relocating them under METHOD was the
+  // obvious reading of "somewhere more prominent" and is worse: it separates
+  // them from the title block they belong to, and it makes the two states
+  // structurally different pages rather than one page with things hidden —
+  // which is the contract that keeps this printable and JS-free.
+  .cocktail-meta {
+    gap: $spacing-section-gap;
+    font-size: 1.05rem;
+    font-weight: 600;
+
+    strong {
+      font-size: 0.7rem;
+      color: $color-menthe-deep;
+      letter-spacing: 0.14em;
+    }
+  }
 
   // What you read with your hands full.
   .cocktail-amount { font-size: 1.3rem; font-weight: 700; }

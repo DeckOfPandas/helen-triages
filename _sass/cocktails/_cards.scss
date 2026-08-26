@@ -32,6 +32,13 @@
 
 $card-height:   12.9rem;
 $card-text-x:   7.6rem;
+// #490. The glass column is exactly $card-text-x wide, so text starting at
+// $card-text-x began flush against the tinted panel's edge with nothing
+// between them. This is that gutter, and it is a SEPARATE value rather than a
+// bigger $card-text-x on purpose: $card-text-x is the panel's width, and the
+// panel's under-mark is derived from it. Widening it to buy text margin would
+// have silently lengthened the mark too.
+$card-gutter:   0.95rem;
 $card-pad-x:    1.15rem;
 $card-pad-y:    1.05rem;
 $card-foot-y:   0.95rem;
@@ -55,7 +62,7 @@ $card-glass-scale: 13rem;
   position: relative;
   height: $card-height;
   overflow: hidden;
-  padding: $card-pad-y $card-pad-x $card-pad-y $card-text-x;
+  padding: $card-pad-y $card-pad-x $card-pad-y ($card-text-x + $card-gutter);
   background: $color-surface;
   border: 1px solid $color-border;
 
@@ -190,7 +197,10 @@ $card-glass-scale: 13rem;
 // chips take one row or two. Chips grow upward into the card.
 .drink-card-foot {
   position: absolute;
-  left: $card-text-x;
+  // Same gutter as the body above, so the title and the foot share one left
+  // edge. They are two separate rules and drifting apart is exactly what the
+  // fixed-anchor design exists to prevent.
+  left: $card-text-x + $card-gutter;
   right: $card-pad-x;
   bottom: $card-foot-y;
 }
