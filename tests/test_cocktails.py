@@ -485,6 +485,59 @@ def test_glass_is_a_list():
     )
 
 
+def test_every_glass_value_is_in_the_vocabulary():
+    """A drink naming a glass `glasses.yml` has never heard of renders NOTHING.
+
+    #500. The glass layer is guarded thoroughly in one direction -- every
+    mapped glass names a real icon, `all_icons` matches the directory both
+    ways, every icon has a height. All of that guards glasses.yml against
+    itself. Nothing guarded the DRINKS against glasses.yml, so a typo produced
+    a drink with no glass drawing and no complaint from anywhere.
+
+    THE SILENCE IS BY DESIGN, WHICH IS WHY IT NEEDS A TEST RATHER THAN A FIX.
+    "Absent means no icon" is the correct default -- it is what stops a missing
+    key becoming a broken image, and glasses.yml's own header says so -- but it
+    cannot tell a deliberate gap from a mistake. That was a fair trade while
+    three values were deliberately unmapped. It is a bad one now `any` is the
+    last of them: an unrecognised glass is far likelier to be a typo than a
+    decision.
+
+    `any` IS THE ONE EXEMPTION AND MUST STAY UNMAPPED. It is a real member of a
+    drink's `glass:` list meaning "no requirement" -- Daisy de Santiago is
+    "anything, but preferably a Collins" -- so mapping it to an icon would draw
+    a glass for a drink that deliberately does not specify one. Listing it here
+    rather than in `icons:` is the whole point.
+
+    Passes on arrival: all 19 distinct values in the collection are known
+    today. That is what makes it worth adding now -- it costs nothing to
+    introduce and catches the next one for free.
+    """
+    g = _glasses()
+    icons = g.get("icons") or {}
+    assert icons, "glasses.yml has no `icons:` -- see the sibling tests."
+
+    deliberately_unmapped = {"any"}
+
+    unknown = {}
+    for slug, fm in _load():
+        for value in fm.get("glass") or []:
+            key = str(value).strip().lower()
+            if key in icons or key in deliberately_unmapped:
+                continue
+            unknown.setdefault(key, []).append(slug)
+
+    assert not unknown, (
+        "glass value(s) not in _data/cocktails/glasses.yml `icons:`:\n  "
+        + "\n  ".join(f"{v!r} -- {', '.join(sorted(d))}"
+                      for v, d in sorted(unknown.items()))
+        + "\n\nThe drink renders NO glass icon, silently. Either it is a typo "
+          "and the drink should be retyped, or it is a real glass and needs a "
+          "key in `icons:` (and artwork, and a heights_mm entry -- the sibling "
+          "tests will say so). If it is genuinely 'no requirement', the word "
+          "is `any`."
+    )
+
+
 def test_garnish_is_a_list():
     """Same reasoning as `glass` and `mood`: a bare string iterates in Liquid as
     its own characters, which renders as nothing visible rather than as an
@@ -783,6 +836,116 @@ def test_every_ship_rung_has_a_tint():
     assert not bad, (
         "ship_tints values are percentages: numbers from 0 to 100.\n  "
         + "\n  ".join(bad)
+    )
+
+
+def test_suggestion_is_a_string_or_a_list_of_strings():
+    """`suggestion` was the only ingredient field with no shape guard at all.
+
+    #499. `generic` has five checks, `character` got one, and
+    `glass`/`garnish`/`mood` all have shape tests -- this had none, despite
+    being rendered by the same oxford-join loop that relies on its shape.
+
+    BOTH SHAPES ARE CORRECT AND MUST STAY correct: 116 strings and 6 lists
+    today. Liquid's `for` treats a bare string as a one-item sequence, which
+    HANDOVER §9.10 verified against the real `liquid` gem rather than assuming,
+    and that is what lets one loop handle both with no type check in the
+    template. The risk is not a string or a list; it is a MAPPING or a
+    list-of-lists arriving from an ingest and rendering as `{"a"=>"b"}` or as
+    nothing, which is precisely what every sibling field is protected against.
+    """
+    bad = []
+    for slug, fm in _load():
+        for ing in (fm.get("ingredients") or []):
+            if not isinstance(ing, dict) or "suggestion" not in ing:
+                continue
+            s = ing["suggestion"]
+            if isinstance(s, str):
+                continue
+            if isinstance(s, list) and all(isinstance(x, str) for x in s):
+                continue
+            bad.append(f"{slug}: suggestion is {type(s).__name__} -- {s!r}")
+
+    assert not bad, (
+        "suggestion must be a string or a list of strings:\n  "
+        + "\n  ".join(bad)
+        + "\n\nA list means 'either of these bottles would do', never 'and'. "
+          "Anything else renders as nonsense rather than as an error."
+    )
+
+
+# The suggestions #457's cleanup did not reach. `suggestion` is meant to be a
+# bottle NAME and nothing else -- #457 moved the reasoning out into `note` --
+# and these six still read as prose. Recorded rather than fixed: they are
+# Helen's words about her own drinks, and rewriting them is her call.
+#
+# THIS IS A RATCHET, NOT A TODO LIST. The test below asserts the flagged set
+# equals this set EXACTLY, in both directions, so a new prose suggestion fails
+# and a fixed one fails too until its line is deleted here. A one-directional
+# check would let the list rot into a record of things that used to be true --
+# the same both-ways contract `all_icons` and `heights_mm` already hold each
+# other to.
+KNOWN_PROSE_SUGGESTIONS = {
+    ("apple-cart", "Avallen -- a round, fresh taste if you need to sub"),
+    ("daisy-de-santiago", "Havana 3 year old and Clément Agricole Blanc"),
+    ("milliners-punch", "the cheapest white rum to hand; sometimes JW Spicers"),
+    ("sazerac", "or other Creole-style bitters"),
+    ("sazerac", "or other aromatic bitters"),
+    ("swizzle", "Pusser's 151, or Planteray OFTD for a 138 Swizzle"),
+}
+
+
+def test_no_new_prose_suggestions():
+    """A `suggestion` should name a bottle, not explain one -- #457, #499.
+
+    "Appleton Estate Reserve" is a suggestion. "or other Creole-style bitters"
+    is a note wearing a suggestion's clothes: the page renders suggestions as
+    the ingredient HEADLINE, so prose there becomes the thing you read first
+    and shop by.
+
+    HEURISTIC, AND DELIBERATELY SO. It looks for connective words and for
+    length, because there is no way to test "is this a bottle name" exactly.
+    That makes it unsuitable as a bare rule and fine as a ratchet: the six it
+    finds today are pinned above, and the assertion is equality, so the check
+    can only ever complain about a CHANGE rather than about the status quo.
+
+    If a new suggestion trips it and is genuinely fine, add it to the set with
+    a word about why. If one gets fixed, delete its line. Both are one-line
+    edits and both are the point.
+    """
+    markers = re.compile(
+        r"\b(or other|if you|because|rather than|instead|works|prefer|any\b|"
+        r"but |though|use |avoid|ideally|would)\b", re.I)
+
+    found = set()
+    for slug, fm in _load():
+        for ing in (fm.get("ingredients") or []):
+            if not isinstance(ing, dict) or "suggestion" not in ing:
+                continue
+            s = ing["suggestion"]
+            for one in (s if isinstance(s, list) else [s]):
+                if not isinstance(one, str):
+                    continue          # shape is the sibling test's problem
+                if markers.search(one) or len(one) > 42:
+                    found.add((slug, one))
+
+    new = sorted(found - KNOWN_PROSE_SUGGESTIONS)
+    fixed = sorted(KNOWN_PROSE_SUGGESTIONS - found)
+
+    assert not new, (
+        "suggestion(s) reading as prose rather than a bottle name:\n  "
+        + "\n  ".join(f"{slug}: {text!r}" for slug, text in new)
+        + "\n\nA suggestion is the ingredient HEADLINE on the drink page, so "
+          "reasoning here becomes the thing you read first. Move it to `note`, "
+          "which exists for exactly this (#457). If it really is a bottle "
+          "name, add it to KNOWN_PROSE_SUGGESTIONS with a word about why."
+    )
+    assert not fixed, (
+        "KNOWN_PROSE_SUGGESTIONS names suggestion(s) that no longer trip the "
+        "check:\n  "
+        + "\n  ".join(f"{slug}: {text!r}" for slug, text in fixed)
+        + "\n\nGood news -- they have been fixed or reworded. Delete their "
+          "lines from the set so it keeps describing the present."
     )
 
 

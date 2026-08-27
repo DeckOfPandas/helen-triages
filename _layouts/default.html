@@ -284,14 +284,23 @@
 
        Site-neutral, so it sits on its own line rather than inside
        .site-footer-top, whose columns each belong to a site. {% endcomment %}
-    <nav class="site-footer-about" aria-label="About this site">
-      <a href="{{ '/about/' | relative_url }}">about</a>
-    </nav>
     <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
     <p class="site-footer-license">
       Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.
       Recipes and writing: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
     </p>
+    {% comment %} BELOW THE LICENCES, #517. It sat above the copyright line,
+       which put the one link a reader might actually want at the top of a
+       block of boilerplate they do not -- so it read as part of the small
+       print rather than as a way out of the page.
+
+       Still its own <nav> outside .site-footer-top: it is the one thing down
+       here belonging to neither site, which is why it is a sibling of the
+       licence paragraph rather than a column beside the reference links.
+    {% endcomment %}
+    <nav class="site-footer-about" aria-label="About this site">
+      <a href="{{ '/about/' | relative_url }}">about</a>
+    </nav>
     <a class="site-footer-github" href="https://github.com/DeckOfPandas/helen-triages" aria-label="Source on GitHub">
       {% include icons/github.svg %}
     </a>
@@ -312,19 +321,11 @@
   {% endcomment %}
   <script src="{{ '/assets/js/decorations.js' | relative_url }}"></script>
 
-  {% comment %} #477's comparison switch, on BOTH sites because the wordmark is
-     shared chrome and the answer has to look right on food and cocktails
-     together. `?wordmark=match` puts HELEN TRIAGES on the shared --emboss-*
-     values; without the parameter nothing changes.
-
-     Gated on `site.show_drafts`, so no production page loads it. The file is
-     still copied — Jekyll copies everything under assets/ whether linked or
-     not, which is issue #276's lesson. Delete this block, the script and the
-     `.wordmark--match` rule in shared/_layout.scss together once #477 is
-     settled. {% endcomment %}
-  {% if site.show_drafts %}
-    <script src="{{ '/assets/js/wordmark-switch.js' | relative_url }}"></script>
-  {% endif %}
+  {% comment %} #477's comparison switch lived here and is gone: Helen looked
+     at the wordmark matched to page headings and kept the old one. The
+     difference is deliberate now, and the reasoning is recorded beside the
+     values in _sass/shared/_layout.scss rather than here, where nobody
+     editing those values would find it. {% endcomment %}
 
 </body>
 </html>
