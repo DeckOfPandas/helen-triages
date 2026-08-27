@@ -479,14 +479,21 @@ def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
           "the ambiguous colour vocabulary #314 retired. Add it to "
           "`rum_display_names` in _data/cocktails/ingredients.yml."
     )
-    extra = sorted(set(names) - rum_generics)
+    # THE SECOND HALF LOOSENED 2026-08-27, and only by one notch. It used to
+    # require the map to be EXACTLY the rum family, which was right while #501
+    # scoped card names to rum. Helen then added Ceylon arrack -- "is that a
+    # rum? Doesn't matter, the category list should eventually contain
+    # everything" -- so the map is growing past rum on purpose. What still bites
+    # is a card name for something that is not a declared generic at all, which
+    # is the typo case; what no longer bites is deliberate widening.
+    declared = _declared_generics(vocab)
+    extra = sorted(set(names) - declared)
     assert not extra, (
-        "Card name(s) for something that is not a rum generic:\n  "
+        "Card name(s) for something that is not a declared generic:\n  "
         + "\n  ".join(extra)
         + "\n\nEither the generic was renamed and this entry did not follow, or "
-          "the map is growing past rum. Growing it is fine -- #501 scopes it to "
-          "rum only because rum is where the item text is AMBIGUOUS -- but "
-          "rename this map and widen the check deliberately."
+          "it is a typo. Widening the map beyond rum is fine and expected -- "
+          "the value still has to be a real generic from this file."
     )
 
 
@@ -878,6 +885,83 @@ def test_every_suggested_bottle_resolves():
           "rather than a bottle name (#457) -- declare it in "
           "`unresolved_suggestions` with the reason, so it fails loudly for "
           "the next reader instead of quietly for this one."
+    )
+
+
+def test_a_cross_category_suggestion_carries_a_note():
+    """Suggesting a bottle from another category needs a note -- #534.
+
+    Helen: "Substituting it isn't straightforward and will vary by drink. Please
+    add notes for me on recipe pages when I've substituted in a surprising way."
+    A `suggestion` whose bottle sits in a different category than that
+    ingredient's `generic` IS the surprising case, by definition; everything
+    else is naming a bottle in the category the recipe already asked for. It
+    stops being a judgement call the moment a bottle knows its own category,
+    which is what _data/cocktails/bottles.yml is for.
+
+    PERMISSIVE, AT HELEN'S DIRECTION, and the permission has a precise shape:
+    the note must EXIST, and `QQ` counts. "Let's be permissive with the test,
+    but given we're pre-first-human-read please add the note field with QQ in it
+    if we don't have anything else." So a substitution can never ship silently
+    -- there is always a visible marker on the page -- while nothing demands
+    prose she has not written yet. QQ is the collection's existing idiom for
+    exactly this (see test_every_ingredient_has_a_generic_or_a_qq) and these are
+    drafts; a QQ is not near a published recipe.
+
+    A DISJUNCTIVE GENERIC CROSSES ONLY IF THE BOTTLE MATCHES NONE OF ITS
+    OPTIONS. A list means "either would do" (#441), so a suggestion satisfying
+    either half is not a substitution at all. Swizzle is why this rule needs
+    stating: it asks for two Demerara styles and suggests bottles in neither.
+
+    An unresolvable suggestion is SKIPPED here rather than failing twice --
+    test_every_suggested_bottle_resolves owns that, and reporting one fault as
+    two teaches you to skim the output.
+    """
+    data = _bottles()
+    index = _bottle_index(data)
+    entries = data.get("bottles") or {}
+    assert index, "bottles.yml resolves no names; nothing to check."
+    vocab = _vocab()
+    family_of = vocab.get("family_of") or {}
+
+    bad, checked = [], 0
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            if not any(family_of.get(g) == "rum" for g in generics):
+                continue
+            suggestion = item.get("suggestion")
+            names = (suggestion if isinstance(suggestion, list)
+                     else [suggestion] if suggestion else [])
+            for name in names:
+                canonical = index.get(name.strip().lower())
+                if canonical is None:
+                    continue  # owned by test_every_suggested_bottle_resolves
+                checked += 1
+                bottle_generic = (entries.get(canonical) or {}).get("generic")
+                if bottle_generic in generics:
+                    continue
+                if item.get("note"):
+                    continue
+                bad.append(
+                    f"{slug}: {item.get('item') or '?'!r} asks for "
+                    f"{generics} and suggests {canonical!r} "
+                    f"({bottle_generic!r}) — no note"
+                )
+    assert checked, (
+        "No rum suggestion resolved to a known bottle, so this check is "
+        "vacuous. Either bottles.yml stopped matching the collection's "
+        "spellings, or the loader is stale."
+    )
+    assert not bad, (
+        "Cross-category substitution(s) with nothing on the page saying why:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nAdd a per-ingredient `note` (#457). `QQ` is a valid note and is "
+          "the right one until Helen's first read-through -- the point is that "
+          "the substitution is VISIBLE, not that the reasoning is finished."
     )
 
 

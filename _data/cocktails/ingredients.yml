@@ -202,6 +202,19 @@ rum_display_names:
   "Malibu": "Malibu"
   "cachaça": "cachaça"
   "Batavia arrack": "Batavia arrack"
+  # THE FIRST NON-RUM ENTRY, and it is deliberate. Helen, 2026-08-27, on Ceylon
+  # arrack: "is that a rum? Doesn't matter, the category list should eventually
+  # contain everything, so let's add it now." It has no `family` and should not
+  # get one -- it is coconut flower sap, and `family_less` above carries the
+  # reason -- so it is outside the rum machinery entirely, which is precisely
+  # why its card would otherwise fall back to the raw item text.
+  #
+  # THE KEY NAME IS NOW HALF A LIE and that is a known debt, not an oversight:
+  # `cocktails/index.html` reads this map by name and is off-limits this
+  # session (another agent). Rename it to `card_names` the next time that file
+  # is open. Nothing else needs to change -- the template only ever looks a
+  # generic up in it.
+  "Ceylon arrack": "Ceylon arrack"
 
 # HOW A DISJUNCTIVE RUM READS ON A CARD, where the default join reads badly.
 #

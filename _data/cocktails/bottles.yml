@@ -70,12 +70,21 @@ bottles:
   "Blackwell":
     generic: "Jamaican, caramel forward"
     aliases: []
+  # RECLASSIFIED 2026-08-27, from `Jamaican, overproof, unaged`. Helen's call,
+  # and it resolves the one bottle that had been sitting under two generics: it
+  # is aged, so the unaged overproof style was never right. 57% is what made it
+  # look like one -- and strength is not what that category names.
   "Smith & Cross":
-    generic: "Jamaican, overproof, unaged"
+    generic: "Jamaican, moderately aged"
     aliases: ["Smith and Cross", "Smith & Cross rum"]
+    note: "57% ABV — be sensible about how much you use."
   "Wray & Nephew":
     generic: "Jamaican, overproof, unaged"
     aliases: ["Wray and Nephew", "Wray & Nephew Overproof"]
+  # Its own thing rather than a Wray & Nephew substitute -- Helen, 2026-08-27:
+  # "choice of that or W&N is mood by mood." Same category, not interchangeable
+  # on autopilot, which is why both are listed rather than one carrying the
+  # other as an alias.
   "Rum Fire":
     generic: "Jamaican, overproof, unaged"
     aliases: []
@@ -143,11 +152,11 @@ bottles:
   "Flor de Caña Extra Dry":
     generic: "lightly aged and filtered"
     aliases: ["Flor de Caña extra dry white rum"]
-  "JW Spicers":
-    generic: "lightly aged and filtered"
-    aliases: []
-    # Frozen Fruit Daiquiri's "the cheapest white rum to hand" bottle. Kept
-    # because it is a real answer to a real question, not because it is good.
+  # JW SPICERS IS DELIBERATELY ABSENT. Helen, 2026-08-27: "never name Spicers --
+  # if I have it skulking at the back of the nonsense shelf then I'll throw it
+  # in where I can." Same rule as Long Island Iced Tea's rum: what is cheap and
+  # what needs using up are facts about the shelf on the day, not about the
+  # drink. Frozen Fruit Daiquiri's suggestion goes rather than being corrected.
 
   # --- blended multi-region, clear -----------------------------------------
   # EFFECTIVELY THE ONLY BOTTLE IN ITS CATEGORY since #314 put Havana 3 and
@@ -203,6 +212,22 @@ bottles:
   "Leblon":
     generic: "cachaça"
     aliases: []
+  # Added 2026-08-27 at Helen's request, and it CORRECTS A SPELLING that has
+  # been sitting in Caipirinha's drink-level note since ingestion: that note
+  # ranks "Sagatiba = Leblon > Viero Barriero > Abelho > Yaguara Organic", and
+  # the brand is Velho Barreiro. The note was transcribed verbatim on purpose
+  # ("Future Helen will know exactly what I mean", #457) so it was never
+  # proofread as a bottle name -- which is exactly how a misspelling survives a
+  # deliberate decision not to touch something.
+  "Velho Barreiro":
+    generic: "cachaça"
+    aliases: ["Viero Barriero"]
+  # Named by Helen 2026-08-27 for `Jamaican, caramel forward`, alongside
+  # Blackwell. NO DRINK MENTIONS IT, and it is listed anyway: this file is what
+  # she would reach for, not an index of what the collection happens to cite.
+  "Myers":
+    generic: "Jamaican, caramel forward"
+    aliases: ["Myers's", "Myer's"]
   "Van Osten Botanik Arrack":
     generic: "Batavia arrack"
     aliases: ["Van Osten"]
@@ -271,8 +296,13 @@ unresolved_suggestions:
     Prose carrying a preference between two bottles. #457's `note` takes the
     reasoning; `suggestion` takes ["El Dorado 3", "Havana Club 3"] in that order.
   "the cheapest white rum to hand; sometimes JW Spicers": >-
-    Prose. The bottle is JW Spicers and the rest is a note -- and a good one,
-    since "whatever is cheapest" is genuinely the answer for that drink.
+    RESOLVED 2026-08-27, and the answer is no bottle -- pending the edit to the
+    drink. Helen: "never name Spicers -- if I have it skulking at the back of
+    the nonsense shelf then I'll throw it in where I can." So the suggestion
+    comes OFF Frozen Fruit Daiquiri rather than being split into a bottle plus
+    a note, the same call she made for Long Island Iced Tea's rum. The generic
+    already says `lightly aged and filtered`, which is the whole of what the
+    drink actually requires.
   "Planteray": >-
     RESOLVED 2026-08-27, AND THE ANSWER IS NO BOTTLE AT ALL -- pending the edit
     to the drink. Long Island Iced Tea suggests a bare brand against a `lightly
