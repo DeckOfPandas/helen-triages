@@ -375,17 +375,48 @@ $card-glass-scale: 13rem;
   // title and the ingredients are siblings inside .drink-card-body, so a real
   // two-row layout would need the template changed. If Helen picks this one,
   // that is worth doing properly rather than leaving as a padding trick.
+  // THE FIRST ATTEMPT RAN THE INGREDIENTS UNDER THE GLASS, and the mistake is
+  // worth keeping written down because it is the obvious one. Indenting the
+  // TITLE past the glass is not the same as making the glass a row: the title
+  // and the ingredient line are siblings, so an indent on one moves one, and
+  // the ingredients carried on starting at the card's left edge -- underneath
+  // a drawing sitting in absolute position on top of them. Helen's screenshot
+  // showed "...n rum" and "...hartreuse" with their first words behind the
+  // panel.
+  //
+  // WHAT MAKES IT A ROW is the title's own MIN-HEIGHT. Giving it the glass's
+  // height means the block it occupies is as tall as the drawing beside it, so
+  // the ingredients -- the next block in normal flow -- necessarily begin
+  // below both. Nothing is positioned to achieve that and nothing has to be
+  // kept in step: one value, `$title-row`, is the glass's size and the title's
+  // floor, and the layout follows.
+  //
+  // `line-height: $title-row` centres the single title line against the
+  // drawing rather than sitting it on the top edge. It stays a block rather
+  // than becoming a flex row on purpose -- .drink-card-name relies on
+  // `white-space: nowrap` + `text-overflow: ellipsis`, which is how CHARTREUSE
+  // SWIZZLE truncates, and flex would break it.
+  //
+  // The glass starts at the card's own padding rather than at 0, so the two
+  // halves of the row share a top edge.
   [data-narrow="title"] {
-    --card-glass-scale: 4.4rem;
+    $title-row: 4.4rem;
+
+    --card-glass-scale: #{$title-row};
 
     .drink-card { height: 13.4rem; padding-left: $card-pad-x; }
     .drink-card-glass {
-      width: 4.4rem;
-      height: 4.4rem;
+      width: $title-row;
+      height: $title-row;
+      top: $card-pad-y;
       bottom: auto;
     }
     .drink-card-glass svg { max-width: 78%; }
-    .drink-card-name { padding-left: 4.4rem + $card-gutter; }
+    .drink-card-name {
+      padding-left: $title-row + $card-gutter;
+      min-height: $title-row;
+      line-height: $title-row;
+    }
   }
 
   // --- 3. shrink: the original narrow layout ---------------------------------
