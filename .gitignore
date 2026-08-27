@@ -10,8 +10,18 @@ _site_prod/
 # UN-IGNORES IT. That happened once: `_drafts/` became `_food_drafts/` in the
 # mono-repo migration and 221 unpublished recipes stopped being ignored without
 # a word. tests/test_site_config.py now checks this against _config.yml.
+#
+# THE TRAILING SLASH IS NOT ENOUGH ON ITS OWN, found 2026-08-27. `foo/` matches
+# a DIRECTORY, and a symlink to a directory is not one as far as git is
+# concerned -- so `_cocktail_drafts` linked into a worktree from the main
+# checkout showed up as an untracked path that `git add -A` would have staged.
+# The slashless twin covers that; both forms are kept because
+# test_every_drafts_collection_is_gitignored requires the `_<name>/` shape, and
+# the slash is what stops the pattern also matching a stray FILE of that name.
 _food_drafts/
+_food_drafts
 _cocktail_drafts/
+_cocktail_drafts
 
 # Individual pages held back the same way as the collections above — not
 # ready for a public repo, regardless of what Jekyll would or wouldn't build.

@@ -447,6 +447,271 @@ def test_rum_character_is_declared():
     )
 
 
+def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
+    """`rum_display_names` covers the rum family exactly -- issue #501.
+
+    The card renders a rum's CATEGORY rather than the source's own words,
+    because those words could not be trusted: eight item strings in this
+    collection each name two or three different rums, `Overproof Navy rum`
+    among them. The substitution is driven by "does this generic have a card
+    name", so a rum missing from this map silently falls back to exactly the
+    ambiguous item text the map exists to replace -- and nothing on the page
+    would look wrong.
+
+    BOTH DIRECTIONS, and the second is the one that catches a rename. A card
+    name for a generic that no longer exists is dead weight that reads as
+    live coverage; `_declared_generics` cannot see it, because this is a
+    mapping rather than a list.
+    """
+    vocab = _vocab()
+    names = vocab.get("rum_display_names") or {}
+    family_of = vocab.get("family_of") or {}
+    rum_generics = {g for g, fam in family_of.items() if fam == "rum"}
+    assert rum_generics, (
+        "`family_of` maps no generic to `rum`, so this check has nothing to "
+        "enforce. Either the family was renamed or the mapping was dropped."
+    )
+    missing = sorted(rum_generics - set(names))
+    assert not missing, (
+        "Rum generic(s) with no card name:\n  " + "\n  ".join(missing)
+        + "\n\nA rum without one falls back to `item` on the index, which is "
+          "the ambiguous colour vocabulary #314 retired. Add it to "
+          "`rum_display_names` in _data/cocktails/ingredients.yml."
+    )
+    extra = sorted(set(names) - rum_generics)
+    assert not extra, (
+        "Card name(s) for something that is not a rum generic:\n  "
+        + "\n  ".join(extra)
+        + "\n\nEither the generic was renamed and this entry did not follow, or "
+          "the map is growing past rum. Growing it is fine -- #501 scopes it to "
+          "rum only because rum is where the item text is AMBIGUOUS -- but "
+          "rename this map and widen the check deliberately."
+    )
+
+
+def test_rum_card_names_are_distinct():
+    """No two rums may read the same on a card -- issue #501.
+
+    THIS IS THE WHOLE POINT OF THE MAP, not a tidiness rule. The fault being
+    fixed is that `Overproof Navy rum` appeared on three cards meaning three
+    different rums. A duplicate card name rebuilds that fault in the very
+    mechanism introduced to remove it, and it would look completely fine on
+    the page -- two drinks reading "Demerara rum" is only wrong if you know
+    one of them is an overproof.
+
+    A COLLAPSE MAY BE DELIBERATE, and then it is declared rather than
+    forbidden. Helen collapsed both Jamaicans to `Jamaican rum` on 2026-08-27:
+    the funk is the shared trait and the caramel is a nuance of the same rum,
+    where both Demeraras and both agricoles keep their own names because proof
+    and age change what you are making. So the rule is not "never" but "not by
+    accident" -- `rum_card_names_may_collide` carries the reason, the same shape
+    `family_less` uses, and an undeclared duplicate still fails.
+
+    THERE IS DELIBERATELY NO LENGTH RULE HERE. An earlier version of this test
+    asserted a card name was never longer than the generic it stands for, which
+    sounds obvious and was wrong within a day: Helen's names say the spirit word
+    out loud wherever the style alone would not read as a rum, so `Demerara,
+    overproof` -> `Demerara overproof rum` grows by three characters on purpose.
+    Brevity was the means and legibility was the point.
+    test_card_lines_do_not_get_longer holds the thing that actually mattered.
+    """
+    vocab = _vocab()
+    names = vocab.get("rum_display_names") or {}
+    permitted = vocab.get("rum_card_names_may_collide") or {}
+    assert names, (
+        "`rum_display_names` is empty, so this check is vacuous."
+    )
+    seen = {}
+    clashes = []
+    for generic, name in sorted(names.items()):
+        key = name.strip().lower()
+        if key in seen and key not in {k.strip().lower() for k in permitted}:
+            clashes.append(f"{name!r}: {seen[key]!r} and {generic!r}")
+        seen[key] = generic
+    assert not clashes, (
+        "Two rums share a card name, and the collapse is not declared:\n  "
+        + "\n  ".join(clashes)
+        + "\n\nThe index would show identical words for rums that are not "
+          "interchangeable, which is the exact ambiguity #501 removed. If the "
+          "collapse is intended, add the NAME to `rum_card_names_may_collide` "
+          "with the reason -- a collapse loses information on the index, so it "
+          "should cost a sentence."
+    )
+    stale = sorted(
+        name for name in permitted
+        if list(names.values()).count(name) < 2
+    )
+    assert not stale, (
+        "Declared collision(s) that no longer collide:\n  " + "\n  ".join(stale)
+        + "\n\nThe names diverged and this permission was left behind, where it "
+          "reads as a live decision and would silently bless the NEXT accidental "
+          "duplicate on the same name."
+    )
+
+
+def test_showing_categories_still_shortens_the_index():
+    """Across the collection, card names must cost less room than items -- #501.
+
+    AGGREGATE, NOT PER-CARD, and the difference is a correction rather than a
+    convenience. The first version of this asserted no single card got longer,
+    which sounds like the same thing and is not: 19 of the 62 rum-bearing cards
+    DO get longer, almost all of them the nine carrying a disjunctive rum, where
+    "either would do" spends a whole second name ("lightly aged rum or clear
+    blended rum" against an item reading `Light rum`). Those nine are the cards
+    where the category is doing the MOST work -- `White rum` concealing a choice
+    between a filtered rum and an agricole blanc -- so failing them would have
+    been the guard punishing the feature.
+
+    What was actually claimed when this shipped, and what this holds: the index
+    as a whole gets shorter. 39 cards shorter, 4 unchanged, 19 longer, median
+    -8 characters, and the collection's median card line 98 -> 94. The card body
+    clamps at two lines, so length is not cosmetic -- it is how many
+    ingredients a reader can see.
+
+    Deliberately loose: it permits any individual name, and fires only if the
+    whole set drifts long enough to stop paying for itself.
+    """
+    vocab = _vocab()
+    names = vocab.get("rum_display_names") or {}
+    assert names, "`rum_display_names` is empty; nothing to check."
+    before_total, after_total, checked = 0, 0, 0
+    for slug, fm in _load():
+        before, after = [], []
+        touched = False
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict) or not item.get("item"):
+                continue
+            before.append(item["item"])
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            labels = [names[g] for g in generics if g in names]
+            if labels and len(labels) == len(generics):
+                after.append(" or ".join(labels))
+                touched = True
+            else:
+                after.append(item["item"])
+        if not touched:
+            continue
+        checked += 1
+        before_total += len(" · ".join(before))
+        after_total += len(" · ".join(after))
+    assert checked, (
+        "No drink's card line uses a rum card name, so this check is vacuous. "
+        "Either `family_of` no longer maps the rum styles, or the map was "
+        "renamed without this following."
+    )
+    assert after_total <= before_total, (
+        f"Showing rum categories now makes the index LONGER: {before_total} -> "
+        f"{after_total} characters across {checked} cards "
+        f"({after_total - before_total:+}).\n\nThe card body clamps at two "
+        f"lines, so this is paid for in ingredients a reader cannot see. Either "
+        f"a card name has grown well past the item text it replaces, or a lot "
+        f"of rums have become disjunctive at once."
+    )
+
+
+def test_no_card_shows_two_different_rums_under_one_name():
+    """One card, one name, one rum -- issue #501.
+
+    TWO DIFFERENT GENERICS, NOT TWO ENTRIES, and the distinction is Helen's,
+    2026-08-27: "where a recipe wants more than one kind of the same rum we
+    obviously should write the display name twice." A drink calling for two
+    pours of the same category genuinely prints its name twice and that is
+    correct -- each ingredient entry renders on its own. The failure this
+    catches is the opposite one: two ingredients that are NOT the same rum
+    arriving at the same words, which is #501's original fault (`Overproof Navy
+    rum` meaning three different things) rebuilt inside the fix for it.
+
+    The first version of this test asserted no card repeats a name at all, and
+    would have failed a correct drink the day one was written. Vocabulary-wide
+    distinctness (above) does not cover this either: a DECLARED collapse is
+    permitted there, and this is where that permission gets checked against real
+    drinks -- both Jamaicans read `Jamaican rum`, so a drink calling for both
+    would say one word for two rums and lose the difference silently.
+    """
+    vocab = _vocab()
+    names = vocab.get("rum_display_names") or {}
+    joins = vocab.get("rum_card_name_joins") or {}
+    assert names, "`rum_display_names` is empty; nothing to check."
+    bad, checked = [], 0
+    for slug, fm in _load():
+        # card name -> the set of generic-tuples that produced it
+        shown = {}
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict) or not item.get("item"):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            labels = [names[g] for g in generics if g in names]
+            # The template substitutes only when EVERY generic has a card name,
+            # so a partial match falls back to `item` and shows no card name.
+            if not labels or len(labels) != len(generics):
+                continue
+            label = " or ".join(labels)
+            label = joins.get(label, label)
+            shown.setdefault(label, set()).add(tuple(generics))
+        checked += 1
+        for label, sources in sorted(shown.items()):
+            if len(sources) > 1:
+                bad.append(
+                    f"{slug}: {label!r} <- "
+                    + " and ".join(sorted(str(list(s)) for s in sources))
+                )
+    assert checked, "No drinks loaded, so this check is vacuous."
+    assert not bad, (
+        "Card(s) showing two different rums under one name:\n  "
+        + "\n  ".join(bad)
+        + "\n\nA reader cannot tell these apart, and the card is the place the "
+          "choice gets made. Either give them distinct card names, or the two "
+          "generics are close enough that this drink should not ask for both."
+    )
+
+
+def test_every_card_name_join_is_reachable():
+    """A `rum_card_name_joins` key must be a join some drink actually produces.
+
+    THE SAME BARGAIN `methods.yml` STRIKES with its proposals, and for the same
+    reason: this map duplicates live data -- the left-hand side is a string the
+    template builds elsewhere from two card names -- so it is only safe
+    alongside the check that keeps the duplicate honest.
+
+    Two ways it rots, and neither is visible on the page. A card name changes
+    and the key stops matching, so the replacement silently stops applying and
+    the clunky join comes back. Or a drink's generics change and the pair no
+    longer occurs, leaving an entry that reads as a live decision about how the
+    index looks while doing nothing at all.
+    """
+    vocab = _vocab()
+    names = vocab.get("rum_display_names") or {}
+    joins = vocab.get("rum_card_name_joins") or {}
+    if not joins:
+        pytest.skip("`rum_card_name_joins` is empty; no default join is "
+                    "overridden, which is a legitimate state.")
+    produced = set()
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict) or not item.get("item"):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            labels = [names[g] for g in generics if g in names]
+            if labels and len(labels) == len(generics) and len(labels) > 1:
+                produced.add(" or ".join(labels))
+    assert produced, (
+        "No drink produces a joined rum card name at all, so this check is "
+        "vacuous. Ten rum entries carry a list `generic` -- either that stopped "
+        "being true, or the card names no longer resolve."
+    )
+    stale = sorted(set(joins) - produced)
+    assert not stale, (
+        "Join replacement(s) matching nothing:\n  " + "\n  ".join(stale)
+        + "\n\nEither a card name changed and this key did not follow — in "
+          "which case the default join is back on the index and nobody was "
+          "told — or no drink asks for that pair any more and the entry should "
+          "go.\nJoins actually produced today:\n  " + "\n  ".join(sorted(produced))
+    )
+
+
 def test_to_serve_is_a_string():
     """`to_serve` is one line of presentation, never a list.
 

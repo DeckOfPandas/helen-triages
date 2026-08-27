@@ -119,6 +119,140 @@ rum_characters:
   - "sherry"
   - "Spanish-style"
 
+# THE CARD NAME FOR EACH RUM CATEGORY. Issue #501, Helen 2026-08-27: "set a
+# display name for each rum category, to be used as a short name on cocktail
+# cards. The recipe page can then display the full category name."
+#
+# WHAT THIS REPLACES IS NOT A LONG NAME, IT IS AN AMBIGUOUS ONE. The card used
+# to render `item` -- the source's own words -- and eight of those strings each
+# named two or three DIFFERENT rums across the collection:
+#
+#   `Overproof Navy rum`  -> Demerara aged / Jamaican moderately aged / O.F.T.D.
+#   `Light aged rum`      -> Demerara aged / blended clear / lightly aged filtered
+#   `Demerara rum`        -> Demerara aged / Demerara overproof
+#   `White rum`           -> agricole unaged / lightly aged and filtered
+#   `Gold rum`, `Navy rum`, `Light rum`, `Lightly aged rum` -> two each
+#
+# So the colour words #314 retired were not merely unfashionable on the index,
+# they were the one thing on the card that could not be trusted. Measured, not
+# assumed: the substitution also SHORTENS the card line in every case (median
+# 98 -> 92 chars, Caribbean Sazerac -87, Mai Tai -69, worst case -1).
+#
+# THE NAMES MUST STAY DISTINCT FROM EACH OTHER, which is the whole point and is
+# what test_rum_card_names_are_distinct enforces. Two rums reading the same on a
+# card would rebuild the exact fault this map exists to fix -- UNLESS the
+# collapse is deliberate, in which case it goes in
+# `rum_card_names_may_collide` below with its reason, the same shape
+# `family_less` uses. No drink in the collection shows the same card name twice
+# either way, which test_no_drink_shows_the_same_card_name_twice holds
+# separately: that is the failure a reader would actually SEE.
+#
+# EVERY RUM-FAMILY GENERIC HAS ONE, including the four that need no shortening
+# (clairin, Malibu, cachaça, Batavia arrack) and the three brand-generics. The
+# map is complete rather than exceptional so the card rule is "substitute when
+# the generic has a card name", with no second question about which rums count.
+#
+# RUM ONLY, deliberately. Four non-rum generics are also over twenty characters
+# (`Full-strength clear fruit brandy`, `ginger and lemongrass cordial`,
+# `Lavender-forward bitters`, `passion fruit liqueur`) and none of them is
+# AMBIGUOUS on a card, which is the problem this solves. Extend it when one is.
+#
+# HELEN'S NAMES, 2026-08-27, tweaked from a first cut. Her edits went one way:
+# the spirit word is SAID rather than implied wherever the style name alone
+# would not read as a rum -- `filtered rum` became `lightly aged rum`,
+# `clear blend` became `clear blended rum`, and both overproofs gained a
+# trailing "rum". Two of them are consequently LONGER than the generic they
+# stand for, which is fine: this map's job is a name you can read at card
+# distance, and brevity was only ever the means.
+rum_display_names:
+  "Jamaican, moderately aged": "Jamaican rum"
+  # DELIBERATELY THE SAME as the moderately aged one above -- see
+  # rum_card_names_may_collide. Declared in rum_styles and used by NO DRINK as
+  # of 2026-08-27; named here anyway, so the map covers the vocabulary rather
+  # than today's data.
+  #
+  # HELEN APPLIES THIS ONE HERSELF and it is not a gap to be filled in by
+  # inference, 2026-08-27: "needs to be applied by me where I need it, for
+  # example where I usually reach for Blackwell or Myers." Those two bottles are
+  # the marker -- a drink whose Jamaican is reached for because it is dark and
+  # molasses-sweet rather than funky. Do not retype a drink into this style
+  # from the item text; `Pot-still dark Jamaican rum` and `Dark aged rum` look
+  # like candidates and are hers to call.
+  "Jamaican, caramel forward": "Jamaican rum"
+  "Jamaican, overproof, unaged": "Jamaican overproof rum"
+  "Demerara, aged": "Demerara rum"
+  "Demerara, overproof": "Demerara overproof rum"
+  # The honest name for what everyone else calls white rum.
+  "lightly aged and filtered": "lightly aged rum"
+  # The weakest name in this map, and flagged as such: it is the residual
+  # category -- a rum with no region and no other distinguishing trait -- so
+  # there is nothing to name it AFTER. "aged rum" beside "Demerara rum" reads
+  # faintly as though the Demerara were not also aged.
+  "moderately aged": "aged rum"
+  "blended multi-region rum, clear": "clear blended rum"
+  # The real category words, and shorter than the description of them.
+  "cane juice (agricole) rum, unaged": "agricole blanc"
+  "cane juice (agricole) rum, aged": "agricole vieux"
+  "clairin": "clairin"
+  # The brand-generics #314 permits because nothing generalises them. O.F.T.D.
+  # earns its place: its item strings are `Overproof Navy rum` and `Navy rum
+  # (float)`, both of which name other rums elsewhere in the collection.
+  "Planteray Stiggins' Fancy": "Stiggins' Fancy"
+  "Planteray O.F.T.D. Overproof": "O.F.T.D."
+  "Malibu": "Malibu"
+  "cachaça": "cachaça"
+  "Batavia arrack": "Batavia arrack"
+
+# HOW A DISJUNCTIVE RUM READS ON A CARD, where the default join reads badly.
+#
+# A list `generic` on ONE ingredient means "either would do" (#441), and the
+# card joins the two card names with " or ". Seven distinct pairs occur and six
+# of them read fine -- `lightly aged rum or agricole blanc` is exactly the
+# choice `White rum` used to conceal. The seventh repeats its own head word:
+# `Demerara overproof rum or Demerara rum`.
+#
+# KEYED ON THE DEFAULT JOIN, so the left-hand side is the string this replaces
+# and you can read the before and after together. AN EXPLICIT MAP RATHER THAN A
+# RULE, Helen 2026-08-27: "not perfect, but we can try. I expect we'll need an
+# explicit mapping of cases like this." Collapsing a shared word is a judgement
+# about two specific names -- her form drops `Demerara` AND `rum` from the
+# second option and reorders the pair -- and no rule recovers that.
+#
+# THIS IS NOT THE "TWO POURS OF THE SAME RUM" CASE, which is a different thing
+# and needs nothing: two separate ingredient entries each render their own card
+# name, so a drink genuinely wanting two Demeraras prints the name twice, which
+# is correct. Helen, same conversation: "where a recipe wants more than one kind
+# of the same rum we obviously should write the display name twice."
+#
+# Every key must still be a join some drink actually produces --
+# test_every_card_name_join_is_reachable -- the same bargain
+# `methods.yml`'s proposals strike: a replacement whose work is already done
+# reads as outstanding, and one whose left-hand side has drifted does nothing
+# while looking live.
+rum_card_name_joins:
+  "Demerara overproof rum or Demerara rum": "Demerara rum or overproof"
+
+# CARD NAMES THAT ARE ALLOWED TO BE THE SAME, with the reason attached -- the
+# idiom `family_less` above and tests/test_reference_data.py's
+# NO_TEMPERATURE_BECAUSE both use, so "why do two rums read alike?" is answered
+# in the repo rather than in someone's memory.
+#
+# Listing a name here is what makes the collapse permitted; an undeclared
+# duplicate still fails. A collapse is a real loss of information on the index,
+# so it should cost a sentence.
+rum_card_names_may_collide:
+  "Jamaican rum": >-
+    Helen's call, 2026-08-27, offered the alternative and choosing this:
+    `Jamaican, moderately aged` and `Jamaican, caramel forward` both read
+    `Jamaican rum` on a card. The funk is the shared trait and it is what you
+    are choosing the drink for at that distance; the caramel is a nuance of the
+    same rum rather than a different strength or a different drink, which is the
+    line the other pairs fall the other side of -- both Demeraras and both
+    agricoles keep their own names, because proof and age genuinely change what
+    you are making. Costs nothing today: `Jamaican, caramel forward` is declared
+    in rum_styles and used by no drink, and no drink calls for both Jamaicans.
+    The full category names are on the drink page either way.
+
 # Helen's own list, 2026-08-26, given in full when `flavoured` was queried:
 # "London Dry, Old Tom, Plymouth, Navy strength, Genever and speciality, where
 # speciality should always carry a character field." Written lowercase here at

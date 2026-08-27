@@ -9,6 +9,7 @@ Everything here exists because it went wrong at least once.
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -1067,6 +1068,32 @@ def test_every_drafts_collection_is_gitignored():
         f"in _config.yml stops them PUBLISHING; it does nothing to stop the "
         f"source markdown being committed."
     )
+
+    # AND ASK GIT, not just the file. Everything above checks that a PATTERN is
+    # written; it cannot tell you whether the PATH is ignored, and the two came
+    # apart on 2026-08-27. `_cocktail_drafts/` matches a directory, and a
+    # symlink to a directory is not one as far as git is concerned -- so a
+    # worktree with the drafts linked in from the main checkout had them sitting
+    # untracked and stageable, with this test green, which is issue #235's shape
+    # arriving through the ignore rule instead of the build config.
+    #
+    # Only checks what is actually on disk: a clean public checkout has neither
+    # directory, and `check-ignore` on an absent path proves nothing either way.
+    for name in drafts:
+        path = ROOT / f"_{name}"
+        if not (path.exists() or path.is_symlink()):
+            continue
+        ignored = subprocess.run(
+            ["git", "check-ignore", "-q", f"_{name}"],
+            cwd=ROOT, capture_output=True,
+        ).returncode == 0
+        assert ignored, (
+            f"`_{name}` exists here but git does NOT ignore it, even though "
+            f".gitignore names it. The usual cause is that it is a SYMLINK: "
+            f"`_{name}/` matches a directory and a link to one is not a "
+            f"directory. Add the slashless `_{name}` beside it. Until then "
+            f"these unpublished drafts are stageable in a public repo."
+        )
 
 
 def test_every_glass_icon_named_in_the_data_exists():
