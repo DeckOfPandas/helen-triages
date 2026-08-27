@@ -2555,6 +2555,106 @@ item, the glass is one of those items, and a percentage height against an
 indefinite height falls back to auto) and the fix is to take the glass out of
 flow, as the cards already do.
 
+#### The six open questions, answered 2026-08-27
+
+The index shipped with six behaviours provisional and issues raised against
+each, so they were decisions rather than defaults. Helen answered all six.
+
+**Ordering — #478 and #479, which turned out to be one question.** Two moods
+means EITHER; drinks matching BOTH rank first; everything shown is in
+**randomised** order within its rank. Include chips stay AND. Mood AND
+ingredient AND chaos between sections.
+
+The ranking is what makes OR usable. AND across moods is nearly always empty
+(`tiki` AND `no juicing` is a handful), so OR was the only answer that kept the
+index alive — but plain OR stops narrowing once you pick a second mood. Ranking
+gives the precision back without the one-match drinks vanishing.
+
+Random rather than alphabetical is the `taxonomy.yml` principle applied:
+alphabetical buries everything after M and greets you with the same drink every
+time. **The shuffle happens once per page load, not per filter pass** — each
+card gets a random sort key at startup and keeps it. Re-shuffling on every
+change would make cards leap around while you type into the has-to-have box,
+which reads as a bug however correct it is. The list is only rewritten when the
+order actually changes.
+
+**Chaos filters, it does not sort (#480)** — unchanged, `definitely good` hides
+everything else.
+
+**The empty state (#481)** takes food's `.recipe-list-empty` treatment value
+for value. One of the few places the two sites SHOULD converge: an empty list
+is not part of either site's personality, and two of them would be two things
+to keep in step for no gain. `text-transform: lowercase` is what makes the copy
+lower case, so the markup keeps ordinary capitalisation.
+
+**Print is the FULL page (#482), not the `make it` state** — and the
+expectation was confidently wrong the other way. `make it` is what you want
+beside you while pouring, but the thing beside you is the phone; a PDF is the
+archive copy, and one that has dropped the tagline, the class lines and the
+notes is a worse record than the page it came from. `_sass/cocktails/_print.scss`
+forces it, so the same page printed twice cannot give two different documents
+depending on an invisible toggle position.
+
+Two traps there, both caught by reading the built CSS rather than by the build
+succeeding: the rules first compiled to TOP LEVEL, outside `@media print`,
+which would have applied on screen and permanently broken the toggle they exist
+to override; and the toggle's class is `btn-make`, not the `.cocktail-make-toggle`
+that got guessed. #86's guard then failed honestly on `.is-making`, because it
+searched templates only and that class comes from JS — **it now searches
+`assets/js/*.js` too**, which is a strengthening rather than an exemption.
+
+**Narrow screens (#483)** — Helen asked "are screens realistically going to be
+narrower than about 380px????" Yes, by the two commonest widths there are: 360px
+is the dominant Android portrait width, 375px covers the iPhone SE, 8 and 13
+mini. What that costs at the default card layout:
+
+| viewport | card | text column | glass takes |
+|---|---|---|---|
+| 360px | 312px | 157px | 39% |
+| 375px | 327px | 172px | 37% |
+| 412px | 364px | 209px | 33% |
+
+157px is about eighteen characters of Courier Prime. Losing the tagline (#512)
+freed a LINE; this is a WIDTH problem.
+
+**`$card-text-x` and `$card-glass-scale` are now custom properties as well as
+Sass variables**, and that is the point rather than a detail: Sass resolves at
+compile time, so five rules had each baked their own copy of `7.6rem`, and any
+narrow-screen variant would have had to restate all five and keep them in step
+— reintroducing the exact coupling `_cards.scss`'s header comment exists to
+prevent.
+
+**Three layouts currently sit behind `?narrow=` and TWO OF THEM ARE DUE TO BE
+DELETED** — `stack` (glass as a full-width band on top, the default),
+`title` (glass small top-left, title beside it) and `shrink` (the original
+column, narrower). Same comparison-switch pattern as `?glass=margin` and
+`?align=top` before it, and it must have the same ending: once Helen picks, the
+losers and the switch script in `cocktails/index.html` go. A comparison switch
+left in becomes a permanent branch nobody dares remove.
+
+#### Every drink names a glass, and `any` is retired (#491)
+
+`any` meant "no requirement" and was the last exempt value in
+`test_every_glass_value_is_in_the_vocabulary`. Exactly one drink ever used it —
+Daisy de Santiago, `[collins, any]`. Helen:
+
+> *"when someone tells me to use an old fashioned glass I always automatically
+> assume I can use any glass I like, so there's no need to have 'any' as a
+> glass type."*
+
+The freedom it encoded is one she applies to every glass spec, so recording it
+on one drink said nothing true about that drink and something false about the
+other 113. Daisy now reads `[collins]`, which is what "anything, but preferably
+a Collins" always meant. **There is now no exempt value.**
+
+**The real gap that issue was hiding: sixteen of 114 drinks name no glass at
+all.** On a drink page the glass is the hero — drawn as tall as the whole title
+block — so an empty `glass` is a page with a hole where its main image goes.
+`test_every_drink_names_a_glass` ratchets the sixteen rather than guessing:
+which glass a drink wants is Helen's knowledge, not derivable, and a wrong glass
+looks exactly as confident as a right one. The list only shrinks — filling one
+in without removing it from the list also fails.
+
 #### A technique worth keeping: tracing a filled icon into strokes
 
 The tiki mug had no lines in it. Its source is fill-only stock artwork — one
@@ -2575,6 +2675,13 @@ showed essentially no grey.
 is a 0.85 radius arc, so the ink is 1.7 units throughout, and the medial axis of
 a constant-width stroke is its centreline. It would not be valid on artwork with
 varying weight.
+
+**Both tools are now permanent, 2026-08-27 (#498):**
+`scripts/trace_centrelines.py` (the tracer, generalised from "the tiki mug" to
+any filled uniform-width artwork, with a CLI and a dry-run default) and
+`scripts/svgrender.py` (the rasteriser, which also does the canvas measuring in
+§9.14 and is imported by two tests). Verified against the mug on the move:
+identical 103,817 → 7,073 → 46 strokes, 323 points.
 
 Two traps if it is ever rebuilt. There is no rasteriser in this environment, so
 one was written (path flattening, scanline fill, PNG out) — validated against
@@ -2610,16 +2717,72 @@ quarter of its canvas is air. **The viewBox being BIGGER is not the same as the
 glass being bigger, and it is easy to check the wrong one:** the redraw's
 viewBox is 1.29× the single's, which looks like confirmation and is not.
 
-**How to check.** Render, then measure the ink's bounding box as a fraction of
-the canvas. Reasoning from viewBox numbers and internal matrix scales gave the
-wrong answer here; the render did not. There is no rasteriser in this
-environment — see §9.13 on the one written for the tiki mug, which does this
-job too.
+**How to check.** Measure the ink's extent as a fraction of the canvas.
+Reasoning from viewBox numbers and internal matrix scales gave the wrong answer
+here; measuring did not.
 
-**Worth a guard eventually**, and it is not built: a test that renders each
-icon and flags any whose ink-fill fraction is an outlier would catch this class
-at the point a drawing lands, rather than when someone notices two glasses look
-wrong together.
+#### FIXED AT THE SOURCE, 2026-08-27 — and the cause was never carelessness
+
+`scripts/normalise_glass_icons.py` now **fits every icon's viewBox to its own
+artwork** as its last step, so a slack canvas cannot reach the site. The guard
+that was "worth a guard eventually" exists too —
+`test_no_glass_artwork_has_a_slack_viewbox` — but as a backstop for artwork
+that skipped the normaliser, and its grandfather list is EMPTY.
+
+**Why it belongs in the pipeline rather than in a checklist.** Helen:
+
+> *"I created the coupe and goblet drawings by editing others, which will be
+> how the height issue happened. I am not able to do anything other than this
+> as I can't draw."*
+
+A shortened drawing keeps the taller drawing's canvas. That is the inevitable
+output of the only way she can make a glass, so "remember to fit the canvas" is
+an instruction that will fail every time.
+
+**It found two worse than the one that prompted it.** The double old-fashioned
+had improved to 85.5% by the time anyone looked (settling on `old-fashioned-2`
+did that, unmeasured). Goblet was at **69.5%** and coupe at **82.5%** — and the
+coupe is the one that mattered: **40 drinks**, declared the same 150 mm as the
+highball and rendering **15% shorter than it**. Two glasses that should be
+identical on screen were not, and nobody had noticed, because nothing is out of
+proportion WITHIN a drawing — only between it and its own frame.
+
+**Three things about the measurement, each learned by getting it wrong:**
+
+1. **Not a raster.** Ink-pixel counting works, but the answer depends on where
+   the pixel grid falls, which depends on the viewBox, which is what is being
+   computed. Over eight successive fits the canvas oscillated across a
+   ~0.1-unit band instead of settling.
+2. **Not raw geometry either.** Some drawings carry paths OUTSIDE their own
+   viewBox, clipped by it and never visible — the goblet's bowl runs to
+   `y = -6.9` above a canvas starting at 0. Fitting to that proposed shrinking
+   the goblet and coupe by 33% and 18%, revealing parts of a drawing nobody has
+   seen. So flatten the paths and **clip the points to the viewBox**.
+3. **Shrink-only.** Padding an ink box that touches the clip edge pushes the
+   canvas out, admitting a sliver of hidden artwork, enlarging the box, pushing
+   it out again — unbounded creep, one margin per regeneration.
+
+**Margin is 1.4 user units, not a percentage.** These icons use
+`vector-effect: non-scaling-stroke`, so the stroke is a fixed number of SCREEN
+pixels and occupies MORE viewBox units the smaller the icon renders. A
+percentage margin shrinks exactly when the stroke needs it most — on a card —
+and clips the rim.
+
+**Unconditional, and that was measured before choosing:** with canvases fitted,
+23 of 26 icons move by 0.4% or less.
+
+**AND THE NORMALISER DELETED ALL 26 ICONS. TWICE.** Its first act is to empty
+`_includes/icons/glasses/`. `SRC` is `tmp/cocktail-glasses`, a **gitignored
+inbox** that is empty in a fresh worktree — so on 2026-08-27 it emptied the
+destination with no input and wrote nothing back, printing `0 icons ->` as if
+that were a result. (The first time, 2026-08-26, was an import running a bare
+`main()`; that is why the file has a `__main__` guard.) It now refuses unless
+it has usable input, BEFORE deleting anything. **A destructive step that runs
+before its inputs are checked will eventually run with no inputs.**
+
+Recovery both times was additive — `git show HEAD:<path>` writing only absent
+files — rather than `git checkout --`, which the destructive-git hook refuses
+on a dirty tree and which would have taken uncommitted work with it.
 
 ### 9.15 Never save a redraw over its predecessor
 

@@ -32,6 +32,13 @@
 
 $card-height:   12.9rem;
 $card-text-x:   7.6rem;
+// ...AND IT IS A CUSTOM PROPERTY TOO, since #483. The Sass variable is still
+// the single source of the DEFAULT, but Sass resolves at compile time, so five
+// rules each baked their own copy of 7.6rem and a narrow-screen variant would
+// have had to restate all five and keep them in step -- which is the exact
+// coupling the comment above exists to prevent, reintroduced by the fix.
+// One custom property, five readers, one line to override.
+:root { --card-text-x: #{$card-text-x}; }
 // #490. The glass column is exactly $card-text-x wide, so text starting at
 // $card-text-x began flush against the tinted panel's edge with nothing
 // between them. This is that gutter, and it is a SEPARATE value rather than a
@@ -47,7 +54,12 @@ $chip-line:     1.15rem;
 // The tallest glass, in the card grid's own units. Every glass is drawn at its
 // true height relative to this — see the template, which counts the tallest
 // live from glasses.yml rather than hardcoding one.
+//
+// A CUSTOM PROPERTY for the same reason --card-text-x is (#483): the stacked
+// narrow-screen layouts need a smaller drawing, and a Sass value cannot be
+// changed by a media query without restating every rule that reads it.
 $card-glass-scale: 13rem;
+:root { --card-glass-scale: #{$card-glass-scale}; }
 
 .drink-cards {
   list-style: none;
@@ -62,7 +74,8 @@ $card-glass-scale: 13rem;
   position: relative;
   height: $card-height;
   overflow: hidden;
-  padding: $card-pad-y $card-pad-x $card-pad-y ($card-text-x + $card-gutter);
+  padding: $card-pad-y $card-pad-x $card-pad-y
+           calc(var(--card-text-x) + #{$card-gutter});
   background: $color-surface;
   border: 1px solid $color-border;
 
@@ -81,7 +94,7 @@ $card-glass-scale: 13rem;
   left: 0;
   top: 0;
   bottom: 0;
-  width: $card-text-x;
+  width: var(--card-text-x);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,9 +107,10 @@ $card-glass-scale: 13rem;
     // The ratio comes from the template (true relative height, from
     // heights_mm), the cheat from glasses.yml's display_scale. Three separate
     // decisions, three separate multipliers, none baked into the others.
-    height: calc(var(--glass-ratio, 1) * var(--glass-cheat, 1) * #{$card-glass-scale});
+    height: calc(var(--glass-ratio, 1) * var(--glass-cheat, 1)
+                 * var(--card-glass-scale));
     width: auto;
-    max-width: $card-text-x - 1.3rem;
+    max-width: calc(var(--card-text-x) - 1.3rem);
     overflow: visible;
   }
 
@@ -114,7 +128,7 @@ $card-glass-scale: 13rem;
   content: "";
   position: absolute;
   left: -1px;
-  width: $card-text-x;
+  width: var(--card-text-x);
   height: 3px;
   pointer-events: none;
   transition: background-color 0.12s ease;
@@ -198,7 +212,7 @@ $card-glass-scale: 13rem;
   // Same gutter as the body above, so the title and the foot share one left
   // edge. They are two separate rules and drifting apart is exactly what the
   // fixed-anchor design exists to prevent.
-  left: $card-text-x + $card-gutter;
+  left: calc(var(--card-text-x) + #{$card-gutter});
   right: $card-pad-x;
   bottom: $card-foot-y;
 }
@@ -272,4 +286,111 @@ $card-glass-scale: 13rem;
 
 @media (max-width: 720px) {
   .drink-cards { grid-template-columns: 1fr; }
+}
+
+// #483. Helen, 2026-08-27: "Are screens realistically going to be narrower
+// than about 380px????" Yes, and by the two commonest widths there are: 360px
+// is the dominant Android portrait width and 375px covers the iPhone SE, 8 and
+// 13 mini. 390 and 412 are the larger common ones; 320 is the historical floor
+// and effectively gone.
+//
+// WHAT THAT COSTS AT THE DEFAULT. The card's text column is whatever is left
+// after the glass column, the gutter and the padding, so at 16px/rem:
+//
+//     viewport   card   text column   glass takes
+//        360px   312px      157px         39%
+//        375px   327px      172px         37%
+//        412px   364px      209px         33%
+//
+// 157px is about eighteen characters of Courier Prime, which is where the
+// two-line clamps start cutting real content while the drawing keeps its full
+// column. Losing the tagline helped, as Helen said, but it freed a LINE and
+// this is a WIDTH problem.
+//
+// SHRINKING, NOT STACKING, and the issue already worked out why: the glass
+// column's width is the title's left edge, the foot's left edge and the
+// under-mark's width, so shrinking is one value and stacking is a relayout.
+// 4.6rem gives the text column 205px at 360px -- a third more -- and keeps the
+// card's horizontal shape, which is what makes the grid scannable.
+//
+// The breakpoint is 400px rather than 380: 390px (iPhone 14/15) is inside the
+// range that hurts, and a breakpoint that stops just short of the commonest
+// phone sold is a breakpoint that does not fire.
+@media (max-width: 400px) {
+  // ===========================================================================
+  // NARROW-SCREEN LAYOUT — THREE OPTIONS BEHIND A SWITCH. SCAFFOLDING (#483).
+  // ===========================================================================
+  // Helen, 2026-08-27: "let's try glasses on top, info below then, for the
+  // smaller screens. Or maybe glass / title on top, details below. Have a
+  // play."
+  //
+  // DELETE TWO OF THESE AND THE SWITCH ONCE SHE HAS CHOSEN. Same pattern as
+  // ?glass=margin and ?align=top before it: the point of a comparison switch
+  // is that it is temporary, and one left in becomes a permanent branch nobody
+  // dares remove. cocktails/index.html carries the matching script and the
+  // same warning.
+  //
+  //   ?narrow=stack   (default) glass as a full-width band on top
+  //   ?narrow=title             glass small top-left, title beside it
+  //   ?narrow=shrink            the original: glass column, just narrower
+  //
+  // The default is `stack` because it is the one Helen asked for first.
+
+  // --- shared by both stacked layouts ---------------------------------------
+  // The glass stops being a left column, so everything that measured itself
+  // against that column has to stop too. Listed together rather than repeated
+  // in each variant: these are consequences of un-columning, not choices.
+  [data-narrow="stack"],
+  [data-narrow="title"] {
+    .drink-card-foot { left: $card-pad-x; }
+    .drink-card::after,
+    .drink-card-glass::after { width: calc(100% + 2px); }
+  }
+
+  // --- 1. stack: glass on top, everything below ------------------------------
+  // Full-bleed band. The drawing gets the whole card width, which is the most
+  // it has ever had, so the scale comes DOWN rather than up -- at 13rem a tall
+  // glass would be most of a phone screen.
+  [data-narrow="stack"] {
+    --card-glass-scale: 6.4rem;
+
+    .drink-card {
+      height: 15.4rem;
+      padding: 6.6rem $card-pad-x $card-pad-y $card-pad-x;
+    }
+    .drink-card-glass {
+      width: 100%;
+      height: 6.4rem;
+      bottom: auto;
+    }
+    .drink-card-glass svg { max-width: 60%; }
+  }
+
+  // --- 2. title: glass small top-left, title beside it -----------------------
+  // The compromise. The glass keeps a column but only as tall as the title, so
+  // the ingredient line and the foot run full width underneath -- which is
+  // where the space was actually being lost.
+  //
+  // Done with a padding on the TITLE rather than by regrouping the markup: the
+  // title and the ingredients are siblings inside .drink-card-body, so a real
+  // two-row layout would need the template changed. If Helen picks this one,
+  // that is worth doing properly rather than leaving as a padding trick.
+  [data-narrow="title"] {
+    --card-glass-scale: 4.4rem;
+
+    .drink-card { height: 13.4rem; padding-left: $card-pad-x; }
+    .drink-card-glass {
+      width: 4.4rem;
+      height: 4.4rem;
+      bottom: auto;
+    }
+    .drink-card-glass svg { max-width: 78%; }
+    .drink-card-name { padding-left: 4.4rem + $card-gutter; }
+  }
+
+  // --- 3. shrink: the original narrow layout ---------------------------------
+  // Kept as the comparison rather than deleted: "is stacking better than just
+  // making it smaller" is the actual question, and it cannot be answered
+  // without the smaller one on screen too.
+  [data-narrow="shrink"] { --card-text-x: 4.6rem; }
 }

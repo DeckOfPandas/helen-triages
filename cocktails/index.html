@@ -276,6 +276,34 @@ permalink: /cocktails/
      it lands as an insult to a search that was simply too narrow. {% endcomment %}
   <p class="drink-none" hidden>Blank canvas.</p>
 
+  {% comment %} =========================================================
+     NARROW-SCREEN LAYOUT SWITCH — SCAFFOLDING, #483. DELETE WHEN CHOSEN.
+     =========================================================
+     Helen, 2026-08-27: "let's try glasses on top, info below then, for the
+     smaller screens... Have a play." Three layouts live in _cards.scss under
+     `@media (max-width: 400px)`; this picks one.
+
+       ?narrow=stack    (default) glass as a full-width band on top
+       ?narrow=title              glass small top-left, title beside it
+       ?narrow=shrink             the original column, just narrower
+
+     ONLY VISIBLE BELOW 400px — resize the window or use the browser's device
+     mode. It deliberately does not force the narrow layout at desktop width,
+     because a layout judged at the wrong size is judged wrong.
+
+     Same pattern as ?glass=margin and ?align=top before it, and the same
+     ending: once Helen picks, two variants and this script are deleted. A
+     comparison switch left in becomes a permanent branch nobody dares remove.
+  {% endcomment %}
+  <script>
+    (function () {
+      var ok = { stack: 1, title: 1, shrink: 1 };
+      var want = (location.search.match(/[?&]narrow=([a-z]+)/) || [])[1];
+      var list = document.querySelector('.drink-cards');
+      if (list) list.dataset.narrow = ok[want] ? want : 'stack';
+    })();
+  </script>
+
   <script src="{{ '/assets/js/cocktail-index.js' | relative_url }}"></script>
 
 {% else %}

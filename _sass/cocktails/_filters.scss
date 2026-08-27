@@ -257,11 +257,36 @@
   strong { color: $color-text; font-size: 1rem; }
 }
 
+// #481. Helen, 2026-08-27: "The food site uses class .recipe-list-empty for
+// this and I really like it, so please replicate that."
+//
+// Deliberately matched to food rather than invented again, and this is one of
+// the few places the two sites SHOULD converge: an empty list is not part of
+// either site's personality, it is the same small apology in both, and having
+// two of them would be two things to keep in step for no gain.
+//
+// So the treatment is food's, value for value -- the type of a recipe title at
+// 1rem/600, lowercase, 0.05em, in $color-clear-text rather than ink because
+// this is not something to reach for. See _sass/food/_active-filter-states.scss
+// for why it follows the TITLES' font: "the same as the titles" has to keep
+// meaning that when the titles move.
+//
+// `text-transform: lowercase` is what makes the copy lower case, so the markup
+// keeps ordinary sentence capitalisation and nothing has to remember not to.
 .drink-none {
-  font-family: $font-body;
+  font-family: $font-headings;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
   color: $color-clear-text;
-  margin: $spacing-section-gap 0;
   text-align: center;
+  padding: $space-xxl 0;
+  margin: 0;
+
+  background: none;
+  border: none;
+  box-shadow: none;
 }
 
 @media (max-width: 720px) {

@@ -767,11 +767,20 @@ def test_every_glass_value_is_in_the_vocabulary():
     last of them: an unrecognised glass is far likelier to be a typo than a
     decision.
 
-    `any` IS THE ONE EXEMPTION AND MUST STAY UNMAPPED. It is a real member of a
-    drink's `glass:` list meaning "no requirement" -- Daisy de Santiago is
-    "anything, but preferably a Collins" -- so mapping it to an icon would draw
-    a glass for a drink that deliberately does not specify one. Listing it here
-    rather than in `icons:` is the whole point.
+    `any` WAS AN EXEMPTION HERE AND IS NOW RETIRED, 2026-08-27. It meant "no
+    requirement", and exactly one drink ever used it -- Daisy de Santiago, as
+    `[collins, any]`, i.e. "anything, but preferably a Collins". Helen: "when
+    someone tells me to use an old fashioned glass I always automatically
+    assume I can use any glass I like, so there's no need to have 'any' as a
+    glass type."
+
+    That is the argument that kills it. The freedom `any` encoded is one she
+    applies to EVERY glass spec already, so recording it on one drink said
+    nothing true about that drink and false about the other 113. Dropping it
+    from Daisy left `[collins]`, which is what the source meant anyway --
+    "preferably a Collins" was always the whole content.
+
+    There is now NO exempt value: every glass a drink names must be in `icons:`.
 
     Passes on arrival: all 19 distinct values in the collection are known
     today. That is what makes it worth adding now -- it costs nothing to
@@ -781,7 +790,11 @@ def test_every_glass_value_is_in_the_vocabulary():
     icons = g.get("icons") or {}
     assert icons, "glasses.yml has no `icons:` -- see the sibling tests."
 
-    deliberately_unmapped = {"any"}
+    # No exemptions. `any` was the last one and was retired 2026-08-27 -- see
+    # the docstring. A new exemption here should be argued for in an issue
+    # first: the whole value of this check is that an unrecognised glass is a
+    # typo rather than a decision.
+    deliberately_unmapped = set()
 
     unknown = {}
     for slug, fm in _load():
@@ -791,15 +804,87 @@ def test_every_glass_value_is_in_the_vocabulary():
                 continue
             unknown.setdefault(key, []).append(slug)
 
+    # Six icons are drawn and normalised but no spelling reaches them
+    # (hot-toddy, julep-cup, margarita, pina-colada, sherry, shot -- the
+    # `UNUSED ICONS` note in glasses.yml says why). For those, the generic
+    # advice below is actively WRONG: it says "and artwork", and the artwork
+    # already exists. Someone taking it at its word draws a second margarita,
+    # or maps the value to `coupe` and never learns `margarita.svg` was there.
+    # So say so, per value, at the moment it matters.
+    lines = []
+    for value, drinks in sorted(unknown.items()):
+        line = f"{value!r} -- {', '.join(sorted(drinks))}"
+        stem = value.replace(" ", "-")
+        if (GLASS_ICON_DIR / f"{stem}.svg").is_file():
+            line += (f"\n      ARTWORK ALREADY EXISTS: {stem}.svg. This needs "
+                     f"a key in `icons:`, NOT a new drawing.")
+        lines.append(line)
+
     assert not unknown, (
         "glass value(s) not in _data/cocktails/glasses.yml `icons:`:\n  "
-        + "\n  ".join(f"{v!r} -- {', '.join(sorted(d))}"
-                      for v, d in sorted(unknown.items()))
+        + "\n  ".join(lines)
         + "\n\nThe drink renders NO glass icon, silently. Either it is a typo "
           "and the drink should be retyped, or it is a real glass and needs a "
-          "key in `icons:` (and artwork, and a heights_mm entry -- the sibling "
-          "tests will say so). If it is genuinely 'no requirement', the word "
-          "is `any`."
+          "key in `icons:` (and artwork unless flagged above, and a heights_mm "
+          "tests will say so). There is no longer a value meaning 'no "
+          "requirement' -- `any` was retired on 2026-08-27, because every "
+          "glass spec is already a suggestion."
+    )
+
+
+# The drinks that named no glass at all on 2026-08-27, when Helen settled that
+# every recipe should have one (#491). Sixteen of 114. Listed rather than
+# tolerated silently, and listed rather than fixed, because which glass a drink
+# wants is her call and not derivable -- a Zombie is not a Bellini.
+#
+# THE LIST ONLY SHRINKS. The test fails if a drink joins it, and fails again if
+# a drink on it gets a glass and is not removed, so it cannot quietly stop
+# describing the collection.
+GLASSLESS_ON_2026_08_27 = {
+    "anitas-attitude-adjuster", "banana-boulevardier", "biggles-sidecar",
+    "cobra-effect", "copenhagen-special", "cynar-toronto", "el-mediterraneo",
+    "georgetown-punch", "kamaniwanalaya", "mai-tai-diffords-recipe",
+    "milliners-punch", "minty-pentones", "modern-zombie-makes-2",
+    "pear-apricot-honey-lemon-and-rosemary-bellini", "tiki-max",
+    "zombie-intoxica",
+}
+
+
+def test_every_drink_names_a_glass():
+    """#491. Helen, 2026-08-27: "All recipes should have a glass."
+
+    A drink with no `glass` renders no icon, and on a drink page the glass is
+    the hero -- it is drawn as tall as the whole title block. So an empty
+    `glass` is not a missing garnish-sized detail, it is a page with a hole
+    where its main image goes, and 16 of 114 have one.
+
+    WHY THIS IS A RATCHET AND NOT A FIX. Which glass a drink wants is Helen's
+    knowledge, not something derivable from the ingredients -- and guessing
+    would be worse than the gap, because a wrong glass looks exactly as
+    confident as a right one. So the existing sixteen are recorded and the
+    check bites on the seventeenth.
+
+    NOTE THE TEST ABOVE NO LONGER EXEMPTS `any`. The two changes are the same
+    decision from both ends: every drink names a glass, and there is no value
+    meaning "it does not matter".
+    """
+    missing = {slug for slug, fm in _load() if not (fm.get("glass") or [])}
+
+    new = sorted(missing - GLASSLESS_ON_2026_08_27)
+    assert not new, (
+        "drink(s) with no `glass`:\n  " + "\n  ".join(new)
+        + "\n\nEvery recipe should have a glass (#491). On a drink page the "
+          "glass is drawn as tall as the title block, so an empty one leaves a "
+          "hole where the page's main image goes."
+    )
+
+    fixed = sorted(GLASSLESS_ON_2026_08_27 - missing)
+    assert not fixed, (
+        "these now HAVE a glass and should come off GLASSLESS_ON_2026_08_27:\n  "
+        + "\n  ".join(fixed)
+        + "\n\nThe list only shrinks. Leaving a fixed drink on it means the "
+          "list stops describing the collection, and the next real gap hides "
+          "among the stale entries."
     )
 
 
@@ -1018,6 +1103,172 @@ def test_every_icon_has_a_real_world_height():
         + "\n  ".join(bad)
         + "\n\nA quoted number is a string, and Liquid's `times` turns a "
           "non-numeric string into 0 -- the same invisible-gap failure."
+    )
+
+
+# `heights_mm` sizes an icon by its VIEWBOX, not by its ink, so a drawing that
+# does not fill its own canvas renders smaller than one that does at the same
+# declared height.
+#
+# NOT A UNIT: this is the fraction of the canvas HEIGHT that the ink spans.
+#
+# THE LIST IS EMPTY AND SHOULD STAY EMPTY. It held three entries for a few
+# hours on 2026-08-27 -- goblet at 69.5%, coupe at 82.5%, old-fashioned-double
+# at 85.5% -- and then `scripts/normalise_glass_icons.py` learned to fit every
+# canvas to its own artwork, which fixed all three at the source instead. An
+# entry appearing here again means a drawing reached _includes/ without going
+# through the normaliser, which is worth knowing about in itself.
+KNOWN_LOOSE_VIEWBOXES = {}
+VIEWBOX_FILL_FLOOR = 92.0
+VIEWBOX_FILL_TOLERANCE = 3.0
+
+
+def test_no_glass_artwork_has_a_slack_viewbox():
+    """#503. An icon must fill its own canvas, or it renders smaller than declared.
+
+    `heights_mm` says how tall a glass is in the real world and the template
+    scales the icon to match. But it scales the VIEWBOX, and the viewBox is
+    whatever the drawing was saved with -- `scripts/normalise_glass_icons.py`
+    deliberately preserves it ("the viewBox stays, so CSS decides"). So ink
+    sitting in the middle of a roomy canvas renders short, by exactly the
+    fraction of the canvas it leaves empty, and nothing anywhere says so.
+
+    THIS IS NOT VISIBLE BY READING THE FILES. It was found the first time by two
+    glasses looking wrong beside each other, and the viewBox numbers actively
+    misled -- see the note on KNOWN_LOOSE_VIEWBOXES above. It has to be
+    measured, which is why this test rasterises.
+
+    IMPORTING THE RASTERISER IS FINE HERE, and is not the mistake
+    tests/test_reference_data.py warns about when it reimplements
+    build_cooking_methods.py's parser rather than sharing it. That warning is
+    about a test agreeing with the generator it is checking. Nothing generates
+    these SVGs from the rasteriser -- Helen draws them, and the normaliser moves
+    XML around without ever rasterising -- so the measurement is independent of
+    the thing being measured.
+
+    THE TOLERANCE IS TWO-SIDED ON PURPOSE. A grandfathered icon that gets worse
+    fails, and one that gets FIXED also fails, telling you to drop it from the
+    list. A one-sided ratchet quietly keeps stale entries forever, which is how
+    a grandfather list stops describing anything real.
+    """
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import svgrender
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/svgrender.py not importable")
+
+    icons = sorted(GLASS_ICON_DIR.glob("*.svg"))
+    assert icons, f"no SVGs in {GLASS_ICON_DIR.relative_to(ROOT)}"
+
+    fills = {}
+    for path in icons:
+        paths, viewbox, translate, _ = svgrender.parse_icon(path)
+        # A hairline stroke and no supersampling: this measures where the
+        # ARTWORK is, and a fat stroke would inflate the box by its own width.
+        width, height, gray = svgrender.render(
+            paths, viewbox, 200, stroke=0.4, translate=translate, ss=1)
+        rows = [i // width for i, v in enumerate(gray) if v < 128]
+        assert rows, (
+            f"{path.name} rasterised to NOTHING. Either the artwork draws "
+            f"outside its own viewBox, or parse_icon missed the <g transform> "
+            f"-- both of which render blank on the site too."
+        )
+        fills[path.stem] = (max(rows) - min(rows) + 1) / height * 100
+
+    stale = sorted(set(KNOWN_LOOSE_VIEWBOXES) - set(fills))
+    assert not stale, (
+        f"KNOWN_LOOSE_VIEWBOXES names icons that no longer exist: {stale}. "
+        f"Drop them."
+    )
+
+    problems = []
+    for name, fill in sorted(fills.items()):
+        if name in KNOWN_LOOSE_VIEWBOXES:
+            was = KNOWN_LOOSE_VIEWBOXES[name]
+            if abs(fill - was) > VIEWBOX_FILL_TOLERANCE:
+                verb = "IMPROVED" if fill > was else "GOT WORSE"
+                problems.append(
+                    f"{name}: {verb} -- grandfathered at {was:.1f}%, now "
+                    f"{fill:.1f}%. If it is fixed, remove it from "
+                    f"KNOWN_LOOSE_VIEWBOXES; if worse, that is a regression.")
+        elif fill < VIEWBOX_FILL_FLOOR:
+            problems.append(
+                f"{name}: ink spans only {fill:.1f}% of its viewBox height, so "
+                f"it renders at {fill / 100:.2f}x its declared heights_mm.")
+
+    assert not problems, (
+        "glass artwork with a slack viewBox:\n  " + "\n  ".join(problems)
+        + f"\n\nThe set median is 97.5% and the floor is "
+          f"{VIEWBOX_FILL_FLOOR:.0f}%. `heights_mm` scales the VIEWBOX, so "
+          f"empty canvas is lost height -- the glass renders short beside its "
+          f"neighbours and its declared millimetres become a lie. Fix by "
+          f"cropping the viewBox to the ink (the paths and their <g transform> "
+          f"do not move), or grandfather it above with a reason."
+    )
+
+
+def test_fitting_a_canvas_never_moves_the_artwork():
+    """`scripts/normalise_glass_icons.py` now fits every icon's viewBox to its
+    own ink, and this is the guard on that step.
+
+    IT RUNS ON ARTWORK THAT CANNOT BE REGENERATED HERE. `SRC` is
+    `tmp/cocktail-glasses`, a gitignored inbox that is empty in a fresh
+    worktree, so the normaliser refuses to run and the fit step is never
+    exercised by anything else. Without this, a change to `fit_viewbox` would
+    be caught only the next time Helen imported a drawing -- by which point it
+    would have silently reframed all 26.
+
+    THE PROPERTY THAT MATTERS is that fitting is a reframe, never a redraw. The
+    path data and the <g transform> must come out byte-identical; only the
+    viewBox attribute may differ. If that holds, the step cannot distort a
+    drawing however wrong its arithmetic is -- the worst case is a badly
+    cropped frame, which the slack-viewBox guard above then catches.
+
+    IDEMPOTENCE is the second half. Fitting an already-fitted icon must be a
+    no-op, or every regeneration would creep the canvas -- and since the
+    normaliser runs on the PUBLISHED files' ancestors rather than on the
+    published files, a creep would be invisible until glasses drifted out of
+    proportion with each other over several imports.
+    """
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import svgrender
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/svgrender.py not importable")
+
+    icons = sorted(GLASS_ICON_DIR.glob("*.svg"))
+    assert icons, f"no SVGs in {GLASS_ICON_DIR.relative_to(ROOT)}"
+
+    moved, crept = [], []
+    for path in icons:
+        original = path.read_text()
+        fitted, _, _ = svgrender.fit_viewbox(original, label=path.stem)
+
+        before = svgrender.parse_icon_text(original, path.stem)
+        after = svgrender.parse_icon_text(fitted, path.stem)
+        if before[0] != after[0] or before[2] != after[2]:
+            moved.append(path.stem)
+
+        # fitting twice must equal fitting once
+        again, _, _ = svgrender.fit_viewbox(fitted, label=path.stem)
+        box_once = svgrender.parse_icon_text(fitted, path.stem)[1]
+        box_twice = svgrender.parse_icon_text(again, path.stem)[1]
+        if any(abs(a - b) > 0.05 for a, b in zip(box_once, box_twice)):
+            crept.append(f"{path.stem}: {box_once} -> {box_twice}")
+
+    assert not moved, (
+        "fit_viewbox CHANGED THE ARTWORK on: " + ", ".join(moved)
+        + "\n\nIt may only rewrite the viewBox attribute. Path data and the "
+          "<g transform> must survive untouched -- that is the whole reason "
+          "this step is safe to run unattended over Helen's drawings."
+    )
+    assert not crept, (
+        "fit_viewbox is not idempotent:\n  " + "\n  ".join(crept)
+        + "\n\nFitting an already-fitted icon must be a no-op, or the canvas "
+          "creeps a little on every regeneration and the set slowly loses its "
+          "relative proportions."
     )
 
 

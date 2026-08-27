@@ -142,10 +142,20 @@ icons:
 # sense that it was CONSIDERED for the mulled wine and rejected: the drawing is
 # a footed handled glass, not a mug.
 #
-# `any` above is now the ONLY deliberately unmapped value left, and it is the
-# one that must stay that way permanently — it means "no requirement", not a
-# glass nobody has drawn yet. The other three were open questions; this one is
-# a decision. If a new unmappable value arrives, add it here with its reason.
+# `any` IS RETIRED, 2026-08-27, and this note used to say it must stay
+# permanently — so the reversal is worth the space. It meant "no requirement",
+# and exactly one drink ever used it: Daisy de Santiago, as [collins, any].
+#
+# Helen: "when someone tells me to use an old fashioned glass I always
+# automatically assume I can use any glass I like, so there's no need to have
+# 'any' as a glass type." The freedom it encoded is one she applies to EVERY
+# glass spec, so recording it on one drink said nothing true about that drink
+# and something false about the other 113. Daisy now reads [collins], which is
+# what "anything, but preferably a Collins" always meant.
+#
+# THERE IS NOW NO UNMAPPED VALUE. Every glass a drink names must appear in
+# `icons:` above — see #491, and test_every_glass_value_is_in_the_vocabulary,
+# which no longer carries an exemption set.
 #
 # =============================================================================
 # THE CANONICAL VOCABULARY — Helen, 2026-08-17, ENFORCED from 2026-08-26
