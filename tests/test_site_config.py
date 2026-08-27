@@ -1591,15 +1591,34 @@ def test_print_rules_target_classes_that_exist():
     )
     markup = "\n".join(p.read_text(encoding="utf-8") for p in html_files if p.exists())
 
+    # A CLASS THE SCRIPTS ADD IS STILL A CLASS THAT EXISTS. `is-making` is put
+    # on the drink page by assets/js/cocktail-make.js, never by a template, and
+    # the print rule that reverses it (#482) is exactly as vulnerable to a
+    # rename as any other -- more so, because nothing type-checks a string in a
+    # classList call either. Searching the scripts as well keeps the guard's
+    # promise ("the class this styles exists somewhere") true, rather than
+    # exempting the case that needed it.
+    #
+    # Matched as a quoted string, which is how classList.add/toggle/remove and
+    # every template literal in this codebase name one.
+    scripts = "\n".join(
+        s.read_text(encoding="utf-8") for s in sorted(ROOT.glob("assets/js/*.js")))
+
+    def somewhere(cls):
+        if re.search(rf'class="[^"]*\b{re.escape(cls)}\b', markup):
+            return True
+        return bool(re.search(rf"""['"]{re.escape(cls)}['"]""", scripts))
+
     missing = sorted({
-        f"{where_}: .{cls}" for where_, cls in named
-        if not re.search(rf'class="[^"]*\b{re.escape(cls)}\b', markup)
+        f"{where_}: .{cls}" for where_, cls in named if not somewhere(cls)
     })
     assert not missing, (
         "Print rule(s) target a class no template emits:\n  " + "\n  ".join(missing)
         + "\n\nEither the class was renamed and the print stylesheet did not "
           "follow it, or the rule is left over from markup that has gone. A "
-          "print rule that matches nothing fails silently and on paper only."
+          "print rule that matches nothing fails silently and on paper only.\n\n"
+          "Templates AND assets/js/*.js are both searched, so a class applied "
+          "only by a script counts as emitted."
     )
 
 

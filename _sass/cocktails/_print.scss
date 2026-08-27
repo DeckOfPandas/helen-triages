@@ -1,0 +1,42 @@
+// =============================================================================
+// COCKTAILS — PRINT. Spec: GitHub issue #482.
+// =============================================================================
+// Helen, 2026-08-27: "The full page should be what ends up in the PDF and
+// prints."
+//
+// THAT IS THE OPPOSITE OF WHAT WAS EXPECTED, and the expectation is worth
+// recording because it was confidently wrong. #482 assumed the `make it` state
+// -- the bar-side spec, amounts enlarged, everything else stripped -- because
+// that is the version you want beside you while pouring. But a PDF is not the
+// thing beside you while pouring; the phone is. A PDF is the archive copy, and
+// an archive copy that has thrown away the tagline, the ingredient class lines
+// and the notes is a worse record than the page it came from.
+//
+// SO PRINT IS THE EDITORIAL STATE, FORCED. The `make it` toggle only adds a
+// class, and both states are always in the DOM, so this is a stylesheet
+// concern with no template or JS involvement -- which is what makes it
+// possible to override at all.
+//
+// The reader may well print WHILE in `make it` mode, having pressed the button
+// to read the spec. Without this they would get whatever they happened to be
+// looking at, which is the actual bug: the same page printed twice would give
+// two different documents depending on an invisible toggle position.
+// WRAPPED IN @media print, and it was not on the first attempt -- the rules
+// compiled to top level and would have applied ON SCREEN, permanently breaking
+// the toggle they exist to override. Caught by reading the built CSS rather
+// than by the build, which succeeded perfectly happily. shared/_print.scss
+// wraps its own rules the same way; a print partial that forgets is just a
+// stylesheet.
+@media print {
+  .cocktail.is-making {
+    .cocktail-tagline,
+    .cocktail-type-line,
+    .cocktail-note,
+    .notes,
+    .cocktail-body-content { display: revert; }
+  }
+
+  // The toggle itself is furniture, not content -- a button that cannot be
+  // pressed on paper. Same reasoning as shared/_print.scss dropping the nav.
+  .btn-make { display: none; }
+}

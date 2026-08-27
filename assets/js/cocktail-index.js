@@ -2,8 +2,8 @@
    COCKTAILS INDEX — filtering. Designed with Helen, 2026-08-26.
    =============================================================================
    Four controls: mood, chaos, has-to-have, leave-out. Everything is already in
-   the DOM — 115 drinks is nothing — so this only toggles [hidden]. No reflow of
-   the cards, no fetch, no dependency on the site's other scripts.
+   the DOM — 115 drinks is nothing — so this toggles [hidden] and reorders the
+   list in place. No fetch, no dependency on the site's other scripts.
 
    NOTHING IS PARSED OUT OF THE RENDERED MARKUP. Every fact a filter needs was
    written into a data- attribute at build time by cocktails/index.html:
@@ -11,12 +11,32 @@
    reads textContent is a filter that breaks the first time someone restyles a
    card.
 
-   HOW THE AXES COMBINE, and this is a decision recorded rather than a default:
-   OR within a section, AND between sections. Two moods selected means "either
-   of these", because AND across moods is nearly always empty — `tiki` AND
-   `no juicing` is a handful of drinks — while mood AND an ingredient is the
-   combination you actually want. This is the shape issue #478 asks about; if
-   Helen wants AND within moods, it is the one line marked below.
+   HOW THE AXES COMBINE. Settled by Helen 2026-08-27, #478 and #479:
+
+     - Two moods selected means EITHER, and drinks matching BOTH rank first.
+     - Include chips are AND: adding an ingredient narrows.
+     - Mood AND ingredient(s) AND chaos, between sections.
+     - Everything shown is in RANDOMISED order, within its rank.
+
+   The ranking is what makes OR usable. AND across moods is nearly always empty
+   -- `tiki` AND `no juicing` is a handful of drinks -- so OR is the only
+   answer that keeps the index alive, but plain OR stops narrowing anything
+   once you pick a second mood. Ranking gives back the precision: the drinks
+   that match both float to the top without the ones matching only one
+   disappearing.
+
+   WHY RANDOM RATHER THAN ALPHABETICAL. Alphabetical is a stable answer to a
+   question nobody asked -- it buries everything after M and it means the same
+   drink greets you every time. Random ordering is what makes the index a way
+   of FINDING something rather than a list you scroll past, which is the
+   principle in _data/cocktails/taxonomy.yml: this exists to get Helen the
+   drink she wants, not to be an encyclopaedia.
+
+   THE SHUFFLE HAPPENS ONCE PER PAGE LOAD, NOT PER KEYSTROKE, and that is the
+   part worth not undoing. Each card is given a random sort key at startup and
+   keeps it; filtering re-ranks against those fixed keys. Re-shuffling on every
+   filter change would make cards leap around while you type into the
+   has-to-have box, which reads as a bug however correct it is.
    ============================================================================= */
 (function () {
   var cards = Array.prototype.slice.call(document.querySelectorAll('.drink-card'));
@@ -31,6 +51,13 @@
   var countEl   = document.getElementById('drink-count-n');
   var wordEl    = document.getElementById('drink-count-word');
   var noneEl    = document.querySelector('.drink-none');
+
+  /* One random key per card, fixed for the life of the page. See the note on
+     ordering at the top: this is what lets the order be random without cards
+     jumping every time a filter changes. */
+  var list = cards[0].parentNode;
+  var shuffleKey = new Map();
+  cards.forEach(function (card) { shuffleKey.set(card, Math.random()); });
 
   var chosenMoods = [];
   var chosenChaos = null;
@@ -75,13 +102,25 @@
 
   var POOL_CAP = 8;
 
+  /* How many of the SELECTED moods this drink has. 0 when nothing is selected,
+     which is what makes the no-filter case fall through to pure random order
+     without a special case. */
+  function moodScore(card) {
+    if (!chosenMoods.length) return 0;
+    var mine = cardMoods(card);
+    var n = 0;
+    for (var i = 0; i < chosenMoods.length; i++) {
+      if (mine.indexOf(chosenMoods[i]) !== -1) n++;
+    }
+    return n;
+  }
+
   function matches(card) {
     /* mood: OR within the section. Change `.some` to `.every` for AND — see
-       the note at the top, and issue #478. */
-    if (chosenMoods.length) {
-      var mine = cardMoods(card);
-      if (!chosenMoods.some(function (m) { return mine.indexOf(m) !== -1; })) return false;
-    }
+       the note at the top, and issue #478. Ranking by moodScore is what makes
+       OR narrow anything, so if this ever becomes AND the ranking is redundant
+       rather than merely unused. */
+    if (chosenMoods.length && moodScore(card) === 0) return false;
     if (chosenChaos && card.dataset.chaos !== chosenChaos) return false;
 
     var ing = card.dataset.ingredients || '';
@@ -97,13 +136,48 @@
     return true;
   }
 
+  /* Put the list in rank order: more matched moods first, random within a
+     rank, hidden cards last so they never split a run of visible ones.
+
+     REWRITTEN ONLY WHEN IT ACTUALLY CHANGES. Moving 115 nodes on every
+     keystroke is wasteful and, worse, it would scroll the page under the
+     reader's cursor while they type. Comparing first makes the common case
+     (typing narrows the same set in the same order) free. */
+  function reorder(order) {
+    var same = true;
+    var kids = list.children;
+    for (var i = 0; i < order.length; i++) {
+      if (kids[i] !== order[i]) { same = false; break; }
+    }
+    if (same) return;
+    var frag = document.createDocumentFragment();
+    order.forEach(function (card) { frag.appendChild(card); });
+    list.appendChild(frag);
+  }
+
   function apply() {
     var shown = 0;
+    var ranked = [];
     cards.forEach(function (card) {
       var ok = matches(card);
       card.hidden = !ok;
       if (ok) shown++;
+      ranked.push({
+        card: card,
+        ok: ok,
+        score: ok ? moodScore(card) : -1,
+        key: shuffleKey.get(card)
+      });
+    });
 
+    ranked.sort(function (a, b) {
+      if (a.ok !== b.ok) return a.ok ? -1 : 1;
+      if (a.score !== b.score) return b.score - a.score;
+      return a.key - b.key;
+    });
+    reorder(ranked.map(function (r) { return r.card; }));
+
+    cards.forEach(function (card) {
       /* The card answers "why am I here" in the colour of the control that put
          it there: a matched mood chip fills menthe, a matched ingredient fills
          violet. Both are cleared and re-applied on every pass rather than
