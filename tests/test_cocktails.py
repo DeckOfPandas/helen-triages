@@ -1038,26 +1038,17 @@ def test_every_icon_has_a_real_world_height():
 
 # `heights_mm` sizes an icon by its VIEWBOX, not by its ink, so a drawing that
 # does not fill its own canvas renders smaller than one that does at the same
-# declared height. These three do not, and each is grandfathered with its
-# measured number so the guard can ship green while still catching the next one.
+# declared height.
 #
 # NOT A UNIT: this is the fraction of the canvas HEIGHT that the ink spans.
-# 97.5% is the set's median -- the icons are drawn tight to their boxes, and
-# these three are the exceptions rather than the rule.
 #
-# The double old-fashioned is the case that raised #503: at the time it was
-# 75.7%, and reasoning from the viewBox numbers pointed the WRONG WAY, because
-# its canvas is 1.29x the single's, which looks like confirmation that it is
-# the bigger glass. Settling on `old-fashioned-2` improved it to 85.5% without
-# anyone measuring. Goblet and coupe were then found BY THIS TEST and are
-# worse -- the goblet renders at 0.71x its declared 175mm. Helen's to fix or
-# accept; cropping a viewBox to its ink is mechanically safe but it CHANGES
-# RENDERED SIZE on the live page, which is her call and not a test's.
-KNOWN_LOOSE_VIEWBOXES = {
-    "goblet": 69.5,
-    "coupe": 82.5,
-    "old-fashioned-double": 85.5,
-}
+# THE LIST IS EMPTY AND SHOULD STAY EMPTY. It held three entries for a few
+# hours on 2026-08-27 -- goblet at 69.5%, coupe at 82.5%, old-fashioned-double
+# at 85.5% -- and then `scripts/normalise_glass_icons.py` learned to fit every
+# canvas to its own artwork, which fixed all three at the source instead. An
+# entry appearing here again means a drawing reached _includes/ without going
+# through the normaliser, which is worth knowing about in itself.
+KNOWN_LOOSE_VIEWBOXES = {}
 VIEWBOX_FILL_FLOOR = 92.0
 VIEWBOX_FILL_TOLERANCE = 3.0
 
@@ -1144,6 +1135,70 @@ def test_no_glass_artwork_has_a_slack_viewbox():
           f"neighbours and its declared millimetres become a lie. Fix by "
           f"cropping the viewBox to the ink (the paths and their <g transform> "
           f"do not move), or grandfather it above with a reason."
+    )
+
+
+def test_fitting_a_canvas_never_moves_the_artwork():
+    """`scripts/normalise_glass_icons.py` now fits every icon's viewBox to its
+    own ink, and this is the guard on that step.
+
+    IT RUNS ON ARTWORK THAT CANNOT BE REGENERATED HERE. `SRC` is
+    `tmp/cocktail-glasses`, a gitignored inbox that is empty in a fresh
+    worktree, so the normaliser refuses to run and the fit step is never
+    exercised by anything else. Without this, a change to `fit_viewbox` would
+    be caught only the next time Helen imported a drawing -- by which point it
+    would have silently reframed all 26.
+
+    THE PROPERTY THAT MATTERS is that fitting is a reframe, never a redraw. The
+    path data and the <g transform> must come out byte-identical; only the
+    viewBox attribute may differ. If that holds, the step cannot distort a
+    drawing however wrong its arithmetic is -- the worst case is a badly
+    cropped frame, which the slack-viewBox guard above then catches.
+
+    IDEMPOTENCE is the second half. Fitting an already-fitted icon must be a
+    no-op, or every regeneration would creep the canvas -- and since the
+    normaliser runs on the PUBLISHED files' ancestors rather than on the
+    published files, a creep would be invisible until glasses drifted out of
+    proportion with each other over several imports.
+    """
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import svgrender
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/svgrender.py not importable")
+
+    icons = sorted(GLASS_ICON_DIR.glob("*.svg"))
+    assert icons, f"no SVGs in {GLASS_ICON_DIR.relative_to(ROOT)}"
+
+    moved, crept = [], []
+    for path in icons:
+        original = path.read_text()
+        fitted, _, _ = svgrender.fit_viewbox(original, label=path.stem)
+
+        before = svgrender.parse_icon_text(original, path.stem)
+        after = svgrender.parse_icon_text(fitted, path.stem)
+        if before[0] != after[0] or before[2] != after[2]:
+            moved.append(path.stem)
+
+        # fitting twice must equal fitting once
+        again, _, _ = svgrender.fit_viewbox(fitted, label=path.stem)
+        box_once = svgrender.parse_icon_text(fitted, path.stem)[1]
+        box_twice = svgrender.parse_icon_text(again, path.stem)[1]
+        if any(abs(a - b) > 0.05 for a, b in zip(box_once, box_twice)):
+            crept.append(f"{path.stem}: {box_once} -> {box_twice}")
+
+    assert not moved, (
+        "fit_viewbox CHANGED THE ARTWORK on: " + ", ".join(moved)
+        + "\n\nIt may only rewrite the viewBox attribute. Path data and the "
+          "<g transform> must survive untouched -- that is the whole reason "
+          "this step is safe to run unattended over Helen's drawings."
+    )
+    assert not crept, (
+        "fit_viewbox is not idempotent:\n  " + "\n  ".join(crept)
+        + "\n\nFitting an already-fitted icon must be a no-op, or the canvas "
+          "creeps a little on every regeneration and the set slowly loses its "
+          "relative proportions."
     )
 
 

@@ -2,13 +2,13 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="39.199932mm"
-   height="98.776703mm"
-   viewBox="0 0 39.199932 98.776703"
+   width="40.923489mm"
+   height="99.08445mm"
+   viewBox="0 0 40.923489 99.08445"
    version="1.1"
    id="svg1"
    inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
-   sodipodi:docname="glass-collins.svg"
+   sodipodi:docname="glass-collins-2.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,8 +24,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="1.1212722"
-     inkscape:cx="118.61527"
-     inkscape:cy="200.66492"
+     inkscape:cx="119.50711"
+     inkscape:cy="201.55677"
      inkscape:window-width="1280"
      inkscape:window-height="730"
      inkscape:window-x="-6"
@@ -38,7 +38,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-68.108156,-83.894378)">
+     transform="translate(-67.954282,-83.740504)">
     <path
        id="path13"
        d="m 107.439,164.3555 -0.27763,12.13911 c -0.16659,2.76049 -2.38775,4.91934 -4.55338,4.91934 H 74.232649 c -2.165625,0 -4.386773,-2.15885 -4.553364,-4.91934 L 69.401629,164.3555"

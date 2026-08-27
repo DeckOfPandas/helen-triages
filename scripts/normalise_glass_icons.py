@@ -26,6 +26,10 @@ been bitten by that assumption before.
 """
 import pathlib, re, shutil, xml.dom.minidom
 import xml.etree.ElementTree as ET
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import svgrender
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "tmp" / "cocktail-glasses"   # drop new exports here
@@ -306,18 +310,76 @@ def normalise(text, name, line_class="glass-icon-line"):
         if re.sub(r"\s+", " ", d).strip() not in result:
             raise SystemExit(f"{name}: a <path d> did not survive normalisation")
     check_nothing_was_dropped(text, result, paths, name)
-    return result
+
+    # 5. FIT THE CANVAS TO THE ARTWORK. Added 2026-08-27, and it is the one
+    #    step here that exists because of how the drawings are MADE rather
+    #    than how Inkscape exports them.
+    #
+    #    Helen builds a new glass by editing an existing one -- "I am not able
+    #    to do anything other than this as I can't draw" -- so a shortened
+    #    drawing keeps the taller drawing's canvas. `heights_mm` scales the
+    #    VIEWBOX, so that leftover empty space is lost height: the coupe was
+    #    declared the same 150mm as the highball and rendered 15% shorter than
+    #    it, across 40 drinks, and the goblet was 29% short. Neither was
+    #    noticeable by looking at one glass, because nothing was out of
+    #    proportion WITHIN the drawing -- only between it and its own frame.
+    #
+    #    Doing it here rather than asking for tidier exports is the point. It
+    #    is deterministic, it cannot distort artwork (the path data and the <g>
+    #    transform are untouched; only the frame moves), and it means the
+    #    failure mode simply cannot reach the site again.
+    #
+    #    UNCONDITIONAL, NOT "WHEN IT LOOKS WRONG". Measured across the set
+    #    before choosing: 23 of 26 icons move by 0.4% or less, so a blanket
+    #    rule costs almost nothing and a conditional one would need a threshold
+    #    that is itself a guess. tests/test_cocktails.py's slack-viewBox guard
+    #    (#503) stays as the backstop for artwork that never came through here.
+    fitted, old_h, new_h = svgrender.fit_viewbox(result, label=name)
+    change = (old_h / new_h - 1) * 100 if new_h else 0
+    if abs(change) >= 1:
+        print(f"  {name}: canvas fitted, renders {change:+.1f}%")
+    return fitted
 
 
 def main():
+    # LOOK BEFORE DELETING. This script's first act is to empty DST, and on
+    # 2026-08-27 it did that with an empty SRC and wrote nothing back: all 26
+    # published icons gone, "0 icons ->" printed as if that were a result, and
+    # then a ZeroDivisionError from the summary line. Recovered from git.
+    #
+    # SRC is `tmp/cocktail-glasses`, which is GITIGNORED -- an inbox for new
+    # exports, not a source of truth. So it is legitimately empty most of the
+    # time, and in a fresh worktree it does not exist at all. That makes "empty
+    # SRC" the normal state rather than an exotic one, and rebuilding from it
+    # the exception.
+    #
+    # This is the second time this script has deleted the whole set. The first
+    # was an import running a bare main() (fixed with the __main__ guard at the
+    # foot of the file); this was the ordinary path, doing exactly what it was
+    # written to do. A destructive step that runs before its inputs are checked
+    # will eventually run with no inputs.
+    sources = sorted(SRC.glob("*.svg")) if SRC.is_dir() else []
+    usable = [s for s in sources if s.name not in SKIP]
+    if not usable:
+        raise SystemExit(
+            f"{SRC.relative_to(ROOT)} has no usable .svg exports"
+            f"{' (directory does not exist)' if not SRC.is_dir() else ''}, so "
+            f"there is nothing to normalise.\n\n"
+            f"REFUSING TO CONTINUE, because the next step empties "
+            f"{DST.relative_to(ROOT)} and would leave the site with no glass "
+            f"icons at all. Drop the Inkscape exports into "
+            f"{SRC.relative_to(ROOT)}/ first.\n\n"
+            f"This is an inbox, not an archive -- the archive is "
+            f"_design_sources/cocktails/glasses/. Regenerating the whole set "
+            f"means copying the archive into the inbox first."
+        )
+
     if DST.exists():
         shutil.rmtree(DST)
     DST.mkdir(parents=True)
 
     written = []
-    for p in sorted(SRC.glob("*.svg")):
-        if p.name in SKIP:
-            continue
+    for p in usable:
         name = RENAME.get(p.stem.replace("glass-", ""), p.stem.replace("glass-", ""))
         cls = "glass-icon-solid" if p.name in SOLID else "glass-icon-line"
         svg = normalise(p.read_text(encoding="utf-8"), name, cls)

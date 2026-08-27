@@ -329,7 +329,14 @@ def parse_icon(svg_path):
     into the path data, so an icon parsed without it rasterises to an empty or
     half-empty canvas -- which counts as "no ink" rather than as a failure.
     """
-    text = pathlib.Path(svg_path).read_text()
+    return parse_icon_text(pathlib.Path(svg_path).read_text(), svg_path)
+
+
+def parse_icon_text(text, label='<svg>'):
+    """As parse_icon, but for SVG text that is not on disk yet -- which is what
+    scripts/normalise_glass_icons.py needs to fit a canvas to output it has
+    just built and not yet written."""
+    svg_path = label
     box = re.search(r'viewBox="([^"]+)"', text)
     if not box:
         raise ValueError(f'{svg_path}: no viewBox')
@@ -340,6 +347,80 @@ def parse_icon(svg_path):
     if not paths:
         raise ValueError(f'{svg_path}: no path data')
     return paths, viewbox, translate, 'glass-icon-solid' in text
+
+
+def ink_bbox_units(paths, viewbox, translate=(0, 0), probe_px=None):
+    """(x0, y0, x1, y1) of the VISIBLE ink, in the viewBox's own units.
+
+    Two traps here, and the naive implementation falls into one or the other.
+
+    NOT A RASTER. Finding ink pixels works, but the answer depends on where the
+    pixel grid falls, which depends on the viewBox, which is the thing being
+    computed -- so feeding the result back in moves it. Measured over eight
+    successive fits, the canvas oscillated across a ~0.1-unit band instead of
+    settling. Flattening the paths is exact and has no grid to land on.
+
+    NOT THE RAW GEOMETRY EITHER, and this is the one that bites. Some drawings
+    carry paths that extend OUTSIDE their own viewBox and are clipped by it:
+    the goblet's bowl runs to y = -6.9 above a canvas starting at 0, and the
+    coupe's to -2.5. That artwork has never been visible on the site. Fitting
+    to it would zoom OUT to reveal parts of a drawing nobody has ever seen,
+    which is the opposite of the intent -- and it is why fitting the two
+    already-cropped icons proposed making them 33% and 18% smaller.
+
+    So: flatten, then keep only what falls inside the current viewBox. That is
+    what a browser draws, and it is idempotent -- the clip region only ever
+    shrinks to something the ink already fits inside, so a second pass finds
+    the same extent.
+    """
+    tx, ty = translate
+    vx0, vy0, vx1, vy1 = (viewbox[0], viewbox[1],
+                          viewbox[0] + viewbox[2], viewbox[1] + viewbox[3])
+    eps = 1e-9
+    xs, ys = [], []
+    for d in paths:
+        for sub in flatten(d):
+            for x, y in sub:
+                x, y = x + tx, y + ty
+                if vx0 - eps <= x <= vx1 + eps and vy0 - eps <= y <= vy1 + eps:
+                    xs.append(x)
+                    ys.append(y)
+    if not xs:
+        raise ValueError('no ink inside the viewBox -- artwork drawn outside it?')
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def fit_viewbox(text, margin=1.4, label='<svg>'):
+    """SVG text with its viewBox tightened to the artwork plus `margin` units.
+
+    THE ARTWORK DOES NOT MOVE. Path data and the <g transform> are untouched;
+    only the frame changes. So this can reframe a drawing but never distort one.
+
+    MARGIN IS IN USER UNITS, NOT A PERCENTAGE. These icons use
+    `vector-effect: non-scaling-stroke`, so the stroke is a fixed number of
+    SCREEN pixels and therefore spans MORE viewBox units the smaller the icon
+    renders. A percentage margin would shrink exactly when the stroke needs it
+    most -- on a card -- and clip the rim. 1.2 is the set's own typical margin.
+    """
+    paths, viewbox, translate, _ = parse_icon_text(text, label)
+    x0, y0, x1, y1 = ink_bbox_units(paths, viewbox, translate)
+
+    # ONLY EVER SHRINK. Clamped to the existing canvas, and that is what makes
+    # this idempotent on the drawings that have artwork outside their own
+    # viewBox (the goblet and the coupe both do). Padding an ink box that
+    # touches the clip edge would push the canvas OUT, which admits a sliver of
+    # previously-hidden artwork, which enlarges the ink box, which pushes it
+    # out again -- unbounded creep, one margin per regeneration. Clamping also
+    # states the intent exactly: fitting removes empty space, it never reveals
+    # drawing nobody has seen.
+    nx0 = max(x0 - margin, viewbox[0])
+    ny0 = max(y0 - margin, viewbox[1])
+    nx1 = min(x1 + margin, viewbox[0] + viewbox[2])
+    ny1 = min(y1 + margin, viewbox[1] + viewbox[3])
+    new = (nx0, ny0, nx1 - nx0, ny1 - ny0)
+    attr = 'viewBox="%s"' % ' '.join(f'{v:.4f}' for v in new)
+    old = re.search(r'viewBox="[^"]+"', text).group(0)
+    return text.replace(old, attr, 1), viewbox[3], new[3]
 
 
 def render_file(svg_path, out_png, height_px=420, stroke=1.6):
