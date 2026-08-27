@@ -791,15 +791,30 @@ def test_every_glass_value_is_in_the_vocabulary():
                 continue
             unknown.setdefault(key, []).append(slug)
 
+    # Six icons are drawn and normalised but no spelling reaches them
+    # (hot-toddy, julep-cup, margarita, pina-colada, sherry, shot -- the
+    # `UNUSED ICONS` note in glasses.yml says why). For those, the generic
+    # advice below is actively WRONG: it says "and artwork", and the artwork
+    # already exists. Someone taking it at its word draws a second margarita,
+    # or maps the value to `coupe` and never learns `margarita.svg` was there.
+    # So say so, per value, at the moment it matters.
+    lines = []
+    for value, drinks in sorted(unknown.items()):
+        line = f"{value!r} -- {', '.join(sorted(drinks))}"
+        stem = value.replace(" ", "-")
+        if (GLASS_ICON_DIR / f"{stem}.svg").is_file():
+            line += (f"\n      ARTWORK ALREADY EXISTS: {stem}.svg. This needs "
+                     f"a key in `icons:`, NOT a new drawing.")
+        lines.append(line)
+
     assert not unknown, (
         "glass value(s) not in _data/cocktails/glasses.yml `icons:`:\n  "
-        + "\n  ".join(f"{v!r} -- {', '.join(sorted(d))}"
-                      for v, d in sorted(unknown.items()))
+        + "\n  ".join(lines)
         + "\n\nThe drink renders NO glass icon, silently. Either it is a typo "
           "and the drink should be retyped, or it is a real glass and needs a "
-          "key in `icons:` (and artwork, and a heights_mm entry -- the sibling "
-          "tests will say so). If it is genuinely 'no requirement', the word "
-          "is `any`."
+          "key in `icons:` (and artwork unless flagged above, and a heights_mm "
+          "entry -- the sibling tests will say so). If it is genuinely 'no "
+          "requirement', the word is `any`."
     )
 
 
