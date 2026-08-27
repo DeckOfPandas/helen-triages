@@ -1657,7 +1657,12 @@ def test_suggestion_is_a_string_or_a_list_of_strings():
 KNOWN_PROSE_SUGGESTIONS = {
     ("apple-cart", "Avallen -- a round, fresh taste if you need to sub"),
     ("daisy-de-santiago", "Havana 3 year old and Clément Agricole Blanc"),
-    ("milliners-punch", "the cheapest white rum to hand; sometimes JW Spicers"),
+    # Milliners Punch's "the cheapest white rum to hand; sometimes JW Spicers"
+    # came off this set on 2026-08-27, retired the way this contract intends:
+    # the suggestion is GONE, not reworded. Helen, "never name Spicers -- if I
+    # have it skulking at the back of the nonsense shelf then I'll throw it in
+    # where I can." What is cheap and what needs using up are facts about the
+    # shelf on the day, and the generic already says what the drink requires.
     ("sazerac", "or other Creole-style bitters"),
     ("sazerac", "or other aromatic bitters"),
     ("swizzle", "Pusser's 151, or Planteray OFTD for a 138 Swizzle"),

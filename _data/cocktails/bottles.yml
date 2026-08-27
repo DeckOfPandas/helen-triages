@@ -284,37 +284,35 @@ unresolved_suggestions:
     and Appleton 8 is `Jamaican, moderately aged` (#314). The list form makes
     the pairing legible instead of coincidental.
   "Pusser's Gunpowder, or Smith & Cross": >-
-    Two bottles in one string, and after #314 NEITHER matches Kamaniwanalaya's
-    generic: Gunpowder is `moderately aged` and Smith & Cross is `Jamaican,
-    overproof, unaged`, against a stated `[Demerara, aged, Jamaican, moderately
-    aged]`. Needs Helen -- both halves moved at once.
+    Two bottles in one string, against Kamaniwanalaya's stated `[Demerara,
+    aged, Jamaican, moderately aged]`. Since #314 and the 2026-08-27
+    reclassification, Smith & Cross MATCHES the second half and Gunpowder
+    matches neither -- it is `moderately aged`. So the list form would fix half
+    of it and leave a real question about the other. Needs Helen.
   "Pusser's 151, or Planteray OFTD for a 138 Swizzle": >-
     Three problems in one string: it is prose (a reason, which #457 moved to
     `note`), it is two bottles where a list is wanted, and neither bottle is in
     either of Swizzle's two stated generics. Needs Helen.
   "Best with ED3, Havana 3 is fine": >-
-    Prose carrying a preference between two bottles. #457's `note` takes the
-    reasoning; `suggestion` takes ["El Dorado 3", "Havana Club 3"] in that order.
-  "the cheapest white rum to hand; sometimes JW Spicers": >-
-    RESOLVED 2026-08-27, and the answer is no bottle -- pending the edit to the
-    drink. Helen: "never name Spicers -- if I have it skulking at the back of
-    the nonsense shelf then I'll throw it in where I can." So the suggestion
-    comes OFF Frozen Fruit Daiquiri rather than being split into a bottle plus
-    a note, the same call she made for Long Island Iced Tea's rum. The generic
-    already says `lightly aged and filtered`, which is the whole of what the
-    drink actually requires.
-  "Planteray": >-
-    RESOLVED 2026-08-27, AND THE ANSWER IS NO BOTTLE AT ALL -- pending the edit
-    to the drink. Long Island Iced Tea suggests a bare brand against a `lightly
-    aged and filtered` generic; Planteray make a dozen rums, so it resolved to
-    nothing. Helen: she reached for it because it was cheap "in a drink where
-    none of the many component spirits benefit the drink for being fancy", and
-    because she was using the bottle up -- neither of which is a fact about the
-    drink. "I'd rather not specify any rum at all for LIIT because neither I nor
-    the drink care." So the `suggestion` comes OFF that ingredient rather than
-    being corrected, and this line goes with it. A genuinely absent suggestion
-    is a real answer, and the first case in the collection where naming any
-    bottle would have been worse than naming none.
+    Prose carrying a real preference between two bottles Helen owns, which is
+    why it STAYS while the two below went: ED3 is the pick and Havana 3 is
+    acceptable, and that is a fact about the drink rather than about the shelf.
+    #457's shape is `suggestion: ["El Dorado 3", "Havana Club 3"]` in that
+    order, with the ranking as a `note`.
+  # `Planteray` (bare, on Long Island Iced Tea) and "the cheapest white rum to
+  # hand; sometimes JW Spicers" (Milliners Punch) WERE HERE AND ARE
+  # GONE, 2026-08-27, because the suggestions themselves are gone. Resolved the
+  # same way, and it is a rule rather than a coincidence: Helen reached for
+  # those bottles because they were cheap and because she was using them up,
+  # neither of which is a fact about the drink. "I'd rather not specify any rum
+  # at all for LIIT because neither I nor the drink care", and "never name
+  # Spicers". So the `suggestion` came off rather than being corrected -- the
+  # generic already says everything the drink requires. A genuinely absent
+  # suggestion is a real answer, and these are the first in the collection.
+  #
+  # An entry here is deleted when its string stops existing. Leaving it would be
+  # the exact rot this block guards against: a declared exception that reads as
+  # an outstanding problem while pointing at nothing.
   "Havana 3 year old and Clément Agricole Blanc": >-
     AND, not OR -- Daisy de Santiago pours both, and its `generic` is correctly
     the disjunctive pair. One suggestion string covering two separate pours is
