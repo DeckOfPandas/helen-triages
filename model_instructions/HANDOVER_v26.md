@@ -1785,6 +1785,11 @@ see §9.10 for the shape. #460 stays open for the REST of the page (method,
 notes, meta), which still hasn't had a design pass — this was the
 ingredient list specifically.
 
+**Every rum generic also has a CARD NAME, `rum_display_names` — #501,
+2026-08-27.** A third string per rum category, beside the generic and the
+family, and it exists because the index cannot show the full name and must not
+show the item. See §9.10.1; that section is where the reasoning lives.
+
 **Disjunctive `generic` has an agreed threshold, not a free-for-all.**
 Helen, 2026-08-21: multi-value only when both bottles can actually be named
 and a reason given for each — "I don't know which" stays a plain `QQ`, it
@@ -2035,6 +2040,82 @@ real, and this line is the ingredient list's own restyle waiting to happen —
 see §9.13. The amount now sets in the heading face in a fixed column, the class
 line and note hang past it, and `character` drops a step quieter than the class
 line it sits inside.
+
+### 9.10.1 The card shows a rum's CATEGORY, because its item cannot be trusted — #501, 2026-08-27
+
+**The card used to render `item`, and the problem was not that the words were
+long. It was that they were ambiguous.** Eight item strings in the collection
+each name two or three *different* rums:
+
+| the card said | the drink actually wanted |
+|---|---|
+| `Overproof Navy rum` | Demerara aged · Jamaican moderately aged · Planteray O.F.T.D. |
+| `Light aged rum` | Demerara aged · blended multi-region clear · lightly aged and filtered |
+| `Demerara rum` | Demerara aged · Demerara overproof |
+| `White rum` | agricole unaged · lightly aged and filtered |
+| `Gold rum`, `Navy rum`, `Light rum`, `Lightly aged rum` | two each |
+
+So the colour vocabulary #314 retired was not merely unfashionable on the
+index — it was the one thing on the card a reader could not rely on, and the
+`generic` beside it was the only correct name available. #501 read as a
+length problem ("the real category name is obviously too long") and the
+measurement said otherwise; **it was a correctness problem that happened to
+also cost room.**
+
+**`rum_display_names` in `ingredients.yml`** maps every rum-family generic to
+its card name. The rule in `cocktails/index.html` is "substitute when every
+generic on the entry has a card name, else fall back to `item`" — the
+all-or-nothing half matters because a list `generic` means "either would do"
+(#441) and ten rum entries carry one; a mixed list would otherwise print half
+a fact.
+
+**Helen's call, asked with `El Dorado 12 year old rum` → `Demerara rum` in
+front of her: category ALWAYS, including where the recipe names a real
+bottle.** 43 of 91 rum entries do name one. The alternative — bottle where
+known, category where vague — needs a mechanical "is this a bottle" test on
+the string, which is exactly the fragile rule #513 objects to, and it would
+have made the card's rum word mean two different kinds of thing depending on
+a drink you cannot see. The bottle is still the drink page's headline.
+
+**Her names say the spirit word out loud**, which reversed two of the drafting
+assumptions: `filtered rum` became `lightly aged rum`, `clear blend` became
+`clear blended rum`, and both overproofs gained a trailing "rum". Two names
+are consequently LONGER than the generic they abbreviate. A first version of
+the test asserted a card name is never longer than its generic — obvious,
+and wrong within a day. **Brevity was the means; legibility was the point.**
+
+**The measured claim, and what guards it.** 39 rum cards shorter, 4 unchanged,
+19 longer, median −8; the collection's median card line 98 → 94. The 19 are
+almost all the nine cards carrying a disjunctive rum, which is where the
+category does the MOST work — `White rum` concealing a choice between a
+filtered rum and an agricole blanc. So the guard is aggregate
+(`test_showing_categories_still_shortens_the_index`), not per-card: a per-card
+rule would have failed the feature's best cases.
+
+**A collapse is permitted but must be declared.** Helen collapsed both
+Jamaicans to `Jamaican rum`, on the principle that the funk is the shared
+trait and caramel is a nuance of the same rum, where both Demeraras and both
+agricoles keep their own names because proof and age change what you are
+making. `rum_card_names_may_collide` carries the reason — the `family_less`
+idiom — and an *undeclared* duplicate still fails, because two rums reading
+alike is the precise fault this map removed.
+
+**The highlight had to move with it**, and this is the transferable half.
+`cocktail-index.js` lit a matched ingredient by reading the span's rendered
+text, which was fine while the card printed the item. Now a card found by
+typing "El Dorado" prints no such words, so it would have survived the filter
+with nothing lit — unable to say why it was there, which §9.13 makes the
+card's job. It reads a build-time `data-ing` attribute instead. **Whenever a
+template stops rendering the string a script was matching on, the script is
+already broken and nothing about the page looks wrong.**
+
+**Still open, deliberately.** A disjunctive pair sharing a head word reads
+badly — Swizzle's `Demerara overproof rum or Demerara rum` — and no drink
+page problem produced it, only the join. `character` is not shown on a card:
+Don's Own Grog's Gosling's reads `aged rum` with the blackstrap dropped,
+which is three drinks and a design decision rather than a data one. Rum only,
+because rum is where the item was AMBIGUOUS; four non-rum generics are also
+long and none of them is ambiguous.
 
 ### 9.11 Glass icons — real relative height, and a UA-stylesheet trap
 

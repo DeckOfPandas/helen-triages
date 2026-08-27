@@ -112,8 +112,17 @@
         chip.classList.toggle('is-match',
           chosenMoods.indexOf(chip.dataset.mood) !== -1);
       });
+      /* MATCHED AGAINST data-ing, NOT THE RENDERED TEXT — #501. A rum shows
+         its category on a card now ("Demerara rum"), while the filter still
+         matches the item and the generic alike, so a card found by typing
+         "El Dorado" prints no such words. Reading textContent here would leave
+         it surviving the filter with nothing lit up: the card would be unable
+         to say why it was there, which is the one job the card section of
+         HANDOVER §9.13 gives it. data-ing carries the same item-plus-generic
+         string the card-level data-ingredients does, written at build time.
+         The fallback keeps a card without the attribute behaving as before. */
       card.querySelectorAll('.drink-card-ing').forEach(function (el) {
-        var text = el.textContent.toLowerCase();
+        var text = (el.dataset.ing || el.textContent).toLowerCase();
         var hit = include.some(function (w) { return text.indexOf(w) !== -1; });
         el.classList.toggle('drink-card-hit', hit);
       });
