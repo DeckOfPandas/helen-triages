@@ -1795,6 +1795,57 @@ Helen, 2026-08-21: multi-value only when both bottles can actually be named
 and a reason given for each — "I don't know which" stays a plain `QQ`, it
 does not become a two-item guess.
 
+### 9.3.2 The bottle dictionary — `_data/cocktails/bottles.yml`, #529
+
+**A third string per rum, after the generic and the card name: which BOTTLE,
+and what category it is.** Added 2026-08-27. Thirty-odd bottles, each with one
+generic and its alias spellings.
+
+**Why this is allowed when #441 rejected a bottle table.** That issue killed a
+shared table for `character`, because character is why THIS DRINK wants THIS
+BOTTLE — a property of the recipe's use. A bottle's CATEGORY is
+bottle-invariant: Appleton 12 is a moderately-aged Jamaican in every drink that
+pours it. Helen settled it by writing eight rulings in #314 in exactly that
+shape ("Blackwell is Jamaican, caramel forward"). #297 (ABV) is on the same
+invariant side; do not read this as reopening `character`.
+
+**It means what Helen would POUR, not what qualifies.** The case that separates
+them: Lemon Hart 151 clears the Demerara appellation and is deliberately absent
+because she does not like it. `not_reached_for` holds the exclusions with
+reasons, the `family_less` idiom. A list of everything that qualifies is the
+busywork #459 rules out.
+
+**`Demerara, aged` and `Demerara, overproof` are APPELLATIONS.** Helen,
+2026-08-27, from *Minimalist Tiki*: 100% of the distillate must come from DDL
+in Guyana. **Two of the eleven rum styles are therefore a different KIND of
+category from the other nine** — checkable against a fact about the bottle
+rather than argued from the glass. It is why both Pusser's are `moderately
+aged` despite tasting Demerara, and why Skipper's needed her rather than
+inference ("all seven distinct rums blended into it are by DDL" — a Halewood
+bottling of Guyanese rum *very probably* qualifies, and that is not what a 100%
+rule asserts). Wood's is `Demerara, aged` and not overproof: 57% is AT proof,
+which begins above 57.15%.
+
+**Aliases are how a bottle keeps one identity**, and they are load-bearing:
+twelve suggestion strings collapse to about five bottles, and **Planteray and
+Plantation are one brand renamed**, which no string comparison recovers.
+
+**`unresolved_suggestions` is the interesting block.** Eleven suggestion
+strings name no bottle — prose (#457 again, drifted back), or two bottles in
+one comma-joined string where a list is wanted. They are declared with reasons
+so `test_every_suggested_bottle_resolves` bites on the NEXT one rather than
+being switched off; deleting a line retires it. Two of them name bottles from
+two different categories inside one string, which is what a list `generic`
+exists to express and a comma cannot — and one, a bare `Planteray` on Long
+Island Iced Tea, is genuinely ambiguous rather than merely badly shaped.
+
+**What it unblocks: #534.** A `suggestion` whose bottle sits in a different
+category than that ingredient's `generic` is a cross-category substitution, and
+Helen asked for those to carry a note ("Please add notes for me on recipe pages
+when I've substituted in a surprising way"). That is only computable once a
+bottle knows its category. Port-au-Prince is already one — Lemon Hart 151
+suggesting Planteray OFTD — and no human had noticed.
+
 ### 9.4 Decided 2026-08-16 — do not re-litigate
 
 - **Ingredients are additive, never a choose-one.** The Sazerac really does

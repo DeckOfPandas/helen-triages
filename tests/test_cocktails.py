@@ -33,6 +33,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DRAFTS = ROOT / "_cocktail_drafts"
 VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"
 TAXONOMY = ROOT / "_data" / "cocktails" / "taxonomy.yml"
+BOTTLES = ROOT / "_data" / "cocktails" / "bottles.yml"
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
@@ -709,6 +710,174 @@ def test_every_card_name_join_is_reachable():
           "which case the default join is back on the index and nobody was "
           "told — or no drink asks for that pair any more and the entry should "
           "go.\nJoins actually produced today:\n  " + "\n  ".join(sorted(produced))
+    )
+
+
+# =============================================================================
+# The bottle dictionary -- #529, and the check it unblocks, #534
+# =============================================================================
+
+def _bottles():
+    if not BOTTLES.exists():
+        pytest.skip("_data/cocktails/bottles.yml does not exist yet.")
+    return yaml.safe_load(BOTTLES.read_text(encoding="utf-8")) or {}
+
+
+def _bottle_index(data):
+    """Every name a bottle answers to, lowercased -> its canonical name.
+
+    Case-insensitive because the collection writes `Plantation OFTD` and
+    `Planteray OFTD` for one bottle, and because a suggestion is prose typed by
+    hand. Aliases and canonical names share one namespace on purpose: an alias
+    that collides with another bottle's real name is the same bug either way.
+    """
+    out = {}
+    for name, entry in (data.get("bottles") or {}).items():
+        out[name.strip().lower()] = name
+        for alias in (entry or {}).get("aliases") or []:
+            out[alias.strip().lower()] = name
+    return out
+
+
+def test_every_bottle_names_a_declared_rum_generic():
+    """A bottle's `generic` is a real rum generic -- #529.
+
+    THE WHOLE VALUE OF THIS FILE IS THAT A BOTTLE KNOWS ITS CATEGORY, so a
+    generic that no longer exists, or one that was never a rum, makes the
+    dictionary quietly wrong rather than loudly broken -- nothing on any page
+    would look different.
+
+    Checked against `family_of` rather than the raw generic list, because that
+    is what makes it a RUM bottle: this file does not cover gin or brandy, and
+    a bottle typed `cognac` would be a scoping mistake rather than a typo.
+    """
+    data = _bottles()
+    vocab = _vocab()
+    family_of = vocab.get("family_of") or {}
+    rum_generics = {g for g, fam in family_of.items() if fam == "rum"}
+    assert rum_generics, "`family_of` maps nothing to rum; nothing to check."
+    entries = data.get("bottles") or {}
+    assert entries, (
+        "bottles.yml declares no bottles, so every check here is vacuous."
+    )
+    bad = sorted(
+        f"{name!r} -> {(entry or {}).get('generic')!r}"
+        for name, entry in entries.items()
+        if (entry or {}).get("generic") not in rum_generics
+    )
+    assert not bad, (
+        "Bottle(s) whose generic is not a declared rum style:\n  "
+        + "\n  ".join(bad)
+        + "\n\nEither the style was renamed and this did not follow, or the "
+          "bottle is not a rum and does not belong in this file."
+    )
+
+
+def test_no_bottle_name_or_alias_is_claimed_twice():
+    """One string, one bottle -- #529.
+
+    Aliases exist because twelve suggestion strings in the collection collapse
+    to about five bottles (ED3 / El Dorado 3 / El Dorado 3yo), and because
+    Planteray and Plantation are one brand renamed, which no string comparison
+    recovers. That only works while a string resolves to exactly one bottle: a
+    duplicate would make resolution order-dependent, and #534's cross-category
+    check would then depend on dictionary ordering rather than on fact.
+
+    Canonical names and aliases share one namespace deliberately -- an alias
+    colliding with another bottle's real name is the same bug as two aliases
+    colliding, and is likelier (`Planteray 3` against `El Dorado 3`).
+    """
+    data = _bottles()
+    entries = data.get("bottles") or {}
+    assert entries, "bottles.yml declares no bottles; nothing to check."
+    seen, clashes = {}, []
+    for name, entry in entries.items():
+        for label in [name] + list((entry or {}).get("aliases") or []):
+            key = label.strip().lower()
+            if key in seen and seen[key] != name:
+                clashes.append(f"{label!r}: {seen[key]!r} and {name!r}")
+            seen[key] = name
+    assert not clashes, (
+        "String(s) claimed by two bottles:\n  " + "\n  ".join(clashes)
+        + "\n\nA suggestion naming one of these could not be resolved to a "
+          "single bottle, so #534's cross-category check would be guessing."
+    )
+
+
+def test_an_excluded_bottle_is_not_also_listed():
+    """`not_reached_for` and `bottles` must not both claim a bottle -- #529.
+
+    The two blocks say opposite things: `bottles` is what Helen would pour,
+    `not_reached_for` is what qualifies and is deliberately out (Lemon Hart
+    151). A bottle in both is a half-finished decision, and the reference page
+    would list it while the reason says it should not.
+    """
+    data = _bottles()
+    index = _bottle_index(data)
+    excluded = data.get("not_reached_for") or {}
+    both = sorted(
+        f"{name!r} (listed as {index[name.strip().lower()]!r})"
+        for name in excluded if name.strip().lower() in index
+    )
+    assert not both, (
+        "Bottle(s) both listed and excluded:\n  " + "\n  ".join(both)
+        + "\n\nDelete it from one. `bottles` means Helen would reach for it; "
+          "`not_reached_for` means it qualifies and she would not."
+    )
+
+
+def test_every_suggested_bottle_resolves():
+    """Every `suggestion` on a rum names a bottle this file knows -- #529/#534.
+
+    THE DIRECTION THAT MATTERS. Nothing requires a bottle to be used by a drink
+    -- Helen owns bottles no recipe names, and El Dorado 151 is on the shopping
+    list -- but a SUGGESTION that resolves to nothing is a bottle the site
+    cannot reason about, and #534's cross-category check silently skips it.
+    Half a check is worse than none, because it reports a clean run.
+
+    KNOWN FAILURES ARE DECLARED, NOT TOLERATED. Eleven suggestion strings are
+    prose or two-bottles-in-one-string, which #457 already settled against;
+    they sit in `unresolved_suggestions` with the reason, so this test bites on
+    the NEXT one while those are being fixed. Deleting a line there is how one
+    gets retired -- the same shape `methods.yml` uses for its proposals.
+    """
+    data = _bottles()
+    index = _bottle_index(data)
+    known = {k.strip().lower() for k in (data.get("unresolved_suggestions") or {})}
+    excluded = {k.strip().lower() for k in (data.get("not_reached_for") or {})}
+    assert index, "bottles.yml resolves no names; nothing to check."
+    vocab = _vocab()
+    family_of = vocab.get("family_of") or {}
+
+    unresolved, checked = [], 0
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            if not any(family_of.get(g) == "rum" for g in generics):
+                continue
+            suggestion = item.get("suggestion")
+            for name in (suggestion if isinstance(suggestion, list)
+                         else [suggestion] if suggestion else []):
+                checked += 1
+                key = name.strip().lower()
+                if key in index or key in known or key in excluded:
+                    continue
+                unresolved.append(f"{slug}: {name!r}")
+    assert checked, (
+        "No rum ingredient carries a suggestion, so this check is vacuous. "
+        "Either `family_of` stopped mapping the rum styles or the loader is "
+        "stale -- around forty rum pours name a bottle."
+    )
+    assert not unresolved, (
+        "Suggestion(s) naming no known bottle:\n  " + "\n  ".join(sorted(unresolved))
+        + "\n\nEither add the bottle to _data/cocktails/bottles.yml, add the "
+          "spelling as an alias of one already there, or -- if it is prose "
+          "rather than a bottle name (#457) -- declare it in "
+          "`unresolved_suggestions` with the reason, so it fails loudly for "
+          "the next reader instead of quietly for this one."
     )
 
 
