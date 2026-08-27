@@ -20,15 +20,66 @@
 .drink-filters { margin: 0 0 $spacing-section-gap; }
 
 // The section labels: MOOD, CHAOS, HAS TO HAVE, LEAVE OUT.
+// =============================================================================
+// THE SECTION HEADINGS. #495, and the problem was rank, not legibility.
+// =============================================================================
+// Helen: "I can't read the headings on the cocktail site." Measured, and they
+// were not illegible -- 5.12:1, which passes AA. They were OUTRANKED:
+//
+//     heading   0.78rem, grey #6b6b70   5.1:1
+//     button    0.92rem, ink            16.6:1
+//
+// A label smaller AND three times paler than the things it labels. The eye
+// landed on ten buttons and never registered the question, which is most of
+// what "I feel like I am doing work to understand what to click" was.
+//
+// So the heading is now larger than its buttons, set in ink, and carries a
+// coloured rule -- food's treatment, arrived at independently and then
+// deliberately matched, because Helen loves that page's top matter and the
+// starkness is the reason.
+//
+// THE RULE IS AN INSET SHADOW, NOT A BORDER OR AN UNDERLINE. A border sits
+// under the whole block and stretches to the container; text-decoration
+// underline sits too close to the letters and breaks across descenders. An
+// inset box-shadow on an inline span paints a band exactly as wide as the
+// words, which is what makes food's headings read as stamped rather than
+// ruled.
 .drink-field-label {
   display: block;
   font-family: $font-headings;
-  font-size: 0.78rem;
+  font-size: 1.05rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: $letter-spacing-label;
-  color: $color-clear-text;
+  letter-spacing: 0.09em;
+  color: $color-text;
   margin: 0 0 $space-md;
+
+  // The colour lands on the WORDS, not the row, so the band stops where the
+  // heading does. A label wrapping its own <label> element (the search fields
+  // do, for the input association) keeps the same treatment.
+  > label,
+  &::after { display: inline; }
 }
+
+// One rule per section, and each hue is the same fact the CARDS already show —
+// see _palette.scss. A heading's colour is a promise the card keeps.
+@mixin heading-rule($colour) {
+  box-shadow: inset 0 -0.3em 0 $colour;
+  padding: 0 0.12em 0.02em 0;
+}
+
+.drink-filter--chaos   .drink-field-label { @include heading-rule($color-tangerine); }
+.drink-filter--mood    .drink-field-label { @include heading-rule($color-absinthe); }
+.drink-filter--hassle  .drink-field-label { @include heading-rule($color-ultraviolet); }
+.drink-search--include .drink-field-label { @include heading-rule($color-magenta); }
+.drink-filter--name    .drink-field-label { @include heading-rule($color-cyan); }
+
+// LEAVE OUT CARRIES NO HUE, and the absence is the decision. Helen: "for food,
+// avoiding can be important whereas for drinks surely less so." Food gave its
+// LEAVE OUT a sixth colour precisely because it had earned one; this has not.
+.drink-search--exclude .drink-field-label { color: $color-clear-text; }
+
+.drink-filter { margin: 0 0 $spacing-section-gap; }
 
 .drink-btns {
   display: flex;
@@ -128,12 +179,15 @@
 
 // Chaos is a goodness question, so it wears goodness's colour -- the same
 // amber as the mark on every card.
+// THESE USED TO BE SET IN THE HEADING'S EXACT TYPEFACE, SIZE, CASE AND
+// LETTERSPACING -- 0.78rem uppercase mono, the same as .drink-field-label was.
+// So "HOW MUCH CHAOS?" and "DEFINITELY GOOD" were visually the same class of
+// object, and the page had two things competing to look like headings with the
+// actual heading the quieter of the two. That is half of why Helen could not
+// read them. A control should not dress as a label.
 .btn-chaos {
   @extend %drink-btn-base;
-  font-family: $font-headings;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.78rem;
+  font-size: 0.92rem;
 
   &:hover,
   &:focus-visible {

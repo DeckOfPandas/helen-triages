@@ -888,6 +888,64 @@ def test_every_drink_names_a_glass():
     )
 
 
+def test_every_mood_belongs_to_exactly_one_group():
+    """The index asks MOOD and HASSLE as separate questions, and the split
+    lives in `taxonomy.yml`'s `mood_groups` rather than in the template.
+
+    THE FAILURE THIS CATCHES IS A DISAPPEARING BUTTON. cocktails/index.html
+    renders each group by iterating its list, so a mood added to `moods:`
+    without being added to a group renders NOWHERE -- no button, no error, and
+    the drinks carrying it become unreachable by mood. That is the same class
+    of silent gap as an unmapped glass (#500): the page is valid, the build is
+    green, and a filter simply does not exist.
+
+    Both directions, because both have a failure. An ungrouped mood vanishes
+    from the page; a grouped name that is not a real mood renders a button that
+    matches nothing, which is worse than no button because it looks like an
+    empty collection rather than a typo.
+
+    Overlap is checked too. A mood in both groups would render twice and toggle
+    both copies from one click, since the script keys on the mood name.
+    """
+    tax = _taxonomy()
+    moods = set(tax.get("moods") or {})
+    assert moods, "taxonomy.yml declares no moods -- this check has nothing to do."
+
+    groups = tax.get("mood_groups") or {}
+    assert groups, (
+        "taxonomy.yml has no `mood_groups`. The index renders its filter "
+        "sections from it, so without it the page has no mood buttons at all."
+    )
+
+    seen = {}
+    for group, names in groups.items():
+        for name in names or []:
+            seen.setdefault(name, []).append(group)
+
+    ungrouped = sorted(moods - set(seen))
+    assert not ungrouped, (
+        "mood(s) in `moods:` but in no group:\n  " + "\n  ".join(ungrouped)
+        + "\n\nThe index iterates the groups, so these render no button and "
+          "the drinks carrying them cannot be filtered for. Add each to "
+          "`mood_groups.mood` (what the drink IS) or `mood_groups.hassle` "
+          "(what it COSTS)."
+    )
+
+    phantom = sorted(set(seen) - moods)
+    assert not phantom, (
+        "grouped name(s) that are not declared moods:\n  " + "\n  ".join(phantom)
+        + "\n\nThese render a button that can never match a drink, which "
+          "reads as an empty collection rather than as the typo it is."
+    )
+
+    both = sorted(n for n, gs in seen.items() if len(gs) > 1)
+    assert not both, (
+        "mood(s) in more than one group: " + ", ".join(both)
+        + "\n\nEach would render twice, and one click would toggle both "
+          "copies, since the script keys on the mood name."
+    )
+
+
 def test_garnish_is_a_list():
     """Same reasoning as `glass` and `mood`: a bare string iterates in Liquid as
     its own characters, which renders as nothing visible rather than as an

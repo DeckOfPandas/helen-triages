@@ -147,6 +147,46 @@ moods:
 # nothing left to hold. Duds still fold into `YOLO` -- remaking something
 # you disliked IS a chaotic choice -- unchanged from the earlier
 # three-from-four revision.
+# =============================================================================
+# THE TWO GROUPS THE INDEX ASKS AS SEPARATE QUESTIONS — Helen, 2026-08-27.
+# =============================================================================
+# Every mood above belongs to exactly one of these, and the index renders them
+# under separate headings. `tests/test_cocktails.py` asserts the partition is
+# total and non-overlapping, so a mood added above without a group here fails
+# rather than silently vanishing from the page.
+#
+# WHY THE SPLIT. The index used to ask one question -- "what do you fancy?" --
+# and offer ten answers belonging to three different questions. "No juicing" is
+# not a flavour and "I want to faff" is not a mood; they answer *can I be
+# bothered*, and sitting them in a row headed *what do you fancy* meant sorting
+# them yourself before choosing. Helen: "I feel like I am doing work to
+# understand what to click in order to maximise my chance of getting the drink
+# I want."
+#
+# TASTE AND STYLE ARE **NOT** SPLIT, and that was tried. The first proposal had
+# three groups -- taste, style, hassle. Helen: "honestly I think taste and
+# style in those columns are the same, and should be called Mood. Splitting out
+# Hassle though feels good." So the cut that earns its place is the one between
+# what a drink IS and what it COSTS, and only that one.
+#
+# `pudding in a glass` is in `mood` and has zero members, which is deliberate
+# -- see its own note above. The index renders no button for an empty mood, so
+# it is grouped here for completeness rather than for display.
+mood_groups:
+  mood:
+    - strong brown drink
+    - clear
+    - short and sharp
+    - fruity
+    - sugar craving
+    - pudding in a glass
+    - tiki
+  hassle:
+    - ice ice baby
+    - I want to faff
+    - no juicing
+    - on fire
+
 chaos:
   definitely good: "ship is yes or oh gods yes"
   YOLO: "everything else, including the five drinks rated `not really`"

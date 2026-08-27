@@ -69,17 +69,93 @@ $color-paper:        #fbfbfa;
 $color-grey-mid:     #6b6b70;
 $color-grey-light:   #e4e4e6;
 
-// MOOD. Crème de menthe.
-$color-menthe:       #51BB86;   // fill    2.30:1 on paper — never text
-$color-menthe-deep:  #317E58;   // text    4.75:1 on paper
+// --- THE FIVE ACCENTS. "Neon bar sign", chosen by Helen 2026-08-27. ----------
+//
+// Each hue has a JOB, and the job is the same fact the CARDS already show, so
+// a heading's colour is a promise the card keeps rather than a decoration:
+//
+//   absinthe     MOOD                 the glass wash and hover on a card
+//   tangerine    YOLO? / goodness     the ship mark on a card
+//   magenta      HAS TO HAVE          the matched-ingredient highlight
+//   ultraviolet  HASSLE               (new section, new colour)
+//   cyan         I KNOW WHAT I WANT   (name search)
+//
+// LEAVE OUT DELIBERATELY HAS NO HUE. Helen: "for food, avoiding can be
+// important whereas for drinks surely less so." Food gave its LEAVE OUT a
+// sixth colour; this does not, and the asymmetry is the decision.
+//
+// ABSINTHE IS THE HOME COLOUR and that is why MOOD gets it: Helen, "I really
+// do like the green fairy absinthe-y green as our home colour" -- it carries
+// the card glass panels, the hover, the nav and footer chrome. Food does the
+// same thing with magenta, which is both $color-accent and $color-star-root,
+// and HANDOVER 13.2 calls those "one rhyme rather than four coincidences".
+//
+// THREE VALUES PER HUE, and mixing them up is the easy mistake:
+//   (bare)  the RULE. A vivid band under a heading. NEVER text -- most of
+//           these are nowhere near 4.5:1.
+//   -deep   4.75:1 on paper. Safe as type: active buttons, counts, marks.
+//   -wash   a 9% tint, for a panel behind ink.
+//
+// WHY NEON, AND WHAT IT COSTS. Helen ranked it first of four candidates and
+// named the cost herself: "all five colours are close (to my eye) to our food
+// palette". Measured and true -- the closest neon hue lands 15 dE from a food
+// colour where the muted candidate landed 31. FIVE SATURATED HUES THAT AVOID
+// FOOD'S SIX DO NOT EXIST: searching the whole circle, the best possible set
+// still comes within 21 degrees, because food's own six already tile it. So
+// the two sites are siblings by construction, and what separates them is the
+// HOME COLOUR (green here, magenta there) and how freely colour is spent --
+// Helen: "there's not ENOUGH of it for me... cocktails won't be like this."
+//
+// THE DICHROMACY BAR APPLIES TO EXACTLY TWO OF THESE, and applying it to all
+// five was a mistake made and corrected on the way here. A heading rule sits
+// under the section's own name in words, so hue is reinforcement and can
+// safely collapse for a dichromat. But the GOODNESS MARK and the INGREDIENT
+// HIGHLIGHT sit on a card with no word beside them, carrying meaning in colour
+// alone, along with the mood chip's fill. Those three were checked: worst pair
+// is magenta vs tangerine under tritanopia at dE 22.6, against a bar of 10.
+// Re-run tmp/neon_values.py if any of the three moves.
 
-// GOODNESS. Aged amber.
-$color-amber:        #DD9C2C;   // fill    2.30:1
-$color-amber-deep:   #966818;   // text    4.73:1
+// MOOD, and the home colour. Absinthe.
+$color-absinthe:      #30E88C;   // rule
+$color-absinthe-deep: #0E8248;   // text  4.71:1
+$color-absinthe-wash: #ECFDF5;   // 9% panel
 
-// ASKED FOR. Deep violet.
-$color-violet:       #B29AD4;   // fill    2.39:1
-$color-violet-deep:  #845EBA;   // text    4.74:1
+// YOLO / GOODNESS. Tangerine.
+$color-tangerine:      #F47E25;  // rule
+$color-tangerine-deep: #B6540A;  // text  4.76:1
+
+// HAS TO HAVE. Hot magenta.
+$color-magenta:      #F127A7;    // rule
+$color-magenta-deep: #D40E8C;    // text  4.78:1
+
+// HASSLE. Ultraviolet.
+//
+// Its rule and its deep are nearly the same value, and that is the hue rather
+// than an error: a vivid blue-violet is already close to 4.75:1, so there is
+// no brighter version to make a band from. Ultraviolet's underline will read
+// darker than cyan's however it is set.
+$color-ultraviolet:      #9233E6;  // rule
+$color-ultraviolet-deep: #9A41E7;  // text  4.73:1
+
+// I KNOW WHAT I WANT. Cyan.
+$color-cyan:      #2ED1EA;        // rule
+$color-cyan-deep: #0E7C8C;        // text  4.74:1
+
+// --- The previous three, as aliases ------------------------------------------
+// Kept so the migration is one commit rather than a rename sweep, and mapped
+// BY AXIS rather than by hue: violet's job was ASKED FOR, which magenta now
+// holds, so $color-violet-deep resolves to magenta and not to ultraviolet even
+// though ultraviolet is the nearer colour. Getting that backwards would have
+// silently swapped two sections.
+//
+// TEMPORARY. Delete these once call sites are migrated -- an alias that
+// outlives its migration is just a second name for a colour.
+$color-menthe:       $color-absinthe;
+$color-menthe-deep:  $color-absinthe-deep;
+$color-amber:        $color-tangerine;
+$color-amber-deep:   $color-tangerine-deep;
+$color-violet:       $color-magenta;
+$color-violet-deep:  $color-magenta-deep;
 
 // --- The ten the shared partials require -------------------------------------
 $color-bg:         $color-paper;
@@ -92,7 +168,7 @@ $color-white:      #ffffff;           // the wordmark sitting on its tape
 // The shared chrome reads this for link hovers and section colouring. Menthe,
 // because on this site the interactive/branded colour is the one that means
 // "this matches what you asked for", and a nav link is that.
-$color-mood-root:  $color-menthe-deep;
+$color-mood-root:  $color-absinthe-deep;
 
 // THE PLACEHOLDER THIS REPLACES WAS THE WEAKEST LINE IN THE FILE, and it said
 // so itself: $color-accent was $color-grey-mid, and the comment recorded that
@@ -109,7 +185,7 @@ $color-mood-root:  $color-menthe-deep;
 // asked for" is menthe -- the mood filters, the glass wash, and a link you
 // are about to follow are the same gesture. Amber's job is a verdict about a
 // drink; it has no business on a nav icon.
-$color-accent:     $color-menthe-deep;
+$color-accent:     $color-absinthe-deep;
 
 // The heading outline. Food has had `$color-label-stroke` since long before
 // this site existed; cocktails never declared an equivalent, so every heading
