@@ -1839,12 +1839,57 @@ two different categories inside one string, which is what a list `generic`
 exists to express and a comma cannot — and one, a bare `Planteray` on Long
 Island Iced Tea, is genuinely ambiguous rather than merely badly shaped.
 
-**What it unblocks: #534.** A `suggestion` whose bottle sits in a different
-category than that ingredient's `generic` is a cross-category substitution, and
-Helen asked for those to carry a note ("Please add notes for me on recipe pages
-when I've substituted in a surprising way"). That is only computable once a
-bottle knows its category. Port-au-Prince is already one — Lemon Hart 151
-suggesting Planteray OFTD — and no human had noticed.
+**Planteray is canonical and Plantation is always an alias**, Helen 2026-08-27.
+The old spellings STAY as aliases and that is not a half-finished rename: the
+drinks predate the rebrand and a suggestion has to keep resolving whether or not
+its drink has been retyped. Same division `canonical_glasses` draws — the rule
+governs what is WRITTEN, the alias map governs what can be READ.
+
+**Smith & Cross moved to `Jamaican, moderately aged`** from `Jamaican,
+overproof, unaged` (2026-08-27), which resolved the one bottle that had been
+sitting under two generics. It is aged; 57% is what made it look unaged, and
+strength is not what that category names. It carries the collection's first
+BOTTLE-level `note` ("be sensible about how much you use") — bottle-invariant
+in the way #297's ABV is, so it does **not** reopen #441.
+
+**#534's check is built, and it is deliberately permissive.** A `suggestion`
+whose bottle sits in a different category than that ingredient's `generic` must
+carry a `note`, and **`QQ` counts** — Helen: "be permissive with the test, but
+given we're pre-first-human-read please add the note field with QQ in it if we
+don't have anything else." So a substitution can never ship silently while
+nothing demands prose she has not written. A disjunctive `generic` crosses only
+if the bottle matches NONE of its options.
+
+**What it found on its first run is the useful part: four of six were not
+substitutions at all**, they were #314's rulings not yet applied to the drinks —
+a suggestion naming a bottle from the category the generic *should* have been.
+The check cannot tell those apart from a real substitution and should not try:
+for a mistype the answer is to fix the type, not to explain it. Helen's call was
+to drop those four suggestions, which **silences the check without changing the
+generic** — hurricane-classic and tiki-max still say `Demerara, aged` on items
+called `Overproof Navy rum` and `Navy rum`. Knowingly accepted, pending her
+classification pass; the bottle was the last trace of which rum each meant and
+that trace is now only in git history.
+
+**An absent suggestion is a real answer**, and 2026-08-27 produced the first
+three. Long Island Iced Tea's rum, Milliners Punch's "cheapest white rum to
+hand", and Frozen Fruit Daiquiri's Spicers all came off rather than being
+corrected. The rule underneath: **what is cheap and what needs using up are
+facts about the shelf on the day, never about the drink.** Compare Frozen Fruit
+Daiquiri's `"Best with ED3, Havana 3 is fine"`, which STAYS — a preference
+between two bottles she owns is a fact about the drink.
+
+**`Jamaican, caramel forward` still has no drink**, and did not gain two as an
+earlier session note claimed. Blackwell was going to bring cobra-effect and
+georgetown-punch into it; Helen dropped both suggestions instead ("I never use
+Blackwell there"). The style has bottles (Blackwell, Myers) and no user.
+
+**One rename debt, written down rather than done.** Ceylon arrack now has a card
+name, making `rum_display_names` the first map with a non-rum member — Helen:
+"is that a rum? Doesn't matter, the category list should eventually contain
+everything." The key name is half a lie. Rename it to `card_names` the next time
+`cocktails/index.html` is open; the template only ever looks a generic up in it,
+so nothing else changes.
 
 ### 9.4 Decided 2026-08-16 — do not re-litigate
 
@@ -2897,6 +2942,27 @@ workflow checked out, built, rendered PDFs and deployed with no test step
 anywhere, so every guard in this repository protected a local run and nothing
 else. `.github/workflows/build-and-deploy.yml` has a `test` job and `build`
 declares `needs: test`. Three things about it are load-bearing:
+
+> **NOT FOR THE COCKTAIL DRINKS, AND THE SENTENCE ABOVE READS AS IF IT WERE —
+> #540, found 2026-08-27.** `tests/test_cocktails.py` skips when
+> `_cocktail_drafts/` is absent, which is correct and documented; but CI checks
+> out this repo alone and the drafts are a separate private repo, so the
+> directory is *always* absent there. **24 of that module's 41 tests call
+> `_load()` and skip in Actions**, reported as passes. For the cocktail
+> collection, "every guard protected a local run and nothing else" — the exact
+> sentence #369 exists to have made obsolete — is still true today.
+>
+> Live proof rather than theory: five tests fail locally on drafts data that is
+> behind (a retired `flavoured` generic, retired honey generics, `blackstrap`
+> still a generic on Jungle Bird, 17 non-canonical glass spellings) and CI is
+> green on all five. It is masked only because drafts build locally; the mask
+> comes off the day a cocktail is promoted into `_cocktail_recipes/`, and the
+> guards that would catch a bad promotion are the ones not running.
+>
+> `test_suite_hygiene.py` cannot see this: from its point of view the skip is
+> legitimate. **The vacuity is in the ENVIRONMENT, not the assertion.** #540
+> has four options and no recommendation — putting private drinks into a runner
+> is Helen's decision.
 
 - **`fetch-depth: 0`.** `actions/checkout` is shallow by default, and in a
   depth-1 clone `git log -- <file>` reports the same single commit for every
