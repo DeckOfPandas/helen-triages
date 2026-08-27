@@ -40,9 +40,17 @@
 #
 # ALIASES ARE HOW A BOTTLE KEEPS ONE IDENTITY. Twelve suggestion strings in the
 # collection collapse to about five bottles: ED3 / El Dorado 3 / El Dorado 3yo /
-# El Dorado 3yo rum. Planteray and Plantation are the SAME BRAND, renamed, which
-# no string comparison recovers. Matching is case-insensitive; add the spelling,
-# do not add a second bottle.
+# El Dorado 3yo rum. Matching is case-insensitive; add the spelling, do not add
+# a second bottle.
+#
+# PLANTERAY IS THE CANONICAL SPELLING AND PLANTATION IS ALWAYS AN ALIAS --
+# Helen, 2026-08-27: "please collapse Plantation and rename to Planteray
+# everywhere." They are one brand, renamed, which no string comparison recovers,
+# so the collapse has to be declared. The old spellings STAY as aliases and that
+# is not a half-finished rename: the drinks were written before the rebrand and
+# a suggestion must keep resolving whether or not its drink has been retyped
+# yet. Same division `canonical_glasses` draws in glasses.yml -- the rule
+# governs what is WRITTEN, the alias map governs what can be READ.
 
 bottles:
 
@@ -123,10 +131,9 @@ bottles:
   "Ron del Barrito":
     generic: "moderately aged"
     aliases: ["Ron del Barrito 3 star rum"]
-  "Plantation Barbados 5":
+  "Planteray Barbados 5":
     generic: "moderately aged"
-    aliases: ["Plantation Barbados 5 year old rum",
-              "Planteray Barbados 5"]
+    aliases: ["Plantation Barbados 5", "Plantation Barbados 5 year old rum"]
 
   # --- lightly aged and filtered -------------------------------------------
   "Havana Club 3":
@@ -267,13 +274,17 @@ unresolved_suggestions:
     Prose. The bottle is JW Spicers and the rest is a note -- and a good one,
     since "whatever is cheapest" is genuinely the answer for that drink.
   "Planteray": >-
-    A BRAND, NOT A BOTTLE, and the only one of these that is genuinely
-    ambiguous rather than merely badly shaped. Long Island Iced Tea suggests it
-    against a `lightly aged and filtered` generic, but Planteray make a dozen
-    rums and the one this file knows -- 3 Stars -- is `blended multi-region rum,
-    clear`, a different category. So it is either the wrong bottle for the
-    generic or the wrong generic for the bottle, and which is Helen's call.
-    Compare `Planteray 3`, which IS 3 Stars and resolves.
+    RESOLVED 2026-08-27, AND THE ANSWER IS NO BOTTLE AT ALL -- pending the edit
+    to the drink. Long Island Iced Tea suggests a bare brand against a `lightly
+    aged and filtered` generic; Planteray make a dozen rums, so it resolved to
+    nothing. Helen: she reached for it because it was cheap "in a drink where
+    none of the many component spirits benefit the drink for being fancy", and
+    because she was using the bottle up -- neither of which is a fact about the
+    drink. "I'd rather not specify any rum at all for LIIT because neither I nor
+    the drink care." So the `suggestion` comes OFF that ingredient rather than
+    being corrected, and this line goes with it. A genuinely absent suggestion
+    is a real answer, and the first case in the collection where naming any
+    bottle would have been worse than naming none.
   "Havana 3 year old and Clément Agricole Blanc": >-
     AND, not OR -- Daisy de Santiago pours both, and its `generic` is correctly
     the disjunctive pair. One suggestion string covering two separate pours is
