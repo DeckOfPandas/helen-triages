@@ -1036,6 +1036,117 @@ def test_every_icon_has_a_real_world_height():
     )
 
 
+# `heights_mm` sizes an icon by its VIEWBOX, not by its ink, so a drawing that
+# does not fill its own canvas renders smaller than one that does at the same
+# declared height. These three do not, and each is grandfathered with its
+# measured number so the guard can ship green while still catching the next one.
+#
+# NOT A UNIT: this is the fraction of the canvas HEIGHT that the ink spans.
+# 97.5% is the set's median -- the icons are drawn tight to their boxes, and
+# these three are the exceptions rather than the rule.
+#
+# The double old-fashioned is the case that raised #503: at the time it was
+# 75.7%, and reasoning from the viewBox numbers pointed the WRONG WAY, because
+# its canvas is 1.29x the single's, which looks like confirmation that it is
+# the bigger glass. Settling on `old-fashioned-2` improved it to 85.5% without
+# anyone measuring. Goblet and coupe were then found BY THIS TEST and are
+# worse -- the goblet renders at 0.71x its declared 175mm. Helen's to fix or
+# accept; cropping a viewBox to its ink is mechanically safe but it CHANGES
+# RENDERED SIZE on the live page, which is her call and not a test's.
+KNOWN_LOOSE_VIEWBOXES = {
+    "goblet": 69.5,
+    "coupe": 82.5,
+    "old-fashioned-double": 85.5,
+}
+VIEWBOX_FILL_FLOOR = 92.0
+VIEWBOX_FILL_TOLERANCE = 3.0
+
+
+def test_no_glass_artwork_has_a_slack_viewbox():
+    """#503. An icon must fill its own canvas, or it renders smaller than declared.
+
+    `heights_mm` says how tall a glass is in the real world and the template
+    scales the icon to match. But it scales the VIEWBOX, and the viewBox is
+    whatever the drawing was saved with -- `scripts/normalise_glass_icons.py`
+    deliberately preserves it ("the viewBox stays, so CSS decides"). So ink
+    sitting in the middle of a roomy canvas renders short, by exactly the
+    fraction of the canvas it leaves empty, and nothing anywhere says so.
+
+    THIS IS NOT VISIBLE BY READING THE FILES. It was found the first time by two
+    glasses looking wrong beside each other, and the viewBox numbers actively
+    misled -- see the note on KNOWN_LOOSE_VIEWBOXES above. It has to be
+    measured, which is why this test rasterises.
+
+    IMPORTING THE RASTERISER IS FINE HERE, and is not the mistake
+    tests/test_reference_data.py warns about when it reimplements
+    build_cooking_methods.py's parser rather than sharing it. That warning is
+    about a test agreeing with the generator it is checking. Nothing generates
+    these SVGs from the rasteriser -- Helen draws them, and the normaliser moves
+    XML around without ever rasterising -- so the measurement is independent of
+    the thing being measured.
+
+    THE TOLERANCE IS TWO-SIDED ON PURPOSE. A grandfathered icon that gets worse
+    fails, and one that gets FIXED also fails, telling you to drop it from the
+    list. A one-sided ratchet quietly keeps stale entries forever, which is how
+    a grandfather list stops describing anything real.
+    """
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import svgrender
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/svgrender.py not importable")
+
+    icons = sorted(GLASS_ICON_DIR.glob("*.svg"))
+    assert icons, f"no SVGs in {GLASS_ICON_DIR.relative_to(ROOT)}"
+
+    fills = {}
+    for path in icons:
+        paths, viewbox, translate, _ = svgrender.parse_icon(path)
+        # A hairline stroke and no supersampling: this measures where the
+        # ARTWORK is, and a fat stroke would inflate the box by its own width.
+        width, height, gray = svgrender.render(
+            paths, viewbox, 200, stroke=0.4, translate=translate, ss=1)
+        rows = [i // width for i, v in enumerate(gray) if v < 128]
+        assert rows, (
+            f"{path.name} rasterised to NOTHING. Either the artwork draws "
+            f"outside its own viewBox, or parse_icon missed the <g transform> "
+            f"-- both of which render blank on the site too."
+        )
+        fills[path.stem] = (max(rows) - min(rows) + 1) / height * 100
+
+    stale = sorted(set(KNOWN_LOOSE_VIEWBOXES) - set(fills))
+    assert not stale, (
+        f"KNOWN_LOOSE_VIEWBOXES names icons that no longer exist: {stale}. "
+        f"Drop them."
+    )
+
+    problems = []
+    for name, fill in sorted(fills.items()):
+        if name in KNOWN_LOOSE_VIEWBOXES:
+            was = KNOWN_LOOSE_VIEWBOXES[name]
+            if abs(fill - was) > VIEWBOX_FILL_TOLERANCE:
+                verb = "IMPROVED" if fill > was else "GOT WORSE"
+                problems.append(
+                    f"{name}: {verb} -- grandfathered at {was:.1f}%, now "
+                    f"{fill:.1f}%. If it is fixed, remove it from "
+                    f"KNOWN_LOOSE_VIEWBOXES; if worse, that is a regression.")
+        elif fill < VIEWBOX_FILL_FLOOR:
+            problems.append(
+                f"{name}: ink spans only {fill:.1f}% of its viewBox height, so "
+                f"it renders at {fill / 100:.2f}x its declared heights_mm.")
+
+    assert not problems, (
+        "glass artwork with a slack viewBox:\n  " + "\n  ".join(problems)
+        + f"\n\nThe set median is 97.5% and the floor is "
+          f"{VIEWBOX_FILL_FLOOR:.0f}%. `heights_mm` scales the VIEWBOX, so "
+          f"empty canvas is lost height -- the glass renders short beside its "
+          f"neighbours and its declared millimetres become a lie. Fix by "
+          f"cropping the viewBox to the ink (the paths and their <g transform> "
+          f"do not move), or grandfather it above with a reason."
+    )
+
+
 def test_display_scale_names_only_real_icons():
     """`display_scale` is a per-glass cheat and a phantom key does nothing.
 
