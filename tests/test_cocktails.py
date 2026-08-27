@@ -610,26 +610,33 @@ def test_showing_categories_still_shortens_the_index():
     )
 
 
-def test_no_drink_shows_the_same_card_name_twice():
-    """A card must not read "Jamaican rum · Jamaican rum" -- issue #501.
+def test_no_card_shows_two_different_rums_under_one_name():
+    """One card, one name, one rum -- issue #501.
 
-    Distinctness across the vocabulary (above) does not give you this: a drink
-    with two rums whose generics are genuinely different still renders two
-    words, and if a future card name collapsed a pair, the repeat would show up
-    HERE rather than in the map. True of all 114 drinks when #501 landed, and
-    the multi-rum tiki drinks are where it would break first -- Modern Zombie
-    carries three, Tiki Max two plus a float.
+    TWO DIFFERENT GENERICS, NOT TWO ENTRIES, and the distinction is Helen's,
+    2026-08-27: "where a recipe wants more than one kind of the same rum we
+    obviously should write the display name twice." A drink calling for two
+    pours of the same category genuinely prints its name twice and that is
+    correct -- each ingredient entry renders on its own. The failure this
+    catches is the opposite one: two ingredients that are NOT the same rum
+    arriving at the same words, which is #501's original fault (`Overproof Navy
+    rum` meaning three different things) rebuilt inside the fix for it.
 
-    Not a rule about the DATA so much as a rule about the pair of decisions:
-    it fails if someone shortens two categories toward each other without
-    checking what that does to a drink that uses both.
+    The first version of this test asserted no card repeats a name at all, and
+    would have failed a correct drink the day one was written. Vocabulary-wide
+    distinctness (above) does not cover this either: a DECLARED collapse is
+    permitted there, and this is where that permission gets checked against real
+    drinks -- both Jamaicans read `Jamaican rum`, so a drink calling for both
+    would say one word for two rums and lose the difference silently.
     """
     vocab = _vocab()
     names = vocab.get("rum_display_names") or {}
+    joins = vocab.get("rum_card_name_joins") or {}
     assert names, "`rum_display_names` is empty; nothing to check."
     bad, checked = [], 0
     for slug, fm in _load():
-        shown = []
+        # card name -> the set of generic-tuples that produced it
+        shown = {}
         for item in (fm.get("ingredients") or []):
             if not isinstance(item, dict) or not item.get("item"):
                 continue
@@ -638,18 +645,70 @@ def test_no_drink_shows_the_same_card_name_twice():
             labels = [names[g] for g in generics if g in names]
             # The template substitutes only when EVERY generic has a card name,
             # so a partial match falls back to `item` and shows no card name.
-            if labels and len(labels) == len(generics):
-                shown.append(" or ".join(labels))
+            if not labels or len(labels) != len(generics):
+                continue
+            label = " or ".join(labels)
+            label = joins.get(label, label)
+            shown.setdefault(label, set()).add(tuple(generics))
         checked += 1
-        dupes = sorted({n for n in shown if shown.count(n) > 1})
-        if dupes:
-            bad.append(f"{slug}: {', '.join(dupes)} (line reads: {' · '.join(shown)})")
+        for label, sources in sorted(shown.items()):
+            if len(sources) > 1:
+                bad.append(
+                    f"{slug}: {label!r} <- "
+                    + " and ".join(sorted(str(list(s)) for s in sources))
+                )
     assert checked, "No drinks loaded, so this check is vacuous."
     assert not bad, (
-        "Drink(s) whose card would repeat a rum name:\n  " + "\n  ".join(bad)
-        + "\n\nTwo different rums are reading identically on one card. Either "
-          "give them distinct card names, or the two generics are close enough "
-          "that the drink should not be asking for both."
+        "Card(s) showing two different rums under one name:\n  "
+        + "\n  ".join(bad)
+        + "\n\nA reader cannot tell these apart, and the card is the place the "
+          "choice gets made. Either give them distinct card names, or the two "
+          "generics are close enough that this drink should not ask for both."
+    )
+
+
+def test_every_card_name_join_is_reachable():
+    """A `rum_card_name_joins` key must be a join some drink actually produces.
+
+    THE SAME BARGAIN `methods.yml` STRIKES with its proposals, and for the same
+    reason: this map duplicates live data -- the left-hand side is a string the
+    template builds elsewhere from two card names -- so it is only safe
+    alongside the check that keeps the duplicate honest.
+
+    Two ways it rots, and neither is visible on the page. A card name changes
+    and the key stops matching, so the replacement silently stops applying and
+    the clunky join comes back. Or a drink's generics change and the pair no
+    longer occurs, leaving an entry that reads as a live decision about how the
+    index looks while doing nothing at all.
+    """
+    vocab = _vocab()
+    names = vocab.get("rum_display_names") or {}
+    joins = vocab.get("rum_card_name_joins") or {}
+    if not joins:
+        pytest.skip("`rum_card_name_joins` is empty; no default join is "
+                    "overridden, which is a legitimate state.")
+    produced = set()
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict) or not item.get("item"):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            labels = [names[g] for g in generics if g in names]
+            if labels and len(labels) == len(generics) and len(labels) > 1:
+                produced.add(" or ".join(labels))
+    assert produced, (
+        "No drink produces a joined rum card name at all, so this check is "
+        "vacuous. Ten rum entries carry a list `generic` -- either that stopped "
+        "being true, or the card names no longer resolve."
+    )
+    stale = sorted(set(joins) - produced)
+    assert not stale, (
+        "Join replacement(s) matching nothing:\n  " + "\n  ".join(stale)
+        + "\n\nEither a card name changed and this key did not follow — in "
+          "which case the default join is back on the index and nobody was "
+          "told — or no drink asks for that pair any more and the entry should "
+          "go.\nJoins actually produced today:\n  " + "\n  ".join(sorted(produced))
     )
 
 

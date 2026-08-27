@@ -2109,13 +2109,41 @@ card's job. It reads a build-time `data-ing` attribute instead. **Whenever a
 template stops rendering the string a script was matching on, the script is
 already broken and nothing about the page looks wrong.**
 
-**Still open, deliberately.** A disjunctive pair sharing a head word reads
-badly — Swizzle's `Demerara overproof rum or Demerara rum` — and no drink
-page problem produced it, only the join. `character` is not shown on a card:
-Don's Own Grog's Gosling's reads `aged rum` with the blackstrap dropped,
-which is three drinks and a design decision rather than a data one. Rum only,
-because rum is where the item was AMBIGUOUS; four non-rum generics are also
-long and none of them is ambiguous.
+**A disjunctive pair sharing a head word gets an EXPLICIT replacement, not a
+rule.** `rum_card_name_joins` is keyed on the default join, so the before and
+after read together: Swizzle's `Demerara overproof rum or Demerara rum` is
+Helen's `Demerara rum or overproof`. Her form drops two words from the second
+option and reorders the pair, which is why it is stored — she expects more
+cases and named the shape herself: "I expect we'll need an explicit mapping of
+cases like this." Six of the seven pairs need nothing.
+`test_every_card_name_join_is_reachable` keeps the keys honest, the bargain
+`methods.yml`'s proposals strike.
+
+**Two pours of the same rum is a DIFFERENT case and needs nothing.** Each
+ingredient entry renders its own card name, so a drink genuinely wanting two
+Demeraras prints the name twice, correctly — Helen: "where a recipe wants more
+than one kind of the same rum we obviously should write the display name
+twice." The first version of the duplicate test forbade any repeat on a card
+and would have failed a correct drink the day one was written. It now fires
+only when two DIFFERENT generics arrive at one name, which is #501's original
+fault rebuilt inside the fix for it.
+
+**`character` is recipe-only.** Helen, 2026-08-27, asked directly about
+blackstrap on a card: "character only on the recipe." So Don's Own Grog's
+Gosling's reads `aged rum` on the index and carries `(character: blackstrap)`
+on the drink page, and that is settled rather than parked. #530 is the
+follow-on she asked for: note `character: hogo` on the drinks that want a
+bottle for it, which needs `hogo` adding to `rum_characters` first or
+`test_rum_character_is_declared` goes red.
+
+**Still open, deliberately.** Rum only, because rum is where the item was
+AMBIGUOUS; four non-rum generics are also long and none of them is ambiguous.
+The rum typings this surfaced — two overproofs typed as non-overproofs, and
+`Jamaican, caramel forward` declared but on no drink — are a first pass and
+Helen's to check: she will "do a thorough classification check when we have a
+full draft to work from", and applies caramel-forward herself where she
+reaches for Blackwell or Myers. **Do not retype a drink into a rum style from
+its item text.**
 
 ### 9.11 Glass icons — real relative height, and a UA-stylesheet trap
 

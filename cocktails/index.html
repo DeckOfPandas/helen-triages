@@ -46,6 +46,7 @@ permalink: /cocktails/
   {% assign glasses    = site.data.cocktails.glasses %}
   {% assign ship_tints = taxonomy.ship_tints %}
   {% assign card_names = site.data.cocktails.ingredients.rum_display_names %}
+  {% assign card_joins = site.data.cocktails.ingredients.rum_card_name_joins %}
 
   {% comment %} Tallest glass counted live from the data, never hardcoded —
      the same rigour _layouts/cocktail.html and _dev/glasses.html hold
@@ -240,9 +241,20 @@ permalink: /cocktails/
                they join with the same italic-free " or " the drink page uses.
                A list mixing a named rum with something unnamed would otherwise
                print half a fact; there is no such entry today, and this is
-               what stops one appearing silently. {% endcomment %}
+               what stops one appearing silently.
+
+               THE JOIN IS THEN LOOKED UP in `rum_card_name_joins`, because a
+               pair sharing a head word reads badly and no rule collapses it
+               well: `Demerara overproof rum or Demerara rum` is Helen's
+               `Demerara rum or overproof`, which drops two words from the
+               second option and reorders the pair. Absent means the default
+               join stands, which is the case for six of the seven pairs.
+
+               A drink wanting two pours of the same rum is NOT this case and
+               needs nothing — each ingredient entry renders its own card name,
+               so the name simply appears twice, correctly. {% endcomment %}
             <p class="drink-card-ingredients">
-              {% for ing in drink.ingredients %}{% if ing.item %}{% assign g_n = 0 %}{% assign named = 0 %}{% assign short = "" %}{% for g in ing.generic %}{% assign g_n = g_n | plus: 1 %}{% assign dn = card_names[g] %}{% if dn %}{% assign named = named | plus: 1 %}{% if short == "" %}{% assign short = dn %}{% else %}{% assign short = short | append: " or " | append: dn %}{% endif %}{% endif %}{% endfor %}{% if named > 0 and named == g_n %}{% assign card_label = short %}{% else %}{% assign card_label = ing.item %}{% endif %}{% comment %} The search text is the ITEM AND THE GENERICS, whatever the card
+              {% for ing in drink.ingredients %}{% if ing.item %}{% assign g_n = 0 %}{% assign named = 0 %}{% assign short = "" %}{% for g in ing.generic %}{% assign g_n = g_n | plus: 1 %}{% assign dn = card_names[g] %}{% if dn %}{% assign named = named | plus: 1 %}{% if short == "" %}{% assign short = dn %}{% else %}{% assign short = short | append: " or " | append: dn %}{% endif %}{% endif %}{% endfor %}{% if named > 0 and named == g_n %}{% assign joined = card_joins[short] %}{% if joined %}{% assign card_label = joined %}{% else %}{% assign card_label = short %}{% endif %}{% else %}{% assign card_label = ing.item %}{% endif %}{% comment %} The search text is the ITEM AND THE GENERICS, whatever the card
                  displays — so a card matched on a bottle name it no longer
                  prints can still show WHY it matched. {% endcomment %}{% capture ing_search %}{{ ing.item }} {% for g in ing.generic %}{{ g }} {% endfor %}{% endcapture %}<span class="drink-card-ing" data-ing="{{ ing_search | strip | downcase }}">{{ card_label }}</span>{% unless forloop.last %} <span class="drink-card-sep">·</span> {% endunless %}{% endif %}{% endfor %}
             </p>

@@ -170,6 +170,14 @@ rum_display_names:
   # rum_card_names_may_collide. Declared in rum_styles and used by NO DRINK as
   # of 2026-08-27; named here anyway, so the map covers the vocabulary rather
   # than today's data.
+  #
+  # HELEN APPLIES THIS ONE HERSELF and it is not a gap to be filled in by
+  # inference, 2026-08-27: "needs to be applied by me where I need it, for
+  # example where I usually reach for Blackwell or Myers." Those two bottles are
+  # the marker -- a drink whose Jamaican is reached for because it is dark and
+  # molasses-sweet rather than funky. Do not retype a drink into this style
+  # from the item text; `Pot-still dark Jamaican rum` and `Dark aged rum` look
+  # like candidates and are hers to call.
   "Jamaican, caramel forward": "Jamaican rum"
   "Jamaican, overproof, unaged": "Jamaican overproof rum"
   "Demerara, aged": "Demerara rum"
@@ -194,6 +202,35 @@ rum_display_names:
   "Malibu": "Malibu"
   "cachaça": "cachaça"
   "Batavia arrack": "Batavia arrack"
+
+# HOW A DISJUNCTIVE RUM READS ON A CARD, where the default join reads badly.
+#
+# A list `generic` on ONE ingredient means "either would do" (#441), and the
+# card joins the two card names with " or ". Seven distinct pairs occur and six
+# of them read fine -- `lightly aged rum or agricole blanc` is exactly the
+# choice `White rum` used to conceal. The seventh repeats its own head word:
+# `Demerara overproof rum or Demerara rum`.
+#
+# KEYED ON THE DEFAULT JOIN, so the left-hand side is the string this replaces
+# and you can read the before and after together. AN EXPLICIT MAP RATHER THAN A
+# RULE, Helen 2026-08-27: "not perfect, but we can try. I expect we'll need an
+# explicit mapping of cases like this." Collapsing a shared word is a judgement
+# about two specific names -- her form drops `Demerara` AND `rum` from the
+# second option and reorders the pair -- and no rule recovers that.
+#
+# THIS IS NOT THE "TWO POURS OF THE SAME RUM" CASE, which is a different thing
+# and needs nothing: two separate ingredient entries each render their own card
+# name, so a drink genuinely wanting two Demeraras prints the name twice, which
+# is correct. Helen, same conversation: "where a recipe wants more than one kind
+# of the same rum we obviously should write the display name twice."
+#
+# Every key must still be a join some drink actually produces --
+# test_every_card_name_join_is_reachable -- the same bargain
+# `methods.yml`'s proposals strike: a replacement whose work is already done
+# reads as outstanding, and one whose left-hand side has drifted does nothing
+# while looking live.
+rum_card_name_joins:
+  "Demerara overproof rum or Demerara rum": "Demerara rum or overproof"
 
 # CARD NAMES THAT ARE ALLOWED TO BE THE SAME, with the reason attached -- the
 # idiom `family_less` above and tests/test_reference_data.py's
