@@ -767,11 +767,20 @@ def test_every_glass_value_is_in_the_vocabulary():
     last of them: an unrecognised glass is far likelier to be a typo than a
     decision.
 
-    `any` IS THE ONE EXEMPTION AND MUST STAY UNMAPPED. It is a real member of a
-    drink's `glass:` list meaning "no requirement" -- Daisy de Santiago is
-    "anything, but preferably a Collins" -- so mapping it to an icon would draw
-    a glass for a drink that deliberately does not specify one. Listing it here
-    rather than in `icons:` is the whole point.
+    `any` WAS AN EXEMPTION HERE AND IS NOW RETIRED, 2026-08-27. It meant "no
+    requirement", and exactly one drink ever used it -- Daisy de Santiago, as
+    `[collins, any]`, i.e. "anything, but preferably a Collins". Helen: "when
+    someone tells me to use an old fashioned glass I always automatically
+    assume I can use any glass I like, so there's no need to have 'any' as a
+    glass type."
+
+    That is the argument that kills it. The freedom `any` encoded is one she
+    applies to EVERY glass spec already, so recording it on one drink said
+    nothing true about that drink and false about the other 113. Dropping it
+    from Daisy left `[collins]`, which is what the source meant anyway --
+    "preferably a Collins" was always the whole content.
+
+    There is now NO exempt value: every glass a drink names must be in `icons:`.
 
     Passes on arrival: all 19 distinct values in the collection are known
     today. That is what makes it worth adding now -- it costs nothing to
@@ -781,7 +790,11 @@ def test_every_glass_value_is_in_the_vocabulary():
     icons = g.get("icons") or {}
     assert icons, "glasses.yml has no `icons:` -- see the sibling tests."
 
-    deliberately_unmapped = {"any"}
+    # No exemptions. `any` was the last one and was retired 2026-08-27 -- see
+    # the docstring. A new exemption here should be argued for in an issue
+    # first: the whole value of this check is that an unrecognised glass is a
+    # typo rather than a decision.
+    deliberately_unmapped = set()
 
     unknown = {}
     for slug, fm in _load():
@@ -813,8 +826,65 @@ def test_every_glass_value_is_in_the_vocabulary():
         + "\n\nThe drink renders NO glass icon, silently. Either it is a typo "
           "and the drink should be retyped, or it is a real glass and needs a "
           "key in `icons:` (and artwork unless flagged above, and a heights_mm "
-          "entry -- the sibling tests will say so). If it is genuinely 'no "
-          "requirement', the word is `any`."
+          "tests will say so). There is no longer a value meaning 'no "
+          "requirement' -- `any` was retired on 2026-08-27, because every "
+          "glass spec is already a suggestion."
+    )
+
+
+# The drinks that named no glass at all on 2026-08-27, when Helen settled that
+# every recipe should have one (#491). Sixteen of 114. Listed rather than
+# tolerated silently, and listed rather than fixed, because which glass a drink
+# wants is her call and not derivable -- a Zombie is not a Bellini.
+#
+# THE LIST ONLY SHRINKS. The test fails if a drink joins it, and fails again if
+# a drink on it gets a glass and is not removed, so it cannot quietly stop
+# describing the collection.
+GLASSLESS_ON_2026_08_27 = {
+    "anitas-attitude-adjuster", "banana-boulevardier", "biggles-sidecar",
+    "cobra-effect", "copenhagen-special", "cynar-toronto", "el-mediterraneo",
+    "georgetown-punch", "kamaniwanalaya", "mai-tai-diffords-recipe",
+    "milliners-punch", "minty-pentones", "modern-zombie-makes-2",
+    "pear-apricot-honey-lemon-and-rosemary-bellini", "tiki-max",
+    "zombie-intoxica",
+}
+
+
+def test_every_drink_names_a_glass():
+    """#491. Helen, 2026-08-27: "All recipes should have a glass."
+
+    A drink with no `glass` renders no icon, and on a drink page the glass is
+    the hero -- it is drawn as tall as the whole title block. So an empty
+    `glass` is not a missing garnish-sized detail, it is a page with a hole
+    where its main image goes, and 16 of 114 have one.
+
+    WHY THIS IS A RATCHET AND NOT A FIX. Which glass a drink wants is Helen's
+    knowledge, not something derivable from the ingredients -- and guessing
+    would be worse than the gap, because a wrong glass looks exactly as
+    confident as a right one. So the existing sixteen are recorded and the
+    check bites on the seventeenth.
+
+    NOTE THE TEST ABOVE NO LONGER EXEMPTS `any`. The two changes are the same
+    decision from both ends: every drink names a glass, and there is no value
+    meaning "it does not matter".
+    """
+    missing = {slug for slug, fm in _load() if not (fm.get("glass") or [])}
+
+    new = sorted(missing - GLASSLESS_ON_2026_08_27)
+    assert not new, (
+        "drink(s) with no `glass`:\n  " + "\n  ".join(new)
+        + "\n\nEvery recipe should have a glass (#491). On a drink page the "
+          "glass is drawn as tall as the title block, so an empty one leaves a "
+          "hole where the page's main image goes."
+    )
+
+    fixed = sorted(GLASSLESS_ON_2026_08_27 - missing)
+    assert not fixed, (
+        "these now HAVE a glass and should come off GLASSLESS_ON_2026_08_27:\n  "
+        + "\n  ".join(fixed)
+        + "\n\nThe list only shrinks. Leaving a fixed drink on it means the "
+          "list stops describing the collection, and the next real gap hides "
+          "among the stale entries."
     )
 
 

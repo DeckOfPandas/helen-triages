@@ -32,6 +32,13 @@
 
 $card-height:   12.9rem;
 $card-text-x:   7.6rem;
+// ...AND IT IS A CUSTOM PROPERTY TOO, since #483. The Sass variable is still
+// the single source of the DEFAULT, but Sass resolves at compile time, so five
+// rules each baked their own copy of 7.6rem and a narrow-screen variant would
+// have had to restate all five and keep them in step -- which is the exact
+// coupling the comment above exists to prevent, reintroduced by the fix.
+// One custom property, five readers, one line to override.
+:root { --card-text-x: #{$card-text-x}; }
 // #490. The glass column is exactly $card-text-x wide, so text starting at
 // $card-text-x began flush against the tinted panel's edge with nothing
 // between them. This is that gutter, and it is a SEPARATE value rather than a
@@ -62,7 +69,8 @@ $card-glass-scale: 13rem;
   position: relative;
   height: $card-height;
   overflow: hidden;
-  padding: $card-pad-y $card-pad-x $card-pad-y ($card-text-x + $card-gutter);
+  padding: $card-pad-y $card-pad-x $card-pad-y
+           calc(var(--card-text-x) + #{$card-gutter});
   background: $color-surface;
   border: 1px solid $color-border;
 
@@ -81,7 +89,7 @@ $card-glass-scale: 13rem;
   left: 0;
   top: 0;
   bottom: 0;
-  width: $card-text-x;
+  width: var(--card-text-x);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,7 +104,7 @@ $card-glass-scale: 13rem;
     // decisions, three separate multipliers, none baked into the others.
     height: calc(var(--glass-ratio, 1) * var(--glass-cheat, 1) * #{$card-glass-scale});
     width: auto;
-    max-width: $card-text-x - 1.3rem;
+    max-width: calc(var(--card-text-x) - 1.3rem);
     overflow: visible;
   }
 
@@ -114,7 +122,7 @@ $card-glass-scale: 13rem;
   content: "";
   position: absolute;
   left: -1px;
-  width: $card-text-x;
+  width: var(--card-text-x);
   height: 3px;
   pointer-events: none;
   transition: background-color 0.12s ease;
@@ -198,7 +206,7 @@ $card-glass-scale: 13rem;
   // Same gutter as the body above, so the title and the foot share one left
   // edge. They are two separate rules and drifting apart is exactly what the
   // fixed-anchor design exists to prevent.
-  left: $card-text-x + $card-gutter;
+  left: calc(var(--card-text-x) + #{$card-gutter});
   right: $card-pad-x;
   bottom: $card-foot-y;
 }
@@ -272,4 +280,36 @@ $card-glass-scale: 13rem;
 
 @media (max-width: 720px) {
   .drink-cards { grid-template-columns: 1fr; }
+}
+
+// #483. Helen, 2026-08-27: "Are screens realistically going to be narrower
+// than about 380px????" Yes, and by the two commonest widths there are: 360px
+// is the dominant Android portrait width and 375px covers the iPhone SE, 8 and
+// 13 mini. 390 and 412 are the larger common ones; 320 is the historical floor
+// and effectively gone.
+//
+// WHAT THAT COSTS AT THE DEFAULT. The card's text column is whatever is left
+// after the glass column, the gutter and the padding, so at 16px/rem:
+//
+//     viewport   card   text column   glass takes
+//        360px   312px      157px         39%
+//        375px   327px      172px         37%
+//        412px   364px      209px         33%
+//
+// 157px is about eighteen characters of Courier Prime, which is where the
+// two-line clamps start cutting real content while the drawing keeps its full
+// column. Losing the tagline helped, as Helen said, but it freed a LINE and
+// this is a WIDTH problem.
+//
+// SHRINKING, NOT STACKING, and the issue already worked out why: the glass
+// column's width is the title's left edge, the foot's left edge and the
+// under-mark's width, so shrinking is one value and stacking is a relayout.
+// 4.6rem gives the text column 205px at 360px -- a third more -- and keeps the
+// card's horizontal shape, which is what makes the grid scannable.
+//
+// The breakpoint is 400px rather than 380: 390px (iPhone 14/15) is inside the
+// range that hurts, and a breakpoint that stops just short of the commonest
+// phone sold is a breakpoint that does not fire.
+@media (max-width: 400px) {
+  :root { --card-text-x: 4.6rem; }
 }
