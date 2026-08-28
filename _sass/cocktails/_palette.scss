@@ -118,7 +118,7 @@ $color-grey-light:   #e4e4e6;
 // MOOD, and the home colour. Absinthe.
 $color-absinthe:      #30E88C;   // rule
 $color-absinthe-deep: #0E8248;   // text  4.71:1
-$color-absinthe-wash: #ECFDF5;   // 9% panel
+$color-absinthe-wash: #ECFDF5;   // 10% panel
 
 // YOLO / GOODNESS. Tangerine.
 $color-tangerine:      #F47E25;  // rule
@@ -140,6 +140,22 @@ $color-ultraviolet-deep: #9A41E7;  // text  4.73:1
 // I KNOW WHAT I WANT. Cyan.
 $color-cyan:      #2ED1EA;        // rule
 $color-cyan-deep: #0E7C8C;        // text  4.74:1
+
+// --- The washes -------------------------------------------------------------
+// A 10% tint of each rule colour on white, for the background of something
+// that has MATCHED. Added 2026-08-28 when the cards turned out to be shouting.
+//
+// TEXT ON A WASH IS INK, NEVER THE DEEP, and that is measured rather than
+// cautious. Each `-deep` is solved to about 4.75:1 against PAPER, so any tint
+// under it pushes the pair below 4.5 -- ultraviolet lands at 4.49 even on a 6%
+// wash. Nudging the deeps darker to compensate would trade the thing they are
+// actually for (readable coloured text on paper) against a case that does not
+// need colour at all. The wash and the border carry the colour; the words stay
+// ink at 16:1.
+$color-tangerine-wash:   #FEF3EB;
+$color-ultraviolet-wash: #F5EDFD;
+$color-magenta-wash:     #FEECF7;
+$color-cyan-wash:        #ECFBFD;
 
 // --- The previous three, as aliases ------------------------------------------
 // Kept so the migration is one commit rather than a rename sweep, and mapped
