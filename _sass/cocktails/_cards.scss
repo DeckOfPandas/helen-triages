@@ -103,7 +103,7 @@ $card-glass-scale: 13rem;
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  background: mix($color-menthe, $color-surface, 9%);
+  background: $color-absinthe-wash;
   transition: background-color 0.12s ease;
 
   svg {
@@ -138,7 +138,7 @@ $card-glass-scale: 13rem;
   transition: background-color 0.12s ease;
 }
 .drink-card-glass::after { top: -1px; background: transparent; }
-.drink-card::after       { bottom: -1px; background: mix($color-menthe, $color-surface, 55%); }
+.drink-card::after       { bottom: -1px; background: mix($color-absinthe, $color-surface, 55%); }
 
 // HOVER: the two marks bracket the glass column, top and bottom.
 // Helen asked for "a very subtle lightening of the white part of the
@@ -147,8 +147,8 @@ $card-glass-scale: 13rem;
 // nowhere lighter to go. Brightening the marks instead says the same thing and
 // moves no large area at all.
 .drink-card:hover {
-  &::after { background: $color-menthe; }
-  .drink-card-glass::after { background: $color-menthe; }
+  &::after { background: $color-absinthe; }
+  .drink-card-glass::after { background: $color-absinthe; }
 }
 
 // --- the words ---------------------------------------------------------------
@@ -167,7 +167,7 @@ $card-glass-scale: 13rem;
   a {
     color: $color-text;
     text-decoration: none;
-    &:hover { color: $color-menthe-deep; }
+    &:hover { color: $color-absinthe-deep; }
   }
 }
 
@@ -197,8 +197,11 @@ $card-glass-scale: 13rem;
 
 // The matched ingredient, in the colour of the field that matched it.
 .drink-card-hit {
-  background: $color-violet;
-  color: darken($color-violet-deep, 25%);
+  background: $color-magenta;
+  // Ink rather than a darkened magenta -- see _filters.scss's note on the same
+  // pair. Magenta's fill is light enough that the darkened deep reaches almost
+  // black before it clears 4.5:1, at which point it is not magenta any more.
+  color: $color-text;
   padding: 0.05em 0.3em;
   font-weight: 600;
 }
@@ -245,11 +248,27 @@ $card-glass-scale: 13rem;
   // ingredient gets — but in MENTHE, because the mood filter is menthe and the
   // ingredient field is violet. The card is answering "why am I here", and it
   // answers in the colour of the control that put it there.
+  // A MATCHED CHIP FILLS IN THE COLOUR OF THE HEADING THAT SELECTED IT. Mood
+  // chips and hassle chips are the same object doing the same job, but they
+  // answer different questions, and a hassle chip lighting up green would
+  // point at the wrong heading -- which is the whole failure this redesign was
+  // for. The group comes from the template (`--hassle`), derived from
+  // taxonomy.yml, so it cannot drift from the buttons above.
   &.is-match {
-    background: $color-menthe;
-    border-color: $color-menthe-deep;
-    color: darken($color-menthe-deep, 22%);
+    background: $color-absinthe;
+    border-color: $color-absinthe-deep;
+    color: darken($color-absinthe-deep, 9%);
     font-weight: 600;
+  }
+
+  // Ultraviolet is the one fill in the set that takes LIGHT text: ink on it is
+  // 3.14:1 and fails, white is 5.47:1, and nothing darkened clears 4.5 at all
+  // because the fill is already dark. See _filters.scss for the same note on
+  // the hassle buttons.
+  &--hassle.is-match {
+    background: $color-ultraviolet;
+    border-color: $color-ultraviolet-deep;
+    color: $color-white;
   }
 }
 
@@ -281,8 +300,8 @@ $card-glass-scale: 13rem;
     display: inline-block;
     width: 0.5rem;
     height: 0.5rem;
-    background: color-mix(in srgb, #{$color-amber} var(--ship-tint, 0%), #{$color-surface});
-    border: 1.5px solid $color-amber-deep;
+    background: color-mix(in srgb, #{$color-tangerine} var(--ship-tint, 0%), #{$color-surface});
+    border: 1.5px solid $color-tangerine-deep;
     margin-left: 0.4rem;
     vertical-align: 0.01rem;
   }

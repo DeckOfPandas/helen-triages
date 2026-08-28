@@ -133,9 +133,37 @@
   &[hidden] { display: none; }
 }
 
-.drink-filter--mood    .btn-clear-filter { color: $color-menthe-deep; &:hover { color: $color-menthe; } }
-.drink-filter--chaos   .btn-clear-filter { color: $color-amber-deep;  &:hover { color: $color-amber; } }
-.drink-search--include .btn-clear-filter { color: $color-violet-deep; &:hover { color: $color-violet; } }
+.drink-filter--mood    .btn-clear-filter { color: $color-absinthe-deep;    &:hover { color: $color-absinthe; } }
+.drink-filter--hassle  .btn-clear-filter { color: $color-ultraviolet-deep; &:hover { color: $color-ultraviolet; } }
+// HASSLE'S BUTTONS ARE .btn-mood TOO, so without this they take MOOD's green
+// and contradict their own ultraviolet heading. They share the class because
+// they share the behaviour -- both write into `chosenMoods` and a drink
+// matching either is matched the same way -- so the colour is overridden here
+// rather than the class being split, which would mean the script tracking two
+// sets that behave identically.
+//
+// ULTRAVIOLET IS THE ONE FILL THAT TAKES LIGHT TEXT. Measured: ink on it is
+// 3.14:1 and fails, white is 5.47:1. Nothing darkened clears 4.5 at all,
+// because the fill is already dark -- a vivid blue-violet has no bright
+// version to be a fill. It is the odd one of the five and this is where that
+// shows.
+.drink-filter--hassle .btn-mood {
+  &:hover,
+  &:focus-visible {
+    border-color: $color-ultraviolet-deep;
+    color: $color-ultraviolet-deep;
+  }
+
+  &.is-on {
+    background: $color-ultraviolet;
+    border-color: $color-ultraviolet-deep;
+    color: $color-white;                        // 5.47:1 on the fill
+  }
+}
+
+.drink-filter--chaos   .btn-clear-filter { color: $color-tangerine-deep;   &:hover { color: $color-tangerine; } }
+.drink-search--include .btn-clear-filter { color: $color-magenta-deep;     &:hover { color: $color-magenta; } }
+.drink-filter--name    .btn-clear-filter { color: $color-cyan-deep;        &:hover { color: $color-cyan; } }
 .drink-search--exclude .btn-clear-filter { color: $color-text;        &:hover { color: $color-clear-text; } }
 
 // --- the buttons -------------------------------------------------------------
@@ -162,17 +190,24 @@
 
   &:hover,
   &:focus-visible {
-    border-color: $color-menthe-deep;
-    color: $color-menthe-deep;
+    border-color: $color-absinthe-deep;
+    color: $color-absinthe-deep;
   }
 
   // A fill, not a border change: with ten of these in a row a 1px border
   // difference is not findable at a glance. Same conclusion the goodness
   // scaffold reached about its own buttons.
+  // ACTIVE TEXT IS SOLVED PER HUE, NOT SET TO ONE DARKEN PERCENTAGE, and the
+  // percentages differing is the point rather than an inconsistency. These
+  // fills are five different lightnesses, so one darken() value gives five
+  // different contrasts -- with the neon palette the old uniform 22%/25% put
+  // MOOD at 10.99:1 (nearly black on bright green) and HAS TO HAVE at 3.61:1,
+  // which fails AA. Each is now solved to about 5.3:1: readable, and still
+  // visibly the section's colour rather than collapsing to black.
   &.is-on {
-    background: $color-menthe;
-    border-color: $color-menthe-deep;
-    color: darken($color-menthe-deep, 22%);
+    background: $color-absinthe;
+    border-color: $color-absinthe-deep;
+    color: darken($color-absinthe-deep, 9%);   // 5.25:1 on the fill
     font-weight: 600;
   }
 }
@@ -191,14 +226,14 @@
 
   &:hover,
   &:focus-visible {
-    border-color: $color-amber-deep;
-    color: $color-amber-deep;
+    border-color: $color-tangerine-deep;
+    color: $color-tangerine-deep;
   }
 
   &.is-on {
-    background: $color-amber;
-    border-color: $color-amber-deep;
-    color: darken($color-amber-deep, 22%);
+    background: $color-tangerine;
+    border-color: $color-tangerine-deep;
+    color: darken($color-tangerine-deep, 23%);  // 5.28:1 on the fill
     font-weight: 600;
   }
 }
@@ -219,13 +254,13 @@
   width: 100%;
   padding: $space-xs 0.1rem;
   border: none;
-  border-bottom: 1.5px solid $color-violet;
+  border-bottom: 1.5px solid $color-magenta;
   background: transparent;
   margin-bottom: $space-md;
 
   &:focus {
     outline: none;
-    border-bottom-color: $color-violet-deep;
+    border-bottom-color: $color-magenta-deep;
   }
 }
 
@@ -252,14 +287,17 @@
 
   &:hover,
   &:focus-visible {
-    border-color: $color-violet-deep;
-    color: $color-violet-deep;
+    border-color: $color-magenta-deep;
+    color: $color-magenta-deep;
   }
 
   &.is-on {
-    background: $color-violet;
-    border-color: $color-violet-deep;
-    color: darken($color-violet-deep, 25%);
+    background: $color-magenta;
+    border-color: $color-magenta-deep;
+    // Ink, not a darkened magenta. Magenta's fill is light enough that the
+    // darkened deep has to go almost to black (41%) before it clears 4.5 --
+    // at which point it is not magenta any more, so the honest version is ink.
+    color: $color-text;                         // 4.57:1 on the fill
     font-weight: 600;
   }
 }
@@ -306,7 +344,7 @@
   color: $color-clear-text;
   margin: $spacing-block-gap 0 $space-xl;
   padding-top: $space-md;
-  border-top: 2px solid $color-amber;
+  border-top: 2px solid $color-tangerine;
 
   strong { color: $color-text; font-size: 1rem; }
 }

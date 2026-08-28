@@ -324,7 +324,7 @@ permalink: /cocktails/
 
         <div class="drink-card-foot">
           <span class="drink-card-moods">
-            {% for m in drink.mood %}<span class="drink-card-mood" data-mood="{{ m }}">{{ m }}</span>{% endfor %}
+            {% comment %} A chip fills in ITS GROUP'S colour rather than one shared colour, so a hassle chip lighting up matches the ultraviolet heading that selected it and not the green one that did not. The group is derived from taxonomy.yml here rather than stored on the drink, because it is a property of the MOOD and a drink that gains a mood should not need retyping. {% endcomment %}{% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<span class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}">{{ m }}</span>{% endfor %}
           </span>
           <span class="drink-card-ship" style="--ship-tint: {{ tint }}%;">{{ ship }}</span>
         </div>
