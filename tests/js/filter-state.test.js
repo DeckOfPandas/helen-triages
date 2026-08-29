@@ -450,3 +450,143 @@ test('a Set field given a non-array is ignored, not coerced', () => {
   const back = FS.deserialise({ tags: 'soup' });
   assert.strictEqual(back.tags.size, 0);
 });
+
+// =============================================================================
+// ONE MECHANISM, TWO TABLES — GitHub issue #579
+// =============================================================================
+// The cocktail index held five loose variables (chosenMoods, chosenChaos,
+// wantName, include, exclude) and six hand-written showClear() calls, which is
+// the shape food's filter state had before issue #52 — and issue #541 asks for
+// a clear-all button on that page, "very much like food site". Clear-all is the
+// exact feature whose visibility predicate drifted from its clearing three
+// times in two days here.
+//
+// So the mechanism is parameterised rather than copied, and every generated
+// case above is re-run below against every declared table. SPECS is derived
+// from the module's own exports, so a table added to filter-state.js is covered
+// by the line that declares it and there is no list of specs to keep in step.
+
+// Detected by SHAPE, not by name. `/_FIELDS$/` was the obvious spelling and it
+// swept up NARROWING_FIELDS, which is a list of names rather than a table — so
+// the generated cases ran over array indices and every one of them failed. A
+// spec is a mapping whose every value declares an empty() factory; nothing else
+// in this module's exports looks like that.
+const isFieldSpec = (v) =>
+  !!v && typeof v === 'object' && !Array.isArray(v) &&
+  Object.keys(v).length > 0 &&
+  Object.keys(v).every((f) => v[f] && typeof v[f].empty === 'function');
+
+const SPECS = Object.keys(FS).filter((k) => isFieldSpec(FS[k])).map((k) => [k, FS[k]]);
+
+test('every declared field table is exercised, and there is more than one', () => {
+  assert.ok(
+    SPECS.length > 1,
+    'filter-state.js exports fewer than two *_FIELDS tables. The parameterisation ' +
+    'exists because there are two indexes; with one table it is machinery for ' +
+    'nothing and should be collapsed back deliberately rather than left standing.'
+  );
+  assert.deepStrictEqual(SPECS.map(([name]) => name).sort(), ['COCKTAIL_FIELDS', 'FOOD_FIELDS']);
+});
+
+SPECS.forEach(([name, spec]) => {
+  const S = FS.create(spec);
+
+  const only = (field) => {
+    const state = S.emptyState();
+    state[field] = aNonEmptyValueLike(state[field], `${name}.${field}`);
+    return state;
+  };
+
+  test(`${name}: FIELDS is exactly the keys of a cleared state`, () => {
+    assert.ok(S.FIELDS.length > 0);
+    assert.deepStrictEqual(Object.keys(S.emptyState()).sort(), S.FIELDS.slice().sort());
+  });
+
+  test(`${name}: a cleared state has nothing to clear`, () => {
+    assert.strictEqual(S.hasAnythingToClear(S.emptyState()), false);
+    assert.strictEqual(S.hasNarrowingFilter(S.emptyState()), false);
+  });
+
+  test(`${name}: every empty() is a FACTORY, so no two states share a Set`, () => {
+    // A shared empty Set handed out twice is one Set mutated from two places,
+    // and the symptom is a filter appearing on a page nobody set it on.
+    const a = S.emptyState();
+    const b = S.emptyState();
+    S.FIELDS.forEach((f) => {
+      if (a[f] && typeof a[f].size === 'number') {
+        assert.notStrictEqual(a[f], b[f], `${f} hands out the same Set twice`);
+      }
+    });
+  });
+
+  S.FIELDS.forEach((field) => {
+    test(`${name}: with only "${field}" set, there is something to clear`, () => {
+      assert.strictEqual(
+        S.hasAnythingToClear(only(field)), true,
+        `hasAnythingToClear() ignores "${field}", so a clear-all button would ` +
+        `hide while it still had work to do.`
+      );
+    });
+  });
+
+  S.NARROWING_FIELDS.forEach((field) => {
+    test(`${name}: "${field}" narrows, so it must also be clearable`, () => {
+      assert.strictEqual(S.hasNarrowingFilter(only(field)), true);
+      assert.strictEqual(S.hasAnythingToClear(only(field)), true);
+    });
+  });
+
+  test(`${name}: a full state survives serialise -> deserialise, Sets included`, () => {
+    // JSON.stringify(new Set()) is `{}` — not an error, not an empty array,
+    // just silently nothing. That is why serialise() exists at all.
+    const dirty = S.emptyState();
+    S.FIELDS.forEach((f) => { dirty[f] = aNonEmptyValueLike(dirty[f], `${name}.${f}`); });
+    const back = S.deserialise(JSON.parse(JSON.stringify(S.serialise(dirty))));
+    S.FIELDS.forEach((f) => {
+      assert.strictEqual(S.isFieldSet(back[f]), true, `${f} came back empty`);
+    });
+  });
+
+  test(`${name}: a malformed record falls back to empty rather than throwing`, () => {
+    [null, undefined, 'nonsense', 42, [], {}].forEach((bad) => {
+      assert.strictEqual(S.hasAnythingToClear(S.deserialise(bad)), false);
+    });
+  });
+});
+
+// --- what the cocktail table must actually hold ------------------------------
+// Named rather than generated, because these are claims about the DESIGN of
+// that index rather than about the mechanism: a field quietly leaving this
+// table would take a whole filter off the clear-all button, silently.
+
+test("the cocktail table covers all five of the index's named questions", () => {
+  const S = FS.create(FS.COCKTAIL_FIELDS);
+  ['moods', 'chaos', 'include', 'exclude', 'nameQuery'].forEach((f) => {
+    assert.ok(S.FIELDS.indexOf(f) !== -1, `the cocktail index has no "${f}" field`);
+    assert.ok(S.NARROWING_FIELDS.indexOf(f) !== -1, `"${f}" does not narrow the list`);
+  });
+});
+
+test('a half-typed cocktail search is clearable but does not narrow', () => {
+  // isSearching's siblings — issue #274 on the food side, declared here rather
+  // than rediscovered. Typing "gi" into HAS TO HAVE and picking nothing leaves
+  // a pool of chips with no other way to dismiss them but deleting the text.
+  const S = FS.create(FS.COCKTAIL_FIELDS);
+  ['isIncludeSearching', 'isExcludeSearching'].forEach((f) => {
+    const state = S.emptyState();
+    state[f] = true;
+    assert.strictEqual(S.hasAnythingToClear(state), true, `${f} is not clearable`);
+    assert.strictEqual(S.hasNarrowingFilter(state), false, `${f} should not narrow`);
+  });
+});
+
+test('the two tables are genuinely different -- this is not one index twice', () => {
+  const food = FS.create(FS.FOOD_FIELDS).FIELDS;
+  const cocktail = FS.create(FS.COCKTAIL_FIELDS).FIELDS;
+  assert.ok(
+    food.some((f) => cocktail.indexOf(f) === -1),
+    'every food field also exists on the cocktail index. If the two really do ' +
+    'ask the same questions, share one table deliberately rather than keeping two.'
+  );
+  assert.ok(cocktail.some((f) => food.indexOf(f) === -1));
+});

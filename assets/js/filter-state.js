@@ -224,15 +224,72 @@
     isExcludeSearching: { empty: function () { return false; }, narrows: false }
   };
 
-  // Derived, never hand-maintained: these two are why adding a field to
-  // FIELD_SPEC is the whole change.
+  /* THE COCKTAIL INDEX'S FIELDS — GitHub issue #579.
+     ---------------------------------------------------------------------------
+     A SECOND TABLE, NOT A SECOND MECHANISM, and the distinction is the whole
+     decision. Everything below the tables -- emptyState, hasAnythingToClear,
+     serialise, the generated per-field test cases -- is written once and takes
+     a spec. The tables are separate because the two indexes genuinely ask
+     different questions: there is no cocktail equivalent of a star ingredient,
+     and no food equivalent of chaos.
+
+     WHY THIS IS WORTH DOING AT ALL, rather than leaving cocktail-index.js its
+     five loose variables: issue #541 asks for a clear-all button on this page,
+     "very much like food site". Food's clear-all is the exact feature that
+     produced the bug three times in two days -- clearAllFilters() emptied N
+     things and the button's visibility predicate checked N-1, so it hid while
+     it still had work to do. Building #541 on five loose variables and six
+     hand-written showClear() calls is that bug's own conditions, reassembled.
+
+     What each field is, and what the page does with it:
+
+       moods      Set, MOOD and HASSLE together. One filter with two headings --
+                  a drink matching either is matched the same way -- and the
+                  headings only differ in which CLEAR link owns them.
+       chaos      string|null. `good` narrows; `open` is a visible STATE that
+                  applies no filter at all, which is the #478 fix rather than an
+                  oversight (the button for "I'll try anything" used to be the
+                  one button guaranteed to hide all 55 of the best drinks). It
+                  is still CLEARABLE while set, because the button is lit.
+       include    Set of pool entries, AND between them: adding an ingredient
+                  means "and this one too", which is how a cupboard works.
+       exclude    Set of pool entries, matched EXACTLY or through a declared
+                  family -- see assets/js/cocktail-search.js for why exclusion
+                  is the strict direction.
+       nameQuery  I KNOW WHAT I WANT, folded and lowercased by the wiring. */
+  var COCKTAIL_FIELD_SPEC = {
+    moods: { empty: function () { return new Set(); }, narrows: true },
+    chaos: { empty: function () { return null; }, narrows: true },
+    include: { empty: function () { return new Set(); }, narrows: true },
+    exclude: { empty: function () { return new Set(); }, narrows: true },
+    nameQuery: { empty: function () { return ''; }, narrows: true },
+
+    /* isSearching's two siblings, and they are here for the reason its own
+       entry above gives: clear-all DOES empty these boxes and their candidate
+       pools, so the clear button must offer itself while one is set. Typing
+       "gi" into HAS TO HAVE and picking nothing leaves a pool of chips on
+       screen with no other way to dismiss them but deleting the text by hand.
+       That is issue #274 on the food side, and it is cheaper to declare the
+       field than to rediscover it here. */
+    isIncludeSearching: { empty: function () { return false; }, narrows: false },
+    isExcludeSearching: { empty: function () { return false; }, narrows: false }
+  };
+
+  // Derived, never hand-maintained: these two are why adding a field to a spec
+  // is the whole change.
   var FIELDS = Object.keys(FIELD_SPEC);
   var NARROWING_FIELDS = FIELDS.filter(function (f) { return FIELD_SPEC[f].narrows; });
 
+  /* Every function below takes the SPEC it is working from, and `create(spec)`
+     at the foot of the file binds one to a table. The food-shaped names this
+     module has always exported (emptyState, hasAnythingToClear, ...) are that
+     binding over FIELD_SPEC, so filters.js and every existing test are
+     untouched by the parameterisation. */
+
   // A fresh, fully-cleared state. What clearAllFilters() assigns.
-  function emptyState() {
+  function emptyStateFor(spec) {
     var state = {};
-    FIELDS.forEach(function (f) { state[f] = FIELD_SPEC[f].empty(); });
+    Object.keys(spec).forEach(function (f) { state[f] = spec[f].empty(); });
     return state;
   }
 
@@ -252,12 +309,8 @@
      button's visibility, and it must agree with what clear-all actually
      clears, or the button hides while still having work to do. It agrees by
      construction: clear-all assigns emptyState(), and both walk FIELDS. */
-  function hasAnythingToClear(state) {
-    return FIELDS.some(function (f) { return isFieldSet((state || {})[f]); });
-  }
-
-  function isEmpty(state) {
-    return !hasAnythingToClear(state);
+  function hasAnythingToClearFor(spec, state) {
+    return Object.keys(spec).some(function (f) { return isFieldSet((state || {})[f]); });
   }
 
   /* ---------------------------------------------------------------------------
@@ -327,8 +380,9 @@
      suppressList, which decides whether the list hides behind the "searching"
      message. Hence NARROWING_FIELDS rather than FIELDS: see `ingredient` and
      `isSearching` in FIELD_SPEC for why each is excluded. */
-  function hasNarrowingFilter(state) {
-    return NARROWING_FIELDS.some(function (f) { return isFieldSet((state || {})[f]); });
+  function hasNarrowingFilterFor(spec, state) {
+    return Object.keys(spec).filter(function (f) { return spec[f].narrows; })
+      .some(function (f) { return isFieldSet((state || {})[f]); });
   }
 
   // ---------------------------------------------------------------------------
@@ -351,9 +405,9 @@
   // table is serialised, restored and defaulted with no change to this code.
   // Each field's shape is read from its own `empty()` value rather than from a
   // list of names — the same reasoning isFieldSet() already uses.
-  function serialise(state) {
+  function serialiseFor(spec, state) {
     var out = {};
-    FIELDS.forEach(function (f) {
+    Object.keys(spec).forEach(function (f) {
       var value = state ? state[f] : undefined;
       // Duck-typed rather than `instanceof Set` — see isFieldSet() for why that
       // is false across a realm boundary.
@@ -374,12 +428,12 @@
      left from a build where a field meant something else — and the cost of a
      bad restore is an index that looks wrong with no way to tell why, while the
      cost of falling back is one unfiltered page. */
-  function deserialise(raw) {
-    var state = emptyState();
+  function deserialiseFor(spec, raw) {
+    var state = emptyStateFor(spec);
     if (!raw || typeof raw !== 'object') return state;
-    FIELDS.forEach(function (f) {
+    Object.keys(spec).forEach(function (f) {
       if (!(f in raw)) return;
-      var blank = FIELD_SPEC[f].empty();
+      var blank = spec[f].empty();
       var value = raw[f];
       if (blank instanceof Set) {
         if (Array.isArray(value)) state[f] = new Set(value);
@@ -394,21 +448,59 @@
     return state;
   }
 
+  /* ONE MECHANISM BOUND TO ONE TABLE — GitHub issue #579.
+
+     Everything a caller wants, derived from the spec it is handed and from
+     nothing else. Two indexes, two tables, and no second copy of the reasoning
+     that keeps a clear-all button honest.
+
+     The returned object is the whole contract: a caller never sees the spec
+     again, which is what stops a call site quietly reaching past the mechanism
+     to a field list of its own -- the exact move that produced the food bug
+     this file was written for. */
+  function create(spec) {
+    var fields = Object.keys(spec);
+    return {
+      FIELDS: fields,
+      NARROWING_FIELDS: fields.filter(function (f) { return spec[f].narrows; }),
+      emptyState: function () { return emptyStateFor(spec); },
+      isFieldSet: isFieldSet,
+      hasAnythingToClear: function (state) { return hasAnythingToClearFor(spec, state); },
+      isEmpty: function (state) { return !hasAnythingToClearFor(spec, state); },
+      hasNarrowingFilter: function (state) { return hasNarrowingFilterFor(spec, state); },
+      serialise: function (state) { return serialiseFor(spec, state); },
+      deserialise: function (raw) { return deserialiseFor(spec, raw); }
+    };
+  }
+
+  // The food index's binding, exported under the names this module has always
+  // used, so filters.js is untouched by any of the above.
+  var food = create(FIELD_SPEC);
+
   var api = {
     KINDS: KINDS,
     EXCLUDE_PREFIX: EXCLUDE_PREFIX,
     parseQuery: parseQuery,
-    serialise: serialise,
-    deserialise: deserialise,
+    serialise: food.serialise,
+    deserialise: food.deserialise,
     FIELDS: FIELDS,
     NARROWING_FIELDS: NARROWING_FIELDS,
-    emptyState: emptyState,
+    emptyState: food.emptyState,
     isFieldSet: isFieldSet,
     FAMILY_SUFFIX: FAMILY_SUFFIX,
     excludesRow: excludesRow,
-    hasAnythingToClear: hasAnythingToClear,
-    isEmpty: isEmpty,
-    hasNarrowingFilter: hasNarrowingFilter
+    hasAnythingToClear: food.hasAnythingToClear,
+    isEmpty: food.isEmpty,
+    hasNarrowingFilter: food.hasNarrowingFilter,
+
+    // The two tables, and the factory that binds either. FOOD_FIELDS is the
+    // same object the food-shaped exports above are bound to, exported so a
+    // test can generate its per-field cases from whichever spec it is checking
+    // rather than from a hand-written list -- which is the omission problem
+    // this whole file exists to remove.
+    create: create,
+    FOOD_FIELDS: FIELD_SPEC,
+    COCKTAIL_FIELDS: COCKTAIL_FIELD_SPEC
   };
 
   if (typeof module !== 'undefined' && module.exports) {
