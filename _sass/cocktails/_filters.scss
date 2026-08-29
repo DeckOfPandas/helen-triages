@@ -264,6 +264,21 @@
   }
 }
 
+// #588, and #548 point 6 is the same line. THREE inputs share this rule and the
+// magenta was written once, for HAS TO HAVE: LEAVE OUT overrides it below
+// (dashed, borderless grey) and I KNOW WHAT I WANT never did, so the name box
+// wore the include section's colour.
+//
+// §9.13's rule is that a heading's colour is a promise the page keeps, and this
+// section's is luminous-lagoon -- the same hue the matched run of a drink name
+// is banded in (.drink-name-hit). An underline in magenta under a lagoon
+// heading says the box belongs to the section above it, which it does not.
+.drink-filter--name .drink-search-input {
+  border-bottom-color: $color-luminous-lagoon;
+
+  &:focus { border-bottom-color: $color-luminous-lagoon-deep; }
+}
+
 .drink-pool {
   display: flex;
   flex-wrap: wrap;

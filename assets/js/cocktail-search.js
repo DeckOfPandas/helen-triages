@@ -153,6 +153,33 @@
     var familyOfGeneric = voc.family_of || {};
     var cardNames = voc.card_names || {};
     var familyAliases = voc.family_aliases || {};
+    var familyLabels = voc.family_labels || {};
+
+    /* What the (all) button SAYS, which is not always the family's key --
+       `family_labels` in the vocabulary. Helen, 2026-08-29: "I think that chip
+       should be 'whisk(e)y (all)', even though it's clunky, to avoid ever
+       having to split or claim they combine."
+
+       A LABEL RATHER THAN A RENAME, and the reason is mechanical: a
+       `<family>_characters` list is keyed off the family's name (see
+       test_a_declared_character_vocabulary_is_enforced, which strips that
+       suffix), so renaming the family would drag `whisk(e)y_characters` along
+       with it. Same separation `card_names` already draws for generics --
+       matching runs on the key, the button shows the name. */
+    function labelForFamily(family) {
+      return familyLabels[family] || family;
+    }
+
+    // Every spelling a family answers to: its key, its display label, and any
+    // declared alias. One list, used both to find the family and to resolve a
+    // chip back to it, so the two can never disagree about what counts.
+    function namesForFamily(family) {
+      var names = [family, labelForFamily(family)];
+      Object.keys(familyAliases).forEach(function (alias) {
+        if (familyAliases[alias] === family) names.push(alias);
+      });
+      return names;
+    }
 
     /* ONE CHIP PER CATEGORY, CARRYING THE CARD'S NAME FOR IT — Helen's ruling,
        2026-08-29, looking at `aged rum` and `moderately aged rum` offered as two
@@ -345,17 +372,27 @@
              umbrella called "scotch (all)" would be an umbrella lying about its
              own width -- the family holds bourbon and rye. Saying `whisky` on
              the button is what makes that visible instead. */
-          var names = [family];
-          Object.keys(familyAliases).forEach(function (alias) {
-            if (familyAliases[alias] === family) names.push(alias);
-          });
-          if (!names.some(function (n) { return normalise(n).indexOf(query) === 0; })) return;
+          var label = labelForFamily(family);
+
+          /* ALREADY CHOSEN, SO NOT OFFERED AGAIN. The chosen chips are drawn
+             first and the search's results after them; pool candidates were
+             filtered against `chosen` and family buttons were NOT, so an
+             umbrella you had already picked came straight back round as an
+             offer and rendered twice -- Helen, with the screenshot: "If I click
+             'whiskey (all)', I see the same button again." Same class of
+             omission as #390's dropped flag: the answer was computed and one of
+             the two consumers ignored it. */
+          if (taken.indexOf(normalise(label + FAMILY_SUFFIX)) !== -1) return;
+
+          if (!namesForFamily(family).some(function (n) {
+            return normalise(n).indexOf(query) === 0;
+          })) return;
 
           var present = (pool || []).some(function (chip) {
             var terms = (chip && chip.terms) ? chip.terms : [chip];
             return terms.some(function (t) { return familiesOf(t).indexOf(family) !== -1; });
           });
-          if (present) familyButtons.push(family);
+          if (present) familyButtons.push(label);
         });
       }
 
@@ -416,11 +453,19 @@
       });
     }
 
+    /* An (all) chip back to the family it stands for. Resolved through EVERY
+       name the family answers to, not just its key, because the chip carries
+       the display label -- `whisk(e)y (all)` has to find `whisky`. Sharing
+       namesForFamily with the button builder is what stops a label that can be
+       offered but not applied. */
     function chipFamily(chip) {
       var wanted = familyKey(chip);
       var hit = null;
       families.forEach(function (family) {
-        if (normalise(family) === wanted) hit = family;
+        if (hit) return;
+        if (namesForFamily(family).some(function (n) { return normalise(n) === wanted; })) {
+          hit = family;
+        }
       });
       return hit;
     }

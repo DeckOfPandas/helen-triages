@@ -82,6 +82,29 @@ family_aliases:
   rhum: rum
   ron: rum
 
+# --- what the (all) button SAYS ----------------------------------------------
+# Helen, 2026-08-29, on the whisky umbrella: "I think that chip should be
+# 'whisk(e)y (all)', even though it's clunky, to avoid ever having to split or
+# claim they combine."
+#
+# The clunkiness IS the point. Either spelling on the button is a claim about
+# which drinks are in it -- `whisky (all)` reads as excluding the Irish and the
+# bourbon, `whiskey (all)` as excluding the scotch -- and the family holds all
+# of them. A name that refuses to choose is the only one that describes it.
+#
+# A LABEL, NOT A RENAME OF THE FAMILY, and the reason is mechanical rather than
+# aesthetic: `whisky_characters` is keyed off the family's name --
+# test_a_declared_character_vocabulary_is_enforced strips the `_characters`
+# suffix to find it -- so renaming the family would drag `whisk(e)y_characters`
+# along with it and put parentheses into a key three tests derive by string
+# surgery. Same separation `card_names` already draws for generics: matching
+# runs on the key, the button shows the name.
+#
+# A family with no entry here keeps its own name, which is right for all nine
+# others: nobody spells `gin` two ways.
+family_labels:
+  whisky: "whisk(e)y"
+
 # --- spirit families: FOR SEARCH AND EXCLUSION, NOT A BROWSE AXIS ------------
 # THIS IS NOT A "SORTED BY SPIRIT" MENU, and that is deliberate. Helen,
 # 2026-08-17: "I get really bored of cocktail bars that have enormous

@@ -30,6 +30,7 @@ const VOCAB = {
   search: { min_query_chars: 2, family_button_min_chars: 3, pool_cap: 8 },
   families: ['rum', 'gin', 'whisky', 'amaro'],
   family_aliases: { whiskey: 'whisky', scotch: 'whisky', rhum: 'rum' },
+  family_labels: { whisky: 'whisk(e)y' },
   family_of: {
     'London dry gin': 'gin',
     'Old Tom': 'gin',
@@ -242,35 +243,91 @@ test('the (all) button carries the suffix filter-state.js already spells', () =>
 // "'whiskey (all)' should return all whisky and bourbon and rye, and the same
 // for 'whisky'." The family already HELD all three; the spelling found nothing.
 
-test('an alias spelling reaches the family, and the button keeps the canonical name', () => {
+test('an alias spelling reaches the family, whatever the button ends up called', () => {
   const pool = S.buildPool([attr('bourbon', 'rye')]);
-  assert.deepStrictEqual(S.search('whisky', pool).familyButtons, ['whisky']);
-  assert.deepStrictEqual(S.search('whiskey', pool).familyButtons, ['whisky']);
-  assert.deepStrictEqual(S.search('scotch', pool).familyButtons, ['whisky']);
+  ['whisky', 'whiskey', 'scotch'].forEach((typed) => {
+    assert.strictEqual(S.search(typed, pool).familyButtons.length, 1, typed);
+  });
 });
 
 test('an alias never mints a SECOND umbrella, which would lie about its width', () => {
-  // `whisky (all)` holds bourbon and rye. A button labelled "scotch (all)"
-  // returning bourbon is an umbrella misdescribing itself, so the canonical
-  // name is what appears -- Helen was shown that trade and asked for it.
+  // The whisky family holds bourbon and rye. A button labelled "scotch (all)"
+  // returning bourbon is an umbrella misdescribing itself, so one button
+  // appears and it carries the family's own name -- Helen was shown that trade
+  // and asked for the alias anyway.
   const pool = S.buildPool([attr('bourbon', 'rye')]);
   const buttons = S.search('scotch', pool).familyButtons;
   assert.strictEqual(buttons.length, 1);
-  assert.strictEqual(buttons[0], 'whisky');
+  assert.strictEqual(buttons[0], 'whisk(e)y');
 });
 
-test('whisky (all) takes the bourbon and the rye with it', () => {
+test('the whisky umbrella takes the bourbon and the rye with it', () => {
   const bourbon = CS.splitEntries(attr('bourbon', 'lemon juice'));
   const rye = CS.splitEntries(attr('rye'));
   const gin = CS.splitEntries(attr('old tom'));
-  assert.strictEqual(S.matchesInclude(bourbon, 'whisky (all)'), true);
-  assert.strictEqual(S.matchesInclude(rye, 'whisky (all)'), true);
-  assert.strictEqual(S.matchesInclude(gin, 'whisky (all)'), false);
+  assert.strictEqual(S.matchesInclude(bourbon, 'whisk(e)y (all)'), true);
+  assert.strictEqual(S.matchesInclude(rye, 'whisk(e)y (all)'), true);
+  assert.strictEqual(S.matchesInclude(gin, 'whisk(e)y (all)'), false);
 });
 
 test('an alias that names no family is still just a word', () => {
   const pool = S.buildPool([attr('bourbon')]);
   assert.deepStrictEqual(S.search('vodka', pool).familyButtons, []);
+});
+
+test('an (all) button already chosen is not offered a SECOND time', () => {
+  // Helen, 2026-08-29, with a screenshot of `whisky (all)` rendered twice --
+  // once filled because it was selected, once plain beside it: "If I click
+  // 'whiskey (all)', I see the same button again."
+  //
+  // The chosen chips are drawn first, then the search's results. Pool
+  // candidates were filtered against what was already chosen and FAMILY
+  // BUTTONS were not, so an umbrella you had picked came back round as an
+  // offer. Same class of omission as issue #390's dropped flag: the answer was
+  // computed correctly and one of the two consumers ignored it.
+  const pool = S.buildPool([attr('bourbon', 'rye')]);
+  assert.deepStrictEqual(S.search('whi', pool).familyButtons, ['whisk(e)y']);
+  assert.deepStrictEqual(S.search('whi', pool, ['whisk(e)y (all)']).familyButtons, []);
+});
+
+test('choosing one family does not hide another', () => {
+  const pool = S.buildPool([attr('bourbon', 'old tom')]);
+  assert.deepStrictEqual(S.search('gin', pool, ['whisk(e)y (all)']).familyButtons, ['gin']);
+});
+
+// --- the family's own display name -------------------------------------------
+// Helen, 2026-08-29: "I think that chip should be 'whisk(e)y (all)', even though
+// it's clunky, to avoid ever having to split or claim they combine."
+//
+// A DISPLAY LABEL, not a rename of the family. `whisky_characters` is keyed off
+// the family name by test_a_declared_character_vocabulary_is_enforced (it
+// strips the `_characters` suffix), so renaming the family would drag
+// `whisk(e)y_characters` along with it. Same separation `card_names` already
+// draws for generics: matching runs on the key, the button shows the name.
+
+test('a family with a declared label wears it on the button', () => {
+  const pool = S.buildPool([attr('bourbon', 'rye')]);
+  assert.deepStrictEqual(S.search('whisky', pool).familyButtons, ['whisk(e)y']);
+  assert.deepStrictEqual(S.search('whiskey', pool).familyButtons, ['whisk(e)y']);
+  assert.deepStrictEqual(S.search('scotch', pool).familyButtons, ['whisk(e)y']);
+});
+
+test('a family with no declared label keeps its own name', () => {
+  const pool = S.buildPool([attr('old tom')]);
+  assert.deepStrictEqual(S.search('gin', pool).familyButtons, ['gin']);
+});
+
+test('the labelled chip still filters by the family underneath it', () => {
+  const bourbon = CS.splitEntries(attr('bourbon'));
+  const gin = CS.splitEntries(attr('old tom'));
+  assert.strictEqual(S.matchesInclude(bourbon, 'whisk(e)y (all)'), true);
+  assert.strictEqual(S.matchesExclude(bourbon, 'whisk(e)y (all)'), true);
+  assert.strictEqual(S.matchesInclude(gin, 'whisk(e)y (all)'), false);
+});
+
+test('the label is reachable by typing it, parentheses and all', () => {
+  const pool = S.buildPool([attr('bourbon')]);
+  assert.deepStrictEqual(S.search('whisk(e)', pool).familyButtons, ['whisk(e)y']);
 });
 
 // =============================================================================
