@@ -58,54 +58,98 @@ permalink: /cocktails/
     {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
   {% endfor %}
 
+  {% comment %} ===========================================================
+     THE ORDER IS THE DIAGNOSIS, NOT A LAYOUT. Helen, 2026-08-27: "I feel like
+     I am doing work to understand what to click in order to maximise my chance
+     of getting the drink I want."
+
+     The page used to ask ONE question -- "what do you fancy?" -- and offer ten
+     answers belonging to three different ones. "No juicing" is not a flavour;
+     "I want to faff" is not a mood. Sorting them into questions was work the
+     reader was doing silently, every visit.
+
+     So: five questions, each named, in the order Helen actually asks them.
+     Chaos comes FIRST because it is the widest cut and the one that changes
+     with the occasion -- hosting versus a Tuesday. Mood and hassle are the two
+     halves of "what do I want", split because they are different halves. The
+     ingredient fields narrow. And I KNOW WHAT I WANT is last because it is the
+     way PAST all of it: food has had that escape hatch since the beginning and
+     this page had none.
+  ========================================================================= {% endcomment %}
   <div class="drink-filters">
 
     {% comment %} Each section clears only itself — #488. The buttons are real
        <button>s and start hidden; the script shows one the moment its own
        filter has something in it. {% endcomment %}
-    <div class="drink-filter--mood">
-    <div class="drink-label-row">
-      <p class="drink-field-label">What do you fancy?</p>
-      <button type="button" class="btn-clear-filter" id="clear-mood" hidden>&times; clear</button>
-    </div>
-    <div class="drink-btns">
-      {% comment %} A MOOD WITH NO DRINKS RENDERS NO BUTTON. taxonomy.yml says
-         so outright about `pudding in a glass`, which is declared with zero
-         members on purpose — it is a spec, not an inventory. Counting the
-         members here rather than listing exceptions means the rule holds for
-         whichever mood is empty next. {% endcomment %}
-      {% for mood in taxonomy.moods %}
-        {% assign name = mood[0] %}
-        {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
-        {% if members.size > 0 %}
-          <button type="button" class="btn-mood" data-mood="{{ name }}" aria-pressed="false">
-            {{ name }}
-          </button>
-        {% endif %}
-      {% endfor %}
+
+    {% comment %} 1. CHAOS, and the wording is load-bearing. It used to be
+       "definitely good" / "YOLO", where YOLO meant ship is NOT yes-or-better
+       -- so the button for "I'll try anything" was the one button guaranteed
+       to hide all 55 of the best drinks. Helen: "'I'm open to chaos'...
+       includes all drinks, not just not-known-to-be-definitely-good drinks."
+       `open` is therefore a visible state that applies NO filter, rather than
+       a second filter. {% endcomment %}
+    <div class="drink-filter drink-filter--chaos">
+      <div class="drink-label-row">
+        <h2 class="drink-field-label">YOLO?</h2>
+        <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
+      </div>
+      <div class="drink-btns">
+        <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false">no chaos please</button>
+        <button type="button" class="btn-chaos" data-chaos="open" aria-pressed="false">I&rsquo;m open to chaos</button>
+      </div>
     </div>
 
+    {% comment %} 2 and 3. MOOD and HASSLE, from taxonomy.yml's `mood_groups`.
+       The split is in DATA rather than here, so a mood added tomorrow lands in
+       a named group or fails a test -- see
+       test_every_mood_belongs_to_exactly_one_group.
+
+       A MOOD WITH NO DRINKS RENDERS NO BUTTON. taxonomy.yml says so outright
+       about `pudding in a glass`, declared with zero members on purpose: it is
+       a spec, not an inventory. Counting members here rather than listing
+       exceptions means the rule holds for whichever mood is empty next.
+    {% endcomment %}
+    {% assign groups = taxonomy.mood_groups %}
+
+    <div class="drink-filter drink-filter--mood">
+      <div class="drink-label-row">
+        <h2 class="drink-field-label">Mood</h2>
+        <button type="button" class="btn-clear-filter" id="clear-mood" hidden>&times; clear</button>
+      </div>
+      <div class="drink-btns">
+        {% for name in groups.mood %}
+          {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
+          {% if members.size > 0 %}
+            <button type="button" class="btn-mood" data-mood="{{ name }}" aria-pressed="false">{{ name }}</button>
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
 
-    <div class="drink-filter--chaos">
-    <div class="drink-label-row" style="margin-top: 1.5rem;">
-      <p class="drink-field-label">How much chaos?</p>
-      <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
-    </div>
-    <div class="drink-btns">
-      {% comment %} Two buckets, from taxonomy.yml's `chaos`: `definitely good`
-         is ship yes or oh gods yes, `YOLO` is everything else. Written as a
-         data attribute the script can test rather than as a list of ship
-         values here, so the definition stays in one place. {% endcomment %}
-      <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false">definitely good</button>
-      <button type="button" class="btn-chaos" data-chaos="yolo" aria-pressed="false">YOLO</button>
-    </div>
+    <div class="drink-filter drink-filter--hassle">
+      <div class="drink-label-row">
+        <h2 class="drink-field-label">Hassle</h2>
+        <button type="button" class="btn-clear-filter" id="clear-hassle" hidden>&times; clear</button>
+      </div>
+      <div class="drink-btns">
+        {% for name in groups.hassle %}
+          {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
+          {% if members.size > 0 %}
+            <button type="button" class="btn-mood" data-mood="{{ name }}" aria-pressed="false">{{ name }}</button>
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
 
+    {% comment %} 4. The ingredient fields. HAS TO HAVE carries magenta and
+       LEAVE OUT carries no colour at all — Helen: "for food, avoiding can be
+       important whereas for drinks surely less so." Food gave its LEAVE OUT a
+       sixth hue; this deliberately does not. {% endcomment %}
     <div class="drink-searches">
-      <div class="drink-search drink-search--include">
+      <div class="drink-filter drink-search drink-search--include">
         <div class="drink-label-row">
-          <label class="drink-field-label" for="drink-include">Has to have</label>
+          <h2 class="drink-field-label"><label for="drink-include">Has to have</label></h2>
           <button type="button" class="btn-clear-filter" id="clear-include" hidden>&times; clear</button>
         </div>
         <input class="drink-search-input" type="text" id="drink-include"
@@ -113,15 +157,31 @@ permalink: /cocktails/
         <div class="drink-pool" id="drink-include-pool" aria-live="polite"></div>
       </div>
 
-      <div class="drink-search drink-search--exclude">
+      <div class="drink-filter drink-search drink-search--exclude">
         <div class="drink-label-row">
-          <label class="drink-field-label" for="drink-exclude">Leave out</label>
+          <h2 class="drink-field-label"><label for="drink-exclude">Leave out</label></h2>
           <button type="button" class="btn-clear-filter" id="clear-exclude" hidden>&times; clear</button>
         </div>
         <input class="drink-search-input" type="text" id="drink-exclude"
                autocomplete="off" placeholder="ingredient name…" />
         <div class="drink-pool" id="drink-exclude-pool" aria-live="polite"></div>
       </div>
+    </div>
+
+    {% comment %} 5. THE ESCAPE HATCH, and the reason it is last rather than
+       first. If you already know you want a Negroni, none of the above is for
+       you -- but a name search at the TOP would invite you to treat the page
+       as a search box, which is not what it is for. Helen browses here on
+       purpose: "I find browsing quick and inspirational... I want to steer
+       myself then read for a while then settle." Last means it is available
+       without being the offer. {% endcomment %}
+    <div class="drink-filter drink-filter--name">
+      <div class="drink-label-row">
+        <h2 class="drink-field-label"><label for="drink-name">I know what I want</label></h2>
+        <button type="button" class="btn-clear-filter" id="clear-name" hidden>&times; clear</button>
+      </div>
+      <input class="drink-search-input" type="text" id="drink-name"
+             autocomplete="off" placeholder="drink name…" />
     </div>
   </div>
 
@@ -189,7 +249,8 @@ permalink: /cocktails/
           data-ship="{{ ship }}"
           data-chaos="{{ chaos }}"
           data-moods="{% for m in drink.mood %}{{ m }}|{% endfor %}"
-          data-ingredients="{{ searchable | downcase }}">
+          data-ingredients="{{ searchable | downcase }}"
+          data-name="{{ drink.title | downcase }}">
 
         {% if glass_icon != "" %}
           {% assign icon_mm = glasses.heights_mm[glass_icon] %}
@@ -263,7 +324,7 @@ permalink: /cocktails/
 
         <div class="drink-card-foot">
           <span class="drink-card-moods">
-            {% for m in drink.mood %}<span class="drink-card-mood" data-mood="{{ m }}">{{ m }}</span>{% endfor %}
+            {% comment %} A chip fills in ITS GROUP'S colour rather than one shared colour, so a hassle chip lighting up matches the ultraviolet heading that selected it and not the green one that did not. The group is derived from taxonomy.yml here rather than stored on the drink, because it is a property of the MOOD and a drink that gains a mood should not need retyping. {% endcomment %}{% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<span class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}">{{ m }}</span>{% endfor %}
           </span>
           <span class="drink-card-ship" style="--ship-tint: {{ tint }}%;">{{ ship }}</span>
         </div>
@@ -275,34 +336,6 @@ permalink: /cocktails/
      filter was goodness, so the joke was about the drinks. With four filters
      it lands as an insult to a search that was simply too narrow. {% endcomment %}
   <p class="drink-none" hidden>Blank canvas.</p>
-
-  {% comment %} =========================================================
-     NARROW-SCREEN LAYOUT SWITCH — SCAFFOLDING, #483. DELETE WHEN CHOSEN.
-     =========================================================
-     Helen, 2026-08-27: "let's try glasses on top, info below then, for the
-     smaller screens... Have a play." Three layouts live in _cards.scss under
-     `@media (max-width: 400px)`; this picks one.
-
-       ?narrow=stack    (default) glass as a full-width band on top
-       ?narrow=title              glass small top-left, title beside it
-       ?narrow=shrink             the original column, just narrower
-
-     ONLY VISIBLE BELOW 400px — resize the window or use the browser's device
-     mode. It deliberately does not force the narrow layout at desktop width,
-     because a layout judged at the wrong size is judged wrong.
-
-     Same pattern as ?glass=margin and ?align=top before it, and the same
-     ending: once Helen picks, two variants and this script are deleted. A
-     comparison switch left in becomes a permanent branch nobody dares remove.
-  {% endcomment %}
-  <script>
-    (function () {
-      var ok = { stack: 1, title: 1, shrink: 1 };
-      var want = (location.search.match(/[?&]narrow=([a-z]+)/) || [])[1];
-      var list = document.querySelector('.drink-cards');
-      if (list) list.dataset.narrow = ok[want] ? want : 'stack';
-    })();
-  </script>
 
   <script src="{{ '/assets/js/cocktail-index.js' | relative_url }}"></script>
 

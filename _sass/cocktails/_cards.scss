@@ -34,10 +34,14 @@ $card-height:   12.9rem;
 $card-text-x:   7.6rem;
 // ...AND IT IS A CUSTOM PROPERTY TOO, since #483. The Sass variable is still
 // the single source of the DEFAULT, but Sass resolves at compile time, so five
-// rules each baked their own copy of 7.6rem and a narrow-screen variant would
-// have had to restate all five and keep them in step -- which is the exact
-// coupling the comment above exists to prevent, reintroduced by the fix.
-// One custom property, five readers, one line to override.
+// rules each baked their own copy of 7.6rem -- which is the exact coupling the
+// comment above exists to prevent, reintroduced the moment anything needs a
+// different value. One custom property, five readers, one line to override.
+//
+// The narrow-screen layout no longer overrides it (it stops using the column
+// altogether), but --card-glass-scale below does exactly this, and the
+// property stays because the argument holds whether or not it is exercised
+// today.
 :root { --card-text-x: #{$card-text-x}; }
 // #490. The glass column is exactly $card-text-x wide, so text starting at
 // $card-text-x began flush against the tinted panel's edge with nothing
@@ -99,7 +103,7 @@ $card-glass-scale: 13rem;
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  background: mix($color-menthe, $color-surface, 9%);
+  background: $color-absinthe-wash;
   transition: background-color 0.12s ease;
 
   svg {
@@ -134,7 +138,7 @@ $card-glass-scale: 13rem;
   transition: background-color 0.12s ease;
 }
 .drink-card-glass::after { top: -1px; background: transparent; }
-.drink-card::after       { bottom: -1px; background: mix($color-menthe, $color-surface, 55%); }
+.drink-card::after       { bottom: -1px; background: mix($color-absinthe, $color-surface, 55%); }
 
 // HOVER: the two marks bracket the glass column, top and bottom.
 // Helen asked for "a very subtle lightening of the white part of the
@@ -143,8 +147,8 @@ $card-glass-scale: 13rem;
 // nowhere lighter to go. Brightening the marks instead says the same thing and
 // moves no large area at all.
 .drink-card:hover {
-  &::after { background: $color-menthe; }
-  .drink-card-glass::after { background: $color-menthe; }
+  &::after { background: $color-absinthe; }
+  .drink-card-glass::after { background: $color-absinthe; }
 }
 
 // --- the words ---------------------------------------------------------------
@@ -163,7 +167,7 @@ $card-glass-scale: 13rem;
   a {
     color: $color-text;
     text-decoration: none;
-    &:hover { color: $color-menthe-deep; }
+    &:hover { color: $color-absinthe-deep; }
   }
 }
 
@@ -193,9 +197,32 @@ $card-glass-scale: 13rem;
 
 // The matched ingredient, in the colour of the field that matched it.
 .drink-card-hit {
-  background: $color-violet;
-  color: darken($color-violet-deep, 25%);
-  padding: 0.05em 0.3em;
+  // A BAND UNDER THE WORDS, NOT A BLOCK BEHIND THEM. Helen, 2026-08-28, on a
+  // card with three filled things on it: "there's just a lot going on...
+  // underline the ingredient rather than highlight."
+  //
+  // Fill is the loudest tool available and this card had reached for it three
+  // times -- and the ingredient one is the worst of the three, because a
+  // matched ingredient WRAPS, so a long name became two solid slabs on two
+  // lines. It also fought the drink's name, which is the thing you are meant
+  // to read first.
+  //
+  // The band is the same language as the section headings, which is the point:
+  // "this colour under text" now means one thing everywhere on the site, and a
+  // matched ingredient is visibly the answer to the magenta heading that found
+  // it.
+  //
+  // text-decoration RATHER THAN THE HEADINGS' inset box-shadow, because this
+  // one wraps. A box-shadow paints the element's box and gives a wrapped
+  // fragment an odd stub; text-decoration follows each line properly.
+  color: $color-text;
+  text-decoration: underline;
+  text-decoration-color: $color-magenta;
+  text-decoration-thickness: 0.16em;
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: none;
+  // No padding. It was there to give the old FILL room to breathe, and with a
+  // band instead it makes the line run wider than the word it underlines.
   font-weight: 600;
 }
 
@@ -241,11 +268,34 @@ $card-glass-scale: 13rem;
   // ingredient gets — but in MENTHE, because the mood filter is menthe and the
   // ingredient field is violet. The card is answering "why am I here", and it
   // answers in the colour of the control that put it there.
+  // A MATCHED CHIP FILLS IN THE COLOUR OF THE HEADING THAT SELECTED IT. Mood
+  // chips and hassle chips are the same object doing the same job, but they
+  // answer different questions, and a hassle chip lighting up green would
+  // point at the wrong heading -- which is the whole failure this redesign was
+  // for. The group comes from the template (`--hassle`), derived from
+  // taxonomy.yml, so it cannot drift from the buttons above.
+  // MATCHED CHIPS WASH RATHER THAN FILL, same reasoning as the ingredient band
+  // above. A solid chip is a block of colour the size of a word, and a drink
+  // matching two filters got two of them plus a highlighted ingredient.
+  //
+  // The border carries the colour and the text stays INK. Every `-deep` is
+  // solved against paper, so deep-on-wash lands below 4.5 for three of the
+  // five hues -- and a chip does not need coloured text when its border, its
+  // background and its weight have all already changed.
   &.is-match {
-    background: $color-menthe;
-    border-color: $color-menthe-deep;
-    color: darken($color-menthe-deep, 22%);
+    background: $color-absinthe-wash;
+    border-color: $color-absinthe-deep;
+    color: $color-text;
     font-weight: 600;
+  }
+
+  // Ultraviolet is the one fill in the set that takes LIGHT text: ink on it is
+  // 3.14:1 and fails, white is 5.47:1, and nothing darkened clears 4.5 at all
+  // because the fill is already dark. See _filters.scss for the same note on
+  // the hassle buttons.
+  &--hassle.is-match {
+    background: $color-ultraviolet-wash;
+    border-color: $color-ultraviolet-deep;
   }
 }
 
@@ -277,8 +327,8 @@ $card-glass-scale: 13rem;
     display: inline-block;
     width: 0.5rem;
     height: 0.5rem;
-    background: color-mix(in srgb, #{$color-amber} var(--ship-tint, 0%), #{$color-surface});
-    border: 1.5px solid $color-amber-deep;
+    background: color-mix(in srgb, #{$color-tangerine} var(--ship-tint, 0%), #{$color-surface});
+    border: 1.5px solid $color-tangerine-deep;
     margin-left: 0.4rem;
     vertical-align: 0.01rem;
   }
@@ -316,81 +366,73 @@ $card-glass-scale: 13rem;
 // The breakpoint is 400px rather than 380: 390px (iPhone 14/15) is inside the
 // range that hurts, and a breakpoint that stops just short of the commonest
 // phone sold is a breakpoint that does not fire.
+// =============================================================================
+// NARROW SCREENS — the glass goes on top. #483, settled 2026-08-27.
+// =============================================================================
+// Helen, having looked at three candidates side by side: "I think we should go
+// with stack." The other two (`title`, a small glass beside the title; and
+// `shrink`, the original column narrowed) are deleted, along with the switch
+// that selected them and the dev page that showed them.
+//
+// WHY A BREAKPOINT AT ALL. The card is horizontal — a fixed glass column, text
+// beside it — and the text column is whatever is left over. At 16px/rem:
+//
+//     viewport   card   text column   glass takes
+//        360px   312px      157px         39%
+//        375px   327px      172px         37%
+//        412px   364px      209px         33%
+//
+// 157px is about eighteen characters of Courier Prime, against ingredient
+// strings that now run to 44 (`Grand Marnier or other cognac orange liqueur`,
+// since #531 put categories on cards). Those are the two commonest phone
+// widths there are: 360px is the dominant Android portrait width, 375px covers
+// the iPhone SE, 8 and 13 mini. Losing the tagline (#512) freed a LINE; this
+// was always a WIDTH problem, which is why it did not go away.
+//
+// THE BREAKPOINT IS 400px, NOT 380. Helen asked whether anything is really
+// narrower than about 380 — 390px (iPhone 14/15) is inside the range that
+// hurts, and a breakpoint stopping just short of the commonest phone sold is a
+// breakpoint that does not fire.
+//
+// WHAT STACKING COSTS, so it is a known trade and not a discovery later: the
+// card stops being scannable as a row of headline-then-detail, and it gets
+// taller, so fewer fit on a screen. What it buys is the full card width for
+// the words, which is the only place the space could come from.
 @media (max-width: 400px) {
-  // ===========================================================================
-  // NARROW-SCREEN LAYOUT — THREE OPTIONS BEHIND A SWITCH. SCAFFOLDING (#483).
-  // ===========================================================================
-  // Helen, 2026-08-27: "let's try glasses on top, info below then, for the
-  // smaller screens. Or maybe glass / title on top, details below. Have a
-  // play."
-  //
-  // DELETE TWO OF THESE AND THE SWITCH ONCE SHE HAS CHOSEN. Same pattern as
-  // ?glass=margin and ?align=top before it: the point of a comparison switch
-  // is that it is temporary, and one left in becomes a permanent branch nobody
-  // dares remove. cocktails/index.html carries the matching script and the
-  // same warning.
-  //
-  //   ?narrow=stack   (default) glass as a full-width band on top
-  //   ?narrow=title             glass small top-left, title beside it
-  //   ?narrow=shrink            the original: glass column, just narrower
-  //
-  // The default is `stack` because it is the one Helen asked for first.
+  // The glass is no longer a left column, so everything that measured itself
+  // against that column has to stop. These are consequences of un-columning,
+  // not choices: the foot's left edge came from the column's width, and the
+  // two panel edges were as wide as the column because the column was what
+  // they bracketed. Now they bracket the card.
+  .drink-card-foot { left: $card-pad-x; }
+  .drink-card::after,
+  .drink-card-glass::after { width: calc(100% + 2px); }
 
-  // --- shared by both stacked layouts ---------------------------------------
-  // The glass stops being a left column, so everything that measured itself
-  // against that column has to stop too. Listed together rather than repeated
-  // in each variant: these are consequences of un-columning, not choices.
-  [data-narrow="stack"],
-  [data-narrow="title"] {
-    .drink-card-foot { left: $card-pad-x; }
-    .drink-card::after,
-    .drink-card-glass::after { width: calc(100% + 2px); }
+  // THE SCALE COMES DOWN, WHICH IS COUNTERINTUITIVE. The drawing now has the
+  // whole card width available — more than it has ever had — so at the full
+  // 13rem a tall glass would be most of a phone screen. The band is what is
+  // being sized here, not the column.
+  //
+  // On :root rather than bare inside the @media -- a declaration needs a
+  // selector to belong to, and Sass rejects the file outright without one.
+  :root { --card-glass-scale: 6.4rem; }
+
+  .drink-card {
+    height: 15.4rem;
+    // Top padding clears the band. The glass is absolutely positioned and so
+    // takes no space of its own; this is what stops the title starting
+    // underneath it — the mistake the `title` variant made and Helen caught in
+    // one look at /dev/cards-narrow/, which is why that page existed.
+    padding: 6.6rem $card-pad-x $card-pad-y $card-pad-x;
   }
 
-  // --- 1. stack: glass on top, everything below ------------------------------
-  // Full-bleed band. The drawing gets the whole card width, which is the most
-  // it has ever had, so the scale comes DOWN rather than up -- at 13rem a tall
-  // glass would be most of a phone screen.
-  [data-narrow="stack"] {
-    --card-glass-scale: 6.4rem;
-
-    .drink-card {
-      height: 15.4rem;
-      padding: 6.6rem $card-pad-x $card-pad-y $card-pad-x;
-    }
-    .drink-card-glass {
-      width: 100%;
-      height: 6.4rem;
-      bottom: auto;
-    }
-    .drink-card-glass svg { max-width: 60%; }
+  .drink-card-glass {
+    width: 100%;
+    height: 6.4rem;
+    bottom: auto;
   }
 
-  // --- 2. title: glass small top-left, title beside it -----------------------
-  // The compromise. The glass keeps a column but only as tall as the title, so
-  // the ingredient line and the foot run full width underneath -- which is
-  // where the space was actually being lost.
-  //
-  // Done with a padding on the TITLE rather than by regrouping the markup: the
-  // title and the ingredients are siblings inside .drink-card-body, so a real
-  // two-row layout would need the template changed. If Helen picks this one,
-  // that is worth doing properly rather than leaving as a padding trick.
-  [data-narrow="title"] {
-    --card-glass-scale: 4.4rem;
-
-    .drink-card { height: 13.4rem; padding-left: $card-pad-x; }
-    .drink-card-glass {
-      width: 4.4rem;
-      height: 4.4rem;
-      bottom: auto;
-    }
-    .drink-card-glass svg { max-width: 78%; }
-    .drink-card-name { padding-left: 4.4rem + $card-gutter; }
-  }
-
-  // --- 3. shrink: the original narrow layout ---------------------------------
-  // Kept as the comparison rather than deleted: "is stacking better than just
-  // making it smaller" is the actual question, and it cannot be answered
-  // without the smaller one on screen too.
-  [data-narrow="shrink"] { --card-text-x: 4.6rem; }
+  // Not the full band width: a glass drawn edge to edge reads as a header
+  // image rather than as the card's own mark.
+  .drink-card-glass svg { max-width: 60%; }
 }

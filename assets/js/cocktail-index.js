@@ -51,6 +51,16 @@
   var countEl   = document.getElementById('drink-count-n');
   var wordEl    = document.getElementById('drink-count-word');
   var noneEl    = document.querySelector('.drink-none');
+  var nameInput = document.getElementById('drink-name');
+
+  /* Mood and hassle are one filter with two headings: both render .btn-mood
+     and both write into `chosenMoods`, because a drink matching either is
+     matched the same way. Only the CLEAR links are per-section, so the two
+     sets are told apart by which block they sit in rather than by a second
+     data attribute the template would have to keep in step. */
+  function inHassle(btn) {
+    return !!btn.closest('.drink-filter--hassle');
+  }
 
   /* One random key per card, fixed for the life of the page. See the note on
      ordering at the top: this is what lets the order be random without cards
@@ -61,6 +71,7 @@
 
   var chosenMoods = [];
   var chosenChaos = null;
+  var wantName    = '';
   var include     = [];
   var exclude     = [];
 
@@ -80,6 +91,16 @@
 
   function cardMoods(card) {
     return (card.dataset.moods || '').split('|').filter(Boolean);
+  }
+
+  function moodBtnsIn(hassle) {
+    return Array.prototype.filter.call(moodBtns, function (b) {
+      return inHassle(b) === hassle;
+    });
+  }
+
+  function isOn(btn) {
+    return chosenMoods.indexOf(btn.dataset.mood) !== -1;
   }
 
   function showClear(id, active) {
@@ -121,7 +142,14 @@
        OR narrow anything, so if this ever becomes AND the ranking is redundant
        rather than merely unused. */
     if (chosenMoods.length && moodScore(card) === 0) return false;
-    if (chosenChaos && card.dataset.chaos !== chosenChaos) return false;
+    /* `open` IS A STATE, NOT A FILTER, and this is the fix rather than an
+       oversight. It used to be `yolo`, meaning ship is not yes-or-better --
+       so the button for "I'll try anything" was the one button guaranteed to
+       hide all 55 of the best drinks. Helen, 2026-08-27: "'I'm open to chaos'
+       ... includes all drinks, not just not-known-to-be-definitely-good
+       drinks." So only `good` narrows; `open` shows everything and exists to
+       make that an answer you can give rather than a default you fall into. */
+    if (chosenChaos === 'good' && card.dataset.chaos !== 'good') return false;
 
     var ing = card.dataset.ingredients || '';
     /* AND across include: each chip you add narrows. That is the opposite of
@@ -133,6 +161,12 @@
     for (var j = 0; j < exclude.length; j++) {
       if (ing.indexOf(exclude[j]) !== -1) return false;
     }
+
+    /* I KNOW WHAT I WANT. Substring rather than word-start, unlike the
+       ingredient fields: those match a vocabulary where "rum" starting a word
+       is the meaningful test, whereas a drink name is a thing you are part-way
+       through typing. "negr" should find the Negroni. */
+    if (wantName && card.dataset.name.indexOf(wantName) === -1) return false;
     return true;
   }
 
@@ -205,8 +239,10 @@
     /* Each clear appears only when its own section has something to clear.
        Driven from the same pass that filters, so a clear can never be visible
        for a filter that is already empty. */
-    showClear('clear-mood', chosenMoods.length > 0);
+    showClear('clear-mood', moodBtnsIn(false).some(isOn));
+    showClear('clear-hassle', moodBtnsIn(true).some(isOn));
     showClear('clear-chaos', chosenChaos !== null);
+    showClear('clear-name', wantName !== '');
     showClear('clear-include', include.length > 0 || incInput.value !== '');
     showClear('clear-exclude', exclude.length > 0 || excInput.value !== '');
 
@@ -324,6 +360,22 @@
   wireSearch(incInput, incPool, include);
   wireSearch(excInput, excPool, exclude);
 
+  /* I KNOW WHAT I WANT. No candidate pool: the ingredient fields offer one
+     because their vocabulary is closed and you are picking FROM it, whereas a
+     drink name is something you already hold and are merely typing. Offering
+     to complete it would be answering a question nobody asked. */
+  if (nameInput) {
+    nameInput.addEventListener('input', function () {
+      wantName = nameInput.value.trim().toLowerCase();
+      apply();
+    });
+  }
+
+  wireClear('clear-name', function () {
+    wantName = '';
+    if (nameInput) nameInput.value = '';
+  });
+
   /* --- the four clears ----------------------------------------------------- */
   /* Each resets ONE section and nothing else. Deliberately four separate
      controls rather than one "clear all": with four axes, the filter you want
@@ -334,13 +386,20 @@
     if (btn) btn.addEventListener('click', function () { reset(); apply(); });
   }
 
-  wireClear('clear-mood', function () {
-    chosenMoods.length = 0;
-    moodBtns.forEach(function (b) {
+  /* MOOD and HASSLE clear independently even though they share `chosenMoods`.
+     Clearing one must not drop the other -- "I have found the mood and am now
+     arguing with the cupboard" applies here too, one heading down. */
+  function clearGroup(hassle) {
+    moodBtnsIn(hassle).forEach(function (b) {
+      var at = chosenMoods.indexOf(b.dataset.mood);
+      if (at !== -1) chosenMoods.splice(at, 1);
       b.classList.remove('is-on');
       b.setAttribute('aria-pressed', 'false');
     });
-  });
+  }
+
+  wireClear('clear-mood', function () { clearGroup(false); });
+  wireClear('clear-hassle', function () { clearGroup(true); });
 
   wireClear('clear-chaos', function () {
     chosenChaos = null;
