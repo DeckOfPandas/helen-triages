@@ -710,15 +710,20 @@ flagged would have got arithmetic instead of a boolean, evaluated it as false,
 and published the flagged page. `tests/test_front_matter.py` fails on the old
 spelling anywhere in `_food_recipes/`.
 
-**The test's scope is `_food_recipes/` only — the rename never propagated
-through `_food_drafts/`.** As of 2026-08-21, roughly 90 pre-existing drafts
-still carry the old hyphenated `awaiting-fix`, uncaught, because nothing scans
-drafts for it. Concretely dangerous while ingesting: copying an existing draft
-as a template for a new one silently copies whichever spelling that draft
-happened to have. A same-day ingestion session did exactly this across 34 new
-files before catching it. Always write `awaiting_fix` (underscore) on any new
-draft regardless of what the file you copied from uses — it costs nothing now
-and it's the only spelling that still works once the file is promoted.
+**The test's scope is `_food_recipes/` only, and nothing scans drafts for the
+old spelling.** This paragraph said "roughly 90 pre-existing drafts still carry
+the old hyphenated `awaiting-fix`" from 2026-08-21 until 2026-08-29, when it was
+measured: **zero, across all 342 drafts.** Either the propagation happened and
+nobody updated this, or the estimate was wrong when written. Both are the same
+lesson and it is §11.2's: `grep -rn 'awaiting-fix' _food_drafts` takes a second
+and this file went eight days asserting the opposite.
+
+The hazard the paragraph describes is still real even at zero, because nothing
+is watching: copying an existing draft as a template silently copies whichever
+spelling that draft happened to have, and a 2026-08-21 ingestion session did
+exactly that across 34 new files before catching it. Always write
+`awaiting_fix` (underscore) on any new draft — it costs nothing now and it is
+the only spelling that still works once the file is promoted.
 
 **Six tests guard this, because every failure mode is silent** — the page
 publishes, the build is green, and nothing says why. Three on the mechanism
@@ -2087,10 +2092,16 @@ alone. See the note there.
   `cocktails` marker. A cocktails test must ASSERT its corpus is non-empty
   rather than skipping mid-run, or it passes vacuously.
 
-  **That requirement does not protect you where it matters most — #540.** The
-  module skips wholesale when `_cocktail_drafts/` is absent, which is legitimate
-  and is also always the case in CI, so 24 of its 41 tests never run on `main`.
-  See the box in §10 before relying on any of them as a gate.
+  **That requirement did not protect the collection where it mattered most, and
+  #540 is now half-answered.** The module used to skip wholesale when
+  `_cocktail_drafts/` was absent — always the case in CI — so 24 of its tests
+  never ran on `main`. Since 2026-08-29 the corpus is `_cocktail_recipes/` +
+  `_cocktail_drafts/`, so a PROMOTED drink is checked everywhere including CI,
+  and `_load()` is the only door into either. The drafts remain a local
+  concern by Helen's decision. **Read the box in §10 before relying on a green
+  cocktails run**: with nothing promoted yet, CI still checks no drink, and the
+  difference is only that this is now a fact about the collection rather than
+  about the loader.
 - `_data/cocktails/taxonomy.yml` — check it before repeating this: it was
   described here as "still empty", and moods and generics have since been
   argued out and are enforced by tests.
@@ -3235,26 +3246,46 @@ anywhere, so every guard in this repository protected a local run and nothing
 else. `.github/workflows/build-and-deploy.yml` has a `test` job and `build`
 declares `needs: test`. Three things about it are load-bearing:
 
-> **NOT FOR THE COCKTAIL DRINKS, AND THE SENTENCE ABOVE READS AS IF IT WERE —
-> #540, found 2026-08-27.** `tests/test_cocktails.py` skips when
-> `_cocktail_drafts/` is absent, which is correct and documented; but CI checks
-> out this repo alone and the drafts are a separate private repo, so the
-> directory is *always* absent there. **24 of that module's 41 tests call
-> `_load()` and skip in Actions**, reported as passes. For the cocktail
-> collection, "every guard protected a local run and nothing else" — the exact
-> sentence #369 exists to have made obsolete — is still true today.
+> **THE COCKTAIL GATE NOW FIRES AT PROMOTION — #540, Helen's ruling 2026-08-29,
+> choosing option 4 of the four that issue lists: gate at promotion, and leave
+> the private drinks out of a runner.**
 >
-> Live proof rather than theory: five tests fail locally on drafts data that is
-> behind (a retired `flavoured` generic, retired honey generics, `blackstrap`
-> still a generic on Jungle Bird, 17 non-canonical glass spellings) and CI is
-> green on all five. It is masked only because drafts build locally; the mask
-> comes off the day a cocktail is promoted into `_cocktail_recipes/`, and the
-> guards that would catch a bad promotion are the ones not running.
+> What it was: `tests/test_cocktails.py`'s `_load()` globbed `_cocktail_drafts/`
+> alone, and CI checks out this repo without that private one, so **24 of the
+> module's 41 tests skipped in every deploy run**, reported as passes.
 >
-> `test_suite_hygiene.py` cannot see this: from its point of view the skip is
-> legitimate. **The vacuity is in the ENVIRONMENT, not the assertion.** #540
-> has four options and no recommendation — putting private drinks into a runner
-> is Helen's decision.
+> **#540's own account of the fix was too optimistic, and this is the part to
+> carry.** It says the mask "comes off the day a cocktail is promoted". It did
+> not. `_cocktail_recipes/` lives in THIS repo and IS present in CI — but the
+> loader never read it, so a promoted drink would have been checked by nothing,
+> anywhere, ever. Promotion did not lift the gate; it moved a drink permanently
+> out from under it. The corpus is both roots now.
+>
+> **The half that the fix alone would have shipped broken.** Building the CI
+> shape — drafts moved aside, real drinks copied into a scratch
+> `_cocktail_recipes/` — showed **five guards failing on entirely correct
+> data**. All five hang on a shrink-only registry (`GLASSLESS_ON_2026_08_27`,
+> `KNOWN_PROSE_SUGGESTIONS`, `card_name_joins`, `methods.yml`'s proposals) or on
+> a mood's share of the book, and **that class of claim is unanswerable on a
+> partial corpus in the one direction that matters: a drink merely ABSENT looks
+> exactly like a drink FIXED.** Five false reds on `main`, and not once —
+> every later promotion re-runs them over a partial corpus too.
+>
+> So the two halves are separated. The RATCHET ("no NEW offender") is a
+> per-drink claim and runs everywhere, which is the coverage promotion buys; the
+> STALENESS half calls `_require_whole_collection` and skips with a reason.
+> `WHOLE_COLLECTION_ONLY` is the registry and
+> `test_whole_collection_only_says_what_it_does` keeps it true both ways.
+>
+> **`_load()` is the only door, and a test now enforces that**
+> (`test_every_drink_reading_test_goes_through_the_loader`). One future test
+> globbing the drafts itself reopens #540 for itself, silently, in CI only.
+>
+> **Still true, and not silenced:** at ONE promoted drink, four anti-vacuity
+> asserts fire ("no rum ingredient carries a suggestion, so this check is
+> vacuous"). They are correct, they say so accurately, and they self-resolve by
+> five drinks. Adding them to `WHOLE_COLLECTION_ONLY` would lose that coverage
+> in CI permanently to buy quiet in a one-drink window.
 
 - **`fetch-depth: 0`.** `actions/checkout` is shallow by default, and in a
   depth-1 clone `git log -- <file>` reports the same single commit for every
@@ -3856,6 +3887,36 @@ unfinished work; genuinely unrelated changes that need independent review, or
 that touch another agent's area, are still worth their own PR. **Say what is
 being held back**, so she can ask for it sooner if she wants it.
 
+### 11.0.2 `/tidy-drafts` — the mechanical half of a drafts pass, on request
+
+**Added 2026-08-29 at Helen's request**: *"I also want a way of saying hey,
+Claude, please tidy up my drafts files."* `.claude/commands/tidy-drafts.md` is
+the procedure and `scripts/tidy_drafts.py` is the engine — the first project
+slash command in this repo, and the first thing in `.claude/` that is not a
+guard hook.
+
+**The boundary is formatting versus judgement, and it is the whole design.** It
+fixes quoting, en dashes, `--`/`->`, accents and the #429 `meta:` migration —
+2,957 changes across all 342 drafts, measured. It never resolves which milk,
+which flour, whether an oven figure is the fan one, or whether a title or a
+filename is the one that should change: ~25 rules and 600-odd hits, every one
+needing Helen or her source material, all of them reported and left alone.
+
+**It never touches a `QQ` line**, which is not a technicality: two thirds of the
+corpus-wide en-dash hits are inside un-rewritten source text (86 of 130).
+
+**Every rule is imported from the test suite, never re-typed** — `META_ORDER`,
+`RETIRED`, `SCALAR_STRING_FIELDS`, `_head_clause_words`. A fixer carrying its own
+copy of the contract eventually tidies files INTO a shape the tests reject,
+while looking green the whole time. That import is also what resolved the
+`test_invisible_keys_are_really_invisible` failure the first draft caused
+honestly, rather than by narrowing a guard that says in its own message not to.
+
+Scope was settled with Helen and the exclusions are hers: size words (108
+drafts) are out, cocktail drafts are out while that schema moves, and a missing
+`meta.awaiting_fix` is reported rather than invented because that flag fails
+closed and writing `false` asserts a recipe is fit to publish.
+
 ### 11.0.1 More than one agent now shares this checkout — use a worktree
 
 2026-08-23. A session went to branch and found the working tree already on
@@ -4201,6 +4262,25 @@ file, run it once and diff — or copy the file to `tmp/` first, which is what
 turned this from a loss into a paragraph. And when a generator's output becomes
 hand-editable, fix the comment in the GENERATOR, not only in the output: the
 person about to re-run it is by definition reading the wrong one.
+
+**YOU WILL READ THE PATCH AND THINK YOU HAVE CHECKED THE OUTPUT.** 2026-08-29,
+building `/tidy-drafts` (§11.0.2). Its `meta:` rewrite scanned the block as
+"indented or blank", which swallowed the trailing empty line that splitting on
+newlines always leaves — so every file came out ending `proofread: false---`
+and **341 of 342 drafts stopped parsing at all**. The diff looked entirely
+plausible: the right two lines gone, the right three in the right order, and
+nothing in a unified diff draws your eye to a newline that is no longer there.
+
+It was caught by parsing both sides and diffing the PARSED front matter, not by
+reading the change. **For anything that rewrites structured text, the check is
+to load the result, not to look at the patch** — and the same pass is what
+proved the quoting was a genuine no-op on the data, which is the other thing a
+diff cannot tell you (`serves: 6` and `serves: "6"` differ in type and look
+identical in intent).
+
+The corollary, and it is why this sits beside the entry below: verify against a
+COPY. `_food_drafts/` was never written to at any point while this was being
+built, so the 341-file breakage cost nothing.
 
 **You will rewrite YAML you were only asked to edit.** Not one of the
 several hundred front-matter edits made across this project's history has
