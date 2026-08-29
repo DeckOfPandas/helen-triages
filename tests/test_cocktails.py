@@ -30,6 +30,7 @@ import yaml
 pytestmark = pytest.mark.cocktails
 
 ROOT = Path(__file__).resolve().parent.parent
+RECIPES = ROOT / "_cocktail_recipes"
 DRAFTS = ROOT / "_cocktail_drafts"
 VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"
 TAXONOMY = ROOT / "_data" / "cocktails" / "taxonomy.yml"
@@ -62,26 +63,311 @@ def _is_character_list(key):
     return key.endswith("_characters")
 
 
-def _load():
-    if not DRAFTS.is_dir():
-        pytest.skip(
-            "_cocktail_drafts/ is not present. It is a separate private repo "
-            "(helen-triages-cocktails-private), gitignored here, so a clean "
-            "checkout of the public repo legitimately has no drinks to check. "
-            "Clone it into _cocktail_drafts/ to run these."
-        )
+# =============================================================================
+# THE CORPUS IS BOTH COLLECTIONS, AND THAT IS THE PROMOTION GATE -- issue #540
+# =============================================================================
+# This loader read `_cocktail_drafts/` and nothing else until 2026-08-29, and
+# #540 records the consequence: the drafts are a separate private repo, CI
+# checks out this one alone, so the directory is ALWAYS absent there and 24 of
+# this module's tests skipped in every deploy run, reported as passes.
+#
+# #540 says the mask "comes off the day a cocktail is promoted". IT DID NOT, and
+# that is what this change fixes. `_cocktail_recipes/` lives in THIS repo and is
+# present in CI -- but the loader globbed the drafts directory, so a promoted
+# drink would have been read by nothing, anywhere, ever. Promotion did not lift
+# the gate; it moved a drink permanently out from under it.
+#
+# So the corpus is both roots. The published half is checked wherever it exists,
+# including CI. The private half is checked wherever it has been cloned. Helen's
+# ruling, 2026-08-29, choosing this over putting the private drinks into a
+# runner: gate at promotion, and leave the drafts a local concern.
+#
+# WHAT THIS DOES NOT DO, said plainly so the green is not over-read: with no
+# drink promoted yet, CI still checks nothing, because there is nothing there to
+# check. The difference is that this is now a fact about the collection rather
+# than about the loader, and it stops being true on the day the first drink
+# moves rather than needing anyone to remember.
+
+NO_DRINKS_REASON = (
+    "No drinks on this machine to check. `_cocktail_recipes/` holds no promoted "
+    "drinks -- it does not exist on disk at all yet, which is deliberate "
+    "(HANDOVER_v26.md §9.1) -- and `_cocktail_drafts/` is a separate private "
+    "repo (helen-triages-cocktails-private), gitignored here, so a clean "
+    "checkout of the public repo legitimately has none either. Clone the drafts "
+    "into _cocktail_drafts/ to check those; promote a drink to check it here "
+    "AND in CI."
+)
+
+
+def _read(root):
+    """Every parseable drink under one collection root. Absent root -> nothing.
+
+    `rglob`, not `glob`. The drafts folder is flat today, but food's loader used
+    `glob` and silently stopped seeing seven files the moment a staging pipeline
+    appeared under it (HANDOVER §4) -- and those seven were the ones closest to
+    promotion. Costs nothing to not repeat.
+    """
     out = []
-    for path in sorted(DRAFTS.glob("*.md")):
+    if not root.is_dir():
+        return out
+    for path in sorted(root.rglob("*.md")):
         match = FRONT_MATTER.match(path.read_text(encoding="utf-8"))
         if match:
             out.append((path.stem, yaml.safe_load(match.group(1)) or {}))
-    assert out, (
-        f"{DRAFTS.name}/ exists but yielded no parseable drinks. The directory "
-        f"is here, so this is not the absent-collection case -- either every "
-        f"file lost its front matter, or this loader has gone stale. Do not let "
-        f"it report green."
-    )
     return out
+
+
+def _load():
+    """Published drinks plus draft drinks, from whichever roots are present.
+
+    Skips ONLY when neither collection is on disk. A root that IS here and
+    yields nothing is the loader-has-gone-stale case and must never be quiet:
+    "this machine has no drinks" and "I looked and found nothing" are opposite
+    answers, and the whole of tests/test_suite_hygiene.py exists because they
+    are easy to conflate into the same green.
+    """
+    out = _read(RECIPES) + _read(DRAFTS)
+    if out:
+        return out
+
+    present = [r.name for r in (RECIPES, DRAFTS) if r.is_dir()]
+    if not present:
+        pytest.skip(NO_DRINKS_REASON)
+    assert False, (
+        f"{', '.join(present)} exists but yielded no parseable drinks. The "
+        f"directory is here, so this is not the absent-collection case -- "
+        f"either every file lost its front matter, or this loader has gone "
+        f"stale. Do not let it report green."
+    )
+
+
+# =============================================================================
+# WHAT A PARTIAL CORPUS CANNOT ANSWER -- the other half of #540
+# =============================================================================
+# Making the loader read both collections is not the whole fix, and the missing
+# half was found by promoting real drinks into a scratch `_cocktail_recipes/`
+# with the drafts moved aside -- i.e. by building the CI shape and looking,
+# rather than by reasoning about it.
+#
+# FIVE GUARDS FAILED ON DATA THAT WAS ENTIRELY CORRECT. All five hang on a
+# SHRINK-ONLY REGISTRY -- GLASSLESS_ON_2026_08_27, KNOWN_PROSE_SUGGESTIONS,
+# `card_name_joins`, methods.yml's proposals -- or on a proportion of the book.
+# Each asserts the registry has no dead entries, on the principle that a
+# registry with dead entries stops being read.
+#
+# THAT ASSERTION IS UNANSWERABLE ON A PARTIAL CORPUS, and unanswerable in the
+# one direction that matters: a drink that is merely ABSENT looks exactly like
+# a drink that has been fixed. In CI the drafts are always absent, so every
+# such registry reads as entirely stale. Promotion day would have produced five
+# false reds, on `main`, for ever -- not once.
+#
+# So the two halves are separated. The RATCHET half ("no NEW offender") is a
+# per-drink rule, true of any drink on its own, and runs everywhere including
+# CI: that is the coverage promotion is supposed to buy. The STALENESS half
+# skips with a reason when the whole book is not here.
+#
+# The alternative considered and rejected: let promotion day produce the five
+# failures and re-baseline the registries by hand. It reads as a one-off and is
+# not one -- every later promotion re-runs them over a partial corpus too.
+
+WHOLE_COLLECTION_ONLY = {
+    "test_the_glassless_list_has_no_stale_entries",
+    "test_the_known_prose_suggestion_list_has_no_stale_entries",
+    "test_every_card_name_join_is_reachable",
+    "test_every_proposal_still_matches_a_real_step",
+    "test_no_mood_covers_more_than_half_the_collection",
+}
+
+
+def _require_whole_collection(what):
+    """Skip unless every drink in the collection is actually on this machine.
+
+    For anything phrased as "this registry has no dead entries" or "no value
+    covers more than N% of the book". Both are claims about the WHOLE
+    collection, and both quietly invert on a partial one.
+    """
+    if not DRAFTS.is_dir():
+        pytest.skip(
+            f"{what} can only be judged against the whole collection, and "
+            f"`_cocktail_drafts/` is not on this machine -- it is a separate "
+            f"private repo (helen-triages-cocktails-private), so CI never has "
+            f"it. On a partial corpus an entry naming an ABSENT drink is "
+            f"indistinguishable from one naming a FIXED drink, so this would "
+            f"report every entry as stale. The ratchet half of the same rule "
+            f"still runs on whatever is here. Clone the drafts to check this."
+        )
+
+
+# The loader guards below are the only tests allowed to name the corpus roots
+# directly; everything else must go through `_load()`. See
+# test_every_drink_reading_test_goes_through_the_loader for why.
+LOADER_GUARDS = {
+    "test_a_promoted_drink_is_checked_with_no_drafts_present",
+    "test_no_drinks_anywhere_skips_rather_than_reporting_green",
+    "test_a_present_but_empty_collection_is_never_quiet",
+    "test_every_drink_reading_test_goes_through_the_loader",
+}
+
+
+def _drink_file(directory, slug, body="glass:\n  - \"coupe\"\n"):
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / f"{slug}.md").write_text(
+        f"---\ntitle: \"{slug}\"\n{body}---\n", encoding="utf-8"
+    )
+
+
+def test_a_promoted_drink_is_checked_with_no_drafts_present(tmp_path, monkeypatch):
+    """A drink in `_cocktail_recipes/` is read even when the drafts are absent.
+
+    THIS IS THE GATE, and it is the assertion #540 needed. CI has this repo and
+    not the private drafts one, so "absent drafts" is the shape every deploy run
+    takes. Before this change the loader skipped outright in that state, which
+    meant a promoted drink -- the only kind the public ever sees -- was the one
+    thing no guard in this module could reach.
+    """
+    monkeypatch.setattr("test_cocktails.RECIPES", tmp_path / "_cocktail_recipes")
+    monkeypatch.setattr("test_cocktails.DRAFTS", tmp_path / "_cocktail_drafts")
+    _drink_file(tmp_path / "_cocktail_recipes", "promoted-drink")
+
+    assert [slug for slug, _ in _load()] == ["promoted-drink"], (
+        "A promoted drink was not read with the drafts absent. The deploy gate "
+        "covers the cocktails collection only through this path."
+    )
+
+
+def test_no_drinks_anywhere_skips_rather_than_reporting_green(tmp_path, monkeypatch):
+    """Neither collection on disk is a skip with a reason, never a silent pass.
+
+    The honest answer to "there is nothing here" is to say so in the run. An
+    empty corpus that returns quietly is the vacuity failure this repository
+    has now been bitten by six times (tests/test_suite_hygiene.py).
+    """
+    monkeypatch.setattr("test_cocktails.RECIPES", tmp_path / "nope")
+    monkeypatch.setattr("test_cocktails.DRAFTS", tmp_path / "also-nope")
+
+    with pytest.raises(pytest.skip.Exception) as caught:
+        _load()
+    assert "promote a drink" in str(caught.value).lower(), (
+        "The skip reason must tell the reader how to make this check real, not "
+        "merely that it did not run."
+    )
+
+
+def test_a_present_but_empty_collection_is_never_quiet(tmp_path, monkeypatch):
+    """A root that exists and yields nothing FAILS -- it does not skip.
+
+    This is the half that stops the fix above from becoming a new hiding place.
+    "The drafts are not cloned here" and "the drafts are cloned and I parsed
+    none of them" must not produce the same outcome, or a loader that has gone
+    stale looks exactly like a machine without the private repo.
+    """
+    monkeypatch.setattr("test_cocktails.RECIPES", tmp_path / "nope")
+    monkeypatch.setattr("test_cocktails.DRAFTS", tmp_path / "_cocktail_drafts")
+    (tmp_path / "_cocktail_drafts").mkdir()
+
+    with pytest.raises(AssertionError) as caught:
+        _load()
+    assert "gone stale" in str(caught.value), (
+        "An empty-but-present collection must fail saying why, not skip."
+    )
+
+
+def test_every_drink_reading_test_goes_through_the_loader():
+    """No test may glob the collections itself; `_load()` is the only door.
+
+    ONE DOOR IS WHAT MAKES THE GATE ABOVE WORTH ANYTHING. Every guard in this
+    module calls `_load()`, so fixing the loader fixed all 24 at once -- and the
+    same property means a single future test globbing `DRAFTS` directly would
+    reintroduce exactly the #540 hole for itself, silently, in CI only.
+
+    Generated from the source rather than from a list somebody maintains, which
+    is HANDOVER §12's lesson about generating the next check from the other end.
+    """
+    import ast
+
+    src = Path(__file__).read_text(encoding="utf-8")
+    offenders = []
+    checked = 0
+    for node in ast.walk(ast.parse(src)):
+        if not (isinstance(node, ast.FunctionDef) and node.name.startswith("test_")):
+            continue
+        checked += 1
+        if node.name in LOADER_GUARDS:
+            continue
+        names = {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
+        named = sorted(names & {"RECIPES", "DRAFTS"})
+        if named:
+            offenders.append(f"{node.name} names {', '.join(named)} directly")
+
+    assert checked, (
+        "No tests found in this module at all -- an empty scan passes while "
+        "checking nothing, which is the one failure mode with a green symptom."
+    )
+    assert not offenders, (
+        "Test(s) read the cocktail collections without going through _load():\n  "
+        + "\n  ".join(offenders)
+        + "\n\nCall _load() instead. It reads BOTH `_cocktail_recipes/` and "
+          "`_cocktail_drafts/`, skips only when neither is on disk, and fails "
+          "loudly when one is present and empty. A test that globs a root "
+          "itself gets none of that, and in CI -- where the drafts are always "
+          "absent -- it scans nothing and reports green (issue #540)."
+    )
+
+    stale = LOADER_GUARDS - {
+        n.name for n in ast.walk(ast.parse(src))
+        if isinstance(n, ast.FunctionDef)
+    }
+    assert not stale, (
+        f"LOADER_GUARDS names test(s) that no longer exist: {sorted(stale)}. "
+        f"An exemption for a deleted test excuses nothing and hides the next "
+        f"real offender behind it."
+    )
+
+
+def test_whole_collection_only_says_what_it_does():
+    """Every test in WHOLE_COLLECTION_ONLY actually skips, and nothing else does.
+
+    THE REGISTRY IS ONLY WORTH HAVING IF IT IS TRUE -- the same claim
+    test_suite_hygiene.py makes about SKIPS_WITHOUT_DRAFTS, and the same reason.
+    A test listed here but not calling `_require_whole_collection` runs in CI
+    over a partial corpus and reports a stale registry that is merely absent; a
+    test calling it without being listed silently stops covering the collection
+    and nobody chose that.
+
+    Asked of the syntax tree, not the text, because a docstring explaining that
+    a check needs the whole collection contains every word a grep would look
+    for -- HANDOVER §12, five instances of exactly that collision.
+    """
+    import ast
+
+    src = Path(__file__).read_text(encoding="utf-8")
+    listed, calls, seen = WHOLE_COLLECTION_ONLY, set(), set()
+    for node in ast.walk(ast.parse(src)):
+        if not (isinstance(node, ast.FunctionDef) and node.name.startswith("test_")):
+            continue
+        seen.add(node.name)
+        for child in ast.walk(node):
+            if (isinstance(child, ast.Call) and isinstance(child.func, ast.Name)
+                    and child.func.id == "_require_whole_collection"):
+                calls.add(node.name)
+
+    assert seen, (
+        "No tests found in this module at all -- an empty scan passes while "
+        "checking nothing."
+    )
+    assert not (listed - seen), (
+        f"WHOLE_COLLECTION_ONLY names test(s) that no longer exist: "
+        f"{sorted(listed - seen)}. A registry with dead entries stops being read."
+    )
+    assert listed == calls, (
+        "WHOLE_COLLECTION_ONLY does not match what the tests actually do.\n"
+        f"  listed but never calls _require_whole_collection: {sorted(listed - calls)}\n"
+        f"  calls it but is not listed: {sorted(calls - listed)}\n\n"
+        "Either add `_require_whole_collection(...)` to the test, or add the "
+        "test's name to the set. A guard that needs the whole book and does not "
+        "say so reports every registry entry as stale the moment the drafts are "
+        "absent -- which in CI is always (#540)."
+    )
 
 
 def _vocab():
@@ -707,6 +993,7 @@ def test_every_card_name_join_is_reachable():
     longer occurs, leaving an entry that reads as a live decision about how the
     index looks while doing nothing at all.
     """
+    _require_whole_collection("`card_name_joins`")
     vocab = _vocab()
     names = vocab.get("card_names") or {}
     joins = vocab.get("card_name_joins") or {}
@@ -1149,6 +1436,19 @@ def test_every_drink_names_a_glass():
           "hole where the page's main image goes."
     )
 
+
+def test_the_glassless_list_has_no_stale_entries():
+    """GLASSLESS_ON_2026_08_27 only shrinks -- a drink that gains a glass comes off.
+
+    SPLIT OUT OF THE RATCHET ABOVE, 2026-08-29, #540. The two halves ask
+    opposite-facing questions and only one of them survives a partial corpus:
+    "is there a seventeenth glassless drink" is true of each drink on its own,
+    while "is every name on this list still glassless" needs the whole book. In
+    CI the drafts are absent, so all sixteen names would read as fixed. See
+    WHOLE_COLLECTION_ONLY at the top of this file.
+    """
+    _require_whole_collection("GLASSLESS_ON_2026_08_27")
+    missing = {slug for slug, fm in _load() if not (fm.get("glass") or [])}
     fixed = sorted(GLASSLESS_ON_2026_08_27 - missing)
     assert not fixed, (
         "these now HAVE a glass and should come off GLASSLESS_ON_2026_08_27:\n  "
@@ -1745,6 +2045,32 @@ KNOWN_PROSE_SUGGESTIONS = {
 }
 
 
+def _prose_suggestions():
+    """Every (slug, suggestion) that reads as prose rather than a bottle name.
+
+    ONE DEFINITION, TWO TESTS. The ratchet and the staleness check split in
+    2026-08-29 (#540) and must keep asking the same question of the data --
+    re-typing this loop into both is how a "new offender" and a "fixed entry"
+    silently stop being complements of each other.
+    """
+    markers = re.compile(
+        r"\b(or other|if you|because|rather than|instead|works|prefer|any\b|"
+        r"but |though|use |avoid|ideally|would)\b", re.I)
+
+    found = set()
+    for slug, fm in _load():
+        for ing in (fm.get("ingredients") or []):
+            if not isinstance(ing, dict) or "suggestion" not in ing:
+                continue
+            s = ing["suggestion"]
+            for one in (s if isinstance(s, list) else [s]):
+                if not isinstance(one, str):
+                    continue          # shape is the sibling test's problem
+                if markers.search(one) or len(one) > 42:
+                    found.add((slug, one))
+    return found
+
+
 def test_no_new_prose_suggestions():
     """A `suggestion` should name a bottle, not explain one -- #457, #499.
 
@@ -1763,24 +2089,7 @@ def test_no_new_prose_suggestions():
     a word about why. If one gets fixed, delete its line. Both are one-line
     edits and both are the point.
     """
-    markers = re.compile(
-        r"\b(or other|if you|because|rather than|instead|works|prefer|any\b|"
-        r"but |though|use |avoid|ideally|would)\b", re.I)
-
-    found = set()
-    for slug, fm in _load():
-        for ing in (fm.get("ingredients") or []):
-            if not isinstance(ing, dict) or "suggestion" not in ing:
-                continue
-            s = ing["suggestion"]
-            for one in (s if isinstance(s, list) else [s]):
-                if not isinstance(one, str):
-                    continue          # shape is the sibling test's problem
-                if markers.search(one) or len(one) > 42:
-                    found.add((slug, one))
-
-    new = sorted(found - KNOWN_PROSE_SUGGESTIONS)
-    fixed = sorted(KNOWN_PROSE_SUGGESTIONS - found)
+    new = sorted(_prose_suggestions() - KNOWN_PROSE_SUGGESTIONS)
 
     assert not new, (
         "suggestion(s) reading as prose rather than a bottle name:\n  "
@@ -1790,6 +2099,18 @@ def test_no_new_prose_suggestions():
           "which exists for exactly this (#457). If it really is a bottle "
           "name, add it to KNOWN_PROSE_SUGGESTIONS with a word about why."
     )
+
+def test_the_known_prose_suggestion_list_has_no_stale_entries():
+    """KNOWN_PROSE_SUGGESTIONS only shrinks -- a reworded suggestion comes off.
+
+    SPLIT OUT OF THE RATCHET ABOVE, 2026-08-29, #540, for the same reason as
+    test_the_glassless_list_has_no_stale_entries: "no NEW prose suggestion" is
+    a per-drink claim and survives a partial corpus, while "every pinned entry
+    still trips the check" needs the whole book -- a drink that is absent has
+    no suggestions at all, so every entry reads as fixed.
+    """
+    _require_whole_collection("KNOWN_PROSE_SUGGESTIONS")
+    fixed = sorted(KNOWN_PROSE_SUGGESTIONS - _prose_suggestions())
     assert not fixed, (
         "KNOWN_PROSE_SUGGESTIONS names suggestion(s) that no longer trip the "
         "check:\n  "
@@ -1953,6 +2274,7 @@ def test_every_proposal_still_matches_a_real_step():
     case -- it is either already canonical or part of the informative tail that
     #290 explicitly does not touch.
     """
+    _require_whole_collection("methods.yml's proposal list")
     spec = _methods()
     proposals = spec.get("proposals") or {}
     assert proposals, (
@@ -2040,6 +2362,7 @@ def test_no_mood_covers_more_than_half_the_collection():
     A guard rather than a note, because the failure mode is gradual: a mood
     stays useful until the collection grows past it, and nobody re-measures.
     """
+    _require_whole_collection("a mood's share of the collection")
     drinks = _load()
     counts = {}
     for _, fm in drinks:
