@@ -45,8 +45,8 @@ permalink: /cocktails/
   {% assign taxonomy   = site.data.cocktails.taxonomy %}
   {% assign glasses    = site.data.cocktails.glasses %}
   {% assign ship_tints = taxonomy.ship_tints %}
-  {% assign card_names = site.data.cocktails.ingredients.rum_display_names %}
-  {% assign card_joins = site.data.cocktails.ingredients.rum_card_name_joins %}
+  {% assign card_names = site.data.cocktails.ingredients.card_names %}
+  {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
 
   {% comment %} Tallest glass counted live from the data, never hardcoded —
      the same rigour _layouts/cocktail.html and _dev/glasses.html hold
@@ -243,7 +243,7 @@ permalink: /cocktails/
          treats a bare string as a one-item sequence — verified against the real
          liquid gem by _layouts/cocktail.html, not assumed — so one loop handles
          both shapes with no type check. {% endcomment %}
-      {% capture searchable %}{% for ing in drink.ingredients %}{% if ing.item %}{{ ing.item }}|{% endif %}{% for g in ing.generic %}{{ g }}|{% endfor %}{% endfor %}{% endcapture %}
+      {% capture searchable %}{% for ing in drink.ingredients %}{% for g in ing.generic %}{{ g }}|{% assign dn = card_names[g] %}{% if dn %}{{ dn }}|{% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }}|{% endfor %}{% endfor %}{% endcapture %}
 
       <li class="drink-card"
           data-ship="{{ ship }}"
@@ -291,7 +291,7 @@ permalink: /cocktails/
                DIFFERENT rums across the collection: `Overproof Navy rum` is a
                Demerara aged on one card, a moderately aged Jamaican on another
                and an O.F.T.D. on a third. So a rum shows its CATEGORY, via
-               `rum_display_names` in _data/cocktails/ingredients.yml, and the
+               `card_names` in _data/cocktails/ingredients.yml, and the
                drink page keeps the bottle in its headline. Helen's call,
                2026-08-27, asked with `El Dorado 12 year old rum` -> `Demerara
                rum` in front of her: category always, so that a rum-shaped word
@@ -304,7 +304,7 @@ permalink: /cocktails/
                print half a fact; there is no such entry today, and this is
                what stops one appearing silently.
 
-               THE JOIN IS THEN LOOKED UP in `rum_card_name_joins`, because a
+               THE JOIN IS THEN LOOKED UP in `card_name_joins`, because a
                pair sharing a head word reads badly and no rule collapses it
                well: `Demerara overproof rum or Demerara rum` is Helen's
                `Demerara rum or overproof`, which drops two words from the
@@ -315,9 +315,7 @@ permalink: /cocktails/
                needs nothing — each ingredient entry renders its own card name,
                so the name simply appears twice, correctly. {% endcomment %}
             <p class="drink-card-ingredients">
-              {% for ing in drink.ingredients %}{% if ing.item %}{% assign g_n = 0 %}{% assign named = 0 %}{% assign short = "" %}{% for g in ing.generic %}{% assign g_n = g_n | plus: 1 %}{% assign dn = card_names[g] %}{% if dn %}{% assign named = named | plus: 1 %}{% if short == "" %}{% assign short = dn %}{% else %}{% assign short = short | append: " or " | append: dn %}{% endif %}{% endif %}{% endfor %}{% if named > 0 and named == g_n %}{% assign joined = card_joins[short] %}{% if joined %}{% assign card_label = joined %}{% else %}{% assign card_label = short %}{% endif %}{% else %}{% assign card_label = ing.item %}{% endif %}{% comment %} The search text is the ITEM AND THE GENERICS, whatever the card
-                 displays — so a card matched on a bottle name it no longer
-                 prints can still show WHY it matched. {% endcomment %}{% capture ing_search %}{{ ing.item }} {% for g in ing.generic %}{{ g }} {% endfor %}{% endcapture %}<span class="drink-card-ing" data-ing="{{ ing_search | strip | downcase }}">{{ card_label }}</span>{% unless forloop.last %} <span class="drink-card-sep">·</span> {% endunless %}{% endif %}{% endfor %}
+              {% for ing in drink.ingredients %}{% assign label = "" %}{% for g in ing.generic %}{% assign dn = card_names[g] | default: g %}{% if label == "" %}{% assign label = dn %}{% else %}{% assign label = label | append: " or " | append: dn %}{% endif %}{% endfor %}{% assign joined = card_name_joins[label] %}{% if joined %}{% assign label = joined %}{% endif %}{% if label == "" %}{% assign label = ing.item %}{% endif %}{% capture ing_search %}{% for g in ing.generic %}{{ g }} {% assign dn = card_names[g] %}{% if dn %}{{ dn }} {% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }} {% endfor %}{% endcapture %}{% if label != "" %}<span class="drink-card-ing" data-ing="{{ ing_search | strip | downcase }}">{{ label }}</span>{% unless forloop.last %} <span class="drink-card-sep">·</span> {% endunless %}{% endif %}{% endfor %}
             </p>
           {% endif %}
         </div>

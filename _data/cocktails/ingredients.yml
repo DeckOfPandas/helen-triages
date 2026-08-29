@@ -163,7 +163,7 @@ whisky_characters:
 # what test_rum_card_names_are_distinct enforces. Two rums reading the same on a
 # card would rebuild the exact fault this map exists to fix -- UNLESS the
 # collapse is deliberate, in which case it goes in
-# `rum_card_names_may_collide` below with its reason, the same shape
+# `card_names_may_collide` below with its reason, the same shape
 # `family_less` uses. No drink in the collection shows the same card name twice
 # either way, which test_no_drink_shows_the_same_card_name_twice holds
 # separately: that is the failure a reader would actually SEE.
@@ -185,10 +185,10 @@ whisky_characters:
 # trailing "rum". Two of them are consequently LONGER than the generic they
 # stand for, which is fine: this map's job is a name you can read at card
 # distance, and brevity was only ever the means.
-rum_display_names:
+card_names:
   "Jamaican, moderately aged": "Jamaican rum"
   # DELIBERATELY THE SAME as the moderately aged one above -- see
-  # rum_card_names_may_collide. Declared in rum_styles and used by NO DRINK as
+  # card_names_may_collide. Declared in rum_styles and used by NO DRINK as
   # of 2026-08-27; named here anyway, so the map covers the vocabulary rather
   # than today's data.
   #
@@ -297,7 +297,7 @@ rum_display_names:
 # `methods.yml`'s proposals strike: a replacement whose work is already done
 # reads as outstanding, and one whose left-hand side has drifted does nothing
 # while looking live.
-rum_card_name_joins:
+card_name_joins:
   "Demerara overproof rum or Demerara rum": "Demerara rum or overproof"
 
 # CARD NAMES THAT ARE ALLOWED TO BE THE SAME, with the reason attached -- the
@@ -308,7 +308,7 @@ rum_card_name_joins:
 # Listing a name here is what makes the collapse permitted; an undeclared
 # duplicate still fails. A collapse is a real loss of information on the index,
 # so it should cost a sentence.
-rum_card_names_may_collide:
+card_names_may_collide:
   "sugar syrup": >-
     `sugar syrup 1:1` and `sugar syrup 2:1` both read `sugar syrup` on a card.
     Helen, 2026-08-27, asked what she would expect to see: "On the card I would

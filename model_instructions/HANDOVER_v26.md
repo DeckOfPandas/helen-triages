@@ -1784,7 +1784,7 @@ see §9.10 for the shape. #460 stays open for the REST of the page (method,
 notes, meta), which still hasn't had a design pass — this was the
 ingredient list specifically.
 
-**Every rum generic also has a CARD NAME, `rum_display_names` — #501,
+**Every rum generic also has a CARD NAME, `card_names` — #501,
 2026-08-27.** A third string per rum category, beside the generic and the
 family, and it exists because the index cannot show the full name and must not
 show the item. See §9.10.1; that section is where the reasoning lives.
@@ -2158,7 +2158,7 @@ length problem ("the real category name is obviously too long") and the
 measurement said otherwise; **it was a correctness problem that happened to
 also cost room.**
 
-**`rum_display_names` in `ingredients.yml`** maps a generic to its card name.
+**`card_names` in `ingredients.yml`** maps a generic to its card name.
 The rule in `cocktails/index.html` is "substitute when every generic on the
 entry has a card name, else fall back to `item`" — the all-or-nothing half
 matters because a list `generic` means "either would do" (#441) and ten rum
@@ -2202,7 +2202,7 @@ rule would have failed the feature's best cases.
 Jamaicans to `Jamaican rum`, on the principle that the funk is the shared
 trait and caramel is a nuance of the same rum, where both Demeraras and both
 agricoles keep their own names because proof and age change what you are
-making. `rum_card_names_may_collide` carries the reason — the `family_less`
+making. `card_names_may_collide` carries the reason — the `family_less`
 idiom — and an *undeclared* duplicate still fails, because two rums reading
 alike is the precise fault this map removed.
 
@@ -2216,7 +2216,7 @@ template stops rendering the string a script was matching on, the script is
 already broken and nothing about the page looks wrong.**
 
 **A disjunctive pair sharing a head word gets an EXPLICIT replacement, not a
-rule.** `rum_card_name_joins` is keyed on the default join, so the before and
+rule.** `card_name_joins` is keyed on the default join, so the before and
 after read together: Swizzle's `Demerara overproof rum or Demerara rum` is
 Helen's `Demerara rum or overproof`. Her form drops two words from the second
 option and reorders the pair, which is why it is stored — she expects more

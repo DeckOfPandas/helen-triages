@@ -467,7 +467,7 @@ def test_a_declared_character_vocabulary_is_enforced():
 
 
 def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
-    """`rum_display_names` covers the rum family exactly -- issue #501.
+    """`card_names` covers the rum family exactly -- issue #501.
 
     The card renders a rum's CATEGORY rather than the source's own words,
     because those words could not be trusted: eight item strings in this
@@ -483,7 +483,7 @@ def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
     mapping rather than a list.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
+    names = vocab.get("card_names") or {}
     family_of = vocab.get("family_of") or {}
     rum_generics = {g for g, fam in family_of.items() if fam == "rum"}
     assert rum_generics, (
@@ -495,7 +495,7 @@ def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
         "Rum generic(s) with no card name:\n  " + "\n  ".join(missing)
         + "\n\nA rum without one falls back to `item` on the index, which is "
           "the ambiguous colour vocabulary #314 retired. Add it to "
-          "`rum_display_names` in _data/cocktails/ingredients.yml."
+          "`card_names` in _data/cocktails/ingredients.yml."
     )
     # THE SECOND HALF LOOSENED 2026-08-27, and only by one notch. It used to
     # require the map to be EXACTLY the rum family, which was right while #501
@@ -530,7 +530,7 @@ def test_rum_card_names_are_distinct():
     the funk is the shared trait and the caramel is a nuance of the same rum,
     where both Demeraras and both agricoles keep their own names because proof
     and age change what you are making. So the rule is not "never" but "not by
-    accident" -- `rum_card_names_may_collide` carries the reason, the same shape
+    accident" -- `card_names_may_collide` carries the reason, the same shape
     `family_less` uses, and an undeclared duplicate still fails.
 
     THERE IS DELIBERATELY NO LENGTH RULE HERE. An earlier version of this test
@@ -542,10 +542,10 @@ def test_rum_card_names_are_distinct():
     test_card_lines_do_not_get_longer holds the thing that actually mattered.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
-    permitted = vocab.get("rum_card_names_may_collide") or {}
+    names = vocab.get("card_names") or {}
+    permitted = vocab.get("card_names_may_collide") or {}
     assert names, (
-        "`rum_display_names` is empty, so this check is vacuous."
+        "`card_names` is empty, so this check is vacuous."
     )
     seen = {}
     clashes = []
@@ -559,7 +559,7 @@ def test_rum_card_names_are_distinct():
         + "\n  ".join(clashes)
         + "\n\nThe index would show identical words for rums that are not "
           "interchangeable, which is the exact ambiguity #501 removed. If the "
-          "collapse is intended, add the NAME to `rum_card_names_may_collide` "
+          "collapse is intended, add the NAME to `card_names_may_collide` "
           "with the reason -- a collapse loses information on the index, so it "
           "should cost a sentence."
     )
@@ -598,8 +598,8 @@ def test_showing_categories_still_shortens_the_index():
     whole set drifts long enough to stop paying for itself.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
-    assert names, "`rum_display_names` is empty; nothing to check."
+    names = vocab.get("card_names") or {}
+    assert names, "`card_names` is empty; nothing to check."
     before_total, after_total, checked = 0, 0, 0
     for slug, fm in _load():
         before, after = [], []
@@ -656,9 +656,9 @@ def test_no_card_shows_two_different_rums_under_one_name():
     would say one word for two rums and lose the difference silently.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
-    joins = vocab.get("rum_card_name_joins") or {}
-    assert names, "`rum_display_names` is empty; nothing to check."
+    names = vocab.get("card_names") or {}
+    joins = vocab.get("card_name_joins") or {}
+    assert names, "`card_names` is empty; nothing to check."
     bad, checked = [], 0
     for slug, fm in _load():
         # card name -> the set of generic-tuples that produced it
@@ -694,7 +694,7 @@ def test_no_card_shows_two_different_rums_under_one_name():
 
 
 def test_every_card_name_join_is_reachable():
-    """A `rum_card_name_joins` key must be a join some drink actually produces.
+    """A `card_name_joins` key must be a join some drink actually produces.
 
     THE SAME BARGAIN `methods.yml` STRIKES with its proposals, and for the same
     reason: this map duplicates live data -- the left-hand side is a string the
@@ -708,10 +708,10 @@ def test_every_card_name_join_is_reachable():
     index looks while doing nothing at all.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
-    joins = vocab.get("rum_card_name_joins") or {}
+    names = vocab.get("card_names") or {}
+    joins = vocab.get("card_name_joins") or {}
     if not joins:
-        pytest.skip("`rum_card_name_joins` is empty; no default join is "
+        pytest.skip("`card_name_joins` is empty; no default join is "
                     "overridden, which is a legitimate state.")
     produced = set()
     for slug, fm in _load():
