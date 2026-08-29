@@ -49,7 +49,17 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 # `blackstrap` is only ever a character could not be enforced while this list
 # still declared it a generic. The guard meant to keep the two fields apart was
 # quietly putting them back together.
-NOT_GENERIC_LISTS = {"families", "rum_characters"}
+# DERIVED FROM THE SUFFIX SINCE 2026-08-29, not listed by hand. `rum_characters`
+# had to be added to this set by hand in the first place, four days after the
+# list existed, and `whisky_characters` would have needed the same remembering.
+# A `<family>_characters` list is never a generic vocabulary, so the rule can be
+# stated once instead of enumerated -- the same reasoning `_retired` already
+# uses for its `retired_` prefix.
+NOT_GENERIC_LISTS = {"families"}
+
+
+def _is_character_list(key):
+    return key.endswith("_characters")
 
 
 def _load():
@@ -107,7 +117,8 @@ def _declared_generics(vocab):
     """
     out = set()
     for key, value in vocab.items():
-        if key in NOT_GENERIC_LISTS or not isinstance(value, list):
+        if (key in NOT_GENERIC_LISTS or _is_character_list(key)
+                or not isinstance(value, list)):
             continue
         out |= set(value)
     return out
@@ -380,39 +391,40 @@ def test_speciality_gin_declares_a_character():
 # 6 and 7 -- shape guards on the drinks themselves
 # =============================================================================
 
-def test_rum_character_is_declared():
-    """A RUM's `character` must be a declared `rum_characters` value.
+def test_a_declared_character_vocabulary_is_enforced():
+    """A `character` must be declared, for every family that closes its list.
 
-    THIS HOLE WAS OPEN UNTIL 2026-08-26 AND NOTHING WAS WATCHING IT.
-    `character` is the field #441 spent an entire issue separating from
-    `generic`, and #314's ruling on blackstrap turns on that separation -- yet
-    every guard in this file pointed at `generic`. A typo in `character` minted
-    a value in silence, which is precisely the failure
-    test_every_generic_is_declared exists to prevent one field over.
+    WAS RUM-ONLY UNTIL 2026-08-29, and generalising it is the point rather than
+    a tidy-up. `whisky_characters` arrived with `peated` (#314, Helen: "so
+    single malt whisky, character: peated ???"), and a rum-shaped guard would
+    have left the new list declared and checked by nothing -- which is EXACTLY
+    the failure this test was written for. `rum_characters` sat unchecked for
+    four days while `sherry` and `Spanish-style` passed silently as generics.
 
-    It got worse, not better, when `rum_characters` was excluded from the
-    declared-generic set in that same session: correct, but it left the list
-    declared and consumed by absolutely nothing. A vocabulary nothing checks
-    against is decoration.
+    NOT EVERY FAMILY, AND THAT ASYMMETRY IS DELIBERATE. Only families that
+    DECLARE a `<family>_characters` list are checked. Gin declares none, on
+    Helen's explicit call: a rum's character comes from a handful of production
+    traits and closes into a list, while a gin's is whatever went in the still,
+    so Spiced Negroni's cardamom is correctly undeclared and must not fire here.
+    Adding a list is what switches enforcement on, which means the vocabulary
+    and its guard can no longer drift apart.
 
-    NOT EVERY CHARACTER -- ONLY RUM'S, and the asymmetry is deliberate rather
-    than an oversight to tidy up later. Helen, 2026-08-26, on gin: character
-    there is FREE TEXT, because a rum's comes from a handful of production
-    traits and closes into a list while a gin's is whatever the distiller
-    reached for. So Spiced Negroni's cardamom is correctly undeclared and this
-    test must not fire on it.
-
-    Rum-ness is derived through `family_of`, not pattern-matched on the item
-    name -- 61 ingredients in this collection are named only by brand, which is
-    the same reason `generic` is stored rather than computed.
+    Family-ness is derived through `family_of`, never pattern-matched on the
+    item name -- 61 ingredients in this collection are named only by brand,
+    which is the same reason `generic` is stored rather than computed.
     """
     vocab = _vocab()
-    declared = set(vocab.get("rum_characters") or [])
     family_of = vocab.get("family_of") or {}
+    declared = {
+        key[: -len("_characters")]: set(value)
+        for key, value in vocab.items()
+        if _is_character_list(key) and isinstance(value, list) and value
+    }
     assert declared, (
-        "ingredients.yml declares no `rum_characters`, so this check enforces "
-        "nothing. An empty set would pass every value."
+        "ingredients.yml declares no `<family>_characters` list at all, so this "
+        "check enforces nothing. `rum_characters` at least should be there."
     )
+
     bad, checked = [], 0
     for slug, fm in _load():
         for item in (fm.get("ingredients") or []):
@@ -420,31 +432,37 @@ def test_rum_character_is_declared():
                 continue
             generic = item.get("generic")
             generics = generic if isinstance(generic, list) else [generic]
-            if not any(family_of.get(g) == "rum" for g in generics):
+            families = {family_of.get(g) for g in generics} & set(declared)
+            if not families:
                 continue
             character = item.get("character")
             if not character:
                 continue
+            permitted = set().union(*(declared[f] for f in families))
             for value in (character if isinstance(character, list) else [character]):
                 checked += 1
-                if value not in declared:
-                    bad.append(f"{slug}: {item.get('item') or '?'!r} -> {value!r}")
-    # The rum-ness test above is a two-step lookup (generic -> family_of ->
-    # "rum"), and EITHER step going stale would leave this test green while
-    # checking nothing -- a renamed generic, a dropped family mapping. The
-    # collection has four rums carrying a character today; zero means the
-    # derivation broke, not that the data got tidier.
+                if value not in permitted:
+                    bad.append(
+                        f"{slug}: {item.get('item') or '?'!r} -> {value!r} "
+                        f"(family {'/'.join(sorted(families))})"
+                    )
+    # The family lookup is a two-step derivation (generic -> family_of ->
+    # family), and EITHER step going stale would leave this green while checking
+    # nothing. The collection has four rums carrying a character today; zero
+    # means the derivation broke, not that the data got tidier.
     assert checked, (
-        "No rum ingredient carries a `character`, so this check is vacuous. "
-        "That is implausible for this collection -- blackstrap alone is on "
+        "No ingredient in a closed-character family carries a `character`, so "
+        "this check is vacuous. That is implausible -- blackstrap alone is on "
         "three drinks. Either `family_of` no longer maps the rum styles, or a "
         "generic was renamed without this following."
     )
     assert not bad, (
-        "Undeclared character(s) on a rum:\n  " + "\n  ".join(sorted(bad))
-        + f"\n\nDeclared: {sorted(declared)}.\nEither it is a typo, or the "
-          "value is real and belongs in `rum_characters`. A character is not a "
-          "generic -- #441 -- but it is just as much a vocabulary."
+        "Undeclared character(s):\n  " + "\n  ".join(sorted(bad))
+        + "\n\nDeclared: "
+        + "; ".join(f"{f}={sorted(v)}" for f, v in sorted(declared.items()))
+        + ".\nEither it is a typo, or the value is real and belongs in that "
+          "family's list. A character is not a generic -- #441 -- but it is "
+          "just as much a vocabulary."
     )
 
 

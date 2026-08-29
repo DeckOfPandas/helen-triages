@@ -119,6 +119,27 @@ rum_characters:
   - "sherry"
   - "Spanish-style"
 
+# PEAT IS A CHARACTER, NOT A STYLE -- Helen, 2026-08-27, working it out aloud:
+# "so single malt whisky, character: peated ???" Yes, and for the reason #441
+# settled for blackstrap: peat is ORTHOGONAL to single-malt-versus-blended, so a
+# peated single malt is both and one field cannot hold it.
+#
+# The collection was already straining against this. The two drinks typed
+# `peated Scotch` have items reading "Peated single malt whisky" and "Peated
+# Scotch whisky" -- one of them was saying style and character through the same
+# slot because there was nowhere else to put the second half.
+#
+# CLOSED VOCABULARY, LIKE RUM'S AND UNLIKE GIN'S. Helen's call, 2026-08-26: a
+# rum's character comes from a handful of production traits and closes into a
+# list, while a gin's is whatever went in the still. Whisky is rum-shaped --
+# peat, sherry cask, bonded -- so it gets a list and a guard.
+#
+# `peated Scotch` IS STILL IN whisky_styles and is not retired yet: two drinks
+# use it, and retyping them needs the drafts repo. Retire it in the same pass
+# that retypes them, not before.
+whisky_characters:
+  - "peated"
+
 # THE CARD NAME FOR EACH RUM CATEGORY. Issue #501, Helen 2026-08-27: "set a
 # display name for each rum category, to be used as a short name on cocktail
 # cards. The recipe page can then display the full category name."
