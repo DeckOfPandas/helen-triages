@@ -2485,60 +2485,165 @@ near-monochrome ground where the glass drawings carry the personality food gets
 from colour. Food leads with ten saturated brights; this site leads with line
 work and spends colour sparingly on top of it.
 
-#### The three accents, and why the count went up
+#### The five accents — "neon bar sign", 2026-08-29
 
-It was "near-monochrome, ONE accent" in the morning and three by the evening.
-Helen named the reversal herself rather than letting it drift: *"I'm breaking
-rules, but I'd like more of the second colour… because it's pretty. I'm
-interested in adding a third too. I know this is going against what I said
-earlier, but I had no vision then and we're getting closer now."*
+**Read this before the history below it.** The palette went one accent →
+three (2026-08-26) → **five** (2026-08-29), and the earlier rounds are kept
+because their REASONING still binds. The values do not.
 
-Worth recording because food's palette argues the opposite at length — its
-recipe page spends four colours and "the count IS the design" (§13). The two
-sites are allowed to disagree; they are not allowed to disagree by accident.
-**What survives is not the count but the rule underneath it: every colour has a
-job, and the jobs are different AXES.**
+| variable | | job | where it already is |
+|---|---|---|---|
+| `$color-electric-absinthe` | `#30E88C` / `#0E8248` | MOOD, **and the home colour** | glass wash and hover on a card, nav/footer chrome |
+| `$color-radiant-reposado` | `#F47E25` / `#B6540A` | YOLO / GOODNESS | the ship mark on a card |
+| `$color-ultra-yvette` | `#9233E6` / `#9A41E7` | HASSLE | — |
+| `$color-cosmic-cosmopolitan` | `#F127A7` / `#D40E8C` | HAS TO HAVE | the matched-ingredient band |
+| `$color-luminous-lagoon` | `#2ED1EA` / `#0E7C8C` | I KNOW WHAT I WANT | — |
 
-| | | |
-|---|---|---|
-| menthe `#51BB86` / `#317E58` | MOOD | mood filters, the glass wash on a card |
-| amber `#DD9C2C` / `#966818` | GOODNESS | the ship mark, chaos buttons, structural rules and counts |
-| violet `#B29AD4` / `#845EBA` | ASKED FOR | has-to-have field and chips, the matching ingredient on a card, method numerals |
+Bare = the RULE, a vivid band under a heading, **never text**. `-deep` =
+4.75:1 on paper, safe as type. `-wash` = a 10% tint for something that has
+matched. **LEAVE OUT has no hue at all** and the absence is the decision —
+Helen: *"for food, avoiding can be important whereas for drinks surely less
+so."* Food gave its LEAVE OUT a sixth colour; this deliberately does not.
 
-A drink can match your mood, be rated `meh`, and contain something you asked
-for. Three facts, three colours, none meaning the same kind of thing.
+**A heading's colour is a promise the card already keeps.** That is the rule
+that makes five hues feel inevitable rather than decorative: MOOD is green
+because the glass panels are green, YOLO is reposado because the ship mark is,
+HAS TO HAVE is cosmopolitan because matched ingredients are. Nothing was
+assigned by taste alone. Helen's own reasoning, and she assigned them.
 
-**Violet spent one revision on LEAVE OUT and came straight off it.** Helen:
-"suddenly busy, and jarring". Exclusion IS a distinct axis and food spent a
-whole hue on it (electric cobalt) — but exclusion is RARE and its control is
-LARGE, so the least-used thing below the fold became the loudest on the page.
+**The home colour doubles as a section colour, and that is not incoherent.**
+Helen worried it was — if green is the site's colour, can it also be MOOD's?
+Food answers it: `$color-accent` **is** `$color-star-root`, and §13.2 calls
+those "one rhyme rather than four coincidences."
+
+##### The three measurements that shaped it
+
+**1. Five saturated hues that avoid food's six DO NOT EXIST.** Helen ranked
+neon top but flagged that "all five colours are close (to my eye) to our food
+palette" — true, and worse than she thought: one was **1° from food's hot
+orange**. Sweeping the whole circle, the best possible five-set still comes
+within **21°**, because food's own six already tile it (25, 58, 84, 197, 223,
+313). So **saturation, not hue, is what separates the two sites**: the muted
+candidate palette landed ΔE 31 from food's nearest colour where neon landed 15,
+using a hue *3° away*. The sites are siblings by construction; what makes them
+different is the home colour (green here, magenta there) and how freely colour
+is spent.
+
+**2. The dichromacy bar applies to exactly two of the five, and I applied it to
+all five first.** It cost two candidate palettes before the error surfaced. A
+heading rule sits under its section's name **in words**, so hue is
+reinforcement and may safely collapse for a dichromat — food runs six hues,
+several of which would fail the bar, and is not broken. The bar is real only
+where colour carries meaning ALONE: **the goodness mark and the matched
+ingredient**, plus the mood chip beside them on the same card. Those three were
+checked — worst pair reposado vs cosmopolitan under tritanopia, **ΔE 22.6**
+against a bar of 10. Re-run `tmp/neon_values.py` if any of them moves.
+
+**3. Ultra-yvette cannot take dark text at all.** Ink on it is 3.14:1 and
+*nothing* darkened clears 4.5, because the fill is already dark — a vivid
+blue-violet has no brighter version to be a fill from. This mattered until the
+card stopped putting text on colour at all, and it is why nothing should start
+again.
+
+##### Bands and washes, not fills — and this is the transferable part
+
+Helen, 2026-08-28, on a card carrying three filled things: *"There's just a lot
+going on… underline the ingredient rather than highlight."*
+
+**Fill is the loudest tool available**, and a card can carry several matches at
+once. The fix was a language already invented for the headings and used nowhere
+else: **a coloured band under text**. So "this colour under text" now means one
+thing everywhere, and a matched ingredient is visibly the answer to the
+cosmopolitan heading that found it.
+
+- matched ingredient → a band (`text-decoration`, **not** the headings'
+  `box-shadow`, because this one WRAPS and a box-shadow gives a wrapped
+  fragment an odd stub)
+- matched chip → a wash plus a coloured border, **text stays ink**
+- **the goodness mark is the only fill left on a card**, which is right: it is
+  the one thing there that is not text
+
+**Text on a wash is ink, never the `-deep`.** Each deep is solved to ~4.75:1
+against PAPER, so any tint beneath drops the pair under 4.5 — ultra-yvette
+lands at 4.49 even on a 6% wash. Darkening the deeps to compensate would damage
+the job they exist for.
+
+##### What the earlier rounds still bind
+
 **Colour weight tracks how much of the page something occupies, not how
-semantically distinct it is.** Exclusion is struck-through and dashed, and
-costs nothing. This is the most transferable thing in this section.
+semantically distinct it is.** Violet spent one revision on LEAVE OUT and came
+straight off — "suddenly busy, and jarring". The least-used control below the
+fold was the largest, so it became the loudest thing on the page. Still the
+most transferable line in this section, and it is why LEAVE OUT now has no hue
+at all.
 
-**Every pair is solved, not darkened by a shared step.** Fill ≈2.30:1 on paper
-(never text), text ≈4.75:1 (clears the body floor). The lightness that hits
-those numbers is a property of the HUE — menthe and amber are far apart in
-lightness at identical measured contrast. Food carries `$darken-active-lime`
-because one shared step did not hold across two yellow-greens; here there is no
-shared step at all.
+**Every pair is solved, not darkened by a shared step.** The lightness that
+hits a contrast target is a property of the HUE. The same trap bit again on
+2026-08-28: after the swap, one shared `darken(…, 22%)` put MOOD at 10.99:1
+(nearly black on bright green) and HAS TO HAVE at **3.61:1**, which fails AA.
+Five fills at five lightnesses cannot share one darken value.
 
-**The hues were chosen by colour-blind separation, not only taste.** Helen
-rejected campari red and bitter orange as "too red-green and inaccessible", and
-simulation agreed exactly: against menthe, campari falls to **24.5 dE under
-protanopia** while reading 101 apart to normal vision — the failure mode where
-a palette looks fine to whoever picked it. Menthe/amber never drops below 31
-across protanopia, deuteranopia and tritanopia. Violet beat slate blue, ink
-teal and aubergine as the only third staying clear of BOTH under all three; the
-others collapse against menthe under tritanopia (slate blue 5.6, ink teal 6.3)
-or against amber (aubergine 12.9). **If a fourth accent is ever proposed: name
-its axis first, then run the separation check before choosing a hue.**
+**Helen rejected campari red and bitter orange** as "too red-green and
+inaccessible" and simulation agreed exactly: against the green, campari falls to
+24.5 ΔE under protanopia while reading 101 apart to normal vision — the failure
+mode where a palette looks fine to whoever picked it.
+
+**The names are the bottles** (#555). A hue name describes the pixel; a bottle
+name describes the site. `radiant-reposado` is arguably the wrong bottle —
+reposado is amber-brown and hue 26 is Aperol almost exactly — and it is Helen's
+name and her call, recorded so the next reader knows it was noticed.
 
 #### The index — `cocktails/index.html`, `_filters.scss`, `assets/js/cocktail-index.js`
 
-Mood and chaos above the fold, ingredient include then exclude below. The order
-is the design: the first question is what you feel like; what is in the cupboard
-is a constraint you apply afterwards.
+**FIVE NAMED QUESTIONS, in the order Helen asks them** — restructured
+2026-08-29 and this is the current shape:
+
+| | | |
+|---|---|---|
+| 1 | **YOLO?** | `no chaos please` / `I'm open to chaos` |
+| 2 | **Mood** | six buttons: what the drink IS |
+| 3 | **Hassle** | four buttons: what it COSTS |
+| 4 | **Has to have** / **Leave out** | typed, with candidate pools |
+| 5 | **I know what I want** | drink name — the way past all of it |
+
+**The order is the diagnosis, not a layout.** Helen: *"I feel like I am doing
+work to understand what to click in order to maximise my chance of getting the
+drink I want."* The page had asked ONE question — "what do you fancy?" — and
+offered ten answers belonging to three different ones. **"No juicing" is not a
+flavour and "I want to faff" is not a mood.** Sorting them into questions was
+work the reader did silently, every visit.
+
+**Taste and style are NOT split, and that was tried.** The first proposal had
+three groups. Helen: *"honestly I think taste and style in those columns are
+the same, and should be called Mood. Splitting out Hassle though feels good."*
+The only cut that earns its place is between what a drink IS and what it COSTS.
+
+**The split lives in `taxonomy.yml`'s `mood_groups`, not the template**, with
+`test_every_mood_belongs_to_exactly_one_group` asserting the partition is
+total, non-overlapping and free of phantoms. Without it a mood added to
+`moods:` renders NOWHERE — no button, no error, and its drinks become
+unfilterable. Same silent-gap class as an unmapped glass (#500).
+
+**`I KNOW WHAT I WANT` is last on purpose.** Food has had that escape hatch
+since the beginning and this page had none, so there was no way past the
+apparatus even when you already knew. Last rather than first because Helen
+browses here deliberately — *"I find browsing quick and inspirational… steer
+myself then read for a while then settle"* — and a name box at the top would
+invite treating the page as a search box, which is not what it is for.
+
+**YOLO USED TO BE BACKWARDS, and this is the bug most worth not
+reintroducing.** `yolo` meant "ship is NOT yes-or-better", so the button for
+"I'll try anything" was **the one button guaranteed to hide all 55 of the best
+drinks**. `open` is now a visible STATE that applies no filter at all — Helen:
+*"'I'm open to chaos'… includes all drinks, not just
+not-known-to-be-definitely-good drinks."*
+
+**The headings were outranked, not illegible**, which is why "I can't read the
+headings" measured at a passing 5.12:1. They were 0.78rem grey labelling
+0.92rem ink buttons — smaller AND three times paler than the things they label.
+Worse, `.btn-chaos` was set in the heading's *exact* typeface, size, case and
+letterspacing, so two things competed to look like headings and the real one
+lost. **A control must not dress as a label.**
 
 **There is NO GLASS FILTER and there must not be one.** The drawings are the
 site's identity, not an axis. This sits alongside taxonomy.yml's older and
@@ -2556,12 +2661,22 @@ exception, so the rule holds for whichever mood is empty next. Today that is
 and a pre-lowercased ingredient string are all written at build time. A filter
 that reads `textContent` breaks the first time somebody restyles a card.
 
-**How the axes combine is a decision, not a default** (issue #478, and the line
-to change is marked in the script): **OR within a section, AND between
-sections.** Two moods means "either", because AND across moods is nearly always
-empty — `tiki` AND `no juicing` is a handful of drinks. Include chips are AND,
-because adding an ingredient means "and this one too", which is how a cupboard
-works.
+**How the axes combine** (#478/#479, settled): **OR within a section, AND
+between sections**, and drinks matching MORE of the selected moods **rank
+first**. Two moods means "either", because AND across moods is nearly always
+empty — `tiki` AND `no juicing` is a handful. The ranking is what makes OR
+usable: plain OR stops narrowing anything once you pick a second mood, and
+ranking gives the precision back without the one-match drinks vanishing.
+Include chips are AND, because adding an ingredient means "and this one too",
+which is how a cupboard works.
+
+**Everything shown is in RANDOMISED order, shuffled ONCE PER PAGE LOAD.** Each
+card gets a random sort key at startup and keeps it; filtering re-ranks against
+those fixed keys. Re-shuffling on every filter change would make cards leap
+around while you type into the has-to-have box, which reads as a bug however
+correct it is. Random rather than alphabetical because alphabetical buries
+everything after M and greets you with the same drink every time — the
+`taxonomy.yml` principle applied.
 
 #### The card — `_cards.scss`
 
@@ -2589,7 +2704,7 @@ is exactly that wide, and the body, the foot and the under-mark all derive from
 it. One value moves four things together and they cannot drift apart.
 
 **The framing and the hover took eleven and four candidates respectively.** What
-won: a tinted glass column with a softened menthe rule along its bottom edge, no
+won: a tinted glass column with a softened rule in the home green along its bottom edge, no
 vertical rule (eight of those down a page is a lot of signal for decoration);
 and on hover, that rule plus the panel's top edge going to full strength, so the
 column is bracketed. **Both hover marks are painted strips, not borders** — a
@@ -2642,9 +2757,14 @@ same browsing-versus-cooking split food draws with its short-method toggle.
 does not want, so the page prints whole and reads whole with the script blocked
 — **in the editorial state, deliberately the one carrying more.**
 
-Three colours doing three levels so the hierarchy reads without reading a word:
-menthe under the title, violet under the section headings and on the method
-numerals, amber on the note bar and its label.
+Three colours doing three levels so the hierarchy reads without reading a
+word: electric-absinthe under the title, cosmic-cosmopolitan under the section
+headings and on the method numerals, radiant-reposado on the note bar and its
+label. (The drink page took the 2026-08-29 palette by variable name — its three
+were menthe/violet/amber, which are now those three. It has NOT had a design
+pass under the new palette: the values are louder than the ones these choices
+were made against, so this page is the most likely place to find a colour that
+was right at the old saturation and is not at the new one.)
 
 **Section headings are 1.35rem and the size is load-bearing, not loud.**
 `$emboss-stroke` is 1.6% of font-size, so at the 0.76rem they nearly were, the

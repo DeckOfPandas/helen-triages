@@ -135,7 +135,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // same distance down the page; they are the same kind of page.
   margin: $spacing-section-gap 0 2.4rem;
   padding-bottom: $head-pad-bottom;
-  border-bottom: 2px solid $color-absinthe;
+  border-bottom: 2px solid $color-electric-absinthe;
 }
 
 // BELOW 1180px THERE IS NO MARGIN to hang a drawing in, so the glass comes
@@ -313,7 +313,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     display: block;
     font-size: 0.85rem;
     letter-spacing: $letter-spacing-label;
-    color: $color-absinthe-deep;
+    color: $color-electric-absinthe-deep;
     // NO EMBOSS. Tried, looked at, dropped -- Helen: "having seen it, it's too
     // much." The size, tracking and menthe stay; only the shadow and its
     // stroke go. The stroke goes WITH it rather than being left behind: at
@@ -353,7 +353,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // file. Nothing sets `width` now, deliberately, so it is a plain block rule
   // and there is no number here for anyone to tune.
   padding-bottom: 0.45rem;
-  border-bottom: 2px solid $color-magenta;
+  border-bottom: 2px solid $color-cosmic-cosmopolitan;
   @include punched(raised, var(--emboss-offset-lg));
 }
 
@@ -587,7 +587,7 @@ $amount-indent: $amount-col + $amount-gap;
 // The DEEP tone, not the fill: this is text at 0.84rem and the fill tone is
 // 2.30:1 on paper, nowhere near readable. See _palette.scss.
 .cocktail-type-line {
-  color: $color-magenta-deep;
+  color: $color-cosmic-cosmopolitan-deep;
   font-size: 0.84rem;
   margin: 0.3rem 0 0 $amount-indent;
   max-width: calc(#{$rule-ingredient} - #{$amount-indent});
@@ -689,7 +689,7 @@ $amount-indent: $amount-col + $amount-gap;
     padding-left: 0.3rem;
     &::marker {
       font-family: $font-headings;
-      color: $color-magenta-deep;
+      color: $color-cosmic-cosmopolitan-deep;
     }
   }
 }
@@ -721,7 +721,7 @@ $amount-indent: $amount-col + $amount-gap;
 }
 
 .cocktail .note {
-  border-left: 2px solid $color-tangerine;
+  border-left: 2px solid $color-radiant-reposado;
   padding-left: $space-lg;
 }
 
@@ -731,7 +731,7 @@ $amount-indent: $amount-col + $amount-gap;
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: $color-tangerine-deep;
+  color: $color-radiant-reposado-deep;
   margin-bottom: $space-xxs;
 }
 
@@ -764,16 +764,16 @@ $amount-indent: $amount-col + $amount-gap;
   letter-spacing: 0.1em;
   font-size: 0.75rem;
   padding: $space-xs $space-md;
-  border: 1.5px solid $color-absinthe-deep;
+  border: 1.5px solid $color-electric-absinthe-deep;
   background: $color-surface;
-  color: $color-absinthe-deep;
+  color: $color-electric-absinthe-deep;
   cursor: pointer;
 
   &:hover,
-  &:focus-visible { background: mix($color-absinthe, $color-surface, 18%); }
+  &:focus-visible { background: mix($color-electric-absinthe, $color-surface, 18%); }
   &.is-on {
-    background: $color-absinthe;
-    color: darken($color-absinthe-deep, 9%);
+    background: $color-electric-absinthe;
+    color: darken($color-electric-absinthe-deep, 9%);
     font-weight: 600;
   }
 }
