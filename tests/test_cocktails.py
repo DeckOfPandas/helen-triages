@@ -33,6 +33,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DRAFTS = ROOT / "_cocktail_drafts"
 VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"
 TAXONOMY = ROOT / "_data" / "cocktails" / "taxonomy.yml"
+BOTTLES = ROOT / "_data" / "cocktails" / "bottles.yml"
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
@@ -478,14 +479,21 @@ def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
           "the ambiguous colour vocabulary #314 retired. Add it to "
           "`rum_display_names` in _data/cocktails/ingredients.yml."
     )
-    extra = sorted(set(names) - rum_generics)
+    # THE SECOND HALF LOOSENED 2026-08-27, and only by one notch. It used to
+    # require the map to be EXACTLY the rum family, which was right while #501
+    # scoped card names to rum. Helen then added Ceylon arrack -- "is that a
+    # rum? Doesn't matter, the category list should eventually contain
+    # everything" -- so the map is growing past rum on purpose. What still bites
+    # is a card name for something that is not a declared generic at all, which
+    # is the typo case; what no longer bites is deliberate widening.
+    declared = _declared_generics(vocab)
+    extra = sorted(set(names) - declared)
     assert not extra, (
-        "Card name(s) for something that is not a rum generic:\n  "
+        "Card name(s) for something that is not a declared generic:\n  "
         + "\n  ".join(extra)
         + "\n\nEither the generic was renamed and this entry did not follow, or "
-          "the map is growing past rum. Growing it is fine -- #501 scopes it to "
-          "rum only because rum is where the item text is AMBIGUOUS -- but "
-          "rename this map and widen the check deliberately."
+          "it is a typo. Widening the map beyond rum is fine and expected -- "
+          "the value still has to be a real generic from this file."
     )
 
 
@@ -709,6 +717,251 @@ def test_every_card_name_join_is_reachable():
           "which case the default join is back on the index and nobody was "
           "told — or no drink asks for that pair any more and the entry should "
           "go.\nJoins actually produced today:\n  " + "\n  ".join(sorted(produced))
+    )
+
+
+# =============================================================================
+# The bottle dictionary -- #529, and the check it unblocks, #534
+# =============================================================================
+
+def _bottles():
+    if not BOTTLES.exists():
+        pytest.skip("_data/cocktails/bottles.yml does not exist yet.")
+    return yaml.safe_load(BOTTLES.read_text(encoding="utf-8")) or {}
+
+
+def _bottle_index(data):
+    """Every name a bottle answers to, lowercased -> its canonical name.
+
+    Case-insensitive because the collection writes `Plantation OFTD` and
+    `Planteray OFTD` for one bottle, and because a suggestion is prose typed by
+    hand. Aliases and canonical names share one namespace on purpose: an alias
+    that collides with another bottle's real name is the same bug either way.
+    """
+    out = {}
+    for name, entry in (data.get("bottles") or {}).items():
+        out[name.strip().lower()] = name
+        for alias in (entry or {}).get("aliases") or []:
+            out[alias.strip().lower()] = name
+    return out
+
+
+def test_every_bottle_names_a_declared_rum_generic():
+    """A bottle's `generic` is a real rum generic -- #529.
+
+    THE WHOLE VALUE OF THIS FILE IS THAT A BOTTLE KNOWS ITS CATEGORY, so a
+    generic that no longer exists, or one that was never a rum, makes the
+    dictionary quietly wrong rather than loudly broken -- nothing on any page
+    would look different.
+
+    Checked against `family_of` rather than the raw generic list, because that
+    is what makes it a RUM bottle: this file does not cover gin or brandy, and
+    a bottle typed `cognac` would be a scoping mistake rather than a typo.
+    """
+    data = _bottles()
+    vocab = _vocab()
+    family_of = vocab.get("family_of") or {}
+    rum_generics = {g for g, fam in family_of.items() if fam == "rum"}
+    assert rum_generics, "`family_of` maps nothing to rum; nothing to check."
+    entries = data.get("bottles") or {}
+    assert entries, (
+        "bottles.yml declares no bottles, so every check here is vacuous."
+    )
+    bad = sorted(
+        f"{name!r} -> {(entry or {}).get('generic')!r}"
+        for name, entry in entries.items()
+        if (entry or {}).get("generic") not in rum_generics
+    )
+    assert not bad, (
+        "Bottle(s) whose generic is not a declared rum style:\n  "
+        + "\n  ".join(bad)
+        + "\n\nEither the style was renamed and this did not follow, or the "
+          "bottle is not a rum and does not belong in this file."
+    )
+
+
+def test_no_bottle_name_or_alias_is_claimed_twice():
+    """One string, one bottle -- #529.
+
+    Aliases exist because twelve suggestion strings in the collection collapse
+    to about five bottles (ED3 / El Dorado 3 / El Dorado 3yo), and because
+    Planteray and Plantation are one brand renamed, which no string comparison
+    recovers. That only works while a string resolves to exactly one bottle: a
+    duplicate would make resolution order-dependent, and #534's cross-category
+    check would then depend on dictionary ordering rather than on fact.
+
+    Canonical names and aliases share one namespace deliberately -- an alias
+    colliding with another bottle's real name is the same bug as two aliases
+    colliding, and is likelier (`Planteray 3` against `El Dorado 3`).
+    """
+    data = _bottles()
+    entries = data.get("bottles") or {}
+    assert entries, "bottles.yml declares no bottles; nothing to check."
+    seen, clashes = {}, []
+    for name, entry in entries.items():
+        for label in [name] + list((entry or {}).get("aliases") or []):
+            key = label.strip().lower()
+            if key in seen and seen[key] != name:
+                clashes.append(f"{label!r}: {seen[key]!r} and {name!r}")
+            seen[key] = name
+    assert not clashes, (
+        "String(s) claimed by two bottles:\n  " + "\n  ".join(clashes)
+        + "\n\nA suggestion naming one of these could not be resolved to a "
+          "single bottle, so #534's cross-category check would be guessing."
+    )
+
+
+def test_an_excluded_bottle_is_not_also_listed():
+    """`not_reached_for` and `bottles` must not both claim a bottle -- #529.
+
+    The two blocks say opposite things: `bottles` is what Helen would pour,
+    `not_reached_for` is what qualifies and is deliberately out (Lemon Hart
+    151). A bottle in both is a half-finished decision, and the reference page
+    would list it while the reason says it should not.
+    """
+    data = _bottles()
+    index = _bottle_index(data)
+    excluded = data.get("not_reached_for") or {}
+    both = sorted(
+        f"{name!r} (listed as {index[name.strip().lower()]!r})"
+        for name in excluded if name.strip().lower() in index
+    )
+    assert not both, (
+        "Bottle(s) both listed and excluded:\n  " + "\n  ".join(both)
+        + "\n\nDelete it from one. `bottles` means Helen would reach for it; "
+          "`not_reached_for` means it qualifies and she would not."
+    )
+
+
+def test_every_suggested_bottle_resolves():
+    """Every `suggestion` on a rum names a bottle this file knows -- #529/#534.
+
+    THE DIRECTION THAT MATTERS. Nothing requires a bottle to be used by a drink
+    -- Helen owns bottles no recipe names, and El Dorado 151 is on the shopping
+    list -- but a SUGGESTION that resolves to nothing is a bottle the site
+    cannot reason about, and #534's cross-category check silently skips it.
+    Half a check is worse than none, because it reports a clean run.
+
+    KNOWN FAILURES ARE DECLARED, NOT TOLERATED. Eleven suggestion strings are
+    prose or two-bottles-in-one-string, which #457 already settled against;
+    they sit in `unresolved_suggestions` with the reason, so this test bites on
+    the NEXT one while those are being fixed. Deleting a line there is how one
+    gets retired -- the same shape `methods.yml` uses for its proposals.
+    """
+    data = _bottles()
+    index = _bottle_index(data)
+    known = {k.strip().lower() for k in (data.get("unresolved_suggestions") or {})}
+    excluded = {k.strip().lower() for k in (data.get("not_reached_for") or {})}
+    assert index, "bottles.yml resolves no names; nothing to check."
+    vocab = _vocab()
+    family_of = vocab.get("family_of") or {}
+
+    unresolved, checked = [], 0
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            if not any(family_of.get(g) == "rum" for g in generics):
+                continue
+            suggestion = item.get("suggestion")
+            for name in (suggestion if isinstance(suggestion, list)
+                         else [suggestion] if suggestion else []):
+                checked += 1
+                key = name.strip().lower()
+                if key in index or key in known or key in excluded:
+                    continue
+                unresolved.append(f"{slug}: {name!r}")
+    assert checked, (
+        "No rum ingredient carries a suggestion, so this check is vacuous. "
+        "Either `family_of` stopped mapping the rum styles or the loader is "
+        "stale -- around forty rum pours name a bottle."
+    )
+    assert not unresolved, (
+        "Suggestion(s) naming no known bottle:\n  " + "\n  ".join(sorted(unresolved))
+        + "\n\nEither add the bottle to _data/cocktails/bottles.yml, add the "
+          "spelling as an alias of one already there, or -- if it is prose "
+          "rather than a bottle name (#457) -- declare it in "
+          "`unresolved_suggestions` with the reason, so it fails loudly for "
+          "the next reader instead of quietly for this one."
+    )
+
+
+def test_a_cross_category_suggestion_carries_a_note():
+    """Suggesting a bottle from another category needs a note -- #534.
+
+    Helen: "Substituting it isn't straightforward and will vary by drink. Please
+    add notes for me on recipe pages when I've substituted in a surprising way."
+    A `suggestion` whose bottle sits in a different category than that
+    ingredient's `generic` IS the surprising case, by definition; everything
+    else is naming a bottle in the category the recipe already asked for. It
+    stops being a judgement call the moment a bottle knows its own category,
+    which is what _data/cocktails/bottles.yml is for.
+
+    PERMISSIVE, AT HELEN'S DIRECTION, and the permission has a precise shape:
+    the note must EXIST, and `QQ` counts. "Let's be permissive with the test,
+    but given we're pre-first-human-read please add the note field with QQ in it
+    if we don't have anything else." So a substitution can never ship silently
+    -- there is always a visible marker on the page -- while nothing demands
+    prose she has not written yet. QQ is the collection's existing idiom for
+    exactly this (see test_every_ingredient_has_a_generic_or_a_qq) and these are
+    drafts; a QQ is not near a published recipe.
+
+    A DISJUNCTIVE GENERIC CROSSES ONLY IF THE BOTTLE MATCHES NONE OF ITS
+    OPTIONS. A list means "either would do" (#441), so a suggestion satisfying
+    either half is not a substitution at all. Swizzle is why this rule needs
+    stating: it asks for two Demerara styles and suggests bottles in neither.
+
+    An unresolvable suggestion is SKIPPED here rather than failing twice --
+    test_every_suggested_bottle_resolves owns that, and reporting one fault as
+    two teaches you to skim the output.
+    """
+    data = _bottles()
+    index = _bottle_index(data)
+    entries = data.get("bottles") or {}
+    assert index, "bottles.yml resolves no names; nothing to check."
+    vocab = _vocab()
+    family_of = vocab.get("family_of") or {}
+
+    bad, checked = [], 0
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            generics = generic if isinstance(generic, list) else [generic]
+            if not any(family_of.get(g) == "rum" for g in generics):
+                continue
+            suggestion = item.get("suggestion")
+            names = (suggestion if isinstance(suggestion, list)
+                     else [suggestion] if suggestion else [])
+            for name in names:
+                canonical = index.get(name.strip().lower())
+                if canonical is None:
+                    continue  # owned by test_every_suggested_bottle_resolves
+                checked += 1
+                bottle_generic = (entries.get(canonical) or {}).get("generic")
+                if bottle_generic in generics:
+                    continue
+                if item.get("note"):
+                    continue
+                bad.append(
+                    f"{slug}: {item.get('item') or '?'!r} asks for "
+                    f"{generics} and suggests {canonical!r} "
+                    f"({bottle_generic!r}) — no note"
+                )
+    assert checked, (
+        "No rum suggestion resolved to a known bottle, so this check is "
+        "vacuous. Either bottles.yml stopped matching the collection's "
+        "spellings, or the loader is stale."
+    )
+    assert not bad, (
+        "Cross-category substitution(s) with nothing on the page saying why:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nAdd a per-ingredient `note` (#457). `QQ` is a valid note and is "
+          "the right one until Helen's first read-through -- the point is that "
+          "the substitution is VISIBLE, not that the reasoning is finished."
     )
 
 
@@ -1404,7 +1657,12 @@ def test_suggestion_is_a_string_or_a_list_of_strings():
 KNOWN_PROSE_SUGGESTIONS = {
     ("apple-cart", "Avallen -- a round, fresh taste if you need to sub"),
     ("daisy-de-santiago", "Havana 3 year old and Clément Agricole Blanc"),
-    ("milliners-punch", "the cheapest white rum to hand; sometimes JW Spicers"),
+    # Milliners Punch's "the cheapest white rum to hand; sometimes JW Spicers"
+    # came off this set on 2026-08-27, retired the way this contract intends:
+    # the suggestion is GONE, not reworded. Helen, "never name Spicers -- if I
+    # have it skulking at the back of the nonsense shelf then I'll throw it in
+    # where I can." What is cheap and what needs using up are facts about the
+    # shelf on the day, and the generic already says what the drink requires.
     ("sazerac", "or other Creole-style bitters"),
     ("sazerac", "or other aromatic bitters"),
     ("swizzle", "Pusser's 151, or Planteray OFTD for a 138 Swizzle"),

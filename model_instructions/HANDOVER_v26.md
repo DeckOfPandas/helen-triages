@@ -1661,14 +1661,13 @@ it keeps ratios clean and it is a decision, not an accident.
 liqueur". No rule can derive the second from the first, which is why it is
 stored rather than computed.
 
-~~**Nothing reads `generic` yet.**~~ **OUT OF DATE — corrected 2026-08-22.**
-This was true when written and has not been true since #322/#314 landed.
-`generic` now has a real, tested, growing vocabulary
-(`_data/cocktails/ingredients.yml`, §9.3.1) and 526+ of 594 ingredient
-entries are typed against it (#335 tracks the rest). It is still the
-cocktails analogue of food's `main_ingredients`, not a copy of it, and
-nothing browses by it yet (§9.1's "no star axis" rule still holds) — but
-it is a live, populated field, not an aspiration.
+**`generic` is fully typed, and it is what the index browses by.** All 617
+ingredient entries carry a declared value; the "526+ of 594, #335 tracks the
+rest" figure that stood here was two coverage passes out of date. It is still
+the cocktails analogue of food's `main_ingredients` rather than a copy, and
+**since #501 it is also what a rum shows on a card** — see §9.10.1. §9.1's "no
+star axis" rule still holds: the index filters and excludes by ingredient, it
+does not browse by spirit.
 
 ### 9.3.1 The ingredient vocabulary — `_data/cocktails/ingredients.yml`
 
@@ -1795,6 +1794,100 @@ Helen, 2026-08-21: multi-value only when both bottles can actually be named
 and a reason given for each — "I don't know which" stays a plain `QQ`, it
 does not become a two-item guess.
 
+### 9.3.2 The bottle dictionary — `_data/cocktails/bottles.yml`, #529
+
+**A third string per rum, after the generic and the card name: which BOTTLE,
+and what category it is.** Added 2026-08-27. Thirty-odd bottles, each with one
+generic and its alias spellings.
+
+**Why this is allowed when #441 rejected a bottle table.** That issue killed a
+shared table for `character`, because character is why THIS DRINK wants THIS
+BOTTLE — a property of the recipe's use. A bottle's CATEGORY is
+bottle-invariant: Appleton 12 is a moderately-aged Jamaican in every drink that
+pours it. Helen settled it by writing eight rulings in #314 in exactly that
+shape ("Blackwell is Jamaican, caramel forward"). #297 (ABV) is on the same
+invariant side; do not read this as reopening `character`.
+
+**It means what Helen would POUR, not what qualifies.** The case that separates
+them: Lemon Hart 151 clears the Demerara appellation and is deliberately absent
+because she does not like it. `not_reached_for` holds the exclusions with
+reasons, the `family_less` idiom. A list of everything that qualifies is the
+busywork #459 rules out.
+
+**`Demerara, aged` and `Demerara, overproof` are APPELLATIONS.** Helen,
+2026-08-27, from *Minimalist Tiki*: 100% of the distillate must come from DDL
+in Guyana. **Two of the eleven rum styles are therefore a different KIND of
+category from the other nine** — checkable against a fact about the bottle
+rather than argued from the glass. It is why both Pusser's are `moderately
+aged` despite tasting Demerara, and why Skipper's needed her rather than
+inference ("all seven distinct rums blended into it are by DDL" — a Halewood
+bottling of Guyanese rum *very probably* qualifies, and that is not what a 100%
+rule asserts). Wood's is `Demerara, aged` and not overproof: 57% is AT proof,
+which begins above 57.15%.
+
+**Aliases are how a bottle keeps one identity**, and they are load-bearing:
+twelve suggestion strings collapse to about five bottles, and **Planteray and
+Plantation are one brand renamed**, which no string comparison recovers.
+Planteray is canonical (Helen, 2026-08-27) and the old spellings STAY as
+aliases — not a half-finished rename, but the same division `canonical_glasses`
+draws: **the rule governs what is WRITTEN, the alias map governs what can be
+READ.** The drinks predate the rebrand, so a suggestion has to keep resolving
+whether or not its drink has been retyped.
+
+**`unresolved_suggestions` is the interesting block.** Eleven suggestion
+strings name no bottle — prose (#457 again, drifted back), or two bottles in
+one comma-joined string where a list is wanted. They are declared with reasons
+so `test_every_suggested_bottle_resolves` bites on the NEXT one rather than
+being switched off; deleting a line retires it. Two of them name bottles from
+two different categories inside one string, which is what a list `generic`
+exists to express and a comma cannot — and one, a bare `Planteray` on Long
+Island Iced Tea, is genuinely ambiguous rather than merely badly shaped.
+
+**Smith & Cross moved to `Jamaican, moderately aged`** from `Jamaican,
+overproof, unaged` (2026-08-27), which resolved the one bottle that had been
+sitting under two generics. It is aged; 57% is what made it look unaged, and
+strength is not what that category names. It carries the collection's first
+BOTTLE-level `note` ("be sensible about how much you use") — bottle-invariant
+in the way #297's ABV is, so it does **not** reopen #441.
+
+**#534's check is built, and it is deliberately permissive.** A `suggestion`
+whose bottle sits in a different category than that ingredient's `generic` must
+carry a `note`, and **`QQ` counts** — Helen: "be permissive with the test, but
+given we're pre-first-human-read please add the note field with QQ in it if we
+don't have anything else." So a substitution can never ship silently while
+nothing demands prose she has not written. A disjunctive `generic` crosses only
+if the bottle matches NONE of its options.
+
+**What it found on its first run is the useful part: four of six were not
+substitutions at all**, they were #314's rulings not yet applied to the drinks —
+a suggestion naming a bottle from the category the generic *should* have been.
+The check cannot tell those apart from a real substitution and should not try:
+for a mistype the answer is to fix the type, not to explain it. Helen's call was
+to drop those four suggestions, which **silences the check without changing the
+generic** — hurricane-classic and tiki-max still say `Demerara, aged` on items
+called `Overproof Navy rum` and `Navy rum`. Knowingly accepted, pending her
+classification pass; the bottle was the last trace of which rum each meant and
+that trace is now only in git history.
+
+**An absent suggestion is a real answer**, and 2026-08-27 produced the first
+two: Long Island Iced Tea's rum and Milliners Punch's "cheapest white rum to
+hand; sometimes JW Spicers". Both came off rather than being corrected, and the
+rule underneath is one rule, not two coincidences: **what is cheap and what
+needs using up are facts about the shelf on the day, never about the drink.**
+
+The line that test sits on: Frozen Fruit Daiquiri's `"Best with ED3, Havana 3
+is fine"` STAYS. It is prose and wants reshaping into a list plus a note, but a
+ranked preference between two bottles she owns *is* a fact about the drink.
+**An earlier draft of this section had that drink dropping its suggestion**,
+because the Spicers string was misattributed to it rather than to Milliners
+Punch; `test_every_suggested_bottle_resolves` caught the edit, not a reader.
+
+**`Jamaican, caramel forward` still has no drink**, and did not gain two as an
+earlier session note claimed. Blackwell was going to bring cobra-effect and
+georgetown-punch into it; Helen dropped both suggestions instead ("I never use
+Blackwell there"). The style has bottles — Blackwell, Myers — and no user, and
+**it is hers to apply**: never retype a drink into it from item text.
+
 ### 9.4 Decided 2026-08-16 — do not re-litigate
 
 - **Ingredients are additive, never a choose-one.** The Sazerac really does
@@ -1878,20 +1971,16 @@ alone. See the note there.
   "only ever meant the same shrug"). `who knows` and `QQ` are deliberately
   OFF that scale — see the file's own comment. §9.9 is where this vocabulary
   turned into an actual feature.
-- ~~**No tests exist for cocktails at all.**~~ **OUT OF DATE, corrected
-  2026-08-19.** `tests/test_cocktails.py` exists and is substantial — glasses,
-  generics, moods, methods, the `amount`/`ml` agreement guard this paragraph
-  asked for. `tests/conftest.py` is still explicitly the FOOD suite; the
-  cocktails module carries its own fixtures and its own `cocktails` marker.
-  The standing requirement is unchanged and still worth knowing: per
-  `test_suite_hygiene.py` a cocktails test must ASSERT its corpus is non-empty
-  rather than skipping, or it passes vacuously on a clean checkout where
-  `_cocktail_drafts/` is not present.
+- **`tests/test_cocktails.py` is the cocktails suite** — glasses, generics,
+  bottles, moods, methods, the `amount`/`ml` agreement guard. `tests/conftest.py`
+  is explicitly the FOOD suite; this module carries its own fixtures and its own
+  `cocktails` marker. A cocktails test must ASSERT its corpus is non-empty
+  rather than skipping mid-run, or it passes vacuously.
 
-  **Left visible rather than silently rewritten, as a worked example of §11.2.**
-  This claim was wrong for some time, sat in the section a reader would go to
-  for exactly this question, and was found only by running `ls tests/`. Do not
-  trust this document over the code.
+  **That requirement does not protect you where it matters most — #540.** The
+  module skips wholesale when `_cocktail_drafts/` is absent, which is legitimate
+  and is also always the case in CI, so 24 of its 41 tests never run on `main`.
+  See the box in §10 before relying on any of them as a gate.
 - `_data/cocktails/taxonomy.yml` — check it before repeating this: it was
   described here as "still empty", and moods and generics have since been
   argued out and are enforced by tests.
@@ -2028,11 +2117,18 @@ treats a bare string as a one-item sequence** — checked against the real
 `liquid` gem before relying on it, not assumed. One oxford-join loop handles
 both shapes with no type-detection anywhere in the template.
 
-**Deliberately not solved**: no spirit-word ("rum", "gin") is appended after
-a bare style name. Several families already bake their spirit into the
-string ("blanco tequila") and others don't ("bourbon" needs no suffix,
+**Deliberately not solved ON THIS PAGE**: no spirit-word ("rum", "gin") is
+appended after a bare style name. Several families already bake their spirit
+into the string ("blanco tequila") and others don't ("bourbon" needs no suffix,
 "London dry" does) — auditing all of that is real, separate work, not a
 template one-liner.
+
+**The CARD solved it for rum by storing rather than deriving**, 2026-08-27:
+Helen's card names say the spirit word out loud where the style alone would not
+read as a rum (`lightly aged rum`, `clear blended rum`), and never where it
+would be wrong (`clairin`, `cachaça`). That is not a rule this page can borrow
+— it is sixteen hand-written strings, which is precisely why the audit above is
+still real work. §9.10.1.
 
 ~~No colour decision either — the placeholder monochrome palette is untouched,
 unargued on purpose.~~ **Superseded 2026-08-26**: the palette is argued and
@@ -2062,12 +2158,22 @@ length problem ("the real category name is obviously too long") and the
 measurement said otherwise; **it was a correctness problem that happened to
 also cost room.**
 
-**`rum_display_names` in `ingredients.yml`** maps every rum-family generic to
-its card name. The rule in `cocktails/index.html` is "substitute when every
-generic on the entry has a card name, else fall back to `item`" — the
-all-or-nothing half matters because a list `generic` means "either would do"
-(#441) and ten rum entries carry one; a mixed list would otherwise print half
-a fact.
+**`rum_display_names` in `ingredients.yml`** maps a generic to its card name.
+The rule in `cocktails/index.html` is "substitute when every generic on the
+entry has a card name, else fall back to `item`" — the all-or-nothing half
+matters because a list `generic` means "either would do" (#441) and ten rum
+entries carry one; a mixed list would otherwise print half a fact.
+
+**THE KEY NAME IS HALF A LIE, and that is a debt rather than an oversight.**
+Ceylon arrack has a card name as of 2026-08-27 — Helen: "is that a rum? Doesn't
+matter, the category list should eventually contain everything" — so the map has
+a non-rum member and will grow more. It has no `family` and must not get one
+(coconut flower sap; `family_less` carries the reason), which is exactly why its
+card would otherwise fall back to raw item text. **Rename it to `card_names` the
+next time `cocktails/index.html` is open**; the template only ever looks a
+generic up in it, so nothing else changes. The test loosened by one notch to
+match: a card name must still be a DECLARED generic — the typo case — but
+deliberate widening no longer fails.
 
 **Helen's call, asked with `El Dorado 12 year old rum` → `Demerara rum` in
 front of her: category ALWAYS, including where the recipe names a real
@@ -2136,14 +2242,12 @@ follow-on she asked for: note `character: hogo` on the drinks that want a
 bottle for it, which needs `hogo` adding to `rum_characters` first or
 `test_rum_character_is_declared` goes red.
 
-**Still open, deliberately.** Rum only, because rum is where the item was
-AMBIGUOUS; four non-rum generics are also long and none of them is ambiguous.
-The rum typings this surfaced — two overproofs typed as non-overproofs, and
-`Jamaican, caramel forward` declared but on no drink — are a first pass and
-Helen's to check: she will "do a thorough classification check when we have a
-full draft to work from", and applies caramel-forward herself where she
-reaches for Blackwell or Myers. **Do not retype a drink into a rum style from
-its item text.**
+**Which generics get card names is a question about AMBIGUITY, not length.**
+Rum was first because its item text named two or three different rums; four
+non-rum generics are longer than some rum ones and none of them is ambiguous,
+so they have waited. Ceylon arrack joined for a third reason again — it had no
+route to a card at all. **Add one when a card is lying or blank, not when a
+name is long.** The bottle side of all this is §9.3.2.
 
 ### 9.11 Glass icons — real relative height, and a UA-stylesheet trap
 
@@ -2846,6 +2950,27 @@ workflow checked out, built, rendered PDFs and deployed with no test step
 anywhere, so every guard in this repository protected a local run and nothing
 else. `.github/workflows/build-and-deploy.yml` has a `test` job and `build`
 declares `needs: test`. Three things about it are load-bearing:
+
+> **NOT FOR THE COCKTAIL DRINKS, AND THE SENTENCE ABOVE READS AS IF IT WERE —
+> #540, found 2026-08-27.** `tests/test_cocktails.py` skips when
+> `_cocktail_drafts/` is absent, which is correct and documented; but CI checks
+> out this repo alone and the drafts are a separate private repo, so the
+> directory is *always* absent there. **24 of that module's 41 tests call
+> `_load()` and skip in Actions**, reported as passes. For the cocktail
+> collection, "every guard protected a local run and nothing else" — the exact
+> sentence #369 exists to have made obsolete — is still true today.
+>
+> Live proof rather than theory: five tests fail locally on drafts data that is
+> behind (a retired `flavoured` generic, retired honey generics, `blackstrap`
+> still a generic on Jungle Bird, 17 non-canonical glass spellings) and CI is
+> green on all five. It is masked only because drafts build locally; the mask
+> comes off the day a cocktail is promoted into `_cocktail_recipes/`, and the
+> guards that would catch a bad promotion are the ones not running.
+>
+> `test_suite_hygiene.py` cannot see this: from its point of view the skip is
+> legitimate. **The vacuity is in the ENVIRONMENT, not the assertion.** #540
+> has four options and no recommendation — putting private drinks into a runner
+> is Helen's decision.
 
 - **`fetch-depth: 0`.** `actions/checkout` is shallow by default, and in a
   depth-1 clone `git log -- <file>` reports the same single commit for every

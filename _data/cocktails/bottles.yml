@@ -1,0 +1,319 @@
+# =============================================================================
+# RUM BOTTLES -> CATEGORY. Spec: #529. The check it unblocks: #534.
+# =============================================================================
+# WHAT THIS IS FOR, and it is not an encyclopaedia (#459). Cocktail cards stopped
+# naming bottles and started naming categories (#501), which moved a question
+# from the page to the reader: "which of mine is a Demerara rum?" This is where
+# that gets answered, and #529's reference page reads it.
+#
+# WHY A BOTTLE TABLE IS ALLOWED HERE WHEN #441 REJECTED ONE. That issue killed a
+# shared bottle table for `character`, because character is why THIS DRINK wants
+# THIS BOTTLE -- a property of the recipe's use, correctly restated per recipe. A
+# bottle's CATEGORY is bottle-invariant: Appleton 12 is a moderately-aged
+# Jamaican in every drink that pours it. Helen's own #314 rulings are written in
+# exactly this shape ("Blackwell is Jamaican, caramel forward"), which is what
+# settled it. #297 (ABV) sits on the same invariant side; `character` does not.
+#
+# THE LIST MEANS BOTTLES HELEN WOULD REACH FOR, NOT BOTTLES THAT QUALIFY.
+# Settled 2026-08-27 by the case that separates them: Lemon Hart 151 clears the
+# Demerara appellation and is deliberately absent, because "I don't like Lemon
+# Hart 151, never mind whether or not I could get hold of it." A column headed
+# "what qualifies" is the busywork #459 rules out; one headed "what I'd reach
+# for" answers a question she actually has. `not_reached_for` below records the
+# exclusions WITH their reasons, the `family_less` idiom.
+#
+# `Demerara, aged` AND `Demerara, overproof` ARE APPELLATIONS, NOT FLAVOURS.
+# Helen, 2026-08-27, from Minimalist Tiki: the category requires 100% of the
+# distillate to come from DDL in Guyana. This makes two of the eleven rum styles
+# a different KIND of category from the other nine -- checkable against a fact
+# about the bottle rather than argued from the glass -- and it is why both
+# Pusser's are `moderately aged` despite tasting Demerara to most people. It is
+# also why Skipper's needed Helen rather than inference: "all seven distinct rums
+# blended into it are by DDL." A Halewood bottling of Guyanese rum very probably
+# qualifies, and "very probably" is not what a 100% rule asserts.
+#
+# ONE GENERIC PER BOTTLE, deliberately. A bottle serving two categories was the
+# state before #314 -- Havana 3 sat under both `lightly aged and filtered` and
+# `blended multi-region rum, clear` -- and Helen resolved it rather than blessing
+# it. If a genuine two-category bottle ever turns up, that is a decision to make
+# then, not a shape to leave open now.
+#
+# ALIASES ARE HOW A BOTTLE KEEPS ONE IDENTITY. Twelve suggestion strings in the
+# collection collapse to about five bottles: ED3 / El Dorado 3 / El Dorado 3yo /
+# El Dorado 3yo rum. Matching is case-insensitive; add the spelling, do not add
+# a second bottle.
+#
+# PLANTERAY IS THE CANONICAL SPELLING AND PLANTATION IS ALWAYS AN ALIAS --
+# Helen, 2026-08-27: "please collapse Plantation and rename to Planteray
+# everywhere." They are one brand, renamed, which no string comparison recovers,
+# so the collapse has to be declared. The old spellings STAY as aliases and that
+# is not a half-finished rename: the drinks were written before the rebrand and
+# a suggestion must keep resolving whether or not its drink has been retyped
+# yet. Same division `canonical_glasses` draws in glasses.yml -- the rule
+# governs what is WRITTEN, the alias map governs what can be READ.
+
+bottles:
+
+  # --- Jamaican ------------------------------------------------------------
+  "Appleton Estate Signature":
+    generic: "Jamaican, moderately aged"
+    aliases: ["Appleton Signature", "Appleton Estate V/X rum", "Appleton V/X"]
+  "Appleton Estate 8 Year Reserve":
+    generic: "Jamaican, moderately aged"
+    aliases: ["Appleton 8", "Appleton Estate 8 Reserve"]
+  "Appleton Estate 12 Rare Casks":
+    generic: "Jamaican, moderately aged"
+    aliases: ["Appleton 12 Rare Casks", "Appleton Rare Casks",
+              "Appleton Estate Rare 12 year old blended rum"]
+  # #314, Helen 2026-08-27. Her marker for the caramel-forward style, along with
+  # Myers -- which no drink names yet, so it is not listed here.
+  "Blackwell":
+    generic: "Jamaican, caramel forward"
+    aliases: []
+  # RECLASSIFIED 2026-08-27, from `Jamaican, overproof, unaged`. Helen's call,
+  # and it resolves the one bottle that had been sitting under two generics: it
+  # is aged, so the unaged overproof style was never right. 57% is what made it
+  # look like one -- and strength is not what that category names.
+  "Smith & Cross":
+    generic: "Jamaican, moderately aged"
+    aliases: ["Smith and Cross", "Smith & Cross rum"]
+    note: "57% ABV — be sensible about how much you use."
+  "Wray & Nephew":
+    generic: "Jamaican, overproof, unaged"
+    aliases: ["Wray and Nephew", "Wray & Nephew Overproof"]
+  # Its own thing rather than a Wray & Nephew substitute -- Helen, 2026-08-27:
+  # "choice of that or W&N is mood by mood." Same category, not interchangeable
+  # on autopilot, which is why both are listed rather than one carrying the
+  # other as an alias.
+  "Rum Fire":
+    generic: "Jamaican, overproof, unaged"
+    aliases: []
+
+  # --- Demerara: 100% DDL, Guyana. See the appellation note above. ----------
+  "El Dorado 3":
+    generic: "lightly aged and filtered"
+    aliases: ["ED3", "El Dorado 3yo", "El Dorado 3yo rum"]
+  "El Dorado 5":
+    generic: "Demerara, aged"
+    aliases: []
+  "El Dorado 8":
+    generic: "Demerara, aged"
+    aliases: []
+  "El Dorado 12":
+    generic: "Demerara, aged"
+    aliases: ["El Dorado 12 year old rum"]
+  "El Dorado 151":
+    generic: "Demerara, overproof"
+    aliases: ["El Dorado 151 rum"]
+    # Helen, 2026-08-27: the ONLY bottle in this category, and on the shopping
+    # list rather than on the shelf. Wanted counts as reached-for; see
+    # `not_reached_for` for what does not.
+  "Skipper's":
+    generic: "Demerara, aged"
+    aliases: ["Skippers dark rum", "Skippers"]
+  # Ruled 2026-08-27 and used by no drink yet. 57% is AT proof, not over it --
+  # overproof begins above 57.15% -- so this is not a `Demerara, overproof`
+  # however much the strength suggests otherwise.
+  "Wood's":
+    generic: "Demerara, aged"
+    aliases: ["Woods", "Wood's 100"]
+
+  # --- moderately aged: the residual style, no region and no other marker ---
+  # BOTH PUSSER'S LIVE HERE, and this is the appellation rule biting rather than
+  # a flavour judgement -- Pusser's blends Trinidadian rum, so it fails the 100%
+  # DDL test whatever it tastes like. Same blend at two strengths, so splitting
+  # them across two categories would have been the odd outcome.
+  "Pusser's Blue Label":
+    generic: "moderately aged"
+    aliases: ["Pusser's Blue"]
+  "Pusser's Gunpowder":
+    generic: "moderately aged"
+    aliases: ["Pusser's Gunpowder Proof", "Pusser's Navy rum 54.5%"]
+  "Gosling's Black Seal":
+    generic: "moderately aged"
+    aliases: ["Gosling's", "Goslings"]
+    # Reached for FOR its blackstrap, which is a `character` on the recipe and
+    # never a generic -- #314, and the reason this file has no character column.
+  "Havana Club 7":
+    generic: "moderately aged"
+    aliases: ["Havana 7", "Havana Club 7yo"]
+  "Ron del Barrito":
+    generic: "moderately aged"
+    aliases: ["Ron del Barrito 3 star rum"]
+  "Planteray Barbados 5":
+    generic: "moderately aged"
+    aliases: ["Plantation Barbados 5", "Plantation Barbados 5 year old rum"]
+
+  # --- lightly aged and filtered -------------------------------------------
+  "Havana Club 3":
+    generic: "lightly aged and filtered"
+    aliases: ["Havana 3", "Havana Club 3yo rum", "Havana 3 year old",
+              "Havana Club Original Añejo 3 Años Cuban rum"]
+  "Flor de Caña Extra Dry":
+    generic: "lightly aged and filtered"
+    aliases: ["Flor de Caña extra dry white rum"]
+  # JW SPICERS IS DELIBERATELY ABSENT. Helen, 2026-08-27: "never name Spicers --
+  # if I have it skulking at the back of the nonsense shelf then I'll throw it
+  # in where I can." Same rule as Long Island Iced Tea's rum: what is cheap and
+  # what needs using up are facts about the shelf on the day, not about the
+  # drink. Frozen Fruit Daiquiri's suggestion goes rather than being corrected.
+
+  # --- blended multi-region, clear -----------------------------------------
+  # EFFECTIVELY THE ONLY BOTTLE IN ITS CATEGORY since #314 put Havana 3 and
+  # El Dorado 3 firmly in `lightly aged and filtered`. That is production rather
+  # than preference: 3 Stars is a genuine Barbados/Jamaica/Trinidad blend where
+  # the other two are single-origin.
+  "Planteray 3 Stars":
+    generic: "blended multi-region rum, clear"
+    aliases: ["Plantation 3 Stars", "Plantation 3 Stars rum", "Planteray 3",
+              "Plantation 3"]
+
+  # --- brand-generics: the bottle IS the category (#314 rum_untyped) --------
+  "Planteray O.F.T.D.":
+    generic: "Planteray O.F.T.D. Overproof"
+    aliases: ["Plantation OFTD", "Planteray OFTD", "OFTD"]
+    # #314, Helen 2026-08-27: "not an aged Demerara, it is its own category".
+    # 69%, and a Guyana/Jamaica/Barbados blend, so it fails DDL twice over.
+  "Planteray Stiggins' Fancy":
+    generic: "Planteray Stiggins' Fancy"
+    aliases: ["Plantation Stiggins Fancy Pineapple rum",
+              "Plantation pineapple-infused rum"]
+  "Malibu":
+    generic: "Malibu"
+    aliases: ["Coconut rum"]
+
+  # --- cane juice: agricole, clairin, cachaça ------------------------------
+  "Clément Agricole Blanc":
+    generic: "cane juice (agricole) rum, unaged"
+    aliases: ["Clement Agricole Blanc"]
+  "Damoiseau Rhum Agricole Blanc":
+    generic: "cane juice (agricole) rum, unaged"
+    aliases: ["Damoiseau Rhum Agricole Blanc 40 proof", "Damoiseau Blanc"]
+  "La Favourite Rhum Agricole Blanc":
+    generic: "cane juice (agricole) rum, unaged"
+    aliases: ["La Favourite Blanc"]
+  "La Favourite L'Authentique Ambré":
+    generic: "cane juice (agricole) rum, aged"
+    aliases: []
+  "Rhum JM Ambré":
+    generic: "cane juice (agricole) rum, aged"
+    aliases: ["JM Rhum Agricole ambre", "JM"]
+  "Barbancourt 3 Star":
+    generic: "cane juice (agricole) rum, aged"
+    aliases: ["Barbancourt Three Star rum", "Barbancourt 3-star rum"]
+    # Haitian cane juice, so agricole by production even though the word on the
+    # label is not "agricole".
+  "Clairin Communal":
+    generic: "clairin"
+    aliases: []
+  "Sagatiba":
+    generic: "cachaça"
+    aliases: []
+  "Leblon":
+    generic: "cachaça"
+    aliases: []
+  # Added 2026-08-27 at Helen's request, and it CORRECTS A SPELLING that has
+  # been sitting in Caipirinha's drink-level note since ingestion: that note
+  # ranks "Sagatiba = Leblon > Viero Barriero > Abelho > Yaguara Organic", and
+  # the brand is Velho Barreiro. The note was transcribed verbatim on purpose
+  # ("Future Helen will know exactly what I mean", #457) so it was never
+  # proofread as a bottle name -- which is exactly how a misspelling survives a
+  # deliberate decision not to touch something.
+  "Velho Barreiro":
+    generic: "cachaça"
+    aliases: ["Viero Barriero"]
+  # Named by Helen 2026-08-27 for `Jamaican, caramel forward`, alongside
+  # Blackwell. NO DRINK MENTIONS IT, and it is listed anyway: this file is what
+  # she would reach for, not an index of what the collection happens to cite.
+  "Myers":
+    generic: "Jamaican, caramel forward"
+    aliases: ["Myers's", "Myer's"]
+  "Van Osten Botanik Arrack":
+    generic: "Batavia arrack"
+    aliases: ["Van Osten"]
+
+# =============================================================================
+# QUALIFIES, DELIBERATELY NOT REACHED FOR -- the reason attached, as family_less
+# =============================================================================
+not_reached_for:
+  "Lemon Hart 151": >-
+    Clears the Demerara appellation and is out anyway. Helen, 2026-08-27: "I
+    don't like Lemon Hart 151, never mind whether or not I could get hold of it
+    if I wanted it." This is the case that settled what this file means -- it is
+    what she would POUR, not what would be permitted. Port-au-Prince still names
+    it as its `item`; the substitution it wants is Planteray OFTD, which crosses
+    a category and therefore wants a note (#534).
+  "Pusser's 151": >-
+    Fails the 100% DDL rule the same way the other two Pusser's do, so it was
+    never a `Demerara, overproof` -- and unlike them it has no obvious home,
+    since `moderately aged` says nothing about strength. Named only inside
+    Swizzle's prose suggestion, which is being rewritten anyway. Give it a
+    category if a drink ever genuinely wants it.
+
+# =============================================================================
+# SUGGESTION STRINGS THAT DO NOT NAME A BOTTLE -- known, and failing on purpose
+# =============================================================================
+# #457 settled that `suggestion` is bottle NAME(S) ONLY and these predate or
+# escaped it. Listed rather than tolerated so that
+# test_every_suggested_bottle_resolves bites on the NEXT one while these are
+# being fixed; deleting a line here is how one gets retired.
+#
+# The two compound strings are the interesting ones: both name bottles from two
+# different categories inside a single string, which is what a list `generic`
+# exists to express and a comma cannot.
+unresolved_suggestions:
+  "Appleton 8, or Appleton 12 Rare Casks": >-
+    Two bottles in one string; wants the list form. Both are
+    `Jamaican, moderately aged`, so nothing is at stake beyond the shape.
+  "ED3 or Havana 3": >-
+    Two bottles in one string; wants the list form. Both `lightly aged and
+    filtered` since #314.
+  "ED3, Plantation": >-
+    Two bottles in one string, and since #314 they are in DIFFERENT categories --
+    El Dorado 3 is `lightly aged and filtered`, Planteray 3 Stars is `blended
+    multi-region rum, clear`. Royal Bermuda Yacht Club's generic is the
+    disjunctive pair, so the list form would say exactly the right thing.
+  "El Dorado 5 or 8": >-
+    Two bottles in one string; wants the list form. Both `Demerara, aged`.
+  "Wray & Nephew, or Rum Fire": >-
+    Two bottles in one string; wants the list form. Both `Jamaican, overproof,
+    unaged`.
+  "Havana 7, Appleton 8": >-
+    Two bottles in one string, in two categories, and Carta Switchel's generic
+    is already the matching disjunctive pair -- Havana 7 is `moderately aged`
+    and Appleton 8 is `Jamaican, moderately aged` (#314). The list form makes
+    the pairing legible instead of coincidental.
+  "Pusser's Gunpowder, or Smith & Cross": >-
+    Two bottles in one string, against Kamaniwanalaya's stated `[Demerara,
+    aged, Jamaican, moderately aged]`. Since #314 and the 2026-08-27
+    reclassification, Smith & Cross MATCHES the second half and Gunpowder
+    matches neither -- it is `moderately aged`. So the list form would fix half
+    of it and leave a real question about the other. Needs Helen.
+  "Pusser's 151, or Planteray OFTD for a 138 Swizzle": >-
+    Three problems in one string: it is prose (a reason, which #457 moved to
+    `note`), it is two bottles where a list is wanted, and neither bottle is in
+    either of Swizzle's two stated generics. Needs Helen.
+  "Best with ED3, Havana 3 is fine": >-
+    Prose carrying a real preference between two bottles Helen owns, which is
+    why it STAYS while the two below went: ED3 is the pick and Havana 3 is
+    acceptable, and that is a fact about the drink rather than about the shelf.
+    #457's shape is `suggestion: ["El Dorado 3", "Havana Club 3"]` in that
+    order, with the ranking as a `note`.
+  # `Planteray` (bare, on Long Island Iced Tea) and "the cheapest white rum to
+  # hand; sometimes JW Spicers" (Milliners Punch) WERE HERE AND ARE
+  # GONE, 2026-08-27, because the suggestions themselves are gone. Resolved the
+  # same way, and it is a rule rather than a coincidence: Helen reached for
+  # those bottles because they were cheap and because she was using them up,
+  # neither of which is a fact about the drink. "I'd rather not specify any rum
+  # at all for LIIT because neither I nor the drink care", and "never name
+  # Spicers". So the `suggestion` came off rather than being corrected -- the
+  # generic already says everything the drink requires. A genuinely absent
+  # suggestion is a real answer, and these are the first in the collection.
+  #
+  # An entry here is deleted when its string stops existing. Leaving it would be
+  # the exact rot this block guards against: a declared exception that reads as
+  # an outstanding problem while pointing at nothing.
+  "Havana 3 year old and Clément Agricole Blanc": >-
+    AND, not OR -- Daisy de Santiago pours both, and its `generic` is correctly
+    the disjunctive pair. One suggestion string covering two separate pours is
+    the real problem here; it may want splitting across two ingredient entries.
