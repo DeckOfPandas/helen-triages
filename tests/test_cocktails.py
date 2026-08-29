@@ -3,17 +3,30 @@
 `tests/conftest.py` is explicitly the FOOD suite, and says so: the food schema
 does not apply to a cocktail. This is the sibling it anticipated.
 
+THE CORPUS IS BOTH COLLECTIONS -- `_cocktail_recipes/` and `_cocktail_drafts/`
+-- since 2026-08-29, issue #540. This docstring described the drafts alone until
+then, which matched a loader that read the drafts alone, and that was the bug:
+the published collection lives in THIS repo and is present in CI, so a promoted
+drink was checked by nothing anywhere. See the long note above `_load()`.
+
 WHY THIS FILE SKIPS RATHER THAN FAILS ON AN ABSENT COLLECTION, and why that is
 not the vacuity trap tests/test_suite_hygiene.py exists to catch.
-`_cocktail_drafts/` is its own private git repo, gitignored from this one, so on
-a clean checkout of the public repo the directory is genuinely ABSENT -- not
-empty, absent. That is a legitimate state and the right response is to skip
-loudly saying so.
+`_cocktail_drafts/` is its own private git repo, gitignored from this one, and
+nothing is promoted into `_cocktail_recipes/` yet, so on a clean checkout of the
+public repo BOTH directories are genuinely ABSENT -- not empty, absent. That is
+a legitimate state and the right response is to skip loudly saying so.
 
-What is NOT legitimate is the directory being present and yielding nothing,
-which would mean the loader has gone stale. So: skip when the collection is not
-here, assert non-empty when it is. "This machine has no drinks" and "I looked
-and found nothing" must never produce the same green.
+What is NOT legitimate is a directory being present and yielding nothing, which
+would mean the loader has gone stale. So: skip when NEITHER collection is here,
+assert non-empty when one is. "This machine has no drinks" and "I looked and
+found nothing" must never produce the same green.
+
+AND A THIRD ANSWER EXISTS, because a PARTIAL corpus is now possible: any claim
+of the form "this registry has no dead entries" or "no value covers more than
+half the book" is unanswerable when only some drinks are present, since a drink
+that is merely absent looks exactly like one that has been fixed. Those live in
+their own tests, call `_require_whole_collection`, and are listed in
+WHOLE_COLLECTION_ONLY.
 """
 from __future__ import annotations
 
