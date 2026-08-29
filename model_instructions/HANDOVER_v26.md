@@ -136,8 +136,15 @@ index.html              permalink /        a bare redirect to /food/
 `food/` and `cocktails/` hold each site's **pages**, not their collections.
 
 `_food_drafts/` and `_cocktail_drafts/` are each their own nested git repo
-(gitignored from this one — see `.gitignore`), pushed to a separate private
-GitHub repo. `output: false` only stops Jekyll rendering them; the repo
+(gitignored from this one — see `.gitignore`), pushed to a private GitHub repo
+of its own: **`helen-triages-food-private`** and
+**`helen-triages-cocktails-private`**. The food one was `helen-triages-private`
+until 2026-08-29 and the pairing was the reason for renaming it — one name said
+which site it belonged to and the other did not. GitHub redirects the old name,
+so an un-updated remote keeps working and will not tell you it is stale; run
+`git remote -v` in `_food_drafts/` rather than assuming. A fine-grained token's
+repository selection follows a rename automatically (it is by repo ID, not by
+name), so `GH_TOKEN` needs nothing doing to it. `output: false` only stops Jekyll rendering them; the repo
 split is what keeps their source out of a public repo regardless of build
 config. A draft is promoted to `_food_recipes/` — and so becomes public the
 moment this repo deploys — only once it contains no copyright material
@@ -197,7 +204,7 @@ not a constant.
 `_layouts/recipe.html` vs `cocktail.html` (food is a procedure — steps,
 prep/cook split, triaged ingredients; a cocktail is a formula plus a build —
 a full untriaged spirit bill, a glass, garnishes, an ordered method. **Not
-"one method line"**, as this said until 2026-08-16: see §9.6); `_data/food/*.yml` vs `_data/cocktails/*.yml`;
+"one method line"**, as this document said until 2026-08-16 — the Sazerac's five steps make a different drink if reordered); `_data/food/*.yml` vs `_data/cocktails/*.yml`;
 `_sass/food/` vs `_sass/cocktails/`; `assets/img/food/` vs `/cocktails/`;
 `assets/css/food.scss` vs `cocktails.scss` (no shared class names to fight
 over).
@@ -1555,6 +1562,33 @@ held and `food/index.html` still listed ten drafts, linking to URLs Jekyll had
 never written. The config stopped the pages; the repo split stopped the
 source. Keep both.
 
+**HOW TO GET THE DRINKS INTO A WORKTREE: CLONE IT.** Git access already works
+and always did — Helen's SSH key is per-ACCOUNT, not per-repo, so it reaches the
+private remote from a worktree exactly as it does from anywhere else:
+
+    git clone git@github.com:DeckOfPandas/helen-triages-cocktails-private.git _cocktail_drafts
+
+A worktree starts blind, because `_cocktail_drafts/` is gitignored and
+`git worktree add` therefore never brings it along — and
+`tests/test_cocktails.py` SKIPS the 24 tests that read a drink, reporting green.
+A symlink into the main checkout half-works (the Edit/Write tools refuse it, and
+writes land in Helen's tree); a copy or a zip goes stale silently. A clone gives
+history, branches and somewhere to commit.
+
+**ALWAYS `git fetch` BEFORE CONCLUDING ANYTHING ABOUT ITS STATE**, and this cost
+a session on 2026-08-29. A zip of Helen's local checkout was two merges behind,
+so five red tests read as work that "had never been done", and an entire day of
+retyping was redone from scratch — including DELETING a drink the remote had
+merely replaced. Local branches, the reflog and the working tree all agreed with
+each other and all were stale. **One clone is not the repo.**
+
+**The API token is a different channel and does not cover file contents.**
+`GH_TOKEN` selects all three repos and carries Issues; probed 2026-08-29,
+`contents` returns **403** on both private repos and 200 on the public one. So
+the API can read and write issues anywhere and read drink files nowhere. Git
+can. Push access to the private repos exists — policy still says ask Helen every
+time, per CLAUDE.md.
+
 **What IS public**: `_layouts/cocktail.html`, `_sass/cocktails/`,
 `assets/css/cocktails.scss`, `cocktails/index.html`,
 `_data/cocktails/taxonomy.yml`, the tape artwork, and the `cocktails:` block
@@ -1641,7 +1675,7 @@ to_serve: ""                     # PRESENTATION, not a further instruction
 notes:                           # bare strings, as food — DRINK-level, not per-ingredient
   - "This is much less sugar than many recipes"
 source: ""
-source_url: ""                   # external; nothing verifies it, see §9.6
+source_url: ""                   # external; nothing verifies it
 meta:
   ship: "oh gods yes"            # a real ordered vocabulary now — see §9.5
   date_last_edited: "2026-08-16"
@@ -1783,6 +1817,57 @@ does a list-form `generic`/`suggestion` — #460.**~~ **RESOLVED,
 see §9.10 for the shape. #460 stays open for the REST of the page (method,
 notes, meta), which still hasn't had a design pass — this was the
 ingredient list specifically.
+
+**EVERY GENERIC NOW READS AS AN INGREDIENT — #561, 2026-08-29.** Ten did not,
+and that is what blocked the drink page: a card name may be lossy (`gin` is right
+for London dry at card distance), a recipe line may not. Helen's pattern, given
+as two examples and extended across — **natural word order, spirit word on the
+end, no inverted commas**:
+
+| was | is |
+|---|---|
+| `Jamaican, moderately aged` | moderately aged Jamaican rum |
+| `Jamaican, caramel forward` | caramel-forward Jamaican rum |
+| `Jamaican, overproof, unaged` | unaged overproof Jamaican rum |
+| `Demerara, aged` / `Demerara, overproof` | aged / overproof Demerara rum |
+| `moderately aged` | moderately aged rum |
+| `lightly aged and filtered` | lightly aged and filtered rum |
+| `blended multi-region rum, clear` | clear blended multi-region rum |
+| `cane juice (agricole) rum, unaged` / `, aged` | rhum agricole blanc / vieux |
+| `London dry` / `navy strength` | London dry gin / navy strength gin |
+
+The agricoles take their real French names at Helen's direction. On the
+mouthfuls: *"they're almost always going to be on their own line, so eminently
+skippable if wanted, and I don't want to do the cognitive work of mapping to
+Minimalist Tiki every time I read them."* The card names carry the short forms,
+which is exactly the division those two strings exist for.
+
+**Renaming a generic is quote-anchored, and must be.** `moderately aged` is a
+substring of `Jamaican, moderately aged`, so a bare replace corrupts the longer
+one. Every occurrence in front matter and in the data files is quoted, so
+matching `"<old>"` is exact — and the inference notes (`-> <generic>`) want the
+same treatment, while narrative prose and quoted decisions must be left alone.
+**Rewriting a quote to match a later rename falsifies it.**
+
+**THE THREE BRAND-GENERICS ARE GONE — #314's amendment, same day.** `Planteray
+Stiggins' Fancy`, `Planteray O.F.T.D. Overproof` and `Malibu` were permitted as
+generics *"because nothing generalises them"*. All three have been generalised —
+`pineapple rum`, `blended overproof rum`, `coconut rum` — so the exception lost
+its reason, and dissolving it RESTORES this file's primary rule rather than
+weakening it: a preferred bottle is a `suggestion`, never a `generic`. `rum_untyped`
+is now an empty declaration, kept so the next reader learns the group existed.
+
+It also housed something homeless: Pusser's 151 fails the DDL rule and
+`moderately aged rum` says nothing about strength, so `blended overproof rum` is
+the first category it fits. **Second time a naming decision fixed a data gap it
+was not aimed at** — and the data had already said so, since both Malibu drinks
+wrote `Coconut rum` in their `item`.
+
+**`peated Scotch` is retired; peat is a `character`.** Orthogonal to
+single-malt-versus-blended, so a peated single malt is both and one field could
+not hold it. Both drinks that used it proved the point — their items read "Peated
+single malt whisky" and "Peated Scotch whisky". They are `single malt scotch
+whisky` + `character: [peated]` now.
 
 **Whisky is named correctly rather than dodged, and peat is a character** —
 2026-08-27/29. Scotch and Japanese take *whisky*, Irish and American take
@@ -2010,15 +2095,6 @@ alone. See the note there.
   described here as "still empty", and moods and generics have since been
   argued out and are enforced by tests.
 
-### 9.6 Two earlier claims in this document were wrong
-
-- **"a cocktail is… one method line"** (old §9, and §2.2's forked-layouts
-  paragraph). It is an ordered list. The Sazerac's five steps get a different
-  drink if reordered: coat the glass with absinthe, shake the rest, discard
-  the wash, strain in.
-- **`garnish` is not a scalar.** Cobra's Fang carries a mint sprig AND a lime
-  wheel. `_layouts/cocktail.html` assumed one value until real data arrived.
-
 ### 9.7 Two traps this layout hit on its first day
 
 - **Liquid parses tag delimiters INSIDE a `comment` block.** Quoting an
@@ -2111,56 +2187,56 @@ rather than vanishing.
 
 ---
 
-### 9.10 The ingredient line, for real — #465/#457/#460, 2026-08-25
+### 9.10 The drink page's ingredient line — #544/#513, 2026-08-29
 
-`_layouts/cocktail.html` renders each ingredient as three parts: **amount +
-headline** / **class line, with character folded on** / **note**. Settled by
-walking real drink data against "does this get Helen the drink she wants"
-(#459) rather than designed up front.
+**The line is the GENERIC, with the bottle in brackets.** Helen's own worked
+example: `London dry gin (Beefeater)`. Then `character` on its own quiet line,
+then `note`.
 
-- **Headline** is `suggestion` when present (oxford-joined if a list —
-  "Planteray 3, El Dorado 3, or Havana 3"), else `item`. You shop by bottle
-  name; an item with no suggestion falls back to itself.
-- **Class line** is `generic`, oxford-joined if a list. A rum-family style
-  name (looked up live via `ingredients.family_of`, not hardcoded) gets the
-  site's heading face — blockier, so the internal comma in "Demerara, aged"
-  doesn't collide with a plain list-join comma — with a quiet italic "or"
-  between disjunctive options. Scoped to rum on purpose: "cognac" has no such
-  collision and stays plain.
-- **Character** folds onto the class line as `(character: blackstrap)`, a
-  LABELLED parenthetical, never a bare one — "moderately aged rum
-  (blackstrap)" reads as if blackstrap were a TYPE of moderately-aged rum,
-  real confusion with actual black rum. Never its own line: #441 settled that
-  character is a property of THIS recipe's use of a bottle, not the bottle in
-  the abstract.
-- **Note** is its own line, always visible, no interaction — #457's fix for
-  reasoning that used to get smuggled into `suggestion`. Right-alignment was
-  tried and dropped: read as competing with the class line above it.
+    45 ml   London dry gin (Tanqueray)
+    15 ml   moderately aged rum (Gosling's Black Seal)
+              character: blackstrap
+    30 ml   coconut rum (Malibu)
+    22.5 ml lime juice
 
-**`generic`/`suggestion` can be a string or a list, and Liquid's `for` quietly
-treats a bare string as a one-item sequence** — checked against the real
-`liquid` gem before relying on it, not assumed. One oxford-join loop handles
-both shapes with no type-detection anywhere in the template.
+**`item` DOES NOT RENDER, and that is the whole fix.** The page used to show
+`item` as the headline with `generic` beneath it, which meant printing the
+source's words and the vocabulary on top of each other. Measured across all 617
+entries, **385 of those pairs restated one another** — 241 where the item
+contains its generic, 124 differing only by case, 20 identical. `Malibu /
+Malibu` was #513 in two words, and `fresh lime juice / lime juice` was Helen's
+own complaint. Removing the field makes the duplication IMPOSSIBLE rather than
+suppressed, which is why #513 closed here rather than acquiring a rule about
+when to hide the second line.
 
-**Deliberately not solved ON THIS PAGE**: no spirit-word ("rum", "gin") is
-appended after a bare style name. Several families already bake their spirit
-into the string ("blanco tequila") and others don't ("bourbon" needs no suffix,
-"London dry" does) — auditing all of that is real, separate work, not a
-template one-liner.
+**It only became readable after #561.** The same change a week earlier would
+have produced `moderately aged (Gosling's Black Seal)` and `London dry
+(Tanqueray)`. **A card name may be lossy; a recipe line may not.** Ten generics
+had to gain their spirit word first — see §9.3.1.
 
-**The CARD solved it for rum by storing rather than deriving**, 2026-08-27:
-Helen's card names say the spirit word out loud where the style alone would not
-read as a rum (`lightly aged rum`, `clear blended rum`), and never where it
-would be wrong (`clairin`, `cachaça`). That is not a rule this page can borrow
-— it is sixteen hand-written strings, which is precisely why the audit above is
-still real work. §9.10.1.
+**`character` gets a LINE now, not a parenthetical, and that is a deliberate
+revision of #441.** That issue banned the bare form because "moderately aged rum
+(blackstrap)" reads as a TYPE of moderately-aged rum, real confusion with black
+rum; it folded onto the class line instead. The class line no longer exists, and
+a LABELLED line of its own carries none of that risk. The rule is still
+`.cocktail-type-line` — kept rather than renamed, because its position, indent
+and quiet tone are all still right for what sits there.
 
-~~No colour decision either — the placeholder monochrome palette is untouched,
-unargued on purpose.~~ **Superseded 2026-08-26**: the palette is argued and
-real, and this line is the ingredient list's own restyle waiting to happen —
-see §9.13. The amount now sets in the heading face in a fixed column, the class
-line and note hang past it, and `character` drops a step quieter than the class
-line it sits inside.
+**`.cocktail-suggestion` is quieter than the class it follows**, deliberately:
+the class is what the drink REQUIRES, the bottle is what Helen happens to reach
+for, and only 18% of entries carry one. It must not read as though the other 82%
+were missing something.
+
+**`generic`/`suggestion` can be a string or a list**, and Liquid's `for` quietly
+treats a bare string as a one-item sequence — checked against the real `liquid`
+gem, not assumed. One loop handles both shapes with no type-detection. A list
+`generic` joins with a quiet italic "or": it means "either would do" (#441),
+never "and".
+
+**Still not solved on this page**: `item` is retired from DISPLAY but still
+stored, and ~90 entries carry real content in it (bottles that belong in
+`suggestion`, `(float)` and `(rinse)` that belong in `method`, and two
+`(optional)`s that have no home at all). #544 move 2 is that redistribution.
 
 ### 9.10.1 Cards and search read the VOCABULARY, never the transcription — #501/#544/#558
 

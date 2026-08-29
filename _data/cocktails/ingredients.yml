@@ -87,6 +87,13 @@ rum_styles:
   # category like cachaca or mezcal, so lowercase under the proper-noun rule.
   - "clairin"
   - "clear blended multi-region rum"
+  # #314's amendment, 2026-08-29 -- were brand-generics in `rum_untyped`.
+  # `blended overproof rum` is Guyana/Jamaica/Barbados at 69%, and it also gives
+  # Pusser's 151 the home `moderately aged rum` could not: that generic says
+  # nothing about strength.
+  - "pineapple rum"
+  - "blended overproof rum"
+  - "coconut rum"
 
 # Permitted WITHOUT a style per #314, because nothing generalises them.
 #
@@ -94,10 +101,13 @@ rum_styles:
 # #314, 2026-08-24: "blackstrap is only ever given as a character for another
 # rum, like this: Moderately aged (character: blackstrap)". It is in
 # rum_characters below, in retired_rum_styles at the bottom, and nowhere else.
-rum_untyped:
-  - "Planteray Stiggins' Fancy"
-  - "Planteray O.F.T.D. Overproof"
-  - "Malibu"
+# RETIRED AS A GROUP, 2026-08-29 -- #314's amendment. The premise was "nothing
+# generalises them"; all three have now been generalised, so the exception has
+# lost its reason and the bottles go back to being `suggestion`s, which is this
+# file's primary rule. `pineapple rum`, `blended overproof rum` and `coconut rum`
+# are in rum_styles. Kept as an empty declaration rather than deleted, so the
+# next reader finds out the group existed and why it went.
+rum_untyped: []
 
 # CHARACTER: a separate, optional field, not `generic`. Some rums have a
 # `generic` style (or none decided yet) but also carry a distinctive flavour
@@ -231,12 +241,12 @@ card_names:
   # Real estate goes the other way for two of the three and that is fine: this
   # buys legibility, not width. O.F.T.D. 8 -> 17 chars, Malibu 6 -> 11,
   # Stiggins' Fancy 15 -> 13.
-  "Planteray Stiggins' Fancy": "pineapple rum"
+  "pineapple rum": "pineapple rum"
   # Guyana/Jamaica/Barbados at 69%, so "blended overproof" is what it IS rather
   # than a summary of it. Distinct from `Demerara overproof rum` and
   # `Jamaican overproof rum`, which are the single-origin overproofs.
-  "Planteray O.F.T.D. Overproof": "blended overproof rum"
-  "Malibu": "coconut rum"
+  "blended overproof rum": "blended overproof rum"
+  "coconut rum": "coconut rum"
   "cachaça": "cachaça"
   "Batavia arrack": "Batavia arrack"
   # THE FIRST NON-RUM ENTRY, and it is deliberate. Helen, 2026-08-27, on Ceylon
@@ -422,7 +432,6 @@ whisky_styles:
   # already documents for `rum_characters`, which passed `sherry` and
   # `Spanish-style` as generics for four days. Vocabulary and guard move
   # together or not at all.
-  - "peated Scotch"
   - "blended scotch whisky"
   - "single malt scotch whisky"
   - "Irish whiskey"
@@ -712,9 +721,9 @@ family_of:
   "rhum agricole vieux": rum
   "clairin": rum
   "clear blended multi-region rum": rum
-  "Planteray Stiggins' Fancy": rum
-  "Planteray O.F.T.D. Overproof": rum
-  "Malibu": rum
+  "pineapple rum": rum
+  "blended overproof rum": rum
+  "coconut rum": rum
   "cachaça": rum
   "Batavia arrack": rum
   "London dry gin": gin
@@ -728,7 +737,6 @@ family_of:
   "rye": whisky
   "bonded rye": whisky
   "bourbon": whisky
-  "peated Scotch": whisky
   "blended scotch whisky": whisky
   "single malt scotch whisky": whisky
   "Irish whiskey": whisky
@@ -804,6 +812,17 @@ family_less:
 # rather than the data. The tests now derive the set from the `retired_`
 # prefix, the same way `_declared_generics` derives from the file's shape.
 retired_rum_styles:
+  "Planteray Stiggins' Fancy": >-
+    was permitted as a generic because nothing generalised it. Something does:
+    `pineapple rum`. The bottle is a `suggestion` now -- #314's amendment,
+    Helen 2026-08-29.
+  "Planteray O.F.T.D. Overproof": >-
+    as Stiggins'. Now `blended overproof rum`, which is what it IS: Guyana,
+    Jamaica and Barbados at 69%.
+  "Malibu": >-
+    as Stiggins'. Now `coconut rum` -- and both drinks using it already said
+    "Coconut rum" in their `item`, so the data had answered this before the
+    vocabulary did. Helen: "to me coconut rum means Malibu for now."
   light: >-
     describes colour, not production, and colour is routinely adjusted with
     caramel. Re-type against rum_styles — issue #314.
@@ -843,6 +862,12 @@ retired_honeys:
 # to mean something must not blend into the not-declared pile, and the next
 # reader should find out these were renamed rather than invented.
 retired_whisky_styles:
+  "peated Scotch": >-
+    peat is ORTHOGONAL to single-malt-versus-blended -- a peated single malt is
+    both -- so it was one field carrying two facts. It is a `character` now,
+    beside a real style, exactly as blackstrap is for rum (#441, #314). Both
+    drinks that used it proved the point: their items read "Peated single malt
+    whisky" and "Peated Scotch whisky".
   "blended Scotch": >-
     said neither whisky nor whiskey. Scotch takes WHISKY. Now `blended scotch
     whisky`, lowercase for the same reason cognac and champagne are.
