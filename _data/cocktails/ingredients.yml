@@ -362,6 +362,16 @@ brandy_styles:
   # may turn out to just be `eau de vie` once revisited; kept separate
   # rather than assumed identical.
   - "full-strength clear fruit brandy"
+  # Added 2026-08-29. Distilled peach wine, ~35%, clear or aged -- and NOT the
+  # same thing as crème de pêche (an infusion of fresh peaches with lots of
+  # sugar, ~20%) or a peach eau de vie (clear, unaged, from whole fruit, ~45%).
+  #
+  # NOT PEDANTRY: the collection already had a drink wrong because this was
+  # missing. Gunmetal Blue asks for "Peach brandy" and is typed
+  # `crème de pêche`, so a 20% sweetened infusion is standing in for a 35%
+  # distillate. Same axis the cherry pair is already split on -- Helen's own
+  # note there is "a liqueur is sweetened, an eau de vie is not".
+  - "peach brandy"
 
 # Cane and palm spirits that are NOT rum. #314: "cachaca is its own generic" --
 # same raw material as an agricole rhum, completely different product. Batavia
@@ -645,6 +655,7 @@ family_of:
   "grappa": brandy
   "eau de vie": brandy
   "full-strength clear fruit brandy": brandy
+  "peach brandy": brandy
   "blanco tequila": agave
   "reposado tequila": agave
   "añejo tequila": agave
