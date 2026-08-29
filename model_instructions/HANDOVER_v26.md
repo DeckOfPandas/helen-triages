@@ -1700,9 +1700,15 @@ it keeps ratios clean and it is a decision, not an accident.
 liqueur". No rule can derive the second from the first, which is why it is
 stored rather than computed.
 
-**`generic` is fully typed, and it is what the index browses by.** All 617
-ingredient entries carry a declared value; the "526+ of 594, #335 tracks the
-rest" figure that stood here was two coverage passes out of date. It is still
+**`generic` is fully typed, and it is what the index browses by.** Re-measured
+2026-08-29 by parsing every drink rather than grepping: **619 ingredient
+entries, 0 untyped and 0 carrying a `QQ` generic.** #335 ("type the remaining 68
+QQ generics") was therefore complete and stayed open — closed on that
+measurement. The "526+ of 594, #335 tracks the rest" figure that stood here was
+two coverage passes out of date, and the issue itself was one more behind that.
+Coverage stays honest on its own: `test_every_ingredient_has_a_generic_or_a_qq`
+means an untyped ingredient is always a visible `QQ`, never an absent key, so
+this backlog cannot quietly regrow. It is still
 the cocktails analogue of food's `main_ingredients` rather than a copy, and
 **since #501 it is also what a rum shows on a card** — see §9.10.1. §9.1's "no
 star axis" rule still holds: the index filters and excludes by ingredient, it
@@ -3844,6 +3850,14 @@ the branch it must never touch. Nothing was lost (the edits were sound and
 were moved onto a fresh branch), but the failure mode is silent and the tree
 is shared with a human who is also using git. Delegate the reading and the
 scanning; keep the branching in the foreground.
+
+**A COMMIT TRAILER IS HOW AN ISSUE GETS CLOSED HERE — Helen's standing
+preference, 2026-08-29**, given while ruling on #540: *"via commit message if
+possible -- this is always my preference."* The API route exists (`GH_TOKEN`,
+`CLAUDE.md`) and is for the cases a trailer cannot reach, the clear one being
+work done inside a nested private drafts repo, where a cross-repo trailer closes
+and cross-references nothing (see §12). Everywhere else, the trailer, because it
+ties the closure to the commit that earned it.
 
 **Put `Fixes #N` on the commit, or the issue stays open forever.** Four issues
 in one 2026-08-16 session (#52, #273, and nearly #274/#281) shipped and merged
