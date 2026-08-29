@@ -152,6 +152,56 @@
     var families = (voc.families || []).map(String);
     var familyOfGeneric = voc.family_of || {};
     var cardNames = voc.card_names || {};
+    var familyAliases = voc.family_aliases || {};
+
+    /* ONE CHIP PER CATEGORY, CARRYING THE CARD'S NAME FOR IT — Helen's ruling,
+       2026-08-29, looking at `aged rum` and `moderately aged rum` offered as two
+       separate chips: "we have no 'aged rum' in our dictionary."
+
+       She was right and it was worse than one pair. FIFTEEN generics in the
+       collection also had their card name in the pool as a chip of its own, and
+       ELEVEN of those fifteen pairs selected exactly the same drinks -- two
+       buttons, one answer, and no way to tell from either which was which.
+
+       The card name wins, so the picker speaks the language the cards speak.
+       The generic stays SEARCHABLE (`cardNameTerms` below), so typing
+       "moderately" still finds the `aged rum` chip; it just never appears as a
+       second button. Food's `display_names` is the same idea and its comment is
+       the one to read: "matching still has to run against the real match key,
+       not the pretty name."
+
+       THE COLLAPSING PAIRS COME FREE AND ARE THE BEST PART. `sugar syrup 1:1`
+       and `sugar syrup 2:1` share the card name `sugar syrup`, so they become
+       one chip covering 35 drinks rather than two covering 4 and 31 -- which is
+       §9.10.1's own ruling arriving in the picker: "a ratio is a MAKING fact,
+       not a CHOOSING fact". Same for the two honey waters and the two
+       Jamaicans. `card_names_may_collide` already declares each of these three
+       as deliberate. */
+    var chipForTerm = Object.create(null);   // folded term -> the chip it belongs to
+    var chipCovers = Object.create(null);    // folded chip -> [folded terms it selects]
+
+    function cover(chipValue, term) {
+      var chipKey = normalise(chipValue);
+      var termKey = normalise(term);
+      if (!chipKey || !termKey) return;
+      if (!chipCovers[chipKey]) chipCovers[chipKey] = [];
+      if (chipCovers[chipKey].indexOf(termKey) === -1) chipCovers[chipKey].push(termKey);
+      chipForTerm[termKey] = chipValue;
+    }
+
+    Object.keys(cardNames).forEach(function (generic) {
+      var card = cardNames[generic];
+      cover(card, generic);
+      cover(card, card);
+    });
+
+    /* What a chip actually selects. A plain entry covers only itself -- the
+       exact rule this module's header argues for -- and a card-name chip covers
+       every generic it stands for. Nothing here is a substring test. */
+    function coveredBy(chipValue) {
+      var key = normalise(chipValue);
+      return chipCovers[key] || [key];
+    }
 
     /* One map, entry -> the families it belongs to, built once. A CARD NAME
        resolves through the generic it abbreviates, which matters because the
@@ -200,14 +250,30 @@
        downcased, so a plain case-insensitive sort is all this needs; the
        comparison is spelled out anyway, because "the values happen to arrive
        lowercase" is a fact about the template and not about this function. */
+    /* Returns CHIPS, not strings: { value, terms }. `value` is what the button
+       says and what gets stored as a filter; `terms` is everything that finds
+       it, which is the card name and every generic it stands for.
+
+       A raw term that is a generic with a card name is folded INTO that card
+       name's chip rather than becoming one of its own -- see the note on
+       chipForTerm above for why, and for the eleven pairs that made it worth
+       doing. */
     function buildPool(attrValues) {
-      var seen = Object.create(null);
+      var byValue = Object.create(null);
       (attrValues || []).forEach(function (value) {
-        splitEntries(value).forEach(function (entry) { seen[entry] = true; });
+        splitEntries(value).forEach(function (entry) {
+          var chipValue = chipForTerm[normalise(entry)] || entry;
+          var key = normalise(chipValue);
+          if (!byValue[key]) byValue[key] = { value: chipValue, terms: [] };
+          [entry].concat(coveredBy(chipValue)).forEach(function (t) {
+            if (byValue[key].terms.indexOf(t) === -1) byValue[key].terms.push(t);
+          });
+        });
       });
-      return Object.keys(seen).sort(function (a, b) {
-        return a.toLowerCase().localeCompare(b.toLowerCase());
-      });
+      return Object.keys(byValue).map(function (k) { return byValue[k]; })
+        .sort(function (a, b) {
+          return a.value.toLowerCase().localeCompare(b.value.toLowerCase());
+        });
     }
 
     // ------------------------------------------------------------------------
@@ -232,16 +298,29 @@
       var taken = (chosen || []).map(normalise);
       var candidates = [];
 
-      (pool || []).forEach(function (entry) {
-        var folded = normalise(entry);
-        if (folded.indexOf(query) === -1) return;
-        if (taken.indexOf(folded) !== -1) return;
-        var words = getWords(folded);
-        candidates.push({
-          entry: entry,
-          isPrefixMatch: folded.indexOf(query) === 0,
-          hasWordMatch: words.some(function (w) { return w.indexOf(query) === 0; })
+      /* A chip is ranked by its BEST term, not only by the name on its face.
+         That is what keeps the generic searchable after the card name took the
+         button: typing "moderately" band-1 matches `moderately aged rum` and
+         surfaces the `aged rum` chip, which is the one thing that would
+         otherwise be lost by collapsing the pair. */
+      (pool || []).forEach(function (chip) {
+        var value = chip && chip.value !== undefined ? chip.value : chip;
+        var terms = (chip && chip.terms) ? chip.terms : [value];
+        if (taken.indexOf(normalise(value)) !== -1) return;
+
+        var best = null;
+        terms.forEach(function (term) {
+          var folded = normalise(term);
+          if (folded.indexOf(query) === -1) return;
+          var words = getWords(folded);
+          var scored = {
+            entry: value,
+            isPrefixMatch: folded.indexOf(query) === 0,
+            hasWordMatch: words.some(function (w) { return w.indexOf(query) === 0; })
+          };
+          if (!best || IS.bandOf(scored) < IS.bandOf(best)) best = scored;
         });
+        if (best) candidates.push(best);
       });
 
       // Shared with food rather than re-derived — see orderByBand's own note in
@@ -256,9 +335,25 @@
       var familyButtons = [];
       if (typed.length >= FAMILY_BUTTON_MIN_CHARS) {
         families.forEach(function (family) {
-          if (normalise(family).indexOf(query) !== 0) return;
-          var present = (pool || []).some(function (entry) {
-            return familiesOf(entry).indexOf(family) !== -1;
+          /* REACHED BY ANY OF ITS NAMES, but always LABELLED with its canonical
+             one -- `family_aliases` in the vocabulary. A family nobody spells
+             the way it is stored is a family nobody can reach: `whiskey` found
+             nothing at all, and `agave` is named after the plant because it
+             holds mezcal too, so nobody types it.
+
+             One button, never one per spelling. `scotch` offering a second
+             umbrella called "scotch (all)" would be an umbrella lying about its
+             own width -- the family holds bourbon and rye. Saying `whisky` on
+             the button is what makes that visible instead. */
+          var names = [family];
+          Object.keys(familyAliases).forEach(function (alias) {
+            if (familyAliases[alias] === family) names.push(alias);
+          });
+          if (!names.some(function (n) { return normalise(n).indexOf(query) === 0; })) return;
+
+          var present = (pool || []).some(function (chip) {
+            var terms = (chip && chip.terms) ? chip.terms : [chip];
+            return terms.some(function (t) { return familiesOf(t).indexOf(family) !== -1; });
           });
           if (present) familyButtons.push(family);
         });
@@ -284,8 +379,14 @@
     function matchesExclude(entries, chip) {
       if (!chip) return false;
       if (isFamilyValue(chip)) return entryHasFamily(entries, chipFamily(chip));
-      var wanted = normalise(chip);
-      return (entries || []).some(function (entry) { return normalise(entry) === wanted; });
+      /* Whole-entry membership against everything this chip stands for. For a
+         plain entry that is the entry itself; for a card-name chip it is every
+         generic wearing that name, which is how one `sugar syrup` chip reaches
+         both ratios without a substring rule anywhere near it. */
+      var wanted = coveredBy(chip);
+      return (entries || []).some(function (entry) {
+        return wanted.indexOf(normalise(entry)) !== -1;
+      });
     }
 
     /* Every word of the chip must PREFIX some word of the entry. Prefix rather
@@ -302,6 +403,9 @@
     function matchesInclude(entries, chip) {
       if (!chip) return false;
       if (isFamilyValue(chip)) return entryHasFamily(entries, chipFamily(chip));
+      // Everything exclude would take, plus the fuzzy reach below. A card-name
+      // chip must never select FEWER drinks than the same chip would exclude.
+      if (matchesExclude(entries, chip)) return true;
       var chipWords = getWords(normalise(chip));
       if (!chipWords.length) return false;
       return (entries || []).some(function (entry) {

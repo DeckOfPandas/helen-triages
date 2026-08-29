@@ -53,6 +53,33 @@ search:
   family_button_min_chars: 3
   pool_cap: 8
 
+# --- other names for a family ------------------------------------------------
+# A FAMILY IS REACHED BY ITS NAME, so a family nobody spells that way is a
+# family nobody can reach. Helen, 2026-08-29: "'whiskey (all)' should return all
+# whisky and bourbon and rye, and the same for 'whisky'." The family already
+# HELD all three; it was the spelling that found nothing.
+#
+# The button always carries the family's CANONICAL name, so typing `scotch`
+# offers `whisky (all)` rather than a second umbrella claiming to be scotch.
+# That matters most for the one alias that is genuinely wider than the word
+# typed: `whisky (all)` includes bourbon and rye, and saying `whisky` on the
+# button is what stops it looking like a scotch filter that has gone wrong.
+# Helen was shown that trade and asked for it anyway.
+#
+# `agave` is the family that most needed this: it is named after the plant
+# because it holds mezcal as well, so nobody types it. `rhum` and `ron` are the
+# spellings that appear in our own ingredient names -- `rhum agricole blanc`,
+# `Ron del Barrito`.
+#
+# NOT A SYNONYM LAYER FOR INGREDIENTS. These name FAMILIES and nothing else; an
+# ingredient reached by two names is a `card_names` question, below.
+family_aliases:
+  whiskey: whisky
+  scotch: whisky
+  tequila: agave
+  rhum: rum
+  ron: rum
+
 # --- spirit families: FOR SEARCH AND EXCLUSION, NOT A BROWSE AXIS ------------
 # THIS IS NOT A "SORTED BY SPIRIT" MENU, and that is deliberate. Helen,
 # 2026-08-17: "I get really bored of cocktail bars that have enormous
@@ -245,9 +272,22 @@ card_names:
   # faintly as though the Demerara were not also aged.
   "moderately aged rum": "aged rum"
   "clear blended multi-region rum": "clear blended rum"
-  # The real category words, and shorter than the description of them.
-  "rhum agricole blanc": "agricole blanc"
-  "rhum agricole vieux": "agricole vieux"
+  # THE SPIRIT WORD STAYS, and these two lost it by accident. Helen, 2026-08-29,
+  # looking at `agricole blanc` and `rhum agricole blanc` offered as two separate
+  # chips in HAS TO HAVE: "'agricole' and 'rhum agricole' should both be 'rhum
+  # agricole'."
+  #
+  # This is her own #561 rule -- "her names say the spirit word out loud", which
+  # is what turned `filtered rum` into `lightly aged rum` and `clear blend` into
+  # `clear blended rum` -- and it simply was not applied here. `agricole blanc`
+  # among `gin`, `cognac` and `sugar syrup` asks the reader to already know that
+  # agricole is a rum. Two of the three names in that pass got LONGER for exactly
+  # this reason: brevity was the means, legibility was the point.
+  #
+  # Now identical to the generic, which is a legitimate entry in this map and
+  # already the case for eight others (`clairin`, `coconut rum`, `cachaça`...).
+  "rhum agricole blanc": "rhum agricole blanc"
+  "rhum agricole vieux": "rhum agricole vieux"
   "clairin": "clairin"
   # The brand-generics #314 permits because nothing generalises them. O.F.T.D.
   # earns its place: its item strings are `Overproof Navy rum` and `Navy rum

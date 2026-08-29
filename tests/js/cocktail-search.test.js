@@ -29,6 +29,7 @@ const CS = require('../../assets/js/cocktail-search.js');
 const VOCAB = {
   search: { min_query_chars: 2, family_button_min_chars: 3, pool_cap: 8 },
   families: ['rum', 'gin', 'whisky', 'amaro'],
+  family_aliases: { whiskey: 'whisky', scotch: 'whisky', rhum: 'rum' },
   family_of: {
     'London dry gin': 'gin',
     'Old Tom': 'gin',
@@ -36,14 +37,20 @@ const VOCAB = {
     'aged Demerara rum': 'rum',
     'Demerara overproof rum': 'rum',
     'moderately aged Jamaican rum': 'rum',
+    'moderately aged rum': 'rum',
+    'bourbon': 'whisky',
+    'rye': 'whisky',
     'Campari': 'amaro',
     'Aperol': 'amaro'
   },
   card_names: {
     'London dry gin': 'gin',
     'aged Demerara rum': 'Demerara rum',
-    'Demerara overproof rum': 'Demerara rum',
-    'moderately aged Jamaican rum': 'Jamaican rum'
+    'Demerara overproof rum': 'Demerara overproof rum',
+    'moderately aged Jamaican rum': 'Jamaican rum',
+    'moderately aged rum': 'aged rum',
+    'sugar syrup 1:1': 'sugar syrup',
+    'sugar syrup 2:1': 'sugar syrup'
   }
 };
 
@@ -52,6 +59,10 @@ const S = CS.create(VOCAB);
 // The attribute cocktails/index.html writes: entries joined and terminated with
 // `|`, the whole thing downcased at build time.
 const attr = (...entries) => entries.map((e) => e + '|').join('');
+
+// The pool holds CHIPS now, not strings — see the note on chipForTerm in
+// cocktail-search.js. Most cases below only care what the buttons SAY.
+const labels = (pool) => pool.map((c) => c.value);
 
 // --- splitting the attribute -------------------------------------------------
 
@@ -71,8 +82,8 @@ test('an empty or missing attribute is no entries, not one empty entry', () => {
 // --- the pool ----------------------------------------------------------------
 
 test('the pool is every distinct entry across every card, deduplicated', () => {
-  const pool = S.buildPool([attr('lime juice', 'gin'), attr('gin', 'absinthe')]);
-  assert.deepStrictEqual(pool, ['absinthe', 'gin', 'lime juice']);
+  const pool = S.buildPool([attr('lime juice', 'absinthe'), attr('absinthe', 'campari')]);
+  assert.deepStrictEqual(labels(pool), ['absinthe', 'campari', 'lime juice']);
 });
 
 test('the sort is case-insensitive, so a stray capital does not jump the list', () => {
@@ -81,8 +92,8 @@ test('the sort is case-insensitive, so a stray capital does not jump the list', 
   // letter, which is the trap ingredient-search.js's buildMasterList records,
   // and "the values happen to arrive lowercase" is a fact about the template
   // rather than about this function.
-  const pool = S.buildPool([attr('absinthe', 'Gin', 'lime juice')]);
-  assert.deepStrictEqual(pool, ['absinthe', 'Gin', 'lime juice']);
+  const pool = S.buildPool([attr('absinthe', 'Campari', 'lime juice')]);
+  assert.deepStrictEqual(labels(pool), ['absinthe', 'Campari', 'lime juice']);
 });
 
 // --- folding: GitHub issue #45's problem, on this site -----------------------
@@ -225,6 +236,100 @@ test('a family with no member anywhere in the pool offers no button', () => {
 
 test('the (all) button carries the suffix filter-state.js already spells', () => {
   assert.strictEqual(CS.FAMILY_SUFFIX, ' (all)');
+});
+
+// --- a family answers to more than one name — Helen, 2026-08-29 --------------
+// "'whiskey (all)' should return all whisky and bourbon and rye, and the same
+// for 'whisky'." The family already HELD all three; the spelling found nothing.
+
+test('an alias spelling reaches the family, and the button keeps the canonical name', () => {
+  const pool = S.buildPool([attr('bourbon', 'rye')]);
+  assert.deepStrictEqual(S.search('whisky', pool).familyButtons, ['whisky']);
+  assert.deepStrictEqual(S.search('whiskey', pool).familyButtons, ['whisky']);
+  assert.deepStrictEqual(S.search('scotch', pool).familyButtons, ['whisky']);
+});
+
+test('an alias never mints a SECOND umbrella, which would lie about its width', () => {
+  // `whisky (all)` holds bourbon and rye. A button labelled "scotch (all)"
+  // returning bourbon is an umbrella misdescribing itself, so the canonical
+  // name is what appears -- Helen was shown that trade and asked for it.
+  const pool = S.buildPool([attr('bourbon', 'rye')]);
+  const buttons = S.search('scotch', pool).familyButtons;
+  assert.strictEqual(buttons.length, 1);
+  assert.strictEqual(buttons[0], 'whisky');
+});
+
+test('whisky (all) takes the bourbon and the rye with it', () => {
+  const bourbon = CS.splitEntries(attr('bourbon', 'lemon juice'));
+  const rye = CS.splitEntries(attr('rye'));
+  const gin = CS.splitEntries(attr('old tom'));
+  assert.strictEqual(S.matchesInclude(bourbon, 'whisky (all)'), true);
+  assert.strictEqual(S.matchesInclude(rye, 'whisky (all)'), true);
+  assert.strictEqual(S.matchesInclude(gin, 'whisky (all)'), false);
+});
+
+test('an alias that names no family is still just a word', () => {
+  const pool = S.buildPool([attr('bourbon')]);
+  assert.deepStrictEqual(S.search('vodka', pool).familyButtons, []);
+});
+
+// =============================================================================
+// ONE CHIP PER CATEGORY, WEARING THE CARD'S NAME — Helen, 2026-08-29
+// =============================================================================
+// "we have no 'aged rum' in our dictionary", said looking at `aged rum` and
+// `moderately aged rum` offered as two separate buttons. Fifteen generics in
+// the real collection had their card name in the pool as a chip of its own, and
+// eleven of those fifteen pairs selected exactly the same drinks.
+
+test('a generic with a card name is not offered twice', () => {
+  const pool = S.buildPool([attr('moderately aged rum', 'aged rum', 'lime juice')]);
+  assert.deepStrictEqual(labels(pool), ['aged rum', 'lime juice']);
+});
+
+test('the surviving chip wears the CARD name, so the picker and the card agree', () => {
+  const pool = S.buildPool([attr('moderately aged rum')]);
+  assert.deepStrictEqual(labels(pool), ['aged rum']);
+});
+
+test('the generic stays searchable -- collapsing a pair must not lose a way in', () => {
+  // Typing the generic still finds the chip; it just never appears as a second
+  // button. Food's display_names is the same idea: "matching still has to run
+  // against the real match key, not the pretty name."
+  const pool = S.buildPool([attr('moderately aged rum')]);
+  assert.deepStrictEqual(S.search('moderately', pool).results.map((r) => r.entry), ['aged rum']);
+  assert.deepStrictEqual(S.search('aged', pool).results.map((r) => r.entry), ['aged rum']);
+});
+
+test('a chip is ranked by its BEST term, not only by the name on its face', () => {
+  // "moderately" is a band-1 prefix of the generic and appears nowhere in the
+  // card name, so ranking the chip by its label alone would bury it.
+  const pool = S.buildPool([attr('moderately aged rum', 'lime juice')]);
+  const hit = S.search('moderately', pool).results[0];
+  assert.strictEqual(hit.entry, 'aged rum');
+  assert.strictEqual(hit.isPrefixMatch, true);
+});
+
+test('a chip that stands for two generics selects both -- the ratios collapse', () => {
+  // §9.10.1: "a ratio is a MAKING fact, not a CHOOSING fact." One `sugar syrup`
+  // chip rather than a 1:1 button and a 2:1 button.
+  const pool = S.buildPool([attr('sugar syrup 1:1'), attr('sugar syrup 2:1')]);
+  assert.deepStrictEqual(labels(pool), ['sugar syrup']);
+
+  const oneToOne = CS.splitEntries(attr('sugar syrup 1:1'));
+  const twoToOne = CS.splitEntries(attr('sugar syrup 2:1'));
+  assert.strictEqual(S.matchesInclude(oneToOne, 'sugar syrup'), true);
+  assert.strictEqual(S.matchesInclude(twoToOne, 'sugar syrup'), true);
+  assert.strictEqual(S.matchesExclude(oneToOne, 'sugar syrup'), true);
+  assert.strictEqual(S.matchesExclude(twoToOne, 'sugar syrup'), true);
+});
+
+test('a card-name chip excludes exactly what it includes, and nothing wider', () => {
+  // The collapse must not smuggle a substring rule back in: `aged rum` covers
+  // `moderately aged rum` because the vocabulary SAYS so, not because one
+  // string contains the other.
+  const other = CS.splitEntries(attr('aged demerara rum'));
+  assert.strictEqual(S.matchesExclude(other, 'aged rum'), false);
+  assert.strictEqual(S.matchesExclude(other, 'Demerara rum'), true);
 });
 
 test('a card name resolves to the family of the generic it abbreviates', () => {

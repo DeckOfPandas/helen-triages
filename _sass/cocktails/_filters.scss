@@ -285,6 +285,15 @@
   font-size: 0.8rem;
   padding: 0.25rem 0.65rem;
 
+  // LOWERCASED IN CSS, NOT IN THE MARKUP -- #543/#553's rule, and the chips
+  // needed it the moment they started wearing card names (2026-08-29). The
+  // pool used to be built from the downcased attribute, so every chip was
+  // lowercase by accident of the data; a chip now carries the card's own name,
+  // capitals and all, which would have put `Demerara rum` beside `gin` and
+  // `coconut rum`. The DOM keeps its capitals so copy-paste and screen readers
+  // are untouched, exactly as on the cards.
+  text-transform: lowercase;
+
   &:hover,
   &:focus-visible {
     border-color: $color-cosmic-cosmopolitan-deep;
