@@ -44,6 +44,12 @@ from a commit message written for exactly this purpose.
 > to act on. Past versions have been wrong — see §11.2. If this file and the
 > code disagree, the code wins and this file needs fixing.
 >
+> **TAG THE ISSUE IN EVERY COMMIT MESSAGE.** `Fixes #N` / `Closes #N` when it
+> resolves one, `Towards #N` / `See #N` when it merely touches one, and the full
+> `DeckOfPandas/helen-triages#N` form from a nested drafts repo. The rule and
+> the reasoning are boxed in §11; it is here as well because it is the one that
+> gets forgotten most, and a missed trailer is unfixable after a push.
+>
 > **§12 is the traps section.** Read it before you touch anything — it is the
 > most re-used part of this document. (This box said "§10" from v26's first
 > draft until 2026-08-21, pointing every reader at the validation section
@@ -3823,6 +3829,45 @@ predates the branch or is a regression from it, and what you checked to know
 that; what you ruled out; guards added, and that you broke them to prove they
 bite.
 
+---
+
+> ## TAG THE ISSUE. EVERY COMMIT, NO EXCEPTIONS.
+>
+> **Resolves an issue → a trailer**, on its own line, one per issue:
+> `Fixes #N` or `Closes #N`. GitHub closes it when the commit reaches `main`.
+>
+> **Merely advances or touches one → cite it in the body**: `Towards #N`,
+> `See #N`. No closing behaviour, and that is the point — it is how the next
+> reader finds the conversation behind the change.
+>
+> **Cross-repo needs the full form.** A bare `#N` resolves only within its OWN
+> repository, and the nested drafts repos have their own empty trackers, so from
+> `_food_drafts/` or `_cocktail_drafts/` it is
+> `Towards DeckOfPandas/helen-triages#367`. Note also that such a trailer from a
+> PRIVATE repo closes and cross-references **nothing** — see §12 — so closing a
+> public issue from work done there is a separate, deliberate step.
+>
+> **Do it AT COMMIT TIME.** While nothing is pushed a message can still be
+> rewritten; after a push it is fixed, and a trailer cannot be attached to a
+> merged commit retroactively.
+>
+> **Helen's standing preference, 2026-08-29:** *"via commit message if possible
+> — this is always my preference."* The `GH_TOKEN` API is for the cases a
+> trailer genuinely cannot reach, not for convenience. A trailer ties the
+> closure to the commit that earned it; closing out of band leaves the issue and
+> the code with no link between them.
+>
+> **This keeps being got wrong, and the cost is always the same shape.** Four
+> issues in one 2026-08-16 session (#52, #273, nearly #274/#281) shipped, merged,
+> and sat in the open list looking like outstanding work. It happened again and
+> was only caught on 2026-08-29: **#558 and #561 were both fully delivered days
+> earlier** — verified by grepping the data, not by reading anything — and both
+> were still open, because their commits carried no trailer. By then a trailer
+> was impossible and they had to be closed through the API.
+>
+> **Before reporting an issue as done, check**:
+> `git log main --grep="#N"`.
+
 End every commit:
 ```
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
@@ -3847,19 +3892,7 @@ were moved onto a fresh branch), but the failure mode is silent and the tree
 is shared with a human who is also using git. Delegate the reading and the
 scanning; keep the branching in the foreground.
 
-**A COMMIT TRAILER IS HOW AN ISSUE GETS CLOSED HERE — Helen's standing
-preference, 2026-08-29**, given while ruling on #540: *"via commit message if
-possible -- this is always my preference."* The API route exists (`GH_TOKEN`,
-`CLAUDE.md`) and is for the cases a trailer cannot reach, the clear one being
-work done inside a nested private drafts repo, where a cross-repo trailer closes
-and cross-references nothing (see §12). Everywhere else, the trailer, because it
-ties the closure to the commit that earned it.
-
-**Put `Fixes #N` on the commit, or the issue stays open forever.** Four issues
-in one 2026-08-16 session (#52, #273, and nearly #274/#281) shipped and merged
-with no trailer, so GitHub never closed them and they sat in the open list
-looking like outstanding work. Check `git log main --grep="Fixes #N"` before
-reporting an issue as done.
+**Issue tagging is the boxed rule above**, not a footnote here.
 
 **This paragraph used to add "Helen has read-only `gh` access by choice, so
 nobody can close them programmatically after the fact".** That stopped being
@@ -3871,10 +3904,6 @@ no pushes, no PRs, no settings. `CLAUDE.md` is the authority. **A trailer is
 still the right way to close an issue**, because it ties the closure to the
 commit that earned it; the point is that a missed one is now recoverable
 without waiting for Helen.
-
-**A bare `#N` only resolves within its OWN repository.** The nested drafts repos
-have their own empty trackers, so a cross-repo reference needs the full
-`DeckOfPandas/helen-triages#N` form.
 
 ### 11.0.0 Prefer LARGER pull requests -- every merge is a deploy
 
