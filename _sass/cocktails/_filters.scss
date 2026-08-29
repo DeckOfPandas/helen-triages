@@ -264,6 +264,21 @@
   }
 }
 
+// #588, and #548 point 6 is the same line. THREE inputs share this rule and the
+// magenta was written once, for HAS TO HAVE: LEAVE OUT overrides it below
+// (dashed, borderless grey) and I KNOW WHAT I WANT never did, so the name box
+// wore the include section's colour.
+//
+// §9.13's rule is that a heading's colour is a promise the page keeps, and this
+// section's is luminous-lagoon -- the same hue the matched run of a drink name
+// is banded in (.drink-name-hit). An underline in magenta under a lagoon
+// heading says the box belongs to the section above it, which it does not.
+.drink-filter--name .drink-search-input {
+  border-bottom-color: $color-luminous-lagoon;
+
+  &:focus { border-bottom-color: $color-luminous-lagoon-deep; }
+}
+
 .drink-pool {
   display: flex;
   flex-wrap: wrap;
@@ -284,6 +299,15 @@
   @extend %drink-btn-base;
   font-size: 0.8rem;
   padding: 0.25rem 0.65rem;
+
+  // LOWERCASED IN CSS, NOT IN THE MARKUP -- #543/#553's rule, and the chips
+  // needed it the moment they started wearing card names (2026-08-29). The
+  // pool used to be built from the downcased attribute, so every chip was
+  // lowercase by accident of the data; a chip now carries the card's own name,
+  // capitals and all, which would have put `Demerara rum` beside `gin` and
+  // `coconut rum`. The DOM keeps its capitals so copy-paste and screen readers
+  // are untouched, exactly as on the cards.
+  text-transform: lowercase;
 
   &:hover,
   &:focus-visible {
@@ -380,6 +404,101 @@
   border: none;
   box-shadow: none;
 }
+
+// --- the candidate you actually meant — #549 point 3 -------------------------
+// A WORD-PREFIX match, not a substring one, and the distinction is the whole
+// point of the treatment. Typing "li" marks `lime juice` and `apricot liqueur`;
+// it does NOT mark `galliano`, which is in the pool correctly, on a substring
+// match. So the marked entries are the ones you meant and the plain ones are
+// what the vocabulary brought along. An (all) button is always marked, by
+// construction: a family only forms when its own name starts with the query.
+//
+// A BAND UNDER THE TEXT, NOT A FILL, and that is the language this site already
+// speaks (HANDOVER §9.13). Helen, on a card carrying three filled things:
+// "There's just a lot going on... underline the ingredient rather than
+// highlight." A pool of eight candidates with two of them filled would be that
+// complaint again, one control higher. `text-decoration` rather than the
+// headings' inset box-shadow because a chip's text can wrap and a box-shadow
+// gives a wrapped fragment an odd stub.
+.btn-pool--word-match {
+  text-decoration: underline;
+  text-decoration-thickness: 0.16em;
+  text-underline-offset: 0.16em;
+  text-decoration-color: $color-cosmic-cosmopolitan;
+}
+
+// LEAVE OUT KEEPS ITS COLOURLESSNESS HERE TOO. It has no hue by decision --
+// Helen: "for food, avoiding can be important whereas for drinks surely less
+// so" -- so the mark is the one distinction available without one: the plain
+// candidates stay grey and the matched ones come up to ink. Borrowing magenta
+// for this pool would put the include section's colour on the exclude control,
+// which is the specific confusion the five accents exist to prevent.
+.drink-search--exclude .btn-pool--word-match {
+  text-decoration: none;
+  color: $color-text;
+}
+
+// --- the matched run of a drink name — #564 ----------------------------------
+// Food's own treatment, and the colour is not a free choice: I KNOW WHAT I WANT
+// carries luminous-lagoon, and §9.13's rule is that a heading's colour is a
+// promise the card already keeps. The band under the matched letters is the
+// answer to the lagoon heading that found them, the same way a matched
+// ingredient is the answer to the cosmopolitan one.
+//
+// `mark` ARRIVES WITH A UA BACKGROUND -- Mark/MarkText, usually a hard yellow --
+// which is exactly the fill this design does not use anywhere. Both are reset
+// rather than overridden by accident.
+.drink-name-hit {
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 0.14em;
+  text-underline-offset: 0.14em;
+  text-decoration-color: $color-luminous-lagoon;
+}
+
+// --- clear all, top and bottom — #541 ----------------------------------------
+// Helen: "very much like food site". Two buttons, one action: the top one above
+// the five questions, the bottom one after the last of them, so clearing does
+// not mean scrolling back up past all five. Food's index has had the pair since
+// its own #67 for the same reason.
+//
+// NOT food's rule, and this is the ruling in #579 rather than an oversight. The
+// two stylesheets share no class names on purpose (HANDOVER §2.2) and food's
+// .btn-clear is absolutely positioned into the top-right of `.controls`, which
+// is a fact about that layout. What is shared is the BEHAVIOUR -- one state
+// object, one predicate deciding whether the button has anything to do -- and
+// that lives in filter-state.js where it can be tested.
+//
+// `visibility`, not `display`: the button appears the moment a filter is set,
+// and a row that changes height as you click the first mood is a page that
+// moves under you. Its space is reserved from the start.
+.btn-clear {
+  visibility: hidden;
+  display: block;
+  margin: 0 0 $space-md auto;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+
+  font-family: $font-body;
+  font-size: 0.82rem;
+  font-weight: 400;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  text-decoration: underline;
+  color: $color-clear-text;
+  transition: color 0.1s ease-in-out;
+
+  // Ink on hover rather than a hue. Clear-all is the one control that belongs
+  // to no section, so it can borrow no section's colour -- the same reason the
+  // survivor count and the empty state carry none.
+  &:hover,
+  &:focus-visible { color: $color-text; }
+}
+
+.btn-clear--bottom { margin: $space-xl 0 0 auto; }
 
 @media (max-width: 720px) {
   .drink-searches { grid-template-columns: 1fr; gap: $space-xl; }

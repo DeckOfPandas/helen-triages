@@ -29,6 +29,139 @@
 # planteray stiggins' fancy, planteray o.f.t.d. overproof, malibu, blackstrap.
 # =============================================================================
 
+# --- what the index's ingredient pickers do with all this --------------------
+# THREE NUMBERS, HERE RATHER THAN IN THE SCRIPT, and for the reason food's
+# `search: family_button_min_chars` is in _data/food/ingredient_words.yml: how
+# much typing earns a pool of candidates is a question about this vocabulary,
+# not about the algorithm that reads it. assets/js/cocktail-search.js writes
+# none of them down and test_the_cocktail_search_config_is_not_hardcoded keeps
+# it that way.
+#
+# `min_query_chars` IS ISSUE #584, split out of #549 so that issue could close
+# on what was actually delivered rather than sit on the board mostly done.
+# Measured 2026-08-29 over the 240 distinct pool terms: at two characters `li`
+# offers 24 candidates and `or` 28, so eight are shown and the rest counted; at
+# three it is nearly always a real answer. Raising it is a one-line change here
+# and needs no code touched -- it is left at 2 because that is what the page did
+# before the search moved into a tested module, and changing behaviour and
+# structure in one pass hides which of them moved something.
+#
+# `pool_cap` is how many candidates are shown at once. The remainder is always
+# COUNTED and said out loud ("+16 more -- keep typing"), never silently
+# dropped: a pool that stops at eight looks like a complete answer, and the one
+# you wanted may be the ninth.
+search:
+  min_query_chars: 2
+  family_button_min_chars: 3
+  pool_cap: 8
+
+  # --- PROSE IS NOT A BOTTLE NAME -------------------------------------------
+  # A `suggestion` is free text typed while transcribing a recipe, and some of
+  # it is a sentence rather than a bottle. As a filter chip a sentence means
+  # nothing -- clicking `ED3 or Havana 3` asks for drinks whose ingredient list
+  # contains that literal string.
+  #
+  # WHY A RULE AND NOT A LIST. Helen met four of these one at a time -- the
+  # Havana disjunction, `Tesco Finest`, `Avallen -- a round, fresh taste if you
+  # need to sub`, then `Jack Daniels > Bulleit` -- and naming them one by one is
+  # how the fifth arrives. #585 is still the backlog of FIXING the data; this is
+  # what keeps them out of the picker meanwhile.
+  #
+  # MEASURED AGAINST ALL 87 SUGGESTIONS BEFORE IT WAS TRUSTED, 2026-08-29: it
+  # flags 17, every one of them genuinely prose, and catches no bottle name. The
+  # clean 70 include every awkward shape the collection has -- `Smith & Cross`,
+  # `Gosling's Black Seal`, `Appleton 8-year`, `La Favourite L'Authentique
+  # Ambré`, `Pierre Ferrand ambre`, `acacia honey`.
+  #
+  # THESE APPLY TO SUGGESTIONS ONLY. A declared generic is a name Helen chose
+  # and is never dropped, which is why `ginger and lemongrass cordial` survives
+  # -- and it is why `and` is deliberately absent below, since `Wray and Nephew`
+  # is one bottle.
+  #
+  # `the` AND `that` WERE IN A FIRST DRAFT AND CAME OUT: a bottle can carry them
+  # ("The Botanist") and neither flagged anything.
+  prose_words:
+    - a
+    - an
+    - or
+    - if
+    - you
+    - your
+    - need
+    - needs
+    - best
+    - better
+    - prefer
+    - other
+    - instead
+    - sub
+    - fine
+    - use
+    - using
+    - when
+    - with
+    - for
+    - unless
+    - though
+    - is
+
+  # A comma catches the three two-bottles-in-one-string entries (`Havana 7,
+  # Appleton 8`) and nothing else in the real 87 -- checked, not assumed. `>`
+  # catches `Jack Daniels > Bulleit`, which was a shape nobody had predicted.
+  # The failure mode if a bottle ever legitimately carries one is mild and
+  # visible: it is not offered as a chip, and it is one line to fix here.
+  prose_marks: ["--", "—", "?", "!", ">", ","]
+
+# --- other names for a family ------------------------------------------------
+# A FAMILY IS REACHED BY ITS NAME, so a family nobody spells that way is a
+# family nobody can reach. Helen, 2026-08-29: "'whiskey (all)' should return all
+# whisky and bourbon and rye, and the same for 'whisky'." The family already
+# HELD all three; it was the spelling that found nothing.
+#
+# The button always carries the family's CANONICAL name, so typing `scotch`
+# offers `whisky (all)` rather than a second umbrella claiming to be scotch.
+# That matters most for the one alias that is genuinely wider than the word
+# typed: `whisky (all)` includes bourbon and rye, and saying `whisky` on the
+# button is what stops it looking like a scotch filter that has gone wrong.
+# Helen was shown that trade and asked for it anyway.
+#
+# `agave` is the family that most needed this: it is named after the plant
+# because it holds mezcal as well, so nobody types it. `rhum` and `ron` are the
+# spellings that appear in our own ingredient names -- `rhum agricole blanc`,
+# `Ron del Barrito`.
+#
+# NOT A SYNONYM LAYER FOR INGREDIENTS. These name FAMILIES and nothing else; an
+# ingredient reached by two names is a `card_names` question, below.
+family_aliases:
+  whiskey: whisky
+  scotch: whisky
+  tequila: agave
+  rhum: rum
+  ron: rum
+
+# --- what the (all) button SAYS ----------------------------------------------
+# Helen, 2026-08-29, on the whisky umbrella: "I think that chip should be
+# 'whisk(e)y (all)', even though it's clunky, to avoid ever having to split or
+# claim they combine."
+#
+# The clunkiness IS the point. Either spelling on the button is a claim about
+# which drinks are in it -- `whisky (all)` reads as excluding the Irish and the
+# bourbon, `whiskey (all)` as excluding the scotch -- and the family holds all
+# of them. A name that refuses to choose is the only one that describes it.
+#
+# A LABEL, NOT A RENAME OF THE FAMILY, and the reason is mechanical rather than
+# aesthetic: `whisky_characters` is keyed off the family's name --
+# test_a_declared_character_vocabulary_is_enforced strips the `_characters`
+# suffix to find it -- so renaming the family would drag `whisk(e)y_characters`
+# along with it and put parentheses into a key three tests derive by string
+# surgery. Same separation `card_names` already draws for generics: matching
+# runs on the key, the button shows the name.
+#
+# A family with no entry here keeps its own name, which is right for all nine
+# others: nobody spells `gin` two ways.
+family_labels:
+  whisky: "whisk(e)y"
+
 # --- spirit families: FOR SEARCH AND EXCLUSION, NOT A BROWSE AXIS ------------
 # THIS IS NOT A "SORTED BY SPIRIT" MENU, and that is deliberate. Helen,
 # 2026-08-17: "I get really bored of cocktail bars that have enormous
@@ -221,9 +354,22 @@ card_names:
   # faintly as though the Demerara were not also aged.
   "moderately aged rum": "aged rum"
   "clear blended multi-region rum": "clear blended rum"
-  # The real category words, and shorter than the description of them.
-  "rhum agricole blanc": "agricole blanc"
-  "rhum agricole vieux": "agricole vieux"
+  # THE SPIRIT WORD STAYS, and these two lost it by accident. Helen, 2026-08-29,
+  # looking at `agricole blanc` and `rhum agricole blanc` offered as two separate
+  # chips in HAS TO HAVE: "'agricole' and 'rhum agricole' should both be 'rhum
+  # agricole'."
+  #
+  # This is her own #561 rule -- "her names say the spirit word out loud", which
+  # is what turned `filtered rum` into `lightly aged rum` and `clear blend` into
+  # `clear blended rum` -- and it simply was not applied here. `agricole blanc`
+  # among `gin`, `cognac` and `sugar syrup` asks the reader to already know that
+  # agricole is a rum. Two of the three names in that pass got LONGER for exactly
+  # this reason: brevity was the means, legibility was the point.
+  #
+  # Now identical to the generic, which is a legitimate entry in this map and
+  # already the case for eight others (`clairin`, `coconut rum`, `cachaça`...).
+  "rhum agricole blanc": "rhum agricole blanc"
+  "rhum agricole vieux": "rhum agricole vieux"
   "clairin": "clairin"
   # The brand-generics #314 permits because nothing generalises them. O.F.T.D.
   # earns its place: its item strings are `Overproof Navy rum` and `Navy rum
@@ -534,9 +680,23 @@ liqueurs:
 
 # Own generics, family = `herbal`. Chartreuse is the BASE of Chartreuse
 # Swizzle, which is why these are not filed as mere modifiers.
+#
+# THE FRENCH NAMES, AND THIS IS THE SECOND TIME THE DECISION HAS BEEN MADE.
+# Helen, 2026-08-29, on seeing `green chartreuse` in the picker: "an earlier
+# Claude and I agreed that names were chartreuse verte and jaune". The agreement
+# was real and was written down NOWHERE -- not here, not in the handover, not in
+# either repo's history, checked before asking her to repeat herself. So it was
+# made, never applied, and had no way of surviving the session it happened in.
+# That is HANDOVER §11.2's failure in its purest form, and the note is the fix:
+# a decision that lives only in a conversation gets made again.
+#
+# They are what the bottles say on their labels. `Chartreuse Verte` also stops
+# the colour reading as a modifier of a generic "chartreuse" -- these are two
+# different liqueurs, not one in two shades, which is the same distinction #314
+# drew for the rums.
 herbal_liqueurs:
-  - "green Chartreuse"
-  - "yellow Chartreuse"
+  - "Chartreuse Verte"
+  - "Chartreuse Jaune"
   - "Bénédictine"
   - "Galliano"
   - "Strega"
@@ -770,8 +930,8 @@ family_of:
   "oloroso sherry": fortified
   "tawny port": fortified
   "aquavit": aquavit
-  "green Chartreuse": herbal
-  "yellow Chartreuse": herbal
+  "Chartreuse Verte": herbal
+  "Chartreuse Jaune": herbal
   "Bénédictine": herbal
   "Strega": herbal
   "Jägermeister": herbal

@@ -1121,3 +1121,73 @@ def test_the_built_site_root_holds_nothing_unexpected(prod_site):
         f"-- and a stale allowlist is how this check would quietly stop meaning "
         f"anything."
     )
+
+
+def test_the_cocktail_index_marks_and_styles_everything_it_lights_up(site):
+    """Three JS-applied classes on the drinks index, and each must have a rule.
+
+    GitHub issue #579's neighbourhood, and issue #390 is the precedent worth
+    naming: on the food side `hasWordMatch` was computed, carried all the way to
+    the call site, and dropped -- so one picker marked its genuine matches and
+    the other rendered forty candidates identically. Nothing could see it,
+    because these classes are applied with classList/className rather than
+    written into a `class="..."` attribute, so
+    test_every_class_we_emit_has_a_rule_in_the_stylesheet's scan does not reach
+    them. Hence checking the compiled stylesheet here rather than assuming one
+    does.
+
+    The three:
+
+      btn-pool--word-match  the candidate you actually meant (#549 point 3)
+      drink-card-hit        the matched ingredient on a card, which is the one
+                            job HANDOVER §9.13 gives the card: say why you are
+                            here
+      drink-name-hit        the matched run of a drink name (#564)
+    """
+    raw = (ROOT / "assets" / "js" / "cocktail-index.js").read_text(encoding="utf-8")
+    js = re.sub(r"//.*$", " ", re.sub(r"/\*.*?\*/", " ", raw, flags=re.S), flags=re.M)
+
+    problems = []
+    for cls in ("btn-pool--word-match", "drink-card-hit", "drink-name-hit"):
+        if cls not in js:
+            problems.append(f"cocktail-index.js never applies .{cls}")
+
+    # The flag has to REACH the chip builder, which is the half #390 lost. Both
+    # a family (all) button and a ranked result pass one; a chosen chip passes
+    # false, deliberately -- it is already selected and marking it as a match
+    # would say something about the query rather than about the chip.
+    calls = re.findall(r"(?<!function )chip\(([^)]*)\)", js)
+    assert calls, (
+        "No calls to the pool chip builder found at all. Either it was renamed "
+        "or this pattern went stale, and a scan matching nothing passes."
+    )
+    if len(calls) < 3:
+        problems.append(
+            f"only {len(calls)} chip() call sites; expected the chosen chip, the "
+            f"(all) button and the ranked result to be built separately"
+        )
+    dropped = [c for c in calls if c.count(",") < 2]
+    if dropped:
+        problems.append(
+            f"{len(dropped)} of {len(calls)} chip() call sites pass no word-match "
+            f"argument, so those chips can never be marked: {dropped}"
+        )
+
+    # MATCHED AS A WHOLE CLASS NAME, not as a substring. A plain `in` check is
+    # satisfied by `.drink-name-hit-unused`, so renaming a rule out of use would
+    # leave this green -- found by breaking it on purpose, which is the only
+    # reason it was found. The lookahead is what makes `.drink-card-hit` fail to
+    # match `.drink-card-hits` and, more to the point, fail to match a rule that
+    # has been renamed to something merely beginning with it.
+    css = (site / "assets" / "css" / "cocktails.css").read_text(encoding="utf-8")
+    for cls in ("btn-pool--word-match", "drink-card-hit", "drink-name-hit"):
+        if not re.search(rf"\.{re.escape(cls)}(?![\w-])", css):
+            problems.append(f".{cls} is applied by cocktail-index.js but styled nowhere")
+
+    assert not problems, (
+        "The drinks index lights something up that nothing styles, or stops "
+        "lighting it at all:\n  " + "\n  ".join(problems)
+        + "\n\nA card that survived a filter it cannot explain is the one thing "
+          "HANDOVER §9.13 says a card must never be, and a candidate pool that "
+          "marks nothing is issue #390 on the other index."
+    )

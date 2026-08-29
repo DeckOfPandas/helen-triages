@@ -2113,3 +2113,231 @@ def test_no_site_holds_a_copy_of_the_chrome_artwork():
           "nobody looks at is the one that goes stale."
     )
 
+
+# =============================================================================
+# THE COCKTAIL INDEX — GitHub issue #579
+# =============================================================================
+# Every guard protecting the food index's shape was scoped to `filters.js` by
+# name, so none of them reached cocktails, and cocktail-index.js drifted into
+# 428 lines that re-derived three things food had deliberately extracted. Two of
+# the three were wrong. These are the same guards, aimed at the other page.
+
+
+def _strip_js_comments(js: str) -> str:
+    """Source with comments removed.
+
+    Not fastidiousness: test_both_ingredient_pickers_mark_their_word_matches
+    records the case where a guard counted a token in the raw source, the
+    comment explaining the bug named that token twice, and deleting the real
+    code left the count unchanged and the test green. A guard defeated by the
+    prose explaining the bug it guards against.
+    """
+    return re.sub(r"//.*$", " ", re.sub(r"/\*.*?\*/", " ", js, flags=re.S), flags=re.M)
+
+
+def test_cocktail_index_js_holds_no_loose_filter_state_variables():
+    """The drinks index's filter state lives in filter-state.js, like food's.
+
+    Issue #579, and the reason it is worth a guard rather than a tidy-up: issue
+    #541 asks for a clear-all button on this page, "very much like food site".
+    Clear-all is the exact feature that shipped broken three times in two days
+    on the food side -- clearAllFilters() emptied N pieces of state while the
+    button's visibility predicate checked N-1, so the button hid while it still
+    had work to do. Each was found by eye, on the page.
+
+    cocktail-index.js held `chosenMoods`, `chosenChaos`, `wantName`, `include`
+    and `exclude` as loose variables and painted six clear links by hand. That
+    is the shape food's state had BEFORE issue #52. Building #541 on it would
+    have been that bug's own conditions, reassembled.
+
+    Declarations only. The names are ordinary English and may appear in a
+    comment; what must not come back is this file owning the value.
+    """
+    js = _strip_js_comments(read("assets", "js", "cocktail-index.js"))
+    for name in ("chosenMoods", "chosenChaos", "wantName", "include", "exclude", "vocabulary"):
+        assert not re.search(rf"\bvar\s+{name}\b", js), (
+            f"assets/js/cocktail-index.js declares `var {name}`. The drinks "
+            f"index's filter state belongs in COCKTAIL_FIELDS in "
+            f"assets/js/filter-state.js, where emptyState() and "
+            f"hasAnythingToClear() both pick it up at once and "
+            f"tests/js/filter-state.test.js generates a case for it."
+        )
+
+    assert "HTF.filterState.create(HTF.filterState.COCKTAIL_FIELDS)" in js, (
+        "assets/js/cocktail-index.js no longer builds its state from "
+        "HTF.filterState. clearAll() must replace the whole state object rather "
+        "than empty it field by field, or the clear-all button's predicate can "
+        "drift from what it clears -- issue #52's bug, on the other index."
+    )
+
+
+def test_the_cocktail_index_never_matches_an_ingredient_by_substring():
+    """Fuzzy to FIND, exact to FILTER -- and the wiring must not do its own thing.
+
+    Both matching directions used to be a raw substring test against the whole
+    concatenated data-ingredients attribute, which is precisely what
+    filter-state.js's excludesRow() exists to forbid on the food side
+    ("excluding peas would silently lose the peanut butter cookies and the pearl
+    barley casserole"). Measured over the 114 drinks, 26 of the 240 pool terms
+    over-matched: `gin` hid twelve drinks whose only gin-shaped ingredient was
+    ginger, `water` hid thirteen whose only water was honey water, and
+    `apple juice` matched fifteen drinks that have PINEapple juice.
+
+    Worse, a substring probe over the joined attribute could match across the
+    `|` between two ingredients, so nothing on the card corresponded to what had
+    matched.
+
+    So the rules live in cocktail-search.js, where Node can ask them a question,
+    and this file may only call them. Checked as "the wiring does not roll its
+    own", not as "the string `indexOf` never appears" -- it legitimately does,
+    on lists of chips and DOM children.
+    """
+    js = _strip_js_comments(read("assets", "js", "cocktail-index.js"))
+
+    for fn in ("matchesInclude", "matchesExclude", "matchesName", "entryIsHit"):
+        assert f"Search.{fn}(" in js, (
+            f"assets/js/cocktail-index.js no longer calls Search.{fn}(). The "
+            f"matching rules belong in assets/js/cocktail-search.js, covered by "
+            f"tests/js/cocktail-search.test.js -- a rule spelled out here can "
+            f"only be checked by opening a browser and typing."
+        )
+
+    offenders = re.findall(r"dataset\.ingredients[^;\n]*indexOf", js)
+    assert not offenders, (
+        "assets/js/cocktail-index.js probes a card's data-ingredients attribute "
+        "with indexOf. That is the substring rule this page was fixed of: it "
+        "cannot tell `gin` from `ginger`, and it can match across the `|` "
+        "between two ingredients. Split the attribute with "
+        "HTF.cocktailSearch.splitEntries and ask Search.matchesInclude / "
+        "matchesExclude, which are tested.\n  " + "\n  ".join(offenders)
+    )
+
+
+def test_the_cocktail_search_thresholds_are_not_hardcoded():
+    """The three numbers live in the vocabulary, not in the algorithm.
+
+    Same rule food's `family_button_min_chars` follows, and for the same reason:
+    how much typing earns a pool of candidates is a question about this
+    vocabulary, not about the code that reads it. #549 point 4 is exactly that
+    question, and the answer should be a one-line edit to a YAML file.
+    """
+    path = ROOT / "_data" / "cocktails" / "ingredients.yml"
+    vocab = yaml.safe_load(path.read_text(encoding="utf-8"))
+    search = vocab.get("search")
+    assert isinstance(search, dict), (
+        "_data/cocktails/ingredients.yml has no `search:` block. It carries the "
+        "drinks index's minimum query length, family-button threshold and pool "
+        "cap; without it cocktail-search.js falls back to defaults and the "
+        "numbers stop being editable."
+    )
+    for key in ("min_query_chars", "family_button_min_chars", "pool_cap"):
+        assert isinstance(search.get(key), int), (
+            f"_data/cocktails/ingredients.yml's `search:` block is missing an "
+            f"integer `{key}`."
+        )
+
+    js = _strip_js_comments(read("assets", "js", "cocktail-search.js"))
+    for key in ("min_query_chars", "family_button_min_chars", "pool_cap"):
+        assert re.search(rf"cfg\.{key}\b", js), (
+            f"assets/js/cocktail-search.js no longer reads `{key}` from the "
+            f"vocabulary it was handed."
+        )
+    # A literal beside the name is the shape of a value that has crept back in.
+    for bad in re.findall(r"(min_query_chars|family_button_min_chars|pool_cap)\s*[:=]\s*\d", js):
+        raise AssertionError(
+            f"assets/js/cocktail-search.js assigns `{bad}` a number of its own. "
+            f"The value belongs in _data/cocktails/ingredients.yml."
+        )
+
+
+def test_the_cocktail_vocabulary_is_emitted_to_the_page():
+    """cocktail-search.js can only read the families if the template emits them.
+
+    `family_of` has existed in _data/cocktails/ingredients.yml since #322, its
+    header says it is for "the ingredient search's `(all)` buttons ... and
+    exclusion", and it was read by NOTHING until #579 -- 68 declared
+    memberships across 10 families, sitting unused while #549 point 1 asked for
+    the mechanism they are.
+    """
+    html = read("cocktails", "index.html")
+    assert 'id="drink-vocabulary"' in html, (
+        "cocktails/index.html no longer emits an id=\"drink-vocabulary\" block. "
+        "Without it cocktail-search.js falls back to no declared families, so "
+        "the (all) buttons vanish and `rum` -- which no drink lists literally -- "
+        "becomes unfilterable."
+    )
+    assert "site.data.cocktails.ingredients | jsonify" in html, (
+        "the drink-vocabulary block no longer emits "
+        "_data/cocktails/ingredients.yml. Emitting a hand-picked subset means a "
+        "key added to the YAML needs this template touched, which is exactly "
+        "the coupling #501 values card_names for not having."
+    )
+
+    assert 'id="drink-bottles"' in html, (
+        "cocktails/index.html no longer emits an id=\"drink-bottles\" block. The "
+        "search reads _data/cocktails/bottles.yml for two of Helen's rules: a "
+        "bottle keeps ONE identity through its aliases (`wray and nephew` and "
+        "`wray & nephew` collapse onto the latter), and the ten strings that "
+        "file declares `unresolved_suggestions` are not offered as chips at all."
+    )
+    assert "site.data.cocktails.bottles | jsonify" in html, (
+        "the drink-bottles block no longer emits _data/cocktails/bottles.yml."
+    )
+
+    script_at = html.index("assets/js/cocktail-search.js")
+    for block in ("drink-vocabulary", "drink-bottles"):
+        assert html.index('id="%s"' % block) < script_at, (
+            f"The {block} block must appear BEFORE the cocktail-search.js script "
+            f"tag, or the JSON is not in the DOM when the module is created."
+        )
+
+
+def test_the_cocktail_index_scripts_load_in_dependency_order():
+    """Four scripts, and every one of them is read at STARTUP, not on first use.
+
+    So a page that loads them out of order fails immediately rather than on the
+    first keystroke -- which is the better failure, and the reason food has
+    three tests of exactly this shape. cocktail-index.js reads
+    HTF.cocktailSearch and HTF.filterState as it runs; cocktail-search.js reads
+    HTF.ingredientSearch as it loads.
+    """
+    html = read("cocktails", "index.html")
+    order = ["ingredient-search.js", "filter-state.js", "cocktail-search.js", "cocktail-index.js"]
+    positions = {}
+    for name in order:
+        tag = re.search(rf"""<script src=["']?\{{\{{ '/assets/js/{re.escape(name)}'""", html)
+        assert tag, f"cocktails/index.html no longer loads assets/js/{name}."
+        positions[name] = tag.start()
+
+    for earlier, later in zip(order, order[1:]):
+        assert positions[earlier] < positions[later], (
+            f"{earlier} must load BEFORE {later} on cocktails/index.html, or the "
+            f"namespace it provides will not exist yet when {later} runs."
+        )
+
+
+def test_the_cocktail_card_ingredient_attribute_is_self_delimiting():
+    """`data-ing` is `|`-separated, like every other ingredient attribute here.
+
+    food/index.html's data-all-ingredients chose `|` because a comma is the
+    commonest character in the values; the drink card's data-ingredients chose
+    it for the same reason. `data-ing` was SPACE-separated, which meant the one
+    attribute the highlight reads could not be split back into ingredients at
+    all -- so a card could only be matched against it by substring, which is the
+    fault this page was fixed of.
+    """
+    html = read("cocktails", "index.html")
+    tag = re.search(r'data-ing="\{\{[^"]*"', html)
+    assert tag, "cocktails/index.html no longer writes a data-ing attribute."
+    assert "ing_search | downcase" in html, (
+        "data-ing no longer emits the captured ing_search unchanged. It must "
+        "keep its `|` separators: assets/js/cocktail-index.js splits it with "
+        "HTF.cocktailSearch.splitEntries so a matched ingredient is found by "
+        "the same rule the filter used."
+    )
+    capture = re.search(r"\{% capture ing_search %\}(.*?)\{% endcapture %\}", html, re.S)
+    assert capture, "the ing_search capture is gone or renamed."
+    assert "|" in capture.group(1), (
+        "the ing_search capture no longer joins its values with `|`, so "
+        "splitEntries cannot recover the individual ingredients from data-ing."
+    )
