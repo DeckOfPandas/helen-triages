@@ -569,10 +569,27 @@ $amount-indent: $amount-col + $amount-gap;
   font-size: 1rem;
 }
 
-// The class line: `generic`, oxford-joined if a list, plus `character` as a
-// trailing parenthetical. Deliberately quiet — this is a gloss on the
-// headline, not a second headline — and indented past the amount column so
-// the amounts keep their clean left edge.
+// The bottle, in brackets after the class — #544, Helen 2026-08-29: "London dry
+// gin (Beefeater)". QUIETER THAN THE CLASS IT FOLLOWS, because the class is what
+// the drink REQUIRES and the bottle is what she happens to reach for: 18% of
+// entries carry a suggestion, so it must not read as though the other 82% are
+// missing something.
+//
+// Cosmic-cosmopolitan, which is the same tie-back the class line used to make on
+// its own: that colour means ASKED FOR on the index, and a bottle name is the
+// other string the has-to-have field matches against.
+.cocktail-suggestion {
+  color: $color-cosmic-cosmopolitan-deep;
+  font-size: 0.88rem;
+}
+
+// WAS THE CLASS LINE, IS NOW THE CHARACTER LINE — #544, 2026-08-29. The generic
+// moved up to be the headline itself, so this rule no longer glosses it; the
+// only thing left below the line is `character`, on the three drinks that carry
+// one. Kept rather than renamed because the position, indent and quiet tone are
+// all still exactly right for what sits here.
+//
+// Indented past the amount column so the amounts keep their clean left edge.
 // VIOLET, and it is the palette's own logic rather than decoration — Helen,
 // 2026-08-26: "I'm aiming to make the list more fun to read, but also to tie
 // the ingredients back to the index page a little."

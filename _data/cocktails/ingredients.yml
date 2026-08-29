@@ -45,7 +45,7 @@
 # FOOD'S FAMILY MECHANISM CANNOT DERIVE THESE. On the food site an `(all)`
 # button forms when entries share a head word after normalisation -- "cheese
 # (all)" from cheddar/feta/comte. These styles share NO common word:
-# "Jamaican, moderately aged" and "Demerara, aged" have nothing in common
+# "moderately aged Jamaican rum" and "aged Demerara rum" have nothing in common
 # textually. So the family has to be DECLARED, which is what `family_of` is.
 #
 # `fortified` exists because 19 drinks have no spirit at all -- Bamboo,
@@ -74,19 +74,19 @@ families:
 
 # GitHub issue #314. `light`, `gold` and `dark` are RETIRED -- see the bottom.
 rum_styles:
-  - "Jamaican, moderately aged"
-  - "Jamaican, caramel forward"
-  - "lightly aged and filtered"
-  - "moderately aged"
-  - "Demerara, aged"
-  - "Demerara, overproof"
-  - "Jamaican, overproof, unaged"
-  - "cane juice (agricole) rum, unaged"
-  - "cane juice (agricole) rum, aged"
+  - "moderately aged Jamaican rum"
+  - "caramel-forward Jamaican rum"
+  - "lightly aged and filtered rum"
+  - "moderately aged rum"
+  - "aged Demerara rum"
+  - "overproof Demerara rum"
+  - "unaged overproof Jamaican rum"
+  - "rhum agricole blanc"
+  - "rhum agricole vieux"
   # Added to #314 after the first transcription. Haitian cane-juice spirit; a
   # category like cachaca or mezcal, so lowercase under the proper-noun rule.
   - "clairin"
-  - "blended multi-region rum, clear"
+  - "clear blended multi-region rum"
 
 # Permitted WITHOUT a style per #314, because nothing generalises them.
 #
@@ -186,7 +186,7 @@ whisky_characters:
 # stand for, which is fine: this map's job is a name you can read at card
 # distance, and brevity was only ever the means.
 card_names:
-  "Jamaican, moderately aged": "Jamaican rum"
+  "moderately aged Jamaican rum": "Jamaican rum"
   # DELIBERATELY THE SAME as the moderately aged one above -- see
   # card_names_may_collide. Declared in rum_styles and used by NO DRINK as
   # of 2026-08-27; named here anyway, so the map covers the vocabulary rather
@@ -199,21 +199,21 @@ card_names:
   # molasses-sweet rather than funky. Do not retype a drink into this style
   # from the item text; `Pot-still dark Jamaican rum` and `Dark aged rum` look
   # like candidates and are hers to call.
-  "Jamaican, caramel forward": "Jamaican rum"
-  "Jamaican, overproof, unaged": "Jamaican overproof rum"
-  "Demerara, aged": "Demerara rum"
-  "Demerara, overproof": "Demerara overproof rum"
+  "caramel-forward Jamaican rum": "Jamaican rum"
+  "unaged overproof Jamaican rum": "Jamaican overproof rum"
+  "aged Demerara rum": "Demerara rum"
+  "overproof Demerara rum": "Demerara overproof rum"
   # The honest name for what everyone else calls white rum.
-  "lightly aged and filtered": "lightly aged rum"
+  "lightly aged and filtered rum": "lightly aged rum"
   # The weakest name in this map, and flagged as such: it is the residual
   # category -- a rum with no region and no other distinguishing trait -- so
   # there is nothing to name it AFTER. "aged rum" beside "Demerara rum" reads
   # faintly as though the Demerara were not also aged.
-  "moderately aged": "aged rum"
-  "blended multi-region rum, clear": "clear blended rum"
+  "moderately aged rum": "aged rum"
+  "clear blended multi-region rum": "clear blended rum"
   # The real category words, and shorter than the description of them.
-  "cane juice (agricole) rum, unaged": "agricole blanc"
-  "cane juice (agricole) rum, aged": "agricole vieux"
+  "rhum agricole blanc": "agricole blanc"
+  "rhum agricole vieux": "agricole vieux"
   "clairin": "clairin"
   # The brand-generics #314 permits because nothing generalises them. O.F.T.D.
   # earns its place: its item strings are `Overproof Navy rum` and `Navy rum
@@ -263,13 +263,13 @@ card_names:
   # ONLY WHERE THE CARD NAME DIFFERS FROM THE GENERIC. A generic that already
   # reads well on a card (`cognac`, `Campari`, `lime juice`) needs no entry;
   # adding one would be 140 rows of the same string twice.
-  "London dry": "gin"
+  "London dry gin": "gin"
   # NOT collapsed to "gin", deliberately, and the line is Helen's own rum rule:
   # collapse where the difference is a nuance, keep it where it changes the
   # STRENGTH or the drink. Navy strength does; genever is a different drink
   # altogether. Old Tom, Plymouth, New Western dry and speciality are the
   # genuinely open ones -- see the note in the issue rather than guessing here.
-  "navy strength": "navy strength gin"
+  "navy strength gin": "navy strength gin"
   "genever": "genever"
   "blended scotch whisky": "scotch"
   "single malt scotch whisky": "single malt"
@@ -358,12 +358,12 @@ card_names_may_collide:
 # style gets capitalised in prose, so `blended Scotch` and `Demerara, aged`
 # keep their shape too.
 gin_styles:
-  - "London dry"
+  - "London dry gin"
   - "Old Tom"
   - "Plymouth"
   - "New Western dry"
   - "genever"
-  - "navy strength"
+  - "navy strength gin"
   # REPLACES `flavoured`, which is retired -- see retired_gin_styles. A gin
   # whose point is a botanical other than juniper: Hendrick's cucumber and
   # rose, Malfy's lemon, a rhubarb gin. The style name alone says nothing
@@ -701,30 +701,30 @@ other:
 # every other modifier -- nobody excludes "all juices". A BASE absent from here
 # is a gap, and `family_less` records a deliberate one with its reason.
 family_of:
-  "Jamaican, moderately aged": rum
-  "Jamaican, caramel forward": rum
-  "lightly aged and filtered": rum
-  "moderately aged": rum
-  "Demerara, aged": rum
-  "Demerara, overproof": rum
-  "Jamaican, overproof, unaged": rum
-  "cane juice (agricole) rum, unaged": rum
-  "cane juice (agricole) rum, aged": rum
+  "moderately aged Jamaican rum": rum
+  "caramel-forward Jamaican rum": rum
+  "lightly aged and filtered rum": rum
+  "moderately aged rum": rum
+  "aged Demerara rum": rum
+  "overproof Demerara rum": rum
+  "unaged overproof Jamaican rum": rum
+  "rhum agricole blanc": rum
+  "rhum agricole vieux": rum
   "clairin": rum
-  "blended multi-region rum, clear": rum
+  "clear blended multi-region rum": rum
   "Planteray Stiggins' Fancy": rum
   "Planteray O.F.T.D. Overproof": rum
   "Malibu": rum
   "cachaça": rum
   "Batavia arrack": rum
-  "London dry": gin
+  "London dry gin": gin
   "Old Tom": gin
   "Plymouth": gin
   "New Western dry": gin
   "genever": gin
   "speciality": gin
   "gin liqueur": gin
-  "navy strength": gin
+  "navy strength gin": gin
   "rye": whisky
   "bonded rye": whisky
   "bourbon": whisky
@@ -808,8 +808,8 @@ retired_rum_styles:
     describes colour, not production, and colour is routinely adjusted with
     caramel. Re-type against rum_styles — issue #314.
   gold: >-
-    same reason as `light`. Almost always either "lightly aged and filtered"
-    or "moderately aged"; which one is Helen's call per drink.
+    same reason as `light`. Almost always either "lightly aged and filtered rum"
+    or "moderately aged rum"; which one is Helen's call per drink.
   dark: >-
     same reason again, and the most misleading of the three: a dark rum may be
     Jamaican caramel-forward, Demerara aged, or a blackstrap. Issue #314.

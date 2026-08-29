@@ -235,62 +235,69 @@ layout: default
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
         {% if item.item %}
-          {% comment %} headline: suggestion, oxford-joined, else item {% endcomment %}
+          {% comment %} THE LINE IS THE GENERIC, WITH THE BOTTLE IN BRACKETS —
+             #544, Helen 2026-08-29: "London dry gin (Beefeater)". `item` does
+             not render at all, which is what makes "prosecco / prosecco" and
+             "fresh lime juice / lime juice" IMPOSSIBLE rather than suppressed:
+             the page printed the source's words and the vocabulary on top of
+             each other, and 385 of 617 pairs restated one another (#513).
+
+             THIS ONLY BECAME READABLE WITH #561. Before the rename, the same
+             change would have produced "moderately aged (Gosling's Black Seal)"
+             and "London dry (Tanqueray)" — a card name may be lossy, a recipe
+             line may not. Ten generics gained their spirit word first.
+
+             A LIST GENERIC joins with the same quiet italic "or" as before —
+             it means "either would do" (#441), never "and". {% endcomment %}
+          {% assign headline = "" %}
+          {% for g in item.generic %}
+            {% if headline == "" %}
+              {% assign headline = g %}
+            {% else %}
+              {% capture headline %}{{ headline }}<span class="cocktail-style-or">or</span>{{ g }}{% endcapture %}
+            {% endif %}
+          {% endfor %}
+          {% comment %} Falls back to `item` only where a drink has no generic
+             at all. Every one of the 617 entries is typed, so this is a guard
+             against future data rather than a live path. {% endcomment %}
+          {% if headline == "" %}{% assign headline = item.item %}{% endif %}
+
+          {% comment %} The bottle, oxford-joined, in brackets after the class.
+             `suggestion` is name(s) only since #457, so it needs no shaping. {% endcomment %}
           {% assign s_count = 0 %}
           {% for s in item.suggestion %}{% assign s_count = s_count | plus: 1 %}{% endfor %}
-          {% if s_count == 0 %}
-            {% assign headline = item.item %}
-          {% else %}
+          {% assign bottles = "" %}
+          {% if s_count > 0 %}
             {% assign s_i = 0 %}
             {% for s in item.suggestion %}
               {% assign s_i = s_i | plus: 1 %}
               {% if s_i == 1 %}
-                {% assign headline = s %}
+                {% assign bottles = s %}
               {% elsif s_i == s_count and s_count == 2 %}
-                {% assign headline = headline | append: " or " | append: s %}
+                {% assign bottles = bottles | append: " or " | append: s %}
               {% elsif s_i == s_count %}
-                {% assign headline = headline | append: ", or " | append: s %}
+                {% assign bottles = bottles | append: ", or " | append: s %}
               {% else %}
-                {% assign headline = headline | append: ", " | append: s %}
+                {% assign bottles = bottles | append: ", " | append: s %}
               {% endif %}
             {% endfor %}
           {% endif %}
 
-          {% comment %} class line: generic, oxford-joined, rum styles blocked {% endcomment %}
+          {% comment %} Character gets a LINE, not a parenthetical. #441 banned
+             a bare parenthetical because "moderately aged rum (blackstrap)"
+             reads as a TYPE of moderately aged rum — real confusion with black
+             rum. It folded onto the class line instead; that line is gone, and
+             a labelled line of its own carries none of that risk. {% endcomment %}
           {% assign class_html = "" %}
-          {% if item.generic and item.generic != item.item %}
-            {% assign g_i = 0 %}
-            {% for g in item.generic %}
-              {% comment %} No rum-family special case any more. It wrapped a
-                 rum style name in `.cocktail-style-name` to give it the
-                 heading face, so its internal comma ("Demerara, aged") did not
-                 collide with the comma joining it to an alternative. Helen
-                 removed the mono on 2026-08-26 and the class line then went
-                 violet, which left that span styling nothing and emitting
-                 markup for a selector that no longer exists. The collision is
-                 handled by the italic "or" below instead — which is why
-                 `family_of` is no longer looked up here at all. {% endcomment %}
-              {% assign g_i = g_i | plus: 1 %}
-              {% assign g_chunk = g %}
-              {% if g_i == 1 %}
-                {% assign class_html = g_chunk %}
-              {% else %}
-                {% capture class_html %}{{ class_html }}<span class="cocktail-style-or">or</span>{{ g_chunk }}{% endcapture %}
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-
-          {% comment %} character folds onto the class line as a labelled
-             parenthetical, LIST joined with commas {% endcomment %}
           {% if item.character %}
             {% assign character_joined = item.character | join: ", " %}
-            {% capture class_html %}{{ class_html }} <span class="cocktail-character">(character: {{ character_joined }})</span>{% endcapture %}
+            {% capture class_html %}<span class="cocktail-character">character: {{ character_joined }}</span>{% endcapture %}
           {% endif %}
 
           <li class="cocktail-ingredient">
             <div class="cocktail-ingredient-top">
               {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}
-              <span class="cocktail-item">{{ headline }}</span>
+              <span class="cocktail-item">{{ headline }}{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
               <p class="cocktail-type-line">{{ class_html }}</p>
