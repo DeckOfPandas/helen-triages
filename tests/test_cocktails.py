@@ -176,6 +176,11 @@ WHOLE_COLLECTION_ONLY = {
     "test_every_card_name_join_is_reachable",
     "test_every_proposal_still_matches_a_real_step",
     "test_no_mood_covers_more_than_half_the_collection",
+    # The four COVERAGE claims below -- see _exercised.
+    "test_the_character_vocabulary_is_exercised",
+    "test_the_bottle_index_is_exercised",
+    "test_the_cross_category_check_is_exercised",
+    "test_the_syrup_ratio_check_is_exercised",
 }
 
 
@@ -196,6 +201,37 @@ def _require_whole_collection(what):
             f"report every entry as stale. The ratchet half of the same rule "
             f"still runs on whatever is here. Clone the drafts to check this."
         )
+
+
+def _exercised(count, what, implausible):
+    """This guard's scan found something to check -- a COVERAGE claim.
+
+    FOUR GUARDS HERE END `assert checked, "...so this check is vacuous"`, and
+    they are right to: a scan that came back empty and passed is the one failure
+    mode with a green symptom, and tests/test_suite_hygiene.py exists because it
+    has bitten six times.
+
+    BUT EVERY ONE OF THEM ARGUES FROM THE SIZE OF THE WHOLE BOOK -- "blackstrap
+    alone is on three drinks", "around forty rum pours name a bottle", "that is
+    implausible for this collection". On a partial corpus the argument simply
+    does not hold: one promoted drink may legitimately contain no rum at all,
+    and finding no rum suggestions in it says nothing about `family_of`.
+
+    SO EACH IS SPLIT OUT INTO ITS OWN TEST RATHER THAN SKIPPED IN PLACE, and the
+    distinction is the whole point. Skipping the original test to silence the
+    coverage claim would take the OFFENDER check down with it -- and that
+    offender check is exactly the coverage promotion is meant to buy (#540).
+    Split, both halves keep working: the substantive rule runs on every promoted
+    drink in CI, and the "is this corpus big enough to exercise me" claim is
+    asked only where it can be answered.
+
+    Helen, 2026-08-29, on the four reds this would otherwise have left for
+    promotion day: "my preference is not to leave things in a state where tests
+    fail and we have to remember why every time we run the suite, but the
+    solution to that is not to turn off or otherwise avoid the tests."
+    """
+    _require_whole_collection(what)
+    assert count, f"{what} found nothing to check. {implausible}"
 
 
 # The loader guards below are the only tests allowed to name the corpus roots
@@ -346,9 +382,17 @@ def test_whole_collection_only_says_what_it_does():
         if not (isinstance(node, ast.FunctionDef) and node.name.startswith("test_")):
             continue
         seen.add(node.name)
+        # BOTH ENTRY POINTS, and the second was found by this guard failing on
+        # four tests that plainly did skip. `_exercised` wraps
+        # `_require_whole_collection` for the coverage claims, so a scan looking
+        # only for the direct call classified all four as "listed but never
+        # calls it". A guard that follows exactly one spelling of the thing it
+        # checks is HANDOVER §11.0's lesson about the destructive-git hook, in
+        # miniature: enumerate how the thing can be SPELLED, not how you happen
+        # to have written it today.
         for child in ast.walk(node):
             if (isinstance(child, ast.Call) and isinstance(child.func, ast.Name)
-                    and child.func.id == "_require_whole_collection"):
+                    and child.func.id in ("_require_whole_collection", "_exercised")):
                 calls.add(node.name)
 
     assert seen, (
@@ -699,6 +743,39 @@ def test_a_declared_character_vocabulary_is_enforced():
     item name -- 61 ingredients in this collection are named only by brand,
     which is the same reason `generic` is stored rather than computed.
     """
+    _, bad, declared = _character_scan()
+    assert not bad, (
+        "Undeclared character(s):\n  " + "\n  ".join(sorted(bad))
+        + "\n\nDeclared: "
+        + "; ".join(f"{f}={sorted(v)}" for f, v in sorted(declared.items()))
+        + ".\nEither it is a typo, or the value is real and belongs in that "
+          "family's list. A character is not a generic -- #441 -- but it is "
+          "just as much a vocabulary."
+    )
+
+
+def test_the_character_vocabulary_is_exercised():
+    """Some ingredient in a closed-character family actually carries one.
+
+    The family lookup is a two-step derivation (generic -> family_of -> family)
+    and EITHER step going stale would leave the rule above green while checking
+    nothing. Whole-collection only: see `_exercised`.
+    """
+    checked, _, _ = _character_scan()
+    _exercised(
+        checked, "the declared-character check",
+        "That is implausible for the whole collection -- blackstrap alone is on "
+        "three drinks. Either `family_of` no longer maps the rum styles, or a "
+        "generic was renamed without this following.")
+
+
+def _character_scan():
+    """(how many characters were checked, offenders, the declared vocabulary).
+
+    ONE SCAN, TWO TESTS. Re-typing the walk into the coverage test would let the
+    two drift, and they must agree about what "checked" means or the coverage
+    claim stops describing the rule it guards.
+    """
     vocab = _vocab()
     family_of = vocab.get("family_of") or {}
     declared = {
@@ -732,24 +809,7 @@ def test_a_declared_character_vocabulary_is_enforced():
                         f"{slug}: {item.get('item') or '?'!r} -> {value!r} "
                         f"(family {'/'.join(sorted(families))})"
                     )
-    # The family lookup is a two-step derivation (generic -> family_of ->
-    # family), and EITHER step going stale would leave this green while checking
-    # nothing. The collection has four rums carrying a character today; zero
-    # means the derivation broke, not that the data got tidier.
-    assert checked, (
-        "No ingredient in a closed-character family carries a `character`, so "
-        "this check is vacuous. That is implausible -- blackstrap alone is on "
-        "three drinks. Either `family_of` no longer maps the rum styles, or a "
-        "generic was renamed without this following."
-    )
-    assert not bad, (
-        "Undeclared character(s):\n  " + "\n  ".join(sorted(bad))
-        + "\n\nDeclared: "
-        + "; ".join(f"{f}={sorted(v)}" for f, v in sorted(declared.items()))
-        + ".\nEither it is a typo, or the value is real and belongs in that "
-          "family's list. A character is not a generic -- #441 -- but it is "
-          "just as much a vocabulary."
-    )
+    return checked, bad, declared
 
 
 def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
@@ -1153,6 +1213,38 @@ def test_every_suggested_bottle_resolves():
     the NEXT one while those are being fixed. Deleting a line there is how one
     gets retired -- the same shape `methods.yml` uses for its proposals.
     """
+    _, unresolved = _suggested_bottle_scan()
+    assert not unresolved, (
+        "Suggestion(s) naming no known bottle:\n  " + "\n  ".join(sorted(unresolved))
+        + "\n\nEither add the bottle to _data/cocktails/bottles.yml, add the "
+          "spelling as an alias of one already there, or -- if it is prose "
+          "rather than a bottle name (#457) -- declare it in "
+          "`unresolved_suggestions` with the reason, so it fails loudly for "
+          "the next reader instead of quietly for this one."
+    )
+
+
+def test_the_bottle_index_is_exercised():
+    """Some rum ingredient in the collection actually carries a suggestion.
+
+    Zero would mean `family_of` stopped mapping the rum styles, or the loader
+    went stale -- either way the rule above is green over nothing. Whole
+    collection only: see `_exercised`.
+    """
+    checked, _ = _suggested_bottle_scan()
+    _exercised(
+        checked, "the suggested-bottle check",
+        "Around forty rum pours name a bottle across the whole collection, so "
+        "zero means `family_of` stopped mapping the rum styles or the loader is "
+        "stale.")
+
+
+def _suggested_bottle_scan():
+    """(how many rum suggestions were checked, the ones naming no known bottle).
+
+    ONE SCAN, TWO TESTS -- see `_character_scan` for why they may not be
+    re-typed apart.
+    """
     data = _bottles()
     index = _bottle_index(data)
     known = {k.strip().lower() for k in (data.get("unresolved_suggestions") or {})}
@@ -1178,19 +1270,7 @@ def test_every_suggested_bottle_resolves():
                 if key in index or key in known or key in excluded:
                     continue
                 unresolved.append(f"{slug}: {name!r}")
-    assert checked, (
-        "No rum ingredient carries a suggestion, so this check is vacuous. "
-        "Either `family_of` stopped mapping the rum styles or the loader is "
-        "stale -- around forty rum pours name a bottle."
-    )
-    assert not unresolved, (
-        "Suggestion(s) naming no known bottle:\n  " + "\n  ".join(sorted(unresolved))
-        + "\n\nEither add the bottle to _data/cocktails/bottles.yml, add the "
-          "spelling as an alias of one already there, or -- if it is prose "
-          "rather than a bottle name (#457) -- declare it in "
-          "`unresolved_suggestions` with the reason, so it fails loudly for "
-          "the next reader instead of quietly for this one."
-    )
+    return checked, unresolved
 
 
 def test_a_cross_category_suggestion_carries_a_note():
@@ -1221,6 +1301,35 @@ def test_a_cross_category_suggestion_carries_a_note():
     An unresolvable suggestion is SKIPPED here rather than failing twice --
     test_every_suggested_bottle_resolves owns that, and reporting one fault as
     two teaches you to skim the output.
+    """
+    _, bad = _cross_category_scan()
+    assert not bad, (
+        "Cross-category substitution(s) with nothing on the page saying why:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nAdd a per-ingredient `note` (#457). `QQ` is a valid note and is "
+          "the right one until Helen's first read-through -- the point is that "
+          "the substitution is VISIBLE, not that the reasoning is finished."
+    )
+
+
+def test_the_cross_category_check_is_exercised():
+    """Some rum suggestion in the collection resolves to a known bottle.
+
+    This rule can only see substitutions among suggestions that RESOLVE, so a
+    bottles.yml that stopped matching the collection's spellings would leave it
+    green over nothing. Whole collection only: see `_exercised`.
+    """
+    checked, _ = _cross_category_scan()
+    _exercised(
+        checked, "the cross-category substitution check",
+        "Either bottles.yml stopped matching the collection's spellings, or the "
+        "loader is stale.")
+
+
+def _cross_category_scan():
+    """(how many resolved rum suggestions were checked, the unexplained ones).
+
+    ONE SCAN, TWO TESTS -- see `_character_scan`.
     """
     data = _bottles()
     index = _bottle_index(data)
@@ -1256,18 +1365,7 @@ def test_a_cross_category_suggestion_carries_a_note():
                     f"{generics} and suggests {canonical!r} "
                     f"({bottle_generic!r}) — no note"
                 )
-    assert checked, (
-        "No rum suggestion resolved to a known bottle, so this check is "
-        "vacuous. Either bottles.yml stopped matching the collection's "
-        "spellings, or the loader is stale."
-    )
-    assert not bad, (
-        "Cross-category substitution(s) with nothing on the page saying why:\n  "
-        + "\n  ".join(sorted(bad))
-        + "\n\nAdd a per-ingredient `note` (#457). `QQ` is a valid note and is "
-          "the right one until Helen's first read-through -- the point is that "
-          "the substitution is VISIBLE, not that the reasoning is finished."
-    )
+    return checked, bad
 
 
 def test_to_serve_is_a_string():
@@ -2136,6 +2234,35 @@ def test_syrup_ratio_is_plausible_for_its_generic():
     reasoning test_notes_are_not_damaged gives for keeping its own checks exact
     rather than heuristic.
     """
+    _, problems = _syrup_ratio_scan()
+    assert not problems, (
+        "Syrup-to-citrus ratio outside anything a recipe would use:\n  "
+        + "\n  ".join(problems)
+        + "\n\nThis is looking for a TRANSCRIPTION error, not a taste "
+          "preference -- the bounds are wide on purpose. Check the source "
+          "spreadsheet before changing the figure."
+    )
+
+
+def test_the_syrup_ratio_check_is_exercised():
+    """Some drink has both a sugar syrup and a citrus juice with ml figures.
+
+    Zero would mean the `sugar syrup` generic prefix or the citrus pattern had
+    gone stale, leaving the ratio check green over nothing. Whole collection
+    only: see `_exercised`.
+    """
+    checked, _ = _syrup_ratio_scan()
+    _exercised(
+        checked, "the syrup-to-citrus ratio check",
+        "That is implausible for the whole collection -- the `sugar syrup` "
+        "generic prefix or the citrus pattern has probably gone stale.")
+
+
+def _syrup_ratio_scan():
+    """(how many drinks had both figures, the implausible ratios).
+
+    ONE SCAN, TWO TESTS -- see `_character_scan`.
+    """
     citrus = re.compile(r"lime juice|lemon juice|grapefruit juice", re.I)
     problems = []
     checked = 0
@@ -2161,18 +2288,7 @@ def test_syrup_ratio_is_plausible_for_its_generic():
                 f"{slug}: {syrup:g} ml syrup against {sour:g} ml citrus "
                 f"(ratio {ratio:.2f})"
             )
-    assert checked, (
-        "No drink has both a sugar syrup and a citrus juice with ml figures, so "
-        "this check is vacuous. That is implausible for this collection -- the "
-        "generic prefix or the citrus pattern has probably gone stale."
-    )
-    assert not problems, (
-        "Syrup-to-citrus ratio outside anything a recipe would use:\n  "
-        + "\n  ".join(problems)
-        + "\n\nThis is looking for a TRANSCRIPTION error, not a taste "
-          "preference -- the bounds are wide on purpose. Check the source "
-          "spreadsheet before changing the figure."
-    )
+    return checked, problems
 
 
 # =============================================================================
