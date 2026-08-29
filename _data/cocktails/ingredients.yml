@@ -680,9 +680,23 @@ liqueurs:
 
 # Own generics, family = `herbal`. Chartreuse is the BASE of Chartreuse
 # Swizzle, which is why these are not filed as mere modifiers.
+#
+# THE FRENCH NAMES, AND THIS IS THE SECOND TIME THE DECISION HAS BEEN MADE.
+# Helen, 2026-08-29, on seeing `green chartreuse` in the picker: "an earlier
+# Claude and I agreed that names were chartreuse verte and jaune". The agreement
+# was real and was written down NOWHERE -- not here, not in the handover, not in
+# either repo's history, checked before asking her to repeat herself. So it was
+# made, never applied, and had no way of surviving the session it happened in.
+# That is HANDOVER §11.2's failure in its purest form, and the note is the fix:
+# a decision that lives only in a conversation gets made again.
+#
+# They are what the bottles say on their labels. `Chartreuse Verte` also stops
+# the colour reading as a modifier of a generic "chartreuse" -- these are two
+# different liqueurs, not one in two shades, which is the same distinction #314
+# drew for the rums.
 herbal_liqueurs:
-  - "green Chartreuse"
-  - "yellow Chartreuse"
+  - "Chartreuse Verte"
+  - "Chartreuse Jaune"
   - "Bénédictine"
   - "Galliano"
   - "Strega"
@@ -916,8 +930,8 @@ family_of:
   "oloroso sherry": fortified
   "tawny port": fortified
   "aquavit": aquavit
-  "green Chartreuse": herbal
-  "yellow Chartreuse": herbal
+  "Chartreuse Verte": herbal
+  "Chartreuse Jaune": herbal
   "Bénédictine": herbal
   "Strega": herbal
   "Jägermeister": herbal
