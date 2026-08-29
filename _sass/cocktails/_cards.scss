@@ -183,6 +183,23 @@ $card-glass-scale: 13rem;
 // card, and Cobra's Fang still needs two rows of mood chip. Spending the
 // recovered space on air around the ingredients is the better use of it.
 .drink-card-ingredients {
+  // LOWERCASE EVERYTHING -- Helen, 2026-08-27: "I am unhappy about capital
+  // letters on cards. It's just very untidy." #543/#553.
+  //
+  // A DISPLAY DECISION, WHICH IS WHY IT IS HERE AND NOT A `downcase` FILTER IN
+  // THE TEMPLATE. The drink page must keep its capitals -- Helen's own worked
+  // example for a recipe line is `London dry gin (Beefeater)` -- so the
+  // lowercasing has to belong to the card, not to the markup both pages share.
+  // Filtering and match-highlighting are unaffected: both read data- attributes
+  // written pre-lowercased at build time, never rendered text.
+  //
+  // WORTH RE-LOOKING AT NOW THE PREMISE HAS MOVED. When Helen asked, cards
+  // rendered `item` and the line was a genuine jumble -- "Fresh lime juice ·
+  // Yellow chartreuse · Simple syrup · White rum", sentence capitals and brand
+  // capitals together. Since #544/#558 they render the vocabulary, and the 37
+  // remaining capitals are all real proper nouns: Campari, Chartreuse, Curaçao,
+  // Jamaican, Demerara. This rule now lowercases those too.
+  text-transform: lowercase;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
