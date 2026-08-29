@@ -179,8 +179,26 @@ def test_number_ranges_use_en_dashes(recipe):
     user, so correct to en dash please." The test is scoped by what a reader
     sees, not by whether a field is prose -- and a metadata time, an ingredient
     amount and a method step all reach the page.
+
+    AND IT STOPS AT A `QQ` LINE, like every other whole-file style rule here.
+    It did not until 2026-08-29: this read `recipe.raw` while its neighbours
+    read `checkable_raw`. #413 (this rule) and #426 (the QQ exemption) landed on
+    the same day and the exemption reached test_typography and not this.
+
+    INVISIBLE ON RECIPES, WHICH IS WHY IT SURVIVED: `test_no_qq_placeholder`
+    forbids the marker in _food_recipes/, so the two readings are identical
+    there -- 0 hits either way. The difference is entirely in the drafts, and it
+    is not small: 130 hits across 58 files counting QQ lines, 44 across 36
+    ignoring them. 22 of those files fail ONLY on source wording awaiting a
+    rewrite, and HANDOVER §5 names this exact case -- "correcting its degree
+    sign or its dash tidies text about to be deleted, by editing someone else's
+    words". Measured before changing anything, not assumed.
+
+    (test_magic_bag.py's copy keeps reading `raw`, and correctly: a magic-bag
+    dish is Helen's own from memory with no source to await a rewrite, so there
+    is no QQ text there to protect.)
     """
-    hits = NUMBER_RANGE.findall(ISO_DATE.sub(" ", recipe.raw))
+    hits = NUMBER_RANGE.findall(ISO_DATE.sub(" ", checkable_raw(recipe)))
     assert not hits, (
         f"{where(recipe)} writes {len(hits)} number range(s) with a hyphen: "
         f"{sorted(set(hits))[:5]}. Ranges take an en dash — 3–4 mins, "

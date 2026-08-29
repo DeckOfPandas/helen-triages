@@ -222,7 +222,23 @@ NOT_FOR_DRAFTS = {
     # Phases 3 and 4 of the plan agreed 2026-08-21.
     "test_scalar_fields_are_quoted": "GAP, mechanical; 295 drafts",
     "test_main_ingredients_entries_are_quoted": "GAP, mechanical; 281 drafts",
-    "test_note_dicts_have_label_and_text": "GAP, mechanical; 256 drafts",
+    # NOT A GAP -- this said "GAP, mechanical; 256 drafts" until 2026-08-29 and
+    # was the one entry here pointing the wrong way. The rule's own docstring
+    # says the opposite: "the bare-string form is still deliberately allowed in
+    # _food_drafts/ (HANDOVER §4/§9), which this test never reads." A draft note
+    # jotted without a label is correct, and `test_note_dicts_have_label_and_
+    # text_when_dict` above is the twin that does apply -- it checks the shape
+    # of a note that HAS gone dict, and leaves bare strings alone.
+    #
+    # The mislabelling mattered in one direction only, and it is the bad one:
+    # anything working through this list looking for mechanical wins would have
+    # set about inventing 256 labels for notes that are meant not to have them.
+    # A registry recording whether a gap is DELIBERATE is worth nothing if an
+    # entry can quietly say the opposite of the rule it names.
+    "test_note_dicts_have_label_and_text":
+        "divergent on purpose -- a bare-string note is correct in a draft "
+        "(the recipe rule's own docstring says so); the narrower twin "
+        "test_note_dicts_have_label_and_text_when_dict is what applies here",
     "test_tags_entries_are_quoted": "GAP, mechanical; 250 drafts",
     "test_size_word_is_with_the_count_not_the_item": "GAP; 108 drafts",
     "test_number_ranges_use_en_dashes": "GAP, mechanical; 58 drafts",

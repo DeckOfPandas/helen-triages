@@ -710,15 +710,20 @@ flagged would have got arithmetic instead of a boolean, evaluated it as false,
 and published the flagged page. `tests/test_front_matter.py` fails on the old
 spelling anywhere in `_food_recipes/`.
 
-**The test's scope is `_food_recipes/` only — the rename never propagated
-through `_food_drafts/`.** As of 2026-08-21, roughly 90 pre-existing drafts
-still carry the old hyphenated `awaiting-fix`, uncaught, because nothing scans
-drafts for it. Concretely dangerous while ingesting: copying an existing draft
-as a template for a new one silently copies whichever spelling that draft
-happened to have. A same-day ingestion session did exactly this across 34 new
-files before catching it. Always write `awaiting_fix` (underscore) on any new
-draft regardless of what the file you copied from uses — it costs nothing now
-and it's the only spelling that still works once the file is promoted.
+**The test's scope is `_food_recipes/` only, and nothing scans drafts for the
+old spelling.** This paragraph said "roughly 90 pre-existing drafts still carry
+the old hyphenated `awaiting-fix`" from 2026-08-21 until 2026-08-29, when it was
+measured: **zero, across all 342 drafts.** Either the propagation happened and
+nobody updated this, or the estimate was wrong when written. Both are the same
+lesson and it is §11.2's: `grep -rn 'awaiting-fix' _food_drafts` takes a second
+and this file went eight days asserting the opposite.
+
+The hazard the paragraph describes is still real even at zero, because nothing
+is watching: copying an existing draft as a template silently copies whichever
+spelling that draft happened to have, and a 2026-08-21 ingestion session did
+exactly that across 34 new files before catching it. Always write
+`awaiting_fix` (underscore) on any new draft — it costs nothing now and it is
+the only spelling that still works once the file is promoted.
 
 **Six tests guard this, because every failure mode is silent** — the page
 publishes, the build is green, and nothing says why. Three on the mechanism
@@ -800,6 +805,107 @@ gate would be gone and the build green.
   ~30 recipes. Keep the same discipline in any commentary/reasoning that
   quotes the source at length; the trigger isn't obviously scoped to file
   writes alone.
+- > ## THE INGEST CONTRACT — settled with Helen 2026-08-29
+  >
+  > **The line is not "how much help is too much". It is one question, asked of
+  > every field: IS THE ANSWER IN THE SOURCE DOCUMENT, OR IN HELEN'S HEAD?**
+  >
+  > In the source — the fan figure, "large eggs", "unsalted butter", "golden
+  > caster" — writing it down is READING, not judgement, and an ingest session
+  > is the only one that will ever have the page open. Do it, unasked.
+  >
+  > In her head — her voice, her palate, whether she liked it — leave it, and
+  > write `QQ`.
+  >
+  > **A silence in the source is never filled from general cooking knowledge.**
+  > A wrong "whole milk" looks exactly as confident as a right one, and that,
+  > not ambition, is the whole garbling risk. `QQ` is the existing answer and
+  > costs nothing.
+
+  **WHY THIS EARNED A CONTRACT: 266 of 342 drafts (77%) carry at least one gap
+  whose answer was printed on the page**, 675 hits in total, measured
+  2026-08-29. Sugar type 117, egg size 103, butter salted/unsalted 92, ginger
+  form 58, warm spices 42, **fan oven 39**, milk 36, garlic 33, flour 30, and
+  nine more rules behind those.
+
+  **The fan temperature is the case that proves the timing matters.** §10 says
+  it "could never have been guessed or bulk-fixed from the file alone" —
+  entirely true *afterwards*, which is why it sat as a hand-worked backlog. At
+  ingest the page is open and prints the pair. The information is not hard to
+  get; it is only hard to get **later**.
+
+  **TIER 1 — do it at ingest, unasked.**
+
+  - **Every qualifier the source states.** Sugar, butter, flour, milk, eggs,
+    garlic, ginger, warm spices, vinegar, mustard, chocolate. Source silent →
+    `QQ`, never a default.
+  - **The fan oven temperature**, taken from the printed pair. Check which of
+    the two *is* the fan figure — they are not always in the same order (§5).
+  - **Quantities in their own `amount:` key, never inside `item:` text.** §4
+    below records the real bug: `item: "~1 tbsp tamarind paste"` renders
+    unstyled because the highlighter is driven by `{% if item.amount %}` and
+    never scans text for a leading number. **No test catches this**, so it is
+    ingest-time or never.
+  - **Size words with the count, not the item** — `amount: "2 large"`, not
+    `item: "large onions"` (108 drafts carry the other shape).
+  - **Split `ingredient_groups` and `method_groups`** — see below.
+  - **Name the file from the title's head clause**, so slug and title cannot
+    diverge (19 drafts already have; each is then a rename-or-retitle decision
+    only Helen can make).
+  - **House style right the first time** — en dashes, `°C`, unicode fractions,
+    quoting, accents. Outside `QQ` lines, always. `/tidy-drafts` (§11.0.2) can
+    clean these up afterwards, so this saves a pass rather than a decision.
+  - **The citation**, per `SOURCE_ATTRIBUTION_SPEC.md`.
+
+  **TIER 2 — fill in at ingest, say plainly they are proposals.**
+  `main_ingredients`, `tags`, `star_ingredient`. Cheap for Helen to correct and
+  expensive for her to originate. The vocabulary is declared, so nothing can be
+  invented: an undeclared tag or star fails the suite. **Be generous with
+  `main_ingredients`** — see §6, where the measured evidence is that ingest
+  sessions read the cap of eight as a budget and stop at five while Helen's own
+  recipes run to fourteen.
+
+  **TIER 3 — never, at ingest or after.** Rewriting a method step into her voice
+  (that is what `QQ PLACEHOLDER ` exists for), `incidental:`, the case-by-case
+  tag calls (`freezable`, `virtuous`, `one-handed food`), inventing a time or a
+  temperature (`Estimated N mins` is banned outright, §5), `meta.rewritten`,
+  `meta.proofread`.
+
+- **SPLIT `ingredient_groups` AND `method_groups` AT INGEST, ONCE — and never
+  again afterwards.** Helen's request, restated 2026-08-29 when she found it was
+  not written down anywhere: *"Claude is requested to split out ingredient and
+  method groups at ingest to help me, then not again after that."*
+
+  **The two halves are one instruction and neither works alone.**
+
+  AT INGEST, do it unasked. A transcribed recipe arrives as a flat
+  `ingredient_groups` with one unnamed group and a flat `method:`, and phases
+  are usually obvious from the source — a custard, then a meringue, then the
+  assembly. Splitting them is cheap while you already have the whole recipe in
+  front of you and expensive later, because it means re-reading it. Group names
+  are bare nouns for ingredients (`dressing`, never `for the dressing`); method
+  group names render bare and MAY be narrative phases (`day before: prepare the
+  beef`). Stored casing does not matter — the template uppercases both.
+
+  AFTER INGEST, never regroup unprompted. This is §12's "don't tidy a draft you
+  were not asked to tidy" applied to the one edit most likely to look like an
+  improvement, and on a published recipe it is worse than untidy: regrouping is
+  a real content edit and takes `meta.proofread` down with it (§4.0). If a draft
+  looks like it wants groups, say so and leave it.
+
+  **THIS WAS NOT WRITTEN ANYWHERE UNTIL NOW, AND THE COST WAS VISIBLE.** The
+  only mention in this file was one clause inside the `meta.claude_rewritten`
+  paragraph above, describing what a *requested* tidy-up pass does — not an
+  ingest instruction, and silent on the once-only half. Checked with `git log
+  -S` rather than assumed: that clause arrived with #418 and no ingest-time
+  version has ever existed. So Helen had been typing
+  `CLAUDE THIS IS A METHOD GROUP` into draft method steps by hand — three times
+  in `meringue-swans-with-diplomat-cream.md` alone, which is exactly the work
+  this instruction exists to have already done.
+
+  `test_no_claude_markers_left` catches those markers, so the workaround at
+  least fails loudly rather than shipping. It is still a workaround for a
+  missing instruction.
 - `incidental: true` on an ingredient item (e.g. frying oil, greasing
   butter) marks it as a cooking fluid rather than a real recipe component —
   Helen: "It's silly to write '2 tbsp olive oil' for a sear, when people
@@ -1218,18 +1324,40 @@ recipe. No cap.
 
 **Savoury — substitution test.** Not "would this fail" but "would I improvise
 around a gap": the protein, the liquid/fat that defines the character, anything
-you'd have to go buy, the vegetable that's the point. Cap at eight. **Not
-mechanically enforced** — no test checks the count, so a recipe with a
-spice-heavy ingredient list can go over deliberately, case by case, rather
-than being forced to cut something that genuinely fails the substitution
-test. `indonesian-chicken-curry-gulai-ayam.md` (11) and `citrus-soy-salmon-
-sticky-rice.md` (12) both sit well past the cap — Helen's explicit call
-(2026-08-02 and 2026-08-09 respectively): everything in each is a "would
-have to specifically go buy" ingredient, so nothing was a good candidate to
-cut. Don't flag either as a violation to fix, and don't expect this to stop
-happening — more lists will grow past eight over time as ingredients get
-added to existing recipes. The cap is a soft first-pass guide, not something
-to defend by cutting a genuine substitution-test ingredient.
+you'd have to go buy, the vegetable that's the point.
+
+> **THE CAP OF EIGHT IS A FIRST-PASS GUIDE AND IT HAS BEEN READ AS A BUDGET.
+> BE GENEROUS.** Helen, 2026-08-29: *"we have generally shifted to allowing more
+> main ingredients where they define a dish, for example the long list of spices
+> in gulai ayam... I do often find myself adding to that array by hand, which is
+> plainly silly."*
+
+**Measured 2026-08-29, and the two halves of the corpus disagree in exactly the
+way that complaint predicts:**
+
+| | files | median | max | over eight |
+|---|---|---|---|---|
+| `_food_recipes/` — curated by Helen | 86 | 6 | **14** | **16 (18%)** |
+| `_food_drafts/` — written at ingest | 342 | 5 | 9 | **1 (0.3%)** |
+
+The one draft over eight is `meringue-swans-with-diplomat-cream.md`, which Helen
+wrote herself. **So the published half spreads to fourteen and the ingested half
+stops at five**, and the difference is her, by hand, one file at a time. Nothing
+about the substitution test changes at promotion; only who applied it does.
+
+**The number is an OUTPUT of the test, never an input to it.** Ask of each
+ingredient "would I improvise around a gap here" and write down every one that
+answers no — then count, if you like. Never cut a genuine substitution-test
+ingredient to reach a number, and never stop adding because you have reached
+one. **Not mechanically enforced**: no test checks the count, deliberately.
+
+`indonesian-chicken-curry-gulai-ayam.md` is the worked example Helen reaches
+for, and it has **fourteen** — this section said eleven from 2026-08-02 until
+2026-08-29, having recorded the figure once and never re-measured it, which is
+§11.2 again. `miso-cashew-butter-vegetable-ramen.md` has 13,
+`indian-mutton-raan-roast.md`, `garam-masala-powder.md` and
+`citrus-soy-salmon-sticky-rice.md` 12 each. Don't flag any of them as a
+violation, and expect the list to keep growing.
 
 **Cheeses** use the bare name where it stands alone (cheddar, feta, comté) —
 keep "cheese" only where the qualifier is meaningless without it (blue cheese,
@@ -1695,9 +1823,15 @@ it keeps ratios clean and it is a decision, not an accident.
 liqueur". No rule can derive the second from the first, which is why it is
 stored rather than computed.
 
-**`generic` is fully typed, and it is what the index browses by.** All 617
-ingredient entries carry a declared value; the "526+ of 594, #335 tracks the
-rest" figure that stood here was two coverage passes out of date. It is still
+**`generic` is fully typed, and it is what the index browses by.** Re-measured
+2026-08-29 by parsing every drink rather than grepping: **619 ingredient
+entries, 0 untyped and 0 carrying a `QQ` generic.** #335 ("type the remaining 68
+QQ generics") was therefore complete and stayed open — closed on that
+measurement. The "526+ of 594, #335 tracks the rest" figure that stood here was
+two coverage passes out of date, and the issue itself was one more behind that.
+Coverage stays honest on its own: `test_every_ingredient_has_a_generic_or_a_qq`
+means an untyped ingredient is always a visible `QQ`, never an absent key, so
+this backlog cannot quietly regrow. It is still
 the cocktails analogue of food's `main_ingredients` rather than a copy, and
 **since #501 it is also what a rum shows on a card** — see §9.10.1. §9.1's "no
 star axis" rule still holds: the index filters and excludes by ingredient, it
@@ -2087,10 +2221,16 @@ alone. See the note there.
   `cocktails` marker. A cocktails test must ASSERT its corpus is non-empty
   rather than skipping mid-run, or it passes vacuously.
 
-  **That requirement does not protect you where it matters most — #540.** The
-  module skips wholesale when `_cocktail_drafts/` is absent, which is legitimate
-  and is also always the case in CI, so 24 of its 41 tests never run on `main`.
-  See the box in §10 before relying on any of them as a gate.
+  **That requirement did not protect the collection where it mattered most, and
+  #540 is now half-answered.** The module used to skip wholesale when
+  `_cocktail_drafts/` was absent — always the case in CI — so 24 of its tests
+  never ran on `main`. Since 2026-08-29 the corpus is `_cocktail_recipes/` +
+  `_cocktail_drafts/`, so a PROMOTED drink is checked everywhere including CI,
+  and `_load()` is the only door into either. The drafts remain a local
+  concern by Helen's decision. **Read the box in §10 before relying on a green
+  cocktails run**: with nothing promoted yet, CI still checks no drink, and the
+  difference is only that this is now a fact about the collection rather than
+  about the loader.
 - `_data/cocktails/taxonomy.yml` — check it before repeating this: it was
   described here as "still empty", and moods and generics have since been
   argued out and are enforced by tests.
@@ -3235,26 +3375,46 @@ anywhere, so every guard in this repository protected a local run and nothing
 else. `.github/workflows/build-and-deploy.yml` has a `test` job and `build`
 declares `needs: test`. Three things about it are load-bearing:
 
-> **NOT FOR THE COCKTAIL DRINKS, AND THE SENTENCE ABOVE READS AS IF IT WERE —
-> #540, found 2026-08-27.** `tests/test_cocktails.py` skips when
-> `_cocktail_drafts/` is absent, which is correct and documented; but CI checks
-> out this repo alone and the drafts are a separate private repo, so the
-> directory is *always* absent there. **24 of that module's 41 tests call
-> `_load()` and skip in Actions**, reported as passes. For the cocktail
-> collection, "every guard protected a local run and nothing else" — the exact
-> sentence #369 exists to have made obsolete — is still true today.
+> **THE COCKTAIL GATE NOW FIRES AT PROMOTION — #540, Helen's ruling 2026-08-29,
+> choosing option 4 of the four that issue lists: gate at promotion, and leave
+> the private drinks out of a runner.**
 >
-> Live proof rather than theory: five tests fail locally on drafts data that is
-> behind (a retired `flavoured` generic, retired honey generics, `blackstrap`
-> still a generic on Jungle Bird, 17 non-canonical glass spellings) and CI is
-> green on all five. It is masked only because drafts build locally; the mask
-> comes off the day a cocktail is promoted into `_cocktail_recipes/`, and the
-> guards that would catch a bad promotion are the ones not running.
+> What it was: `tests/test_cocktails.py`'s `_load()` globbed `_cocktail_drafts/`
+> alone, and CI checks out this repo without that private one, so **24 of the
+> module's 41 tests skipped in every deploy run**, reported as passes.
 >
-> `test_suite_hygiene.py` cannot see this: from its point of view the skip is
-> legitimate. **The vacuity is in the ENVIRONMENT, not the assertion.** #540
-> has four options and no recommendation — putting private drinks into a runner
-> is Helen's decision.
+> **#540's own account of the fix was too optimistic, and this is the part to
+> carry.** It says the mask "comes off the day a cocktail is promoted". It did
+> not. `_cocktail_recipes/` lives in THIS repo and IS present in CI — but the
+> loader never read it, so a promoted drink would have been checked by nothing,
+> anywhere, ever. Promotion did not lift the gate; it moved a drink permanently
+> out from under it. The corpus is both roots now.
+>
+> **The half that the fix alone would have shipped broken.** Building the CI
+> shape — drafts moved aside, real drinks copied into a scratch
+> `_cocktail_recipes/` — showed **five guards failing on entirely correct
+> data**. All five hang on a shrink-only registry (`GLASSLESS_ON_2026_08_27`,
+> `KNOWN_PROSE_SUGGESTIONS`, `card_name_joins`, `methods.yml`'s proposals) or on
+> a mood's share of the book, and **that class of claim is unanswerable on a
+> partial corpus in the one direction that matters: a drink merely ABSENT looks
+> exactly like a drink FIXED.** Five false reds on `main`, and not once —
+> every later promotion re-runs them over a partial corpus too.
+>
+> So the two halves are separated. The RATCHET ("no NEW offender") is a
+> per-drink claim and runs everywhere, which is the coverage promotion buys; the
+> STALENESS half calls `_require_whole_collection` and skips with a reason.
+> `WHOLE_COLLECTION_ONLY` is the registry and
+> `test_whole_collection_only_says_what_it_does` keeps it true both ways.
+>
+> **`_load()` is the only door, and a test now enforces that**
+> (`test_every_drink_reading_test_goes_through_the_loader`). One future test
+> globbing the drafts itself reopens #540 for itself, silently, in CI only.
+>
+> **Still true, and not silenced:** at ONE promoted drink, four anti-vacuity
+> asserts fire ("no rum ingredient carries a suggestion, so this check is
+> vacuous"). They are correct, they say so accurately, and they self-resolve by
+> five drinks. Adding them to `WHOLE_COLLECTION_ONLY` would lose that coverage
+> in CI permanently to buy quiet in a one-drink window.
 
 - **`fetch-depth: 0`.** `actions/checkout` is shallow by default, and in a
   depth-1 clone `git log -- <file>` reports the same single commit for every
@@ -3814,6 +3974,14 @@ were moved onto a fresh branch), but the failure mode is silent and the tree
 is shared with a human who is also using git. Delegate the reading and the
 scanning; keep the branching in the foreground.
 
+**A COMMIT TRAILER IS HOW AN ISSUE GETS CLOSED HERE — Helen's standing
+preference, 2026-08-29**, given while ruling on #540: *"via commit message if
+possible -- this is always my preference."* The API route exists (`GH_TOKEN`,
+`CLAUDE.md`) and is for the cases a trailer cannot reach, the clear one being
+work done inside a nested private drafts repo, where a cross-repo trailer closes
+and cross-references nothing (see §12). Everywhere else, the trailer, because it
+ties the closure to the commit that earned it.
+
 **Put `Fixes #N` on the commit, or the issue stays open forever.** Four issues
 in one 2026-08-16 session (#52, #273, and nearly #274/#281) shipped and merged
 with no trailer, so GitHub never closed them and they sat in the open list
@@ -3855,6 +4023,36 @@ Do not batch when batching is wrong. An urgent fix should not wait behind
 unfinished work; genuinely unrelated changes that need independent review, or
 that touch another agent's area, are still worth their own PR. **Say what is
 being held back**, so she can ask for it sooner if she wants it.
+
+### 11.0.2 `/tidy-drafts` — the mechanical half of a drafts pass, on request
+
+**Added 2026-08-29 at Helen's request**: *"I also want a way of saying hey,
+Claude, please tidy up my drafts files."* `.claude/commands/tidy-drafts.md` is
+the procedure and `scripts/tidy_drafts.py` is the engine — the first project
+slash command in this repo, and the first thing in `.claude/` that is not a
+guard hook.
+
+**The boundary is formatting versus judgement, and it is the whole design.** It
+fixes quoting, en dashes, `--`/`->`, accents and the #429 `meta:` migration —
+2,957 changes across all 342 drafts, measured. It never resolves which milk,
+which flour, whether an oven figure is the fan one, or whether a title or a
+filename is the one that should change: ~25 rules and 600-odd hits, every one
+needing Helen or her source material, all of them reported and left alone.
+
+**It never touches a `QQ` line**, which is not a technicality: two thirds of the
+corpus-wide en-dash hits are inside un-rewritten source text (86 of 130).
+
+**Every rule is imported from the test suite, never re-typed** — `META_ORDER`,
+`RETIRED`, `SCALAR_STRING_FIELDS`, `_head_clause_words`. A fixer carrying its own
+copy of the contract eventually tidies files INTO a shape the tests reject,
+while looking green the whole time. That import is also what resolved the
+`test_invisible_keys_are_really_invisible` failure the first draft caused
+honestly, rather than by narrowing a guard that says in its own message not to.
+
+Scope was settled with Helen and the exclusions are hers: size words (108
+drafts) are out, cocktail drafts are out while that schema moves, and a missing
+`meta.awaiting_fix` is reported rather than invented because that flag fails
+closed and writing `false` asserts a recipe is fit to publish.
 
 ### 11.0.1 More than one agent now shares this checkout — use a worktree
 
@@ -4201,6 +4399,25 @@ file, run it once and diff — or copy the file to `tmp/` first, which is what
 turned this from a loss into a paragraph. And when a generator's output becomes
 hand-editable, fix the comment in the GENERATOR, not only in the output: the
 person about to re-run it is by definition reading the wrong one.
+
+**YOU WILL READ THE PATCH AND THINK YOU HAVE CHECKED THE OUTPUT.** 2026-08-29,
+building `/tidy-drafts` (§11.0.2). Its `meta:` rewrite scanned the block as
+"indented or blank", which swallowed the trailing empty line that splitting on
+newlines always leaves — so every file came out ending `proofread: false---`
+and **341 of 342 drafts stopped parsing at all**. The diff looked entirely
+plausible: the right two lines gone, the right three in the right order, and
+nothing in a unified diff draws your eye to a newline that is no longer there.
+
+It was caught by parsing both sides and diffing the PARSED front matter, not by
+reading the change. **For anything that rewrites structured text, the check is
+to load the result, not to look at the patch** — and the same pass is what
+proved the quoting was a genuine no-op on the data, which is the other thing a
+diff cannot tell you (`serves: 6` and `serves: "6"` differ in type and look
+identical in intent).
+
+The corollary, and it is why this sits beside the entry below: verify against a
+COPY. `_food_drafts/` was never written to at any point while this was being
+built, so the 341-file breakage cost nothing.
 
 **You will rewrite YAML you were only asked to edit.** Not one of the
 several hundred front-matter edits made across this project's history has
