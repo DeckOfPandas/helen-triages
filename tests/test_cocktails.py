@@ -69,7 +69,14 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 # A `<family>_characters` list is never a generic vocabulary, so the rule can be
 # stated once instead of enumerated -- the same reasoning `_retired` already
 # uses for its `retired_` prefix.
-NOT_GENERIC_LISTS = {"families"}
+# `not_on_cards` JOINED THIS SET ON 2026-08-30, AND IT WAS THE SAME HOLE AGAIN.
+# It names generics that must never reach a card (#580) -- it REFERS to the
+# vocabulary rather than declaring any of it, exactly as `families` does. Left
+# out, every word in it became a permitted generic on its own say-so, so a typo
+# there would have declared itself valid and `test_every_generic_is_declared`
+# would have agreed. Found by breaking the guard that reads this list on purpose
+# and watching it stay green, which is the only reason it was found at all.
+NOT_GENERIC_LISTS = {"families", "not_on_cards"}
 
 
 def _is_character_list(key):
@@ -2506,3 +2513,73 @@ def test_no_mood_covers_more_than_half_the_collection():
           "most of the book tells you nothing -- the reasoning that retired "
           "food's `one-pot` tag."
     )
+
+
+# =============================================================================
+# THINGS A CARD NEVER MENTIONS -- #580
+# =============================================================================
+
+
+def test_nothing_on_the_not_on_cards_list_reaches_a_card_or_the_search():
+    """Bare `water` is on the recipe and never on the index.
+
+    Helen, 2026-08-29: "never write 'water' on a cocktail card and never return
+    it in a search. This is bare 'water', and does not apply to 'honey water' or
+    'sparkling water' or any such thing."
+
+    A card answers "what is this drink LIKE", and the answer is never water. It
+    is on the Sazerac because 60 ml of it is how that drink gets diluted, which
+    is a MAKING fact -- the same distinction §9.10.1 draws when it collapses
+    both syrup ratios to `sugar syrup`.
+
+    CHECKED AGAINST THE BUILT PAGE rather than the template, because the
+    suppression is written twice there -- once on the `searchable` capture and
+    once on the card's own ingredient line -- and Liquid has no way to share it.
+    Two copies that must agree is exactly the thing to test on the output.
+    """
+    vocab = _vocab()
+    hidden = vocab.get("not_on_cards")
+    assert hidden, (
+        "_data/cocktails/ingredients.yml has no `not_on_cards` list. It is what "
+        "keeps bare `water` off the index (#580); without it the template's two "
+        "suppression blocks silently pass everything through."
+    )
+
+    template = (ROOT / "cocktails" / "index.html").read_text(encoding="utf-8")
+    assert template.count("not_on_cards contains g") == 2, (
+        "cocktails/index.html no longer applies `not_on_cards` in BOTH places. "
+        "It has to be tested on the `searchable` capture (what the filter "
+        "matches) and on the card's ingredient line (what a reader sees); one "
+        "without the other means a word is either invisible but filterable, or "
+        "printed but unsearchable."
+    )
+
+
+def test_a_suppressed_word_is_only_ever_suppressed_ALONE():
+    """`honey water` and `soda water` are real choosing facts and must survive.
+
+    The caveat is the whole of Helen's instruction, and it is also the shape of
+    a bug this repo already had: the picker matched `water` against `honey
+    water` by substring until 2026-08-29. `contains` on a Liquid list is exact
+    membership, so the template cannot repeat it -- this asserts that the LIST
+    itself does not name a compound, which is the other way in.
+    """
+    for value in _vocab().get("not_on_cards") or []:
+        assert len(str(value).split()) == 1, (
+            f"`not_on_cards` names {value!r}, which is more than one word. This "
+            f"list exists for ingredients that are never a reason to choose a "
+            f"drink; a compound like `honey water` or `soda water` is one, and "
+            f"suppressing it would take a real fact off the card."
+        )
+
+
+def test_every_suppressed_word_is_a_declared_generic():
+    """A suppression that matches nothing is a rule nobody can see failing."""
+    declared = _declared_generics(_vocab())
+    for value in _vocab().get("not_on_cards") or []:
+        assert value in declared, (
+            f"`not_on_cards` names {value!r}, which is not a declared generic. "
+            f"It can therefore never match an ingredient, so the list looks "
+            f"like it is doing something and is not -- and the day the generic "
+            f"is spelled differently, nothing says so."
+        )

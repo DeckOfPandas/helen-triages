@@ -287,7 +287,12 @@ unresolved_suggestions:
   "ED3 or Havana 3": >-
     Two bottles in one string; wants the list form. Both `lightly aged and
     filtered` since #314.
-  "ED3, Plantation": >-
+  # Re-keyed from "ED3, Plantation" on 2026-08-30 when #582 corrected the
+  # spelling in the drink. This block names STRINGS AS WRITTEN, so it moves with
+  # them -- and `test_every_suggested_bottle_resolves` caught the gap the moment
+  # the draft changed, which is the whole reason a declared exception beats a
+  # comment.
+  "ED3, Planteray": >-
     Two bottles in one string, and since #314 they are in DIFFERENT categories --
     El Dorado 3 is `lightly aged and filtered`, Planteray 3 Stars is `blended
     multi-region rum, clear`. Royal Bermuda Yacht Club's generic is the

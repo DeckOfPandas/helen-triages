@@ -112,6 +112,30 @@ search:
   # visible: it is not offered as a chip, and it is one line to fix here.
   prose_marks: ["--", "—", "?", "!", ">", ","]
 
+# --- things a card never mentions --------------------------------------------
+# #580. Helen: "never write 'water' on a cocktail card and never return it in a
+# search. This is bare 'water', and does not apply to 'honey water' or
+# 'sparkling water' or any such thing."
+#
+# A card answers "what is this drink LIKE", and the answer is never water. It is
+# on the recipe because 60 ml of it is how a Sazerac gets diluted, and that is a
+# MAKING fact -- the same distinction §9.10.1 draws when it collapses both syrup
+# ratios to `sugar syrup`: a ratio matters while you pour and not while you
+# choose. Water is that argument at its limit.
+#
+# EXACT MATCHES ONLY, and that is the whole of Helen's caveat. `honey water` and
+# `soda water` are real choosing facts -- one is a sweetener and the other makes
+# the drink long -- so nothing here may be treated as a substring. The picker
+# was matching `water` against `honey water` by substring until 2026-08-29 and
+# the fix for THAT is upstream in cocktail-search.js; this list is a different
+# rule and must not lean on the old bug's shape.
+#
+# ONE ENTRY TODAY, and a list rather than a special case in the template because
+# the next one will not be water: `ice` is the obvious candidate the day a drink
+# writes it down.
+not_on_cards:
+  - water
+
 # --- other names for a family ------------------------------------------------
 # A FAMILY IS REACHED BY ITS NAME, so a family nobody spells that way is a
 # family nobody can reach. Helen, 2026-08-29: "'whiskey (all)' should return all
