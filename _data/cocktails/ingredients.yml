@@ -216,6 +216,40 @@ rum_display_names:
   # generic up in it.
   "Ceylon arrack": "Ceylon arrack"
 
+  # --- BEYOND RUM, 2026-08-29 -------------------------------------------------
+  # Helen's model, from her own worked examples: the card shows the shortest
+  # name that tells you what the drink is LIKE -- not the family, not the style,
+  # but whichever of those actually matters. "gin", because London dry versus
+  # Plymouth does not change your evening. "bourbon" and "blanco tequila",
+  # because bourbon versus rye and blanco versus anejo absolutely do.
+  #
+  # ONLY WHERE THE CARD NAME DIFFERS FROM THE GENERIC. A generic that already
+  # reads well on a card (`cognac`, `Campari`, `lime juice`) needs no entry;
+  # adding one would be 140 rows of the same string twice.
+  "London dry": "gin"
+  # NOT collapsed to "gin", deliberately, and the line is Helen's own rum rule:
+  # collapse where the difference is a nuance, keep it where it changes the
+  # STRENGTH or the drink. Navy strength does; genever is a different drink
+  # altogether. Old Tom, Plymouth, New Western dry and speciality are the
+  # genuinely open ones -- see the note in the issue rather than guessing here.
+  "navy strength": "navy strength gin"
+  "genever": "genever"
+  "blended scotch whisky": "scotch"
+  "single malt scotch whisky": "single malt"
+  # Bonded stays its own word. Helen, 2026-08-27: "bonded rye is a different
+  # thing, like overproof demerara rum" -- and five of seven rye entries in the
+  # collection are bonded, so collapsing it to `rye` would hide the majority
+  # case behind the exception.
+  "bonded rye": "bonded rye"
+  # THE RATIO IS A RECIPE FACT, NOT A CARD FACT. Helen, 2026-08-27: "On the card
+  # I would expect to see sugar syrup, and on the recipe ingredient line cane
+  # sugar syrup, 2:1." Both ratios therefore read the same on a card, which is a
+  # declared collapse below -- it loses real information and it is meant to.
+  "sugar syrup 1:1": "sugar syrup"
+  "sugar syrup 2:1": "sugar syrup"
+  "honey water 1:1": "honey water"
+  "honey water 2:1": "honey water"
+
 # HOW A DISJUNCTIVE RUM READS ON A CARD, where the default join reads badly.
 #
 # A list `generic` on ONE ingredient means "either would do" (#441), and the
@@ -254,6 +288,20 @@ rum_card_name_joins:
 # duplicate still fails. A collapse is a real loss of information on the index,
 # so it should cost a sentence.
 rum_card_names_may_collide:
+  "sugar syrup": >-
+    `sugar syrup 1:1` and `sugar syrup 2:1` both read `sugar syrup` on a card.
+    Helen, 2026-08-27, asked what she would expect to see: "On the card I would
+    expect to see sugar syrup, and on the recipe ingredient line cane sugar
+    syrup, 2:1." The ratio changes how much you pour, which is a thing you need
+    while MAKING the drink and not while choosing it -- so this is a collapse
+    that loses real information on purpose, at the distance where the
+    information is not being used. Nine drinks carry both a syrup and something
+    else sweet; none carries both ratios at once.
+  "honey water": >-
+    Same call as `sugar syrup`, same reason: `honey water 1:1` and `honey water
+    2:1` are one thing on a card and two in the glass. The distinction exists
+    precisely because a diluted honey and a twice-concentrated one are poured at
+    different volumes for the same sweetness -- a making fact.
   "Jamaican rum": >-
     Helen's call, 2026-08-27, offered the alternative and choosing this:
     `Jamaican, moderately aged` and `Jamaican, caramel forward` both read
