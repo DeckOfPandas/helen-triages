@@ -68,11 +68,11 @@
   padding: 0 0.12em 0.02em 0;
 }
 
-.drink-filter--chaos   .drink-field-label { @include heading-rule($color-tangerine); }
-.drink-filter--mood    .drink-field-label { @include heading-rule($color-absinthe); }
-.drink-filter--hassle  .drink-field-label { @include heading-rule($color-ultraviolet); }
-.drink-search--include .drink-field-label { @include heading-rule($color-magenta); }
-.drink-filter--name    .drink-field-label { @include heading-rule($color-cyan); }
+.drink-filter--chaos   .drink-field-label { @include heading-rule($color-radiant-reposado); }
+.drink-filter--mood    .drink-field-label { @include heading-rule($color-electric-absinthe); }
+.drink-filter--hassle  .drink-field-label { @include heading-rule($color-ultra-yvette); }
+.drink-search--include .drink-field-label { @include heading-rule($color-cosmic-cosmopolitan); }
+.drink-filter--name    .drink-field-label { @include heading-rule($color-luminous-lagoon); }
 
 // LEAVE OUT CARRIES NO HUE, and the absence is the decision. Helen: "for food,
 // avoiding can be important whereas for drinks surely less so." Food gave its
@@ -133,8 +133,8 @@
   &[hidden] { display: none; }
 }
 
-.drink-filter--mood    .btn-clear-filter { color: $color-absinthe-deep;    &:hover { color: $color-absinthe; } }
-.drink-filter--hassle  .btn-clear-filter { color: $color-ultraviolet-deep; &:hover { color: $color-ultraviolet; } }
+.drink-filter--mood    .btn-clear-filter { color: $color-electric-absinthe-deep;    &:hover { color: $color-electric-absinthe; } }
+.drink-filter--hassle  .btn-clear-filter { color: $color-ultra-yvette-deep; &:hover { color: $color-ultra-yvette; } }
 // HASSLE'S BUTTONS ARE .btn-mood TOO, so without this they take MOOD's green
 // and contradict their own ultraviolet heading. They share the class because
 // they share the behaviour -- both write into `chosenMoods` and a drink
@@ -150,20 +150,20 @@
 .drink-filter--hassle .btn-mood {
   &:hover,
   &:focus-visible {
-    border-color: $color-ultraviolet-deep;
-    color: $color-ultraviolet-deep;
+    border-color: $color-ultra-yvette-deep;
+    color: $color-ultra-yvette-deep;
   }
 
   &.is-on {
-    background: $color-ultraviolet;
-    border-color: $color-ultraviolet-deep;
+    background: $color-ultra-yvette;
+    border-color: $color-ultra-yvette-deep;
     color: $color-white;                        // 5.47:1 on the fill
   }
 }
 
-.drink-filter--chaos   .btn-clear-filter { color: $color-tangerine-deep;   &:hover { color: $color-tangerine; } }
-.drink-search--include .btn-clear-filter { color: $color-magenta-deep;     &:hover { color: $color-magenta; } }
-.drink-filter--name    .btn-clear-filter { color: $color-cyan-deep;        &:hover { color: $color-cyan; } }
+.drink-filter--chaos   .btn-clear-filter { color: $color-radiant-reposado-deep;   &:hover { color: $color-radiant-reposado; } }
+.drink-search--include .btn-clear-filter { color: $color-cosmic-cosmopolitan-deep;     &:hover { color: $color-cosmic-cosmopolitan; } }
+.drink-filter--name    .btn-clear-filter { color: $color-luminous-lagoon-deep;        &:hover { color: $color-luminous-lagoon; } }
 .drink-search--exclude .btn-clear-filter { color: $color-text;        &:hover { color: $color-clear-text; } }
 
 // --- the buttons -------------------------------------------------------------
@@ -190,8 +190,8 @@
 
   &:hover,
   &:focus-visible {
-    border-color: $color-absinthe-deep;
-    color: $color-absinthe-deep;
+    border-color: $color-electric-absinthe-deep;
+    color: $color-electric-absinthe-deep;
   }
 
   // A fill, not a border change: with ten of these in a row a 1px border
@@ -205,9 +205,9 @@
   // which fails AA. Each is now solved to about 5.3:1: readable, and still
   // visibly the section's colour rather than collapsing to black.
   &.is-on {
-    background: $color-absinthe;
-    border-color: $color-absinthe-deep;
-    color: darken($color-absinthe-deep, 9%);   // 5.25:1 on the fill
+    background: $color-electric-absinthe;
+    border-color: $color-electric-absinthe-deep;
+    color: darken($color-electric-absinthe-deep, 9%);   // 5.25:1 on the fill
     font-weight: 600;
   }
 }
@@ -226,14 +226,14 @@
 
   &:hover,
   &:focus-visible {
-    border-color: $color-tangerine-deep;
-    color: $color-tangerine-deep;
+    border-color: $color-radiant-reposado-deep;
+    color: $color-radiant-reposado-deep;
   }
 
   &.is-on {
-    background: $color-tangerine;
-    border-color: $color-tangerine-deep;
-    color: darken($color-tangerine-deep, 23%);  // 5.28:1 on the fill
+    background: $color-radiant-reposado;
+    border-color: $color-radiant-reposado-deep;
+    color: darken($color-radiant-reposado-deep, 23%);  // 5.28:1 on the fill
     font-weight: 600;
   }
 }
@@ -254,13 +254,13 @@
   width: 100%;
   padding: $space-xs 0.1rem;
   border: none;
-  border-bottom: 1.5px solid $color-magenta;
+  border-bottom: 1.5px solid $color-cosmic-cosmopolitan;
   background: transparent;
   margin-bottom: $space-md;
 
   &:focus {
     outline: none;
-    border-bottom-color: $color-magenta-deep;
+    border-bottom-color: $color-cosmic-cosmopolitan-deep;
   }
 }
 
@@ -287,13 +287,13 @@
 
   &:hover,
   &:focus-visible {
-    border-color: $color-magenta-deep;
-    color: $color-magenta-deep;
+    border-color: $color-cosmic-cosmopolitan-deep;
+    color: $color-cosmic-cosmopolitan-deep;
   }
 
   &.is-on {
-    background: $color-magenta;
-    border-color: $color-magenta-deep;
+    background: $color-cosmic-cosmopolitan;
+    border-color: $color-cosmic-cosmopolitan-deep;
     // Ink, not a darkened magenta. Magenta's fill is light enough that the
     // darkened deep has to go almost to black (41%) before it clears 4.5 --
     // at which point it is not magenta any more, so the honest version is ink.
@@ -344,7 +344,7 @@
   color: $color-clear-text;
   margin: $spacing-block-gap 0 $space-xl;
   padding-top: $space-md;
-  border-top: 2px solid $color-tangerine;
+  border-top: 2px solid $color-radiant-reposado;
 
   strong { color: $color-text; font-size: 1rem; }
 }
