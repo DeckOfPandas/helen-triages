@@ -37,12 +37,14 @@
 # none of them down and test_the_cocktail_search_config_is_not_hardcoded keeps
 # it that way.
 #
-# `min_query_chars` IS ISSUE #549 POINT 4. Measured 2026-08-29 over the 240
-# distinct pool terms: at two characters `li` offers 24 candidates and `or` 28,
-# so eight are shown and the rest counted. Raising this to 3 is a one-line
-# change here and needs no code touched -- it is left at 2 because that is what
-# the page did before the search moved into a tested module, and changing
-# behaviour and structure in one pass hides which of them moved something.
+# `min_query_chars` IS ISSUE #584, split out of #549 so that issue could close
+# on what was actually delivered rather than sit on the board mostly done.
+# Measured 2026-08-29 over the 240 distinct pool terms: at two characters `li`
+# offers 24 candidates and `or` 28, so eight are shown and the rest counted; at
+# three it is nearly always a real answer. Raising it is a one-line change here
+# and needs no code touched -- it is left at 2 because that is what the page did
+# before the search moved into a tested module, and changing behaviour and
+# structure in one pass hides which of them moved something.
 #
 # `pool_cap` is how many candidates are shown at once. The remainder is always
 # COUNTED and said out loud ("+16 more -- keep typing"), never silently
