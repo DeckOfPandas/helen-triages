@@ -2280,6 +2280,16 @@ bourbon versus rye and blanco versus añejo do. That is the same judgement the
 rum names already encoded, so rum was never a special case, only the first
 place it hurt.
 
+**No brand appears on a card any more.** The three brand-generics #314 permits
+because nothing generalises the bottle -- Planteray O.F.T.D., Stiggins' Fancy,
+Malibu -- now carry DESCRIPTIVE card names: `blended overproof`, `pineapple
+rum`, `coconut rum`. That ruling is untouched; only the label changed, which is
+what card names are for. They were the only three brands on any card, so a
+reader met `O.F.T.D.` among `gin`, `cognac` and `sugar syrup` and learned
+nothing (#556 exactly). **Lowercasing is what surfaced it** -- `o.f.t.d.` reads
+badly in a way the capitalised form hid. Two of the three got LONGER; this buys
+legibility, not width.
+
 **Adding an entry changes what cards show with NO template edit**, because the
 template only ever looks a generic up in the map. That is worth knowing: card
 display is a data-layer change, which is how gin and syrup cards landed while

@@ -218,9 +218,25 @@ card_names:
   # The brand-generics #314 permits because nothing generalises them. O.F.T.D.
   # earns its place: its item strings are `Overproof Navy rum` and `Navy rum
   # (float)`, both of which name other rums elsewhere in the collection.
-  "Planteray Stiggins' Fancy": "Stiggins' Fancy"
-  "Planteray O.F.T.D. Overproof": "O.F.T.D."
-  "Malibu": "Malibu"
+  # THE THREE BRAND-GENERICS GET DESCRIPTIVE CARD NAMES -- Helen, 2026-08-29.
+  # #314 permits these three as generics because nothing generalises the BOTTLE;
+  # that ruling is untouched. What changes is only the card LABEL, which is what
+  # card names are for -- and these were the only three brands on any card, so
+  # a reader met `O.F.T.D.` among `gin`, `cognac` and `sugar syrup` and learned
+  # nothing from it (#556's worry, exactly).
+  #
+  # LOWERCASING IS WHAT SURFACED IT. `o.f.t.d.` and `stiggins' fancy` read badly
+  # in a lowercase line in a way the capitalised forms hid.
+  #
+  # Real estate goes the other way for two of the three and that is fine: this
+  # buys legibility, not width. O.F.T.D. 8 -> 17 chars, Malibu 6 -> 11,
+  # Stiggins' Fancy 15 -> 13.
+  "Planteray Stiggins' Fancy": "pineapple rum"
+  # Guyana/Jamaica/Barbados at 69%, so "blended overproof" is what it IS rather
+  # than a summary of it. Distinct from `Demerara overproof rum` and
+  # `Jamaican overproof rum`, which are the single-origin overproofs.
+  "Planteray O.F.T.D. Overproof": "blended overproof"
+  "Malibu": "coconut rum"
   "cachaça": "cachaça"
   "Batavia arrack": "Batavia arrack"
   # THE FIRST NON-RUM ENTRY, and it is deliberate. Helen, 2026-08-27, on Ceylon
