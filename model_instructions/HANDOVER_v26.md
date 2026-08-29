@@ -136,8 +136,15 @@ index.html              permalink /        a bare redirect to /food/
 `food/` and `cocktails/` hold each site's **pages**, not their collections.
 
 `_food_drafts/` and `_cocktail_drafts/` are each their own nested git repo
-(gitignored from this one — see `.gitignore`), pushed to a separate private
-GitHub repo. `output: false` only stops Jekyll rendering them; the repo
+(gitignored from this one — see `.gitignore`), pushed to a private GitHub repo
+of its own: **`helen-triages-food-private`** and
+**`helen-triages-cocktails-private`**. The food one was `helen-triages-private`
+until 2026-08-29 and the pairing was the reason for renaming it — one name said
+which site it belonged to and the other did not. GitHub redirects the old name,
+so an un-updated remote keeps working and will not tell you it is stale; run
+`git remote -v` in `_food_drafts/` rather than assuming. A fine-grained token's
+repository selection follows a rename automatically (it is by repo ID, not by
+name), so `GH_TOKEN` needs nothing doing to it. `output: false` only stops Jekyll rendering them; the repo
 split is what keeps their source out of a public repo regardless of build
 config. A draft is promoted to `_food_recipes/` — and so becomes public the
 moment this repo deploys — only once it contains no copyright material
