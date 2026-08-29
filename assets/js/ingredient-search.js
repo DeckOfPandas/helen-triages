@@ -34,6 +34,44 @@
     return str.toLowerCase().trim().split(/[\s-]+/).filter(Boolean);
   }
 
+  // ---------------------------------------------------------------------------
+  // THE THREE-BAND RULE — the one place the ORDERING is written down.
+  // ---------------------------------------------------------------------------
+  //
+  //   1  the entry STARTS with the query        "lime juice" for "li"
+  //   2  some word in the entry starts with it  "apricot liqueur" for "li"
+  //   3  the entry is in the list for some other reason
+  //
+  // Band 3 deliberately does NOT get promoted into band 1, or a mid-word
+  // coincidence ranks alongside the thing you were obviously typing --
+  // "chocolate chips" beside "chicken breast" for "chi".
+  //
+  // SHARED WITH COCKTAILS SINCE #579, AND ONLY THIS MUCH IS SHARED. What band 3
+  // MEANS differs by site (here, a curated family member; on the cocktail index,
+  // a plain substring hit) and so do the two predicates, because each is
+  // answered in its own vocabulary -- singulars and synonyms here, a flat
+  // declared list there. The ordering is the part that was written twice and
+  // the part that would silently drift, so the ordering is the part extracted.
+  // assets/js/cocktail-search.js calls orderByBand and computes its own
+  // isPrefixMatch/hasWordMatch; cocktail-index.js used to re-derive both.
+  //
+  // A candidate is any object carrying `isPrefixMatch` and `hasWordMatch`.
+  function bandOf(candidate) {
+    if (candidate.isPrefixMatch) return 1;
+    if (candidate.hasWordMatch) return 2;
+    return 3;
+  }
+
+  // STABLE WITHIN A BAND, and that is load-bearing rather than incidental:
+  // "alphabetical within each band" comes free only because the input list is
+  // already sorted and this preserves that order. A comparator-based sort would
+  // not promise it.
+  function orderByBand(candidates) {
+    var bands = [[], [], []];
+    candidates.forEach(function (c) { bands[bandOf(c) - 1].push(c); });
+    return bands[0].concat(bands[1], bands[2]);
+  }
+
   // Builds a matcher bound to one vocabulary (the parsed contents of
   // _data/ingredient_words.yml). Everything below is a closure over the
   // word lists so they're only ever parsed once.
@@ -347,15 +385,12 @@
           });
           multiMatches.push({ ing: ing, ingKey: ingKey, isPrefixMatch: isPrefixMatch, hasWordMatch: hasWordMatch });
         });
-        // Three-band order, same as the single-word path below: entries
-        // starting with the query outrank everything else; within the
-        // rest, a genuine word match outranks one included only because a
-        // query word happened to sit mid-word somewhere in the phrase.
-        var multiPrefix = multiMatches.filter(function (c) { return c.isPrefixMatch; });
-        var multiRestMatched = multiMatches.filter(function (c) { return !c.isPrefixMatch && c.hasWordMatch; });
-        var multiRestOther = multiMatches.filter(function (c) { return !c.isPrefixMatch && !c.hasWordMatch; });
+        // Three-band order, same as the single-word path below — orderByBand
+        // above, shared with the cocktail index since #579 rather than spelled
+        // out here for the second time in this function and the third in the
+        // repo.
         var multiResults = [];
-        multiPrefix.concat(multiRestMatched, multiRestOther).forEach(function (c) {
+        orderByBand(multiMatches).forEach(function (c) {
           if (!renderedKeys.has(c.ingKey)) {
             renderedKeys.add(c.ingKey);
             multiResults.push({ ing: c.ing, label: getDisplayLabel(c.ing), isPrefixMatch: c.isPrefixMatch, hasWordMatch: c.hasWordMatch });
@@ -458,20 +493,13 @@
         }
       });
 
-      // Render order, three bands: entries starting with the query outrank
-      // everything else, full stop. Within the rest, a genuine word match
-      // ("cream cheese") outranks a family-only member ("cheddar") —
-      // deliberately NOT promoted as far as the prefix tier, or "chocolate
-      // chips" (word-matched for "chi" via "chips") would rank alongside
-      // "chicken breast" again. Alphabetical within each band —
-      // masterIngredientsList is already sorted, and filtering preserves
-      // that order.
-      var prefixMatches = candidates.filter(function (c) { return c.isPrefixMatch; });
-      var restMatched = candidates.filter(function (c) { return !c.isPrefixMatch && c.hasWordMatch; });
-      var restFamilyOnly = candidates.filter(function (c) { return !c.isPrefixMatch && !c.hasWordMatch; });
-
+      // Render order, three bands — orderByBand above, which is where the rule
+      // and its reasoning now live. Here band 3 is a family-only member
+      // ("cheddar" for "chees"), deliberately not promoted as far as the prefix
+      // tier. Alphabetical within each band — masterIngredientsList is already
+      // sorted, filtering preserves that order, and orderByBand is stable.
       var results = [];
-      prefixMatches.concat(restMatched, restFamilyOnly).forEach(function (c) {
+      orderByBand(candidates).forEach(function (c) {
         if (!renderedKeys.has(c.normKey)) {
           renderedKeys.add(c.normKey);
           results.push({ ing: c.ing, label: getDisplayLabel(c.ing), isPrefixMatch: c.isPrefixMatch, hasWordMatch: c.hasWordMatch });
@@ -489,7 +517,13 @@
     };
   }
 
-  var api = { fold: fold, getWords: getWords, create: create };
+  var api = {
+    fold: fold,
+    getWords: getWords,
+    bandOf: bandOf,
+    orderByBand: orderByBand,
+    create: create
+  };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;
