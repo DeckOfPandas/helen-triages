@@ -805,6 +805,41 @@ gate would be gone and the build green.
   ~30 recipes. Keep the same discipline in any commentary/reasoning that
   quotes the source at length; the trigger isn't obviously scoped to file
   writes alone.
+- **SPLIT `ingredient_groups` AND `method_groups` AT INGEST, ONCE — and never
+  again afterwards.** Helen's request, restated 2026-08-29 when she found it was
+  not written down anywhere: *"Claude is requested to split out ingredient and
+  method groups at ingest to help me, then not again after that."*
+
+  **The two halves are one instruction and neither works alone.**
+
+  AT INGEST, do it unasked. A transcribed recipe arrives as a flat
+  `ingredient_groups` with one unnamed group and a flat `method:`, and phases
+  are usually obvious from the source — a custard, then a meringue, then the
+  assembly. Splitting them is cheap while you already have the whole recipe in
+  front of you and expensive later, because it means re-reading it. Group names
+  are bare nouns for ingredients (`dressing`, never `for the dressing`); method
+  group names render bare and MAY be narrative phases (`day before: prepare the
+  beef`). Stored casing does not matter — the template uppercases both.
+
+  AFTER INGEST, never regroup unprompted. This is §12's "don't tidy a draft you
+  were not asked to tidy" applied to the one edit most likely to look like an
+  improvement, and on a published recipe it is worse than untidy: regrouping is
+  a real content edit and takes `meta.proofread` down with it (§4.0). If a draft
+  looks like it wants groups, say so and leave it.
+
+  **THIS WAS NOT WRITTEN ANYWHERE UNTIL NOW, AND THE COST WAS VISIBLE.** The
+  only mention in this file was one clause inside the `meta.claude_rewritten`
+  paragraph above, describing what a *requested* tidy-up pass does — not an
+  ingest instruction, and silent on the once-only half. Checked with `git log
+  -S` rather than assumed: that clause arrived with #418 and no ingest-time
+  version has ever existed. So Helen had been typing
+  `CLAUDE THIS IS A METHOD GROUP` into draft method steps by hand — three times
+  in `meringue-swans-with-diplomat-cream.md` alone, which is exactly the work
+  this instruction exists to have already done.
+
+  `test_no_claude_markers_left` catches those markers, so the workaround at
+  least fails loudly rather than shipping. It is still a workaround for a
+  missing instruction.
 - `incidental: true` on an ingredient item (e.g. frying oil, greasing
   butter) marks it as a cooking fluid rather than a real recipe component —
   Helen: "It's silly to write '2 tbsp olive oil' for a sear, when people
