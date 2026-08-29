@@ -67,32 +67,41 @@
      written down in this file; to change either, edit the YAML. Same contract
      food/index.html has with filters.js, and the same fallback: a page without
      the block still searches, it just offers no (all) buttons. */
-  var VOCABULARY = (function () {
-    var fallback = { search: { min_query_chars: 2, family_button_min_chars: 3, pool_cap: 8 },
-                     families: [], family_of: {}, card_names: {} };
-    var node = document.getElementById('drink-vocabulary');
+  function readJson(id, what, fallback) {
+    var node = document.getElementById(id);
     if (!node) {
       console.warn(
-        'cocktail-index.js: no #drink-vocabulary block found. cocktails/index.html ' +
-        'should emit _data/cocktails/ingredients.yml as JSON before loading this ' +
-        'script. Ingredient search will run without declared families.'
+        'cocktail-index.js: no #' + id + ' block found. cocktails/index.html ' +
+        'should emit ' + what + ' as JSON before loading this script.'
       );
       return fallback;
     }
     try {
-      var parsed = JSON.parse(node.textContent);
-      parsed.search = parsed.search || fallback.search;
-      parsed.families = parsed.families || [];
-      parsed.family_of = parsed.family_of || {};
-      parsed.card_names = parsed.card_names || {};
-      return parsed;
+      return JSON.parse(node.textContent);
     } catch (e) {
-      console.warn('cocktail-index.js: could not parse #drink-vocabulary — ' + e.message);
+      console.warn('cocktail-index.js: could not parse #' + id + ' — ' + e.message);
       return fallback;
     }
+  }
+
+  var VOCABULARY = (function () {
+    var fallback = { search: { min_query_chars: 2, family_button_min_chars: 3, pool_cap: 8 },
+                     families: [], family_of: {}, card_names: {} };
+    var parsed = readJson('drink-vocabulary', '_data/cocktails/ingredients.yml', fallback);
+    parsed.search = parsed.search || fallback.search;
+    parsed.families = parsed.families || [];
+    parsed.family_of = parsed.family_of || {};
+    parsed.card_names = parsed.card_names || {};
+    return parsed;
   })();
 
-  var Search = CS.create(VOCABULARY);
+  /* The bottle dictionary (#529). Absent, the pool still works and still refuses
+     a disjunction -- that rule is structural -- but two spellings of one bottle
+     stop collapsing. A degraded picker, not a broken page. */
+  var BOTTLES = readJson('drink-bottles', '_data/cocktails/bottles.yml',
+                         { bottles: {}, unresolved_suggestions: {} });
+
+  var Search = CS.create(VOCABULARY, BOTTLES);
 
   /* ONE state object, not five loose variables — GitHub issue #579. The fields,
      their cleared values and the "is anything set" answer all come from

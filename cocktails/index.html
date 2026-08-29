@@ -372,6 +372,24 @@ permalink: /cocktails/
     {{ site.data.cocktails.ingredients | jsonify }}
   </script>
 
+  {% comment %} THE BOTTLE DICTIONARY, #529. The search reads it for two things
+     and both are Helen's, 2026-08-29:
+
+       "'wray and nephew' and 'wray & nephew' should both collapse onto the
+       latter" -- `aliases` is how a bottle keeps ONE identity, which that file
+       has said since it was written and the search had never read. HANDOVER
+       §9.10.1 names the gap: "suggestions go in raw rather than resolved through
+       bottles.yml's aliases, so `Havana 3` and `Havana Club 3` can both appear."
+
+       "I don't want any returned search chips to be an X or Y shape" --
+       `unresolved_suggestions` is that file's own list of the ten suggestion
+       strings that are not a usable bottle name, each carrying its reason.
+
+     7 KB, and public in this repo already. {% endcomment %}
+  <script type="application/json" id="drink-bottles">
+    {{ site.data.cocktails.bottles | jsonify }}
+  </script>
+
   {% comment %} ORDER MATTERS, and each of these is read at startup rather than
      on first use, so a page that loads them out of order fails immediately
      rather than on the first keystroke:

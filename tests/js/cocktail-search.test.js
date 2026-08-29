@@ -44,6 +44,11 @@ const VOCAB = {
     'Campari': 'amaro',
     'Aperol': 'amaro'
   },
+  // A list-valued key is a generic vocabulary — that is how the module tells a
+  // name Helen chose from text someone transcribed, the same shape
+  // test_cocktails.py's _declared_generics reads.
+  syrups: ['ginger and lemongrass cordial', 'sugar syrup 1:1', 'sugar syrup 2:1'],
+  cane_and_palm_spirits: ['coconut rum', 'moderately aged rum'],
   card_names: {
     'London dry gin': 'gin',
     'aged Demerara rum': 'Demerara rum',
@@ -55,7 +60,30 @@ const VOCAB = {
   }
 };
 
-const S = CS.create(VOCAB);
+// _data/cocktails/bottles.yml, trimmed to the keys this module reads. A bottle
+// keeps ONE identity through its aliases; `unresolved_suggestions` is the file's
+// own declared list of suggestion strings that are not a usable bottle name,
+// each carrying its reason.
+const BOTTLES = {
+  bottles: {
+    'Wray & Nephew': {
+      generic: 'unaged overproof Jamaican rum',
+      aliases: ['Wray and Nephew', 'Wray & Nephew Overproof']
+    },
+    'El Dorado 3': { generic: 'lightly aged and filtered rum', aliases: ['ED3', 'El Dorado 3yo'] },
+    'Rum Fire': { generic: 'unaged overproof Jamaican rum' },
+    // The measured collision: `coconut rum` is a DECLARED GENERIC and also a
+    // declared alias of this bottle. Resolving it would put a brand back into
+    // the picker, reversing #501.
+    'Malibu': { generic: 'coconut rum', aliases: ['Coconut rum'] }
+  },
+  unresolved_suggestions: {
+    'Wray & Nephew, or Rum Fire': 'Two bottles in one string; wants the list form.',
+    'ED3 or Havana 3': 'Two bottles in one string; wants the list form.'
+  }
+};
+
+const S = CS.create(VOCAB, BOTTLES);
 
 // The attribute cocktails/index.html writes: entries joined and terminated with
 // `|`, the whole thing downcased at build time.
@@ -480,6 +508,85 @@ test('both rules fold, so an accented ingredient is filterable at all', () => {
   const entries = CS.splitEntries(attr('crème de cassis'));
   assert.strictEqual(S.matchesInclude(entries, 'creme de cassis'), true);
   assert.strictEqual(S.matchesExclude(entries, 'creme de cassis'), true);
+});
+
+// =============================================================================
+// A CHIP IS NEVER AN "X or Y" — Helen, 2026-08-29
+// =============================================================================
+// "I don't want any returned search chips to be an X or Y shape. Also, 'wray and
+// nephew' and 'wray & nephew' should both collapse onto the latter."
+//
+// Both are answered by the same change, and _data/cocktails/bottles.yml had
+// already declared both answers -- the search simply never read it. HANDOVER
+// §9.10.1 names the gap outright: "suggestions go in raw rather than resolved
+// through bottles.yml's aliases, so `Havana 3` and `Havana Club 3` can both
+// appear."
+//
+// THE RULES APPLY TO SUGGESTIONS ONLY, never to declared vocabulary. A generic
+// is a name Helen chose; a suggestion is free text typed while transcribing.
+// `ginger and lemongrass cordial` is a real generic and a blanket connector ban
+// would have eaten it.
+
+test('a bottle keeps ONE identity: an alias collapses onto the canonical name', () => {
+  const pool = S.buildPool([attr('wray and nephew'), attr('wray & nephew')]);
+  assert.deepStrictEqual(labels(pool), ['Wray & Nephew']);
+});
+
+test('the alias is still what FINDS it -- collapsing must not lose a way in', () => {
+  const pool = S.buildPool([attr('wray and nephew')]);
+  assert.deepStrictEqual(S.search('nephew', pool).results.map((r) => r.entry), ['Wray & Nephew']);
+  assert.deepStrictEqual(S.search('ed3', S.buildPool([attr('ed3')])).results.map((r) => r.entry),
+    ['El Dorado 3']);
+});
+
+test('a chip resolved to its canonical name still filters the drink that named the alias', () => {
+  const drink = CS.splitEntries(attr('wray and nephew', 'lime juice'));
+  assert.strictEqual(S.matchesInclude(drink, 'Wray & Nephew'), true);
+  assert.strictEqual(S.matchesExclude(drink, 'Wray & Nephew'), true);
+});
+
+test('a suggestion the bottle file calls unresolved is not offered at all', () => {
+  const pool = S.buildPool([attr('wray & nephew, or rum fire'), attr('ed3 or havana 3')]);
+  assert.deepStrictEqual(labels(pool), []);
+});
+
+test('an "X or Y" suggestion is dropped even when nothing has declared it', () => {
+  // bottles.yml is a RUM file, so the bitters and the syrups are not in it and
+  // never will be. The shape is the rule, not the declaration.
+  const pool = S.buildPool([attr('or other aromatic bitters', 'Or 20g palm sugar')]);
+  assert.deepStrictEqual(labels(pool), []);
+});
+
+test('the ban is on the CONNECTOR, not on the letters o-r', () => {
+  const pool = S.buildPool([attr('orgeat', 'orange juice', 'cointreau')]);
+  assert.deepStrictEqual(labels(pool), ['cointreau', 'orange juice', 'orgeat']);
+});
+
+test('a declared generic is never dropped, whatever it happens to contain', () => {
+  // `ginger and lemongrass cordial` is a real generic, which is why the ban is
+  // on "or" and not on connectors generally.
+  const pool = S.buildPool([attr('ginger and lemongrass cordial')]);
+  assert.deepStrictEqual(labels(pool), ['ginger and lemongrass cordial']);
+});
+
+test('a declared generic is never resolved into a BOTTLE, and one really collides', () => {
+  // `coconut rum` is a declared generic AND a declared alias of Malibu. The one
+  // collision of the 173 declared names against the 97 bottle names and
+  // aliases, measured -- and without the boundary it would silently put a brand
+  // back into the picker, reversing #501's "no brand appears on a card any
+  // more". A guard for exactly one case, and the case is real.
+  const pool = S.buildPool([attr('coconut rum')]);
+  assert.deepStrictEqual(labels(pool), ['coconut rum']);
+  const drink = CS.splitEntries(attr('coconut rum'));
+  assert.strictEqual(S.matchesInclude(drink, 'coconut rum'), true);
+});
+
+test('with no bottle file the pool still works, and still refuses an X or Y', () => {
+  // The page must survive the JSON block being absent -- same stance
+  // filters.js takes on a missing #ingredient-vocabulary.
+  const bare = CS.create(VOCAB);
+  const pool = bare.buildPool([attr('wray and nephew', 'ed3 or havana 3', 'lime juice')]);
+  assert.deepStrictEqual(labels(pool), ['lime juice', 'wray and nephew']);
 });
 
 // --- the name search ---------------------------------------------------------

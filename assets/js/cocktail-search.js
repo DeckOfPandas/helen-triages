@@ -134,9 +134,29 @@
     return normalise(value.slice(0, -FAMILY_SUFFIX.length));
   }
 
-  function create(vocabulary) {
+  /* AN "X or Y" IS NEVER A CHIP — Helen, 2026-08-29: "I don't want any returned
+     search chips to be an X or Y shape."
+
+     A disjunction is not an ingredient. It is a transcription of a choice, and
+     as a filter it means nothing: clicking `ED3 or Havana 3` would ask for
+     drinks whose ingredient list contains that literal sentence.
+
+     THE CONNECTOR, NOT THE LETTERS. `orgeat`, `orange juice` and `Cointreau` all
+     contain "or" and none of them is a disjunction. Measured before this was
+     applied to every term rather than to suggestions alone: of the 173 declared
+     generics and card names, ZERO contain an " or " connector, so this can never
+     eat a name Helen chose. `and` is deliberately NOT banned -- `Wray and
+     Nephew` is one bottle and `ginger and lemongrass cordial` is one generic. */
+  var DISJUNCTION = /(^|[\s,])or([\s,]|$)/i;
+
+  function isDisjunction(term) {
+    return DISJUNCTION.test(String(term == null ? '' : term));
+  }
+
+  function create(vocabulary, bottleData) {
     var voc = vocabulary || {};
     var cfg = voc.search || {};
+    var bottles = bottleData || {};
 
     /* Three numbers, and none of them is written down in this file. They live
        in _data/cocktails/ingredients.yml beside the vocabulary they govern,
@@ -230,6 +250,86 @@
       return chipCovers[key] || [key];
     }
 
+    /* ---------------------------------------------------------------------
+       DECLARED VOCABULARY versus TRANSCRIBED TEXT
+       ---------------------------------------------------------------------
+       A generic or a card name is a name Helen chose. A suggestion is free text
+       typed while transcribing a recipe, and it is the only one of the three
+       that arrives carrying sentences. The two rules below apply to the second
+       kind and must never touch the first.
+
+       THIS IS NOT DEFENSIVENESS, IT IS ONE MEASURED CASE: `coconut rum` is a
+       declared generic AND a declared alias of the bottle `Malibu`. Without
+       this boundary the `coconut rum` chip would resolve to `Malibu`, putting a
+       brand back into the picker and reversing #501's ruling that no brand
+       appears on a card. It is the only collision of the 173 against the 97,
+       and it would have been a silent regression.
+
+       Derived from the file's own shape, exactly as test_cocktails.py's
+       _declared_generics does: every list-valued key is a generic vocabulary
+       except `families` and the `<family>_characters` lists. A group added to
+       the YAML is covered by the line that adds it. */
+    var declaredVocabulary = Object.create(null);
+    Object.keys(voc).forEach(function (key) {
+      if (key === 'families' || /_characters$/.test(key)) return;
+      if (!Array.isArray(voc[key])) return;
+      voc[key].forEach(function (value) { declaredVocabulary[normalise(value)] = true; });
+    });
+    Object.keys(cardNames).forEach(function (generic) {
+      declaredVocabulary[normalise(generic)] = true;
+      declaredVocabulary[normalise(cardNames[generic])] = true;
+    });
+
+    function isDeclared(term) {
+      return !!declaredVocabulary[normalise(term)];
+    }
+
+    /* A BOTTLE KEEPS ONE IDENTITY — Helen: "'wray and nephew' and 'wray &
+       nephew' should both collapse onto the latter." bottles.yml has said so
+       since #529 ("ALIASES ARE HOW A BOTTLE KEEPS ONE IDENTITY... add the
+       spelling, do not add a second bottle") and the search had never read it,
+       which HANDOVER §9.10.1 names as the known excess: "suggestions go in raw
+       rather than resolved through bottles.yml's aliases, so `Havana 3` and
+       `Havana Club 3` can both appear." 97 names and aliases over 38 bottles. */
+    var bottleCanonical = Object.create(null);
+    Object.keys(bottles.bottles || {}).forEach(function (name) {
+      // A bottle whose NAME is also declared vocabulary is not a bottle here --
+      // #314 permits three brands as generics precisely because nothing
+      // generalises them, and their chip is the descriptive card name.
+      if (isDeclared(name)) return;
+      bottleCanonical[normalise(name)] = name;
+      cover(name, name);
+      ((bottles.bottles[name] || {}).aliases || []).forEach(function (alias) {
+        if (isDeclared(alias)) return;
+        bottleCanonical[normalise(alias)] = name;
+        // So the chip SELECTS the drink that named the alias, not merely finds
+        // it: a drink listing `wray and nephew` must answer to `Wray & Nephew`
+        // in the exclude direction too, where there is no fuzzy reach to save it.
+        cover(name, alias);
+      });
+    });
+
+    /* The bottle file's OWN list of suggestion strings that are not a usable
+       bottle name -- ten of them, each carrying the reason it is unresolved and
+       what shape it wants instead. Declared there rather than detected here,
+       because "two bottles in one string, in two categories" is a judgement
+       about the drinks and not a fact about the characters. #585 is the backlog
+       of working them off. */
+    var unresolvedSuggestion = Object.create(null);
+    Object.keys(bottles.unresolved_suggestions || {}).forEach(function (s) {
+      unresolvedSuggestion[normalise(s)] = true;
+    });
+
+    /* One term as it arrives on a card -> the chip it should become, or null to
+       offer it at all. Declared vocabulary passes through untouched. */
+    function resolveTerm(term) {
+      if (isDeclared(term)) return term;
+      if (isDisjunction(term)) return null;
+      var key = normalise(term);
+      if (unresolvedSuggestion[key]) return null;
+      return bottleCanonical[key] || term;
+    }
+
     /* One map, entry -> the families it belongs to, built once. A CARD NAME
        resolves through the generic it abbreviates, which matters because the
        pool contains both: a drink whose rum shows as "Demerara rum" on the card
@@ -288,11 +388,18 @@
     function buildPool(attrValues) {
       var byValue = Object.create(null);
       (attrValues || []).forEach(function (value) {
-        splitEntries(value).forEach(function (entry) {
+        splitEntries(value).forEach(function (raw) {
+          // A disjunction, or a suggestion the bottle file calls unresolved,
+          // never becomes a chip at all; an aliased bottle becomes its
+          // canonical self. See resolveTerm above.
+          var entry = resolveTerm(raw);
+          if (entry === null) return;
           var chipValue = chipForTerm[normalise(entry)] || entry;
           var key = normalise(chipValue);
           if (!byValue[key]) byValue[key] = { value: chipValue, terms: [] };
-          [entry].concat(coveredBy(chipValue)).forEach(function (t) {
+          // The RAW term stays searchable, so collapsing a spelling never loses
+          // a way in: typing "wray and nephew" still finds `Wray & Nephew`.
+          [raw, entry].concat(coveredBy(chipValue)).forEach(function (t) {
             if (byValue[key].terms.indexOf(t) === -1) byValue[key].terms.push(t);
           });
         });

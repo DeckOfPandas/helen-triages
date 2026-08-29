@@ -2273,12 +2273,23 @@ def test_the_cocktail_vocabulary_is_emitted_to_the_page():
         "the coupling #501 values card_names for not having."
     )
 
-    vocab_at = html.index('id="drink-vocabulary"')
-    script_at = html.index("assets/js/cocktail-search.js")
-    assert vocab_at < script_at, (
-        "The drink-vocabulary block must appear BEFORE the cocktail-search.js "
-        "script tag, or the JSON is not in the DOM when the module is created."
+    assert 'id="drink-bottles"' in html, (
+        "cocktails/index.html no longer emits an id=\"drink-bottles\" block. The "
+        "search reads _data/cocktails/bottles.yml for two of Helen's rules: a "
+        "bottle keeps ONE identity through its aliases (`wray and nephew` and "
+        "`wray & nephew` collapse onto the latter), and the ten strings that "
+        "file declares `unresolved_suggestions` are not offered as chips at all."
     )
+    assert "site.data.cocktails.bottles | jsonify" in html, (
+        "the drink-bottles block no longer emits _data/cocktails/bottles.yml."
+    )
+
+    script_at = html.index("assets/js/cocktail-search.js")
+    for block in ("drink-vocabulary", "drink-bottles"):
+        assert html.index('id="%s"' % block) < script_at, (
+            f"The {block} block must appear BEFORE the cocktail-search.js script "
+            f"tag, or the JSON is not in the DOM when the module is created."
+        )
 
 
 def test_the_cocktail_index_scripts_load_in_dependency_order():
