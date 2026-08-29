@@ -234,11 +234,20 @@ permalink: /cocktails/
       {% endif %}
 
       {% comment %} The searchable ingredient text, built once at build time so
-         the script never has to read the rendered markup: `generic` is what you
-         would ever filter by (the schema note in _layouts/cocktail.html), with
-         `item` alongside it because a bottle name is a reasonable thing to
-         type. Lowercased here so the script can compare without lowering 115
-         strings on every keystroke. {% endcomment %}
+         the script never has to read the rendered markup. THREE SOURCES, and
+         `item` is deliberately not one of them: the VOCABULARY (`generic`), the
+         short form the card shows (`card_names`), and the bottle a drink
+         actually suggests. `item` is the transcription — #544 retires it from
+         display and #558 took it out of here, because 307 raw item strings were
+         what made typing "li" offer nine spellings of one rum.
+
+         This comment said `item` was included until 2026-08-29, three commits
+         after it stopped being. A comment describing code that no longer exists
+         is the mirror of the trap in HANDOVER 12 where prose defeats a
+         source-scanning guard, and it is the more common direction.
+
+         Lowercased here so the script can compare without lowering 115 strings
+         on every keystroke. {% endcomment %}
       {% comment %} `generic` IS A STRING OR A LIST and Liquid's `for` quietly
          treats a bare string as a one-item sequence — verified against the real
          liquid gem by _layouts/cocktail.html, not assumed — so one loop handles

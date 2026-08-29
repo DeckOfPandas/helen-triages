@@ -2272,60 +2272,36 @@ generator, §13.8 for the sizing mechanism, and the note at the top of
 
 ---
 
-### 9.9 The index browses by goodness, and `meta.ship` IS the rating
+### 9.9 `meta.ship` IS the rating, and the vocabulary outlived the feature
 
-> **SUPERSEDED AS A DESCRIPTION OF THE INDEX, 2026-08-26 — see §9.13.** The
-> goodness-only filter described below was a twenty-minute build with friends
-> arriving, and it has been replaced by a designed index: mood and chaos above
-> the fold, ingredient include then exclude below, cards rather than a list.
-> `_sass/cocktails/_goodness.scss` is deleted.
->
-> **Everything below about the VOCABULARY still holds and is why the new index
-> was cheap.** `meta.ship` is still the rating, `ship_scale` is still its
-> order, and the lesson in the stale-ordering-list paragraph is now enforced
-> rather than remembered: the new index derives chaos buckets and the goodness
-> tint from `_data/cocktails/taxonomy.yml` instead of hardcoding a value list
-> in the template, which is exactly the failure that paragraph describes.
+**CUT 2026-08-29.** This section described a goodness-only filter built in
+twenty minutes on 2026-08-23, which §9.13's designed index replaced three days
+later (`_sass/cocktails/_goodness.scss` is deleted). The UI description was
+already flagged superseded and is now gone; three lessons survive it, and the
+first is the one that made the replacement cheap.
 
-2026-08-23. Helen asked for "filter buttons on the front page to show me a list
-of recipes by goodness, e.g. 'oh gods yes'." The field already existed. `meta.ship`
-is not a yes/no publish flag despite the name — it holds her own verdict, in her
-own words, and "oh gods yes" was already on 18 drinks. The distribution when this
-was built (`okay`/`maybe` collapsed into `meh` in the same session, just after):
+**Look for the vocabulary before inventing one.** `meta.ship` already held
+Helen's own verdict in her own words — "oh gods yes" was on 18 drinks before
+anyone asked for a rating. The whole feature was a template and a stylesheet: no
+new field, no migration, nothing for her to fill in. A scale designed from
+scratch would have been worse AND needed 115 decisions from her. `ship_scale` in
+`_data/cocktails/taxonomy.yml` is the order; `who knows` and `QQ` sit off it
+deliberately (see the file's own comment).
 
-    yes 37 · QQ 19 · oh gods yes 18 · meh 17 (was okay 14 + maybe 3) ·
-    who knows 12 · sure 6 · not really 5
+**A HARDCODED VALUE LIST AND THE VOCABULARY IT ENUMERATES WILL DRIFT, AND THE
+BREAK IS SILENT.** That template hardcoded its own ordering string, and the
+`meh` collapse landed in a *different, still-unmerged* PR the same day. Nothing
+would have crashed — an unlisted value "just sorts last" by design — so 17
+drinks, the biggest bucket after yes/QQ/oh-gods-yes, would have sorted dead last
+the moment both PRs merged. **Neither branch's own tests could have caught it,
+because each was green in isolation**; it took rebuilding the combined state of
+both locally. The new index derives its buckets and tint from `taxonomy.yml`
+instead, which is the enforcement version of this paragraph.
 
-**The template's own ordering list went stale within the same day.** It
-hardcoded `"oh gods yes,yes,sure,okay,maybe,not really,who knows,QQ"` — and
-the `meh` collapse landed in a *different, still-unmerged* PR at the same
-time. Nothing crashed (an unlisted value "just sorts last", by the page's
-own design), but it meant 17 drinks — the single biggest bucket after
-yes/QQ/oh-gods-yes — would have silently sorted dead last instead of between
-`sure` and `not really` the moment both PRs merged. Caught by rebuilding the
-combined state of both pending branches locally before trusting either one
-was done; neither branch's own tests could have caught it, because each was
-green in isolation. Fixed to `"oh gods yes,yes,sure,meh,not really,who
-knows,QQ"`. **Whenever a hardcoded value list and a vocabulary it enumerates
-live in different files (worse, different repos), a change to one is a
-silent break in the other until someone rebuilds both together.**
+**The index reads DRAFTS, not recipes.** There are 115 cocktail drafts and zero
+promoted recipes, so the index before this one looped `site.cocktail_recipes` —
+an empty collection — and had done since it was written.
 
-**Look for the vocabulary before inventing one.** The whole feature was a
-template and a stylesheet; no new field, no migration, and nothing for Helen to
-fill in. A rating scale designed from scratch would have been worse AND would
-have needed 115 decisions from her.
-
-**The index reads DRAFTS, not recipes**, and this is not a shortcut: there are
-115 cocktail drafts and **zero** promoted cocktail recipes, so the previous
-index — a bare `<ul>` over `site.cocktail_recipes` — was looping an empty
-collection and had been since it was written.
-
-Ordering is declared in the template, not derived. Nothing about the strings
-says "oh gods yes" beats "sure". Any value not in the declared list still
-renders and still filters, so a word Helen invents mid-session sorts last
-rather than vanishing.
-
----
 
 ### 9.10 The drink page's ingredient line — #544/#513, 2026-08-29
 
@@ -3479,162 +3455,59 @@ red, and a red suite hides a real cocktails regression. `test_suite_hygiene.py`
 asserts every module declares one, because an unmarked file is silently missed
 by every filtered run.
 
-### 10.1 The 2026-08-12 issue audit
+### 10.1 Standing rules that came out of the 2026-08-12 issue audit
 
-Helen's own framing: "I keep getting confused… I'm concerned that issues we
-closed in the last few days weren't represented as tests — I wasn't paying
-attention, and I'm not sorry, because that's part of the experiment, but I
-still don't want to end up in a mess." The finding: of ~35 real (non-PR)
-issues closed 2026-08-10 through 2026-08-12, most had a matching test, but
-a real cluster didn't — closed by hand, correctly, with nothing guarding
-the fix afterward. Method: grepped every test file for `issue #NNN`
-citations, diffed that set against the closed-issue list pulled via
-`curl` to the GitHub API (read-only at the time; **access changed
-2026-08-17** — Claude may now raise, close, comment on, label and assign
-issues via a fine-grained token, and nothing else. See CLAUDE.md), then
-checked each gap against the actual front matter before deciding whether it
-was a real gap, already-satisfied-but-untested, or a false alarm from a
-too-strict reading of the issue title.
+**CUT HARD 2026-08-29.** This section was 157 lines, most of it an enumeration
+of twenty-odd issues closed in August 2026 and the tests each became. Every one
+of those tests exists and states its own rule in its own docstring and assert
+message — §11 requires that — so the table was a second copy of information that
+maintains itself. Deleted rather than trimmed; `git log` and the tests are the
+record. What survives is the handful of rules that still govern behaviour today.
 
-**Fixed and now guarded** (GitHub issue → test): #147 main_ingredients
-egg/eggs count agreement (`test_main_ingredients_egg_count_agrees`,
-already-compliant data, pure regression guard) · #144/#145 egg size in
-`amount:` (`test_egg_size_is_stated`, one real placement bug fixed) · #149
-size word in `amount:` not `item:` (`test_size_word_is_with_the_count_not_
-the_item`, five real fixes — apples, lemons ×2, garlic, butter pats, not
-just #149's own carrot example) · #135 homemade pastry needs salt
-(`test_homemade_pastry_has_salt`, already compliant) · #138 unsalted
-butter needs salt or a note (`test_unsalted_butter_has_salt_or_a_note`,
-already compliant except one method-step wording nuance) · #171 garlic
-form (`test_garlic_specifies_form`, real main_ingredients fixes across 8
-recipes) · #173 loomi colour (`test_loomi_specifies_colour`, already
-compliant, one user) · #174 method-step notes read as sentences
-(`test_method_step_notes_are_sentences`, 18 real fixes across 13 recipes,
-the mirror-image convention to `test_ingredient_notes_are_lowercase_fragments`) · #172
-title/slug divergence (`test_title_and_slug_dont_diverge` in
-`test_taxonomy.py`, one real standing case — see below) · #170/#168
-quoting (`test_main_ingredients_entries_are_quoted`, `test_tags_entries_
-are_quoted`, `test_scalar_fields_are_quoted` — 125 + 94 + 284 unquoted
-values fixed across the whole collection; **deliberately excludes
-`meta:` booleans** — quoting `rewritten: true` would silently make it the
-string `"true"` and break every `is True` check in the suite, checked
-against the actual test code before touching a single value) · #169
-`short_name` removed entirely (zero template/JS/SCSS references found
-before removal; see §4).
+**The audit itself is worth being able to repeat, and it is three steps**: grep
+every test file for `issue #NNN` citations, diff that set against the closed-issue
+list from the GitHub API, then check each gap against the actual front matter
+before calling it a gap. Helen's framing, and the reason it happened: *"I'm
+concerned that issues we closed in the last few days weren't represented as
+tests... I still don't want to end up in a mess."* Most closures did have a test;
+a real cluster did not.
 
-**`test_milk_specifies_type` was a standing checklist, not a guard expected
-to be green** (same shape as `test_oven_temperature_says_fan`, §10 above,
-and now in the same state) — issue #167's 9-recipe backlog has since been
-worked through, the test passes, and a failure in it going forward is a
-real regression, not a known gap. The reason it was never a candidate for
-a bulk fix is still live: which milk a recipe actually used needed Helen's
-own source material or judgement, not a guess — "whole milk" could not be
-assumed blind for every unspecified case. If it goes red again, the same
-rule applies: it needs her judgement, not a mechanical fill-in.
+**TWO TESTS ARE EX-CHECKLISTS, AND A RED IN EITHER IS NOW A REAL REGRESSION.**
+`test_oven_temperature_says_fan` (#146, ~19 recipes) and
+`test_milk_specifies_type` (#167, 9 recipes) both started deliberately red as
+standing backlogs and were worked through by hand. Both pass now. **The reason
+neither was ever a candidate for a bulk fix is still live**: which figure of a
+fan/conventional pair is the fan one, and which milk a recipe actually used,
+are answerable only from the original source — never guessable from the file.
+If either goes red, get Helen's source material recipe by recipe; do not fix
+blind. (At INGEST this is cheap and the page is in front of you — see §4's
+ingest contract, which is why 39 drafts should never have reached this state.)
 
-**Retired 2026-08-12, Helen's explicit call, not fixed by filling in
-values**: `test_bake_eggs_state_a_weight` (#145's second half — a bake
-stating a gram weight/range for its eggs on top of the UK size band) and
-`test_fresh_aromatics_state_a_paste_equivalent` (#153/#155 — fresh
-ginger/garlic/lemongrass stating a paste/purée equivalent) are both gone,
-issues #181/#182 closed. Neither had a single compliant recipe as of
-2026-08-12; Helen decided the requirement itself wasn't worth keeping
-rather than working through the backlog by hand. `test_egg_size_is_stated`
-(UK size band, no gram weight) is unaffected and still enforced.
+**`test_ingredient_notes_are_lowercase_fragments` FLAGS AND NEVER FIXES.** One
+sentence, no trailing full stop, lower case unless the first word is `I` or a
+declared proper noun. Helen: *"I'll look at violations myself because I care
+about tone of voice."* Whether a capitalised first word wants lowercasing or
+belongs in `taxonomy.yml`'s `proper_nouns` is her call. Same standing rule as
+`QQ`: don't fix a violation unprompted.
 
-**Resolved 2026-08-12**: `ridiculously-good-oxtail-stew.md`'s title,
-"Sticky Oxtail Stew" (agreeing with its own tagline), had disagreed with
-its filename since before this HANDOVER's own §4 filename-stability rule
-started blocking an unprompted rename. Helen's explicit call: renamed the
-file to `sticky-oxtail-stew.md` rather than reverting the title.
-
-**Deliberately NOT ported to every value in the file, and why** (checked
-against real data before deciding, not assumed): the qualified-ingredient
-closed lists, `test_ingredient_notes_are_lowercase_fragments`, `test_ingredient_group_
-order_matches_title`, and `test_spice_order_within_group` were all
-considered for a draft-scoped version and rejected — see `test_drafts.py`'s
-own module docstring for the full reasoning per rule.
-
-`.node-runtime/node/bin/node --test` runs `tests/js/*.test.js` — five files
-today, listed in §3's module table. Node tests, not pytest, because they test JS
-modules directly. **This said "20 checks across two files" until 2026-08-21, when
-there were 161 across five**, which is the ordinary fate of a count written into
-prose: run the suite, don't quote from here.
-
-**`PLACEHOLDER` briefly existed as a second draft marker alongside `QQ`**
-(added 2026-08-09, its own `test_no_placeholder_marker`, after
-`roast-beef-fillet.md` published with literal "PLACEHOLDER - rewrite: ..."
-still in every method step) and was retired 2026-08-10 — one marker for
-everything now, not two. `test_no_qq_placeholder` covers both cases: a
-blank field (`cook_time: QQ`) and an un-rewritten ingest line
-(`QQ - rewrite: ...`). If you see `PLACEHOLDER` anywhere, it predates this
-retirement — treat it exactly as `QQ`, don't add a third marker, and see
-§4's ingest paragraph for the actual instruction.
-
-**`test_ingredient_notes_are_lowercase_fragments`** (`test_taxonomy.py`,
-renamed 2026-08-12 from `test_ingredient_annotation_style` so the failure
-summary states the rule without opening the file) checks: one sentence, no
-trailing full stop, lower case unless the first word is `I` or a declared
-proper noun. It only flags, never rewrites, because Helen said so directly:
-"I'll look at violations myself because I care about tone of voice."
-**Don't fix a future violation of this test unprompted** — whether a
-capitalised first word needs lowercasing or is actually a proper noun that
-belongs in `taxonomy.yml`'s `proper_nouns` list is her call, same standing
-rule as `QQ`.
-
-**The ~12-recipe backlog against that test was cleared 2026-08-09, at
-Helen's explicit in-session request** — this one batch was prompted, not a
-change to the standing rule above. Nearly all were mechanical (strip the
-full stop, lowercase the first word, leave mid-sentence proper nouns like
-Merlot or Ceylon alone). Three needed real judgement and are worth Helen
-double-checking the actual wording chosen, not just that the test now
-passes: `best-ever-chocolate-sponge-cake.md` and `chai-spice-powder.md`
-each had a genuine two-sentence note merged into one; `indonesian-chicken-
-curry-gulai-ayam.md`'s ginger note started "I'm", which the test doesn't
-exempt the way it exempts bare `I` (lowercasing to "i'm" would just be bad
-grammar), so the sentence was reworded to drop the leading "I'm" instead of
-touching the test.
-
-The `Estimated`-timing (§5), `QQ`-placeholder, `cherry-glaze.md`
-reversed-bracket-link, and the `test_typography`/
-`test_brown_sugar_is_soft_brown_sugar` failures on
-`indonesian-chicken-curry-gulai-ayam.md`, `mixed-spice-powder.md`,
-`citrus-soy-salmon-sticky-rice.md` and `miso-salmon-veg-traybake.md` that
-used to live in this list are all resolved (the last batch fixed
-2026-08-10, commit `117edc9`) — don't go looking for them.
-`peanut-butter-ice-cream` still links to `ben-jerrys-sweet-cream-base-1`,
-but that recipe was promoted out of drafts 2026-08-09, so the link is no
-longer to a draft.
-
-**`test_oven_temperature_says_fan` was a standing checklist, not a guard
-expected to be green, from issue #146 until the ~19-recipe backlog was
-worked through by hand — it passes now, and a failure in it is a real
-regression to investigate, not a known backlog to wave past.** The
-reasoning that made it a checklist rather than a bulk-fix in the first
-place is still live and still worth knowing: house style is fan-only, and
-fixing one of these recipes meant confirming from the *original source*
-which figure was the fan one — they aren't always in the same order in a
-fan/conventional pair (§5), so it could never have been guessed or
-bulk-fixed from the file alone. If this test goes red again, treat it the
-same way: don't attempt a fix blind, get Helen's source material or her
-direct confirmation, recipe by recipe.
+**`PLACEHOLDER` was a second draft marker for one day** (2026-08-09 to
+2026-08-10) and is retired; there is one marker, `QQ`. Roughly 190 old drafts
+still say `PLACEHOLDER - rewrite: ...`. Treat it exactly as `QQ`, leave it alone,
+and never add a third marker.
 
 **Which checks read `_food_drafts/` — ask the registry, not this file.** This
-section claimed "exactly three" until 2026-08-21, naming three, while the same
-section listed five a few hundred words above and `test_drafts.py`'s 31
-per-draft tests and the whole of `test_source_attribution.py` read them too. The
-number was wrong, it contradicted its own section, and there is a mechanical
-answer: `SKIPS_WITHOUT_DRAFTS` and `PARTIAL_IN_CI` in `test_suite_hygiene.py`
-are the registries, and `test_every_draft_reading_test_says_what_it_does_without_drafts`
-fails on any draft-reading test in neither.
+section claimed "exactly three" until 2026-08-21 while contradicting itself a few
+hundred words above. There is a mechanical answer: `SKIPS_WITHOUT_DRAFTS` and
+`PARTIAL_IN_CI` in `test_suite_hygiene.py`, enforced by
+`test_every_draft_reading_test_says_what_it_does_without_drafts`.
 
-The one that fires in practice is
-`test_no_main_ingredient_spelling_collisions`, when a new draft's spelling
-collides with an existing ingredient — it caught `"demerara sugar"` against four
-recipes' `"Demerara sugar"` on 2026-08-21. **Before reporting a new failure,
-check whether the file is a draft Helen just added:**
-`find _food_drafts -name '*.md' -mmin -120`. Don't chase it, don't tidy a
-draft you weren't asked to tidy.
+The one that fires in practice is `test_no_main_ingredient_spelling_collisions`,
+when a new draft's spelling collides with an existing ingredient — it caught
+`"demerara sugar"` against four recipes' `"Demerara sugar"` on 2026-08-21.
+**Before reporting a new failure, check whether the file is a draft Helen just
+added**: `find _food_drafts -name '*.md' -mmin -120`. Don't chase it, and don't
+tidy a draft you weren't asked to tidy.
+
 
 ### 10.2 Diagnosing decoration JS — the stub-DOM harness
 
@@ -4032,15 +3905,36 @@ the procedure and `scripts/tidy_drafts.py` is the engine — the first project
 slash command in this repo, and the first thing in `.claude/` that is not a
 guard hook.
 
+**RUN FOR REAL 2026-08-29**, in three commits, one per class. What it did, and
+what the rules read afterwards:
+
+| | before | after |
+|---|---|---|
+| scalar quoting | 295 drafts | **0** |
+| `main_ingredients` quoting | 279 | **0** |
+| `tags` quoting | 248 | **0** |
+| en dashes | 58 | **0** |
+| `meta:` three flags in order | 341 | **5** |
+
+**All four zeroes were then ADOPTED as draft rules** (`test_drafts.py`, two-line
+delegations) and removed from `NOT_FOR_DRAFTS`. That is the point of having
+cleared them: without adoption the next ingest re-grows the backlog quietly and
+the pass has to be run again for ever. The five remaining `meta:` files are
+three carrying `claude_rewritten` (legitimate on a draft, forbidden on a recipe)
+and two with no `awaiting_fix` at all, which is Helen's to set because that flag
+fails closed.
+
 **The boundary is formatting versus judgement, and it is the whole design.** It
-fixes quoting, en dashes, `--`/`->`, accents and the #429 `meta:` migration —
-2,957 changes across all 342 drafts, measured. It never resolves which milk,
-which flour, whether an oven figure is the fan one, or whether a title or a
-filename is the one that should change: ~25 rules and 600-odd hits, every one
-needing Helen or her source material, all of them reported and left alone.
+fixes quoting, en dashes, `--`/`->`, accents and the #429 `meta:` migration. It
+never resolves which milk, which flour, whether an oven figure is the fan one, or
+whether a title or a filename is the one that should change: ~25 rules and
+600-odd hits, every one needing Helen or her source material, all of them
+reported and left alone.
 
 **It never touches a `QQ` line**, which is not a technicality: two thirds of the
-corpus-wide en-dash hits are inside un-rewritten source text (86 of 130).
+corpus-wide en-dash hits are inside un-rewritten source text (86 of 130), and 22
+files consist of nothing else. Verified on the real run rather than trusted: of
+the 44 lines it changed, **zero begin with `QQ`**, counted from the diff.
 
 **Every rule is imported from the test suite, never re-typed** — `META_ORDER`,
 `RETIRED`, `SCALAR_STRING_FIELDS`, `_head_clause_words`. A fixer carrying its own
@@ -4399,6 +4293,26 @@ file, run it once and diff — or copy the file to `tmp/` first, which is what
 turned this from a loss into a paragraph. And when a generator's output becomes
 hand-editable, fix the comment in the GENERATOR, not only in the output: the
 person about to re-run it is by definition reading the wrong one.
+
+**YOU WILL ASK "IS ANYTHING UNPUSHED?" OF THE BRANCH YOU HAPPEN TO BE ON.**
+2026-08-29, and it cost one of Helen's own edits. She answered a flag by editing
+a draft; that was committed, and the session then created a different branch
+without pushing it. The PR merged everything up to the commit before, so `main`
+took the value she had just corrected away.
+
+**The status sweep run at the end reported `unpushed=0` and was believed.** It
+used `git log @{u}..HEAD`, which asks only about the CURRENT branch — a branch
+walked away from is invisible to it. Same shape as the `git branch
+--show-current` failure `CLAUDE.md` records: **a check narrow enough to miss the
+thing it exists to catch is a narration, not a check.**
+
+    git log --branches --not --remotes --oneline     # every unpushed commit, any branch
+
+It was recovered because `git branch -d` refused with "not fully merged" and the
+refusal was READ rather than overridden with `-D`. On a squash-merged branch that
+refusal is routine and the reflex is to force it — do not, until you have
+diffed the branch's file against `main` and know what is in it. Squash merges
+make `-d` unreliable in exactly the situation where `-D` is unrecoverable.
 
 **YOU WILL READ THE PATCH AND THINK YOU HAVE CHECKED THE OUTPUT.** 2026-08-29,
 building `/tidy-drafts` (§11.0.2). Its `meta:` rewrite scanned the block as
