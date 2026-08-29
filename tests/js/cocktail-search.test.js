@@ -27,7 +27,17 @@ const CS = require('../../assets/js/cocktail-search.js');
 // this module reads. Real values, taken from the file, so a rename there shows
 // up here rather than in a browser.
 const VOCAB = {
-  search: { min_query_chars: 2, family_button_min_chars: 3, pool_cap: 8 },
+  search: {
+    min_query_chars: 2,
+    family_button_min_chars: 3,
+    pool_cap: 8,
+    // The real list, from _data/cocktails/ingredients.yml. `and` is absent on
+    // purpose: `Wray and Nephew` is one bottle.
+    prose_words: ['a', 'an', 'or', 'if', 'you', 'your', 'need', 'needs', 'best',
+      'better', 'prefer', 'other', 'instead', 'sub', 'fine', 'use', 'using',
+      'when', 'with', 'for', 'unless', 'though', 'is'],
+    prose_marks: ['--', '—', '?', '!', '>', ',']
+  },
   families: ['rum', 'gin', 'whisky', 'amaro'],
   family_aliases: { whiskey: 'whisky', scotch: 'whisky', rhum: 'rum' },
   family_labels: { whisky: 'whisk(e)y' },
@@ -191,7 +201,10 @@ test('a word match is flagged, so the picker can mark what you actually meant', 
 
 test('the pool is capped and the remainder is COUNTED, never silently dropped', () => {
   const many = [];
-  for (let i = 0; i < 12; i++) many.push('liqueur ' + String.fromCharCode(97 + i));
+  // Two letters, not one: a bare "a" is a prose word, so `liqueur a` is
+  // correctly not a bottle name and the first version of this fixture built
+  // twelve strings the pool was right to refuse.
+  for (let i = 0; i < 12; i++) many.push('liqueur x' + String.fromCharCode(97 + i));
   const pool = S.buildPool([attr(...many)]);
   const result = S.search('liq', pool);
   assert.strictEqual(result.results.length, 8);
@@ -579,6 +592,81 @@ test('a declared generic is never resolved into a BOTTLE, and one really collide
   assert.deepStrictEqual(labels(pool), ['coconut rum']);
   const drink = CS.splitEntries(attr('coconut rum'));
   assert.strictEqual(S.matchesInclude(drink, 'coconut rum'), true);
+});
+
+// --- a hidden term cannot earn a chip on a substring alone -------------------
+// Helen, 2026-08-29: "'el' returns both 'aged rum' and 'jamaican rum', which is
+// counterintuitive." It is worse than counterintuitive -- it is unexplainable.
+// Neither LABEL contains "el". The match was band 3, a mid-word substring,
+// inside the hidden generics those chips stand for: "moderat(el)y aged rum" and
+// "caram(el)-forward Jamaican rum".
+//
+// Band 3 means "in the list for some other reason", and a card can always show
+// its reason. A chip cannot show a term it does not display, so a hidden alias
+// may only earn its chip a place on a REAL match -- the query starting the
+// entry, or starting a word in it. Substring reach belongs to the visible label
+// alone.
+
+test('a hidden generic does not surface its chip on a mid-word substring', () => {
+  const pool = S.buildPool([attr('moderately aged rum', 'moderately aged jamaican rum')]);
+  assert.deepStrictEqual(S.search('el', pool).results.map((r) => r.entry), []);
+});
+
+test('but a hidden generic still surfaces its chip on a real word match', () => {
+  const pool = S.buildPool([attr('moderately aged rum')]);
+  assert.deepStrictEqual(S.search('moderately', pool).results.map((r) => r.entry), ['aged rum']);
+  assert.deepStrictEqual(S.search('mod', pool).results.map((r) => r.entry), ['aged rum']);
+});
+
+test('a hidden bottle alias behaves the same way', () => {
+  const pool = S.buildPool([attr('wray and nephew')]);
+  assert.deepStrictEqual(S.search('nephew', pool).results.map((r) => r.entry), ['Wray & Nephew']);
+  // "nd" sits mid-word inside the alias's "and" and nowhere in the label, which
+  // spells that word "&". Nothing visible would explain the chip.
+  assert.deepStrictEqual(S.search('nd', pool).results.map((r) => r.entry), []);
+});
+
+test('the VISIBLE label keeps its substring reach, which is band 3 doing its job', () => {
+  // `galliano` for "li" is the case the three bands exist to rank, and it is
+  // fine precisely because you can see the "li" in the button.
+  const pool = S.buildPool([attr('galliano')]);
+  assert.deepStrictEqual(S.search('li', pool).results.map((r) => r.entry), ['galliano']);
+});
+
+// --- prose is not a bottle name ----------------------------------------------
+// Helen hit three of these one at a time -- the Havana disjunction, `Tesco
+// Finest`, `Avallen -- a round, fresh taste if you need to sub` -- and then
+// `Jack Daniels > Bulleit`. Patching them one by one is how the fourth arrives,
+// so the shape is a rule, declared in _data/cocktails/ingredients.yml.
+//
+// MEASURED AGAINST ALL 87 REAL SUGGESTIONS BEFORE IT WAS TRUSTED: it flags 17
+// and every one of them is genuinely prose, with no bottle name caught. The
+// words that fired are the whole list; `the` and `that` were dropped from a
+// first draft because a bottle can carry them ("The Botanist") and neither was
+// doing any work.
+
+test('an aside, a question mark, a comparison or a comma is not a bottle name', () => {
+  const pool = S.buildPool([attr(
+    'Avallen -- a round, fresh taste if you need to sub',
+    'Dolin Rouge?',
+    'Jack Daniels > Bulleit',
+    'Patron Silver, Rooster Bianco'
+  )]);
+  assert.deepStrictEqual(labels(pool), []);
+});
+
+test('a function word marks prose even with no punctuation in sight', () => {
+  const pool = S.buildPool([attr('or other aromatic bitters', 'Best with ED3')]);
+  assert.deepStrictEqual(labels(pool), []);
+});
+
+test('a real bottle name survives every one of those tests', () => {
+  // Straight from the collection, including the awkward ones: an ampersand, an
+  // apostrophe, digits, an accent, a hyphen and a lowercase word.
+  const real = ['Smith & Cross', "Gosling's Black Seal", 'El Dorado 3', 'Appleton 8-year',
+    'La Favourite L\'Authentique Ambré', 'Pierre Ferrand ambre', 'acacia honey', 'Rutte'];
+  const pool = S.buildPool([attr(...real)]);
+  assert.deepStrictEqual(labels(pool).length, real.length);
 });
 
 test('with no bottle file the pool still works, and still refuses an X or Y', () => {

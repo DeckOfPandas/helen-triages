@@ -262,6 +262,25 @@ not_reached_for:
 # different categories inside a single string, which is what a list `generic`
 # exists to express and a comma cannot.
 unresolved_suggestions:
+  # NOT A RUM, AND THE FIRST NON-RUM ENTRY HERE -- deliberate, and the same
+  # widening `card_names` already took when Ceylon arrack joined it. Helen,
+  # 2026-08-29, on finding it offered as an ingredient chip by typing "sco":
+  # "This should never be there anyway, but certainly never without the kind of
+  # alcohol it actually is."
+  #
+  # A retailer's own-brand RANGE is not a product. It names no distillery, no
+  # style and -- the part that makes it useless rather than merely vague -- no
+  # spirit: both drinks that carry it want an `eau de vie`, and nothing in the
+  # string says so. It is the one entry in the collection flagged by neither the
+  # prose rule nor the bottle aliases, because it is a perfectly well-formed
+  # name for the wrong kind of thing.
+  #
+  # Listing it here keeps it out of the picker and records WHY, which is what
+  # this block is for. #585 is where it gets fixed: Helen names the bottle.
+  "Tesco Finest": >-
+    A retailer range rather than a bottle. Charleston and Cobra Effect both
+    want an `eau de vie` and this says neither which one nor even which
+    spirit. Needs Helen.
   "Appleton 8, or Appleton 12 Rare Casks": >-
     Two bottles in one string; wants the list form. Both are
     `Jamaican, moderately aged`, so nothing is at stake beyond the shape.

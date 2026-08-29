@@ -134,25 +134,6 @@
     return normalise(value.slice(0, -FAMILY_SUFFIX.length));
   }
 
-  /* AN "X or Y" IS NEVER A CHIP — Helen, 2026-08-29: "I don't want any returned
-     search chips to be an X or Y shape."
-
-     A disjunction is not an ingredient. It is a transcription of a choice, and
-     as a filter it means nothing: clicking `ED3 or Havana 3` would ask for
-     drinks whose ingredient list contains that literal sentence.
-
-     THE CONNECTOR, NOT THE LETTERS. `orgeat`, `orange juice` and `Cointreau` all
-     contain "or" and none of them is a disjunction. Measured before this was
-     applied to every term rather than to suggestions alone: of the 173 declared
-     generics and card names, ZERO contain an " or " connector, so this can never
-     eat a name Helen chose. `and` is deliberately NOT banned -- `Wray and
-     Nephew` is one bottle and `ginger and lemongrass cordial` is one generic. */
-  var DISJUNCTION = /(^|[\s,])or([\s,]|$)/i;
-
-  function isDisjunction(term) {
-    return DISJUNCTION.test(String(term == null ? '' : term));
-  }
-
   function create(vocabulary, bottleData) {
     var voc = vocabulary || {};
     var cfg = voc.search || {};
@@ -320,11 +301,33 @@
       unresolvedSuggestion[normalise(s)] = true;
     });
 
+    /* PROSE IS NOT A BOTTLE NAME — Helen met four of these one at a time, so
+       the shape is a rule rather than a list of the four. Both halves are
+       declared in _data/cocktails/ingredients.yml's `search:` block, where the
+       measurement behind them is recorded: applied to all 87 real suggestions
+       it flags 17, every one genuinely prose, and catches no bottle name.
+
+       WHOLE WORDS, NOT LETTERS. `orgeat`, `orange juice` and `Cointreau` all
+       contain "or"; none is a disjunction. */
+    var proseWords = (cfg.prose_words || []).map(function (w) {
+      return String(w).toLowerCase();
+    });
+    var proseMarks = (cfg.prose_marks || []).map(String);
+
+    function isProse(term) {
+      var text = String(term == null ? '' : term);
+      if (proseMarks.some(function (m) { return text.indexOf(m) !== -1; })) return true;
+      var seen = getWords(fold(text.toLowerCase()));
+      return proseWords.some(function (w) { return seen.indexOf(w) !== -1; });
+    }
+
     /* One term as it arrives on a card -> the chip it should become, or null to
-       offer it at all. Declared vocabulary passes through untouched. */
+       not offer it at all. Declared vocabulary passes through untouched: a
+       generic is a name Helen chose, and `ginger and lemongrass cordial` must
+       survive any rule aimed at transcription. */
     function resolveTerm(term) {
       if (isDeclared(term)) return term;
-      if (isDisjunction(term)) return null;
+      if (isProse(term)) return null;
       var key = normalise(term);
       if (unresolvedSuggestion[key]) return null;
       return bottleCanonical[key] || term;
@@ -452,6 +455,32 @@
             isPrefixMatch: folded.indexOf(query) === 0,
             hasWordMatch: words.some(function (w) { return w.indexOf(query) === 0; })
           };
+
+          /* A HIDDEN TERM EARNS THE CHIP ITS PLACE ONLY IN BAND 1 — only when
+             the query is what that term STARTS WITH.
+
+             Helen, 2026-08-29: "'el' returns both 'aged rum' and 'jamaican
+             rum', which is counterintuitive." Neither LABEL contains "el"; the
+             match was mid-word inside the generics those chips stand for,
+             "moderat(el)y aged rum" and "caram(el)-forward Jamaican rum".
+
+             Band 3 was the obvious thing to ban and it was not enough. Sweeping
+             all 676 two-letter queries afterwards still found 25 chips that
+             could not explain themselves, and the survivors were band 2 --
+             `an` returning `Smith & Cross`, because its alias is spelled "Smith
+             AND Cross"; `dr` returning `gin`, via "London DRY gin". A word
+             buried in a name you cannot see is no more explicable than a
+             substring in it.
+
+             So: a chip is offered on what it SHOWS, plus the one case the
+             aliases exist for -- you started typing the real name of the thing.
+             "moderately" and "mod" still surface `aged rum`; "ed3" still
+             surfaces `El Dorado 3`; "wray and nephew" still surfaces `Wray &
+             Nephew`, and so does "nephew", because that word is in the label.
+             The visible label keeps all three bands, where `galliano` for "li"
+             is exactly right and visibly so. */
+          if (normalise(term) !== normalise(value) && IS.bandOf(scored) !== 1) return;
+
           if (!best || IS.bandOf(scored) < IS.bandOf(best)) best = scored;
         });
         if (best) candidates.push(best);
