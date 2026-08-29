@@ -1784,7 +1784,32 @@ see §9.10 for the shape. #460 stays open for the REST of the page (method,
 notes, meta), which still hasn't had a design pass — this was the
 ingredient list specifically.
 
-**Every rum generic also has a CARD NAME, `rum_display_names` — #501,
+**Whisky is named correctly rather than dodged, and peat is a character** —
+2026-08-27/29. Scotch and Japanese take *whisky*, Irish and American take
+*whiskey*; `blended Scotch`, `Irish` and `Japanese` said neither, which looked
+tidy and was an unmade decision. All three were used by zero drinks, so the fix
+was free. `bonded rye` joined as a real style rather than a strength — Helen:
+"bonded rye is a different thing, like overproof demerara rum", and five of the
+seven rye entries already say bonded or 100 proof in their item text, so plain
+`rye` was the exception wearing the default's clothes. `rye` and `bourbon` stay
+BARE, because the test is the name you would say out loud.
+
+**`peated` is a `character`, not a style**, for #441's reason: peat is
+orthogonal to single-malt-versus-blended, so a peated single malt is both. Both
+drinks using `peated Scotch` prove it — their items read "Peated single malt
+whisky" and "Peated Scotch whisky", one field carrying two facts.
+
+**The GUARD is the load-bearing half, and it is derived from the suffix now.**
+Adding `whisky_characters` alone would have made `peated` a permitted GENERIC,
+because the declared-generic set is every top-level list minus a hand-written
+exclusion — the precise hole `rum_characters` sat in for four days while
+`sherry` and `Spanish-style` passed as generics. Any `<family>_characters` list
+is now excluded by its name, and `test_a_declared_character_vocabulary_is_enforced`
+checks every family that declares one. **Declaring a list is what switches
+enforcement on**, so gin's free-text characters stay correctly unchecked and a
+vocabulary can no longer outrun its guard.
+
+**Every rum generic also has a CARD NAME, `card_names` — #501,
 2026-08-27.** A third string per rum category, beside the generic and the
 family, and it exists because the index cannot show the full name and must not
 show the item. See §9.10.1; that section is where the reasoning lives.
@@ -2137,7 +2162,7 @@ see §9.13. The amount now sets in the heading face in a fixed column, the class
 line and note hang past it, and `character` drops a step quieter than the class
 line it sits inside.
 
-### 9.10.1 The card shows a rum's CATEGORY, because its item cannot be trusted — #501, 2026-08-27
+### 9.10.1 Cards and search read the VOCABULARY, never the transcription — #501/#544/#558
 
 **The card used to render `item`, and the problem was not that the words were
 long. It was that they were ambiguous.** Eight item strings in the collection
@@ -2158,7 +2183,7 @@ length problem ("the real category name is obviously too long") and the
 measurement said otherwise; **it was a correctness problem that happened to
 also cost room.**
 
-**`rum_display_names` in `ingredients.yml`** maps a generic to its card name.
+**`card_names` in `ingredients.yml`** maps a generic to its card name.
 The rule in `cocktails/index.html` is "substitute when every generic on the
 entry has a card name, else fall back to `item`" — the all-or-nothing half
 matters because a list `generic` means "either would do" (#441) and ten rum
@@ -2202,7 +2227,7 @@ rule would have failed the feature's best cases.
 Jamaicans to `Jamaican rum`, on the principle that the funk is the shared
 trait and caramel is a nuance of the same rum, where both Demeraras and both
 agricoles keep their own names because proof and age change what you are
-making. `rum_card_names_may_collide` carries the reason — the `family_less`
+making. `card_names_may_collide` carries the reason — the `family_less`
 idiom — and an *undeclared* duplicate still fails, because two rums reading
 alike is the precise fault this map removed.
 
@@ -2216,7 +2241,7 @@ template stops rendering the string a script was matching on, the script is
 already broken and nothing about the page looks wrong.**
 
 **A disjunctive pair sharing a head word gets an EXPLICIT replacement, not a
-rule.** `rum_card_name_joins` is keyed on the default join, so the before and
+rule.** `card_name_joins` is keyed on the default join, so the before and
 after read together: Swizzle's `Demerara overproof rum or Demerara rum` is
 Helen's `Demerara rum or overproof`. Her form drops two words from the second
 option and reorders the pair, which is why it is stored — she expects more
@@ -2242,12 +2267,75 @@ follow-on she asked for: note `character: hogo` on the drinks that want a
 bottle for it, which needs `hogo` adding to `rum_characters` first or
 `test_rum_character_is_declared` goes red.
 
-**Which generics get card names is a question about AMBIGUITY, not length.**
-Rum was first because its item text named two or three different rums; four
-non-rum generics are longer than some rum ones and none of them is ambiguous,
-so they have waited. Ceylon arrack joined for a third reason again — it had no
-route to a card at all. **Add one when a card is lying or blank, not when a
-name is long.** The bottle side of all this is §9.3.2.
+**Card names are not rum-only and the maps are no longer named as if they
+were** — `card_names`, `card_name_joins`, `card_names_may_collide` since
+2026-08-29. Gin, whisky and the syrups have entries; Ceylon arrack was the first
+non-rum member.
+
+**Helen's model, given as six worked examples rather than a rule: the card shows
+the shortest name that tells you what the drink is LIKE.** Not the family, not
+the style, but whichever of those matters — `gin`, because London dry versus
+Plymouth does not change your evening; `bourbon` and `blanco tequila`, because
+bourbon versus rye and blanco versus añejo do. That is the same judgement the
+rum names already encoded, so rum was never a special case, only the first
+place it hurt.
+
+**No brand appears on a card any more.** The three brand-generics #314 permits
+because nothing generalises the bottle -- Planteray O.F.T.D., Stiggins' Fancy,
+Malibu -- now carry DESCRIPTIVE card names: `blended overproof`, `pineapple
+rum`, `coconut rum`. That ruling is untouched; only the label changed, which is
+what card names are for. They were the only three brands on any card, so a
+reader met `O.F.T.D.` among `gin`, `cognac` and `sugar syrup` and learned
+nothing (#556 exactly). **Lowercasing is what surfaced it** -- `o.f.t.d.` reads
+badly in a way the capitalised form hid. Two of the three got LONGER; this buys
+legibility, not width.
+
+**Adding an entry changes what cards show with NO template edit**, because the
+template only ever looks a generic up in the map. That is worth knowing: card
+display is a data-layer change, which is how gin and syrup cards landed while
+another agent had `cocktails/index.html` open.
+
+**The card falls back to the GENERIC, never to `item` — #544 move 1, and it is
+what made the card line honest.** Sazerac went from `La Fée Parisienne absinthe
+· chilled water · Camus VSOP cognac · straight bottled-in-bond rye whiskey · …`
+to `absinthe · water · cognac · rye · bourbon · sugar syrup · …`. The
+all-or-nothing rule for a disjunctive generic DISSOLVED rather than being
+maintained: it existed so a mixed list could not print half a fact, and with a
+per-option fallback there is no half fact left to print.
+
+**The search pool dropped `item` too — #558.** It is `generic + card name +
+suggestion`, built at build time. 380 terms → 239; typing "li" offers 23 options
+instead of 63. The remaining excess is that suggestions go in raw rather than
+resolved through `bottles.yml`'s aliases, so `Havana 3` and `Havana Club 3` can
+both appear. **This was never a search bug**: Helen's nine "light…" options were
+nine `item` strings for what is mostly one rum, which is #544 seen from the
+other end.
+
+**Two declared collapses that lose information ON PURPOSE**: both syrup ratios
+read `sugar syrup` on a card, both honey ratios read `honey water`. Helen: "On
+the card I would expect to see sugar syrup, and on the recipe ingredient line
+cane sugar syrup, 2:1." **A ratio is a MAKING fact, not a CHOOSING fact** — at
+card distance it is not being used. Checked before declaring: no drink carries
+both ratios of the same syrup.
+
+**Cards are lowercased in CSS, not in the markup** (`text-transform` on
+`.drink-card-ingredients`, #543/#553). The DOM keeps its capitals, so
+copy-paste, screen readers and the drink page are untouched — and the drink page
+needs them, since a recipe line reads `London dry gin (Beefeater)`. Worth
+re-looking at: when Helen asked, cards rendered `item` and the line really was a
+jumble; they now render vocabulary, and the 37 surviving capitals were all real
+proper nouns before this rule lowercased them too.
+
+**THE DRINK PAGE IS DELIBERATELY UNCHANGED, and this is the live constraint.**
+#544 makes its ingredient line the generic plus the bottle — which today would
+read `moderately aged (Gosling's Black Seal)` and `London dry (Tanqueray)`,
+worse than what is there. **A card name may be lossy; a recipe line must read as
+an ingredient.** Ten generics do not, eight of them rum styles named after
+production traits rather than after the drink they make. #561 is that rename,
+blocked on the drafts checkout because ~93 entries move with it. The drink page
+follows in that pass, and #513 closes with it.
+
+The bottle side of all this is §9.3.2.
 
 ### 9.11 Glass icons — real relative height, and a UA-stylesheet trap
 

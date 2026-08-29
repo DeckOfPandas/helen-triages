@@ -56,66 +56,66 @@ bottles:
 
   # --- Jamaican ------------------------------------------------------------
   "Appleton Estate Signature":
-    generic: "Jamaican, moderately aged"
+    generic: "moderately aged Jamaican rum"
     aliases: ["Appleton Signature", "Appleton Estate V/X rum", "Appleton V/X"]
   "Appleton Estate 8 Year Reserve":
-    generic: "Jamaican, moderately aged"
+    generic: "moderately aged Jamaican rum"
     aliases: ["Appleton 8", "Appleton Estate 8 Reserve"]
   "Appleton Estate 12 Rare Casks":
-    generic: "Jamaican, moderately aged"
+    generic: "moderately aged Jamaican rum"
     aliases: ["Appleton 12 Rare Casks", "Appleton Rare Casks",
               "Appleton Estate Rare 12 year old blended rum"]
   # #314, Helen 2026-08-27. Her marker for the caramel-forward style, along with
   # Myers -- which no drink names yet, so it is not listed here.
   "Blackwell":
-    generic: "Jamaican, caramel forward"
+    generic: "caramel-forward Jamaican rum"
     aliases: []
   # RECLASSIFIED 2026-08-27, from `Jamaican, overproof, unaged`. Helen's call,
   # and it resolves the one bottle that had been sitting under two generics: it
   # is aged, so the unaged overproof style was never right. 57% is what made it
   # look like one -- and strength is not what that category names.
   "Smith & Cross":
-    generic: "Jamaican, moderately aged"
+    generic: "moderately aged Jamaican rum"
     aliases: ["Smith and Cross", "Smith & Cross rum"]
     note: "57% ABV — be sensible about how much you use."
   "Wray & Nephew":
-    generic: "Jamaican, overproof, unaged"
+    generic: "unaged overproof Jamaican rum"
     aliases: ["Wray and Nephew", "Wray & Nephew Overproof"]
   # Its own thing rather than a Wray & Nephew substitute -- Helen, 2026-08-27:
   # "choice of that or W&N is mood by mood." Same category, not interchangeable
   # on autopilot, which is why both are listed rather than one carrying the
   # other as an alias.
   "Rum Fire":
-    generic: "Jamaican, overproof, unaged"
+    generic: "unaged overproof Jamaican rum"
     aliases: []
 
   # --- Demerara: 100% DDL, Guyana. See the appellation note above. ----------
   "El Dorado 3":
-    generic: "lightly aged and filtered"
+    generic: "lightly aged and filtered rum"
     aliases: ["ED3", "El Dorado 3yo", "El Dorado 3yo rum"]
   "El Dorado 5":
-    generic: "Demerara, aged"
+    generic: "aged Demerara rum"
     aliases: []
   "El Dorado 8":
-    generic: "Demerara, aged"
+    generic: "aged Demerara rum"
     aliases: []
   "El Dorado 12":
-    generic: "Demerara, aged"
+    generic: "aged Demerara rum"
     aliases: ["El Dorado 12 year old rum"]
   "El Dorado 151":
-    generic: "Demerara, overproof"
+    generic: "overproof Demerara rum"
     aliases: ["El Dorado 151 rum"]
     # Helen, 2026-08-27: the ONLY bottle in this category, and on the shopping
     # list rather than on the shelf. Wanted counts as reached-for; see
     # `not_reached_for` for what does not.
   "Skipper's":
-    generic: "Demerara, aged"
+    generic: "aged Demerara rum"
     aliases: ["Skippers dark rum", "Skippers"]
   # Ruled 2026-08-27 and used by no drink yet. 57% is AT proof, not over it --
   # overproof begins above 57.15% -- so this is not a `Demerara, overproof`
   # however much the strength suggests otherwise.
   "Wood's":
-    generic: "Demerara, aged"
+    generic: "aged Demerara rum"
     aliases: ["Woods", "Wood's 100"]
 
   # --- moderately aged: the residual style, no region and no other marker ---
@@ -124,33 +124,33 @@ bottles:
   # DDL test whatever it tastes like. Same blend at two strengths, so splitting
   # them across two categories would have been the odd outcome.
   "Pusser's Blue Label":
-    generic: "moderately aged"
+    generic: "moderately aged rum"
     aliases: ["Pusser's Blue"]
   "Pusser's Gunpowder":
-    generic: "moderately aged"
+    generic: "moderately aged rum"
     aliases: ["Pusser's Gunpowder Proof", "Pusser's Navy rum 54.5%"]
   "Gosling's Black Seal":
-    generic: "moderately aged"
+    generic: "moderately aged rum"
     aliases: ["Gosling's", "Goslings"]
     # Reached for FOR its blackstrap, which is a `character` on the recipe and
     # never a generic -- #314, and the reason this file has no character column.
   "Havana Club 7":
-    generic: "moderately aged"
+    generic: "moderately aged rum"
     aliases: ["Havana 7", "Havana Club 7yo"]
   "Ron del Barrito":
-    generic: "moderately aged"
+    generic: "moderately aged rum"
     aliases: ["Ron del Barrito 3 star rum"]
   "Planteray Barbados 5":
-    generic: "moderately aged"
+    generic: "moderately aged rum"
     aliases: ["Plantation Barbados 5", "Plantation Barbados 5 year old rum"]
 
   # --- lightly aged and filtered -------------------------------------------
   "Havana Club 3":
-    generic: "lightly aged and filtered"
+    generic: "lightly aged and filtered rum"
     aliases: ["Havana 3", "Havana Club 3yo rum", "Havana 3 year old",
               "Havana Club Original Añejo 3 Años Cuban rum"]
   "Flor de Caña Extra Dry":
-    generic: "lightly aged and filtered"
+    generic: "lightly aged and filtered rum"
     aliases: ["Flor de Caña extra dry white rum"]
   # JW SPICERS IS DELIBERATELY ABSENT. Helen, 2026-08-27: "never name Spicers --
   # if I have it skulking at the back of the nonsense shelf then I'll throw it
@@ -164,7 +164,7 @@ bottles:
   # than preference: 3 Stars is a genuine Barbados/Jamaica/Trinidad blend where
   # the other two are single-origin.
   "Planteray 3 Stars":
-    generic: "blended multi-region rum, clear"
+    generic: "clear blended multi-region rum"
     aliases: ["Plantation 3 Stars", "Plantation 3 Stars rum", "Planteray 3",
               "Plantation 3"]
 
@@ -184,22 +184,22 @@ bottles:
 
   # --- cane juice: agricole, clairin, cachaça ------------------------------
   "Clément Agricole Blanc":
-    generic: "cane juice (agricole) rum, unaged"
+    generic: "rhum agricole blanc"
     aliases: ["Clement Agricole Blanc"]
   "Damoiseau Rhum Agricole Blanc":
-    generic: "cane juice (agricole) rum, unaged"
+    generic: "rhum agricole blanc"
     aliases: ["Damoiseau Rhum Agricole Blanc 40 proof", "Damoiseau Blanc"]
   "La Favourite Rhum Agricole Blanc":
-    generic: "cane juice (agricole) rum, unaged"
+    generic: "rhum agricole blanc"
     aliases: ["La Favourite Blanc"]
   "La Favourite L'Authentique Ambré":
-    generic: "cane juice (agricole) rum, aged"
+    generic: "rhum agricole vieux"
     aliases: []
   "Rhum JM Ambré":
-    generic: "cane juice (agricole) rum, aged"
+    generic: "rhum agricole vieux"
     aliases: ["JM Rhum Agricole ambre", "JM"]
   "Barbancourt 3 Star":
-    generic: "cane juice (agricole) rum, aged"
+    generic: "rhum agricole vieux"
     aliases: ["Barbancourt Three Star rum", "Barbancourt 3-star rum"]
     # Haitian cane juice, so agricole by production even though the word on the
     # label is not "agricole".
@@ -226,7 +226,7 @@ bottles:
   # Blackwell. NO DRINK MENTIONS IT, and it is listed anyway: this file is what
   # she would reach for, not an index of what the collection happens to cite.
   "Myers":
-    generic: "Jamaican, caramel forward"
+    generic: "caramel-forward Jamaican rum"
     aliases: ["Myers's", "Myer's"]
   "Van Osten Botanik Arrack":
     generic: "Batavia arrack"

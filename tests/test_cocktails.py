@@ -49,7 +49,17 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 # `blackstrap` is only ever a character could not be enforced while this list
 # still declared it a generic. The guard meant to keep the two fields apart was
 # quietly putting them back together.
-NOT_GENERIC_LISTS = {"families", "rum_characters"}
+# DERIVED FROM THE SUFFIX SINCE 2026-08-29, not listed by hand. `rum_characters`
+# had to be added to this set by hand in the first place, four days after the
+# list existed, and `whisky_characters` would have needed the same remembering.
+# A `<family>_characters` list is never a generic vocabulary, so the rule can be
+# stated once instead of enumerated -- the same reasoning `_retired` already
+# uses for its `retired_` prefix.
+NOT_GENERIC_LISTS = {"families"}
+
+
+def _is_character_list(key):
+    return key.endswith("_characters")
 
 
 def _load():
@@ -107,7 +117,8 @@ def _declared_generics(vocab):
     """
     out = set()
     for key, value in vocab.items():
-        if key in NOT_GENERIC_LISTS or not isinstance(value, list):
+        if (key in NOT_GENERIC_LISTS or _is_character_list(key)
+                or not isinstance(value, list)):
             continue
         out |= set(value)
     return out
@@ -380,39 +391,40 @@ def test_speciality_gin_declares_a_character():
 # 6 and 7 -- shape guards on the drinks themselves
 # =============================================================================
 
-def test_rum_character_is_declared():
-    """A RUM's `character` must be a declared `rum_characters` value.
+def test_a_declared_character_vocabulary_is_enforced():
+    """A `character` must be declared, for every family that closes its list.
 
-    THIS HOLE WAS OPEN UNTIL 2026-08-26 AND NOTHING WAS WATCHING IT.
-    `character` is the field #441 spent an entire issue separating from
-    `generic`, and #314's ruling on blackstrap turns on that separation -- yet
-    every guard in this file pointed at `generic`. A typo in `character` minted
-    a value in silence, which is precisely the failure
-    test_every_generic_is_declared exists to prevent one field over.
+    WAS RUM-ONLY UNTIL 2026-08-29, and generalising it is the point rather than
+    a tidy-up. `whisky_characters` arrived with `peated` (#314, Helen: "so
+    single malt whisky, character: peated ???"), and a rum-shaped guard would
+    have left the new list declared and checked by nothing -- which is EXACTLY
+    the failure this test was written for. `rum_characters` sat unchecked for
+    four days while `sherry` and `Spanish-style` passed silently as generics.
 
-    It got worse, not better, when `rum_characters` was excluded from the
-    declared-generic set in that same session: correct, but it left the list
-    declared and consumed by absolutely nothing. A vocabulary nothing checks
-    against is decoration.
+    NOT EVERY FAMILY, AND THAT ASYMMETRY IS DELIBERATE. Only families that
+    DECLARE a `<family>_characters` list are checked. Gin declares none, on
+    Helen's explicit call: a rum's character comes from a handful of production
+    traits and closes into a list, while a gin's is whatever went in the still,
+    so Spiced Negroni's cardamom is correctly undeclared and must not fire here.
+    Adding a list is what switches enforcement on, which means the vocabulary
+    and its guard can no longer drift apart.
 
-    NOT EVERY CHARACTER -- ONLY RUM'S, and the asymmetry is deliberate rather
-    than an oversight to tidy up later. Helen, 2026-08-26, on gin: character
-    there is FREE TEXT, because a rum's comes from a handful of production
-    traits and closes into a list while a gin's is whatever the distiller
-    reached for. So Spiced Negroni's cardamom is correctly undeclared and this
-    test must not fire on it.
-
-    Rum-ness is derived through `family_of`, not pattern-matched on the item
-    name -- 61 ingredients in this collection are named only by brand, which is
-    the same reason `generic` is stored rather than computed.
+    Family-ness is derived through `family_of`, never pattern-matched on the
+    item name -- 61 ingredients in this collection are named only by brand,
+    which is the same reason `generic` is stored rather than computed.
     """
     vocab = _vocab()
-    declared = set(vocab.get("rum_characters") or [])
     family_of = vocab.get("family_of") or {}
+    declared = {
+        key[: -len("_characters")]: set(value)
+        for key, value in vocab.items()
+        if _is_character_list(key) and isinstance(value, list) and value
+    }
     assert declared, (
-        "ingredients.yml declares no `rum_characters`, so this check enforces "
-        "nothing. An empty set would pass every value."
+        "ingredients.yml declares no `<family>_characters` list at all, so this "
+        "check enforces nothing. `rum_characters` at least should be there."
     )
+
     bad, checked = [], 0
     for slug, fm in _load():
         for item in (fm.get("ingredients") or []):
@@ -420,36 +432,42 @@ def test_rum_character_is_declared():
                 continue
             generic = item.get("generic")
             generics = generic if isinstance(generic, list) else [generic]
-            if not any(family_of.get(g) == "rum" for g in generics):
+            families = {family_of.get(g) for g in generics} & set(declared)
+            if not families:
                 continue
             character = item.get("character")
             if not character:
                 continue
+            permitted = set().union(*(declared[f] for f in families))
             for value in (character if isinstance(character, list) else [character]):
                 checked += 1
-                if value not in declared:
-                    bad.append(f"{slug}: {item.get('item') or '?'!r} -> {value!r}")
-    # The rum-ness test above is a two-step lookup (generic -> family_of ->
-    # "rum"), and EITHER step going stale would leave this test green while
-    # checking nothing -- a renamed generic, a dropped family mapping. The
-    # collection has four rums carrying a character today; zero means the
-    # derivation broke, not that the data got tidier.
+                if value not in permitted:
+                    bad.append(
+                        f"{slug}: {item.get('item') or '?'!r} -> {value!r} "
+                        f"(family {'/'.join(sorted(families))})"
+                    )
+    # The family lookup is a two-step derivation (generic -> family_of ->
+    # family), and EITHER step going stale would leave this green while checking
+    # nothing. The collection has four rums carrying a character today; zero
+    # means the derivation broke, not that the data got tidier.
     assert checked, (
-        "No rum ingredient carries a `character`, so this check is vacuous. "
-        "That is implausible for this collection -- blackstrap alone is on "
+        "No ingredient in a closed-character family carries a `character`, so "
+        "this check is vacuous. That is implausible -- blackstrap alone is on "
         "three drinks. Either `family_of` no longer maps the rum styles, or a "
         "generic was renamed without this following."
     )
     assert not bad, (
-        "Undeclared character(s) on a rum:\n  " + "\n  ".join(sorted(bad))
-        + f"\n\nDeclared: {sorted(declared)}.\nEither it is a typo, or the "
-          "value is real and belongs in `rum_characters`. A character is not a "
-          "generic -- #441 -- but it is just as much a vocabulary."
+        "Undeclared character(s):\n  " + "\n  ".join(sorted(bad))
+        + "\n\nDeclared: "
+        + "; ".join(f"{f}={sorted(v)}" for f, v in sorted(declared.items()))
+        + ".\nEither it is a typo, or the value is real and belongs in that "
+          "family's list. A character is not a generic -- #441 -- but it is "
+          "just as much a vocabulary."
     )
 
 
 def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
-    """`rum_display_names` covers the rum family exactly -- issue #501.
+    """`card_names` covers the rum family exactly -- issue #501.
 
     The card renders a rum's CATEGORY rather than the source's own words,
     because those words could not be trusted: eight item strings in this
@@ -465,7 +483,7 @@ def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
     mapping rather than a list.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
+    names = vocab.get("card_names") or {}
     family_of = vocab.get("family_of") or {}
     rum_generics = {g for g, fam in family_of.items() if fam == "rum"}
     assert rum_generics, (
@@ -477,7 +495,7 @@ def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
         "Rum generic(s) with no card name:\n  " + "\n  ".join(missing)
         + "\n\nA rum without one falls back to `item` on the index, which is "
           "the ambiguous colour vocabulary #314 retired. Add it to "
-          "`rum_display_names` in _data/cocktails/ingredients.yml."
+          "`card_names` in _data/cocktails/ingredients.yml."
     )
     # THE SECOND HALF LOOSENED 2026-08-27, and only by one notch. It used to
     # require the map to be EXACTLY the rum family, which was right while #501
@@ -512,7 +530,7 @@ def test_rum_card_names_are_distinct():
     the funk is the shared trait and the caramel is a nuance of the same rum,
     where both Demeraras and both agricoles keep their own names because proof
     and age change what you are making. So the rule is not "never" but "not by
-    accident" -- `rum_card_names_may_collide` carries the reason, the same shape
+    accident" -- `card_names_may_collide` carries the reason, the same shape
     `family_less` uses, and an undeclared duplicate still fails.
 
     THERE IS DELIBERATELY NO LENGTH RULE HERE. An earlier version of this test
@@ -524,10 +542,10 @@ def test_rum_card_names_are_distinct():
     test_card_lines_do_not_get_longer holds the thing that actually mattered.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
-    permitted = vocab.get("rum_card_names_may_collide") or {}
+    names = vocab.get("card_names") or {}
+    permitted = vocab.get("card_names_may_collide") or {}
     assert names, (
-        "`rum_display_names` is empty, so this check is vacuous."
+        "`card_names` is empty, so this check is vacuous."
     )
     seen = {}
     clashes = []
@@ -541,7 +559,7 @@ def test_rum_card_names_are_distinct():
         + "\n  ".join(clashes)
         + "\n\nThe index would show identical words for rums that are not "
           "interchangeable, which is the exact ambiguity #501 removed. If the "
-          "collapse is intended, add the NAME to `rum_card_names_may_collide` "
+          "collapse is intended, add the NAME to `card_names_may_collide` "
           "with the reason -- a collapse loses information on the index, so it "
           "should cost a sentence."
     )
@@ -580,8 +598,8 @@ def test_showing_categories_still_shortens_the_index():
     whole set drifts long enough to stop paying for itself.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
-    assert names, "`rum_display_names` is empty; nothing to check."
+    names = vocab.get("card_names") or {}
+    assert names, "`card_names` is empty; nothing to check."
     before_total, after_total, checked = 0, 0, 0
     for slug, fm in _load():
         before, after = [], []
@@ -638,9 +656,9 @@ def test_no_card_shows_two_different_rums_under_one_name():
     would say one word for two rums and lose the difference silently.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
-    joins = vocab.get("rum_card_name_joins") or {}
-    assert names, "`rum_display_names` is empty; nothing to check."
+    names = vocab.get("card_names") or {}
+    joins = vocab.get("card_name_joins") or {}
+    assert names, "`card_names` is empty; nothing to check."
     bad, checked = [], 0
     for slug, fm in _load():
         # card name -> the set of generic-tuples that produced it
@@ -676,7 +694,7 @@ def test_no_card_shows_two_different_rums_under_one_name():
 
 
 def test_every_card_name_join_is_reachable():
-    """A `rum_card_name_joins` key must be a join some drink actually produces.
+    """A `card_name_joins` key must be a join some drink actually produces.
 
     THE SAME BARGAIN `methods.yml` STRIKES with its proposals, and for the same
     reason: this map duplicates live data -- the left-hand side is a string the
@@ -690,10 +708,10 @@ def test_every_card_name_join_is_reachable():
     index looks while doing nothing at all.
     """
     vocab = _vocab()
-    names = vocab.get("rum_display_names") or {}
-    joins = vocab.get("rum_card_name_joins") or {}
+    names = vocab.get("card_names") or {}
+    joins = vocab.get("card_name_joins") or {}
     if not joins:
-        pytest.skip("`rum_card_name_joins` is empty; no default join is "
+        pytest.skip("`card_name_joins` is empty; no default join is "
                     "overridden, which is a legitimate state.")
     produced = set()
     for slug, fm in _load():
