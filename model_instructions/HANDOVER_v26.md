@@ -805,6 +805,72 @@ gate would be gone and the build green.
   ~30 recipes. Keep the same discipline in any commentary/reasoning that
   quotes the source at length; the trigger isn't obviously scoped to file
   writes alone.
+- > ## THE INGEST CONTRACT — settled with Helen 2026-08-29
+  >
+  > **The line is not "how much help is too much". It is one question, asked of
+  > every field: IS THE ANSWER IN THE SOURCE DOCUMENT, OR IN HELEN'S HEAD?**
+  >
+  > In the source — the fan figure, "large eggs", "unsalted butter", "golden
+  > caster" — writing it down is READING, not judgement, and an ingest session
+  > is the only one that will ever have the page open. Do it, unasked.
+  >
+  > In her head — her voice, her palate, whether she liked it — leave it, and
+  > write `QQ`.
+  >
+  > **A silence in the source is never filled from general cooking knowledge.**
+  > A wrong "whole milk" looks exactly as confident as a right one, and that,
+  > not ambition, is the whole garbling risk. `QQ` is the existing answer and
+  > costs nothing.
+
+  **WHY THIS EARNED A CONTRACT: 266 of 342 drafts (77%) carry at least one gap
+  whose answer was printed on the page**, 675 hits in total, measured
+  2026-08-29. Sugar type 117, egg size 103, butter salted/unsalted 92, ginger
+  form 58, warm spices 42, **fan oven 39**, milk 36, garlic 33, flour 30, and
+  nine more rules behind those.
+
+  **The fan temperature is the case that proves the timing matters.** §10 says
+  it "could never have been guessed or bulk-fixed from the file alone" —
+  entirely true *afterwards*, which is why it sat as a hand-worked backlog. At
+  ingest the page is open and prints the pair. The information is not hard to
+  get; it is only hard to get **later**.
+
+  **TIER 1 — do it at ingest, unasked.**
+
+  - **Every qualifier the source states.** Sugar, butter, flour, milk, eggs,
+    garlic, ginger, warm spices, vinegar, mustard, chocolate. Source silent →
+    `QQ`, never a default.
+  - **The fan oven temperature**, taken from the printed pair. Check which of
+    the two *is* the fan figure — they are not always in the same order (§5).
+  - **Quantities in their own `amount:` key, never inside `item:` text.** §4
+    below records the real bug: `item: "~1 tbsp tamarind paste"` renders
+    unstyled because the highlighter is driven by `{% if item.amount %}` and
+    never scans text for a leading number. **No test catches this**, so it is
+    ingest-time or never.
+  - **Size words with the count, not the item** — `amount: "2 large"`, not
+    `item: "large onions"` (108 drafts carry the other shape).
+  - **Split `ingredient_groups` and `method_groups`** — see below.
+  - **Name the file from the title's head clause**, so slug and title cannot
+    diverge (19 drafts already have; each is then a rename-or-retitle decision
+    only Helen can make).
+  - **House style right the first time** — en dashes, `°C`, unicode fractions,
+    quoting, accents. Outside `QQ` lines, always. `/tidy-drafts` (§11.0.2) can
+    clean these up afterwards, so this saves a pass rather than a decision.
+  - **The citation**, per `SOURCE_ATTRIBUTION_SPEC.md`.
+
+  **TIER 2 — fill in at ingest, say plainly they are proposals.**
+  `main_ingredients`, `tags`, `star_ingredient`. Cheap for Helen to correct and
+  expensive for her to originate. The vocabulary is declared, so nothing can be
+  invented: an undeclared tag or star fails the suite. **Be generous with
+  `main_ingredients`** — see §6, where the measured evidence is that ingest
+  sessions read the cap of eight as a budget and stop at five while Helen's own
+  recipes run to fourteen.
+
+  **TIER 3 — never, at ingest or after.** Rewriting a method step into her voice
+  (that is what `QQ PLACEHOLDER ` exists for), `incidental:`, the case-by-case
+  tag calls (`freezable`, `virtuous`, `one-handed food`), inventing a time or a
+  temperature (`Estimated N mins` is banned outright, §5), `meta.rewritten`,
+  `meta.proofread`.
+
 - **SPLIT `ingredient_groups` AND `method_groups` AT INGEST, ONCE — and never
   again afterwards.** Helen's request, restated 2026-08-29 when she found it was
   not written down anywhere: *"Claude is requested to split out ingredient and
@@ -1258,18 +1324,40 @@ recipe. No cap.
 
 **Savoury — substitution test.** Not "would this fail" but "would I improvise
 around a gap": the protein, the liquid/fat that defines the character, anything
-you'd have to go buy, the vegetable that's the point. Cap at eight. **Not
-mechanically enforced** — no test checks the count, so a recipe with a
-spice-heavy ingredient list can go over deliberately, case by case, rather
-than being forced to cut something that genuinely fails the substitution
-test. `indonesian-chicken-curry-gulai-ayam.md` (11) and `citrus-soy-salmon-
-sticky-rice.md` (12) both sit well past the cap — Helen's explicit call
-(2026-08-02 and 2026-08-09 respectively): everything in each is a "would
-have to specifically go buy" ingredient, so nothing was a good candidate to
-cut. Don't flag either as a violation to fix, and don't expect this to stop
-happening — more lists will grow past eight over time as ingredients get
-added to existing recipes. The cap is a soft first-pass guide, not something
-to defend by cutting a genuine substitution-test ingredient.
+you'd have to go buy, the vegetable that's the point.
+
+> **THE CAP OF EIGHT IS A FIRST-PASS GUIDE AND IT HAS BEEN READ AS A BUDGET.
+> BE GENEROUS.** Helen, 2026-08-29: *"we have generally shifted to allowing more
+> main ingredients where they define a dish, for example the long list of spices
+> in gulai ayam... I do often find myself adding to that array by hand, which is
+> plainly silly."*
+
+**Measured 2026-08-29, and the two halves of the corpus disagree in exactly the
+way that complaint predicts:**
+
+| | files | median | max | over eight |
+|---|---|---|---|---|
+| `_food_recipes/` — curated by Helen | 86 | 6 | **14** | **16 (18%)** |
+| `_food_drafts/` — written at ingest | 342 | 5 | 9 | **1 (0.3%)** |
+
+The one draft over eight is `meringue-swans-with-diplomat-cream.md`, which Helen
+wrote herself. **So the published half spreads to fourteen and the ingested half
+stops at five**, and the difference is her, by hand, one file at a time. Nothing
+about the substitution test changes at promotion; only who applied it does.
+
+**The number is an OUTPUT of the test, never an input to it.** Ask of each
+ingredient "would I improvise around a gap here" and write down every one that
+answers no — then count, if you like. Never cut a genuine substitution-test
+ingredient to reach a number, and never stop adding because you have reached
+one. **Not mechanically enforced**: no test checks the count, deliberately.
+
+`indonesian-chicken-curry-gulai-ayam.md` is the worked example Helen reaches
+for, and it has **fourteen** — this section said eleven from 2026-08-02 until
+2026-08-29, having recorded the figure once and never re-measured it, which is
+§11.2 again. `miso-cashew-butter-vegetable-ramen.md` has 13,
+`indian-mutton-raan-roast.md`, `garam-masala-powder.md` and
+`citrus-soy-salmon-sticky-rice.md` 12 each. Don't flag any of them as a
+violation, and expect the list to keep growing.
 
 **Cheeses** use the bare name where it stands alone (cheddar, feta, comté) —
 keep "cheese" only where the qualifier is meaningless without it (blue cheese,
