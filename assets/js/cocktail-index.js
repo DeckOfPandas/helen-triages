@@ -175,7 +175,15 @@
     };
   });
 
-  var pool = Search.buildPool(cards.map(function (c) { return c.dataset.ingredients; }));
+  /* ONE GROUP PER INGREDIENT, from data-ing, not one per card from
+     data-ingredients. A `suggestion` is a bottle FOR the generic written beside
+     it, and the card-level attribute has already flattened that pairing away --
+     so it is the only shape that can express "do not offer a bottle when its
+     category is offered". See buildPool's own note. */
+  var pool = Search.buildPool(model.reduce(function (groups, d) {
+    d.ingEls.forEach(function (ing) { groups.push(ing.el.dataset.ing); });
+    return groups;
+  }, []));
 
   function chosen(field) {
     var out = [];

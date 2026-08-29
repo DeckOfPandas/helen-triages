@@ -66,10 +66,23 @@
   // "alphabetical within each band" comes free only because the input list is
   // already sorted and this preserves that order. A comparator-based sort would
   // not promise it.
-  function orderByBand(candidates) {
-    var bands = [[], [], []];
-    candidates.forEach(function (c) { bands[bandOf(c) - 1].push(c); });
-    return bands[0].concat(bands[1], bands[2]);
+  //
+  // HOW MANY BANDS THERE ARE IS THE CALLER'S BUSINESS. Food has three; the
+  // cocktail index has four, because a chip can be found by a name it does not
+  // display and Helen ranked that between "a word in what you can see" and "a
+  // substring in what you can see". Pass a band function to say so; the default
+  // is bandOf above. What is shared is the DISCIPLINE -- lower band first,
+  // input order preserved inside a band -- which is the part that was written
+  // twice and would drift.
+  function orderByBand(candidates, bandFor) {
+    var band = bandFor || bandOf;
+    var buckets = [];
+    candidates.forEach(function (c) {
+      var n = band(c);
+      while (buckets.length < n) buckets.push([]);
+      buckets[n - 1].push(c);
+    });
+    return buckets.reduce(function (all, b) { return all.concat(b); }, []);
   }
 
   // Builds a matcher bound to one vocabulary (the parsed contents of

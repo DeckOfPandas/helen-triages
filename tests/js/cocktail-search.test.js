@@ -59,6 +59,8 @@ const VOCAB = {
   // test_cocktails.py's _declared_generics reads.
   syrups: ['ginger and lemongrass cordial', 'sugar syrup 1:1', 'sugar syrup 2:1'],
   cane_and_palm_spirits: ['coconut rum', 'moderately aged rum'],
+  liqueurs: ['falernum', 'apricot liqueur', 'cherry liqueur', 'gin liqueur'],
+  juices: ['lime juice', 'lime', 'lime cordial'],
   card_names: {
     'London dry gin': 'gin',
     'aged Demerara rum': 'Demerara rum',
@@ -99,6 +101,11 @@ const S = CS.create(VOCAB, BOTTLES);
 // `|`, the whole thing downcased at build time.
 const attr = (...entries) => entries.map((e) => e + '|').join('');
 
+// Several unrelated pours, each its own group. buildPool takes one group per
+// INGREDIENT — putting two pours in one group says a bottle in it belongs to
+// the other one's generic, which is the pairing the whole thing turns on.
+const pours = (...terms) => terms.map((t) => attr(t));
+
 // The pool holds CHIPS now, not strings — see the note on chipForTerm in
 // cocktail-search.js. Most cases below only care what the buttons SAY.
 const labels = (pool) => pool.map((c) => c.value);
@@ -121,7 +128,7 @@ test('an empty or missing attribute is no entries, not one empty entry', () => {
 // --- the pool ----------------------------------------------------------------
 
 test('the pool is every distinct entry across every card, deduplicated', () => {
-  const pool = S.buildPool([attr('lime juice', 'absinthe'), attr('absinthe', 'campari')]);
+  const pool = S.buildPool(pours('lime juice', 'absinthe', 'absinthe', 'campari'));
   assert.deepStrictEqual(labels(pool), ['absinthe', 'campari', 'lime juice']);
 });
 
@@ -131,7 +138,7 @@ test('the sort is case-insensitive, so a stray capital does not jump the list', 
   // letter, which is the trap ingredient-search.js's buildMasterList records,
   // and "the values happen to arrive lowercase" is a fact about the template
   // rather than about this function.
-  const pool = S.buildPool([attr('absinthe', 'Campari', 'lime juice')]);
+  const pool = S.buildPool(pours('absinthe', 'Campari', 'lime juice'));
   assert.deepStrictEqual(labels(pool), ['absinthe', 'Campari', 'lime juice']);
 });
 
@@ -142,7 +149,7 @@ test('the sort is case-insensitive, so a stray capital does not jump the list', 
 // them was reachable by typing ASCII, because cocktail-index.js folded nothing.
 
 test('an unaccented query finds an accented entry', () => {
-  const pool = S.buildPool([attr('crème de cassis', 'cachaça', 'bénédictine')]);
+  const pool = S.buildPool(pours('crème de cassis', 'cachaça', 'bénédictine'));
   assert.deepStrictEqual(S.search('creme', pool).results.map((r) => r.entry), ['crème de cassis']);
   assert.deepStrictEqual(S.search('cachaca', pool).results.map((r) => r.entry), ['cachaça']);
   assert.deepStrictEqual(S.search('bene', pool).results.map((r) => r.entry), ['bénédictine']);
@@ -170,7 +177,7 @@ test('a hyphen reads as a space, so a naturally typed two-word query matches', (
 // vocabularies; the ordering is what kept drifting and is what is now shared.
 
 test('an entry starting with the query outranks a word match, which outranks a substring', () => {
-  const pool = S.buildPool([attr('lime juice', 'apricot liqueur', 'galliano')]);
+  const pool = S.buildPool(pours('lime juice', 'apricot liqueur', 'galliano'));
   // "li": prefix `lime juice`; word-start `apricot liqueur`; substring `galliano`.
   assert.deepStrictEqual(
     S.search('li', pool).results.map((r) => r.entry),
@@ -179,7 +186,7 @@ test('an entry starting with the query outranks a word match, which outranks a s
 });
 
 test('alphabetical within a band comes free, because the pool is already sorted', () => {
-  const pool = S.buildPool([attr('lime juice', 'lime cordial', 'lime')]);
+  const pool = S.buildPool(pours('lime juice', 'lime cordial', 'lime'));
   assert.deepStrictEqual(
     S.search('lim', pool).results.map((r) => r.entry),
     ['lime', 'lime cordial', 'lime juice']
@@ -187,7 +194,7 @@ test('alphabetical within a band comes free, because the pool is already sorted'
 });
 
 test('a word match is flagged, so the picker can mark what you actually meant', () => {
-  const pool = S.buildPool([attr('lime juice', 'apricot liqueur', 'galliano')]);
+  const pool = S.buildPool(pours('lime juice', 'apricot liqueur', 'galliano'));
   const byEntry = {};
   S.search('li', pool).results.forEach((r) => { byEntry[r.entry] = r; });
   assert.strictEqual(byEntry['lime juice'].isPrefixMatch, true);
@@ -205,14 +212,14 @@ test('the pool is capped and the remainder is COUNTED, never silently dropped', 
   // correctly not a bottle name and the first version of this fixture built
   // twelve strings the pool was right to refuse.
   for (let i = 0; i < 12; i++) many.push('liqueur x' + String.fromCharCode(97 + i));
-  const pool = S.buildPool([attr(...many)]);
+  const pool = S.buildPool(pours(...many));
   const result = S.search('liq', pool);
   assert.strictEqual(result.results.length, 8);
   assert.strictEqual(result.hidden, 4);
 });
 
 test('nothing hidden reports zero rather than a negative', () => {
-  const pool = S.buildPool([attr('gin', 'absinthe')]);
+  const pool = S.buildPool(pours('gin', 'absinthe'));
   assert.strictEqual(S.search('gin', pool).hidden, 0);
 });
 
@@ -222,7 +229,10 @@ test('nothing hidden reports zero rather than a negative', () => {
 // follows, and test_the_cocktail_search_config_is_not_hardcoded enforces it.
 
 test('a query shorter than the declared minimum offers nothing at all', () => {
-  const pool = S.buildPool([attr('gin', 'gin liqueur')]);
+  // Two ingredients, so two groups. buildPool takes one group per INGREDIENT —
+  // putting both in one would say they are the same pour, and a bottle in a
+  // group is read as a bottle FOR that group's generic.
+  const pool = S.buildPool([attr('gin'), attr('gin liqueur')]);
   assert.deepStrictEqual(S.search('g', pool).results, []);
   assert.strictEqual(S.search('g', pool).hidden, 0);
   assert.strictEqual(S.search('gi', pool).results.length, 2);
@@ -237,7 +247,7 @@ test('an empty query is not a search', () => {
 // --- already-chosen chips ----------------------------------------------------
 
 test('an entry already chosen is not offered again', () => {
-  const pool = S.buildPool([attr('lime', 'lime juice')]);
+  const pool = S.buildPool(pours('lime', 'lime juice'));
   assert.deepStrictEqual(
     S.search('lim', pool, ['lime']).results.map((r) => r.entry),
     ['lime juice']
@@ -260,7 +270,7 @@ test('an entry already chosen is not offered again', () => {
 // declared family, which is what `synonyms` in ingredient_words.yml already is.
 
 test('a family whose name starts the query earns an (all) button', () => {
-  const pool = S.buildPool([attr('london dry gin', 'old tom')]);
+  const pool = S.buildPool(pours('london dry gin', 'old tom'));
   assert.deepStrictEqual(S.search('gin', pool).familyButtons, ['gin']);
 });
 
@@ -285,7 +295,7 @@ test('the (all) button carries the suffix filter-state.js already spells', () =>
 // for 'whisky'." The family already HELD all three; the spelling found nothing.
 
 test('an alias spelling reaches the family, whatever the button ends up called', () => {
-  const pool = S.buildPool([attr('bourbon', 'rye')]);
+  const pool = S.buildPool(pours('bourbon', 'rye'));
   ['whisky', 'whiskey', 'scotch'].forEach((typed) => {
     assert.strictEqual(S.search(typed, pool).familyButtons.length, 1, typed);
   });
@@ -296,7 +306,7 @@ test('an alias never mints a SECOND umbrella, which would lie about its width', 
   // returning bourbon is an umbrella misdescribing itself, so one button
   // appears and it carries the family's own name -- Helen was shown that trade
   // and asked for the alias anyway.
-  const pool = S.buildPool([attr('bourbon', 'rye')]);
+  const pool = S.buildPool(pours('bourbon', 'rye'));
   const buttons = S.search('scotch', pool).familyButtons;
   assert.strictEqual(buttons.length, 1);
   assert.strictEqual(buttons[0], 'whisk(e)y');
@@ -326,13 +336,13 @@ test('an (all) button already chosen is not offered a SECOND time', () => {
   // BUTTONS were not, so an umbrella you had picked came back round as an
   // offer. Same class of omission as issue #390's dropped flag: the answer was
   // computed correctly and one of the two consumers ignored it.
-  const pool = S.buildPool([attr('bourbon', 'rye')]);
+  const pool = S.buildPool(pours('bourbon', 'rye'));
   assert.deepStrictEqual(S.search('whi', pool).familyButtons, ['whisk(e)y']);
   assert.deepStrictEqual(S.search('whi', pool, ['whisk(e)y (all)']).familyButtons, []);
 });
 
 test('choosing one family does not hide another', () => {
-  const pool = S.buildPool([attr('bourbon', 'old tom')]);
+  const pool = S.buildPool(pours('bourbon', 'old tom'));
   assert.deepStrictEqual(S.search('gin', pool, ['whisk(e)y (all)']).familyButtons, ['gin']);
 });
 
@@ -347,7 +357,7 @@ test('choosing one family does not hide another', () => {
 // draws for generics: matching runs on the key, the button shows the name.
 
 test('a family with a declared label wears it on the button', () => {
-  const pool = S.buildPool([attr('bourbon', 'rye')]);
+  const pool = S.buildPool(pours('bourbon', 'rye'));
   assert.deepStrictEqual(S.search('whisky', pool).familyButtons, ['whisk(e)y']);
   assert.deepStrictEqual(S.search('whiskey', pool).familyButtons, ['whisk(e)y']);
   assert.deepStrictEqual(S.search('scotch', pool).familyButtons, ['whisk(e)y']);
@@ -380,7 +390,9 @@ test('the label is reachable by typing it, parentheses and all', () => {
 // eleven of those fifteen pairs selected exactly the same drinks.
 
 test('a generic with a card name is not offered twice', () => {
-  const pool = S.buildPool([attr('moderately aged rum', 'aged rum', 'lime juice')]);
+  // The rum's own group carries both spellings, exactly as data-ing does; the
+  // lime is a separate pour.
+  const pool = S.buildPool([attr('moderately aged rum', 'aged rum'), attr('lime juice')]);
   assert.deepStrictEqual(labels(pool), ['aged rum', 'lime juice']);
 });
 
@@ -401,7 +413,7 @@ test('the generic stays searchable -- collapsing a pair must not lose a way in',
 test('a chip is ranked by its BEST term, not only by the name on its face', () => {
   // "moderately" is a band-1 prefix of the generic and appears nowhere in the
   // card name, so ranking the chip by its label alone would bury it.
-  const pool = S.buildPool([attr('moderately aged rum', 'lime juice')]);
+  const pool = S.buildPool(pours('moderately aged rum', 'lime juice'));
   const hit = S.search('moderately', pool).results[0];
   assert.strictEqual(hit.entry, 'aged rum');
   assert.strictEqual(hit.isPrefixMatch, true);
@@ -566,12 +578,12 @@ test('a suggestion the bottle file calls unresolved is not offered at all', () =
 test('an "X or Y" suggestion is dropped even when nothing has declared it', () => {
   // bottles.yml is a RUM file, so the bitters and the syrups are not in it and
   // never will be. The shape is the rule, not the declaration.
-  const pool = S.buildPool([attr('or other aromatic bitters', 'Or 20g palm sugar')]);
+  const pool = S.buildPool(pours('or other aromatic bitters', 'Or 20g palm sugar'));
   assert.deepStrictEqual(labels(pool), []);
 });
 
 test('the ban is on the CONNECTOR, not on the letters o-r', () => {
-  const pool = S.buildPool([attr('orgeat', 'orange juice', 'cointreau')]);
+  const pool = S.buildPool(pours('orgeat', 'orange juice', 'cointreau'));
   assert.deepStrictEqual(labels(pool), ['cointreau', 'orange juice', 'orgeat']);
 });
 
@@ -594,6 +606,44 @@ test('a declared generic is never resolved into a BOTTLE, and one really collide
   assert.strictEqual(S.matchesInclude(drink, 'coconut rum'), true);
 });
 
+// =============================================================================
+// A BOTTLE IS NOT OFFERED WHEN ITS CATEGORY IS — Helen, 2026-08-29
+// =============================================================================
+// On `falernum` and `john d taylor's velvet falernum` sitting side by side:
+// "the first chip being 'falernum (all)' would at least stop me worrying that
+// the two sets were disjoint."
+//
+// They are not disjoint, measured rather than argued: the bottle matches 1
+// drink and the category 14, and the 1 is inside the 14. Across all 15
+// bottle/category pairs in the collection 14 are strictly nested, and the
+// exception is a data bug. So the two chips were never alternatives, and a
+// picker that lays them out as though they were asks a question with no answer.
+
+test('a bottle beside a category does not get its own chip', () => {
+  const pool = S.buildPool([attr('falernum', "john d taylor's velvet falernum")]);
+  assert.deepStrictEqual(labels(pool), ['falernum']);
+});
+
+test('but the bottle still FINDS the category -- the way in survives', () => {
+  const pool = S.buildPool([attr('falernum', "john d taylor's velvet falernum")]);
+  assert.deepStrictEqual(S.search('velvet', pool).results.map((r) => r.entry), ['falernum']);
+  assert.deepStrictEqual(S.search('taylor', pool).results.map((r) => r.entry), ['falernum']);
+});
+
+test('a bottle with no category beside it is still offered', () => {
+  // Nothing else in the group, so the bottle is all there is to name the pour.
+  const pool = S.buildPool([attr('Rutte')]);
+  assert.deepStrictEqual(labels(pool), ['Rutte']);
+});
+
+test('the category a bottle folds into is the one on ITS ingredient', () => {
+  // Two pours. The bottle belongs to the first and must not attach to the
+  // second, which is the pairing a card-level attribute has already lost.
+  const pool = S.buildPool([attr('falernum', 'velvet falernum'), attr('lime juice')]);
+  assert.deepStrictEqual(labels(pool), ['falernum', 'lime juice']);
+  assert.deepStrictEqual(S.search('velvet', pool).results.map((r) => r.entry), ['falernum']);
+});
+
 // --- a hidden term cannot earn a chip on a substring alone -------------------
 // Helen, 2026-08-29: "'el' returns both 'aged rum' and 'jamaican rum', which is
 // counterintuitive." It is worse than counterintuitive -- it is unexplainable.
@@ -608,7 +658,7 @@ test('a declared generic is never resolved into a BOTTLE, and one really collide
 // alone.
 
 test('a hidden generic does not surface its chip on a mid-word substring', () => {
-  const pool = S.buildPool([attr('moderately aged rum', 'moderately aged jamaican rum')]);
+  const pool = S.buildPool(pours('moderately aged rum', 'moderately aged jamaican rum'));
   assert.deepStrictEqual(S.search('el', pool).results.map((r) => r.entry), []);
 });
 
@@ -626,7 +676,48 @@ test('a hidden bottle alias behaves the same way', () => {
   assert.deepStrictEqual(S.search('nd', pool).results.map((r) => r.entry), []);
 });
 
-test('the VISIBLE label keeps its substring reach, which is band 3 doing its job', () => {
+// --- four bands, and the order Helen gave -------------------------------------
+// "It's surprising to me that 've' returns 'falernum' before any vermouth. I
+// think here it should be prefix matching of first word, prefix matching of any
+// word, then prefix matching of any word in the bottle name as is this one,
+// then substring."
+//
+// Visible beats hidden at equal strength, and any real word beats a mere
+// substring. Band 3 exists only because a bottle stopped being its own chip and
+// became a way IN to its category -- a way in that was outranking the thing you
+// had actually typed.
+
+test('a visible name outranks a hidden one, however strong the hidden match', () => {
+  const pool = S.buildPool([
+    attr('sweet vermouth'),
+    attr('falernum', "john d taylor's velvet falernum"),
+    attr('vermouth')
+  ]);
+  assert.deepStrictEqual(
+    S.search('ve', pool).results.map((r) => r.entry),
+    ['vermouth', 'sweet vermouth', 'falernum']
+  );
+});
+
+test('the four bands land in Helen\'s order', () => {
+  const pool = S.buildPool([
+    attr('vermouth'),                                   // 1: own name starts
+    attr('sweet vermouth'),                             // 2: word in own name
+    attr('falernum', 'velvet falernum'),                // 3: word in a hidden name
+    attr('salve')                                       // 4: substring of own name
+  ]);
+  const got = S.search('ve', pool).results;
+  assert.deepStrictEqual(got.map((r) => r.entry),
+    ['vermouth', 'sweet vermouth', 'falernum', 'salve']);
+  assert.deepStrictEqual(got.map((r) => r.band), [1, 2, 3, 4]);
+});
+
+test('a hidden word still beats a visible substring -- a real word is a real signal', () => {
+  const pool = S.buildPool([attr('salve'), attr('falernum', 'velvet falernum')]);
+  assert.deepStrictEqual(S.search('ve', pool).results.map((r) => r.entry), ['falernum', 'salve']);
+});
+
+test('the VISIBLE label keeps its substring reach, which is the last band doing its job', () => {
   // `galliano` for "li" is the case the three bands exist to rank, and it is
   // fine precisely because you can see the "li" in the button.
   const pool = S.buildPool([attr('galliano')]);
@@ -646,17 +737,17 @@ test('the VISIBLE label keeps its substring reach, which is band 3 doing its job
 // doing any work.
 
 test('an aside, a question mark, a comparison or a comma is not a bottle name', () => {
-  const pool = S.buildPool([attr(
+  const pool = S.buildPool(pours(
     'Avallen -- a round, fresh taste if you need to sub',
     'Dolin Rouge?',
     'Jack Daniels > Bulleit',
     'Patron Silver, Rooster Bianco'
-  )]);
+  ));
   assert.deepStrictEqual(labels(pool), []);
 });
 
 test('a function word marks prose even with no punctuation in sight', () => {
-  const pool = S.buildPool([attr('or other aromatic bitters', 'Best with ED3')]);
+  const pool = S.buildPool(pours('or other aromatic bitters', 'Best with ED3'));
   assert.deepStrictEqual(labels(pool), []);
 });
 
@@ -665,7 +756,7 @@ test('a real bottle name survives every one of those tests', () => {
   // apostrophe, digits, an accent, a hyphen and a lowercase word.
   const real = ['Smith & Cross', "Gosling's Black Seal", 'El Dorado 3', 'Appleton 8-year',
     'La Favourite L\'Authentique Ambré', 'Pierre Ferrand ambre', 'acacia honey', 'Rutte'];
-  const pool = S.buildPool([attr(...real)]);
+  const pool = S.buildPool(pours(...real));
   assert.deepStrictEqual(labels(pool).length, real.length);
 });
 
@@ -673,7 +764,7 @@ test('with no bottle file the pool still works, and still refuses an X or Y', ()
   // The page must survive the JSON block being absent -- same stance
   // filters.js takes on a missing #ingredient-vocabulary.
   const bare = CS.create(VOCAB);
-  const pool = bare.buildPool([attr('wray and nephew', 'ed3 or havana 3', 'lime juice')]);
+  const pool = bare.buildPool(pours('wray and nephew', 'ed3 or havana 3', 'lime juice'));
   assert.deepStrictEqual(labels(pool), ['lime juice', 'wray and nephew']);
 });
 

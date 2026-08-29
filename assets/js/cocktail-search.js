@@ -382,29 +382,69 @@
        lowercase" is a fact about the template and not about this function. */
     /* Returns CHIPS, not strings: { value, terms }. `value` is what the button
        says and what gets stored as a filter; `terms` is everything that finds
-       it, which is the card name and every generic it stands for.
+       it -- the card name, every generic it stands for, and any bottle that
+       sits beside it.
 
-       A raw term that is a generic with a card name is folded INTO that card
-       name's chip rather than becoming one of its own -- see the note on
-       chipForTerm above for why, and for the eleven pairs that made it worth
-       doing. */
-    function buildPool(attrValues) {
+       TAKES ONE GROUP PER INGREDIENT, not one per card, and that is what makes
+       the rule below expressible at all: a `suggestion` is a bottle FOR the
+       generic written next to it, and only the per-ingredient `data-ing`
+       attribute knows which generic that is. A card-level list has already
+       thrown the pairing away.
+
+       A BOTTLE IS NOT OFFERED WHEN ITS CATEGORY IS — Helen's ruling,
+       2026-08-29, on `falernum` and `john d taylor's velvet falernum` sitting
+       side by side: "the first chip being 'falernum (all)' would at least stop
+       me worrying that the two sets were disjoint."
+
+       They are not disjoint, and that was measured rather than argued: the
+       falernum bottle matches 1 drink and the category matches 14, and the 1 is
+       inside the 14. Across all 15 bottle/category pairs in the collection, 14
+       are strictly nested -- the exception is a data bug, not a design case.
+       So the two chips were never alternatives, and a picker that lays them out
+       as though they were is asking a question with no answer.
+
+       The bottle stays SEARCHABLE as a hidden term of its category, so typing
+       "velvet" or "el dorado" still gets you there; what goes is the second
+       button. Same shape as #501's ruling one layer up: the card shows the
+       category, and the bottle is the drink page's business. */
+    function buildPool(ingredientGroups) {
       var byValue = Object.create(null);
-      (attrValues || []).forEach(function (value) {
-        splitEntries(value).forEach(function (raw) {
+
+      function add(chipValue, terms) {
+        var key = normalise(chipValue);
+        if (!byValue[key]) byValue[key] = { value: chipValue, terms: [] };
+        terms.forEach(function (t) {
+          if (t && byValue[key].terms.indexOf(t) === -1) byValue[key].terms.push(t);
+        });
+      }
+
+      (ingredientGroups || []).forEach(function (group) {
+        var raws = splitEntries(group);
+        // The declared half of this ingredient: its generics and their card
+        // names. Everything else in the group is a bottle someone typed.
+        var declared = raws.filter(isDeclared);
+        var loose = raws.filter(function (r) { return !isDeclared(r); });
+
+        declared.forEach(function (raw) {
+          var chipValue = chipForTerm[normalise(raw)] || raw;
+          // The bottles beside it become hidden terms of the category's chip:
+          // the way in survives, the second button does not.
+          add(chipValue, [raw].concat(coveredBy(chipValue), loose));
+        });
+
+        if (declared.length) return;
+
+        // No category on this ingredient, so a bottle is all there is to offer.
+        loose.forEach(function (raw) {
           // A disjunction, or a suggestion the bottle file calls unresolved,
           // never becomes a chip at all; an aliased bottle becomes its
           // canonical self. See resolveTerm above.
           var entry = resolveTerm(raw);
           if (entry === null) return;
           var chipValue = chipForTerm[normalise(entry)] || entry;
-          var key = normalise(chipValue);
-          if (!byValue[key]) byValue[key] = { value: chipValue, terms: [] };
           // The RAW term stays searchable, so collapsing a spelling never loses
           // a way in: typing "wray and nephew" still finds `Wray & Nephew`.
-          [raw, entry].concat(coveredBy(chipValue)).forEach(function (t) {
-            if (byValue[key].terms.indexOf(t) === -1) byValue[key].terms.push(t);
-          });
+          add(chipValue, [raw, entry].concat(coveredBy(chipValue)));
         });
       });
       return Object.keys(byValue).map(function (k) { return byValue[k]; })
@@ -435,17 +475,35 @@
       var taken = (chosen || []).map(normalise);
       var candidates = [];
 
-      /* A chip is ranked by its BEST term, not only by the name on its face.
-         That is what keeps the generic searchable after the card name took the
-         button: typing "moderately" band-1 matches `moderately aged rum` and
-         surfaces the `aged rum` chip, which is the one thing that would
-         otherwise be lost by collapsing the pair. */
+      /* FOUR BANDS, NOT FOOD'S THREE — Helen, 2026-08-29: "it's surprising to
+         me that 've' returns 'falernum' before any vermouth. I think here it
+         should be prefix matching of first word, prefix matching of any word,
+         then prefix matching of any word in the bottle name as is this one,
+         then substring."
+
+             1  the chip's own name starts with the query      "ve" -> vermouth
+             2  a word in the chip's own name starts with it   "ve" -> sweet vermouth
+             3  a word in a name it does NOT show starts with it
+                                                               "ve" -> falernum,
+                                                               via velvet falernum
+             4  the query is only a substring of its own name  "li" -> galliano
+
+         The rule underneath is that VISIBLE BEATS HIDDEN at equal strength, and
+         any real word beats a mere substring. Band 3 exists at all because
+         Helen chose to stop offering a bottle its own chip when its category is
+         offered -- the bottle became a way IN to the category rather than a
+         button, and a way in that outranked the thing you actually typed.
+
+         A chip is ranked by its BEST term. That is also what keeps the generic
+         searchable after the card name took the button: "moderately" band-1
+         matches `moderately aged rum` and surfaces the `aged rum` chip. */
       (pool || []).forEach(function (chip) {
         var value = chip && chip.value !== undefined ? chip.value : chip;
         var terms = (chip && chip.terms) ? chip.terms : [value];
         if (taken.indexOf(normalise(value)) !== -1) return;
 
         var best = null;
+        var bestBand = Infinity;
         terms.forEach(function (term) {
           var folded = normalise(term);
           if (folded.indexOf(query) === -1) return;
@@ -456,39 +514,57 @@
             hasWordMatch: words.some(function (w) { return w.indexOf(query) === 0; })
           };
 
-          /* A HIDDEN TERM EARNS THE CHIP ITS PLACE ONLY IN BAND 1 — only when
-             the query is what that term STARTS WITH.
+          /* A HIDDEN TERM MUST BE MATCHED ON A REAL WORD, never on a substring
+             and never on a connector.
 
              Helen, 2026-08-29: "'el' returns both 'aged rum' and 'jamaican
              rum', which is counterintuitive." Neither LABEL contains "el"; the
              match was mid-word inside the generics those chips stand for,
-             "moderat(el)y aged rum" and "caram(el)-forward Jamaican rum".
+             "moderat(el)y aged rum" and "caram(el)-forward Jamaican rum". So
+             band 3 is out for anything the chip does not display: a card can
+             always print its reason, and a chip cannot print a term it hides.
 
-             Band 3 was the obvious thing to ban and it was not enough. Sweeping
-             all 676 two-letter queries afterwards still found 25 chips that
-             could not explain themselves, and the survivors were band 2 --
-             `an` returning `Smith & Cross`, because its alias is spelled "Smith
-             AND Cross"; `dr` returning `gin`, via "London DRY gin". A word
-             buried in a name you cannot see is no more explicable than a
-             substring in it.
+             BAND 2 STAYS, AND HAS TO. It is what makes typing a bottle name
+             find its category -- "velvet" reaching `falernum`, which is the
+             whole point of not offering the bottle its own button. A first pass
+             banned band 2 as well; it took "velvet" with it.
 
-             So: a chip is offered on what it SHOWS, plus the one case the
-             aliases exist for -- you started typing the real name of the thing.
-             "moderately" and "mod" still surface `aged rum`; "ed3" still
-             surfaces `El Dorado 3`; "wray and nephew" still surfaces `Wray &
-             Nephew`, and so does "nephew", because that word is in the label.
-             The visible label keeps all three bands, where `galliano` for "li"
-             is exactly right and visibly so. */
-          if (normalise(term) !== normalise(value) && IS.bandOf(scored) !== 1) return;
+             What band 2 must NOT do is match a connector. Sweeping all 676
+             two-letter queries found `an` returning `Smith & Cross`, because
+             its alias is spelled "Smith AND Cross" -- a word that is in the
+             name without being any of what the name means. The prose list
+             already names those words for a different job, and it is the same
+             set of words for the same reason. */
+          var band;
+          if (normalise(term) === normalise(value)) {
+            // What the chip SHOWS: food's three bands, with substring last.
+            band = scored.isPrefixMatch ? 1 : (scored.hasWordMatch ? 2 : 4);
+          } else {
+            /* A name the chip does NOT show. It must be matched on a real word
+               -- never a substring, which is how "el" surfaced `aged rum` out
+               of "moderat(el)y", and never a connector, which is how "an"
+               surfaced `Smith & Cross` out of "Smith AND Cross". The prose list
+               already names those words for a different job and it is the same
+               set for the same reason. */
+            if (!scored.hasWordMatch) return;
+            var onlyConnector = words.every(function (w) {
+              return w.indexOf(query) !== 0 || proseWords.indexOf(w) !== -1;
+            });
+            if (onlyConnector) return;
+            band = 3;
+          }
 
-          if (!best || IS.bandOf(scored) < IS.bandOf(best)) best = scored;
+          if (band < bestBand) { bestBand = band; best = scored; }
         });
-        if (best) candidates.push(best);
+        if (best) { best.band = bestBand; candidates.push(best); }
       });
 
-      // Shared with food rather than re-derived — see orderByBand's own note in
-      // assets/js/ingredient-search.js for what is shared and what is not.
-      var ordered = IS.orderByBand(candidates);
+      /* Shared with food rather than re-derived — see orderByBand's own note in
+         assets/js/ingredient-search.js. What is shared is the discipline (lower
+         band first, input order preserved inside a band, which is what makes
+         "alphabetical within a band" free); the bands themselves are this
+         site's four, computed above. */
+      var ordered = IS.orderByBand(candidates, function (c) { return c.band; });
 
       /* A family earns a button when the query is heading towards its NAME and
          it has at least one member in the pool. The membership half is not
