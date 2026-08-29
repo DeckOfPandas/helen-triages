@@ -124,10 +124,15 @@ DIVERGENT_ON_PURPOSE = {
         "brand names arrive, and its message points at ampersand_proper_nouns "
         "as the first thing to try rather than the last",
     "test_meta_block_complete":
-        "TEMPORARY. Drafts still carry the pre-#429 meta contract -- all of "
-        "them have cooked_before/date_last_edited and two have no "
-        "awaiting_fix. Delete this entry and delegate once #429 reaches "
-        "_food_drafts/. Found by the delegation migration, not by reading",
+        "#429 REACHED _food_drafts/ ON 2026-08-29 and this entry survived it, "
+        "narrowed. Every draft is now on the three-flag contract; what is left "
+        "is TWO files with no awaiting_fix at all "
+        "(bbq-spatchcock-duck-grilled-plum-ketchup, duck-fesenjan). That flag "
+        "fails closed, so writing `false` in asserts a recipe is fit to "
+        "publish, which is Helen's call and not a migration's. Delete this "
+        "entry and delegate once those two have a value. Until 2026-08-29 this "
+        "said drafts carried cooked_before/date_last_edited -- all 341 did, "
+        "and none does now",
 }
 
 # Suite marker, so `pytest -m food` can run this half alone.
@@ -208,8 +213,11 @@ NOT_FOR_DRAFTS = {
         "the draft twin checks key presence only, deliberately, without the "
         "'and it must be written' half",
     "test_meta_block_is_exactly_the_three_flags_in_order":
-        "343 drafts -- #429 has not been propagated to _food_drafts/ yet. This "
-        "is the one entry here that is a TODO rather than a judgement",
+        "5 drafts, down from 341 -- the #429 migration landed 2026-08-29 and "
+        "this is no longer a TODO. Three legitimately carry claude_rewritten, "
+        "which #418 allows on a draft and this rule forbids outright; two have "
+        "no awaiting_fix, which is Helen's to set. Both remainders are real "
+        "divergences now, not a backlog",
     "test_internal_temp_ref_resolves":
         "wiring a temperature is wasted work until Helen has cooked it "
         "(HANDOVER 14); the test catches each draft on the day it is promoted",
@@ -220,8 +228,6 @@ NOT_FOR_DRAFTS = {
     # -- WOULD APPLY CLEANLY. These are the real gaps: mechanical, no
     # judgement needed, and every one is a tax paid at promotion instead.
     # Phases 3 and 4 of the plan agreed 2026-08-21.
-    "test_scalar_fields_are_quoted": "GAP, mechanical; 295 drafts",
-    "test_main_ingredients_entries_are_quoted": "GAP, mechanical; 281 drafts",
     # NOT A GAP -- this said "GAP, mechanical; 256 drafts" until 2026-08-29 and
     # was the one entry here pointing the wrong way. The rule's own docstring
     # says the opposite: "the bare-string form is still deliberately allowed in
@@ -239,9 +245,7 @@ NOT_FOR_DRAFTS = {
         "divergent on purpose -- a bare-string note is correct in a draft "
         "(the recipe rule's own docstring says so); the narrower twin "
         "test_note_dicts_have_label_and_text_when_dict is what applies here",
-    "test_tags_entries_are_quoted": "GAP, mechanical; 250 drafts",
     "test_size_word_is_with_the_count_not_the_item": "GAP; 108 drafts",
-    "test_number_ranges_use_en_dashes": "GAP, mechanical; 58 drafts",
     "test_title_and_slug_dont_diverge": "GAP; 20 drafts, one call each",
     "test_internal_recipe_links_resolve": "GAP, mechanical; 7 drafts",
     "test_main_ingredients_egg_count_agrees": "GAP; 3 drafts",
@@ -347,6 +351,40 @@ def test_front_matter_has_no_duplicate_keys(draft):
 
 def test_no_retired_fields(draft):
     _fm.test_no_retired_fields(draft)
+
+
+# =============================================================================
+# ADOPTED 2026-08-29, THE MOMENT THE TIDY PASS TOOK THEM TO ZERO
+# =============================================================================
+# All four sat in NOT_FOR_DRAFTS as "GAP, mechanical" -- a real rule with a real
+# backlog, whose cost was paid one file at a time at promotion. scripts/
+# tidy_drafts.py cleared them across 341 drafts in one pass:
+#
+#     scalar quoting            295 -> 0
+#     main_ingredients quoting  279 -> 0
+#     tags quoting              248 -> 0
+#     en dashes                  58 -> 0
+#
+# ADOPTING THEM IS THE POINT OF HAVING CLEARED THEM, and this file's own
+# "already clean" section says so: zero backlog makes twinning free and buys
+# immediate regression cover. Without it the next ingest re-grows the backlog
+# quietly and the pass has to be run again for ever. With it, a draft that
+# arrives unquoted fails on the day it arrives.
+
+def test_scalar_fields_are_quoted(draft):
+    _fm.test_scalar_fields_are_quoted(draft)
+
+
+def test_main_ingredients_entries_are_quoted(draft):
+    _tx.test_main_ingredients_entries_are_quoted(draft)
+
+
+def test_tags_entries_are_quoted(draft):
+    _tx.test_tags_entries_are_quoted(draft)
+
+
+def test_number_ranges_use_en_dashes(draft):
+    _st.test_number_ranges_use_en_dashes(draft)
 
 
 def test_meta_fields_are_nested_not_top_level(draft):
