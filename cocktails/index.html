@@ -294,6 +294,14 @@ permalink: /cocktails/
             {% comment %} Items only. Amounts are noise at this distance, and
                Helen knows how to make drinks.
 
+               `data-ing` IS `|`-SEPARATED, the same self-delimiting shape
+               data-ingredients uses on the card above and food/index.html's
+               data-all-ingredients uses on a recipe row. It carries the generic,
+               its card name and the suggestion for ONE ingredient, so the script
+               can ask "does this ingredient answer the chip?" without a
+               substring probe that could match across the seam between two of
+               them.
+
                EXCEPT FOR RUM, WHERE THE ITEM CANNOT BE TRUSTED — #501. The
                source's own words for a rum are the colour vocabulary #314
                retired, and eight of those strings each name two or three
@@ -324,7 +332,7 @@ permalink: /cocktails/
                needs nothing — each ingredient entry renders its own card name,
                so the name simply appears twice, correctly. {% endcomment %}
             <p class="drink-card-ingredients">
-              {% for ing in drink.ingredients %}{% assign label = "" %}{% for g in ing.generic %}{% assign dn = card_names[g] | default: g %}{% if label == "" %}{% assign label = dn %}{% else %}{% assign label = label | append: " or " | append: dn %}{% endif %}{% endfor %}{% assign joined = card_name_joins[label] %}{% if joined %}{% assign label = joined %}{% endif %}{% if label == "" %}{% assign label = ing.item %}{% endif %}{% capture ing_search %}{% for g in ing.generic %}{{ g }} {% assign dn = card_names[g] %}{% if dn %}{{ dn }} {% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }} {% endfor %}{% endcapture %}{% if label != "" %}<span class="drink-card-ing" data-ing="{{ ing_search | strip | downcase }}">{{ label }}</span>{% unless forloop.last %} <span class="drink-card-sep">·</span> {% endunless %}{% endif %}{% endfor %}
+              {% for ing in drink.ingredients %}{% assign label = "" %}{% for g in ing.generic %}{% assign dn = card_names[g] | default: g %}{% if label == "" %}{% assign label = dn %}{% else %}{% assign label = label | append: " or " | append: dn %}{% endif %}{% endfor %}{% assign joined = card_name_joins[label] %}{% if joined %}{% assign label = joined %}{% endif %}{% if label == "" %}{% assign label = ing.item %}{% endif %}{% capture ing_search %}{% for g in ing.generic %}{{ g }}|{% assign dn = card_names[g] %}{% if dn %}{{ dn }}|{% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }}|{% endfor %}{% endcapture %}{% if label != "" %}<span class="drink-card-ing" data-ing="{{ ing_search | downcase }}">{{ label }}</span>{% unless forloop.last %} <span class="drink-card-sep">·</span> {% endunless %}{% endif %}{% endfor %}
             </p>
           {% endif %}
         </div>
@@ -344,6 +352,42 @@ permalink: /cocktails/
      it lands as an insult to a search that was simply too narrow. {% endcomment %}
   <p class="drink-none" hidden>Blank canvas.</p>
 
+  {% comment %} THE INGREDIENT VOCABULARY — declared families, card names and
+     the three search thresholds — comes from _data/cocktails/ingredients.yml.
+     cocktail-search.js reads it from here rather than hardcoding any of it, the
+     same contract food/index.html has with filters.js.
+
+     `family_of` HAS EXISTED SINCE #322 AND WAS READ BY NOTHING until #579. Its
+     own header says what it is for: "the ingredient search's `(all)` buttons ...
+     and exclusion. 'I don't like Scotch' is a family-level operation." 68
+     generics are mapped across 10 families, and #549 point 1 is asking for
+     exactly this rather than for a new mechanism.
+
+     The whole file is emitted, not a hand-picked subset, so adding a key to the
+     YAML never needs this template touched -- which is the property #501 already
+     values about `card_names`. It is 12 KB of JSON on a page that already
+     carries 115 cards, and every byte of it is public in this repo anyway
+     (HANDOVER §9.1: the shell is public, the drinks are not). {% endcomment %}
+  <script type="application/json" id="drink-vocabulary">
+    {{ site.data.cocktails.ingredients | jsonify }}
+  </script>
+
+  {% comment %} ORDER MATTERS, and each of these is read at startup rather than
+     on first use, so a page that loads them out of order fails immediately
+     rather than on the first keystroke:
+
+       ingredient-search.js  fold, getWords and orderByBand — the three-band
+                             ordering rule, shared with the food index since
+                             #579 rather than re-derived here.
+       filter-state.js       COCKTAIL_FIELDS: what this index's filter state IS.
+       cocktail-search.js    the pool, the ranking and the two matching rules.
+                             Requires the first of these.
+
+     Guarded by tests/test_site_config.py, the same way food's four are.
+  {% endcomment %}
+  <script src="{{ '/assets/js/ingredient-search.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/cocktail-search.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-index.js' | relative_url }}"></script>
 
 {% else %}

@@ -1,15 +1,41 @@
 /* =============================================================================
-   COCKTAILS INDEX — filtering. Designed with Helen, 2026-08-26.
+   COCKTAILS INDEX — DOM wiring. Designed with Helen, 2026-08-26.
    =============================================================================
-   Four controls: mood, chaos, has-to-have, leave-out. Everything is already in
-   the DOM — 115 drinks is nothing — so this toggles [hidden] and reorders the
-   list in place. No fetch, no dependency on the site's other scripts.
+   Five named questions: YOLO, mood, hassle, has-to-have/leave-out, and the way
+   past all of it. Everything is already in the DOM — 115 drinks is nothing —
+   so this toggles [hidden] and reorders the list in place. No fetch.
+
+   THIS FILE IS DOM WIRING AND NOTHING ELSE, since GitHub issue #579. It used to
+   be 428 lines that reused nothing from the food index's stack and hand-rolled
+   three things food had deliberately extracted: vocabulary derivation, ranked
+   prefix matching, and filter state as loose variables. Two of those were
+   wrong, and neither could be asked a question without opening a browser:
+
+     - both matching directions were a raw SUBSTRING test against the whole
+       concatenated attribute, so `gin` hid twelve drinks whose only gin-shaped
+       ingredient was ginger, and `apple juice` matched fifteen drinks that
+       have pineapple juice;
+     - nothing was folded, so nineteen accented ingredients and three accented
+       drink names were unreachable from an ASCII keyboard.
+
+   Where it lives now:
+
+     assets/js/cocktail-search.js   the pool, the ranking, the declared-family
+                                    umbrellas, and the two matching rules.
+                                    Pure. tests/js/cocktail-search.test.js.
+     assets/js/filter-state.js      WHAT this index's filter state is, as
+                                    COCKTAIL_FIELDS — the same mechanism food
+                                    uses over a different table.
+     assets/js/ingredient-search.js fold, getWords, and orderByBand: the
+                                    three-band ordering rule, shared rather
+                                    than re-derived for the second time.
 
    NOTHING IS PARSED OUT OF THE RENDERED MARKUP. Every fact a filter needs was
    written into a data- attribute at build time by cocktails/index.html:
-   data-moods, data-chaos and a pre-lowercased data-ingredients. A filter that
-   reads textContent is a filter that breaks the first time someone restyles a
-   card.
+   data-moods, data-chaos, data-name and a pre-lowercased data-ingredients. A
+   filter that reads textContent is a filter that breaks the first time someone
+   restyles a card — and #501 is the case where it broke for real, when the card
+   stopped printing the item the script was matching on.
 
    HOW THE AXES COMBINE. Settled by Helen 2026-08-27, #478 and #479:
 
@@ -21,16 +47,7 @@
    The ranking is what makes OR usable. AND across moods is nearly always empty
    -- `tiki` AND `no juicing` is a handful of drinks -- so OR is the only
    answer that keeps the index alive, but plain OR stops narrowing anything
-   once you pick a second mood. Ranking gives back the precision: the drinks
-   that match both float to the top without the ones matching only one
-   disappearing.
-
-   WHY RANDOM RATHER THAN ALPHABETICAL. Alphabetical is a stable answer to a
-   question nobody asked -- it buries everything after M and it means the same
-   drink greets you every time. Random ordering is what makes the index a way
-   of FINDING something rather than a list you scroll past, which is the
-   principle in _data/cocktails/taxonomy.yml: this exists to get Helen the
-   drink she wants, not to be an encyclopaedia.
+   once you pick a second mood.
 
    THE SHUFFLE HAPPENS ONCE PER PAGE LOAD, NOT PER KEYSTROKE, and that is the
    part worth not undoing. Each card is given a random sort key at startup and
@@ -42,8 +59,54 @@
   var cards = Array.prototype.slice.call(document.querySelectorAll('.drink-card'));
   if (!cards.length) return;
 
-  var moodBtns  = document.querySelectorAll('.btn-mood');
-  var chaosBtns = document.querySelectorAll('.btn-chaos');
+  var CS = HTF.cocktailSearch;
+  var FAMILY_SUFFIX = CS.FAMILY_SUFFIX;
+
+  /* THE VOCABULARY comes from _data/cocktails/ingredients.yml, emitted as JSON
+     by cocktails/index.html. Nothing about families or search thresholds is
+     written down in this file; to change either, edit the YAML. Same contract
+     food/index.html has with filters.js, and the same fallback: a page without
+     the block still searches, it just offers no (all) buttons. */
+  var VOCABULARY = (function () {
+    var fallback = { search: { min_query_chars: 2, family_button_min_chars: 3, pool_cap: 8 },
+                     families: [], family_of: {}, card_names: {} };
+    var node = document.getElementById('drink-vocabulary');
+    if (!node) {
+      console.warn(
+        'cocktail-index.js: no #drink-vocabulary block found. cocktails/index.html ' +
+        'should emit _data/cocktails/ingredients.yml as JSON before loading this ' +
+        'script. Ingredient search will run without declared families.'
+      );
+      return fallback;
+    }
+    try {
+      var parsed = JSON.parse(node.textContent);
+      parsed.search = parsed.search || fallback.search;
+      parsed.families = parsed.families || [];
+      parsed.family_of = parsed.family_of || {};
+      parsed.card_names = parsed.card_names || {};
+      return parsed;
+    } catch (e) {
+      console.warn('cocktail-index.js: could not parse #drink-vocabulary — ' + e.message);
+      return fallback;
+    }
+  })();
+
+  var Search = CS.create(VOCABULARY);
+
+  /* ONE state object, not five loose variables — GitHub issue #579. The fields,
+     their cleared values and the "is anything set" answer all come from
+     COCKTAIL_FIELDS in assets/js/filter-state.js, where the reasoning for each
+     lives and where tests/js/filter-state.test.js can reach them.
+
+     Reassigned wholesale by clearAll(), never rebuilt field by field: that is
+     the whole point, and it is why #541's clear-all button can be added at all
+     without re-running the bug food hit three times in two days. */
+  var FilterState = HTF.filterState.create(HTF.filterState.COCKTAIL_FIELDS);
+  var state = FilterState.emptyState();
+
+  var moodBtns  = Array.prototype.slice.call(document.querySelectorAll('.btn-mood'));
+  var chaosBtns = Array.prototype.slice.call(document.querySelectorAll('.btn-chaos'));
   var incInput  = document.getElementById('drink-include');
   var excInput  = document.getElementById('drink-exclude');
   var incPool   = document.getElementById('drink-include-pool');
@@ -52,9 +115,16 @@
   var wordEl    = document.getElementById('drink-count-word');
   var noneEl    = document.querySelector('.drink-none');
   var nameInput = document.getElementById('drink-name');
+  var filters   = document.querySelector('.drink-filters');
+  var list      = cards[0].parentNode;
+
+  // Declared here rather than beside the code that builds them, so apply() can
+  // never read them before they exist. Populated further down.
+  var clearAllButtons = [];
+  var redrawPool = {};
 
   /* Mood and hassle are one filter with two headings: both render .btn-mood
-     and both write into `chosenMoods`, because a drink matching either is
+     and both write into `state.moods`, because a drink matching either is
      matched the same way. Only the CLEAR links are per-section, so the two
      sets are told apart by which block they sit in rather than by a second
      data attribute the template would have to keep in step. */
@@ -62,112 +132,90 @@
     return !!btn.closest('.drink-filter--hassle');
   }
 
-  /* One random key per card, fixed for the life of the page. See the note on
-     ordering at the top: this is what lets the order be random without cards
-     jumping every time a filter changes. */
-  var list = cards[0].parentNode;
-  var shuffleKey = new Map();
-  cards.forEach(function (card) { shuffleKey.set(card, Math.random()); });
-
-  var chosenMoods = [];
-  var chosenChaos = null;
-  var wantName    = '';
-  var include     = [];
-  var exclude     = [];
-
-  /* Every distinct ingredient word in the collection, gathered once from the
-     data attributes rather than from a second copy of the vocabulary. The
-     pools below are filtered slices of this. */
-  var vocabulary = (function () {
-    var seen = Object.create(null);
-    cards.forEach(function (card) {
-      (card.dataset.ingredients || '').split('|').forEach(function (word) {
-        word = word.trim();
-        if (word) seen[word] = true;
-      });
-    });
-    return Object.keys(seen).sort();
-  })();
-
-  function cardMoods(card) {
-    return (card.dataset.moods || '').split('|').filter(Boolean);
-  }
-
   function moodBtnsIn(hassle) {
-    return Array.prototype.filter.call(moodBtns, function (b) {
-      return inHassle(b) === hassle;
-    });
+    return moodBtns.filter(function (b) { return inHassle(b) === hassle; });
   }
 
-  function isOn(btn) {
-    return chosenMoods.indexOf(btn.dataset.mood) !== -1;
+  /* Everything each card needs, read ONCE. The attribute is split here rather
+     than probed on every keystroke, which is also what makes the seam between
+     two ingredients unreachable: the old substring test ran against the joined
+     string, where a query could match across the `|` and nothing on the card
+     corresponded to what had matched.
+
+     The random sort key is fixed for the life of the page — see the note on
+     ordering at the top. */
+  var model = cards.map(function (card) {
+    var nameEl = card.querySelector('.drink-card-name a');
+    return {
+      card: card,
+      entries: CS.splitEntries(card.dataset.ingredients),
+      moods: (card.dataset.moods || '').split('|').filter(Boolean),
+      name: card.dataset.name || '',
+      chaos: card.dataset.chaos || '',
+      key: Math.random(),
+      nameEl: nameEl,
+      /* The unmarked title, stashed once. The highlight always rebuilds from
+         this rather than from the link's current (possibly already wrapped)
+         text, so re-running it on every keystroke never compounds — the same
+         reason filters.js stashes dataset.titleText. */
+      title: nameEl ? nameEl.textContent : '',
+      moodEls: Array.prototype.slice.call(card.querySelectorAll('.drink-card-mood')),
+      ingEls: Array.prototype.slice.call(card.querySelectorAll('.drink-card-ing')).map(function (el) {
+        return { el: el, entries: CS.splitEntries(el.dataset.ing) };
+      })
+    };
+  });
+
+  var pool = Search.buildPool(cards.map(function (c) { return c.dataset.ingredients; }));
+
+  function chosen(field) {
+    var out = [];
+    state[field].forEach(function (v) { out.push(v); });
+    return out;
   }
 
-  function showClear(id, active) {
-    var el = document.getElementById(id);
-    if (el) el.hidden = !active;
-  }
-
-  /* Does the query start a WORD inside this entry, rather than merely appear
-     in it? "rum" starts a word in "Jamaican rum" and does not in "plumbago".
-     Punctuation counts as a boundary as well as space, because the vocabulary
-     contains things like "sugar syrup 2:1" and "demerara, aged". */
-  function wordStarts(haystack, needle) {
-    var at = haystack.indexOf(needle);
-    while (at !== -1) {
-      if (at === 0 || /[^a-z0-9]/.test(haystack.charAt(at - 1))) return true;
-      at = haystack.indexOf(needle, at + 1);
-    }
-    return false;
-  }
-
-  var POOL_CAP = 8;
+  /* The two chip lists, flattened ONCE per pass rather than per card. matches()
+     reads these; apply() refreshes them before the loop. 115 cards times two
+     Set walks per keystroke is not expensive, but it is a rebuild of something
+     that cannot change inside the loop. */
+  var activeInclude = [];
+  var activeExclude = [];
 
   /* How many of the SELECTED moods this drink has. 0 when nothing is selected,
      which is what makes the no-filter case fall through to pure random order
      without a special case. */
-  function moodScore(card) {
-    if (!chosenMoods.length) return 0;
-    var mine = cardMoods(card);
+  function moodScore(d) {
+    if (!state.moods.size) return 0;
     var n = 0;
-    for (var i = 0; i < chosenMoods.length; i++) {
-      if (mine.indexOf(chosenMoods[i]) !== -1) n++;
-    }
+    d.moods.forEach(function (m) { if (state.moods.has(m)) n++; });
     return n;
   }
 
-  function matches(card) {
-    /* mood: OR within the section. Change `.some` to `.every` for AND — see
-       the note at the top, and issue #478. Ranking by moodScore is what makes
-       OR narrow anything, so if this ever becomes AND the ranking is redundant
-       rather than merely unused. */
-    if (chosenMoods.length && moodScore(card) === 0) return false;
-    /* `open` IS A STATE, NOT A FILTER, and this is the fix rather than an
-       oversight. It used to be `yolo`, meaning ship is not yes-or-better --
-       so the button for "I'll try anything" was the one button guaranteed to
-       hide all 55 of the best drinks. Helen, 2026-08-27: "'I'm open to chaos'
-       ... includes all drinks, not just not-known-to-be-definitely-good
-       drinks." So only `good` narrows; `open` shows everything and exists to
-       make that an answer you can give rather than a default you fall into. */
-    if (chosenChaos === 'good' && card.dataset.chaos !== 'good') return false;
+  function matches(d) {
+    /* mood: OR within the section, ranked by moodScore below. If this ever
+       becomes AND the ranking is redundant rather than merely unused — see the
+       note at the top, and issue #478. */
+    if (state.moods.size && moodScore(d) === 0) return false;
 
-    var ing = card.dataset.ingredients || '';
+    /* `open` IS A STATE, NOT A FILTER, and this is the fix rather than an
+       oversight. It used to be `yolo`, meaning ship is not yes-or-better -- so
+       the button for "I'll try anything" was the one button guaranteed to hide
+       all 55 of the best drinks. Helen, 2026-08-27: "'I'm open to chaos' ...
+       includes all drinks". So only `good` narrows. */
+    if (state.chaos === 'good' && d.chaos !== 'good') return false;
+
     /* AND across include: each chip you add narrows. That is the opposite of
        the mood rule and deliberately so — adding an ingredient means "and this
        one too", which is how a cupboard works. */
-    for (var i = 0; i < include.length; i++) {
-      if (ing.indexOf(include[i]) === -1) return false;
+    var i;
+    for (i = 0; i < activeInclude.length; i++) {
+      if (!Search.matchesInclude(d.entries, activeInclude[i])) return false;
     }
-    for (var j = 0; j < exclude.length; j++) {
-      if (ing.indexOf(exclude[j]) !== -1) return false;
+    for (i = 0; i < activeExclude.length; i++) {
+      if (Search.matchesExclude(d.entries, activeExclude[i])) return false;
     }
 
-    /* I KNOW WHAT I WANT. Substring rather than word-start, unlike the
-       ingredient fields: those match a vocabulary where "rum" starting a word
-       is the meaningful test, whereas a drink name is a thing you are part-way
-       through typing. "negr" should find the Negroni. */
-    if (wantName && card.dataset.name.indexOf(wantName) === -1) return false;
-    return true;
+    return Search.matchesName(d.name, state.nameQuery);
   }
 
   /* Put the list in rank order: more matched moods first, random within a
@@ -175,8 +223,7 @@
 
      REWRITTEN ONLY WHEN IT ACTUALLY CHANGES. Moving 115 nodes on every
      keystroke is wasteful and, worse, it would scroll the page under the
-     reader's cursor while they type. Comparing first makes the common case
-     (typing narrows the same set in the same order) free. */
+     reader's cursor while they type. */
   function reorder(order) {
     var same = true;
     var kids = list.children;
@@ -189,19 +236,73 @@
     list.appendChild(frag);
   }
 
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* THE MATCHED RUN OF A DRINK NAME — GitHub issue #564, food's own treatment.
+     The offsets come from cocktail-search.js and index the ORIGINAL title, so a
+     name keeps its accents while an unaccented query still finds it: "vieux
+     carre" marks the "Carré" in Vieux Carré. Rebuilt from the stashed title
+     every pass rather than patched in place. */
+  function paintNameHighlight(d) {
+    if (!d.nameEl) return;
+    var at = state.nameQuery ? Search.nameHighlight(d.title, state.nameQuery) : null;
+    var mark = at ? (at.start + ':' + at.end) : '';
+    // Only when it actually changes. Every card's name would otherwise be
+    // rewritten on every keystroke, including the 114 that are not highlighted
+    // at all -- and rewriting a node's contents under a reader is the same
+    // wastefulness reorder() already declines.
+    if (d.painted === mark) return;
+    d.painted = mark;
+    if (!at) {
+      d.nameEl.textContent = d.title;
+      return;
+    }
+    d.nameEl.innerHTML =
+      escapeHtml(d.title.slice(0, at.start)) +
+      '<mark class="drink-name-hit">' + escapeHtml(d.title.slice(at.start, at.end)) + '</mark>' +
+      escapeHtml(d.title.slice(at.end));
+  }
+
+  function showClear(id, active) {
+    var el = document.getElementById(id);
+    if (el) el.hidden = !active;
+  }
+
   function apply() {
     var shown = 0;
     var ranked = [];
-    cards.forEach(function (card) {
-      var ok = matches(card);
-      card.hidden = !ok;
+    activeInclude = chosen('include');
+    activeExclude = chosen('exclude');
+
+    model.forEach(function (d) {
+      var ok = matches(d);
+      d.card.hidden = !ok;
       if (ok) shown++;
-      ranked.push({
-        card: card,
-        ok: ok,
-        score: ok ? moodScore(card) : -1,
-        key: shuffleKey.get(card)
+      ranked.push({ card: d.card, ok: ok, score: ok ? moodScore(d) : -1, key: d.key });
+
+      /* The card answers "why am I here" in the colour of the control that put
+         it there. Both are cleared and re-applied on every pass rather than
+         tracked, which is cheap at this size and cannot drift out of step. */
+      d.moodEls.forEach(function (chip) {
+        chip.classList.toggle('is-match', state.moods.has(chip.dataset.mood));
       });
+
+      /* MATCHED AGAINST data-ing, NOT THE RENDERED TEXT — #501. A rum shows its
+         category on a card now ("Demerara rum"), while the filter matches the
+         generic, the card name and the suggestion alike, so a card found by
+         typing "El Dorado" prints no such words. Reading textContent here would
+         leave it surviving the filter with nothing lit up: the card would be
+         unable to say why it was there, which is the one job HANDOVER §9.13
+         gives it. And it is the SAME rule the filter used — Search.entryIsHit
+         is matchesInclude — so a lit ingredient and a surviving card can never
+         disagree about why. */
+      d.ingEls.forEach(function (ing) {
+        ing.el.classList.toggle('drink-card-hit', Search.entryIsHit(ing.entries, activeInclude));
+      });
+
+      paintNameHighlight(d);
     });
 
     ranked.sort(function (a, b) {
@@ -211,40 +312,24 @@
     });
     reorder(ranked.map(function (r) { return r.card; }));
 
-    cards.forEach(function (card) {
-      /* The card answers "why am I here" in the colour of the control that put
-         it there: a matched mood chip fills menthe, a matched ingredient fills
-         violet. Both are cleared and re-applied on every pass rather than
-         tracked, which is cheap at this size and cannot drift out of step. */
-      card.querySelectorAll('.drink-card-mood').forEach(function (chip) {
-        chip.classList.toggle('is-match',
-          chosenMoods.indexOf(chip.dataset.mood) !== -1);
-      });
-      /* MATCHED AGAINST data-ing, NOT THE RENDERED TEXT — #501. A rum shows
-         its category on a card now ("Demerara rum"), while the filter still
-         matches the item and the generic alike, so a card found by typing
-         "El Dorado" prints no such words. Reading textContent here would leave
-         it surviving the filter with nothing lit up: the card would be unable
-         to say why it was there, which is the one job the card section of
-         HANDOVER §9.13 gives it. data-ing carries the same item-plus-generic
-         string the card-level data-ingredients does, written at build time.
-         The fallback keeps a card without the attribute behaving as before. */
-      card.querySelectorAll('.drink-card-ing').forEach(function (el) {
-        var text = (el.dataset.ing || el.textContent).toLowerCase();
-        var hit = include.some(function (w) { return text.indexOf(w) !== -1; });
-        el.classList.toggle('drink-card-hit', hit);
-      });
-    });
-
     /* Each clear appears only when its own section has something to clear.
        Driven from the same pass that filters, so a clear can never be visible
        for a filter that is already empty. */
-    showClear('clear-mood', moodBtnsIn(false).some(isOn));
-    showClear('clear-hassle', moodBtnsIn(true).some(isOn));
-    showClear('clear-chaos', chosenChaos !== null);
-    showClear('clear-name', wantName !== '');
-    showClear('clear-include', include.length > 0 || incInput.value !== '');
-    showClear('clear-exclude', exclude.length > 0 || excInput.value !== '');
+    showClear('clear-mood', moodBtnsIn(false).some(function (b) { return state.moods.has(b.dataset.mood); }));
+    showClear('clear-hassle', moodBtnsIn(true).some(function (b) { return state.moods.has(b.dataset.mood); }));
+    showClear('clear-chaos', state.chaos !== null);
+    showClear('clear-name', state.nameQuery !== '');
+    showClear('clear-include', state.include.size > 0 || state.isIncludeSearching);
+    showClear('clear-exclude', state.exclude.size > 0 || state.isExcludeSearching);
+
+    /* THE CLEAR-ALL BUTTONS — #541, and their visibility is FilterState's
+       answer rather than a hand-written run of `||`s. That run is what kept
+       going wrong on the food side: it disagreed with what clear-all actually
+       cleared, and the button hid while it still had work to do. Here the two
+       agree by construction, because clearAll() assigns emptyState() and both
+       walk the same table. */
+    var clearVisibility = FilterState.hasAnythingToClear(state) ? 'visible' : 'hidden';
+    clearAllButtons.forEach(function (btn) { btn.style.visibility = clearVisibility; });
 
     if (countEl) countEl.textContent = shown;
     /* The word has to move with the number or "1 survivors" appears the first
@@ -258,171 +343,213 @@
   moodBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
       var name = btn.dataset.mood;
-      var at = chosenMoods.indexOf(name);
-      if (at === -1) { chosenMoods.push(name); } else { chosenMoods.splice(at, 1); }
-      btn.classList.toggle('is-on', at === -1);
-      btn.setAttribute('aria-pressed', at === -1 ? 'true' : 'false');
+      if (state.moods.has(name)) state.moods.delete(name);
+      else state.moods.add(name);
+      syncMoodButtons();
       apply();
     });
   });
 
+  /* Painted FROM STATE rather than at each place state changes — the argument
+     filters.js's syncFilterButtons() makes, and the reason it matters here is
+     the same: clear-all reassigns the whole state object and never touches this
+     markup, so anything toggled at click time would survive a clear. */
+  function syncMoodButtons() {
+    moodBtns.forEach(function (b) {
+      var on = state.moods.has(b.dataset.mood);
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  function syncChaosButtons() {
+    chaosBtns.forEach(function (b) {
+      var on = b.dataset.chaos === state.chaos;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
   chaosBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
       var want = btn.dataset.chaos;
-      chosenChaos = (chosenChaos === want) ? null : want;
-      chaosBtns.forEach(function (b) {
-        var on = b.dataset.chaos === chosenChaos;
-        b.classList.toggle('is-on', on);
-        b.setAttribute('aria-pressed', on ? 'true' : 'false');
-      });
+      state.chaos = (state.chaos === want) ? null : want;
+      syncChaosButtons();
       apply();
     });
   });
 
   /* --- the two ingredient fields ------------------------------------------ */
   /* One builder for both, because they are the same control with opposite
-     signs — the only differences are which list a chip lands in and that the
-     exclude side is struck through, which is CSS's business, not this file's. */
-  function wireSearch(input, pool, chosen) {
-    if (!input || !pool) return;
+     signs — the only differences are which set a chip lands in, which
+     searching-flag the half-typed state sets, and that the exclude side is
+     struck through, which is CSS's business.
+
+     THE TWO MATCHING RULES ARE NOT THE SAME, though, and that asymmetry is in
+     cocktail-search.js where it can be tested: fuzzy to include, exact or
+     declared-family to exclude. Over-including shows you a drink you may not
+     want; over-excluding hides one you would have had. */
+  function wireSearch(input, poolEl, field, searchingField) {
+    if (!input || !poolEl) return;
 
     function redraw() {
-      var typed = input.value.trim().toLowerCase();
-      pool.textContent = '';
+      poolEl.textContent = '';
 
-      chosen.forEach(function (word) {
-        pool.appendChild(chip(word, true));
+      /* "There is text in this box", which is a state clear-all empties and so
+         must count towards the clear button — issue #274 on the food side, where
+         a half-finished search set nothing and the clear button stayed hidden
+         beside a pool you had no other way to dismiss. It narrows nothing, which
+         is why COCKTAIL_FIELDS declares it narrows: false. */
+      state[searchingField] = !!input.value.trim();
+
+      state[field].forEach(function (word) {
+        poolEl.appendChild(chip(word, true, false));
       });
 
-      if (typed.length < 2) { return; }
+      var result = Search.search(input.value, pool, chosen(field));
 
-      /* THREE BANDS, MATCHING FOOD — #497. assets/js/ingredient-search.js
-         orders its candidates the same way and its comment explains why: an
-         entry STARTING with the query outranks everything else, full stop;
-         below that a genuine word match outranks a merely-contains match, and
-         is deliberately not promoted into the prefix tier, or a mid-word
-         coincidence ranks alongside the thing you were obviously typing.
-         Alphabetical within each band, which comes free because `vocabulary`
-         is already sorted and filtering preserves order.
-
-         Cocktails has no synonym or family layer, so food's third band
-         (family-only members) has no equivalent here; its place is taken by
-         the merely-contains matches. Two real bands and a tail, against
-         food's two and a tail. */
-      var pending = vocabulary.filter(function (w) {
-        return w.indexOf(typed) !== -1 && chosen.indexOf(w) === -1;
+      /* THE (all) BUTTONS COME FIRST, as food's do: an umbrella is a different
+         offer from the things it stands over, and putting it above them is what
+         makes it read as one. #549 point 1, and the mechanism is
+         _data/cocktails/ingredients.yml's `family_of` — declared since #322 for
+         exactly this, and read by nothing until now. */
+      result.familyButtons.forEach(function (family) {
+        poolEl.appendChild(chip(family + FAMILY_SUFFIX, false, true));
       });
 
-      var prefix = pending.filter(function (w) { return w.indexOf(typed) === 0; });
-      var wordly = pending.filter(function (w) {
-        return w.indexOf(typed) !== 0 && wordStarts(w, typed);
-      });
-      var rest = pending.filter(function (w) {
-        return w.indexOf(typed) !== 0 && !wordStarts(w, typed);
+      result.results.forEach(function (r) {
+        poolEl.appendChild(chip(r.entry, false, r.hasWordMatch));
       });
 
-      prefix.concat(wordly, rest)
-        .slice(0, POOL_CAP)
-        .forEach(function (w) { pool.appendChild(chip(w, false)); });
-
-      /* THE CAP IS STATED, NOT SILENT. A pool that quietly stops at eight
-         looks like a complete answer, and the one you wanted may be the
-         ninth. Food's own rule elsewhere in this repo: never truncate
-         without saying so. */
-      var hidden = prefix.length + wordly.length + rest.length - POOL_CAP;
-      if (hidden > 0) {
+      /* THE CAP IS STATED, NOT SILENT. A pool that quietly stops at eight looks
+         like a complete answer, and the one you wanted may be the ninth. */
+      if (result.hidden > 0) {
         var more = document.createElement('span');
         more.className = 'drink-pool-more';
-        more.textContent = '+' + hidden + ' more — keep typing';
-        pool.appendChild(more);
+        more.textContent = '+' + result.hidden + ' more — keep typing';
+        poolEl.appendChild(more);
       }
     }
 
-    function chip(word, on) {
+    /* `wordMatch` marks the candidates you actually meant — #549 point 3, and
+       the same treatment food's two pickers give theirs (#390). It is a WORD
+       PREFIX, not a substring: typing "li" marks "lime juice" and "apricot
+       liqueur" and does NOT mark "galliano", which is in the list correctly on
+       a substring match. So the marked entries are the ones you meant and the
+       plain ones are what the vocabulary brought along. An (all) button is
+       always a word match by construction. */
+    function chip(word, on, wordMatch) {
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'btn-pool' + (on ? ' is-on' : '');
+      b.className = 'btn-pool' + (on ? ' is-on' : '') + (wordMatch ? ' btn-pool--word-match' : '');
       b.textContent = word;
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
       b.addEventListener('click', function () {
-        var at = chosen.indexOf(word);
-        if (at === -1) { chosen.push(word); } else { chosen.splice(at, 1); }
+        if (state[field].has(word)) state[field].delete(word);
+        else state[field].add(word);
         redraw();
         apply();
       });
       return b;
     }
 
-    input.addEventListener('input', redraw);
+    input.addEventListener('input', function () { redraw(); apply(); });
+    redrawPool[field] = redraw;
     redraw();
   }
 
-  wireSearch(incInput, incPool, include);
-  wireSearch(excInput, excPool, exclude);
+  wireSearch(incInput, incPool, 'include', 'isIncludeSearching');
+  wireSearch(excInput, excPool, 'exclude', 'isExcludeSearching');
 
   /* I KNOW WHAT I WANT. No candidate pool: the ingredient fields offer one
      because their vocabulary is closed and you are picking FROM it, whereas a
-     drink name is something you already hold and are merely typing. Offering
-     to complete it would be answering a question nobody asked. */
+     drink name is something you already hold and are merely typing. */
   if (nameInput) {
     nameInput.addEventListener('input', function () {
-      wantName = nameInput.value.trim().toLowerCase();
+      state.nameQuery = nameInput.value.trim().toLowerCase();
       apply();
     });
   }
 
-  wireClear('clear-name', function () {
-    wantName = '';
-    if (nameInput) nameInput.value = '';
-  });
-
-  /* --- the four clears ----------------------------------------------------- */
-  /* Each resets ONE section and nothing else. Deliberately four separate
-     controls rather than one "clear all": with four axes, the filter you want
-     to drop is almost never all of them -- you have found the mood and are now
-     arguing with the cupboard. */
+  /* --- the clears ---------------------------------------------------------- */
+  /* Each per-section clear resets ONE section and nothing else. Deliberately
+     separate controls rather than only a clear-all: with five axes, the filter
+     you want to drop is almost never all of them — you have found the mood and
+     are now arguing with the cupboard. #541 adds the clear-all BESIDE them, not
+     instead of them, which is exactly how food's index reads. */
   function wireClear(id, reset) {
     var btn = document.getElementById(id);
     if (btn) btn.addEventListener('click', function () { reset(); apply(); });
   }
 
-  /* MOOD and HASSLE clear independently even though they share `chosenMoods`.
-     Clearing one must not drop the other -- "I have found the mood and am now
-     arguing with the cupboard" applies here too, one heading down. */
+  /* MOOD and HASSLE clear independently even though they share `state.moods`.
+     Clearing one must not drop the other. */
   function clearGroup(hassle) {
-    moodBtnsIn(hassle).forEach(function (b) {
-      var at = chosenMoods.indexOf(b.dataset.mood);
-      if (at !== -1) chosenMoods.splice(at, 1);
-      b.classList.remove('is-on');
-      b.setAttribute('aria-pressed', 'false');
-    });
+    moodBtnsIn(hassle).forEach(function (b) { state.moods.delete(b.dataset.mood); });
+    syncMoodButtons();
   }
 
   wireClear('clear-mood', function () { clearGroup(false); });
   wireClear('clear-hassle', function () { clearGroup(true); });
 
   wireClear('clear-chaos', function () {
-    chosenChaos = null;
-    chaosBtns.forEach(function (b) {
-      b.classList.remove('is-on');
-      b.setAttribute('aria-pressed', 'false');
-    });
+    state.chaos = null;
+    syncChaosButtons();
+  });
+
+  wireClear('clear-name', function () {
+    state.nameQuery = '';
+    if (nameInput) nameInput.value = '';
   });
 
   /* The input is cleared as well as the chips. Leaving the typed text behind
      would redraw its candidate pool on the next keystroke and look like the
      clear had partly failed. */
-  wireClear('clear-include', function () {
-    include.length = 0;
-    incInput.value = '';
-    incInput.dispatchEvent(new Event('input'));
-  });
+  function clearField(field, input) {
+    state[field].clear();
+    if (input) input.value = '';
+    if (redrawPool[field]) redrawPool[field]();
+  }
 
-  wireClear('clear-exclude', function () {
-    exclude.length = 0;
-    excInput.value = '';
-    excInput.dispatchEvent(new Event('input'));
-  });
+  wireClear('clear-include', function () { clearField('include', incInput); });
+  wireClear('clear-exclude', function () { clearField('exclude', excInput); });
+
+  /* --- clear all, top and bottom — #541 ------------------------------------ */
+  /* Two buttons, one action, the same shape food's index has had since #67: the
+     top one is pinned above the filters, the bottom one repeats it after the
+     last section so clearing does not mean scrolling back up past five of them.
+
+     Built here rather than in the template for the same reason food builds its
+     pair in filters.js: a control that only works with script has no business
+     rendering before the script that makes it work. */
+  if (filters) {
+    ['btn-clear', 'btn-clear btn-clear--bottom'].forEach(function (cls, i) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = cls;
+      btn.textContent = '× clear all';
+      if (i === 0) filters.insertBefore(btn, filters.firstChild);
+      else filters.appendChild(btn);
+      clearAllButtons.push(btn);
+    });
+  }
+
+  function clearAll() {
+    /* ONE assignment, not a field-by-field emptying. A field-by-field version
+       is a list that has to be kept in step with hasAnythingToClear()'s list,
+       and on the food side it wasn't, three times in two days. emptyState()
+       walks the same table that predicate walks. */
+    state = FilterState.emptyState();
+    [incInput, excInput, nameInput].forEach(function (input) {
+      if (input) input.value = '';
+    });
+    Object.keys(redrawPool).forEach(function (field) { redrawPool[field](); });
+    syncMoodButtons();
+    syncChaosButtons();
+    apply();
+  }
+
+  clearAllButtons.forEach(function (btn) { btn.addEventListener('click', clearAll); });
 
   apply();
 })();
