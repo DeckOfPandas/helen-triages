@@ -60,7 +60,7 @@ bottles:
     aliases: ["Appleton Signature", "Appleton Estate V/X rum", "Appleton V/X"]
   "Appleton Estate 8 Year Reserve":
     generic: "moderately aged Jamaican rum"
-    aliases: ["Appleton 8", "Appleton Estate 8 Reserve"]
+    aliases: ["Appleton 8", "Appleton 8-year", "Appleton Estate 8 Reserve"]
   "Appleton Estate 12 Rare Casks":
     generic: "moderately aged Jamaican rum"
     aliases: ["Appleton 12 Rare Casks", "Appleton Rare Casks",
@@ -170,16 +170,16 @@ bottles:
 
   # --- brand-generics: the bottle IS the category (#314 rum_untyped) --------
   "Planteray O.F.T.D.":
-    generic: "Planteray O.F.T.D. Overproof"
+    generic: "blended overproof rum"
     aliases: ["Plantation OFTD", "Planteray OFTD", "OFTD"]
     # #314, Helen 2026-08-27: "not an aged Demerara, it is its own category".
     # 69%, and a Guyana/Jamaica/Barbados blend, so it fails DDL twice over.
   "Planteray Stiggins' Fancy":
-    generic: "Planteray Stiggins' Fancy"
+    generic: "pineapple rum"
     aliases: ["Plantation Stiggins Fancy Pineapple rum",
               "Plantation pineapple-infused rum"]
   "Malibu":
-    generic: "Malibu"
+    generic: "coconut rum"
     aliases: ["Coconut rum"]
 
   # --- cane juice: agricole, clairin, cachaça ------------------------------
