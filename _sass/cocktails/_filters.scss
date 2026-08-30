@@ -106,6 +106,13 @@
 // whose height is fixed by the text beside them, so there is nothing to
 // reserve space for and a permanently-present "clear" that does nothing is
 // worse than one that arrives.
+//
+// THAT IS STILL TRUE OF CHAOS, MOOD AND HASSLE, AND STOPPED BEING TRUE OF THE
+// THREE SEARCH FIELDS on 2026-08-30 (#587 / #548.9), when their clear moved
+// onto the input's own row. Beside an input, `display: none` means the box
+// widens and narrows as the button comes and goes -- the exact fault food fixed
+// once already. `.drink-label-row--search` below keeps the attribute and
+// changes what it costs.
 .drink-label-row {
   display: flex;
   align-items: baseline;
@@ -114,6 +121,63 @@
 
   .drink-field-label { margin: 0; }
 }
+
+// --- a label row with an input in it ------------------------------------------
+// #587, and #548 point 9 from the other end. Food's three search sections put
+// the heading, the box and the clear on ONE line; these put the heading and the
+// clear on one line with the box beneath, so the same control read as two
+// different shapes on two sibling pages.
+//
+// A MODIFIER, NOT A NEW CLASS: it is still the label row, with one more thing in
+// it, and §11.3's convention is a flat noun for the thing and `--modifier` for
+// its variant with the base class always present.
+.drink-label-row--search {
+  // baseline is right for a row of text and wrong for a row containing an
+  // input, whose baseline sits well below the heading's.
+  align-items: center;
+
+  // #548 point 5, "copy element widths from food". This is food's own
+  // `.search-input` value and the reasoning with it: the clear button reserves
+  // its space at all times now, and that space came out of the input's share at
+  // rest until food widened this by roughly the button's own footprint.
+  max-width: 620px;
+
+  .drink-field-label {
+    // The label must not reflow because of what you typed elsewhere in the row.
+    // Without this it is the HEADING that gives when the row runs short --
+    // wrapping "I know what" / "I want" -- rather than the input absorbing it.
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .drink-search-input {
+    flex: 1;
+    // A text input carries a non-zero intrinsic min-width from the browser,
+    // which flex respects unless told otherwise, so `flex: 1` alone will not let
+    // it shrink past that floor -- it overflows the row instead. Food's own
+    // #ingredient-search-box comment is the long version.
+    min-width: 0;
+    // The gap below now belongs to the row, which already has one. Left on, the
+    // two stack.
+    margin-bottom: 0;
+  }
+
+  // KEEPS ITS BOX WHEN HIDDEN, unlike the three label-row clears above. The
+  // `hidden` attribute stays -- cocktail-index.js's showClear() sets it, and it
+  // is still the honest thing for a control that does nothing yet -- but here it
+  // must not take the row's width with it. visibility also keeps the button out
+  // of the tab order, which display: none was doing and which is still wanted.
+  .btn-clear-filter[hidden] {
+    display: inline;
+    visibility: hidden;
+  }
+}
+
+// Inside the two-column grid each field already has its column, so the 620px cap
+// would only ever make the two boxes end short of their own edges -- and unequal
+// to each other, since the columns are equal and the caps are not proportional.
+// Food's `.search-pair` sets `max-width: none` for exactly this reason.
+.drink-searches .drink-label-row--search { max-width: none; }
 
 .btn-clear-filter {
   border: 0;

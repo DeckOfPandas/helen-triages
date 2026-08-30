@@ -152,24 +152,45 @@ permalink: /cocktails/
        LEAVE OUT carries no colour at all — Helen: "for food, avoiding can be
        important whereas for drinks surely less so." Food gave its LEAVE OUT a
        sixth hue; this deliberately does not. {% endcomment %}
+      {% comment %} LABEL, INPUT, CLEAR -- ONE ROW, as food's three search
+         sections are. Issue #587, and #548 point 9 is the same change seen from
+         the other end ("move the clear button to the end of the input field
+         rather than next to the section heading"), with point 5 (element widths
+         copied from food) falling out of it.
+
+         `.drink-label-row--search` is a modifier rather than a new class: this
+         is still the label row, with one more thing in it. Chaos, mood and
+         hassle keep the bare `.drink-label-row`, because they have no input to
+         put in it.
+
+         THE CLEAR BUTTON HAS TO RESERVE ITS SPACE NOW. It used the `hidden`
+         attribute, and _filters.scss argued for that over food's
+         `visibility: hidden` on the grounds that "these sit on a label line
+         whose height is fixed by the text beside them, so there is nothing to
+         reserve space for". That was true and is not any more -- beside an
+         input, display:none means the box jumps narrower the instant the button
+         arrives, which is the exact fault food fixed once already (Helen: "cut
+         off even before typing anything -- it ends at the first '.'"). See the
+         rule in _filters.scss; the attribute stays, its CSS meaning changes for
+         these three only. {% endcomment %}
     <div class="drink-searches">
       <div class="drink-filter drink-search drink-search--include">
-        <div class="drink-label-row">
+        <div class="drink-label-row drink-label-row--search">
           <h2 class="drink-field-label"><label for="drink-include">Has to have</label></h2>
+          <input class="drink-search-input" type="text" id="drink-include"
+                 autocomplete="off" placeholder="ingredient name…" />
           <button type="button" class="btn-clear-filter" id="clear-include" hidden>&times; clear</button>
         </div>
-        <input class="drink-search-input" type="text" id="drink-include"
-               autocomplete="off" placeholder="ingredient name…" />
         <div class="drink-pool" id="drink-include-pool" aria-live="polite"></div>
       </div>
 
       <div class="drink-filter drink-search drink-search--exclude">
-        <div class="drink-label-row">
+        <div class="drink-label-row drink-label-row--search">
           <h2 class="drink-field-label"><label for="drink-exclude">Leave out</label></h2>
+          <input class="drink-search-input" type="text" id="drink-exclude"
+                 autocomplete="off" placeholder="ingredient name…" />
           <button type="button" class="btn-clear-filter" id="clear-exclude" hidden>&times; clear</button>
         </div>
-        <input class="drink-search-input" type="text" id="drink-exclude"
-               autocomplete="off" placeholder="ingredient name…" />
         <div class="drink-pool" id="drink-exclude-pool" aria-live="polite"></div>
       </div>
     </div>
@@ -182,12 +203,12 @@ permalink: /cocktails/
        myself then read for a while then settle." Last means it is available
        without being the offer. {% endcomment %}
     <div class="drink-filter drink-filter--name">
-      <div class="drink-label-row">
+      <div class="drink-label-row drink-label-row--search">
         <h2 class="drink-field-label"><label for="drink-name">I know what I want</label></h2>
+        <input class="drink-search-input" type="text" id="drink-name"
+               autocomplete="off" placeholder="drink name…" />
         <button type="button" class="btn-clear-filter" id="clear-name" hidden>&times; clear</button>
       </div>
-      <input class="drink-search-input" type="text" id="drink-name"
-             autocomplete="off" placeholder="drink name…" />
     </div>
   </div>
 
