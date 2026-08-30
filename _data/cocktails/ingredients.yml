@@ -493,8 +493,18 @@ card_names:
 # `methods.yml`'s proposals strike: a replacement whose work is already done
 # reads as outstanding, and one whose left-hand side has drifted does nothing
 # while looking live.
-card_name_joins:
-  "Demerara overproof rum or Demerara rum": "Demerara rum or overproof"
+# EMPTY SINCE 2026-08-30, and the mechanism stays. Its one entry replaced the
+# Swizzle's `Demerara overproof rum or Demerara rum` with Helen's own
+# `Demerara rum or overproof`; that drink was rewritten the same day into the
+# Martinique Swizzle -- 60 ml of unaged agricole, no Demerara anywhere -- so the
+# pair it fixed is no longer produced by any drink.
+#
+# `test_every_card_name_join_is_reachable` is what said so, refusing to let a
+# replacement sit there matching nothing, and it SKIPS on an empty map rather
+# than passing. So this block currently checks nothing, which is worth knowing
+# rather than discovering: the day a disjunctive pair reads badly again, the
+# entry goes back here and the guard wakes up with it.
+card_name_joins: {}
 
 # CARD NAMES THAT ARE ALLOWED TO BE THE SAME, with the reason attached -- the
 # idiom `family_less` above and tests/test_reference_data.py's

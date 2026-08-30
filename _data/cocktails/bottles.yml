@@ -1,6 +1,22 @@
 # =============================================================================
-# RUM BOTTLES -> CATEGORY. Spec: #529. The check it unblocks: #534.
+# BOTTLES -> CATEGORY. Spec: #529. The check it unblocks: #534.
 # =============================================================================
+# NOT RUM-ONLY SINCE 2026-08-30, Helen's call. It was built as a rum reference
+# and `test_every_bottle_names_a_declared_generic` used to enforce that, on the
+# reasoning that "a bottle typed `cognac` would be a scoping mistake rather than
+# a typo". The scope had already drifted past it: Ceylon arrack is in the card
+# names, `Tesco Finest` sits in `unresolved_suggestions` standing in for a
+# kirsch and a sloe gin, and the Kamaniwanalaya's Disaronno had nowhere to
+# resolve to. Widening the file was the honest move rather than keeping a rule
+# the data had stopped obeying.
+#
+# The TYPO half of that test survives and is the half worth having: a bottle's
+# generic must still be DECLARED, so a renamed style that does not get followed
+# here fails loudly instead of silently.
+#
+# Everything below about rum is unchanged and still the bulk of the file --
+# #314's rulings, the appellations, `not_reached_for`. A non-rum entry simply
+# does not have to argue with any of it.
 # WHAT THIS IS FOR, and it is not an encyclopaedia (#459). Cocktail cards stopped
 # naming bottles and started naming categories (#501), which moved a question
 # from the page to the reader: "which of mine is a Demerara rum?" This is where
@@ -232,6 +248,40 @@ bottles:
     generic: "Batavia arrack"
     aliases: ["Van Osten"]
 
+  # --- the Martinique agricoles, 2026-08-30 ---------------------------------
+  # Named by Helen for the Martinique Swizzle, one per reason: JM for the
+  # classic build, Trois Rivières for a savoury one, La Favourite for high
+  # proof. All three are `rhum agricole blanc` and the ORIGIN THAT SEPARATES
+  # THEM IS NOT RECORDABLE YET -- she asked for "a way of noting the origin of
+  # agricole given flavour varies so much" and it is a real gap: thirteen drinks
+  # use an agricole generic and Barbancourt, which is Haitian, is typed
+  # `rhum agricole vieux` behind a QQ admitting the value was inferred. Raised
+  # rather than invented here.
+  "Rhum JM Blanc":
+    generic: "rhum agricole blanc"
+    aliases: ["JM Blanc", "JM blanc"]
+  "Trois Rivières Cuvée de l'Océan":
+    generic: "rhum agricole blanc"
+    aliases: ["Trois Rivieres Cuvee de l'Ocean", "Trois Rivières", "Cuvée de l'Océan"]
+  "La Favourite Cœur de Canne":
+    generic: "rhum agricole blanc"
+    aliases: ["La Favourite Coeur de Canne", "Coeur de Canne", "Cœur de Canne"]
+
+  # --- not a rum ------------------------------------------------------------
+  # The first entries here that are not cane spirits at all, which is what the
+  # 2026-08-30 widening at the top of this file is about.
+  #
+  # ST LUCIAN, NOT JAMAICAN, and that is why it sits under the origin-free
+  # style. Helen named it for the Kamaniwanalaya's Jamaican arm; St Lucia
+  # Distillers is not Jamaica, and her call when shown that was to move it to
+  # the arm that makes no origin claim.
+  "Chairman's Reserve":
+    generic: "moderately aged rum"
+    aliases: ["Chairmans Reserve", "Chairman's"]
+  "Disaronno":
+    generic: "amaretto"
+    aliases: ["Disaronno Originale"]
+
 # =============================================================================
 # QUALIFIES, DELIBERATELY NOT REACHED FOR -- the reason attached, as family_less
 # =============================================================================
@@ -307,16 +357,18 @@ unresolved_suggestions:
     is already the matching disjunctive pair -- Havana 7 is `moderately aged`
     and Appleton 8 is `Jamaican, moderately aged` (#314). The list form makes
     the pairing legible instead of coincidental.
-  "Pusser's Gunpowder, or Smith & Cross": >-
-    Two bottles in one string, against Kamaniwanalaya's stated `[Demerara,
-    aged, Jamaican, moderately aged]`. Since #314 and the 2026-08-27
-    reclassification, Smith & Cross MATCHES the second half and Gunpowder
-    matches neither -- it is `moderately aged`. So the list form would fix half
-    of it and leave a real question about the other. Needs Helen.
-  "Pusser's 151, or Planteray OFTD for a 138 Swizzle": >-
-    Three problems in one string: it is prose (a reason, which #457 moved to
-    `note`), it is two bottles where a list is wanted, and neither bottle is in
-    either of Swizzle's two stated generics. Needs Helen.
+  # BOTH OF THE "NEEDS HELEN" COMPOUNDS CAME OFF ON 2026-08-30, and neither by
+  # being reworded -- the drinks were rewritten and the strings went with them.
+  #
+  # Kamaniwanalaya's "Pusser's Gunpowder, or Smith & Cross" is now a real list:
+  # the generic is `[moderately aged Jamaican rum, moderately aged rum]` and the
+  # suggestion is `[Appleton 8, Chairman's Reserve, Pusser's Gunpowder]`, with
+  # Smith & Cross moved to a note "for more hogo". That is exactly the half this
+  # entry said needed her.
+  #
+  # Swizzle's "Pusser's 151, or Planteray OFTD for a 138 Swizzle" went further:
+  # Helen, "Swizzle has got a bit confused. It should be Martinique Swizzle", so
+  # the drink is 60 ml of unaged agricole and neither bottle is in it.
   "Best with ED3, Havana 3 is fine": >-
     Prose carrying a real preference between two bottles Helen owns, which is
     why it STAYS while the two below went: ED3 is the pick and Havana 3 is

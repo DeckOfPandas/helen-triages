@@ -1131,23 +1131,29 @@ def _bottle_index(data):
     return out
 
 
-def test_every_bottle_names_a_declared_rum_generic():
-    """A bottle's `generic` is a real rum generic -- #529.
+def test_every_bottle_names_a_declared_generic():
+    """A bottle's `generic` is a real generic -- #529.
 
     THE WHOLE VALUE OF THIS FILE IS THAT A BOTTLE KNOWS ITS CATEGORY, so a
-    generic that no longer exists, or one that was never a rum, makes the
-    dictionary quietly wrong rather than loudly broken -- nothing on any page
-    would look different.
+    generic that no longer exists makes the dictionary quietly wrong rather
+    than loudly broken -- nothing on any page would look different.
 
-    Checked against `family_of` rather than the raw generic list, because that
-    is what makes it a RUM bottle: this file does not cover gin or brandy, and
-    a bottle typed `cognac` would be a scoping mistake rather than a typo.
+    THE RUM-ONLY HALF CAME OFF ON 2026-08-30, Helen's call. This used to check
+    against `family_of`'s rum members, on the reasoning that "this file does not
+    cover gin or brandy, and a bottle typed `cognac` would be a scoping mistake
+    rather than a typo". That was true when #529 built it as a rum reference and
+    had already stopped being true: Ceylon arrack joined the card names, `Tesco
+    Finest` went into `unresolved_suggestions` for a kirsch and a sloe gin, and
+    the Kamaniwanalaya wanted Disaronno resolved.
+
+    The scoping argument does not survive the widening, but the TYPO argument
+    does and is the one worth keeping -- a generic that was renamed and not
+    followed here is still silent. So: declared, not rum.
     """
     data = _bottles()
     vocab = _vocab()
-    family_of = vocab.get("family_of") or {}
-    rum_generics = {g for g, fam in family_of.items() if fam == "rum"}
-    assert rum_generics, "`family_of` maps nothing to rum; nothing to check."
+    declared = _declared_generics(vocab)
+    assert declared, "ingredients.yml declares no generics; nothing to check."
     entries = data.get("bottles") or {}
     assert entries, (
         "bottles.yml declares no bottles, so every check here is vacuous."
@@ -1155,13 +1161,14 @@ def test_every_bottle_names_a_declared_rum_generic():
     bad = sorted(
         f"{name!r} -> {(entry or {}).get('generic')!r}"
         for name, entry in entries.items()
-        if (entry or {}).get("generic") not in rum_generics
+        if (entry or {}).get("generic") not in declared
     )
     assert not bad, (
-        "Bottle(s) whose generic is not a declared rum style:\n  "
+        "Bottle(s) whose generic is not a declared style:\n  "
         + "\n  ".join(bad)
-        + "\n\nEither the style was renamed and this did not follow, or the "
-          "bottle is not a rum and does not belong in this file."
+        + "\n\nThe style was probably renamed and this did not follow. Note "
+          "that a bottle no longer has to be a rum -- that restriction came off "
+          "on 2026-08-30 -- but its category still has to exist."
     )
 
 
@@ -1517,9 +1524,12 @@ def test_every_glass_value_is_in_the_vocabulary():
 # a drink on it gets a glass and is not removed, so it cannot quietly stop
 # describing the collection.
 GLASSLESS_ON_2026_08_27 = {
+    # kamaniwanalaya came off on 2026-08-30: Helen gave it a Collins, a
+    # pineapple wedge, a maraschino cherry and a bouquet of mint sprigs. Fifteen
+    # left of the original sixteen.
     "anitas-attitude-adjuster", "banana-boulevardier", "biggles-sidecar",
     "cobra-effect", "copenhagen-special", "cynar-toronto", "el-mediterraneo",
-    "georgetown-punch", "kamaniwanalaya", "mai-tai-diffords-recipe",
+    "georgetown-punch", "mai-tai-diffords-recipe",
     "milliners-punch", "minty-pentones", "modern-zombie-makes-2",
     "pear-apricot-honey-lemon-and-rosemary-bellini", "tiki-max",
     "zombie-intoxica",
@@ -2159,7 +2169,12 @@ KNOWN_PROSE_SUGGESTIONS = {
     # shelf on the day, and the generic already says what the drink requires.
     ("sazerac", "or other Creole-style bitters"),
     ("sazerac", "or other aromatic bitters"),
-    ("swizzle", "Pusser's 151, or Planteray OFTD for a 138 Swizzle"),
+    # The Swizzle's "Pusser's 151, or Planteray OFTD for a 138 Swizzle" came off
+    # on 2026-08-30, and retired the way this contract intends: the drink was
+    # rewritten rather than the string reworded. Helen: "Swizzle has got a bit
+    # confused. It should be Martinique Swizzle" -- so it is a 60 ml unaged
+    # agricole now, and neither Pusser's nor the OFTD is in it at all. The
+    # suggestion that could not resolve went with the rum it was suggesting.
 }
 
 
