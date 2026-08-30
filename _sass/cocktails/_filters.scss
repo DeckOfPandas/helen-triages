@@ -447,8 +447,10 @@
 }
 
 .drink-search-input {
-  font-family: $font-body;
-  font-size: 0.9rem;
+  // Food's own -- @mixin index-search-input-type in shared/_rule.scss. These
+  // were $font-body at 0.9rem, which read as a form field rather than as the
+  // filter value it produces.
+  @include index-search-input-type;
   width: 100%;
   padding: $space-xs 0.1rem;
   border: none;
@@ -471,6 +473,10 @@
     outline: none;
     border-bottom-color: lighten($color-clear-text, 5%);
   }
+
+  // These had no placeholder rule at all, so the prompt sat at the browser's
+  // own weight and colour beside food's lighter, quieter one.
+  &::placeholder { @include index-search-placeholder; }
 }
 
 // #588, and #548 point 6 is the same line. THREE inputs share this rule and the

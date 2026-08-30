@@ -566,3 +566,38 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   flex: 1;
   min-width: 0;
 }
+
+
+// --- What you type into a filter box -----------------------------------------
+// THE HEADINGS FONT, NOT THE BODY ONE. What you type is a filter value, and it
+// belongs to the same family as the chips it produces and the headings it sits
+// under -- lowercase Courier at 0.78rem, which is deliberately smaller and
+// tighter than a body input would be.
+//
+// Cocktails' three boxes were $font-body at 0.9rem, so typing into them looked
+// like filling in a form rather than naming an ingredient. Helen, 2026-08-30:
+// "match the fonts in cocktail's include, exclude and name search input fields
+// to food's."
+//
+// Shared rather than copied a fourth time. Food already carried this twice --
+// once for the include/exclude pair and once for the name box -- and its own
+// comment said so: "the name search's own copy below is already one too many".
+@mixin index-search-input-type {
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+
+// Separate from the type above so each site can place it where its own rule
+// already puts the nested selectors -- `&:focus` and `&::placeholder` compile
+// to their own rules, and their order relative to each other is the only thing
+// that could move.
+//
+// $color-clear-text is one of the ten the palette contract guarantees (§2.3),
+// so naming it here is allowed; each site resolves its own grey.
+@mixin index-search-placeholder {
+  color: lighten($color-clear-text, 30%);
+  font-weight: 300;
+}

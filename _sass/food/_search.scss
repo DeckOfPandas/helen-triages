@@ -45,11 +45,7 @@
   // direction, and a fork would only ever drift.
   #ingredient-search-box,
   #exclude-search-box {
-    font-family: $font-headings;
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: lowercase;
-    letter-spacing: 0.04em;
+    @include index-search-input-type;
 
     // Override browser input defaults
     background: transparent;
@@ -68,10 +64,7 @@
       border-bottom-color: lighten($color-clear-text, 5%);
     }
 
-    &::placeholder {
-      color: lighten($color-clear-text, 30%);
-      font-weight: 300;
-    }
+    &::placeholder { @include index-search-placeholder; }
   }
 
   // Was a full duplicate of .btn-clear-inline's styling under an ID
@@ -118,11 +111,7 @@
 // its own block so the structural rule and the type rule stay readable apart.
 .controls .search--name {
   #name-search-box {
-    font-family: $font-headings;
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: lowercase;
-    letter-spacing: 0.04em;
+    @include index-search-input-type;
     background: transparent;
     box-shadow: none;
     outline: none;
@@ -139,10 +128,7 @@
       border-bottom-color: lighten($color-clear-text, 5%);
     }
 
-    &::placeholder {
-      color: lighten($color-clear-text, 30%);
-      font-weight: 300;
-    }
+    &::placeholder { @include index-search-placeholder; }
   }
 
   // Same duplicate-ID story as #ingredient-search-clear above.
