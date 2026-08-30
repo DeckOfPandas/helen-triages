@@ -84,9 +84,31 @@ moods:
     was stated; `fortified`, `amaro` and `herbal` are modifiers. Helen: "thanks
     for knowing that Negroni is not (it's red anyway)."
   clear: >-
-    Transparent and, in Helen's definition, usually free of citrus. Not the
-    opposite of `strong brown drink` -- they are independent, and a drink can
-    be neither.
+    GLASSY MOUTHFEEL, LOW COMPLEXITY, NOT FILLING. HAND-ASSIGNED.
+    Helen, 2026-08-30: "Clear implies transparent (not strictly though) and
+    does not imply colourless. It is about mouthfeel (glassy), complexity
+    (low), how filling it is (not), that kind of thing."
+    THIS SAID "TRANSPARENT... USUALLY FREE OF CITRUS" FOR THIRTEEN DAYS AND
+    THAT WAS NEVER WHAT SHE MEANT. Written 2026-08-17 with the original
+    vocabulary and never revised. The whole repository was searched on
+    2026-08-30 for any record of the real meaning -- data, tests, handover, git
+    history -- and there was none. She said "we've discussed this before", and
+    she had. It left no trace.
+    WHAT THE STALE DEFINITION NEARLY COST, recorded because the near-miss is
+    the whole argument for writing this down. Reading it, I measured the tag
+    against literal transparency, found 13 of the 16 tagged drinks are not
+    transparent, called the rule broken, and proposed inverting it to "every
+    ingredient is colourless". Confidently and completely wrong -- and every
+    number in the analysis supporting it was correct. Same shape as #542: a
+    plausible reading of an incomplete record.
+    IT EXPLAINS WHAT TRANSPARENCY COULD NOT. Brooklyn is brown and IS clear;
+    the Negroni is transparent and is NOT -- four stirred things that slip
+    down, against something assertive and bitter. Espresso Martini is out for
+    being filling, not for being black. And Aviation, Corpse Reviver #2 and El
+    Mediterraneo all carry citrus and are all clear, so the "free of citrus"
+    half was wrong too.
+    Not the opposite of `strong brown drink` -- they are independent, and a
+    drink can be neither, or both: six are.
   sharp: >-
     A base, a citrus and a sweetener, in five ingredients or fewer. Aviation,
     Bee's Knees, Sidecar, Champs Élysées, Tom Collins.
@@ -136,10 +158,6 @@ moods:
     might have duplicated already exists for search and exclusion. What was
     missing was only a word: `bitter` now aliases to `amaro`, because a family
     nobody spells that way is a family nobody can reach (§9.3.3).
-  clear: >-
-    Transparent and, in Helen's definition, usually free of citrus. Not the
-    opposite of `strong brown drink` -- they are independent, and a drink can
-    be neither.
   fruity: >-
     Contains a non-citrus fruit: pineapple, passion fruit, berries, a crème de
     or a fruit liqueur. CITRUS DOES NOT COUNT. It is the sour component and
@@ -345,8 +363,25 @@ mood_ingredients:
     - orange juice
 
   # Non-citrus fruit.
+  # ORANGE JUICE IS FRUIT, NOT SOUR -- added 2026-08-30. The note above says
+  # citrus does not count because "it is the sour component", which is true of
+  # lime and lemon and false of orange: nobody builds a sour on orange juice.
+  # It cost this rule four drinks Helen calls fruity (Cactus Banger, Copenhagen
+  # Special, Fog Cutter, Witches' Daiquiri). GRAPEFRUIT STAYS OUT -- a Brown
+  # Derby really is a sour.
+  #
+  # THE ORANGE LIQUEURS ARE DELIBERATELY NOT HERE, and that is the same
+  # distinction from the other side: orange juice is fruit, orange liqueur is
+  # construction. Adding triple sec, Curaçao and maraschino reaches every drink
+  # she tagged and wrongly tags NINE more -- Brooklyn, Last Word, Aviation,
+  # El Presidente. Measured before deciding.
+  #
+  # `crème de banane` LEFT on the same pass, at her instruction: she took
+  # `fruity` off Banana Boulevardier. It is a pudding flavour and is already in
+  # that set, which is where it belongs.
   fruity:
     - pineapple juice
+    - orange juice
     - cranberry juice
     - apple juice
     - passion fruit
@@ -354,12 +389,13 @@ mood_ingredients:
     - raspberries
     - blackberries
     - pear
+    - calvados
+    - apple schnapps
     - fruit purée
     - passion fruit syrup
     - crème de mûre
     - crème de cassis
     - crème de pêche
-    - crème de banane
     - apricot liqueur
     - cherry liqueur
     - passion fruit liqueur
@@ -521,6 +557,126 @@ mood_include:
   # and compares by spirit family, so the Sazerac's 40 ml of whisky now leads
   # its 20 ml of cognac and it qualifies on its own. A correction retired by
   # fixing the rule is worth more than one that stands for ever.
+
+  # ---------------------------------------------------------------------
+  # THE 2026-08-30 PASS. Helen went through all 114 drinks on a review page
+  # and these 31 are where her answer and a rule disagree. Every relaxation
+  # that would have closed them was measured first and cost more than it
+  # bought -- dropping `sharp`'s ingredient cap fixes 9 and wrongly tags 20;
+  # `warming` + falernum fixes 2 and wrongly tags 8; one muddle instead of two
+  # fixes 3 and wrongly tags 11. The rules stay narrow and precise (`sharp` is
+  # 40 right and 0 wrong) and her calls are recorded here instead.
+  #
+  # THE ONE RULE THAT DID CHANGE was `fruity`, because there the measurement
+  # went the other way: orange juice moved into the fruit set and `crème de
+  # banane` out, taking it from 8 misses and 1 false positive to 2 and 0.
+  # See its own note in `mood_ingredients`.
+  #
+  # A CORRECTION IS NOT A DEFEAT FOR THE RULE. Every drink below still gets
+  # every OTHER mood derived, and any later improvement reaches it -- that is
+  # the whole reason these name one mood each rather than replacing the list.
+
+  18th-century-cocktail:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  accoutrement:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  apple-cart:
+    moods: [warming]
+    why: >-
+      she calls it warming and it carries no declared warm spice.
+  arrack-punch:
+    moods: [I want to faff, on fire]
+    why: >-
+      one muddle or one long prep, where the rule wants two; she sets it alight; the method does not say so.
+  better-and-better:
+    moods: [strong brown drink, warming]
+    why: >-
+      she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
+  caipirinha:
+    moods: [I want to faff]
+    why: >-
+      one muddle or one long prep, where the rule wants two.
+  caribbean-sazerac:
+    moods: [strong brown drink, warming]
+    why: >-
+      she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
+  carta-switchel:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  charleston:
+    moods: [fruity]
+    why: >-
+      she calls it fruity and no ingredient in it is on the fruit list.
+  coney-park-swizzle:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  copenhagen-special:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  dons-mai-tai:
+    moods: [fruity, sharp]
+    why: >-
+      she calls it fruity and no ingredient in it is on the fruit list; she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  espresso-martini:
+    moods: [pudding in a glass]
+    why: >-
+      she calls it rich; nothing in it is on the rich list.
+  fish-house-punch:
+    moods: [ice ice baby, sharp]
+    why: >-
+      she calls it icy; the method does not say how; she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  gunmetal-blue:
+    moods: [ice ice baby]
+    why: >-
+      she calls it icy; the method does not say how.
+  kill-devil-punch:
+    moods: [I want to faff]
+    why: >-
+      one muddle or one long prep, where the rule wants two.
+  mai-tai:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  martinique-swizzle:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  milliners-punch:
+    moods: [on fire]
+    why: >-
+      she sets it alight; the method does not say so.
+  north-sea-oil:
+    moods: [strong brown drink]
+    why: >-
+      she calls it one; no aged BASE spirit leads it by volume.
+  pear-apricot-honey-lemon-and-rosemary-bellini:
+    moods: [I want to faff]
+    why: >-
+      one muddle or one long prep, where the rule wants two.
+  pic-a-de-crop-punch:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  smokestack-lightning:
+    moods: [warming]
+    why: >-
+      she calls it warming and it carries no declared warm spice.
+  ti-punch:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  tiki-max:
+    moods: [on fire]
+    why: >-
+      she sets it alight; the method does not say so.
+
   south-sider:
     moods: [strong brown drink]
     why: >-
@@ -549,14 +705,17 @@ mood_include:
 # Add it back here if she says tiki; leave it if she does not.
 
 mood_exclude:
-  blue-hawaiian:
-    moods: [pudding in a glass]
+  # BLUE HAWAIIAN'S EXCLUSION IS GONE, 2026-08-30. It read: "it has coconut
+  # cream, which is genuinely on the rich list... don't take it off the dessert
+  # list until it's failed us more than this." It has not failed -- Helen
+  # tagged the drink `pudding in a glass` herself on the review pass, so the
+  # correction had started arguing with her.
+  mastiha-mojito:
+    moods: [ice ice baby]
     why: >-
-      It has coconut cream, which is genuinely on the rich list. Helen,
-      2026-08-17: "I'm not certain there will be zero puddings with coconut
-      cream, so don't take it off the dessert list until it's failed us more
-      than this." So the INGREDIENT keeps its meaning and this one drink is
-      excepted — the narrower fix, and the reason these two hooks exist.
+      Fine-strained into an ice-filled glass and then churned twice, so the
+      rule reads it as an icy drink and she does not. Her call on the
+      2026-08-30 pass: the churning is technique here rather than the point.
 
 # Served UP — no ice in the glass. Read by the `up` mood. Glass names, not
 # generics, so they are checked against glasses.yml rather than the generic
@@ -665,6 +824,30 @@ mood_step_words:
 # ADDING A NAME HERE IS WHAT MAKES A MOOD HERS. Removing one hands it back to
 # the rules, and needs a rule to hand it back TO.
 moods_by_hand:
+  # THE FOUR BELOW MOVED HERE ON 2026-08-30, after every rule was scored
+  # against a full pass Helen made over all 114 drinks. The fit, as
+  # intersection over union:
+  #
+  #     no juicing 1.00 | ice ice baby .88 | warming .79 | sharp .78
+  #     strong brown drink .76 | fruity .76 | I want to faff .73
+  #     clear .67 | tiki .53 | on fire .40 | aperitivo .36
+  #     sugar craving .23
+  #
+  # The bottom four are here now. `sugar craving` is the clearest case: she
+  # tagged 47 drinks, the rule found 11, and the 36 she added share nothing the
+  # data can see. `clear` is the sharpest: it turns out to mean mouthfeel,
+  # complexity and how filling a drink is -- see its own note above, and the
+  # thirteen days it spent claiming to mean "transparent".
+  #
+  # ACROSS THE WHOLE TABLE THE RULES UNDER-FIRE, and that is the reassuring
+  # half: only FOUR times in the entire pass did a rule tag something she did
+  # not. Everything else was her adding. A conservative rule is the right kind
+  # of wrong, and the ones that stay derived are gaps to widen rather than
+  # judgements to distrust.
+  - clear
+  - sugar craving
+  - tiki
+  - aperitivo
   - nightcap
   - brunch
   - sunny terrace

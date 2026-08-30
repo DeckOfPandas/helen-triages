@@ -166,6 +166,13 @@ def derive(drink, sets, up_glasses, step_words, families):
     glasses = [str(g) for g in listed(drink.get("glass"))]
     n_ingredients = len(entries)
 
+    # `clear`, `sugar craving`, `tiki` and `aperitivo` ARE NOT DERIVED HERE
+    # ANY MORE -- they moved to `moods_by_hand` on 2026-08-30 after every rule
+    # was scored against a full pass of Helen's. Their fit was .67, .23, .53
+    # and .36; the ones that remain are .73 and above. The sets they used
+    # (`tiki`, `loud`, `pudding_flavour`, `aperitivo`) stay in taxonomy.yml:
+    # `tiki` and `loud` are still read by nothing, and are kept because they
+    # are a good starting list if a rule is ever wanted again.
     out = []
 
     # `strong brown drink` -- whisky leads; or another aged BASE spirit leads
@@ -193,8 +200,6 @@ def derive(drink, sets, up_glasses, step_words, families):
             if aged_leads and not has("citrus"):
                 out.append("strong brown drink")
 
-    if has("clear") and not has("citrus"):
-        out.append("clear")
 
     # `sharp` -- a base, a citrus, a sweetener, in five ingredients or fewer.
     # The count replaced an UP-GLASS requirement on 2026-08-30: that bar cost
@@ -228,8 +233,6 @@ def derive(drink, sets, up_glasses, step_words, families):
 
     if has("fruity"):
         out.append("fruity")
-    if has("pudding_flavour"):
-        out.append("sugar craving")
     if has("rich"):
         out.append("pudding in a glass")
 
@@ -238,8 +241,6 @@ def derive(drink, sets, up_glasses, step_words, families):
     # taste layers which is why it's not just a jar full of sugar". Count alone
     # dropped Jungle Bird and Better and Better ("only three ingredients, but
     # they're bonkers"); intensity recovers them and drags in nothing.
-    if count("tiki") >= 2 and (n_ingredients >= 6 or count("loud") >= 2):
-        out.append("tiki")
 
     if has("warming"):
         out.append("warming")
@@ -270,8 +271,6 @@ def derive(drink, sets, up_glasses, step_words, families):
     # `aperitivo` -- an amaro or an aromatised wine, and not a strong brown
     # drink. That second clause is what keeps a Boulevardier out: same
     # Campari, entirely different moment in the evening.
-    if has("aperitivo") and "strong brown drink" not in out:
-        out.append("aperitivo")
 
     if hits_in(steps, step_words.get("ice") or []):
         out.append("ice ice baby")
