@@ -891,25 +891,21 @@ function renderResultsPool() {
         if (HTF.ingredientSearch.fold(title.toLowerCase()).indexOf(state.nameQuery) === -1) visible = false;
       }
 
-      if (state.meta.has('rewrite') && li.dataset.metaRewrite !== 'true') visible = false;
-      if (state.meta.has('proofread') && li.dataset.metaProofread !== 'true') visible = false;
-      // THREE-VALUED, NOT BOOLEAN, since the magic bag landed. data-meta-short
-      // NOT COVERED BY A TEST — this file has none at all (HANDOVER 3's table:
-      // "exercised by hand"), so the branch below is reasoned and hand-checked
-      // rather than executed. Issue #506 proposes lifting it into a pure
-      // predicate that Node can test, same argument as back-link.js.
-      // is 'true', 'false', or 'n/a' -- the last for a row that is not a recipe
-      // and so has no answer to "does it have a short method?". Both halves of
-      // this filter pair now require their explicit value rather than treating
-      // "not true" as "false": 'n/a' fails both, which is the whole point.
-      //
-      // Reading no-short as `!== 'true'` would have been the natural spelling
-      // and is the bug -- it puts every magic-bag dish into a list that means
-      // "recipes still needing a short method written", where none of them can
-      // ever be dealt with. Fails closed, like meta.awaiting_fix: a row joins
-      // this list only by saying so.
-      if (state.meta.has('no-short') && li.dataset.metaShort !== 'false') visible = false;
-      if (state.meta.has('has-short') && li.dataset.metaShort !== 'true') visible = false;
+      /* ONE META FILTER, AND `draft` IS IT -- issue #562. There were five:
+         `rewrite`, `proofread`, `no-short`, `has-short` and this one, reading
+         data-meta-rewrite / -proofread / -short off each row. All four are
+         gone, and their data attributes with them, because an attribute no
+         branch reads is worse than an absent one -- it looks like a live fact.
+
+         The pair that went is worth a line, because it was subtle and its
+         subtlety is now moot. data-meta-short was THREE-valued ('true' /
+         'false' / 'n/a') so that a magic-bag row, which has no answer to "does
+         it have a short method", could fail BOTH halves; reading no-short as
+         `!== 'true'` was the natural spelling and the bug. That is the branch
+         issue #506 was raised to get under test, and it no longer exists.
+
+         `draft` stays boolean and needs none of that: every row either is a
+         draft or is not. */
       if (state.meta.has('draft') && li.dataset.metaDraft !== 'true') visible = false;
 
       if (state.ingredient) {
