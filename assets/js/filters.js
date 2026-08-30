@@ -577,7 +577,7 @@ function renderResultsPool() {
   /* `wordMatch` is the same flag makeIngredientButton() has always taken, and
      the two pickers now agree on it -- issue #390. They did not: this builder
      simply dropped `r.hasWordMatch` on the floor, so LEAVE OUT rendered every
-     candidate identically while SEARCH MAIN INGREDIENTS, one box above, picked
+     candidate identically while HAS TO HAVE, one box above, picked
      out the genuine matches. Same query, same ranked results, same code path
      (HANDOVER 8.1) -- one of them just never used the answer.
 

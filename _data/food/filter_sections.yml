@@ -30,7 +30,12 @@ star:
   class: category--star
 
 ingredients:
-  label: "SEARCH MAIN INGREDIENTS"
+  # "HAS TO HAVE" since issue #583. It was "SEARCH MAIN INGREDIENTS", which
+  # named the MECHANISM (a search, over the main_ingredients field) rather than
+  # the question being asked. The cocktails index already asks "HAS TO HAVE",
+  # and the two sites asking the same question in different words was the whole
+  # of the complaint.
+  label: "HAS TO HAVE"
 
 tag_groups:
   - name: mood
