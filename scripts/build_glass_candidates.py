@@ -42,13 +42,38 @@ _spec.loader.exec_module(nrm)
 
 
 def main():
+    # LOOK BEFORE DELETING -- issue #537. This emptied DST before it knew SRC
+    # held anything, which is the shape that cost the published icon set twice
+    # in two days next door. The guard is nrm's, deliberately: one
+    # implementation of the rule, called by both, rather than a check written
+    # out twice and kept in step by hand.
+    #
+    # LOWER SEVERITY HERE, AND THAT IS NOT THE SAME AS SAFE. Unlike the
+    # normaliser's gitignored inbox, this SRC is `_design_sources/`, which is
+    # TRACKED -- so it is very unlikely to be empty, and the failure this
+    # prevents is a rename or a move rather than an ordinary day. That makes it
+    # rarer, not different: the drawer would empty silently, and
+    # _data/dev_glass_candidates.yml would be rewritten to agree with the empty
+    # directory, so the listing and the drawer would still match each other and
+    # nothing would look wrong.
+    sources = sorted(SRC.glob("*.svg"))
+    nrm.refuse_if_no_input(
+        sources, src=SRC, dst=DST, doing="build candidates from",
+        extra=(
+            "It would also rewrite _data/dev_glass_candidates.yml to an empty "
+            "list, so the drawer and its listing would agree with each other "
+            "and /dev/glasses/ would show nothing wrong. If _design_sources/ "
+            "has moved, point SRC at it rather than running this."
+        ),
+    )
+
     DST.mkdir(parents=True, exist_ok=True)
     for old in DST.glob("*.svg"):
         old.unlink()
 
     written, skipped = [], []
 
-    for p in sorted(SRC.glob("*.svg")):
+    for p in sources:
         stem = p.stem.replace("glass-", "")
         try:
             svg = nrm.normalise(p.read_text(encoding="utf-8"), stem, "glass-icon-line")
