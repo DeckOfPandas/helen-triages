@@ -435,3 +435,83 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   font-weight: 700;
   letter-spacing: 0.08em;
 }
+
+
+// --- The filter panel's shape ------------------------------------------------
+// BOTH INDEXES ARE THE SAME CONTROL PANEL and were two implementations of it.
+// Sharing the mark and the type was not enough -- the same mixin still drew the
+// bar in a different place, because the BOX it draws on was different: food's
+// heading is an inline span inside a flex column, cocktails' was a blockified
+// h2 in a plain block, and a background positioned 0.70em from the top of the
+// box lands somewhere else when the box is a whole line-height taller.
+//
+// So the structure is shared too. Mixins rather than a placeholder, because the
+// two sites' class names differ (.category vs .drink-filter) and because
+// `@extend` would merge their selector lists and reshape the compiled output --
+// and the check on all of this is that food.css comes out byte-identical.
+//
+// `position: relative` on the panel is LOAD-BEARING and not tidiness: the
+// clear-all button is `position: absolute; top: 0; right: 0`, so the panel is
+// what it anchors to. Cocktails had neither, which is why its clear-all sat
+// somewhere else entirely.
+@mixin index-panel {
+  position: relative;
+  width: 100%;
+  padding-top: $space-lg;
+}
+
+// One filter section. The gap is what spaces a label from its own buttons, so
+// nothing inside needs a margin -- and a margin here is how the two drifted.
+@mixin index-section {
+  // `margin` first, matching the order food's rule already had. Declaration
+  // order changes nothing about the cascade here (no property is set twice),
+  // but the check on this whole refactor is that food.css comes out
+  // BYTE-identical, and a check that tolerates "near enough" stops being one.
+  margin: $index-section-gap 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $index-label-gap;
+}
+
+// The label and its inline clear link, side by side.
+@mixin index-label-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: $space-lg;
+}
+
+// The clear-all, pinned to the panel's top-right corner.
+@mixin index-clear-all {
+  visibility: hidden;
+  border: none;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  margin: 0;
+  transition: color 0.1s ease-in-out;
+
+  font-family: $font-body;
+  font-size: 0.88rem;
+  font-weight: 400;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+  color: $color-clear-text;
+  text-decoration: underline;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 20;
+}
+
+// The same button repeated after the last section, in normal flow. `width:
+// fit-content` gives it a definite box so `margin-left: auto` has spare width
+// to consume and pushes it to the same edge as the top copy, with no wrapper.
+@mixin index-clear-all-bottom {
+  position: static;
+  display: block;
+  width: fit-content;
+  margin: $spacing-block-gap 0 0 auto;
+}

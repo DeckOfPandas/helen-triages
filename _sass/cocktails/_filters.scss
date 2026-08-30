@@ -28,8 +28,12 @@
 // wrapper stops the first section's top margin collapsing out through it, so
 // the two add rather than the larger swallowing the smaller -- which is
 // precisely how food gets 2.5rem from a 1rem and a 1.5rem.
+// Shared with food's `.controls` -- @mixin index-panel in shared/_rule.scss.
+// `position: relative` comes with it and is load-bearing: the clear-all is
+// absolutely positioned and this is what it anchors to. Without it the button
+// resolved against the page and sat somewhere else entirely.
 .drink-filters {
-  padding-top: $space-lg;
+  @include index-panel;
   margin: 0 0 $spacing-section-gap;
 }
 
@@ -74,7 +78,7 @@
   display: block;
   @include index-section-label;
   color: $color-text;
-  margin: 0 0 $space-md;
+  margin: 0;
 
   // The colour lands on the WORDS, not the row, so the band stops where the
   // heading does. A label wrapping its own <label> element (the search fields
@@ -82,6 +86,16 @@
   > label,
   &::after { display: inline; }
 }
+
+// THE MARK GOES ON AN INLINE SPAN, NOT ON THE HEADING, and this is the fix for
+// "all the cocktail headings sit lower in the double underline than food".
+//
+// The mixin positions its bars from the TOP of the box it paints. Food puts it
+// on `.category-label-text`, an inline span, whose box is the font's own
+// content area. This put it on the h2 -- a flex item, so blockified -- whose
+// box is a whole line-height tall and starts half a leading higher. Same code,
+// same numbers, box a few pixels taller, bar in the wrong place relative to the
+// letters. Sharing the mixin was never going to fix that on its own.
 
 // One rule per section, and each hue is the same fact the CARDS already show —
 // see _palette.scss. A heading's colour is a promise the card keeps.
@@ -117,11 +131,11 @@
   @include overlapping-rule-double($colour, $color-heading-shared);
 }
 
-.drink-filter--chaos   .drink-field-label { @include heading-rule($color-heading-yolo); }
-.drink-filter--mood    .drink-field-label { @include heading-rule($color-heading-mood); }
-.drink-filter--hassle  .drink-field-label { @include heading-rule($color-heading-hassle); }
-.drink-search--include .drink-field-label { @include heading-rule($color-heading-include); }
-.drink-filter--name    .drink-field-label { @include heading-rule($color-heading-name); }
+.drink-filter--chaos   .drink-field-label-text { @include heading-rule($color-heading-yolo); }
+.drink-filter--mood    .drink-field-label-text { @include heading-rule($color-heading-mood); }
+.drink-filter--hassle  .drink-field-label-text { @include heading-rule($color-heading-hassle); }
+.drink-search--include .drink-field-label-text { @include heading-rule($color-heading-include); }
+.drink-filter--name    .drink-field-label-text { @include heading-rule($color-heading-name); }
 
 // LEAVE OUT CARRIES NO HUE, and the absence is the decision. Helen: "for food,
 // avoiding can be important whereas for drinks surely less so." Food gave its
@@ -139,7 +153,9 @@
 // $index-section-gap by name now: it moved to shared/_tokens.scss on
 // 2026-08-30, so both indexes name the same gap rather than spelling the same
 // number twice.
-.drink-filter { margin: $index-section-gap 0; }
+// Shared -- @mixin index-section. A flex column whose GAP spaces the label
+// from its buttons, which is why nothing inside carries a margin any more.
+.drink-filter { @include index-section; }
 
 // EXCEPT INSIDE THE PAIR, where the grid owns the spacing -- and this is #548
 // point 4, "there is too much vertical space between has to have and leave out
@@ -190,14 +206,13 @@
 // widens and narrows as the button comes and goes -- the exact fault food fixed
 // once already. `.drink-label-row--search` below keeps the attribute and
 // changes what it costs.
-.drink-label-row {
-  display: flex;
-  align-items: baseline;
-  gap: $space-md;
-  margin: 0 0 $space-md;
-
-  .drink-field-label { margin: 0; }
-}
+// Shared -- @mixin index-label-row. It was `align-items: baseline` with its
+// own bottom margin; the margin is the section's gap now, and centre rather
+// than baseline because the row holds a 1.35rem heading beside a 0.88rem link
+// and baseline-aligning those two sets the row's height from the larger
+// ascent -- which is one of the things that put these headings and food's at
+// different heights.
+.drink-label-row { @include index-label-row; }
 
 // --- a label row with an input in it ------------------------------------------
 // #587, and #548 point 9 from the other end. Food's three search sections put
@@ -732,32 +747,14 @@
 // `visibility`, not `display`: the button appears the moment a filter is set,
 // and a row that changes height as you click the first mood is a page that
 // moves under you. Its space is reserved from the start.
-.btn-clear {
-  visibility: hidden;
-  display: block;
-  margin: 0 0 $space-md auto;
-  border: 0;
-  background: none;
-  padding: 0;
-  cursor: pointer;
+// Shared with food's -- @mixin index-clear-all. It was a block pushed right
+// with `margin-left: auto`, at its own size and colour; food's is pinned to the
+// panel's top-right corner. Helen: "I'd expect the clear all button to look the
+// same and be in the same place too."
+.btn-clear { @include index-clear-all; }
 
-  font-family: $font-body;
-  font-size: 0.82rem;
-  font-weight: 400;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
-  text-decoration: underline;
-  color: $color-clear-text;
-  transition: color 0.1s ease-in-out;
-
-  // Ink on hover rather than a hue. Clear-all is the one control that belongs
-  // to no section, so it can borrow no section's colour -- the same reason the
-  // survivor count and the empty state carry none.
-  &:hover,
-  &:focus-visible { color: $color-text; }
-}
-
-.btn-clear--bottom { margin: $space-xl 0 0 auto; }
+// Shared -- @mixin index-clear-all-bottom.
+.btn-clear--bottom { @include index-clear-all-bottom; }
 
 @media (max-width: 720px) {
   .drink-searches { grid-template-columns: 1fr; gap: $index-section-gap; }

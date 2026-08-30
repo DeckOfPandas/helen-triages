@@ -175,18 +175,13 @@
 }
 
 .category {
-  margin: $index-section-gap 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $index-label-gap;
+  // Shared -- @mixin index-section in shared/_rule.scss. The gap is what
+  // spaces a label from its own buttons, so nothing inside needs a margin.
+  @include index-section;
 
-  .category-label-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: $space-lg;   // horizontal, label to its inline clear link
-  }
+  // Shared -- @mixin index-label-row. The gap is horizontal, label to its
+  // own inline clear link.
+  .category-label-row { @include index-label-row; }
 
   // Brought closer to .btn-clear (the global "clear all", below) and to
   // article.recipe a — Helen, 2026-08-03: this page already has multiple

@@ -6,11 +6,9 @@
 // Split out of the old food/_layout.scss (2026-08-10) -- see HANDOVER for
 // the naming convention and the section boundaries this split follows.
 
-.controls {
-  position: relative;
-  width: 100%;
-  padding-top: $space-lg;
-}
+// Shared with cocktails' own filter panel -- see @mixin index-panel in
+// shared/_rule.scss. `position: relative` is what .btn-clear anchors to.
+.controls { @include index-panel; }
 
 // The boundary between filters and results, previously just a margin on
 // .recipe-list, now belongs to this heading instead -- the same three-to-one
