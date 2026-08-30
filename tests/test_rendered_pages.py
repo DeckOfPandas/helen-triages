@@ -1006,6 +1006,84 @@ def test_no_active_filter_button_changes_its_own_width(site):
     )
 
 
+# Properties that give a box vertical size of its own, i.e. that an EMPTY
+# element would still occupy. `gap` is deliberately absent: it only ever
+# appears between children, so an empty flex box with a gap is still zero-high.
+VERTICAL_SPACE_PROPERTIES = (
+    "margin", "margin-top", "margin-bottom",
+    "padding", "padding-top", "padding-bottom",
+    "height", "min-height",
+)
+
+
+def _is_all_zero(value: str) -> bool:
+    """True if every length in a (possibly shorthand) value is zero."""
+    parts = value.split()
+    return bool(parts) and all(
+        re.fullmatch(r"0(?:px|rem|em|%|vh)?", p, flags=re.I) for p in parts
+    )
+
+
+def test_an_empty_search_results_pool_reserves_no_space(site):
+    """An empty ingredient/exclude pool must take up no room. Issue #589.
+
+    The pool sits between a search box and whatever is under it, and it is empty
+    for the whole of every session that never types into it. Issue #290 moved
+    its gap onto the pool itself, gated on `:not(:empty)`, so that dead air went
+    away -- and it did not, because `_sass/food/_search.scss` went on declaring
+    `margin-top: $space-lg` on `.search-results` unconditionally.
+
+    THE DIRECTION IS THE WHOLE BUG. A `:not(:empty)` override can only ever ADD
+    to the unconditional base underneath it; it cannot take space away. So the
+    empty pool kept the larger 1rem and the full one got 0.75rem, which made the
+    pool 4px TALLER with nothing in it. Clicking a LEAVE OUT candidate empties
+    the pool at the same moment the chosen pill is drawn below it, so the pill
+    landed 4px lower than the chip that had just been clicked -- Helen, "if I
+    click a chip, it then jumps downwards by a few pixels, but should stay in
+    the same place".
+
+    A rule that only fires when the pool has content is fine and is the whole
+    design. What this forbids is the unconditional twin, because that is what
+    silently decides what "empty" costs.
+    """
+    css = (site / "assets" / "css" / "food.css").read_text(encoding="utf-8")
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+
+    blocks = re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+    pool_rules = [(" ".join(sel.split()), body) for sel, body in blocks
+                  if ".search-results" in sel]
+    assert pool_rules, (
+        "No .search-results rules found in the compiled CSS. Either the class "
+        "was renamed or this scan went stale -- and a scan that matches nothing "
+        "passes while checking nothing (HANDOVER 12)."
+    )
+
+    offenders = []
+    for sel, body in pool_rules:
+        # A rule that already says "only when it has content" is the intended
+        # shape, not the bug.
+        if ":not(:empty)" in sel or ":empty" in sel:
+            continue
+        for decl in body.split(";"):
+            if ":" not in decl:
+                continue
+            prop, _, value = decl.partition(":")
+            prop = prop.strip().lower()
+            if prop in VERTICAL_SPACE_PROPERTIES and not _is_all_zero(value.strip()):
+                offenders.append(f"{sel} declares {prop}: {value.strip()}")
+
+    assert not offenders, (
+        "A .search-results rule gives the pool vertical size unconditionally:\n  "
+        + "\n  ".join(sorted(set(offenders)))
+        + "\n\nThat space is paid by every session that never opens the picker, "
+          "and it makes the EMPTY pool a different height from the full one -- "
+          "which is issue #589, the chosen LEAVE OUT pill dropping a few pixels "
+          "below the chip you clicked. Put the declaration on the "
+          "`:not(:empty)` rule in _sass/food/_category-labels.scss instead, "
+          "which is the one place the pool's spacing is meant to live."
+    )
+
+
 def _luminance(css_colour):
     """Relative luminance of an `rgb(r, g, b)` string, 0 (black) to 1 (white)."""
     nums = [float(n) for n in re.findall(r"[\d.]+", css_colour)[:3]]

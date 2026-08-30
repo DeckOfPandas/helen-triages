@@ -1539,6 +1539,69 @@ def test_no_selector_declares_the_same_property_twice():
 
 # --- the print stylesheet keeps pointing at real markup ----------------------
 
+def test_a_print_partial_declares_nothing_outside_media_print():
+    """A rule in a `_print.scss` that forgets `@media print` styles the SCREEN.
+
+    GitHub issue #538. `_sass/cocktails/_print.scss` was added for #482, to make
+    a drink page print its full editorial state rather than whichever state the
+    `make it` toggle happened to be left in. Its rules were written without the
+    wrapper, so they compiled to top level:
+
+        .cocktail.is-making .cocktail-tagline { display: revert; }
+        .btn-make { display: none; }
+
+    On screen that would have PERMANENTLY BROKEN THE TOGGLE IT EXISTS TO
+    OVERRIDE -- `make it` would stop hiding anything, and the button itself
+    would be invisible. The build succeeded, the site rendered, and nothing in
+    the suite noticed. It was caught by reading _site/assets/css/cocktails.css
+    and seeing the rules sitting after the `@media print` block rather than
+    inside it.
+
+    THE TWO HALVES ARE BOTH SILENT AND ONLY ONE WAS COVERED.
+    test_print_rules_target_classes_that_exist below is "a print rule that
+    matches nothing"; this is "a print rule that matches everything, all the
+    time". Neither is visible in review and neither has a console.
+
+    The file being NAMED `_print.scss` is a strong enough declaration of intent
+    to assert against, which is what makes this checkable at all -- there is no
+    way to tell a stray print rule from an ordinary one in a general partial.
+
+    Scoped to top-level BLOCKS on purpose. A print partial may legitimately
+    hold variables, an `@import`, or comments; what it may not hold is a rule
+    that emits declarations to every medium.
+    """
+    partials = [p for p in sass_files() if p.name.startswith("_print")]
+    assert partials, (
+        "No _print*.scss partials found under _sass/. There are three "
+        "(shared, food, cocktails), so finding none means this scan went stale "
+        "and would pass while checking nothing (HANDOVER 12)."
+    )
+
+    offenders = []
+    for path in partials:
+        depth = 0
+        for i, raw in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+            code = raw.split("//")[0]
+            if depth == 0 and "{" in code:
+                head = code.split("{")[0].strip()
+                if not (head.startswith("@media") and "print" in head):
+                    # All three are called _print.scss, so the parent directory
+                    # is the half that says which one.
+                    offenders.append(f"{path.parent.name}/{path.name}:{i} {head}")
+            depth += code.count("{") - code.count("}")
+
+    assert not offenders, (
+        "Top-level block(s) in a print partial that are not `@media print`:\n  "
+        + "\n  ".join(offenders)
+        + "\n\nThese compile to top level and apply ON SCREEN, which is issue "
+          "#538: cocktails' print rules did exactly this and would have "
+          "permanently disabled the `make it` toggle they were written to "
+          "override. Wrap them in `@media print { … }`. If a rule genuinely "
+          "belongs on screen, it belongs in a partial that is not named "
+          "_print.scss."
+    )
+
+
 def _print_block_classes() -> list[tuple[str, str]]:
     """(file, class) for every class named inside an `@media print` block."""
     out = []
@@ -1779,10 +1842,23 @@ def test_spacing_tokens_are_not_used_for_type():
 def test_no_element_can_force_horizontal_scroll():
     """A fixed width wider than a phone viewport, with nothing clamping it.
 
-    Horizontal scroll is the most visible mobile failure there is, and it takes
-    exactly one unclamped element to cause it. The site has no media queries and
-    does not need any — everything else is fluid or wraps — so this one check
-    stands in for a responsive test suite.
+    Horizontal scroll is the most visible mobile failure there is, and one
+    unclamped element is enough to cause it.
+
+    THIS CHECKS ELEMENTS, AND OVERFLOW IS A PROPERTY OF THE ROW -- issue #468,
+    and the limit is stated here rather than left for the next reader to
+    discover. On 2026-08-23 the footer overflowed a phone with every element in
+    it under this threshold: `.site-footer-top` was `1fr auto 1fr`, a `1fr`
+    track will not shrink below min-content, and the row's floor was
+    "temperatures" (~120px) plus the hearts' flat 240px plus 2rem of gaps --
+    about 392px against a ~360px viewport. Three sub-320px tracks side by side
+    overflow a phone perfectly well. `test_a_multi_track_row_can_become_one`
+    below is the half this one cannot see.
+
+    This docstring also used to claim "the site has no media queries and does
+    not need any". It has had one in food/_recipe-list.scss for a long time,
+    shared/_layout.scss added a second on 2026-08-23, and food/_search.scss a
+    third with issue #586. Four counting print.
 
     A `width: Npx` above 320 is fine as long as a max-width, min() or clamp()
     sits with it.
@@ -1803,6 +1879,181 @@ def test_no_element_can_force_horizontal_scroll():
         + "\n\nUse `width: min(Npx, 92vw)` or add a max-width. 92 rather than 100 "
           "if the element is rotated, since the rendered box is wider than the "
           "declared width."
+    )
+
+
+# A multi-track grid that never collapses is a BET that its content stays
+# narrow, and nothing static can settle that bet: the floor of a `1fr` track is
+# its content's min-content width, which depends on a font, a string and a
+# browser. So the rule is about the collapse, not about the arithmetic.
+#
+# These four rows are declared exceptions, each with the claim it is making.
+# The list only shrinks: giving one of them a narrow-screen variant means
+# deleting its entry, and an entry for a row that HAS one fails too, so it
+# cannot rot into a list of things that were fixed years ago.
+MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
+    ".recipe-pagination": (
+        "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "
+        "of Courier all told, so it is believed to fit a 360px phone -- BELIEVED, "
+        "not measured, and it is the same shape as the footer row that did not. "
+        "The status string is built in filters.js and is the part that could grow."
+    ),
+    ".tc-row": (
+        "`$tc-label-width 1fr` -- a 9.5rem (152px) label column and a bar. It "
+        "cannot overflow, because only the label is fixed, but on a 360px phone "
+        "the bar is left about 140px. The temperature charts are read on an iPad "
+        "in the kitchen (HANDOVER 14), where there is room; a phone would want "
+        "the label above the bar rather than beside it, which is a redesign of "
+        "the chart and wants Helen's eye."
+    ),
+    ".tc-axis": (
+        "The axis row for .tc-row above, and it must keep the same two tracks or "
+        "the scale stops lining up with the bars it labels. Whatever happens to "
+        ".tc-row happens to this in the same pass -- that is the point of it "
+        "being a separate entry saying so."
+    ),
+}
+
+
+def _split_tracks(value: str) -> list[str]:
+    """Top-level whitespace split, respecting parentheses."""
+    out, depth, cur = [], 0, ""
+    for ch in value:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        if ch.isspace() and depth == 0:
+            if cur:
+                out.append(cur)
+                cur = ""
+        else:
+            cur += ch
+    if cur:
+        out.append(cur)
+    return out
+
+
+def _track_count(value: str):
+    """How many tracks this declares, or None if it sizes itself.
+
+    `repeat(auto-fit, …)` and `repeat(auto-fill, …)` drop to one column on their
+    own as the container narrows, which is exactly the collapse this test asks
+    for -- so they are exempt by construction rather than by listing.
+    """
+    if re.search(r"repeat\(\s*auto-(?:fit|fill)", value):
+        return None
+    total = 0
+    for track in _split_tracks(value):
+        repeated = re.match(r"repeat\(\s*(\d+)\s*,", track)
+        total += int(repeated.group(1)) if repeated else 1
+    return total
+
+
+def _grid_declarations():
+    """(selector, value, inside_a_narrow_media_query, file, line) for each one."""
+    found = []
+    for path in sass_files():
+        stack: list[str] = []
+        narrow_at: list[int] = []
+        for i, raw in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+            code = raw.split("//")[0]
+            declared = re.search(r"grid-template-columns:\s*([^;]+);", code)
+            if declared:
+                # A rule written entirely on one line (`.x { grid-…; }`) names
+                # its own selector left of the brace; otherwise the open block
+                # on the stack does.
+                inline = re.match(r"\s*([^{};]+?)\s*\{", code)
+                selector = inline.group(1) if inline else (stack[-1] if stack else "?")
+                found.append(
+                    (selector, declared.group(1).strip(), bool(narrow_at), path.name, i)
+                )
+            for _ in range(code.count("{")):
+                head = code.split("{")[0].strip()
+                if head.startswith("@media") and "max-width" in head:
+                    narrow_at.append(len(stack))
+                stack.append(head)
+            for _ in range(code.count("}")):
+                if stack:
+                    stack.pop()
+                if narrow_at and narrow_at[-1] >= len(stack):
+                    narrow_at.pop()
+    return found
+
+
+def test_a_multi_track_row_can_become_one():
+    """Every grid row of 2+ tracks collapses on a narrow screen, or says why not.
+
+    Issue #468. `test_no_element_can_force_horizontal_scroll` above asks whether
+    any single element is too wide. The footer overflowed a phone on 2026-08-23
+    with every element in it under that threshold, because OVERFLOW IS A
+    PROPERTY OF THE ROW: `1fr auto 1fr` gave "temperatures" (~120px min-content),
+    the hearts (a flat 240px) and 2rem of gaps a floor of about 392px against a
+    ~360px viewport. Three sub-320px tracks side by side overflow a phone
+    perfectly well.
+
+    WHY THIS CHECKS FOR A COLLAPSE RATHER THAN DOING THE ARITHMETIC. The
+    arithmetic cannot be done here and it is worth being plain about that: a
+    `1fr` track will not shrink below its content's min-content width, and
+    min-content depends on a font, a string and a browser. Summing the declared
+    lengths would have given the real footer bug a floor of 272px and passed it.
+    So the honest static claim is not "this row fits" but "this row is a bet
+    that its content is narrow, and it never gets to stop betting".
+
+    The fix that actually worked was a collapse to one column, which is what
+    this asks for, and it is what .drink-searches, .search-pair and
+    .site-footer-top all now do.
+
+    `repeat(auto-fit, …)` and `repeat(auto-fill, …)` are exempt by construction:
+    they collapse on their own.
+    """
+    declarations = _grid_declarations()
+    assert declarations, (
+        "No grid-template-columns declarations found under _sass/. Either the "
+        "scan went stale or the selector-stack walk is broken -- and a scan that "
+        "matches nothing passes while checking nothing (HANDOVER 12)."
+    )
+
+    collapses = {sel for sel, _v, in_narrow, _f, _l in declarations if in_narrow}
+    assert collapses, (
+        "No grid row anywhere restates grid-template-columns inside a "
+        "`@media (max-width: …)` block. Three do (.drink-searches, .search-pair, "
+        ".site-footer-top), so finding none means this walk stopped recognising "
+        "media queries and every row below would pass vacuously."
+    )
+
+    offenders = []
+    for selector, value, in_narrow, fname, line in declarations:
+        if in_narrow or selector in collapses:
+            continue
+        count = _track_count(value)
+        if count is None or count < 2:
+            continue
+        if selector in MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT:
+            continue
+        offenders.append(f"{fname}:{line} {selector} -- {value} ({count} tracks)")
+
+    assert not offenders, (
+        "Grid row(s) of two or more tracks with no narrow-screen variant:\n  "
+        + "\n  ".join(sorted(offenders))
+        + "\n\nA `1fr` track will not shrink below its content's min-content "
+          "width, so a row like this has a floor nothing in this repo can "
+          "compute -- which is how the footer overflowed a phone in issue #468 "
+          "with every element in it under 320px. Restate "
+          "`grid-template-columns: 1fr` for this selector inside a "
+          "`@media (max-width: 600px)` block, or add it to "
+          "MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT with the claim you are "
+          "making about its content."
+    )
+
+    stale = sorted(set(MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT) & collapses)
+    assert not stale, (
+        "Registered as having no narrow-screen variant, and now has one:\n  "
+        + "\n  ".join(stale)
+        + "\n\nDelete the entry. A registry that keeps naming rows somebody has "
+          "already fixed stops being a list of open questions and becomes "
+          "furniture -- the same reason methods.yml's proposals are checked "
+          "against the live collection."
     )
 
 

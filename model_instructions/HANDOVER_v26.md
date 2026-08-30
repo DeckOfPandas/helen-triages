@@ -1224,25 +1224,32 @@ This is the part worth reading before touching the index again.
   A second loop reads `ingredients`. There is deliberately no branch on the
   collection — a recipe has no `ingredients` and an entry has no
   `ingredient_groups`, so each loop is simply a no-op for the other shape.
-- **The three meta filters.** "needs rewrite", "needs proofread" and "no short
-  method" all mean *this recipe isn't finished yet*. On the defaults an entry
-  answers true to all three and pads every one of those working lists with
-  dishes that can never leave them. `data-meta-short` is **three-valued now** —
-  `'true'`, `'false'`, `'n/a'` — because that filter is a PAIR whose halves want
-  opposite answers, and only a third value fails both. `filters.js`'s no-short
-  branch requires an explicit `'false'`; reading it as `!== 'true'` is the
-  natural spelling and is the bug.
-- **A `magic bag` badge on the row, shown in production** unlike the two
-  work-state badges. Without it a magic-bag row is indistinguishable from a
-  recipe row until the page loads and there is no method on it.
+- ~~**The three meta filters.**~~ **GONE, 2026-08-30, issue #562** — and the
+  care they needed is worth reading once even though the code is deleted, because
+  it is the sharpest example on the page of a default that lies. "needs rewrite",
+  "needs proofread" and "no short method" all mean *this recipe isn't finished
+  yet*, and on the defaults a magic-bag entry answers TRUE to all three (no
+  `meta.rewritten`, no `meta.proofread`, no `method_short`), padding three
+  working lists with dishes that can never leave them. `data-meta-short` was
+  therefore **three-valued** — `'true'`, `'false'`, `'n/a'` — because that filter
+  was a PAIR whose halves want opposite answers, and only a third value fails
+  both; reading the no-short branch as `!== 'true'` was the natural spelling and
+  the bug. **All of it is deleted**: Helen reduced the meta filters to `draft`
+  alone (§13.4), so the attribute, the Liquid deriving it and the branches
+  reading it went together rather than being left as data nothing reads.
+- **A `magic bag` badge on the row, shown in production.** Without it a
+  magic-bag row is indistinguishable from a recipe row until the page loads and
+  there is no method on it. It used to be the exception among three badges;
+  since #562 there are two, `magic bag` and `draft`, and they are the same kind
+  of statement — **what you are about to CLICK**, not what state it is in.
 
 **Not covered by any test: `filters.js`.** That file has no unit tests at all
-(§3's table says "exercised by hand"), so the three-valued change is reasoned
-and hand-checked, not exercised — a production build emits the values in the
-right proportions (67 `false`, 19 `true`, 1 `n/a`) but the branch itself has
-never been executed by a test. **Issue #506**, which proposes the §3 split:
-pull the predicate out as a pure function and test that, leaving the DOM wiring
-behind. Exactly the `back-link.js` argument.
+(§3's table says "exercised by hand"). **Issue #506** was raised about the
+three-valued branch above specifically, and that branch no longer exists — so
+the issue's worked example is gone while its argument stands: pull a predicate
+out as a pure function and test that, leaving the DOM wiring behind, exactly the
+`back-link.js` case. Worth re-reading before doing it, since what it points at
+has changed.
 
 **A trap paid for while building it:** Liquid **tokenises tags inside a
 `{% comment %}` block** rather than treating the body as text, so an
@@ -4185,6 +4192,44 @@ table that listed a file nobody had ever written, for three versions running,
 because nobody checked. **If the code and this file disagree, the code wins,**
 and the fix is to correct this file, not to trust it harder next time.
 
+### 11.2.1 Do not ship a layout at a size you cannot look at
+
+**Issue #539, at Helen's request, from a near-miss rather than a bug.**
+
+> **If a change only manifests at a size, state or device you cannot produce,
+> building a way to SEE it is part of the work, not overhead.**
+
+#483 asked how the cocktail cards should behave on a narrow screen. Three
+candidate layouts shipped behind a `?narrow=` switch under
+`@media (max-width: 400px)` — and **neither Helen nor the agent could look at
+any of them.** A desktop window will not drag narrower than about 500px; device
+mode reflows correctly but shows one option at a time, and "is stacking better
+than just making it smaller" is a *comparison*; and her actual device is an iPad
+at 768–834px, where a 400px breakpoint never fires at all.
+
+**That is worse than picking the wrong layout, because it looks like progress
+and produces no decision.** One of the three was also broken outright — the
+`title` variant ran its ingredient line underneath the glass panel, hiding the
+first words of every card. Obvious in a screenshot, invisible in the source, and
+it had been committed and pushed.
+
+**What fixed it: a dev page of iframes at fixed CSS widths** (360 / 390 / 320).
+An iframe carries its own viewport, so `width: 360px` is a genuine 360px layout
+whatever the screen around it is — it works on the iPad, on a desktop, at any
+window size, and puts the candidates side by side. Helen found the bug in one
+look, chose `stack`, and the page went with the losing variants.
+
+The trick generalises to anything viewport-conditional: breakpoints, and by the
+same argument (though an iframe cannot print) print. It sits alongside the
+existing comparison-switch convention — build the options, let Helen look, then
+**delete the losers and the switch** — because this near-miss is exactly what
+happens when the first half is done and "let Helen look" is assumed rather than
+provided for.
+
+**There is no browser in this environment**, which is what makes this a rule
+rather than a nicety: an agent cannot check its own narrow-screen work at all,
+so the only way anyone sees it is if a way to see it is built.
+
 ### 11.3 CSS naming — flat noun for the thing, `--modifier` for its state
 
 Not a split that needs unifying (issue #131 is still open on GitHub — a
@@ -4644,6 +4689,34 @@ compiled CSS for every rule that named its old ancestor. This is the same
 family as the "test that cannot fail" run above — a green suite proving
 nothing — but the vacuous thing is a CSS selector rather than a test.
 
+**YOU WILL WRITE A `:not(...)` RULE TO TAKE SPACE AWAY, AND IT CAN ONLY EVER
+ADD.** 2026-08-30, issue #589, and it is a one-line fact with a two-week tail.
+Issue #290 moved the results pool's gap onto the pool itself, gated on
+`:not(:empty)`, so an empty picker would stop buying dead air — and its own
+comment says exactly that. It never did, because `_search.scss` went on
+declaring `margin-top: $space-lg` on the same element unconditionally, and a
+conditional override sits ON TOP of its base rather than replacing the
+condition. So the pool got 0.75rem with content in it and kept the larger 1rem
+with none: **4px TALLER empty than full.**
+
+The visible symptom was somewhere else entirely, which is why it took a bug
+report to find. Picking a LEAVE OUT candidate empties the pool at the same
+moment the chosen pill is drawn below it, so the pill landed 4px lower than the
+chip that had just been clicked — Helen: *"if I click a chip, it then jumps
+downwards by a few pixels, but should stay in the same place."* Nothing about
+the chip had changed at all.
+
+**The general form: to make a state cost NOTHING, the base must declare
+nothing.** Ask which value applies when the condition FAILS, because that is the
+one a `:not()` rule never gets to set. `test_an_empty_search_results_pool_
+reserves_no_space` is the guard.
+
+The `:empty { display: none }` idiom next door does not have this problem, and
+the difference is worth knowing: `display: none` removes the box and its margins
+together, so an unconditional margin beside it is harmless. That makes the rule
+depend on its neighbour, which is why `.exclude-active` uses `:not(:empty)`
+anyway.
+
 **A lightness-only colour change is not a state change at small type.** Twice
 in one day, 2026-08-16, both found by Helen on the page and neither visible to
 me in the source. The footer reference links moved `$color-clear-text` →
@@ -4867,6 +4940,44 @@ existing gap.
 
 Same mark, deliberately different colour discipline — see §13.5. Filter
 labels carry the punched-tape effect, §13.4.1.
+
+**THE SECTIONS, IN PAGE ORDER, AND IT CHANGED ON 2026-08-30** (issues #583,
+#586, #562 — the food index converging on the shape §9.13 gave cocktails):
+
+| | | |
+|---|---|---|
+| 1 | STAR INGREDIENT | |
+| 2 | MOOD | |
+| 3 | PRACTICALITIES | |
+| 4 | **HAS TO HAVE** / **LEAVE OUT** | side by side, `.search-pair` |
+| 5 | I KNOW WHAT I WANT | the escape hatch, last on purpose |
+| — | META FILTERS | local only, and **one button now**: `draft` |
+
+**HAS TO HAVE was `SEARCH MAIN INGREDIENTS`** — that named the mechanism where
+every other label names the question, and cocktails already asked it in the
+better words.
+
+**LEAVE OUT was behind a reveal link**, "(I know what I don't want)", opened
+closed on a progressive-disclosure argument: revealing it deliberately framed it
+as a dislike navigator rather than a sixth filter everyone must consider on the
+way past. **The framing was the only thing the disclosure bought**, and sitting
+beside its own opposite does it better — so the button, its two label strings,
+its `aria-expanded`, the `hidden` panel, clear-all's special case and
+`#exclude-active` living outside the panel all went at once. It is a
+`.category.search` sibling now; §13.5 still gives it no code hue.
+
+**META FILTERS was five buttons and is one.** `needs rewrite`, `needs
+proofread`, `no short method` and `has short method` all asked "is this recipe
+finished yet", which Helen does not need this page to ask — the same call she
+made about cocktails' `meta.status`. `draft` survives because it is a different
+kind of fact: which collection a row came from. The rows lost their `needs
+rewrite` / `needs proofread` badges in the same pass, keeping only `magic bag`
+and `draft`, which say what you are about to CLICK.
+
+**That dissolved the three-valued `data-meta-short`** (§4.3's fourth bullet, and
+the specific branch #506 was raised to get under test). The attribute and its
+filters.js branches are gone; #506 still stands for the rest of `filters.js`,
+which still has no tests.
 
 **Density is the index's own** (`$index-section-gap`, `$index-label-gap` in
 `_layout.scss`), not the recipe page's tokens — matching them was tried and
@@ -5138,8 +5249,13 @@ of the five rules that extend it or in a sixth written next year.
 **Recipe page: five hues** (§13.2), colour as decoration, rationed.
 **Index page: five hues**, one per filter section, in page order: `$color-
 star-root` (STAR INGREDIENT), `$color-vivid-cerulean` (MOOD), `$color-
-aureolin` (PRACTICALITIES), `$color-pure-lime-green` (SEARCH MAIN INGREDIENTS),
-`$color-hot-orange` (I KNOW WHAT I WANT). On the index colour is a CODE — each
+aureolin` (PRACTICALITIES), `$color-pure-lime-green` (**HAS TO HAVE** — this
+section was `SEARCH MAIN INGREDIENTS` until issue #583, 2026-08-30, and the
+variable name still says ingredient),
+`$color-hot-orange` (I KNOW WHAT I WANT). **LEAVE OUT still takes no code
+colour**, on the reasoning §13.4 gives, even though #586 has since promoted it
+from a hidden panel to a section of its own beside HAS TO HAVE — its heading
+carries a cobalt double-rule and its buttons stay neutral. On the index colour is a CODE — each
 hue ties a section's rule to its filter buttons, active states, and badges,
 so it has to be learned and distinct. On the recipe page colour is
 decoration and has to be rationed. **This is a principled divergence — don't
@@ -5355,11 +5471,20 @@ the first time. Removed. See §12 for the general form of this trap — it will
 recur anywhere an element's width and its container's width are assumed to
 always be equal until one day they aren't.
 
-**The same mechanism, used for the index page's reveal link — and the way it
-fails.** 2026-08-16, issue #275: "(I know what I don't want)" had to centre
-under I KNOW WHAT I WANT, whose width changes with its own text. Same answer
-as above — `display: inline-grid; grid-template-columns: max-content;
-justify-items: center`, both rows in the one column (`.name-heading-stack`).
+**The same mechanism was used for the index page's reveal link — and the way it
+failed is the part to keep.** 2026-08-16, issue #275: "(I know what I don't
+want)" had to centre under I KNOW WHAT I WANT, whose width changes with its own
+text. Same answer as above — `display: inline-grid; grid-template-columns:
+max-content; justify-items: center`, both rows in the one column
+(`.name-heading-stack`).
+
+**THAT LINK AND ITS STACK ARE GONE, 2026-08-30, issue #586.** LEAVE OUT is a
+section of its own beside HAS TO HAVE now, so there is nothing to reveal and
+nothing to centre; `.name-heading-stack`, `.exclude-reveal-row`, `.btn-reveal`
+and `.exclude-panel` were all deleted rather than left compiling. **The
+paragraphs below are kept anyway**, because the mechanism is the WORDMARK's and
+is still live there — this was its second consumer, and the failure it hit is a
+property of the trick rather than of the page.
 
 The first attempt put the heading, the search input, the exclude panel and the
 active list into a single grid on `.search--name`, with the panel spanning

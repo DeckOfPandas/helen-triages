@@ -36,8 +36,17 @@
 }
 
 
-// Clip-path shape — now for .badge only (the meta/draft status flags:
-// -draft, -meta-rewrite, -meta-proofread). .badge-star/mood/practicalities
+// Clip-path shape — now for .badge only. Two consumers, and BOTH say what a
+// row IS rather than what state it is in: `.badge-magic-bag` (there is no
+// method on the other side of this link) and `.badge-draft` (this row is not
+// on the live site). Neither declares anything of its own, which is why they
+// look identical -- Helen asked for exactly that on #562, "styled exactly as
+// 'magic bag' which is already in place", and it needed no rule to deliver.
+//
+// `.badge-meta-rewrite` and `.badge-meta-proofread` were named here too, and
+// went with #562: a work-state note on every unfinished row is a to-do list
+// down the side of the page you use to decide what to cook.
+// .badge-star/mood/practicalities
 // and .btn-tag/.btn-star moved to the tape-shape SVG system below
 // (Helen, 2026-08-03: "the grey shapes... don't really look like anything
 // in particular... hastily broken old-fashioned highlighter tape").

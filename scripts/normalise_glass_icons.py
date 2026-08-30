@@ -341,38 +341,58 @@ def normalise(text, name, line_class="glass-icon-line"):
     return fitted
 
 
+def refuse_if_no_input(usable, *, src, dst, doing, extra=""):
+    """Stop before a destructive step when there is nothing to put back.
+
+    > A DESTRUCTIVE STEP THAT RUNS BEFORE ITS INPUTS ARE CHECKED WILL
+    > EVENTUALLY RUN WITH NO INPUTS.
+
+    Issue #537, and this exists as a shared function rather than as a check
+    written twice because it has already been learned twice. On 2026-08-27 this
+    script emptied `_includes/icons/glasses/` with an empty SRC and wrote
+    nothing back: 26 published icons gone, `0 icons ->` printed as though that
+    were a result, then a ZeroDivisionError from the summary line. The day
+    before, the same directory went to an import running a bare `main()` --
+    different mechanism, identical outcome, and the `__main__` guard that fixed
+    it did nothing for this.
+
+    The shape to recognise, which is what makes this reusable: a script whose
+    OUTPUT is tracked and whose INPUT is not. `tmp/cocktail-glasses` is a
+    gitignored inbox that is legitimately empty most of the time and absent
+    entirely in a fresh worktree, so "no input" is the NORMAL state and running
+    the rebuild is the exception. Anything with that shape needs this call
+    before it deletes, not after.
+
+    `usable` is the already-filtered list, so each caller keeps its own idea of
+    what counts (this script drops SKIP names; the candidates drawer does not).
+
+    Raises SystemExit -- the caller has not deleted anything yet, so there is
+    nothing to unwind.
+    """
+    if usable:
+        return
+    missing = " (directory does not exist)" if not src.is_dir() else ""
+    raise SystemExit(
+        f"{src.relative_to(ROOT)} has no usable .svg files{missing}, so there "
+        f"is nothing to {doing}.\n\n"
+        f"REFUSING TO CONTINUE, because the next step empties "
+        f"{dst.relative_to(ROOT)}." + (f" {extra}" if extra else "")
+    )
+
+
 def main():
-    # LOOK BEFORE DELETING. This script's first act is to empty DST, and on
-    # 2026-08-27 it did that with an empty SRC and wrote nothing back: all 26
-    # published icons gone, "0 icons ->" printed as if that were a result, and
-    # then a ZeroDivisionError from the summary line. Recovered from git.
-    #
-    # SRC is `tmp/cocktail-glasses`, which is GITIGNORED -- an inbox for new
-    # exports, not a source of truth. So it is legitimately empty most of the
-    # time, and in a fresh worktree it does not exist at all. That makes "empty
-    # SRC" the normal state rather than an exotic one, and rebuilding from it
-    # the exception.
-    #
-    # This is the second time this script has deleted the whole set. The first
-    # was an import running a bare main() (fixed with the __main__ guard at the
-    # foot of the file); this was the ordinary path, doing exactly what it was
-    # written to do. A destructive step that runs before its inputs are checked
-    # will eventually run with no inputs.
     sources = sorted(SRC.glob("*.svg")) if SRC.is_dir() else []
     usable = [s for s in sources if s.name not in SKIP]
-    if not usable:
-        raise SystemExit(
-            f"{SRC.relative_to(ROOT)} has no usable .svg exports"
-            f"{' (directory does not exist)' if not SRC.is_dir() else ''}, so "
-            f"there is nothing to normalise.\n\n"
-            f"REFUSING TO CONTINUE, because the next step empties "
-            f"{DST.relative_to(ROOT)} and would leave the site with no glass "
-            f"icons at all. Drop the Inkscape exports into "
-            f"{SRC.relative_to(ROOT)}/ first.\n\n"
-            f"This is an inbox, not an archive -- the archive is "
-            f"_design_sources/cocktails/glasses/. Regenerating the whole set "
-            f"means copying the archive into the inbox first."
-        )
+    refuse_if_no_input(
+        usable, src=SRC, dst=DST, doing="normalise",
+        extra=(
+            "That would leave the site with no glass icons at all. Drop the "
+            "Inkscape exports into tmp/cocktail-glasses/ first.\n\n"
+            "This is an inbox, not an archive -- the archive is "
+            "_design_sources/cocktails/glasses/. Regenerating the whole set "
+            "means copying the archive into the inbox first."
+        ),
+    )
 
     if DST.exists():
         shutil.rmtree(DST)
