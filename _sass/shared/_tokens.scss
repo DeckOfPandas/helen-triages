@@ -107,3 +107,22 @@ $index-search-max-width: 620px;
 // 2026-08-30, seeing them together: "the cocktail version is correct." One
 // number now, so there is no in-between to be wrong in.
 $index-stack-width: 720px;
+
+// WHERE THE HEADER STOPS PUTTING THE NAV BESIDE THE WORDMARK, and the number is
+// derived rather than picked. The widest wordmark the site has is
+// `[ COCKTAILS ]`: 13 characters at 2.5rem with 0.18em tracking and 1.4em of
+// padding either side, which is 524px. The nav row is 128px (two 32px icons,
+// "??", two 1.4rem gaps). The header's own padding takes 48px. That is 700px
+// before any air at all, so the two only sit together comfortably above about
+// 820px -- and below that the nav takes its own line.
+//
+// 600px was the old value and it was set for a different job: stopping the tape
+// PAINTING OVER the nav, which the header grid now makes impossible at any
+// width (#551). What is left is whether they FIT, which is a bigger number.
+//
+// It is one number for both sites deliberately, even though food's shorter
+// wordmark would sit happily beside the nav down to about 550px. A per-site
+// breakpoint is a second chrome, which is what #374 exists to prevent -- and
+// the day a third site word arrives, this is the one place that needs looking
+// at. Recompute with tmp/header_width.py if a wordmark ever gets longer.
+$header-stack-width: 820px;
