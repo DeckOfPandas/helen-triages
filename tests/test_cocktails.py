@@ -1616,6 +1616,54 @@ def test_no_ingredient_stores_a_millilitre_figure():
     )
 
 
+def test_no_drink_writes_plantation():
+    """Planteray is the brand's name; `plantation` is only ever read -- #582.
+
+    Helen: "'plantation' is not permitted as a kind of rum and should always be
+    corrected to 'planteray'." Planteray is canonical (HANDOVER 9.3.2,
+    2026-08-27) and the old spellings stay in `bottles.yml` as ALIASES, which is
+    not half a finished rename but the same division `canonical_glasses` draws:
+    **the rule governs what is WRITTEN, the alias map governs what can be
+    READ.** Most of these drinks predate the rebrand, so a suggestion has to
+    keep resolving whether or not its drink has been retyped.
+
+    SO THIS CHECKS THE DRINKS AND NOT THE DATA FILES, and deleting the eleven
+    aliases to "finish the job" would break every suggestion this rule has not
+    reached. `bottles.yml` is deliberately out of scope.
+
+    The last live case was a TITLE, which is why nothing caught it: every
+    ingredient, suggestion and generic had already been retyped, and
+    "Plantation Pineapple Daiquiri" was the only trace left -- on a drink whose
+    own `item` reads "Planteray pineapple-infused rum" two lines below it.
+    Renamed with its file on 2026-08-30.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        checked += 1
+        if "plantation" in slug.lower():
+            bad.append(f"{slug}: the FILENAME says plantation")
+        haystack = [("title", fm.get("title"))]
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            for key in ("item", "generic", "suggestion", "note"):
+                value = item.get(key)
+                haystack += [(key, v) for v in
+                             (value if isinstance(value, list) else [value])]
+        for key, value in haystack:
+            if isinstance(value, str) and "plantation" in value.lower():
+                bad.append(f"{slug}: {key} = {value!r}")
+    assert not bad, (
+        "Drinks still writing `plantation`:\n  " + "\n  ".join(bad)
+        + "\n\nWrite `Planteray` -- it is the same brand, renamed. The old "
+          "spellings stay in bottles.yml as aliases on purpose, so a "
+          "suggestion keeps resolving either way; this rule is about what "
+          "gets WRITTEN into a drink, not what can be read."
+    )
+    assert checked, "No drinks were scanned at all, so this compared nothing."
+
+
 def test_a_qq_note_carries_a_qq_label():
     """A drink note that is unresolved says so on its tab -- #572.
 
