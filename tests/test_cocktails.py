@@ -1370,16 +1370,30 @@ def test_the_cross_category_check_is_exercised():
 
 
 def _cross_category_scan():
-    """(how many resolved rum suggestions were checked, the unexplained ones).
+    """(how many resolved suggestions were checked, the unexplained ones).
 
     ONE SCAN, TWO TESTS -- see `_character_scan`.
+
+    NOT RUM-ONLY SINCE 2026-08-30, and the widening has a worked example behind
+    it rather than a principle. `bottles.yml` stopped being a rum file that
+    morning; this scan did not follow, so a cross-category substitution outside
+    rum was invisible -- and one was: Don's Mai Tai asks for `absinthe` and
+    suggests Pernod, which is a pastis. The drink has carried a note saying so
+    all along, so nothing was broken; nothing was CHECKING either, and the
+    session that widened the bottle file nearly declared Pernod an absinthe on
+    the strength of the generic beside it. That declaration would have made this
+    very check agree the pair matched.
+
+    Helen, asked whether a bottle's category may differ from the ingredient it
+    is suggested for: "Yes, and the note should be required." Her own example is
+    the reason it must be allowed at all -- "a recipe might call for cherry
+    brandy, and I suggest Cherry Heering OR Briottet cerise even though that's a
+    cherry liqueur not a brandy, leaving it to future Helen to choose."
     """
     data = _bottles()
     index = _bottle_index(data)
     entries = data.get("bottles") or {}
     assert index, "bottles.yml resolves no names; nothing to check."
-    vocab = _vocab()
-    family_of = vocab.get("family_of") or {}
 
     bad, checked = [], 0
     for slug, fm in _load():
@@ -1388,8 +1402,6 @@ def _cross_category_scan():
                 continue
             generic = item.get("generic")
             generics = generic if isinstance(generic, list) else [generic]
-            if not any(family_of.get(g) == "rum" for g in generics):
-                continue
             suggestion = item.get("suggestion")
             names = (suggestion if isinstance(suggestion, list)
                      else [suggestion] if suggestion else [])
