@@ -304,9 +304,6 @@ bottles:
     generic: "London dry gin"
   "Hayman's":
     generic: "London dry gin"
-  "Portobello Road":
-    generic: "London dry gin"
-    aliases: ["Portobello"]
   "Rutte":
     generic: "London dry gin"
 
@@ -316,9 +313,6 @@ bottles:
     # The curly apostrophe is a SECOND STRING for one bottle and invisible on
     # the page -- it made two entries out of one in every count until now.
     aliases: ["Woodford’s Reserve", "Woodfords Reserve"]
-  "Sazerac Rye":
-    generic: "rye"
-    aliases: ["Sazerac"]
   "Ardbeg XO":
     generic: "single malt scotch whisky"
 
@@ -333,22 +327,17 @@ bottles:
   "Pierre Ferrand Ambre":
     generic: "cognac"
     aliases: ["Pierre Ferrand ambre"]
-  "Kirschwasser":
-    generic: "full-strength clear fruit brandy"
-    aliases: ["kirschwasser"]
-  "Aguardiente":
-    generic: "full-strength clear fruit brandy"
-    aliases: ["aguardiente"]
 
   # --- aromatised wine. See #568, which proposes splitting these further -----
   "Carpano Antica Formula":
     generic: "sweet vermouth"
-  "Cocchi Storico Vermouth di Torino":
-    generic: "sweet vermouth"
-    aliases: ["Cocchi di Torino"]
+  # A BRAND THAT IS ITS OWN GENERIC, the pattern #314 permits for three rums
+  # because nothing generalises the bottle. The Ridgwell pours this AND a sweet
+  # vermouth in the same drink, 12.5 ml of each, which is the proof that
+  # "sweet vermouth" does not generalise it.
   "Punt e Mes":
-    generic: "sweet vermouth"
-    aliases: ["Carpano Punt e Mes"]
+    generic: "Punt e Mes"
+    aliases: ["Carpano Punt e Mes", "Punt E Mes"]
   "Dolin Dry":
     generic: "dry vermouth"
     aliases: ["Dolin dry"]
@@ -356,19 +345,10 @@ bottles:
   # --- liqueurs -------------------------------------------------------------
   "Cointreau":
     generic: "triple sec"
-  "Pierre Ferrand Dry Curacao":
-    generic: "orange Curaçao"
-    aliases: ["Pierre Ferrand dry", "Pierre Ferrand Dry Curaçao"]
-  "Luxardo Maraschino":
-    generic: "maraschino liqueur"
-    aliases: ["Luxardo"]
   "Cherry Heering":
     generic: "cherry liqueur"
   "Suze":
     generic: "gentian liqueur"
-  "Roots Mastiha":
-    generic: "mastiha liqueur"
-    aliases: ["Roots"]
   "John D Taylor's Velvet Falernum":
     generic: "falernum"
     # `Velvet` alone is how two drinks write it, which is a fragment rather than
@@ -390,19 +370,9 @@ bottles:
     aliases: ["Angostura bitters"]
   "Bittermens Xocolatl Mole":
     generic: "chocolate bitters"
-  "Bob's Peppermint":
-    generic: "peppermint bitters"
-    aliases: ["Bob's"]
-  "Bob's Margarita bitters":
-    generic: "lavender-forward bitters"
-  "Elemakule Tiki":
-    generic: "warm-spiced bitters"
-    aliases: ["Bittermens Elemakule Tiki"]
 
   # --- absinthe and pastis --------------------------------------------------
   "Vieux Pontarlier":
-    generic: "absinthe"
-  "Pernod":
     generic: "absinthe"
 
   # --- syrups, juices and the rest ------------------------------------------
@@ -500,6 +470,58 @@ unresolved_suggestions:
   # Swizzle's "Pusser's 151, or Planteray OFTD for a 138 Swizzle" went further:
   # Helen, "Swizzle has got a bit confused. It should be Martinique Swizzle", so
   # the drink is 60 ml of unaged agricole and neither bottle is in it.
+  # --- HANDED BACK 2026-08-30, and the reason is the same for eleven of them --
+  # Helen: "Keep only what the collection already spells out; hand me back the
+  # rest." These were declared in this session by DERIVING the bottle's category
+  # from the generic of the ingredient it sits beside -- which is a good default
+  # and not a rule, because a suggestion may deliberately cross categories.
+  # Helen's own example: "a recipe might call for cherry brandy, and I suggest
+  # Cherry Heering OR Briottet cerise even though that's a cherry liqueur not a
+  # brandy, leaving it to future Helen to choose."
+  #
+  # The one that was actually WRONG is first, and it is the argument for the
+  # other eleven: a plausible-looking declaration would have taught #534's
+  # cross-category check a false fact and blinded it to a substitution the drink
+  # already documents.
+  "Pernod": >-
+    Declared `absinthe` in error. Don's Mai Tai suggests it against an absinthe
+    and that drink's own note says "the source says absinthe and then names
+    Pernod, which is a pastis. Carried as written rather than corrected." So
+    this is a cross-category substitution; `pastis` is a declared generic and is
+    almost certainly the right value, but it is Helen's to confirm rather than
+    mine to infer twice.
+  "aguardiente": >-
+    A spirit TYPE rather than a bottle. Bali Hai writes `Aguardiente brandy` as
+    its item and this as its suggestion, so the suggestion repeats the item
+    instead of naming a bottle.
+  "kirschwasser": >-
+    A spirit TYPE rather than a bottle, same as aguardiente.
+  "Portobello": >-
+    A brand, and completing it to Portobello Road was memory rather than
+    reading. Tailspin's generic is `London dry gin`.
+  "Sazerac": >-
+    Written by the drink of the same name against `rye`, so it is not even
+    certain this names a bottle rather than repeating the title.
+  "Luxardo": >-
+    A house, not a bottle. Three drinks write it against `maraschino liqueur`.
+  "Roots": >-
+    A house, not a bottle. Art de Vivre writes it against `mastiha liqueur`.
+  "Bob's": >-
+    A house that makes a great many bitters. Minty Pentones writes it against
+    `peppermint bitters`.
+  "Cocchi di Torino": >-
+    Short of the product name. Man o' War writes it against `sweet vermouth`.
+  "Pierre Ferrand dry": >-
+    Short of the product name, and ambiguous with the Ambre already declared.
+    El Presidente writes it against `orange Curaçao`.
+  "Bob's Margarita bitters": >-
+    A real product name whose CATEGORY is in doubt: Margarita writes it against
+    `lavender-forward bitters` and nothing in the collection says whether these
+    are lavender-led.
+  "Elemakule Tiki": >-
+    Christmas Daiquiri writes it against `warm-spiced bitters`. Probably
+    Bittermens', which is memory rather than reading.
+
   # --- BEYOND RUM, 2026-08-30 ------------------------------------------------
   # Declared so `test_every_suggested_bottle_resolves` could stop being
   # rum-only. Each of these is REAL DEBT with a reason attached, not a way of

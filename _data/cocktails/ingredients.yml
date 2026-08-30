@@ -773,14 +773,53 @@ amari:
   - "Amaro Nonino"
   - "Amaro Ciociano"
 
+# FIVE AROMATISED-WINE GENERICS, AND "AROMATISED WINE" IS NOT ONE OF THEM.
+# Helen, 2026-08-30, settling #568: "I would never write 'aromatised wine' as a
+# cocktail ingredient or generic, because it suggests some equivalence between
+# the types where none or very little exists. So I decided to jump down a level
+# of abstraction, and make the generics three vermouths, americano and
+# quinquina, because those are what I'd actually write on a recipe."
+#
+# That is this file's own two-layer rule, applied by her rather than to her: the
+# GENERIC is the precise thing a recipe says, and the roll-up belongs in
+# `family`, which is "for SEARCH and EXCLUSION only, never a browse axis". The
+# family already exists and is `fortified`. So the abstraction she declined to
+# write is available to exclude by and appears on no recipe line, and nothing
+# needed building.
+#
+# A QUINQUINA AND AN AMERICANO ARE NOT VERMOUTHS. Both are quinine-led rather
+# than wormwood-led, which is why they sit beside the vermouths here rather than
+# under them.
+#
+# `americano` IS NEW, and the line below it used to do both jobs -- its comment
+# read "Aperitif wines, not vermouths: Lillet, Cocchi Americano", filing a
+# quinquina and an americano under one word. That is the conflation #568 is
+# about, one level down. THREE DRINKS CURRENTLY SAY `quinquina` and at least one
+# of them may mean the other: #569 asks for Corpse Reviver No. 2 to accept
+# either, which only became expressible now. north-sea-oil and
+# voodoo-that-you-do have not been looked at.
 fortified_and_aromatised:
   - "sweet vermouth"
   - "dry vermouth"
   - "blanc vermouth"
   # A vermouth-amaro hybrid; swapping it for sweet vermouth is audible.
+  #
+  # PROPOSED FOR RETIREMENT ON 2026-08-30 AND KEPT, because the drinks settled
+  # it. Helen named five generics for #568 and this was not among them, on my
+  # report that no drink used it -- which was wrong, and wrong in a way worth
+  # recording: the scan that produced it matched generics containing "vermouth",
+  # "sherry" or "quinquina", and this one contains none of those words.
+  #
+  # THE RIDGWELL IS THE EVIDENCE. It pours 12.5 ml of Punt e Mes AND 12.5 ml of
+  # Martini Rosso, side by side. Collapse this into `sweet vermouth` and that
+  # drink asks for 25 ml of one thing, which is a different drink. Spiced
+  # Negroni names it too. So the comment above was right and it is the rum-styles
+  # test passing: the difference changes what you are making.
   - "Punt e Mes"
-  # Aperitif wines, not vermouths: Lillet, Cocchi Americano.
+  # Lillet Blanc, Dubonnet, Byrrh.
   - "quinquina"
+  # Cocchi Americano Bianco.
+  - "americano"
   - "amontillado sherry"
   - "oloroso sherry"
   - "tawny port"
@@ -988,6 +1027,7 @@ family_of:
   "blanc vermouth": fortified
   "Punt e Mes": fortified
   "quinquina": fortified
+  "americano": fortified
   "amontillado sherry": fortified
   "oloroso sherry": fortified
   "tawny port": fortified
