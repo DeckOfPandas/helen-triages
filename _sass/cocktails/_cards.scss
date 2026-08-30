@@ -416,11 +416,33 @@ $card-glass-scale: 13rem;
 // :empty stays for exactly those drafts -- it drops the band so an unrated
 // drink shows no bare orange bar. Same idiom as .exclude-active:empty on the
 // food side.
+// THE BAND IS text-decoration, NOT AN INSET SHADOW, and that is what aligns the
+// two -- #548 point 10, "vertically align their centres".
+//
+// An inset box-shadow paints INSIDE the element's box, so the band was part of
+// the word's height: `align-items: center` then centred a box made of letters
+// PLUS a band against a box made only of a ship, and the ship rode about half
+// the band's height too high. Nothing was misaligned in the values; the two
+// boxes were measuring different things.
+//
+// text-decoration draws outside the box and changes no geometry, so the word's
+// line box is its letters and the two centres are the same centre. It is also
+// the site's other band already: `.drink-card-hit` uses text-decoration for its
+// own reason (§9.13 -- a box-shadow gives a WRAPPED fragment an odd stub), so
+// this is one mechanism for "a coloured band under text" rather than two.
+//
+// skip-ink: none because a descender interrupting the band would read as damage
+// rather than as typography at this size -- the same call .drink-card-hit makes.
+//
+// No :empty rule needed any more: text-decoration on an empty element draws
+// nothing, where an inset shadow drew a bare orange bar.
 .drink-card-ship-word {
   font-weight: 700;
-  box-shadow: inset 0 -0.24em 0 $color-radiant-reposado;
-
-  &:empty { box-shadow: none; }
+  text-decoration: underline;
+  text-decoration-color: $color-radiant-reposado;
+  text-decoration-thickness: 0.24em;
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: none;
 }
 
 @media (max-width: 720px) {

@@ -17,7 +17,21 @@
 // its habit rather than a decision anyone made.
 // =============================================================================
 
-.drink-filters { margin: 0 0 $spacing-section-gap; }
+// THE SPACE ABOVE THE FIRST HEADING, matched to food -- #548 point 1, and it
+// was 0 here against food's 2.5rem. Both pages sit in the same `main` padding
+// and both open with a zero-height visually-hidden <h1>, so everything above
+// the first filter was already identical; what food adds and this did not is
+// `.controls { padding-top: $space-lg }` plus the first `.category`'s own
+// 1.5rem top margin. The filters began flush against the header.
+//
+// PADDING, NOT MARGIN, and that is what makes the sum work. Padding on the
+// wrapper stops the first section's top margin collapsing out through it, so
+// the two add rather than the larger swallowing the smaller -- which is
+// precisely how food gets 2.5rem from a 1rem and a 1.5rem.
+.drink-filters {
+  padding-top: $space-lg;
+  margin: 0 0 $spacing-section-gap;
+}
 
 // The section labels: MOOD, CHAOS, HAS TO HAVE, LEAVE OUT.
 // =============================================================================
@@ -115,7 +129,24 @@
 // $space-xl rather than food's `$index-section-gap` by name: that variable
 // lives in _sass/food/ and cocktails cannot see it. Same value, and the shared
 // token is the honest way to say so.
-.drink-filter { margin: 0 0 $space-xl; }
+.drink-filter { margin: $space-xl 0; }
+
+// EXCEPT INSIDE THE PAIR, where the grid owns the spacing -- and this is #548
+// point 4, "there is too much vertical space between has to have and leave out
+// in single column mode".
+//
+// IT WAS AN ADDITION NOBODY WROTE. Grid items do not collapse margins, so the
+// stacked gap was the grid's own `gap` PLUS each field's bottom margin:
+//
+//     1.5rem (gap at <=720px)  +  3rem ($spacing-section-gap)  =  4.5rem
+//
+// The margin was for separating one filter section from the next in normal
+// flow, where it collapses against its neighbour and costs 3rem once. Inside a
+// grid it collapses against nothing and is simply added. Zeroing it leaves the
+// grid's 1.5rem, which is the value food's own `.search-pair` uses when it
+// stacks -- so the fix is a deletion rather than a fourth number to keep in
+// step with three others.
+.drink-searches > .drink-filter { margin: 0; }
 
 .drink-btns {
   display: flex;
