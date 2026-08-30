@@ -167,6 +167,39 @@ $color-ultra-yvette-wash: #F5EDFD;
 $color-cosmic-cosmopolitan-wash:     #FEECF7;
 $color-luminous-lagoon-wash:        #ECFBFD;
 
+// --- The heading bars --------------------------------------------------------
+// FIVE GREENS OVER ONE SHARED ELECTRIC ABSINTHE, and both halves are the
+// decision. Helen, 2026-08-30, choosing this off the palette page: "there's
+// something very attractive about the stability" -- the shared lower bar is the
+// stability -- and, immediately afterwards, "definitely not with all headings
+// having the same underline".
+//
+// So the mark is two bars: the section's own green hugging the letters, and one
+// electric absinthe beneath it on every heading. It is the same DEVICE food's
+// index uses (a stepped two-colour bar, §13.1) in cocktails' own colours, which
+// is what stops the two sites reading as near-misses of each other.
+//
+// SEPARATED BY HUE, NOT BY LIGHTNESS, deliberately. The first set ran 96-186
+// degrees at 34% saturation and Helen's read was "the different greens under
+// the headings don't actually look that different any more". They were about
+// two points of contrast apart from each other -- §12's rule is that the eye
+// reads hue rather than lightness, so lightness was never going to carry this.
+// These span 78 to 196 (warm yellow-green to a cyan-leaning teal) at 62%, so
+// neighbours differ by roughly 30 degrees of hue while sitting at almost the
+// same luminance, which is the arrangement that actually reads.
+//
+// These are BANDS, not text, so they carry no contrast bar -- the heading's
+// words stay ink on paper. tmp/greens2.py prints the figures.
+$color-heading-yolo:    #99C62F;   // hue  78
+$color-heading-mood:    #43C62F;   // hue 112
+$color-heading-hassle:  #2FC66E;   // hue 145
+$color-heading-include: #2FC6B2;   // hue 172
+$color-heading-name:    #2F9EC6;   // hue 196
+
+// The one every heading shares, under its own. Full strength on purpose: it is
+// the home colour doing the job §9.13 already lets it do on the glass panels.
+$color-heading-shared:  $color-electric-absinthe;
+
 // --- The previous three, as aliases ------------------------------------------
 // Kept so the migration is one commit rather than a rename sweep, and mapped
 // BY AXIS rather than by hue: violet's job was ASKED FOR, which magenta now

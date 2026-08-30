@@ -1,0 +1,24 @@
+<!-- SHIP, the goodness mark on a drink card. Supplied by Helen, 2026-08-30.
+
+     SOURCE AND CREDIT: "Ricons", via the Noun Project. The original carried the
+     credit as two <text> nodes INSIDE the artwork, which would have drawn
+     "Created by Ricons / from Noun Project" on every card. They are removed
+     from the drawing and recorded here instead. THE LICENCE IS NOT SETTLED —
+     a Noun Project icon is CC BY unless it came with a paid licence, and CC BY
+     needs a visible credit somewhere on a public site. Do not treat this
+     comment as discharging that; it is a note to whoever settles it.
+
+     CANVAS FITTED to the ink by scripts/svgrender.py's fit_viewbox. The source
+     box was 110x135 for artwork about 100 tall — the slack was the space the
+     attribution text sat in — and §9.14 is why that matters: the box is what
+     gets sized, so a drawing with air in it renders smaller than one without.
+
+     FILLED, NOT STROKED, and that is deliberate rather than an oversight. It
+     replaces a filled square, it is 1rem on a card, and at that size a stroked
+     version would read as spindly beside the word it sits with. It is also far
+     from the glass column, so it is not competing with the line-art glasses.
+     scripts/trace_centrelines.py could convert it, but that tool is only valid
+     on artwork of UNIFORM stroke width (§9.13) and this is a solid silhouette.
+
+     Colour comes from .drink-card-ship-icon; the path takes currentColor. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="1.7250 1.7252 96.5500 96.5498" class="ship-icon" role="img" fill="currentColor"><path d="m50 71.875h46.875v3.125c0 12.082-9.793 21.875-21.875 21.875h-62.5c-5.1797 0-9.375-4.1953-9.375-9.375v-15.625h40.625v-9.375h-34.059l34.059-49.617v-3.5078h-12.5v-6.25h18.75v7.1875l0.011719 0.003906c20.633 7.5039 34.363 27.105 34.363 49.059v3.125h-34.375zm40.312 6.25h-80.938v9.375c0 1.7266 1.3984 3.125 3.125 3.125h62.5c7.5586 0 13.867-5.3672 15.312-12.5zm-46.562-54.199-22.191 32.324h22.191zm6.25 32.324h28.02c-1.1719-17.285-12.004-32.492-28.02-39.227z" fill-rule="evenodd"/></svg>

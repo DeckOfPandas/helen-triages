@@ -44,13 +44,25 @@
 // inset box-shadow on an inline span paints a band exactly as wide as the
 // words, which is what makes food's headings read as stamped rather than
 // ruled.
+// TYPE COPIED FROM FOOD'S `.category-label`, at Helen's ask on 2026-08-30:
+// "spacing, section heading font and sizes, spacing between sections, I think
+// please copy those". 1.35rem and 0.08em are food's own numbers, not a nearby
+// pair -- these two sections are the same control panel doing the same job, and
+// §13.4 already argues that an index is a control panel where a recipe page is
+// a document.
+//
+// WHAT IS NOT COPIED IS THE MARK. Food's is a green-and-violet stepped bar;
+// this is five greens over one electric absinthe. That is the divergence Helen
+// kept when she closed #486 ("the design vision has moved on") -- same device,
+// same type, different palette, which is the arrangement that reads as sister
+// sites rather than as one site failing to match the other.
 .drink-field-label {
   display: block;
   font-family: $font-headings;
-  font-size: 1.05rem;
+  font-size: 1.35rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
   color: $color-text;
   margin: 0 0 $space-md;
 
@@ -63,23 +75,47 @@
 
 // One rule per section, and each hue is the same fact the CARDS already show —
 // see _palette.scss. A heading's colour is a promise the card keeps.
+// TWO BARS, AND THE ORDER OF THE SHADOWS IS THE ORDER ON THE PAGE, backwards.
+// An inset shadow of -0.18em paints the bottom 0.18em; the -0.34em one paints
+// the bottom 0.34em but sits BEHIND it, so only the strip from 0.18 to 0.34
+// shows. First listed is therefore the LOWER bar and second is the one hugging
+// the letters -- which is why $color-heading-shared is written first.
+//
+// The bar stops where the words do. `.drink-field-label` is display:block, so
+// the shadow would run the container's width; every heading is a flex item
+// inside `.drink-label-row`, which shrinks it to its content. That is
+// load-bearing rather than incidental -- take a heading out of a flex row and
+// its bar silently becomes full-width.
 @mixin heading-rule($colour) {
-  box-shadow: inset 0 -0.3em 0 $colour;
+  box-shadow:
+    inset 0 -0.18em 0 $color-heading-shared,
+    inset 0 -0.34em 0 $colour;
   padding: 0 0.12em 0.02em 0;
 }
 
-.drink-filter--chaos   .drink-field-label { @include heading-rule($color-radiant-reposado); }
-.drink-filter--mood    .drink-field-label { @include heading-rule($color-electric-absinthe); }
-.drink-filter--hassle  .drink-field-label { @include heading-rule($color-ultra-yvette); }
-.drink-search--include .drink-field-label { @include heading-rule($color-cosmic-cosmopolitan); }
-.drink-filter--name    .drink-field-label { @include heading-rule($color-luminous-lagoon); }
+.drink-filter--chaos   .drink-field-label { @include heading-rule($color-heading-yolo); }
+.drink-filter--mood    .drink-field-label { @include heading-rule($color-heading-mood); }
+.drink-filter--hassle  .drink-field-label { @include heading-rule($color-heading-hassle); }
+.drink-search--include .drink-field-label { @include heading-rule($color-heading-include); }
+.drink-filter--name    .drink-field-label { @include heading-rule($color-heading-name); }
 
 // LEAVE OUT CARRIES NO HUE, and the absence is the decision. Helen: "for food,
 // avoiding can be important whereas for drinks surely less so." Food gave its
 // LEAVE OUT a sixth colour precisely because it had earned one; this has not.
 .drink-search--exclude .drink-field-label { color: $color-clear-text; }
 
-.drink-filter { margin: 0 0 $spacing-section-gap; }
+// FOOD'S GAP BETWEEN SECTIONS, not this file's own. It was
+// $spacing-section-gap (3rem), which is the RECIPE PAGE's "below a section"
+// token; food's index uses $index-section-gap ($space-xl, 1.5rem) and §13.4
+// says why the two differ -- "the index is a control panel (every section
+// visible in one glance); the recipe page is a document (space isolates the one
+// section you're mid-task on). Keep the ratio near 2:1." This page is a control
+// panel and was spaced like a document.
+//
+// $space-xl rather than food's `$index-section-gap` by name: that variable
+// lives in _sass/food/ and cocktails cannot see it. Same value, and the shared
+// token is the honest way to say so.
+.drink-filter { margin: 0 0 $space-xl; }
 
 .drink-btns {
   display: flex;
@@ -199,31 +235,22 @@
 
 .drink-filter--mood    .btn-clear-filter { color: $color-electric-absinthe-deep;    &:hover { color: $color-electric-absinthe; } }
 .drink-filter--hassle  .btn-clear-filter { color: $color-ultra-yvette-deep; &:hover { color: $color-ultra-yvette; } }
-// HASSLE'S BUTTONS ARE .btn-mood TOO, so without this they take MOOD's green
-// and contradict their own ultraviolet heading. They share the class because
-// they share the behaviour -- both write into `chosenMoods` and a drink
-// matching either is matched the same way -- so the colour is overridden here
-// rather than the class being split, which would mean the script tracking two
-// sets that behave identically.
+// A `.drink-filter--hassle .btn-mood` OVERRIDE STOOD HERE AND IS GONE, because
+// the thing it corrected for no longer exists. Hassle's buttons carry .btn-mood
+// (they share the class because they share the behaviour -- both write into the
+// same set, and a drink matching either is matched the same way), so while a
+// selected button filled in ITS SECTION'S colour they had to be pushed off
+// MOOD's green and onto ultraviolet, or they pointed at the wrong heading.
 //
-// ULTRAVIOLET IS THE ONE FILL THAT TAKES LIGHT TEXT. Measured: ink on it is
-// 3.14:1 and fails, white is 5.47:1. Nothing darkened clears 4.5 at all,
-// because the fill is already dark -- a vivid blue-violet has no bright
-// version to be a fill. It is the odd one of the five and this is where that
-// shows.
-.drink-filter--hassle .btn-mood {
-  &:hover,
-  &:focus-visible {
-    border-color: $color-ultra-yvette-deep;
-    color: $color-ultra-yvette-deep;
-  }
-
-  &.is-on {
-    background: $color-ultra-yvette;
-    border-color: $color-ultra-yvette-deep;
-    color: $color-white;                        // 5.47:1 on the fill
-  }
-}
+// Selected buttons take MAGENTA now, on every section, because the colour means
+// "matched" rather than "this section" -- so there is nothing left to correct
+// and one rule serves both.
+//
+// One measurement worth not losing with it: ultraviolet was the single fill in
+// the five that needed LIGHT text. Ink on it is 3.14:1 and fails, white is
+// 5.47:1, and nothing darkened clears 4.5 at all, because the fill is already
+// dark -- a vivid blue-violet has no brighter version to be a fill from. If
+// ultraviolet is ever used as a fill again, it is the one that cannot take ink.
 
 .drink-filter--chaos   .btn-clear-filter { color: $color-radiant-reposado-deep;   &:hover { color: $color-radiant-reposado; } }
 .drink-search--include .btn-clear-filter { color: $color-cosmic-cosmopolitan-deep;     &:hover { color: $color-cosmic-cosmopolitan; } }
@@ -247,69 +274,71 @@
   line-height: 1.3;
 }
 
-.btn-mood {
-  @extend %drink-btn-base;
-  font-size: 0.92rem;
-  padding: 0.42rem 0.95rem;
+// NAKED WORDS THAT BAND ON CLICK -- Helen, 2026-08-30: "we need to change the
+// filter buttons, quite a bit. Maybe just naked words that underline on click?"
+//
+// WHY THEY HAD TO GO. She had already named the symptom -- "the way the chips
+// currently fill in under the filters was beginning to become too loud for me
+// anyway" -- and it was one rule the site had already adopted failing to reach
+// one place. §9.13 settled BANDS AND WASHES, NOT FILLS on 2026-08-28, after
+// "there's just a lot going on... underline the ingredient rather than
+// highlight", and left "the goodness mark is the only fill left on a card". The
+// cards were converted. These were not, so ten filled boxes sat above cards
+// that had deliberately stopped filling anything.
+//
+// MAGENTA, WHICH IS NOT THIS SECTION'S HUE, and that is the argument for it.
+// Magenta now means MATCHED everywhere on a card -- the ingredient band and the
+// mood chip both wear it. A selected filter in the same magenta says the
+// control and the thing it lit up are one idea: the card answers the button in
+// the button's own colour. Colouring each button by its section instead would
+// say which heading it sits under, which the reader can already see, and would
+// lose the only cross-reference that is hard to see.
+//
+// The chip-shaped candidates in the two search pools are NOT touched. Helen:
+// "the search returns could stay as they are." They are a different control --
+// an unbounded list you pick from, not a fixed set you toggle.
+%drink-btn-naked {
+  font-family: $font-headings;
+  font-size: 0.85rem;
+  text-transform: lowercase;
+  border: 0;
+  background: none;
+  padding: $space-xs 0;
+  margin: 0 $space-lg 0 0;
+  color: $color-clear-text;
+  cursor: pointer;
+  line-height: 1.3;
 
   &:hover,
-  &:focus-visible {
-    border-color: $color-electric-absinthe-deep;
-    color: $color-electric-absinthe-deep;
-  }
+  &:focus-visible { color: $color-text; }
 
-  // A fill, not a border change: with ten of these in a row a 1px border
-  // difference is not findable at a glance. Same conclusion the goodness
-  // scaffold reached about its own buttons.
-  // ACTIVE TEXT IS SOLVED PER HUE, NOT SET TO ONE DARKEN PERCENTAGE, and the
-  // percentages differing is the point rather than an inconsistency. These
-  // fills are five different lightnesses, so one darken() value gives five
-  // different contrasts -- with the neon palette the old uniform 22%/25% put
-  // MOOD at 10.99:1 (nearly black on bright green) and HAS TO HAVE at 3.61:1,
-  // which fails AA. Each is now solved to about 5.3:1: readable, and still
-  // visibly the section's colour rather than collapsing to black.
+  // One band, where a heading carries two. Same device, one level down -- the
+  // heading names a question and a chosen answer sits under it, so the answer
+  // wearing a simpler version of the heading's own mark is the hierarchy.
   &.is-on {
-    background: $color-electric-absinthe;
-    border-color: $color-electric-absinthe-deep;
-    color: darken($color-electric-absinthe-deep, 9%);   // 5.25:1 on the fill
-    font-weight: 600;
+    color: $color-text;
+    font-weight: 700;
+    box-shadow: inset 0 -0.22em 0 $color-cosmic-cosmopolitan;
   }
 }
 
-// Chaos is a goodness question, so it wears goodness's colour -- the same
-// amber as the mark on every card.
-// THESE USED TO BE SET IN THE HEADING'S EXACT TYPEFACE, SIZE, CASE AND
-// LETTERSPACING -- 0.78rem uppercase mono, the same as .drink-field-label was.
-// So "HOW MUCH CHAOS?" and "DEFINITELY GOOD" were visually the same class of
-// object, and the page had two things competing to look like headings with the
-// actual heading the quieter of the two. That is half of why Helen could not
-// read them. A control should not dress as a label.
-.btn-chaos {
-  @extend %drink-btn-base;
-  font-size: 0.92rem;
-
-  &:hover,
-  &:focus-visible {
-    border-color: $color-radiant-reposado-deep;
-    color: $color-radiant-reposado-deep;
-  }
-
-  &.is-on {
-    background: $color-radiant-reposado;
-    border-color: $color-radiant-reposado-deep;
-    color: darken($color-radiant-reposado-deep, 23%);  // 5.28:1 on the fill
-    font-weight: 600;
-  }
-}
+.btn-mood  { @extend %drink-btn-naked; }
+.btn-chaos { @extend %drink-btn-naked; }
 
 // --- the two ingredient fields -----------------------------------------------
+// NO RULE ABOVE IT -- #548 point 3. A full-width border sat here, separating
+// HASSLE from HAS TO HAVE for no reason the other four section boundaries
+// needed one: every other section is divided by space alone. Helen listed it
+// with the amber bar above the count, and it is the same fault -- structure
+// drawn where structure was already legible.
+//
+// The padding it held the row off goes with it; the gap between sections is
+// `.drink-filter`'s own margin, one value for all five.
 .drink-searches {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: $spacing-block-gap;
-  margin-top: $spacing-block-gap;
-  padding-top: $spacing-block-gap;
-  border-top: 1px solid $color-border;
+  margin-top: $space-xl;
 }
 
 .drink-search-input {

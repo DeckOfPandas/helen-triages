@@ -45,6 +45,10 @@ permalink: /cocktails/
   {% assign taxonomy   = site.data.cocktails.taxonomy %}
   {% assign glasses    = site.data.cocktails.glasses %}
   {% assign ship_tints = taxonomy.ship_tints %}
+  {% comment %} The card's own name for a rung -- see ship_card_names' header in
+     taxonomy.yml. A rung with no entry keeps its own words; `QQ` and `who
+     knows` have neither an entry nor a rung and render no word at all. {% endcomment %}
+  {% assign ship_card_names = taxonomy.ship_card_names %}
   {% assign card_names = site.data.cocktails.ingredients.card_names %}
   {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
   {% comment %} #580: things a card never mentions. Bare `water` and nothing
@@ -250,6 +254,14 @@ permalink: /cocktails/
 
       {% assign ship = drink.meta.ship | default: "who knows" %}
       {% assign tint = ship_tints[ship] | default: 0 %}
+      {% comment %} A WORD ONLY IF THE RUNG IS ONE. ship_tints holds every value
+         a drink can carry INCLUDING `who knows` (and `QQ` falls through to it),
+         so it cannot be asked whether something is on the scale. ship_scale
+         can, and is the list that means exactly that. {% endcomment %}
+      {% assign ship_word = "" %}
+      {% if taxonomy.ship_scale contains ship %}
+        {% assign ship_word = ship_card_names[ship] | default: ship %}
+      {% endif %}
 
       {% comment %} `definitely good` is ship yes or oh gods yes; everything
          else is YOLO, duds included — remaking something you disliked IS a
@@ -378,7 +390,15 @@ permalink: /cocktails/
           <span class="drink-card-moods">
             {% comment %} A chip fills in ITS GROUP'S colour rather than one shared colour, so a hassle chip lighting up matches the ultraviolet heading that selected it and not the green one that did not. The group is derived from taxonomy.yml here rather than stored on the drink, because it is a property of the MOOD and a drink that gains a mood should not need retyping. {% endcomment %}{% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<span class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}">{{ m }}</span>{% endfor %}
           </span>
-          <span class="drink-card-ship" style="--ship-tint: {{ tint }}%;">{{ ship }}</span>
+          {% comment %} THE SHIP IS ALWAYS DRAWN, the word only when there is
+             one. `--ship-tint` is gone from here: it filled the old square, and
+             a word is not a quantity. The value stays in taxonomy.yml because
+             the drink PAGE still uses it -- this is the card's mark changing,
+             not the scale. {% endcomment %}
+          <span class="drink-card-ship">
+            <span class="drink-card-ship-icon">{% include icons/ship.svg %}</span>
+            <span class="drink-card-ship-word">{{ ship_word }}</span>
+          </span>
         </div>
       </li>
     {% endfor %}
