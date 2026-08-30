@@ -685,8 +685,26 @@ other_base_spirits:
   - "vodka"
   - "flavoured vodka"
   - "absinthe"
-  - "pastis"
   - "aquavit"
+
+# `pastis` RETIRED 2026-08-30, and it is worth saying that this was a
+# CONSEQUENCE rather than a judgement about pastis.
+#
+# Its `family_less` entry gave one reason for existing -- "Swizzle uses 6 drops
+# of Pernod or absinthe" -- and that drink was rewritten the same day into the
+# Martinique Swizzle, which takes 1 dash of absinthe. So the only drink cited
+# stopped citing it.
+#
+# The other thread was Don's Mai Tai suggesting `Pernod` against `absinthe`,
+# which looked like a pastis-for-absinthe substitution and was carrying a note
+# saying so. It was not: "Pernod" names two bottles, and Helen owns the 68%
+# absinthe, which is also what the source asks for. So the substitution was an
+# artefact of a brand name written without its product, and it took the note
+# with it.
+#
+# A pastis is still a real thing -- Ricard, Henri Bardouin -- and nothing here
+# says otherwise. The day a drink wants one, put this line back.
+retired_other_base_spirits:
 
 # =============================================================================
 # MODIFIERS

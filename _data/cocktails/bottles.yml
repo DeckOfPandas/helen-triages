@@ -371,9 +371,21 @@ bottles:
   "Bittermens Xocolatl Mole":
     generic: "chocolate bitters"
 
-  # --- absinthe and pastis --------------------------------------------------
+  # --- absinthe -------------------------------------------------------------
+  # Helen, 2026-08-30: "honestly my favourite absinthe is Vieux Pontarlier, and
+  # I struggle to not reach for that every time!"
   "Vieux Pontarlier":
     generic: "absinthe"
+  # THE FULL NAME MATTERS HERE MORE THAN USUAL. "Pernod" alone names two
+  # different bottles -- this one at 68%, and Pernod Anise at 40%, which is a
+  # pastis. That ambiguity is the entire reason Don's Mai Tai looked like a
+  # cross-category substitution: the bare brand could be read either way, and it
+  # was read the wrong way twice, once by a note on the drink and once by a
+  # declaration in this file.
+  "Pernod Absinthe":
+    generic: "absinthe"
+    aliases: ["Pernod"]
+    note: "Pernod Anise, the 40% yellow one, is a different bottle and a pastis."
 
   # --- syrups, juices and the rest ------------------------------------------
   "Monin Gingembre":
@@ -483,13 +495,6 @@ unresolved_suggestions:
   # other eleven: a plausible-looking declaration would have taught #534's
   # cross-category check a false fact and blinded it to a substitution the drink
   # already documents.
-  "Pernod": >-
-    Declared `absinthe` in error. Don's Mai Tai suggests it against an absinthe
-    and that drink's own note says "the source says absinthe and then names
-    Pernod, which is a pastis. Carried as written rather than corrected." So
-    this is a cross-category substitution; `pastis` is a declared generic and is
-    almost certainly the right value, but it is Helen's to confirm rather than
-    mine to infer twice.
   "aguardiente": >-
     A spirit TYPE rather than a bottle. Bali Hai writes `Aguardiente brandy` as
     its item and this as its suggestion, so the suggestion repeats the item
