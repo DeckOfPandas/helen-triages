@@ -1616,6 +1616,66 @@ def test_no_ingredient_stores_a_millilitre_figure():
     )
 
 
+def test_a_qq_note_carries_a_qq_label():
+    """A drink note that is unresolved says so on its tab -- #572.
+
+    NOTES ARE `{label, text}` OR A BARE STRING, exactly as a food recipe's are
+    (HANDOVER 4) -- and `_layouts/cocktail.html` has rendered both shapes since
+    the layout was written, falling back to the literal word "note". Nothing had
+    ever used the labelled form, so all 170 notes rendered identically.
+
+    THE SPLIT THAT MATTERS IS NOT TOPIC BUT AUTHORSHIP. 81 of the 170 are the
+    ingest audit trail -- "QQ - `generic` values INFERRED, not confirmed", "QQ -
+    method step 2 is TRUNCATED in the source" -- and they sat on the page
+    labelled "note" beside Helen's own "This drink is incredibly forgiving with
+    the rum". One is a remark about the drink; the other is a record that
+    something is unresolved, and reading it as the first is the failure.
+
+    ONE LABEL, NOT FIVE. The 81 sort into five kinds (inferred, no unit,
+    truncated, glass, mood) and Helen's call was a single `QQ` anyway: the tab
+    says "not ruled on yet", which is what `QQ` means everywhere else in this
+    repo, and a five-word vocabulary would need its own guard to stop a sixth
+    kind arriving untagged.
+
+    THE TEXT KEEPS ITS OWN `QQ - ` PREFIX, which is duplication on the page and
+    deliberate. HANDOVER 5's house-style exemption matches `QQ` as a PREFIX on
+    the string, and every `grep -rn QQ` in this repo's history has found these
+    by their text. Moving the marker into the label alone would fail in the
+    direction where a future scanner silently stops seeing them.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for note in (fm.get("notes") or []):
+            checked += 1
+            if isinstance(note, str):
+                if note.strip().startswith("QQ"):
+                    bad.append(f"{slug}: unlabelled QQ note {note[:60]!r}...")
+                continue
+            if not isinstance(note, dict):
+                continue
+            text = str(note.get("text", ""))
+            label = note.get("label")
+            if text.strip().startswith("QQ") and label != "QQ":
+                bad.append(f"{slug}: QQ note labelled {label!r}, not 'QQ'")
+            if label == "QQ" and not text.strip().startswith("QQ"):
+                bad.append(f"{slug}: labelled QQ but the text does not say so: "
+                           f"{text[:60]!r}")
+    assert not bad, (
+        "QQ notes and their labels disagree:\n  " + "\n  ".join(bad)
+        + "\n\nA note whose text begins `QQ` is written as:\n"
+          '  - label: "QQ"\n    text: "QQ - ..."\n\n'
+          "Both halves, on purpose: the label is what the page shows, the "
+          "prefix is what every QQ scanner in this repo matches on. A note "
+          "that is Helen's own remark stays a bare string and renders as "
+          "\"note\"."
+    )
+    assert checked, (
+        "No drink notes were scanned at all, so this compared nothing -- the "
+        "collection had 170 when this was written."
+    )
+
+
 def test_no_method_step_restates_to_serve_or_garnish():
     """A step that opens "Serve" or "Garnish" is another field's fact -- #573.
 
