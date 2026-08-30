@@ -76,3 +76,53 @@ $letter-spacing-label: 0.1em;
 
 // --- Borders & Radii ---------------------------------------------------------
 $radius-sm: 2px;   // note boxes, method-short box, meta wash
+
+
+// --- The index panel ---------------------------------------------------------
+// BOTH SITES' INDEXES ARE THE SAME CONTROL PANEL, so these two gaps belong to
+// neither. They lived in _sass/food/_category-labels.scss and cocktails used
+// `$space-xl` and `$space-md` directly -- the same values under different
+// names, which is the arrangement that stays equal only until someone tunes
+// one. Moved 2026-08-30.
+//
+// §13.4's reasoning travels with them: the index is a control panel, where
+// every section should be visible in one glance, and the recipe page is a
+// document, where space isolates the section you are mid-task on. Keep the
+// ratio near 2:1. That is why these are NOT $spacing-section-gap -- reaching
+// for the recipe page's token is exactly the mistake cocktails had made, and it
+// spaced its control panel like a document.
+$index-section-gap: $space-xl;   // between one filter section and the next
+$index-label-gap:   $space-md;   // a label to its own buttons
+
+// The search row: a heading, a text box and an inline clear, on one line.
+// $index-search-max-width was 550px until the clear button started reserving
+// its space at all times -- that space came out of the input's share even at
+// rest, so the row was widened by roughly the button's own footprint (Helen,
+// 2026-08-03: "cut off even before typing anything -- it ends at the first '.'").
+$index-search-max-width: 620px;
+
+// WHERE THE TWO INGREDIENT FIELDS STOP SITTING SIDE BY SIDE. Food stacked at
+// 600px and cocktails at 720px, so between those widths food squashed both
+// inputs into half a column each while cocktails had already stacked. Helen,
+// 2026-08-30, seeing them together: "the cocktail version is correct." One
+// number now, so there is no in-between to be wrong in.
+$index-stack-width: 720px;
+
+// WHERE THE HEADER STOPS PUTTING THE NAV BESIDE THE WORDMARK, and the number is
+// derived rather than picked. The widest wordmark the site has is
+// `[ COCKTAILS ]`: 13 characters at 2.5rem with 0.18em tracking and 1.4em of
+// padding either side, which is 524px. The nav row is 128px (two 32px icons,
+// "??", two 1.4rem gaps). The header's own padding takes 48px. That is 700px
+// before any air at all, so the two only sit together comfortably above about
+// 820px -- and below that the nav takes its own line.
+//
+// 600px was the old value and it was set for a different job: stopping the tape
+// PAINTING OVER the nav, which the header grid now makes impossible at any
+// width (#551). What is left is whether they FIT, which is a bigger number.
+//
+// It is one number for both sites deliberately, even though food's shorter
+// wordmark would sit happily beside the nav down to about 550px. A per-site
+// breakpoint is a second chrome, which is what #374 exists to prevent -- and
+// the day a third site word arrives, this is the one place that needs looking
+// at. Recompute with tmp/header_width.py if a wordmark ever gets longer.
+$header-stack-width: 820px;

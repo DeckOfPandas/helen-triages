@@ -161,6 +161,33 @@ def _load():
     )
 
 
+def _load_published():
+    """Only the drinks in `_cocktail_recipes/` -- the ones the world sees.
+
+    A SECOND DOOR, NOT A SECOND GLOB, and the distinction is what keeps #540
+    shut. `_load()` above is right for anything true of every drink; a PROMOTION
+    GATE is a claim about published drinks alone, and answering it from the
+    combined corpus would hold 114 drafts to a rule that is deliberately not
+    theirs.
+
+    It skips rather than passing when nothing is promoted. That is the honest
+    answer here and not the one `_load()` gives: `_cocktail_recipes/` lives in
+    THIS repo, so it is never missing, and an empty one is a true fact about the
+    collection rather than a stale scan. Reporting "checked, all fine" over zero
+    drinks would be the vacuous green tests/test_suite_hygiene.py exists to
+    prevent.
+    """
+    out = _read(RECIPES)
+    if not out:
+        pytest.skip(
+            "No promoted drinks. `_cocktail_recipes/` is empty, so there is "
+            "nothing for a promotion gate to check -- this is a fact about the "
+            "collection, not a loader that has gone stale. It starts running "
+            "the day the first drink is promoted."
+        )
+    return out
+
+
 # =============================================================================
 # WHAT A PARTIAL CORPUS CANNOT ANSWER -- the other half of #540
 # =============================================================================
@@ -2091,6 +2118,51 @@ def test_display_scale_names_only_real_icons():
           "glass drawn LARGER than its real proportions, which defeats the "
           "point of heights_mm. A quoted number is a string and Liquid's "
           "`times` turns it into 0 -- an invisible glass."
+    )
+
+
+def test_every_published_drink_names_a_rung_on_the_ship_scale():
+    """A promoted drink has a verdict. Helen, 2026-08-30: "every cocktail we
+    publish must have the ship field filled in".
+
+    A PROMOTION GATE, deliberately, and drafts are exempt. 31 of the 114 drafts
+    say `QQ` or `who knows` today and that is a legitimate state -- it is the
+    shape of a drink not yet made up its mind about. What it cannot be is
+    published.
+
+    THE COLLECTION ALREADY IMPLIED THIS AND NOTHING ENFORCED IT. §9.5 records
+    `meta.status` being retired because its only consumer was a "haven't tried"
+    bucket, "dropped rather than redefined, since an untried drink never
+    publishes". So promotion has always meant tried-and-judged; this is the
+    first thing that checks it.
+
+    IT IS ALSO NOW A RENDERING FACT, which is why it arrives with the ship. The
+    card's mark is the WORD, and a drink off the scale renders the icon with no
+    label beside it -- fine on a local draft, and on a published card it is a
+    rating that says nothing. Helen accepted the icon shifting slightly between
+    cards on the strength of every published drink having a word to shift it by.
+
+    `who knows` and `QQ` fail this deliberately even though `ship_tints` covers
+    them: tints exist so an off-scale value renders SOMETHING rather than
+    erroring, which is a different question from whether it may ship.
+    """
+    scale = set(_taxonomy().get("ship_scale") or [])
+    assert scale, "taxonomy.yml has no `ship_scale:` to check against."
+
+    offenders = []
+    for slug, front in _load_published():
+        ship = (front.get("meta") or {}).get("ship")
+        if ship not in scale:
+            offenders.append(f"{slug}: meta.ship is {ship!r}")
+
+    assert not offenders, (
+        "Published drink(s) whose `meta.ship` is not a rung on the scale:\n  "
+        + "\n  ".join(sorted(offenders))
+        + f"\n\nAllowed: {sorted(scale)}. `who knows` and `QQ` are legitimate "
+          "on a DRAFT and not on a published drink -- promotion means the drink "
+          "has been made and judged (§9.5: an untried drink never publishes). "
+          "The card's goodness mark is the word itself, so a published drink "
+          "off the scale renders a ship with nothing beside it."
     )
 
 

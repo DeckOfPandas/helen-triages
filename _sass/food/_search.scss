@@ -13,18 +13,9 @@
   .search-input {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    gap: $space-md;
-    width: 100%;
-    // Was 550px. The clear button now reserves its own space at ALL times
-    // (visibility, not display -- see its own comment below), which is
-    // exactly what fixed it appearing to cut the input off mid-typing, but
-    // it also meant that reserved space came out of the input's share of
-    // the same 550px even at rest, before you'd typed a single character
-    // (Helen: "cut off even before typing anything -- it ends at the first
-    // '.'"). Widened by roughly the clear button's own footprint (its text
-    // plus $space-md of margin) so the input gets back the room it lost.
-    max-width: 620px;
+    // Shared with cocktails' own search row -- @mixin index-search-row in
+    // shared/_rule.scss carries the alignment, the gap and the max-width.
+    @include index-search-row;
     position: relative;
 
     // Both label and clear button default to flex-shrink: 1 with no
@@ -39,8 +30,7 @@
     // behaviour actually wanted -- a heading shouldn't reflow because of
     // how much you've typed elsewhere in the same row.
     .category-label {
-      white-space: nowrap;
-      flex-shrink: 0;
+      @include index-search-row-label;
       // "A little space after the heading" -- Helen, 2026-08-03. On top of
       // the row's own $space-md gap (label to input to clear button,
       // uniformly), not instead of it -- this row specifically wanted more
@@ -55,11 +45,7 @@
   // direction, and a fork would only ever drift.
   #ingredient-search-box,
   #exclude-search-box {
-    font-family: $font-headings;
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: lowercase;
-    letter-spacing: 0.04em;
+    @include index-search-input-type;
 
     // Override browser input defaults
     background: transparent;
@@ -71,36 +57,14 @@
     border: none;
     border-bottom: 1px solid lighten($color-clear-text, 25%);
     color: lighten($color-text, 12%);
-    flex: 1;
-    // Text inputs get a non-zero intrinsic min-width from the browser
-    // (roughly the UA's default `size`), which flexbox respects unless
-    // told otherwise, so flex: 1 alone doesn't let this shrink past that
-    // floor. A longer label eats more of the row, so it pushes its own
-    // input against that floor sooner and overflows .search-input's
-    // max-width further than a shorter-labelled row does — and the two
-    // inputs then end at different points instead of both sitting flush
-    // with their row's own right edge. Helen: "it would look tidiest if
-    // both search input fields ended in the same place." Standard fix for
-    // a flex item refusing to shrink to its container; matching override
-    // on #name-search-box below.
-    //
-    // WHICH row is the long one is not a constant, which is why this
-    // comment no longer names one. SEARCH MAIN INGREDIENTS was the longest
-    // label on the page and was the case that found the bug; it is HAS TO
-    // HAVE since issue #583, and I KNOW WHAT I WANT is now the long one.
-    // The fix is the same either way, and it has to be, because the labels
-    // are data (_data/food/filter_sections.yml) and can change again.
-    min-width: 0;
+    @include index-search-row-input;
 
     &:focus {
       outline: none;
       border-bottom-color: lighten($color-clear-text, 5%);
     }
 
-    &::placeholder {
-      color: lighten($color-clear-text, 30%);
-      font-weight: 300;
-    }
+    &::placeholder { @include index-search-placeholder; }
   }
 
   // Was a full duplicate of .btn-clear-inline's styling under an ID
@@ -147,11 +111,7 @@
 // its own block so the structural rule and the type rule stay readable apart.
 .controls .search--name {
   #name-search-box {
-    font-family: $font-headings;
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: lowercase;
-    letter-spacing: 0.04em;
+    @include index-search-input-type;
     background: transparent;
     box-shadow: none;
     outline: none;
@@ -161,19 +121,14 @@
     border: none;
     border-bottom: 1px solid lighten($color-clear-text, 25%);
     color: lighten($color-text, 12%);
-    flex: 1;
-    // See #ingredient-search-box's own comment above.
-    min-width: 0;
+    @include index-search-row-input;
 
     &:focus {
       outline: none;
       border-bottom-color: lighten($color-clear-text, 5%);
     }
 
-    &::placeholder {
-      color: lighten($color-clear-text, 30%);
-      font-weight: 300;
-    }
+    &::placeholder { @include index-search-placeholder; }
   }
 
   // Same duplicate-ID story as #ingredient-search-clear above.
@@ -234,7 +189,7 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: $index-stack-width) {
   // One column. The pair is a claim about two questions being halves of one,
   // and that claim survives them being stacked -- what does not survive is two
   // search boxes sharing a phone's width.

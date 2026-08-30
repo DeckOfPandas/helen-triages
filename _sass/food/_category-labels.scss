@@ -70,8 +70,10 @@
 //
 // Tune density here. Keep the ratio near 2:1 or the structure blurs: the gap
 // BETWEEN sections has to read as clearly larger than the gap WITHIN one.
-$index-section-gap: $space-xl;   // between one filter section and the next
-$index-label-gap:   $space-md;   // a label to its own buttons
+// $index-section-gap and $index-label-gap moved to _sass/shared/_tokens.scss on
+// 2026-08-30 -- cocktails' index is the same control panel and was spelling the
+// same two values as $space-xl and $space-md. Same values, imported before this
+// file, so nothing here changes.
 
 .category {
   // TYPOGRAPHY MATCHED TO THE RECIPE PAGE'S SECTION HEADINGS, ONE STEP DOWN.
@@ -114,11 +116,10 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // left to the absence of a matching rule -- see .results-heading
   // .category-label directly below.
   .category-label {
-    font-family: $font-headings;   // NOT $font-label -- see _palette.scss
-    text-transform: uppercase;
-    font-size: 1.35rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    // $font-headings, NOT $font-label -- see _palette.scss. The five type
+    // values are shared with cocktails' own filter labels; see
+    // @mixin index-section-label in shared/_rule.scss.
+    @include index-section-label;
     // A LIGHTER stroke than the letter, restoring Helen's punched-tape edge —
     // but derived from the text colour instead of a standalone rgba(50,50,50),
     // which was a grey with no relationship to the letter it outlined.
@@ -137,13 +138,10 @@ $index-label-gap:   $space-md;   // a label to its own buttons
     // every heading on the recipe page.
     color: $color-text;
     position: relative;   // anchors the absolutely-positioned wash slot
-    // Was `padding: 0.22rem 3rem` here plus an inline `padding: 0.22rem 1rem`
-    // on the element, which won. Both existed only to give the ragged brush
-    // wash room to bleed past the lettering. With the blocky rule there is
-    // nothing to bleed, and the padding was pushing the label 1rem right of the
-    // filter buttons underneath it — invisible under a wash, obvious under a
-    // straight rule.
-    padding: 0.22rem 0;
+    // The 0.22rem vertical padding moved into @mixin index-section-label with
+    // the rest of this label's type -- cocktails' heading needs the same box,
+    // and not having it was the last thing sitting the two at different
+    // heights. The full story of the horizontal half is in the mixin.
   }
 }
 
@@ -174,18 +172,13 @@ $index-label-gap:   $space-md;   // a label to its own buttons
 }
 
 .category {
-  margin: $index-section-gap 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $index-label-gap;
+  // Shared -- @mixin index-section in shared/_rule.scss. The gap is what
+  // spaces a label from its own buttons, so nothing inside needs a margin.
+  @include index-section;
 
-  .category-label-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: $space-lg;   // horizontal, label to its inline clear link
-  }
+  // Shared -- @mixin index-label-row. The gap is horizontal, label to its
+  // own inline clear link.
+  .category-label-row { @include index-label-row; }
 
   // Brought closer to .btn-clear (the global "clear all", below) and to
   // article.recipe a — Helen, 2026-08-03: this page already has multiple
