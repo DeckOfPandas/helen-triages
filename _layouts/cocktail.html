@@ -186,13 +186,13 @@ layout: default
      main_ingredients is — no completeness/substitution split, no pantry
      demotion. Keys, each earning its place from the real data:
 
-       amount     the quantity AS WRITTEN ("0.5 oz", "3 dashes") — the display
-                  string, which carries units a number cannot
-       ml         the same quantity in millilitres, for ratios and scaling.
-                  ABSENT on purpose where the unit is not volumetric — a dash
-                  is not 0.8 ml in any way worth writing down. Duplicated on
-                  purpose and guarded by a test, the same idiom
-                  internal_temperatures.yml uses for its display/numeric pairs.
+       amount     the quantity, and the ONLY quantity field — "25 ml",
+                  "0.5 oz", "3 dashes". A `ml:` key sat beside this on every
+                  entry until #571 and is retired: 521 of them restated a
+                  string that already said the same number, and every one
+                  derives exactly from `measures:` in ingredients.yml.
+                  Helen: "Food YAML has this structure, and I'd like cocktails
+                  to match" — one display string, as a food recipe has.
        item       what the source calls it, brand-led when the source names a
                   bottle ("Appleton Estate Reserve")
        generic    what you would ever FILTER by ("Jamaican, moderately aged").

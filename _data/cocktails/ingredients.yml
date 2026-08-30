@@ -29,6 +29,61 @@
 # planteray stiggins' fancy, planteray o.f.t.d. overproof, malibu, blackstrap.
 # =============================================================================
 
+# --- how an `amount` becomes a number ----------------------------------------
+# THIS REPLACES THE `ml:` KEY, WHICH IS GONE -- #571, 2026-08-30. Every
+# ingredient used to carry its quantity twice: `amount: "25 ml"` beside
+# `ml: 25`. Helen: "Food YAML has this structure, and I'd like cocktails to
+# match" -- one quantity field, a display string, as a food recipe has.
+#
+# MEASURED BEFORE DELETING, because the pair was justified (HANDOVER 9.3) on
+# the grounds that "the string carries units a number cannot". True of
+# "0.5 oz" and "3 dashes". False of "25 ml", which was 376 of the 619 entries.
+# Across the whole collection 521 entries carried both and ALL 521 derive
+# exactly from the table below; the other 98 are non-volumetric and not one of
+# them carried an `ml` at all. So the data already obeyed this rule and was
+# writing the answer down anyway.
+#
+# WHAT `ml:` WAS ACTUALLY BUYING was not the number but the GUARANTEE that a
+# number exists -- which #545 (scaler), #294/#297 (units of alcohol) and #547
+# (cost) all need. A hand-maintained duplicate cannot promise that: it can
+# simply be absent, and it was, on all 19 unitless amounts. The guarantee lives
+# in `test_every_amount_is_readable_as_a_quantity` now, which is stronger,
+# because it fails on an amount nothing can read rather than shrugging.
+#
+# THE CONVERSIONS ARE A DECISION, NOT ARITHMETIC. 1 oz is 30 ml here and not
+# 29.5735 -- bar-standard rounding, which keeps ratios clean. Recorded in
+# HANDOVER 9.4 as a decision and written down nowhere executable until now.
+measures:
+  per_ml:
+    ml: 1
+    cl: 10
+    oz: 30
+    tsp: 5
+
+  # Units that count or weigh something, never a volume. An amount in one of
+  # these has no millilitre figure and is not missing one -- HANDOVER 9.3: "a
+  # dash is not 0.8 ml in any way worth writing down". A consumer checks
+  # whether a figure came back rather than assuming one did.
+  non_volumetric:
+    - dash
+    - dashes
+    - drop
+    - drops
+    - cube
+    - cubes
+    - pinch
+    - each
+    - leaf
+    - leaves
+    - sprig
+    - strip
+    - g
+
+  # Words that may sit between the number and its unit without changing either.
+  # One entry, and it is real: "1 heaping oz" on Kill Devil Punch.
+  ignored_words:
+    - heaping
+
 # --- what the index's ingredient pickers do with all this --------------------
 # THREE NUMBERS, HERE RATHER THAN IN THE SCRIPT, and for the reason food's
 # `search: family_button_min_chars` is in _data/food/ingredient_words.yml: how

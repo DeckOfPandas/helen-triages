@@ -196,11 +196,12 @@ WHOLE_COLLECTION_ONLY = {
     "test_every_card_name_join_is_reachable",
     "test_every_proposal_still_matches_a_real_step",
     "test_no_mood_covers_more_than_half_the_collection",
-    # The four COVERAGE claims below -- see _exercised.
+    # The five COVERAGE claims below -- see _exercised.
     "test_the_character_vocabulary_is_exercised",
     "test_the_bottle_index_is_exercised",
     "test_the_cross_category_check_is_exercised",
     "test_the_syrup_ratio_check_is_exercised",
+    "test_the_amount_table_is_exercised",
 }
 
 
@@ -1423,6 +1424,198 @@ def _cross_category_scan():
     return checked, bad
 
 
+# =============================================================================
+# AMOUNTS -- one field, and a table that turns it into a number. Spec: #571
+# =============================================================================
+# `ml:` USED TO BE STORED BESIDE EVERY `amount:` and is gone. See the
+# `measures:` block in ingredients.yml for the measurement that made the
+# deletion safe and for why the conversions belong in data.
+
+_AMOUNT_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*(?:/\s*(\d+))?\s*(.*?)\s*$")
+
+
+def _millilitres(amount, measures):
+    """(millilitres, unit) for one `amount` string; (None, unit) if not a volume.
+
+    Raises ValueError when the string cannot be read at all, which is the one
+    outcome that matters -- see test_every_amount_is_readable_as_a_quantity.
+
+    THE UNIT IS REQUIRED, and a bare number is deliberately an error rather
+    than an assumed millilitre figure. Nineteen amounts in the collection are
+    bare numbers, and they are NOT all the same unit: Port-au-Prince's ladder
+    (30, 22.5, 15, 7.5, 5) is plainly millilitres and Drunken Skull's
+    (0.75, 0.75, 0.5, 0.5) is just as plainly ounces. Guessing gets one of them
+    wrong by a factor of 30 and looks exactly as confident either way. Every
+    one of the nineteen already carries a `QQ - no unit in the source` note,
+    which is the right answer and the one this check preserves.
+    """
+    text = str(amount)
+    match = _AMOUNT_RE.match(text)
+    if not match:
+        raise ValueError("no leading number")
+    whole, denominator, rest = match.groups()
+    number = float(whole)
+    if denominator:
+        number /= float(denominator)
+    words = [w for w in rest.lower().split()
+             if w not in (measures.get("ignored_words") or [])]
+    if not words:
+        raise ValueError("a number with no unit")
+    unit = " ".join(words)
+    per_ml = measures.get("per_ml") or {}
+    if unit in per_ml:
+        return round(number * per_ml[unit], 3), unit
+    if unit in (measures.get("non_volumetric") or []):
+        return None, unit
+    raise ValueError(f"undeclared unit {unit!r}")
+
+
+def _amount_scan():
+    """(how many amounts read cleanly, the ones that did not).
+
+    ONE SCAN, TWO TESTS -- see `_character_scan`.
+    """
+    measures = _vocab().get("measures") or {}
+    read = 0
+    bad = []
+    for slug, fm in _load():
+        notes = " ".join(str(n) for n in (fm.get("notes") or []))
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict) or item.get("amount") is None:
+                continue
+            try:
+                _millilitres(item["amount"], measures)
+            except ValueError as why:
+                # THE EXEMPTION IS THE DRINK'S OWN QQ, not a registry here.
+                # A hardcoded list of slugs cannot tell a gap that has been
+                # filled from one that has merely been deleted, and HANDOVER 10
+                # records five guards going false-red on exactly that shape.
+                # A QQ note is per-drink, so it works on a partial corpus, and
+                # it fails in BOTH directions that matter: fill the unit in and
+                # forget the note, or drop the note without filling it in.
+                if "no unit in the source" in notes or "carries no ml figure" in notes:
+                    continue
+                bad.append(
+                    f"{slug}: amount {item['amount']!r} on "
+                    f"{item.get('item') or item.get('generic')!r} -- {why}"
+                )
+            else:
+                read += 1
+    return read, bad
+
+
+def test_every_amount_is_readable_as_a_quantity():
+    """Every `amount` yields millilitres, or names a declared non-volume -- #571.
+
+    THIS IS WHAT `ml:` WAS ACTUALLY FOR. The stored figure looked like the
+    guarantee that a drink's quantities are computable, and it was not one: it
+    could simply be absent, and on all nineteen unitless amounts it was. A
+    consumer reading `.get("ml")` got `None` and had no way to tell "this is a
+    dash, correctly numberless" from "this says 30 and nobody wrote the unit".
+
+    So the number is derived from `measures:` in ingredients.yml and this check
+    is the promise. #545 (scaler), #294/#297 (alcohol units) and #547 (cost)
+    can all be built against it.
+
+    AN UNDECLARED UNIT FAILS HERE RATHER THAN VANISHING. Adding a unit is one
+    line in `measures:` -- `per_ml` if it is a volume, `non_volumetric` if it
+    counts or weighs. Declaring it is what switches enforcement on, the same
+    bargain `canonical_glasses` and the `<family>_characters` lists strike.
+    """
+    _, bad = _amount_scan()
+    assert not bad, (
+        "Amounts that cannot be read as a quantity:\n  " + "\n  ".join(bad)
+        + "\n\nEither the unit is missing from `measures:` in "
+          "_data/cocktails/ingredients.yml -- add it to `per_ml` with its "
+          "millilitre value, or to `non_volumetric` -- or the amount really "
+          "has no unit, in which case do NOT guess one: 0.75 is an ounce on "
+          "Drunken Skull and 22.5 is a millilitre on Port-au-Prince, and the "
+          "difference is thirtyfold. Write a `QQ - no unit in the source for "
+          "<amount> <item>` note, as all nineteen existing cases do."
+    )
+
+
+def test_the_amount_table_is_exercised():
+    """Amounts are actually being read, rather than all being exempted.
+
+    The QQ escape in `_amount_scan` is per-drink and generous by design, so the
+    failure mode this guards is the whole check quietly exempting itself -- a
+    parser change that raised on everything would look identical to a clean run
+    if nobody counted what got through.
+    """
+    read, _ = _amount_scan()
+    _exercised(
+        read, "the amount table",
+        "Every amount in the collection failed to parse, or none was found at "
+        "all -- `measures:` or the `amount` key has moved.")
+
+
+def test_the_declared_measures_produce_the_figures_the_data_used_to_store():
+    """The conversions still say what `ml:` said before it was deleted -- #571.
+
+    ANCHORS, NOT A ROUND TRIP. The 521 stored figures are gone, so nothing can
+    re-derive and compare them; what survives is a handful of real pairs taken
+    from the collection on the day of the deletion, one per declared unit plus
+    the two shapes that nearly broke the parser.
+
+    THE FRACTION CASE IS HERE BECAUSE IT ALREADY FOOLED ME ONCE. A first pass
+    at this measurement read "2/3 oz" as 2 and reported Don's Mai Tai as the
+    only drink whose stored `ml` disagreed with its `amount`. The data was
+    right and the parser was wrong, which is the direction that would have
+    silently tripled two figures had it not been checked against what was
+    actually stored.
+    """
+    measures = _vocab().get("measures") or {}
+    cases = [
+        ("25 ml", 25.0),        # the 376-entry majority
+        ("0.5 oz", 15.0),       # 1 oz -> 30, the bar-standard rounding
+        ("2/3 oz", 20.0),       # Don's Mai Tai -- stored 20
+        ("1/3 oz", 10.0),       # Don's Mai Tai -- stored 10
+        ("2 tsp", 10.0),        # 1 tsp -> 5
+        ("1 heaping oz", 30.0), # Kill Devil Punch -- `heaping` is ignored
+    ]
+    wrong = [f"{text!r} -> {_millilitres(text, measures)[0]}, expected {want}"
+             for text, want in cases
+             if _millilitres(text, measures)[0] != want]
+    assert not wrong, (
+        "The declared conversions no longer reproduce figures the collection "
+        "actually stored:\n  " + "\n  ".join(wrong)
+        + "\n\nThese are real amounts from real drinks, checked against their "
+          "`ml:` values before that key was deleted. If a conversion is being "
+          "changed on purpose, say so here -- silently is how ratios drift."
+    )
+    for text in ("2 dashes", "12 cubes", "75 g"):
+        assert _millilitres(text, measures)[0] is None, (
+            f"{text!r} is not a volume and must yield no millilitre figure. "
+            "Returning 0 instead of None is the bug that would make "
+            "_syrup_ratio_scan average a dash in as if it were nothing."
+        )
+
+
+def test_no_ingredient_stores_a_millilitre_figure():
+    """`ml:` is retired -- #571. The `amount` string is the only quantity.
+
+    A RETURNING KEY WOULD BE READ BY NOTHING AND WOULD DRIFT IN SILENCE, which
+    is the whole reason it went: 521 entries held the same fact twice, and the
+    duplicate's only possible future was to disagree with the string beside it.
+    An ingest session copying an older drink as a template is exactly how it
+    comes back -- the same route HANDOVER 4.0 records for the hyphenated
+    `awaiting-fix` spelling reappearing across 34 files.
+    """
+    bad = [f"{slug}: {item.get('item') or item.get('generic')!r} has ml: {item['ml']!r}"
+           for slug, fm in _load()
+           for item in (fm.get("ingredients") or [])
+           if isinstance(item, dict) and "ml" in item]
+    assert not bad, (
+        "`ml:` is retired -- the quantity is `amount` alone:\n  "
+        + "\n  ".join(bad)
+        + "\n\nThe millilitre figure is derived from `measures:` in "
+          "_data/cocktails/ingredients.yml. If an amount cannot be read, that "
+          "is a missing unit to declare or a genuine QQ, not a reason to write "
+          "the number down a second time."
+    )
+
+
 def test_no_method_step_restates_to_serve_or_garnish():
     """A step that opens "Serve" or "Garnish" is another field's fact -- #573.
 
@@ -2476,6 +2669,24 @@ def _syrup_ratio_scan():
     ONE SCAN, TWO TESTS -- see `_character_scan`.
     """
     citrus = re.compile(r"lime juice|lemon juice|grapefruit juice", re.I)
+    measures = _vocab().get("measures") or {}
+
+    def ml(entry):
+        """Millilitres, or 0 for anything that is not a volume.
+
+        DERIVED SINCE #571, where it used to be `entry.get("ml")`. Deleting
+        that key without repointing this would not have failed: both halves of
+        the ratio would have summed to zero, `if not (syrup and sour)` would
+        have skipped every drink, and the check would have reported green over
+        nothing -- HANDOVER 12's "test that cannot fail" exactly. What would
+        have caught it is its own sibling, test_the_syrup_ratio_check_is
+        _exercised, which is why that test exists.
+        """
+        try:
+            return _millilitres(entry.get("amount", ""), measures)[0] or 0
+        except ValueError:
+            return 0
+
     problems = []
     checked = 0
     for slug, fm in _load():
@@ -2488,9 +2699,12 @@ def _syrup_ratio_scan():
             g = entry.get("generic")
             return g if isinstance(g, list) else [g] if g else []
 
-        syrup = sum(i.get("ml") or 0 for i in items
+        syrup = sum(ml(i) for i in items
                     if any(str(g).startswith("sugar syrup") for g in generics(i)))
-        sour = sum(i.get("ml") or 0 for i in items if citrus.search(i.get("item", "")))
+        # Matches on `item`, which #544 is retiring. When that lands this wants
+        # to read `generic` -- `lime juice` and `lemon juice` are both declared
+        # generics, so it is a straight swap and a slightly better one.
+        sour = sum(ml(i) for i in items if citrus.search(i.get("item", "")))
         if not (syrup and sour):
             continue
         checked += 1
