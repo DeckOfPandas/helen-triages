@@ -138,13 +138,10 @@
     // every heading on the recipe page.
     color: $color-text;
     position: relative;   // anchors the absolutely-positioned wash slot
-    // Was `padding: 0.22rem 3rem` here plus an inline `padding: 0.22rem 1rem`
-    // on the element, which won. Both existed only to give the ragged brush
-    // wash room to bleed past the lettering. With the blocky rule there is
-    // nothing to bleed, and the padding was pushing the label 1rem right of the
-    // filter buttons underneath it — invisible under a wash, obvious under a
-    // straight rule.
-    padding: 0.22rem 0;
+    // The 0.22rem vertical padding moved into @mixin index-section-label with
+    // the rest of this label's type -- cocktails' heading needs the same box,
+    // and not having it was the last thing sitting the two at different
+    // heights. The full story of the horizontal half is in the mixin.
   }
 }
 

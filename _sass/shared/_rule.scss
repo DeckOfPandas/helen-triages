@@ -434,6 +434,18 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: 0.08em;
+  // 0.22rem TOP AND BOTTOM, and it is the last thing that was making the two
+  // sites' headings sit at different heights. Food had it and cocktails did
+  // not, so food's label box was 7px taller and its words sat 3.5px lower
+  // inside it -- which is a heading "a tiny bit higher" on cocktails, exactly
+  // as Helen described.
+  //
+  // The HORIZONTAL half of this is already gone and should stay gone: it was
+  // `0.22rem 3rem`, room for a ragged brush wash to bleed past the lettering,
+  // and with the blocky rule there is nothing to bleed -- it was pushing the
+  // label 1rem right of the buttons underneath it, invisible under a wash and
+  // obvious under a straight rule.
+  padding: 0.22rem 0;
 }
 
 
