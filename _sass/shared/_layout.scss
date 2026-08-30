@@ -128,6 +128,18 @@ main {
 // tape SVGs", so if that height or the SVG's margins change, re-eyeball this by
 // hand rather than expecting it to follow.
 .site-nav-icons {
+  // BOTH ITEMS NAME THEIR ROW, and without it the header stacks. Grid
+  // auto-placement is SPARSE: it walks the items in DOM order and never moves
+  // its cursor backwards. The nav comes first and is pinned to column 3, which
+  // puts the cursor past column 3 of row 1 -- so the wordmark, asking for
+  // column 2, cannot be placed in row 1 at all and starts a second row. The
+  // result is the nav above the wordmark rather than beside it, which is
+  // exactly what it looked like: icons top-right.
+  //
+  // `grid-row: 1` on both is the fix rather than `grid-auto-flow: dense`, which
+  // would also work and would leave the arrangement depending on the order two
+  // elements happen to appear in. This says where they go.
+  grid-row: 1;
   grid-column: 3;
   justify-self: end;
   align-self: end;
@@ -141,6 +153,7 @@ main {
 // overflowing the grid -- without it an intrinsic-width child can push the
 // outer tracks to zero and then keep going.
 .site-title-link {
+  grid-row: 1;
   grid-column: 2;
   min-width: 0;
 }
