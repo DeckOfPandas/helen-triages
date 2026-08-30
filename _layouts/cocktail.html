@@ -203,6 +203,17 @@ layout: default
                   LIST.
        note       the reasoning that used to get smuggled into `suggestion`
                   (#457) — its own line, always visible, no interaction.
+       optional   BOOLEAN, absent means required (#570). The drink is still
+                  the drink without this pour. Two entries carry it today —
+                  Espresso Martini's syrup and Gunmetal Blue's Suze — and
+                  both said it inside `item` text before the field existed,
+                  which is #544's point exactly: `item` was holding a fact
+                  no field could.
+
+     `optional` IS NOT FOOD'S `incidental`, DESPITE THE MATCHING SHAPE. Both
+     are a bare boolean on an ingredient item and they do opposite things:
+     `incidental` HIDES the line entirely (a frying oil nobody measures),
+     `optional` SHOWS it and marks it. Do not reason from one to the other.
 
      HEADLINE, CLASS LINE, CHARACTER, NOTE — settled 2026-08-24 after a design
      pass on #465/#460. The headline is `suggestion` when present (you shop by
@@ -297,7 +308,13 @@ layout: default
           <li class="cocktail-ingredient">
             <div class="cocktail-ingredient-top">
               {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}
-              <span class="cocktail-item">{{ headline }}{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}</span>
+              {% comment %} `optional` is a plain word after the name, NOT a
+                 parenthetical — the brackets on this line already mean "the
+                 bottle", and "sugar syrup (optional)" beside "gin (Beefeater)"
+                 would make one punctuation mark carry two unrelated jobs.
+                 That is #441's argument about "(blackstrap)" arriving on a
+                 different field. {% endcomment %}
+              <span class="cocktail-item">{{ headline }}{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">optional</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
               <p class="cocktail-type-line">{{ class_html }}</p>

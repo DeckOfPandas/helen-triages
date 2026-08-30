@@ -1423,6 +1423,98 @@ def _cross_category_scan():
     return checked, bad
 
 
+def test_optional_is_a_real_boolean():
+    """`optional` marks an ingredient the drink survives without -- #570.
+
+    A REAL BOOLEAN, NEVER A QUOTED STRING. The exact lesson `meta.awaiting_fix`
+    paid for in HANDOVER 4.0: `optional: "true"` is a string, and every
+    truthiness test in Liquid and in Python agrees a non-empty string is true --
+    so a QUOTED value happens to work here and stops working the moment anything
+    compares it, while `optional: "false"` is true today and reads as false to
+    every human who looks at it. There is no spelling of this field that fails
+    loudly on its own, so the shape is guarded instead.
+
+    `false` is permitted and means the same as absent. It is not written into
+    any drink -- writing "this is not optional" on 617 entries is noise -- but a
+    drink that has been thought about and answered no is a legitimate thing to
+    record, and forbidding it would make the absence ambiguous in the other
+    direction.
+    """
+    seen = 0
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict) or "optional" not in item:
+                continue
+            seen += 1
+            if not isinstance(item["optional"], bool):
+                bad.append(
+                    f"{slug}: {item.get('item') or item.get('generic')!r} has "
+                    f"optional: {item['optional']!r} "
+                    f"({type(item['optional']).__name__}, not bool)"
+                )
+    assert not bad, (
+        "`optional` must be a real YAML boolean -- bare true or false, never "
+        "quoted:\n  " + "\n  ".join(bad)
+    )
+    assert seen, (
+        "No ingredient anywhere carries `optional`, so this check compared "
+        "nothing. Two entries had it when the field was added (#570): Espresso "
+        "Martini's cane sugar syrup and Gunmetal Blue's gentian liqueur. If the "
+        "field has genuinely been retired, delete this test and its sibling "
+        "test_no_ingredient_says_optional_in_prose rather than leaving both "
+        "reporting green over an empty scan."
+    )
+
+
+def test_no_ingredient_says_optional_in_prose():
+    """Optionality is the `optional` field and nothing else -- #570.
+
+    THIS IS THE HALF THAT MAKES THE FIELD STICK, and the reason it exists is
+    that the field was invented to replace exactly this: both live cases said
+    `item: "Gentian liqueur (optional)"` before #570, because `item` was the
+    only slot that would hold a fact no field had. #544 calls that out as the
+    one parenthetical in `item` that sorted into no other field.
+
+    A drink that writes the word back into prose renders it as part of the
+    ingredient's NAME, and nothing else notices: the ingredient line prints
+    whatever the generic says, so "sugar syrup (optional)" would read as a
+    category, sit in the search pool as one, and never reach `optional`'s own
+    rendering. Silent in every direction.
+
+    Scoped to the ingredient fields, NOT to the drink's prose. A method step or
+    a note may discuss what is optional in a sentence -- "the float is optional
+    if you are out of Wray" is a reason, which is a note's whole job.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            for key in ("item", "generic", "suggestion"):
+                value = item.get(key)
+                for text in (value if isinstance(value, list) else [value]):
+                    if not isinstance(text, str):
+                        continue
+                    checked += 1
+                    if re.search(r"\boptional\b", text, re.I):
+                        bad.append(f"{slug}: {key} = {text!r}")
+    assert not bad, (
+        "An ingredient says it is optional in prose rather than in the "
+        "field:\n  " + "\n  ".join(bad)
+        + "\n\nWrite `optional: true` on the entry and take the word out of "
+          "the text. A word inside `item`/`generic`/`suggestion` becomes part "
+          "of the ingredient's name -- it reaches the card, the search pool "
+          "and the recipe line as though it were the category."
+    )
+    assert checked, (
+        "No ingredient text was scanned at all, so this check compared "
+        "nothing. It reads `item`, `generic` and `suggestion` across every "
+        "drink; an empty scan means the loader or the key names have moved."
+    )
+
+
 def test_to_serve_is_a_string():
     """`to_serve` is one line of presentation, never a list.
 
