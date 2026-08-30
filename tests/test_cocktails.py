@@ -1226,7 +1226,7 @@ def test_an_excluded_bottle_is_not_also_listed():
 
 
 def test_every_suggested_bottle_resolves():
-    """Every `suggestion` on a rum names a bottle this file knows -- #529/#534.
+    """Every `suggestion` names a bottle this file knows -- #529/#534.
 
     THE DIRECTION THAT MATTERS. Nothing requires a bottle to be used by a drink
     -- Helen owns bottles no recipe names, and El Dorado 151 is on the shopping
@@ -1234,11 +1234,17 @@ def test_every_suggested_bottle_resolves():
     cannot reason about, and #534's cross-category check silently skips it.
     Half a check is worse than none, because it reports a clean run.
 
-    KNOWN FAILURES ARE DECLARED, NOT TOLERATED. Eleven suggestion strings are
-    prose or two-bottles-in-one-string, which #457 already settled against;
-    they sit in `unresolved_suggestions` with the reason, so this test bites on
-    the NEXT one while those are being fixed. Deleting a line there is how one
-    gets retired -- the same shape `methods.yml` uses for its proposals.
+    THE WORD "rum" CAME OUT OF THAT FIRST LINE ON 2026-08-30, and it had been
+    doing a lot of quiet work: 54 of the collection's 91 distinct suggestions
+    were non-rum and so were checked by nothing at all. See `_suggested_bottle_scan`.
+
+    KNOWN FAILURES ARE DECLARED, NOT TOLERATED. What is left in
+    `unresolved_suggestions` is prose, two-bottles-in-one-string, or a BRAND
+    where a bottle belongs -- Briottet makes six of the things this collection
+    pours, so the string names a house and the drink names the product. Each
+    sits there with its reason, so this test bites on the NEXT one while those
+    are being fixed. Deleting a line there is how one gets retired -- the same
+    shape `methods.yml` uses for its proposals.
     """
     _, unresolved = _suggested_bottle_scan()
     assert not unresolved, (
@@ -1252,11 +1258,15 @@ def test_every_suggested_bottle_resolves():
 
 
 def test_the_bottle_index_is_exercised():
-    """Some rum ingredient in the collection actually carries a suggestion.
+    """Some ingredient in the collection actually carries a suggestion.
 
-    Zero would mean `family_of` stopped mapping the rum styles, or the loader
-    went stale -- either way the rule above is green over nothing. Whole
-    collection only: see `_exercised`.
+    Zero would mean the loader went stale -- and the rule above would be green
+    over nothing. Whole collection only: see `_exercised`.
+
+    The word "rum" came out of this docstring on 2026-08-30 with the scoping it
+    described. Leaving it would be the trap this repo keeps meeting from the
+    other side: a comment that outlives the code it describes, which is how
+    `cocktails/index.html` spent three commits claiming to emit `item`.
     """
     checked, _ = _suggested_bottle_scan()
     _exercised(
@@ -1267,27 +1277,33 @@ def test_the_bottle_index_is_exercised():
 
 
 def _suggested_bottle_scan():
-    """(how many rum suggestions were checked, the ones naming no known bottle).
+    """(how many suggestions were checked, the ones naming no known bottle).
 
     ONE SCAN, TWO TESTS -- see `_character_scan` for why they may not be
     re-typed apart.
+
+    NOT RUM-ONLY SINCE 2026-08-30. It skipped any ingredient whose generic was
+    not in the rum family, which was right while `bottles.yml` was a rum
+    reference and left a real hole once it stopped being one: 54 of the 91
+    distinct suggestions in the collection resolved to nothing and no test
+    minded, because none of them was a rum. Beefeater, Cointreau, Tanqueray,
+    Luxardo, Suze, Punt e Mes -- all invisible.
+
+    Helen's call when shown that count: "are we now assuming every named bottle
+    should be in it, and classified? That feels right to me." So the scan covers
+    every ingredient, and the 43 whose category the collection already stated
+    were declared in the same pass.
     """
     data = _bottles()
     index = _bottle_index(data)
     known = {k.strip().lower() for k in (data.get("unresolved_suggestions") or {})}
     excluded = {k.strip().lower() for k in (data.get("not_reached_for") or {})}
     assert index, "bottles.yml resolves no names; nothing to check."
-    vocab = _vocab()
-    family_of = vocab.get("family_of") or {}
 
     unresolved, checked = [], 0
     for slug, fm in _load():
         for item in (fm.get("ingredients") or []):
             if not isinstance(item, dict):
-                continue
-            generic = item.get("generic")
-            generics = generic if isinstance(generic, list) else [generic]
-            if not any(family_of.get(g) == "rum" for g in generics):
                 continue
             suggestion = item.get("suggestion")
             for name in (suggestion if isinstance(suggestion, list)
