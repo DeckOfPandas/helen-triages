@@ -136,9 +136,17 @@ proposals:
   # --- QQ: genuinely unclear -------------------------------------------------
   "Fine strain with ice.": "QQ"
 
-  # --- QQ: these are presentation, and belong to #291 rather than here -------
-  # Same shape as the three moved to `to_serve` on 2026-08-26 ("Straw.",
-  # "Stirrer.", "Without ice."), but written as full sentences, so moving them
-  # is a wording decision rather than a relocation.
-  "Serve with a straw.": "QQ"
-  "Serve with two straws.": "QQ"
+  # THE TWO STRAW PROPOSALS ARE GONE, 2026-08-30, #573 -- resolved rather than
+  # rejected. They sat here as QQ because moving them to `to_serve` was "a
+  # wording decision rather than a relocation", and Helen made it: "Serve with
+  # a straw." is now `to_serve: "Straw."` on Mai Tai and Coney Park Swizzle,
+  # and "Serve with two straws." is "Two straws." on Pic-a-de-Crop Punch --
+  # matching the terse noun phrase the three existing values already use.
+  #
+  # Deleting the rows is how this file records that, and
+  # test_every_proposal_still_matches_a_real_step is what forced it: the moment
+  # the last drink stopped saying the string, the proposal went red. That is
+  # the bargain this file strikes working exactly as intended.
+  #
+  # It cannot happen again -- test_no_method_step_restates_to_serve_or_garnish
+  # now refuses a step opening with "Serve" or "Garnish" outright.

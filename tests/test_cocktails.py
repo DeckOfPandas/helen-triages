@@ -1423,6 +1423,63 @@ def _cross_category_scan():
     return checked, bad
 
 
+def test_no_method_step_restates_to_serve_or_garnish():
+    """A step that opens "Serve" or "Garnish" is another field's fact -- #573.
+
+    THE FIELDS ALREADY EXISTED AND THE DRINKS DISAGREED WITH EACH OTHER, which
+    is what #573 means by "we talked about this but it looks like we didn't
+    implement it". Mastiha Mojito said `to_serve: "Straw."`; Mai Tai and Coney
+    Park Swizzle said `Serve with a straw.` as a method step. One fact, two
+    fields, decided per drink by which session last touched it. Don's Own Grog
+    and Man o' War went further and restated their own `garnish:` verbatim.
+
+    THE VERB IS THE TEST, NOT THE WORDS. This deliberately does not fire on a
+    step that merely NAMES a garnish, and the difference is the whole rule:
+
+        "Float the dehydrated lime slice wheel."     an ACTION -- stays
+        "Express lemon zest twist and use as garnish" an ACTION -- stays
+        "Garnish with grated nutmeg."                 a RESTATEMENT -- goes
+
+    HANDOVER 9.4 settles which is which: finishing ACTIONS are method steps
+    ("top with champagne", "squeeze the twist over the drink"), presentation is
+    `to_serve`. An imperative "Garnish with X" instructs you to do the thing the
+    `garnish:` list already states, in the way 9.12 describes for naming the
+    glass inside a strain step -- variance that looks informative and is not.
+
+    Nothing about this is caught by the build. A duplicated garnish renders
+    twice on the page and reads as a page with a redundant last step; a
+    presentation fragment stranded in `method` renders as an instruction and
+    quietly makes `to_serve` look like a field nobody uses, which is how it sat
+    empty on 111 of 114 drinks.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        method = fm.get("method")
+        for step in (method if isinstance(method, list) else [method] if method else []):
+            if not isinstance(step, str):
+                continue
+            checked += 1
+            verb = re.match(r"\s*(serve|garnish)\b", step, re.I)
+            if verb:
+                field = "to_serve" if verb.group(1).lower() == "serve" else "garnish"
+                bad.append(f"{slug}: {step!r} -> {field}")
+    assert not bad, (
+        "Method steps holding another field's fact:\n  " + "\n  ".join(bad)
+        + "\n\nA step OPENING with \"Serve\" is presentation and belongs in "
+          "`to_serve` -- one terse line, as \"Straw.\" and \"Without ice.\" "
+          "already are. A step opening with \"Garnish\" restates `garnish:` "
+          "and should simply go.\n\nA step that DOES something to the garnish "
+          "is fine and is not what this catches -- \"Float the lime wheel\", "
+          "\"Express the zest over the drink\". Lead with the real verb."
+    )
+    assert checked, (
+        "No method steps were scanned at all, so this compared nothing. Every "
+        "drink has a `method`; an empty scan means the loader or the key name "
+        "has moved."
+    )
+
+
 def test_optional_is_a_real_boolean():
     """`optional` marks an ingredient the drink survives without -- #570.
 
