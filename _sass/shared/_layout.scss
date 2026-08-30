@@ -149,13 +149,28 @@ main {
   gap: 1.4rem;
 }
 
-// Centre track. `min-width: 0` so a long wordmark shrinks the track rather than
-// overflowing the grid -- without it an intrinsic-width child can push the
-// outer tracks to zero and then keep going.
+// Centre track. NO `min-width: 0`, and that is the whole of issue #551's
+// second half.
+//
+// It was there on the reasoning that a long wordmark should shrink its track
+// rather than overflow the grid. That is exactly backwards here: `min-width: 0`
+// drops the item's minimum contribution to zero, so the auto track is free to
+// be sized SMALLER than the thing in it -- and `.site-logo` inside is
+// `grid-template-columns: max-content`, which cannot shrink. So the track got
+// squeezed, the wordmark kept its width, and the surplus spilled out of the
+// track and over the nav in column 3. The tape appeared to cover the icons
+// again, for a different reason than the first time.
+//
+// Left at `auto`, the track's minimum is the wordmark's own min-content, so
+// column 3 can only ever begin after the wordmark ends. Overlap is impossible
+// rather than unlikely, which is the point of the three tracks.
+//
+// A wordmark genuinely too wide for the viewport is handled where it should be:
+// `.site-logo-top` carries `max-width: 92vw` as the mobile safety net, and
+// below 600px the header stacks.
 .site-title-link {
   grid-row: 1;
   grid-column: 2;
-  min-width: 0;
 }
 
 // Shared link styling for every item in the nav row -- icons and the "??"
