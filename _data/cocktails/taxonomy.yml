@@ -108,6 +108,20 @@ moods:
     collection has exactly two drinks served hot, which is too thin to be a
     filter. Helen's word, and the right one: "warm spice" describes the
     bottles, "warming" describes what you want.
+  up: >-
+    No ice in the glass. Read straight off `glass:` — coupe, nick and nora,
+    flute, sour, martini.
+    HELEN IS NOT SOLD ON IT, 2026-08-30: "I'm not sold on up. Let's retain it,
+    but with suspicion." Recorded rather than smoothed over, because the case
+    for it is real and unproven: it pairs with `clear` to mean a Martini and
+    with `strong brown drink` to mean a Manhattan, which is a distinction
+    nothing else on the page makes. Whether anyone reaches for it is a
+    different question, and if the answer is no it costs one line here and one
+    in the deriver to remove.
+    BUILT AFTER THE GLASSES AND NOT BEFORE. It is the only mood read entirely
+    from `glass:`, and 15 of 114 drinks named none until #491 closed on
+    2026-08-30 — deriving it earlier would have quietly answered "not up" for
+    all fifteen.
   aperitivo: >-
     The first one, before eating. An amaro or an aromatised wine, and not
     something that would flatten your appetite.
@@ -160,6 +174,34 @@ moods:
     And it made the threshold FIRMER, which is counterintuitive: on markers
     alone, 25 drinks sat one ingredient from flipping in; with both bars, one
     does. Few drinks sit at two edges at once.
+  nightcap: >-
+    The last one. HAND-ASSIGNED.
+  brunch: >-
+    Defensible before noon. HAND-ASSIGNED.
+  sunny terrace: >-
+    Long, cold, and the glass sweats. Helen's name for it, and better than the
+    "in the sun" it replaced: a place you can picture. HAND-ASSIGNED.
+  festive: >-
+    The once-a-year one. HAND-ASSIGNED.
+  signature: >-
+    What she makes without being asked. HAND-ASSIGNED.
+    `signature` AND NOT `Helen signature`, which she also floated: every drink
+    on this site is her judgement already, so putting her name on one tag
+    quietly implies the others are somebody else's.
+  so wrong it's right: >-
+    A drink that has no business working and does. Hers, and the best tag
+    anyone proposed. HAND-ASSIGNED.
+    IT IS NOT `YOLO`, which is the obvious objection. The chaos dial is about
+    RISK -- how likely this is to be bad, read off `meta.ship`. This is about a
+    transgression that pays off, which is a different and much rarer thing: a
+    drink you have never made is chaotic, a Jägerita is wrong and right.
+    `stuff in a glass` WAS PROPOSED ALONGSIDE IT AND DROPPED, and the reasoning
+    is worth keeping because both were good. That was her and Simon's phrase
+    for the kitchen-sink drink -- the 18th Century Cocktail, arrack and cacao
+    and Lillet, a heap that happens to be a respectable classic. Genuinely a
+    different thing from this. But tagging both means deciding, per drink,
+    which flavour of odd it is, and that is the friction that makes a tagging
+    pass tiring. One tag, and it is the one that names a feeling.
   ice ice baby: >-
     Wants a lot of ice -- crushed, swizzled, blended, or a big block. Read
     inverted it is also the "I don't have much ice" constraint, which is the
@@ -371,6 +413,13 @@ mood_ingredients:
     - Grand Marnier
 
   # `warming` -- warm spice, never temperature. See the mood's own note.
+  #
+  # THE TWO HERBAL LIQUEURS ARE HELEN'S ADDITION, 2026-08-30, spotted while
+  # skimming the review table: "Jagermeister, Strega and Becherovka could hint
+  # at warming too." Both are warm-spiced rather than merely herbal --
+  # Jägermeister runs on star anise, cinnamon and ginger, Strega on saffron and
+  # mint over a spiced base. Becherovka is the third and the collection has
+  # none; add it here the day a drink does.
   warming:
     - ginger syrup
     - ginger liqueur
@@ -378,6 +427,8 @@ mood_ingredients:
     - ginger and lemongrass cordial
     - warm-spiced bitters
     - pimento bitters
+    - Jägermeister
+    - Strega
 
   # `aperitivo` -- what an appetite-opening drink is built on. The amari and
   # the aromatised wines; the mood then requires the drink not to be a
@@ -507,15 +558,23 @@ mood_exclude:
       than this." So the INGREDIENT keeps its meaning and this one drink is
       excepted — the narrower fix, and the reason these two hooks exist.
 
-# Served UP — no ice in the glass. Part of `short and sharp`, whose whole shape
-# is a base, a citrus, a sweetener and no ice. Glass names, not generics, so
-# they are checked against glasses.yml rather than the generic vocabulary.
+# Served UP — no ice in the glass. Read by the `up` mood. Glass names, not
+# generics, so they are checked against glasses.yml rather than the generic
+# vocabulary.
+#
+# BOTH SPELLINGS OF MARTINI, and the omission was costing drinks their mood.
+# Two drinks write `martini glass` and one writes `martini`; only the second
+# was listed, so the Porn Star Martini could not be served up. §9.11.1 leaves
+# that pair out of `canonical_glasses` deliberately — Helen has not ruled on
+# which spelling wins — which is exactly why a list that READS glass values has
+# to carry both. The rule governs what is written; this governs what is read.
 mood_up_glasses:
   - coupe
   - nick and nora
   - flute
   - sour
   - martini
+  - martini glass
 
 # Words read from the METHOD steps rather than the ingredients. Same drift risk
 # as the sets above, one field over: a step reworded stops matching and nothing
@@ -577,6 +636,42 @@ mood_step_words:
 # `pudding in a glass` is in `mood` and has zero members, which is deliberate
 # -- see its own note above. The index renders no button for an empty mood, so
 # it is grouped here for completeness rather than for display.
+# =============================================================================
+# MOODS ONLY HELEN ASSIGNS — no rule derives these, and none ever should
+# =============================================================================
+# Every mood above this list is computed from ingredients, method and glass.
+# These are not, because they name an OCCASION or a judgement rather than a
+# property of the liquid, and that is precisely what makes them worth having.
+#
+# HELEN, 2026-08-30, ON A SET OF PROPOSED FLAVOUR TAGS -- `bitter`, `smoky`,
+# `herbal`, `vegetal` -- ALL OF WHICH WERE DROPPED BECAUSE OF THIS:
+#
+#   "they're flat descriptors, which is fine in moderation, whereas I'd hoped
+#    for more evocative moods, you know, something I can offer beyond what one
+#    might guess from the ingredients list."
+#
+# That is the sharper test and it is the one to apply to any future mood: a tag
+# meaning "contains one of these bottles" is a worse copy of the HAS TO HAVE
+# field, which already does exactly that and does it better.
+#
+# WHAT THIS COSTS, AND WHY IT IS WORTH IT. `test_every_drinks_moods_match_the
+# _derivation` exists so stored moods cannot drift from the rules that made
+# them -- that drift is what left 23 drinks unbrowsable. A mood no rule
+# produces would fail it on every drink. So these are named here, the deriver
+# never emits one, and the check preserves whatever a drink already carries for
+# them rather than asking where it came from. The guarantee stays exactly as
+# strong for the moods it applies to.
+#
+# ADDING A NAME HERE IS WHAT MAKES A MOOD HERS. Removing one hands it back to
+# the rules, and needs a rule to hand it back TO.
+moods_by_hand:
+  - nightcap
+  - brunch
+  - sunny terrace
+  - festive
+  - signature
+  - so wrong it's right
+
 mood_groups:
   mood:
     - strong brown drink
@@ -588,6 +683,13 @@ mood_groups:
     - tiki
     - warming
     - aperitivo
+    - up
+    - nightcap
+    - brunch
+    - sunny terrace
+    - festive
+    - signature
+    - so wrong it's right
   hassle:
     - ice ice baby
     - I want to faff

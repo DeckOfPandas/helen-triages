@@ -210,16 +210,20 @@ def derive(drink, sets, up_glasses, step_words, families):
     # `tiki` and `I want to faff` deliberately keep the FULL count below: there
     # the question is complexity, and three dashes of tiki bitters genuinely
     # are another layer to taste.
-    # AND IT IS NOT LENGTHENED OR CHURNED, the same two clauses `strong brown
-    # drink` uses. Dropping the up-glass bar let punches and swizzles in --
-    # Kill Devil Punch, Arrack Punch, both swizzles, the Porn Star Martini with
-    # its champagne on the side. Those were excluded before only as a side
-    # effect of being served in a tall glass, which is the accidental version
-    # of a rule worth stating: a sharp drink is not topped up and not swizzled.
+    # NOT CHURNED, BUT LENGTH IS FINE. Helen, 2026-08-30: "I think a Tom
+    # Collins is sharp, so is Airmail and Green Flash." All three are topped up
+    # -- soda for the Collins, champagne for the other two -- and excluding
+    # them was the last of the "short" smuggling itself back into a mood no
+    # longer called that. Being long does not stop a drink being sharp.
+    #
+    # Blending and swizzling still do, and that is not the same clause wearing
+    # a disguise: those turn a drink into a slushy iced one where the ice is
+    # the point, which is what `ice ice baby` is for. Allowing them too takes
+    # this from 42 of 114 to 51, at which point it stops narrowing anything.
     poured = sum(1 for e in entries
                  if millilitres(e.get("amount", ""), sets["_measures"]) is not None)
     if has("citrus") and has("sweet") and (present & families) and poured <= 5 \
-            and not lengthened and not churned:
+            and not churned:
         out.append("sharp")
 
     if has("fruity"):
@@ -240,6 +244,29 @@ def derive(drink, sets, up_glasses, step_words, families):
     if has("warming"):
         out.append("warming")
 
+    # `up` -- PARKED, NOT DELETED, 2026-08-30. Read straight off the glass, and
+    # possible only because #491 closed: 15 drinks named none until that day.
+    #
+    # IT MEASURES 58 OF 114, WHICH IS 51%, and
+    # test_no_mood_covers_more_than_half_the_collection refuses it -- the guard
+    # that retired food's `one-pot` at 57% and caught `fruity` at 51% before it
+    # was ever written down. Helen said "I'm not sold on up. Let's retain it,
+    # but with suspicion", and the suite reached her conclusion independently
+    # an hour later, which is about as good a reason to believe an instinct as
+    # this repo produces.
+    #
+    # Narrowing it does not help: the coupe alone is 40 drinks, so any version
+    # that excludes the coupe is not `up` any more. Half of what she makes is
+    # served up, which is a true fact about the collection and exactly why the
+    # tag cannot narrow anything.
+    #
+    # The mood stays DECLARED in taxonomy.yml with zero members, which renders
+    # no button (`pudding in a glass` precedent), so reinstating it is
+    # uncommenting these two lines. Hers to call.
+    #
+    # if any(g in up_glasses for g in glasses):
+    #     out.append("up")
+
     # `aperitivo` -- an amaro or an aromatised wine, and not a strong brown
     # drink. That second clause is what keeps a Boulevardier out: same
     # Campari, entirely different moment in the evening.
@@ -259,6 +286,34 @@ def derive(drink, sets, up_glasses, step_words, families):
 
 
 # -----------------------------------------------------------------------------
+def expected_moods(slug, drink, stored, taxonomy, sets, up_glasses,
+                   step_words, families):
+    """What a drink's `mood` should be: derived, corrected, and hers preserved.
+
+    ONE FUNCTION SO THE SCRIPT AND THE TEST CANNOT DISAGREE. They ran the same
+    four steps separately until 2026-08-30, and the copies drifted the first
+    time the derivation gained an input.
+
+    HAND-ASSIGNED MOODS ARE PRESERVED, NEVER DERIVED. `moods_by_hand` in
+    taxonomy.yml names the ones that describe an occasion rather than the
+    liquid -- `nightcap`, `so wrong it's right` -- and no rule produces them.
+    Whatever a drink already carries for those is kept as-is; everything else
+    is recomputed. So the guarantee that stored moods match their rules stays
+    exactly as strong for the moods that HAVE rules, and Helen's own judgement
+    is never argued with or overwritten by a re-run.
+    """
+    by_hand = set(taxonomy.get("moods_by_hand") or [])
+    include = (taxonomy.get("mood_include") or {}).get(slug, {}).get("moods") or []
+    exclude = set((taxonomy.get("mood_exclude") or {}).get(slug, {}).get("moods") or [])
+
+    moods = derive(drink, sets, up_glasses, step_words, families)
+    moods += [m for m in include if m not in moods]
+    moods += [m for m in stored if m in by_hand and m not in moods]
+    moods = [m for m in moods if m not in exclude]
+    # taxonomy.yml's own order, so a diff is about membership, never sequence
+    return [m for m in (taxonomy.get("moods") or {}) if m in moods]
+
+
 def load_sets(taxonomy, vocab):
     """The ingredient sets `derive()` reads, assembled in ONE place.
 
@@ -348,18 +403,9 @@ def main(argv=None):
     for path, text, drink in drinks:
         slug = path.stem
         stored = [str(m) for m in (drink.get("mood") or [])]
-        derived = derive(drink, sets, up_glasses, step_words, families)
-        # HELEN'S CORRECTIONS APPLY ON TOP, never instead: each names the one
-        # mood it is about, so the drink keeps benefiting from every later
-        # improvement to the rules above.
         corrected = slug in include or slug in exclude
-        derived += [m for m in (include.get(slug, {}).get("moods") or [])
-                    if m not in derived]
-        dropped = set(exclude.get(slug, {}).get("moods") or [])
-        derived = [m for m in derived if m not in dropped]
-        # taxonomy.yml's own order, so a diff is about membership and never
-        # about sequence.
-        derived = [m for m in declared if m in derived]
+        derived = expected_moods(slug, drink, stored, taxonomy, sets,
+                                 up_glasses, step_words, families)
         if derived == stored:
             unchanged += 1
             continue

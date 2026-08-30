@@ -1688,11 +1688,11 @@ def test_every_drinks_moods_match_the_derivation():
     bad = []
     for slug, fm in _load():
         stored = [str(m) for m in (fm.get("mood") or [])]
-        derived = deriver.derive(fm, sets, up_glasses, step_words, families)
-        derived += [m for m in (include.get(slug, {}).get("moods") or [])
-                    if m not in derived]
-        dropped = set(exclude.get(slug, {}).get("moods") or [])
-        derived = [m for m in order if m in derived and m not in dropped]
+        # THE SCRIPT'S OWN FUNCTION, not a second copy of its four steps. The
+        # copy that used to live here drifted the moment the derivation gained
+        # an input, and would have drifted again over `moods_by_hand`.
+        derived = deriver.expected_moods(slug, fm, stored, taxonomy, sets,
+                                         up_glasses, step_words, families)
         if derived != stored:
             gained = [m for m in derived if m not in stored]
             lost = [m for m in stored if m not in derived]
