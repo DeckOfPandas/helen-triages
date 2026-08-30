@@ -297,15 +297,35 @@
 // The chip-shaped candidates in the two search pools are NOT touched. Helen:
 // "the search returns could stay as they are." They are a different control --
 // an unbounded list you pick from, not a fixed set you toggle.
+// FOOD'S `.btn-tag` TYPE, WITHOUT ITS SHAPE -- Helen, 2026-08-30: "please try
+// matching the font and style of food's chips for cocktail filter buttons, just
+// not the background shape."
+//
+// So every value below except the background and the band is food's own:
+// $font-headings at 0.75rem, lowercase, weight 700, its resting grey, its
+// padding and its margins. What is left behind is the tape shape -- the thing
+// that made these read as filled boxes.
+//
+// THE ACTIVE STATE IS FOOD'S TOO, and the two halves do different jobs. Food
+// goes uppercase and adds a stroke in the letter's OWN colour, which is a
+// faux-bold: Courier Prime ships only Regular and Bold, so `font-weight` has
+// nowhere left to go above 700 and thickening the glyph is the only way to read
+// heavier (§13.4.2). Uppercase costs no width here because the face is
+// monospaced -- which is exactly why food gets away with it and why #389's rule
+// that a selected filter must not resize itself still holds.
+//
+// 0.05em is food's `$faux-bold-stroke`, restated rather than imported: that
+// variable lives in _sass/food/_palette.scss and cocktails cannot see it.
 %drink-btn-naked {
   font-family: $font-headings;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   text-transform: lowercase;
+  font-weight: 700;
   border: 0;
   background: none;
-  padding: $space-xs 0;
-  margin: 0 $space-lg 0 0;
-  color: $color-clear-text;
+  padding: $space-xs $space-md;
+  margin: 0.2rem 0.45rem 0.2rem 0;
+  color: lighten($color-text, 22%);
   cursor: pointer;
   line-height: 1.3;
 
@@ -317,7 +337,8 @@
   // wearing a simpler version of the heading's own mark is the hierarchy.
   &.is-on {
     color: $color-text;
-    font-weight: 700;
+    text-transform: uppercase;
+    -webkit-text-stroke: 0.05em $color-text;
     box-shadow: inset 0 -0.22em 0 $color-cosmic-cosmopolitan;
   }
 }
@@ -347,13 +368,24 @@
   width: 100%;
   padding: $space-xs 0.1rem;
   border: none;
-  border-bottom: 1.5px solid $color-cosmic-cosmopolitan;
+  // NEUTRAL, NOT THE SECTION'S HUE -- Helen, 2026-08-30: "please update the
+  // border colours of the has to have and I know what I want input fields to
+  // the same neutral grey food's input fields use."
+  //
+  // Derived the way food derives it (`lighten($color-clear-text, 25%)`) rather
+  // than copied as a hex, so it follows this palette's own grey.
+  //
+  // It also stops the box making a claim the page no longer makes. A magenta
+  // underline said "this is HAS TO HAVE's field" while magenta meant that
+  // section; magenta now means MATCHED, everywhere, so an unfilled input
+  // wearing it was announcing a match that had not happened.
+  border-bottom: 1.5px solid lighten($color-clear-text, 25%);
   background: transparent;
   margin-bottom: $space-md;
 
   &:focus {
     outline: none;
-    border-bottom-color: $color-cosmic-cosmopolitan-deep;
+    border-bottom-color: lighten($color-clear-text, 5%);
   }
 }
 
@@ -366,11 +398,10 @@
 // section's is luminous-lagoon -- the same hue the matched run of a drink name
 // is banded in (.drink-name-hit). An underline in magenta under a lagoon
 // heading says the box belongs to the section above it, which it does not.
-.drink-filter--name .drink-search-input {
-  border-bottom-color: $color-luminous-lagoon;
+// The name field had its own lagoon override (#588, so it would stop wearing
+// HAS TO HAVE's magenta). Both are neutral now, so there is nothing to override
+// and the rule is gone rather than restating the value it inherits.
 
-  &:focus { border-bottom-color: $color-luminous-lagoon-deep; }
-}
 
 .drink-pool {
   display: flex;

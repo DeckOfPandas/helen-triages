@@ -3,10 +3,15 @@
      SOURCE AND CREDIT: "Ricons", via the Noun Project. The original carried the
      credit as two <text> nodes INSIDE the artwork, which would have drawn
      "Created by Ricons / from Noun Project" on every card. They are removed
-     from the drawing and recorded here instead. THE LICENCE IS NOT SETTLED —
-     a Noun Project icon is CC BY unless it came with a paid licence, and CC BY
-     needs a visible credit somewhere on a public site. Do not treat this
-     comment as discharging that; it is a note to whoever settles it.
+     from the drawing and recorded here instead.
+
+     THIS ONE NEEDS A VISIBLE CREDIT AND MOST OF THE OTHERS DO NOT. Helen,
+     2026-08-30: most site artwork came from a paid Shutterstock account, which
+     is attribution-free; this is a Noun Project icon, which is CC BY unless
+     separately licensed. She holds the credit text and plans a footer-linked
+     attributions page once the icon set settles, "given icons come in and out".
+     So this comment is the RECORD, not the discharge — the obligation is met
+     when that page exists and names this file.
 
      CANVAS FITTED to the ink by scripts/svgrender.py's fit_viewbox. The source
      box was 110x135 for artwork about 100 tall — the slack was the space the
