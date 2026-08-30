@@ -2557,7 +2557,7 @@ because each was green in isolation**; it took rebuilding the combined state of
 both locally. The new index derives its buckets and tint from `taxonomy.yml`
 instead, which is the enforcement version of this paragraph.
 
-**The index reads DRAFTS, not recipes.** There are 115 cocktail drafts and zero
+**The index reads DRAFTS, not recipes.** There are 114 cocktail drafts and zero
 promoted recipes, so the index before this one looped `site.cocktail_recipes` —
 an empty collection — and had done since it was written.
 
@@ -2599,8 +2599,9 @@ and quiet tone are all still right for what sits there.
 
 **`.cocktail-suggestion` is quieter than the class it follows**, deliberately:
 the class is what the drink REQUIRES, the bottle is what Helen happens to reach
-for, and only 18% of entries carry one. It must not read as though the other 82%
-were missing something.
+for. It must not read as though an entry without one were missing something —
+though that argument has weakened: #544 promoted 61 bottles out of `item` on
+2026-08-30 and coverage went from 18% of entries to 29%.
 
 **`generic`/`suggestion` can be a string or a list**, and Liquid's `for` quietly
 treats a bare string as a one-item sequence — checked against the real `liquid`
@@ -3211,6 +3212,15 @@ retired food's `one-pot` at 57%. Helen had said *"I'm not sold on up, let's
 retain it but with suspicion"* an hour earlier, and **the suite reached her
 conclusion independently**. Narrowing was not available — the coupe alone is 40
 drinks, so any version without it is not `up`. `mood_up_glasses` went with it.
+
+**WHAT THIS COSTS A FUTURE INGEST, and it is the thing most likely to be
+forgotten.** A newly written drink gets its nine derived moods for free and
+**none of the ten that are Helen's**. Nobody will be told: the page renders, the
+suite is green, and the drink is simply missing from half the browse axes.
+`scripts/derive_cocktail_moods.py` is not the whole answer any more — after
+adding drinks, ask her for the hand-assigned ones. The review page built for the
+2026-08-30 pass is the cheap way to do it (a clickable table of every drink
+against every mood); rebuild it rather than asking drink by drink.
 
 **THE RULES UNDER-FIRE, AND THAT IS THE REASSURING HALF.** Across the entire
 pass there were only **four** cases where a rule tagged something she did not.
@@ -4898,7 +4908,7 @@ something the commit message will do for you across that boundary.
 **YOU WILL LOOP A COLLECTION THAT `output: false` DID NOT EMPTY.** `output:
 false` stops Jekyll *writing* a document. It does **not** remove it from
 `site.<collection>`. So a template that loops `site.cocktail_drafts`
-unconditionally prints 115 private drink names into public HTML and links them
+unconditionally prints every private drink name into public HTML and links them
 at URLs that were never written — and every test passes, because the links are
 "valid" and nothing is checking the index for things that should not be on it.
 This is issue #235, and it has now been available to happen twice.
