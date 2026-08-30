@@ -135,6 +135,295 @@ moods:
     answer to "something on fire" is a good answer, not a failed filter.
 
 # =============================================================================
+# WHAT THE DEFINITIONS ABOVE MEAN IN INGREDIENTS — the derivation's vocabulary
+# =============================================================================
+# Every mood above states a rule. These are the ingredient sets those rules
+# read, and `scripts/derive_cocktail_moods.py` is the only thing that reads
+# them.
+#
+# THEY LIVED IN A SCRIPT UNTIL 2026-08-30 AND THAT IS WHY THEY WENT WRONG.
+# Moods were derived once, on 2026-08-17 (`d2c76dc` in the drafts repo), from
+# nine hardcoded sets of generic names inside `ingest_from_csv.py`. The
+# vocabulary then moved underneath them and nothing could see it:
+#
+#   #335 finished typing every generic — the derivation's own commit message
+#        says "17 carry none, mostly blocked by untyped ingredients"
+#   #314 reclassified the rums and moved `blackstrap` from generic to CHARACTER
+#   #561 renamed ten generics, including every rum and both gins
+#   #568 added five aromatised-wine generics
+#        `sloe gin` split out; the Chartreuses took their French names
+#
+# **34 of the sets' strings named nothing at all** when this was measured.
+# Nine of `_AGED`'s 29 — every rum and every whisky in it — so `strong brown
+# drink` could no longer fire on a rum. Five of `_CLEAR`'s 17. Five of
+# `_TIKI`'s 13. Nine of `_LOUD`'s 23, including both Chartreuses.
+#
+# A SET INTERSECTION AGAINST A RENAMED STRING RETURNS EMPTY. It does not raise,
+# it does not warn, and the derivation had already been run and its output
+# frozen into 114 files — so the drift was invisible from both ends. This is
+# §9.12's bargain stated from the other side: duplicate live data only
+# alongside the test that keeps the duplicate honest. There was no test,
+# because the duplicate was in a private repo's script.
+#
+# So the sets are data now, and `test_every_mood_ingredient_is_declared`
+# requires every member to be a declared generic or a declared character.
+# A rename cannot silently empty one again.
+#
+# MATCHED AGAINST GENERICS **AND** CHARACTERS. `blackstrap` is a
+# `rum_characters` value since #314, not a generic — it appears here in `tiki`
+# and `loud` and would match nothing if only generics were read. That is one of
+# the 34.
+mood_ingredients:
+
+  # Aged and/or bitter-amaro. Used by `strong brown drink`, which also needs
+  # 60% of the volume to be a base spirit and more aged than clear.
+  aged:
+    - moderately aged Jamaican rum
+    - caramel-forward Jamaican rum
+    - aged Demerara rum
+    - moderately aged rum
+    - rhum agricole vieux
+    - bourbon
+    - rye
+    - blended scotch whisky
+    - single malt scotch whisky
+    - Irish whiskey
+    - Japanese whisky
+    - cognac
+    - armagnac
+    - calvados
+    - reposado tequila
+    - añejo tequila
+    - sweet vermouth
+    - tawny port
+    - amontillado sherry
+    - Campari
+    - Aperol
+    - Cynar
+    - fernet
+    - Amaro Nonino
+    - Amaro Ciociano
+    - Bénédictine
+    - demerara syrup
+    - molasses sugar
+    - raw sugar
+
+  # Transparent. Not the opposite of `aged` — a drink can be neither.
+  clear:
+    - lightly aged and filtered rum
+    - clear blended multi-region rum
+    - London dry gin
+    - Plymouth
+    - New Western dry
+    - navy strength gin
+    - vodka
+    - blanco tequila
+    - cachaça
+    - clairin
+    - rhum agricole blanc
+    - dry vermouth
+    - blanc vermouth
+    - maraschino liqueur
+    - triple sec
+    - prosecco
+    - champagne
+
+  # Tiki MARKERS. Two or more, plus complexity, makes a drink tiki.
+  tiki:
+    - orgeat
+    - falernum
+    - passion fruit syrup
+    - cinnamon syrup
+    - pineapple juice
+    - grenadine
+    - pineapple rum
+    - coconut rum
+    - blackstrap          # a rum CHARACTER, not a generic — #314
+    - overproof Demerara rum
+    - unaged overproof Jamaican rum
+    - passion fruit
+    - pineapple
+
+  # The sour component. NOT counted as fruit — see `fruity` above.
+  citrus:
+    - lime juice
+    - lemon juice
+    - grapefruit juice
+    - orange juice
+
+  # Non-citrus fruit.
+  fruity:
+    - pineapple juice
+    - cranberry juice
+    - apple juice
+    - passion fruit
+    - pineapple
+    - raspberries
+    - blackberries
+    - pear
+    - fruit purée
+    - passion fruit syrup
+    - crème de mûre
+    - crème de cassis
+    - crème de pêche
+    - crème de banane
+    - apricot liqueur
+    - cherry liqueur
+    - passion fruit liqueur
+    - dried apricots
+
+  # Pudding FLAVOURS. Deliberately excludes crème de violette (floral — it
+  # wrongly pulled in the Aviation) and the fruit liqueurs, which are `fruity`.
+  pudding_flavour:
+    - coffee liqueur
+    - crème de cacao
+    - amaretto
+    - crème de banane
+    - crème de menthe
+    - coconut cream
+    - coconut rum
+    - vanilla syrup
+    - espresso
+    - cola
+    - chocolate bitters
+
+  # Rich BODY, not sweetness — `pudding in a glass`. Zero members in the
+  # collection on purpose; see #337 and the mood's own note above.
+  rich:
+    - coconut cream
+    - cream
+    - milk
+    - whole egg
+
+  sweet:
+    - sugar syrup 1:1
+    - sugar syrup 2:1
+    - demerara syrup
+    - honey
+    - honey water 1:1
+    - honey water 2:1
+    - orgeat
+    - falernum
+    - grenadine
+    - agave syrup
+    - white sugar
+    - raw sugar
+    - molasses sugar
+    - sugar cube
+    - palm sugar
+    - vanilla syrup
+    - cinnamon syrup
+    - ginger syrup
+    - triple sec
+    - orange Curaçao
+    - maraschino liqueur
+    - Grand Marnier
+
+  # LOUD: ingredients carrying a whole flavour layer alone. Helen's insight,
+  # and the thing that rescues `tiki` from being a headcount — "Better and
+  # Better is a tiki drink. Only three ingredients, but they're bonkers."
+  loud:
+    - overproof Demerara rum
+    - unaged overproof Jamaican rum
+    - blended overproof rum
+    - blackstrap          # a rum CHARACTER, not a generic — #314
+    - Campari
+    - Cynar
+    - fernet
+    - Aperol
+    - Amaro Nonino
+    - Amaro Ciociano
+    - falernum
+    - absinthe
+    - Chartreuse Verte
+    - Chartreuse Jaune
+    - Bénédictine
+    - caramel-forward Jamaican rum
+    - pimento bitters
+    - tiki bitters
+    - mastiha liqueur
+    - gentian liqueur
+    - Jägermeister
+    - Strega
+    - liqueur de sapin
+
+# --- Helen's corrections, which beat the derivation --------------------------
+# DERIVATION IS A STARTING POINT, NOT THE AUTHORITY. A drink she thinks is tiki
+# is tiki whatever the ingredient count says.
+#
+# TWO NARROW HOOKS RATHER THAN ONE BLUNT ONE, and the reasoning is the original
+# derivation's own: replacing a drink's whole mood list would FREEZE it against
+# every later improvement to the rules, so a correction names the one mood it
+# is about and leaves the rest derived. That mattered immediately — every drink
+# below still gained moods from the 2026-08-30 re-derivation while keeping its
+# correction.
+#
+# Ported here from `MOOD_INCLUDE`/`MOOD_EXCLUDE` in the drafts repo's
+# `ingest_from_csv.py`, where they were invisible to this repo entirely.
+mood_include:
+  sazerac:
+    moods: [strong brown drink]
+    why: >-
+      The archetype of the mood, and it derives at 44% base spirit because its
+      60 ml of chilled water belongs to the absinthe rinse and is thrown away
+      at method step 4. The volume rule cannot see a discard without parsing
+      the method, so this is recorded rather than fixed — see the mood's own
+      note above. Any rinse-and-discard drink will need the same.
+
+# THE SWIZZLE'S `tiki` CORRECTION DIED WITH THE DRINK AND IS NOT REPLACED HERE,
+# because reinstating it would be deciding something that is Helen's.
+#
+# `MOOD_INCLUDE = {"Swizzle": ["tiki"]}` existed because she said that drink was
+# tiki. On 2026-08-30 the Swizzle became the **Martinique Swizzle** (`b42939b`)
+# and the correction stayed behind, naming a drink that no longer exists —
+# caught by `test_every_mood_correction_is_reachable_and_needed` on its first
+# run, which is the whole reason that test is here.
+#
+# THE SUCCESSOR DERIVES NO `tiki` AND IT IS NOT OBVIOUS THAT IT SHOULD.
+# Martinique Swizzle is agricole blanc, lemon, sugar syrup, absinthe and
+# Angostura: **zero** tiki markers, where the rule wants two. But its `source`
+# reads "Don the Beachcomber via Beachbum Berry", which is about as tiki a
+# provenance as exists. So either the drink is not tiki after all, or the marker
+# list is missing something a swizzle has — and that is a ruling, not a guess.
+# Add it back here if she says tiki; leave it if she does not.
+
+mood_exclude:
+  blue-hawaiian:
+    moods: [pudding in a glass]
+    why: >-
+      It has coconut cream, which is genuinely on the rich list. Helen,
+      2026-08-17: "I'm not certain there will be zero puddings with coconut
+      cream, so don't take it off the dessert list until it's failed us more
+      than this." So the INGREDIENT keeps its meaning and this one drink is
+      excepted — the narrower fix, and the reason these two hooks exist.
+
+# Served UP — no ice in the glass. Part of `short and sharp`, whose whole shape
+# is a base, a citrus, a sweetener and no ice. Glass names, not generics, so
+# they are checked against glasses.yml rather than the generic vocabulary.
+mood_up_glasses:
+  - coupe
+  - nick and nora
+  - flute
+  - sour
+  - martini
+
+# Words read from the METHOD steps rather than the ingredients. Same drift risk
+# as the sets above, one field over: a step reworded stops matching and nothing
+# says so. Matched case-insensitively as substrings, so `swizzle` catches
+# "swizzling" and `dehydrat` catches both spellings.
+mood_step_words:
+  # Two or more of these makes `I want to faff` (or nine-plus ingredients).
+  faff:
+    [muddle, alight, flame, shell, blend, swizzle, churn, rinse,
+     dehydrat, infus, steep, clarif]
+  # Any one makes `ice ice baby`.
+  ice:
+    ["crushed ice", swizzle, churn, blend, "large ice", "ice block",
+     "block of ice"]
+  # Any one makes `on fire`.
+  fire: [alight, flame, burn]
+
+# =============================================================================
 # APPETITE FOR CHAOS — how much risk you want tonight
 # =============================================================================
 # Helen's own axis, and the one she actually starts from with company. Built

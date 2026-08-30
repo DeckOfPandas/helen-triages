@@ -1063,6 +1063,22 @@ other:
   - "egg white"
   - "salt"
   - "cider vinegar"
+  # THE THREE BELOW HAVE NO DRINK, ON PURPOSE, and they are declared for the
+  # reason this file already declares Plymouth, New Western dry and genever
+  # while owning none of them: it is a SPEC, not an inventory.
+  #
+  # They are what `pudding in a glass` is made of -- taxonomy.yml's
+  # `mood_ingredients.rich` -- and that mood is likewise declared with zero
+  # members, pending the whole flips-and-Alexanders family in #337. Until
+  # 2026-08-30 the derivation named all three and the vocabulary declared none,
+  # so the mood could not have fired even once a drink arrived, and nothing
+  # anywhere would have said why.
+  #
+  # `egg white` above is a different ingredient and not a substitute: it does
+  # FOAM, not richness, which is why the Gin Sour is not a pudding.
+  - "cream"
+  - "milk"
+  - "whole egg"
 
 # =============================================================================
 # GENERIC -> FAMILY. Bases only.

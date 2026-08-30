@@ -31,6 +31,7 @@ WHOLE_COLLECTION_ONLY.
 from __future__ import annotations
 
 import re
+import sys
 import unicodedata
 from pathlib import Path
 
@@ -202,6 +203,9 @@ WHOLE_COLLECTION_ONLY = {
     "test_the_cross_category_check_is_exercised",
     "test_the_syrup_ratio_check_is_exercised",
     "test_the_amount_table_is_exercised",
+    # A correction whose drink is merely ABSENT looks exactly like one whose
+    # drink is gone -- see _require_whole_collection.
+    "test_every_mood_correction_is_reachable_and_needed",
 }
 
 
@@ -1629,6 +1633,214 @@ def test_no_ingredient_stores_a_millilitre_figure():
           "_data/cocktails/ingredients.yml. If an amount cannot be read, that "
           "is a missing unit to declare or a genuine QQ, not a reason to write "
           "the number down a second time."
+    )
+
+
+def test_every_drinks_moods_match_the_derivation():
+    """Stored moods equal what taxonomy.yml's own rules produce -- #452.
+
+    MOODS ARE STORED RATHER THAN COMPUTED AT RENDER, so that Helen can
+    override one -- and the cost of storing them is that they can go stale
+    against the rules while looking perfectly fine. They did, comprehensively.
+    Derived once on 2026-08-17 and frozen into 114 files; by 2026-08-30 the
+    derivation's ingredient sets held 34 strings naming nothing, 24 drinks
+    disagreed with the rules, and **23 drinks had no mood at all** -- including
+    `naked-and-famous`, which Helen rates `oh gods yes`, and
+    `martinique-swizzle`, which was carrying `fruity` and `tiki` inherited from
+    the drink it replaced despite containing no fruit and no tiki marker.
+
+    A DRINK WITH NO MOOD IS INVISIBLE TO BOTH QUESTIONS THE INDEX ASKS. It can
+    be reached by ingredient or by name and by nothing else, and the index --
+    which is a browsing tool first -- gives no sign it is there. Nothing failed,
+    because nothing compared the stored value to the rule that produced it.
+
+    HELEN'S CORRECTIONS ARE PART OF THE EXPECTED VALUE, not an exemption from
+    it: `mood_include` and `mood_exclude` in taxonomy.yml each name the single
+    mood they are about, so a corrected drink still tracks every later
+    improvement to the rules. The Sazerac keeps `strong brown drink` (its
+    discarded rinse water drags the volume rule to 44%) and still gained
+    nothing wrongly.
+
+    RE-RUN, DO NOT HAND-EDIT: `python3 scripts/derive_cocktail_moods.py`
+    reports the difference and `--write` applies it. If the derivation is
+    wrong about a drink, that is a rule to fix in taxonomy.yml or a correction
+    to record there -- never a mood typed into a file where the next run will
+    silently revert it.
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import derive_cocktail_moods as deriver
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/derive_cocktail_moods.py not importable")
+
+    taxonomy = _taxonomy()
+    vocab = _vocab()
+    sets = dict(taxonomy.get("mood_ingredients") or {})
+    assert sets, "`mood_ingredients` is missing; nothing to derive from."
+    sets["_measures"] = vocab.get("measures") or {}
+    up_glasses = set(taxonomy.get("mood_up_glasses") or [])
+    step_words = taxonomy.get("mood_step_words") or {}
+    families = set(vocab.get("family_of") or {})
+    include = taxonomy.get("mood_include") or {}
+    exclude = taxonomy.get("mood_exclude") or {}
+    order = list(taxonomy.get("moods") or {})
+
+    bad = []
+    for slug, fm in _load():
+        stored = [str(m) for m in (fm.get("mood") or [])]
+        derived = deriver.derive(fm, sets, up_glasses, step_words, families)
+        derived += [m for m in (include.get(slug, {}).get("moods") or [])
+                    if m not in derived]
+        dropped = set(exclude.get(slug, {}).get("moods") or [])
+        derived = [m for m in order if m in derived and m not in dropped]
+        if derived != stored:
+            gained = [m for m in derived if m not in stored]
+            lost = [m for m in stored if m not in derived]
+            bad.append(f"{slug}: stored {stored}"
+                       + (f", derivation adds {gained}" if gained else "")
+                       + (f", derivation drops {lost}" if lost else ""))
+    assert not bad, (
+        "Stored moods disagree with taxonomy.yml's own rules:\n  "
+        + "\n  ".join(bad)
+        + "\n\nRun `python3 scripts/derive_cocktail_moods.py` to see the "
+          "difference and `--write` to apply it. Do NOT hand-edit a `mood:` "
+          "block -- the next run reverts it silently. If the derivation is "
+          "wrong about a drink, fix the rule in `mood_ingredients` or record "
+          "the correction in `mood_include`/`mood_exclude`, both in "
+          "taxonomy.yml, so the reason survives."
+    )
+
+
+def test_every_mood_correction_is_reachable_and_needed():
+    """A correction names a real drink and still changes something -- #452.
+
+    A CORRECTION THAT SILENTLY DOES NOTHING is the failure this repo has met
+    before: `EXTRA_NOTES["Sazerac"]` was written, the ingest ran cleanly, and
+    the note never appeared because that drink was in SKIP. Nothing complained.
+
+    Two ways one dies here. It can name a drink that no longer exists, in
+    which case it is inert. Or the rules can improve until the drink derives
+    the mood on its own -- and then the correction reads as load-bearing while
+    doing nothing, which is worse, because the next reader trusts it. The
+    Swizzle's entry says exactly that of itself: it was expected to become
+    unnecessary once #335 typed its rums.
+
+    Same bargain `methods.yml`'s proposals strike, and the reason it is
+    WHOLE_COLLECTION_ONLY: on a partial corpus a correction whose drink is
+    merely absent looks identical to one whose drink is gone.
+    """
+    _require_whole_collection("the mood corrections")
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import derive_cocktail_moods as deriver
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/derive_cocktail_moods.py not importable")
+
+    taxonomy = _taxonomy()
+    vocab = _vocab()
+    sets = dict(taxonomy.get("mood_ingredients") or {})
+    sets["_measures"] = vocab.get("measures") or {}
+    up_glasses = set(taxonomy.get("mood_up_glasses") or [])
+    step_words = taxonomy.get("mood_step_words") or {}
+    families = set(vocab.get("family_of") or {})
+    drinks = dict(_load())
+
+    bad = []
+    for kind, entries in (("mood_include", taxonomy.get("mood_include") or {}),
+                          ("mood_exclude", taxonomy.get("mood_exclude") or {})):
+        for slug, entry in entries.items():
+            if slug not in drinks:
+                bad.append(f"{kind}.{slug}: names no drink in the collection")
+                continue
+            if not str(entry.get("why", "")).strip():
+                bad.append(f"{kind}.{slug}: has no `why`")
+            derived = deriver.derive(drinks[slug], sets, up_glasses,
+                                     step_words, families)
+            for mood in (entry.get("moods") or []):
+                if mood not in (taxonomy.get("moods") or {}):
+                    bad.append(f"{kind}.{slug}: {mood!r} is not a declared mood")
+                elif kind == "mood_include" and mood in derived:
+                    bad.append(
+                        f"mood_include.{slug}: {mood!r} is derived anyway now "
+                        "-- the rules caught up, so this entry does nothing "
+                        "and should go")
+                elif kind == "mood_exclude" and mood not in derived:
+                    bad.append(
+                        f"mood_exclude.{slug}: {mood!r} is not derived anyway "
+                        "-- nothing to remove, so this entry does nothing")
+    assert not bad, (
+        "Mood correction(s) that do not do what they claim:\n  "
+        + "\n  ".join(bad)
+        + "\n\nA spent correction reads as outstanding work and as a live "
+          "reason. Delete the entry, or fix what it names."
+    )
+
+
+def test_every_mood_ingredient_is_declared():
+    """The mood derivation's ingredient sets name real vocabulary -- #452.
+
+    THIS IS THE TEST WHOSE ABSENCE COST THE MOODS. Moods were derived once, on
+    2026-08-17, from nine hardcoded sets of generic names inside the drafts
+    repo's `ingest_from_csv.py`, and the output was frozen into 114 files. The
+    vocabulary then moved: #335 finished typing every generic, #314
+    reclassified the rums and moved `blackstrap` from a generic to a character,
+    #561 renamed ten generics including every rum and both gins, #568 added
+    five, the Chartreuses took their French names.
+
+    **34 of those strings named nothing at all** by the time anyone looked --
+    nine of `aged`'s 29, which is every rum and every whisky in it, so `strong
+    brown drink` could no longer fire on a rum; five of `clear`'s 17; five of
+    `tiki`'s 13; nine of `loud`'s 23.
+
+    A SET INTERSECTION AGAINST A RENAMED STRING RETURNS EMPTY. It does not
+    raise and it does not warn, and the derivation had already run, so the
+    drift was invisible from both ends at once. §9.12's bargain, from the other
+    side: duplicate live data only alongside the test that keeps the duplicate
+    honest. The duplicate was in a private repo's script, so there was no test
+    and could not have been one.
+
+    GENERICS **OR** CHARACTERS, because `blackstrap` is legitimately a
+    `rum_characters` value and appears in two sets. Reading generics alone was
+    one of the 34.
+    """
+    vocab = _vocab()
+    sets = _taxonomy().get("mood_ingredients") or {}
+    assert sets, (
+        "`mood_ingredients` is missing from taxonomy.yml. It is the "
+        "derivation's whole vocabulary; without it "
+        "scripts/derive_cocktail_moods.py derives nothing and this check "
+        "compares nothing."
+    )
+    allowed = set(_declared_generics(vocab))
+    for key, value in vocab.items():
+        if _is_character_list(key) and isinstance(value, list):
+            allowed |= set(value)
+
+    bad = []
+    for name, members in sorted(sets.items()):
+        for m in members:
+            if m not in allowed:
+                bad.append(f"mood_ingredients.{name}: {m!r}")
+    assert not bad, (
+        "Mood ingredient(s) naming no declared generic or character:\n  "
+        + "\n  ".join(bad)
+        + "\n\nEvery member must be a real value from ingredients.yml. A "
+          "string that names nothing does not fail at derivation time -- the "
+          "set intersection simply comes back empty and the mood silently "
+          "stops firing, which is exactly how `strong brown drink` stopped "
+          "reaching any rum. If a generic was renamed, follow it here; the "
+          "`retired_*` maps in ingredients.yml record every successor."
+    )
+
+    glasses = _taxonomy().get("mood_up_glasses") or []
+    assert glasses, "`mood_up_glasses` is empty; `short and sharp` needs it."
+    icons = (_glasses().get("icons") or {})
+    unknown = sorted(g for g in glasses if g not in icons)
+    assert not unknown, (
+        "`mood_up_glasses` names glass(es) glasses.yml has never heard of:\n  "
+        + "\n  ".join(unknown)
+        + "\n\nSame failure as above one field over: an unmatched glass name "
+          "silently narrows `short and sharp` rather than erroring."
     )
 
 
