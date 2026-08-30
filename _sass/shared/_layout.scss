@@ -768,14 +768,24 @@ $tape-protrusion: 0.2rem;
     gap: $space-lg;
   }
 
+  // EXPLICIT ROWS, RELEASING THE ONES THE WIDE LAYOUT PINS. Both items carry
+  // `grid-row: 1` up there, so that the nav (which comes first in the markup,
+  // for tab order) does not push the wordmark into a second row under sparse
+  // auto-placement. Left in place here they land in the SAME CELL -- one
+  // column, one row -- and draw on top of each other, which is exactly what it
+  // looked like: the icons behind the tape.
+  //
+  // `order` went with the fix rather than being kept beside it. It only ever
+  // reordered auto-placed items, and these are placed; naming the row says the
+  // same thing once instead of twice.
   .site-title-link {
+    grid-row: 1;
     grid-column: 1;
-    order: 1;
   }
 
   .site-nav-icons {
+    grid-row: 2;
     grid-column: 1;
-    order: 2;
     justify-self: center;
     // Both margins reset. The bottom one lined the row up with the tape's ink
     // when it sat BESIDE the wordmark; the right one held it off the page edge
