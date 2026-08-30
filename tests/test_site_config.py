@@ -1539,6 +1539,69 @@ def test_no_selector_declares_the_same_property_twice():
 
 # --- the print stylesheet keeps pointing at real markup ----------------------
 
+def test_a_print_partial_declares_nothing_outside_media_print():
+    """A rule in a `_print.scss` that forgets `@media print` styles the SCREEN.
+
+    GitHub issue #538. `_sass/cocktails/_print.scss` was added for #482, to make
+    a drink page print its full editorial state rather than whichever state the
+    `make it` toggle happened to be left in. Its rules were written without the
+    wrapper, so they compiled to top level:
+
+        .cocktail.is-making .cocktail-tagline { display: revert; }
+        .btn-make { display: none; }
+
+    On screen that would have PERMANENTLY BROKEN THE TOGGLE IT EXISTS TO
+    OVERRIDE -- `make it` would stop hiding anything, and the button itself
+    would be invisible. The build succeeded, the site rendered, and nothing in
+    the suite noticed. It was caught by reading _site/assets/css/cocktails.css
+    and seeing the rules sitting after the `@media print` block rather than
+    inside it.
+
+    THE TWO HALVES ARE BOTH SILENT AND ONLY ONE WAS COVERED.
+    test_print_rules_target_classes_that_exist below is "a print rule that
+    matches nothing"; this is "a print rule that matches everything, all the
+    time". Neither is visible in review and neither has a console.
+
+    The file being NAMED `_print.scss` is a strong enough declaration of intent
+    to assert against, which is what makes this checkable at all -- there is no
+    way to tell a stray print rule from an ordinary one in a general partial.
+
+    Scoped to top-level BLOCKS on purpose. A print partial may legitimately
+    hold variables, an `@import`, or comments; what it may not hold is a rule
+    that emits declarations to every medium.
+    """
+    partials = [p for p in sass_files() if p.name.startswith("_print")]
+    assert partials, (
+        "No _print*.scss partials found under _sass/. There are three "
+        "(shared, food, cocktails), so finding none means this scan went stale "
+        "and would pass while checking nothing (HANDOVER 12)."
+    )
+
+    offenders = []
+    for path in partials:
+        depth = 0
+        for i, raw in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+            code = raw.split("//")[0]
+            if depth == 0 and "{" in code:
+                head = code.split("{")[0].strip()
+                if not (head.startswith("@media") and "print" in head):
+                    # All three are called _print.scss, so the parent directory
+                    # is the half that says which one.
+                    offenders.append(f"{path.parent.name}/{path.name}:{i} {head}")
+            depth += code.count("{") - code.count("}")
+
+    assert not offenders, (
+        "Top-level block(s) in a print partial that are not `@media print`:\n  "
+        + "\n  ".join(offenders)
+        + "\n\nThese compile to top level and apply ON SCREEN, which is issue "
+          "#538: cocktails' print rules did exactly this and would have "
+          "permanently disabled the `make it` toggle they were written to "
+          "override. Wrap them in `@media print { … }`. If a rule genuinely "
+          "belongs on screen, it belongs in a partial that is not named "
+          "_print.scss."
+    )
+
+
 def _print_block_classes() -> list[tuple[str, str]]:
     """(file, class) for every class named inside an `@media print` block."""
     out = []
