@@ -1632,6 +1632,54 @@ def test_no_ingredient_stores_a_millilitre_figure():
     )
 
 
+def test_source_names_a_source_and_source_url_holds_the_url():
+    """`source` is who, `source_url` is where -- #454. A SHAPE rule only.
+
+    NOTHING HERE ASKS FOR COVERAGE, and that is the whole design. 86 of 114
+    drinks have `source: ""` and Helen's ruling on 2026-08-30 is that this is
+    fine: "I sort of don't care about this. You can't copyright facts, and I am
+    taking no prose from anywhere. Some will be attributable to a big-name
+    inventor, bar or maybe hotel, and it's nice to note that, but I'm not going
+    to sweat it."
+
+    That is the right call and it is a real difference from food, not laziness.
+    `SOURCE_ATTRIBUTION_SPEC.md` and the eight `source_type` values exist
+    because a food recipe is ADAPTED PROSE and the promotion gate is about
+    copyright. A cocktail is a formula plus a build -- quantities and steps --
+    so there is nothing to attribute in that sense, and importing that
+    apparatus would be the encyclopaedia-of-drinks busywork #459 rules out.
+
+    WHAT IS STILL WRONG RATHER THAN ABSENT is one field being used as the
+    other. `witches-daiquiri` carried a raw Difford's URL in `source` with
+    `source_url` empty -- so the drink page printed a URL where it prints a
+    name, and the URL field it has sat unused beside it. One instance, fixed;
+    this stops the next, because the shape of a mistake is what recurs and an
+    empty field is not a mistake at all.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        if "source" not in fm:
+            continue
+        checked += 1
+        source = fm.get("source")
+        if not isinstance(source, str):
+            bad.append(f"{slug}: source is a {type(source).__name__}")
+            continue
+        if re.match(r"\s*(https?://|www\.)", source):
+            bad.append(f"{slug}: source holds a URL -- {source[:60]!r}")
+    assert not bad, (
+        "`source` is misused:\n  " + "\n  ".join(bad)
+        + "\n\n`source` names WHO -- a person, a bar, a book, a site by name "
+          "(\"Difford's\"). `source_url` holds the link. An empty `source` is "
+          "fine and always will be; a URL in it is not."
+    )
+    assert checked, (
+        "No drink declares `source` at all, so this compared nothing -- every "
+        "drink carried the key when this was written."
+    )
+
+
 def test_no_drink_uses_a_generic_that_is_helens_to_apply():
     """A style listed in `hers_to_apply` may not be inferred onto a drink -- #542.
 
