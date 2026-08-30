@@ -31,6 +31,24 @@
   }
 }
 
+// TWO PER ROW IS A CLAIM ABOUT A WIDE SCREEN, and it stops being true on a
+// phone. Found by test_a_multi_track_row_can_become_one (issue #468) rather
+// than by anyone looking: at a 360px viewport, two 1fr tracks and a
+// $spacing-block-gap leave each note about 142px, which is roughly eighteen
+// characters of prose per line inside a box that also has its own padding.
+//
+// The reasoning above survives intact -- a set of thin horizontal stripes is
+// what stacking looks like when there is room for two abreast, and there is
+// not. .notes--single already drops to one column for the commonest case; this
+// is the same drop for the same reason, decided by width instead of by count.
+//
+// 600px is the site's existing breakpoint, not a new one.
+@media (max-width: 600px) {
+  .notes {
+    grid-template-columns: 1fr;
+  }
+}
+
 // --- Note (singular: one box) -------------------------------------------------
 // Was a flat neutral mix (mix($color-border, $color-surface, 35%)), left that
 // way pending a proper answer — see DEV_JOBS_v24.md §1.8. Now shares the
