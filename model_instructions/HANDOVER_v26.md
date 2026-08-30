@@ -87,6 +87,20 @@ pytest              # content and structure checks
 .node-runtime/node/bin/node --test     # tests/js/*.test.js — no arguments, not system node
 ```
 
+**`.node-runtime/` DOES NOT COME WITH A WORKTREE**, and neither does
+`.gh-runtime/`. They are gitignored, exactly like the two drafts repos (§9.1),
+so the line above is "No such file or directory" in a worktree and reads as a
+broken checkout. Use the system `node` there — `node --test tests/js/*.test.js`
+runs the whole suite. Cost time on 2026-08-29; §9.1 tells you to clone the
+drafts and says nothing about the runtimes.
+
+**NEVER RUN TWO `pytest` SESSIONS AT ONCE.** `test_rendered_pages.py` writes two
+throwaway recipes into `_food_recipes/` (`zzz-gate-no-flag`, `zzz-gate-old-key`)
+to prove the publish gate fails closed, and deletes them after. A concurrent run
+collects them as real recipes and reports **14 failures that look like genuine
+schema breakage** and vanish on a clean rerun. The tell is `zzz-gate-` in the
+parametrised test IDs.
+
 Local URL: `http://localhost:4001/helen-triages/`, then `/food/` or `/cocktails/`.
 
 **`jekyll serve` does not reload `_config.yml`.** Config is read once at
@@ -397,7 +411,15 @@ from here.
 | `assets/js/filter-state.js` | What the index's filter state IS, and serialising it | `tests/js/filter-state.test.js` |
 | `assets/js/cook-schedule.js` | The timings arithmetic | `tests/js/cook-schedule.test.js` |
 | `assets/js/back-link.js` | Whether the back arrow may use history (§13.7) | `tests/js/back-link.test.js` |
+| `assets/js/cocktail-search.js` | The drinks index's pool, ranking and matching (§9.3.3) | `tests/js/cocktail-search.test.js` |
 | `assets/js/filters.js` | DOM wiring for all of the above | Not directly tested; exercised by hand |
+| `assets/js/cocktail-index.js` | DOM wiring, drinks index | Not directly tested |
+
+**`filter-state.js` HOLDS TWO TABLES, NOT ONE, since #579.** `create(spec)`
+binds the mechanism to a spec; `FOOD_FIELDS` and `COCKTAIL_FIELDS` are the two,
+and the food-shaped exports are that binding over the first, so `filters.js` is
+untouched by the parameterisation. `orderByBand` in `ingredient-search.js` is
+shared the same way — the ordering discipline, not the bands.
 
 **`back-link.js` is the clearest argument for this split in the repo**, and it
 earned the place within an hour of being written. Its whole content is one
@@ -2044,11 +2066,79 @@ Helen, 2026-08-21: multi-value only when both bottles can actually be named
 and a reason given for each — "I don't know which" stays a plain `QQ`, it
 does not become a two-item guess.
 
+**FIVE VOCABULARY RULINGS FROM 2026-08-30, all Helen's, all recorded because
+the chartreuse one below proves what happens otherwise.**
+
+- **`Chartreuse Verte` / `Chartreuse Jaune`**, not green/yellow. She and an
+  earlier session had agreed this and it was **written down nowhere** — not in
+  the data, the handover, or either repo's history, all four checked. So it was
+  decided, never applied, and had no way of surviving the session it happened
+  in. That is §11.2 in its purest form and the reason the other four are here.
+- **`sloe gin` is its own generic**, split out of `gin liqueur`. That name had
+  the identical fault `flavoured` was retired for — "covered everything from
+  sloe to rhubarb to cucumber" — and unlike `speciality` it carried no
+  `character` to say which. Both its members were sloe. **No guard could catch
+  it**: every value involved was declared and valid. Helen found it looking at a
+  card.
+- **Five aromatised-wine generics** (#568): the three vermouths, `quinquina`,
+  `americano`. Helen: *"I would never write 'aromatised wine' as a cocktail
+  ingredient or generic, because it suggests some equivalence between the types
+  where none or very little exists."* The roll-up is a FAMILY and already
+  exists as `fortified`, so nothing needed building. `americano` was the only
+  addition and was overdue — `quinquina`'s own comment covered Cocchi Americano
+  too.
+- **`Punt e Mes` stays a generic**, proposed for retirement and saved by the
+  data: The Ridgwell pours 12.5 ml of it AND 12.5 ml of Martini Rosso. Collapse
+  them and that drink asks for 25 ml of one thing. **The retirement was proposed
+  on a bad measurement of mine** — a scan matching generics containing
+  "vermouth"/"sherry"/"quinquina", and this one contains none of those words.
+- **`pastis` retired**, and as a CONSEQUENCE rather than a judgement about
+  pastis: its stated reason was the Swizzle's "6 drops of Pernod or absinthe",
+  and that drink became the Martinique Swizzle the same day. Re-declare it when
+  a drink wants one.
+
+**"Pernod" NAMES TWO BOTTLES** — Absinthe at 68% and Anise at 40%, which is the
+pastis. That ambiguity misled twice in two days: once as a note on Don's Mai Tai
+claiming a substitution, once as a declaration derived from the generic beside
+it. Helen pours the absinthe, so there was never a substitution. **Write the
+product, not the house.**
+
 ### 9.3.2 The bottle dictionary — `_data/cocktails/bottles.yml`, #529
 
-**A third string per rum, after the generic and the card name: which BOTTLE,
-and what category it is.** Added 2026-08-27. Thirty-odd bottles, each with one
-generic and its alias spellings.
+**A third string per ingredient, after the generic and the card name: which
+BOTTLE, and what category it is.** Added 2026-08-27, and each bottle has one
+generic plus its alias spellings.
+
+**IT STOPPED BEING RUM-ONLY ON 2026-08-30 AND SO DID THE TWO TESTS THAT MADE IT
+WORTH HAVING**, which is the more important half. `test_every_suggested_bottle_resolves`
+and `_cross_category_scan` both skipped any ingredient whose generic was not in
+the rum family — so of the collection's 91 distinct suggestions, **54 resolved to
+nothing and no test minded**. Beefeater, Cointreau, Tanqueray, Luxardo, Suze,
+Punt e Mes: all invisible. Helen: *"are we now assuming every named bottle
+should be in it, and classified? That feels right to me."* Today: 57 resolve, 34
+are declared debt in `unresolved_suggestions`, none is unchecked.
+
+**A SUGGESTION'S BOTTLE NEED NOT BE IN THE INGREDIENT'S CATEGORY, and that is
+the feature.** Helen: *"a recipe might call for cherry brandy, and I suggest
+Cherry Heering OR Briottet cerise even though that's a cherry liqueur not a
+brandy, leaving it to future Helen to choose what kind of drink I want at the
+time."* #534 requires a note when it happens, and `QQ` counts — the substitution
+must be VISIBLE, not explained.
+
+**DO NOT DERIVE A BOTTLE'S CATEGORY FROM THE INGREDIENT IT SITS BESIDE.** It is
+a good default and it is not a rule, and the 2026-08-30 session declared 43
+bottles that way before Helen stopped it: *"keep only what the collection
+already spells out; hand me back the rest."* One was outright wrong (`Pernod`
+declared an absinthe), and the failure mode is the one #542 warns about — a
+plausible declaration teaches #534's check a false fact and blinds it to the
+substitution it exists to catch. Nine more were fragments completed from memory:
+the collection wrote `Portobello`, `Luxardo`, `Bob's`, and a full product name
+was supplied that appears nowhere in the data.
+
+**A BRAND IS NOT A BOTTLE.** `Briottet` sits beside six different generics and
+`Monin` beside four, so those strings name a house and the drink names the
+product. Helen: *"Briottet creme de peche is the bottle, that's its name."* They
+stay in `unresolved_suggestions` until the drink says which.
 
 **Why this is allowed when #441 rejected a bottle table.** That issue killed a
 shared table for `character`, because character is why THIS DRINK wants THIS
@@ -2137,6 +2227,73 @@ earlier session note claimed. Blackwell was going to bring cobra-effect and
 georgetown-punch into it; Helen dropped both suggestions instead ("I never use
 Blackwell there"). The style has bottles — Blackwell, Myers — and no user, and
 **it is hers to apply**: never retype a drink into it from item text.
+
+### 9.3.3 The drinks index's search — three modules, and what each ruling was
+
+**#579, 2026-08-29/30.** `cocktail-index.js` was 428 lines that reused nothing
+from the food index and hand-rolled vocabulary derivation, ranked matching and
+filter state. It is DOM wiring now and nothing else.
+
+| | |
+|---|---|
+| `assets/js/cocktail-search.js` | pool, ranking, families, the two matching rules. Pure. `tests/js/cocktail-search.test.js` |
+| `assets/js/filter-state.js` | `COCKTAIL_FIELDS` — one mechanism, two tables, food's untouched |
+| `assets/js/ingredient-search.js` | `fold`, `getWords`, `orderByBand` — shared |
+
+**What is shared is the DISCIPLINE, not the bands.** `orderByBand` takes a band
+function: food has three bands, cocktails four. Read its own comment before
+merging anything else — the predicates are answered in different vocabularies
+and were never the same question.
+
+**FUZZY TO FIND, FUZZY TO INCLUDE, EXACT-OR-DECLARED-FAMILY TO EXCLUDE.** Food's
+rule, adopted here, and the asymmetry is the cost of being wrong in each
+direction: over-including shows you a drink and the card says why; over-excluding
+hides one and you never learn it existed. Before this, BOTH directions were a
+substring test against the joined attribute — `gin` hid twelve drinks whose only
+gin-shaped ingredient was ginger, `apple juice` matched fifteen with PINEapple.
+
+**FOUR BANDS, IN HELEN'S ORDER.** *"It should be prefix matching of first word,
+prefix matching of any word, then prefix matching of any word in the bottle name,
+then substring."* Visible beats hidden at equal strength; any real word beats a
+substring. Band 3 exists only because a bottle stopped being its own chip.
+
+**A CHIP MUST BE ABLE TO EXPLAIN ITSELF**, and this took three passes. Helen:
+*"'el' returns both 'aged rum' and 'jamaican rum', which is counterintuitive."*
+Neither label contains "el" — it was mid-word inside "moderat(el)y" and
+"caram(el)-forward". Banning band 3 on hidden terms was not enough: sweeping all
+676 two-letter queries still found 25 chips that could not explain themselves,
+band 2 on a CONNECTOR (`an` → `Smith & Cross`, via "Smith AND Cross"). **The
+sweep is the technique worth keeping** — it is only possible because the module
+is pure, and twice the obvious fix was not the whole fix.
+
+**ONE CHIP PER CATEGORY, WEARING THE CARD'S NAME.** Fifteen generics also had
+their card name in the pool as a chip of its own and eleven of those pairs
+selected identical drinks. The generic stays searchable; only the button goes.
+The three declared collisions collapse with it — one `sugar syrup` chip covering
+both ratios, which is §9.10.1's "a ratio is a MAKING fact" arriving in the picker.
+
+**A BOTTLE IS A WAY IN TO ITS CATEGORY, NOT A CHIP BESIDE IT.** Measured before
+deciding: 14 of the 15 bottle/category pairs are strictly nested, so the two
+chips were never alternatives. Typing "velvet" or "portobello" returns
+`falernum` and `gin`. **This needs the pool built PER INGREDIENT** — a
+suggestion belongs to the generic written beside it and the card-level
+`data-ingredients` has flattened that away, so `data-ing` is the only attribute
+that still knows.
+
+**PROSE IS NOT A BOTTLE NAME**, and it is a rule rather than a list because
+Helen met four one at a time. `search.prose_words` / `prose_marks`, measured
+against all 87 suggestions before being trusted: flags 17, catches no bottle
+name. `and` is deliberately absent — `Wray and Nephew` is one bottle.
+
+**`family_aliases` and `family_labels`.** A family nobody spells that way is a
+family nobody can reach: `whiskey` found nothing while the family held bourbon
+and rye. The button always carries the canonical name, and `whisky` is labelled
+`whisk(e)y` — Helen: *"even though it's clunky, to avoid ever having to split or
+claim they combine."*
+
+**`not_on_cards`** keeps bare `water` off a card and out of the search (#580).
+Exact matches only: `honey water` and `soda water` are real choosing facts.
+
 
 ### 9.4 Decided 2026-08-16 — do not re-litigate
 
@@ -2503,11 +2660,15 @@ per-option fallback there is no half fact left to print.
 
 **The search pool dropped `item` too — #558.** It is `generic + card name +
 suggestion`, built at build time. 380 terms → 239; typing "li" offers 23 options
-instead of 63. The remaining excess is that suggestions go in raw rather than
-resolved through `bottles.yml`'s aliases, so `Havana 3` and `Havana Club 3` can
-both appear. **This was never a search bug**: Helen's nine "light…" options were
-nine `item` strings for what is mostly one rum, which is #544 seen from the
+instead of 63. **This was never a search bug**: Helen's nine "light…" options
+were nine `item` strings for what is mostly one rum, which is #544 seen from the
 other end.
+
+**The alias gap this paragraph used to describe is CLOSED, 2026-08-30.** It read
+"suggestions go in raw rather than resolved through `bottles.yml`'s aliases, so
+`Havana 3` and `Havana Club 3` can both appear" — the search reads that file
+now, so they collapse. 240 pool terms → 142, because a bottle is no longer
+offered a chip at all when its category is; see §9.3.3.
 
 **Two declared collapses that lose information ON PURPOSE**: both syrup ratios
 read `sugar syrup` on a card, both honey ratios read `honey water`. Helen: "On
@@ -2880,6 +3041,12 @@ reposado is amber-brown and hue 26 is Aperol almost exactly — and it is Helen'
 name and her call, recorded so the next reader knows it was noticed.
 
 #### The index — `cocktails/index.html`, `_filters.scss`, `assets/js/cocktail-index.js`
+
+**`cocktail-index.js` IS DOM WIRING ONLY SINCE #579** — the pool, the ranking
+and the matching rules are `assets/js/cocktail-search.js`, and the filter state
+is `COCKTAIL_FIELDS` in `filter-state.js`. See §9.3.3 before changing any
+behaviour described below; several of the sentences here predate that split and
+describe where a rule USED to live.
 
 **FIVE NAMED QUESTIONS, in the order Helen asks them** — restructured
 2026-08-29 and this is the current shape:
