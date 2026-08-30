@@ -300,6 +300,19 @@ $index-label-gap:   $space-md;   // a label to its own buttons
   // `:not(:empty)` rather than hiding the empty pool with `display: none`,
   // because the pool carries aria-live and a region announces more reliably if
   // it stays in the tree rather than appearing at the moment it is filled.
+  //
+  // THIS IS THE ONLY PLACE THE POOL'S TOP MARGIN IS SET, and it has to be --
+  // issue #589. `_search.scss` also declared `margin-top: $space-lg` on
+  // `.search-results`, unconditionally, which meant this rule never removed
+  // any space: a `:not(:empty)` override can only ADD to the base it sits on,
+  // so an empty pool kept the larger 1rem while a full one got this 0.75rem.
+  // The pool was 4px taller with nothing in it than with something in it, and
+  // clicking a LEAVE OUT candidate -- which empties the pool -- dropped the
+  // chosen pill 4px below the chip that had just been clicked.
+  //
+  // So: if this ever needs a second declaration, the second one has to carry
+  // the same condition. `test_an_empty_search_results_pool_reserves_no_space`
+  // is what says so mechanically.
   &.search {
     gap: 0;
 

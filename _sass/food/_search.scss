@@ -108,8 +108,22 @@
     margin-left: $space-md;
   }
 
+  // NO margin-top HERE. It is set once, in _category-labels.scss, gated on
+  // `:not(:empty)` -- see that rule's own comment for why the gap belongs to
+  // the pool's CONTENT rather than to the pool.
+  //
+  // This rule declared `margin-top: $space-lg` unconditionally until issue
+  // #589, and that is what made the conditional one a no-op in the only
+  // direction it was written for. A `:not(:empty)` rule can only ever ADD to
+  // its unconditional base, never take space away -- so an empty pool kept
+  // 1rem while a full one got 0.75rem, and the pool was 4px TALLER with
+  // nothing in it. Clicking a LEAVE OUT candidate empties the pool
+  // (toggleExcluded) at the same moment the chosen pill appears below it, so
+  // the pill landed 4px lower than the chip that had just been clicked: Helen,
+  // "if I click a chip, it then jumps downwards by a few pixels".
+  //
+  // Guarded by test_an_empty_search_results_pool_reserves_no_space.
   .search-results {
-    margin-top: $space-lg;
     min-height: 0;
     width: 100%;
     display: flex;
