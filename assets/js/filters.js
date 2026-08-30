@@ -88,10 +88,9 @@ document.addEventListener('DOMContentLoaded', function () {
   var nameSearchBox = document.getElementById('name-search-box');
   var nameSearchClear = document.getElementById('name-search-clear');
 
-  // The dislike navigator (GitHub issue #52) -- see food/index.html's own
-  // comment on the section for why it starts hidden.
-  var excludeReveal = document.getElementById('exclude-reveal');
-  var excludePanel = document.getElementById('exclude-panel');
+  // The dislike navigator (GitHub issue #52). It is a plain section beside HAS
+  // TO HAVE now, always visible -- #exclude-reveal and #exclude-panel went with
+  // issue #586, and with them this module's only piece of disclosure state.
   var excludeBox = document.getElementById('exclude-search-box');
   var excludeClear = document.getElementById('exclude-search-clear');
   var excludePool = document.getElementById('exclude-results-pool');
@@ -739,46 +738,19 @@ function renderResultsPool() {
     update();
   }
 
-  // #exclude-dismiss follows #exclude-search-clear's own idiom -- visibility,
-  // not display, so its space is reserved beside the reveal button rather
-  // than the row jumping width the instant the panel opens (see
-  // #ingredient-search-box's comment in _search.scss for why that mattered
-  // enough to fix once already).
-  /* ONE CONTROL, WHOSE LABEL REPORTS THE STATE. There was a second button, a
-     "x hide" beside this one, until Helen's 2026-08-16 pass: "remove the hide
-     link -- when the section is shown, update the link text". Two controls for
-     one binary meant one of them was always the wrong thing to look at, and
-     the closed state offered a dismiss for a panel that was not there.
+  /* THE DISCLOSURE IS GONE -- issue #586, and what it took with it is the
+     interesting part. This module used to own a reveal button, two label
+     strings ("(I know what I don't want)" / "(hide leave out)"), an
+     aria-expanded attribute, a `hidden` attribute on the panel, and a focus
+     hand-off on open. Six moving parts, all of them bookkeeping for a piece of
+     state that was deliberately NOT filter state -- so clear-all had to know to
+     leave it alone, and #exclude-active had to live outside the panel so
+     chosen pills survived a dismiss.
 
-     The label is the disclosure's own state, which is also why aria-expanded
-     is not doing this work alone: a sighted reader gets the same information
-     the attribute gives a screen reader, from the same element. */
-  /* BOTH STATES WEAR THEIR BRACKETS -- GitHub issue #275. The open label has
-     read "(hide leave out)" since the two-controls-into-one pass, so the closed
-     one was the odd state out: the same control changed punctuation as well as
-     words as you toggled it, which made the brackets look like they meant
-     something rather than being the control's own costume. The server-rendered
-     copy in food/index.html carries them too, so the button does not visibly
-     re-punctuate itself the first time filters.js touches it. */
-  var EXCLUDE_LABEL_CLOSED = "(I know what I don't want)";
-  var EXCLUDE_LABEL_OPEN = '(hide leave out)';
-
-  function setExcludeRevealed(open) {
-    if (!excludeReveal || !excludePanel) return;
-    excludeReveal.setAttribute('aria-expanded', open ? 'true' : 'false');
-    excludePanel.hidden = !open;
-    excludeReveal.textContent = open ? EXCLUDE_LABEL_OPEN : EXCLUDE_LABEL_CLOSED;
-  }
-
-  if (excludeReveal && excludePanel) {
-    excludeReveal.addEventListener('click', function () {
-      setExcludeRevealed(excludeReveal.getAttribute('aria-expanded') !== 'true');
-      // Focus follows the disclosure, so a keyboard user lands in the box
-      // they just asked for rather than tabbing back through the panel.
-      if (excludePanel.hidden === false && excludeBox) excludeBox.focus();
-    });
-  }
-
+     None of that is here now, because the section is simply visible. Helen's
+     ruling was that pairing LEAVE OUT with HAS TO HAVE frames it better than
+     hiding it did, and the framing was the only thing the disclosure was
+     buying. */
 
   if (excludeBox) {
     excludeBox.addEventListener('input', renderExcludePool);
@@ -1113,9 +1085,8 @@ function renderResultsPool() {
          buttons wear .btn-tag for their appearance, so without this they would
          fall into the tag branch immediately below and toggle a MOOD tag
          called "peas" -- which does not exist, so the visible result would be
-         a button that does nothing at all. The reveal button and the section's
-         own inline clear have their own listeners; this just declines to
-         second-guess them. */
+         a button that does nothing at all. The section's own inline clear has
+         its own listener; this just declines to second-guess it. */
       if (target.closest && target.closest('.search--exclude')) {
         if (target.classList.contains('btn-exclude')) toggleExcluded(target.dataset.exclude);
         return;
@@ -1249,8 +1220,11 @@ function renderResultsPool() {
       // Set, and update() repaints the "leaving out" list from it. These three
       // are the exclude picker's half-typed SEARCH, the same loose ends the
       // ingredient box's own box/pool/clear are being tidied for two lines up.
-      // The panel is deliberately left open: revealing it was a decision about
-      // what this session is doing, not a filter.
+      // There is no panel to leave open any more (issue #586). The reasoning
+      // that used to sit here -- that revealing it was a decision about what
+      // this session is doing rather than a filter, so clear-all must not undo
+      // it -- is the reasoning the disclosure needed and the plain section
+      // does not.
       if (excludeBox) excludeBox.value = '';
       if (excludePool) excludePool.innerHTML = '';
       if (excludeClear) excludeClear.style.visibility = 'hidden';

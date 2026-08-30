@@ -17,6 +17,7 @@ permalink: /food/
   {% assign ingredients_data = site.data.food.filter_sections.ingredients %}
   {% assign tag_groups = site.data.food.filter_sections.tag_groups %}
   {% assign name_search_data = site.data.food.filter_sections.name_search %}
+  {% assign exclude_data = site.data.food.filter_sections.exclude %}
 
   {% comment %} DRAFTS JOIN THE LIST ONLY IF THEY ACTUALLY PUBLISH. `site.food_drafts`
      is populated whenever the collection is DECLARED, which _config.yml does
@@ -92,135 +93,107 @@ permalink: /food/
     %}
   {% endfor %}
 
-  <div class="category search search--ingredients">
-    <div class="search-input">
-      <label class="category-label" for="ingredient-search-box">
-        <span class="category-label-text">{{ ingredients_data.label }}</span>
-      </label>
-      <input type="text" id="ingredient-search-box" autocomplete="off" placeholder="ingredient name..." />
-      {% comment %} visibility, not display: none -- the button's own space
-         stays reserved in the row from the start, so the input doesn't
-         suddenly lose width the instant this appears. See its rule in
-         _sass/food/_layout.scss for the fuller story. {% endcomment %}
-      <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="visibility: hidden;">&times; clear</button>
-    </div>
-    {% comment %} Populated by filters.js as you type; aria-live announces the
-       change so it is not a silent update. {% endcomment %}
-    <div class="category-buttons search-results" id="ingredient-results-pool" aria-live="polite"></div>
-  </div>
+  {% comment %} HAS TO HAVE AND LEAVE OUT ARE ONE QUESTION, ASKED ON ONE LINE --
+     GitHub issue #586, and it is the shape cocktails' index already has (its
+     `.drink-searches`, HANDOVER 9.13). Helen: "has to have then leave out on
+     the same line".
 
-  <div class="category search search--name">
-    <div class="search-input">
-      {% comment %} THE HEADING AND THE REVEAL LINK ARE ONE STACK -- GitHub issue
-         #275, "centered under I KNOW WHAT I WANT".
+     They are two halves of "what is in it", answered in opposite directions,
+     and reading them as one row is what says so. Stacked, LEAVE OUT read as a
+     sixth filter category that happened to be about ingredients; beside its
+     own opposite it reads as the other half of a pair.
 
-         The link used to live below, inside .search--exclude with the panel it
-         opens. Centring it under the heading from there is not something CSS
-         can express: "centre B under A" needs A and B in one sizing context,
-         and the heading sits inside .search-input while the link sat a level
-         deeper in a different wrapper.
-
-         Putting them in ONE grid was tried first and is instructive. The
-         panel and the active list are in that same wrapper, so they joined
-         the grid too, spanning every column -- and a spanning item still
-         contributes to an intrinsic track's size, so the LEAVE OUT panel
-         decided the width of the column the heading was meant to define. The
-         heading's column came out ~116px wider than the heading, and the
-         search input beside it moved right by the same amount.
-
-         So the stack holds ONLY the two things being centred on each other.
-         .name-heading-stack is the wordmark's own mechanism (HANDOVER 13.8):
-         one max-content column, both rows in it, the column as wide as the
-         wider of the two, the narrower centred. Nothing else can inflate it.
-
-         The button stays wired to the panel by aria-controls, which is
-         id-based and does not care that they are no longer siblings. {% endcomment %}
-      <div class="name-heading-stack">
-        <label class="category-label" for="name-search-box">
-          <span class="category-label-text">{{ name_search_data.label }}</span>
+     The pair is a real wrapper rather than a rule on the two sections, because
+     the GAP has to belong to something: .category carries its own
+     $index-section-gap top and bottom, and grid items do not collapse margins
+     the way the block-flow siblings did, so leaving them on would have doubled
+     the space above and below this row. The wrapper owns it now and its
+     children have theirs zeroed -- one value, in _search.scss. {% endcomment %}
+  <div class="search-pair">
+    <div class="category search search--ingredients">
+      <div class="search-input">
+        <label class="category-label" for="ingredient-search-box">
+          <span class="category-label-text">{{ ingredients_data.label }}</span>
         </label>
-        <div class="exclude-reveal-row">
-          <button type="button" class="btn-reveal" id="exclude-reveal" aria-expanded="false" aria-controls="exclude-panel">(I know what I don't want)</button>
-        </div>
+        <input type="text" id="ingredient-search-box" autocomplete="off" placeholder="ingredient name..." />
+        {% comment %} visibility, not display: none -- the button's own space
+           stays reserved in the row from the start, so the input doesn't
+           suddenly lose width the instant this appears. See its rule in
+           _sass/food/_layout.scss for the fuller story. {% endcomment %}
+        <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="visibility: hidden;">&times; clear</button>
       </div>
-      <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
-      <button type="button" class="btn-clear-inline" id="name-search-clear" style="visibility: hidden;">&times; clear</button>
+      {% comment %} Populated by filters.js as you type; aria-live announces the
+         change so it is not a silent update. {% endcomment %}
+      <div class="category-buttons search-results" id="ingredient-results-pool" aria-live="polite"></div>
     </div>
 
     {% comment %} THE DISLIKE NAVIGATOR -- GitHub issue #52. "I have invited
        someone for dinner and they hate peas, so I want to see all recipes that
        do NOT contain peas as an ingredient."
 
-       PROGRESSIVE DISCLOSURE. It starts closed because most sessions never
-       need it, and because revealing it deliberately is what frames this as a
-       dislike navigator rather than a sixth filter everyone has to consider
-       on the way past.
+       NO LONGER BEHIND A REVEAL, and the reasoning that put it there is worth
+       recording rather than silently dropping. It opened closed on the
+       progressive-disclosure argument: most sessions never need it, and
+       revealing it deliberately framed it as a dislike navigator rather than a
+       sixth filter everyone has to consider on the way past. Helen's ruling on
+       #586 is that the pairing does that framing better than the hiding did --
+       beside HAS TO HAVE it is visibly the other half of one question, so it
+       needs no door to explain what it is. "'leave out' always visible, so
+       delete the show/hide button."
 
-       A CHILD OF .search--name, NOT A SIBLING .category, since Helen's
-       2026-08-16 pass on the shipped filter: "closer to I KNOW WHAT I WANT",
-       centred under it. A sibling .category picks up
-       $index-section-gap (the gap BETWEEN sections) from the shared .category
-       rule in _category-labels.scss, which is exactly the wrong amount of
-       distance for something that is meant to read as attached to the search
-       above it rather than as a sixth filter category of its own -- so it
-       moved inside .search--name's own box instead, where the existing
-       .category { gap: $index-label-gap } already spaces it correctly, and
-       .search--exclude's own centred row in _search.scss does the rest.
+       So `#exclude-reveal`, `.exclude-reveal-row`, `.name-heading-stack` and
+       `.exclude-panel` are all gone, along with filters.js's open/closed label
+       strings and its aria-expanded bookkeeping. Nothing replaced them: there
+       is no state to keep, which is the point.
 
-       A REAL <button>, not a span with a click handler. It toggles a region in
-       place -- a control, not a destination -- and
-       test_clear_controls_are_buttons exists because a span-with-a-handler
-       shipped here once and was unreachable by keyboard. aria-expanded is kept
-       in step by filters.js; the panel uses the `hidden` attribute rather than
-       display:none in CSS, so while it is closed its input and buttons are out
-       of the tab order too, and reachable in the ordinary way the moment it
-       opens. That only became TRUE on 2026-08-16: .exclude-panel's own
-       `display: flex` had been overriding the UA's [hidden] rule, so the panel
-       shipped permanently open whatever aria-expanded said. See the
-       .exclude-panel[hidden] rule in _sass/food/_search.scss.
+       ITS HEADING COMES FROM filter_sections.yml NOW. It was the one section
+       with its label written into this template, because the reveal button WAS
+       the heading and splitting that copy across two files would have been
+       worse. With an ordinary heading it belongs with the other five.
 
-       ONE CONTROL, NOT TWO. A separate "x hide" button sat beside this one
-       until Helen's second pass: "remove the hide link -- when the section is
-       shown, update the link text to (hide leave out)". Two controls for one
-       binary meant one was always the wrong thing to look at, and the closed
-       state offered a dismiss for a panel that wasn't there. The button's own
-       label is the state now; filters.js owns both strings.
-
-       CLOSING KEEPS THE EXCLUSIONS. Disclosure is not filter state (the
-       existing "clear all" comment lower in filters.js already establishes
-       this for the panel's open/closed state; the dismiss button is the same
-       call applied to the same state). #exclude-active therefore lives
-       OUTSIDE #exclude-panel, as this section's own third child -- not gated
-       by the panel's `hidden` -- so the "leaving out ..." pills and the
-       hiding-N-recipes count stay visible and still clickable with the panel
-       shut, rather than an active filter going dark with no way to see or
-       lift it short of reopening the whole picker.
-
-       No label of its own from _data/food/filter_sections.yml: the reveal
-       button IS this section's heading, and inventing a `label:` there would
-       put half the section's copy in one file and half in another.
-    {% endcomment %}
-    <div class="search--exclude">
-
-      <div class="exclude-panel" id="exclude-panel" hidden>
-        <div class="search-input">
-          <label class="category-label" for="exclude-search-box">
-            <span class="category-label-text">LEAVE OUT</span>
-          </label>
-          <input type="text" id="exclude-search-box" autocomplete="off" placeholder="ingredient name..." />
-          <button type="button" class="btn-clear-inline" id="exclude-search-clear" style="visibility: hidden;">&times; clear</button>
-        </div>
-        {% comment %} Populated by filters.js as you type, from the DERIVED
-           vocabulary (every data-all-ingredients entry on the page), not from
-           main_ingredients -- see the data-all-ingredients comment on the rows
-           below. Fuzzy on purpose: typing "pea" offering peas, peanut butter
-           and pearl barley is correct, because you then pick the one you
-           meant, and what gets picked is matched as a whole entry rather than
-           as a substring. {% endcomment %}
-        <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
+       #exclude-active USED TO LIVE OUTSIDE THE PANEL ON PURPOSE, so the chosen
+       pills survived the panel being dismissed. There is no panel and no
+       dismiss, so that reason is spent -- the pills sit under the pool because
+       that is where the answers to this question go. {% endcomment %}
+    <div class="category search search--exclude">
+      <div class="search-input">
+        <label class="category-label" for="exclude-search-box">
+          <span class="category-label-text">{{ exclude_data.label }}</span>
+        </label>
+        <input type="text" id="exclude-search-box" autocomplete="off" placeholder="ingredient name..." />
+        <button type="button" class="btn-clear-inline" id="exclude-search-clear" style="visibility: hidden;">&times; clear</button>
       </div>
+      {% comment %} Populated by filters.js as you type, from the DERIVED
+         vocabulary (every data-all-ingredients entry on the page), not from
+         main_ingredients -- see the data-all-ingredients comment on the rows
+         below. Fuzzy on purpose: typing "pea" offering peas, peanut butter
+         and pearl barley is correct, because you then pick the one you
+         meant, and what gets picked is matched as a whole entry rather than
+         as a substring. {% endcomment %}
+      <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
 
       <div class="exclude-active" id="exclude-active" aria-live="polite"></div>
+    </div>
+  </div>
+
+  {% comment %} 5. THE ESCAPE HATCH, and it is last for the same reason
+     cocktails' is (HANDOVER 9.13): if you already know what you want, none of
+     the above is for you, but a name box at the TOP invites treating the page
+     as a search box, which is not what it is for.
+
+     IT USED TO CARRY THE LEAVE OUT REVEAL as a second row under its heading,
+     centred on it with .name-heading-stack -- the wordmark's max-content grid
+     trick (HANDOVER 13.8). Both are gone with issue #586: the picker they
+     opened is now a section of its own, beside HAS TO HAVE, so there is
+     nothing left to reveal and nothing left to centre. This section is back to
+     being one label and one input, like the rest. {% endcomment %}
+  <div class="category search search--name">
+    <div class="search-input">
+      <label class="category-label" for="name-search-box">
+        <span class="category-label-text">{{ name_search_data.label }}</span>
+      </label>
+      <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
+      <button type="button" class="btn-clear-inline" id="name-search-clear" style="visibility: hidden;">&times; clear</button>
     </div>
   </div>
 

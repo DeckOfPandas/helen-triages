@@ -37,6 +37,17 @@ ingredients:
   # of the complaint.
   label: "HAS TO HAVE"
 
+# LEAVE OUT was the one section whose heading was NOT in this file, and the
+# reason was real at the time: the reveal button "(I know what I don't want)"
+# WAS the section's heading, so inventing a `label:` here would have put half
+# the section's copy in one file and half in another.
+#
+# Issue #586 deleted the reveal button -- the picker is always visible now, on
+# one line with HAS TO HAVE -- so the section has an ordinary heading like
+# every other, and it belongs here like every other.
+exclude:
+  label: "LEAVE OUT"
+
 tag_groups:
   - name: mood
     label: "MOOD"
