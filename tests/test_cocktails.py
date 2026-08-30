@@ -1678,7 +1678,6 @@ def test_every_drinks_moods_match_the_derivation():
     assert taxonomy.get("mood_ingredients"), (
         "`mood_ingredients` is missing; nothing to derive from.")
     sets = deriver.load_sets(taxonomy, vocab)
-    up_glasses = set(taxonomy.get("mood_up_glasses") or [])
     step_words = taxonomy.get("mood_step_words") or {}
     families = set(vocab.get("family_of") or {})
     include = taxonomy.get("mood_include") or {}
@@ -1692,7 +1691,7 @@ def test_every_drinks_moods_match_the_derivation():
         # copy that used to live here drifted the moment the derivation gained
         # an input, and would have drifted again over `moods_by_hand`.
         derived = deriver.expected_moods(slug, fm, stored, taxonomy, sets,
-                                         up_glasses, step_words, families)
+                                         step_words, families)
         if derived != stored:
             gained = [m for m in derived if m not in stored]
             lost = [m for m in stored if m not in derived]
@@ -1739,7 +1738,6 @@ def test_every_mood_correction_is_reachable_and_needed():
     taxonomy = _taxonomy()
     vocab = _vocab()
     sets = deriver.load_sets(taxonomy, vocab)
-    up_glasses = set(taxonomy.get("mood_up_glasses") or [])
     step_words = taxonomy.get("mood_step_words") or {}
     families = set(vocab.get("family_of") or {})
     drinks = dict(_load())
@@ -1753,8 +1751,7 @@ def test_every_mood_correction_is_reachable_and_needed():
                 continue
             if not str(entry.get("why", "")).strip():
                 bad.append(f"{kind}.{slug}: has no `why`")
-            derived = deriver.derive(drinks[slug], sets, up_glasses,
-                                     step_words, families)
+            derived = deriver.derive(drinks[slug], sets, step_words, families)
             for mood in (entry.get("moods") or []):
                 if mood not in (taxonomy.get("moods") or {}):
                     bad.append(f"{kind}.{slug}: {mood!r} is not a declared mood")
@@ -1831,16 +1828,11 @@ def test_every_mood_ingredient_is_declared():
           "`retired_*` maps in ingredients.yml record every successor."
     )
 
-    glasses = _taxonomy().get("mood_up_glasses") or []
-    assert glasses, "`mood_up_glasses` is empty."
-    icons = (_glasses().get("icons") or {})
-    unknown = sorted(g for g in glasses if g not in icons)
-    assert not unknown, (
-        "`mood_up_glasses` names glass(es) glasses.yml has never heard of:\n  "
-        + "\n  ".join(unknown)
-        + "\n\nSame failure as above one field over: an unmatched glass name "
-          "silently narrows whatever reads it rather than erroring."
-    )
+    # `mood_up_glasses` USED TO BE CHECKED HERE and went with the `up` mood on
+    # 2026-08-30 -- see the deriver for why that mood lost. It was the only
+    # glass-valued list the moods read; if another appears, check it against
+    # glasses.yml the way this did, because an unmatched glass name narrows a
+    # mood silently rather than erroring.
 
 
 def test_source_names_a_source_and_source_url_holds_the_url():

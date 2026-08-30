@@ -3148,7 +3148,7 @@ describe where a rule USED to live.
 | | | |
 |---|---|---|
 | 1 | **YOLO?** | `no chaos please` / `I'm open to chaos` |
-| 2 | **Mood** | what the drink IS — fifteen buttons since 2026-08-30 |
+| 2 | **Mood** | what the drink IS — fourteen buttons since 2026-08-30 |
 | 3 | **Hassle** | four buttons: what it COSTS |
 | 4 | **Has to have** / **Leave out** | typed, with candidate pools |
 | 5 | **I know what I want** | drink name — the way past all of it |
@@ -3173,7 +3173,7 @@ unfilterable. Same silent-gap class as an unmapped glass (#500).
 
 ##### HALF THE MOODS ARE HELEN'S AND NO RULE PRODUCES THEM — #452, 2026-08-30
 
-**Twenty moods. Ten are derived from ingredients, method and glass; ten are
+**Nineteen moods. Nine are derived from ingredients and method; ten are
 hers alone**, listed in `moods_by_hand`. `scripts/derive_cocktail_moods.py`
 never emits one of hers, and `expected_moods()` preserves whatever a drink
 already carries for them, so a re-run can reorder her judgement but never
@@ -3203,6 +3203,14 @@ union:
     aperitivo .36 | sugar craving .23
 
 The four after the break moved to `moods_by_hand` on those numbers.
+
+**`up` WAS PROPOSED AND KILLED THE SAME DAY, and the way it died is the useful
+part.** Read straight off the glass it covered 58 of 114 — 51% — and
+`test_no_mood_covers_more_than_half_the_collection` refused it: the guard that
+retired food's `one-pot` at 57%. Helen had said *"I'm not sold on up, let's
+retain it but with suspicion"* an hour earlier, and **the suite reached her
+conclusion independently**. Narrowing was not available — the coupe alone is 40
+drinks, so any version without it is not `up`. `mood_up_glasses` went with it.
 
 **THE RULES UNDER-FIRE, AND THAT IS THE REASSURING HALF.** Across the entire
 pass there were only **four** cases where a rule tagged something she did not.
@@ -3256,7 +3264,7 @@ are unchanged from the page it replaced — see §9.9 and issue #235.
 **A mood with no drinks renders no button**, counted rather than listed as an
 exception, so the rule holds for whichever mood is empty next. Today that is
 `pudding in a glass` (2 drinks now, but see #337 — the family exists in Helen's
-head and not in the collection) and `up`; eighteen of the twenty render.
+head and not in the collection); eighteen of the nineteen render.
 
 **Filtering reads data- attributes, never rendered text.** Moods, chaos bucket
 and a pre-lowercased ingredient string are all written at build time. A filter

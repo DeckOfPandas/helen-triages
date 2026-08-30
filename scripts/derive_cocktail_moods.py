@@ -135,7 +135,7 @@ def hits_in(text, words):
     return len(re.findall("|".join(re.escape(w) for w in words), text, re.I))
 
 
-def derive(drink, sets, up_glasses, step_words, families):
+def derive(drink, sets, step_words, families):
     """The mood list for one parsed drink, in taxonomy.yml's own order.
 
     Every rule here is a transcription of a definition in that file's `moods:`
@@ -163,7 +163,6 @@ def derive(drink, sets, up_glasses, step_words, families):
         return len(present & set(sets.get(name) or []))
 
     steps = " ".join(str(s) for s in listed(drink.get("method")))
-    glasses = [str(g) for g in listed(drink.get("glass"))]
     n_ingredients = len(entries)
 
     # `clear`, `sugar craving`, `tiki` and `aperitivo` ARE NOT DERIVED HERE
@@ -245,6 +244,17 @@ def derive(drink, sets, up_glasses, step_words, families):
     if has("warming"):
         out.append("warming")
 
+    # `up` IS GONE, 2026-08-30, and the reason is worth more than the mood.
+    # Read straight off the glass it covered 58 of 114 -- 51% --  and
+    # test_no_mood_covers_more_than_half_the_collection refused it: the guard
+    # that retired food's `one-pot` at 57% and caught `fruity` at 51% before it
+    # was ever written down. Helen had said "I'm not sold on up, let's retain
+    # it but with suspicion" an hour earlier, and the suite reached her
+    # conclusion independently. Narrowing was not available: the coupe alone is
+    # 40 drinks, so any version without it is not `up`.
+    if has("warming"):
+        out.append("warming")
+
     # `up` -- PARKED, NOT DELETED, 2026-08-30. Read straight off the glass, and
     # possible only because #491 closed: 15 drinks named none until that day.
     #
@@ -265,8 +275,6 @@ def derive(drink, sets, up_glasses, step_words, families):
     # no button (`pudding in a glass` precedent), so reinstating it is
     # uncommenting these two lines. Hers to call.
     #
-    # if any(g in up_glasses for g in glasses):
-    #     out.append("up")
 
     # `aperitivo` -- an amaro or an aromatised wine, and not a strong brown
     # drink. That second clause is what keeps a Boulevardier out: same
@@ -285,7 +293,7 @@ def derive(drink, sets, up_glasses, step_words, families):
 
 
 # -----------------------------------------------------------------------------
-def expected_moods(slug, drink, stored, taxonomy, sets, up_glasses,
+def expected_moods(slug, drink, stored, taxonomy, sets,
                    step_words, families):
     """What a drink's `mood` should be: derived, corrected, and hers preserved.
 
@@ -305,7 +313,7 @@ def expected_moods(slug, drink, stored, taxonomy, sets, up_glasses,
     include = (taxonomy.get("mood_include") or {}).get(slug, {}).get("moods") or []
     exclude = set((taxonomy.get("mood_exclude") or {}).get(slug, {}).get("moods") or [])
 
-    moods = derive(drink, sets, up_glasses, step_words, families)
+    moods = derive(drink, sets, step_words, families)
     moods += [m for m in include if m not in moods]
     moods += [m for m in stored if m in by_hand and m not in moods]
     moods = [m for m in moods if m not in exclude]
@@ -386,7 +394,6 @@ def main(argv=None):
     sets = load_sets(taxonomy, vocab)
     if not taxonomy.get("mood_ingredients"):
         sys.exit("taxonomy.yml has no `mood_ingredients`; nothing to derive from.")
-    up_glasses = set(taxonomy.get("mood_up_glasses") or [])
     step_words = taxonomy.get("mood_step_words") or {}
     families = set(vocab.get("family_of") or {})
     include = taxonomy.get("mood_include") or {}
@@ -404,7 +411,7 @@ def main(argv=None):
         stored = [str(m) for m in (drink.get("mood") or [])]
         corrected = slug in include or slug in exclude
         derived = expected_moods(slug, drink, stored, taxonomy, sets,
-                                 up_glasses, step_words, families)
+                                 step_words, families)
         if derived == stored:
             unchanged += 1
             continue

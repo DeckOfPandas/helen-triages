@@ -130,20 +130,6 @@ moods:
     collection has exactly two drinks served hot, which is too thin to be a
     filter. Helen's word, and the right one: "warm spice" describes the
     bottles, "warming" describes what you want.
-  up: >-
-    No ice in the glass. Read straight off `glass:` — coupe, nick and nora,
-    flute, sour, martini.
-    HELEN IS NOT SOLD ON IT, 2026-08-30: "I'm not sold on up. Let's retain it,
-    but with suspicion." Recorded rather than smoothed over, because the case
-    for it is real and unproven: it pairs with `clear` to mean a Martini and
-    with `strong brown drink` to mean a Manhattan, which is a distinction
-    nothing else on the page makes. Whether anyone reaches for it is a
-    different question, and if the answer is no it costs one line here and one
-    in the deriver to remove.
-    BUILT AFTER THE GLASSES AND NOT BEFORE. It is the only mood read entirely
-    from `glass:`, and 15 of 114 drinks named none until #491 closed on
-    2026-08-30 — deriving it earlier would have quietly answered "not up" for
-    all fifteen.
   aperitivo: >-
     The first one, before eating. An amaro or an aromatised wine, and not
     something that would flatten your appetite.
@@ -717,24 +703,9 @@ mood_exclude:
       rule reads it as an icy drink and she does not. Her call on the
       2026-08-30 pass: the churning is technique here rather than the point.
 
-# Served UP — no ice in the glass. Read by the `up` mood. Glass names, not
-# generics, so they are checked against glasses.yml rather than the generic
-# vocabulary.
-#
-# BOTH SPELLINGS OF MARTINI, and the omission was costing drinks their mood.
-# Two drinks write `martini glass` and one writes `martini`; only the second
-# was listed, so the Porn Star Martini could not be served up. §9.11.1 leaves
-# that pair out of `canonical_glasses` deliberately — Helen has not ruled on
-# which spelling wins — which is exactly why a list that READS glass values has
-# to carry both. The rule governs what is written; this governs what is read.
-mood_up_glasses:
-  - coupe
-  - nick and nora
-  - flute
-  - sour
-  - martini
-  - martini glass
-
+# `mood_up_glasses` WENT WITH `up`, 2026-08-30. It listed the stemmed glasses
+# and nothing reads it any more. Recovering it means recovering the mood; both
+# are one commit away in git.
 # Words read from the METHOD steps rather than the ingredients. Same drift risk
 # as the sets above, one field over: a step reworded stops matching and nothing
 # says so. Matched case-insensitively as substrings, so `swizzle` catches
@@ -866,7 +837,6 @@ mood_groups:
     - tiki
     - warming
     - aperitivo
-    - up
     - nightcap
     - brunch
     - sunny terrace
