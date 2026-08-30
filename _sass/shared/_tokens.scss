@@ -93,3 +93,17 @@ $radius-sm: 2px;   // note boxes, method-short box, meta wash
 // spaced its control panel like a document.
 $index-section-gap: $space-xl;   // between one filter section and the next
 $index-label-gap:   $space-md;   // a label to its own buttons
+
+// The search row: a heading, a text box and an inline clear, on one line.
+// $index-search-max-width was 550px until the clear button started reserving
+// its space at all times -- that space came out of the input's share even at
+// rest, so the row was widened by roughly the button's own footprint (Helen,
+// 2026-08-03: "cut off even before typing anything -- it ends at the first '.'").
+$index-search-max-width: 620px;
+
+// WHERE THE TWO INGREDIENT FIELDS STOP SITTING SIDE BY SIDE. Food stacked at
+// 600px and cocktails at 720px, so between those widths food squashed both
+// inputs into half a column each while cocktails had already stacked. Helen,
+// 2026-08-30, seeing them together: "the cocktail version is correct." One
+// number now, so there is no in-between to be wrong in.
+$index-stack-width: 720px;

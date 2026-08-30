@@ -515,3 +515,42 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   width: fit-content;
   margin: $spacing-block-gap 0 0 auto;
 }
+
+
+// --- A label row with an input in it -----------------------------------------
+// Three mixins rather than one, because the two sites name their children
+// differently (.category-label vs .drink-field-label) and a mixin cannot select
+// what it cannot name. Each site applies these to its own classes; what matters
+// is that the VALUES exist once.
+@mixin index-search-row {
+  align-items: center;
+  gap: $index-label-gap;
+  // `width: 100%` AND a max-width, not the cap alone. The section is a flex
+  // column with `align-items: flex-start`, so without this the row shrinks to
+  // its content and the input ends wherever the words happen to stop -- which
+  // is why cocktails' I KNOW WHAT I WANT box was shorter than food's while both
+  // declared the same 620px cap.
+  width: 100%;
+  max-width: $index-search-max-width;
+}
+
+// The heading must not reflow because of what you typed beside it. Without
+// this it is the LABEL that gives when the row runs short -- wrapping "I KNOW
+// WHAT" / "I WANT" -- rather than the input absorbing the squeeze, which is
+// the behaviour actually wanted: a heading should not move because of how much
+// you have typed elsewhere in the same row.
+@mixin index-search-row-label {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// A text input carries a non-zero intrinsic min-width from the browser, which
+// flex respects unless told otherwise -- so `flex: 1` alone will not let it
+// shrink past that floor and it overflows the row instead. This is the standard
+// fix, and it is what makes the two inputs on a row end in the same place
+// (Helen, 2026-08-03: "it would look tidiest if both search input fields ended
+// in the same place").
+@mixin index-search-row-input {
+  flex: 1;
+  min-width: 0;
+}
