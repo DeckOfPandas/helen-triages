@@ -100,11 +100,49 @@
 // inside `.drink-label-row`, which shrinks it to its content. That is
 // load-bearing rather than incidental -- take a heading out of a flex row and
 // its bar silently becomes full-width.
+// FOOD'S GEOMETRY, NOT AN APPROXIMATION OF IT -- Helen, 2026-08-30: "the
+// underlines under cocktails headings are lower relative to the letters than
+// food headings ... this makes the input field lower border look weirdly low."
+//
+// AN INSET SHADOW IS MEASURED FROM THE BOTTOM OF THE BOX, which is the whole
+// bug. `inset 0 -0.34em 0` puts the bar in the bottom 0.34em of a box whose
+// height is the LINE-HEIGHT -- so the bars sat below the descender line, well
+// clear of the letters, and moved if the line-height ever changed. Food
+// measures from the TOP of the em box instead, so its bar overlaps the base of
+// the lettering by design and cannot drift.
+//
+// These are food's own dials, restated because they live in _sass/food/_rule.scss
+// and cocktails cannot import them:
+//
+//     $rule-thickness       0.38em   the section bar
+//     $rule-drop            0.70em   its top, measured DOWN from the text top
+//     $rule-indent          0.15em   how far INTO the text it starts
+//     $rule-overhang        0.20em   how far PAST the text it runs
+//     $rule-under-thickness 0.20em   the shared bar, thinner
+//     $rule-overlap         0.10em   how far it rises behind the one above
+//
+// §13.1's reasoning comes with them: the two read as ONE bar with a stepped
+// edge rather than as two bars, which is what the overlap buys. The lower bar
+// is inset at both ends so it stops inside the lettering; the upper runs to the
+// box's right edge and keeps the overhang.
+//
+// padding-bottom RESERVES ROOM FOR THE LOWER BAR. Courier's content box is only
+// about 1.13em tall and the pair runs to 1.22em, so without it the second bar
+// is clipped. Vertical padding on an inline box grows the background without
+// touching the line height, so nothing moves.
 @mixin heading-rule($colour) {
-  box-shadow:
-    inset 0 -0.18em 0 $color-heading-shared,
-    inset 0 -0.34em 0 $colour;
-  padding: 0 0.12em 0.02em 0;
+  padding: 0 0.20em 0.45em 0;
+
+  background-image:
+    linear-gradient($color-heading-shared, $color-heading-shared),
+    linear-gradient($colour, $colour);
+  background-repeat: no-repeat, no-repeat;
+  background-size:
+    calc(100% - 0.41em) 0.20em,
+    calc(100% - 0.15em) 0.38em;
+  background-position:
+    0.05em 0.98em,
+    0.15em 0.70em;
 }
 
 .drink-filter--chaos   .drink-field-label { @include heading-rule($color-heading-yolo); }
@@ -264,8 +302,31 @@
   &[hidden] { display: none; }
 }
 
-.drink-filter--mood    .btn-clear-filter { color: $color-electric-absinthe-deep;    &:hover { color: $color-electric-absinthe; } }
-.drink-filter--hassle  .btn-clear-filter { color: $color-ultra-yvette-deep; &:hover { color: $color-ultra-yvette; } }
+// ONE COLOUR FOR EVERY CLEAR BUT ONE -- Helen, 2026-08-30: "clear buttons for
+// all filters other than leave out should be absinthe or a darkened shade for
+// legibility, lightening on mouseover."
+//
+// The deep, not the raw hue: electric absinthe is 1.55:1 on paper and cannot be
+// read as text at 0.78rem. -deep is solved to 4.71:1. Hover goes to the full
+// strength, which is the "lightening on mouseover" she asked for and is also
+// how food's own inline clears behave -- they rest at a darkened root and
+// lighten to it.
+//
+// They used to take their section's hue, one rule each. That said "this clear
+// belongs to this section", which the reader can already see from where it is;
+// what it cost was five different greens and violets doing a job that is the
+// same job everywhere. LEAVE OUT keeps its own, below, because that section
+// deliberately spends no colour at all.
+.drink-filter--chaos   .btn-clear-filter,
+.drink-filter--mood    .btn-clear-filter,
+.drink-filter--hassle  .btn-clear-filter,
+.drink-search--include .btn-clear-filter,
+.drink-filter--name    .btn-clear-filter {
+  color: $color-electric-absinthe-deep;
+
+  &:hover,
+  &:focus-visible { color: $color-electric-absinthe; }
+}
 // A `.drink-filter--hassle .btn-mood` OVERRIDE STOOD HERE AND IS GONE, because
 // the thing it corrected for no longer exists. Hassle's buttons carry .btn-mood
 // (they share the class because they share the behaviour -- both write into the
@@ -366,11 +427,31 @@
   // One band, where a heading carries two. Same device, one level down -- the
   // heading names a question and a chosen answer sits under it, so the answer
   // wearing a simpler version of the heading's own mark is the hierarchy.
+  // NO CAPITALS ON CLICK -- Helen, 2026-08-30. Food's chips go uppercase when
+  // selected and it costs them no width, the face being monospaced; here it
+  // read as the word changing rather than the word being chosen. The faux-bold
+  // stroke stays, which is the half that actually carries weight (§13.4.2).
+  //
+  // text-decoration, NOT AN INSET SHADOW, and this is #548's "the underline
+  // extends left and right beyond the text". A box-shadow paints the PADDING
+  // box, and these carry food's 0.75rem of horizontal padding -- inherited from
+  // chips that needed room for a tape shape this design does not draw. So the
+  // band ran the full hit area. text-decoration paints the GLYPHS, so the
+  // padding keeps its job (a comfortable target) and the band hugs the word.
+  //
+  // Helen offered the alternative -- "lose the horizontal spaces, or retain the
+  // space but calculate how to shorten the underline" -- and this is neither:
+  // it needs no calculation, because the underline was never measuring the
+  // right box. It is also the mechanism .drink-card-hit and .drink-card-ship-word
+  // already use, so "a coloured band under text" stays one thing.
   &.is-on {
     color: $color-text;
-    text-transform: uppercase;
     -webkit-text-stroke: 0.05em $color-text;
-    box-shadow: inset 0 -0.22em 0 $color-cosmic-cosmopolitan;
+    text-decoration: underline;
+    text-decoration-color: $color-cosmic-cosmopolitan;
+    text-decoration-thickness: 0.22em;
+    text-underline-offset: 0.18em;
+    text-decoration-skip-ink: none;
   }
 }
 
@@ -470,14 +551,27 @@
     color: $color-cosmic-cosmopolitan-deep;
   }
 
+  // BANDS, DOES NOT FILL -- Helen, 2026-08-30: "has to have chips should show
+  // magenta underline on select rather than fill in on select." The last fill
+  // on the page, and the same call §9.13 made for the cards on 2026-08-28.
+  //
+  // The border still changes, because a chip has an outline where a filter word
+  // does not -- so it has two things to move and uses both. The contrast note
+  // this replaces is kept next door in the palette: ink was chosen over a
+  // darkened magenta because magenta's fill is light enough that the deep has
+  // to go almost to black before it clears 4.5, at which point it is not
+  // magenta any more. With no fill the question does not arise; the text is ink
+  // on paper at 16:1.
   &.is-on {
-    background: $color-cosmic-cosmopolitan;
+    background: none;
     border-color: $color-cosmic-cosmopolitan-deep;
-    // Ink, not a darkened magenta. Magenta's fill is light enough that the
-    // darkened deep has to go almost to black (41%) before it clears 4.5 --
-    // at which point it is not magenta any more, so the honest version is ink.
-    color: $color-text;                         // 4.57:1 on the fill
+    color: $color-text;
     font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: $color-cosmic-cosmopolitan;
+    text-decoration-thickness: 0.18em;
+    text-underline-offset: 0.16em;
+    text-decoration-skip-ink: none;
   }
 }
 
@@ -631,13 +725,23 @@
 // `mark` ARRIVES WITH A UA BACKGROUND -- Mark/MarkText, usually a hard yellow --
 // which is exactly the fill this design does not use anywhere. Both are reset
 // rather than overridden by accident.
+// YVETTE, AND THICKER -- Helen, 2026-08-30. It was luminous-lagoon on the
+// reasoning that I KNOW WHAT I WANT carries lagoon and a heading's colour is a
+// promise the card keeps (§9.13). That promise is not made any more: the
+// headings are five greens now, and lagoon is not among them, so the band was
+// answering a heading that no longer exists. Ultraviolet is unspoken for and is
+// the one accent still doing nothing on this page.
+//
+// 0.14em to 0.2em because at name-search size the thinner band read as a
+// hairline rather than as a mark.
 .drink-name-hit {
   background: none;
   color: inherit;
   text-decoration: underline;
-  text-decoration-thickness: 0.14em;
-  text-underline-offset: 0.14em;
-  text-decoration-color: $color-luminous-lagoon;
+  text-decoration-thickness: 0.2em;
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: none;
+  text-decoration-color: $color-ultra-yvette;
 }
 
 // --- clear all, top and bottom — #541 ----------------------------------------
