@@ -972,17 +972,26 @@ def test_showing_categories_still_shortens_the_index():
         before, after = [], []
         touched = False
         for item in (fm.get("ingredients") or []):
-            if not isinstance(item, dict) or not item.get("item"):
+            if not isinstance(item, dict) or not item.get("generic"):
                 continue
-            before.append(item["item"])
-            generic = item.get("generic")
+            generic = item["generic"]
             generics = generic if isinstance(generic, list) else [generic]
+            # THE BASELINE IS THE GENERIC, NOT `item` -- corrected with #544's
+            # second move. It was `item` because that is what the card printed
+            # when #501 measured this; move 1 changed the fallback to the
+            # generic, so "what this card would say without card_names" has
+            # been the generic since, and the old baseline was measuring a
+            # counterfactual the template can no longer produce. Re-run on the
+            # day of the change: the claim holds either way and holds harder on
+            # the true baseline -- 8437 -> 7261 against 9956 -> 8960.
+            plain = " or ".join(str(g) for g in generics)
+            before.append(plain)
             labels = [names[g] for g in generics if g in names]
             if labels and len(labels) == len(generics):
                 after.append(" or ".join(labels))
                 touched = True
             else:
-                after.append(item["item"])
+                after.append(plain)
         if not touched:
             continue
         checked += 1
@@ -1031,13 +1040,18 @@ def test_no_card_shows_two_different_rums_under_one_name():
         # card name -> the set of generic-tuples that produced it
         shown = {}
         for item in (fm.get("ingredients") or []):
-            if not isinstance(item, dict) or not item.get("item"):
+            # Gated on `generic`, not `item` -- see the note in
+            # test_showing_categories_still_shortens_the_index. `item` is being
+            # retired (#544) and using it here would silently stop checking
+            # every entry that had already lost it.
+            if not isinstance(item, dict) or not item.get("generic"):
                 continue
-            generic = item.get("generic")
+            generic = item["generic"]
             generics = generic if isinstance(generic, list) else [generic]
             labels = [names[g] for g in generics if g in names]
             # The template substitutes only when EVERY generic has a card name,
-            # so a partial match falls back to `item` and shows no card name.
+            # so a partial match falls back to the generic and shows no card
+            # name.
             if not labels or len(labels) != len(generics):
                 continue
             label = " or ".join(labels)
@@ -1084,9 +1098,11 @@ def test_every_card_name_join_is_reachable():
     produced = set()
     for slug, fm in _load():
         for item in (fm.get("ingredients") or []):
-            if not isinstance(item, dict) or not item.get("item"):
+            # Gated on `generic`, not `item` -- see the note in
+            # test_showing_categories_still_shortens_the_index.
+            if not isinstance(item, dict) or not item.get("generic"):
                 continue
-            generic = item.get("generic")
+            generic = item["generic"]
             generics = generic if isinstance(generic, list) else [generic]
             labels = [names[g] for g in generics if g in names]
             if labels and len(labels) == len(generics) and len(labels) > 1:
@@ -2846,10 +2862,15 @@ def _syrup_ratio_scan():
 
         syrup = sum(ml(i) for i in items
                     if any(str(g).startswith("sugar syrup") for g in generics(i)))
-        # Matches on `item`, which #544 is retiring. When that lands this wants
-        # to read `generic` -- `lime juice` and `lemon juice` are both declared
-        # generics, so it is a straight swap and a slightly better one.
-        sour = sum(ml(i) for i in items if citrus.search(i.get("item", "")))
+        # MATCHES THE GENERIC, NOT `item` -- moved with #544's second move, and
+        # it had to move in the same commit: 106 of the entries that lost their
+        # `item` are juices whose only contribution was the word "fresh", so
+        # every one of them is citrus. Left reading `item` this scan would have
+        # gone quietly blind to most of the sour side of every ratio it checks,
+        # and a ratio with half its numerator missing does not fail, it looks
+        # implausible or vanishes under `if not (syrup and sour)`.
+        sour = sum(ml(i) for i in items
+                   if any(citrus.search(str(g)) for g in generics(i)))
         if not (syrup and sour):
             continue
         checked += 1
