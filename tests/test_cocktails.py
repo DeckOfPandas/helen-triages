@@ -2372,17 +2372,53 @@ def test_every_glass_value_is_in_the_vocabulary():
 # THE LIST ONLY SHRINKS. The test fails if a drink joins it, and fails again if
 # a drink on it gets a glass and is not removed, so it cannot quietly stop
 # describing the collection.
-GLASSLESS_ON_2026_08_27 = {
-    # kamaniwanalaya came off on 2026-08-30: Helen gave it a Collins, a
-    # pineapple wedge, a maraschino cherry and a bouquet of mint sprigs. Fifteen
-    # left of the original sixteen.
-    "anitas-attitude-adjuster", "banana-boulevardier", "biggles-sidecar",
-    "cobra-effect", "copenhagen-special", "cynar-toronto", "el-mediterraneo",
-    "georgetown-punch", "mai-tai-diffords-recipe",
-    "milliners-punch", "minty-pentones", "modern-zombie-makes-2",
-    "pear-apricot-honey-lemon-and-rosemary-bellini", "tiki-max",
-    "zombie-intoxica",
-}
+#
+# WHO NAMED WHAT, 2026-08-30 -- kept because each is a ruling and several
+# turned on something only Helen knows.
+# kamaniwanalaya came off on 2026-08-30: Helen gave it a Collins, a
+# pineapple wedge, a maraschino cherry and a bouquet of mint sprigs. Fifteen
+# left of the original sixteen.
+#
+# FIVE MORE CAME OFF THE SAME DAY, Helen ruling on each in turn:
+#   anitas-attitude-adjuster  highball, "whatever we say for Long Island
+#                             Iced Tea" -- it is that drink with sparkling
+#                             wine in place of the cola, and says so in its
+#                             own tagline
+#   banana-boulevardier       double old fashioned over the ice block its
+#                             method already asks for, or up in a coupe
+#   biggles-sidecar           coupe
+#   cobra-effect              tiki mug -- "or anything you like because
+#                             it's a mad colour and you might want to see
+#                             it", hence the coupe second
+#   copenhagen-special        coupe, and it gained the orange zest twist
+#                             she named with it
+#   cynar-toronto             old fashioned
+#   el-mediterraneo           collins
+#   georgetown-punch          highball -- she wondered about a sling,
+#                             "they're awesome and underused", and does not
+#                             own one; recorded here rather than as data
+#   mai-tai-diffords-recipe   double old fashioned usually, tiki mug
+#                             sometimes, so both in that order
+#   milliners-punch           highball. "I made this up so I can say what
+#                             I like!"
+#   minty-pentones            old fashioned
+#   modern-zombie-makes-2     collins -- "zombie glass really", which the
+#                             vocabulary does not have and she does not
+#                             own, so the drink carries a note saying so
+#   pear-...-bellini          flute, which its own method already said
+#   tiki-max                  tiki mug
+#   zombie-intoxica           tiki mug
+#
+# AND THAT IS ALL SIXTEEN. The set is empty and stays declared: it is what
+# `test_the_glassless_list_has_no_stale_entries` reads, and that check now
+# asserts the emptiness rather than trusting it -- an empty registry that
+# nothing looks at is how a closed backlog quietly reopens.
+#
+# `set()` AND NOT `{}`: an empty pair of braces is a DICT, which is what
+# this became when the last name came out. Nothing about the braces says
+# so -- the tests below simply started failing with "unsupported operand
+# type(s) for -: 'dict' and 'set'", which is at least a loud way to learn.
+GLASSLESS_ON_2026_08_27 = set()
 
 
 def test_every_drink_names_a_glass():
@@ -2396,8 +2432,15 @@ def test_every_drink_names_a_glass():
     WHY THIS IS A RATCHET AND NOT A FIX. Which glass a drink wants is Helen's
     knowledge, not something derivable from the ingredients -- and guessing
     would be worse than the gap, because a wrong glass looks exactly as
-    confident as a right one. So the existing sixteen are recorded and the
-    check bites on the seventeenth.
+    confident as a right one. So the existing sixteen were recorded and the
+    check bit on the seventeenth.
+
+    ALL SIXTEEN ARE DONE, 2026-08-30. She named every one, in three batches,
+    given the ingredients and the total volume of each -- and several answered
+    themselves once the volume was in front of her: the Bellini's own method
+    already said "add 25 ml syrup to a champagne flute", and Banana
+    Boulevardier's said "over a large ice block". The exemption set is empty,
+    so this test is now simply "every drink names a glass".
 
     NOTE THE TEST ABOVE NO LONGER EXEMPTS `any`. The two changes are the same
     decision from both ends: every drink names a glass, and there is no value
@@ -2423,6 +2466,13 @@ def test_the_glassless_list_has_no_stale_entries():
     while "is every name on this list still glassless" needs the whole book. In
     CI the drafts are absent, so all sixteen names would read as fixed. See
     WHOLE_COLLECTION_ONLY at the top of this file.
+
+    IT IS EMPTY NOW, and that is checked rather than assumed. An exemption set
+    that has emptied is the moment a ratchet stops doing anything, and an
+    unwatched empty set is how one gets quietly refilled -- so the assert below
+    fails if a name is ever added back. Deleting both the set and this test is
+    the right move only once nothing can regress; the sibling above is what
+    keeps the collection honest either way.
     """
     _require_whole_collection("GLASSLESS_ON_2026_08_27")
     missing = {slug for slug, fm in _load() if not (fm.get("glass") or [])}
@@ -2433,6 +2483,14 @@ def test_the_glassless_list_has_no_stale_entries():
         + "\n\nThe list only shrinks. Leaving a fixed drink on it means the "
           "list stops describing the collection, and the next real gap hides "
           "among the stale entries."
+    )
+    assert not GLASSLESS_ON_2026_08_27, (
+        "GLASSLESS_ON_2026_08_27 has entries again:\n  "
+        + "\n  ".join(sorted(GLASSLESS_ON_2026_08_27))
+        + "\n\nIt emptied on 2026-08-30 when Helen named the last of the "
+          "sixteen. A new drink with no glass should fail "
+          "test_every_drink_names_a_glass and be given one -- not be added "
+          "here. This set exists to record a backlog that is now closed."
     )
 
 
