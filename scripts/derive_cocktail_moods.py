@@ -25,8 +25,10 @@ Three things follow, and all three are the point of this file:
     and diff before letting it near a tracked file.
 
 DERIVATION IS A STARTING POINT, NOT THE AUTHORITY. A drink Helen thinks is tiki
-is tiki whatever the ingredient count says. `mood_overrides` in taxonomy.yml
-carries her rulings and always wins; this script never argues with one.
+is tiki whatever the ingredient count says. `mood_include` and `mood_exclude` in
+taxonomy.yml carry her rulings and always win; this script never argues with one.
+Each names the single mood it is about, so a corrected drink still tracks every
+later improvement to the rules.
 
     python3 scripts/derive_cocktail_moods.py            # report differences
     python3 scripts/derive_cocktail_moods.py --write    # apply them
@@ -78,6 +80,61 @@ def millilitres(amount, measures):
 
 
 # -----------------------------------------------------------------------------
+# Families that can be a drink's BASE. `fortified`, `amaro` and `herbal` are
+# modifiers however aged they are -- a Negroni's sweet vermouth ties with its
+# gin for the largest pour, and that tie is the whole reason this list is
+# written down rather than assumed.
+BASE_FAMILIES = {"rum", "gin", "whisky", "brandy", "agave", "vodka", "aquavit"}
+
+# Never counted toward a drink's volume. Water is a rinse or a dilution and
+# never the drink; counting the Sazerac's discarded 60 ml is what used to drag
+# it to 44% base spirit and force a hand-correction.
+NOT_A_POUR = {"water"}
+
+
+def spirit_volumes(entries, measures, family_of, whisky):
+    """Millilitres per spirit FAMILY, not per ingredient.
+
+    BY FAMILY BECAUSE SINGLE INGREDIENTS TIE. The Sazerac pours equal 20 ml of
+    cognac, rye and bourbon, so "the biggest pour" was being decided by which
+    key came first in the file -- and 34 of the collection's 114 drinks have
+    such a tie. Summed by family, its whisky is 40 ml against cognac's 20 and
+    the answer stops depending on YAML ordering.
+    """
+    out = {}
+    for entry in entries:
+        millilitres_ = millilitres(entry.get("amount", ""), measures)
+        if millilitres_ is None:
+            continue
+        for generic in _listed(entry.get("generic")):
+            name = str(generic)
+            if name in NOT_A_POUR:
+                continue
+            family = "whisky" if name in whisky else family_of.get(name)
+            if family:
+                out[family] = out.get(family, 0) + millilitres_
+    return out
+
+
+def _listed(value):
+    if value is None:
+        return []
+    return value if isinstance(value, list) else [value]
+
+
+def hits_in(text, words):
+    """OCCURRENCES of any of `words` in `text`, not distinct words matched.
+
+    The difference is load-bearing: `I want to faff` wants two or more faff
+    MOMENTS, and Coney Park Swizzle swizzles twice while Mastiha Mojito churns
+    twice. Counting distinct words scores both at one and drops a mood each.
+    Caught by diffing against the stored values, not by reading the code.
+    """
+    if not words:
+        return 0
+    return len(re.findall("|".join(re.escape(w) for w in words), text, re.I))
+
+
 def derive(drink, sets, up_glasses, step_words, families):
     """The mood list for one parsed drink, in taxonomy.yml's own order.
 
@@ -109,36 +166,61 @@ def derive(drink, sets, up_glasses, step_words, families):
     glasses = [str(g) for g in listed(drink.get("glass"))]
     n_ingredients = len(entries)
 
-    volumes = {}
-    for entry in entries:
-        ml = millilitres(entry.get("amount", ""), sets["_measures"])
-        if ml is None:
-            continue
-        for g in listed(entry.get("generic")):
-            volumes[str(g)] = volumes.get(str(g), 0) + ml
-    total = sum(volumes.values())
-    base = sum(v for k, v in volumes.items() if k in families)
-
     out = []
 
-    # `strong brown drink` -- 60% base spirit by volume, and more aged than
-    # clear. KNOWN FLAW, recorded in taxonomy.yml rather than fixed: the
-    # fraction counts volume the drink THROWS AWAY, which is why the Sazerac's
-    # discarded rinse water drags it to 44%. Rinse-and-discard drinks need an
-    # override.
-    if total and base / total >= 0.60 and count("aged") >= 2 \
-            and count("aged") > count("clear"):
-        out.append("strong brown drink")
+    # `strong brown drink` -- whisky leads; or another aged BASE spirit leads
+    # and the drink has not been turned into a sour. Revised 2026-08-30
+    # against Helen's own rulings on 23 drinks; see taxonomy.yml for what the
+    # previous rule got wrong and why each clause is here.
+    by_family = spirit_volumes(entries, sets["_measures"],
+                               sets["_family_of"], sets["_whisky"])
+    lengthened = has("lengthener")
+    churned = bool(hits_in(steps, step_words.get("churned") or []))
+    if by_family and not lengthened and not churned and not has("juice"):
+        top = max(by_family.values())
+        leaders = [f for f, v in by_family.items() if v == top]
+        if "whisky" in leaders:
+            out.append("strong brown drink")
+        else:
+            # An aged base spirit may lead instead -- but citrus makes it a
+            # sour, which is the line Helen drew between Art de Vivre and the
+            # Sidecar.
+            aged = set(sets.get("aged") or [])
+            aged_leads = any(
+                f in BASE_FAMILIES
+                and any(g in aged and sets["_family_of"].get(g) == f for g in present)
+                for f in leaders)
+            if aged_leads and not has("citrus"):
+                out.append("strong brown drink")
 
     if has("clear") and not has("citrus"):
         out.append("clear")
 
-    # `short and sharp` -- the shape does all the work, and there is
-    # deliberately no ingredient-count bar: it excluded four drinks Helen would
-    # call short and sharp while discriminating nothing.
-    if has("citrus") and has("sweet") and (present & families) \
-            and any(g in up_glasses for g in glasses):
-        out.append("short and sharp")
+    # `sharp` -- a base, a citrus, a sweetener, in five ingredients or fewer.
+    # The count replaced an UP-GLASS requirement on 2026-08-30: that bar cost
+    # drinks their mood for want of a `glass:` value, and five is Helen's own
+    # number from this mood's definition. With no bar at all it catches 72 of
+    # 114 and narrows nothing.
+    # POURED ingredients, not every line. Between the Sheets is rum, cognac,
+    # triple sec, lemon and syrup -- a textbook short sour -- plus half a pinch
+    # of salt, and the salt took it over five and cost it the mood outright. A
+    # dash of bitters or a pinch of seasoning does not make a drink less
+    # simple, and this cap is about simplicity.
+    #
+    # `tiki` and `I want to faff` deliberately keep the FULL count below: there
+    # the question is complexity, and three dashes of tiki bitters genuinely
+    # are another layer to taste.
+    # AND IT IS NOT LENGTHENED OR CHURNED, the same two clauses `strong brown
+    # drink` uses. Dropping the up-glass bar let punches and swizzles in --
+    # Kill Devil Punch, Arrack Punch, both swizzles, the Porn Star Martini with
+    # its champagne on the side. Those were excluded before only as a side
+    # effect of being served in a tall glass, which is the accidental version
+    # of a rule worth stating: a sharp drink is not topped up and not swizzled.
+    poured = sum(1 for e in entries
+                 if millilitres(e.get("amount", ""), sets["_measures"]) is not None)
+    if has("citrus") and has("sweet") and (present & families) and poured <= 5 \
+            and not lengthened and not churned:
+        out.append("sharp")
 
     if has("fruity"):
         out.append("fruity")
@@ -155,32 +237,57 @@ def derive(drink, sets, up_glasses, step_words, families):
     if count("tiki") >= 2 and (n_ingredients >= 6 or count("loud") >= 2):
         out.append("tiki")
 
-    def hits(words):
-        """OCCURRENCES, not distinct words -- and the difference is load-bearing.
+    if has("warming"):
+        out.append("warming")
 
-        `I want to faff` wants two or more faff MOMENTS. Coney Park Swizzle
-        swizzles twice and Mastiha Mojito churns twice; counting distinct words
-        scores both at one and drops a mood each. Caught by diffing against the
-        stored values rather than by reading this function.
-        """
-        if not words:
-            return 0
-        pattern = "|".join(re.escape(w) for w in words)
-        return len(re.findall(pattern, steps, re.I))
+    # `aperitivo` -- an amaro or an aromatised wine, and not a strong brown
+    # drink. That second clause is what keeps a Boulevardier out: same
+    # Campari, entirely different moment in the evening.
+    if has("aperitivo") and "strong brown drink" not in out:
+        out.append("aperitivo")
 
-    if hits(step_words.get("ice") or []):
+    if hits_in(steps, step_words.get("ice") or []):
         out.append("ice ice baby")
-    if hits(step_words.get("faff") or []) >= 2 or n_ingredients >= 9:
+    if hits_in(steps, step_words.get("faff") or []) >= 2 or n_ingredients >= 9:
         out.append("I want to faff")
     if not has("citrus"):
         out.append("no juicing")
-    if hits(step_words.get("fire") or []):
+    if hits_in(steps, step_words.get("fire") or []):
         out.append("on fire")
 
     return out
 
 
 # -----------------------------------------------------------------------------
+def load_sets(taxonomy, vocab):
+    """The ingredient sets `derive()` reads, assembled in ONE place.
+
+    Both this script and tests/test_cocktails.py need them, and building them
+    twice is how they drift: adding `_family_of` and `_whisky` for the revised
+    `strong brown drink` rule broke the tests instantly, because their copy of
+    this setup did not know about them. Same argument as `mood_ingredients`
+    living in data rather than in a script, one level down.
+
+    NOTE ON THE WORD "REVISED" ABOVE, which is not fussiness. `scripts/` is on
+    the render surface that test_invisible_keys_are_really_invisible scans, and
+    that guard keeps string literals deliberately, because a string literal is
+    exactly how front matter gets read. One of the keys it protects is named
+    with an ordinary English past participle meaning "written again". Using that
+    word anywhere in this file -- in a docstring, in prose, describing this rule
+    rather than any key -- reports the key as rendered and fails the suite.
+
+    It happened twice while this file was being written, the second time in a
+    paragraph explaining the first. HANDOVER 12 lists five prior instances of
+    prose defeating a source-scanning guard, the very first of which is a hook
+    refusing the commit that introduced it. Say "revised".
+    """
+    sets = dict(taxonomy.get("mood_ingredients") or {})
+    sets["_measures"] = vocab.get("measures") or {}
+    sets["_family_of"] = vocab.get("family_of") or {}
+    sets["_whisky"] = set(vocab.get("whisky_styles") or [])
+    return sets
+
+
 def load_drinks():
     for root in COLLECTIONS:
         if not root.is_dir():
@@ -222,10 +329,9 @@ def main(argv=None):
     taxonomy = yaml.safe_load(TAXONOMY.read_text(encoding="utf-8")) or {}
     vocab = yaml.safe_load(VOCAB.read_text(encoding="utf-8")) or {}
 
-    sets = dict(taxonomy.get("mood_ingredients") or {})
-    if not sets:
+    sets = load_sets(taxonomy, vocab)
+    if not taxonomy.get("mood_ingredients"):
         sys.exit("taxonomy.yml has no `mood_ingredients`; nothing to derive from.")
-    sets["_measures"] = vocab.get("measures") or {}
     up_glasses = set(taxonomy.get("mood_up_glasses") or [])
     step_words = taxonomy.get("mood_step_words") or {}
     families = set(vocab.get("family_of") or {})

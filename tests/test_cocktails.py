@@ -1675,9 +1675,9 @@ def test_every_drinks_moods_match_the_derivation():
 
     taxonomy = _taxonomy()
     vocab = _vocab()
-    sets = dict(taxonomy.get("mood_ingredients") or {})
-    assert sets, "`mood_ingredients` is missing; nothing to derive from."
-    sets["_measures"] = vocab.get("measures") or {}
+    assert taxonomy.get("mood_ingredients"), (
+        "`mood_ingredients` is missing; nothing to derive from.")
+    sets = deriver.load_sets(taxonomy, vocab)
     up_glasses = set(taxonomy.get("mood_up_glasses") or [])
     step_words = taxonomy.get("mood_step_words") or {}
     families = set(vocab.get("family_of") or {})
@@ -1738,8 +1738,7 @@ def test_every_mood_correction_is_reachable_and_needed():
 
     taxonomy = _taxonomy()
     vocab = _vocab()
-    sets = dict(taxonomy.get("mood_ingredients") or {})
-    sets["_measures"] = vocab.get("measures") or {}
+    sets = deriver.load_sets(taxonomy, vocab)
     up_glasses = set(taxonomy.get("mood_up_glasses") or [])
     step_words = taxonomy.get("mood_step_words") or {}
     families = set(vocab.get("family_of") or {})
@@ -1833,14 +1832,14 @@ def test_every_mood_ingredient_is_declared():
     )
 
     glasses = _taxonomy().get("mood_up_glasses") or []
-    assert glasses, "`mood_up_glasses` is empty; `short and sharp` needs it."
+    assert glasses, "`mood_up_glasses` is empty."
     icons = (_glasses().get("icons") or {})
     unknown = sorted(g for g in glasses if g not in icons)
     assert not unknown, (
         "`mood_up_glasses` names glass(es) glasses.yml has never heard of:\n  "
         + "\n  ".join(unknown)
         + "\n\nSame failure as above one field over: an unmatched glass name "
-          "silently narrows `short and sharp` rather than erroring."
+          "silently narrows whatever reads it rather than erroring."
     )
 
 

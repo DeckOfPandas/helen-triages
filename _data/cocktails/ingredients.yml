@@ -217,6 +217,19 @@ family_aliases:
   tequila: agave
   rhum: rum
   ron: rum
+  # `bitter` AND `amari` REACH THE AMARO FAMILY, added 2026-08-30. Nobody
+  # browsing for a bitter drink types "amaro" first, and the family held
+  # Campari, Aperol, Cynar, fernet and both Amari while the word found nothing
+  # -- precisely the failure that put `whiskey` and `scotch` in this list.
+  #
+  # This is what was left of a proposal to add `bitter` as a MOOD. Helen:
+  # "do we need families -- thinking of bitter and herbal? Why? They're not
+  # browsable or searchable." She was right twice over: `amaro` and `herbal`
+  # already exist as families, so there was nothing to build, and a mood that
+  # means "contains one of these bottles" is a worse copy of HAS TO HAVE. What
+  # was genuinely missing was two words.
+  bitter: amaro
+  amari: amaro
 
 # --- what the (all) button SAYS ----------------------------------------------
 # Helen, 2026-08-29, on the whisky umbrella: "I think that chip should be
