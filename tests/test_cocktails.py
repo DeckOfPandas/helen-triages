@@ -31,6 +31,7 @@ WHOLE_COLLECTION_ONLY.
 from __future__ import annotations
 
 import re
+import sys
 import unicodedata
 from pathlib import Path
 
@@ -223,11 +224,15 @@ WHOLE_COLLECTION_ONLY = {
     "test_every_card_name_join_is_reachable",
     "test_every_proposal_still_matches_a_real_step",
     "test_no_mood_covers_more_than_half_the_collection",
-    # The four COVERAGE claims below -- see _exercised.
+    # The five COVERAGE claims below -- see _exercised.
     "test_the_character_vocabulary_is_exercised",
     "test_the_bottle_index_is_exercised",
     "test_the_cross_category_check_is_exercised",
     "test_the_syrup_ratio_check_is_exercised",
+    "test_the_amount_table_is_exercised",
+    # A correction whose drink is merely ABSENT looks exactly like one whose
+    # drink is gone -- see _require_whole_collection.
+    "test_every_mood_correction_is_reachable_and_needed",
 }
 
 
@@ -998,17 +1003,26 @@ def test_showing_categories_still_shortens_the_index():
         before, after = [], []
         touched = False
         for item in (fm.get("ingredients") or []):
-            if not isinstance(item, dict) or not item.get("item"):
+            if not isinstance(item, dict) or not item.get("generic"):
                 continue
-            before.append(item["item"])
-            generic = item.get("generic")
+            generic = item["generic"]
             generics = generic if isinstance(generic, list) else [generic]
+            # THE BASELINE IS THE GENERIC, NOT `item` -- corrected with #544's
+            # second move. It was `item` because that is what the card printed
+            # when #501 measured this; move 1 changed the fallback to the
+            # generic, so "what this card would say without card_names" has
+            # been the generic since, and the old baseline was measuring a
+            # counterfactual the template can no longer produce. Re-run on the
+            # day of the change: the claim holds either way and holds harder on
+            # the true baseline -- 8437 -> 7261 against 9956 -> 8960.
+            plain = " or ".join(str(g) for g in generics)
+            before.append(plain)
             labels = [names[g] for g in generics if g in names]
             if labels and len(labels) == len(generics):
                 after.append(" or ".join(labels))
                 touched = True
             else:
-                after.append(item["item"])
+                after.append(plain)
         if not touched:
             continue
         checked += 1
@@ -1057,13 +1071,18 @@ def test_no_card_shows_two_different_rums_under_one_name():
         # card name -> the set of generic-tuples that produced it
         shown = {}
         for item in (fm.get("ingredients") or []):
-            if not isinstance(item, dict) or not item.get("item"):
+            # Gated on `generic`, not `item` -- see the note in
+            # test_showing_categories_still_shortens_the_index. `item` is being
+            # retired (#544) and using it here would silently stop checking
+            # every entry that had already lost it.
+            if not isinstance(item, dict) or not item.get("generic"):
                 continue
-            generic = item.get("generic")
+            generic = item["generic"]
             generics = generic if isinstance(generic, list) else [generic]
             labels = [names[g] for g in generics if g in names]
             # The template substitutes only when EVERY generic has a card name,
-            # so a partial match falls back to `item` and shows no card name.
+            # so a partial match falls back to the generic and shows no card
+            # name.
             if not labels or len(labels) != len(generics):
                 continue
             label = " or ".join(labels)
@@ -1110,9 +1129,11 @@ def test_every_card_name_join_is_reachable():
     produced = set()
     for slug, fm in _load():
         for item in (fm.get("ingredients") or []):
-            if not isinstance(item, dict) or not item.get("item"):
+            # Gated on `generic`, not `item` -- see the note in
+            # test_showing_categories_still_shortens_the_index.
+            if not isinstance(item, dict) or not item.get("generic"):
                 continue
-            generic = item.get("generic")
+            generic = item["generic"]
             generics = generic if isinstance(generic, list) else [generic]
             labels = [names[g] for g in generics if g in names]
             if labels and len(labels) == len(generics) and len(labels) > 1:
@@ -1450,6 +1471,798 @@ def _cross_category_scan():
     return checked, bad
 
 
+# =============================================================================
+# AMOUNTS -- one field, and a table that turns it into a number. Spec: #571
+# =============================================================================
+# `ml:` USED TO BE STORED BESIDE EVERY `amount:` and is gone. See the
+# `measures:` block in ingredients.yml for the measurement that made the
+# deletion safe and for why the conversions belong in data.
+
+_AMOUNT_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*(?:/\s*(\d+))?\s*(.*?)\s*$")
+
+
+def _millilitres(amount, measures):
+    """(millilitres, unit) for one `amount` string; (None, unit) if not a volume.
+
+    Raises ValueError when the string cannot be read at all, which is the one
+    outcome that matters -- see test_every_amount_is_readable_as_a_quantity.
+
+    THE UNIT IS REQUIRED, and a bare number is deliberately an error rather
+    than an assumed millilitre figure. Nineteen amounts in the collection are
+    bare numbers, and they are NOT all the same unit: Port-au-Prince's ladder
+    (30, 22.5, 15, 7.5, 5) is plainly millilitres and Drunken Skull's
+    (0.75, 0.75, 0.5, 0.5) is just as plainly ounces. Guessing gets one of them
+    wrong by a factor of 30 and looks exactly as confident either way. Every
+    one of the nineteen already carries a `QQ - no unit in the source` note,
+    which is the right answer and the one this check preserves.
+    """
+    text = str(amount)
+    match = _AMOUNT_RE.match(text)
+    if not match:
+        raise ValueError("no leading number")
+    whole, denominator, rest = match.groups()
+    number = float(whole)
+    if denominator:
+        number /= float(denominator)
+    words = [w for w in rest.lower().split()
+             if w not in (measures.get("ignored_words") or [])]
+    if not words:
+        raise ValueError("a number with no unit")
+    unit = " ".join(words)
+    per_ml = measures.get("per_ml") or {}
+    if unit in per_ml:
+        return round(number * per_ml[unit], 3), unit
+    if unit in (measures.get("non_volumetric") or []):
+        return None, unit
+    raise ValueError(f"undeclared unit {unit!r}")
+
+
+def _amount_scan():
+    """(how many amounts read cleanly, the ones that did not).
+
+    ONE SCAN, TWO TESTS -- see `_character_scan`.
+    """
+    measures = _vocab().get("measures") or {}
+    read = 0
+    bad = []
+    for slug, fm in _load():
+        notes = " ".join(str(n) for n in (fm.get("notes") or []))
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict) or item.get("amount") is None:
+                continue
+            try:
+                _millilitres(item["amount"], measures)
+            except ValueError as why:
+                # THE EXEMPTION IS THE DRINK'S OWN QQ, not a registry here.
+                # A hardcoded list of slugs cannot tell a gap that has been
+                # filled from one that has merely been deleted, and HANDOVER 10
+                # records five guards going false-red on exactly that shape.
+                # A QQ note is per-drink, so it works on a partial corpus, and
+                # it fails in BOTH directions that matter: fill the unit in and
+                # forget the note, or drop the note without filling it in.
+                if "no unit in the source" in notes or "carries no ml figure" in notes:
+                    continue
+                bad.append(
+                    f"{slug}: amount {item['amount']!r} on "
+                    f"{item.get('item') or item.get('generic')!r} -- {why}"
+                )
+            else:
+                read += 1
+    return read, bad
+
+
+def test_every_amount_is_readable_as_a_quantity():
+    """Every `amount` yields millilitres, or names a declared non-volume -- #571.
+
+    THIS IS WHAT `ml:` WAS ACTUALLY FOR. The stored figure looked like the
+    guarantee that a drink's quantities are computable, and it was not one: it
+    could simply be absent, and on all nineteen unitless amounts it was. A
+    consumer reading `.get("ml")` got `None` and had no way to tell "this is a
+    dash, correctly numberless" from "this says 30 and nobody wrote the unit".
+
+    So the number is derived from `measures:` in ingredients.yml and this check
+    is the promise. #545 (scaler), #294/#297 (alcohol units) and #547 (cost)
+    can all be built against it.
+
+    AN UNDECLARED UNIT FAILS HERE RATHER THAN VANISHING. Adding a unit is one
+    line in `measures:` -- `per_ml` if it is a volume, `non_volumetric` if it
+    counts or weighs. Declaring it is what switches enforcement on, the same
+    bargain `canonical_glasses` and the `<family>_characters` lists strike.
+    """
+    _, bad = _amount_scan()
+    assert not bad, (
+        "Amounts that cannot be read as a quantity:\n  " + "\n  ".join(bad)
+        + "\n\nEither the unit is missing from `measures:` in "
+          "_data/cocktails/ingredients.yml -- add it to `per_ml` with its "
+          "millilitre value, or to `non_volumetric` -- or the amount really "
+          "has no unit, in which case do NOT guess one: 0.75 is an ounce on "
+          "Drunken Skull and 22.5 is a millilitre on Port-au-Prince, and the "
+          "difference is thirtyfold. Write a `QQ - no unit in the source for "
+          "<amount> <item>` note, as all nineteen existing cases do."
+    )
+
+
+def test_the_amount_table_is_exercised():
+    """Amounts are actually being read, rather than all being exempted.
+
+    The QQ escape in `_amount_scan` is per-drink and generous by design, so the
+    failure mode this guards is the whole check quietly exempting itself -- a
+    parser change that raised on everything would look identical to a clean run
+    if nobody counted what got through.
+    """
+    read, _ = _amount_scan()
+    _exercised(
+        read, "the amount table",
+        "Every amount in the collection failed to parse, or none was found at "
+        "all -- `measures:` or the `amount` key has moved.")
+
+
+def test_the_declared_measures_produce_the_figures_the_data_used_to_store():
+    """The conversions still say what `ml:` said before it was deleted -- #571.
+
+    ANCHORS, NOT A ROUND TRIP. The 521 stored figures are gone, so nothing can
+    re-derive and compare them; what survives is a handful of real pairs taken
+    from the collection on the day of the deletion, one per declared unit plus
+    the two shapes that nearly broke the parser.
+
+    THE FRACTION CASE IS HERE BECAUSE IT ALREADY FOOLED ME ONCE. A first pass
+    at this measurement read "2/3 oz" as 2 and reported Don's Mai Tai as the
+    only drink whose stored `ml` disagreed with its `amount`. The data was
+    right and the parser was wrong, which is the direction that would have
+    silently tripled two figures had it not been checked against what was
+    actually stored.
+    """
+    measures = _vocab().get("measures") or {}
+    cases = [
+        ("25 ml", 25.0),        # the 376-entry majority
+        ("0.5 oz", 15.0),       # 1 oz -> 30, the bar-standard rounding
+        ("2/3 oz", 20.0),       # Don's Mai Tai -- stored 20
+        ("1/3 oz", 10.0),       # Don's Mai Tai -- stored 10
+        ("2 tsp", 10.0),        # 1 tsp -> 5
+        ("1 heaping oz", 30.0), # Kill Devil Punch -- `heaping` is ignored
+    ]
+    wrong = [f"{text!r} -> {_millilitres(text, measures)[0]}, expected {want}"
+             for text, want in cases
+             if _millilitres(text, measures)[0] != want]
+    assert not wrong, (
+        "The declared conversions no longer reproduce figures the collection "
+        "actually stored:\n  " + "\n  ".join(wrong)
+        + "\n\nThese are real amounts from real drinks, checked against their "
+          "`ml:` values before that key was deleted. If a conversion is being "
+          "changed on purpose, say so here -- silently is how ratios drift."
+    )
+    for text in ("2 dashes", "12 cubes", "75 g"):
+        assert _millilitres(text, measures)[0] is None, (
+            f"{text!r} is not a volume and must yield no millilitre figure. "
+            "Returning 0 instead of None is the bug that would make "
+            "_syrup_ratio_scan average a dash in as if it were nothing."
+        )
+
+
+def test_no_ingredient_stores_a_millilitre_figure():
+    """`ml:` is retired -- #571. The `amount` string is the only quantity.
+
+    A RETURNING KEY WOULD BE READ BY NOTHING AND WOULD DRIFT IN SILENCE, which
+    is the whole reason it went: 521 entries held the same fact twice, and the
+    duplicate's only possible future was to disagree with the string beside it.
+    An ingest session copying an older drink as a template is exactly how it
+    comes back -- the same route HANDOVER 4.0 records for the hyphenated
+    `awaiting-fix` spelling reappearing across 34 files.
+    """
+    bad = [f"{slug}: {item.get('item') or item.get('generic')!r} has ml: {item['ml']!r}"
+           for slug, fm in _load()
+           for item in (fm.get("ingredients") or [])
+           if isinstance(item, dict) and "ml" in item]
+    assert not bad, (
+        "`ml:` is retired -- the quantity is `amount` alone:\n  "
+        + "\n  ".join(bad)
+        + "\n\nThe millilitre figure is derived from `measures:` in "
+          "_data/cocktails/ingredients.yml. If an amount cannot be read, that "
+          "is a missing unit to declare or a genuine QQ, not a reason to write "
+          "the number down a second time."
+    )
+
+
+def test_every_drinks_moods_match_the_derivation():
+    """Stored moods equal what taxonomy.yml's own rules produce -- #452.
+
+    MOODS ARE STORED RATHER THAN COMPUTED AT RENDER, so that Helen can
+    override one -- and the cost of storing them is that they can go stale
+    against the rules while looking perfectly fine. They did, comprehensively.
+    Derived once on 2026-08-17 and frozen into 114 files; by 2026-08-30 the
+    derivation's ingredient sets held 34 strings naming nothing, 24 drinks
+    disagreed with the rules, and **23 drinks had no mood at all** -- including
+    `naked-and-famous`, which Helen rates `oh gods yes`, and
+    `martinique-swizzle`, which was carrying `fruity` and `tiki` inherited from
+    the drink it replaced despite containing no fruit and no tiki marker.
+
+    A DRINK WITH NO MOOD IS INVISIBLE TO BOTH QUESTIONS THE INDEX ASKS. It can
+    be reached by ingredient or by name and by nothing else, and the index --
+    which is a browsing tool first -- gives no sign it is there. Nothing failed,
+    because nothing compared the stored value to the rule that produced it.
+
+    HELEN'S CORRECTIONS ARE PART OF THE EXPECTED VALUE, not an exemption from
+    it: `mood_include` and `mood_exclude` in taxonomy.yml each name the single
+    mood they are about, so a corrected drink still tracks every later
+    improvement to the rules. The Sazerac keeps `strong brown drink` (its
+    discarded rinse water drags the volume rule to 44%) and still gained
+    nothing wrongly.
+
+    RE-RUN, DO NOT HAND-EDIT: `python3 scripts/derive_cocktail_moods.py`
+    reports the difference and `--write` applies it. If the derivation is
+    wrong about a drink, that is a rule to fix in taxonomy.yml or a correction
+    to record there -- never a mood typed into a file where the next run will
+    silently revert it.
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import derive_cocktail_moods as deriver
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/derive_cocktail_moods.py not importable")
+
+    taxonomy = _taxonomy()
+    vocab = _vocab()
+    assert taxonomy.get("mood_ingredients"), (
+        "`mood_ingredients` is missing; nothing to derive from.")
+    sets = deriver.load_sets(taxonomy, vocab)
+    step_words = taxonomy.get("mood_step_words") or {}
+    families = set(vocab.get("family_of") or {})
+    include = taxonomy.get("mood_include") or {}
+    exclude = taxonomy.get("mood_exclude") or {}
+    order = list(taxonomy.get("moods") or {})
+
+    bad = []
+    for slug, fm in _load():
+        stored = [str(m) for m in (fm.get("mood") or [])]
+        # THE SCRIPT'S OWN FUNCTION, not a second copy of its four steps. The
+        # copy that used to live here drifted the moment the derivation gained
+        # an input, and would have drifted again over `moods_by_hand`.
+        derived = deriver.expected_moods(slug, fm, stored, taxonomy, sets,
+                                         step_words, families)
+        if derived != stored:
+            gained = [m for m in derived if m not in stored]
+            lost = [m for m in stored if m not in derived]
+            bad.append(f"{slug}: stored {stored}"
+                       + (f", derivation adds {gained}" if gained else "")
+                       + (f", derivation drops {lost}" if lost else ""))
+    assert not bad, (
+        "Stored moods disagree with taxonomy.yml's own rules:\n  "
+        + "\n  ".join(bad)
+        + "\n\nRun `python3 scripts/derive_cocktail_moods.py` to see the "
+          "difference and `--write` to apply it. Do NOT hand-edit a `mood:` "
+          "block -- the next run reverts it silently. If the derivation is "
+          "wrong about a drink, fix the rule in `mood_ingredients` or record "
+          "the correction in `mood_include`/`mood_exclude`, both in "
+          "taxonomy.yml, so the reason survives."
+    )
+
+
+def test_every_mood_correction_is_reachable_and_needed():
+    """A correction names a real drink and still changes something -- #452.
+
+    A CORRECTION THAT SILENTLY DOES NOTHING is the failure this repo has met
+    before: `EXTRA_NOTES["Sazerac"]` was written, the ingest ran cleanly, and
+    the note never appeared because that drink was in SKIP. Nothing complained.
+
+    Two ways one dies here. It can name a drink that no longer exists, in
+    which case it is inert. Or the rules can improve until the drink derives
+    the mood on its own -- and then the correction reads as load-bearing while
+    doing nothing, which is worse, because the next reader trusts it. The
+    Swizzle's entry says exactly that of itself: it was expected to become
+    unnecessary once #335 typed its rums.
+
+    Same bargain `methods.yml`'s proposals strike, and the reason it is
+    WHOLE_COLLECTION_ONLY: on a partial corpus a correction whose drink is
+    merely absent looks identical to one whose drink is gone.
+    """
+    _require_whole_collection("the mood corrections")
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import derive_cocktail_moods as deriver
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/derive_cocktail_moods.py not importable")
+
+    taxonomy = _taxonomy()
+    vocab = _vocab()
+    sets = deriver.load_sets(taxonomy, vocab)
+    step_words = taxonomy.get("mood_step_words") or {}
+    families = set(vocab.get("family_of") or {})
+    drinks = dict(_load())
+
+    bad = []
+    for kind, entries in (("mood_include", taxonomy.get("mood_include") or {}),
+                          ("mood_exclude", taxonomy.get("mood_exclude") or {})):
+        for slug, entry in entries.items():
+            if slug not in drinks:
+                bad.append(f"{kind}.{slug}: names no drink in the collection")
+                continue
+            if not str(entry.get("why", "")).strip():
+                bad.append(f"{kind}.{slug}: has no `why`")
+            derived = deriver.derive(drinks[slug], sets, step_words, families)
+            for mood in (entry.get("moods") or []):
+                if mood not in (taxonomy.get("moods") or {}):
+                    bad.append(f"{kind}.{slug}: {mood!r} is not a declared mood")
+                elif kind == "mood_include" and mood in derived:
+                    bad.append(
+                        f"mood_include.{slug}: {mood!r} is derived anyway now "
+                        "-- the rules caught up, so this entry does nothing "
+                        "and should go")
+                elif kind == "mood_exclude" and mood not in derived:
+                    bad.append(
+                        f"mood_exclude.{slug}: {mood!r} is not derived anyway "
+                        "-- nothing to remove, so this entry does nothing")
+    assert not bad, (
+        "Mood correction(s) that do not do what they claim:\n  "
+        + "\n  ".join(bad)
+        + "\n\nA spent correction reads as outstanding work and as a live "
+          "reason. Delete the entry, or fix what it names."
+    )
+
+
+def test_every_mood_ingredient_is_declared():
+    """The mood derivation's ingredient sets name real vocabulary -- #452.
+
+    THIS IS THE TEST WHOSE ABSENCE COST THE MOODS. Moods were derived once, on
+    2026-08-17, from nine hardcoded sets of generic names inside the drafts
+    repo's `ingest_from_csv.py`, and the output was frozen into 114 files. The
+    vocabulary then moved: #335 finished typing every generic, #314
+    reclassified the rums and moved `blackstrap` from a generic to a character,
+    #561 renamed ten generics including every rum and both gins, #568 added
+    five, the Chartreuses took their French names.
+
+    **34 of those strings named nothing at all** by the time anyone looked --
+    nine of `aged`'s 29, which is every rum and every whisky in it, so `strong
+    brown drink` could no longer fire on a rum; five of `clear`'s 17; five of
+    `tiki`'s 13; nine of `loud`'s 23.
+
+    A SET INTERSECTION AGAINST A RENAMED STRING RETURNS EMPTY. It does not
+    raise and it does not warn, and the derivation had already run, so the
+    drift was invisible from both ends at once. §9.12's bargain, from the other
+    side: duplicate live data only alongside the test that keeps the duplicate
+    honest. The duplicate was in a private repo's script, so there was no test
+    and could not have been one.
+
+    GENERICS **OR** CHARACTERS, because `blackstrap` is legitimately a
+    `rum_characters` value and appears in two sets. Reading generics alone was
+    one of the 34.
+    """
+    vocab = _vocab()
+    sets = _taxonomy().get("mood_ingredients") or {}
+    assert sets, (
+        "`mood_ingredients` is missing from taxonomy.yml. It is the "
+        "derivation's whole vocabulary; without it "
+        "scripts/derive_cocktail_moods.py derives nothing and this check "
+        "compares nothing."
+    )
+    allowed = set(_declared_generics(vocab))
+    for key, value in vocab.items():
+        if _is_character_list(key) and isinstance(value, list):
+            allowed |= set(value)
+
+    bad = []
+    for name, members in sorted(sets.items()):
+        for m in members:
+            if m not in allowed:
+                bad.append(f"mood_ingredients.{name}: {m!r}")
+    assert not bad, (
+        "Mood ingredient(s) naming no declared generic or character:\n  "
+        + "\n  ".join(bad)
+        + "\n\nEvery member must be a real value from ingredients.yml. A "
+          "string that names nothing does not fail at derivation time -- the "
+          "set intersection simply comes back empty and the mood silently "
+          "stops firing, which is exactly how `strong brown drink` stopped "
+          "reaching any rum. If a generic was renamed, follow it here; the "
+          "`retired_*` maps in ingredients.yml record every successor."
+    )
+
+    # `mood_up_glasses` USED TO BE CHECKED HERE and went with the `up` mood on
+    # 2026-08-30 -- see the deriver for why that mood lost. It was the only
+    # glass-valued list the moods read; if another appears, check it against
+    # glasses.yml the way this did, because an unmatched glass name narrows a
+    # mood silently rather than erroring.
+
+
+def test_source_names_a_source_and_source_url_holds_the_url():
+    """`source` is who, `source_url` is where -- #454. A SHAPE rule only.
+
+    NOTHING HERE ASKS FOR COVERAGE, and that is the whole design. 86 of 114
+    drinks have `source: ""` and Helen's ruling on 2026-08-30 is that this is
+    fine: "I sort of don't care about this. You can't copyright facts, and I am
+    taking no prose from anywhere. Some will be attributable to a big-name
+    inventor, bar or maybe hotel, and it's nice to note that, but I'm not going
+    to sweat it."
+
+    That is the right call and it is a real difference from food, not laziness.
+    `SOURCE_ATTRIBUTION_SPEC.md` and the eight `source_type` values exist
+    because a food recipe is ADAPTED PROSE and the promotion gate is about
+    copyright. A cocktail is a formula plus a build -- quantities and steps --
+    so there is nothing to attribute in that sense, and importing that
+    apparatus would be the encyclopaedia-of-drinks busywork #459 rules out.
+
+    WHAT IS STILL WRONG RATHER THAN ABSENT is one field being used as the
+    other. `witches-daiquiri` carried a raw Difford's URL in `source` with
+    `source_url` empty -- so the drink page printed a URL where it prints a
+    name, and the URL field it has sat unused beside it. One instance, fixed;
+    this stops the next, because the shape of a mistake is what recurs and an
+    empty field is not a mistake at all.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        if "source" not in fm:
+            continue
+        checked += 1
+        source = fm.get("source")
+        if not isinstance(source, str):
+            bad.append(f"{slug}: source is a {type(source).__name__}")
+            continue
+        if re.match(r"\s*(https?://|www\.)", source):
+            bad.append(f"{slug}: source holds a URL -- {source[:60]!r}")
+    assert not bad, (
+        "`source` is misused:\n  " + "\n  ".join(bad)
+        + "\n\n`source` names WHO -- a person, a bar, a book, a site by name "
+          "(\"Difford's\"). `source_url` holds the link. An empty `source` is "
+          "fine and always will be; a URL in it is not."
+    )
+    assert checked, (
+        "No drink declares `source` at all, so this compared nothing -- every "
+        "drink carried the key when this was written."
+    )
+
+
+def test_no_drink_uses_a_generic_that_is_helens_to_apply():
+    """A style listed in `hers_to_apply` may not be inferred onto a drink -- #542.
+
+    THE FAILURE THIS EXISTS FOR IS INVISIBLE TO EVERY OTHER GUARD HERE, and
+    #542 says so in its own words: "a wrong-but-declared value with no
+    contradicting evidence is invisible to every guard in the suite". Every
+    value involved is declared and valid. `test_every_generic_is_declared` is
+    green. The suggestion that would have contradicted it was dropped, so
+    #534's cross-category check is green too. Nothing was left to notice.
+
+    What actually happened, twice: `caramel-forward Jamaican rum` has bottles
+    (Blackwell, Myers) and no drink, and a session read that as a gap and
+    retyped a drink into it from its own `item` text. Helen, 2026-08-30, after
+    the second time: "I have discussed this at least twice... If I have to deal
+    with this again I will simply delete those recipes."
+
+    HANDOVER 9.3.2 ALREADY FORBADE IT IN PROSE -- "it is hers to apply: never
+    retype a drink into it from item text" -- which is the whole argument for
+    this being a test. Two hooks in `.claude/`, `meta.awaiting_fix` and
+    `meta.proofread` all reached the same conclusion first: a rule that gets
+    read and broken needs a mechanism.
+
+    THE LIST IS THE ENFORCEMENT AND REMOVING A LINE IS THE GRANT. Helen deletes
+    an entry in the same commit as the drink that earns the style; nobody else
+    does, and never to make this go green.
+    """
+    reserved = _vocab().get("hers_to_apply") or {}
+    assert reserved, (
+        "`hers_to_apply` is empty. If a style has genuinely been released, "
+        "that is Helen's call and this test should have gone with it -- an "
+        "empty registry here means the check compares nothing."
+    )
+    declared = _declared_generics(_vocab())
+    phantom = sorted(set(reserved) - declared)
+    assert not phantom, (
+        "`hers_to_apply` names generic(s) no group declares:\n  "
+        + "\n  ".join(phantom)
+        + "\n\nA reserved style must be a real one. A typo here reserves "
+          "nothing and reads as though it does."
+    )
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            for g in (generic if isinstance(generic, list) else [generic]):
+                if g in reserved:
+                    bad.append(f"{slug}: {g!r}\n      {reserved[g].strip()}")
+    assert not bad, (
+        "Drink(s) using a generic that is Helen's to apply:\n  "
+        + "\n  ".join(bad)
+        + "\n\nDo not infer this from `item` text or from a bottle name. If "
+          "she has applied it, the line comes out of `hers_to_apply` in "
+          "_data/cocktails/ingredients.yml in the same commit -- and that "
+          "deletion is hers, not yours."
+    )
+
+
+def test_every_ingredient_entry_has_something_the_line_renders():
+    """An entry with none of `amount`/`generic`/`item` prints as a raw Hash.
+
+    `_layouts/cocktail.html` renders the structured ingredient line when the
+    entry carries one of those three and otherwise falls through to a
+    bare-string branch, where Liquid stringifies a dict. Tried on Aperol
+    Spritz: the page printed `{"amount"=>"90 ml", "generic"=>"prosecco"}` with
+    a clean build and nothing in the log.
+
+    THE GATE USED TO NAME `item` ALONE, which #544 move 1 stopped rendering, so
+    this was primed to fire on move 2's first and safest step -- dropping
+    `item` from the ~283 entries whose every word already appears in the
+    generic beside them. Fixed there; this is the data half.
+
+    There are no bare-string ingredients today (619 of 619 are dicts), and that
+    branch is for a genuinely unstructured one. A dict arriving there is not
+    that shape, it is this one with a key missing, which is why it must never
+    be reachable by omission.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            checked += 1
+            if not (item.get("amount") or item.get("generic") or item.get("item")):
+                bad.append(f"{slug}: {item!r}")
+    assert not bad, (
+        "Ingredient entries with nothing the line can render:\n  "
+        + "\n  ".join(bad)
+        + "\n\nEach needs an `amount`, a `generic` or an `item`. Without one "
+          "the drink page prints the YAML dict itself, on a green build."
+    )
+    assert checked, "No ingredient entries were scanned, so this compared nothing."
+
+
+def test_no_drink_writes_plantation():
+    """Planteray is the brand's name; `plantation` is only ever read -- #582.
+
+    Helen: "'plantation' is not permitted as a kind of rum and should always be
+    corrected to 'planteray'." Planteray is canonical (HANDOVER 9.3.2,
+    2026-08-27) and the old spellings stay in `bottles.yml` as ALIASES, which is
+    not half a finished rename but the same division `canonical_glasses` draws:
+    **the rule governs what is WRITTEN, the alias map governs what can be
+    READ.** Most of these drinks predate the rebrand, so a suggestion has to
+    keep resolving whether or not its drink has been retyped.
+
+    SO THIS CHECKS THE DRINKS AND NOT THE DATA FILES, and deleting the eleven
+    aliases to "finish the job" would break every suggestion this rule has not
+    reached. `bottles.yml` is deliberately out of scope.
+
+    The last live case was a TITLE, which is why nothing caught it: every
+    ingredient, suggestion and generic had already been retyped, and
+    "Plantation Pineapple Daiquiri" was the only trace left -- on a drink whose
+    own `item` reads "Planteray pineapple-infused rum" two lines below it.
+    Renamed with its file on 2026-08-30.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        checked += 1
+        if "plantation" in slug.lower():
+            bad.append(f"{slug}: the FILENAME says plantation")
+        haystack = [("title", fm.get("title"))]
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            for key in ("item", "generic", "suggestion", "note"):
+                value = item.get(key)
+                haystack += [(key, v) for v in
+                             (value if isinstance(value, list) else [value])]
+        for key, value in haystack:
+            if isinstance(value, str) and "plantation" in value.lower():
+                bad.append(f"{slug}: {key} = {value!r}")
+    assert not bad, (
+        "Drinks still writing `plantation`:\n  " + "\n  ".join(bad)
+        + "\n\nWrite `Planteray` -- it is the same brand, renamed. The old "
+          "spellings stay in bottles.yml as aliases on purpose, so a "
+          "suggestion keeps resolving either way; this rule is about what "
+          "gets WRITTEN into a drink, not what can be read."
+    )
+    assert checked, "No drinks were scanned at all, so this compared nothing."
+
+
+def test_a_qq_note_carries_a_qq_label():
+    """A drink note that is unresolved says so on its tab -- #572.
+
+    NOTES ARE `{label, text}` OR A BARE STRING, exactly as a food recipe's are
+    (HANDOVER 4) -- and `_layouts/cocktail.html` has rendered both shapes since
+    the layout was written, falling back to the literal word "note". Nothing had
+    ever used the labelled form, so all 170 notes rendered identically.
+
+    THE SPLIT THAT MATTERS IS NOT TOPIC BUT AUTHORSHIP. 81 of the 170 are the
+    ingest audit trail -- "QQ - `generic` values INFERRED, not confirmed", "QQ -
+    method step 2 is TRUNCATED in the source" -- and they sat on the page
+    labelled "note" beside Helen's own "This drink is incredibly forgiving with
+    the rum". One is a remark about the drink; the other is a record that
+    something is unresolved, and reading it as the first is the failure.
+
+    ONE LABEL, NOT FIVE. The 81 sort into five kinds (inferred, no unit,
+    truncated, glass, mood) and Helen's call was a single `QQ` anyway: the tab
+    says "not ruled on yet", which is what `QQ` means everywhere else in this
+    repo, and a five-word vocabulary would need its own guard to stop a sixth
+    kind arriving untagged.
+
+    THE TEXT KEEPS ITS OWN `QQ - ` PREFIX, which is duplication on the page and
+    deliberate. HANDOVER 5's house-style exemption matches `QQ` as a PREFIX on
+    the string, and every `grep -rn QQ` in this repo's history has found these
+    by their text. Moving the marker into the label alone would fail in the
+    direction where a future scanner silently stops seeing them.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for note in (fm.get("notes") or []):
+            checked += 1
+            if isinstance(note, str):
+                if note.strip().startswith("QQ"):
+                    bad.append(f"{slug}: unlabelled QQ note {note[:60]!r}...")
+                continue
+            if not isinstance(note, dict):
+                continue
+            text = str(note.get("text", ""))
+            label = note.get("label")
+            if text.strip().startswith("QQ") and label != "QQ":
+                bad.append(f"{slug}: QQ note labelled {label!r}, not 'QQ'")
+            if label == "QQ" and not text.strip().startswith("QQ"):
+                bad.append(f"{slug}: labelled QQ but the text does not say so: "
+                           f"{text[:60]!r}")
+    assert not bad, (
+        "QQ notes and their labels disagree:\n  " + "\n  ".join(bad)
+        + "\n\nA note whose text begins `QQ` is written as:\n"
+          '  - label: "QQ"\n    text: "QQ - ..."\n\n'
+          "Both halves, on purpose: the label is what the page shows, the "
+          "prefix is what every QQ scanner in this repo matches on. A note "
+          "that is Helen's own remark stays a bare string and renders as "
+          "\"note\"."
+    )
+    assert checked, (
+        "No drink notes were scanned at all, so this compared nothing -- the "
+        "collection had 170 when this was written."
+    )
+
+
+def test_no_method_step_restates_to_serve_or_garnish():
+    """A step that opens "Serve" or "Garnish" is another field's fact -- #573.
+
+    THE FIELDS ALREADY EXISTED AND THE DRINKS DISAGREED WITH EACH OTHER, which
+    is what #573 means by "we talked about this but it looks like we didn't
+    implement it". Mastiha Mojito said `to_serve: "Straw."`; Mai Tai and Coney
+    Park Swizzle said `Serve with a straw.` as a method step. One fact, two
+    fields, decided per drink by which session last touched it. Don's Own Grog
+    and Man o' War went further and restated their own `garnish:` verbatim.
+
+    THE VERB IS THE TEST, NOT THE WORDS. This deliberately does not fire on a
+    step that merely NAMES a garnish, and the difference is the whole rule:
+
+        "Float the dehydrated lime slice wheel."     an ACTION -- stays
+        "Express lemon zest twist and use as garnish" an ACTION -- stays
+        "Garnish with grated nutmeg."                 a RESTATEMENT -- goes
+
+    HANDOVER 9.4 settles which is which: finishing ACTIONS are method steps
+    ("top with champagne", "squeeze the twist over the drink"), presentation is
+    `to_serve`. An imperative "Garnish with X" instructs you to do the thing the
+    `garnish:` list already states, in the way 9.12 describes for naming the
+    glass inside a strain step -- variance that looks informative and is not.
+
+    Nothing about this is caught by the build. A duplicated garnish renders
+    twice on the page and reads as a page with a redundant last step; a
+    presentation fragment stranded in `method` renders as an instruction and
+    quietly makes `to_serve` look like a field nobody uses, which is how it sat
+    empty on 111 of 114 drinks.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        method = fm.get("method")
+        for step in (method if isinstance(method, list) else [method] if method else []):
+            if not isinstance(step, str):
+                continue
+            checked += 1
+            verb = re.match(r"\s*(serve|garnish)\b", step, re.I)
+            if verb:
+                field = "to_serve" if verb.group(1).lower() == "serve" else "garnish"
+                bad.append(f"{slug}: {step!r} -> {field}")
+    assert not bad, (
+        "Method steps holding another field's fact:\n  " + "\n  ".join(bad)
+        + "\n\nA step OPENING with \"Serve\" is presentation and belongs in "
+          "`to_serve` -- one terse line, as \"Straw.\" and \"Without ice.\" "
+          "already are. A step opening with \"Garnish\" restates `garnish:` "
+          "and should simply go.\n\nA step that DOES something to the garnish "
+          "is fine and is not what this catches -- \"Float the lime wheel\", "
+          "\"Express the zest over the drink\". Lead with the real verb."
+    )
+    assert checked, (
+        "No method steps were scanned at all, so this compared nothing. Every "
+        "drink has a `method`; an empty scan means the loader or the key name "
+        "has moved."
+    )
+
+
+def test_optional_is_a_real_boolean():
+    """`optional` marks an ingredient the drink survives without -- #570.
+
+    A REAL BOOLEAN, NEVER A QUOTED STRING. The exact lesson `meta.awaiting_fix`
+    paid for in HANDOVER 4.0: `optional: "true"` is a string, and every
+    truthiness test in Liquid and in Python agrees a non-empty string is true --
+    so a QUOTED value happens to work here and stops working the moment anything
+    compares it, while `optional: "false"` is true today and reads as false to
+    every human who looks at it. There is no spelling of this field that fails
+    loudly on its own, so the shape is guarded instead.
+
+    `false` is permitted and means the same as absent. It is not written into
+    any drink -- writing "this is not optional" on 617 entries is noise -- but a
+    drink that has been thought about and answered no is a legitimate thing to
+    record, and forbidding it would make the absence ambiguous in the other
+    direction.
+    """
+    seen = 0
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict) or "optional" not in item:
+                continue
+            seen += 1
+            if not isinstance(item["optional"], bool):
+                bad.append(
+                    f"{slug}: {item.get('item') or item.get('generic')!r} has "
+                    f"optional: {item['optional']!r} "
+                    f"({type(item['optional']).__name__}, not bool)"
+                )
+    assert not bad, (
+        "`optional` must be a real YAML boolean -- bare true or false, never "
+        "quoted:\n  " + "\n  ".join(bad)
+    )
+    assert seen, (
+        "No ingredient anywhere carries `optional`, so this check compared "
+        "nothing. Two entries had it when the field was added (#570): Espresso "
+        "Martini's cane sugar syrup and Gunmetal Blue's gentian liqueur. If the "
+        "field has genuinely been retired, delete this test and its sibling "
+        "test_no_ingredient_says_optional_in_prose rather than leaving both "
+        "reporting green over an empty scan."
+    )
+
+
+def test_no_ingredient_says_optional_in_prose():
+    """Optionality is the `optional` field and nothing else -- #570.
+
+    THIS IS THE HALF THAT MAKES THE FIELD STICK, and the reason it exists is
+    that the field was invented to replace exactly this: both live cases said
+    `item: "Gentian liqueur (optional)"` before #570, because `item` was the
+    only slot that would hold a fact no field had. #544 calls that out as the
+    one parenthetical in `item` that sorted into no other field.
+
+    A drink that writes the word back into prose renders it as part of the
+    ingredient's NAME, and nothing else notices: the ingredient line prints
+    whatever the generic says, so "sugar syrup (optional)" would read as a
+    category, sit in the search pool as one, and never reach `optional`'s own
+    rendering. Silent in every direction.
+
+    Scoped to the ingredient fields, NOT to the drink's prose. A method step or
+    a note may discuss what is optional in a sentence -- "the float is optional
+    if you are out of Wray" is a reason, which is a note's whole job.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            for key in ("item", "generic", "suggestion"):
+                value = item.get(key)
+                for text in (value if isinstance(value, list) else [value]):
+                    if not isinstance(text, str):
+                        continue
+                    checked += 1
+                    if re.search(r"\boptional\b", text, re.I):
+                        bad.append(f"{slug}: {key} = {text!r}")
+    assert not bad, (
+        "An ingredient says it is optional in prose rather than in the "
+        "field:\n  " + "\n  ".join(bad)
+        + "\n\nWrite `optional: true` on the entry and take the word out of "
+          "the text. A word inside `item`/`generic`/`suggestion` becomes part "
+          "of the ingredient's name -- it reaches the card, the search pool "
+          "and the recipe line as though it were the category."
+    )
+    assert checked, (
+        "No ingredient text was scanned at all, so this check compared "
+        "nothing. It reads `item`, `generic` and `suggestion` across every "
+        "drink; an empty scan means the loader or the key names have moved."
+    )
+
+
 def test_to_serve_is_a_string():
     """`to_serve` is one line of presentation, never a list.
 
@@ -1578,17 +2391,53 @@ def test_every_glass_value_is_in_the_vocabulary():
 # THE LIST ONLY SHRINKS. The test fails if a drink joins it, and fails again if
 # a drink on it gets a glass and is not removed, so it cannot quietly stop
 # describing the collection.
-GLASSLESS_ON_2026_08_27 = {
-    # kamaniwanalaya came off on 2026-08-30: Helen gave it a Collins, a
-    # pineapple wedge, a maraschino cherry and a bouquet of mint sprigs. Fifteen
-    # left of the original sixteen.
-    "anitas-attitude-adjuster", "banana-boulevardier", "biggles-sidecar",
-    "cobra-effect", "copenhagen-special", "cynar-toronto", "el-mediterraneo",
-    "georgetown-punch", "mai-tai-diffords-recipe",
-    "milliners-punch", "minty-pentones", "modern-zombie-makes-2",
-    "pear-apricot-honey-lemon-and-rosemary-bellini", "tiki-max",
-    "zombie-intoxica",
-}
+#
+# WHO NAMED WHAT, 2026-08-30 -- kept because each is a ruling and several
+# turned on something only Helen knows.
+# kamaniwanalaya came off on 2026-08-30: Helen gave it a Collins, a
+# pineapple wedge, a maraschino cherry and a bouquet of mint sprigs. Fifteen
+# left of the original sixteen.
+#
+# FIVE MORE CAME OFF THE SAME DAY, Helen ruling on each in turn:
+#   anitas-attitude-adjuster  highball, "whatever we say for Long Island
+#                             Iced Tea" -- it is that drink with sparkling
+#                             wine in place of the cola, and says so in its
+#                             own tagline
+#   banana-boulevardier       double old fashioned over the ice block its
+#                             method already asks for, or up in a coupe
+#   biggles-sidecar           coupe
+#   cobra-effect              tiki mug -- "or anything you like because
+#                             it's a mad colour and you might want to see
+#                             it", hence the coupe second
+#   copenhagen-special        coupe, and it gained the orange zest twist
+#                             she named with it
+#   cynar-toronto             old fashioned
+#   el-mediterraneo           collins
+#   georgetown-punch          highball -- she wondered about a sling,
+#                             "they're awesome and underused", and does not
+#                             own one; recorded here rather than as data
+#   mai-tai-diffords-recipe   double old fashioned usually, tiki mug
+#                             sometimes, so both in that order
+#   milliners-punch           highball. "I made this up so I can say what
+#                             I like!"
+#   minty-pentones            old fashioned
+#   modern-zombie-makes-2     collins -- "zombie glass really", which the
+#                             vocabulary does not have and she does not
+#                             own, so the drink carries a note saying so
+#   pear-...-bellini          flute, which its own method already said
+#   tiki-max                  tiki mug
+#   zombie-intoxica           tiki mug
+#
+# AND THAT IS ALL SIXTEEN. The set is empty and stays declared: it is what
+# `test_the_glassless_list_has_no_stale_entries` reads, and that check now
+# asserts the emptiness rather than trusting it -- an empty registry that
+# nothing looks at is how a closed backlog quietly reopens.
+#
+# `set()` AND NOT `{}`: an empty pair of braces is a DICT, which is what
+# this became when the last name came out. Nothing about the braces says
+# so -- the tests below simply started failing with "unsupported operand
+# type(s) for -: 'dict' and 'set'", which is at least a loud way to learn.
+GLASSLESS_ON_2026_08_27 = set()
 
 
 def test_every_drink_names_a_glass():
@@ -1602,8 +2451,15 @@ def test_every_drink_names_a_glass():
     WHY THIS IS A RATCHET AND NOT A FIX. Which glass a drink wants is Helen's
     knowledge, not something derivable from the ingredients -- and guessing
     would be worse than the gap, because a wrong glass looks exactly as
-    confident as a right one. So the existing sixteen are recorded and the
-    check bites on the seventeenth.
+    confident as a right one. So the existing sixteen were recorded and the
+    check bit on the seventeenth.
+
+    ALL SIXTEEN ARE DONE, 2026-08-30. She named every one, in three batches,
+    given the ingredients and the total volume of each -- and several answered
+    themselves once the volume was in front of her: the Bellini's own method
+    already said "add 25 ml syrup to a champagne flute", and Banana
+    Boulevardier's said "over a large ice block". The exemption set is empty,
+    so this test is now simply "every drink names a glass".
 
     NOTE THE TEST ABOVE NO LONGER EXEMPTS `any`. The two changes are the same
     decision from both ends: every drink names a glass, and there is no value
@@ -1629,6 +2485,13 @@ def test_the_glassless_list_has_no_stale_entries():
     while "is every name on this list still glassless" needs the whole book. In
     CI the drafts are absent, so all sixteen names would read as fixed. See
     WHOLE_COLLECTION_ONLY at the top of this file.
+
+    IT IS EMPTY NOW, and that is checked rather than assumed. An exemption set
+    that has emptied is the moment a ratchet stops doing anything, and an
+    unwatched empty set is how one gets quietly refilled -- so the assert below
+    fails if a name is ever added back. Deleting both the set and this test is
+    the right move only once nothing can regress; the sibling above is what
+    keeps the collection honest either way.
     """
     _require_whole_collection("GLASSLESS_ON_2026_08_27")
     missing = {slug for slug, fm in _load() if not (fm.get("glass") or [])}
@@ -1639,6 +2502,14 @@ def test_the_glassless_list_has_no_stale_entries():
         + "\n\nThe list only shrinks. Leaving a fixed drink on it means the "
           "list stops describing the collection, and the next real gap hides "
           "among the stale entries."
+    )
+    assert not GLASSLESS_ON_2026_08_27, (
+        "GLASSLESS_ON_2026_08_27 has entries again:\n  "
+        + "\n  ".join(sorted(GLASSLESS_ON_2026_08_27))
+        + "\n\nIt emptied on 2026-08-30 when Helen named the last of the "
+          "sixteen. A new drink with no glass should fail "
+          "test_every_drink_names_a_glass and be given one -- not be added "
+          "here. This set exists to record a backlog that is now closed."
     )
 
 
@@ -2399,6 +3270,24 @@ def _syrup_ratio_scan():
     ONE SCAN, TWO TESTS -- see `_character_scan`.
     """
     citrus = re.compile(r"lime juice|lemon juice|grapefruit juice", re.I)
+    measures = _vocab().get("measures") or {}
+
+    def ml(entry):
+        """Millilitres, or 0 for anything that is not a volume.
+
+        DERIVED SINCE #571, where it used to be `entry.get("ml")`. Deleting
+        that key without repointing this would not have failed: both halves of
+        the ratio would have summed to zero, `if not (syrup and sour)` would
+        have skipped every drink, and the check would have reported green over
+        nothing -- HANDOVER 12's "test that cannot fail" exactly. What would
+        have caught it is its own sibling, test_the_syrup_ratio_check_is
+        _exercised, which is why that test exists.
+        """
+        try:
+            return _millilitres(entry.get("amount", ""), measures)[0] or 0
+        except ValueError:
+            return 0
+
     problems = []
     checked = 0
     for slug, fm in _load():
@@ -2411,9 +3300,17 @@ def _syrup_ratio_scan():
             g = entry.get("generic")
             return g if isinstance(g, list) else [g] if g else []
 
-        syrup = sum(i.get("ml") or 0 for i in items
+        syrup = sum(ml(i) for i in items
                     if any(str(g).startswith("sugar syrup") for g in generics(i)))
-        sour = sum(i.get("ml") or 0 for i in items if citrus.search(i.get("item", "")))
+        # MATCHES THE GENERIC, NOT `item` -- moved with #544's second move, and
+        # it had to move in the same commit: 106 of the entries that lost their
+        # `item` are juices whose only contribution was the word "fresh", so
+        # every one of them is citrus. Left reading `item` this scan would have
+        # gone quietly blind to most of the sour side of every ratio it checks,
+        # and a ratio with half its numerator missing does not fail, it looks
+        # implausible or vanishes under `if not (syrup and sour)`.
+        sour = sum(ml(i) for i in items
+                   if any(citrus.search(str(g)) for g in generics(i)))
         if not (syrup and sour):
             continue
         checked += 1

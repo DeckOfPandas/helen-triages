@@ -29,6 +29,61 @@
 # planteray stiggins' fancy, planteray o.f.t.d. overproof, malibu, blackstrap.
 # =============================================================================
 
+# --- how an `amount` becomes a number ----------------------------------------
+# THIS REPLACES THE `ml:` KEY, WHICH IS GONE -- #571, 2026-08-30. Every
+# ingredient used to carry its quantity twice: `amount: "25 ml"` beside
+# `ml: 25`. Helen: "Food YAML has this structure, and I'd like cocktails to
+# match" -- one quantity field, a display string, as a food recipe has.
+#
+# MEASURED BEFORE DELETING, because the pair was justified (HANDOVER 9.3) on
+# the grounds that "the string carries units a number cannot". True of
+# "0.5 oz" and "3 dashes". False of "25 ml", which was 376 of the 619 entries.
+# Across the whole collection 521 entries carried both and ALL 521 derive
+# exactly from the table below; the other 98 are non-volumetric and not one of
+# them carried an `ml` at all. So the data already obeyed this rule and was
+# writing the answer down anyway.
+#
+# WHAT `ml:` WAS ACTUALLY BUYING was not the number but the GUARANTEE that a
+# number exists -- which #545 (scaler), #294/#297 (units of alcohol) and #547
+# (cost) all need. A hand-maintained duplicate cannot promise that: it can
+# simply be absent, and it was, on all 19 unitless amounts. The guarantee lives
+# in `test_every_amount_is_readable_as_a_quantity` now, which is stronger,
+# because it fails on an amount nothing can read rather than shrugging.
+#
+# THE CONVERSIONS ARE A DECISION, NOT ARITHMETIC. 1 oz is 30 ml here and not
+# 29.5735 -- bar-standard rounding, which keeps ratios clean. Recorded in
+# HANDOVER 9.4 as a decision and written down nowhere executable until now.
+measures:
+  per_ml:
+    ml: 1
+    cl: 10
+    oz: 30
+    tsp: 5
+
+  # Units that count or weigh something, never a volume. An amount in one of
+  # these has no millilitre figure and is not missing one -- HANDOVER 9.3: "a
+  # dash is not 0.8 ml in any way worth writing down". A consumer checks
+  # whether a figure came back rather than assuming one did.
+  non_volumetric:
+    - dash
+    - dashes
+    - drop
+    - drops
+    - cube
+    - cubes
+    - pinch
+    - each
+    - leaf
+    - leaves
+    - sprig
+    - strip
+    - g
+
+  # Words that may sit between the number and its unit without changing either.
+  # One entry, and it is real: "1 heaping oz" on Kill Devil Punch.
+  ignored_words:
+    - heaping
+
 # --- what the index's ingredient pickers do with all this --------------------
 # THREE NUMBERS, HERE RATHER THAN IN THE SCRIPT, and for the reason food's
 # `search: family_button_min_chars` is in _data/food/ingredient_words.yml: how
@@ -162,6 +217,19 @@ family_aliases:
   tequila: agave
   rhum: rum
   ron: rum
+  # `bitter` AND `amari` REACH THE AMARO FAMILY, added 2026-08-30. Nobody
+  # browsing for a bitter drink types "amaro" first, and the family held
+  # Campari, Aperol, Cynar, fernet and both Amari while the word found nothing
+  # -- precisely the failure that put `whiskey` and `scotch` in this list.
+  #
+  # This is what was left of a proposal to add `bitter` as a MOOD. Helen:
+  # "do we need families -- thinking of bitter and herbal? Why? They're not
+  # browsable or searchable." She was right twice over: `amaro` and `herbal`
+  # already exist as families, so there was nothing to build, and a mood that
+  # means "contains one of these bottles" is a worse copy of HAS TO HAVE. What
+  # was genuinely missing was two words.
+  bitter: amaro
+  amari: amaro
 
 # --- what the (all) button SAYS ----------------------------------------------
 # Helen, 2026-08-29, on the whisky umbrella: "I think that chip should be
@@ -228,6 +296,36 @@ families:
 # Styles Helen does not currently own are declared anyway. This is a spec, not
 # an inventory: she chose that explicitly for gin, where Plymouth, New Western
 # and Genever are all absent from the collection.
+
+# --- generics only Helen may put on a drink ----------------------------------
+# A DECLARED STYLE WITH NO USER IS NOT A GAP TO FILL. These are real categories
+# with real bottles behind them, and applying one to a drink is her judgement
+# about what she reaches for -- never an inference from what the source
+# happened to call the rum.
+#
+# THIS EXISTS BECAUSE IT HAPPENED TWICE AND SHE SAID SO TWICE. #542, and
+# Helen on 2026-08-30: "I remain annoyed about this. I have discussed this at
+# least twice... If I have to deal with this again I will simply delete those
+# recipes." That issue diagnosed its own invisibility exactly -- "a
+# wrong-but-declared value with no contradicting evidence is invisible to every
+# guard in the suite" -- and then nothing was built, so the next session had
+# nothing to stop it.
+#
+# It is the repo's own repeated conclusion, from the two hooks in .claude/ and
+# from `meta.awaiting_fix` and `meta.proofread` before them: a rule that gets
+# read and broken needs a mechanism, not firmer wording. Adding a line here is
+# what switches enforcement on -- test_no_drink_uses_a_generic_that_is_helens
+# _to_apply -- and REMOVING one is how she grants it, in the same commit as
+# the drink that earns it.
+hers_to_apply:
+  "caramel-forward Jamaican rum": >-
+    Blackwell and Myers are declared bottles for this style and no drink uses
+    it. Helen has said twice that she never reaches for Blackwell in the
+    drinks it kept being applied to; a session put cobra-effect into it from
+    item text anyway, and she reverted that on 2026-08-30, ruling the drink
+    `moderately aged Jamaican rum` with no suggestion at all. HANDOVER 9.3.2
+    already said "it is hers to apply: never retype a drink into it from item
+    text", in prose, and prose did not hold.
 
 # GitHub issue #314. `light`, `gold` and `dark` are RETIRED -- see the bottom.
 rum_styles:
@@ -978,6 +1076,22 @@ other:
   - "egg white"
   - "salt"
   - "cider vinegar"
+  # THE THREE BELOW HAVE NO DRINK, ON PURPOSE, and they are declared for the
+  # reason this file already declares Plymouth, New Western dry and genever
+  # while owning none of them: it is a SPEC, not an inventory.
+  #
+  # They are what `pudding in a glass` is made of -- taxonomy.yml's
+  # `mood_ingredients.rich` -- and that mood is likewise declared with zero
+  # members, pending the whole flips-and-Alexanders family in #337. Until
+  # 2026-08-30 the derivation named all three and the vocabulary declared none,
+  # so the mood could not have fired even once a drink arrived, and nothing
+  # anywhere would have said why.
+  #
+  # `egg white` above is a different ingredient and not a substitute: it does
+  # FOAM, not richness, which is why the Gin Sour is not a pudding.
+  - "cream"
+  - "milk"
+  - "whole egg"
 
 # =============================================================================
 # GENERIC -> FAMILY. Bases only.

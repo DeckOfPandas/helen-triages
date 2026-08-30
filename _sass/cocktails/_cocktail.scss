@@ -583,6 +583,25 @@ $amount-indent: $amount-col + $amount-gap;
   font-size: 0.88rem;
 }
 
+// OPTIONAL — #570. An ingredient the drink survives without.
+//
+// A WORD, NOT A PARENTHETICAL, and the reason is the bracket above: on this
+// line brackets mean "the bottle" and nothing else, so "(optional)" sitting
+// where "(Beefeater)" sits would make one mark carry two jobs. Same argument
+// #441 made about a bare "(blackstrap)".
+//
+// Italic and in $color-clear-text rather than a hue. It is not a filter axis
+// and nothing on the index matches it, so it has no colour to tie back to —
+// every hue on this page means "this string is also a control somewhere", and
+// spending one here would make a promise the index cannot keep. Compare
+// `.cocktail-suggestion`, which is cosmopolitan precisely BECAUSE a bottle name
+// is a thing has-to-have matches against.
+.cocktail-optional {
+  font-style: italic;
+  color: $color-clear-text;
+  font-size: 0.84rem;
+}
+
 // WAS THE CLASS LINE, IS NOW THE CHARACTER LINE — #544, 2026-08-29. The generic
 // moved up to be the headline itself, so this rule no longer glosses it; the
 // only thing left below the line is `character`, on the three drinks that carry

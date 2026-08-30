@@ -1812,31 +1812,28 @@ glass:                           # LIST, not scalar — corrected 2026-08-17
   - "rocks"
 garnish: []                      # LIST — Cobra's Fang has two
 ingredients:                     # FULL list, untriaged, in build order
-  - amount: "0.5 oz"             # the quantity AS WRITTEN — display string
-    ml: 15                       # the same quantity numerically; see below
-    item: "Appleton Estate Reserve"   # what you actually pour, brand-led
-    generic: "Jamaican, moderately aged"  # the #314 vocabulary; see §9.3.1
-    suggestion: "Pierre Ferrand ambre"  # alternative bottle or category
+  - amount: "0.5 oz"             # the ONLY quantity field — see below
+    generic: "moderately aged Jamaican rum"  # the #314 vocabulary; see §9.3.1
+    suggestion: "Appleton Estate Signature"  # the bottle, NAME(S) ONLY — §9.3.1
   - amount: "15 ml"
-    ml: 15
-    item: "Light aged rum"       # the source genuinely doesn't name a bottle
     generic:                     # a LIST means "or", never "and" — §9.3.1
-      - "lightly aged and filtered"
-      - "blended multi-region rum, clear"
-    suggestion: "Havana 3"       # bottle NAME(S) ONLY — never reasoning, §9.3.1
+      - "lightly aged and filtered rum"
+      - "clear blended multi-region rum"
+    suggestion: "Havana Club 3"
     note: "Whichever you prefer or are trying to use up"   # the REASON, resolving #457
   - amount: "15 ml"
-    ml: 15
-    item: "Black rum"
-    generic: "moderately aged"
+    generic: "moderately aged rum"
     character:                   # a property of THIS RECIPE'S use of the
       - "blackstrap"             # bottle, not of the bottle in the abstract — #441, §9.3.1
-    suggestion: "Gosling's"
+    suggestion: "Gosling's Black Seal"
+    optional: true               # BOOLEAN, absent means required — #570
 method:                          # ORDERED LIST — the steps are sequential
   - "Pour absinthe into ice-filled glass."
 to_serve: ""                     # PRESENTATION, not a further instruction
-notes:                           # bare strings, as food — DRINK-level, not per-ingredient
+notes:                           # {label, text} or a bare string, as food
   - "This is much less sugar than many recipes"
+  - label: "QQ"                  # 81 of the 170 are the ingest audit
+    text: "QQ - `generic` values INFERRED, not confirmed: ..."   # trail — #572
 source: ""
 source_url: ""                   # external; nothing verifies it
 meta:
@@ -1844,19 +1841,68 @@ meta:
   date_last_edited: "2026-08-16"
 ```
 
-**`amount` and `ml` are the same fact twice, on purpose, and want a guard.**
-Same idiom as `internal_temperatures.yml`'s display-string-beside-numeric-pair
-(§14): the string carries units a number cannot, the number makes ratios and
-scaling possible at all. **`ml` is ABSENT wherever the unit is not
-volumetric** — a dash is not 0.8 ml in any way worth writing down — so a
-consumer must check for the key rather than assume it. Conversions used:
-1 oz → 30 ml, 1 tsp → 5 ml. That is bar-standard rounding, not 29.5735;
-it keeps ratios clean and it is a decision, not an accident.
+**`amount` IS THE ONLY QUANTITY FIELD. `ml:` is retired — #571, 2026-08-30.**
+Every entry used to carry the same quantity twice, `amount: "25 ml"` beside
+`ml: 25`. Helen: *"Food YAML has this structure, and I'd like cocktails to
+match."*
 
-**`item` versus `generic`.** `item` is the bottle: "Skippers dark rum",
-"Briottet Abricot". `generic` is the category: "Demerara, aged", "apricot
-liqueur". No rule can derive the second from the first, which is why it is
-stored rather than computed.
+**Measured before deleting**, because the pair had a stated justification —
+"the string carries units a number cannot", true of `0.5 oz` and `3 dashes` and
+false of `25 ml`, which was 376 of the 619 entries. **521 entries carried both
+and all 521 derive exactly** from `measures:` in `ingredients.yml`; the other 98
+are non-volumetric and not one of them carried an `ml` at all. The data already
+obeyed the rule and was writing the answer down twice.
+
+**What the key was actually buying was the GUARANTEE that a number exists** —
+which #545, #294/#297 and #547 all need, and which it never delivered: it could
+simply be absent, and on all 19 unitless amounts it was.
+`test_every_amount_is_readable_as_a_quantity` is that guarantee now, and it is
+stronger, because an amount nothing can read fails instead of shrugging.
+
+Conversions live in `measures:`: 1 oz → 30 ml, 1 tsp → 5 ml, 1 cl → 10 ml. That
+is bar-standard rounding, not 29.5735; it keeps ratios clean and it is a
+decision, not an accident. Non-volumetric units are declared there too, so a
+dash is *known* to have no millilitre figure rather than merely lacking one.
+
+**NINETEEN AMOUNTS ARE A BARE NUMBER AND MUST NOT BE GUESSED.**
+Port-au-Prince's ladder (30, 22.5, 15, 7.5) is plainly millilitres and Drunken
+Skull's (0.75, 0.5) is just as plainly ounces — thirty times apart, and a wrong
+guess looks exactly as confident as a right one. All nineteen carry a
+`QQ - no unit in the source` note, and the guard reads that note rather than a
+registry of slugs, so filling one in without removing the note fails too.
+
+**`item` IS BEING RETIRED — #544, and it is most of the way gone.** It held
+what the SOURCE called the ingredient, brand-led; `generic` is the category, and
+no rule derives the second from the first, which is why that one is stored.
+619 entries carried an `item`; **282 still do.**
+
+What has gone, and why each was safe rather than judged:
+
+| | |
+|---|---|
+| **177** | every word already in the entry's own generic or suggestion — `Prosecco`/`prosecco` |
+| **106** | the only addition was `fresh`, which `ingredients.yml` bans in its own capitals |
+| **61** | the item WAS a bottle, promoted to `suggestion` on Helen's ruling — see below |
+
+**The 61 were 26 bottles, not 61 decisions**, and she ruled on them from a
+review page: Angostura alone was 16 entries, Velvet Falernum 9. Two came off
+rather than being promoted (Flor de Caña Extra Dry, Ron del Barrito). The
+evidence that made it quick was that **14 of the 26 were already named as a
+`suggestion` on another drink** — her reaching for the bottle in writing,
+elsewhere.
+
+**What is left is 269 entries with real residue plus 19 parentheticals**, and
+two of Helen's own issues sit inside it: `cane` ×31 is #594 (cane vs demerara vs
+turbinado syrup) and the retired colour vocabulary is #542's territory.
+
+**THE GATE IS THE TRAP HERE, and it fired for real.** The drink page's
+ingredient line was `{% raw %}{% if item.item %}{% endraw %}` — the one field
+#544 move 1 stopped rendering — so removing an `item` printed
+`{"amount"=>"90 ml", "generic"=>"prosecco"}` on the page, clean build, nothing
+in the log. Four guards in the test suite had the same stale gate. Both fixed
+*before* any deletion, with the whole suite run green first to prove the repoint
+changed nothing. **A condition is a bet on which field carries the content, and
+moving the content silently voids it** — §12's nested-CSS-rule trap, in Liquid.
 
 **`generic` is fully typed, and it is what the index browses by.** Re-measured
 2026-08-29 by parsing every drink rather than grepping: **619 ingredient
@@ -2229,11 +2275,52 @@ ranked preference between two bottles she owns *is* a fact about the drink.
 because the Spicers string was misattributed to it rather than to Milliners
 Punch; `test_every_suggested_bottle_resolves` caught the edit, not a reader.
 
-**`Jamaican, caramel forward` still has no drink**, and did not gain two as an
+**`caramel-forward Jamaican rum` still has no drink**, and did not gain two as an
 earlier session note claimed. Blackwell was going to bring cobra-effect and
 georgetown-punch into it; Helen dropped both suggestions instead ("I never use
 Blackwell there"). The style has bottles — Blackwell, Myers — and no user, and
 **it is hers to apply**: never retype a drink into it from item text.
+
+> ### THAT PARAGRAPH WAS ALREADY HERE AND DID NOT HOLD. IT IS A TEST NOW.
+>
+> Between it being written and 2026-08-30, a session put cobra-effect into
+> `caramel-forward Jamaican rum` from its own `item` text, with a Blackwell
+> suggestion — the exact thing the sentence above forbids. Helen: *"I remain
+> annoyed about this. I have discussed this at least twice… If I have to deal
+> with this again I will simply delete those recipes."*
+>
+> **`hers_to_apply` in `ingredients.yml` is the mechanism**, checked by
+> `test_no_drink_uses_a_generic_that_is_helens_to_apply`. Adding a line
+> switches enforcement on; **removing one is Helen's grant**, made in the same
+> commit as the drink that earns the style, and never to turn a red green.
+>
+> **#542 diagnosed its own invisibility and nobody built the answer**, which is
+> the part to carry. Its own text says "a wrong-but-declared value with no
+> contradicting evidence is invisible to every guard in the suite" — every
+> value declared, `test_every_generic_is_declared` green, and the suggestion
+> that would have disagreed already dropped, so #534 green too. Writing that
+> diagnosis down felt like handling it. It is §12's "you will write down a rule
+> instead of following it", one level up: **stating why nothing can catch
+> something is not catching it.**
+
+**THE FOUR #542 RULINGS, Helen 2026-08-30, applied the same day.** Recorded here
+because the last set was recorded only in an issue comment and was reversed
+inside three days. Names are the post-#561 ones; she wrote the older shorthand.
+
+| drink | generic | suggestion |
+|---|---|---|
+| `hurricane-classic` | `moderately aged rum` | **Pusser's Gunpowder** |
+| `tiki-max` | `moderately aged rum` | **Pusser's Blue Label** |
+| `cobra-effect` | `moderately aged Jamaican rum` | **none, deliberately** |
+| `georgetown-punch` | `lightly aged and filtered rum`, then `moderately aged rum` + `character: [blackstrap]` | Gosling's |
+
+Both Pusser's are already declared `moderately aged rum` in `bottles.yml`, so
+these two restore the evidence #542 says was deleted, and neither crosses a
+category or needs a #534 note. Georgetown Punch already matched her ruling; what
+it gained is a note carrying the source's own figures, which differ from hers in
+two amounts (22.5 ml against 20 ml of each juice) and name Koko Kanu rather than
+Malibu. Her figures stand — §9.4.1, the site is canon — and the source is
+recorded beside them rather than argued with.
 
 ### 9.3.3 The drinks index's search — three modules, and what each ruling was
 
@@ -2325,6 +2412,20 @@ Exact matches only: `honey water` and `soda water` are real choosing facts.
   `test_to_serve_is_a_string` now guards the shape, which nothing did while
   there was no data: a list would NOT fail loudly, because the layout pipes it
   through `markdownify`, which stringifies rather than raises.
+
+  **SEVEN DRINKS USE IT NOW, and #573 was the other half of the same fact.**
+  While three drinks said `to_serve: "Straw."`, four others wrote the identical
+  thing into `method` as "Serve with a straw." — one fact in two fields, decided
+  per drink by whichever session last touched it. The four moved; the wording
+  follows the terse noun phrase the original three already used, because the
+  field name supplies the verb.
+
+  **`test_no_method_step_restates_to_serve_or_garnish` keys on the VERB**, and
+  that is the whole rule rather than a judgement per step. Two more steps
+  restated `garnish:` outright and were deleted. But a step that DOES something
+  to a garnish stays: "Float the dehydrated lime slice wheel" and "Express lemon
+  zest twist" both name a garnish and both instruct. Word-matching cannot tell
+  those apart; the leading verb can.
 - **Both brand and generic** are stored per ingredient.
 
 ### 9.4.1 The site is canon. Deviation happens in the kitchen.
@@ -2374,19 +2475,14 @@ alone. See the note there.
   `test_no_garnish_is_stated_as_none_and_nothing_else`, which allows `none`
   only ALONE and only lowercase. It cannot become one member of a list beside
   a real garnish, and it cannot acquire a second spelling.
-- ~~**`meta.status` and `meta.ship` have no vocabulary.**~~ **OUT OF DATE,
-  2026-08-23.** `meta.status` is retired entirely — Helen: "I am perfectly
-  well aware of how much work I have done on each drink... it's easy to keep
-  track of" — its only consumer anywhere in the codebase was `chaos`'s
-  `haven't tried` bucket, which is dropped rather than redefined, since an
-  untried drink never publishes. `meta.ship` has a real, ordered, tested
-  vocabulary, `ship_scale` in `_data/cocktails/taxonomy.yml`: `not really` <
-  `meh` < `sure` < `yes` < `oh gods yes` (`meh` replaced `maybe`/`okay`, which
-  "only ever meant the same shrug"). `who knows` and `QQ` are deliberately
-  OFF that scale — see the file's own comment. §9.9 is where this vocabulary
-  turned into an actual feature.
+- **`meta.ship` is an ordered, tested vocabulary** — `ship_scale` in
+  `_data/cocktails/taxonomy.yml`: `not really` < `meh` < `sure` < `yes` <
+  `oh gods yes`, with `who knows` and `QQ` deliberately OFF the scale (see the
+  file's own comment). `meta.status` is retired entirely; its only consumer
+  anywhere was `chaos`'s `haven't tried` bucket, and an untried drink never
+  publishes. §9.9 is where this vocabulary turned into a feature.
 - **`tests/test_cocktails.py` is the cocktails suite** — glasses, generics,
-  bottles, moods, methods, the `amount`/`ml` agreement guard. `tests/conftest.py`
+  bottles, moods, methods, the `measures:` amount table. `tests/conftest.py`
   is explicitly the FOOD suite; this module carries its own fixtures and its own
   `cocktails` marker. A cocktails test must ASSERT its corpus is non-empty
   rather than skipping mid-run, or it passes vacuously.
@@ -2519,10 +2615,14 @@ gem, not assumed. One loop handles both shapes with no type-detection. A list
 `generic` joins with a quiet italic "or": it means "either would do" (#441),
 never "and".
 
-**Still not solved on this page**: `item` is retired from DISPLAY but still
-stored, and ~90 entries carry real content in it (bottles that belong in
-`suggestion`, `(float)` and `(rinse)` that belong in `method`, and two
-`(optional)`s that have no home at all). #544 move 2 is that redistribution.
+**`optional: true` is the field the two `(optional)`s used to hide inside
+`item`** — #570, and it renders as a plain word after the name rather than a
+parenthetical, because the brackets on that line already mean "the bottle".
+It is NOT food's `incidental`, despite the matching shape: that one HIDES a
+line, this one shows it and marks it.
+
+**The rest of `item`'s redistribution is #544 move 2 and is most of the way
+done — see §9.3 for what has gone and what is left.**
 
 ### 9.10.1 Cards and search read the VOCABULARY, never the transcription — #501/#544/#558
 
@@ -2551,16 +2651,13 @@ entry has a card name, else fall back to `item`" — the all-or-nothing half
 matters because a list `generic` means "either would do" (#441) and ten rum
 entries carry one; a mixed list would otherwise print half a fact.
 
-**THE KEY NAME IS HALF A LIE, and that is a debt rather than an oversight.**
-Ceylon arrack has a card name as of 2026-08-27 — Helen: "is that a rum? Doesn't
-matter, the category list should eventually contain everything" — so the map has
-a non-rum member and will grow more. It has no `family` and must not get one
-(coconut flower sap; `family_less` carries the reason), which is exactly why its
-card would otherwise fall back to raw item text. **Rename it to `card_names` the
-next time `cocktails/index.html` is open**; the template only ever looks a
-generic up in it, so nothing else changes. The test loosened by one notch to
-match: a card name must still be a DECLARED generic — the typo case — but
-deliberate widening no longer fails.
+**The map is not rum-only and is not named as if it were** — renamed to
+`card_names` on 2026-08-29. Ceylon arrack was its first non-rum member; Helen:
+"is that a rum? Doesn't matter, the category list should eventually contain
+everything." It has no `family` and must not get one (coconut flower sap;
+`family_less` carries the reason), which is exactly why its card would otherwise
+fall back to raw item text. A card name must still be a DECLARED generic — the
+typo case — but deliberate widening no longer fails.
 
 **Helen's call, asked with `El Dorado 12 year old rum` → `Demerara rum` in
 front of her: category ALWAYS, including where the recipe names a real
@@ -2692,14 +2789,11 @@ re-looking at: when Helen asked, cards rendered `item` and the line really was a
 jumble; they now render vocabulary, and the 37 surviving capitals were all real
 proper nouns before this rule lowercased them too.
 
-**THE DRINK PAGE IS DELIBERATELY UNCHANGED, and this is the live constraint.**
-#544 makes its ingredient line the generic plus the bottle — which today would
-read `moderately aged (Gosling's Black Seal)` and `London dry (Tanqueray)`,
-worse than what is there. **A card name may be lossy; a recipe line must read as
-an ingredient.** Ten generics do not, eight of them rum styles named after
-production traits rather than after the drink they make. #561 is that rename,
-blocked on the drafts checkout because ~93 entries move with it. The drink page
-follows in that pass, and #513 closes with it.
+**A CARD NAME MAY BE LOSSY; A RECIPE LINE MAY NOT** — the rule that survives
+this, and #561 is what made the drink page possible. Ten generics were named
+after production traits rather than after the drink they make, so #544's
+ingredient line would have read `moderately aged (Gosling's Black Seal)` until
+they were renamed. They were; the drink page followed; #513 closed with it.
 
 The bottle side of all this is §9.3.2.
 
@@ -3061,7 +3155,7 @@ describe where a rule USED to live.
 | | | |
 |---|---|---|
 | 1 | **YOLO?** | `no chaos please` / `I'm open to chaos` |
-| 2 | **Mood** | six buttons: what the drink IS |
+| 2 | **Mood** | what the drink IS — fourteen buttons since 2026-08-30 |
 | 3 | **Hassle** | four buttons: what it COSTS |
 | 4 | **Has to have** / **Leave out** | typed, with candidate pools |
 | 5 | **I know what I want** | drink name — the way past all of it |
@@ -3083,6 +3177,67 @@ The only cut that earns its place is between what a drink IS and what it COSTS.
 total, non-overlapping and free of phantoms. Without it a mood added to
 `moods:` renders NOWHERE — no button, no error, and its drinks become
 unfilterable. Same silent-gap class as an unmapped glass (#500).
+
+##### HALF THE MOODS ARE HELEN'S AND NO RULE PRODUCES THEM — #452, 2026-08-30
+
+**Nineteen moods. Nine are derived from ingredients and method; ten are
+hers alone**, listed in `moods_by_hand`. `scripts/derive_cocktail_moods.py`
+never emits one of hers, and `expected_moods()` preserves whatever a drink
+already carries for them, so a re-run can reorder her judgement but never
+overwrite it. **Verified rather than assumed**: two were put on the Negroni by
+hand and the whole collection re-derived with `--write`; both survived.
+
+**THE TEST THAT DECIDES WHICH SIDE A MOOD BELONGS ON IS HERS.** Four flavour
+tags were proposed — `bitter`, `smoky`, `herbal`, `vegetal` — and she killed
+all four:
+
+> *"They're flat descriptors, which is fine in moderation, whereas I'd hoped
+> for more evocative moods, you know, something I can offer beyond what one
+> might guess from the ingredients list."*
+
+A tag meaning "contains one of these bottles" is a worse copy of the HAS TO HAVE
+field, which already does that and does it better. **Apply this to any future
+mood.** `amaro` and `herbal` turned out to already exist as FAMILIES, so the
+roll-up those tags would have duplicated was built all along; the only thing
+genuinely missing was the word `bitter`, now an alias to `amaro`.
+
+**EVERY RULE WAS SCORED against a full pass she made over all 114 drinks**,
+which is the measurement to repeat rather than re-derive. Intersection over
+union:
+
+    no juicing 1.00 | fruity .94 | ice ice baby .88 | warming .79 | sharp .78
+    strong brown drink .76 | I want to faff .73 || clear .67 | tiki .53
+    aperitivo .36 | sugar craving .23
+
+The four after the break moved to `moods_by_hand` on those numbers.
+
+**`up` WAS PROPOSED AND KILLED THE SAME DAY, and the way it died is the useful
+part.** Read straight off the glass it covered 58 of 114 — 51% — and
+`test_no_mood_covers_more_than_half_the_collection` refused it: the guard that
+retired food's `one-pot` at 57%. Helen had said *"I'm not sold on up, let's
+retain it but with suspicion"* an hour earlier, and **the suite reached her
+conclusion independently**. Narrowing was not available — the coupe alone is 40
+drinks, so any version without it is not `up`. `mood_up_glasses` went with it.
+
+**THE RULES UNDER-FIRE, AND THAT IS THE REASSURING HALF.** Across the entire
+pass there were only **four** cases where a rule tagged something she did not.
+Everything else was her adding. A conservative rule is the right kind of wrong.
+
+**THIRTY-ONE OF HER CALLS ARE `mood_include` ENTRIES rather than looser rules**,
+because every relaxation was measured and cost more than it bought: dropping
+`sharp`'s ingredient cap fixes 9 and wrongly tags 20; `warming` plus falernum
+fixes 2 and wrongly tags 8; one muddle instead of two fixes 3 and wrongly tags
+11. `sharp` stays 40 right and 0 wrong. **A narrow, precise rule plus recorded
+exceptions beats a loose rule**, and each exception still receives every other
+mood and every later improvement.
+
+**THE ONE RULE THAT DID CHANGE was `fruity`**, where the measurement went the
+other way: `orange juice` in, `crème de banane` out, from 8 misses and 1 false
+positive to 2 and 0. The rule excluded all citrus as "the sour component" —
+true of lime and lemon, **false of orange**, since nobody builds a sour on
+orange juice. Grapefruit stays out; a Brown Derby really is a sour. The orange
+LIQUEURS were tested and rejected: they reach every drink she tagged and wrongly
+tag nine more. **Orange juice is fruit; orange liqueur is construction.**
 
 **`I KNOW WHAT I WANT` is last on purpose.** Food has had that escape hatch
 since the beginning and this page had none, so there was no way past the
@@ -3115,7 +3270,8 @@ are unchanged from the page it replaced — see §9.9 and issue #235.
 
 **A mood with no drinks renders no button**, counted rather than listed as an
 exception, so the rule holds for whichever mood is empty next. Today that is
-`pudding in a glass`; ten of the eleven render.
+`pudding in a glass` (2 drinks now, but see #337 — the family exists in Helen's
+head and not in the collection); eighteen of the nineteen render.
 
 **Filtering reads data- attributes, never rendered text.** Moods, chaos bucket
 and a pre-lowercased ingredient string are all written at build time. A filter
@@ -3331,13 +3487,25 @@ on one drink said nothing true about that drink and something false about the
 other 113. Daisy now reads `[collins]`, which is what "anything, but preferably
 a Collins" always meant. **There is now no exempt value.**
 
-**The real gap that issue was hiding: sixteen of 114 drinks name no glass at
-all.** On a drink page the glass is the hero — drawn as tall as the whole title
-block — so an empty `glass` is a page with a hole where its main image goes.
-`test_every_drink_names_a_glass` ratchets the sixteen rather than guessing:
-which glass a drink wants is Helen's knowledge, not derivable, and a wrong glass
-looks exactly as confident as a right one. The list only shrinks — filling one
-in without removing it from the list also fails.
+**The real gap that issue was hiding was sixteen of 114 drinks naming no glass
+at all, and it is CLOSED — 2026-08-30.** On a drink page the glass is the hero,
+drawn as tall as the whole title block, so an empty `glass` was a page with a
+hole where its main image goes. `test_every_drink_names_a_glass` ratcheted the
+sixteen rather than guessing, because which glass a drink wants is Helen's
+knowledge and a wrong glass looks exactly as confident as a right one.
+
+She named all sixteen in three sittings. `GLASSLESS_ON_2026_08_27` is empty and
+the test is now simply what its name says. **The empty set is asserted rather
+than assumed** — an exemption list that has emptied is the moment a ratchet
+stops doing anything, so its sibling fails if a name is ever added back.
+
+**WHAT MADE IT QUICK WAS SHOWING THE TOTAL VOLUME**, which is the transferable
+part. That is what actually decides a glass and it had never been put in front
+of her; several drinks then answered themselves — the Bellini's own method
+already said "add 25 ml syrup to a champagne flute", Banana Boulevardier's said
+"over a large ice block". Two glasses she wants and does not own (a sling, a
+zombie) are recorded as NOTES rather than data, because a `glass` value is what
+she would actually pour into.
 
 #### A technique worth keeping: tracing a filled icon into strokes
 

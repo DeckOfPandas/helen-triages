@@ -186,13 +186,13 @@ layout: default
      main_ingredients is — no completeness/substitution split, no pantry
      demotion. Keys, each earning its place from the real data:
 
-       amount     the quantity AS WRITTEN ("0.5 oz", "3 dashes") — the display
-                  string, which carries units a number cannot
-       ml         the same quantity in millilitres, for ratios and scaling.
-                  ABSENT on purpose where the unit is not volumetric — a dash
-                  is not 0.8 ml in any way worth writing down. Duplicated on
-                  purpose and guarded by a test, the same idiom
-                  internal_temperatures.yml uses for its display/numeric pairs.
+       amount     the quantity, and the ONLY quantity field — "25 ml",
+                  "0.5 oz", "3 dashes". A `ml:` key sat beside this on every
+                  entry until #571 and is retired: 521 of them restated a
+                  string that already said the same number, and every one
+                  derives exactly from `measures:` in ingredients.yml.
+                  Helen: "Food YAML has this structure, and I'd like cocktails
+                  to match" — one display string, as a food recipe has.
        item       what the source calls it, brand-led when the source names a
                   bottle ("Appleton Estate Reserve")
        generic    what you would ever FILTER by ("Jamaican, moderately aged").
@@ -203,6 +203,17 @@ layout: default
                   LIST.
        note       the reasoning that used to get smuggled into `suggestion`
                   (#457) — its own line, always visible, no interaction.
+       optional   BOOLEAN, absent means required (#570). The drink is still
+                  the drink without this pour. Two entries carry it today —
+                  Espresso Martini's syrup and Gunmetal Blue's Suze — and
+                  both said it inside `item` text before the field existed,
+                  which is #544's point exactly: `item` was holding a fact
+                  no field could.
+
+     `optional` IS NOT FOOD'S `incidental`, DESPITE THE MATCHING SHAPE. Both
+     are a bare boolean on an ingredient item and they do opposite things:
+     `incidental` HIDES the line entirely (a frying oil nobody measures),
+     `optional` SHOWS it and marks it. Do not reason from one to the other.
 
      HEADLINE, CLASS LINE, CHARACTER, NOTE — settled 2026-08-24 after a design
      pass on #465/#460. The headline is `suggestion` when present (you shop by
@@ -234,7 +245,25 @@ layout: default
     <h2 class="cocktail-section-heading">Ingredients</h2>
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
-        {% if item.item %}
+        {% comment %} THE GATE ASKS FOR THE FIELDS THIS BLOCK ACTUALLY RENDERS,
+           and it used to ask for `item.item`, which this block stopped
+           rendering at all in #544 move 1. That left a trap primed for move 2:
+           drop `item` from an entry and it falls through to the bare-string
+           branch below, where `{{ item }}` stringifies a Hash. Tried on Aperol
+           Spritz before this was changed, and the page printed
+
+               {"amount"=>"90 ml", "generic"=>"prosecco"}
+
+           with a clean build and nothing in the log. `item` is on ~283 entries
+           whose every word is already in the generic beside it, so move 2's
+           first and safest step would have done this several hundred times.
+
+           A GATE MUST NAME WHAT THE BRANCH NEEDS, not what the data happened
+           to carry when it was written. The bare-string branch is for an
+           ingredient written as a plain string; there are none today, and a
+           dict arriving there is not that shape, it is this one with a key
+           missing. {% endcomment %}
+        {% if item.amount or item.generic or item.item %}
           {% comment %} THE LINE IS THE GENERIC, WITH THE BOTTLE IN BRACKETS —
              #544, Helen 2026-08-29: "London dry gin (Beefeater)". `item` does
              not render at all, which is what makes "prosecco / prosecco" and
@@ -297,7 +326,13 @@ layout: default
           <li class="cocktail-ingredient">
             <div class="cocktail-ingredient-top">
               {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}
-              <span class="cocktail-item">{{ headline }}{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}</span>
+              {% comment %} `optional` is a plain word after the name, NOT a
+                 parenthetical — the brackets on this line already mean "the
+                 bottle", and "sugar syrup (optional)" beside "gin (Beefeater)"
+                 would make one punctuation mark carry two unrelated jobs.
+                 That is #441's argument about "(blackstrap)" arriving on a
+                 different field. {% endcomment %}
+              <span class="cocktail-item">{{ headline }}{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">optional</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
               <p class="cocktail-type-line">{{ class_html }}</p>
