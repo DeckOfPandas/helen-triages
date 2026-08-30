@@ -72,11 +72,7 @@
 // sites rather than as one site failing to match the other.
 .drink-field-label {
   display: block;
-  font-family: $font-headings;
-  font-size: 1.35rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  @include index-section-label;
   color: $color-text;
   margin: 0 0 $space-md;
 
@@ -100,49 +96,25 @@
 // inside `.drink-label-row`, which shrinks it to its content. That is
 // load-bearing rather than incidental -- take a heading out of a flex row and
 // its bar silently becomes full-width.
-// FOOD'S GEOMETRY, NOT AN APPROXIMATION OF IT -- Helen, 2026-08-30: "the
-// underlines under cocktails headings are lower relative to the letters than
-// food headings ... this makes the input field lower border look weirdly low."
+// ONE MARK, TWO PALETTES. `heading-rule` used to be cocktails' own drawing of
+// food's device -- its own dials, its own geometry, and a bug in it that took
+// four rounds of Helen spotting differences to find: an inset box-shadow is
+// measured from the BOTTOM of the box, so the bars sat below the descender line
+// instead of overlapping the letters, and would have moved again the first time
+// anything touched the line-height.
 //
-// AN INSET SHADOW IS MEASURED FROM THE BOTTOM OF THE BOX, which is the whole
-// bug. `inset 0 -0.34em 0` puts the bar in the bottom 0.34em of a box whose
-// height is the LINE-HEIGHT -- so the bars sat below the descender line, well
-// clear of the letters, and moved if the line-height ever changed. Food
-// measures from the TOP of the em box instead, so its bar overlaps the base of
-// the lettering by design and cannot drift.
+// It calls the real thing now. `overlapping-rule-double` moved to
+// _sass/shared/_rule.scss on 2026-08-30 and takes both colours as arguments, so
+// this is the same code food's headings run, with green over absinthe instead
+// of green over violet. The geometry cannot drift because there is only one of
+// it.
 //
-// These are food's own dials, restated because they live in _sass/food/_rule.scss
-// and cocktails cannot import them:
-//
-//     $rule-thickness       0.38em   the section bar
-//     $rule-drop            0.70em   its top, measured DOWN from the text top
-//     $rule-indent          0.15em   how far INTO the text it starts
-//     $rule-overhang        0.20em   how far PAST the text it runs
-//     $rule-under-thickness 0.20em   the shared bar, thinner
-//     $rule-overlap         0.10em   how far it rises behind the one above
-//
-// §13.1's reasoning comes with them: the two read as ONE bar with a stepped
-// edge rather than as two bars, which is what the overlap buys. The lower bar
-// is inset at both ends so it stops inside the lettering; the upper runs to the
-// box's right edge and keeps the overhang.
-//
-// padding-bottom RESERVES ROOM FOR THE LOWER BAR. Courier's content box is only
-// about 1.13em tall and the pair runs to 1.22em, so without it the second bar
-// is clipped. Vertical padding on an inline box grows the background without
-// touching the line height, so nothing moves.
+// $rule-under-inset-right is food's default and right here for the same reason
+// it is right there: it gives back the letter-spacing after the last character,
+// so the lower bar stops inside the lettering rather than trailing past it.
+// Both headings carry 0.08em of tracking, so the number transfers exactly.
 @mixin heading-rule($colour) {
-  padding: 0 0.20em 0.45em 0;
-
-  background-image:
-    linear-gradient($color-heading-shared, $color-heading-shared),
-    linear-gradient($colour, $colour);
-  background-repeat: no-repeat, no-repeat;
-  background-size:
-    calc(100% - 0.41em) 0.20em,
-    calc(100% - 0.15em) 0.38em;
-  background-position:
-    0.05em 0.98em,
-    0.15em 0.70em;
+  @include overlapping-rule-double($colour, $color-heading-shared);
 }
 
 .drink-filter--chaos   .drink-field-label { @include heading-rule($color-heading-yolo); }
@@ -164,10 +136,10 @@
 // section you're mid-task on). Keep the ratio near 2:1." This page is a control
 // panel and was spaced like a document.
 //
-// $space-xl rather than food's `$index-section-gap` by name: that variable
-// lives in _sass/food/ and cocktails cannot see it. Same value, and the shared
-// token is the honest way to say so.
-.drink-filter { margin: $space-xl 0; }
+// $index-section-gap by name now: it moved to shared/_tokens.scss on
+// 2026-08-30, so both indexes name the same gap rather than spelling the same
+// number twice.
+.drink-filter { margin: $index-section-gap 0; }
 
 // EXCEPT INSIDE THE PAIR, where the grid owns the spacing -- and this is #548
 // point 4, "there is too much vertical space between has to have and leave out
@@ -471,7 +443,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: $spacing-block-gap;
-  margin-top: $space-xl;
+  margin-top: $index-section-gap;
 }
 
 .drink-search-input {
@@ -788,5 +760,5 @@
 .btn-clear--bottom { margin: $space-xl 0 0 auto; }
 
 @media (max-width: 720px) {
-  .drink-searches { grid-template-columns: 1fr; gap: $space-xl; }
+  .drink-searches { grid-template-columns: 1fr; gap: $index-section-gap; }
 }

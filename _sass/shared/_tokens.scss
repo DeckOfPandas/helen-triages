@@ -76,3 +76,20 @@ $letter-spacing-label: 0.1em;
 
 // --- Borders & Radii ---------------------------------------------------------
 $radius-sm: 2px;   // note boxes, method-short box, meta wash
+
+
+// --- The index panel ---------------------------------------------------------
+// BOTH SITES' INDEXES ARE THE SAME CONTROL PANEL, so these two gaps belong to
+// neither. They lived in _sass/food/_category-labels.scss and cocktails used
+// `$space-xl` and `$space-md` directly -- the same values under different
+// names, which is the arrangement that stays equal only until someone tunes
+// one. Moved 2026-08-30.
+//
+// §13.4's reasoning travels with them: the index is a control panel, where
+// every section should be visible in one glance, and the recipe page is a
+// document, where space isolates the section you are mid-task on. Keep the
+// ratio near 2:1. That is why these are NOT $spacing-section-gap -- reaching
+// for the recipe page's token is exactly the mistake cocktails had made, and it
+// spaced its control panel like a document.
+$index-section-gap: $space-xl;   // between one filter section and the next
+$index-label-gap:   $space-md;   // a label to its own buttons
