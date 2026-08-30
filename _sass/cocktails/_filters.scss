@@ -436,6 +436,23 @@
 }
 
 // --- the count ---------------------------------------------------------------
+// NO RULE ABOVE IT -- #548 point 7. It carried `border-top: 2px solid
+// $color-radiant-reposado`, a full-width amber bar between the filters and the
+// count. Helen: "distracting."
+//
+// It was also borrowing a hue it has no claim on. §9.13's rule is that a
+// heading's colour is a promise the card keeps -- reposado means YOLO/goodness
+// here, and it is the ship mark's colour -- so a reposado bar above a line that
+// has nothing to do with goodness said something untrue in the site's own
+// vocabulary. Food reached the same conclusion for the same reason and states
+// it outright: its `.results-heading` "carries no colour rule underneath... it
+// isn't one of the five filter categories, so it doesn't borrow one of their
+// hues."
+//
+// `padding-top` stays. It existed to hold the text off the rule, and with the
+// rule gone it simply adds to the margin -- keeping it leaves the spacing
+// exactly as it is, which is a separate question (#548 point 1) from whether
+// there is a bar.
 .drink-count {
   font-family: $font-headings;
   font-size: 0.8rem;
@@ -444,7 +461,6 @@
   color: $color-clear-text;
   margin: $spacing-block-gap 0 $space-xl;
   padding-top: $space-md;
-  border-top: 2px solid $color-radiant-reposado;
 
   strong { color: $color-text; font-size: 1rem; }
 }
