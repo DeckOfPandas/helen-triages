@@ -47,6 +47,12 @@ permalink: /cocktails/
   {% assign ship_tints = taxonomy.ship_tints %}
   {% assign card_names = site.data.cocktails.ingredients.card_names %}
   {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
+  {% comment %} #580: things a card never mentions. Bare `water` and nothing
+     else today -- see the list's own reasoning in ingredients.yml. EXACT
+     membership, which is what `contains` gives on a Liquid list, because
+     `honey water` and `soda water` are real choosing facts and only the bare
+     word is not. {% endcomment %}
+  {% assign not_on_cards = site.data.cocktails.ingredients.not_on_cards %}
 
   {% comment %} Tallest glass counted live from the data, never hardcoded —
      the same rigour _layouts/cocktail.html and _dev/glasses.html hold
@@ -252,7 +258,17 @@ permalink: /cocktails/
          treats a bare string as a one-item sequence — verified against the real
          liquid gem by _layouts/cocktail.html, not assumed — so one loop handles
          both shapes with no type check. {% endcomment %}
-      {% capture searchable %}{% for ing in drink.ingredients %}{% for g in ing.generic %}{{ g }}|{% assign dn = card_names[g] %}{% if dn %}{{ dn }}|{% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }}|{% endfor %}{% endfor %}{% endcapture %}
+      {% comment %} SUPPRESSED ONLY WHEN EVERY GENERIC IS SUPPRESSED, counted
+         rather than tested on the first one. A disjunctive `[water, soda water]`
+         is half a choosing fact and must survive; nothing carries that shape
+         today, which is exactly when to write the rule rather than after.
+
+         The same four lines appear again on the card's own ingredient line
+         below. Liquid has no functions and an include tag called once per
+         ingredient across the collection is the slow way to avoid eight lines --
+         food/index.html duplicates its derivation loop for the same reason. The
+         two must stay in step. {% endcomment %}
+      {% capture searchable %}{% for ing in drink.ingredients %}{% assign gcount = 0 %}{% assign hcount = 0 %}{% for g in ing.generic %}{% assign gcount = gcount | plus: 1 %}{% if not_on_cards contains g %}{% assign hcount = hcount | plus: 1 %}{% endif %}{% endfor %}{% unless gcount > 0 and gcount == hcount %}{% for g in ing.generic %}{{ g }}|{% assign dn = card_names[g] %}{% if dn %}{{ dn }}|{% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }}|{% endfor %}{% endunless %}{% endfor %}{% endcapture %}
 
       <li class="drink-card"
           data-ship="{{ ship }}"
@@ -332,7 +348,7 @@ permalink: /cocktails/
                needs nothing — each ingredient entry renders its own card name,
                so the name simply appears twice, correctly. {% endcomment %}
             <p class="drink-card-ingredients">
-              {% for ing in drink.ingredients %}{% assign label = "" %}{% for g in ing.generic %}{% assign dn = card_names[g] | default: g %}{% if label == "" %}{% assign label = dn %}{% else %}{% assign label = label | append: " or " | append: dn %}{% endif %}{% endfor %}{% assign joined = card_name_joins[label] %}{% if joined %}{% assign label = joined %}{% endif %}{% if label == "" %}{% assign label = ing.item %}{% endif %}{% capture ing_search %}{% for g in ing.generic %}{{ g }}|{% assign dn = card_names[g] %}{% if dn %}{{ dn }}|{% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }}|{% endfor %}{% endcapture %}{% if label != "" %}<span class="drink-card-ing" data-ing="{{ ing_search | downcase }}">{{ label }}</span>{% unless forloop.last %} <span class="drink-card-sep">·</span> {% endunless %}{% endif %}{% endfor %}
+              {% assign shown = 0 %}{% for ing in drink.ingredients %}{% assign gcount = 0 %}{% assign hcount = 0 %}{% for g in ing.generic %}{% assign gcount = gcount | plus: 1 %}{% if not_on_cards contains g %}{% assign hcount = hcount | plus: 1 %}{% endif %}{% endfor %}{% assign hidden = false %}{% if gcount > 0 and gcount == hcount %}{% assign hidden = true %}{% endif %}{% unless hidden %}{% assign label = "" %}{% for g in ing.generic %}{% assign dn = card_names[g] | default: g %}{% if label == "" %}{% assign label = dn %}{% else %}{% assign label = label | append: " or " | append: dn %}{% endif %}{% endfor %}{% assign joined = card_name_joins[label] %}{% if joined %}{% assign label = joined %}{% endif %}{% if label == "" %}{% assign label = ing.item %}{% endif %}{% capture ing_search %}{% for g in ing.generic %}{{ g }}|{% assign dn = card_names[g] %}{% if dn %}{{ dn }}|{% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }}|{% endfor %}{% endcapture %}{% if label != "" %}{% if shown > 0 %} <span class="drink-card-sep">·</span> {% endif %}<span class="drink-card-ing" data-ing="{{ ing_search | downcase }}">{{ label }}</span>{% assign shown = shown | plus: 1 %}{% endif %}{% endunless %}{% endfor %}
             </p>
           {% endif %}
         </div>

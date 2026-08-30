@@ -1,6 +1,22 @@
 # =============================================================================
-# RUM BOTTLES -> CATEGORY. Spec: #529. The check it unblocks: #534.
+# BOTTLES -> CATEGORY. Spec: #529. The check it unblocks: #534.
 # =============================================================================
+# NOT RUM-ONLY SINCE 2026-08-30, Helen's call. It was built as a rum reference
+# and `test_every_bottle_names_a_declared_generic` used to enforce that, on the
+# reasoning that "a bottle typed `cognac` would be a scoping mistake rather than
+# a typo". The scope had already drifted past it: Ceylon arrack is in the card
+# names, `Tesco Finest` sits in `unresolved_suggestions` standing in for a
+# kirsch and a sloe gin, and the Kamaniwanalaya's Disaronno had nowhere to
+# resolve to. Widening the file was the honest move rather than keeping a rule
+# the data had stopped obeying.
+#
+# The TYPO half of that test survives and is the half worth having: a bottle's
+# generic must still be DECLARED, so a renamed style that does not get followed
+# here fails loudly instead of silently.
+#
+# Everything below about rum is unchanged and still the bulk of the file --
+# #314's rulings, the appellations, `not_reached_for`. A non-rum entry simply
+# does not have to argue with any of it.
 # WHAT THIS IS FOR, and it is not an encyclopaedia (#459). Cocktail cards stopped
 # naming bottles and started naming categories (#501), which moved a question
 # from the page to the reader: "which of mine is a Demerara rum?" This is where
@@ -232,6 +248,153 @@ bottles:
     generic: "Batavia arrack"
     aliases: ["Van Osten"]
 
+  # --- the Martinique agricoles, 2026-08-30 ---------------------------------
+  # Named by Helen for the Martinique Swizzle, one per reason: JM for the
+  # classic build, Trois Rivières for a savoury one, La Favourite for high
+  # proof. All three are `rhum agricole blanc` and the ORIGIN THAT SEPARATES
+  # THEM IS NOT RECORDABLE YET -- she asked for "a way of noting the origin of
+  # agricole given flavour varies so much" and it is a real gap: thirteen drinks
+  # use an agricole generic and Barbancourt, which is Haitian, is typed
+  # `rhum agricole vieux` behind a QQ admitting the value was inferred. Raised
+  # rather than invented here.
+  "Rhum JM Blanc":
+    generic: "rhum agricole blanc"
+    aliases: ["JM Blanc", "JM blanc"]
+  "Trois Rivières Cuvée de l'Océan":
+    generic: "rhum agricole blanc"
+    aliases: ["Trois Rivieres Cuvee de l'Ocean", "Trois Rivières", "Cuvée de l'Océan"]
+  "La Favourite Cœur de Canne":
+    generic: "rhum agricole blanc"
+    aliases: ["La Favourite Coeur de Canne", "Coeur de Canne", "Cœur de Canne"]
+
+  # --- not a rum ------------------------------------------------------------
+  # The first entries here that are not cane spirits at all, which is what the
+  # 2026-08-30 widening at the top of this file is about.
+  #
+  # ST LUCIAN, NOT JAMAICAN, and that is why it sits under the origin-free
+  # style. Helen named it for the Kamaniwanalaya's Jamaican arm; St Lucia
+  # Distillers is not Jamaica, and her call when shown that was to move it to
+  # the arm that makes no origin claim.
+  "Chairman's Reserve":
+    generic: "moderately aged rum"
+    aliases: ["Chairmans Reserve", "Chairman's"]
+  "Disaronno":
+    generic: "amaretto"
+    aliases: ["Disaronno Originale"]
+
+  # ===========================================================================
+  # BEYOND RUM -- 2026-08-30
+  # ===========================================================================
+  # Declared so that `test_every_suggested_bottle_resolves` can stop being
+  # rum-only. Helen's call: "are we now assuming every named bottle should be in
+  # it, and classified? That feels right to me."
+  #
+  # EVERY GENERIC HERE IS READ FROM THE COLLECTION, NOT REMEMBERED. It is the
+  # generic of the ingredient the suggestion is written beside, in every drink
+  # that names the bottle -- so `Cointreau -> triple sec` is what the drinks
+  # already say, not what anyone recalls about the bottle. The four brands that
+  # sit beside MORE than one generic (Briottet, Monin, Gabriel Boudier, Acacia)
+  # are deliberately absent: a brand is not a bottle, and which product is meant
+  # is Helen's.
+
+  # --- gin ------------------------------------------------------------------
+  "Beefeater":
+    generic: "London dry gin"
+  "Tanqueray":
+    generic: "London dry gin"
+  "Hayman's":
+    generic: "London dry gin"
+  "Rutte":
+    generic: "London dry gin"
+
+  # --- whisky ---------------------------------------------------------------
+  "Woodford's Reserve":
+    generic: "bourbon"
+    # The curly apostrophe is a SECOND STRING for one bottle and invisible on
+    # the page -- it made two entries out of one in every count until now.
+    aliases: ["Woodford’s Reserve", "Woodfords Reserve"]
+  "Ardbeg XO":
+    generic: "single malt scotch whisky"
+
+  # --- agave ----------------------------------------------------------------
+  "Del Maguey Vida":
+    generic: "mezcal"
+    aliases: ["Del Maguey VIDA", "Del Maguey vida"]
+  "Tapatio":
+    generic: "blanco tequila"
+
+  # --- brandy ---------------------------------------------------------------
+  "Pierre Ferrand Ambre":
+    generic: "cognac"
+    aliases: ["Pierre Ferrand ambre"]
+
+  # --- aromatised wine. See #568, which proposes splitting these further -----
+  "Carpano Antica Formula":
+    generic: "sweet vermouth"
+  # A BRAND THAT IS ITS OWN GENERIC, the pattern #314 permits for three rums
+  # because nothing generalises the bottle. The Ridgwell pours this AND a sweet
+  # vermouth in the same drink, 12.5 ml of each, which is the proof that
+  # "sweet vermouth" does not generalise it.
+  "Punt e Mes":
+    generic: "Punt e Mes"
+    aliases: ["Carpano Punt e Mes", "Punt E Mes"]
+  "Dolin Dry":
+    generic: "dry vermouth"
+    aliases: ["Dolin dry"]
+
+  # --- liqueurs -------------------------------------------------------------
+  "Cointreau":
+    generic: "triple sec"
+  "Cherry Heering":
+    generic: "cherry liqueur"
+  "Suze":
+    generic: "gentian liqueur"
+  "John D Taylor's Velvet Falernum":
+    generic: "falernum"
+    # `Velvet` alone is how two drinks write it, which is a fragment rather than
+    # a name -- resolvable here precisely because the falernum is the only
+    # velvet-anything in the collection.
+    aliases: ["Velvet", "Velvet Falernum", "Velvet falernum"]
+  "Briottet Crème de Pêche":
+    generic: "crème de pêche"
+  "Briottet Crème d'Abricot":
+    generic: "apricot liqueur"
+    # The written spelling carries a stray circumflex and an unaccented Creme.
+    # Aliased rather than corrected in the draft: this file governs what can be
+    # READ, and #585 is where the writing gets fixed.
+    aliases: ["Briottet Creme d'Abricôt", "Briottet Crème d'Abricôt"]
+
+  # --- bitters --------------------------------------------------------------
+  "Angostura":
+    generic: "aromatic bitters"
+    aliases: ["Angostura bitters"]
+  "Bittermens Xocolatl Mole":
+    generic: "chocolate bitters"
+
+  # --- absinthe -------------------------------------------------------------
+  # Helen, 2026-08-30: "honestly my favourite absinthe is Vieux Pontarlier, and
+  # I struggle to not reach for that every time!"
+  "Vieux Pontarlier":
+    generic: "absinthe"
+  # THE FULL NAME MATTERS HERE MORE THAN USUAL. "Pernod" alone names two
+  # different bottles -- this one at 68%, and Pernod Anise at 40%, which is a
+  # pastis. That ambiguity is the entire reason Don's Mai Tai looked like a
+  # cross-category substitution: the bare brand could be read either way, and it
+  # was read the wrong way twice, once by a note on the drink and once by a
+  # declaration in this file.
+  "Pernod Absinthe":
+    generic: "absinthe"
+    aliases: ["Pernod"]
+    note: "Pernod Anise, the 40% yellow one, is a different bottle and a pastis."
+
+  # --- syrups, juices and the rest ------------------------------------------
+  "Monin Gingembre":
+    generic: "ginger syrup"
+  "Bottle Green":
+    generic: "ginger and lemongrass cordial"
+  "Biona unsweetened":
+    generic: "cranberry juice"
+
 # =============================================================================
 # QUALIFIES, DELIBERATELY NOT REACHED FOR -- the reason attached, as family_less
 # =============================================================================
@@ -287,7 +450,12 @@ unresolved_suggestions:
   "ED3 or Havana 3": >-
     Two bottles in one string; wants the list form. Both `lightly aged and
     filtered` since #314.
-  "ED3, Plantation": >-
+  # Re-keyed from "ED3, Plantation" on 2026-08-30 when #582 corrected the
+  # spelling in the drink. This block names STRINGS AS WRITTEN, so it moves with
+  # them -- and `test_every_suggested_bottle_resolves` caught the gap the moment
+  # the draft changed, which is the whole reason a declared exception beats a
+  # comment.
+  "ED3, Planteray": >-
     Two bottles in one string, and since #314 they are in DIFFERENT categories --
     El Dorado 3 is `lightly aged and filtered`, Planteray 3 Stars is `blended
     multi-region rum, clear`. Royal Bermuda Yacht Club's generic is the
@@ -302,16 +470,125 @@ unresolved_suggestions:
     is already the matching disjunctive pair -- Havana 7 is `moderately aged`
     and Appleton 8 is `Jamaican, moderately aged` (#314). The list form makes
     the pairing legible instead of coincidental.
-  "Pusser's Gunpowder, or Smith & Cross": >-
-    Two bottles in one string, against Kamaniwanalaya's stated `[Demerara,
-    aged, Jamaican, moderately aged]`. Since #314 and the 2026-08-27
-    reclassification, Smith & Cross MATCHES the second half and Gunpowder
-    matches neither -- it is `moderately aged`. So the list form would fix half
-    of it and leave a real question about the other. Needs Helen.
-  "Pusser's 151, or Planteray OFTD for a 138 Swizzle": >-
-    Three problems in one string: it is prose (a reason, which #457 moved to
-    `note`), it is two bottles where a list is wanted, and neither bottle is in
-    either of Swizzle's two stated generics. Needs Helen.
+  # BOTH OF THE "NEEDS HELEN" COMPOUNDS CAME OFF ON 2026-08-30, and neither by
+  # being reworded -- the drinks were rewritten and the strings went with them.
+  #
+  # Kamaniwanalaya's "Pusser's Gunpowder, or Smith & Cross" is now a real list:
+  # the generic is `[moderately aged Jamaican rum, moderately aged rum]` and the
+  # suggestion is `[Appleton 8, Chairman's Reserve, Pusser's Gunpowder]`, with
+  # Smith & Cross moved to a note "for more hogo". That is exactly the half this
+  # entry said needed her.
+  #
+  # Swizzle's "Pusser's 151, or Planteray OFTD for a 138 Swizzle" went further:
+  # Helen, "Swizzle has got a bit confused. It should be Martinique Swizzle", so
+  # the drink is 60 ml of unaged agricole and neither bottle is in it.
+  # --- HANDED BACK 2026-08-30, and the reason is the same for eleven of them --
+  # Helen: "Keep only what the collection already spells out; hand me back the
+  # rest." These were declared in this session by DERIVING the bottle's category
+  # from the generic of the ingredient it sits beside -- which is a good default
+  # and not a rule, because a suggestion may deliberately cross categories.
+  # Helen's own example: "a recipe might call for cherry brandy, and I suggest
+  # Cherry Heering OR Briottet cerise even though that's a cherry liqueur not a
+  # brandy, leaving it to future Helen to choose."
+  #
+  # The one that was actually WRONG is first, and it is the argument for the
+  # other eleven: a plausible-looking declaration would have taught #534's
+  # cross-category check a false fact and blinded it to a substitution the drink
+  # already documents.
+  "aguardiente": >-
+    A spirit TYPE rather than a bottle. Bali Hai writes `Aguardiente brandy` as
+    its item and this as its suggestion, so the suggestion repeats the item
+    instead of naming a bottle.
+  "kirschwasser": >-
+    A spirit TYPE rather than a bottle, same as aguardiente.
+  "Portobello": >-
+    A brand, and completing it to Portobello Road was memory rather than
+    reading. Tailspin's generic is `London dry gin`.
+  "Sazerac": >-
+    Written by the drink of the same name against `rye`, so it is not even
+    certain this names a bottle rather than repeating the title.
+  "Luxardo": >-
+    A house, not a bottle. Three drinks write it against `maraschino liqueur`.
+  "Roots": >-
+    A house, not a bottle. Art de Vivre writes it against `mastiha liqueur`.
+  "Bob's": >-
+    A house that makes a great many bitters. Minty Pentones writes it against
+    `peppermint bitters`.
+  "Cocchi di Torino": >-
+    Short of the product name. Man o' War writes it against `sweet vermouth`.
+  "Pierre Ferrand dry": >-
+    Short of the product name, and ambiguous with the Ambre already declared.
+    El Presidente writes it against `orange Curaçao`.
+  "Bob's Margarita bitters": >-
+    A real product name whose CATEGORY is in doubt: Margarita writes it against
+    `lavender-forward bitters` and nothing in the collection says whether these
+    are lavender-led.
+  "Elemakule Tiki": >-
+    Christmas Daiquiri writes it against `warm-spiced bitters`. Probably
+    Bittermens', which is memory rather than reading.
+
+  # --- BEYOND RUM, 2026-08-30 ------------------------------------------------
+  # Declared so `test_every_suggested_bottle_resolves` could stop being
+  # rum-only. Each of these is REAL DEBT with a reason attached, not a way of
+  # silencing the check: the other 43 non-rum suggestions resolved to a bottle.
+
+  # A BRAND IS NOT A BOTTLE. Each of these names a house that makes several of
+  # the things the collection pours, so the string cannot say which product is
+  # meant -- and unlike `Velvet`, no single candidate makes it unambiguous. The
+  # generic beside each one narrows it in every case; completing the string is
+  # Helen's, because "Briottet make a crème de cacao" is an assumption about a
+  # range rather than a fact in the data.
+  "Briottet": >-
+    A brand, not a bottle. Written beside SIX different generics -- crème de
+    cacao, crème de violette, crème de pêche, blue Curaçao, crème de menthe and
+    orange Curaçao -- so the string names a house and the drink names the
+    product. Two of its bottles ARE declared (Crème de Pêche, Crème d'Abricot);
+    these are the ones written bare.
+  "Edmond Briottet": >-
+    The same house under its founder's name, beside `orange Curaçao` in Don's
+    Mai Tai. One generic, so it is resolvable in principle -- but it is still a
+    brand rather than a product, and naming it would guess which Curaçao.
+  "Gabriel Boudier": >-
+    A brand, beside `crème de banane` and `orange Curaçao`.
+  "Monin": >-
+    A brand, beside four generics -- sugar syrup 2:1, cinnamon syrup, passion
+    fruit syrup and orgeat. `Monin Gingembre` is declared because it names the
+    product; these do not.
+  "Acacia": >-
+    A honey VARIETY rather than a bottle, and beside two generics (`honey` and
+    `honey water 2:1`).
+  "acacia honey": >-
+    The same thing spelled out, beside `honey water 2:1`. A SCHEMA MISMATCH
+    rather than a naming one: the suggestion is which honey to make the syrup
+    FROM, and `suggestion` means which bottle to pour. Worth its own decision.
+
+  # PROSE, and each already kept out of the index by the search's prose rule --
+  # this is the data half. #585 is the backlog.
+  "Avallen -- a round, fresh taste if you need to sub": >-
+    A bottle plus a reason. Avallen is a calvados and Apple Cart's generic says
+    so; #457's shape is the bottle in `suggestion` and the reason in `note`.
+  "Dolin Rouge?": >-
+    A question mark, and #568 answers it: Helen lists Dolin Rouge under sweet
+    red vermouth, "I pick this one when I want a lighter character". The
+    Ridgwell's generic is already `sweet vermouth`, so this wants the question
+    mark taken off rather than a decision.
+  "Jack Daniels > Bulleit": >-
+    A comparison, and the direction is ambiguous -- ">" could mean "prefer" or
+    "replaced by". Banana Boulevardier's generic is `bourbon`; Bulleit makes a
+    bourbon and a rye, and Jack Daniels is neither by category.
+  "Or 20g palm sugar": >-
+    An alternative INGREDIENT, not an alternative bottle -- Caipirinha's generic
+    is `raw sugar`. It wants a `note`, or a second option on the generic.
+  "Patron Silver, Rooster Bianco": >-
+    Two bottles in one string. Patrón Silver is a blanco tequila and matches
+    Margarita's generic; Rooster Rojo Bianco is also a blanco, so this is the
+    list form (#457) rather than a real question.
+  "or other Creole-style bitters": >-
+    Prose. Sazerac's generic is already `Creole bitters`, so the string says
+    only "or something else of the same kind" -- which the generic says better.
+  "or other aromatic bitters": >-
+    The same, against `aromatic bitters`.
+
   "Best with ED3, Havana 3 is fine": >-
     Prose carrying a real preference between two bottles Helen owns, which is
     why it STAYS while the two below went: ED3 is the pick and Havana 3 is

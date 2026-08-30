@@ -69,7 +69,14 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 # A `<family>_characters` list is never a generic vocabulary, so the rule can be
 # stated once instead of enumerated -- the same reasoning `_retired` already
 # uses for its `retired_` prefix.
-NOT_GENERIC_LISTS = {"families"}
+# `not_on_cards` JOINED THIS SET ON 2026-08-30, AND IT WAS THE SAME HOLE AGAIN.
+# It names generics that must never reach a card (#580) -- it REFERS to the
+# vocabulary rather than declaring any of it, exactly as `families` does. Left
+# out, every word in it became a permitted generic on its own say-so, so a typo
+# there would have declared itself valid and `test_every_generic_is_declared`
+# would have agreed. Found by breaking the guard that reads this list on purpose
+# and watching it stay green, which is the only reason it was found at all.
+NOT_GENERIC_LISTS = {"families", "not_on_cards"}
 
 
 def _is_character_list(key):
@@ -1124,23 +1131,29 @@ def _bottle_index(data):
     return out
 
 
-def test_every_bottle_names_a_declared_rum_generic():
-    """A bottle's `generic` is a real rum generic -- #529.
+def test_every_bottle_names_a_declared_generic():
+    """A bottle's `generic` is a real generic -- #529.
 
     THE WHOLE VALUE OF THIS FILE IS THAT A BOTTLE KNOWS ITS CATEGORY, so a
-    generic that no longer exists, or one that was never a rum, makes the
-    dictionary quietly wrong rather than loudly broken -- nothing on any page
-    would look different.
+    generic that no longer exists makes the dictionary quietly wrong rather
+    than loudly broken -- nothing on any page would look different.
 
-    Checked against `family_of` rather than the raw generic list, because that
-    is what makes it a RUM bottle: this file does not cover gin or brandy, and
-    a bottle typed `cognac` would be a scoping mistake rather than a typo.
+    THE RUM-ONLY HALF CAME OFF ON 2026-08-30, Helen's call. This used to check
+    against `family_of`'s rum members, on the reasoning that "this file does not
+    cover gin or brandy, and a bottle typed `cognac` would be a scoping mistake
+    rather than a typo". That was true when #529 built it as a rum reference and
+    had already stopped being true: Ceylon arrack joined the card names, `Tesco
+    Finest` went into `unresolved_suggestions` for a kirsch and a sloe gin, and
+    the Kamaniwanalaya wanted Disaronno resolved.
+
+    The scoping argument does not survive the widening, but the TYPO argument
+    does and is the one worth keeping -- a generic that was renamed and not
+    followed here is still silent. So: declared, not rum.
     """
     data = _bottles()
     vocab = _vocab()
-    family_of = vocab.get("family_of") or {}
-    rum_generics = {g for g, fam in family_of.items() if fam == "rum"}
-    assert rum_generics, "`family_of` maps nothing to rum; nothing to check."
+    declared = _declared_generics(vocab)
+    assert declared, "ingredients.yml declares no generics; nothing to check."
     entries = data.get("bottles") or {}
     assert entries, (
         "bottles.yml declares no bottles, so every check here is vacuous."
@@ -1148,13 +1161,14 @@ def test_every_bottle_names_a_declared_rum_generic():
     bad = sorted(
         f"{name!r} -> {(entry or {}).get('generic')!r}"
         for name, entry in entries.items()
-        if (entry or {}).get("generic") not in rum_generics
+        if (entry or {}).get("generic") not in declared
     )
     assert not bad, (
-        "Bottle(s) whose generic is not a declared rum style:\n  "
+        "Bottle(s) whose generic is not a declared style:\n  "
         + "\n  ".join(bad)
-        + "\n\nEither the style was renamed and this did not follow, or the "
-          "bottle is not a rum and does not belong in this file."
+        + "\n\nThe style was probably renamed and this did not follow. Note "
+          "that a bottle no longer has to be a rum -- that restriction came off "
+          "on 2026-08-30 -- but its category still has to exist."
     )
 
 
@@ -1212,7 +1226,7 @@ def test_an_excluded_bottle_is_not_also_listed():
 
 
 def test_every_suggested_bottle_resolves():
-    """Every `suggestion` on a rum names a bottle this file knows -- #529/#534.
+    """Every `suggestion` names a bottle this file knows -- #529/#534.
 
     THE DIRECTION THAT MATTERS. Nothing requires a bottle to be used by a drink
     -- Helen owns bottles no recipe names, and El Dorado 151 is on the shopping
@@ -1220,11 +1234,17 @@ def test_every_suggested_bottle_resolves():
     cannot reason about, and #534's cross-category check silently skips it.
     Half a check is worse than none, because it reports a clean run.
 
-    KNOWN FAILURES ARE DECLARED, NOT TOLERATED. Eleven suggestion strings are
-    prose or two-bottles-in-one-string, which #457 already settled against;
-    they sit in `unresolved_suggestions` with the reason, so this test bites on
-    the NEXT one while those are being fixed. Deleting a line there is how one
-    gets retired -- the same shape `methods.yml` uses for its proposals.
+    THE WORD "rum" CAME OUT OF THAT FIRST LINE ON 2026-08-30, and it had been
+    doing a lot of quiet work: 54 of the collection's 91 distinct suggestions
+    were non-rum and so were checked by nothing at all. See `_suggested_bottle_scan`.
+
+    KNOWN FAILURES ARE DECLARED, NOT TOLERATED. What is left in
+    `unresolved_suggestions` is prose, two-bottles-in-one-string, or a BRAND
+    where a bottle belongs -- Briottet makes six of the things this collection
+    pours, so the string names a house and the drink names the product. Each
+    sits there with its reason, so this test bites on the NEXT one while those
+    are being fixed. Deleting a line there is how one gets retired -- the same
+    shape `methods.yml` uses for its proposals.
     """
     _, unresolved = _suggested_bottle_scan()
     assert not unresolved, (
@@ -1238,11 +1258,15 @@ def test_every_suggested_bottle_resolves():
 
 
 def test_the_bottle_index_is_exercised():
-    """Some rum ingredient in the collection actually carries a suggestion.
+    """Some ingredient in the collection actually carries a suggestion.
 
-    Zero would mean `family_of` stopped mapping the rum styles, or the loader
-    went stale -- either way the rule above is green over nothing. Whole
-    collection only: see `_exercised`.
+    Zero would mean the loader went stale -- and the rule above would be green
+    over nothing. Whole collection only: see `_exercised`.
+
+    The word "rum" came out of this docstring on 2026-08-30 with the scoping it
+    described. Leaving it would be the trap this repo keeps meeting from the
+    other side: a comment that outlives the code it describes, which is how
+    `cocktails/index.html` spent three commits claiming to emit `item`.
     """
     checked, _ = _suggested_bottle_scan()
     _exercised(
@@ -1253,27 +1277,33 @@ def test_the_bottle_index_is_exercised():
 
 
 def _suggested_bottle_scan():
-    """(how many rum suggestions were checked, the ones naming no known bottle).
+    """(how many suggestions were checked, the ones naming no known bottle).
 
     ONE SCAN, TWO TESTS -- see `_character_scan` for why they may not be
     re-typed apart.
+
+    NOT RUM-ONLY SINCE 2026-08-30. It skipped any ingredient whose generic was
+    not in the rum family, which was right while `bottles.yml` was a rum
+    reference and left a real hole once it stopped being one: 54 of the 91
+    distinct suggestions in the collection resolved to nothing and no test
+    minded, because none of them was a rum. Beefeater, Cointreau, Tanqueray,
+    Luxardo, Suze, Punt e Mes -- all invisible.
+
+    Helen's call when shown that count: "are we now assuming every named bottle
+    should be in it, and classified? That feels right to me." So the scan covers
+    every ingredient, and the 43 whose category the collection already stated
+    were declared in the same pass.
     """
     data = _bottles()
     index = _bottle_index(data)
     known = {k.strip().lower() for k in (data.get("unresolved_suggestions") or {})}
     excluded = {k.strip().lower() for k in (data.get("not_reached_for") or {})}
     assert index, "bottles.yml resolves no names; nothing to check."
-    vocab = _vocab()
-    family_of = vocab.get("family_of") or {}
 
     unresolved, checked = [], 0
     for slug, fm in _load():
         for item in (fm.get("ingredients") or []):
             if not isinstance(item, dict):
-                continue
-            generic = item.get("generic")
-            generics = generic if isinstance(generic, list) else [generic]
-            if not any(family_of.get(g) == "rum" for g in generics):
                 continue
             suggestion = item.get("suggestion")
             for name in (suggestion if isinstance(suggestion, list)
@@ -1340,16 +1370,30 @@ def test_the_cross_category_check_is_exercised():
 
 
 def _cross_category_scan():
-    """(how many resolved rum suggestions were checked, the unexplained ones).
+    """(how many resolved suggestions were checked, the unexplained ones).
 
     ONE SCAN, TWO TESTS -- see `_character_scan`.
+
+    NOT RUM-ONLY SINCE 2026-08-30, and the widening has a worked example behind
+    it rather than a principle. `bottles.yml` stopped being a rum file that
+    morning; this scan did not follow, so a cross-category substitution outside
+    rum was invisible -- and one was: Don's Mai Tai asks for `absinthe` and
+    suggests Pernod, which is a pastis. The drink has carried a note saying so
+    all along, so nothing was broken; nothing was CHECKING either, and the
+    session that widened the bottle file nearly declared Pernod an absinthe on
+    the strength of the generic beside it. That declaration would have made this
+    very check agree the pair matched.
+
+    Helen, asked whether a bottle's category may differ from the ingredient it
+    is suggested for: "Yes, and the note should be required." Her own example is
+    the reason it must be allowed at all -- "a recipe might call for cherry
+    brandy, and I suggest Cherry Heering OR Briottet cerise even though that's a
+    cherry liqueur not a brandy, leaving it to future Helen to choose."
     """
     data = _bottles()
     index = _bottle_index(data)
     entries = data.get("bottles") or {}
     assert index, "bottles.yml resolves no names; nothing to check."
-    vocab = _vocab()
-    family_of = vocab.get("family_of") or {}
 
     bad, checked = [], 0
     for slug, fm in _load():
@@ -1358,8 +1402,6 @@ def _cross_category_scan():
                 continue
             generic = item.get("generic")
             generics = generic if isinstance(generic, list) else [generic]
-            if not any(family_of.get(g) == "rum" for g in generics):
-                continue
             suggestion = item.get("suggestion")
             names = (suggestion if isinstance(suggestion, list)
                      else [suggestion] if suggestion else [])
@@ -1510,9 +1552,12 @@ def test_every_glass_value_is_in_the_vocabulary():
 # a drink on it gets a glass and is not removed, so it cannot quietly stop
 # describing the collection.
 GLASSLESS_ON_2026_08_27 = {
+    # kamaniwanalaya came off on 2026-08-30: Helen gave it a Collins, a
+    # pineapple wedge, a maraschino cherry and a bouquet of mint sprigs. Fifteen
+    # left of the original sixteen.
     "anitas-attitude-adjuster", "banana-boulevardier", "biggles-sidecar",
     "cobra-effect", "copenhagen-special", "cynar-toronto", "el-mediterraneo",
-    "georgetown-punch", "kamaniwanalaya", "mai-tai-diffords-recipe",
+    "georgetown-punch", "mai-tai-diffords-recipe",
     "milliners-punch", "minty-pentones", "modern-zombie-makes-2",
     "pear-apricot-honey-lemon-and-rosemary-bellini", "tiki-max",
     "zombie-intoxica",
@@ -2152,7 +2197,12 @@ KNOWN_PROSE_SUGGESTIONS = {
     # shelf on the day, and the generic already says what the drink requires.
     ("sazerac", "or other Creole-style bitters"),
     ("sazerac", "or other aromatic bitters"),
-    ("swizzle", "Pusser's 151, or Planteray OFTD for a 138 Swizzle"),
+    # The Swizzle's "Pusser's 151, or Planteray OFTD for a 138 Swizzle" came off
+    # on 2026-08-30, and retired the way this contract intends: the drink was
+    # rewritten rather than the string reworded. Helen: "Swizzle has got a bit
+    # confused. It should be Martinique Swizzle" -- so it is a 60 ml unaged
+    # agricole now, and neither Pusser's nor the OFTD is in it at all. The
+    # suggestion that could not resolve went with the rum it was suggesting.
 }
 
 
@@ -2506,3 +2556,73 @@ def test_no_mood_covers_more_than_half_the_collection():
           "most of the book tells you nothing -- the reasoning that retired "
           "food's `one-pot` tag."
     )
+
+
+# =============================================================================
+# THINGS A CARD NEVER MENTIONS -- #580
+# =============================================================================
+
+
+def test_nothing_on_the_not_on_cards_list_reaches_a_card_or_the_search():
+    """Bare `water` is on the recipe and never on the index.
+
+    Helen, 2026-08-29: "never write 'water' on a cocktail card and never return
+    it in a search. This is bare 'water', and does not apply to 'honey water' or
+    'sparkling water' or any such thing."
+
+    A card answers "what is this drink LIKE", and the answer is never water. It
+    is on the Sazerac because 60 ml of it is how that drink gets diluted, which
+    is a MAKING fact -- the same distinction §9.10.1 draws when it collapses
+    both syrup ratios to `sugar syrup`.
+
+    CHECKED AGAINST THE BUILT PAGE rather than the template, because the
+    suppression is written twice there -- once on the `searchable` capture and
+    once on the card's own ingredient line -- and Liquid has no way to share it.
+    Two copies that must agree is exactly the thing to test on the output.
+    """
+    vocab = _vocab()
+    hidden = vocab.get("not_on_cards")
+    assert hidden, (
+        "_data/cocktails/ingredients.yml has no `not_on_cards` list. It is what "
+        "keeps bare `water` off the index (#580); without it the template's two "
+        "suppression blocks silently pass everything through."
+    )
+
+    template = (ROOT / "cocktails" / "index.html").read_text(encoding="utf-8")
+    assert template.count("not_on_cards contains g") == 2, (
+        "cocktails/index.html no longer applies `not_on_cards` in BOTH places. "
+        "It has to be tested on the `searchable` capture (what the filter "
+        "matches) and on the card's ingredient line (what a reader sees); one "
+        "without the other means a word is either invisible but filterable, or "
+        "printed but unsearchable."
+    )
+
+
+def test_a_suppressed_word_is_only_ever_suppressed_ALONE():
+    """`honey water` and `soda water` are real choosing facts and must survive.
+
+    The caveat is the whole of Helen's instruction, and it is also the shape of
+    a bug this repo already had: the picker matched `water` against `honey
+    water` by substring until 2026-08-29. `contains` on a Liquid list is exact
+    membership, so the template cannot repeat it -- this asserts that the LIST
+    itself does not name a compound, which is the other way in.
+    """
+    for value in _vocab().get("not_on_cards") or []:
+        assert len(str(value).split()) == 1, (
+            f"`not_on_cards` names {value!r}, which is more than one word. This "
+            f"list exists for ingredients that are never a reason to choose a "
+            f"drink; a compound like `honey water` or `soda water` is one, and "
+            f"suppressing it would take a real fact off the card."
+        )
+
+
+def test_every_suppressed_word_is_a_declared_generic():
+    """A suppression that matches nothing is a rule nobody can see failing."""
+    declared = _declared_generics(_vocab())
+    for value in _vocab().get("not_on_cards") or []:
+        assert value in declared, (
+            f"`not_on_cards` names {value!r}, which is not a declared generic. "
+            f"It can therefore never match an ingredient, so the list looks "
+            f"like it is doing something and is not -- and the day the generic "
+            f"is spelled differently, nothing says so."
+        )

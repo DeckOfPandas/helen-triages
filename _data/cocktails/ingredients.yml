@@ -112,6 +112,30 @@ search:
   # visible: it is not offered as a chip, and it is one line to fix here.
   prose_marks: ["--", "—", "?", "!", ">", ","]
 
+# --- things a card never mentions --------------------------------------------
+# #580. Helen: "never write 'water' on a cocktail card and never return it in a
+# search. This is bare 'water', and does not apply to 'honey water' or
+# 'sparkling water' or any such thing."
+#
+# A card answers "what is this drink LIKE", and the answer is never water. It is
+# on the recipe because 60 ml of it is how a Sazerac gets diluted, and that is a
+# MAKING fact -- the same distinction §9.10.1 draws when it collapses both syrup
+# ratios to `sugar syrup`: a ratio matters while you pour and not while you
+# choose. Water is that argument at its limit.
+#
+# EXACT MATCHES ONLY, and that is the whole of Helen's caveat. `honey water` and
+# `soda water` are real choosing facts -- one is a sweetener and the other makes
+# the drink long -- so nothing here may be treated as a substring. The picker
+# was matching `water` against `honey water` by substring until 2026-08-29 and
+# the fix for THAT is upstream in cocktail-search.js; this list is a different
+# rule and must not lean on the old bug's shape.
+#
+# ONE ENTRY TODAY, and a list rather than a special case in the template because
+# the next one will not be water: `ice` is the obvious candidate the day a drink
+# writes it down.
+not_on_cards:
+  - water
+
 # --- other names for a family ------------------------------------------------
 # A FAMILY IS REACHED BY ITS NAME, so a family nobody spells that way is a
 # family nobody can reach. Helen, 2026-08-29: "'whiskey (all)' should return all
@@ -469,8 +493,18 @@ card_names:
 # `methods.yml`'s proposals strike: a replacement whose work is already done
 # reads as outstanding, and one whose left-hand side has drifted does nothing
 # while looking live.
-card_name_joins:
-  "Demerara overproof rum or Demerara rum": "Demerara rum or overproof"
+# EMPTY SINCE 2026-08-30, and the mechanism stays. Its one entry replaced the
+# Swizzle's `Demerara overproof rum or Demerara rum` with Helen's own
+# `Demerara rum or overproof`; that drink was rewritten the same day into the
+# Martinique Swizzle -- 60 ml of unaged agricole, no Demerara anywhere -- so the
+# pair it fixed is no longer produced by any drink.
+#
+# `test_every_card_name_join_is_reachable` is what said so, refusing to let a
+# replacement sit there matching nothing, and it SKIPS on an empty map rather
+# than passing. So this block currently checks nothing, which is worth knowing
+# rather than discovering: the day a disjunctive pair reads badly again, the
+# entry goes back here and the guard wakes up with it.
+card_name_joins: {}
 
 # CARD NAMES THAT ARE ALLOWED TO BE THE SAME, with the reason attached -- the
 # idiom `family_less` above and tests/test_reference_data.py's
@@ -532,11 +566,36 @@ gin_styles:
   # list; a gin's is whatever went in the still, and closing that list would
   # mean a vocabulary edit for every new bottle.
   - "speciality"
-  # Helen's own parenthesis: "not a gin though". Sloe gin lives here rather
-  # than hiding inside london dry. Deliberately NOT one of the styles above --
-  # her 2026-08-26 list is types of GIN, and this is not one; it sits in this
-  # group so that `family_of` can still roll it up to gin for exclusion.
+  # Helen's own parenthesis: "not a gin though". Deliberately NOT one of the
+  # styles above -- her 2026-08-26 list is types of GIN, and this is not one; it
+  # sits in this group so that `family_of` can still roll it up to gin for
+  # exclusion.
+  #
+  # NO DRINK USES IT AS OF 2026-08-30, and that is the intended state rather
+  # than a gap: it is the catch-all for the next gin liqueur that is not sloe.
+  # See `sloe gin` immediately below for why the two are not one.
   - "gin liqueur"
+  # SPLIT OUT OF `gin liqueur` ON 2026-08-30, and it is the `flavoured` mistake
+  # caught a second time. Helen, looking at the Cobra Effect's card: "specialty
+  # gins and gin liqueurs got recoded and it looks like this one got squashed,
+  # suggesting our taxonomy isn't right here."
+  #
+  # She was right, and `retired_gin_styles` above already argues her case in her
+  # own words: `flavoured` was retired for "covering everything from sloe to
+  # rhubarb to cucumber, which are not substitutable for each other", and it was
+  # replaced by `speciality` CARRYING A CHARACTER. Both sloe gins were recoded
+  # to `gin liqueur` instead -- a name with the identical fault and, unlike
+  # `speciality`, no character requirement to say which botanical. The category
+  # meant "sloe gin" for both of its members while claiming to mean any gin
+  # liqueur.
+  #
+  # A GENERIC RATHER THAN A CHARACTER, Helen's call when shown both: sloe gin is
+  # a standard named category with a legal definition, not one distiller's
+  # botanical, and `character` is recipe-only (#441) so it would have left the
+  # card still reading `gin liqueur` -- which is the thing she was looking at
+  # when she spotted this. Same reasoning the eleven rum styles get: when the
+  # difference changes what you are making, it earns a name.
+  - "sloe gin"
 
 # NAME THEM CORRECTLY RATHER THAN DODGING THE SPELLING -- Helen, 2026-08-27:
 # "please apply correctness rather than the fudge of dropping the word." Scotch
@@ -626,8 +685,26 @@ other_base_spirits:
   - "vodka"
   - "flavoured vodka"
   - "absinthe"
-  - "pastis"
   - "aquavit"
+
+# `pastis` RETIRED 2026-08-30, and it is worth saying that this was a
+# CONSEQUENCE rather than a judgement about pastis.
+#
+# Its `family_less` entry gave one reason for existing -- "Swizzle uses 6 drops
+# of Pernod or absinthe" -- and that drink was rewritten the same day into the
+# Martinique Swizzle, which takes 1 dash of absinthe. So the only drink cited
+# stopped citing it.
+#
+# The other thread was Don's Mai Tai suggesting `Pernod` against `absinthe`,
+# which looked like a pastis-for-absinthe substitution and was carrying a note
+# saying so. It was not: "Pernod" names two bottles, and Helen owns the 68%
+# absinthe, which is also what the source asks for. So the substitution was an
+# artefact of a brand name written without its product, and it took the note
+# with it.
+#
+# A pastis is still a real thing -- Ricard, Henri Bardouin -- and nothing here
+# says otherwise. The day a drink wants one, put this line back.
+retired_other_base_spirits:
 
 # =============================================================================
 # MODIFIERS
@@ -714,14 +791,53 @@ amari:
   - "Amaro Nonino"
   - "Amaro Ciociano"
 
+# FIVE AROMATISED-WINE GENERICS, AND "AROMATISED WINE" IS NOT ONE OF THEM.
+# Helen, 2026-08-30, settling #568: "I would never write 'aromatised wine' as a
+# cocktail ingredient or generic, because it suggests some equivalence between
+# the types where none or very little exists. So I decided to jump down a level
+# of abstraction, and make the generics three vermouths, americano and
+# quinquina, because those are what I'd actually write on a recipe."
+#
+# That is this file's own two-layer rule, applied by her rather than to her: the
+# GENERIC is the precise thing a recipe says, and the roll-up belongs in
+# `family`, which is "for SEARCH and EXCLUSION only, never a browse axis". The
+# family already exists and is `fortified`. So the abstraction she declined to
+# write is available to exclude by and appears on no recipe line, and nothing
+# needed building.
+#
+# A QUINQUINA AND AN AMERICANO ARE NOT VERMOUTHS. Both are quinine-led rather
+# than wormwood-led, which is why they sit beside the vermouths here rather than
+# under them.
+#
+# `americano` IS NEW, and the line below it used to do both jobs -- its comment
+# read "Aperitif wines, not vermouths: Lillet, Cocchi Americano", filing a
+# quinquina and an americano under one word. That is the conflation #568 is
+# about, one level down. THREE DRINKS CURRENTLY SAY `quinquina` and at least one
+# of them may mean the other: #569 asks for Corpse Reviver No. 2 to accept
+# either, which only became expressible now. north-sea-oil and
+# voodoo-that-you-do have not been looked at.
 fortified_and_aromatised:
   - "sweet vermouth"
   - "dry vermouth"
   - "blanc vermouth"
   # A vermouth-amaro hybrid; swapping it for sweet vermouth is audible.
+  #
+  # PROPOSED FOR RETIREMENT ON 2026-08-30 AND KEPT, because the drinks settled
+  # it. Helen named five generics for #568 and this was not among them, on my
+  # report that no drink used it -- which was wrong, and wrong in a way worth
+  # recording: the scan that produced it matched generics containing "vermouth",
+  # "sherry" or "quinquina", and this one contains none of those words.
+  #
+  # THE RIDGWELL IS THE EVIDENCE. It pours 12.5 ml of Punt e Mes AND 12.5 ml of
+  # Martini Rosso, side by side. Collapse this into `sweet vermouth` and that
+  # drink asks for 25 ml of one thing, which is a different drink. Spiced
+  # Negroni names it too. So the comment above was right and it is the rum-styles
+  # test passing: the difference changes what you are making.
   - "Punt e Mes"
-  # Aperitif wines, not vermouths: Lillet, Cocchi Americano.
+  # Lillet Blanc, Dubonnet, Byrrh.
   - "quinquina"
+  # Cocchi Americano Bianco.
+  - "americano"
   - "amontillado sherry"
   - "oloroso sherry"
   - "tawny port"
@@ -893,6 +1009,9 @@ family_of:
   "genever": gin
   "speciality": gin
   "gin liqueur": gin
+  # Neither of these is a gin, and both roll up to it anyway -- the family is
+  # for search and EXCLUSION, and "no gin tonight" plainly means the sloe too.
+  "sloe gin": gin
   "navy strength gin": gin
   "rye": whisky
   "bonded rye": whisky
@@ -926,6 +1045,7 @@ family_of:
   "blanc vermouth": fortified
   "Punt e Mes": fortified
   "quinquina": fortified
+  "americano": fortified
   "amontillado sherry": fortified
   "oloroso sherry": fortified
   "tawny port": fortified
