@@ -406,6 +406,12 @@
      cocktail-search.js where it can be tested: fuzzy to include, exact or
      declared-family to exclude. Over-including shows you a drink you may not
      want; over-excluding hides one you would have had. */
+  /* What a chosen chip's × undoes, per field. Spoken by the aria-label, since
+     "×" says nothing to a screen reader and "Havana 3 ×" says the wrong thing.
+     Phrased as the section heading is, so the sentence a reader hears matches
+     the words they clicked under. */
+  var STOP_DOING = { include: 'stop requiring ', exclude: 'stop leaving out ' };
+
   function wireSearch(input, poolEl, field, searchingField) {
     if (!input || !poolEl) return;
 
@@ -455,15 +461,57 @@
        a substring match. So the marked entries are the ones you meant and the
        plain ones are what the vocabulary brought along. An (all) button is
        always a word match by construction. */
+    /* A CHOSEN CHIP CARRIES ITS OWN ×, AND THE × IS NOT PART OF THE LABEL.
+       Helen, 2026-08-30: "add an x for a clear button to the right of selected
+       chips on the cocktail site, same as food."
+
+       The split into a span is not tidiness, it is the whole point. LEAVE OUT
+       strikes a chosen chip through (_filters.scss), and a single text node
+       reading "peas ×" strikes the × as well -- which reads as "this control is
+       disabled" rather than "this ingredient is out". Food hit exactly that and
+       fixed it the same way; the rule there now strikes only
+       `.btn-exclude-label`, and here only `.btn-pool-label`.
+
+       Still ONE button throughout. The × is a target, not a second control --
+       clicking anywhere on the chip removes it, which is what it already did. */
     function chip(word, on, wordMatch) {
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'btn-pool' + (on ? ' is-on' : '') + (wordMatch ? ' btn-pool--word-match' : '');
-      b.textContent = word;
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
+
+      if (on) {
+        var label = document.createElement('span');
+        label.className = 'btn-pool-label';
+        label.textContent = word;
+        b.appendChild(label);
+        b.appendChild(document.createTextNode(' \u00d7'));
+        b.setAttribute('aria-label', STOP_DOING[field] + word);
+      } else {
+        b.textContent = word;
+      }
+
       b.addEventListener('click', function () {
-        if (state[field].has(word)) state[field].delete(word);
-        else state[field].add(word);
+        if (state[field].has(word)) {
+          state[field].delete(word);
+        } else {
+          state[field].add(word);
+          /* CHOOSING ONE CLEARS THE SEARCH, so the candidates vanish and the
+             chosen chips are all that is left. Helen, 2026-08-30, on food doing
+             this: "it frees the input field for more typing, and reclaims the
+             space on the page." The next thing you want is to name the NEXT
+             ingredient, and the one you just picked is now sitting in front of
+             you as a chip.
+
+             Only on ADD. Removing a chip leaves the pool alone -- you are
+             correcting the list you can see, not starting a new search.
+
+             Clearing input.value is the whole mechanism: redraw() below reads
+             it for `state[searchingField]`, and Search.search() returns nothing
+             for a query under MIN_QUERY_CHARS, so the pool comes back holding
+             the chosen chips and no candidates. No second code path. */
+          input.value = '';
+        }
         redraw();
         apply();
       });

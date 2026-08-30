@@ -354,7 +354,19 @@
       border-color: $color-text;
       color: $color-text;
       font-weight: 600;
-      text-decoration: line-through;
+
+      // THE STRIKE RUNS THROUGH THE INGREDIENT, NOT THROUGH THE ×, and that is
+      // why the chip's word sits in a span of its own. This declaration was on
+      // the button until 2026-08-30; the moment a chosen chip gained a trailing
+      // × (Helen: "add an x for a clear button to the right of selected chips
+      // on the cocktail site, same as food"), a button-level line-through
+      // struck the × too -- which reads as "this control is disabled" rather
+      // than "this ingredient is out".
+      //
+      // Food met this first and fixed it identically: its own rule strikes only
+      // .btn-exclude-label. Same bug, same shape, same answer -- worth noting
+      // because the two pickers are separate code and arrived at it separately.
+      .btn-pool-label { text-decoration: line-through; }
     }
   }
 }
