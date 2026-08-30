@@ -1616,6 +1616,43 @@ def test_no_ingredient_stores_a_millilitre_figure():
     )
 
 
+def test_every_ingredient_entry_has_something_the_line_renders():
+    """An entry with none of `amount`/`generic`/`item` prints as a raw Hash.
+
+    `_layouts/cocktail.html` renders the structured ingredient line when the
+    entry carries one of those three and otherwise falls through to a
+    bare-string branch, where Liquid stringifies a dict. Tried on Aperol
+    Spritz: the page printed `{"amount"=>"90 ml", "generic"=>"prosecco"}` with
+    a clean build and nothing in the log.
+
+    THE GATE USED TO NAME `item` ALONE, which #544 move 1 stopped rendering, so
+    this was primed to fire on move 2's first and safest step -- dropping
+    `item` from the ~283 entries whose every word already appears in the
+    generic beside them. Fixed there; this is the data half.
+
+    There are no bare-string ingredients today (619 of 619 are dicts), and that
+    branch is for a genuinely unstructured one. A dict arriving there is not
+    that shape, it is this one with a key missing, which is why it must never
+    be reachable by omission.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            checked += 1
+            if not (item.get("amount") or item.get("generic") or item.get("item")):
+                bad.append(f"{slug}: {item!r}")
+    assert not bad, (
+        "Ingredient entries with nothing the line can render:\n  "
+        + "\n  ".join(bad)
+        + "\n\nEach needs an `amount`, a `generic` or an `item`. Without one "
+          "the drink page prints the YAML dict itself, on a green build."
+    )
+    assert checked, "No ingredient entries were scanned, so this compared nothing."
+
+
 def test_no_drink_writes_plantation():
     """Planteray is the brand's name; `plantation` is only ever read -- #582.
 
