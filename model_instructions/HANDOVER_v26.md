@@ -2222,11 +2222,52 @@ ranked preference between two bottles she owns *is* a fact about the drink.
 because the Spicers string was misattributed to it rather than to Milliners
 Punch; `test_every_suggested_bottle_resolves` caught the edit, not a reader.
 
-**`Jamaican, caramel forward` still has no drink**, and did not gain two as an
+**`caramel-forward Jamaican rum` still has no drink**, and did not gain two as an
 earlier session note claimed. Blackwell was going to bring cobra-effect and
 georgetown-punch into it; Helen dropped both suggestions instead ("I never use
 Blackwell there"). The style has bottles — Blackwell, Myers — and no user, and
 **it is hers to apply**: never retype a drink into it from item text.
+
+> ### THAT PARAGRAPH WAS ALREADY HERE AND DID NOT HOLD. IT IS A TEST NOW.
+>
+> Between it being written and 2026-08-30, a session put cobra-effect into
+> `caramel-forward Jamaican rum` from its own `item` text, with a Blackwell
+> suggestion — the exact thing the sentence above forbids. Helen: *"I remain
+> annoyed about this. I have discussed this at least twice… If I have to deal
+> with this again I will simply delete those recipes."*
+>
+> **`hers_to_apply` in `ingredients.yml` is the mechanism**, checked by
+> `test_no_drink_uses_a_generic_that_is_helens_to_apply`. Adding a line
+> switches enforcement on; **removing one is Helen's grant**, made in the same
+> commit as the drink that earns the style, and never to turn a red green.
+>
+> **#542 diagnosed its own invisibility and nobody built the answer**, which is
+> the part to carry. Its own text says "a wrong-but-declared value with no
+> contradicting evidence is invisible to every guard in the suite" — every
+> value declared, `test_every_generic_is_declared` green, and the suggestion
+> that would have disagreed already dropped, so #534 green too. Writing that
+> diagnosis down felt like handling it. It is §12's "you will write down a rule
+> instead of following it", one level up: **stating why nothing can catch
+> something is not catching it.**
+
+**THE FOUR #542 RULINGS, Helen 2026-08-30, applied the same day.** Recorded here
+because the last set was recorded only in an issue comment and was reversed
+inside three days. Names are the post-#561 ones; she wrote the older shorthand.
+
+| drink | generic | suggestion |
+|---|---|---|
+| `hurricane-classic` | `moderately aged rum` | **Pusser's Gunpowder** |
+| `tiki-max` | `moderately aged rum` | **Pusser's Blue Label** |
+| `cobra-effect` | `moderately aged Jamaican rum` | **none, deliberately** |
+| `georgetown-punch` | `lightly aged and filtered rum`, then `moderately aged rum` + `character: [blackstrap]` | Gosling's |
+
+Both Pusser's are already declared `moderately aged rum` in `bottles.yml`, so
+these two restore the evidence #542 says was deleted, and neither crosses a
+category or needs a #534 note. Georgetown Punch already matched her ruling; what
+it gained is a note carrying the source's own figures, which differ from hers in
+two amounts (22.5 ml against 20 ml of each juice) and name Koko Kanu rather than
+Malibu. Her figures stand — §9.4.1, the site is canon — and the source is
+recorded beside them rather than argued with.
 
 ### 9.3.3 The drinks index's search — three modules, and what each ruling was
 

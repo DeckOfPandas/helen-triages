@@ -1632,6 +1632,65 @@ def test_no_ingredient_stores_a_millilitre_figure():
     )
 
 
+def test_no_drink_uses_a_generic_that_is_helens_to_apply():
+    """A style listed in `hers_to_apply` may not be inferred onto a drink -- #542.
+
+    THE FAILURE THIS EXISTS FOR IS INVISIBLE TO EVERY OTHER GUARD HERE, and
+    #542 says so in its own words: "a wrong-but-declared value with no
+    contradicting evidence is invisible to every guard in the suite". Every
+    value involved is declared and valid. `test_every_generic_is_declared` is
+    green. The suggestion that would have contradicted it was dropped, so
+    #534's cross-category check is green too. Nothing was left to notice.
+
+    What actually happened, twice: `caramel-forward Jamaican rum` has bottles
+    (Blackwell, Myers) and no drink, and a session read that as a gap and
+    retyped a drink into it from its own `item` text. Helen, 2026-08-30, after
+    the second time: "I have discussed this at least twice... If I have to deal
+    with this again I will simply delete those recipes."
+
+    HANDOVER 9.3.2 ALREADY FORBADE IT IN PROSE -- "it is hers to apply: never
+    retype a drink into it from item text" -- which is the whole argument for
+    this being a test. Two hooks in `.claude/`, `meta.awaiting_fix` and
+    `meta.proofread` all reached the same conclusion first: a rule that gets
+    read and broken needs a mechanism.
+
+    THE LIST IS THE ENFORCEMENT AND REMOVING A LINE IS THE GRANT. Helen deletes
+    an entry in the same commit as the drink that earns the style; nobody else
+    does, and never to make this go green.
+    """
+    reserved = _vocab().get("hers_to_apply") or {}
+    assert reserved, (
+        "`hers_to_apply` is empty. If a style has genuinely been released, "
+        "that is Helen's call and this test should have gone with it -- an "
+        "empty registry here means the check compares nothing."
+    )
+    declared = _declared_generics(_vocab())
+    phantom = sorted(set(reserved) - declared)
+    assert not phantom, (
+        "`hers_to_apply` names generic(s) no group declares:\n  "
+        + "\n  ".join(phantom)
+        + "\n\nA reserved style must be a real one. A typo here reserves "
+          "nothing and reads as though it does."
+    )
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            for g in (generic if isinstance(generic, list) else [generic]):
+                if g in reserved:
+                    bad.append(f"{slug}: {g!r}\n      {reserved[g].strip()}")
+    assert not bad, (
+        "Drink(s) using a generic that is Helen's to apply:\n  "
+        + "\n  ".join(bad)
+        + "\n\nDo not infer this from `item` text or from a bottle name. If "
+          "she has applied it, the line comes out of `hers_to_apply` in "
+          "_data/cocktails/ingredients.yml in the same commit -- and that "
+          "deletion is hers, not yours."
+    )
+
+
 def test_every_ingredient_entry_has_something_the_line_renders():
     """An entry with none of `amount`/`generic`/`item` prints as a raw Hash.
 

@@ -284,6 +284,36 @@ families:
 # an inventory: she chose that explicitly for gin, where Plymouth, New Western
 # and Genever are all absent from the collection.
 
+# --- generics only Helen may put on a drink ----------------------------------
+# A DECLARED STYLE WITH NO USER IS NOT A GAP TO FILL. These are real categories
+# with real bottles behind them, and applying one to a drink is her judgement
+# about what she reaches for -- never an inference from what the source
+# happened to call the rum.
+#
+# THIS EXISTS BECAUSE IT HAPPENED TWICE AND SHE SAID SO TWICE. #542, and
+# Helen on 2026-08-30: "I remain annoyed about this. I have discussed this at
+# least twice... If I have to deal with this again I will simply delete those
+# recipes." That issue diagnosed its own invisibility exactly -- "a
+# wrong-but-declared value with no contradicting evidence is invisible to every
+# guard in the suite" -- and then nothing was built, so the next session had
+# nothing to stop it.
+#
+# It is the repo's own repeated conclusion, from the two hooks in .claude/ and
+# from `meta.awaiting_fix` and `meta.proofread` before them: a rule that gets
+# read and broken needs a mechanism, not firmer wording. Adding a line here is
+# what switches enforcement on -- test_no_drink_uses_a_generic_that_is_helens
+# _to_apply -- and REMOVING one is how she grants it, in the same commit as
+# the drink that earns it.
+hers_to_apply:
+  "caramel-forward Jamaican rum": >-
+    Blackwell and Myers are declared bottles for this style and no drink uses
+    it. Helen has said twice that she never reaches for Blackwell in the
+    drinks it kept being applied to; a session put cobra-effect into it from
+    item text anyway, and she reverted that on 2026-08-30, ruling the drink
+    `moderately aged Jamaican rum` with no suggestion at all. HANDOVER 9.3.2
+    already said "it is hers to apply: never retype a drink into it from item
+    text", in prose, and prose did not hold.
+
 # GitHub issue #314. `light`, `gold` and `dark` are RETIRED -- see the bottom.
 rum_styles:
   - "moderately aged Jamaican rum"
