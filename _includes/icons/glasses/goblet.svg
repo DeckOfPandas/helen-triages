@@ -1,8 +1,8 @@
-<svg viewBox="0.0000 22.9726 54.4411 59.2169" class="glass-icon glass-icon--goblet"
+<svg viewBox="-1.2719 -1.2721 54.6792 82.3106" class="glass-icon glass-icon--goblet"
      role="img" aria-hidden="true" focusable="false">
-  <g transform="translate(-97.141349,-171.79943)">
+  <g transform="translate(-98.294198,-172.95036)">
     <path class="glass-icon-line" d="m 124.36189,235.62028 c 0,7.86694 5.46806,14.64027 13.12333,16.36887 l 2.75167,0.59973 h -31.75 l 2.75166,-0.59973 c 7.65527,-1.7286 13.12334,-8.50193 13.12334,-16.36887 z" />
-    <path class="glass-icon-line" d="m 124.36189,235.62028 v -28.8925" />
+    <path class="glass-icon-line" d="M 124.36189,235.61322 V 205.2748" />
     <g transform="matrix(0.79034204,0,0,0.78908042,26.07346,42.940241)">
       <path class="glass-icon-line" d="M 157.17266,164.92362 H 91.551112" />
       <path class="glass-icon-line" d="m 140.23689,205.59597 h -31.75" />

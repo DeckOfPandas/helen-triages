@@ -120,10 +120,18 @@ layout: default
      half of it, and the ORDER is untouched — a shot is still shorter than a
      Collins, just not four times shorter.
 
-     This is the same compression the card grid applies with its `spread`
-     curve, at a different strength, and for the same reason. Note the CARD
-     also applies `display_scale`; a drink page deliberately does not, because
-     that cheat exists for a size this page does not render at.
+     THE CARD HAS ITS OWN CURVE NOW, AND IT IS A DIFFERENT ONE — 2026-08-31,
+     #601. It maps onto 0.5–1.0 where this maps onto 0.32–1.0, because there
+     are ~114 glasses in that grid and the short end has to stay legible
+     against its NEIGHBOURS rather than against a title block. Its headroom
+     lives in `$card-glass-scale`, not in its ratio.
+
+     (This comment claimed the card applied "the same compression... with its
+     `spread` curve" until that day, when the card had none at all. It was
+     wrong for as long as it existed, and `display_scale`'s header in
+     glasses.yml said the same thing — worth knowing as the shape of the error
+     rather than the instance: a cross-reference to another file's behaviour is
+     a claim nothing re-checks.)
 
      0.32 and 0.68 are not tuned constants to preserve — they are simply what
      puts the shortest real glass (shot, 60mm of a 230mm tallest) at about half

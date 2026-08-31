@@ -86,6 +86,30 @@ SKIP = {
     "glass-coupe-2.svg",
     "glass-hurricane.svg",
     "glass-tiki-mug.svg",
+    # 2026-08-31, #526/#527: Helen drew a tiki mug and a pineapple to replace
+    # the two she had always called placeholders, and they are superseded by
+    # glass-tiki-mug-3 / glass-pineapple-4 in RENAME. Both stay on disk in
+    # _design_sources as the record -- §9.15, a record you can overwrite is not
+    # one.
+    "glass-tiki-mug-2.svg",
+    "glass-pineapple-3.svg",
+    # 2026-08-31: coupe-3's stroke ends fell short of each other by up to 1.06
+    # user units. Invisible while drawing -- her stroke is ~2.8 units wide and a
+    # round cap bridges one stroke width -- and visible on the page, where
+    # non-scaling-stroke means the cap only spans 0.46. coupe-4 closes all six.
+    "glass-coupe-3.svg",
+    # The same pass, same day: Helen closed the open stroke ends on five more.
+    # Each predecessor is superseded by a RENAME target below.
+    "glass-absinthe.svg",
+    "glass-collins.svg",
+    "glass-goblet.svg",
+    "glass-hot-toddy.svg",
+    "glass-sherry.svg",
+    # These two closed their gaps AND changed shape, both on purpose:
+    # the sour's bowl was redrawn, and the julep cup lost its handle.
+    "glass-julep-cup.svg",
+    "glass-julep-cup-2.svg",
+    "glass-sour.svg",
     # NO OLD-FASHIONED ENTRIES HERE ANY MORE, and their absence is the fix.
     # This set briefly held four of them: two version suffixes, a 2-path early
     # draft, and a never-adopted 12-path candidate, plus a RENAME pointing at
@@ -127,7 +151,33 @@ SKIP = {
 # viewBox, so the mug rejoins the set on one weight set once in CSS. The
 # fill-based original is kept in _design_sources as the record and is SKIPped
 # above. The set is back to one member.
-SOLID = {"glass-pineapple-3.svg"}
+#
+# AND IT IS THE DEFAULT FOR FILL-ONLY ARTWORK AGAIN, 2026-08-31, with all three
+# of Helen's new drawings in it. They were traced first and that was the wrong
+# call -- hers, plainly: "you redrew these three new ones, right? They're not
+# right." Tracing IS a redraw. It broke lines at junctions and lost the
+# pineapple's umbrella stem, and none of that was necessary, because filling
+# shows the drawing she actually made.
+#
+# SO ASK "MUST THIS BE REDRAWN" BEFORE ASKING "CAN THIS BE TRACED". Tracing is
+# the answer when a fill is unusable, not when a fill is merely heavier. The
+# tiki mug in #355 is still the case that needs it: that drawing is a stock
+# icon whose weight Helen rejected outright. Hers are hers, and what they
+# should look like is her call to make by looking, not one to pre-empt with a
+# transformation she did not ask for.
+#
+# The weight cost, measured, so the trade is visible rather than argued -- ink
+# width as a fraction of canvas height, against a stroked icon's ~0.65% at card
+# size: pineapple 1.3% (~2x), coconut 2.5% (~3.9x), tiki mug 4.2% (~6.5x). A
+# filled icon's ink also scales WITH the drawing, where `non-scaling-stroke`
+# holds a stroked one at a constant screen weight -- so the gap widens as the
+# icon grows. That is the thing to look at on /dev/card-glasses/, and it is a
+# reason to redraw only if it actually looks wrong.
+SOLID = {
+    "glass-tiki-mug-3.svg",
+    "glass-pineapple-4.svg",
+    "glass-coconut.svg",
+}
 
 # Source name -> published name, where the export carries a working title.
 #
@@ -155,12 +205,35 @@ SOLID = {"glass-pineapple-3.svg"}
 #    would have vanished with nothing to say why. Rename here, where the
 #    mapping survives a regeneration.
 RENAME = {
-    "pineapple-3": "pineapple",
-    "coupe-3": "coupe",
+    "pineapple-4": "pineapple",
+    "coupe-4": "coupe",
     "hurricane-2": "hurricane",
-    "tiki-mug-2": "tiki-mug",
+    "tiki-mug-3": "tiki-mug",
     "mule-mug": "mug",
+    # 2026-08-31, the open-stroke-ends pass. See the SKIP comment above for what
+    # was wrong and why it was invisible while drawing.
+    "absinthe-2": "absinthe",
+    "collins-4": "collins",
+    "goblet-2": "goblet",
+    "hot-toddy-2": "hot-toddy",
+    "sherry-2": "sherry",
+    # A REDRAW AS WELL AS A REPAIR, both Helen's and both deliberate.
+    # The sour's bowl went from a narrow U (aspect 0.391, NARROWER than the
+    # sherry and a near-twin of the nick-and-nora) to a waisted bowl at 0.499,
+    # which is its own silhouette in a set where four stemmed glasses sit
+    # within 0.1 of each other. The julep cup lost its handle: a real one is a
+    # handleless beaker, and with it gone the three handled vessels are down to
+    # two that no longer read as the same drawing.
+    "julep-cup-3": "julep-cup",
+    "sour-2": "sour",
 }
+
+# NOT IN THAT PASS, AND DELIBERATELY: `old-fashioned-double` carries the set's
+# two largest open ends (3.92 units each, on the base) and Helen looked at it
+# and ruled it correct as drawn -- 2026-08-31, "I decided old fashioned double
+# was correct as it was". So a gap here is not automatically a fault, which is
+# exactly why the check that comes out of this is hers to grant exemptions
+# from rather than something to fix on sight.
 
 
 # =============================================================================
@@ -239,7 +312,21 @@ def _emit(el, out, indent, line_class, seen_paths):
         elif tag == "path":
             d = re.sub(r"\s+", " ", child.get("d", "")).strip()
             if d:
-                out.append(f'{indent}<path class="{line_class}" d="{d}" />')
+                # A TRANSFORM CAN SIT ON THE PATH ITSELF, not only on a <g>, and
+                # dropping it is the absinthe bug one level down -- 2026-08-31,
+                # found on Helen's pineapple, whose single path carries
+                # matrix(0.1333,0,0,-0.1333,0,192). That matrix has a NEGATIVE y
+                # scale, so losing it does not nudge the drawing, it flips it and
+                # throws it off the canvas.
+                #
+                # It was invisible until now because every earlier export put its
+                # transform on a group. check_nothing_was_dropped counts
+                # transforms in against transforms out and caught this on the
+                # first drawing that did otherwise, which is what that guard is
+                # for -- it fired before anything was published.
+                transform = child.get("transform")
+                attr = f' transform="{transform}"' if transform else ""
+                out.append(f'{indent}<path class="{line_class}"{attr} d="{d}" />')
                 seen_paths.append(d)
         else:
             # defs, sodipodi:namedview, metadata: no artwork, dropped on purpose.

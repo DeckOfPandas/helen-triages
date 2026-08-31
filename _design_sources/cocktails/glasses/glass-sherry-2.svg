@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="41.383842mm"
+   height="98.072227mm"
+   viewBox="0 0 41.383842 98.072227"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   sodipodi:docname="glass-sherry-2.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.1212722"
+     inkscape:cx="74.023064"
+     inkscape:cy="230.09579"
+     inkscape:window-width="1280"
+     inkscape:window-height="730"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-36.899096,-133.08526)">
+    <path
+       id="path3"
+       d="M 43.479902,134.49638 H 71.702128"
+       style="fill:none;stroke:#4c4c4e;stroke-width:0.282;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       id="path4"
+       d="m 43.568528,134.61825 -4.872815,30.96189 c -0.245393,1.50829 -0.385617,3.0585 -0.385617,4.65057 0,12.73673 8.623828,23.04338 19.280916,23.04338 10.657093,0 19.280925,-10.30665 19.280925,-23.04338 0,-1.59207 -0.140224,-3.14228 -0.38562,-4.65057 l -4.872815,-30.96189"
+       style="fill:none;stroke:#4c4c4e;stroke-width:0.282;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       id="path5"
+       d="m 57.591012,212.77778 c 0,7.86694 5.468055,14.64027 13.123339,16.36887 l 2.751668,0.59973 H 41.716012 l 2.751667,-0.59973 c 7.655277,-1.7286 13.123333,-8.50193 13.123333,-16.36887 z"
+       style="fill:none;stroke:#4c4c4e;stroke-width:0.282;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       id="path6"
+       d="M 57.591012,213.2536 V 193.33322"
+       style="fill:none;stroke:#4c4c4e;stroke-width:0.282;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+</svg>

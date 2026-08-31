@@ -81,6 +81,13 @@ icons:
   chalice: goblet
   pineapple: pineapple
   hollowed pineapple: pineapple
+  # NO DRINK USES THIS YET -- added 2026-08-31 with the drawing (#528), because
+  # Helen drew one to see whether it earns a place: "we might not use it, but
+  # why not try". An icon with no drink is the normal state for this file
+  # (nine others are in it), and declaring the spelling now is what lets a
+  # future drink simply say `glass: [coconut]` and render.
+  coconut: coconut
+  coconut shell: coconut
 
   # --- four spellings of one glass, all live in the data -----------------------
   # `rocks` used to point at a genuinely different (panelled) drawing -- see
@@ -293,6 +300,15 @@ heights_mm:
   # As unmeasured as every other number here — #295 still supersedes the lot.
   mug: 95
   julep-cup: 110
+  # A GUESS, AND FLAGGED AS ONE RATHER THAN QUIETLY AVERAGED IN. Added
+  # 2026-08-31 with the drawing (#528). A drinking coconut is roughly as wide
+  # as it is tall and shorter than any glass here bar the shot and the
+  # old-fashioned; 115 puts it between the julep cup and the punch bowl, which
+  # is where it sits in the hand. Every number in this block is unmeasured
+  # (#295) so this is no worse founded than its neighbours -- but it is the
+  # newest and the least looked at, so check it against a real coconut before
+  # trusting it over them.
+  coconut: 115
   punch-bowl: 130
   brandy: 130
   hot-toddy: 140
@@ -337,17 +353,43 @@ heights_mm:
 # already holds the other per-glass judgement (`heights_mm`), so this is its
 # neighbour rather than a new idea.
 #
-# TRY THE GLOBAL CURVE FIRST if a third glass ever wants a line here. The card
-# template raises every ratio to a power before applying it, so compressing the
-# whole range is one number and does not need a per-glass exception. These two
-# are here because the curve that fixed them flattened everything else.
-display_scale:
-  collins: 0.82
-  hurricane: 0.74
+# THE GLOBAL CURVE EXISTS NOW AND THIS MAP IS EMPTY -- Helen, 2026-08-31,
+# #599/#601, choosing from /dev/card-glasses/.
+#
+# This paragraph used to say "TRY THE GLOBAL CURVE FIRST if a third glass ever
+# wants a line here. The card template raises every ratio to a power before
+# applying it." The advice was right and the fact was false: no curve existed,
+# on the card or anywhere but the drink page, and `git log -S` over
+# cocktails/index.html and _cards.scss confirms one never had. So the file told
+# the next reader to reach for a knob that was not there, at exactly the moment
+# a third glass wanted a line -- the flute, which is the tallest glass declared
+# here and therefore 1.0 BY CONSTRUCTION, filling the whole panel.
+#
+# The curve is real now: `ratio * 0.5 + 0.5` in cocktails/index.html, with the
+# headroom in $card-glass-scale. It does for every glass what these two lines
+# did for the two that were noticed, so both came off. Measured on the
+# collision they existed to fix -- a Collins beside an old-fashioned -- the pair
+# stood 1.74x apart with the cheats and stand 1.34x apart with the curve.
+#
+# THE MECHANISM STAYS AND THE MAP IS DELIBERATELY EMPTY. `display_scale` is
+# still read, still composes with the curve, and is still the right home for a
+# judgement about ONE drawing rather than about the range. An empty map is the
+# honest state: the range problem has a range answer now, and nothing is
+# currently a special case. Add a line only when a specific drawing is wrong in
+# a way the curve cannot see.
+#
+# WHY A DRAWING ARRIVES IN THE WRONG FRAME, since it will happen again. Helen
+# builds a glass by editing an existing one, and Inkscape keeps the previous
+# canvas silently even when it reports the document as resized. Four icons had
+# artwork hanging outside their own viewBox that way (#599). The normaliser
+# fits every canvas to its own ink on the way in, and
+# test_no_glass_artwork_is_drawn_outside_its_viewbox is the check that it took.
+display_scale: {}
 
 all_icons:
   - absinthe
   - brandy
+  - coconut
   - collins
   - coupe
   - flute

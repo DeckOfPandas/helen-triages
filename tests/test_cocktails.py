@@ -3023,8 +3023,126 @@ def test_no_glass_artwork_has_a_slack_viewbox():
     )
 
 
+def test_the_icon_parser_applies_nested_transforms():
+    """#599. A <g> inside a <g> composes, and reading only the outer one is the
+    bug this whole cluster came from.
+
+    IT IS A SYNTHETIC SVG ON PURPOSE. Asserting against a real icon would only
+    say that today's drawings parse the way they parse; this states the rule,
+    so it still bites if every nested drawing is later flattened away. The
+    numbers are worked by hand: the inner matrix doubles x and shifts y by 10,
+    the outer group then translates by (100, 1000), so (1, 2) lands at
+    (2 + 100, 2 + 10 + 1000).
+    """
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import svgrender
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/svgrender.py not importable")
+
+    svg = (
+        '<svg viewBox="0 0 10 10">'
+        '  <g transform="translate(100,1000)">'
+        '    <g transform="matrix(2,0,0,1,0,10)">'
+        '      <path d="M 1,2 L 1,2" />'
+        '    </g>'
+        '  </g>'
+        '</svg>'
+    )
+    paths, viewbox, translate, _ = svgrender.parse_icon_text(svg, "synthetic")
+    x0, y0, x1, y1 = svgrender.ink_bbox_units(paths, viewbox, translate)
+
+    assert (round(x0, 6), round(y0, 6)) == (102.0, 1012.0), (
+        f"the parser put the point at ({x0}, {y0}); composing both groups puts "
+        f"it at (102.0, 1012.0). Applying only the outer <g transform> gives "
+        f"(101.0, 1002.0), which is the exact fault behind issue #599: four "
+        f"icons nest a matrix group holding the bowl, and every measurement "
+        f"taken through this parser read those bowls in the wrong place."
+    )
+    assert translate == (0.0, 0.0), (
+        f"parse_icon_text returned translate={translate}. It bakes every "
+        f"ancestor transform into the path data and must report none left to "
+        f"apply, or a caller adds the outer offset a second time."
+    )
+
+
+# The margin scripts/normalise_glass_icons.py pads a fitted canvas with, in
+# user units. Ink is allowed to sit this far inside the frame and no distance
+# at all outside it.
+VIEWBOX_MARGIN = 1.4
+
+
+def test_no_glass_artwork_is_drawn_outside_its_viewbox():
+    """#599. A drawing must fit inside its own canvas, not merely fill it.
+
+    THIS IS THE OTHER DIRECTION FROM test_no_glass_artwork_has_a_slack_viewbox,
+    and neither substitutes for the other. That one rasterises INSIDE the
+    viewBox and measures what fraction of the canvas the ink spans, so it
+    catches a canvas bigger than its drawing -- and is structurally incapable of
+    seeing a drawing bigger than its canvas, because ink outside the frame is
+    simply not drawn into the raster it measures. Every icon scored 96-100% on
+    it while four had artwork hanging outside.
+
+    WHY IT MATTERS RATHER THAN BEING TIDINESS. `heights_mm` scales the VIEWBOX,
+    so ink outside the frame is height the template never accounted for: the
+    coupe was declared 150 mm and drew as if 179, the goblet 175 and drew as if
+    259 -- taller than the flute, which is the tallest glass in the file. And
+    because a root <svg> only clips by UA-stylesheet default, `.drink-card-glass
+    svg { overflow: visible }` (added so a stroke on the frame edge is not
+    sheared) meant all of it painted, hanging off the top of the panel. Helen
+    reported the coupe sitting high on a card; this is what that was.
+
+    HOW IT HAPPENS, so a red here is read correctly. Helen builds a glass by
+    editing an existing drawing, and Inkscape keeps the previous canvas silently
+    even when it reports the document as resized -- so the drawing arrives in a
+    frame belonging to a different glass. That is not carelessness and cannot be
+    fixed by remembering: the normaliser fits every canvas to its own artwork on
+    the way in, and this is the check that the fitting worked.
+
+    THE FIX IS NEVER TO EDIT THE PATH DATA. Re-run the fit (fit_viewbox rewrites
+    only the viewBox attribute); the artwork does not move.
+    """
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import svgrender
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/svgrender.py not importable")
+
+    icons = sorted(GLASS_ICON_DIR.glob("*.svg"))
+    assert icons, f"no SVGs in {GLASS_ICON_DIR.relative_to(ROOT)}"
+
+    problems = []
+    for path in icons:
+        paths, viewbox, translate, _ = svgrender.parse_icon(path)
+        x0, y0, x1, y1 = svgrender.ink_bbox_units(paths, viewbox, translate)
+        vx, vy, vw, vh = viewbox
+        outside = {
+            "left": vx - x0, "right": x1 - (vx + vw),
+            "above": vy - y0, "below": y1 - (vy + vh),
+        }
+        worst = {k: v for k, v in outside.items() if v > 0.01}
+        if worst:
+            over = ", ".join(f"{v:.2f} units {k}" for k, v in sorted(worst.items()))
+            grew = (max(worst.values()) + VIEWBOX_MARGIN) / vh * 100
+            problems.append(
+                f"{path.stem}: artwork runs outside its viewBox -- {over} "
+                f"(about {grew:.0f}% of the canvas height)")
+
+    assert not problems, (
+        "glass artwork drawn outside its own canvas:\n  " + "\n  ".join(problems)
+        + "\n\nThe viewBox is what heights_mm scales, so ink outside it is "
+          "height nothing accounted for -- and `.drink-card-glass svg` sets "
+          "overflow: visible, so it paints rather than being clipped, hanging "
+          "the glass off the edge of its panel. Fix by re-running the fit "
+          "(svgrender.fit_viewbox rewrites the viewBox attribute and nothing "
+          "else); never by editing the path data."
+    )
+
+
 def test_fitting_a_canvas_never_moves_the_artwork():
-    """`scripts/normalise_glass_icons.py` now fits every icon's viewBox to its
+    """`scripts/normalise_glass_icons.py` fits every icon's viewBox to its
     own ink, and this is the guard on that step.
 
     IT RUNS ON ARTWORK THAT CANNOT BE REGENERATED HERE. `SRC` is

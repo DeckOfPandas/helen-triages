@@ -2826,13 +2826,80 @@ no entry. **The scale was 2.6rem and is 10.4rem since 2026-08-26**, when the
 glass stopped being an icon beside a title and became the drink page's hero;
 the width cap moved with it in the same proportion (3.2 : 2.6 became 12.8 :
 10.4) rather than being re-guessed, since its job — stopping a punch bowl
-shouldering the title along — is unchanged. The CARD uses the same calculation
-at its own scale, plus `display_scale` (§9.13); a drink page deliberately does
-not apply `display_scale`. `_dev/glasses.html`'s section 2 proved the calculation
+shouldering the title along — is unchanged. **The card is a different
+calculation, not the same one at another scale** — its own curve and its own
+headroom, both in §9.13 — and it alone applies `display_scale`, which is empty
+today. `_dev/glasses.html`'s section 2 proved the calculation
 out before it reached the real page; section 1 is now the honest "as the
 site actually shows it" view, height AND the real 3.2rem width cap together
 — it was quietly stale for a day, still claiming "every icon is the same
 height here" after #298 shipped, a live instance of §11.2.
+
+> #### FILL-ONLY ARTWORK: ASK "MUST THIS BE REDRAWN" BEFORE "CAN THIS BE TRACED"
+>
+> **2026-08-31, and it is a mistake to learn from rather than a mechanism.**
+> Stock and hand-made glass artwork very often arrives fill-only — the ink is a
+> filled compound path with `stroke: none`, so there is no centreline to give a
+> stroke width to. Two ways to publish it, and the repo has both:
+>
+> - **`glass-icon-solid`** (`_sass/cocktails/_cocktail.scss`) fills with
+>   `currentColor`. The drawing is exactly what was drawn. It reads HEAVIER,
+>   and its ink scales WITH the icon where `non-scaling-stroke` holds the rest
+>   of the set at a constant screen weight.
+> - **`scripts/trace_centrelines.py`** derives real centrelines so the drawing
+>   joins the stroked set. **Tracing is a redraw**, and it is lossy: on Helen's
+>   three it broke lines at junctions and lost the pineapple's umbrella stem,
+>   and retracing finer recovered neither (#355's stated cost).
+>
+> **Two different questions decide it, and a drawing can fail both.** Whether
+> the ink is UNIFORM WIDTH decides whether tracing is *valid* — measure it, do
+> not eyeball it: a distance transform read along the skeleton is tight for a
+> constant-width stroke (pineapple 1.27×, coconut 1.33×) and long-tailed for one
+> with solid regions (the tiki mug, 2.92×). Ink width as a fraction of canvas
+> height decides whether filling is *bearable* — against a stroked icon's ~0.65%
+> at card size, the three ran 1.3%, 2.5% and 4.2%.
+>
+> **All three were traced first and Helen stopped it:** *"you redrew these three
+> new ones, right? They're not right."* She was correct twice over — a fill
+> renders fine and is only heavier, so the transformation bought nothing she had
+> asked for. They are published solid. Weight is a thing to LOOK at, never a
+> reason to transform someone's artwork unasked.
+>
+> **Ink can be thinned without touching a path**: an `<feMorphology
+> operator="erode">` filter shrinks the painted region at render time, and the
+> radius is one attribute that returns to 0. The three carry one (tiki 1.20,
+> pineapple 0.25, coconut 0.35 — interim, Helen is redrawing them). Not a
+> background-coloured stroke, which does the same job while hardcoding whatever
+> sits behind the icon.
+
+> #### OPEN STROKE ENDS: THE SITE DRAWS 4–6× THINNER THAN HELEN EDITS
+>
+> **2026-08-31, nine glasses, and it is a class rather than an incident.** Her
+> sources carry `stroke-width` ~2.8 user units and a round cap bridges one
+> stroke width, so a 1-unit gap between two line ends is **invisible while
+> drawing**. The published icons use `vector-effect: non-scaling-stroke` — a
+> fixed number of SCREEN pixels — which works out at 0.35–0.66 user units. **Any
+> gap between about 0.7 and 2.8 units is hidden at edit time and open on the
+> page.**
+>
+> Helen diagnosed it unprompted and exactly: *"I assume this is because you're
+> drawing them with a different stroke width than when I edited the files,
+> meaning my lines didn't quite go far enough."* She then closed 25 of the 27
+> open ends across eight glasses in an afternoon.
+>
+> **Measure ends against STROKES, not against other ends.** The goblet's
+> endpoints all met within 0.26 units; its one fault was a line stopping 1.56
+> units short of the MIDDLE of another line. An end-to-end scan reports it clean.
+>
+> **A wand was built and is not good enough** (`git log -S wand`): appending a
+> stub along each short stroke's own tangent closed 4 of 6 on the coupe, refused
+> 2 where the tangent was 90° off the join, and left 3 open. Hand-editing wins.
+>
+> **A gap is not automatically a fault.** `old-fashioned-double` carries the
+> set's two largest (3.92 units each) and Helen ruled it correct as drawn.
+> **There is deliberately no guard** — her call, 2026-08-31: the set will be
+> replaced wholesale if it changes at all, so a per-drawing check protects
+> against something that would bypass it anyway.
 
 **The width cap matters as much as the height, and can make a correctly-sized
 glass look wrong without it.** Helen, 2026-08-26, on `_dev/glasses.html`
@@ -3376,19 +3443,60 @@ a different fact the scale already holds separately as `who knows`.
 depended on the length of the rating word, so the one mark meant to be findable
 without reading moved from card to card.
 
-#### `display_scale` — the per-glass cheat, in `glasses.yml`
+#### How tall a glass is drawn on a card — the curve, and the empty cheat
 
-A multiplier on true relative height when a glass is drawn ON A CARD. Absent
-means 1. Collins 0.82, hurricane 0.74. True relative height is correct
-information and, past a point, a bad drawing: a 180mm Collins beside an 85mm
-old-fashioned is accurate and reads as a stripe.
+**Two numbers, and neither is per-glass.** Settled 2026-08-31 by Helen at
+`/dev/card-glasses/`, closing #601.
 
-A multiplier rather than padding — padding moves a baseline while leaving the
-glass as tall as it was, and the size is what is wrong. Data rather than CSS
-because each value is a judgement about ONE drawing, and this file already holds
-the other per-glass judgement. **Try the global curve first if a third glass
-ever wants a line here**: the card template raises every ratio to a power, so
-compressing the whole range is one number.
+| | | |
+|---|---|---|
+| the curve | `ratio × 0.5 + 0.5` | `cocktails/index.html` — lifts the SHORT end |
+| the headroom | `$card-glass-scale: 10.4rem` | `_cards.scss` — caps the TALL end |
+| `display_scale` | **`{}`** | the per-glass cheat, kept and empty |
+
+**Each fixes a different complaint and they compose.** A curve cannot move the
+tallest glass — it is the reference, so its ratio is 1.0 *by construction* —
+which is why the flute filled the panel edge to edge and why headroom had to be
+a separate dial. Conversely headroom moves everything together and does nothing
+about a 180mm Collins reading as a stripe beside an 85mm old-fashioned. Offering
+them as rival models on the dev page was a drafting error Helen caught in one
+line: *"Is headroom plus compression an option?"*
+
+**Measured, on the collision the cheat existed for:** a Collins stood 1.74× the
+old-fashioned beside it and stands 1.34× now. That is why `display_scale`'s two
+entries (collins 0.82, hurricane 0.74) came off — the curve does their job for
+every pair rather than the two somebody noticed. Collins and hurricane are
+consequently *taller* than they were, +7 and +11 points of panel height, which
+was put to Helen with both numbers before the change.
+
+**The map is kept and deliberately empty.** It is still the right home for a
+judgement about ONE drawing, and it still composes with the curve. Add a line
+only when a specific drawing is wrong in a way a range answer cannot see.
+
+**`$card-glass-scale` was 13rem against a 12.9rem panel** — the reference glass
+defined to be taller than the box it lives in. That is the whole of #601.
+
+**Eight wide glasses are capped by `max-width` before they reach their height
+target**, so the curve does not reach them: punch-bowl sits at 32% of the panel
+and did not move. Known and accepted; the lever there is the width cap, not the
+curve.
+
+> **A CROSS-REFERENCE TO ANOTHER FILE'S BEHAVIOUR IS A CLAIM NOTHING RE-CHECKS.**
+> Three places — `glasses.yml`, `_layouts/cocktail.html` and this section — said
+> the card template "raises every ratio to a power". It never had. Worse,
+> `glasses.yml`'s was an INSTRUCTION ("try the global curve first if a third
+> glass ever wants a line here"), so it sent the next reader after a knob that
+> did not exist at exactly the moment a third glass wanted one. Grepping for it
+> finds the three comments asserting it, which is §12's prose-fools-a-scan trap:
+> the vocabulary is densest where the claim is wrong. `git log -S` over the files
+> that would have to contain it is the check that works.
+
+**`/dev/card-glasses/` is kept rather than deleted with its losers** — Helen's
+call, and an exception to the comparison-switch convention (§13.9) rather than a
+hole in it. That convention is about a switch left in a SHIPPED page; this is a
+dev page whose whole job is the comparison, and rebuilding the instrument costs
+more than keeping it. **Its defaults are the shipped values and must stay that
+way**, or it quietly starts describing a site that no longer exists.
 
 #### The drink page — two states, one page
 
@@ -3632,14 +3740,53 @@ proportion WITHIN a drawing — only between it and its own frame.
    the pixel grid falls, which depends on the viewBox, which is what is being
    computed. Over eight successive fits the canvas oscillated across a
    ~0.1-unit band instead of settling.
-2. **Not raw geometry either.** Some drawings carry paths OUTSIDE their own
-   viewBox, clipped by it and never visible — the goblet's bowl runs to
-   `y = -6.9` above a canvas starting at 0. Fitting to that proposed shrinking
-   the goblet and coupe by 33% and 18%, revealing parts of a drawing nobody has
-   seen. So flatten the paths and **clip the points to the viewBox**.
-3. **Shrink-only.** Padding an ink box that touches the clip edge pushes the
-   canvas out, admitting a sliver of hidden artwork, enlarging the box, pushing
-   it out again — unbounded creep, one margin per regeneration.
+2. ~~**Not raw geometry either.**~~ **WRONG ON BOTH HALVES, AND IT COST THE
+   COUPE — #599, 2026-08-31.** This said some drawings carry paths outside their
+   own viewBox, "clipped by it and never visible", so `ink_bbox_units` should
+   clip the points to the viewBox and `fit_viewbox` should only ever shrink.
+
+   **They were visible.** `.drink-card-glass svg` sets `overflow: visible` — a
+   root `<svg>` clips only because the UA stylesheet says so (§9.11, added to
+   stop a stroke on the frame edge being sheared), so every card painted the
+   excess. Helen reported the coupe sitting high in its panel; that was 11.8
+   units of bowl hanging above its own canvas.
+
+   **And the numbers were mis-measured.** `svgrender.parse_icon` read ONE
+   `<g transform="translate(...)">` with a regex. Four icons nest a
+   `<g transform="matrix(...)">` holding the bowl — coupe, goblet,
+   old-fashioned-double, nick-and-nora — and that matrix was dropped, so the
+   figures quoted here described geometry in the wrong place. The parser
+   composes the whole ancestor stack now and bakes it into the geometry, so a
+   caller cannot apply only the outermost.
+
+   `ink_bbox_units` measures ALL the ink, and `fit_viewbox` grows as well as
+   shrinks. **The creep the shrink-only clamp prevented was a property of
+   measuring clipped ink** — the input moved when the frame moved. An unclipped
+   bbox does not depend on the viewBox at all, so it cannot creep, and the
+   idempotence guard still passes.
+
+   **`heights_mm` scales the VIEWBOX**, so ink outside it is height nothing
+   accounted for: the coupe was declared 150 mm and drew as if 179, the goblet
+   175 and drew as if 259 — taller than the flute. Eight canvases were refitted;
+   the other 19 did not move, which is the evidence the corrected fit agrees
+   with the pipeline everywhere it was already working.
+
+   **Why it will happen again, in Helen's own words:** Inkscape keeps the
+   previous canvas silently even when it reports the document as resized, so a
+   glass built by editing another arrives framed for a different glass. That is
+   the same argument as §9.14's own — it belongs in the pipeline, not in a
+   checklist.
+3. ~~**Shrink-only.**~~ **GONE with the clip, 2026-08-31.** It read: padding an
+   ink box that touches the clip edge pushes the canvas out, admitting a sliver
+   of hidden artwork, enlarging the box, pushing it out again — unbounded creep,
+   one margin per regeneration. All true, and **all a property of measuring
+   CLIPPED ink**: the input moved when the frame moved. An unclipped bounding
+   box does not depend on the viewBox at all, so there is no feedback to creep,
+   and `fit_viewbox` grows as well as shrinks.
+   `test_fitting_a_canvas_never_moves_the_artwork` still asserts idempotence and
+   still passes. **The general form is worth more than the fix: a guard against
+   a feedback loop is only needed while the loop exists, so check whether it
+   still does before keeping the guard's cost.**
 
 **Margin is 1.4 user units, not a percentage.** These icons use
 `vector-effect: non-scaling-stroke`, so the stroke is a fixed number of SCREEN
@@ -3649,6 +3796,17 @@ and clips the rim.
 
 **Unconditional, and that was measured before choosing:** with canvases fitted,
 23 of 26 icons move by 0.4% or less.
+
+**A guard exists for each direction now, and neither substitutes for the other.**
+`test_no_glass_artwork_has_a_slack_viewbox` rasterises INSIDE the viewBox and
+asks what fraction of the canvas the ink spans — so it catches a canvas bigger
+than its drawing and is *structurally incapable* of seeing the reverse, because
+ink outside the frame is not in the raster it measures. Every icon scored
+96–100% on it while four had artwork hanging out.
+`test_no_glass_artwork_is_drawn_outside_its_viewbox` is the other direction, and
+`test_the_icon_parser_applies_nested_transforms` is the one that keeps the
+measurement honest — a synthetic two-group SVG with the answer worked by hand,
+so it still bites if the drawings are ever flattened.
 
 **AND THE NORMALISER DELETED ALL 26 ICONS. TWICE.** Its first act is to empty
 `_includes/icons/glasses/`. `SRC` is `tmp/cocktail-glasses`, a **gitignored
@@ -3675,9 +3833,13 @@ and was the wrong shape: the whole job of comparing a redraw against what it
 replaces cannot rest on archaeology that a squash, rebase or shallow clone
 removes.
 
-**The convention** — already in use for `coupe-3`, `hurricane-2`, `tiki-mug-2`,
-`old-fashioned-2`, and now applied to the double: base name is the original, a
-numeric suffix is the redraw. Both stay on disk.
+**The convention** — base name is the original, a numeric suffix is the redraw,
+and both stay on disk. Eleven sources carry one after the 2026-08-31 pass
+(`coupe-4`, `absinthe-2`, `collins-4`, `goblet-2`, `hot-toddy-2`,
+`julep-cup-3`, `sherry-2`, `sour-2`, `tiki-mug-3`, `pineapple-4`, plus
+`hurricane-2`), so **read `RENAME` in the normaliser rather than guessing which
+number is live** — the count moves and the suffix is a fact about this repo's
+history, not a pattern.
 
 **Which one publishes is then a NAMED SWITCH, not an accident.** In
 `scripts/normalise_glass_icons.py`, a `RENAME` entry points the suffixed name
@@ -3816,7 +3978,7 @@ from here.
 | `test_drafts.py` | `_food_drafts/`-scoped subset of the structural/style rules above, via its own `draft` fixture — see its own module docstring for exactly which rules ported and which deliberately didn't |
 | `test_reference_data.py` | `_data/food/internal_temperatures.yml`'s own invariants — see §14 |
 | `test_suite_hygiene.py` | Tests about the tests: the one failure mode whose symptom is green (§12) |
-| `test_cocktails.py` | The drinks' own spec. **This table omitted it entirely until 2026-08-19**, and §9.5 still said "no tests exist for cocktails at all" — both written before it did |
+| `test_cocktails.py` | The drinks' own spec, **and the glass ARTWORK's** — the two viewBox guards face opposite directions (§9.14) and `test_the_icon_parser_applies_nested_transforms` keeps their measurement honest. **This table omitted the file entirely until 2026-08-19**, and §9.5 still said "no tests exist for cocktails at all" — both written before it did |
 | `test_page_links.py` | Every `<a href>` in every template, traced to a literal path. Also omitted from this table until 2026-08-19 |
 | `test_rendered_pages.py` | Assertions about BUILT html, including the two chrome guards (§2.5), `test_every_published_page_links_a_stylesheet` (§2.4), and `test_every_icon_partial_class_has_a_styled_base` (#396) |
 | `test_source_attribution.py` | The six citation rules, over recipes and drafts — see `SOURCE_ATTRIBUTION_SPEC.md` (§4). Omitted from this table until 2026-08-21 |
@@ -4742,6 +4904,29 @@ different exporters are in use — most decorative folders open with `<svg `
 second kind — no error, just subtly wrong output, because a failed
 `String.replace` returns the input unchanged. Match `<svg` plus whitespace,
 not a specific character.
+
+**AND YOU WILL READ ONE TRANSFORM WHERE THERE ARE TWO.** 2026-08-31, #599, the
+same family one level deeper. `svgrender.parse_icon` pulled the first
+`<g transform="translate(…)">` out with a regex; four icons nest a
+`<g transform="matrix(…)">` holding the bowl, and that matrix was silently
+dropped — so every measurement of those four read their geometry in the wrong
+place, and the normaliser then fitted their canvases to what it had mis-read.
+`normalise_glass_icons.py`'s `_emit` had the mirror bug: it re-emitted a
+transform on a `<g>` and dropped one on a `<path>`, which on Helen's pineapple
+(a negative y scale) would have flipped the drawing rather than nudging it.
+
+**Both failed in the direction that looks fine.** The bowl still landed
+somewhere inside the canvas, so the slack-viewBox guard measured a healthy
+97.5% fill while 11.8 units of rim sat outside the frame entirely. **A
+transform is a stack, not an attribute** — compose the ancestors, and prefer
+baking the result into the geometry so a caller cannot apply half of it.
+
+**A CROSS-REFERENCE TO ANOTHER FILE'S BEHAVIOUR IS A CLAIM NOTHING RE-CHECKS**,
+and the same day proved it: three separate comments said the card template
+"raises every ratio to a power" and it never had. One of the three was an
+INSTRUCTION to reach for that curve. Grepping finds the comments asserting the
+claim, not the code — `git log -S` over the file that would have to implement
+it is the check that works. See §9.13.
 
 **You will rename something and silently un-ignore it.** `.gitignore`
 matches by directory *name*. `test_every_drafts_collection_is_gitignored`
