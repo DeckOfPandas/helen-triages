@@ -105,6 +105,39 @@ sitemap: false
     </fieldset>
   </div>
 
+  {% comment %} THE SOLID ICONS' OWN DIAL. Three of the set are filled artwork
+     rather than strokes (Helen's tiki mug, pineapple and coconut), so their
+     ink is the drawing and `stroke-width` does nothing to it. Each carries an
+     <feMorphology erode> filter instead, and this drives its radius live so
+     the amount can be chosen by looking rather than guessed at.
+
+     THE VALUES HERE ARE THE ONES BAKED INTO THE SVGs, read out of the files at
+     render rather than restated -- same rule as the shape dials above. Whatever
+     Helen settles on gets written back into the icons. {% endcomment %}
+  <div class="dev-controls dev-controls--ink">
+    <fieldset>
+      <legend>Solid ink</legend>
+      {% for icon in glasses.all_icons %}
+        {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
+        {% capture icon_svg %}{% include {{ icon_file }} %}{% endcapture %}
+        {% if icon_svg contains "feMorphology" %}
+          <label class="dial dial--always">
+            {{ icon }}
+            <input type="range" class="ink-dial" data-icon="{{ icon }}"
+                   min="0" max="2.4" step="0.05">
+            <output></output>
+          </label>
+        {% endif %}
+      {% endfor %}
+      <p class="dev-note">
+        These three are filled drawings, so they have no stroke to set a width
+        on. The dial erodes the ink instead — the paths are untouched, and 0 is
+        the drawing exactly as Helen sent it. Parity with the stroked set would
+        be tiki&nbsp;1.77, pineapple&nbsp;0.63, coconut&nbsp;0.94.
+      </p>
+    </fieldset>
+  </div>
+
   <p class="dev-readout" id="readout"></p>
 
   {% comment %} Which glasses are actually asked for, and how often. Counted
@@ -297,6 +330,33 @@ sitemap: false
     Array.prototype.slice.call(grid.children)
       .sort(function (a, b) { return parseFloat(b.dataset.mm) - parseFloat(a.dataset.mm); })
       .forEach(function (cell) { grid.appendChild(cell); });
+
+    // --- the solid icons' erode dials ---------------------------------------
+    // Every card is a separate copy of the icon, so a change has to reach all
+    // of them: the filters carry the same id per icon by design (identical
+    // definitions, so a duplicate resolves correctly), and this walks the lot.
+    function inkNodes(icon) {
+      return document.querySelectorAll(
+        '.dev-card[data-icon="' + icon + '"] feMorphology');
+    }
+
+    document.querySelectorAll('.ink-dial').forEach(function (dial) {
+      var icon = dial.dataset.icon;
+      var first = inkNodes(icon)[0];
+      // Seeded from the SVG rather than from a number typed here, so the page
+      // opens showing what the icons actually carry.
+      var baked = first ? parseFloat(first.getAttribute('radius')) : 0;
+      dial.value = baked;
+      var out = dial.parentNode.querySelector('output');
+      function show() { out.textContent = ' ' + parseFloat(dial.value).toFixed(2); }
+      show();
+      dial.addEventListener('input', function () {
+        inkNodes(icon).forEach(function (n) {
+          n.setAttribute('radius', dial.value);
+        });
+        show();
+      });
+    });
 
     syncDials();
     apply();
