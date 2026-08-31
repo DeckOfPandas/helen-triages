@@ -63,7 +63,8 @@ const VOCAB = {
   // vocabulary does -- measured 2026-08-31, 0 of 188 -- so without a fixture
   // saying so, viaKind's declared-before-prose ordering is a branch no test
   // can reach, and flipping it would stay green.
-  cane_and_palm_spirits: ['coconut rum', 'moderately aged rum', 'Jamaican, moderately aged'],
+  cane_and_palm_spirits: ['coconut rum', 'moderately aged rum', 'Jamaican, moderately aged',
+    'lightly aged and filtered rum'],
   liqueurs: ['falernum', 'apricot liqueur', 'cherry liqueur', 'gin liqueur'],
   juices: ['lime juice', 'lime', 'lime cordial'],
   card_names: {
@@ -92,6 +93,13 @@ const BOTTLES = {
       aliases: ['Wray and Nephew', 'Wray & Nephew Overproof']
     },
     'El Dorado 3': { generic: 'lightly aged and filtered rum', aliases: ['ED3', 'El Dorado 3yo'] },
+    // Kamaniwanalaya's two, which is the collection's one worked example of a
+    // disjunctive pour whose bottles each name exactly one of the options.
+    'Appleton Estate 8 Year Reserve': {
+      generic: 'moderately aged Jamaican rum',
+      aliases: ['Appleton 8']
+    },
+    "Chairman's Reserve": { generic: 'moderately aged rum' },
     'Rum Fire': { generic: 'unaged overproof Jamaican rum' },
     // The measured collision: `coconut rum` is a DECLARED GENERIC and also a
     // declared alias of this bottle. Resolving it would put a brand back into
@@ -883,32 +891,77 @@ test('a chip found through the GENERIC its card name abbreviates says which', ()
   assert.strictEqual(hit.viaKind, 'generic');
 });
 
-test('a chip found through PROSE is marked as such, not as a bottle', () => {
-  // "Wray & Nephew, or Rum Fire" is two bottles in one string, and
-  // bottles.yml's own `unresolved_suggestions` says so. #585 already stops it
-  // becoming a chip of its own; nothing stopped it being searchABLE, so typing
-  // "wray" reaches a category through a string Helen has said should not exist.
+test('PROSE beside a generic is not searchable at all, so it can explain nothing', () => {
+  // "Wray & Nephew, or Rum Fire" is two bottles in one string, and bottles.yml's
+  // own `unresolved_suggestions` says so. #585 already stopped it becoming a
+  // chip; nothing stopped it being searchABLE, because buildPool only filtered
+  // loose terms on an ingredient carrying NO generic. So "wray" reached a
+  // category through a string Helen has said should not exist -- and under
+  // #603's annotation that string would have been printed as the reason.
   const pool = S.buildPool(pours(
     attr('moderately aged jamaican rum', 'jamaican rum', 'wray & nephew, or rum fire')));
-  const [hit] = S.search('wray', pool, []).results;
 
-  // The chip wears the vocabulary's own casing, not the downcased attribute's.
-  assert.strictEqual(hit.entry, 'Jamaican rum');
-  assert.strictEqual(hit.band, 3);
-  assert.strictEqual(hit.viaKind, 'prose');
+  assert.deepStrictEqual(S.search('wray', pool, []).results, []);
+  // The chip itself is untouched -- only the way in through prose has gone.
+  assert.strictEqual(S.search('jamaic', pool, []).results[0].entry, 'Jamaican rum');
 });
 
-test('a declared name is a generic even when it reads as prose', () => {
-  // resolveTerm asks "is this declared?" before "is this prose?", and viaKind
-  // has to ask in the same order or the two answers to "what is this string"
-  // drift apart. No live term needs this today; a comma'd generic is exactly
-  // the shape #561 retired, and a retired shape is the one likeliest to come
-  // back through an alias.
+test('a DECLARED name that reads as prose is still searchable', () => {
+  // resolveHiddenTerm asks "is this declared?" before "is this prose?", and the
+  // order is load-bearing in the direction that loses data: a generic dropped
+  // as prose takes a real chip's own search term with it. No live term needs
+  // it today (0 of 188 declared terms read as prose, measured 2026-08-31), so
+  // the fixture pins it with the comma'd spelling #561 retired -- a retired
+  // shape being the one likeliest to come back through an alias.
   const pool = S.buildPool(pours(attr('jamaican, moderately aged', 'jamaican rum')));
   const [hit] = S.search('moderat', pool, []).results;
 
   assert.strictEqual(hit.band, 3);
   assert.strictEqual(hit.viaKind, 'generic');
+});
+
+test('a bottle belongs to the option it names, not to every option on the pour', () => {
+  // Kamaniwanalaya's shape, and the drink that proves this is code and not
+  // data: its suggestions were rewritten into a proper list on 2026-08-30, and
+  // typing "chairman" still offered BOTH categories, though Chairman's Reserve
+  // is declared `moderately aged rum` and nothing else. A disjunctive generic
+  // means "either would do" (#441); it does not mean either bottle.
+  const pool = S.buildPool(pours(attr(
+    'moderately aged jamaican rum', 'jamaican rum',
+    'moderately aged rum', 'aged rum',
+    'appleton 8', "chairman's reserve")));
+
+  const jamaican = S.search('appleton', pool, []).results;
+  assert.deepStrictEqual(jamaican.map((r) => r.entry), ['Jamaican rum']);
+  assert.strictEqual(jamaican[0].via, 'Appleton Estate 8 Year Reserve');
+
+  const aged = S.search('chairman', pool, []).results;
+  assert.deepStrictEqual(aged.map((r) => r.entry), ['aged rum']);
+});
+
+test('a bottle from ANOTHER category still reaches a pour offering only one', () => {
+  // #534's case, and the one the rule above must not break: a cherry brandy
+  // may suggest Cherry Heering, which is a liqueur, on purpose and with a
+  // note. Nothing on that pour contradicts it, so nothing may filter it out.
+  const pool = S.buildPool(pours(attr('falernum', "chairman's reserve")));
+  const [hit] = S.search('chairman', pool, []).results;
+
+  assert.strictEqual(hit.entry, 'falernum');
+  assert.strictEqual(hit.viaKind, 'bottle');
+});
+
+test('an alias keeps finding its bottle, and the bracket prints the real name', () => {
+  // ED3 contains not one letter of "El Dorado 3", so collapsing the spelling
+  // instead of adding to it would delete a way in that works today. Both are
+  // searchable; what a reader is shown is the name bottles.yml calls canonical.
+  const pool = S.buildPool(pours(attr('lightly aged and filtered rum', 'ed3')));
+
+  const short = S.search('ed3', pool, []).results[0];
+  const long = S.search('dorado', pool, []).results[0];
+
+  assert.strictEqual(short.entry, 'lightly aged and filtered rum');
+  assert.strictEqual(short.via, 'El Dorado 3');
+  assert.strictEqual(long.via, 'El Dorado 3');
 });
 
 test('the winning band decides which term is reported, not the first one seen', () => {

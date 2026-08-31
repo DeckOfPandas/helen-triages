@@ -231,6 +231,15 @@
       return chipCovers[key] || [key];
     }
 
+    /* Which chip a term ends up under, as a comparable key. A generic and the
+       card name that abbreviates it are the SAME chip, so asking "are these
+       two names the same option?" has to be asked here rather than of the
+       strings -- `moderately aged Jamaican rum` and `Jamaican rum` are one
+       answer, not two. */
+    function chipKeyOf(term) {
+      return normalise(chipForTerm[normalise(term)] || term);
+    }
+
     /* ---------------------------------------------------------------------
        DECLARED VOCABULARY versus TRANSCRIBED TEXT
        ---------------------------------------------------------------------
@@ -254,15 +263,34 @@
     Object.keys(voc).forEach(function (key) {
       if (key === 'families' || /_characters$/.test(key)) return;
       if (!Array.isArray(voc[key])) return;
-      voc[key].forEach(function (value) { declaredVocabulary[normalise(value)] = true; });
+      // The VALUE, not `true`: this doubles as the map from a downcased
+      // attribute back to the spelling Helen wrote -- see canonicalSpelling.
+      voc[key].forEach(function (value) { declaredVocabulary[normalise(value)] = value; });
     });
     Object.keys(cardNames).forEach(function (generic) {
-      declaredVocabulary[normalise(generic)] = true;
-      declaredVocabulary[normalise(cardNames[generic])] = true;
+      declaredVocabulary[normalise(generic)] = generic;
+      declaredVocabulary[normalise(cardNames[generic])] = cardNames[generic];
     });
 
     function isDeclared(term) {
       return !!declaredVocabulary[normalise(term)];
+    }
+
+    /* THE SPELLING TO SHOW A READER, for a term that arrived downcased.
+       `data-ing` is lowercased at build time -- the card wants it that way and
+       the filtering compares folded strings -- so every searchable term is
+       lower case by the time this module sees it. That is invisible while
+       nothing renders a term, and #603's annotation renders one: the bracket
+       would read `cachaça (sagatiba)` for a bottle the collection spells
+       Sagatiba, and `(havana club 3)` for one it spells Havana Club 3.
+
+       Both source files carry the real spelling, so neither is guessed: the
+       vocabulary for a generic or a card name, bottles.yml for a bottle. An
+       unknown string is returned as it came, which is the only honest answer
+       and is what a drink's own suggestion text gets. */
+    function canonicalSpelling(term) {
+      var key = normalise(term);
+      return declaredVocabulary[key] || bottleCanonical[key] || term;
     }
 
     /* A BOTTLE KEEPS ONE IDENTITY — Helen: "'wray and nephew' and 'wray &
@@ -287,6 +315,23 @@
         // it: a drink listing `wray and nephew` must answer to `Wray & Nephew`
         // in the exclude direction too, where there is no fuzzy reach to save it.
         cover(name, alias);
+      });
+    });
+
+    /* WHICH CATEGORY A BOTTLE IS, keyed by every spelling it answers to. The
+       same file, one field further in, and it is what lets an ingredient
+       offering two categories say which of them a bottle actually names --
+       see buildPool. A bottle's category is bottle-invariant (#529: "Appleton
+       12 is a moderately-aged Jamaican in every drink that pours it"), which
+       is why reading it here does NOT reopen #441's ruling against a shared
+       table for `character`. */
+    var bottleGenericOf = Object.create(null);
+    Object.keys(bottles.bottles || {}).forEach(function (name) {
+      var generic = (bottles.bottles[name] || {}).generic;
+      if (!generic) return;
+      bottleGenericOf[normalise(name)] = generic;
+      ((bottles.bottles[name] || {}).aliases || []).forEach(function (alias) {
+        bottleGenericOf[normalise(alias)] = generic;
       });
     });
 
@@ -331,6 +376,33 @@
       var key = normalise(term);
       if (unresolvedSuggestion[key]) return null;
       return bottleCanonical[key] || term;
+    }
+
+    /* THE SAME QUESTION ASKED OF A TERM THAT WILL NEVER BE A BUTTON, and the
+       one place the two answers differ is deliberate.
+
+       BECOMING A CHIP needs a usable bottle name, so resolveTerm above drops
+       everything `unresolved_suggestions` names. BEING A WAY IN only needs to
+       be a NAME: `Portobello` and `Luxardo` are in that list because a brand
+       is not a bottle (#529), and typing either of them to reach `gin` and
+       `maraschino liqueur` is a feature Helen has praised -- §9.3.3 cites it.
+       Dropping those from the search to satisfy a rule about buttons would
+       take out the thing band 3 exists for.
+
+       PROSE IS DIFFERENT AND GOES, on both paths. "Havana 7, Appleton 8" is
+       not a name at all, so it can neither be a button nor explain one: under
+       #603's annotation it prints a bracket that is two bottles, on two
+       different chips, with nothing saying which belongs to which. 14 hidden
+       terms read as prose today.
+
+       THE CANONICAL NAME JOINS THE TERMS, it does not replace them -- the same
+       bargain the loose branch already strikes below, and for the same reason:
+       `ED3` is an alias whose canonical name contains none of its letters, so
+       collapsing rather than adding would delete a way in that works today. */
+    function resolveHiddenTerm(term) {
+      if (isDeclared(term)) return term;
+      if (isProse(term)) return null;
+      return bottleCanonical[normalise(term)] || term;
     }
 
     /* One map, entry -> the families it belongs to, built once. A CARD NAME
@@ -425,11 +497,58 @@
         var declared = raws.filter(isDeclared);
         var loose = raws.filter(function (r) { return !isDeclared(r); });
 
+        /* The bottles beside this ingredient, as searchable names: the way in
+           survives, the second button does not. Routed through
+           resolveHiddenTerm now -- prose is not a name and cannot explain a
+           chip, and a bottle's canonical spelling joins its own. */
+        var hidden = [];
+        loose.forEach(function (raw) {
+          var resolved = resolveHiddenTerm(raw);
+          if (resolved === null) return;
+          if (hidden.indexOf(raw) === -1) hidden.push(raw);
+          if (hidden.indexOf(resolved) === -1) hidden.push(resolved);
+        });
+
+        /* A BOTTLE BELONGS TO THE OPTION IT NAMES, NOT TO EVERY OPTION ON THE
+           POUR. An ingredient may offer two categories -- a disjunctive
+           `generic` means "either would do" (#441) -- and then name a bottle
+           for each. Nothing in the drink says which goes with which; the two
+           lists simply sit in the same order, and order is not a statement.
+
+           Attaching all of them to all of them is what put `Jamaican rum` in
+           front of Helen when she typed "havana" (#603). The proof that this
+           is a CODE fault rather than a data one is Kamaniwanalaya, whose
+           suggestions were rewritten into a proper list on 2026-08-30 and
+           whose every bottle resolves cleanly: typing "chairman" still offered
+           both `aged rum` and `Jamaican rum`, though Chairman's Reserve is
+           declared `moderately aged rum` and nothing else.
+
+           So the pairing is recovered from bottles.yml, which states each
+           bottle's own category, rather than from position. Three ingredients
+           in the collection have this shape today.
+
+           DELIBERATELY NARROW, and the case it must not break is #534's: an
+           ingredient offering ONE category may suggest a bottle from another
+           on purpose -- a cherry brandy suggesting Cherry Heering, which is a
+           liqueur -- so a bottle is only ever filtered AWAY from an option
+           when it demonstrably names a different option on the same pour. */
+        var groupChips = Object.create(null);
+        declared.forEach(function (raw) { groupChips[chipKeyOf(raw)] = true; });
+        var offersSeveral = Object.keys(groupChips).length > 1;
+
+        function belongsWith(term, raw) {
+          if (!offersSeveral) return true;
+          var generic = bottleGenericOf[normalise(term)];
+          if (!generic) return true;                    // not a bottle we know
+          var key = chipKeyOf(generic);
+          if (!groupChips[key]) return true;            // names no option here
+          return key === chipKeyOf(raw);
+        }
+
         declared.forEach(function (raw) {
           var chipValue = chipForTerm[normalise(raw)] || raw;
-          // The bottles beside it become hidden terms of the category's chip:
-          // the way in survives, the second button does not.
-          add(chipValue, [raw].concat(coveredBy(chipValue), loose));
+          var mine = hidden.filter(function (term) { return belongsWith(term, raw); });
+          add(chipValue, [raw].concat(coveredBy(chipValue), mine));
         });
 
         if (declared.length) return;
@@ -523,7 +642,7 @@
                asking "is this the chip's own name?" should compare rather
                than infer -- on bands 1, 2 and 4, `via` is the chip's own
                value. */
-            via: term,
+            via: canonicalSpelling(term),
             /* WHAT KIND of name found it, because the three hidden kinds are
                three different arguments and #603 collects one of each:
 
@@ -533,23 +652,16 @@
                           MUlti-region rum")
                  bottle   a suggestion sitting beside the generic. This is the
                           kind band 3 was BUILT for -- "velvet" -> `falernum`
-                 prose    a suggestion that is not a bottle name at all
-                          ("havana" -> `rhum agricole blanc`, via "Havana 3
-                          year old and Clément Agricole Blanc"). #585 already
-                          stops these becoming chips; nothing stopped them
-                          being searched.
 
-               Classified in resolveTerm's own order -- declared first, so a
-               generic is never re-read as prose -- because two answers to
-               "what is this string" is how they drift apart. No live term
-               needs that ordering today (measured 2026-08-31: 0 of 188
-               declared terms read as prose), so the test pins it with the
-               comma'd spelling #561 retired rather than leaving a branch
-               nothing can reach. */
+               THERE IS NO `prose` KIND, and there was one for an hour. A
+               suggestion that is not a bottle name at all -- "Havana 7,
+               Appleton 8" -- used to reach the search as a hidden term and
+               would have printed as a chip's own explanation. resolveHiddenTerm
+               drops those from the pool now, so a prose string cannot be
+               matched, and a fourth value here would be a classification
+               nothing can produce. */
             viaKind: (normalise(term) === normalise(value)) ? 'own'
-              : isDeclared(term) ? 'generic'
-                : isProse(term) ? 'prose'
-                  : 'bottle',
+              : isDeclared(term) ? 'generic' : 'bottle',
             isPrefixMatch: folded.indexOf(query) === 0,
             hasWordMatch: words.some(function (w) { return w.indexOf(query) === 0; })
           };

@@ -682,6 +682,26 @@
   text-decoration-color: $color-cosmic-cosmopolitan;
 }
 
+// --- why this chip is here — #603 --------------------------------------------
+// A candidate matched through a name it does not display carries that name in a
+// bracket. Quieter than the chip it explains, because it is an aside about the
+// answer and not part of it: the chip says what you would be filtering ON, and
+// this says how you arrived at it.
+//
+// NOT ITALIC, and not a second colour. The word-match underline is already
+// spending a mark on these chips, and #603's own complaint was that the picker
+// asks you to work out what it is telling you -- two treatments on one chip is
+// that complaint again. Size and tone carry it.
+//
+// It never wears the underline: `text-decoration` inherits into a child, and a
+// chip that is a word match paints the rule under its bracket too, which reads
+// as the bracket being part of the name.
+.btn-pool-via {
+  font-size: 0.86em;
+  color: $color-clear-text;
+  text-decoration: none;
+}
+
 // LEAVE OUT KEEPS ITS COLOURLESSNESS HERE TOO. It has no hue by decision --
 // Helen: "for food, avoiding can be important whereas for drinks surely less
 // so" -- so the mark is the one distinction available without one: the plain
