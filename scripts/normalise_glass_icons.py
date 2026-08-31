@@ -93,6 +93,11 @@ SKIP = {
     # one.
     "glass-tiki-mug-2.svg",
     "glass-pineapple-3.svg",
+    # 2026-08-31: coupe-3's stroke ends fell short of each other by up to 1.06
+    # user units. Invisible while drawing -- her stroke is ~2.8 units wide and a
+    # round cap bridges one stroke width -- and visible on the page, where
+    # non-scaling-stroke means the cap only spans 0.46. coupe-4 closes all six.
+    "glass-coupe-3.svg",
     # NO OLD-FASHIONED ENTRIES HERE ANY MORE, and their absence is the fix.
     # This set briefly held four of them: two version suffixes, a 2-path early
     # draft, and a never-adopted 12-path candidate, plus a RENAME pointing at
@@ -189,7 +194,7 @@ SOLID = {
 #    mapping survives a regeneration.
 RENAME = {
     "pineapple-4": "pineapple",
-    "coupe-3": "coupe",
+    "coupe-4": "coupe",
     "hurricane-2": "hurricane",
     "tiki-mug-3": "tiki-mug",
     "mule-mug": "mug",
