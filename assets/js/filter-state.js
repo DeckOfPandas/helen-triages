@@ -368,6 +368,65 @@
     return hit;
   }
 
+  /* THE OTHER HALF OF THE ROW QUESTION — "is this row one you asked for?" —
+     issue #506, and it is deliberately NOT merged with excludesRow above.
+     ---------------------------------------------------------------------
+     filters.js runs them in this order and says why: everything here decides
+     whether a row is one you asked for, and excludesRow decides whether it is
+     one you cannot serve. Keeping them apart is what makes the excluded COUNT
+     meaningful -- the panel reports how many rows survived every other filter
+     and were dropped only for what they list, which a single merged predicate
+     could not tell you.
+
+     WHY IT MOVED. It was 40 lines inside filters.js's update(), the one module
+     in HANDOVER 3's table with no tests at all, reading five data- attributes
+     off a live <li>. Every rule below is a decision with a handful of inputs
+     and no need of a DOM, which is back-link.js's argument exactly.
+
+     THE ROW IS PRE-NORMALISED BY THE CALLER, the same contract excludesRow
+     already states for `entries`: `titleFolded` has been through
+     ingredientSearch.fold on a lowercased title, because `state.nameQuery` is
+     stored folded and a comparison between one folded and one raw string is a
+     silent miss. filters.js computes it only when there IS a name query, so an
+     empty `titleFolded` on a row means "not asked", never "no title".
+
+     WITHOUT A `familyMatch` AN INGREDIENT FILTER SELECTS NOTHING, where the
+     same omission on the exclude side excludes nothing. Both are "the umbrella
+     cannot be applied", and each fails in the direction that shows: an empty
+     list is visibly wrong, where a silently unenforced exclusion would hand
+     back the very thing you ruled out. */
+  function rowMatchesFilters(row, state, familyMatch) {
+    var r = row || {};
+    var s = state || {};
+
+    // AND across chosen tags: two tags means both, which is how a shelf works.
+    var rowTags = r.tags || [];
+    var missing = false;
+    if (s.tags && typeof s.tags.forEach === 'function') {
+      s.tags.forEach(function (t) { if (rowTags.indexOf(t) === -1) missing = true; });
+    }
+    if (missing) return false;
+
+    if (s.star && (r.star || '') !== s.star) return false;
+
+    if (s.nameQuery && String(r.titleFolded || '').indexOf(s.nameQuery) === -1) return false;
+
+    /* ONE META FILTER, AND `draft` IS IT -- issue #562 removed the other four
+       (`rewrite`, `proofread`, `no-short`, `has-short`) and their attributes
+       with them. `draft` needs none of the care they did: every row either is
+       a draft or is not, where "does this have a short method" had no answer
+       at all for a magic-bag row and needed three values to say so. */
+    if (s.meta && typeof s.meta.has === 'function' &&
+        s.meta.has('draft') && !r.isDraft) return false;
+
+    if (s.ingredient) {
+      var key = String(s.ingredient).replace(FAMILY_SUFFIX, '').trim();
+      if (!familyMatch || !familyMatch(r.ingredients || [], key)) return false;
+    }
+
+    return true;
+  }
+
   /* A DIFFERENT QUESTION, and it must stay different — GitHub issue #248.
      There used to be three near-identical expressions in filters.js and the
      issue read as "unify them"; unifying them would have been wrong, because
@@ -489,6 +548,10 @@
     isFieldSet: isFieldSet,
     FAMILY_SUFFIX: FAMILY_SUFFIX,
     excludesRow: excludesRow,
+    // The pair, and food-shaped: tags, star, name, meta and the one ingredient
+    // key are the food index's questions. The cocktail index asks a different
+    // five and answers them in cocktail-index.js against COCKTAIL_FIELDS.
+    rowMatchesFilters: rowMatchesFilters,
     hasAnythingToClear: food.hasAnythingToClear,
     isEmpty: food.isEmpty,
     hasNarrowingFilter: food.hasNarrowingFilter,

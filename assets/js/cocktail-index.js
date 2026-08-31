@@ -440,8 +440,26 @@
         poolEl.appendChild(chip(family + FAMILY_SUFFIX, false, true));
       });
 
+      /* A CHIP FOUND THROUGH A NAME IT DOES NOT SHOW SAYS WHICH — #603, and
+         Helen picked this out of four candidates shown side by side on a dev
+         page, which was deleted with the losers the moment she chose -- the
+         comparison-switch contract, same as `?narrow=` and `?glass=margin`.
+         Recover it from git if the argument ever reopens.
+
+         Band 3 is the one that matches a hidden name: a bottle beside the
+         generic, or a generic the card name abbreviates away. It is what makes
+         "velvet" reach `falernum` and "beefeater" reach `gin`, and it is also
+         what put `cachaça` in front of her when she typed "sa". Both are the
+         same rule; the difference is only whether the chip can account for
+         itself, so the fix is to let it.
+
+         The bracket is a SEPARATE SPAN and the chip's value is untouched. What
+         gets stored as a filter, compared against a card and read back by
+         clear-all is still the chip's own name -- an annotation folded into the
+         label would become part of the filter and match nothing. */
       result.results.forEach(function (r) {
-        poolEl.appendChild(chip(r.entry, false, r.hasWordMatch));
+        poolEl.appendChild(chip(r.entry, false, r.hasWordMatch,
+          r.band === 3 ? r.via : null));
       });
 
       /* THE CAP IS STATED, NOT SILENT. A pool that quietly stops at eight looks
@@ -474,7 +492,7 @@
 
        Still ONE button throughout. The × is a target, not a second control --
        clicking anywhere on the chip removes it, which is what it already did. */
-    function chip(word, on, wordMatch) {
+    function chip(word, on, wordMatch, via) {
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'btn-pool' + (on ? ' is-on' : '') + (wordMatch ? ' btn-pool--word-match' : '');
@@ -487,6 +505,15 @@
         b.appendChild(label);
         b.appendChild(document.createTextNode(' \u00d7'));
         b.setAttribute('aria-label', STOP_DOING[field] + word);
+      } else if (via) {
+        // ONLY WHILE IT IS AN OFFER. The bracket answers "why is this here?",
+        // which is a question about a candidate; once the chip is chosen it is
+        // your filter and the reason has been spent.
+        b.textContent = word + ' ';
+        var reason = document.createElement('span');
+        reason.className = 'btn-pool-via';
+        reason.textContent = '(' + via + ')';
+        b.appendChild(reason);
       } else {
         b.textContent = word;
       }

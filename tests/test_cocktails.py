@@ -3263,7 +3263,11 @@ def test_suggestion_is_a_string_or_a_list_of_strings():
 # other to.
 KNOWN_PROSE_SUGGESTIONS = {
     ("apple-cart", "Avallen -- a round, fresh taste if you need to sub"),
-    ("daisy-de-santiago", "Havana 3 year old and Clément Agricole Blanc"),
+    # Daisy de Santiago's "Havana 3 year old and Clément Agricole Blanc" came
+    # off on 2026-08-31, retired the way this contract intends: the drink was
+    # rewritten, not the string reworded. Helen: "let's chop down to just Havana
+    # 3, 2 oz." The suggestion that could not resolve went with the disjunction
+    # it was trying to cover.
     # Milliners Punch's "the cheapest white rum to hand; sometimes JW Spicers"
     # came off this set on 2026-08-27, retired the way this contract intends:
     # the suggestion is GONE, not reworded. Helen, "never name Spicers -- if I
