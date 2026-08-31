@@ -292,11 +292,10 @@ def render_filled(paths, viewbox, height_px=420, ss=3, translate=(0, 0)):
 
 
 def render_file_filled(svg_path, out_png, height_px=420):
-    text = open(svg_path).read()
-    vb = [float(v) for v in re.search(r'viewBox="([^"]+)"', text).group(1).split()]
-    tr = re.search(r'transform="translate\(([-\d.]+)[, ]+([-\d.]+)\)"', text)
-    translate = (float(tr.group(1)), float(tr.group(2))) if tr else (0, 0)
-    paths = re.findall(r'\sd="([^"]+)"', text)
+    # Through parse_icon_text, not its own regexes -- this had a fourth copy of
+    # the one-translate parse that #599 found wrong on four icons.
+    paths, vb, translate, _ = parse_icon_text(
+        pathlib.Path(svg_path).read_text(), str(svg_path))
     W, H, g = render_filled(paths, vb, height_px, translate=translate)
     write_png(out_png, W, H, g)
     return W, H
@@ -324,29 +323,137 @@ def parse_icon(svg_path):
     guard. Copies of a parser drift, and a parser that drifts from the files it
     reads fails by returning PLAUSIBLE numbers rather than by erroring.
 
-    The <g transform="translate(...)"> matters and is easy to forget: the
-    normaliser leaves Inkscape's group offset in place rather than baking it
-    into the path data, so an icon parsed without it rasterises to an empty or
-    half-empty canvas -- which counts as "no ink" rather than as a failure.
+    The <g transform="..."> matters and is easy to forget: the normaliser leaves
+    Inkscape's group offset in place rather than baking it into the path data,
+    so an icon parsed without it rasterises to an empty or half-empty canvas --
+    which counts as "no ink" rather than as a failure.
+
+    THE TRANSFORM IS A STACK, NOT AN ATTRIBUTE, and reading it as one attribute
+    was wrong for four of the 26 icons. This function used to pull the FIRST
+    `translate(...)` out with a regex and hand it back for callers to add on.
+    Four drawings nest a second group inside the first -- coupe, goblet,
+    old-fashioned-double and nick-and-nora each carry a
+    `<g transform="matrix(...)">` holding the bowl -- and that matrix was
+    silently dropped, so every measurement taken through here read their bowls
+    at the wrong size and place.
+
+    IT FAILED IN THE DIRECTION THAT LOOKS FINE. The bowl still landed somewhere
+    inside the canvas, so `test_no_glass_artwork_has_a_slack_viewbox` measured a
+    healthy 97.5% fill for the coupe while 11.8 units of its rim sat outside the
+    viewBox entirely, and `fit_viewbox` then clamped the canvas onto geometry it
+    had mis-read. See issue #599.
     """
     return parse_icon_text(pathlib.Path(svg_path).read_text(), svg_path)
+
+
+TRANSFORM_OP = re.compile(r'(translate|matrix|scale)\(([^)]*)\)')
+_ELEMENT = re.compile(r'<(/?)([A-Za-z][\w:-]*)((?:"[^"]*"|[^>])*?)(/?)>', re.S)
+IDENTITY = (1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
+
+
+def compose(m, n):
+    """m then n, as SVG's (a b c d e f) column-vector convention: m applied to
+    the result of n, i.e. the matrix a nested group ends up with."""
+    a1, b1, c1, d1, e1, f1 = m
+    a2, b2, c2, d2, e2, f2 = n
+    return (a1 * a2 + c1 * b2, b1 * a2 + d1 * b2,
+            a1 * c2 + c1 * d2, b1 * c2 + d1 * d2,
+            a1 * e2 + c1 * f2 + e1, b1 * e2 + d1 * f2 + f1)
+
+
+def parse_transform(value):
+    """An SVG transform attribute -> one (a, b, c, d, e, f) matrix.
+
+    Only the three operations these drawings actually use are supported, and an
+    unknown one raises rather than being skipped: silently ignoring a rotate()
+    would put the artwork somewhere else and report a plausible number for it,
+    which is the whole failure this function exists to stop.
+    """
+    m = IDENTITY
+    consumed = 0
+    for op, args in TRANSFORM_OP.findall(value or ''):
+        nums = [float(x) for x in re.split(r'[,\s]+', args.strip()) if x]
+        if op == 'translate':
+            t = (1.0, 0.0, 0.0, 1.0, nums[0], nums[1] if len(nums) > 1 else 0.0)
+        elif op == 'scale':
+            t = (nums[0], 0.0, 0.0, nums[1] if len(nums) > 1 else nums[0], 0.0, 0.0)
+        else:
+            t = tuple(nums)
+        m = compose(m, t)
+        consumed += 1
+    if (value or '').strip() and not consumed:
+        raise ValueError(f'unsupported transform {value!r}')
+    return m
+
+
+def apply_matrix(m, x, y):
+    a, b, c, d, e, f = m
+    return a * x + c * y + e, b * x + d * y + f
+
+
+def _placed_paths(text, label):
+    """[(d, matrix)] for every <path>, each with its full ancestor transform."""
+    stack = [IDENTITY]
+    out = []
+    for close, tag, attrs, selfclose in _ELEMENT.findall(text):
+        if close:
+            if tag == 'g' and len(stack) > 1:
+                stack.pop()
+            continue
+        here = stack[-1]
+        tm = re.search(r'transform="([^"]*)"', attrs)
+        if tm:
+            here = compose(here, parse_transform(tm.group(1)))
+        if tag == 'g' and not selfclose:
+            stack.append(here)
+        elif tag == 'path':
+            d = re.search(r'\sd="([^"]*)"', attrs)
+            if d and d.group(1).strip():
+                out.append((d.group(1), here))
+    if not out:
+        raise ValueError(f'{label}: no path data')
+    return out
+
+
+def _as_path_data(polylines):
+    """Flattened polylines -> one `d` string, in the viewBox's own units."""
+    parts = []
+    for sub in polylines:
+        if not sub:
+            continue
+        parts.append('M ' + ' L '.join(f'{x:.6f},{y:.6f}' for x, y in sub))
+    return ' '.join(parts)
 
 
 def parse_icon_text(text, label='<svg>'):
     """As parse_icon, but for SVG text that is not on disk yet -- which is what
     scripts/normalise_glass_icons.py needs to fit a canvas to output it has
-    just built and not yet written."""
-    svg_path = label
+    just built and not yet written.
+
+    THE PATHS COME BACK ALREADY PLACED, and `translate` is therefore always
+    (0, 0). Every ancestor transform is composed and baked into the geometry
+    here, so a caller cannot forget to apply one and cannot apply only the
+    outermost -- which is exactly the bug this replaces. The returned `d`
+    strings are flattened polylines rather than the file's own curves: the
+    callers are a rasteriser and a bounding box, both of which flatten anyway,
+    and `fit_viewbox` never writes path data back.
+
+    `translate` is still returned so the four existing call sites keep working
+    unchanged; passing it on to render() adds nothing, which is correct now.
+    """
     box = re.search(r'viewBox="([^"]+)"', text)
     if not box:
-        raise ValueError(f'{svg_path}: no viewBox')
+        raise ValueError(f'{label}: no viewBox')
     viewbox = [float(v) for v in box.group(1).split()]
-    tr = re.search(r'transform="translate\(([-\d.]+)[, ]+([-\d.]+)\)"', text)
-    translate = (float(tr.group(1)), float(tr.group(2))) if tr else (0.0, 0.0)
-    paths = re.findall(r'\sd="([^"]+)"', text)
+    paths = []
+    for d, m in _placed_paths(text, label):
+        placed = [[apply_matrix(m, x, y) for x, y in sub] for sub in flatten(d)]
+        data = _as_path_data(placed)
+        if data:
+            paths.append(data)
     if not paths:
-        raise ValueError(f'{svg_path}: no path data')
-    return paths, viewbox, translate, 'glass-icon-solid' in text
+        raise ValueError(f'{label}: no path data')
+    return paths, viewbox, (0.0, 0.0), 'glass-icon-solid' in text
 
 
 def ink_bbox_units(paths, viewbox, translate=(0, 0), probe_px=None):
@@ -360,33 +467,34 @@ def ink_bbox_units(paths, viewbox, translate=(0, 0), probe_px=None):
     successive fits, the canvas oscillated across a ~0.1-unit band instead of
     settling. Flattening the paths is exact and has no grid to land on.
 
-    NOT THE RAW GEOMETRY EITHER, and this is the one that bites. Some drawings
-    carry paths that extend OUTSIDE their own viewBox and are clipped by it:
-    the goblet's bowl runs to y = -6.9 above a canvas starting at 0, and the
-    coupe's to -2.5. That artwork has never been visible on the site. Fitting
-    to it would zoom OUT to reveal parts of a drawing nobody has ever seen,
-    which is the opposite of the intent -- and it is why fitting the two
-    already-cropped icons proposed making them 33% and 18% smaller.
+    IT USED TO CLIP TO THE VIEWBOX AND NO LONGER DOES -- issue #599. The
+    argument for clipping was that some drawings extend outside their own
+    canvas, that the excess "has never been visible on the site", and that
+    fitting to it would reveal drawing nobody has seen. Both halves of that
+    turned out to be wrong:
 
-    So: flatten, then keep only what falls inside the current viewBox. That is
-    what a browser draws, and it is idempotent -- the clip region only ever
-    shrinks to something the ink already fits inside, so a second pass finds
-    the same extent.
+    - It IS visible. `.drink-card-glass svg` sets `overflow: visible` (added so
+      a stroke sitting on the viewBox edge is not sheared, §9.11), and a root
+      <svg> only clips because the UA stylesheet says so. Turning that off drew
+      the excess on every card, which is what made the coupe sit high in its
+      panel.
+    - The numbers behind it were mis-measured. They came from a parser that
+      dropped nested <g transform> groups (see parse_icon_text), so the figures
+      quoted for the goblet and the coupe described geometry in the wrong place.
+
+    So this measures ALL the ink, which is what a browser now paints. That is
+    also strictly more idempotent than clipping was: the answer does not depend
+    on the viewBox at all, so it cannot move when the viewBox does.
     """
     tx, ty = translate
-    vx0, vy0, vx1, vy1 = (viewbox[0], viewbox[1],
-                          viewbox[0] + viewbox[2], viewbox[1] + viewbox[3])
-    eps = 1e-9
     xs, ys = [], []
     for d in paths:
         for sub in flatten(d):
             for x, y in sub:
-                x, y = x + tx, y + ty
-                if vx0 - eps <= x <= vx1 + eps and vy0 - eps <= y <= vy1 + eps:
-                    xs.append(x)
-                    ys.append(y)
+                xs.append(x + tx)
+                ys.append(y + ty)
     if not xs:
-        raise ValueError('no ink inside the viewBox -- artwork drawn outside it?')
+        raise ValueError('no ink at all -- the file has no usable path data')
     return min(xs), min(ys), max(xs), max(ys)
 
 
@@ -401,35 +509,37 @@ def fit_viewbox(text, margin=1.4, label='<svg>'):
     SCREEN pixels and therefore spans MORE viewBox units the smaller the icon
     renders. A percentage margin would shrink exactly when the stroke needs it
     most -- on a card -- and clip the rim. 1.2 is the set's own typical margin.
+
+    IT GROWS AS WELL AS SHRINKS, SINCE #599, and the clamp it replaces was a
+    consequence of the clip that ink_bbox_units no longer applies. The old
+    reasoning was that padding an ink box which touches the clip edge pushes the
+    canvas out, admitting a sliver of previously-hidden artwork, enlarging the
+    box, pushing it out again -- unbounded creep, one margin per regeneration.
+    That is real, and it is a property of measuring CLIPPED ink: the input moved
+    when the frame moved. Measuring all the ink has no such feedback, because
+    the bounding box does not depend on the viewBox at all, so one pass lands on
+    the answer and a second finds it unchanged. `test_fitting_a_canvas_never_
+    moves_the_artwork` asserts exactly that.
+
+    What the clamp actually bought was a promise -- "fitting removes empty
+    space, it never reveals drawing nobody has seen" -- that the site had
+    already broken. `overflow: visible` on a card means the excess was on
+    screen; the canvas was simply lying about where the drawing was. Growing the
+    box to contain it is what makes `heights_mm` true again.
     """
     paths, viewbox, translate, _ = parse_icon_text(text, label)
     x0, y0, x1, y1 = ink_bbox_units(paths, viewbox, translate)
-
-    # ONLY EVER SHRINK. Clamped to the existing canvas, and that is what makes
-    # this idempotent on the drawings that have artwork outside their own
-    # viewBox (the goblet and the coupe both do). Padding an ink box that
-    # touches the clip edge would push the canvas OUT, which admits a sliver of
-    # previously-hidden artwork, which enlarges the ink box, which pushes it
-    # out again -- unbounded creep, one margin per regeneration. Clamping also
-    # states the intent exactly: fitting removes empty space, it never reveals
-    # drawing nobody has seen.
-    nx0 = max(x0 - margin, viewbox[0])
-    ny0 = max(y0 - margin, viewbox[1])
-    nx1 = min(x1 + margin, viewbox[0] + viewbox[2])
-    ny1 = min(y1 + margin, viewbox[1] + viewbox[3])
-    new = (nx0, ny0, nx1 - nx0, ny1 - ny0)
+    new = (x0 - margin, y0 - margin,
+           (x1 - x0) + 2 * margin, (y1 - y0) + 2 * margin)
     attr = 'viewBox="%s"' % ' '.join(f'{v:.4f}' for v in new)
     old = re.search(r'viewBox="[^"]+"', text).group(0)
     return text.replace(old, attr, 1), viewbox[3], new[3]
 
 
 def render_file(svg_path, out_png, height_px=420, stroke=1.6):
-    """Render an existing icon file (single optional <g transform=translate>)."""
-    text = open(svg_path).read()
-    vb = [float(v) for v in re.search(r'viewBox="([^"]+)"', text).group(1).split()]
-    tr = re.search(r'transform="translate\(([-\d.]+)[, ]+([-\d.]+)\)"', text)
-    translate = (float(tr.group(1)), float(tr.group(2))) if tr else (0, 0)
-    paths = re.findall(r'\sd="([^"]+)"', text)
+    """Render an existing icon file, with its full transform stack applied."""
+    paths, vb, translate, _ = parse_icon_text(
+        pathlib.Path(svg_path).read_text(), str(svg_path))
     W, H, g = render(paths, vb, height_px, stroke, translate=translate)
     write_png(out_png, W, H, g)
     return W, H
