@@ -337,10 +337,30 @@ heights_mm:
 # already holds the other per-glass judgement (`heights_mm`), so this is its
 # neighbour rather than a new idea.
 #
-# TRY THE GLOBAL CURVE FIRST if a third glass ever wants a line here. The card
-# template raises every ratio to a power before applying it, so compressing the
-# whole range is one number and does not need a per-glass exception. These two
-# are here because the curve that fixed them flattened everything else.
+# THERE IS NO GLOBAL CURVE, AND THIS COMMENT SAID THERE WAS -- corrected
+# 2026-08-31, #599/#601. It read: "TRY THE GLOBAL CURVE FIRST if a third glass
+# ever wants a line here. The card template raises every ratio to a power before
+# applying it." It does not and never has. `cocktails/index.html` computes a
+# flat `icon_mm / tallest_mm` and `_cards.scss` multiplies it by this cheat and
+# `--card-glass-scale`; `git log -S` over both files finds only the original
+# build. `_layouts/cocktail.html` DOES compress (`ratio * 0.68 + 0.32`), which
+# is probably where the belief came from -- but that is the drink page, at a
+# different size, for a different reason, and it lifts the SHORT end rather
+# than lowering the tall one.
+#
+# So the advice was pointing at a knob that does not exist, at exactly the
+# moment a third glass wanted a line: the flute is the tallest glass declared
+# here, which makes its ratio 1.0 BY CONSTRUCTION, so it fills the whole panel
+# whatever it is. /dev/card-glasses/ draws every glass at real card geometry
+# with four candidate models, including the power curve this used to promise.
+# Decide there, then replace this paragraph with what was chosen.
+#
+# WHY A DRAWING ARRIVES IN THE WRONG FRAME, since it will happen again. Helen
+# builds a glass by editing an existing one, and Inkscape keeps the previous
+# canvas silently even when it reports the document as resized. Four icons had
+# artwork hanging outside their own viewBox that way (#599). The normaliser
+# fits every canvas to its own ink on the way in, and
+# test_no_glass_artwork_is_drawn_outside_its_viewbox is the check that it took.
 display_scale:
   collins: 0.82
   hurricane: 0.74

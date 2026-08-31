@@ -3386,9 +3386,27 @@ old-fashioned is accurate and reads as a stripe.
 A multiplier rather than padding — padding moves a baseline while leaving the
 glass as tall as it was, and the size is what is wrong. Data rather than CSS
 because each value is a judgement about ONE drawing, and this file already holds
-the other per-glass judgement. **Try the global curve first if a third glass
-ever wants a line here**: the card template raises every ratio to a power, so
-compressing the whole range is one number.
+the other per-glass judgement.
+
+**THERE IS NO GLOBAL CURVE ON THE CARD, and this paragraph said to reach for one
+first** — corrected 2026-08-31, #599/#601. It read: *"Try the global curve first
+if a third glass ever wants a line here: the card template raises every ratio to
+a power."* It does not and never has. `cocktails/index.html` computes a flat
+`icon_mm / tallest_mm`; `_cards.scss` multiplies that by the cheat and
+`--card-glass-scale`. Checked with `git log -S` over both files rather than by
+grep, because a grep for the word finds the two comments asserting it.
+
+`glasses.yml` and `_layouts/cocktail.html` both carried the same claim and are
+corrected too. **The compression is real but it is the DRINK PAGE's** —
+`ratio × 0.68 + 0.32`, mapping onto 0.32–1.0 — and it lifts the SHORT end rather
+than lowering the tall one, so it would not have fixed the flute anyway.
+
+**The flute is what made this matter.** It is the tallest glass declared, so its
+ratio is 1.0 *by construction* and it fills the whole panel — `$card-glass-scale`
+is 13rem against a 12.9rem panel, i.e. the reference glass is defined to be
+taller than the box it lives in. `/dev/card-glasses/` draws every in-use glass at
+real card geometry with four candidate models, including the power curve the
+comment used to promise. **Delete the losers and the switch once Helen picks.**
 
 #### The drink page — two states, one page
 
@@ -3632,11 +3650,42 @@ proportion WITHIN a drawing — only between it and its own frame.
    the pixel grid falls, which depends on the viewBox, which is what is being
    computed. Over eight successive fits the canvas oscillated across a
    ~0.1-unit band instead of settling.
-2. **Not raw geometry either.** Some drawings carry paths OUTSIDE their own
-   viewBox, clipped by it and never visible — the goblet's bowl runs to
-   `y = -6.9` above a canvas starting at 0. Fitting to that proposed shrinking
-   the goblet and coupe by 33% and 18%, revealing parts of a drawing nobody has
-   seen. So flatten the paths and **clip the points to the viewBox**.
+2. ~~**Not raw geometry either.**~~ **WRONG ON BOTH HALVES, AND IT COST THE
+   COUPE — #599, 2026-08-31.** This said some drawings carry paths outside their
+   own viewBox, "clipped by it and never visible", so `ink_bbox_units` should
+   clip the points to the viewBox and `fit_viewbox` should only ever shrink.
+
+   **They were visible.** `.drink-card-glass svg` sets `overflow: visible` — a
+   root `<svg>` clips only because the UA stylesheet says so (§9.11, added to
+   stop a stroke on the frame edge being sheared), so every card painted the
+   excess. Helen reported the coupe sitting high in its panel; that was 11.8
+   units of bowl hanging above its own canvas.
+
+   **And the numbers were mis-measured.** `svgrender.parse_icon` read ONE
+   `<g transform="translate(...)">` with a regex. Four icons nest a
+   `<g transform="matrix(...)">` holding the bowl — coupe, goblet,
+   old-fashioned-double, nick-and-nora — and that matrix was dropped, so the
+   figures quoted here described geometry in the wrong place. The parser
+   composes the whole ancestor stack now and bakes it into the geometry, so a
+   caller cannot apply only the outermost.
+
+   `ink_bbox_units` measures ALL the ink, and `fit_viewbox` grows as well as
+   shrinks. **The creep the shrink-only clamp prevented was a property of
+   measuring clipped ink** — the input moved when the frame moved. An unclipped
+   bbox does not depend on the viewBox at all, so it cannot creep, and the
+   idempotence guard still passes.
+
+   **`heights_mm` scales the VIEWBOX**, so ink outside it is height nothing
+   accounted for: the coupe was declared 150 mm and drew as if 179, the goblet
+   175 and drew as if 259 — taller than the flute. Eight canvases were refitted;
+   the other 19 did not move, which is the evidence the corrected fit agrees
+   with the pipeline everywhere it was already working.
+
+   **Why it will happen again, in Helen's own words:** Inkscape keeps the
+   previous canvas silently even when it reports the document as resized, so a
+   glass built by editing another arrives framed for a different glass. That is
+   the same argument as §9.14's own — it belongs in the pipeline, not in a
+   checklist.
 3. **Shrink-only.** Padding an ink box that touches the clip edge pushes the
    canvas out, admitting a sliver of hidden artwork, enlarging the box, pushing
    it out again — unbounded creep, one margin per regeneration.
@@ -3649,6 +3698,17 @@ and clips the rim.
 
 **Unconditional, and that was measured before choosing:** with canvases fitted,
 23 of 26 icons move by 0.4% or less.
+
+**A guard exists for each direction now, and neither substitutes for the other.**
+`test_no_glass_artwork_has_a_slack_viewbox` rasterises INSIDE the viewBox and
+asks what fraction of the canvas the ink spans — so it catches a canvas bigger
+than its drawing and is *structurally incapable* of seeing the reverse, because
+ink outside the frame is not in the raster it measures. Every icon scored
+96–100% on it while four had artwork hanging out.
+`test_no_glass_artwork_is_drawn_outside_its_viewbox` is the other direction, and
+`test_the_icon_parser_applies_nested_transforms` is the one that keeps the
+measurement honest — a synthetic two-group SVG with the answer worked by hand,
+so it still bites if the drawings are ever flattened.
 
 **AND THE NORMALISER DELETED ALL 26 ICONS. TWICE.** Its first act is to empty
 `_includes/icons/glasses/`. `SRC` is `tmp/cocktail-glasses`, a **gitignored
