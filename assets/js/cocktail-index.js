@@ -441,7 +441,10 @@
       });
 
       /* A CHIP FOUND THROUGH A NAME IT DOES NOT SHOW SAYS WHICH — #603, and
-         Helen picked this out of four candidates on /dev/chip-search/.
+         Helen picked this out of four candidates shown side by side on a dev
+         page, which was deleted with the losers the moment she chose -- the
+         comparison-switch contract, same as `?narrow=` and `?glass=margin`.
+         Recover it from git if the argument ever reopens.
 
          Band 3 is the one that matches a hidden name: a bottle beside the
          generic, or a generic the card name abbreviates away. It is what makes
