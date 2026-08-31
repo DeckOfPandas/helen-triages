@@ -53,6 +53,27 @@
 # 'not filled in' even though you and I know that's not the case."
 no_garnish: "no garnish"
 
+# "EITHER OF THESE, MAKER'S CHOICE" IS A SINGLE STRING, NOT A LIST.
+# Settled 2026-08-31 on fake-id's `orange or lemon twist`. Helen: "either of
+# these are lovely and the maker can choose. I like this approach on principle."
+#
+# IT HAS TO BE ONE STRING BECAUSE A LIST ALREADY MEANS SOMETHING ELSE. A
+# `garnish:` list is conjunctive -- Cobra's Fang wants a mint sprig AND a lime
+# wheel -- so `["orange twist", "lemon twist"]` would ask for both. `generic`
+# solved the identical problem the other way round (#441), where a list means
+# "any of these would do"; the two fields cannot share one convention because
+# they start from opposite defaults, and that is worth knowing before anyone
+# tries to unify them.
+#
+# SO THE OR LIVES INSIDE THE STRING and the whole thing is declared as one
+# entry under `canonical`. Both halves should be real garnishes in their own
+# right, so the reader can act on either.
+#
+# ONE DRINK USES IT TODAY. That is deliberately not enough to build machinery
+# for -- #459's rule about not becoming an encyclopaedia. If a third or fourth
+# arrives, the question to ask is whether every combination declaring its own
+# string has become the wrong shape; until then this costs one line.
+
 # --- THE VOCABULARY ----------------------------------------------------------
 # Grouped for reading only. tests/test_cocktails.py flattens every list under
 # `canonical`, so a group added tomorrow is covered tomorrow -- the same shape
@@ -159,25 +180,24 @@ canonical:
 # "and" in it. Splitting them is a data edit to somebody else's drink, though,
 # and a count or a construction can be part of the garnish rather than noise --
 # so every one is proposed and none is applied.
-# EIGHT OF THE TEN ORIGINAL ROWS ARE GONE, worked through with Helen on
-# 2026-08-31, the day after they were written. Three splits were applied
-# (singapore-sling, carta-switchel, pic-a-de-crop-punch); `12 raspberries`
-# became `raspberries`; and four were REJECTED, which is what deleting a row
-# means -- `three coffee beans`, the fruit stick, and the skewered and Luxardo
-# cherries all keep their words, because each carries a fact a shorter string
-# would lose. What is left is what genuinely still needs her.
-proposals:
-
-  # --- two garnishes, but the first is too vague to split confidently --------
-  # port-au-prince. "pineapple" alone is a wedge on some drinks and a wheel on
-  # others, and this one does not say which. Splitting it needs Helen, and
-  # guessing would put a garnish on her drink that she did not choose.
-  "pineapple and brandied cherry": "QQ"
-
-  # --- a disjunction, which no single entry can express ----------------------
-  # fake-id. THE BLOCKER IS STRUCTURAL rather than a matter of wording: a
-  # `garnish:` list means "all of these", so it cannot say "either of these".
-  # `generic` solved the identical shape with a list meaning "any of these would
-  # do" (#441), but that convention does not exist for garnishes and inventing
-  # it on the strength of one drink would be the wrong way round.
-  "orange or lemon twist": "QQ"
+# ALL TEN ORIGINAL ROWS ARE GONE, inside two days, which is what this block is
+# for: methods.yml's bargain is that a proposal is resolved by DELETION, in one
+# direction or the other, and never by sitting here looking outstanding.
+#
+# WHAT HAPPENED TO EACH, so the absences are readable. Four splits applied
+# (singapore-sling, carta-switchel, pic-a-de-crop-punch, port-au-prince);
+# `12 raspberries` became `raspberries`; four rejected outright -- `three coffee
+# beans`, the fruit stick, and the skewered and Luxardo cherries, each keeping
+# words a shorter string would lose; and `orange or lemon twist` KEPT, which
+# turned it from a wart into the maker's-choice convention documented at the top
+# of this file.
+#
+# port-au-prince was the last to need Helen and she settled it on 2026-08-31:
+# `pineapple` there is a WEDGE. The collection uses both wedge and wheel, which
+# is exactly why guessing was not available.
+#
+# THE BLOCK STAYS, EMPTY. It is where the next census's proposals go, and an
+# empty mapping says "nothing outstanding" where a deleted key would say
+# nothing at all -- the same reason GLASSLESS_ON_2026_08_27 was kept and
+# asserted empty rather than removed.
+proposals: {}

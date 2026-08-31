@@ -2673,8 +2673,18 @@ def test_every_garnish_proposal_still_matches_a_real_string():
     _require_whole_collection("a garnish proposal's staleness")
 
     vocab = _garnish_vocab()
+    # THE KEY MUST EXIST; ITS BEING EMPTY IS FINE AND IS THE GOAL. This asserted
+    # non-emptiness for one day, which was wrong the moment the last row was
+    # resolved: proposals empty out by design -- that is what "resolved by
+    # deletion" means -- so a full map is the temporary state and an empty one is
+    # the settled one. What must not happen silently is the KEY going away, which
+    # would make every future proposal invisible to this check.
+    assert "proposals" in vocab, (
+        "garnish.yml has no `proposals` key at all. An empty mapping says "
+        "'nothing outstanding'; a missing one says nothing, and silently "
+        "switches this guard off for whatever is added next."
+    )
     proposals = vocab.get("proposals") or {}
-    assert proposals, "garnish.yml declares no proposals -- has it been renamed?"
 
     live = set()
     for _slug, fm in _load():
