@@ -92,21 +92,40 @@ measures:
 # none of them down and test_the_cocktail_search_config_is_not_hardcoded keeps
 # it that way.
 #
-# `min_query_chars` IS ISSUE #584, split out of #549 so that issue could close
-# on what was actually delivered rather than sit on the board mostly done.
-# Measured 2026-08-29 over the 240 distinct pool terms: at two characters `li`
-# offers 24 candidates and `or` 28, so eight are shown and the rest counted; at
-# three it is nearly always a real answer. Raising it is a one-line change here
-# and needs no code touched -- it is left at 2 because that is what the page did
-# before the search moved into a tested module, and changing behaviour and
-# structure in one pass hides which of them moved something.
+# `min_query_chars` WAS ISSUE #584, and it is 3 as of 2026-08-31 on Helen's
+# instruction to settle it. It sat at 2 only because that is what the page did
+# before the search moved into a tested module, which was the right reason then
+# and stopped being one once the numbers existed.
+#
+# RE-MEASURED THE DAY IT CHANGED, because the figures in #584 were taken over
+# 240 pool terms and #603 has since dropped prose and collapsed aliases -- the
+# pool is 141 chips now, so the issue's own evidence was two changes stale.
+# Swept over every prefix the chips' own words actually produce:
+#
+#            queries   median candidates   over the cap of 8
+#   2 chars    130            5             37  (28%)
+#   3 chars    242            1              7  (3%)
+#   4 chars    250            1              2  (1%)
+#
+# AT TWO CHARACTERS THE PICKER IS MOSTLY A PROMISE THAT THERE IS MORE: more
+# than a quarter of two-letter queries overflow the cap, so what you get is
+# eight arbitrary chips and "+21 more -- keep typing". At three it is nearly
+# always the answer. The step from 3 to 4 buys 2% and costs a keystroke on
+# every search, so it is not taken.
+#
+# FOOD HAS NO MINIMUM AT ALL and that stays true: its picker sits above a list
+# that remains on screen, so a wide pool is noise beside the answer rather than
+# instead of it. This one replaces the page's whole result area.
+#
+# Changing it needs no code touched, and `test_the_cocktail_search_config_is_
+# not_hardcoded` keeps it that way.
 #
 # `pool_cap` is how many candidates are shown at once. The remainder is always
 # COUNTED and said out loud ("+16 more -- keep typing"), never silently
 # dropped: a pool that stops at eight looks like a complete answer, and the one
 # you wanted may be the ninth.
 search:
-  min_query_chars: 2
+  min_query_chars: 3
   family_button_min_chars: 3
   pool_cap: 8
 
