@@ -1,0 +1,261 @@
+---
+layout: default
+site_key: cocktails
+title: Glasses on cards
+sitemap: false
+---
+
+{% comment %} ─────────────────────────────────────────────────────────────────
+  GLASSES ON CARDS — internal, never published. Issues #601, #599.
+
+  WHY THIS PAGE EXISTS, and it is HANDOVER §11.2.1 rather than convenience:
+  how a glass sits in a card panel is a question about a SIZE, and neither
+  Helen nor I can produce the comparison by looking at the real index — the
+  cards are scattered through 114 drinks in random order, so no two glasses
+  that need comparing are ever next to each other. "Is the flute too tall"
+  is a comparison, and a comparison has to be built before it can be made.
+
+  IT USES THE SITE'S OWN CSS, NOT A COPY. Every swatch below is a real
+  `.drink-card` containing a real `.drink-card-glass`, pulling the icon in with
+  the same include tag the index uses, so the panel width, the wash, the width
+  cap, the stroke weight and the centring are the live rules — not a
+  reproduction of them. _dev/emboss.html's own note is the reason: its
+  predecessor reproduced the treatment by hand, applied half of it, and made
+  the font look like the fault. A swatch that draws itself cannot be trusted
+  about the thing it is swatching.
+
+  EVERY NUMBER IS COUNTED LIVE — the drink counts from site.cocktail_drafts,
+  the heights from glasses.yml, the tallest glass by scanning rather than by
+  being written down. A swatch page with a stale number in it is worse than
+  no swatch page, because it looks like evidence.
+
+  THE MODELS ARE A COMPARISON SWITCH, and the convention that comes with one
+  is that the losers get DELETED once Helen picks. See §13.9 and the
+  `?narrow=` switch before it: a comparison switch left in becomes a
+  permanent branch nobody dares remove.
+────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+{% assign glasses = site.data.cocktails.glasses %}
+
+{% comment %} Tallest glass counted live, exactly as cocktails/index.html does
+   it — same loop, same source. If the two ever disagree this page is lying
+   about the site. {% endcomment %}
+{% assign tallest_mm = 0 %}
+{% for icon in glasses.all_icons %}
+  {% assign mm = glasses.heights_mm[icon] | times: 1.0 %}
+  {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
+{% endfor %}
+
+<article class="recipe">
+  <h1 class="recipe-title"><span class="recipe-title-text">Glasses on cards</span></h1>
+
+  <p class="dev-intro">
+    Every glass that a drink actually asks for, drawn in a real card panel at
+    the real scale. The tallest glass in <code>glasses.yml</code> is
+    <strong>{{ tallest_mm | round }} mm</strong>, and it is the reference every
+    other glass is measured against — so it is <em>always</em> 1.0 and always
+    fills the panel, whatever it happens to be.
+  </p>
+
+  <div class="dev-controls">
+    <fieldset>
+      <legend>Model</legend>
+      <label><input type="radio" name="model" value="flat" checked> <b>A · flat</b> — what ships today: <code>mm / tallest</code></label>
+      <label><input type="radio" name="model" value="headroom"> <b>B · flat + headroom</b> — same shape, tallest glass leaves a margin</label>
+      <label><input type="radio" name="model" value="linear"> <b>C · compressed range</b> — <code>ratio × k + (1−k)</code>, the drink page's curve</label>
+      <label><input type="radio" name="model" value="power"> <b>D · power</b> — <code>ratio ^ p</code>, the one glasses.yml promises</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Dials</legend>
+      <label class="dial" data-for="headroom">headroom <input type="range" id="headroom" min="0.70" max="1.00" step="0.01" value="0.90"><output for="headroom"></output></label>
+      <label class="dial" data-for="linear">k <input type="range" id="k" min="0.30" max="1.00" step="0.02" value="0.68"><output for="k"></output></label>
+      <label class="dial" data-for="power">p <input type="range" id="p" min="0.30" max="1.00" step="0.02" value="0.60"><output for="p"></output></label>
+      <label class="dial dial--always"><input type="checkbox" id="cheats" checked> apply the <code>display_scale</code> cheats</label>
+      <label class="dial dial--always"><input type="checkbox" id="frame"> outline the panel and the drawing</label>
+    </fieldset>
+  </div>
+
+  <p class="dev-readout" id="readout"></p>
+
+  {% comment %} Which glasses are actually asked for, and how often. Counted
+     from the drafts because that is what the index reads (§9.9) — a glass no
+     drink names is not a card problem, so it is listed separately below rather
+     than padding the comparison. {% endcomment %}
+  {% assign used = "" %}
+  {% for drink in site.cocktail_drafts %}
+    {% for g in drink.glass %}
+      {% assign icon = glasses.icons[g] | default: g %}
+      {% assign used = used | append: icon | append: "|" %}
+    {% endfor %}
+  {% endfor %}
+
+  <ul class="dev-card-grid">
+    {% for icon in glasses.all_icons %}
+      {% assign needle = icon | append: "|" %}
+      {% assign bits = used | split: needle %}
+      {% assign n = bits.size | minus: 1 %}
+      {% if n > 0 %}
+        {% assign mm = glasses.heights_mm[icon] | times: 1.0 %}
+        {% assign cheat = glasses.display_scale[icon] | default: 1.0 %}
+        {% assign ratio = mm | divided_by: tallest_mm %}
+        <li class="dev-card-cell">
+          <div class="drink-card dev-card"
+               data-icon="{{ icon }}" data-mm="{{ mm }}"
+               data-ratio="{{ ratio }}" data-cheat="{{ cheat }}">
+            <span class="drink-card-glass" style="--glass-ratio: {{ ratio }}; --glass-cheat: {{ cheat }};">
+              {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
+              {% include {{ icon_file }} %}
+            </span>
+          </div>
+          <p class="dev-card-label">
+            <b>{{ icon }}</b><br>
+            {{ mm | round }} mm · {{ n }} drink{% unless n == 1 %}s{% endunless %}
+            {% if glasses.display_scale[icon] %}<br><span class="dev-cheat">cheat {{ cheat }}</span>{% endif %}
+            <br><span class="dev-height" data-height-for="{{ icon }}"></span>
+          </p>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+  <h2 class="recipe-section-heading"><span class="section-heading-text">Declared but unused</span></h2>
+  <p class="dev-intro">
+    These have a <code>heights_mm</code> entry and no drink. They still set the
+    reference: <code>tallest_mm</code> is counted over <code>all_icons</code>,
+    not over the glasses in use, so an unused glass taller than every real one
+    would silently shrink the whole set.
+  </p>
+  <p class="dev-unused">
+    {% for icon in glasses.all_icons %}
+      {% assign needle = icon | append: "|" %}
+      {% assign bits = used | split: needle %}
+      {% assign n = bits.size | minus: 1 %}
+      {% if n == 0 %}<span>{{ icon }} <i>{{ glasses.heights_mm[icon] | round }} mm</i></span>{% endif %}
+    {% endfor %}
+  </p>
+</article>
+
+<style>
+  /* Page furniture only. Nothing here touches .drink-card or
+     .drink-card-glass -- those must stay exactly what _cards.scss says, or the
+     page stops being evidence about the site. */
+  .dev-intro { max-width: 62ch; }
+  .dev-controls { display: flex; gap: 2rem; flex-wrap: wrap; margin: 1.5rem 0; }
+  .dev-controls fieldset { border: 1px solid var(--dev-rule, #ccc); padding: 0.6rem 1rem; }
+  .dev-controls legend { font-family: var(--dev-mono, monospace); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .dev-controls label { display: block; font-size: 0.82rem; margin: 0.28rem 0; }
+  .dial { opacity: 0.35; }
+  .dial.is-live, .dial--always { opacity: 1; }
+  .dial input[type=range] { vertical-align: middle; width: 9rem; }
+  .dial output { font-family: var(--dev-mono, monospace); font-weight: 700; }
+  .dev-readout { font-family: var(--dev-mono, monospace); font-size: 0.8rem; }
+
+  .dev-card-grid { list-style: none; margin: 1.5rem 0 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 1.4rem; }
+  .dev-card-cell { margin: 0; }
+  /* The panel is the full width of the swatch card, so what you see is the
+     panel and nothing else -- a real card's words would only be noise here. */
+  .dev-card { width: 7.6rem; }
+  .dev-card-label { font-size: 0.72rem; line-height: 1.45; margin: 0.45rem 0 0; }
+  .dev-cheat, .dev-height { font-family: var(--dev-mono, monospace); font-size: 0.68rem; }
+  .dev-unused span { display: inline-block; margin-right: 1rem; font-size: 0.78rem; }
+  .dev-unused i { opacity: 0.6; }
+
+  /* The frame overlay: the panel's box, and the drawing's own box inside it.
+     Off by default -- it is a measuring aid, and leaving it on would change
+     what the comparison looks like. */
+  .is-framed .drink-card-glass { outline: 1px solid rgba(200, 0, 120, 0.55); outline-offset: -1px; }
+  .is-framed .drink-card-glass svg { outline: 1px dashed rgba(0, 90, 200, 0.75); }
+</style>
+
+<script>
+  (function () {
+    // The card's own height and glass scale, read from the live custom
+    // property rather than restated here -- _cards.scss owns both, and a
+    // second copy on this page is the coupling its header comment forbids.
+    var probe = document.querySelector('.drink-card');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.dev-card'));
+    var readout = document.getElementById('readout');
+    var grid = document.querySelector('.dev-card-grid');
+
+    function num(el, prop, fallback) {
+      var v = getComputedStyle(el).getPropertyValue(prop).trim();
+      var f = parseFloat(v);
+      return isNaN(f) ? fallback : f;
+    }
+
+    var GLASS_SCALE = num(document.documentElement, '--card-glass-scale', 13);
+    var PANEL = probe ? probe.getBoundingClientRect().height : 0;
+
+    var model = 'flat';
+    var dials = { headroom: 0.90, k: 0.68, p: 0.60 };
+
+    function shape(ratio) {
+      if (model === 'headroom') return ratio * dials.headroom;
+      if (model === 'linear') return ratio * dials.k + (1 - dials.k);
+      if (model === 'power') return Math.pow(ratio, dials.p);
+      return ratio;
+    }
+
+    function apply() {
+      var cheatsOn = document.getElementById('cheats').checked;
+      var tallestDrawn = 0;
+      cards.forEach(function (card) {
+        var ratio = parseFloat(card.dataset.ratio);
+        var cheat = cheatsOn ? parseFloat(card.dataset.cheat) : 1;
+        var out = shape(ratio);
+        var glass = card.querySelector('.drink-card-glass');
+        glass.style.setProperty('--glass-ratio', out);
+        glass.style.setProperty('--glass-cheat', cheat);
+        // What it actually measures on screen, which is the only number worth
+        // reporting -- the width cap can make a glass shorter than the maths
+        // says, and that is invisible in the arithmetic.
+        var svg = glass.querySelector('svg');
+        var h = svg ? svg.getBoundingClientRect().height : 0;
+        tallestDrawn = Math.max(tallestDrawn, h);
+        var label = document.querySelector('[data-height-for="' + card.dataset.icon + '"]');
+        if (label && PANEL) {
+          label.textContent = (h / PANEL * 100).toFixed(0) + '% of panel';
+          label.style.color = h > PANEL - 1 ? 'crimson' : '';
+        }
+      });
+      if (PANEL) {
+        readout.textContent =
+          'panel ' + PANEL.toFixed(0) + 'px · --card-glass-scale ' + GLASS_SCALE + 'rem · '
+          + 'tallest drawn ' + tallestDrawn.toFixed(0) + 'px ('
+          + (tallestDrawn / PANEL * 100).toFixed(0) + '% of panel)'
+          + (tallestDrawn > PANEL - 1 ? '  ← fills or overflows the panel' : '');
+      }
+    }
+
+    function syncDials() {
+      document.querySelectorAll('.dial[data-for]').forEach(function (d) {
+        d.classList.toggle('is-live', d.dataset.for === model);
+      });
+      [['headroom', 'headroom'], ['k', 'k'], ['p', 'p']].forEach(function (pair) {
+        var input = document.getElementById(pair[0]);
+        var out = input.parentNode.querySelector('output');
+        if (out) out.textContent = ' ' + parseFloat(input.value).toFixed(2);
+      });
+    }
+
+    document.querySelectorAll('input[name=model]').forEach(function (r) {
+      r.addEventListener('change', function () { model = r.value; syncDials(); apply(); });
+    });
+    ['headroom', 'k', 'p'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', function (e) {
+        dials[id] = parseFloat(e.target.value);
+        syncDials();
+        apply();
+      });
+    });
+    document.getElementById('cheats').addEventListener('change', apply);
+    document.getElementById('frame').addEventListener('change', function (e) {
+      grid.classList.toggle('is-framed', e.target.checked);
+    });
+
+    syncDials();
+    apply();
+  }());
+</script>
