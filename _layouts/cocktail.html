@@ -39,9 +39,11 @@ layout: default
      artwork and so the no-icon path was "the normal case today, not an edge
      one" — the coupe has been drawn since 2026-08-16 and redrawn twice since,
      so that is no longer true and the path is a genuine edge case again. It
-     still fires: 14 drinks carry no glass at all, and `any` is a real member
-     of the vocabulary with deliberately no icon. Same absent-means-nothing
-     convention as
+     still fires, but only for artwork that is missing rather than for a drink
+     that named no glass: EVERY drink names one since #491 closed on
+     2026-08-30, and `any` was retired with it — that value meant "no
+     requirement", which Helen applies to every glass anyway. Same
+     absent-means-nothing convention as
      _data/sites.yml's `reference_links` — a missing key must never become a
      broken image. (This used to cite `footer_svg`, retired by issue #374 when
      the footer became one artefact for the whole repo; the convention it stood
@@ -52,15 +54,20 @@ layout: default
      glasses, and Daisy de Santiago is "anything, but preferably a Collins".
      The icon is drawn for the FIRST entry that has one, so a drink whose
      preference has no artwork still gets its second choice rather than
-     nothing. "any" is a real member and deliberately has no icon.
+     nothing. Two drinks now name a second glass for that reason and two more
+     because Helen genuinely uses either — the Mai Tai is a double old
+     fashioned "more often" and a tiki mug "sometimes".
   {% endcomment %}
   {% comment %} The accumulator starts as "" and the final test is against "",
-     NOT a bare truth test. An empty string is TRUTHY in Liquid, and 14 drinks
-     carry no glass at all, so the loop never runs for them and a bare test
-     sent an empty filename to the include tag — a hard build failure reading
+     NOT a bare truth test. An empty string is TRUTHY in Liquid, so a drink
+     whose loop never runs sent an empty filename to the include tag — a hard
+     build failure reading
      "File contains invalid characters or sequences: icons/glasses/.svg".
      Third time this one property has bitten this layout: empty array on the
-     list sections, empty string on the source footer, and now here.
+     list sections, empty string on the source footer, and now here. NO DRINK
+     TRIGGERS IT TODAY — all 114 name a glass since #491 — so this guard is
+     protecting against a future drink rather than a present one, which is
+     exactly when a removed guard looks safe to remove.
   {% endcomment %}
   {% assign glass_icon = "" %}
   {% for g in page.glass %}
@@ -215,13 +222,15 @@ layout: default
      `incidental` HIDES the line entirely (a frying oil nobody measures),
      `optional` SHOWS it and marks it. Do not reason from one to the other.
 
-     HEADLINE, CLASS LINE, CHARACTER, NOTE — settled 2026-08-24 after a design
-     pass on #465/#460. The headline is `suggestion` when present (you shop by
-     bottle name), falling back to `item`. The class line is `generic`;
-     `character` folds onto it as a labelled parenthetical, never a sibling
-     fact, because "moderately aged rum (blackstrap)" reads as if blackstrap
-     were a TYPE of moderately-aged rum — real, live confusion with actual
-     black rum — so it says "(character: blackstrap)" instead.
+     THE LINE IS THE GENERIC, WITH THE BOTTLE IN BRACKETS, and this paragraph
+     described the OPPOSITE until 2026-08-30. It said "the headline is
+     `suggestion` when present, falling back to `item`" — that was the shape
+     settled on 2026-08-24 and #544 inverted it a week later, leaving the
+     comment describing a layout that no longer existed directly above the code
+     that replaced it. `character` then gets a LINE of its own rather than
+     folding onto the class line, since that line is gone; #441's ban on a bare
+     "(blackstrap)" is unaffected, because a LABELLED line carries none of the
+     "a TYPE of moderately-aged rum" confusion the parenthetical did.
 
      `generic`/`suggestion` CAN BE A STRING OR A LIST, and Liquid's `for`
      quietly treats a bare string as a one-item sequence (verified against the
@@ -254,7 +263,7 @@ layout: default
 
                {"amount"=>"90 ml", "generic"=>"prosecco"}
 
-           with a clean build and nothing in the log. `item` is on ~283 entries
+           with a clean build and nothing in the log. `item` is on 282 entries
            whose every word is already in the generic beside it, so move 2's
            first and safest step would have done this several hundred times.
 
