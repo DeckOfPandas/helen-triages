@@ -879,6 +879,68 @@ test('a chip found through a BOTTLE names the bottle -- the case band 3 exists f
   assert.strictEqual(hit.viaKind, 'bottle');
 });
 
+test('a multi-word query matches a hidden name from its start', () => {
+  // Helen, 2026-08-31: "I do want to be able to type 'el d' and see el dorado."
+  // `hasWordMatch` asks whether one WORD begins with the whole query, so it is
+  // never true of a query containing a space -- typing a bottle's real name
+  // found nothing at all.
+  const pool = S.buildPool(pours(attr('lightly aged and filtered rum', 'el dorado 3')));
+
+  ['el d', 'el dorado', 'el dorado 3'].forEach((q) => {
+    const [hit] = S.search(q, pool, []).results;
+    assert.ok(hit, `"${q}" found nothing`);
+    assert.strictEqual(hit.entry, 'lightly aged and filtered rum');
+    assert.strictEqual(hit.band, 3);
+  });
+});
+
+test('a multi-word query still may not begin mid-word, or on a connector', () => {
+  // The two faults band 3 was narrowed for, restated against the wider rule:
+  // "orado" is inside El Dorado and starts no word of it, and `and` reaches
+  // Wray & Nephew only through its alias's connector.
+  const dorado = S.buildPool(pours(attr('lightly aged and filtered rum', 'el dorado 3')));
+  assert.deepStrictEqual(S.search('orado', dorado, []).results, []);
+  // A whole-string prefix is a prefix, not a substring: "dorado 3" appears in
+  // "el dorado 3" and does not start it.
+  assert.deepStrictEqual(S.search('dorado 3', dorado, []).results, []);
+
+  /* THE CONNECTOR RULE IS NARROWER THAN §9.3.3 CLAIMS, and this is where that
+     shows. It refuses a hidden match only when the matched WORD is itself in
+     the prose list -- and `and` is deliberately absent from that list, because
+     `Wray and Nephew` is one bottle. So the case the rule is named for, `an`
+     reaching a rum through "Smith AND Cross", is refused only by `an` being a
+     prose word and not by anything about "and".
+
+     Asserted as it IS rather than as it was described: a query matching a real
+     word of a hidden name is a band-3 hit, and what stops it being confusing
+     is that the bracket now shows the spelling carrying the query (see the
+     alias test above). Two characters are also below the live minimum now, so
+     `an` cannot be typed on the real page at all. */
+  const wray = S.buildPool(pours(
+    attr('moderately aged jamaican rum', 'jamaican rum', 'Wray and Nephew')));
+  const [connector] = S.search('and', wray, []).results;
+  assert.strictEqual(connector.band, 3);
+  assert.strictEqual(connector.via, 'Wray and Nephew');
+
+  // What the rule DOES refuse: the matched word is a prose word in its own
+  // right. `with` heads nothing and means nothing on a bottle.
+  const prose = S.buildPool(pours(attr('falernum', 'Something with Spice')));
+  assert.deepStrictEqual(S.search('with', prose, []).results, []);
+});
+
+test('the bracket shows the spelling that carries the query, not always the canonical', () => {
+  // #603 arriving through its own fix. `Wray and Nephew` is an alias of the
+  // bottle `Wray & Nephew`; someone typing "and" matches the alias, and
+  // canonicalising the answer prints a bracket with not one letter of what
+  // they typed in it. The canonical name is right whenever it can explain
+  // itself, and the alias as written is right when it cannot.
+  const pool = S.buildPool(pours(
+    attr('moderately aged jamaican rum', 'jamaican rum', 'Wray and Nephew')));
+
+  assert.strictEqual(S.search('and', pool, []).results[0].via, 'Wray and Nephew');
+  assert.strictEqual(S.search('wray', pool, []).results[0].via, 'Wray & Nephew');
+});
+
 test('a chip found through the GENERIC its card name abbreviates says which', () => {
   // The "mu" case in miniature: the card name is what the chip shows, so the
   // words the generic carries are invisible on the very button they matched.
@@ -960,7 +1022,10 @@ test('an alias keeps finding its bottle, and the bracket prints the real name', 
   const long = S.search('dorado', pool, []).results[0];
 
   assert.strictEqual(short.entry, 'lightly aged and filtered rum');
-  assert.strictEqual(short.via, 'El Dorado 3');
+  // "El Dorado 3" cannot explain a search for "ed3" -- it shares no letters
+  // with it -- so the bracket shows the alias that does. The canonical name is
+  // right whenever it carries the query, which is the far commoner case.
+  assert.strictEqual(short.via, 'ED3');
   assert.strictEqual(long.via, 'El Dorado 3');
 });
 
