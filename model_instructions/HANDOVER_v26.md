@@ -3177,6 +3177,9 @@ would be enforcing a decision she has not made.
 > delete each row in whichever direction it went. Do that here rather than
 > reinventing the method. The 20 resolvable rows are the mechanical kind; the 4
 > QQs are the dangerous kind and are why a fuzzy matcher is the wrong tool.
+>
+> **Tracked as #630**, with the measurement in it, so the next reader does not
+> re-derive the census to find out whether it is worth doing.
 
 **The four QQs are where a naive collapse would have changed a drink**, and they
 are the case against the fuzzy matcher that is the obvious alternative here.
