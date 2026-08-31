@@ -135,26 +135,32 @@ SKIP = {
 # fill-based original is kept in _design_sources as the record and is SKIPped
 # above. The set is back to one member.
 #
-# AND THE SET IS EMPTY AGAIN, 2026-08-31. The pineapple was its last member and
-# its replacement (glass-pineapple-4) goes through trace_centrelines.py like
-# the mug did, so every published icon is stroked once more and one weight in
-# CSS governs the lot. The class and this switch stay: fill-only artwork keeps
-# arriving, and filling is still the right answer for a drawing whose ink is
-# too fine to trace or whose weight happens to suit.
+# AND IT IS THE DEFAULT FOR FILL-ONLY ARTWORK AGAIN, 2026-08-31, with all three
+# of Helen's new drawings in it. They were traced first and that was the wrong
+# call -- hers, plainly: "you redrew these three new ones, right? They're not
+# right." Tracing IS a redraw. It broke lines at junctions and lost the
+# pineapple's umbrella stem, and none of that was necessary, because filling
+# shows the drawing she actually made.
 #
-# THE NUMBERS THAT DECIDE IT, measured 2026-08-31 on the three new drawings --
-# ink width as a fraction of canvas height, against a stroked icon's ~0.65% at
-# card size:
+# SO ASK "MUST THIS BE REDRAWN" BEFORE ASKING "CAN THIS BE TRACED". Tracing is
+# the answer when a fill is unusable, not when a fill is merely heavier. The
+# tiki mug in #355 is still the case that needs it: that drawing is a stock
+# icon whose weight Helen rejected outright. Hers are hers, and what they
+# should look like is her call to make by looking, not one to pre-empt with a
+# transformation she did not ask for.
 #
-#   pineapple  1.3%  ~2x heavier filled     coconut  2.5%  ~3.9x
-#   tiki mug   4.2%  ~6.5x heavier filled
-#
-# The tiki is the case this comment was written about the first time round: the
-# fill Helen rejected as too heavy was 2.8x, and this drawing filled would be
-# more than twice that again. So "is it uniform width" decides whether tracing
-# is VALID, and this fraction decides whether filling is BEARABLE -- two
-# different questions, and a drawing can fail both.
-SOLID = set()
+# The weight cost, measured, so the trade is visible rather than argued -- ink
+# width as a fraction of canvas height, against a stroked icon's ~0.65% at card
+# size: pineapple 1.3% (~2x), coconut 2.5% (~3.9x), tiki mug 4.2% (~6.5x). A
+# filled icon's ink also scales WITH the drawing, where `non-scaling-stroke`
+# holds a stroked one at a constant screen weight -- so the gap widens as the
+# icon grows. That is the thing to look at on /dev/card-glasses/, and it is a
+# reason to redraw only if it actually looks wrong.
+SOLID = {
+    "glass-tiki-mug-3.svg",
+    "glass-pineapple-4.svg",
+    "glass-coconut.svg",
+}
 
 # Source name -> published name, where the export carries a working title.
 #
@@ -187,18 +193,6 @@ RENAME = {
     "hurricane-2": "hurricane",
     "tiki-mug-3": "tiki-mug",
     "mule-mug": "mug",
-}
-
-# THESE THREE ARE TRACED, NOT COPIED, and the pipeline does not do it for you.
-# glass-tiki-mug-3, glass-pineapple-4 and glass-coconut arrived from Helen as
-# fill-only line art (2026-08-31, #526/#527/#528) and were put through
-# scripts/trace_centrelines.py before this script ever saw them, because a fill
-# has no centreline to give a stroke width to. If those sources are ever
-# re-dropped into SRC raw, this script will normalise the OUTLINE of the ink
-# and every line will draw as a hollow double -- the exact failure the SOLID
-# comment above records. Trace first, then normalise.
-TRACED_ON_INGEST = {
-    "glass-tiki-mug-3.svg", "glass-pineapple-4.svg", "glass-coconut.svg",
 }
 
 
@@ -278,7 +272,21 @@ def _emit(el, out, indent, line_class, seen_paths):
         elif tag == "path":
             d = re.sub(r"\s+", " ", child.get("d", "")).strip()
             if d:
-                out.append(f'{indent}<path class="{line_class}" d="{d}" />')
+                # A TRANSFORM CAN SIT ON THE PATH ITSELF, not only on a <g>, and
+                # dropping it is the absinthe bug one level down -- 2026-08-31,
+                # found on Helen's pineapple, whose single path carries
+                # matrix(0.1333,0,0,-0.1333,0,192). That matrix has a NEGATIVE y
+                # scale, so losing it does not nudge the drawing, it flips it and
+                # throws it off the canvas.
+                #
+                # It was invisible until now because every earlier export put its
+                # transform on a group. check_nothing_was_dropped counts
+                # transforms in against transforms out and caught this on the
+                # first drawing that did otherwise, which is what that guard is
+                # for -- it fired before anything was published.
+                transform = child.get("transform")
+                attr = f' transform="{transform}"' if transform else ""
+                out.append(f'{indent}<path class="{line_class}"{attr} d="{d}" />')
                 seen_paths.append(d)
         else:
             # defs, sodipodi:namedview, metadata: no artwork, dropped on purpose.
