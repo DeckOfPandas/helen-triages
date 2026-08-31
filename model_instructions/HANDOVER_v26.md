@@ -3,7 +3,7 @@
 **Helen Triages** — a Jekyll mono-repo serving two personal decision-support
 sites. **Food** answers *what shall we cook*, not *how do I cook*. **Cocktails**
 is its sibling: it has real drinks and a schema now, and almost no styling.
-Written 2026-08-02, revised 2026-08-21. Supersedes v25 — deleted, not kept, per
+Written 2026-08-02, revised 2026-08-31. Supersedes v25 — deleted, not kept, per
 house practice: this file has no back-catalogue, only the current version.
 
 **Three things to read before you start.**
@@ -142,7 +142,8 @@ _layouts/     default.html (shared)   recipe.html (food)   cocktail.html (cockta
               magic_bag.html (food, §4.3)
 _includes/    filter_group.html   recipe_badges.html
 _sass/        shared/{_tokens,_base,_layout}   food/   cocktails/
-_data/        sites.yml   accented_words.yml   food/*.yml   cocktails/taxonomy.yml
+_data/        sites.yml   accented_words.yml   chrome.yml   food/*.yml
+              cocktails/{taxonomy,ingredients,bottles,glasses,methods,garnish}.yml
 assets/css/   food.scss   cocktails.scss
 assets/img/   favicon.svg   food/   cocktails/
 assets/js/    (shared — every script is site-agnostic)
@@ -1812,13 +1813,73 @@ Cobra's Fang's "Honestly this just gets better and better" in `Notes` when
 the file has it in `Method`. It is kept as a note anyway, flagged rather than
 silently decided, because it plainly is not a step.
 
-Known defects in the source, to expect rather than be surprised by: the
-Sazerac's last method step is **truncated in the CSV itself** ("Strain the
-shaken drink into the absinthe-coated" — and stops), carried as a `QQ`;
-`Corvoisier` should be Courvoisier; `La Fee Parisienne` and
-`Creme de Pêche` are missing accents that `_data/accented_words.yml` covers
-(it lives at `_data/` root precisely because it is house style for both
-sites, and `crème` is its own worked example).
+Known defects in the source, to expect rather than be surprised by:
+`Corvoisier` should be Courvoisier; `La Fee Parisienne` and `Creme de Pêche`
+are missing accents that `_data/accented_words.yml` covers (it lives at
+`_data/` root precisely because it is house style for both sites, and `crème`
+is its own worked example).
+
+**The Sazerac's truncated last step is FIXED, 2026-08-31**, and how says
+something about the CSV generally. It read "Strain the shaken drink into the
+absinthe-coated" and stopped, carried as a `QQ` since 2026-08-16 — for fifteen
+days, because nobody could complete somebody else's sentence. A photo ingest of
+Death & Co put the same instruction in front of Helen in another book's words,
+and she confirmed the ending in one line. **The CSV's truncations are not
+mysteries, they are just missing text**, and the fastest route to one is
+usually a second source rather than harder thinking.
+
+### 9.2.1 Ingesting from photographs — the second source
+
+**2026-08-31, the Death & Co batch**, and the shape recurs: Helen photographs
+book pages into `tmp/inbox-cocktail-recipes/` (and `tmp/inbox-food-recipes/`)
+and a session transcribes them. Ten drinks landed from fifteen photographs.
+
+**RESOLVE EVERY RECIPE BY OPENING ITS PHOTO.** §12 already carries this from a
+43-photo food batch, and it held again: two photographs caught only a title and
+half an intro, from pages Helen had not meant to include. She said so and they
+were dropped. **Do not infer a batch's contents from its folder.**
+
+**A DRINK ALREADY IN THE COLLECTION MAY SHARE A NAME AND NOT BE THE SAME
+DRINK.** Four of the ten were already here from the CSV. Three matched the book
+exactly and gained the citation they had always lacked. The fourth was the
+Sazerac, and it is **a different drink**: Helen's pours absinthe and chilled
+water into the glass and splits the spirit three ways across rye, bourbon and
+cognac; Death & Co's rinses and discards the absinthe, has no bourbon and no
+water, runs 3:1 rye to cognac, and sweetens with demerara syrup. Two of *her*
+suggestions are *its* bottles, which is what made them look like one recipe.
+They live side by side now as `sazerac` and `sazerac-death-and-co` — her call:
+*"name it 'Sazerac (Death & Co)', leaving mine as simply 'Sazerac'."*
+**Compare the formula, never the title.**
+
+**THE SOURCE IS THE BEST AUDIT THE COLLECTION EVER GETS.** Transcribing a page
+beside a drink already derived from it found, in one pass: a citation missing on
+four drinks, an ice instruction that said half where the book says
+three-quarters, a serving count, and one amount out by a factor of 24
+(`pic-a-de-crop-punch`'s 12 oz of overproof Demerara against half an ounce).
+**Every one was recorded and none was changed** — §9.4.1, the site is canon, and
+Georgetown Punch is the precedent: her figures stand and the source is noted
+beside them.
+
+> **AND THEN STOP TRACKING IT ONCE SHE HAS RULED.** Helen, on the 12 oz: *"we've
+> agreed this twice now, so stop tracking it."* The note came off. A settled
+> question left sitting in a `QQ` is a standing invitation to raise it a third
+> time, which is §11.2's whole complaint. **A QQ that has been ANSWERED becomes a
+> plain note recording the answer; only a QQ that was wrong to ask gets
+> deleted.** The measurement survives in the commit that made it.
+
+**HAND BACK THE BOTTLES.** Eleven bottles the book named were absent from
+`bottles.yml` and none was declared, per §9.3.2 — a bottle's category is not
+derived from the ingredient beside it. Helen's ruling: *"I will update these
+when I make the drinks, so QQ is right. These won't get promoted until I've made
+them."* She took exactly one, Dolin Blanc, because she already knew it.
+
+**WHAT A PHOTOGRAPH CANNOT GIVE YOU, flag and raise.** Two drinks are unmakeable
+from what was photographed — a method cut off mid-sentence (#627) and an
+infusion recipe on a page nobody shot (#628). Both are flagged in the drink and
+tracked as issues, deliberately paired so one trip to the book answers both:
+*"I'm not digging the book out for just two!"* Truncations are never
+reconstructed, even when the sibling recipes on the same page all end the same
+way.
 
 ### 9.3 Cocktail front matter
 
@@ -1826,8 +1887,9 @@ sites, and `crème` is its own worked example).
 title: "Sazerac"
 tagline: "QQ"                    # the one line of prose; QQ until written
 glass:                           # LIST, not scalar — corrected 2026-08-17
-  - "rocks"
-garnish: []                      # LIST — Cobra's Fang has two
+  - "old fashioned"              # canonical spelling; `rocks` fails a test — §9.11.1
+garnish: []                      # LIST, declared vocabulary — §9.12.1
+  # ["no garnish"] = decided, [] = unfilled. Cobra's Fang has two.
 ingredients:                     # FULL list, untriaged, in build order
   - amount: "0.5 oz"             # the ONLY quantity field — see below
     generic: "moderately aged Jamaican rum"  # the #314 vocabulary; see §9.3.1
@@ -1891,7 +1953,10 @@ registry of slugs, so filling one in without removing the note fails too.
 **`item` IS BEING RETIRED — #544, and it is most of the way gone.** It held
 what the SOURCE called the ingredient, brand-led; `generic` is the category, and
 no rule derives the second from the first, which is why that one is stored.
-619 entries carried an `item`; **282 still do.**
+619 entries carried an `item`; **282 still do** — re-measured 2026-08-31 and
+unchanged, though the collection is 682 entries across 124 drinks now, so the
+migration has stalled rather than progressed. New drinks are written without
+`item` at all, which is why the absolute figure holds while the share falls.
 
 What has gone, and why each was safe rather than judged:
 
@@ -2167,6 +2232,36 @@ the chartreuse one below proves what happens otherwise.**
   and that drink became the Martinique Swizzle the same day. Re-declare it when
   a drink wants one.
 
+**FOUR MORE FROM 2026-08-31, all Helen's, all forced by one photo ingest** — the
+Death & Co batch in §9.2.1 hit each of them as an untyped ingredient.
+
+- **`apple brandy` added.** Pink Lady pours Laird's Bonded, an American
+  applejack. **It is not `calvados`**, which names a French appellation — the
+  same kind of category as the two Demeraras, checkable against a fact about the
+  bottle. Naming it after the FRUIT rather than the country is what lets an
+  applejack and a Spanish apple brandy share it honestly.
+- **`Becherovka` added, and the reasoning generalises to every future case.**
+  Helen's worry was that filing it under herbal liqueurs would claim it swaps
+  for Chartreuse: *"'Herbal liqueur (Becherovka)' would be misleading. This will
+  come up over and over and I don't know what to do about it."* **It never
+  renders that way.** Every member of `herbal_liqueurs` is already a proper
+  noun, for exactly her reason — nothing generalises them and none is
+  substitutable — so the group is a filing drawer and the recipe line shows the
+  GENERIC, which is `Becherovka`. `herbal` is the family, and a family is a
+  search-and-exclusion roll-up, never a browse axis. Same shape as the amari.
+  **The rule: when nothing generalises a bottle, the bottle IS the generic.**
+  That is not an exception to §9.3.1's "a preferred bottle is a `suggestion`,
+  never a `generic`" — it is what that rule already does for Campari and Cynar.
+  Her *"cinnamon- or ginger-forward"* went where such things go: a per-ingredient
+  `note` on the drink, per #457. Its `warming` entry executed a standing
+  instruction rather than making a call — `taxonomy.yml` had said since
+  2026-08-30 *"Becherovka is the third and the collection has none; add it here
+  the day a drink does"*, and she described it in those terms before seeing that.
+- **`cucumber` and `kaffir lime leaves` added, bare.** Helen: *"will need to go
+  in the dictionary naked."* **The leaf is not a variety of `lime`** — it is an
+  aromatic that tastes nothing like the fruit, so collapsing them would let an
+  exclusion on one silently drop drinks built on the other.
+
 **"Pernod" NAMES TWO BOTTLES** — Absinthe at 68% and Anise at 40%, which is the
 pastis. That ambiguity misled twice in two days: once as a note on Don's Mai Tai
 claiming a substitution, once as a declaration derived from the generic beside
@@ -2185,8 +2280,14 @@ and `_cross_category_scan` both skipped any ingredient whose generic was not in
 the rum family — so of the collection's 91 distinct suggestions, **54 resolved to
 nothing and no test minded**. Beefeater, Cointreau, Tanqueray, Luxardo, Suze,
 Punt e Mes: all invisible. Helen: *"are we now assuming every named bottle
-should be in it, and classified? That feels right to me."* Today: 57 resolve, 34
-are declared debt in `unresolved_suggestions`, none is unchecked.
+should be in it, and classified? That feels right to me."* On the day: 57
+resolve, 34 declared debt in `unresolved_suggestions`, none unchecked.
+
+**The suggestion count moves with every ingest — 91 then, 103 on 2026-08-31 —
+so count them rather than quoting a figure from here.** What does not move is
+the rule: a bottle the collection does not already spell out is handed back
+rather than declared (§9.3.2 below), so a photo ingest adds QQ notes, not
+entries.
 
 **A SUGGESTION'S BOTTLE NEED NOT BE IN THE INGREDIENT'S CATEGORY, and that is
 the feature.** Helen: *"a recipe might call for cherry brandy, and I suggest
@@ -2472,26 +2573,17 @@ classify — the variation it detects is often Helen adjusting a drink on
 purpose, which is indistinguishable from a transcription error by volume
 alone. See the note there.
 
-### 9.5 Open, and worth deciding out loud
+### 9.5 Settled apparatus — was "Open, and worth deciding out loud"
 
-- ~~**`garnish: []` versus stating "none".**~~ **SETTLED 2026-08-26, and this
-  paragraph was WRONG about the data before it was settled.** It claimed a
-  deliberate "None" was "currently flattened to `[]`, which loses it". It is
-  not and was not: **15 drinks carry `garnish: ["none"]`**, the Sazerac among
-  them, against 18 that are genuinely empty. Both conventions were live and
-  this section — the one place a reader would check — said only one was.
-  Another worked example of §11.2, found the same way as the last one: by
-  looking at the files rather than at this document.
+**RETITLED 2026-08-31 because nothing in it was open any more.** Every bullet
+had become a settled fact, and a section promising open questions to a reader
+looking for them is worse than no section. Where an item grew a data file of its
+own it now lives beside that file instead.
 
-  Helen's call, asked with the count in front of her, is the convention the
-  data already used: **`["none"]` means DECIDED, `[]` means unfilled.** Same
-  distinction food's `cook_time: "None"` preserves.
-
-  The risk this paragraph correctly identified — that `none` "would pollute
-  any future garnish vocabulary with a fake member" — is now closed by
-  `test_no_garnish_is_stated_as_none_and_nothing_else`, which allows `none`
-  only ALONE and only lowercase. It cannot become one member of a list beside
-  a real garnish, and it cannot acquire a second spelling.
+- ~~**`garnish: []` versus stating "none".**~~ **CLOSED — §9.12.1**, which is
+  where `garnish.yml` and its rules are. `["no garnish"]` means DECIDED, `[]`
+  means unfilled; the marker is spelled `no garnish`, not `none`, since
+  2026-08-31.
 - **`meta.ship` is an ordered, tested vocabulary** — `ship_scale` in
   `_data/cocktails/taxonomy.yml`: `not really` < `meh` < `sure` < `yes` <
   `oh gods yes`, with `who knows` and `QQ` deliberately OFF the scale (see the
@@ -2499,7 +2591,8 @@ alone. See the note there.
   anywhere was `chaos`'s `haven't tried` bucket, and an untried drink never
   publishes. §9.9 is where this vocabulary turned into a feature.
 - **`tests/test_cocktails.py` is the cocktails suite** — glasses, generics,
-  bottles, moods, methods, the `measures:` amount table. `tests/conftest.py`
+  bottles, moods, methods, garnishes, the `measures:` amount table.
+  `tests/conftest.py`
   is explicitly the FOOD suite; this module carries its own fixtures and its own
   `cocktails` marker. A cocktails test must ASSERT its corpus is non-empty
   rather than skipping mid-run, or it passes vacuously.
@@ -2514,9 +2607,6 @@ alone. See the note there.
   cocktails run**: with nothing promoted yet, CI still checks no drink, and the
   difference is only that this is now a fact about the collection rather than
   about the loader.
-- `_data/cocktails/taxonomy.yml` — check it before repeating this: it was
-  described here as "still empty", and moods and generics have since been
-  argued out and are enforced by tests.
 
 ### 9.7 Two traps this layout hit on its first day
 
@@ -2581,9 +2671,11 @@ because each was green in isolation**; it took rebuilding the combined state of
 both locally. The new index derives its buckets and tint from `taxonomy.yml`
 instead, which is the enforcement version of this paragraph.
 
-**The index reads DRAFTS, not recipes.** There are 114 cocktail drafts and zero
-promoted recipes, so the index before this one looped `site.cocktail_recipes` —
-an empty collection — and had done since it was written.
+**The index reads DRAFTS, not recipes.** `_cocktail_recipes/` is still empty and
+every drink is a draft, so the index before this one looped
+`site.cocktail_recipes` — an empty collection — and had done since it was
+written. (The draft count moves with every ingest; count them rather than
+quoting a figure from here.)
 
 
 ### 9.10 The drink page's ingredient line — #544/#513, 2026-08-29
@@ -3061,19 +3153,32 @@ never will be — "Muddle the lime chunks hard with the sugar in the bottom of a
 shaker until the sugar has dissolved" cannot be collapsed without losing the
 drink.
 
-The census that produced it: **277 steps across 105 drinks, 144 distinct.** One
-instruction accounted for 43 uses written three ways; Stir the same for 17;
+The founding census, 2026-08-26: **277 steps across 105 drinks, 144 distinct.**
+One instruction accounted for 43 uses written three ways; Stir the same for 17;
 Strain alone had eleven forms.
 
 **NOTHING IS APPLIED TO A DRINK, and that is Helen's explicit design.** "Prefer
 both, leaving my original too, then I delete whatever I don't want." So
 `proposals:` holds her exact existing string on the left and the suggested
-canonical form on the right — 26 rows, 6 of them `QQ`. **Deleting a row is how
-a suggestion gets rejected**, and a later pass applies only what survives. Do
-not turn this into an enforcing test without asking; a check that failed on a
-non-canonical step would be enforcing a decision she has not made.
+canonical form on the right. **Deleting a row is how a suggestion gets
+rejected**, and a later pass applies only what survives. Do not turn this into
+an enforcing test without asking; a check that failed on a non-canonical step
+would be enforcing a decision she has not made.
 
-**The six QQs are where a naive collapse would have changed a drink**, and they
+> **THE PASS HAS NOT HAPPENED, AND THE FILE IS THE OLDEST UNPRUNED THING HERE.**
+> Re-measured 2026-08-31 rather than quoted: **308 step uses, 161 distinct, 110
+> already canonical, 24 proposals outstanding (20 with a suggested form, 4 QQ),
+> 62 steps a clean apply would move.** 120 distinct steps match neither the
+> canonical set nor a proposal, so this is a partial map and always was.
+>
+> **§9.12.1 is the worked precedent now.** `garnish.yml` went from census to a
+> pruned, EMPTY `proposals` block in two days, on the same shape — measure,
+> collapse only what carries no information, propose the rest, let Helen rule,
+> delete each row in whichever direction it went. Do that here rather than
+> reinventing the method. The 20 resolvable rows are the mechanical kind; the 4
+> QQs are the dangerous kind and are why a fuzzy matcher is the wrong tool.
+
+**The four QQs are where a naive collapse would have changed a drink**, and they
 are the case against the fuzzy matcher that is the obvious alternative here.
 "Shake with ice.", "Shake the rest with ice." and "Stir with ice." each follow
 an earlier build step, so they mean *shake what is in the shaker*, not *shake
@@ -3100,6 +3205,82 @@ instruction split across two lines ("Strain." + "Into a chilled glass."). Only
 three fragments were genuinely presentation, and those went to `to_serve`
 (§9.4). Truncations are flagged, never reconstructed: a plausible guess is
 still an agent writing Helen's recipe.
+
+### 9.12.1 The garnish vocabulary — `_data/cocktails/garnish.yml`
+
+**Added 2026-08-31 at Helen's request, and it is methods.yml's sibling in every
+respect** — same argument, same shape, same bargain. The difference is that this
+one was pruned to empty within two days, which is why §9.12 now points here.
+
+**IT IS NOT FOR FILTERING, and that matters more than it sounds.** There is no
+garnish filter and this is not a step towards one — the same ruling
+`taxonomy.yml` makes about glasses and about spirits. The case for it is #290's:
+a shape that changes every time has to be RE-READ. The weaker case ("a
+vocabulary would let you exclude by garnish") was available and is wrong; it
+would have been building a feature nobody asked for, which is #459's busywork.
+
+**The census, 2026-08-31: 130 garnish entries across 123 drinks in 65 distinct
+strings**, for perhaps 35 actual garnishes. `mint sprig` / `mint sprigs` /
+`mint bouquet` / `mint sprigs bouquet` was one garnish wearing four faces.
+Collapsing only unambiguous drift took it to 55; Helen's rulings the next day
+took it to **49**.
+
+**`["no garnish"]` MEANS DECIDED, `[]` MEANS UNFILLED**, and the marker may only
+appear ALONE, which is what stops it becoming a fake member of the vocabulary.
+It was `none` until 2026-08-31 and **the rename is about the page, not the
+data**: `_layouts/cocktail.html` joins this list straight into the drink page,
+so the stored word is the word a reader sees. Helen: *"'no garnish' actually,
+because none might read like 'not filled in' even though you and I know that's
+not the case."*
+
+**ONE DRINK ALREADY SAID IT, AND THAT IS HOW THE RENAME WAS FOUND.** ti-punch
+carried `no garnish` against fifteen `none`s, and the old guard could not see
+it — it only inspected lists that CONTAINED `none`, so a second spelling of the
+same decision passed silently. That is precisely the failure its own docstring
+claimed to prevent. **A guard anchored on one spelling cannot see the second
+one**; it is anchored on the canonical string now, and names the retired
+spelling rather than reporting it as merely undeclared.
+
+**What was deliberately NOT collapsed is the useful half.** `lime wedge on rim`
+says where to put it, `orange zest twist (discarded)` says it does not stay in
+the drink, `luxardo maraschino cherry` names a genuinely different object.
+methods.yml's own test — *does the phrasing carry information?* — decides every
+one of these, and it is the same test in both files.
+
+**A TWIST IS A STRIP OF ZEST.** Helen collapsed all four `<citrus> zest twist` /
+`<citrus> twist` pairs to the short form. **The tails survived the collapse**:
+only the head form was normalised, so `orange twist (discarded)` and `lemon
+twist after expressing over cocktail` keep the words that say whether the peel
+stays in the drink. `flamed orange zest coin` kept its `zest` — a coin is a
+different cut, not a longer name for a twist.
+
+**A COUNT STAYS ONLY WHERE THE COUNT IS THE SPEC.** `three coffee beans` is the
+Espresso Martini; `12 raspberries` was how many that punch happened to want, and
+became `raspberries`. One rule, two rows, rather than two decisions.
+
+**"EITHER OF THESE, MAKER'S CHOICE" IS A SINGLE STRING, NOT A LIST** — settled
+on fake-id's `orange or lemon twist`. Helen: *"either of these are lovely and
+the maker can choose. I like this approach on principle."* **It has to be one
+string because a list already means something else**: `garnish:` is
+CONJUNCTIVE (Cobra's Fang wants a mint sprig AND a lime wheel), so
+`["orange twist", "lemon twist"]` asks for both. `generic` solved the identical
+problem from the opposite default, where a list means "any of these would do"
+(#441). **The two fields cannot share one convention**, and anyone tempted to
+unify them should read that first. One drink uses it, which is deliberately not
+enough to build machinery for.
+
+**`test_every_garnish_is_declared` is a RATCHET**: seeded from the collection's
+real strings, odd ones included, so it cannot fail on what is there and bites on
+the next new spelling. `proposals` is `{}` and **the key stays** — an empty
+mapping says "nothing outstanding" where a missing one says nothing at all, the
+same reason `GLASSLESS_ON_2026_08_27` was kept and asserted empty.
+
+**That guard asserted `proposals` non-empty for exactly one day and was wrong.**
+These empty out BY DESIGN — that is what "resolved by deletion" means — so a
+full map is the temporary state and an empty one is the settled one. It asserts
+the KEY exists now, which is the thing whose silent loss would switch the check
+off for whatever is proposed next.
+
 ---
 
 ### 9.13 The cocktails visual language, and the index and drink page built from it
@@ -3535,23 +3716,10 @@ flow, as the cards already do.
 The index shipped with six behaviours provisional and issues raised against
 each, so they were decisions rather than defaults. Helen answered all six.
 
-**Ordering — #478 and #479, which turned out to be one question.** Two moods
-means EITHER; drinks matching BOTH rank first; everything shown is in
-**randomised** order within its rank. Include chips stay AND. Mood AND
-ingredient AND chaos between sections.
-
-The ranking is what makes OR usable. AND across moods is nearly always empty
-(`tiki` AND `no juicing` is a handful), so OR was the only answer that kept the
-index alive — but plain OR stops narrowing once you pick a second mood. Ranking
-gives the precision back without the one-match drinks vanishing.
-
-Random rather than alphabetical is the `taxonomy.yml` principle applied:
-alphabetical buries everything after M and greets you with the same drink every
-time. **The shuffle happens once per page load, not per filter pass** — each
-card gets a random sort key at startup and keeps it. Re-shuffling on every
-change would make cards leap around while you type into the has-to-have box,
-which reads as a bug however correct it is. The list is only rewritten when the
-order actually changes.
+**Ordering — #478 and #479, which turned out to be one question.** Answered
+above under "How the axes combine" and the randomised-order paragraph beside it;
+seventeen lines restating both stood here until 2026-08-31 and are deleted
+rather than kept in step.
 
 **Chaos filters, it does not sort (#480)** — unchanged, `definitely good` hides
 everything else.
@@ -4787,6 +4955,34 @@ not a pattern that went stale, but a list that was never a pattern.
 `search.family_button_min_chars`. A test fails if a literal reappears in
 either JS file.
 
+**YOU WILL SCOPE A GUARD BY THE VALUE IT IS POLICING, AND IT WILL NOT SEE THE
+RIVAL VALUE.** 2026-08-31, and it is a sharper cousin of the entry below.
+`test_no_garnish_is_stated_as_none_and_nothing_else` existed to stop a second
+spelling of "this drink takes no garnish" — its docstring says so outright. It
+opened by skipping any drink whose garnish list did not CONTAIN `none`. So
+`ti-punch`, which said `no garnish`, was invisible to it: the one drink in the
+collection actually committing the fault the test was written to prevent, waved
+through by the test's own first line, for however long it had been there.
+
+**The general form: a guard that filters on the canonical value can only ever
+see drinks that are already right.** Everything wrong is, by definition, spelled
+differently — which is what put it outside the filter. Anchor on the FIELD and
+ask what it holds, not on the value and ask whether it is well-formed. Same
+family as the stale `JS_DIR` below, but it fails on a corpus that is fully
+present and a pattern that is not stale, so nothing about it looks wrong.
+
+**AND YOU WILL ASSERT A REGISTRY IS NON-EMPTY WHEN EMPTYING IT IS THE GOAL.**
+Same day, my own guard, wrong within a day of being written. `garnish.yml`'s
+`proposals` block is a WORKLIST — rows are resolved by deletion, in either
+direction — so a full map is the temporary state and an empty one is the settled
+one. Asserting it non-empty made finishing the work a test failure.
+
+**A ratchet list and a worklist look identical and want opposite assertions.**
+`GLASSLESS_ON_2026_08_27` empties and must STAY empty, so its sibling asserts
+emptiness. `proposals` empties and will refill, so it must assert only that the
+KEY exists — the thing whose silent loss would switch the check off for whatever
+is proposed next. Ask which kind you have before writing `assert thing`.
+
 **You will write a test that cannot fail and not notice.** The most dangerous
 trap here because the symptom is green. Has happened four times now: a stale
 `JS_DIR`, a non-recursive SCSS glob (both a path/pattern going stale after a
@@ -5174,6 +5370,23 @@ recipe-to-photo mapping by actually opening the photo, not by trusting a
 prior pass's count or an assumed shared source for a whole folder** — cheap
 per photo, and the alternative is silent overwrites or gaps that only surface
 when someone later reads the file.
+
+**AND A CAPTURE THAT ENDS MID-RECIPE LOOKS EXACTLY LIKE A COMPLETE ONE.**
+2026-08-31, both halves of the same inbox. A screenshot of a web recipe stopped
+just below the dipping-sauce list, and a book photograph stopped mid-sentence at
+"Stir until cold,". **Neither announces itself** — the first read as a finished
+ingredient list, and only counting every ingredient the method steps name gave
+any evidence at all (weak evidence: it proved nothing was missing that was USED,
+not that nothing followed). Helen checked the page and confirmed it. The second
+was obvious only because the sentence broke.
+
+So: **an ingest transcribes what is in frame and says where the frame ended.**
+Never complete the recipe from the sibling recipes on the same page, however
+uniform they look — the other punches in that chapter all end the same way and
+that is still their wording. Flag, and raise an issue if it needs the book back
+(#627, #628). Two photographs in that batch also caught only a title and half an
+intro, from pages Helen had not meant to include; she said so and they were
+dropped rather than guessed at.
 
 **"Lost work" after a disconnect may just be sitting in a `git worktree` you
 haven't looked in.** 2026-08-22, `_cocktail_drafts`. Helen described a whole
