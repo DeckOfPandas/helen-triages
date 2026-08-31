@@ -413,7 +413,7 @@ from here.
 | `assets/js/cook-schedule.js` | The timings arithmetic | `tests/js/cook-schedule.test.js` |
 | `assets/js/back-link.js` | Whether the back arrow may use history (§13.7) | `tests/js/back-link.test.js` |
 | `assets/js/cocktail-search.js` | The drinks index's pool, ranking and matching (§9.3.3) | `tests/js/cocktail-search.test.js` |
-| `assets/js/filters.js` | DOM wiring for all of the above | Not directly tested; exercised by hand |
+| `assets/js/filters.js` | DOM wiring, food index — its two DECISIONS moved out, #506 | wiring not directly tested |
 | `assets/js/cocktail-index.js` | DOM wiring, drinks index | Not directly tested |
 
 **`filter-state.js` HOLDS TWO TABLES, NOT ONE, since #579.** `create(spec)`
@@ -421,6 +421,32 @@ binds the mechanism to a spec; `FOOD_FIELDS` and `COCKTAIL_FIELDS` are the two,
 and the food-shaped exports are that binding over the first, so `filters.js` is
 untouched by the parameterisation. `orderByBand` in `ingredient-search.js` is
 shared the same way — the ordering discipline, not the bands.
+
+**IT ALSO HOLDS TWO SHAPES, AND TAKING A NAME OFF THE WRONG ONE THROWS.**
+`HTF.filterState` is the MODULE (`parseQuery`, `excludesRow`,
+`rowMatchesFilters`, `arrivedByGoingBack`, `create`, the two tables);
+`HTF.filterState.create(SPEC)` returns a BINDING of seven spec-bound functions
+and nothing else. `filters.js` holds the first, `cocktail-index.js` the second.
+On 2026-08-31 the drinks index read `arrivedByGoingBack` off the binding —
+`undefined`, and calling it took out the whole tail of that file: the restore,
+`apply()` at startup (so the index stopped filtering and shuffling), and the
+save listener. **Every JS test stayed green**, because each asks a pure module a
+question and the fault was in the wiring between two.
+`test_a_filter_state_binding_is_only_asked_for_what_it_has` reads both export
+blocks and fails on any name read off the shape that lacks it.
+
+**#506 MOVED THE FOOD INDEX'S TWO DECISIONS OUT OF `filters.js`**, which had no
+tests at all: `FilterState.rowMatchesFilters` (is this row one you asked for?)
+and `IS.entriesMatchKey` (does a row answer a picked ingredient — asked by both
+the include filter and the exclude umbrella, so it is one function). The
+EXCLUSION deliberately stayed a second call at the call site: `filters.js` runs
+it last on purpose, and that ordering is what makes the excluded COUNT mean
+"survived everything else and was dropped only for what it lists".
+
+**Behaviour-preservation was checked, not asserted**: the old predicate was
+re-implemented from git and run against the new one over a real build — 429 rows
+× 890 filter states, 381,810 decisions, identical on every pair — and then the
+check was broken on purpose to confirm it could see a difference.
 
 **`back-link.js` is the clearest argument for this split in the repo**, and it
 earned the place within an hour of being written. Its whole content is one
@@ -1244,13 +1270,20 @@ This is the part worth reading before touching the index again.
   since #562 there are two, `magic bag` and `draft`, and they are the same kind
   of statement — **what you are about to CLICK**, not what state it is in.
 
-**Not covered by any test: `filters.js`.** That file has no unit tests at all
-(§3's table says "exercised by hand"). **Issue #506** was raised about the
-three-valued branch above specifically, and that branch no longer exists — so
-the issue's worked example is gone while its argument stands: pull a predicate
-out as a pure function and test that, leaving the DOM wiring behind, exactly the
-`back-link.js` case. Worth re-reading before doing it, since what it points at
-has changed.
+**`filters.js`'s two DECISIONS are covered now — #506, 2026-08-31 — and its
+wiring still is not.** The issue was raised about the three-valued branch above,
+which no longer exists; its argument stood anyway, and the answer was §3's
+split: `FilterState.rowMatchesFilters` and `IS.entriesMatchKey` moved out with
+tests, the DOM wiring stayed. See §3 for what deliberately did NOT move and for
+how the extraction was proved behaviour-preserving.
+
+**The class of fault that file harbours is still open, and it bit the same
+day.** Two hours after the extraction, a name read off the wrong object took
+out the whole of `cocktail-index.js`'s startup while every JS test stayed green
+— because they ask pure modules questions, and wiring is the gap between them.
+§10.2's stub-DOM harness is the tool for that, and it had never been used on
+either index. Use it before believing a green suite about a file that touches
+the DOM.
 
 **A trap paid for while building it:** Liquid **tokenises tags inside a
 `{% comment %}` block** rather than treating the body as text, so an
@@ -2469,14 +2502,69 @@ prefix matching of any word, then prefix matching of any word in the bottle name
 then substring."* Visible beats hidden at equal strength; any real word beats a
 substring. Band 3 exists only because a bottle stopped being its own chip.
 
-**A CHIP MUST BE ABLE TO EXPLAIN ITSELF**, and this took three passes. Helen:
-*"'el' returns both 'aged rum' and 'jamaican rum', which is counterintuitive."*
-Neither label contains "el" — it was mid-word inside "moderat(el)y" and
-"caram(el)-forward". Banning band 3 on hidden terms was not enough: sweeping all
-676 two-letter queries still found 25 chips that could not explain themselves,
-band 2 on a CONNECTOR (`an` → `Smith & Cross`, via "Smith AND Cross"). **The
-sweep is the technique worth keeping** — it is only possible because the module
-is pure, and twice the obvious fix was not the whole fix.
+**A CHIP MUST BE ABLE TO EXPLAIN ITSELF**, and this took five passes over three
+sessions. Helen: *"'el' returns both 'aged rum' and 'jamaican rum', which is
+counterintuitive."* Neither label contains "el" — it was mid-word inside
+"moderat(el)y" and "caram(el)-forward". Banning band 3 on hidden terms was not
+enough: sweeping all 676 two-letter queries still found 25 chips that could not
+explain themselves, band 2 on a CONNECTOR (`an` → `Smith & Cross`, via "Smith
+AND Cross"). **The sweep is the technique worth keeping** — it is only possible
+because the module is pure, and each time the obvious fix was not the whole fix.
+
+**THE CONNECTOR HALF IS NARROWER THAN IT READS, and this paragraph claimed
+otherwise for two days.** The check refuses a hidden match only when the matched
+WORD is itself in the prose list — so `an` was stopped by `an` being a prose
+word, and nothing about "and" was ever involved. `and` is deliberately absent
+from that list, because `Wray and Nephew` is one bottle, so it still reaches a
+category through an alias. Two things make that harmless rather than a hole:
+`min_query_chars` is 3, so `an` cannot be typed at all, and a band-3 chip now
+prints the name that found it.
+
+**AND THAT IS THE ANSWER THAT FINALLY HELD — #603, 2026-08-31.** Helen typed
+three letters three times and got three chips that could not say why they were
+there: `mu` → `clear blended rum` (inside "clear blended MUlti-region rum"),
+`sa` → `cachaça` (the bottle Sagatiba), `wr` → `Jamaican overproof rum`. All
+three were band 3 working exactly as designed — the rule that makes "velvet"
+reach `falernum`. Four candidates were built side by side on a dev page and she
+picked: **a chip found through a name it does not show carries that name.**
+
+Three shapes, one rule — show the name that answers the question:
+
+| matched on | the chip reads |
+|---|---|
+| its own name | the chip, nothing added |
+| a name CONTAINING the chip's | that name alone — `clear blended multi-region rum` |
+| a genuinely other name | the chip plus a bracket — `cachaça (Sagatiba)` |
+
+The middle row is a principle, not a one-off: **15 of the 27 card names are
+strict abbreviations of their own generic**, so a bracket in all fifteen would
+print the chip to itself and append the bit the card name dropped
+(`gin (London dry gin)`). **The chip's VALUE never moves** — only the label —
+because an annotation folded into the value would become part of the filter and
+match nothing.
+
+**The bracket shows whichever spelling carries the query.** Canonicalising it
+was right until it was not: "and" matches the alias `Wray and Nephew` and
+printing the canonical `Wray & Nephew` gave a bracket with none of the typed
+letters in it — #603 arriving through its own fix.
+
+**A MULTI-WORD QUERY MATCHES A HIDDEN NAME FROM ITS START**, Helen 2026-08-31:
+*"I do want to be able to type 'el d' and see el dorado."* `hasWordMatch` asks
+whether one WORD begins with the whole query, so it is never true of a query
+containing a space — typing a bottle's real name found nothing at all. A match
+at position 0 is at a word boundary by definition, so it cannot be the mid-word
+accident band 3 was narrowed for.
+
+**AN UMBRELLA SUPPRESSES ITS OWN BARE WORD — #51's rule, ported here
+2026-08-31.** `gin (all)` takes `gin` off the list beside it and leaves `sloe
+gin`, `navy strength gin` and every ginger entry. Helen was sure this was
+already a food rule and was told it was not, on a measurement that called
+`ingredient-search.js` directly — **the suppression is in `filters.js`, at
+render time**, so the check exercised the layer that does not implement the rule
+and reported its absence as a fact. **A measurement is only evidence about the
+layer it ran through.** Cocktails keeps the rule in the pure module rather than
+the wiring, on the same day the wiring shipped a startup crash no pure test
+could see.
 
 **ONE CHIP PER CATEGORY, WEARING THE CARD'S NAME.** Fifteen generics also had
 their card name in the pool as a chip of its own and eleven of those pairs
@@ -2491,6 +2579,20 @@ chips were never alternatives. Typing "velvet" or "portobello" returns
 suggestion belongs to the generic written beside it and the card-level
 `data-ingredients` has flattened that away, so `data-ing` is the only attribute
 that still knows.
+
+**THE PICKER WAITS FOR THREE CHARACTERS — #584, 2026-08-31.** It was 2, which
+was what the page did before the search became a module, and the numbers settled
+it: at two characters **31% of queries overflow the cap of 8**, so the answer is
+eight arbitrary chips and "+21 more — keep typing"; at three it is 3%, median 2.
+Four buys 2% for a keystroke on every search. **Food keeps no minimum at all**
+and that is not an inconsistency to tidy: its picker sits above a list that
+stays on screen, so a wide pool is noise BESIDE the answer, where this one
+replaces the whole result area. One line in `ingredients.yml`; no code.
+
+**The first measurement of it was taken with the new minimum already live**, so
+the two-character row reported a tidy zero candidates — a check measuring its
+own change, and it read as a clean result. Lift the thing under test before
+measuring it.
 
 **PROSE IS NOT A BOTTLE NAME**, and it is a rule rather than a list because
 Helen met four one at a time. `search.prose_words` / `prose_marks`, measured
@@ -2883,6 +2985,15 @@ other end.
 `Havana 3` and `Havana Club 3` can both appear" — the search reads that file
 now, so they collapse. 240 pool terms → 142, because a bottle is no longer
 offered a chip at all when its category is; see §9.3.3.
+
+**IT WAS TRUE OF CHIPS ONLY, and the other half closed 2026-08-31.** A bottle
+sitting beside a generic never became a chip, so it never went through that
+resolution: 14 alias spellings were searched as themselves, and 14 prose strings
+`bottles.yml` calls unusable were searchable too — printable, once #603 started
+rendering the name that matched. Hidden terms go through the same door now.
+**The canonical name JOINS the terms rather than replacing them**, because `ED3`
+shares not one letter with `El Dorado 3` and collapsing would delete a way in
+that works.
 
 **Two declared collapses that lose information ON PURPOSE**: both syrup ratios
 read `sugar syrup` on a card, both honey ratios read `honey water`. Helen: "On
@@ -4867,8 +4978,24 @@ two nav icons rendered as raw unstyled SVG, because their rules lived in
 resolves. **"Shared" is a claim about three layers, not one** — markup, cascade
 and assets — and it is only true when all three hold. See §2.5.
 
-**A SOURCE-SCANNING GUARD WILL BE FOOLED BY THE PROSE EXPLAINING IT.** FIVE
-times on 2026-08-19–21, in five unrelated places, which is what promotes this
+**YOU WILL MEASURE THE WRONG LAYER AND REPORT THE ANSWER AS A FACT.**
+2026-08-31, and it is the sharpest one on this page because the measurement was
+real, the numbers were right, and the conclusion was false. Helen said she was
+"9/10 sure" the food picker suppresses a bare `chicken` chip when `chicken
+(all)` is offered. I called `ingredient-search.js`, asked what it returned, got
+the bare chip in 54 places, and told her food had no such rule. **It does —
+issue #51 — and the suppression is in `filters.js`, at render time.** The module
+offers the entry and the wiring drops it. So the check exercised the layer that
+does not implement the rule and reported its absence.
+
+**A measurement is only evidence about the layer it ran through**, and she was
+looking at the page, which is the only layer that settles anything. Before
+reporting that a behaviour does not exist, ask which file would implement it if
+it did — and if the answer is the DOM wiring, §10.2's harness or a screenshot is
+the check, not a module call.
+
+**A SOURCE-SCANNING GUARD WILL BE FOOLED BY THE PROSE EXPLAINING IT.** SIX
+times on 2026-08-19–31, in six unrelated places, which is what promotes this
 from an anecdote to a rule:
 
 1. The destructive-git hook (§11.0) refused the commit that introduced it: the
@@ -4886,6 +5013,11 @@ from an anecdote to a rule:
    surface, and one comment in `ingredient-search.js` using the English word
    "rewritten" kept `meta.rewritten` off `INVISIBLE_KEYS` for two days. Fixed
    2026-08-21, issue #428.
+6. `test_a_filter_state_binding_is_only_asked_for_what_it_has` (§3) failed on
+   the paragraph explaining the bug it was written for — that comment names
+   `FilterState.arrivedByGoingBack`, which is precisely the string it hunts.
+   2026-08-31, within a minute of the guard existing. It imports
+   `test_front_matter._strip_comments` rather than growing a second stripper.
 
 **A test that greps source cannot tell code from commentary**, and the
 commentary explaining a rule is exactly where that rule's vocabulary is densest
@@ -5608,8 +5740,8 @@ and `draft`, which say what you are about to CLICK.
 
 **That dissolved the three-valued `data-meta-short`** (§4.3's fourth bullet, and
 the specific branch #506 was raised to get under test). The attribute and its
-filters.js branches are gone; #506 still stands for the rest of `filters.js`,
-which still has no tests.
+filters.js branches are gone; #506 closed on the argument rather than the
+example — see §3.
 
 **Density is the index's own** (`$index-section-gap`, `$index-label-gap` in
 `_layout.scss`), not the recipe page's tokens — matching them was tried and
@@ -5635,7 +5767,8 @@ plain body text — it carries `class="category-label"` but sits outside
 `.category`, so the rule is scoped to keep it out, and `.results-heading
 .category-label` now states the bare treatment outright so it can't be
 "fixed" again by accident (it was, once, on 2026-08-12; Helen: "I liked it
-bare"). And the **active states of filter buttons and recipe-row tags** carry
+bare"). **§13.7 contradicted this paragraph for three weeks** and an issue got
+written from the wrong one — see the box there; the two agree now. And the **active states of filter buttons and recipe-row tags** carry
 a heavy `-webkit-text-stroke` in the *same* colour as the letter with
 `text-shadow: none` — see §13.4.2, that is a different effect wearing the same
 property. Written out in full because "reads as
@@ -5941,12 +6074,31 @@ to serve; pills matter more at filter-time than at browse-time.
 
 ### 13.7 Results heading, pagination, shuffle
 
-**"N recipes"**, right-aligned, between the filter matrix and the list —
-reuses the filter section labels' own punched/stroke typography with no
-colour rule underneath, the same reason META FILTERS carries none: it isn't
-one of the five filter categories, so it doesn't borrow one of their hues.
-Margin above uses `$spacing-section-top`, the recipe page's own "gap above a
-heading" token, rather than inventing a second one.
+**"N survivors"**, left-aligned, between the filter matrix and the list, and
+**PLAIN BODY TEXT** — no punched treatment, no stroke, no colour rule
+underneath. It carries `class="category-label"` and `.results-heading
+.category-label` sets every one of those values back to the body default on
+purpose, with Helen's ruling in its own comment: *"I liked it bare."*
+
+> **THIS SECTION SAID THE OPPOSITE FOR THREE WEEKS AND IT COST A DECISION.** It
+> read "right-aligned... reuses the filter section labels' own punched/stroke
+> typography", which stopped being true on 2026-08-03 (alignment: sitting alone
+> at the right edge of an otherwise left-aligned page, it "read as stray rather
+> than placed") and 2026-08-12 (typography: tried, and she preferred it bare).
+> **Issue #615 was then written from this paragraph** — "the survivors line is a
+> heading on food and a caption on cocktails" — and asked whether cocktails
+> should match a food treatment that does not exist. The two sites did differ,
+> in both directions at once: cocktails' was smaller AND more styled. Matching
+> food meant going plainer, not louder, which is the opposite of what the issue
+> proposed. Cocktails' `.drink-count` took the same values on 2026-08-31.
+>
+> **An issue inherits the handover's mistakes.** §11.2 says an open issue rots
+> because nothing re-reads it; this is the other direction — a stale line here
+> is copied into an issue and becomes a plan.
+
+The gap above it uses `$spacing-section-gap`, not `$spacing-section-top`; see
+`_recipe-list.scss`'s own note on why that was reduced and why it wants Helen's
+eye rather than arithmetic.
 
 **Pagination**, 20 per page: prev/next, a page-status label, and a
 `(see all)` link that drops the page-size cap for the current filter state
@@ -5976,6 +6128,18 @@ Saved to `sessionStorage` on `pagehide` and restored when
 finished searches are deliberately not restored (text typed with nothing chosen
 is candidates mid-thought, not a filter); a CHOSEN ingredient result is, rebuilt
 to the exact end state the click handler leaves.
+
+**THE DRINKS INDEX HAS IT TOO SINCE #595, 2026-08-31**, on Helen's "exactly as
+the food site does", and the one real difference is worth knowing before
+touching either. **Food restores an ARRAY; cocktails restores the SORT KEYS.**
+Food keeps its order in `items` and reorders the DOM to match. The drinks index
+derives its order every pass — rank by matched moods, then each card's random
+key — so putting the nodes back and calling `apply()` would re-sort them by keys
+randomised at startup. Each card takes its INDEX in the saved order instead, and
+a drink the record has never seen sorts after all of them rather than being
+dropped. `arrivedByGoingBack` lives in `filter-state.js` now, shared by both and
+taking `performance` as an argument, so the one browser fact underneath this can
+be asked a question without a browser.
 
 **IT WAS BUILT ON THE BACK/FORWARD CACHE FIRST, AND THAT WAS WRONG.** The
 reasoning was seductive: go back, the browser restores the page without
