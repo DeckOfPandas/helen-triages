@@ -17,6 +17,12 @@
 # unambiguous drift -- singulars, plurals, a stray article -- took 65 to 55
 # without losing a word that carried information.
 #
+# THEN 55 TO 49, working the proposals through with Helen the next day: the
+# four zest-twist pairs collapsed to their short form, three compound strings
+# split into the two garnishes they each named, and one incidental count came
+# off. 65 to 49 in total, with every rejection recorded in place rather than
+# as an absence.
+#
 # WHAT IS DELIBERATELY NOT COLLAPSED. `lime wedge on rim` says where to put it.
 # `orange zest twist (discarded)` says it does not stay in the drink.
 # `luxardo maraschino cherry` names a bottle that genuinely differs from a
@@ -54,15 +60,25 @@ no_garnish: "no garnish"
 canonical:
 
   # Peel. The commonest garnish in the collection by a distance.
+  #
+  # A TWIST IS A STRIP OF ZEST, so `lemon zest twist` and `lemon twist` were one
+  # garnish written two ways. Helen collapsed all four pairs to the short form
+  # on 2026-08-31 -- the shortest name that says what it is, which is the rule
+  # she already applied to card names. Ten strings became eight, and eleven
+  # drinks were retyped.
+  #
+  # THE TAILS SURVIVE THE COLLAPSE because they carry information the head does
+  # not: `(discarded)` says the peel does not stay in the drink, and `after
+  # expressing over cocktail` says the opposite. Only the head form was
+  # normalised. `flamed orange zest coin` keeps its `zest` -- a coin is a
+  # different cut from a twist, not a longer name for one.
   citrus_peel:
     - "lemon twist"
     - "lemon twist (discarded)"
-    - "lemon zest twist"
-    - "lemon zest twist after expressing over cocktail"
+    - "lemon twist after expressing over cocktail"
     - "orange twist"
-    - "orange zest twist"
-    - "orange zest twist (discarded)"
-    - "orange or lemon zest twist"
+    - "orange twist (discarded)"
+    - "orange or lemon twist"
     - "grapefruit twist"
     - "flamed orange zest coin"
 
@@ -86,24 +102,33 @@ canonical:
     - "blackberry"
     - "dried apple slice"
     - "banana chip"
-    - "12 raspberries"
+    # `12 raspberries` until 2026-08-31. A COUNT STAYS ONLY WHERE THE COUNT IS
+    # THE SPEC -- Helen's rule, settling this and `three coffee beans` together.
+    # Twelve is how many that punch happened to want; three coffee beans is the
+    # drink. See spice_and_other.
+    - "raspberries"
     - "half an empty passion fruit shell"
     - "passion fruit shell filled with overproof rum"
     - "pineapple and brandied cherry"
 
+  # THE THREE QUALIFIED CHERRIES ALL STAY, ruled 2026-08-31. A Luxardo really is
+  # a different object from a bright red cocktail cherry, `skewered` says how it
+  # is served, and a fruit stick is one thing you build rather than two garnishes
+  # to split. Each was proposed for collapsing and each was rejected.
+  #
+  # `Luxardo` gained its capital in the same pass -- it is a proper noun and was
+  # lowercased, which is a typo whichever way the collapse question had gone.
   cherries:
     - "brandied cherry"
     - "maraschino cherry"
-    - "luxardo maraschino cherry"
+    - "Luxardo maraschino cherry"
     - "skewered maraschino cherry"
     - "cherry flag"
-    - "one pineapple wedge and one maraschino cherry"
     - "fruit stick (skewered pineapple cubes and a maraschino cherry)"
 
   herbs_and_leaves:
     - "mint sprig"
     - "mint bouquet"
-    - "mint sprig and grapefruit zest twist"
     - "rosemary sprig"
     - "kaffir lime leaves"
     - "cucumber wheels"
@@ -112,12 +137,14 @@ canonical:
   spice_and_other:
     - "grated nutmeg"
     - "cinnamon stick"
+    # THE COUNT IS THE SPEC HERE, which is why it survives where `12
+    # raspberries` did not. Three coffee beans is the Espresso Martini, not an
+    # arbitrary number of beans.
     - "three coffee beans"
     - "half-rim of sugar"
     - "cocktail umbrella"
     - "3 dashes red creole-style bitters"
     - "5 drops of olive oil"
-    - "lime wheels and nutmeg"
 
 # =============================================================================
 # PROPOSALS -- both halves kept, so the choice is Helen's and not mine
@@ -132,37 +159,25 @@ canonical:
 # "and" in it. Splitting them is a data edit to somebody else's drink, though,
 # and a count or a construction can be part of the garnish rather than noise --
 # so every one is proposed and none is applied.
+# EIGHT OF THE TEN ORIGINAL ROWS ARE GONE, worked through with Helen on
+# 2026-08-31, the day after they were written. Three splits were applied
+# (singapore-sling, carta-switchel, pic-a-de-crop-punch); `12 raspberries`
+# became `raspberries`; and four were REJECTED, which is what deleting a row
+# means -- `three coffee beans`, the fruit stick, and the skewered and Luxardo
+# cherries all keep their words, because each carries a fact a shorter string
+# would lose. What is left is what genuinely still needs her.
 proposals:
 
-  # --- plainly two garnishes in one string -----------------------------------
-  "one pineapple wedge and one maraschino cherry": ["pineapple wedge", "maraschino cherry"]
-  "mint sprig and grapefruit zest twist": ["mint sprig", "grapefruit zest twist"]
-  "lime wheels and nutmeg": ["lime wheel", "grated nutmeg"]
-
   # --- two garnishes, but the first is too vague to split confidently --------
-  # "pineapple" alone is a wedge on some drinks and a wheel on others, and this
-  # one does not say which.
+  # port-au-prince. "pineapple" alone is a wedge on some drinks and a wheel on
+  # others, and this one does not say which. Splitting it needs Helen, and
+  # guessing would put a garnish on her drink that she did not choose.
   "pineapple and brandied cherry": "QQ"
 
-  # --- a count inside the string ---------------------------------------------
-  # Both are arguably part of the garnish rather than noise: three coffee beans
-  # is the traditional Espresso Martini spec, not an arbitrary number.
-  "12 raspberries": "raspberries"
-  "three coffee beans": "QQ"
-
-  # --- one constructed garnish, not two ---------------------------------------
-  # A fruit stick is a single object you build. Splitting it would describe
-  # something you do not make.
-  "fruit stick (skewered pineapple cubes and a maraschino cherry)": "QQ"
-
-  # --- presentation and brand, where collapsing would lose a real fact -------
-  # Listed so the question is visible, not because either obviously wants
-  # changing. A Luxardo cherry really is a different object from a bright red
-  # cocktail cherry, and "skewered" says how it is served.
-  "skewered maraschino cherry": "QQ"
-  "luxardo maraschino cherry": "QQ"
-
   # --- a disjunction, which no single entry can express ----------------------
-  # `generic` solved the same shape with a list meaning "either would do"
-  # (#441). Whether a garnish wants that is undecided.
-  "orange or lemon zest twist": "QQ"
+  # fake-id. THE BLOCKER IS STRUCTURAL rather than a matter of wording: a
+  # `garnish:` list means "all of these", so it cannot say "either of these".
+  # `generic` solved the identical shape with a list meaning "any of these would
+  # do" (#441), but that convention does not exist for garnishes and inventing
+  # it on the strength of one drink would be the wrong way round.
+  "orange or lemon twist": "QQ"
