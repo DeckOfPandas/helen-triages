@@ -98,6 +98,18 @@ SKIP = {
     # round cap bridges one stroke width -- and visible on the page, where
     # non-scaling-stroke means the cap only spans 0.46. coupe-4 closes all six.
     "glass-coupe-3.svg",
+    # The same pass, same day: Helen closed the open stroke ends on five more.
+    # Each predecessor is superseded by a RENAME target below.
+    "glass-absinthe.svg",
+    "glass-collins.svg",
+    "glass-goblet.svg",
+    "glass-hot-toddy.svg",
+    "glass-sherry.svg",
+    # These two closed their gaps AND changed shape, both on purpose:
+    # the sour's bowl was redrawn, and the julep cup lost its handle.
+    "glass-julep-cup.svg",
+    "glass-julep-cup-2.svg",
+    "glass-sour.svg",
     # NO OLD-FASHIONED ENTRIES HERE ANY MORE, and their absence is the fix.
     # This set briefly held four of them: two version suffixes, a 2-path early
     # draft, and a never-adopted 12-path candidate, plus a RENAME pointing at
@@ -198,7 +210,30 @@ RENAME = {
     "hurricane-2": "hurricane",
     "tiki-mug-3": "tiki-mug",
     "mule-mug": "mug",
+    # 2026-08-31, the open-stroke-ends pass. See the SKIP comment above for what
+    # was wrong and why it was invisible while drawing.
+    "absinthe-2": "absinthe",
+    "collins-4": "collins",
+    "goblet-2": "goblet",
+    "hot-toddy-2": "hot-toddy",
+    "sherry-2": "sherry",
+    # A REDRAW AS WELL AS A REPAIR, both Helen's and both deliberate.
+    # The sour's bowl went from a narrow U (aspect 0.391, NARROWER than the
+    # sherry and a near-twin of the nick-and-nora) to a waisted bowl at 0.499,
+    # which is its own silhouette in a set where four stemmed glasses sit
+    # within 0.1 of each other. The julep cup lost its handle: a real one is a
+    # handleless beaker, and with it gone the three handled vessels are down to
+    # two that no longer read as the same drawing.
+    "julep-cup-3": "julep-cup",
+    "sour-2": "sour",
 }
+
+# NOT IN THAT PASS, AND DELIBERATELY: `old-fashioned-double` carries the set's
+# two largest open ends (3.92 units each, on the base) and Helen looked at it
+# and ruled it correct as drawn -- 2026-08-31, "I decided old fashioned double
+# was correct as it was". So a gap here is not automatically a fault, which is
+# exactly why the check that comes out of this is hers to grant exemptions
+# from rather than something to fix on sight.
 
 
 # =============================================================================
