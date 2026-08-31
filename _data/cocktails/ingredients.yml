@@ -98,14 +98,19 @@ measures:
 # and stopped being one once the numbers existed.
 #
 # RE-MEASURED THE DAY IT CHANGED, because the figures in #584 were taken over
-# 240 pool terms and #603 has since dropped prose and collapsed aliases -- the
-# pool is 141 chips now, so the issue's own evidence was two changes stale.
-# Swept over every prefix the chips' own words actually produce:
+# 240 pool terms and #603 has since dropped prose and collapsed aliases -- so
+# the issue's own evidence was two changes stale. Swept over every prefix the
+# chips' own words actually produce, across 150 chips and 124 drinks:
 #
 #            queries   median candidates   over the cap of 8
-#   2 chars    130            5             37  (28%)
-#   3 chars    242            1              7  (3%)
-#   4 chars    250            1              2  (1%)
+#   2 chars    132            6             41  (31%)
+#   3 chars    250            2              7  (3%)
+#   4 chars    257            1              2  (1%)
+#
+# THE MEASUREMENT HAS TO LIFT THE MINIMUM IT IS MEASURING. Run with the live
+# config, the two-character row reports a tidy zero candidates -- because the
+# change under test is what produced it. That is a check measuring itself, and
+# it read as a clean result.
 #
 # AT TWO CHARACTERS THE PICKER IS MOSTLY A PROMISE THAT THERE IS MORE: more
 # than a quarter of two-letter queries overflow the cap, so what you get is
