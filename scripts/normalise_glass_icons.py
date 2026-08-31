@@ -86,6 +86,13 @@ SKIP = {
     "glass-coupe-2.svg",
     "glass-hurricane.svg",
     "glass-tiki-mug.svg",
+    # 2026-08-31, #526/#527: Helen drew a tiki mug and a pineapple to replace
+    # the two she had always called placeholders, and they are superseded by
+    # glass-tiki-mug-3 / glass-pineapple-4 in RENAME. Both stay on disk in
+    # _design_sources as the record -- §9.15, a record you can overwrite is not
+    # one.
+    "glass-tiki-mug-2.svg",
+    "glass-pineapple-3.svg",
     # NO OLD-FASHIONED ENTRIES HERE ANY MORE, and their absence is the fix.
     # This set briefly held four of them: two version suffixes, a 2-path early
     # draft, and a never-adopted 12-path candidate, plus a RENAME pointing at
@@ -127,7 +134,27 @@ SKIP = {
 # viewBox, so the mug rejoins the set on one weight set once in CSS. The
 # fill-based original is kept in _design_sources as the record and is SKIPped
 # above. The set is back to one member.
-SOLID = {"glass-pineapple-3.svg"}
+#
+# AND THE SET IS EMPTY AGAIN, 2026-08-31. The pineapple was its last member and
+# its replacement (glass-pineapple-4) goes through trace_centrelines.py like
+# the mug did, so every published icon is stroked once more and one weight in
+# CSS governs the lot. The class and this switch stay: fill-only artwork keeps
+# arriving, and filling is still the right answer for a drawing whose ink is
+# too fine to trace or whose weight happens to suit.
+#
+# THE NUMBERS THAT DECIDE IT, measured 2026-08-31 on the three new drawings --
+# ink width as a fraction of canvas height, against a stroked icon's ~0.65% at
+# card size:
+#
+#   pineapple  1.3%  ~2x heavier filled     coconut  2.5%  ~3.9x
+#   tiki mug   4.2%  ~6.5x heavier filled
+#
+# The tiki is the case this comment was written about the first time round: the
+# fill Helen rejected as too heavy was 2.8x, and this drawing filled would be
+# more than twice that again. So "is it uniform width" decides whether tracing
+# is VALID, and this fraction decides whether filling is BEARABLE -- two
+# different questions, and a drawing can fail both.
+SOLID = set()
 
 # Source name -> published name, where the export carries a working title.
 #
@@ -155,11 +182,23 @@ SOLID = {"glass-pineapple-3.svg"}
 #    would have vanished with nothing to say why. Rename here, where the
 #    mapping survives a regeneration.
 RENAME = {
-    "pineapple-3": "pineapple",
+    "pineapple-4": "pineapple",
     "coupe-3": "coupe",
     "hurricane-2": "hurricane",
-    "tiki-mug-2": "tiki-mug",
+    "tiki-mug-3": "tiki-mug",
     "mule-mug": "mug",
+}
+
+# THESE THREE ARE TRACED, NOT COPIED, and the pipeline does not do it for you.
+# glass-tiki-mug-3, glass-pineapple-4 and glass-coconut arrived from Helen as
+# fill-only line art (2026-08-31, #526/#527/#528) and were put through
+# scripts/trace_centrelines.py before this script ever saw them, because a fill
+# has no centreline to give a stroke width to. If those sources are ever
+# re-dropped into SRC raw, this script will normalise the OUTLINE of the ink
+# and every line will draw as a hollow double -- the exact failure the SOLID
+# comment above records. Trace first, then normalise.
+TRACED_ON_INGEST = {
+    "glass-tiki-mug-3.svg", "glass-pineapple-4.svg", "glass-coconut.svg",
 }
 
 

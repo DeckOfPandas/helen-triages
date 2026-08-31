@@ -81,6 +81,13 @@ icons:
   chalice: goblet
   pineapple: pineapple
   hollowed pineapple: pineapple
+  # NO DRINK USES THIS YET -- added 2026-08-31 with the drawing (#528), because
+  # Helen drew one to see whether it earns a place: "we might not use it, but
+  # why not try". An icon with no drink is the normal state for this file
+  # (nine others are in it), and declaring the spelling now is what lets a
+  # future drink simply say `glass: [coconut]` and render.
+  coconut: coconut
+  coconut shell: coconut
 
   # --- four spellings of one glass, all live in the data -----------------------
   # `rocks` used to point at a genuinely different (panelled) drawing -- see
@@ -293,6 +300,15 @@ heights_mm:
   # As unmeasured as every other number here — #295 still supersedes the lot.
   mug: 95
   julep-cup: 110
+  # A GUESS, AND FLAGGED AS ONE RATHER THAN QUIETLY AVERAGED IN. Added
+  # 2026-08-31 with the drawing (#528). A drinking coconut is roughly as wide
+  # as it is tall and shorter than any glass here bar the shot and the
+  # old-fashioned; 115 puts it between the julep cup and the punch bowl, which
+  # is where it sits in the hand. Every number in this block is unmeasured
+  # (#295) so this is no worse founded than its neighbours -- but it is the
+  # newest and the least looked at, so check it against a real coconut before
+  # trusting it over them.
+  coconut: 115
   punch-bowl: 130
   brandy: 130
   hot-toddy: 140
@@ -373,6 +389,7 @@ display_scale: {}
 all_icons:
   - absinthe
   - brandy
+  - coconut
   - collins
   - coupe
   - flute
