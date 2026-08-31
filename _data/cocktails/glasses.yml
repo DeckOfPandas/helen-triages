@@ -337,23 +337,30 @@ heights_mm:
 # already holds the other per-glass judgement (`heights_mm`), so this is its
 # neighbour rather than a new idea.
 #
-# THERE IS NO GLOBAL CURVE, AND THIS COMMENT SAID THERE WAS -- corrected
-# 2026-08-31, #599/#601. It read: "TRY THE GLOBAL CURVE FIRST if a third glass
-# ever wants a line here. The card template raises every ratio to a power before
-# applying it." It does not and never has. `cocktails/index.html` computes a
-# flat `icon_mm / tallest_mm` and `_cards.scss` multiplies it by this cheat and
-# `--card-glass-scale`; `git log -S` over both files finds only the original
-# build. `_layouts/cocktail.html` DOES compress (`ratio * 0.68 + 0.32`), which
-# is probably where the belief came from -- but that is the drink page, at a
-# different size, for a different reason, and it lifts the SHORT end rather
-# than lowering the tall one.
+# THE GLOBAL CURVE EXISTS NOW AND THIS MAP IS EMPTY -- Helen, 2026-08-31,
+# #599/#601, choosing from /dev/card-glasses/.
 #
-# So the advice was pointing at a knob that does not exist, at exactly the
-# moment a third glass wanted a line: the flute is the tallest glass declared
-# here, which makes its ratio 1.0 BY CONSTRUCTION, so it fills the whole panel
-# whatever it is. /dev/card-glasses/ draws every glass at real card geometry
-# with four candidate models, including the power curve this used to promise.
-# Decide there, then replace this paragraph with what was chosen.
+# This paragraph used to say "TRY THE GLOBAL CURVE FIRST if a third glass ever
+# wants a line here. The card template raises every ratio to a power before
+# applying it." The advice was right and the fact was false: no curve existed,
+# on the card or anywhere but the drink page, and `git log -S` over
+# cocktails/index.html and _cards.scss confirms one never had. So the file told
+# the next reader to reach for a knob that was not there, at exactly the moment
+# a third glass wanted a line -- the flute, which is the tallest glass declared
+# here and therefore 1.0 BY CONSTRUCTION, filling the whole panel.
+#
+# The curve is real now: `ratio * 0.5 + 0.5` in cocktails/index.html, with the
+# headroom in $card-glass-scale. It does for every glass what these two lines
+# did for the two that were noticed, so both came off. Measured on the
+# collision they existed to fix -- a Collins beside an old-fashioned -- the pair
+# stood 1.74x apart with the cheats and stand 1.34x apart with the curve.
+#
+# THE MECHANISM STAYS AND THE MAP IS DELIBERATELY EMPTY. `display_scale` is
+# still read, still composes with the curve, and is still the right home for a
+# judgement about ONE drawing rather than about the range. An empty map is the
+# honest state: the range problem has a range answer now, and nothing is
+# currently a special case. Add a line only when a specific drawing is wrong in
+# a way the curve cannot see.
 #
 # WHY A DRAWING ARRIVES IN THE WRONG FRAME, since it will happen again. Helen
 # builds a glass by editing an existing one, and Inkscape keeps the previous
@@ -361,9 +368,7 @@ heights_mm:
 # artwork hanging outside their own viewBox that way (#599). The normaliser
 # fits every canvas to its own ink on the way in, and
 # test_no_glass_artwork_is_drawn_outside_its_viewbox is the check that it took.
-display_scale:
-  collins: 0.82
-  hurricane: 0.74
+display_scale: {}
 
 all_icons:
   - absinthe

@@ -29,10 +29,21 @@ sitemap: false
   being written down. A swatch page with a stale number in it is worse than
   no swatch page, because it looks like evidence.
 
-  THE MODELS ARE A COMPARISON SWITCH, and the convention that comes with one
-  is that the losers get DELETED once Helen picks. See §13.9 and the
-  `?narrow=` switch before it: a comparison switch left in becomes a
-  permanent branch nobody dares remove.
+  IT IS KEPT AFTER THE DECISION, WHICH IS AN EXCEPTION AND IS HELEN'S —
+  2026-08-31: "Leave that page up for me though please." The standing
+  convention for a comparison switch is that the losers and the switch are
+  DELETED once she picks (§13.9, and the `?narrow=` variants before it),
+  because one left in becomes a permanent branch nobody dares remove. That
+  reasoning is about a switch in the SHIPPED page. This is a dev page whose
+  entire job is the comparison, so keeping it costs the index nothing and
+  saves rebuilding the instrument the next time a glass is redrawn — which
+  §9.11 says happens, and #295 (measuring `heights_mm` for real) will make
+  happen again.
+
+  SO THE CONTROLS MUST KEEP TELLING THE TRUTH ABOUT WHAT SHIPS. Its defaults
+  are the shipped values, and if anyone changes the curve or the headroom
+  without changing them here, this page starts quietly describing a site that
+  no longer exists — which is the failure it was built to fix.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
 {% assign glasses = site.data.cocktails.glasses %}
@@ -63,8 +74,8 @@ sitemap: false
   <div class="dev-controls">
     <fieldset>
       <legend>Shape</legend>
-      <label><input type="radio" name="model" value="flat" checked> <b>flat</b> — what ships: <code>mm / tallest</code></label>
-      <label><input type="radio" name="model" value="linear"> <b>compressed</b> — <code>ratio × k + (1−k)</code>, the drink page's curve</label>
+      <label><input type="radio" name="model" value="flat"> <b>flat</b> — true relative height: <code>mm / tallest</code></label>
+      <label><input type="radio" name="model" value="linear" checked> <b>compressed</b> — <code>ratio × k + (1−k)</code>, <b>what ships</b> at k&nbsp;=&nbsp;0.50</label>
       <label><input type="radio" name="model" value="power"> <b>power</b> — <code>ratio ^ p</code>, the one glasses.yml promises</label>
       <p class="dev-note">
         Both curves lift the SHORT end. Neither moves the tallest glass, which
@@ -75,15 +86,21 @@ sitemap: false
 
     <fieldset>
       <legend>Dials</legend>
-      <label class="dial dial--always">headroom <input type="range" id="headroom" min="0.60" max="1.00" step="0.01" value="1.00"><output for="headroom"></output></label>
-      <label class="dial" data-for="linear">k <input type="range" id="k" min="0.30" max="1.00" step="0.02" value="0.68"><output for="k"></output></label>
+      <label class="dial dial--always">headroom <input type="range" id="headroom" min="0.60" max="1.30" step="0.01" value="1.00"><output for="headroom"></output></label>
+      <label class="dial" data-for="linear">k <input type="range" id="k" min="0.30" max="1.00" step="0.02" value="0.50"><output for="k"></output></label>
       <label class="dial" data-for="power">p <input type="range" id="p" min="0.30" max="1.00" step="0.02" value="0.60"><output for="p"></output></label>
       <label class="dial dial--always"><input type="checkbox" id="cheats" checked> apply the <code>display_scale</code> cheats</label>
       <label class="dial dial--always"><input type="checkbox" id="frame"> outline the panel and the drawing</label>
       <label class="dial dial--always"><input type="checkbox" id="usedonly"> only glasses a drink asks for</label>
       <p class="dev-note">
-        headroom 1.00 with shape <b>flat</b> and the cheats on is exactly what
-        ships today, so any change you see is a change you made.
+        The controls open on <b>exactly what ships</b>: compressed at
+        k&nbsp;=&nbsp;0.50, headroom 1.00. Anything that moves is something you
+        moved. The headroom dial is relative to the shipped
+        <code>--card-glass-scale</code>, which this page reads live — so 1.00
+        follows that value rather than pinning a number here, and the two
+        cannot drift apart. <code>display_scale</code> is empty since the curve
+        replaced it, so the cheats box now changes nothing until a glass earns
+        a line.
       </p>
     </fieldset>
   </div>
@@ -191,8 +208,11 @@ sitemap: false
     var GLASS_SCALE = num(document.documentElement, '--card-glass-scale', 13);
     var PANEL = probe ? probe.getBoundingClientRect().height : 0;
 
-    var model = 'flat';
-    var dials = { headroom: 1.00, k: 0.68, p: 0.60 };
+    // These are the SHIPPED values, and they have to stay that way -- the page
+    // claims in its own copy that its defaults reproduce the site. See
+    // cocktails/index.html for the curve and _cards.scss for the headroom.
+    var model = 'linear';
+    var dials = { headroom: 1.00, k: 0.50, p: 0.60 };
 
     // SHAPE AND HEADROOM COMPOSE, they do not compete. Both curves lift the
     // short end and leave the tallest glass at exactly 1.0 -- it is the

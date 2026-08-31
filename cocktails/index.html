@@ -309,10 +309,40 @@ permalink: /cocktails/
           data-name="{{ drink.title | downcase }}">
 
         {% if glass_icon != "" %}
+          {% comment %} THE HEIGHT IS COMPRESSED, NOT PROPORTIONAL — Helen,
+             2026-08-31, choosing from /dev/card-glasses/ after #599/#601. True
+             relative height is correct information and, at card size, a bad
+             drawing: a 180 mm Collins beside an 85 mm old-fashioned is accurate
+             and reads as a stripe. So the ratio is mapped onto 0.5–1.0.
+
+             ONE NUMBER FOR THE RANGE, WHICH IS WHAT THIS FILE'S OWN DATA ALWAYS
+             SAID TO REACH FOR. `display_scale` in glasses.yml is a per-glass
+             cheat and its header has always said to try a global curve first —
+             while claiming, wrongly, that this template already applied one. It
+             did not; it does now, and the two per-glass lines the cheat held
+             (collins 0.82, hurricane 0.74) are gone, because the curve does
+             their job for every glass rather than for the two that were
+             noticed. The mechanism stays: a genuine one-drawing judgement may
+             still want a line, and it composes with this.
+
+             MEASURED, on the collision the curve exists to fix: collins stood
+             1.74x the old-fashioned beside it and now stands 1.34x.
+
+             IT IS NOT THE DRINK PAGE'S CURVE, and the two are deliberately
+             different. _layouts/cocktail.html maps onto 0.32–1.0, because there
+             is one glass on that page and it is the hero; here there are ~114 in
+             a grid and the short end has to stay legible against its neighbours
+             rather than against a title block.
+
+             HEADROOM IS NOT HERE — it is $card-glass-scale in _cards.scss, which
+             is already the "how tall is the tallest glass" knob. Putting a
+             second multiplier here would have split one decision across two
+             files. {% endcomment %}
           {% assign icon_mm = glasses.heights_mm[glass_icon] %}
           {% assign ratio = 1.0 %}
           {% if icon_mm and tallest_mm > 0 %}
             {% assign ratio = icon_mm | times: 1.0 | divided_by: tallest_mm %}
+            {% assign ratio = ratio | times: 0.5 | plus: 0.5 %}
           {% endif %}
           {% assign cheat = glasses.display_scale[glass_icon] | default: 1.0 %}
           {% capture icon_file %}icons/glasses/{{ glass_icon }}.svg{% endcapture %}

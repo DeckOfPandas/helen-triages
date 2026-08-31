@@ -55,14 +55,26 @@ $card-pad-y:    1.05rem;
 $card-foot-y:   0.95rem;
 $chip-line:     1.15rem;
 
-// The tallest glass, in the card grid's own units. Every glass is drawn at its
-// true height relative to this — see the template, which counts the tallest
-// live from glasses.yml rather than hardcoding one.
+// The tallest glass, in the card grid's own units. Every glass is drawn at a
+// compressed fraction of this — see cocktails/index.html, which counts the
+// tallest live from glasses.yml rather than hardcoding one.
+//
+// IT WAS 13rem AGAINST A 12.9rem PANEL, so the tallest glass was defined to be
+// taller than the box it lives in — the flute (230 mm, the tallest declared)
+// filled the panel edge to edge, which is issue #601. 10.4rem is Helen's pick
+// from /dev/card-glasses/ on 2026-08-31: the tallest glass now stands at about
+// 81% of the panel and everything else beneath it.
+//
+// THIS IS THE HEADROOM DIAL AND IT LIVES HERE ON PURPOSE. The compression that
+// lifts the SHORT end is in the template, because it is per glass; this is the
+// one number that says how tall the tallest glass may be, which is exactly what
+// this variable already meant. Two multipliers in two files would be one
+// decision split in half.
 //
 // A CUSTOM PROPERTY for the same reason --card-text-x is (#483): the stacked
 // narrow-screen layouts need a smaller drawing, and a Sass value cannot be
 // changed by a media query without restating every rule that reads it.
-$card-glass-scale: 13rem;
+$card-glass-scale: 10.4rem;
 :root { --card-glass-scale: #{$card-glass-scale}; }
 
 .drink-cards {
