@@ -616,16 +616,46 @@
 // rule gone it simply adds to the margin -- keeping it leaves the spacing
 // exactly as it is, which is a separate question (#548 point 1) from whether
 // there is a bar.
+// MATCHED TO FOOD — #615, Helen: "just make cocktail match food."
+//
+// AND FOOD IS NOT A HEADING, which is the opposite of what that issue says and
+// worth writing down here because both of us read the same stale sentence.
+// #615 describes food's count as reusing "the filter section labels' own
+// punched/stroke typography at 1.35rem", and HANDOVER 13.7 says the same. The
+// CODE has said otherwise since 2026-08-12: `.results-heading .category-label`
+// sets the label class back to plain body text on purpose, and its own comment
+// carries Helen's ruling -- "I liked it bare" -- and ends "if you are here
+// because you want the count to match the filter labels above it: that was
+// tried and Helen preferred it bare. Don't."
+//
+// So matching food means going QUIETER in kind and PLAINER in treatment, not
+// louder: from a 0.8rem uppercase Courier caption to ordinary body text. The
+// two sites disagreed in both directions at once -- cocktails' was smaller and
+// more styled -- which is why "one reads as a heading and the other as a
+// caption" was a fair description of a real difference and a wrong description
+// of which was which.
+//
+// Same reasoning as the empty state below: an empty list and a survivor count
+// are not part of either site's personality, and two of them are two things to
+// keep in step for no gain.
+//
+// THE SPACING IS DELIBERATELY UNTOUCHED. It is #548 point 1's open question and
+// a separate one from what the type is; changing both at once would leave
+// neither answered.
 .drink-count {
-  font-family: $font-headings;
-  font-size: 0.8rem;
-  letter-spacing: $letter-spacing-label;
-  text-transform: uppercase;
-  color: $color-clear-text;
+  font-family: $font-body;
+  font-size: 1rem;          // body default; no size of its own
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.01em;   // matches the `body, button` rule in shared/_base
+  color: $color-text;
   margin: $spacing-block-gap 0 $space-xl;
   padding-top: $space-md;
 
-  strong { color: $color-text; font-size: 1rem; }
+  // The number keeps its element -- the script writes into it by id, and a
+  // count IS the emphasis of this sentence -- but not a second weight and size
+  // of its own. Food's line is one plain sentence and reads as one.
+  strong { font-weight: inherit; font-size: inherit; color: inherit; }
 }
 
 // #481. Helen, 2026-08-27: "The food site uses class .recipe-list-empty for
