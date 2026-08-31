@@ -393,31 +393,16 @@ document.addEventListener('DOMContentLoaded', function () {
   var FAMILY_SUFFIX = FilterState.FAMILY_SUFFIX;
 
   /* Does any entry in `list` match the picked ingredient key `key`, by the
-     rules ingredient search already uses — a curated synonym family matches on
-     containment of any of its words, anything else matches when every word of
-     the key prefixes some word of the entry?
+     rules ingredient search already uses?
 
-     Extracted rather than written twice: the ingredient INCLUDE filter in
-     update() and the "(all)" family case of the EXCLUDE filter are the same
-     question asked of two different lists, and two copies of a matching rule
-     this fiddly is how "chicken (all)" ends up meaning one thing when you
-     filter for it and another when you filter it out. */
-  function entriesMatchKey(list, key) {
-    var synonyms = IS.getSynonymWords(key);
-    if (synonyms) {
-      return list.some(function (entry) {
-        var lower = entry.toLowerCase();
-        return synonyms.some(function (syn) { return lower.indexOf(syn) !== -1; });
-      });
-    }
-    var keyWords = getWords(key).map(IS.normaliseIngredientWord);
-    return list.some(function (entry) {
-      var entryWords = getWords(entry).map(IS.normaliseIngredientWord);
-      return keyWords.every(function (kw) {
-        return entryWords.some(function (ew) { return ew.indexOf(kw) !== -1; });
-      });
-    });
-  }
+     THE RULE ITSELF IS IS.entriesMatchKey, moved into ingredient-search.js by
+     issue #506 so it can be asked a question without a browser. It reads the
+     vocabulary (singulars, synonyms), which is why it lives on the instance
+     rather than here. This name stays as the local alias because it is what
+     both call sites below already read as, and because it is what gets handed
+     to FilterState.excludesRow -- which takes a matcher precisely so that
+     module need not grow a vocabulary of its own. */
+  var entriesMatchKey = IS.entriesMatchKey;
 
   /* The RULE itself — set membership, never substring — is
      FilterState.excludesRow, next to the state it acts on and where
@@ -873,57 +858,38 @@ function renderResultsPool() {
     var excludedCount = 0;
 
     items.forEach(function(li) {
-      var tags = (li.dataset.tags || '').split(',').filter(Boolean);
-      var star = li.dataset.star || '';
-      var ingList = (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); });
-      var visible = true;
+      /* THE ROW, AS THE PREDICATE NEEDS IT. Every rule that used to be spelled
+         out here is FilterState.rowMatchesFilters now (issue #506) -- the same
+         decisions, with a DOM-free shape so they can be asked a question
+         without a browser. What is left here is reading the attributes, which
+         is this file's actual job.
 
-      state.tags.forEach(function(t) {
-        if (tags.indexOf(t) === -1) visible = false;
-      });
-
-      if (state.star && star !== state.star) visible = false;
-
-      if (state.nameQuery) {
+         `titleFolded` IS BUILT ONLY WHEN THERE IS A NAME QUERY, exactly as the
+         old inline branch did: it is a querySelector plus a fold per row per
+         update, and there are ~370 rows on the local build. The predicate reads
+         it only under the same condition, and its own comment says an empty one
+         means "not asked". */
+      var row = {
+        tags: (li.dataset.tags || '').split(',').filter(Boolean),
+        star: li.dataset.star || '',
+        ingredients: (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); }),
+        isDraft: li.dataset.metaDraft === 'true',
         // Named class, not querySelector('a') -- see reorderForTitleSearch()
         // above for why that stopped being safe with issue #40's badge links.
-        var title = (li.querySelector('.recipe-title-link') || {}).textContent || '';
-        if (HTF.ingredientSearch.fold(title.toLowerCase()).indexOf(state.nameQuery) === -1) visible = false;
-      }
+        titleFolded: state.nameQuery
+          ? HTF.ingredientSearch.fold(
+            ((li.querySelector('.recipe-title-link') || {}).textContent || '').toLowerCase())
+          : ''
+      };
 
-      /* ONE META FILTER, AND `draft` IS IT -- issue #562. There were five:
-         `rewrite`, `proofread`, `no-short`, `has-short` and this one, reading
-         data-meta-rewrite / -proofread / -short off each row. All four are
-         gone, and their data attributes with them, because an attribute no
-         branch reads is worse than an absent one -- it looks like a live fact.
-
-         The pair that went is worth a line, because it was subtle and its
-         subtlety is now moot. data-meta-short was THREE-valued ('true' /
-         'false' / 'n/a') so that a magic-bag row, which has no answer to "does
-         it have a short method", could fail BOTH halves; reading no-short as
-         `!== 'true'` was the natural spelling and the bug. That is the branch
-         issue #506 was raised to get under test, and it no longer exists.
-
-         `draft` stays boolean and needs none of that: every row either is a
-         draft or is not. */
-      if (state.meta.has('draft') && li.dataset.metaDraft !== 'true') visible = false;
-
-      if (state.ingredient) {
-        // The two branches this used to spell out inline (a curated synonym
-        // family by containment, anything else by per-word prefix) are
-        // entriesMatchKey() now -- same rule, one copy, shared with the
-        // exclusion filter below so an "(all)" button cannot come to mean one
-        // thing when you filter FOR it and another when you filter it OUT.
-        if (!entriesMatchKey(ingList, state.ingredient.replace(FAMILY_SUFFIX, '').trim())) {
-          visible = false;
-        }
-      }
+      var visible = FilterState.rowMatchesFilters(row, state, entriesMatchKey);
 
       /* LAST, deliberately. Everything above decides whether this row is one
          you asked for; this decides whether it is one you can't serve. Running
          it last is what makes excludedCount meaningful: it counts rows that
          survived every other filter and were dropped only for what they list,
-         which is the number the panel reports back. */
+         which is the number the panel reports back. Two calls rather than one
+         merged predicate for exactly that reason. */
       if (visible && rowIsExcluded(li)) {
         visible = false;
         excludedCount += 1;

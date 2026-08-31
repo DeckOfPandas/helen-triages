@@ -115,6 +115,43 @@
       return foldedSynonymMap[query] || null;
     }
 
+    /* Does any entry in `list` match the picked ingredient key `key`?
+       ---------------------------------------------------------------------
+       A curated synonym family matches on CONTAINMENT of any of its words --
+       typing toward `cheese` has to reach comté, which shares no letters with
+       it -- and anything else matches when every word of the key is contained
+       in some word of the entry.
+
+       MOVED HERE FROM filters.js, unchanged, issue #506. It lived in 1,336
+       lines of DOM wiring where the only way to ask it a question was to open
+       a browser and type, which is the argument back-link.js already makes
+       (HANDOVER 3). It reads the vocabulary -- singulars and synonyms -- so
+       this instance is its home rather than the module's bare api.
+
+       IT IS ASKED BY BOTH DIRECTIONS AND THAT IS WHY IT IS ONE FUNCTION. The
+       include filter asks it of a row's `main_ingredients`; the exclude
+       filter's "(all)" umbrella asks it of the row's derived entries, through
+       filter-state.js's excludesRow, which takes it as an argument precisely
+       so that module need not grow a vocabulary. Two copies of a rule this
+       fiddly is how `chicken (all)` comes to mean one thing when you filter
+       FOR it and another when you filter it OUT. */
+    function entriesMatchKey(list, key) {
+      var synonyms = getSynonymWords(key);
+      if (synonyms) {
+        return (list || []).some(function (entry) {
+          var lower = String(entry).toLowerCase();
+          return synonyms.some(function (syn) { return lower.indexOf(syn) !== -1; });
+        });
+      }
+      var keyWords = getWords(key).map(normaliseIngredientWord);
+      return (list || []).some(function (entry) {
+        var entryWords = getWords(entry).map(normaliseIngredientWord);
+        return keyWords.every(function (kw) {
+          return entryWords.some(function (ew) { return ew.indexOf(kw) !== -1; });
+        });
+      });
+    }
+
     // Preparation-state words ("chopped", "crispy") describe what was done
     // to an ingredient, not what it is — recipe files keep them, but the
     // search UI strips them so "chopped pistachios" and "pistachios" are
@@ -525,6 +562,7 @@
     return {
       normaliseIngredientWord: normaliseIngredientWord,
       getSynonymWords: getSynonymWords,
+      entriesMatchKey: entriesMatchKey,
       buildMasterList: buildMasterList,
       search: search
     };

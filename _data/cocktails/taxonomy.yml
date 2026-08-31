@@ -442,6 +442,12 @@ mood_ingredients:
   # Jägermeister runs on star anise, cinnamon and ginger, Strega on saffron and
   # mint over a spiced base. Becherovka is the third and the collection has
   # none; add it here the day a drink does.
+  #
+  # THAT DAY IS 2026-08-31. P-Five Punch pours two ounces of Becherovka, and
+  # Helen described it in exactly these terms, unprompted and before seeing this
+  # comment: "I'd reach for Becherovka if a recipe wanted something cinnamon- or
+  # ginger-forward." Added on her words plus the standing instruction above,
+  # rather than as a fresh judgement.
   warming:
     - ginger syrup
     - ginger liqueur
@@ -451,6 +457,7 @@ mood_ingredients:
     - pimento bitters
     - Jägermeister
     - Strega
+    - Becherovka
 
   # `aperitivo` -- what an appetite-opening drink is built on. The amari and
   # the aromatised wines; the mood then requires the drink not to be a

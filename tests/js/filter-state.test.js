@@ -580,6 +580,128 @@ test('a half-typed cocktail search is clearable but does not narrow', () => {
   });
 });
 
+// --- is this row one you asked for? — issue #506 ------------------------------
+// The 40 lines that used to sit inside filters.js's update(), where the only
+// way to ask them a question was to open a browser and type. They are
+// FilterState.rowMatchesFilters now, and these are the questions.
+//
+// The row shape is what filters.js reads off each <li>: tags, star,
+// titleFolded, isDraft, ingredients. `titleFolded` is pre-folded by the caller
+// because state.nameQuery is stored folded -- see the function's own comment.
+
+const ROW = (over) => Object.assign({
+  tags: ['soup', 'make-ahead'],
+  star: 'lamb',
+  titleFolded: '',
+  isDraft: false,
+  ingredients: ['lamb', 'barley', 'carrots']
+}, over || {});
+
+const EMPTY = () => FS.emptyState();
+
+// The real matcher lives in ingredient-search.js and needs a vocabulary. These
+// cases are about the ROW rules, so the umbrella is stubbed to something with
+// no opinions -- exact membership, which is what a family button falls back to
+// anyway when nothing is passed.
+const EXACT = (list, key) => list.indexOf(key) !== -1;
+
+test('an empty state keeps every row', () => {
+  assert.strictEqual(FS.rowMatchesFilters(ROW(), EMPTY(), EXACT), true);
+});
+
+test('chosen tags are AND, not OR -- two tags means a row carrying both', () => {
+  const state = EMPTY();
+  state.tags = new Set(['soup', 'make-ahead']);
+  assert.strictEqual(FS.rowMatchesFilters(ROW(), state, EXACT), true);
+
+  state.tags = new Set(['soup', 'freezable']);
+  assert.strictEqual(
+    FS.rowMatchesFilters(ROW(), state, EXACT), false,
+    'a row carrying one of two chosen tags survived. Tags narrow: picking a ' +
+    'second one asks for both, the way a shelf does.'
+  );
+});
+
+test('the star is a single value, and a row with none is not a match for one', () => {
+  const state = EMPTY();
+  state.star = 'lamb';
+  assert.strictEqual(FS.rowMatchesFilters(ROW(), state, EXACT), true);
+  assert.strictEqual(FS.rowMatchesFilters(ROW({ star: 'beef' }), state, EXACT), false);
+  assert.strictEqual(FS.rowMatchesFilters(ROW({ star: '' }), state, EXACT), false);
+});
+
+test('a blank star on a row is fine while nothing is selected -- ~a quarter are', () => {
+  assert.strictEqual(FS.rowMatchesFilters(ROW({ star: '' }), EMPTY(), EXACT), true);
+});
+
+test('the name query is a substring of the FOLDED title, both sides folded', () => {
+  const state = EMPTY();
+  state.nameQuery = 'creme';           // as filters.js stores it: folded, lower
+  assert.strictEqual(
+    FS.rowMatchesFilters(ROW({ titleFolded: 'creme brulee' }), state, EXACT), true);
+  assert.strictEqual(
+    FS.rowMatchesFilters(ROW({ titleFolded: 'lamb tagine' }), state, EXACT), false);
+});
+
+test('the draft filter is boolean, and asks nothing at all when it is off', () => {
+  const state = EMPTY();
+  state.meta = new Set(['draft']);
+  assert.strictEqual(FS.rowMatchesFilters(ROW({ isDraft: true }), state, EXACT), true);
+  assert.strictEqual(FS.rowMatchesFilters(ROW({ isDraft: false }), state, EXACT), false);
+  // Off: both survive. #562 left `draft` as the only meta filter, and it is a
+  // fact about which collection a row came from rather than a state of
+  // completion -- so with the button unpressed it says nothing about anything.
+  assert.strictEqual(FS.rowMatchesFilters(ROW({ isDraft: true }), EMPTY(), EXACT), true);
+});
+
+test('the ingredient key drops its (all) suffix before it is matched', () => {
+  const state = EMPTY();
+  state.ingredient = 'lamb (all)';
+  assert.strictEqual(
+    FS.rowMatchesFilters(ROW(), state, EXACT), true,
+    'the umbrella was matched with its suffix still attached, so it looked for ' +
+    'an ingredient literally called "lamb (all)".'
+  );
+});
+
+test('with no matcher, an ingredient filter selects nothing rather than everything', () => {
+  // The opposite direction from excludesRow's own no-matcher case, and both
+  // fail where it shows: an empty list is visibly wrong, where a silently
+  // unenforced EXCLUSION would hand back the thing you ruled out.
+  const state = EMPTY();
+  state.ingredient = 'lamb';
+  assert.strictEqual(FS.rowMatchesFilters(ROW(), state, undefined), false);
+});
+
+test('the row rules are ALL of them, and each one alone can drop a row', () => {
+  // A sweep, so a rule quietly deleted from the predicate is a failure rather
+  // than a smaller function. Generated from the four fields rather than
+  // hand-listed, which is the omission problem this module exists to remove.
+  const cases = [
+    ['tags', (s) => { s.tags = new Set(['nonexistent']); }],
+    ['star', (s) => { s.star = 'beef'; }],
+    ['nameQuery', (s) => { s.nameQuery = 'zzz'; }],
+    ['meta.draft', (s) => { s.meta = new Set(['draft']); }]
+  ];
+  cases.forEach(([name, apply]) => {
+    const state = EMPTY();
+    apply(state);
+    assert.strictEqual(
+      FS.rowMatchesFilters(ROW({ titleFolded: 'lamb tagine' }), state, EXACT), false,
+      `${name} no longer excludes a row it should. Every rule here can drop a ` +
+      `row on its own; one that cannot has stopped being a filter.`
+    );
+  });
+});
+
+test('a row missing every field is not a crash', () => {
+  // Defensive because the caller reads a live DOM: a row whose data attributes
+  // are all absent arrives as empty strings and empty arrays, and the answer
+  // wanted there is "nothing is filtering it out", not an exception.
+  assert.strictEqual(FS.rowMatchesFilters({}, EMPTY(), EXACT), true);
+  assert.strictEqual(FS.rowMatchesFilters(undefined, undefined, EXACT), true);
+});
+
 test('the two tables are genuinely different -- this is not one index twice', () => {
   const food = FS.create(FS.FOOD_FIELDS).FIELDS;
   const cocktail = FS.create(FS.COCKTAIL_FIELDS).FIELDS;

@@ -2592,3 +2592,142 @@ def test_the_cocktail_card_ingredient_attribute_is_self_delimiting():
         "the ing_search capture no longer joins its values with `|`, so "
         "splitEntries cannot recover the individual ingredients from data-ing."
     )
+
+
+# --- duplicate YAML keys, issue #609 -----------------------------------------
+#
+# A duplicate key in a YAML mapping is NOT an error. The parser keeps the last
+# one and discards the first, in silence. _data/cocktails/taxonomy.yml grew one
+# twice in a single session on 2026-08-30 and neither changed behaviour, which
+# is exactly why neither was found:
+#
+#   `moods:` held two `clear:` keys, both with identical text -- 21 key lines
+#   and 20 keys.
+#
+#   `mood_include:` held two `south-sider:` keys, one written by hand carrying
+#   Helen's own reason and one written by a script that did not know about it.
+#   The generated one won. Her reasoning was still in the file, doing nothing.
+#
+# THE SECOND IS THE SHARP ONE AND IT IS WHY THIS EXISTS: a duplicate does not
+# merely waste a line, it can silently replace a documented decision with a
+# generated placeholder. Both were found by counting `^  key:` lines against
+# len(yaml.safe_load(...)), not by reading.
+#
+# WIDER THAN THE ISSUE ASKED, on measurement rather than ambition. #609 asks for
+# _data/; front matter is the identical hole with far more surface -- 543 files
+# against 15, several hundred of them edited by script. Two `generic:` keys on
+# one drink ingredient would drop a category with nothing to show for it.
+# Measured 2026-08-31 before the guard was written: 0 duplicates across all 558.
+
+
+class _DuplicateKeyLoader(yaml.SafeLoader):
+    """A SafeLoader that REPORTS repeats instead of quietly resolving them.
+
+    The duplicates are collected rather than raised, so one file can report all
+    of its own -- and so the message can name the key and the line, which is the
+    only part that saves anyone any time.
+    """
+
+
+def _collect_duplicates(loader, node, deep=False):
+    mapping = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        if key in mapping:
+            loader.duplicates.append((key, key_node.start_mark.line + 1))
+        mapping[key] = loader.construct_object(value_node, deep=deep)
+    return mapping
+
+
+_DuplicateKeyLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _collect_duplicates)
+
+
+def _duplicate_keys(text: str):
+    """Every (key, line) that appears twice in one mapping, at any depth."""
+    loader = _DuplicateKeyLoader(text)
+    loader.duplicates = []
+    try:
+        loader.get_single_data()
+    except yaml.YAMLError:
+        # Not this test's business -- a file that does not parse at all is
+        # somebody else's failure, and reporting it twice helps nobody.
+        return []
+    finally:
+        loader.dispose()
+    return loader.duplicates
+
+
+def _yaml_sources():
+    """Every (label, path, text) the site reads as YAML: data files and front matter.
+
+    The collections are globbed rather than listed, and absent ones are simply
+    absent -- the two drafts directories are private repos that a CI checkout
+    does not have.
+    """
+    sources = []
+    for path in sorted(ROOT.glob("_data/**/*.yml")):
+        sources.append((f"{path.relative_to(ROOT)}", path, path.read_text(encoding="utf-8")))
+
+    for name in ("_food_recipes", "_food_magic_bag", "_food_drafts",
+                 "_cocktail_recipes", "_cocktail_drafts"):
+        for path in sorted((ROOT / name).rglob("*.md")) if (ROOT / name).exists() else []:
+            text = path.read_text(encoding="utf-8")
+            if not text.startswith("---"):
+                continue
+            parts = text.split("---", 2)
+            if len(parts) < 3:
+                continue
+            sources.append((f"{path.relative_to(ROOT)}", path, parts[1]))
+    return sources
+
+
+_YAML_SOURCES = _yaml_sources()
+
+
+def test_the_duplicate_key_scan_actually_has_files_to_scan():
+    """The corpus above is a glob, and a glob that goes stale scans nothing.
+
+    Asserted rather than left implicit, because the parametrised test below
+    reports an empty parametrisation as a skip and a skip reads like a pass at
+    a glance. The two floors are what CI genuinely has: the data files and the
+    published recipes live in this repo. The drafts do not, so their absence is
+    expected there and is not what this is checking.
+    """
+    labels = [label for label, _, _ in _YAML_SOURCES]
+    assert any(l.startswith("_data/") for l in labels), (
+        "No _data/**/*.yml matched. Either the data directory moved or this "
+        "glob went stale -- and a stale glob here means the duplicate-key check "
+        "silently stopped checking, which is the failure mode it exists for."
+    )
+    assert any(l.startswith("_food_recipes/") for l in labels), (
+        "No _food_recipes/*.md front matter matched, and those are in this "
+        "repository, so they are present even in CI."
+    )
+
+
+@pytest.mark.parametrize(
+    "label,text",
+    [(label, text) for label, _, text in _YAML_SOURCES],
+    ids=[label for label, _, _ in _YAML_SOURCES],
+)
+def test_no_yaml_mapping_has_a_duplicate_key(label, text):
+    """A repeated key is silently discarded, taking whatever it said with it.
+
+    IN CI THIS COVERS THE DATA FILES AND THE PUBLISHED COLLECTIONS ONLY. The two
+    drafts directories are private repos a CI checkout does not have, so a green
+    run there says nothing about them -- the parametrisation is simply smaller.
+    Locally it is all 558 files.
+
+    THE FIX IS ALWAYS TO DELETE ONE OF THE TWO, and which one is not a
+    formality: the pair that prompted this held Helen's reasoning in the copy
+    that lost. Read both before choosing.
+    """
+    duplicates = _duplicate_keys(text)
+    assert not duplicates, (
+        f"{label} repeats {len(duplicates)} key(s) in one mapping:\n  "
+        + "\n  ".join(f"line {line}: {key!r}" for key, line in duplicates)
+        + "\n\nYAML keeps the LAST and discards the first, without complaint, so "
+          "whatever the earlier one said is gone. Delete one -- after reading "
+          "both, because the two are not always the same text."
+    )

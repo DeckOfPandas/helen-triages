@@ -752,6 +752,13 @@ brandy_styles:
   - "calvados"
   - "pisco"
   - "grappa"
+  # Helen, 2026-08-31, on Pink Lady's Laird's Bonded: applejack's generic is
+  # `apple brandy`. It is NOT `calvados`, which names a French appellation --
+  # the same distinction the two Demeraras turn on, where the category is a
+  # checkable fact about the bottle rather than an argument from the glass.
+  # Naming it after the fruit rather than the country is what lets an American
+  # applejack and a Spanish or English apple brandy share it honestly.
+  - "apple brandy"
   # The category term rather than one country's word for it, so a slivovitz or
   # a framboise has somewhere to go. Cherry eau de vie is the live example.
   - "eau de vie"
@@ -878,6 +885,25 @@ herbal_liqueurs:
   - "Jägermeister"
   - "liqueur de sapin"
   - "Swedish flaggpunsch"
+  # P-Five Punch pours two ounces of it, which is too much of the drink to
+  # leave as a QQ. Helen, 2026-08-31, worried that filing it here would read as
+  # a claim it swaps for the rest: "'Herbal liqueur (Becherovka)' would be
+  # misleading. This will come up over and over."
+  #
+  # IT NEVER RENDERS THAT WAY, AND THAT IS WHAT THIS GROUP IS FOR. Every member
+  # above is already a proper noun, for exactly her reason -- nothing
+  # generalises them and none is substitutable for another. So the group is a
+  # filing drawer, not a category a drink is described by: a recipe line shows
+  # the GENERIC, which is `Becherovka`. `herbal` is the family, and a family is
+  # only ever a search and exclusion roll-up, never a browse axis. Same shape as
+  # the amari, where Campari, Aperol, Cynar and fernet are four generics rather
+  # than one "amaro" for precisely this reason.
+  #
+  # WHERE HER ACTUAL FACT GOES. "I'd reach for Becherovka if a recipe wanted
+  # something cinnamon- or ginger-forward" is a statement about a drink's use of
+  # a bottle, not about the bottle in the abstract -- so it is a per-ingredient
+  # `note` on the drink that wants it, which is what #457 built that key for.
+  - "Becherovka"
 
 # Separate generics, one family. Not substitutable for each other -- swapping
 # Campari for Fernet is a different drink, not a variation.
@@ -1065,6 +1091,17 @@ fruit_and_herbs:
   - "basil"
   - "rosemary"
   - "fruit purée"
+  # Both from East River Underground, which muddles them and then garnishes
+  # with them again. Helen, 2026-08-31: "Cucumber and kaffir lime leaves will
+  # need to go in the dictionary naked" -- bare, no qualifier, because neither
+  # is a form of anything already here.
+  #
+  # `kaffir lime leaves` is NOT a variety of `lime`, which is the fruit you
+  # muddle. The leaf is an aromatic and tastes nothing like the fruit, so the
+  # two must not collapse -- excluding one would otherwise silently drop drinks
+  # built on the other.
+  - "cucumber"
+  - "kaffir lime leaves"
 
 other:
   - "soda water"
@@ -1142,6 +1179,7 @@ family_of:
   "eau de vie": brandy
   "full-strength clear fruit brandy": brandy
   "peach brandy": brandy
+  "apple brandy": brandy
   "blanco tequila": agave
   "reposado tequila": agave
   "añejo tequila": agave
@@ -1172,6 +1210,7 @@ family_of:
   "liqueur de sapin": herbal
   "Swedish flaggpunsch": herbal
   "Galliano": herbal
+  "Becherovka": herbal
 
 # Bases with NO family, deliberately. Same idea as
 # tests/test_reference_data.py's NO_TEMPERATURE_BECAUSE: a decision with its

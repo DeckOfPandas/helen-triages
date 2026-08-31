@@ -223,6 +223,7 @@ WHOLE_COLLECTION_ONLY = {
     "test_the_known_prose_suggestion_list_has_no_stale_entries",
     "test_every_card_name_join_is_reachable",
     "test_every_proposal_still_matches_a_real_step",
+    "test_every_garnish_proposal_still_matches_a_real_string",
     "test_no_mood_covers_more_than_half_the_collection",
     # The five COVERAGE claims below -- see _exercised.
     "test_the_character_vocabulary_is_exercised",
@@ -2583,22 +2584,140 @@ def test_garnish_is_a_list():
     assert not bad, "garnish must be a list:\n  " + "\n  ".join(bad)
 
 
-def test_no_garnish_is_stated_as_none_and_nothing_else():
-    """`["none"]` means DECIDED: this drink takes no garnish. `[]` means nobody
-    has filled it in. Helen settled that convention on 2026-08-26, and the
-    collection already followed it -- 15 drinks say `none` (the Sazerac among
-    them, deliberately, from its own source row) against 18 genuinely empty.
+GARNISH = ROOT / "_data" / "cocktails" / "garnish.yml"
 
-    HANDOVER §9.5 SAYS THE OPPOSITE, claiming both cases are "currently
-    flattened to []" and listing the choice as an open question. That was true
-    once and has not been for some time; the file it describes is the authority,
-    per §11.2. This test is what stops the two conventions drifting apart again.
 
-    WHAT IT ACTUALLY GUARDS is the risk §9.5 correctly identified: that `none`
-    "would pollute any future garnish vocabulary with a fake member". It cannot
-    now, because it may only ever appear ALONE. A drink with `["none", "lime
-    wheel"]` is a contradiction, and a drink with `["None"]` is a second
-    spelling that any future vocabulary would have to carry twice.
+def _garnish_vocab():
+    return yaml.safe_load(GARNISH.read_text(encoding="utf-8"))
+
+
+def _declared_garnishes(vocab):
+    """Every string under `canonical`, plus the no-garnish marker.
+
+    Derived from the mapping's SHAPE rather than from a hardcoded list of group
+    names, so a group added to the data file is covered without touching this
+    file -- the same reasoning `_declared_generics` uses on ingredients.yml.
+    """
+    declared = set()
+    for group in (vocab.get("canonical") or {}).values():
+        if isinstance(group, list):
+            declared |= {g for g in group if isinstance(g, str)}
+    marker = vocab.get("no_garnish")
+    if isinstance(marker, str):
+        declared.add(marker)
+    return declared
+
+
+NO_GARNISH = "no garnish"
+
+
+def test_every_garnish_is_declared():
+    """Every garnish on every drink appears in `_data/cocktails/garnish.yml`.
+
+    A RATCHET, NOT A BACKLOG. The vocabulary was seeded from the collection's
+    own strings on 2026-08-31, odd ones included, so this cannot fail on
+    anything already here -- it bites on the NEXT new spelling. That is the
+    point: the census behind that file found 65 distinct strings for perhaps 35
+    real garnishes, and nothing was watching the gap.
+
+    ADDING A LINE IS WHAT SWITCHES ENFORCEMENT ON, the same bargain
+    `canonical_glasses` and the `<family>_characters` lists strike. A garnish
+    that genuinely wants a new word gets one; a garnish that is a second
+    spelling of an existing one fails here and says so.
+
+    IT DOES NOT ASK WHETHER THE VOCABULARY IS TIDY. `garnish.yml`'s `proposals`
+    block holds the strings that still want a judgement -- the compounds, the
+    counts, the brand -- and deliberately nothing enforces those. A check that
+    failed on a non-canonical garnish would be enforcing a decision Helen has
+    not made, which is exactly what methods.yml's own header refuses to do.
+    """
+    declared = _declared_garnishes(_garnish_vocab())
+    assert declared, "garnish.yml declares nothing -- has `canonical` been renamed?"
+
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        garnish = fm.get("garnish")
+        if not isinstance(garnish, list):
+            continue          # test_garnish_is_a_list owns that failure
+        for g in garnish:
+            if not isinstance(g, str):
+                continue
+            checked += 1
+            if g not in declared:
+                bad.append(f"{slug}: {g!r}")
+
+    assert not bad, (
+        f"{len(bad)} garnish(es) not declared in _data/cocktails/garnish.yml:\n  "
+        + "\n  ".join(bad)
+        + "\n\nEither it is a new garnish -- add it to the right group under "
+          "`canonical` -- or it is a second spelling of one already there, in "
+          "which case use the existing string. Case and plurals both count: "
+          "`mint sprigs` and `mint sprig` are two entries a reader has to "
+          "re-read, which is the whole reason that file exists."
+    )
+    assert checked, (
+        "No drink declares a garnish at all, so this compared nothing -- 124 "
+        "carried the key when this was written."
+    )
+
+
+def test_every_garnish_proposal_still_matches_a_real_string():
+    """A proposal whose work is already done reads as outstanding.
+
+    Same guard methods.yml carries, for the same reason and against the same
+    failure: the moment a drink stops saying the left-hand string, the row is
+    describing the collection as it was rather than as it is. HANDOVER §11.2 --
+    an open proposal is a document too, and it rots.
+    """
+    _require_whole_collection("a garnish proposal's staleness")
+
+    vocab = _garnish_vocab()
+    proposals = vocab.get("proposals") or {}
+    assert proposals, "garnish.yml declares no proposals -- has it been renamed?"
+
+    live = set()
+    for _slug, fm in _load():
+        garnish = fm.get("garnish")
+        if isinstance(garnish, list):
+            live |= {g for g in garnish if isinstance(g, str)}
+
+    stale = sorted(set(proposals) - live)
+    assert not stale, (
+        "garnish.yml proposes changes to strings no drink says any more:\n  "
+        + "\n  ".join(repr(s) for s in stale)
+        + "\n\nDelete the row. It has either been applied already or the drink "
+          "that said it has changed, and either way it now describes the "
+          "collection as it was rather than as it is."
+    )
+
+
+def test_no_garnish_is_stated_as_no_garnish_and_nothing_else():
+    """`["no garnish"]` means DECIDED: this drink takes one. `[]` means nobody
+    has filled it in. Helen settled the distinction on 2026-08-26 and the
+    WORDING on 2026-08-31.
+
+    IT WAS `none` UNTIL THEN, AND THE RENAME IS ABOUT THE PAGE, NOT THE DATA.
+    `_layouts/cocktail.html` joins this list straight into the drink page, so
+    whatever is stored is what a reader sees -- and Helen's objection was that
+    the reader is not us: "'no garnish' actually, because none might read like
+    'not filled in' even though you and I know that's not the case." The
+    convention was already unambiguous to anyone who had read §9.5. The word on
+    the page was not.
+
+    ONE DRINK ALREADY SAID IT, WHICH IS HOW THE RENAME WAS FOUND. ti-punch
+    carried `no garnish` against fifteen `none`s, and the older version of this
+    test could not see it: it only inspected lists that CONTAINED `none`, so a
+    second spelling of the same decision passed silently -- the precise failure
+    the docstring below says it prevents. The check is now anchored on the
+    canonical string rather than on the one spelling it happened to know.
+
+    WHAT IT GUARDS is the risk §9.5 identified: that a "no garnish" value
+    "would pollute any future garnish vocabulary with a fake member". It cannot,
+    because it may only ever appear ALONE. A drink with
+    `["no garnish", "lime wheel"]` is a contradiction, and `["No garnish"]` is a
+    second spelling any vocabulary would have to carry twice. `garnish.yml`
+    declares it once, and `test_every_garnish_is_declared` reads it from there.
     """
     bad = []
     for slug, fm in _load():
@@ -2606,17 +2725,30 @@ def test_no_garnish_is_stated_as_none_and_nothing_else():
         if not isinstance(garnish, list):
             continue          # test_garnish_is_a_list owns that failure
         lowered = [str(g).strip().lower() for g in garnish]
-        if "none" not in lowered:
+        # RETIRED SPELLINGS ARE CAUGHT HERE TOO, not merely undeclared. An
+        # undeclared value is a typo; `none` is a value that used to be right,
+        # and saying so beats "not in the vocabulary".
+        if "none" in lowered:
+            bad.append(
+                f"{slug}: {garnish!r} -- `none` was renamed to "
+                f"{NO_GARNISH!r} on 2026-08-31"
+            )
+            continue
+        if NO_GARNISH not in lowered:
             continue
         if len(garnish) > 1:
-            bad.append(f"{slug}: {garnish!r} -- `none` alongside a real garnish")
-        elif garnish[0] != "none":
-            bad.append(f"{slug}: {garnish[0]!r} -- must be exactly \"none\"")
+            bad.append(
+                f"{slug}: {garnish!r} -- {NO_GARNISH!r} alongside a real garnish"
+            )
+        elif garnish[0] != NO_GARNISH:
+            bad.append(
+                f"{slug}: {garnish[0]!r} -- must be exactly {NO_GARNISH!r}"
+            )
     assert not bad, (
         "Garnish problems:\n  " + "\n  ".join(bad)
-        + "\n\n`none` states a DECISION and must stand alone, lowercase. Use "
-          "`[]` for a garnish nobody has chosen yet -- absent is not the same "
-          "as deliberately nothing."
+        + f"\n\n{NO_GARNISH!r} states a DECISION and must stand alone, "
+          "lowercase. Use `[]` for a garnish nobody has chosen yet -- absent is "
+          "not the same as deliberately nothing."
     )
 
 
@@ -3249,7 +3381,11 @@ def test_suggestion_is_a_string_or_a_list_of_strings():
 # other to.
 KNOWN_PROSE_SUGGESTIONS = {
     ("apple-cart", "Avallen -- a round, fresh taste if you need to sub"),
-    ("daisy-de-santiago", "Havana 3 year old and Clément Agricole Blanc"),
+    # Daisy de Santiago's "Havana 3 year old and Clément Agricole Blanc" came
+    # off on 2026-08-31, retired the way this contract intends: the drink was
+    # rewritten, not the string reworded. Helen: "let's chop down to just Havana
+    # 3, 2 oz." The suggestion that could not resolve went with the disjunction
+    # it was trying to cover.
     # Milliners Punch's "the cheapest white rum to hand; sometimes JW Spicers"
     # came off this set on 2026-08-27, retired the way this contract intends:
     # the suggestion is GONE, not reworded. Helen, "never name Spicers -- if I

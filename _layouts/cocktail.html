@@ -18,9 +18,15 @@ layout: default
 
   EMPTY ARRAY IS TRUTHY IN LIQUID. Only nil and false are falsy, so every
   list-gated section below tests `.size > 0` rather than the bare value. This
-  is not hypothetical here: `garnish: []` is real, live data on sazerac.md
-  (the drink genuinely has no garnish), and a bare truth test would draw a
-  GARNISH heading over blank space. Same bug as the 49 food drafts with
+  is not hypothetical here: `garnish: []` is real, live data on 16 drinks
+  (caipirinha among them), and a bare truth test would draw a GARNISH heading
+  over blank space.
+
+  THIS NAMED sazerac.md AS THE EXAMPLE UNTIL 2026-08-31 and glossed it as "the
+  drink genuinely has no garnish", which had drifted into being exactly
+  backwards. That drink states `["no garnish"]` -- a DECISION, which renders --
+  where `[]` means nobody has filled the field in. The two are opposite claims
+  and the comment illustrated one with the other. Same bug as the 49 food drafts with
   `notes: []` — see tests/test_site_config.py's
   test_list_sections_are_conditioned_on_size_not_truthiness.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}

@@ -382,3 +382,57 @@ test('within the non-prefix results, a real word match ranks above a family-only
   assert.ok(cheeseIdx < creamCheeseIdx, 'a prefix match should rank before a word-only match');
   assert.ok(creamCheeseIdx < fetaIdx, 'a real word match should rank before a family-only member');
 });
+
+// --- entriesMatchKey — issue #506 --------------------------------------------
+// The rule that decides whether a row answers a picked ingredient. It sat in
+// filters.js, untested, and it is asked by BOTH directions: the include filter
+// of a row's main_ingredients, and the exclude filter's "(all)" umbrella of the
+// row's derived entries, through filter-state.js's excludesRow. Two copies of
+// this is how "chicken (all)" comes to mean one thing when you filter FOR it
+// and another when you filter it OUT, which is why it is one function.
+
+test('a plain key matches an entry containing it', () => {
+  assert.strictEqual(matcher().entriesMatchKey(['chicken breast', 'thyme'], 'chicken'), true);
+  assert.strictEqual(matcher().entriesMatchKey(['thyme', 'butter'], 'chicken'), false);
+});
+
+test('EVERY word of a two-word key has to land, not just one', () => {
+  const m = matcher();
+  assert.strictEqual(m.entriesMatchKey(['chicken breast'], 'chicken breast'), true);
+  assert.strictEqual(
+    m.entriesMatchKey(['chicken thighs'], 'chicken breast'), false,
+    'half a key matched. "chicken breast" is not answered by chicken alone, ' +
+    'or the picker offers a precision it does not have.'
+  );
+});
+
+test('a curated family matches by CONTAINMENT, including members sharing no letters', () => {
+  // The whole reason synonyms exist: feta is a cheese and says so nowhere in
+  // its own name. A prefix rule cannot reach it and must not have to.
+  const m = matcher();
+  assert.strictEqual(m.entriesMatchKey(['feta'], 'cheese'), true);
+  assert.strictEqual(m.entriesMatchKey(['mature cheddar'], 'cheese'), true);
+  assert.strictEqual(m.entriesMatchKey(['cream cheese'], 'cheese'), true);
+  assert.strictEqual(m.entriesMatchKey(['butter'], 'cheese'), false);
+});
+
+test('the family rule is containment, so a family member matches mid-word too', () => {
+  // Recorded rather than admired: `cheddar` inside `cheddary crumbs` matches,
+  // where the non-family branch would want a word. It is the include/umbrella
+  // direction, where over-reaching shows you a recipe and the row says why.
+  assert.strictEqual(matcher().entriesMatchKey(['cheddary crumbs'], 'cheese'), true);
+});
+
+test('an irregular plural is normalised on BOTH sides before comparing', () => {
+  // singulars: { cherries: 'cherry' }. The row says one, the picker may say
+  // the other, and the pair must not depend on which.
+  const m = matcher();
+  assert.strictEqual(m.entriesMatchKey(['cherries'], 'cherry'), true);
+  assert.strictEqual(m.entriesMatchKey(['cherry'], 'cherries'), true);
+});
+
+test('an empty or missing list matches nothing, rather than throwing', () => {
+  const m = matcher();
+  assert.strictEqual(m.entriesMatchKey([], 'chicken'), false);
+  assert.strictEqual(m.entriesMatchKey(undefined, 'chicken'), false);
+});
