@@ -465,11 +465,12 @@ unresolved_suggestions:
   "Wray & Nephew, or Rum Fire": >-
     Two bottles in one string; wants the list form. Both `Jamaican, overproof,
     unaged`.
-  "Havana 7, Appleton 8": >-
-    Two bottles in one string, in two categories, and Carta Switchel's generic
-    is already the matching disjunctive pair -- Havana 7 is `moderately aged`
-    and Appleton 8 is `Jamaican, moderately aged` (#314). The list form makes
-    the pairing legible instead of coincidental.
+  # Carta Switchel's "Havana 7, Appleton 8" came off on 2026-08-31, the way this
+  # block intends: the drink now writes the list, so each bottle names the option
+  # it belongs to. Helen, asked with the pair in front of her: "thanks, yes
+  # please." The pairing is no longer coincidental in a second sense either --
+  # cocktail-search.js reads each bottle's category from THIS file rather than
+  # from the two lists happening to sit in the same order (#603).
   # BOTH OF THE "NEEDS HELEN" COMPOUNDS CAME OFF ON 2026-08-30, and neither by
   # being reworded -- the drinks were rewritten and the strings went with them.
   #
@@ -505,8 +506,13 @@ unresolved_suggestions:
     A brand, and completing it to Portobello Road was memory rather than
     reading. Tailspin's generic is `London dry gin`.
   "Sazerac": >-
-    Written by the drink of the same name against `rye`, so it is not even
-    certain this names a bottle rather than repeating the title.
+    THE DOUBT IS SETTLED AND THE STRING STILL DOES NOT RESOLVE. This entry used
+    to read "it is not even certain this names a bottle rather than repeating
+    the title". Helen, 2026-08-31: "there is a rye named Sazerac, confusingly.
+    Even worse, I tend not to use it in a Sazerac." So it does name a real rye
+    -- and `Sazerac` alone is the house, not the product (#529: a brand is not
+    a bottle), and it is not what she reaches for in the drink that carries it.
+    Pending her call on whether the suggestion comes off that drink entirely.
   "Luxardo": >-
     A house, not a bottle. Three drinks write it against `maraschino liqueur`.
   "Roots": >-
@@ -609,7 +615,11 @@ unresolved_suggestions:
   # An entry here is deleted when its string stops existing. Leaving it would be
   # the exact rot this block guards against: a declared exception that reads as
   # an outstanding problem while pointing at nothing.
-  "Havana 3 year old and Clément Agricole Blanc": >-
-    AND, not OR -- Daisy de Santiago pours both, and its `generic` is correctly
-    the disjunctive pair. One suggestion string covering two separate pours is
-    the real problem here; it may want splitting across two ingredient entries.
+  # "Havana 3 year old and Clément Agricole Blanc" came off on 2026-08-31, and
+  # the entry that stood here was wrong about the drink in a way worth recording.
+  # It read: "AND, not OR -- Daisy de Santiago pours both, and its `generic` is
+  # correctly the disjunctive pair." Both halves cannot be true at once, since a
+  # list `generic` means "either would do" and never "both" (#441) -- so the
+  # string was being explained rather than questioned. Helen, asked which it was:
+  # "let's chop down to just Havana 3, 2 oz." One rum, one bottle, no
+  # disjunction, and the agricole was never in the drink.
