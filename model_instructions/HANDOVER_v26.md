@@ -1745,6 +1745,23 @@ retyping was redone from scratch — including DELETING a drink the remote had
 merely replaced. Local branches, the reflog and the working tree all agreed with
 each other and all were stale. **One clone is not the repo.**
 
+**IT FIRES ONCE PER MERGE, NOT ONCE PER SESSION, AND IT CAUGHT THE SAME SESSION
+THREE TIMES ON 2026-08-30.** A clone fetched at the start of a session is stale
+the moment anyone merges into the drafts repo, and while two agents are working
+that is several times an afternoon. Each time the symptom was identical and
+completely convincing: a handful of `test_cocktails.py` failures naming real
+drinks and real fields, reading exactly like a regression in whatever had just
+been changed. Each time the fix was `git fetch` and a fast-forward, and the
+failures were work someone else had already done.
+
+**So fetch it immediately before any run whose result you are going to act on**
+— before reporting a failure, before concluding a change is safe, and before
+pushing. Not at the start of the session. The cheap version:
+
+    cd _cocktail_drafts && git fetch origin && git rev-list --count HEAD..origin/main
+
+A non-zero answer means the next red test is probably not yours.
+
 **The API token is a different channel and does not cover file contents.**
 `GH_TOKEN` selects all three repos and carries Issues; probed 2026-08-29,
 `contents` returns **403** on both private repos and 200 on the public one. So
