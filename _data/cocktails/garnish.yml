@@ -1,0 +1,168 @@
+# =============================================================================
+# COCKTAIL GARNISHES. Requested by Helen, 2026-08-31.
+# =============================================================================
+# WHY THIS EXISTS, AND IT IS NOT SO ANYTHING CAN BE FILTERED. There is no
+# garnish filter on the index and this file is not a step towards one -- the
+# same ruling taxonomy.yml makes about glasses and spirits. It exists for
+# #290's reason, the one that earned methods.yml: a shape that changes every
+# time has to be RE-READ, where an identical repeated one becomes something you
+# RECOGNISE. That matters most in the situation Helen named for the method
+# steps -- people in the house, and thirsty.
+#
+# THE CENSUS THAT PRODUCED IT, 2026-08-31: 130 garnish entries across 123
+# drinks, in 65 distinct strings, for perhaps 35 actual garnishes. `mint sprig`
+# / `mint sprigs` / `mint bouquet` / `mint sprigs bouquet` was one garnish
+# wearing four faces; so were `brandied cherry` / `brandied cherries`, both
+# wheel pairs, and `lime wedge` / `one lime wedge`. Collapsing only the
+# unambiguous drift -- singulars, plurals, a stray article -- took 65 to 55
+# without losing a word that carried information.
+#
+# WHAT IS DELIBERATELY NOT COLLAPSED. `lime wedge on rim` says where to put it.
+# `orange zest twist (discarded)` says it does not stay in the drink.
+# `luxardo maraschino cherry` names a bottle that genuinely differs from a
+# bright red cocktail cherry. Applying methods.yml's own test -- does the
+# phrasing carry information? -- keeps all three apart.
+#
+# HOW IT IS ENFORCED. `test_every_garnish_is_declared` requires each garnish on
+# each drink to appear below. The list starts as the collection's real
+# vocabulary, undeclared values and all, so it is a RATCHET: it cannot fail on
+# what is already here and it bites on the next new spelling. That is the same
+# bargain glasses.yml's canonical map and the `<family>_characters` lists
+# strike -- declaring a value is what switches enforcement on.
+#
+# NOTHING HERE REWRITES A DRINK. `proposals` holds the strings that still want
+# a judgement, left beside what they might become, exactly as methods.yml does.
+# Helen, on that file: "Prefer both, leaving my original too, then I delete
+# whatever I don't want." Deleting a row is how a suggestion is rejected.
+# =============================================================================
+
+# THE DECISION, NOT A GARNISH. `["no garnish"]` means this drink takes one;
+# `[]` means nobody has filled it in yet. It may only ever appear ALONE, which
+# is what stops it becoming a fake member of the vocabulary below --
+# test_no_garnish_is_stated_as_no_garnish_and_nothing_else owns that rule.
+#
+# IT WAS `none` UNTIL 2026-08-31 AND THE RENAME IS ABOUT THE PAGE. The layout
+# joins this list straight into the drink page, so the stored word is the word
+# a reader sees. Helen: "'no garnish' actually, because none might read like
+# 'not filled in' even though you and I know that's not the case."
+no_garnish: "no garnish"
+
+# --- THE VOCABULARY ----------------------------------------------------------
+# Grouped for reading only. tests/test_cocktails.py flattens every list under
+# `canonical`, so a group added tomorrow is covered tomorrow -- the same shape
+# methods.yml and ingredients.yml both use.
+canonical:
+
+  # Peel. The commonest garnish in the collection by a distance.
+  citrus_peel:
+    - "lemon twist"
+    - "lemon twist (discarded)"
+    - "lemon zest twist"
+    - "lemon zest twist after expressing over cocktail"
+    - "orange twist"
+    - "orange zest twist"
+    - "orange zest twist (discarded)"
+    - "orange or lemon zest twist"
+    - "grapefruit twist"
+    - "flamed orange zest coin"
+
+  citrus_cut:
+    - "lime wedge"
+    - "lime wedge on rim"
+    - "lime wheel"
+    - "lemon wheel"
+    - "lemon slice"
+    - "orange slice"
+    - "orange crescent"
+    - "grapefruit crescents"
+    - "citrus wheel"
+    - "dehydrated lime slice wheel"
+    - "half lime shell"
+
+  fruit:
+    - "pineapple wedge"
+    - "pineapple wedge (cut to resemble a bird's plumage)"
+    - "pineapple wheel"
+    - "blackberry"
+    - "dried apple slice"
+    - "banana chip"
+    - "12 raspberries"
+    - "half an empty passion fruit shell"
+    - "passion fruit shell filled with overproof rum"
+    - "pineapple and brandied cherry"
+
+  cherries:
+    - "brandied cherry"
+    - "maraschino cherry"
+    - "luxardo maraschino cherry"
+    - "skewered maraschino cherry"
+    - "cherry flag"
+    - "one pineapple wedge and one maraschino cherry"
+    - "fruit stick (skewered pineapple cubes and a maraschino cherry)"
+
+  herbs_and_leaves:
+    - "mint sprig"
+    - "mint bouquet"
+    - "mint sprig and grapefruit zest twist"
+    - "rosemary sprig"
+    - "kaffir lime leaves"
+    - "cucumber wheels"
+    - "edible violet"
+
+  spice_and_other:
+    - "grated nutmeg"
+    - "cinnamon stick"
+    - "three coffee beans"
+    - "half-rim of sugar"
+    - "cocktail umbrella"
+    - "3 dashes red creole-style bitters"
+    - "5 drops of olive oil"
+    - "lime wheels and nutmeg"
+
+# =============================================================================
+# PROPOSALS -- both halves kept, so the choice is Helen's and not mine
+# =============================================================================
+# LEFT: the string exactly as a drink says it today.
+# RIGHT: what it might become, or `QQ` where there is no clean answer and a
+#        judgement is needed. `QQ` means unfinished, not absent -- the same
+#        thing it means on an ingredient.
+#
+# THE COMPOUNDS ARE THE REAL WORK HERE. `garnish:` is a LIST, so a drink
+# wanting two garnishes should carry two entries rather than one string with
+# "and" in it. Splitting them is a data edit to somebody else's drink, though,
+# and a count or a construction can be part of the garnish rather than noise --
+# so every one is proposed and none is applied.
+proposals:
+
+  # --- plainly two garnishes in one string -----------------------------------
+  "one pineapple wedge and one maraschino cherry": ["pineapple wedge", "maraschino cherry"]
+  "mint sprig and grapefruit zest twist": ["mint sprig", "grapefruit zest twist"]
+  "lime wheels and nutmeg": ["lime wheel", "grated nutmeg"]
+
+  # --- two garnishes, but the first is too vague to split confidently --------
+  # "pineapple" alone is a wedge on some drinks and a wheel on others, and this
+  # one does not say which.
+  "pineapple and brandied cherry": "QQ"
+
+  # --- a count inside the string ---------------------------------------------
+  # Both are arguably part of the garnish rather than noise: three coffee beans
+  # is the traditional Espresso Martini spec, not an arbitrary number.
+  "12 raspberries": "raspberries"
+  "three coffee beans": "QQ"
+
+  # --- one constructed garnish, not two ---------------------------------------
+  # A fruit stick is a single object you build. Splitting it would describe
+  # something you do not make.
+  "fruit stick (skewered pineapple cubes and a maraschino cherry)": "QQ"
+
+  # --- presentation and brand, where collapsing would lose a real fact -------
+  # Listed so the question is visible, not because either obviously wants
+  # changing. A Luxardo cherry really is a different object from a bright red
+  # cocktail cherry, and "skewered" says how it is served.
+  "skewered maraschino cherry": "QQ"
+  "luxardo maraschino cherry": "QQ"
+
+  # --- a disjunction, which no single entry can express ----------------------
+  # `generic` solved the same shape with a list meaning "either would do"
+  # (#441). Whether a garnish wants that is undecided.
+  "orange or lemon zest twist": "QQ"
