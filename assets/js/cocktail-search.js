@@ -293,6 +293,25 @@
       return declaredVocabulary[key] || bottleCanonical[key] || term;
     }
 
+    /* THE SPELLING THAT EXPLAINS THE MATCH, which is not always the canonical
+       one -- and a bracket that cannot explain itself is the whole of #603.
+
+       `Wray and Nephew` is an ALIAS of the bottle `Wray & Nephew`. Someone
+       typing "and" matches the alias; canonicalising the answer prints
+       `Jamaican overproof rum (Wray & Nephew)`, where neither the chip nor the
+       bracket contains a single letter of what they typed. That is the exact
+       complaint #603 was raised about, arriving through the fix for it.
+
+       So: the canonical name when it carries the query, and otherwise the
+       spelling that actually did -- preferring the alias AS WRITTEN in
+       bottles.yml over the downcased attribute, because one is a name someone
+       chose and the other is a build artefact. */
+    function displaySpelling(term, query) {
+      var canonical = canonicalSpelling(term);
+      if (!query || normalise(canonical).indexOf(query) !== -1) return canonical;
+      return bottleAliasSpelling[normalise(term)] || term;
+    }
+
     /* A BOTTLE KEEPS ONE IDENTITY — Helen: "'wray and nephew' and 'wray &
        nephew' should both collapse onto the latter." bottles.yml has said so
        since #529 ("ALIASES ARE HOW A BOTTLE KEEPS ONE IDENTITY... add the
@@ -300,6 +319,13 @@
        which HANDOVER §9.10.1 names as the known excess: "suggestions go in raw
        rather than resolved through bottles.yml's aliases, so `Havana 3` and
        `Havana Club 3` can both appear." 97 names and aliases over 38 bottles. */
+    /* Every alias AS WRITTEN, keyed by its folded form. bottleCanonical answers
+       "which bottle is this", which is the right answer almost everywhere and
+       the wrong one for a bracket: `Wray & Nephew` is the bottle, and it is not
+       what someone typing "and" matched -- they matched the alias
+       "Wray and Nephew". See displaySpelling. */
+    var bottleAliasSpelling = Object.create(null);
+
     var bottleCanonical = Object.create(null);
     Object.keys(bottles.bottles || {}).forEach(function (name) {
       // A bottle whose NAME is also declared vocabulary is not a bottle here --
@@ -311,6 +337,7 @@
       ((bottles.bottles[name] || {}).aliases || []).forEach(function (alias) {
         if (isDeclared(alias)) return;
         bottleCanonical[normalise(alias)] = name;
+        bottleAliasSpelling[normalise(alias)] = alias;
         // So the chip SELECTS the drink that named the alias, not merely finds
         // it: a drink listing `wray and nephew` must answer to `Wray & Nephew`
         // in the exclude direction too, where there is no fuzzy reach to save it.
@@ -642,7 +669,7 @@
                asking "is this the chip's own name?" should compare rather
                than infer -- on bands 1, 2 and 4, `via` is the chip's own
                value. */
-            via: canonicalSpelling(term),
+            via: displaySpelling(term, query),
             /* WHAT KIND of name found it, because the three hidden kinds are
                three different arguments and #603 collects one of each:
 
@@ -662,6 +689,37 @@
                nothing can produce. */
             viaKind: (normalise(term) === normalise(value)) ? 'own'
               : isDeclared(term) ? 'generic' : 'bottle',
+            /* WHEN THE NAME THAT FOUND IT SHOULD REPLACE THE CHIP'S OWN RATHER
+               THAN SIT IN A BRACKET AFTER IT — Helen, 2026-08-31, on
+               `clear blended rum (clear blended multi-region rum)`: "should be
+               returned without its display name given that name is a bit of a
+               hack. I don't know if this is a one-off or a principle."
+
+               It is a principle, and measured: 15 of the 27 card names are
+               STRICT ABBREVIATIONS of their generic -- every word of the card
+               name appears in the generic, which adds a qualifier. So the
+               bracket in all fifteen repeats the chip to itself and appends the
+               bit it dropped: `aged rum (moderately aged rum)`,
+               `Demerara rum (aged Demerara rum)`, `gin (London dry gin)`.
+
+               A bracket is for a name that is genuinely OTHER -- Sagatiba,
+               Beefeater, El Dorado 3 -- where the two strings say different
+               things and both are worth reading. Where the longer one simply
+               contains the shorter, printing both is printing one twice, and
+               the longer is the one that answers the question.
+
+               THE CHIP'S VALUE IS UNTOUCHED. This is what a candidate is
+               LABELLED; what gets stored, compared against a card and cleared
+               is still the card name, because that is what the index filters
+               by. */
+            viaReplacesName: (function () {
+              if (normalise(term) === normalise(value)) return false;
+              if (!isDeclared(term)) return false;
+              var termWords = getWords(normalise(term));
+              return getWords(normalise(value)).every(function (w) {
+                return termWords.indexOf(w) !== -1;
+              });
+            })(),
             isPrefixMatch: folded.indexOf(query) === 0,
             hasWordMatch: words.some(function (w) { return w.indexOf(query) === 0; })
           };
@@ -698,11 +756,31 @@
                surfaced `Smith & Cross` out of "Smith AND Cross". The prose list
                already names those words for a different job and it is the same
                set for the same reason. */
-            if (!scored.hasWordMatch) return;
-            var onlyConnector = words.every(function (w) {
-              return w.indexOf(query) !== 0 || proseWords.indexOf(w) !== -1;
-            });
-            if (onlyConnector) return;
+            /* A MULTI-WORD QUERY MATCHES A HIDDEN NAME FROM ITS START, and
+               that is not an exception to the rule above -- it is the same
+               rule. Helen, 2026-08-31: "I do want to be able to type 'el d'
+               and see el dorado."
+
+               `hasWordMatch` asks whether one WORD begins with the whole
+               query, so it can never be true of a query containing a space:
+               "el d" prefixes no single word of "el dorado 12", and typing the
+               bottle's real name found nothing at all. What band 3 exists to
+               refuse is a match that begins in the MIDDLE of a word -- "el"
+               inside "moderat(el)y" -- and a match at the start of the whole
+               string cannot be one of those, because position 0 is a word
+               boundary by definition.
+
+               So the test is "does this name begin with what you typed", which
+               is band 1's own test applied to a name the chip does not show.
+               It cannot readmit the connector case either: `an` is not a
+               prefix of "Smith & Cross". */
+            if (!scored.hasWordMatch && !scored.isPrefixMatch) return;
+            if (scored.hasWordMatch) {
+              var onlyConnector = words.every(function (w) {
+                return w.indexOf(query) !== 0 || proseWords.indexOf(w) !== -1;
+              });
+              if (onlyConnector) return;
+            }
             band = 3;
           }
 
@@ -760,10 +838,42 @@
         });
       }
 
+      /* AN UMBRELLA SUPPRESSES ITS OWN BARE WORD — issue #51's rule, which food
+         has applied in both its pickers since that issue and this index never
+         got. Helen, seeing `gin (all)` and `gin` side by side: "I think gin
+         (all) should suppress gin", and in #51 itself: "I am always suspicious
+         of searches like this, so if I read 'chicken (all)' next to 'chicken'
+         I'd look at both."
+
+         ONLY THE EXACT BARE NAME, never a real multi-word chip: `gin (all)`
+         takes out `gin` and leaves `navy strength gin`, `sloe gin` and every
+         ginger entry where they are, the same way food's rule leaves `chicken
+         breast` alone.
+
+         WHAT IT COSTS, stated because it is real and food pays it too: while
+         the umbrella is on offer there is no way to pick the bare name alone --
+         here `gin` is the card name for London dry, so "London dry and nothing
+         else" is unavailable in that moment.
+
+         HERE RATHER THAN IN THE INDEX, which is where food keeps its copy. The
+         day this rule was ported, the same session had just shipped a startup
+         crash that lived in DOM wiring and that every pure-module test passed
+         straight over. A rule with a reason is a decision, and decisions belong
+         where they can be asked a question. Filtered BEFORE the cap, so the
+         "+N more" count never counts a chip nobody will be shown. */
+      // The buttons array holds BARE labels -- the index appends the suffix
+      // when it draws them -- so there is nothing to strip here. Slicing the
+      // suffix off anyway turned `gin` into an empty string and suppressed
+      // nothing, silently, which is what the test below exists to notice.
+      var umbrellaNames = familyButtons.map(normalise);
+      var offered = ordered.filter(function (candidate) {
+        return umbrellaNames.indexOf(normalise(candidate.entry)) === -1;
+      });
+
       return {
         familyButtons: familyButtons,
-        results: ordered.slice(0, POOL_CAP),
-        hidden: Math.max(0, ordered.length - POOL_CAP)
+        results: offered.slice(0, POOL_CAP),
+        hidden: Math.max(0, offered.length - POOL_CAP)
       };
     }
 
