@@ -901,6 +901,34 @@ ship_scale:
 # the mark keeps its BORDER at every rung: an empty square reads as "rated, and
 # rated low", where a square that vanished would read as "not rated", which is
 # a different fact this scale already holds separately.
+# =============================================================================
+# WHAT A RUNG IS CALLED ON A CARD — the display map. Added 2026-08-30.
+# =============================================================================
+# THE SAME IDIOM `card_names` USES IN ingredients.yml, and for the same reason:
+# a card name may be lossy where the real value may not. `meta.ship` keeps
+# saying "oh gods yes" — Helen's own words, and §9.9 records that the vocabulary
+# existed on 18 drinks before anyone asked for a rating — while the card says
+# `yes²`.
+#
+# WHY THE CARD WANTS SHORTER. The mark is a ship pinned to the card's
+# bottom-right with the word beside it, so the word's length decides where the
+# ship sits. Helen: "the motivation is getting everything to the same number of
+# words, i.e. one, so the cards look more stable." Three of the five were one
+# word already; these two were not.
+#
+# `²` IS THE CHARACTER, NOT MARKUP. House style already prefers a real glyph to
+# a synthetic one — §5 uses unicode fractions (½) rather than markup for exactly
+# this — and it keeps HTML out of a data file, which is where it would have to
+# be escaped or deliberately un-escaped in the template.
+#
+# A RUNG WITH NO ENTRY GETS NO WORD, which is what `QQ` and `who knows` want:
+# they are deliberately off the scale (see the note below), they are 31 of 114
+# drinks, and the card draws the ship without a label rather than inventing a
+# sixth term for "not rated".
+ship_card_names:
+  "not really": "hmm"
+  "oh gods yes": "yes²"
+
 ship_tints:
   "not really": 0
   "meh": 16

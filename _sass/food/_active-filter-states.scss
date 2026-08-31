@@ -81,26 +81,7 @@
 
 // --- Global clear-all button (JS-created, prepended to .controls) -----
 .btn-clear {
-  visibility: hidden;
-  border: none;
-  cursor: pointer;
-  background: none;
-  padding: 0;
-  margin: 0;
-  transition: color 0.1s ease-in-out;
-
-  font-family: $font-body;
-  font-size: 0.88rem;
-  font-weight: 400;
-  text-transform: lowercase;
-  letter-spacing: 0.04em;
-  color: $color-clear-text;
-  text-decoration: underline;
-
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 20;
+  @include index-clear-all;
 
   &:hover {
     color: $color-star-root;
@@ -114,12 +95,7 @@
 // fit-content` gives it a definite (shrink-to-fit) box so `margin-left: auto`
 // has spare width to consume and pushes it to the right, same edge as the
 // top copy, without needing a wrapping element.
-.btn-clear--bottom {
-  position: static;
-  display: block;
-  width: fit-content;
-  margin: $spacing-block-gap 0 0 auto;
-}
+.btn-clear--bottom { @include index-clear-all-bottom; }
 
 // "Nothing to see here." and "Select something to see a list." -- Helen,
 // 2026-08-26: both are "doing the same job" as a recipe row title, so they are

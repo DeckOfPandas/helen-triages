@@ -45,6 +45,10 @@ permalink: /cocktails/
   {% assign taxonomy   = site.data.cocktails.taxonomy %}
   {% assign glasses    = site.data.cocktails.glasses %}
   {% assign ship_tints = taxonomy.ship_tints %}
+  {% comment %} The card's own name for a rung -- see ship_card_names' header in
+     taxonomy.yml. A rung with no entry keeps its own words; `QQ` and `who
+     knows` have neither an entry nor a rung and render no word at all. {% endcomment %}
+  {% assign ship_card_names = taxonomy.ship_card_names %}
   {% assign card_names = site.data.cocktails.ingredients.card_names %}
   {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
   {% comment %} #580: things a card never mentions. Bare `water` and nothing
@@ -97,7 +101,7 @@ permalink: /cocktails/
        a second filter. {% endcomment %}
     <div class="drink-filter drink-filter--chaos">
       <div class="drink-label-row">
-        <h2 class="drink-field-label">YOLO?</h2>
+        <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
       </div>
       <div class="drink-btns">
@@ -120,7 +124,7 @@ permalink: /cocktails/
 
     <div class="drink-filter drink-filter--mood">
       <div class="drink-label-row">
-        <h2 class="drink-field-label">Mood</h2>
+        <h2 class="drink-field-label"><span class="drink-field-label-text">Mood</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-mood" hidden>&times; clear</button>
       </div>
       <div class="drink-btns">
@@ -135,7 +139,7 @@ permalink: /cocktails/
 
     <div class="drink-filter drink-filter--hassle">
       <div class="drink-label-row">
-        <h2 class="drink-field-label">Hassle</h2>
+        <h2 class="drink-field-label"><span class="drink-field-label-text">Hassle</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-hassle" hidden>&times; clear</button>
       </div>
       <div class="drink-btns">
@@ -152,24 +156,45 @@ permalink: /cocktails/
        LEAVE OUT carries no colour at all — Helen: "for food, avoiding can be
        important whereas for drinks surely less so." Food gave its LEAVE OUT a
        sixth hue; this deliberately does not. {% endcomment %}
+      {% comment %} LABEL, INPUT, CLEAR -- ONE ROW, as food's three search
+         sections are. Issue #587, and #548 point 9 is the same change seen from
+         the other end ("move the clear button to the end of the input field
+         rather than next to the section heading"), with point 5 (element widths
+         copied from food) falling out of it.
+
+         `.drink-label-row--search` is a modifier rather than a new class: this
+         is still the label row, with one more thing in it. Chaos, mood and
+         hassle keep the bare `.drink-label-row`, because they have no input to
+         put in it.
+
+         THE CLEAR BUTTON HAS TO RESERVE ITS SPACE NOW. It used the `hidden`
+         attribute, and _filters.scss argued for that over food's
+         `visibility: hidden` on the grounds that "these sit on a label line
+         whose height is fixed by the text beside them, so there is nothing to
+         reserve space for". That was true and is not any more -- beside an
+         input, display:none means the box jumps narrower the instant the button
+         arrives, which is the exact fault food fixed once already (Helen: "cut
+         off even before typing anything -- it ends at the first '.'"). See the
+         rule in _filters.scss; the attribute stays, its CSS meaning changes for
+         these three only. {% endcomment %}
     <div class="drink-searches">
       <div class="drink-filter drink-search drink-search--include">
-        <div class="drink-label-row">
-          <h2 class="drink-field-label"><label for="drink-include">Has to have</label></h2>
+        <div class="drink-label-row drink-label-row--search">
+          <h2 class="drink-field-label"><label for="drink-include"><span class="drink-field-label-text">Has to have</span></label></h2>
+          <input class="drink-search-input" type="text" id="drink-include"
+                 autocomplete="off" placeholder="ingredient name…" />
           <button type="button" class="btn-clear-filter" id="clear-include" hidden>&times; clear</button>
         </div>
-        <input class="drink-search-input" type="text" id="drink-include"
-               autocomplete="off" placeholder="ingredient name…" />
         <div class="drink-pool" id="drink-include-pool" aria-live="polite"></div>
       </div>
 
       <div class="drink-filter drink-search drink-search--exclude">
-        <div class="drink-label-row">
-          <h2 class="drink-field-label"><label for="drink-exclude">Leave out</label></h2>
+        <div class="drink-label-row drink-label-row--search">
+          <h2 class="drink-field-label"><label for="drink-exclude"><span class="drink-field-label-text">Leave out</span></label></h2>
+          <input class="drink-search-input" type="text" id="drink-exclude"
+                 autocomplete="off" placeholder="ingredient name…" />
           <button type="button" class="btn-clear-filter" id="clear-exclude" hidden>&times; clear</button>
         </div>
-        <input class="drink-search-input" type="text" id="drink-exclude"
-               autocomplete="off" placeholder="ingredient name…" />
         <div class="drink-pool" id="drink-exclude-pool" aria-live="polite"></div>
       </div>
     </div>
@@ -182,12 +207,12 @@ permalink: /cocktails/
        myself then read for a while then settle." Last means it is available
        without being the offer. {% endcomment %}
     <div class="drink-filter drink-filter--name">
-      <div class="drink-label-row">
-        <h2 class="drink-field-label"><label for="drink-name">I know what I want</label></h2>
+      <div class="drink-label-row drink-label-row--search">
+        <h2 class="drink-field-label"><label for="drink-name"><span class="drink-field-label-text">I know what I want</span></label></h2>
+        <input class="drink-search-input" type="text" id="drink-name"
+               autocomplete="off" placeholder="drink name…" />
         <button type="button" class="btn-clear-filter" id="clear-name" hidden>&times; clear</button>
       </div>
-      <input class="drink-search-input" type="text" id="drink-name"
-             autocomplete="off" placeholder="drink name…" />
     </div>
   </div>
 
@@ -229,6 +254,14 @@ permalink: /cocktails/
 
       {% assign ship = drink.meta.ship | default: "who knows" %}
       {% assign tint = ship_tints[ship] | default: 0 %}
+      {% comment %} A WORD ONLY IF THE RUNG IS ONE. ship_tints holds every value
+         a drink can carry INCLUDING `who knows` (and `QQ` falls through to it),
+         so it cannot be asked whether something is on the scale. ship_scale
+         can, and is the list that means exactly that. {% endcomment %}
+      {% assign ship_word = "" %}
+      {% if taxonomy.ship_scale contains ship %}
+        {% assign ship_word = ship_card_names[ship] | default: ship %}
+      {% endif %}
 
       {% comment %} `definitely good` is ship yes or oh gods yes; everything
          else is YOLO, duds included — remaking something you disliked IS a
@@ -357,7 +390,15 @@ permalink: /cocktails/
           <span class="drink-card-moods">
             {% comment %} A chip fills in ITS GROUP'S colour rather than one shared colour, so a hassle chip lighting up matches the ultraviolet heading that selected it and not the green one that did not. The group is derived from taxonomy.yml here rather than stored on the drink, because it is a property of the MOOD and a drink that gains a mood should not need retyping. {% endcomment %}{% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<span class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}">{{ m }}</span>{% endfor %}
           </span>
-          <span class="drink-card-ship" style="--ship-tint: {{ tint }}%;">{{ ship }}</span>
+          {% comment %} THE SHIP IS ALWAYS DRAWN, the word only when there is
+             one. `--ship-tint` is gone from here: it filled the old square, and
+             a word is not a quantity. The value stays in taxonomy.yml because
+             the drink PAGE still uses it -- this is the card's mark changing,
+             not the scale. {% endcomment %}
+          <span class="drink-card-ship">
+            <span class="drink-card-ship-icon">{% include icons/ship.svg %}</span>
+            <span class="drink-card-ship-word">{{ ship_word }}</span>
+          </span>
         </div>
       </li>
     {% endfor %}

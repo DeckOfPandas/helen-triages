@@ -165,6 +165,25 @@
      (see _layout.scss) purely so the nav can align with the right edge of
      the CONTENT column -- .site-header itself is edge-to-edge full width,
      with no column of its own to align against otherwise. {% endcomment %}
+  {% comment %} THE WORDMARK AND THE NAV ARE SIBLINGS IN ONE GRID -- issue #551.
+
+     They used to be a centred link in normal flow and an absolutely positioned
+     row, with nothing between them but luck about widths. The nav was pinned
+     into the header's bottom-right corner; the wordmark grew from the middle;
+     and on cocktails they met, because `[ COCKTAILS ]` is wider than
+     HELEN TRIAGES and the wordmark's grid takes the width of whichever row is
+     wider (HANDOVER 13.8). Helen: the tape "covers the start of the navbar on
+     the right".
+
+     A `1fr auto 1fr` grid makes that impossible at every width rather than
+     below a chosen one: the middle track holds the wordmark and cannot grow
+     into the track the nav occupies. Same shape, and the same reasoning, as
+     `.site-footer-top` -- which also places its children explicitly rather than
+     letting them auto-flow, for the same reason it matters here.
+
+     THE NAV STAYS FIRST IN THE MARKUP. It is first in the tab order on purpose
+     (§12), so its column is assigned in CSS rather than by moving it after the
+     wordmark. {% endcomment %}
   <div class="site-header-inner">
     <nav class="site-nav-icons">
       {% for entry in site.data.sites %}
@@ -176,7 +195,6 @@
       {% endfor %}
       <a href="{{ '/about/' | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
     </nav>
-  </div>
   <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">
     <div class="site-logo">
       <div class="site-logo-top">HELEN TRIAGES</div>
@@ -217,6 +235,7 @@
       {% endif %}
     </div>
   </a>
+  </div>
   </header>
 
   <main>

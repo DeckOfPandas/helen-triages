@@ -17,7 +17,25 @@
 // its habit rather than a decision anyone made.
 // =============================================================================
 
-.drink-filters { margin: 0 0 $spacing-section-gap; }
+// THE SPACE ABOVE THE FIRST HEADING, matched to food -- #548 point 1, and it
+// was 0 here against food's 2.5rem. Both pages sit in the same `main` padding
+// and both open with a zero-height visually-hidden <h1>, so everything above
+// the first filter was already identical; what food adds and this did not is
+// `.controls { padding-top: $space-lg }` plus the first `.category`'s own
+// 1.5rem top margin. The filters began flush against the header.
+//
+// PADDING, NOT MARGIN, and that is what makes the sum work. Padding on the
+// wrapper stops the first section's top margin collapsing out through it, so
+// the two add rather than the larger swallowing the smaller -- which is
+// precisely how food gets 2.5rem from a 1rem and a 1.5rem.
+// Shared with food's `.controls` -- @mixin index-panel in shared/_rule.scss.
+// `position: relative` comes with it and is load-bearing: the clear-all is
+// absolutely positioned and this is what it anchors to. Without it the button
+// resolved against the page and sat somewhere else entirely.
+.drink-filters {
+  @include index-panel;
+  margin: 0 0 $spacing-section-gap;
+}
 
 // The section labels: MOOD, CHAOS, HAS TO HAVE, LEAVE OUT.
 // =============================================================================
@@ -44,15 +62,23 @@
 // inset box-shadow on an inline span paints a band exactly as wide as the
 // words, which is what makes food's headings read as stamped rather than
 // ruled.
+// TYPE COPIED FROM FOOD'S `.category-label`, at Helen's ask on 2026-08-30:
+// "spacing, section heading font and sizes, spacing between sections, I think
+// please copy those". 1.35rem and 0.08em are food's own numbers, not a nearby
+// pair -- these two sections are the same control panel doing the same job, and
+// §13.4 already argues that an index is a control panel where a recipe page is
+// a document.
+//
+// WHAT IS NOT COPIED IS THE MARK. Food's is a green-and-violet stepped bar;
+// this is five greens over one electric absinthe. That is the divergence Helen
+// kept when she closed #486 ("the design vision has moved on") -- same device,
+// same type, different palette, which is the arrangement that reads as sister
+// sites rather than as one site failing to match the other.
 .drink-field-label {
   display: block;
-  font-family: $font-headings;
-  font-size: 1.05rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  @include index-section-label;
   color: $color-text;
-  margin: 0 0 $space-md;
+  margin: 0;
 
   // The colour lands on the WORDS, not the row, so the band stops where the
   // heading does. A label wrapping its own <label> element (the search fields
@@ -61,25 +87,92 @@
   &::after { display: inline; }
 }
 
+// THE MARK GOES ON AN INLINE SPAN, NOT ON THE HEADING, and this is the fix for
+// "all the cocktail headings sit lower in the double underline than food".
+//
+// The mixin positions its bars from the TOP of the box it paints. Food puts it
+// on `.category-label-text`, an inline span, whose box is the font's own
+// content area. This put it on the h2 -- a flex item, so blockified -- whose
+// box is a whole line-height tall and starts half a leading higher. Same code,
+// same numbers, box a few pixels taller, bar in the wrong place relative to the
+// letters. Sharing the mixin was never going to fix that on its own.
+
 // One rule per section, and each hue is the same fact the CARDS already show —
 // see _palette.scss. A heading's colour is a promise the card keeps.
+// TWO BARS, AND THE ORDER OF THE SHADOWS IS THE ORDER ON THE PAGE, backwards.
+// An inset shadow of -0.18em paints the bottom 0.18em; the -0.34em one paints
+// the bottom 0.34em but sits BEHIND it, so only the strip from 0.18 to 0.34
+// shows. First listed is therefore the LOWER bar and second is the one hugging
+// the letters -- which is why $color-heading-shared is written first.
+//
+// The bar stops where the words do. `.drink-field-label` is display:block, so
+// the shadow would run the container's width; every heading is a flex item
+// inside `.drink-label-row`, which shrinks it to its content. That is
+// load-bearing rather than incidental -- take a heading out of a flex row and
+// its bar silently becomes full-width.
+// ONE MARK, TWO PALETTES. `heading-rule` used to be cocktails' own drawing of
+// food's device -- its own dials, its own geometry, and a bug in it that took
+// four rounds of Helen spotting differences to find: an inset box-shadow is
+// measured from the BOTTOM of the box, so the bars sat below the descender line
+// instead of overlapping the letters, and would have moved again the first time
+// anything touched the line-height.
+//
+// It calls the real thing now. `overlapping-rule-double` moved to
+// _sass/shared/_rule.scss on 2026-08-30 and takes both colours as arguments, so
+// this is the same code food's headings run, with green over absinthe instead
+// of green over violet. The geometry cannot drift because there is only one of
+// it.
+//
+// $rule-under-inset-right is food's default and right here for the same reason
+// it is right there: it gives back the letter-spacing after the last character,
+// so the lower bar stops inside the lettering rather than trailing past it.
+// Both headings carry 0.08em of tracking, so the number transfers exactly.
 @mixin heading-rule($colour) {
-  box-shadow: inset 0 -0.3em 0 $colour;
-  padding: 0 0.12em 0.02em 0;
+  @include overlapping-rule-double($colour, $color-heading-shared);
 }
 
-.drink-filter--chaos   .drink-field-label { @include heading-rule($color-radiant-reposado); }
-.drink-filter--mood    .drink-field-label { @include heading-rule($color-electric-absinthe); }
-.drink-filter--hassle  .drink-field-label { @include heading-rule($color-ultra-yvette); }
-.drink-search--include .drink-field-label { @include heading-rule($color-cosmic-cosmopolitan); }
-.drink-filter--name    .drink-field-label { @include heading-rule($color-luminous-lagoon); }
+.drink-filter--chaos   .drink-field-label-text { @include heading-rule($color-heading-yolo); }
+.drink-filter--mood    .drink-field-label-text { @include heading-rule($color-heading-mood); }
+.drink-filter--hassle  .drink-field-label-text { @include heading-rule($color-heading-hassle); }
+.drink-search--include .drink-field-label-text { @include heading-rule($color-heading-include); }
+.drink-filter--name    .drink-field-label-text { @include heading-rule($color-heading-name); }
 
 // LEAVE OUT CARRIES NO HUE, and the absence is the decision. Helen: "for food,
 // avoiding can be important whereas for drinks surely less so." Food gave its
 // LEAVE OUT a sixth colour precisely because it had earned one; this has not.
 .drink-search--exclude .drink-field-label { color: $color-clear-text; }
 
-.drink-filter { margin: 0 0 $spacing-section-gap; }
+// FOOD'S GAP BETWEEN SECTIONS, not this file's own. It was
+// $spacing-section-gap (3rem), which is the RECIPE PAGE's "below a section"
+// token; food's index uses $index-section-gap ($space-xl, 1.5rem) and §13.4
+// says why the two differ -- "the index is a control panel (every section
+// visible in one glance); the recipe page is a document (space isolates the one
+// section you're mid-task on). Keep the ratio near 2:1." This page is a control
+// panel and was spaced like a document.
+//
+// $index-section-gap by name now: it moved to shared/_tokens.scss on
+// 2026-08-30, so both indexes name the same gap rather than spelling the same
+// number twice.
+// Shared -- @mixin index-section. A flex column whose GAP spaces the label
+// from its buttons, which is why nothing inside carries a margin any more.
+.drink-filter { @include index-section; }
+
+// EXCEPT INSIDE THE PAIR, where the grid owns the spacing -- and this is #548
+// point 4, "there is too much vertical space between has to have and leave out
+// in single column mode".
+//
+// IT WAS AN ADDITION NOBODY WROTE. Grid items do not collapse margins, so the
+// stacked gap was the grid's own `gap` PLUS each field's bottom margin:
+//
+//     1.5rem (gap at <=720px)  +  3rem ($spacing-section-gap)  =  4.5rem
+//
+// The margin was for separating one filter section from the next in normal
+// flow, where it collapses against its neighbour and costs 3rem once. Inside a
+// grid it collapses against nothing and is simply added. Zeroing it leaves the
+// grid's 1.5rem, which is the value food's own `.search-pair` uses when it
+// stacks -- so the fix is a deletion rather than a fourth number to keep in
+// step with three others.
+.drink-searches > .drink-filter { margin: 0; }
 
 .drink-btns {
   display: flex;
@@ -106,14 +199,62 @@
 // whose height is fixed by the text beside them, so there is nothing to
 // reserve space for and a permanently-present "clear" that does nothing is
 // worse than one that arrives.
-.drink-label-row {
-  display: flex;
-  align-items: baseline;
-  gap: $space-md;
-  margin: 0 0 $space-md;
+//
+// THAT IS STILL TRUE OF CHAOS, MOOD AND HASSLE, AND STOPPED BEING TRUE OF THE
+// THREE SEARCH FIELDS on 2026-08-30 (#587 / #548.9), when their clear moved
+// onto the input's own row. Beside an input, `display: none` means the box
+// widens and narrows as the button comes and goes -- the exact fault food fixed
+// once already. `.drink-label-row--search` below keeps the attribute and
+// changes what it costs.
+// Shared -- @mixin index-label-row. It was `align-items: baseline` with its
+// own bottom margin; the margin is the section's gap now, and centre rather
+// than baseline because the row holds a 1.35rem heading beside a 0.88rem link
+// and baseline-aligning those two sets the row's height from the larger
+// ascent -- which is one of the things that put these headings and food's at
+// different heights.
+.drink-label-row { @include index-label-row; }
 
-  .drink-field-label { margin: 0; }
+// --- a label row with an input in it ------------------------------------------
+// #587, and #548 point 9 from the other end. Food's three search sections put
+// the heading, the box and the clear on ONE line; these put the heading and the
+// clear on one line with the box beneath, so the same control read as two
+// different shapes on two sibling pages.
+//
+// A MODIFIER, NOT A NEW CLASS: it is still the label row, with one more thing in
+// it, and §11.3's convention is a flat noun for the thing and `--modifier` for
+// its variant with the base class always present.
+.drink-label-row--search {
+  // Shared with food's `.search-input` -- @mixin index-search-row and its two
+  // companions in shared/_rule.scss. The gap, the max-width and the two flex
+  // rules were all written out here by hand and had already drifted from food's,
+  // which is exactly the class of difference Helen kept finding one screenshot
+  // at a time.
+  @include index-search-row;
+
+  .drink-field-label { @include index-search-row-label; }
+
+  .drink-search-input {
+    @include index-search-row-input;
+    // The gap below belongs to the row, which already has one.
+    margin-bottom: 0;
+  }
+
+  // KEEPS ITS BOX WHEN HIDDEN, unlike the label-row clears. The `hidden`
+  // attribute stays -- showClear() sets it, and it is honest for a control that
+  // does nothing yet -- but beside an input it must not take the row's width
+  // with it. visibility also keeps it out of the tab order, which display:none
+  // was doing and which is still wanted.
+  .btn-clear-filter[hidden] {
+    display: inline;
+    visibility: hidden;
+  }
 }
+
+// Inside the two-column grid each field already has its column, so the 620px cap
+// would only ever make the two boxes end short of their own edges -- and unequal
+// to each other, since the columns are equal and the caps are not proportional.
+// Food's `.search-pair` sets `max-width: none` for exactly this reason.
+.drink-searches .drink-label-row--search { max-width: none; }
 
 .btn-clear-filter {
   border: 0;
@@ -133,33 +274,47 @@
   &[hidden] { display: none; }
 }
 
-.drink-filter--mood    .btn-clear-filter { color: $color-electric-absinthe-deep;    &:hover { color: $color-electric-absinthe; } }
-.drink-filter--hassle  .btn-clear-filter { color: $color-ultra-yvette-deep; &:hover { color: $color-ultra-yvette; } }
-// HASSLE'S BUTTONS ARE .btn-mood TOO, so without this they take MOOD's green
-// and contradict their own ultraviolet heading. They share the class because
-// they share the behaviour -- both write into `chosenMoods` and a drink
-// matching either is matched the same way -- so the colour is overridden here
-// rather than the class being split, which would mean the script tracking two
-// sets that behave identically.
+// ONE COLOUR FOR EVERY CLEAR BUT ONE -- Helen, 2026-08-30: "clear buttons for
+// all filters other than leave out should be absinthe or a darkened shade for
+// legibility, lightening on mouseover."
 //
-// ULTRAVIOLET IS THE ONE FILL THAT TAKES LIGHT TEXT. Measured: ink on it is
-// 3.14:1 and fails, white is 5.47:1. Nothing darkened clears 4.5 at all,
-// because the fill is already dark -- a vivid blue-violet has no bright
-// version to be a fill. It is the odd one of the five and this is where that
-// shows.
-.drink-filter--hassle .btn-mood {
-  &:hover,
-  &:focus-visible {
-    border-color: $color-ultra-yvette-deep;
-    color: $color-ultra-yvette-deep;
-  }
+// The deep, not the raw hue: electric absinthe is 1.55:1 on paper and cannot be
+// read as text at 0.78rem. -deep is solved to 4.71:1. Hover goes to the full
+// strength, which is the "lightening on mouseover" she asked for and is also
+// how food's own inline clears behave -- they rest at a darkened root and
+// lighten to it.
+//
+// They used to take their section's hue, one rule each. That said "this clear
+// belongs to this section", which the reader can already see from where it is;
+// what it cost was five different greens and violets doing a job that is the
+// same job everywhere. LEAVE OUT keeps its own, below, because that section
+// deliberately spends no colour at all.
+.drink-filter--chaos   .btn-clear-filter,
+.drink-filter--mood    .btn-clear-filter,
+.drink-filter--hassle  .btn-clear-filter,
+.drink-search--include .btn-clear-filter,
+.drink-filter--name    .btn-clear-filter {
+  color: $color-electric-absinthe-deep;
 
-  &.is-on {
-    background: $color-ultra-yvette;
-    border-color: $color-ultra-yvette-deep;
-    color: $color-white;                        // 5.47:1 on the fill
-  }
+  &:hover,
+  &:focus-visible { color: $color-electric-absinthe; }
 }
+// A `.drink-filter--hassle .btn-mood` OVERRIDE STOOD HERE AND IS GONE, because
+// the thing it corrected for no longer exists. Hassle's buttons carry .btn-mood
+// (they share the class because they share the behaviour -- both write into the
+// same set, and a drink matching either is matched the same way), so while a
+// selected button filled in ITS SECTION'S colour they had to be pushed off
+// MOOD's green and onto ultraviolet, or they pointed at the wrong heading.
+//
+// Selected buttons take MAGENTA now, on every section, because the colour means
+// "matched" rather than "this section" -- so there is nothing left to correct
+// and one rule serves both.
+//
+// One measurement worth not losing with it: ultraviolet was the single fill in
+// the five that needed LIGHT text. Ink on it is 3.14:1 and fails, white is
+// 5.47:1, and nothing darkened clears 4.5 at all, because the fill is already
+// dark -- a vivid blue-violet has no brighter version to be a fill from. If
+// ultraviolet is ever used as a fill again, it is the one that cannot take ink.
 
 .drink-filter--chaos   .btn-clear-filter { color: $color-radiant-reposado-deep;   &:hover { color: $color-radiant-reposado; } }
 .drink-search--include .btn-clear-filter { color: $color-cosmic-cosmopolitan-deep;     &:hover { color: $color-cosmic-cosmopolitan; } }
@@ -183,85 +338,145 @@
   line-height: 1.3;
 }
 
-.btn-mood {
-  @extend %drink-btn-base;
-  font-size: 0.92rem;
-  padding: 0.42rem 0.95rem;
+// NAKED WORDS THAT BAND ON CLICK -- Helen, 2026-08-30: "we need to change the
+// filter buttons, quite a bit. Maybe just naked words that underline on click?"
+//
+// WHY THEY HAD TO GO. She had already named the symptom -- "the way the chips
+// currently fill in under the filters was beginning to become too loud for me
+// anyway" -- and it was one rule the site had already adopted failing to reach
+// one place. §9.13 settled BANDS AND WASHES, NOT FILLS on 2026-08-28, after
+// "there's just a lot going on... underline the ingredient rather than
+// highlight", and left "the goodness mark is the only fill left on a card". The
+// cards were converted. These were not, so ten filled boxes sat above cards
+// that had deliberately stopped filling anything.
+//
+// MAGENTA, WHICH IS NOT THIS SECTION'S HUE, and that is the argument for it.
+// Magenta now means MATCHED everywhere on a card -- the ingredient band and the
+// mood chip both wear it. A selected filter in the same magenta says the
+// control and the thing it lit up are one idea: the card answers the button in
+// the button's own colour. Colouring each button by its section instead would
+// say which heading it sits under, which the reader can already see, and would
+// lose the only cross-reference that is hard to see.
+//
+// The chip-shaped candidates in the two search pools are NOT touched. Helen:
+// "the search returns could stay as they are." They are a different control --
+// an unbounded list you pick from, not a fixed set you toggle.
+// FOOD'S `.btn-tag` TYPE, WITHOUT ITS SHAPE -- Helen, 2026-08-30: "please try
+// matching the font and style of food's chips for cocktail filter buttons, just
+// not the background shape."
+//
+// So every value below except the background and the band is food's own:
+// $font-headings at 0.75rem, lowercase, weight 700, its resting grey, its
+// padding and its margins. What is left behind is the tape shape -- the thing
+// that made these read as filled boxes.
+//
+// THE ACTIVE STATE IS FOOD'S TOO, and the two halves do different jobs. Food
+// goes uppercase and adds a stroke in the letter's OWN colour, which is a
+// faux-bold: Courier Prime ships only Regular and Bold, so `font-weight` has
+// nowhere left to go above 700 and thickening the glyph is the only way to read
+// heavier (§13.4.2). Uppercase costs no width here because the face is
+// monospaced -- which is exactly why food gets away with it and why #389's rule
+// that a selected filter must not resize itself still holds.
+//
+// 0.05em is food's `$faux-bold-stroke`, restated rather than imported: that
+// variable lives in _sass/food/_palette.scss and cocktails cannot see it.
+%drink-btn-naked {
+  font-family: $font-headings;
+  font-size: 0.75rem;
+  text-transform: lowercase;
+  font-weight: 700;
+  border: 0;
+  background: none;
+  padding: $space-xs $space-md;
+  margin: 0.2rem 0.45rem 0.2rem 0;
+  color: lighten($color-text, 22%);
+  cursor: pointer;
+  line-height: 1.3;
 
   &:hover,
-  &:focus-visible {
-    border-color: $color-electric-absinthe-deep;
-    color: $color-electric-absinthe-deep;
-  }
+  &:focus-visible { color: $color-text; }
 
-  // A fill, not a border change: with ten of these in a row a 1px border
-  // difference is not findable at a glance. Same conclusion the goodness
-  // scaffold reached about its own buttons.
-  // ACTIVE TEXT IS SOLVED PER HUE, NOT SET TO ONE DARKEN PERCENTAGE, and the
-  // percentages differing is the point rather than an inconsistency. These
-  // fills are five different lightnesses, so one darken() value gives five
-  // different contrasts -- with the neon palette the old uniform 22%/25% put
-  // MOOD at 10.99:1 (nearly black on bright green) and HAS TO HAVE at 3.61:1,
-  // which fails AA. Each is now solved to about 5.3:1: readable, and still
-  // visibly the section's colour rather than collapsing to black.
+  // One band, where a heading carries two. Same device, one level down -- the
+  // heading names a question and a chosen answer sits under it, so the answer
+  // wearing a simpler version of the heading's own mark is the hierarchy.
+  // NO CAPITALS ON CLICK -- Helen, 2026-08-30. Food's chips go uppercase when
+  // selected and it costs them no width, the face being monospaced; here it
+  // read as the word changing rather than the word being chosen. The faux-bold
+  // stroke stays, which is the half that actually carries weight (§13.4.2).
+  //
+  // text-decoration, NOT AN INSET SHADOW, and this is #548's "the underline
+  // extends left and right beyond the text". A box-shadow paints the PADDING
+  // box, and these carry food's 0.75rem of horizontal padding -- inherited from
+  // chips that needed room for a tape shape this design does not draw. So the
+  // band ran the full hit area. text-decoration paints the GLYPHS, so the
+  // padding keeps its job (a comfortable target) and the band hugs the word.
+  //
+  // Helen offered the alternative -- "lose the horizontal spaces, or retain the
+  // space but calculate how to shorten the underline" -- and this is neither:
+  // it needs no calculation, because the underline was never measuring the
+  // right box. It is also the mechanism .drink-card-hit and .drink-card-ship-word
+  // already use, so "a coloured band under text" stays one thing.
   &.is-on {
-    background: $color-electric-absinthe;
-    border-color: $color-electric-absinthe-deep;
-    color: darken($color-electric-absinthe-deep, 9%);   // 5.25:1 on the fill
-    font-weight: 600;
+    color: $color-text;
+    -webkit-text-stroke: 0.05em $color-text;
+    text-decoration: underline;
+    text-decoration-color: $color-cosmic-cosmopolitan;
+    text-decoration-thickness: 0.22em;
+    text-underline-offset: 0.18em;
+    text-decoration-skip-ink: none;
   }
 }
 
-// Chaos is a goodness question, so it wears goodness's colour -- the same
-// amber as the mark on every card.
-// THESE USED TO BE SET IN THE HEADING'S EXACT TYPEFACE, SIZE, CASE AND
-// LETTERSPACING -- 0.78rem uppercase mono, the same as .drink-field-label was.
-// So "HOW MUCH CHAOS?" and "DEFINITELY GOOD" were visually the same class of
-// object, and the page had two things competing to look like headings with the
-// actual heading the quieter of the two. That is half of why Helen could not
-// read them. A control should not dress as a label.
-.btn-chaos {
-  @extend %drink-btn-base;
-  font-size: 0.92rem;
-
-  &:hover,
-  &:focus-visible {
-    border-color: $color-radiant-reposado-deep;
-    color: $color-radiant-reposado-deep;
-  }
-
-  &.is-on {
-    background: $color-radiant-reposado;
-    border-color: $color-radiant-reposado-deep;
-    color: darken($color-radiant-reposado-deep, 23%);  // 5.28:1 on the fill
-    font-weight: 600;
-  }
-}
+.btn-mood  { @extend %drink-btn-naked; }
+.btn-chaos { @extend %drink-btn-naked; }
 
 // --- the two ingredient fields -----------------------------------------------
+// NO RULE ABOVE IT -- #548 point 3. A full-width border sat here, separating
+// HASSLE from HAS TO HAVE for no reason the other four section boundaries
+// needed one: every other section is divided by space alone. Helen listed it
+// with the amber bar above the count, and it is the same fault -- structure
+// drawn where structure was already legible.
+//
+// The padding it held the row off goes with it; the gap between sections is
+// `.drink-filter`'s own margin, one value for all five.
 .drink-searches {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: $spacing-block-gap;
-  margin-top: $spacing-block-gap;
-  padding-top: $spacing-block-gap;
-  border-top: 1px solid $color-border;
+  margin-top: $index-section-gap;
 }
 
 .drink-search-input {
-  font-family: $font-body;
-  font-size: 0.9rem;
+  // Food's own -- @mixin index-search-input-type in shared/_rule.scss. These
+  // were $font-body at 0.9rem, which read as a form field rather than as the
+  // filter value it produces.
+  @include index-search-input-type;
   width: 100%;
   padding: $space-xs 0.1rem;
   border: none;
-  border-bottom: 1.5px solid $color-cosmic-cosmopolitan;
+  // NEUTRAL, NOT THE SECTION'S HUE -- Helen, 2026-08-30: "please update the
+  // border colours of the has to have and I know what I want input fields to
+  // the same neutral grey food's input fields use."
+  //
+  // Derived the way food derives it (`lighten($color-clear-text, 25%)`) rather
+  // than copied as a hex, so it follows this palette's own grey.
+  //
+  // It also stops the box making a claim the page no longer makes. A magenta
+  // underline said "this is HAS TO HAVE's field" while magenta meant that
+  // section; magenta now means MATCHED, everywhere, so an unfilled input
+  // wearing it was announcing a match that had not happened.
+  border-bottom: 1.5px solid lighten($color-clear-text, 25%);
   background: transparent;
   margin-bottom: $space-md;
 
   &:focus {
     outline: none;
-    border-bottom-color: $color-cosmic-cosmopolitan-deep;
+    border-bottom-color: lighten($color-clear-text, 5%);
   }
+
+  // These had no placeholder rule at all, so the prompt sat at the browser's
+  // own weight and colour beside food's lighter, quieter one.
+  &::placeholder { @include index-search-placeholder; }
 }
 
 // #588, and #548 point 6 is the same line. THREE inputs share this rule and the
@@ -273,11 +488,10 @@
 // section's is luminous-lagoon -- the same hue the matched run of a drink name
 // is banded in (.drink-name-hit). An underline in magenta under a lagoon
 // heading says the box belongs to the section above it, which it does not.
-.drink-filter--name .drink-search-input {
-  border-bottom-color: $color-luminous-lagoon;
+// The name field had its own lagoon override (#588, so it would stop wearing
+// HAS TO HAVE's magenta). Both are neutral now, so there is nothing to override
+// and the rule is gone rather than restating the value it inherits.
 
-  &:focus { border-bottom-color: $color-luminous-lagoon-deep; }
-}
 
 .drink-pool {
   display: flex;
@@ -315,14 +529,27 @@
     color: $color-cosmic-cosmopolitan-deep;
   }
 
+  // BANDS, DOES NOT FILL -- Helen, 2026-08-30: "has to have chips should show
+  // magenta underline on select rather than fill in on select." The last fill
+  // on the page, and the same call §9.13 made for the cards on 2026-08-28.
+  //
+  // The border still changes, because a chip has an outline where a filter word
+  // does not -- so it has two things to move and uses both. The contrast note
+  // this replaces is kept next door in the palette: ink was chosen over a
+  // darkened magenta because magenta's fill is light enough that the deep has
+  // to go almost to black before it clears 4.5, at which point it is not
+  // magenta any more. With no fill the question does not arise; the text is ink
+  // on paper at 16:1.
   &.is-on {
-    background: $color-cosmic-cosmopolitan;
+    background: none;
     border-color: $color-cosmic-cosmopolitan-deep;
-    // Ink, not a darkened magenta. Magenta's fill is light enough that the
-    // darkened deep has to go almost to black (41%) before it clears 4.5 --
-    // at which point it is not magenta any more, so the honest version is ink.
-    color: $color-text;                         // 4.57:1 on the fill
+    color: $color-text;
     font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: $color-cosmic-cosmopolitan;
+    text-decoration-thickness: 0.18em;
+    text-underline-offset: 0.16em;
+    text-decoration-skip-ink: none;
   }
 }
 
@@ -354,12 +581,41 @@
       border-color: $color-text;
       color: $color-text;
       font-weight: 600;
-      text-decoration: line-through;
+
+      // THE STRIKE RUNS THROUGH THE INGREDIENT, NOT THROUGH THE ×, and that is
+      // why the chip's word sits in a span of its own. This declaration was on
+      // the button until 2026-08-30; the moment a chosen chip gained a trailing
+      // × (Helen: "add an x for a clear button to the right of selected chips
+      // on the cocktail site, same as food"), a button-level line-through
+      // struck the × too -- which reads as "this control is disabled" rather
+      // than "this ingredient is out".
+      //
+      // Food met this first and fixed it identically: its own rule strikes only
+      // .btn-exclude-label. Same bug, same shape, same answer -- worth noting
+      // because the two pickers are separate code and arrived at it separately.
+      .btn-pool-label { text-decoration: line-through; }
     }
   }
 }
 
 // --- the count ---------------------------------------------------------------
+// NO RULE ABOVE IT -- #548 point 7. It carried `border-top: 2px solid
+// $color-radiant-reposado`, a full-width amber bar between the filters and the
+// count. Helen: "distracting."
+//
+// It was also borrowing a hue it has no claim on. §9.13's rule is that a
+// heading's colour is a promise the card keeps -- reposado means YOLO/goodness
+// here, and it is the ship mark's colour -- so a reposado bar above a line that
+// has nothing to do with goodness said something untrue in the site's own
+// vocabulary. Food reached the same conclusion for the same reason and states
+// it outright: its `.results-heading` "carries no colour rule underneath... it
+// isn't one of the five filter categories, so it doesn't borrow one of their
+// hues."
+//
+// `padding-top` stays. It existed to hold the text off the rule, and with the
+// rule gone it simply adds to the margin -- keeping it leaves the spacing
+// exactly as it is, which is a separate question (#548 point 1) from whether
+// there is a bar.
 .drink-count {
   font-family: $font-headings;
   font-size: 0.8rem;
@@ -368,7 +624,6 @@
   color: $color-clear-text;
   margin: $spacing-block-gap 0 $space-xl;
   padding-top: $space-md;
-  border-top: 2px solid $color-radiant-reposado;
 
   strong { color: $color-text; font-size: 1rem; }
 }
@@ -448,13 +703,23 @@
 // `mark` ARRIVES WITH A UA BACKGROUND -- Mark/MarkText, usually a hard yellow --
 // which is exactly the fill this design does not use anywhere. Both are reset
 // rather than overridden by accident.
+// YVETTE, AND THICKER -- Helen, 2026-08-30. It was luminous-lagoon on the
+// reasoning that I KNOW WHAT I WANT carries lagoon and a heading's colour is a
+// promise the card keeps (§9.13). That promise is not made any more: the
+// headings are five greens now, and lagoon is not among them, so the band was
+// answering a heading that no longer exists. Ultraviolet is unspoken for and is
+// the one accent still doing nothing on this page.
+//
+// 0.14em to 0.2em because at name-search size the thinner band read as a
+// hairline rather than as a mark.
 .drink-name-hit {
   background: none;
   color: inherit;
   text-decoration: underline;
-  text-decoration-thickness: 0.14em;
-  text-underline-offset: 0.14em;
-  text-decoration-color: $color-luminous-lagoon;
+  text-decoration-thickness: 0.2em;
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: none;
+  text-decoration-color: $color-ultra-yvette;
 }
 
 // --- clear all, top and bottom — #541 ----------------------------------------
@@ -473,33 +738,15 @@
 // `visibility`, not `display`: the button appears the moment a filter is set,
 // and a row that changes height as you click the first mood is a page that
 // moves under you. Its space is reserved from the start.
-.btn-clear {
-  visibility: hidden;
-  display: block;
-  margin: 0 0 $space-md auto;
-  border: 0;
-  background: none;
-  padding: 0;
-  cursor: pointer;
+// Shared with food's -- @mixin index-clear-all. It was a block pushed right
+// with `margin-left: auto`, at its own size and colour; food's is pinned to the
+// panel's top-right corner. Helen: "I'd expect the clear all button to look the
+// same and be in the same place too."
+.btn-clear { @include index-clear-all; }
 
-  font-family: $font-body;
-  font-size: 0.82rem;
-  font-weight: 400;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
-  text-decoration: underline;
-  color: $color-clear-text;
-  transition: color 0.1s ease-in-out;
+// Shared -- @mixin index-clear-all-bottom.
+.btn-clear--bottom { @include index-clear-all-bottom; }
 
-  // Ink on hover rather than a hue. Clear-all is the one control that belongs
-  // to no section, so it can borrow no section's colour -- the same reason the
-  // survivor count and the empty state carry none.
-  &:hover,
-  &:focus-visible { color: $color-text; }
-}
-
-.btn-clear--bottom { margin: $space-xl 0 0 auto; }
-
-@media (max-width: 720px) {
-  .drink-searches { grid-template-columns: 1fr; gap: $space-xl; }
+@media (max-width: $index-stack-width) {
+  .drink-searches { grid-template-columns: 1fr; gap: $index-section-gap; }
 }

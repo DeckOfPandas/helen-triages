@@ -17,6 +17,7 @@ permalink: /food/
   {% assign ingredients_data = site.data.food.filter_sections.ingredients %}
   {% assign tag_groups = site.data.food.filter_sections.tag_groups %}
   {% assign name_search_data = site.data.food.filter_sections.name_search %}
+  {% assign exclude_data = site.data.food.filter_sections.exclude %}
 
   {% comment %} DRAFTS JOIN THE LIST ONLY IF THEY ACTUALLY PUBLISH. `site.food_drafts`
      is populated whenever the collection is DECLARED, which _config.yml does
@@ -92,148 +93,138 @@ permalink: /food/
     %}
   {% endfor %}
 
-  <div class="category search search--ingredients">
-    <div class="search-input">
-      <label class="category-label" for="ingredient-search-box">
-        <span class="category-label-text">{{ ingredients_data.label }}</span>
-      </label>
-      <input type="text" id="ingredient-search-box" autocomplete="off" placeholder="ingredient name..." />
-      {% comment %} visibility, not display: none -- the button's own space
-         stays reserved in the row from the start, so the input doesn't
-         suddenly lose width the instant this appears. See its rule in
-         _sass/food/_layout.scss for the fuller story. {% endcomment %}
-      <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="visibility: hidden;">&times; clear</button>
-    </div>
-    {% comment %} Populated by filters.js as you type; aria-live announces the
-       change so it is not a silent update. {% endcomment %}
-    <div class="category-buttons search-results" id="ingredient-results-pool" aria-live="polite"></div>
-  </div>
+  {% comment %} HAS TO HAVE AND LEAVE OUT ARE ONE QUESTION, ASKED ON ONE LINE --
+     GitHub issue #586, and it is the shape cocktails' index already has (its
+     `.drink-searches`, HANDOVER 9.13). Helen: "has to have then leave out on
+     the same line".
 
-  <div class="category search search--name">
-    <div class="search-input">
-      {% comment %} THE HEADING AND THE REVEAL LINK ARE ONE STACK -- GitHub issue
-         #275, "centered under I KNOW WHAT I WANT".
+     They are two halves of "what is in it", answered in opposite directions,
+     and reading them as one row is what says so. Stacked, LEAVE OUT read as a
+     sixth filter category that happened to be about ingredients; beside its
+     own opposite it reads as the other half of a pair.
 
-         The link used to live below, inside .search--exclude with the panel it
-         opens. Centring it under the heading from there is not something CSS
-         can express: "centre B under A" needs A and B in one sizing context,
-         and the heading sits inside .search-input while the link sat a level
-         deeper in a different wrapper.
-
-         Putting them in ONE grid was tried first and is instructive. The
-         panel and the active list are in that same wrapper, so they joined
-         the grid too, spanning every column -- and a spanning item still
-         contributes to an intrinsic track's size, so the LEAVE OUT panel
-         decided the width of the column the heading was meant to define. The
-         heading's column came out ~116px wider than the heading, and the
-         search input beside it moved right by the same amount.
-
-         So the stack holds ONLY the two things being centred on each other.
-         .name-heading-stack is the wordmark's own mechanism (HANDOVER 13.8):
-         one max-content column, both rows in it, the column as wide as the
-         wider of the two, the narrower centred. Nothing else can inflate it.
-
-         The button stays wired to the panel by aria-controls, which is
-         id-based and does not care that they are no longer siblings. {% endcomment %}
-      <div class="name-heading-stack">
-        <label class="category-label" for="name-search-box">
-          <span class="category-label-text">{{ name_search_data.label }}</span>
+     The pair is a real wrapper rather than a rule on the two sections, because
+     the GAP has to belong to something: .category carries its own
+     $index-section-gap top and bottom, and grid items do not collapse margins
+     the way the block-flow siblings did, so leaving them on would have doubled
+     the space above and below this row. The wrapper owns it now and its
+     children have theirs zeroed -- one value, in _search.scss. {% endcomment %}
+  <div class="search-pair">
+    <div class="category search search--ingredients">
+      <div class="search-input">
+        <label class="category-label" for="ingredient-search-box">
+          <span class="category-label-text">{{ ingredients_data.label }}</span>
         </label>
-        <div class="exclude-reveal-row">
-          <button type="button" class="btn-reveal" id="exclude-reveal" aria-expanded="false" aria-controls="exclude-panel">(I know what I don't want)</button>
-        </div>
+        <input type="text" id="ingredient-search-box" autocomplete="off" placeholder="ingredient name..." />
+        {% comment %} visibility, not display: none -- the button's own space
+           stays reserved in the row from the start, so the input doesn't
+           suddenly lose width the instant this appears. See its rule in
+           _sass/food/_layout.scss for the fuller story. {% endcomment %}
+        <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="visibility: hidden;">&times; clear</button>
       </div>
-      <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
-      <button type="button" class="btn-clear-inline" id="name-search-clear" style="visibility: hidden;">&times; clear</button>
+      {% comment %} Populated by filters.js as you type; aria-live announces the
+         change so it is not a silent update. {% endcomment %}
+      <div class="category-buttons search-results" id="ingredient-results-pool" aria-live="polite"></div>
     </div>
 
     {% comment %} THE DISLIKE NAVIGATOR -- GitHub issue #52. "I have invited
        someone for dinner and they hate peas, so I want to see all recipes that
        do NOT contain peas as an ingredient."
 
-       PROGRESSIVE DISCLOSURE. It starts closed because most sessions never
-       need it, and because revealing it deliberately is what frames this as a
-       dislike navigator rather than a sixth filter everyone has to consider
-       on the way past.
+       NO LONGER BEHIND A REVEAL, and the reasoning that put it there is worth
+       recording rather than silently dropping. It opened closed on the
+       progressive-disclosure argument: most sessions never need it, and
+       revealing it deliberately framed it as a dislike navigator rather than a
+       sixth filter everyone has to consider on the way past. Helen's ruling on
+       #586 is that the pairing does that framing better than the hiding did --
+       beside HAS TO HAVE it is visibly the other half of one question, so it
+       needs no door to explain what it is. "'leave out' always visible, so
+       delete the show/hide button."
 
-       A CHILD OF .search--name, NOT A SIBLING .category, since Helen's
-       2026-08-16 pass on the shipped filter: "closer to I KNOW WHAT I WANT",
-       centred under it. A sibling .category picks up
-       $index-section-gap (the gap BETWEEN sections) from the shared .category
-       rule in _category-labels.scss, which is exactly the wrong amount of
-       distance for something that is meant to read as attached to the search
-       above it rather than as a sixth filter category of its own -- so it
-       moved inside .search--name's own box instead, where the existing
-       .category { gap: $index-label-gap } already spaces it correctly, and
-       .search--exclude's own centred row in _search.scss does the rest.
+       So `#exclude-reveal`, `.exclude-reveal-row`, `.name-heading-stack` and
+       `.exclude-panel` are all gone, along with filters.js's open/closed label
+       strings and its aria-expanded bookkeeping. Nothing replaced them: there
+       is no state to keep, which is the point.
 
-       A REAL <button>, not a span with a click handler. It toggles a region in
-       place -- a control, not a destination -- and
-       test_clear_controls_are_buttons exists because a span-with-a-handler
-       shipped here once and was unreachable by keyboard. aria-expanded is kept
-       in step by filters.js; the panel uses the `hidden` attribute rather than
-       display:none in CSS, so while it is closed its input and buttons are out
-       of the tab order too, and reachable in the ordinary way the moment it
-       opens. That only became TRUE on 2026-08-16: .exclude-panel's own
-       `display: flex` had been overriding the UA's [hidden] rule, so the panel
-       shipped permanently open whatever aria-expanded said. See the
-       .exclude-panel[hidden] rule in _sass/food/_search.scss.
+       ITS HEADING COMES FROM filter_sections.yml NOW. It was the one section
+       with its label written into this template, because the reveal button WAS
+       the heading and splitting that copy across two files would have been
+       worse. With an ordinary heading it belongs with the other five.
 
-       ONE CONTROL, NOT TWO. A separate "x hide" button sat beside this one
-       until Helen's second pass: "remove the hide link -- when the section is
-       shown, update the link text to (hide leave out)". Two controls for one
-       binary meant one was always the wrong thing to look at, and the closed
-       state offered a dismiss for a panel that wasn't there. The button's own
-       label is the state now; filters.js owns both strings.
-
-       CLOSING KEEPS THE EXCLUSIONS. Disclosure is not filter state (the
-       existing "clear all" comment lower in filters.js already establishes
-       this for the panel's open/closed state; the dismiss button is the same
-       call applied to the same state). #exclude-active therefore lives
-       OUTSIDE #exclude-panel, as this section's own third child -- not gated
-       by the panel's `hidden` -- so the "leaving out ..." pills and the
-       hiding-N-recipes count stay visible and still clickable with the panel
-       shut, rather than an active filter going dark with no way to see or
-       lift it short of reopening the whole picker.
-
-       No label of its own from _data/food/filter_sections.yml: the reveal
-       button IS this section's heading, and inventing a `label:` there would
-       put half the section's copy in one file and half in another.
-    {% endcomment %}
-    <div class="search--exclude">
-
-      <div class="exclude-panel" id="exclude-panel" hidden>
-        <div class="search-input">
-          <label class="category-label" for="exclude-search-box">
-            <span class="category-label-text">LEAVE OUT</span>
-          </label>
-          <input type="text" id="exclude-search-box" autocomplete="off" placeholder="ingredient name..." />
-          <button type="button" class="btn-clear-inline" id="exclude-search-clear" style="visibility: hidden;">&times; clear</button>
-        </div>
-        {% comment %} Populated by filters.js as you type, from the DERIVED
-           vocabulary (every data-all-ingredients entry on the page), not from
-           main_ingredients -- see the data-all-ingredients comment on the rows
-           below. Fuzzy on purpose: typing "pea" offering peas, peanut butter
-           and pearl barley is correct, because you then pick the one you
-           meant, and what gets picked is matched as a whole entry rather than
-           as a substring. {% endcomment %}
-        <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
+       #exclude-active USED TO LIVE OUTSIDE THE PANEL ON PURPOSE, so the chosen
+       pills survived the panel being dismissed. There is no panel and no
+       dismiss, so that reason is spent -- the pills sit under the pool because
+       that is where the answers to this question go. {% endcomment %}
+    <div class="category search search--exclude">
+      <div class="search-input">
+        <label class="category-label" for="exclude-search-box">
+          <span class="category-label-text">{{ exclude_data.label }}</span>
+        </label>
+        <input type="text" id="exclude-search-box" autocomplete="off" placeholder="ingredient name..." />
+        <button type="button" class="btn-clear-inline" id="exclude-search-clear" style="visibility: hidden;">&times; clear</button>
       </div>
+      {% comment %} Populated by filters.js as you type, from the DERIVED
+         vocabulary (every data-all-ingredients entry on the page), not from
+         main_ingredients -- see the data-all-ingredients comment on the rows
+         below. Fuzzy on purpose: typing "pea" offering peas, peanut butter
+         and pearl barley is correct, because you then pick the one you
+         meant, and what gets picked is matched as a whole entry rather than
+         as a substring. {% endcomment %}
+      <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
 
       <div class="exclude-active" id="exclude-active" aria-live="polite"></div>
     </div>
   </div>
 
+  {% comment %} 5. THE ESCAPE HATCH, and it is last for the same reason
+     cocktails' is (HANDOVER 9.13): if you already know what you want, none of
+     the above is for you, but a name box at the TOP invites treating the page
+     as a search box, which is not what it is for.
+
+     IT USED TO CARRY THE LEAVE OUT REVEAL as a second row under its heading,
+     centred on it with .name-heading-stack -- the wordmark's max-content grid
+     trick (HANDOVER 13.8). Both are gone with issue #586: the picker they
+     opened is now a section of its own, beside HAS TO HAVE, so there is
+     nothing left to reveal and nothing left to centre. This section is back to
+     being one label and one input, like the rest. {% endcomment %}
+  <div class="category search search--name">
+    <div class="search-input">
+      <label class="category-label" for="name-search-box">
+        <span class="category-label-text">{{ name_search_data.label }}</span>
+      </label>
+      <input type="text" id="name-search-box" autocomplete="off" placeholder="recipe name..." />
+      <button type="button" class="btn-clear-inline" id="name-search-clear" style="visibility: hidden;">&times; clear</button>
+    </div>
+  </div>
+
+  {% comment %} ONE META FILTER -- GitHub issue #562, Helen: "reduce meta
+     filters on local site to draft".
+
+     There were five: needs rewrite, needs proofread, no short method, has short
+     method, and draft. Four of them answered "is this recipe finished yet",
+     which is a question she does not need this page to ask -- the same call she
+     made about cocktails' `meta.status`: "I am perfectly well aware of how much
+     work I have done on each drink."
+
+     `draft` is the survivor because it is not that kind of question. It is a
+     fact about which COLLECTION a row came from, and it decides whether the row
+     you are looking at exists on the live site at all.
+
+     This block is still local-only, gated on show_source_wording. The whole
+     section is one button now, which is where "reduce vertical space plenty"
+     comes from -- no new spacing rule, just four fewer controls.
+
+     The removed filters read data-meta-rewrite, -proofread and -short off each
+     row; those attributes went with them, along with filters.js's branches. An
+     attribute nothing reads is worse than one that is absent, because it reads
+     as a live fact to the next person. git log has all four if they are
+     wanted back. {% endcomment %}
   {% if site.show_source_wording %}
   <div class="category category--meta">
     <div class="category-label-row">
       <span class="category-label"><span class="category-label-text">META FILTERS</span></span>
     </div>
     <div class="category-buttons">
-      <button type="button" class="btn-meta" aria-pressed="false" data-meta="rewrite">needs rewrite</button>
-      <button type="button" class="btn-meta" aria-pressed="false" data-meta="proofread">needs proofread</button>
-      <button type="button" class="btn-meta" aria-pressed="false" data-meta="no-short">no short method</button>
-      <button type="button" class="btn-meta" aria-pressed="false" data-meta="has-short">has short method</button>
       <button type="button" class="btn-meta" aria-pressed="false" data-meta="draft">draft</button>
     </div>
   </div>
@@ -260,35 +251,19 @@ permalink: /food/
       {% assign is_draft = false %}
       {% if recipe.collection == "food_drafts" %}{% assign is_draft = true %}{% endif %}
 
-      {% comment %} THE THREE META FILTERS ARE RECIPE-ONLY, and a magic-bag row
-         must fail all of them rather than default into them. They are working
-         tools -- "needs rewrite", "needs proofread", "no short method" all mean
-         "this recipe is not finished yet" -- and a magic-bag entry has no
-         rewrite to do, no proofread to grant and no short method it will ever
-         have. Left to the defaults it would answer TRUE to all three (no
-         `meta.rewritten`, no `meta.proofread`, no `method_short`) and quietly
-         pad every one of those lists with dishes that can never leave them.
+      {% comment %} `is_draft` IS THE ONLY META FACT A ROW CARRIES NOW -- issue
+         #562, and see the META FILTERS block above for why the other four went.
 
-         `n/a` rather than `false` for the short-method one, because that filter
-         is a PAIR and the two halves want opposite answers: `false` would
-         correctly drop the row from "has short method" and wrongly add it to
-         "no short method". A third value is the only thing that fails both, and
-         filters.js reads it as "not an answer to this question" -- see its
-         no-short branch, which now requires an explicit `false`. {% endcomment %}
-      {% assign _needs_rewrite = false %}
-      {% assign _needs_proofread = false %}
-      {% assign _has_short = "n/a" %}
-      {% unless is_magic_bag %}
-        {% unless recipe.meta.rewritten %}{% assign _needs_rewrite = true %}{% endunless %}
-        {% unless recipe.meta.proofread %}{% assign _needs_proofread = true %}{% endunless %}
-        {% assign _has_short = false %}
-        {% for step in recipe.method_short %}
-          {% assign _s = step | strip %}
-          {% unless _s == "" or _s == "QQ" or _s == "none" %}
-            {% assign _has_short = true %}
-          {% endunless %}
-        {% endfor %}
-      {% endunless %}
+         What stood here derived _needs_rewrite, _needs_proofread and a
+         three-valued _has_short, all three carefully written so a magic-bag row
+         would fail every one of them rather than default into them: left to the
+         defaults an entry answers TRUE to all three (no `meta.rewritten`, no
+         `meta.proofread`, no `method_short`) and pads three working lists with
+         dishes that can never leave them.
+
+         That care is not lost, it is spent -- the lists it protected no longer
+         exist. `is_draft` needs none of it, because it asks which collection a
+         row came from, which every row can answer. {% endcomment %}
       {% comment %} THE DERIVED INGREDIENT INDEX -- GitHub issue #52, the
          "they hate peas" filter. Every ingredient_groups item on this recipe,
          not main_ingredients.
@@ -429,7 +404,7 @@ permalink: /food/
           {% assign _all_ing = _all_ing | append: _name | append: "|" %}
         {% endunless %}
       {% endfor %}
-      <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}" data-meta-rewrite="{{ _needs_rewrite }}" data-meta-proofread="{{ _needs_proofread }}" data-meta-short="{{ _has_short }}" data-meta-draft="{{ is_draft }}">
+      <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}" data-meta-draft="{{ is_draft }}">
 
         <div class="recipe-row-content">
         <a class="recipe-title-link" href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
@@ -466,21 +441,29 @@ permalink: /food/
           <div class="badge-group-content">
             {% include recipe_badges.html recipe=recipe %}
           </div>
+          {% comment %} TWO BADGES, AND BOTH SAY WHAT A ROW IS -- issue #562,
+             "remove all metadata chips from recipe rows".
+
+             `needs rewrite` and `needs proofread` stood here and are gone. They
+             were work-state notes, and a work-state note on every unfinished
+             row is a to-do list printed down the side of the page you are
+             using to decide what to cook. Helen sees the same thing four
+             filters were also telling her, and asked for both.
+
+             What is left says what you are about to click, which is a
+             different job and the reason these two survive the cull:
+             `magic bag` warns that there is no method on the other side of the
+             link, and `draft` that the row is not on the live site. Same
+             treatment for both -- Helen: "styled exactly as 'magic bag' which
+             is already in place" -- because they are the same kind of
+             statement.
+
+             `draft` is still local-only in practice without being gated on
+             anything: `is_draft` can only be true for a row from
+             `food_drafts`, and that collection is only built locally. One fact
+             deciding it, rather than a flag that has to agree with the
+             build. {% endcomment %}
           <div class="badge-group-meta">
-            {% comment %} The two work-state badges are recipe-only, same
-               reasoning as the meta filters above: a magic-bag entry has no
-               rewrite to do and no proofread to grant, so labelling it "needs"
-               either would be asking for work that does not exist. {% endcomment %}
-            {% if site.show_source_wording and is_magic_bag == false %}
-              {% unless recipe.meta.rewritten %}<span class="badge badge-meta-rewrite">needs rewrite</span>{% endunless %}
-              {% unless recipe.meta.proofread %}<span class="badge badge-meta-proofread">needs proofread</span>{% endunless %}
-            {% endif %}
-            {% comment %} SHOWN IN PRODUCTION, unlike the two above. This one is
-               not a note about unfinished work -- it tells you what you are
-               about to click. Without it a magic-bag row is indistinguishable
-               from a recipe row until the page loads and there is no method on
-               it, which is a small betrayal of the site's one promise: it tells
-               you what to cook. {% endcomment %}
             {% if is_magic_bag %}<span class="badge badge-magic-bag">magic bag</span>{% endif %}
             {% if is_draft %}<span class="badge badge-draft">draft</span>{% endif %}
           </div>

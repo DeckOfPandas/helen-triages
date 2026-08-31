@@ -69,72 +69,120 @@ main {
 }
 
 // .site-header itself is edge-to-edge, full viewport width -- it has no
-// content column of its own to align anything against. This shares main's
-// own max-width/margin:auto formula so the nav lines up with the right
-// edge of the actual content column beneath it, at every viewport width,
-// not just a fixed offset from the header's own edge.
+// content column of its own to align anything against. This shares main's own
+// max-width/margin:auto formula so the nav lines up with the right edge of the
+// actual content column beneath it, at every viewport width, not just a fixed
+// offset from the header's own edge.
 //
-// STRETCHED TO THE FULL HEADER HEIGHT, on purpose -- Helen wants the nav row
-// at the BOTTOM of the header now, not the top, and .site-header-inner used
-// to be a normal in-flow block sitting before the logo with no height of its
-// own (its only child was position:absolute, so it contributed nothing to
-// flow), which meant "bottom:0" and "top:0" resolved to the same point. Making
-// this itself position:absolute with inset:0 gives it the header's FULL
-// height -- .site-header needs position:relative for that to resolve against
-// it rather than the page -- while max-width/margin:auto still cap and centre
-// it to the content column exactly as before. .site-header's own $space-xl
-// padding is respected automatically: inset:0 on an absolutely positioned
-// child sits against the containing block's PADDING edge, not its outer edge.
+// A GRID, NOT AN ABSOLUTELY POSITIONED OVERLAY -- issue #551, 2026-08-30.
 //
-// pointer-events:none is load-bearing. This box now overlaps the wordmark
-// below it, and an absolutely positioned box paints (and hit-tests) above
-// static in-flow content regardless of DOM order -- without this, the empty
-// area around the nav would swallow clicks meant for .site-title-link. auto
-// on .site-nav-icons hands hit-testing back for the row that actually needs it.
+// It was `position: absolute; inset: 0` holding a nav pinned to its
+// bottom-right, with the wordmark a separate centred link in normal flow
+// underneath. Nothing kept those two apart: the wordmark grows from the middle
+// outwards, the nav sits at the right edge, and at some width they meet. They
+// met on COCKTAILS first because `[ COCKTAILS ]` is wider than HELEN TRIAGES
+// and the wordmark's own grid takes the width of whichever row is wider (§13.8)
+// -- so the tape ran under the nav icons and, being `position: relative` with a
+// `transform`, painted over them (§12).
+//
+// Helen's first instinct was to collapse cocktails to one column earlier than
+// food. That is a per-site chrome rule, which is exactly what #374 exists to
+// prevent, and it would have left the overlap live on both sites -- just at a
+// different width each. `1fr auto 1fr` removes it at EVERY width instead: the
+// middle track holds the wordmark and cannot grow into the track the nav
+// occupies. `.site-footer-top` is the same three tracks for the same reason.
+//
+// PLACED EXPLICITLY, NOT AUTO-FLOWED, and that is load-bearing rather than
+// fussy: the nav comes FIRST in the markup because it is first in the tab order
+// (§12), so under auto-placement it would take column 1 and the wordmark column
+// 2, putting the nav on the left and the wordmark off-centre. The footer's
+// hearts carry the identical note for the identical reason.
+//
+// The old `pointer-events: none/auto` pair is gone with the overlay. It existed
+// because an absolutely positioned box hit-tests above in-flow content whatever
+// the DOM order, so the empty area around the nav swallowed clicks meant for
+// the wordmark. Nothing overlaps now, so nothing needs excusing.
 .site-header-inner {
-  position: absolute;
-  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
   max-width: $width-content;
   margin: 0 auto;
-  pointer-events: none;
 }
 
 // Header nav row -- one icon per site in _data/sites.yml, in that file's own
 // order, then the about link (see default.html's own comment). The SAME row on
 // every page since issue #374: it used to be built from per-site keys and so
-// rendered nothing at all on cocktails. Absolutely positioned as a group
-// against .site-header-inner rather than each child positioning itself, so
-// they lay out left-to-right as one row pinned to the bottom-right corner
-// (was top-right -- Helen's ask).
+// rendered nothing at all on cocktails.
 //
-// bottom: 2rem, not the header's own $space-xl padding (1.5rem) -- issue
-// #236, Helen wanted the row raised to sit roughly level with the BOTTOM
-// EDGE OF THE BLACK TAPE rather than wherever "1.5rem clear of the header"
-// happened to land it. This is an eyeballed offset, not a mechanism: the
-// tape graphic (assets/img/chrome/tape/*.svg, viewBox 0 0 1400 170) doesn't
-// fill its own box -- the black polygon's visible bottom ink line sits at
-// y=148 of 170, i.e. about 9px shy of its box's own bottom edge, once that
-// box is .site-logo-tape's actual 70px height. .site-nav-icons' "bottom" is
-// measured from .site-header-inner's bottom edge, which itself sits exactly
-// $space-xl (1.5rem) below the wordmark's own bottom edge (.site-header's
-// padding-bottom) -- so 1.5rem + ~9px lands roughly on the ink line, hence
-// 2rem, rounded rather than chased to the pixel.
+// THE 0.5rem IS THE OLD 2rem, RE-EXPRESSED. It used to be `bottom: 2rem`
+// measured from .site-header-inner's bottom edge, which sat $space-xl (1.5rem)
+// below the wordmark -- so the row rested 0.5rem above the wordmark's own
+// bottom. Aligned to the grid row's end instead, that same 0.5rem is a margin.
 //
-// Deliberately not chasing this further: the tape is rotated
-// (rotate(-1.75deg) on .site-logo-tape), it's a multi-icon ROW being lined
-// up against a tilted edge, and Helen's own call was "approximately level ...
-// does not need to change with different tape SVGs" -- so this is a single
-// hand-picked rem value, not a calc() tracking the SVG's geometry. If the
-// tape SVG's own margins change, or .site-logo-tape's 70px height changes,
-// re-eyeball this by hand rather than expecting it to follow automatically.
+// What it is FOR is unchanged, and is an eyeballed offset rather than a
+// mechanism: Helen wanted the row roughly level with the black tape's bottom
+// ink line, and the tape graphic does not fill its own box -- the polygon's
+// visible bottom sits about 9px shy of it at .site-logo-tape's 70px height. Her
+// own call was "approximately level ... does not need to change with different
+// tape SVGs", so if that height or the SVG's margins change, re-eyeball this by
+// hand rather than expecting it to follow.
 .site-nav-icons {
-  position: absolute;
-  bottom: 2rem;
-  right: 0;
+  // BOTH ITEMS NAME THEIR ROW, and without it the header stacks. Grid
+  // auto-placement is SPARSE: it walks the items in DOM order and never moves
+  // its cursor backwards. The nav comes first and is pinned to column 3, which
+  // puts the cursor past column 3 of row 1 -- so the wordmark, asking for
+  // column 2, cannot be placed in row 1 at all and starts a second row. The
+  // result is the nav above the wordmark rather than beside it, which is
+  // exactly what it looked like: icons top-right.
+  //
+  // `grid-row: 1` on both is the fix rather than `grid-auto-flow: dense`, which
+  // would also work and would leave the arrangement depending on the order two
+  // elements happen to appear in. This says where they go.
+  grid-row: 1;
+  grid-column: 3;
+  justify-self: end;
+  align-self: end;
+  margin-bottom: 0.5rem;
+  // AIR BETWEEN "??" AND THE PAGE EDGE -- Helen, 2026-08-30. The nav lines up
+  // with the content column's right edge, which is the alignment
+  // .site-header-inner's max-width exists to give it; at narrower viewports
+  // that edge IS very close to the page edge, because the column is then just
+  // the viewport less `main`'s own padding. So the row sat 24px from the glass
+  // with nothing between.
+  //
+  // A margin rather than more header padding: padding would move the wordmark
+  // too, and it is the nav that needed the room. The cost is stated rather than
+  // hidden -- the nav no longer lines up exactly with the content column's
+  // right edge, it sits $space-md inside it.
+  margin-right: $space-md;
   display: flex;
   align-items: center;
   gap: 1.4rem;
-  pointer-events: auto;
+}
+
+// Centre track. NO `min-width: 0`, and that is the whole of issue #551's
+// second half.
+//
+// It was there on the reasoning that a long wordmark should shrink its track
+// rather than overflow the grid. That is exactly backwards here: `min-width: 0`
+// drops the item's minimum contribution to zero, so the auto track is free to
+// be sized SMALLER than the thing in it -- and `.site-logo` inside is
+// `grid-template-columns: max-content`, which cannot shrink. So the track got
+// squeezed, the wordmark kept its width, and the surplus spilled out of the
+// track and over the nav in column 3. The tape appeared to cover the icons
+// again, for a different reason than the first time.
+//
+// Left at `auto`, the track's minimum is the wordmark's own min-content, so
+// column 3 can only ever begin after the wordmark ends. Overlap is impossible
+// rather than unlikely, which is the point of the three tracks.
+//
+// A wordmark genuinely too wide for the viewport is handled where it should be:
+// `.site-logo-top` carries `max-width: 92vw` as the mobile safety net, and
+// below 600px the header stacks.
+.site-title-link {
+  grid-row: 1;
+  grid-column: 2;
 }
 
 // Shared link styling for every item in the nav row -- icons and the "??"
@@ -692,50 +740,72 @@ $tape-protrusion: 0.2rem;
 // docstring on that test still says the site has no media queries; it has had
 // one since before this file did, and this block makes it two.
 
-@media (max-width: 600px) {
+@media (max-width: $header-stack-width) {
 
-  // --- 1. The nav icons were underneath the tape ---------------------------
-  // .site-nav-icons is absolutely positioned into the header's bottom-right
-  // corner, which is empty on a wide screen. .site-logo-tape carries BOTH
-  // `position: relative` and `transform: rotate(-1.75deg)`, so it paints in
-  // the positioned layer too -- and it comes later in the DOM with the same
-  // auto z-index, so it wins. On a wide header the tape never reaches that
-  // corner and the two never meet. On a phone the wordmark spans nearly the
-  // full width, so the tape lands squarely on the icons: they were painted
-  // over AND their clicks were swallowed, which is exactly what Helen saw.
+  // --- 1. The header stacks, rather than squeezing --------------------------
+  // WHAT THIS RULE IS FOR CHANGED WITH #551, and the old reason is worth
+  // keeping because it explains why the shape below is the shape it is.
   //
-  // Raising the nav's z-index would put the icons back on top of the tape,
-  // which is not what anyone wants to look at. Helen's own suggestion is the
-  // structural fix and the right one -- give the row its own line underneath,
-  // so there is no overlap left to resolve.
+  // It used to fix an OVERLAP. The nav was absolutely positioned into the
+  // header's bottom-right corner and `.site-logo-tape` carries both
+  // `position: relative` and a `transform`, so the tape paints in the
+  // positioned layer and, being later in the DOM at the same auto z-index, won
+  // outright. On a wide header the two never met; on a phone the wordmark spans
+  // nearly the full width and the tape landed squarely on the icons -- painted
+  // over them AND swallowed their clicks.
   //
-  // `order` rather than a DOM change: the nav is FIRST in the markup (it is
-  // first in the tab order on purpose, and it stays that way), so it has to be
-  // moved visually rather than physically.
-  .site-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  // That cannot happen at any width now: the header is a `1fr auto 1fr` grid
+  // and the wordmark's track cannot grow into the nav's. So this is no longer a
+  // fix, it is a LAYOUT CHOICE -- three tracks on a phone leaves the wordmark
+  // about a third of the screen, which is not enough for it, so the row moves
+  // to its own line and both get the full width.
+  //
+  // `order`, not a DOM change: the nav is FIRST in the markup because it is
+  // first in the tab order, and it stays that way.
+  .site-header-inner {
+    grid-template-columns: 1fr;
+    justify-items: center;
     gap: $space-lg;
   }
 
+  // EXPLICIT ROWS, RELEASING THE ONES THE WIDE LAYOUT PINS. Both items carry
+  // `grid-row: 1` up there, so that the nav (which comes first in the markup,
+  // for tab order) does not push the wordmark into a second row under sparse
+  // auto-placement. Left in place here they land in the SAME CELL -- one
+  // column, one row -- and draw on top of each other, which is exactly what it
+  // looked like: the icons behind the tape.
+  //
+  // `order` went with the fix rather than being kept beside it. It only ever
+  // reordered auto-placed items, and these are placed; naming the row says the
+  // same thing once instead of twice.
   .site-title-link {
-    order: 1;
-  }
-
-  // position: static is what actually releases it -- `inset` and `bottom`
-  // below are inert on a static box, so neither needs unsetting by hand.
-  .site-header-inner {
-    order: 2;
-    position: static;
-    max-width: none;
-    pointer-events: auto;   // no longer overlapping anything to protect
+    grid-row: 1;
+    grid-column: 1;
   }
 
   .site-nav-icons {
-    position: static;
-    justify-content: center;
+    grid-row: 2;
+    grid-column: 1;
+    justify-self: center;
+    // Both margins reset. The bottom one lined the row up with the tape's ink
+    // when it sat BESIDE the wordmark; the right one held it off the page edge
+    // when it sat at the column's edge. Centred on its own line it wants
+    // neither -- and `justify-self: center` centres the MARGIN box, so a
+    // leftover right margin would push the icons visibly off-centre.
+    margin-bottom: 0;
+    margin-right: 0;
   }
+
+}
+
+// THE FOOTER STACKS AT ITS OWN WIDTH, NOT THE HEADER'S, and the two were one
+// block until 2026-08-30. They were both 600px and both about "this row has run
+// out of room", but they run out at different widths -- the header's limit is
+// set by the widest wordmark plus the nav (see $header-stack-width), and the
+// footer's by the hearts' flat 240px plus two reference columns. Sharing one
+// number meant raising the header's would have stacked the footer 220px earlier
+// than it needs, for no reason anyone could have found later.
+@media (max-width: 600px) {
 
   // --- 2. The footer could not centre anything -----------------------------
   // `1fr auto 1fr` gives the middle column whatever it asks for and splits

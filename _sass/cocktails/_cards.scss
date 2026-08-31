@@ -266,8 +266,16 @@ $card-glass-scale: 13rem;
   flex-wrap: wrap;
   gap: 0.28rem;
   min-width: 0;
-  // two chip rows plus the single gap between them
-  max-height: ($chip-line * 2) + 0.28rem;
+  // TWO CHIP ROWS PLUS THE GAP -- AND PLUS THE BORDERS, which is what this was
+  // missing. A chip's rendered height is its `line-height` ($chip-line) plus
+  // 1px of border top and bottom; the cap counted the line-heights and the gap
+  // and forgot the borders, so it fell 4px short of two full rows and sheared
+  // the bottom off the second one. Helen caught it on a card with four chips.
+  //
+  // Stated as a calc against the same tokens rather than a rounded literal, so
+  // changing $chip-line or the chip's border moves this with it instead of
+  // silently re-clipping.
+  max-height: calc(#{$chip-line * 2} + 0.28rem + 4px);
   overflow: hidden;
   margin-bottom: 0.45rem;
 }
@@ -299,56 +307,142 @@ $card-glass-scale: 13rem;
   // solved against paper, so deep-on-wash lands below 4.5 for three of the
   // five hues -- and a chip does not need coloured text when its border, its
   // background and its weight have all already changed.
-  &.is-match {
-    background: $color-electric-absinthe-wash;
-    border-color: $color-electric-absinthe-deep;
+  // ONE COLOUR FOR EVERY MATCH, and it is no longer the section's -- Helen,
+  // 2026-08-30, choosing magenta off the dev page. A mood chip and a matched
+  // ingredient now wear the same hue, and so does the filter button that lit
+  // them, so magenta means MATCHED across the whole page rather than meaning
+  // "the green heading found this".
+  //
+  // WHAT THIS GIVES UP, stated because the old comment argued for it at length:
+  // a chip no longer says WHICH heading selected it. That mattered while the
+  // headings were five spread hues and a chip could point back at one. They are
+  // five shades of green now, and §12's rule is that the eye reads hue rather
+  // than lightness -- so pointing back was going to stop working anyway, and
+  // one clear "this matched" is worth more than five near-identical ones.
+  &.is-match,
+  &--hassle.is-match {
+    background: $color-cosmic-cosmopolitan-wash;
+    border-color: $color-cosmic-cosmopolitan-deep;
     color: $color-text;
     font-weight: 600;
-  }
-
-  // Ultraviolet is the one fill in the set that takes LIGHT text: ink on it is
-  // 3.14:1 and fails, white is 5.47:1, and nothing darkened clears 4.5 at all
-  // because the fill is already dark. See _filters.scss for the same note on
-  // the hassle buttons.
-  &--hassle.is-match {
-    background: $color-ultra-yvette-wash;
-    border-color: $color-ultra-yvette-deep;
   }
 }
 
 // --- the goodness mark -------------------------------------------------------
-// The label stays one quiet grey at every rung; the SQUARE carries the scale.
-// Two things both encoding the rating would be louder, not clearer.
+// A SHIP AND A WORD, replacing the tinted square -- Helen, 2026-08-30: "I am
+// worried I no longer like the goodness mark. It might well not be clear enough
+// at speed."
+//
+// The square encoded the rung as a FILL PERCENTAGE, which is a quantity, read
+// at a glance, with no name on it. That is exactly the misreading she named
+// when we tried a bar instead: "if we lose them, it looks like we're rating
+// some drinks as 1 or 2 out of 5, which isn't the case, I just don't have any
+// of those. Drinks I've currently rated 'not really' are in here because I
+// judge they will be worth some work." A word cannot be misread as a score,
+// because it is not a quantity.
+//
+// So the rung is the WORD, banded in curaçao, and the ship is a fixed landmark
+// beside it. Her framing, and it is the same anchoring argument the old mark
+// already rested on: "it will have to be the right to keep the icon in the same
+// place on each card, otherwise I think it will create visual noise."
+//
+// THE ICON IS ON THE LEFT OF THE WORD AND THE PAIR IS PINNED RIGHT, which only
+// holds still because every rung is now one short word -- `ship_card_names` in
+// taxonomy.yml maps "oh gods yes" to yes² and "not really" to hmm, and the
+// other three were one word already. Helen: "the motivation is getting
+// everything to the same number of words, i.e. one, so the cards look more
+// stable." In Courier Prime those five run three to four characters, so the
+// ship moves by at most one character between cards.
+//
+// A DRINK OFF THE SCALE GETS THE SHIP AND NO WORD. `QQ` and `who knows` are 31
+// of 114 drinks and are deliberately not rungs; drawing the ship anyway keeps
+// the anchor in place on a quarter of the collection, and saying nothing beside
+// it is honest about there being no rating rather than inventing a sixth term.
 .drink-card-ship {
-  display: block;
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
   font-family: $font-headings;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   line-height: 1rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: $color-clear-text;
+  letter-spacing: 0.06em;
+  color: $color-text;
   white-space: nowrap;
+}
 
-  // AFTER the text, not before: before it, the square's x position depended on
-  // the length of the rating word, so the one mark meant to be findable
-  // without reading moved from card to card. After it, the square sits against
-  // the card's right padding edge, which is fixed.
-  //
-  // --ship-tint comes from taxonomy.yml via the template. The BORDER does not
-  // change at any rung: an empty square reads as "rated, and rated low", where
-  // a square that faded out entirely would read as "not rated" — a different
-  // fact the scale already holds separately as `who knows`.
-  &::after {
-    content: "";
-    display: inline-block;
-    width: 0.5rem;
-    height: 0.5rem;
-    background: color-mix(in srgb, #{$color-radiant-reposado} var(--ship-tint, 0%), #{$color-surface});
-    border: 1.5px solid $color-radiant-reposado-deep;
-    margin-left: 0.4rem;
-    vertical-align: 0.01rem;
+.drink-card-ship-icon {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: $color-radiant-reposado-deep;
+
+  // .ship-icon IS THE CLASS THE PARTIAL EMITS, so it is the one that carries
+  // the rule. Styling `svg` by descendant instead left the emitted class with
+  // no rule anywhere, which test_every_icon_partial_class_has_a_styled_base
+  // catches -- and rightly: a class an icon names and no stylesheet knows about
+  // renders at whatever size the surrounding flow happens to give it.
+  .ship-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    // An inline <svg> clips its own content by default -- every browser's UA
+    // stylesheet sets overflow:hidden on the root svg specifically, and a
+    // stroke or a fill touching the viewBox edge is sheared off with nothing in
+    // the source to say why. §9.11's trap, and the canvas here is fitted to the
+    // artwork, so the ink does touch the edge.
+    overflow: visible;
+    fill: currentColor;
   }
+}
+
+// The band, not a fill: "bands and washes, not fills" (§9.13), and this is the
+// last thing on a card that was still filled.
+//
+// NO RESERVED WIDTH. A `min-width: 4ch` held the ship in exactly one place
+// across every card, including the ones with no word; Helen's call on seeing
+// it: "please don't force the word to be fixed width, it looks weird. The words
+// are similar enough length that I'm hoping the slight movement in the ship
+// icon won't matter."
+//
+// The case it was really defending against is closed by data rather than by
+// CSS: a PUBLISHED drink must now name a rung
+// (test_every_published_drink_names_a_rung_on_the_ship_scale), so the word is
+// never absent on a card the world sees. What is left is drafts, where a
+// missing rung is a legitimate work-in-progress state and the ship sitting a
+// few characters over is not worth a rule.
+//
+// :empty stays for exactly those drafts -- it drops the band so an unrated
+// drink shows no bare orange bar. Same idiom as .exclude-active:empty on the
+// food side.
+// THE BAND IS text-decoration, NOT AN INSET SHADOW, and that is what aligns the
+// two -- #548 point 10, "vertically align their centres".
+//
+// An inset box-shadow paints INSIDE the element's box, so the band was part of
+// the word's height: `align-items: center` then centred a box made of letters
+// PLUS a band against a box made only of a ship, and the ship rode about half
+// the band's height too high. Nothing was misaligned in the values; the two
+// boxes were measuring different things.
+//
+// text-decoration draws outside the box and changes no geometry, so the word's
+// line box is its letters and the two centres are the same centre. It is also
+// the site's other band already: `.drink-card-hit` uses text-decoration for its
+// own reason (§9.13 -- a box-shadow gives a WRAPPED fragment an odd stub), so
+// this is one mechanism for "a coloured band under text" rather than two.
+//
+// skip-ink: none because a descender interrupting the band would read as damage
+// rather than as typography at this size -- the same call .drink-card-hit makes.
+//
+// No :empty rule needed any more: text-decoration on an empty element draws
+// nothing, where an inset shadow drew a bare orange bar.
+.drink-card-ship-word {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: $color-radiant-reposado;
+  text-decoration-thickness: 0.24em;
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: none;
 }
 
 @media (max-width: 720px) {

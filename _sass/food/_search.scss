@@ -13,18 +13,9 @@
   .search-input {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    gap: $space-md;
-    width: 100%;
-    // Was 550px. The clear button now reserves its own space at ALL times
-    // (visibility, not display -- see its own comment below), which is
-    // exactly what fixed it appearing to cut the input off mid-typing, but
-    // it also meant that reserved space came out of the input's share of
-    // the same 550px even at rest, before you'd typed a single character
-    // (Helen: "cut off even before typing anything -- it ends at the first
-    // '.'"). Widened by roughly the clear button's own footprint (its text
-    // plus $space-md of margin) so the input gets back the room it lost.
-    max-width: 620px;
+    // Shared with cocktails' own search row -- @mixin index-search-row in
+    // shared/_rule.scss carries the alignment, the gap and the max-width.
+    @include index-search-row;
     position: relative;
 
     // Both label and clear button default to flex-shrink: 1 with no
@@ -39,8 +30,7 @@
     // behaviour actually wanted -- a heading shouldn't reflow because of
     // how much you've typed elsewhere in the same row.
     .category-label {
-      white-space: nowrap;
-      flex-shrink: 0;
+      @include index-search-row-label;
       // "A little space after the heading" -- Helen, 2026-08-03. On top of
       // the row's own $space-md gap (label to input to clear button,
       // uniformly), not instead of it -- this row specifically wanted more
@@ -55,11 +45,7 @@
   // direction, and a fork would only ever drift.
   #ingredient-search-box,
   #exclude-search-box {
-    font-family: $font-headings;
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: lowercase;
-    letter-spacing: 0.04em;
+    @include index-search-input-type;
 
     // Override browser input defaults
     background: transparent;
@@ -71,29 +57,14 @@
     border: none;
     border-bottom: 1px solid lighten($color-clear-text, 25%);
     color: lighten($color-text, 12%);
-    flex: 1;
-    // Text inputs get a non-zero intrinsic min-width from the browser
-    // (roughly the UA's default `size`), which flexbox respects unless
-    // told otherwise, so flex: 1 alone doesn't let this shrink past that
-    // floor. SEARCH MAIN INGREDIENTS is longer than I KNOW WHAT I WANT, so
-    // this row's label ate more space and pushed THIS input against its
-    // floor sooner, overflowing .search-input's own max-width further than
-    // the shorter-labelled row did — the two inputs ended at different
-    // points instead of both flush with their row's own right edge.
-    // Helen: "it would look tidiest if both search input fields ended in
-    // the same place." Standard fix for a flex item refusing to shrink to
-    // its container; matching override on #name-search-box below.
-    min-width: 0;
+    @include index-search-row-input;
 
     &:focus {
       outline: none;
       border-bottom-color: lighten($color-clear-text, 5%);
     }
 
-    &::placeholder {
-      color: lighten($color-clear-text, 30%);
-      font-weight: 300;
-    }
+    &::placeholder { @include index-search-placeholder; }
   }
 
   // Was a full duplicate of .btn-clear-inline's styling under an ID
@@ -108,8 +79,22 @@
     margin-left: $space-md;
   }
 
+  // NO margin-top HERE. It is set once, in _category-labels.scss, gated on
+  // `:not(:empty)` -- see that rule's own comment for why the gap belongs to
+  // the pool's CONTENT rather than to the pool.
+  //
+  // This rule declared `margin-top: $space-lg` unconditionally until issue
+  // #589, and that is what made the conditional one a no-op in the only
+  // direction it was written for. A `:not(:empty)` rule can only ever ADD to
+  // its unconditional base, never take space away -- so an empty pool kept
+  // 1rem while a full one got 0.75rem, and the pool was 4px TALLER with
+  // nothing in it. Clicking a LEAVE OUT candidate empties the pool
+  // (toggleExcluded) at the same moment the chosen pill appears below it, so
+  // the pill landed 4px lower than the chip that had just been clicked: Helen,
+  // "if I click a chip, it then jumps downwards by a few pixels".
+  //
+  // Guarded by test_an_empty_search_results_pool_reserves_no_space.
   .search-results {
-    margin-top: $space-lg;
     min-height: 0;
     width: 100%;
     display: flex;
@@ -126,11 +111,7 @@
 // its own block so the structural rule and the type rule stay readable apart.
 .controls .search--name {
   #name-search-box {
-    font-family: $font-headings;
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: lowercase;
-    letter-spacing: 0.04em;
+    @include index-search-input-type;
     background: transparent;
     box-shadow: none;
     outline: none;
@@ -140,19 +121,14 @@
     border: none;
     border-bottom: 1px solid lighten($color-clear-text, 25%);
     color: lighten($color-text, 12%);
-    flex: 1;
-    // See #ingredient-search-box's own comment above.
-    min-width: 0;
+    @include index-search-row-input;
 
     &:focus {
       outline: none;
       border-bottom-color: lighten($color-clear-text, 5%);
     }
 
-    &::placeholder {
-      color: lighten($color-clear-text, 30%);
-      font-weight: 300;
-    }
+    &::placeholder { @include index-search-placeholder; }
   }
 
   // Same duplicate-ID story as #ingredient-search-clear above.
@@ -160,141 +136,83 @@
     margin-left: $space-md;
   }
 
-  // .search--exclude is a CHILD of this section now (Helen, 2026-08-16: put
-  // the reveal "closer to I KNOW WHAT I WANT" and centre it under that
-  // heading), not a sibling .category — see food/index.html's own comment on
-  // the wrapper for the full reasoning. This box just gives that child its
-  // width and its own internal stacking; .controls .search--exclude below
-  // still owns everything about how its contents look.
-  .search--exclude {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $index-label-gap;
+  // A `.search--exclude` rule sat here, giving the exclude picker its width and
+  // its internal stacking while it lived INSIDE this section. It is a sibling
+  // section in .search-pair now (issue #586), so a rule scoped to
+  // `.controls .search--name` would match nothing at all -- which is #275's own
+  // lesson arriving from the other direction, and the reason it was deleted
+  // rather than left compiling harmlessly.
+}
+
+
+// --- HAS TO HAVE and LEAVE OUT, side by side --------------------------------
+// GitHub issue #586. Helen: "has to have then leave out on the same line".
+// The same shape cocktails' index already uses for the same pair of questions
+// (its `.drink-searches`, HANDOVER 9.13) -- two columns above 600px, stacked
+// below it, which is the site's existing breakpoint rather than a new one.
+//
+// THE WRAPPER OWNS THE VERTICAL GAP, and it has to. `.category` carries
+// `margin: $index-section-gap 0` so that adjacent sections in block flow
+// collapse to one gap between them. Grid items do not collapse margins at all,
+// so leaving those margins on the two children would have added their own gap
+// inside a row that already has one on the outside. One value, here, and the
+// children are zeroed -- rather than a second gap token that has to be kept
+// equal to the first by hand.
+//
+// WHAT WENT WHEN THIS ARRIVED: `.name-heading-stack` and `.exclude-reveal-row`
+// (issue #275's max-content grid, centring "(I know what I don't want)" under
+// I KNOW WHAT I WANT), `.btn-reveal` itself, and `.exclude-panel` with its
+// `[hidden]` companion. All four existed to hide the exclude picker and to
+// explain where its door was. There is no door.
+//
+// #275's own hard-won lesson is why this is a deletion rather than a set of
+// rules left compiling: a rule nested under a parent is a bet on where the
+// element lives, and moving the markup voids it silently. Sass compiles clean,
+// the suite stays green, and the element ships unstyled.
+.search-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $index-section-gap;
+  margin: $index-section-gap 0;
+  align-items: start;
+
+  > .category {
+    margin: 0;
+    // The columns are already as wide as the grid gives them; without this,
+    // .search-input's own 620px max-width would let a wide viewport pull the
+    // include box past its column's share and out of line with the exclude box
+    // beside it. Helen's standing ask on these two inputs is that they end in
+    // the same place (see #ingredient-search-box above).
+    min-width: 0;
+
+    .search-input { max-width: none; }
   }
 }
 
-
-// --- The reveal link, and the heading it is centred under --------------------
-// GitHub issue #275. These rules are NOT nested under .controls
-// .search--exclude, and that is not tidiness -- the button and its row now sit
-// inside .search-input, beside I KNOW WHAT I WANT, so a rule scoped to
-// .search--exclude would silently match nothing. That is exactly what happened
-// on the first attempt: the markup moved, the styles did not, and the button
-// shipped with no styling at all while the CSS still compiled cleanly.
-//
-// THE STACK IS THE WORDMARK'S MECHANISM (HANDOVER 13.8): one `max-content`
-// column with both rows in it, so the column takes the width of whichever line
-// is wider -- the heading -- and `justify-items: center` centres the narrower
-// one under it. No JS measurement, nothing to keep in sync when either string
-// changes.
-//
-// ONLY THESE TWO GO IN IT. The first attempt put the heading, the search
-// input, the exclude panel and the active list in one grid. The panel spanned
-// every column, and a spanning item still contributes to an intrinsic track's
-// size -- so the LEAVE OUT panel, not the heading, decided the width the link
-// was centred in: the column came out ~116px wider than the heading and shoved
-// the search input right by the same amount. Anything added to this stack will
-// do it again.
-.controls .search--name .name-heading-stack {
-  display: inline-grid;
-  grid-template-columns: max-content;
-  justify-items: center;
-  row-gap: $space-sm;
-  // Replaces the label as a flex item of .search-input, so it inherits the
-  // label's job: refuse to shrink, and let the INPUT absorb the squeeze rather
-  // than the heading wrapping to two lines.
-  flex-shrink: 0;
+@media (max-width: $index-stack-width) {
+  // One column. The pair is a claim about two questions being halves of one,
+  // and that claim survives them being stacked -- what does not survive is two
+  // search boxes sharing a phone's width.
+  .search-pair { grid-template-columns: 1fr; }
 }
 
-// Was `width: 100%` with `justify-content: flex-start`, which is what a
-// full-width row underneath the search needed. In the stack it must be exactly
-// as wide as its own text, or it fills the column and leaves justify-items
-// nothing to centre.
-.controls .search--name .exclude-reveal-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: auto;
-}
-
-// The reveal is a link in appearance and a button in fact — see
-// food/index.html and test_clear_controls_are_buttons. Matched to
-// .btn-clear-inline (sans, regular, underline, colour-shift hover), which is
-// this page's one inline-link design; NOT lowercased, because the words are
-// Helen's own sentence rather than a filter label.
-.btn-reveal {
-  border: 0;
-  background: none;
-  padding: 0;
-  font-family: $font-body;
-  font-size: 0.78rem;
-  // 350, not 400 -- Helen's 2026-08-16 pass, "lighten the weight". The same
-  // value .ingredient-list uses on the recipe rows, so this reads as the
-  // page's quiet register rather than as a third weight invented here.
-  font-weight: 350;
-  letter-spacing: 0.02em;
-  color: lighten($color-text, 12%);
-  cursor: pointer;
-  text-decoration: underline;
-  transition: color 0.1s ease-in-out;
-
-  // ONE TREATMENT FOR HOVER, CLICK AND KEYBOARD FOCUS -- Helen, 2026-08-16:
-  // "use the same link styling on mouseover and click". They were three
-  // different looks: hover darkened the text, focus painted a grey box
-  // behind it and removed the outline, and a click got whichever the
-  // browser decided applied. Now all three darken, and nothing else moves.
-  // GitHub issue #277. These three already agreed with each other -- what
-  // they did not do was READ as a change: lighten($color-text, 12%) to
-  // $color-text is #3a3739 to #211f20, a pure lightness step of 12% on a
-  // 0.78rem line, and at that size a lightness step alone is invisible. The
-  // same mistake as the footer reference links the same day.
-  //
-  // Every other inline link in this section moves HUE on interaction -- the
-  // clear buttons sit at their section's darkened root and shift on hover --
-  // so this now lands on the cobalt this section owns rather than on a
-  // slightly darker grey. The resting colour is untouched: Helen asked for
-  // this one to be quiet ("lighten the weight") and #277 is about the
-  // mouseover and the click, not about the state it sits in.
-  // MAGENTA, NOT THE SECTION'S COBALT, and this reverses half of #277 on
-  // purpose. Issues #287 and #362 -- Helen asked twice, six weeks apart, for
-  // this one to "mouseover in our magenta same as for other links".
-  //
-  // #277 landed it on $color-exclude-active because everything in this section
-  // owns cobalt. That reasoning was about the SECTION; hers is about what the
-  // element IS. "(I know what I don't want)" is a link that opens a panel, and
-  // it reads as a link, so it should behave like every other link on the page.
-  // Cobalt stays where it belongs: the excluded INGREDIENTS inside the panel
-  // (#364, #365), which are results rather than navigation.
-  //
-  // $color-recipe-link-hover, not raw magenta, so it is literally the same
-  // value a link in a method step takes under the cursor.
-  &:hover,
-  &:active,
-  &:focus-visible { color: $color-recipe-link-hover; }
-
-  // The keyboard indicator stays, because a colour shift alone is not one --
-  // it is the same shift the mouse already causes, so it says "you are
-  // hovering", not "you are here". An outline rather than the old background
-  // fill: it does not change the element's apparent size or weight, so the
-  // focused link is still the same link.
-  &:focus-visible {
-    outline: 2px solid $color-exclude-active;
-    outline-offset: 2px;
-  }
-}
 
 // --- The dislike navigator (GitHub issue #52) --------------------------------
-// "I know what I don't want": the exclude picker, revealed by its own link
-// under I KNOW WHAT I WANT.
+// LEAVE OUT: the exclude picker, a section of its own beside HAS TO HAVE since
+// issue #586. It was revealed by a link under I KNOW WHAT I WANT until then.
 //
 // IT BORROWS NO CATEGORY HUE, on purpose, the same call META FILTERS and the
 // results heading already made: it is not one of the five filter categories,
 // so it doesn't take one of their colours. Everything here is $color-text and
-// the neutral clear-link grey, which also keeps the pane visibly quieter than
-// the five sections above it — right for something you opened deliberately
-// rather than something the page is offering everyone.
+// the neutral clear-link grey, which keeps the picker visibly quieter than the
+// five sections above it.
+//
+// THAT QUIETNESS USED TO BE ARGUED FROM THE DISCLOSURE -- "right for something
+// you opened deliberately rather than something the page is offering
+// everyone". The page offers it to everyone now, and the restraint is still
+// right, for the reason that outlived the door: spending a sixth code colour
+// on the buttons would claim this as a sixth filter category, which HANDOVER
+// 13.5 says the five hues exist to prevent.
 //
 // (The LEAVE OUT *label* is the one deliberate exception — it carries its own
 // cobalt double-rule, added in _category-labels.scss, not here. That is a
@@ -302,17 +220,19 @@
 // specifically; it has nothing to do with the buttons, links and pills below,
 // which stay neutral exactly as this comment already argues.)
 .controls .search--exclude {
-  // .search--exclude now lives inside .search--name (see the wrapper's own
-  // comment in food/index.html), so #exclude-search-clear and #exclude-dismiss
-  // are both descendants of .category.search--name as well as of this
-  // selector. Without this, _category-labels.scss's
+  // THIS RULE WAS DEFENSIVE AND NO LONGER NEEDS TO BE, which is worth saying
+  // rather than deleting. While .search--exclude lived INSIDE .search--name,
+  // #exclude-search-clear was a descendant of .category.search--name too, so
+  // _category-labels.scss's
   // `&.search--name { .btn-clear-inline { color: $color-name-search-active } }`
-  // rule would reach in and paint them I KNOW WHAT I WANT's own hot orange —
-  // exactly the borrowed hue this section's own comment, three paragraphs up,
-  // says it refuses. Restated here at equal specificity (three classes deep
-  // either way) rather than left to depend on _search.scss importing after
-  // _category-labels.scss in food.scss, which happens to be true today but
-  // isn't what anyone reading this rule in isolation could tell.
+  // reached in and painted it I KNOW WHAT I WANT's hot orange. This rule was
+  // restated at equal specificity to hold it off.
+  //
+  // #586 made the section a sibling, so nothing reaches in any more. The
+  // declaration stays because it is this section's own colour on its own
+  // terms -- it says which hue LEAVE OUT owns, not merely which one it
+  // refuses -- and that was already the reason it named the value outright
+  // instead of using `inherit`.
   .btn-clear-inline {
     // $color-exclude-active, the same $darken-active treatment every other
     // section's clear button gets from its own root hue -- Helen, 2026-08-16.
@@ -326,45 +246,49 @@
     &:hover { color: $color-text; }
   }
 
-  // `hidden` does the hiding (the attribute, from filters.js) so the closed
-  // panel is out of the tab order as well as off the screen. This only owns
-  // the layout of the open one.
-  .exclude-panel {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: $index-label-gap;
-    margin-top: $space-md;
-  }
+  // `.exclude-panel` and `.exclude-panel[hidden]` stood here and are gone with
+  // issue #586. One worked example is worth keeping out of them: `hidden` IS
+  // AN ATTRIBUTE, AND display BEATS IT. The UA stylesheet gives
+  // `[hidden] { display: none }`, which any explicit `display` on the element
+  // overrides -- so the panel's own `display: flex` silently cancelled it and
+  // the picker shipped permanently open, whatever aria-expanded claimed. If
+  // anything on this page ever uses `hidden` again, it needs its own
+  // higher-specificity `[hidden] { display: none }` beside it.
 
-  // `hidden` IS AN ATTRIBUTE, AND display BEATS IT. The UA stylesheet gives
-  // [hidden] { display: none }, which any explicit display on the element
-  // overrides -- so the flex above silently cancelled it and the panel was
-  // open from the moment the page loaded, whatever aria-expanded claimed.
-  // Helen: "should not be shown by default". Restated here at higher
-  // specificity (0,1,1 beats 0,1,0) rather than by swapping the attribute for
-  // a class, so the panel's contents stay out of the tab order while closed --
-  // which is the reason it uses `hidden` in the first place.
-  .exclude-panel[hidden] {
-    display: none;
-  }
-
-  // OUTSIDE #exclude-panel on purpose (see food/index.html's comment on the
-  // wrapper): #exclude-dismiss hides the panel but the exclusions themselves
-  // stay applied, so this has to keep rendering — and stay clickable — while
-  // .exclude-panel is `hidden`.
   // NOTHING EXCLUDED, NOTHING TO SPACE. This div renders on every page load
-  // whether or not anything is in it -- it has to, because it lives outside
-  // #exclude-panel so the pills survive the panel closing. Empty it is
-  // zero-height, but it is still a flex CHILD of .category, so it was
-  // collecting a full $index-label-gap between the search box and the recipe
-  // list below for the majority of sessions that never open the panel at all.
-  // Helen: "reduce the amount of vertical space between LEAVE OUT and the
-  // recipe list." :empty is exact here -- filters.js appends element children
-  // when there is something to show and empties innerHTML when there is not,
-  // so there is never stray whitespace to defeat it.
+  // whether or not anything is in it. Empty it is zero-height, but it is still
+  // a flex CHILD of .category, so it was collecting a full $index-label-gap
+  // between the search box and the recipe list below for the majority of
+  // sessions that never exclude anything at all. Helen: "reduce the amount of
+  // vertical space between LEAVE OUT and the recipe list." :empty is exact
+  // here -- filters.js appends element children when there is something to
+  // show and empties innerHTML when there is not, so there is never stray
+  // whitespace to defeat it.
+  //
+  // Same family as the empty results pool above it (issue #589), and the two
+  // are worth reading together: an element that renders unconditionally and is
+  // filled conditionally must be told what it costs when empty, because the
+  // answer is never automatically zero.
   .exclude-active:empty {
     display: none;
+  }
+
+  // THE PILLS NEED THEIR OWN TOP GAP NOW, and this is a real consequence of
+  // #586 rather than a tidy-up. While this section lived inside .search--name
+  // it was a flex column with `gap: $index-label-gap`, which spaced the panel
+  // from the pills for free. As a `.category.search` it inherits
+  // `gap: 0` instead (_category-labels.scss, so that an empty pool buys no
+  // dead air), and the pills would sit flush against the pool above them.
+  //
+  // `:not(:empty)`, matching .search-results next door, and for the same
+  // reason: the space belongs to the CONTENT, not to the box. The
+  // `.exclude-active:empty { display: none }` rule above would in fact make an
+  // unconditional margin harmless here, since `display: none` takes the
+  // margins with it -- but that makes this rule's correctness depend on that
+  // one, and #589 is exactly what happens when two rules have to agree about
+  // what empty costs.
+  .exclude-active:not(:empty) {
+    margin-top: $index-label-gap;
   }
 
   .exclude-active {
