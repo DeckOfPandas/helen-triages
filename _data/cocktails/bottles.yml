@@ -315,6 +315,19 @@ bottles:
     aliases: ["Woodford’s Reserve", "Woodfords Reserve"]
   "Ardbeg XO":
     generic: "single malt scotch whisky"
+  # THE PRODUCT REALLY IS CALLED "SAZERAC", which is why it sat in
+  # `unresolved_suggestions` for days under the reasonable suspicion that the
+  # Sazerac's suggestion was just its own title written twice. Helen,
+  # 2026-08-31: "the product name is Sazerac, though, I promise, and I have it
+  # and use it elsewhere." So it is a bottle like any other.
+  #
+  # NO DRINK SUGGESTS IT TODAY, and that is not an oversight to correct: it came
+  # off the Sazerac in the same commit, because she does not reach for it there.
+  # This file records what she would POUR (#529), not what a drink happens to
+  # name, so a bottle she owns and uses belongs here whether or not the
+  # collection has caught up.
+  "Sazerac":
+    generic: "rye"
 
   # --- agave ----------------------------------------------------------------
   "Del Maguey Vida":
@@ -505,14 +518,13 @@ unresolved_suggestions:
   "Portobello": >-
     A brand, and completing it to Portobello Road was memory rather than
     reading. Tailspin's generic is `London dry gin`.
-  "Sazerac": >-
-    THE DOUBT IS SETTLED AND THE STRING STILL DOES NOT RESOLVE. This entry used
-    to read "it is not even certain this names a bottle rather than repeating
-    the title". Helen, 2026-08-31: "there is a rye named Sazerac, confusingly.
-    Even worse, I tend not to use it in a Sazerac." So it does name a real rye
-    -- and `Sazerac` alone is the house, not the product (#529: a brand is not
-    a bottle), and it is not what she reaches for in the drink that carries it.
-    Pending her call on whether the suggestion comes off that drink entirely.
+  # "Sazerac" IS RESOLVED AND IS A REAL BOTTLE -- see the whisky block above.
+  # This entry stood on the suspicion that the string was the drink's own title
+  # written twice; Helen, 2026-08-31: "the product name is Sazerac, though, I
+  # promise". It is declared now, and the suggestion came off the Sazerac in the
+  # same commit because she does not reach for it in that drink: "if I like the
+  # D&C recipe I will figure out the bottle myself." Both halves of a suspicion
+  # answered in opposite directions, which is why neither could be guessed.
   "Luxardo": >-
     A house, not a bottle. Three drinks write it against `maraschino liqueur`.
   "Roots": >-
