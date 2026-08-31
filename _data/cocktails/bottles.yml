@@ -341,6 +341,12 @@ bottles:
   "Dolin Dry":
     generic: "dry vermouth"
     aliases: ["Dolin dry"]
+  # Helen's call, 2026-08-31, from White Negroni. The one bottle of the eleven
+  # this ingest met that she wanted declared now rather than when she makes the
+  # drink -- a different bottle from Dolin Dry above, not a spelling of it.
+  "Dolin Blanc":
+    generic: "blanc vermouth"
+    aliases: ["Dolin blanc"]
 
   # --- liqueurs -------------------------------------------------------------
   "Cointreau":
