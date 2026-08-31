@@ -50,38 +50,52 @@ sitemap: false
   <h1 class="recipe-title"><span class="recipe-title-text">Glasses on cards</span></h1>
 
   <p class="dev-intro">
-    Every glass that a drink actually asks for, drawn in a real card panel at
-    the real scale. The tallest glass in <code>glasses.yml</code> is
-    <strong>{{ tallest_mm | round }} mm</strong>, and it is the reference every
+    Every glass in <code>glasses.yml</code>, drawn in a real card panel at the
+    real scale, tallest first. The tallest is
+    <strong>{{ tallest_mm | round }} mm</strong> and it is the reference every
     other glass is measured against — so it is <em>always</em> 1.0 and always
-    fills the panel, whatever it happens to be.
+    fills the panel, whatever it happens to be. <b>Unused glasses are drawn
+    too</b>, greyed in the label: <code>tallest_mm</code> is counted over
+    <code>all_icons</code>, not over the glasses in use, so one of those can set
+    the scale for the whole set without appearing on a single card.
   </p>
 
   <div class="dev-controls">
     <fieldset>
-      <legend>Model</legend>
-      <label><input type="radio" name="model" value="flat" checked> <b>A · flat</b> — what ships today: <code>mm / tallest</code></label>
-      <label><input type="radio" name="model" value="headroom"> <b>B · flat + headroom</b> — same shape, tallest glass leaves a margin</label>
-      <label><input type="radio" name="model" value="linear"> <b>C · compressed range</b> — <code>ratio × k + (1−k)</code>, the drink page's curve</label>
-      <label><input type="radio" name="model" value="power"> <b>D · power</b> — <code>ratio ^ p</code>, the one glasses.yml promises</label>
+      <legend>Shape</legend>
+      <label><input type="radio" name="model" value="flat" checked> <b>flat</b> — what ships: <code>mm / tallest</code></label>
+      <label><input type="radio" name="model" value="linear"> <b>compressed</b> — <code>ratio × k + (1−k)</code>, the drink page's curve</label>
+      <label><input type="radio" name="model" value="power"> <b>power</b> — <code>ratio ^ p</code>, the one glasses.yml promises</label>
+      <p class="dev-note">
+        Both curves lift the SHORT end. Neither moves the tallest glass, which
+        is 1.0 by construction — that is what headroom is for, and why the two
+        compose rather than competing.
+      </p>
     </fieldset>
 
     <fieldset>
       <legend>Dials</legend>
-      <label class="dial" data-for="headroom">headroom <input type="range" id="headroom" min="0.70" max="1.00" step="0.01" value="0.90"><output for="headroom"></output></label>
+      <label class="dial dial--always">headroom <input type="range" id="headroom" min="0.60" max="1.00" step="0.01" value="1.00"><output for="headroom"></output></label>
       <label class="dial" data-for="linear">k <input type="range" id="k" min="0.30" max="1.00" step="0.02" value="0.68"><output for="k"></output></label>
       <label class="dial" data-for="power">p <input type="range" id="p" min="0.30" max="1.00" step="0.02" value="0.60"><output for="p"></output></label>
       <label class="dial dial--always"><input type="checkbox" id="cheats" checked> apply the <code>display_scale</code> cheats</label>
       <label class="dial dial--always"><input type="checkbox" id="frame"> outline the panel and the drawing</label>
+      <label class="dial dial--always"><input type="checkbox" id="usedonly"> only glasses a drink asks for</label>
+      <p class="dev-note">
+        headroom 1.00 with shape <b>flat</b> and the cheats on is exactly what
+        ships today, so any change you see is a change you made.
+      </p>
     </fieldset>
   </div>
 
   <p class="dev-readout" id="readout"></p>
 
   {% comment %} Which glasses are actually asked for, and how often. Counted
-     from the drafts because that is what the index reads (§9.9) — a glass no
-     drink names is not a card problem, so it is listed separately below rather
-     than padding the comparison. {% endcomment %}
+     from the drafts because that is what the index reads (§9.9). Every glass is
+     DRAWN either way — an unused one still sets the reference, and one of them
+     is exactly the sort of thing that changes the whole set silently — but the
+     count is on the label, because how much a glass matters is how many drinks
+     wear it. {% endcomment %}
   {% assign used = "" %}
   {% for drink in site.cocktail_drafts %}
     {% for g in drink.glass %}
@@ -95,45 +109,30 @@ sitemap: false
       {% assign needle = icon | append: "|" %}
       {% assign bits = used | split: needle %}
       {% assign n = bits.size | minus: 1 %}
-      {% if n > 0 %}
-        {% assign mm = glasses.heights_mm[icon] | times: 1.0 %}
-        {% assign cheat = glasses.display_scale[icon] | default: 1.0 %}
-        {% assign ratio = mm | divided_by: tallest_mm %}
-        <li class="dev-card-cell">
-          <div class="drink-card dev-card"
-               data-icon="{{ icon }}" data-mm="{{ mm }}"
-               data-ratio="{{ ratio }}" data-cheat="{{ cheat }}">
-            <span class="drink-card-glass" style="--glass-ratio: {{ ratio }}; --glass-cheat: {{ cheat }};">
-              {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
-              {% include {{ icon_file }} %}
-            </span>
-          </div>
-          <p class="dev-card-label">
-            <b>{{ icon }}</b><br>
-            {{ mm | round }} mm · {{ n }} drink{% unless n == 1 %}s{% endunless %}
-            {% if glasses.display_scale[icon] %}<br><span class="dev-cheat">cheat {{ cheat }}</span>{% endif %}
-            <br><span class="dev-height" data-height-for="{{ icon }}"></span>
-          </p>
-        </li>
-      {% endif %}
+      {% assign mm = glasses.heights_mm[icon] | times: 1.0 %}
+      {% assign cheat = glasses.display_scale[icon] | default: 1.0 %}
+      {% assign ratio = mm | divided_by: tallest_mm %}
+      <li class="dev-card-cell{% if n == 0 %} dev-card-cell--unused{% endif %}"
+          data-used="{{ n }}" data-mm="{{ mm }}">
+        <div class="drink-card dev-card"
+             data-icon="{{ icon }}" data-mm="{{ mm }}"
+             data-ratio="{{ ratio }}" data-cheat="{{ cheat }}">
+          <span class="drink-card-glass" style="--glass-ratio: {{ ratio }}; --glass-cheat: {{ cheat }};">
+            {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
+            {% include {{ icon_file }} %}
+          </span>
+        </div>
+        <p class="dev-card-label">
+          <b>{{ icon }}</b><br>
+          {{ mm | round }} mm ·
+          {% if n > 0 %}{{ n }} drink{% unless n == 1 %}s{% endunless %}
+          {% else %}<span class="dev-nodrink">no drink</span>{% endif %}
+          {% if glasses.display_scale[icon] %}<br><span class="dev-cheat">cheat {{ cheat }}</span>{% endif %}
+          <br><span class="dev-height" data-height-for="{{ icon }}"></span>
+        </p>
+      </li>
     {% endfor %}
   </ul>
-
-  <h2 class="recipe-section-heading"><span class="section-heading-text">Declared but unused</span></h2>
-  <p class="dev-intro">
-    These have a <code>heights_mm</code> entry and no drink. They still set the
-    reference: <code>tallest_mm</code> is counted over <code>all_icons</code>,
-    not over the glasses in use, so an unused glass taller than every real one
-    would silently shrink the whole set.
-  </p>
-  <p class="dev-unused">
-    {% for icon in glasses.all_icons %}
-      {% assign needle = icon | append: "|" %}
-      {% assign bits = used | split: needle %}
-      {% assign n = bits.size | minus: 1 %}
-      {% if n == 0 %}<span>{{ icon }} <i>{{ glasses.heights_mm[icon] | round }} mm</i></span>{% endif %}
-    {% endfor %}
-  </p>
 </article>
 
 <style>
@@ -159,8 +158,12 @@ sitemap: false
   .dev-card { width: 7.6rem; }
   .dev-card-label { font-size: 0.72rem; line-height: 1.45; margin: 0.45rem 0 0; }
   .dev-cheat, .dev-height { font-family: var(--dev-mono, monospace); font-size: 0.68rem; }
-  .dev-unused span { display: inline-block; margin-right: 1rem; font-size: 0.78rem; }
-  .dev-unused i { opacity: 0.6; }
+  .dev-note { font-size: 0.72rem; line-height: 1.5; max-width: 30ch; margin: 0.5rem 0 0; opacity: 0.75; }
+  /* Unused glasses are greyed in the LABEL only -- the drawing has to stay at
+     full strength, or the comparison it is here for stops working. */
+  .dev-card-cell--unused .dev-card-label { opacity: 0.5; }
+  .dev-nodrink { font-style: italic; }
+  .is-usedonly .dev-card-cell--unused { display: none; }
 
   /* The frame overlay: the panel's box, and the drawing's own box inside it.
      Off by default -- it is a measuring aid, and leaving it on would change
@@ -189,10 +192,14 @@ sitemap: false
     var PANEL = probe ? probe.getBoundingClientRect().height : 0;
 
     var model = 'flat';
-    var dials = { headroom: 0.90, k: 0.68, p: 0.60 };
+    var dials = { headroom: 1.00, k: 0.68, p: 0.60 };
 
+    // SHAPE AND HEADROOM COMPOSE, they do not compete. Both curves lift the
+    // short end and leave the tallest glass at exactly 1.0 -- it is the
+    // reference, so by construction nothing about its RATIO can move it.
+    // Headroom is the only dial that can, which is why it applies to every
+    // shape rather than being one of them.
     function shape(ratio) {
-      if (model === 'headroom') return ratio * dials.headroom;
       if (model === 'linear') return ratio * dials.k + (1 - dials.k);
       if (model === 'power') return Math.pow(ratio, dials.p);
       return ratio;
@@ -204,7 +211,7 @@ sitemap: false
       cards.forEach(function (card) {
         var ratio = parseFloat(card.dataset.ratio);
         var cheat = cheatsOn ? parseFloat(card.dataset.cheat) : 1;
-        var out = shape(ratio);
+        var out = shape(ratio) * dials.headroom;
         var glass = card.querySelector('.drink-card-glass');
         glass.style.setProperty('--glass-ratio', out);
         glass.style.setProperty('--glass-cheat', cheat);
@@ -213,7 +220,11 @@ sitemap: false
         // says, and that is invisible in the arithmetic.
         var svg = glass.querySelector('svg');
         var h = svg ? svg.getBoundingClientRect().height : 0;
-        tallestDrawn = Math.max(tallestDrawn, h);
+        // The tallest DRAWN is measured over what is on screen, so hiding the
+        // unused glasses changes it -- which is the point: it answers "does the
+        // tallest thing anyone actually sees fit", not "does the tallest row in
+        // the data fit".
+        if (svg && svg.getClientRects().length) tallestDrawn = Math.max(tallestDrawn, h);
         var label = document.querySelector('[data-height-for="' + card.dataset.icon + '"]');
         if (label && PANEL) {
           label.textContent = (h / PANEL * 100).toFixed(0) + '% of panel';
@@ -254,6 +265,18 @@ sitemap: false
     document.getElementById('frame').addEventListener('change', function (e) {
       grid.classList.toggle('is-framed', e.target.checked);
     });
+    document.getElementById('usedonly').addEventListener('change', function (e) {
+      grid.classList.toggle('is-usedonly', e.target.checked);
+      apply();  // the readout's "tallest drawn" is over what is visible
+    });
+
+    // TALLEST FIRST, sorted here rather than in Liquid, which cannot order a
+    // list by a lookup into another map without building one. This is the
+    // order the decision wants: the glasses that fill the panel are the
+    // question, so they should be the first thing on the page.
+    Array.prototype.slice.call(grid.children)
+      .sort(function (a, b) { return parseFloat(b.dataset.mm) - parseFloat(a.dataset.mm); })
+      .forEach(function (cell) { grid.appendChild(cell); });
 
     syncDials();
     apply();
