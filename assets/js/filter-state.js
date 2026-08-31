@@ -444,6 +444,32 @@
       .some(function (f) { return isFieldSet((state || {})[f]); });
   }
 
+  /* THE ONE BROWSER FACT THE RESTORE RESTS ON — #387, and shared by both
+     indexes since #595 rather than written twice.
+
+     BFCACHE IS NOT THE MECHANISM, and building on it was the first attempt.
+     `jekyll serve` sends `Cache-Control: ... no-store ...` (measured with
+     curl -I, not assumed) and no-store disqualifies a page from bfcache in
+     Chrome and Firefox -- so on the machine this site is developed on it can
+     NEVER apply, and a feature resting on it would work on the deployed site
+     and not on :4001. That is issue #235's trap running backwards: the page
+     Helen looks at all day disagreeing with the live one.
+
+     The navigation TYPE is a fact rather than a favour. It says whether this
+     load was a back/forward navigation whether or not bfcache was involved,
+     and paired with sessionStorage it needs nothing from the browser's
+     goodwill. `performance` is injected so this can be asked a question
+     without one. */
+  function arrivedByGoingBack(perf) {
+    var timing = perf || (typeof performance !== 'undefined' ? performance : null);
+    try {
+      var nav = timing.getEntriesByType('navigation')[0];
+      return !!nav && nav.type === 'back_forward';
+    } catch (e) {
+      return false;    // no Navigation Timing: behave as a fresh visit
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // SERIALISING THE STATE — GitHub issue #387
   // ---------------------------------------------------------------------------
@@ -552,6 +578,7 @@
     // key are the food index's questions. The cocktail index asks a different
     // five and answers them in cocktail-index.js against COCKTAIL_FIELDS.
     rowMatchesFilters: rowMatchesFilters,
+    arrivedByGoingBack: arrivedByGoingBack,
     hasAnythingToClear: food.hasAnythingToClear,
     isEmpty: food.isEmpty,
     hasNarrowingFilter: food.hasNarrowingFilter,

@@ -643,5 +643,94 @@
 
   clearAllButtons.forEach(function (btn) { btn.addEventListener('click', clearAll); });
 
+  /* --- GOING BACK RETURNS THE LIST YOU LEFT — #595 -------------------------- */
+  /* Helen: "exactly as the food site does", and it is food's #387 mechanism
+     with one difference that matters.
+
+     FOOD RESTORES AN ARRAY; THIS RESTORES THE SORT KEYS. The food index keeps
+     its order in `items` and reorders the DOM to match. Here the order is
+     DERIVED on every pass -- rank by matched moods, then by each card's random
+     key -- so putting the cards back in the right nodes and calling apply()
+     would immediately re-sort them by keys that were freshly randomised at
+     startup. The order is the keys, so the keys are what comes back: each card
+     takes its INDEX in the saved order, and a drink the record has never seen
+     sorts after all of them rather than being dropped.
+
+     WHAT IS NOT RESTORED, on food's own reasoning: a half-typed picker.
+     isIncludeSearching / isExcludeSearching mean "there is text in that box and
+     nothing chosen from its results yet", which is candidates mid-thought
+     rather than a filter. A CHOSEN chip is different and does come back -- it
+     is an applied filter, and it rebuilds from the state like any other. */
+  var MEMORY_KEY = 'htf-drinks-memory-v1';
+
+  /* Cards carry no id; the drink link's href is the one thing on a card that is
+     unique and stable. `data-name` is not -- two drinks may share a name and
+     the Modern Zombie already writes "(makes 2)" into its slug and not its
+     name. */
+  function cardKey(d) {
+    return d.nameEl ? d.nameEl.getAttribute('href') : '';
+  }
+
+  function saveDrinksMemory() {
+    try {
+      var order = model.slice().sort(function (a, b) { return a.key - b.key; });
+      sessionStorage.setItem(MEMORY_KEY, JSON.stringify({
+        order: order.map(cardKey),
+        filters: FilterState.serialise(state),
+        scrollY: window.scrollY || 0
+      }));
+    } catch (e) { /* storage full, blocked or absent: a fresh list is no worse */ }
+  }
+
+  /* Returns the record when it restored, or null for "carry on as a fresh
+     load" -- which every failure path returns: not a back navigation, nothing
+     stored, unparseable, or a record whose shape does not fit. Stored state is
+     untrusted input; see FilterState.deserialise's own note. */
+  function restoreDrinksMemory() {
+    if (!FilterState.arrivedByGoingBack()) return null;
+
+    var saved;
+    try {
+      saved = JSON.parse(sessionStorage.getItem(MEMORY_KEY));
+    } catch (e) {
+      return null;
+    }
+    if (!saved || !Array.isArray(saved.order)) return null;
+
+    var position = Object.create(null);
+    saved.order.forEach(function (key, i) { position[key] = i; });
+    var unseen = saved.order.length;
+    model.forEach(function (d) {
+      var at = position[cardKey(d)];
+      d.key = (typeof at === 'number') ? at : unseen++;
+    });
+
+    state = FilterState.deserialise(saved.filters);
+    state.isIncludeSearching = false;
+    state.isExcludeSearching = false;
+
+    if (nameInput) nameInput.value = state.nameQuery || '';
+    [incInput, excInput].forEach(function (input) { if (input) input.value = ''; });
+    Object.keys(redrawPool).forEach(function (field) { redrawPool[field](); });
+    syncMoodButtons();
+    syncChaosButtons();
+    return saved;
+  }
+
+  var restored = restoreDrinksMemory();
+
   apply();
+
+  /* AFTER apply(), because the page is not its full height until the hidden
+     cards are hidden -- scrolling to 2,400px on a list that is still 6,000px
+     tall and about to become 900px lands somewhere else entirely. */
+  if (restored && typeof restored.scrollY === 'number') {
+    window.scrollTo(0, restored.scrollY);
+  }
+
+  /* pagehide rather than unload: it fires on the way out INCLUDING into
+     bfcache, and unlike unload it does not itself disqualify the page from it.
+     On the deployed site bfcache does apply, and this mechanism should stay out
+     of its way rather than compete with it. */
+  window.addEventListener('pagehide', saveDrinksMemory);
 })();

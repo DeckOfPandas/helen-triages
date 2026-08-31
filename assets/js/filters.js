@@ -221,14 +221,10 @@ document.addEventListener('DOMContentLoaded', function () {
     return a ? a.getAttribute('href') : '';
   }
 
-  function arrivedByGoingBack() {
-    try {
-      var nav = performance.getEntriesByType('navigation')[0];
-      return !!nav && nav.type === 'back_forward';
-    } catch (e) {
-      return false;    // no Navigation Timing: behave as a fresh visit
-    }
-  }
+  // FilterState.arrivedByGoingBack since #595, where the cocktail index needed
+  // the same fact. The reasoning above moved with it, into that module's own
+  // comment, where a test can reach the function it explains.
+  var arrivedByGoingBack = FilterState.arrivedByGoingBack;
 
   /* Saved on pagehide rather than on every update: it fires on the way out of
      the page, including into bfcache, and unlike `unload` it does not itself

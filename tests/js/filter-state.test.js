@@ -702,6 +702,37 @@ test('a row missing every field is not a crash', () => {
   assert.strictEqual(FS.rowMatchesFilters(undefined, undefined, EXACT), true);
 });
 
+// --- did we get here by going back? — #387, shared with cocktails by #595 -----
+// The one browser fact both restores rest on. It is here rather than in either
+// index because the alternative was the same six lines twice, and because
+// `performance` can be injected -- so the question can be asked without a
+// browser, which is the whole reason the food side's version was unreachable.
+
+test('a back/forward navigation is recognised', () => {
+  const perf = { getEntriesByType: () => [{ type: 'back_forward' }] };
+  assert.strictEqual(FS.arrivedByGoingBack(perf), true);
+});
+
+test('every other kind of arrival is a fresh visit', () => {
+  ['navigate', 'reload', 'prerender', ''].forEach((type) => {
+    const perf = { getEntriesByType: () => [{ type }] };
+    assert.strictEqual(
+      FS.arrivedByGoingBack(perf), false,
+      `a "${type}" navigation was treated as going back, which would restore a ` +
+      `stale list over a deliberate reload.`
+    );
+  });
+});
+
+test('no Navigation Timing at all is a fresh visit, not a crash', () => {
+  // The index runs this at startup; an exception here would take the whole
+  // page's filtering with it, and the honest fallback is the list you would
+  // have had before the feature existed.
+  assert.strictEqual(FS.arrivedByGoingBack({ getEntriesByType: () => [] }), false);
+  assert.strictEqual(FS.arrivedByGoingBack({}), false);
+  assert.strictEqual(FS.arrivedByGoingBack(null), false);
+});
+
 test('the two tables are genuinely different -- this is not one index twice', () => {
   const food = FS.create(FS.FOOD_FIELDS).FIELDS;
   const cocktail = FS.create(FS.COCKTAIL_FIELDS).FIELDS;
