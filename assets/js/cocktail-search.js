@@ -510,6 +510,46 @@
           var words = getWords(folded);
           var scored = {
             entry: value,
+            /* WHICH TERM ACTUALLY MATCHED, which is a different question from
+               which chip won -- and on band 3 it is the only place the answer
+               exists. A chip found through a name it does not display can say
+               nothing about why it is on screen unless it is handed the term,
+               and #603 is what happens then: typing "mu" returns
+               `clear blended rum` (matched inside "clear blended MUlti-region
+               rum") and "sa" returns `cachaça` (matched on the bottle
+               Sagatiba). Both are band 3 working exactly as designed.
+
+               Carried on every band, not only band 3, because a consumer
+               asking "is this the chip's own name?" should compare rather
+               than infer -- on bands 1, 2 and 4, `via` is the chip's own
+               value. */
+            via: term,
+            /* WHAT KIND of name found it, because the three hidden kinds are
+               three different arguments and #603 collects one of each:
+
+                 own      the chip's own name -- bands 1, 2 and 4
+                 generic  a category name the card name abbreviates away
+                          ("mu" -> `clear blended rum`, via "clear blended
+                          MUlti-region rum")
+                 bottle   a suggestion sitting beside the generic. This is the
+                          kind band 3 was BUILT for -- "velvet" -> `falernum`
+                 prose    a suggestion that is not a bottle name at all
+                          ("havana" -> `rhum agricole blanc`, via "Havana 3
+                          year old and Clément Agricole Blanc"). #585 already
+                          stops these becoming chips; nothing stopped them
+                          being searched.
+
+               Classified in resolveTerm's own order -- declared first, so a
+               generic is never re-read as prose -- because two answers to
+               "what is this string" is how they drift apart. No live term
+               needs that ordering today (measured 2026-08-31: 0 of 188
+               declared terms read as prose), so the test pins it with the
+               comma'd spelling #561 retired rather than leaving a branch
+               nothing can reach. */
+            viaKind: (normalise(term) === normalise(value)) ? 'own'
+              : isDeclared(term) ? 'generic'
+                : isProse(term) ? 'prose'
+                  : 'bottle',
             isPrefixMatch: folded.indexOf(query) === 0,
             hasWordMatch: words.some(function (w) { return w.indexOf(query) === 0; })
           };

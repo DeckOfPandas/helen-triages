@@ -58,7 +58,12 @@ const VOCAB = {
   // name Helen chose from text someone transcribed, the same shape
   // test_cocktails.py's _declared_generics reads.
   syrups: ['ginger and lemongrass cordial', 'sugar syrup 1:1', 'sugar syrup 2:1'],
-  cane_and_palm_spirits: ['coconut rum', 'moderately aged rum'],
+  // `Jamaican, moderately aged` is #561's RETIRED shape, kept here as the one
+  // declared term that reads as prose by the comma rule. Nothing in the live
+  // vocabulary does -- measured 2026-08-31, 0 of 188 -- so without a fixture
+  // saying so, viaKind's declared-before-prose ordering is a branch no test
+  // can reach, and flipping it would stay green.
+  cane_and_palm_spirits: ['coconut rum', 'moderately aged rum', 'Jamaican, moderately aged'],
   liqueurs: ['falernum', 'apricot liqueur', 'cherry liqueur', 'gin liqueur'],
   juices: ['lime juice', 'lime', 'lime cordial'],
   card_names: {
@@ -66,6 +71,10 @@ const VOCAB = {
     'aged Demerara rum': 'Demerara rum',
     'Demerara overproof rum': 'Demerara overproof rum',
     'moderately aged Jamaican rum': 'Jamaican rum',
+    // Two generics under one card name is #501's declared collapse, and it is
+    // what puts the comma'd spelling above out of sight behind a card name --
+    // which is the only way it reaches viaKind as a HIDDEN declared term.
+    'Jamaican, moderately aged': 'Jamaican rum',
     'moderately aged rum': 'aged rum',
     'sugar syrup 1:1': 'sugar syrup',
     'sugar syrup 2:1': 'sugar syrup'
@@ -815,4 +824,102 @@ test('a matched ingredient on a card is found by the same rule the filter used',
   assert.strictEqual(S.entryIsHit(CS.splitEntries(attr('lime juice')), ['lime']), true);
   assert.strictEqual(S.entryIsHit(CS.splitEntries(attr('ginger syrup')), ['gin']), true);
   assert.strictEqual(S.entryIsHit(CS.splitEntries(attr('ginger syrup')), []), false);
+});
+
+// --- why a chip is on screen: `via` and `viaKind` -----------------------------
+// #603. Helen typed three letters three times and got three chips that could
+// not say why they were there: "mu" -> `clear blended rum`, "sa" -> `cachaça`,
+// "wr" -> `Jamaican overproof rum`. Every one was band 3 doing exactly what it
+// was built to do -- matching a name the chip does not display.
+//
+// The module cannot decide what a picker should DO about that; what it can do
+// is stop the picker having to guess. `via` is the term that won and `viaKind`
+// says what kind of name it was, because the three hidden kinds are three
+// different arguments: a BOTTLE is the case band 3 exists for, a hidden
+// GENERIC is the case Helen finds confusing, and PROSE is one #585 has already
+// ruled should not be there at all.
+
+test('a chip matched on its own name says so, on every visible band', () => {
+  const pool = S.buildPool(pours('lime juice', 'apricot liqueur'));
+  const bands = {};
+  S.search('li', pool, []).results.forEach((r) => { bands[r.entry] = r; });
+
+  // Band 1: the chip's own name starts with the query.
+  assert.strictEqual(bands['lime juice'].band, 1);
+  assert.strictEqual(bands['lime juice'].via, 'lime juice');
+  assert.strictEqual(bands['lime juice'].viaKind, 'own');
+
+  // Band 2: a word inside the chip's own name. Still its own name.
+  assert.strictEqual(bands['apricot liqueur'].band, 2);
+  assert.strictEqual(bands['apricot liqueur'].viaKind, 'own');
+
+  // Band 4: a bare substring of the chip's own name -- li-QUE-ur starts no
+  // word at all -- and still its own name, which is the point here.
+  const [substring] = S.search('que', pool, []).results;
+  assert.strictEqual(substring.entry, 'apricot liqueur');
+  assert.strictEqual(substring.band, 4);
+  assert.strictEqual(substring.viaKind, 'own');
+});
+
+test('a chip found through a BOTTLE names the bottle -- the case band 3 exists for', () => {
+  const pool = S.buildPool(pours(attr('moderately aged rum', 'aged rum', 'appleton 12')));
+  const [hit] = S.search('appleton', pool, []).results;
+
+  assert.strictEqual(hit.entry, 'aged rum');
+  assert.strictEqual(hit.band, 3);
+  assert.strictEqual(hit.via, 'appleton 12');
+  assert.strictEqual(hit.viaKind, 'bottle');
+});
+
+test('a chip found through the GENERIC its card name abbreviates says which', () => {
+  // The "mu" case in miniature: the card name is what the chip shows, so the
+  // words the generic carries are invisible on the very button they matched.
+  const pool = S.buildPool(pours(attr('moderately aged rum', 'aged rum')));
+  const [hit] = S.search('moderat', pool, []).results;
+
+  assert.strictEqual(hit.entry, 'aged rum');
+  assert.strictEqual(hit.band, 3);
+  assert.strictEqual(hit.via, 'moderately aged rum');
+  assert.strictEqual(hit.viaKind, 'generic');
+});
+
+test('a chip found through PROSE is marked as such, not as a bottle', () => {
+  // "Wray & Nephew, or Rum Fire" is two bottles in one string, and
+  // bottles.yml's own `unresolved_suggestions` says so. #585 already stops it
+  // becoming a chip of its own; nothing stopped it being searchABLE, so typing
+  // "wray" reaches a category through a string Helen has said should not exist.
+  const pool = S.buildPool(pours(
+    attr('moderately aged jamaican rum', 'jamaican rum', 'wray & nephew, or rum fire')));
+  const [hit] = S.search('wray', pool, []).results;
+
+  // The chip wears the vocabulary's own casing, not the downcased attribute's.
+  assert.strictEqual(hit.entry, 'Jamaican rum');
+  assert.strictEqual(hit.band, 3);
+  assert.strictEqual(hit.viaKind, 'prose');
+});
+
+test('a declared name is a generic even when it reads as prose', () => {
+  // resolveTerm asks "is this declared?" before "is this prose?", and viaKind
+  // has to ask in the same order or the two answers to "what is this string"
+  // drift apart. No live term needs this today; a comma'd generic is exactly
+  // the shape #561 retired, and a retired shape is the one likeliest to come
+  // back through an alias.
+  const pool = S.buildPool(pours(attr('jamaican, moderately aged', 'jamaican rum')));
+  const [hit] = S.search('moderat', pool, []).results;
+
+  assert.strictEqual(hit.band, 3);
+  assert.strictEqual(hit.viaKind, 'generic');
+});
+
+test('the winning band decides which term is reported, not the first one seen', () => {
+  // One chip reachable two ways at once: `gin` shows its own name AND hides
+  // the bottle Portobello. "gin" must report the visible match, because that is
+  // the one that won -- a picker annotating this with "Portobello" would be
+  // explaining a chip that needs no explanation.
+  const pool = S.buildPool(pours(attr('london dry gin', 'gin', 'portobello')));
+  const [hit] = S.search('gin', pool, []).results;
+
+  assert.strictEqual(hit.band, 1);
+  assert.strictEqual(hit.via, 'gin');
+  assert.strictEqual(hit.viaKind, 'own');
 });
