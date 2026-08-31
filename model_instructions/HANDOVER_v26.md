@@ -4387,6 +4387,42 @@ table that listed a file nobody had ever written, for three versions running,
 because nobody checked. **If the code and this file disagree, the code wins,**
 and the fix is to correct this file, not to trust it harder next time.
 
+> ### AN OPEN ISSUE IS A DOCUMENT TOO, AND IT ROTS FASTER
+>
+> **MEASURE ANY ISSUE OLDER THAN A DAY BEFORE ACTING ON IT OR REPEATING IT.**
+> Not "read it carefully" — run the numbers in it against the data.
+>
+> Helen, 2026-08-31, on being asked about something settled for the third
+> time: *"I saw Kamaniwanalaya and Swizzle and felt annoyed again — have we
+> not settled this? Now three times or more?"* She was right, and the cost of
+> being wrong here lands on her rather than on the suite.
+>
+> **The instance that earned this box.** #600 was raised on 2026-08-30 by
+> copying #542's "Also outstanding" section, written 2026-08-27, without
+> re-measuring a word. Four days. Every claim in it was false by the time it
+> was written: six drinks said to carry a half-empty disjunction — **zero**
+> did, four of them had no list `generic` at all any more; a drink said to
+> need a decision — Kamaniwanalaya — **already had the exact fix requested**;
+> a second drink, `swizzle`, **no longer existed**, having become the
+> Martinique Swizzle; and two suggestion strings quoted as outstanding were
+> **not in `unresolved_suggestions` any more**.
+>
+> **The same day it also named `caramel-forward Jamaican rum`** — a style
+> settled twice, and one for which `hers_to_apply` plus
+> `test_no_drink_uses_a_generic_that_is_helens_to_apply` had been built THAT
+> MORNING precisely so it could not come back. The guard held; the prose went
+> round it. **A mechanism stops the data regressing and does nothing about an
+> agent re-raising the question in words.**
+>
+> Why an issue rots faster than this file: nothing re-reads it. This document
+> gets corrected when a session trips over it, and every guard in `tests/` is
+> re-run on every commit — an issue body is written once and is never
+> executed, so it records the collection on the day it was typed and says so
+> nowhere. **Its age is the only warning you get.**
+>
+> Three minutes of measuring closes a stale issue outright. Repeating it costs
+> Helen the same conversation for the third time.
+
 ### 11.2.1 Do not ship a layout at a size you cannot look at
 
 **Issue #539, at Helen's request, from a near-miss rather than a bug.**
