@@ -61,6 +61,10 @@
 
   var CS = HTF.cocktailSearch;
   var FAMILY_SUFFIX = CS.FAMILY_SUFFIX;
+  // Accent folding, shared with food rather than re-derived -- the same
+  // function the search itself compares with, so "what the picker suppresses"
+  // and "what the picker matched" can never disagree about a ç.
+  var fold = HTF.ingredientSearch.fold;
 
   /* THE VOCABULARY comes from _data/cocktails/ingredients.yml, emitted as JSON
      by cocktails/index.html. Nothing about families or search thresholds is
@@ -470,6 +474,8 @@
          gets stored as a filter, compared against a card and read back by
          clear-all is still the chip's own name -- an annotation folded into the
          label would become part of the filter and match nothing. */
+      /* An umbrella suppresses its own bare word -- #51's rule, applied inside
+         cocktail-search.js where a test can reach it. Nothing to do here. */
       result.results.forEach(function (r) {
         /* Three shapes, one rule: show the name that answers the question.
              - matched on its own name        -> the chip, nothing added

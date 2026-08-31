@@ -879,6 +879,51 @@ test('a chip found through a BOTTLE names the bottle -- the case band 3 exists f
   assert.strictEqual(hit.viaKind, 'bottle');
 });
 
+// --- an umbrella suppresses its own bare word — #51's rule, ported ------------
+// Food has applied this in both its pickers since issue #51 and this index
+// never got it. Helen, from the page: "I think gin (all) should suppress gin",
+// and in #51 itself: "if I read 'chicken (all)' next to 'chicken' I'd look at
+// both."
+
+test('an (all) button takes the bare chip of the same name off the list', () => {
+  const pool = S.buildPool(pours('gin', 'sloe gin', 'Old Tom'));
+  const found = S.search('gin', pool, []);
+
+  assert.deepStrictEqual(found.familyButtons, ['gin']);
+  assert.strictEqual(
+    found.results.some((r) => r.entry === 'gin'), false,
+    'the bare `gin` chip is still offered beside `gin (all)`, which is the pair ' +
+    'that makes a reader check both.'
+  );
+});
+
+test('it takes ONLY the bare name -- a real multi-word chip is untouched', () => {
+  const pool = S.buildPool(pours('gin', 'sloe gin', 'Old Tom'));
+  const offered = S.search('gin', pool, []).results.map((r) => r.entry);
+
+  assert.ok(offered.indexOf('sloe gin') !== -1, 'sloe gin should survive');
+  assert.deepStrictEqual(offered.indexOf('gin'), -1);
+});
+
+test('with no umbrella offered, the bare chip is offered as usual', () => {
+  // The suppression is a fact about the PAIR, not about the word: below the
+  // family-button threshold there is no umbrella and nothing to be confused
+  // with, so the chip is the answer.
+  const pool = S.buildPool(pours('gin', 'sloe gin'));
+  const found = S.search('gi', pool, []);
+
+  assert.deepStrictEqual(found.familyButtons, []);
+  assert.ok(found.results.some((r) => r.entry === 'gin'));
+});
+
+test('the cap counts what will be shown, not what was suppressed', () => {
+  // Filtered BEFORE the slice, so "+N more" never counts a chip nobody is
+  // going to be offered.
+  const pool = S.buildPool(pours('gin', 'sloe gin', 'Old Tom'));
+  const found = S.search('gin', pool, []);
+  assert.strictEqual(found.hidden, 0);
+});
+
 test('a multi-word query matches a hidden name from its start', () => {
   // Helen, 2026-08-31: "I do want to be able to type 'el d' and see el dorado."
   // `hasWordMatch` asks whether one WORD begins with the whole query, so it is
@@ -1030,14 +1075,17 @@ test('an alias keeps finding its bottle, and the bracket prints the real name', 
 });
 
 test('the winning band decides which term is reported, not the first one seen', () => {
-  // One chip reachable two ways at once: `gin` shows its own name AND hides
-  // the bottle Portobello. "gin" must report the visible match, because that is
-  // the one that won -- a picker annotating this with "Portobello" would be
-  // explaining a chip that needs no explanation.
-  const pool = S.buildPool(pours(attr('london dry gin', 'gin', 'portobello')));
-  const [hit] = S.search('gin', pool, []).results;
+  // One chip reachable two ways at once: `falernum` shows its own name AND
+  // hides the bottle. "falernum" must report the visible match, because that is
+  // the one that won -- annotating it with the bottle would be explaining a
+  // chip that needs no explanation.
+  //
+  // NOT `gin`, which this used to use: `gin` is a family name, so the umbrella
+  // now suppresses the bare chip (#51) and there is no result to inspect.
+  const pool = S.buildPool(pours(attr('falernum', "john d taylor's velvet falernum")));
+  const [hit] = S.search('falernum', pool, []).results;
 
   assert.strictEqual(hit.band, 1);
-  assert.strictEqual(hit.via, 'gin');
+  assert.strictEqual(hit.via, 'falernum');
   assert.strictEqual(hit.viaKind, 'own');
 });

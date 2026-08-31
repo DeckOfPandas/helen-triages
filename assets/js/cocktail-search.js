@@ -838,10 +838,42 @@
         });
       }
 
+      /* AN UMBRELLA SUPPRESSES ITS OWN BARE WORD — issue #51's rule, which food
+         has applied in both its pickers since that issue and this index never
+         got. Helen, seeing `gin (all)` and `gin` side by side: "I think gin
+         (all) should suppress gin", and in #51 itself: "I am always suspicious
+         of searches like this, so if I read 'chicken (all)' next to 'chicken'
+         I'd look at both."
+
+         ONLY THE EXACT BARE NAME, never a real multi-word chip: `gin (all)`
+         takes out `gin` and leaves `navy strength gin`, `sloe gin` and every
+         ginger entry where they are, the same way food's rule leaves `chicken
+         breast` alone.
+
+         WHAT IT COSTS, stated because it is real and food pays it too: while
+         the umbrella is on offer there is no way to pick the bare name alone --
+         here `gin` is the card name for London dry, so "London dry and nothing
+         else" is unavailable in that moment.
+
+         HERE RATHER THAN IN THE INDEX, which is where food keeps its copy. The
+         day this rule was ported, the same session had just shipped a startup
+         crash that lived in DOM wiring and that every pure-module test passed
+         straight over. A rule with a reason is a decision, and decisions belong
+         where they can be asked a question. Filtered BEFORE the cap, so the
+         "+N more" count never counts a chip nobody will be shown. */
+      // The buttons array holds BARE labels -- the index appends the suffix
+      // when it draws them -- so there is nothing to strip here. Slicing the
+      // suffix off anyway turned `gin` into an empty string and suppressed
+      // nothing, silently, which is what the test below exists to notice.
+      var umbrellaNames = familyButtons.map(normalise);
+      var offered = ordered.filter(function (candidate) {
+        return umbrellaNames.indexOf(normalise(candidate.entry)) === -1;
+      });
+
       return {
         familyButtons: familyButtons,
-        results: ordered.slice(0, POOL_CAP),
-        hidden: Math.max(0, ordered.length - POOL_CAP)
+        results: offered.slice(0, POOL_CAP),
+        hidden: Math.max(0, offered.length - POOL_CAP)
       };
     }
 
