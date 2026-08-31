@@ -15,6 +15,11 @@ from pathlib import Path
 import pytest
 import yaml
 
+# One comment-stripper for the whole suite, not a second copy. Its own comment
+# carries the reasoning that matters -- comments go, STRING LITERALS STAY,
+# because a string is exactly how a name gets read.
+from test_front_matter import _strip_comments
+
 # Suite marker, so `pytest -m shared` can run this half alone.
 # tests/test_suite_hygiene.py asserts every module declares one --
 # an unmarked file is silently missed by every filtered run.
@@ -2591,6 +2596,117 @@ def test_the_cocktail_card_ingredient_attribute_is_self_delimiting():
     assert "|" in capture.group(1), (
         "the ing_search capture no longer joins its values with `|`, so "
         "splitEntries cannot recover the individual ingredients from data-ing."
+    )
+
+
+# --- a binding is only asked for what it has ---------------------------------
+#
+# filter-state.js exports TWO shapes and they are not the same object:
+#
+#   HTF.filterState                     the module: parseQuery, excludesRow,
+#                                       rowMatchesFilters, arrivedByGoingBack,
+#                                       create, the two field tables...
+#   HTF.filterState.create(SPEC)        a BINDING: seven spec-bound functions
+#                                       and nothing else.
+#
+# filters.js holds the first; cocktail-index.js holds the second. Taking a name
+# off the wrong one is not a missing feature, it is `undefined`, and calling
+# undefined throws -- which on 2026-08-31 took out the whole of
+# cocktail-index.js's startup for one commit: `arrivedByGoingBack` was read off
+# the binding, so the restore never ran, apply() never ran, and the pagehide
+# listener was never registered. The index stopped shuffling as well as
+# stopped remembering, and every JS test stayed green, because each of them
+# asks a pure module a question and the fault was in the wiring between them.
+#
+# A DIFFERENT KIND OF CHECK FROM THE ONES AROUND IT, and deliberately: the JS
+# suite proves the functions are right, and this proves the call sites are
+# talking to something that has them.
+
+
+def _js_object_keys(source: str, opener: str) -> set[str]:
+    """The keys of the object literal that starts at `opener`, one brace deep.
+
+    Deliberately shallow -- it reads the top level of one literal and stops at
+    its closing brace, so a nested object cannot leak its own keys in.
+    """
+    start = source.index(opener) + len(opener)
+    depth = 1
+    keys, i = set(), start
+    while depth and i < len(source):
+        ch = source[i]
+        if ch in "{[(":
+            depth += 1
+        elif ch in "}])":
+            depth -= 1
+        elif depth == 1:
+            match = re.match(r"\s*([A-Za-z_$][\w$]*)\s*:", source[i:])
+            if match:
+                keys.add(match.group(1))
+        i += 1
+    return keys
+
+
+def test_a_filter_state_binding_is_only_asked_for_what_it_has():
+    """Every `X.name` on a filter-state object must be a name that object has.
+
+    THE FIX WHEN THIS FAILS IS USUALLY ONE WORD: a spec-bound name comes off
+    the binding, a spec-free one comes off the module. Read filter-state.js's
+    two return blocks before moving anything between them -- `create()` returns
+    what depends on WHICH INDEX you are, and the module returns what does not.
+    """
+    fs_source = read("assets", "js", "filter-state.js")
+    module_keys = _js_object_keys(fs_source, "var api = {")
+    binding_keys = _js_object_keys(fs_source, "return {\n      FIELDS:")
+
+    assert "create" in module_keys and "arrivedByGoingBack" in module_keys, (
+        "the module's export block is not where this test thinks it is; "
+        "`var api = {` no longer starts it."
+    )
+    assert "emptyState" in binding_keys and "serialise" in binding_keys, (
+        "create()'s return block is not where this test thinks it is."
+    )
+
+    # Which shape each consumer holds, read from how it assigns the variable
+    # rather than assumed -- if one of them switches, this switches with it.
+    consumers = {
+        "filters.js": ("var FilterState = HTF.filterState;", module_keys),
+        "cocktail-index.js": (
+            "var FilterState = HTF.filterState.create(", binding_keys),
+    }
+
+    problems = []
+    for filename, (assignment, available) in consumers.items():
+        raw = read("assets", "js", filename)
+        assert assignment in raw, (
+            f"{filename} no longer binds FilterState as `{assignment}`, so this "
+            f"test is checking its names against the wrong shape. Update the "
+            f"table above rather than deleting the case."
+        )
+        # COMMENTS STRIPPED FIRST, and this guard needed it within a minute of
+        # being written: the paragraph in cocktail-index.js explaining the bug
+        # names `FilterState.arrivedByGoingBack` in prose, and the first version
+        # of this test failed on its own explanation. HANDOVER 12's fifth
+        # instance, and the escalation it prescribes -- imported from
+        # test_front_matter rather than re-typed, so there is one stripper and
+        # its reasoning (strings are KEPT, because a string is how a name gets
+        # read) lives in one place.
+        source = _strip_comments(raw, ".js")
+        for name in sorted(set(re.findall(r"\bFilterState\.([A-Za-z_$][\w$]*)", source))):
+            if name not in available:
+                where = "the binding create() returns" if available is binding_keys \
+                    else "the filterState module"
+                other = module_keys if available is binding_keys else binding_keys
+                hint = " It IS on the other one -- take it off that instead." \
+                    if name in other else ""
+                problems.append(
+                    f"{filename} calls FilterState.{name}, which is not on "
+                    f"{where}.{hint}"
+                )
+
+    assert not problems, (
+        "A filter-state name is read off an object that does not have it, which "
+        "is `undefined` at runtime and throws when called:\n  "
+        + "\n  ".join(problems)
     )
 
 

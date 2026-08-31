@@ -114,6 +114,19 @@
   var FilterState = HTF.filterState.create(HTF.filterState.COCKTAIL_FIELDS);
   var state = FilterState.emptyState();
 
+  /* OFF THE MODULE, NOT OFF THE BINDING ABOVE, and the difference is not
+     cosmetic: `create(spec)` returns only the seven spec-bound functions, so
+     `FilterState.arrivedByGoingBack` is undefined -- and calling undefined
+     throws, taking the rest of this file's startup with it. It did, for one
+     commit: the restore never ran, apply() never ran, and the pagehide listener
+     was never registered, so the index stopped shuffling as well as stopped
+     remembering. Helen found it in the first minute of looking.
+
+     Bound here rather than called inline so there is one place to be wrong,
+     and test_a_filter_state_binding_is_only_asked_for_what_it_has now checks
+     every such name in both index scripts. */
+  var arrivedByGoingBack = HTF.filterState.arrivedByGoingBack;
+
   var moodBtns  = Array.prototype.slice.call(document.querySelectorAll('.btn-mood'));
   var chaosBtns = Array.prototype.slice.call(document.querySelectorAll('.btn-chaos'));
   var incInput  = document.getElementById('drink-include');
@@ -458,8 +471,23 @@
          clear-all is still the chip's own name -- an annotation folded into the
          label would become part of the filter and match nothing. */
       result.results.forEach(function (r) {
-        poolEl.appendChild(chip(r.entry, false, r.hasWordMatch,
-          r.band === 3 ? r.via : null));
+        /* Three shapes, one rule: show the name that answers the question.
+             - matched on its own name        -> the chip, nothing added
+             - matched on a name that CONTAINS the chip's  -> that name, alone,
+               because a bracket there would print the chip to itself and
+               append the bit its card name dropped
+             - matched on a genuinely other name           -> the chip, and the
+               name in a bracket after it
+           The VALUE handed to the state is `r.entry` in every case; only the
+           label moves. */
+        var explains = r.band === 3 && r.via;
+        poolEl.appendChild(chip(
+          explains && r.viaReplacesName ? r.via : r.entry,
+          false,
+          r.hasWordMatch,
+          explains && !r.viaReplacesName ? r.via : null,
+          r.entry
+        ));
       });
 
       /* THE CAP IS STATED, NOT SILENT. A pool that quietly stops at eight looks
@@ -492,7 +520,13 @@
 
        Still ONE button throughout. The × is a target, not a second control --
        clicking anywhere on the chip removes it, which is what it already did. */
-    function chip(word, on, wordMatch, via) {
+    /* THE LABEL AND THE VALUE ARE TWO THINGS, since #603's annotation. What a
+       chip SAYS may be the generic that found it; what it IS -- stored in the
+       state, compared against a card, cleared by clear-all -- is always the
+       chip's own name. `value` defaults to the label, so every other caller is
+       untouched and a chip that says what it is stays one argument. */
+    function chip(word, on, wordMatch, via, value) {
+      var stored = value === undefined ? word : value;
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'btn-pool' + (on ? ' is-on' : '') + (wordMatch ? ' btn-pool--word-match' : '');
@@ -519,10 +553,10 @@
       }
 
       b.addEventListener('click', function () {
-        if (state[field].has(word)) {
-          state[field].delete(word);
+        if (state[field].has(stored)) {
+          state[field].delete(stored);
         } else {
-          state[field].add(word);
+          state[field].add(stored);
           /* CHOOSING ONE CLEARS THE SEARCH, so the candidates vanish and the
              chosen chips are all that is left. Helen, 2026-08-30, on food doing
              this: "it frees the input field for more typing, and reclaims the
@@ -687,7 +721,7 @@
      stored, unparseable, or a record whose shape does not fit. Stored state is
      untrusted input; see FilterState.deserialise's own note. */
   function restoreDrinksMemory() {
-    if (!FilterState.arrivedByGoingBack()) return null;
+    if (!arrivedByGoingBack()) return null;
 
     var saved;
     try {
