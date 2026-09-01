@@ -101,15 +101,45 @@ sitemap: false
   --dark-quiet: #97959a;
   --dark-line: #3a3a41;
 
-  /* THE OPTICAL CENTRING, and 0.028em of it is exact.
-     Every tape SVG insets its polygon 16.47% from the top of the viewBox and
-     12.94% from the bottom, so the BAND's centre is 1.76% of the box height
-     below the BOX's centre -- 0.028em at the 1.6em box below. The remainder is
-     the cap-height correction: capitals sit slightly high inside their own line
-     box, and Courier Prime is woff2-only here with no font parser available, so
-     that half is an estimate. This is the one number to nudge if the lettering
-     still reads high or low; nothing else needs touching. */
-  --tape-optical: 0.048em;
+  /* THE TAPE IS BACK TO ITS OLD SIZE -- round 6 shrank it and Helen caught it
+     from a screenshot: "the tape size is cut much tighter to the lettering".
+     She was right and the cause was mine. Round 6 set `line-height: 1` on the
+     lettering so the padding could be SOLVED against a predictable box, and
+     the body's own line-height is 1.6 -- so the tape went from 2.2em tall to
+     1.6em, a 27% shrink, as a side effect of making the arithmetic tractable.
+     A fix that changes something it was not aiming at is not a fix.
+
+     The line-height stays at 1, because the arithmetic below still needs it.
+     The height comes back through the padding instead: 1em + 2 x 0.6em = 2.2em,
+     exactly what it was. */
+  --tape-pad-y: 0.6em;
+
+  /* WHERE THE LETTERING SITS, SOLVED RATHER THAN NUDGED.
+     Every tape SVG insets its black polygon 16.47% from the top of its viewBox
+     and 12.94% from the bottom -- identical across all seven, measured -- so
+     the BAND's centre is at 0.5176 of the box height where the BOX's centre is
+     at 0.5. Capitals also sit slightly high inside their own line box; 0.475em
+     is where they centre in a 1em box, and that half is an ESTIMATE, because
+     Courier Prime ships here as woff2 only and there is no font parser in this
+     environment to read its real ascent and cap height.
+
+     Deriving the padding rather than writing two numbers means changing
+     --tape-pad-y re-solves the centring for free. Round 6 wrote a fixed
+     0.048em offset, which was correct for a 1.6em box and silently wrong for
+     any other -- a constant that was really a function. */
+     The algebra, so the constant below is checkable rather than magic:
+
+       height          H = 1em + 2P              (P = --tape-pad-y)
+       band centre       = 0.5176 H
+       caps centre       = padTop + 0.475em
+       solve             padTop = 0.5176 (1em + 2P) - 0.475em
+                                = 0.0426em + 1.0352 P
+
+     Written flat rather than as nested calc() -- a var() holding a calc()
+     multiplied by a number is legal and is exactly the sort of thing that
+     silently resolves to nothing in one engine, and there is no browser here
+     to catch it. At P = 0.6em this gives 0.6637em top and 0.5363em bottom. */
+  --tape-pad-top: calc(0.0426em + 1.0352 * var(--tape-pad-y));
 
   /* Rounds 3-5 brightened the tape. Helen took that off in round 6, so this
      is 1 and the tape is its own colour. Kept as a property rather than
@@ -136,14 +166,40 @@ sitemap: false
   color: var(--dark-text);
 }
 
-/* THE LIFTED GROUND -- Helen: "the background a little lighter even, to give
-   the cards more drama, but not so light as to feel connected to the tape."
-   The card goes DARK at the same time, which is what makes it drama rather
-   than just a paler page: the card is now a hole in the ground rather than a
-   panel on it. The tape is darker still, and by a margin so small it has
-   almost no fill left to be seen by -- which is the whole subject of the
-   edge ladder below. */
-.devct-ground-lift { --dark-ground: #16161a; --ink-card: #0a0a0d; --ink-edge: #1e1e24; }
+/* ===========================================================================
+   HOW CLOSE CAN A CARD GET TO THE PAGE? Helen's question, and she asked for the
+   clearest possible answer: "don't alter the background of the page, but do
+   very slightly decrease the lightness of the cards."
+
+   THE ANSWER IS "AS CLOSE AS YOU LIKE, BUT IT COSTS THE TAPE", and it is one
+   fact rather than two. Measured in L*, the perceptual lightness axis, where
+   equal steps look equal and raw hex does not. A just-noticeable difference is
+   about 1.0 on a good screen in a dark room, and several in daylight.
+
+     card       L*    dL* vs page   dL* vs the tape it holds
+     #17171a   7.85       3.84            4.22      <- where it is now
+     #151518   6.88       2.86            3.24
+     #131316   5.98       1.96            2.35
+     #121215   5.56       1.54            1.92
+     #101013   4.77       0.75            1.13      <- fill below the JND
+     page       4.02       0              0.38
+
+   THE CARD NEVER VANISHES, because the border sits at L* 18.18 -- 14 above the
+   page -- so however far the fill is taken down the card's outline still holds
+   it. That is the good news and it is why the ladder can run this far.
+
+   THE PRICE IS IN THE RIGHT-HAND COLUMN. Every step the card takes toward the
+   page is a step the TAPE takes toward the card, because the tape is fixed at
+   its own black. At #17171a the tape is a visible dark patch; by #101013 it is
+   1.13 of L* from its own card and has essentially no fill contrast left. So
+   below about #121215 the top edge stops being a highlight and becomes the only
+   thing drawing the tape at all -- which is why the two questions in this round
+   are really one question.
+   ======================================================================== */
+.devct-card-15 { --ink-card: #151518; }
+.devct-card-13 { --ink-card: #131316; }
+.devct-card-12 { --ink-card: #121215; }
+.devct-card-10 { --ink-card: #101013; }
 
 /* --- FOOD'S HOT MAGENTA --------------------------------------------------- */
 .devct-page .btn-mood.is-on { text-decoration-color: var(--pink); }
@@ -158,9 +214,11 @@ sitemap: false
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* Asymmetric, and the asymmetry IS the centring -- the total is still
-     0.60em, so the tape's height and the card's layout are unchanged. */
-  padding: calc(0.30em + var(--tape-optical)) 0.95em calc(0.30em - var(--tape-optical));
+  /* Asymmetric, and the asymmetry IS the centring. The two values sum to
+     2 x --tape-pad-y whatever that is set to, so the tape's height is the
+     dial and the centring follows it rather than needing to be re-derived. */
+  padding: var(--tape-pad-top) 0.95em
+           calc(2 * var(--tape-pad-y) - var(--tape-pad-top));
   max-width: 100%;
   vertical-align: baseline;
 }
@@ -296,7 +354,7 @@ sitemap: false
 
 {% comment %} FIELDS, `~`-separated: tag | ground class | card classes |
    whether this stage carries the filter block. {% endcomment %}
-{% assign stages = "O~~~yes|G~devct-ground-lift~~no|L~devct-ground-lift~devct--lit-18~no|T1~devct-ground-lift~devct--lit-10~no|T2~devct-ground-lift~devct--lit-06~no|T3~devct-ground-lift~devct--lit-03~no" | split: "|" %}
+{% assign stages = "A~~devct--lit-10~yes|B~devct-card-15~devct--lit-10~no|C~devct-card-13~devct--lit-10~no|D~devct-card-12~devct--lit-10~no|E~devct-card-10~devct--lit-10~no|F~devct-card-13~devct--lit-06~no" | split: "|" %}
 
 {% for stage in stages %}
   {% assign f = stage | split: "~" %}
@@ -306,12 +364,12 @@ sitemap: false
   {% assign wantfilters = f[3] %}
 
   {% case tag %}
-    {% when "O"  %}{% assign label = "the original &mdash; page darker than the card, tape darkest, no edge" %}
-    {% when "G"  %}{% assign label = "ground lifted, card dark, tape at its own colour, no edge" %}
-    {% when "L"  %}{% assign label = "&hellip; plus the 0.18 top edge (E4c, tape unlifted)" %}
-    {% when "T1" %}{% assign label = "&hellip; top edge 0.10" %}
-    {% when "T2" %}{% assign label = "&hellip; top edge 0.06" %}
-    {% when "T3" %}{% assign label = "&hellip; top edge 0.03" %}
+    {% when "A" %}{% assign label = "card #17171a &mdash; where it is now &middot; edge T1 (0.10) &middot; tape back to full size" %}
+    {% when "B" %}{% assign label = "card #151518 &mdash; &Delta;L* 2.86 from the page &middot; edge 0.10" %}
+    {% when "C" %}{% assign label = "card #131316 &mdash; &Delta;L* 1.96 &middot; edge 0.10" %}
+    {% when "D" %}{% assign label = "card #121215 &mdash; &Delta;L* 1.54 &middot; edge 0.10" %}
+    {% when "E" %}{% assign label = "card #101013 &mdash; &Delta;L* 0.75, the fill below the eye&rsquo;s threshold &middot; edge 0.10" %}
+    {% when "F" %}{% assign label = "card #131316 again, with edge T2 (0.06) &mdash; C and F are the edge comparison" %}
   {% endcase %}
 
   <p class="devct-tag">{{ tag }} &nbsp; {{ label }}</p>
