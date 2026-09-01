@@ -30,16 +30,19 @@ WHAT IT WILL NOT DO, AND THIS IS THE LOAD-BEARING HALF.
     is a proper noun -- ~25 rules and 600-odd hits across the corpus, listed in
     test_drafts.py's NOT_FOR_DRAFTS, every one of which needs Helen or her
     source material. They are reported and left alone.
-  - It never renames a file, and never retitles one. A title/slug divergence is
-    reported with both strings; the one precedent went the file's way, not the
-    title's (HANDOVER §10.1), and it is a decision each time.
+  - It never renames a file, and never retitles one, and as of 2026-09-01 it no
+    longer even reports the two disagreeing. Helen ruled the class out for
+    drafts: a draft's title is still the SOURCE's title while the slug is
+    already the dish, so the divergence is the ingest working. See
+    test_title_and_slug_dont_diverge in test_drafts.py's NOT_FOR_DRAFTS.
   - It never runs a YAML dumper over a draft.
 
 SCOPE SETTLED WITH HELEN, 2026-08-29: pure formatting, plus the #429 `meta:`
-migration, plus title/slug divergence as a REPORT. Size words (108 drafts,
-moving a word between `amount:` and `item:`) were considered and excluded --
-mechanical in shape, but it rewrites two fields per hit and the precedent
-records real fixes that needed an eye.
+migration. It also reported title/slug divergence until 2026-09-01, when she
+ruled that out; the entry above says why. Size words (108 drafts, moving a word
+between `amount:` and `item:`) were considered and excluded -- mechanical in
+shape, but it rewrites two fields per hit and the precedent records real fixes
+that needed an eye.
 
 Cocktail drafts are deliberately out of scope: that schema is mid-migration
 (#544, #571, #573), so a tidy pass there would be fixing things about to change
@@ -85,7 +88,6 @@ sys.path.insert(0, str(ROOT / "tests"))
 from test_front_matter import (  # noqa: E402
     META_ORDER, RETIRED, SCALAR_STRING_FIELDS,
 )
-from test_taxonomy import _head_clause_words  # noqa: E402
 
 FLOW_FIELDS = ["main_ingredients", "tags"]
 
@@ -410,36 +412,23 @@ FIXERS = [
 # REPORTERS -- never fixed, always surfaced
 # =============================================================================
 
-# BOTH PREDICATES ARE IMPORTED FROM THE SUITE, NOT RE-TYPED, and the first
-# draft of this file proves why. It invented its own versions and both flooded:
+# THE PREDICATE IS IMPORTED FROM THE SUITE, NOT RE-TYPED, and the first draft of
+# this file proves why: a CLAUDE-marker scan with re.I on it matched `QQ Claude
+# ...`, which is the documented interleaved-rewrite convention (HANDOVER §4) and
+# not an instruction at all. It reported hundreds of files as needing attention
+# and every one was that convention. The real rule is case-sensitive. HANDOVER
+# §12: "if you scan and find lots of problems, be suspicious of your own
+# findings before reporting them."
 #
-#   - a title/slug check comparing a slugified title to the filename reported
-#     `watercress-and-beef-noodle-soup` against `watercress-beef-noodle-soup`,
-#     i.e. the ordinary convention of dropping a stopword, plus garbage for
-#     every accented title ("Comté" -> "comt"). The real rule is much narrower:
-#     every word of the title's HEAD CLAUSE must appear somewhere in the slug.
-#   - a CLAUDE-marker scan with re.I on it matched `QQ Claude ...`, which is the
-#     documented interleaved-rewrite convention (HANDOVER §4) and not an
-#     instruction at all. The real rule is case-sensitive.
-#
-# Between them they reported hundreds of files as needing attention, and every
-# one was a documented convention. HANDOVER §12: "if you scan and find lots of
-# problems, be suspicious of your own findings before reporting them."
+# THERE WAS A SECOND REPORTER HERE AND IT IS GONE, 2026-09-01. It flagged a
+# title whose head-clause words are absent from the filename, 19 drafts, and
+# Helen ruled the whole class out: "let's not run the title matches slug-ish
+# test over drafts". A draft's title is still the SOURCE's title while the slug
+# is already the dish, so the divergence is the ingest working, not failing --
+# see the reason on test_title_and_slug_dont_diverge in test_drafts.py's
+# NOT_FOR_DRAFTS. It was 19 of the 21 lines this script printed, so removing it
+# is most of what makes the report readable.
 CLAUDE_MARKER = re.compile(r"[^\"\n]{0,10}\bCLAUDE\b[^\"\n]{0,40}")
-
-
-def report_title_slug(path, text):
-    m = re.search(r'^title:\s*"?(.+?)"?\s*$', text, re.M)
-    if not m:
-        return []
-    missing = _head_clause_words(m.group(1)) - set(re.findall(r"[a-z0-9]+", path.stem))
-    if not missing:
-        return []
-    return [f"title/slug divergence: head-clause word(s) {sorted(missing)} "
-            f"appear nowhere in the filename. Title {m.group(1)!r}, file "
-            f"{path.stem!r}. Either the title changed without a rename or the "
-            f"rename never happened -- confirm WHICH before touching either. "
-            f"Never fixed here."]
 
 
 def report_claude_markers(path, text):
@@ -447,7 +436,7 @@ def report_claude_markers(path, text):
             for h in CLAUDE_MARKER.findall(text)]
 
 
-REPORTERS = [report_title_slug, report_claude_markers]
+REPORTERS = [report_claude_markers]
 
 
 # =============================================================================
