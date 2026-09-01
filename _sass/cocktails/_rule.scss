@@ -30,10 +30,36 @@
 // drowned — so cocktail headings showed the shadow half of the emboss and none
 // of the light, while food's showed both. One wrong value, two symptoms, and
 // the light looked like the missing thing when the stroke was.
+// AND THE INVERSION MOVED THREE MORE OF THEM, 2026-09-01, issue #469. The
+// shared defaults in `shared/_rule.scss` are solved for DARK TYPE ON A LIGHT
+// GROUND, and this site is now the opposite. The two are inverse problems and
+// the values disagree on every one:
+//
+//   - `--emboss-shadow` is `rgba($color-text, 0.68)` there. `$color-text` is
+//     near-white here, so that computes to a LIGHT shadow -- a highlight in the
+//     shadow's position, which reads as a second letterform rather than depth.
+//     It goes to almost nothing, because A SHADOW COPY IS ONLY VISIBLE WHERE IT
+//     EXTENDS PAST THE GLYPH ONTO THE GROUND, and dark on dark shows nothing.
+//   - `--emboss-light` stays $color-white and now does all the work, for the
+//     same reason from the other side: white spilling past a light letter onto
+//     a near-black ground is the most visible mark available here.
+//   - `--emboss-stroke-w` comes down. A stroke on light-on-dark type reads
+//     heavier than the same stroke on dark-on-light, because the glyph is
+//     already blooming into its surround.
+//
+// THESE ARE `.on-dark`'S OWN NUMBERS, which is the point rather than a
+// coincidence. That class was built for exactly this case and had no consumer
+// anywhere until this palette existed (#469); it was applied to the dev stages
+// where Helen judged the headings and approved them. Adopting them as this
+// site's DEFAULTS is the finding that issue ended on: a dark SECTION on a light
+// site wants a context class, and a dark SITE wants its palette inverted, after
+// which every shared partial follows for free.
 $emboss-cocktails-vars-emitted: false !default;
 @if not $emboss-cocktails-vars-emitted {
   :root {
     --emboss-stroke-c: #{$color-label-stroke};
+    --emboss-stroke-w: 0.010em;
+    --emboss-shadow:   #{rgba($color-paper, 0.06)};
   }
   $emboss-cocktails-vars-emitted: true !global;
 }
