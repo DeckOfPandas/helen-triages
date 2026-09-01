@@ -114,30 +114,37 @@ sitemap: false
      exactly what it was. */
   --tape-pad-y: 0.6em;
 
-  /* WHERE THE LETTERING SITS, SOLVED RATHER THAN NUDGED.
-     Every tape SVG insets its black polygon 16.47% from the top of its viewBox
-     and 12.94% from the bottom -- identical across all seven, measured -- so
-     the BAND's centre is at 0.5176 of the box height where the BOX's centre is
-     at 0.5. Capitals also sit slightly high inside their own line box; 0.475em
-     is where they centre in a 1em box, and that half is an ESTIMATE, because
-     Courier Prime ships here as woff2 only and there is no font parser in this
-     environment to read its real ascent and cap height.
+  /* TWO WORDS, PRECISELY, because the labels on this page conflated them and
+     Helen rightly asked:
 
-     Deriving the padding rather than writing two numbers means changing
-     --tape-pad-y re-solves the centring for free. Round 6 wrote a fixed
-     0.048em offset, which was correct for a 1.6em box and silently wrong for
-     any other -- a constant that was really a function.
+       TAPE  the .devct-tape box -- the inline-flex element, padding included.
+             The SVG is stretched to fill exactly this.
+       BAND  the black polygon INSIDE that SVG. The artwork carries transparent
+             margin, 16.47% of its height at the top and 12.94% at the bottom
+             (measured, identical across all seven files), so the visible black
+             is 70.59% of the tape box and sits slightly low within it.
 
-     The algebra, so the constant below is checkable rather than magic:
+     THE CENTRING IS NOT ARITHMETIC ANY MORE, and that is the fix rather than a
+     tidy-up. Rounds 6-8 solved a padding-top from the band's offset and an
+     ESTIMATE of where capitals sit inside their line box -- an estimate,
+     because Courier Prime ships here as woff2 only and there is no font parser
+     in this environment. Two things went wrong with that:
 
-       height          H = 1em + 2P              (P = --tape-pad-y)
-       band centre       = 0.5176 H
-       caps centre       = padTop + 0.475em
-       solve             padTop = 0.5176 (1em + 2P) - 0.475em
-                                = 0.0426em + 1.0352 P
+     1. It was derived on THIS element, so `var(--tape-pad-y)` resolved against
+        0.6em here and inherited down as a fixed 0.664em. The ladder classes set
+        --tape-pad-y on the STAGE, so padding-BOTTOM grew with each step while
+        padding-TOP did not. The taller the tape, the higher the lettering rode
+        -- which is exactly what Helen saw down the page. A custom property
+        containing var() is substituted where it is DECLARED, not where it is
+        used, and that is the whole trap.
+     2. It rested on a font metric nobody here can measure.
 
-     At P = 0.6em this gives 0.6637em top and 0.5363em bottom. */
-  --tape-pad-top: calc(0.0426em + 1.0352 * var(--tape-pad-y));
+     So the padding is symmetric now and the BACKGROUND moves instead. The
+     band's centre sits 1.765% of the box height below the box's centre, so
+     shifting the SVG up by exactly that puts the band's centre on the box's
+     centre -- and then ordinary flex centring puts the lettering there too,
+     with no font metric involved at all. One measured number, applied to the
+     thing it was measured from. */
 
   /* Rounds 3-5 brightened the tape. Helen took that off in round 6, so this
      is 1 and the tape is its own colour. Kept as a property rather than
@@ -230,24 +237,33 @@ sitemap: false
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  /* Asymmetric, and the asymmetry IS the centring. The two values sum to
-     2 x --tape-pad-y whatever that is set to, so the tape's height is the
-     dial and the centring follows it rather than needing to be re-derived.
+  /* SYMMETRIC. The band's own offset is corrected on the background instead,
+     below, so nothing here needs to know about it.
 
-     EVERY var() HERE CARRIES A FALLBACK, and that is not belt-and-braces, it
-     is the fix for how this failed. A var() with no fallback that fails to
-     resolve makes the WHOLE declaration invalid at computed-value time, so
-     `padding` fell back to its initial value -- ZERO, on all four sides -- and
-     the tape collapsed onto the letters. A fallback turns that silent
-     catastrophe into a tape that is merely a little off. */
-  padding: var(--tape-pad-top, 0.664em) 0.95em
-           calc(2 * var(--tape-pad-y, 0.6em) - var(--tape-pad-top, 0.664em));
+     THE FALLBACK STAYS. A var() with no fallback that fails to resolve makes
+     the WHOLE declaration invalid at computed-value time, so `padding` fell
+     back to its initial value -- ZERO, on all four sides -- which is how the
+     tape collapsed onto the letters for two rounds. A fallback turns that
+     silent catastrophe into a tape that is merely a little off. */
+  padding: var(--tape-pad-y, 0.6em) 0.95em;
   max-width: 100%;
   vertical-align: baseline;
 }
+/* THE BAND IS CENTRED BY MOVING THE ARTWORK, NOT THE WORDS.
+   The polygon sits 16.47% from the top of the viewBox and 12.94% from the
+   bottom, so its centre is at 0.5176 of the height where the box's centre is
+   at 0.5 -- 1.765% low. Shifting the whole SVG up by exactly that puts the
+   band's centre on the box's centre, and the lettering is then centred by
+   ordinary flexbox with no font metric involved.
+
+   `top` in percent resolves against the containing block's HEIGHT, which is
+   what makes this scale with the tape rather than needing a value per rung.
+   The 1.765% that falls off the bottom is transparent margin anyway -- there
+   is 12.94% of it down there. */
 .devct-tape-bg {
   position: absolute;
-  left: 0; top: 0;
+  left: 0;
+  top: -1.765%;
   width: 100%; height: 100%;
   z-index: 0;
   pointer-events: none;
@@ -421,11 +437,15 @@ sitemap: false
   {% assign cardcls     = f[2] | default: "" %}
   {% assign wantfilters = f[3] %}
 
+  {% comment %} TAPE = the box. BAND = the black polygon inside it, which is
+     70.59% of the box because the artwork carries transparent margin. The
+     third figure is the black ABOVE and BELOW the capitals, which is the thing
+     the eye is actually judging. {% endcomment %}
   {% case tag %}
-    {% when "H0" %}{% assign label = "tape 2.20em &mdash; the size it has been since round 1 &middot; band 2.72&times; the caps" %}
-    {% when "H1" %}{% assign label = "tape 2.50em &middot; band 3.09&times;" %}
-    {% when "H2" %}{% assign label = "tape 2.80em &middot; band 3.46&times;" %}
-    {% when "H3" %}{% assign label = "tape 3.10em &middot; band 3.83&times; &mdash; the header wordmark&rsquo;s own band is 2.16&times;" %}
+    {% when "H0" %}{% assign label = "black band 28px &middot; 9px of it above and below the caps &mdash; the size it has been since round 1" %}
+    {% when "H1" %}{% assign label = "black band 32px &middot; 11px above and below" %}
+    {% when "H2" %}{% assign label = "black band 36px &middot; 13px above and below" %}
+    {% when "H3" %}{% assign label = "black band 40px &middot; 15px above and below &mdash; the header wordmark has 13px around letters twice this size" %}
   {% endcase %}
 
   <p class="devct-tag">{{ tag }} &nbsp; {{ label }}</p>
