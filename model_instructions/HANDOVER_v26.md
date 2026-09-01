@@ -1910,6 +1910,21 @@ pushing. Not at the start of the session. The cheap version:
 
 A non-zero answer means the next red test is probably not yours.
 
+**AND YOU CANNOT FAST-FORWARD IT THE OBVIOUS WAY — `git checkout --detach
+origin/main`.** Added 2026-09-01, having cost a detour. A test clone sits on
+`main`, so `git merge`/`git pull` there is *a merge onto `main`* and
+`guard-main-branch.py` refuses it, correctly and in every repo in the tree.
+`git fetch origin main:main` is the usual answer and does not work either: git
+refuses to update the ref of the branch you have checked out. Detaching takes
+neither path — it is a checkout, the destructive-git hook allows it on a clean
+tree, and a detached HEAD is not `main`, so nothing can be written to `main` by
+accident.
+
+**Detach onto the BRANCH you need, not only onto `main`.** The same day, the
+public repo's tests wanted drink data sitting on an unmerged drafts branch
+(§10), and `git checkout --detach origin/<branch>` is how you get a corpus that
+matches what you are testing.
+
 **The API token is a different channel and does not cover file contents.**
 `GH_TOKEN` selects all three repos and carries Issues; probed 2026-08-29,
 `contents` returns **403** on both private repos and 200 on the public one. So
@@ -4336,6 +4351,25 @@ declares `needs: test`. Three things about it are load-bearing:
 > **`_load()` is the only door, and a test now enforces that**
 > (`test_every_drink_reading_test_goes_through_the_loader`). One future test
 > globbing the drafts itself reopens #540 for itself, silently, in CI only.
+>
+> ### THE SAME GAP FROM A NEW ANGLE: A PUBLIC TEST CAN NEED PRIVATE DATA, AND
+> ### NOTHING MAKES THE TWO MERGES ARRIVE TOGETHER — #624, 2026-08-31
+>
+> The garnish vocabulary landed in halves: `_data/cocktails/garnish.yml` and its
+> three tests merged HERE while the drink-side rename sat on an unmerged branch
+> in the drafts repo. `main` was red for anyone with a current clone and **green
+> in CI**, because the runner has no drafts and `_cocktail_recipes/` is empty —
+> so those tests passed over an empty corpus. The deploy gate could not see it.
+>
+> **The tell is both directions failing at once.** "39 garnishes not declared"
+> AND "garnish.yml proposes changes to strings no drink says any more" cannot
+> both be a mistake in one file; they mean two files are at different commits.
+> Read that as a synchronisation fault, not a data fault, and check the other
+> repo before touching either.
+>
+> #540 made a PROMOTED drink checkable everywhere. This is the case where a
+> public test depends on data the runner cannot reach at all, and the honest
+> answer is not yet decided — see #624.
 >
 > **Still true, and not silenced:** at ONE promoted drink, four anti-vacuity
 > asserts fire ("no rum ingredient carries a suggestion, so this check is
