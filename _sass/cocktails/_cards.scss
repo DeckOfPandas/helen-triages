@@ -211,12 +211,29 @@ $card-tape-pad-y: 0.75em;   // gives a 32px black band around 10.4px capitals
 //
 // One symmetric padding gives the balance for free, and the tape's leftward
 // pull is set separately below -- so the lettering's own left edge is the
-// DIFFERENCE between them, which is how it can move right while the tape moves
-// left. On a long title the tape caps at the panel and the WORD shrinks inside
-// it, so this padding survives on both ends and the ellipsis appears rather
-// than the air disappearing.
-$card-tape-pad-x:  1.15em;  // 19.9px of tape past the letters, each end
-$card-tape-bleed:  0.87em;  // how far the tape's left edge passes the body's
+// DIFFERENCE between them. On a long title the tape caps at its max-width and
+// the WORD shrinks inside it, so this padding survives on both ends and the
+// ellipsis appears rather than the air disappearing.
+//
+// SOLVED FOR THE NAME'S WIDTH RATHER THAN NUDGED, 2026-09-02. Helen's goal is
+// the thing to optimise: "what I am trying to achieve is that reasonably
+// lengthed names of cocktails can appear on the one line." The width available
+// to the word is
+//
+//     body width + bleed-left + bleed-right - 2 x pad-x
+//
+// so PADDING COSTS THE NAME TWICE while a bleed pays it back once. That is why
+// the earlier, more generous 1.15em padding was making titles ellipsise: it was
+// taking 39.8px of a ~330px line and giving back only 15.
+//
+// THE BLEED EQUALS THE PADDING, which is what puts the lettering exactly on the
+// ingredient line's left edge -- her second ask, and the alignment the rest of
+// the card is built on. At 0.95em the tape still carries 16.4px of air past the
+// letters at both ends, and the name gets back to within 3px of the full
+// ingredient width: -0.3 of a character against -2.3 before.
+$card-tape-pad-x:      0.95em;   // 16.4px of tape past the letters, each end
+$card-tape-bleed:      0.95em;   // equal, so the lettering aligns exactly
+$card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 
 .drink-card-name {
   font-family: $font-headings;
@@ -251,19 +268,23 @@ $card-tape-bleed:  0.87em;  // how far the tape's left edge passes the body's
   padding: $card-tape-pad-y $card-tape-pad-x;
   vertical-align: baseline;
 
-  // THE TAPE GOES LEFT AND THE LETTERING GOES RIGHT, which is only one move
-  // because they are measured from different edges. Pulling the box left by
-  // $card-tape-bleed puts the tape's left edge that far past the ingredient
-  // line's; the lettering then starts at ($card-tape-pad-x - $card-tape-bleed)
-  // = 0.28em, about 5px, to the RIGHT of the ingredients.
+  // THE TAPE BLEEDS BOTH WAYS. Left past the ingredient line by exactly its own
+  // left padding, so the LETTERING lands on that line's edge; right into the
+  // card's own padding, which costs no alignment and buys the name back the
+  // width the left padding takes.
   //
-  // THE GUTTER IS THE CEILING ON THE BLEED. 0.87em is 15.0px against the
-  // $card-gutter of 15.2px between the glass panel and the text, so the tape
-  // stops a fifth of a pixel short of the drawing. Raise it and the tape starts
-  // to sit on the glass -- which may yet be the right look, but it is a
-  // different decision and not a number to drift into.
+  // IT NOW CROSSES ONTO THE GLASS PANEL BY 1.2px -- 16.4px of bleed against the
+  // $card-gutter's 15.2px. Deliberate rather than drifted: Helen asked for the
+  // tape "slightly leftwards" again after it had been held a fifth of a pixel
+  // short of the drawing. A hair of black tape over a dark panel reads as a
+  // label laid across, which is what the object is.
+  //
+  // The right bleed stops 0.3rem inside the card's border rather than running
+  // to it, so the tape ends ON the card instead of appearing to be cut off by
+  // it.
   margin-left: -$card-tape-bleed;
-  max-width: calc(100% + #{$card-tape-bleed});
+  margin-right: -$card-tape-bleed-right;
+  max-width: calc(100% + #{$card-tape-bleed} + #{$card-tape-bleed-right});
 }
 
 // THE BAND IS CENTRED BY MOVING THE ARTWORK, NOT THE WORDS.

@@ -499,7 +499,13 @@ $tape-protrusion: 0.2rem;
   // comment on cocktails, where padding-right made a mismatch worse, not
   // better).
   margin-right: -0.18em;
-  color: $color-text;
+  // A variable so the two halves of the lockup can be made to MATCH. They have
+  // always been styled independently -- one is dark type on the page, the other
+  // light type on black tape, which on a light site are genuinely different
+  // problems. On a dark site they are the same problem, and Helen asked for one
+  // answer: "please make the punched font treatment the same for HELEN TRIAGES
+  // and [ COCKTAILS ]." Food's default is unchanged.
+  color: var(--wordmark-top-color, #{$color-text});
   // Brought onto $emboss-stroke 2026-08-12 with every other heading on the
   // site. THIS IS THE CHANGE HERE MOST LIKELY TO WANT REVERTING, so: it was
   // `1.2px rgba(50,50,50,0.9)`, which is 3.75% of this element's 2rem -- the
@@ -670,7 +676,6 @@ $tape-protrusion: 0.2rem;
   font-size: 2.5rem;
   font-weight: 1000;
   letter-spacing: 0.18em;
-  -webkit-text-stroke: 0px;
   text-transform: uppercase;
   text-align: center;
   line-height: 1;
@@ -740,7 +745,16 @@ $tape-protrusion: 0.2rem;
   // hsl(340 6% 92%); written as hex to match its neighbours). It still has to
   // sit BELOW pure white -- see the paragraph above about headroom, which is the
   // whole reason this element does not use @include punched().
-  color: #ECE9EA;
+  color: var(--wordmark-word-color, #ECE9EA);
+
+  // THE STROKE IS A VARIABLE TOO, DEFAULTING TO NONE. This element has carried
+  // `-webkit-text-stroke: 0px` since #122 because its four-copy shadow did all
+  // the work and an edge on top of it was one treatment too many. A site whose
+  // wordmark uses the SHARED punched lettering wants the shared edge with it --
+  // 13.4.1's rule is that stroke sets an edge's weight and shadow sets its
+  // direction, so half the treatment is half the effect. Food keeps 0px.
+  -webkit-text-stroke: var(--wordmark-word-stroke, 0px);
+
   // A CUSTOM PROPERTY FOR THE SAME REASON AS .site-logo-top ABOVE, though this
   // one was never broken by the inversion: it is already light type on black
   // tape, so the ground moving underneath it changed nothing. It is a variable

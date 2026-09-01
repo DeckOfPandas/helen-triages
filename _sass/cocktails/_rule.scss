@@ -78,9 +78,20 @@ $emboss-cocktails-vars-emitted: false !default;
     // here, BOTH copies came out light -- two pale blobs 2px apart on either
     // side of a near-white letter. Its stroke had the same fault: half-opaque
     // ink is a faux-bold on paper and near-invisible fattening on black.
+    // ONE TREATMENT FOR BOTH HALVES OF THE LOCKUP -- Helen, 2026-09-02: "please
+    // make the punched font treatment the same for HELEN TRIAGES and
+    // [ COCKTAILS ]." All five values below are deliberately paired, and on a
+    // dark site that is not a compromise: the two elements were styled apart
+    // because one was dark type on light paper and the other light type on
+    // black tape, which are inverse problems. Here the page is #0e0e10 and the
+    // tape is #0d0d0d -- one unit of lightness apart -- so they are the same
+    // problem and one answer is the honest one.
     --wordmark-top-shadow:  -1px -1px 0 #fdfbfe, 1px 1px 0 rgba(5, 5, 5, 0.9);
     --wordmark-word-shadow: -1px -1px 0 #fdfbfe, 1px 1px 0 rgba(5, 5, 5, 0.9);
+    --wordmark-top-color:   #ECE9EA;
+    --wordmark-word-color:  #ECE9EA;
     --wordmark-top-stroke:  #{$color-label-stroke};
+    --wordmark-word-stroke: #{$emboss-stroke} #{$color-label-stroke};
   }
   $emboss-cocktails-vars-emitted: true !global;
 }
