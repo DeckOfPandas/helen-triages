@@ -1,0 +1,509 @@
+---
+layout: default
+site_key: cocktails
+title: Card titles on tape
+sitemap: false
+---
+
+{% comment %} ─────────────────────────────────────────────────────────────────
+  CARD TITLES ON PUNCHED TAPE — internal, never published. Issue #469.
+
+  WHY THIS PAGE EXISTS. Helen, 2026-09-01, asked whether `.on-dark` should be
+  deleted for having no consumer: "Honestly I've been flirting with the idea of
+  letting the cocktail titles on cards be white on black punched tape..." That
+  is the first real consumer that class has ever been in line for, and it is a
+  LOOK-AT-IT question, not an argue-about-it one. HANDOVER §11.-1's standing
+  rule: build it at a throwaway URL and let her settle it in one line.
+
+  IT USES THE SITE'S OWN CSS WHEREVER THE SITE HAS ANY. Every card below is a
+  real `.drink-card` with a real glass panel, real `.drink-card-hit` bands, real
+  `.drink-card-mood.is-match` chips and a real goodness mark, built from the
+  same Liquid the index uses. The filter block above them is the index's own
+  markup with the active states written in by hand. Only the four candidate
+  TITLE treatments are page-local CSS, because none of them exists in
+  `_sass/` yet -- and whichever wins moves there, with the losers and this
+  page's `<style>` block deleted, per the comparison-switch convention.
+
+  THE FILTER BLOCK IS STATIC AND SAYS SO. Helen asked for "some lit chips and
+  underlined text on cards (can be static, no need for working filter buttons,
+  just draw me a row so I can frame the page in my head)". So the fiction is a
+  single filter state -- MOOD: tiki, HAS TO HAVE: lime juice, LEAVE OUT:
+  pineapple juice -- and every lit control and every banded word on a card is
+  the honest consequence of it, written at build time rather than by the script.
+
+  THE FOUR DRINKS ARE REAL AND CHOSEN FOR THEIR TITLE LENGTHS: 8, 19, 24 and 48
+  characters. The last one is the collection's longest and already ellipsises
+  under `.drink-card-name`'s `text-overflow`, which is the case a tape has to
+  survive rather than the case it gets to ignore.
+
+  THE TAPE SHAPE IS DETERMINISTIC HERE, cycling 1..N by card position, so a
+  reload gives the same comparison and the same drink wears the same shape in
+  every row. The real wordmark picks one at random per page load, and whether
+  that is right for a repeated mark is HANDOVER §13.9's own open question --
+  deliberately not answered here, because it is a different question from this
+  one and answering both at once answers neither.
+────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+{% if site.show_drafts and site.cocktail_drafts.size > 0 %}
+
+  {% assign taxonomy        = site.data.cocktails.taxonomy %}
+  {% assign glasses         = site.data.cocktails.glasses %}
+  {% assign ship_card_names = taxonomy.ship_card_names %}
+  {% assign card_names      = site.data.cocktails.ingredients.card_names %}
+  {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
+  {% assign not_on_cards    = site.data.cocktails.ingredients.not_on_cards %}
+  {% assign groups          = taxonomy.mood_groups %}
+
+  {% comment %} Tallest glass counted live, never hardcoded -- same rigour as
+     cocktails/index.html and _layouts/cocktail.html. {% endcomment %}
+  {% assign tallest_mm = 0 %}
+  {% for icon in glasses.all_icons %}
+    {% assign mm = glasses.heights_mm[icon] | times: 1.0 %}
+    {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
+  {% endfor %}
+
+  {% comment %} THE FICTION. One filter state, applied consistently to the
+     controls and to the cards, so nothing on this page contradicts anything
+     else on it. {% endcomment %}
+  {% assign lit_mood     = "tiki" %}
+  {% assign lit_include  = "lime juice" %}
+  {% assign lit_exclude  = "pineapple juice" %}
+
+  {% comment %} Four real drinks, by slug, in title-length order. {% endcomment %}
+  {% assign want = "ti-punch|hurricane-classic|royal-bermuda-yacht-club|pear-apricot-honey-lemon-and-rosemary-bellini" | split: "|" %}
+  {% assign chosen = "" | split: "," %}
+  {% for slug in want %}
+    {% assign hit = site.cocktail_drafts | where: "slug", slug | first %}
+    {% if hit %}{% assign chosen = chosen | push: hit %}{% endif %}
+  {% endfor %}
+
+<style>
+/* ===========================================================================
+   PAGE-LOCAL ONLY. Nothing here belongs to the site yet; the winner moves into
+   _sass/cocktails/_cards.scss and this block goes with the losers.
+   ======================================================================== */
+
+.devct-note {
+  max-width: 62ch;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #4f4e4a;
+}
+.devct-note code { font-size: 0.92em; }
+
+.devct-row-head {
+  margin: 3rem 0 0.35rem;
+  font-family: "Courier Prime", "Courier New", monospace;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.devct-row-sub {
+  margin: 0 0 1rem;
+  max-width: 68ch;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #4f4e4a;
+}
+.devct-static {
+  display: inline-block;
+  margin-bottom: 1.4rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px dashed #b9b5b6;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4f4e4a;
+}
+
+/* --- the tape itself ------------------------------------------------------
+   `.tape-bg` is the header's class and `tape()` in decorations.js takes only
+   the FIRST match on the page, so these carry a class of their own and the
+   script at the foot fills them through HTF.chromeAsset -- the sanctioned
+   route for chrome artwork (HANDOVER §3), not a hand-built URL. */
+.devct-tape {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.30em 0.95em;
+  max-width: 100%;
+  vertical-align: baseline;
+}
+.devct-tape-bg {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.devct-tape-bg svg { width: 100%; height: 100%; display: block; }
+.devct-tape-word { position: relative; z-index: 1; white-space: nowrap; }
+
+/* SPAN variant: the tape runs the full width of the card's text column rather
+   than hugging the word, so its right edge is in the same place on every card. */
+.devct--span .devct-tape { display: flex; width: 100%; justify-content: flex-start; }
+.devct--span .devct-tape-word { overflow: hidden; text-overflow: ellipsis; }
+
+/* TILT variant: the wordmark's own -1.75deg. The card is `overflow: hidden`,
+   so a tilted tape is clipped by the card edge rather than hanging off it --
+   which is a fact about the card, not about the idea, and is the thing to
+   look at here. */
+.devct--tilt .devct-tape { transform: rotate(-1.75deg); transform-origin: center center; }
+
+/* --- LETTERING A: the wordmark's four-copy bevel, at its own pixel values ---
+   Copied verbatim from `.site-logo-word` in _sass/shared/_layout.scss, offsets
+   included. NOT SCALED DOWN, deliberately: those are hard whole pixels for the
+   reason §13.4.1 gives -- a fractional shadow offset antialiases the whole
+   duplicate glyph and reads as floating rather than punched. So the honest
+   preview of "the wordmark treatment on a card" is the wordmark's own numbers
+   on 1.08rem type, where 1.8px is 10.4% of the font size against 4.5% on the
+   2.5rem wordmark. If this reads heavy, that ratio is why. */
+.devct--bevel4 .devct-tape-word {
+  color: #ECE9EA;
+  text-shadow: -1.0px -1.0px 0 #fdfbfe,
+               -1.8px -1.8px 0 rgba(253, 251, 254, 0.75),
+                1.0px  1.0px 0 rgba(5, 5, 5, 0.90),
+                1.8px  1.8px 0 rgba(5, 5, 5, 0.45);
+}
+
+/* --- LETTERING B: one pair, not two --------------------------------------
+   The same idea at a size that can hold it: the tight cut line and the tight
+   shadow, and no wide pair at all. One pixel is 5.9% of 1.08rem type, which is
+   close to the 6.5% §13.4.1 says the offset targets -- so this is the variant
+   the documented ratio actually predicts. */
+.devct--bevel2 .devct-tape-word {
+  color: #ECE9EA;
+  text-shadow: -1.0px -1.0px 0 #fdfbfe,
+                1.0px  1.0px 0 rgba(5, 5, 5, 0.90);
+}
+
+/* --- LETTERING C: plain, no emboss at all --------------------------------
+   The control for "does the bevel earn its place at this size". If this is
+   indistinguishable from B at arm's length, B is spending complexity on
+   nothing. */
+.devct--plain .devct-tape-word { color: #ECE9EA; }
+
+/* --- LETTERING D: the shared .on-dark mechanism --------------------------
+   THIS IS THE ROW #469 IS ACTUALLY ABOUT. `.on-dark` is on the <ul>, so it
+   re-points four of the six emboss custom properties for everything inside it;
+   the declarations below are exactly what `@include punched(raised)` emits,
+   written out by hand because this is a plain <style> block and not SCSS. The
+   stroke sits ALONGSIDE the shadow rather than inside it, which is §13.4.1's
+   split: stroke sets the edge's weight, shadow sets its direction.
+
+   WHAT IS BEING JUDGED, precisely: --emboss-stroke-w 0.010em,
+   --emboss-stroke-c a 40% lightened ink, --emboss-shadow at 0.06 alpha, and
+   --emboss-light left at $color-white because `.on-dark` deliberately does not
+   re-point it. Those numbers were tuned in August against a swatch on
+   /dev/emboss/ that has since been deleted, and have never been seen against
+   real content. The fill is the wordmark's #ECE9EA so the row is comparable
+   with the others -- and because it has to sit below pure white for the light
+   copy to have anywhere brighter to be, which is the headroom argument that
+   excused the wordmark from punched() in the first place. */
+.devct--ondark .devct-tape-word {
+  color: #ECE9EA;
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+  text-shadow: calc(var(--emboss-offset) * -1) calc(var(--emboss-offset) * -1) 0 var(--emboss-light),
+               var(--emboss-offset) var(--emboss-offset) 0 var(--emboss-shadow);
+}
+
+/* Every variant needs the card title's own colour rule overridden: the shipped
+   `.drink-card-name a` is $color-text and its hover is menthe. */
+.devct-variant .drink-card-name a { color: inherit; }
+.devct-variant .drink-card-name a:hover { color: #fff; }
+
+/* The shipped rule ellipsises the <p>. A tape inside it cannot, so the HUG
+   variants clip instead -- shown rather than worked around, because that is
+   what would actually happen. */
+.devct-variant .drink-card-name { white-space: nowrap; overflow: hidden; }
+</style>
+
+<div class="recipe">
+
+<h1 class="recipe-title"><span class="recipe-title-text">Card titles on tape</span></h1>
+
+<p class="devct-note">
+  Issue #469. Four candidate treatments for a cocktail card's title as white
+  lettering on the wordmark's black punched tape, against the shipped ink-on-paper
+  control. Everything except the title treatments is the site's own CSS.
+</p>
+
+<p class="devct-note">
+  <strong>The filter block below is static.</strong> One made-up state — MOOD
+  <em>tiki</em>, HAS TO HAVE <em>lime juice</em>, LEAVE OUT <em>pineapple
+  juice</em> — with the lit controls and the banded words on the cards written
+  at build time rather than by <code>cocktail-index.js</code>. Nothing clicks.
+</p>
+
+<p class="devct-note">
+  <strong>The four drinks are real</strong>, chosen for title length: 8, 19, 24
+  and 48 characters. The Bellini is the collection's longest title and already
+  ellipsises on the live index — a tape has to survive that case, so it is here
+  rather than left out.
+</p>
+
+{% comment %} ============================ THE FILTER BLOCK ================== {% endcomment %}
+
+<h2 class="devct-row-head">The page, for framing</h2>
+<p class="devct-row-sub">
+  The index's own filter markup, with one state written in by hand.
+</p>
+<span class="devct-static">static — nothing here clicks</span>
+
+<div class="drink-filters">
+
+  <div class="drink-filter drink-filter--chaos">
+    <div class="drink-label-row">
+      <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
+    </div>
+    <div class="drink-btns">
+      <button type="button" class="btn-chaos" aria-pressed="false">no chaos please</button>
+      <button type="button" class="btn-chaos" aria-pressed="false">I&rsquo;m open to chaos</button>
+    </div>
+  </div>
+
+  <div class="drink-filter drink-filter--mood">
+    <div class="drink-label-row">
+      <h2 class="drink-field-label"><span class="drink-field-label-text">Mood</span></h2>
+      <button type="button" class="btn-clear-filter">&times; clear</button>
+    </div>
+    <div class="drink-btns">
+      {% for name in groups.mood %}
+        {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
+        {% if members.size > 0 %}
+          {% if name == lit_mood %}
+            <button type="button" class="btn-mood is-on" aria-pressed="true">{{ name }}</button>
+          {% else %}
+            <button type="button" class="btn-mood" aria-pressed="false">{{ name }}</button>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="drink-filter drink-filter--hassle">
+    <div class="drink-label-row">
+      <h2 class="drink-field-label"><span class="drink-field-label-text">Hassle</span></h2>
+    </div>
+    <div class="drink-btns">
+      {% for name in groups.hassle %}
+        {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
+        {% if members.size > 0 %}
+          <button type="button" class="btn-mood" aria-pressed="false">{{ name }}</button>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="drink-searches">
+    <div class="drink-filter drink-search drink-search--include">
+      <div class="drink-label-row drink-label-row--search">
+        <h2 class="drink-field-label"><span class="drink-field-label-text">Has to have</span></h2>
+        <input class="drink-search-input" type="text" autocomplete="off" placeholder="ingredient name…" value="lime" readonly />
+        <button type="button" class="btn-clear-filter">&times; clear</button>
+      </div>
+      <div class="drink-pool">
+        <button type="button" class="btn-pool is-on"><span class="btn-pool-label">{{ lit_include }}</span></button>
+        <button type="button" class="btn-pool btn-pool--word-match"><span class="btn-pool-label">lime cordial</span></button>
+        <button type="button" class="btn-pool"><span class="btn-pool-label">falernum</span><span class="btn-pool-via">Velvet Falernum</span></button>
+      </div>
+    </div>
+
+    <div class="drink-filter drink-search drink-search--exclude">
+      <div class="drink-label-row drink-label-row--search">
+        <h2 class="drink-field-label"><span class="drink-field-label-text">Leave out</span></h2>
+        <input class="drink-search-input" type="text" autocomplete="off" placeholder="ingredient name…" value="pine" readonly />
+        <button type="button" class="btn-clear-filter">&times; clear</button>
+      </div>
+      <div class="drink-pool">
+        <button type="button" class="btn-pool is-on"><span class="btn-pool-label">{{ lit_exclude }}</span></button>
+        <button type="button" class="btn-pool"><span class="btn-pool-label">pineapple rum</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="drink-filter drink-filter--name">
+    <div class="drink-label-row drink-label-row--search">
+      <h2 class="drink-field-label"><span class="drink-field-label-text">I know what I want</span></h2>
+      <input class="drink-search-input" type="text" autocomplete="off" placeholder="drink name…" readonly />
+    </div>
+  </div>
+</div>
+
+<p class="drink-count"><strong>4</strong> <span>survivors</span></p>
+
+{% comment %} ============================ THE FIVE ROWS ====================== {% endcomment %}
+
+{% assign variants = "control|bevel2|bevel4|plain|ondark" | split: "|" %}
+
+{% for v in variants %}
+
+  {% case v %}
+    {% when "control" %}
+      {% assign vhead = "0 · Control — as shipped today" %}
+      {% assign vsub  = "Ink on paper, no tape. Everything below is measured against this." %}
+      {% assign vcls  = "" %}
+    {% when "bevel2" %}
+      {% assign vhead = "1 · Tape hugging the word — one shadow pair" %}
+      {% assign vsub  = "The wordmark's bevel reduced to a single tight pair, which is what §13.4.1's 6.5%-of-font-size ratio predicts at 1.08rem. My pick of the four, if any of them works." %}
+      {% assign vcls  = "devct--bevel2" %}
+    {% when "bevel4" %}
+      {% assign vhead = "2 · Tape hugging the word — the wordmark's full four-copy bevel" %}
+      {% assign vsub  = "The header's own numbers, unscaled. 1.8px is 10.4% of this type against 4.5% of the wordmark's, so if it reads heavy that ratio is the reason — and the alternative, scaling the offsets down, is sub-pixel, which antialiases the whole duplicate glyph and reads as floating rather than punched." %}
+      {% assign vcls  = "devct--bevel4" %}
+    {% when "plain" %}
+      {% assign vhead = "3 · Tape hugging the word — no emboss at all" %}
+      {% assign vsub  = "The control for whether the bevel earns its place at this size. If this is indistinguishable from row 1 at arm's length, row 1 is spending complexity on nothing." %}
+      {% assign vcls  = "devct--plain" %}
+    {% when "ondark" %}
+      {% assign vhead = "4 · Tape hugging the word — the shared .on-dark mechanism" %}
+      {% assign vsub  = "punched(raised) inside .on-dark, which re-points six custom properties for exactly this case. THIS IS THE ONE #469 IS ABOUT: those six values were tuned against a swatch that no longer exists and have never been judged against real content. They are being judged here." %}
+      {% assign vcls  = "on-dark devct--ondark" %}
+  {% endcase %}
+
+  <h2 class="devct-row-head">{{ vhead }}</h2>
+  <p class="devct-row-sub">{{ vsub }}</p>
+
+  {% if v == "control" %}
+    <ul class="drink-cards">
+  {% else %}
+    <ul class="drink-cards devct-variant {{ vcls }}">
+  {% endif %}
+
+  {% for drink in chosen %}
+
+    {% comment %} --- the glass, exactly as cocktails/index.html computes it --- {% endcomment %}
+    {% assign glass_icon = "" %}
+    {% for g in drink.glass %}
+      {% if glass_icon == "" %}
+        {% assign found = glasses.icons[g] %}
+        {% if found %}{% assign glass_icon = found %}{% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% assign ship = drink.meta.ship | default: "who knows" %}
+    {% assign ship_word = "" %}
+    {% if taxonomy.ship_scale contains ship %}
+      {% assign ship_word = ship_card_names[ship] | default: ship %}
+    {% endif %}
+
+    <li class="drink-card">
+
+      {% if glass_icon != "" %}
+        {% assign icon_mm = glasses.heights_mm[glass_icon] %}
+        {% assign ratio = 1.0 %}
+        {% if icon_mm and tallest_mm > 0 %}
+          {% assign ratio = icon_mm | times: 1.0 | divided_by: tallest_mm %}
+          {% assign ratio = ratio | times: 0.5 | plus: 0.5 %}
+        {% endif %}
+        {% assign cheat = glasses.display_scale[glass_icon] | default: 1.0 %}
+        {% capture icon_file %}icons/glasses/{{ glass_icon }}.svg{% endcapture %}
+        <span class="drink-card-glass" style="--glass-ratio: {{ ratio }}; --glass-cheat: {{ cheat }};">
+          {% include {{ icon_file }} %}
+        </span>
+      {% else %}
+        <span class="drink-card-glass"></span>
+      {% endif %}
+
+      <div class="drink-card-body">
+        <p class="drink-card-name">
+          {% if v == "control" %}
+            <a href="{{ drink.url | relative_url }}">{{ drink.title }}</a>
+          {% else %}
+            <span class="devct-tape">
+              <span class="devct-tape-bg" data-devct-tape="{{ forloop.index }}"></span>
+              <span class="devct-tape-word"><a href="{{ drink.url | relative_url }}">{{ drink.title }}</a></span>
+            </span>
+          {% endif %}
+        </p>
+
+        {% if drink.ingredients.size > 0 %}
+          <p class="drink-card-ingredients">
+            {% assign shown = 0 %}{% for ing in drink.ingredients %}{% assign gcount = 0 %}{% assign hcount = 0 %}{% for g in ing.generic %}{% assign gcount = gcount | plus: 1 %}{% if not_on_cards contains g %}{% assign hcount = hcount | plus: 1 %}{% endif %}{% endfor %}{% assign hidden = false %}{% if gcount > 0 and gcount == hcount %}{% assign hidden = true %}{% endif %}{% unless hidden %}{% assign label = "" %}{% for g in ing.generic %}{% assign dn = card_names[g] | default: g %}{% if label == "" %}{% assign label = dn %}{% else %}{% assign label = label | append: " or " | append: dn %}{% endif %}{% endfor %}{% assign joined = card_name_joins[label] %}{% if joined %}{% assign label = joined %}{% endif %}{% if label == "" %}{% assign label = ing.item %}{% endif %}{% if label != "" %}{% if shown > 0 %} <span class="drink-card-sep">·</span> {% endif %}{% comment %} THE BAND IS THE FICTION, drawn at build time: an ingredient whose card name IS the lit HAS TO HAVE chip wears .drink-card-hit, which is the same class the script applies. The Bellini matches nothing, so it correctly wears no band -- a filtered index would not show it at all, and showing it unbanded is more honest than inventing a match for it. {% endcomment %}{% assign lc = label | downcase %}{% if lc == lit_include %}<span class="drink-card-ing drink-card-hit">{{ label }}</span>{% else %}<span class="drink-card-ing">{{ label }}</span>{% endif %}{% assign shown = shown | plus: 1 %}{% endif %}{% endunless %}{% endfor %}
+          </p>
+        {% endif %}
+      </div>
+
+      <div class="drink-card-foot">
+        <span class="drink-card-moods">
+          {% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}{% if m == lit_mood %}<span class="drink-card-mood drink-card-mood--{{ chip }} is-match">{{ m }}</span>{% else %}<span class="drink-card-mood drink-card-mood--{{ chip }}">{{ m }}</span>{% endif %}{% endfor %}
+        </span>
+        <span class="drink-card-ship">
+          <span class="drink-card-ship-icon">{% include icons/ship.svg %}</span>
+          <span class="drink-card-ship-word">{{ ship_word }}</span>
+        </span>
+      </div>
+    </li>
+  {% endfor %}
+  </ul>
+
+{% endfor %}
+
+<h2 class="devct-row-head">Three things I could not settle by looking</h2>
+<div class="devct-note">
+  <ul>
+    <li><strong>The tilt.</strong> The wordmark rotates its tape −1.75°. A card
+      is <code>overflow: hidden</code>, so a tilted tape is cut off square by the
+      card edge instead of hanging past it. That is a fact about the card rather
+      than about the idea, and it needs a real decision (drop the tilt, or open
+      the card's overflow and accept whatever else escapes) rather than a number.
+      Not built above, because it changes the card and the title at once.</li>
+    <li><strong>The ellipsis.</strong> <code>.drink-card-name</code> ellipsises
+      with <code>text-overflow</code>, which only works on the text directly
+      inside the overflowing box. A tape wrapping the words breaks that, so the
+      Bellini's title is <em>clipped</em> in every row above rather than getting
+      its "…". The SPAN variant is the shape that fixes it, and it is not built
+      either, for the reason below.</li>
+    <li><strong>Hug versus span.</strong> A tape hugging the word gives four
+      different tape widths on four cards; a tape spanning the text column gives
+      one edge and stops looking like a torn label. I have built hug only,
+      because if the whole idea is wrong the second axis never matters — and if
+      it is right, that is one more question to put in front of you rather than
+      guess at.</li>
+    <li><strong>The tape is taller than the words it replaces</strong>, so the
+      ingredient line sits lower on every variant row than on the control. The
+      card's height is fixed and its foot is pinned, so that space comes out of
+      the ingredients. Left visible rather than compensated for: if the idea
+      survives, how much room the tape is allowed to take is the next question,
+      and hiding the cost now would only move it.</li>
+    <li><strong>The tape SVG is drawn at 1400×170 and stretches with
+      <code>preserveAspectRatio="none"</code></strong>, as it does in the header.
+      The header renders it 70px tall; a card title is roughly half that, so the
+      machine marks and the edge bevel are being asked to work at a size they
+      were never chosen at. If the shape reads muddy rather than the idea reading
+      wrong, that is a <code>scripts/generate_tape.py</code> question — a
+      card-sized tape set — not a reason to abandon it.</li>
+  </ul>
+</div>
+
+<script>
+  // Fills every tape slot through HTF.chromeAsset -- the sanctioned route for
+  // chrome artwork (HANDOVER §3), not a hand-built URL. Deterministic by card
+  // position, so a reload gives the same comparison; see the header comment.
+  (function () {
+    var HTF = window.HTF;
+    if (!HTF) return;
+    var count = {{ site.data.chrome.tape_count }};
+    var slots = document.querySelectorAll('[data-devct-tape]');
+    Array.prototype.forEach.call(slots, function (slot) {
+      var i = parseInt(slot.getAttribute('data-devct-tape'), 10) || 1;
+      var n = ((i - 1) % count) + 1;
+      HTF.fetchSvg(HTF.chromeAsset('/tape/tape-' + n + '.svg'), function (svg) {
+        slot.innerHTML = svg.replace(/<svg(\s)/, '<svg preserveAspectRatio="none"$1');
+      });
+    });
+  }());
+</script>
+
+</div>
+
+{% else %}
+  <div class="recipe">
+    <h1 class="recipe-title"><span class="recipe-title-text">Card titles on tape</span></h1>
+    <p class="devct-note">
+      This page reads <code>_cocktail_drafts/</code>, which only exists locally.
+      Run <code>jekyll-local</code> and open it on :4001.
+    </p>
+  </div>
+{% endif %}
