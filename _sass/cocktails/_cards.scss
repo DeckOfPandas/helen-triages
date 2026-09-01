@@ -203,7 +203,20 @@ $card-glass-scale: 10.4rem;
 //      used to be centred and clipped, so a long name showed the MIDDLE of a
 //      tape with both ends cut off.
 $card-tape-pad-y: 0.75em;   // gives a 32px black band around 10.4px capitals
-$card-tape-pad-x: 0.8em;    // the overhang past the lettering, both ends
+
+// THE OVERHANG PAST THE LETTERING, EQUAL AT BOTH ENDS. Helen: "extend the tape
+// slightly leftwards, and start the lettering slightly rightwards of where it
+// is now, then balance the tape at the right edge with the same padding IF the
+// cocktail name is short enough to all be shown on one line."
+//
+// One symmetric padding gives the balance for free, and the tape's leftward
+// pull is set separately below -- so the lettering's own left edge is the
+// DIFFERENCE between them, which is how it can move right while the tape moves
+// left. On a long title the tape caps at the panel and the WORD shrinks inside
+// it, so this padding survives on both ends and the ellipsis appears rather
+// than the air disappearing.
+$card-tape-pad-x:  1.15em;  // 19.9px of tape past the letters, each end
+$card-tape-bleed:  0.87em;  // how far the tape's left edge passes the body's
 
 .drink-card-name {
   font-family: $font-headings;
@@ -238,18 +251,19 @@ $card-tape-pad-x: 0.8em;    // the overhang past the lettering, both ends
   padding: $card-tape-pad-y $card-tape-pad-x;
   vertical-align: baseline;
 
-  // THE TAPE OVERHANGS TO THE LEFT AND THE LETTERING ALIGNS WITH THE
-  // INGREDIENTS. Helen: "the tape extending leftwards past the left-hand edge
-  // of the ingredients lettering". Pulling the box left by exactly its own left
-  // padding does both at once -- the lettering lands on `.drink-card-body`'s
-  // edge, which is the ingredient line's edge, and the tape carries on past it.
+  // THE TAPE GOES LEFT AND THE LETTERING GOES RIGHT, which is only one move
+  // because they are measured from different edges. Pulling the box left by
+  // $card-tape-bleed puts the tape's left edge that far past the ingredient
+  // line's; the lettering then starts at ($card-tape-pad-x - $card-tape-bleed)
+  // = 0.28em, about 5px, to the RIGHT of the ingredients.
   //
-  // 0.8em is 14.6px against the $card-gutter of 15.2px between the glass panel
-  // and the text, so the overhang stops just short of the panel rather than
-  // touching it. That is the constraint on this value: raise it and the tape
-  // starts to sit on the drawing.
-  margin-left: -$card-tape-pad-x;
-  max-width: calc(100% + #{$card-tape-pad-x});
+  // THE GUTTER IS THE CEILING ON THE BLEED. 0.87em is 15.0px against the
+  // $card-gutter of 15.2px between the glass panel and the text, so the tape
+  // stops a fifth of a pixel short of the drawing. Raise it and the tape starts
+  // to sit on the glass -- which may yet be the right look, but it is a
+  // different decision and not a number to drift into.
+  margin-left: -$card-tape-bleed;
+  max-width: calc(100% + #{$card-tape-bleed});
 }
 
 // THE BAND IS CENTRED BY MOVING THE ARTWORK, NOT THE WORDS.

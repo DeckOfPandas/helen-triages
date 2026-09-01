@@ -60,6 +60,27 @@ $emboss-cocktails-vars-emitted: false !default;
     --emboss-stroke-c: #{$color-label-stroke};
     --emboss-stroke-w: 0.010em;
     --emboss-shadow:   #{rgba($color-paper, 0.06)};
+
+    // THE WORDMARK TAKES THE LETTERING HELEN SETTLED ON THE CARDS. Her ask,
+    // 2026-09-01, seeing the header after the inversion: "the wordmark text is
+    // weirrrrrd ... I would like the same lettering you created for our new
+    // white on black headings."
+    //
+    // TWO NEAR-WHITES, ONE TIGHT PAIR, NO SOFTENING -- the treatment she chose
+    // over the wordmark's own four copies at card size, and the same values
+    // `.drink-card-tape-word` carries. The wide second pair is what read as a
+    // spread bevel rather than a cut edge, and it goes.
+    //
+    // HELEN TRIAGES NEEDED IT MOST, and for a reason that is a bug rather than
+    // a preference: shared/_layout.scss hardcoded `#dad7d8` up-left (chosen as
+    // "a touch darker than the page", which is only a highlight on a LIGHT
+    // page) and `rgba($color-text, 0.5)` down-right. With $color-text near-white
+    // here, BOTH copies came out light -- two pale blobs 2px apart on either
+    // side of a near-white letter. Its stroke had the same fault: half-opaque
+    // ink is a faux-bold on paper and near-invisible fattening on black.
+    --wordmark-top-shadow:  -1px -1px 0 #fdfbfe, 1px 1px 0 rgba(5, 5, 5, 0.9);
+    --wordmark-word-shadow: -1px -1px 0 #fdfbfe, 1px 1px 0 rgba(5, 5, 5, 0.9);
+    --wordmark-top-stroke:  #{$color-label-stroke};
   }
   $emboss-cocktails-vars-emitted: true !global;
 }
