@@ -581,8 +581,23 @@ sitemap: false
     Array.prototype.forEach.call(slots, function (slot) {
       var i = parseInt(slot.getAttribute('data-devct-tape'), 10) || 1;
       var n = ((i - 1) % count) + 1;
+      // THE REPLACEMENT IS decorations.js's, CHARACTER FOR CHARACTER, and the
+      // difference between the two cost a round. Mine injected
+      // preserveAspectRatio and NOT `height="100%"`. The tape SVG carries
+      // `width="100%"` and no height of its own, so without that attribute the
+      // element does not fill its box -- it takes its intrinsic ratio and
+      // LETTERBOXES, scaling to fit entirely rather than stretching. A narrow
+      // tape (TI PUNCH, ~135px wide against a 40px box) then renders about 16px
+      // tall inside 40, while a wide one (the 48-character Bellini) fills the
+      // box completely. Helen: "too short top to bottom, not just left to
+      // right" -- and the two cards disagreeing with each other is the tell.
+      //
+      // The lesson is not the attribute, it is that I retyped a working line
+      // instead of copying it. decorations.js has drawn this exact artwork on
+      // every page of this site for weeks.
       HTF.fetchSvg(HTF.chromeAsset('/tape/tape-' + n + '.svg'), function (svg) {
-        slot.innerHTML = svg.replace(/<svg(\s)/, '<svg preserveAspectRatio="none"$1');
+        slot.innerHTML = svg.replace(/<svg(?=[\s>])/,
+          '<svg preserveAspectRatio="none" height="100%"');
       });
     });
   }());
