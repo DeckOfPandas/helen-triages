@@ -343,6 +343,33 @@ sitemap: false
 .devct-tape-105 { --tape-pad-y: 1.05em; }  /* band 3.83x caps */
 
 /* ===========================================================================
+   HOW FAR LEFT THE NAME CAN START, and how much name that buys.
+
+   THE TAPE IS ALREADY FLUSH WITH THE INGREDIENTS. `.drink-card-name` and
+   `.drink-card-ingredients` are siblings in `.drink-card-body` with no padding
+   between them and its edge, so the tape's left edge and the ingredient line's
+   left edge are the same x. What is inset is the LETTERING, by the tape's own
+   0.95em of horizontal padding -- 17.3px. So Helen's two sentences are two
+   different moves and both are worth seeing:
+
+     - spend less of the tape on padding, so the letters sit nearer its edge;
+     - move the TAPE left, past the ingredients, into the card's gutter, so the
+       letters land exactly on the ingredients' left edge.
+
+   The second is the tidier idea: the tape butts against the glass panel and the
+   title then aligns with the words below it, which is the alignment the card's
+   fixed anchors are built on everywhere else.
+
+   WHAT EACH BUYS, in characters. Courier Prime's advance is 0.6em and the title
+   carries 0.03em of letter-spacing, so a character costs 0.63em = 11.5px at
+   this size. The gutter is 0.95rem and the card's right padding is 1.15rem. */
+.devct-pad-tight .devct-tape { padding-left: 0.35em; padding-right: 0.35em; }
+.devct-bleed-l .devct-tape   { margin-left: -0.95rem;
+                               max-width: calc(100% + 0.95rem); }
+.devct-bleed-lr .devct-tape  { margin-left: -0.95rem; margin-right: -1.15rem;
+                               max-width: calc(100% + 0.95rem + 1.15rem); }
+
+/* ===========================================================================
    THE TOP EDGE, four weights and all of them below where it started.
    A hairline highlight along the tape's rim and a hard shadow under it -- the
    two-hard-copies logic 13.4.1 uses on glyphs, applied to the object.
@@ -460,7 +487,7 @@ sitemap: false
 
 {% comment %} FIELDS, `~`-separated: tag | ground class | card classes |
    whether this stage carries the filter block. {% endcomment %}
-{% assign stages = "L30~devct-tape-75~devct--lit-30~yes|L22~devct-tape-75~devct--lit-22~no|L16~devct-tape-75~devct--lit-16~no|L10~devct-tape-75~devct--lit-10~no|L06~devct-tape-75~devct--lit-06~no|L2~devct-tape-75~devct--lit-2px~no" | split: "|" %}
+{% assign stages = "A~devct-tape-75~devct--lit-06~yes|B~devct-tape-75 devct-pad-tight~devct--lit-06~no|C~devct-tape-75 devct-bleed-l~devct--lit-06~no|D~devct-tape-75 devct-bleed-l devct-pad-tight~devct--lit-06~no|E~devct-tape-75 devct-bleed-lr devct-pad-tight~devct--lit-06~no" | split: "|" %}
 
 {% for stage in stages %}
   {% assign f = stage | split: "~" %}
@@ -473,16 +500,15 @@ sitemap: false
      70.59% of the box because the artwork carries transparent margin. The
      third figure is the black ABOVE and BELOW the capitals, which is the thing
      the eye is actually judging. {% endcomment %}
-  {% comment %} One variable: the weight of the highlight along the tape's top
-     rim. Every stage is the same tape (32px black band) and the same bottom
-     shadow. {% endcomment %}
+  {% comment %} All five are L06, Helen's pick. One variable: how far left the
+     name can start, and how much name that buys. A character costs 11.5px
+     here. {% endcomment %}
   {% case tag %}
-    {% when "L30" %}{% assign label = "top edge 1px at 30% &mdash; where it started" %}
-    {% when "L22" %}{% assign label = "top edge 1px at 22%" %}
-    {% when "L16" %}{% assign label = "top edge 1px at 16%" %}
-    {% when "L10" %}{% assign label = "top edge 1px at 10%" %}
-    {% when "L06" %}{% assign label = "top edge 1px at 6%" %}
-    {% when "L2"  %}{% assign label = "top edge 2px at 14% &mdash; same light, twice the width: the SHAPE of the edge rather than its strength" %}
+    {% when "A" %}{% assign label = "as it is &mdash; tape flush with the ingredients, letters 17px inside it" %}
+    {% when "B" %}{% assign label = "letters nearer the tape&rsquo;s edge (0.35em not 0.95em) &mdash; about 2 more characters" %}
+    {% when "C" %}{% assign label = "tape pulled left into the gutter, padding kept &mdash; the LETTERS now align with the ingredients &middot; about 1 more character" %}
+    {% when "D" %}{% assign label = "both: pulled left AND tighter &mdash; about 3 more characters" %}
+    {% when "E" %}{% assign label = "both, and out into the card&rsquo;s right padding too &mdash; about 5 more characters" %}
   {% endcase %}
 
   <p class="devct-tag">{{ tag }} &nbsp; {{ label }}</p>
