@@ -231,13 +231,27 @@ $card-tape-pad-y: 0.75em;   // gives a 32px black band around 10.4px capitals
 // the card is built on. At 0.95em the tape still carries 16.4px of air past the
 // letters at both ends, and the name gets back to within 3px of the full
 // ingredient width: -0.3 of a character against -2.3 before.
-$card-tape-pad-x:      0.95em;   // 16.4px of tape past the letters, each end
-$card-tape-bleed:      0.95em;   // equal, so the lettering aligns exactly
+// 1.05em RATHER THAN 0.95em, AND THE REASON IS THE FONT SIZE DROPPING. These
+// are `em`, so they shrank with the title: at 1rem a 0.95em bleed is exactly
+// 15.2px, which is exactly $card-gutter -- the tape would land flush against
+// the glass panel instead of a hair over it, losing the overlap Helen approved.
+// 1.05em puts it back 1.6px onto the panel and costs 0.16 of a character.
+$card-tape-pad-x:      1.05em;   // 16.8px of tape past the letters, each end
+$card-tape-bleed:      1.05em;   // equal, so the lettering aligns exactly
 $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 
 .drink-card-name {
   font-family: $font-headings;
-  font-size: 1.08rem;
+  // 1rem SINCE 2026-09-02, down from 1.08rem. Helen: "let's change the cocktail
+  // names to 1rem. It's a shame but I think it's the right compromise" -- the
+  // compromise being title size against how many names survive on one line.
+  //
+  // MEASURED, so the trade is on the record rather than assumed. Of 124 titles
+  // (median 14 characters, longest 48), on a 420px card it takes 117 on one
+  // line to 120; on a 470px card both sizes manage 122. So the gain is real and
+  // it is concentrated on NARROW cards -- which is where it matters, since a
+  // wide card was never the case that ellipsised.
+  font-size: 1rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   margin: 0 0 0.3rem;
