@@ -6,71 +6,69 @@ sitemap: false
 ---
 
 {% comment %} ─────────────────────────────────────────────────────────────────
-  GOING BLACK — internal, never published. Issue #469.
+  BLACK ON BLACK — internal, never published. Issue #469.
 
-  ROUND 3, 2026-09-01. Helen, having settled the lettering in round 1 and looked
-  at the card in round 2: "Ahhhhh you know what we need to do....? We need to go
-  black background. And pick up all the pieces we break on the way!" She named
-  the shortlist herself (2a, 2c, 3a, 3c), the two title treatments a black panel
-  would want, and the alternative worth taking seriously -- white cards on a
-  black page, with the filter section finding a way to be white on black. She
-  also asked that 2d, the incremental evolution, be considered properly rather
-  than swept along.
+  ROUND 5, 2026-09-01. Helen: "One thing for sure: we're going black on black. I
+  wear black on black animal print whenever possible. I have some black on black
+  bed linen. This is what we're doing."
 
-  SO THE PAGE IS SIX STAGES, and each is a whole page ground rather than a card
-  variant. A stage paints its ground past its own box with a box-shadow spread
-  and a clip-path, so a black stage and a light one can sit on one page without
-  a full-bleed rule that could force horizontal scroll.
+  SO THE LOSERS ARE GONE, per the comparison-switch convention rather than left
+  compiling: the light ground, the white cards, the solid absinthe panel, the
+  no-tape lettering, the white tape and both of its black-letter treatments, the
+  glass-hero and ruled cards, and the sunken E3. Recover any of them from git;
+  they are in rounds 2, 3 and 4 with the reasoning that produced them.
 
-    A   light ground, 2d cards -- the natural evolution, with filters
-    B   BLACK ground, WHITE cards, black tape title -- with filters
-    C   black ground, ink cards, NO TAPE, white punched letters
-    D   black ground, ink cards, WHITE TAPE, black punched letters
-    E   black ground, ink cards, the current black tape -- what "invisible tape"
-        actually looks like, which is the thing worth checking rather than
-        assuming
-    F   black ground, ink cards, solid absinthe panel -- the loudest
+  WHAT SURVIVED AND WHY:
+    E2  the tape LIFTED off a darker card. Helen: "love it. Black label tape
+        doesn't store well (from my memories of the 80s and 90s...), and does
+        lighten, especially if the roll is manhandled."
+    E4  the tape's rim LIT, both grounds untouched. "Good. Maybe the top edge is
+        a little too heavy -- it's trying to get involved with the text."
+    E3  cut. "E3 blends everything in a way, and just doesn't excite me."
 
-  Filters appear in A and B only. The filter treatment is a property of the
-  GROUND, not of the card, so demonstrating it once on light and once on black
-  answers it for every stage below.
+  ROUND 5 DOES FOUR THINGS.
 
-  THE ONE STRUCTURAL FACT, CHECKED RATHER THAN FEARED. A black cocktails does
-  NOT fork the shared chrome. `test_the_header_and_footer_are_identical_on_every_page`
-  compares rendered HTML and colour is CSS; `test_every_chrome_class_has_a_rule_in_every_site_stylesheet`
-  checks DIVERGENCE -- a chrome class styled on one site must be styled on the
-  other -- and never compares values. The chrome already differs in colour
-  between the sites through `$color-accent`, which is exactly what §2.3's
-  palette contract exists to allow. So this is a palette change, not an
-  architecture one.
+  1. THE TITLE NOW WEARS THE HEADING'S OWN STROKE. Helen: "The YOLO/MOOD etc
+     you've done has outlines over the top edge of the letter. I think this
+     helps both legibility and the raised effect. Please treat the title of
+     cocktails the same way." That outline is `-webkit-text-stroke` in
+     `--emboss-stroke-c`, which `.on-dark` re-points to a mid grey -- darker
+     than a near-white letter, so it cuts an edge into it. The tape lettering
+     had the two-copy shadow and no stroke at all, which is 13.4.1's split with
+     one half missing: STROKE SETS THE EDGE'S WEIGHT, SHADOW SETS ITS
+     DIRECTION. It now reads the same two custom properties the headings do, so
+     it is literally the same treatment rather than a copy of it. Stage `S` is a
+     weight ladder across its four cards -- none, the heading's own 0.010em,
+     0.016em, 0.024em -- because "the same" and "the same at this size" are
+     different claims and only looking settles which she wants.
 
-  AND `.on-dark` IS ON EVERY BLACK STAGE, which is #469 answered by the largest
-  possible route. Those six custom-property values were tuned in August against
-  a swatch that has since been deleted and have never been rendered on real
-  content; every punched heading inside a dark stage here is running them. But
-  the finding underneath is that a dark SITE may not want the class at all: the
-  class exists for a dark SECTION on a light site, whereas inverting the palette
-  makes every shared partial follow for free -- including `shared/_base.scss`'s
-  hardcoded `$color-text` stroke on plain h1/h2/h3, which is #469's "known gap"
-  and simply stops being one if `$color-text` is itself near-white.
+  2. THE GROUND LIFTS, three ways. "The background a little lighter even, to
+     give the cards more drama, but not so light as to feel connected to the
+     tape." Three tiers have to stay separated: the CARD is the darkest thing,
+     the PAGE sits above it, and the TAPE stays above both. So as the page
+     lifts, the tape's brightness lifts with it -- otherwise the gap she is
+     protecting closes from the other side.
 
-  WHAT WOULD ACTUALLY BREAK, and none of it is on this page yet:
-    - every `-deep` accent is solved to 4.75:1 against PAPER. On black they are
-      too dark to read; the BARE hues are the text colours on a dark ground.
-    - every `-wash` is a 10% tint of paper, so on black each becomes a near-white
-      block. All five want re-deriving downward.
-    - `_sass/cocktails/_print.scss` must keep printing on white, and
-      `test_print_neutralises_the_screen_page_background` is the guard that
-      already exists for exactly this.
-    - the tape SVGs are drawn black. Stage D inverts them in CSS with
-      `filter: invert(1)`, which is honest enough to look at and wrong in
-      detail: it flips the bevel's light source too. A real white tape is a
-      `scripts/generate_tape.py` run with its colours parameterised.
+  3. THE TAPE WEARS. Her riff, taken literally: a manhandled roll does not
+     lighten uniformly, so stage E2c varies each card's tape by position and
+     adds a little warmth and a little less contrast -- worn black tape goes
+     grey-brown, not grey. Deterministic by card position, so it is a texture
+     rather than a lottery.
 
-  THE PINK IS FOOD'S HOT MAGENTA, #FF00C8, per Helen's round-2 ask. On black it
-  is a different argument than on paper -- it needs no darkening at all, where
-  on paper it needed #C4009A to clear AA. That is one of the pieces going black
-  picks up rather than breaks.
+  4. E4'S TOP EDGE BACKS OFF, two ways -- a lighter highlight, and the same
+     highlight with more room between the tape's rim and the cap line, since
+     "trying to get involved with the text" is as much a distance problem as a
+     weight one.
+
+  AND `X` IS THE ONE SHE HAS NOT SEEN: E2 and E4 together. A lifted tape with
+  a lit rim on the lifted ground, which is the obvious combination of the two
+  things she liked and was in neither round.
+
+  PROTANOPIA IS PARKED, at her call, and raised as its own issue rather than
+  left in a commit message -- she named the right shape for it herself ("we
+  could have a protanopia mode. We don't need to limit ourselves to pink for
+  that"), and a mode is a better answer than a compromised hue. The measurement
+  that prompted it is in round 4's commit and in tmp/a11y.py.
 
   Four real drinks, 8 / 19 / 24 / 48 characters. Tape shapes deterministic by
   card position. Nothing clicks.
@@ -107,21 +105,19 @@ sitemap: false
 /* ===========================================================================
    PAGE-LOCAL ONLY. Whatever wins becomes a palette change in
    _sass/cocktails/_palette.scss plus rules in _cards.scss and _filters.scss,
-   and this whole block goes with the losers.
+   and this whole block goes with it.
    ======================================================================== */
 
 .devct-page {
-  --pink: #FF00C8;          /* food's hot magenta, on black; needs no deep */
-  --pink-deep: #C4009A;     /* the light-ground text value, 5.32:1 on paper */
-  --pink-wash: #FBE2F5;
+  --pink: #FF00C8;
   --absinthe: #30E88C;
-  --absinthe-deep: #0E8248;
-  --ink-card: #17171a;
-  --ink-edge: #2e2e34;
-  --dark-ground: #0e0e10;
+  --ink-card: #0a0a0d;      /* the card, and it is the darkest thing here */
+  --ink-edge: #212127;
+  --dark-ground: #0e0e10;   /* the page, lifted per stage below */
   --dark-text: #e8e6e2;
   --dark-quiet: #97959a;
   --dark-line: #3a3a41;
+  --tape-lift: 2.7;         /* how far the tape's own ink is brightened */
 }
 
 .devct-tag {
@@ -133,34 +129,33 @@ sitemap: false
 }
 
 /* A STAGE IS A GROUND, NOT A PANEL. box-shadow with a huge spread paints past
-   the element's own box and clip-path stops that spread growing the page --
-   so a black ground reaches the window edges without a 100vw rule, which is
-   the thing that forces horizontal scroll on a machine with a visible
-   scrollbar (test_no_element_can_force_horizontal_scroll's whole subject). */
+   the element's own box; clip-path stops the spread growing the page. So a
+   ground reaches the window edges without a 100vw rule, which is the thing
+   that forces horizontal scroll on a machine with a visible scrollbar. */
 .devct-stage {
   padding: 1.5rem 0 2.2rem;
   clip-path: inset(0 -100vmax);
-}
-.devct-stage--dark {
   box-shadow: 0 0 0 100vmax var(--dark-ground);
   background: var(--dark-ground);
   color: var(--dark-text);
 }
 
-/* --- FOOD'S HOT MAGENTA, in the four places the pink actually lives -------- */
-.devct-page .btn-mood.is-on          { text-decoration-color: var(--pink); }
-.devct-page .btn-pool.is-on          { border-color: var(--pink-deep);
-                                       text-decoration-color: var(--pink); }
-.devct-page .btn-pool:hover,
-.devct-page .btn-pool:focus-visible  { border-color: var(--pink-deep); color: var(--pink-deep); }
-.devct-page .drink-card-hit          { text-decoration-color: var(--pink); }
-.devct-page .drink-card-mood.is-match,
-.devct-page .drink-card-mood--hassle.is-match {
-  background: var(--pink-wash);
-  border-color: var(--pink-deep);
-}
+/* THE THREE GROUNDS. The card stays at --ink-card throughout, so lifting the
+   page lifts the card OFF it -- which is where the drama comes from. The tape
+   lifts with the page so the gap Helen is protecting cannot close from the
+   other side. */
+.devct-ground-mid  { --dark-ground: #16161a; --tape-lift: 3.2; }
+.devct-ground-high { --dark-ground: #1c1c22; --tape-lift: 3.9; }
 
-/* --- THE SETTLED TITLE, from round 1 -------------------------------------- */
+/* --- FOOD'S HOT MAGENTA, in the four places the pink lives ---------------- */
+.devct-page .btn-mood.is-on          { text-decoration-color: var(--pink); }
+.devct-page .btn-pool.is-on          { border-color: var(--pink);
+                                       text-decoration-color: var(--pink); }
+.devct-page .drink-card-hit          { text-decoration-color: var(--pink); }
+
+/* ===========================================================================
+   THE TITLE. Round 1's lettering, plus round 5's stroke.
+   ======================================================================== */
 .devct-tape {
   position: relative;
   display: inline-flex;
@@ -176,340 +171,190 @@ sitemap: false
   width: 100%; height: 100%;
   z-index: 0;
   pointer-events: none;
+  filter: brightness(var(--tape-lift));
 }
 .devct-tape-bg svg { width: 100%; height: 100%; display: block; }
+
+/* THE SAME TREATMENT AS A FILTER HEADING, not a copy of it -- both halves,
+   reading the same two custom properties `.on-dark` re-points. The shadow was
+   already here from round 1 and Helen settled it; the stroke is what she asked
+   for in round 5, and it is the half 13.4.1 says carries the edge's WEIGHT
+   where the shadow carries its DIRECTION. */
 .devct-tape-word {
   position: relative;
   z-index: 1;
   white-space: nowrap;
   color: #ECE9EA;
+  -webkit-text-stroke: var(--title-stroke, var(--emboss-stroke-w)) var(--emboss-stroke-c);
   text-shadow: -1.0px -1.0px 0 #fdfbfe,
                 1.0px  1.0px 0 rgba(5, 5, 5, 0.90);
 }
-.devct-page .drink-card-name        { white-space: nowrap; overflow: hidden; }
-.devct-page .drink-card-name a      { color: inherit; }
+.devct-page .drink-card-name         { white-space: nowrap; overflow: hidden; }
+.devct-page .drink-card-name a       { color: inherit; }
 .devct-page .drink-card-name a:hover { color: #fff; }
 
-/* TITLE VARIANT: no tape at all. Helen's first guess for a black panel --
-   "white punched text with no tape". The lettering is unchanged; only the
-   ground under it goes. */
-.devct--notape .devct-tape-bg { display: none; }
-.devct--notape .devct-tape    { padding: 0.30em 0; }
+/* Stage S only: the four cards become a weight ladder. */
+.devct--stroke-ladder .drink-card:nth-child(1) .devct-tape-word { --title-stroke: 0; }
+.devct--stroke-ladder .drink-card:nth-child(2) .devct-tape-word { --title-stroke: 0.010em; }
+.devct--stroke-ladder .drink-card:nth-child(3) .devct-tape-word { --title-stroke: 0.016em; }
+.devct--stroke-ladder .drink-card:nth-child(4) .devct-tape-word { --title-stroke: 0.024em; }
 
-/* TITLE VARIANT: white tape, black punched letters. Her second guess, and the
-   inversion runs all the way down -- the light copy goes up-left as usual but
-   now against a near-white ground, so it is the CUT LINE that shows, and the
-   dark copy down-right does the raising. Same structure as every heading on
-   the food site, which is the point: a white tape is a light ground and wants
-   the light-ground treatment.
-
-   `filter: invert(1)` is a mockup, not a proposal. It flips the tape's own
-   bevel light source along with its ink; a real white tape is a
-   generate_tape.py run with its colours parameterised. */
-.devct--whitetape .devct-tape-bg svg { filter: invert(1); }
-.devct--whitetape .devct-tape-word {
-  color: #141417;
-  text-shadow: -1.0px -1.0px 0 rgba(255, 255, 255, 0.95),
-                1.0px  1.0px 0 rgba(0, 0, 0, 0.38);
-}
-.devct--whitetape .drink-card-name a:hover { color: #000; }
+/* ===========================================================================
+   BIGGER TYPE ON DARK. Helen called it, and the reason is irradiation: a light
+   glyph on a dark ground blooms into its surround, so the same type reads
+   heavier and less crisp than ink on paper. The corrections are more SIZE and
+   more TRACKING and, counter-intuitively, LESS WEIGHT. Nothing here gains
+   weight. The card grew to 13.8rem with it, because the anchors are fixed and
+   bigger type in an unchanged box just clips the second chip row.
+   ======================================================================== */
+.devct-page .drink-card             { height: 13.8rem; }
+.devct-page .drink-field-label      { font-size: 1.52rem; letter-spacing: 0.09em; }
+.devct-page .btn-mood,
+.devct-page .btn-chaos              { font-size: 0.82rem; letter-spacing: 0.015em; }
+.devct-page .btn-pool               { font-size: 0.86rem; }
+.devct-page .drink-card-name        { font-size: 1.14rem; }
+.devct-page .drink-card-ingredients { font-size: 0.88rem; letter-spacing: 0.012em; }
+.devct-page .drink-card-mood        { font-size: 0.72rem; }
+.devct-page .drink-card-ship        { font-size: 0.76rem; }
 
 /* ===========================================================================
    THE DARK GROUND -- every piece the inversion breaks, picked up.
-   Scoped to a dark stage so the light stage is untouched and the two can be
-   compared honestly on one page.
    ======================================================================== */
-
-.devct-stage--dark .drink-field-label            { color: var(--dark-text); }
-.devct-stage--dark .drink-search--exclude .drink-field-label { color: var(--dark-quiet); }
-.devct-stage--dark .btn-mood,
-.devct-stage--dark .btn-chaos                    { color: #a8a6ab; }
-.devct-stage--dark .btn-mood:hover,
-.devct-stage--dark .btn-chaos:hover,
-.devct-stage--dark .btn-mood:focus-visible       { color: #ffffff; }
-.devct-stage--dark .btn-mood.is-on {
+.devct-page .drink-field-label                     { color: var(--dark-text); }
+.devct-page .drink-search--exclude .drink-field-label { color: var(--dark-quiet); }
+.devct-page .btn-mood,
+.devct-page .btn-chaos                             { color: #a8a6ab; }
+.devct-page .btn-mood:hover,
+.devct-page .btn-chaos:hover,
+.devct-page .btn-mood:focus-visible                { color: #ffffff; }
+.devct-page .btn-mood.is-on {
   color: #ffffff;
   -webkit-text-stroke: 0.05em #ffffff;
   text-decoration-color: var(--pink);
 }
-.devct-stage--dark .btn-clear-filter             { color: var(--dark-quiet); }
-.devct-stage--dark .drink-search-input {
+.devct-page .btn-clear-filter                      { color: var(--dark-quiet); }
+.devct-page .drink-search-input {
   color: var(--dark-text);
   background: transparent;
   border-bottom-color: #4a4a52;
 }
-.devct-stage--dark .drink-search-input::placeholder { color: #6d6b72; }
-.devct-stage--dark .btn-pool {
+.devct-page .drink-search-input::placeholder       { color: #6d6b72; }
+.devct-page .btn-pool {
   background: var(--ink-card);
   border-color: var(--dark-line);
   color: #cfcdc9;
 }
-.devct-stage--dark .btn-pool:hover,
-.devct-stage--dark .btn-pool:focus-visible       { border-color: var(--pink); color: #ffffff; }
-.devct-stage--dark .btn-pool.is-on {
-  border-color: var(--pink);
-  color: #ffffff;
-  text-decoration-color: var(--pink);
-}
-.devct-stage--dark .btn-pool-via                 { color: var(--dark-quiet); }
-.devct-stage--dark .drink-search--exclude .btn-pool { color: var(--dark-quiet); border-color: var(--dark-line); }
-.devct-stage--dark .drink-search--exclude .btn-pool.is-on { border-color: var(--dark-text); color: var(--dark-text); }
-.devct-stage--dark .drink-count                  { color: var(--dark-text); }
+.devct-page .btn-pool:hover,
+.devct-page .btn-pool:focus-visible                { border-color: var(--pink); color: #ffffff; }
+.devct-page .btn-pool.is-on                        { color: #ffffff; }
+.devct-page .btn-pool-via                          { color: var(--dark-quiet); }
+.devct-page .drink-search--exclude .btn-pool       { color: var(--dark-quiet); border-color: var(--dark-line); }
+.devct-page .drink-search--exclude .btn-pool.is-on { border-color: var(--dark-text); color: var(--dark-text); }
+.devct-page .drink-count                           { color: var(--dark-text); }
 
-/* ===========================================================================
-   ROUND 4 -- BIGGER TYPE ON DARK.
-
-   Helen: "Where we have white on black throughout the page I expect we'll need
-   the font to be bigger out of the box." She is right, and the reason is
-   irradiation: a light glyph on a dark ground blooms into its surround, so the
-   same type reads slightly heavier and slightly less crisp than it does as ink
-   on paper. The standard corrections are MORE SIZE and MORE TRACKING -- and,
-   counter-intuitively, LESS WEIGHT, not more. Everything here goes up in size
-   and tracking; nothing goes up in weight.
-
-   THE CARD GREW WITH IT. $card-height is 12.9rem and the anchors are fixed, so
-   bigger type inside an unchanged box just clips the second chip row. The dark
-   stages set 13.8rem. That is a real cost of going black and it is stated
-   rather than absorbed.
-   ======================================================================== */
-.devct-stage--dark .drink-cards      { --card-height-dark: 13.8rem; }
-.devct-stage--dark .drink-card       { height: 13.8rem; }
-.devct-stage--dark .drink-field-label { font-size: 1.52rem; letter-spacing: 0.09em; }
-.devct-stage--dark .btn-mood,
-.devct-stage--dark .btn-chaos        { font-size: 0.82rem; letter-spacing: 0.015em; }
-.devct-stage--dark .btn-pool         { font-size: 0.86rem; }
-.devct-stage--dark .drink-card-name  { font-size: 1.14rem; }
-.devct-stage--dark .drink-card-ingredients { font-size: 0.88rem; letter-spacing: 0.012em; }
-.devct-stage--dark .drink-card-mood  { font-size: 0.72rem; }
-.devct-stage--dark .drink-card-ship  { font-size: 0.76rem; }
-
-/* --- A: light ground, 2d cards. The incremental route, kept honest.
-   The wash panel stays; the drawing goes to absinthe-deep at the drink page's
-   own 1.6 stroke instead of the card's lightened 1, so the panel stops being a
-   ghost without becoming a block. */
-.devct--gp-strong .drink-card-glass { color: var(--absinthe-deep); }
-.devct--gp-strong .drink-card-glass .glass-icon-line { stroke-width: 1.6; }
-
-/* --- B: white cards on a black page. Helen's alternative, and the cheapest
-   of the dark options by a distance -- the card itself is untouched, so
-   nothing inside it has to be restated. */
-.devct--white-card .drink-card { background: #fbfbfa; border-color: #d6d4cf; }
-.devct--white-card .drink-card-glass { color: var(--absinthe-deep); }
-.devct--white-card .drink-card-glass .glass-icon-line { stroke-width: 1.6; }
-
-/* --- C/D/E: ink cards on a black page. Every text colour restated, which is
-   the honest cost of inverting a card built for paper -- and the reason a
-   palette inversion beats a per-element override list in the real thing. */
-.devct--ink .drink-card              { background: var(--ink-card); border-color: var(--ink-edge); }
-.devct--ink .drink-card-glass        { background: transparent; color: rgba(48, 232, 140, 0.85); }
-.devct--ink .drink-card-glass .glass-icon-line { stroke-width: 1.3; }
-.devct--ink .drink-card-glass::after { background: transparent; }
-.devct--ink .drink-card::after       { background: var(--pink); }
-.devct--ink .drink-card-ingredients  { color: #c9c7c2; }
-.devct--ink .drink-card-sep          { color: #55555c; }
-.devct--ink .drink-card-hit          { color: #ffffff; }
-.devct--ink .drink-card-mood         { color: #a3a3ab; border-color: var(--dark-line); }
-.devct--ink .drink-card-mood.is-match,
-.devct--ink .drink-card-mood--hassle.is-match {
+/* --- the ink card ---------------------------------------------------------- */
+.devct-page .drink-card              { background: var(--ink-card); border-color: var(--ink-edge); }
+.devct-page .drink-card-glass        { background: transparent; color: rgba(48, 232, 140, 0.85); }
+.devct-page .drink-card-glass .glass-icon-line { stroke-width: 1.3; }
+.devct-page .drink-card-glass::after { background: transparent; }
+.devct-page .drink-card::after       { background: var(--pink); }
+.devct-page .drink-card-ingredients  { color: #c9c7c2; }
+.devct-page .drink-card-hit          { color: #ffffff; }
+.devct-page .drink-card-mood         { color: #a3a3ab; border-color: var(--dark-line); }
+.devct-page .drink-card-mood.is-match,
+.devct-page .drink-card-mood--hassle.is-match {
   background: rgba(255, 0, 200, 0.20);
   border-color: var(--pink);
   color: #ffffff;
 }
-.devct--ink .drink-card-ship         { color: #c9c7c2; }
-.devct--ink .drink-card-ship-icon    { color: #F9A45E; }
-.devct--ink .drink-card:hover::after { background: var(--absinthe); }
+.devct-page .drink-card-ship         { color: #c9c7c2; }
+.devct-page .drink-card:hover::after { background: var(--absinthe); }
 
-/* --- F: the loudest. An ink card with the glass panel at full absinthe and
-   the glass knocked out in the ground's own black, so the panel reads as a
-   cut-out rather than a tint. */
-.devct--block .drink-card-glass  { background: var(--absinthe); color: var(--dark-ground); }
-.devct--block .drink-card-glass .glass-icon-line { stroke-width: 1.6; }
-.devct--block .drink-card-glass::after { background: transparent; }
-.devct--block .drink-card::after { background: var(--pink); height: 5px; }
+/* Two measured fixes from round 4 -- tmp/a11y.py has the workings. The
+   separator was 2.42:1 against a 3:1 decorative bar; the goodness amber sat
+   dE 9.9 from the absinthe under protanopia against 9.13's bar of 10. */
+.devct-page .drink-card-sep          { color: #6a6a72; }
+.devct-page .drink-card-ship-icon    { color: #F7913F; }
 
 /* ===========================================================================
-   ROUND 4 -- TWO ACCESSIBILITY FIXES, MEASURED. tmp/a11y.py has the workings.
+   E2 -- THE TAPE LIFTS OFF THE CARD. The lift itself is --tape-lift on
+   .devct-tape-bg above, so it moves with the ground rather than being set
+   per stage twice.
    ======================================================================== */
 
-/* The ingredient separator was 2.42:1 on an ink card, under the 3:1 a
-   decorative mark wants. #6a6a72 is 3.34:1 and still recessive. */
-.devct-stage--dark .drink-card-sep { color: #6a6a72; }
-
-/* The goodness amber I picked for dark sat dE 9.9 from the absinthe under
-   PROTANOPIA, a hair under 9.13's bar of 10. Warming it to #F7913F buys
-   dE 15.8 and costs nothing -- it is still 7.73:1 on the card. Neither colour
-   carries meaning alone (the mark has its word, the glass is a drawing), so
-   this is margin rather than a fix, and margin is free here. */
-.devct-stage--dark .drink-card-ship-icon { color: #F7913F; }
+/* E2c  A MANHANDLED ROLL. Helen's own riff -- black label tape lightens with
+        age and handling, and not evenly. Each card's tape takes its own
+        brightness, a little warmth (worn black goes grey-brown, not grey) and
+        a little less contrast. Deterministic by position, so it is a texture
+        rather than a lottery, and it is the one thing on this page that could
+        not be arrived at by reasoning about colour. */
+.devct--worn .drink-card:nth-child(1) .devct-tape-bg { filter: brightness(3.3) contrast(0.90) sepia(0.10); }
+.devct--worn .drink-card:nth-child(2) .devct-tape-bg { filter: brightness(4.6) contrast(0.82) sepia(0.18); }
+.devct--worn .drink-card:nth-child(3) .devct-tape-bg { filter: brightness(3.0) contrast(0.94) sepia(0.06); }
+.devct--worn .drink-card:nth-child(4) .devct-tape-bg { filter: brightness(4.1) contrast(0.86) sepia(0.14); }
 
 /* ===========================================================================
-   ROUND 4 -- C: answering "every sticky nightclub in a touristy part of
-   London". Helen is right, and the diagnosis is that white-on-black with no
-   other material IS the genre default: it is what you get when you invert and
-   stop. This site's answer to genericness everywhere else is MATERIAL -- the
-   tape, the drawings, the punched letters -- and C is the one option that
-   removed a material without putting one back.
+   E4 -- THE RIM IS LIT. Both grounds left alone; a hairline highlight along
+   the tape's top edge and a hard shadow under its bottom, which is the same
+   two-hard-copies logic 13.4.1 uses on glyphs, applied to the object.
+   drop-shadow follows the SVG's alpha, so it traces the tape's real skewed
+   outline rather than a box.
+
+   HELEN: "maybe the top edge is a little too heavy -- it's trying to get
+   involved with the text." Two readings, and both are built, because it is as
+   much a DISTANCE problem as a weight one: the rim is only 0.30em above the
+   cap line, so even a correct highlight is standing on the letters.
    ======================================================================== */
-
-/* C2  LET THE GLASS CARRY IT. One line, because #483 made $card-text-x and
-       $card-glass-scale custom properties: the panel, the card's padding, the
-       foot's left edge and the drawing's height all read them, so widening the
-       column moves five things in step and nothing else has to know. The card
-       stops being a menu line and becomes a drawing with words on it. */
-.devct--glass-hero { --card-text-x: 9.6rem; --card-glass-scale: 12.8rem; }
-.devct--glass-hero .drink-card-glass { color: rgba(48, 232, 140, 0.92); }
-.devct--glass-hero .drink-card-glass .glass-icon-line { stroke-width: 1.5; }
-
-/* C3  GIVE IT STRUCTURE. A menu is a list; a form is ruled. An absinthe rule
-       under the title and a magenta rule along the foot make the card a filled
-       -in thing rather than a line of a list, using the two colours that are
-       already the only rules. */
-.devct--ruled .drink-card-name {
-  border-bottom: 2px solid var(--absinthe);
-  padding-bottom: 0.42rem;
-  margin-bottom: 0.55rem;
-}
-.devct--ruled .drink-card-glass { border-right: 1px solid var(--ink-edge); }
-.devct--ruled .drink-card::after { background: var(--pink); height: 4px; }
-
-/* ===========================================================================
-   ROUND 4 -- D: black letters on white tape, made aggressive.
-   ======================================================================== */
-
-/* D2  PRESSED, NOT RAISED. `punched()` has taken a $style argument since it was
-       written and `pressed` has never had a consumer -- it inverts the light so
-       the letter reads STAMPED INTO the surface rather than standing off it.
-       On a white tape that is not a variation, it is the correct metaphor: a
-       label maker embosses INTO the tape. Helen: "I know we can't have the
-       light source as clearly highlighting onto the top left angles" -- this is
-       the answer to that, which is to stop trying and flip it. */
-.devct--pressed .devct-tape-word {
-  color: #141417;
-  text-shadow:  1.0px  1.0px 0 rgba(255, 255, 255, 0.95),
-               -1.0px -1.0px 0 rgba(0, 0, 0, 0.42);
-}
-
-/* D3  PRESSED, IN THE OTHER FACE WE ALREADY OWN. Helen asked for "a change of
-       font". IBM Plex Mono is $font-label, already self-hosted at 600 and 700,
-       already on the site (an ingredient amount, a note label) -- so this costs
-       no new file and breaks no rule. It is squarer and heavier in the stem
-       than Courier Prime, which is what "aggressive" wants. Tracking is up,
-       weight is not: 700 is the top face there is.
-       ADDING A TENTH FACE would be a real decision (13.10), not a tweak. */
-.devct--plex .devct-tape-word {
-  font-family: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #141417;
-  text-shadow:  1.0px  1.0px 0 rgba(255, 255, 255, 0.95),
-               -1.0px -1.0px 0 rgba(0, 0, 0, 0.42);
-}
-
-/* ===========================================================================
-   ROUND 4 -- E: black tape on a black card. Helen: "I've never seen anything
-   like this before. I'm hoping that's not for a good reason."
-
-   IT IS NOT. Black-on-black is a real and old idea -- blind embossing, spot
-   varnish, black-on-black print -- and it is rare because it is EXPENSIVE in
-   print and DELICATE on screen, not because it looks bad. The whole read has
-   to come from the edge: the bevel, the machine marks and the step between the
-   tape and what it sits on. So the three experiments each give the edge
-   something to work with, from a different direction.
-   ======================================================================== */
-
-/* E2  LIFT THE TAPE OFF THE CARD. The card goes darker and the tape's own ink
-       is brightened, so the tape is the lighter object -- a label laid ON the
-       card. Brightness on the SVG rather than a new file, which lifts the
-       machine marks and the bevel with it. */
-.devct--lift .drink-card { background: #0b0b0e; border-color: #212127; }
-.devct--lift .devct-tape-bg svg { filter: brightness(2.7); }
-
-/* E3  SINK IT INSTEAD. The card goes LIGHTER and the tape stays true black, so
-       the tape is the darkest thing on the card -- which is what a blind
-       emboss actually looks like, and the only one of the three that needs no
-       filter at all. */
-.devct--sunken .drink-card             { background: #26262c; border-color: #383840; }
-.devct--sunken .drink-card-ingredients { color: #d6d4cf; }
-.devct--sunken .drink-card-sep         { color: #7c7b84; }
-.devct--sunken .drink-card-mood        { color: #b3b2ba; border-color: #45454e; }
-.devct--sunken .drink-card-ship        { color: #d6d4cf; }
-.devct--sunken .drink-card-glass       { color: rgba(48, 232, 140, 0.92); }
-
-/* E4  LIGHT THE EDGE. Both grounds left alone; a one-pixel highlight along the
-       tape's top edge and a hard shadow under its bottom, which is the same
-       two-hard-copies logic the lettering and the tape's own bevel already use
-       (13.4.1), applied to the object instead of to the glyphs. drop-shadow
-       follows the SVG's alpha, so it traces the tape's real skewed outline
-       rather than a box. */
-.devct--litedge .devct-tape-bg {
-  filter: drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.30))
+.devct--lit-30 .devct-tape-bg {
+  filter: brightness(var(--tape-lift))
+          drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.30))
           drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.95));
 }
-
-/* ===========================================================================
-   ROUND 4 -- P: THE PINK, LIFTED FOR A PROTANOPE. Measured, not guessed.
-
-   Hot magenta under protanopia is a dark blue. On PAPER that is 9.79:1 and
-   perfectly legible -- which is why nobody has ever had to think about it. On
-   an ink card it is 1.76:1, so on black the band that says "this is why you
-   are here" very nearly disappears for Simon.
-
-   #FF5CDA is the same hue lifted: 4.19:1 under protanopia, 5.82:1 under
-   deuteranopia, dE 7.4 from the true magenta -- a shift you can see side by
-   side and would not notice alone.
-
-   THE SPLIT WORTH KNOWING is that #FF00C8 still passes as TEXT on black
-   (5.59:1), and fails as text on paper (3.33:1). So on a dark ground the hue
-   needs LIFTING to be a band and needs nothing at all to be text, where on
-   paper it needed darkening to #C4009A to be text. Same hue, opposite
-   correction, and the bare colour is the identity in the middle.
-   ======================================================================== */
-.devct--pink-lift .drink-card-hit { text-decoration-color: #FF5CDA; }
-.devct--pink-lift .drink-card-mood.is-match,
-.devct--pink-lift .drink-card-mood--hassle.is-match {
-  background: rgba(255, 92, 218, 0.22);
-  border-color: #FF5CDA;
+.devct--lit-18 .devct-tape-bg {
+  filter: brightness(var(--tape-lift))
+          drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.18))
+          drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.95));
 }
-.devct--pink-lift .drink-card::after { background: #FF5CDA; }
+.devct--lit-12 .devct-tape-bg {
+  filter: brightness(var(--tape-lift))
+          drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.12))
+          drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.95));
+}
+/* More room between the rim and the cap line, so the highlight stops
+   crowding the letters without being dimmed to do it. */
+.devct--roomy .devct-tape { padding: 0.46em 1.05em; }
 </style>
 
 <div class="devct-page">
 
-{% comment %} SIX STAGES. Fields, `~`-separated: tag | ground | card classes |
-   title classes | whether this stage carries the filter block. {% endcomment %}
-{% assign stages = "C1~dark~devct--ink~devct--notape~yes|C2~dark~devct--ink devct--glass-hero~devct--notape~no|C3~dark~devct--ink devct--ruled~devct--notape~no|D1~dark~devct--ink~devct--whitetape~no|D2~dark~devct--ink~devct--whitetape devct--pressed~no|D3~dark~devct--ink~devct--whitetape devct--plex~no|E1~dark~devct--ink~~no|E2~dark~devct--ink devct--lift~~no|E3~dark~devct--ink devct--sunken~~no|E4~dark~devct--ink devct--litedge~~no|P~dark~devct--ink devct--pink-lift~~no" | split: "|" %}
+{% comment %} FIELDS, `~`-separated: tag | ground class | card classes |
+   whether this stage carries the filter block. {% endcomment %}
+{% assign stages = "S~~devct--stroke-ladder~yes|E2a~devct-ground-mid~~no|E2b~devct-ground-high~~no|E2c~devct-ground-high~devct--worn~no|E4a~~devct--lit-18~no|E4b~~devct--lit-12 devct--roomy~no|E4c~devct-ground-mid~devct--lit-18~no|X~devct-ground-mid~devct--lit-18 devct--worn~no|X2~devct-ground-high~devct--lit-12 devct--roomy devct--worn~no" | split: "|" %}
 
 {% for stage in stages %}
   {% assign f = stage | split: "~" %}
-  {% assign tag     = f[0] %}
-  {% assign ground  = f[1] %}
-  {% assign cardcls = f[2] | default: "" %}
-  {% assign titlecls = f[3] | default: "" %}
-  {% assign wantfilters = f[4] %}
+  {% assign tag        = f[0] %}
+  {% assign groundcls  = f[1] | default: "" %}
+  {% assign cardcls    = f[2] | default: "" %}
+  {% assign wantfilters = f[3] %}
 
   {% case tag %}
-    {% when "C1" %}{% assign label = "no tape, white letters &mdash; as you saw it, with the bigger type" %}
-    {% when "C2" %}{% assign label = "&hellip; and the glass carries the card" %}
-    {% when "C3" %}{% assign label = "&hellip; and the card is ruled, not listed" %}
-    {% when "D1" %}{% assign label = "white tape, black letters &mdash; as you saw it" %}
-    {% when "D2" %}{% assign label = "&hellip; PRESSED: letters stamped into the tape, not raised off it" %}
-    {% when "D3" %}{% assign label = "&hellip; pressed, in IBM Plex Mono 700 &mdash; a face we already own" %}
-    {% when "E1" %}{% assign label = "black tape on a black card &mdash; as you saw it" %}
-    {% when "E2" %}{% assign label = "&hellip; tape LIFTED: card darker, tape brighter" %}
-    {% when "E3" %}{% assign label = "&hellip; tape SUNKEN: card lighter, tape the darkest thing" %}
-    {% when "E4" %}{% assign label = "&hellip; edge LIT: both grounds unchanged, the tape's rim lit" %}
-    {% when "P"  %}{% assign label = "E1 again, with the pink lifted to #FF5CDA for a protanope" %}
+    {% when "S"   %}{% assign label = "STROKE LADDER on the title &mdash; none / 0.010em (the heading&rsquo;s own) / 0.016em / 0.024em, left to right" %}
+    {% when "E2a" %}{% assign label = "E2, ground lifted one step &mdash; card unchanged, tape lifts with it" %}
+    {% when "E2b" %}{% assign label = "E2, ground lifted two steps" %}
+    {% when "E2c" %}{% assign label = "&hellip; and the roll has been manhandled: every tape wears differently" %}
+    {% when "E4a" %}{% assign label = "E4, top edge down from 0.30 to 0.18" %}
+    {% when "E4b" %}{% assign label = "E4, top edge 0.12 AND more room between the rim and the letters" %}
+    {% when "E4c" %}{% assign label = "E4 at 0.18, on the lifted ground" %}
+    {% when "X"   %}{% assign label = "BOTH &mdash; lifted tape, lit rim, worn roll, lifted ground" %}
+    {% when "X2"  %}{% assign label = "BOTH, quieter &mdash; two-step ground, 0.12 rim, roomy, worn" %}
   {% endcase %}
 
   <p class="devct-tag">{{ tag }} &nbsp; {{ label }}</p>
 
-  {% comment %} `on-dark` on every dark stage -- #469's six emboss values, on
-     real content for the first time. {% endcomment %}
-  {% if ground == "dark" %}
-    <div class="devct-stage devct-stage--dark on-dark">
-  {% else %}
-    <div class="devct-stage devct-stage--light">
-  {% endif %}
+  {% comment %} `on-dark` on every stage -- #469's six emboss values, and the
+     title now reads two of them directly. {% endcomment %}
+  <div class="devct-stage on-dark {{ groundcls }}">
 
   {% if wantfilters == "yes" %}
     <div class="drink-filters">
@@ -595,7 +440,7 @@ sitemap: false
     <p class="drink-count"><strong>4</strong> <span>survivors</span></p>
   {% endif %}
 
-  <ul class="drink-cards {{ cardcls }} {{ titlecls }}">
+  <ul class="drink-cards {{ cardcls }}">
   {% for drink in chosen %}
 
     {% assign glass_icon = "" %}
