@@ -291,6 +291,24 @@ sitemap: false
   -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
   text-shadow: -1.0px -1.0px 0 #fdfbfe,
                 1.0px  1.0px 0 rgba(5, 5, 5, 0.90);
+
+  /* THE LAST 2px, AND IT IS MEASURED IN THE BROWSER RATHER THAN GUESSED.
+     Helen's devtools settled what was left: .devct-tape-bg is 45.59px and
+     .devct-tape-word is 18.24px, so the WORD BOX is centred exactly -- 13.68px
+     of tape above it and below it. The LETTERS are not, because capitals do not
+     sit centred inside their own line box: the baseline sits at half-leading
+     plus the font's ascent, and with line-height 1 that leading is negative.
+     Where the caps land therefore depends on Courier Prime's real ascent,
+     descent and cap height, and it ships here as woff2 only with no font parser
+     in this environment -- so every value I have used for it has been an
+     estimate, and this is the third round one has been wrong.
+
+     The script at the foot asks the BROWSER instead, through canvas
+     TextMetrics, which reports the font's own box and the actual ink extent of
+     a capital. That is exact, it self-corrects if the face ever changes, and it
+     needs no font file. A transform rather than a margin, because this is an
+     optical shift and must not move the layout the tape's height depends on. */
+  transform: translateY(var(--tape-text-nudge, 0px));
 }
 /* `line-height: 0` so the PARAGRAPH's own strut contributes nothing and the
    tape alone decides the height. Helen's devtools caught this from the other
@@ -331,20 +349,34 @@ sitemap: false
    drop-shadow follows the SVG's alpha, so it traces the tape's real skewed
    outline rather than a box.
 
-   THE BOTTOM SHADOW STAYS AT FULL STRENGTH throughout. It is not decoration
-   here: with the tape at its own colour on a lifted ground the tape has barely
-   any fill contrast left, so the shadow under its lower edge is doing half the
-   work of saying an object is present. Only the TOP number moves, which is the
-   one Helen said was getting involved with the text.
+   HEAVINESS IS TWO DIALS, NOT ONE, and they are worth separating before
+   settling either. A drop-shadow line has an OPACITY and a THICKNESS, and they
+   do not look alike: 2px at half the opacity carries the same amount of light
+   as 1px at full, and reads as a softer, wider bevel rather than a brighter
+   wire. The ladder below moves opacity at 1px, and the last rung holds the
+   light roughly constant while doubling the thickness, so the difference on
+   screen is the SHAPE of the edge rather than its strength.
+
+   THE BOTTOM SHADOW STAYS AT FULL STRENGTH ON EVERY RUNG. It is not decoration
+   here: with the tape at its own black on a dark card it has almost no fill
+   contrast left, so the shadow under its lower edge is doing half the work of
+   saying an object is there -- and letting it move too would mean comparing two
+   things at once. Only the top number varies, which is the one Helen said was
+   getting involved with the text.
    ======================================================================== */
-.devct--lit-18 .devct-tape-bg { filter: brightness(var(--tape-lift))
-  drop-shadow(0 -1px 0 rgba(255,255,255,0.18)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
+.devct--lit-30 .devct-tape-bg { filter: brightness(var(--tape-lift))
+  drop-shadow(0 -1px 0 rgba(255,255,255,0.30)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
+.devct--lit-22 .devct-tape-bg { filter: brightness(var(--tape-lift))
+  drop-shadow(0 -1px 0 rgba(255,255,255,0.22)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
+.devct--lit-16 .devct-tape-bg { filter: brightness(var(--tape-lift))
+  drop-shadow(0 -1px 0 rgba(255,255,255,0.16)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
 .devct--lit-10 .devct-tape-bg { filter: brightness(var(--tape-lift))
   drop-shadow(0 -1px 0 rgba(255,255,255,0.10)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
 .devct--lit-06 .devct-tape-bg { filter: brightness(var(--tape-lift))
   drop-shadow(0 -1px 0 rgba(255,255,255,0.06)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
-.devct--lit-03 .devct-tape-bg { filter: brightness(var(--tape-lift))
-  drop-shadow(0 -1px 0 rgba(255,255,255,0.03)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
+/* Same light, twice the width -- the SHAPE question rather than the strength one. */
+.devct--lit-2px .devct-tape-bg { filter: brightness(var(--tape-lift))
+  drop-shadow(0 -2px 0 rgba(255,255,255,0.14)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
 
 /* ===========================================================================
    BIGGER TYPE ON DARK. A light glyph on a dark ground blooms into its
@@ -428,7 +460,7 @@ sitemap: false
 
 {% comment %} FIELDS, `~`-separated: tag | ground class | card classes |
    whether this stage carries the filter block. {% endcomment %}
-{% assign stages = "H0~~devct--lit-10~yes|H1~devct-tape-75~devct--lit-10~no|H2~devct-tape-90~devct--lit-10~no|H3~devct-tape-105~devct--lit-10~no" | split: "|" %}
+{% assign stages = "L30~devct-tape-75~devct--lit-30~yes|L22~devct-tape-75~devct--lit-22~no|L16~devct-tape-75~devct--lit-16~no|L10~devct-tape-75~devct--lit-10~no|L06~devct-tape-75~devct--lit-06~no|L2~devct-tape-75~devct--lit-2px~no" | split: "|" %}
 
 {% for stage in stages %}
   {% assign f = stage | split: "~" %}
@@ -441,11 +473,16 @@ sitemap: false
      70.59% of the box because the artwork carries transparent margin. The
      third figure is the black ABOVE and BELOW the capitals, which is the thing
      the eye is actually judging. {% endcomment %}
+  {% comment %} One variable: the weight of the highlight along the tape's top
+     rim. Every stage is the same tape (32px black band) and the same bottom
+     shadow. {% endcomment %}
   {% case tag %}
-    {% when "H0" %}{% assign label = "black band 28px &middot; 9px of it above and below the caps &mdash; the size it has been since round 1" %}
-    {% when "H1" %}{% assign label = "black band 32px &middot; 11px above and below" %}
-    {% when "H2" %}{% assign label = "black band 36px &middot; 13px above and below" %}
-    {% when "H3" %}{% assign label = "black band 40px &middot; 15px above and below &mdash; the header wordmark has 13px around letters twice this size" %}
+    {% when "L30" %}{% assign label = "top edge 1px at 30% &mdash; where it started" %}
+    {% when "L22" %}{% assign label = "top edge 1px at 22%" %}
+    {% when "L16" %}{% assign label = "top edge 1px at 16%" %}
+    {% when "L10" %}{% assign label = "top edge 1px at 10%" %}
+    {% when "L06" %}{% assign label = "top edge 1px at 6%" %}
+    {% when "L2"  %}{% assign label = "top edge 2px at 14% &mdash; same light, twice the width: the SHAPE of the edge rather than its strength" %}
   {% endcase %}
 
   <p class="devct-tag">{{ tag }} &nbsp; {{ label }}</p>
@@ -608,6 +645,58 @@ sitemap: false
   // so a reload gives the same comparison and a drink wears the same shape on
   // every stage. decorations.js's own tape() takes only the FIRST .tape-bg on
   // a page and the header already has it.
+  // ---------------------------------------------------------------------------
+  // CENTRE THE CAPITALS ON THE BAND, BY MEASUREMENT.
+  //
+  // Everything up to here centres BOXES, which CSS does correctly and which is
+  // not what the eye is judging. What is left is where the capitals sit inside
+  // their own line box, and that is a fact about the typeface: with
+  // line-height 1 the baseline lands at half-leading + ascent, the half-leading
+  // is negative, and the caps hang off the baseline by their cap height. Three
+  // rounds of estimating that number have been wrong.
+  //
+  // Canvas TextMetrics knows it exactly. fontBoundingBoxAscent/Descent give the
+  // face's own box; actualBoundingBoxAscent on a capital gives the real ink
+  // height above the baseline. From those the caps' centre is arithmetic, and
+  // the nudge is the difference between it and the line box's centre.
+  //
+  // Runs after document.fonts.ready, because measuring before Courier Prime has
+  // loaded measures the fallback -- which is a different face with different
+  // metrics, and would produce a confidently wrong constant.
+  // ---------------------------------------------------------------------------
+  (function () {
+    function centreCaps() {
+      var probe = document.querySelector('.devct-tape-word');
+      if (!probe || !window.CanvasRenderingContext2D) return;
+      var cs = getComputedStyle(probe);
+      var size = parseFloat(cs.fontSize);
+      var ctx = document.createElement('canvas').getContext('2d');
+      ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      var m = ctx.measureText('H');
+      var A = m.fontBoundingBoxAscent, D = m.fontBoundingBoxDescent;
+      var capA = m.actualBoundingBoxAscent;
+      if (!A || !D || !capA) return;          // unsupported: leave it centred on the box
+      var baseline = (size - (A + D)) / 2 + A; // line-height is 1, so the box is `size`
+      var nudge = size / 2 - (baseline - capA / 2);
+      document.documentElement.style.setProperty('--tape-text-nudge', nudge.toFixed(2) + 'px');
+
+      // Reported on the page so the constant can be baked into real SCSS later
+      // rather than this script shipping with it.
+      var tag = document.querySelector('.devct-tag');
+      if (tag) {
+        tag.insertAdjacentHTML('beforeend',
+          ' &nbsp;&middot;&nbsp; caps nudged ' + nudge.toFixed(2) + 'px' +
+          ' (ascent ' + (A / size).toFixed(3) + 'em, descent ' + (D / size).toFixed(3) +
+          'em, cap ' + (capA / size).toFixed(3) + 'em)');
+      }
+    }
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(centreCaps);
+    } else {
+      window.addEventListener('load', centreCaps);
+    }
+  }());
+
   (function () {
     var HTF = window.HTF;
     if (!HTF) return;
