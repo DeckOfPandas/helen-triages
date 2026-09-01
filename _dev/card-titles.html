@@ -126,7 +126,8 @@ sitemap: false
      Deriving the padding rather than writing two numbers means changing
      --tape-pad-y re-solves the centring for free. Round 6 wrote a fixed
      0.048em offset, which was correct for a 1.6em box and silently wrong for
-     any other -- a constant that was really a function. */
+     any other -- a constant that was really a function.
+
      The algebra, so the constant below is checkable rather than magic:
 
        height          H = 1em + 2P              (P = --tape-pad-y)
@@ -135,10 +136,7 @@ sitemap: false
        solve             padTop = 0.5176 (1em + 2P) - 0.475em
                                 = 0.0426em + 1.0352 P
 
-     Written flat rather than as nested calc() -- a var() holding a calc()
-     multiplied by a number is legal and is exactly the sort of thing that
-     silently resolves to nothing in one engine, and there is no browser here
-     to catch it. At P = 0.6em this gives 0.6637em top and 0.5363em bottom. */
+     At P = 0.6em this gives 0.6637em top and 0.5363em bottom. */
   --tape-pad-top: calc(0.0426em + 1.0352 * var(--tape-pad-y));
 
   /* Rounds 3-5 brightened the tape. Helen took that off in round 6, so this
@@ -234,9 +232,16 @@ sitemap: false
   justify-content: flex-start;
   /* Asymmetric, and the asymmetry IS the centring. The two values sum to
      2 x --tape-pad-y whatever that is set to, so the tape's height is the
-     dial and the centring follows it rather than needing to be re-derived. */
-  padding: var(--tape-pad-top) 0.95em
-           calc(2 * var(--tape-pad-y) - var(--tape-pad-top));
+     dial and the centring follows it rather than needing to be re-derived.
+
+     EVERY var() HERE CARRIES A FALLBACK, and that is not belt-and-braces, it
+     is the fix for how this failed. A var() with no fallback that fails to
+     resolve makes the WHOLE declaration invalid at computed-value time, so
+     `padding` fell back to its initial value -- ZERO, on all four sides -- and
+     the tape collapsed onto the letters. A fallback turns that silent
+     catastrophe into a tape that is merely a little off. */
+  padding: var(--tape-pad-top, 0.664em) 0.95em
+           calc(2 * var(--tape-pad-y, 0.6em) - var(--tape-pad-top, 0.664em));
   max-width: 100%;
   vertical-align: baseline;
 }
@@ -271,7 +276,17 @@ sitemap: false
   text-shadow: -1.0px -1.0px 0 #fdfbfe,
                 1.0px  1.0px 0 rgba(5, 5, 5, 0.90);
 }
-.devct-page .drink-card-name         { white-space: nowrap; overflow: visible; }
+/* `line-height: 0` so the PARAGRAPH's own strut contributes nothing and the
+   tape alone decides the height. Helen's devtools caught this from the other
+   end: p.drink-card-name measured 577.81 x 29.18, and 29.18px is exactly
+   1.6 x 18.24 -- the paragraph's inherited line-height, with the tape inside it
+   SHORTER than its own strut. That is only possible with the tape's padding at
+   zero, which is what she meant by "nothing below that level has any at all".
+   With the padding restored the tape is the taller box and sets the height, but
+   leaving the strut in place means the two compete whenever the tape is small,
+   so it goes. */
+.devct-page .drink-card-name         { white-space: nowrap; overflow: visible;
+                                       line-height: 0; }
 .devct-page .drink-card-name a       { color: inherit; }
 .devct-page .drink-card-name a:hover { color: #fff; }
 
