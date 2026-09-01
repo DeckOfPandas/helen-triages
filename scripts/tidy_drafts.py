@@ -101,7 +101,12 @@ META_OPTIONAL = ["claude_rewritten"]
 
 ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 NUMBER_RANGE = re.compile(r"(?<![\d.])(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)(?![\d.])")
-QQ_LINE = re.compile(r"^\s*(-\s*)?[\"']?QQ\b")
+# `QQ Claude` IS EXCLUDED, and deliberately -- see the long note on `_QQ_LINE`
+# in tests/conftest.py, which this mirrors. The marker protects SOMEBODY ELSE'S
+# wording; a `QQ Claude` line is the paraphrase written here, and HANDOVER §4
+# holds it to normal house style like any other prose. Fifteen hyphenated
+# number ranges were hiding behind the old pattern on 2026-09-01.
+QQ_LINE = re.compile(r"^\s*(-\s*)?[\"']?QQ\b(?!\s+Claude\b)")
 
 
 # =============================================================================
