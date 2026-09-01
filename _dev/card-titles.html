@@ -8,70 +8,54 @@ sitemap: false
 {% comment %} ─────────────────────────────────────────────────────────────────
   BLACK ON BLACK — internal, never published. Issue #469.
 
-  ROUND 5, 2026-09-01. Helen: "One thing for sure: we're going black on black. I
-  wear black on black animal print whenever possible. I have some black on black
-  bed linen. This is what we're doing."
+  ROUND 6, 2026-09-01, and it is a subtraction. Helen: "Let's do less." Six
+  stages, one variable moving at a time.
 
-  SO THE LOSERS ARE GONE, per the comparison-switch convention rather than left
-  compiling: the light ground, the white cards, the solid absinthe panel, the
-  no-tape lettering, the white tape and both of its black-letter treatments, the
-  glass-hero and ruled cards, and the sunken E3. Recover any of them from git;
-  they are in rounds 2, 3 and 4 with the reasoning that produced them.
+  WHAT SHE ASKED FOR: the original; E2a without lifting the colour of the tape;
+  E4c without lifting the tape; all with the lettering vertically centred on the
+  tape; then E2a with a top edge "but much much less".
 
-  WHAT SURVIVED AND WHY:
-    E2  the tape LIFTED off a darker card. Helen: "love it. Black label tape
-        doesn't store well (from my memories of the 80s and 90s...), and does
-        lighten, especially if the roll is manhandled."
-    E4  the tape's rim LIT, both grounds untouched. "Good. Maybe the top edge is
-        a little too heavy -- it's trying to get involved with the text."
-    E3  cut. "E3 blends everything in a way, and just doesn't excite me."
+  THE CENTRING WAS A REAL FAULT AND IT IS MEASURED, NOT NUDGED. Every tape SVG
+  insets its black polygon 16.47% from the top of its viewBox and 12.94% from
+  the bottom -- identical across all seven files, checked rather than assumed --
+  so the BAND's centre sits 1.76% of the box height BELOW the BOX's centre. The
+  lettering was flex-centred on the box, which is the wrong target: it was
+  landing high on the visible tape by about a pixel at card size. Capitals add a
+  little more of the same, sitting slightly high inside their own line box.
 
-  ROUND 5 DOES FOUR THINGS.
+  So `--tape-optical` moves the lettering down by 0.048em, spent as asymmetric
+  padding so the tape's total height does not change. 0.028em of that is the
+  band offset and is exact; the rest is the cap-height correction and is an
+  ESTIMATE -- Courier Prime ships here as woff2 only and there is no font
+  parser in this environment, so its real cap height and ascent could not be
+  read. If the lettering still sits a hair high or low, that one value is the
+  knob and nothing else needs touching.
 
-  1. THE TITLE NOW WEARS THE HEADING'S OWN STROKE. Helen: "The YOLO/MOOD etc
-     you've done has outlines over the top edge of the letter. I think this
-     helps both legibility and the raised effect. Please treat the title of
-     cocktails the same way." That outline is `-webkit-text-stroke` in
-     `--emboss-stroke-c`, which `.on-dark` re-points to a mid grey -- darker
-     than a near-white letter, so it cuts an edge into it. The tape lettering
-     had the two-copy shadow and no stroke at all, which is 13.4.1's split with
-     one half missing: STROKE SETS THE EDGE'S WEIGHT, SHADOW SETS ITS
-     DIRECTION. It now reads the same two custom properties the headings do, so
-     it is literally the same treatment rather than a copy of it. Stage `S` is a
-     weight ladder across its four cards -- none, the heading's own 0.010em,
-     0.016em, 0.024em -- because "the same" and "the same at this size" are
-     different claims and only looking settles which she wants.
+  AND THIS IS WHY E4b IS GONE. Helen guessed it: "maybe vertically centered
+  means we wouldn't need E4b." E4b gave the tape more vertical padding so its
+  rim would stop crowding the letters -- treating a CENTRING fault as a SPACING
+  one. With the letters actually centred there is nothing to make room for, so
+  the fix is deleted rather than kept as a second dial.
 
-  2. THE GROUND LIFTS, three ways. "The background a little lighter even, to
-     give the cards more drama, but not so light as to feel connected to the
-     tape." Three tiers have to stay separated: the CARD is the darkest thing,
-     the PAGE sits above it, and the TAPE stays above both. So as the page
-     lifts, the tape's brightness lifts with it -- otherwise the gap she is
-     protecting closes from the other side.
+  THE TAPE IS AT ITS OWN COLOUR THROUGHOUT. Rounds 3-5 brightened it; she has
+  taken that off. The consequence is the thing to look at: on a lifted ground
+  with a dark card, a true-black tape is very nearly the card's own colour, so
+  it has almost no fill to be seen by. What is left is its EDGE -- which is
+  exactly why she asked for a top edge next, and why the ladder below runs down
+  to almost nothing rather than up.
 
-  3. THE TAPE WEARS. Her riff, taken literally: a manhandled roll does not
-     lighten uniformly, so stage E2c varies each card's tape by position and
-     adds a little warmth and a little less contrast -- worn black tape goes
-     grey-brown, not grey. Deterministic by card position, so it is a texture
-     rather than a lottery.
+  THE STAGES, one variable each:
+    O    the original -- page darker than the card, tape darkest, no edge
+    G    the ground lifted and the card dark, tape unlifted, no edge
+    L    G plus the 0.18 top edge, which is E4c without the tape lift
+    T1   G plus 0.10
+    T2   G plus 0.06
+    T3   G plus 0.03
 
-  4. E4'S TOP EDGE BACKS OFF, two ways -- a lighter highlight, and the same
-     highlight with more room between the tape's rim and the cap line, since
-     "trying to get involved with the text" is as much a distance problem as a
-     weight one.
+  Deleted with the losers: the ground ladder's second step, the worn roll, the
+  roomy padding, and every C and D treatment. Rounds 2-5 hold them.
 
-  AND `X` IS THE ONE SHE HAS NOT SEEN: E2 and E4 together. A lifted tape with
-  a lit rim on the lifted ground, which is the obvious combination of the two
-  things she liked and was in neither round.
-
-  PROTANOPIA IS PARKED, at her call, and raised as its own issue rather than
-  left in a commit message -- she named the right shape for it herself ("we
-  could have a protanopia mode. We don't need to limit ourselves to pink for
-  that"), and a mode is a better answer than a compromised hue. The measurement
-  that prompted it is in round 4's commit and in tmp/a11y.py.
-
-  Four real drinks, 8 / 19 / 24 / 48 characters. Tape shapes deterministic by
-  card position. Nothing clicks.
+  Four real drinks, 8 / 19 / 24 / 48 characters. Nothing clicks.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
 {% if site.show_drafts and site.cocktail_drafts.size > 0 %}
@@ -104,20 +88,33 @@ sitemap: false
 <style>
 /* ===========================================================================
    PAGE-LOCAL ONLY. Whatever wins becomes a palette change in
-   _sass/cocktails/_palette.scss plus rules in _cards.scss and _filters.scss,
-   and this whole block goes with it.
+   _sass/cocktails/_palette.scss plus rules in _cards.scss and _filters.scss.
    ======================================================================== */
 
 .devct-page {
   --pink: #FF00C8;
   --absinthe: #30E88C;
-  --ink-card: #0a0a0d;      /* the card, and it is the darkest thing here */
-  --ink-edge: #212127;
-  --dark-ground: #0e0e10;   /* the page, lifted per stage below */
+  --dark-ground: #0e0e10;
+  --ink-card: #17171a;
+  --ink-edge: #2c2c31;
   --dark-text: #e8e6e2;
   --dark-quiet: #97959a;
   --dark-line: #3a3a41;
-  --tape-lift: 2.7;         /* how far the tape's own ink is brightened */
+
+  /* THE OPTICAL CENTRING, and 0.028em of it is exact.
+     Every tape SVG insets its polygon 16.47% from the top of the viewBox and
+     12.94% from the bottom, so the BAND's centre is 1.76% of the box height
+     below the BOX's centre -- 0.028em at the 1.6em box below. The remainder is
+     the cap-height correction: capitals sit slightly high inside their own line
+     box, and Courier Prime is woff2-only here with no font parser available, so
+     that half is an estimate. This is the one number to nudge if the lettering
+     still reads high or low; nothing else needs touching. */
+  --tape-optical: 0.048em;
+
+  /* Rounds 3-5 brightened the tape. Helen took that off in round 6, so this
+     is 1 and the tape is its own colour. Kept as a property rather than
+     deleted, because it is the dial the whole E2 family turned on. */
+  --tape-lift: 1;
 }
 
 .devct-tag {
@@ -128,10 +125,9 @@ sitemap: false
   color: #a2a2a7;
 }
 
-/* A STAGE IS A GROUND, NOT A PANEL. box-shadow with a huge spread paints past
-   the element's own box; clip-path stops the spread growing the page. So a
-   ground reaches the window edges without a 100vw rule, which is the thing
-   that forces horizontal scroll on a machine with a visible scrollbar. */
+/* A STAGE IS A GROUND, NOT A PANEL: box-shadow paints past the element's own
+   box and clip-path stops that spread growing the page, so a ground reaches
+   the window edges without a 100vw rule that could force horizontal scroll. */
 .devct-stage {
   padding: 1.5rem 0 2.2rem;
   clip-path: inset(0 -100vmax);
@@ -140,28 +136,31 @@ sitemap: false
   color: var(--dark-text);
 }
 
-/* THE THREE GROUNDS. The card stays at --ink-card throughout, so lifting the
-   page lifts the card OFF it -- which is where the drama comes from. The tape
-   lifts with the page so the gap Helen is protecting cannot close from the
-   other side. */
-.devct-ground-mid  { --dark-ground: #16161a; --tape-lift: 3.2; }
-.devct-ground-high { --dark-ground: #1c1c22; --tape-lift: 3.9; }
+/* THE LIFTED GROUND -- Helen: "the background a little lighter even, to give
+   the cards more drama, but not so light as to feel connected to the tape."
+   The card goes DARK at the same time, which is what makes it drama rather
+   than just a paler page: the card is now a hole in the ground rather than a
+   panel on it. The tape is darker still, and by a margin so small it has
+   almost no fill left to be seen by -- which is the whole subject of the
+   edge ladder below. */
+.devct-ground-lift { --dark-ground: #16161a; --ink-card: #0a0a0d; --ink-edge: #1e1e24; }
 
-/* --- FOOD'S HOT MAGENTA, in the four places the pink lives ---------------- */
-.devct-page .btn-mood.is-on          { text-decoration-color: var(--pink); }
-.devct-page .btn-pool.is-on          { border-color: var(--pink);
-                                       text-decoration-color: var(--pink); }
-.devct-page .drink-card-hit          { text-decoration-color: var(--pink); }
+/* --- FOOD'S HOT MAGENTA --------------------------------------------------- */
+.devct-page .btn-mood.is-on { text-decoration-color: var(--pink); }
+.devct-page .btn-pool.is-on { border-color: var(--pink); text-decoration-color: var(--pink); }
+.devct-page .drink-card-hit { text-decoration-color: var(--pink); }
 
 /* ===========================================================================
-   THE TITLE. Round 1's lettering, plus round 5's stroke.
+   THE TITLE. Round 1's lettering, round 5's stroke, round 6's centring.
    ======================================================================== */
 .devct-tape {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.30em 0.95em;
+  /* Asymmetric, and the asymmetry IS the centring -- the total is still
+     0.60em, so the tape's height and the card's layout are unchanged. */
+  padding: calc(0.30em + var(--tape-optical)) 0.95em calc(0.30em - var(--tape-optical));
   max-width: 100%;
   vertical-align: baseline;
 }
@@ -176,16 +175,16 @@ sitemap: false
 .devct-tape-bg svg { width: 100%; height: 100%; display: block; }
 
 /* THE SAME TREATMENT AS A FILTER HEADING, not a copy of it -- both halves,
-   reading the same two custom properties `.on-dark` re-points. The shadow was
-   already here from round 1 and Helen settled it; the stroke is what she asked
-   for in round 5, and it is the half 13.4.1 says carries the edge's WEIGHT
-   where the shadow carries its DIRECTION. */
+   reading the two custom properties `.on-dark` re-points. 13.4.1: stroke sets
+   the edge's WEIGHT, shadow sets its DIRECTION. `line-height: 1` so the box
+   the padding above is solved against is predictable. */
 .devct-tape-word {
   position: relative;
   z-index: 1;
   white-space: nowrap;
+  line-height: 1;
   color: #ECE9EA;
-  -webkit-text-stroke: var(--title-stroke, var(--emboss-stroke-w)) var(--emboss-stroke-c);
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
   text-shadow: -1.0px -1.0px 0 #fdfbfe,
                 1.0px  1.0px 0 rgba(5, 5, 5, 0.90);
 }
@@ -193,19 +192,35 @@ sitemap: false
 .devct-page .drink-card-name a       { color: inherit; }
 .devct-page .drink-card-name a:hover { color: #fff; }
 
-/* Stage S only: the four cards become a weight ladder. */
-.devct--stroke-ladder .drink-card:nth-child(1) .devct-tape-word { --title-stroke: 0; }
-.devct--stroke-ladder .drink-card:nth-child(2) .devct-tape-word { --title-stroke: 0.010em; }
-.devct--stroke-ladder .drink-card:nth-child(3) .devct-tape-word { --title-stroke: 0.016em; }
-.devct--stroke-ladder .drink-card:nth-child(4) .devct-tape-word { --title-stroke: 0.024em; }
+/* ===========================================================================
+   THE TOP EDGE, four weights and all of them below where it started.
+   A hairline highlight along the tape's rim and a hard shadow under it -- the
+   two-hard-copies logic 13.4.1 uses on glyphs, applied to the object.
+   drop-shadow follows the SVG's alpha, so it traces the tape's real skewed
+   outline rather than a box.
+
+   THE BOTTOM SHADOW STAYS AT FULL STRENGTH throughout. It is not decoration
+   here: with the tape at its own colour on a lifted ground the tape has barely
+   any fill contrast left, so the shadow under its lower edge is doing half the
+   work of saying an object is present. Only the TOP number moves, which is the
+   one Helen said was getting involved with the text.
+   ======================================================================== */
+.devct--lit-18 .devct-tape-bg { filter: brightness(var(--tape-lift))
+  drop-shadow(0 -1px 0 rgba(255,255,255,0.18)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
+.devct--lit-10 .devct-tape-bg { filter: brightness(var(--tape-lift))
+  drop-shadow(0 -1px 0 rgba(255,255,255,0.10)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
+.devct--lit-06 .devct-tape-bg { filter: brightness(var(--tape-lift))
+  drop-shadow(0 -1px 0 rgba(255,255,255,0.06)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
+.devct--lit-03 .devct-tape-bg { filter: brightness(var(--tape-lift))
+  drop-shadow(0 -1px 0 rgba(255,255,255,0.03)) drop-shadow(0 1.5px 0 rgba(0,0,0,0.95)); }
 
 /* ===========================================================================
-   BIGGER TYPE ON DARK. Helen called it, and the reason is irradiation: a light
-   glyph on a dark ground blooms into its surround, so the same type reads
-   heavier and less crisp than ink on paper. The corrections are more SIZE and
-   more TRACKING and, counter-intuitively, LESS WEIGHT. Nothing here gains
-   weight. The card grew to 13.8rem with it, because the anchors are fixed and
-   bigger type in an unchanged box just clips the second chip row.
+   BIGGER TYPE ON DARK. A light glyph on a dark ground blooms into its
+   surround, so the same type reads heavier and less crisp than ink on paper.
+   The corrections are more SIZE and more TRACKING and, counter-intuitively,
+   LESS WEIGHT. Nothing here gains weight. The card grew to 13.8rem with it,
+   because the anchors are fixed and bigger type in an unchanged box clips the
+   second chip row.
    ======================================================================== */
 .devct-page .drink-card             { height: 13.8rem; }
 .devct-page .drink-field-label      { font-size: 1.52rem; letter-spacing: 0.09em; }
@@ -220,39 +235,39 @@ sitemap: false
 /* ===========================================================================
    THE DARK GROUND -- every piece the inversion breaks, picked up.
    ======================================================================== */
-.devct-page .drink-field-label                     { color: var(--dark-text); }
+.devct-page .drink-field-label                        { color: var(--dark-text); }
 .devct-page .drink-search--exclude .drink-field-label { color: var(--dark-quiet); }
 .devct-page .btn-mood,
-.devct-page .btn-chaos                             { color: #a8a6ab; }
+.devct-page .btn-chaos                                { color: #a8a6ab; }
 .devct-page .btn-mood:hover,
 .devct-page .btn-chaos:hover,
-.devct-page .btn-mood:focus-visible                { color: #ffffff; }
+.devct-page .btn-mood:focus-visible                   { color: #ffffff; }
 .devct-page .btn-mood.is-on {
   color: #ffffff;
   -webkit-text-stroke: 0.05em #ffffff;
   text-decoration-color: var(--pink);
 }
-.devct-page .btn-clear-filter                      { color: var(--dark-quiet); }
+.devct-page .btn-clear-filter                         { color: var(--dark-quiet); }
 .devct-page .drink-search-input {
   color: var(--dark-text);
   background: transparent;
   border-bottom-color: #4a4a52;
 }
-.devct-page .drink-search-input::placeholder       { color: #6d6b72; }
+.devct-page .drink-search-input::placeholder          { color: #6d6b72; }
 .devct-page .btn-pool {
   background: var(--ink-card);
   border-color: var(--dark-line);
   color: #cfcdc9;
 }
 .devct-page .btn-pool:hover,
-.devct-page .btn-pool:focus-visible                { border-color: var(--pink); color: #ffffff; }
-.devct-page .btn-pool.is-on                        { color: #ffffff; }
-.devct-page .btn-pool-via                          { color: var(--dark-quiet); }
-.devct-page .drink-search--exclude .btn-pool       { color: var(--dark-quiet); border-color: var(--dark-line); }
-.devct-page .drink-search--exclude .btn-pool.is-on { border-color: var(--dark-text); color: var(--dark-text); }
-.devct-page .drink-count                           { color: var(--dark-text); }
+.devct-page .btn-pool:focus-visible                   { border-color: var(--pink); color: #ffffff; }
+.devct-page .btn-pool.is-on                           { color: #ffffff; }
+.devct-page .btn-pool-via                             { color: var(--dark-quiet); }
+.devct-page .drink-search--exclude .btn-pool          { color: var(--dark-quiet); border-color: var(--dark-line); }
+.devct-page .drink-search--exclude .btn-pool.is-on    { border-color: var(--dark-text); color: var(--dark-text); }
+.devct-page .drink-count                              { color: var(--dark-text); }
 
-/* --- the ink card ---------------------------------------------------------- */
+/* --- the card ------------------------------------------------------------- */
 .devct-page .drink-card              { background: var(--ink-card); border-color: var(--ink-edge); }
 .devct-page .drink-card-glass        { background: transparent; color: rgba(48, 232, 140, 0.85); }
 .devct-page .drink-card-glass .glass-icon-line { stroke-width: 1.3; }
@@ -270,90 +285,37 @@ sitemap: false
 .devct-page .drink-card-ship         { color: #c9c7c2; }
 .devct-page .drink-card:hover::after { background: var(--absinthe); }
 
-/* Two measured fixes from round 4 -- tmp/a11y.py has the workings. The
-   separator was 2.42:1 against a 3:1 decorative bar; the goodness amber sat
-   dE 9.9 from the absinthe under protanopia against 9.13's bar of 10. */
-.devct-page .drink-card-sep          { color: #6a6a72; }
-.devct-page .drink-card-ship-icon    { color: #F7913F; }
-
-/* ===========================================================================
-   E2 -- THE TAPE LIFTS OFF THE CARD. The lift itself is --tape-lift on
-   .devct-tape-bg above, so it moves with the ground rather than being set
-   per stage twice.
-   ======================================================================== */
-
-/* E2c  A MANHANDLED ROLL. Helen's own riff -- black label tape lightens with
-        age and handling, and not evenly. Each card's tape takes its own
-        brightness, a little warmth (worn black goes grey-brown, not grey) and
-        a little less contrast. Deterministic by position, so it is a texture
-        rather than a lottery, and it is the one thing on this page that could
-        not be arrived at by reasoning about colour. */
-.devct--worn .drink-card:nth-child(1) .devct-tape-bg { filter: brightness(3.3) contrast(0.90) sepia(0.10); }
-.devct--worn .drink-card:nth-child(2) .devct-tape-bg { filter: brightness(4.6) contrast(0.82) sepia(0.18); }
-.devct--worn .drink-card:nth-child(3) .devct-tape-bg { filter: brightness(3.0) contrast(0.94) sepia(0.06); }
-.devct--worn .drink-card:nth-child(4) .devct-tape-bg { filter: brightness(4.1) contrast(0.86) sepia(0.14); }
-
-/* ===========================================================================
-   E4 -- THE RIM IS LIT. Both grounds left alone; a hairline highlight along
-   the tape's top edge and a hard shadow under its bottom, which is the same
-   two-hard-copies logic 13.4.1 uses on glyphs, applied to the object.
-   drop-shadow follows the SVG's alpha, so it traces the tape's real skewed
-   outline rather than a box.
-
-   HELEN: "maybe the top edge is a little too heavy -- it's trying to get
-   involved with the text." Two readings, and both are built, because it is as
-   much a DISTANCE problem as a weight one: the rim is only 0.30em above the
-   cap line, so even a correct highlight is standing on the letters.
-   ======================================================================== */
-.devct--lit-30 .devct-tape-bg {
-  filter: brightness(var(--tape-lift))
-          drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.30))
-          drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.95));
-}
-.devct--lit-18 .devct-tape-bg {
-  filter: brightness(var(--tape-lift))
-          drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.18))
-          drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.95));
-}
-.devct--lit-12 .devct-tape-bg {
-  filter: brightness(var(--tape-lift))
-          drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.12))
-          drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.95));
-}
-/* More room between the rim and the cap line, so the highlight stops
-   crowding the letters without being dimmed to do it. */
-.devct--roomy .devct-tape { padding: 0.46em 1.05em; }
+/* Two measured fixes -- tmp/a11y.py has the workings. The separator was 2.42:1
+   against a 3:1 decorative bar; the goodness amber sat dE 9.9 from the
+   absinthe under protanopia against 9.13's bar of 10. */
+.devct-page .drink-card-sep       { color: #6a6a72; }
+.devct-page .drink-card-ship-icon { color: #F7913F; }
 </style>
 
 <div class="devct-page">
 
 {% comment %} FIELDS, `~`-separated: tag | ground class | card classes |
    whether this stage carries the filter block. {% endcomment %}
-{% assign stages = "S~~devct--stroke-ladder~yes|E2a~devct-ground-mid~~no|E2b~devct-ground-high~~no|E2c~devct-ground-high~devct--worn~no|E4a~~devct--lit-18~no|E4b~~devct--lit-12 devct--roomy~no|E4c~devct-ground-mid~devct--lit-18~no|X~devct-ground-mid~devct--lit-18 devct--worn~no|X2~devct-ground-high~devct--lit-12 devct--roomy devct--worn~no" | split: "|" %}
+{% assign stages = "O~~~yes|G~devct-ground-lift~~no|L~devct-ground-lift~devct--lit-18~no|T1~devct-ground-lift~devct--lit-10~no|T2~devct-ground-lift~devct--lit-06~no|T3~devct-ground-lift~devct--lit-03~no" | split: "|" %}
 
 {% for stage in stages %}
   {% assign f = stage | split: "~" %}
-  {% assign tag        = f[0] %}
-  {% assign groundcls  = f[1] | default: "" %}
-  {% assign cardcls    = f[2] | default: "" %}
+  {% assign tag         = f[0] %}
+  {% assign groundcls   = f[1] | default: "" %}
+  {% assign cardcls     = f[2] | default: "" %}
   {% assign wantfilters = f[3] %}
 
   {% case tag %}
-    {% when "S"   %}{% assign label = "STROKE LADDER on the title &mdash; none / 0.010em (the heading&rsquo;s own) / 0.016em / 0.024em, left to right" %}
-    {% when "E2a" %}{% assign label = "E2, ground lifted one step &mdash; card unchanged, tape lifts with it" %}
-    {% when "E2b" %}{% assign label = "E2, ground lifted two steps" %}
-    {% when "E2c" %}{% assign label = "&hellip; and the roll has been manhandled: every tape wears differently" %}
-    {% when "E4a" %}{% assign label = "E4, top edge down from 0.30 to 0.18" %}
-    {% when "E4b" %}{% assign label = "E4, top edge 0.12 AND more room between the rim and the letters" %}
-    {% when "E4c" %}{% assign label = "E4 at 0.18, on the lifted ground" %}
-    {% when "X"   %}{% assign label = "BOTH &mdash; lifted tape, lit rim, worn roll, lifted ground" %}
-    {% when "X2"  %}{% assign label = "BOTH, quieter &mdash; two-step ground, 0.12 rim, roomy, worn" %}
+    {% when "O"  %}{% assign label = "the original &mdash; page darker than the card, tape darkest, no edge" %}
+    {% when "G"  %}{% assign label = "ground lifted, card dark, tape at its own colour, no edge" %}
+    {% when "L"  %}{% assign label = "&hellip; plus the 0.18 top edge (E4c, tape unlifted)" %}
+    {% when "T1" %}{% assign label = "&hellip; top edge 0.10" %}
+    {% when "T2" %}{% assign label = "&hellip; top edge 0.06" %}
+    {% when "T3" %}{% assign label = "&hellip; top edge 0.03" %}
   {% endcase %}
 
   <p class="devct-tag">{{ tag }} &nbsp; {{ label }}</p>
 
-  {% comment %} `on-dark` on every stage -- #469's six emboss values, and the
-     title now reads two of them directly. {% endcomment %}
   <div class="devct-stage on-dark {{ groundcls }}">
 
   {% if wantfilters == "yes" %}
