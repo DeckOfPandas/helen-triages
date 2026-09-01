@@ -582,7 +582,29 @@ raw to pass stays out of the pipeline rather than the pipeline staying out of
 the suite. **`QQ PLACEHOLDER` survives a
 Claude-assisted pass.** Tidying structure and wording is not the same thing as
 Helen actually rewriting a step in her own voice — the marker only comes off
-once she says so, same reasoning as the `proofread` rule in §4.0. Considered
+once she says so, same reasoning as the `proofread` rule in §4.0.
+
+**THE PIPELINE STILL STANDS AFTER THE 2026-08-31 UNIVERSAL REWRITE PASS. ITS
+ENTRY LEVEL JUST WENT UP.** Every draft that can carry a `QQ Claude` line now
+has one (264 of 267 — the three exceptions are #637/#638/#639), so `to-rewrite/`
+no longer means "waiting for a Claude pass": the pass has happened everywhere.
+I read that as making the folder redundant and said so, and Helen corrected me
+on 2026-09-01 — she needs it, for two reasons a flag has no word for:
+
+> "with all the love in the world, I'm likely to want to cast my eyes over what
+> you've rewritten for me even though I predict it will be pretty good. At the
+> point of being about to cook I'll also delete any original lines that have
+> been totally superseded by yours, leaving me less to pick through in the
+> kitchen."
+
+So `to-rewrite/` is where she reviews **your** prose, and the transition out of
+it is a real edit she makes: dropping the `QQ original` line wherever the
+`QQ Claude` line has fully replaced it, so what reaches `to-cook/` is a method
+she can read at the hob without stepping over the source. That is a judgement
+about her own kitchen and is not automatable — **never delete a `QQ original`
+line yourself.** The correction generalises: the folders are how Helen tracks
+*her* work, and reading them as duplicating the flags gets it backwards (§11.0.2
+records the same mistake made about `to-cook/` two days earlier). Considered
 and rejected for now: renaming `rewritten` → `human_rewritten` for symmetry —
 would touch every file in `_food_recipes/` and interact with the
 `proofread`-invalidation rule.
@@ -726,14 +748,36 @@ flagged. This is the gate that decides what the world sees; the cost of failing
 closed is that a new recipe does not publish until someone writes
 `awaiting_fix: false`, and that is the right cost.
 
+**WHAT `awaiting_fix: true` MEANS TO HELEN, in her own words, 2026-09-01 —
+and it is not what "unfinished" would suggest.** It means she **has** proofread
+the page, found one small thing wrong, and raised it as a ticket:
+
+> "'awaiting_fix' means I've proofread, but one small thing has been raised as
+> a ticket, meaning that once that's fixed I can look for just that one thing
+> rather than having to read the entire file again carefully."
+
+So the flag is a **bookmark in her own review**, not a marker of incompleteness.
+Its whole value is that it survives the fix: when the ticket is closed she reads
+one line instead of the file. Two consequences that bite:
+
+- **A flagged page has been read.** Do not treat `awaiting_fix: true` as
+  permission to make further edits to the file "since it's held back anyway" —
+  every edit past her proofread costs her the saving the flag exists to give
+  her, and `meta.proofread` must go `false` in that same commit regardless
+  (§4.0, issue #367).
+- **`true` and ABSENT are not the same state**, even though both hold the page
+  back. `true` says she has read it; absent says nobody has. This is exactly
+  why `scripts/tidy_drafts.py` reports the two drafts with no flag rather than
+  writing `false` into them — writing a value in asserts something about her
+  reading that no script can know.
+
 **`GATED_COLLECTIONS` is `food_recipes` and `cocktail_recipes` only, and the
 scoping is not optional.** Fail-closed applied to every collection would delete
 the entire site: `dev` pages carry no `meta.awaiting_fix` at all, and plenty of
 drafts don't either. Drafts and dev pages have their own `output: false`
 protection and need no gate regardless of whether they happen to carry the key.
-(A growing number of drafts DO carry one anyway, used informally as a personal
-"needs more source material, don't promote yet" note — no plugin reads it
-there, so it's Helen's own bookkeeping, not enforcement.)
+(A growing number of drafts DO carry one anyway — no plugin reads it there, so
+on a draft it is purely the bookmark described above, not enforcement.)
 
 `_config.yml` sets `show_awaiting_fix: false`; `_config_local.yml` sets it
 `true`, so flagged pages stay visible while you work on them and vanish from
@@ -4310,9 +4354,13 @@ belongs in `taxonomy.yml`'s `proper_nouns` is her call. Same standing rule as
 `QQ`: don't fix a violation unprompted.
 
 **`PLACEHOLDER` was a second draft marker for one day** (2026-08-09 to
-2026-08-10) and is retired; there is one marker, `QQ`. Roughly 190 old drafts
-still say `PLACEHOLDER - rewrite: ...`. Treat it exactly as `QQ`, leave it alone,
-and never add a third marker.
+2026-08-10) and is retired; there is one marker, `QQ`. Never add a third.
+**The ~190 drafts that still said `PLACEHOLDER - rewrite: ...` are gone as of
+2026-08-31** — Helen asked for the whole corpus to be paired, and
+`tmp/rename_markers.py` renamed 1,074 markers in place (270 `QQ PLACEHOLDER` +
+804 `PLACEHOLDER - rewrite:`) to `QQ original`. This paragraph told you to leave
+them alone; her instruction supersedes that, and the corpus is now uniform. See
+§4 for the interleaved format.
 
 **Which checks read `_food_drafts/` — ask the registry, not this file.** This
 section claimed "exactly three" until 2026-08-21 while contradicting itself a few
@@ -4768,10 +4816,31 @@ fails closed.
 
 **The boundary is formatting versus judgement, and it is the whole design.** It
 fixes quoting, en dashes, `--`/`->`, accents and the #429 `meta:` migration. It
-never resolves which milk, which flour, whether an oven figure is the fan one, or
-whether a title or a filename is the one that should change: ~25 rules and
-600-odd hits, every one needing Helen or her source material, all of them
-reported and left alone.
+never resolves which milk, which flour, or whether an oven figure is the fan
+one: ~25 rules and 600-odd hits, every one needing Helen or her source material,
+all of them reported and left alone.
+
+**A THIRD CATEGORY EXISTS AND TITLE/SLUG DIVERGENCE IS IN IT: not a fix, not a
+judgement, NOT A FINDING.** The script reported a title whose head-clause words
+are absent from the filename — 19 drafts, and 19 of the 21 lines it printed.
+Helen ruled the whole class out on 2026-09-01: *"let's not run the 'title
+matches slug'-ish test over drafts."* The reasoning is worth keeping because it
+is the general shape of a false finding here. **A draft's title is still the
+SOURCE's title, and the slug is already the dish.** `chocolate-fudge-cake`
+titled "Cassie's Favourite Chocolate Fudge Cake", `swedish-meatballs` titled
+"Bronte's Swedish Meatballs", `choc-chunk-cookies` titled "Malty NYC-style Choc
+Chunk Cookies" — every one is the ingest doing exactly the right thing, keeping
+the source's own words in `title:` while the filename names what the dish is.
+The divergence closes itself at promotion, when Helen writes the title she
+wants; and she mostly will, since her rule on possessives is *"I mostly dislike
+'Cassie's Sunday Chicken' unless Cassie is either famous or a member of my
+family."* The reporter is deleted, and `test_title_and_slug_dont_diverge` moved
+in `NOT_FOR_DRAFTS` from the "real gaps" section to the deliberate-decline one.
+**The recipe-side test is untouched** and still fires where it means something:
+on a published page, where the title is hers. That is the second entry in that
+registry found pointing the wrong way (the first was
+`test_note_dicts_have_label_and_text`, 2026-08-29) — read a "GAP" label as a
+claim to check, not a fact.
 
 **It never touches a `QQ` line**, which is not a technicality: two thirds of the
 corpus-wide en-dash hits are inside un-rewritten source text (86 of 130), and 22
@@ -4779,7 +4848,7 @@ files consist of nothing else. Verified on the real run rather than trusted: of
 the 44 lines it changed, **zero begin with `QQ`**, counted from the diff.
 
 **Every rule is imported from the test suite, never re-typed** — `META_ORDER`,
-`RETIRED`, `SCALAR_STRING_FIELDS`, `_head_clause_words`. A fixer carrying its own
+`RETIRED`, `SCALAR_STRING_FIELDS`. A fixer carrying its own
 copy of the contract eventually tidies files INTO a shape the tests reject,
 while looking green the whole time. That import is also what resolved the
 `test_invisible_keys_are_really_invisible` failure the first draft caused

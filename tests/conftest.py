@@ -319,16 +319,42 @@ def internal_temperatures() -> dict:
 # marker there at all. That is what makes it safe for ONE shared rule to blank
 # QQ lines unconditionally and be correct for both collections -- rather than
 # two copies of the rule differing by a call nobody can tell is deliberate.
+#
+# `QQ Claude` IS THE ONE EXCEPTION AND IT IS NOT AN EXEMPTION FROM THE RULE --
+# it is the rule read correctly. The marker means "SOMEBODY ELSE'S wording,
+# awaiting a rewrite", which is why correcting its dash is off limits: it edits
+# words that are about to be deleted. A `QQ Claude` line is the opposite. It is
+# the paraphrase, written here, and HANDOVER §4 says outright that it "IS held
+# to normal house style, same as any other prose it writes".
+#
+# FOUND BY MEASUREMENT ON 2026-09-01, after the interleaved format became the
+# default for every draft and the corpus gained ~1,000 of these lines. 15 number
+# ranges were sitting in `QQ Claude` prose with hyphens instead of en dashes --
+# invisible to test_number_ranges_use_en_dashes, and to `scripts/tidy_drafts.py`,
+# which carries its own copy of this pattern for the same reason. Every one was
+# in a file paired BEFORE that session, so the hole had been open since the
+# format was invented on 2026-08-21 and only showed when the volume grew.
+#
+# The lookahead is what a reader most needs to see here: the pattern is not
+# "starts with QQ", it is "starts with QQ and is not the rewrite".
 _QQ_LINE = re.compile(r"""^\s*             # indent
                           (?:-\s*)?        # optional list dash
                           (?:[a-z_]+:\s*)? # optional key, e.g. `step: `
                           (?:['"])?        # optional opening quote
-                          QQ\b""", re.X)
+                          QQ\b(?!\s+Claude\b)""", re.X)
 
 
 def is_qq(value) -> bool:
-    """True if this scalar is un-rewritten source text."""
-    return isinstance(value, str) and value.lstrip().startswith("QQ")
+    """True if this scalar is un-rewritten SOURCE text.
+
+    `QQ Claude` is deliberately False -- see the note on `_QQ_LINE`. It carries
+    the marker so Helen can see the pair at a glance, not because it is
+    somebody else's words.
+    """
+    if not isinstance(value, str):
+        return False
+    stripped = value.lstrip()
+    return stripped.startswith("QQ") and not stripped.startswith("QQ Claude")
 
 
 def checkable_raw(recipe) -> str:

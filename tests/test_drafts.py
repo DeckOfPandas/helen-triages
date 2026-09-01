@@ -224,6 +224,19 @@ NOT_FOR_DRAFTS = {
     "test_doneness_names_a_real_level": "same reasoning as internal_temp_ref",
     "test_no_recipe_says_cooking_temperatures":
         "0 drafts; about a published page's own cross-link wording",
+    "test_title_and_slug_dont_diverge":
+        "19 drafts, and NOT a gap -- Helen's ruling, 2026-09-01: 'let's not run "
+        "the title matches slug-ish test over drafts'. This entry said 'GAP; 20 "
+        "drafts' until then, which had it exactly backwards. A DRAFT'S TITLE IS "
+        "STILL THE SOURCE'S TITLE and the slug is already the dish: 'Cassie's "
+        "Favourite Chocolate Fudge Cake' / chocolate-fudge-cake, 'Bronte's "
+        "Swedish Meatballs' / swedish-meatballs, 'Malty NYC-style Choc Chunk "
+        "Cookies' / choc-chunk-cookies. The divergence IS the ingest doing the "
+        "right thing, and it closes itself at promotion when Helen writes the "
+        "title she wants -- she strips a possessive unless the name is famous "
+        "or family, so most of these titles are going to change anyway. The "
+        "recipe-side rule is untouched and still fires where it means "
+        "something: on a published page, where the title is hers",
 
     # -- WOULD APPLY CLEANLY. These are the real gaps: mechanical, no
     # judgement needed, and every one is a tax paid at promotion instead.
@@ -246,7 +259,6 @@ NOT_FOR_DRAFTS = {
         "(the recipe rule's own docstring says so); the narrower twin "
         "test_note_dicts_have_label_and_text_when_dict is what applies here",
     "test_size_word_is_with_the_count_not_the_item": "GAP; 108 drafts",
-    "test_title_and_slug_dont_diverge": "GAP; 20 drafts, one call each",
     "test_internal_recipe_links_resolve": "GAP, mechanical; 7 drafts",
     "test_main_ingredients_egg_count_agrees": "GAP; 3 drafts",
 

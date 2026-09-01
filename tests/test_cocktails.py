@@ -1598,6 +1598,74 @@ def test_the_amount_table_is_exercised():
         "all -- `measures:` or the `amount` key has moved.")
 
 
+US_UNITS = {"oz", "ounce", "ounces", "tsp", "teaspoon", "teaspoons",
+            "tbsp", "tablespoon", "tablespoons", "cup", "cups"}
+
+
+def test_no_amount_uses_a_us_unit():
+    """Volumes are millilitres. Helen's call, 2026-09-01: "I don't want any US
+    units, just ml."
+
+    THE WHOLE COLLECTION WAS CONVERTED THE SAME DAY -- 191 amounts across 44
+    drinks, at the factors `measures:` already declared (1 oz = 30 ml, 1 tsp =
+    5 ml). Every one landed on a clean .0 or .5, so nothing was rounded and no
+    figure was judged.
+
+    WHY THIS IS A TEST AND NOT A LINE IN THE INGEST DOC. The conversion is the
+    easy half; staying converted is the half that fails. A recipe is transcribed
+    from a book that prints ounces, and writing what the page says is the
+    default behaviour of every ingest -- it is what happened on 2026-08-31, when
+    ten drinks came in wholly in ounces because the collection already had 177
+    of them and matching the neighbours looked like the careful choice. Prose
+    telling the next session otherwise is exactly the shape this repo has
+    watched fail repeatedly.
+
+    `oz` AND `tsp` STAY DECLARED IN `measures:` DELIBERATELY, which looks
+    contradictory and is not. That table is the CONVERSION record, and
+    test_the_declared_measures_produce_the_figures_the_data_used_to_store anchors
+    on `("0.5 oz", 15.0)` to prove the factors still say what the deleted `ml:`
+    key said. Deleting the unit would destroy that evidence to enforce a rule
+    that a three-line test enforces better -- and would make an old ounce
+    unreadable rather than loudly wrong.
+
+    NON-VOLUMETRIC UNITS ARE UNTOUCHED: a dash, a pinch, a cube, a leaf and a
+    sprig are not US units and have no millilitre figure. `tbsp` and `cup` are
+    on the list without ever having appeared, because the point is the next
+    transcription rather than the current data.
+    """
+    measures = _vocab().get("measures") or {}
+    ignored = {w.lower() for w in (measures.get("ignored_words") or [])}
+
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict) or item.get("amount") is None:
+                continue
+            checked += 1
+            words = {w.strip(".,").lower() for w in str(item["amount"]).split()}
+            hit = (words - ignored) & US_UNITS
+            if hit:
+                bad.append(
+                    f"{slug}: {item['amount']!r} on "
+                    f"{item.get('generic') or item.get('item')!r} -- {sorted(hit)}"
+                )
+
+    assert not bad, (
+        f"{len(bad)} amount(s) in a US unit:\n  " + "\n  ".join(bad)
+        + "\n\nConvert to millilitres using the factors in `measures:` "
+          "(1 oz = 30 ml, 1 tsp = 5 ml). Transcribe the DRINK, not the page's "
+          "units. If a source qualifies the measure -- a scant or a heaping "
+          "one -- print the single figure and put the qualifier in the "
+          "ingredient's `note`, per HANDOVER 9.4.1: the site states one figure "
+          "and does not hedge it."
+    )
+    assert checked, (
+        "No amounts were examined at all, so this compared nothing -- the "
+        "collection carried 568 when this was written."
+    )
+
+
 def test_the_declared_measures_produce_the_figures_the_data_used_to_store():
     """The conversions still say what `ml:` said before it was deleted -- #571.
 
