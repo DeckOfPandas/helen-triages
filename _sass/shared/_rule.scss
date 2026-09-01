@@ -192,10 +192,19 @@ $emboss-vars-emitted: false !default;
   // against that swatch rather than against real content, so they were a
   // considered starting point and not a verified result even while it existed.
   //
-  // Kept rather than deleted because the reasoning above took a real
-  // conversation to reach and issue #469 tracks it. If you are reading this and
-  // there is still no dark section, deleting the whole block is a reasonable
-  // call -- the comment is the valuable part, and git keeps it.
+  // DO NOT DELETE IT. This comment told you to, from 2026-08-26 until
+  // 2026-09-01: "if you are reading this and there is still no dark section,
+  // deleting the whole block is a reasonable call." Helen, asked that exact
+  // question on 2026-09-01, gave the reason it is now wrong -- "I've been
+  // flirting with the idea of letting the cocktail titles on cards be white on
+  // black punched tape". That is the first real consumer this class has ever
+  // been in line for, so the instruction is withdrawn rather than merely stale.
+  // Issue #469 carries the three things that bite the day it lands.
+  //
+  // An instruction in a comment is the one kind of staleness that costs
+  // somebody work rather than merely misinforming them -- it sends the next
+  // reader to do a thing. HANDOVER 9.13 records the same shape from the other
+  // direction, three comments asserting a curve the template never had.
   //
   // This is NOT dark mode, which is a separate and much larger question Helen
   // has explicitly deferred.

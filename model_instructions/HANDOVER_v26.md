@@ -6550,10 +6550,34 @@ files, not free once they emitted CSS.
 `/dev/emboss/`, and that went when the heading dials did on 2026-08-26 — so the
 class is now live CSS with no user anywhere, and its numbers cannot be seen
 without re-adding a swatch. They were a considered starting point rather than a
-verified result even then. Kept rather than deleted because the reasoning behind
-it took a real conversation to reach and issue #469 tracks it; delete it instead
-if a dark section still has not appeared by the time anyone reads this. This is
-*not* dark mode, which Helen has explicitly deferred.
+verified result even then. Issue #469 tracks it. This is *not* dark mode, which
+Helen has explicitly deferred.
+
+**THIS PARAGRAPH SAID "DELETE IT INSTEAD IF A DARK SECTION STILL HAS NOT
+APPEARED" UNTIL 2026-09-01, AND SO DID THE CODE.** Asked that exact question,
+Helen answered with the reason it is wrong: *"I've been flirting with the idea of
+letting the cocktail titles on cards be white on black punched tape."* That is
+the first real consumer this class has ever been in line for. Both instructions
+are withdrawn; `_sass/shared/_rule.scss` carries the correction beside the block.
+
+**The general form is worth more than the instance, and §9.13 already has it from
+the other direction.** A stale *description* misinforms the next reader; a stale
+*instruction* sends them to do a thing. Both of these had been sitting there for
+six days telling anyone who checked the one condition they named — "is there a
+dark section yet?" — to delete a block whose whole value is that it is hard to
+re-derive. **When you write "do X if Y", Y is a fact about the day you wrote it,
+and nothing re-evaluates it.** Prefer recording the condition and who can rule on
+it over pre-authorising the action.
+
+**Three things bite the day a card title goes light-on-dark**, all on #469: the
+numbers were never verified against real content; `shared/_base.scss` still
+hardcodes `$color-text` on plain `h1/h2/h3`, so an unstyled heading inside
+`.on-dark` gets a near-black stroke on a dark ground; and `.site-logo-word` sets
+its stroke WIDTH from a Sass variable, so the class cannot reach the site's only
+existing light-on-dark lettering. Read §13.4.1 on the wordmark before reaching
+for `punched()` there — light type on black tape is the exact case that mixin is
+excused from, because a mid-grey "light" copy comes out darker than a near-white
+letter.
 
 #### 13.10.3 `/dev/emboss/` — tune here, not in a mock
 
