@@ -209,11 +209,29 @@ sitemap: false
 /* ===========================================================================
    THE TITLE. Round 1's lettering, round 5's stroke, round 6's centring.
    ======================================================================== */
+/* THE TAPE IS A WHOLE OBJECT NOW, NOT A FRAGMENT -- Helen, round 8: "please
+   start the lettering at the left-hand edge of the tape. If the word stops
+   short of the panel width, then stop the tape too (after appropriate padding).
+   But if the name is longer than the panel then please end with '...'"
+
+   That is three behaviours from one box, and inline-flex gives all three:
+   shrink-to-fit means a short title's tape ends where the title does; the
+   max-width caps a long one at the panel; and the word, as a flex item allowed
+   to shrink (min-width: 0), then ellipsises inside it. The tape was previously
+   CENTRED and clipped by the card, so a long title showed the middle of a tape
+   with both ends cut off -- which reads as a scrap of a much longer tape rather
+   than a label, and is very probably the whole of "the tape is still small".
+
+   `.drink-card-name` gives up its own `overflow: hidden` for this, and it has
+   to: the tape's top-edge highlight is drawn 1px ABOVE the tape by a
+   drop-shadow, and the name's box is exactly the tape's height -- so the parent
+   was clipping the highlight off. Nothing overflows without it, because the
+   tape now caps itself at the panel. */
 .devct-tape {
   position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   /* Asymmetric, and the asymmetry IS the centring. The two values sum to
      2 x --tape-pad-y whatever that is set to, so the tape's height is the
      dial and the centring follows it rather than needing to be re-derived. */
@@ -239,16 +257,41 @@ sitemap: false
 .devct-tape-word {
   position: relative;
   z-index: 1;
+  display: block;
+  /* min-width: 0 is the load-bearing one. A flex item will not shrink below
+     its own content width without it, so the ellipsis would never fire and the
+     tape would simply overflow the panel instead. */
+  min-width: 0;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   line-height: 1;
   color: #ECE9EA;
   -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
   text-shadow: -1.0px -1.0px 0 #fdfbfe,
                 1.0px  1.0px 0 rgba(5, 5, 5, 0.90);
 }
-.devct-page .drink-card-name         { white-space: nowrap; overflow: hidden; }
+.devct-page .drink-card-name         { white-space: nowrap; overflow: visible; }
 .devct-page .drink-card-name a       { color: inherit; }
 .devct-page .drink-card-name a:hover { color: #fff; }
+
+/* THE HEIGHT LADDER. Round 7 restored the tape to 2.2em, which is EXACTLY what
+   rounds 1-5 had -- verified against the live server, which sends `no-store`,
+   so nothing stale was being looked at. So "still small" is a request for
+   bigger than it has ever been, and guessing at it once more would waste
+   another round.
+
+   FOR SCALE, and it is the surprising part: the visible band is always 70.59%
+   of the tape's box, because the SVG carries 29.41% of its own height as
+   transparent margin. At 0.60em the card's band is 2.72x its cap height where
+   the HEADER WORDMARK's is 2.16x -- so the card's tape is already
+   proportionally MORE generous than the one on every page of the site. Which is
+   the evidence that the fault was the clipping rather than the size, and the
+   reason this ladder is offered alongside the alignment fix rather than
+   instead of it. */
+.devct-tape-75 { --tape-pad-y: 0.75em; }   /* band 3.09x caps */
+.devct-tape-90 { --tape-pad-y: 0.90em; }   /* band 3.46x caps */
+.devct-tape-105 { --tape-pad-y: 1.05em; }  /* band 3.83x caps */
 
 /* ===========================================================================
    THE TOP EDGE, four weights and all of them below where it started.
@@ -354,7 +397,7 @@ sitemap: false
 
 {% comment %} FIELDS, `~`-separated: tag | ground class | card classes |
    whether this stage carries the filter block. {% endcomment %}
-{% assign stages = "A~~devct--lit-10~yes|B~devct-card-15~devct--lit-10~no|C~devct-card-13~devct--lit-10~no|D~devct-card-12~devct--lit-10~no|E~devct-card-10~devct--lit-10~no|F~devct-card-13~devct--lit-06~no" | split: "|" %}
+{% assign stages = "H0~~devct--lit-10~yes|H1~devct-tape-75~devct--lit-10~no|H2~devct-tape-90~devct--lit-10~no|H3~devct-tape-105~devct--lit-10~no" | split: "|" %}
 
 {% for stage in stages %}
   {% assign f = stage | split: "~" %}
@@ -364,12 +407,10 @@ sitemap: false
   {% assign wantfilters = f[3] %}
 
   {% case tag %}
-    {% when "A" %}{% assign label = "card #17171a &mdash; where it is now &middot; edge T1 (0.10) &middot; tape back to full size" %}
-    {% when "B" %}{% assign label = "card #151518 &mdash; &Delta;L* 2.86 from the page &middot; edge 0.10" %}
-    {% when "C" %}{% assign label = "card #131316 &mdash; &Delta;L* 1.96 &middot; edge 0.10" %}
-    {% when "D" %}{% assign label = "card #121215 &mdash; &Delta;L* 1.54 &middot; edge 0.10" %}
-    {% when "E" %}{% assign label = "card #101013 &mdash; &Delta;L* 0.75, the fill below the eye&rsquo;s threshold &middot; edge 0.10" %}
-    {% when "F" %}{% assign label = "card #131316 again, with edge T2 (0.06) &mdash; C and F are the edge comparison" %}
+    {% when "H0" %}{% assign label = "tape 2.20em &mdash; the size it has been since round 1 &middot; band 2.72&times; the caps" %}
+    {% when "H1" %}{% assign label = "tape 2.50em &middot; band 3.09&times;" %}
+    {% when "H2" %}{% assign label = "tape 2.80em &middot; band 3.46&times;" %}
+    {% when "H3" %}{% assign label = "tape 3.10em &middot; band 3.83&times; &mdash; the header wordmark&rsquo;s own band is 2.16&times;" %}
   {% endcase %}
 
   <p class="devct-tag">{{ tag }} &nbsp; {{ label }}</p>
