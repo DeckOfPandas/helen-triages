@@ -3,7 +3,7 @@
 **Helen Triages** — a Jekyll mono-repo serving two personal decision-support
 sites. **Food** answers *what shall we cook*, not *how do I cook*. **Cocktails**
 is its sibling: it has real drinks and a schema now, and almost no styling.
-Written 2026-08-02, revised 2026-08-31. Supersedes v25 — deleted, not kept, per
+Written 2026-08-02, revised 2026-09-01. Supersedes v25 — deleted, not kept, per
 house practice: this file has no back-catalogue, only the current version.
 
 **Three things to read before you start.**
@@ -56,16 +56,34 @@ from a commit message written for exactly this purpose.
 > instead. §10 is worth reading too, but it is not the one being recommended
 > here.)
 
-**One companion document: `SOURCE_ATTRIBUTION_SPEC.md`.** It is the full
-contract for `source` and `source_type` — the eight types, the exact string
-shape each one dictates, and the date rule that separates a `publication` from a
-`website`. §4 summarises it and deliberately does not repeat it. It exists
-because ingestion sessions need the citation rules without reading 3,500 lines
-of this.
+**Two companion documents, and they point in opposite directions.**
+
+**`SOURCE_ATTRIBUTION_SPEC.md`** is the full contract for `source` and
+`source_type` — the eight types, the exact string shape each one dictates, and
+the date rule that separates a `publication` from a `website`. §4 summarises it
+and deliberately does not repeat it. It exists because ingestion sessions need
+the citation rules without reading 3,500 lines of this.
+
+**`INGEST_ONE_RECIPE.md` is written for a Claude that does NOT have this
+repository** — added 2026-09-01, at Helen's request, for the case where she
+finds a recipe in the wild and pastes it into claude.ai with no checkout, no
+tests and no `_data/`. It stands alone on purpose: the closed vocabularies
+(22 tags, 14 star ingredients, the eight citation types) are small enough to
+embed verbatim, and everything else that file needs is a rule rather than a
+lookup. **Its scope is one food recipe.** Cocktails are deliberately out —
+that schema needs `ingredients.yml`, `bottles.yml`, `glasses.yml`,
+`methods.yml` and `garnish.yml`, which do not embed.
+
+**Do not let the two drift.** If §4's schema, §5's house style, §7's taxonomy or
+the attribution spec changes, that file needs the same edit — it is the only
+place in the repo where those rules are written out a second time, and it was
+built that way knowingly, because the alternative was that Helen gets nothing
+useful back from a session with no repo. It carries no reasoning and no history,
+only the rules, which is what keeps the duplication small enough to maintain.
 
 **This paragraph said "No companion documents" until 2026-08-21**, having been
-written before that spec existed and never revisited — while §4, four hundred
-lines later, cited the file by name. Its own last sentence said to run
+written before the first spec existed and never revisited — while §4, four
+hundred lines later, cited the file by name. Its own last sentence said to run
 `ls model_instructions/` before trusting it, and nobody did, which is the
 smaller lesson inside the larger one: **an instruction to verify is not
 verification.**
@@ -75,6 +93,12 @@ slug/publish-status inventory, went on 2026-08-11: it saved compute during large
 batch ingests from photos, back before the Max plan made that a non-issue.
 `DEV_JOBS_v26.md` went on 2026-08-10; the backlog is on GitHub Issues now. Run
 `ls model_instructions/` anyway — and this time actually run it.
+
+**Two project slash commands, both in `.claude/commands/`**: `/tidy-drafts`
+(§11.0.2) and `/ingest` (§11.0.3). Each is a procedure doc over a script in
+`scripts/` that reports and never writes. `/ingest` is the IN-REPO batch
+procedure and is a different thing from `INGEST_ONE_RECIPE.md` above, which is
+for a Claude with no repo at all.
 
 ---
 
@@ -484,14 +508,14 @@ title: "Lemony Cavolo Nero and Butter Bean Soup"
 tagline: "It's fun to have a one-pot stew that is bright and acidic..."
 source: "Adapted from Good Food, January 2026"
 source_type: publication              # required; see SOURCE_ATTRIBUTION_SPEC.md
-serves: 4                        # xor makes: — never both
+serves: "4"                      # xor makes: — never both. QUOTED, see below
 prep_time: "20 mins"
 cook_time: "1 hr 30 mins"
-main_ingredients: ["cavolo nero", "butter beans", lemon]
-star_ingredient: greens          # optional; ~a quarter are legitimately blank
+main_ingredients: ["cavolo nero", "butter beans", "lemon"]
+star_ingredient: "greens"        # optional; ~a quarter are legitimately blank
 internal_temp_ref: beef.tender_roast   # optional; see §14 — most recipes have neither this nor doneness
 doneness: medium_rare                  # optional, only alongside internal_temp_ref; see §14
-tags: [soup, "one-pot"]
+tags: ["soup"]
 ingredient_groups:
   - name: soup                   # bare noun — template adds "For the "
     items:
@@ -511,9 +535,19 @@ notes:                           # always a list, never a blob
     text: "If it sinks, you added too much syrup."
 meta:                            # EXACTLY these three, in this order — see §4.0
   rewritten: false
-  awaiting_fix: false            # true  = do not publish this page at all
+  awaiting_fix: false            # true  = held back, and Helen HAS read it — §4.0
   proofread: false               # false = Helen has not blessed THIS text
 ```
+
+**EVERY SCALAR STRING IS QUOTED, AND EVERY LIST MEMBER TOO.**
+`SCALAR_STRING_FIELDS` in `test_front_matter.py` is the list — `title`,
+`tagline`, `source`, `prep_time`, `cook_time`, `star_ingredient`, `makes`,
+`serves` — and `main_ingredients`/`tags` members are checked as well. The block
+above showed `serves: 4`, a bare `lemon` and the retired tag `one-pot` until
+2026-09-01, having been written before the quoting rule and never re-read
+against the corpus, where all 86 recipes quote every one. **A schema example is
+copied more often than it is checked**; `/tidy-drafts` fixes the quoting
+mechanically, which is exactly why it went nine days unnoticed here.
 
 **`meta:` is three flags and nothing else, since 2026-08-21 (issue #429), and
 the ORDER is enforced.** `test_meta_block_is_exactly_the_three_flags_in_order`
@@ -849,38 +883,37 @@ gate would be gone and the build green.
 
   **INGESTING A RECIPE THAT IS NOT IN HELEN'S OWN VOICE — a magazine scan, a
   website, a transcript, anything transcribed rather than written — every
-  method step starts with `QQ PLACEHOLDER `.** Restated 2026-08-18 because
-  the practice had drifted: the prefix is `QQ PLACEHOLDER ` and it goes on
-  the METHOD STEPS, not just on the odd field somebody noticed was rough.
+  method step is marked, and since 2026-08-31 every one is also PAIRED with a
+  rewrite.** The marked form below is the older half of the convention and
+  still describes what the marker means; the pair is the format to write.
 
       method:
-        - "QQ PLACEHOLDER Heat the oven to 180°C fan and grease a 20-cm tin."
-        - "QQ PLACEHOLDER Cream the butter and sugar until pale."
+        - "QQ original Heat the oven to 180C fan and grease a 20cm tin."
+        - "QQ Claude Heat the oven to 180°C fan and grease a 20cm tin."
 
   The point is that a transcribed step is not a finished step even when it
   reads perfectly well. Helen rewrites every one into her own voice, and
   ingested text that happens to scan cleanly is exactly the kind that slips
   through un-rewritten — so the marker goes on at ingest time, on all of
-  them, and comes off one at a time as she rewrites.
+  them, and comes off one at a time as she rewrites. The marker goes on the
+  METHOD STEPS, not just on the odd field somebody noticed was rough.
 
   `test_no_qq_placeholder` (§10) catches any that reach `_food_recipes/`.
   Drafts may carry it indefinitely; that is what drafts are for.
 
-  One marker, not two. Older drafts (roughly 190 files, predating this
-  convention) say `PLACEHOLDER - rewrite: ...` instead — leave them alone,
-  see §12 on not tidying a draft unprompted, but write every new ingest as
-  `QQ PLACEHOLDER `. (This is the exact
-  convention already in wide use across `_food_drafts/` — as of 2026-08-10
-  it's still written there as `PLACEHOLDER - rewrite: ...` in roughly 190
-  files, predating this paragraph existing at all. Those weren't
-  bulk-converted — see §12 on not tidying a draft unprompted — but
-  every new ingest from here on uses `QQ`.)
+  **ONE MARKER SPELLING, AND SINCE 2026-08-31 IT IS `QQ original`.** This
+  paragraph used to describe two — `QQ PLACEHOLDER ` for new ingests and a
+  legacy `PLACEHOLDER - rewrite: ` on roughly 190 older drafts, with an
+  instruction to leave the legacy ones alone. Helen asked for the whole
+  corpus to be paired instead, so `tmp/rename_markers.py` renamed all 1,074
+  markers in place — 270 `QQ PLACEHOLDER` and 804 `PLACEHOLDER - rewrite:`,
+  across 236 files — and the drafts folder now spells it exactly one way.
+  Never introduce a third.
 
-  **Interleaved original/rewrite variant, established 2026-08-21.** When
-  Helen wants the source wording and the paraphrase visible side by side
-  (e.g. to judge rewrite quality directly, rather than trusting it blind),
-  write each step as a PAIR of consecutive entries instead of one bare
-  `QQ PLACEHOLDER ` line:
+  **THE INTERLEAVED PAIR IS THE STANDARD FORMAT, NOT A PER-BATCH ASK.**
+  Established 2026-08-21 as a variant Helen would opt into; universal as of
+  2026-08-31, when she asked for a rewrite on every draft she had. Each
+  method step is a PAIR of consecutive entries:
 
       method:
         - "QQ original Heat the oven to 180C fan and grease a 20cm tin."
@@ -890,10 +923,26 @@ gate would be gone and the build green.
   habits, "minutes" instead of "mins", everything — because the whole point
   is an unedited comparison. Never tidy or house-style a `QQ original` line;
   it will read as broken house style and that's expected, not a bug to fix.
+  **Never DELETE one either** — dropping a superseded original is Helen's own
+  edit, made when she takes a file out of `to-rewrite/` (see the pipeline
+  above).
+
   `QQ Claude` is Claude's own paraphrase and IS held to normal house style,
-  same as any other prose it writes. This is a preference to confirm per
-  ingest, not a permanent replacement for bare `QQ PLACEHOLDER ` — ask which
-  format she wants for a given batch.
+  same as any other prose it writes. **That sentence was written correctly
+  here and implemented wrongly for eleven days — see §5.**
+
+  **264 of 267 drafts are paired.** The three that are not are #637, #638 and
+  #639: sources corrupted badly enough that paraphrasing them means inventing
+  a recipe. A source too broken to rewrite is flagged and raised, never
+  reconstructed.
+
+  **WRITE THE PAIRS WITH A SCRIPT, NOT BY HAND, AT ANY SCALE.**
+  `tmp/insert_rewrites.py` takes `{slug: [paraphrase, ...]}` and places each
+  `QQ Claude` line after its `QQ original`. It never reproduces source text —
+  which is what sidesteps the content-filter refusal below — refuses on a
+  per-file count mismatch, and is idempotent, so a re-run replaces an existing
+  paraphrase rather than doubling it. Over a thousand rewrites were placed
+  this way without a hand-edited `method:` block.
 
   **Generating a `QQ original` line risks "API Error: 400 Output blocked by
   content filtering policy."** Seen twice on 2026-08-21, both times from a
@@ -1401,6 +1450,27 @@ the first measurement of the data files.
   the marker is checked like any other prose. This was worth 66 of the 67
   house-style violations in the drafts folder.
 
+  **BUT IT MUST NOT STOP AT A `QQ Claude` LINE, AND IT DID, FOR ELEVEN DAYS.**
+  Fixed 2026-08-31. `conftest._QQ_LINE` and `scripts/tidy_drafts.py`'s
+  `QQ_LINE` both matched *any* line starting `QQ`, so the interleaved format
+  (§4) put Claude's own prose behind the exemption written for somebody
+  else's. **The exemption was never wrong; the pattern was.** `QQ` means text
+  awaiting a rewrite, and correcting its dash edits words about to be deleted.
+  `QQ Claude` is the exact opposite — our prose, held to house style like
+  anything else we write, and this section already said so.
+
+  Both patterns now carry a negative lookahead, `QQ\b(?!\s+Claude\b)`. The
+  15 hyphenated number ranges that had been hiding were then fixed by
+  `/tidy-drafts` — the script that should always have fixed them, fixing them.
+
+  **WHAT MADE IT INVISIBLE IS THE PART WORTH CARRYING.** The format existed
+  for eleven days on 32 drafts and never showed. Adding ~1,000 `QQ Claude`
+  lines in a day exposed it immediately. **A hole in a guard is proportional
+  to the data flowing through it**, so a rule that has been quiet since it
+  was written is not thereby proven — it may only be starved. Before scaling
+  up any operation tenfold, ask which guard is about to see its first real
+  traffic.
+
 **Time** — tighter for metadata than prose: `prep_time`/`cook_time` use `20
 mins`/`1 hr 30 mins`/`2 hrs`; prose uses `mins`/`hours`/`seconds`. Only
 numeric quantities are abbreviated — "ten minutes of glory" stays as written.
@@ -1840,6 +1910,21 @@ pushing. Not at the start of the session. The cheap version:
 
 A non-zero answer means the next red test is probably not yours.
 
+**AND YOU CANNOT FAST-FORWARD IT THE OBVIOUS WAY — `git checkout --detach
+origin/main`.** Added 2026-09-01, having cost a detour. A test clone sits on
+`main`, so `git merge`/`git pull` there is *a merge onto `main`* and
+`guard-main-branch.py` refuses it, correctly and in every repo in the tree.
+`git fetch origin main:main` is the usual answer and does not work either: git
+refuses to update the ref of the branch you have checked out. Detaching takes
+neither path — it is a checkout, the destructive-git hook allows it on a clean
+tree, and a detached HEAD is not `main`, so nothing can be written to `main` by
+accident.
+
+**Detach onto the BRANCH you need, not only onto `main`.** The same day, the
+public repo's tests wanted drink data sitting on an unmerged drafts branch
+(§10), and `git checkout --detach origin/<branch>` is how you get a corpus that
+matches what you are testing.
+
 **The API token is a different channel and does not cover file contents.**
 `GH_TOKEN` selects all three repos and carries Issues; probed 2026-08-29,
 `contents` returns **403** on both private repos and 200 on the public one. So
@@ -1968,7 +2053,7 @@ glass:                           # LIST, not scalar — corrected 2026-08-17
 garnish: []                      # LIST, declared vocabulary — §9.12.1
   # ["no garnish"] = decided, [] = unfilled. Cobra's Fang has two.
 ingredients:                     # FULL list, untriaged, in build order
-  - amount: "0.5 oz"             # the ONLY quantity field — see below
+  - amount: "15 ml"              # the ONLY quantity field, and NO US UNITS
     generic: "moderately aged Jamaican rum"  # the #314 vocabulary; see §9.3.1
     suggestion: "Appleton Estate Signature"  # the bottle, NAME(S) ONLY — §9.3.1
   - amount: "15 ml"
@@ -2019,6 +2104,24 @@ Conversions live in `measures:`: 1 oz → 30 ml, 1 tsp → 5 ml, 1 cl → 10 ml.
 is bar-standard rounding, not 29.5735; it keeps ratios clean and it is a
 decision, not an accident. Non-volumetric units are declared there too, so a
 dash is *known* to have no millilitre figure rather than merely lacking one.
+
+**NO DRINK MAY USE A US UNIT. Helen's ruling, 2026-08-31:** *"I don't want any
+US units, just ml, so please convert for me as part of ingestion. 1 oz = 30
+ml."* Extended to `tsp` in the same breath. 191 amounts across 44 drinks were
+converted; `test_no_amount_uses_a_us_unit` is the guard, and `US_UNITS` is its
+list (oz, tsp, tbsp, cup, and their long forms).
+
+**`oz` AND `tsp` STAY DECLARED IN `measures:`, AND THAT IS NOT AN OVERSIGHT.**
+`test_the_declared_measures_produce_the_figures_the_data_used_to_store` anchors
+on `("0.5 oz", 15.0)` — the dictionary is what makes a conversion *checkable*,
+so deleting the entries would delete the arithmetic that proves the conversion
+was right. The dictionary says what a unit MEANS; the new test says which units
+the collection may USE. Those are different claims and want different homes.
+
+**CONVERT AT INGEST, from the source's own figure** — an American book prints
+ounces and the drink stores millilitres. §9.4.1 still holds: the site is canon,
+so a converted figure is the site's, and the source's own is worth a note only
+where it disagrees with something already stored.
 
 **NINETEEN AMOUNTS ARE A BARE NUMBER AND MUST NOT BE GUESSED.**
 Port-au-Prince's ladder (30, 22.5, 15, 7.5) is plainly millilitres and Drunken
@@ -4249,6 +4352,25 @@ declares `needs: test`. Three things about it are load-bearing:
 > (`test_every_drink_reading_test_goes_through_the_loader`). One future test
 > globbing the drafts itself reopens #540 for itself, silently, in CI only.
 >
+> ### THE SAME GAP FROM A NEW ANGLE: A PUBLIC TEST CAN NEED PRIVATE DATA, AND
+> ### NOTHING MAKES THE TWO MERGES ARRIVE TOGETHER — #624, 2026-08-31
+>
+> The garnish vocabulary landed in halves: `_data/cocktails/garnish.yml` and its
+> three tests merged HERE while the drink-side rename sat on an unmerged branch
+> in the drafts repo. `main` was red for anyone with a current clone and **green
+> in CI**, because the runner has no drafts and `_cocktail_recipes/` is empty —
+> so those tests passed over an empty corpus. The deploy gate could not see it.
+>
+> **The tell is both directions failing at once.** "39 garnishes not declared"
+> AND "garnish.yml proposes changes to strings no drink says any more" cannot
+> both be a mistake in one file; they mean two files are at different commits.
+> Read that as a synchronisation fault, not a data fault, and check the other
+> repo before touching either.
+>
+> #540 made a PROMOTED drink checkable everywhere. This is the case where a
+> public test depends on data the runner cannot reach at all, and the honest
+> answer is not yet decided — see #624.
+>
 > **Still true, and not silenced:** at ONE promoted drink, four anti-vacuity
 > asserts fire ("no rum ingredient carries a suggestion, so this check is
 > vacuous"). They are correct, they say so accurately, and they self-resolve by
@@ -4793,7 +4915,8 @@ being held back**, so she can ask for it sooner if she wants it.
 Claude, please tidy up my drafts files."* `.claude/commands/tidy-drafts.md` is
 the procedure and `scripts/tidy_drafts.py` is the engine — the first project
 slash command in this repo, and the first thing in `.claude/` that is not a
-guard hook.
+guard hook. `/ingest` (§11.0.3) is the second and copies its shape exactly:
+a script that reports, a command doc that decides.
 
 **RUN FOR REAL 2026-08-29**, in three commits, one per class. What it did, and
 what the rules read afterwards:
@@ -4858,6 +4981,34 @@ Scope was settled with Helen and the exclusions are hers: size words (108
 drafts) are out, cocktail drafts are out while that schema moves, and a missing
 `meta.awaiting_fix` is reported rather than invented because that flag fails
 closed and writing `false` asserts a recipe is fit to publish.
+
+### 11.0.3 `/ingest` — the procedure, and the pre-flight that feeds it
+
+**Added 2026-08-31.** `.claude/commands/ingest.md` is the procedure;
+`scripts/ingest_preflight.py` is the engine. Same division as `/tidy-drafts`:
+the script reports and never writes, the doc decides.
+
+**WHAT THE PRE-FLIGHT IS FOR: one list, grouped by DECISION, not by file.**
+Ingesting fifteen photographs means the same ruling arrives eleven times in
+eleven files, and asking eleven times is how a session burns Helen's attention
+on one question. The report gathers every decision a batch needs — undeclared
+bottles, undeclared generics, garnish strings that are near-misses on the
+vocabulary, method steps that already have a proposal, US units, unitless
+amounts — and prints each one once with its instances under it.
+
+**It imports every rule from `tests/`**, never re-typing one, for the reason
+`tidy_drafts.py`'s own header gives at length: a checker carrying its own copy
+of the contract eventually reports against a shape the suite has moved on from.
+
+**THE PLAYTEST CHANGED THREE THINGS, and the third is the useful one.**
+Absences became NEAR-MISSES, because "this garnish is undeclared" is noise and
+"this is one word off `lime wheel`" is a decision. Steps already in
+`methods.yml`'s proposals stopped being reported, since that map is the queue
+for exactly them. And **the `star_ingredient` check was deleted outright**: it
+fired on 118 drafts, about a third of the corpus, which §7 documents as
+correct — a blank star is the right answer for a plain sponge — and §12 uses
+that exact field as its worked example of a false finding. A check that fires
+on a third of the data is describing the data, not auditing it.
 
 ### 11.0.1 More than one agent now shares this checkout — use a worktree
 
@@ -5186,6 +5337,36 @@ one. Asserting it non-empty made finishing the work a test failure.
 emptiness. `proposals` empties and will refill, so it must assert only that the
 KEY exists — the thing whose silent loss would switch the check off for whatever
 is proposed next. Ask which kind you have before writing `assert thing`.
+
+**YOU WILL EXEMPT YOUR OWN WORK FROM A RULE WRITTEN FOR SOMEBODY ELSE'S.**
+2026-08-31, eleven days late. House style deliberately stops at a `QQ` line
+(§5): that is the source's wording, and correcting its dash edits words about
+to be deleted. The interleaved format then introduced `QQ Claude`, which is
+**our** prose — and both guards matched any line starting `QQ`, so Claude's
+own writing sat behind an exemption written for a copyright holder's. §4 said
+in plain English that `QQ Claude` "IS held to normal house style". The
+sentence was right; the regex never implemented it.
+
+**The exemption was never wrong. The pattern was**, which is why the fix is a
+lookahead and not a carve-out. When a marker gains a second meaning, go back
+to every pattern that matches the first one: a prefix rule silently widens to
+cover whatever is added after it.
+
+**AND A GUARD THAT HAS NEVER FIRED MAY ONLY BE STARVED.** The hole existed for
+eleven days across 32 drafts and showed nothing. ~1,000 new `QQ Claude` lines
+in one day surfaced 15 hidden violations immediately. **Coverage is
+proportional to traffic**, so a quiet rule is not thereby a proven one. Before
+scaling an operation tenfold, ask which guard is about to see real volume for
+the first time.
+
+**A `git fetch` IS ONLY GOOD FOR THE MOMENT YOU RAN IT.** 2026-08-31, and it
+is embarrassing because the discipline was being quoted elsewhere in the same
+session. A fetch ran, four tool calls of other work happened, and the branch
+state from before was then reported as current — wrong in one direction, and
+after Helen said "I thought I'd merged that", wrong in the other. **Re-fetch
+immediately before reporting**, and say what the fetch showed rather than what
+you remember it showing. `git log --branches --not --remotes --oneline` is the
+sweep; its answer expires the moment anyone else pushes.
 
 **You will write a test that cannot fail and not notice.** The most dangerous
 trap here because the symptom is green. Has happened four times now: a stale
