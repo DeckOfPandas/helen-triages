@@ -6,72 +6,74 @@ sitemap: false
 ---
 
 {% comment %} ─────────────────────────────────────────────────────────────────
-  CARD TITLES ON PUNCHED TAPE — internal, never published. Issue #469.
+  GOING BLACK — internal, never published. Issue #469.
 
-  ROUND 2, 2026-09-01. Round 1 offered four lettering treatments and Helen chose
-  one in one look: "the boldness of the two near-whites with no softening shadow
-  is exactly what we need. Hugging the text is right. No tilt here." That is the
-  single-pair bevel, hugging, straight -- and it is now FIXED on every row here
-  rather than being one of the options. The other three lettering candidates,
-  the tilt variant and all the explanatory prose are deleted, per the
-  comparison-switch convention: once she picks, the losers and the switch go.
+  ROUND 3, 2026-09-01. Helen, having settled the lettering in round 1 and looked
+  at the card in round 2: "Ahhhhh you know what we need to do....? We need to go
+  black background. And pick up all the pieces we break on the way!" She named
+  the shortlist herself (2a, 2c, 3a, 3c), the two title treatments a black panel
+  would want, and the alternative worth taking seriously -- white cards on a
+  black page, with the filter section finding a way to be white on black. She
+  also asked that 2d, the incremental evolution, be considered properly rather
+  than swept along.
 
-  THE QUESTION THIS ROUND IS BIGGER, and it is hers: "is this the road we want
-  to go down design-wise???" So the page stopped being about lettering and
-  became about the CARD. Her diagnosis of what to look at is the brief:
+  SO THE PAGE IS SIX STAGES, and each is a whole page ground rather than a card
+  variant. A stage paints its ground past its own box with a box-shadow spread
+  and a clip-path, so a black stage and a light one can sit on one page without
+  a full-bleed rule that could force horizontal scroll.
 
-    - the glass panel "is the part that most jars with the new tape"
-    - "the underlining and chip highlighting actually works fantastically well,
-      which is a good hint we're doing something plausible" -- so the pink band
-      language is load-bearing and appears on every row unchanged
-    - a bolder reimagining may keep only two things: the pink and the home
-      absinthe
+    A   light ground, 2d cards -- the natural evolution, with filters
+    B   BLACK ground, WHITE cards, black tape title -- with filters
+    C   black ground, ink cards, NO TAPE, white punched letters
+    D   black ground, ink cards, WHITE TAPE, black punched letters
+    E   black ground, ink cards, the current black tape -- what "invisible tape"
+        actually looks like, which is the thing worth checking rather than
+        assuming
+    F   black ground, ink cards, solid absinthe panel -- the loudest
 
-  THE PINK IS FOOD'S HOT MAGENTA HERE, NOT COCKTAILS' COSMOPOLITAN. Helen,
-  2026-09-01: "could we please use the hot magenta from the food site as our
-  pink? I just can't get away from loving it, and honestly that is my personal
-  brand both at home and at work." #FF00C8 rather than #F127A7, applied to every
-  pink thing on this page -- the lit chips, the chosen pool buttons, the
-  ingredient bands and the matched mood chips -- so the question is asked of the
-  whole page at once rather than one element at a time. It is page-local: making
-  it real is a change to _sass/cocktails/_palette.scss, which is a different
-  commit and should follow her looking, not precede it.
+  Filters appear in A and B only. The filter treatment is a property of the
+  GROUND, not of the card, so demonstrating it once on light and once on black
+  answers it for every stage below.
 
-  THE DEEP AND THE WASH ARE DERIVED, NOT INVENTED. #C4009A is food's own
-  $color-bright-magenta-dark (darken 12%), measured at 5.32:1 against this
-  site's paper, so it clears AA as text. #FBE2F5 is a 10% tint of the bare hue
-  on paper, the same construction as every other -wash in the palette. If this
-  is adopted, both want solving properly rather than copying from here.
+  THE ONE STRUCTURAL FACT, CHECKED RATHER THAN FEARED. A black cocktails does
+  NOT fork the shared chrome. `test_the_header_and_footer_are_identical_on_every_page`
+  compares rendered HTML and colour is CSS; `test_every_chrome_class_has_a_rule_in_every_site_stylesheet`
+  checks DIVERGENCE -- a chrome class styled on one site must be styled on the
+  other -- and never compares values. The chrome already differs in colour
+  between the sites through `$color-accent`, which is exactly what §2.3's
+  palette contract exists to allow. So this is a palette change, not an
+  architecture one.
 
-  NO PROSE ON THE PAGE, at Helen's ask: "remove everything on the page other
-  than the mock filters and the cards. No extra visual distractions." Each row
-  carries a two-character tag and nothing else, so she can name what she likes.
-  Everything that used to be written on the page is written here instead.
+  AND `.on-dark` IS ON EVERY BLACK STAGE, which is #469 answered by the largest
+  possible route. Those six custom-property values were tuned in August against
+  a swatch that has since been deleted and have never been rendered on real
+  content; every punched heading inside a dark stage here is running them. But
+  the finding underneath is that a dark SITE may not want the class at all: the
+  class exists for a dark SECTION on a light site, whereas inverting the palette
+  makes every shared partial follow for free -- including `shared/_base.scss`'s
+  hardcoded `$color-text` stroke on plain h1/h2/h3, which is #469's "known gap"
+  and simply stops being one if `$color-text` is itself near-white.
 
-  WHAT IS REAL AND WHAT IS NOT. Every card is a real `.drink-card` with the real
-  glass panel and compression curve, real `.drink-card-hit` bands, real
-  `.drink-card-mood.is-match` chips and the real goodness mark, built from the
-  index's own Liquid. The filter block is the index's own markup with one
-  invented state written in -- MOOD tiki, HAS TO HAVE lime juice, LEAVE OUT
-  pineapple juice -- so every lit control and every banded word is the honest
-  consequence of one state. Nothing clicks.
+  WHAT WOULD ACTUALLY BREAK, and none of it is on this page yet:
+    - every `-deep` accent is solved to 4.75:1 against PAPER. On black they are
+      too dark to read; the BARE hues are the text colours on a dark ground.
+    - every `-wash` is a 10% tint of paper, so on black each becomes a near-white
+      block. All five want re-deriving downward.
+    - `_sass/cocktails/_print.scss` must keep printing on white, and
+      `test_print_neutralises_the_screen_page_background` is the guard that
+      already exists for exactly this.
+    - the tape SVGs are drawn black. Stage D inverts them in CSS with
+      `filter: invert(1)`, which is honest enough to look at and wrong in
+      detail: it flips the bevel's light source too. A real white tape is a
+      `scripts/generate_tape.py` run with its colours parameterised.
 
-  THE FOUR DRINKS ARE REAL and chosen for title length: 8, 19, 24 and 48
-  characters. The Bellini is the collection's longest and already ellipsises on
-  the live index; a tape breaks `text-overflow`, so it clips instead. Left
-  visible, because it is what would actually happen.
+  THE PINK IS FOOD'S HOT MAGENTA, #FF00C8, per Helen's round-2 ask. On black it
+  is a different argument than on paper -- it needs no darkening at all, where
+  on paper it needed #C4009A to clear AA. That is one of the pieces going black
+  picks up rather than breaks.
 
-  ROWS.
-    1     the settled tape title, everything else exactly as shipped
-    2a-2d the glass panel, four ways
-    3a-3d bolder reimaginings of the whole card
-
-  TAPE SHAPES ARE DETERMINISTIC by card position, so a reload gives the same
-  comparison and a drink wears the same shape on every row. Helen expects to
-  draw more shapes -- `scripts/generate_tape.py` is the tool and §13.9 is the
-  procedure. The current seven are drawn at 1400x170 for a 70px header; a card
-  title is about half that, so a card-sized set is a real follow-on rather than
-  a nicety.
+  Four real drinks, 8 / 19 / 24 / 48 characters. Tape shapes deterministic by
+  card position. Nothing clicks.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
 {% if site.show_drafts and site.cocktail_drafts.size > 0 %}
@@ -103,26 +105,49 @@ sitemap: false
 
 <style>
 /* ===========================================================================
-   PAGE-LOCAL ONLY. Nothing here belongs to the site yet. Whatever wins moves
-   into _sass/cocktails/ and this whole block goes with the losers.
+   PAGE-LOCAL ONLY. Whatever wins becomes a palette change in
+   _sass/cocktails/_palette.scss plus rules in _cards.scss and _filters.scss,
+   and this whole block goes with the losers.
    ======================================================================== */
 
-.devct-page { --pink: #FF00C8; --pink-deep: #C4009A; --pink-wash: #FBE2F5;
-              --ink-card: #17171a; --ink-edge: #2c2c31; }
+.devct-page {
+  --pink: #FF00C8;          /* food's hot magenta, on black; needs no deep */
+  --pink-deep: #C4009A;     /* the light-ground text value, 5.32:1 on paper */
+  --pink-wash: #FBE2F5;
+  --absinthe: #30E88C;
+  --absinthe-deep: #0E8248;
+  --ink-card: #17171a;
+  --ink-edge: #2e2e34;
+  --dark-ground: #0e0e10;
+  --dark-text: #e8e6e2;
+  --dark-quiet: #97959a;
+  --dark-line: #3a3a41;
+}
 
-/* The only thing on the page that is not a filter or a card. */
 .devct-tag {
-  margin: 2.6rem 0 0.55rem;
+  margin: 2.4rem 0 0.5rem;
   font-family: "Courier Prime", "Courier New", monospace;
   font-size: 0.68rem;
   letter-spacing: 0.14em;
   color: #a2a2a7;
 }
 
-/* --- 5. FOOD'S HOT MAGENTA, EVERYWHERE THE COCKTAIL PINK WAS ---------------
-   Each of these overrides one real rule in _filters.scss or _cards.scss, and
-   the list IS the answer to "where does the pink live" -- four places, which is
-   what makes the swap a palette change rather than a redesign. */
+/* A STAGE IS A GROUND, NOT A PANEL. box-shadow with a huge spread paints past
+   the element's own box and clip-path stops that spread growing the page --
+   so a black ground reaches the window edges without a 100vw rule, which is
+   the thing that forces horizontal scroll on a machine with a visible
+   scrollbar (test_no_element_can_force_horizontal_scroll's whole subject). */
+.devct-stage {
+  padding: 1.5rem 0 2.2rem;
+  clip-path: inset(0 -100vmax);
+}
+.devct-stage--dark {
+  box-shadow: 0 0 0 100vmax var(--dark-ground);
+  background: var(--dark-ground);
+  color: var(--dark-text);
+}
+
+/* --- FOOD'S HOT MAGENTA, in the four places the pink actually lives -------- */
 .devct-page .btn-mood.is-on          { text-decoration-color: var(--pink); }
 .devct-page .btn-pool.is-on          { border-color: var(--pink-deep);
                                        text-decoration-color: var(--pink); }
@@ -135,17 +160,7 @@ sitemap: false
   border-color: var(--pink-deep);
 }
 
-/* --- THE SETTLED TITLE ----------------------------------------------------
-   Hugging, straight, and the wordmark's bevel cut to ONE pair. Helen chose it
-   against the full four-copy version and against no emboss at all: "at this
-   smaller size, the boldness of the two near-whites with no softening shadow
-   is exactly what we need."
-
-   The fill sits below pure white for the reason that excused .site-logo-word
-   from punched() in the first place -- a highlight copy needs somewhere
-   brighter to be. 1px is 5.9% of 1.08rem type, near the 6.5% §13.4.1 targets,
-   and whole pixels because a fractional shadow offset antialiases the whole
-   duplicate glyph and reads as floating rather than punched. */
+/* --- THE SETTLED TITLE, from round 1 -------------------------------------- */
 .devct-tape {
   position: relative;
   display: inline-flex;
@@ -171,55 +186,93 @@ sitemap: false
   text-shadow: -1.0px -1.0px 0 #fdfbfe,
                 1.0px  1.0px 0 rgba(5, 5, 5, 0.90);
 }
-.devct-page .drink-card-name { white-space: nowrap; overflow: hidden; }
-.devct-page .drink-card-name a         { color: inherit; }
-.devct-page .drink-card-name a:hover   { color: #fff; }
+.devct-page .drink-card-name        { white-space: nowrap; overflow: hidden; }
+.devct-page .drink-card-name a      { color: inherit; }
+.devct-page .drink-card-name a:hover { color: #fff; }
+
+/* TITLE VARIANT: no tape at all. Helen's first guess for a black panel --
+   "white punched text with no tape". The lettering is unchanged; only the
+   ground under it goes. */
+.devct--notape .devct-tape-bg { display: none; }
+.devct--notape .devct-tape    { padding: 0.30em 0; }
+
+/* TITLE VARIANT: white tape, black punched letters. Her second guess, and the
+   inversion runs all the way down -- the light copy goes up-left as usual but
+   now against a near-white ground, so it is the CUT LINE that shows, and the
+   dark copy down-right does the raising. Same structure as every heading on
+   the food site, which is the point: a white tape is a light ground and wants
+   the light-ground treatment.
+
+   `filter: invert(1)` is a mockup, not a proposal. It flips the tape's own
+   bevel light source along with its ink; a real white tape is a
+   generate_tape.py run with its colours parameterised. */
+.devct--whitetape .devct-tape-bg svg { filter: invert(1); }
+.devct--whitetape .devct-tape-word {
+  color: #141417;
+  text-shadow: -1.0px -1.0px 0 rgba(255, 255, 255, 0.95),
+                1.0px  1.0px 0 rgba(0, 0, 0, 0.38);
+}
+.devct--whitetape .drink-card-name a:hover { color: #000; }
 
 /* ===========================================================================
-   2. THE GLASS PANEL -- the part Helen says jars with the tape.
-
-   The diagnosis underneath the four: the card now holds a hard black graphic
-   object and a pale mint wash at the same scale, so it has two grounds arguing.
-   Each option resolves that differently -- join the tape (2a), get out of its
-   way (2b), out-shout it (2c), or keep the ground and give the DRAWING enough
-   weight to stand beside it (2d).
+   THE DARK GROUND -- every piece the inversion breaks, picked up.
+   Scoped to a dark stage so the light stage is untouched and the two can be
+   compared honestly on one page.
    ======================================================================== */
 
-/* 2a  JOIN IT. Panel goes to the tape's own near-black, glass strokes absinthe.
-       The card gains one dark field running down its left side and across its
-       title, and the two read as one printed thing rather than two. */
-.devct--gp-ink .drink-card-glass { background: var(--ink-card); color: #30E88C; }
-.devct--gp-ink .drink-card-glass .glass-icon-line { stroke-width: 1.4; }
+.devct-stage--dark .drink-field-label            { color: var(--dark-text); }
+.devct-stage--dark .drink-search--exclude .drink-field-label { color: var(--dark-quiet); }
+.devct-stage--dark .btn-mood,
+.devct-stage--dark .btn-chaos                    { color: #a8a6ab; }
+.devct-stage--dark .btn-mood:hover,
+.devct-stage--dark .btn-chaos:hover,
+.devct-stage--dark .btn-mood:focus-visible       { color: #ffffff; }
+.devct-stage--dark .btn-mood.is-on {
+  color: #ffffff;
+  -webkit-text-stroke: 0.05em #ffffff;
+  text-decoration-color: var(--pink);
+}
+.devct-stage--dark .btn-clear-filter             { color: var(--dark-quiet); }
+.devct-stage--dark .drink-search-input {
+  color: var(--dark-text);
+  background: transparent;
+  border-bottom-color: #4a4a52;
+}
+.devct-stage--dark .drink-search-input::placeholder { color: #6d6b72; }
+.devct-stage--dark .btn-pool {
+  background: var(--ink-card);
+  border-color: var(--dark-line);
+  color: #cfcdc9;
+}
+.devct-stage--dark .btn-pool:hover,
+.devct-stage--dark .btn-pool:focus-visible       { border-color: var(--pink); color: #ffffff; }
+.devct-stage--dark .btn-pool.is-on {
+  border-color: var(--pink);
+  color: #ffffff;
+  text-decoration-color: var(--pink);
+}
+.devct-stage--dark .btn-pool-via                 { color: var(--dark-quiet); }
+.devct-stage--dark .drink-search--exclude .btn-pool { color: var(--dark-quiet); border-color: var(--dark-line); }
+.devct-stage--dark .drink-search--exclude .btn-pool.is-on { border-color: var(--dark-text); color: var(--dark-text); }
+.devct-stage--dark .drink-count                  { color: var(--dark-text); }
 
-/* 2b  GET OUT OF THE WAY. No panel at all; the drawing sits on paper in a pale
-       absinthe, and the tape is the only heavy object on the card. */
-.devct--gp-none .drink-card-glass { background: transparent; color: rgba(14, 130, 72, 0.42); }
-.devct--gp-none .drink-card-glass::after { background: transparent; }
-
-/* 2c  OUT-SHOUT IT. Solid electric absinthe with the glass knocked out in
-       paper. The loudest use of the home colour available, and the one that
-       makes the card two blocks rather than a block and a wash. */
-.devct--gp-solid .drink-card-glass { background: #30E88C; color: #fbfbfa; }
-.devct--gp-solid .drink-card-glass .glass-icon-line { stroke-width: 1.6; }
-
-/* 2d  KEEP THE GROUND, WEIGHT THE DRAWING. The wash stays; the glass goes to
-       absinthe-deep at the drink page's own 1.6 stroke instead of the card's
-       lightened 1. The panel stops being a ghost without becoming a block --
-       the smallest change of the four, and the only one that leaves the card's
-       tonal balance alone. */
-.devct--gp-strong .drink-card-glass { color: #0E8248; }
+/* --- A: light ground, 2d cards. The incremental route, kept honest.
+   The wash panel stays; the drawing goes to absinthe-deep at the drink page's
+   own 1.6 stroke instead of the card's lightened 1, so the panel stops being a
+   ghost without becoming a block. */
+.devct--gp-strong .drink-card-glass { color: var(--absinthe-deep); }
 .devct--gp-strong .drink-card-glass .glass-icon-line { stroke-width: 1.6; }
 
-/* ===========================================================================
-   3. BOLDER. Two rules only, both Helen's: keep the pink, keep the home
-   absinthe. Everything else is open.
-   ======================================================================== */
+/* --- B: white cards on a black page. Helen's alternative, and the cheapest
+   of the dark options by a distance -- the card itself is untouched, so
+   nothing inside it has to be restated. */
+.devct--white-card .drink-card { background: #fbfbfa; border-color: #d6d4cf; }
+.devct--white-card .drink-card-glass { color: var(--absinthe-deep); }
+.devct--white-card .drink-card-glass .glass-icon-line { stroke-width: 1.6; }
 
-/* 3a  INK CARD. The card takes the tape's ground, so the title stops being an
-       object stuck on and becomes a stripe in the same material. Absinthe is
-       the drawing; magenta is the only other colour and it now glows rather
-       than tints. Every text colour has to be restated, which is the honest
-       cost of inverting a card built for paper. */
+/* --- C/D/E: ink cards on a black page. Every text colour restated, which is
+   the honest cost of inverting a card built for paper -- and the reason a
+   palette inversion beats a per-element override list in the real thing. */
 .devct--ink .drink-card              { background: var(--ink-card); border-color: var(--ink-edge); }
 .devct--ink .drink-card-glass        { background: transparent; color: rgba(48, 232, 140, 0.85); }
 .devct--ink .drink-card-glass .glass-icon-line { stroke-width: 1.3; }
@@ -228,7 +281,7 @@ sitemap: false
 .devct--ink .drink-card-ingredients  { color: #c9c7c2; }
 .devct--ink .drink-card-sep          { color: #55555c; }
 .devct--ink .drink-card-hit          { color: #ffffff; }
-.devct--ink .drink-card-mood         { color: #a3a3ab; border-color: #3a3a41; }
+.devct--ink .drink-card-mood         { color: #a3a3ab; border-color: var(--dark-line); }
 .devct--ink .drink-card-mood.is-match,
 .devct--ink .drink-card-mood--hassle.is-match {
   background: rgba(255, 0, 200, 0.20);
@@ -237,150 +290,135 @@ sitemap: false
 }
 .devct--ink .drink-card-ship         { color: #c9c7c2; }
 .devct--ink .drink-card-ship-icon    { color: #F9A45E; }
-.devct--ink .drink-card:hover::after,
-.devct--ink .drink-card:hover .drink-card-glass::after { background: #30E88C; }
+.devct--ink .drink-card:hover::after { background: var(--absinthe); }
 
-/* 3b  TAPE HEADER. The tape stops hugging and becomes the card's masthead,
-       full width across the top. Every title then starts and ends in the same
-       place, which is what the fixed-anchor design wants everywhere else --
-       and it is the only shape here where the 48-character Bellini can
-       ellipsis properly instead of being clipped. */
-.devct--header .drink-card       { padding-top: 3.05rem; }
-.devct--header .drink-card-name  { position: absolute; left: 0; right: 0; top: 0;
-                                   margin: 0; height: 2.5rem; }
-.devct--header .devct-tape       { display: flex; width: 100%; height: 100%;
-                                   justify-content: flex-start; padding: 0 1.15rem; }
-.devct--header .devct-tape-word  { overflow: hidden; text-overflow: ellipsis; display: block; }
-.devct--header .drink-card-glass { top: 2.5rem; }
-
-/* 3c  ABSINTHE BLOCK. Paper kept, so nothing has to be restated -- and the
-       three colours are simply stated at full strength instead of hedged: a
-       green block, a black tape, a magenta rule along the foot where a 3px
-       absinthe hairline used to be. The least invasive of the four and the
-       loudest to look at. */
-.devct--block .drink-card-glass  { background: #30E88C; color: #fbfbfa; }
+/* --- F: the loudest. An ink card with the glass panel at full absinthe and
+   the glass knocked out in the ground's own black, so the panel reads as a
+   cut-out rather than a tint. */
+.devct--block .drink-card-glass  { background: var(--absinthe); color: var(--dark-ground); }
 .devct--block .drink-card-glass .glass-icon-line { stroke-width: 1.6; }
-.devct--block .drink-card::after { background: var(--pink); height: 5px; }
 .devct--block .drink-card-glass::after { background: transparent; }
-.devct--block .drink-card:hover::after { background: var(--pink-deep); }
-
-/* 3d  FULL-BLEED GLASS. The panel goes and the drawing becomes the card's
-       ground, oversized and running off two edges, with the words in front of
-       it. This is §9.13's own claim taken literally -- "the glass drawings
-       carry the personality food gets from colour" -- and it is the only
-       option here that gives up the fixed left edge the whole card is built
-       on, so it is the biggest bet and the one most likely to be wrong. */
-.devct--bleed .drink-card        { padding-left: 1.15rem; }
-.devct--bleed .drink-card-glass  { left: auto; right: -2.4rem; top: auto; bottom: -3.2rem;
-                                   width: 60%; height: auto; background: transparent;
-                                   align-items: flex-end; justify-content: flex-end;
-                                   color: rgba(48, 232, 140, 0.60); }
-.devct--bleed .drink-card-glass svg { height: 15rem; max-width: none; }
-.devct--bleed .drink-card-glass .glass-icon-line { stroke-width: 1.5; }
-.devct--bleed .drink-card-glass::after { background: transparent; }
-.devct--bleed .drink-card-body   { position: relative; z-index: 1; }
-.devct--bleed .drink-card-foot   { left: 1.15rem; z-index: 1; }
-.devct--bleed .drink-card::after { background: var(--pink); }
+.devct--block .drink-card::after { background: var(--pink); height: 5px; }
 </style>
 
 <div class="devct-page">
 
-{% comment %} ============================ THE FILTER BLOCK ================== {% endcomment %}
+{% comment %} SIX STAGES. Fields, `~`-separated: tag | ground | card classes |
+   title classes | whether this stage carries the filter block. {% endcomment %}
+{% assign stages = "A~light~devct--gp-strong~~yes|B~dark~devct--white-card~~yes|C~dark~devct--ink~devct--notape~no|D~dark~devct--ink~devct--whitetape~no|E~dark~devct--ink~~no|F~dark~devct--ink devct--block~~no" | split: "|" %}
 
-<div class="drink-filters">
+{% for stage in stages %}
+  {% assign f = stage | split: "~" %}
+  {% assign tag     = f[0] %}
+  {% assign ground  = f[1] %}
+  {% assign cardcls = f[2] | default: "" %}
+  {% assign titlecls = f[3] | default: "" %}
+  {% assign wantfilters = f[4] %}
 
-  <div class="drink-filter drink-filter--chaos">
-    <div class="drink-label-row">
-      <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
-    </div>
-    <div class="drink-btns">
-      <button type="button" class="btn-chaos" aria-pressed="false">no chaos please</button>
-      <button type="button" class="btn-chaos" aria-pressed="false">I&rsquo;m open to chaos</button>
-    </div>
-  </div>
+  {% case tag %}
+    {% when "A" %}{% assign label = "light ground &middot; 2d cards &middot; black tape" %}
+    {% when "B" %}{% assign label = "BLACK ground &middot; white cards &middot; black tape" %}
+    {% when "C" %}{% assign label = "BLACK ground &middot; ink cards &middot; NO TAPE, white letters" %}
+    {% when "D" %}{% assign label = "BLACK ground &middot; ink cards &middot; WHITE TAPE, black letters" %}
+    {% when "E" %}{% assign label = "BLACK ground &middot; ink cards &middot; black tape as it is" %}
+    {% when "F" %}{% assign label = "BLACK ground &middot; ink cards &middot; solid absinthe panel" %}
+  {% endcase %}
 
-  <div class="drink-filter drink-filter--mood">
-    <div class="drink-label-row">
-      <h2 class="drink-field-label"><span class="drink-field-label-text">Mood</span></h2>
-      <button type="button" class="btn-clear-filter">&times; clear</button>
-    </div>
-    <div class="drink-btns">
-      {% for name in groups.mood %}
-        {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
-        {% if members.size > 0 %}
-          {% if name == lit_mood %}
-            <button type="button" class="btn-mood is-on" aria-pressed="true">{{ name }}</button>
-          {% else %}
-            <button type="button" class="btn-mood" aria-pressed="false">{{ name }}</button>
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-    </div>
-  </div>
+  <p class="devct-tag">{{ tag }} &nbsp; {{ label }}</p>
 
-  <div class="drink-filter drink-filter--hassle">
-    <div class="drink-label-row">
-      <h2 class="drink-field-label"><span class="drink-field-label-text">Hassle</span></h2>
-    </div>
-    <div class="drink-btns">
-      {% for name in groups.hassle %}
-        {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
-        {% if members.size > 0 %}
-          <button type="button" class="btn-mood" aria-pressed="false">{{ name }}</button>
-        {% endif %}
-      {% endfor %}
-    </div>
-  </div>
+  {% comment %} `on-dark` on every dark stage -- #469's six emboss values, on
+     real content for the first time. {% endcomment %}
+  {% if ground == "dark" %}
+    <div class="devct-stage devct-stage--dark on-dark">
+  {% else %}
+    <div class="devct-stage devct-stage--light">
+  {% endif %}
 
-  <div class="drink-searches">
-    <div class="drink-filter drink-search drink-search--include">
-      <div class="drink-label-row drink-label-row--search">
-        <h2 class="drink-field-label"><span class="drink-field-label-text">Has to have</span></h2>
-        <input class="drink-search-input" type="text" autocomplete="off" placeholder="ingredient name…" value="lime" readonly />
-        <button type="button" class="btn-clear-filter">&times; clear</button>
+  {% if wantfilters == "yes" %}
+    <div class="drink-filters">
+
+      <div class="drink-filter drink-filter--chaos">
+        <div class="drink-label-row">
+          <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
+        </div>
+        <div class="drink-btns">
+          <button type="button" class="btn-chaos" aria-pressed="false">no chaos please</button>
+          <button type="button" class="btn-chaos" aria-pressed="false">I&rsquo;m open to chaos</button>
+        </div>
       </div>
-      <div class="drink-pool">
-        <button type="button" class="btn-pool is-on"><span class="btn-pool-label">{{ lit_include }}</span></button>
-        <button type="button" class="btn-pool btn-pool--word-match"><span class="btn-pool-label">lime cordial</span></button>
-        <button type="button" class="btn-pool"><span class="btn-pool-label">falernum</span><span class="btn-pool-via">Velvet Falernum</span></button>
+
+      <div class="drink-filter drink-filter--mood">
+        <div class="drink-label-row">
+          <h2 class="drink-field-label"><span class="drink-field-label-text">Mood</span></h2>
+          <button type="button" class="btn-clear-filter">&times; clear</button>
+        </div>
+        <div class="drink-btns">
+          {% for name in groups.mood %}
+            {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
+            {% if members.size > 0 %}
+              {% if name == lit_mood %}
+                <button type="button" class="btn-mood is-on" aria-pressed="true">{{ name }}</button>
+              {% else %}
+                <button type="button" class="btn-mood" aria-pressed="false">{{ name }}</button>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="drink-filter drink-filter--hassle">
+        <div class="drink-label-row">
+          <h2 class="drink-field-label"><span class="drink-field-label-text">Hassle</span></h2>
+        </div>
+        <div class="drink-btns">
+          {% for name in groups.hassle %}
+            {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
+            {% if members.size > 0 %}
+              <button type="button" class="btn-mood" aria-pressed="false">{{ name }}</button>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="drink-searches">
+        <div class="drink-filter drink-search drink-search--include">
+          <div class="drink-label-row drink-label-row--search">
+            <h2 class="drink-field-label"><span class="drink-field-label-text">Has to have</span></h2>
+            <input class="drink-search-input" type="text" autocomplete="off" placeholder="ingredient name…" value="lime" readonly />
+            <button type="button" class="btn-clear-filter">&times; clear</button>
+          </div>
+          <div class="drink-pool">
+            <button type="button" class="btn-pool is-on"><span class="btn-pool-label">{{ lit_include }}</span></button>
+            <button type="button" class="btn-pool btn-pool--word-match"><span class="btn-pool-label">lime cordial</span></button>
+            <button type="button" class="btn-pool"><span class="btn-pool-label">falernum</span><span class="btn-pool-via">Velvet Falernum</span></button>
+          </div>
+        </div>
+
+        <div class="drink-filter drink-search drink-search--exclude">
+          <div class="drink-label-row drink-label-row--search">
+            <h2 class="drink-field-label"><span class="drink-field-label-text">Leave out</span></h2>
+            <input class="drink-search-input" type="text" autocomplete="off" placeholder="ingredient name…" value="pine" readonly />
+            <button type="button" class="btn-clear-filter">&times; clear</button>
+          </div>
+          <div class="drink-pool">
+            <button type="button" class="btn-pool is-on"><span class="btn-pool-label">{{ lit_exclude }}</span></button>
+            <button type="button" class="btn-pool"><span class="btn-pool-label">pineapple rum</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="drink-filter drink-filter--name">
+        <div class="drink-label-row drink-label-row--search">
+          <h2 class="drink-field-label"><span class="drink-field-label-text">I know what I want</span></h2>
+          <input class="drink-search-input" type="text" autocomplete="off" placeholder="drink name…" readonly />
+        </div>
       </div>
     </div>
 
-    <div class="drink-filter drink-search drink-search--exclude">
-      <div class="drink-label-row drink-label-row--search">
-        <h2 class="drink-field-label"><span class="drink-field-label-text">Leave out</span></h2>
-        <input class="drink-search-input" type="text" autocomplete="off" placeholder="ingredient name…" value="pine" readonly />
-        <button type="button" class="btn-clear-filter">&times; clear</button>
-      </div>
-      <div class="drink-pool">
-        <button type="button" class="btn-pool is-on"><span class="btn-pool-label">{{ lit_exclude }}</span></button>
-        <button type="button" class="btn-pool"><span class="btn-pool-label">pineapple rum</span></button>
-      </div>
-    </div>
-  </div>
+    <p class="drink-count"><strong>4</strong> <span>survivors</span></p>
+  {% endif %}
 
-  <div class="drink-filter drink-filter--name">
-    <div class="drink-label-row drink-label-row--search">
-      <h2 class="drink-field-label"><span class="drink-field-label-text">I know what I want</span></h2>
-      <input class="drink-search-input" type="text" autocomplete="off" placeholder="drink name…" readonly />
-    </div>
-  </div>
-</div>
-
-<p class="drink-count"><strong>4</strong> <span>survivors</span></p>
-
-{% comment %} ============================ THE ROWS =========================== {% endcomment %}
-
-{% assign rows = "1:|2a:devct--gp-ink|2b:devct--gp-none|2c:devct--gp-solid|2d:devct--gp-strong|3a:devct--ink|3b:devct--header|3c:devct--block|3d:devct--bleed" | split: "|" %}
-
-{% for row in rows %}
-  {% assign parts = row | split: ":" %}
-  {% assign tag   = parts[0] %}
-  {% assign cls   = parts[1] | default: "" %}
-
-  <p class="devct-tag">{{ tag }}</p>
-  <ul class="drink-cards {{ cls }}">
-
+  <ul class="drink-cards {{ cardcls }} {{ titlecls }}">
   {% for drink in chosen %}
 
     {% assign glass_icon = "" %}
@@ -425,7 +463,7 @@ sitemap: false
 
         {% if drink.ingredients.size > 0 %}
           <p class="drink-card-ingredients">
-            {% assign shown = 0 %}{% for ing in drink.ingredients %}{% assign gcount = 0 %}{% assign hcount = 0 %}{% for g in ing.generic %}{% assign gcount = gcount | plus: 1 %}{% if not_on_cards contains g %}{% assign hcount = hcount | plus: 1 %}{% endif %}{% endfor %}{% assign hidden = false %}{% if gcount > 0 and gcount == hcount %}{% assign hidden = true %}{% endif %}{% unless hidden %}{% assign label = "" %}{% for g in ing.generic %}{% assign dn = card_names[g] | default: g %}{% if label == "" %}{% assign label = dn %}{% else %}{% assign label = label | append: " or " | append: dn %}{% endif %}{% endfor %}{% assign joined = card_name_joins[label] %}{% if joined %}{% assign label = joined %}{% endif %}{% if label == "" %}{% assign label = ing.item %}{% endif %}{% if label != "" %}{% if shown > 0 %} <span class="drink-card-sep">·</span> {% endif %}{% assign lc = label | downcase %}{% if lc == lit_include %}<span class="drink-card-ing drink-card-hit">{{ label }}</span>{% else %}<span class="drink-card-ing">{{ label }}</span>{% endif %}{% assign shown = shown | plus: 1 %}{% endif %}{% endunless %}{% endfor %}
+            {% assign shown = 0 %}{% for ing in drink.ingredients %}{% assign gcount = 0 %}{% assign hcount = 0 %}{% for g in ing.generic %}{% assign gcount = gcount | plus: 1 %}{% if not_on_cards contains g %}{% assign hcount = hcount | plus: 1 %}{% endif %}{% endfor %}{% assign hidden = false %}{% if gcount > 0 and gcount == hcount %}{% assign hidden = true %}{% endif %}{% unless hidden %}{% assign label2 = "" %}{% for g in ing.generic %}{% assign dn = card_names[g] | default: g %}{% if label2 == "" %}{% assign label2 = dn %}{% else %}{% assign label2 = label2 | append: " or " | append: dn %}{% endif %}{% endfor %}{% assign joined = card_name_joins[label2] %}{% if joined %}{% assign label2 = joined %}{% endif %}{% if label2 == "" %}{% assign label2 = ing.item %}{% endif %}{% if label2 != "" %}{% if shown > 0 %} <span class="drink-card-sep">·</span> {% endif %}{% assign lc = label2 | downcase %}{% if lc == lit_include %}<span class="drink-card-ing drink-card-hit">{{ label2 }}</span>{% else %}<span class="drink-card-ing">{{ label2 }}</span>{% endif %}{% assign shown = shown | plus: 1 %}{% endif %}{% endunless %}{% endfor %}
           </p>
         {% endif %}
       </div>
@@ -443,15 +481,15 @@ sitemap: false
   {% endfor %}
   </ul>
 
+  </div>
 {% endfor %}
 
 <script>
   // Fills every tape slot through HTF.chromeAsset -- the sanctioned route for
   // chrome artwork (§3), not a hand-built URL. Deterministic by card position,
   // so a reload gives the same comparison and a drink wears the same shape on
-  // every row. decorations.js's own tape() takes only the FIRST .tape-bg on a
-  // page and the header already has it, which is why these carry their own
-  // class and their own filler.
+  // every stage. decorations.js's own tape() takes only the FIRST .tape-bg on
+  // a page and the header already has it.
   (function () {
     var HTF = window.HTF;
     if (!HTF) return;
