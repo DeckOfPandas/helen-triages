@@ -256,6 +256,33 @@ sitemap: false
 .devct-stage--dark .drink-search--exclude .btn-pool.is-on { border-color: var(--dark-text); color: var(--dark-text); }
 .devct-stage--dark .drink-count                  { color: var(--dark-text); }
 
+/* ===========================================================================
+   ROUND 4 -- BIGGER TYPE ON DARK.
+
+   Helen: "Where we have white on black throughout the page I expect we'll need
+   the font to be bigger out of the box." She is right, and the reason is
+   irradiation: a light glyph on a dark ground blooms into its surround, so the
+   same type reads slightly heavier and slightly less crisp than it does as ink
+   on paper. The standard corrections are MORE SIZE and MORE TRACKING -- and,
+   counter-intuitively, LESS WEIGHT, not more. Everything here goes up in size
+   and tracking; nothing goes up in weight.
+
+   THE CARD GREW WITH IT. $card-height is 12.9rem and the anchors are fixed, so
+   bigger type inside an unchanged box just clips the second chip row. The dark
+   stages set 13.8rem. That is a real cost of going black and it is stated
+   rather than absorbed.
+   ======================================================================== */
+.devct-stage--dark .drink-cards      { --card-height-dark: 13.8rem; }
+.devct-stage--dark .drink-card       { height: 13.8rem; }
+.devct-stage--dark .drink-field-label { font-size: 1.52rem; letter-spacing: 0.09em; }
+.devct-stage--dark .btn-mood,
+.devct-stage--dark .btn-chaos        { font-size: 0.82rem; letter-spacing: 0.015em; }
+.devct-stage--dark .btn-pool         { font-size: 0.86rem; }
+.devct-stage--dark .drink-card-name  { font-size: 1.14rem; }
+.devct-stage--dark .drink-card-ingredients { font-size: 0.88rem; letter-spacing: 0.012em; }
+.devct-stage--dark .drink-card-mood  { font-size: 0.72rem; }
+.devct-stage--dark .drink-card-ship  { font-size: 0.76rem; }
+
 /* --- A: light ground, 2d cards. The incremental route, kept honest.
    The wash panel stays; the drawing goes to absinthe-deep at the drink page's
    own 1.6 stroke instead of the card's lightened 1, so the panel stops being a
@@ -299,13 +326,158 @@ sitemap: false
 .devct--block .drink-card-glass .glass-icon-line { stroke-width: 1.6; }
 .devct--block .drink-card-glass::after { background: transparent; }
 .devct--block .drink-card::after { background: var(--pink); height: 5px; }
+
+/* ===========================================================================
+   ROUND 4 -- TWO ACCESSIBILITY FIXES, MEASURED. tmp/a11y.py has the workings.
+   ======================================================================== */
+
+/* The ingredient separator was 2.42:1 on an ink card, under the 3:1 a
+   decorative mark wants. #6a6a72 is 3.34:1 and still recessive. */
+.devct-stage--dark .drink-card-sep { color: #6a6a72; }
+
+/* The goodness amber I picked for dark sat dE 9.9 from the absinthe under
+   PROTANOPIA, a hair under 9.13's bar of 10. Warming it to #F7913F buys
+   dE 15.8 and costs nothing -- it is still 7.73:1 on the card. Neither colour
+   carries meaning alone (the mark has its word, the glass is a drawing), so
+   this is margin rather than a fix, and margin is free here. */
+.devct-stage--dark .drink-card-ship-icon { color: #F7913F; }
+
+/* ===========================================================================
+   ROUND 4 -- C: answering "every sticky nightclub in a touristy part of
+   London". Helen is right, and the diagnosis is that white-on-black with no
+   other material IS the genre default: it is what you get when you invert and
+   stop. This site's answer to genericness everywhere else is MATERIAL -- the
+   tape, the drawings, the punched letters -- and C is the one option that
+   removed a material without putting one back.
+   ======================================================================== */
+
+/* C2  LET THE GLASS CARRY IT. One line, because #483 made $card-text-x and
+       $card-glass-scale custom properties: the panel, the card's padding, the
+       foot's left edge and the drawing's height all read them, so widening the
+       column moves five things in step and nothing else has to know. The card
+       stops being a menu line and becomes a drawing with words on it. */
+.devct--glass-hero { --card-text-x: 9.6rem; --card-glass-scale: 12.8rem; }
+.devct--glass-hero .drink-card-glass { color: rgba(48, 232, 140, 0.92); }
+.devct--glass-hero .drink-card-glass .glass-icon-line { stroke-width: 1.5; }
+
+/* C3  GIVE IT STRUCTURE. A menu is a list; a form is ruled. An absinthe rule
+       under the title and a magenta rule along the foot make the card a filled
+       -in thing rather than a line of a list, using the two colours that are
+       already the only rules. */
+.devct--ruled .drink-card-name {
+  border-bottom: 2px solid var(--absinthe);
+  padding-bottom: 0.42rem;
+  margin-bottom: 0.55rem;
+}
+.devct--ruled .drink-card-glass { border-right: 1px solid var(--ink-edge); }
+.devct--ruled .drink-card::after { background: var(--pink); height: 4px; }
+
+/* ===========================================================================
+   ROUND 4 -- D: black letters on white tape, made aggressive.
+   ======================================================================== */
+
+/* D2  PRESSED, NOT RAISED. `punched()` has taken a $style argument since it was
+       written and `pressed` has never had a consumer -- it inverts the light so
+       the letter reads STAMPED INTO the surface rather than standing off it.
+       On a white tape that is not a variation, it is the correct metaphor: a
+       label maker embosses INTO the tape. Helen: "I know we can't have the
+       light source as clearly highlighting onto the top left angles" -- this is
+       the answer to that, which is to stop trying and flip it. */
+.devct--pressed .devct-tape-word {
+  color: #141417;
+  text-shadow:  1.0px  1.0px 0 rgba(255, 255, 255, 0.95),
+               -1.0px -1.0px 0 rgba(0, 0, 0, 0.42);
+}
+
+/* D3  PRESSED, IN THE OTHER FACE WE ALREADY OWN. Helen asked for "a change of
+       font". IBM Plex Mono is $font-label, already self-hosted at 600 and 700,
+       already on the site (an ingredient amount, a note label) -- so this costs
+       no new file and breaks no rule. It is squarer and heavier in the stem
+       than Courier Prime, which is what "aggressive" wants. Tracking is up,
+       weight is not: 700 is the top face there is.
+       ADDING A TENTH FACE would be a real decision (13.10), not a tweak. */
+.devct--plex .devct-tape-word {
+  font-family: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #141417;
+  text-shadow:  1.0px  1.0px 0 rgba(255, 255, 255, 0.95),
+               -1.0px -1.0px 0 rgba(0, 0, 0, 0.42);
+}
+
+/* ===========================================================================
+   ROUND 4 -- E: black tape on a black card. Helen: "I've never seen anything
+   like this before. I'm hoping that's not for a good reason."
+
+   IT IS NOT. Black-on-black is a real and old idea -- blind embossing, spot
+   varnish, black-on-black print -- and it is rare because it is EXPENSIVE in
+   print and DELICATE on screen, not because it looks bad. The whole read has
+   to come from the edge: the bevel, the machine marks and the step between the
+   tape and what it sits on. So the three experiments each give the edge
+   something to work with, from a different direction.
+   ======================================================================== */
+
+/* E2  LIFT THE TAPE OFF THE CARD. The card goes darker and the tape's own ink
+       is brightened, so the tape is the lighter object -- a label laid ON the
+       card. Brightness on the SVG rather than a new file, which lifts the
+       machine marks and the bevel with it. */
+.devct--lift .drink-card { background: #0b0b0e; border-color: #212127; }
+.devct--lift .devct-tape-bg svg { filter: brightness(2.7); }
+
+/* E3  SINK IT INSTEAD. The card goes LIGHTER and the tape stays true black, so
+       the tape is the darkest thing on the card -- which is what a blind
+       emboss actually looks like, and the only one of the three that needs no
+       filter at all. */
+.devct--sunken .drink-card             { background: #26262c; border-color: #383840; }
+.devct--sunken .drink-card-ingredients { color: #d6d4cf; }
+.devct--sunken .drink-card-sep         { color: #7c7b84; }
+.devct--sunken .drink-card-mood        { color: #b3b2ba; border-color: #45454e; }
+.devct--sunken .drink-card-ship        { color: #d6d4cf; }
+.devct--sunken .drink-card-glass       { color: rgba(48, 232, 140, 0.92); }
+
+/* E4  LIGHT THE EDGE. Both grounds left alone; a one-pixel highlight along the
+       tape's top edge and a hard shadow under its bottom, which is the same
+       two-hard-copies logic the lettering and the tape's own bevel already use
+       (13.4.1), applied to the object instead of to the glyphs. drop-shadow
+       follows the SVG's alpha, so it traces the tape's real skewed outline
+       rather than a box. */
+.devct--litedge .devct-tape-bg {
+  filter: drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.30))
+          drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.95));
+}
+
+/* ===========================================================================
+   ROUND 4 -- P: THE PINK, LIFTED FOR A PROTANOPE. Measured, not guessed.
+
+   Hot magenta under protanopia is a dark blue. On PAPER that is 9.79:1 and
+   perfectly legible -- which is why nobody has ever had to think about it. On
+   an ink card it is 1.76:1, so on black the band that says "this is why you
+   are here" very nearly disappears for Simon.
+
+   #FF5CDA is the same hue lifted: 4.19:1 under protanopia, 5.82:1 under
+   deuteranopia, dE 7.4 from the true magenta -- a shift you can see side by
+   side and would not notice alone.
+
+   THE SPLIT WORTH KNOWING is that #FF00C8 still passes as TEXT on black
+   (5.59:1), and fails as text on paper (3.33:1). So on a dark ground the hue
+   needs LIFTING to be a band and needs nothing at all to be text, where on
+   paper it needed darkening to #C4009A to be text. Same hue, opposite
+   correction, and the bare colour is the identity in the middle.
+   ======================================================================== */
+.devct--pink-lift .drink-card-hit { text-decoration-color: #FF5CDA; }
+.devct--pink-lift .drink-card-mood.is-match,
+.devct--pink-lift .drink-card-mood--hassle.is-match {
+  background: rgba(255, 92, 218, 0.22);
+  border-color: #FF5CDA;
+}
+.devct--pink-lift .drink-card::after { background: #FF5CDA; }
 </style>
 
 <div class="devct-page">
 
 {% comment %} SIX STAGES. Fields, `~`-separated: tag | ground | card classes |
    title classes | whether this stage carries the filter block. {% endcomment %}
-{% assign stages = "A~light~devct--gp-strong~~yes|B~dark~devct--white-card~~yes|C~dark~devct--ink~devct--notape~no|D~dark~devct--ink~devct--whitetape~no|E~dark~devct--ink~~no|F~dark~devct--ink devct--block~~no" | split: "|" %}
+{% assign stages = "C1~dark~devct--ink~devct--notape~yes|C2~dark~devct--ink devct--glass-hero~devct--notape~no|C3~dark~devct--ink devct--ruled~devct--notape~no|D1~dark~devct--ink~devct--whitetape~no|D2~dark~devct--ink~devct--whitetape devct--pressed~no|D3~dark~devct--ink~devct--whitetape devct--plex~no|E1~dark~devct--ink~~no|E2~dark~devct--ink devct--lift~~no|E3~dark~devct--ink devct--sunken~~no|E4~dark~devct--ink devct--litedge~~no|P~dark~devct--ink devct--pink-lift~~no" | split: "|" %}
 
 {% for stage in stages %}
   {% assign f = stage | split: "~" %}
@@ -316,12 +488,17 @@ sitemap: false
   {% assign wantfilters = f[4] %}
 
   {% case tag %}
-    {% when "A" %}{% assign label = "light ground &middot; 2d cards &middot; black tape" %}
-    {% when "B" %}{% assign label = "BLACK ground &middot; white cards &middot; black tape" %}
-    {% when "C" %}{% assign label = "BLACK ground &middot; ink cards &middot; NO TAPE, white letters" %}
-    {% when "D" %}{% assign label = "BLACK ground &middot; ink cards &middot; WHITE TAPE, black letters" %}
-    {% when "E" %}{% assign label = "BLACK ground &middot; ink cards &middot; black tape as it is" %}
-    {% when "F" %}{% assign label = "BLACK ground &middot; ink cards &middot; solid absinthe panel" %}
+    {% when "C1" %}{% assign label = "no tape, white letters &mdash; as you saw it, with the bigger type" %}
+    {% when "C2" %}{% assign label = "&hellip; and the glass carries the card" %}
+    {% when "C3" %}{% assign label = "&hellip; and the card is ruled, not listed" %}
+    {% when "D1" %}{% assign label = "white tape, black letters &mdash; as you saw it" %}
+    {% when "D2" %}{% assign label = "&hellip; PRESSED: letters stamped into the tape, not raised off it" %}
+    {% when "D3" %}{% assign label = "&hellip; pressed, in IBM Plex Mono 700 &mdash; a face we already own" %}
+    {% when "E1" %}{% assign label = "black tape on a black card &mdash; as you saw it" %}
+    {% when "E2" %}{% assign label = "&hellip; tape LIFTED: card darker, tape brighter" %}
+    {% when "E3" %}{% assign label = "&hellip; tape SUNKEN: card lighter, tape the darkest thing" %}
+    {% when "E4" %}{% assign label = "&hellip; edge LIT: both grounds unchanged, the tape's rim lit" %}
+    {% when "P"  %}{% assign label = "E1 again, with the pink lifted to #FF5CDA for a protanope" %}
   {% endcase %}
 
   <p class="devct-tag">{{ tag }} &nbsp; {{ label }}</p>
