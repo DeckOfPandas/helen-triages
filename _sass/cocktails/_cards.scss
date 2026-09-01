@@ -166,6 +166,45 @@ $card-glass-scale: 10.4rem;
 // --- the words ---------------------------------------------------------------
 .drink-card-body { min-width: 0; }
 
+// =============================================================================
+// THE TITLE SITS ON PUNCHED TAPE — issue #469, settled with Helen 2026-09-01
+// =============================================================================
+// The header wordmark's own black label tape, at card size, carrying the drink's
+// name. Her idea, and the whole reason this palette went black: "I've been
+// flirting with the idea of letting the cocktail titles on cards be white on
+// black punched tape."
+//
+// FOUR THINGS ARE LOAD-BEARING and each was settled by her looking at it:
+//
+//   1. THE LETTERING IS TWO NEAR-WHITES WITH NO SOFTENING SHADOW. "At this
+//      smaller size, the boldness of the two near-whites with no softening
+//      shadow is exactly what we need." One tight pair, not the wordmark's four
+//      copies -- 1px is 5.9% of this type where the wordmark's 1.8px is 4.5% of
+//      its own, so the four-copy version reads as two overlapping letterforms
+//      down here. Whole pixels, because a fractional shadow offset antialiases
+//      the entire duplicate glyph and reads as floating rather than punched
+//      (§13.4.1).
+//
+//   2. IT ALSO WEARS THE STROKE, which the first version did not. Helen, on the
+//      filter headings: "the YOLO/MOOD etc you've done has outlines over the top
+//      edge of the letter. I think this helps both legibility and the raised
+//      effect. Please treat the title of cocktails the same way." It reads the
+//      same two custom properties every heading does, so it is literally the
+//      same treatment and not a copy of it. §13.4.1's split: STROKE SETS THE
+//      EDGE'S WEIGHT, SHADOW SETS ITS DIRECTION.
+//
+//   3. THE FILL IS BELOW PURE WHITE, and that is the wordmark's own hard-won
+//      reason (§13.9): a highlight copy needs somewhere brighter to be. #ECE9EA
+//      leaves it room; #ffffff does not, and the effect collapses into two
+//      overlapping letterforms.
+//
+//   4. THE TAPE IS A WHOLE OBJECT, never a fragment. It hugs a short title,
+//      caps at the panel for a long one, and the title ellipsises inside it. It
+//      used to be centred and clipped, so a long name showed the MIDDLE of a
+//      tape with both ends cut off.
+$card-tape-pad-y: 0.75em;   // gives a 32px black band around 10.4px capitals
+$card-tape-pad-x: 0.8em;    // the overhang past the lettering, both ends
+
 .drink-card-name {
   font-family: $font-headings;
   font-size: 1.08rem;
@@ -173,14 +212,107 @@ $card-glass-scale: 10.4rem;
   text-transform: uppercase;
   margin: 0 0 0.3rem;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+
+  // NOT `overflow: hidden`, and this is not a tidy-up. The tape's top edge is
+  // drawn one pixel ABOVE the tape by a drop-shadow, and this box is exactly
+  // the tape's height -- so hiding overflow here crops that highlight off.
+  // Nothing needs clipping: the tape caps its own width below.
+  overflow: visible;
+
+  // The paragraph's own strut would otherwise compete with the tape for the
+  // line's height. Zero it and the tape alone decides.
+  line-height: 0;
 
   a {
-    color: $color-text;
+    color: inherit;
     text-decoration: none;
-    &:hover { color: $color-electric-absinthe-deep; }
+    &:hover { color: #ffffff; }
   }
+}
+
+.drink-card-tape {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: $card-tape-pad-y $card-tape-pad-x;
+  vertical-align: baseline;
+
+  // THE TAPE OVERHANGS TO THE LEFT AND THE LETTERING ALIGNS WITH THE
+  // INGREDIENTS. Helen: "the tape extending leftwards past the left-hand edge
+  // of the ingredients lettering". Pulling the box left by exactly its own left
+  // padding does both at once -- the lettering lands on `.drink-card-body`'s
+  // edge, which is the ingredient line's edge, and the tape carries on past it.
+  //
+  // 0.8em is 14.6px against the $card-gutter of 15.2px between the glass panel
+  // and the text, so the overhang stops just short of the panel rather than
+  // touching it. That is the constraint on this value: raise it and the tape
+  // starts to sit on the drawing.
+  margin-left: -$card-tape-pad-x;
+  max-width: calc(100% + #{$card-tape-pad-x});
+}
+
+// THE BAND IS CENTRED BY MOVING THE ARTWORK, NOT THE WORDS.
+//
+// Every tape SVG insets its black polygon 16.47% from the top of its viewBox
+// and 12.94% from the bottom -- identical across all seven files, measured --
+// so the visible BAND is 70.59% of the box and its centre sits 1.765% of the
+// height BELOW the box's centre. Shifting the whole SVG up by exactly that puts
+// the band's centre on the box's centre, after which ordinary flex centring
+// places the lettering with no font metric involved.
+//
+// EARLIER VERSIONS COMPENSATED ON THE TEXT INSTEAD and it took three rounds to
+// get right, because that route needs Courier Prime's real ascent and cap
+// height and the face ships here as woff2 only. Correcting a fact about the
+// ARTWORK on the artwork needs no estimate at all. The general form is worth
+// carrying: compensating for object A by adjusting object B is how a one-line
+// fact becomes a standing source of bugs.
+.drink-card-tape-bg {
+  position: absolute;
+  left: 0;
+  top: -1.765%;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+
+  // A HAIRLINE ALONG THE RIM, AND THE BOTTOM IS NOT DECORATION. With the tape
+  // at its own black on a card only 4.22 of L* lighter, it has almost no fill
+  // contrast to be seen by -- so the shadow under its lower edge is doing half
+  // the work of saying an object is there. The top is 6%, which is where Helen
+  // settled it after a ladder from 30% down: "L06 is looking great."
+  //
+  // drop-shadow rather than a border, because it follows the SVG's own alpha
+  // and so traces the tape's real skewed outline instead of a rectangle. Same
+  // two-hard-copies logic §13.4.1 uses on glyphs, applied to the object.
+  filter: drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.06))
+          drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.95));
+
+  svg { width: 100%; height: 100%; display: block; }
+}
+
+.drink-card-tape-word {
+  position: relative;
+  z-index: 1;
+  display: block;
+  // A flex item will not shrink below its own content width without this, so
+  // the ellipsis would never fire and the tape would overflow the panel.
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+
+  color: #ECE9EA;
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+  text-shadow: -1px -1px 0 #fdfbfe,
+                1px  1px 0 rgba(5, 5, 5, 0.9);
+
+  // The last of it: capitals do not sit centred inside their own line box, and
+  // where they land needs the face's real ascent, descent and cap height.
+  // decorations.js measures those in the browser and sets this; absent, the
+  // lettering is merely centred on its box, which is close. See cardTapes().
+  transform: translateY(var(--tape-text-nudge, 0px));
 }
 
 // THE TAGLINE IS GONE FROM CARDS — #512 — and its rules go with it rather
