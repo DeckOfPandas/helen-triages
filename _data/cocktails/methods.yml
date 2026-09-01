@@ -38,6 +38,21 @@ canonical:
   shake:
     - "Shake all ingredients with ice."
     - "Shake all ingredients hard with ice."
+    # SHAKE WHAT IS IN THE SHAKER, after an earlier build step. Helen's ruling,
+    # 2026-09-01, on sapins-swizzle: "should retain 'shake with ice'". It is
+    # not drift -- it says something the line above does not, so by this file's
+    # own test (does the phrasing carry information?) it belongs here. Declared
+    # rather than left in the tail so the next census does not re-propose
+    # collapsing it: a settled question left looking unsettled gets asked again.
+    - "Shake with ice."
+    # AFTER A RINSE, and the rinse is the reason it is not "all ingredients":
+    # some of the spirit went into the glass and was discarded. Three drinks
+    # rinse, and tailspin and sazerac-death-and-co already said "the remaining
+    # ingredients" while caribbean-sazerac said "the rest" -- Helen's ruling,
+    # 2026-09-01, was to match the two. Both verbs are declared because the
+    # stir form has two live users and the shake form one; this is NOT the
+    # asymmetry noted under `proposals`, where the second form has no user.
+    - "Shake the remaining ingredients with ice."
     # The champagne exclusion is standardised because it is frequent -- eight
     # uses across shake and stir. The rest of the exclusion tail (Prosecco,
     # soda, bitters, a named rum) is open-ended and stays free text, which is
@@ -46,6 +61,7 @@ canonical:
 
   stir:
     - "Stir all ingredients with ice."
+    - "Stir the remaining ingredients with ice."   # after a rinse -- see shake
     - "Stir all ingredients other than the champagne with ice."
     - "Stir until cold."
     - "Stir."
@@ -69,6 +85,7 @@ canonical:
     - "Strain into an ice-filled glass."
     - "Fine strain into an ice-filled glass."
     - "Strain over ice."
+    - "Fine strain over ice."
     - "Strain over crushed ice."
 
   build:
@@ -95,46 +112,82 @@ canonical:
 # ingredients. Collapsing them into the plain canonical form would silently
 # change the drink. This is the trap that makes a fuzzy matcher the wrong tool
 # here and an explicit map the right one.
+# THE TWENTY MECHANICAL ROWS WERE APPLIED AND DELETED ON 2026-09-01, #630 --
+# 62 steps across 61 drinks, by tmp/apply_method_proposals.py, as text edits.
+# They were the "with" vs "over" pairs, a missing article, the glass named
+# twice, and two spellings of one exclusion word. Every one had sat here since
+# 2026-08-26 for Helen to reject, and none was.
+#
+# DELETING THEM IS HOW THIS FILE RECORDS THAT, and it is not optional: the
+# moment a drink stops saying the left-hand string,
+# test_every_proposal_still_matches_a_real_step goes red. Apply and prune are
+# one commit or the suite is broken between them. The two straw rows went the
+# same way on 2026-08-30 (#573), and the note at the bottom of this file
+# records that they were RESOLVED rather than rejected -- the same distinction
+# applies here.
 proposals:
 
-  # --- pure variance: "with" vs "over", an article, a stray word ------------
-  "Shake all the ingredients over ice.": "Shake all ingredients with ice."
-  "Shake all ingredients over ice.": "Shake all ingredients with ice."
-  "Shake all the ingredients hard over ice.": "Shake all ingredients hard with ice."
-  "Stir all the ingredients with ice.": "Stir all ingredients with ice."
-  "Stir all the ingredients over ice.": "Stir all ingredients with ice."
-  "Stir all ingredients over ice.": "Stir all ingredients with ice."
-  "Strain into chilled glass.": "Strain into a chilled glass."
-  "Strain into ice-filled glass.": "Strain into an ice-filled glass."
-  "Fine strain into chilled glass.": "Fine strain into a chilled glass."
-  "Fine strain into ice-filled glass.": "Fine strain into an ice-filled glass."
-  "Blend all ingredients together until smooth.": "Blend all ingredients until smooth."
-  "Add remaining ingredients.": "Add the remaining ingredients."
-  "Fill a pitcher half full of ice cubes.": "Fill the pitcher half full with ice cubes."
+  # EMPTY, 2026-09-01, and the key stays. An empty mapping says "nothing
+  # outstanding"; a missing one says nothing at all, and would switch off
+  # test_every_proposal_still_matches_a_real_step for whatever is proposed
+  # next. Same reasoning as garnish.yml's own empty block, and the same
+  # reasoning that keeps GLASSSLESS_ON_2026_08_27 asserted rather than deleted.
+  #
+  # THIS IS A WORKLIST, NOT A RATCHET. It empties and it will refill, so the
+  # guard asserts the KEY exists and never that the map is non-empty -- getting
+  # that backwards on garnish.yml made finishing the work a test failure, for
+  # one day, on 2026-08-31.
+  {}
 
-  # --- the glass named twice -------------------------------------------------
-  # `glass:` already carries it, and it draws the icon. Naming it in the step
-  # as well is the one case here where the phrasing looks informative and
-  # isn't.
-  "Fine strain into a chilled coupe.": "Fine strain into a chilled glass."
-  "Double strain into glass.": "Double strain."
-  "Strain into glass filled with crushed ice.": "Strain over crushed ice."
-  "Strain into a glass filled with crushed ice.": "Strain over crushed ice."
-
-  # --- one exclusion word, two spellings -------------------------------------
-  # "other than" wins on frequency: it is what the open-ended exclusions
-  # already use (the Prosecco, the bitters, the light aged overproof rum).
-  "Shake all the ingredients over ice, other than the champagne.": "Shake all ingredients other than the champagne with ice."
-  "Shake all the ingredients over ice, except for the champagne.": "Shake all ingredients other than the champagne with ice."
-  "Stir all the ingredients with ice, except for the champagne.": "Stir all ingredients other than the champagne with ice."
-
-  # --- QQ: shake WHAT? These follow a build step ----------------------------
-  "Shake with ice.": "QQ"
-  "Shake the rest with ice.": "QQ"
-  "Stir with ice.": "QQ"
-
-  # --- QQ: genuinely unclear -------------------------------------------------
-  "Fine strain with ice.": "QQ"
+# =============================================================================
+# HOW THE FOUR QQ ROWS WERE ANSWERED, 2026-09-01 -- the reasoning, not the rows
+# =============================================================================
+# Worth keeping because it is what a future short-form step needs, and because
+# the reason originally given for parking them was WRONG for two of the four.
+#
+# The comment used to say all four "follow an earlier build step, so they mean
+# shake WHAT IS IN THE SHAKER". That was reasoned from the STRING -- exactly
+# the mistake a fuzzy matcher would make, made by hand instead. Read per
+# instance, with the step above each one:
+#
+#   north-sea-oil "Stir with ice."     IT WAS THE FIRST STEP. Nothing had been
+#                                      built, so it did mean all ingredients.
+#                                      -> "Stir all ingredients with ice."
+#
+#   sapins-swizzle "Shake with ice."   follows "Add the remaining ingredients",
+#                                      so everything IS in the shaker by then.
+#                                      Helen: "should retain 'shake with ice'".
+#                                      -> UNCHANGED, and now canonical.
+#
+#   caribbean-sazerac "Shake the       follows a rinse. tailspin and
+#   rest with ice."                    sazerac-death-and-co already said "the
+#                                      remaining ingredients"; Helen: "match
+#                                      please." -> that form, now canonical.
+#
+#   smokestack-lightning "Fine         MEANINGLESS AS WRITTEN, and Helen named
+#   strain with ice."                  it: "I bet I meant 'fine strain over
+#                                      ice'." The drink said `coupe`, which
+#                                      holds no ice -- so the GLASS was the
+#                                      wrong field, not the step. Now
+#                                      `old fashioned` and "Fine strain over
+#                                      ice.", which is canonical beside the
+#                                      existing "Strain over ice."
+#
+# TWO THINGS GENERALISE, and they pull in opposite directions:
+#
+#   THE PRECEDING STEP IS THE WHOLE QUESTION for any short verb form. Two
+#   identical-looking rows went opposite ways on nothing but the line above
+#   them. Never decide one from its shape.
+#
+#   WHEN A STEP IS INCOHERENT, ASK WHICH FIELD IS WRONG. Smokestack's step
+#   read as a transcription fault for as long as the glass was assumed right.
+#   `glass:`, `garnish:` and the method all describe one serve, so an
+#   impossible instruction may be a correct instruction beside a wrong glass.
+#
+# "Stir with ice." IS DELIBERATELY NOT DECLARED, though its shake twin is: no
+# drink stirs after a build today. A future one should say it and be declared
+# then. That is a form with no user yet, not drift, and adding it now would be
+# machinery for a case that does not exist.
 
   # THE TWO STRAW PROPOSALS ARE GONE, 2026-08-30, #573 -- resolved rather than
   # rejected. They sat here as QQ because moving them to `to_serve` was "a
