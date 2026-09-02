@@ -17,6 +17,31 @@ and the schemas share almost nothing.
 
 ---
 
+## 0. How to hand this back
+
+Helen pastes what you write into a GitHub Issue on her private drafts
+repository, `helen-triages-cocktails-private`, titled `ingest: <slug>` and
+labelled `ingest`. A script there parses it, so the shape matters: anything
+missing is a rejection rather than a guess. `INGEST_INBOX_DESIGN.md` §6 is the
+reference and this is the short form.
+
+Four parts, in this order, and nothing else at the top level:
+
+1. `<!-- ingest v1 cocktail -->`, as the first non-blank line. Exactly that.
+2. **One** fenced `yaml` block, and only one — the complete file, front matter
+   and all, beginning `---`.
+3. A `## What I could not know` heading with your list under it. If there is
+   genuinely nothing, write "nothing"; the heading is never absent.
+4. A `## Fingerprint` heading, then ONE line: the title lowercased, then every
+   amount in build order, separated by ` | `. For the worked example in §9 that
+   is `jungle bird | 45 ml | 22.5 ml | 15 ml | 15 ml | 45 ml`.
+
+**The fingerprint is what compares the FORMULA rather than the name**, which is
+the whole of §6's Sazerac trap made mechanical, so the amounts must be the ones
+in the file, in the file's own order.
+
+---
+
 ## 1. What is different about a cocktail, and it is the whole document
 
 A food ingest can fill in nearly everything, because the vocabularies are small
@@ -95,6 +120,8 @@ meta:
 | `mood` | **Always `mood: []`.** The key is required and the value is DERIVED in her repo by a script. Never write a mood yourself. |
 | `garnish` | **A LIST.** `[]` means nobody has filled it in; `["no garnish"]` means the drink genuinely takes none. Vocabulary in §4. |
 | `ingredients` | The FULL list, untriaged, **in build order**. §3. |
+| `ingredients[].item` | What the SOURCE called the pour, brand and all. **A drafts-only field** — §3. |
+| `ingredients[].character` | Why a drink wants a particular bottle. **Never yours to write** — §3. |
 | `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. |
 | `to_serve` | Presentation, not a further instruction. `"Straw."`, `"Two straws."` A terse noun phrase, or `""`. |
 | `notes` | A bare string, or `{label, text}`. Use one to record what the source could not give you. |
@@ -186,6 +213,36 @@ times apart and a wrong guess looks exactly as confident as a right one.
 
 **`item` is what the source called it, brand and all.** `generic` is the
 category, and it is always `QQ` from you. Do not put the quantity in `item`.
+
+### `item` is a transcription field, and it lives only in the drafts
+
+**It does not render on a published drink page, and a promoted drink will not
+carry it.** The line a reader sees is built from `generic` and `suggestion`;
+`item` is the source's own wording, held so that Helen can see what the page
+said when she comes to fill those two in. She deletes it at that point, which
+is the same moment she stops guessing about the bottle.
+
+So: **write it on every pour, and do not treat it as the answer.** A file whose
+`item` fields are perfect and whose `generic` fields are all `QQ` is exactly
+what this document is asking for. A file that resolved the categories and lost
+the source's words is worse, in both directions at once.
+
+### `character` — the field that is never yours
+
+`character` is the flavour property that made a drink want THIS bottle:
+`blackstrap` on a rum, `peated` on a whisky, the botanical a gin pushes. Helen,
+2026-08-24: *"Blackstrap is only ever given as a character for another rum, like
+this: Moderately aged (character: blackstrap)."* So it rides ALONGSIDE a real
+`generic` and never replaces one — a pour still needs its category, and the
+character says why that particular bottle.
+
+**Which means you cannot write one, because you are not writing `generic`
+either.** A character with no category under it is a property attached to
+nothing, and for rum and whisky the vocabulary is closed and declared in her
+repository, where you cannot see it. Leave the field out. If the source names a
+property beside a pour, it is already in `item` where you transcribed it, and
+one line in your list is what turns it into a `character` when she makes the
+drink.
 
 ---
 
@@ -384,6 +441,7 @@ sauté · sautés · sautéed · soufflé · soufflés · velouté
 - **Never invent `meta.ship`** — that is Helen's rating of a drink she has
   drunk.
 - **Never write a `mood:`** — derived or hers.
+- **Never write a `character:`** — it hangs off a `generic` you are not writing.
 - **Never leave a US unit**, and never convert a non-volumetric one.
 - **Never write a bare number as an amount** without flagging it.
 - **Never name the glass inside a method step.**

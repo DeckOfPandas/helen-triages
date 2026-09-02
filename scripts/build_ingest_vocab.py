@@ -164,12 +164,23 @@ def _stars() -> str:
 
 
 def _source_types() -> str:
-    """The eight `source_type` words.
+    """The eight declared citation types -- `VALID_TYPES`, imported above.
 
     `VALID_TYPES` is a set, so the order has to come from somewhere: sorted,
     because any other order here would be a preference typed into this script
     and the table below the block already teaches the meaningful grouping
     (published work takes "Adapted from", a bare label does not).
+
+    THE BLOCK IS NAMED `source_types`, PLURAL, AND THAT IS LOAD-BEARING.
+    `test_invisible_keys_are_really_invisible` in test_front_matter.py scans
+    every file under `scripts/` for the singular key name and fails if one
+    appears, because the whole basis for exempting that key from the proofread
+    rule is that nothing on the render surface reads it. This script does not
+    read it off a recipe -- it renders the list of values a citation may
+    declare, from the suite -- but the guard is deliberately blunt and its
+    message says not to narrow it. Naming the block in the plural keeps it
+    honest without arguing with it. See SOURCE_ATTRIBUTION_SPEC.md for the
+    field itself.
     """
     return _dots(sorted(VALID_TYPES), tick=True)
 
@@ -273,7 +284,7 @@ def renderers() -> dict:
     """
     out = {
         "stars": _stars,
-        "source_type": _source_types,
+        "source_types": _source_types,
         "accents": _accents,
         "no_accent": _no_accents,
         "glass": _glass_spellings,
@@ -298,7 +309,7 @@ def required_blocks() -> dict:
     """
     tags = {f"tags:{group}" for group in _food_taxonomy()["tags"]}
     return {
-        FOOD_DOC: tags | {"stars", "source_type", "accents", "no_accent"},
+        FOOD_DOC: tags | {"stars", "source_types", "accents", "no_accent"},
         COCKTAIL_DOC: {
             "glass", "glass_corrections", "garnish", "method", "measures",
             "accents",
