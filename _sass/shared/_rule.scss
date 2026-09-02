@@ -180,40 +180,33 @@ $emboss-vars-emitted: false !default;
     --emboss-offset-lg:   #{$emboss-offset-large};
   }
 
-  // Put this on any SECTION whose type is light on a dark ground. It is a
-  // context, not a component: it styles nothing itself, it only re-points the
-  // six values every punched rule already reads.
+  // `.on-dark` LIVED HERE AND IS GONE, 2026-09-02, issue #469 -- and it is
+  // worth knowing that it WORKED rather than that it failed.
   //
-  // NOTE FOR WHOEVER ADDS THE FIRST REAL ONE, AND IT IS NOT GOOD NEWS. This
-  // class has NO CONSUMER ANYWHERE. It had exactly one -- a swatch on
-  // /dev/emboss/ -- and that went on 2026-08-26 when the heading dials were
-  // deleted from that page, so these numbers are now live CSS that nothing
-  // renders and nobody can see without re-adding a swatch. They were tuned
-  // against that swatch rather than against real content, so they were a
-  // considered starting point and not a verified result even while it existed.
+  // It was a context class re-pointing four of the six values above, so any
+  // SECTION of a light page could carry light type on a dark ground. It never
+  // had a consumer: one swatch on /dev/emboss/, deleted 2026-08-26, and then
+  // nothing. Its values were finally exercised for real on the dev stages where
+  // Helen judged the black cocktails headings, she approved them, and they are
+  // now `_sass/cocktails/_rule.scss`'s defaults.
   //
-  // DO NOT DELETE IT. This comment told you to, from 2026-08-26 until
-  // 2026-09-01: "if you are reading this and there is still no dark section,
-  // deleting the whole block is a reasonable call." Helen, asked that exact
-  // question on 2026-09-01, gave the reason it is now wrong -- "I've been
-  // flirting with the idea of letting the cocktail titles on cards be white on
-  // black punched tape". That is the first real consumer this class has ever
-  // been in line for, so the instruction is withdrawn rather than merely stale.
-  // Issue #469 carries the three things that bite the day it lands.
+  // WHICH IS THE FINDING, AND IT IS WHY THE CLASS GOES RATHER THAN GAINING A
+  // USER: a dark SECTION on a light site wants a context class; a dark SITE
+  // wants its palette inverted, after which every shared partial follows for
+  // free and the class has nothing left to do. The four numbers are safer in a
+  // palette that renders on every page than in a class nothing renders.
   //
-  // An instruction in a comment is the one kind of staleness that costs
-  // somebody work rather than merely misinforming them -- it sends the next
-  // reader to do a thing. HANDOVER 9.13 records the same shape from the other
-  // direction, three comments asserting a curve the template never had.
+  // The mechanism is still the right one if a dark section ever appears on
+  // FOOD: custom properties inherit, so one class re-points four values at any
+  // nesting depth in any partial including ones written later, where a
+  // `.on-dark h1 { ... }` block would have had to out-specify thirteen
+  // component rules and would have silently missed the fourteenth. Recover it
+  // with `git show 0b350c3:_sass/shared/_rule.scss`.
   //
-  // This is NOT dark mode, which is a separate and much larger question Helen
-  // has explicitly deferred.
-  .on-dark {
-    --emboss-stroke-w:  0.010em;
-    --emboss-stroke-c:  #{lighten($color-text, 40%)};
-    --emboss-shadow:    #{rgba($color-text, 0.06)};
-    --emboss-offset-lg: 2px;
-  }
+  // Two things it never reached, recorded because they are still true of any
+  // successor: `shared/_base.scss` hardcodes `$color-text` on plain h1/h2/h3,
+  // and `.site-logo-word`'s stroke WIDTH is a Sass value. The second is fixed
+  // -- that element reads custom properties now -- and the first is not.
   $emboss-vars-emitted: true !global;
 }
 
