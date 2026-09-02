@@ -3753,15 +3753,31 @@ def test_every_proposal_still_matches_a_real_step():
     NOT the reverse direction. A method step with no proposal is the normal
     case -- it is either already canonical or part of the informative tail that
     #290 explicitly does not touch.
+
+    AN EMPTY `proposals` IS THE GOAL, NOT A FAULT, and this test asserted the
+    opposite until 2026-09-01. It required the map to be NON-EMPTY, so clearing
+    the last row -- the entire point of #630 -- turned the work into a red
+    suite. `proposals` is a WORKLIST: rows are resolved by deletion, in either
+    direction, so a full map is the temporary state and an empty one is the
+    settled one.
+
+    THE IDENTICAL BUG WAS FOUND AND FIXED IN garnish.yml's TWIN ON 2026-08-31,
+    written up in HANDOVER 12 as "a ratchet list and a worklist look identical
+    and want opposite assertions" -- and this sibling was never checked. A
+    lesson applied to one instance of a pattern and not swept for the rest is
+    half a fix. What is asserted now is that the KEY EXISTS, which is the thing
+    whose silent loss would switch this check off for whatever is proposed
+    next; GLASSLESS_ON_2026_08_27 is the genuine ratchet next door and asserts
+    emptiness, in the opposite direction, correctly.
     """
     _require_whole_collection("methods.yml's proposal list")
     spec = _methods()
-    proposals = spec.get("proposals") or {}
-    assert proposals, (
-        "methods.yml lists no proposals. If every one has been applied and "
-        "pruned, delete this test deliberately rather than letting it pass "
-        "while checking nothing."
+    assert "proposals" in spec, (
+        "methods.yml has no `proposals` key at all. An EMPTY map is the "
+        "settled state and is fine; a MISSING one silently switches this "
+        "check off for whatever gets proposed next. Restore `proposals: {}`."
     )
+    proposals = spec.get("proposals") or {}
     live = {s for _, s in _all_method_steps()}
     assert live, "no drink has a method -- the loader has gone stale."
     spent = sorted(set(proposals) - live)
