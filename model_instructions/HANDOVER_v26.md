@@ -56,7 +56,9 @@ from a commit message written for exactly this purpose.
 > instead. §10 is worth reading too, but it is not the one being recommended
 > here.)
 
-**Two companion documents, and they point in opposite directions.**
+**Three companion documents in two kinds, and the kinds point in opposite
+directions.** Run `ls model_instructions/` rather than trusting this sentence —
+it has been wrong before, and the count is a fact about the repo today.
 
 **`SOURCE_ATTRIBUTION_SPEC.md`** is the full contract for `source` and
 `source_type` — the eight types, the exact string shape each one dictates, and
@@ -3446,21 +3448,19 @@ rejected**, and a later pass applies only what survives. Do not turn this into
 an enforcing test without asking; a check that failed on a non-canonical step
 would be enforcing a decision she has not made.
 
-> **THE PASS HAS NOT HAPPENED, AND THE FILE IS THE OLDEST UNPRUNED THING HERE.**
-> Re-measured 2026-08-31 rather than quoted: **308 step uses, 161 distinct, 110
-> already canonical, 24 proposals outstanding (20 with a suggested form, 4 QQ),
-> 62 steps a clean apply would move.** 120 distinct steps match neither the
-> canonical set nor a proposal, so this is a partial map and always was.
+> **THE PASS HAS HAPPENED — 2026-09-02, #630 closed.** This box said it had not
+> from 2026-08-26 until then, and called the file "the oldest unpruned thing
+> here". It is pruned: `proposals` is **empty**, 65 steps were applied across 64
+> drinks, and the collection went from 161 distinct method steps to **146**.
+> Re-measured after the merge rather than quoted.
 >
-> **§9.12.1 is the worked precedent now.** `garnish.yml` went from census to a
-> pruned, EMPTY `proposals` block in two days, on the same shape — measure,
-> collapse only what carries no information, propose the rest, let Helen rule,
-> delete each row in whichever direction it went. Do that here rather than
-> reinventing the method. The 20 resolvable rows are the mechanical kind; the 4
-> QQs are the dangerous kind and are why a fuzzy matcher is the wrong tool.
->
-> **Tracked as #630**, with the measurement in it, so the next reader does not
-> re-derive the census to find out whether it is worth doing.
+> **`proposals: {}` IS THE SETTLED STATE, NOT AN EMPTY FILE.** Both this and
+> `garnish.yml` empty out BY DESIGN — that is what "resolved by deletion" means
+> — so a full map is the temporary state. The key stays and its guard asserts
+> the KEY exists rather than that it has rows, which is the one thing whose
+> silent loss would switch the check off for whatever is proposed next. §12
+> carries the general form: **a ratchet list and a worklist look identical and
+> want opposite assertions.**
 
 **The four QQs are where a naive collapse would have changed a drink**, and they
 are the case against the fuzzy matcher that is the obvious alternative here.
@@ -3955,10 +3955,29 @@ everything after M and greets you with the same drink every time — the
 
 #### The card — `_cards.scss`
 
-Horizontal: the glass drawn large and pale down a fixed left column, words
-beside it. Chosen over a vertical card and over a typographic tile because it is
-the only one with room for a full ingredient line, which the index needs — you
-can search by ingredient, so a card must be able to show why it matched.
+Horizontal: the glass drawn large down a fixed left column, words beside it.
+Chosen over a vertical card and over a typographic tile because it is the only
+one with room for a full ingredient line, which the index needs — you can search
+by ingredient, so a card must be able to show why it matched.
+
+**THERE IS NO PANEL BEHIND THE GLASS, since 2026-09-02.** The column is still
+exactly `$card-text-x` wide and still holds the drawing; what has gone is the
+tinted field it used to sit on. The drawing is `$color-electric-absinthe` and
+the card shows through. Helen chose it against three darker and greyer fields on
+the real index, and two things made the case:
+
+- **the green wash was the lightest thing on a card.** L\* 19.40, against the
+  card's own border at 18.18 and the card itself at 7.85 — a bright field on a
+  site whose premise is black on black. It arrived as a 10% tint that made sense
+  on paper and survived the inversion as a value rather than as a decision.
+- **the arrangement was backwards.** This section's own opening claim is that
+  the glass drawings carry the personality food gets from colour; a near-white
+  glass on a green field is the opposite of that, with the field carrying the
+  colour and the drawing carrying none.
+
+One `color` declaration on `.drink-card-glass` reaches every glass, because the
+artwork strokes with `currentColor` (§3) — including the three fill-based
+drawings, which a rule on `.glass-icon-line` would have missed.
 
 **Every anchor is fixed, and that is the design rather than a side effect.**
 Helen: the title starts in the same place on every card, and the goodness mark
@@ -3968,8 +3987,10 @@ the foot somewhere different on every card, and a vertically-centred text block
 moves the title. So: fixed height, body anchored top-left, foot pinned to the
 bottom and out of flow.
 
-**The cost is clamping and it is not avoidable.** Two lines each for tagline and
-ingredients, two rows of mood chip. A rigid grid buys its rigidity with
+**The cost is clamping and it is not avoidable.** Two lines of ingredients and
+two rows of mood chip — the tagline went with #512, so this said "two lines each
+for tagline and ingredients" describing an element the card no longer has. A
+rigid grid buys its rigidity with
 clamping; the alternatives are a card whose height varies with mood count
 (unpinning every anchor) or no moods on cards. Helen named the trade first:
 "it's a shame to lose the card proportion but I can't think of another way."
@@ -3979,17 +4000,31 @@ is exactly that wide, and the body, the foot and the under-mark all derive from
 it. One value moves four things together and they cannot drift apart.
 
 **The framing and the hover took eleven and four candidates respectively.** What
-won: a tinted glass column with a softened rule in the home green along its bottom edge, no
+won: a glass column marked by a rule in the home green along its bottom edge, no
 vertical rule (eight of those down a page is a lot of signal for decoration);
-and on hover, that rule plus the panel's top edge going to full strength, so the
-column is bracketed. **Both hover marks are painted strips, not borders** — a
-border would eat into the column's fixed height and nudge the glass, and the one
-rule the hover has is that nothing moves.
+and on hover, that rule plus the column's top edge going to full strength, so
+the column is bracketed. **Both hover marks are painted strips, not borders** —
+a border would eat into the column's fixed height and nudge the glass, and the
+one rule the hover has is that nothing moves.
+
+**The bottom rule is full-strength absinthe now, not a mix.** It was
+`mix($color-electric-absinthe, $color-surface, 55%)`, which read as a pale green
+while there was a green panel beside it to belong to; with the panel gone it is
+the only green on a resting card, and a diluted one reads as a leftover rather
+than a mark.
 
 **Helen asked for "a very subtle lightening of the white part of the background"
-and that is not available**: a card is `$color-surface` on `$color-paper`, so
-its white is already the brightest thing on screen with nowhere lighter to go.
-Worth knowing before promising it on any light-ground design.
+and it was not available**: a card was `$color-surface` on `$color-paper`, so
+its white was already the brightest thing on screen with nowhere lighter to go.
+
+**THAT CONSTRAINT IS GONE AND ITS OPPOSITE IS NOW TRUE.** Since the inversion a
+card is `#17171a` on `#0e0e10` — DARKER than the page — so a hover could lighten
+it, and there is room in both directions. The hover deliberately still does not:
+the brackets are what move, because nothing on this card is allowed to. Kept
+here because **the lesson survives the reversal** — before promising a subtle
+lightening on any design, check which end of the range the surface is already
+sitting at, since on a light ground it is the answer and on a dark one it is not
+even the question.
 
 #### The goodness mark
 

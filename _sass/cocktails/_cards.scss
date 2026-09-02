@@ -102,9 +102,11 @@ $card-glass-scale: 10.4rem;
 }
 
 // --- the glass column --------------------------------------------------------
-// PALE, LARGE, AND TINTED BEHIND. Its width IS $card-text-x, so the drawing can
-// never push the title along — the same failure _cocktail.scss's 3.2rem cap
-// prevents on a drink page, at a much bigger scale.
+// LARGE, IN THE HOME COLOUR, AND ON NOTHING. This said "pale, large and tinted
+// behind" until 2026-09-02; the tint is gone and the drawing is no longer pale.
+// Its width IS $card-text-x, so the drawing can never push the title along —
+// the same failure _cocktail.scss's 3.2rem cap prevents on a drink page, at a
+// much bigger scale.
 .drink-card-glass {
   position: absolute;
   left: 0;
@@ -154,8 +156,11 @@ $card-glass-scale: 10.4rem;
     overflow: visible;
   }
 
-  // A lighter stroke than a drink page's: this is a wash behind type, and the
-  // page's own weight would read as a second drawing competing with the words.
+  // A lighter stroke than a drink page's. The reason has changed with the
+  // panel: it used to be that this was "a wash behind type", which it is not
+  // any more -- there is no wash. What still holds is the other half, that the
+  // drink page's own weight would read as a second drawing competing with the
+  // words, and this one sits beside a title rather than being the hero.
   .glass-icon-line { stroke-width: 1; }
 }
 
