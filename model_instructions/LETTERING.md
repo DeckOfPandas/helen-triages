@@ -91,8 +91,8 @@ on almost-but-not-quite the same ratio before either was named).
 
 | tier | where | stroke width | offset |
 |---|---|---|---|
-| display | HELEN TRIAGES only | 0.016em (`$emboss-stroke`) | 1px (`--emboss-offset`) |
-| heading | every heading ≥ 1rem | 0.016em | 1px, or `--emboss-offset-lg` for the two display-size headings |
+| display | HELEN TRIAGES, and the recipe title (`.recipe-title-text`, which the reference-page titles share) | 0.016em (`$emboss-stroke`) | 1px (`--emboss-offset`); the title passes `--emboss-offset-lg` |
+| heading | every other heading ≥ 1rem | 0.016em | 1px, or `--emboss-offset-lg` for the 1.8rem section headings |
 | label | every punched element < 1rem | 0.016em | n/a — no shadow |
 | plain | no edge at all | 0 | n/a |
 
@@ -172,7 +172,7 @@ caller that genuinely wants the inverted read.
 |---|---|---|---|
 | `.site-logo-top` (HELEN TRIAGES) | `shared/_layout.scss:521` | 2rem | **display** |
 | `h1, h2, h3` (unstyled fallback) | `shared/_base.scss:69` | browser default (≥1rem) | heading |
-| `.recipe-title-text` | `food/_recipe-header.scss:266` | 2.2rem | heading (offset-lg) |
+| `.recipe-title-text` | `food/_recipe-header.scss:269` | 2.2rem | display (offset-lg) — Helen, later the same day: "recipe title goes hard like the wordmark" |
 | `.recipe-section-heading` | `food/_recipe-header.scss:430` | 1.8rem | heading (offset-lg) |
 | `.recipe-meta li strong` (SERVES/PREP/COOK) | `food/_recipe-header.scss:358` | 0.85rem | label |
 | `.category-label` (index filter heading) | `food/_category-labels.scss:136` | 1.05rem | heading |
@@ -374,3 +374,8 @@ a punched element:
   6. "FAQ headings need to be darker, possibly simply matching SERVES / PREP
      / COOK even though they're on different pages" — `.about-faq-item h3`'s
      own label-tier override, `food/_about.scss:241`.
+  7. Later the same evening, on Beef Wellington at 4019: "recipe title goes
+     hard like the wordmark please, thanks for letting me change my mind" —
+     `.recipe-title-text` moves from heading to display, so the page runs
+     three strengths of one construction: hard on wordmark and title, soft on
+     section headings, edge only below 1rem.

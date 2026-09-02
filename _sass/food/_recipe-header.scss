@@ -255,15 +255,18 @@ article.recipe a:not(.badge) {
   // so the raised read this treatment exists for was barely present at the
   // one size it should be most obvious. See shared/_rule.scss.
   //
-  // HEADING TIER, WITH THE LARGE OFFSET, 2026-09-02. This is one of the two
-  // headings that pass $emboss-offset-large explicitly rather than taking the
-  // tier's own default -- see @include lettering() in shared/_rule.scss for
-  // why the argument survived the wordmark's 2px going away. The stroke and
-  // shadow colours themselves moved with the tier: a much darker near-black
-  // stroke and a mid-grey highlight, replacing the old --emboss-stroke-c
-  // (food's soft $color-label-stroke) that used to sit under every heading
-  // and every small label alike. See LETTERING.md.
-  @include lettering(heading, var(--emboss-offset-lg));
+  // DISPLAY TIER, WITH THE LARGE OFFSET, 2026-09-02. The title shipped on the
+  // heading tier for an hour under "T2 wordmark, T1 large headings", then
+  // Helen, looking at Beef Wellington: "recipe title goes hard like the
+  // wordmark please". So the page has three strengths of one construction --
+  // hard on the wordmark and the title, soft on the 1.8rem section headings,
+  // edge only below 1rem -- and the title is the only element besides HELEN
+  // TRIAGES on the display tier. The reference-page titles share this class
+  // and come with it. It still passes $emboss-offset-large explicitly rather
+  // than taking the tier's default; see @include lettering() in
+  // shared/_rule.scss for why that argument outlived the wordmark's 2px.
+  // See LETTERING.md.
+  @include lettering(display, var(--emboss-offset-lg));
   padding: 0;
   @include overlapping-rule-double(
     $color-bright-magenta,
