@@ -64,22 +64,45 @@ the date rule that separates a `publication` from a `website`. §4 summarises it
 and deliberately does not repeat it. It exists because ingestion sessions need
 the citation rules without reading 3,500 lines of this.
 
-**`INGEST_ONE_RECIPE.md` is written for a Claude that does NOT have this
-repository** — added 2026-09-01, at Helen's request, for the case where she
-finds a recipe in the wild and pastes it into claude.ai with no checkout, no
-tests and no `_data/`. It stands alone on purpose: the closed vocabularies
-(22 tags, 14 star ingredients, the eight citation types) are small enough to
-embed verbatim, and everything else that file needs is a rule rather than a
-lookup. **Its scope is one food recipe.** Cocktails are deliberately out —
-that schema needs `ingredients.yml`, `bottles.yml`, `glasses.yml`,
-`methods.yml` and `garnish.yml`, which do not embed.
+**`INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md` are written for a Claude
+that does NOT have this repository** — added 2026-09-01 and 2026-09-02, at
+Helen's request, for the case where she finds something in the wild and pastes
+it into claude.ai with no checkout, no tests and no `_data/`. Each hands back a
+draft file plus a short "what I could not know" list.
 
-**Do not let the two drift.** If §4's schema, §5's house style, §7's taxonomy or
-the attribution spec changes, that file needs the same edit — it is the only
-place in the repo where those rules are written out a second time, and it was
-built that way knowingly, because the alternative was that Helen gets nothing
-useful back from a session with no repo. It carries no reasoning and no history,
-only the rules, which is what keeps the duplication small enough to maintain.
+They stand alone because the closed vocabularies are small: 22 tags and 14 star
+ingredients for food; 23 glasses, 42 garnishes and 28 canonical method steps
+for drinks. Everything else either file needs is a rule rather than a lookup.
+
+**THE COCKTAIL ONE LEAVES `generic` AND `suggestion` AS `QQ`, ALWAYS, and the
+reason is not size.** 224 generics would embed fine. It is that **a bottle's
+category is not derivable from the ingredient printed beside it** (§9.3.1,
+#314), so a guess is an invention in the field the cards, the search and the
+drink page all read. It is also already Helen's standing ruling for a photo
+ingest: *"I will update these when I make the drinks, so QQ is right."*
+`mood` is `[]` for a different reason — it is DERIVED, by
+`scripts/derive_cocktail_moods.py --write`, so hand-writing one is reverted on
+the next run.
+
+**THIS PARAGRAPH SAID COCKTAILS WERE OUT OF SCOPE BECAUSE FIVE DATA FILES "DO
+NOT EMBED", AND THAT WAS WRONG — measured 2026-09-02 rather than assumed.**
+Four of the five are between 41 and 1,034 characters. Only `bottles.yml` and
+the generics are large, and those two were never candidates anyway for the
+reason above. **The estimate was made from the number of files rather than
+their size**, which is §11.2 in one line.
+
+**Do not let the three drift.** If §4's schema, §5's house style, §7's taxonomy,
+§9.3's schema, the garnish or method vocabularies, or the attribution spec
+changes, the standalone docs need the same edit — they are the only place in
+the repo where those rules are written out a second time, and they were built
+that way knowingly, because the alternative was that Helen gets nothing useful
+back from a session with no repo. **`tmp/check_doc_example.py` and
+`tmp/check_cocktail_doc.py` are the guard**: each extracts the worked example
+from its document, parses it, checks it against the live `_data/` vocabularies,
+and (for the cocktail one) re-checks every garnish, glass and method step the
+document PRINTS against what the collection declares. Both found real faults on
+their first run. Neither is in `tests/`, which is a gap worth closing the day
+either document is edited by someone who did not write it.
 
 **This paragraph said "No companion documents" until 2026-08-21**, having been
 written before the first spec existed and never revisited — while §4, four
