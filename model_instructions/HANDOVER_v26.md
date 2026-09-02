@@ -843,7 +843,7 @@ last touch" is unchanged: a trivial fix she requests, which Claude makes with
 `proofread: false` in the same commit, and she re-reads the affected line and
 sets `true` herself. The cocktail side of the same ruling (all three flags,
 same names, same order, on every drink) is in the plan this came from:
-`tmp/ARCHITECTURE_PLAN_2026-09-02.md` while it lives there, workstream 2.
+`model_instructions/ARCHITECTURE_PLAN_2026-09-02.md`, workstream 2.
 When the plugin change lands, rewrite the paragraph above this one, rename
 the plugin so its name says what it gates, and delete this notice.
 
