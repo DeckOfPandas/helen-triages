@@ -164,9 +164,20 @@ ingredients:
 > `"15 ml"`, `¼ oz` → `"7.5 ml"`, `2 oz` → `"60 ml"`.
 
 **Non-volumetric amounts are NOT converted and must not be.** `"2 dashes"`,
-`"1 drop"`, `"1 barspoon"`, `"1 pinch"`, `"1 whole egg"`, `"1 sugar cube"`,
-`"top"` — these have no millilitre figure and inventing one is worse than
-leaving them.
+`"1 drop"`, `"1 pinch"` — these have no millilitre figure and inventing one is
+worse than leaving them. These are the units her suite knows, and an amount
+whose unit is not one of them (and is not `ml`, `cl`, `oz` or `tsp`) fails a
+test rather than rendering:
+
+<!-- vocab:measures start -->
+`dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` · `each` ·
+`leaf` · `leaves` · `sprig` · `strip` · `g`
+<!-- vocab:measures end -->
+
+So `"1 barspoon"` and `"1 sugar cube"` are not yet readable, however sensible
+they look. Write the source's own words, and say in your list that the unit is
+undeclared — that is a one-line data edit for Helen, and much cheaper than a
+figure you invented.
 
 **NEVER WRITE A BARE NUMBER.** An amount with no unit cannot be read. If the
 source really gives one, write it as it stands **and add a note saying the
@@ -185,45 +196,58 @@ fits, use the source's own words and flag it in your list.
 
 ### `glass` — use these spellings
 
-`coupe` · `old fashioned` · `double old fashioned` · `highball` · `collins` ·
-`flute` · `nick and nora` · `martini` · `sour` · `wine` · `brandy glass` ·
-`hurricane` · `sling` · `pilsner` · `mug` · `mule mug` · `goblet` · `chalice` ·
-`absinthe` · `punch bowl` · `tiki mug` · `coconut shell` · `hollowed pineapple`
+<!-- vocab:glass start -->
+`coupe` · `sour` · `collins` · `flute` · `highball` · `hurricane` ·
+`nick and nora` · `punch bowl` · `tiki mug` · `mug` · `mule mug` · `martini` ·
+`martini glass` · `wine` · `pilsner` · `sling` · `absinthe` · `goblet` ·
+`chalice` · `pineapple` · `hollowed pineapple` · `coconut` · `coconut shell` ·
+`old fashioned` · `double old fashioned` · `brandy glass`
+<!-- vocab:glass end -->
 
 **These spellings are WRONG and will be corrected against you** — write the
 right-hand form:
 
 | the source will say | write |
 |---|---|
+<!-- vocab:glass_corrections start -->
 | rocks, old-fashioned, old-fashioned glass | **old fashioned** |
 | double rocks, double old-fashioned | **double old fashioned** |
-| champagne saucer | **coupe** |
+| champagne saucer, champage saucer | **coupe** |
 | snifter | **brandy glass** |
+<!-- vocab:glass_corrections end -->
 
 If the source names no glass, use `glass: []` **and lead your list with it** —
 see the warning in §2. Do not infer one.
 
 ### `garnish` — the declared vocabulary
 
-**Citrus peel:** lemon twist · lemon twist (discarded) · lemon twist after
-expressing over cocktail · orange twist · orange twist (discarded) · orange or
-lemon twist · grapefruit twist · flamed orange zest coin
+<!-- vocab:garnish start -->
+**Citrus peel:** lemon twist · lemon twist (discarded) ·
+lemon twist after expressing over cocktail · orange twist ·
+orange twist (discarded) · orange or lemon twist · grapefruit twist ·
+flamed orange zest coin
 
 **Citrus cut:** lime wedge · lime wedge on rim · lime wheel · lemon wheel ·
-lemon slice · orange slice · orange crescent · grapefruit crescents · citrus
-wheel · dehydrated lime slice wheel · half lime shell
+lemon slice · orange slice · orange crescent · grapefruit crescents ·
+citrus wheel · dehydrated lime slice wheel · half lime shell
 
-**Fruit:** pineapple wedge · pineapple wheel · blackberry · dried apple slice ·
-banana chip · raspberries · half an empty passion fruit shell
+**Fruit:** pineapple wedge ·
+pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
+blackberry · dried apple slice · banana chip · raspberries ·
+half an empty passion fruit shell ·
+passion fruit shell filled with overproof rum · pineapple and brandied cherry
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
-skewered maraschino cherry · cherry flag
+skewered maraschino cherry · cherry flag ·
+fruit stick (skewered pineapple cubes and a maraschino cherry)
 
-**Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig · kaffir lime
-leaves · cucumber wheels · edible violet
+**Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
+kaffir lime leaves · cucumber wheels · edible violet
 
 **Spice and other:** grated nutmeg · cinnamon stick · three coffee beans ·
-half-rim of sugar · cocktail umbrella
+half-rim of sugar · cocktail umbrella · 3 dashes red creole-style bitters ·
+5 drops of olive oil
+<!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:
 
@@ -250,26 +274,30 @@ information?** "with ice" versus "over ice" carries none. "other than the
 champagne" carries all of it. So use a canonical string where one fits exactly,
 and write the source's own words where none does.
 
-**Shake:** `Shake all ingredients with ice.` · `Shake all ingredients hard with
-ice.` · `Shake with ice.` · `Shake the remaining ingredients with ice.` ·
+<!-- vocab:method start -->
+**Shake:** `Shake all ingredients with ice.` ·
+`Shake all ingredients hard with ice.` · `Shake with ice.` ·
+`Shake the remaining ingredients with ice.` ·
 `Shake all ingredients other than the champagne with ice.`
 
-**Stir:** `Stir all ingredients with ice.` · `Stir the remaining ingredients
-with ice.` · `Stir all ingredients other than the champagne with ice.` · `Stir
-until cold.` · `Stir.`
+**Stir:** `Stir all ingredients with ice.` ·
+`Stir the remaining ingredients with ice.` ·
+`Stir all ingredients other than the champagne with ice.` · `Stir until cold.` ·
+`Stir.`
 
-**Blend and swizzle:** `Blend all ingredients until smooth.` · `Swizzle until
-the glass frosts.`
+**Blend and swizzle:** `Blend all ingredients until smooth.` ·
+`Swizzle until the glass frosts.`
 
-**Strain:** `Strain.` · `Double strain.` · `Fine strain.` · `Strain into a
-chilled glass.` · `Double strain into a chilled glass.` · `Fine strain into a
-chilled glass.` · `Strain into an ice-filled glass.` · `Fine strain into an
-ice-filled glass.` · `Strain over ice.` · `Fine strain over ice.` · `Strain
-over crushed ice.`
+**Strain:** `Strain.` · `Double strain.` · `Fine strain.` ·
+`Strain into a chilled glass.` · `Double strain into a chilled glass.` ·
+`Fine strain into a chilled glass.` · `Strain into an ice-filled glass.` ·
+`Fine strain into an ice-filled glass.` · `Strain over ice.` ·
+`Fine strain over ice.` · `Strain over crushed ice.`
 
-**Build:** `Add the remaining ingredients.` · `Fill the pitcher half full with
-ice cubes.` · `Fill with crushed ice.` · `Top with champagne.` · `Top with more
-crushed ice.`
+**Build:** `Add the remaining ingredients.` ·
+`Fill the pitcher half full with ice cubes.` · `Fill with crushed ice.` ·
+`Top with champagne.` · `Top with more crushed ice.`
+<!-- vocab:method end -->
 
 Four things that will catch you out:
 
@@ -333,6 +361,20 @@ inferable.
 - British spellings. Em dash for `--` in prose. `°C` with the degree sign.
 - **Reproduce a bottle or brand exactly as it spells itself**, accents and all:
   `Bénédictine`, `Cointreau`, `St-Germain`, `Difford's`.
+
+**Accented words her house style declares.** The list is shared with the food
+site, so most of it is culinary — but `crème`, `piña` and `purée` all turn up
+in a drink, and a missing accent on one of these is a mechanical fault her
+formatter would fix on a recipe and does not yet fix on a drink:
+
+<!-- vocab:accents start -->
+açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
+chèvre · comté · consommé · crème · crémeux · crêpe · crêpes · éclair ·
+éclairs · entrecôte · flambé · fraîche · frisée · gâteau · glacé · gougère ·
+gougères · gruyère · jalapeño · jalapeños · marinière · niçoise · pâté ·
+pâtisserie · pâtissière · piña · purée · puréed · purées · ragù · rösti ·
+sauté · sautés · sautéed · soufflé · soufflés · velouté
+<!-- vocab:accents end -->
 
 ---
 

@@ -232,13 +232,17 @@ term.
 ### `tags` — pick from these 22 and no others
 
 **Mood** — *what you feel like eating, a craving:*
+<!-- vocab:tags:mood start -->
 `bakes`, `carbs party`, `cheese-tastic`, `dessert`, `drinks`, `fakeaway`,
 `hot snack`, `ice cream`, `nibbles`, `one-handed food`, `salad`, `showstopper`,
 `soup`, `sweets`, `virtuous`
+<!-- vocab:tags:mood end -->
 
 **Practicalities** — *what the occasion demands of you, regardless:*
+<!-- vocab:tags:practicalities start -->
 `breakfast`, `extras`, `festive`, `freezable`, `make-ahead`, `no-cook`,
 `starter`
+<!-- vocab:tags:practicalities end -->
 
 Meanings you would not guess:
 
@@ -263,8 +267,10 @@ for her to fix, so propose rather than agonise — but propose only from the lis
 
 ### `star_ingredient` — one of these 14, or omit
 
+<!-- vocab:stars start -->
 `beef`, `chocolate`, `duck`, `eggs`, `fruit`, `game`, `greens`, `lamb`,
 `oily fish`, `pork`, `poultry`, `root veg`, `shellfish`, `white fish`
+<!-- vocab:stars end -->
 
 **It is the one thing the recipe is ABOUT, and about a quarter of her collection
 correctly leaves it blank.** A plain sponge, a dressing, a spice blend has no
@@ -297,6 +303,11 @@ cheese`, `cream cheese`). Leave out frying and greasing oil.
 
 `source_type` is one of exactly these words. `magazine` is not one of them; a
 magazine is a `publication`.
+
+<!-- vocab:source_type start -->
+`author` · `book` · `joke` · `person` · `place` · `publication` · `unknown` ·
+`website`
+<!-- vocab:source_type end -->
 
 | `source_type` | `source` shape | Example |
 |---|---|---|
@@ -345,11 +356,32 @@ website). Keep one that points into the same book the recipe came from.
 - **British spellings** throughout.
 - **Times**: `20 mins`, `1 hr 30 mins`, `2 hrs` in the metadata fields;
   `mins` / `hours` / `seconds` in prose. Only numeric quantities abbreviate.
-- **Accents on food words**: crème fraîche, sauté, purée, jalapeño, comté,
-  mangetout, consommé, soufflé, crudités, açaí, piña, mole poblano. In prose
-  only — never in the filename, and never in `source`.
 - Cross-recipe links, if you write one at all, are relative markdown:
   `[display text](../other-slug/)`. Never root-relative.
+- **Accents on food words** — the two lists below. In prose only, never in the
+  filename and never in `source`.
+
+**The accented spellings her house style declares:**
+
+<!-- vocab:accents start -->
+açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
+chèvre · comté · consommé · crème · crémeux · crêpe · crêpes · éclair ·
+éclairs · entrecôte · flambé · fraîche · frisée · gâteau · glacé · gougère ·
+gougères · gruyère · jalapeño · jalapeños · marinière · niçoise · pâté ·
+pâtisserie · pâtissière · piña · purée · puréed · purées · ragù · rösti ·
+sauté · sautés · sautéed · soufflé · soufflés · velouté
+<!-- vocab:accents end -->
+
+**And the words that keep NO accent**, which is the half worth reading twice —
+every one of them looks French enough to accent, and accenting one is a
+correction somebody then has to undo:
+
+<!-- vocab:no_accent start -->
+echalion · chorizo · gratin · julienne · vinaigrette · dauphinoise · mornay ·
+confit
+<!-- vocab:no_accent end -->
+
+Anything not on either list, leave as the source spells it.
 
 **All of this is mechanically fixable in her repo and none of it is worth
 agonising over.** Get it right where it is easy; do not let it slow down section 3.
