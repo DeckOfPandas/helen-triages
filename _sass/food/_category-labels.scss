@@ -126,9 +126,10 @@
     // This is half the effect; @include punched() below is the other half, and
     // the two are independent. See the long note in _sass/food/_rule.scss.
     -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-    // 1.35rem sits between the two offset values (it wants 1.4px). Staying at
-    // 1px rather than rounding up to 2: this is a control-panel label with
-    // five of them stacked in a screenful, not a landmark, and the ratio
+    // 1.05rem (was 1.35rem before the 2026-09-02 index fold tightening) sits
+    // between the two offset values. Staying at 1px rather than rounding up
+    // to 2: this is a control-panel label with five of them stacked in a
+    // screenful, not a landmark, and the ratio
     // matters least at the size where both values are close. Try
     // $emboss-offset-large here if the index reads flatter than the recipe
     // page once both are in front of you.
@@ -339,8 +340,9 @@
       // It was a workaround for the exact problem the em-based $emboss-stroke
       // now solves: at 0.72rem the old flat $stroke-light was 4.9% of the type,
       // heavier than anything else on the site, so switching it off entirely
-      // was the only way to stop this label looking chunkier than the 1.35rem
-      // ones above it. That left it as the one label wearing half the effect --
+      // was the only way to stop this label looking chunkier than the 1.05rem
+      // ones above it (1.35rem before the 2026-09-02 index fold tightening).
+      // That left it as the one label wearing half the effect --
       // an emboss shadow with no edge under it. Inheriting the proportional
       // stroke gives it the whole treatment at its own size; it stays demoted
       // by size and colour, which is what "local-only appendix" should mean.

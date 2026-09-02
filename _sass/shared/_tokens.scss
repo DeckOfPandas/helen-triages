@@ -87,12 +87,22 @@ $radius-sm: 2px;   // note boxes, method-short box, meta wash
 //
 // §13.4's reasoning travels with them: the index is a control panel, where
 // every section should be visible in one glance, and the recipe page is a
-// document, where space isolates the section you are mid-task on. Keep the
-// ratio near 2:1. That is why these are NOT $spacing-section-gap -- reaching
-// for the recipe page's token is exactly the mistake cocktails had made, and it
-// spaced its control panel like a document.
-$index-section-gap: $space-xl;   // between one filter section and the next
-$index-label-gap:   $space-md;   // a label to its own buttons
+// document, where space isolates the section you are mid-task on. That is why
+// these are NOT $spacing-section-gap -- reaching for the recipe page's token
+// is exactly the mistake cocktails had made, and it spaced its control panel
+// like a document.
+//
+// TIGHTENED A STEP FURTHER, 2026-09-02, with the fold work: the first recipe
+// or card sat about 1,200px down at desktop, and Helen chose the "less
+// height, nothing new" candidate from the mockups over adding anything. Both
+// values moved down one rung of the spacing scale, which also moves the ratio
+// between them from 2:1 to 1.5:1 -- still a bigger gap between sections than
+// within one, just a smaller one than before.
+$index-section-gap: $space-md;   // between one filter section and the next --
+                                 // was $space-xl (1.5rem), now $space-md
+                                 // (0.75rem)
+$index-label-gap:   $space-sm;   // a label to its own buttons -- was
+                                 // $space-md (0.75rem), now $space-sm (0.5rem)
 
 // The search row: a heading, a text box and an inline clear, on one line.
 // $index-search-max-width was 550px until the clear button started reserving
