@@ -320,7 +320,14 @@
          it there. Both are cleared and re-applied on every pass rather than
          tracked, which is cheap at this size and cannot drift out of step. */
       d.moodEls.forEach(function (chip) {
-        chip.classList.toggle('is-match', state.moods.has(chip.dataset.mood));
+        var on = state.moods.has(chip.dataset.mood);
+        chip.classList.toggle('is-match', on);
+        /* These became real <button>s when they gained the power to filter, so
+           the state has to be announced as well as painted -- `is-match` is a
+           class and a screen reader cannot see it. Set here rather than at
+           click time for the same reason the class is: clear-all reassigns the
+           whole state object without touching any markup. */
+        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
 
       /* MATCHED AGAINST data-ing, NOT THE RENDERED TEXT — #501. A rum shows its
@@ -383,6 +390,42 @@
       apply();
     });
   });
+
+  /* --- the same moods, clicked ON A CARD — Helen, 2026-09-02 -----------------
+     "please make the chips on cocktail cards clickable, with mouseover
+     outlining the chip in pink as when they're active from filtering, where
+     clicking filters all cocktails by whatever the chip is for."
+
+     ONE HANDLER FOR BOTH, DELEGATED, AND THAT IS THE POINT RATHER THAN A SAVING.
+     A card chip and a filter button now do exactly the same thing, so they must
+     not be two implementations that agree today: the toggle, the sync and the
+     re-render are the mood button's own, called from here.
+
+     DELEGATED ON THE LIST because there are ~370 chips across 125 cards, and
+     because `apply()` re-ranks by reordering nodes — a listener bound per chip
+     would have to be rebound every time the list changed, which is the class of
+     bug HANDOVER 12 records for `tagShapes()` on the food side.
+
+     The chip's own `is-match` class is NOT toggled here. It is painted from
+     state in apply(), which is what keeps it correct after `clear all`
+     reassigns the whole state object without touching any markup — the same
+     argument the note below makes for the buttons. */
+  var cardList = document.querySelector('.drink-cards');
+  if (cardList) {
+    cardList.addEventListener('click', function (ev) {
+      var chip = ev.target.closest ? ev.target.closest('.drink-card-mood') : null;
+      if (!chip || !cardList.contains(chip)) return;
+      var name = chip.dataset.mood;
+      if (!name) return;
+      /* The chip sits inside the card, and the card's title is a link. Without
+         this a click would filter AND navigate. */
+      ev.preventDefault();
+      if (state.moods.has(name)) state.moods.delete(name);
+      else state.moods.add(name);
+      syncMoodButtons();
+      apply();
+    });
+  }
 
   /* Painted FROM STATE rather than at each place state changes — the argument
      filters.js's syncFilterButtons() makes, and the reason it matters here is

@@ -142,7 +142,10 @@ $color-grey-light:   #2c2c31;   // borders; L* 18.2 against the ground's 4.0
 // HIGHLIGHT sit on a card with no word beside them, carrying meaning in colour
 // alone, along with the mood chip's fill. Those three were checked: worst pair
 // is magenta vs tangerine under tritanopia at dE 22.6, against a bar of 10.
-// Re-run tmp/neon_values.py if any of the three moves.
+// Re-check with `scripts/palette_measure.py --separation <a> <b>` if any of the
+// three moves. That instruction used to name `tmp/neon_values.py`, which is
+// gone -- tmp/ is gitignored, so the tool an instruction names outlives the
+// instruction only if it is tracked.
 
 // EVERY `-deep` WAS SOLVED AGAINST PAPER AND HAS BEEN RE-SOLVED AGAINST THE
 // DARK GROUND. On white a hue has to be DARKENED to be readable as text; on
@@ -248,7 +251,11 @@ $color-luminous-lagoon-wash:     #1A3137;
 // same luminance, which is the arrangement that actually reads.
 //
 // These are BANDS, not text, so they carry no contrast bar -- the heading's
-// words stay ink on paper. tmp/greens2.py prints the figures.
+// words stay ink -- and they stay LIGHT ink now, the ground having inverted
+// under this paragraph on 2026-09-02. The bands themselves needed nothing: all
+// six clear 6:1 against the black page, checked rather than assumed.
+// `scripts/palette_measure.py --lstar <hexes>` prints the figures; this used to
+// name `tmp/greens2.py`, which is gone.
 $color-heading-yolo:    #99C62F;   // hue  78
 $color-heading-mood:    #43C62F;   // hue 112
 $color-heading-hassle:  #2FC66E;   // hue 145
