@@ -3735,7 +3735,18 @@ several of which would fail the bar, and is not broken. The bar is real only
 where colour carries meaning ALONE: **the goodness mark and the matched
 ingredient**, plus the mood chip beside them on the same card. Those three were
 checked — worst pair reposado vs cosmopolitan under tritanopia, **ΔE 22.6**
-against a bar of 10. Re-run `tmp/neon_values.py` if any of them moves.
+against a bar of 10.
+
+> **THE TOOL IS TRACKED NOW: `scripts/palette_measure.py`.** This line said
+> "re-run `tmp/neon_values.py`" and two comments in `_palette.scss` named that
+> file and `tmp/greens2.py`. **All three were gone** — `tmp/` is gitignored — so
+> three instructions pointed at nothing, and the black-on-black work rebuilt the
+> same contrast, dichromacy and CIEDE2000 arithmetic from scratch to answer the
+> same questions. It is in `scripts/` so the next inversion does not rebuild it
+> a third time. `--contrast`, `--separation`, `--lstar`, `--over`.
+>
+> **An instruction to re-run something is only as good as the something.** This
+> is §12's stale-instruction trap wearing tooling rather than prose.
 
 **3. Ultra-yvette cannot take dark text at all.** Ink on it is 3.14:1 and
 *nothing* darkened clears 4.5, because the fill is already dark — a vivid
