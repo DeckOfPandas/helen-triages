@@ -2579,6 +2579,36 @@ rules on a row. It has its own staleness guard now, added with #585's pass: a
 declared row whose string no longer appears in any drink is a row claiming debt
 that has been paid, and seven of them were exactly that.
 
+**A BARE BRAND IS NOT A BOTTLE, and #585 made this a rule rather than a
+recurring surprise.** `Planteray` names four products here; `Bulleit` makes a
+bourbon and a rye, both of which Helen owns; `Briottet` makes six things this
+collection pours. So a suggestion naming only the house resolves to nothing
+useful, and completing it is Helen's — she chose `Planteray 3 Stars` and
+`Bulleit Bourbon` on 2026-09-02. **Declare the PRODUCT, and do not add the bare
+name as an alias**: a later drink meaning the rye would resolve to the bourbon
+silently, which is the exact failure this file exists to prevent.
+
+**JACK DANIELS IS A BOURBON HERE, and the story is a correction of mine.** #585
+held eight bottles back rather than declaring them, on the sound rule that a
+category must never be derived from the generic beside it — and offered Jack
+Daniels as the proof, saying it "is Tennessee whiskey, which is a different
+legal category". **That was wrong.** Tennessee whiskey meets the bourbon
+standard in full; the Lincoln County Process is an addition on top, not an
+exemption from it. Helen: *"It meets all the legal requirements for being
+called that, and their own decision to apply a further qualifier on top is...
+vain!"* **The rule stands and the example did not** — the eleven bottles handed
+back on 2026-08-30 are still the reason for it.
+
+**ONE DRINK CHANGED SHAPE BECAUSE A BOTTLE BECAME READABLE.** Royal Bermuda
+Yacht Club suggested `ED3, Planteray` as one unresolvable string; splitting it
+and resolving the second half made #534's cross-category check fire, because
+Planteray 3 Stars is a `clear blended multi-region rum` and the drink's
+`generic` asked only for `lightly aged and filtered rum`. Helen's answer widened
+the recipe rather than the note: *"the generic wants two categories. Both make
+excellent drinks, just quite different ones."* So the generic is a disjunctive
+pair now and the suggestion crosses nothing. See §12 for the general form,
+which is the more useful half.
+
 **Smith & Cross moved to `Jamaican, moderately aged`** from `Jamaican,
 overproof, unaged` (2026-08-27), which resolved the one bottle that had been
 sitting under two generics. It is aged; 57% is what made it look unaged, and
@@ -5752,6 +5782,33 @@ one. Asserting it non-empty made finishing the work a test failure.
 emptiness. `proposals` empties and will refill, so it must assert only that the
 KEY exists — the thing whose silent loss would switch the check off for whatever
 is proposed next. Ask which kind you have before writing `assert thing`.
+
+**A DECLARED EXCEPTION SILENCES EVERY CHECK DOWNSTREAM OF IT, NOT ONLY THE ONE
+IT WAS DECLARED AGAINST.** 2026-09-02, #585, and it is the sharpest thing that
+pass found. `unresolved_suggestions` exists to say "this string names no bottle
+yet" so `test_every_suggested_bottle_resolves` bites on the next one. But a
+string that resolves to no bottle also resolves to no CATEGORY — so #534's
+cross-category check silently skipped every drink carrying one. Royal Bermuda
+Yacht Club had been suggesting a `clear blended multi-region rum` against a
+generic asking for `lightly aged and filtered` for as long as the string was
+prose, and nothing could see it. Declaring the bottle made the second check
+fire within seconds.
+
+**An exemption is a hole in every rule that reads the same field**, not just in
+the rule that granted it. Before adding one, ask what else consumes that value
+and what those checks will now not see — and when you retire one, expect
+something unrelated to go red, because that is the coverage coming back.
+
+**AND A REGISTRY OF DECLARED FAILURES NEEDS A STALENESS GUARD OR IT ROTS
+SILENTLY.** The same block held seven rows naming strings no drink said any
+more — finished work still reading as outstanding, and still exempting those
+strings for whoever wrote them next. `test_every_suggested_bottle_resolves`'
+own docstring said "deleting a line there is how one gets retired — the same
+shape `methods.yml` uses for its proposals", and methods.yml had a test
+enforcing exactly that while this file had only the sentence. **A convention
+stated in a docstring is not a convention anybody follows.** Both have the
+guard now; `KNOWN_PROSE_SUGGESTIONS` is empty and `unresolved_suggestions` is
+down to 16.
 
 **YOU WILL EXEMPT YOUR OWN WORK FROM A RULE WRITTEN FOR SOMEBODY ELSE'S.**
 2026-08-31, eleven days late. House style deliberately stops at a `QQ` line
