@@ -89,12 +89,18 @@
     text-transform: uppercase;
     letter-spacing: $letter-spacing-label;
     color: $color-text;
-    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-    @include punched(raised);
+    // Label tier, 2026-09-02 -- a 0.7rem field label is well under the 1rem
+    // line, so stroke only, no shadow. See LETTERING.md.
+    @include lettering(label);
   }
 
   input, select {
-    font-family: $font-headings;
+    // PLEX MONO, 2026-09-02: what you type or pick here (a weight, a protein)
+    // drives the arithmetic below -- a number you act on, per food/_palette.
+    // scss's $font-label rule. The field's own LABEL above it (WEIGHT,
+    // PROTEIN) stays Courier, two rules up -- it names the input, it isn't one.
+    font-family: $font-label;
+    font-weight: 600;
     font-size: 1rem;
     color: $color-text;
     background: $color-bg;
@@ -211,6 +217,24 @@
   margin-bottom: $spacing-section-gap;
 }
 
+// THE TABLE'S OWN TIME COLUMN, 2026-09-02. No class exists in the markup for
+// it -- cook-timer.js (see timeHtml()/render()) writes a plain `<td>` and
+// leans on the site's generic `article.recipe .recipe-body-content table`
+// rule (_recipe-notes-body.scss) for everything else, which is body-font
+// prose sizing. That is right for "Method" and "What you get", both names,
+// and wrong for "Time", which is the same figure .ct-total shows on the
+// card below -- a number you act on, per food/_palette.scss's $font-label
+// rule. `:last-child` rather than a new class: the table always renders
+// exactly three cells per row (Method, What you get, Time), in that order,
+// so position is as reliable a selector as a class would be and needs no
+// markup change. `.ct-doneness-label` inside a by-doneness row's cell
+// already names its own font (above), so this does not need to carve out an
+// exception for it.
+#ct-table td:last-child {
+  font-family: $font-label;
+  font-weight: 600;
+}
+
 // The one line left of what used to be four paragraphs of explanation.
 .ct-seealso {
   margin-top: $spacing-section-gap;
@@ -258,23 +282,44 @@
   margin: 0 0 $space-xs 0;
 }
 
-.ct-card-name,
-.ct-total {
+// SPLIT FROM ONE SHARED RULE, 2026-09-02. Both sat at the same size and weight
+// by design -- Helen: "the cooking method name should be as bold as the
+// time" -- but they are not the same KIND of type any more: .ct-card-name is
+// a name, .ct-total is the figure it answers, and food/_palette.scss's
+// $font-label rule ("is it a number you act on?") now says one of the two
+// gets Plex Mono and the other does not. Size, weight, line-height and colour
+// stay matched by hand across the two rules below so the visual pairing
+// Helen asked for survives the split -- if one changes, check the other.
+.ct-card-name {
   font-family: $font-headings;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.25;
   color: $color-text;
   margin: 0;
-}
-
-.ct-card-name {
   letter-spacing: 0.02em;
-  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-  @include punched(raised);
+  // Heading tier, 2026-09-02: this sits at exactly 1rem, the tier table's own
+  // threshold (font-size: 1rem, two rules up), so it lands on the >= 1rem
+  // side and gets the fuller stroke+shadow treatment rather than the
+  // stroke-only label one. It reads more like a card's own name than a field
+  // label, so the boundary call agrees with what the element actually is, not
+  // only with the number. See LETTERING.md.
+  @include lettering(heading);
 }
 
+// PLEX MONO, 2026-09-02: this is the card's own headline figure -- "1 hr 20
+// mins" -- the number the whole card answers "how long?" with. Weight 600
+// rather than the 700 the shared rule used to carry: 700 isn't loaded for
+// this face (shared/_fonts.scss), and matching the name's 700 by letting the
+// browser synthesise a fake bold is exactly the artefact that file's own
+// comment warns against.
 .ct-total {
+  font-family: $font-label;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: $color-text;
+  margin: 0;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -301,6 +346,12 @@
 }
 
 .ct-doneness-label {
+  // NAMED EXPLICITLY, 2026-09-02. This sits inside .ct-total (the card) or the
+  // table's own time cell (below), both of which are Plex Mono now -- and
+  // without its own font-family this word ("rare", "medium") would silently
+  // inherit that, which is exactly backwards: "rare" is not a number you act
+  // on, the figure beside it is. See food/_palette.scss's $font-label rule.
+  font-family: $font-headings;
   font-weight: 400;
   color: $color-clear-text;
   margin-right: $space-sm;

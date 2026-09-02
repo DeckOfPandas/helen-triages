@@ -120,12 +120,6 @@
     // values are shared with cocktails' own filter labels; see
     // @mixin index-section-label in shared/_rule.scss.
     @include index-section-label;
-    // A LIGHTER stroke than the letter, restoring Helen's punched-tape edge —
-    // but derived from the text colour instead of a standalone rgba(50,50,50),
-    // which was a grey with no relationship to the letter it outlined.
-    // This is half the effect; @include punched() below is the other half, and
-    // the two are independent. See the long note in _sass/food/_rule.scss.
-    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
     // 1.05rem (was 1.35rem before the 2026-09-02 index fold tightening) sits
     // between the two offset values. Staying at 1px rather than rounding up
     // to 2: this is a control-panel label with five of them stacked in a
@@ -133,7 +127,13 @@
     // matters least at the size where both values are close. Try
     // $emboss-offset-large here if the index reads flatter than the recipe
     // page once both are in front of you.
-    @include punched(raised);   // `pressed` inverts the light and punches IN
+    //
+    // HEADING TIER, 2026-09-02: 1.05rem clears the >= 1rem line the tier
+    // table draws (see shared/_rule.scss), so this gets the fuller
+    // stroke+shadow treatment rather than the small labels' stroke-only one,
+    // same as it always got through the pre-tier --emboss-stroke-c/punched()
+    // pair. See LETTERING.md.
+    @include lettering(heading);
     // Was $color-highlighter-label — "text sitting on top of a highlighter",
     // of which there is none here any more. Plain body text colour, same as
     // every heading on the recipe page.

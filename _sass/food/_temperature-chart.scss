@@ -103,8 +103,9 @@ $tc-threshold-height: 1.35rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: $color-text;
-  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-  @include punched(raised);
+  // Label tier, 2026-09-02: 0.78rem, under the 1rem line, stroke only. See
+  // LETTERING.md.
+  @include lettering(label);
   text-align: right;
   line-height: 1.3;
 }
@@ -249,13 +250,19 @@ $tc-threshold-height: 1.35rem;
   border-top: 1px solid $color-border;
 }
 
+// PLEX MONO, 2026-09-02: an axis tick is a number you read the position
+// against, not a name -- see food/_palette.scss's $font-label comment for the
+// rule this and .tc-value below both now follow. Weight 600 rather than
+// inheriting whatever this element's ancestor carries, so the ticks read as
+// data rather than as body prose set smaller.
 .tc-tick {
   position: absolute;
   top: 0;
   left: calc((var(--t) - #{$tc-min}) / #{$tc-max - $tc-min} * 100%);
   transform: translateX(-50%);
   padding-top: $space-xxs;
-  font-family: $font-headings;
+  font-family: $font-label;
+  font-weight: 600;
   font-size: 0.68rem;
   color: $color-clear-text;
   white-space: nowrap;
@@ -264,10 +271,17 @@ $tc-threshold-height: 1.35rem;
 // --- Direct labels -----------------------------------------------------------
 // The figures, beside their bars. TEXT WEARS TEXT TOKENS, never the series
 // colour -- the bar carries the identity, the number stays ink.
+//
+// PLEX MONO, 2026-09-02, same reasoning as .tc-tick above: this is the
+// out-at/rested readout itself ("48-50°C -> ~52-54°C"), the number the whole
+// chart exists to show, not a name beside it -- .tc-row-label (the row's own
+// name, RARE/MEDIUM RARE/...) stays Courier because it isn't one.
 .tc-value {
   position: absolute;
   top: calc(50% - 0.62rem);
   left: calc((var(--b) - #{$tc-min}) / #{$tc-max - $tc-min} * 100% + 0.5rem);
+  font-family: $font-label;
+  font-weight: 600;
   font-size: 0.76rem;
   color: $color-clear-text;
   white-space: nowrap;
@@ -380,8 +394,8 @@ $tc-threshold-height: 1.35rem;
   font-size: 0.7rem;
   letter-spacing: $letter-spacing-label;
   color: $color-text;
-  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-  @include punched(raised);
+  // Label tier, 2026-09-02: 0.7rem, stroke only. See LETTERING.md.
+  @include lettering(label);
   margin: 0 0 $space-md 0;
 }
 

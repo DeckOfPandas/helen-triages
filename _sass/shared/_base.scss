@@ -43,26 +43,30 @@ a {
 // recipe section headings) already pass it explicitly, and they'd have to
 // override this rule anyway.
 //
-// $color-text rather than food's $color-label-stroke: this is shared, and only
-// the nine palette-contract variables may be named here (HANDOVER §2.3). A site
-// wanting a softer outline colour overrides it on its own components, which
-// food does on all of its.
+// NAMES ITS TIER, 2026-09-02, RATHER THAN HARDCODING A COLOUR. This used to
+// read `-webkit-text-stroke: var(--emboss-stroke-w) $color-text;` directly --
+// $color-text rather than food's softer $color-label-stroke, because only the
+// nine palette-contract variables may be named here (HANDOVER §2.3), and the
+// comment on that line said plainly that "in practice this colour is only ever
+// seen on a heading nobody has styled" and flagged a KNOWN GAP: such a heading
+// inside `.on-dark` would get a near-black stroke on a dark ground, because
+// the colour was a literal Sass value rather than something a context class
+// could reach.
+//
+// @include lettering(heading) closes that gap as a side effect of closing a
+// bigger one -- every heading this rule reaches now gets the SAME tiered
+// stroke and shadow every explicitly-styled heading gets (see
+// shared/_rule.scss for the tier table), through custom properties a site or
+// a future dark section can re-point, rather than a hardcoded fallback colour
+// nobody chose. Any heading that lands here unstyled is treated as a heading,
+// full stop -- which is what this rule has always tried to guarantee.
 h1, h2, h3 {
   font-family: $font-headings;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-top: 0;
-  // Width from the custom property so `.on-dark` reaches it; COLOUR left as
-  // $color-text on purpose. This is the harder edge, and food overrides it with
-  // the softer $color-label-stroke on every component that matters (see
-  // _recipe-notes-body.scss:164) -- so in practice this colour is only ever seen
-  // on a heading nobody has styled. KNOWN GAP: such a heading inside `.on-dark`
-  // would get a near-black stroke on a dark ground. There is no dark section on
-  // the site yet, so this is a note rather than a bug; fix it by giving this a
-  // property of its own at the point one exists.
-  -webkit-text-stroke: var(--emboss-stroke-w) $color-text;
-  @include punched(raised);
+  @include lettering(heading);
 }
 
 body, button {

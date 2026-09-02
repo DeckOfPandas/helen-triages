@@ -81,17 +81,26 @@
   position: absolute;
   top: -0.65rem;
   left: 1.1rem;
-  // $font-label, not $font-headings, since 2026-08-24. Helen: "our
-  // styling for the notes box labels is a little unloved... I'm wondering about
-  // trying our new Plex Mono there."
+  // BACK IN COURIER PRIME, 2026-09-02. This spent since 2026-08-24 in
+  // $font-label -- Helen: "our styling for the notes box labels is a little
+  // unloved... I'm wondering about trying our new Plex Mono there" -- on a
+  // functional argument: at 0.62rem UPPERCASE, about as small as type gets on
+  // this site, Plex Mono's larger x-height and more open counters read better
+  // than Courier Prime, which closes up at that size.
   //
-  // The functional argument is the one that decided it rather than the taste
-  // argument: this is 0.62rem UPPERCASE, which is about as small as type on this
-  // site gets, and Plex Mono has a noticeably larger x-height and more open
-  // counters than Courier Prime. A Courier at 0.62rem is thin and closes up; a
-  // Plex at 0.62rem stays readable. The label was "unloved" partly because the
-  // face was working against the size it was being asked to hold.
-  font-family: $font-label;
+  // THE RULE THAT REPLACED IT IS NARROWER AND THIS FAILS IT. Plex Mono is for
+  // numbers you act on, and a note label ("TIP", "MAKE AHEAD") is a word, not
+  // a figure -- see food/_palette.scss's $font-label comment for the rule and
+  // HANDOVER §13.10.1 for the full history. It was the last label-shaped
+  // consumer standing once the other four (category labels, filter tags,
+  // badges, the recipe-title link) had already come back to Courier; this one
+  // survived only because "recipe page, hands full" and "a number" happened to
+  // agree for every OTHER consumer at the time the rule was written.
+  //
+  // NO SYNTHESIS AT THIS WEIGHT: Courier Prime ships a real 700 face (see
+  // shared/_fonts.scss), so this doesn't fall back to a browser-faked bold the
+  // way an in-between weight would.
+  font-family: $font-headings;
   font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -139,8 +148,8 @@ article.recipe .recipe-body-content {
     font-size: 1rem;
     letter-spacing: $letter-spacing-label;
     color: $color-text;
-    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-    @include punched(raised);
+    // Heading tier, 2026-09-02: 1rem clears the tier line. See LETTERING.md.
+    @include lettering(heading);
     margin: $spacing-section-gap 0 $space-md 0;
   }
 
@@ -181,23 +190,33 @@ article.recipe .recipe-body-content {
     margin: -0.75rem 0 $space-xl 0;
   }
 
-  // The quiet sub-level: the about page's FAQ questions, and any h3 a reference
-  // page writes. It never carried the punched-tape lettering at all until the
+  // The quiet sub-level: any h3 a reference page writes that isn't the about
+  // page's FAQ. It never carried the punched-tape lettering at all until the
   // global h1/h2/h3 rule in shared/_base.scss started handing it out
   // unconditionally (2026-08-12) -- one of the headings the first calibration
   // pass missed precisely because it had never opted in.
   //
-  // Only the stroke COLOUR needs restating here. The shared rule can only name
-  // the nine palette-contract variables, so it outlines in $color-text; every
-  // heading on this site uses the softer $color-label-stroke instead, and a
-  // full-strength dark outline on this element's already-lightened grey would
-  // read heavier than the 1.8rem section heading above it, which is backwards.
+  // LABEL TIER, 2026-09-02: 0.78rem is under the 1rem line, so stroke only --
+  // which is what this rule already was (no shadow was ever set here; it
+  // predates the tiers and happened to already be the shape @include
+  // lettering(label) draws). See LETTERING.md.
+  //
+  // THE ABOUT PAGE'S FAQ QUESTIONS USED TO GET THIS RULE'S COLOUR TOO --
+  // .about-faq-item h3 is inside .recipe-body-content (about.html shares the
+  // wrapper deliberately, see that file's own comment), so it fell through to
+  // this selector and inherited `lighten($color-clear-text, 10%)`, a fair bit
+  // greyer than SERVES/PREP/COOK. Helen, 2026-09-02: "FAQ headings need to be
+  // darker, possibly simply matching SERVES / PREP / COOK even though they're
+  // on different pages." food/_about.scss now gives `.about-faq-item h3` its
+  // own override that does exactly that (full $color-text, not this grey), so
+  // this rule's own colour is now specific to a BARE reference-page h3 -- one
+  // that opted into nothing beyond landing inside .recipe-body-content.
   h3 {
     @extend %heading-base;
     font-size: 0.78rem;
     letter-spacing: 0.08em;
     color: lighten($color-clear-text, 10%);
-    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+    @include lettering(label);
     margin: $space-xl 0 $space-sm 0;
   }
 
@@ -336,8 +355,11 @@ article.recipe .recipe-body-content {
       // whether she was imagining it. Now expressed through the function like
       // everything else -- $emboss-stroke on 0.92rem is 0.206px, which is the
       // 0.2px this was hand-set to.
-      -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-      @include punched(raised);
+      //
+      // LABEL TIER, 2026-09-02: $font-size-body-sm is 0.92rem, under the 1rem
+      // line, so stroke only now -- this element loses the shadow copy it
+      // used to carry through punched(raised). See LETTERING.md.
+      @include lettering(label);
       margin-bottom: $space-xs;
       // Shorter than the prose it labels, so a long label wraps before the
       // paragraph under it does and the two never share a right edge.
@@ -420,8 +442,12 @@ article.recipe .recipe-body-content {
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: $color-text;
-        -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-        @include punched(raised);
+        // Heading tier, 2026-09-02: 1.06rem clears the 1rem line -- the one
+        // size in longform that isn't $font-size-body-sm (see the note above)
+        // is also the one that reads as a heading under the tier table, which
+        // agrees with how it was already being used: uppercase, a violet
+        // rule, one tier below a section heading. See LETTERING.md.
+        @include lettering(heading);
         @include overlapping-rule-single($color-section-underline-2);
       }
 
@@ -536,7 +562,8 @@ article.recipe .recipe-body-content {
   // Raised label-tape lettering (HANDOVER_v26.md §13.4.1). Stroke was
   // $stroke-light's flat 0.5px, i.e. 3.1% of this element's own 1rem -- same
   // swallowing problem the meta labels had, see food/_recipe-header.scss.
-  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-  @include punched(raised);
+  //
+  // Heading tier, 2026-09-02: 1rem clears the tier line. See LETTERING.md.
+  @include lettering(heading);
   line-height: 1.4;
 }

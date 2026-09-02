@@ -48,8 +48,10 @@
 // page degrades to exactly what it looked like before this file existed, rather
 // than to a generic.
 //
-// 152 KB for all nine faces, latin subset. Less than one photograph -- which is
-// the whole argument for keeping the no-images principle and spending here.
+// 124 KB for all eight faces, latin subset -- was 152 KB for nine before the
+// unused Plex Mono 700 face was dropped, 2026-09-02 (see the note by that
+// @font-face below). Less than one photograph -- which is the whole argument
+// for keeping the no-images principle and spending here.
 
 $font-dir: "../fonts";
 
@@ -73,28 +75,44 @@ $font-dir: "../fonts";
   }
 }
 
-// A THIRD FAMILY, FOR EXACTLY ONE CLASS. Helen, 2026-08-24: "how about trying
-// IBM Plex Mono for the recipe-title-link class? ... I suspect the slightly
-// different proportions will help the recipe titles stand out."
+// A THIRD FAMILY, FOR NUMBERS YOU ACT ON. Helen, 2026-08-24, first asking
+// about it for a heading (.recipe-title-link): "how about trying IBM Plex
+// Mono... I suspect the slightly different proportions will help the recipe
+// titles stand out." That specific use didn't survive -- see food/_palette.
+// scss's $font-label comment and HANDOVER §13.10.1 for the run of elements
+// that tried this face and came back to Courier -- but the face itself found
+// its actual job once the pattern across the survivors was named, 2026-09-02:
+// a figure you read to act on, not a label, a heading or a button. Current
+// consumers: food's `.ingredient-amount`, cocktails' `.cocktail-amount`, the
+// doneness charts' `.tc-value`/`.tc-tick` (temperature readouts and axis
+// ticks), and the timings calculator's inputs and results (`_timings.scss`).
+// $font-label names it in both sites' palettes; grep that variable for the
+// full, current list rather than trusting this one.
 //
-// ONE WEIGHT ONLY, and that is the whole point of the restraint: .recipe-title-link
-// is the sole consumer, it asks for 600 and nothing nested inside it asks for
-// anything else, so 600 is the entire requirement. 15 KB. Adding the other four
-// faces would quadruple that for nothing, and would also make it far too easy
-// for this to quietly become a second heading font.
+// ONE WEIGHT ONLY, and that is still the whole point of the restraint: every
+// current consumer asks for 600 and nothing nested inside any of them asks
+// for anything else. 15 KB for the one face. Adding the other four would
+// quadruple that for nothing, and would also make it far too easy for this to
+// quietly become a second heading font -- which is exactly the failure mode
+// the returns above are a record of.
 //
 // THE FALLBACK IS COURIER PRIME, not Courier New: if this file fails to load,
-// the titles should land on the site's own mono rather than on a system one.
-// 600 for .recipe-title-link and .ingredient-amount; 700 for .note-label, which
-// is 700 already. The 700 is here so that changing the LABEL's face changes only
-// its face: without it the browser would match 600 and synthesise a fake bold,
-// and Helen would have been judging a rendering artefact rather than a typeface.
-@each $weight in (600, 700) {
-  @font-face {
-    font-family: "IBM Plex Mono";
-    font-style: normal;
-    font-weight: $weight;
-    font-display: swap;
-    src: url("#{$font-dir}/ibm-plex-mono-#{$weight}.woff2") format("woff2");
-  }
+// a Plex consumer should land on the site's own mono rather than on a system
+// one.
+//
+// THE 700 FACE THAT USED TO SIT HERE IS GONE, 2026-09-02. It existed for
+// exactly one consumer, .note-label, so that changing the LABEL's face
+// changed only its face rather than also asking the browser to synthesise a
+// fake bold at an unloaded weight. .note-label went back to Courier the same
+// day (it is a word, not a number -- the rule this file's own comment now
+// states), and nothing else has ever asked Plex for anything but 600, so the
+// weight this comment used to defend has no consumer left to defend. Do not
+// add a 700 -- or a 400 -- back without a real consumer asking for it: 600 is
+// the weight, everywhere, on purpose.
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("#{$font-dir}/ibm-plex-mono-600.woff2") format("woff2");
 }

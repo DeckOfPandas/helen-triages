@@ -28,20 +28,51 @@
 // Nothing in this file's call sites changed: shared/rule is imported before
 // food/rule in assets/css/food.scss, for exactly this reason.
 
-// Food's headings take a SOFTER stroke than the shared default -- see
-// _recipe-notes-body.scss:164. This used to be restated at thirteen call sites
-// as `-webkit-text-stroke: $emboss-stroke $color-label-stroke`; now those all
-// read `var(--emboss-stroke-c)` and this is the one place the value is chosen.
+// THE TIERS, RESOLVED FOR FOOD, 2026-09-02. shared/_rule.scss's own defaults
+// for --lettering-display-* and --lettering-heading-* are computed as
+// darken/lighten/rgba of $color-text, and food IS the site those formulas
+// were solved against -- Helen chose the display and heading numbers looking
+// at food's own #211f20 ink on #faf7f8 paper (tmp/mock/lettering.html). So
+// the shared defaults already ARE food's values; checked in the compiled
+// food.css (the display/heading custom properties are identical whether or
+// not this file touches them), not assumed. Nothing to re-point for either
+// of those two tiers.
+//
+// THE LABEL TIER IS THE ONE EXCEPTION, and it is the same exception the old
+// single-value version of this file already carried: food's small punched
+// labels (SERVES/PREP/COOK and its kin, all < 1rem) want the SOFTER
+// $color-label-stroke, not the heading tier's much darker outline -- a label
+// is "flat with edge", stroke only, and $color-label-stroke is a lighter
+// grey than either lettering-heading-stroke-c or the shared label default of
+// plain $color-text. This used to be restated at thirteen call sites as
+// `-webkit-text-stroke: $emboss-stroke $color-label-stroke`; then unified
+// onto the single custom property `--emboss-stroke-c` (2026-08-12); now it is
+// `--lettering-label-stroke-c`, read through `@include lettering(label)`
+// rather than named at each call site.
 //
 // It lives here rather than in shared/_rule.scss because $color-label-stroke is
 // food's own, not one of the ten the palette contract guarantees. Imported
 // after shared/rule (see assets/css/food.scss), so this wins.
+//
+// --emboss-stroke-c's OWN override is GONE. It used to re-point the pre-tier
+// name to this same softer grey, for every heading AND every label alike --
+// which is exactly the flattening the tier system replaces: headings now want
+// a much darker, near-black stroke (the whole point of the 2026-09-02 finding)
+// and labels want the old softer one, and one custom property cannot hold
+// both values at once any more. Checked before removing it: nothing on food
+// reads `var(--emboss-stroke-c)` directly after this commit's step 3 migrates
+// every consumer onto `@include lettering()` -- grep `var(--emboss` in
+// _sass/food/ to re-verify if that ever stops being true. (It is still read
+// on cocktails, by _cards.scss's card-tape word and by _cocktail.scss's drink
+// page -- see cocktails/_rule.scss for why that site keeps both the old and
+// the new names.)
+//
 // Emitted once -- same reason as shared/_rule.scss's own guard: this file is
 // imported again by food/_timings.scss.
 $emboss-food-vars-emitted: false !default;
 @if not $emboss-food-vars-emitted {
   :root {
-    --emboss-stroke-c: #{$color-label-stroke};
+    --lettering-label-stroke-c: #{$color-label-stroke};
   }
   $emboss-food-vars-emitted: true !global;
 }

@@ -99,24 +99,97 @@ $emboss-stroke: 0.016em;
 $emboss-offset:       1px;                      // hard, not blurred
 $emboss-offset-large: 1px;                      // was 2px -- see above
 
-// THE HIGHLIGHT NEEDS HEADROOM ABOVE THE GROUND, AND ON THIS SITE IT BARELY HAS
-// ANY. This was $color-bg -- the paper catching the light -- which is exactly
-// right as a model and invisible in practice on a page whose ground IS
-// $color-bg: a copy painted in the background colour, offset over the
-// background, cannot be seen. It earns its keep only where a heading sits on
-// something else (the metadata wash, a note box), where it reads as a cut line.
+// THE HIGHLIGHT NEEDED HEADROOM ABOVE THE GROUND, AND ON THIS SITE IT BARELY
+// HAD ANY -- THIS WAS THE BUG, NOT A TUNING PROBLEM, AND IT TOOK UNTIL
+// 2026-09-02 TO BE NAMED CORRECTLY. The light copy used to be $color-white --
+// the paper catching the light, correct as a MODEL and invisible in practice
+// on a page whose ground IS $color-bg: a copy painted in the background
+// colour, offset over the background, cannot be seen. The shadow copy, to
+// compensate, ran dark (rgba(ink, 0.68)) and did all the work alone -- which
+// reads as a second, slightly offset LETTER, not as one raised one. Helen's
+// name for the result on the FAQ questions: "dissolving in acid".
 //
-// Helen, 2026-08-24, comparing a heading against the header wordmark: "we're
-// still missing the white up and left from the simulated light source". Correct,
-// and the wordmark is the reason it looks achievable -- .site-logo-word is LIGHT
-// TYPE ON BLACK TAPE, so it has the whole brightness range to play with. Dark
-// type on #faf7f8 has about 3% of headroom and no more.
+// THE PHYSICS, STATED PLAINLY, IS WHAT FIXES IT. A raised dark letter under a
+// top-left light source has a lit edge that is LIGHTER THAN THE LETTER BUT
+// DARKER THAN THE PAPER -- it is still ink catching a glancing light, not the
+// paper itself -- and a shadow only slightly darker than the paper it falls
+// on, because a 1px sliver of cast shadow is a thin thing, not a hole. Asking
+// the highlight to be lighter than the page and the shadow to be dramatically
+// darker than the letter both describe the punched-tape MOTIF this mixin is
+// named for (an actual channel cut into black tape, lit from inside) rather
+// than what it draws everywhere else on food: dark ink standing slightly
+// proud of a light page. One set of numbers had been asked to do both jobs.
 //
-// $color-white is that 3%, which is the entire available budget. It is a real
-// improvement and a small one; anything stronger would need the ground behind
-// headings to be darker, which is a different design.
-$color-emboss-light:  $color-white;             // the paper catching the light
-$color-emboss-shadow: rgba($color-text, 0.68);  // where it does not -- was 0.38
+// Helen, looking at a candidates page (tmp/mock/lettering.html, not in the
+// repo): "off black front letter with a very thin darker outline, and a
+// lighter black (or even light grey) up and left... similar aggression,
+// without asking physics to go lighter than white." That is the fix in one
+// sentence -- the highlight moves DOWN off pure white to a mid grey, and the
+// shadow moves UP off two-thirds ink to a faint wash, both toward the paper,
+// from opposite directions.
+//
+// FOUR NAMED TIERS CARRY THAT FIX NOW, BY ROLE RATHER THAN BY SIZE -- see
+// @mixin lettering() below, and LETTERING.md for the full table, the values
+// per site and the decision log. $color-emboss-light/-shadow above this
+// paragraph are gone; the values below replace them, and unlike the old pair
+// they come in three sets rather than one, because a wordmark, a page heading
+// and a small label do not want the same amount of edge.
+//
+//   display  HELEN TRIAGES ONLY -- heaviest of the four. A wordmark is a
+//            logo, not a heading, and Helen kept it louder even once it took
+//            on the same construction ("I like the drama").
+//   heading  EVERY HEADING >= 1rem: recipe titles, section headings, filter
+//            labels, reference-page headings, longform section names.
+//   label    EVERY PUNCHED ELEMENT < 1rem: SERVES/PREP/COOK, note labels,
+//            Tips labels, timings field labels, FAQ questions. STROKE ONLY,
+//            NO SHADOW -- "flat with edge", Helen's own phrase, 2026-09-02:
+//            "T2 wordmark, T1 large headings. Surprisingly T1 is good on the
+//            small headings too, but I prefer T3, flat with edge, so let's do
+//            that." At these sizes a shadow copy cannot clear the stroke to
+//            be seen at all -- the mechanism note above this whole section,
+//            "THE SHADOW HAS TO CLEAR THE STROKE TO BE SEEN AT ALL", is
+//            exactly why: a 1px offset on an already-small glyph has nowhere
+//            left to read as raised.
+//   plain    NO EDGE. Already existed as the hand-written pattern
+//            `-webkit-text-stroke: 0; text-shadow: none;` at a handful of
+//            call sites; named here so it is a fourth tier rather than the
+//            absence of one.
+//
+// THE 1rem THRESHOLD IS THE SAME LINE $emboss-offset-large's own history
+// already drew: elements big enough that the offset's proportion of the
+// glyph needs help (a title, a section heading) get the fuller heading
+// treatment; everything smaller gets stroke only.
+//
+// A TIER NAMES A ROLE, NOT A SIZE, deliberately -- a consumer says what it
+// IS ("this is a heading") and the mixin resolves that to numbers, rather
+// than a fresh value copied from whatever's nearby, which is how the
+// pre-tier system drifted apart in the first place (see the $emboss-stroke/
+// $emboss-offset history above: two elements independently converged on
+// almost-but-not-quite the same ratio before either was named).
+//
+// ONLY $color-text FEEDS THESE, same palette-contract constraint the old
+// --emboss-stroke-c comment already stated: shared may only name what every
+// site's palette guarantees (HANDOVER §2.3). Each site's own $color-text
+// plugs into the SAME lighten/darken/rgba calls below, so on food (dark ink,
+// light page) these already resolve to the numbers Helen chose; on cocktails
+// (light ink, dark page) the same formulas resolve to something illegible,
+// which is exactly the point already made two sections up about dark-on-light
+// and light-on-dark being inverse problems -- cocktails re-points its own
+// heading and display sets in its own _rule.scss, the same way it already
+// re-points --emboss-stroke-c/-shadow today.
+$lettering-display-stroke-c: darken($color-text, 12%);   // ~#000 on food
+$lettering-display-light:    lighten($color-text, 53%);  // ~#aaa4a7 on food
+$lettering-display-shadow:   rgba($color-text, 0.24);
+
+$lettering-heading-stroke-c: darken($color-text, 5%);    // ~#141213 on food
+$lettering-heading-light:    lighten($color-text, 65%);  // ~#c9c4c7 on food
+$lettering-heading-shadow:   rgba($color-text, 0.16);
+
+// $color-text itself -- the same fallback --emboss-stroke-c always carried
+// before any site re-pointed it. Food re-points this to its own softer
+// $color-label-stroke in food/_rule.scss, same as it always has; cocktails
+// does the equivalent in its own file.
+$lettering-label-stroke-c: $color-text;
 
 // $style: raised   letters standing proud of the tape  (light from top-left)
 //         pressed  letters punched down into it        (the same light, inverted)
@@ -168,16 +241,38 @@ $emboss-vars-emitted: false !default;
 @if not $emboss-vars-emitted {
   :root {
     --emboss-stroke-w:    #{$emboss-stroke};
-    // $color-text, NOT food's softer $color-label-stroke -- that is not one of
-    // the ten the palette CONTRACT guarantees, and naming it here broke the
-    // cocktails build outright the moment this block was written. Shared may only
-    // ask for what every palette promises. Food re-points this to its own softer
-    // value in food/_rule.scss, which is imported after this file.
-    --emboss-stroke-c:    #{$color-text};
-    --emboss-light:       #{$color-emboss-light};
-    --emboss-shadow:      #{$color-emboss-shadow};
     --emboss-offset:      #{$emboss-offset};
     --emboss-offset-lg:   #{$emboss-offset-large};
+
+    // THE THREE TIER SETS. Computed above from $color-text alone -- see the
+    // long comment there for why that is the whole palette-contract budget
+    // shared is allowed to spend, and why the same formulas resolve
+    // correctly on food and illegibly on cocktails (which re-points all
+    // three in its own _rule.scss, the same as it already did for the single
+    // --emboss-stroke-c below).
+    --lettering-display-stroke-c: #{$lettering-display-stroke-c};
+    --lettering-display-light:    #{$lettering-display-light};
+    --lettering-display-shadow:   #{$lettering-display-shadow};
+
+    --lettering-heading-stroke-c: #{$lettering-heading-stroke-c};
+    --lettering-heading-light:    #{$lettering-heading-light};
+    --lettering-heading-shadow:   #{$lettering-heading-shadow};
+
+    --lettering-label-stroke-c:   #{$lettering-label-stroke-c};
+
+    // --emboss-stroke-c/-light/-shadow ARE THE PRE-TIER NAMES, 2026-09-02.
+    // They stay, as aliases of the heading set, so nothing that still reads
+    // them directly changes underneath it -- "nothing un-migrated changes".
+    // That is fewer things than it sounds: every food and shared consumer
+    // that used to read them is migrated onto @include lettering() in this
+    // same commit (see food/_rule.scss and the files it lists), and the one
+    // caller left is punched() itself, which cocktails/_cocktail.scss still
+    // calls directly for the drink page (briefed and edited separately --
+    // not touched here). Delete these three lines, and punched()'s doc
+    // comment below, once that file also names a tier.
+    --emboss-stroke-c: var(--lettering-heading-stroke-c);
+    --emboss-light:    var(--lettering-heading-light);
+    --emboss-shadow:   var(--lettering-heading-shadow);
   }
 
   // `.on-dark` LIVED HERE AND IS GONE, 2026-09-02, issue #469 -- and it is
@@ -203,10 +298,14 @@ $emboss-vars-emitted: false !default;
   // component rules and would have silently missed the fourteenth. Recover it
   // with `git show 0b350c3:_sass/shared/_rule.scss`.
   //
-  // Two things it never reached, recorded because they are still true of any
-  // successor: `shared/_base.scss` hardcodes `$color-text` on plain h1/h2/h3,
-  // and `.site-logo-word`'s stroke WIDTH is a Sass value. The second is fixed
-  // -- that element reads custom properties now -- and the first is not.
+  // Two things it never reached, recorded because they were still true of any
+  // successor as of 2026-08-26. Both are now fixed, on the tiered system
+  // below rather than by `.on-dark`'s mechanism: `shared/_base.scss` no
+  // longer hardcodes `$color-text` on plain h1/h2/h3 (it names its tier,
+  // `@include lettering(heading)`, same as everything else), and
+  // `.site-logo-word`'s stroke width was already fixed by the time this note
+  // was written. Left here as the historical record of what `.on-dark` did
+  // and did not reach, not as an open item.
   $emboss-vars-emitted: true !global;
 }
 
@@ -218,6 +317,69 @@ $emboss-vars-emitted: false !default;
   } @else {
     text-shadow: #{$offset} #{$offset} 0 var(--emboss-light),
                  #{$neg} #{$neg} 0 var(--emboss-shadow);
+  }
+}
+
+// =============================================================================
+// @mixin lettering($tier, $offset) -- THE FOUR TIERS, AS ONE CALL
+// =============================================================================
+// Says WHAT a punched element IS -- display, heading, label or plain -- and
+// resolves that to a stroke and a shadow, rather than asking every call site
+// to write `-webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+// @include punched(raised);` by hand and get the pairing right every time.
+// See the long comment above $lettering-display-stroke-c for the physics this
+// is built on (the highlight-darker-than-paper, shadow-lighter-than-letter
+// finding, 2026-09-02) and LETTERING.md for the full reference -- the table of
+// values per site, the consumer inventory, the traps.
+//
+// DOES NOT CALL punched(), on purpose, even though `display` and `heading` are
+// both a stroke plus a two-copy raised shadow -- exactly what punched() draws.
+// punched() reads --emboss-light/--emboss-shadow, which are shared, inherited
+// custom properties; routing a tier through it would mean locally
+// REDECLARING those two properties on every display/heading element so
+// punched() picks up the right pair, and a locally redeclared custom property
+// inherits into every descendant of that element, not just into punched()'s
+// own text-shadow line. That is a real behaviour change for anything nested
+// inside a heading that also happens to read --emboss-light or --emboss-shadow
+// (nothing does today, but the two are shared, general-purpose names, and
+// someone migrating a component AFTER this one would have no reason to expect
+// a heading was silently rebinding them underneath it). Duplicating punched()'s
+// two-line raised-shadow arithmetic here, reading the tier's OWN four
+// properties directly, costs four lines and avoids that trap outright.
+//
+// EVERY TIERED CONSUMER IS `raised` -- nothing on the site uses `pressed`
+// through a tier, so the mixin does not take a $style argument. punched()
+// keeps it, for cocktails/_cocktail.scss and any future direct caller that
+// genuinely wants the inverted read.
+//
+// $offset DEFAULTS TO var(--emboss-offset) (1px) FOR EVERY TIER, since the
+// wordmark's old 2px is gone (see shared/_layout.scss's .site-logo-top). Two
+// heading-tier consumers -- the recipe title and the recipe/about section
+// headings -- pass var(--emboss-offset-lg) explicitly, same as they did
+// through punched() before. The argument stays rather than being dropped
+// along with the wordmark's 2px: $emboss-offset and $emboss-offset-large are
+// still separate variables precisely because the smaller type levels have not
+// been tuned yet and may want to diverge again (see that note above).
+@mixin lettering($tier, $offset: var(--emboss-offset)) {
+  $neg: calc(#{$offset} * -1);
+  @if $tier == display {
+    -webkit-text-stroke: var(--emboss-stroke-w) var(--lettering-display-stroke-c);
+    text-shadow: #{$neg} #{$neg} 0 var(--lettering-display-light),
+                 #{$offset} #{$offset} 0 var(--lettering-display-shadow);
+  } @else if $tier == heading {
+    -webkit-text-stroke: var(--emboss-stroke-w) var(--lettering-heading-stroke-c);
+    text-shadow: #{$neg} #{$neg} 0 var(--lettering-heading-light),
+                 #{$offset} #{$offset} 0 var(--lettering-heading-shadow);
+  } @else if $tier == label {
+    // Stroke only -- no shadow copy at this size can clear the stroke to be
+    // seen at all. See the tier table above.
+    -webkit-text-stroke: var(--emboss-stroke-w) var(--lettering-label-stroke-c);
+    text-shadow: none;
+  } @else if $tier == plain {
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+  } @else {
+    @error "lettering(): unknown tier `#{$tier}` -- expected display, heading, label or plain.";
   }
 }
 

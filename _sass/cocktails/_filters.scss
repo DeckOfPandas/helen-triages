@@ -130,26 +130,15 @@
 // inside `.drink-label-row`, which shrinks it to its content. That is
 // load-bearing rather than incidental -- take a heading out of a flex row and
 // its bar silently becomes full-width.
-// ONE MARK, TWO PALETTES. `heading-rule` used to be cocktails' own drawing of
-// food's device -- its own dials, its own geometry, and a bug in it that took
-// four rounds of Helen spotting differences to find: an inset box-shadow is
-// measured from the BOTTOM of the box, so the bars sat below the descender line
-// instead of overlapping the letters, and would have moved again the first time
-// anything touched the line-height.
-//
-// It calls the real thing now. `overlapping-rule-double` moved to
-// _sass/shared/_rule.scss on 2026-08-30 and takes both colours as arguments, so
-// this is the same code food's headings run, with green over absinthe instead
-// of green over violet. The geometry cannot drift because there is only one of
-// it.
-//
-// $rule-under-inset-right is food's default and right here for the same reason
-// it is right there: it gives back the letter-spacing after the last character,
-// so the lower bar stops inside the lettering rather than trailing past it.
-// Both headings carry 0.08em of tracking, so the number transfers exactly.
-@mixin heading-rule($colour) {
-  @include overlapping-rule-double($colour, $color-heading-shared);
-}
+// `@mixin heading-rule($colour)` MOVED TO _sass/cocktails/_rule.scss,
+// 2026-09-02 -- the drink page's section headings (INGREDIENTS/METHOD/NOTES)
+// needed the identical two-bar mark this file's filter headings already used,
+// and cocktails/_rule.scss is imported before both this file and
+// cocktails/_cocktail.scss (see assets/css/cocktails.scss), so it is the one
+// place both can reach. Left defined there rather than duplicated here again --
+// the whole point of moving it once already, out of cocktails and into
+// shared/_rule.scss as `overlapping-rule-double`, was that two implementations
+// of one mark do not stay equal; they stay equal until nobody is looking.
 
 .drink-filter--chaos   .drink-field-label-text { @include heading-rule($color-heading-yolo); }
 .drink-filter--mood    .drink-field-label-text { @include heading-rule($color-heading-mood); }

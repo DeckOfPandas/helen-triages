@@ -343,16 +343,23 @@ $color-accent:     $color-electric-absinthe-deep;
 $color-label-stroke: darken($color-ink, 30%);
 
 // --- Typography --------------------------------------------------------------
-// UNCHANGED FROM THE SCAFFOLD, AND THAT IS THE DECISION RATHER THAN THE ABSENCE
-// OF ONE. The scaffold's own note said the typographic voice is the family
-// resemblance between the two sites while colour and decoration are what
-// separate them, and asked that any change here be made as a decision rather
-// than by drift. Cocktails now has a drawing language food does not have, which
-// is separation enough without a second typeface.
+// THE SCAFFOLD'S OWN NOTE SAID TYPOGRAPHY IS THE FAMILY RESEMBLANCE BETWEEN
+// THE TWO SITES, and asked that any change here be made as a decision rather
+// than by drift -- true of $font-headings and $font-body, which stay unchanged
+// below. $font-label is a decision now rather than an absence of one, and the
+// argument is food's own, finally made rather than borrowed.
 //
-// No $font-label. On food that face earned two jobs by surviving four returns
-// (see food/_palette.scss for the list); borrowing the survivor of someone
-// else's argument is not the same as having made one. The one thing on a drink
-// page set in mono for a reason is the AMOUNT, and it uses $font-headings.
+// PLEX IS FOR NUMBERS YOU ACT ON, and a drink amount is exactly that -- the
+// same fact `.ingredient-amount` states on food (see food/_palette.scss's
+// $font-label comment for the rule and its history). This site declared no
+// $font-label until 2026-09-02 on the reasoning that borrowing the survivor of
+// someone else's argument is not the same as having made one; the argument is
+// made now, not borrowed, and it happens to land on the same face. Helen:
+// "Please apply Plex amounts on the drinks page" -- which is the sisterhood
+// she asked for elsewhere the same day ("if we're doing an inversion that we
+// retain some sisterhood", of the shared magenta) applied to type rather than
+// colour: both sites set the number you act on in the same mono, for the same
+// reason, and everything else in Courier stays exactly as different as it was.
+$font-label:    "IBM Plex Mono", "Courier Prime", monospace;
 $font-headings: "Courier Prime", "Courier New", "Courier", monospace;
 $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;

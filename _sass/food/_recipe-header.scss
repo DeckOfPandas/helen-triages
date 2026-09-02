@@ -254,8 +254,19 @@ article.recipe a:not(.badge) {
   // was 2.8% of a 2.2rem glyph, the smallest proportion anywhere on the site,
   // so the raised read this treatment exists for was barely present at the
   // one size it should be most obvious. See shared/_rule.scss.
-  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-  @include punched(raised, var(--emboss-offset-lg));
+  //
+  // DISPLAY TIER, WITH THE LARGE OFFSET, 2026-09-02. The title shipped on the
+  // heading tier for an hour under "T2 wordmark, T1 large headings", then
+  // Helen, looking at Beef Wellington: "recipe title goes hard like the
+  // wordmark please". So the page has three strengths of one construction --
+  // hard on the wordmark and the title, soft on the 1.8rem section headings,
+  // edge only below 1rem -- and the title is the only element besides HELEN
+  // TRIAGES on the display tier. The reference-page titles share this class
+  // and come with it. It still passes $emboss-offset-large explicitly rather
+  // than taking the tier's default; see @include lettering() in
+  // shared/_rule.scss for why that argument outlived the wordmark's 2px.
+  // See LETTERING.md.
+  @include lettering(display, var(--emboss-offset-lg));
   padding: 0;
   @include overlapping-rule-double(
     $color-bright-magenta,
@@ -343,8 +354,11 @@ article.recipe a:not(.badge) {
       // emboss copies have no crisp edge to sit against, so SERVES/PREP/COOK
       // read as outlined rather than raised. Offset was already fine here
       // (1px on 0.85rem is 7.4%); it's the stroke that was swallowing it.
-      -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-      @include punched(raised);
+      //
+      // LABEL TIER, 2026-09-02: stroke only, no shadow -- "T3, flat with
+      // edge", Helen's own name for it when she chose the tier over the
+      // heading treatment for every element this size. See LETTERING.md.
+      @include lettering(label);
       margin-bottom: $space-xs;
     }
 
@@ -412,8 +426,11 @@ article.recipe a:not(.badge) {
   // a 0.9rem label reads raised. This is the class INGREDIENTS/METHOD/NOTES
   // and every peer heading in .recipe-body-content share, so it reaches all
   // of them at once.
-  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-  @include punched(raised, var(--emboss-offset-lg));
+  //
+  // HEADING TIER, WITH THE LARGE OFFSET, 2026-09-02 -- see the matching note
+  // on .recipe-title-text above for why the offset argument stays explicit
+  // and LETTERING.md for the tier's values.
+  @include lettering(heading, var(--emboss-offset-lg));
   position: relative;  // anchor for absolute-positioned method toggle
 
   // The horizontal padding that used to give the ragged brush shape room to
