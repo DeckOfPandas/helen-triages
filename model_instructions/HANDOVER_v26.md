@@ -93,6 +93,20 @@ the generics are large, and those two were never candidates anyway for the
 reason above. **The estimate was made from the number of files rather than
 their size**, which is §11.2 in one line.
 
+**THE RETURN JOURNEY IS IN §11.0.3**, not here: what to do with a file that
+comes back from one of these sessions, including the one command a cocktail
+needs before the suite goes green.
+
+**`tests/test_standalone_docs.py` IS THE GUARD, since 2026-09-02.** Nine checks:
+every fenced YAML block parses, each worked example obeys the rules its own
+document states, and — the half that matters — every garnish, glass, method
+step, tag and star ingredient the documents PRINT is still declared in
+`_data/`. It runs in one direction on purpose: a retired term left in a
+document teaches a value the suite rejects, to a reader who cannot run the
+suite, whereas a newly declared term the document has not caught up with merely
+under-serves. Helen, on the two `tmp/` scripts it grew from: *"It sounds very
+much like they should form part of our suite."*
+
 **Do not let the three drift.** If §4's schema, §5's house style, §7's taxonomy,
 §9.3's schema, the garnish or method vocabularies, or the attribution spec
 changes, the standalone docs need the same edit — they are the only place in
@@ -3448,11 +3462,19 @@ rejected**, and a later pass applies only what survives. Do not turn this into
 an enforcing test without asking; a check that failed on a non-canonical step
 would be enforcing a decision she has not made.
 
-> **THE PASS HAS HAPPENED — 2026-09-02, #630 closed.** This box said it had not
-> from 2026-08-26 until then, and called the file "the oldest unpruned thing
-> here". It is pruned: `proposals` is **empty**, 65 steps were applied across 64
-> drinks, and the collection went from 161 distinct method steps to **146**.
-> Re-measured after the merge rather than quoted.
+> **THE PASS IS DONE — 2026-09-02, #630 closed.** This box said it had not
+> happened from 2026-08-26 until then, and called the file "the oldest unpruned
+> thing here". It is pruned:
+>
+> | | before | after |
+> |---|---|---|
+> | distinct method steps | 161 | **146** |
+> | uses on the canonical spine | 110 | **177** |
+> | outstanding proposals | 24 | **0** |
+>
+> **65 steps across 64 drinks**, of which 62 came from the 20 mechanical rows
+> (applied as text edits by `tmp/apply_method_proposals.py`) and 3 from Helen's
+> rulings on the QQ rows, which are recorded below.
 >
 > **`proposals: {}` IS THE SETTLED STATE, NOT AN EMPTY FILE.** Both this and
 > `garnish.yml` empty out BY DESIGN — that is what "resolved by deletion" means
@@ -3461,13 +3483,48 @@ would be enforcing a decision she has not made.
 > silent loss would switch the check off for whatever is proposed next. §12
 > carries the general form: **a ratchet list and a worklist look identical and
 > want opposite assertions.**
+>
+> **§9.12.1 was the worked precedent and it held exactly**: measure, collapse
+> only what carries no information, propose the rest, let Helen rule, delete
+> each row in whichever direction it went. Use that shape again rather than
+> reinventing it.
+>
+> **THIS BOX WAS WRITTEN TWICE, by two sessions, from opposite sides of the
+> merge** — which is what a shared handover does under parallel work, and the
+> merge conflict is the mechanism catching it rather than a problem. The two
+> accounts agreed on everything except the count, because one was counting the
+> mechanical rows and the other the total. Both numbers are above, said apart.
 
-**The four QQs are where a naive collapse would have changed a drink**, and they
-are the case against the fuzzy matcher that is the obvious alternative here.
-"Shake with ice.", "Shake the rest with ice." and "Stir with ice." each follow
-an earlier build step, so they mean *shake what is in the shaker*, not *shake
-all ingredients*. Normalisation cannot see the preceding step and would have
-collapsed all three, silently altering three recipes.
+**THE FOUR QQ ROWS, AND THE REASON THEY WERE PARKED WAS WRONG FOR TWO OF THEM.**
+This section used to say the short forms "each follow an earlier build step, so
+they mean *shake what is in the shaker*". That was reasoned from the STRING —
+the exact mistake a fuzzy matcher makes, made by hand. Read per instance, with
+the step above each one:
+
+| drink | the step before | answer |
+|---|---|---|
+| `north-sea-oil` "Stir with ice." | **nothing — it is step 1** | → "Stir all ingredients with ice." |
+| `sapins-swizzle` "Shake with ice." | "Add the remaining ingredients." | Helen: *"should retain 'shake with ice'"*. Now canonical. |
+| `caribbean-sazerac` "Shake the rest with ice." | a rinse | Helen: *"match please."* → "Shake the remaining ingredients with ice." |
+| `smokestack-lightning` "Fine strain with ice." | a shake, into a `coupe` | **the GLASS was the wrong field** — see below |
+
+**TWO IDENTICAL-LOOKING STRINGS WENT OPPOSITE WAYS** on nothing but the line
+above them. That is #290's argument against a fuzzy matcher in its concrete
+form, and it is why an explicit map is the right tool. **The preceding step is
+the whole question** for any short verb form; never decide one from its shape.
+
+**AND WHEN A STEP IS INCOHERENT, ASK WHICH FIELD IS WRONG.** Smokestack
+Lightning read as a transcription fault for as long as the glass was assumed
+right — you fine strain to keep ice *out*, and it said `coupe`. Helen: *"'fine
+strain with ice' doesn't mean anything — I bet I meant 'fine strain over
+ice'."* The step was fine and the GLASS was wrong; it is `old fashioned` now.
+`glass:`, `garnish:` and `method:` all describe one serve, so an impossible
+instruction may be a correct instruction beside a wrong glass.
+
+**`"Stir with ice."` is deliberately NOT declared though its shake twin is**: no
+drink stirs after a build today. A future one should say it and be declared
+then. A form with no user is not drift, and adding it now is machinery for a
+case that does not exist.
 
 **Naming the glass in a strain step is the one variance that looks informative
 and is not** — `glass:` already carries it and draws the icon, so "Fine strain
@@ -5225,6 +5282,36 @@ amounts — and prints each one once with its instances under it.
 **It imports every rule from `tests/`**, never re-typing one, for the reason
 `tidy_drafts.py`'s own header gives at length: a checker carrying its own copy
 of the contract eventually reports against a shape the suite has moved on from.
+
+**THE ROUND TRIP, AND IT IS THE HALF THAT WAS MISSING UNTIL 2026-09-02.** The
+standalone documents (see the header) describe what a repo-less session should
+HAND BACK; nothing described what to do when the file arrives. Helen asked
+directly — *"is this in the case where I get files back from a Claude web and
+we need to ingest them properly once I'm back at a desk? Is the pipeline very
+clear in the handover?"* It was not, and it is now the second section of
+`.claude/commands/ingest.md`:
+
+    she pastes INGEST_ONE_*.md + the recipe into claude.ai, away from her desk
+      -> a draft file, plus a short "what I could not know" list
+      -> saved into _food_drafts/ or _cocktail_drafts/ root, on a branch
+      -> COCKTAILS: python3 scripts/derive_cocktail_moods.py --write
+      -> pytest, then /tidy-drafts for food
+      -> work the hand-back list as TIER 3 questions -- ask, never fill in
+      -> ingest_preflight.py for a drink
+
+**A FILE FROM A REPO-LESS SESSION IS 90% OF AN INGEST**, and what is missing is
+exactly the parts that need this repository: `mood` (derived from
+`taxonomy.yml`), `generic` and `suggestion` (a dictionary lookup, and Helen's
+standing `QQ` anyway), a glass the source did not name, and whatever else its
+list flags. **Do not redo the parts that are done** — its prose has already
+been rewritten and re-rewriting it burns her review twice.
+
+**THE COCKTAIL CASE FAILS A TEST ON ARRIVAL AND THAT IS EXPECTED.** `mood: []`
+disagrees with `test_every_drinks_moods_match_the_derivation` until the deriver
+runs. Proved end to end on 2026-09-02 rather than assumed: the worked example
+was copied into `_cocktail_drafts/`, failed exactly that one test, and
+`derive_cocktail_moods.py --write` turned it green — 125 drinks, 124 already
+agreeing, 1 written.
 
 **THE PLAYTEST CHANGED THREE THINGS, and the third is the useful one.**
 Absences became NEAR-MISSES, because "this garnish is undeclared" is noise and

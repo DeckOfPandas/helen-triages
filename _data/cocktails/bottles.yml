@@ -313,6 +313,29 @@ bottles:
     # The curly apostrophe is a SECOND STRING for one bottle and invisible on
     # the page -- it made two entries out of one in every count until now.
     aliases: ["Woodford’s Reserve", "Woodfords Reserve"]
+  # JACK DANIELS IS A BOURBON HERE, Helen's ruling 2026-09-02, and it corrects
+  # something this file asserted for one commit. That entry said Jack Daniels
+  # "is Tennessee whiskey, which is a different legal category" and offered it
+  # as the proof that a bottle's category must never be derived from the
+  # generic beside it. THE EXAMPLE WAS WRONG. Tennessee whiskey meets the
+  # bourbon standard in full; the Lincoln County Process is an ADDITION on top
+  # of it, not an exemption from it. Helen: "It meets all the legal
+  # requirements for being called that, and their own decision to apply a
+  # further qualifier on top is... vain!"
+  #
+  # THE RULE IT WAS OFFERED AS EVIDENCE FOR STILL STANDS -- eleven bottles were
+  # handed back on 2026-08-30 for exactly that reason. It just needs a true
+  # example, and this was not one.
+  "Jack Daniels":
+    generic: "bourbon"
+    aliases: ["Jack Daniel's", "Jack Daniels No. 7"]
+  # `Bulleit` BARE NAMES A HOUSE, and Helen owns both its bourbon and its rye,
+  # so the drink names the product. Deliberately NO bare `Bulleit` alias: a
+  # future drink meaning the rye would resolve to the bourbon silently, which
+  # is the failure this whole file exists to stop.
+  "Bulleit Bourbon":
+    generic: "bourbon"
+    note: "Not being replaced when it runs out — Helen's call, 2026-09-02."
   "Ardbeg XO":
     generic: "single malt scotch whisky"
   # THE PRODUCT REALLY IS CALLED "SAZERAC", which is why it sat in
@@ -335,15 +358,36 @@ bottles:
     aliases: ["Del Maguey VIDA", "Del Maguey vida"]
   "Tapatio":
     generic: "blanco tequila"
+  # Both arrived from #585, where they had been living inside one comma-joined
+  # string ("Patron Silver, Rooster Bianco") on the Margarita. Splitting it is
+  # what exposed the two spelling questions -- the accent and the missing
+  # middle word -- neither of which was visible while they shared a field.
+  # Helen, 2026-09-02: "It's Patron with the diacritic, and Rooster Rojo
+  # Bianco."
+  "Patrón Silver":
+    generic: "blanco tequila"
+    aliases: ["Patron Silver"]
+  "Rooster Rojo Bianco":
+    generic: "blanco tequila"
+    aliases: ["Rooster Bianco"]
 
   # --- brandy ---------------------------------------------------------------
   "Pierre Ferrand Ambre":
     generic: "cognac"
     aliases: ["Pierre Ferrand ambre"]
+  "Avallen":
+    generic: "calvados"
 
   # --- aromatised wine. See #568, which proposes splitting these further -----
   "Carpano Antica Formula":
     generic: "sweet vermouth"
+  # From #585: The Ridgwell's suggestion was the question "Dolin Rouge?" where
+  # the bottle it actually pours belongs. Helen's answer put the curiosity in a
+  # `note` -- "Try Dolin Rouge" -- and left the field naming what goes in the
+  # glass today, which its `item` had said all along.
+  "Martini Rosso":
+    generic: "sweet vermouth"
+    aliases: ["Martini Rosso vermouth"]
   # A BRAND THAT IS ITS OWN GENERIC, the pattern #314 permits for three rums
   # because nothing generalises the bottle. The Ridgwell pours this AND a sweet
   # vermouth in the same drink, 12.5 ml of each, which is the proof that
@@ -387,6 +431,13 @@ bottles:
   "Angostura":
     generic: "aromatic bitters"
     aliases: ["Angostura bitters"]
+  # The exact twin of the entry above, and it arrived the same way: the
+  # Sazerac's `suggestion` said "or other Creole-style bitters", which its
+  # generic already said better, while the bottle sat in `item` -- the field
+  # #544 is retiring. #585 moved it here.
+  "Peychaud's":
+    generic: "Creole bitters"
+    aliases: ["Peychauds", "Peychaud's bitters", "Peychaud’s"]
   "Bittermens Xocolatl Mole":
     generic: "chocolate bitters"
 
@@ -459,31 +510,79 @@ unresolved_suggestions:
   #
   # Listing it here keeps it out of the picker and records WHY, which is what
   # this block is for. #585 is where it gets fixed: Helen names the bottle.
-  "Tesco Finest": >-
-    A retailer range rather than a bottle. Charleston and Cobra Effect both
-    want an `eau de vie` and this says neither which one nor even which
-    spirit. Needs Helen.
-  "Appleton 8, or Appleton 12 Rare Casks": >-
-    Two bottles in one string; wants the list form. Both are
-    `Jamaican, moderately aged`, so nothing is at stake beyond the shape.
-  "ED3 or Havana 3": >-
-    Two bottles in one string; wants the list form. Both `lightly aged and
-    filtered` since #314.
-  # Re-keyed from "ED3, Plantation" on 2026-08-30 when #582 corrected the
-  # spelling in the drink. This block names STRINGS AS WRITTEN, so it moves with
-  # them -- and `test_every_suggested_bottle_resolves` caught the gap the moment
-  # the draft changed, which is the whole reason a declared exception beats a
-  # comment.
-  "ED3, Planteray": >-
-    Two bottles in one string, and since #314 they are in DIFFERENT categories --
-    El Dorado 3 is `lightly aged and filtered`, Planteray 3 Stars is `blended
-    multi-region rum, clear`. Royal Bermuda Yacht Club's generic is the
-    disjunctive pair, so the list form would say exactly the right thing.
-  "El Dorado 5 or 8": >-
-    Two bottles in one string; wants the list form. Both `Demerara, aged`.
-  "Wray & Nephew, or Rum Fire": >-
-    Two bottles in one string; wants the list form. Both `Jamaican, overproof,
-    unaged`.
+  # "Tesco Finest" IS GONE, 2026-09-02, and it went the shortest way available.
+  # Helen: "just drop the Tesco suggestion entirely please. Let's get towards
+  # removing all Tesco bottles from our library because I don't have them any
+  # more." So Charleston and Cobra Effect carry no suggestion at all, which is
+  # the honest state -- their generics (`eau de vie`, `sloe gin`) already say
+  # what the drinks require, and one retailer range standing in for a kirsch on
+  # one drink and a sloe gin on the other said less than nothing.
+  #
+  # A STANDING INSTRUCTION CAME WITH IT: no Tesco own-brand belongs in this
+  # file. There are none left today -- the only other mentions are this comment
+  # and the header's example, both of which are about the rule rather than a
+  # bottle -- but a future ingest that reads one off a shelf photo should leave
+  # the suggestion empty rather than record it.
+  # ALL SIX "TWO BOTTLES IN ONE STRING" ENTRIES CAME OFF ON 2026-09-02, #585 --
+  # the way this block intends, by the DRINK being rewritten rather than the
+  # string reworded. Each is now the list form #457 established, so every
+  # bottle names the option it belongs to:
+  #
+  #   Appleton 8, or Appleton 12 Rare Casks   modern-zombie-makes-2, zombie-intoxica
+  #   ED3 or Havana 3                         el-presidente
+  #   ED3, Planteray                          royal-bermuda-yacht-club
+  #   El Dorado 5 or 8                        dons-own-grog
+  #   Patron Silver, Rooster Bianco           margarita-classic
+  #   Wray & Nephew, or Rum Fire              modern-zombie-makes-2
+  #
+  # NOTHING WAS GUESSED. Every bottle was already named in the string it came
+  # out of; only the shape changed. Seven of the twelve parts already resolved
+  # through `bottles` or an alias, which is why only three land below.
+  #
+  # THE ED3/PLANTERAY SPLIT IS THE ONE WORTH KNOWING ABOUT, and it is the only
+  # one that changed a RECIPE rather than a string. Those two bottles are in
+  # different categories -- El Dorado 3 is `lightly aged and filtered`,
+  # Planteray 3 Stars is `clear blended multi-region rum` -- so the moment the
+  # bottle stopped being unresolvable prose, #534's cross-category check fired
+  # on a drink that had looked fine for as long as nothing could read it. A
+  # DECLARED EXCEPTION SILENCES EVERY CHECK DOWNSTREAM OF IT, not only the one
+  # it was declared against.
+  #
+  # This comment claimed Royal Bermuda Yacht Club's generic "is the disjunctive
+  # pair" and it was a scalar. Helen made it true rather than the other way
+  # round, 2026-09-02: "the generic wants two categories. Both make excellent
+  # drinks, just quite different ones." So the list `generic` now says which
+  # two, and the suggestion crosses nothing. That entry had also been re-keyed
+  # from "ED3, Plantation" on 2026-08-30 when #582 corrected the spelling --
+  # this block names STRINGS AS WRITTEN, and test_every_suggested_bottle_resolves
+  # caught that gap the moment the draft changed, which is the whole reason a
+  # declared exception beats a comment.
+
+  # THE THREE THAT NOW STAND ALONE AND ARE STILL UNDECLARED. Each is a real
+  # bottle name -- an improvement on the prose blob it came out of, which was
+  # awaiting both a split AND a category. What is left is only the category.
+  #
+  # NOT DECLARED HERE, DELIBERATELY. Helen handed eleven bottles back on
+  # 2026-08-30 for exactly this: they had been declared by DERIVING the
+  # category from the generic of the ingredient beside them, which is a good
+  # default and not a rule, because a suggestion may deliberately cross
+  # categories. "Keep only what the collection already spells out; hand me back
+  # the rest." The reasons below record what this file already believes about
+  # each, so declaring them is one question rather than three.
+
+  # --- FIVE MORE ARRIVED WITH #585's RULINGS, 2026-09-02, and every one is a
+  # REAL BOTTLE NAME rather than the prose it came out of. That is the whole
+  # gain: each was previously awaiting a split AND a category, and only the
+  # category is left.
+  #
+  # DELIBERATELY NOT DECLARED, and Jack Daniels is the proof that this is not
+  # timidity. Deriving each category from the generic of the ingredient beside
+  # it is what Helen handed eleven bottles back for on 2026-08-30 -- "a good
+  # default and not a rule, because a suggestion may deliberately cross
+  # categories". Banana Boulevardier's generic is `bourbon`, and JACK DANIELS
+  # IS NOT A BOURBON: it is Tennessee whiskey, which is a different legal
+  # category. A derived declaration would have written a false fact into the
+  # file that #534's cross-category check reads.
   # Carta Switchel's "Havana 7, Appleton 8" came off on 2026-08-31, the way this
   # block intends: the drink now writes the list, so each bottle names the option
   # it belongs to. Helen, asked with the pair in front of her: "thanks, yes
@@ -588,37 +687,9 @@ unresolved_suggestions:
 
   # PROSE, and each already kept out of the index by the search's prose rule --
   # this is the data half. #585 is the backlog.
-  "Avallen -- a round, fresh taste if you need to sub": >-
-    A bottle plus a reason. Avallen is a calvados and Apple Cart's generic says
-    so; #457's shape is the bottle in `suggestion` and the reason in `note`.
-  "Dolin Rouge?": >-
-    A question mark, and #568 answers it: Helen lists Dolin Rouge under sweet
-    red vermouth, "I pick this one when I want a lighter character". The
-    Ridgwell's generic is already `sweet vermouth`, so this wants the question
-    mark taken off rather than a decision.
-  "Jack Daniels > Bulleit": >-
-    A comparison, and the direction is ambiguous -- ">" could mean "prefer" or
-    "replaced by". Banana Boulevardier's generic is `bourbon`; Bulleit makes a
-    bourbon and a rye, and Jack Daniels is neither by category.
-  "Or 20g palm sugar": >-
-    An alternative INGREDIENT, not an alternative bottle -- Caipirinha's generic
-    is `raw sugar`. It wants a `note`, or a second option on the generic.
-  "Patron Silver, Rooster Bianco": >-
-    Two bottles in one string. Patrón Silver is a blanco tequila and matches
-    Margarita's generic; Rooster Rojo Bianco is also a blanco, so this is the
-    list form (#457) rather than a real question.
-  "or other Creole-style bitters": >-
-    Prose. Sazerac's generic is already `Creole bitters`, so the string says
-    only "or something else of the same kind" -- which the generic says better.
-  "or other aromatic bitters": >-
-    The same, against `aromatic bitters`.
+  # "Patron Silver, Rooster Bianco" was split on 2026-09-02 (#585). Its two
+  # halves are above, with what this file already recorded about each.
 
-  "Best with ED3, Havana 3 is fine": >-
-    Prose carrying a real preference between two bottles Helen owns, which is
-    why it STAYS while the two below went: ED3 is the pick and Havana 3 is
-    acceptable, and that is a fact about the drink rather than about the shelf.
-    #457's shape is `suggestion: ["El Dorado 3", "Havana Club 3"]` in that
-    order, with the ranking as a `note`.
   # `Planteray` (bare, on Long Island Iced Tea) and "the cheapest white rum to
   # hand; sometimes JW Spicers" (Milliners Punch) WERE HERE AND ARE
   # GONE, 2026-08-27, because the suggestions themselves are gone. Resolved the

@@ -46,6 +46,49 @@ to `_cocktail_recipes/`. There is no staging.
 
 ---
 
+## A FILE THAT ARRIVES FROM A REPO-LESS SESSION
+
+**Helen finds things away from her desk.** She pastes
+`model_instructions/INGEST_ONE_RECIPE.md` or `INGEST_ONE_COCKTAIL.md` into
+claude.ai along with the recipe, and gets back a draft file plus a short "what
+I could not know" list. **That file is 90% of an ingest and is missing exactly
+the parts that need this repository.** Finishing it is a different job from a
+photo batch and it is much smaller.
+
+**Ask her for the hand-back list.** It names every `QQ` and every guess, and it
+is faster to read than the file. If she has lost it, the `QQ` notes inside the
+file say the same things.
+
+**THE FINISHING PASS, in order:**
+
+1. **Save the file** into `_food_drafts/` or `_cocktail_drafts/` root. Branch
+   the drafts repo first -- never commit to its `main`.
+2. **COCKTAILS ONLY: `python3 scripts/derive_cocktail_moods.py --write`.** The
+   file arrives with `mood: []` because the derivation needs `taxonomy.yml`,
+   which that session did not have. **Without this the suite fails**, on
+   `test_every_drinks_moods_match_the_derivation`, and it is the expected
+   failure rather than a fault in the file. Run it dry first if you want to see
+   what it will add.
+3. **Run `pytest`.** Everything mechanical shows up here -- quoting, dashes,
+   accents, an undeclared tag, a missing glass.
+4. **`/tidy-drafts`** for the food side if the quoting or typography needs it.
+   It never touches a `QQ` line, so the transcription is safe.
+5. **Work the hand-back list, and treat every item as a TIER 3 question.**
+   These are the things that session could not know, which is nearly always
+   because the answer is in Helen's head rather than in the source. A missing
+   glass, a `generic`, a `tagline`: ask, do not fill in.
+6. **Run `python3 scripts/ingest_preflight.py`** for a drink, which reports the
+   undeclared bottles and near-miss garnishes in the same shape as a photo
+   batch.
+
+**WHAT NOT TO DO TO IT.** Do not rewrite its prose, do not re-derive its
+`main_ingredients`, and do not "improve" a `QQ Claude` line -- a rewrite pass
+has already happened and redoing it burns Helen's review twice. Do not fill in
+a `generic` or a `suggestion`: those are `QQ` by her standing ruling until she
+makes the drink, and that is not relaxed by the file arriving from elsewhere.
+
+---
+
 ## TIER 1 -- do it at ingest, unasked, both sites
 
 - **Every qualifier the source states.** Sugar, butter, flour, milk, eggs,
