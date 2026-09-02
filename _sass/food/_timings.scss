@@ -89,8 +89,9 @@
     text-transform: uppercase;
     letter-spacing: $letter-spacing-label;
     color: $color-text;
-    -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-    @include punched(raised);
+    // Label tier, 2026-09-02 -- a 0.7rem field label is well under the 1rem
+    // line, so stroke only, no shadow. See LETTERING.md.
+    @include lettering(label);
   }
 
   input, select {
@@ -270,8 +271,13 @@
 
 .ct-card-name {
   letter-spacing: 0.02em;
-  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-  @include punched(raised);
+  // Heading tier, 2026-09-02: this sits at exactly 1rem, the tier table's own
+  // threshold (font-size: 1rem, two rules up), so it lands on the >= 1rem
+  // side and gets the fuller stroke+shadow treatment rather than the
+  // stroke-only label one. It reads more like a card's own name than a field
+  // label, so the boundary call agrees with what the element actually is, not
+  // only with the number. See LETTERING.md.
+  @include lettering(heading);
 }
 
 .ct-total {

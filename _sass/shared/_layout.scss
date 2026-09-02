@@ -506,27 +506,6 @@ $tape-protrusion: 0.2rem;
   // answer: "please make the punched font treatment the same for HELEN TRIAGES
   // and [ COCKTAILS ]." Food's default is unchanged.
   color: var(--wordmark-top-color, #{$color-text});
-  // Brought onto $emboss-stroke 2026-08-12 with every other heading on the
-  // site. THIS IS THE CHANGE HERE MOST LIKELY TO WANT REVERTING, so: it was
-  // `1.2px rgba(50,50,50,0.9)`, which is 3.75% of this element's 2rem -- the
-  // heaviest outline anywhere, and the reason the note below had to widen the
-  // offset to 2px to be seen past it at all. Thinning the stroke is the other
-  // way to solve that same problem, and it's the way every other heading now
-  // solves it. Put the old line back verbatim if HELEN TRIAGES has lost too
-  // much weight; the 2px offset below is independent and should stay either
-  // way (2rem x 6.5% = 2.1px, so it is on the ratio, not a compensation any
-  // more).
-  //
-  // Colour follows too: rgba(50,50,50,0.9) was a standalone grey with no
-  // relationship to the letter it outlined -- the same thing .category-label
-  // called out and fixed for itself. $color-text at 0.8 is derived from the
-  // lettering, and shared/ may name it (palette contract, HANDOVER §2.3).
-  // THROUGH A CUSTOM PROPERTY SINCE 2026-09-01, AND THAT IS THE POINT RATHER
-  // THAN A TIDY-UP. See the block below the shadow for the whole story: this
-  // element was outside the custom-property system, so cocktails' inversion
-  // could not reach it and it broke. Food's value is the default and is
-  // unchanged; cocktails re-points it in its own _rule.scss.
-  -webkit-text-stroke: $emboss-stroke var(--wordmark-top-stroke, #{rgba($color-text, 0.8)});
   text-transform: uppercase;
   // NOT padding-right: 0.18em, deliberately -- that was here before and it's
   // why HELEN TRIAGES visibly shifted right on cocktails. letter-spacing adds
@@ -537,88 +516,58 @@ $tape-protrusion: 0.2rem;
   // this box always defined its own column (food), visible the moment
   // something else (cocktails' wider word) does instead -- the box gets
   // centered in extra space and the built-in right-bias becomes a shift.
-  @include punched(raised);
-  // Default 1px emboss offset was getting swallowed by this element's own
-  // heavy 1.2px stroke -- Helen: "can HELEN TRIAGES be raised too... if it
-  // is already then we need to look at the colours." Traced to offset, not
-  // colour, once followed through: at 1px the shadow barely clears the
-  // stroke at all, so it read as a flat drop-shadow rather than a raised
-  // letter. Widened to 2px so it's clearly visible past the stroke; dark
-  // side also strengthened a little for the same reason (0.38 -> 0.5).
-  // Light side confirmed good at $color-bg, then finalised by Helen at a
-  // literal #dad7d8 -- a touch darker than $color-bg, giving the highlight
-  // a bit more presence than "invisible against the page" without tipping
-  // back into the stark-white territory the tag work ran into.
-  //
-  // AND IT IS A CUSTOM PROPERTY NOW, 2026-09-01, BECAUSE THE HARDCODING BROKE
-  // THE MOMENT A SITE INVERTED. The two literals above are solved for DARK TYPE
-  // ON A LIGHT GROUND: #dad7d8 is "a touch darker than the page" and so reads as
-  // a highlight, and rgba($color-text, 0.5) is half-strength ink and so reads as
-  // a shadow. On cocktails' black ground $color-text is near-WHITE, so the
-  // second copy became light too -- a pale blob up-left and a pale blob
-  // down-right of a near-white letter, 2px apart in opposite directions. Helen:
-  // "the wordmark text is weirrrrrd."
-  //
-  // The section below already named the cause without anyone noticing it was a
-  // BUG waiting rather than a curiosity: "the rule above reads $emboss-stroke as
-  // a SASS variable and then overrides punched() with a literal text-shadow, so
-  // it sits outside the custom-property system that pass moved everything else
-  // onto. Nothing touching those properties could reach it." That was written
-  // about a typography pass. It was equally true of a palette.
-  //
-  // FOOD'S VALUES ARE THE DEFAULTS AND ARE BYTE-IDENTICAL -- checked in the
-  // compiled CSS, not assumed. Cocktails re-points them in its own _rule.scss,
-  // which is the palette contract doing its job (§2.3) rather than a chrome
-  // fork: one rule, one markup, a value that each site supplies.
-  text-shadow: var(--wordmark-top-shadow,
-                   -2px -2px 0 #dad7d8, 2px 2px 0 #{rgba($color-text, 0.5)});
+  // THE DISPLAY TIER, 2026-09-02. See @mixin lettering() in shared/_rule.scss
+  // for the mechanism and LETTERING.md for the full table.
+  @include lettering(display);
 }
 
 // =============================================================================
-// #477 IS SETTLED: THIS ELEMENT DOES NOT MATCH PAGE HEADINGS, ON PURPOSE.
+// #477 WAS SETTLED, THEN REOPENED, THEN SETTLED THE OTHER WAY -- READ THIS
+// BEFORE CHANGING THE ELEMENT ABOVE.
 // =============================================================================
-// Read this before "fixing" the values above. They are the pre-#470 numbers
-// and they are staying.
+// THREE STATES, IN ORDER. (1) Pre-#470: this element carried its own
+// hand-tuned numbers, entirely outside the shared emboss system -- a heavier
+// 1.2px stroke, a 2px offset, a literal `#dad7d8` highlight and `rgba(ink,
+// 0.5)` shadow, written as a Sass expression rather than a custom property.
+// (2) #477, 2026-08-26: Helen asked why it looked different from a heading,
+// a switch was built to match it to the shared values, and she looked at the
+// match and kept the ORIGINAL instead -- "I prefer the old HELEN TRIAGES,
+// even though it's on its own in terms of styling. I like the drama." The
+// switch was deleted and this section documented the difference as a decision
+// rather than an oversight. (3) 2026-09-02: Helen reopened it anyway --
+// "HELEN TRIAGES is not treated the same way as the other headings and should
+// be" -- and this time the answer is state (3), not a reversion to (1).
 //
-// WHAT WAS FOUND, 2026-08-26. Helen: "the HELEN TRIAGES part of the wordmark
-// looks different to page headings now -- maybe it wasn't updated in our
-// typography pass." It was not, and it could not have been: the rule above
-// reads `$emboss-stroke` as a SASS variable and then overrides `punched()`
-// with a literal text-shadow, so it sits outside the custom-property system
-// that pass moved everything else onto. Nothing touching those properties
-// could reach it. It differs from a heading in all four:
+// WHAT CHANGED IN BETWEEN, AND WHY THE OLD "DRAMA" ARGUMENT NO LONGER APPLIES.
+// States (1) and (2) both predate the 2026-09-02 finding (shared/_rule.scss,
+// above $lettering-display-stroke-c) that FOOD'S HEADINGS THEMSELVES WERE
+// WRONG -- a highlight lighter than the page and a shadow two-thirds ink both
+// asked the physics to do something a raised dark letter on a light page
+// cannot do. "The drama" state (2) kept was, in hindsight, closer to correct
+// than the headings it was being compared against: a stronger stroke, more
+// highlight headroom, a shadow with real presence. Once the headings were
+// fixed to the same physics, matching them stopped being a demotion and
+// became "the same construction, one tier harder" -- which is exactly what
+// the display tier is: display's numbers (darken 12%/lighten 53%/rgba 0.24)
+// are heading's own formula (darken 5%/lighten 65%/rgba 0.16) pushed further
+// in the same three directions, not a different idea.
 //
-//     stroke colour   rgba(ink, 0.8)   vs  lighten(ink, 30%)
-//     offset          2px              vs  1px
-//     highlight       #dad7d8          vs  #ffffff
-//     shadow          rgba(ink, 0.5)   vs  rgba(ink, 0.68)
+// SO THE WORDMARK NOW READS `@include lettering(display)`, THE SAME
+// CONSTRUCTION EVERY HEADING USES, AT A TIER OF ITS OWN. It keeps its own
+// numbers -- nothing here converged onto the heading tier's values, only onto
+// the heading tier's MECHANISM -- and it keeps the offset at the shared 1px:
+// the old 2px was solved for the old, too-thin shadow needing extra distance
+// to clear a heavy stroke; the new shadow has real weight of its own and does
+// not need the extra throw. Cocktails supplies its own display set in its own
+// _rule.scss, converted from the numbers Helen tuned for its wordmark under
+// the black-on-black inversion (2026-09-01) rather than re-derived.
 //
-// The evidence that it was an oversight is as strong as it gets: `.site-logo-
-// word`, the tape line of the SAME component a hundred lines below, WAS
-// re-tuned for Courier Prime under #470, by Helen at /dev/emboss/. Two lines
-// of one wordmark, one moved and one did not.
-//
-// AND IT STAYS ANYWAY. A switch was built to see it matched -- both sites,
-// reading the shared custom properties so each wordmark took its own site's
-// heading values -- and Helen looked at it and kept the old one: "I prefer the
-// old HELEN TRIAGES, even though it's on its own in terms of styling. I like
-// the drama." The switch is deleted; being able to flip it was worth building
-// and worth removing once it had answered.
-//
-// SO THE DIFFERENCE IS NOW A DECISION, AND THAT IS THE POINT OF THIS COMMENT.
-// A wordmark is not a heading: it is a logo, it is the one piece of furniture
-// both sites share, and looking like an h1 is not a goal it has. The values
-// above were hand-tuned -- the highlight is recorded a few lines up as
-// "finalised by Helen at a literal #dad7d8" -- and the heavier stroke with the
-// wider offset is what carries the drama she kept it for.
-//
-// THE STRUCTURAL COMPLAINT IS SEPARATE AND STILL FAIR: this element cannot be
-// reached by `.on-dark`, because its stroke width is a Sass value rather than
-// `var(--emboss-stroke-w)`. Nothing renders on a dark ground today so nothing
-// is broken, but a future dark section would leave the wordmark behind.
-// Adopting the WIDTH variable while keeping every tuned value is a change with
-// no visual effect and is not made here, because "no visual effect" is a claim
-// best made in a commit that can be reverted on its own.
+// THE STRUCTURAL COMPLAINT #477 ALSO RAISED IS RESOLVED AS A SIDE EFFECT: this
+// element's stroke width was a Sass value outside the custom-property system,
+// so `.on-dark` (since removed, see shared/_rule.scss) could never have
+// reached it. @include lettering(display) reads var(--emboss-stroke-w) like
+// every other tier, so a future dark section on food would reach the wordmark
+// the same way it reaches a heading.
 
 .site-logo-tape {
   grid-column: 1;

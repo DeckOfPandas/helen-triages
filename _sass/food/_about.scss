@@ -224,6 +224,21 @@ article.recipe .recipe-body-content.about-page {
       // two share a right edge -- Helen's ask. See $about-measure above for why
       // this can't just be the `68ch` the paragraphs use.
       max-width: $about-measure;
+      // MATCHES SERVES/PREP/COOK, 2026-09-02. Without this the question
+      // inherited `.recipe-body-content h3`'s own rule (food/_recipe-notes-
+      // body.scss) -- 0.78rem, lighten($color-clear-text, 10%), a fair bit
+      // greyer than a metadata label -- because about.html deliberately wraps
+      // this page in `.recipe-body-content` (see that file's own comment).
+      // Helen: "FAQ headings need to be darker, possibly simply matching
+      // SERVES / PREP / COOK even though they're on different pages." So this
+      // restates that element's own values rather than its size/spacing --
+      // 0.85rem, $letter-spacing-label, full $color-text -- and the label
+      // tier for the lettering, same reasoning as that element: stroke only,
+      // no shadow, nothing at this size for a shadow copy to clear.
+      font-size: 0.85rem;
+      letter-spacing: $letter-spacing-label;
+      color: $color-text;
+      @include lettering(label);
 
       &::before {
         @extend %about-mark;
