@@ -3446,28 +3446,55 @@ rejected**, and a later pass applies only what survives. Do not turn this into
 an enforcing test without asking; a check that failed on a non-canonical step
 would be enforcing a decision she has not made.
 
-> **THE PASS HAS NOT HAPPENED, AND THE FILE IS THE OLDEST UNPRUNED THING HERE.**
-> Re-measured 2026-08-31 rather than quoted: **308 step uses, 161 distinct, 110
-> already canonical, 24 proposals outstanding (20 with a suggested form, 4 QQ),
-> 62 steps a clean apply would move.** 120 distinct steps match neither the
-> canonical set nor a proposal, so this is a partial map and always was.
+> **THE PASS IS DONE, 2026-09-02, #630.** This box said "THE PASS HAS NOT
+> HAPPENED, AND THE FILE IS THE OLDEST UNPRUNED THING HERE" from 2026-08-31
+> until then, and the numbers below are what changed:
 >
-> **§9.12.1 is the worked precedent now.** `garnish.yml` went from census to a
-> pruned, EMPTY `proposals` block in two days, on the same shape — measure,
-> collapse only what carries no information, propose the rest, let Helen rule,
-> delete each row in whichever direction it went. Do that here rather than
-> reinventing the method. The 20 resolvable rows are the mechanical kind; the 4
-> QQs are the dangerous kind and are why a fuzzy matcher is the wrong tool.
+> | | before | after |
+> |---|---|---|
+> | distinct method steps | 161 | **146** |
+> | uses on the canonical spine | 110 | **177** |
+> | outstanding proposals | 24 | **0** |
 >
-> **Tracked as #630**, with the measurement in it, so the next reader does not
-> re-derive the census to find out whether it is worth doing.
+> **The 20 mechanical rows moved 62 steps across 61 drinks**, applied as text
+> edits by `tmp/apply_method_proposals.py`. `proposals` is `{}` and the key
+> stays. The four QQ rows were Helen's and are answered below.
+>
+> **§9.12.1 was the worked precedent and it held exactly**: measure, collapse
+> only what carries no information, propose the rest, let Helen rule, delete
+> each row in whichever direction it went. Use that shape again rather than
+> reinventing it.
 
-**The four QQs are where a naive collapse would have changed a drink**, and they
-are the case against the fuzzy matcher that is the obvious alternative here.
-"Shake with ice.", "Shake the rest with ice." and "Stir with ice." each follow
-an earlier build step, so they mean *shake what is in the shaker*, not *shake
-all ingredients*. Normalisation cannot see the preceding step and would have
-collapsed all three, silently altering three recipes.
+**THE FOUR QQ ROWS, AND THE REASON THEY WERE PARKED WAS WRONG FOR TWO OF THEM.**
+This section used to say the short forms "each follow an earlier build step, so
+they mean *shake what is in the shaker*". That was reasoned from the STRING —
+the exact mistake a fuzzy matcher makes, made by hand. Read per instance, with
+the step above each one:
+
+| drink | the step before | answer |
+|---|---|---|
+| `north-sea-oil` "Stir with ice." | **nothing — it is step 1** | → "Stir all ingredients with ice." |
+| `sapins-swizzle` "Shake with ice." | "Add the remaining ingredients." | Helen: *"should retain 'shake with ice'"*. Now canonical. |
+| `caribbean-sazerac` "Shake the rest with ice." | a rinse | Helen: *"match please."* → "Shake the remaining ingredients with ice." |
+| `smokestack-lightning` "Fine strain with ice." | a shake, into a `coupe` | **the GLASS was the wrong field** — see below |
+
+**TWO IDENTICAL-LOOKING STRINGS WENT OPPOSITE WAYS** on nothing but the line
+above them. That is #290's argument against a fuzzy matcher in its concrete
+form, and it is why an explicit map is the right tool. **The preceding step is
+the whole question** for any short verb form; never decide one from its shape.
+
+**AND WHEN A STEP IS INCOHERENT, ASK WHICH FIELD IS WRONG.** Smokestack
+Lightning read as a transcription fault for as long as the glass was assumed
+right — you fine strain to keep ice *out*, and it said `coupe`. Helen: *"'fine
+strain with ice' doesn't mean anything — I bet I meant 'fine strain over
+ice'."* The step was fine and the GLASS was wrong; it is `old fashioned` now.
+`glass:`, `garnish:` and `method:` all describe one serve, so an impossible
+instruction may be a correct instruction beside a wrong glass.
+
+**`"Stir with ice."` is deliberately NOT declared though its shake twin is**: no
+drink stirs after a build today. A future one should say it and be declared
+then. A form with no user is not drift, and adding it now is machinery for a
+case that does not exist.
 
 **Naming the glass in a strain step is the one variance that looks informative
 and is not** — `glass:` already carries it and draws the icon, so "Fine strain
