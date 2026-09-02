@@ -75,9 +75,29 @@ no_garnish: "no garnish"
 # string has become the wrong shape; until then this costs one line.
 
 # --- THE VOCABULARY ----------------------------------------------------------
-# Grouped for reading only. tests/test_cocktails.py flattens every list under
-# `canonical`, so a group added tomorrow is covered tomorrow -- the same shape
-# methods.yml and ingredients.yml both use.
+# tests/test_cocktails.py flattens every list under `canonical`, so a group
+# added tomorrow is covered tomorrow -- the same shape methods.yml and
+# ingredients.yml both use.
+#
+# THE GROUPING IS NO LONGER "FOR READING ONLY", WHICH IS WHAT IT SAID HERE
+# UNTIL 2026-09-02. Ruling D11 of INGEST_INBOX_DESIGN.md asked for every
+# declared garnish to carry a group, so that the grouping the repo-less ingest
+# document prints is data rather than a map living in a script. This mapping
+# already WAS that data: `canonical:` is group name -> list, so every garnish
+# sits in exactly one group by construction. The design doc allows this shape
+# explicitly ("a `groups:` map from group name to list is acceptable"), and it
+# is the better of the two -- a per-entry `group:` key would turn each entry
+# from a string into a dict, which is precisely the change that would empty
+# `_declared_garnishes()` in silence and take every garnish check with it.
+#
+# WHAT IS DIFFERENT IS THE CONSEQUENCE. `scripts/build_ingest_vocab.py` renders
+# these group names and their members straight into INGEST_ONE_COCKTAIL.md §4,
+# with the key title-cased for the heading (`citrus_peel` -> "Citrus peel"). So
+# renaming a group renames a heading in a document handed to a session that
+# cannot check it, and moving a garnish between groups moves it in print.
+# `test_every_declared_garnish_has_exactly_one_group` in
+# tests/test_standalone_docs.py is the guard, and the generator's own test is
+# what keeps the document in step.
 canonical:
 
   # Peel. The commonest garnish in the collection by a distance.
