@@ -81,17 +81,26 @@
   position: absolute;
   top: -0.65rem;
   left: 1.1rem;
-  // $font-label, not $font-headings, since 2026-08-24. Helen: "our
-  // styling for the notes box labels is a little unloved... I'm wondering about
-  // trying our new Plex Mono there."
+  // BACK IN COURIER PRIME, 2026-09-02. This spent since 2026-08-24 in
+  // $font-label -- Helen: "our styling for the notes box labels is a little
+  // unloved... I'm wondering about trying our new Plex Mono there" -- on a
+  // functional argument: at 0.62rem UPPERCASE, about as small as type gets on
+  // this site, Plex Mono's larger x-height and more open counters read better
+  // than Courier Prime, which closes up at that size.
   //
-  // The functional argument is the one that decided it rather than the taste
-  // argument: this is 0.62rem UPPERCASE, which is about as small as type on this
-  // site gets, and Plex Mono has a noticeably larger x-height and more open
-  // counters than Courier Prime. A Courier at 0.62rem is thin and closes up; a
-  // Plex at 0.62rem stays readable. The label was "unloved" partly because the
-  // face was working against the size it was being asked to hold.
-  font-family: $font-label;
+  // THE RULE THAT REPLACED IT IS NARROWER AND THIS FAILS IT. Plex Mono is for
+  // numbers you act on, and a note label ("TIP", "MAKE AHEAD") is a word, not
+  // a figure -- see food/_palette.scss's $font-label comment for the rule and
+  // HANDOVER §13.10.1 for the full history. It was the last label-shaped
+  // consumer standing once the other four (category labels, filter tags,
+  // badges, the recipe-title link) had already come back to Courier; this one
+  // survived only because "recipe page, hands full" and "a number" happened to
+  // agree for every OTHER consumer at the time the rule was written.
+  //
+  // NO SYNTHESIS AT THIS WEIGHT: Courier Prime ships a real 700 face (see
+  // shared/_fonts.scss), so this doesn't fall back to a browser-faked bold the
+  // way an in-between weight would.
+  font-family: $font-headings;
   font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;

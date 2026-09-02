@@ -553,7 +553,11 @@ $amount-indent: $amount-col + $amount-gap;
 }
 
 .cocktail-amount {
-  font-family: $font-headings;
+  // PLEX MONO, 2026-09-02: a drink amount is a number you act on, the same
+  // fact food's .ingredient-amount was already built on -- see
+  // cocktails/_palette.scss's $font-label comment.
+  font-family: $font-label;
+  font-weight: 600;
   font-size: 0.95rem;
   width: $amount-col;
   flex: none;
@@ -882,7 +886,13 @@ $amount-indent: $amount-col + $amount-gap;
   }
 
   // What you read with your hands full.
-  .cocktail-amount { font-size: 1.3rem; font-weight: 700; }
+  //
+  // WEIGHT STAYS 600 HERE TOO, 2026-09-02 -- was 700, which is not a loaded
+  // Plex Mono weight (shared/_fonts.scss carries 600 only), so this size-only
+  // override was quietly asking the browser to synthesise a fake bold on top
+  // of the base rule's real one. Only the size needs restating for the larger
+  // "make it" view; the weight and family are the base rule's already.
+  .cocktail-amount { font-size: 1.3rem; font-weight: 600; }
   .cocktail-item { font-size: 1.15rem; }
   .cocktail-ingredient { padding: $space-md 0; }
   .cocktail-method { font-size: 1.1rem; line-height: 1.85; }

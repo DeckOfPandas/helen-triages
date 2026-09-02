@@ -7217,14 +7217,14 @@ All generated with `marks_seed` unset (defaults to `seed`) — see
 ### 13.10 Typography — three fonts, and the rule for which goes where
 
 **The site self-hosts everything and names no system font as a first choice.**
-`_sass/shared/_fonts.scss` declares nine faces, 152 KB, latin subset, served from
+`_sass/shared/_fonts.scss` declares eight faces, 124 KB, latin subset, served from
 `assets/fonts/` with relative urls (which resolve against the compiled
 stylesheet's own location, so they survive any baseurl — a `{{ site.baseurl }}`
 would not work at all, Sass not being run through Liquid).
 
     Selawik        300 350 400 600 700    $font-body
     Courier Prime  400 700                $font-headings
-    IBM Plex Mono  600 700                $font-label
+    IBM Plex Mono  600                    $font-label
 
 Every stack keeps the old system font as its fallback, so a failed woff2 degrades
 to what the site looked like before rather than to a generic.
@@ -7250,17 +7250,27 @@ untouched. Rejected: Open Sans (Helen: "aggressively blah"), Cousine (Courier
 New's metrics on Liberation Mono — the measurements without the character),
 Myriad Pro (commercial Adobe, cannot be self-hosted in a public repo).
 
-#### 13.10.1 `$font-label` — the rule, and the four elements that failed it
+#### 13.10.1 `$font-label` — the rule, and the five elements that failed it
 
-**The index is entirely Courier Prime. IBM Plex Mono appears only on recipe
-pages, on two things: `.ingredient-amount` and `.note-label`.** That is the whole
-rule. The split falls on **browsing versus cooking**, not on any property of the
-elements.
+**IBM Plex Mono is for numbers you act on.** Ingredient amounts on food, drink
+amounts on cocktails, the temperature readouts and axis ticks on the doneness
+charts, the inputs and results of the timings calculator. Nothing else — not
+labels, not badges, not buttons, not note labels.
 
-It is short because it is what survived. This variable was `$font-recipe-title`,
-then over three days owned badges, tag buttons, category labels, filter states,
-two status messages and the index titles. **Every one came back**, and the
-returns are worth more than the rule:
+**Settled 2026-09-02, Helen:** "Please apply Plex amounts on the drinks page,
+and the doneness charts and timing calculator. Send note labels back to
+Courier." Every consumer as of that decision:
+
+    food/_recipe-annotations.scss   .ingredient-amount
+    cocktails/_cocktail.scss        .cocktail-amount
+    food/_temperature-chart.scss    .tc-value, .tc-tick
+    food/_timings.scss              .ct-field input/select, .ct-total,
+                                     #ct-table td:last-child
+
+It took two rules and a run of five returns to find. This variable was
+`$font-recipe-title`, then over three days owned badges, tag buttons, category
+labels, filter states, two status messages and the index titles. **Every one
+came back**, and the returns are worth more than either rule tried on them:
 
 - `.category-label` failed on **size**. At 1.35rem it was the largest thing
   wearing the face, and Plex at display size reads as a *heading* font — the one
@@ -7276,14 +7286,32 @@ returns are worth more than the rule:
   "I could justify it intellectually by counting font groups, but it could well
   be that I got used to seeing the typewriter effect and now I miss it." The
   justification turned out to be the good one.
+- **`.note-label` failed last, and took the longest to notice.** It held the
+  face from 2026-08-24 until this decision — a real functional win at the time
+  (Plex's larger x-height reads better than Courier Prime at 0.62rem uppercase)
+  — under the rule this section used to state: "is this on a recipe page, and
+  something you look at with your hands full?" A note label passed that test
+  for a year of not being looked at closely, because on food's own pages the
+  test and the real rule happened to agree for every OTHER element too. It
+  stopped agreeing the moment Plex was asked onto a temperature reading and a
+  calculator result — neither is "a recipe page" and both are obviously
+  correct — which is what exposed the old rule as a proxy for the true one
+  rather than the true one itself. `.note-label` is a word ("TIP", "MAKE
+  AHEAD"), not a figure, so it went back to Courier the same day.
 
-**So the test for a new consumer is not "is this a label".** Every returned
-element was a label. It is: *is this on a recipe page, and something you look at
-with your hands full?* The rule that lost four times — "things you scan" — asked
-what an element **is**. The rule that works asks what it must **agree with**.
+**So the test for a new consumer is not "is this a label", and it is not "is
+this on a recipe page" either — both lost to the plainer question underneath
+them: is it a number you act on?** Every element in the list above that failed
+was a label of some kind, on a recipe page or off it. Every element that has
+actually held the face — food's amount, cocktails' amount, a temperature
+reading, an axis tick, a calculator input or result — is a figure someone
+reads in order to do something with it.
 
-The clash only works while Plex Mono is the minority. Two consumers is a
-comfortable minority; five was not.
+The clash only works while Plex Mono stays the minority face. It now has more
+consumers than it did under the old rule, across both sites and off the
+recipe page entirely, but the shape hasn't changed: everything you *read* to
+decide something is still Courier or body prose, and only the number you act
+on next wears the third face.
 
 #### 13.10.2 The emboss, and the ceiling on the highlight
 
