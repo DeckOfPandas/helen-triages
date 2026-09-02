@@ -631,9 +631,9 @@ $tape-protrusion: 0.2rem;
   padding: 0 1.4em;
   white-space: nowrap;
   // ==========================================================================
-  // THE ONE HEADING ON THE SITE THAT IS DELIBERATELY EXCLUDED FROM THE SHARED
-  // PUNCHED-TAPE LETTERING. DO NOT "FIX" IT BY GIVING IT $emboss-stroke OR
-  // @include punched() -- that is what it had, and it did not work.
+  // THE ONE HEADING ON THE SITE THAT IS DELIBERATELY EXCLUDED FROM THE FOUR
+  // LETTERING TIERS. DO NOT "FIX" IT BY GIVING IT A TIER OR @include punched()
+  // -- both are what it had at different points, and neither worked.
   // ==========================================================================
   // Confirmed as a permanent exception by Helen on 2026-08-12, when the
   // treatment went site-wide and everything else came onto one ratio: "please
@@ -645,9 +645,16 @@ $tape-protrusion: 0.2rem;
   // THE REASON IS THE BACKGROUND, and it applies to nothing else on the site.
   // Every other heading is dark type on $color-bg, where a light copy offset
   // up-and-left genuinely reads as a highlight. This word is LIGHT TYPE ON THE
-  // TAPE SVG. Its sibling .site-logo-top (HELEN TRIAGES) is a normal consumer
-  // of the shared treatment and was brought onto the ratios the same day; the
-  // two halves of the lockup have always been styled independently.
+  // TAPE SVG. Its sibling .site-logo-top (HELEN TRIAGES) IS a normal consumer
+  // of the tiered treatment -- it reads @include lettering(display), see that
+  // rule above -- and the two halves of the lockup have always been styled
+  // independently regardless: one is a page-ground wordmark, the other is
+  // light type on an SVG tape, and only one of those two problems has ever
+  // had a tier built for it. This word's own defaults, below, are the
+  // untiered fourth case -- see cocktails/_rule.scss for how the two sites'
+  // header tapes came to agree on using them (2026-09-02, #469), and
+  // cocktails/_cards.scss for the CARD tape's own, deliberately different,
+  // two-copy version of this same idea.
   //
   // Redesigned in the issue #122 pass (2026-08-10), replacing the
   // @include punched(raised) + single-pair-shadow version this used to be.
@@ -702,15 +709,26 @@ $tape-protrusion: 0.2rem;
   // wordmark uses the SHARED punched lettering wants the shared edge with it --
   // 13.4.1's rule is that stroke sets an edge's weight and shadow sets its
   // direction, so half the treatment is half the effect. Food keeps 0px.
+  //
+  // COCKTAILS BRIEFLY OVERRODE THIS, AND DOESN'T ANY MORE, 2026-09-02
+  // (#469). For part of one day this and the text-shadow below both read a
+  // `--wordmark-word-*` pair cocktails/_rule.scss set to the card tape's own
+  // two-copy, no-stroke numbers, so its header tape word matched HELEN
+  // TRIAGES on that site. Superseded the same day when Helen asked to treat
+  // [ COCKTAILS ] the way [ FOOD ] is treated instead -- and [ FOOD ] has
+  // never overridden either property, so matching it means matching THIS
+  // fallback, on both sites. Both variables still exist for any site that
+  // wants a genuinely different treatment; none currently supplies one. See
+  // cocktails/_rule.scss for the fuller history and cocktails/_cards.scss for
+  // why the CARD tape word stays on its own two-copy version regardless.
   -webkit-text-stroke: var(--wordmark-word-stroke, 0px);
 
   // A CUSTOM PROPERTY FOR THE SAME REASON AS .site-logo-top ABOVE, though this
   // one was never broken by the inversion: it is already light type on black
-  // tape, so the ground moving underneath it changed nothing. It is a variable
-  // so that a site which has settled a DIFFERENT lettering treatment can use
-  // its own -- cocktails now has one, chosen by Helen against these four copies
-  // and preferred to them at card size, and she asked for the wordmark to match
-  // it. Food keeps these values, which are #470's and are hers.
+  // tape, so the ground moving underneath it changed nothing. Food's own
+  // values, below, are #470's and are hers, and are now what both sites'
+  // header tape word renders -- see the stroke note just above for how
+  // cocktails arrived at the same fallback rather than a re-point of its own.
   text-shadow: var(--wordmark-word-shadow,
                    -1.0px -1.0px 0 #fdfbfe,
                    -1.8px -1.8px 0 rgba(253, 251, 254, 0.75),

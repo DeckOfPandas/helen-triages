@@ -122,23 +122,38 @@ $emboss-cocktails-vars-emitted: false !default;
     --lettering-display-light:    #fdfbfe;
     --lettering-display-shadow:   rgba(5, 5, 5, 0.9);
 
-    // ONE TREATMENT FOR BOTH HALVES OF THE LOCKUP -- Helen, 2026-09-02:
-    // "please make the punched font treatment the same for HELEN TRIAGES and
-    // [ COCKTAILS ]." On a dark site that is not a compromise: the two
-    // elements were styled apart on food because one was dark type on light
-    // paper and the other light type on black tape, which are inverse
-    // problems, and here the page is #0e0e10 and the tape is #0d0d0d -- one
-    // unit of lightness apart -- so they are the same problem and one answer
-    // is the honest one. HELEN TRIAGES (above) now gets there through the
-    // display tier; [ COCKTAILS ] on the tape (below) still carries its own
-    // --wordmark-word-* pair with the identical numbers -- see
-    // shared/_layout.scss's `.site-logo-word` for why that element is not
-    // migrated onto a tier in this commit, and cocktails/_cards.scss for the
-    // sibling treatment its own tape word carries.
-    --wordmark-word-shadow: -1px -1px 0 #fdfbfe, 1px 1px 0 rgba(5, 5, 5, 0.9);
+    // HELEN TRIAGES AND [ COCKTAILS ] AGREED FOR ONE DAY, THEN DIVERGED THE
+    // OTHER WAY. Earlier on 2026-09-02, Helen asked for the two halves of the
+    // lockup to match each other -- "please make the punched font treatment
+    // the same for HELEN TRIAGES and [ COCKTAILS ]" -- and this file set
+    // `--wordmark-word-stroke` / `--wordmark-word-shadow` to the exact same
+    // two-copy, no-softening numbers `--lettering-display-*` carries above,
+    // so both words on this site's header tape shared one treatment.
+    //
+    // THAT OVERRIDE IS GONE, SAME DAY, ONCE FOOD'S OWN HEADER TAPE ENTERED THE
+    // COMPARISON. Helen: "Please treat [ COCKTAILS ] the same way we now treat
+    // [ FOOD ]." Food's `[ FOOD ]` (shared/_layout.scss's `.site-logo-word`)
+    // has never taken a tier -- it carries its own hand-tuned four-copy
+    // shadow and no stroke, read from that element's own shared defaults --
+    // and it was never asked to match HELEN TRIAGES either. Matching FOOD
+    // means matching THAT, not matching this site's own wordmark-top. So
+    // `--wordmark-word-stroke` and `--wordmark-word-shadow` are removed
+    // outright rather than re-pointed: with nothing here to override them,
+    // `.site-logo-word` falls through to shared's four-copy default on both
+    // sites, the same way it always has on food.
+    //
+    // THE CARD TAPES KEEP THEIR OWN TWO-COPY TREATMENT, AND THE SPLIT FROM
+    // THE HEADER TAPE IS NOW DELIBERATE RATHER THAN SOMETHING THAT NEEDS
+    // RECONCILING. HANDOVER §9.13 ("The card title sits on punched tape",
+    // #469) records why a card's own tape word never used the four-copy
+    // version: at 1rem it reads as two overlapping letterforms rather than
+    // one raised one, so `.drink-card-tape-word` in cocktails/_cards.scss
+    // carries its own explicit two-copy pair, sized for a 1rem card title
+    // rather than the header's 2.5rem word. Header tape and card tape were
+    // never the same size, so there was never really one number for both --
+    // only a coincidence, for one day, that they used the same two.
     --wordmark-top-color:   #ECE9EA;
     --wordmark-word-color:  #ECE9EA;
-    --wordmark-word-stroke: #{$emboss-stroke} #{$color-label-stroke};
   }
   $emboss-cocktails-vars-emitted: true !global;
 }
