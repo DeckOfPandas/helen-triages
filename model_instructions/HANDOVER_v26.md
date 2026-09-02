@@ -821,6 +821,32 @@ flagged. This is the gate that decides what the world sees; the cost of failing
 closed is that a new recipe does not publish until someone writes
 `awaiting_fix: false`, and that is the right cost.
 
+**RULED 2026-09-02, NOT YET IMPLEMENTED: `proofread` GATES PUBLICATION TOO.**
+Helen's intent has always been that `proofread: false` blocks a page from the
+live site, on both sites — *"this is the very last touch that I, the human, make
+to the file"*. The plugin does not do that today: it publishes on
+`awaiting_fix: false` alone and never reads `proofread`, and as of e31970d
+FIVE food recipes are live unproofread because of it (`wagamama-yakitori-sauce`,
+`youvetsi`, `sweet-potato-chocolate-brownies`, `wagamama-teriyaki-sauce`,
+`duck-a-lorange-sanguine`). The audit of 2026-09-02 recommended leaving the
+one-field gate, citing the plugin header's "two fields that must agree will
+disagree" argument, and that was wrong: that argument is about a `published:`
+key duplicating `awaiting_fix` — two fields, one meaning — and `proofread` is a
+*different fact*. Requiring both is not that mistake.
+
+**The change to make:** the plugin publishes only when `awaiting_fix == false`
+AND `proofread == true`, for every gated collection, and its log line says
+which flag held each page back. Deploying it takes those five recipes down
+until Helen proofreads them; whether she reads them first or lets them drop
+is her call, and the PR must name them. The one exception to "she is the
+last touch" is unchanged: a trivial fix she requests, which Claude makes with
+`proofread: false` in the same commit, and she re-reads the affected line and
+sets `true` herself. The cocktail side of the same ruling (all three flags,
+same names, same order, on every drink) is in the plan this came from:
+`tmp/ARCHITECTURE_PLAN_2026-09-02.md` while it lives there, workstream 2.
+When the plugin change lands, rewrite the paragraph above this one, rename
+the plugin so its name says what it gates, and delete this notice.
+
 **WHAT `awaiting_fix: true` MEANS TO HELEN, in her own words, 2026-09-01 —
 and it is not what "unfinished" would suggest.** It means she **has** proofread
 the page, found one small thing wrong, and raised it as a ticket:
