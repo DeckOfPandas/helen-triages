@@ -488,6 +488,22 @@ article.recipe .recipe-section-heading {
   scroll-margin-top: $space-xxl;
 }
 
+// INGREDIENTS, METHOD and NOTES are the page's spine at 1.8rem with the
+// two-bar mark; DONENESS is reference material you are sent to (see the
+// comment above the markup in recipe.html), and wearing the same heading
+// made it read as a fourth primary section. 1.35rem is the size the drink
+// page's section headings use, and the smallest at which the punched emboss
+// still resolves (HANDOVER §9.13). The single violet rule is the third tier
+// the site already has for names one level below a section heading (see
+// overlapping-rule-single's own comment, shared/_rule.scss).
+.recipe-section-temp .recipe-section-heading {
+  font-size: 1.35rem;
+
+  .section-heading-text {
+    @include overlapping-rule-single($color-section-underline-2);
+  }
+}
+
 // "↑ top", now after the chart rather than beside the heading (issue #215
 // -- Helen: the control that gets a section's own contents was offered
 // before you'd read anything, buried in the one place you land first). Its
