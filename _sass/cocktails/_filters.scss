@@ -757,6 +757,18 @@
 // a separate one from what the type is; changing both at once would leave
 // neither answered.
 .drink-count {
+  // Flex so the legend can sit at the far end of the same line. align-items:
+  // baseline, not center, because the count and the legend are both text and
+  // a baseline is the alignment that reads as "one line" for text.
+  //
+  // NOT justify-content: space-between -- the count and word are two separate
+  // elements (the script rewrites them independently, see the comment above),
+  // and space-between would spread all three children evenly, prising the
+  // number away from its own word. margin-left: auto on .drink-count-legend
+  // below does the pushing instead, so the number and word stay packed
+  // together at the start and only the legend moves to the edge.
+  display: flex;
+  align-items: baseline;
   font-family: $font-body;
   font-size: 1rem;          // body default; no size of its own
   font-weight: 400;
@@ -770,6 +782,41 @@
   // count IS the emphasis of this sentence -- but not a second weight and size
   // of its own. Food's line is one plain sentence and reads as one.
   strong { font-weight: inherit; font-size: inherit; color: inherit; }
+}
+
+// The ship and word on every card are a private code (yes, yes², meh, sure,
+// hmm) -- this is the one line on the page that says what the ship means,
+// once, in the card's own type: same family, size and treatment as
+// .drink-card-ship (_cards.scss), just muted to $color-clear-text rather
+// than $color-text since this is a caption on the count, not a card label.
+.drink-count-legend {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin-left: auto;
+  font-family: $font-headings;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $color-clear-text;
+}
+
+.drink-count-legend-icon {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: $color-radiant-reposado-deep;
+
+  // Same four lines .drink-card-ship-icon .ship-icon carries, and for the
+  // same reason -- .ship-icon is the class the partial emits, so it is the
+  // one that has to carry the rule (test_every_icon_partial_class_has_a_styled_base).
+  .ship-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: currentColor;
+  }
 }
 
 // #481. Helen, 2026-08-27: "The food site uses class .recipe-list-empty for

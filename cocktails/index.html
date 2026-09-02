@@ -222,6 +222,12 @@ permalink: /cocktails/
   <p class="drink-count">
     <strong id="drink-count-n">{{ site.cocktail_drafts.size }}</strong>
     <span id="drink-count-word">survivor{% unless site.cocktail_drafts.size == 1 %}s{% endunless %}</span>
+    {% comment %} The ship and word on every card are a private code (yes,
+       yes², meh, sure, hmm) -- this one line says what the ship is, once, in
+       the card's own type, rather than leaving it to be guessed at from the
+       cards below. Ids on the two elements above are untouched: this is
+       static, and cocktail-index.js never looks for it. {% endcomment %}
+    <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>the verdict</span>
   </p>
 
   <ul class="drink-cards">
