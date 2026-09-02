@@ -81,6 +81,21 @@
   // listing is not a thing a browser can ask for — and it now comes from
   // _data/chrome.yml, which is chrome config rather than site identity.
   // ---------------------------------------------------------------------------
+  // BOTH INJECTED ATTRIBUTES ARE REQUIRED and neither is optional decoration.
+  // The tape files carry `width="100%"` and NO height, so without `height="100%"`
+  // the element keeps its intrinsic 1400x170 ratio and LETTERBOXES -- scaling to
+  // fit its box entirely rather than stretching to fill it. A narrow tape then
+  // draws far shorter than its box while a wide one fills it, so two tapes on
+  // one page disagree with each other. That cost a round of Helen's time on
+  // 2026-09-01, from a hand-copied version of this line that dropped the height.
+  // It is a named constant now so there is one copy of it to get right.
+  var TAPE_ATTRS = '<svg preserveAspectRatio="none" height="100%"';
+
+  // `<svg` + any whitespace OR `>`, for the reason spelled out in brushes()
+  // above: two exporters are in use and a literal '<svg ' silently no-ops on
+  // the other kind, because a failed String.replace returns its input.
+  var TAPE_OPEN = /<svg(?=[\s>])/;
+
   function tape() {
     var slot = document.querySelector('.tape-bg');
     if (!slot) return;
@@ -91,11 +106,79 @@
     var n = Math.floor(Math.random() * count) + 1;
     var url = HTF.chromeAsset('/tape/tape-' + n + '.svg');
     HTF.fetchSvg(url, function (svg) {
-      // `<svg` + any whitespace, for the reason spelled out in brushes() above.
-      // Today's tape files are space-style so the old literal worked, but
-      // cocktails' artwork does not exist yet and may well come out of Inkscape.
-      slot.innerHTML = svg.replace(/<svg(?=[\s>])/, '<svg preserveAspectRatio="none" height="100%"');
+      slot.innerHTML = svg.replace(TAPE_OPEN, TAPE_ATTRS);
     });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Card titles on tape — issue #469, the cocktails index.
+  //
+  // A SECOND FUNCTION RATHER THAN A WIDENED tape(), because the two want
+  // opposite things and saying so is cheaper than a flag. The wordmark's tape is
+  // ONE slot chosen at RANDOM per page load; these are ~124 slots that must be
+  // STABLE, so a card wears the same shape on every visit and a reload is a
+  // comparison rather than a lottery. They share the artwork, the fetch and the
+  // two attributes above, which is where the duplication actually mattered.
+  //
+  // The count comes from the header's own slot, so there is still exactly one
+  // place that knows how many tape files exist (_data/chrome.yml).
+  // ---------------------------------------------------------------------------
+  function cardTapes() {
+    var slots = document.querySelectorAll('[data-card-tape]');
+    if (!slots.length) return;
+
+    var header = document.querySelector('.tape-bg');
+    var count = header ? parseInt(header.getAttribute('data-tape-count'), 10) : 0;
+    if (!count) return;
+
+    Array.prototype.forEach.call(slots, function (slot) {
+      var i = parseInt(slot.getAttribute('data-card-tape'), 10) || 1;
+      var n = ((i - 1) % count) + 1;
+      HTF.fetchSvg(HTF.chromeAsset('/tape/tape-' + n + '.svg'), function (svg) {
+        slot.innerHTML = svg.replace(TAPE_OPEN, TAPE_ATTRS);
+      });
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Centre the capitals on the band.
+  //
+  // Everything in CSS centres BOXES, which it does correctly and which is not
+  // what the eye judges. What is left is where capitals sit inside their own
+  // line box: with line-height 1 the baseline lands at half-leading plus the
+  // font's ascent, that leading is negative, and the caps hang off the baseline
+  // by their cap height. So it is a fact about the FACE.
+  //
+  // ESTIMATING IT FAILED THREE TIMES. Courier Prime ships here as woff2 only and
+  // there is no font parser in the build environment; across plausible metric
+  // sets the required nudge ranges from -1.5px to +2.2px and does not even have
+  // a reliable sign. Canvas TextMetrics knows it exactly, so ask.
+  //
+  // After document.fonts.ready, because measuring before Courier Prime has
+  // loaded measures the FALLBACK -- a different face, different metrics, and a
+  // confidently wrong constant baked in for the life of the page.
+  // ---------------------------------------------------------------------------
+  function centreTapeCaps() {
+    var probe = document.querySelector('.drink-card-tape-word');
+    if (!probe || !window.CanvasRenderingContext2D) return;
+
+    var cs = window.getComputedStyle(probe);
+    var size = parseFloat(cs.fontSize);
+    var ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+
+    var m = ctx.measureText('H');
+    var ascent = m.fontBoundingBoxAscent;
+    var descent = m.fontBoundingBoxDescent;
+    var capAscent = m.actualBoundingBoxAscent;
+    // Older engines report none of these. Leaving the property unset falls back
+    // to a translateY of 0, which is the box-centred version -- close, and never
+    // broken.
+    if (!ascent || !descent || !capAscent) return;
+
+    var baseline = (size - (ascent + descent)) / 2 + ascent;
+    var nudge = size / 2 - (baseline - capAscent / 2);
+    document.documentElement.style.setProperty('--tape-text-nudge', nudge.toFixed(2) + 'px');
   }
 
   // ---------------------------------------------------------------------------
@@ -278,8 +361,20 @@
 
   highlighters();
   tape();
+  cardTapes();
   footerDecoration();
   annotationMarks();
   tagShapes();
+
+  // AFTER THE FONTS, not with the rest. Everything above fetches artwork and
+  // does not care what has loaded; this one MEASURES a typeface, and measuring
+  // before Courier Prime arrives measures the fallback. Guarded because
+  // document.fonts is absent in older engines, where the untouched property
+  // leaves the lettering centred on its box -- close, and never broken.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(centreTapeCaps);
+  } else {
+    centreTapeCaps();
+  }
 
 })();

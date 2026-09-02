@@ -64,10 +64,29 @@
 // =============================================================================
 
 // --- Raw palette -------------------------------------------------------------
-$color-ink:          #1b1b1f;
-$color-paper:        #fbfbfa;
-$color-grey-mid:     #6b6b70;
-$color-grey-light:   #e4e4e6;
+//
+// BLACK ON BLACK, 2026-09-01, issue #469. Helen: "One thing for sure: we're
+// going black on black. I wear black on black animal print whenever possible. I
+// have some black on black bed linen. This is what we're doing." Settled over
+// several rounds at /dev/card-titles/.
+//
+// THE NAMES KEEP THEIR JOBS, NOT THEIR LITERAL MEANINGS. `$color-paper` is
+// still the ground you read ON and `$color-ink` is still the marks you read;
+// only their values invert. Renaming them would have touched every consumer in
+// the site for no gain, and "ink on paper" remains the right way to think about
+// a page whichever way round the two sit.
+//
+// THIS IS A PALETTE CHANGE AND NOT AN ARCHITECTURE ONE, checked before starting:
+// `test_the_header_and_footer_are_identical_on_every_page` compares rendered
+// HTML and colour is CSS, and
+// `test_every_chrome_class_has_a_rule_in_every_site_stylesheet` checks
+// DIVERGENCE rather than values. The shared chrome already differs in colour
+// between the two sites through `$color-accent`, which is exactly what §2.3's
+// palette contract exists to allow. Food is untouched.
+$color-ink:          #e8e6e2;   // was #1b1b1f
+$color-paper:        #0e0e10;   // was #fbfbfa
+$color-grey-mid:     #97959a;   // 6.50:1 on the ground -- de-emphasised UI text
+$color-grey-light:   #2c2c31;   // borders; L* 18.2 against the ground's 4.0
 
 // --- THE FIVE ACCENTS. "Neon bar sign", chosen by Helen 2026-08-27. ----------
 //
@@ -125,18 +144,50 @@ $color-grey-light:   #e4e4e6;
 // is magenta vs tangerine under tritanopia at dE 22.6, against a bar of 10.
 // Re-run tmp/neon_values.py if any of the three moves.
 
+// EVERY `-deep` WAS SOLVED AGAINST PAPER AND HAS BEEN RE-SOLVED AGAINST THE
+// DARK GROUND. On white a hue has to be DARKENED to be readable as text; on
+// black it has to be LIGHTENED, and four of the five are already bright enough
+// that the bare rule colour IS the text colour. Measured on a card, which is
+// the harder of the two grounds:
+//
+//     absinthe  11.11:1     reposado  6.69:1     lagoon  9.73:1
+//     magenta    5.18:1     yvette    3.27:1  -> lightened 26% to 5.10:1
+//
+// Ultraviolet is the one exception and its own note below predicted it from the
+// other direction: it was already close to 4.75:1 on paper because the fill is
+// dark, so there was nothing darker to make text from. On black that inverts
+// into an advantage -- there is plenty of room above it.
+
 // MOOD, and the home colour. Absinthe — the green fairy.
 $color-electric-absinthe:      #30E88C;   // rule
-$color-electric-absinthe-deep: #0E8248;   // text  4.71:1
-$color-electric-absinthe-wash: #ECFDF5;   // 10% panel
+$color-electric-absinthe-deep: #30E88C;   // text  11.11:1 on a card
+$color-electric-absinthe-wash: #1A342A;   // 14% of the hue over a card
 
 // YOLO / GOODNESS. Tequila reposado.
 $color-radiant-reposado:      #F47E25;  // rule
-$color-radiant-reposado-deep: #B6540A;  // text  4.76:1
+$color-radiant-reposado-deep: #F47E25;  // text  6.69:1 on a card
 
 // HAS TO HAVE. A Cosmopolitan.
-$color-cosmic-cosmopolitan:      #F127A7;    // rule
-$color-cosmic-cosmopolitan-deep: #D40E8C;    // text  4.78:1
+//
+// FOOD'S HOT MAGENTA SINCE 2026-09-01, replacing #F127A7. Helen: "could we
+// please use the hot magenta from the food site as our pink? I just can't get
+// away from loving it, and honestly that is my personal brand both at home and
+// at work. Extra important if we're doing an inversion that we retain some
+// sisterhood."
+//
+// AND GOING BLACK IS WHAT MAKES IT USABLE. #FF00C8 as text is 3.33:1 on paper
+// -- a fail -- and 5.18:1 on a card here. On the food site it has to be
+// darkened to $color-bright-magenta-dark before it can carry text at all. This
+// palette gets the colour she actually loves, undarkened, because the ground
+// moved.
+//
+// THE ONE THING IT COSTS is recorded on #636 rather than hidden: under
+// protanopia hot magenta is a dark blue, which is 9.79:1 on paper and 1.76:1
+// here. The band that says "this matched" nearly disappears for a protanope
+// specifically BECAUSE the ground went black. Parked at Helen's call, with a
+// colour-vision mode as the shape she chose over compromising the hue.
+$color-cosmic-cosmopolitan:      #FF00C8;    // rule
+$color-cosmic-cosmopolitan-deep: #FF00C8;    // text  5.18:1 on a card
 
 // HASSLE. Crème Yvette.
 //
@@ -144,28 +195,36 @@ $color-cosmic-cosmopolitan-deep: #D40E8C;    // text  4.78:1
 // than an error: a vivid blue-violet is already close to 4.75:1, so there is
 // no brighter version to make a band from. Ultraviolet's underline will read
 // darker than cyan's however it is set.
+// On a dark ground the constraint reverses and there IS room above it, so this
+// is the only `-deep` that still needs a derived value -- lightened 26%.
 $color-ultra-yvette:      #9233E6;  // rule
-$color-ultra-yvette-deep: #9A41E7;  // text  4.73:1
+$color-ultra-yvette-deep: #AE68EC;  // text  5.10:1 on a card
 
 // I KNOW WHAT I WANT. A Blue Lagoon.
 $color-luminous-lagoon:      #2ED1EA;        // rule
-$color-luminous-lagoon-deep: #0E7C8C;        // text  4.74:1
+$color-luminous-lagoon-deep: #2ED1EA;        // text  9.73:1 on a card
 
 // --- The washes -------------------------------------------------------------
 // A 10% tint of each rule colour on white, for the background of something
 // that has MATCHED. Added 2026-08-28 when the cards turned out to be shouting.
 //
-// TEXT ON A WASH IS INK, NEVER THE DEEP, and that is measured rather than
-// cautious. Each `-deep` is solved to about 4.75:1 against PAPER, so any tint
-// under it pushes the pair below 4.5 -- ultraviolet lands at 4.49 even on a 6%
-// wash. Nudging the deeps darker to compensate would trade the thing they are
-// actually for (readable coloured text on paper) against a case that does not
-// need colour at all. The wash and the border carry the colour; the words stay
-// ink at 16:1.
-$color-radiant-reposado-wash:   #FEF3EB;
-$color-ultra-yvette-wash: #F5EDFD;
-$color-cosmic-cosmopolitan-wash:     #FEECF7;
-$color-luminous-lagoon-wash:        #ECFBFD;
+// TEXT ON A WASH IS INK, NEVER THE DEEP, and it stays true after the inversion
+// for the opposite arithmetic: these are now 14% of each hue over a CARD rather
+// than 10% over white, and ink reads 10.7 to 12.9:1 on them where the bare hue
+// manages only 2.95 to 8.32. So the wash and the border still carry the colour
+// and the words still do not.
+//
+// 14% RATHER THAN 10%, MEASURED. A tint toward a dark ground moves the eye less
+// per percentage point than a tint toward white, because the same proportion
+// spans less of the perceptual range down here. 10% was almost invisible
+// against the card; 14% is the first step where every one of the five reads as
+// tinted rather than as a slightly different black.
+// Absinthe's own is declared with its hue above, because it is the glass
+// panel's colour rather than only a matched-state tint.
+$color-radiant-reposado-wash:    #36251C;
+$color-ultra-yvette-wash:        #281B37;
+$color-cosmic-cosmopolitan-wash: #371432;
+$color-luminous-lagoon-wash:     #1A3137;
 
 // --- The heading bars --------------------------------------------------------
 // FIVE GREENS OVER ONE SHARED ELECTRIC ABSINTHE, and both halves are the
@@ -220,9 +279,21 @@ $color-violet-deep:  $color-cosmic-cosmopolitan-deep;
 $color-bg:         $color-paper;
 $color-text:       $color-ink;
 $color-border:     $color-grey-light;
-$color-surface:    #ffffff;
+// A CARD, and it is now DARKER than the page rather than lighter. That is the
+// inversion's one genuinely structural choice: on paper a card is a white panel
+// laid on a tinted ground, and here it is a darker field cut into a lighter
+// one. Helen chose it looking at both -- "the background a little lighter even,
+// to give the cards more drama" -- and the drama is that the card recedes
+// instead of floating.
+//
+// L* 7.85 against the page's 4.02, a difference of 3.84, where the border sits
+// at 18.18 and holds the card's shape however close the two fills get.
+$color-surface:    #17171a;
 $color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
-$color-white:      #ffffff;           // the wordmark sitting on its tape
+// STAYS WHITE, and it is the one value the inversion must not touch: this is
+// the wordmark's lettering sitting on BLACK TAPE, which was already
+// light-on-dark before any of this and is unaffected by the ground moving.
+$color-white:      #ffffff;
 
 // The shared chrome reads this for link hovers and section colouring. Menthe,
 // because on this site the interactive/branded colour is the one that means
@@ -253,7 +324,16 @@ $color-accent:     $color-electric-absinthe-deep;
 //
 // Same derivation as food's: the text colour lightened, so it stays related to
 // the letters it outlines rather than being a standalone grey.
-$color-label-stroke: lighten($color-ink, 30%);
+// DARKEN, NOT LIGHTEN, SINCE THE INVERSION. The derivation is unchanged in
+// spirit -- the outline is the text colour moved toward the ground, so it stays
+// related to the letters it outlines rather than being a standalone grey -- but
+// on a dark ground "toward the ground" means down. Lightening a near-white ink
+// by 30% gives a near-white outline, which is no outline at all.
+//
+// This is the mid grey Helen singled out: "the YOLO/MOOD etc you've done has
+// outlines over the top edge of the letter. I think this helps both legibility
+// and the raised effect."
+$color-label-stroke: darken($color-ink, 30%);
 
 // --- Typography --------------------------------------------------------------
 // UNCHANGED FROM THE SCAFFOLD, AND THAT IS THE DECISION RATHER THAN THE ABSENCE

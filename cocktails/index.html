@@ -357,8 +357,20 @@ permalink: /cocktails/
         {% endif %}
 
         <div class="drink-card-body">
+          {% comment %} THE NAME SITS ON PUNCHED TAPE — #469. The empty span is
+             a slot; decorations.js fills it with one of the chrome tape SVGs
+             through HTF.chromeAsset, the same door the header wordmark's tape
+             uses. Absent JavaScript it renders as plain light lettering on the
+             card, which is legible and unremarkable rather than broken.
+
+             The word is wrapped rather than the anchor styled directly, because
+             the tape needs a flex item it can let SHRINK (min-width: 0) for the
+             ellipsis to fire on a long title. {% endcomment %}
           <p class="drink-card-name">
-            <a href="{{ drink.url | relative_url }}">{{ drink.title }}</a>
+            <span class="drink-card-tape">
+              <span class="drink-card-tape-bg" data-card-tape="{{ forloop.index }}"></span>
+              <span class="drink-card-tape-word"><a href="{{ drink.url | relative_url }}">{{ drink.title }}</a></span>
+            </span>
           </p>
           {% comment %} NO TAGLINE HERE — #512. It was two clamped lines of
              italic between the name and the ingredients, and the ingredients
@@ -442,6 +454,13 @@ permalink: /cocktails/
      filter was goodness, so the joke was about the drinks. With four filters
      it lands as an insult to a search that was simply too narrow. {% endcomment %}
   <p class="drink-none" hidden>Blank canvas.</p>
+
+  {% comment %} A `?panel=` SWITCH STOOD HERE for one round, offering four glass
+     panels against the shipped green wash. Helen chose `none` -- no panel at
+     all, the home colour in the line work -- so the switch and the three losers
+     are gone and the winner is the default in _sass/cocktails/_cards.scss.
+     HANDOVER 9.13: a comparison switch left in becomes a permanent branch
+     nobody dares remove. {% endcomment %}
 
   {% comment %} THE INGREDIENT VOCABULARY — declared families, card names and
      the three search thresholds — comes from _data/cocktails/ingredients.yml.

@@ -180,31 +180,33 @@ $emboss-vars-emitted: false !default;
     --emboss-offset-lg:   #{$emboss-offset-large};
   }
 
-  // Put this on any SECTION whose type is light on a dark ground. It is a
-  // context, not a component: it styles nothing itself, it only re-points the
-  // six values every punched rule already reads.
+  // `.on-dark` LIVED HERE AND IS GONE, 2026-09-02, issue #469 -- and it is
+  // worth knowing that it WORKED rather than that it failed.
   //
-  // NOTE FOR WHOEVER ADDS THE FIRST REAL ONE, AND IT IS NOT GOOD NEWS. This
-  // class has NO CONSUMER ANYWHERE. It had exactly one -- a swatch on
-  // /dev/emboss/ -- and that went on 2026-08-26 when the heading dials were
-  // deleted from that page, so these numbers are now live CSS that nothing
-  // renders and nobody can see without re-adding a swatch. They were tuned
-  // against that swatch rather than against real content, so they were a
-  // considered starting point and not a verified result even while it existed.
+  // It was a context class re-pointing four of the six values above, so any
+  // SECTION of a light page could carry light type on a dark ground. It never
+  // had a consumer: one swatch on /dev/emboss/, deleted 2026-08-26, and then
+  // nothing. Its values were finally exercised for real on the dev stages where
+  // Helen judged the black cocktails headings, she approved them, and they are
+  // now `_sass/cocktails/_rule.scss`'s defaults.
   //
-  // Kept rather than deleted because the reasoning above took a real
-  // conversation to reach and issue #469 tracks it. If you are reading this and
-  // there is still no dark section, deleting the whole block is a reasonable
-  // call -- the comment is the valuable part, and git keeps it.
+  // WHICH IS THE FINDING, AND IT IS WHY THE CLASS GOES RATHER THAN GAINING A
+  // USER: a dark SECTION on a light site wants a context class; a dark SITE
+  // wants its palette inverted, after which every shared partial follows for
+  // free and the class has nothing left to do. The four numbers are safer in a
+  // palette that renders on every page than in a class nothing renders.
   //
-  // This is NOT dark mode, which is a separate and much larger question Helen
-  // has explicitly deferred.
-  .on-dark {
-    --emboss-stroke-w:  0.010em;
-    --emboss-stroke-c:  #{lighten($color-text, 40%)};
-    --emboss-shadow:    #{rgba($color-text, 0.06)};
-    --emboss-offset-lg: 2px;
-  }
+  // The mechanism is still the right one if a dark section ever appears on
+  // FOOD: custom properties inherit, so one class re-points four values at any
+  // nesting depth in any partial including ones written later, where a
+  // `.on-dark h1 { ... }` block would have had to out-specify thirteen
+  // component rules and would have silently missed the fourteenth. Recover it
+  // with `git show 0b350c3:_sass/shared/_rule.scss`.
+  //
+  // Two things it never reached, recorded because they are still true of any
+  // successor: `shared/_base.scss` hardcodes `$color-text` on plain h1/h2/h3,
+  // and `.site-logo-word`'s stroke WIDTH is a Sass value. The second is fixed
+  // -- that element reads custom properties now -- and the first is not.
   $emboss-vars-emitted: true !global;
 }
 

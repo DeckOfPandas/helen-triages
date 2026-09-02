@@ -3555,10 +3555,110 @@ candidates that nothing renders is issue #276's trap exactly: it looks like
 evidence, goes stale silently, and the next reader cannot tell which of the
 eleven shipped. Recover it from git if you need the losers.
 
-**"Ink, paper and glass."** Helen's phrase and the whole idea: a light,
+**"Ink, paper and glass."** Helen's phrase and the whole idea: a
 near-monochrome ground where the glass drawings carry the personality food gets
 from colour. Food leads with ten saturated brights; this site leads with line
 work and spends colour sparingly on top of it.
+
+> ### ⚠ THE PAPER IS BLACK NOW — 2026-09-02, issue #469
+>
+> **Helen: "One thing for sure: we're going black on black. I wear black on
+> black animal print whenever possible. I have some black on black bed linen.
+> This is what we're doing."** The sentence above said "a LIGHT, near-monochrome
+> ground" until then, and everything in this section written before that date
+> should be read as reasoning that still binds over values that have moved.
+>
+> **`$color-paper` is `#0e0e10` and `$color-ink` is `#e8e6e2`.** The names keep
+> their jobs rather than their literal meanings — paper is still what you read
+> ON — and renaming them would have touched every consumer for no gain.
+>
+> **A CARD IS DARKER THAN THE PAGE**, `#17171a` on `#0e0e10`. That is the one
+> structural choice rather than a value: a card recedes instead of floating, and
+> the drama comes from the page being the lighter thing. L\* 7.85 against 4.02,
+> with the border at 18.18 holding the card's shape however close the fills get.
+>
+> **THE DRINK PAGE IS NOT DONE.** `_sass/cocktails/_cocktail.scss` hand-sets
+> around a dozen sizes and several colours, so it inverted only where the shared
+> partials read the palette contract. Clicking a card currently leaves a black
+> index for a half-inverted page. Tracked, and it is the next piece of work.
+>
+> **What the inversion cost, all measured — the workings are in the commit and
+> the reasoning beside each value in `_palette.scss`:**
+>
+> - **Every `-deep` was re-solved.** They were each ~4.75:1 against paper; on
+>   black a hue must be LIGHTENED rather than darkened to carry text, and four
+>   of the five are bright enough that the bare rule colour IS the text colour.
+>   Only `ultra-yvette` needed deriving — and its own note had predicted that
+>   from the other direction, having been stuck near 4.75 on paper because there
+>   was nothing darker to make text from.
+> - **Every `-wash` was re-derived**, 10% tints of white being near-white blocks
+>   on black. They are 14% of each hue over a CARD. 14 rather than 10 because a
+>   tint toward a dark ground moves the eye less per percentage point; at 10 they
+>   read as a slightly different black.
+> - **The heading bars needed nothing.** They are bands rather than text, so no
+>   contrast bar applies, and all six clear 6:1 against the ground anyway.
+> - **The emboss inverted.** `shared/_rule.scss`'s defaults are solved for dark
+>   type on a light ground; `--emboss-shadow` computed to a LIGHT shadow once
+>   `$color-text` went near-white, which reads as a second letterform rather
+>   than depth. Cocktails re-points three values in its own `_rule.scss`. A
+>   shadow copy is only visible where it spills past the glyph onto the ground,
+>   and dark on dark shows nothing.
+>
+> **IT IS A PALETTE CHANGE AND NOT AN ARCHITECTURE ONE, and that was checked
+> before starting rather than hoped.** `test_the_header_and_footer_are_identical_on_every_page`
+> compares rendered HTML and colour is CSS;
+> `test_every_chrome_class_has_a_rule_in_every_site_stylesheet` checks
+> DIVERGENCE rather than values. The chrome already differed in colour between
+> the sites through `$color-accent`. **Food is untouched** — verified in the
+> compiled CSS, not assumed.
+
+#### The card title sits on punched tape — #469, 2026-09-02
+
+The header wordmark's own black label tape, at card size, carrying the drink's
+name. This is what took the site black: the tape needed a dark card to sit on,
+and the card needed a dark page.
+
+**Two near-whites, one tight pair, no softening**, plus the shared heading
+stroke. Not the wordmark's four copies — 1px is 5.9% of a 1rem title where the
+wordmark's 1.8px is 4.5% of its 2.5rem, so the four-copy version reads as two
+overlapping letterforms down here. Helen: *"the boldness of the two near-whites
+with no softening shadow is exactly what we need."*
+
+**The band is centred by moving the ARTWORK, not the words.** Every tape SVG
+insets its polygon 16.47% from the top of its viewBox and 12.94% from the bottom
+— identical across all seven, measured — so the visible band is 70.59% of the
+box and its centre sits 1.765% low. `top: -1.765%` on the background fixes it,
+after which flex centring places the lettering with no font metric involved.
+**Three rounds of bugs came from compensating on the TEXT instead**, which needs
+Courier Prime's real ascent and cap height, and the face ships here as woff2
+only with no font parser available. Correcting a fact about the artwork ON the
+artwork needs no estimate at all.
+
+**The tape's geometry is solved for the NAME'S WIDTH**, which is the thing Helen
+actually wanted: *"reasonably lengthed names of cocktails can appear on the one
+line."* The word gets
+
+    body width + bleed-left + bleed-right − 2 × pad-x
+
+so **padding costs the name twice while a bleed pays it back once** — a generous
+padding was the thing making titles ellipsise. The bleed EQUALS the padding, so
+the lettering lands exactly on the ingredient line's left edge; the tape bleeds
+right into the card's own padding to buy the width back. **The gutter is the
+ceiling on the left bleed** — 1.05em is 16.8px against `$card-gutter`'s 15.2px,
+so the tape deliberately crosses onto the glass panel by 1.6px.
+
+**`$card-tape-pad-x` and `$card-tape-bleed` are `em` and the gutter is not**, so
+dropping the title from 1.08rem to 1rem shrank the bleed to exactly the gutter
+and silently removed that overlap. Any tape number in `em` is a ratio to the
+title; the gutter is a fact about the card. Re-check the pair whenever the title
+size moves.
+
+**The two injected SVG attributes are a named constant**, `TAPE_ATTRS` in
+`decorations.js`, shared by `tape()` and `cardTapes()`. The files carry
+`width="100%"` and no height, so without `height="100%"` the element keeps its
+intrinsic ratio and LETTERBOXES — a narrow tape draws far shorter than its box
+while a wide one fills it, which is two tapes on one page disagreeing. A
+hand-copied version of that line dropping the height cost a round.
 
 #### The five accents — "neon bar sign", 2026-08-29
 
@@ -3869,6 +3969,15 @@ its white is already the brightest thing on screen with nowhere lighter to go.
 Worth knowing before promising it on any light-ground design.
 
 #### The goodness mark
+
+**IT IS A SHIP AND A WORD, NOT A SQUARE — and this paragraph said otherwise
+until 2026-09-02.** `cocktails/index.html` renders `.drink-card-ship-icon` (the
+ship partial) beside `.drink-card-ship-word`; the tinted square is gone, and the
+template's own comment records that nothing reads `ship_tints` any more. The
+paragraph below describes the retired square. It is kept because **its
+reasoning is the part that binds** — the scale's shape, not the mark's — and
+because #511 and #612 both want a goodness scale on the DRINK page, where these
+are exactly the traps to avoid. Read it as an argument, not as a description.
 
 A small square, tinted along `ship_tints` in `_data/cocktails/taxonomy.yml`.
 **Not a linear ramp and it must not be made into one**: `yes` and `oh gods yes`
@@ -5174,6 +5283,60 @@ registers, both deliberate:
 **You will flag `QQ` as an error.** It's Helen's deliberate placeholder.
 Never flag it, never fix it, never convert it.
 
+> ### FIVE TRAPS FROM ONE DESIGN SESSION, 2026-09-02, AND THEY SHARE A SHAPE
+>
+> The black-on-black work (#469) took nine rounds of Helen looking, and **five
+> of those rounds were spent on bugs I introduced rather than on the design.**
+> Every one was in a hand-built replica of the card's CSS in a dev page's
+> `<style>` block. The real card had none of them. Her own diagnosis was the
+> right one — *"the tape was perfect in layout earlier, and since we've been
+> changing colours, yet the layout has been all over the place"* — and the
+> answer was to stop replicating and build it for real.
+>
+> **1. A STRAY `*/` IN AN INLINE `<style>` FAILS SILENTLY.** Prose written after
+> a comment had already closed left NINETEEN unbalanced delimiters; the parser
+> inverted at the first one and read comments as CSS and CSS as comments for the
+> rest of the block. `--tape-pad-top` was never declared, so `padding:
+> var(--tape-pad-top) …` was invalid at computed-value time and computed to its
+> INITIAL value — zero, on all four sides. The same slip in a `.scss` file is a
+> loud build error. **This is §12's Liquid-comment trap from the parser side**,
+> and it is the one that costs somebody else's time rather than your own.
+> Corollary, learned the same hour: **you will break a rule again while
+> documenting the fix for it.** I repeated the identical slip writing the
+> explanation of it.
+>
+> **2. GIVE EVERY `var()` IN A SHORTHAND A FALLBACK.** One unresolvable custom
+> property does not lose one value — it invalidates the whole declaration. A
+> fallback turns a silent catastrophe into something merely a little off.
+>
+> **3. A CUSTOM PROPERTY CONTAINING `var()` IS SUBSTITUTED WHERE IT IS DECLARED,
+> NOT WHERE IT IS USED.** `--tape-pad-top` was declared on an ancestor, so its
+> `var(--tape-pad-y)` resolved against THAT element's value and inherited down
+> frozen, while the sibling declaration read the live one on the tape itself.
+> Two paddings that were supposed to move together stopped doing so. Invisible
+> at the default, because there the stale value is the correct one.
+>
+> **4. RETYPING A WORKING LINE IS NOT COPYING IT.** `decorations.js` had drawn
+> this exact artwork for weeks with
+> `'<svg preserveAspectRatio="none" height="100%"'`; I retyped it from memory
+> and dropped the height. The tape files carry `width="100%"` and no height, so
+> the element LETTERBOXED — a narrow tape drew far shorter than its box while a
+> wide one filled it. **Two elements on one page disagreeing is the tell**, and
+> it was in the screenshot before I saw it.
+>
+> **5. COMPENSATE FOR A FACT ABOUT OBJECT A ON OBJECT A.** Three rounds went on
+> centring the tape's lettering by nudging the TEXT, which needs the typeface's
+> real ascent and cap height — unavailable, since Courier Prime ships here as
+> woff2 only. The band's offset is a fact about the ARTWORK and correcting it
+> there (`top: -1.765%`) needs no estimate at all.
+>
+> **AND THE MEASUREMENT THAT DISAGREES IS MEASURING THE WRONG THING.** Told
+> twice that the tape was "still small", I measured the box, found it correct,
+> and reported that its proportions were already more generous than the header
+> wordmark's. Every number was right. All of them were arithmetic about a BOX
+> and none was about what was being PAINTED in it. **When the person who can
+> see it says the same thing twice, stop defending the measurement.**
+
 **You will WRITE DOWN a rule instead of following it, in the same file, in the
 same minute.** 2026-08-19, and it is the most humbling entry here. Moving
 `about.html` to the repo root took it out of the `_config.yml` default that
@@ -6099,6 +6262,38 @@ tuned it by hand, and the longform Tips label at 6.8% offset / 1.4% stroke,
 which is the element she pointed at ("it looks better than the lettering for
 my existing page headings — am I imagining this?"). She wasn't.
 
+> **THE EXCLUSION IS FOOD'S ONLY, SINCE 2026-09-02 — #469.** Everything below
+> is still exactly right for food and no longer describes cocktails. Helen, on
+> the inverted header: *"the wordmark text is weirrrrrd… I would like the same
+> lettering you created for our new white on black headings."* Both halves of
+> that lockup now carry one treatment there — the card tape's two near-whites
+> plus the shared stroke.
+>
+> **THE ARGUMENT BELOW IS WHY IT WAS EXCLUDED, AND THE ARGUMENT IS WHAT
+> EXPIRED.** It rests on the two halves sitting on opposite grounds: dark type
+> on light paper above, light type on black tape below, so a mid-grey highlight
+> came out darker than a near-white letter. On cocktails the page is `#0e0e10`
+> and the tape is `#0d0d0d` — **one unit of lightness apart** — so they are the
+> same ground and the same problem, and one answer is honest rather than a
+> compromise. Food's paper has not moved, so food keeps both treatments.
+>
+> **AND `.site-logo-top` WAS A REAL BUG ON A DARK GROUND, not a preference.** It
+> hardcoded `text-shadow: -2px -2px 0 #dad7d8, 2px 2px 0 rgba($color-text, 0.5)`
+> — a literal light grey chosen as "a touch darker than the page", which is only
+> a highlight when the page is light, plus half-opacity ink, which is only a
+> shadow when the ink is dark. Inverted, BOTH copies came out light: two pale
+> blobs 2px apart on either side of a near-white letter. Its stroke had the same
+> fault.
+>
+> **§13.10.2's own note had named the cause and nobody saw it was a bug
+> waiting** — it says this element "sits outside the custom-property system…
+> nothing touching those properties could reach it", written about a typography
+> pass and equally true of a palette. Five values are custom properties now,
+> defaulting to the literals they replaced, so **food is byte-identical**
+> (verified in the compiled CSS) and cocktails re-points them. That is the
+> palette contract doing its job (§2.3) rather than a chrome fork: one rule, one
+> markup, a value each site supplies.
+
 **`[ FOOD ]` IS THE ONE DELIBERATE EXCLUSION, AND IT MUST STAY EXCLUDED.**
 `.site-logo-word` — the bracketed site word sitting on the tape, `[ FOOD ]` /
 `[ COCKTAILS ]` — sets `-webkit-text-stroke: 0` and does **not** call
@@ -6796,14 +6991,42 @@ and would have missed the fourteenth. **Both `shared/_rule.scss` and
 `food/_timings.scss` imports them again — free while they were pure definition
 files, not free once they emitted CSS.
 
-**Nothing on the site uses `.on-dark` at all.** It had one consumer, a swatch on
-`/dev/emboss/`, and that went when the heading dials did on 2026-08-26 — so the
-class is now live CSS with no user anywhere, and its numbers cannot be seen
-without re-adding a swatch. They were a considered starting point rather than a
-verified result even then. Kept rather than deleted because the reasoning behind
-it took a real conversation to reach and issue #469 tracks it; delete it instead
-if a dark section still has not appeared by the time anyone reads this. This is
-*not* dark mode, which Helen has explicitly deferred.
+> ### `.on-dark` IS DELETED — 2026-09-02, #469 closed, and it WORKED
+>
+> The class never had a consumer: one swatch on `/dev/emboss/`, gone
+> 2026-08-26, then nothing. Its four values were finally exercised for real on
+> the dev stages where Helen judged the black cocktails headings, she approved
+> them, **and they are `_sass/cocktails/_rule.scss`'s defaults now.**
+>
+> **THE FINDING IS WHY IT GOES RATHER THAN GAINING A USER: a dark SECTION on a
+> light site wants a context class; a dark SITE wants its palette inverted**,
+> after which every shared partial follows for free and the class has nothing
+> left to do. Four numbers are safer in a palette that renders on every page
+> than in a class nothing renders. Recover it with
+> `git show 0b350c3:_sass/shared/_rule.scss` if food ever wants a dark section —
+> the mechanism is still right, and it is described in place.
+>
+> **Of the three things #469 said would bite, one is fixed and one is not.**
+> `.site-logo-word` reads custom properties now, so the wordmark is reachable.
+> `shared/_base.scss` still hardcodes `$color-text` on plain `h1/h2/h3` — which
+> costs nothing on an inverted SITE, because `$color-text` inverts with it, and
+> would still bite a dark SECTION. The third — that the numbers were unverified
+> — is spent: they have been looked at on real content and kept.
+>
+> **THE INSTRUCTION THAT USED TO BE HERE IS THE LESSON.** From 2026-08-26 this
+> paragraph and the code both said to delete the block "if a dark section still
+> has not appeared", and on 2026-09-01 that was withdrawn because one nearly
+> had. A stale *description* misinforms the next reader; a stale *instruction*
+> sends them to do a thing. **When you write "do X if Y", Y is a fact about the
+> day you wrote it, and nothing re-evaluates it.** Record the condition and who
+> can rule on it; do not pre-authorise the action.
+
+The paragraph above describes the class in the past tense. What remains true is
+the MECHANISM: the two grounds are inverse problems — on dark, a dark shadow is
+invisible and the *light* copy does everything — and Sass variables resolve at
+compile time and cannot be overridden by context, which is why these six values
+are custom properties at all. That is what let cocktails invert without a single
+`.cocktails h1 { … }` override anywhere.
 
 #### 13.10.3 `/dev/emboss/` — tune here, not in a mock
 

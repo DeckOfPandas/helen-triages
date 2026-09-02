@@ -499,7 +499,13 @@ $tape-protrusion: 0.2rem;
   // comment on cocktails, where padding-right made a mismatch worse, not
   // better).
   margin-right: -0.18em;
-  color: $color-text;
+  // A variable so the two halves of the lockup can be made to MATCH. They have
+  // always been styled independently -- one is dark type on the page, the other
+  // light type on black tape, which on a light site are genuinely different
+  // problems. On a dark site they are the same problem, and Helen asked for one
+  // answer: "please make the punched font treatment the same for HELEN TRIAGES
+  // and [ COCKTAILS ]." Food's default is unchanged.
+  color: var(--wordmark-top-color, #{$color-text});
   // Brought onto $emboss-stroke 2026-08-12 with every other heading on the
   // site. THIS IS THE CHANGE HERE MOST LIKELY TO WANT REVERTING, so: it was
   // `1.2px rgba(50,50,50,0.9)`, which is 3.75% of this element's 2rem -- the
@@ -515,7 +521,12 @@ $tape-protrusion: 0.2rem;
   // relationship to the letter it outlined -- the same thing .category-label
   // called out and fixed for itself. $color-text at 0.8 is derived from the
   // lettering, and shared/ may name it (palette contract, HANDOVER §2.3).
-  -webkit-text-stroke: $emboss-stroke rgba($color-text, 0.8);
+  // THROUGH A CUSTOM PROPERTY SINCE 2026-09-01, AND THAT IS THE POINT RATHER
+  // THAN A TIDY-UP. See the block below the shadow for the whole story: this
+  // element was outside the custom-property system, so cocktails' inversion
+  // could not reach it and it broke. Food's value is the default and is
+  // unchanged; cocktails re-points it in its own _rule.scss.
+  -webkit-text-stroke: $emboss-stroke var(--wordmark-top-stroke, #{rgba($color-text, 0.8)});
   text-transform: uppercase;
   // NOT padding-right: 0.18em, deliberately -- that was here before and it's
   // why HELEN TRIAGES visibly shifted right on cocktails. letter-spacing adds
@@ -538,8 +549,29 @@ $tape-protrusion: 0.2rem;
   // literal #dad7d8 -- a touch darker than $color-bg, giving the highlight
   // a bit more presence than "invisible against the page" without tipping
   // back into the stark-white territory the tag work ran into.
-  text-shadow: -2px -2px 0 #dad7d8,
-                2px  2px 0 rgba($color-text, 0.5);
+  //
+  // AND IT IS A CUSTOM PROPERTY NOW, 2026-09-01, BECAUSE THE HARDCODING BROKE
+  // THE MOMENT A SITE INVERTED. The two literals above are solved for DARK TYPE
+  // ON A LIGHT GROUND: #dad7d8 is "a touch darker than the page" and so reads as
+  // a highlight, and rgba($color-text, 0.5) is half-strength ink and so reads as
+  // a shadow. On cocktails' black ground $color-text is near-WHITE, so the
+  // second copy became light too -- a pale blob up-left and a pale blob
+  // down-right of a near-white letter, 2px apart in opposite directions. Helen:
+  // "the wordmark text is weirrrrrd."
+  //
+  // The section below already named the cause without anyone noticing it was a
+  // BUG waiting rather than a curiosity: "the rule above reads $emboss-stroke as
+  // a SASS variable and then overrides punched() with a literal text-shadow, so
+  // it sits outside the custom-property system that pass moved everything else
+  // onto. Nothing touching those properties could reach it." That was written
+  // about a typography pass. It was equally true of a palette.
+  //
+  // FOOD'S VALUES ARE THE DEFAULTS AND ARE BYTE-IDENTICAL -- checked in the
+  // compiled CSS, not assumed. Cocktails re-points them in its own _rule.scss,
+  // which is the palette contract doing its job (§2.3) rather than a chrome
+  // fork: one rule, one markup, a value that each site supplies.
+  text-shadow: var(--wordmark-top-shadow,
+                   -2px -2px 0 #dad7d8, 2px 2px 0 #{rgba($color-text, 0.5)});
 }
 
 // =============================================================================
@@ -644,7 +676,6 @@ $tape-protrusion: 0.2rem;
   font-size: 2.5rem;
   font-weight: 1000;
   letter-spacing: 0.18em;
-  -webkit-text-stroke: 0px;
   text-transform: uppercase;
   text-align: center;
   line-height: 1;
@@ -714,11 +745,28 @@ $tape-protrusion: 0.2rem;
   // hsl(340 6% 92%); written as hex to match its neighbours). It still has to
   // sit BELOW pure white -- see the paragraph above about headroom, which is the
   // whole reason this element does not use @include punched().
-  color: #ECE9EA;
-  text-shadow: -1.0px -1.0px 0 #fdfbfe,
-               -1.8px -1.8px 0 rgba(253, 251, 254, 0.75),
-                1.0px  1.0px 0 rgba(5, 5, 5, 0.90),
-                1.8px  1.8px 0 rgba(5, 5, 5, 0.45);
+  color: var(--wordmark-word-color, #ECE9EA);
+
+  // THE STROKE IS A VARIABLE TOO, DEFAULTING TO NONE. This element has carried
+  // `-webkit-text-stroke: 0px` since #122 because its four-copy shadow did all
+  // the work and an edge on top of it was one treatment too many. A site whose
+  // wordmark uses the SHARED punched lettering wants the shared edge with it --
+  // 13.4.1's rule is that stroke sets an edge's weight and shadow sets its
+  // direction, so half the treatment is half the effect. Food keeps 0px.
+  -webkit-text-stroke: var(--wordmark-word-stroke, 0px);
+
+  // A CUSTOM PROPERTY FOR THE SAME REASON AS .site-logo-top ABOVE, though this
+  // one was never broken by the inversion: it is already light type on black
+  // tape, so the ground moving underneath it changed nothing. It is a variable
+  // so that a site which has settled a DIFFERENT lettering treatment can use
+  // its own -- cocktails now has one, chosen by Helen against these four copies
+  // and preferred to them at card size, and she asked for the wordmark to match
+  // it. Food keeps these values, which are #470's and are hers.
+  text-shadow: var(--wordmark-word-shadow,
+                   -1.0px -1.0px 0 #fdfbfe,
+                   -1.8px -1.8px 0 rgba(253, 251, 254, 0.75),
+                    1.0px  1.0px 0 rgba(5, 5, 5, 0.90),
+                    1.8px  1.8px 0 rgba(5, 5, 5, 0.45));
 
   .site-logo-bracket {
     letter-spacing: 0;
