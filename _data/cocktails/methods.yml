@@ -93,7 +93,39 @@ canonical:
     - "Fill the pitcher half full with ice cubes."
     - "Fill with crushed ice."
     - "Top with champagne."
+    # SODA WATER, NEVER CLUB SODA -- Helen's ruling, 2026-09-02: she is not in
+    # the US and doubts the difference is more than marketing. Eight drinks said
+    # club soda in a step or an `item` and were normalised the same day; the one
+    # remaining mention sits inside a QQ note on la-fee-noir-punch, which is a
+    # record of what a source said and is not rewritten.
+    - "Top with soda water."
     - "Top with more crushed ice."
+
+  # RINSE AND RIM -- added 2026-09-02 with the amount ruling that needed them.
+  # An ingredient whose amount is `to rinse` is poured by one of these steps and
+  # by nothing else, so the two halves are declared together or neither is
+  # legible. Both strings are the drinks' own, unchanged: sazerac-death-and-co
+  # says the first, tailspin the second. `glasses` plural on the second is
+  # tailspin's own wording for a batch and is left alone -- this file collapses
+  # variance that carries no information, and how many glasses are being made is
+  # information.
+  #
+  # THE THIRD RINSE IS DELIBERATELY NOT HERE. caribbean-sazerac says "Rinse a
+  # frozen glass with the overproof rum, then discard the excess." -- the frozen
+  # glass and the rum are both facts about that drink, so by this file's own
+  # test the phrasing carries information and the step stays in the free-text
+  # tail.
+  rinse_and_rim:
+    - "Rinse the glass with absinthe and dump."
+    - "Rinse the glasses with Campari."
+    # HELEN'S EXACT WORDING, 2026-09-02, preferred over "Salt half the rim of
+    # the glass". Its one live user says something else today
+    # (margarita-classic), so it is PROPOSED below rather than applied -- this
+    # file never rewrites a drink, and a canonical form arriving with a proposal
+    # attached is the shape #290 asks for. It is not the "form with no user"
+    # case the note at the foot of this file warns against: the user exists and
+    # is named.
+    - "Salt a half-rim of the glass."
 
 # =============================================================================
 # PROPOSALS -- both halves kept, so the choice is Helen's and not mine
@@ -137,7 +169,14 @@ proposals:
   # guard asserts the KEY exists and never that the map is non-empty -- getting
   # that backwards on garnish.yml made finishing the work a test failure, for
   # one day, on 2026-08-31.
-  {}
+  #
+  # REFILLED 2026-09-02 with one row, which is what a worklist doing its job
+  # looks like. Helen gave the rim wording while ruling on man-o-war's salt, and
+  # the drink it applies to is not the drink that prompted it: man-o-war's salt
+  # goes IN the drink and gets no rim step at all. So the wording is canonical
+  # above and margarita-classic is proposed for it here, to be accepted or
+  # deleted like every other row -- propose, never apply.
+  "Dip only half the rim in salt.": "Salt a half-rim of the glass."
 
 # =============================================================================
 # HOW THE FOUR QQ ROWS WERE ANSWERED, 2026-09-01 -- the reasoning, not the rows

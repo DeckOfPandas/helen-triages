@@ -72,12 +72,36 @@ measures:
     - cube
     - cubes
     - pinch
+    # `1 small pinch`, on man-o-war's salt. Declared beside `pinch` rather than
+    # collapsed into it because the drink says small and the amount is the only
+    # field that can carry it -- the `item` that used to say "Tiny pinch of
+    # salt" was deleted the same day for restating the quantity.
+    - small pinch
     - each
     - leaf
     - leaves
     - sprig
     - strip
     - g
+
+    # ACTIONS, NOT COUNTS -- Helen's ruling, 2026-09-02. Every ingredient has an
+    # amount, and for an ingredient the method ADDS rather than measures, the
+    # amount is a verb phrase: the list reads "champagne, to top" and "absinthe,
+    # to rinse". Eleven entries carried no `amount` at all before this and no
+    # test noticed.
+    #
+    # THEY ARE DECLARED HERE AND NOWHERE ELSE, which is the point. A unit is
+    # readable because `measures:` says so -- that is the bargain
+    # test_every_amount_is_readable_as_a_quantity strikes with every other unit
+    # in this block, and special-casing two strings inside the test would have
+    # put the vocabulary in the guard instead of in the data.
+    #
+    # The matching method step is what actually pours it: `Top with champagne.`
+    # / `Top with soda water.` / `Rinse the glass with absinthe and dump.` in
+    # methods.yml. The amount says how much (all of it, none of it), the step
+    # says when.
+    - to top
+    - to rinse
 
   # Words that may sit between the number and its unit without changing either.
   # One entry, and it is real: "1 heaping oz" on Kill Devil Punch.
