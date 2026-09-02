@@ -139,6 +139,52 @@ $card-glass-scale: 10.4rem;
 // because a border would eat into the column's fixed height and nudge the
 // glass — and the one rule the hover has is that nothing moves. Offset -1px so
 // they land ON the card's own border rather than inside it.
+// =============================================================================
+// PANEL CANDIDATES — behind `?panel=` on the index. TEMPORARY, #469.
+// =============================================================================
+// Helen, 2026-09-02: "can I see one or two more options without the green
+// background panel? I'd like to try absinthe (or a tint/shade) on black or
+// grey, so a black inbetween the page background and the main panel background,
+// maybe."
+//
+// SAME COMPARISON-SWITCH CONVENTION AS `?narrow=` AND `?glass=margin` BEFORE
+// IT: build the options on the REAL page, let her look, then delete the losers
+// AND the switch. A comparison switch left in becomes a permanent branch nobody
+// dares remove. These rules and the script in cocktails/index.html go together.
+//
+// WHY THE GREEN PANEL DOMINATES, measured rather than guessed: at L* 19.40 it
+// is BRIGHTER THAN THE CARD'S OWN BORDER (18.18) and two and a half times the
+// card's own lightness (7.85). It is the lightest thing on the card, on a site
+// whose whole premise is now black on black. That is the case against it, and
+// it is also why every option below is darker rather than differently coloured.
+//
+// EVERY ONE PUTS THE GLASS IN ABSINTHE. Today the drawing is near-white
+// (currentColor, inherited) on a green panel; these invert that relationship,
+// so the home colour is in the LINE WORK -- which is what §9.13's "ink, paper
+// and glass" says it should be -- rather than in a field behind it.
+//
+//   ?panel=well    #0a0a0d   L*  2.81   darker than the PAGE: a well cut in
+//   ?panel=tween   #121215   L*  5.56   Helen's own suggestion, between the two
+//   ?panel=none    #17171a   L*  7.85   no panel at all, just the drawing
+//   ?panel=grey    #232329   L* 13.94   a neutral lift, the only one going up
+//
+// Absinthe reads 12.28 / 11.62 / 11.11 / 9.71:1 on them respectively, so
+// legibility does not decide this -- all four are far above any bar. It is
+// purely which relationship looks right.
+.drink-cards--panel-well  .drink-card-glass { background: #0a0a0d; color: $color-electric-absinthe; }
+.drink-cards--panel-tween .drink-card-glass { background: #121215; color: $color-electric-absinthe; }
+.drink-cards--panel-none  .drink-card-glass { background: transparent; color: $color-electric-absinthe; }
+.drink-cards--panel-grey  .drink-card-glass { background: #232329; color: $color-electric-absinthe; }
+
+// The foot rule is mixed from absinthe against $color-surface, which reads as a
+// pale green on a card. With the panel no longer green it is the only green
+// left on a resting card, so it goes to the real thing rather than a mix --
+// otherwise it looks like a leftover.
+.drink-cards--panel-well  .drink-card::after,
+.drink-cards--panel-tween .drink-card::after,
+.drink-cards--panel-none  .drink-card::after,
+.drink-cards--panel-grey  .drink-card::after { background: $color-electric-absinthe-deep; }
+
 .drink-card-glass::after,
 .drink-card::after {
   content: "";
