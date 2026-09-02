@@ -52,6 +52,65 @@ BOTTLES = ROOT / "_data" / "cocktails" / "bottles.yml"
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
+# =============================================================================
+# THE DRINK SCHEMA -- issue #669. What a drink file may and must contain.
+# =============================================================================
+# THE CORPUS WAS ALREADY UNIFORM AND NOTHING SAID SO. Censused 2026-09-02 over
+# all 124 drinks: twelve top-level keys, every one single-shaped, `meta` exactly
+# `{ship, date_last_edited}` on every file. The "ad hoc" feeling around this
+# collection came from the ABSENCE OF A GUARD, not from the data -- and the
+# proof is what the same census found underneath: nine drinks with no `method`
+# at all and eleven ingredient entries with no `amount`, both invisible to every
+# test in this module for as long as they had existed.
+#
+# A CLOSED SET IS THE POINT, AND SO IS THE COST OF ADDING TO IT. A new key is
+# one line here, and writing that line is the moment somebody decides the key is
+# real -- the same bargain `canonical_glasses`, `measures:` and the
+# `<family>_characters` lists all strike. A typo'd key name is otherwise a
+# silent no-op: nothing reads it, nothing renders it, nothing fails.
+
+TOP_LEVEL_KEYS = {
+    "title", "tagline", "glass", "garnish", "ingredients", "method", "mood",
+    "notes", "source", "source_url", "meta", "to_serve",
+}
+
+# `to_serve` is the only optional one -- 12 drinks of 124 carry it, because most
+# drinks have no presentation note to make. Everything else is on every file
+# today, including `source`/`source_url` where the value is the empty string:
+# "nobody has recorded a source" and "the key is missing" must not look alike.
+REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve"}
+
+# `item` IS DRAFT-ONLY, ruled by Helen 2026-09-02 (D8, ARCHITECTURE_PLAN §8).
+# It holds what the SOURCE called the ingredient and is being retired by #544;
+# 282 draft entries still carry one and nothing renders it (§9.10). So it is
+# permitted where the migration is still running and refused where the world can
+# see the file -- which makes promotion the deadline rather than a someday.
+INGREDIENT_KEYS_DRAFTS = {
+    "generic", "amount", "item", "suggestion", "note", "character", "optional",
+}
+INGREDIENT_KEYS_RECIPES = INGREDIENT_KEYS_DRAFTS - {"item"}
+
+# `amount` is not required HERE because it has its own test with its own
+# explanation -- see test_every_ingredient_has_an_amount below.
+REQUIRED_INGREDIENT = {"generic"}
+
+# THE ORDER IS THE ASSERTION, not tidiness -- the same claim
+# test_front_matter.py::test_meta_block_is_exactly_the_three_flags_in_order
+# makes about a food recipe. Reordering a block changes no value, so obeying it
+# is free, which is exactly what makes it enforceable.
+#
+# WORKSTREAM 2 APPENDS `rewritten`, `awaiting_fix`, `proofread` (D1/D2), and
+# this list is the single place that changes: the two tests below read it and
+# name nothing themselves.
+META_KEYS_IN_ORDER = ["ship", "date_last_edited"]
+
+_ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+# A tagline nobody has written yet. 120 of the 124 drinks say this, which is a
+# backlog and not a design smell (Helen, 2026-09-02) -- but it is a backlog that
+# must not reach the live site. See test_a_promoted_drink_has_a_real_tagline.
+PLACEHOLDER = "QQ"
+
 # Groups in ingredients.yml that are lists of generic VALUES. Everything else at
 # the top level is a mapping (family_of, family_less, retired_*) or the family
 # list itself, and must not be mistaken for declared generics.
@@ -468,6 +527,265 @@ def test_whole_collection_only_says_what_it_does():
         "test's name to the set. A guard that needs the whole book and does not "
         "say so reports every registry entry as stale the moment the drafts are "
         "absent -- which in CI is always (#540)."
+    )
+
+
+# =============================================================================
+# THE SCHEMA GUARD -- issue #669. A drink cannot gain or lose a key in silence.
+# =============================================================================
+# Every check below reads the constants at the top of this file and names no
+# field of its own, so the schema is stated once and enforced from there. The
+# food suite's equivalents are test_front_matter.py::test_no_retired_fields,
+# ::test_meta_block_is_exactly_the_three_flags_in_order and ::test_notes_is_a_list;
+# these are the cocktails half, which did not exist until now.
+
+
+def test_no_unknown_top_level_keys():
+    """A drink's front matter holds only the twelve keys the schema declares.
+
+    An undeclared key is a silent no-op: no template reads it, no test sees it,
+    and a misspelling of a real one reads exactly like a new idea. Adding a key
+    is one line in TOP_LEVEL_KEYS, and having to write that line is the point.
+    """
+    bad = []
+    for slug, fm in _load():
+        for key in sorted(set(fm) - TOP_LEVEL_KEYS):
+            bad.append(f"{slug}: {key!r}")
+    assert not bad, (
+        "Undeclared top-level key(s):\n  " + "\n  ".join(bad)
+        + "\n\nEither it is a typo for a declared key -- in which case nothing "
+          "has been reading it -- or it is real, and belongs in TOP_LEVEL_KEYS "
+          "at the top of this file with a note saying what renders it."
+    )
+
+
+def test_required_top_level_keys_present():
+    """Every drink carries all eleven required keys, `to_serve` aside.
+
+    A MISSING KEY AND AN EMPTY ONE ARE DIFFERENT FACTS and only one of them is
+    recorded. `source: ""` says nobody has found the source yet; no `source` at
+    all says nothing, and reads identically to a key that was never written.
+    """
+    bad = []
+    for slug, fm in _load():
+        missing = sorted(REQUIRED_TOP_LEVEL - set(fm))
+        if missing:
+            bad.append(f"{slug}: missing {missing}")
+    assert not bad, (
+        "Drink(s) missing required front matter:\n  " + "\n  ".join(bad)
+        + "\n\nWrite the key with an empty value rather than leaving it out: "
+          "`notes: []`, `garnish: []`, `source: \"\"`. `to_serve` is the one "
+          "genuinely optional key and is not asked for here."
+    )
+
+
+def test_no_unknown_ingredient_keys():
+    """An ingredient entry holds only the seven keys the schema declares.
+
+    The same argument as the top-level check, and it bites harder: an entry is a
+    bare mapping with no layout of its own, so a stray key renders nowhere and
+    fails nothing. `note` versus `notes` is the whole failure mode.
+    """
+    bad = []
+    for slug, fm in _load():
+        for i, item in enumerate(fm.get("ingredients") or [], 1):
+            if not isinstance(item, dict):
+                bad.append(f"{slug} entry {i}: {type(item).__name__}, not a mapping")
+                continue
+            for key in sorted(set(item) - INGREDIENT_KEYS_DRAFTS):
+                bad.append(f"{slug} entry {i}: {key!r}")
+    assert not bad, (
+        "Undeclared ingredient key(s):\n  " + "\n  ".join(bad)
+        + "\n\nDeclared: " + ", ".join(sorted(INGREDIENT_KEYS_DRAFTS))
+        + ". Nothing reads anything else -- see §9.10 for what the line renders."
+    )
+
+
+def test_a_promoted_drink_carries_no_draft_only_key():
+    """A published drink has no `item` -- it is draft-only, ruled 2026-09-02.
+
+    A SECOND DOOR RATHER THAN A BRANCH INSIDE THE CHECK ABOVE, for `_load_published`'s
+    own reason: this is a claim about published drinks alone, and asking it of
+    the combined corpus would hold 124 drafts to a rule that is deliberately not
+    theirs while #544's migration is still running.
+    """
+    bad = []
+    for slug, fm in _load_published():
+        for i, item in enumerate(fm.get("ingredients") or [], 1):
+            if not isinstance(item, dict):
+                continue
+            for key in sorted(set(item) - INGREDIENT_KEYS_RECIPES):
+                bad.append(f"{slug} entry {i}: {key!r}")
+    assert not bad, (
+        "Promoted drink(s) carrying a draft-only ingredient key:\n  "
+        + "\n  ".join(bad)
+        + "\n\n`item` holds the source's own words for an ingredient and is "
+          "retired by #544 -- nothing renders it (§9.10), and where it survives "
+          "on a draft it is migration residue. Promotion is the deadline: fold "
+          "it into `generic`, `suggestion` or `note`, or drop it."
+    )
+
+
+def test_every_ingredient_has_a_declared_shape():
+    """Every ingredient entry carries a `generic`; nothing else is required.
+
+    `generic` IS WHAT THE INDEX BROWSES BY (§9.3.1), so an entry without one is
+    invisible to every filter and to the card. Coverage cannot quietly regrow
+    either: an untyped ingredient is a visible `QQ` generic, never an absent key.
+    """
+    bad = []
+    for slug, fm in _load():
+        for i, item in enumerate(fm.get("ingredients") or [], 1):
+            if not isinstance(item, dict):
+                continue
+            missing = sorted(REQUIRED_INGREDIENT - set(item))
+            if missing:
+                bad.append(f"{slug} entry {i}: missing {missing}")
+    assert not bad, (
+        "Ingredient entr(ies) missing a required key:\n  " + "\n  ".join(bad)
+        + "\n\nAn ingredient nobody has typed yet writes `generic: \"QQ\"`, "
+          "which is what test_every_ingredient_has_a_generic_or_a_qq expects. "
+          "An ABSENT key is the one shape neither check can report on."
+    )
+
+
+def test_method_is_a_non_empty_list():
+    """Every drink's `method` is an ordered list with at least one step in it.
+
+    NINE DRINKS HAD NO `method` KEY AT ALL until 2026-09-02 and no test noticed,
+    so a drink you cannot make rendered as a drink with nothing left to do.
+    Where the source genuinely records no build the step is a visible `QQ`, which
+    is a question on the page rather than a silence.
+    """
+    bad = []
+    for slug, fm in _load():
+        method = fm.get("method")
+        if not isinstance(method, list) or not method:
+            bad.append(f"{slug}: {method!r}")
+    assert not bad, (
+        "Drink(s) with no usable method:\n  " + "\n  ".join(bad)
+        + "\n\n`method: []` is not the answer and neither is omitting the key: "
+          "both render as a drink with no steps, which is indistinguishable "
+          "from a drink that needs none. If the source has no method, write one "
+          "step saying so -- `QQ - no method in the source; Helen to supply.` "
+          "-- and never reconstruct a build from general bartending knowledge."
+    )
+
+
+def test_every_ingredient_has_an_amount():
+    """Every ingredient entry says how much, in every case, with no exceptions.
+
+    Helen's ruling, 2026-09-02: an ingredient the method ADDS rather than
+    measures still has an amount, and it is a verb phrase -- "champagne, to top",
+    "absinthe, to rinse". Eleven entries carried no `amount` before that, and a
+    consumer reading the key got the same `None` for "numberless by nature" and
+    "nobody wrote it down".
+    """
+    bad = []
+    for slug, fm in _load():
+        for i, item in enumerate(fm.get("ingredients") or [], 1):
+            if not isinstance(item, dict):
+                continue
+            if item.get("amount") is None:
+                bad.append(f"{slug} entry {i}: "
+                           f"{item.get('generic') or item.get('item')!r}")
+    assert not bad, (
+        "Ingredient entr(ies) with no `amount`:\n  " + "\n  ".join(bad)
+        + "\n\nThere is no amount-less case. A top-up is `amount: \"to top\"` "
+          "with a `Top with ...` method step; a rinse is `amount: \"to rinse\"` "
+          "with a `Rinse ...` step. Both units are declared in `measures:` in "
+          "_data/cocktails/ingredients.yml, so "
+          "test_every_amount_is_readable_as_a_quantity reads them by the same "
+          "path it reads `dash`."
+    )
+
+
+def test_date_last_edited_is_an_iso_date():
+    """`meta.date_last_edited` is a `YYYY-MM-DD` string and not a YAML date.
+
+    UNQUOTED, YAML PARSES IT INTO A `datetime.date` and Liquid then renders it in
+    a different format from every quoted sibling -- the silent kind of drift,
+    since both look identical in the file. The string form is what the other 124
+    already use.
+    """
+    bad = []
+    for slug, fm in _load():
+        meta = fm.get("meta")
+        if not isinstance(meta, dict):
+            bad.append(f"{slug}: no `meta:` mapping")
+            continue
+        value = meta.get("date_last_edited")
+        if not (isinstance(value, str) and _ISO_DATE.fullmatch(value)):
+            bad.append(f"{slug}: {value!r} ({type(value).__name__})")
+    assert not bad, (
+        "Bad `meta.date_last_edited`:\n  " + "\n  ".join(bad)
+        + "\n\nWrite it quoted: `date_last_edited: \"2026-09-02\"`. Unquoted, "
+          "YAML reads it as a date object rather than the string every other "
+          "drink stores."
+    )
+
+
+def test_meta_keys_are_exactly_the_schema_in_order():
+    """A drink's `meta:` block holds exactly META_KEYS_IN_ORDER, in that order.
+
+    THE ORDER IS FREE TO OBEY, which is what makes it worth enforcing: reordering
+    a block changes no value, so nothing is at stake but consistency across 124
+    files read at a glance. When workstream 2 adds the three gate flags, that
+    list is the only line that changes.
+    """
+    bad = []
+    for slug, fm in _load():
+        meta = fm.get("meta")
+        if not isinstance(meta, dict):
+            bad.append(f"{slug}: no `meta:` mapping")
+            continue
+        if list(meta) != META_KEYS_IN_ORDER:
+            bad.append(f"{slug}: {list(meta)}")
+    assert not bad, (
+        f"`meta:` blocks that are not exactly {META_KEYS_IN_ORDER}:\n  "
+        + "\n  ".join(bad)
+        + "\n\nSame keys, same order, every drink. A key that belongs here and "
+          "is not listed goes in META_KEYS_IN_ORDER at the top of this file; a "
+          "key that does not belong is dead weight, not data."
+    )
+
+
+def test_tagline_is_a_non_empty_string():
+    """Every drink has a `tagline`, and it is a string with something in it.
+
+    `tagline` IS A REAL FIELD and is not to be dropped -- Helen, 2026-09-02, on
+    the 120 drinks that still say `QQ`. That is a backlog, and this check is what
+    keeps it a visible one rather than letting the key quietly disappear.
+    """
+    bad = []
+    for slug, fm in _load():
+        tagline = fm.get("tagline")
+        if not isinstance(tagline, str) or not tagline.strip():
+            bad.append(f"{slug}: {tagline!r}")
+    assert not bad, (
+        "Drink(s) with no usable tagline:\n  " + "\n  ".join(bad)
+        + "\n\nOne line of prose, or the placeholder `\"QQ\"` until it is "
+          "written. Never an empty string and never an absent key: both erase "
+          "the fact that the line is owed."
+    )
+
+
+def test_a_promoted_drink_has_a_real_tagline():
+    """A published drink's tagline is written prose, never the `QQ` placeholder.
+
+    Helen's ruling D7, 2026-09-02: a `QQ` tagline never publishes. It skips today
+    because `_cocktail_recipes/` is empty -- a fact about the collection, not a
+    stale loader -- and starts running on the day the first drink is promoted,
+    which is exactly the day it matters.
+    """
+    bad = [f"{slug}: {fm.get('tagline')!r}" for slug, fm in _load_published()
+           if str(fm.get("tagline", "")).strip() == PLACEHOLDER]
+    assert not bad, (
+        "Promoted drink(s) still carrying the placeholder tagline:\n  "
+        + "\n  ".join(bad)
+        + "\n\n`QQ` means \"not written yet\" everywhere in this repo, and the "
+          "live site is the one place it must never appear. Write the line, or "
+          "move the drink back to `_cocktail_drafts/` until it has one."
     )
 
 
@@ -1553,10 +1871,22 @@ def _millilitres(amount, measures):
     wrong by a factor of 30 and looks exactly as confident either way. Every
     one of the nineteen already carries a `QQ - no unit in the source` note,
     which is the right answer and the one this check preserves.
+
+    AN AMOUNT MAY BE AN ACTION RATHER THAN A COUNT, and then it has no number at
+    all. Helen's ruling, 2026-09-02: every ingredient has an `amount`, and for
+    one the method adds rather than measures it is a verb phrase -- "champagne,
+    to top", "absinthe, to rinse". Those two read by exactly the path `dash`
+    reads by, a lookup in `non_volumetric`, and nothing here names them: putting
+    the strings in the guard would move the vocabulary out of the data, which is
+    the bargain every other unit in `measures:` strikes.
     """
     text = str(amount)
     match = _AMOUNT_RE.match(text)
     if not match:
+        unit = " ".join(w for w in text.lower().split()
+                        if w not in (measures.get("ignored_words") or []))
+        if unit and unit in (measures.get("non_volumetric") or []):
+            return None, unit
         raise ValueError("no leading number")
     whole, denominator, rest = match.groups()
     number = float(whole)
