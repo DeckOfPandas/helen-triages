@@ -430,12 +430,27 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 // What each site keeps for itself is everything below the type: the stroke
 // colour, whether it is punched, the mark under it and its hues. Those are the
 // parts that genuinely differ.
-@mixin index-section-label {
+// SIZE AND TRACKING ARE ARGUMENTS, since 2026-09-02, and the defaults are
+// food's unchanged values. Cocktails passes its own because its ground is black
+// and a light glyph blooms into its surround, so the same type reads heavier and
+// less crisp -- Helen: "I'm finding the headings a little hard to read as they
+// are." The corrections are more size and more tracking.
+//
+// ARGUMENTS RATHER THAN AN OVERRIDE AFTER THE @include, which is what it was
+// for an hour: that compiles both values into the same block, the later winning
+// and the mixin's sitting there dead. `test_no_selector_declares_the_same_
+// property_twice` cannot see a duplicate INSIDE one block -- it compares
+// separate blocks -- so this is the shape that test is about, arriving where it
+// cannot look.
+//
+// WHAT STAYS SHARED IS THE TREATMENT: family, case, weight, padding and the
+// punched mark. That is #495's rule -- share the treatment, not the value.
+@mixin index-section-label($size: 1.35rem, $tracking: 0.08em) {
   font-family: $font-headings;
   text-transform: uppercase;
-  font-size: 1.35rem;
+  font-size: $size;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: $tracking;
   // 0.22rem TOP AND BOTTOM, and it is the last thing that was making the two
   // sites' headings sit at different heights. Food had it and cocktails did
   // not, so food's label box was 7px taller and its words sat 3.5px lower

@@ -56,7 +56,9 @@ from a commit message written for exactly this purpose.
 > instead. §10 is worth reading too, but it is not the one being recommended
 > here.)
 
-**Two companion documents, and they point in opposite directions.**
+**Three companion documents in two kinds, and the kinds point in opposite
+directions.** Run `ls model_instructions/` rather than trusting this sentence —
+it has been wrong before, and the count is a fact about the repo today.
 
 **`SOURCE_ATTRIBUTION_SPEC.md`** is the full contract for `source` and
 `source_type` — the eight types, the exact string shape each one dictates, and
@@ -3460,9 +3462,9 @@ rejected**, and a later pass applies only what survives. Do not turn this into
 an enforcing test without asking; a check that failed on a non-canonical step
 would be enforcing a decision she has not made.
 
-> **THE PASS IS DONE, 2026-09-02, #630.** This box said "THE PASS HAS NOT
-> HAPPENED, AND THE FILE IS THE OLDEST UNPRUNED THING HERE" from 2026-08-31
-> until then, and the numbers below are what changed:
+> **THE PASS IS DONE — 2026-09-02, #630 closed.** This box said it had not
+> happened from 2026-08-26 until then, and called the file "the oldest unpruned
+> thing here". It is pruned:
 >
 > | | before | after |
 > |---|---|---|
@@ -3470,14 +3472,28 @@ would be enforcing a decision she has not made.
 > | uses on the canonical spine | 110 | **177** |
 > | outstanding proposals | 24 | **0** |
 >
-> **The 20 mechanical rows moved 62 steps across 61 drinks**, applied as text
-> edits by `tmp/apply_method_proposals.py`. `proposals` is `{}` and the key
-> stays. The four QQ rows were Helen's and are answered below.
+> **65 steps across 64 drinks**, of which 62 came from the 20 mechanical rows
+> (applied as text edits by `tmp/apply_method_proposals.py`) and 3 from Helen's
+> rulings on the QQ rows, which are recorded below.
+>
+> **`proposals: {}` IS THE SETTLED STATE, NOT AN EMPTY FILE.** Both this and
+> `garnish.yml` empty out BY DESIGN — that is what "resolved by deletion" means
+> — so a full map is the temporary state. The key stays and its guard asserts
+> the KEY exists rather than that it has rows, which is the one thing whose
+> silent loss would switch the check off for whatever is proposed next. §12
+> carries the general form: **a ratchet list and a worklist look identical and
+> want opposite assertions.**
 >
 > **§9.12.1 was the worked precedent and it held exactly**: measure, collapse
 > only what carries no information, propose the rest, let Helen rule, delete
 > each row in whichever direction it went. Use that shape again rather than
 > reinventing it.
+>
+> **THIS BOX WAS WRITTEN TWICE, by two sessions, from opposite sides of the
+> merge** — which is what a shared handover does under parallel work, and the
+> merge conflict is the mechanism catching it rather than a problem. The two
+> accounts agreed on everything except the count, because one was counting the
+> mechanical rows and the other the total. Both numbers are above, said apart.
 
 **THE FOUR QQ ROWS, AND THE REASON THEY WERE PARKED WAS WRONG FOR TWO OF THEM.**
 This section used to say the short forms "each follow an earlier build step, so
@@ -3776,7 +3792,18 @@ several of which would fail the bar, and is not broken. The bar is real only
 where colour carries meaning ALONE: **the goodness mark and the matched
 ingredient**, plus the mood chip beside them on the same card. Those three were
 checked — worst pair reposado vs cosmopolitan under tritanopia, **ΔE 22.6**
-against a bar of 10. Re-run `tmp/neon_values.py` if any of them moves.
+against a bar of 10.
+
+> **THE TOOL IS TRACKED NOW: `scripts/palette_measure.py`.** This line said
+> "re-run `tmp/neon_values.py`" and two comments in `_palette.scss` named that
+> file and `tmp/greens2.py`. **All three were gone** — `tmp/` is gitignored — so
+> three instructions pointed at nothing, and the black-on-black work rebuilt the
+> same contrast, dichromacy and CIEDE2000 arithmetic from scratch to answer the
+> same questions. It is in `scripts/` so the next inversion does not rebuild it
+> a third time. `--contrast`, `--separation`, `--lstar`, `--over`.
+>
+> **An instruction to re-run something is only as good as the something.** This
+> is §12's stale-instruction trap wearing tooling rather than prose.
 
 **3. Ultra-yvette cannot take dark text at all.** Ink on it is 3.14:1 and
 *nothing* darkened clears 4.5, because the fill is already dark — a vivid
@@ -3994,12 +4021,79 @@ correct it is. Random rather than alphabetical because alphabetical buries
 everything after M and greets you with the same drink every time — the
 `taxonomy.yml` principle applied.
 
+#### The index's hover language — one colour, one meaning, 2026-09-02
+
+**Magenta means "this one", and it is the only thing hover ever changes.** A
+card title, a card's glass-column brackets, a filter tag, a pool chip's box and a
+mood chip's box all go magenta under the cursor; nothing else moves, and nothing
+resizes. It reads as one gesture because it is one colour making one claim — the
+same claim `is-match` makes in the settled tense.
+
+**Four hover states were no-ops before this, all in the same way.** Filter tags
+rested at white and hovered to a dimmer white; the card title rested at `#ECE9EA`
+and hovered to `#ffffff`, four values away. §12's rule is the diagnosis: **at
+these sizes the eye reads hue, not lightness**, so a lightness-only hover is a
+state that never arrives. The `clear` buttons are the one deliberate exception —
+grey to full ink is a lightness step, and it works only because the gap is
+6.50:1 to 15.47:1, which is most of the available range rather than a nudge.
+
+**`:hover` AND `.is-on` ARE THE SAME SPECIFICITY, so the later block wins
+outright.** A chosen tag turned magenta under the cursor until `:not(.is-on)`
+was added. They are saying different things and only one can be true at a time:
+hover means *you could pick this*, which a picked one is past — so hover stops
+applying rather than being out-specified.
+
+**A CHIP HAS A BOX AND A FILTER WORD DOES NOT**, which decides what each moves.
+HAS TO HAVE's chips changed their TEXT colour on hover on top of their border,
+so a chip whose words already carried magenta word-match underlines went almost
+entirely magenta — three uses of one colour on one small object. LEAVE OUT had
+it right by accident of being colourless. Chips move their box; bare words move
+their text.
+
 #### The card — `_cards.scss`
 
-Horizontal: the glass drawn large and pale down a fixed left column, words
-beside it. Chosen over a vertical card and over a typographic tile because it is
-the only one with room for a full ingredient line, which the index needs — you
-can search by ingredient, so a card must be able to show why it matched.
+**THE MOOD CHIPS FILTER THE INDEX — Helen's ask, 2026-09-02.** Clicking one adds
+or removes that mood exactly as its filter button does.
+
+- **They are real `<button>`s**, not spans with a handler. That is what earns
+  keyboard focus, Enter and Space, and a role — none of which a span gets for
+  free — and it is why `_cards.scss` has to undo the UA's own button styling.
+- **One DELEGATED listener on the list**, calling the mood buttons' own toggle,
+  sync and re-render. Two reasons, and the second is the load-bearing one:
+  a chip and its filter button must not be two implementations that agree today;
+  and `apply()` re-orders nodes to rank them, so a per-chip listener would need
+  rebinding on every pass — the class of bug §12 records for `tagShapes()`.
+- **`is-match` and `aria-pressed` are painted FROM STATE in `apply()`**, never
+  toggled at click time, because clear-all reassigns the whole state object
+  without touching any markup.
+- **The handler calls `preventDefault`**, because the chip sits inside a card
+  whose title is a link.
+
+
+
+Horizontal: the glass drawn large down a fixed left column, words beside it.
+Chosen over a vertical card and over a typographic tile because it is the only
+one with room for a full ingredient line, which the index needs — you can search
+by ingredient, so a card must be able to show why it matched.
+
+**THERE IS NO PANEL BEHIND THE GLASS, since 2026-09-02.** The column is still
+exactly `$card-text-x` wide and still holds the drawing; what has gone is the
+tinted field it used to sit on. The drawing is `$color-electric-absinthe` and
+the card shows through. Helen chose it against three darker and greyer fields on
+the real index, and two things made the case:
+
+- **the green wash was the lightest thing on a card.** L\* 19.40, against the
+  card's own border at 18.18 and the card itself at 7.85 — a bright field on a
+  site whose premise is black on black. It arrived as a 10% tint that made sense
+  on paper and survived the inversion as a value rather than as a decision.
+- **the arrangement was backwards.** This section's own opening claim is that
+  the glass drawings carry the personality food gets from colour; a near-white
+  glass on a green field is the opposite of that, with the field carrying the
+  colour and the drawing carrying none.
+
+One `color` declaration on `.drink-card-glass` reaches every glass, because the
+artwork strokes with `currentColor` (§3) — including the three fill-based
+drawings, which a rule on `.glass-icon-line` would have missed.
 
 **Every anchor is fixed, and that is the design rather than a side effect.**
 Helen: the title starts in the same place on every card, and the goodness mark
@@ -4009,8 +4103,10 @@ the foot somewhere different on every card, and a vertically-centred text block
 moves the title. So: fixed height, body anchored top-left, foot pinned to the
 bottom and out of flow.
 
-**The cost is clamping and it is not avoidable.** Two lines each for tagline and
-ingredients, two rows of mood chip. A rigid grid buys its rigidity with
+**The cost is clamping and it is not avoidable.** Two lines of ingredients and
+two rows of mood chip — the tagline went with #512, so this said "two lines each
+for tagline and ingredients" describing an element the card no longer has. A
+rigid grid buys its rigidity with
 clamping; the alternatives are a card whose height varies with mood count
 (unpinning every anchor) or no moods on cards. Helen named the trade first:
 "it's a shame to lose the card proportion but I can't think of another way."
@@ -4020,17 +4116,31 @@ is exactly that wide, and the body, the foot and the under-mark all derive from
 it. One value moves four things together and they cannot drift apart.
 
 **The framing and the hover took eleven and four candidates respectively.** What
-won: a tinted glass column with a softened rule in the home green along its bottom edge, no
+won: a glass column marked by a rule in the home green along its bottom edge, no
 vertical rule (eight of those down a page is a lot of signal for decoration);
-and on hover, that rule plus the panel's top edge going to full strength, so the
-column is bracketed. **Both hover marks are painted strips, not borders** — a
-border would eat into the column's fixed height and nudge the glass, and the one
-rule the hover has is that nothing moves.
+and on hover, that rule plus the column's top edge going to full strength, so
+the column is bracketed. **Both hover marks are painted strips, not borders** —
+a border would eat into the column's fixed height and nudge the glass, and the
+one rule the hover has is that nothing moves.
+
+**The bottom rule is full-strength absinthe now, not a mix.** It was
+`mix($color-electric-absinthe, $color-surface, 55%)`, which read as a pale green
+while there was a green panel beside it to belong to; with the panel gone it is
+the only green on a resting card, and a diluted one reads as a leftover rather
+than a mark.
 
 **Helen asked for "a very subtle lightening of the white part of the background"
-and that is not available**: a card is `$color-surface` on `$color-paper`, so
-its white is already the brightest thing on screen with nowhere lighter to go.
-Worth knowing before promising it on any light-ground design.
+and it was not available**: a card was `$color-surface` on `$color-paper`, so
+its white was already the brightest thing on screen with nowhere lighter to go.
+
+**THAT CONSTRAINT IS GONE AND ITS OPPOSITE IS NOW TRUE.** Since the inversion a
+card is `#17171a` on `#0e0e10` — DARKER than the page — so a hover could lighten
+it, and there is room in both directions. The hover deliberately still does not:
+the brackets are what move, because nothing on this card is allowed to. Kept
+here because **the lesson survives the reversal** — before promising a subtle
+lightening on any design, check which end of the range the surface is already
+sitting at, since on a light ground it is the answer and on a dark one it is not
+even the question.
 
 #### The goodness mark
 
@@ -5377,6 +5487,43 @@ registers, both deliberate:
 **You will flag `QQ` as an error.** It's Helen's deliberate placeholder.
 Never flag it, never fix it, never convert it.
 
+> ### FOUR THINGS THE BROWSER DOES THAT NO TEST HERE CAN SEE, 2026-09-02
+>
+> All four shipped green, all four were found by Helen looking, and all four are
+> facts about CSS or the UA rather than about this repo.
+>
+> **1. AN `<input>` DOES NOT INHERIT `color`.** It takes the UA stylesheet's
+> `fieldtext`, which is near-black whatever its ancestors say. So when the
+> cocktails palette inverted, every element on the page took the new colours for
+> free through inheritance and the search inputs silently did not — typing
+> produced **black text on a black ground**, invisible rather than absent.
+> Nothing could see it: the class has a rule, and the contrast guards do not read
+> form controls. **The same is true of `background`, `font-family` and
+> `font-size` on form controls.** Set them explicitly or they are not set.
+>
+> **2. `text-shadow` PAINTS UNDER TEXT DECORATIONS, NOT JUST GLYPHS.** The card
+> title's punched lettering casts a near-white copy up-and-left, and that copy
+> landed on the search-hit UNDERLINE too — a purple line with a white line beside
+> it. The fix is not to remove the shadow (that would unpunch the matched letters
+> mid-title) but to stop the mark being a decoration: it is a `linear-gradient`
+> background now, which is §13.1's own device and is not painted by a shadow.
+>
+> **3. `<mark>` ARRIVES WITH A UA BACKGROUND AND COLOUR** — `Mark`, a hard
+> yellow, and `MarkText`. `background: none` resets it; `background-image:` does
+> **not**, because it only sets the image and leaves the colour underneath.
+> Swapping the shorthand for the longhand brought the yellow back an hour after
+> the rule's own comment warned about it. **Use the `background` shorthand for
+> anything that paints a `<mark>`** — it resets the colour as part of setting the
+> image, so the guard is in the syntax.
+>
+> **4. A PROPERTY DECLARED TWICE IN ONE BLOCK IS INVISIBLE TO
+> `test_no_selector_declares_the_same_property_twice`.** That guard compares
+> SEPARATE blocks, and it is genuinely good at that — it caught a second
+> `.btn-clear-filter { color: … }` within a minute. But `@include` a mixin and
+> then override one of its values, and both land in one block with the mixin's
+> sitting dead. That is why `index-section-label` takes `$size` and `$tracking`
+> now: **arguments rather than an override after the include.**
+>
 > ### FIVE TRAPS FROM ONE DESIGN SESSION, 2026-09-02, AND THEY SHARE A SHAPE
 >
 > The black-on-black work (#469) took nine rounds of Helen looking, and **five

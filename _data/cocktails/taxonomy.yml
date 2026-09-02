@@ -936,6 +936,23 @@ ship_card_names:
   "not really": "hmm"
   "oh gods yes": "yes²"
 
+# NOTHING READS THIS ANY MORE, and it is kept deliberately rather than by
+# neglect. The card's goodness mark was a square tinted along this ramp until it
+# became a ship icon plus a word; `cocktails/index.html` says so at its own call
+# site, and no template, stylesheet or script mentions `ship_tints` today
+# (checked 2026-09-02, not assumed).
+#
+# IT IS KEPT BECAUSE THE SHAPE OF THE RAMP IS AN ARGUMENT, and #511 and #612
+# both want a goodness scale on the DRINK page, where these are exactly the
+# traps. It is deliberately NOT linear: `yes` and `oh gods yes` are both 100
+# because both mean "make this" -- the difference is enthusiasm, not decision --
+# so the whole range is spent on the gap that matters. `sure` and `meh` were 62
+# and 30 for one afternoon, and at 62 a `sure` was mistakable for a `yes` at a
+# glance, which is the one thing a scale exists to prevent.
+#
+# So: reach for these numbers when building that scale, and delete this block if
+# that scale is ever built on a different footing. A value nothing reads is only
+# safe while a comment says why it is here.
 ship_tints:
   "not really": 0
   "meh": 16
