@@ -3910,6 +3910,11 @@ is `COCKTAIL_FIELDS` in `filter-state.js`. See §9.3.3 before changing any
 behaviour described below; several of the sentences here predate that split and
 describe where a rule USED to live.
 
+**THE UNIVERSE SAYS… SITS ABOVE THE FIVE QUESTIONS, since 2026-09-02** — one
+random card's tape name, ingredient line and mood chips dealt before the page
+asks anything, with `deal again`. Same section, same script and same reasoning
+as food's; see §13.4, which is where it is written up once for both sites.
+
 **FIVE NAMED QUESTIONS, in the order Helen asks them** — restructured
 2026-08-29 and this is the current shape:
 
@@ -6475,12 +6480,32 @@ labels carry the punched-tape effect, §13.4.1.
 
 | | | |
 |---|---|---|
+| 0 | **THE UNIVERSE SAYS…** | one random row, dealt above the panel; since 2026-09-02 |
 | 1 | STAR INGREDIENT | |
 | 2 | MOOD | |
 | 3 | PRACTICALITIES | |
 | 4 | **HAS TO HAVE** / **LEAVE OUT** | side by side, `.search-pair` |
 | 5 | I KNOW WHAT I WANT | the escape hatch, last on purpose |
 | — | META FILTERS | local only, and **one button now**: `draft` |
+
+**THE UNIVERSE SAYS… — PR #660, 2026-09-02, and the same section exists on
+cocktails.** The page offers before it asks: one random survivor above the
+filter panel, with a `deal again` control. `assets/js/universe.js` (shared,
+site-agnostic) picks a random row from the selector in
+`data-universe-rows` and CLONES the parts named in `data-universe-parts`
+into `.universe-pick`, so the pick is a real row's title link and ingredient
+line (food) or a real card's tape name, ingredient line and mood chips
+(cocktails) and cannot drift from how rows look. Cloned buttons become spans
+(a card chip outside the card list would be a button that does nothing);
+cloned tape slots are filled by `decorations.js`'s `cardTapes()` because
+universe.js runs before it, and re-filled from the source card on a later
+deal. Absent JavaScript the section is `hidden`. Helen's copy, exactly: "the
+universe says…" and "deal again"; she is supplying an SVG for the ↻
+placeholder in `.universe-again-icon`. The food pick carries no badges, on
+her wording ("style the recipe line like the recipes in the list below, and
+give a single line of main ingredients below it") — an open question in
+`DESIGN_PLAN.md`. Frame styles: `food/_universe.scss`,
+`cocktails/_universe.scss`.
 
 **HAS TO HAVE was `SEARCH MAIN INGREDIENTS`** — that named the mechanism where
 every other label names the question, and cocktails already asked it in the
@@ -6509,11 +6534,21 @@ filters.js branches are gone; #506 closed on the argument rather than the
 example — see §3.
 
 **Density is the index's own** (`$index-section-gap`, `$index-label-gap` in
-`_layout.scss`), not the recipe page's tokens — matching them was tried and
-rejected on sight, pushing the five filter sections ~340px apart. The index
+`shared/_tokens.scss`), not the recipe page's tokens — matching them was tried
+and rejected on sight, pushing the five filter sections ~340px apart. The index
 is a control panel (every section visible in one glance); the recipe page is
-a document (space isolates the one section you're mid-task on). Keep the
-ratio near 2:1.
+a document (space isolates the one section you're mid-task on).
+
+**TIGHTENED ON 2026-09-02 FOR THE FOLD** (PR #660, from the design review's
+first finding: the first recipe sat ~1,200px down at desktop and the page
+opened as an instrument panel with no output). Section gap 1.5rem → 0.75rem,
+label-to-buttons gap 0.75rem → 0.5rem, panel top padding 1rem → 0.3rem, the
+filter headings 1.35rem → 1.05rem (cocktails 1.6rem → 1.2rem), and the
+survivor count's margins pulled up on both sites. Helen chose this
+("tighten") over three louder candidates — one row per group behind a "more"
+link ("loses what the page is here for"), a side rail ("makes the page look
+like even more work"), and a strip of four random rows. The ratio between the
+two gaps is 1.5:1 now, not 2:1.
 
 #### 13.4.1 The punched-tape effect — mechanism, not just description
 
@@ -6615,31 +6650,50 @@ tokens (`$stroke-heavy` / `$stroke-medium` / `$stroke-light`) were retired on
 2026-08-12; if you find them referenced anywhere, that reference is stale.
 Use instead, both in `_sass/shared/_rule.scss`:
 
-- `$emboss-stroke` — **`0.014em`**, i.e. 1.4% of font-size. An `em` resolves
-  against the element's own computed size, so this is self-scaling and needs
-  no argument, no arithmetic and no maintenance. It is what lets the global
-  `h1, h2, h3` rule work at all, since that rule cannot know what size a
-  heading will turn out to be.
-- `$emboss-offset` (`1px`) and `$emboss-offset-large` (`2px`) — target 6.5%
-  of font-size. These stay hard whole pixels rather than a computed
-  proportion, deliberately: a fractional stroke antialiases harmlessly along
-  an edge, but a fractional shadow offset antialiases the whole duplicate
-  glyph, which is the soft floating read the "no blur" rule exists to
-  prevent. 1px up to about 1.2rem, 2px from about 1.6rem. Only the recipe
-  title and the recipe section headings need the large one.
+- `$emboss-stroke` — **`0.016em`**, i.e. 1.6% of font-size (1.4% against
+  Courier New; Helen re-tuned it against Courier Prime, and the heavier face
+  wanted MORE edge, not less). An `em` resolves against the element's own
+  computed size, so this is self-scaling and needs no argument, no arithmetic
+  and no maintenance. It is what lets the global `h1, h2, h3` rule work at
+  all, since that rule cannot know what size a heading will turn out to be.
+- `$emboss-offset` and `$emboss-offset-large` — **both `1px` now.** They stay
+  hard whole pixels rather than a computed proportion, deliberately: a
+  fractional stroke antialiases harmlessly along an edge, but a fractional
+  shadow offset antialiases the whole duplicate glyph, which is the soft
+  floating read the "no blur" rule exists to prevent. The 2px large offset
+  went when Helen tuned the h1 against Courier Prime (two letters, not one
+  raised one) and the wordmark's own 2px went with the tiers on 2026-09-02;
+  the two variables stay separate in case the levels want to diverge again.
 
-The two ratios aren't invented — they're where the two elements that
+**SINCE 2026-09-02 NOBODY WRITES STROKE AND SHADOW BY HAND: A CONSUMER NAMES
+ITS TIER.** `@include lettering(display | heading | label | plain)` in
+`shared/_rule.scss`, and the tier resolves to per-site custom properties.
+Display is HELEN TRIAGES and the recipe title (hard), heading is every other
+heading at 1rem and up (soft), label is everything smaller (stroke only, no
+copies — below 1rem a shadow cannot clear the stroke to be seen), plain is
+nothing. The finding that produced them — food's dark-on-light punched
+lettering had a WHITE highlight on a near-white page (invisible) and a 68%
+ink shadow (a second letter), "dissolving in acid" on the FAQ — and every
+value per tier per site is in **`LETTERING.md`**, which supersedes the rest
+of this subsection wherever they disagree.
+
+The original ratios weren't invented — they were where the two elements that
 demonstrably worked already sat: HELEN TRIAGES at 6.3% offset after Helen
 tuned it by hand, and the longform Tips label at 6.8% offset / 1.4% stroke,
 which is the element she pointed at ("it looks better than the lettering for
-my existing page headings — am I imagining this?"). She wasn't.
+my existing page headings — am I imagining this?"). She wasn't; the Tips
+label is on the label tier now and the ratio argument is history.
 
 > **THE EXCLUSION IS FOOD'S ONLY, SINCE 2026-09-02 — #469.** Everything below
 > is still exactly right for food and no longer describes cocktails. Helen, on
 > the inverted header: *"the wordmark text is weirrrrrd… I would like the same
-> lettering you created for our new white on black headings."* Both halves of
-> that lockup now carry one treatment there — the card tape's two near-whites
-> plus the shared stroke.
+> lettering you created for our new white on black headings."* HELEN TRIAGES
+> there is on the display tier with cocktails' own values. The tape word
+> [ COCKTAILS ] briefly matched the card tapes' two near-whites and, on
+> 2026-09-02, went back to the shared four-copy tape lettering [ FOOD ] wears —
+> Helen: "treat [ COCKTAILS ] the same way we now treat [ FOOD ]" — while the
+> card tapes keep their two copies, because four collapse into two letterforms
+> at 1rem. See LETTERING.md §8.
 >
 > **THE ARGUMENT BELOW IS WHY IT WAS EXCLUDED, AND THE ARGUMENT IS WHAT
 > EXPIRED.** It rests on the two halves sitting on opposite grounds: dark type
