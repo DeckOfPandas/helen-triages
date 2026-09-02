@@ -6483,6 +6483,26 @@ mis-tuned on others. `.category-label` (the index's filter section labels —
 STAR INGREDIENT, MOOD, etc.) lives in `_sass/food/_category-labels.scss`; the
 header wordmark lives in `_sass/shared/_layout.scss`, see §13.8.
 
+**2026-09-02 UPDATE, READ THIS BEFORE FOLLOWING THE REST OF THIS SECTION AS A
+HOW-TO.** Dark-on-light punched lettering (food's own case) never actually
+worked — its highlight copy was painted in a colour with no headroom above the
+page to be seen against, and its shadow copy did all the work alone, reading
+as a second letter rather than depth ("dissolving in acid" on the FAQ). The
+mechanism below — two dials, stroke sets weight, shadow sets direction — is
+still exactly right and unchanged; what changed is that the raw values it
+used to read (`$color-emboss-light`, `rgba($color-text, 0.38)`, and every
+per-component restatement of `$emboss-stroke $color-label-stroke`) are gone,
+replaced by four named TIERS (display, heading, label, plain) that resolve
+those two dials together through `@mixin lettering($tier, $offset)`. A new
+consumer says its tier — `@include lettering(heading)` — rather than writing
+`-webkit-text-stroke` and `text-shadow` by hand the way this section still
+describes below. **`model_instructions/LETTERING.md` is the reference now**:
+the physics, the tier table with every site's values, the full consumer
+inventory with file:line, and the traps. This section stays as the historical
+record of how the mechanism was discovered and reasoned about — it is not
+rewritten — but do not copy code from it for a new element; read LETTERING.md
+instead.
+
 **Two things on the index deliberately do NOT wear it, and both were checked
 with Helen rather than assumed.** The results heading's "N survivors" count is
 plain body text — it carries `class="category-label"` but sits outside
