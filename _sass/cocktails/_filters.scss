@@ -488,8 +488,18 @@
   padding: 0.3rem 0.75rem;
   line-height: 1.2;
 
-  &:hover,
-  &:focus-visible { color: $color-cosmic-cosmopolitan; }
+  // `:not(.is-on)` IS LOAD-BEARING, and without it a chosen tag turned magenta
+  // under the cursor -- Helen, 2026-09-02: "here is what a tag looks like having
+  // clicked it but still mouseover... the text should be white."
+  //
+  // `.btn-mood:hover` and `.btn-mood.is-on` are both 0,2,0, so the later block
+  // wins outright and hover was overwriting the selected state's white. The two
+  // are saying different things and only one can be true at a time: hover means
+  // "you could pick this", which a picked one is past. So hover stops applying
+  // rather than being out-specified, and the magenta band underneath keeps
+  // saying the tag is chosen.
+  &:hover:not(.is-on),
+  &:focus-visible:not(.is-on) { color: $color-cosmic-cosmopolitan; }
 }
 
 // --- the two ingredient fields -----------------------------------------------
@@ -613,11 +623,19 @@
   // are untouched, exactly as on the cards.
   text-transform: lowercase;
 
+  // THE BOX MOVES AND THE TEXT DOES NOT -- Helen, 2026-09-02: "for has to have,
+  // I think the mouseover text being pink is a bit much... make it behave like
+  // the leave out, where mouseover outlines the box but leaves the text styling
+  // alone."
+  //
+  // The text had been changing colour ON TOP OF the border, so a hovered chip
+  // whose words already carried magenta word-match underlines went almost
+  // entirely magenta -- three uses of one colour on one small object. LEAVE OUT
+  // had it right by accident of being colourless: a chip HAS a box, which is a
+  // change available to it and not to a bare filter word, so the box is the
+  // thing to move.
   &:hover,
-  &:focus-visible {
-    border-color: $color-cosmic-cosmopolitan-deep;
-    color: $color-cosmic-cosmopolitan-deep;
-  }
+  &:focus-visible { border-color: $color-cosmic-cosmopolitan; }
 
   // BANDS, DOES NOT FILL -- Helen, 2026-08-30: "has to have chips should show
   // magenta underline on select rather than fill in on select." The last fill
@@ -872,14 +890,53 @@
 //
 // 0.14em to 0.2em because at name-search size the thinner band read as a
 // hairline rather than as a mark.
+// A PAINTED BAND, NOT AN UNDERLINE, SINCE 2026-09-02 -- and the reason is a
+// property of text-shadow that is easy to forget: IT PAINTS UNDER TEXT
+// DECORATIONS TOO, not only under glyphs.
+//
+// This band sits inside `.drink-card-tape-word`, whose punched lettering casts a
+// near-white copy one pixel up and left. That copy was landing on the UNDERLINE
+// as well, so the mark showed as a purple line with a white line beside it.
+// Helen saw both at once: "the purple underline showing the search hit has white
+// as well in the same way."
+//
+// A BACKGROUND IS IMMUNE TO IT, and this is the site's own device rather than a
+// new one -- §13.1's section marks are a per-line `linear-gradient` on an inline
+// element for exactly the reason that suits here, that it wraps properly where a
+// box-shadow gives a wrapped fragment an odd stub. `box-decoration-break: clone`
+// is what makes that true on a second line; the card title is `nowrap` today, so
+// it costs nothing and stops this breaking if that ever changes.
+//
+// HELEN'S DECISION, 2026-09-02: "thicker purple underline please, no punch.
+// Match the pink underline for selected chips, because that's nice and bright."
+//
+// A BACKGROUND BAND IS HOW "NO PUNCH" IS AVAILABLE AT ALL. The obvious reading
+// -- put `text-shadow: none` on this span -- would unpunch the matched LETTERS
+// too, leaving a few flat characters in the middle of a punched title. The
+// shadow has to keep reaching the glyphs and stop reaching the mark, and a
+// background is not a text decoration, so it simply is not painted.
+//
+// 0.22em MATCHES `.btn-mood.is-on`'s band exactly, which is the "nice and
+// bright" she is pointing at, and it is thicker than the 0.2em underline this
+// replaces. Drawn from the bottom of the line box rather than offset from the
+// baseline, because a background has no baseline to offset from -- if it ever
+// reads a shade low or high, that one length is the dial.
+//
+// -deep RATHER THAN THE BARE HUE, and this is the half "bright" actually turns
+// on. Bare ultraviolet is 3.52:1 on this ground where the magenta it is being
+// matched to is 5.59:1, so the bare version would be the dimmest mark on the
+// page rather than a peer of the pink. The lightened value is 5.10:1 -- and
+// ultraviolet is the one accent whose fill is already dark enough that there
+// was nothing DARKER to make text from on paper, which is the same fact from
+// the other side.
 .drink-name-hit {
-  background: none;
+  background-image: linear-gradient(to top,
+                    $color-ultra-yvette-deep 0.22em, transparent 0.22em);
+  background-repeat: no-repeat;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
   color: inherit;
-  text-decoration: underline;
-  text-decoration-thickness: 0.2em;
-  text-underline-offset: 0.16em;
-  text-decoration-skip-ink: none;
-  text-decoration-color: $color-ultra-yvette;
+  text-decoration: none;
 }
 
 // --- clear all, top and bottom — #541 ----------------------------------------

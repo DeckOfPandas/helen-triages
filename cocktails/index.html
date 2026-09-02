@@ -428,7 +428,21 @@ permalink: /cocktails/
 
         <div class="drink-card-foot">
           <span class="drink-card-moods">
-            {% comment %} A chip fills in ITS GROUP'S colour rather than one shared colour, so a hassle chip lighting up matches the ultraviolet heading that selected it and not the green one that did not. The group is derived from taxonomy.yml here rather than stored on the drink, because it is a property of the MOOD and a drink that gains a mood should not need retyping. {% endcomment %}{% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<span class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}">{{ m }}</span>{% endfor %}
+            {% comment %} The group is derived from taxonomy.yml here rather than
+               stored on the drink, because it is a property of the MOOD and a
+               drink that gains a mood should not need retyping.
+
+               A <button>, NOT A <span>, SINCE 2026-09-02 -- Helen asked for card
+               chips to filter the index. It is a real button rather than a span
+               with a click handler because it now DOES something: that is what
+               gets it keyboard focus, Enter and Space, and an accessible role,
+               none of which a span gets for free. `cocktail-index.js` delegates
+               one listener on the list and calls the mood buttons' own toggle,
+               so a chip and its filter button cannot drift apart.
+
+               The chip's `is-match` class is painted from state in apply(), not
+               toggled at click time -- clear-all reassigns the whole state
+               object without touching markup. {% endcomment %}{% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<button type="button" class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}">{{ m }}</button>{% endfor %}
           </span>
           {% comment %} THE SHIP IS ALWAYS DRAWN, the word only when there is
              one. `--ship-tint` is gone from here: it filled the old square, and

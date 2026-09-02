@@ -192,9 +192,18 @@ $card-glass-scale: 10.4rem;
 // $color-paper, so its white is already the brightest thing on screen with
 // nowhere lighter to go. Brightening the marks instead says the same thing and
 // moves no large area at all.
+// HOVER BRACKETS THE COLUMN IN MAGENTA, REST KEEPS THE GREEN -- Helen,
+// 2026-09-02: "for mouseover on the cocktail cards the top and bottom borders
+// of the glass panel should be pink. Leave the green bottom border at rest."
+//
+// The two colours are now saying two different things rather than one thing at
+// two strengths, which is what green-to-brighter-green was. Green at rest is
+// the home colour marking the column; magenta on hover is the same claim every
+// other magenta on this page makes -- "this one" -- in the interactive tense,
+// and it matches the title turning magenta under the same cursor.
 .drink-card:hover {
-  &::after { background: $color-electric-absinthe; }
-  .drink-card-glass::after { background: $color-electric-absinthe; }
+  &::after { background: $color-cosmic-cosmopolitan; }
+  .drink-card-glass::after { background: $color-cosmic-cosmopolitan; }
 }
 
 // --- the words ---------------------------------------------------------------
@@ -314,8 +323,25 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     // Magenta also makes the page consistent about what the colour MEANS: it is
     // already "this matched" on a chip and a band, and a title under the cursor
     // is the same claim in the interactive tense.
+    // THE HIGHLIGHT COPY HAS TO MOVE WITH THE FILL. Helen, 2026-09-02: "do we
+    // need a lighter pink for the offset letter behind the front one?" Yes, and
+    // that is exactly the diagnosis. `.drink-card-tape-word` paints a near-white
+    // copy one pixel up and left; when the letter turns magenta that copy stays
+    // white and stops reading as a highlight OF the letter, reading instead as a
+    // second white letter behind a pink one.
+    //
+    // #FF9BE8 is the hue lightened, so it is to magenta what #fdfbfe is to
+    // #ECE9EA -- a step brighter than the fill, which is the only thing a
+    // highlight has to be. §13.9's headroom rule is why it cannot just be white:
+    // a highlight needs somewhere brighter to be RELATIVE TO ITS OWN FILL, and
+    // white is not brighter than magenta in any useful sense, it is simply a
+    // different colour.
     &:hover,
-    &:focus-visible { color: $color-cosmic-cosmopolitan; }
+    &:focus-visible {
+      color: $color-cosmic-cosmopolitan;
+      text-shadow: -1px -1px 0 #FF9BE8,
+                    1px  1px 0 rgba(5, 5, 5, 0.9);
+    }
   }
 }
 
@@ -526,6 +552,25 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   border: 1px solid $color-border;
   padding: 0 0.45rem;
   flex: none;
+
+  // IT IS A <button> NOW, so the UA's own button styling has to be undone --
+  // background, radius and the inherited-font default it does NOT have. Without
+  // these a chip arrives as a grey system button in the browser's own face,
+  // which is the one thing this card cannot carry.
+  //
+  // `background: none` rather than transparent for the same reason the pool
+  // buttons use it: there is no fill here at rest and none when matched either,
+  // which is §9.13's "bands and washes, not fills".
+  font-family: inherit;
+  background: none;
+  border-radius: 0;
+  cursor: pointer;
+
+  // The card itself is not a link, so nothing is competing for this click --
+  // but the title above it IS, and a chip sits inside the same card. The
+  // handler calls preventDefault for that reason.
+  &:hover,
+  &:focus-visible { border-color: $color-cosmic-cosmopolitan; color: $color-text; }
 
   // A chip matching an active mood filter fills, the same treatment a matched
   // ingredient gets — but in MENTHE, because the mood filter is menthe and the
