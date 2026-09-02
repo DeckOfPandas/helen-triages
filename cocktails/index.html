@@ -85,6 +85,23 @@ permalink: /cocktails/
      way PAST all of it: food has had that escape hatch since the beginning and
      this page had none.
   ========================================================================= {% endcomment %}
+
+  {% comment %} THE UNIVERSE SAYS -- Helen, 2026-09-02, from the fold mockups: the
+     index opened with a screenful of questions and no answer, so one random
+     survivor is dealt above the panel, styled exactly like a card beneath it
+     (name on its tape, then the ingredient line on its own line, then the
+     mood chips), with a control to deal again. assets/js/universe.js fills
+     .universe-pick by cloning the named parts out of a random card, so this
+     never drifts from how a card looks. Absent JavaScript the section is
+     empty and hidden. {% endcomment %}
+  <section class="universe" data-universe-rows=".drink-cards > li" data-universe-parts=".drink-card-name, .drink-card-ingredients, .drink-card-moods" hidden>
+    <div class="universe-row">
+      <span class="universe-label">the universe says…</span>
+      <button type="button" class="btn-universe-again">deal again <span class="universe-again-icon" aria-hidden="true">&#8635;</span></button>
+    </div>
+    <div class="universe-pick" aria-live="polite"></div>
+  </section>
+
   <div class="drink-filters">
 
     {% comment %} Each section clears only itself — #488. The buttons are real
@@ -537,6 +554,11 @@ permalink: /cocktails/
   <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-search.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-index.js' | relative_url }}"></script>
+  {% comment %} AFTER cocktail-index.js and, more to the point, before
+     _layouts/default.html's own decorations.js -- see universe.js's header
+     comment for why that order is load-bearing: it is what lets a cloned,
+     emptied tape slot get its tape for free on the FIRST deal. {% endcomment %}
+  <script src="{{ '/assets/js/universe.js' | relative_url }}"></script>
 
 {% else %}
   <p class="cocktails-empty" align="center">

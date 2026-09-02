@@ -44,6 +44,10 @@
 @import "cocktails/cocktail";
 @import "cocktails/cards";
 @import "cocktails/filters";
+// Universe sits right after filters: it draws the panel it dealt above, and
+// its three cloned parts (.drink-card-name, .drink-card-ingredients,
+// .drink-card-moods) are styled by rules cards already defines.
+@import "cocktails/universe";
 // Print, last -- see shared/_print.scss's header for why last, and why all
 // three stylesheets take it rather than just the one whose pages prompted it
 // (#86).

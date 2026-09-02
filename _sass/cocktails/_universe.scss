@@ -1,0 +1,100 @@
+// =============================================================================
+// THE UNIVERSE SAYS — one random drink, dealt above the filter panel
+// =============================================================================
+// Helen, 2026-09-02, from the fold mockups: the index opened with a
+// screenful of questions and no answer, so this offers one random survivor
+// before you have filtered anything, with a "deal again" control.
+//
+// THE PICK IS A CLONE OF CARD PARTS, not a rule of its own — assets/js/
+// universe.js copies `.drink-card-name`, `.drink-card-ingredients` and
+// `.drink-card-moods` straight out of a random `.drink-cards > li`, so those
+// classes' own rules (_sass/cocktails/_cards.scss) do almost all of the
+// styling here, name-on-tape included. What follows is the FRAME, plus the
+// handful of overrides a card part needs once it is no longer sitting inside
+// a fixed-height card.
+.universe {
+  margin: $space-sm 0 $index-section-gap;
+}
+
+// EMPTY UNTIL THE SCRIPT RUNS — absent JavaScript there is nothing to show
+// and no half-built pick to leave on the page.
+.universe[hidden] {
+  display: none;
+}
+
+.universe-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-lg;
+  margin-bottom: $space-sm;
+}
+
+.universe-label {
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $color-clear-text;
+}
+
+// Food has a shared placeholder for "a button that looks like a body link"
+// (%link-button, _sass/food/_recipe-header.scss); cocktails has no such base
+// to reach, so its four resets are replicated by hand here instead of
+// invented differently. Colour is $color-accent resting, magenta on hover --
+// §9.13's rule that magenta means "this one" on hover site-wide.
+.btn-universe-again {
+  font-family: $font-body;
+  font-weight: 600;
+  font-size: 0.82rem;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  letter-spacing: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  color: $color-accent;
+
+  &:hover,
+  &:focus-visible {
+    color: $color-cosmic-cosmopolitan;
+  }
+}
+
+.universe-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-sm;
+
+  // A card's title carries its own bottom margin, spacing it from the
+  // ingredient line beneath it inside the card's fixed box. The flex gap
+  // above does that job here instead, so the two would otherwise add.
+  .drink-card-name {
+    margin: 0;
+  }
+
+  // A card clamps this to two lines because the box it sits in is a fixed
+  // height; the pick has no such box, and Helen wants the ingredients on
+  // their own line here regardless — never clamped.
+  .drink-card-ingredients {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+
+  // Same story, for the mood chips: the card's max-height exists to hold two
+  // rows inside a fixed foot, which the pick does not have.
+  .drink-card-moods {
+    max-height: none;
+    overflow: visible;
+  }
+
+  // NOTHING NEEDED FOR THE TAPE. `.drink-card-tape`, `.drink-card-tape-bg`
+  // and `.drink-card-tape-word` (_cards.scss) are plain class selectors, not
+  // scoped under `.drink-card` -- checked rather than assumed, since a
+  // scoped version would need widening to reach a clone living outside the
+  // card list. They already apply here as they are.
+}

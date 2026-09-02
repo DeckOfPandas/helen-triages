@@ -1,0 +1,72 @@
+// =============================================================================
+// THE UNIVERSE SAYS — one random recipe, dealt above the filter panel
+// =============================================================================
+// Helen, 2026-09-02, from the fold mockups: the index opened with a
+// screenful of questions and no answer, so this offers one random survivor
+// before you have filtered anything, with a "deal again" control.
+//
+// THE PICK IS A CLONE OF A LIST ROW, not a rule of its own — assets/js/
+// universe.js copies `.recipe-title-link` and `.ingredient-list` straight out
+// of a random `.recipe-list li`, so those two classes' own rules
+// (food/_recipe-list.scss) do all the typography here. What follows is only
+// the FRAME: the row it clones into, the caption above it and the "deal
+// again" control. Nothing below should restate a value those rules already
+// own.
+.universe {
+  margin: $space-sm 0 $index-section-gap;
+}
+
+// EMPTY UNTIL THE SCRIPT RUNS, same shape as .recipe-list starting
+// `visibility: hidden` next door — absent JavaScript there is nothing to
+// show and no half-built row to leave on the page.
+.universe[hidden] {
+  display: none;
+}
+
+.universe-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-lg;
+  margin-bottom: $space-sm;
+}
+
+// The small caption style — $font-headings rather than $category-label's own
+// treatment, because that carries the punched emboss and a coloured rule,
+// both of which say "this is one of the five filter questions", which this
+// is not.
+.universe-label {
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $color-clear-text;
+}
+
+// The same "button that looks like a body link" .btn-print and
+// .btn-method-toggle use (_sass/food/_recipe-header.scss) — a placeholder,
+// so reachable here even though this partial imports before that one; Sass
+// resolves @extend across the whole stylesheet rather than in import order.
+// Smaller than its two siblings (0.82rem, not $font-size-body-sm/0.92rem):
+// this sits beside a 0.78rem caption rather than in a paragraph of body
+// text, and the caption is what its size answers to.
+.btn-universe-again {
+  @extend %link-button;
+  font-size: 0.82rem;
+}
+
+// MIRRORS `.recipe-list li`'s OWN FRAME, so a single pick reads as a row
+// pulled out of the list beneath it: the same padding and border-bottom, and
+// the same gap between title and ingredient line as `.recipe-row-content`
+// uses inside a real one. The two cloned children need nothing of their
+// own — .recipe-title-link and .ingredient-list carry their styling with
+// them.
+.universe-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-sm;
+  padding: $space-xl 0;
+  border-bottom: 1px solid $color-border;
+}
