@@ -91,6 +91,20 @@ the generics are large, and those two were never candidates anyway for the
 reason above. **The estimate was made from the number of files rather than
 their size**, which is §11.2 in one line.
 
+**THE RETURN JOURNEY IS IN §11.0.3**, not here: what to do with a file that
+comes back from one of these sessions, including the one command a cocktail
+needs before the suite goes green.
+
+**`tests/test_standalone_docs.py` IS THE GUARD, since 2026-09-02.** Nine checks:
+every fenced YAML block parses, each worked example obeys the rules its own
+document states, and — the half that matters — every garnish, glass, method
+step, tag and star ingredient the documents PRINT is still declared in
+`_data/`. It runs in one direction on purpose: a retired term left in a
+document teaches a value the suite rejects, to a reader who cannot run the
+suite, whereas a newly declared term the document has not caught up with merely
+under-serves. Helen, on the two `tmp/` scripts it grew from: *"It sounds very
+much like they should form part of our suite."*
+
 **Do not let the three drift.** If §4's schema, §5's house style, §7's taxonomy,
 §9.3's schema, the garnish or method vocabularies, or the attribution spec
 changes, the standalone docs need the same edit — they are the only place in
@@ -5158,6 +5172,36 @@ amounts — and prints each one once with its instances under it.
 **It imports every rule from `tests/`**, never re-typing one, for the reason
 `tidy_drafts.py`'s own header gives at length: a checker carrying its own copy
 of the contract eventually reports against a shape the suite has moved on from.
+
+**THE ROUND TRIP, AND IT IS THE HALF THAT WAS MISSING UNTIL 2026-09-02.** The
+standalone documents (see the header) describe what a repo-less session should
+HAND BACK; nothing described what to do when the file arrives. Helen asked
+directly — *"is this in the case where I get files back from a Claude web and
+we need to ingest them properly once I'm back at a desk? Is the pipeline very
+clear in the handover?"* It was not, and it is now the second section of
+`.claude/commands/ingest.md`:
+
+    she pastes INGEST_ONE_*.md + the recipe into claude.ai, away from her desk
+      -> a draft file, plus a short "what I could not know" list
+      -> saved into _food_drafts/ or _cocktail_drafts/ root, on a branch
+      -> COCKTAILS: python3 scripts/derive_cocktail_moods.py --write
+      -> pytest, then /tidy-drafts for food
+      -> work the hand-back list as TIER 3 questions -- ask, never fill in
+      -> ingest_preflight.py for a drink
+
+**A FILE FROM A REPO-LESS SESSION IS 90% OF AN INGEST**, and what is missing is
+exactly the parts that need this repository: `mood` (derived from
+`taxonomy.yml`), `generic` and `suggestion` (a dictionary lookup, and Helen's
+standing `QQ` anyway), a glass the source did not name, and whatever else its
+list flags. **Do not redo the parts that are done** — its prose has already
+been rewritten and re-rewriting it burns her review twice.
+
+**THE COCKTAIL CASE FAILS A TEST ON ARRIVAL AND THAT IS EXPECTED.** `mood: []`
+disagrees with `test_every_drinks_moods_match_the_derivation` until the deriver
+runs. Proved end to end on 2026-09-02 rather than assumed: the worked example
+was copied into `_cocktail_drafts/`, failed exactly that one test, and
+`derive_cocktail_moods.py --write` turned it green — 125 drinks, 124 already
+agreeing, 1 written.
 
 **THE PLAYTEST CHANGED THREE THINGS, and the third is the useful one.**
 Absences became NEAR-MISSES, because "this garnish is undeclared" is noise and

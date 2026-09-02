@@ -72,6 +72,7 @@ method:
   - "Shake all ingredients with ice."
   - "Fine strain over ice."
 to_serve: ""
+mood: []
 notes:
   - label: "QQ"
     text: "QQ - `generic` and `suggestion` not filled in; the source names bottles, not categories."
