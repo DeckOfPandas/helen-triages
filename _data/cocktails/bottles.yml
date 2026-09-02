@@ -463,27 +463,56 @@ unresolved_suggestions:
     A retailer range rather than a bottle. Charleston and Cobra Effect both
     want an `eau de vie` and this says neither which one nor even which
     spirit. Needs Helen.
-  "Appleton 8, or Appleton 12 Rare Casks": >-
-    Two bottles in one string; wants the list form. Both are
-    `Jamaican, moderately aged`, so nothing is at stake beyond the shape.
-  "ED3 or Havana 3": >-
-    Two bottles in one string; wants the list form. Both `lightly aged and
-    filtered` since #314.
-  # Re-keyed from "ED3, Plantation" on 2026-08-30 when #582 corrected the
-  # spelling in the drink. This block names STRINGS AS WRITTEN, so it moves with
-  # them -- and `test_every_suggested_bottle_resolves` caught the gap the moment
-  # the draft changed, which is the whole reason a declared exception beats a
-  # comment.
-  "ED3, Planteray": >-
-    Two bottles in one string, and since #314 they are in DIFFERENT categories --
-    El Dorado 3 is `lightly aged and filtered`, Planteray 3 Stars is `blended
-    multi-region rum, clear`. Royal Bermuda Yacht Club's generic is the
-    disjunctive pair, so the list form would say exactly the right thing.
-  "El Dorado 5 or 8": >-
-    Two bottles in one string; wants the list form. Both `Demerara, aged`.
-  "Wray & Nephew, or Rum Fire": >-
-    Two bottles in one string; wants the list form. Both `Jamaican, overproof,
-    unaged`.
+  # ALL SIX "TWO BOTTLES IN ONE STRING" ENTRIES CAME OFF ON 2026-09-02, #585 --
+  # the way this block intends, by the DRINK being rewritten rather than the
+  # string reworded. Each is now the list form #457 established, so every
+  # bottle names the option it belongs to:
+  #
+  #   Appleton 8, or Appleton 12 Rare Casks   modern-zombie-makes-2, zombie-intoxica
+  #   ED3 or Havana 3                         el-presidente
+  #   ED3, Planteray                          royal-bermuda-yacht-club
+  #   El Dorado 5 or 8                        dons-own-grog
+  #   Patron Silver, Rooster Bianco           margarita-classic
+  #   Wray & Nephew, or Rum Fire              modern-zombie-makes-2
+  #
+  # NOTHING WAS GUESSED. Every bottle was already named in the string it came
+  # out of; only the shape changed. Seven of the twelve parts already resolved
+  # through `bottles` or an alias, which is why only three land below.
+  #
+  # THE ED3/PLANTERAY SPLIT IS THE ONE WORTH KNOWING ABOUT: those two are in
+  # DIFFERENT categories (El Dorado 3 is `lightly aged and filtered`, Planteray
+  # 3 Stars is `blended multi-region rum, clear`), and Royal Bermuda Yacht
+  # Club's generic is the disjunctive pair. So the list form says exactly the
+  # right thing where the comma said nothing. That entry had also been re-keyed
+  # from "ED3, Plantation" on 2026-08-30 when #582 corrected the spelling --
+  # this block names STRINGS AS WRITTEN, and test_every_suggested_bottle_resolves
+  # caught that gap the moment the draft changed, which is the whole reason a
+  # declared exception beats a comment.
+
+  # THE THREE THAT NOW STAND ALONE AND ARE STILL UNDECLARED. Each is a real
+  # bottle name -- an improvement on the prose blob it came out of, which was
+  # awaiting both a split AND a category. What is left is only the category.
+  #
+  # NOT DECLARED HERE, DELIBERATELY. Helen handed eleven bottles back on
+  # 2026-08-30 for exactly this: they had been declared by DERIVING the
+  # category from the generic of the ingredient beside them, which is a good
+  # default and not a rule, because a suggestion may deliberately cross
+  # categories. "Keep only what the collection already spells out; hand me back
+  # the rest." The reasons below record what this file already believes about
+  # each, so declaring them is one question rather than three.
+  "Planteray": >-
+    Planteray 3 Stars, per the entry this came out of, is `blended
+    multi-region rum, clear` -- which is NOT Royal Bermuda Yacht Club's other
+    option, and is the whole reason that string needed splitting. Needs Helen
+    to confirm the category before it is declared.
+  "Patron Silver": >-
+    Recorded here as a blanco tequila, matching Margarita's generic. Note the
+    accent: this file's own prose writes `Patrón Silver` and the drink writes
+    `Patron Silver`. Needs Helen for the category and for which spelling wins.
+  "Rooster Bianco": >-
+    Recorded here as Rooster Rojo Bianco, also a blanco. The drink writes the
+    short form. Needs Helen for the category and for whether the name should
+    be completed.
   # Carta Switchel's "Havana 7, Appleton 8" came off on 2026-08-31, the way this
   # block intends: the drink now writes the list, so each bottle names the option
   # it belongs to. Helen, asked with the pair in front of her: "thanks, yes
@@ -603,10 +632,8 @@ unresolved_suggestions:
   "Or 20g palm sugar": >-
     An alternative INGREDIENT, not an alternative bottle -- Caipirinha's generic
     is `raw sugar`. It wants a `note`, or a second option on the generic.
-  "Patron Silver, Rooster Bianco": >-
-    Two bottles in one string. Patrón Silver is a blanco tequila and matches
-    Margarita's generic; Rooster Rojo Bianco is also a blanco, so this is the
-    list form (#457) rather than a real question.
+  # "Patron Silver, Rooster Bianco" was split on 2026-09-02 (#585). Its two
+  # halves are above, with what this file already recorded about each.
   "or other Creole-style bitters": >-
     Prose. Sazerac's generic is already `Creole bitters`, so the string says
     only "or something else of the same kind" -- which the generic says better.
