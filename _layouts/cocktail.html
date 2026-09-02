@@ -159,7 +159,7 @@ layout: default
     {% capture glass_icon_style %} style="--glass-fill: {{ compressed }};"{% endcapture %}
   {% endif %}
 
-  {% comment %} TWO STATES, ONE PAGE. The button adds `is-making` to the
+  {% comment %} TWO STATES, ONE PAGE. The toggle adds `is-making` to the
      article and _sass/cocktails/_cocktail.scss does the rest — nothing leaves
      the DOM, so this page still prints and still reads with JS off, in the
      editorial state, which is the one carrying the most information. Same
@@ -169,37 +169,121 @@ layout: default
       <span class="cocktail-glass-icon"{{ glass_icon_style }}>{% include {{ glass_icon_file }} %}</span>
     {% endif %}
     <div class="cocktail-head-words">
-      {% comment %} The toggle sits ON the title's line, right-aligned, exactly
-         where food's recipe pages put `print` — Helen, 2026-08-26. It had its
-         own row above the title, which spent a whole line on one control and
-         made the two sites' recipe pages open differently for no reason. The
-         title wraps before the full width to leave room for it. {% endcomment %}
+      {% comment %} THE NAME SITS ON THE SAME DYMO TAPE AS A CARD'S, 2026-09-02
+         -- Helen's brief: "worn black Dymo tape with white punched lettering."
+         Reused exactly rather than redrawn: `.drink-card-name` >
+         `.drink-card-tape` > `.drink-card-tape-bg[data-card-tape]` +
+         `.drink-card-tape-word`, the same four classes _sass/cocktails/_cards.scss
+         already styles and the same slot assets/js/decorations.js's cardTapes()
+         already fills for any page, not only the index — verified against that
+         function during the fold work (HANDOVER §9.13). `data-card-tape` only
+         has to be a stable-per-page number, unlike the index's `forloop.index`;
+         `page.url`'s length is as good a hash as any and needs no data file.
+
+         THE OUTER WRAPPER IS A `<div>`, NOT THE CARD'S `<p>`. A card's tape
+         wraps an `<a>` and a `<p>` may legally contain one; this page wraps a
+         real `<h1>`, and a `<p>` may not legally contain a heading — the browser
+         would close the paragraph early and break the tape's own box structure
+         to do it. `.drink-card-name` is a class selector regardless of the tag
+         it lands on, so nothing in _cards.scss cares which element carries it.
+
+         THE H1 IS `display: contents`, in _sass/cocktails/_cocktail.scss. The
+         tape word already carries its own two-copy raised lettering (§9.13,
+         "two near-whites, no softening shadow") — giving the h1
+         `@include lettering(display)` on top would be a second emboss stacked
+         on the first. `display: contents` drops only the h1's own box, so its
+         text renders as if it were the tape word's direct content and picks up
+         that span's colour, stroke, shadow, size, line-height and ellipsis for
+         free, while the DOM keeps a real heading for anyone not reading pixels.
+      {% endcomment %}
       <div class="cocktail-title-row">
-        <h1 class="cocktail-title">{{ page.title }}</h1>
-        <button type="button" class="btn-make" id="cocktail-make" aria-pressed="false">make it</button>
+        <div class="drink-card-name">
+          <span class="drink-card-tape">
+            <span class="drink-card-tape-bg" data-card-tape="{{ page.url | size }}"></span>
+            <span class="drink-card-tape-word"><h1 class="cocktail-title">{{ page.title }}</h1></span>
+          </span>
+        </div>
+
+        {% comment %} THE READ-IT / MAKE-IT TOGGLE REPLACES A SINGLE BUTTON,
+           2026-09-02 -- Helen's brief: "remake this button as a binary
+           slider/toggle... with 'read it' or 'make it' active." It sits on the
+           title's line at the column's right edge, exactly where the old
+           `.btn-make` sat and for the same reason (Helen, 2026-08-26): the two
+           sites' recipe pages should open the same way, and food puts its own
+           toggle here.
+
+           THREE ELEMENTS, ONE GROUP: a "read it" label, a track with a knob, a
+           "make it" label. Both labels are always visible and the active one is
+           the SAME colour the old button's `.is-on` state used
+           ($color-electric-absinthe-deep) plus bold weight — so which mode the
+           page is in is legible from the words themselves, not only from a
+           knob's position. See assets/js/cocktail-make.js for why this is not
+           the ambiguous-label trap #494 fixed by holding one constant label:
+           two labels that are both always on screen cannot be misread as
+           "the state" versus "the action", because they are never the only
+           word present. {% endcomment %}
+        <div class="cocktail-toggle" role="group" aria-label="read it or make it">
+          <button type="button" class="cocktail-toggle-label is-active" data-mode="read" aria-pressed="true">read it</button>
+          <button type="button" class="cocktail-toggle-track" id="cocktail-make" aria-label="switch reading or making">
+            <span class="cocktail-toggle-knob"></span>
+          </button>
+          <button type="button" class="cocktail-toggle-label" data-mode="make" aria-pressed="false">make it</button>
+        </div>
       </div>
 
-      {% if page.tagline %}<p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
+      {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
+         model_instructions/INGEST_ONE_COCKTAIL.md §"Leave both as QQ": every
+         drink is ingested with `tagline: "QQ"` until Helen writes the real one
+         by hand, since a tagline is voice and nothing in a source photo can
+         supply it. A bare `page.tagline` truth test would print "QQ" as if it
+         were the drink's one line of prose on every draft that has not had one
+         written yet — most of them. {% endcomment %}
+      {% if page.tagline and page.tagline != "QQ" %}
+        <p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+      {% endif %}
 
-  {% comment %} Glass is a scalar; garnish is a LIST — Cobra's Fang carries a
-     mint sprig AND a lime wheel, so the single-value shape the first sketch
-     assumed was wrong the moment real data arrived.
-  {% endcomment %}
-  {% if page.glass or page.garnish.size > 0 %}
-    <ul class="cocktail-meta">
-      {% comment %} `join` on the whole list, not the first entry plus a
-         separate "or" line: the alternatives are equally acceptable serves,
-         not a fallback. Liquid has no `shift`/`rest`, so an "or" line would
-         need slicing the array anyway, for no gain.
-      {% endcomment %}
-      {% if page.glass.size > 0 %}
-        <li><strong>Glass</strong> <span>{{ page.glass | join: " or " }}</span></li>
+      {% comment %} META IS A <dl> OF THREE NOW, 2026-09-02 -- glass, garnish,
+         SHIP IT?. Glass is a scalar list; garnish is a LIST — Cobra's Fang
+         carries a mint sprig AND a lime wheel, so the single-value shape the
+         first sketch assumed was wrong the moment real data arrived. `join` on
+         the whole list, not the first entry plus a separate "or" line: the
+         alternatives are equally acceptable serves, not a fallback.
+
+         SHIP IT? IS UNCONDITIONAL, unlike glass and garnish, which still guard
+         themselves individually (belt and braces — #491 means every drink
+         names a glass today, but the guard cost nothing to keep). A ship rating
+         may be absent (`QQ`, "who knows"), and the include below renders that
+         correctly as an icon with no word rather than an empty line, so there
+         is nothing to gate here. {% endcomment %}
+      <dl class="cocktail-meta">
+        {% if page.glass.size > 0 %}
+          <div><dt>Glass</dt><dd>{{ page.glass | join: " or " }}</dd></div>
+        {% endif %}
+        {% if page.garnish.size > 0 %}
+          <div><dt>Garnish</dt><dd>{{ page.garnish | join: ", " }}</dd></div>
+        {% endif %}
+        {% comment %} THE SAME INCLUDE THE INDEX CARD READS —
+           _includes/cocktails/ship.html, factored out 2026-09-02 so the two can
+           never render a different word for the same rung. See
+           cocktails/index.html's own call for the other half of this pair.
+        {% endcomment %}
+        <div><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
+      </dl>
+
+      {% comment %} CHIPS ARE THE CARD'S MOOD CHIPS, AS <span>s -- Helen's
+         brief: "Must be the same chips as on the cards." Same classes
+         (`.drink-card-mood`, `--hassle` via taxonomy.yml's `mood_groups`) and
+         the identical derivation loop cocktails/index.html runs, so a mood can
+         never look different here than it does on the card it came from. A
+         `<span>`, not the card's `<button>`, because this page has no filter
+         list for a click to narrow — see _sass/cocktails/_cocktail.scss for the
+         `cursor: default` that follows from that. {% endcomment %}
+      {% assign mood_groups = site.data.cocktails.taxonomy.mood_groups %}
+      {% if page.mood.size > 0 %}
+        <div class="cocktail-chips">
+          {% for m in page.mood %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<span class="drink-card-mood drink-card-mood--{{ chip }}">{{ m }}</span>{% endfor %}
+        </div>
       {% endif %}
-      {% if page.garnish.size > 0 %}
-        <li><strong>Garnish</strong> <span>{{ page.garnish | join: ", " }}</span></li>
-      {% endif %}
-    </ul>
-  {% endif %}
     </div>
   </div>
 
@@ -265,7 +349,7 @@ layout: default
      below. That case is gone and so is the assignment — an unread variable is
      the template equivalent of the dead selector it went with. {% endcomment %}
   {% if page.ingredients.size > 0 %}
-    <h2 class="cocktail-section-heading">Ingredients</h2>
+    <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
         {% comment %} THE GATE ASKS FOR THE FIELDS THIS BLOCK ACTUALLY RENDERS,
@@ -355,7 +439,13 @@ layout: default
                  would make one punctuation mark carry two unrelated jobs.
                  That is #441's argument about "(blackstrap)" arriving on a
                  different field. {% endcomment %}
-              <span class="cocktail-item">{{ headline }}{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">optional</span>{% endif %}</span>
+              {% comment %} `headline` GETS ITS OWN SPAN, 2026-09-02, so the
+                 double-rule underline (yvette over absinthe, Helen's brief:
+                 "yvette showing what is in something") lands under the
+                 ingredient's name only — never under the bottle suggestion in
+                 brackets after it, which is a different colour making a
+                 different claim. {% endcomment %}
+              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">optional</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
               <p class="cocktail-type-line">{{ class_html }}</p>
@@ -378,12 +468,12 @@ layout: default
      one-step build rather than forcing `- ` on a single line.
   {% endcomment %}
   {% if page.method.size > 0 and page.method.first %}
-    <h2 class="cocktail-section-heading">Method</h2>
+    <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>
     <ol class="cocktail-method">
       {% for step in page.method %}<li>{{ step | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endfor %}
     </ol>
   {% elsif page.method %}
-    <h2 class="cocktail-section-heading">Method</h2>
+    <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>
     <p class="cocktail-method">{{ page.method | markdownify | remove: '<p>' | remove: '</p>' }}</p>
   {% endif %}
 
@@ -403,7 +493,7 @@ layout: default
      draft does not have to carry a label yet.
   {% endcomment %}
   {% if page.notes.size > 0 %}
-    <h2 class="cocktail-section-heading">Notes</h2>
+    <h2 class="cocktail-section-heading cocktail-section-heading--notes"><span>Notes</span></h2>
     <div class="notes {% if page.notes.size == 1 %}notes--single{% endif %}">
       {% for note in page.notes %}
         <div class="note">

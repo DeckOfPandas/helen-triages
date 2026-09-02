@@ -1917,6 +1917,18 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         ".tc-row happens to this in the same pass -- that is the point of it "
         "being a separate entry saying so."
     ),
+    ".cocktail-ingredient-top": (
+        "`$amount-col 1fr` -- a 5.5rem fixed amount column and the ingredient "
+        "name/suggestion text. Only the amount track is fixed; the amount itself "
+        "wraps inside its own column rather than growing past it (see "
+        "$amount-col's own comment), so it contributes no floor of its own. The "
+        "`1fr` track is ordinary wrapping prose, not a nowrap label or a flat-"
+        "width image the way the footer's hearts were -- its min-content is the "
+        "width of its single longest WORD, and every ingredient name and bottle "
+        "suggestion in the data (_cocktail_drafts/*.md) is comfortably under a "
+        "360px phone one word at a time. Unlike .tc-row, there is no unbroken "
+        "string here that could grow past that."
+    ),
 }
 
 

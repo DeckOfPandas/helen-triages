@@ -36,9 +36,12 @@
     .cocktail-body-content { display: revert; }
   }
 
-  // The toggle itself is furniture, not content -- a button that cannot be
-  // pressed on paper. Same reasoning as shared/_print.scss dropping the nav.
-  .btn-make { display: none; }
+  // The toggle itself is furniture, not content -- three controls that cannot
+  // be pressed on paper. Was `.btn-make`, the single button this replaced,
+  // 2026-09-02 -- same reasoning as shared/_print.scss dropping the nav, now
+  // hiding the whole read-it/make-it group in one rule rather than each of its
+  // three elements.
+  .cocktail-toggle { display: none; }
 
   // The universe pick is furniture too -- a random deal and "deal again" do
   // nothing on paper.
