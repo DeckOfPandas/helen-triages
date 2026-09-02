@@ -455,36 +455,12 @@ permalink: /cocktails/
      it lands as an insult to a search that was simply too narrow. {% endcomment %}
   <p class="drink-none" hidden>Blank canvas.</p>
 
-  {% comment %} ─────────────────────────────────────────────────────────────
-    THE GLASS PANEL, BEHIND `?panel=` — TEMPORARY, #469.
-
-    Same comparison-switch convention as `?narrow=` and `?glass=margin` before
-    it: the options go on the REAL page rather than a dev page, Helen looks,
-    and then the losers AND this script are deleted together. HANDOVER 9.13 is
-    explicit that a switch left in becomes a permanent branch nobody dares
-    remove — and 11.2.1 is why it is here rather than in `_dev/`, since a
-    comparison you cannot make against real data is not a comparison.
-
-    Four values, all darker or greyer than today's green wash, all putting the
-    home colour into the DRAWING rather than a field behind it:
-
-        ?panel=well    a well cut deeper than the page
-        ?panel=tween   between the page and the card — Helen's suggestion
-        ?panel=none    no panel at all
-        ?panel=grey    a neutral lift
-
-    No parameter leaves the shipped green. The rules live beside their reasoning
-    in _sass/cocktails/_cards.scss; delete both halves in one commit.
-  ───────────────────────────────────────────────────────────────{% endcomment %}
-  <script>
-    (function () {
-      var allowed = ['well', 'tween', 'none', 'grey'];
-      var want = new URLSearchParams(window.location.search).get('panel');
-      if (allowed.indexOf(want) === -1) return;
-      var list = document.querySelector('.drink-cards');
-      if (list) list.classList.add('drink-cards--panel-' + want);
-    }());
-  </script>
+  {% comment %} A `?panel=` SWITCH STOOD HERE for one round, offering four glass
+     panels against the shipped green wash. Helen chose `none` -- no panel at
+     all, the home colour in the line work -- so the switch and the three losers
+     are gone and the winner is the default in _sass/cocktails/_cards.scss.
+     HANDOVER 9.13: a comparison switch left in becomes a permanent branch
+     nobody dares remove. {% endcomment %}
 
   {% comment %} THE INGREDIENT VOCABULARY — declared families, card names and
      the three search thresholds — comes from _data/cocktails/ingredients.yml.

@@ -115,7 +115,31 @@ $card-glass-scale: 10.4rem;
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  background: $color-electric-absinthe-wash;
+
+  // NO PANEL, AND THE DRAWING CARRIES THE COLOUR — Helen, 2026-09-02, choosing
+  // it against three darker and greyer fields on the real index.
+  //
+  // IT WAS A GREEN WASH UNTIL TODAY, and the measurement is the case against
+  // it: at L* 19.40 that field was BRIGHTER THAN THE CARD'S OWN BORDER (18.18)
+  // and two and a half times the card's own lightness — the lightest thing on a
+  // card, on a site whose premise is black on black. It arrived as a 10% tint
+  // that made sense on paper and survived the inversion as a value rather than
+  // as a decision.
+  //
+  // AND THE ARRANGEMENT WAS BACKWARDS. §9.13's claim is that "the glass
+  // drawings carry the personality food gets from colour"; a near-white glass
+  // on a green field is the opposite of that. The colour is in the LINE WORK
+  // now and there is no field at all.
+  //
+  // `color` rather than a rule on the icon: the artwork strokes with
+  // `currentColor` (§3), so this one declaration reaches every glass including
+  // the fill-based ones. 11.11:1 on a card, so nothing is being asked of the
+  // reader's eyes that a hairline cannot deliver.
+  color: $color-electric-absinthe;
+
+  // The column still animates on hover — see the bracket rules below, which are
+  // painted strips rather than a background, so the transition stays useful
+  // even with nothing behind them.
   transition: background-color 0.12s ease;
 
   svg {
@@ -139,52 +163,6 @@ $card-glass-scale: 10.4rem;
 // because a border would eat into the column's fixed height and nudge the
 // glass — and the one rule the hover has is that nothing moves. Offset -1px so
 // they land ON the card's own border rather than inside it.
-// =============================================================================
-// PANEL CANDIDATES — behind `?panel=` on the index. TEMPORARY, #469.
-// =============================================================================
-// Helen, 2026-09-02: "can I see one or two more options without the green
-// background panel? I'd like to try absinthe (or a tint/shade) on black or
-// grey, so a black inbetween the page background and the main panel background,
-// maybe."
-//
-// SAME COMPARISON-SWITCH CONVENTION AS `?narrow=` AND `?glass=margin` BEFORE
-// IT: build the options on the REAL page, let her look, then delete the losers
-// AND the switch. A comparison switch left in becomes a permanent branch nobody
-// dares remove. These rules and the script in cocktails/index.html go together.
-//
-// WHY THE GREEN PANEL DOMINATES, measured rather than guessed: at L* 19.40 it
-// is BRIGHTER THAN THE CARD'S OWN BORDER (18.18) and two and a half times the
-// card's own lightness (7.85). It is the lightest thing on the card, on a site
-// whose whole premise is now black on black. That is the case against it, and
-// it is also why every option below is darker rather than differently coloured.
-//
-// EVERY ONE PUTS THE GLASS IN ABSINTHE. Today the drawing is near-white
-// (currentColor, inherited) on a green panel; these invert that relationship,
-// so the home colour is in the LINE WORK -- which is what §9.13's "ink, paper
-// and glass" says it should be -- rather than in a field behind it.
-//
-//   ?panel=well    #0a0a0d   L*  2.81   darker than the PAGE: a well cut in
-//   ?panel=tween   #121215   L*  5.56   Helen's own suggestion, between the two
-//   ?panel=none    #17171a   L*  7.85   no panel at all, just the drawing
-//   ?panel=grey    #232329   L* 13.94   a neutral lift, the only one going up
-//
-// Absinthe reads 12.28 / 11.62 / 11.11 / 9.71:1 on them respectively, so
-// legibility does not decide this -- all four are far above any bar. It is
-// purely which relationship looks right.
-.drink-cards--panel-well  .drink-card-glass { background: #0a0a0d; color: $color-electric-absinthe; }
-.drink-cards--panel-tween .drink-card-glass { background: #121215; color: $color-electric-absinthe; }
-.drink-cards--panel-none  .drink-card-glass { background: transparent; color: $color-electric-absinthe; }
-.drink-cards--panel-grey  .drink-card-glass { background: #232329; color: $color-electric-absinthe; }
-
-// The foot rule is mixed from absinthe against $color-surface, which reads as a
-// pale green on a card. With the panel no longer green it is the only green
-// left on a resting card, so it goes to the real thing rather than a mix --
-// otherwise it looks like a leftover.
-.drink-cards--panel-well  .drink-card::after,
-.drink-cards--panel-tween .drink-card::after,
-.drink-cards--panel-none  .drink-card::after,
-.drink-cards--panel-grey  .drink-card::after { background: $color-electric-absinthe-deep; }
-
 .drink-card-glass::after,
 .drink-card::after {
   content: "";
@@ -196,7 +174,12 @@ $card-glass-scale: 10.4rem;
   transition: background-color 0.12s ease;
 }
 .drink-card-glass::after { top: -1px; background: transparent; }
-.drink-card::after       { bottom: -1px; background: mix($color-electric-absinthe, $color-surface, 55%); }
+// FULL STRENGTH SINCE 2026-09-02, not a mix. It was
+// `mix($color-electric-absinthe, $color-surface, 55%)` -- absinthe halfway to
+// the card -- which read as a pale green while there was a green PANEL beside
+// it to belong to. With the panel gone this is the only green on a resting card
+// and a diluted one looks like a leftover rather than a mark.
+.drink-card::after       { bottom: -1px; background: $color-electric-absinthe-deep; }
 
 // HOVER: the two marks bracket the glass column, top and bottom.
 // Helen asked for "a very subtle lightening of the white part of the
