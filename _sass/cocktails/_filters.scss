@@ -18,16 +18,19 @@
 // =============================================================================
 
 // THE SPACE ABOVE THE FIRST HEADING, matched to food -- #548 point 1, and it
-// was 0 here against food's 2.5rem. Both pages sit in the same `main` padding
-// and both open with a zero-height visually-hidden <h1>, so everything above
-// the first filter was already identical; what food adds and this did not is
-// `.controls { padding-top: $space-lg }` plus the first `.category`'s own
-// 1.5rem top margin. The filters began flush against the header.
+// was 0 here against food's total at the time. Both pages sit in the same
+// `main` padding and both open with a zero-height visually-hidden <h1>, so
+// everything above the first filter was already identical; what food adds and
+// this did not is `.controls { padding-top: $space-xs }` plus the first
+// `.category`'s own 0.75rem top margin. The filters began flush against the
+// header.
 //
 // PADDING, NOT MARGIN, and that is what makes the sum work. Padding on the
 // wrapper stops the first section's top margin collapsing out through it, so
 // the two add rather than the larger swallowing the smaller -- which is
-// precisely how food gets 2.5rem from a 1rem and a 1.5rem.
+// precisely how food gets 1.05rem from a 0.3rem and a 0.75rem. Both were
+// bigger before the index fold tightening, 2026-09-02: $space-lg and
+// $space-xl summed to 2.5rem.
 // Shared with food's `.controls` -- @mixin index-panel in shared/_rule.scss.
 // `position: relative` comes with it and is load-bearing: the clear-all is
 // absolutely positioned and this is what it anchors to. Without it the button
@@ -88,7 +91,11 @@
   // title being the first. Neither is drift: both are the ground being
   // different, and #495's rule -- share the treatment, not the value -- is
   // exactly what passing arguments to a shared mixin does.
-  @include index-section-label($size: 1.6rem, $tracking: 0.1em);
+  //
+  // 1.6rem TO 1.2rem, 2026-09-02, with the index fold tightening -- moved in
+  // step with food's own default (1.35rem to 1.05rem, shared/_rule.scss), so
+  // the ratio between the two sites' headings holds.
+  @include index-section-label($size: 1.2rem, $tracking: 0.1em);
 
   color: $color-text;
   margin: 0;
@@ -157,8 +164,9 @@
 
 // FOOD'S GAP BETWEEN SECTIONS, not this file's own. It was
 // $spacing-section-gap (3rem), which is the RECIPE PAGE's "below a section"
-// token; food's index uses $index-section-gap ($space-xl, 1.5rem) and §13.4
-// says why the two differ -- "the index is a control panel (every section
+// token; food's index uses $index-section-gap ($space-md, 0.75rem since the
+// 2026-09-02 fold tightening, was $space-xl/1.5rem) and §13.4 says why the
+// two differ -- "the index is a control panel (every section
 // visible in one glance); the recipe page is a document (space isolates the one
 // section you're mid-task on). Keep the ratio near 2:1." This page is a control
 // panel and was spaced like a document.
@@ -287,9 +295,10 @@
   // think the clear buttons should all be the same colour, not sure which."
   //
   // GREY RATHER THAN THE HOME COLOUR, and the reason is what the headings did
-  // rather than anything about the clears. They are 1.6rem now and each sits on
-  // a green rule, so a green link beside a green rule joins the heading instead
-  // of standing apart from it. Grey also makes CLEAR one language: `clear all`
+  // rather than anything about the clears. They are 1.2rem now (were 1.6rem
+  // before the 2026-09-02 fold tightening) and each sits on a green rule, so a
+  // green link beside a green rule joins the heading instead of standing apart
+  // from it. Grey also makes CLEAR one language: `clear all`
   // at the top and foot of the page has always been neutral, and five coloured
   // siblings made it look like a different control rather than the same one at
   // another scale.
@@ -753,9 +762,8 @@
 // are not part of either site's personality, and two of them are two things to
 // keep in step for no gain.
 //
-// THE SPACING IS DELIBERATELY UNTOUCHED. It is #548 point 1's open question and
-// a separate one from what the type is; changing both at once would leave
-// neither answered.
+// THE SPACING WAS SETTLED 2026-09-02, with the fold work: it now takes the
+// same margin food's `.results-heading` uses above its own list.
 .drink-count {
   // Flex so the legend can sit at the far end of the same line. align-items:
   // baseline, not center, because the count and the legend are both text and
@@ -775,7 +783,9 @@
   text-transform: none;
   letter-spacing: 0.01em;   // matches the `body, button` rule in shared/_base
   color: $color-text;
-  margin: $spacing-block-gap 0 $space-xl;
+  margin: $space-xl 0 $space-lg;   // was $spacing-block-gap 0 $space-xl
+                                   // (1.75rem/1.5rem); matched to food's
+                                   // .results-heading, 2026-09-02
   padding-top: $space-md;
 
   // The number keeps its element -- the script writes into it by id, and a

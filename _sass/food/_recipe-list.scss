@@ -36,7 +36,13 @@
   // Reduced here rather than by shrinking the token: $spacing-section-top is
   // the recipe page's "gap above a heading" too, and this is a fact about
   // THIS heading's neighbours, not about the scale.
-  margin: $spacing-section-gap 0 $space-lg;
+  //
+  // TIGHTENED AGAIN, 2026-09-02, with the index fold work: $spacing-section-gap
+  // (3rem) and $space-lg (1rem) were both the recipe page's own tokens, reused
+  // here rather than invented -- and the recipe page is a document, not a
+  // control panel (§13.4). $space-xl and $space-sm are the index's own scale
+  // instead, matched to cocktails' `.drink-count` below its own list.
+  margin: $space-xl 0 $space-sm;
   display: flex;
   // Was flex-end -- Helen, 2026-08-03: sitting alone at the right edge of
   // an otherwise left-aligned page, it read as stray rather than placed.

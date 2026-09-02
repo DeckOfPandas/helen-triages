@@ -445,7 +445,13 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 //
 // WHAT STAYS SHARED IS THE TREATMENT: family, case, weight, padding and the
 // punched mark. That is #495's rule -- share the treatment, not the value.
-@mixin index-section-label($size: 1.35rem, $tracking: 0.08em) {
+//
+// THE DEFAULT WENT DOWN A STEP, 2026-09-02, with the index fold tightening --
+// food's filter headings from 1.35rem to 1.05rem. Cocktails' own argument
+// moved with it, 1.6rem to 1.2rem (below, _sass/cocktails/_filters.scss),
+// keeping the same ratio between the two the divergence above already argues
+// for.
+@mixin index-section-label($size: 1.05rem, $tracking: 0.08em) {
   font-family: $font-headings;
   text-transform: uppercase;
   font-size: $size;
@@ -483,10 +489,15 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 // clear-all button is `position: absolute; top: 0; right: 0`, so the panel is
 // what it anchors to. Cocktails had neither, which is why its clear-all sat
 // somewhere else entirely.
+//
+// PADDING-TOP DOWN TO $space-xs, 2026-09-02, with the index fold tightening --
+// was $space-lg (1rem). Same mechanism as before (padding, not margin, so it
+// adds to the first section's own top margin rather than losing to the larger
+// of the two in a collapse); only the number is smaller.
 @mixin index-panel {
   position: relative;
   width: 100%;
-  padding-top: $space-lg;
+  padding-top: $space-xs;
 }
 
 // One filter section. The gap is what spaces a label from its own buttons, so

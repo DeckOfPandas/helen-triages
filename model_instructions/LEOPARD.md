@@ -87,10 +87,19 @@ Keep it. Keep it up-left.
   "The sheen really brings it to life." She then asked for more: a more
   extreme pattern, more shades of black, print in the page gutters, a
   leopardy header and footer, and "can you make it... furry?"
-- Round 2 (same day): five patterns × four placements, on
-  `tmp/mock/leopard_v2.py`. Not yet decided at the time of writing. **Record
-  the decision here when she makes it**, and move the chosen values into
-  `_sass/cocktails/_palette.scss` beside the greys they are solved against.
+- Round 2 (same day): five patterns × four placements. Not yet decided at the
+  time of writing. **Record the decision here when she makes it**, and move
+  the chosen values into `_sass/cocktails/_palette.scss` beside the greys they
+  are solved against.
+
+**STATUS, 2026-09-02: HELEN HOLDS THIS. DO NOT SHIP ANY OF IT.** Her words:
+"Leave leopard with me. Write instructions for it, but don't ship anything."
+Nothing under `_sass/` or `assets/img/` carries a leopard tile, and nothing
+should until she says which pattern and which placement. `tmp/` is
+gitignored, so the round-two mock script is not in the repo; the generator in
+`scripts/leopard_tile.py` and the tone table in §3 are enough to rebuild any
+of the twenty combinations. If you are an agent reading this because a task
+mentions leopard, the task is to help her decide, not to build.
 
 ## 5. Placing it on the site (when it ships)
 
