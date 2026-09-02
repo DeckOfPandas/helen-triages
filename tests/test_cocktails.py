@@ -221,6 +221,10 @@ def _load_published():
 WHOLE_COLLECTION_ONLY = {
     "test_the_glassless_list_has_no_stale_entries",
     "test_the_known_prose_suggestion_list_has_no_stale_entries",
+    # Added 2026-09-02, #585. Same shape as its neighbours and the same reason:
+    # a drink merely ABSENT looks exactly like a drink FIXED, so "no drink says
+    # this any more" is unanswerable on a partial corpus.
+    "test_unresolved_suggestions_has_no_stale_entries",
     "test_every_card_name_join_is_reachable",
     "test_every_proposal_still_matches_a_real_step",
     "test_every_garnish_proposal_still_matches_a_real_string",
@@ -1303,6 +1307,59 @@ def test_every_suggested_bottle_resolves():
           "rather than a bottle name (#457) -- declare it in "
           "`unresolved_suggestions` with the reason, so it fails loudly for "
           "the next reader instead of quietly for this one."
+    )
+
+
+def test_unresolved_suggestions_has_no_stale_entries():
+    """The other direction: a declared failure must still be a real one.
+
+    THE TEST ABOVE SAYS "deleting a line there is how one gets retired -- the
+    same shape `methods.yml` uses for its proposals". methods.yml has
+    `test_every_proposal_still_matches_a_real_step` enforcing exactly that.
+    This file had the sentence and not the test, so nothing ever deleted the
+    line, and #585 found seven entries naming strings no drink says any more --
+    every one of them a job that had been DONE and still read as outstanding.
+
+    That is the one thing a declared-exception block must never get wrong. A
+    stale entry is worse than a missing one in both directions at once: it
+    hides finished work, and it silently exempts whatever later happens to be
+    written with the same string.
+
+    NOT THE REVERSE. A bottle in `bottles` need not be used -- Helen owns
+    bottles no recipe names, and El Dorado 151 is on the shopping list. This
+    asks only about `unresolved_suggestions`, which is a list of live problems
+    by definition.
+    """
+    _require_whole_collection("unresolved_suggestions")
+    data = _bottles()
+    declared = data.get("unresolved_suggestions")
+    assert declared is not None, (
+        "bottles.yml has no `unresolved_suggestions` key at all. An EMPTY "
+        "mapping is a fine state and says 'nothing outstanding'; a MISSING "
+        "one silently stops this check and the resolver's exemption from "
+        "being kept honest."
+    )
+
+    said = set()
+    for _, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            suggestion = item.get("suggestion")
+            for name in (suggestion if isinstance(suggestion, list)
+                         else [suggestion] if suggestion else []):
+                if isinstance(name, str):
+                    said.add(name.strip().lower())
+    assert said, "no drink carries a suggestion -- the loader has gone stale."
+
+    stale = sorted(k for k in declared if k.strip().lower() not in said)
+    assert not stale, (
+        f"{len(stale)} entr(ies) in `unresolved_suggestions` name a "
+        f"suggestion no drink uses any more:\n  "
+        + "\n  ".join(repr(s) for s in stale)
+        + "\n\nThe work is done -- delete the line. This block records LIVE "
+          "problems, and a spent entry reads as outstanding while also "
+          "exempting the string for whoever writes it next."
     )
 
 
@@ -3457,28 +3514,48 @@ def test_suggestion_is_a_string_or_a_list_of_strings():
 # check would let the list rot into a record of things that used to be true --
 # the same both-ways contract `all_icons` and `heights_mm` already hold each
 # other to.
-KNOWN_PROSE_SUGGESTIONS = {
-    ("apple-cart", "Avallen -- a round, fresh taste if you need to sub"),
-    # Daisy de Santiago's "Havana 3 year old and Clément Agricole Blanc" came
-    # off on 2026-08-31, retired the way this contract intends: the drink was
-    # rewritten, not the string reworded. Helen: "let's chop down to just Havana
-    # 3, 2 oz." The suggestion that could not resolve went with the disjunction
-    # it was trying to cover.
-    # Milliners Punch's "the cheapest white rum to hand; sometimes JW Spicers"
-    # came off this set on 2026-08-27, retired the way this contract intends:
-    # the suggestion is GONE, not reworded. Helen, "never name Spicers -- if I
-    # have it skulking at the back of the nonsense shelf then I'll throw it in
-    # where I can." What is cheap and what needs using up are facts about the
-    # shelf on the day, and the generic already says what the drink requires.
-    ("sazerac", "or other Creole-style bitters"),
-    ("sazerac", "or other aromatic bitters"),
-    # The Swizzle's "Pusser's 151, or Planteray OFTD for a 138 Swizzle" came off
-    # on 2026-08-30, and retired the way this contract intends: the drink was
-    # rewritten rather than the string reworded. Helen: "Swizzle has got a bit
-    # confused. It should be Martinique Swizzle" -- so it is a 60 ml unaged
-    # agricole now, and neither Pusser's nor the OFTD is in it at all. The
-    # suggestion that could not resolve went with the rum it was suggesting.
-}
+# ---- WHAT HAS COME OFF THIS SET, AND WHY ----
+# EMPTY AS OF 2026-09-02, #585, and the key stays for the reason
+# methods.yml's `proposals` block does: this list will refill the next time
+# a prose suggestion is written, and the ratchet must still be armed for it.
+#
+# The last three came off together, each the way this contract intends:
+#
+#   apple-cart's "Avallen -- a round, fresh taste if you need to sub" is
+#   now `suggestion: "Avallen"` with the reason in a `note`, which is what
+#   #457 settled `note` is for.
+#
+#   sazerac's two bitters lines said only "or something else of the same
+#   kind" -- which the generic (`Creole bitters`, `aromatic bitters`) says
+#   better and already said. The bottles moved out of `item`, which #544 is
+#   retiring, into `suggestion` where they belong: Peychaud's and Angostura.
+#
+# Daisy de Santiago's "Havana 3 year old and Clément Agricole Blanc" came
+# off on 2026-08-31, retired the way this contract intends: the drink was
+# rewritten, not the string reworded. Helen: "let's chop down to just Havana
+# 3, 2 oz." The suggestion that could not resolve went with the disjunction
+# it was trying to cover.
+# Milliners Punch's "the cheapest white rum to hand; sometimes JW Spicers"
+# came off this set on 2026-08-27, retired the way this contract intends:
+# the suggestion is GONE, not reworded. Helen, "never name Spicers -- if I
+# have it skulking at the back of the nonsense shelf then I'll throw it in
+# where I can." What is cheap and what needs using up are facts about the
+# shelf on the day, and the generic already says what the drink requires.
+# The Swizzle's "Pusser's 151, or Planteray OFTD for a 138 Swizzle" came off
+# on 2026-08-30, and retired the way this contract intends: the drink was
+# rewritten rather than the string reworded. Helen: "Swizzle has got a bit
+# confused. It should be Martinique Swizzle" -- so it is a 60 ml unaged
+# agricole now, and neither Pusser's nor the OFTD is in it at all. The
+# suggestion that could not resolve went with the rum it was suggesting.
+#
+# `set()` AND NOT `{}`, WHICH IS THE WHOLE REASON THIS LINE IS SPELLED OUT.
+# Emptying a set literal turns it into a DICT, silently, and the two tests
+# below then fail with `TypeError: unsupported operand type(s) for -: 'dict'
+# and 'set'` rather than with anything about suggestions. It happened on the
+# commit that emptied it. A registry that changes TYPE when it empties is a
+# trap the other empty registries here do not have: garnish.yml's
+# `proposals: {}` really is a mapping, and methods.yml's really is too.
+KNOWN_PROSE_SUGGESTIONS = set()
 
 
 def _prose_suggestions():
