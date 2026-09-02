@@ -3698,10 +3698,12 @@ work and spends colour sparingly on top of it.
 > the drama comes from the page being the lighter thing. L\* 7.85 against 4.02,
 > with the border at 18.18 holding the card's shape however close the fills get.
 >
-> **THE DRINK PAGE IS NOT DONE.** `_sass/cocktails/_cocktail.scss` hand-sets
-> around a dozen sizes and several colours, so it inverted only where the shared
-> partials read the palette contract. Clicking a card currently leaves a black
-> index for a half-inverted page. Tracked, and it is the next piece of work.
+> **THE DRINK PAGE IS DONE, 2026-09-02.** It was rebuilt whole against Helen's
+> own written brief and the round-two mockup she approved from it
+> (`tmp/mock/drink_page.py`, gitignored scratch — read the commit that shipped
+> this paragraph if the file itself is gone by the time you read this). See
+> "The drink page — two states, one page" below for the anatomy and the colour
+> jobs that came out of that brief.
 >
 > **What the inversion cost, all measured — the workings are in the commit and
 > the reasoning beside each value in `_palette.scss`:**
@@ -4266,35 +4268,76 @@ way**, or it quietly starts describing a site that no longer exists.
 
 #### The drink page — two states, one page
 
-Editorial by default; a `make it` toggle strips to a bar-side spec — no tagline,
-class lines, characters or notes; bigger amounts and method; small glass. The
-same browsing-versus-cooking split food draws with its short-method toggle.
+**Rebuilt whole, 2026-09-02, against Helen's own written brief** (reproduced in
+the commit that shipped this rewrite) and the round-two mockup she approved
+from it. Read `_sass/cocktails/_cocktail.scss` end to end before touching this
+page again — its header carries the anatomy and the colour jobs in full, and
+this section is the shorter pointer to that, not a duplicate of it.
 
-**Nothing leaves the DOM.** One class, and the stylesheet hides what the state
-does not want, so the page prints whole and reads whole with the script blocked
-— **in the editorial state, deliberately the one carrying more.**
+**The anatomy.** The glass sits in the page's left margin above 1180px (large,
+top-aligned with the title) and tucks inline below that width, as it always
+has — only the WIDTH changed, to a clamp derived from the margin itself (see
+`$glass-col`). The name sits on the same Dymo tape a card's title does —
+`.drink-card-name` / `.drink-card-tape` / `.drink-card-tape-bg` /
+`.drink-card-tape-word`, reused exactly rather than redrawn, with a real `<h1>`
+nested inside the tape word at `display: contents` so the tape's own lettering
+treatment reaches it without a second emboss stacked on top. Meta is a `<dl>`
+of GLASS / GARNISH / SHIP IT?, the last of those reading `page.meta.ship`
+through `_includes/cocktails/ship.html` — the SAME include the index card now
+calls, factored out so a card and this page can never render one rung two
+different ways. Mood chips are the card's own `.drink-card-mood` spans (not
+its `<button>`s — this page has no filter list for a click to narrow).
+INGREDIENTS / METHOD / NOTES follow, each with its own two-bar heading mark
+(`@include heading-rule`, moved to `_sass/cocktails/_rule.scss` so the index's
+filter headings and this page's section headings share one mixin rather than
+two lookalikes).
 
-Three colours doing three levels so the hierarchy reads without reading a
-word: electric-absinthe under the title, cosmic-cosmopolitan under the section
-headings and on the method numerals, radiant-reposado on the note bar and its
-label. (The drink page took the 2026-08-29 palette by variable name — its three
-were menthe/violet/amber, which are now those three. It has NOT had a design
-pass under the new palette: the values are louder than the ones these choices
-were made against, so this page is the most likely place to find a colour that
-was right at the old saturation and is not at the new one.)
+**Nothing leaves the DOM.** One class (`is-making`), and the stylesheet hides
+what the state does not want, so the page prints whole and reads whole with
+the script blocked — **in the editorial state, deliberately the one carrying
+more.** `assets/js/cocktail-make.js` sets it now from a THREE-part toggle
+("read it" / a track with a knob / "make it") rather than a single button —
+Helen's brief asked for "a binary slider/toggle... with 'read it' or 'make it'
+active", and both labels are always on screen, so the #494 ambiguous-label
+problem the old button solved with a constant label cannot arise here in the
+first place: there is no single label whose meaning could be read two ways.
 
-**Section headings are 1.35rem and the size is load-bearing, not loud.**
-`$emboss-stroke` is 1.6% of font-size, so at the 0.76rem they nearly were, the
-punched effect resolves to about a fifth of a pixel. **The effect needs the size
-before it means anything** — worth knowing anywhere the punched treatment is
-applied to small type.
+**Four colours, four jobs — not the three this section used to describe.**
+Electric absinthe stays the page's home colour (the title's border, the
+toggle's ON state) and claims no section on its own. Ultra yvette marks
+INGREDIENTS and METHOD — Helen: yvette "shows what is in something", and a
+method step is a component of the drink as much as an ingredient is, so one
+colour marks both, under the section heading and under each ingredient's own
+name (`.cocktail-item-name`'s own double-rule underline, the same device at a
+smaller size). Cosmic cosmopolitan stays the bottle suggestion's colour (ASKED
+FOR) and is spent nowhere else on this page. Luminous lagoon is new to the
+page and marks NOTES — Helen's commentary is "a different kind of thing" from
+what is in the drink or how it is made, so a different colour marks it; lagoon
+already carries name-search on the index, which is the site's existing pattern
+of one colour, two jobs (absinthe is home and mood). **Radiant reposado came
+off notes entirely** — it is the verdict's colour (the ship mark) and a note
+card must not borrow it; section rules and note cards never use pink,
+curaçao, or (on notes specifically) yvette.
 
-**Known compromise, issue #485:** the glass heights in both states are
-hand-tuned numbers. What is wanted is the glass matching the text column beside
-it; the CSS-only version is circular (the row's height comes from its tallest
-item, the glass is one of those items, and a percentage height against an
-indefinite height falls back to auto) and the fix is to take the glass out of
-flow, as the cards already do.
+**Section headings are 1.35rem again, and the size is still load-bearing, not
+loud.** `$emboss-stroke` is 1.6% of font-size, so at the 0.76rem they opened
+at, the punched effect resolved to about a fifth of a pixel. **The effect needs
+the size before it means anything** — worth knowing anywhere the punched
+treatment is applied to small type. (This page's headings spent a round at
+1.8rem, matching food's `.recipe-section-heading`, for a different reason —
+keeping the h1/h2 ratio identical between the two sites. Helen's brief asked
+for 1.35rem directly, which is a return to the number the size-registration
+argument always named, not a regression from it.)
+
+**Issue #485 is CLOSED, not a known compromise** — checked against the tracker
+rather than assumed, since this section had gone on describing it as open well
+after the fix shipped. What #485 wanted was the glass matching the text
+column's height with no second number to keep in step by hand; the fix was to
+take the glass out of flow entirely (`_sass/cocktails/_cocktail.scss`'s own
+"THE GLASS IS AS TALL AS THE TITLE BLOCK" note), which had already happened
+before this rewrite. The margin-width clamp this rewrite added is a separate,
+later change — it makes the glass LARGER, per Helen's brief — and does not
+itself touch #485's height question, which needed no further touching.
 
 #### The six open questions, answered 2026-08-27
 

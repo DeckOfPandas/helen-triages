@@ -186,6 +186,7 @@ caller that genuinely wants the inverted read.
 | Failure/diagnostic name (`ol > li > strong:first-child`) | `food/_recipe-notes-body.scss:441` | 1.06rem | heading — boundary case |
 | `.recipe-group-heading` | `food/_recipe-notes-body.scss:558` | 1rem | heading — boundary case |
 | `.about-faq-item h3` (FAQ question) | `food/_about.scss:241` | 0.85rem | label |
+| `.cocktail-section-heading` (INGREDIENTS/METHOD/NOTES — the drink page) | `cocktails/_cocktail.scss:465` | 1.35rem | heading |
 
 ### 5.1 The four boundary cases
 
