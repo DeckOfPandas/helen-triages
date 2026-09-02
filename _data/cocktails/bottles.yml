@@ -539,11 +539,20 @@ unresolved_suggestions:
   # out of; only the shape changed. Seven of the twelve parts already resolved
   # through `bottles` or an alias, which is why only three land below.
   #
-  # THE ED3/PLANTERAY SPLIT IS THE ONE WORTH KNOWING ABOUT: those two are in
-  # DIFFERENT categories (El Dorado 3 is `lightly aged and filtered`, Planteray
-  # 3 Stars is `blended multi-region rum, clear`), and Royal Bermuda Yacht
-  # Club's generic is the disjunctive pair. So the list form says exactly the
-  # right thing where the comma said nothing. That entry had also been re-keyed
+  # THE ED3/PLANTERAY SPLIT IS THE ONE WORTH KNOWING ABOUT, and it is the only
+  # one that changed a RECIPE rather than a string. Those two bottles are in
+  # different categories -- El Dorado 3 is `lightly aged and filtered`,
+  # Planteray 3 Stars is `clear blended multi-region rum` -- so the moment the
+  # bottle stopped being unresolvable prose, #534's cross-category check fired
+  # on a drink that had looked fine for as long as nothing could read it. A
+  # DECLARED EXCEPTION SILENCES EVERY CHECK DOWNSTREAM OF IT, not only the one
+  # it was declared against.
+  #
+  # This comment claimed Royal Bermuda Yacht Club's generic "is the disjunctive
+  # pair" and it was a scalar. Helen made it true rather than the other way
+  # round, 2026-09-02: "the generic wants two categories. Both make excellent
+  # drinks, just quite different ones." So the list `generic` now says which
+  # two, and the suggestion crosses nothing. That entry had also been re-keyed
   # from "ED3, Plantation" on 2026-08-30 when #582 corrected the spelling --
   # this block names STRINGS AS WRITTEN, and test_every_suggested_bottle_resolves
   # caught that gap the moment the draft changed, which is the whole reason a
