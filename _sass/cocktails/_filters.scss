@@ -929,10 +929,24 @@
 // ultraviolet is the one accent whose fill is already dark enough that there
 // was nothing DARKER to make text from on paper, which is the same fact from
 // the other side.
+// THE SHORTHAND, AND THAT IS NOT A STYLE PREFERENCE. `.drink-name-hit` is a
+// `<mark>`, which arrives with a UA `background-color` of `Mark` -- a hard
+// yellow -- and a `color` of `MarkText`. The rule this replaced reset both with
+// `background: none`, and its own comment said why in as many words. Rewriting
+// it as `background-image` set the gradient and left the yellow underneath it
+// (Helen, 2026-09-02: "the yellow highlight behind the searched cocktail title
+// letters is too much"), which is the reset being lost while the warning about
+// needing it was being carried forward one line above.
+//
+// `background:` sets background-COLOR back to transparent as part of the
+// shorthand, so the gradient cannot sit on top of a UA fill again. Using the
+// longhand here is the mistake, not the shorthand.
+//
+// 0.3em, up from 0.22em -- Helen: "the purple underline for searched cocktail
+// titles should be thicker to make it stand out more."
 .drink-name-hit {
-  background-image: linear-gradient(to top,
-                    $color-ultra-yvette-deep 0.22em, transparent 0.22em);
-  background-repeat: no-repeat;
+  background: linear-gradient(to top,
+              $color-ultra-yvette-deep 0.3em, transparent 0.3em) no-repeat;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
   color: inherit;
