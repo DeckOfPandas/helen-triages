@@ -182,7 +182,10 @@
   font-family: $font-body;
   font-size: 0.86rem;
   font-weight: 350;
-  color: lighten($color-clear-text, 18%);
+  // 18% was #7E7D76, 3.88:1 on $color-bg -- fails the 4.5:1 body floor at
+  // this size. 12% is #6F6D68, 4.85:1: the lightest step that clears it
+  // with margin.
+  color: lighten($color-clear-text, 12%);
   line-height: 1.5;
   max-width: 100%;
   overflow: hidden;
@@ -262,8 +265,10 @@
   // line and recede, so the eye meets the distinctive ingredients first.
   // Declared BEFORE .ingredient-pill--matched: equal specificity, source order
   // wins, and a matched pantry staple should still light up.
+  // 22% was 3.37:1, failing. 14% is #74726D, 4.51:1: pantry staples still
+  // sit one step lighter than the line they are in but no longer fail.
   &.ingredient-pill--pantry {
-    color: lighten($color-clear-text, 22%);
+    color: lighten($color-clear-text, 14%);
   }
 
   // Was just a colour + weight bump ("just turning the text green" -- Helen,
