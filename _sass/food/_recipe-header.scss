@@ -180,6 +180,16 @@ article.recipe a:not(.badge) {
   position: relative;
 }
 
+// The back arrow (shared/_chrome.scss) is a 3rem glyph with its own 1rem
+// margin-bottom, rendered immediately before article.recipe. The arrow
+// already separates the title from the header, so the section gap above
+// stacked a second gap on top of it -- about 4rem of dead space below the
+// arrow's baseline for one job. Scoped to pages that actually render the
+// arrow; where there is none, .recipe-title above keeps its 3rem.
+.back-to-index + .recipe .recipe-title {
+  margin-top: $space-lg;
+}
+
 .recipe-main-title {
   @extend %heading-base;
   display: inline-block;
