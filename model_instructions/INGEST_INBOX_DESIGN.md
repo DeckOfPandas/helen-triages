@@ -269,14 +269,17 @@ close an issue by API, or touch `_food_recipes/` / `_cocktail_recipes/`.
   marker carries the version so this is loud, and the document's §0 and the
   script's `SUPPORTED_VERSIONS` are checked equal by a test.
 
-## 9. Decisions for Helen
+## 9. Decisions — RULED by Helen, 2026-09-02
 
-| ID | Question | Recommendation |
+| ID | Question | Ruling |
 |---|---|---|
-| D8 | With `item` being retired (#544, WS4), where does the SOURCE's wording for a pour go at ingest, given `generic` and `suggestion` are `QQ` by her standing rule? | Keep `item` as a **draft-only** transcription field: allowed in `_cocktail_drafts/`, forbidden in `_cocktail_recipes/` by the WS1 schema guard, deleted by Helen when she fills `generic`/`suggestion` on making the drink. The cocktail document keeps teaching it. Alternative: a `note: "source: Patron Reposado"` on the entry, which loses structure. |
-| D9 | Label name and title prefix | `ingest` and `ingest: <slug>`; both private repos get the label by hand once. |
-| D10 | Does the browser get its own issue-writing access (her GitHub connector or a token of her own), or does she paste the output into an issue herself? | Start with paste. It needs no new access and produces the identical envelope; add the connector later if pasting from a phone proves to be the step that does not happen. |
-| D11 | Should `garnish.yml` gain a `group:` per entry so the document's grouping is data, or may the script hold a small map? | Data file. A map in a script is the drift this design exists to remove. |
+| D8 | With `item` being retired (#544, WS4), where does the SOURCE's wording for a pour go at ingest, given `generic` and `suggestion` are `QQ` by her standing rule? | **`item` is a draft-only transcription field.** Allowed in `_cocktail_drafts/`, forbidden in `_cocktail_recipes/` by the WS1 schema guard, deleted by Helen when she fills `generic`/`suggestion` on making the drink. The cocktail document keeps teaching it, and says it is draft-only. |
+| D9 | Label name and title prefix | **`ingest` and `ingest: <slug>`.** Both private repos get the label by hand once. |
+| D10 | Does the browser get its own issue-writing access, or does Helen paste the output into an issue herself? | **Paste, for now.** Helen: "I am new to this and quite conservative." No new access, no connector. Revisit only if she asks. |
+| D11 | Should `garnish.yml` gain a `group:` per entry so the document's grouping is data? | **Yes.** Every declared garnish carries a `group:`, and a test says so. |
+
+None of these is open. Opus can start PR 1 immediately and PR 2 without
+waiting on anything but PR 1.
 
 ## 10. Implementation plan for Opus
 
@@ -297,7 +300,7 @@ Two PRs in this repo, plus small commits in the private repos.
 6. Acceptance: `pytest tests/test_standalone_docs.py` green; `--check` clean;
    the six missing garnishes and the eight no-accent words now print.
 
-**PR 2 — inbox (one to two days), after D8–D10.**
+**PR 2 — inbox (one to two days), after PR 1.**
 1. `scripts/ingest_inbox.py` per §7, with unit tests in `tests/` over fixture
    envelopes in `tests/fixtures/ingest_inbox/`: one valid food, one valid
    cocktail, and one each of: no marker, unknown site, unsupported version,

@@ -299,10 +299,14 @@ fallback for an entry with no `generic`, and zero such entries exist, so
 2. The remaining ~164 carry residue (brand, style, "cane" ×31 is #594).
    Produce one table to Helen per family, largest first, asking per line:
    move to `suggestion`, move to `note`, or delete. Do not guess.
-3. When the count reaches zero, remove `item` from `INGREDIENT_KEYS` in
-   WS1 so it cannot return, remove the fallback at `cocktail.html` L315,
-   and delete `item` from `INGEST_ONE_COCKTAIL.md` (WS5 regenerates this
-   anyway).
+3. **Revised by D8 (2026-09-02): `item` is NOT removed from the schema.**
+   It becomes a DRAFT-ONLY transcription field: allowed in
+   `_cocktail_drafts/`, forbidden in `_cocktail_recipes/` by the WS1 guard
+   (split `INGREDIENT_KEYS` into a drafts set and a recipes set). Steps 1
+   and 2 still apply to the current backlog of restating and residue
+   entries. The fallback at `cocktail.html` L315 can go once no promoted
+   drink can carry the key. `INGEST_ONE_COCKTAIL.md` keeps teaching `item`
+   and says it is draft-only.
 
 **Depends on.** WS1 for the key list. Does not block anything.
 
@@ -493,6 +497,7 @@ manual half says.
 | D5 | Drinks index cards show the gate flags locally, as food's cards do? | **Yes.** Same badges as food's cards, local build only (`show_drafts`), production never renders them. Reuse `_includes/recipe_badges.html` if it takes a drink's `meta` without a `site_key` branch; otherwise a cocktails include. |
 | D6 | Parameterise the filter panel | **No.** No more panels or indexes. 6d dropped. |
 | D7 | `tagline` backlog | Into the ingest hand-back list; a `"QQ"` tagline never publishes. |
+| D8–D11 | Ingest inbox questions (draft-only `item`, label name, paste versus connector, `group:` in `garnish.yml`) | **All ruled 2026-09-02**, recorded in `INGEST_INBOX_DESIGN.md` §9: draft-only `item`; `ingest` / `ingest: <slug>`; paste for now; yes to `group:`. |
 
 ## 9. Suggested order and PR shape
 
