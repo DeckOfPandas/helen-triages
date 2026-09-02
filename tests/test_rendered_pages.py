@@ -503,48 +503,54 @@ def test_every_text_input_on_the_index_has_state_behind_it(site):
 
 
 def test_the_awaiting_fix_gate_fires_in_the_production_build(prod_site):
-    """Flagged recipes are absent from the production build; unflagged are present.
+    """Held-back recipes are absent from the production build; cleared are present.
 
-    GitHub issue #331. tests/test_site_config.py checks the gate's PARTS exist
-    and tests/test_front_matter.py checks the DATA is well formed. This is the
-    only one that checks the gate actually does anything, against a real
-    production build -- the same place the swatch-page bug (#276) was invisible
-    until someone looked at the output rather than the source.
+    GitHub issues #331 and #667. tests/test_site_config.py checks the gate's
+    PARTS exist and tests/test_front_matter.py checks the DATA is well formed.
+    This is the only one that checks the gate actually does anything, against a
+    real production build -- the same place the swatch-page bug (#276) was
+    invisible until someone looked at the output rather than the source.
 
-    BOTH DIRECTIONS ON PURPOSE. The flagged half is the feature. The UNFLAGGED
+    TWO FLAGS SINCE 2026-09-02. A recipe publishes only on `awaiting_fix: false`
+    AND `proofread: true`. This test used to split the corpus on `awaiting_fix`
+    alone, which meant the five recipes that were live unproofread counted as
+    "clear" and the test asserted they were PRESENT -- i.e. it asserted the bug
+    #667 fixed. The split now asks the gate's own question.
+
+    BOTH DIRECTIONS ON PURPOSE. The held-back half is the feature. The CLEARED
     half is what stops the fix being "hide everything": a plugin that dropped
-    every document would satisfy the flagged assertion perfectly and take the
-    site down, and with no recipe currently flagged that would be the only
-    assertion running.
+    every document would satisfy the held-back assertion perfectly and take the
+    site down.
     """
     import yaml as _yaml
     import re as _re
 
-    flagged, clear = [], []
+    held, clear = [], []
     for path in sorted((ROOT / "_food_recipes").glob("*.md")):
         raw = path.read_text(encoding="utf-8")
         fm = _re.match(r"\A---\n(.*?)\n---", raw, _re.S)
         meta = (_yaml.safe_load(fm.group(1)) or {}).get("meta", {}) or {}
-        (flagged if meta.get("awaiting_fix") is True else clear).append(path.stem)
+        passes = meta.get("awaiting_fix") is False and meta.get("proofread") is True
+        (clear if passes else held).append(path.stem)
 
     assert clear, (
-        "No unflagged recipes at all -- this test would pass while checking "
+        "No publishable recipes at all -- this test would pass while checking "
         "nothing, which is what tests/test_suite_hygiene.py exists to prevent."
     )
 
-    published = [s for s in flagged if (prod_site / "food" / "recipes" / s / "index.html").exists()]
+    published = [s for s in held if (prod_site / "food" / "recipes" / s / "index.html").exists()]
     assert not published, (
-        "Recipe(s) flagged `meta.awaiting_fix: true` were PUBLISHED anyway:\n  "
+        "Recipe(s) the gate should hold back were PUBLISHED anyway:\n  "
         + "\n  ".join(published)
-        + "\n\nThe gate has failed open. Check _plugins/hide_awaiting_fix.rb "
-          "still reads `awaiting_fix`, that _config.yml sets "
+        + "\n\nThe gate has failed open. Check _plugins/publish_gate.rb "
+          "still reads `awaiting_fix` AND `proofread`, that _config.yml sets "
           "`show_awaiting_fix: false`, and that the build is not running in "
           "Jekyll's safe mode, which ignores _plugins/ without warning."
     )
 
     vanished = [s for s in clear if not (prod_site / "food" / "recipes" / s / "index.html").exists()]
     assert not vanished, (
-        "Unflagged recipe(s) missing from the production build:\n  "
+        "Cleared recipe(s) missing from the production build:\n  "
         + "\n  ".join(vanished)
         + "\n\nThe gate is over-firing, or something else is dropping documents."
     )
@@ -575,8 +581,15 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
             'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
             'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
             'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
-            '  proofread: false\n{flag}  cooked_before: false\n'
+            '  proofread: true\n{flag}  cooked_before: false\n'
             '  date_last_edited: "2026-08-18"\n---\n')
+    # `proofread: true` ON A FIXTURE, DELIBERATELY, and it is not a claim about
+    # anything Helen has read -- these two files exist for one build and are
+    # deleted in the `finally` below. Since #667 the gate has two legs, and a
+    # fixture that fails both proves nothing about either: `proofread: false`
+    # here would hold the page back on its own and the awaiting_fix assertion
+    # would pass whatever the plugin did with the key it is named for. The one
+    # leg under test is the only one allowed to fail.
     try:
         cases = {
             "zzz-gate-no-flag": "",                             # field absent entirely
@@ -597,7 +610,7 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
         published = [s for s in cases if (out / "food" / "recipes" / s / "index.html").exists()]
         assert not published, (
             "The gate FAILED OPEN for:\n  " + "\n  ".join(published)
-            + "\n\n_plugins/hide_awaiting_fix.rb must publish only on an "
+            + "\n\n_plugins/publish_gate.rb must publish only on an "
               "explicit `awaiting_fix: false`. A missing key and the old "
               "hyphenated key must both hold the page back."
         )
@@ -608,6 +621,179 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
     finally:
         for p in made:
             p.unlink(missing_ok=True)
+        shutil.rmtree(out, ignore_errors=True)
+
+
+# =============================================================================
+# THE SECOND LEG OF THE GATE — `proofread`, GitHub issue #667
+# =============================================================================
+# A page publishes only on `awaiting_fix: false` AND `proofread: true` since
+# 2026-09-02. The two tests below are the `proofread` half of what the two
+# above do for `awaiting_fix`, and they follow the same fixture discipline for
+# the same reason: BOTH STATES ARE WRITTEN INTO THE REAL COLLECTION for one
+# build and removed in a `finally`.
+#
+# That discipline is why `pytest` must never run twice at once on this
+# machine -- a concurrent session collects these `zzz-gate-` files as real
+# recipes and reports a screenful of bogus failures. It is also why the drink
+# fixture below removes `_cocktail_recipes/` itself when it created it: an
+# empty directory left behind changes what tests/test_cocktails.py's
+# `_load_published` does on the next run.
+
+FOOD_GATE_FIXTURE = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
+    'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: {proofread}\n  cooked_before: false\n'
+    '  date_last_edited: "2026-09-02"\n---\n'
+)
+
+# The smallest drink the #669 schema accepts: every key in REQUIRED_TOP_LEVEL,
+# one ingredient with a declared generic and an amount, a canonical glass, a
+# real mood, and a tagline that is not the "QQ" placeholder (a promoted drink
+# may not carry one). Nothing here is a judgement about a real drink -- both
+# files exist for one build and are then deleted.
+DRINK_GATE_FIXTURE = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'glass:\n  - "coupe"\ngarnish:\n  - "lime twist"\n'
+    'ingredients:\n  - amount: "50 ml"\n    generic: "London dry gin"\n'
+    '  - amount: "25 ml"\n    generic: "lime juice"\n'
+    'method:\n  - "Shake all ingredients with ice."\n'
+    'mood:\n  - "sharp"\nnotes: []\nsource: ""\nsource_url: ""\n'
+    'meta:\n  ship: "yes"\n  date_last_edited: "2026-09-02"\n'
+    '  rewritten: true\n  awaiting_fix: false\n  proofread: {proofread}\n---\n'
+)
+
+
+def test_an_unproofread_recipe_does_not_reach_the_production_build():
+    """`awaiting_fix: false, proofread: false` is held back; `proofread: true`
+    publishes. GitHub issue #667, Helen's ruling 2026-09-02: proofread "is the
+    very last touch that I, the human, make to the file".
+
+    THE PAIR IS THE TEST. A single held-back fixture is satisfied perfectly by
+    a plugin that drops every document, and the `awaiting_fix` leg above cannot
+    tell you anything about this one: both recipes here differ in exactly one
+    key, so the only thing that can explain one URL existing and the other not
+    is the flag under test.
+
+    It builds its own site rather than using `prod_site`, because the two
+    states must be manufactured -- the real collection cannot hold a recipe
+    whose only defect is being unproofread AND stay the corpus the rest of the
+    suite reasons about.
+    """
+    _require_bundler()
+    out = ROOT / "tmp" / "_test_site_proofread_gate"
+    made = []
+    try:
+        cases = {"zzz-gate-unproofread": "false", "zzz-gate-proofread": "true"}
+        for slug, value in cases.items():
+            p = ROOT / "_food_recipes" / f"{slug}.md"
+            p.write_text(FOOD_GATE_FIXTURE.format(t=slug, proofread=value),
+                         encoding="utf-8")
+            made.append(p)
+
+        result = subprocess.run(
+            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
+             "--destination", str(out)],
+            cwd=ROOT, capture_output=True, text=True, timeout=600,
+        )
+        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
+
+        assert not (out / "food" / "recipes" / "zzz-gate-unproofread" / "index.html").exists(), (
+            "A recipe with `meta.proofread: false` was PUBLISHED. The gate's "
+            "second leg has failed open -- _plugins/publish_gate.rb must "
+            "publish only when `awaiting_fix == false` AND `proofread == "
+            "true` (#667). Everything Helen has not read is now live."
+        )
+        assert (out / "food" / "recipes" / "zzz-gate-proofread" / "index.html").exists(), (
+            "The control recipe -- identical but for `meta.proofread: true` -- "
+            "is missing too, so this build proves nothing about the gate. It "
+            "is over-firing, or the build dropped everything."
+        )
+    finally:
+        for p in made:
+            p.unlink(missing_ok=True)
+        shutil.rmtree(out, ignore_errors=True)
+
+
+def test_the_gate_covers_a_promoted_drink():
+    """The cocktail collection is gated too, and this proves it on a bare CI
+    checkout. GitHub issues #667, #668 and #624.
+
+    #624 IS WHY THIS WRITES ITS OWN DRINKS. `_cocktail_drafts/` is a separate
+    private repo, absent in CI, and nothing coordinates a public merge with a
+    private one -- so a public test may never REQUIRE private drink data. Two
+    throwaway drinks written into `_cocktail_recipes/` need none of it: the
+    cocktail leg of the gate is exercised in exactly the checkout where the
+    real collection is empty.
+
+    `_cocktail_recipes/` does not exist on disk yet (nothing is promoted), so
+    this creates it and, if it did, removes it again. An empty directory left
+    behind is not harmless: tests/test_cocktails.py's `_load_published` reads
+    its presence.
+    """
+    _require_bundler()
+    out = ROOT / "tmp" / "_test_site_drink_gate"
+    recipes = ROOT / "_cocktail_recipes"
+    created_dir = not recipes.exists()
+    made = []
+    try:
+        recipes.mkdir(exist_ok=True)
+        cases = {"zzz-gate-drink-unproofread": "false",
+                 "zzz-gate-drink-proofread": "true"}
+        for slug, value in cases.items():
+            p = recipes / f"{slug}.md"
+            p.write_text(DRINK_GATE_FIXTURE.format(t=slug, proofread=value),
+                         encoding="utf-8")
+            made.append(p)
+
+        result = subprocess.run(
+            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
+             "--destination", str(out)],
+            cwd=ROOT, capture_output=True, text=True, timeout=600,
+        )
+        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
+
+        held = out / "cocktails" / "recipes" / "zzz-gate-drink-unproofread" / "index.html"
+        live = out / "cocktails" / "recipes" / "zzz-gate-drink-proofread" / "index.html"
+
+        assert not held.exists(), (
+            "A promoted drink with `meta.proofread: false` was PUBLISHED. "
+            "`cocktail_recipes` is in GATED_COLLECTIONS, so the gate is "
+            "failing open on the collection the whole of #668 exists to "
+            "protect."
+        )
+        assert live.exists(), (
+            "The control drink -- identical but for `meta.proofread: true` -- "
+            "is missing too, so this build proves nothing. Either the gate is "
+            "over-firing on drinks, or the cocktail collection is not being "
+            "written at all."
+        )
+
+        # AND THE INDEX AGREES WITH THE GATE. The drinks index reads
+        # `site.cocktail_recipes`, which the plugin has already emptied of the
+        # held-back drink at :post_read -- so the page cannot list it even by
+        # accident. This is the half issue #276 taught: a URL that exists and a
+        # listing that mentions it are two separate leaks.
+        index = (out / "cocktails" / "index.html").read_text(encoding="utf-8")
+        assert "zzz-gate-drink-unproofread" not in index, (
+            "The production drinks index names a drink the gate held back. "
+            "The listing and the URL are separate leaks (#276) and this is "
+            "the listing one."
+        )
+        assert "zzz-gate-drink-proofread" in index, (
+            "The production drinks index does not list a published drink. "
+            "cocktails/index.html must read `site.cocktail_recipes` in every "
+            "build and concatenate the drafts only under `site.show_drafts` "
+            "-- an index gated on `show_drafts` alone shows nothing the day a "
+            "drink is promoted."
+        )
+    finally:
+        for p in made:
+            p.unlink(missing_ok=True)
+        if created_dir and recipes.is_dir() and not any(recipes.iterdir()):
+            recipes.rmdir()
         shutil.rmtree(out, ignore_errors=True)
 
 

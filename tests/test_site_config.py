@@ -2149,12 +2149,15 @@ def test_no_decoration_slot_is_orphaned():
 
 
 # =============================================================================
-# THE awaiting_fix PUBLISH GATE — GitHub issue #331
+# THE PUBLICATION GATE — GitHub issues #331 and #667
 # =============================================================================
-# `meta.awaiting_fix: true` means a page has a known, open problem and must not
-# reach the live site, while everything else still ships. The mechanism is
-# _plugins/hide_awaiting_fix.rb, which removes the document at :post_read so it
-# gets no URL and no sitemap entry.
+# A page publishes only on `meta.awaiting_fix: false` AND `meta.proofread:
+# true`: no known open problem, and Helen has read what is now in the file.
+# Anything else is held back. The mechanism is _plugins/publish_gate.rb, which
+# removes the document at :post_read so it gets no URL and no sitemap entry.
+#
+# The file was `hide_awaiting_fix.rb` until 2026-09-02, when `proofread` became
+# the second leg (#667) and the name stopped describing the whole rule.
 #
 # EVERY FAILURE MODE OF THIS GATE FAILS OPEN. Delete the plugin, flip one config
 # key, or switch the workflow to a build that ignores plugins, and flagged pages
@@ -2162,22 +2165,32 @@ def test_no_decoration_slot_is_orphaned():
 # explicitly marked as wrong is the one that goes live. That asymmetry is why
 # these are asserted rather than trusted.
 
-PLUGIN = ROOT / "_plugins" / "hide_awaiting_fix.rb"
+PLUGIN = ROOT / "_plugins" / "publish_gate.rb"
 
 
 def test_awaiting_fix_plugin_exists_and_checks_the_flag():
-    """The gate's implementation is present and still reads the right key."""
+    """The gate's implementation is present and still reads both flags."""
     assert PLUGIN.is_file(), (
         f"{PLUGIN.relative_to(ROOT)} is missing. Without it every recipe "
-        f"flagged `meta.awaiting_fix: true` publishes normally -- silently, "
-        f"because nothing else in the build looks at that field."
+        f"flagged `meta.awaiting_fix: true`, and every unproofread one, "
+        f"publishes normally -- silently, because nothing else in the build "
+        f"looks at those fields."
     )
     src = PLUGIN.read_text(encoding="utf-8")
-    for needle in ("awaiting_fix", "show_awaiting_fix", "post_read"):
+    for needle in ("awaiting_fix", "proofread", "show_awaiting_fix", "post_read"):
         assert needle in src, (
             f"{PLUGIN.name} no longer mentions {needle!r}. The gate is either "
             f"reading a different field or hooking a different phase, and it "
             f"fails open either way."
+        )
+    # The two legs must both be COMPARED, not merely mentioned in a comment.
+    # A gate that reads `proofread` only in its header is the failure this file
+    # exists to make loud.
+    for needle in ('meta["awaiting_fix"] == false', 'meta["proofread"] == true'):
+        assert needle in src, (
+            f"{PLUGIN.name} no longer contains `{needle}`. The gate publishes "
+            f"only on an explicit pass on BOTH flags (#667); a missing leg "
+            f"fails open for every page that leg was holding back."
         )
 
 

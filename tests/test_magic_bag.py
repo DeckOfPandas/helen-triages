@@ -177,7 +177,7 @@ def test_meta_is_exactly_the_publish_gate(magic_bag):
 def test_awaiting_fix_is_a_real_boolean(magic_bag):
     """`awaiting_fix: "false"` is a string, and a string is not `false`.
 
-    _plugins/hide_awaiting_fix.rb publishes only on an explicit boolean `false`,
+    _plugins/publish_gate.rb publishes only on an explicit boolean `false`,
     so a quoted value holds the page back — which fails in the SAFE direction,
     but silently, and you would be left wondering where your dish went. The
     recipe side has the identical guard for the identical reason (#331).

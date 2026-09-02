@@ -1212,8 +1212,9 @@ def test_agent_edited_recipes_are_not_marked_proofread():
 # =============================================================================
 # THE PUBLISH GATE'S DATA SIDE — GitHub issue #331
 # =============================================================================
-# _plugins/hide_awaiting_fix.rb reads `meta.awaiting_fix` and drops the document
-# when it is exactly `true`. tests/test_site_config.py guards the MECHANISM
+# _plugins/publish_gate.rb reads `meta.awaiting_fix` and `meta.proofread` and
+# publishes only on `false` and `true` respectively -- it drops the document on
+# anything else. tests/test_site_config.py guards the MECHANISM
 # (plugin present, configs disagreeing correctly, workflow still plugin-capable).
 # These two guard the DATA the mechanism reads, and both failure modes are
 # silent: the page publishes, and nothing anywhere says why.
