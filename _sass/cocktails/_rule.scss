@@ -195,3 +195,24 @@ $emboss-cocktails-vars-emitted: false !default;
 // shared/base for the same-specificity win, is exactly the shape to bring
 // back -- see assets/css/cocktails.scss for the import order that makes it
 // win.
+
+// =============================================================================
+// @mixin heading-rule($colour) — THE TWO-BAR MARK, ONE PLACE FOR BOTH PAGES
+// =============================================================================
+// MOVED HERE FROM _sass/cocktails/_filters.scss, 2026-09-02. It drew the index's
+// five filter headings (chaos/mood/hassle/include/name) alone until the drink
+// page's own section headings (INGREDIENTS/METHOD/NOTES) needed the identical
+// mark -- the section's own colour hugging the letters, the shared electric
+// absinthe bar beneath it. Filters is imported after cocktails/cocktail (see
+// assets/css/cocktails.scss), so a mixin the drink page could reach had to live
+// somewhere both files import; this file already sits before both.
+//
+// A THIN WRAPPER OVER `overlapping-rule-double`, and staying one is the point.
+// That mixin is the shared geometry (shared/_rule.scss), so this file names only
+// what genuinely differs per call site: which colour sits on top of the shared
+// absinthe bar. Duplicating the geometry here a second time is the exact mistake
+// this mixin was extracted to stop repeating — see overlapping-rule-double's own
+// header for the four-round bug that cost.
+@mixin heading-rule($colour) {
+  @include overlapping-rule-double($colour, $color-heading-shared);
+}

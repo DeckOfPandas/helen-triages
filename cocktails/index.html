@@ -44,10 +44,10 @@ permalink: /cocktails/
 
   {% assign taxonomy   = site.data.cocktails.taxonomy %}
   {% assign glasses    = site.data.cocktails.glasses %}
-  {% comment %} The card's own name for a rung -- see ship_card_names' header in
-     taxonomy.yml. A rung with no entry keeps its own words; `QQ` and `who
-     knows` have neither an entry nor a rung and render no word at all. {% endcomment %}
-  {% assign ship_card_names = taxonomy.ship_card_names %}
+  {% comment %} `ship_card_names` used to be assigned here for the ship-word
+     lookup below. That lookup moved into _includes/cocktails/ship.html,
+     2026-09-02, and so did the assignment -- an unread variable is the
+     template equivalent of the dead selector it went with. {% endcomment %}
   {% assign card_names = site.data.cocktails.ingredients.card_names %}
   {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
   {% comment %} #580: things a card never mentions. Bare `water` and nothing
@@ -275,14 +275,11 @@ permalink: /cocktails/
       {% endfor %}
 
       {% assign ship = drink.meta.ship | default: "who knows" %}
-      {% comment %} A WORD ONLY IF THE RUNG IS ONE. ship_tints holds every value
-         a drink can carry INCLUDING `who knows` (and `QQ` falls through to it),
-         so it cannot be asked whether something is on the scale. ship_scale
-         can, and is the list that means exactly that. {% endcomment %}
-      {% assign ship_word = "" %}
-      {% if taxonomy.ship_scale contains ship %}
-        {% assign ship_word = ship_card_names[ship] | default: ship %}
-      {% endif %}
+      {% comment %} THE WORD ITSELF IS NOW DERIVED IN _includes/cocktails/ship.html,
+         shared with the drink page (2026-09-02) so the two can never disagree
+         about what a rung is called. `ship` stays assigned here regardless — it
+         also drives `data-ship` below, for filtering, which the include has no
+         reason to know about. {% endcomment %}
 
       {% comment %} `definitely good` is ship yes or oh gods yes; everything
          else is YOLO, duds included — remaking something you disliked IS a
@@ -471,17 +468,14 @@ permalink: /cocktails/
              one. `--ship-tint` is gone from here: it filled the old square, and
              a word is not a quantity.
 
-             THIS COMMENT USED TO SAY "the value stays in taxonomy.yml because
-             the drink PAGE still uses it", AND THAT WAS WRONG -- checked, not
-             assumed: _layouts/cocktail.html does not mention `ship` at all. So
-             nothing on the site reads `ship_tints` now, and the two lines that
-             looked it up here were assigning a value no template used. They are
-             gone; the data itself is a decision for Helen, raised separately.
-          {% endcomment %}
-          <span class="drink-card-ship">
-            <span class="drink-card-ship-icon">{% include icons/ship.svg %}</span>
-            <span class="drink-card-ship-word">{{ ship_word }}</span>
-          </span>
+             THIS COMMENT USED TO SAY "_layouts/cocktail.html does not mention
+             `ship` at all", AND THAT IS NOW FALSE ON PURPOSE: the drink page
+             gained its own SHIP IT? line, 2026-09-02, reading `page.meta.ship`
+             through the same _includes/cocktails/ship.html this card now calls,
+             so the two can never render a different word for the same rung.
+             `ship_tints` itself is still unread by anything -- that half of the
+             old comment stands. {% endcomment %}
+          <span class="drink-card-ship">{% include cocktails/ship.html ship=ship %}</span>
         </div>
       </li>
     {% endfor %}

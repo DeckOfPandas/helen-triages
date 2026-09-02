@@ -1,0 +1,29 @@
+{% comment %} THE SHIP AND ITS WORD, ONE PLACE — 2026-09-02. This used to be six
+   lines duplicated between cocktails/index.html (the card) and the drink page,
+   which is exactly the trap HANDOVER 12 names: markup shared, logic forked, and
+   the two silently disagree the first time one of them is edited and the other
+   is not. Both call sites now read this include instead.
+
+   Takes `ship`, the raw value of `drink.meta.ship` or `page.meta.ship` — never
+   assumed present, since a value the caller does not have is exactly what
+   `default: "who knows"` below exists for.
+
+   A WORD ONLY IF THE RUNG IS ON THE SCALE. `ship_card_names` maps every value a
+   drink can carry, INCLUDING "who knows" -- so it cannot be asked whether a
+   value is a real rung. `ship_scale` can, and is the list that means exactly
+   that. `QQ` and "who knows" both fall through to no word, which is the
+   template's honest way of saying there is no rating yet rather than inventing
+   a sixth term.
+
+   Emits the two inner spans ONLY, not the outer `.drink-card-ship` wrapper —
+   the card and the drink page lay them out differently (the card right-aligns
+   a fixed foot row; the page sits one inside a `<dd>`), so the wrapper is each
+   call site's own, and only the icon-plus-word pairing that must never drift is
+   shared. {% endcomment %}
+{% assign taxonomy = site.data.cocktails.taxonomy %}
+{% assign ship = include.ship | default: "who knows" %}
+{% assign ship_word = "" %}
+{% if taxonomy.ship_scale contains ship %}
+  {% assign ship_word = taxonomy.ship_card_names[ship] | default: ship %}
+{% endif %}
+<span class="drink-card-ship-icon">{% include icons/ship.svg %}</span><span class="drink-card-ship-word">{{ ship_word }}</span>
