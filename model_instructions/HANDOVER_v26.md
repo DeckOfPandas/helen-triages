@@ -2500,7 +2500,9 @@ the rum family — so of the collection's 91 distinct suggestions, **54 resolved
 nothing and no test minded**. Beefeater, Cointreau, Tanqueray, Luxardo, Suze,
 Punt e Mes: all invisible. Helen: *"are we now assuming every named bottle
 should be in it, and classified? That feels right to me."* On the day: 57
-resolve, 34 declared debt in `unresolved_suggestions`, none unchecked.
+resolve, 34 declared debt in `unresolved_suggestions`, none unchecked. **Those
+are the figures for 2026-08-30 and are kept as a snapshot rather than a
+count** — the debt block is a worklist and is 16 as of 2026-09-02; see §9.3.2.
 
 **The suggestion count moves with every ingest — 91 then, 103 on 2026-08-31 —
 so count them rather than quoting a figure from here.** What does not move is
@@ -2564,14 +2566,18 @@ draws: **the rule governs what is WRITTEN, the alias map governs what can be
 READ.** The drinks predate the rebrand, so a suggestion has to keep resolving
 whether or not its drink has been retyped.
 
-**`unresolved_suggestions` is the interesting block.** Eleven suggestion
-strings name no bottle — prose (#457 again, drifted back), or two bottles in
-one comma-joined string where a list is wanted. They are declared with reasons
-so `test_every_suggested_bottle_resolves` bites on the NEXT one rather than
-being switched off; deleting a line retires it. Two of them name bottles from
-two different categories inside one string, which is what a list `generic`
-exists to express and a comma cannot — and one, a bare `Planteray` on Long
-Island Iced Tea, is genuinely ambiguous rather than merely badly shaped.
+**`unresolved_suggestions` is the interesting block.** It holds every suggestion
+string that names no bottle — prose (#457 again, drifted back), or two bottles
+in one comma-joined string where a list is wanted. They are declared with
+reasons so `test_every_suggested_bottle_resolves` bites on the NEXT one rather
+than being switched off; deleting a line retires it.
+
+**COUNT IT, DO NOT QUOTE IT.** This paragraph said "eleven" from 2026-08-27
+until 2026-09-02, and the block has been 34, 30 and 16 since — it is a WORKLIST,
+so its number is a fact about the day it was written and moves every time Helen
+rules on a row. It has its own staleness guard now, added with #585's pass: a
+declared row whose string no longer appears in any drink is a row claiming debt
+that has been paid, and seven of them were exactly that.
 
 **Smith & Cross moved to `Jamaican, moderately aged`** from `Jamaican,
 overproof, unaged` (2026-08-27), which resolved the one bottle that had been
@@ -3454,13 +3460,18 @@ The founding census, 2026-08-26: **277 steps across 105 drinks, 144 distinct.**
 One instruction accounted for 43 uses written three ways; Stir the same for 17;
 Strain alone had eleven forms.
 
-**NOTHING IS APPLIED TO A DRINK, and that is Helen's explicit design.** "Prefer
-both, leaving my original too, then I delete whatever I don't want." So
-`proposals:` holds her exact existing string on the left and the suggested
-canonical form on the right. **Deleting a row is how a suggestion gets
-rejected**, and a later pass applies only what survives. Do not turn this into
-an enforcing test without asking; a check that failed on a non-canonical step
-would be enforcing a decision she has not made.
+**NOTHING WAS APPLIED TO A DRINK UNTIL HELEN HAD RULED, and that was her
+explicit design** — past tense since 2026-09-02, when the pass below finally
+ran. "Prefer both, leaving my original too, then I delete whatever I don't
+want." So `proposals:` held her exact existing string on the left and the
+suggested canonical form on the right, **deleting a row was how a suggestion got
+rejected**, and the pass applied only what survived.
+
+**The design still governs the NEXT census**, which is why it is written here
+rather than in a commit: propose, never apply; let her delete in either
+direction; apply what is left. And do not turn this into an enforcing test
+without asking — a check that failed on a non-canonical step would be enforcing
+a decision she has not made.
 
 > **THE PASS IS DONE — 2026-09-02, #630 closed.** This box said it had not
 > happened from 2026-08-26 until then, and called the file "the oldest unpruned
