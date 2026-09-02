@@ -15,7 +15,13 @@
 .method-full {
   padding-left: 0;
   list-style: none;
-  // font-family, font-weight, color inherited from article.recipe
+  // font-family, color inherited from article.recipe. font-weight is not:
+  // article.recipe sets 300 for the whole page, which is right for the
+  // tagline, notes and troubleshooting prose you read at a desk, and wrong
+  // for the two lists you read with your hands full at arm's length on an
+  // iPad. Selawik ships a real 400 face (shared/_fonts.scss), so this is a
+  // face change, not synthesis.
+  font-weight: 400;
 }
 
 // The violet asterisk bullets are gone, and nothing replaced them. Almost every
