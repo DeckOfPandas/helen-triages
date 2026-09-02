@@ -442,7 +442,7 @@ permalink: /cocktails/
 
                The chip's `is-match` class is painted from state in apply(), not
                toggled at click time -- clear-all reassigns the whole state
-               object without touching markup. {% endcomment %}{% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<button type="button" class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}">{{ m }}</button>{% endfor %}
+               object without touching markup. {% endcomment %}{% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<button type="button" class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}" aria-pressed="false">{{ m }}</button>{% endfor %}
           </span>
           {% comment %} THE SHIP IS ALWAYS DRAWN, the word only when there is
              one. `--ship-tint` is gone from here: it filled the old square, and

@@ -320,7 +320,14 @@
          it there. Both are cleared and re-applied on every pass rather than
          tracked, which is cheap at this size and cannot drift out of step. */
       d.moodEls.forEach(function (chip) {
-        chip.classList.toggle('is-match', state.moods.has(chip.dataset.mood));
+        var on = state.moods.has(chip.dataset.mood);
+        chip.classList.toggle('is-match', on);
+        /* These became real <button>s when they gained the power to filter, so
+           the state has to be announced as well as painted -- `is-match` is a
+           class and a screen reader cannot see it. Set here rather than at
+           click time for the same reason the class is: clear-all reassigns the
+           whole state object without touching any markup. */
+        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
 
       /* MATCHED AGAINST data-ing, NOT THE RENDERED TEXT — #501. A rum shows its

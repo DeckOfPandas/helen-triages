@@ -3964,7 +3964,55 @@ correct it is. Random rather than alphabetical because alphabetical buries
 everything after M and greets you with the same drink every time — the
 `taxonomy.yml` principle applied.
 
+#### The index's hover language — one colour, one meaning, 2026-09-02
+
+**Magenta means "this one", and it is the only thing hover ever changes.** A
+card title, a card's glass-column brackets, a filter tag, a pool chip's box and a
+mood chip's box all go magenta under the cursor; nothing else moves, and nothing
+resizes. It reads as one gesture because it is one colour making one claim — the
+same claim `is-match` makes in the settled tense.
+
+**Four hover states were no-ops before this, all in the same way.** Filter tags
+rested at white and hovered to a dimmer white; the card title rested at `#ECE9EA`
+and hovered to `#ffffff`, four values away. §12's rule is the diagnosis: **at
+these sizes the eye reads hue, not lightness**, so a lightness-only hover is a
+state that never arrives. The `clear` buttons are the one deliberate exception —
+grey to full ink is a lightness step, and it works only because the gap is
+6.50:1 to 15.47:1, which is most of the available range rather than a nudge.
+
+**`:hover` AND `.is-on` ARE THE SAME SPECIFICITY, so the later block wins
+outright.** A chosen tag turned magenta under the cursor until `:not(.is-on)`
+was added. They are saying different things and only one can be true at a time:
+hover means *you could pick this*, which a picked one is past — so hover stops
+applying rather than being out-specified.
+
+**A CHIP HAS A BOX AND A FILTER WORD DOES NOT**, which decides what each moves.
+HAS TO HAVE's chips changed their TEXT colour on hover on top of their border,
+so a chip whose words already carried magenta word-match underlines went almost
+entirely magenta — three uses of one colour on one small object. LEAVE OUT had
+it right by accident of being colourless. Chips move their box; bare words move
+their text.
+
 #### The card — `_cards.scss`
+
+**THE MOOD CHIPS FILTER THE INDEX — Helen's ask, 2026-09-02.** Clicking one adds
+or removes that mood exactly as its filter button does.
+
+- **They are real `<button>`s**, not spans with a handler. That is what earns
+  keyboard focus, Enter and Space, and a role — none of which a span gets for
+  free — and it is why `_cards.scss` has to undo the UA's own button styling.
+- **One DELEGATED listener on the list**, calling the mood buttons' own toggle,
+  sync and re-render. Two reasons, and the second is the load-bearing one:
+  a chip and its filter button must not be two implementations that agree today;
+  and `apply()` re-orders nodes to rank them, so a per-chip listener would need
+  rebinding on every pass — the class of bug §12 records for `tagShapes()`.
+- **`is-match` and `aria-pressed` are painted FROM STATE in `apply()`**, never
+  toggled at click time, because clear-all reassigns the whole state object
+  without touching any markup.
+- **The handler calls `preventDefault`**, because the chip sits inside a card
+  whose title is a link.
+
+
 
 Horizontal: the glass drawn large down a fixed left column, words beside it.
 Chosen over a vertical card and over a typographic tile because it is the only
@@ -5352,6 +5400,43 @@ registers, both deliberate:
 **You will flag `QQ` as an error.** It's Helen's deliberate placeholder.
 Never flag it, never fix it, never convert it.
 
+> ### FOUR THINGS THE BROWSER DOES THAT NO TEST HERE CAN SEE, 2026-09-02
+>
+> All four shipped green, all four were found by Helen looking, and all four are
+> facts about CSS or the UA rather than about this repo.
+>
+> **1. AN `<input>` DOES NOT INHERIT `color`.** It takes the UA stylesheet's
+> `fieldtext`, which is near-black whatever its ancestors say. So when the
+> cocktails palette inverted, every element on the page took the new colours for
+> free through inheritance and the search inputs silently did not — typing
+> produced **black text on a black ground**, invisible rather than absent.
+> Nothing could see it: the class has a rule, and the contrast guards do not read
+> form controls. **The same is true of `background`, `font-family` and
+> `font-size` on form controls.** Set them explicitly or they are not set.
+>
+> **2. `text-shadow` PAINTS UNDER TEXT DECORATIONS, NOT JUST GLYPHS.** The card
+> title's punched lettering casts a near-white copy up-and-left, and that copy
+> landed on the search-hit UNDERLINE too — a purple line with a white line beside
+> it. The fix is not to remove the shadow (that would unpunch the matched letters
+> mid-title) but to stop the mark being a decoration: it is a `linear-gradient`
+> background now, which is §13.1's own device and is not painted by a shadow.
+>
+> **3. `<mark>` ARRIVES WITH A UA BACKGROUND AND COLOUR** — `Mark`, a hard
+> yellow, and `MarkText`. `background: none` resets it; `background-image:` does
+> **not**, because it only sets the image and leaves the colour underneath.
+> Swapping the shorthand for the longhand brought the yellow back an hour after
+> the rule's own comment warned about it. **Use the `background` shorthand for
+> anything that paints a `<mark>`** — it resets the colour as part of setting the
+> image, so the guard is in the syntax.
+>
+> **4. A PROPERTY DECLARED TWICE IN ONE BLOCK IS INVISIBLE TO
+> `test_no_selector_declares_the_same_property_twice`.** That guard compares
+> SEPARATE blocks, and it is genuinely good at that — it caught a second
+> `.btn-clear-filter { color: … }` within a minute. But `@include` a mixin and
+> then override one of its values, and both land in one block with the mixin's
+> sitting dead. That is why `index-section-label` takes `$size` and `$tracking`
+> now: **arguments rather than an override after the include.**
+>
 > ### FIVE TRAPS FROM ONE DESIGN SESSION, 2026-09-02, AND THEY SHARE A SHAPE
 >
 > The black-on-black work (#469) took nine rounds of Helen looking, and **five
