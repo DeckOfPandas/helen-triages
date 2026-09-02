@@ -313,6 +313,29 @@ bottles:
     # The curly apostrophe is a SECOND STRING for one bottle and invisible on
     # the page -- it made two entries out of one in every count until now.
     aliases: ["Woodford’s Reserve", "Woodfords Reserve"]
+  # JACK DANIELS IS A BOURBON HERE, Helen's ruling 2026-09-02, and it corrects
+  # something this file asserted for one commit. That entry said Jack Daniels
+  # "is Tennessee whiskey, which is a different legal category" and offered it
+  # as the proof that a bottle's category must never be derived from the
+  # generic beside it. THE EXAMPLE WAS WRONG. Tennessee whiskey meets the
+  # bourbon standard in full; the Lincoln County Process is an ADDITION on top
+  # of it, not an exemption from it. Helen: "It meets all the legal
+  # requirements for being called that, and their own decision to apply a
+  # further qualifier on top is... vain!"
+  #
+  # THE RULE IT WAS OFFERED AS EVIDENCE FOR STILL STANDS -- eleven bottles were
+  # handed back on 2026-08-30 for exactly that reason. It just needs a true
+  # example, and this was not one.
+  "Jack Daniels":
+    generic: "bourbon"
+    aliases: ["Jack Daniel's", "Jack Daniels No. 7"]
+  # `Bulleit` BARE NAMES A HOUSE, and Helen owns both its bourbon and its rye,
+  # so the drink names the product. Deliberately NO bare `Bulleit` alias: a
+  # future drink meaning the rye would resolve to the bourbon silently, which
+  # is the failure this whole file exists to stop.
+  "Bulleit Bourbon":
+    generic: "bourbon"
+    note: "Not being replaced when it runs out — Helen's call, 2026-09-02."
   "Ardbeg XO":
     generic: "single malt scotch whisky"
   # THE PRODUCT REALLY IS CALLED "SAZERAC", which is why it sat in
@@ -335,15 +358,36 @@ bottles:
     aliases: ["Del Maguey VIDA", "Del Maguey vida"]
   "Tapatio":
     generic: "blanco tequila"
+  # Both arrived from #585, where they had been living inside one comma-joined
+  # string ("Patron Silver, Rooster Bianco") on the Margarita. Splitting it is
+  # what exposed the two spelling questions -- the accent and the missing
+  # middle word -- neither of which was visible while they shared a field.
+  # Helen, 2026-09-02: "It's Patron with the diacritic, and Rooster Rojo
+  # Bianco."
+  "Patrón Silver":
+    generic: "blanco tequila"
+    aliases: ["Patron Silver"]
+  "Rooster Rojo Bianco":
+    generic: "blanco tequila"
+    aliases: ["Rooster Bianco"]
 
   # --- brandy ---------------------------------------------------------------
   "Pierre Ferrand Ambre":
     generic: "cognac"
     aliases: ["Pierre Ferrand ambre"]
+  "Avallen":
+    generic: "calvados"
 
   # --- aromatised wine. See #568, which proposes splitting these further -----
   "Carpano Antica Formula":
     generic: "sweet vermouth"
+  # From #585: The Ridgwell's suggestion was the question "Dolin Rouge?" where
+  # the bottle it actually pours belongs. Helen's answer put the curiosity in a
+  # `note` -- "Try Dolin Rouge" -- and left the field naming what goes in the
+  # glass today, which its `item` had said all along.
+  "Martini Rosso":
+    generic: "sweet vermouth"
+    aliases: ["Martini Rosso vermouth"]
   # A BRAND THAT IS ITS OWN GENERIC, the pattern #314 permits for three rums
   # because nothing generalises the bottle. The Ridgwell pours this AND a sweet
   # vermouth in the same drink, 12.5 ml of each, which is the proof that
@@ -387,6 +431,13 @@ bottles:
   "Angostura":
     generic: "aromatic bitters"
     aliases: ["Angostura bitters"]
+  # The exact twin of the entry above, and it arrived the same way: the
+  # Sazerac's `suggestion` said "or other Creole-style bitters", which its
+  # generic already said better, while the bottle sat in `item` -- the field
+  # #544 is retiring. #585 moved it here.
+  "Peychaud's":
+    generic: "Creole bitters"
+    aliases: ["Peychauds", "Peychaud's bitters", "Peychaud’s"]
   "Bittermens Xocolatl Mole":
     generic: "chocolate bitters"
 
@@ -509,18 +560,6 @@ unresolved_suggestions:
   # categories. "Keep only what the collection already spells out; hand me back
   # the rest." The reasons below record what this file already believes about
   # each, so declaring them is one question rather than three.
-  "Planteray": >-
-    Planteray 3 Stars, per the entry this came out of, is `blended
-    multi-region rum, clear` -- which is NOT Royal Bermuda Yacht Club's other
-    option, and is the whole reason that string needed splitting. Needs Helen
-    to confirm the category before it is declared.
-  "Patrón Silver": >-
-    Spelling settled by Helen 2026-09-02: "It's Patron with the diacritic."
-    This file's prose already recorded it as a blanco tequila, matching
-    Margarita's generic. Needs Helen only for the category now.
-  "Rooster Rojo Bianco": >-
-    Name completed from the drink's `Rooster Bianco` by Helen, 2026-09-02.
-    Recorded here as a blanco. Needs Helen only for the category now.
 
   # --- FIVE MORE ARRIVED WITH #585's RULINGS, 2026-09-02, and every one is a
   # REAL BOTTLE NAME rather than the prose it came out of. That is the whole
@@ -535,28 +574,6 @@ unresolved_suggestions:
   # IS NOT A BOURBON: it is Tennessee whiskey, which is a different legal
   # category. A derived declaration would have written a false fact into the
   # file that #534's cross-category check reads.
-  "Jack Daniels": >-
-    Banana Boulevardier's generic is `bourbon` and Jack Daniels is Tennessee
-    whiskey, so this is either a category that needs widening or a deliberate
-    cross-category suggestion that wants a note (#534). Helen ruled only on the
-    preference -- "Jack Daniels beats Bulleit" -- not on this.
-  "Bulleit": >-
-    A bourbon, and Banana Boulevardier's generic says `bourbon`, so this one is
-    straightforward. Held only because its twin above is not, and declaring one
-    of a pair invites the other to be derived from it.
-  "Peychaud's": >-
-    Sazerac's item said `Peychaud's bitters` and its generic says `Creole
-    bitters`. Angostura is already declared against `aromatic bitters`, so this
-    is that entry's exact twin and is likely a one-line declaration.
-  "Martini Rosso": >-
-    The Ridgwell's item said `Martini Rosso vermouth` and its generic says
-    `sweet vermouth`. Helen's note on that drink is "Try Dolin Rouge", so the
-    bottle poured today and the bottle she is curious about are different --
-    which is precisely why the suggestion names the first.
-  "Avallen": >-
-    Apple Cart's generic is `calvados` and the note now carries the reason it
-    was suggested. Whether Avallen is a calvados proper is Helen's to say, not
-    mine to infer from the ingredient beside it.
   # Carta Switchel's "Havana 7, Appleton 8" came off on 2026-08-31, the way this
   # block intends: the drink now writes the list, so each bottle names the option
   # it belongs to. Helen, asked with the pair in front of her: "thanks, yes
