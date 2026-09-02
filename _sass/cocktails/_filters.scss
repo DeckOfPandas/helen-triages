@@ -76,7 +76,20 @@
 // sites rather than as one site failing to match the other.
 .drink-field-label {
   display: block;
-  @include index-section-label;
+  // BIGGER AND MORE TRACKED THAN FOOD'S, and the divergence is deliberate.
+  // Helen, 2026-09-02: "I'm finding the headings a little hard to read as they
+  // are." The mixin's defaults were solved for dark type on light paper; a
+  // light glyph on a dark ground blooms into its surround, so the same type
+  // reads heavier and less crisp. The corrections are more SIZE and more
+  // TRACKING -- and, counter-intuitively, less weight, which is why 700 is left
+  // alone and passed through unchanged.
+  //
+  // This is the second place the two indexes part company on type, the card
+  // title being the first. Neither is drift: both are the ground being
+  // different, and #495's rule -- share the treatment, not the value -- is
+  // exactly what passing arguments to a shared mixin does.
+  @include index-section-label($size: 1.6rem, $tracking: 0.1em);
+
   color: $color-text;
   margin: 0;
 
@@ -269,7 +282,26 @@
   text-decoration: underline;
   transition: color 0.1s ease-in-out;
   white-space: nowrap;
+
+  // ONE COLOUR FOR EVERY CLEAR BUTTON, IN ONE PLACE -- Helen, 2026-09-02: "I
+  // think the clear buttons should all be the same colour, not sure which."
+  //
+  // GREY RATHER THAN THE HOME COLOUR, and the reason is what the headings did
+  // rather than anything about the clears. They are 1.6rem now and each sits on
+  // a green rule, so a green link beside a green rule joins the heading instead
+  // of standing apart from it. Grey also makes CLEAR one language: `clear all`
+  // at the top and foot of the page has always been neutral, and five coloured
+  // siblings made it look like a different control rather than the same one at
+  // another scale.
+  //
+  // Hover moves to full ink. That is a lightness step, which §12 warns is a
+  // no-op at small sizes -- it works here only because the gap is 6.50:1 to
+  // 15.47:1 against the ground, which is not a 12% nudge but most of the
+  // available range.
   color: $color-clear-text;
+
+  &:hover,
+  &:focus-visible { color: $color-text; }
 
   &[hidden] { display: none; }
 }
@@ -289,16 +321,12 @@
 // what it cost was five different greens and violets doing a job that is the
 // same job everywhere. LEAVE OUT keeps its own, below, because that section
 // deliberately spends no colour at all.
-.drink-filter--chaos   .btn-clear-filter,
-.drink-filter--mood    .btn-clear-filter,
-.drink-filter--hassle  .btn-clear-filter,
-.drink-search--include .btn-clear-filter,
-.drink-filter--name    .btn-clear-filter {
-  color: $color-electric-absinthe-deep;
-
-  &:hover,
-  &:focus-visible { color: $color-electric-absinthe; }
-}
+// THE COLOUR MOVED INTO `.btn-clear-filter` ITSELF, above, on 2026-09-02 --
+// there is exactly one block that says what colour a clear button is, and
+// `test_no_selector_declares_the_same_property_twice` is what insisted on that.
+// It caught a second `.btn-clear-filter { color: … }` here within a minute of
+// it being written, and its own message is the whole argument: "the later block
+// wins, so editing the earlier one does nothing."
 // A `.drink-filter--hassle .btn-mood` OVERRIDE STOOD HERE AND IS GONE, because
 // the thing it corrected for no longer exists. Hassle's buttons carry .btn-mood
 // (they share the class because they share the behaviour -- both write into the
@@ -316,10 +344,22 @@
 // dark -- a vivid blue-violet has no brighter version to be a fill from. If
 // ultraviolet is ever used as a fill again, it is the one that cannot take ink.
 
-.drink-filter--chaos   .btn-clear-filter { color: $color-radiant-reposado-deep;   &:hover { color: $color-radiant-reposado; } }
-.drink-search--include .btn-clear-filter { color: $color-cosmic-cosmopolitan-deep;     &:hover { color: $color-cosmic-cosmopolitan; } }
-.drink-filter--name    .btn-clear-filter { color: $color-luminous-lagoon-deep;        &:hover { color: $color-luminous-lagoon; } }
-.drink-search--exclude .btn-clear-filter { color: $color-text;        &:hover { color: $color-clear-text; } }
+// FOUR PER-SECTION OVERRIDES STOOD HERE AND ARE GONE, 2026-09-02. Helen: "I
+// think the clear buttons should all be the same colour, not sure which."
+//
+// THE FILE HAD ALREADY DECIDED THIS AND THE DECISION HAD BEEN UNDONE. The block
+// above consolidates all five to one colour and writes out why -- "what it cost
+// was five different greens and violets doing a job that is the same job
+// everywhere" -- and then these four lines overrode three of them straight back
+// to their section's hue plus a fourth for LEAVE OUT. So the comment described
+// a decision the code did not implement, which is the shape §11.2 keeps
+// recording. Deleting them is what makes the paragraph above true.
+//
+// LEAVE OUT LOSES ITS CARVE-OUT TOO. That block says the section "deliberately
+// spends no colour at all", which is right about its CHIPS and was over-applied
+// to its clear button: a clear is a utility, identical in every section, and
+// making one of five different says something about the section that its own
+// heading already says.
 
 // --- the buttons -------------------------------------------------------------
 // The mood buttons carry Helen's own words -- "no juicing", "I want to faff" --
@@ -430,6 +470,28 @@
 .btn-mood  { @extend %drink-btn-naked; }
 .btn-chaos { @extend %drink-btn-naked; }
 
+// BIGGER, WHITE, AND HOVERING TO MAGENTA — Helen's settings, 2026-09-02.
+//
+// THE REST STATE GOING TO WHITE IS WHAT FORCES THE HOVER TO CHANGE, and the two
+// arrived as separate asks an hour apart. %drink-btn-naked rested at
+// `lighten($color-text, 22%)` and hovered to `$color-text`, which on a light
+// ground is a step DARKER and reads as a state. Inverted, and with rest now at
+// pure white, that hover is a step dimmer -- and there is nothing brighter than
+// white to move to. §12's rule settles it: at these sizes the eye reads HUE, not
+// lightness, so a hover that only changes lightness is a no-op. It moves to the
+// hot magenta, which is the same answer she gave for the card titles.
+.btn-mood,
+.btn-chaos {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 0.3rem 0.75rem;
+  line-height: 1.2;
+
+  &:hover,
+  &:focus-visible { color: $color-cosmic-cosmopolitan; }
+}
+
 // --- the two ingredient fields -----------------------------------------------
 // NO RULE ABOVE IT -- #548 point 3. A full-width border sat here, separating
 // HASSLE from HAS TO HAVE for no reason the other four section boundaries
@@ -454,6 +516,19 @@
   width: 100%;
   padding: $space-xs 0.1rem;
   border: none;
+
+  // AN <input> DOES NOT INHERIT `color`, and that is why typing here produced
+  // BLACK TEXT ON A BLACK GROUND until 2026-09-02. Every other element on the
+  // page took the inverted palette for free through inheritance; a form control
+  // takes the UA stylesheet's `fieldtext` instead, which is near-black
+  // regardless of what its ancestors say. Nothing in the suite could see it --
+  // the class has a rule, the contrast guards do not read form controls, and
+  // the text is invisible rather than absent.
+  //
+  // `background` needs no such line: this rule already sets it transparent a
+  // few declarations down, and adding a second would trip
+  // test_no_selector_declares_the_same_property_twice.
+  color: $color-text;
   // NEUTRAL, NOT THE SECTION'S HUE -- Helen, 2026-08-30: "please update the
   // border colours of the has to have and I know what I want input fields to
   // the same neutral grey food's input fields use."
@@ -477,6 +552,21 @@
   // These had no placeholder rule at all, so the prompt sat at the browser's
   // own weight and colour beside food's lighter, quieter one.
   &::placeholder { @include index-search-placeholder; }
+
+  // IT GOES ON FOCUS, NOT ON THE FIRST KEYSTROKE — Helen, 2026-09-02: "the
+  // placeholder text 'ingredient name' doesn't disappear when I click in the
+  // input field."
+  //
+  // That is the browser default rather than a bug: a placeholder survives focus
+  // and clears when you type. It is the wrong default HERE because these
+  // prompts are set in the same face, case and tracking as the value they
+  // invite -- so at the moment of clicking there are two plausible readings of
+  // the same-looking text, and only one of them is yours. Clearing on focus
+  // means the field is empty exactly when you are about to fill it.
+  //
+  // `color: transparent` rather than `content: ""`, so the text is still there
+  // for a screen reader and the field does not change width.
+  &:focus::placeholder { color: transparent; }
 }
 
 // #588, and #548 point 6 is the same line. THREE inputs share this rule and the
@@ -540,16 +630,22 @@
   // to go almost to black before it clears 4.5, at which point it is not
   // magenta any more. With no fill the question does not arise; the text is ink
   // on paper at 16:1.
+  // ONE MAGENTA MARK, NOT TWO — Helen, 2026-09-02: "the has to have selected
+  // button should lose its pink underline when it gains its pink box."
+  //
+  // The underline was the whole signal while a chip was a bare word; then the
+  // border started moving too, and a chosen chip carried the same colour twice
+  // in two shapes. The border is the better of the two here because a chip HAS
+  // an outline where a filter word does not, so it is a change available to
+  // this control and not to that one -- and because the underline is the
+  // language the WORD-MATCH mark uses, which is a different fact about a chip
+  // and now has the shape to itself.
   &.is-on {
     background: none;
     border-color: $color-cosmic-cosmopolitan-deep;
     color: $color-text;
     font-weight: 600;
-    text-decoration: underline;
-    text-decoration-color: $color-cosmic-cosmopolitan;
-    text-decoration-thickness: 0.18em;
-    text-underline-offset: 0.16em;
-    text-decoration-skip-ink: none;
+    text-decoration: none;
   }
 }
 
@@ -738,8 +834,22 @@
 // candidates stay grey and the matched ones come up to ink. Borrowing magenta
 // for this pool would put the include section's colour on the exclude control,
 // which is the specific confusion the five accents exist to prevent.
+// THE WORD-MATCH MARK IS THE SAME IN BOTH PICKERS SINCE 2026-09-02. Helen: "the
+// chip underline rule should be the same between has to have and leave out,
+// namely that prefix matching of any word gets the pink whereas substring
+// matching does not."
+//
+// This rule used to cancel the underline here, so LEAVE OUT's pool showed no
+// word-match mark at all: the flag was computed, carried to the call site and
+// then styled away on one side. That is #390 exactly, one layer up -- "one code
+// path" guarantees the same ANSWER and guarantees nothing about what either
+// picker DOES with it -- and `test_both_ingredient_pickers_mark_their_word_matches`
+// is food's guard against the identical fault.
+//
+// The colour lift stays. This section rests at $color-clear-text so its
+// candidates read as the quieter pool, and a marked one still wants to be the
+// brighter of the two.
 .drink-search--exclude .btn-pool--word-match {
-  text-decoration: none;
   color: $color-text;
 }
 

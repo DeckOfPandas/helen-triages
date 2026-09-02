@@ -304,7 +304,18 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   a {
     color: inherit;
     text-decoration: none;
-    &:hover { color: #ffffff; }
+
+    // HOT MAGENTA ON HOVER — Helen, 2026-09-02. It was `#ffffff`, which is a
+    // LIGHTNESS-ONLY step from the tape lettering's own near-white #ECE9EA:
+    // about 3% of headroom, and §12's rule is that at these sizes the eye reads
+    // hue rather than lightness. A four-value brightening is a no-op dressed as
+    // a state, which is the exact fault recorded twice on 2026-08-16.
+    //
+    // Magenta also makes the page consistent about what the colour MEANS: it is
+    // already "this matched" on a chip and a band, and a title under the cursor
+    // is the same claim in the interactive tense.
+    &:hover,
+    &:focus-visible { color: $color-cosmic-cosmopolitan; }
   }
 }
 
