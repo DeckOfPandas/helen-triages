@@ -125,8 +125,8 @@ $head-pad-bottom: 1.4rem;
 // changes. Half-leading is exact arithmetic; the second term is the remaining
 // gap between the em box and the cap height, which depends on the font's own
 // metrics and is measured. Named separately so it is obvious which is which.
-$title-size:         2.2rem;
-$title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;  // 0.715rem
+$title-size:         3.2rem;   // the tape's font-size, `.cocktail-title-block .drink-card-name`
+$title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;
 $title-cap-inset:    0.14rem;   // em box top -> cap top, Courier Prime
 $glass-top:          $title-half-leading + $title-cap-inset;
 
@@ -242,8 +242,20 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // which is exactly what makes a long name truncate on this page the same way
 // it does on a card, one mechanism rather than two. The class survives so the
 // DOM keeps a real, styleable h1 rather than only a bare element with no hook.
+//
+// `font-size: 1em` IS THE FIX FOR #679 POINT 1, AND IT IS A BROWSER DEFAULT
+// BEING UNDONE, NOT A TASTE CALL. `display: contents` drops the h1's box and
+// nothing else: its inherited-into-text properties still apply, and the UA
+// stylesheet gives every h1 `font-size: 2em`. So the title rendered at TWICE
+// the tape's size -- 4.4rem when this file said 2.2rem -- and the tape's own
+// em-based padding, computed from the smaller number, came out at half the
+// proportion a card gets. Helen (2026-09-03): "the font is too big", and
+// "there isn't any space (spare tape) at all either side of the name" --
+// one cause, two symptoms. Measured off her screenshots rather than guessed:
+// 18 characters of Courier at 2.2rem should span 24.8rem and spanned ~46.
 .cocktail-title {
   display: contents;
+  font-size: 1em;
 }
 
 // THE TAPE, SCALED UP FOR THE PAGE. `.drink-card-name`, `.drink-card-tape` and
@@ -263,17 +275,28 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     // MATCHED TO FOOD'S `.recipe-title-text` — 2.2rem — HANDOVER §9.13 asked
     // for the two sites' recipe titles to agree, and this is the tape's own
     // font-size doing that job now instead of the old bare h1's.
-    font-size: 2.2rem;
+    //
+    // 3.2rem SINCE 2026-09-03, AND THAT IS THE SIZE HELEN CHOSE, NOT A
+    // DOUBLING OF IT. The number above never rendered: the h1 inside the tape
+    // was taking the UA's `font-size: 2em` on top of it (see `.cocktail-title`
+    // above), so "2.2rem" was 4.4rem on screen, and the candidate she picked
+    // as "1.6rem" from a page of three was 3.2rem on screen. That rendered
+    // size is what she looked at and said yes to, so it is the number written
+    // here now that the h1 inherits honestly. Food's title is 2.2rem; the two
+    // sites' titles no longer agree, and that is her call from looking at
+    // this page rather than a drift.
+    font-size: 3.2rem;
     margin: 0 0 $space-sm;
   }
 
-  .drink-card-tape {
-    // Helen's brief: "tape padding 0.5em 0.85em" — looser than the card's
-    // 0.75em/1.05em (_cards.scss's `$card-tape-pad-y`/`-x`), which were tuned
-    // for a 1rem card title and read as too generous once the em unit scales
-    // with 2.2rem type instead.
-    padding: 0.5em 0.85em;
-  }
+  // NO PADDING OVERRIDE ANY MORE. Helen's brief gave the page "tape padding
+  // 0.5em 0.85em", and on 2026-09-03 she withdrew it having seen the result:
+  // "Whatever I said in the brief, please try using the same amount of space
+  // (proportional) as the cards." The card's own `.drink-card-tape` rule
+  // (_cards.scss, $card-tape-pad-y / -x, both in em of the title) now applies
+  // here untouched, which is the proportion she asked for by construction.
+  // The brief's tighter numbers had been chosen against a title rendering at
+  // twice its stated size, so they were solving a problem that is gone.
 }
 
 // THE READ-IT / MAKE-IT TOGGLE — three elements, one group, replacing the old
@@ -378,7 +401,13 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // $spacing-section-gap, unchanged from the old rule's own finding: GLASS,
   // GARNISH and SHIP IT? are three independent facts, not a list, and reads
   // cramped at anything smaller once the labels are this size.
-  gap: $spacing-section-gap;
+  //
+  // 5rem SINCE 2026-09-03 -- #679 point 3, Helen: "glass, garnish and ship
+  // are far too close together, because they're hard to read." Chosen from
+  // the built 3rem, 5rem, three equal columns and spread-to-the-right-edge
+  // on the real page; the wider gap keeps the three reading as a row from the
+  // left, which the two full-width options lost.
+  gap: 5rem;
 
   > div {
     display: flex;
@@ -635,8 +664,15 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // only place a colour is written down (three-layer rule). The exported SVGs had
 // #4c4c4e baked into all 104 paths; that is stripped at normalisation, and an
 // inline fill would beat this rule anyway and make the palette look broken.
+//
+// ABSINTHE, NOT GREY, SINCE 2026-09-03 -- Helen: "I think our glass styling
+// has fallen off. Can the glass be bigger, bolder and absinthe?" It was
+// $color-clear-text, a de-emphasised grey, on a page whose hero it is; the
+// card draws its glass in the home colour (_cards.scss, "there is no panel
+// behind the glass") and §9.13's premise is that the drawings carry the
+// personality food gets from colour. Grey was the drawing carrying none.
 .cocktail-glass-icon {
-  color: $color-clear-text;
+  color: $color-electric-absinthe;
 }
 
 // =============================================================================
