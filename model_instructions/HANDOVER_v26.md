@@ -4534,10 +4534,14 @@ its `<button>`s — this page has no filter list for a click to narrow).
 INGREDIENTS / METHOD / NOTES follow, each with its own heading mark
 (`@include heading-rule`, moved to `_sass/cocktails/_rule.scss` so the index's
 filter headings and this page's section headings share one mixin rather than
-two lookalikes — **single-bar since 2026-09-03**, see the box under "The five
-accents" above; the ingredient NAME's own underline still calls
-`overlapping-rule-double` directly and is still yvette over absinthe, per
-Helen's written brief, pending her look).
+two lookalikes — **and parted from it on 2026-09-03**: the index's mixin went
+single-bar for its ramp, while these three call `overlapping-rule-double`
+directly with ABSINTHE as the upper bar and yvette, yvette, lagoon in front
+beneath, which is food's construction in this site's colours. Helen: the
+brief's "yvette over absinthe" double rule had been aimed at these headings,
+"not ingredients, my apologies". Each ingredient NAME now carries one
+yvette-deep `text-decoration` band instead, 0.2em below the baseline — the
+heading geometry had put the double rule through the lowercase letters).
 
 **Nothing leaves the DOM.** One class (`is-making`), and the stylesheet hides
 what the state does not want, so the page prints whole and reads whole with

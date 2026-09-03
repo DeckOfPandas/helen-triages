@@ -497,13 +497,27 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // suggestion's colour (ASKED FOR, on the ingredient line below) and curaçao is
 // the verdict's (the ship mark); a section rule wearing either would make a
 // promise the section itself is not the answer to.
+//
+// ABSINTHE OVER YVETTE, A DOUBLE RULE, SINCE 2026-09-03 -- and this is the
+// brief's own sentence landing where it was aimed. Helen: "In my brief I had
+// intended to say can we do absinthe over yvette as a double underline for
+// the section headings, not ingredients, my apologies. This would be a nice
+// echo back to the food site too." It is: food's section mark is the section
+// colour as the upper bar with violet in front beneath it, and this is the
+// same construction in this site's two colours -- the home green above, the
+// "what is in it" violet below. `overlapping-rule-double` directly, because
+// `heading-rule` (cocktails/_rule.scss) went single-bar the same day for the
+// INDEX, where a ramp anchors itself; here the two colours ARE the mark.
+//
+// NOTES KEEPS ITS OWN LOWER COLOUR, lagoon, under the same absinthe -- the
+// note cards' bars and labels are lagoon, and the heading is what ties them.
 .cocktail-section-heading--ingredients span,
 .cocktail-section-heading--method span {
-  @include heading-rule($color-ultra-yvette);
+  @include overlapping-rule-double($color-electric-absinthe, $color-ultra-yvette);
 }
 
 .cocktail-section-heading--notes span {
-  @include heading-rule($color-luminous-lagoon);
+  @include overlapping-rule-double($color-electric-absinthe, $color-luminous-lagoon);
 }
 
 // SIZED BY HEIGHT, NEVER WIDTH, and this is the whole reason the icons keep
@@ -711,23 +725,37 @@ $amount-indent: $amount-col + $amount-gap;
   font-size: 1rem;
 }
 
-// THE NAME'S OWN DOUBLE-RULE UNDERLINE — Helen's brief: "Double rule underline
-// under ingredients, under the word only, yvette over absinthe -- yvette
-// showing what is in something." `overlapping-rule-double` directly, not the
-// `heading-rule` wrapper (_sass/cocktails/_rule.scss) that draws the section
-// heading's own version of this mark: the wrapper's name says HEADING and this
-// is an ingredient name, so calling the wrapper here would be borrowing a name
-// that no longer describes what it is doing even though the underlying device
-// is identical. Every dial is EM, so the mark scales correctly at this
-// element's 1rem exactly as it does at the section heading's 1.35rem — one
-// geometry, read against whatever font-size sits on it.
+// THE NAME'S OWN UNDERLINE: ONE YVETTE BAND, UNDER THE WORD. The brief's
+// "double rule underline under ingredients... yvette over absinthe" was
+// meant for the section headings (Helen, 2026-09-03: "not ingredients, my
+// apologies"), and with the headings carrying it "the yvette under the
+// ingredients list items is its own highlight again" -- one colour, saying
+// what is in the drink, under each thing that is.
+//
+// `text-decoration`, NOT THE HEADING GEOMETRY. The double mixin positions
+// its bars from the top of the box, solved for uppercase Courier at heading
+// size; on a lowercase sans name at 1rem they landed through the letters
+// rather than under them ("those ingredient list underlines are too high").
+// A decoration hangs off the baseline, which is the fact a lowercase word
+// actually has -- and it wraps, which a name with a long bottle list beside
+// it needs. Same device and near the same numbers as `.drink-card-hit`, the
+// matched ingredient on a card (_cards.scss): this is the same claim about
+// the same kind of thing, made on the page instead of the card.
+//
+// -deep, as the title hit is, because bare yvette is the one accent too dark
+// to read as a mark on this ground (3.52:1; _palette.scss). The heading bar
+// above stays bare because it is wide enough to carry the darker value.
 //
 // SCOPED TO THE NAME ONLY, never the bottle suggestion that can follow it in
 // brackets — Helen's brief again: the suggestion is a different colour making a
 // different claim, and the template gives it its own span for exactly this
 // reason (see _layouts/cocktail.html).
 .cocktail-item-name {
-  @include overlapping-rule-double($color-ultra-yvette, $color-electric-absinthe);
+  text-decoration: underline;
+  text-decoration-color: $color-ultra-yvette-deep;
+  text-decoration-thickness: 0.16em;
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: none;
 }
 
 // The bottle, in brackets after the class — #544, Helen 2026-08-29: "London dry
