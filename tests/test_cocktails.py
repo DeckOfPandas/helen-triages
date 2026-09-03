@@ -38,6 +38,18 @@ from pathlib import Path
 import pytest
 import yaml
 
+# THE HOUSE-STYLE RULES ARE SHARED WITH THE FOOD SITE, NOT RE-TYPED HERE --
+# issue #670. An en dash, an accent, a quoted scalar and a degree sign are
+# properties of Helen's writing rather than of a recipe, and
+# `model_instructions/INGEST_ONE_COCKTAIL.md` §7 demands every one of them of a
+# drink. conftest.py holds the corpus-agnostic predicates and nothing else; the
+# asserts, the messages and the field lists below are this collection's own.
+from conftest import (
+    SHARED_TYPOGRAPHY, accent_problems, accented_words, checkable_text,
+    degreeless_temperatures, is_qq, number_range_hits, spelling_problems,
+    unquoted_scalars,
+)
+
 # Suite marker, so `pytest -m cocktails` can run this half alone.
 # tests/test_suite_hygiene.py asserts every module declares one --
 # an unmarked file is silently missed by every filtered run.
@@ -192,7 +204,30 @@ NO_DRINKS_REASON = (
 )
 
 
-def _read(root):
+class DrinkFile:
+    """One drink file: its slug, its path, its raw text and its front matter.
+
+    ADDED 2026-09-03 FOR THE HOUSE-STYLE RULES (#670), which need two things
+    `(slug, fm)` cannot give them: the RAW TEXT, because quoting and a `QQ` line
+    are properties of how the file is written rather than of what it parses to,
+    and the PATH, because a failure message that cannot be opened is worth
+    little. Everything else in this module still reads the pair, which is why
+    `_read` below is now a projection of this rather than a second scan.
+    """
+
+    __slots__ = ("path", "slug", "raw", "fm")
+
+    def __init__(self, path, raw, fm):
+        self.path = path
+        self.slug = path.stem
+        self.raw = raw
+        self.fm = fm
+
+    def __repr__(self):                 # what pytest prints in the test id
+        return self.slug
+
+
+def _scan(root):
     """Every parseable drink under one collection root. Absent root -> nothing.
 
     `rglob`, not `glob`. The drafts folder is flat today, but food's loader used
@@ -204,14 +239,20 @@ def _read(root):
     if not root.is_dir():
         return out
     for path in sorted(root.rglob("*.md")):
-        match = FRONT_MATTER.match(path.read_text(encoding="utf-8"))
+        raw = path.read_text(encoding="utf-8")
+        match = FRONT_MATTER.match(raw)
         if match:
-            out.append((path.stem, yaml.safe_load(match.group(1)) or {}))
+            out.append(DrinkFile(path, raw, yaml.safe_load(match.group(1)) or {}))
     return out
 
 
-def _load():
-    """Published drinks plus draft drinks, from whichever roots are present.
+def _read(root):
+    """`_scan`, as the `(slug, front matter)` pairs every other test reads."""
+    return [(drink.slug, drink.fm) for drink in _scan(root)]
+
+
+def _load_files():
+    """Published drinks plus draft drinks, whole, from whichever roots are here.
 
     Skips ONLY when neither collection is on disk. A root that IS here and
     yields nothing is the loader-has-gone-stale case and must never be quiet:
@@ -219,7 +260,7 @@ def _load():
     answers, and the whole of tests/test_suite_hygiene.py exists because they
     are easy to conflate into the same green.
     """
-    out = _read(RECIPES) + _read(DRAFTS)
+    out = _scan(RECIPES) + _scan(DRAFTS)
     if out:
         return out
 
@@ -232,6 +273,17 @@ def _load():
         f"either every file lost its front matter, or this loader has gone "
         f"stale. Do not let it report green."
     )
+
+
+def _load():
+    """The same corpus as `_load_files`, as `(slug, front matter)` pairs.
+
+    STILL THE ONE DOOR -- see test_every_drink_reading_test_goes_through_the_
+    loader. `_load_files` is the same door with the raw text left on, not a
+    second one: both go through `_scan`, both skip and fail in the same places,
+    and this is a projection of that rather than its own glob.
+    """
+    return [(drink.slug, drink.fm) for drink in _load_files()]
 
 
 def _load_published():
@@ -259,6 +311,50 @@ def _load_published():
             "the day the first drink is promoted."
         )
     return out
+
+
+# =============================================================================
+# PER-DRINK PARAMETRISATION, added 2026-09-03 with the house-style rules (#670)
+# =============================================================================
+# Every other test in this module scans the whole corpus and reports one list of
+# offenders, which is right for a claim about the collection ("no two generics
+# differ only by case"). A house-style rule is a claim about a FILE, and food
+# has always parametrised those per recipe so that the failure names the file
+# you have to open -- conftest.pytest_generate_tests, and the module docstring
+# there says why. A drink gets the same.
+#
+# THE EMPTY CASE ROUTES BACK THROUGH `_load_files`, deliberately. Parametrising
+# over nothing makes pytest report a bare "skipped", which says neither that the
+# collections are absent nor that a loader has gone stale -- and those are
+# opposite answers (see `_load_files`). So an empty corpus yields ONE parameter,
+# `None`, and `_require_drink` hands it straight back to the loader for the
+# right skip or the right loud failure.
+
+def pytest_generate_tests(metafunc):
+    if "drink_file" not in metafunc.fixturenames:
+        return
+    drinks = _scan(RECIPES) + _scan(DRAFTS)
+    if drinks:
+        metafunc.parametrize("drink_file", drinks, ids=[d.slug for d in drinks])
+    else:
+        metafunc.parametrize("drink_file", [None], ids=["no-drinks"])
+
+
+def _require_drink(drink_file):
+    """Never returns for a placeholder: it skips, or it fails loudly."""
+    if drink_file is None:
+        _load_files()
+        raise AssertionError(
+            "The drink corpus is empty but `_load_files()` neither skipped nor "
+            "failed. That is the one outcome it must never have -- see its "
+            "docstring and issue #540."
+        )
+
+
+def _drink_where(drink, detail=""):
+    """The file's real path from the repo root, as food's `where()` gives."""
+    path = drink.path.resolve().relative_to(ROOT).as_posix()
+    return path + (f" -- {detail}" if detail else "")
 
 
 # =============================================================================
@@ -4573,3 +4669,280 @@ def test_every_suppressed_word_is_a_declared_generic():
             f"like it is doing something and is not -- and the day the generic "
             f"is spelled differently, nothing says so."
         )
+
+
+# =============================================================================
+# HOUSE STYLE -- issue #670. What §7 has always demanded and nothing checked.
+# =============================================================================
+# `model_instructions/INGEST_ONE_COCKTAIL.md` §7 asks a drink for the same
+# typography and spelling the food formatter enforces on a recipe: an en dash in
+# a number range, a quoted string value, British spellings, an em dash for `--`,
+# `°C` with the degree sign, and the accents `_data/accented_words.yml` declares
+# -- a file whose own header says it lives in `_data/` rather than `_data/food/`
+# because "`crème de cassis` will want the same treatment `crème fraîche` gets".
+#
+# NOTHING CHECKED ANY OF IT. tests/test_style.py's ~40 rules are parametrised
+# over the food `recipe` fixture and tests/conftest.py says outright that it is
+# the food suite. So the ingest document demanded a house style that no test
+# could see, and the drinks drifted: measured across the 124 drinks on
+# 2026-09-03, seven hyphenated number ranges, six `--`, one `Demarara`.
+#
+# THE PREDICATES ARE conftest's, THE FIELD LISTS ARE OURS. That split is the
+# whole design. A missing accent is the same fault in either collection; WHERE
+# to look for one is not, and the two exclusions below are drink-specific and
+# have nothing to do with food.
+
+# THE LINES A HOUSE-STYLE RULE MUST NOT TOUCH, and it is one reason four times.
+#
+# `QQ` lines are blanked for every collection by `conftest.checkable_text`:
+# they are the SOURCE's wording awaiting a rewrite, and correcting a dash there
+# tidies text that is about to be deleted, by editing someone else's words
+# (HANDOVER §5, issue #426). These four keys are the drink-shaped rest of that
+# same sentence:
+#
+#   `item`        -- "the source's own wording, held so that Helen can see what
+#                    the page said" (INGEST_ONE_COCKTAIL §3). It renders
+#                    NOWHERE -- `_layouts/cocktail.html` reads it only as a
+#                    fallback for an entry with no `generic`, and no such entry
+#                    exists -- it is refused on a promoted drink
+#                    (INGREDIENT_KEYS_RECIPES above), and #544 is retiring it.
+#                    A transcription that is never read is the last thing to
+#                    restyle.
+#   `suggestion`  -- a bottle, and §7's own rule is "reproduce a bottle or brand
+#                    exactly as it spells itself, accents and all". A rule that
+#                    accented `Briottet Creme d'Abricot` would be correcting the
+#                    distiller's own label.
+#   `source`,     -- a citation, reproduced as the publication writes it. Food
+#   `source_url`     excludes `source:` from its accent rule for exactly this
+#                    reason ("Cafe Delites" is a real name), and
+#                    scripts/tidy_drafts.py never touches it either.
+#
+# WHAT THIS COSTS, said plainly: six of the seven hyphenated number ranges in
+# the collection sit in an `item`, so this exclusion is the difference between
+# one failing drink and seven. It is written as a rule about whose words they
+# are, not as a way to be green -- and the six went to Helen in the #670
+# hand-back list either way, because reversing this is one line and hers to ask
+# for.
+VERBATIM_KEYS = ("item", "suggestion", "source", "source_url")
+_VERBATIM_LINE = re.compile(
+    rf"^(?:-\s*)?(?:{'|'.join(VERBATIM_KEYS)}):(?P<value>.*)$"
+)
+
+
+def _checkable(drink):
+    """`drink.raw` with QQ lines and verbatim-field lines blanked.
+
+    Blanked, never dropped, so line COUNT survives -- the same reason
+    `conftest.checkable_text` does it, and these strings feed failure messages.
+
+    A verbatim key whose value is empty opens a BLOCK (`suggestion:` followed by
+    an indented list is how a couple of dozen drinks name two bottles), so the
+    lines under it go too. Matching the key line alone would have blanked the
+    header and left the bottle names in scope, which is the shape of exclusion
+    that looks right in the file and does nothing.
+    """
+    out, block_indent = [], None
+    for line in checkable_text(drink.raw).split("\n"):
+        stripped = line.strip()
+        indent = len(line) - len(line.lstrip())
+        if block_indent is not None:
+            if not stripped or indent > block_indent:
+                out.append("")
+                continue
+            block_indent = None
+        match = _VERBATIM_LINE.match(stripped)
+        if match:
+            out.append("")
+            if not match.group("value").strip():
+                block_indent = indent
+            continue
+        out.append(line)
+    return "\n".join(out)
+
+
+def _prose_fields(drink):
+    """Every stretch of Helen's own prose on a drink, tagged with where it is.
+
+    FREE PROSE, NOT VOCABULARY, and that is the whole selection rule. `glass`,
+    `garnish`, `mood`, `generic` and `character` are closed vocabularies
+    declared in `_data/cocktails/` and enforced against those files by the tests
+    above -- the declaration is the authority on how each is spelled, and a
+    second authority here could only ever disagree with it. `item`,
+    `suggestion` and `source` are somebody else's words (see VERBATIM_KEYS).
+    What is left is what Helen wrote: the title, the tagline, the method, the
+    notes, an ingredient's own note, and the serving line.
+
+    `QQ` values are dropped exactly as `conftest.checkable_prose` drops them.
+    """
+    fields = []
+    for key in ("title", "tagline", "to_serve"):
+        value = drink.fm.get(key)
+        if isinstance(value, str) and value.strip():
+            fields.append((key, value))
+    for i, step in enumerate(drink.fm.get("method") or [], 1):
+        if isinstance(step, str):
+            fields.append((f"method step {i}", step))
+    for i, note in enumerate(drink.fm.get("notes") or [], 1):
+        if isinstance(note, dict):
+            for part in ("label", "text"):
+                if isinstance(note.get(part), str):
+                    fields.append((f"note {i} {part}", note[part]))
+        elif isinstance(note, str):
+            fields.append((f"note {i}", note))
+    for i, ingredient in enumerate(drink.fm.get("ingredients") or [], 1):
+        if isinstance(ingredient, dict) and isinstance(ingredient.get("note"), str):
+            fields.append((f"ingredient {i} note", ingredient["note"]))
+    return [(location, text) for location, text in fields if not is_qq(text)]
+
+
+# The string-valued top-level keys, and nothing else: `glass`, `garnish`,
+# `mood`, `method` and `notes` are lists, `ingredients` is a list of mappings,
+# and `meta` holds the three booleans that must NEVER be quoted -- quoting one
+# turns it into the string "true", which the publish gate reads as neither true
+# nor false and which holds the drink back for ever (test_the_gate_flags_are_
+# real_booleans above). `meta.date_last_edited` is quoted and has its own test.
+DRINK_SCALAR_FIELDS = ["title", "tagline", "source", "source_url", "to_serve"]
+
+
+def test_the_quoted_scalar_list_names_real_drink_fields():
+    """A field renamed out from under this list would take the rule with it.
+
+    `unquoted_scalars` finds nothing to complain about when a field is simply
+    absent -- correctly, because `to_serve` is optional -- so a typo or a rename
+    here does not fail, it stops checking. TOP_LEVEL_KEYS is the schema, so
+    asking it is the cheap way to keep this list honest.
+    """
+    unknown = sorted(set(DRINK_SCALAR_FIELDS) - TOP_LEVEL_KEYS)
+    assert not unknown, (
+        f"DRINK_SCALAR_FIELDS names {unknown}, which the schema does not "
+        f"declare. A name that matches no field checks nothing and fails "
+        f"nothing -- add it to TOP_LEVEL_KEYS if it is real, or fix the "
+        f"spelling here."
+    )
+
+
+def test_drink_scalar_fields_are_quoted(drink_file):
+    """Every string value is quoted -- INGEST_ONE_COCKTAIL §7.
+
+    Read from the raw front matter, never from the parsed value: a quoted and an
+    unquoted scalar parse identically, so the parsed value cannot tell you how
+    it was written. Same rule and same helper as a recipe's
+    (test_front_matter.py::test_scalar_fields_are_quoted), a different field
+    list, and the same purely-editing-convenience justification -- it changes
+    formatting, not data.
+    """
+    _require_drink(drink_file)
+    match = re.match(r"\A---\n(.*?\n)---", drink_file.raw, re.S)
+    assert match, f"{_drink_where(drink_file)} has no front matter to read."
+    bad = unquoted_scalars(match.group(1), DRINK_SCALAR_FIELDS)
+    assert not bad, (
+        f"{_drink_where(drink_file)} has unquoted scalar front-matter "
+        f"value(s): {bad!r}. Wrap each in double quotes, e.g. "
+        f'title: "Fish House Punch". Never the `meta:` booleans.'
+    )
+
+
+def test_drink_number_ranges_use_en_dashes(drink_file):
+    """`3–4 dashes`, not `3-4 dashes` -- §7's first line.
+
+    Over the whole file rather than the prose fields, on the same ruling that
+    put food's there: Helen, of `cook_time: "20-25 mins"`, "These still render
+    to the user, so correct to en dash please." An amount, a method step and a
+    note all reach the page.
+
+    THE LAST HYPHENATED RANGE WAS NOT A RANGE PROBLEM. anitas-attitude-adjuster's
+    Prosecco pour said `amount: "Top (30-45) ml"`, with a QQ note quoting that
+    string back verbatim, so en-dashing the amount would have desynchronised
+    the note from the value it describes -- a two-field judgement, not a
+    formatting fix, and it was left red for that reason. The answer came from
+    the amount ruling instead (#669, 2026-09-02): a top-up's amount is the verb
+    phrase `"to top"`, so the range left the amount altogether and the QQ note
+    stays as the record of what the source printed. Every range in the
+    collection was fixed on 2026-09-03 (#670).
+    """
+    _require_drink(drink_file)
+    hits = number_range_hits(_checkable(drink_file))
+    assert not hits, (
+        f"{_drink_where(drink_file)} writes {len(hits)} number range(s) with a "
+        f"hyphen: {sorted(set(hits))[:5]}. Ranges take an en dash -- 3–4 "
+        f"dashes, 1–4 years old."
+    )
+
+
+@pytest.mark.parametrize("name,pattern,fix", SHARED_TYPOGRAPHY,
+                         ids=[name for name, _, _ in SHARED_TYPOGRAPHY])
+def test_drink_typography(drink_file, name, pattern, fix):
+    """The two typography rules that are about English, not about food.
+
+    The table is conftest's, spliced into test_style.py's larger one for
+    recipes. The three rules NOT shared are food's own: Unicode fractions (a
+    drink's amounts are decimal millilitres, so a fraction in one is a different
+    conversation -- it went to Helen in the #670 hand-back list), and the two
+    markdown link shapes, which are about a recipe page's cross-links.
+    """
+    _require_drink(drink_file)
+    hits = re.findall(pattern, _checkable(drink_file))
+    assert not hits, (
+        f"{_drink_where(drink_file)} contains {len(hits)} instance(s) of "
+        f"{name}: "
+        f"{sorted(set(h if isinstance(h, str) else h[0] for h in hits))[:5]}. "
+        f"Fix: {fix}."
+    )
+
+
+def test_drink_spellings(drink_file):
+    """The declared non-house spellings, shared with the recipes.
+
+    Seeded here by a real one: royal-bermuda-yacht-club said `OVD Demarara`.
+    """
+    _require_drink(drink_file)
+    problems = spelling_problems(_checkable(drink_file))
+    assert not problems, (
+        f"{_drink_where(drink_file)} uses non-house spellings: "
+        + "; ".join(problems)
+    )
+
+
+def test_drink_temperatures_use_degree_c(drink_file):
+    """`°C`, never a bare `C` -- §7.
+
+    A regression guard rather than a backlog: the collection is clean today, and
+    a drink names a temperature rarely enough -- a hot buttered rum, a mulled
+    wine -- that the first one to arrive unmarked would arrive unnoticed.
+    """
+    _require_drink(drink_file)
+    bad = degreeless_temperatures(_checkable(drink_file))
+    assert not bad, (
+        f"{_drink_where(drink_file)} writes temperature(s) {bad} without the "
+        f"degree sign. Always °C, e.g. 70°C."
+    )
+
+
+def test_drink_accents(drink_file):
+    """Words that take an accent have one, checked against the curated list.
+
+    `_data/accented_words.yml` is shared with the food site by design -- its own
+    header says so -- and `crème`, `piña` and `purée` all turn up in a drink.
+
+    Scope is `_prose_fields`: Helen's own writing, never a bottle name and never
+    a citation. See VERBATIM_KEYS for why that is a rule about authorship rather
+    than a convenience.
+    """
+    _require_drink(drink_file)
+    words = accented_words()
+    # An `if not words: return` here would silence the accent rule across the
+    # whole collection while reporting green -- the exact bug test_style.py's
+    # own copy of this assert was written to close on 2026-08-14.
+    assert words, (
+        "_data/accented_words.yml has no `words:` map, so there is nothing to "
+        "check any drink against. That file IS this test's specification -- an "
+        "empty one means the accent rule is unenforced, not satisfied."
+    )
+    problems = accent_problems(_prose_fields(drink_file), words)
+    assert not problems, (
+        f"{_drink_where(drink_file)} uses unaccented spelling(s):\n  "
+        + "\n  ".join(problems)
+        + "\n\nIf the word genuinely takes no accent in British usage, add it "
+          "to the `no_accent` list in _data/accented_words.yml so nobody "
+          "'fixes' it back."
+    )
