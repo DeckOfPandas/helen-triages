@@ -99,10 +99,23 @@ REQUIRED_INGREDIENT = {"generic"}
 # makes about a food recipe. Reordering a block changes no value, so obeying it
 # is free, which is exactly what makes it enforceable.
 #
-# WORKSTREAM 2 APPENDS `rewritten`, `awaiting_fix`, `proofread` (D1/D2), and
-# this list is the single place that changes: the two tests below read it and
-# name nothing themselves.
-META_KEYS_IN_ORDER = ["ship", "date_last_edited"]
+# WORKSTREAM 2 APPENDED `rewritten`, `awaiting_fix`, `proofread` on 2026-09-02
+# (D1/D2, issue #668), and this list was the single place that changed: the two
+# tests below read it and name nothing themselves.
+#
+# THE THREE GATE FLAGS ARE FOOD'S, IN FOOD'S ORDER -- test_front_matter.py's
+# `META_ORDER` -- after the two drink-specific keys. Same names deliberately:
+# they are the same three questions (has Helen rewritten it, is one thing
+# ticketed, has she read what is in the file now), and a second vocabulary for
+# them would be two things to keep in step for no gain. `awaiting_fix` and
+# `proofread` are read by _plugins/publish_gate.rb the moment a drink is
+# promoted; `rewritten` is read by nothing and is Helen's own record.
+META_KEYS_IN_ORDER = ["ship", "date_last_edited", "rewritten", "awaiting_fix",
+                      "proofread"]
+
+# The two flags the publish gate reads, and `rewritten` alongside them because
+# all three are booleans with the same trap.
+GATE_FLAGS = ["rewritten", "awaiting_fix", "proofread"]
 
 _ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
@@ -730,8 +743,8 @@ def test_meta_keys_are_exactly_the_schema_in_order():
 
     THE ORDER IS FREE TO OBEY, which is what makes it worth enforcing: reordering
     a block changes no value, so nothing is at stake but consistency across 124
-    files read at a glance. When workstream 2 adds the three gate flags, that
-    list is the only line that changes.
+    files read at a glance. Workstream 2 added the three gate flags on
+    2026-09-02 and that list was, as promised, the only line that changed.
     """
     bad = []
     for slug, fm in _load():
@@ -786,6 +799,207 @@ def test_a_promoted_drink_has_a_real_tagline():
         + "\n\n`QQ` means \"not written yet\" everywhere in this repo, and the "
           "live site is the one place it must never appear. Write the line, or "
           "move the drink back to `_cocktail_drafts/` until it has one."
+    )
+
+
+# =============================================================================
+# THE PUBLICATION GATE, DRINK SIDE — issues #667, #668, D1–D3
+# =============================================================================
+# `_plugins/publish_gate.rb` has listed `cocktail_recipes` in GATED_COLLECTIONS
+# since the plugin existed, and since 2026-09-02 it publishes a document only on
+# `meta.awaiting_fix == false` AND `meta.proofread == true`. Until the migration
+# in this commit's private-repo counterpart, no drink carried either key, so the
+# gate would have held back every promoted drink silently -- safe, and invisible.
+#
+# These are the drink half of test_front_matter.py's four food guards. The
+# boolean and hyphen checks run over BOTH collections, because they are true of
+# any drink; the git-history check runs over `_cocktail_recipes/` alone, because
+# it is a claim about published files.
+
+def test_the_gate_flags_are_real_booleans():
+    """`awaiting_fix: "false"` is a STRING and the gate does not match it.
+
+    THE SILENT ONE, exactly as on the food side. The plugin compares against
+    Ruby's `false` and `true`, not truthiness, so a quoted value is never equal
+    to either -- and because the gate fails closed, a quoted flag holds the
+    drink back rather than publishing it. Safe, and completely unexplained: you
+    would be left looking for a drink that simply is not there.
+
+    The mirror of this trap bit `_data/cocktails/taxonomy.yml`'s `ship_scale`,
+    where a bare `yes` parsed as the BOOLEAN True and failed every comparison
+    against the string "yes". Same family, pointing the other way.
+    """
+    bad = []
+    for slug, fm in _load():
+        meta = fm.get("meta")
+        if not isinstance(meta, dict):
+            bad.append(f"{slug}: no `meta:` mapping")
+            continue
+        for flag in GATE_FLAGS:
+            if flag not in meta:
+                bad.append(f"{slug}: no `meta.{flag}`")
+            elif not isinstance(meta[flag], bool):
+                bad.append(f"{slug}: {flag} is {meta[flag]!r} "
+                           f"({type(meta[flag]).__name__})")
+    assert not bad, (
+        f"Drink(s) whose gate flags are not unquoted true/false:\n  "
+        + "\n  ".join(bad)
+        + "\n\nAll three of "
+        + ", ".join(GATE_FLAGS)
+        + " are booleans on every drink (D2, 2026-09-02). Absent is not the "
+          "same as false: absent means nobody has considered the file, and it "
+          "reads as 'not cleared' to a gate that fails closed. Never quote the "
+          "value -- a string never equals Ruby's `false`."
+    )
+
+
+def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
+    """`awaiting-fix` must never appear, on a drink or anywhere else.
+
+    THE HYPHEN IS A HAZARD, NOT A STYLE PREFERENCE, which is why this is a test
+    and not a note. Ruby reads `meta["awaiting-fix"]` happily, so the plugin
+    never minds -- but LIQUID PARSES `page.meta.awaiting-fix` AS SUBTRACTION.
+    Any template asking whether a drink is flagged would get arithmetic instead
+    of a boolean, evaluate it as false, i.e. "not flagged", and show the drink
+    it was asked to hide. The drinks index reads `meta` on every card, so this
+    is a live surface rather than a hypothetical one.
+
+    Food renamed the key on 2026-08-18 and carries the identical guard. The
+    drinks arrived after the rename and have never used the old spelling; this
+    is what keeps it that way rather than a fix for anything.
+    """
+    bad = []
+    for slug, fm in _load():
+        meta = fm.get("meta")
+        holders = [fm] + ([meta] if isinstance(meta, dict) else [])
+        for holder in holders:
+            if "awaiting-fix" in holder:
+                bad.append(slug)
+    assert not bad, (
+        "Drink(s) using the old hyphenated `awaiting-fix` key:\n  "
+        + "\n  ".join(sorted(set(bad)))
+        + "\n\nRename to `awaiting_fix`. Liquid reads the hyphenated form as a "
+          "subtraction, so a template asking whether the drink is flagged gets "
+          "arithmetic instead of the flag."
+    )
+
+
+# THE BASELINE, AND WHY IT GRANDFATHERS NOTHING.
+#
+# The food test's `BASELINE_COMMIT` exists to exempt history from before its
+# rule existed. Here there is no such history to exempt: `_cocktail_recipes/`
+# is EMPTY -- not one drink has been promoted -- so every commit reachable from
+# this baseline touched zero published drinks, and the exemption covers zero
+# files by construction.
+#
+# The migration that gave drinks their flags is not this SHA and cannot be: it
+# landed in `_cocktail_drafts/`, a different git repository, and this test reads
+# THIS repo's history only. There is no public-side counterpart commit to point
+# at, and pointing at one that merely happened at the same time would assert a
+# relationship that does not exist.
+#
+# So it is simply the tip of `origin/main` on the day the test was written. Move
+# it only under the rules the food constant's own comment sets out -- measure
+# first ("how many drinks is this rule currently holding at proofread: false?"),
+# and never to make a red test green. Once drinks are actually promoted this
+# stops being a formality.
+COCKTAIL_BASELINE_COMMIT = "2381444"   # tip of origin/main, 2026-09-02
+
+
+def _newest_commit_per_published_drink():
+    """{relative path: newest commit sha} across `_cocktail_recipes/`.
+
+    A module-level helper rather than inline, so the test function itself never
+    names the corpus roots -- see test_every_drink_reading_test_goes_through_
+    the_loader, which is what keeps `_load()` the only door.
+    """
+    from test_front_matter import _git
+
+    last: dict[str, str] = {}
+    sha = None
+    pathspec = f"{RECIPES.name}/"
+    for line in _git("log", "--format=%H", "--name-only", "--", pathspec).splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if len(line) == 40 and all(c in "0123456789abcdef" for c in line):
+            sha = line
+        elif line.endswith(".md"):
+            last.setdefault(line, sha)
+    return last
+
+
+def test_agent_edited_drinks_are_not_marked_proofread():
+    """A promoted drink whose newest commit is an agent's must say
+    `proofread: false`. Issue #367's rule, applied to drinks.
+
+    THE SAME MECHANISM, NOT A COPY OF IT. `_git`, `AGENT_TRAILER` and
+    `_only_invisible_keys_changed` are imported from tests/test_front_matter.py
+    rather than reimplemented: `_only_invisible_keys_changed` in particular is
+    150 lines of hard-won reasoning about what "nothing a reader could see
+    changed" means (#417, #429), and two copies of it would drift the first time
+    one was fixed. `INVISIBLE_KEYS` covers `meta.rewritten` and
+    `meta.date_last_edited`, both of which are drink keys too and both of which
+    genuinely render nothing.
+
+    IT READS THIS REPO'S HISTORY ONLY. `_cocktail_recipes/` lives here;
+    `_cocktail_drafts/` is a separate private repo and its history is not
+    readable from a public test, nor should it be -- issue #624: a public test
+    must never require private drink data.
+
+    It skips while nothing is promoted, the way `_load_published` does, because
+    "checked, all fine" over zero drinks is the vacuous green
+    tests/test_suite_hygiene.py exists to prevent.
+    """
+    from test_front_matter import AGENT_TRAILER, _git, _only_invisible_keys_changed
+
+    published = {slug for slug, _ in _load_published()}   # skips if none
+    assert (ROOT / ".git").exists(), "Not a git checkout -- this test cannot run."
+    assert "true" not in _git("rev-parse", "--is-shallow-repository").lower(), (
+        "This is a SHALLOW clone, so `git log` cannot see who last touched each "
+        "drink and this test would silently check almost nothing. Fetch full "
+        "history (actions/checkout needs `fetch-depth: 0`)."
+    )
+
+    last = _newest_commit_per_published_drink()
+    assert last, (
+        f"{len(published)} drink(s) are on disk but git knows of no commit "
+        f"touching any of them. Either they are uncommitted, or the pathspec "
+        f"this test uses has stopped matching -- both would let it pass while "
+        f"checking nothing."
+    )
+
+    import subprocess
+
+    agent_commit: dict[str, bool] = {}
+    offenders = []
+    for relpath, commit in sorted(last.items()):
+        path = ROOT / relpath
+        if not path.exists():
+            continue                                  # renamed, or demoted since
+        if subprocess.run(["git", "merge-base", "--is-ancestor",
+                           commit, COCKTAIL_BASELINE_COMMIT],
+                          cwd=ROOT, capture_output=True).returncode == 0:
+            continue                                  # grandfathered; see above
+        if _only_invisible_keys_changed(commit, relpath):
+            continue                                  # renders nothing
+        if commit not in agent_commit:
+            agent_commit[commit] = AGENT_TRAILER in _git(
+                "show", "-s", "--format=%B", commit).lower()
+        if not agent_commit[commit]:
+            continue                                  # Helen's own commit
+        match = FRONT_MATTER.match(path.read_text(encoding="utf-8"))
+        meta = (yaml.safe_load(match.group(1)) or {}).get("meta", {}) or {}
+        if meta.get("proofread") is not False:
+            offenders.append(f"{relpath} (last touched by {commit[:8]})")
+
+    assert not offenders, (
+        "Promoted drink(s) last edited by an agent but still marked "
+        "proofread:\n  " + "\n  ".join(offenders)
+        + "\n\nAn agent editing a drink invalidates Helen's proofread of it, so "
+          "the SAME commit must set `meta.proofread: false` (issue #367). Since "
+          "2026-09-02 that also takes the drink off the live site until she "
+          "reads it, which is the point rather than a side-effect."
     )
 
 
