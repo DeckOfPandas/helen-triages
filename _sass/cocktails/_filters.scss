@@ -475,11 +475,16 @@
   // it needs no calculation, because the underline was never measuring the
   // right box. It is also the mechanism .drink-card-hit and .drink-card-ship-word
   // already use, so "a coloured band under text" stays one thing.
+  // THE COLOUR IS THE SECTION'S, SET BELOW PER SECTION, SINCE 2026-09-03 --
+  // the paragraph above argued for magenta everywhere while the headings
+  // were five greens a word could not point back at. They are a ramp now,
+  // and Helen chose the version where "a chosen filter word underlines in
+  // its own section's colour" from the candidates page: "I'm in love with
+  // the top!" See _palette.scss's heading bars for the whole rule.
   &.is-on {
     color: $color-text;
     -webkit-text-stroke: 0.05em $color-text;
     text-decoration: underline;
-    text-decoration-color: $color-cosmic-cosmopolitan;
     text-decoration-thickness: 0.22em;
     text-underline-offset: 0.18em;
     text-decoration-skip-ink: none;
@@ -488,6 +493,13 @@
 
 .btn-mood  { @extend %drink-btn-naked; }
 .btn-chaos { @extend %drink-btn-naked; }
+
+// A chosen word wears the bar of the heading it answers -- the same variable,
+// so the two cannot drift. HASSLE's buttons carry .btn-mood (shared
+// behaviour, one set), which is why the section wrapper is what selects.
+.drink-filter--chaos  .btn-chaos.is-on { text-decoration-color: $color-heading-yolo; }
+.drink-filter--mood   .btn-mood.is-on  { text-decoration-color: $color-heading-mood; }
+.drink-filter--hassle .btn-mood.is-on  { text-decoration-color: $color-heading-hassle; }
 
 // BIGGER, WHITE, AND HOVERING TO MAGENTA — Helen's settings, 2026-09-02.
 //

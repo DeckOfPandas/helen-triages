@@ -56,6 +56,7 @@ over-broad `rm -rf`. Tell agents to delete only what they created.
 | Punched lettering never worked dark-on-light | four tiers (display / heading / label / plain); food's highlight is a mid grey and its shadow faint; HELEN TRIAGES and the recipe title hard, other headings soft, everything under 1rem edge-only; FAQ questions match SERVES/PREP/COOK; [ COCKTAILS ] wears [ FOOD ]'s tape lettering | `shared/_rule.scss`, both `_rule.scss`, `LETTERING.md` |
 | Second typeface without a rule | Plex is for numbers you act on: amounts on both sites, chart readouts and ticks, calculator inputs and results; note labels back to Courier; Plex 700 dropped | `shared/_fonts.scss`, both palettes |
 | Drink page half-inverted, colours off-job | rebuilt to Helen's brief: glass large in the margin, name on the card tape, glass/garnish/ship it? meta, card chips, yvette-over-absinthe under Ingredients and Method and under each ingredient name, lagoon on Notes and its cards, pink suggestions, ink numerals, read it / make it slider, shared ship include | `_layouts/cocktail.html`, `cocktails/_cocktail.scss`, `_includes/cocktails/ship.html`, `assets/js/cocktail-make.js` |
+| Section greens read as green on green (critical #4); headings smudged (#680); drink-page headings too small (#679 pt 4) | **2026-09-03.** A reposado-to-yvette ramp through pink (coral, hot pink derived in OKLCH) under the five index headings, ONE bar, the shared absinthe bar gone; each section's colour also on its chosen filter word and on the chip or band it lit on a card, so "magenta means matched everywhere" is reversed and cosmopolitan means HAS TO HAVE again; index headings 1.4rem / weight 400 / 0.14em, drink-page section headings 1.8rem / 400, punch kept on both. The mechanism: bold light-on-dark stems bloom into the punched highlight. `index-section-label` gained `$weight`. | `cocktails/_palette.scss`, `cocktails/_rule.scss` (heading-rule is single-bar now), `cocktails/_filters.scss`, `cocktails/_cards.scss`, `cocktails/_cocktail.scss`, `shared/_rule.scss` |
 
 ## 2. Decided, not yet built
 
@@ -73,20 +74,18 @@ over-broad `rm -rf`. Tell agents to delete only what they created.
 
 Each of these wants a candidates page, not an argument. Highest impact first.
 
-1. **The five section greens on the cocktails index** (audit critical #4).
-   YOLO, MOOD and HASSLE read as green on green; each heading's own bar sits
-   1.25–1.9:1 against the shared absinthe bar under it. Options to show: the
-   five accents already assigned to those sections in `cocktails/_palette.scss`
-   (orange, green, violet, magenta, cyan — the "promise the card keeps"
-   logic), or separation by weight. Note the drink page now uses yvette and
-   lagoon as heading bars over absinthe, so the index and drink page should
-   agree on what a heading bar's colour means.
+1. ~~The five section greens on the cocktails index~~ **Done 2026-09-03**,
+   see §1. Three rounds on one candidates page: type, then colour, then card
+   language. The one loose end is the drink page's ingredient-name underline,
+   still yvette over absinthe per Helen's written brief while every heading
+   is single-bar; a drink-page bundle with a switch was published for her.
 2. **Cocktail filter words versus card chips** (critical #5). The index's
    mood buttons are bare bold words; the same words on cards and now on the
    drink page are outlined chips. Helen's brief flagged it: "this may change
    if we decide to match card chips to the filter chips above, rather than
    match the filter chips to the card chips." One shape for one idea; show
-   both directions.
+   both directions. Since 2026-09-03 a chosen word and a matched chip already
+   share a colour (the section's), so the remaining gap is shape alone.
 3. **Food index hierarchy** (critical #2). The filter labels came down to
    1.05rem, which helps, but the recipe title is still 16px lowercase with
    the badge trio as the loudest thing on the row. Candidates: title one size
