@@ -1105,9 +1105,10 @@ gate would be gone and the build green.
   - **Size words with the count, not the item** — `amount: "2 large"`, not
     `item: "large onions"` (108 drafts carry the other shape).
   - **Split `ingredient_groups` and `method_groups`** — see below.
-  - **Name the file from the title's head clause**, so slug and title cannot
-    diverge (19 drafts already have; each is then a rename-or-retitle decision
-    only Helen can make).
+  - **Name the file from the whole title**, lowercased and hyphenated, so slug
+    and title cannot diverge. Head clause only until 2026-09-03, when Helen
+    ruled "slug the whole title" for the ingest inbox (§11.0.4) and the rule
+    followed for every ingest; existing files keep their names.
   - **House style right the first time** — en dashes, `°C`, unicode fractions,
     quoting, accents. Outside `QQ` lines, always. `/tidy-drafts` (§11.0.2) can
     clean these up afterwards, so this saves a pass rather than a decision.

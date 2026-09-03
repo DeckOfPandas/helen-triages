@@ -309,6 +309,39 @@ def test_comment_is_a_no_op_with_from_file(drafts, monkeypatch, capsys):
     assert "would write" in capsys.readouterr().out
 
 
+def test_comment_carries_the_hand_back_list(drafts, monkeypatch, capsys):
+    """`--comment` posts the outcome AND the browser's hand-back bullets.
+
+    Helen, 2026-09-03: "Bullets too please." The issue is where she reads on
+    her phone, so the list of what the browser could not know goes there,
+    not only into a terminal she is not looking at.
+    """
+    posted = []
+    issues = [{"number": 21, "body": envelope_text("valid_food")}]
+    monkeypatch.setattr(inbox, "fetch_issues", lambda site, number=None: issues)
+    monkeypatch.setattr(inbox, "post_comment",
+                        lambda site, number, text: posted.append((number, text)))
+    assert inbox.main(["--site", "food", "--comment", "--drafts-dir", str(drafts)]) == 0
+    capsys.readouterr()
+    assert len(posted) == 1 and posted[0][0] == 21
+    text = posted[0][1]
+    assert text.startswith("would write ")
+    env = inbox.parse_envelope(envelope_text("valid_food"), "food")
+    for item in env.hand_back:
+        assert f"- {item}" in text, f"hand-back bullet missing from the comment: {item!r}"
+
+
+def test_slug_is_the_whole_title():
+    """Helen, 2026-09-03: "Slug the whole title." Not the head clause.
+
+    Two "with" dishes sharing a head clause would otherwise collide and the
+    second would land as `-2` for no reason a reader could see in the name.
+    """
+    assert inbox.slug_for("Roast Chicken with Lemon and Thyme") == "roast-chicken-with-lemon-and-thyme"
+    assert inbox.slug_for("Crème Brûlée") == "creme-brulee"
+    assert inbox.slug_for("Anita's Attitude Adjuster") == "anitas-attitude-adjuster"
+
+
 def test_an_absent_drafts_repo_is_a_loud_refusal(capsys):
     """The absent-repo case, in the shape `tidy_drafts.py` set (#537).
 

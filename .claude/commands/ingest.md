@@ -117,8 +117,9 @@ makes the drink, and that is not relaxed by the file arriving from elsewhere.
   food that is `source` + `source_type`; a dated magazine is a `publication`, an
   undated one is a `website`, and that distinction catches everyone out. For
   cocktails `source` is free text and empty is fine.
-- **Name the file from the title's head clause**, so slug and title cannot
-  diverge.
+- **Name the file from the whole title**, lowercased and hyphenated, so slug
+  and title cannot diverge. (Head clause only until 2026-09-03; Helen: "Slug
+  the whole title.") Existing files are not renamed.
 
 ### Food only
 

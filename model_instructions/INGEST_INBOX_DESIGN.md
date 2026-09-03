@@ -203,9 +203,10 @@ Rules the consumer enforces:
   the Sazerac case.
 - Anything else in the body is ignored; anything missing is a rejection.
 
-**Slug.** From the title's head clause, as `INGEST_ONE_RECIPE.md` §2 says.
-If the slug exists in the target collection the consumer appends `-2` and
-reports it; it never overwrites.
+**Slug.** The whole title, folded to `[a-z0-9-]` — Helen's ruling 2026-09-03,
+replacing the head-clause rule this first said, so that two "with" dishes
+sharing a head clause do not collide. If the slug exists in the target
+collection the consumer appends `-2` and reports it; it never overwrites.
 
 ## 7. The consumer — `/ingest-inbox`
 

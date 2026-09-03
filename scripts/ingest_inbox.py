@@ -53,7 +53,7 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tests"))
 
-from test_taxonomy import _fold, _title_head_clause  # noqa: E402
+from test_taxonomy import _fold  # noqa: E402
 
 # THE VERSIONS THIS SCRIPT IMPLEMENTS. §0 of each standalone document tells a
 # repo-less browser which one to write, and
@@ -255,13 +255,16 @@ def fingerprint(fm: dict, site: str) -> str:
 
 
 def slug_for(title: str) -> str:
-    """The title's head clause, as `INGEST_ONE_RECIPE.md` §2 says.
+    """The WHOLE title, folded and hyphenated -- Helen's ruling, 2026-09-03.
 
-    `_title_head_clause` is imported rather than re-derived because
-    `test_title_and_slug_dont_diverge` judges the result with it: a slug built
-    any other way could fail the suite the moment it lands.
+    The first version took the head clause (the part before "with ..."), which
+    is what `ingest.md` asked of a photo batch. Asked whether two "with" dishes
+    sharing a head clause should collide and land as `-2`, Helen chose the
+    whole title. `test_title_and_slug_dont_diverge` is still satisfied on a
+    promoted recipe, because a slug holding every word holds the head clause's
+    words; and on a draft that test does not run at all (HANDOVER §11.0.3).
     """
-    text = _fold(_title_head_clause(title).replace("’", "").replace("'", ""))
+    text = _fold(title.replace("’", "").replace("'", ""))
     return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", text)).strip("-")
 
 
@@ -339,6 +342,23 @@ class Plan:
                     f"fingerprint, nothing written")
         verb = "wrote" if self.written else "would write"
         return f"{verb} {self.path.name}"
+
+    def comment_text(self) -> str:
+        """What `--comment` posts on the issue: the outcome, then everything
+        the run knows that Helen would otherwise have to open the file for --
+        the notes (a collision, a Sazerac case) and the browser's own hand-back
+        list. Her ruling, 2026-09-03: "Bullets too please." The issue is where
+        she reads on her phone, so the list goes where she is.
+        """
+        lines = [self.one_line()]
+        for note in self.notes:
+            lines.append(f"- {note}")
+        if self.envelope and self.envelope.hand_back:
+            lines.append("")
+            lines.append("What the browser could not know:")
+            for item in self.envelope.hand_back:
+                lines.append(f"- {item}")
+        return "\n".join(lines)
 
 
 def plan_for(body: str, site: str, existing: list, root: Path, number=None) -> Plan:
@@ -528,7 +548,7 @@ def main(argv=None) -> int:
         for plan in plans:
             if plan.number is None:
                 continue
-            post_comment(args.site, plan.number, plan.one_line())
+            post_comment(args.site, plan.number, plan.comment_text())
 
     return 0
 
