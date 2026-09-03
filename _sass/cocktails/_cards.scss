@@ -525,55 +525,6 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   bottom: $card-foot-y;
 }
 
-// THE THREE GATE FLAGS — D5, Helen 2026-09-02. Local build only: the markup
-// comes from _includes/cocktails/gate_badges.html, which carries its own
-// `site.show_drafts` test, so none of this ever reaches a production page.
-//
-// STYLED FROM THE CARD'S OWN TOKENS, not by importing _sass/food/_badges.scss.
-// Food's badge is a clip-path polygon in food's palette and pulling it across
-// would drag that whole system's variables into this stylesheet for three
-// words. These are the QUIETEST thing on the card by design -- they are a note
-// to Helen while she works, not a fact about the drink, and the card's job is
-// still to answer "what is this and do I want it".
-//
-// A LOWER-CASE ROW ABOVE THE MOOD CHIPS, sharing the chip's own line-height so
-// the foot's fixed-anchor geometry (see .drink-card-foot) keeps working: the
-// row is one more block growing upward, not a new position.
-.drink-card-flags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.28rem;
-  min-width: 0;
-  margin-bottom: 0.3rem;
-
-  // Every flag satisfied is the common case once a drink is finished, and the
-  // include still emits the wrapper. An empty flex row would otherwise hold
-  // open its own margin on every card that has nothing to say.
-  &:empty { display: none; }
-}
-
-.drink-card-flag {
-  font-size: 0.62rem;
-  line-height: $chip-line;
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
-  padding: 0 0.4rem;
-  flex: none;
-  // No border and no fill: §9.13's "bands and washes, not fills", and the mood
-  // chips beside these already own the bordered shape. Dimmer than a chip on
-  // purpose -- mixing the text toward the card's surface is the same move
-  // .drink-card-sep uses for the same reason.
-  color: mix($color-clear-text, $color-surface, 60%);
-  background: none;
-
-  // ONE FLAG READS THE OTHER WAY ROUND. `awaiting fix` means Helen HAS
-  // proofread the page and ticketed one thing (§4.0), so it is the only one of
-  // the three that reports a decision rather than an absence -- and the only
-  // one worth a colour. Cosmopolitan is the card's existing attention hue, the
-  // same one a hovered mood chip borrows.
-  &--ticket { color: $color-cosmic-cosmopolitan; }
-}
-
 .drink-card-moods {
   display: flex;
   flex-wrap: wrap;
