@@ -112,6 +112,7 @@
 // inline layout — the formula already gives the small size there.
 $glass-col: clamp(7rem, calc((100vw - #{$width-content}) / 2 - 3.5rem), 12.5rem);
 $glass-gap: $spacing-section-gap;
+$glass-min: 14rem;   // the drawing's floor -- see `.cocktail-glass-icon`'s min-height
 $head-pad-bottom: 1.4rem;
 
 // WHERE THE GLASS STARTS, and why it is not zero. The block's top is the top
@@ -189,6 +190,16 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // is the browser doing the same addition CSS's own way.
   .cocktail-title-block { padding-left: calc(#{$glass-col} + #{$glass-gap}); }
   .cocktail-glass-icon  { left: 0; right: auto; }
+
+  // THE HEAD HOLDS ITSELF OPEN FOR THE GLASS'S FLOOR. Inline, the drawing has
+  // the ingredients beneath it rather than an empty margin, so where the words
+  // are shorter than $glass-min the block grows to fit the glass instead of
+  // the glass hanging over the list. Border-box (shared/_base.scss), so the
+  // block's own bottom padding is inside this number: the glass runs from
+  // $glass-top down to that padding, and this is exactly that span.
+  .cocktail-title-block {
+    min-height: calc(#{$glass-top} + #{$glass-min} + #{$head-pad-bottom});
+  }
 
   // A drink with no glass gets no reservation — 17 of them have none, and an
   // empty 9rem gutter beside the title would read as a missing image rather
@@ -289,14 +300,22 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     margin: 0 0 $space-sm;
   }
 
-  // NO PADDING OVERRIDE ANY MORE. Helen's brief gave the page "tape padding
-  // 0.5em 0.85em", and on 2026-09-03 she withdrew it having seen the result:
-  // "Whatever I said in the brief, please try using the same amount of space
-  // (proportional) as the cards." The card's own `.drink-card-tape` rule
-  // (_cards.scss, $card-tape-pad-y / -x, both in em of the title) now applies
-  // here untouched, which is the proportion she asked for by construction.
-  // The brief's tighter numbers had been chosen against a title rendering at
-  // twice its stated size, so they were solving a problem that is gone.
+  // THE CARD'S OWN HORIZONTAL PADDING, AND THE BRIEF'S VERTICAL. Helen's brief
+  // gave the page "tape padding 0.5em 0.85em"; on 2026-09-03, having seen the
+  // spare tape it left either side of a name, she withdrew the horizontal
+  // half: "Whatever I said in the brief, please try using the same amount of
+  // space (proportional) as the cards." So $card-tape-pad-x from the card's
+  // own `.drink-card-tape` rule (_cards.scss) applies here untouched, in em of
+  // the title, which is the proportion she asked for by construction. The
+  // brief's 0.85em had been chosen against a title rendering at twice its
+  // stated size, so it was solving a problem that is gone.
+  //
+  // The vertical half she kept, from a switch on the built page: the card's
+  // 0.75em at a 3.2rem title is a 8rem band, and 0.5em is the one she chose.
+  .drink-card-tape {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+  }
 }
 
 // THE READ-IT / MAKE-IT TOGGLE — three elements, one group, replacing the old
@@ -576,6 +595,19 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   top: $glass-top;
   bottom: $head-pad-bottom;
   width: $glass-col;
+  // NEVER SHORTER THAN $glass-min, 2026-09-03. "As tall as the title block"
+  // (above) tied the drawing's height to the words beside it, and once the
+  // title was one line at its true size (see `.cocktail-title`) the head
+  // was short and the hero glass with it -- Helen: "our glass styling has
+  // fallen off... It looks much better on the narrower screen actually",
+  // where the title wrapped and the head was taller. A minimum breaks the
+  // tie in one direction only: a tall head still stretches the glass; a
+  // short one no longer shrinks it. Above 1180px the drawing hangs below
+  // the rule in the margin, where nothing else is; below, the head holds
+  // itself open for it (see the media block that tucks the glass inline).
+  // Chosen from 14rem and 18rem on the real page. The stable top edge that
+  // "as tall as the title block" was built for survives: `top` is unchanged.
+  min-height: $glass-min;
   display: flex;
   // TOP-ALIGNED, shipped. Helen looked at this against centred and chose it:
   // every glass on every drink now starts at the same y, level with the title
@@ -630,10 +662,15 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 //
 // Set the weight here and nowhere else. If a glass ever looks wrong, the
 // artwork is wrong, not this number.
+//
+// 3, UP FROM 1.6, 2026-09-03 -- Helen: "bigger, bolder and absinthe", chosen
+// against 1.6 and 2.2 on the real page. The card keeps its own 1 (_cards.scss
+// scopes it under `.drink-card-glass`); this is the hero drawing on the page
+// that exists for it, and at 14rem tall a 1.6 line read as a wire.
 .glass-icon-line {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.6;
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;

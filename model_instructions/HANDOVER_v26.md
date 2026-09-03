@@ -4518,6 +4518,23 @@ from it. Read `_sass/cocktails/_cocktail.scss` end to end before touching this
 page again — its header carries the anatomy and the colour jobs in full, and
 this section is the shorter pointer to that, not a duplicate of it.
 
+> ### #679, 2026-09-03 — THE TITLE WAS RENDERING AT TWICE ITS STATED SIZE
+>
+> `.cocktail-title` is an `h1` at `display: contents` inside the tape word,
+> and the UA stylesheet's `h1 { font-size: 2em }` still reaches its text: a
+> tape declared at 2.2rem carried a 4.4rem title, and the tape's em-based
+> padding, computed from the smaller number, gave half a card's proportion.
+> Helen's "the font is too big" and "no space (spare tape) at all either side
+> of the name" were one default. `font-size: 1em` on the h1 is the fix; the
+> size she then chose by looking is **3.2rem**, written as such. The tape
+> takes the card's own horizontal padding and the brief's 0.5em vertical; the
+> meta row's gap is 5rem; the glass is **absinthe, stroke 3, and never
+> shorter than `$glass-min` (14rem)** — it hangs below the rule in the margin,
+> and below 1180px the head holds itself open for it. Section headings are
+> 1.8rem / weight 400, absinthe over yvette (NOTES: over lagoon), and each
+> ingredient name carries one yvette-deep `text-decoration` band. **Not yet
+> seen on an iPad** — Helen can only check that after a deploy.
+
 **The anatomy.** The glass sits in the page's left margin above 1180px (large,
 top-aligned with the title) and tucks inline below that width, as it always
 has — only the WIDTH changed, to a clamp derived from the margin itself (see
