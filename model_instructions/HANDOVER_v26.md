@@ -2246,6 +2246,15 @@ tracked as issues, deliberately paired so one trip to the book answers both:
 reconstructed, even when the sibling recipes on the same page all end the same
 way.
 
+**A PHOTOGRAPH IS NOT THE ONLY WAY IN, SINCE 2026-09-03.** Helen also hands a
+source to claude.ai from her phone, using
+`model_instructions/INGEST_ONE_RECIPE.md` or `INGEST_ONE_COCKTAIL.md`, and
+pastes what comes back into an `ingest` issue on the matching private drafts
+repo. `/ingest-inbox` (§11.0.4) is the consumer: it parses the envelope, writes
+the file, and refuses rather than guesses. **Everything above still applies to
+it** — the Sazerac rule especially, which that path enforces mechanically by
+comparing a fingerprint of the amounts rather than the title.
+
 ### 9.3 Cocktail front matter
 
 ```yaml
@@ -5621,6 +5630,71 @@ fired on 118 drafts, about a third of the corpus, which §7 documents as
 correct — a blank star is the right answer for a plain sponge — and §12 uses
 that exact field as its worked example of a false finding. A check that fires
 on a third of the data is describing the data, not auditing it.
+
+### 11.0.4 `/ingest-inbox` — a recipe that arrives as a GitHub Issue
+
+**Added 2026-09-03, issue #672, implementing `INGEST_INBOX_DESIGN.md` §6–§8.**
+`.claude/commands/ingest-inbox.md` is the procedure and
+`scripts/ingest_inbox.py` is the engine — the third command in this repo and
+the third to copy `/tidy-drafts`' shape exactly.
+
+**THE GAP IT CLOSES IS TRANSPORT, AND NOTHING ELSE.** §11.0.3's repo-less path
+already worked in every respect but one: the browser's output reached the
+drafts by Helen copying a code block out of a chat, into a file, and telling a
+local session about it. **On a phone that is the step that does not happen.**
+So the code block travels as the body of a GitHub Issue instead — titled
+`ingest: <slug>`, labelled `ingest`, on the matching PRIVATE drafts repo, which
+is where an envelope carrying possibly-copyright source text belongs.
+
+**WHY AN ISSUE AND NOT A BRANCH**, because it looks like the harder route and
+is the cheaper one. A branch needs contents-write on a private repo from a
+session that runs neither `guard-main-branch.py` nor `guard-destructive-git.py`.
+An issue needs nothing `GH_TOKEN` does not already have (issues-only on three
+repos, probed 2026-08-17), the private repos have no build so nothing an issue
+carries can publish, and the session that finally writes the file is a local one
+under every guard this repo owns. **The transport was chosen by the permissions,
+which is the right way round.**
+
+**HELEN PASTES THE ENVELOPE HERSELF** — ruling D10, 2026-09-02: *"I am new to
+this and quite conservative."* No connector, no token for the browser, no new
+access of any kind. The consumer cannot tell her paste from a bot's issue and
+never needs to.
+
+**THE PARSER REJECTS, IT NEVER REPAIRS.** Nine rules from §6, one line of
+reason each, and every one is a refusal rather than a guess: no marker on the
+first non-blank line, a site it does not know, a version it does not implement,
+a site that is not the one asked for, two fenced blocks, YAML that is not a
+mapping, no `title:`, a missing `## What I could not know` or `## Fingerprint`
+section, and a fingerprint that disagrees with the file sitting above it. **A
+malformed envelope is a question for Helen, not a puzzle for the session** —
+this channel exists to keep inventions out of the drafts, so inventing what a
+broken one meant would defeat it precisely.
+
+**THE FINGERPRINT IS §9.2.1's SAZERAC MADE MECHANICAL.** One line: the title
+lowercased, then every amount in the file's own order, `|`-separated, an entry
+with no amount contributing nothing. The consumer rebuilds it from the parsed
+file (which catches a transcription the browser did not fingerprint) and from
+every draft already on disk (which catches the duplicate). **A matching
+fingerprint is reported and NOT written. A matching TITLE with a different
+fingerprint is written under its own slug and reported as what it is** — two
+recipes, one name, exactly as `sazerac` and `sazerac-death-and-co` live side by
+side. Neither case is ever merged by a script.
+
+**THE VERSION MARKER IS A HANDSHAKE WITH A TEST ON BOTH ENDS.** §8 names one
+failure that could go quiet: a standalone document teaching `v2` to a browser
+while the consumer implements `v1`. `SUPPORTED_VERSIONS` lives in the script,
+each document's §0 prints its marker, and
+`test_ingest_inbox.py::test_both_documents_name_a_supported_version` fails at
+commit time rather than letting every envelope be rejected at parse time.
+The same test module also checks that each valid fixture's fingerprint is the
+exact line its document prints, so the two copies of that format cannot drift.
+
+**TESTED WITHOUT THE NETWORK AND WITHOUT HER DRAFTS.** One function reaches
+GitHub (`fetch_issues`) and one writes to it (`post_comment`); the tests replace
+the first and fail on the second, and every case needing existing files builds a
+drafts root under `tmp/` and removes it. Both private repos are absent in a
+worktree and in CI, and the script exits non-zero saying so rather than
+reporting a clean inbox — #537's lesson, in the shape `tidy_drafts.py` set.
 
 ### 11.0.1 More than one agent now shares this checkout — use a worktree
 
