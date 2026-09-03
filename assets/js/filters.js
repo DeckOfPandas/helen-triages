@@ -231,23 +231,23 @@ document.addEventListener('DOMContentLoaded', function () {
      disqualify the page from bfcache -- which matters on the deployed site,
      where bfcache DOES apply and this whole mechanism should stay out of its
      way. Storage being full, disabled or blocked is not worth breaking a page
-     over; the fallback is a fresh list, which is what you had before. */
+     over; the fallback is a fresh list, which is what you had before -- and
+     since #686 that swallowing lives once, in HTF.indexMemory, which the drinks
+     index shares. The KEY and the RECORD stay here: they are this index's. */
   function saveIndexMemory() {
     if (!recipeList) return;
-    try {
-      sessionStorage.setItem(MEMORY_KEY, JSON.stringify({
-        order: items.map(rowKey),
-        filters: FilterState.serialise(state),
-        // The chosen ingredient result's DISPLAY text, which is not its match
-        // key -- an aliased entry like "five-spice" shows as "Chinese five-spice
-        // powder" (see display_names in ingredient_words.yml). The box echoes
-        // what the button shows, so that is what has to come back.
-        ingredientLabel: searchBox ? searchBox.value : '',
-        page: currentPage,
-        showAll: showAll,
-        scrollY: window.scrollY || 0
-      }));
-    } catch (e) { /* nothing to be done, and nothing worth breaking for */ }
+    HTF.indexMemory.save(MEMORY_KEY, {
+      order: items.map(rowKey),
+      filters: FilterState.serialise(state),
+      // The chosen ingredient result's DISPLAY text, which is not its match
+      // key -- an aliased entry like "five-spice" shows as "Chinese five-spice
+      // powder" (see display_names in ingredient_words.yml). The box echoes
+      // what the button shows, so that is what has to come back.
+      ingredientLabel: searchBox ? searchBox.value : '',
+      page: currentPage,
+      showAll: showAll,
+      scrollY: window.scrollY || 0
+    });
   }
 
   /* Returns the saved record when it restored, or null. Null means "carry on as
@@ -257,12 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function restoreIndexMemory() {
     if (!recipeList || !arrivedByGoingBack()) return null;
 
-    var saved;
-    try {
-      saved = JSON.parse(sessionStorage.getItem(MEMORY_KEY));
-    } catch (e) {
-      return null;
-    }
+    var saved = HTF.indexMemory.restore(MEMORY_KEY);
     if (!saved || !Array.isArray(saved.order)) return null;
 
     // Reorder by the saved keys, then append anything the record did not know

@@ -739,7 +739,12 @@
      isIncludeSearching / isExcludeSearching mean "there is text in that box and
      nothing chosen from its results yet", which is candidates mid-thought
      rather than a filter. A CHOSEN chip is different and does come back -- it
-     is an applied filter, and it rebuilds from the state like any other. */
+     is an applied filter, and it rebuilds from the state like any other.
+
+     THE STORE ITSELF IS SHARED SINCE #686: HTF.indexMemory in assets.js holds
+     the sessionStorage read and write and the swallowing of every way it can
+     fail. What stays here is what is this index's own -- the key, the record,
+     and the question of whether you arrived by going back. */
   var MEMORY_KEY = 'htf-drinks-memory-v1';
 
   /* Cards carry no id; the drink link's href is the one thing on a card that is
@@ -751,14 +756,12 @@
   }
 
   function saveDrinksMemory() {
-    try {
-      var order = model.slice().sort(function (a, b) { return a.key - b.key; });
-      sessionStorage.setItem(MEMORY_KEY, JSON.stringify({
-        order: order.map(cardKey),
-        filters: FilterState.serialise(state),
-        scrollY: window.scrollY || 0
-      }));
-    } catch (e) { /* storage full, blocked or absent: a fresh list is no worse */ }
+    var order = model.slice().sort(function (a, b) { return a.key - b.key; });
+    HTF.indexMemory.save(MEMORY_KEY, {
+      order: order.map(cardKey),
+      filters: FilterState.serialise(state),
+      scrollY: window.scrollY || 0
+    });
   }
 
   /* Returns the record when it restored, or null for "carry on as a fresh
@@ -768,12 +771,7 @@
   function restoreDrinksMemory() {
     if (!arrivedByGoingBack()) return null;
 
-    var saved;
-    try {
-      saved = JSON.parse(sessionStorage.getItem(MEMORY_KEY));
-    } catch (e) {
-      return null;
-    }
+    var saved = HTF.indexMemory.restore(MEMORY_KEY);
     if (!saved || !Array.isArray(saved.order)) return null;
 
     var position = Object.create(null);

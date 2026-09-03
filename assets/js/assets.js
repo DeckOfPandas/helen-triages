@@ -213,4 +213,58 @@ window.HTF = window.HTF || {};
       .replace(/'/g, '&#39;');
   };
 
+  // --- Index memory ----------------------------------------------------------
+  // GitHub issue #387, and #686 for this being one function rather than two.
+  // Both indexes remember the order and filters they were left in, so that
+  // going BACK from a recipe or a drink returns you to the list you were
+  // reading rather than to a freshly shuffled one. Same store, same shape, same
+  // two failure rules -- only the key and the record differ, so those are what
+  // the caller passes, the way filter-state.js is parameterised by its spec.
+  //
+  // WHAT IS DELIBERATELY NOT HERE: the decision to restore at all. That is
+  // FilterState.arrivedByGoingBack(), asked at each call site, and it stays
+  // there because it is about the NAVIGATION rather than the storage -- a page
+  // may well want to read this record for some other reason. Its own reasoning
+  // (why performance navigation type and not bfcache) lives with it in
+  // filter-state.js.
+  //
+  // EVERY PATH IS WRAPPED, and not only for the obvious throw. Private mode
+  // throws on setItem; a browser with site data blocked can make even the
+  // getter throw; and in a context with no sessionStorage at all the bare
+  // reference is a ReferenceError. All three end the same way, because the
+  // fallback -- a fresh list -- is what you had before the feature existed and
+  // is not worth breaking a page for.
+  HTF.indexMemory = {
+    /**
+     * Store an index's state under its own key. Silent on failure.
+     * @param {string} key - the caller's own, e.g. 'htf-index-memory-v1'
+     * @param {Object} state - anything JSON can carry
+     */
+    save: function (key, state) {
+      try {
+        sessionStorage.setItem(key, JSON.stringify(state));
+      } catch (e) { /* nothing to be done, and nothing worth breaking for */ }
+    },
+
+    /**
+     * Read back what save() stored, or null.
+     *
+     * NULL MEANS "CARRY ON AS A FRESH LOAD" and every failure returns it:
+     * nothing stored, unparseable, storage unreachable. The caller checks the
+     * SHAPE of what comes back -- this function knows nothing about the record
+     * beyond it being JSON, and a record written by an older version of a page
+     * is exactly as untrusted as any other stored input.
+     *
+     * @param {string} key
+     * @returns {Object|null}
+     */
+    restore: function (key) {
+      try {
+        return JSON.parse(sessionStorage.getItem(key)) || null;
+      } catch (e) {
+        return null;
+      }
+    }
+  };
+
 })(window.HTF);
