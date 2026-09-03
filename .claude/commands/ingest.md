@@ -55,6 +55,13 @@ I could not know" list. **That file is 90% of an ingest and is missing exactly
 the parts that need this repository.** Finishing it is a different job from a
 photo batch and it is much smaller.
 
+**WHICH PROCEDURE, AND IT DEPENDS ON HOW IT ARRIVED.** If she pasted it into
+the chat, **this is still the procedure** — read on. If she put it in an
+`ingest` issue on the private drafts repo, **run `/ingest-inbox` instead**:
+`scripts/ingest_inbox.py` parses the envelope, checks the fingerprint against
+every existing draft and writes the file, and then hands back to the same
+finishing pass below. The two paths differ only in who copies the code block.
+
 **Ask her for the hand-back list.** It names every `QQ` and every guess, and it
 is faster to read than the file. If she has lost it, the `QQ` notes inside the
 file say the same things.
@@ -110,8 +117,9 @@ makes the drink, and that is not relaxed by the file arriving from elsewhere.
   food that is `source` + `source_type`; a dated magazine is a `publication`, an
   undated one is a `website`, and that distinction catches everyone out. For
   cocktails `source` is free text and empty is fine.
-- **Name the file from the title's head clause**, so slug and title cannot
-  diverge.
+- **Name the file from the whole title**, lowercased and hyphenated, so slug
+  and title cannot diverge. (Head clause only until 2026-09-03; Helen: "Slug
+  the whole title.") Existing files are not renamed.
 
 ### Food only
 
