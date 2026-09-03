@@ -357,15 +357,26 @@ def is_qq(value) -> bool:
     return stripped.startswith("QQ") and not stripped.startswith("QQ Claude")
 
 
-def checkable_raw(recipe) -> str:
-    """`recipe.raw` with every un-rewritten `QQ` line blanked.
+def checkable_text(raw: str) -> str:
+    """One file's raw text with every un-rewritten `QQ` line blanked.
 
     Blanked rather than dropped so line COUNT is preserved: these strings feed
     failure messages, and a report whose line numbers are off by however many
     QQ lines happened to precede it is worse than no line numbers at all.
+
+    TAKES TEXT, NOT A `Recipe`, since 2026-09-03 (#670). The cocktails
+    collection has no `Recipe` object -- tests/test_cocktails.py has its own
+    loader and its own schema -- but it has the same `QQ` marker meaning the
+    same thing, so the exemption has to be reachable from a plain string.
+    `checkable_raw` below is the food-shaped door onto it and is unchanged.
     """
     return "\n".join("" if _QQ_LINE.match(line) else line
-                     for line in recipe.raw.split("\n"))
+                     for line in raw.split("\n"))
+
+
+def checkable_raw(recipe) -> str:
+    """`recipe.raw` with every un-rewritten `QQ` line blanked."""
+    return checkable_text(recipe.raw)
 
 
 def checkable_prose(recipe) -> list[tuple[str, str]]:
@@ -397,3 +408,128 @@ def where_draft(draft: Recipe, detail: str = "") -> str:
     class.
     """
     return _relative(draft) + (f" — {detail}" if detail else "")
+
+
+# =============================================================================
+# HOUSE STYLE THAT IS NOT ABOUT FOOD — GitHub issue #670
+# =============================================================================
+# An en dash, an accent, a quoted scalar and a degree sign are properties of
+# Helen's WRITING, not of a recipe. `model_instructions/INGEST_ONE_COCKTAIL.md`
+# §7 demands every one of them of a drink in the same words the food formatter
+# uses — and until 2026-09-03 nothing checked a single one, because
+# tests/test_style.py is parametrised over the food `recipe` fixture and this
+# module is explicitly the food suite (see the header, L28–32).
+#
+# So the CORE of each corpus-agnostic rule lives here, taking a string, and the
+# per-collection test keeps its own assert, its own message and its own
+# parametrisation. Three surfaces already consume these — recipes and drafts
+# (tests/test_style.py, tests/test_drafts.py), the prose pages
+# (tests/test_prose_pages.py, which imported them from test_style.py by name
+# from the day it was written) and now drinks (tests/test_cocktails.py).
+#
+# WHY NOT MOVE THE TESTS THEMSELVES. A food failure message says "recipe", cites
+# a food issue number and names food fields; a drink's cannot. Sharing the
+# PREDICATE and not the message is what lets the drink rules exist at all
+# without touching a single food test id — `pytest --collect-only` is
+# byte-identical across this change on the food half.
+#
+# WHY NOT LEAVE THEM IN test_style.py AND IMPORT FROM THERE. That is what
+# test_prose_pages.py does, and it works; but test_style.py is `pytest.mark.food`
+# and a cocktails module importing the food suite to borrow its spelling list
+# reads as an accident waiting to be tidied away. A rule that belongs to neither
+# collection belongs beside `checkable_text`, which is already exactly that.
+
+# ISO DATES ARE BLANKED BEFORE THE RANGE RULE RUNS, not excluded by a cleverer
+# pattern: `2026-08-12` is three number pairs joined by hyphens and matches a
+# range perfectly. See test_style.py::test_number_ranges_use_en_dashes.
+ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+NUMBER_RANGE = re.compile(r"(?<![\d.])\d+(?:\.\d+)?\s*-\s*\d+(?:\.\d+)?(?![\d.])")
+
+# The two typography rules that are true of any English prose this site
+# publishes. The rest of test_style.py's TYPOGRAPHY table is food's own —
+# fractions, wikilinks and the reversed-bracket link shape are about a recipe
+# page's markdown conventions — so the table there splices these in rather than
+# moving wholesale. Order is preserved exactly: reordering it would reorder
+# every `test_typography[...]` id.
+SHARED_TYPOGRAPHY = [
+    ("double hyphen", r"(?<!-)--(?!-)", "use an em dash —"),
+    ("ASCII arrow", r"->", "use →"),
+]
+
+SPELLINGS = {
+    r"\bdemarara\b": "demerara",
+    r"\byogurt\b": "yoghurt",
+    r"\bcreme fraiche\b": "crème fraîche",
+    r"\bgruyere\b": "gruyère",
+    r"\bpuree\b": "purée",
+    r"\bsaute\b": "sauté",
+    r"\bbain marie\b": "bain-marie",
+}
+
+DEGREELESS_TEMPERATURE = re.compile(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)")
+
+
+def number_range_hits(text: str) -> list[str]:
+    """Every `3-4` written with a hyphen where an en dash belongs."""
+    return NUMBER_RANGE.findall(ISO_DATE.sub(" ", text))
+
+
+def spelling_problems(text: str) -> list[str]:
+    """`['demarara -> demerara', ...]` for each non-house spelling present."""
+    return [f"{pattern.strip(chr(92) + 'b')} -> {correct}"
+            for pattern, correct in SPELLINGS.items()
+            if re.search(pattern, text, re.I)]
+
+
+def degreeless_temperatures(text: str) -> list[str]:
+    """Every `200C` / `200oC` written without the degree sign."""
+    return DEGREELESS_TEMPERATURE.findall(text)
+
+
+def unquoted_scalars(fm_text: str, fields) -> list[str]:
+    """`['title: Beef Wellington', ...]` for each bare scalar among `fields`.
+
+    Reads the RAW front matter, never the parsed value: a quoted and an
+    unquoted scalar parse identically, so the parsed value cannot tell you how
+    it was written. A flow sequence or mapping is not a bare scalar and is
+    skipped; booleans are never in `fields`, because quoting one turns it into
+    the string "true" and every `is True` check in the suite silently reads
+    False (test_front_matter.py, and scripts/tidy_drafts.py's header).
+    """
+    bad = []
+    for field in fields:
+        match = re.search(rf"^{field}:[ \t]*(.+)$", fm_text, re.M)
+        if not match:
+            continue
+        value = match.group(1).rstrip()
+        if value.startswith("[") or value.startswith("{"):
+            continue          # a flow sequence/mapping, not a bare scalar
+        if not (value.startswith('"') and value.endswith('"')):
+            bad.append(f"{field}: {value}")
+    return bad
+
+
+def accented_words() -> dict:
+    """The curated unaccented -> accented map, _data/accented_words.yml.
+
+    Lives in `_data/`, not `_data/food/`, because it is HOUSE STYLE rather than
+    food vocabulary — `crème de cassis` wants the same treatment `crème fraîche`
+    gets. See SHARED_DATA_DIR at the top of this file.
+    """
+    path = SHARED_DATA_DIR / "accented_words.yml"
+    if not path.exists():
+        pytest.skip(
+            "_data/accented_words.yml is missing. It is the curated list of "
+            "culinary words whose correct spelling carries an accent."
+        )
+    return (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("words") or {}
+
+
+def accent_problems(fields: list[tuple[str, str]], words: dict) -> list[str]:
+    """Every declared unaccented spelling found in `(location, text)` pairs."""
+    problems = []
+    for location, text in fields:
+        for plain, accented in words.items():
+            if re.search(rf"\b{re.escape(plain)}\b", text, re.I):
+                problems.append(f"{location}: '{plain}' should be '{accented}'")
+    return problems

@@ -10,7 +10,7 @@ import re
 import pytest
 import yaml
 
-from conftest import where
+from conftest import where, unquoted_scalars
 
 # Suite marker, so `pytest -m food` can run this half alone.
 # tests/test_suite_hygiene.py asserts every module declares one --
@@ -502,18 +502,12 @@ SCALAR_STRING_FIELDS = ["title", "tagline", "source", "prep_time",
 
 
 def test_scalar_fields_are_quoted(recipe):
+    """The scan itself is `conftest.unquoted_scalars`, shared with the drinks
+    since 2026-09-03 (#670) -- a bare scalar is a bare scalar in either
+    collection, and only the FIELD LIST differs. This message is unchanged.
+    """
     match = re.match(r"\A---\n(.*?\n)---", recipe.raw, re.S)
-    fm_text = match.group(1)
-    bad = []
-    for field in SCALAR_STRING_FIELDS:
-        m = re.search(rf"^{field}:[ \t]*(.+)$", fm_text, re.M)
-        if not m:
-            continue
-        val = m.group(1).rstrip()
-        if val.startswith("[") or val.startswith("{"):
-            continue  # a flow sequence/mapping, not a bare scalar
-        if not (val.startswith('"') and val.endswith('"')):
-            bad.append(f"{field}: {val}")
+    bad = unquoted_scalars(match.group(1), SCALAR_STRING_FIELDS)
     assert not bad, (
         f"{where(recipe)} has unquoted scalar front-matter value(s): {bad!r}. "
         f'Wrap each in double quotes, e.g. title: "Beef Wellington".'

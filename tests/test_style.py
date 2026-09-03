@@ -16,6 +16,22 @@ import re
 import pytest
 
 from conftest import where, checkable_raw, checkable_prose
+# The corpus-agnostic half of this file's rules — see the long note above them
+# in conftest.py (issue #670). They live there so the cocktails suite can reach
+# them without importing the food suite; every assert and every message below
+# is unchanged, and so is every test id.
+from conftest import (
+    ISO_DATE, NUMBER_RANGE, SHARED_TYPOGRAPHY, SPELLINGS, accent_problems,
+    accented_words, degreeless_temperatures, number_range_hits,
+    spelling_problems,
+)
+
+# Re-exported under the names three other consumers already import from this
+# module: tests/test_prose_pages.py, tests/test_magic_bag.py and
+# scripts/build_ingest_vocab.py. Kept as aliases rather than repointed at their
+# new home so that #670 changes no file it did not have to.
+_accented_words = accented_words
+_accent_problems = accent_problems
 
 # Suite marker, so `pytest -m food` can run this half alone.
 # tests/test_suite_hygiene.py asserts every module declares one --
@@ -140,8 +156,10 @@ def test_method_step_notes_are_sentences(recipe):
 TYPOGRAPHY = [
     ("slash fractions", r"(?<![\d/])(1/2|1/4|3/4|1/3|2/3|1/8|3/8|5/8|7/8)(?![\d/])",
      "use Unicode fractions: ½ ¼ ¾ ⅓ ⅔ ⅛ ⅜ ⅝ ⅞"),
-    ("double hyphen", r"(?<!-)--(?!-)", "use an em dash —"),
-    ("ASCII arrow", r"->", "use →"),
+    # `double hyphen` and `ASCII arrow`, in that order and with the same
+    # messages, spliced in from conftest so the cocktails suite enforces the
+    # same two without a second copy. The three around them are food's own.
+    *SHARED_TYPOGRAPHY,
     ("wikilink", r"\[\[[^\]]+\]\]",
      "cross-recipe links are markdown, relative: [display text](../slug/)"),
     ("reversed link brackets", r"\([^()\n]+\)\[[^\]\n]*\]",
@@ -167,8 +185,11 @@ TYPOGRAPHY = [
 # ordinary hyphen -- only on `<number>-<number>`, which on this site is always a
 # range. Scoped that narrowly, it found no false positives at all across 82
 # recipes, both reference pages and the reference data.
-ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
-NUMBER_RANGE = re.compile(r"(?<![\d.])\d+(?:\.\d+)?\s*-\s*\d+(?:\.\d+)?(?![\d.])")
+#
+# BOTH PATTERNS, AND THE `findall` OVER THEM, MOVED TO conftest ON 2026-09-03
+# (#670) so that a drink is held to the same rule. They are imported back into
+# this module's namespace at the top of the file, because tests/test_magic_bag.py
+# and tests/test_prose_pages.py both import them FROM HERE by name.
 
 
 def test_number_ranges_use_en_dashes(recipe):
@@ -198,7 +219,7 @@ def test_number_ranges_use_en_dashes(recipe):
     dish is Helen's own from memory with no source to await a rewrite, so there
     is no QQ text there to protect.)
     """
-    hits = NUMBER_RANGE.findall(ISO_DATE.sub(" ", checkable_raw(recipe)))
+    hits = number_range_hits(checkable_raw(recipe))
     assert not hits, (
         f"{where(recipe)} writes {len(hits)} number range(s) with a hyphen: "
         f"{sorted(set(hits))[:5]}. Ranges take an en dash — 3–4 mins, "
@@ -243,29 +264,20 @@ def test_no_ampersand_in_title(recipe, taxonomy):
     )
 
 
-SPELLINGS = {
-    r"\bdemarara\b": "demerara",
-    r"\byogurt\b": "yoghurt",
-    r"\bcreme fraiche\b": "crème fraîche",
-    r"\bgruyere\b": "gruyère",
-    r"\bpuree\b": "purée",
-    r"\bsaute\b": "sauté",
-    r"\bbain marie\b": "bain-marie",
-}
+# SPELLINGS MOVED TO conftest ON 2026-09-03 (#670) and is imported back at the
+# top of this file — tests/test_magic_bag.py and tests/test_prose_pages.py both
+# import it from here by name. A misspelling is a misspelling on a drink too.
 
 
 def test_spellings(recipe):
-    problems = []
-    for pattern, correct in SPELLINGS.items():
-        if re.search(pattern, checkable_raw(recipe), re.I):
-            problems.append(f"{pattern.strip(chr(92) + 'b')} -> {correct}")
+    problems = spelling_problems(checkable_raw(recipe))
     assert not problems, (
         f"{where(recipe)} uses non-house spellings: " + "; ".join(problems)
     )
 
 
 def test_temperatures_use_degree_c(recipe):
-    bad = re.findall(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)", checkable_raw(recipe))
+    bad = degreeless_temperatures(checkable_raw(recipe))
     assert not bad, (
         f"{where(recipe)} writes temperature(s) {bad} without the degree sign. "
         f"Always °C, e.g. 200°C."
@@ -916,17 +928,12 @@ def test_unsalted_butter_has_salt_or_a_note(recipe):
 
 
 # --- accents ----------------------------------------------------------------
-
-def _accented_words() -> dict:
-    import yaml
-    from conftest import SHARED_DATA_DIR
-    path = SHARED_DATA_DIR / "accented_words.yml"
-    if not path.exists():
-        pytest.skip(
-            "_data/accented_words.yml is missing. It is the curated list of "
-            "culinary words whose correct spelling carries an accent."
-        )
-    return (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("words") or {}
+# `_accented_words` and `_accent_problems` MOVED TO conftest ON 2026-09-03
+# (#670), where the cocktails suite can reach them, and are aliased back to
+# their old names at the top of this file. WHICH FIELDS to look in is the half
+# that does not travel: `_accent_check_fields` below is food's own answer, and a
+# drink's is different (no main_ingredients, and a bottle name is reproduced as
+# the bottle spells it -- INGEST_ONE_COCKTAIL §7).
 
 
 def _accent_check_fields(recipe) -> list[tuple[str, str]]:
@@ -956,15 +963,6 @@ def _accent_check_fields(recipe) -> list[tuple[str, str]]:
     for i, item in enumerate(recipe.ingredient_items, 1):
         out.append((f"ingredient item {i}", item))
     return out
-
-
-def _accent_problems(fields: list[tuple[str, str]], words: dict) -> list[str]:
-    problems = []
-    for location, text in fields:
-        for plain, accented in words.items():
-            if re.search(rf"\b{re.escape(plain)}\b", text, re.I):
-                problems.append(f"{location}: '{plain}' should be '{accented}'")
-    return problems
 
 
 def test_accents_in_prose(recipe):
