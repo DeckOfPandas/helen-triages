@@ -424,10 +424,10 @@ website). Keep one that points into the same book the recipe came from.
 
 <!-- vocab:accents start -->
 açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
-chèvre · comté · consommé · crème · crémeux · crêpe · crêpes · éclair ·
-éclairs · entrecôte · flambé · fraîche · frisée · gâteau · glacé · gougère ·
-gougères · gruyère · jalapeño · jalapeños · marinière · niçoise · pâté ·
-pâtisserie · pâtissière · piña · purée · puréed · purées · ragù · rösti ·
+chèvre · comté · consommé · crème · crémeux · crêpe · crêpes · crudités ·
+éclair · éclairs · entrecôte · flambé · fraîche · frisée · gâteau · glacé ·
+gougère · gougères · gruyère · jalapeño · jalapeños · marinière · niçoise ·
+pâté · pâtisserie · pâtissière · piña · purée · puréed · purées · ragù · rösti ·
 sauté · sautés · sautéed · soufflé · soufflés · velouté
 <!-- vocab:accents end -->
 
@@ -437,7 +437,7 @@ correction somebody then has to undo:
 
 <!-- vocab:no_accent start -->
 echalion · chorizo · gratin · julienne · vinaigrette · dauphinoise · mornay ·
-confit
+confit · mole · poblano
 <!-- vocab:no_accent end -->
 
 Anything not on either list, leave as the source spells it.

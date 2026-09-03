@@ -197,14 +197,26 @@ whose unit is not one of them (and is not `ml`, `cl`, `oz` or `tsp`) fails a
 test rather than rendering:
 
 <!-- vocab:measures start -->
-`dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` · `each` ·
-`leaf` · `leaves` · `sprig` · `strip` · `g`
+`dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
+`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `g` ·
+`to top` · `to rinse`
 <!-- vocab:measures end -->
 
-So `"1 barspoon"` and `"1 sugar cube"` are not yet readable, however sensible
-they look. Write the source's own words, and say in your list that the unit is
-undeclared — that is a one-line data edit for Helen, and much cheaper than a
-figure you invented.
+Four things a source prints as if they were units, and what to do instead
+(Helen's rulings, 2026-09-03):
+
+- **A barspoon is `"5 ml"`.** Convert it like a teaspoon; her suite rejects
+  the word.
+- **An egg or a sugar cube is an INGREDIENT, not a unit.** `amount: "1"`,
+  `generic: "QQ"`, `item: "whole egg"` (or `"sugar cube"`), the same as any
+  other pour.
+- **"Top" is not an amount on its own** — the ingredient added by a top-up is
+  `amount: "to top"`, and the method carries a `Top with …` step. Likewise a
+  rinse is `amount: "to rinse"` with a `Rinse …` step.
+- Anything else the source calls a measure and this list does not know:
+  write the source's own words, and say in your list that the unit is
+  undeclared — that is a one-line data edit for Helen, and much cheaper than
+  a figure you invented.
 
 **NEVER WRITE A BARE NUMBER.** An amount with no unit cannot be read. If the
 source really gives one, write it as it stands **and add a note saying the
@@ -353,7 +365,10 @@ and write the source's own words where none does.
 
 **Build:** `Add the remaining ingredients.` ·
 `Fill the pitcher half full with ice cubes.` · `Fill with crushed ice.` ·
-`Top with champagne.` · `Top with more crushed ice.`
+`Top with champagne.` · `Top with soda water.` · `Top with more crushed ice.`
+
+**Rinse and rim:** `Rinse the glass with absinthe and dump.` ·
+`Rinse the glasses with Campari.` · `Salt a half-rim of the glass.`
 <!-- vocab:method end -->
 
 Four things that will catch you out:
@@ -426,10 +441,10 @@ formatter would fix on a recipe and does not yet fix on a drink:
 
 <!-- vocab:accents start -->
 açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
-chèvre · comté · consommé · crème · crémeux · crêpe · crêpes · éclair ·
-éclairs · entrecôte · flambé · fraîche · frisée · gâteau · glacé · gougère ·
-gougères · gruyère · jalapeño · jalapeños · marinière · niçoise · pâté ·
-pâtisserie · pâtissière · piña · purée · puréed · purées · ragù · rösti ·
+chèvre · comté · consommé · crème · crémeux · crêpe · crêpes · crudités ·
+éclair · éclairs · entrecôte · flambé · fraîche · frisée · gâteau · glacé ·
+gougère · gougères · gruyère · jalapeño · jalapeños · marinière · niçoise ·
+pâté · pâtisserie · pâtissière · piña · purée · puréed · purées · ragù · rösti ·
 sauté · sautés · sautéed · soufflé · soufflés · velouté
 <!-- vocab:accents end -->
 
