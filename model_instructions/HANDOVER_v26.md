@@ -3240,9 +3240,42 @@ source's words and the vocabulary on top of each other. Measured across all 617
 entries, **385 of those pairs restated one another** — 241 where the item
 contains its generic, 124 differing only by case, 20 identical. `Malibu /
 Malibu` was #513 in two words, and `fresh lime juice / lime juice` was Helen's
-own complaint. Removing the field makes the duplication IMPOSSIBLE rather than
-suppressed, which is why #513 closed here rather than acquiring a rule about
-when to hide the second line.
+own complaint. Not rendering the field makes the duplication IMPOSSIBLE rather
+than suppressed, which is why #513 closed here rather than acquiring a rule
+about when to hide the second line.
+
+**`item` IS NOT RETIRED. It is a DRAFTS-ONLY TRANSCRIPTION FIELD — Helen's
+ruling, 2026-09-02, D8.** What the source called the pour: allowed in
+`_cocktail_drafts/`, refused in `_cocktail_recipes/` by
+`INGREDIENT_KEYS_RECIPES`, so **promotion is the deadline rather than a
+someday**. She deletes it herself when she fills `generic`/`suggestion` on
+making the drink, and *"ignore everything in `item` as we'll throw it away"* —
+it is never house-styled, corrected or rewritten. That reverses the sentence
+this section and §9.3 carried for a fortnight, and reverses it on the right
+grounds: the field was never the fault. The RENDERING was, and that was fixed
+on 2026-08-29.
+
+**TEN restating entries were deleted on 2026-09-03, and the interesting number
+is the 111 that were not.** The plan's step said 118 restate their own generic
+"textually", from a measure that asks whether the generic is a SUBSTRING of the
+item — 121 entries as re-measured on the day. Most of those extra words are a
+BRAND: `Tanqueray London dry gin`, `Luxardo maraschino liqueur`. **A substring
+test would have deleted precisely the information #544 exists to
+redistribute.** On equality — after lowercasing, stripping a leading article,
+stripping trailing punctuation and collapsing whitespace — it is 8, plus 2 that
+differ only by `fresh` and a unit the entry's own `amount` already states
+(`item: "Fresh basil leaves"` beside `amount: "3 leaves"`). No entry was caught
+by `juice of` or by a leading quantity; an earlier pass had taken those.
+278 entries carried an `item` before the pass and 268 after.
+
+**The other 268 are RESIDUE and not one was touched: they are Helen's rulings,
+not a script's.** The census is `tmp/item_census.py` — scratch, gitignored,
+re-runnable — which writes `tmp/item_census.md`: every entry grouped by family,
+largest group first, with a proposal per line (move to `suggestion` only where
+`bottles.yml` already declares the bottle, move to `note`, become a declared
+`character`, or delete). **106 of them name a bottle nobody has declared yet**,
+which is the single largest ruling outstanding, and the 35 sugar syrups are
+#594's question rather than this pass's.
 
 **It only became readable after #561.** The same change a week earlier would
 have produced `moderately aged (Gosling's Black Seal)` and `London dry
@@ -3275,8 +3308,11 @@ parenthetical, because the brackets on that line already mean "the bottle".
 It is NOT food's `incidental`, despite the matching shape: that one HIDES a
 line, this one shows it and marks it.
 
-**The rest of `item`'s redistribution is #544 move 2 and is most of the way
-done — see §9.3 for what has gone and what is left.**
+**The rest of `item`'s redistribution is #544 move 2, and after 2026-09-03 it
+is entirely Helen's** — the mechanical half is spent, 268 residue entries are
+tabled for her, and #544 stays open until she has ruled. §9.3 still carries the
+count of what has gone; its "`item` IS BEING RETIRED" heading is the sentence
+D8 overturned, and the paragraphs above are what governs.
 
 ### 9.10.1 Cards and search read the VOCABULARY, never the transcription — #501/#544/#558
 
