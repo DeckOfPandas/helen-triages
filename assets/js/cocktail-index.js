@@ -270,10 +270,6 @@
     list.appendChild(frag);
   }
 
-  function escapeHtml(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
   /* THE MATCHED RUN OF A DRINK NAME — GitHub issue #564, food's own treatment.
      The offsets come from cocktail-search.js and index the ORIGINAL title, so a
      name keeps its accents while an unaccented query still finds it: "vieux
@@ -294,9 +290,9 @@
       return;
     }
     d.nameEl.innerHTML =
-      escapeHtml(d.title.slice(0, at.start)) +
-      '<mark class="drink-name-hit">' + escapeHtml(d.title.slice(at.start, at.end)) + '</mark>' +
-      escapeHtml(d.title.slice(at.end));
+      HTF.escapeHtml(d.title.slice(0, at.start)) +
+      '<mark class="drink-name-hit">' + HTF.escapeHtml(d.title.slice(at.start, at.end)) + '</mark>' +
+      HTF.escapeHtml(d.title.slice(at.end));
   }
 
   function showClear(id, active) {

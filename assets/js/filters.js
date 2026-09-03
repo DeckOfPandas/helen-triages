@@ -463,10 +463,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function escapeHtml(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
   // Wraps the substring of each recipe title that matches state.nameQuery in a
   // .title-hit span, same "same tag styling" idea as the ingredient pills
   // above -- Helen's stretch goal: "could the part of the title hit gain
@@ -489,9 +485,9 @@ document.addEventListener('DOMContentLoaded', function () {
       var before = original.slice(0, idx);
       var hit = original.slice(idx, idx + state.nameQuery.length);
       var after = original.slice(idx + state.nameQuery.length);
-      a.innerHTML = escapeHtml(before) +
-        '<mark class="title-hit"><span class="tag-shape" aria-hidden="true"></span>' + escapeHtml(hit) + '</mark>' +
-        escapeHtml(after);
+      a.innerHTML = HTF.escapeHtml(before) +
+        '<mark class="title-hit"><span class="tag-shape" aria-hidden="true"></span>' + HTF.escapeHtml(hit) + '</mark>' +
+        HTF.escapeHtml(after);
     });
     if (state.nameQuery && window.HTF && HTF.tagShapes) HTF.tagShapes();
   }

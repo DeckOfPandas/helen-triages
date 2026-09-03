@@ -1,6 +1,6 @@
 // assets.js
 // =============================================================================
-// BASE URL AND SVG ASSET LOADING — the single source for both.
+// BASE URL, SVG ASSET LOADING, AND THE HELPERS BOTH INDEX PAGES SHARE.
 // =============================================================================
 // Must be the FIRST script loaded. Everything that reaches for a file under
 // assets/ goes through here.
@@ -17,6 +17,13 @@
 // a wrong baseurl produced a site with no decoration at all and a completely
 // clean console. That is the worst possible diagnostic position, and it is what
 // fetchSvg below is really for.
+//
+// THE SAME ARGUMENT ADDED TWO NON-ASSET HELPERS, GitHub issue #686. escapeHtml
+// and the sessionStorage index memory were each written twice, once in
+// filters.js and once in cocktail-index.js, and were identical in both. This is
+// the file every page loads first and the namespace every other script already
+// reaches into, so it is where a thing that belongs to both indexes lives.
+// Neither knows which site it is on; that is what makes them shareable at all.
 // =============================================================================
 
 window.HTF = window.HTF || {};
@@ -177,6 +184,33 @@ window.HTF = window.HTF || {};
       .map(function (o) { return o.n; });
     var idx = 0;
     return function () { return shuffled[idx++ % shuffled.length]; };
+  };
+
+  // --- HTML escaping ---------------------------------------------------------
+  /**
+   * Escape a string for insertion into HTML.
+   *
+   * Both indexes rebuild a title with a <mark> around the matched run, which
+   * means building HTML from text that came out of a recipe or drink file —
+   * Helen's own prose, not an attacker's, but "Bangers & Mash" is enough to
+   * make the point, and the escaping is what keeps an ampersand an ampersand.
+   *
+   * FIVE CHARACTERS, NOT THE THREE THE TWO COPIES ESCAPED. `&`, `<` and `>` are
+   * all a text position needs; the quotes cost nothing there (a browser renders
+   * &quot; as ") and mean the same call is still right the first time somebody
+   * builds an attribute value with it. `&` is replaced FIRST, or the escapes
+   * would then be escaped again into &amp;lt;.
+   *
+   * @param {string} text
+   * @returns {string}
+   */
+  HTF.escapeHtml = function (text) {
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   };
 
 })(window.HTF);
