@@ -4078,6 +4078,35 @@ matched. **LEAVE OUT has no hue at all** and the absence is the decision —
 Helen: *"for food, avoiding can be important whereas for drinks surely less
 so."* Food gave its LEAVE OUT a sixth colour; this deliberately does not.
 
+> ### THE INDEX HEADINGS ARE A RAMP, ONE BAR EACH — 2026-09-03
+>
+> The table above is still the accent inventory; the five INDEX HEADINGS no
+> longer read straight off it. They went to five greens over a shared absinthe
+> bar on 2026-08-30, the design audit found the greens indistinguishable in a
+> bar 0.38em tall (critical #4), and Helen chose from three candidates rounds:
+>
+> - **reposado → coral `#FD6758` → hot pink `#FD5289` → cosmopolitan →
+>   yvette**, top to bottom. The ends and centre are accents already doing
+>   those jobs (ship mark, matched ingredient, title hit); the two steps are
+>   interpolated in OKLCH on the short arc through red. *"The ramp colours
+>   are gorgeous!"*
+> - **one bar, not two.** *"Ramp alone, gorgeous!!!!"* The shared absinthe bar
+>   read as messy under a ramp; a pink under-bar was *"a lot of pink up top,
+>   even for me"*. `heading-rule` in `cocktails/_rule.scss` is single-bar now
+>   and draws the top bar's geometry, solid. `$color-heading-shared` is gone.
+> - **the section's colour reaches the card**, reversing 2026-08-30's "magenta
+>   means matched everywhere": a chosen filter word underlines in its
+>   section's colour, a matched MOOD chip lights coral, a matched HASSLE chip
+>   hot pink, a matched ingredient cosmopolitan, the title hit yvette. Helen,
+>   on a card carrying three: *"There's a lot going on... But I genuinely
+>   think it's really pretty!"* Cosmopolitan means HAS TO HAVE again; hover
+>   keeps it for "this one", the one place two meanings share a hue.
+>
+> The same day the headings went to **weight 400** (#680, and the drink page's
+> to 1.8rem for #679 point 4): bold light-on-dark stems bloom into the punched
+> highlight and read as smudged. `_filters.scss`'s `.drink-field-label` has
+> the mechanism; `index-section-label` grew a `$weight` argument for it.
+
 **A heading's colour is a promise the card already keeps.** That is the rule
 that makes five hues feel inevitable rather than decorative: MOOD is green
 because the glass panels are green, YOLO is reposado because the ship mark is,
@@ -4554,6 +4583,23 @@ from it. Read `_sass/cocktails/_cocktail.scss` end to end before touching this
 page again — its header carries the anatomy and the colour jobs in full, and
 this section is the shorter pointer to that, not a duplicate of it.
 
+> ### #679, 2026-09-03 — THE TITLE WAS RENDERING AT TWICE ITS STATED SIZE
+>
+> `.cocktail-title` is an `h1` at `display: contents` inside the tape word,
+> and the UA stylesheet's `h1 { font-size: 2em }` still reaches its text: a
+> tape declared at 2.2rem carried a 4.4rem title, and the tape's em-based
+> padding, computed from the smaller number, gave half a card's proportion.
+> Helen's "the font is too big" and "no space (spare tape) at all either side
+> of the name" were one default. `font-size: 1em` on the h1 is the fix; the
+> size she then chose by looking is **3.2rem**, written as such. The tape
+> takes the card's own horizontal padding and the brief's 0.5em vertical; the
+> meta row's gap is 5rem; the glass is **absinthe, stroke 3, and never
+> shorter than `$glass-min` (14rem)** — it hangs below the rule in the margin,
+> and below 1180px the head holds itself open for it. Section headings are
+> 1.8rem / weight 400, absinthe over yvette (NOTES: over lagoon), and each
+> ingredient name carries one yvette-deep `text-decoration` band. **Not yet
+> seen on an iPad** — Helen can only check that after a deploy.
+
 **The anatomy.** The glass sits in the page's left margin above 1180px (large,
 top-aligned with the title) and tucks inline below that width, as it always
 has — only the WIDTH changed, to a clamp derived from the margin itself (see
@@ -4567,10 +4613,17 @@ through `_includes/cocktails/ship.html` — the SAME include the index card now
 calls, factored out so a card and this page can never render one rung two
 different ways. Mood chips are the card's own `.drink-card-mood` spans (not
 its `<button>`s — this page has no filter list for a click to narrow).
-INGREDIENTS / METHOD / NOTES follow, each with its own two-bar heading mark
+INGREDIENTS / METHOD / NOTES follow, each with its own heading mark
 (`@include heading-rule`, moved to `_sass/cocktails/_rule.scss` so the index's
 filter headings and this page's section headings share one mixin rather than
-two lookalikes).
+two lookalikes — **and parted from it on 2026-09-03**: the index's mixin went
+single-bar for its ramp, while these three call `overlapping-rule-double`
+directly with ABSINTHE as the upper bar and yvette, yvette, lagoon in front
+beneath, which is food's construction in this site's colours. Helen: the
+brief's "yvette over absinthe" double rule had been aimed at these headings,
+"not ingredients, my apologies". Each ingredient NAME now carries one
+yvette-deep `text-decoration` band instead, 0.2em below the baseline — the
+heading geometry had put the double rule through the lowercase letters).
 
 **Nothing leaves the DOM.** One class (`is-making`), and the stylesheet hides
 what the state does not want, so the page prints whole and reads whole with
@@ -4598,6 +4651,12 @@ of one colour, two jobs (absinthe is home and mood). **Radiant reposado came
 off notes entirely** — it is the verdict's colour (the ship mark) and a note
 card must not borrow it; section rules and note cards never use pink,
 curaçao, or (on notes specifically) yvette.
+
+**Section headings are 1.8rem and weight 400 since 2026-09-03** — #679 point
+4, Helen: *"INGREDIENTS and METHOD feel very small. They're larger on food
+recipe pages and I prefer that."* The paragraph below records the 1.35rem
+round and its reasoning, which still binds for the SIZE FLOOR; the weight is
+the index's finding (#680).
 
 **Section headings are 1.35rem again, and the size is still load-bearing, not
 loud.** `$emboss-stroke` is 1.6% of font-size, so at the 0.76rem they opened
@@ -6883,7 +6942,8 @@ a document (space isolates the one section you're mid-task on).
 first finding: the first recipe sat ~1,200px down at desktop and the page
 opened as an instrument panel with no output). Section gap 1.5rem → 0.75rem,
 label-to-buttons gap 0.75rem → 0.5rem, panel top padding 1rem → 0.3rem, the
-filter headings 1.35rem → 1.05rem (cocktails 1.6rem → 1.2rem), and the
+filter headings 1.35rem → 1.05rem (cocktails 1.6rem → 1.2rem, then back up
+to 1.4rem at weight 400 on 2026-09-03 for #680 — §9.13), and the
 survivor count's margins pulled up on both sites. Helen chose this
 ("tighten") over three louder candidates — one row per group behind a "more"
 link ("loses what the page is here for"), a side rail ("makes the page look

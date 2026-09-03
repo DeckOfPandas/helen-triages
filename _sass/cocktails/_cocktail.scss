@@ -112,6 +112,7 @@
 // inline layout — the formula already gives the small size there.
 $glass-col: clamp(7rem, calc((100vw - #{$width-content}) / 2 - 3.5rem), 12.5rem);
 $glass-gap: $spacing-section-gap;
+$glass-min: 14rem;   // the drawing's floor -- see `.cocktail-glass-icon`'s min-height
 $head-pad-bottom: 1.4rem;
 
 // WHERE THE GLASS STARTS, and why it is not zero. The block's top is the top
@@ -125,8 +126,8 @@ $head-pad-bottom: 1.4rem;
 // changes. Half-leading is exact arithmetic; the second term is the remaining
 // gap between the em box and the cap height, which depends on the font's own
 // metrics and is measured. Named separately so it is obvious which is which.
-$title-size:         2.2rem;
-$title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;  // 0.715rem
+$title-size:         3.2rem;   // the tape's font-size, `.cocktail-title-block .drink-card-name`
+$title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;
 $title-cap-inset:    0.14rem;   // em box top -> cap top, Courier Prime
 $glass-top:          $title-half-leading + $title-cap-inset;
 
@@ -190,6 +191,16 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   .cocktail-title-block { padding-left: calc(#{$glass-col} + #{$glass-gap}); }
   .cocktail-glass-icon  { left: 0; right: auto; }
 
+  // THE HEAD HOLDS ITSELF OPEN FOR THE GLASS'S FLOOR. Inline, the drawing has
+  // the ingredients beneath it rather than an empty margin, so where the words
+  // are shorter than $glass-min the block grows to fit the glass instead of
+  // the glass hanging over the list. Border-box (shared/_base.scss), so the
+  // block's own bottom padding is inside this number: the glass runs from
+  // $glass-top down to that padding, and this is exactly that span.
+  .cocktail-title-block {
+    min-height: calc(#{$glass-top} + #{$glass-min} + #{$head-pad-bottom});
+  }
+
   // A drink with no glass gets no reservation — 17 of them have none, and an
   // empty 9rem gutter beside the title would read as a missing image rather
   // than as a drink that never named a glass. See #491. Only needed here:
@@ -242,8 +253,20 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // which is exactly what makes a long name truncate on this page the same way
 // it does on a card, one mechanism rather than two. The class survives so the
 // DOM keeps a real, styleable h1 rather than only a bare element with no hook.
+//
+// `font-size: 1em` IS THE FIX FOR #679 POINT 1, AND IT IS A BROWSER DEFAULT
+// BEING UNDONE, NOT A TASTE CALL. `display: contents` drops the h1's box and
+// nothing else: its inherited-into-text properties still apply, and the UA
+// stylesheet gives every h1 `font-size: 2em`. So the title rendered at TWICE
+// the tape's size -- 4.4rem when this file said 2.2rem -- and the tape's own
+// em-based padding, computed from the smaller number, came out at half the
+// proportion a card gets. Helen (2026-09-03): "the font is too big", and
+// "there isn't any space (spare tape) at all either side of the name" --
+// one cause, two symptoms. Measured off her screenshots rather than guessed:
+// 18 characters of Courier at 2.2rem should span 24.8rem and spanned ~46.
 .cocktail-title {
   display: contents;
+  font-size: 1em;
 }
 
 // THE TAPE, SCALED UP FOR THE PAGE. `.drink-card-name`, `.drink-card-tape` and
@@ -263,16 +286,35 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     // MATCHED TO FOOD'S `.recipe-title-text` — 2.2rem — HANDOVER §9.13 asked
     // for the two sites' recipe titles to agree, and this is the tape's own
     // font-size doing that job now instead of the old bare h1's.
-    font-size: 2.2rem;
+    //
+    // 3.2rem SINCE 2026-09-03, AND THAT IS THE SIZE HELEN CHOSE, NOT A
+    // DOUBLING OF IT. The number above never rendered: the h1 inside the tape
+    // was taking the UA's `font-size: 2em` on top of it (see `.cocktail-title`
+    // above), so "2.2rem" was 4.4rem on screen, and the candidate she picked
+    // as "1.6rem" from a page of three was 3.2rem on screen. That rendered
+    // size is what she looked at and said yes to, so it is the number written
+    // here now that the h1 inherits honestly. Food's title is 2.2rem; the two
+    // sites' titles no longer agree, and that is her call from looking at
+    // this page rather than a drift.
+    font-size: 3.2rem;
     margin: 0 0 $space-sm;
   }
 
+  // THE CARD'S OWN HORIZONTAL PADDING, AND THE BRIEF'S VERTICAL. Helen's brief
+  // gave the page "tape padding 0.5em 0.85em"; on 2026-09-03, having seen the
+  // spare tape it left either side of a name, she withdrew the horizontal
+  // half: "Whatever I said in the brief, please try using the same amount of
+  // space (proportional) as the cards." So $card-tape-pad-x from the card's
+  // own `.drink-card-tape` rule (_cards.scss) applies here untouched, in em of
+  // the title, which is the proportion she asked for by construction. The
+  // brief's 0.85em had been chosen against a title rendering at twice its
+  // stated size, so it was solving a problem that is gone.
+  //
+  // The vertical half she kept, from a switch on the built page: the card's
+  // 0.75em at a 3.2rem title is a 8rem band, and 0.5em is the one she chose.
   .drink-card-tape {
-    // Helen's brief: "tape padding 0.5em 0.85em" — looser than the card's
-    // 0.75em/1.05em (_cards.scss's `$card-tape-pad-y`/`-x`), which were tuned
-    // for a 1rem card title and read as too generous once the em unit scales
-    // with 2.2rem type instead.
-    padding: 0.5em 0.85em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
   }
 }
 
@@ -378,7 +420,13 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // $spacing-section-gap, unchanged from the old rule's own finding: GLASS,
   // GARNISH and SHIP IT? are three independent facts, not a list, and reads
   // cramped at anything smaller once the labels are this size.
-  gap: $spacing-section-gap;
+  //
+  // 5rem SINCE 2026-09-03 -- #679 point 3, Helen: "glass, garnish and ship
+  // are far too close together, because they're hard to read." Chosen from
+  // the built 3rem, 5rem, three equal columns and spread-to-the-right-edge
+  // on the real page; the wider gap keeps the three reading as a row from the
+  // left, which the two full-width options lost.
+  gap: 5rem;
 
   > div {
     display: flex;
@@ -462,8 +510,21 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // same device the index's five filter headings already use), and an h2 is
 // block-level — the mark has to sit on something inline, or it paints the
 // full width of the heading's box rather than hugging the word.
+//
+// 1.8rem AND WEIGHT 400, 2026-09-03 -- #679 point 4, Helen: "INGREDIENTS and
+// METHOD feel very small. They're larger on food recipe pages and I prefer
+// that." So food's `.recipe-section-heading` size after all, a day after the
+// paragraph above argued its way back down from it; the brief that set
+// 1.35rem is superseded by her reading the page. The weight is the index's
+// finding (#680, `_filters.scss`'s `.drink-field-label`): on this ground a
+// bold punched heading blooms into its own highlight and reads as smudged,
+// and regular weight is the correction. One rule for punched headings on
+// black, applied on both pages the same day rather than on one and then
+// rediscovered on the other. shared/_base.scss's h1/h2/h3 rule sets 700, so
+// it is restated here.
 .cocktail-section-heading {
-  font-size: 1.35rem;
+  font-size: 1.8rem;
+  font-weight: 400;
   letter-spacing: 0.08em;
   margin: 2.25rem 0 $space-lg;
 
@@ -484,13 +545,27 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // suggestion's colour (ASKED FOR, on the ingredient line below) and curaçao is
 // the verdict's (the ship mark); a section rule wearing either would make a
 // promise the section itself is not the answer to.
+//
+// ABSINTHE OVER YVETTE, A DOUBLE RULE, SINCE 2026-09-03 -- and this is the
+// brief's own sentence landing where it was aimed. Helen: "In my brief I had
+// intended to say can we do absinthe over yvette as a double underline for
+// the section headings, not ingredients, my apologies. This would be a nice
+// echo back to the food site too." It is: food's section mark is the section
+// colour as the upper bar with violet in front beneath it, and this is the
+// same construction in this site's two colours -- the home green above, the
+// "what is in it" violet below. `overlapping-rule-double` directly, because
+// `heading-rule` (cocktails/_rule.scss) went single-bar the same day for the
+// INDEX, where a ramp anchors itself; here the two colours ARE the mark.
+//
+// NOTES KEEPS ITS OWN LOWER COLOUR, lagoon, under the same absinthe -- the
+// note cards' bars and labels are lagoon, and the heading is what ties them.
 .cocktail-section-heading--ingredients span,
 .cocktail-section-heading--method span {
-  @include heading-rule($color-ultra-yvette);
+  @include overlapping-rule-double($color-electric-absinthe, $color-ultra-yvette);
 }
 
 .cocktail-section-heading--notes span {
-  @include heading-rule($color-luminous-lagoon);
+  @include overlapping-rule-double($color-electric-absinthe, $color-luminous-lagoon);
 }
 
 // SIZED BY HEIGHT, NEVER WIDTH, and this is the whole reason the icons keep
@@ -520,6 +595,19 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   top: $glass-top;
   bottom: $head-pad-bottom;
   width: $glass-col;
+  // NEVER SHORTER THAN $glass-min, 2026-09-03. "As tall as the title block"
+  // (above) tied the drawing's height to the words beside it, and once the
+  // title was one line at its true size (see `.cocktail-title`) the head
+  // was short and the hero glass with it -- Helen: "our glass styling has
+  // fallen off... It looks much better on the narrower screen actually",
+  // where the title wrapped and the head was taller. A minimum breaks the
+  // tie in one direction only: a tall head still stretches the glass; a
+  // short one no longer shrinks it. Above 1180px the drawing hangs below
+  // the rule in the margin, where nothing else is; below, the head holds
+  // itself open for it (see the media block that tucks the glass inline).
+  // Chosen from 14rem and 18rem on the real page. The stable top edge that
+  // "as tall as the title block" was built for survives: `top` is unchanged.
+  min-height: $glass-min;
   display: flex;
   // TOP-ALIGNED, shipped. Helen looked at this against centred and chose it:
   // every glass on every drink now starts at the same y, level with the title
@@ -574,10 +662,15 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 //
 // Set the weight here and nowhere else. If a glass ever looks wrong, the
 // artwork is wrong, not this number.
+//
+// 3, UP FROM 1.6, 2026-09-03 -- Helen: "bigger, bolder and absinthe", chosen
+// against 1.6 and 2.2 on the real page. The card keeps its own 1 (_cards.scss
+// scopes it under `.drink-card-glass`); this is the hero drawing on the page
+// that exists for it, and at 14rem tall a 1.6 line read as a wire.
 .glass-icon-line {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.6;
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
@@ -608,8 +701,15 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // only place a colour is written down (three-layer rule). The exported SVGs had
 // #4c4c4e baked into all 104 paths; that is stripped at normalisation, and an
 // inline fill would beat this rule anyway and make the palette look broken.
+//
+// ABSINTHE, NOT GREY, SINCE 2026-09-03 -- Helen: "I think our glass styling
+// has fallen off. Can the glass be bigger, bolder and absinthe?" It was
+// $color-clear-text, a de-emphasised grey, on a page whose hero it is; the
+// card draws its glass in the home colour (_cards.scss, "there is no panel
+// behind the glass") and §9.13's premise is that the drawings carry the
+// personality food gets from colour. Grey was the drawing carrying none.
 .cocktail-glass-icon {
-  color: $color-clear-text;
+  color: $color-electric-absinthe;
 }
 
 // =============================================================================
@@ -698,23 +798,37 @@ $amount-indent: $amount-col + $amount-gap;
   font-size: 1rem;
 }
 
-// THE NAME'S OWN DOUBLE-RULE UNDERLINE — Helen's brief: "Double rule underline
-// under ingredients, under the word only, yvette over absinthe -- yvette
-// showing what is in something." `overlapping-rule-double` directly, not the
-// `heading-rule` wrapper (_sass/cocktails/_rule.scss) that draws the section
-// heading's own version of this mark: the wrapper's name says HEADING and this
-// is an ingredient name, so calling the wrapper here would be borrowing a name
-// that no longer describes what it is doing even though the underlying device
-// is identical. Every dial is EM, so the mark scales correctly at this
-// element's 1rem exactly as it does at the section heading's 1.35rem — one
-// geometry, read against whatever font-size sits on it.
+// THE NAME'S OWN UNDERLINE: ONE YVETTE BAND, UNDER THE WORD. The brief's
+// "double rule underline under ingredients... yvette over absinthe" was
+// meant for the section headings (Helen, 2026-09-03: "not ingredients, my
+// apologies"), and with the headings carrying it "the yvette under the
+// ingredients list items is its own highlight again" -- one colour, saying
+// what is in the drink, under each thing that is.
+//
+// `text-decoration`, NOT THE HEADING GEOMETRY. The double mixin positions
+// its bars from the top of the box, solved for uppercase Courier at heading
+// size; on a lowercase sans name at 1rem they landed through the letters
+// rather than under them ("those ingredient list underlines are too high").
+// A decoration hangs off the baseline, which is the fact a lowercase word
+// actually has -- and it wraps, which a name with a long bottle list beside
+// it needs. Same device and near the same numbers as `.drink-card-hit`, the
+// matched ingredient on a card (_cards.scss): this is the same claim about
+// the same kind of thing, made on the page instead of the card.
+//
+// -deep, as the title hit is, because bare yvette is the one accent too dark
+// to read as a mark on this ground (3.52:1; _palette.scss). The heading bar
+// above stays bare because it is wide enough to carry the darker value.
 //
 // SCOPED TO THE NAME ONLY, never the bottle suggestion that can follow it in
 // brackets — Helen's brief again: the suggestion is a different colour making a
 // different claim, and the template gives it its own span for exactly this
 // reason (see _layouts/cocktail.html).
 .cocktail-item-name {
-  @include overlapping-rule-double($color-ultra-yvette, $color-electric-absinthe);
+  text-decoration: underline;
+  text-decoration-color: $color-ultra-yvette-deep;
+  text-decoration-thickness: 0.16em;
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: none;
 }
 
 // The bottle, in brackets after the class — #544, Helen 2026-08-29: "London dry

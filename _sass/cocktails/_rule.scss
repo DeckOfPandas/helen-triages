@@ -207,12 +207,42 @@ $emboss-cocktails-vars-emitted: false !default;
 // assets/css/cocktails.scss), so a mixin the drink page could reach had to live
 // somewhere both files import; this file already sits before both.
 //
-// A THIN WRAPPER OVER `overlapping-rule-double`, and staying one is the point.
-// That mixin is the shared geometry (shared/_rule.scss), so this file names only
-// what genuinely differs per call site: which colour sits on top of the shared
-// absinthe bar. Duplicating the geometry here a second time is the exact mistake
-// this mixin was extracted to stop repeating — see overlapping-rule-double's own
-// header for the four-round bug that cost.
+// ONE BAR, NOT TWO, SINCE 2026-09-03. Helen, choosing from a candidates page
+// on the real index with the reposado-to-yvette ramp on top of three different
+// under-bars: "Ramp alone, gorgeous!!!!" The shared absinthe bar under every
+// heading was the "stability" she chose on 2026-08-30 -- when the five bars
+// above it were five greens and needed a common anchor. A ramp anchors itself:
+// its steps are visibly one line, so the shared bar read as messy rather than
+// steady ("ramp over absinthe is actually messy, which is a shame"). The pink
+// under-bar that would have tied the headings to the card lights was "a lot of
+// pink up top, even for me".
+//
+// THE GEOMETRY IS THE TOP BAR OF `overlapping-rule-double`, exactly, so a
+// single bar here sits where the upper bar of food's double mark sits: same
+// $rule-drop, same $rule-thickness, same $rule-indent and $rule-overhang. It
+// is NOT `overlapping-rule-single`, which paints the thin LOWER bar's geometry
+// at $rule-front-opacity -- a mark solved for a different job on food's recipe
+// page. Solid, because the top bar of the double has always been solid; the
+// opacity belongs to the bar that overlaps, and nothing overlaps here.
+//
+// Names the shared $rule-* variables rather than restating their values, so if
+// the mark moves on food it moves here: that was the whole argument for
+// extracting overlapping-rule-double in the first place, and it still holds
+// with one bar.
 @mixin heading-rule($colour) {
-  @include overlapping-rule-double($colour, $color-heading-shared);
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+
+  padding-right: $rule-overhang;
+  // Same vertical room the double mixin reserves. The bar itself ends at
+  // 1.08em, inside Courier's ~1.13em content box, but the padding is what
+  // keeps this heading's box the same height as a double-ruled one, so the
+  // index's label rows do not shift by a few pixels for the loss of a bar.
+  padding-bottom: 0.45em;
+
+  background-image: linear-gradient($colour, $colour);
+  background-repeat: no-repeat;
+  background-size: calc(100% - #{$rule-indent}) #{$rule-thickness};
+  background-position: #{$rule-indent} #{$rule-drop};
 }

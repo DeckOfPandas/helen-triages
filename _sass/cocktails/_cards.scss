@@ -602,12 +602,25 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // five shades of green now, and §12's rule is that the eye reads hue rather
   // than lightness -- so pointing back was going to stop working anyway, and
   // one clear "this matched" is worth more than five near-identical ones.
-  &.is-match,
-  &--hassle.is-match {
-    background: $color-cosmic-cosmopolitan-wash;
-    border-color: $color-cosmic-cosmopolitan-deep;
+  //
+  // AND BACK TO THE SECTION'S OWN COLOUR, 2026-09-03, because the headings
+  // are a ramp now and a chip CAN point back at one. A matched mood chip
+  // wears MOOD's coral and a matched hassle chip wears HASSLE's hot pink --
+  // the heading's own variables, so the promise and the thing that keeps it
+  // are one value. Helen chose it off a card carrying both plus a magenta
+  // ingredient band: "There's a lot going on... But I genuinely think it's
+  // really pretty!" The whole rule is written once, at _palette.scss's
+  // heading bars.
+  &.is-match {
+    background: $color-heading-mood-wash;
+    border-color: $color-heading-mood;
     color: $color-text;
     font-weight: 600;
+  }
+
+  &--hassle.is-match {
+    background: $color-heading-hassle-wash;
+    border-color: $color-heading-hassle;
   }
 }
 
