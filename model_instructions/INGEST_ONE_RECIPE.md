@@ -21,6 +21,31 @@ not garbling, and the quality of the rewritten method.
 
 ---
 
+## 0. How to hand this back
+
+Helen pastes what you write into a GitHub Issue on her private drafts
+repository, `helen-triages-food-private`, titled `ingest: <slug>` and labelled
+`ingest`. A script there parses it, so the shape matters: anything missing is a
+rejection rather than a guess. `INGEST_INBOX_DESIGN.md` §6 is the reference and
+this is the short form.
+
+Four parts, in this order, and nothing else at the top level:
+
+1. `<!-- ingest v1 food -->`, as the first non-blank line. Exactly that.
+2. **One** fenced `yaml` block, and only one — the complete file, front matter
+   and all, beginning `---`.
+3. A `## What I could not know` heading with your list under it. If there is
+   genuinely nothing, write "nothing"; the heading is never absent.
+4. A `## Fingerprint` heading, then ONE line: the title lowercased, then every
+   amount in ingredient order, separated by ` | `. For the worked example in §9
+   that is `crispy sage butter gnocchi | 500 g | 60 g | 12 | 1 | 30 g`.
+
+**The fingerprint is how her repo tells a real duplicate from two dishes
+sharing a name**, so the amounts must be the ones in the file, in the file's
+own order, and an ingredient with no amount contributes nothing.
+
+---
+
 ## 1. The one rule that matters more than the rest
 
 > **IS THE ANSWER IN THE SOURCE, OR IN HELEN'S HEAD?**
@@ -100,7 +125,7 @@ stripped in a filename even though they are kept in the title.
 | `star_ingredient` | Section 4. **Optional** — leave it out rather than force one. |
 | `tags` | Section 4. Only from the declared list. |
 | `ingredient_groups` | Below. |
-| `method` | Section 3 — the part that matters most. |
+| `method` **xor** `method_groups` | Section 3 — the part that matters most. Flat `method:` for a recipe with one phase, `method_groups:` when the source has more. **Never both** — the layout renders one and silently drops the other. |
 | `method_short` | Always exactly `[""]`. It means "not written", and Helen writes it herself. |
 | `notes` | A list. Each entry is a bare string, or `{label: "Sinking", text: "…"}`. Three at most; more than that and the material wants to be prose. |
 | `meta` | Exactly these three keys, in this order, all `false`. See below. |
@@ -197,6 +222,40 @@ remedy for a problem the instruction already prevents.
 
 A step may be two short sentences. It is often better as two.
 
+### `method_groups` — split the phases here, or nobody ever will
+
+**If the source's method has phases, split it once, now.** A custard then a
+meringue then the assembly; a marinade then a grill; a dough that proves while
+a filling is made. This is the same rule the ingredient groups follow and for
+the same reason: it is cheap while the whole recipe is in front of you and
+expensive afterwards, when it means re-reading a page that may be gone.
+
+`method_groups:` replaces `method:`. **Never write both** — they are mutually
+exclusive and a file carrying both renders one and silently drops the other.
+Every group needs a `name` and a non-empty `steps`, and the pairs work exactly
+as they do above:
+
+```yaml
+method_groups:
+  - name: custard
+    steps:
+    - "QQ original Whisk the yolks and sugar together until pale, then pour on the hot milk in a thin stream, whisking all the time."
+    - "QQ Claude Whisk the yolks and sugar pale. Pour on the hot milk in a thin stream, whisking."
+  - name: assembly
+    steps:
+    - "QQ original Spoon the custard over the sponge and leave it to set in the fridge for at least four hours."
+    - "QQ Claude Spoon the custard over the sponge. Set in the fridge, 4 hours."
+```
+
+**`name:` is a bare noun** — `custard`, not `for the custard`. The template
+supplies "For the " itself, so an article there renders as "For the for the
+custard". `steps`, plural: a `step:` typo produces a group with no content and
+no error.
+
+**One phase means flat `method:`.** Do not invent a second group to use the
+field, and do not split a recipe the source ran as one sequence — that is
+restructuring somebody else's recipe, which §3's rules forbid everywhere else.
+
 ### What the rewrite must NOT change
 
 - **Never invent a temperature, a time or a quantity the source does not give.**
@@ -232,13 +291,17 @@ term.
 ### `tags` — pick from these 22 and no others
 
 **Mood** — *what you feel like eating, a craving:*
+<!-- vocab:tags:mood start -->
 `bakes`, `carbs party`, `cheese-tastic`, `dessert`, `drinks`, `fakeaway`,
 `hot snack`, `ice cream`, `nibbles`, `one-handed food`, `salad`, `showstopper`,
 `soup`, `sweets`, `virtuous`
+<!-- vocab:tags:mood end -->
 
 **Practicalities** — *what the occasion demands of you, regardless:*
+<!-- vocab:tags:practicalities start -->
 `breakfast`, `extras`, `festive`, `freezable`, `make-ahead`, `no-cook`,
 `starter`
+<!-- vocab:tags:practicalities end -->
 
 Meanings you would not guess:
 
@@ -263,8 +326,10 @@ for her to fix, so propose rather than agonise — but propose only from the lis
 
 ### `star_ingredient` — one of these 14, or omit
 
+<!-- vocab:stars start -->
 `beef`, `chocolate`, `duck`, `eggs`, `fruit`, `game`, `greens`, `lamb`,
 `oily fish`, `pork`, `poultry`, `root veg`, `shellfish`, `white fish`
+<!-- vocab:stars end -->
 
 **It is the one thing the recipe is ABOUT, and about a quarter of her collection
 correctly leaves it blank.** A plain sponge, a dressing, a spice blend has no
@@ -297,6 +362,11 @@ cheese`, `cream cheese`). Leave out frying and greasing oil.
 
 `source_type` is one of exactly these words. `magazine` is not one of them; a
 magazine is a `publication`.
+
+<!-- vocab:source_types start -->
+`author` · `book` · `joke` · `person` · `place` · `publication` · `unknown` ·
+`website`
+<!-- vocab:source_types end -->
 
 | `source_type` | `source` shape | Example |
 |---|---|---|
@@ -345,11 +415,32 @@ website). Keep one that points into the same book the recipe came from.
 - **British spellings** throughout.
 - **Times**: `20 mins`, `1 hr 30 mins`, `2 hrs` in the metadata fields;
   `mins` / `hours` / `seconds` in prose. Only numeric quantities abbreviate.
-- **Accents on food words**: crème fraîche, sauté, purée, jalapeño, comté,
-  mangetout, consommé, soufflé, crudités, açaí, piña, mole poblano. In prose
-  only — never in the filename, and never in `source`.
 - Cross-recipe links, if you write one at all, are relative markdown:
   `[display text](../other-slug/)`. Never root-relative.
+- **Accents on food words** — the two lists below. In prose only, never in the
+  filename and never in `source`.
+
+**The accented spellings her house style declares:**
+
+<!-- vocab:accents start -->
+açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
+chèvre · comté · consommé · crème · crémeux · crêpe · crêpes · crudités ·
+éclair · éclairs · entrecôte · flambé · fraîche · frisée · gâteau · glacé ·
+gougère · gougères · gruyère · jalapeño · jalapeños · marinière · niçoise ·
+pâté · pâtisserie · pâtissière · piña · purée · puréed · purées · ragù · rösti ·
+sauté · sautés · sautéed · soufflé · soufflés · velouté
+<!-- vocab:accents end -->
+
+**And the words that keep NO accent**, which is the half worth reading twice —
+every one of them looks French enough to accent, and accenting one is a
+correction somebody then has to undo:
+
+<!-- vocab:no_accent start -->
+echalion · chorizo · gratin · julienne · vinaigrette · dauphinoise · mornay ·
+confit · mole · poblano
+<!-- vocab:no_accent end -->
+
+Anything not on either list, leave as the source spells it.
 
 **All of this is mechanically fixable in her repo and none of it is worth
 agonising over.** Get it right where it is easy; do not let it slow down section 3.

@@ -34,10 +34,21 @@ agent that wrote this file, none by re-reading:
 They began as `tmp/check_doc_example.py` and `tmp/check_cocktail_doc.py`.
 Helen, 2026-09-02: "It sounds very much like they should form part of our
 suite." They do now, and `tmp/` is not where a guard should live.
+
+THE ASYMMETRY IS NARROWED, NOT ABANDONED, SINCE 2026-09-02. Each vocabulary now
+sits between `<!-- vocab:<name> start -->` markers and is rendered by
+`scripts/build_ingest_vocab.py` from the same loaders below;
+`test_every_vocab_block_matches_its_generator` runs that script's `--check` and
+fails if a committed block has drifted in either direction. That is a two-way
+guard applied ONLY where the duplication is mechanical. The prose around each
+block -- the "meanings you would not guess" bullets, the four garnish rules,
+the worked examples -- is judgement, is still hand-written, and is still guarded
+one way only. INGEST_INBOX_DESIGN.md §5 is the argument for the split.
 """
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 
 import pytest
@@ -110,13 +121,24 @@ def _example(text: str, marker: str) -> dict:
 
 
 def _flat(text: str) -> str:
-    """Whitespace-normalised, because the documents are hard-wrapped.
+    """Whitespace-normalised and with the `<!-- vocab: -->` markers removed.
 
-    THE FIRST VERSION OF THE DRIFT SCAN DID NOT DO THIS and reported twelve
-    stale vocabulary entries, every one of them a line break inside a string.
-    HANDOVER 12: be suspicious of your own findings before reporting them.
+    THE FIRST VERSION OF THE DRIFT SCAN DID NOT NORMALISE WHITESPACE and
+    reported twelve stale vocabulary entries, every one of them a line break
+    inside a string. HANDOVER 12: be suspicious of your own findings before
+    reporting them.
+
+    THE MARKERS CAME OFF FOR THE SAME REASON, 2026-09-02. The garnish scraper
+    reads `**Group:** a · b · c` up to the next `*`, and the last group in the
+    section is now followed by `<!-- vocab:garnish end -->` with no asterisk
+    between them -- so it read `5 drops of olive oil <!-- vocab:garnish end -->`
+    as a garnish string and called it undeclared. That is a false finding about
+    the SCAFFOLDING, not a weakened check: a marker carries no vocabulary, the
+    generator's own test compares the block against `_data/` character for
+    character, and every real entry is still checked here. Dropping them is the
+    same class of normalisation as dropping the hard wrap that produced them.
     """
-    return re.sub(r"\s+", " ", text)
+    return re.sub(r"\s+", " ", re.sub(r"<!--.*?-->", " ", text, flags=re.S))
 
 
 def _declared_garnishes() -> set[str]:
@@ -157,6 +179,36 @@ def test_every_yaml_block_in_a_standalone_doc_parses(path):
             yaml.safe_load(block.strip().strip("-").strip())
         except yaml.YAMLError as exc:
             pytest.fail(f"{path.name} yaml block {i + 1} does not parse:\n{exc}")
+
+
+def test_every_vocab_block_matches_its_generator():
+    """The two-way half: what the documents print IS what `_data/` declares.
+
+    THE SAME CODE `--check` RUNS, imported rather than re-implemented, so the
+    script and the suite cannot disagree about what stale means -- the failure
+    that would matter here is a green test beside a script that says otherwise.
+
+    It fails in both directions, which the one-way checks below deliberately do
+    not: a retired garnish still printed, AND a newly declared one missing. The
+    distinction is that a marked block is mechanical duplication with a
+    generator behind it, so "the document has not caught up" is a five-second
+    fix rather than a two-repo edit -- which is the trade the one-way rule was
+    protecting the PROSE from, and prose is not what is inside these markers.
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from build_ingest_vocab import check  # noqa: E402
+
+    diff, problems = check()
+    assert not (diff or problems), (
+        "a vocabulary block in a standalone document no longer matches "
+        "`_data/`:\n\n"
+        + "\n".join(problems)
+        + ("\n" if problems else "")
+        + diff
+        + "\nRun: python3 scripts/build_ingest_vocab.py --write\n"
+          "Do NOT hand-edit inside a `<!-- vocab:... -->` pair; the script "
+          "owns those lines and the prose around them is yours."
+    )
 
 
 # =============================================================================
@@ -306,6 +358,33 @@ def test_every_tag_and_star_the_food_doc_prints_is_still_declared():
     )
 
 
+def test_the_food_docs_source_type_table_uses_declared_types():
+    """The citation table's first column, against the eight real types.
+
+    THE LIST ABOVE THE TABLE IS GENERATED AND THE TABLE ITSELF IS NOT: its
+    other two columns are the citation's shape and an example, which are
+    judgement and prose. So the table gets the same one-way check every other
+    hand-written vocabulary in these documents gets -- what it prints must
+    still be declared. `magazine` is the near-miss, and it has been typed by
+    hand once already; test_source_attribution.py's header tells that story.
+    """
+    from test_source_attribution import VALID_TYPES  # noqa: E402
+
+    flat = _flat(_doc(FOOD_DOC))
+    section = flat.split("`magazine` is not one of them")[1].split("**The date is")[0]
+    printed = {t for t in re.findall(r"\|\s*`([a-z]+)`\s*\|", section)}
+    assert len(printed) >= 6, (
+        f"only found {len(printed)} source type(s) in the food document's "
+        f"citation table; the scraper has gone stale against its formatting. "
+        f"An empty scan must never read as 'nothing wrong'."
+    )
+    stale = sorted(t for t in printed if t not in VALID_TYPES)
+    assert not stale, (
+        f"the food document's citation table prints source_type(s) that are "
+        f"not among the eight: {stale}"
+    )
+
+
 # =============================================================================
 # THE COCKTAIL DOCUMENT
 # =============================================================================
@@ -417,6 +496,64 @@ def test_every_vocabulary_the_cocktail_doc_prints_is_still_declared():
     assert len(glasses) >= 15, f"only found {len(glasses)} glasses printed"
     stale_glass = sorted(g for g in glasses if g not in _glass_icons())
     assert not stale_glass, f"document prints glass(es) with no icon: {stale_glass}"
+
+
+def test_every_declared_garnish_has_exactly_one_group():
+    """Ruling D11: the document's grouping is DATA, not a map in a script.
+
+    THE FILE ALREADY HELD THE ANSWER and the ruling's wording ("a `group:` key
+    per entry") is what it looks like from outside. `canonical:` is a mapping of
+    group name to list, so every declared garnish already sits in exactly one
+    group -- adding a per-entry key would mean turning each entry from a string
+    into a dict, which is the one change that would break
+    `_declared_garnishes()` in test_cocktails.py, in silence, for every drink.
+    INGEST_INBOX_DESIGN §5 allows the alternative outright: "a `groups:` map
+    from group name to list is acceptable". This is that map.
+
+    WHAT CHANGED IS THE CONTRACT, WHICH IS WHY THIS TEST EXISTS. garnish.yml
+    said the grouping was "for reading only" and it is now printed verbatim
+    into INGEST_ONE_COCKTAIL.md by scripts/build_ingest_vocab.py. A garnish
+    listed under two groups would print twice; a group renamed would rename a
+    heading in a document handed to a session that cannot check it.
+    """
+    vocab = _data("garnish")
+    groups = vocab.get("canonical") or {}
+    assert groups, (
+        "garnish.yml has no `canonical:` mapping, so the grouping this test "
+        "guards -- and the block the cocktail document prints -- has nothing "
+        "behind it. An empty scan must never read as 'nothing wrong'."
+    )
+
+    seen = {}
+    problems = []
+    for group, members in groups.items():
+        assert isinstance(members, list) and members, (
+            f"garnish group {group!r} is not a non-empty list."
+        )
+        for garnish in members:
+            if garnish in seen:
+                problems.append(
+                    f"{garnish!r} is in both {seen[garnish]!r} and {group!r}"
+                )
+            seen[garnish] = group
+
+    marker = vocab.get("no_garnish")
+    if marker in seen:
+        problems.append(
+            f"the no-garnish marker {marker!r} is declared under "
+            f"{seen[marker]!r}. It is the DECISION that a drink takes none, "
+            f"never a garnish, and printing it in a group would teach a "
+            f"reader to write it beside a real one."
+        )
+
+    assert not problems, (
+        "every declared garnish must sit in exactly one group -- the cocktail "
+        "document prints those groups verbatim:\n  " + "\n  ".join(problems)
+    )
+    assert set(seen) == _declared_garnishes() - {marker}, (
+        "the grouped garnishes and `_declared_garnishes()` disagree, which "
+        "means one of the two derivations has gone stale."
+    )
 
 
 def test_the_cocktail_docs_correction_map_matches_glasses_yml():

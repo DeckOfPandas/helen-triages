@@ -39,6 +39,7 @@ words:
   cremeux: crémeux
   crepe: crêpe
   crepes: crêpes
+  crudites: crudités
   eclair: éclair
   eclairs: éclairs
   entrecote: entrecôte
@@ -81,3 +82,5 @@ no_accent:
   - dauphinoise
   - mornay
   - confit
+  - mole        # mole poblano -- Helen, 2026-09-03: no diacritic on either word
+  - poblano

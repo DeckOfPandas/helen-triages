@@ -17,6 +17,31 @@ and the schemas share almost nothing.
 
 ---
 
+## 0. How to hand this back
+
+Helen pastes what you write into a GitHub Issue on her private drafts
+repository, `helen-triages-cocktails-private`, titled `ingest: <slug>` and
+labelled `ingest`. A script there parses it, so the shape matters: anything
+missing is a rejection rather than a guess. `INGEST_INBOX_DESIGN.md` §6 is the
+reference and this is the short form.
+
+Four parts, in this order, and nothing else at the top level:
+
+1. `<!-- ingest v1 cocktail -->`, as the first non-blank line. Exactly that.
+2. **One** fenced `yaml` block, and only one — the complete file, front matter
+   and all, beginning `---`.
+3. A `## What I could not know` heading with your list under it. If there is
+   genuinely nothing, write "nothing"; the heading is never absent.
+4. A `## Fingerprint` heading, then ONE line: the title lowercased, then every
+   amount in build order, separated by ` | `. For the worked example in §9 that
+   is `jungle bird | 45 ml | 22.5 ml | 15 ml | 15 ml | 45 ml`.
+
+**The fingerprint is what compares the FORMULA rather than the name**, which is
+the whole of §6's Sazerac trap made mechanical, so the amounts must be the ones
+in the file, in the file's own order.
+
+---
+
 ## 1. What is different about a cocktail, and it is the whole document
 
 A food ingest can fill in nearly everything, because the vocabularies are small
@@ -95,6 +120,8 @@ meta:
 | `mood` | **Always `mood: []`.** The key is required and the value is DERIVED in her repo by a script. Never write a mood yourself. |
 | `garnish` | **A LIST.** `[]` means nobody has filled it in; `["no garnish"]` means the drink genuinely takes none. Vocabulary in §4. |
 | `ingredients` | The FULL list, untriaged, **in build order**. §3. |
+| `ingredients[].item` | What the SOURCE called the pour, brand and all. **A drafts-only field** — §3. |
+| `ingredients[].character` | Why a drink wants a particular bottle. **Never yours to write** — §3. |
 | `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. |
 | `to_serve` | Presentation, not a further instruction. `"Straw."`, `"Two straws."` A terse noun phrase, or `""`. |
 | `notes` | A bare string, or `{label, text}`. Use one to record what the source could not give you. |
@@ -164,9 +191,32 @@ ingredients:
 > `"15 ml"`, `¼ oz` → `"7.5 ml"`, `2 oz` → `"60 ml"`.
 
 **Non-volumetric amounts are NOT converted and must not be.** `"2 dashes"`,
-`"1 drop"`, `"1 barspoon"`, `"1 pinch"`, `"1 whole egg"`, `"1 sugar cube"`,
-`"top"` — these have no millilitre figure and inventing one is worse than
-leaving them.
+`"1 drop"`, `"1 pinch"` — these have no millilitre figure and inventing one is
+worse than leaving them. These are the units her suite knows, and an amount
+whose unit is not one of them (and is not `ml`, `cl`, `oz` or `tsp`) fails a
+test rather than rendering:
+
+<!-- vocab:measures start -->
+`dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
+`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `g` ·
+`to top` · `to rinse`
+<!-- vocab:measures end -->
+
+Four things a source prints as if they were units, and what to do instead
+(Helen's rulings, 2026-09-03):
+
+- **A barspoon is `"5 ml"`.** Convert it like a teaspoon; her suite rejects
+  the word.
+- **An egg or a sugar cube is an INGREDIENT, not a unit.** `amount: "1"`,
+  `generic: "QQ"`, `item: "whole egg"` (or `"sugar cube"`), the same as any
+  other pour.
+- **"Top" is not an amount on its own** — the ingredient added by a top-up is
+  `amount: "to top"`, and the method carries a `Top with …` step. Likewise a
+  rinse is `amount: "to rinse"` with a `Rinse …` step.
+- Anything else the source calls a measure and this list does not know:
+  write the source's own words, and say in your list that the unit is
+  undeclared — that is a one-line data edit for Helen, and much cheaper than
+  a figure you invented.
 
 **NEVER WRITE A BARE NUMBER.** An amount with no unit cannot be read. If the
 source really gives one, write it as it stands **and add a note saying the
@@ -175,6 +225,36 @@ times apart and a wrong guess looks exactly as confident as a right one.
 
 **`item` is what the source called it, brand and all.** `generic` is the
 category, and it is always `QQ` from you. Do not put the quantity in `item`.
+
+### `item` is a transcription field, and it lives only in the drafts
+
+**It does not render on a published drink page, and a promoted drink will not
+carry it.** The line a reader sees is built from `generic` and `suggestion`;
+`item` is the source's own wording, held so that Helen can see what the page
+said when she comes to fill those two in. She deletes it at that point, which
+is the same moment she stops guessing about the bottle.
+
+So: **write it on every pour, and do not treat it as the answer.** A file whose
+`item` fields are perfect and whose `generic` fields are all `QQ` is exactly
+what this document is asking for. A file that resolved the categories and lost
+the source's words is worse, in both directions at once.
+
+### `character` — the field that is never yours
+
+`character` is the flavour property that made a drink want THIS bottle:
+`blackstrap` on a rum, `peated` on a whisky, the botanical a gin pushes. Helen,
+2026-08-24: *"Blackstrap is only ever given as a character for another rum, like
+this: Moderately aged (character: blackstrap)."* So it rides ALONGSIDE a real
+`generic` and never replaces one — a pour still needs its category, and the
+character says why that particular bottle.
+
+**Which means you cannot write one, because you are not writing `generic`
+either.** A character with no category under it is a property attached to
+nothing, and for rum and whisky the vocabulary is closed and declared in her
+repository, where you cannot see it. Leave the field out. If the source names a
+property beside a pour, it is already in `item` where you transcribed it, and
+one line in your list is what turns it into a `character` when she makes the
+drink.
 
 ---
 
@@ -185,45 +265,58 @@ fits, use the source's own words and flag it in your list.
 
 ### `glass` — use these spellings
 
-`coupe` · `old fashioned` · `double old fashioned` · `highball` · `collins` ·
-`flute` · `nick and nora` · `martini` · `sour` · `wine` · `brandy glass` ·
-`hurricane` · `sling` · `pilsner` · `mug` · `mule mug` · `goblet` · `chalice` ·
-`absinthe` · `punch bowl` · `tiki mug` · `coconut shell` · `hollowed pineapple`
+<!-- vocab:glass start -->
+`coupe` · `sour` · `collins` · `flute` · `highball` · `hurricane` ·
+`nick and nora` · `punch bowl` · `tiki mug` · `mug` · `mule mug` · `martini` ·
+`martini glass` · `wine` · `pilsner` · `sling` · `absinthe` · `goblet` ·
+`chalice` · `pineapple` · `hollowed pineapple` · `coconut` · `coconut shell` ·
+`old fashioned` · `double old fashioned` · `brandy glass`
+<!-- vocab:glass end -->
 
 **These spellings are WRONG and will be corrected against you** — write the
 right-hand form:
 
 | the source will say | write |
 |---|---|
+<!-- vocab:glass_corrections start -->
 | rocks, old-fashioned, old-fashioned glass | **old fashioned** |
 | double rocks, double old-fashioned | **double old fashioned** |
-| champagne saucer | **coupe** |
+| champagne saucer, champage saucer | **coupe** |
 | snifter | **brandy glass** |
+<!-- vocab:glass_corrections end -->
 
 If the source names no glass, use `glass: []` **and lead your list with it** —
 see the warning in §2. Do not infer one.
 
 ### `garnish` — the declared vocabulary
 
-**Citrus peel:** lemon twist · lemon twist (discarded) · lemon twist after
-expressing over cocktail · orange twist · orange twist (discarded) · orange or
-lemon twist · grapefruit twist · flamed orange zest coin
+<!-- vocab:garnish start -->
+**Citrus peel:** lemon twist · lemon twist (discarded) ·
+lemon twist after expressing over cocktail · orange twist ·
+orange twist (discarded) · orange or lemon twist · grapefruit twist ·
+flamed orange zest coin
 
 **Citrus cut:** lime wedge · lime wedge on rim · lime wheel · lemon wheel ·
-lemon slice · orange slice · orange crescent · grapefruit crescents · citrus
-wheel · dehydrated lime slice wheel · half lime shell
+lemon slice · orange slice · orange crescent · grapefruit crescents ·
+citrus wheel · dehydrated lime slice wheel · half lime shell
 
-**Fruit:** pineapple wedge · pineapple wheel · blackberry · dried apple slice ·
-banana chip · raspberries · half an empty passion fruit shell
+**Fruit:** pineapple wedge ·
+pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
+blackberry · dried apple slice · banana chip · raspberries ·
+half an empty passion fruit shell ·
+passion fruit shell filled with overproof rum · pineapple and brandied cherry
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
-skewered maraschino cherry · cherry flag
+skewered maraschino cherry · cherry flag ·
+fruit stick (skewered pineapple cubes and a maraschino cherry)
 
-**Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig · kaffir lime
-leaves · cucumber wheels · edible violet
+**Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
+kaffir lime leaves · cucumber wheels · edible violet
 
 **Spice and other:** grated nutmeg · cinnamon stick · three coffee beans ·
-half-rim of sugar · cocktail umbrella
+half-rim of sugar · cocktail umbrella · 3 dashes red creole-style bitters ·
+5 drops of olive oil
+<!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:
 
@@ -250,26 +343,33 @@ information?** "with ice" versus "over ice" carries none. "other than the
 champagne" carries all of it. So use a canonical string where one fits exactly,
 and write the source's own words where none does.
 
-**Shake:** `Shake all ingredients with ice.` · `Shake all ingredients hard with
-ice.` · `Shake with ice.` · `Shake the remaining ingredients with ice.` ·
+<!-- vocab:method start -->
+**Shake:** `Shake all ingredients with ice.` ·
+`Shake all ingredients hard with ice.` · `Shake with ice.` ·
+`Shake the remaining ingredients with ice.` ·
 `Shake all ingredients other than the champagne with ice.`
 
-**Stir:** `Stir all ingredients with ice.` · `Stir the remaining ingredients
-with ice.` · `Stir all ingredients other than the champagne with ice.` · `Stir
-until cold.` · `Stir.`
+**Stir:** `Stir all ingredients with ice.` ·
+`Stir the remaining ingredients with ice.` ·
+`Stir all ingredients other than the champagne with ice.` · `Stir until cold.` ·
+`Stir.`
 
-**Blend and swizzle:** `Blend all ingredients until smooth.` · `Swizzle until
-the glass frosts.`
+**Blend and swizzle:** `Blend all ingredients until smooth.` ·
+`Swizzle until the glass frosts.`
 
-**Strain:** `Strain.` · `Double strain.` · `Fine strain.` · `Strain into a
-chilled glass.` · `Double strain into a chilled glass.` · `Fine strain into a
-chilled glass.` · `Strain into an ice-filled glass.` · `Fine strain into an
-ice-filled glass.` · `Strain over ice.` · `Fine strain over ice.` · `Strain
-over crushed ice.`
+**Strain:** `Strain.` · `Double strain.` · `Fine strain.` ·
+`Strain into a chilled glass.` · `Double strain into a chilled glass.` ·
+`Fine strain into a chilled glass.` · `Strain into an ice-filled glass.` ·
+`Fine strain into an ice-filled glass.` · `Strain over ice.` ·
+`Fine strain over ice.` · `Strain over crushed ice.`
 
-**Build:** `Add the remaining ingredients.` · `Fill the pitcher half full with
-ice cubes.` · `Fill with crushed ice.` · `Top with champagne.` · `Top with more
-crushed ice.`
+**Build:** `Add the remaining ingredients.` ·
+`Fill the pitcher half full with ice cubes.` · `Fill with crushed ice.` ·
+`Top with champagne.` · `Top with soda water.` · `Top with more crushed ice.`
+
+**Rinse and rim:** `Rinse the glass with absinthe and dump.` ·
+`Rinse the glasses with Campari.` · `Salt a half-rim of the glass.`
+<!-- vocab:method end -->
 
 Four things that will catch you out:
 
@@ -334,6 +434,20 @@ inferable.
 - **Reproduce a bottle or brand exactly as it spells itself**, accents and all:
   `Bénédictine`, `Cointreau`, `St-Germain`, `Difford's`.
 
+**Accented words her house style declares.** The list is shared with the food
+site, so most of it is culinary — but `crème`, `piña` and `purée` all turn up
+in a drink, and a missing accent on one of these is a mechanical fault her
+formatter would fix on a recipe and does not yet fix on a drink:
+
+<!-- vocab:accents start -->
+açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
+chèvre · comté · consommé · crème · crémeux · crêpe · crêpes · crudités ·
+éclair · éclairs · entrecôte · flambé · fraîche · frisée · gâteau · glacé ·
+gougère · gougères · gruyère · jalapeño · jalapeños · marinière · niçoise ·
+pâté · pâtisserie · pâtissière · piña · purée · puréed · purées · ragù · rösti ·
+sauté · sautés · sautéed · soufflé · soufflés · velouté
+<!-- vocab:accents end -->
+
 ---
 
 ## 8. Never do these
@@ -342,6 +456,7 @@ inferable.
 - **Never invent `meta.ship`** — that is Helen's rating of a drink she has
   drunk.
 - **Never write a `mood:`** — derived or hers.
+- **Never write a `character:`** — it hangs off a `generic` you are not writing.
 - **Never leave a US unit**, and never convert a non-volumetric one.
 - **Never write a bare number as an amount** without flagging it.
 - **Never name the glass inside a method step.**
