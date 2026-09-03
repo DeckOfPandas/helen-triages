@@ -4850,15 +4850,15 @@ def test_drink_number_ranges_use_en_dashes(drink_file):
     to the user, so correct to en dash please." An amount, a method step and a
     note all reach the page.
 
-    ONE DRINK IS KNOWN RED AND IS WAITING ON HELEN, not on anybody's attention:
-    anitas-attitude-adjuster's Prosecco pour is `amount: "Top (30-45) ml"`, and
-    its own QQ note quotes that string back verbatim -- "amount 'Top (30-45)'
-    for Prosecco is not a plain number, so it carries no ml figure". Correcting
-    the dash silently desynchronises the note from the value it is about, which
-    makes this a two-field edit and a judgement rather than a formatting one. It
-    is the standing-checklist shape test_style.py::test_oven_temperature_says_fan
-    already uses: a real failure, left visible, because the fix is hers. Every
-    other range in the collection was fixed on 2026-09-03 (#670).
+    THE LAST HYPHENATED RANGE WAS NOT A RANGE PROBLEM. anitas-attitude-adjuster's
+    Prosecco pour said `amount: "Top (30-45) ml"`, with a QQ note quoting that
+    string back verbatim, so en-dashing the amount would have desynchronised
+    the note from the value it describes -- a two-field judgement, not a
+    formatting fix, and it was left red for that reason. The answer came from
+    the amount ruling instead (#669, 2026-09-02): a top-up's amount is the verb
+    phrase `"to top"`, so the range left the amount altogether and the QQ note
+    stays as the record of what the source printed. Every range in the
+    collection was fixed on 2026-09-03 (#670).
     """
     _require_drink(drink_file)
     hits = number_range_hits(_checkable(drink_file))
