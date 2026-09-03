@@ -2389,13 +2389,17 @@ the glass."**, preferred over "Salt half the rim of the glass" — canonical in
 proposed for it rather than rewritten, because this file proposes and never
 applies.
 
-**`item` IS BEING RETIRED — #544, and it is most of the way gone.** It held
-what the SOURCE called the ingredient, brand-led; `generic` is the category, and
-no rule derives the second from the first, which is why that one is stored.
-619 entries carried an `item`; **282 still do** — re-measured 2026-08-31 and
-unchanged, though the collection is 682 entries across 124 drinks now, so the
-migration has stalled rather than progressed. New drinks are written without
-`item` at all, which is why the absolute figure holds while the share falls.
+**`item` IS A DRAFTS-ONLY TRANSCRIPTION FIELD — ruled 2026-09-02 (D8), which
+overturned this paragraph's earlier heading "`item` IS BEING RETIRED".** It
+holds what the SOURCE called the ingredient, brand-led; `generic` is the
+category, and no rule derives the second from the first, which is why the
+source's words are kept until Helen fills `generic`/`suggestion` on making the
+drink and deletes `item` herself. It is allowed in `_cocktail_drafts/` and
+forbidden in `_cocktail_recipes/` by the schema guard (#669), so promotion is
+the deadline. 619 entries once carried an `item`; **268 still do** after
+2026-09-03, when the ten that merely restated their own `generic` were deleted
+and the rest were tabled for Helen's rulings on #544 (§9.10). New drinks
+arriving through the repo-less ingest write it on every pour, by design.
 
 What has gone, and why each was safe rather than judged:
 
@@ -3310,9 +3314,9 @@ line, this one shows it and marks it.
 
 **The rest of `item`'s redistribution is #544 move 2, and after 2026-09-03 it
 is entirely Helen's** — the mechanical half is spent, 268 residue entries are
-tabled for her, and #544 stays open until she has ruled. §9.3 still carries the
-count of what has gone; its "`item` IS BEING RETIRED" heading is the sentence
-D8 overturned, and the paragraphs above are what governs.
+tabled for her, and #544 stays open until she has ruled. §9.3 carries the
+count of what has gone and now states the same drafts-only rule; the
+paragraphs above are what governs.
 
 ### 9.10.1 Cards and search read the VOCABULARY, never the transcription — #501/#544/#558
 
