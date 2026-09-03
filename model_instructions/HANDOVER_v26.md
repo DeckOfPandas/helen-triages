@@ -2136,6 +2136,9 @@ ingredients:                     # FULL list, untriaged, in build order
 method:                          # ORDERED LIST — the steps are sequential
   - "Pour absinthe into ice-filled glass."
 to_serve: ""                     # PRESENTATION, not a further instruction
+mood:                            # LIST, DERIVED and then stored — see below
+  - "sharp"
+  - "aperitivo"
 notes:                           # {label, text} or a bare string, as food
   - "This is much less sugar than many recipes"
   - label: "QQ"                  # 81 of the 170 are the ingest audit
@@ -2146,6 +2149,23 @@ meta:
   ship: "oh gods yes"            # a real ordered vocabulary now — see §9.5
   date_last_edited: "2026-08-16"
 ```
+
+**`mood` IS DERIVED AND THEN STORED, and this document had never said so** —
+until 2026-09-02 it was written down only in `INGEST_ONE_COCKTAIL.md` L95 and in
+`taxonomy.yml`, which is how a key on all 124 drinks stayed absent from the
+schema block above. `scripts/derive_cocktail_moods.py --write` computes it from
+the drink's generics, characters, glass, amounts and method steps against
+`mood_ingredients` in `taxonomy.yml`, and writes the result into the file; the
+stored list is what the index filters on, so the derivation runs at ingest
+rather than at build time. **Change a drink's ingredients and the moods may
+move**, which is why the script is run dry after any such edit and `--write`
+only if it reports a difference.
+`test_every_drinks_moods_match_the_derivation` is what keeps the stored value
+honest: it re-derives all 124 and fails on any drink whose file disagrees, so a
+hand-edited mood list cannot quietly outlive the rule that produced it. Helen's
+own rulings override the derivation and always win — `mood_include` /
+`mood_exclude` in `taxonomy.yml`, each naming the single mood it is about, with
+`test_every_mood_correction_is_reachable_and_needed` as their guard.
 
 **`amount` IS THE ONLY QUANTITY FIELD. `ml:` is retired — #571, 2026-08-30.**
 Every entry used to carry the same quantity twice, `amount: "25 ml"` beside
@@ -2194,6 +2214,32 @@ Skull's (0.75, 0.5) is just as plainly ounces — thirty times apart, and a wron
 guess looks exactly as confident as a right one. All nineteen carry a
 `QQ - no unit in the source` note, and the guard reads that note rather than a
 registry of slugs, so filling one in without removing the note fails too.
+
+**EVERY INGREDIENT HAS AN AMOUNT, AND FOR SOME IT IS A VERB — Helen, 2026-09-02,
+#669.** Eleven entries carried no `amount` at all and no test noticed. Her
+ruling is that there is no amount-less case: an ingredient the method ADDS
+rather than measures still says how much, and the list reads "champagne, to
+top" and "absinthe, to rinse". So six champagnes and two soda waters became
+`amount: "to top"`, `sazerac-death-and-co`'s absinthe and `tailspin`'s Campari
+became `amount: "to rinse"`, and `man-o-war`'s salt — which goes IN the drink
+and is **not** a rim — became `amount: "1 small pinch"`, its `item: "Tiny pinch
+of salt"` deleted for restating the quantity. `to top`, `to rinse` and `small
+pinch` are declared in `measures:` `non_volumetric` alongside `dash`, and
+`_millilitres` reads them by that same path: **the two strings appear nowhere
+in the test**, because special-casing them there would move the vocabulary out
+of the data. The matching method steps are `Top with champagne.` / `Top with
+soda water.` / `Rinse the glass with absinthe and dump.` — the amount says how
+much, the step says when.
+
+**SODA WATER, NEVER CLUB SODA**, same ruling: she is not in the US and doubts
+the difference is more than marketing. Eight drinks said club soda in a step or
+an `item` and were normalised; the one surviving mention is inside a `QQ` note
+on `la-fee-noir-punch` recording what a source said, and a QQ is never rewritten
+to match a later decision. And the rim wording is hers: **"Salt a half-rim of
+the glass."**, preferred over "Salt half the rim of the glass" — canonical in
+`methods.yml`, with `margarita-classic`'s "Dip only half the rim in salt."
+proposed for it rather than rewritten, because this file proposes and never
+applies.
 
 **`item` IS BEING RETIRED — #544, and it is most of the way gone.** It held
 what the SOURCE called the ingredient, brand-led; `generic` is the category, and
