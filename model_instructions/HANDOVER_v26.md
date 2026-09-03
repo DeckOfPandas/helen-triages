@@ -255,8 +255,17 @@ report draft edits as uncommitted/at-risk work in this repo.
 the shared wordmark started using it; see §13.8); `_sass/shared/_chrome.scss`
 (the header and footer's colour — added 2026-08-19, see §2.5);
 `_data/accented_words.yml` (house style, applies to cocktails too);
-`assets/js/*` (no script knows which site it's on); `assets/img/favicon.svg`;
-`assets/img/chrome/` (the header and footer's artwork, §2.5); `about.html`.
+`assets/js/*` (no script's LOGIC knows which site it's on — it reads the site
+key from the page, §3); `assets/img/favicon.svg`; `assets/img/chrome/` (the
+header and footer's artwork, §2.5); `about.html`.
+
+**That claim is about the logic, not the file names, and three names say
+otherwise**: `cocktail-index.js`, `cocktail-search.js` and `cocktail-make.js`
+are loaded by cocktails pages only and are named for it — one directory, but
+not one audience for every file in it. **`assets/js/assets.js` is the shared
+one that matters**: it loads first on every page and, since #686, holds
+`HTF.escapeHtml` and `HTF.indexMemory` — the two helpers both index scripts
+were carrying their own copy of.
 
 **THREE files import `shared/`, not two.** `assets/css/food.scss`,
 `cocktails.scss`, and `assets/css/longform-demo.scss`. This section said "two,
@@ -308,13 +317,19 @@ chrome stop being forked.** It means *this site's one "interactive / branded"
 colour*. Food's resolves to `$color-bright-magenta`, which HANDOVER §13.2
 already describes as exactly that job — the title rule, the toggle, every
 cross-recipe link and `$color-star-root` are one rhyme, not four coincidences —
-so naming it costs nothing and changed no pixel. Cocktails' is a documented
-placeholder: that palette is all neutrals until it is argued from real drinks,
-so its accent is grey on grey, which at footer size is the lightness-only no-op
-§12 warns about. Helen, asked directly: "Cocktail styling is almost totally
-unstarted, so this doesn't matter." **When cocktails gets a hue, that one line
-is where it goes**, and the footer and nav start working on that site the moment
-it does.
+so naming it costs nothing and changed no pixel. **Cocktails' is
+`$color-electric-absinthe-deep` — menthe — and has been since #487
+(2026-08-26)**, the same value as `$color-mood-root`: on this site the colour
+that means *this is the thing you asked for* is the mood filters', and the nav
+and footer are the way out of a page, so a link you are about to follow is the
+same gesture. (It shipped as amber for a few hours first, on the reasoning that
+amber does the structural work; amber's job is a verdict about a drink and it
+has no business on a nav icon.) This section said "a documented placeholder,
+grey on grey" until 2026-09-03, which had been out of date for a week: that
+placeholder was `$color-grey-mid`, and it was the lightness-only no-op §12
+warns about — the reason the shared footer did not read on cocktails at all
+until a hue replaced it. **A grey `$color-accent` is the symptom to recognise,
+not the current state**; the line to read is `_sass/cocktails/_palette.scss`.
 
 ### 2.4 `site_key`
 

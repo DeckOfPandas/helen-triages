@@ -1467,6 +1467,62 @@ def test_every_palette_satisfies_the_shared_contract(owner):
     )
 
 
+SHARED_FONT_STACKS = ["font-headings", "font-body"]
+
+
+@pytest.mark.parametrize("variable", SHARED_FONT_STACKS)
+def test_the_two_palettes_declare_the_SAME_font_stack(variable):
+    """Typography is the family resemblance between the two sites.
+
+    Both palettes' own comments say so and ask that any change here be made as
+    a DECISION rather than by drift — and until GitHub issue #686 nothing
+    checked it. The two files' `$font-headings` and `$font-body` lines were
+    byte-identical because somebody had been careful, which is not a guarantee:
+    a third face added to one stack, or a fallback dropped from it, would leave
+    food and cocktails setting the same text in different type and neither site
+    would look wrong on its own screen.
+
+    NOT MOVED INTO shared/, deliberately. `SHARED_PALETTE_CONTRACT` above
+    requires every palette to DECLARE all ten variables by name, which is what
+    makes the shared partials shareable and what makes a missing one fail with
+    the palette's name on it rather than a shared file's. Hoisting these two
+    would carve the first exception into that rule, and cocktails' own
+    `$font-label` comment (2026-09-02) is the argument against: borrowing the
+    survivor of someone else's argument is not the same as having made one, so
+    each site keeps the line and the chance to diverge from it on purpose.
+    Equality is the cheaper guarantee — it costs one assert and holds the
+    resemblance without taking the decision away from either site.
+
+    IF THIS FAILS AND THE DIFFERENCE IS INTENDED: the fix is to delete the
+    variable from SHARED_FONT_STACKS with a note saying which site diverged and
+    why, not to edit one palette back to match the other.
+    """
+    pattern = rf"^\${re.escape(variable)}\s*:\s*(.+?);"
+    declared = {}
+    for owner in PALETTE_OWNERS:
+        text = (SASS_DIR / owner / "_palette.scss").read_text(encoding="utf-8")
+        match = re.search(pattern, text, re.M)
+        assert match, (
+            f"_sass/{owner}/_palette.scss declares no ${variable}, which "
+            f"test_every_palette_satisfies_the_shared_contract should have "
+            f"caught first — the build fails without it."
+        )
+        # Whitespace normalised: the two files align their values in a column,
+        # so `$font-body:     "Selawik"` and `$font-body: "Selawik"` are the
+        # same decision spelled differently and this test is not about spacing.
+        declared[owner] = re.sub(r"\s+", " ", match.group(1).strip())
+
+    values = set(declared.values())
+    assert len(values) == 1, (
+        f"The two sites set ${variable} differently:\n  "
+        + "\n  ".join(f"_sass/{o}/_palette.scss: {v}" for o, v in declared.items())
+        + f"\n\nTypography is the family resemblance between the two sites, and "
+          f"both palettes' comments ask that a change here be a decision rather "
+          f"than drift. If the divergence IS the decision, take '{variable}' out "
+          f"of SHARED_FONT_STACKS and say why."
+    )
+
+
 def test_shared_scss_never_imports_a_site_partial():
     """The dependency arrow points one way: sites import shared, never back.
 
