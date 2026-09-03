@@ -165,10 +165,18 @@ def _load(directory: Path) -> list[Recipe]:
 
     `sorted()` over `rglob` orders by full path, so a staged draft sorts under
     its folder rather than among the flat ones. Ids still come from the stem.
+
+    A `README.md` AT THE ROOT IS NOT A RECIPE, and it is the ONLY name skipped.
+    `_food_drafts/` gained one on 2026-09-03 (the private repos had described
+    themselves nowhere) and this loader raised on it at import, taking the
+    whole suite down before a test ran. The skip is by exact name rather than
+    "anything without front matter", because a draft that has lost its
+    delimiters is exactly the file that should fail loudly, not vanish.
     """
     if not directory.is_dir():
         return []
-    return [Recipe(p) for p in sorted(directory.rglob("*.md"))]
+    return [Recipe(p) for p in sorted(directory.rglob("*.md"))
+            if not (p.name == "README.md" and p.parent == directory)]
 
 
 ALL_RECIPES = _load(RECIPES_DIR)
