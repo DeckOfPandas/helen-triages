@@ -613,11 +613,16 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 // moved with it, 1.6rem to 1.2rem (below, _sass/cocktails/_filters.scss),
 // keeping the same ratio between the two the divergence above already argues
 // for.
-@mixin index-section-label($size: 1.05rem, $tracking: 0.08em) {
+// $weight IS AN ARGUMENT SINCE 2026-09-03, for the same reason $size and
+// $tracking already were: the two grounds want different numbers. Food keeps
+// the default; cocktails passes 400 -- see _sass/cocktails/_filters.scss for
+// the finding (#680), which is that bold light-on-dark type blooms into its
+// own punched highlight and reads as smudged.
+@mixin index-section-label($size: 1.05rem, $tracking: 0.08em, $weight: 700) {
   font-family: $font-headings;
   text-transform: uppercase;
   font-size: $size;
-  font-weight: 700;
+  font-weight: $weight;
   letter-spacing: $tracking;
   // 0.22rem TOP AND BOTTOM, and it is the last thing that was making the two
   // sites' headings sit at different heights. Food had it and cocktails did

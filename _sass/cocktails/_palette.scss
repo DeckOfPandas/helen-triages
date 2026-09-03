@@ -256,11 +256,46 @@ $color-luminous-lagoon-wash:     #1A3137;
 // six clear 6:1 against the black page, checked rather than assumed.
 // `scripts/palette_measure.py --lstar <hexes>` prints the figures; this used to
 // name `tmp/greens2.py`, which is gone.
-$color-heading-yolo:    #99C62F;   // hue  78
-$color-heading-mood:    #43C62F;   // hue 112
-$color-heading-hassle:  #2FC66E;   // hue 145
-$color-heading-include: #2FC6B2;   // hue 172
-$color-heading-name:    #2F9EC6;   // hue 196
+//
+// THE GREENS ARE GONE, 2026-09-03 -- the design audit's critical #4, and the
+// paragraph above explains why they failed in its own words. Thirty degrees
+// of hue at the same luminance "is the arrangement that actually reads" on a
+// palette page; in a bar 0.38em tall it does not, and YOLO, MOOD and HASSLE
+// read as green on green. Measured: each green sat between 1.25:1 and 1.9:1
+// against the absinthe bar beneath it.
+//
+// A RAMP FROM REPOSADO TO YVETTE THROUGH PINK, top of the page to bottom.
+// Helen's own shape, chosen from a candidates page on the real index against
+// the five accents and a shades-of-cosmopolitan version: "the ramp colours
+// are gorgeous!" The two ends and the centre are palette colours already
+// doing these jobs -- YOLO is reposado because the ship mark is, HAS TO HAVE
+// is cosmopolitan because a matched ingredient is, I KNOW WHAT I WANT is
+// yvette because the matched run of a title is (`.drink-name-hit`). MOOD and
+// HASSLE are the two even steps between reposado and cosmopolitan.
+//
+// INTERPOLATED IN OKLCH, NOT PICKED BY EYE, taking the short arc through red
+// rather than the long one through green, and gamut-clipped by pulling chroma
+// in so each step keeps its hue. The workings are in the commit that shipped
+// this. Neighbours are 15 to 21 dE apart (`scripts/palette_measure.py
+// --separation`), against the 10 that HANDOVER 9.13 sets as the bar -- and a
+// heading sits under its own name in words, so the bar does not even apply
+// here; it is cleared anyway.
+//
+// TWO NEW HUES, AND THAT IS HELEN'S CALL, MADE KNOWINGLY. The coral and the
+// hot pink are the first colours on this site that are not one of the five
+// accents. They are steps on a line between two of them rather than a sixth
+// and seventh idea, which is why they do not join the accent table above:
+// nothing but these two bars may use them.
+//
+// MOOD NO LONGER WEARS ABSINTHE, and that is cleaner than it was. Absinthe is
+// the home colour -- the chrome, the glass line work, a card's bottom rule --
+// and the shared bar under every heading still says so. It stops also meaning
+// "this section", which it only ever meant for one of the five.
+$color-heading-yolo:    $color-radiant-reposado;       // #F47E25
+$color-heading-mood:    #FD6758;                       // coral,    1/3 of the way to pink
+$color-heading-hassle:  #FD5289;                       // hot pink, 2/3 of the way
+$color-heading-include: $color-cosmic-cosmopolitan;    // #FF00C8
+$color-heading-name:    $color-ultra-yvette;           // #9233E6
 
 // The one every heading shares, under its own. Full strength on purpose: it is
 // the home colour doing the job §9.13 already lets it do on the glass panels.

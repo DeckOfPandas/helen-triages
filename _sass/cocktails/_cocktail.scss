@@ -462,8 +462,21 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // same device the index's five filter headings already use), and an h2 is
 // block-level — the mark has to sit on something inline, or it paints the
 // full width of the heading's box rather than hugging the word.
+//
+// 1.8rem AND WEIGHT 400, 2026-09-03 -- #679 point 4, Helen: "INGREDIENTS and
+// METHOD feel very small. They're larger on food recipe pages and I prefer
+// that." So food's `.recipe-section-heading` size after all, a day after the
+// paragraph above argued its way back down from it; the brief that set
+// 1.35rem is superseded by her reading the page. The weight is the index's
+// finding (#680, `_filters.scss`'s `.drink-field-label`): on this ground a
+// bold punched heading blooms into its own highlight and reads as smudged,
+// and regular weight is the correction. One rule for punched headings on
+// black, applied on both pages the same day rather than on one and then
+// rediscovered on the other. shared/_base.scss's h1/h2/h3 rule sets 700, so
+// it is restated here.
 .cocktail-section-heading {
-  font-size: 1.35rem;
+  font-size: 1.8rem;
+  font-weight: 400;
   letter-spacing: 0.08em;
   margin: 2.25rem 0 $space-lg;
 
