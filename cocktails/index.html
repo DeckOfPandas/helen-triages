@@ -466,16 +466,15 @@ permalink: /cocktails/
         </div>
 
         <div class="drink-card-foot">
-          {% comment %} THE GATE FLAGS, LOCAL BUILD ONLY -- D5, 2026-09-02. The
-             include carries its own `site.show_drafts` test, so production
-             renders nothing here and the wrapper below is an empty span rather
-             than a decision this template has to remember. See
-             _includes/cocktails/gate_badges.html for why it is a cocktails
-             include and not food's recipe_badges.html. The WRAPPER is inside
-             the include too, so production emits no empty span -- a hollow
-             element nothing fills is the shape test_site_config.py already
-             objects to elsewhere. {% endcomment %}
-          {% include cocktails/gate_badges.html meta=drink.meta %}
+          {% comment %} NO GATE BADGES ON A CARD, and it was built and taken out
+             again on 2026-09-02. A local-only include drew `needs rewrite` /
+             `awaiting fix` / `needs proofread` here for one commit, on the
+             premise that food's cards showed the same. They do not: #562 took
+             every work-state chip off the food rows because "a work-state note
+             on every unfinished row is a to-do list down the side of the page
+             you use to decide what to cook", and Helen ruled the same for
+             drinks. The flags live in the file and in the build log; the card
+             is for choosing a drink. {% endcomment %}
           <span class="drink-card-moods">
             {% comment %} The group is derived from taxonomy.yml here rather than
                stored on the drink, because it is a property of the MOOD and a

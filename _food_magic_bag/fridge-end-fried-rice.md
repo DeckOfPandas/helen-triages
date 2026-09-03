@@ -19,4 +19,5 @@ notes:
     text: "It has to be cold and a day old. Fresh rice steams instead of frying and you get a sad clump."
 meta:
   awaiting_fix: false
+  proofread: false
 ---

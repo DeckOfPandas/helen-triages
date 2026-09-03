@@ -698,19 +698,20 @@ the list, and **the measurement taken before adding it was that it releases
 ZERO recipes from `proofread: false` today** — it was purely forward-looking,
 which is exactly the condition under which widening that list is safe.
 
-**AND IT CAME OFF AGAIN ON 2026-09-02, which does re-block the rename.**
-`_includes/cocktails/gate_badges.html` draws a `needs rewrite` badge on a drink
-card (D5, #668), so the key is read on the render surface and the guard said so
-in the very next run. The entry is gone; the measurement taken before removing
-it was again ZERO recipes affected. Note what the removal exposed: food's own
-`food/index.html` has read `recipe.meta.rewritten` all along — twice, once
-deciding whether a row renders at all — and the scanner never saw it because
-`RENDER_SURFACE` covers `_layouts`, `_includes`, `_plugins`, `assets/js` and
-`scripts`, **not pages**. So the paragraph above ("nothing reads it — no layout,
-include, plugin or script") was true only of the four directories it names.
-A `rewritten` → `<something>` rename would now invalidate proofreads, and the
-honest fix if that rename is ever wanted is to widen `RENDER_SURFACE` to pages
-and see what else falls out.
+**IT CAME OFF FOR ONE COMMIT ON 2026-09-02, AND WENT BACK THE SAME DAY.** A
+local-only drinks include drew a `needs rewrite` badge off it, so the key was
+read on the render surface and the guard said so in the very next run; the
+entry was removed, the measurement taken first was again ZERO recipes affected.
+Then the include itself was reverted (#562's argument applies to drink cards
+too — §9.1.1) and the entry was restored. Note what the episode exposed, which
+outlives it: food's own `food/index.html` has read `recipe.meta.rewritten` all
+along — twice, once deciding whether a row renders at all — and the scanner
+never saw it because `RENDER_SURFACE` covers `_layouts`, `_includes`,
+`_plugins`, `assets/js` and `scripts`, **not pages**. So the paragraph above
+("nothing reads it — no layout, include, plugin or script") is true only of
+the four directories it names. A `rewritten` → `<something>` rename would
+invalidate proofreads, and the honest fix if that rename is ever wanted is to
+widen `RENDER_SURFACE` to pages and see what else falls out.
 
 `show_source_wording` in `_config.yml` is an unrelated CONFIG flag governing
 whether unrewritten recipes publish at all. It shares a substring and nothing
@@ -788,10 +789,12 @@ Three things about it that will otherwise waste your time:
   reviewed a change line by line, move it and say so in the commit message.
   Never move it to make a red test go green.
 - **Two narrower escape hatches exist besides the baseline, added #417.**
-  `INVISIBLE_KEYS` names front-matter keys nothing ever renders — three today:
-  `source_type`, `meta.cooked_before`, `meta.date_last_edited`. `meta.rewritten`
-  was a fourth until 2026-09-02, when a drinks include started drawing a badge
-  off it and the guard threw the entry out; see §4 above.
+  `INVISIBLE_KEYS` names front-matter keys nothing ever renders — four today:
+  `source_type`, `meta.rewritten`, `meta.cooked_before`, `meta.date_last_edited`.
+  (`meta.rewritten` left the list for one commit on 2026-09-02, when a
+  local-only drinks include drew a badge off it and the guard threw the entry
+  out; the include was removed the same day per #562 and the entry restored —
+  which is the guard doing its job in both directions.)
   A commit that changes ONLY those keys, with the body byte-identical, doesn't
   need `proofread: false`, and `test_invisible_keys_are_really_invisible` scans
   the actual render surface to keep that claim honest rather than trusting it.
@@ -866,14 +869,16 @@ side-effect.** Five food recipes were live unproofread and are now held back
 until Helen reads them: `wagamama-yakitori-sauce`, `youvetsi`,
 `sweet-potato-chocolate-brownies`, `wagamama-teriyaki-sauce`,
 `duck-a-lorange-sanguine`. Six pages appear in the build log, not five — the
-sixth is `_food_magic_bag/fridge-end-fried-rice.md`, and it is **an open
-question for Helen, not a decision**. The magic-bag schema is `meta:
-{awaiting_fix}` and deliberately nothing else, so that collection now cannot
-publish at all: the gate asks for a key its own schema forbids. Either the
-magic bag gains a `proofread` flag like a recipe, or it is exempted from the
-second leg because Helen writes those entries herself and is the last judgement
-by construction. The plugin's `GATED_COLLECTIONS` comment records the same
-question, and nothing has been picked.
+sixth is `_food_magic_bag/fridge-end-fried-rice.md`, and it exposed a hole:
+the magic-bag schema was `meta: {awaiting_fix}` and deliberately nothing else,
+so that collection could not publish at all once the gate asked for a key its
+own schema forbade. **Helen's ruling, 2026-09-03: the magic bag must be able
+to publish, so `proofread` joins its schema** — required, `false` by default
+on a new entry like everything else at ingest, hers to flip once she has read
+the built page. `rewritten` stays out of the magic bag (no source to rewrite
+from). §4.3 and `tests/test_magic_bag.py`'s `META_KEYS` carry the two-flag
+shape; the one existing entry says `proofread: false` and is held back until
+she reads it.
 
 The one exception to "she is the last touch" is unchanged: a trivial fix she
 requests, which Claude makes with `proofread: false` in the same commit, and
@@ -1391,7 +1396,8 @@ notes:                                                    # optional, {label, te
   - label: "Rice"
     text: "Has to be cold and a day old."
 meta:
-  awaiting_fix: false                                     # the publish gate, and nothing else
+  awaiting_fix: false                                     # the publish gate, and nothing else --
+  proofread: false                                        # both its flags, since #667
 ---
 ```
 
@@ -1410,11 +1416,17 @@ dish has to be nearly free, or Helen won't, and the collection stays empty.
 ingredients, and forcing a taxonomy decision at jot-down time is exactly the
 friction that stops the note being written. Tags are validated when present.
 
-**`meta:` is ONE flag here, not three.** `rewritten` and `proofread` are recipe
-flags with no meaning for a dish that has no source and never left Helen's own
-head — and a flag that can only ever hold one value is precisely what
-`test_front_matter.py`'s `cooked_before` tombstone warns against. `awaiting_fix`
-stays, and `food_magic_bag` is in the plugin's `GATED_COLLECTIONS`, because the
+**`meta:` is TWO flags here, not three — `awaiting_fix` then `proofread`.**
+`rewritten` is a recipe flag with no meaning for a dish that has no source and
+never left Helen's own head — and a flag that can only ever hold one value is
+precisely what `test_front_matter.py`'s `cooked_before` tombstone warns
+against. Until 2026-09-02 this paragraph said the same of `proofread`, and it
+was true until the gate started reading it (§4.0, #667): the plugin publishes
+only on `awaiting_fix: false` AND `proofread: true`, and a collection whose
+schema forbids a required key cannot publish at all. Helen's ruling
+(2026-09-03): the magic bag must publish, so `proofread` is required here,
+`false` by default on a new entry, hers to flip once she has read the built
+page. `food_magic_bag` is in the plugin's `GATED_COLLECTIONS` because the
 collection is `output: true` and the gate is about what the world sees.
 
 **The incompleteness is enforced by the schema, not announced on the page.**
@@ -2061,7 +2073,7 @@ lifted copy. §9.1.1 is that gate.
 
 ### 9.1.1 The drinks publication gate — three flags, and the index that reads them
 
-Landed 2026-09-02, issue #668, ruled by Helen the same day (D1–D3, D5 in
+Landed 2026-09-02, issue #668, ruled by Helen the same day (D1–D3 in
 `model_instructions/ARCHITECTURE_PLAN_2026-09-02.md` §8). **§4.0 is the
 authority on what the two gate flags MEAN**; this section is only what is
 different about drinks.
@@ -2123,24 +2135,19 @@ the drafts, are behind the local-only key — and the empty-state test moved ont
 asked of it. **Production still renders "Nothing to see here yet" because the
 collection is empty, not because the template refuses to look at it.**
 
-**The cards show the three flags locally** (D5), via
-`_includes/cocktails/gate_badges.html`, styled in `_sass/cocktails/_cards.scss`.
-Two things to know before touching it:
-
-- **It is a cocktails include, not `_includes/recipe_badges.html`**, and the
-  plan's claim that that file "renders food's flags on the index" is wrong. It
-  renders TAXONOMY badges — star ingredient and tag groups — off
-  `include.recipe.star_ingredient`, `include.recipe.tags` and two
-  `site.data.food.*` tables. A drink has none of those keys.
-- **Food's cards show none of these badges anywhere today.** `needs rewrite`
-  and `needs proofread` stood on a recipe row until #562, when Helen asked for
-  "all metadata chips" off the rows: a work-state note on every unfinished row
-  is a to-do list down the side of the page you use to decide what to cook. The
-  wording here is that removed pair's, verbatim. Whether the drinks index wants
-  them at all when the same argument applies is Helen's to say.
-
-The include carries its own `site.show_drafts` test, wrapper and all, so a
-production build emits nothing — not even an empty span.
+**The cards do NOT show the flags, and that was built and removed within the
+same day.** The plan's D5 said "the same badges as food's cards", on the
+premise that food's cards showed gate state. They do not: `needs rewrite` and
+`needs proofread` stood on a recipe row until #562, when Helen asked for "all
+metadata chips" off the rows — a work-state note on every unfinished row is a
+to-do list down the side of the page you use to decide what to cook. A
+local-only `_includes/cocktails/gate_badges.html` existed for one commit; shown
+the #562 argument, Helen ruled the same for drinks and it was reverted. Two
+things survive from it: `_includes/recipe_badges.html` renders TAXONOMY badges
+(star ingredient, tag groups) and could never have served a drink; and
+`meta.rewritten` briefly left `INVISIBLE_KEYS` because that include read it,
+and went back when the include did (§4.0). The flags live in the file and in
+the build log.
 
 **One rendered-page test exercises the drink leg on a bare CI checkout**
 (`test_the_gate_covers_a_promoted_drink` in `tests/test_rendered_pages.py`). It

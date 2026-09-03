@@ -2202,6 +2202,14 @@ def test_the_amount_table_is_exercised():
 US_UNITS = {"oz", "ounce", "ounces", "tsp", "teaspoon", "teaspoons",
             "tbsp", "tablespoon", "tablespoons", "cup", "cups"}
 
+# NOT US, STILL NOT WANTED. A barspoon is a bar's own name for about a
+# teaspoon, and Helen's ruling on 2026-09-02 was the same as for the teaspoon
+# itself: "I prefer '5 ml' to barspoon". No drink carried one on that day, so
+# nothing was converted; the set exists for the next transcription from a book
+# that says barspoon, which is most of them. Checked by the same test as the
+# US units because the remedy is identical -- write the millilitres.
+NOT_UNITS = {"barspoon", "barspoons", "bar-spoon", "bar-spoons"}
+
 
 def test_no_amount_uses_a_us_unit():
     """Volumes are millilitres. Helen's call, 2026-09-01: "I don't want any US
@@ -2245,7 +2253,7 @@ def test_no_amount_uses_a_us_unit():
                 continue
             checked += 1
             words = {w.strip(".,").lower() for w in str(item["amount"]).split()}
-            hit = (words - ignored) & US_UNITS
+            hit = (words - ignored) & (US_UNITS | NOT_UNITS)
             if hit:
                 bad.append(
                     f"{slug}: {item['amount']!r} on "
@@ -2253,9 +2261,10 @@ def test_no_amount_uses_a_us_unit():
                 )
 
     assert not bad, (
-        f"{len(bad)} amount(s) in a US unit:\n  " + "\n  ".join(bad)
+        f"{len(bad)} amount(s) in a US unit or a barspoon:\n  " + "\n  ".join(bad)
         + "\n\nConvert to millilitres using the factors in `measures:` "
-          "(1 oz = 30 ml, 1 tsp = 5 ml). Transcribe the DRINK, not the page's "
+          "(1 oz = 30 ml, 1 tsp = 5 ml, 1 barspoon = 5 ml). Transcribe the "
+          "DRINK, not the page's "
           "units. If a source qualifies the measure -- a scant or a heaping "
           "one -- print the single figure and put the qualifier in the "
           "ingredient's `note`, per HANDOVER 9.4.1: the site states one figure "

@@ -92,19 +92,28 @@ RECIPE_ONLY = {
     "doneness": "as `internal_temp_ref`",
 }
 
-# `meta:` IS ONE FLAG HERE, NOT THREE. The publish gate and nothing else.
+# `meta:` IS THE PUBLISH GATE HERE AND NOTHING ELSE -- two flags, not three.
 #
 # test_front_matter.py's META_ORDER is `rewritten -> awaiting_fix -> proofread`
-# because that is the order a RECIPE moves through them. A magic-bag entry moves
-# through none of it: there is no source to rewrite from and no proofread to
-# grant, so two of the three would be permanently false and meaningless -- and a
-# flag that can only hold one value is the thing test_front_matter.py's own
-# `cooked_before` tombstone warns about.
+# because that is the order a RECIPE moves through them. A magic-bag entry has
+# no source to rewrite from, so `rewritten` would be permanently false and
+# meaningless -- a flag that can only hold one value is the thing
+# test_front_matter.py's own `cooked_before` tombstone warns about -- and it is
+# left out.
 #
-# awaiting_fix stays because the collection is `output: true` and the gate is
-# about what the world sees, which is as true of a four-line dish as of a
-# recipe.
-META_KEYS = ["awaiting_fix"]
+# `proofread` JOINED ON 2026-09-02 (#667), and until that day this comment said
+# it had no meaning here either. It gained one the moment the gate started
+# asking for it: the plugin publishes only on `awaiting_fix: false` AND
+# `proofread: true`, for every gated collection, and a collection whose schema
+# forbids a key the gate requires can never publish. Helen's ruling was that
+# the magic bag must be able to publish and that the flag arrives `false` by
+# default, like everything else at ingest -- so it is required here, written
+# false on a new entry, and she flips it when she has read the built page.
+#
+# awaiting_fix stays for the reason it always had: the collection is
+# `output: true` and the gate is about what the world sees, which is as true
+# of a four-line dish as of a recipe.
+META_KEYS = ["awaiting_fix", "proofread"]
 
 
 @pytest.mark.parametrize("field", REQUIRED)
@@ -169,8 +178,10 @@ def test_meta_is_exactly_the_publish_gate(magic_bag):
     assert list(meta) == META_KEYS, (
         f"{where(magic_bag)} `meta:` is {list(meta)}, expected exactly "
         f"{META_KEYS}.\nA magic-bag entry carries the publish gate and nothing "
-        f"else — `rewritten` and `proofread` are recipe flags with no meaning "
-        f"here, and a flag that can only ever hold one value is dead weight."
+        f"else — both flags the gate reads, in that order. `rewritten` is a "
+        f"recipe flag with no meaning here, and a flag that can only ever hold "
+        f"one value is dead weight. A new entry writes `proofread: false`; "
+        f"Helen sets it true once she has read the built page."
     )
 
 

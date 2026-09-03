@@ -85,22 +85,17 @@
 # and is held back on anything other than an explicit pass, same as everything
 # else here.
 #
-# AND THAT IS A QUESTION FOR HELEN AS OF 2026-09-02, said here rather than only
-# in a pull request because the next person to wonder will be reading this file.
-# The magic-bag schema is `meta: {awaiting_fix}` and NOTHING ELSE -- deliberately
-# (tests/test_magic_bag.py: "`rewritten` and `proofread` are recipe flags with no
-# meaning here"). So the moment `proofread == true` became the second leg, the
-# one magic-bag entry stopped publishing and no magic-bag entry can ever publish
-# again: the gate now asks for a key that collection's own schema forbids, and a
-# gate that cannot be passed is a deletion rather than a gate.
-#
-# The uniform rule is what Helen ruled (D3, both sites, all gated collections),
-# so it is what this implements, and `_food_magic_bag/fridge-end-fried-rice.md`
-# is untouched and currently held back -- the build log names it every time.
-# The two ways out are hers to pick: give the magic bag a `proofread` flag like
-# a recipe, or exempt the collection from the second leg because she writes
-# those entries herself and is the last judgement by construction. Do not pick
-# one by editing this line.
+# THE MAGIC BAG'S SCHEMA GREW A `proofread` FLAG THE SAME DAY THE SECOND LEG
+# ARRIVED, 2026-09-02, and the order of events is worth keeping. Its schema was
+# `meta: {awaiting_fix}` and nothing else -- deliberately, because `rewritten`
+# and `proofread` were "recipe flags with no meaning here". The moment
+# `proofread == true` became a leg of this gate, that stopped being true: a
+# gate asking for a key a collection's schema forbids is a deletion, not a
+# gate, and the one magic-bag entry vanished from the production build. Helen's
+# ruling: the magic bag must be able to publish, `proofread` is required there
+# too, it arrives `false` by default like everything else at ingest, and she
+# flips it when she has read the built page. `rewritten` stays out -- there is
+# no source to rewrite from. tests/test_magic_bag.py's META_KEYS is the schema.
 GATED_COLLECTIONS = %w[food_recipes food_magic_bag cocktail_recipes].freeze
 
 Jekyll::Hooks.register :site, :post_read do |site|
