@@ -1,0 +1,42 @@
+{% comment %} THE THREE GATE FLAGS ON A DRINK CARD — D5, Helen 2026-09-02.
+
+  LOCAL BUILD ONLY, and the gate is inside this include rather than at each call
+  site so there is one place to get it wrong. `site.show_drafts` exists ONLY in
+  _config_local.yml; production has no such key, the condition is false, and
+  this renders nothing at all. That matters the day a drink is promoted: the
+  drinks index becomes a public page then, and a work-state note is not
+  something the world reads.
+
+  WHY THIS IS NOT `_includes/recipe_badges.html`. The plan assumed that include
+  "renders food's flags on the index". It does not, and has not since #562: it
+  emits TAXONOMY badges — the star ingredient and the tag groups — reading
+  `include.recipe.star_ingredient`, `include.recipe.tags` and two
+  `site.data.food.*` tables. A drink has none of those keys and there is no
+  food data to read for one, so reuse was never possible without the `site_key`
+  branch D5 said to avoid.
+
+  WHAT FOOD SHOWS TODAY, said plainly because D5 is phrased as "the same badges
+  as food's cards": food's cards show NEITHER of these any more. `needs rewrite`
+  and `needs proofread` stood on a recipe row until issue #562, when Helen asked
+  for "all metadata chips" off the rows — a work-state note on every unfinished
+  row is a to-do list down the side of the page you use to decide what to cook.
+  The wording here is that removed pair's, verbatim, because it is the wording
+  Helen wrote and there is no reason to invent a second vocabulary for the same
+  three facts. Whether the drinks index wants them at all when the same argument
+  applies is hers to say; it is asked in the PR.
+
+  ONLY THE UNFINISHED STATE IS DRAWN. A badge on every card for every flag is
+  115 cards of noise saying nothing; a badge is a note that something is
+  outstanding, which is the same negated-test shape the food rows used. (The
+  tag is not quoted here: Liquid PARSES tag delimiters inside a comment block,
+  so writing one is a syntax error -- cocktails/index.html and
+  _layouts/cocktail.html carry the same warning, each having broken a build
+  that way once.)
+
+  `awaiting fix` READS THE OPPOSITE WAY ROUND from its neighbours and that is
+  correct, not a slip. `rewritten` and `proofread` are true when the work is
+  DONE; `awaiting_fix: true` means Helen has proofread the page and ticketed one
+  small thing (§4.0, her words 2026-09-01). So the first two are drawn when
+  false and this one when true. {% endcomment %}
+
+{% if site.show_drafts %}{% assign gate_meta = include.meta %}<span class="drink-card-flags">{% unless gate_meta.rewritten %}<span class="drink-card-flag">needs rewrite</span>{% endunless %}{% if gate_meta.awaiting_fix %}<span class="drink-card-flag drink-card-flag--ticket">awaiting fix</span>{% endif %}{% unless gate_meta.proofread %}<span class="drink-card-flag">needs proofread</span>{% endunless %}</span>{% endif %}

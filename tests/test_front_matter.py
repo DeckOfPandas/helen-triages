@@ -741,16 +741,32 @@ INVISIBLE_KEYS = {
         "Gordon Ramsay's Ultimate Cookery Course` are the same string shape and "
         "no regex separates them. Read by tests only. Issue #406."
     ),
-    "meta.rewritten": (
-        "Records that Helen has rewritten the source's wording in her own words, "
-        "rather than the draft still carrying the original text. Read by nothing "
-        "that builds a page -- the index badge and the publish gate hang off "
-        "meta.awaiting_fix and meta.proofread, not this. Listable only since the "
-        "scanner below learned to ignore comments: the sole match on the render "
-        "surface is an English sentence in assets/js/ingredient-search.js about "
-        "ingredient text being rewritten, which has nothing to do with the key. "
-        "Issues #418, #428."
-    ),
+    # `meta.rewritten` WAS HERE AND CAME OFF ON 2026-09-02. The entry claimed it
+    # was "read by nothing that builds a page", and on that day
+    # _includes/cocktails/gate_badges.html started reading it to draw a `needs
+    # rewrite` badge on a drink card (D5, issue #668) -- so the claim became
+    # false and `test_invisible_keys_are_really_invisible` said so, in the run
+    # after the include was written.
+    #
+    # THAT IS THE MECHANISM WORKING, NOT A PROBLEM WITH IT. The list's own
+    # header says the guard is mechanical rather than social: "the day someone
+    # starts rendering one, that test goes red and the entry has to come out."
+    # It went red; it came out. Narrowing the scanner to ignore the cocktails
+    # include would have been the exact move HANDOVER §12 warns about -- prose,
+    # or a carve-out, defeating a source-scanning guard.
+    #
+    # THE CLAIM WAS ALREADY SHAKY FOR FOOD, which is worth knowing before anyone
+    # tries to put it back. food/index.html reads `recipe.meta.rewritten` twice
+    # -- once to decide whether a row renders at all -- and the scanner never saw
+    # that only because RENDER_SURFACE covers _layouts, _includes, _plugins,
+    # assets/js and scripts, and not pages. The drinks include did not make this
+    # key visible so much as put it somewhere the scanner looks.
+    #
+    # COST, MEASURED BEFORE REMOVING IT, the same discipline BASELINE_COMMIT
+    # demands: the number of recipes this exemption was holding at
+    # `proofread: false` was ZERO. Removing it releases nothing and turns
+    # nothing red. What it changes is the future -- a commit that flips only
+    # `meta.rewritten` on a recipe now needs `proofread: false` like any other.
     "meta.cooked_before": (
         "Retired 2026-08-21, issue #429. Recorded whether Helen had cooked the "
         "recipe before; read by no layout, include, plugin or script, and "
