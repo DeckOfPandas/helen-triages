@@ -106,6 +106,9 @@ source_url: "https://..."
 meta:
   ship: "QQ"
   date_last_edited: "2026-09-02"
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
 ---
 ```
 
@@ -128,6 +131,7 @@ meta:
 | `source` / `source_url` | Free text here, unlike food. `"Difford's"`, `"Death & Co"`. `source_url` may be `""`. |
 | `meta.ship` | Helen's rating. **Always `"QQ"`** — you have not drunk it and neither has she. |
 | `meta.date_last_edited` | Today's date, `YYYY-MM-DD`. |
+| `meta.rewritten` / `meta.awaiting_fix` / `meta.proofread` | **Exactly these three, in this order, all `false`, unquoted.** The same publish gate a food recipe carries (since 2026-09-02). `rewritten` and `proofread` are Helen's own claims about her own work and you never set either `true`; `awaiting_fix: false` is what lets a drink publish once she has, and `false` unquoted is the only value that works. Underscore, never a hyphen. |
 
 > ### EVERY DRINK MUST NAME A GLASS, and you may not guess one.
 >
@@ -515,6 +519,9 @@ source_url: ""
 meta:
   ship: "QQ"
   date_last_edited: "2026-09-02"
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
 ---
 ```
 

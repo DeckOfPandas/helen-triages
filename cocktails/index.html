@@ -19,20 +19,34 @@ permalink: /cocktails/
   this site's identity, not an axis. It sits alongside taxonomy.yml's older and
   much stronger ruling that there is no SPIRIT filter either.
 
-  IT READS DRAFTS, NOT RECIPES, and that is Helen's explicit call for how this
-  ships: "for food, we build drafts locally only, so let's do the same." There
-  are 115 cocktail drafts and zero promoted cocktail recipes, so an index over
-  site.cocktail_recipes is an index over nothing.
+  IT READS RECIPES ALWAYS AND DRAFTS ONLY LOCALLY — food's shape, adopted
+  2026-09-02 for #668. Helen's call for how this ships is unchanged: "for food,
+  we build drafts locally only, so let's do the same." What changed is the
+  other half of the sentence.
 
-  THE GUARD MATTERS MORE THAN THE PAGE, and it is unchanged from the version
-  this replaces. `output: false` stops Jekyll WRITING a draft; it does NOT
-  remove it from site.cocktail_drafts, so a template that loops the collection
+  THIS COMMENT USED TO SAY "an index over site.cocktail_recipes is an index
+  over nothing", and it was true of the day it was written and false of the day
+  after the first promotion. Nothing is promoted yet, so production still
+  renders the empty state — but it does so because the collection is EMPTY, not
+  because the template refuses to look at it. The day a drink is promoted the
+  index lists it, with no template change and nobody having to remember.
+
+  THE GUARD MATTERS MORE THAN THE PAGE, and it is unchanged in substance.
+  `output: false` stops Jekyll WRITING a draft; it does NOT remove it from
+  site.cocktail_drafts, so a template that loops that collection
   unconditionally will happily print 115 private drink names into public HTML
   and link them to URLs that were never written. That is issue #235 exactly,
-  and it is why this is gated on `site.show_drafts` — a key that exists ONLY in
-  _config_local.yml. Production has no such key, the condition is false, and the
-  whole block collapses to the empty state. Do not replace this with a check on
-  whether the collection is non-empty.
+  and it is why the DRAFTS — and only the drafts — are gated on
+  `site.show_drafts`, a key that exists ONLY in _config_local.yml. Production
+  has no such key, so `all_drinks` there is `site.cocktail_recipes` alone.
+  Do not widen that condition, and never let a draft into `all_drinks` on any
+  test other than this one.
+
+  THE EMPTY-STATE TEST IS ON `all_drinks`, DELIBERATELY. Testing the collection
+  for non-emptiness is what #235 warns against when the collection is the
+  DRAFTS; here the variable being tested is the one that has already had the
+  draft question asked of it, so an empty `all_drinks` in production means
+  exactly "nothing is published".
 
   EVERYTHING IS IN THE DOM AND FILTERING ONLY TOGGLES [hidden]. 115 drinks is
   nothing, and it means no reflow of the cards and no dependency on the rest of
@@ -40,7 +54,12 @@ permalink: /cocktails/
   build time, so the script never parses text to decide what a card is.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
-{% if site.show_drafts and site.cocktail_drafts.size > 0 %}
+{% assign all_drinks = site.cocktail_recipes %}
+{% if site.show_drafts %}
+  {% assign all_drinks = all_drinks | concat: site.cocktail_drafts %}
+{% endif %}
+
+{% if all_drinks.size > 0 %}
 
   {% assign taxonomy   = site.data.cocktails.taxonomy %}
   {% assign glasses    = site.data.cocktails.glasses %}
@@ -145,7 +164,7 @@ permalink: /cocktails/
       </div>
       <div class="drink-btns">
         {% for name in groups.mood %}
-          {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
+          {% assign members = all_drinks | where_exp: "d", "d.mood contains name" %}
           {% if members.size > 0 %}
             <button type="button" class="btn-mood" data-mood="{{ name }}" aria-pressed="false">{{ name }}</button>
           {% endif %}
@@ -160,7 +179,7 @@ permalink: /cocktails/
       </div>
       <div class="drink-btns">
         {% for name in groups.hassle %}
-          {% assign members = site.cocktail_drafts | where_exp: "d", "d.mood contains name" %}
+          {% assign members = all_drinks | where_exp: "d", "d.mood contains name" %}
           {% if members.size > 0 %}
             <button type="button" class="btn-mood" data-mood="{{ name }}" aria-pressed="false">{{ name }}</button>
           {% endif %}
@@ -237,8 +256,8 @@ permalink: /cocktails/
      both the number and the word as filters change, so the two have to agree
      on the rule. See assets/js/cocktail-index.js. {% endcomment %}
   <p class="drink-count">
-    <strong id="drink-count-n">{{ site.cocktail_drafts.size }}</strong>
-    <span id="drink-count-word">survivor{% unless site.cocktail_drafts.size == 1 %}s{% endunless %}</span>
+    <strong id="drink-count-n">{{ all_drinks.size }}</strong>
+    <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
     {% comment %} The ship and word on every card are a private code (yes,
        yes², meh, sure, hmm) -- this one line says what the ship is, once, in
        the card's own type, rather than leaving it to be guessed at from the
@@ -248,8 +267,8 @@ permalink: /cocktails/
   </p>
 
   <ul class="drink-cards">
-    {% assign all_drinks = site.cocktail_drafts | sort: "title" %}
-    {% for drink in all_drinks %}
+    {% assign sorted_drinks = all_drinks | sort: "title" %}
+    {% for drink in sorted_drinks %}
 
       {% comment %} GLASS IS AN ORDERED LIST, FIRST WITH ARTWORK WINS — the same
          contract _layouts/cocktail.html follows. A drink whose preferred glass
@@ -447,6 +466,15 @@ permalink: /cocktails/
         </div>
 
         <div class="drink-card-foot">
+          {% comment %} NO GATE BADGES ON A CARD, and it was built and taken out
+             again on 2026-09-02. A local-only include drew `needs rewrite` /
+             `awaiting fix` / `needs proofread` here for one commit, on the
+             premise that food's cards showed the same. They do not: #562 took
+             every work-state chip off the food rows because "a work-state note
+             on every unfinished row is a to-do list down the side of the page
+             you use to decide what to cook", and Helen ruled the same for
+             drinks. The flags live in the file and in the build log; the card
+             is for choosing a drink. {% endcomment %}
           <span class="drink-card-moods">
             {% comment %} The group is derived from taxonomy.yml here rather than
                stored on the drink, because it is a property of the MOOD and a

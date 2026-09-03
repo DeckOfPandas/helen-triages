@@ -693,10 +693,25 @@ What actually stood in the way was the GUARD, not the key.
 one COMMENT in `assets/js/ingredient-search.js` contains the English word
 "rewritten" — about ingredient text, nothing to do with the key. So a key that
 qualified could not be listed. That guard now strips comments per language
-before matching (§12, and the constant's own comment), `meta.rewritten` is on
+before matching (§12, and the constant's own comment), `meta.rewritten` went on
 the list, and **the measurement taken before adding it was that it releases
-ZERO recipes from `proofread: false` today** — it is purely forward-looking,
+ZERO recipes from `proofread: false` today** — it was purely forward-looking,
 which is exactly the condition under which widening that list is safe.
+
+**IT CAME OFF FOR ONE COMMIT ON 2026-09-02, AND WENT BACK THE SAME DAY.** A
+local-only drinks include drew a `needs rewrite` badge off it, so the key was
+read on the render surface and the guard said so in the very next run; the
+entry was removed, the measurement taken first was again ZERO recipes affected.
+Then the include itself was reverted (#562's argument applies to drink cards
+too — §9.1.1) and the entry was restored. Note what the episode exposed, which
+outlives it: food's own `food/index.html` has read `recipe.meta.rewritten` all
+along — twice, once deciding whether a row renders at all — and the scanner
+never saw it because `RENDER_SURFACE` covers `_layouts`, `_includes`,
+`_plugins`, `assets/js` and `scripts`, **not pages**. So the paragraph above
+("nothing reads it — no layout, include, plugin or script") is true only of
+the four directories it names. A `rewritten` → `<something>` rename would
+invalidate proofreads, and the honest fix if that rename is ever wanted is to
+widen `RENDER_SURFACE` to pages and see what else falls out.
 
 `show_source_wording` in `_config.yml` is an unrelated CONFIG flag governing
 whether unrewritten recipes publish at all. It shares a substring and nothing
@@ -776,6 +791,10 @@ Three things about it that will otherwise waste your time:
 - **Two narrower escape hatches exist besides the baseline, added #417.**
   `INVISIBLE_KEYS` names front-matter keys nothing ever renders — four today:
   `source_type`, `meta.rewritten`, `meta.cooked_before`, `meta.date_last_edited`.
+  (`meta.rewritten` left the list for one commit on 2026-09-02, when a
+  local-only drinks include drew a badge off it and the guard threw the entry
+  out; the include was removed the same day per #562 and the entry restored —
+  which is the guard doing its job in both directions.)
   A commit that changes ONLY those keys, with the body byte-identical, doesn't
   need `proofread: false`, and `test_invisible_keys_are_really_invisible` scans
   the actual render surface to keep that claim honest rather than trusting it.
@@ -803,14 +822,25 @@ own uncommitted typo fixes on 2026-08-18, which put *her* edit inside an
 agent-co-authored commit and correctly tripped the rule. The repository cannot
 tell your edit from hers; only the staging can.
 
-**A recipe publishes only if it says `awaiting_fix: false`. Nothing else
-publishes.**
+**A recipe publishes only if it says `awaiting_fix: false` AND
+`proofread: true`. Nothing else publishes.**
 
-Not "true hides it" — **false is the only thing that lets it through.** The flag
-missing, the flag left under its old hyphenated name, the value quoted as a
-string: all held back. `_plugins/hide_awaiting_fix.rb` removes the document from
-its collection at `:post_read`, so it gets no URL, no sitemap entry and no place
-in `site.food_recipes`.
+Not "true hides it" — **an explicit pass on BOTH flags is the only thing that
+lets a page through.** Either flag missing, `awaiting_fix` left under its old
+hyphenated name, either value quoted as a string: all held back.
+`_plugins/publish_gate.rb` removes the document from its collection at
+`:post_read`, so it gets no URL, no sitemap entry and no place in
+`site.food_recipes`. Its log line names which flag held each page back
+(`slug (proofread)`, `slug (awaiting_fix)`, `slug (no meta)`), because "held
+back 6 pages" leaves you diffing front matter to find out why.
+
+The two flags are not one fact spelled twice, which is why requiring both is
+not the mistake the `published:` paragraph below refuses. `awaiting_fix` is a
+bookmark in Helen's own review — see her words further down — and `proofread`
+is whether that review still describes the bytes. A page is routinely
+`proofread: true, awaiting_fix: true` (read, one thing ticketed) or
+`awaiting_fix: false, proofread: false` (no ticket, and an agent has touched it
+since she read it). Neither value can be derived from the other.
 
 **It fails CLOSED, and it used to fail open.** Helen's call, 2026-08-18. The
 first version hid a document only on an explicit `true`, which meant every way
@@ -821,31 +851,41 @@ flagged. This is the gate that decides what the world sees; the cost of failing
 closed is that a new recipe does not publish until someone writes
 `awaiting_fix: false`, and that is the right cost.
 
-**RULED 2026-09-02, NOT YET IMPLEMENTED: `proofread` GATES PUBLICATION TOO.**
-Helen's intent has always been that `proofread: false` blocks a page from the
-live site, on both sites — *"this is the very last touch that I, the human, make
-to the file"*. The plugin does not do that today: it publishes on
-`awaiting_fix: false` alone and never reads `proofread`, and as of e31970d
-FIVE food recipes are live unproofread because of it (`wagamama-yakitori-sauce`,
-`youvetsi`, `sweet-potato-chocolate-brownies`, `wagamama-teriyaki-sauce`,
-`duck-a-lorange-sanguine`). The audit of 2026-09-02 recommended leaving the
-one-field gate, citing the plugin header's "two fields that must agree will
-disagree" argument, and that was wrong: that argument is about a `published:`
-key duplicating `awaiting_fix` — two fields, one meaning — and `proofread` is a
-*different fact*. Requiring both is not that mistake.
+**IMPLEMENTED 2026-09-02, issue #667: `proofread` GATES PUBLICATION.** Helen's
+intent had always been that `proofread: false` blocks a page from the live
+site, on both sites — *"this is the very last touch that I, the human, make to
+the file"* — and the plugin did not do it: it published on `awaiting_fix: false`
+alone and never read `proofread`. The audit earlier the same day recommended
+leaving the one-field gate, citing the plugin header's "two fields that must
+agree will disagree" argument, and that was wrong: that argument is about a
+`published:` key duplicating `awaiting_fix` — two fields, one meaning — and
+`proofread` is a *different fact*.
 
-**The change to make:** the plugin publishes only when `awaiting_fix == false`
-AND `proofread == true`, for every gated collection, and its log line says
-which flag held each page back. Deploying it takes those five recipes down
-until Helen proofreads them; whether she reads them first or lets them drop
-is her call, and the PR must name them. The one exception to "she is the
-last touch" is unchanged: a trivial fix she requests, which Claude makes with
-`proofread: false` in the same commit, and she re-reads the affected line and
-sets `true` herself. The cocktail side of the same ruling (all three flags,
-same names, same order, on every drink) is in the plan this came from:
-`model_instructions/ARCHITECTURE_PLAN_2026-09-02.md`, workstream 2.
-When the plugin change lands, rewrite the paragraph above this one, rename
-the plugin so its name says what it gates, and delete this notice.
+`_plugins/hide_awaiting_fix.rb` is now **`_plugins/publish_gate.rb`**, renamed
+because a name describing half a rule is worse than no name.
+
+**What the change took off the live site, and it was the point rather than a
+side-effect.** Five food recipes were live unproofread and are now held back
+until Helen reads them: `wagamama-yakitori-sauce`, `youvetsi`,
+`sweet-potato-chocolate-brownies`, `wagamama-teriyaki-sauce`,
+`duck-a-lorange-sanguine`. Six pages appear in the build log, not five — the
+sixth is `_food_magic_bag/fridge-end-fried-rice.md`, and it exposed a hole:
+the magic-bag schema was `meta: {awaiting_fix}` and deliberately nothing else,
+so that collection could not publish at all once the gate asked for a key its
+own schema forbade. **Helen's ruling, 2026-09-03: the magic bag must be able
+to publish, so `proofread` joins its schema** — required, `false` by default
+on a new entry like everything else at ingest, hers to flip once she has read
+the built page. `rewritten` stays out of the magic bag (no source to rewrite
+from). §4.3 and `tests/test_magic_bag.py`'s `META_KEYS` carry the two-flag
+shape; the one existing entry says `proofread: false` and is held back until
+she reads it.
+
+The one exception to "she is the last touch" is unchanged: a trivial fix she
+requests, which Claude makes with `proofread: false` in the same commit, and
+she re-reads the affected line and sets `true` herself.
+
+The cocktail side of the same ruling — all three flags, same names, same order,
+on every drink — is **§9.1.1**, and landed with this.
 
 **WHAT `awaiting_fix: true` MEANS TO HELEN, in her own words, 2026-09-01 —
 and it is not what "unfinished" would suggest.** It means she **has** proofread
@@ -870,13 +910,16 @@ one line instead of the file. Two consequences that bite:
   writing `false` into them — writing a value in asserts something about her
   reading that no script can know.
 
-**`GATED_COLLECTIONS` is `food_recipes` and `cocktail_recipes` only, and the
-scoping is not optional.** Fail-closed applied to every collection would delete
-the entire site: `dev` pages carry no `meta.awaiting_fix` at all, and plenty of
-drafts don't either. Drafts and dev pages have their own `output: false`
-protection and need no gate regardless of whether they happen to carry the key.
-(A growing number of drafts DO carry one anyway — no plugin reads it there, so
-on a draft it is purely the bookmark described above, not enforcement.)
+**`GATED_COLLECTIONS` is `food_recipes`, `food_magic_bag` and
+`cocktail_recipes`, and the scoping is not optional.** It has been three
+collections since `food_magic_bag` joined on 2026-08-26 with the collection
+itself; this paragraph said two until 2026-09-02. Fail-closed applied to every
+collection would delete the entire site: `dev` pages carry no `meta` block at
+all. Drafts and dev pages have their own `output: false` protection and need no
+gate regardless of whether they happen to carry the keys. (Every food draft
+carries `awaiting_fix` and every cocktail draft has carried all three since the
+#668 migration — no plugin reads them there, so on a draft they are purely the
+bookmark and the work-state note, not enforcement.)
 
 `_config.yml` sets `show_awaiting_fix: false`; `_config_local.yml` sets it
 `true`, so flagged pages stay visible while you work on them and vanish from
@@ -1353,7 +1396,8 @@ notes:                                                    # optional, {label, te
   - label: "Rice"
     text: "Has to be cold and a day old."
 meta:
-  awaiting_fix: false                                     # the publish gate, and nothing else
+  awaiting_fix: false                                     # the publish gate, and nothing else --
+  proofread: false                                        # both its flags, since #667
 ---
 ```
 
@@ -1372,11 +1416,17 @@ dish has to be nearly free, or Helen won't, and the collection stays empty.
 ingredients, and forcing a taxonomy decision at jot-down time is exactly the
 friction that stops the note being written. Tags are validated when present.
 
-**`meta:` is ONE flag here, not three.** `rewritten` and `proofread` are recipe
-flags with no meaning for a dish that has no source and never left Helen's own
-head — and a flag that can only ever hold one value is precisely what
-`test_front_matter.py`'s `cooked_before` tombstone warns against. `awaiting_fix`
-stays, and `food_magic_bag` is in the plugin's `GATED_COLLECTIONS`, because the
+**`meta:` is TWO flags here, not three — `awaiting_fix` then `proofread`.**
+`rewritten` is a recipe flag with no meaning for a dish that has no source and
+never left Helen's own head — and a flag that can only ever hold one value is
+precisely what `test_front_matter.py`'s `cooked_before` tombstone warns
+against. Until 2026-09-02 this paragraph said the same of `proofread`, and it
+was true until the gate started reading it (§4.0, #667): the plugin publishes
+only on `awaiting_fix: false` AND `proofread: true`, and a collection whose
+schema forbids a required key cannot publish at all. Helen's ruling
+(2026-09-03): the magic bag must publish, so `proofread` is required here,
+`false` by default on a new entry, hers to flip once she has read the built
+page. `food_magic_bag` is in the plugin's `GATED_COLLECTIONS` because the
 collection is `output: true` and the gate is about what the world sees.
 
 **The incompleteness is enforced by the schema, not announced on the page.**
@@ -2019,7 +2069,95 @@ it was broken on purpose to confirm it bites.
 disk**. That is fine and deliberate: Jekyll builds the collection empty and
 `cocktails/index.html` shows its empty state. Nothing is promoted into it
 yet, and the promotion gate is the same as food's — Helen's own words, no
-lifted copy.
+lifted copy. §9.1.1 is that gate.
+
+### 9.1.1 The drinks publication gate — three flags, and the index that reads them
+
+Landed 2026-09-02, issue #668, ruled by Helen the same day (D1–D3 in
+`model_instructions/ARCHITECTURE_PLAN_2026-09-02.md` §8). **§4.0 is the
+authority on what the two gate flags MEAN**; this section is only what is
+different about drinks.
+
+**Every drink carries `meta.rewritten`, `meta.awaiting_fix` and
+`meta.proofread`** — food's names, in food's order, after the two
+drink-specific keys. A drink's `meta:` block is now exactly:
+
+    meta:
+      ship: "yes"
+      date_last_edited: "2026-08-16"
+      rewritten: false
+      awaiting_fix: false
+      proofread: false
+
+Same names deliberately, and D1 is the ruling: they are the same three
+questions, and a second vocabulary for them would be two things to keep in step
+for no gain. **Only Helen writes `rewritten: true`** — it "shows me if I have
+rewritten it, not an agent", which for a drink mostly means the notes and the
+tagline, though her first pass also checks ingredients, bottle suggestions and
+method before the proofread.
+
+**All 124 drafts say `false` to all three, and that is honest rather than a
+placeholder** (D2). What keeps a draft private is `output: false` on the
+collection, not these flags. The migration is one commit in
+`_cocktail_drafts/`, written by `tmp/migrate_drink_gate_flags.py` in this repo:
+textual insertion of three lines after `date_last_edited:`, never a YAML
+round-trip, so `git diff --numstat` reads `3/0` on every file and the diff is
+readable. If you ever migrate a drink field again, do it that way.
+
+**The gate itself needed no change.** `cocktail_recipes` has been in
+`GATED_COLLECTIONS` since `_plugins/publish_gate.rb` existed. What changed is
+that drinks now carry the keys it reads: before the migration a promoted drink
+would have been held back silently by the fail-closed rule, which is safe and
+completely invisible — a drink that simply is not there.
+
+**`tests/test_cocktails.py` guards the data**, mirroring food's four:
+`test_the_gate_flags_are_real_booleans` and
+`test_no_drink_uses_the_old_hyphenated_awaiting_fix_key` run over both
+collections; `test_agent_edited_drinks_are_not_marked_proofread` runs over
+`_cocktail_recipes/` alone and skips, with a reason, while nothing is promoted.
+It imports `_git`, `AGENT_TRAILER` and `_only_invisible_keys_changed` from
+`tests/test_front_matter.py` rather than copying them — that last one is 150
+lines of reasoning about what "nothing a reader could see changed" means (#417,
+#429) and two copies would drift the first time one was fixed. Its
+`COCKTAIL_BASELINE_COMMIT` grandfathers nothing by construction: the collection
+is empty, so every commit at or before it touched zero published drinks. It is
+not the migration commit and cannot be — that lives in a different repository.
+
+**`cocktails/index.html` now has food's shape**, and this is the part that was
+quietly broken before: it read `site.cocktail_drafts` and nothing else, gated on
+`site.show_drafts`, so a promoted drink would have rendered at
+`/cocktails/recipes/<slug>/` and been listed **nowhere**. It now assigns
+`all_drinks = site.cocktail_recipes`, concatenates the drafts only under
+`site.show_drafts`, and every mood loop, the count and the card sort read
+`all_drinks`. The #235 guard is unchanged in substance — the drafts, and only
+the drafts, are behind the local-only key — and the empty-state test moved onto
+`all_drinks`, which is the variable that has already had the draft question
+asked of it. **Production still renders "Nothing to see here yet" because the
+collection is empty, not because the template refuses to look at it.**
+
+**The cards do NOT show the flags, and that was built and removed within the
+same day.** The plan's D5 said "the same badges as food's cards", on the
+premise that food's cards showed gate state. They do not: `needs rewrite` and
+`needs proofread` stood on a recipe row until #562, when Helen asked for "all
+metadata chips" off the rows — a work-state note on every unfinished row is a
+to-do list down the side of the page you use to decide what to cook. A
+local-only `_includes/cocktails/gate_badges.html` existed for one commit; shown
+the #562 argument, Helen ruled the same for drinks and it was reverted. Two
+things survive from it: `_includes/recipe_badges.html` renders TAXONOMY badges
+(star ingredient, tag groups) and could never have served a drink; and
+`meta.rewritten` briefly left `INVISIBLE_KEYS` because that include read it,
+and went back when the include did (§4.0). The flags live in the file and in
+the build log.
+
+**One rendered-page test exercises the drink leg on a bare CI checkout**
+(`test_the_gate_covers_a_promoted_drink` in `tests/test_rendered_pages.py`). It
+writes two `zzz-gate-` drinks into `_cocktail_recipes/`, differing only in
+`proofread`, builds, asserts one URL exists and the other does not, and asserts
+the index lists one and not the other. That shape is issue #624's requirement:
+a public test must never REQUIRE private drink data, because nothing
+coordinates a public merge with a private one. It creates `_cocktail_recipes/`
+and removes it again if it did — an empty directory left behind changes what
+`_load_published` does on the next run.
 
 ### 9.2 The source data
 

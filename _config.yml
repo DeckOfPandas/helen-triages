@@ -74,11 +74,16 @@ pdf_downloads: true
 # to true once the feature itself is fixed and she's happy with it again.
 short_method_enabled: false
 
-# DO NOT PUBLISH A RECIPE WAITING ON A FIX. GitHub issue #331.
-# `meta.awaiting_fix: true` means a page has a known, open problem. false here
-# means production removes those pages entirely -- no URL, no sitemap entry --
-# via _plugins/hide_awaiting_fix.rb. _config_local.yml sets it true so you can
-# still see and fix them locally.
+# DO NOT PUBLISH A RECIPE WAITING ON A FIX, OR ONE NOBODY HAS PROOFREAD.
+# GitHub issues #331 and #667. A page publishes only on `meta.awaiting_fix:
+# false` AND `meta.proofread: true`; false here means production removes every
+# other page entirely -- no URL, no sitemap entry -- via
+# _plugins/publish_gate.rb. _config_local.yml sets it true so you can still see
+# and fix them locally.
+#
+# The key is still named for the first flag alone. It switches the WHOLE gate,
+# both legs together, and always has; renaming it would touch two configs, two
+# tests and every mention in the handover for no behavioural gain.
 #
 # The point of the flag is that ONE broken page does not hold the site back.
 # Flag it, ship everything else, fix it, unflag it.

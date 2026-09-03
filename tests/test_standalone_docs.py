@@ -428,6 +428,19 @@ def _drink_problems(fm: dict) -> list[str]:
             problems.append("no glass -- #491, every drink names one")
         if fm.get("meta", {}).get("ship") != "QQ":
             problems.append(f"meta.ship must be QQ: {fm.get('meta', {}).get('ship')!r}")
+        # THE THREE GATE FLAGS JOINED THE DRINK SCHEMA ON 2026-09-02 (#668), and
+        # a drink file without them fails test_cocktails.py's meta-order guard
+        # the moment it lands. The document's examples are what a repo-less
+        # reader copies, so they carry the flags -- read from the schema's own
+        # list rather than re-typed, the same rule every block in this file
+        # follows -- and all three are False on a new file, as on a recipe.
+        from test_cocktails import META_KEYS_IN_ORDER  # noqa: E402
+        meta = fm.get("meta") or {}
+        if list(meta) != META_KEYS_IN_ORDER:
+            problems.append(f"meta keys/order: {list(meta)} != {META_KEYS_IN_ORDER}")
+        for flag in ("rewritten", "awaiting_fix", "proofread"):
+            if flag in meta and meta[flag] is not False:
+                problems.append(f"meta.{flag} must be False on a new drink: {meta[flag]!r}")
 
     # A GLASS MUST BE CANONICAL, NOT MERELY DRAWABLE. `rocks` has an icon and
     # is still the wrong spelling -- glasses.yml's `canonical_glasses` maps it
