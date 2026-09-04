@@ -314,12 +314,11 @@ $color-heading-hassle:  #FD5289;                       // hot pink, 2/3 of the w
 $color-heading-include: $color-cosmic-cosmopolitan;    // #FF00C8
 $color-heading-name:    $color-ultra-yvette;           // #9233E6
 
-// The two derived steps' washes, for a matched chip's field: 14% of the hue
-// over a card (#17171a), the same derivation as the five accent washes above
-// and for the same reason. Literals like those, because $color-surface is
-// declared further down this file and Sass reads top to bottom.
-$color-heading-mood-wash:   #372223;
-$color-heading-hassle-wash: #371F2A;
+// Two washes for the derived steps -- 14% over a card, for a matched chip's
+// field -- stood here for one day and went on 2026-09-04 when the card chips
+// became bare words (DESIGN_PLAN §3.2, _cards.scss): a word has no field to
+// wash. If a boxed consumer ever returns, the derivation is the one the five
+// accent washes above use, and $color-surface is declared BELOW this point.
 
 // `$color-heading-shared` STOOD HERE -- "the one every heading shares, under
 // its own" -- and went with the shared bar on 2026-09-03. Deleted rather than

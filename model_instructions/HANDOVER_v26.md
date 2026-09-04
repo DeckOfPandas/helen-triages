@@ -4409,6 +4409,15 @@ their text.
 
 #### The card — `_cards.scss`
 
+**THE MOOD CHIPS ARE BARE WORDS, NOT BOXES, SINCE 2026-09-04** — the audit's
+critical #5, one shape for one idea. Helen saw both directions on the real
+index (the filter words taking the chip's box, or the chips taking the word's
+form) and chose the second, "100% cards take words": Courier, bold, lowercase,
+white, no box, a middle dot between them (the ingredient line's own `·`),
+magenta on hover, and underlined in the section's colour when matched, exactly
+as a chosen filter word is. Still `<button>`s, still filtering. The universe
+card and the drink page's chips share the class and follow.
+
 **THE MOOD CHIPS FILTER THE INDEX — Helen's ask, 2026-09-02.** Clicking one adds
 or removes that mood exactly as its filter button does.
 

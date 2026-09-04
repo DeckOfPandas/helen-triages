@@ -82,13 +82,12 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    language. The one loose end is the drink page's ingredient-name underline,
    still yvette over absinthe per Helen's written brief while every heading
    is single-bar; a drink-page bundle with a switch was published for her.
-2. **Cocktail filter words versus card chips** (critical #5). The index's
-   mood buttons are bare bold words; the same words on cards and now on the
-   drink page are outlined chips. Helen's brief flagged it: "this may change
-   if we decide to match card chips to the filter chips above, rather than
-   match the filter chips to the card chips." One shape for one idea; show
-   both directions. Since 2026-09-03 a chosen word and a matched chip already
-   share a colour (the section's), so the remaining gap is shape alone.
+2. ~~Cocktail filter words versus card chips~~ **Done 2026-09-04**: both
+   directions shown on the real index; Helen, "100% cards take words". A
+   card's moods are bare bold Courier words like the filter list, separated
+   by the ingredient line's middle dot, hovering to magenta, underlined in
+   the section's colour when matched. Reaches the universe card and the
+   drink page's chips through the shared class. `_cards.scss`.
 3. **Food index hierarchy** (critical #2). The filter labels came down to
    1.05rem, which helps, but the recipe title is still 16px lowercase with
    the badge trio as the loudest thing on the row. Candidates: title one size

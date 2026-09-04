@@ -544,13 +544,34 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   margin-bottom: 0.45rem;
 }
 
+// A BARE WORD, NOT A BOXED CHIP, SINCE 2026-09-04 -- the design audit's
+// critical #5 ("the same word appears in two shapes... one shape for one
+// idea"), DESIGN_PLAN §3.2. Both directions were built on the real index --
+// the filter words taking this chip's box, or this chip taking the filter
+// word's form -- and Helen chose the second outright: "100% cards take
+// words." So a mood on a card is now set exactly as the mood in the filter
+// list above it: Courier, bold, lowercase, white, no box; hovering to magenta;
+// and when it is the reason the card is here, underlined in its section's
+// colour with the same band the chosen filter word wears. The card answers
+// the button in the button's own shape as well as its own colour.
+//
+// A MIDDLE DOT BETWEEN WORDS, because bare words in a row need a seam that a
+// box used to provide -- Helen: "Let's find a separator though, maybe a
+// single vertically centred dot?" It is the ingredient line's own `·`
+// (`.drink-card-sep`), one row down, so the two lines of a card's body
+// separate their items the same way. On the FOLLOWING word's ::before, as an
+// inline-block so a matched word's underline does not run under the dot: a
+// text decoration propagates to inline children and stops at atomic ones.
 .drink-card-mood {
-  font-size: 0.68rem;
+  font-family: $font-headings;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: lowercase;
   line-height: $chip-line;
-  letter-spacing: 0.02em;
-  color: $color-clear-text;
-  border: 1px solid $color-border;
-  padding: 0 0.45rem;
+  letter-spacing: 0;
+  color: #ffffff;
+  border: 0;
+  padding: 0;
   flex: none;
 
   // IT IS A <button> NOW, so the UA's own button styling has to be undone --
@@ -561,7 +582,6 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // `background: none` rather than transparent for the same reason the pool
   // buttons use it: there is no fill here at rest and none when matched either,
   // which is §9.13's "bands and washes, not fills".
-  font-family: inherit;
   background: none;
   border-radius: 0;
   cursor: pointer;
@@ -569,8 +589,20 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // The card itself is not a link, so nothing is competing for this click --
   // but the title above it IS, and a chip sits inside the same card. The
   // handler calls preventDefault for that reason.
+  // A BARE WORD MOVES ITS TEXT on hover, as the filter words do (§9.13, "a
+  // chip has a box and a filter word does not"): with the box gone, the text
+  // is what there is to move, and magenta is what hover means site-wide.
   &:hover,
-  &:focus-visible { border-color: $color-cosmic-cosmopolitan; color: $color-text; }
+  &:focus-visible { color: $color-cosmic-cosmopolitan; }
+
+  & + &::before {
+    content: "·";
+    display: inline-block;
+    margin-right: 0.28rem;
+    color: $color-clear-text;
+    font-weight: 400;
+    -webkit-text-stroke: 0;
+  }
 
   // A chip matching an active mood filter fills, the same treatment a matched
   // ingredient gets — but in MENTHE, because the mood filter is menthe and the
@@ -611,16 +643,23 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // ingredient band: "There's a lot going on... But I genuinely think it's
   // really pretty!" The whole rule is written once, at _palette.scss's
   // heading bars.
+  //
+  // AND THE WASH WENT WITH THE BOX, 2026-09-04: a matched word is underlined,
+  // exactly as `.btn-mood.is-on` is in _filters.scss (same thickness, offset
+  // and faux-bold stroke), in the heading's own variable. The two washes this
+  // used to read are deleted from _palette.scss with their consumer.
   &.is-match {
-    background: $color-heading-mood-wash;
-    border-color: $color-heading-mood;
-    color: $color-text;
-    font-weight: 600;
+    color: #ffffff;
+    -webkit-text-stroke: 0.04em #ffffff;
+    text-decoration: underline;
+    text-decoration-color: $color-heading-mood;
+    text-decoration-thickness: 0.2em;
+    text-underline-offset: 0.16em;
+    text-decoration-skip-ink: none;
   }
 
   &--hassle.is-match {
-    background: $color-heading-hassle-wash;
-    border-color: $color-heading-hassle;
+    text-decoration-color: $color-heading-hassle;
   }
 }
 
