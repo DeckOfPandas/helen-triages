@@ -378,14 +378,28 @@
      list you shop from is the one you shortlisted. */
   var shoppingEl = document.getElementById('shopping-list');
   var shoppingItems = shoppingEl && shoppingEl.querySelector('.shopping-list-items');
+  var shoppingDrinks = shoppingEl && shoppingEl.querySelector('.shopping-list-drinks');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
-  var glassesInput = document.getElementById('shopping-list-glasses');
+  var setAllInput = document.getElementById('shopping-list-setall');
 
-  function glasses() {
-    var n = parseInt(glassesInput ? glassesInput.value : '1', 10);
-    // NaN from an emptied box, or a pasted 0, is one glass -- never zero, which
-    // would render an empty list and read as a bug rather than as an answer.
-    return isFinite(n) && n > 0 ? n : 1;
+  /* The card's own title, for the per-drink list. Read off the model rather than
+     re-derived: `d.title` is the unmarked title card-name highlighting stashes,
+     so a drink found by a name search still lists under its real name. */
+  var titleByUrl = (function () {
+    var map = {};
+    model.forEach(function (d) { if (d.url) map[d.url] = d.title || d.url; });
+    return map;
+  })();
+
+  /* THE DRINKS, IN THE ORDER THEY WERE SHORTLISTED. The store keeps insertion
+     order, which is the order Helen marked them in -- a more useful order for
+     a planning list than either alphabetical or the index's own ranking, and
+     one she can predict. Drinks no longer on the page are dropped, the same
+     silence a renamed drink already gets everywhere else in this feature. */
+  function shortlistedDrinks() {
+    return HTF.shortlist.list().filter(function (url) {
+      return Object.prototype.hasOwnProperty.call(INGREDIENTS, url);
+    });
   }
 
   function renderShoppingList() {
@@ -393,50 +407,94 @@
     shoppingEl.hidden = !state.shortlisted;
     if (!state.shortlisted) return;
 
+    var urls = shortlistedDrinks();
+
+    if (shoppingEmpty) shoppingEmpty.hidden = urls.length > 0;
+
+    /* THE PER-DRINK COUNTS. Rebuilt whole, like the totals below -- but NOT
+       while one of its own inputs has focus, because replacing the node under a
+       typing cursor loses the caret and the keystroke. `renderTotals()` is
+       called on its own from the input handler for exactly that reason. */
+    if (shoppingDrinks) {
+      shoppingDrinks.innerHTML = urls.map(function (url) {
+        return '<li>' +
+          '<input type="number" class="shopping-list-glasses" min="1" max="99" step="1" ' +
+          'inputmode="numeric" value="' + HTF.shortlist.glasses(url) + '" ' +
+          'data-url="' + HTF.escapeHtml(url) + '" ' +
+          'aria-label="glasses of ' + HTF.escapeHtml(titleByUrl[url] || url) + '">' +
+          '<span>' + HTF.escapeHtml(titleByUrl[url] || url) + '</span>' +
+          '</li>';
+      }).join('');
+    }
+
+    renderTotals(urls);
+  }
+
+  function renderTotals(urls) {
+    if (!shoppingItems) return;
+
     var entries = [];
-    HTF.shortlist.list().forEach(function (url) {
-      // A url in the store with no drink on the page is one that has been
-      // renamed or unpublished since it was marked. Skipped in silence, exactly
-      // as its card silently is not in the list -- see the filter button's own
-      // note in cocktails/index.html.
+    (urls || shortlistedDrinks()).forEach(function (url) {
+      var glasses = HTF.shortlist.glasses(url);
       (INGREDIENTS[url] || []).forEach(function (ing) {
-        entries.push({ amount: ing.a, generic: ing.g, bottle: ing.b });
+        entries.push({ amount: ing.a, generic: ing.g, bottle: ing.b, glasses: glasses });
       });
     });
 
     var rows = HTF.shoppingList.build(entries, {
-      multiplier: glasses(),
       // The cards' own list, not a second copy -- `not_on_cards: ['water']`.
       exclude: VOCABULARY.not_on_cards || [],
-      bottleAliases: BOTTLE_ALIASES
+      bottleAliases: BOTTLE_ALIASES,
+      // Declared in the same file, for the four juices you squeeze yourself.
+      juiceYields: VOCABULARY.juice_yields || {}
     });
 
-    if (shoppingEmpty) shoppingEmpty.hidden = rows.length > 0;
-    if (!shoppingItems) return;
-
     /* REBUILT WHOLE, not patched. It is at most a couple of dozen rows, it
-       changes only when the shortlist or the scaler does, and a diffing render
+       changes only when the shortlist or a count does, and a diffing render
        here would be complexity bought for nothing. */
-    var html = rows.map(function (row) {
-      var note = row.note
-        ? '<span class="shopping-list-note">' + HTF.escapeHtml(row.note) + '</span>'
+    shoppingItems.innerHTML = rows.map(function (row) {
+      /* THE BOTTLE IN BRACKETS ON THE SAME LINE -- Helen, 2026-09-04, "like the
+         recipes", which is `.cocktail-item-name` then `.cocktail-suggestion` on
+         a drink page. The fruit count joins it in the same brackets when there
+         is one, because "(Beefeater) (9 to 13 lemons)" is two parentheticals
+         where the sentence wants one. */
+      var brackets = [];
+      if (row.note) brackets.push(row.note);
+      if (row.fruit) brackets.push(row.fruit.text);
+      var suffix = brackets.length
+        ? ' <span class="shopping-list-note">(' +
+          HTF.escapeHtml(brackets.join(', ')) + ')</span>'
         : '';
       return '<li>' +
         '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
-        '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + note + '</span>' +
+        '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + suffix + '</span>' +
         '</li>';
     }).join('');
-    shoppingItems.innerHTML = html;
-
-    // "1 glass of each", "6 glasses of each" -- the same rule the survivor count
-    // above follows, and for the same reason: the word has to move with the
-    // number or the line reads as a bug.
-    var plural = shoppingEl.querySelector('[data-shopping-plural]');
-    if (plural) plural.textContent = glasses() === 1 ? '' : 'es';
   }
 
-  if (glassesInput) {
-    glassesInput.addEventListener('input', renderShoppingList);
+  if (shoppingDrinks) {
+    // Delegated, because the inputs are replaced on every shortlist change.
+    shoppingDrinks.addEventListener('input', function (ev) {
+      var input = ev.target;
+      if (!input.classList || !input.classList.contains('shopping-list-glasses')) return;
+      HTF.shortlist.setGlasses(input.dataset.url, input.value);
+      // Totals only. Re-rendering the drinks list would replace the very input
+      // being typed into and take the caret with it.
+      renderTotals();
+    });
+  }
+
+  if (setAllInput) {
+    /* SET ALL: it writes every drink's own count and then has no further
+       opinion. One number per drink, one place it lives -- rather than a global
+       factor on top of a per-drink figure, where nobody can say what six times
+       two is meant to mean. */
+    setAllInput.addEventListener('input', function () {
+      var n = parseInt(setAllInput.value, 10);
+      if (!isFinite(n) || n < 1) return;
+      shortlistedDrinks().forEach(function (url) { HTF.shortlist.setGlasses(url, n); });
+      renderShoppingList();
+    });
   }
 
   function apply() {

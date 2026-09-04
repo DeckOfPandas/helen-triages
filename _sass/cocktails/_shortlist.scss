@@ -229,7 +229,25 @@
   margin-bottom: $space-md;
 }
 
-.shopping-list-scaler {
+// Every typed number in this panel wears the same box: the site's own surface
+// and border rather than the browser's, and the home colour on focus. One rule,
+// because "set all to" and a drink's own count are the same control.
+%shopping-number {
+  @extend %cocktail-heading-face;
+  width: 3.2rem;
+  font-size: 0.95rem;
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  padding: $space-xxs $space-xs;
+
+  &:focus-visible {
+    outline: none;
+    border-color: $color-cosmic-cosmopolitan;
+  }
+}
+
+.shopping-list-setall {
   @extend %cocktail-heading-face;
   display: flex;
   align-items: baseline;
@@ -238,22 +256,30 @@
   letter-spacing: 0.08em;
   color: $color-clear-text;
 
-  input {
-    @extend %cocktail-heading-face;
-    width: 3.2rem;
-    font-size: 0.95rem;
-    // The one place on this index where a number is TYPED rather than chosen,
-    // so it wears the site's own surface and border rather than the browser's.
-    color: $color-text;
-    background: $color-surface;
-    border: 1px solid $color-border;
-    padding: $space-xxs $space-xs;
+  input { @extend %shopping-number; }
+}
 
-    &:focus-visible {
-      outline: none;
-      border-color: $color-cosmic-cosmopolitan;
-    }
+// --- one count per drink -----------------------------------------------------
+// A wrapping row of number-and-name pairs rather than a column: a weekend's
+// shortlist is a handful of drinks, and a column of six would push the totals —
+// the thing the panel is FOR — below the fold on a phone.
+.shopping-list-drinks {
+  list-style: none;
+  margin: 0 0 $space-lg;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm $space-lg;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: $space-xs;
+    font-size: 0.9rem;
+    color: $color-text;
   }
+
+  input { @extend %shopping-number; }
 }
 
 .shopping-list-items {
@@ -285,12 +311,15 @@
   min-width: 0;
 }
 
-// The bottle, or the bottles, that the drinks actually named — quiet, because
-// the line is already labelled and this is the detail under it. See
-// assets/js/shopping-list.js for which of the two the label ends up being.
+// The bottles the drinks named, and the whole-fruit count, in one bracket on
+// the same line as the generic — Helen, 2026-09-04: "show generic first, with
+// bottle on the same line in brackets, like the recipes." That is the drink
+// page's `.cocktail-suggestion` shape, so a line reads the same way in both
+// places. INLINE, not a block: it was a second line under the name for one
+// version, which is what made this a list of two-line entries rather than of
+// ingredients.
 .shopping-list-note {
-  display: block;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: $color-clear-text;
 }
 

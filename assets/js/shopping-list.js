@@ -25,14 +25,21 @@
 // Reserve` and `Woodford’s Reserve` differ by an apostrophe, `Dolin Dry` and
 // `Dolin dry` by a capital, and El Dorado 3 is written five ways.
 //
-// So the GROUP is the generic — the thing there is one of in a cupboard — and
-// the LABEL still answers Helen's rule wherever the data lets it:
+// So the GROUP is the generic — the thing there is one of in a cupboard.
 //
-//   - every entry in the group names the same bottle  ->  the bottle leads,
-//     with the generic as the quiet note. Her rule, exactly.
-//   - otherwise                                       ->  the generic leads,
-//     and the bottles that were named are listed beside it, so nothing she
-//     wrote down is lost.
+// THE GENERIC ALWAYS LEADS, AND THE BOTTLES FOLLOW IN BRACKETS — Helen,
+// 2026-09-04, settling it after seeing the first version: "show generic first,
+// with bottle on the same line in brackets, like the recipes." That is the drink
+// page's own shape (`.cocktail-item-name` then `.cocktail-suggestion` in
+// parentheses, _layouts/cocktail.html), so a line reads the same way in both
+// places. The earlier rule — bottle leading whenever a group was unanimous —
+// made a list whose left column changed KIND from row to row, which is exactly
+// what a shopping list scanned down its edge cannot afford.
+//
+// The generic is the one a drink WROTE, never the shortened name a card shows:
+// `card_names` exists to fit "moderately aged Jamaican rum" onto a 370px card
+// (#501) and nothing in this file reads it. Helen, same message: "give the long
+// rum names, not the shortened ones we generated for cards."
 //
 // -----------------------------------------------------------------------------
 // AMOUNTS
@@ -120,14 +127,14 @@
     // `leaf` -> `leaves`, the one unit here that does not take a suffix.
     if (/f$/.test(unit)) return unit.replace(/f$/, 'ves');
 
-    /* A SIBILANT TAKES `es`, EVERYTHING ELSE TAKES `s`. Written as the rule
-       rather than as a list, because a list is what got this wrong: `dash` and
-       `pinch` were the two the collection contains, `pinch` had a line of its
-       own and `dash` fell through to the default and printed `2 dashs` -- in
-       the single most common non-millilitre unit in the data (45 entries). The
-       rule covers both, and covers whichever sibilant unit is written next. */
-    if (/(s|sh|ch|x|z)$/.test(unit)) return unit + 'es';
-    return unit + 's';
+    /* A SIBILANT TAKES `es`, EVERYTHING ELSE TAKES `s` -- pluralise() above.
+       Written as a rule rather than a list, because a list is what got this
+       wrong: `dash` and `pinch` are the two the collection contains, `pinch`
+       had a line of its own and `dash` fell through to the default and printed
+       `2 dashs` -- in the single most common non-millilitre unit in the data
+       (45 entries). The rule covers both, and whichever sibilant unit is
+       written next. */
+    return pluralise(unit);
   }
 
   /**
@@ -146,6 +153,50 @@
     var quantity = parseFloat(match[1]);
     if (!isFinite(quantity)) return null;
     return { quantity: quantity, unit: foldUnit(match[2]) };
+  }
+
+  /* HOW MANY WHOLE FRUITS A VOLUME OF JUICE COMES TO — #546, Helen 2026-09-04:
+     "Please give the range of whole fruits needed, like this '375 ml lemon juice
+     (X to Y lemons)'."
+
+     THE YIELDS ARE DATA, in _data/cocktails/ingredients.yml under `juice_yields`,
+     and are passed in. Only four juices have them, and only the four you squeeze
+     yourself: pineapple, cranberry and apple arrive in a carton, so "how many
+     whole fruits" is not a question anyone is asking in the shop.
+
+     THE DIVISION RUNS THE OTHER WAY ROUND FROM THE INSTINCT, which is the one
+     thing here worth getting wrong slowly rather than quickly: the FEWEST fruits
+     is the total over the LARGEST yield. More juice per lemon means fewer
+     lemons. Both ends round UP, because three quarters of a lemon is a lemon you
+     had to buy.
+
+     A RANGE THAT COLLAPSES IS PRINTED ONCE. 60 ml of lime is 2 to 3 limes; 20 ml
+     is 1 to 1, and "1 to 1 limes" is a worse sentence than "1 lime". */
+  function pluralise(word) {
+    if (/(s|sh|ch|x|z)$/.test(word)) return word + 'es';
+    return word + 's';
+  }
+
+  function fruitCount(ml, yields) {
+    if (!yields || !(ml > 0)) return null;
+
+    var low = Number(yields.ml_min);
+    var high = Number(yields.ml_max);
+    var fruit = String(yields.fruit || '').trim();
+    if (!fruit || !isFinite(low) || !isFinite(high) || low <= 0 || high <= 0) return null;
+
+    // Declared either way round without changing the answer.
+    var smallest = Math.min(low, high);
+    var largest = Math.max(low, high);
+
+    var fewest = Math.ceil(ml / largest);
+    var most = Math.ceil(ml / smallest);
+
+    var text = fewest === most
+      ? fewest + ' ' + (fewest === 1 ? fruit : pluralise(fruit))
+      : fewest + ' to ' + most + ' ' + pluralise(fruit);
+
+    return { fewest: fewest, most: most, fruit: fruit, text: text };
   }
 
   /* FLOATING POINT, AND IT SHOWS UP IMMEDIATELY HERE: the collection is full of
@@ -167,6 +218,8 @@
    *        same way the keys are (pass `not_on_cards`)
    * @param {Object} [options.bottleAliases] - folded spelling -> canonical
    *        bottle name, so one bottle written several ways is one bottle
+   * @param {Object} [options.juiceYields] - generic -> {fruit, ml_min, ml_max},
+   *        `juice_yields` from _data/cocktails/ingredients.yml
    * @returns {Array} one row per ingredient, sorted by label:
    *        { label, note, generic, bottles: string[],
    *          totals: [{quantity, unit, text}], unquantified: [{text, drinks}],
@@ -195,6 +248,14 @@
     function canonicalBottle(name) {
       return aliases[foldKey(name)] || name;
     }
+
+    /* Keyed the same way the groups are, so a yield declared as `lemon juice`
+       is found however the drink capitalised it. Absent, no line gets a fruit
+       count and every total is still right. */
+    var yields = {};
+    Object.keys(opts.juiceYields || {}).forEach(function (generic) {
+      yields[foldKey(generic)] = opts.juiceYields[generic];
+    });
 
     var groups = {};
     var order = [];
@@ -265,13 +326,24 @@
         group.bare += 1;
       }
 
+      /* PER-DRINK QUANTITIES — Helen, 2026-09-04, asked for after the global
+         scaler: two negronis and six daiquiris is a real weekend, and one
+         number for everything cannot say it.
+
+         An entry's own `glasses` wins; `options.multiplier` is the fallback for
+         everything that does not carry one. So the global scaler is simply the
+         case where no entry has an opinion, which is why it needed no second
+         code path and why every existing test still describes what it did. */
+      var scale = (typeof entry.glasses === 'number' && entry.glasses > 0)
+        ? entry.glasses : multiplier;
+
       var parsed = parseAmount(entry.amount);
       if (parsed) {
         if (group.units[parsed.unit] === undefined) {
           group.units[parsed.unit] = 0;
           group.unitOrder.push(parsed.unit);
         }
-        group.units[parsed.unit] += parsed.quantity * multiplier;
+        group.units[parsed.unit] += parsed.quantity * scale;
       } else {
         var text = String(entry.amount || '').trim();
         if (!text) return;
@@ -279,22 +351,23 @@
           group.unquantified[text] = 0;
           group.unquantifiedOrder.push(text);
         }
-        group.unquantified[text] += multiplier;
+        group.unquantified[text] += scale;
       }
     });
 
     return order.map(function (key) {
       var group = groups[key];
 
-      /* HELEN'S RULE, APPLIED WHERE THE DATA ALLOWS IT. One bottle named by
-         every entry in the group is the case she described, and the bottle
-         leads. Anything else -- a bare entry, or two bottles -- and the generic
-         has to lead, because there is no single bottle for this line to be. */
-      var oneBottle = group.bottles.length === 1 && group.bare === 0;
-      var label = oneBottle ? group.bottles[0] : group.generic;
-      // The flat, deduped names for the note — see `bottleNames` above for the
-      // real line on real data that this is fixing.
-      var note = oneBottle ? group.generic : group.bottleNames.join(' / ');
+      /* THE GENERIC LEADS, ALWAYS. See the header: Helen settled this after
+         looking at the first version, and it matches the drink page's own
+         `name (bottle)` shape.
+
+         The bracketed part is the flat, deduped list of individual bottles --
+         see `bottleNames` above for the real line this shape is fixing. The
+         group's bottles AS WRITTEN are still on the row for a caller that wants
+         the "or" form back. */
+      var label = group.generic;
+      var note = group.bottleNames.join(' / ');
 
       var totals = group.unitOrder.map(function (unit) {
         var quantity = tidy(group.units[unit]);
@@ -309,6 +382,11 @@
       var unquantified = group.unquantifiedOrder.map(function (text) {
         return { text: text, drinks: group.unquantified[text] };
       });
+
+      /* HOW MANY LEMONS. Only ever from the ml total: the yields are declared in
+         millilitres, and "2 dashes of lemon juice" is not a fruit. */
+      var millilitres = group.units.ml || 0;
+      var fruit = fruitCount(tidy(millilitres), yields[foldKey(group.generic)]);
 
       /* ONE STRING FOR THE WHOLE AMOUNT, built here rather than in the template,
          so that the copy-to-clipboard text and the rendered row can never say
@@ -325,9 +403,22 @@
         bottles: group.bottles.slice(),
         totals: totals,
         unquantified: unquantified,
+        fruit: fruit,
+        millilitres: tidy(millilitres),
         text: parts.join(' + ')
       };
     }).sort(function (a, b) {
+      /* DESCENDING BY VOLUME — Helen, 2026-09-04: "order by descending volume
+         required." The big pours are what you shop for and what you might not
+         have; two dashes of bitters is a bottle you almost certainly own.
+
+         MILLILITRES DECIDE, AND ONLY MILLILITRES. Sorting across units would
+         mean ranking 45 ml against 2 dashes, which needs the conversion this
+         file refuses to invent everywhere else. So everything with a volume
+         sorts first, largest to smallest; everything without one (bitters by
+         the dash, mint by the leaf, a `to top`) follows in a block of its own,
+         alphabetically, which is the only order left that means anything. */
+      if (a.millilitres !== b.millilitres) return b.millilitres - a.millilitres;
       return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
     });
   }
@@ -335,6 +426,7 @@
   var api = {
     build: build,
     parseAmount: parseAmount,
+    fruitCount: fruitCount,
     foldKey: foldKey,
     foldUnit: foldUnit,
     unitLabel: unitLabel

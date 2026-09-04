@@ -101,14 +101,26 @@ test('a quantity and an unquantified entry can share a line', () => {
 });
 
 // --- the label rule, which is Helen's ------------------------------------------
+// Settled 2026-09-04, after she looked at the first version: "show generic
+// first, with bottle on the same line in brackets, like the recipes." The
+// generic ALWAYS leads; the bottles are always the bracketed note.
 
-test('one bottle named by every entry: the bottle leads, generic as the note', () => {
+test('the generic leads and the bottle is the note, even when unanimous', () => {
   const rows = SL.build([
     ing('30 ml', 'aromatic bitters', 'Angostura'),
     ing('2 dashes', 'aromatic bitters', 'Angostura')
   ]);
-  assert.strictEqual(rows[0].label, 'Angostura');
-  assert.strictEqual(rows[0].note, 'aromatic bitters');
+  assert.strictEqual(rows[0].label, 'aromatic bitters');
+  assert.strictEqual(rows[0].note, 'Angostura');
+});
+
+test('the long generic is used, never a shortened card name', () => {
+  // `card_names` shortens "moderately aged Jamaican rum" to "Jamaican rum" to
+  // fit a 370px card (#501). Helen: "give the long rum names, not the shortened
+  // ones we generated for cards." Nothing in this module reads that map, and
+  // this is the test that says so.
+  const rows = SL.build([ing('30 ml', 'moderately aged Jamaican rum', 'Appleton 8')]);
+  assert.strictEqual(rows[0].label, 'moderately aged Jamaican rum');
 });
 
 test('two bottles for one generic: the generic leads and both are kept', () => {
@@ -142,8 +154,7 @@ test('a curly apostrophe does not split a group or duplicate a bottle', () => {
     ing('30 ml', 'bourbon', 'Woodford’s Reserve')
   ]);
   assert.strictEqual(rows.length, 1);
-  assert.strictEqual(rows[0].bottles.length, 1, 'one bottle, written two ways');
-  assert.strictEqual(rows[0].label, "Woodford's Reserve");
+  assert.strictEqual(rows[0].note, "Woodford's Reserve", 'one bottle, written two ways');
   assert.strictEqual(rows[0].text, '80 ml');
 });
 
@@ -171,7 +182,10 @@ test('a generic written as a list is one ingredient, joined with "or"', () => {
 
 test('a bottle written as a list is one suggestion, joined the same way', () => {
   const rows = SL.build([ing('30 ml', 'blanco tequila', ['Patrón Silver', 'Tapatio'])]);
-  assert.strictEqual(rows[0].label, 'Patrón Silver or Tapatio');
+  assert.strictEqual(rows[0].label, 'blanco tequila');
+  assert.strictEqual(rows[0].note, 'Patrón Silver / Tapatio');
+  assert.deepStrictEqual(rows[0].bottles, ['Patrón Silver or Tapatio'],
+    'the "or" form is still on the row for a caller that wants it');
 });
 
 // --- the scaler ---------------------------------------------------------------
@@ -209,11 +223,140 @@ test('excluded generics are left out, and the caller supplies the list', () => {
   assert.deepStrictEqual(labels(rows), ['gin']);
 });
 
-test('rows come back sorted by their label, case-insensitively', () => {
+// --- order --------------------------------------------------------------------
+// Helen, 2026-09-04: "order by descending volume required." The big pours are
+// what you shop for; two dashes of bitters is a bottle you almost certainly own.
+
+test('rows come back largest volume first', () => {
+  const rows = SL.build([
+    ing('10 ml', 'benedictine'), ing('180 ml', 'rum'), ing('45 ml', 'lime juice')
+  ]);
+  assert.deepStrictEqual(labels(rows), ['rum', 'lime juice', 'benedictine']);
+});
+
+test('rows with no volume at all follow the ones that have it', () => {
+  // Sorting 2 dashes against 45 ml would need the conversion this module
+  // refuses to invent, so everything volumetric sorts first and the rest
+  // follows in a block.
+  const rows = SL.build([
+    ing('2 dashes', 'aromatic bitters'),
+    ing('10 ml', 'benedictine'),
+    ing('to top', 'soda water'),
+    ing('180 ml', 'rum')
+  ]);
+  assert.deepStrictEqual(labels(rows),
+    ['rum', 'benedictine', 'aromatic bitters', 'soda water']);
+});
+
+test('equal volumes fall back to the label, case-insensitively', () => {
   const rows = SL.build([
     ing('10 ml', 'rum'), ing('10 ml', 'Angostura'), ing('10 ml', 'benedictine')
   ]);
   assert.deepStrictEqual(labels(rows), ['Angostura', 'benedictine', 'rum']);
+});
+
+// --- whole fruits -------------------------------------------------------------
+// Helen, 2026-09-04: "375 ml lemon juice (X to Y lemons)". Yields are declared
+// in _data/cocktails/ingredients.yml and passed in; only the four you squeeze
+// yourself have them.
+
+const YIELDS = {
+  'lemon juice': { fruit: 'lemon', ml_min: 30, ml_max: 45 },
+  'lime juice': { fruit: 'lime', ml_min: 20, ml_max: 30 },
+  'grapefruit juice': { fruit: 'grapefruit', ml_min: 180, ml_max: 240 }
+};
+
+test('the worked example from the brief', () => {
+  // 375 / 45 = 8.33 -> 9 at best; 375 / 30 = 12.5 -> 13 at worst.
+  const rows = SL.build([ing('375 ml', 'lemon juice')], { juiceYields: YIELDS });
+  assert.strictEqual(rows[0].fruit.text, '9 to 13 lemons');
+});
+
+test('the FEWEST fruits comes from the LARGEST yield, which is the easy one to invert', () => {
+  const [row] = SL.build([ing('120 ml', 'lime juice')], { juiceYields: YIELDS });
+  assert.strictEqual(row.fruit.fewest, 4, '120 / 30, the generous lime');
+  assert.strictEqual(row.fruit.most, 6, '120 / 20, the mean one');
+});
+
+test('both ends round up — three quarters of a lemon is a lemon you bought', () => {
+  const [row] = SL.build([ing('10 ml', 'lemon juice')], { juiceYields: YIELDS });
+  assert.strictEqual(row.fruit.fewest, 1);
+  assert.strictEqual(row.fruit.most, 1);
+});
+
+test('a range that collapses is printed once, and singular', () => {
+  const [row] = SL.build([ing('20 ml', 'lime juice')], { juiceYields: YIELDS });
+  assert.strictEqual(row.fruit.text, '1 lime');
+});
+
+test('a collapsed range above one is still printed once, and plural', () => {
+  const [row] = SL.build([ing('180 ml', 'grapefruit juice')], { juiceYields: YIELDS });
+  assert.strictEqual(row.fruit.text, '1 grapefruit');
+  // 360 / 240 = 1.5 -> 2, and 360 / 180 = 2 -> 2. (480 does NOT collapse:
+  // it is 2 to 3, which is what this test asserted on its first run.)
+  const [two] = SL.build([ing('360 ml', 'grapefruit juice')], { juiceYields: YIELDS });
+  assert.strictEqual(two.fruit.text, '2 grapefruits');
+});
+
+test('the count follows the scaler, because the total does', () => {
+  const [row] = SL.build([ing('45 ml', 'lemon juice')], { juiceYields: YIELDS, multiplier: 8 });
+  assert.strictEqual(row.text, '360 ml');
+  assert.strictEqual(row.fruit.text, '8 to 12 lemons');
+});
+
+test('a juice with no declared yield gets no count, and does not throw', () => {
+  // Pineapple, cranberry and apple arrive in a carton — deliberately absent
+  // from the data rather than forgotten.
+  const [row] = SL.build([ing('90 ml', 'pineapple juice')], { juiceYields: YIELDS });
+  assert.strictEqual(row.fruit, null);
+});
+
+test('only millilitres make fruit — 2 dashes of lemon juice is not a lemon', () => {
+  const [row] = SL.build([ing('2 dashes', 'lemon juice')], { juiceYields: YIELDS });
+  assert.strictEqual(row.fruit, null);
+});
+
+test('with no yields passed at all, every total is still right', () => {
+  const [row] = SL.build([ing('375 ml', 'lemon juice')]);
+  assert.strictEqual(row.fruit, null);
+  assert.strictEqual(row.text, '375 ml');
+});
+
+// --- per-drink quantities ------------------------------------------------------
+// Helen, 2026-09-04: "Per drink quantities, zomg yes please!" An entry's own
+// `glasses` wins; the global multiplier is the fallback, which is why it needed
+// no second code path.
+
+test('each entry can carry its own number of glasses', () => {
+  const rows = SL.build([
+    { amount: '50 ml', generic: 'gin', glasses: 2 },
+    { amount: '50 ml', generic: 'rum', glasses: 6 }
+  ]);
+  assert.strictEqual(byLabel(rows, 'rum').text, '300 ml');
+  assert.strictEqual(byLabel(rows, 'gin').text, '100 ml');
+});
+
+test('two drinks sharing an ingredient each scale by their own count', () => {
+  // A negroni x2 and a boulevardier x6, both wanting Campari.
+  const rows = SL.build([
+    { amount: '30 ml', generic: 'Campari', glasses: 2 },
+    { amount: '20 ml', generic: 'Campari', glasses: 6 }
+  ]);
+  assert.strictEqual(rows[0].text, '180 ml', '60 + 120');
+});
+
+test('an entry with no count of its own falls back to the global multiplier', () => {
+  const rows = SL.build([
+    { amount: '50 ml', generic: 'gin', glasses: 2 },
+    { amount: '50 ml', generic: 'rum' }
+  ], { multiplier: 10 });
+  assert.strictEqual(byLabel(rows, 'gin').text, '100 ml', 'its own count wins');
+  assert.strictEqual(byLabel(rows, 'rum').text, '500 ml', 'the fallback applies');
+});
+
+test('per-drink counts scale an unquantified entry by drinks too', () => {
+  const rows = SL.build([{ amount: 'to top', generic: 'soda water', glasses: 5 }]);
+  assert.strictEqual(rows[0].text, 'to top (×5)');
 });
 
 // --- declared bottle aliases ---------------------------------------------------
@@ -226,8 +369,7 @@ test('a declared alias collapses onto the canonical bottle', () => {
     ing('30 ml', 'lightly aged and filtered rum', 'ED3'),
     ing('30 ml', 'lightly aged and filtered rum', 'El Dorado 3')
   ], { bottleAliases: { ed3: 'El Dorado 3' } });
-  assert.strictEqual(rows[0].bottles.length, 1, 'one bottle, written two ways');
-  assert.strictEqual(rows[0].label, 'El Dorado 3', 'and the bottle may now lead');
+  assert.strictEqual(rows[0].note, 'El Dorado 3', 'one bottle, written two ways');
   assert.strictEqual(rows[0].text, '60 ml');
 });
 
@@ -235,7 +377,7 @@ test('each alternative of a list suggestion resolves on its own', () => {
   const rows = SL.build([ing('30 ml', 'rum', ['ED3', 'Havana Club 3'])], {
     bottleAliases: { ed3: 'El Dorado 3', 'havana club 3': 'Havana 3' }
   });
-  assert.strictEqual(rows[0].label, 'El Dorado 3 or Havana 3');
+  assert.strictEqual(rows[0].note, 'El Dorado 3 / Havana 3');
 });
 
 test('the note names each bottle once, even when a suggestion was a list', () => {
@@ -251,21 +393,21 @@ test('the note names each bottle once, even when a suggestion was a list', () =>
   assert.strictEqual(rows[0].note, 'Havana Club 3 / El Dorado 3');
 });
 
-test('a unanimous list suggestion still keeps its "or" in the label', () => {
-  // The note flattens; the label must not. "El Dorado 3 or Havana Club 3" is
-  // Helen's own wording for a choice she is happy with (#441), and where it is
-  // the only suggestion in the group it is what the line should be called.
+test('the suggestion as Helen wrote it survives on the row', () => {
+  // The note flattens to individual bottles; `bottles` keeps the "or" form,
+  // which is her own wording for a choice she is happy with (#441).
   const rows = SL.build([
     ing('30 ml', 'rum', ['El Dorado 3', 'Havana Club 3']),
     ing('30 ml', 'rum', ['El Dorado 3', 'Havana Club 3'])
   ]);
-  assert.strictEqual(rows[0].label, 'El Dorado 3 or Havana Club 3');
-  assert.strictEqual(rows[0].note, 'rum');
+  assert.strictEqual(rows[0].label, 'rum');
+  assert.strictEqual(rows[0].note, 'El Dorado 3 / Havana Club 3');
+  assert.deepStrictEqual(rows[0].bottles, ['El Dorado 3 or Havana Club 3']);
 });
 
 test('with no alias map the fold is still the answer, and nothing throws', () => {
   const rows = SL.build([ing('30 ml', 'rum', 'ED3')]);
-  assert.strictEqual(rows[0].label, 'ED3');
+  assert.strictEqual(rows[0].note, 'ED3');
 });
 
 test('an entry with no generic is dropped rather than making a nameless line', () => {

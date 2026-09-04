@@ -612,11 +612,23 @@ permalink: /cocktails/
   <section class="shopping-list" id="shopping-list" hidden aria-live="polite">
     <div class="shopping-list-head">
       <h2 class="drink-field-label"><span class="drink-field-label-text">Shopping list</span></h2>
-      <label class="shopping-list-scaler">
-        <input type="number" id="shopping-list-glasses" value="1" min="1" max="99" step="1" inputmode="numeric">
-        <span>glass<span data-shopping-plural>es</span> of each</span>
+      {% comment %} SET ALL, NOT A MULTIPLIER. It writes every drink's own count
+         and then has no further opinion -- so there is one number per drink and
+         one place it lives, rather than a global factor multiplying a per-drink
+         figure and nobody able to say what six times two means. {% endcomment %}
+      <label class="shopping-list-setall">
+        <span>set all to</span>
+        <input type="number" id="shopping-list-setall" value="1" min="1" max="99" step="1" inputmode="numeric">
       </label>
     </div>
+
+    {% comment %} ONE COUNT PER DRINK -- Helen, 2026-09-04: "Per drink
+       quantities, zomg yes please!" Two negronis and six daiquiris is a real
+       weekend and one number for the whole list cannot say it. Rendered by
+       cocktail-index.js from the shortlist, because only the browser knows what
+       is in it. {% endcomment %}
+    <ul class="shopping-list-drinks"></ul>
+
     <ul class="shopping-list-items"></ul>
     <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
   </section>
