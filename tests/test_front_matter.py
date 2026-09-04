@@ -687,6 +687,26 @@ HELEN_CLEARED: dict[str, str] = {
         "2026-08-21 -- en-dash pass, `170-180°C` in two method steps.",
     "_food_recipes/sweet-shortcrust-pastry-mince-pies.md":
         "2026-08-21 -- en-dash pass, `15-20 mins` in a method step.",
+
+    # --- the copywriting review, 2026-09-04 -----------------------------------
+    #
+    # Helen asked for a copy review of her two longform recipes, applied the
+    # notes herself in tmp/inbox ("it's easier to internalise the feedback when
+    # I apply it myself"), had the agent install her files with only paste
+    # slips fixed (an indented `---`, `proofread: fasle`, a mangled title, one
+    # `--`), read both rendered pages on a local build of the branch, and then:
+    # "Ganache and Hollandaise are signed off, so please flip proofread and
+    # push." The words on the page are hers and she read them last; the agent's
+    # commits wrote the bytes, which is the only reason these entries exist.
+    #
+    # WHY NOT THE BASELINE: same reason as the en-dash block above. Two named
+    # files, and anything else an agent has touched since 9306cef stays held.
+    "_food_recipes/henrys-quick-bulletproof-hollandaise-sauce.md":
+        "2026-09-04 -- copywriting review; Helen's own rewrite of the tips and "
+        "troubleshooting, read on the rendered page and signed off in words.",
+    "_food_recipes/chocolate-ganache.md":
+        "2026-09-04 -- copywriting review; Helen's own rewrite of the tips and "
+        "troubleshooting, read on the rendered page and signed off in words.",
 }
 
 

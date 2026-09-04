@@ -26,8 +26,8 @@ method:
   - "Whisk the egg yolks until thicker and paler, then season with the salt and pepper. Go easy on the salt if you're serving this over something already salty like bacon or ham."
   - "Heat the acids until boiling briskly, then dribble very slowly into the egg yolks while whisking continuously."
   - Melt the butter in another pan until it starts to froth, but if it boils you've gone too far.
-  - "Dribble the butter very slowly into the yolk/acid mixture while still whisking, until the mixture thickens."
-  - step: The sauce will thicken slightly as it cools.
+  - step: "Dribble the butter very slowly into the yolk/acid mixture while still whisking, until the mixture thickens."
+    note: "The sauce will thicken slightly as it cools, so don't panic."
   - "Check seasoning, and keep warm over a bain-marie until serving."
 method_short:
   - ""
@@ -52,8 +52,8 @@ And a note on food safety: this starts out as raw egg. Don't let it sit too long
 - **Use a heavy-bottomed saucepan for the butter.** If it gets away from you and browns, hide the eggs and tell everyone you meant to make beurre noisette instead.
 - **Trust the science of cooling.** It hasn't failed to set until it's finger-warm and still failed to set. 
 - **Whisk manually with a balloon whisk for better control of texture.** You want a classic, glossy, velvety finish rather than over-aerated foam. There's a higher chance of splitting with an electric whisk, and you'll have poor bowl contact compared with doing it by hand. Put "Eye of the Tiger" on and get to it.
-- **Use clarified butter.** Whole butter brings in about 15% water and milk solids. Clarifying your butter first gives a slightly bigger safety net for the emulsion to form.
-- **Salt helps.** The sodium and chloride ions slightly alter the protein matrix, helping it hold water better. Unsalted butter plus salt added directly, rather than however much happens to be in salted butter, means you can control that margin.
+- **Use clarified butter.** Whole butter brings in about 18% water and milk solids. Clarifying it first gives a slightly bigger safety net for the emulsion to form. But then the acid is your only water, so don't reduce it to nothing.
+- **Salt helps.** Unsalted butter plus your own salt means you control how much.
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">Troubleshooting</span></h2>
 <p class="recipe-section-subtitle">a.k.a. egg yolks are sneaky</p>
@@ -70,10 +70,10 @@ Here are four ways the emulsion can fail:
    - **Insufficient violence.** You didn't whisk enough. If you don't break the fat into microscopic droplets, large droplets slide past each other, and the sauce will never thicken.
 
 3. **Curdling** *a lumpy, grainy texture like wet sand*
-   - **Your bain-marie was too hot.** Eggs coagulate permanently at 65°C. Note the word "permanently".
+   - **Your bain-marie was too hot.** Eggs start to coagulate permanently at about 70°C. Note the word "permanently". And how close that is to the 63°C you're holding it above.
 
 4. **Overcooking** *a stodgy, gluey sauce that stands up like wallpaper paste*
-   - **You used too little acid, or over-clarified butter.** There was nothing but fat and protein left to do the work, so the sauce set thick and pasty instead of staying pourable.
+   - **You used too little acid, especially with clarified butter.** There was nothing but fat and protein left to do the work, so the sauce set thick and pasty instead of staying pourable.
    - **Your heart wanted to make scrambled eggs instead.** You followed misplaced advice to slowly warm the egg yolks over low heat before adding the butter. The cooked proteins lost the flexibility to stretch and coat the fat droplets properly, so instead of smooth thickening you got weird blancmange.
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">A Final Warning</span></h2>

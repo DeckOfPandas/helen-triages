@@ -40,11 +40,11 @@ method:
     - Pouring/glazing: 32–35°C
     - Drip cakes: 29–32°C
     - Piping/filling: 20–24°C
-    - Whipped ganache: 18–21°C — cool completely, then beat with an electric mixer until light, fluffy, and holding its shape.
+    - Whipped ganache: 18–21°C — cool completely, then beat with an electric mixer until light, fluffy, and holding its shape. Whipping is fine once it's cold and set; it's whipping while the emulsion is forming that kills it.
 method_short:
   - |
     * Grate chocolate 150 into dry bowl
-    * Heat cream 150 to 88–90°C, pour over, wait 1–3 mins
+    * Heat cream 150 to 88–90°C, pour over, wait 2–3 mins
     * Stir gently to 40–45°C until glossy
     * Butter 1 tbsp, flavourings
     * Cool at room temp to working temp
@@ -60,8 +60,9 @@ meta:
 
 <h2 class="recipe-section-heading" id="tips"><span class="section-heading-text">Tips</span></h2>
 
-- **Use perfectly clean and dry stainless steel bowls.** For even heating.
-- **Use a perfectly clean and dry silicone spatula.** It can create a tight seal against the bottom of the bowl, sweeping up melting pockets without whipping in air.
+- **Use stainless steel bowls.** Glass and ceramic hold heat and keep cooking the chocolate after you want them to stop.
+- **Use a silicone spatula.** Silicone creates a tight seal against the bottom of the bowl, sweeping up melting pockets without whipping in air.
+- **Use perfectly clean and dry equipment.** Water causes seizing — see below.
 - **Heat the cream in a pan.** For the best temperature control, unless you have literally perfect microwave-fu.
 - **Allow the ganache to cool slowly, and set at room temperature.** If you put it in the fridge, you'll need to stir more than you want to get the more-set and less-set bits to combine.
 
@@ -73,18 +74,18 @@ Ganache is a fussy, implausible emulsion. Cocoa butter fat and dairy fat must be
 Here are four ways to accidentally not make ganache, with likely causes:
 
 1. **Splitting** *a greasy, oily layer on top of grainy clumps*
-   - **Over-heating** (>55°C) broke the delicate bonds in the emulsion, so the fat droplets coalesced into giant globs of oil.
+   - **Over-heating** the finished ganache (above 55°C) broke the delicate bonds in the emulsion, so the fat droplets coalesced into giant globs of oil.
    - **Over-stirring** pushed fat droplets to collide. See above re: giant globs of oil.
 2. **Under-melting** *chunky texture with solid, hard flecks of chocolate*
-   - **The cream was too cold** to completely melt the cocoa butter.
+   - **Insufficient patience** when heating the cream so the cocoa butter didn't completely melt.
    - **Coarse chopping** meant the heat from the cream withered and died before reaching the centre of the too-big pieces.
 3. **Seizing** *mixture resembling concrete; a dry, grainy paste that can't be stirred*
    - **Water got in**, so the chocolate's sugar crystals clumped immediately.
    - **Accidental whipping**, such as from using a balloon whisk, let moisture from the air sneak in.
 4. **Chaos** *that is, not following the recipe — see source line above*
-   - **Dropping cold pieces of chocolate into hot cream** is simply cold chunks floating in hot fat, like bad hotpot, which doesn't sound much like an emulsion to me.
+   - **Thinking you can get away without grating the chocolate** means cold chunks floating in hot fat, like bad hotpot, which doesn't sound much like an emulsion to me.
    - **Pouring cold cream into melted chocolate** snap-freezes the cocoa butter out of the emulsion, and the sugars immediately make the most of the opportunity to clump...yum, curdled concrete.
 
-Dark chocolate ganache is less likely to split than lower %s because the dry cocoa solids act as a giant structural sponge holding the emulsion together. White chocolate has zero cocoa sponge, but lots of highly temperature-sensitive cocoa butter and moisture-sensitive sugar. Basically, white chocolate ganache is a temperamental toddler, and splits if you even look at it wrong.
+Dark chocolate ganache is less likely to split than milk or white because the dry cocoa solids act as a giant structural sponge holding the emulsion together. White chocolate has zero cocoa sponge, but lots of highly temperature-sensitive cocoa butter and moisture-sensitive sugar. Basically, white chocolate ganache is a temperamental toddler, and splits if you even look at it wrong.
 
 For more troubleshooting, see [Philosophy of Yum](https://philosophyofyum.com/grainy-ganache-fix-prevent/).

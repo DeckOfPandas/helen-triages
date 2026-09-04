@@ -157,6 +157,52 @@ article.recipe .recipe-body-content.about-page {
     }
   }
 
+  // --- The footnote ----------------------------------------------------------
+  // "*Or artisanally hand-crafted Japanese ice tools." -- the one line on the
+  // page addressed to a reader who arrived from the cocktails site, hung off an
+  // asterisk on "sauté pan*" in item b) above. Added 2026-09-04 when the copy
+  // was rewritten to cover both sites.
+  //
+  // IT SITS AT THE a) b) LEVEL, NOT THE GUTTER'S. The first version gave it
+  // the page gutter and a full-size "*" so the marks column read 1 2 *. Helen,
+  // the same day, looking at it: that "puts the footnote at the same place in
+  // the hierarchy as the points", and "its block isn't aligned with the block
+  // that called it, so I have to do work to parse, and I do not like doing
+  // work." Both are the same mistake -- a footnote is subordinate to the thing
+  // that called it, and the thing that called it is b). So the markup puts it
+  // inside point 2, after the sub-list, and this rule gives it exactly the
+  // sub-list's own treatment: the same 1.7rem indent (its text column IS b)'s
+  // text column), the same body-size mark in the same face and colour. Only
+  // the text is one size down, because it is a footnote and should look like
+  // one.
+  .about-footnote {
+    position: relative;
+    padding-left: 1.7rem;            // = .about-enum-sub > li, so the columns match
+    margin: $space-sm 0 0 0;
+    font-size: $font-size-body-sm;
+
+    &::before {
+      content: "*";
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-family: $font-headings;
+      font-weight: 700;
+      font-size: $font-size-body-sm;   // the a) b) marks' size, not the gutter's
+      color: $about-mark-colour;
+    }
+  }
+
+  // --- Variable names in prose -----------------------------------------------
+  // The dark-site FAQ names three Sass variables. Nothing in food/ styles
+  // <code> (recipes never use it), so without this the browser's own monospace
+  // default applies at its own size. The headings face is the site's monospace
+  // already, so this is the same voice as the marks, one size down.
+  code {
+    font-family: $font-headings;
+    font-size: 0.92em;
+  }
+
   // --- The ways into the collection ------------------------------------------
   // "Filter recipes: by what you have in your hand / by what's lurking in your
   // fridge / by being in the mood for a giant pile of cheese."
