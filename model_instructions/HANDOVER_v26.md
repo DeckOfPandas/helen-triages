@@ -6879,7 +6879,6 @@ labels carry the punched-tape effect, §13.4.1.
 
 | | | |
 |---|---|---|
-| 0 | **THE UNIVERSE SAYS…** | one random row, dealt above the panel; since 2026-09-02 |
 | 1 | STAR INGREDIENT | |
 | 2 | MOOD | |
 | 3 | PRACTICALITIES | |
@@ -6887,24 +6886,23 @@ labels carry the punched-tape effect, §13.4.1.
 | 5 | I KNOW WHAT I WANT | the escape hatch, last on purpose |
 | — | META FILTERS | local only, and **one button now**: `draft` |
 
-**THE UNIVERSE SAYS… — PR #660, 2026-09-02, and the same section exists on
-cocktails.** The page offers before it asks: one random survivor above the
-filter panel, with a `deal again` control. `assets/js/universe.js` (shared,
-site-agnostic) picks a random row from the selector in
-`data-universe-rows` and CLONES the parts named in `data-universe-parts`
-into `.universe-pick`, so the pick is a real row's title link and ingredient
-line (food) or a real card's tape name, ingredient line and mood chips
-(cocktails) and cannot drift from how rows look. Cloned buttons become spans
-(a card chip outside the card list would be a button that does nothing);
-cloned tape slots are filled by `decorations.js`'s `cardTapes()` because
-universe.js runs before it, and re-filled from the source card on a later
-deal. Absent JavaScript the section is `hidden`. Helen's copy, exactly: "the
-universe says…" and "deal again"; she is supplying an SVG for the ↻
-placeholder in `.universe-again-icon`. The food pick carries no badges, on
-her wording ("style the recipe line like the recipes in the list below, and
-give a single line of main ingredients below it") — an open question in
-`DESIGN_PLAN.md`. Frame styles: `food/_universe.scss`,
-`cocktails/_universe.scss`.
+**THE UNIVERSE SAYS… WAS HERE FOR TWO DAYS AND IS GONE FROM FOOD — PR #660,
+2026-09-02, removed 2026-09-04.** The design audit's answer to "nothing
+edible above the fold": one random survivor dealt above the filter panel
+with a `deal again` control, cloned from a real row by `assets/js/universe.js`.
+Helen saw it deployed, was shown a styled-row version and two card versions
+on the real page, and turned the feature down rather than the styling:
+*"This advice was the only part of the design review I disagreed with.
+Having all the dolly mixture colours visible together and first thing
+pleases me. I don't think anyone (and certainly not me) opens a triage
+website to click on a random recipe. And given the styling is hard, my gut
+says that trying to polish it is solving the wrong problem."* **On a triage
+site the panel of choices IS the fold.** The section, its stylesheet and its
+print rule are in git at the commit before this one; if the question is ever
+reopened, recover them rather than rebuilding. The cocktails index still
+carries its own copy (§9.13), where `universe.js` and `cocktails/_universe.scss`
+remain — the script is site-agnostic and does nothing on a page without a
+`.universe` section, so food loading nothing is the whole change there.
 
 **HAS TO HAVE was `SEARCH MAIN INGREDIENTS`** — that named the mechanism where
 every other label names the question, and cocktails already asked it in the

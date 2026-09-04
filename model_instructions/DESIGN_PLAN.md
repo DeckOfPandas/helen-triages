@@ -61,10 +61,12 @@ over-broad `rm -rf`. Tell agents to delete only what they created.
 
 ## 2. Decided, not yet built
 
-1. **"Deal again" icon.** Helen is finding an SVG. The placeholder is
-   `.universe-again-icon` (a ↻ character) in both index templates. Drop the
-   SVG into `_includes/icons/`, render it in the span, size 0.9em, colour
-   `currentColor`.
+1. ~~"Deal again" icon.~~ **The universe section came off food on 2026-09-04**
+   — Helen, having seen it deployed and then a styled row and two card
+   treatments on the real page: "I think it's the feature, not your work…
+   I don't think anyone (and certainly not me) opens a triage website to
+   click on a random recipe." Cocktails still has its copy; the icon question
+   only matters if that survives.
 2. **Leopard.** Round one she chose L3 (sheen). Round two (five patterns ×
    four placements) she has not decided, and said "leave leopard with me…
    don't ship anything." `model_instructions/LEOPARD.md` has the generator,
@@ -91,8 +93,8 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    1.05rem, which helps, but the recipe title is still 16px lowercase with
    the badge trio as the loudest thing on the row. Candidates: title one size
    up; badges muted one step at rest; row order title / badges / ingredients.
-   Also ask whether the universe pick should carry the badges (left off, per
-   her wording).
+   (The universe pick's badge question is moot: the section came off food on
+   2026-09-04.)
 4. **Wrapped titles stack their rules** (critical #7). Per-line background
    cannot do "last line only"; the options are a block-level rule under the
    whole title, a wider title measure, or a small script that marks the last

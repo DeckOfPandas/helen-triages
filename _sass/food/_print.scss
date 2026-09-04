@@ -32,13 +32,6 @@
     display: none;
   }
 
-  // The universe pick is a browsing affordance too -- "deal again" does
-  // nothing on paper, and a random pick is not the recipe you chose to
-  // print.
-  .universe {
-    display: none;
-  }
-
   // Badges are Helen's one explicit subtraction (2026-08-14): they are a
   // browsing affordance — the printed-out form of a filter button — and the
   // page they are printed from is one you have already chosen.
