@@ -4642,19 +4642,24 @@ def test_nothing_on_the_not_on_cards_list_reaches_a_card_or_the_search():
 
 
 def test_a_suppressed_word_is_only_ever_suppressed_ALONE():
-    """`honey water` and `soda water` are real choosing facts and must survive.
+    """`soda water` is a real choosing fact and must survive.
 
     The caveat is the whole of Helen's instruction, and it is also the shape of
     a bug this repo already had: the picker matched `water` against `honey
     water` by substring until 2026-08-29. `contains` on a Liquid list is exact
     membership, so the template cannot repeat it -- this asserts that the LIST
     itself does not name a compound, which is the other way in.
+
+    `honey water` was the second example until 2026-09-04, when Helen flattened
+    both ratios into one `honey syrup` generic. The compound it illustrated is
+    gone from the vocabulary; the rule is not, and `soda water` still shows it.
     """
     for value in _vocab().get("not_on_cards") or []:
         assert len(str(value).split()) == 1, (
             f"`not_on_cards` names {value!r}, which is more than one word. This "
             f"list exists for ingredients that are never a reason to choose a "
-            f"drink; a compound like `honey water` or `soda water` is one, and "
+            f"drink; a compound like `soda water` or `sugar syrup 2:1` is one, "
+            f"and "
             f"suppressing it would take a real fact off the card."
         )
 

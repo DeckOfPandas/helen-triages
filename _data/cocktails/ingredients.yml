@@ -270,12 +270,14 @@ search:
 # ratios to `sugar syrup`: a ratio matters while you pour and not while you
 # choose. Water is that argument at its limit.
 #
-# EXACT MATCHES ONLY, and that is the whole of Helen's caveat. `honey water` and
-# `soda water` are real choosing facts -- one is a sweetener and the other makes
-# the drink long -- so nothing here may be treated as a substring. The picker
-# was matching `water` against `honey water` by substring until 2026-08-29 and
-# the fix for THAT is upstream in cocktail-search.js; this list is a different
-# rule and must not lean on the old bug's shape.
+# EXACT MATCHES ONLY, and that is the whole of Helen's caveat. `soda water` is
+# a real choosing fact -- it is what makes a drink long -- so nothing here may
+# be treated as a substring. The picker was matching `water` against `honey
+# water` by substring until 2026-08-29 and the fix for THAT is upstream in
+# cocktail-search.js; this list is a different rule and must not lean on the old
+# bug's shape. (`honey water` was the other example until 2026-09-04, when
+# Helen flattened both ratios into `honey syrup`; the rule it illustrated is
+# unchanged, and `soda water` still illustrates it.)
 #
 # ONE ENTRY TODAY, and a list rather than a special case in the template because
 # the next one will not be water: `ice` is the obvious candidate the day a drink
@@ -654,8 +656,11 @@ card_names:
   # declared collapse below -- it loses real information and it is meant to.
   "sugar syrup 1:1": "sugar syrup"
   "sugar syrup 2:1": "sugar syrup"
-  "honey water 1:1": "honey water"
-  "honey water 2:1": "honey water"
+  # THE TWO HONEY WATERS CAME OFF ON 2026-09-04, and not because the collapse
+  # stopped being right -- because there is nothing left to collapse. Helen
+  # ruled one flat `honey syrup` (see `honeys` below), so the generic already
+  # reads on a card exactly as she would write it, and this map only ever
+  # carries a generic whose card name DIFFERS from it.
 
 # HOW A DISJUNCTIVE RUM READS ON A CARD, where the default join reads badly.
 #
@@ -714,11 +719,12 @@ card_names_may_collide:
     that loses real information on purpose, at the distance where the
     information is not being used. Nine drinks carry both a syrup and something
     else sweet; none carries both ratios at once.
-  "honey water": >-
-    Same call as `sugar syrup`, same reason: `honey water 1:1` and `honey water
-    2:1` are one thing on a card and two in the glass. The distinction exists
-    precisely because a diluted honey and a twice-concentrated one are poured at
-    different volumes for the same sweetness -- a making fact.
+  # `honey water` STOOD HERE UNTIL 2026-09-04 and came off with the pair it
+  # permitted: Helen's one flat `honey syrup` means there is no second honey
+  # generic for the first to collide with. Left here it would have failed
+  # test_rum_card_names_are_distinct's staleness half, which is the guard doing
+  # its job -- a permission whose names have diverged silently blesses the next
+  # accidental duplicate on the same string.
   "Jamaican rum": >-
     Helen's call, 2026-08-27, offered the alternative and choosing this:
     `Jamaican, moderately aged` and `Jamaican, caramel forward` both read
@@ -811,6 +817,10 @@ whisky_styles:
   # "straight bottled-in-bond rye whiskey", "Rye whiskey (100% proof)"). Bonded
   # is what she actually pours; plain `rye` was the exception wearing the
   # default's clothes.
+  #
+  # ASKED AGAIN AND ANSWERED THE SAME WAY, 2026-09-04: "Bonded rye and rye are
+  # different generics." Recorded here so that the next reader counting five
+  # bonded entries against two plain ones does not propose collapsing them.
   - "bonded rye"
   - "bourbon"
   # PENDING RETIREMENT, and deliberately untouched today. Peat is orthogonal to
@@ -854,10 +864,18 @@ brandy_styles:
   # The category term rather than one country's word for it, so a slivovitz or
   # a framboise has somewhere to go. Cherry eau de vie is the live example.
   - "eau de vie"
-  # Helen, 2026-08-22, on Bali Hai's Aguardiente brandy, "for now" -- this
-  # may turn out to just be `eau de vie` once revisited; kept separate
-  # rather than assumed identical.
-  - "full-strength clear fruit brandy"
+  # BOTH ARE GENERICS, Helen 2026-09-04, revisiting the "for now" the line
+  # below used to carry: asked whether `aguardiente` and `kirschwasser` were
+  # bottles or categories, "both are generics." So Bali Hai's suggestions --
+  # which repeated its own item text rather than naming anything on a shelf --
+  # become the thing the recipe actually asks for, as a list `generic` meaning
+  # either would do (#441).
+  #
+  # `full-strength clear fruit brandy` WENT WITH THEM, see retired_brandy_styles
+  # at the bottom: it was invented for Bali Hai in 2026-08-22 and Bali Hai was
+  # its only user, so naming the two spirits leaves it describing nothing.
+  - "aguardiente"
+  - "kirschwasser"
   # Added 2026-08-29. Distilled peach wine, ~35%, clear or aged -- and NOT the
   # same thing as crème de pêche (an infusion of fresh peaches with lots of
   # sugar, ~20%) or a peach eau de vie (clear, unaged, from whole fruit, ~45%).
@@ -880,7 +898,20 @@ cane_and_palm_spirits:
 
 other_base_spirits:
   - "vodka"
-  - "flavoured vodka"
+  # `flavoured vodka` RETIRED 2026-09-04, and it goes for the reason this file
+  # keeps giving: Helen, "'flavoured vodka' is not a useful generic because
+  # members aren't substitutable. I suggest 'pineapple vodka' and 'vanilla
+  # vodka' or whatever." The same test that makes Campari, Aperol, Cynar and
+  # fernet four generics rather than one amaro, and the same one that retired
+  # `flavoured` from the gin styles on 2026-08-26 -- a filter button reading
+  # "flavoured" tells you nothing, and swapping a pineapple vodka into a Porn
+  # Star Martini is a different drink rather than a variation.
+  #
+  # NAMED BY FLAVOUR, consistent with crème de X and with the bitters. Two
+  # today because two drinks use them; "or whatever" is her invitation to add
+  # the next one the same way rather than a licence to guess at a range.
+  - "vanilla vodka"
+  - "pineapple vodka"
   - "absinthe"
   - "aquavit"
 
@@ -901,7 +932,17 @@ other_base_spirits:
 #
 # A pastis is still a real thing -- Ricard, Henri Bardouin -- and nothing here
 # says otherwise. The day a drink wants one, put this line back.
+#
+# THE MAPPING BELOW WAS EMPTY UNTIL 2026-09-04 and now carries one entry, which
+# is the shape every other `retired_*` block already has: a name that used to
+# mean something must not blend into the not-declared pile.
 retired_other_base_spirits:
+  "flavoured vodka": >-
+    covered a vanilla vodka and a pineapple one, which are not substitutable
+    for each other -- Helen, 2026-09-04: "'flavoured vodka' is not a useful
+    generic because members aren't substitutable. I suggest 'pineapple vodka'
+    and 'vanilla vodka' or whatever." Both are declared in
+    `other_base_spirits` above. Same call as `flavoured` gin, 2026-08-26.
 
 # =============================================================================
 # MODIFIERS
@@ -1071,21 +1112,25 @@ wine_and_sparkling:
 # rule Helen applied to the gin styles the same day: a proper noun keeps its
 # capital (Creole does), a description does not.
 #
-# TWO LAVENDERS, DELIBERATELY, and this partly reverses #451's recorded
-# resolution -- Helen, 2026-08-26: "lavender bitters is fine". #451 had merged
-# Bee's Knees' plain lavender bitters into `lavender-forward bitters`, but the
-# reason it gave for keeping the SUGGESTIONS apart is the reason to keep the
-# generics apart too: Bob's Margarita bitters "is very much its own thing and
-# putting it in a Bee's Knees isn't right, because it adds mint and liquorice".
-# Not substitutable, so not one category -- the same test that makes Campari,
-# Aperol, Cynar and fernet four generics rather than one amaro.
+# ONE LAVENDER AGAIN SINCE 2026-09-04, and it is Helen's third and final word
+# on a question this file has now answered three ways. #451 merged the two;
+# 2026-08-26 split them again ("lavender bitters is fine"); asked once more with
+# the Bee's Knees in front of her she ruled: "the generic should be
+# 'lavender-forward bitters', and Bob's Margarita bitters is an example of this
+# I reach for. I don't own 'lavender bitters' but I expect I will at some point,
+# and they would be an example of 'lavender-forward bitters' too."
+#
+# So the SUBSTITUTABILITY argument that split them in August is answered rather
+# than overruled: a plain lavender bitters and Bob's Margarita really are
+# different, and both are lavender-forward, so the difference is which bottle
+# you pour -- which is a `suggestion`, and never a generic. `lavender bitters`
+# is in retired_bitters at the bottom; the Bee's Knees is retyped.
 bitters:
   - "aromatic bitters"
   - "orange bitters"
   - "Creole bitters"
   - "chocolate bitters"
   - "tiki bitters"
-  - "lavender bitters"
   - "lavender-forward bitters"
   - "peppermint bitters"
   - "wood smoke bitters"
@@ -1117,25 +1162,33 @@ syrups:
   - "lime cordial"
   - "ginger and lemongrass cordial"
 
-# `honey water` is what other people call honey syrup. Helen makes no syrup, so
-# the word does not appear. Clover is a suggestion in a note, not a generic.
+# ONE FLAT `honey syrup` SINCE 2026-09-04, and the ratio is gone with the name.
+# Helen: "Honey: one flat honey syrup please, because I don't think I'll often
+# request a specific type. Acacia is a bit special."
 #
-# THE RATIO IS ALWAYS STATED, exactly as the syrups above -- Helen, 2026-08-26,
-# asked directly. There is deliberately no bare `honey water` to fall back on:
-# a diluted honey and a twice-as-concentrated one are used at different volumes
-# for the same sweetness, which is the whole reason `sugar syrup 1:1` and
-# `sugar syrup 2:1` are two generics rather than one.
+# THIS REVERSES 2026-08-26, WHICH IS WORTH SAYING PLAINLY. That day the ratio
+# was ruled always-stated, on the argument that a diluted honey and a
+# twice-concentrated one are poured at different volumes for the same
+# sweetness -- the same argument that keeps `sugar syrup 1:1` and `sugar syrup
+# 2:1` apart, and it is still true of the sugar syrups. What changed is her
+# answer to how often she will ASK for one rather than the other: not often. So
+# the distinction went to where the collection was already keeping it -- the
+# `item` line and the drink's own note, which is where island-of-martinique's
+# "Honey water 2:1 (clover)" has said it all along.
 #
-# `acacia honey` IS GONE, folded into plain `honey` with acacia as a
-# `suggestion` -- Helen, 2026-08-26. It was a varietal preference wearing a
-# category's clothes, which is precisely what this file's own rule forbids
-# ("a preferred bottle is a suggestion, never a generic"). The distinction
-# worth keeping is neat honey versus honey diluted with water; acacia versus
-# clover is a bottle on the shelf.
+# `honey water 1:1` AND `honey water 2:1` are in retired_honeys at the bottom,
+# and both card_names rows went with them: a flat name needs no card name.
+#
+# BARE `honey` SURVIVES AND IS NOT THE SAME THING -- Helen, same conversation,
+# on the pear Bellini: it "really does use plain honey, cooked into a syrup on
+# the stove with the fruit". So `honey` is the raw thing you cook WITH (the
+# Bellini's pear, honey and thyme syrup, weighed in grams) and `honey syrup` is
+# the ready-made pour. Acacia versus clover remains a bottle on the shelf and
+# therefore a `suggestion`, which is the 2026-08-26 half that stands: the
+# bottle dictionary declares `Acacia honey` and the drinks point at it.
 honeys:
   - "honey"
-  - "honey water 1:1"
-  - "honey water 2:1"
+  - "honey syrup"
 
 # DELIBERATELY MIXES FORM WITH TYPE, and the reasoning is a browsing one rather
 # than a purity one -- Helen: "if I don't have a sugar cube I won't make a
@@ -1269,7 +1322,8 @@ family_of:
   "pisco": brandy
   "grappa": brandy
   "eau de vie": brandy
-  "full-strength clear fruit brandy": brandy
+  "aguardiente": brandy
+  "kirschwasser": brandy
   "peach brandy": brandy
   "apple brandy": brandy
   "blanco tequila": agave
@@ -1277,7 +1331,8 @@ family_of:
   "añejo tequila": agave
   "mezcal": agave
   "vodka": vodka
-  "flavoured vodka": vodka
+  "vanilla vodka": vodka
+  "pineapple vodka": vodka
   "Campari": amaro
   "Aperol": amaro
   "Cynar": amaro
@@ -1380,6 +1435,38 @@ retired_honeys:
     a varietal, not a category. Folded into `honey`, with acacia carried as a
     `suggestion` -- the file's own rule that a preferred bottle is a
     suggestion and never a generic. Helen, 2026-08-26.
+  "honey water 1:1": >-
+    the ratio is gone and so is the word `water`. Helen, 2026-09-04: "Honey:
+    one flat honey syrup please, because I don't think I'll often request a
+    specific type." Re-type as `honey syrup`; if the ratio matters to the
+    drink it belongs in the `item` line or a note, which is where
+    island-of-martinique had already put it.
+  "honey water 2:1": >-
+    as `honey water 1:1`. Seven drinks carried the pair between them and all
+    seven are now `honey syrup`.
+
+# NEW BLOCK 2026-09-04, and it exists for the same reason as every other one:
+# `full-strength clear fruit brandy` meant something for thirteen days and must
+# not blend into the not-declared pile now that it does not.
+retired_brandy_styles:
+  "full-strength clear fruit brandy": >-
+    invented for Bali Hai on 2026-08-22 "for now", against the day someone
+    decided whether it was really just an `eau de vie`. Helen decided
+    otherwise on 2026-09-04, asked about the two bottles Bali Hai suggested:
+    "both are generics." So the drink says `[aguardiente, kirschwasser]` --
+    either would do, the #441 list shape -- and this style, which had exactly
+    one user, is describing nothing. Both new names are in `brandy_styles`.
+
+# NEW BLOCK 2026-09-04. One lavender, not two -- see the comment on `bitters`.
+retired_bitters:
+  "lavender bitters": >-
+    Helen, 2026-09-04: "the generic should be 'lavender-forward bitters', and
+    Bob's Margarita bitters is an example of this I reach for. I don't own
+    'lavender bitters' but I expect I will at some point, and they would be an
+    example of 'lavender-forward bitters' too." So the plain one is not a
+    second category but a bottle she does not yet own, and a bottle is a
+    `suggestion`. Re-type as `lavender-forward bitters`; the Bee's Knees was
+    its only user.
 
 # Renamed 2026-08-27 for correctness (Helen: "apply correctness rather than the
 # fudge of dropping the word"). All three were used by ZERO drinks, so nothing

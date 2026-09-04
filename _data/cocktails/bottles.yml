@@ -297,10 +297,16 @@ bottles:
   # EVERY GENERIC HERE IS READ FROM THE COLLECTION, NOT REMEMBERED. It is the
   # generic of the ingredient the suggestion is written beside, in every drink
   # that names the bottle -- so `Cointreau -> triple sec` is what the drinks
-  # already say, not what anyone recalls about the bottle. The four brands that
-  # sit beside MORE than one generic (Briottet, Monin, Gabriel Boudier, Acacia)
-  # are deliberately absent: a brand is not a bottle, and which product is meant
-  # is Helen's.
+  # already say, not what anyone recalls about the bottle.
+  #
+  # THE FOUR BRANDS THAT SAT BESIDE MORE THAN ONE GENERIC ARE ANSWERED, and
+  # 2026-09-04 is the day it happened. Briottet, Monin, Gabriel Boudier and
+  # Acacia were "deliberately absent: a brand is not a bottle, and which product
+  # is meant is Helen's" -- so she named the products, which is the only thing
+  # that could have resolved them. Her rule for Briottet stands for all four:
+  # "A house, not a bottle. Declare each Briottet product you own by its name
+  # and retype the drinks to the product." `unresolved_suggestions` is empty for
+  # the first time since it was written.
 
   # --- gin ------------------------------------------------------------------
   "Beefeater":
@@ -311,6 +317,26 @@ bottles:
     generic: "London dry gin"
   "Rutte":
     generic: "London dry gin"
+  # Helen, 2026-09-04, completing the brand Tailspin writes bare: the bottle is
+  # Portobello Road. `unresolved_suggestions` had it as "completing it to
+  # Portobello Road was memory rather than reading" -- so it was read out loud
+  # instead, which is the only way that entry could ever have come off.
+  "Portobello Road":
+    generic: "London dry gin"
+    aliases: ["Portobello"]
+
+  # --- vodka ----------------------------------------------------------------
+  # THE FIRST VODKA IN THIS FILE, 2026-09-04, and it arrives with the generic
+  # that made it nameable. `flavoured vodka` was retired the same day (Helen:
+  # "'flavoured vodka' is not a useful generic because members aren't
+  # substitutable"), so the Porn Star Martini asks for a `vanilla vodka` and
+  # this is the one she pours.
+  "Absolut Vanilla":
+    generic: "vanilla vodka"
+    # The drink's `item` spells it "Absolut vanilla vodka"; `Vanilia` is the
+    # label's own spelling. Aliased rather than argued about -- this file
+    # governs what can be READ.
+    aliases: ["Absolut vanilla vodka", "Absolut Vanilia"]
 
   # --- whisky ---------------------------------------------------------------
   "Woodford's Reserve":
@@ -399,6 +425,15 @@ bottles:
   "Martini Rosso":
     generic: "sweet vermouth"
     aliases: ["Martini Rosso vermouth"]
+  # Helen, 2026-09-04, giving the product name two drinks were writing short of.
+  # `Cocchi di Torino` was in `unresolved_suggestions` as exactly that -- "short
+  # of the product name" -- and it stays as the alias, because a suggestion must
+  # keep resolving whether or not its drink has been retyped yet. Not to be
+  # confused with Cocchi Americano, which is an `americano` and which
+  # voodoo-that-you-do writes as its `item`.
+  "Cocchi Vermouth di Torino":
+    generic: "sweet vermouth"
+    aliases: ["Cocchi di Torino"]
   # The Corpse Reviver #2's quinquina, 2026-09-04, first publication batch.
   # Kina Lillet is the bottle the 1930 recipe named and no longer exists;
   # Lillet Blanc is what Helen pours in its place.
@@ -435,8 +470,41 @@ bottles:
     # a name -- resolvable here precisely because the falernum is the only
     # velvet-anything in the collection.
     aliases: ["Velvet", "Velvet Falernum", "Velvet falernum"]
+  # ================= THE BRIOTTET HOUSE, 2026-09-04 =========================
+  # Helen: "A house, not a bottle. Declare each Briottet product you own by its
+  # name and retype the drinks to the product." Asked whether she owned all six
+  # the collection writes `Briottet` against: "I own all of those."
+  #
+  # SO THE ENTRY IN `unresolved_suggestions` WAS RIGHT AND IS SPENT. It said the
+  # string "names a house and the drink names the product", and completing it
+  # would be "an assumption about a range rather than a fact in the data". The
+  # fact arrived; nothing was inferred from the range.
+  #
+  # TWO NAMES CARRY A COLOUR WORD BECAUSE THE DRINK'S OWN `item` DOES. The 18th
+  # Century writes "Crème de Cacao blanc" and Minty Pentones "Crème de Menthe
+  # blanc", so the white expressions are what those drinks pour and the bottles
+  # are named for them. Briottet's own labels read Blanc and Blanche
+  # respectively. A brown cacao or a green menthe would be a second entry, not a
+  # wider alias -- the `Bulleit` rule.
   "Briottet Crème de Pêche":
     generic: "crème de pêche"
+    # Briottet calls it Pêche de Vigne, which is how Fish House Punch writes its
+    # item ("Crème de Pêche de Vigne liqueur"). Declared before this batch and
+    # kept as it stands: Helen's ruling names the product she owns, and this is
+    # already it.
+  "Briottet Crème de Cacao Blanc":
+    generic: "crème de cacao"
+  "Briottet Crème de Violette":
+    generic: "crème de violette"
+  "Briottet Crème de Menthe Blanche":
+    generic: "crème de menthe"
+  "Briottet Curaçao Bleu":
+    generic: "blue Curaçao"
+  # Don's Mai Tai writes "Edmond Briottet", the house under its founder's name,
+  # against the same generic Royal Bermuda Yacht Club writes "Briottet" against.
+  # One product, so both drinks now name it.
+  "Briottet Curaçao Orange":
+    generic: "orange Curaçao"
   "Briottet Crème d'Abricot":
     generic: "apricot liqueur"
     # The written spelling carries a stray circumflex and an unaccented Creme.
@@ -450,6 +518,50 @@ bottles:
   "Briottet Maraschino":
     generic: "maraschino liqueur"
     aliases: ["Briottet maraschino liqueur"]
+  # `Luxardo` KEEPS THE BARE BRAND AS AN ALIAS, and it is the one place this
+  # file lets a house name a product. Helen, 2026-09-04: in this collection
+  # Luxardo only ever means the maraschino -- the four drinks that write it
+  # (Charleston, The Last Wall Highball, Aviation, Brooklyn) all sit it beside
+  # `maraschino liqueur`, and the Last Word's note names it as the sweeter
+  # alternative to Briottet's. That is the `Velvet` case rather than the
+  # `Bulleit` one: resolvable because nothing else in the collection is a
+  # Luxardo-anything.
+  #
+  # The day a drink wants Luxardo's sambuca or its bitter, it is a second entry
+  # and this alias comes off -- exactly what the Bulleit note says about a house
+  # whose products the collection genuinely uses more than one of.
+  "Luxardo Maraschino":
+    generic: "maraschino liqueur"
+    aliases: ["Luxardo"]
+  # ================= GABRIEL BOUDIER, 2026-09-04 =============================
+  # Four products, named by Helen the same way as the Briottets. TWO ARE USED BY
+  # NO DRINK and are here anyway, which is this file's oldest rule: it lists
+  # what she would POUR, not what the collection happens to cite (El Dorado 151,
+  # Myers, Wood's, Sazerac).
+  "Gabriel Boudier Crème de Banane":
+    generic: "crème de banane"
+    # REEF JUICE'S `item` SAYS GIFFORD AND THE SUGGESTION STAYS BOUDIER, on the
+    # dictionary's own division: `item` is the source's transcription and
+    # `suggestion` is the bottle Helen reaches for. She pours the Boudier.
+  "Gabriel Boudier Curaçao Orange":
+    generic: "orange Curaçao"
+  "Gabriel Boudier Crème de Menthe":
+    generic: "crème de menthe"
+  "Gabriel Boudier Gingembre":
+    generic: "ginger liqueur"
+  # Art de Vivre writes `Roots` bare against `mastiha liqueur`, and three more
+  # drinks write "Roots Mastiha" as their `item`. One product, so the house name
+  # resolves -- the `Velvet` case again.
+  "Roots Mastiha":
+    generic: "mastiha liqueur"
+    aliases: ["Roots"]
+  # El Presidente's "Pierre Ferrand dry", completed 2026-09-04. It was in
+  # `unresolved_suggestions` as "short of the product name, and ambiguous with
+  # the Ambre already declared" -- both halves fixed by naming the product, and
+  # the short spelling kept as an alias so the drink resolves either way.
+  "Pierre Ferrand Dry Curaçao":
+    generic: "dry orange Curaçao"
+    aliases: ["Pierre Ferrand dry"]
   # The Mai Tai's orange liqueur. Filed as a bottle of the `Créole Shrubb`
   # generic, which ingredients.yml already declares under the orange liqueurs
   # with its reasoning: a rhum-based orange liqueur, not a rum.
@@ -470,6 +582,36 @@ bottles:
     aliases: ["Peychauds", "Peychaud's bitters", "Peychaud’s"]
   "Bittermens Xocolatl Mole":
     generic: "chocolate bitters"
+  # THE MAKER WAS THE WHOLE QUESTION, and Helen answered it flatly on
+  # 2026-09-04: "the maker is Bittermens, 100%." The `unresolved_suggestions`
+  # entry had said "Probably Bittermens', which is memory rather than reading" --
+  # the right refusal, and the only thing that could resolve it was her saying
+  # so. The leading apostrophe is the product's own: 'Elemakule is Hawaiian.
+  "Bittermens 'Elemakule Tiki Bitters":
+    generic: "warm-spiced bitters"
+    aliases: ["Elemakule Tiki"]
+  # `Bob's` bare is Minty Pentones' string, beside `peppermint bitters`. The
+  # house makes a great many bitters, which is why the bare name sat in
+  # `unresolved_suggestions` -- and the alias is safe now for the reason the
+  # entry below makes visible: the collection's other Bob's names its product in
+  # full, so the two strings cannot collide.
+  "Bob's Peppermint Bitters":
+    generic: "peppermint bitters"
+    aliases: ["Bob's"]
+  # THE CATEGORY WAS THE DOUBT, not the name -- `unresolved_suggestions` said
+  # "a real product name whose CATEGORY is in doubt: Margarita writes it against
+  # `lavender-forward bitters` and nothing in the collection says whether these
+  # are lavender-led". Helen, 2026-09-04: "the generic should be
+  # 'lavender-forward bitters', and Bob's Margarita bitters is an example of
+  # this I reach for." So the drink was right and the file was honest to ask.
+  #
+  # `lavender bitters` was retired the same day (ingredients.yml), because the
+  # plain one is a bottle she does not yet own rather than a second category:
+  # "I don't own 'lavender bitters' but I expect I will at some point, and they
+  # would be an example of 'lavender-forward bitters' too."
+  "Bob's Margarita Bitters":
+    generic: "lavender-forward bitters"
+    aliases: ["Bob's Margarita bitters"]
 
   # --- absinthe -------------------------------------------------------------
   # Helen, 2026-08-30: "honestly my favourite absinthe is Vieux Pontarlier, and
@@ -488,8 +630,33 @@ bottles:
     note: "Pernod Anise, the 40% yellow one, is a different bottle and a pastis."
 
   # --- syrups, juices and the rest ------------------------------------------
+  # MONIN, 2026-09-04. Offered the choice between declaring the house and
+  # declaring the products, Helen chose the products -- which `Monin Gingembre`
+  # below already was, and which is why that one entry resolved while four
+  # sibling strings did not. Each name is Monin's own.
   "Monin Gingembre":
     generic: "ginger syrup"
+  "Monin Cinnamon":
+    generic: "cinnamon syrup"
+  "Monin Passion Fruit":
+    generic: "passion fruit syrup"
+  "Monin Orgeat":
+    generic: "orgeat"
+  # Monin's 2:1 cane sugar syrup, which is what Art de Vivre and Fish House
+  # Punch both write "Cane sugar syrup" for.
+  "Monin Pure Cane Sugar":
+    generic: "sugar syrup 2:1"
+  # A HONEY, NOT A BOTTLE OF SYRUP, and it is here because a honey syrup's
+  # `suggestion` names the honey it is made FROM. That was the exact objection
+  # `unresolved_suggestions` raised -- "a SCHEMA MISMATCH rather than a naming
+  # one: the suggestion is which honey to make the syrup FROM, and `suggestion`
+  # means which bottle to pour" -- and Helen resolved it by keeping the
+  # preference rather than the schema purity: "Acacia is a bit special." Four
+  # drinks name it, two of them spelled lowercase, so both spellings are
+  # aliases.
+  "Acacia honey":
+    generic: "honey syrup"
+    aliases: ["Acacia", "acacia honey"]
   "Bottle Green":
     generic: "ginger and lemongrass cordial"
   "Biona unsweetened":
@@ -524,196 +691,47 @@ not_reached_for:
 # The two compound strings are the interesting ones: both name bottles from two
 # different categories inside a single string, which is what a list `generic`
 # exists to express and a comma cannot.
-unresolved_suggestions:
-  # NOT A RUM, AND THE FIRST NON-RUM ENTRY HERE -- deliberate, and the same
-  # widening `card_names` already took when Ceylon arrack joined it. Helen,
-  # 2026-08-29, on finding it offered as an ingredient chip by typing "sco":
-  # "This should never be there anyway, but certainly never without the kind of
-  # alcohol it actually is."
-  #
-  # A retailer's own-brand RANGE is not a product. It names no distillery, no
-  # style and -- the part that makes it useless rather than merely vague -- no
-  # spirit: both drinks that carry it want an `eau de vie`, and nothing in the
-  # string says so. It is the one entry in the collection flagged by neither the
-  # prose rule nor the bottle aliases, because it is a perfectly well-formed
-  # name for the wrong kind of thing.
-  #
-  # Listing it here keeps it out of the picker and records WHY, which is what
-  # this block is for. #585 is where it gets fixed: Helen names the bottle.
-  # "Tesco Finest" IS GONE, 2026-09-02, and it went the shortest way available.
-  # Helen: "just drop the Tesco suggestion entirely please. Let's get towards
-  # removing all Tesco bottles from our library because I don't have them any
-  # more." So Charleston and Cobra Effect carry no suggestion at all, which is
-  # the honest state -- their generics (`eau de vie`, `sloe gin`) already say
-  # what the drinks require, and one retailer range standing in for a kirsch on
-  # one drink and a sloe gin on the other said less than nothing.
-  #
-  # A STANDING INSTRUCTION CAME WITH IT: no Tesco own-brand belongs in this
-  # file. There are none left today -- the only other mentions are this comment
-  # and the header's example, both of which are about the rule rather than a
-  # bottle -- but a future ingest that reads one off a shelf photo should leave
-  # the suggestion empty rather than record it.
-  # ALL SIX "TWO BOTTLES IN ONE STRING" ENTRIES CAME OFF ON 2026-09-02, #585 --
-  # the way this block intends, by the DRINK being rewritten rather than the
-  # string reworded. Each is now the list form #457 established, so every
-  # bottle names the option it belongs to:
-  #
-  #   Appleton 8, or Appleton 12 Rare Casks   modern-zombie-makes-2, zombie-intoxica
-  #   ED3 or Havana 3                         el-presidente
-  #   ED3, Planteray                          royal-bermuda-yacht-club
-  #   El Dorado 5 or 8                        dons-own-grog
-  #   Patron Silver, Rooster Bianco           margarita-classic
-  #   Wray & Nephew, or Rum Fire              modern-zombie-makes-2
-  #
-  # NOTHING WAS GUESSED. Every bottle was already named in the string it came
-  # out of; only the shape changed. Seven of the twelve parts already resolved
-  # through `bottles` or an alias, which is why only three land below.
-  #
-  # THE ED3/PLANTERAY SPLIT IS THE ONE WORTH KNOWING ABOUT, and it is the only
-  # one that changed a RECIPE rather than a string. Those two bottles are in
-  # different categories -- El Dorado 3 is `lightly aged and filtered`,
-  # Planteray 3 Stars is `clear blended multi-region rum` -- so the moment the
-  # bottle stopped being unresolvable prose, #534's cross-category check fired
-  # on a drink that had looked fine for as long as nothing could read it. A
-  # DECLARED EXCEPTION SILENCES EVERY CHECK DOWNSTREAM OF IT, not only the one
-  # it was declared against.
-  #
-  # This comment claimed Royal Bermuda Yacht Club's generic "is the disjunctive
-  # pair" and it was a scalar. Helen made it true rather than the other way
-  # round, 2026-09-02: "the generic wants two categories. Both make excellent
-  # drinks, just quite different ones." So the list `generic` now says which
-  # two, and the suggestion crosses nothing. That entry had also been re-keyed
-  # from "ED3, Plantation" on 2026-08-30 when #582 corrected the spelling --
-  # this block names STRINGS AS WRITTEN, and test_every_suggested_bottle_resolves
-  # caught that gap the moment the draft changed, which is the whole reason a
-  # declared exception beats a comment.
+unresolved_suggestions: {}
 
-  # THE THREE THAT NOW STAND ALONE AND ARE STILL UNDECLARED. Each is a real
-  # bottle name -- an improvement on the prose blob it came out of, which was
-  # awaiting both a split AND a category. What is left is only the category.
+  # ===========================================================================
+  # EMPTY SINCE 2026-09-04, FOR THE FIRST TIME SINCE THIS BLOCK WAS WRITTEN
+  # ===========================================================================
+  # Sixteen entries came off in one pass, and every one of them the way this
+  # block intends: HELEN ANSWERED THE QUESTION THE ENTRY WAS ASKING. Not one
+  # was reworded, and nothing was derived from a generic.
   #
-  # NOT DECLARED HERE, DELIBERATELY. Helen handed eleven bottles back on
-  # 2026-08-30 for exactly this: they had been declared by DERIVING the
-  # category from the generic of the ingredient beside them, which is a good
-  # default and not a rule, because a suggestion may deliberately cross
-  # categories. "Keep only what the collection already spells out; hand me back
-  # the rest." The reasons below record what this file already believes about
-  # each, so declaring them is one question rather than three.
-
-  # --- FIVE MORE ARRIVED WITH #585's RULINGS, 2026-09-02, and every one is a
-  # REAL BOTTLE NAME rather than the prose it came out of. That is the whole
-  # gain: each was previously awaiting a split AND a category, and only the
-  # category is left.
+  # Four houses named their products -- Briottet (six), Monin (four), Gabriel
+  # Boudier (four) and Acacia. Her rule, given for Briottet and applied to all
+  # four: "A house, not a bottle. Declare each Briottet product you own by its
+  # name and retype the drinks to the product." Asked whether she owned all six
+  # Briottets: "I own all of those."
   #
-  # DELIBERATELY NOT DECLARED, and Jack Daniels is the proof that this is not
-  # timidity. Deriving each category from the generic of the ingredient beside
-  # it is what Helen handed eleven bottles back for on 2026-08-30 -- "a good
-  # default and not a rule, because a suggestion may deliberately cross
-  # categories". Banana Boulevardier's generic is `bourbon`, and JACK DANIELS
-  # IS NOT A BOURBON: it is Tennessee whiskey, which is a different legal
-  # category. A derived declaration would have written a false fact into the
-  # file that #534's cross-category check reads.
-  # Carta Switchel's "Havana 7, Appleton 8" came off on 2026-08-31, the way this
-  # block intends: the drink now writes the list, so each bottle names the option
-  # it belongs to. Helen, asked with the pair in front of her: "thanks, yes
-  # please." The pairing is no longer coincidental in a second sense either --
-  # cocktail-search.js reads each bottle's category from THIS file rather than
-  # from the two lists happening to sit in the same order (#603).
-  # BOTH OF THE "NEEDS HELEN" COMPOUNDS CAME OFF ON 2026-08-30, and neither by
-  # being reworded -- the drinks were rewritten and the strings went with them.
+  # Two houses kept their bare name as an ALIAS, and the difference is worth
+  # knowing: `Luxardo` and `Roots` each name exactly one thing in this
+  # collection, which is the `Velvet` case -- resolvable because nothing else is
+  # a Luxardo-anything or a Roots-anything. `Briottet` and `Gabriel Boudier` did
+  # not get that treatment, because both genuinely sit beside several generics.
   #
-  # Kamaniwanalaya's "Pusser's Gunpowder, or Smith & Cross" is now a real list:
-  # the generic is `[moderately aged Jamaican rum, moderately aged rum]` and the
-  # suggestion is `[Appleton 8, Chairman's Reserve, Pusser's Gunpowder]`, with
-  # Smith & Cross moved to a note "for more hogo". That is exactly the half this
-  # entry said needed her.
+  # Three strings were short of a product name and got the rest of it: Cocchi
+  # Vermouth di Torino, Pierre Ferrand Dry Curacao, Portobello Road.
   #
-  # Swizzle's "Pusser's 151, or Planteray OFTD for a 138 Swizzle" went further:
-  # Helen, "Swizzle has got a bit confused. It should be Martinique Swizzle", so
-  # the drink is 60 ml of unaged agricole and neither bottle is in it.
-  # --- HANDED BACK 2026-08-30, and the reason is the same for eleven of them --
-  # Helen: "Keep only what the collection already spells out; hand me back the
-  # rest." These were declared in this session by DERIVING the bottle's category
-  # from the generic of the ingredient it sits beside -- which is a good default
-  # and not a rule, because a suggestion may deliberately cross categories.
-  # Helen's own example: "a recipe might call for cherry brandy, and I suggest
-  # Cherry Heering OR Briottet cerise even though that's a cherry liqueur not a
-  # brandy, leaving it to future Helen to choose."
+  # Two were a maker and a category this file refused to guess. Helen: "the
+  # maker is Bittermens, 100%" for 'Elemakule Tiki, and for Bob's Margarita,
+  # "the generic should be 'lavender-forward bitters', and Bob's Margarita
+  # bitters is an example of this I reach for."
   #
-  # The one that was actually WRONG is first, and it is the argument for the
-  # other eleven: a plausible-looking declaration would have taught #534's
-  # cross-category check a false fact and blinded it to a substitution the drink
-  # already documents.
-  "aguardiente": >-
-    A spirit TYPE rather than a bottle. Bali Hai writes `Aguardiente brandy` as
-    its item and this as its suggestion, so the suggestion repeats the item
-    instead of naming a bottle.
-  "kirschwasser": >-
-    A spirit TYPE rather than a bottle, same as aguardiente.
-  "Portobello": >-
-    A brand, and completing it to Portobello Road was memory rather than
-    reading. Tailspin's generic is `London dry gin`.
-  # "Sazerac" IS RESOLVED AND IS A REAL BOTTLE -- see the whisky block above.
-  # This entry stood on the suspicion that the string was the drink's own title
-  # written twice; Helen, 2026-08-31: "the product name is Sazerac, though, I
-  # promise". It is declared now, and the suggestion came off the Sazerac in the
-  # same commit because she does not reach for it in that drink: "if I like the
-  # D&C recipe I will figure out the bottle myself." Both halves of a suspicion
-  # answered in opposite directions, which is why neither could be guessed.
-  "Luxardo": >-
-    A house, not a bottle. Three drinks write it against `maraschino liqueur`.
-  "Roots": >-
-    A house, not a bottle. Art de Vivre writes it against `mastiha liqueur`.
-  "Bob's": >-
-    A house that makes a great many bitters. Minty Pentones writes it against
-    `peppermint bitters`.
-  "Cocchi di Torino": >-
-    Short of the product name. Man o' War writes it against `sweet vermouth`.
-  "Pierre Ferrand dry": >-
-    Short of the product name, and ambiguous with the Ambre already declared.
-    El Presidente writes it against `orange Curaçao`.
-  "Bob's Margarita bitters": >-
-    A real product name whose CATEGORY is in doubt: Margarita writes it against
-    `lavender-forward bitters` and nothing in the collection says whether these
-    are lavender-led.
-  "Elemakule Tiki": >-
-    Christmas Daiquiri writes it against `warm-spiced bitters`. Probably
-    Bittermens', which is memory rather than reading.
-
-  # --- BEYOND RUM, 2026-08-30 ------------------------------------------------
-  # Declared so `test_every_suggested_bottle_resolves` could stop being
-  # rum-only. Each of these is REAL DEBT with a reason attached, not a way of
-  # silencing the check: the other 43 non-rum suggestions resolved to a bottle.
-
-  # A BRAND IS NOT A BOTTLE. Each of these names a house that makes several of
-  # the things the collection pours, so the string cannot say which product is
-  # meant -- and unlike `Velvet`, no single candidate makes it unambiguous. The
-  # generic beside each one narrows it in every case; completing the string is
-  # Helen's, because "Briottet make a crème de cacao" is an assumption about a
-  # range rather than a fact in the data.
-  "Briottet": >-
-    A brand, not a bottle. Written beside SIX different generics -- crème de
-    cacao, crème de violette, crème de pêche, blue Curaçao, crème de menthe and
-    orange Curaçao -- so the string names a house and the drink names the
-    product. Two of its bottles ARE declared (Crème de Pêche, Crème d'Abricot);
-    these are the ones written bare.
-  "Edmond Briottet": >-
-    The same house under its founder's name, beside `orange Curaçao` in Don's
-    Mai Tai. One generic, so it is resolvable in principle -- but it is still a
-    brand rather than a product, and naming it would guess which Curaçao.
-  "Gabriel Boudier": >-
-    A brand, beside `crème de banane` and `orange Curaçao`.
-  "Monin": >-
-    A brand, beside four generics -- sugar syrup 2:1, cinnamon syrup, passion
-    fruit syrup and orgeat. `Monin Gingembre` is declared because it names the
-    product; these do not.
-  "Acacia": >-
-    A honey VARIETY rather than a bottle, and beside two generics (`honey` and
-    `honey water 2:1`).
-  "acacia honey": >-
-    The same thing spelled out, beside `honey water 2:1`. A SCHEMA MISMATCH
-    rather than a naming one: the suggestion is which honey to make the syrup
-    FROM, and `suggestion` means which bottle to pour. Worth its own decision.
+  # Two were not bottles at all and never could be. `aguardiente` and
+  # `kirschwasser` repeated Bali Hai's own item text; Helen: "both are
+  # generics." So they are declared in ingredients.yml, the drink carries them
+  # as a list `generic` meaning either would do, and its suggestions are gone --
+  # a genuinely absent suggestion being a real answer, as `Planteray` and
+  # Spicers established below.
+  #
+  # AN EMPTY MAPPING IS A REAL STATE AND NOT A MISSING ONE. It says nothing is
+  # outstanding; deleting the key would silently stop
+  # test_unresolved_suggestions_has_no_stale_entries and the resolver's
+  # exemption from being kept honest. The mechanism stays for the next string
+  # that cannot resolve.
 
   # PROSE, and each already kept out of the index by the search's prose rule --
   # this is the data half. #585 is the backlog.

@@ -3067,7 +3067,9 @@ and rye. The button always carries the canonical name, and `whisky` is labelled
 claim they combine."*
 
 **`not_on_cards`** keeps bare `water` off a card and out of the search (#580).
-Exact matches only: `honey water` and `soda water` are real choosing facts.
+Exact matches only: `soda water` is a real choosing fact. (`honey water` was the
+second example until 2026-09-04, when Helen flattened both ratios into one
+`honey syrup`.)
 
 
 ### 9.4 Decided 2026-08-16 — do not re-litigate
@@ -3492,12 +3494,14 @@ rendering the name that matched. Hidden terms go through the same door now.
 shares not one letter with `El Dorado 3` and collapsing would delete a way in
 that works.
 
-**Two declared collapses that lose information ON PURPOSE**: both syrup ratios
-read `sugar syrup` on a card, both honey ratios read `honey water`. Helen: "On
-the card I would expect to see sugar syrup, and on the recipe ingredient line
-cane sugar syrup, 2:1." **A ratio is a MAKING fact, not a CHOOSING fact** — at
-card distance it is not being used. Checked before declaring: no drink carries
-both ratios of the same syrup.
+**One declared collapse that loses information ON PURPOSE**: both syrup ratios
+read `sugar syrup` on a card. Helen: "On the card I would expect to see sugar
+syrup, and on the recipe ingredient line cane sugar syrup, 2:1." **A ratio is a
+MAKING fact, not a CHOOSING fact** — at card distance it is not being used.
+Checked before declaring: no drink carries both ratios of the same syrup. (The
+two honey waters were a second such collapse until 2026-09-04, when Helen ruled
+one flat `honey syrup` generic — so that pair now collapses in the vocabulary
+and needs no card name at all.)
 
 **Cards are lowercased in CSS, not in the markup** (`text-transform` on
 `.drink-card-ingredients`, #543/#553). The DOM keeps its capitals, so
