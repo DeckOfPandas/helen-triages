@@ -323,6 +323,23 @@
   color: $color-clear-text;
 }
 
+// THE BOTTLE IS COSMOPOLITAN — Helen, 2026-09-04, and it is the drink page's own
+// `.cocktail-suggestion` colour rather than a new decision. _cocktail.scss states
+// the reason where it refuses the same hue to `optional`: "cosmopolitan
+// precisely BECAUSE a bottle name is a thing has-to-have matches against". The
+// bottle in a shopping list is the same claim — the thing you chose — so the two
+// pages say it the same way.
+.shopping-list-bottle {
+  color: $color-cosmic-cosmopolitan-deep;
+}
+
+// The whole-fruit count stays quiet. It is arithmetic this page did, not
+// something Helen chose, and colouring it would spend the hue on the wrong half
+// of the bracket.
+.shopping-list-fruit {
+  color: $color-clear-text;
+}
+
 .shopping-list-empty {
   font-size: 0.95rem;
   color: $color-clear-text;

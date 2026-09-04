@@ -457,14 +457,29 @@
          recipes", which is `.cocktail-item-name` then `.cocktail-suggestion` on
          a drink page. The fruit count joins it in the same brackets when there
          is one, because "(Beefeater) (9 to 13 lemons)" is two parentheticals
-         where the sentence wants one. */
-      var brackets = [];
-      if (row.note) brackets.push(row.note);
-      if (row.fruit) brackets.push(row.fruit.text);
-      var suffix = brackets.length
-        ? ' <span class="shopping-list-note">(' +
-          HTF.escapeHtml(brackets.join(', ')) + ')</span>'
-        : '';
+         where the sentence wants one.
+
+         TWO SPANS INSIDE THE ONE BRACKET, because they are not the same kind of
+         fact and Helen coloured only one of them: a bottle is a thing she chose
+         and the has-to-have search matches against, which is what
+         `.cocktail-suggestion` is cosmopolitan for (_sass/cocktails/_cocktail.scss
+         says so where it declines to give `optional` a hue); a fruit count is
+         arithmetic this page did. No drink pairs them today -- none of the four
+         squeezed juices carries a suggestion -- so the comma between them is
+         written for the day one does rather than for anything on screen now. */
+      var suffix = '';
+      if (row.note || row.fruit) {
+        var inner = [];
+        if (row.note) {
+          inner.push('<span class="shopping-list-bottle">' +
+            HTF.escapeHtml(row.note) + '</span>');
+        }
+        if (row.fruit) {
+          inner.push('<span class="shopping-list-fruit">' +
+            HTF.escapeHtml(row.fruit.text) + '</span>');
+        }
+        suffix = ' <span class="shopping-list-note">(' + inner.join(', ') + ')</span>';
+      }
       return '<li>' +
         '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
         '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + suffix + '</span>' +
