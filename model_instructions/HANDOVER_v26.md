@@ -6833,6 +6833,33 @@ further left, reading as one bar with a stepped edge rather than two.
 is inset**, not the reverse — everything on the page starts at x=0, and a
 mark hanging into the left margin reads as broken alignment, not design.
 
+**THE MARK SITS UNDER THE LAST LINE ONLY, SINCE 2026-09-04** (design audit
+critical #7, `DESIGN_PLAN.md` §3.4). `clone` is what makes the mark measure
+the lettering rather than the box, and its cost is that every line fragment
+of a wrapped title gets its own full copy — a three-line title wore three
+stacked double rules. Helen, from a candidates page on the real quiche
+recipe: *"Last line only please, 10000%."* `assets/js/last-line-rule.js`
+wraps each word of a target in a throwaway span, reads the tops with
+`getBoundingClientRect`, finds the first word of the last line (2px
+tolerance) and rebuilds the element as `<span class="rule-lines">` +
+`<span class="rule-last">`, adding `rule-split` to the element. It runs at
+load, again on `document.fonts.ready` (the real face moves the line breaks)
+and on a debounced resize, always from the text stashed on the first run.
+`@mixin overlapping-rule-double-last-line` in `_sass/shared/_rule.scss` is
+the CSS half: the double rule is emitted on the ELEMENT first, so with
+JavaScript off the title still wears the mark it always did (stacked — the
+old bug, not a blank heading); `.rule-split` then switches that off and
+`.rule-last` carries it. **`box-decoration-break: slice` is not the fix, and
+this was checked rather than assumed**: slice treats the fragments as slices
+of one long box, so each keeps the FULL height and the background is cut
+horizontally — bottom-anchored bars land under the first line and nowhere
+else. There is no `::last-line` either. Targets are `.recipe-title-text` and
+`.section-heading-text` (so recipe, magic bag, about and reference pages);
+NOT the index's `.category-label-text`, which never wraps. An element whose
+text belongs to another script opts out with `data-last-line-rule="skip"` —
+exactly one does, the cooking-methods protein heading that cook-timer.js
+rewrites.
+
 It replaced watercolour brush washes. The reason it won wasn't raw area: a
 wash picked a random shape per page load, so the eye had to re-identify it
 each time. An identical, repeated mark becomes something you *recognise*

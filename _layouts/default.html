@@ -340,6 +340,30 @@
   {% endcomment %}
   <script src="{{ '/assets/js/decorations.js' | relative_url }}"></script>
 
+  {% comment %} last-line-rule.js puts the double rule under the LAST line of a
+     wrapped title or section heading instead of once under every line — design
+     audit critical #7, DESIGN_PLAN §3.4, Helen 2026-09-04: "Last line only
+     please, 10000%."
+
+     LOADED FROM THE SHARED LAYOUT, not from recipe.html, because it is
+     site-agnostic in the same way print-link.js and universe.js are: it queries
+     a class list and does nothing on a page that has none. Cocktails has no
+     wrapping consumer of the mark, so on a drink page it finds nothing and
+     returns.
+
+     AFTER assets.js, which is the one hard ordering rule here
+     (tests/test_site_config.py::test_assets_js_loads_before_any_other_script).
+     It reads nothing off window.HTF, so anywhere below the head would do; it
+     sits beside decorations.js because both are page-shell finishing passes
+     that want the whole document present.
+
+     It measures where the lines break, so it must run when the elements are
+     laid out — and after {{ content }}'s own scripts, one of which
+     (cook-timer.js) writes the text of a heading this would otherwise split.
+     That heading opts out with `data-last-line-rule="skip"`; see the script's
+     header. {% endcomment %}
+  <script src="{{ '/assets/js/last-line-rule.js' | relative_url }}"></script>
+
   {% comment %} #477's comparison switch lived here and is gone: Helen looked
      at the wordmark matched to page headings and kept the old one. The
      difference is deliberate now, and the reasoning is recorded beside the

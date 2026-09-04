@@ -95,10 +95,21 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    old dusty 35% mix when matched, and the lightened hue only on their own
    hover. `food/_recipe-list.scss`, `food/_badges.scss`,
    `food/_active-filter-states.scss`.
-4. **Wrapped titles stack their rules** (critical #7). Per-line background
-   cannot do "last line only"; the options are a block-level rule under the
-   whole title, a wider title measure, or a small script that marks the last
-   line. Reference pages and long recipe titles show it.
+4. ~~Wrapped titles stack their rules~~ **Done 2026-09-04** (critical #7).
+   Candidates page on the real quiche recipe; Helen: "Last line only please,
+   10000%." A small script measures where the lines break and rebuilds the
+   element as `.rule-lines` + `.rule-last`, and the mark moves to the last
+   line's span — so a wrapped title wears it exactly as a one-line title does.
+   The CSS-only alternative was checked and does not work:
+   `box-decoration-break: slice` makes the fragments slices of ONE box, each
+   keeping its full height, so bottom-anchored bars land under the first line
+   only. The element keeps its own double rule as the no-JS fallback, switched
+   off by the `rule-split` class the script adds. Reaches the recipe/magic-bag
+   title and every recipe, about and reference section heading; the
+   cooking-methods protein heading opts out with `data-last-line-rule="skip"`
+   because cook-timer.js owns its text. `assets/js/last-line-rule.js`,
+   `shared/_rule.scss` (`overlapping-rule-double-last-line`),
+   `food/_recipe-header.scss`, `_layouts/default.html`.
 5. **Card clamps** (critical #9). Long names ellipsise on the tape, ingredient
    lines clamp at two, chips at two rows. Candidates: two-line tape, a size
    step for long names, a narrower glass column.

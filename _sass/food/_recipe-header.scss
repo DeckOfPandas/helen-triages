@@ -268,7 +268,21 @@ article.recipe a:not(.badge) {
   // See LETTERING.md.
   @include lettering(display, var(--emboss-offset-lg));
   padding: 0;
-  @include overlapping-rule-double(
+  // THE MARK SITS UNDER THE LAST LINE ONLY, since 2026-09-04. This is the
+  // element the decision was made on -- a candidates page on the real quiche
+  // recipe, whose title wraps to two lines and wore two stacked double rules
+  // (design audit critical #7, DESIGN_PLAN §3.4). Helen: "Last line only
+  // please, 10000%."
+  //
+  // `text-wrap: balance` on .recipe-title above already keeps the lines a
+  // similar length "so no line ends up carrying a stub of a rule" -- that was
+  // the mitigation while every line carried one. With the mark on the last line
+  // alone, balance is now doing a plainer job: keeping the marked line a
+  // sensible width rather than a two-word tail.
+  //
+  // See shared/_rule.scss for the mixin, why `box-decoration-break: slice` is
+  // not the fix, and what happens with JavaScript off.
+  @include overlapping-rule-double-last-line(
     $color-bright-magenta,
     $color-section-underline-2,
     $rule-under-inset-right-title
@@ -442,7 +456,11 @@ article.recipe a:not(.badge) {
     display: inline-block;
     padding: 0;
     margin-left: 0;
-    @include overlapping-rule-double($color-section-underline, $color-section-underline-2);
+    // Last line only, 2026-09-04, same call as the title above -- a section
+    // heading is a block at the full column width, so a long one wraps and
+    // stacked its rule exactly as the title did. Nothing about the mark
+    // changes on a heading that fits on one line.
+    @include overlapping-rule-double-last-line($color-section-underline, $color-section-underline-2);
   }
 
 }
@@ -467,7 +485,7 @@ article.recipe a:not(.badge) {
 // so keeping it here means only ONE thing has changed about this mark, which
 // is exactly as much difference as "this page is not a recipe" needs.
 .section-heading-text.section-heading-text--about-faq {
-  @include overlapping-rule-double($color-aureolin, $color-section-underline-2);
+  @include overlapping-rule-double-last-line($color-aureolin, $color-section-underline-2);
 }
 
 // The REFERENCE pages' own variant: bright lime over the same violet, where a
@@ -491,7 +509,7 @@ article.recipe a:not(.badge) {
 // which is the point -- if they didn't, this would be a distinction nobody
 // could use.
 .section-heading-text.section-heading-text--reference {
-  @include overlapping-rule-double($color-pure-lime-green, $color-section-underline-2);
+  @include overlapping-rule-double-last-line($color-pure-lime-green, $color-section-underline-2);
 }
 
 
