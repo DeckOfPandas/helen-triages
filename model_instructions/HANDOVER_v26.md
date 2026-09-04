@@ -4214,10 +4214,15 @@ is `COCKTAIL_FIELDS` in `filter-state.js`. See §9.3.3 before changing any
 behaviour described below; several of the sentences here predate that split and
 describe where a rule USED to live.
 
-**THE UNIVERSE SAYS… SITS ABOVE THE FIVE QUESTIONS, since 2026-09-02** — one
-random card's tape name, ingredient line and mood chips dealt before the page
-asks anything, with `deal again`. Same section, same script and same reasoning
-as food's; see §13.4, which is where it is written up once for both sites.
+**THE UNIVERSE SAYS… SITS ABOVE THE FIVE QUESTIONS, since 2026-09-02, AND IS
+A WHOLE CARD IN THE RIGHT-HAND COLUMN since 2026-09-04** — the label and
+`deal again` in a narrow left column, a random drink dealt as a real
+`.drink-card` (the pick carries the class; `universe.js` clones every child
+of a random card into it with `data-universe-parts=":scope > *"`) beside
+them. **Food's copy is gone** — Helen turned the feature down there on
+2026-09-04 (§13.4 has her words); she kept this one, *"almost always more
+open to persuasion about what I drink than what I eat"*, and means to refine
+it. `assets/js/universe.js` and `cocktails/_universe.scss` are its only code.
 
 **FIVE NAMED QUESTIONS, in the order Helen asks them** — restructured
 2026-08-29 and this is the current shape:
