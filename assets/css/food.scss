@@ -34,11 +34,6 @@
 // touches a class any of the sections between its old and new position also
 // styles.
 @import "food/recipe-list";
-// Universe sits right after recipe-list: its own .universe-pick frame reads
-// as a row pulled from that list, and its two cloned parts
-// (.recipe-title-link, .ingredient-list) are styled by rules recipe-list
-// already defines.
-@import "food/universe";
 @import "food/badges";
 @import "food/buttons";
 // %btn-active-base is defined in category-labels and @extended from here and

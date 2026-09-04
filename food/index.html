@@ -12,20 +12,15 @@ permalink: /food/
 
 <h1 class="visually-hidden">{{ this_site.title }} — {{ this_site.description }}</h1>
 
-{% comment %} THE UNIVERSE SAYS -- Helen, 2026-09-02, from the fold mockups: the
-   index opened with a screenful of questions and no answer, so one random
-   survivor is dealt above the panel, styled exactly like a row of the list
-   beneath (title, then one line of main ingredients), with a control to deal
-   again. assets/js/universe.js fills .universe-pick by cloning the named
-   parts out of a random row, so this never drifts from how a row looks.
-   Absent JavaScript the section is empty and hidden. {% endcomment %}
-<section class="universe" data-universe-rows=".recipe-list > li" data-universe-parts=".recipe-title-link, .ingredient-list" hidden>
-  <div class="universe-row">
-    <span class="universe-label">the universe says…</span>
-    <button type="button" class="btn-universe-again">deal again <span class="universe-again-icon" aria-hidden="true">&#8635;</span></button>
-  </div>
-  <div class="universe-pick" aria-live="polite"></div>
-</section>
+{% comment %} "THE UNIVERSE SAYS…" STOOD HERE for two days (PR #660, 2026-09-02
+   to 2026-09-04): one random row dealt above the panel with a "deal again"
+   control, the design audit's answer to "nothing edible above the fold".
+   Helen removed it having seen it deployed: "Having all the dolly mixture
+   colours visible together and first thing pleases me. I don't think anyone
+   (and certainly not me) opens a triage website to click on a random
+   recipe." The panel of choices IS the fold on a triage site. Recover the
+   section from git if the question is ever reopened; do not rebuild it from
+   memory. {% endcomment %}
 
 <div class="controls">
   {% assign star_data = site.data.food.filter_sections.star %}
@@ -521,8 +516,3 @@ permalink: /food/
    tests/test_site_config.py::test_filter_state_js_loads_before_filters_js. {% endcomment %}
 <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/filters.js' | relative_url }}"></script>
-{% comment %} AFTER filters.js and, more to the point, before _layouts/default.html's
-   own decorations.js -- see universe.js's header comment for why that order is
-   load-bearing: it is what lets a cloned, emptied tape slot get its tape for
-   free on the FIRST deal. {% endcomment %}
-<script src="{{ '/assets/js/universe.js' | relative_url }}"></script>

@@ -5,15 +5,46 @@
 // screenful of questions and no answer, so this offers one random survivor
 // before you have filtered anything, with a "deal again" control.
 //
-// THE PICK IS A CLONE OF CARD PARTS, not a rule of its own — assets/js/
-// universe.js copies `.drink-card-name`, `.drink-card-ingredients` and
-// `.drink-card-moods` straight out of a random `.drink-cards > li`, so those
-// classes' own rules (_sass/cocktails/_cards.scss) do almost all of the
-// styling here, name-on-tape included. What follows is the FRAME, plus the
-// handful of overrides a card part needs once it is no longer sitting inside
-// a fixed-height card.
+// THE PICK IS A CARD, SINCE 2026-09-04 — a real `.drink-card`, not three parts
+// lifted out of one. assets/js/universe.js copies a random card's body and
+// foot into `.universe-pick`, and the pick itself carries the `drink-card`
+// class in the template, so _sass/cocktails/_cards.scss's rules apply to it:
+// the tape, the ingredient line, the moods, the ship mark, the hover
+// brackets. What follows is the FRAME around it, and (at the foot of this
+// file) the handful of overrides that collapse the card's fixed box.
+//
+// THE SAME FEATURE CAME OFF FOOD THE SAME DAY. Helen: "I find the cocktail one
+// almost fine, actually, and I think we can get there with styling. I am
+// almost always more open to persuasion about what I drink than what I eat.
+// Pop it on a card, and move it to the right-hand column." So: the label and
+// `deal again` stand in a narrow left column, the card is dealt into the wide
+// one beside them, and the panel of five questions follows. A first pass she
+// intends to pick up again; the numbers below are a starting point, not a
+// ruling.
+//
+// LABEL LEFT, CARD RIGHT, IN A GRID. A full-width block above the panel
+// "demands attention and I'm not sure what it wants me to do" (Helen, of the
+// food version); a label in its own column says what the thing beside it is.
 .universe {
+  display: grid;
+  grid-template-columns: minmax(9rem, 1fr) minmax(0, 2.2fr);
+  gap: $space-lg $space-xl;
+  align-items: start;
   margin: $space-sm 0 $index-section-gap;
+}
+
+// One column on a phone: label and control on a line, the card beneath.
+@media (max-width: $index-stack-width) {
+  .universe {
+    grid-template-columns: 1fr;
+    gap: $space-sm;
+  }
+  .universe-row {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-top: 0;
+  }
 }
 
 // EMPTY UNTIL THE SCRIPT RUNS — absent JavaScript there is nothing to show
@@ -22,12 +53,14 @@
   display: none;
 }
 
+// The left column: label above, `deal again` beneath it, both starting at the
+// top so they sit level with the card's own first line.
 .universe-row {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: $space-lg;
-  margin-bottom: $space-sm;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-sm;
+  padding-top: $space-md;
 }
 
 .universe-label {
@@ -63,38 +96,38 @@
   }
 }
 
+// THE PICK IS A `.drink-card` (the template puts the class on it) WITH THE
+// BOX COLLAPSED. A list card is a fixed 12.9rem tall so that every anchor on
+// it sits in the same place card after card; a single dealt card has no
+// neighbours to line up with, and at full height it was, Helen: "farrrr too
+// big... a nudge not an iceberg. Goal is half the height or even less." So:
+// no glass (the template does not clone it), height from content, the foot
+// back in flow beneath the body instead of pinned to a bottom edge, one line
+// of ingredients, one row of moods. The tape, the type and the colours are
+// untouched -- they are what make it read as a card of the list below.
+//
+// THE BASICS ONLY, on Helen's instruction; she is taking this to another
+// session to refine. Every number here is a first guess and is hers to move.
 .universe-pick {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $space-sm;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  // Left padding leaves room for the tape's own 1.05em left bleed
+  // (_cards.scss, $card-tape-bleed), which on a list card lands on the glass
+  // column and here would otherwise touch the border.
+  padding: 0.7rem 1.15rem 0.7rem 1.45rem;
 
-  // A card's title carries its own bottom margin, spacing it from the
-  // ingredient line beneath it inside the card's fixed box. The flex gap
-  // above does that job here instead, so the two would otherwise add.
-  .drink-card-name {
-    margin: 0;
-  }
-
-  // A card clamps this to two lines because the box it sits in is a fixed
-  // height; the pick has no such box, and Helen wants the ingredients on
-  // their own line here regardless — never clamped.
   .drink-card-ingredients {
-    display: block;
-    -webkit-line-clamp: unset;
-    overflow: visible;
+    -webkit-line-clamp: 1;
   }
 
-  // Same story, for the mood chips: the card's max-height exists to hold two
-  // rows inside a fixed foot, which the pick does not have.
+  .drink-card-foot {
+    position: static;
+    margin-top: 0.45rem;
+  }
+
   .drink-card-moods {
-    max-height: none;
-    overflow: visible;
+    max-height: $chip-line;
+    margin-bottom: 0;
   }
-
-  // NOTHING NEEDED FOR THE TAPE. `.drink-card-tape`, `.drink-card-tape-bg`
-  // and `.drink-card-tape-word` (_cards.scss) are plain class selectors, not
-  // scoped under `.drink-card` -- checked rather than assumed, since a
-  // scoped version would need widening to reach a clone living outside the
-  // card list. They already apply here as they are.
 }

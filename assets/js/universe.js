@@ -4,16 +4,20 @@
 // =============================================================================
 // Issue from the fold mockups, 2026-09-02: both indexes opened with a
 // screenful of questions and no answer, so this deals one random survivor
-// (a recipe on food, a drink on cocktails) above the panel before you have
-// filtered anything, with a "deal again" control.
+// above the panel before you have filtered anything, with a "deal again"
+// control.
 //
-// SHARED, SITE-AGNOSTIC JS, same pattern as print-link.js's own header: this
-// queries `.universe` and does nothing on a page that has none, so it is
-// harmless to load on every page and only food's and cocktails' indexes ever
-// give it something to find. Which row a deal is drawn from, and which parts
-// of it get copied, are read off the section's own `data-universe-rows` and
-// `data-universe-parts` attributes rather than hardcoded here, so this file
-// carries no knowledge of either site's markup.
+// COCKTAILS ONLY SINCE 2026-09-04. Food had the same section for two days
+// and Helen took it off having seen it deployed: nobody opens a triage site
+// to be dealt a random recipe, and the panel of choices is the fold there.
+// She kept the drinks one and means to refine it. Nothing in this file
+// changed for that -- it is SITE-AGNOSTIC JS, same pattern as print-link.js's
+// own header: it queries `.universe` and does nothing on a page that has
+// none, so it is harmless to load on every page. Which row a deal is drawn
+// from, and which parts of it get copied, are read off the section's own
+// `data-universe-rows` and `data-universe-parts` attributes rather than
+// hardcoded here, so this file carries no knowledge of the site's markup.
+// The cocktails pick is a card: its parts are a card's body and its foot.
 //
 // THE PICK IS A CLONE, NOT A REBUILD. `data-universe-parts` names the exact
 // elements of a row/card that already carry the right classes (title, main
@@ -70,13 +74,20 @@
     var row = rows[Math.floor(Math.random() * rows.length)];
     pick.innerHTML = '';
 
+    // EVERY MATCH OF EACH SELECTOR, not the first -- since 2026-09-04, when
+    // the cocktails pick became a card and its parts were briefly
+    // `:scope > *`. They are named parts again now, one match each, but a
+    // selector that can match several should copy several.
+    var sources = [];
     for (var i = 0; i < parts.length; i++) {
       var sel = parts[i].replace(/^\s+|\s+$/g, '');
       if (!sel) continue;
+      var found = row.querySelectorAll(sel);
+      for (var j = 0; j < found.length; j++) sources.push(found[j]);
+    }
 
-      var source = row.querySelector(sel);
-      if (!source) continue;
-
+    for (var k = 0; k < sources.length; k++) {
+      var source = sources[k];
       var clone = source.cloneNode(true);
 
       // ONE LINE COVERS BOTH TAPE CASES. On the page's first deal (this

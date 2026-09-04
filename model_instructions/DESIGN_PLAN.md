@@ -52,7 +52,7 @@ over-broad `rm -rf`. Tell agents to delete only what they created.
 | DONENESS reads as a fourth section | 1.35rem, single violet rule | `food/_temperature-chart.scss` |
 | Ship mark is a private code | "ship it?" legend beside the survivor count | `cocktails/index.html`, `_filters.scss` |
 | About dividers look like broken headings | the footer's dashed hairline (Helen overrode the earlier decision) | `food/_about.scss` |
-| Nothing edible above the fold | **tighten**: section gap 0.75rem, label gap 0.5rem, filter headings 1.05rem / 1.2rem, panel padding 0.3rem; **the universe says…**: one random row cloned above the panel with "deal again", both sites | `shared/_tokens.scss`, `shared/_rule.scss`, `assets/js/universe.js`, `food/_universe.scss`, `cocktails/_universe.scss` |
+| Nothing edible above the fold | **tighten**: section gap 0.75rem, label gap 0.5rem, filter headings 1.05rem / 1.2rem, panel padding 0.3rem; **the universe says…**: one random row cloned above the panel with "deal again", both sites. **Off food since 2026-09-04** (Helen: the panel of choices is the fold on a triage site); on cocktails it is a whole card dealt into the right-hand column with the label on the left, a first pass she means to refine | `shared/_tokens.scss`, `shared/_rule.scss`, `assets/js/universe.js`, `cocktails/_universe.scss` |
 | Punched lettering never worked dark-on-light | four tiers (display / heading / label / plain); food's highlight is a mid grey and its shadow faint; HELEN TRIAGES and the recipe title hard, other headings soft, everything under 1rem edge-only; FAQ questions match SERVES/PREP/COOK; [ COCKTAILS ] wears [ FOOD ]'s tape lettering | `shared/_rule.scss`, both `_rule.scss`, `LETTERING.md` |
 | Second typeface without a rule | Plex is for numbers you act on: amounts on both sites, chart readouts and ticks, calculator inputs and results; note labels back to Courier; Plex 700 dropped | `shared/_fonts.scss`, both palettes |
 | Drink page half-inverted, colours off-job | rebuilt to Helen's brief: glass large in the margin, name on the card tape, glass/garnish/ship it? meta, card chips, yvette-over-absinthe under Ingredients and Method and under each ingredient name, lagoon on Notes and its cards, pink suggestions, ink numerals, read it / make it slider, shared ship include | `_layouts/cocktail.html`, `cocktails/_cocktail.scss`, `_includes/cocktails/ship.html`, `assets/js/cocktail-make.js` |
@@ -61,10 +61,12 @@ over-broad `rm -rf`. Tell agents to delete only what they created.
 
 ## 2. Decided, not yet built
 
-1. **"Deal again" icon.** Helen is finding an SVG. The placeholder is
-   `.universe-again-icon` (a ↻ character) in both index templates. Drop the
-   SVG into `_includes/icons/`, render it in the span, size 0.9em, colour
-   `currentColor`.
+1. ~~"Deal again" icon.~~ **The universe section came off food on 2026-09-04**
+   — Helen, having seen it deployed and then a styled row and two card
+   treatments on the real page: "I think it's the feature, not your work…
+   I don't think anyone (and certainly not me) opens a triage website to
+   click on a random recipe." Cocktails still has its copy; the icon question
+   only matters if that survives.
 2. **Leopard.** Round one she chose L3 (sheen). Round two (five patterns ×
    four placements) she has not decided, and said "leave leopard with me…
    don't ship anything." `model_instructions/LEOPARD.md` has the generator,
@@ -80,19 +82,18 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    language. The one loose end is the drink page's ingredient-name underline,
    still yvette over absinthe per Helen's written brief while every heading
    is single-bar; a drink-page bundle with a switch was published for her.
-2. **Cocktail filter words versus card chips** (critical #5). The index's
-   mood buttons are bare bold words; the same words on cards and now on the
-   drink page are outlined chips. Helen's brief flagged it: "this may change
-   if we decide to match card chips to the filter chips above, rather than
-   match the filter chips to the card chips." One shape for one idea; show
-   both directions. Since 2026-09-03 a chosen word and a matched chip already
-   share a colour (the section's), so the remaining gap is shape alone.
+2. ~~Cocktail filter words versus card chips~~ **Done 2026-09-04**: both
+   directions shown on the real index; Helen, "100% cards take words". A
+   card's moods are bare bold Courier words like the filter list, separated
+   by the ingredient line's middle dot, hovering to magenta, underlined in
+   the section's colour when matched. Reaches the universe card and the
+   drink page's chips through the shared class. `_cards.scss`.
 3. **Food index hierarchy** (critical #2). The filter labels came down to
    1.05rem, which helps, but the recipe title is still 16px lowercase with
    the badge trio as the loudest thing on the row. Candidates: title one size
    up; badges muted one step at rest; row order title / badges / ingredients.
-   Also ask whether the universe pick should carry the badges (left off, per
-   her wording).
+   (The universe pick's badge question is moot: the section came off food on
+   2026-09-04.)
 4. **Wrapped titles stack their rules** (critical #7). Per-line background
    cannot do "last line only"; the options are a block-level rule under the
    whole title, a wider title measure, or a small script that marks the last

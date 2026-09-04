@@ -4214,10 +4214,16 @@ is `COCKTAIL_FIELDS` in `filter-state.js`. See §9.3.3 before changing any
 behaviour described below; several of the sentences here predate that split and
 describe where a rule USED to live.
 
-**THE UNIVERSE SAYS… SITS ABOVE THE FIVE QUESTIONS, since 2026-09-02** — one
-random card's tape name, ingredient line and mood chips dealt before the page
-asks anything, with `deal again`. Same section, same script and same reasoning
-as food's; see §13.4, which is where it is written up once for both sites.
+**THE UNIVERSE SAYS… SITS ABOVE THE FIVE QUESTIONS, since 2026-09-02, AND IS
+A WHOLE CARD IN THE RIGHT-HAND COLUMN since 2026-09-04** — the label and
+`deal again` in a narrow left column, a random drink dealt as a real
+`.drink-card` (the pick carries the class; `universe.js` clones a random
+card's body and foot into it, no glass, and `cocktails/_universe.scss`
+collapses the fixed box to about half a list card's height — Helen: "a nudge
+not an iceberg") beside them. **Food's copy is gone** — Helen turned the feature down there on
+2026-09-04 (§13.4 has her words); she kept this one, *"almost always more
+open to persuasion about what I drink than what I eat"*, and means to refine
+it. `assets/js/universe.js` and `cocktails/_universe.scss` are its only code.
 
 **FIVE NAMED QUESTIONS, in the order Helen asks them** — restructured
 2026-08-29 and this is the current shape:
@@ -4403,6 +4409,15 @@ it right by accident of being colourless. Chips move their box; bare words move
 their text.
 
 #### The card — `_cards.scss`
+
+**THE MOOD CHIPS ARE BARE WORDS, NOT BOXES, SINCE 2026-09-04** — the audit's
+critical #5, one shape for one idea. Helen saw both directions on the real
+index (the filter words taking the chip's box, or the chips taking the word's
+form) and chose the second, "100% cards take words": Courier, bold, lowercase,
+white, no box, a middle dot between them (the ingredient line's own `·`),
+magenta on hover, and underlined in the section's colour when matched, exactly
+as a chosen filter word is. Still `<button>`s, still filtering. The universe
+card and the drink page's chips share the class and follow.
 
 **THE MOOD CHIPS FILTER THE INDEX — Helen's ask, 2026-09-02.** Clicking one adds
 or removes that mood exactly as its filter button does.
@@ -6879,7 +6894,6 @@ labels carry the punched-tape effect, §13.4.1.
 
 | | | |
 |---|---|---|
-| 0 | **THE UNIVERSE SAYS…** | one random row, dealt above the panel; since 2026-09-02 |
 | 1 | STAR INGREDIENT | |
 | 2 | MOOD | |
 | 3 | PRACTICALITIES | |
@@ -6887,24 +6901,23 @@ labels carry the punched-tape effect, §13.4.1.
 | 5 | I KNOW WHAT I WANT | the escape hatch, last on purpose |
 | — | META FILTERS | local only, and **one button now**: `draft` |
 
-**THE UNIVERSE SAYS… — PR #660, 2026-09-02, and the same section exists on
-cocktails.** The page offers before it asks: one random survivor above the
-filter panel, with a `deal again` control. `assets/js/universe.js` (shared,
-site-agnostic) picks a random row from the selector in
-`data-universe-rows` and CLONES the parts named in `data-universe-parts`
-into `.universe-pick`, so the pick is a real row's title link and ingredient
-line (food) or a real card's tape name, ingredient line and mood chips
-(cocktails) and cannot drift from how rows look. Cloned buttons become spans
-(a card chip outside the card list would be a button that does nothing);
-cloned tape slots are filled by `decorations.js`'s `cardTapes()` because
-universe.js runs before it, and re-filled from the source card on a later
-deal. Absent JavaScript the section is `hidden`. Helen's copy, exactly: "the
-universe says…" and "deal again"; she is supplying an SVG for the ↻
-placeholder in `.universe-again-icon`. The food pick carries no badges, on
-her wording ("style the recipe line like the recipes in the list below, and
-give a single line of main ingredients below it") — an open question in
-`DESIGN_PLAN.md`. Frame styles: `food/_universe.scss`,
-`cocktails/_universe.scss`.
+**THE UNIVERSE SAYS… WAS HERE FOR TWO DAYS AND IS GONE FROM FOOD — PR #660,
+2026-09-02, removed 2026-09-04.** The design audit's answer to "nothing
+edible above the fold": one random survivor dealt above the filter panel
+with a `deal again` control, cloned from a real row by `assets/js/universe.js`.
+Helen saw it deployed, was shown a styled-row version and two card versions
+on the real page, and turned the feature down rather than the styling:
+*"This advice was the only part of the design review I disagreed with.
+Having all the dolly mixture colours visible together and first thing
+pleases me. I don't think anyone (and certainly not me) opens a triage
+website to click on a random recipe. And given the styling is hard, my gut
+says that trying to polish it is solving the wrong problem."* **On a triage
+site the panel of choices IS the fold.** The section, its stylesheet and its
+print rule are in git at the commit before this one; if the question is ever
+reopened, recover them rather than rebuilding. The cocktails index still
+carries its own copy (§9.13), where `universe.js` and `cocktails/_universe.scss`
+remain — the script is site-agnostic and does nothing on a page without a
+`.universe` section, so food loading nothing is the whole change there.
 
 **HAS TO HAVE was `SEARCH MAIN INGREDIENTS`** — that named the mechanism where
 every other label names the question, and cocktails already asked it in the

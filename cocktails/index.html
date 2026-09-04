@@ -107,18 +107,26 @@ permalink: /cocktails/
 
   {% comment %} THE UNIVERSE SAYS -- Helen, 2026-09-02, from the fold mockups: the
      index opened with a screenful of questions and no answer, so one random
-     survivor is dealt above the panel, styled exactly like a card beneath it
-     (name on its tape, then the ingredient line on its own line, then the
-     mood chips), with a control to deal again. assets/js/universe.js fills
-     .universe-pick by cloning the named parts out of a random card, so this
-     never drifts from how a card looks. Absent JavaScript the section is
-     empty and hidden. {% endcomment %}
-  <section class="universe" data-universe-rows=".drink-cards > li" data-universe-parts=".drink-card-name, .drink-card-ingredients, .drink-card-moods" hidden>
+     survivor is dealt above the panel, with a control to deal again.
+
+     A CARD, DEALT INTO THE RIGHT-HAND COLUMN, SINCE 2026-09-04 -- AND A SHORT
+     ONE. The pick carries the card's own `drink-card` class and universe.js
+     clones a random card's body and foot into it (not its glass column:
+     Helen, on the full-height version, "farrrr too big. Please drop the
+     glass at least, and get the rest into a nudge not an iceberg"), so the
+     tape, ingredient line, moods and ship mark are a card's by _cards.scss's
+     rules, and _universe.scss collapses the box around them to about half a
+     list card's height. The label and the control stand in the narrow column
+     to its left. The same feature came off food the same day; Helen kept this
+     one -- "I am almost always more open to persuasion about what I drink
+     than what I eat" -- and means to refine it. Absent JavaScript the section
+     is empty and hidden. {% endcomment %}
+  <section class="universe" data-universe-rows=".drink-cards > li" data-universe-parts=".drink-card-body, .drink-card-foot" hidden>
     <div class="universe-row">
       <span class="universe-label">the universe says…</span>
       <button type="button" class="btn-universe-again">deal again <span class="universe-again-icon" aria-hidden="true">&#8635;</span></button>
     </div>
-    <div class="universe-pick" aria-live="polite"></div>
+    <div class="universe-pick drink-card" aria-live="polite"></div>
   </section>
 
   <div class="drink-filters">
