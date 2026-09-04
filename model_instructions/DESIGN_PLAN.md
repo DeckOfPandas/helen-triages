@@ -88,12 +88,13 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    by the ingredient line's middle dot, hovering to magenta, underlined in
    the section's colour when matched. Reaches the universe card and the
    drink page's chips through the shared class. `_cards.scss`.
-3. **Food index hierarchy** (critical #2). The filter labels came down to
-   1.05rem, which helps, but the recipe title is still 16px lowercase with
-   the badge trio as the loudest thing on the row. Candidates: title one size
-   up; badges muted one step at rest; row order title / badges / ingredients.
-   (The universe pick's badge question is moot: the section came off food on
-   2026-09-04.)
+3. ~~Food index hierarchy~~ **Done 2026-09-04.** Title 1.2rem / 700 (a
+   punched version "looks fuzzy"); badges stay after the ingredients (the
+   ingredient scan "makes the decision about opening the page or not"; a
+   right-hand column "makes the rows enormous"); badges rest muted, take the
+   old dusty 35% mix when matched, and the lightened hue only on their own
+   hover. `food/_recipe-list.scss`, `food/_badges.scss`,
+   `food/_active-filter-states.scss`.
 4. **Wrapped titles stack their rules** (critical #7). Per-line background
    cannot do "last line only"; the options are a block-level rule under the
    whole title, a wider title measure, or a small script that marks the last

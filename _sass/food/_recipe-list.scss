@@ -115,16 +115,25 @@
     // on recipe pages. That is a cleaner line than anything we reached by
     // arguing about individual elements, and it was found by looking.
     font-family: $font-headings;
-    font-size: 1rem;
-    font-weight: 600;     // 400 and 500 render identically -- Courier Prime, like
+    // 1.2rem AND BOLD SINCE 2026-09-04 -- the design audit's critical #2: "the
+    // recipe title, the thing you are actually choosing, is 16px lowercase
+    // Courier with no colour... the list reads as metadata with a name
+    // attached." Helen chose this from three on the real index (as was, this,
+    // and a punched version she found fuzzy at this size): the dish is now
+    // the biggest thing on its row, still lowercase, still ink. Tracking
+    // comes in a hair and the leading down, because both were set for a
+    // smaller face and read loose at this one.
+    font-size: 1.2rem;
+    font-weight: 700;     // 400 and 500 render identically -- Courier Prime, like
                            // Courier New before it, ships only Regular and Bold,
                            // so anything <=500 resolves to Regular and anything
-                           // >500 jumps straight to Bold
+                           // >500 jumps straight to Bold. 600 and 700 are the
+                           // same face too; 700 says what is meant.
     text-transform: lowercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     color: $color-text;
     text-decoration: none;
-    line-height: 1.4;
+    line-height: 1.3;
     transition: color 0.12s ease-in-out;
 
     &:hover {

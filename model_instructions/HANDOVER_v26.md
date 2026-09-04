@@ -7323,11 +7323,23 @@ override.
 Each row: title, ingredient line, then pills — in that order, deliberately
 (§13.6.1).
 
-**Title** is `$font-headings` (Courier Prime), lowercase, weight 600, 1rem.
-Weight 400 and 500 render *identically* — Courier Prime, like Courier New before
-it, ships only Regular and Bold as static faces, so any request ≤500 resolves to
-Regular and only >500 jumps to Bold. If a future weight change appears to do
-nothing, this is why.
+**Title** is `$font-headings` (Courier Prime), lowercase, **weight 700, 1.2rem
+since 2026-09-04** (was 600, 1rem — the design audit's critical #2, "the list
+reads as metadata with a name attached"; Helen chose the size from the real
+index, and found a punched version "fuzzy"). Weight 400 and 500 render
+*identically* — Courier Prime, like Courier New before it, ships only Regular
+and Bold as static faces, so any request ≤500 resolves to Regular and only
+>500 jumps to Bold. If a future weight change appears to do nothing, this is
+why.
+
+**The pills rest MUTED since the same day** — a 14% hint of the hue in the
+tape, grey text — and climb a three-rung ladder Helen set in words: *"leave
+the buttons entirely muted until hit by a filter, when they should take your
+middle saturation, then the loudest active state for mouseover."* Matched is
+the old 35% dusty mix; hover is the lightened full hue and is louder than
+matched, not a preview of it. Only a pill's own hover lights it. The order
+title / ingredients / pills is unchanged, on her ruling that the ingredient
+scan "makes the decision about opening the page or not".
 
 It spent 2026-08-24 to 08-26 in IBM Plex Mono and came back; see §13.10.1, which
 is the more useful read, because *why* it came back is the rule.
