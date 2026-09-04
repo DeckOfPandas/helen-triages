@@ -6,12 +6,12 @@
 // before you have filtered anything, with a "deal again" control.
 //
 // THE PICK IS A CARD, SINCE 2026-09-04 — a real `.drink-card`, not three parts
-// lifted out of one. assets/js/universe.js copies every child of a random
-// `.drink-cards > li` (glass column, body, foot) into `.universe-pick`, and
-// the pick itself carries the `drink-card` class in the template, so every
-// rule in _sass/cocktails/_cards.scss applies to it unchanged: fixed height,
-// the glass column, the tape, the clamps, the hover brackets. Nothing here
-// restyles a card. What follows is the FRAME around it.
+// lifted out of one. assets/js/universe.js copies a random card's body and
+// foot into `.universe-pick`, and the pick itself carries the `drink-card`
+// class in the template, so _sass/cocktails/_cards.scss's rules apply to it:
+// the tape, the ingredient line, the moods, the ship mark, the hover
+// brackets. What follows is the FRAME around it, and (at the foot of this
+// file) the handful of overrides that collapse the card's fixed box.
 //
 // THE SAME FEATURE CAME OFF FOOD THE SAME DAY. Helen: "I find the cocktail one
 // almost fine, actually, and I think we can get there with styling. I am
@@ -96,14 +96,38 @@
   }
 }
 
-// THE PICK IS STYLED BY `.drink-card`, which the template puts on it, and by
-// nothing here. Three overrides used to live in this block — unclamping the
-// ingredient line and the mood chips, zeroing the title's margin — because
-// the pick was card PARTS outside a card's fixed box. It is the box now, and
-// a card that clamps in the list clamps here for the same reason. The one
-// thing a card in a grid cell needs that a card in the list does not: the
-// list's grid gives every card its width, and this cell must too.
+// THE PICK IS A `.drink-card` (the template puts the class on it) WITH THE
+// BOX COLLAPSED. A list card is a fixed 12.9rem tall so that every anchor on
+// it sits in the same place card after card; a single dealt card has no
+// neighbours to line up with, and at full height it was, Helen: "farrrr too
+// big... a nudge not an iceberg. Goal is half the height or even less." So:
+// no glass (the template does not clone it), height from content, the foot
+// back in flow beneath the body instead of pinned to a bottom edge, one line
+// of ingredients, one row of moods. The tape, the type and the colours are
+// untouched -- they are what make it read as a card of the list below.
+//
+// THE BASICS ONLY, on Helen's instruction; she is taking this to another
+// session to refine. Every number here is a first guess and is hers to move.
 .universe-pick {
   width: 100%;
   min-width: 0;
+  height: auto;
+  // Left padding leaves room for the tape's own 1.05em left bleed
+  // (_cards.scss, $card-tape-bleed), which on a list card lands on the glass
+  // column and here would otherwise touch the border.
+  padding: 0.7rem 1.15rem 0.7rem 1.45rem;
+
+  .drink-card-ingredients {
+    -webkit-line-clamp: 1;
+  }
+
+  .drink-card-foot {
+    position: static;
+    margin-top: 0.45rem;
+  }
+
+  .drink-card-moods {
+    max-height: $chip-line;
+    margin-bottom: 0;
+  }
 }

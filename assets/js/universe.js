@@ -17,7 +17,7 @@
 // from, and which parts of it get copied, are read off the section's own
 // `data-universe-rows` and `data-universe-parts` attributes rather than
 // hardcoded here, so this file carries no knowledge of the site's markup.
-// The cocktails pick is a whole card: its parts selector is `:scope > *`.
+// The cocktails pick is a card: its parts are a card's body and its foot.
 //
 // THE PICK IS A CLONE, NOT A REBUILD. `data-universe-parts` names the exact
 // elements of a row/card that already carry the right classes (title, main
@@ -75,8 +75,9 @@
     pick.innerHTML = '';
 
     // EVERY MATCH OF EACH SELECTOR, not the first -- since 2026-09-04, when
-    // the cocktails pick became a whole card: its parts are `:scope > *`,
-    // the card's three children, and querySelector would have taken one.
+    // the cocktails pick became a card and its parts were briefly
+    // `:scope > *`. They are named parts again now, one match each, but a
+    // selector that can match several should copy several.
     var sources = [];
     for (var i = 0; i < parts.length; i++) {
       var sel = parts[i].replace(/^\s+|\s+$/g, '');

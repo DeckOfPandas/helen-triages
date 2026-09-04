@@ -4217,9 +4217,10 @@ describe where a rule USED to live.
 **THE UNIVERSE SAYS… SITS ABOVE THE FIVE QUESTIONS, since 2026-09-02, AND IS
 A WHOLE CARD IN THE RIGHT-HAND COLUMN since 2026-09-04** — the label and
 `deal again` in a narrow left column, a random drink dealt as a real
-`.drink-card` (the pick carries the class; `universe.js` clones every child
-of a random card into it with `data-universe-parts=":scope > *"`) beside
-them. **Food's copy is gone** — Helen turned the feature down there on
+`.drink-card` (the pick carries the class; `universe.js` clones a random
+card's body and foot into it, no glass, and `cocktails/_universe.scss`
+collapses the fixed box to about half a list card's height — Helen: "a nudge
+not an iceberg") beside them. **Food's copy is gone** — Helen turned the feature down there on
 2026-09-04 (§13.4 has her words); she kept this one, *"almost always more
 open to persuasion about what I drink than what I eat"*, and means to refine
 it. `assets/js/universe.js` and `cocktails/_universe.scss` are its only code.
