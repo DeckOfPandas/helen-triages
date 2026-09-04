@@ -157,6 +157,44 @@ article.recipe .recipe-body-content.about-page {
     }
   }
 
+  // --- The footnote ----------------------------------------------------------
+  // "*Or artisanally hand-crafted Japanese ice tools." -- the one line on the
+  // page addressed to a reader who arrived from the cocktails site, hung off an
+  // asterisk on "sauté pan*" in the list above. Added 2026-09-04 when the copy
+  // was rewritten to cover both sites.
+  //
+  // It takes the gutter like everything else here, with "*" as its mark, so
+  // the left edge reads 1 2 * → → → ? ? ... rather than a body-size asterisk
+  // sitting in the marks column at x=0 -- the column is the page's one device
+  // and a stray character in it reads as a typo. Body-small text because it
+  // is a footnote and should look like one; the mark stays at full mark size
+  // so the column doesn't wobble.
+  .about-footnote {
+    position: relative;
+    padding-left: $about-gutter;
+    margin: (-$space-md) 0 0 0;   // tucks up under the list it annotates
+    max-width: calc(#{$about-measure} + #{$about-gutter});
+    font-size: $font-size-body-sm;
+
+    &::before {
+      @extend %about-mark;
+      content: "*";
+      // Courier's asterisk sits at cap height, so it needs no lift; flush with
+      // the line box lands it on the footnote's first line.
+      top: 0;
+    }
+  }
+
+  // --- Variable names in prose -----------------------------------------------
+  // The dark-site FAQ names three Sass variables. Nothing in food/ styles
+  // <code> (recipes never use it), so without this the browser's own monospace
+  // default applies at its own size. The headings face is the site's monospace
+  // already, so this is the same voice as the marks, one size down.
+  code {
+    font-family: $font-headings;
+    font-size: 0.92em;
+  }
+
   // --- The ways into the collection ------------------------------------------
   // "Filter recipes: by what you have in your hand / by what's lurking in your
   // fridge / by being in the mood for a giant pile of cheese."

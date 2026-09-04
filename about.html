@@ -63,19 +63,25 @@ site_key: food
 
     <ol class="about-enum">
       <li>I want to cook something that I already know how to make, but scrolling through a list of files isn't inspiring.</li>
-      <li>I want to browse recipes I haven't tried yet without having to
+      <li>I want to browse recipes I haven't tried yet without first having to
         <ul class="about-enum-sub">
-          <li>be able to find a magazine/email/screenshot/bookmark or open tab, or</li>
-          <li>scroll through pages of boring nonsense about somebody's favourite sauté pan or the blow-by-blow of a recent seaside trip that inexplicably precedes a recipe for beans on toast.</li>
+          <li>locate a magazine/email/screenshot/bookmark or open tab, or</li>
+          <li>scroll through pages of boring nonsense about somebody's favourite sauté pan*, or the blow-by-blow of a recent seaside trip that inexplicably precedes a recipe for beans on toast.</li>
         </ul>
       </li>
     </ol>
 
-    <p>If you reached this page from the cocktails site rather than the food site, then use your imagination re: nouns, verbs and examples.</p>
+    {% comment %} The footnote takes the same gutter as the lists above it, with
+       "*" as its mark, so the left edge reads 1 2 * rather than an asterisk
+       floating at x=0 in body size. Copy rewritten 2026-09-04 to cover both
+       sites; this replaced a paragraph addressed to cocktail readers. {% endcomment %}
+    <p class="about-footnote">Or artisanally hand-crafted Japanese ice tools. Substitute cocktail nouns, verbs and grievances as required.</p>
 
     <hr>
 
-    <p>This site helps me triage my recipe options to match my mood and whims. It tells me what to cook. It does not tell me much about how to cook, because I already know how to cook. So if you want instructions beyond, for example, "spatchcock the chicken", then I suggest you look elsewhere.</p>
+    <p><strong>The only goal of this site is that I end up with the food or drink I want.</strong> It helps me triage my recipe options to match my mood and whims, and is almost not at all annoying to cook from.</p>
+
+    <p>The food side tells me what to cook. It does not tell me much about how to cook, because I already know how to cook. So if you want instructions beyond, say, "spatchcock the chicken", then I suggest you look elsewhere. The cocktail side is the same, except that the summit of my technique is a "muddle" before the "shake". If you want more than that, see above.</p>
 
     {% comment %} Link text is a subset of each target's own title
        ("Henry's Quick and Bulletproof Hollandaise Sauce", "Chocolate Ganache"),
@@ -84,20 +90,27 @@ site_key: food
        page isn't in that fixture, so the TEXT rule does not reach it -- but the
        HREF is checked: tests/test_page_links.py globs every root-level page
        since issue #374, so a renamed recipe fails
-       test_internal_links_point_at_a_published_page naming this file. 
+       test_internal_links_point_at_a_published_page naming this file.
        No styling needed: article.recipe a covers every link on the site. {% endcomment %}
     <p>That said, a few recipes carry more troubleshooting than seems reasonable, such as <a href="{{ '/food/recipes/henrys-quick-bulletproof-hollandaise-sauce/' | relative_url }}">Hollandaise sauce</a> and <a href="{{ '/food/recipes/chocolate-ganache/' | relative_url }}">chocolate ganache</a>. The length of extra writing on any recipe is proportional to how much that food has personally wronged me.</p>
 
     <hr>
 
-    <p>Filter my recipes:</p>
+    <p>Filter the food side:</p>
     <ul class="about-ways">
       <li>by what you have in your hand,</li>
       <li>by what's lurking in your fridge and going off, or</li>
       <li>by being in the mood for a giant pile of cheese.</li>
     </ul>
 
-    <p>Filter however you like; honestly, I don't care — this site is not for you.</p>
+    <p>Filter the cocktail side:</p>
+    <ul class="about-ways">
+      <li>by your appetite for chaos,</li>
+      <li>by whether you can be bothered to juice anything, or</li>
+      <li>by how badly you want to set something on fire.</li>
+    </ul>
+
+    <p>Filter however you like. Honestly, I don't care — this site is not for you.</p>
 
     <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--about-faq">FAQ</span></h2>
 
@@ -108,12 +121,7 @@ site_key: food
 
     <div class="about-faq-item">
       <h3>I have a great idea/recipe/criticism for your site. Will you build/try/hear it?</h3>
-      <p>No. I welcome <a href="https://github.com/DeckOfPandas/helen-triages">pull requests</a> with thanks. But I'm not interested in pleasing you, in the same way you're not interested in this one time I made Emma wait over two hours for a quiche that in the end never set. Or in the Christmas 2024 <i lang="fr">liaison dangereuse</i> between my then-94-year-old grandmother and a 9-kg leg of ham that, unbeknownst to us, was cured rather than cooked.</p>
-    </div>
-
-    <div class="about-faq-item">
-      <h3>Can I see your to-try recipes?</h3>
-      <p>No. They only build locally and are committed to a private repository. Two reasons. I don't want to break copyright or disrespect authors. But more importantly — and please hear me when I say this — I don't want to put effort into rewriting a load of recipes I haven't tested because many will turn out to be terrible.</p>
+      <p>No. I welcome <a href="https://github.com/DeckOfPandas/helen-triages">pull requests</a> with thanks. But I'm no more interested in pleasing you than you are in this one time I made Emma wait over three hours for a quiche that never set. Or in the Christmas 2024 <i lang="fr">liaison dangereuse</i> between my then-94-year-old grandmother and a 7-kg leg of ham that, unbeknownst to us, was cured rather than cooked.</p>
     </div>
 
     <div class="about-faq-item">
@@ -122,21 +130,40 @@ site_key: food
     </div>
 
     <div class="about-faq-item">
+      <h3>Can I see your to-try recipes?</h3>
+      <p>No. They only build locally, from a private repository each for food and drink. I also don't want to break copyright or disrespect authors. But more importantly — and please hear me when I say this — I don't want to put effort into rewriting a load of recipes I haven't tested because many will turn out to be terrible.</p>
+    </div>
+
+    <div class="about-faq-item">
+      <h3>Why do cocktails have ratings but food doesn't?</h3>
+      <p>All my food recipes are excellent. Cocktail ratings are Helen-facing. All my cocktail recipes are shippable, but differently robust to things like bottle selection, ice pedantry, and being distracted while making them. An El Presidente is famously unforgiving about vermouth. Ask me how I know. I've since found my vermouth, chaos is contained, and it now sits in my top bracket. Future-Helen can decide whether she wants a sure thing or YOLO.</p>
+    </div>
+
+    {% comment %} The three names are the cocktails palette's own variables,
+       shortened for prose: _sass/cocktails/_palette.scss spells them
+       $color-cosmic-cosmopolitan and so on. Set in <code> so they read as
+       names rather than as words that happen to start with a dollar. {% endcomment %}
+    <div class="about-faq-item">
+      <h3>Why is the cocktail site dark?</h3>
+      <p>I was running out of ways to use <code>$cosmic-cosmopolitan</code> (#FF00C8) on white, and <code>$electric-absinthe</code> and <code>$ultra-yvette</code> look far better on black. But truthfully, the moment I realised I could include black-on-black leopard print, my lifetime-favourite texture, the decision made itself.</p>
+    </div>
+
+    <div class="about-faq-item">
       <h3>Did you write any of this code yourself directly?</h3>
-      <p>Absolutely not. Not one single line, for better or worse, mostly better. I could have written most of this myself the old-fashioned way. Eventually. But I certainly wouldn't have &gt;18,000 tests were I left to my own devices. Every time I found myself about to edit some YAML, I requested new tests instead. Obviously TDD has always been great, but I'm feeling particularly fond of it now I have to neither write the test nor satisfy it.</p>
+      <p>Absolutely not. Not one single line, for better or worse, mostly better. This was an experiment in agentic engineering. My repo topology is built around stopping parallel Claudes from trampling each other's work when I can't be bothered to supervise them. I could have written most of the code myself the old-fashioned way...eventually. But I certainly wouldn't have north of 18,000 tests were I left to my own devices. Every time I found myself about to edit some YAML, I requested new tests instead. Obviously TDD has always been great, but I'm feeling particularly fond of it now that neither writing the test nor satisfying it is my problem.</p>
     </div>
 
     <div class="about-faq-item">
       <h3>Can you share the prompts or scripts or workflows you used to ingest and clean your recipe data?</h3>
-      <p>No. I didn't log these things or think them through that hard...welcome to the future: it looks Claude-y. I don't have Repeatable Analysis Pipelines. I do have Claude Code, a comprehensive herd of tests that fail loudly rather than admit broken code or poor formatting to my site, and slightly too much time on my hands at the moment (but still not enough to write YAML).</p>
+      <p>No. I didn't log any of this, or even really think it through — welcome to the future: it looks Claude-y. See <a href="https://github.com/DeckOfPandas/helen-triages/tree/main/_data">the repository</a> for the data models if you care. I don't have Repeatable Analysis Pipelines. I do have Claude Code, a comprehensive herd of tests that fail loudly rather than admit broken code or poor formatting, and slightly too much time on my hands at the moment (but still not enough to write YAML).</p>
     </div>
 
     <div class="about-faq-item">
-      <h3>Can you write a blog post about what you learned about AI-assisted development?</h3>
+      <h3>Can you write a blog post about what you learned about agentic engineering?</h3>
       <p>Yes, I can. I expect that I will not.</p>
     </div>
 
-      <p>Now stop reading recipe websites and go and actually cook something.</p>
+    <p>Now stop reading recipe websites and go and actually make something.</p>
 
   </div>
 </article>
