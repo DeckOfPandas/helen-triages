@@ -296,13 +296,23 @@
   }
 }
 
+// PLEX, IN INK -- the site's own rule for a number you act on, 2026-09-04.
+// It opened in the Courier heading face in cosmopolitan, on the reasoning
+// that "the number is the fact you are shopping by, so it carries the colour
+// that means 'you chose this'". But cosmopolitan means HAS TO HAVE (the
+// matched ingredient, the bottle suggestion) and the site already has a
+// vocabulary for a quantity: `.cocktail-amount` on the drink page and the
+// ingredient amounts on food are $font-label at weight 600 in ink, tabular,
+// because "Plex is for numbers you act on" (_palette.scss, HANDOVER 13.10).
+// A shopping total is exactly such a number. The bottle beside it keeps the
+// pink, which is the drink page's own pairing of amount and suggestion.
 .shopping-list-amount {
-  @extend %cocktail-heading-face;
   flex: 0 0 7rem;
+  font-family: $font-label;
+  font-weight: 600;
   font-size: 0.92rem;
-  // The number is the fact you are shopping by, so it carries the colour that
-  // means "you chose this" everywhere else on the site.
-  color: $color-cosmic-cosmopolitan-deep;
+  font-variant-numeric: tabular-nums;
+  color: $color-text;
 }
 
 .shopping-list-name {
