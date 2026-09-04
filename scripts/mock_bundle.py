@@ -9,7 +9,13 @@ from memory instead of the network. Output is body content only (no
 """
 import base64, glob, json, os, re
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# TWO dirnames, not three, since 2026-09-04. This file was restored into
+# scripts/ from tmp/mock/, one level deeper, and kept the three-dirname root
+# that was right there and one level too high here -- so from scripts/ it
+# pointed at the parent of the checkout and every mock of the week re-pointed
+# ROOT and SITE by hand after importing. Anchored on the file's own location
+# because that is what it always meant.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, "tmp", "site-mock")
 BASE = "/helen-triages"
 
