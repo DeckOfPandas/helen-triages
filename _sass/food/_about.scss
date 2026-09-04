@@ -160,28 +160,36 @@ article.recipe .recipe-body-content.about-page {
   // --- The footnote ----------------------------------------------------------
   // "*Or artisanally hand-crafted Japanese ice tools." -- the one line on the
   // page addressed to a reader who arrived from the cocktails site, hung off an
-  // asterisk on "sauté pan*" in the list above. Added 2026-09-04 when the copy
+  // asterisk on "sauté pan*" in item b) above. Added 2026-09-04 when the copy
   // was rewritten to cover both sites.
   //
-  // It takes the gutter like everything else here, with "*" as its mark, so
-  // the left edge reads 1 2 * → → → ? ? ... rather than a body-size asterisk
-  // sitting in the marks column at x=0 -- the column is the page's one device
-  // and a stray character in it reads as a typo. Body-small text because it
-  // is a footnote and should look like one; the mark stays at full mark size
-  // so the column doesn't wobble.
+  // IT SITS AT THE a) b) LEVEL, NOT THE GUTTER'S. The first version gave it
+  // the page gutter and a full-size "*" so the marks column read 1 2 *. Helen,
+  // the same day, looking at it: that "puts the footnote at the same place in
+  // the hierarchy as the points", and "its block isn't aligned with the block
+  // that called it, so I have to do work to parse, and I do not like doing
+  // work." Both are the same mistake -- a footnote is subordinate to the thing
+  // that called it, and the thing that called it is b). So the markup puts it
+  // inside point 2, after the sub-list, and this rule gives it exactly the
+  // sub-list's own treatment: the same 1.7rem indent (its text column IS b)'s
+  // text column), the same body-size mark in the same face and colour. Only
+  // the text is one size down, because it is a footnote and should look like
+  // one.
   .about-footnote {
     position: relative;
-    padding-left: $about-gutter;
-    margin: (-$space-md) 0 0 0;   // tucks up under the list it annotates
-    max-width: calc(#{$about-measure} + #{$about-gutter});
+    padding-left: 1.7rem;            // = .about-enum-sub > li, so the columns match
+    margin: $space-sm 0 0 0;
     font-size: $font-size-body-sm;
 
     &::before {
-      @extend %about-mark;
       content: "*";
-      // Courier's asterisk sits at cap height, so it needs no lift; flush with
-      // the line box lands it on the footnote's first line.
+      position: absolute;
+      left: 0;
       top: 0;
+      font-family: $font-headings;
+      font-weight: 700;
+      font-size: $font-size-body-sm;   // the a) b) marks' size, not the gutter's
+      color: $about-mark-colour;
     }
   }
 

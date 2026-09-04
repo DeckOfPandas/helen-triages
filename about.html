@@ -68,14 +68,18 @@ site_key: food
           <li>locate a magazine/email/screenshot/bookmark or open tab, or</li>
           <li>scroll through pages of boring nonsense about somebody's favourite sauté pan*, or the blow-by-blow of a recent seaside trip that inexplicably precedes a recipe for beans on toast.</li>
         </ul>
+        {% comment %} The footnote lives INSIDE point 2, under the a) b) list
+           it annotates, and takes that list's indent and mark size rather than
+           the page gutter's. The first version hung it off the gutter as a
+           third full-size mark (1 2 *), and Helen, 2026-09-04: it "puts the
+           footnote at the same place in the hierarchy as the points" and "its
+           block isn't aligned with the block that called it, so I have to do
+           work to parse". Here its text column is b)'s text column. Copy
+           rewritten the same day to cover both sites; this replaced a
+           paragraph addressed to cocktail readers. {% endcomment %}
+        <p class="about-footnote">Or artisanally hand-crafted Japanese ice tools. Use your imagination for other cocktail-related nouns and verbs.</p>
       </li>
     </ol>
-
-    {% comment %} The footnote takes the same gutter as the lists above it, with
-       "*" as its mark, so the left edge reads 1 2 * rather than an asterisk
-       floating at x=0 in body size. Copy rewritten 2026-09-04 to cover both
-       sites; this replaced a paragraph addressed to cocktail readers. {% endcomment %}
-    <p class="about-footnote">Or artisanally hand-crafted Japanese ice tools. Use your imagination for other cocktail-related nouns and verbs.</p>
 
     <hr>
 
