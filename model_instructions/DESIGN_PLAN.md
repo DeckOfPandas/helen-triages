@@ -154,12 +154,19 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    hit title wears a highlighter. Cobalt deleted; LEAVE OUT keeps the violet
    rule alone, grey, like cocktails. `food/_palette.scss`,
    `food/_category-labels.scss`, `food/_buttons.scss`.
-7. **The card's green bottom rule reads as a progress bar** (refinement).
-   Span the card at rest, or run it vertically along the column's inner edge.
-8. **Tablet.** Nothing in this review was seen on an iPad. Breakpoints: 400,
-   600, 720, 820, 1180. She cooks and mixes at 1024 landscape and 768
-   portrait; the drink page's inline-glass layout below 1180 is the least
-   verified path. Ask her for captures before changing anything.
+7. ~~The card's green bottom rule reads as a progress bar~~ **Done
+   2026-09-04**: four treatments on the real index; Helen, "Agree, no mark,
+   end of." Nothing at rest, since the absinthe glass already carries the
+   column's green; the magenta brackets stay hover-only. `cocktails/_cards.scss`.
+8. **Tablet — PARKED by Helen, 2026-09-04.** Nothing in this review was seen
+   on an iPad. Breakpoints: 400, 600, 720, 820, 1180. She cooks and mixes at
+   1024 landscape and 768 portrait; the drink page's inline-glass layout
+   below 1180 is the least verified path. A page of iframes at 768 and 1024
+   was built (`tmp/mock/tablet.py`, the §11.2.1 pattern) and she declined to
+   use it: "viewport wrangling is never as good as just looking at it... It's
+   not a showstopper to deploy something ugly, basically, as we can just fix
+   it when we have real data." So: ship, look on the iPad, fix what she sees.
+   Do not raise this again until she has looked.
 
 ## 4. Things that are hers, not yours
 

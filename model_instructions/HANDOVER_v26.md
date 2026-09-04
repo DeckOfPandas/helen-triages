@@ -4538,6 +4538,12 @@ the column is bracketed. **Both hover marks are painted strips, not borders** â€
 a border would eat into the column's fixed height and nudge the glass, and the
 one rule the hover has is that nothing moves.
 
+**There is no bottom rule at rest since 2026-09-04** â€” the design audit read
+the column-width dash as "a progress bar stuck at 18 percent", and with the
+glass itself drawn in absinthe the dash was a second green saying the same
+thing; Helen: "Agree, no mark, end of." The strip stays as the hover's lower
+bracket. The paragraph below is history.
+
 **The bottom rule is full-strength absinthe now, not a mix.** It was
 `mix($color-electric-absinthe, $color-surface, 55%)`, which read as a pale green
 while there was a green panel beside it to belong to; with the panel gone it is
