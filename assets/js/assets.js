@@ -308,11 +308,17 @@ window.HTF = window.HTF || {};
   // memory copy is what makes that true, and it costs one array.
   var shortlist = (function () {
     var KEY_PREFIX = 'htf-shortlist-';
+    var GLASSES_PREFIX = 'htf-shortlist-glasses-';
     var VERSION = '-v1';
     var entries = null;   // the in-memory copy; null until first read
+    var counts = null;    // url -> glasses, for the entries that are not 1
 
     function storageKey() {
       return HTF.site ? KEY_PREFIX + HTF.site + VERSION : '';
+    }
+
+    function glassesKey() {
+      return HTF.site ? GLASSES_PREFIX + HTF.site + VERSION : '';
     }
 
     /* Stored state is UNTRUSTED INPUT, the same standing this codebase already
@@ -345,6 +351,35 @@ window.HTF = window.HTF || {};
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
+    /* The glasses map, read and written exactly as the list above is, and with
+       the same standing: untrusted input, and a failure to persist must not
+       cost you the number you just typed. Only positive numbers survive the
+       read -- anything else is a value nobody could have meant. */
+    function readGlasses() {
+      if (counts) return counts;
+      counts = {};
+      var key = glassesKey();
+      if (!key) return counts;
+      try {
+        var raw = JSON.parse(localStorage.getItem(key));
+        if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+          Object.keys(raw).forEach(function (url) {
+            var n = raw[url];
+            if (typeof n === 'number' && isFinite(n) && n > 1) counts[url] = Math.floor(n);
+          });
+        }
+      } catch (e) { /* everything is one glass, and the page works */ }
+      return counts;
+    }
+
+    function writeGlasses() {
+      var key = glassesKey();
+      if (!key) return;
+      try {
+        localStorage.setItem(key, JSON.stringify(counts));
+      } catch (e) { /* this visit still has it; tomorrow will not */ }
+    }
+
     return {
       /** @returns {string[]} the entries, oldest first. A copy — callers sort. */
       list: function () { return read().slice(); },
@@ -370,16 +405,54 @@ window.HTF = window.HTF || {};
         return at === -1;
       },
 
-      /** Empty it. @returns {void} */
+      /** Empty it — the marks and the counts together. @returns {void} */
       clear: function () {
         entries = [];
         write();
+        counts = {};
+        writeGlasses();
+      },
+
+      /* --- HOW MANY OF EACH — GitHub issue #546, Helen 2026-09-04 ------------
+         "Per drink quantities, zomg yes please!" -- two negronis and six
+         daiquiris is a real weekend, and one number for the whole list cannot
+         say it.
+
+         A SECOND KEY, NOT A RICHER ENTRY. Making the shortlist an array of
+         `{url, glasses}` would change the shape of everything already stored in
+         every browser that has used the feature, and would put a planning
+         number inside the record of what is marked -- two facts with different
+         lifetimes in one place. This is a plain map beside it: the shortlist
+         still says WHAT, this says HOW MANY.
+
+         A MISSING ENTRY IS ONE GLASS, which is what makes the map sparse and
+         self-healing: a drink dropped from the shortlist leaves a number behind
+         that nothing reads, and setting a count back to 1 removes it rather
+         than storing the default. Nothing has to tidy up after the shortlist. */
+      glasses: function (url) {
+        var n = readGlasses()[url];
+        return typeof n === 'number' && n > 0 ? n : 1;
+      },
+
+      /**
+       * @param {string} url
+       * @param {number} n - glasses; 1 or less removes the entry
+       * @returns {number} what it ended up as
+       */
+      setGlasses: function (url, n) {
+        if (!url) return 1;
+        var all = readGlasses();
+        var value = Math.floor(Number(n));
+        if (!isFinite(value) || value <= 1) delete all[url];
+        else all[url] = value;
+        writeGlasses();
+        return value > 1 ? value : 1;
       },
 
       /* FOR TESTS ONLY, and named so nobody mistakes it for API. The module
          reads localStorage once and caches; a test that wants a second scenario
          in the same page needs to say so. */
-      _forget: function () { entries = null; }
+      _forget: function () { entries = null; counts = null; }
     };
   })();
 

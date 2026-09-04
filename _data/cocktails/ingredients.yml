@@ -108,6 +108,50 @@ measures:
   ignored_words:
     - heaping
 
+# --- how much juice one fruit gives ------------------------------------------
+# GitHub issue #546's shopping list. Helen, 2026-09-04: "Lemons give about 30-45
+# ml of juice. Limes 20-30 ml. Medium oranges about 60-80 ml. Grapefruit 180-240
+# ml. Please give the range of whole fruits needed."
+#
+# A RANGE, NOT AN AVERAGE, and that is the whole point of the feature. A single
+# figure would print "375 ml lemon juice (10 lemons)" and be wrong in the shop
+# roughly half the time. The honest answer to "how many lemons" is a span,
+# because a lemon is not a unit of volume, and the list says so: "375 ml lemon
+# juice (9 to 13 lemons)".
+#
+# THE ARITHMETIC RUNS THE OTHER WAY ROUND FROM THE INSTINCT: the FEWEST fruits
+# is the total divided by the LARGEST yield, and the most is the total divided
+# by the smallest. Both are rounded UP -- three quarters of a lemon is a lemon
+# you have to have bought.
+#
+# ONLY THE FOUR THAT ARE SQUEEZED. `juices:` below also lists pineapple,
+# cranberry and apple, and they are absent on purpose rather than forgotten:
+# those arrive in a carton, so "how many whole fruits" is not a question anyone
+# is asking in the shop. An entry here is a claim that you juice this yourself.
+#
+# The KEY is the generic exactly as a drink writes it, so nothing has to map
+# between two spellings -- all four are single, settled strings across the
+# collection (58 lime, 34 lemon, 10 orange, 6 grapefruit).
+juice_yields:
+  lemon juice:
+    fruit: lemon
+    ml_min: 30
+    ml_max: 45
+  lime juice:
+    fruit: lime
+    ml_min: 20
+    ml_max: 30
+  # "Medium oranges", Helen's word, and the size that matters: a large one is
+  # nearer a small grapefruit and would make this range a fiction.
+  orange juice:
+    fruit: orange
+    ml_min: 60
+    ml_max: 80
+  grapefruit juice:
+    fruit: grapefruit
+    ml_min: 180
+    ml_max: 240
+
 # --- what the index's ingredient pickers do with all this --------------------
 # THREE NUMBERS, HERE RATHER THAN IN THE SCRIPT, and for the reason food's
 # `search: family_button_min_chars` is in _data/food/ingredient_words.yml: how

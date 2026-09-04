@@ -188,6 +188,70 @@ test('a duplicated entry is read once, so toggling it off actually removes it', 
   assert.strictEqual(HTF.shortlist.has('/a/'), false);
 });
 
+// --- how many of each ----------------------------------------------------------
+// #546, per-drink quantities. A second key beside the list: the shortlist says
+// WHAT, this says HOW MANY.
+
+test('everything is one glass until it is told otherwise', () => {
+  const { HTF } = pageWith();
+  assert.strictEqual(HTF.shortlist.glasses('/a/'), 1);
+});
+
+test('a count is stored and read back', () => {
+  const { HTF, storage } = pageWith();
+  assert.strictEqual(HTF.shortlist.setGlasses('/a/', 6), 6);
+  assert.strictEqual(HTF.shortlist.glasses('/a/'), 6);
+  assert.deepStrictEqual(JSON.parse(storage.read('htf-shortlist-glasses-food-v1')), { '/a/': 6 });
+});
+
+test('setting a count back to one REMOVES it, rather than storing the default', () => {
+  // What keeps the map sparse, and what makes a dropped drink self-healing:
+  // there is never a stored 1 for anything to have to tidy up.
+  const { HTF, storage } = pageWith();
+  HTF.shortlist.setGlasses('/a/', 6);
+  assert.strictEqual(HTF.shortlist.setGlasses('/a/', 1), 1);
+  assert.deepStrictEqual(JSON.parse(storage.read('htf-shortlist-glasses-food-v1')), {});
+});
+
+test('a nonsense count is one glass, not a stored nonsense', () => {
+  const { HTF } = pageWith();
+  [0, -3, 'six', NaN, null].forEach((n) => {
+    assert.strictEqual(HTF.shortlist.setGlasses('/a/', n), 1, `for ${JSON.stringify(n)}`);
+    assert.strictEqual(HTF.shortlist.glasses('/a/'), 1);
+  });
+});
+
+test('a fractional count is floored — half a daiquiri is not a plan', () => {
+  const { HTF } = pageWith();
+  assert.strictEqual(HTF.shortlist.setGlasses('/a/', 3.7), 3);
+});
+
+test('a stored counts map that is the wrong shape reads as all-ones', () => {
+  const KEY = 'htf-shortlist-glasses-food-v1';
+  [JSON.stringify(['/a/', 6]), JSON.stringify('six'), 'not json', JSON.stringify({ '/a/': 'six' })]
+    .forEach((raw) => {
+      const { HTF } = pageWith(workingStorage({ [KEY]: raw }));
+      assert.strictEqual(HTF.shortlist.glasses('/a/'), 1, `for stored ${raw}`);
+    });
+});
+
+test('clear() empties the counts as well as the marks', () => {
+  const { HTF } = pageWith();
+  HTF.shortlist.toggle('/a/');
+  HTF.shortlist.setGlasses('/a/', 6);
+  HTF.shortlist.clear();
+  assert.strictEqual(HTF.shortlist.count(), 0);
+  assert.strictEqual(HTF.shortlist.glasses('/a/'), 1);
+});
+
+test('the two sites keep separate counts, like separate lists', () => {
+  const shared = workingStorage();
+  const food = pageWith(shared, 'food');
+  const cocktails = pageWith(shared, 'cocktails');
+  food.HTF.shortlist.setGlasses('/x/', 4);
+  assert.strictEqual(cocktails.HTF.shortlist.glasses('/x/'), 1);
+});
+
 // --- storage that fights back --------------------------------------------------
 // The rule this module has and HTF.indexMemory does not: a failed WRITE must
 // still leave the click working for this visit. Nobody asked for an index-memory

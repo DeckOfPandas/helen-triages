@@ -201,3 +201,156 @@
 .drink-cards .drink-card-name {
   padding-right: calc(0.85 * 0.95rem + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right});
 }
+
+// =============================================================================
+// THE SHOPPING LIST — what a shortlist adds up to
+// =============================================================================
+// #546's stretch goal. The last thing on the index, shown only while the
+// shortlisted-only filter is on — see cocktails/index.html for why that is the
+// literal reading of "the bottom of my shortlist listing".
+//
+// AMOUNT FIRST, NAME SECOND, and a fixed column for the amount. A shopping list
+// is read down its left edge for "how much", and ragged amounts against a ragged
+// name is two ragged columns and no way in. 7rem holds `540 ml` and
+// `12 drops + 6 dashes` at this size; anything longer pushes the name along
+// rather than wrapping under it, which is the failure worth avoiding.
+.shopping-list {
+  margin: $space-xxl 0 0;
+  padding-top: $space-lg;
+  border-top: 1px solid $color-border;
+}
+
+.shopping-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-lg;
+  flex-wrap: wrap;
+  margin-bottom: $space-md;
+}
+
+// Every typed number in this panel wears the same box: the site's own surface
+// and border rather than the browser's, and the home colour on focus. One rule,
+// because "set all to" and a drink's own count are the same control.
+%shopping-number {
+  @extend %cocktail-heading-face;
+  width: 3.2rem;
+  font-size: 0.95rem;
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  padding: $space-xxs $space-xs;
+
+  &:focus-visible {
+    outline: none;
+    border-color: $color-cosmic-cosmopolitan;
+  }
+}
+
+.shopping-list-setall {
+  @extend %cocktail-heading-face;
+  display: flex;
+  align-items: baseline;
+  gap: $space-xs;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: $color-clear-text;
+
+  input { @extend %shopping-number; }
+}
+
+// --- one count per drink -----------------------------------------------------
+// A wrapping row of number-and-name pairs rather than a column: a weekend's
+// shortlist is a handful of drinks, and a column of six would push the totals —
+// the thing the panel is FOR — below the fold on a phone.
+.shopping-list-drinks {
+  list-style: none;
+  margin: 0 0 $space-lg;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm $space-lg;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: $space-xs;
+    font-size: 0.9rem;
+    color: $color-text;
+  }
+
+  input { @extend %shopping-number; }
+}
+
+.shopping-list-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: $space-sm;
+    padding: $space-xs 0;
+    border-bottom: 1px solid $color-border;
+  }
+}
+
+// PLEX, IN INK -- the site's own rule for a number you act on, 2026-09-04.
+// It opened in the Courier heading face in cosmopolitan, on the reasoning
+// that "the number is the fact you are shopping by, so it carries the colour
+// that means 'you chose this'". But cosmopolitan means HAS TO HAVE (the
+// matched ingredient, the bottle suggestion) and the site already has a
+// vocabulary for a quantity: `.cocktail-amount` on the drink page and the
+// ingredient amounts on food are $font-label at weight 600 in ink, tabular,
+// because "Plex is for numbers you act on" (_palette.scss, HANDOVER 13.10).
+// A shopping total is exactly such a number. The bottle beside it keeps the
+// pink, which is the drink page's own pairing of amount and suggestion.
+.shopping-list-amount {
+  flex: 0 0 7rem;
+  font-family: $font-label;
+  font-weight: 600;
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+  color: $color-text;
+}
+
+.shopping-list-name {
+  font-size: 0.95rem;
+  color: $color-text;
+  min-width: 0;
+}
+
+// The bottles the drinks named, and the whole-fruit count, in one bracket on
+// the same line as the generic — Helen, 2026-09-04: "show generic first, with
+// bottle on the same line in brackets, like the recipes." That is the drink
+// page's `.cocktail-suggestion` shape, so a line reads the same way in both
+// places. INLINE, not a block: it was a second line under the name for one
+// version, which is what made this a list of two-line entries rather than of
+// ingredients.
+.shopping-list-note {
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
+// THE BOTTLE IS COSMOPOLITAN — Helen, 2026-09-04, and it is the drink page's own
+// `.cocktail-suggestion` colour rather than a new decision. _cocktail.scss states
+// the reason where it refuses the same hue to `optional`: "cosmopolitan
+// precisely BECAUSE a bottle name is a thing has-to-have matches against". The
+// bottle in a shopping list is the same claim — the thing you chose — so the two
+// pages say it the same way.
+.shopping-list-bottle {
+  color: $color-cosmic-cosmopolitan-deep;
+}
+
+// The whole-fruit count stays quiet. It is arithmetic this page did, not
+// something Helen chose, and colouring it would spend the hue on the wrong half
+// of the bracket.
+.shopping-list-fruit {
+  color: $color-clear-text;
+}
+
+.shopping-list-empty {
+  font-size: 0.95rem;
+  color: $color-clear-text;
+}

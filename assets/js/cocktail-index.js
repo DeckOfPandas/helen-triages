@@ -115,6 +115,40 @@
 
   var Search = CS.create(VOCABULARY, BOTTLES);
 
+  /* WHAT EACH DRINK IS MADE OF, for the shopping list -- #546. Keyed by the same
+     `drink.url` the cards carry as `data-url` and the shortlist stores, so the
+     three agree by construction. Absent, the shopping list renders nothing and
+     the rest of the index is untouched. */
+  var INGREDIENTS = readJson('drink-ingredients', 'the drinks’ own front matter', {});
+
+  /* ONE BOTTLE, HOWEVER IT WAS WRITTEN. Built from the dictionary already on the
+     page rather than from a second blob: every declared name maps to itself and
+     every alias maps to its bottle, which is what stops a shopping list printing
+     `El Dorado 3 / ED3 / El Dorado 3yo` beside one line. The ingredient search
+     does the same job with its own copy inside cocktail-search.js (#529); this
+     is fifteen lines against widening that module's contract, and if the
+     dictionary is missing the list falls back to case-folding on its own. */
+  var BOTTLE_ALIASES = (function () {
+    var map = {};
+    var declared = (BOTTLES && BOTTLES.bottles) || {};
+    var names = Object.keys(declared);
+    function fold(name) { return HTF.shoppingList.foldKey(name); }
+
+    /* TWO PASSES, AND THE ORDER IS THE POINT: aliases first, then the declared
+       names over the top. A DECLARED BOTTLE NAME MUST ALWAYS WIN -- if one
+       bottle lists another bottle's real name among its aliases, the real name
+       is the answer, and a single pass would let whichever came later in the
+       object decide. That is a bug that would show up as one bottle silently
+       renamed to another, on a page nobody would think to check. */
+    names.forEach(function (name) {
+      ((declared[name] || {}).aliases || []).forEach(function (alias) {
+        if (!map[fold(alias)]) map[fold(alias)] = name;
+      });
+    });
+    names.forEach(function (name) { map[fold(name)] = name; });
+    return map;
+  })();
+
   /* ONE state object, not five loose variables — GitHub issue #579. The fields,
      their cleared values and the "is anything set" answer all come from
      COCKTAIL_FIELDS in assets/js/filter-state.js, where the reasoning for each
@@ -331,6 +365,153 @@
     if (el) el.hidden = !active;
   }
 
+  /* --- the shopping list ---------------------------------------------------
+     #546's stretch goal. The arithmetic is assets/js/shopping-list.js; this
+     gathers the entries and paints the answer.
+
+     SHOWN ONLY WHILE THE SHORTLISTED FILTER IS ON, which is what makes it "the
+     bottom of my shortlist listing" rather than a running total under a browse.
+
+     IT READS THE STORE, NOT THE VISIBLE CARDS, and the difference matters the
+     moment a second filter is on: shortlist three drinks, then narrow to `no
+     chaos please`, and the cards on screen are a subset of the shortlist. The
+     list you shop from is the one you shortlisted. */
+  var shoppingEl = document.getElementById('shopping-list');
+  var shoppingItems = shoppingEl && shoppingEl.querySelector('.shopping-list-items');
+  var shoppingDrinks = shoppingEl && shoppingEl.querySelector('.shopping-list-drinks');
+  var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
+  var setAllInput = document.getElementById('shopping-list-setall');
+
+  /* The card's own title, for the per-drink list. Read off the model rather than
+     re-derived: `d.title` is the unmarked title card-name highlighting stashes,
+     so a drink found by a name search still lists under its real name. */
+  var titleByUrl = (function () {
+    var map = {};
+    model.forEach(function (d) { if (d.url) map[d.url] = d.title || d.url; });
+    return map;
+  })();
+
+  /* THE DRINKS, IN THE ORDER THEY WERE SHORTLISTED. The store keeps insertion
+     order, which is the order Helen marked them in -- a more useful order for
+     a planning list than either alphabetical or the index's own ranking, and
+     one she can predict. Drinks no longer on the page are dropped, the same
+     silence a renamed drink already gets everywhere else in this feature. */
+  function shortlistedDrinks() {
+    return HTF.shortlist.list().filter(function (url) {
+      return Object.prototype.hasOwnProperty.call(INGREDIENTS, url);
+    });
+  }
+
+  function renderShoppingList() {
+    if (!shoppingEl) return;
+    shoppingEl.hidden = !state.shortlisted;
+    if (!state.shortlisted) return;
+
+    var urls = shortlistedDrinks();
+
+    if (shoppingEmpty) shoppingEmpty.hidden = urls.length > 0;
+
+    /* THE PER-DRINK COUNTS. Rebuilt whole, like the totals below -- but NOT
+       while one of its own inputs has focus, because replacing the node under a
+       typing cursor loses the caret and the keystroke. `renderTotals()` is
+       called on its own from the input handler for exactly that reason. */
+    if (shoppingDrinks) {
+      shoppingDrinks.innerHTML = urls.map(function (url) {
+        return '<li>' +
+          '<input type="number" class="shopping-list-glasses" min="1" max="99" step="1" ' +
+          'inputmode="numeric" value="' + HTF.shortlist.glasses(url) + '" ' +
+          'data-url="' + HTF.escapeHtml(url) + '" ' +
+          'aria-label="glasses of ' + HTF.escapeHtml(titleByUrl[url] || url) + '">' +
+          '<span>' + HTF.escapeHtml(titleByUrl[url] || url) + '</span>' +
+          '</li>';
+      }).join('');
+    }
+
+    renderTotals(urls);
+  }
+
+  function renderTotals(urls) {
+    if (!shoppingItems) return;
+
+    var entries = [];
+    (urls || shortlistedDrinks()).forEach(function (url) {
+      var glasses = HTF.shortlist.glasses(url);
+      (INGREDIENTS[url] || []).forEach(function (ing) {
+        entries.push({ amount: ing.a, generic: ing.g, bottle: ing.b, glasses: glasses });
+      });
+    });
+
+    var rows = HTF.shoppingList.build(entries, {
+      // The cards' own list, not a second copy -- `not_on_cards: ['water']`.
+      exclude: VOCABULARY.not_on_cards || [],
+      bottleAliases: BOTTLE_ALIASES,
+      // Declared in the same file, for the four juices you squeeze yourself.
+      juiceYields: VOCABULARY.juice_yields || {}
+    });
+
+    /* REBUILT WHOLE, not patched. It is at most a couple of dozen rows, it
+       changes only when the shortlist or a count does, and a diffing render
+       here would be complexity bought for nothing. */
+    shoppingItems.innerHTML = rows.map(function (row) {
+      /* THE BOTTLE IN BRACKETS ON THE SAME LINE -- Helen, 2026-09-04, "like the
+         recipes", which is `.cocktail-item-name` then `.cocktail-suggestion` on
+         a drink page. The fruit count joins it in the same brackets when there
+         is one, because "(Beefeater) (9 to 13 lemons)" is two parentheticals
+         where the sentence wants one.
+
+         TWO SPANS INSIDE THE ONE BRACKET, because they are not the same kind of
+         fact and Helen coloured only one of them: a bottle is a thing she chose
+         and the has-to-have search matches against, which is what
+         `.cocktail-suggestion` is cosmopolitan for (_sass/cocktails/_cocktail.scss
+         says so where it declines to give `optional` a hue); a fruit count is
+         arithmetic this page did. No drink pairs them today -- none of the four
+         squeezed juices carries a suggestion -- so the comma between them is
+         written for the day one does rather than for anything on screen now. */
+      var suffix = '';
+      if (row.note || row.fruit) {
+        var inner = [];
+        if (row.note) {
+          inner.push('<span class="shopping-list-bottle">' +
+            HTF.escapeHtml(row.note) + '</span>');
+        }
+        if (row.fruit) {
+          inner.push('<span class="shopping-list-fruit">' +
+            HTF.escapeHtml(row.fruit.text) + '</span>');
+        }
+        suffix = ' <span class="shopping-list-note">(' + inner.join(', ') + ')</span>';
+      }
+      return '<li>' +
+        '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
+        '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + suffix + '</span>' +
+        '</li>';
+    }).join('');
+  }
+
+  if (shoppingDrinks) {
+    // Delegated, because the inputs are replaced on every shortlist change.
+    shoppingDrinks.addEventListener('input', function (ev) {
+      var input = ev.target;
+      if (!input.classList || !input.classList.contains('shopping-list-glasses')) return;
+      HTF.shortlist.setGlasses(input.dataset.url, input.value);
+      // Totals only. Re-rendering the drinks list would replace the very input
+      // being typed into and take the caret with it.
+      renderTotals();
+    });
+  }
+
+  if (setAllInput) {
+    /* SET ALL: it writes every drink's own count and then has no further
+       opinion. One number per drink, one place it lives -- rather than a global
+       factor on top of a per-drink figure, where nobody can say what six times
+       two is meant to mean. */
+    setAllInput.addEventListener('input', function () {
+      var n = parseInt(setAllInput.value, 10);
+      if (!isFinite(n) || n < 1) return;
+      shortlistedDrinks().forEach(function (url) { HTF.shortlist.setGlasses(url, n); });
+      renderShoppingList();
+    });
+  }
+
   function apply() {
     var shown = 0;
     var ranked = [];
@@ -408,6 +589,12 @@
       shortlistOnlyBtn.classList.toggle('is-on', !!state.shortlisted);
       shortlistOnlyBtn.setAttribute('aria-pressed', state.shortlisted ? 'true' : 'false');
     }
+
+    /* In the same pass as everything else -- #546. So a card toggled while the
+       filter is on updates the list in the same frame the card leaves it, and
+       `clear all` (which empties `shortlisted` with every other field) hides it
+       without a second thing to remember. */
+    renderShoppingList();
 
     if (countEl) countEl.textContent = shown;
     /* The word has to move with the number or "1 survivors" appears the first
