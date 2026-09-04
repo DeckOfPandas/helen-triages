@@ -81,11 +81,29 @@ $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;
 // $index-rule-* and $index-text-*, from when the rule colours were an
 // experiment that did not yet agree with the badges. They agree now, so the
 // duplicates are gone: there is no second place to change a section's colour.
+// REORDERED AGAIN ON 2026-09-04, and the order is Helen's, against five tests
+// she set herself: pink first; no two blues next to each other; star, mood
+// and practicalities decently accessible; star, mood and practicalities
+// looking nice together; and not the classic order of a rainbow. The trigger
+// was the design audit's refinement that yellow was the loudest active state
+// on the page and belonged to PRACTICALITIES, the least appetising axis: a
+// lit "make-ahead" outranked a lit "beef". A tinted fill was tried and did
+// not read; swapping yellow with LEAVE OUT's cobalt was "very visually
+// unbalanced". Her own answer moves the yellow to the LAST question instead:
+//
+//     "so the aureolin is the I KNOW WHAT I WANT -- visible, important, and
+//      pleasingly a yellow highlighter over the recipe titles when they're
+//      hit, which feels familiar."
+//
+// Cerulean and lime then swapped places (her follow-up, "to avoid a
+// rainbow"), and COBALT IS GONE: LEAVE OUT spends no hue, as it does on the
+// cocktails site, keeping only the violet structural rule. Five section hues
+// again, not six.
 $color-star-root:           $color-bright-magenta;      // 1. STAR INGREDIENT
-$color-mood-root:           $color-vivid-cerulean;      // 2. MOOD
-$color-practicalities-root: $color-aureolin;            // 3. PRACTICALITIES
-$color-ingredient-root:     $color-pure-lime-green;     // 4. SEARCH INGREDIENTS
-$color-name-search-root:    $color-hot-orange;          // 5. I KNOW WHAT I WANT
+$color-mood-root:           $color-pure-lime-green;     // 2. MOOD
+$color-practicalities-root: $color-vivid-cerulean;      // 3. PRACTICALITIES
+$color-ingredient-root:     $color-hot-orange;          // 4. SEARCH INGREDIENTS
+$color-name-search-root:    $color-aureolin;            // 5. I KNOW WHAT I WANT
 
 // Derived active tones (darkened from the roots for legibility on white).
 // A bar only has to be seen; a word has to be read.
@@ -93,30 +111,29 @@ $color-name-search-root:    $color-hot-orange;          // 5. I KNOW WHAT I WANT
 //
 // HOW FAR TO DARKEN IS A PROPERTY OF THE HUE, NOT OF THE SECTION. The two
 // exceptions below are both yellow-greens, and both are here because of where
-// they sit on the spectrum, not because of what they label.
+// they sit on the spectrum, not because of what they label -- which is why,
+// when the five were reordered on 2026-08-01 and again on 2026-09-04, the
+// deeper cuts moved WITH their hues: the extra step follows aureolin to
+// I KNOW WHAT I WANT, and the lime step follows lime to MOOD. Leaving either
+// behind would give one section near-invisible yellow text and make another
+// needlessly dark, in a change that otherwise looks like a straight swap of
+// five values.
 //
-// $darken-active-extra used to sit on the INGREDIENT line, which read as a
-// property of that section — it was not; that section simply happened to be the
-// yellow one. When the colours were reordered on 2026-08-01, aureolin moved
-// from ingredient to practicalities, and the deeper cut had to move with it.
-// Leaving it behind would have given practicalities near-invisible yellow text
-// and made ingredient needlessly dark, in a change that otherwise looks like a
-// straight swap of five values.
-//
-// Lime green then needed its own step: at $darken-active it lands on 4.37:1
+// Lime green needs its own step: at $darken-active it lands on 4.37:1
 // against $color-bg, and these are button labels at 0.72rem, so 4.5:1 is the
 // line. -22 clears it at 4.99:1 and is the smallest value that does, which
 // keeps the button as green as it can be while staying readable. Measured, not
 // guessed. The other three clear it comfortably at $darken-active: magenta
 // 7.5:1, cerulean 5.3:1, orange 6.4:1, and aureolin 6.4:1 with the extra.
+// Every pair below is one of those five, so the reorder re-solved nothing.
 $darken-active:       20;
 $darken-active-extra: 30;
 $darken-active-lime:  22;
 $color-star-active:           darken($color-star-root,           $darken-active);
-$color-mood-active:           darken($color-mood-root,           $darken-active);
-$color-practicalities-active: darken($color-practicalities-root, $darken-active-extra);
-$color-ingredient-active:     darken($color-ingredient-root,     $darken-active-lime);
-$color-name-search-active:    darken($color-name-search-root,    $darken-active);
+$color-mood-active:           darken($color-mood-root,           $darken-active-lime);
+$color-practicalities-active: darken($color-practicalities-root, $darken-active);
+$color-ingredient-active:     darken($color-ingredient-root,     $darken-active);
+$color-name-search-active:    darken($color-name-search-root,    $darken-active-extra);
 
 // Clear filters button — the background and border went with the wash-era
 // styling; what is left is the text.
@@ -301,32 +318,28 @@ $color-section-underline-2: $color-vibrant-violet;   // the second, lower rule
 // (see above), and deleting it a second time the day after it came back would
 // have been churn, not tidying.
 //
-// Now read by .search--exclude .category-label-text in
+// It was then read by .search--exclude .category-label-text in
 // _sass/food/_category-labels.scss -- the LEAVE OUT heading's own double
-// rule, Helen's sixth deliberately-added section hue, 2026-08-16. See that
-// rule's own comment for why LEAVE OUT gets one when the picker beneath it
-// otherwise borrows none.
-$color-electric-cobalt: #0047FF;
+// rule, Helen's sixth deliberately-added section hue, 2026-08-16 -- until
+// 2026-09-04, WHEN IT WENT FOR GOOD. Helen, reordering the five section hues
+// (see their block above): "we'd drop the cobalt, and drop the colouring on
+// 'leave out', like we do for the cocktail site. It could retain its violet
+// perhaps." So LEAVE OUT is colourless the way its sibling is, keeping the
+// violet structural rule alone, and the value this paragraph kept alive twice
+// is deleted rather than parked a third time: the rule it broke says a
+// swatch nothing chooses from is a paint chart, and nothing chooses it now.
 
-// The exclude section's own -active, on the same $darken-active every other
-// section's root hue gets. DECLARED HERE, not up with its five siblings,
-// because Sass resolves a file top to bottom: written beside them it referred
-// to $color-electric-cobalt 170 lines before this line defines it, and the
-// build died with "Undefined variable" pointing at the USE rather than at the
-// gap. The five siblings can sit together because their roots are declared
-// above them; this one cannot, and the split is the price of that.
-$color-exclude-active: darken($color-electric-cobalt, $darken-active);
-
-// The hover for LEAVE OUT's pool candidates -- issue #403, 2026-08-19. Darker
-// than $color-exclude-active, and it HAS to be: a word-matched candidate rests
-// at $color-exclude-active (see .btn-exclude--word-match), so hovering it to
-// that same value would be a literal no-op. Not the "lightness-only change at
-// small type" HANDOVER 12 warns about -- no change at all.
-//
-// $darken-active-extra rather than a fresh number: it is the deeper cut the
-// palette already uses where $darken-active is not enough, so this stays a
-// choice between two existing steps rather than a third value to maintain.
-$color-exclude-hover: darken($color-electric-cobalt, $darken-active-extra);
+// LEAVE OUT'S OWN -active AND -hover, NEUTRAL SINCE 2026-09-04. They were the
+// darkened cobalt and its deeper cut (#403: the hover has to differ from the
+// resting -active, because a word-matched candidate rests at -active and a
+// hover to the same value is a no-op). Both still hold with neutrals: the
+// section's clear link and its chosen exclusions deepen to the page's quiet
+// grey, and its pool candidates darken to full ink under the cursor -- the
+// same "darken, not lighten" direction every other section moves in, without
+// a hue to move in. The names stay so the four consumers in _search.scss and
+// _buttons.scss keep saying which section they belong to.
+$color-exclude-active: $color-clear-text;
+$color-exclude-hover:  $color-text;
 
 // Step numerals in the method, and the top-level bullets in the short method.
 // Body text colour, not a hue of their own. They were violet, then a darkened

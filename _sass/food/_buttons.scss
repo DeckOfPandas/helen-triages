@@ -111,10 +111,12 @@
   @include word-match-emphasis($color-ingredient-active);
 }
 
-// The same emphasis on the LEAVE OUT picker, in that section's own cobalt.
-// $color-exclude-active is the darkened tone, matching what the include side
-// uses -- the raw #0047FF is a filter-section ROOT, for rules and fills, and
-// reading it as small text is what $color-exclude-active exists to avoid.
+// The same emphasis on the LEAVE OUT picker. It was that section's own
+// darkened cobalt until 2026-09-04, when LEAVE OUT stopped spending a hue
+// (_palette.scss); the mark now uses the SEARCH INGREDIENTS tone, exactly as
+// the cocktails site does -- Helen's ruling there: "the chip underline rule
+// should be the same between has to have and leave out". A word match is the
+// same fact in both pickers, and one colour says so.
 .btn-exclude--word-match {
-  @include word-match-emphasis($color-exclude-active);
+  @include word-match-emphasis($color-ingredient-active);
 }

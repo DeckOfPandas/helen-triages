@@ -450,4 +450,14 @@
 // once already, as $color-name-search-root, before hot orange took that root
 // over on 2026-08-01 — see _palette.scss's own note on it. A hue returning to
 // the system, not a new one being invented.
-.search--exclude           .category-label-text { @include overlapping-rule-double($color-electric-cobalt,     $color-section-underline-2); }
+//
+// AND GONE AGAIN, 2026-09-04, THIS TIME WITH THE HUE ITSELF. Helen, reordering
+// the five section colours so that yellow left PRACTICALITIES: "we'd drop the
+// cobalt, and drop the colouring on 'leave out', like we do for the cocktail
+// site. It could retain its violet perhaps." So this heading keeps the violet
+// alone -- the thin lower bar every section shares, the site's structural hue
+// -- in the grey the cocktails site gives its own LEAVE OUT heading, and the
+// paragraph above stands as the record of why a sixth hue was tried. The
+// picker beneath it was always neutral; the heading now agrees with it.
+.search--exclude           .category-label-text { @include overlapping-rule-single($color-section-underline-2); }
+.search--exclude           .category-label      { color: $color-clear-text; }

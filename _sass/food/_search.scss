@@ -236,6 +236,8 @@
   .btn-clear-inline {
     // $color-exclude-active, the same $darken-active treatment every other
     // section's clear button gets from its own root hue -- Helen, 2026-08-16.
+    // (A NEUTRAL SINCE 2026-09-04: LEAVE OUT spends no hue any more, see
+    // _palette.scss. The variable and the reasoning below both survive.)
     // This used to be `inherit`, which was the safe answer when the concern
     // was only "don't let I KNOW WHAT I WANT's hot orange leak in through the
     // nesting". Naming the colour outright settles that better than inherit
@@ -349,7 +351,10 @@
     }
   }
 
-  // POOL CANDIDATES: cobalt, and DARKER than they rest -- issues #365 then #403.
+  // POOL CANDIDATES: DARKER than they rest -- issues #365 then #403. "Cobalt"
+  // below is history since 2026-09-04: both values are neutral now (grey at
+  // rest for a match, ink under the cursor), and the darken-not-lighten
+  // direction is the part that still binds.
   //
   // #365 asked for cobalt rather than .btn-tag's generic $color-text hover, so
   // that hovering a candidate said which section it belonged to, and asked for

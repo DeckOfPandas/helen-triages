@@ -1271,8 +1271,22 @@ def test_an_empty_search_results_pool_reserves_no_space(site):
 
 
 def _luminance(css_colour):
-    """Relative luminance of an `rgb(r, g, b)` string, 0 (black) to 1 (white)."""
-    nums = [float(n) for n in re.findall(r"[\d.]+", css_colour)[:3]]
+    """Relative luminance of a CSS colour, 0 (black) to 1 (white).
+
+    Takes `rgb(r, g, b)` or `#rrggbb`. Sass emits the former for a colour it
+    has computed (a darken() of a root) and the latter for a literal or a
+    plain alias -- and on 2026-09-04 LEAVE OUT's two tones became aliases of
+    the palette's neutrals, so this stopped seeing three numbers and unpacked
+    nothing.
+    """
+    css_colour = css_colour.strip()
+    if css_colour.startswith("#"):
+        hexs = css_colour.lstrip("#")
+        if len(hexs) == 3:
+            hexs = "".join(ch * 2 for ch in hexs)
+        nums = [float(int(hexs[i:i + 2], 16)) for i in (0, 2, 4)]
+    else:
+        nums = [float(n) for n in re.findall(r"[\d.]+", css_colour)[:3]]
     channels = []
     for raw in nums:
         c = raw / 255.0
