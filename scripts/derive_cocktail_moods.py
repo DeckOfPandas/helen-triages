@@ -354,7 +354,10 @@ def load_drinks():
     for root in COLLECTIONS:
         if not root.is_dir():
             continue
-        for path in sorted(root.glob("*.md")):
+        # rglob, not glob, since 2026-09-04: Helen stages drinks for publication
+        # in _cocktail_drafts/to-promote/, and the suite (which walks the folder
+        # recursively) was disputing moods this script could not even see.
+        for path in sorted(root.rglob("*.md")):
             text = path.read_text(encoding="utf-8")
             match = FRONT_MATTER.match(text)
             if not match:

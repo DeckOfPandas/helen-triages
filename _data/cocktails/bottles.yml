@@ -76,7 +76,12 @@ bottles:
     aliases: ["Appleton Signature", "Appleton Estate V/X rum", "Appleton V/X"]
   "Appleton Estate 8 Year Reserve":
     generic: "moderately aged Jamaican rum"
-    aliases: ["Appleton 8", "Appleton 8-year", "Appleton Estate 8 Reserve"]
+    # "Appleton Estate Reserve" is how the Cobra's Fang writes it, 2026-09-04.
+    # Read as the 8-year, which is the Reserve Helen owns; if it turns out to
+    # mean the newer unnumbered Reserve blend, that is a second bottle and a
+    # new entry, not a wider alias.
+    aliases: ["Appleton 8", "Appleton 8-year", "Appleton Estate 8 Reserve",
+              "Appleton Estate Reserve"]
   "Appleton Estate 12 Rare Casks":
     generic: "moderately aged Jamaican rum"
     aliases: ["Appleton 12 Rare Casks", "Appleton Rare Casks",
@@ -313,6 +318,12 @@ bottles:
     # The curly apostrophe is a SECOND STRING for one bottle and invisible on
     # the page -- it made two entries out of one in every count until now.
     aliases: ["Woodford’s Reserve", "Woodfords Reserve"]
+  # Helen's rye, 2026-09-04, arriving with the first publication batch: the
+  # Brooklyn and the Vieux Carré both pour it. The bottled-in-bond 100 proof,
+  # which is what the number on the label means.
+  "Rittenhouse 100":
+    generic: "rye"
+    aliases: ["Rittenhouse Rye", "Rittenhouse Bottled in Bond", "Rittenhouse"]
   # JACK DANIELS IS A BOURBON HERE, Helen's ruling 2026-09-02, and it corrects
   # something this file asserted for one commit. That entry said Jack Daniels
   # "is Tennessee whiskey, which is a different legal category" and offered it
@@ -388,6 +399,12 @@ bottles:
   "Martini Rosso":
     generic: "sweet vermouth"
     aliases: ["Martini Rosso vermouth"]
+  # The Corpse Reviver #2's quinquina, 2026-09-04, first publication batch.
+  # Kina Lillet is the bottle the 1930 recipe named and no longer exists;
+  # Lillet Blanc is what Helen pours in its place.
+  "Lillet Blanc":
+    generic: "quinquina"
+    aliases: ["Lillet", "Lillet blanc"]
   # A BRAND THAT IS ITS OWN GENERIC, the pattern #314 permits for three rums
   # because nothing generalises the bottle. The Ridgwell pours this AND a sweet
   # vermouth in the same drink, 12.5 ml of each, which is the proof that
@@ -426,6 +443,19 @@ bottles:
     # Aliased rather than corrected in the draft: this file governs what can be
     # READ, and #585 is where the writing gets fixed.
     aliases: ["Briottet Creme d'Abricôt", "Briottet Crème d'Abricôt"]
+  # Two more from the first publication batch, 2026-09-04. The Last Word
+  # pours Briottet's maraschino and says so in its own note: Luxardo "makes a
+  # slightly sweeter, less vegetal Last Word", which is why the bottle is
+  # named rather than left to `Luxardo` in unresolved_suggestions.
+  "Briottet Maraschino":
+    generic: "maraschino liqueur"
+    aliases: ["Briottet maraschino liqueur"]
+  # The Mai Tai's orange liqueur. Filed as a bottle of the `Créole Shrubb`
+  # generic, which ingredients.yml already declares under the orange liqueurs
+  # with its reasoning: a rhum-based orange liqueur, not a rum.
+  "Rhum Clément Créole Shrubb":
+    generic: "Créole Shrubb"
+    aliases: ["Rhum Clement Créole Shrubb", "Clément Créole Shrubb", "Créole Shrubb"]
 
   # --- bitters --------------------------------------------------------------
   "Angostura":
