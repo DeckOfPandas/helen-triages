@@ -246,3 +246,9 @@ ingredient beside it.
   Two files kept their ounces through the 2026-09-01 conversion for exactly
   this reason.
 - **`QQ` is never an error.** Do not flag it, fix it, or convert it.
+- **Every note an ingest ADDS is `{label, text}` with both fields set, each
+  beginning `QQ`** — never a bare string. Helen, 2026-09-04: "It's annoying
+  for me to remember how to type YAML every time." She searches for `QQ`,
+  replaces the label with a real heading and the text with her words, and
+  never has to recall the shape. Both sites, both standalone documents say
+  the same. A note that already exists keeps whatever shape it has.

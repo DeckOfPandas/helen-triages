@@ -127,7 +127,7 @@ meta:
 | `ingredients[].character` | Why a drink wants a particular bottle. **Never yours to write** — §3. |
 | `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. |
 | `to_serve` | Presentation, not a further instruction. `"Straw."`, `"Two straws."` A terse noun phrase, or `""`. |
-| `notes` | A bare string, or `{label, text}`. Use one to record what the source could not give you. |
+| `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s and replaces the label with a real heading and the text with her own words. A bare string is legal in the schema but not for an ingest. Use one to record what the source could not give you. |
 | `source` / `source_url` | Free text here, unlike food. `"Difford's"`, `"Death & Co"`. `source_url` may be `""`. |
 | `meta.ship` | Helen's rating. **Always `"QQ"`** — you have not drunk it and neither has she. |
 | `meta.date_last_edited` | Today's date, `YYYY-MM-DD`. |

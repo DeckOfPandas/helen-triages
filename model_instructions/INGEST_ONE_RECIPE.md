@@ -99,7 +99,8 @@ method:
 method_short:
   - ""
 notes:
-  - "Anything worth saying that is not a step."
+  - label: "QQ"
+    text: "QQ - anything worth saying that is not a step."
 meta:
   rewritten: false
   awaiting_fix: false
@@ -130,7 +131,7 @@ name you give is a courtesy rather than a contract.
 | `ingredient_groups` | Below. |
 | `method` **xor** `method_groups` | Section 3 — the part that matters most. Flat `method:` for a recipe with one phase, `method_groups:` when the source has more. **Never both** — the layout renders one and silently drops the other. |
 | `method_short` | Always exactly `[""]`. It means "not written", and Helen writes it herself. |
-| `notes` | A list. Each entry is a bare string, or `{label: "Sinking", text: "…"}`. Three at most; more than that and the material wants to be prose. |
+| `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s, replaces the label with a real heading and the text with her own words, and never has to recall the shape. A bare string is legal in the schema but not for an ingest. Three at most; more than that and the material wants to be prose. |
 | `meta` | Exactly these three keys, in this order, all `false`. See below. |
 
 **`meta:` is three flags, in that order, and on a new file all three are
@@ -541,7 +542,8 @@ method:
 method_short:
   - ""
 notes:
-  - "QQ - the source stops after the garlic. Nothing tells you when the parmesan goes in, or how the gnocchi and the butter meet."
+  - label: "QQ"
+    text: "QQ - the source stops after the garlic. Nothing tells you when the parmesan goes in, or how the gnocchi and the butter meet."
 meta:
   rewritten: false
   awaiting_fix: false
