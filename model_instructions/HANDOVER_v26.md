@@ -2748,12 +2748,12 @@ generic plus its alias spellings.
 >   and kirschwasser are generics (Bali Hai's either-would-do list); the
 >   suggestion goes.
 > - **A syrup's suggestion may name what it is made from.** "Acacia honey" is
->   a declared entry under `honey syrup` — *"Acacia is a bit special."*
+>   a declared entry under `honey water` — *"Acacia is a bit special."*
 > - **Generics are named by what substitutes for what.** `flavoured vodka` is
 >   retired for `vanilla vodka` and `pineapple vodka` (*"members aren't
 >   substitutable"*); `lavender bitters` is retired for `lavender-forward
 >   bitters` (the wider name, with Bob's Margarita Bitters as her example);
->   `honey water 1:1` / `2:1` are retired for one flat `honey syrup`, while
+>   `honey water 1:1` / `2:1` are retired for one flat `honey water`, while
 >   bare `honey` stays for the raw thing you cook with (the pear Bellini);
 >   `bonded rye` and `rye` stay distinct; `dry orange Curaçao` and `orange
 >   Curaçao` stay distinct.
@@ -3103,7 +3103,7 @@ claim they combine."*
 **`not_on_cards`** keeps bare `water` off a card and out of the search (#580).
 Exact matches only: `soda water` is a real choosing fact. (`honey water` was the
 second example until 2026-09-04, when Helen flattened both ratios into one
-`honey syrup`.)
+`honey water`.)
 
 
 ### 9.4 Decided 2026-08-16 — do not re-litigate
@@ -3534,7 +3534,7 @@ syrup, and on the recipe ingredient line cane sugar syrup, 2:1." **A ratio is a
 MAKING fact, not a CHOOSING fact** — at card distance it is not being used.
 Checked before declaring: no drink carries both ratios of the same syrup. (The
 two honey waters were a second such collapse until 2026-09-04, when Helen ruled
-one flat `honey syrup` generic — so that pair now collapses in the vocabulary
+one flat `honey water` generic — so that pair now collapses in the vocabulary
 and needs no card name at all.)
 
 **Cards are lowercased in CSS, not in the markup** (`text-transform` on

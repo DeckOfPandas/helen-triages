@@ -205,7 +205,7 @@
        not a CHOOSING fact". Same for the two Jamaicans.
        `card_names_may_collide` already declares both of these as deliberate.
        (The two honey waters were a third such pair until 2026-09-04, when
-       Helen flattened them into one `honey syrup` generic -- so that collapse
+       Helen flattened them into one `honey water` generic -- so that collapse
        now happens in the vocabulary rather than here.) */
     var chipForTerm = Object.create(null);   // folded term -> the chip it belongs to
     var chipCovers = Object.create(null);    // folded chip -> [folded terms it selects]

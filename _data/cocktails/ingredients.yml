@@ -276,7 +276,7 @@ search:
 # water` by substring until 2026-08-29 and the fix for THAT is upstream in
 # cocktail-search.js; this list is a different rule and must not lean on the old
 # bug's shape. (`honey water` was the other example until 2026-09-04, when
-# Helen flattened both ratios into `honey syrup`; the rule it illustrated is
+# Helen flattened both ratios into `honey water`; the rule it illustrated is
 # unchanged, and `soda water` still illustrates it.)
 #
 # ONE ENTRY TODAY, and a list rather than a special case in the template because
@@ -658,7 +658,7 @@ card_names:
   "sugar syrup 2:1": "sugar syrup"
   # THE TWO HONEY WATERS CAME OFF ON 2026-09-04, and not because the collapse
   # stopped being right -- because there is nothing left to collapse. Helen
-  # ruled one flat `honey syrup` (see `honeys` below), so the generic already
+  # ruled one flat `honey water` (see `honeys` below), so the generic already
   # reads on a card exactly as she would write it, and this map only ever
   # carries a generic whose card name DIFFERS from it.
 
@@ -720,7 +720,7 @@ card_names_may_collide:
     information is not being used. Nine drinks carry both a syrup and something
     else sweet; none carries both ratios at once.
   # `honey water` STOOD HERE UNTIL 2026-09-04 and came off with the pair it
-  # permitted: Helen's one flat `honey syrup` means there is no second honey
+  # permitted: Helen's one flat `honey water` means there is no second honey
   # generic for the first to collide with. Left here it would have failed
   # test_rum_card_names_are_distinct's staleness half, which is the guard doing
   # its job -- a permission whose names have diverged silently blesses the next
@@ -1162,9 +1162,12 @@ syrups:
   - "lime cordial"
   - "ginger and lemongrass cordial"
 
-# ONE FLAT `honey syrup` SINCE 2026-09-04, and the ratio is gone with the name.
+# ONE FLAT `honey water` SINCE 2026-09-04, and the ratio is gone from the name.
 # Helen: "Honey: one flat honey syrup please, because I don't think I'll often
-# request a specific type. Acacia is a bit special."
+# request a specific type. Acacia is a bit special." -- and then, an hour
+# later, on seeing `honey syrup` and `honey water` side by side: "I actually
+# prefer water and should have said so earlier." So the WORD stays as the
+# collection always had it and only the ratio goes.
 #
 # THIS REVERSES 2026-08-26, WHICH IS WORTH SAYING PLAINLY. That day the ratio
 # was ruled always-stated, on the argument that a diluted honey and a
@@ -1182,13 +1185,13 @@ syrups:
 # BARE `honey` SURVIVES AND IS NOT THE SAME THING -- Helen, same conversation,
 # on the pear Bellini: it "really does use plain honey, cooked into a syrup on
 # the stove with the fruit". So `honey` is the raw thing you cook WITH (the
-# Bellini's pear, honey and thyme syrup, weighed in grams) and `honey syrup` is
+# Bellini's pear, honey and thyme syrup, weighed in grams) and `honey water` is
 # the ready-made pour. Acacia versus clover remains a bottle on the shelf and
 # therefore a `suggestion`, which is the 2026-08-26 half that stands: the
 # bottle dictionary declares `Acacia honey` and the drinks point at it.
 honeys:
   - "honey"
-  - "honey syrup"
+  - "honey water"
 
 # DELIBERATELY MIXES FORM WITH TYPE, and the reasoning is a browsing one rather
 # than a purity one -- Helen: "if I don't have a sugar cube I won't make a
@@ -1420,11 +1423,11 @@ retired_rum_styles:
     it. Don's Own Grog and Georgetown Punch already have this shape.
 
 retired_honeys:
-  "honey water": >-
-    the ratio is now always stated, as it always was for sugar syrup. A bare
-    `honey water` cannot say whether it is used at 22.5 ml or 15 ml for the
-    same sweetness. Re-type as `honey water 1:1` or `honey water 2:1`. Helen,
-    2026-08-26.
+  # `honey water` (bare) sat here from 2026-08-26 -- "the ratio is now always
+  # stated, as it always was for sugar syrup" -- and came OFF this list on
+  # 2026-09-04 when Helen retired the ratios instead (see the `honeys` block
+  # above). A generic cannot be both live and retired, and the guard that
+  # reads this list said so within the hour.
   "Honey water 2:1": >-
     capitalisation only -- it is `honey water 2:1` now, matching `sugar syrup
     2:1` and every other lowercase commodity in this file. It sat two lines
@@ -1436,14 +1439,15 @@ retired_honeys:
     `suggestion` -- the file's own rule that a preferred bottle is a
     suggestion and never a generic. Helen, 2026-08-26.
   "honey water 1:1": >-
-    the ratio is gone and so is the word `water`. Helen, 2026-09-04: "Honey:
+    the ratio is gone; the word stays. Helen, 2026-09-04: "Honey:
     one flat honey syrup please, because I don't think I'll often request a
-    specific type." Re-type as `honey syrup`; if the ratio matters to the
+    specific type" -- then "I actually prefer water and should have said so
+    earlier." Re-type as `honey water`; if the ratio matters to the
     drink it belongs in the `item` line or a note, which is where
     island-of-martinique had already put it.
   "honey water 2:1": >-
     as `honey water 1:1`. Seven drinks carried the pair between them and all
-    seven are now `honey syrup`.
+    seven are now `honey water`.
 
 # NEW BLOCK 2026-09-04, and it exists for the same reason as every other one:
 # `full-strength clear fruit brandy` meant something for thirteen days and must

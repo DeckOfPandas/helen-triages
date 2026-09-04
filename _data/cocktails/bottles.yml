@@ -676,7 +676,7 @@ bottles:
   # Punch both write "Cane sugar syrup" for.
   "Monin Pure Cane Sugar":
     generic: "sugar syrup 2:1"
-  # A HONEY, NOT A BOTTLE OF SYRUP, and it is here because a honey syrup's
+  # A HONEY, NOT A BOTTLE OF SYRUP, and it is here because a honey water's
   # `suggestion` names the honey it is made FROM. That was the exact objection
   # `unresolved_suggestions` raised -- "a SCHEMA MISMATCH rather than a naming
   # one: the suggestion is which honey to make the syrup FROM, and `suggestion`
@@ -685,7 +685,7 @@ bottles:
   # drinks name it, two of them spelled lowercase, so both spellings are
   # aliases.
   "Acacia honey":
-    generic: "honey syrup"
+    generic: "honey water"
     aliases: ["Acacia", "acacia honey"]
   "Bottle Green":
     generic: "ginger and lemongrass cordial"

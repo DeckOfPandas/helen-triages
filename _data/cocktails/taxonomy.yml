@@ -417,7 +417,7 @@ mood_ingredients:
     - honey
     # One flat generic since 2026-09-04; it replaces `honey water 1:1` and
     # `honey water 2:1`, which stood here as two lines meaning one mood.
-    - honey syrup
+    - honey water
     - orgeat
     - falernum
     - grenadine

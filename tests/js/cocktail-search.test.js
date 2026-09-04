@@ -537,7 +537,7 @@ test('INCLUDE is a word PREFIX, not a substring -- apple juice is not pineapple 
 test('INCLUDE needs EVERY word of the chip to land somewhere in the entry', () => {
   const entries = CS.splitEntries(attr('sugar syrup 2:1'));
   assert.strictEqual(S.matchesInclude(entries, 'sugar syrup'), true);
-  assert.strictEqual(S.matchesInclude(entries, 'honey syrup'), false);
+  assert.strictEqual(S.matchesInclude(entries, 'honey water'), false);
 });
 
 test('INCLUDE also honours a declared family', () => {

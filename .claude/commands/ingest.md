@@ -255,7 +255,7 @@ ingredient beside it.
   - a spirit type beside its own generic is not a suggestion; it goes;
   - a syrup's suggestion may name what it is made from (Acacia honey);
   - generics are named by what substitutes for what: never a `flavoured X`
-    that spans non-substitutable members; `honey syrup` is one flat generic
+    that spans non-substitutable members; `honey water` is one flat generic
     and bare `honey` is the raw thing you cook with; `lavender-forward
     bitters`, not `lavender bitters`; `bonded rye` and `rye` are distinct;
   - spelling: leave the drink as she wrote it and add the spelling as an

@@ -4651,7 +4651,7 @@ def test_a_suppressed_word_is_only_ever_suppressed_ALONE():
     itself does not name a compound, which is the other way in.
 
     `honey water` was the second example until 2026-09-04, when Helen flattened
-    both ratios into one `honey syrup` generic. The compound it illustrated is
+    both ratios into one `honey water` generic. The compound it illustrated is
     gone from the vocabulary; the rule is not, and `soda water` still shows it.
     """
     for value in _vocab().get("not_on_cards") or []:
