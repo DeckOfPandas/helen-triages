@@ -201,3 +201,100 @@
 .drink-cards .drink-card-name {
   padding-right: calc(0.85 * 0.95rem + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right});
 }
+
+// =============================================================================
+// THE SHOPPING LIST — what a shortlist adds up to
+// =============================================================================
+// #546's stretch goal. The last thing on the index, shown only while the
+// shortlisted-only filter is on — see cocktails/index.html for why that is the
+// literal reading of "the bottom of my shortlist listing".
+//
+// AMOUNT FIRST, NAME SECOND, and a fixed column for the amount. A shopping list
+// is read down its left edge for "how much", and ragged amounts against a ragged
+// name is two ragged columns and no way in. 7rem holds `540 ml` and
+// `12 drops + 6 dashes` at this size; anything longer pushes the name along
+// rather than wrapping under it, which is the failure worth avoiding.
+.shopping-list {
+  margin: $space-xxl 0 0;
+  padding-top: $space-lg;
+  border-top: 1px solid $color-border;
+}
+
+.shopping-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-lg;
+  flex-wrap: wrap;
+  margin-bottom: $space-md;
+}
+
+.shopping-list-scaler {
+  @extend %cocktail-heading-face;
+  display: flex;
+  align-items: baseline;
+  gap: $space-xs;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: $color-clear-text;
+
+  input {
+    @extend %cocktail-heading-face;
+    width: 3.2rem;
+    font-size: 0.95rem;
+    // The one place on this index where a number is TYPED rather than chosen,
+    // so it wears the site's own surface and border rather than the browser's.
+    color: $color-text;
+    background: $color-surface;
+    border: 1px solid $color-border;
+    padding: $space-xxs $space-xs;
+
+    &:focus-visible {
+      outline: none;
+      border-color: $color-cosmic-cosmopolitan;
+    }
+  }
+}
+
+.shopping-list-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: $space-sm;
+    padding: $space-xs 0;
+    border-bottom: 1px solid $color-border;
+  }
+}
+
+.shopping-list-amount {
+  @extend %cocktail-heading-face;
+  flex: 0 0 7rem;
+  font-size: 0.92rem;
+  // The number is the fact you are shopping by, so it carries the colour that
+  // means "you chose this" everywhere else on the site.
+  color: $color-cosmic-cosmopolitan-deep;
+}
+
+.shopping-list-name {
+  font-size: 0.95rem;
+  color: $color-text;
+  min-width: 0;
+}
+
+// The bottle, or the bottles, that the drinks actually named — quiet, because
+// the line is already labelled and this is the detail under it. See
+// assets/js/shopping-list.js for which of the two the label ends up being.
+.shopping-list-note {
+  display: block;
+  font-size: 0.8rem;
+  color: $color-clear-text;
+}
+
+.shopping-list-empty {
+  font-size: 0.95rem;
+  color: $color-clear-text;
+}

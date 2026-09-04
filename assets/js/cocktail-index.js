@@ -115,6 +115,40 @@
 
   var Search = CS.create(VOCABULARY, BOTTLES);
 
+  /* WHAT EACH DRINK IS MADE OF, for the shopping list -- #546. Keyed by the same
+     `drink.url` the cards carry as `data-url` and the shortlist stores, so the
+     three agree by construction. Absent, the shopping list renders nothing and
+     the rest of the index is untouched. */
+  var INGREDIENTS = readJson('drink-ingredients', 'the drinks’ own front matter', {});
+
+  /* ONE BOTTLE, HOWEVER IT WAS WRITTEN. Built from the dictionary already on the
+     page rather than from a second blob: every declared name maps to itself and
+     every alias maps to its bottle, which is what stops a shopping list printing
+     `El Dorado 3 / ED3 / El Dorado 3yo` beside one line. The ingredient search
+     does the same job with its own copy inside cocktail-search.js (#529); this
+     is fifteen lines against widening that module's contract, and if the
+     dictionary is missing the list falls back to case-folding on its own. */
+  var BOTTLE_ALIASES = (function () {
+    var map = {};
+    var declared = (BOTTLES && BOTTLES.bottles) || {};
+    var names = Object.keys(declared);
+    function fold(name) { return HTF.shoppingList.foldKey(name); }
+
+    /* TWO PASSES, AND THE ORDER IS THE POINT: aliases first, then the declared
+       names over the top. A DECLARED BOTTLE NAME MUST ALWAYS WIN -- if one
+       bottle lists another bottle's real name among its aliases, the real name
+       is the answer, and a single pass would let whichever came later in the
+       object decide. That is a bug that would show up as one bottle silently
+       renamed to another, on a page nobody would think to check. */
+    names.forEach(function (name) {
+      ((declared[name] || {}).aliases || []).forEach(function (alias) {
+        if (!map[fold(alias)]) map[fold(alias)] = name;
+      });
+    });
+    names.forEach(function (name) { map[fold(name)] = name; });
+    return map;
+  })();
+
   /* ONE state object, not five loose variables — GitHub issue #579. The fields,
      their cleared values and the "is anything set" answer all come from
      COCKTAIL_FIELDS in assets/js/filter-state.js, where the reasoning for each
@@ -331,6 +365,80 @@
     if (el) el.hidden = !active;
   }
 
+  /* --- the shopping list ---------------------------------------------------
+     #546's stretch goal. The arithmetic is assets/js/shopping-list.js; this
+     gathers the entries and paints the answer.
+
+     SHOWN ONLY WHILE THE SHORTLISTED FILTER IS ON, which is what makes it "the
+     bottom of my shortlist listing" rather than a running total under a browse.
+
+     IT READS THE STORE, NOT THE VISIBLE CARDS, and the difference matters the
+     moment a second filter is on: shortlist three drinks, then narrow to `no
+     chaos please`, and the cards on screen are a subset of the shortlist. The
+     list you shop from is the one you shortlisted. */
+  var shoppingEl = document.getElementById('shopping-list');
+  var shoppingItems = shoppingEl && shoppingEl.querySelector('.shopping-list-items');
+  var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
+  var glassesInput = document.getElementById('shopping-list-glasses');
+
+  function glasses() {
+    var n = parseInt(glassesInput ? glassesInput.value : '1', 10);
+    // NaN from an emptied box, or a pasted 0, is one glass -- never zero, which
+    // would render an empty list and read as a bug rather than as an answer.
+    return isFinite(n) && n > 0 ? n : 1;
+  }
+
+  function renderShoppingList() {
+    if (!shoppingEl) return;
+    shoppingEl.hidden = !state.shortlisted;
+    if (!state.shortlisted) return;
+
+    var entries = [];
+    HTF.shortlist.list().forEach(function (url) {
+      // A url in the store with no drink on the page is one that has been
+      // renamed or unpublished since it was marked. Skipped in silence, exactly
+      // as its card silently is not in the list -- see the filter button's own
+      // note in cocktails/index.html.
+      (INGREDIENTS[url] || []).forEach(function (ing) {
+        entries.push({ amount: ing.a, generic: ing.g, bottle: ing.b });
+      });
+    });
+
+    var rows = HTF.shoppingList.build(entries, {
+      multiplier: glasses(),
+      // The cards' own list, not a second copy -- `not_on_cards: ['water']`.
+      exclude: VOCABULARY.not_on_cards || [],
+      bottleAliases: BOTTLE_ALIASES
+    });
+
+    if (shoppingEmpty) shoppingEmpty.hidden = rows.length > 0;
+    if (!shoppingItems) return;
+
+    /* REBUILT WHOLE, not patched. It is at most a couple of dozen rows, it
+       changes only when the shortlist or the scaler does, and a diffing render
+       here would be complexity bought for nothing. */
+    var html = rows.map(function (row) {
+      var note = row.note
+        ? '<span class="shopping-list-note">' + HTF.escapeHtml(row.note) + '</span>'
+        : '';
+      return '<li>' +
+        '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
+        '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + note + '</span>' +
+        '</li>';
+    }).join('');
+    shoppingItems.innerHTML = html;
+
+    // "1 glass of each", "6 glasses of each" -- the same rule the survivor count
+    // above follows, and for the same reason: the word has to move with the
+    // number or the line reads as a bug.
+    var plural = shoppingEl.querySelector('[data-shopping-plural]');
+    if (plural) plural.textContent = glasses() === 1 ? '' : 'es';
+  }
+
+  if (glassesInput) {
+    glassesInput.addEventListener('input', renderShoppingList);
+  }
+
   function apply() {
     var shown = 0;
     var ranked = [];
@@ -408,6 +516,12 @@
       shortlistOnlyBtn.classList.toggle('is-on', !!state.shortlisted);
       shortlistOnlyBtn.setAttribute('aria-pressed', state.shortlisted ? 'true' : 'false');
     }
+
+    /* In the same pass as everything else -- #546. So a card toggled while the
+       filter is on updates the list in the same frame the card leaves it, and
+       `clear all` (which empties `shortlisted` with every other field) hides it
+       without a second thing to remember. */
+    renderShoppingList();
 
     if (countEl) countEl.textContent = shown;
     /* The word has to move with the number or "1 survivors" appears the first

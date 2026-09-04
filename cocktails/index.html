@@ -587,6 +587,40 @@ permalink: /cocktails/
      it lands as an insult to a search that was simply too narrow. {% endcomment %}
   <p class="drink-none" hidden>Blank canvas.</p>
 
+  {% comment %} THE SHOPPING LIST -- #546's stretch goal, Helen 2026-09-04:
+     "information at the bottom of my shortlist listing each ingredient (bottle
+     selection if I have one, generic if not) and its amount in total if I were
+     to make 1 glass of each of those drinks. Next step is a scaler."
+
+     AT THE BOTTOM OF THE SHORTLIST LISTING, LITERALLY: it is the last thing on
+     the index and it appears only while the shortlisted-only filter is on. That
+     is what makes it "my shortlist listing" rather than a running total under a
+     browse -- and it needs no page of its own for the same reason the shortlist
+     itself did not (see the filter button above).
+
+     THE SCALER IS A NUMBER INPUT, not a pair of steppers. It is one control,
+     it takes a typed 12 as fast as a 2, it gets a numeric keypad on the phone
+     this is most likely to be read on, and it is keyboard-reachable without
+     anything written here. `min=1` because zero glasses of each is an empty
+     list with extra steps.
+
+     THE TOTALS ARE assets/js/shopping-list.js, which is pure and tested; this
+     is the markup it fills and cocktail-index.js is the wiring. Same three-way
+     split as filter-state.js / filters.js, for the same reason -- the arithmetic
+     is the part worth testing without a browser, and summing 682 hand-written
+     amounts across 124 files has more edge cases than it looks. {% endcomment %}
+  <section class="shopping-list" id="shopping-list" hidden aria-live="polite">
+    <div class="shopping-list-head">
+      <h2 class="drink-field-label"><span class="drink-field-label-text">Shopping list</span></h2>
+      <label class="shopping-list-scaler">
+        <input type="number" id="shopping-list-glasses" value="1" min="1" max="99" step="1" inputmode="numeric">
+        <span>glass<span data-shopping-plural>es</span> of each</span>
+      </label>
+    </div>
+    <ul class="shopping-list-items"></ul>
+    <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
+  </section>
+
   {% comment %} A `?panel=` SWITCH STOOD HERE for one round, offering four glass
      panels against the shipped green wash. Helen chose `none` -- no panel at
      all, the home colour in the line work -- so the switch and the three losers
@@ -632,6 +666,43 @@ permalink: /cocktails/
     {{ site.data.cocktails.bottles | jsonify }}
   </script>
 
+  {% comment %} WHAT EACH DRINK IS MADE OF, FOR THE SHOPPING LIST -- #546's
+     stretch goal, asked for on 2026-09-04: "each ingredient (bottle selection if
+     I have one, generic if not) and its amount in total if I were to make 1
+     glass of each of those drinks".
+
+     IT HAS TO BE EVERY DRINK, not the shortlisted ones, and that is not
+     wastefulness: the shortlist lives in this browser's localStorage and the
+     build cannot know what is in it. The same fact that makes the whole feature
+     client-side makes this blob unconditional.
+
+     THREE FIELDS, NOT THE WHOLE INGREDIENT. `item`, `note`, `optional` and the
+     rest are what a drink PAGE renders; a shopping list needs the amount, the
+     generic and the bottle, and nothing else. That is about 30 KB rather than
+     the ~90 KB `drink.ingredients | jsonify` would emit, on a page that already
+     carries 124 cards and 19 KB of vocabulary.
+
+     EACH VALUE THROUGH `jsonify` INDIVIDUALLY, never hand-quoted. Bottles and
+     generics carry apostrophes (`John D Taylor's Velvet Falernum`), accents and
+     the odd ampersand, and `jsonify` on the string is what escapes them
+     correctly. It also does the right thing for the fields that are sometimes a
+     LIST and sometimes a scalar -- `generic` has five list entries, `suggestion`
+     nineteen (#441, "either would do") -- and for `suggestion` being absent
+     altogether on 490 of the 682, where it emits `null` and the reader treats it
+     as "no bottle named". Keys are one letter because this is machine-read and
+     682 entries pay for the difference. {% endcomment %}
+  <script type="application/json" id="drink-ingredients">
+{
+{%- for drink in sorted_drinks %}{% unless forloop.first %},{% endunless %}
+{{ drink.url | jsonify }}:[
+{%- for ing in drink.ingredients -%}
+{% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"g":{{ ing.generic | jsonify }},"b":{{ ing.suggestion | jsonify }}}
+{%- endfor -%}
+]
+{%- endfor %}
+}
+  </script>
+
   {% comment %} ORDER MATTERS, and each of these is read at startup rather than
      on first use, so a page that loads them out of order fails immediately
      rather than on the first keystroke:
@@ -642,12 +713,18 @@ permalink: /cocktails/
        filter-state.js       COCKTAIL_FIELDS: what this index's filter state IS.
        cocktail-search.js    the pool, the ranking and the two matching rules.
                              Requires the first of these.
+       shopping-list.js      the totals a shortlist adds up to (#546).
+                             cocktail-index.js calls HTF.shoppingList.foldKey at
+                             STARTUP, building its bottle-alias map, so this is
+                             the same trap as the three above rather than a
+                             looser dependency.
 
      Guarded by tests/test_site_config.py, the same way food's four are.
   {% endcomment %}
   <script src="{{ '/assets/js/ingredient-search.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-search.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-index.js' | relative_url }}"></script>
   {% comment %} AFTER cocktail-index.js and, more to the point, before
      _layouts/default.html's own decorations.js -- see universe.js's header
