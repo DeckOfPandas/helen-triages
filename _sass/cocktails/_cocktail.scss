@@ -126,7 +126,7 @@ $head-pad-bottom: 1.4rem;
 // changes. Half-leading is exact arithmetic; the second term is the remaining
 // gap between the em box and the cap height, which depends on the font's own
 // metrics and is measured. Named separately so it is obvious which is which.
-$title-size:         3.2rem;   // the tape's font-size, `.cocktail-title-block .drink-card-name`
+$title-size:         3.2rem;   // the tape's size: `--card-name-size` on `.cocktail-title-block .drink-card-name`
 $title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;
 $title-cap-inset:    0.14rem;   // em box top -> cap top, Courier Prime
 $glass-top:          $title-half-leading + $title-cap-inset;
@@ -296,7 +296,15 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     // here now that the h1 inherits honestly. Food's title is 2.2rem; the two
     // sites' titles no longer agree, and that is her call from looking at
     // this page rather than a drift.
-    font-size: 3.2rem;
+    //
+    // SET AS `--card-name-size` RATHER THAN AS `font-size` SINCE 2026-09-04.
+    // The value and the reason above are unchanged; what changed is which
+    // property carries it. `.drink-card-name` in _cards.scss now computes
+    // `calc(var(--card-name-size, 1rem) * var(--card-name-scale, 1))`, so a
+    // long name on this page steps down by the same 14% a long name on a card
+    // does, from one rule that knows neither number. Writing `font-size` here
+    // would win over that calc and quietly opt the drink page out of the fit.
+    --card-name-size: 3.2rem;
     margin: 0 0 $space-sm;
   }
 

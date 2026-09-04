@@ -113,21 +113,41 @@
   // page just lightens it (still reads as a pale, bright tint), where an
   // actual mix desaturates it into a dustier, quieter version of the same
   // hue. Solid colour, not rgba -- the desaturation is doing the calming
-  // work here, not opacity. .badge--matched below still overrides back to
-  // the full-strength root hue, so a matched tag keeps popping.
+  // work here, not opacity.
+  //
+  // TAKE THREE, 2026-09-04: MUTED ENTIRELY AT REST. The design audit's
+  // critical #2 -- "the row's most saturated element is its badge trio, so
+  // the eye lands on 'beef showstopper make-ahead' before it lands on 'beef
+  // wellington'" -- and Helen, choosing from the real index: "leave the
+  // buttons entirely muted until hit by a filter, when they should take your
+  // middle saturation, then the loudest active state for mouseover." So the
+  // ladder has three rungs now, and the 35% dusty mix that WAS the resting
+  // shape is the middle one:
+  //
+  //     rest      a hint of the hue in the tape (14%), grey text
+  //     matched   the 35% mix, text in the category's own dark colour
+  //               (_active-filter-states.scss)
+  //     hover     the lightened full-strength hue, below
+  //
+  // What this gives up, knowingly: at rest you can no longer find
+  // practicalities by "the yellow one". Helen took that trade for a list
+  // whose titles scan first -- "that scan makes the decision about opening
+  // the page or not". ONLY THE BADGE'S OWN HOVER LIGHTS IT: a candidate that
+  // lit the whole trio when the cursor crossed the row was rejected outright
+  // ("feels weird").
   &-star {
-    color: $color-star-active;
-    .tag-shape { color: mix($color-star-root, $color-border, 35%); }
+    color: $color-clear-text;
+    .tag-shape { color: mix($color-star-root, $color-border, 14%); }
   }
 
   &-mood {
-    color: $color-mood-active;
-    .tag-shape { color: mix($color-mood-root, $color-border, 35%); }
+    color: $color-clear-text;
+    .tag-shape { color: mix($color-mood-root, $color-border, 14%); }
   }
 
   &-practicalities {
-    color: $color-practicalities-active;
-    .tag-shape { color: mix($color-practicalities-root, $color-border, 35%); }
+    color: $color-clear-text;
+    .tag-shape { color: mix($color-practicalities-root, $color-border, 14%); }
   }
 }
 
@@ -139,6 +159,12 @@
 // to do to that badge. No new colour is introduced -- both ends of the move
 // are values the page already spends, which is what §13.5's five-hue code and
 // the palette's colour budget require.
+//
+// NOT A PREVIEW ANY MORE, 2026-09-04: hover is the LOUDEST of three rungs
+// (rest, matched, hover -- see the resting block above), and matched sits a
+// step below it. The lightened hue below is unchanged; what moved is what it
+// is compared against. The text colour still holds the category against
+// shared/_base.scss's `a:hover`, for the reason given next.
 //
 // WHY EACH SELECTOR LEADS WITH `a`, AND WHY THAT IS NOT COSMETIC.
 // shared/_base.scss sets `a:hover { color: $color-mood-root }` -- (0,1,1),

@@ -88,19 +88,64 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    by the ingredient line's middle dot, hovering to magenta, underlined in
    the section's colour when matched. Reaches the universe card and the
    drink page's chips through the shared class. `_cards.scss`.
-3. **Food index hierarchy** (critical #2). The filter labels came down to
-   1.05rem, which helps, but the recipe title is still 16px lowercase with
-   the badge trio as the loudest thing on the row. Candidates: title one size
-   up; badges muted one step at rest; row order title / badges / ingredients.
-   (The universe pick's badge question is moot: the section came off food on
-   2026-09-04.)
-4. **Wrapped titles stack their rules** (critical #7). Per-line background
-   cannot do "last line only"; the options are a block-level rule under the
-   whole title, a wider title measure, or a small script that marks the last
-   line. Reference pages and long recipe titles show it.
-5. **Card clamps** (critical #9). Long names ellipsise on the tape, ingredient
-   lines clamp at two, chips at two rows. Candidates: two-line tape, a size
-   step for long names, a narrower glass column.
+3. ~~Food index hierarchy~~ **Done 2026-09-04.** Title 1.2rem / 700 (a
+   punched version "looks fuzzy"); badges stay after the ingredients (the
+   ingredient scan "makes the decision about opening the page or not"; a
+   right-hand column "makes the rows enormous"); badges rest muted, take the
+   old dusty 35% mix when matched, and the lightened hue only on their own
+   hover. `food/_recipe-list.scss`, `food/_badges.scss`,
+   `food/_active-filter-states.scss`.
+4. ~~Wrapped titles stack their rules~~ **Done 2026-09-04** (critical #7).
+   Candidates page on the real quiche recipe; Helen: "Last line only please,
+   10000%." A small script measures where the lines break and rebuilds the
+   element as `.rule-lines` + `.rule-last`, and the mark moves to the last
+   line's span — so a wrapped title wears it exactly as a one-line title does.
+   The CSS-only alternative was checked and does not work:
+   `box-decoration-break: slice` makes the fragments slices of ONE box, each
+   keeping its full height, so bottom-anchored bars land under the first line
+   only. The element keeps its own double rule as the no-JS fallback, switched
+   off by the `rule-split` class the script adds. Reaches the recipe/magic-bag
+   title and every recipe, about and reference section heading; the
+   cooking-methods protein heading opts out with `data-last-line-rule="skip"`
+   because cook-timer.js owns its text. `assets/js/last-line-rule.js`,
+   `shared/_rule.scss` (`overlapping-rule-double-last-line`),
+   `food/_recipe-header.scss`, `_layouts/default.html`.
+5. ~~Card clamps~~ **Done 2026-09-04** (critical #9). All three candidates were
+   built on the real index and Helen took two of them plus a refusal:
+   *"Let's do: shrink when it's just one short-ish word too long, then two lines
+   where it's more than that. The one super-long title we have I'll just
+   shorten, and retain that principle. Narrower glass column please. Let's
+   stick with two lines of ingredients -- when we get issue #691 done
+   (ingredients in importance order) I expect two lines will get the point
+   across plus leave some comfy real estate on the cards."*
+   - **The glass column is 6.5rem**, down from 7.6rem — the audit's own ~15%.
+     One value moves the title's left edge, the foot's left edge, the two panel
+     strips and the drawing's width cap together, so nothing else changed; the
+     text column gains 17px at every width.
+   - **The name rule is a measurement, not a length.** One size step of 0.86
+     buys about 14% of the line — four or five Courier characters, which is one
+     short-ish word. A name that overflows by less than that steps down and
+     nobody sees it; a name that overflows by more wraps to a two-line tape,
+     which the absolutely-positioned tape background grows to fit. Never cut.
+     `assets/js/card-name-fit.js` measures `scrollWidth` against `clientWidth`,
+     re-measures once after stepping (the prediction is linear and type is not)
+     and adds one of `drink-card-name--step` / `--wrap`. It runs at load, on
+     `document.fonts.ready` and on a debounced resize, and exposes
+     `HTF.fitCardNames()` — which `universe.js` calls after each deal, because
+     the pick is a wider card and a cloned measurement would be the wrong
+     answer. With no JS nothing gets a class and the ellipsis stays, which is
+     the behaviour the page had before.
+   - **The name's size goes through `--card-name-size` × `--card-name-scale`**,
+     so ONE step rule works on a card and on the drink page's 3.2rem title.
+     The tape's padding and left bleed are `em` of the title and follow the
+     step for free; the right bleed is `rem` and deliberately does not.
+   - **The ingredient clamp stays at two lines**, and the fix for a clamped
+     line is #691 rather than a third line. The reason is recorded beside the
+     clamp so nobody raises it again.
+
+   `_sass/cocktails/_cards.scss`, `_sass/cocktails/_cocktail.scss`,
+   `assets/js/card-name-fit.js`, `assets/js/universe.js`,
+   `_layouts/default.html`, `_dev/card-glasses.html`.
 6. **Yellow is the loudest active state and belongs to PRACTICALITIES**
    (refinement). Tinted rather than solid active fill, or swap yellow to
    LEAVE OUT and give practicalities the cobalt.

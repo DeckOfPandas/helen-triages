@@ -577,6 +577,51 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 }
 
 
+// --- The same mark, once, under the LAST line of a wrapped one ---------------
+// Design audit critical #7, DESIGN_PLAN §3.4, decided 2026-09-04 from a
+// candidates page built on the real quiche recipe. Helen, having switched
+// between the treatments on the page itself: "Last line only please, 10000%."
+//
+// `box-decoration-break: clone` above is what makes the mark measure the
+// LETTERING rather than the box -- the whole reason this is a background and
+// not a `border-bottom` (see the note above .recipe-title-text in
+// food/_recipe-header.scss). Its cost is that every line fragment of a wrapped
+// title gets its own full copy of the background, so a three-line title wears
+// three stacked double rules and the mark stops reading as one mark.
+//
+// `box-decoration-break: slice` DOES NOT FIX IT, and this was checked rather
+// than assumed. Slice treats the fragments as slices of ONE long box: each
+// fragment keeps the full HEIGHT of that box and the background is cut
+// horizontally, so bottom-anchored bars land under the first line and nowhere
+// else, and every fragment still paints. Nor is there a selector for "the last
+// line of a wrapped inline box" -- ::first-line has no counterpart. Which line
+// is last is a measurement, so a script does it: assets/js/last-line-rule.js
+// splits the text into `<span class="rule-lines">` + `<span class="rule-last">`
+// and puts `rule-split` on the element.
+//
+// THE ELEMENT KEEPS ITS OWN RULE, AND THAT IS THE POINT OF THE ORDERING HERE.
+// The double rule is emitted on the element first, unconditionally, so with
+// JavaScript off (or before the script has run, or if it ever throws) the title
+// still wears the mark it wears today -- stacked on a wrapped title, which is
+// the old bug and not a blank heading. `.rule-split` is the script's signal
+// that it has finished, and only then is the element's own background switched
+// off and the mark handed to the last line's span.
+//
+// `.rule-lines` gets nothing of its own: it is the part of the title that is
+// deliberately unmarked now.
+@mixin overlapping-rule-double-last-line($top-colour, $under-colour, $inset-right: $rule-under-inset-right) {
+  @include overlapping-rule-double($top-colour, $under-colour, $inset-right);
+
+  &.rule-split {
+    background-image: none;
+  }
+
+  .rule-last {
+    @include overlapping-rule-double($top-colour, $under-colour, $inset-right);
+  }
+}
+
+
 // --- An index section's heading ----------------------------------------------
 // THE TYPE ONLY, not the mark and not the emboss. Both indexes label their
 // filter sections the same way -- §13.4 calls them "filter labels on a control

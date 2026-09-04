@@ -94,7 +94,15 @@ permalink: /food/reference/cooking-methods-and-timings/
        weight box that cannot answer anything. The dropdown itself stays outside
        the wrapper, because it is how you get back. {% endcomment %}
     <div id="ct-calculator">
-    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference" id="ct-protein-name"></span></h2>
+    {% comment %} `data-last-line-rule="skip"` because THIS heading's text is
+       cook-timer.js's, rewritten every time the dropdown changes.
+       assets/js/last-line-rule.js rebuilds a heading out of its own text to put
+       the double rule under its last line only (2026-09-04) -- and the next
+       protein pick would overwrite the spans it inserted, leaving the element
+       carrying `rule-split` with nothing left to paint the mark. A protein
+       label is one short line and never wrapped, so the opt-out costs this page
+       nothing. {% endcomment %}
+    <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference" id="ct-protein-name" data-last-line-rule="skip"></span></h2>
 
     {% comment %} THE FINISHING TEMPERATURE SITS ABOVE THE CONTROLS, and this
        reverses the arrangement this file argued for until 2026-08-16. The old

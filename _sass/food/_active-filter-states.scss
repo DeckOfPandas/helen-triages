@@ -74,9 +74,17 @@
   text-shadow: none;
   -webkit-text-stroke: $faux-bold-stroke $color-text;
 
-  &.badge-star           { .tag-shape { color: mix($color-star-root, $color-white, 82%); } }
-  &.badge-mood           { .tag-shape { color: mix($color-mood-root, $color-white, 82%); } }
-  &.badge-practicalities { .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); } }
+  // THE MIDDLE RUNG, 2026-09-04. These were the lightened full-strength hue,
+  // the same value hover paints, so that hover previewed matched exactly.
+  // Helen re-cut the ladder from the real index: badges now rest muted (a
+  // 14% hint of hue, grey text -- _badges.scss), a matched one takes "your
+  // middle saturation", the 35% dusty mix that used to be the resting shape,
+  // and only the cursor on a badge brings up the loudest lightened hue. So
+  // hover no longer previews matched; it outranks it, which is what she
+  // asked for: "then the loudest active state for mouseover".
+  &.badge-star           { .tag-shape { color: mix($color-star-root, $color-border, 35%); } }
+  &.badge-mood           { .tag-shape { color: mix($color-mood-root, $color-border, 35%); } }
+  &.badge-practicalities { .tag-shape { color: mix($color-practicalities-root, $color-border, 35%); } }
 }
 
 // --- Global clear-all button (JS-created, prepended to .controls) -----
@@ -110,13 +118,15 @@
 // that when the titles move, or these quietly become the odd one out in the very
 // list they stand in for. NOT its colour -- these keep $color-clear-text,
 // because a row title is a link you are meant to reach for and these are not.
+// AND THEY MOVED WITH THE TITLES ON 2026-09-04, to 1.2rem / 700 / 0.04em,
+// for exactly the reason the paragraph above gives.
 .recipe-list-empty,
 .recipe-list-searching {
   font-family: $font-headings;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
   text-transform: lowercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: $color-clear-text;
   text-align: center;
   padding: $space-xxl 0;

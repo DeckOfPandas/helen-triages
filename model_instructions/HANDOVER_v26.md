@@ -4058,6 +4058,43 @@ intrinsic ratio and LETTERBOXES — a narrow tape draws far shorter than its box
 while a wide one fills it, which is two tapes on one page disagreeing. A
 hand-copied version of that line dropping the height cost a round.
 
+**A NAME THAT DOES NOT FIT NOW SHRINKS OR WRAPS, AND NEVER ELLIPSISES —
+2026-09-04**, the design audit's critical #9 and DESIGN_PLAN §3 item 5. Helen,
+off a candidates page on the real index: *"shrink when it's just one short-ish
+word too long, then two lines where it's more than that. The one super-long
+title we have I'll just shorten, and retain that principle."* **The rule is
+about how much the name is OVER by, not about how long it is.** One size step
+of 0.86 buys about 14% of the line — four or five Courier characters, which is
+one short-ish word — so a name inside that steps down invisibly, and a name
+outside it takes a second line of tape rather than sitting at small type and
+ellipsising anyway. `assets/js/card-name-fit.js` measures `scrollWidth >
+clientWidth + 1`, steps if `scrollWidth <= clientWidth / 0.86`, **re-measures
+once** (the prediction is a linear model and type is not quite linear) and
+falls back to wrapping if the step did not reach. It runs at load, on
+`document.fonts.ready` and on a debounced resize, and exposes
+`HTF.fitCardNames()`; `universe.js` calls it after each deal because the pick
+is a WIDER card and a cloned `--step`/`--wrap` class would be an answer to the
+wrong question. **With no JS nothing gets a class and the ellipsis stays**,
+which is the behaviour that was there before — the base rule is the fallback,
+the same shape as `.rule-split`.
+
+**The size moves through `--card-name-size` × `--card-name-scale`**, not
+`font-size`, and that is what makes ONE step rule work at 1rem on a card and at
+3.2rem on a drink page (`.cocktail-title-block` sets the base property, not
+`font-size`, or it would win over the calc and opt the page out). The tape's
+`em` numbers follow the step for free — `$card-tape-pad-y`, `$card-tape-pad-x`
+and `$card-tape-bleed` are ratios to the title, so at 0.86 the tape is the same
+object at a smaller scale — while `$card-tape-bleed-right` is `rem` and does
+not, being a fact about the card's padding. That is the same em/rem split this
+section already warns about two paragraphs up, doing useful work for once.
+
+**A two-line tape is a taller object on a fixed-height card**, and the line
+comes out of the clamps beneath it: the ingredient line and the two rows of
+mood word absorb it, exactly as the card's own header says content that does
+not fit is cut rather than allowed to push. The foot is pinned, so the goodness
+mark does not move. The background is absolutely positioned at 100%/100% and
+grows with the word, so nothing has to say how tall the tape is.
+
 #### The five accents — "neon bar sign", 2026-08-29
 
 **Read this before the history below it.** The palette went one accent →
@@ -4482,6 +4519,17 @@ clamping; the alternatives are a card whose height varies with mood count
 is exactly that wide, and the body, the foot and the under-mark all derive from
 it. One value moves four things together and they cannot drift apart.
 
+**It is 6.5rem since 2026-09-04**, down from 7.6rem — the design audit's
+critical #9 and its own ~15% figure, and Helen's words off the candidates page:
+*"Narrower glass column please."* The paragraph above is why nothing else had to
+move: the four readers narrowed together from one line, and the 17px it returns
+at every card width goes to the name and the ingredient line. **The clamps
+themselves did not change** — the ingredient line stays at two lines, and that
+is a decision rather than an omission: *"when we get issue #691 done
+(ingredients in importance order) I expect two lines will get the point across
+plus leave some comfy real estate on the cards."* So the answer to a clamped
+ingredient line is ordering the ingredients, not a third line.
+
 **The framing and the hover took eleven and four candidates respectively.** What
 won: a glass column marked by a rule in the home green along its bottom edge, no
 vertical rule (eight of those down a page is a lot of signal for decoration);
@@ -4572,6 +4620,13 @@ defined to be taller than the box it lives in. That is the whole of #601.
 target**, so the curve does not reach them: punch-bowl sits at 32% of the panel
 and did not move. Known and accepted; the lever there is the width cap, not the
 curve.
+
+**The width cap is `calc(var(--card-text-x) - 1.3rem)`, so the 2026-09-04
+narrowing of the column to 6.5rem moved exactly those eight** and nothing else
+— every other glass is limited by height, and the headroom dial did not change.
+`_dev/card-glasses.html` reads `--card-text-x` for its swatch width now rather
+than repeating the number, which is what that page's own "it uses the site's
+CSS, not a copy" note always claimed and a hardcoded `7.6rem` quietly did not.
 
 > **A CROSS-REFERENCE TO ANOTHER FILE'S BEHAVIOUR IS A CLAIM NOTHING RE-CHECKS.**
 > Three places — `glasses.yml`, `_layouts/cocktail.html` and this section — said
@@ -4742,12 +4797,22 @@ mini. What that costs at the default card layout:
 157px is about eighteen characters of Courier Prime. Losing the tagline (#512)
 freed a LINE; this is a WIDTH problem.
 
+**That table was measured at the 7.6rem column and the column is 6.5rem since
+2026-09-04**, so the three rows now read 174px / 33%, 189px / 32% and 226px /
+29%. It changes nothing here: 174px is still under twenty characters, so the
+stacked layout still earns its breakpoint. The `@media (max-width: 400px)`
+block deliberately does NOT override `--card-text-x` — it un-columns the card
+entirely, overriding each reader of that value individually, so the column's
+width simply stops applying below 400px.
+
 **`$card-text-x` and `$card-glass-scale` are now custom properties as well as
 Sass variables**, and that is the point rather than a detail: Sass resolves at
-compile time, so five rules had each baked their own copy of `7.6rem`, and any
-narrow-screen variant would have had to restate all five and keep them in step
-— reintroducing the exact coupling `_cards.scss`'s header comment exists to
-prevent.
+compile time, so five rules had each baked their own copy of the value (`7.6rem`
+then, `6.5rem` now), and any narrow-screen variant would have had to restate all
+five and keep them in step — reintroducing the exact coupling `_cards.scss`'s
+header comment exists to prevent. The 2026-09-04 narrowing is what that
+property was for: one line moved the column and the four things measured
+against it followed.
 
 **Three layouts currently sit behind `?narrow=` and TWO OF THEM ARE DUE TO BE
 DELETED** — `stack` (glass as a full-width band on top, the default),
@@ -6833,6 +6898,33 @@ further left, reading as one bar with a stepped edge rather than two.
 is inset**, not the reverse — everything on the page starts at x=0, and a
 mark hanging into the left margin reads as broken alignment, not design.
 
+**THE MARK SITS UNDER THE LAST LINE ONLY, SINCE 2026-09-04** (design audit
+critical #7, `DESIGN_PLAN.md` §3.4). `clone` is what makes the mark measure
+the lettering rather than the box, and its cost is that every line fragment
+of a wrapped title gets its own full copy — a three-line title wore three
+stacked double rules. Helen, from a candidates page on the real quiche
+recipe: *"Last line only please, 10000%."* `assets/js/last-line-rule.js`
+wraps each word of a target in a throwaway span, reads the tops with
+`getBoundingClientRect`, finds the first word of the last line (2px
+tolerance) and rebuilds the element as `<span class="rule-lines">` +
+`<span class="rule-last">`, adding `rule-split` to the element. It runs at
+load, again on `document.fonts.ready` (the real face moves the line breaks)
+and on a debounced resize, always from the text stashed on the first run.
+`@mixin overlapping-rule-double-last-line` in `_sass/shared/_rule.scss` is
+the CSS half: the double rule is emitted on the ELEMENT first, so with
+JavaScript off the title still wears the mark it always did (stacked — the
+old bug, not a blank heading); `.rule-split` then switches that off and
+`.rule-last` carries it. **`box-decoration-break: slice` is not the fix, and
+this was checked rather than assumed**: slice treats the fragments as slices
+of one long box, so each keeps the FULL height and the background is cut
+horizontally — bottom-anchored bars land under the first line and nowhere
+else. There is no `::last-line` either. Targets are `.recipe-title-text` and
+`.section-heading-text` (so recipe, magic bag, about and reference pages);
+NOT the index's `.category-label-text`, which never wraps. An element whose
+text belongs to another script opts out with `data-last-line-rule="skip"` —
+exactly one does, the cooking-methods protein heading that cook-timer.js
+rewrites.
+
 It replaced watercolour brush washes. The reason it won wasn't raw area: a
 wash picked a random shape per page load, so the eye had to re-identify it
 each time. An identical, repeated mark becomes something you *recognise*
@@ -7323,11 +7415,23 @@ override.
 Each row: title, ingredient line, then pills — in that order, deliberately
 (§13.6.1).
 
-**Title** is `$font-headings` (Courier Prime), lowercase, weight 600, 1rem.
-Weight 400 and 500 render *identically* — Courier Prime, like Courier New before
-it, ships only Regular and Bold as static faces, so any request ≤500 resolves to
-Regular and only >500 jumps to Bold. If a future weight change appears to do
-nothing, this is why.
+**Title** is `$font-headings` (Courier Prime), lowercase, **weight 700, 1.2rem
+since 2026-09-04** (was 600, 1rem — the design audit's critical #2, "the list
+reads as metadata with a name attached"; Helen chose the size from the real
+index, and found a punched version "fuzzy"). Weight 400 and 500 render
+*identically* — Courier Prime, like Courier New before it, ships only Regular
+and Bold as static faces, so any request ≤500 resolves to Regular and only
+>500 jumps to Bold. If a future weight change appears to do nothing, this is
+why.
+
+**The pills rest MUTED since the same day** — a 14% hint of the hue in the
+tape, grey text — and climb a three-rung ladder Helen set in words: *"leave
+the buttons entirely muted until hit by a filter, when they should take your
+middle saturation, then the loudest active state for mouseover."* Matched is
+the old 35% dusty mix; hover is the lightened full hue and is louder than
+matched, not a preview of it. Only a pill's own hover lights it. The order
+title / ingredients / pills is unchanged, on her ruling that the ingredient
+scan "makes the decision about opening the page or not".
 
 It spent 2026-08-24 to 08-26 in IBM Plex Mono and came back; see §13.10.1, which
 is the more useful read, because *why* it came back is the rule.

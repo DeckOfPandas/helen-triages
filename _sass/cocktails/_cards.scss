@@ -31,12 +31,28 @@
 // =============================================================================
 
 $card-height:   12.9rem;
-$card-text-x:   7.6rem;
+// 6.5rem SINCE 2026-09-04, down from 7.6rem — the design audit's critical #9
+// and DESIGN_PLAN §3 item 5, and Helen's own words off a candidates page on
+// the real index: "Narrower glass column please." About 15% off the column,
+// which is the audit's own number, and every pixel of it goes to the words:
+// the text column is whatever is left after the column, the gutter and the
+// padding, so on a 370px card (the grid's minimum) the name and the ingredient
+// line each get 17px more than they had.
+//
+// NOTHING ELSE HAD TO MOVE FOR IT, which is the point of the paragraph above:
+// the title's left edge, the foot's left edge, the two panel strips and the
+// glass drawing's width cap all read this one value, so the column narrows in
+// one place and the four of them stay in step. The tallest glass is unchanged
+// at $card-glass-scale below — the drawing is capped by height, not by this,
+// except for the eight wide glasses that hit `max-width` first and now draw
+// 1.1rem narrower.
+$card-text-x:   6.5rem;
 // ...AND IT IS A CUSTOM PROPERTY TOO, since #483. The Sass variable is still
 // the single source of the DEFAULT, but Sass resolves at compile time, so five
-// rules each baked their own copy of 7.6rem -- which is the exact coupling the
-// comment above exists to prevent, reintroduced the moment anything needs a
-// different value. One custom property, five readers, one line to override.
+// rules each baked their own copy of it (7.6rem then, 6.5rem now) -- which is
+// the exact coupling the comment above exists to prevent, reintroduced the
+// moment anything needs a different value. One custom property, five readers,
+// one line to override.
 //
 // The narrow-screen layout no longer overrides it (it stops using the column
 // altogether), but --card-glass-scale below does exactly this, and the
@@ -294,7 +310,16 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // line to 120; on a 470px card both sizes manage 122. So the gain is real and
   // it is concentrated on NARROW cards -- which is where it matters, since a
   // wide card was never the case that ellipsised.
-  font-size: 1rem;
+  //
+  // THE SIZE GOES THROUGH A CUSTOM PROPERTY SINCE 2026-09-04, so that ONE step
+  // rule works at card size and at drink-page size. `--card-name-size` is the
+  // base (1rem here, 3.2rem where `.cocktail-title-block` sets it in
+  // _cocktail.scss) and `--card-name-scale` is the step the fitting script
+  // applies. Two properties rather than one because they are two different
+  // decisions: how big this title is, and whether this particular name needed
+  // shrinking to fit. Multiplying them means the drink page's title steps by
+  // the same 14% the card's does without either knowing the other's number.
+  font-size: calc(var(--card-name-size, 1rem) * var(--card-name-scale, 1));
   letter-spacing: 0.03em;
   text-transform: uppercase;
   margin: 0 0 0.3rem;
@@ -342,6 +367,77 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
       text-shadow: -1px -1px 0 #FF9BE8,
                     1px  1px 0 rgba(5, 5, 5, 0.9);
     }
+  }
+}
+
+// =============================================================================
+// A NAME THAT DOES NOT FIT: SHRINK IT, OR WRAP IT — 2026-09-04
+// =============================================================================
+// Design audit critical #9, DESIGN_PLAN §3 item 5. Helen decided it from a
+// candidates page on the real index, having switched between the treatments:
+// "Let's do: shrink when it's just one short-ish word too long, then two lines
+// where it's more than that. The one super-long title we have I'll just
+// shorten, and retain that principle."
+//
+// THE PRINCIPLE IS THE PART THAT BINDS, and it is a rule about HOW MUCH is
+// over, not about how long the name is. One step of 0.86 buys about 14% of the
+// line — four or five Courier characters, which is one short-ish word. If that
+// is all the name is over by, shrinking is invisible and the tape stays one
+// object on one line. If it is over by more, no plausible step reaches it and
+// shrinking would only make small type that still ellipsises, so the name wraps
+// to a two-line tape instead. Nothing is ever cut.
+//
+// The measuring is `assets/js/card-name-fit.js`, which adds exactly one of
+// these two classes to a `.drink-card-name` and re-measures after stepping. The
+// classes are the whole of its output; everything about how the two states LOOK
+// is here.
+//
+// WITHOUT THE SCRIPT NOTHING GETS EITHER CLASS AND THE ELLIPSIS STAYS, which is
+// precisely the behaviour this page had before today. No-JS is not a degraded
+// case that needs its own rules — it is the base rule, and both of these are
+// additions to it. Same shape as `.rule-split` in shared/_rule.scss.
+
+// ONE STEP, AND THERE IS DELIBERATELY NO SECOND ONE. A ladder of steps would
+// mean cards down one column carrying titles at three or four different sizes,
+// which is the fixed-anchor design losing its whole argument for a case it can
+// already answer by wrapping.
+//
+// THE TAPE FOLLOWS THE TYPE FOR FREE, and that is why the size moves through
+// font-size rather than through a transform. $card-tape-pad-y, $card-tape-pad-x
+// and $card-tape-bleed are all `em` of the title, so at 0.86 the padding and
+// the leftward bleed shrink by exactly 0.86 too and the tape stays the same
+// object at a smaller scale. The one number that does NOT follow is
+// $card-tape-bleed-right, which is `rem` on purpose — it is a fact about the
+// card's own padding, not a ratio to the title (§9.13's rule about which tape
+// numbers are em and which are not).
+.drink-card-name--step { --card-name-scale: 0.86; }
+
+// TWO LINES OF TAPE, for the names a step cannot reach.
+//
+// The background is absolutely positioned at 100%/100% of the tape
+// (`.drink-card-tape-bg`), so it grows with the word and a two-line name gets a
+// two-line tape rather than a one-line tape with letters hanging out of it.
+// Nothing here has to say how tall the tape is.
+//
+// WHAT IT COSTS, stated because a fixed-height card has to pay for it from
+// somewhere: a two-line tape is a taller object, and the space comes out of the
+// clamps beneath it — the ingredient line and the two rows of mood word absorb
+// the line, exactly as this file's header says content that does not fit is cut
+// rather than allowed to push. The foot is pinned to the bottom and does not
+// move, so the goodness mark stays in its corner. Helen accepted the trade in
+// the same breath as choosing the rule.
+//
+// 1.12 rather than the base rule's 1: two lines at line-height 1 collide,
+// because Courier Prime's capitals fill their box and the tape's band is only
+// 70.59% of the artwork.
+.drink-card-name--wrap {
+  white-space: normal;
+
+  .drink-card-tape-word {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.12;
   }
 }
 
@@ -465,6 +561,18 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // Jamaican, Demerara. This rule now lowercases those too.
   text-transform: lowercase;
   display: -webkit-box;
+  // TWO LINES, AND IT STAYS TWO — Helen, 2026-09-04, deciding the audit's
+  // critical #9 off a candidates page on the real index. A third line was one
+  // of the treatments offered and she turned it down for a reason that is
+  // about the DATA rather than about the card: "Let's stick with two lines of
+  // ingredients -- when we get issue #691 done (ingredients in importance
+  // order) I expect two lines will get the point across plus leave some comfy
+  // real estate on the cards."
+  //
+  // So the fix for a clamped ingredient line is #691 — putting the ingredients
+  // that decide whether you want this drink FIRST — not a taller clamp. A
+  // third line would also cost the card its air, and the two-line tape below
+  // needs somewhere for its extra line to come from. Do not raise this to 3.
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -791,7 +899,8 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // and effectively gone.
 //
 // WHAT THAT COSTS AT THE DEFAULT. The card's text column is whatever is left
-// after the glass column, the gutter and the padding, so at 16px/rem:
+// after the glass column, the gutter and the padding, so at 16px/rem, WITH THE
+// COLUMN AT THE 7.6rem IT WAS WHEN THIS BREAKPOINT WAS ARGUED FOR:
 //
 //     viewport   card   text column   glass takes
 //        360px   312px      157px         39%
@@ -802,6 +911,11 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // two-line clamps start cutting real content while the drawing keeps its full
 // column. Losing the tagline helped, as Helen said, but it freed a LINE and
 // this is a WIDTH problem.
+//
+// THE COLUMN IS 6.5rem SINCE 2026-09-04, so the same three rows now read 174px
+// / 33%, 189px / 32% and 226px / 29%. That is 17px back at every width and it
+// does NOT close the case for this breakpoint: 174px is still under twenty
+// characters, which is why the stacked layout below stays exactly as it is.
 //
 // SHRINKING, NOT STACKING, and the issue already worked out why: the glass
 // column's width is the title's left edge, the foot's left edge and the
@@ -821,7 +935,8 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // that selected them and the dev page that showed them.
 //
 // WHY A BREAKPOINT AT ALL. The card is horizontal — a fixed glass column, text
-// beside it — and the text column is whatever is left over. At 16px/rem:
+// beside it — and the text column is whatever is left over. At 16px/rem, and
+// with the column at the 7.6rem it was on the day this was settled:
 //
 //     viewport   card   text column   glass takes
 //        360px   312px      157px         39%
@@ -834,6 +949,13 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // widths there are: 360px is the dominant Android portrait width, 375px covers
 // the iPhone SE, 8 and 13 mini. Losing the tagline (#512) freed a LINE; this
 // was always a WIDTH problem, which is why it did not go away.
+//
+// AT THE 6.5rem COLUMN OF 2026-09-04 the three rows are 174px / 33%, 189px /
+// 32% and 226px / 29%. The narrowing helps at every width and changes nothing
+// here: 174px is still under twenty characters, so the stack still earns its
+// breakpoint. NOTE THAT THIS BLOCK DOES NOT OVERRIDE `--card-text-x` and does
+// not need to — it un-columns the card entirely, so every reader of that value
+// is overridden individually below and the column's width stops applying.
 //
 // THE BREAKPOINT IS 400px, NOT 380. Helen asked whether anything is really
 // narrower than about 380 — 390px (iPhone 14/15) is inside the range that
