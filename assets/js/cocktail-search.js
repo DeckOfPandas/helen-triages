@@ -198,8 +198,8 @@
        the one to read: "matching still has to run against the real match key,
        not the pretty name."
 
-       THE COLLAPSING PAIRS COME FREE AND ARE THE BEST PART. `sugar syrup 1:1`
-       and `sugar syrup 2:1` share the card name `sugar syrup`, so they become
+       THE COLLAPSING PAIRS COME FREE AND ARE THE BEST PART. `cane sugar syrup
+       1:1` and `cane sugar syrup 2:1` share the card name `sugar syrup`, so they become
        one chip covering 35 drinks rather than two covering 4 and 31 -- which is
        §9.10.1's own ruling arriving in the picker: "a ratio is a MAKING fact,
        not a CHOOSING fact". Same for the two Jamaicans.

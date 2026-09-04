@@ -2438,8 +2438,10 @@ holds what the SOURCE called the ingredient, brand-led; `generic` is the
 category, and no rule derives the second from the first, which is why the
 source's words are kept until Helen fills `generic`/`suggestion` on making the
 drink and deletes `item` herself. It is allowed in `_cocktail_drafts/` and
-forbidden in `_cocktail_recipes/` by the schema guard (#669), so promotion is
-the deadline. 619 entries once carried an `item`; **268 still do** after
+forbidden in `_cocktail_recipes/` by the schema guard (#669) **and in
+`_cocktail_drafts/to-promote/` since 2026-09-04** — see §9.3.2's rulings box —
+so the deadline is the staging folder rather than the move itself. 619 entries
+once carried an `item`; **258 still do** after
 2026-09-03, when the ten that merely restated their own `generic` were deleted
 and the rest were tabled for Helen's rulings on #544 (§9.10). New drinks
 arriving through the repo-less ingest write it on every pour, by design.
@@ -2462,6 +2464,17 @@ elsewhere.
 **What is left is 269 entries with real residue plus 19 parentheticals**, and
 two of Helen's own issues sit inside it: `cane` ×31 is #594 (cane vs demerara vs
 turbinado syrup) and the retired colour vocabulary is #542's territory.
+
+**#594's VOCABULARY HALF IS ANSWERED, 2026-09-04.** Helen: *"Most 'sugar syrup'
+means 'cane sugar syrup', possibly all. Sometimes I say 'demerara sugar syrup'
+when I mean that. Let's standardise this please."* So the sugar is IN the
+generic — `cane sugar syrup 1:1`, `cane sugar syrup 2:1`, `demerara sugar
+syrup`, with the three old names in `retired_syrups` — and 43 drinks were
+retyped. **The card is untouched:** both cane forms still read `sugar syrup` and
+the demerara one still reads `demerara syrup`, which is her 2026-08-27 sentence
+working exactly as written. What it does NOT answer is the ITEM residue: the 31
+entries whose `item` says "Cane sugar syrup" now restate their own generic word
+for word, and most of them are deletions somebody still has to make.
 
 **THE GATE IS THE TRAP HERE, and it fired for real.** The drink page's
 ingredient line was `{% raw %}{% if item.item %}{% endraw %}` — the one field
@@ -2781,18 +2794,60 @@ generic plus its alias spellings.
 >   retired for `vanilla vodka` and `pineapple vodka` (*"members aren't
 >   substitutable"*); `lavender bitters` is retired for `lavender-forward
 >   bitters` (the wider name, with Bob's Margarita Bitters as her example);
->   `honey water 1:1` / `2:1` are retired for one flat `honey water`, while
+>   `honey water 1:1` / `2:1` were retired for one flat `honey water` and
+>   came BACK the same evening beside it (see below), while
 >   bare `honey` stays for the raw thing you cook with (the pear Bellini);
 >   `bonded rye` and `rye` stay distinct; `dry orange Curaçao` and `orange
 >   Curaçao` stay distinct.
 > - **Spelling: leave the drinks as she wrote them; aliases do the reading.**
 >   Seventeen bottles are written more than one way across the drinks and
 >   every one resolves. Do not retype a drink to a canonical spelling; add
->   the spelling as an alias.
+>   the spelling as an alias. **In a DRAFT. See the next box for where this
+>   rule ends.**
 >
 > Twenty-three bottles were declared that day (the full list is the commit
 > "thirteen rulings on bottles and generics"), thirty-three drinks retyped,
 > and nothing in a tagline, note, method or amount touched.
+
+> ### `to-promote/` AND `_cocktail_recipes/` ARE THE PUBLISHED TENSE — 2026-09-04
+>
+> Both rulings came out of Helen reading `to-promote/fish-house-punch.md`, and
+> both are about the difference between a drink being WRITTEN and a drink being
+> FINISHED. The scope is those two directories and nothing else; the drafts pool
+> is unchanged.
+>
+> - **Every `suggestion` is a bottle's CANONICAL NAME, never an alias.**
+>   *"'ED3' isn't a bottle."* It resolves — it is a declared alias of `El Dorado
+>   3 year old rum` — and that is the point: the alias map exists so a drink can
+>   be written fast, not so shorthand can be published. The bullet above still
+>   governs the pool, and the two are not in tension: **an alias is a reading
+>   convenience, and a finished drink has had time to write the real name.**
+>   Nine staged suggestions were retyped (`ED3`, `El Dorado 3`, `El Dorado 12`,
+>   `Havana Club 3`, `Gosling's`, `Damoiseau Rhum Agricole Blanc`, `Acacia`,
+>   plus two apostrophe/case variants — `Woodford’s Reserve`, `Peychaud’s`,
+>   `Pierre Ferrand ambre`).
+> - **No ingredient carries `item`.** *"This has 'item' everywhere too."* §9.10
+>   has said since 2026-09-02 that `item` is drafts-only and *"promotion is the
+>   deadline"*; the deadline was in the wrong place, because a drink only
+>   reaches `_cocktail_recipes/` by being MOVED, which is the worst moment to
+>   discover a field needs reading. Ten entries went on the day: five on Fish
+>   House Punch, three on Smokestack Lightning, two on the pear Bellini.
+>   **Four facts survived into a `note:`** — "the source pours Pierre Ferrand
+>   Ambré", "brewed strong, from breakfast tea, and cold", "sliced", "the source
+>   pours Patrón Reposado" — because `generic`, `suggestion` and `amount` did
+>   not carry them. The other six restated their own generic.
+>
+> **A bottle named only in `item` is still not yours to declare.** Patrón
+> Reposado is not in `bottles.yml` (only Patrón Silver is), so the fact went in
+> a note and the `suggestion` field was left empty for Helen — the "hand me back
+> the rest" rule below, unchanged. Pierre Ferrand Ambré IS declared and two
+> staged drinks already suggest it; that one was still left as a note, because
+> promoting a bottle out of `item` is a decision she makes, not one a pass makes
+> for her.
+>
+> Enforced by `test_a_staged_drink_writes_a_bottles_canonical_name` and
+> `test_a_staged_drink_carries_no_transcription_field`, both reading
+> `_load_staged()` — a third door beside `_load()` and `_load_published()`.
 
 **IT STOPPED BEING RUM-ONLY ON 2026-08-30 AND SO DID THE TWO TESTS THAT MADE IT
 WORTH HAVING**, which is the more important half. `test_every_suggested_bottle_resolves`
@@ -3349,9 +3404,10 @@ stripping trailing punctuation and collapsing whitespace — it is 8, plus 2 tha
 differ only by `fresh` and a unit the entry's own `amount` already states
 (`item: "Fresh basil leaves"` beside `amount: "3 leaves"`). No entry was caught
 by `juice of` or by a leading quantity; an earlier pass had taken those.
-278 entries carried an `item` before the pass and 268 after.
+278 entries carried an `item` before the pass and 268 after, and 258 after
+the ten in `to-promote/` went on 2026-09-04 (§9.3.2).
 
-**The other 268 are RESIDUE and not one was touched: they are Helen's rulings,
+**The other 258 are RESIDUE and not one was touched: they are Helen's rulings,
 not a script's.** The census is `tmp/item_census.py` — scratch, gitignored,
 re-runnable — which writes `tmp/item_census.md`: every entry grouped by family,
 largest group first, with a proposal per line (move to `suggestion` only where
@@ -3392,7 +3448,7 @@ It is NOT food's `incidental`, despite the matching shape: that one HIDES a
 line, this one shows it and marks it.
 
 **The rest of `item`'s redistribution is #544 move 2, and after 2026-09-03 it
-is entirely Helen's** — the mechanical half is spent, 268 residue entries are
+is entirely Helen's** — the mechanical half is spent, 258 residue entries are
 tabled for her, and #544 stays open until she has ruled. §9.3 carries the
 count of what has gone and now states the same drafts-only rule; the
 paragraphs above are what governs.
@@ -3561,9 +3617,36 @@ read `sugar syrup` on a card. Helen: "On the card I would expect to see sugar
 syrup, and on the recipe ingredient line cane sugar syrup, 2:1." **A ratio is a
 MAKING fact, not a CHOOSING fact** — at card distance it is not being used.
 Checked before declaring: no drink carries both ratios of the same syrup. (The
-two honey waters were a second such collapse until 2026-09-04, when Helen ruled
-one flat `honey water` generic — so that pair now collapses in the vocabulary
-and needs no card name at all.)
+two honey waters were a second such collapse; they were flattened into one
+`honey water` generic on the afternoon of 2026-09-04 and put back beside it the
+same evening — *"Bee's Knees needs to say honey water 2:1… I really do need that
+generic here"* — so there are now THREE honey-water generics, one card name for
+all three, and the flat one is the default for a drink where the ratio does not
+matter.)
+
+> ### WHICH SURFACE READS `card_names`, and it is only one — Helen, 2026-09-04
+>
+> *"Let's display the full name in the ingredients list please, just the short
+> name on the card."*
+>
+> | surface | what it prints | how |
+> |---|---|---|
+> | the index card | the CARD NAME | `cocktails/index.html` looks the generic up in `card_names` |
+> | the drink page's ingredient line | **the generic, verbatim** | `_layouts/cocktail.html` prints `item.generic` and reads `card_names` nowhere |
+>
+> So a Sazerac's syrup line reads **`cane sugar syrup 2:1`** and the same drink's
+> card reads **`sugar syrup`**; the Bee's Knees reads `honey water 2:1` on the
+> page and `honey water` on the card. This is what makes a three-way generic
+> free: the ratio and the sugar are on the page where you are pouring, and off
+> the card where you are choosing.
+>
+> **The layout was already doing this** and no code changed for her ruling —
+> which is worth saying plainly, because the paragraph above used to describe a
+> DERIVED form, "cane sugar syrup, 2:1" with a comma, as though the page
+> reassembled the name from parts. It never did. Her sentence of 2026-08-27 was
+> a description of what she wanted to READ, and on 2026-09-04 the generic was
+> renamed to say it, which is the honest way round: the string on the page is
+> the string in the data.
 
 **Cards are lowercased in CSS, not in the markup** (`text-transform` on
 `.drink-card-ingredients`, #543/#553). The DOM keeps its capitals, so
@@ -4783,11 +4866,59 @@ right-aligned in a `.cocktail-section-row` (the shape `.cocktail-meta-row`
 already gives the meta panel and its shortlist button). **Servings means
 MULTIPLES OF THE RECIPE AS WRITTEN** — Helen's ruling: there is no `serves:`
 field on a drink and this invents none, so ×2 is twice what the page says.
-**Volumes round to the nearest 2.5 ml** — "a barspoon is 5 ml and a jigger is
-marked in 2.5s", the smallest anyone pours — **and only the rounded figure is
-shown**, because the unrounded one is the number you cannot pour. Counts
-(dashes, drops, leaves, `each`) multiply and re-pluralise; `to top` and `to
-rinse` pass through untouched; a range keeps its shape with both ends scaled.
+Counts (dashes, drops, leaves, `each`) multiply and re-pluralise; `to top` and
+`to rinse` pass through untouched; a range keeps its shape with both ends
+scaled.
+
+> ### NOTHING IS ROUNDED, BECAUSE NOTHING MAY MOVE A RATIO — Helen, 2026-09-04
+>
+> This replaced the rule that stood here for a day (*"volumes round to the
+> nearest 2.5 ml"*), and it replaced it on her objection to what rounding does:
+>
+> *"Order should be: recipe states single-order amount, target ml works the
+> ratios out backwards within reason but then updates the target ml the user has
+> entered to something more sane, that is, based on 2.5-ml increments."* And:
+> *"The ml only matter because I love my glasses and make drinks for them
+> precisely, but that isn't as important as not poisoning my friends."*
+>
+> **THE MULTIPLE IS SNAPPED, NEVER THE AMOUNTS.** ×1.5 of `30 / 22.5 / 30` is
+> `45 / 33.75 / 45`, and printing `45 / 32.5 / 45` shrank the Campari by 4% of
+> itself against the gin. Invisible on a Negroni; the same arithmetic runs over
+> a 5 ml pour of absinthe, where the same rounding is 25%.
+>
+> **A MULTIPLE IS ALLOWED ONLY WHERE EVERY ml AMOUNT LANDS EXACTLY ON THE 2.5 ml
+> GRID.** In half-millilitre integers, with G the gcd of the amounts and the grid
+> 5 units, the allowed multiples are `k × 5/G` — Bézout gives both directions.
+> `30 / 22.5 / 30` has G = 15, so it steps in **thirds**, and ×⅓ pours
+> `10 / 7.5 / 10`. `45 / 22.5 / 15 / 5` has G = 5 and steps in whole recipes.
+> The collection produces twelve distinct steps; thirds (35 drinks), halves (24)
+> and whole recipes (25) are most of it.
+>
+> **THE FLOOR COMES FREE AND SO DOES ×1.** G divides every amount, so at k = 1
+> the smallest is already ≥ 2.5 ml; and every amount is a whole number of 2.5 ml,
+> so 5 divides G and ×1 is always allowed. The recipe as written can never be
+> refused by its own arithmetic.
+>
+> **KEPT AS THE INTEGER k, never as a float compared for equality.** 5/15 is
+> 0.333… and no number of decimals makes `0.3333 × 3` equal 1. The decimal is
+> produced for the `step` attribute and for display, and nothing else.
+>
+> **ONE AMOUNT IN THE COLLECTION IS OFF THE GRID** — cobra-effect's `22.75 ml`.
+> It is outside G (it could only drag the step somewhere absurd) and it is
+> multiplied rather than rounded, for the same reason as everything else.
+>
+> **THE BOXES.** The multiple box's `step` and `min` are the drink's own; a typed
+> value snaps to the nearest allowed multiple and the box is rewritten to it on
+> the way out. The target box works the ratios backwards, snaps, and is rewritten
+> to **the total that actually comes out** — 95 ml of a 90 ml drink is ×1.056,
+> snaps to ×1, and the box says 90. The total line says the fraction the box
+> cannot: `30 ml, ×⅓`, and only when the multiple is not a whole one.
+>
+> **ONE LINE OF CAVEAT, AND THE WORDING IS PROVISIONAL** (an issue is open;
+> nothing should copy the sentence until Helen has written hers). Dashes and
+> drops scale with everything else — leaving them alone would be a different
+> decision made silently — and a dash of bitters does not taste twice as strong
+> at ×2. `.cocktail-scale-caveat`, revealed with the control.
 
 **The floor is a REFUSAL, not a silent round** — Helen: "say you can't go below
 X ml if any ingredient wants to go below 2.5 ml." A multiple that would take any
@@ -4820,12 +4951,12 @@ dashes and pinches in target ml."* The row now reads `make [1] × the recipe
 list's own rule, because a dash is not 0.8 ml in any way worth writing down —
 and a range counts its LOWER end (changed the same day; it totalled at the top
 end before, which is the right answer to a different question). **A target is
-EXACT and is not snapped to the half step**: a multiple is a choice from a list
-of halves, but someone typing 200 ml means 200 ml, so `multipleForTotal` divides
-and hands the raw figure to the same `scale()` — one floor, one refusal, no
-second opinion — while the amounts still land on the 2.5 ml grid, so the poured
-total may sit a little either side of what was asked. **The two boxes are one
-state**: whichever you type in, the other is redrawn from the multiple that is
+worked backwards and then MADE SANE** — see the box above; the paragraph that
+stood here said a target was exact by intent and must not be snapped, which was
+the right answer to the wrong question, since honouring the typed total was
+paid for by rounding the amounts. `multipleForTotal` divides, `snapMultiple`
+snaps, and the same `scale()` answers — one floor, one refusal, no second
+opinion. **The two boxes are one state**: whichever you type in, the other is redrawn from the multiple that is
 actually on screen, and neither is written under a cursor mid-type. Step three
 (target units of alcohol) waits on ABV per bottle, #297.
 

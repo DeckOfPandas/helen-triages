@@ -675,7 +675,7 @@ bottles:
   # Monin's 2:1 cane sugar syrup, which is what Art de Vivre and Fish House
   # Punch both write "Cane sugar syrup" for.
   "Monin Pure Cane Sugar":
-    generic: "sugar syrup 2:1"
+    generic: "cane sugar syrup 2:1"
   # A HONEY, NOT A BOTTLE OF SYRUP, and it is here because a honey water's
   # `suggestion` names the honey it is made FROM. That was the exact objection
   # `unresolved_suggestions` raised -- "a SCHEMA MISMATCH rather than a naming
@@ -684,6 +684,14 @@ bottles:
   # preference rather than the schema purity: "Acacia is a bit special." Four
   # drinks name it, two of them spelled lowercase, so both spellings are
   # aliases.
+  #
+  # IT STAYS UNDER THE FLAT `honey water` NOW THAT THE RATIOS ARE BACK (Helen,
+  # 2026-09-04 evening, on the Bee's Knees), and that is deliberate rather than
+  # unfinished: the ratio is what you DO with the honey, not a property of the
+  # jar, so declaring an `Acacia honey (2:1)` would be inventing a second
+  # bottle for a fact about a recipe. `_same_category` in tests/test_cocktails.py
+  # is what makes the flat generic cover `honey water 1:1` and `honey water 2:1`
+  # without a note being demanded on every honey drink.
   "Acacia honey":
     generic: "honey water"
     aliases: ["Acacia", "acacia honey"]

@@ -383,7 +383,9 @@ and write the source's own words where none does.
 `Strain into a chilled glass.` · `Double strain into a chilled glass.` ·
 `Fine strain into a chilled glass.` · `Strain into an ice-filled glass.` ·
 `Fine strain into an ice-filled glass.` · `Strain over ice.` ·
-`Fine strain over ice.` · `Strain over crushed ice.`
+`Fine strain over ice.` · `Strain over crushed ice.` ·
+`Strain over a giant ice cube.` · `Double strain over a giant ice cube.` ·
+`Fine strain over a giant ice cube.` · `Strain over two giant ice cubes.`
 
 **Build:** `Add the remaining ingredients.` ·
 `Fill the pitcher half full with ice cubes.` · `Fill with crushed ice.` ·
@@ -397,11 +399,17 @@ and write the source's own words where none does.
 `Express the twist over the drink and discard it.`
 <!-- vocab:method end -->
 
-Six things that will catch you out:
+Seven things that will catch you out:
 
 - **NEVER NAME THE GLASS IN A STRAIN STEP.** `glass:` already carries it and
   draws an icon. "Fine strain into a chilled coupe" says coupe twice. Write
   `Fine strain into a chilled glass.`
+- **THE BIG SINGLE CUBE IS `giant`, NOT `large` OR `big`.** Helen's ruling,
+  2026-09-04: *"I really do want 'giant ice cube' for e.g. strong brown drinks
+  over ice."* If the source says a large cube, a big cube, a rock or a block
+  and means ONE piece of ice in the glass, use the giant form above — and note
+  that these steps name no glass either, so "strain into a rocks glass over a
+  big cube" is `Strain over a giant ice cube.`
 - **"Shake all ingredients" and "Shake" mean different things.** After a build
   step — a muddle, a rinse, an "add the rest" — "Shake with ice." means *shake
   what is in the shaker*, and that is a different instruction. **Read the step

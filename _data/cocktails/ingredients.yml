@@ -520,6 +520,15 @@ whisky_characters:
 # display name for each rum category, to be used as a short name on cocktail
 # cards. The recipe page can then display the full category name."
 #
+# ONE SURFACE READS THIS MAP, AND IT IS THE CARD -- `cocktails/index.html`.
+# `_layouts/cocktail.html` prints `generic` VERBATIM and does not look anything
+# up here, which is Helen's second sentence above and her ruling again on
+# 2026-09-04: "Let's display the full name in the ingredients list please, just
+# the short name on the card." So a drink page reads `cane sugar syrup 2:1` and
+# `honey water 2:1` while its card reads `sugar syrup` and `honey water`. That
+# split is what makes a long, precise generic free: the ratio and the sugar are
+# on the page where you are POURING, and off the card where you are CHOOSING.
+#
 # WHAT THIS REPLACES IS NOT A LONG NAME, IT IS AN AMBIGUOUS ONE. The card used
 # to render `item` -- the source's own words -- and eight of those strings each
 # named two or three DIFFERENT rums across the collection:
@@ -671,13 +680,29 @@ card_names:
   # I would expect to see sugar syrup, and on the recipe ingredient line cane
   # sugar syrup, 2:1." Both ratios therefore read the same on a card, which is a
   # declared collapse below -- it loses real information and it is meant to.
-  "sugar syrup 1:1": "sugar syrup"
-  "sugar syrup 2:1": "sugar syrup"
-  # THE TWO HONEY WATERS CAME OFF ON 2026-09-04, and not because the collapse
-  # stopped being right -- because there is nothing left to collapse. Helen
-  # ruled one flat `honey water` (see `honeys` below), so the generic already
-  # reads on a card exactly as she would write it, and this map only ever
-  # carries a generic whose card name DIFFERS from it.
+  #
+  # HER SENTENCE ALREADY SAID `cane sugar syrup` ON THE RECIPE LINE, a week
+  # before the generics were renamed to match it on 2026-09-04. That is the
+  # whole of this pair: the card keeps the short name she asked for and the
+  # generic is now the long one she was already writing.
+  "cane sugar syrup 1:1": "sugar syrup"
+  "cane sugar syrup 2:1": "sugar syrup"
+  # THE SUGAR IS THE POINT AND THE WORD "sugar" IS NOT -- the card said
+  # `demerara syrup` before the rename and says it after, because at card
+  # distance `demerara` is the whole fact. Helen, 2026-09-04: "Sometimes I say
+  # 'demerara sugar syrup' when I mean that." The recipe line gets her full
+  # phrase; the card does not need it.
+  "demerara sugar syrup": "demerara syrup"
+  # THE TWO HONEY WATERS CAME OFF ON 2026-09-04 with the generics they named,
+  # and went back on the same evening with them. Helen: "Bee's Knees needs to
+  # say honey water 2:1. I'm sorry if I said the wrong thing about this before,
+  # but I really do need that generic here." So there are three honey-water
+  # generics and ONE card name for all of them -- the flat `honey water` needs
+  # no row, because this map only ever carries a generic whose card name DIFFERS
+  # from it, and the two ratios need one for exactly the reason the sugar syrups
+  # do: a ratio is a MAKING fact, not a CHOOSING fact.
+  "honey water 1:1": "honey water"
+  "honey water 2:1": "honey water"
 
 # HOW A DISJUNCTIVE RUM READS ON A CARD, where the default join reads badly.
 #
@@ -728,20 +753,33 @@ card_name_joins: {}
 # so it should cost a sentence.
 card_names_may_collide:
   "sugar syrup": >-
-    `sugar syrup 1:1` and `sugar syrup 2:1` both read `sugar syrup` on a card.
-    Helen, 2026-08-27, asked what she would expect to see: "On the card I would
-    expect to see sugar syrup, and on the recipe ingredient line cane sugar
-    syrup, 2:1." The ratio changes how much you pour, which is a thing you need
-    while MAKING the drink and not while choosing it -- so this is a collapse
-    that loses real information on purpose, at the distance where the
-    information is not being used. Nine drinks carry both a syrup and something
-    else sweet; none carries both ratios at once.
-  # `honey water` STOOD HERE UNTIL 2026-09-04 and came off with the pair it
-  # permitted: Helen's one flat `honey water` means there is no second honey
-  # generic for the first to collide with. Left here it would have failed
+    `cane sugar syrup 1:1` and `cane sugar syrup 2:1` both read `sugar syrup` on
+    a card. Helen, 2026-08-27, asked what she would expect to see: "On the card
+    I would expect to see sugar syrup, and on the recipe ingredient line cane
+    sugar syrup, 2:1." The ratio changes how much you pour, which is a thing you
+    need while MAKING the drink and not while choosing it -- so this is a
+    collapse that loses real information on purpose, at the distance where the
+    information is not being used. It now drops the SUGAR as well as the ratio,
+    since the generics were renamed on 2026-09-04, and her sentence covers that
+    too: the card said `sugar syrup` when the generic did, and still does.
+    Nine drinks carry both a syrup and something else sweet; none carries both
+    ratios at once.
+  # `honey water` CAME OFF ON 2026-09-04 with the pair it permitted and went
+  # back on the same evening with them -- Helen needed `honey water 2:1` on the
+  # Bee's Knees. In between, leaving it here would have failed
   # test_rum_card_names_are_distinct's staleness half, which is the guard doing
   # its job -- a permission whose names have diverged silently blesses the next
   # accidental duplicate on the same string.
+  "honey water": >-
+    `honey water 1:1` and `honey water 2:1` both read `honey water` on a card,
+    which is also what the flat `honey water` generic reads. Exactly the sugar
+    syrups' collapse and for exactly the same reason -- Helen, 2026-08-27: "On
+    the card I would expect to see sugar syrup, and on the recipe ingredient
+    line cane sugar syrup, 2:1." The ratio is a thing you need while MAKING the
+    drink and not while choosing it. The flat generic is the DEFAULT, for a
+    drink where the ratio does not matter; a card cannot tell the three apart
+    and does not need to. One drink carries a ratio today (the Bee's Knees, at
+    2:1) and no drink carries two honey waters at once.
   "Jamaican rum": >-
     Helen's call, 2026-08-27, offered the alternative and choosing this:
     `Jamaican, moderately aged` and `Jamaican, caramel forward` both read
@@ -1159,15 +1197,34 @@ bitters:
 # SWEETENERS, JUICES, FRUIT
 # =============================================================================
 
+# A SUGAR SYRUP IS NAMED BY ITS SUGAR, 2026-09-04. Helen: "Most 'sugar syrup'
+# means 'cane sugar syrup', possibly all. Sometimes I say 'demerara sugar syrup'
+# when I mean that. Let's standardise this please." So the sugar is IN the
+# generic on all three -- `sugar syrup 1:1` -> `cane sugar syrup 1:1`, `sugar
+# syrup 2:1` -> `cane sugar syrup 2:1`, `demerara syrup` -> `demerara sugar
+# syrup` -- and the old names are in `retired_syrups` at the bottom pointing at
+# the new ones.
+#
+# HER OWN BATCH HAD ALREADY WRITTEN IT. "Cane sugar syrup 2:1" appears five
+# times in the drinks she typed the same day, which is the collection saying
+# what the vocabulary had not: the word was never optional, it was implied, and
+# an implied word is one a reader has to already know.
+#
+# THE CARD IS UNCHANGED, which is what makes this cheap: both cane forms still
+# read `sugar syrup` on a card (see `card_names`, and the reasoning there is
+# Helen's own), and `demerara sugar syrup` reads `demerara syrup`. The longer
+# name is a RECIPE-LINE fact -- §9.10.1's rule that a card name may be lossy and
+# a recipe line may not.
+#
 # 1:1 AND 2:1 ARE SEPARATE GENERICS. "Simple syrup" means 1:1. Only 2 of 27
 # entries state a ratio, and syrup-to-citrus volume CANNOT tell them apart -- a
 # declared 1:1 (Daisy de Santiago) and a declared 2:1 (Long Island) both sit at
 # 0.50, because Helen adjusts sugar deliberately. See HANDOVER §9.4.1: the site
 # is canon and she deviates in the kitchen.
 syrups:
-  - "sugar syrup 1:1"
-  - "sugar syrup 2:1"
-  - "demerara syrup"
+  - "cane sugar syrup 1:1"
+  - "cane sugar syrup 2:1"
+  - "demerara sugar syrup"
   - "grenadine"
   - "ginger syrup"
   - "passion fruit syrup"
@@ -1196,8 +1253,27 @@ syrups:
 # `item` line and the drink's own note, which is where island-of-martinique's
 # "Honey water 2:1 (clover)" has said it all along.
 #
-# `honey water 1:1` AND `honey water 2:1` are in retired_honeys at the bottom,
-# and both card_names rows went with them: a flat name needs no card name.
+# THE RATIOS CAME BACK THE NEXT DAY, 2026-09-04 evening, AND THE FLAT ONE
+# STAYED. Helen, on the Bee's Knees: "Bee's Knees needs to say honey water 2:1.
+# I'm sorry if I said the wrong thing about this before, but I really do need
+# that generic here." So this is not a reversal of the paragraph above -- it is
+# the paragraph above plus a case it did not cover. THREE GENERICS:
+#
+#   `honey water`      THE DEFAULT, for a drink where the ratio does not
+#                      matter -- which is most of them, and is exactly what she
+#                      ruled in the afternoon. Six of the seven honey drinks
+#                      keep it.
+#   `honey water 1:1`  for a drink where the ratio DOES matter and is 1:1.
+#   `honey water 2:1`  the same, at 2:1. The Bee's Knees is the one that asked.
+#
+# ONE CARD NAME, `honey water`, FOR ALL THREE, so the card is unaffected either
+# way -- §9.10.1's rule, that a ratio is a MAKING fact and not a CHOOSING fact,
+# is what makes three generics cost the index nothing. Both `card_names` rows
+# are back and so is the `card_names_may_collide` permission that covers them.
+#
+# ONLY THE BEE'S KNEES WAS RETYPED. The other six honey drinks stay flat: she
+# named one drink, and retyping the rest into a ratio nobody stated would be
+# inventing the very fact the flat generic exists to not claim.
 #
 # BARE `honey` SURVIVES AND IS NOT THE SAME THING -- Helen, same conversation,
 # on the pear Bellini: it "really does use plain honey, cooked into a syrup on
@@ -1209,6 +1285,8 @@ syrups:
 honeys:
   - "honey"
   - "honey water"
+  - "honey water 1:1"
+  - "honey water 2:1"
 
 # DELIBERATELY MIXES FORM WITH TYPE, and the reasoning is a browsing one rather
 # than a purity one -- Helen: "if I don't have a sugar cube I won't make a
@@ -1455,16 +1533,37 @@ retired_honeys:
     a varietal, not a category. Folded into `honey`, with acacia carried as a
     `suggestion` -- the file's own rule that a preferred bottle is a
     suggestion and never a generic. Helen, 2026-08-26.
-  "honey water 1:1": >-
-    the ratio is gone; the word stays. Helen, 2026-09-04: "Honey:
-    one flat honey syrup please, because I don't think I'll often request a
-    specific type" -- then "I actually prefer water and should have said so
-    earlier." Re-type as `honey water`; if the ratio matters to the
-    drink it belongs in the `item` line or a note, which is where
-    island-of-martinique had already put it.
-  "honey water 2:1": >-
-    as `honey water 1:1`. Seven drinks carried the pair between them and all
-    seven are now `honey water`.
+  # `honey water 1:1` AND `honey water 2:1` SAT HERE FOR ONE AFTERNOON, retired
+  # on 2026-09-04 in favour of a flat `honey water`, and came OFF again the same
+  # evening. Helen, on the Bee's Knees: "Bee's Knees needs to say honey water
+  # 2:1. I'm sorry if I said the wrong thing about this before, but I really do
+  # need that generic here." Both are live generics in `honeys` above, BESIDE
+  # the flat one, which is the default for a drink where the ratio does not
+  # matter. A generic cannot be both live and retired, so they cannot stay here.
+
+# NEW BLOCK 2026-09-04. A SUGAR SYRUP IS NAMED BY ITS SUGAR -- Helen: "Most
+# 'sugar syrup' means 'cane sugar syrup', possibly all. Sometimes I say
+# 'demerara sugar syrup' when I mean that. Let's standardise this please."
+#
+# All three names had users -- 43 ingredient lines across 43 drinks -- so unlike
+# the three whisky renames this block WILL fire if a drink is missed, which is
+# the point of writing it rather than trusting the pass. The full reasoning is
+# on `syrups` above.
+retired_syrups:
+  "sugar syrup 1:1": >-
+    the sugar is in the name now. It is `cane sugar syrup 1:1` -- Helen,
+    2026-09-04, standardising after her own batch wrote "Cane sugar syrup 2:1"
+    five times: "Most 'sugar syrup' means 'cane sugar syrup', possibly all."
+    The card name is unchanged and is still `sugar syrup`.
+  "sugar syrup 2:1": >-
+    as `sugar syrup 1:1`. It is `cane sugar syrup 2:1` now, which is the string
+    Helen's own recipe-line wording used a week before the generic did ("on the
+    recipe ingredient line cane sugar syrup, 2:1", 2026-08-27).
+  "demerara syrup": >-
+    said the sugar and not the thing. It is `demerara sugar syrup` now --
+    Helen, 2026-09-04: "Sometimes I say 'demerara sugar syrup' when I mean
+    that." The CARD still reads `demerara syrup`, because at card distance
+    `demerara` is the whole fact; the long form is the recipe line's.
 
 # NEW BLOCK 2026-09-04, and it exists for the same reason as every other one:
 # `full-strength clear fruit brandy` meant something for thirteen days and must

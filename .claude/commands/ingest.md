@@ -41,8 +41,45 @@ are `rewritten: false`, because "readable enough to cook from" sits below "the
 prose is mine". The folders and the flags answer different questions and are not
 expected to agree.
 
-**Cocktails.** `_cocktail_drafts/` is flat, and nothing has ever been promoted
-to `_cocktail_recipes/`. There is no staging.
+**Cocktails.** New ingests land in `_cocktail_drafts/` root — that is the pool,
+and it is where nearly everything still is. There is now ONE staging folder,
+and it is Helen's in exactly the way the food ones are:
+
+    _cocktail_drafts/             the pool -- everything lives here
+      to-promote/                 she has made it, amended it, and it ships;
+                                  waiting on her proofread, then
+                                  _cocktail_recipes/
+
+**Never move a drink into `to-promote/` unless asked.** It records that she has
+MADE the drink and decided it ships, which no flag says.
+
+> ### `to-promote/` AND `_cocktail_recipes/` ARE THE PUBLISHED TENSE
+>
+> Two rules bite in those two places and nowhere else — Helen's rulings,
+> 2026-09-04, reading Fish House Punch. Both are enforced
+> (`test_a_staged_drink_writes_a_bottles_canonical_name`,
+> `test_a_staged_drink_carries_no_transcription_field`), and both are things to
+> FIX when a drink is moved rather than reasons to refuse the move.
+>
+> - **Every `suggestion` is a bottle's canonical name, never an alias.**
+>   *"'ED3' isn't a bottle"* — it is a declared alias of `El Dorado 3 year old
+>   rum`, so it resolves, and resolving is not the same as being written down.
+>   Look each one up in `_data/cocktails/bottles.yml` and write the key.
+>   **This does not change the rule for a DRAFT**, which is the opposite one and
+>   stays: leave a drink as she spelled it and add the spelling as an alias
+>   (HANDOVER §9.3.2). The alias map is what lets an ingest be fast; a finished
+>   drink has had time to say the real name.
+> - **No ingredient carries `item`.** *"This has 'item' everywhere too."* It is
+>   the source's own wording, drafts-only since 2026-09-02 (§9.10), and nothing
+>   renders it. **Read each one before deleting it:** if it says something
+>   `generic`, `suggestion` and `amount` do not already say — "Strong cold black
+>   breakfast tea" beside `black tea`, "pear, sliced" beside `pear` — that fact
+>   moves to a `note:` on the same ingredient. If it merely restates the generic,
+>   which is the usual case, delete the line.
+>
+> **A bottle named only in `item` is still not yours to declare.** Where the
+> bottle is undeclared (Patrón Reposado), the fact goes in a `note:` and the
+> `suggestion` field is left for Helen — TIER 3, unchanged.
 
 ---
 
