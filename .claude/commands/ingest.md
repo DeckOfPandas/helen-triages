@@ -246,6 +246,20 @@ ingredient beside it.
   Two files kept their ounces through the 2026-09-01 conversion for exactly
   this reason.
 - **`QQ` is never an error.** Do not flag it, fix it, or convert it.
+- **Resolving a drink's `suggestion` and `generic`, Helen's rulings of
+  2026-09-04** (HANDOVER §9.3.2 has the long form; `unresolved_suggestions`
+  in bottles.yml is empty and must stay so):
+  - a HOUSE is not a bottle: declare the product she owns by its name and
+    retype the drink to it; a house is an alias only where it can mean one
+    thing in the collection (Luxardo → Luxardo Maraschino);
+  - a spirit type beside its own generic is not a suggestion; it goes;
+  - a syrup's suggestion may name what it is made from (Acacia honey);
+  - generics are named by what substitutes for what: never a `flavoured X`
+    that spans non-substitutable members; `honey syrup` is one flat generic
+    and bare `honey` is the raw thing you cook with; `lavender-forward
+    bitters`, not `lavender bitters`; `bonded rye` and `rye` are distinct;
+  - spelling: leave the drink as she wrote it and add the spelling as an
+    alias. Never retype a drink to a canonical bottle name.
 - **Every note an ingest ADDS is `{label, text}` with both fields set, each
   beginning `QQ`** — never a bare string. Helen, 2026-09-04: "It's annoying
   for me to remember how to type YAML every time." She searches for `QQ`,

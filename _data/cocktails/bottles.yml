@@ -76,12 +76,12 @@ bottles:
     aliases: ["Appleton Signature", "Appleton Estate V/X rum", "Appleton V/X"]
   "Appleton Estate 8 Year Reserve":
     generic: "moderately aged Jamaican rum"
-    # "Appleton Estate Reserve" is how the Cobra's Fang writes it, 2026-09-04.
-    # Read as the 8-year, which is the Reserve Helen owns; if it turns out to
-    # mean the newer unnumbered Reserve blend, that is a second bottle and a
-    # new entry, not a wider alias.
-    aliases: ["Appleton 8", "Appleton 8-year", "Appleton Estate 8 Reserve",
-              "Appleton Estate Reserve"]
+    # "Appleton Estate Reserve" was how the Cobra's Fang wrote it for one day;
+    # Helen, 2026-09-04: "Appleton Estate 8 Year Reserve is correct, I was
+    # wrong in Cobra's Fang." The drink is retyped, and the short form is NOT
+    # an alias, because a real unnumbered Reserve exists and the two must not
+    # collapse by accident.
+    aliases: ["Appleton 8", "Appleton 8-year", "Appleton Estate 8 Reserve"]
   "Appleton Estate 12 Rare Casks":
     generic: "moderately aged Jamaican rum"
     aliases: ["Appleton 12 Rare Casks", "Appleton Rare Casks",
@@ -111,18 +111,23 @@ bottles:
     aliases: []
 
   # --- Demerara: 100% DDL, Guyana. See the appellation note above. ----------
-  "El Dorado 3":
+  # THE CANONICAL FORM IS "El Dorado N year old rum" -- Helen, 2026-09-04,
+  # going through every bottle name: "The El Dorado pattern is always like
+  # 'El Dorado 3 year old rum', for 3, 5, 8 and 12. 15 and 21 too if they ever
+  # appear. El Dorado 151 is the correct string already." The short forms the
+  # drinks write stay as aliases; a drink keeps her spelling (see the header).
+  "El Dorado 3 year old rum":
     generic: "lightly aged and filtered rum"
-    aliases: ["ED3", "El Dorado 3yo", "El Dorado 3yo rum"]
-  "El Dorado 5":
+    aliases: ["El Dorado 3", "ED3", "El Dorado 3yo", "El Dorado 3yo rum"]
+  "El Dorado 5 year old rum":
     generic: "aged Demerara rum"
-    aliases: []
-  "El Dorado 8":
+    aliases: ["El Dorado 5"]
+  "El Dorado 8 year old rum":
     generic: "aged Demerara rum"
-    aliases: []
-  "El Dorado 12":
+    aliases: ["El Dorado 8"]
+  "El Dorado 12 year old rum":
     generic: "aged Demerara rum"
-    aliases: ["El Dorado 12 year old rum"]
+    aliases: ["El Dorado 12"]
   "El Dorado 151":
     generic: "overproof Demerara rum"
     aliases: ["El Dorado 151 rum"]
@@ -155,20 +160,24 @@ bottles:
     aliases: ["Gosling's", "Goslings"]
     # Reached for FOR its blackstrap, which is a `character` on the recipe and
     # never a generic -- #314, and the reason this file has no character column.
-  "Havana Club 7":
+  # "Havana Club 7 year old", same for 3 -- Helen's canonical form, 2026-09-04.
+  "Havana Club 7 year old":
     generic: "moderately aged rum"
-    aliases: ["Havana 7", "Havana Club 7yo"]
-  "Ron del Barrito":
+    aliases: ["Havana Club 7", "Havana 7", "Havana Club 7yo"]
+  # "Ron del Barrilito Three Stars" -- Helen, 2026-09-04: "a bad typo from
+  # me". The misspelling stays as an alias because the drink that wrote it
+  # still does.
+  "Ron del Barrilito Three Stars":
     generic: "moderately aged rum"
-    aliases: ["Ron del Barrito 3 star rum"]
+    aliases: ["Ron del Barrito", "Ron del Barrito 3 star rum", "Ron del Barrilito"]
   "Planteray Barbados 5":
     generic: "moderately aged rum"
     aliases: ["Plantation Barbados 5", "Plantation Barbados 5 year old rum"]
 
   # --- lightly aged and filtered -------------------------------------------
-  "Havana Club 3":
+  "Havana Club 3 year old":
     generic: "lightly aged and filtered rum"
-    aliases: ["Havana 3", "Havana Club 3yo rum", "Havana 3 year old",
+    aliases: ["Havana Club 3", "Havana 3", "Havana Club 3yo rum", "Havana 3 year old",
               "Havana Club Original Añejo 3 Años Cuban rum"]
   "Flor de Caña Extra Dry":
     generic: "lightly aged and filtered rum"
@@ -204,12 +213,23 @@ bottles:
     aliases: ["Coconut rum"]
 
   # --- cane juice: agricole, clairin, cachaça ------------------------------
-  "Clément Agricole Blanc":
+  # Canonical forms from Helen's pass over every name, 2026-09-04.
+  "Clément Rhum Agricole Blanc":
     generic: "rhum agricole blanc"
-    aliases: ["Clement Agricole Blanc"]
-  "Damoiseau Rhum Agricole Blanc":
+    aliases: ["Clément Agricole Blanc", "Clement Agricole Blanc"]
+  # THREE DAMOISEAU BLANCS, and the degree sign is part of the name: the 40°,
+  # the 50°, and the Pure Cane. The 40° is the one the drinks had been writing
+  # without its strength; the other two are declared because she owns them.
+  "Damoiseau Rhum Agricole Blanc 40°":
     generic: "rhum agricole blanc"
-    aliases: ["Damoiseau Rhum Agricole Blanc 40 proof", "Damoiseau Blanc"]
+    aliases: ["Damoiseau Rhum Agricole Blanc", "Damoiseau Rhum Agricole Blanc 40 proof",
+              "Damoiseau Blanc", "Damoiseau 40"]
+  "Damoiseau Rhum Agricole Blanc 50°":
+    generic: "rhum agricole blanc"
+    aliases: ["Damoiseau 50"]
+  "Damoiseau Rhum Agricole Blanc Pure Cane":
+    generic: "rhum agricole blanc"
+    aliases: ["Damoiseau Pure Cane"]
   "La Favourite Rhum Agricole Blanc":
     generic: "rhum agricole blanc"
     aliases: ["La Favourite Blanc"]
@@ -347,9 +367,13 @@ bottles:
   # Helen's rye, 2026-09-04, arriving with the first publication batch: the
   # Brooklyn and the Vieux Carré both pour it. The bottled-in-bond 100 proof,
   # which is what the number on the label means.
+  # "Rittenhouse and Rittenhouse 100 are different, but 100 is the same as
+  # bottled-in-bond" -- Helen, 2026-09-04. So the bare name is NOT an alias
+  # of this bottle; Fancy Free's item says "Rittenhouse" and, if she pours the
+  # 80-proof there, that is a second entry when she says so.
   "Rittenhouse 100":
     generic: "rye"
-    aliases: ["Rittenhouse Rye", "Rittenhouse Bottled in Bond", "Rittenhouse"]
+    aliases: ["Rittenhouse Rye 100", "Rittenhouse Bottled in Bond"]
   # JACK DANIELS IS A BOURBON HERE, Helen's ruling 2026-09-02, and it corrects
   # something this file asserted for one commit. That entry said Jack Daniels
   # "is Tennessee whiskey, which is a different legal category" and offered it
@@ -373,6 +397,12 @@ bottles:
   "Bulleit Bourbon":
     generic: "bourbon"
     note: "Not being replaced when it runs out — Helen's call, 2026-09-02."
+  # ONE HOUSE, TWO BOTTLES, and the generic is repeated in the name on purpose
+  # (Helen asked, 2026-09-04, "should we call them both Bulleit, or repeat the
+  # generic too?"): one generic per bottle is this file's rule, so "Bulleit"
+  # alone can be an alias of neither.
+  "Bulleit Rye":
+    generic: "rye"
   "Ardbeg XO":
     generic: "single malt scotch whisky"
   # THE PRODUCT REALLY IS CALLED "SAZERAC", which is why it sat in

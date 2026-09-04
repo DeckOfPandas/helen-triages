@@ -230,6 +230,15 @@ times apart and a wrong guess looks exactly as confident as a right one.
 **`item` is what the source called it, brand and all.** `generic` is the
 category, and it is always `QQ` from you. Do not put the quantity in `item`.
 
+**Write the bottle as the source spells it, and do not tidy it.** Helen's
+bottle dictionary resolves spellings by alias, and her standing rule
+(2026-09-04) is that a drink keeps her spelling and the dictionary learns it,
+never the other way round. Two things you can get right from the source
+alone: a HOUSE is not a bottle (Briottet, Monin, Gabriel Boudier make many
+things — if the source names the product, write the product), and a spirit
+TYPE printed beside its own name is not a bottle at all (a source's
+"aguardiente" next to aguardiente is the generic, not a suggestion).
+
 ### `item` is a transcription field, and it lives only in the drafts
 
 **It does not render on a published drink page, and a promoted drink will not

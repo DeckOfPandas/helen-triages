@@ -2732,6 +2732,40 @@ product, not the house.**
 BOTTLE, and what category it is.** Added 2026-08-27, and each bottle has one
 generic plus its alias spellings.
 
+> ### `unresolved_suggestions` IS EMPTY — 2026-09-04, and the rulings that emptied it
+>
+> Helen went through every synonym line by line before shipping the first
+> drinks ("I never want to have these conversations more than once") and ruled
+> on all sixteen strings that resolved to nothing, plus three generic pairs.
+> The rulings, now the standing rules for any ingest (`INGEST_ONE_COCKTAIL.md`
+> §3 carries the same list for a session with no repo):
+>
+> - **A house is not a bottle.** Briottet, Monin, Gabriel Boudier: declare
+>   each PRODUCT she owns by its name and retype the drink to it. A house name
+>   may be an alias only where it can mean one thing in this collection
+>   (Luxardo → Luxardo Maraschino; Bob's → Bob's Peppermint Bitters).
+> - **A spirit type beside its own generic is not a suggestion.** Aguardiente
+>   and kirschwasser are generics (Bali Hai's either-would-do list); the
+>   suggestion goes.
+> - **A syrup's suggestion may name what it is made from.** "Acacia honey" is
+>   a declared entry under `honey syrup` — *"Acacia is a bit special."*
+> - **Generics are named by what substitutes for what.** `flavoured vodka` is
+>   retired for `vanilla vodka` and `pineapple vodka` (*"members aren't
+>   substitutable"*); `lavender bitters` is retired for `lavender-forward
+>   bitters` (the wider name, with Bob's Margarita Bitters as her example);
+>   `honey water 1:1` / `2:1` are retired for one flat `honey syrup`, while
+>   bare `honey` stays for the raw thing you cook with (the pear Bellini);
+>   `bonded rye` and `rye` stay distinct; `dry orange Curaçao` and `orange
+>   Curaçao` stay distinct.
+> - **Spelling: leave the drinks as she wrote them; aliases do the reading.**
+>   Seventeen bottles are written more than one way across the drinks and
+>   every one resolves. Do not retype a drink to a canonical spelling; add
+>   the spelling as an alias.
+>
+> Twenty-three bottles were declared that day (the full list is the commit
+> "thirteen rulings on bottles and generics"), thirty-three drinks retyped,
+> and nothing in a tagline, note, method or amount touched.
+
 **IT STOPPED BEING RUM-ONLY ON 2026-08-30 AND SO DID THE TWO TESTS THAT MADE IT
 WORTH HAVING**, which is the more important half. `test_every_suggested_bottle_resolves`
 and `_cross_category_scan` both skipped any ingredient whose generic was not in
