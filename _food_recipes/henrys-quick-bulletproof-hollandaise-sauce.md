@@ -38,7 +38,7 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 ---
 
 <h2 class="recipe-section-heading" id="why-hollandaise-is-hard"><span class="section-heading-text">Why Hollandaise is hard</span></h2>
