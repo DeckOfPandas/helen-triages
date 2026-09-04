@@ -152,6 +152,13 @@
   var filters   = document.querySelector('.drink-filters');
   var list      = cards[0].parentNode;
 
+  /* THE SHORTLISTED-ONLY BUTTON -- #546, on the count line rather than in
+     `.drink-filters`. cocktails/index.html says why: the five filter sections
+     are all questions about what a drink IS, and a sixth holding one button
+     about what this browser has marked would read as another of them. Food's
+     index carries the twin of this on its own results heading. */
+  var shortlistOnlyBtn = document.getElementById('shortlist-only');
+
   // Declared here rather than beside the code that builds them, so apply() can
   // never read them before they exist. Populated further down.
   var clearAllButtons = [];
@@ -186,6 +193,11 @@
       moods: (card.dataset.moods || '').split('|').filter(Boolean),
       name: card.dataset.name || '',
       chaos: card.dataset.chaos || '',
+      /* The shortlist's key -- #546, `drink.url` written by the template. Read
+         once here with everything else; whether it IS shortlisted is asked in
+         matches(), because that answer can change under the page while this one
+         cannot. */
+      url: card.dataset.url || '',
       key: Math.random(),
       nameEl: nameEl,
       /* The unmarked title, stashed once. The highlight always rebuilds from
@@ -234,6 +246,17 @@
   }
 
   function matches(d) {
+    /* SHORTLISTED -- #546, and first because it is the cheapest test here and
+       the most narrowing one anybody turns on: one lookup against a list that
+       is usually a handful of drinks long, in front of four ingredient walks.
+       Everything below it is unchanged.
+
+       ASKED OF THE STORE, NOT OF THE MODEL. Every other fact in `d` was written
+       into the markup by the build; this one is in this browser's localStorage
+       and can change between two calls of this function -- which is exactly
+       what happens when you press a card's own toggle while the filter is on. */
+    if (state.shortlisted && !HTF.shortlist.has(d.url)) return false;
+
     /* mood: OR within the section, ranked by moodScore below. If this ever
        becomes AND the ranking is redundant rather than merely unused — see the
        note at the top, and issue #478. */
@@ -376,6 +399,16 @@
     var clearVisibility = FilterState.hasAnythingToClear(state) ? 'visible' : 'hidden';
     clearAllButtons.forEach(function (btn) { btn.style.visibility = clearVisibility; });
 
+    /* THE SHORTLISTED-ONLY BUTTON, painted from state in the same pass as
+       everything else -- #546. Not at click time, for the reason the mood chips
+       above carry in their own comment: `clear all` reassigns the whole state
+       object without touching any markup, so a class set where it was clicked
+       would outlive the filter it stands for. */
+    if (shortlistOnlyBtn) {
+      shortlistOnlyBtn.classList.toggle('is-on', !!state.shortlisted);
+      shortlistOnlyBtn.setAttribute('aria-pressed', state.shortlisted ? 'true' : 'false');
+    }
+
     if (countEl) countEl.textContent = shown;
     /* The word has to move with the number or "1 survivors" appears the first
        time a filter narrows to one drink. The Liquid in the template does the
@@ -459,6 +492,31 @@
       apply();
     });
   });
+
+  /* --- the shortlist -------------------------------------------------------
+     GitHub issue #546, and the same two listeners food's filters.js registers.
+
+     REVEALED HERE, not by shortlist.js: that script owns the per-card toggles,
+     this owns the filter, and each unhides the half it has actually wired. The
+     button ships `hidden` like every other JS-dependent control on both sites.
+
+     No sync call after the state change -- apply() paints this button in the
+     same pass it filters, for the reason its own comment there gives. */
+  if (shortlistOnlyBtn) {
+    shortlistOnlyBtn.hidden = false;
+    shortlistOnlyBtn.addEventListener('click', function () {
+      state.shortlisted = !state.shortlisted;
+      apply();
+    });
+  }
+
+  /* A CARD'S OWN TOGGLE CHANGED -- dispatched by shortlist.js. Unconditional
+     rather than gated on `state.shortlisted`: with the filter on, the card just
+     un-shortlisted has to leave the list, and with it off apply() still has the
+     count on the button to repaint. It is the same pass every other filter
+     runs, which is what stops the shortlisted view and the toggles on it from
+     ever disagreeing. */
+  document.addEventListener('htf:shortlist-change', apply);
 
   /* --- the two ingredient fields ------------------------------------------ */
   /* One builder for both, because they are the same control with opposite

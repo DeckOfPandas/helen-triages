@@ -282,21 +282,12 @@
     exclude: { empty: function () { return new Set(); }, narrows: true },
     nameQuery: { empty: function () { return ''; }, narrows: true },
 
-    /* NO `shortlisted` FIELD HERE YET, and its absence is deliberate — #546.
-       The food table declares one because food/index.html has a shortlisted-only
-       button wired to it. This index does not, because the control that would
-       fill the list lives on a drink CARD, and the cards were being restyled
-       when this landed (2026-09-04). Declaring the field now would put a live-
-       looking fact in the one file whose entire job is to be the list nothing
-       reaches past — the same reason food/index.html's own comment gives for
-       deleting the data- attributes of four retired filters rather than leaving
-       them: "an attribute nothing reads is worse than one that is absent".
-
-       WHAT THE COCKTAIL HALF NEEDS, when the cards are free: `data-url` on the
-       card, a `.btn-shortlist` in its top-right, this field, one line in
-       matches(), and the `.btn-shortlist-only` button on the count line.
-       Everything else — the store, the wiring, the drink page's own toggle — is
-       already here and already works. */
+    /* The same field the food table declares, and it means the same thing on
+       both sites — see FIELD_SPEC's own note for why the answer arrives on the
+       row rather than being looked up here. The two tables stay separate
+       because the two indexes ask genuinely different questions; this is one of
+       the few they both ask. */
+    shortlisted: { empty: function () { return false; }, narrows: true },
 
     /* isSearching's two siblings, and they are here for the reason its own
        entry above gives: clear-all DOES empty these boxes and their candidate
