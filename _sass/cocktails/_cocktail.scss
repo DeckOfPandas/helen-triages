@@ -667,6 +667,55 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   &[hidden] { display: none; }
 }
 
+// THE WHOLE SCALER — the multiple box, the total it comes to, and the target
+// box — Helen, 2026-09-04: "please add total ml, either set by your input box,
+// or user-entered number of ml." One wrapper, so ONE `hidden` covers all three
+// parts and cocktail-scale.js reveals the row rather than three elements.
+//
+// IT WRAPS AS A UNIT AND EACH PART WRAPS WHOLE. At 360px `make [1] × the
+// recipe` and `or [90] ml in total` do not share a line; the row breaks between
+// them rather than mid-sentence, which is what `flex-wrap` on the container plus
+// `flex-shrink: 0` on each part buys.
+.cocktail-scale-controls {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: $space-xs $space-sm;
+
+  &[hidden] { display: none; }
+}
+
+// THE TOTAL IS A NUMBER YOU ACT ON, so it is `.cocktail-amount`'s typography
+// rather than the control's: Plex, tabular figures, in ink — see that rule for
+// the argument, which is food's `.ingredient-amount` argument and the reason
+// $font-label exists. The `=` before it is the control's own grey, because it
+// is punctuation joining two controls rather than part of the figure.
+//
+// A `<p>`, NOT A SPAN INSIDE A LABEL: it is the answer the two boxes agree on,
+// and clicking an answer should not put a cursor in a box.
+.cocktail-scale-total {
+  @extend %cocktail-heading-face;
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: $color-clear-text;
+  flex-shrink: 0;
+
+  .cocktail-scale-total-value {
+    font-family: $font-label;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: normal;
+    text-transform: none;
+    color: $color-text;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // `hidden` MUST BEAT the block's own display — see `.cocktail-scale` above
+  // for the UA-stylesheet specificity trap this one line answers.
+  &[hidden] { display: none; }
+}
+
 // THE FLOOR MESSAGE — Helen, 2026-09-04: "say you can't go below X ml if any
 // ingredient wants to go below 2.5 ml." Quiet: it is an answer to something you
 // just tried, not a warning, so it takes the clear-text grey the control itself
@@ -1084,6 +1133,20 @@ $amount-indent: $amount-col + $amount-gap;
   margin: 0.25rem 0 0 $amount-indent;
 }
 
+// A METHOD STEP MAY CARRY ONE TOO — Helen, 2026-09-04: "separate note field
+// please, although it will be used sparingly." It is the SAME rule as an
+// ingredient's note, because it is the same kind of remark ("my giant spiky
+// muddler not the polite smooth one"), and it takes the class rather than a
+// copy of the four declarations.
+//
+// THE ONLY DIFFERENCE IS THE INDENT, and it has to be: `$amount-indent` lines an
+// ingredient's note up under the ingredient's NAME, past the amount column,
+// which is a column the method list does not have. Here the note simply sits
+// under its own step's text.
+.cocktail-method-note {
+  margin-left: 0;
+}
+
 // =============================================================================
 // METHOD, TO SERVE, NOTES
 // =============================================================================
@@ -1204,7 +1267,15 @@ $amount-indent: $amount-col + $amount-gap;
   .cocktail-section-heading--notes,
   .notes,
   .cocktail-type-line,
-  .cocktail-note,
+  // SCOPED TO THE INGREDIENT LIST, 2026-09-04, when a method step could carry a
+  // note too. This selector was a bare `.cocktail-note` and would have taken
+  // both. An ingredient's note is editorial ("whichever you prefer or are
+  // trying to use up") and goes when your hands are full; a step's note is HOW
+  // TO DO THE STEP ("my giant spiky muddler not the polite smooth one"), which
+  // is the one state where you most want it. Same class, same look, opposite
+  // answers to "is this needed at the bar" — so the state block asks about the
+  // list it is in.
+  .cocktail-ingredient .cocktail-note,
   .cocktail-suggestion,
   .cocktail-body-content { display: none; }
 

@@ -84,6 +84,23 @@ measures:
     - strip
     - g
 
+    # HALF A LIME -- Helen's ruling, 2026-09-04, on caipirinha's `amount: "0.5"`
+    # and its QQ note: yes to `amount: "half"`, with `half` and `whole` as
+    # units. A WHOLE FRUIT IS COUNTED, NEVER MEASURED. The drink says half a
+    # lime because that is what you pick up and cut, not because anyone has
+    # decided it is 12 ml of anything -- and the juice a lime gives is a range
+    # (`juice_yields` below says 20-30 ml), so a millilitre figure here would be
+    # inventing precision the fruit does not have.
+    #
+    # `half` IS A UNIT WITH NO NUMBER IN FRONT OF IT, which is why it is
+    # declared rather than written `0.5 whole`: it reads by the same path `to
+    # top` and `to rinse` read by (a whole-string lookup in this list), and
+    # "half" is the word Helen writes. `whole` is its partner for the counts the
+    # scaler produces from it -- half a lime doubled is `1 whole` -- and for the
+    # day a drink wants a whole one to start with.
+    - half
+    - whole
+
     # ACTIONS, NOT COUNTS -- Helen's ruling, 2026-09-02. Every ingredient has an
     # amount, and for an ingredient the method ADDS rather than measures, the
     # amount is a verb phrase: the list reads "champagne, to top" and "absinthe,

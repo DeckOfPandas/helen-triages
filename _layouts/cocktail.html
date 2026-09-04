@@ -396,14 +396,41 @@ layout: default
 
        `hidden` UNTIL THE SCRIPT REVEALS IT, the rule every JS-dependent control
        on both sites follows — see the shortlist button above, and
-       assets/js/cocktail-scale.js's own header. {% endcomment %}
+       assets/js/cocktail-scale.js's own header. ONE WRAPPER CARRIES THE
+       `hidden` for all three parts, rather than three attributes the script
+       has to remember to clear separately.
+
+       TOTAL ML AND A TARGET ML — Helen, 2026-09-04, step two of #545: "please
+       add total ml, either set by your input box, or user-entered number of ml
+       -- which you can refuse if it forces a volume to be <2.5 ml." So the row
+       reads `make [1] × the recipe = 90 ml, or [90] ml in total`: the equals
+       sign is what makes the three parts one sentence rather than three
+       controls, and the two boxes are kept in step by cocktail-scale.js so
+       neither can be read as the stale one.
+
+       THE TOTAL IS ml AND ONLY ml, drops and dashes and pinches excluded on
+       Helen's instruction — see assets/js/scale.js's header for why a dash is
+       not some number of millilitres this page may invent. {% endcomment %}
     <div class="cocktail-section-row">
       <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
-      <label class="cocktail-scale" hidden>
-        <span>make</span>
-        <input type="number" min="0.5" step="0.5" value="1" inputmode="decimal" aria-label="how many times the recipe">
-        <span>× the recipe</span>
-      </label>
+      <div class="cocktail-scale-controls" hidden>
+        <label class="cocktail-scale">
+          <span>make</span>
+          <input type="number" min="0.5" step="0.5" value="1" inputmode="decimal" class="cocktail-scale-multiple" aria-label="how many times the recipe">
+          <span>× the recipe</span>
+        </label>
+        {% comment %} A `<p>` rather than a span inside either label: it is the
+           ANSWER, not part of a control, and clicking it should not focus a
+           box. `aria-live` so a screen reader hears the new total when a box
+           changes it, since nothing else on the row says what happened.
+        {% endcomment %}
+        <p class="cocktail-scale-total" aria-live="polite">= <span class="cocktail-scale-total-value"></span></p>
+        <label class="cocktail-scale">
+          <span>or</span>
+          <input type="number" min="0" step="2.5" inputmode="decimal" class="cocktail-scale-target" aria-label="how many millilitres in total">
+          <span>ml in total</span>
+        </label>
+      </div>
     </div>
     {% comment %} The floor message, empty and hidden until a refusal fills it —
        "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
@@ -527,10 +554,69 @@ layout: default
      the wrong drink if reordered. The string form is still accepted for a
      one-step build rather than forcing `- ` on a single line.
   {% endcomment %}
+  {% comment %} A CITRUS TWIST ADDS ITS OWN LAST STEP, AND NO DRINK WRITES IT —
+     Helen's ruling, 2026-09-04, answering el-presidente's QQ ("Express the
+     orange twist and use it as a garnish. This should become canonical, for
+     each type of citrus twist"): yes, a garnish of any citrus twist adds
+     "Express the twist over the drink and drop it in" at the end of the method.
+
+     WHY THE LAYOUT AND NOT THE FILES. It is one fact — this drink is garnished
+     with a twist — and a drink that states the garnish and then also writes the
+     step states it twice, which is exactly what §9.12 calls variance that looks
+     informative and is not. Three drinks had written it by hand, in three
+     wordings; those are deleted, and `test_no_method_step_opens_with_express`
+     is what stops a fourth being written.
+
+     THE TWIST LIST COMES FROM garnish.yml, not from a bare substring test:
+     `citrus_peel` also holds `flamed orange zest coin`, which is a coin and not
+     a twist, so the members are filtered by the word themselves and the drink's
+     own garnish must MATCH A DECLARED ONE. An undeclared spelling gets no step
+     rather than a guessed one — and `test_every_garnish_is_declared` is what
+     makes that a safe bargain.
+
+     `(discarded)` FLIPS THE TAIL. garnish.yml declares `lemon twist
+     (discarded)` beside `lemon twist` precisely because the tail carries
+     information the head does not: the peel does not stay in the drink. So that
+     drink's step ends "and discard it". A drink whose twist is NOT discarded
+     wins the toss where it carries both, because a twist you keep is one you
+     drop in. {% endcomment %}
+  {% assign declared_twists = "" %}
+  {% for group in site.data.cocktails.garnish.canonical %}
+    {% for declared in group[1] %}
+      {% if declared contains "twist" %}
+        {% capture declared_twists %}{{ declared_twists }}|{{ declared }}|{% endcapture %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+  {% assign twist_step = "" %}
+  {% for g in page.garnish %}
+    {% capture bounded %}|{{ g }}|{% endcapture %}
+    {% if declared_twists contains bounded %}
+      {% if g contains "discard" %}
+        {% if twist_step == "" %}
+          {% assign twist_step = "Express the twist over the drink and discard it." %}
+        {% endif %}
+      {% else %}
+        {% assign twist_step = "Express the twist over the drink and drop it in." %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+
   {% if page.method.size > 0 and page.method.first %}
     <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>
     <ol class="cocktail-method">
-      {% for step in page.method %}<li>{{ step | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endfor %}
+      {% comment %} A STEP IS A STRING OR A `{step, note}` PAIR — Helen,
+         2026-09-04: "separate note field please, although it will be used
+         sparingly." The note renders under its step in the ingredient note's
+         own style, because it is the same kind of remark about the same kind of
+         thing; see `.cocktail-note` in _sass/cocktails/_cocktail.scss. The
+         string form is still the overwhelmingly normal one and is untouched.
+      {% endcomment %}
+      {% for step in page.method %}{% if step.step %}<li>{{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}{% if step.note %}<p class="cocktail-note cocktail-method-note">{{ step.note }}</p>{% endif %}</li>{% else %}<li>{{ step | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endif %}{% endfor %}
+      {% comment %} THE TWIST STEP IS A STEP LIKE ANY OTHER: same list, same
+         numbering, same rules, and it is in the DOM in both states, so `make
+         it` and print carry it exactly as they carry a written one. {% endcomment %}
+      {% if twist_step != "" %}<li>{{ twist_step }}</li>{% endif %}
     </ol>
   {% elsif page.method %}
     <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>

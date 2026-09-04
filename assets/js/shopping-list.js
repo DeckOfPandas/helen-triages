@@ -144,6 +144,40 @@
     return pluralise(unit);
   }
 
+  /* HOW MANY WHOLE FRUITS, IN WORDS -- Helen, 2026-09-04: `amount: "half"` on
+     caipirinha's lime, with `half` and `whole` added to `measures:`.
+
+     "0.5 whole" IS THE THING THIS EXISTS TO PREVENT. Nobody halves a lime by
+     writing 0.5 of one, and `unitLabel` would go further and print "0.5 wholes".
+     So a count in this unit prints as Helen writes it: `half`, `1 whole`,
+     `1½ whole`, `2 whole` -- and `quarter` and `¾ whole`, because ×0.5 of half a
+     lime is a real thing this control can produce and a decimal there would be
+     the same wart one line further down.
+
+     ANYTHING THE FRACTIONS DO NOT COVER FALLS BACK TO THE NUMBER, rather than
+     being rounded to one that reads nicely: a third of a lime is not a half. */
+  var FRACTIONS = { 0.25: '¼', 0.5: '½', 0.75: '¾' };
+
+  function wholeText(quantity) {
+    var n = tidy(Number(quantity));
+    if (n === 0.5) return 'half';
+    if (n === 0.25) return 'quarter';
+
+    var whole = Math.floor(n);
+    var fraction = FRACTIONS[tidy(n - whole)];
+    var number = fraction
+      ? (whole ? whole + fraction : fraction)
+      : String(n);
+    return number + ' whole';
+  }
+
+  /** One quantity and its unit, as a line of the list prints them. */
+  function amountText(quantity, unit) {
+    if (unit === 'whole') return wholeText(quantity);
+    var shown = unitLabel(unit, quantity);
+    return shown ? quantity + ' ' + shown : String(quantity);
+  }
+
   /**
    * Split "22.5 ml" into a number and a unit.
    *
@@ -155,6 +189,19 @@
    * @returns {{quantity: number, unit: string}|null}
    */
   function parseAmount(amount) {
+    /* `half` IS A NUMBER WITH NO DIGITS IN IT -- Helen, 2026-09-04, ruling on
+       caipirinha's lime: `amount: "half"`, with `half` and `whole` declared as
+       units in `measures.non_volumetric`. A whole fruit is COUNTED, never
+       measured, so it has no millilitre figure and does not want one.
+
+       IT READS AS 0.5 OF A `whole` so that the arithmetic is ordinary: half a
+       lime doubled is one lime, tripled is one and a half, and neither the
+       scaler nor the shopping list needs a rule of its own to say so. Only the
+       PRINTING is special -- `wholeText` below. */
+    if (String(amount || '').trim().toLowerCase() === 'half') {
+      return { quantity: 0.5, unit: 'whole' };
+    }
+
     var match = /^\s*([0-9]+(?:\.[0-9]+)?)\s*(.*?)\s*$/.exec(String(amount || ''));
     if (!match) return null;
     var quantity = parseFloat(match[1]);
@@ -378,11 +425,10 @@
 
       var totals = group.unitOrder.map(function (unit) {
         var quantity = tidy(group.units[unit]);
-        var shown = unitLabel(unit, quantity);
         return {
           quantity: quantity,
           unit: unit,
-          text: shown ? quantity + ' ' + shown : String(quantity)
+          text: amountText(quantity, unit)
         };
       });
 
@@ -436,7 +482,9 @@
     fruitCount: fruitCount,
     foldKey: foldKey,
     foldUnit: foldUnit,
-    unitLabel: unitLabel
+    unitLabel: unitLabel,
+    wholeText: wholeText,
+    amountText: amountText
   };
 
   if (typeof module !== 'undefined' && module.exports) {

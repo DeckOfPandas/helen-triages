@@ -758,6 +758,85 @@ def test_every_ingredient_has_a_declared_shape():
     )
 
 
+def _step_text(step):
+    """The words of one method step, whichever of the two shapes it is written in.
+
+    A STEP IS A STRING OR A `{step, note}` PAIR -- Helen, 2026-09-04: "separate
+    note field please, although it will be used sparingly." Every reader of
+    `method` in this file goes through here, and that is the point: the pair
+    arrived on one drink and turned
+    `test_every_proposal_still_matches_a_real_step` red with "cannot use 'dict'
+    as a set element", because that test built a set straight out of the raw
+    list. One reader, fixed once, is what stops the next reader hitting the same
+    wall -- `conftest.Recipe.method_steps` is the food side's own version of this
+    and has read both shapes for as long as food has had them.
+
+    Anything that is neither shape reads as no words at all, and the shape test
+    below is what fails on it -- a reader is not the place to complain.
+    """
+    if isinstance(step, dict):
+        step = step.get("step")
+    return step if isinstance(step, str) else ""
+
+
+def _steps(fm):
+    """Every method step of one drink, as text.
+
+    The scalar form (`method: "Stir."`) is accepted here the way the layout
+    accepts it, so a check cannot silently skip a drink written that way.
+    """
+    method = fm.get("method")
+    listed = method if isinstance(method, list) else [method] if method else []
+    return [text for text in (_step_text(s) for s in listed) if text]
+
+
+def test_a_method_step_is_a_string_or_a_step_note_pair():
+    """`method` holds strings, or `{step, note}` pairs -- Helen, 2026-09-04.
+
+    "Separate note field please, although it will be used sparingly." The
+    Caipirinha is the drink that earned it: its muddle step used to carry the
+    remark in brackets -- "(my giant spiky muddler, not the polite smooth one)"
+    -- inside the instruction, where it reads as part of what to do rather than
+    as an aside about how she does it.
+
+    THE NOTE MUST BE A NON-EMPTY STRING WHEN PRESENT. `note: ""` and `note: []`
+    both render as a step with an empty grey line under it, which looks like a
+    page bug rather than like a drink with nothing to add; a step with nothing
+    to say simply stays a string.
+
+    AND THE PAIR MAY HOLD NOTHING ELSE. A third key is either a typo or a field
+    nobody implemented, and both render as silence -- the same argument
+    `test_no_unknown_front_matter_keys` makes one level up.
+    """
+    bad = []
+    for slug, fm in _load():
+        method = fm.get("method")
+        listed = method if isinstance(method, list) else [method] if method else []
+        for i, step in enumerate(listed, 1):
+            where = f"{slug} step {i}"
+            if isinstance(step, str):
+                continue
+            if not isinstance(step, dict):
+                bad.append(f"{where}: {step!r} is neither a string nor a pair")
+                continue
+            extra = sorted(set(step) - {"step", "note"})
+            if extra:
+                bad.append(f"{where}: unknown key(s) {extra}")
+            if not (isinstance(step.get("step"), str) and step["step"].strip()):
+                bad.append(f"{where}: `step` is {step.get('step')!r}")
+            if "note" in step and not (isinstance(step["note"], str)
+                                       and step["note"].strip()):
+                bad.append(f"{where}: `note` is {step['note']!r}")
+    assert not bad, (
+        "Method step(s) in neither shape:\n  " + "\n  ".join(bad)
+        + "\n\nA step is a plain string, or:\n\n"
+          '  - step: "Muddle the lime chunks hard with the sugar."\n'
+          '    note: "my giant spiky muddler not the polite smooth one"\n\n'
+          "Both halves are non-empty strings and there is no third key. Used "
+          "sparingly -- Helen, 2026-09-04."
+    )
+
+
 def test_method_is_a_non_empty_list():
     """Every drink's `method` is an ordered list with at least one step in it.
 
@@ -2903,8 +2982,13 @@ def test_no_method_step_restates_to_serve_or_garnish():
     step that merely NAMES a garnish, and the difference is the whole rule:
 
         "Float the dehydrated lime slice wheel."     an ACTION -- stays
-        "Express lemon zest twist and use as garnish" an ACTION -- stays
         "Garnish with grated nutmeg."                 a RESTATEMENT -- goes
+
+    (It used to cite "Express lemon zest twist and use as garnish" as the
+    action that stays, and that step is gone: the LAYOUT writes it now, from the
+    garnish -- Helen's ruling, 2026-09-04. See
+    test_no_method_step_opens_with_express below, which is this rule applied to
+    the one action that turned out to be derivable after all.)
 
     HANDOVER 9.4 settles which is which: finishing ACTIONS are method steps
     ("top with champagne", "squeeze the twist over the drink"), presentation is
@@ -2921,10 +3005,7 @@ def test_no_method_step_restates_to_serve_or_garnish():
     checked = 0
     bad = []
     for slug, fm in _load():
-        method = fm.get("method")
-        for step in (method if isinstance(method, list) else [method] if method else []):
-            if not isinstance(step, str):
-                continue
+        for step in _steps(fm):
             checked += 1
             verb = re.match(r"\s*(serve|garnish)\b", step, re.I)
             if verb:
@@ -2943,6 +3024,53 @@ def test_no_method_step_restates_to_serve_or_garnish():
         "No method steps were scanned at all, so this compared nothing. Every "
         "drink has a `method`; an empty scan means the loader or the key name "
         "has moved."
+    )
+
+
+def test_no_method_step_opens_with_express():
+    """The twist step is the LAYOUT's, not a drink's -- Helen's ruling, 2026-09-04.
+
+    She was asked whether "a garnish of any citrus twist should automatically
+    add the step 'Express the twist over the drink and drop it in' at the end of
+    the method, so no drink has to write it", and said yes -- answering
+    `el-presidente`'s own QQ, which had asked for exactly that and said it
+    "should become canonical, for each type of citrus twist".
+
+    SO THE STEP IS DERIVED FROM `garnish:` AND WRITING IT IS A DUPLICATION. It
+    is the same fact twice, in two fields, which is what §9.12 means by variance
+    that looks informative and is not -- and it is worse than the usual case,
+    because the two copies can disagree: `man-o-war` said "discard" while its
+    garnish said `lemon twist`, so the page would have told you to drop the peel
+    in and to throw it away.
+
+    THREE DRINKS HAD WRITTEN IT, IN THREE WORDINGS, and all three were deleted
+    the day this landed: `corpse-reviver-no-2` ("Express lemon zest twist and use
+    as garnish"), `man-o-war` and `north-sea-oil`. The wording the layout emits
+    is canonical in methods.yml under `express`.
+
+    THE VERB IS THE TEST, as in its sibling above: this fires on a step that
+    OPENS with "Express" and nothing else. A step that expresses something in
+    passing is prose about a different action and stays.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for step in _steps(fm):
+            checked += 1
+            if re.match(r"\s*express\b", step, re.I):
+                bad.append(f"{slug}: {step!r}")
+    assert not bad, (
+        "Method step(s) writing the twist step by hand:\n  " + "\n  ".join(bad)
+        + "\n\nDELETE THEM. _layouts/cocktail.html adds \"Express the twist "
+          "over the drink and drop it in.\" as the last step of any drink whose "
+          "`garnish` names a citrus twist, and \"...and discard it.\" where the "
+          "garnish says `(discarded)`. Helen ruled on 2026-09-04 that no drink "
+          "writes it. If the drink really does express something, say what it "
+          "is doing to the drink and lead with that verb."
+    )
+    assert checked, (
+        "No method steps were scanned at all, so this compared nothing -- the "
+        "loader or the key name has moved."
     )
 
 
@@ -4420,8 +4548,14 @@ def _canonical_steps(spec):
 
 
 def _all_method_steps():
-    return [(slug, s) for slug, fm in _load()
-            for s in (fm.get("method") or [])]
+    """Every step in the collection, as (slug, text).
+
+    THROUGH `_steps`, which is what makes a `{step, note}` pair readable here:
+    the raw list went into a set below and a dict is not hashable, so the first
+    drink written in the pair shape turned this red with "cannot use 'dict' as a
+    set element" -- a schema addition breaking a check about method WORDING.
+    """
+    return [(slug, s) for slug, fm in _load() for s in _steps(fm)]
 
 
 def test_every_proposal_names_a_real_canonical_step():
@@ -4785,8 +4919,18 @@ def _prose_fields(drink):
         if isinstance(value, str) and value.strip():
             fields.append((key, value))
     for i, step in enumerate(drink.fm.get("method") or [], 1):
+        # BOTH HALVES OF A `{step, note}` PAIR ARE HELEN'S OWN PROSE, so both go
+        # through the typography checks. Reading only `isinstance(step, str)`
+        # here would have quietly exempted every step written in the new shape
+        # -- an addition to the schema switching a check off for the files that
+        # use it, which is the failure mode HANDOVER 10 records five times.
         if isinstance(step, str):
             fields.append((f"method step {i}", step))
+        elif isinstance(step, dict):
+            if isinstance(step.get("step"), str):
+                fields.append((f"method step {i}", step["step"]))
+            if isinstance(step.get("note"), str):
+                fields.append((f"method step {i} note", step["note"]))
     for i, note in enumerate(drink.fm.get("notes") or [], 1):
         if isinstance(note, dict):
             for part in ("label", "text"):

@@ -149,3 +149,85 @@ test('the total is the poured volumes only, never the dashes', () => {
   // Halved and re-gridded: 15 + 12.5 + 15. 11.25 lands on 12.5, not 11.25.
   assert.strictEqual(scaler.totalMl(NEGRONI, 0.5), 42.5);
 });
+
+test('every non-volumetric amount sits outside the total', () => {
+  // Helen, 2026-09-04: "Ignore drops and dashes and pinches in target ml."
+  // Grams, leaves, `each`, a bare count and `to top` are outside it for the
+  // same reason — the total is millilitres, and only millilitres are.
+  assert.strictEqual(
+    scaler.totalMl(['30 ml', '2 dashes', '1 small pinch', '25 g', '8 leaves',
+                    'to top', '1', 'half'], 1),
+    30);
+});
+
+test('a range counts its LOWER end in the total', () => {
+  // The total is a figure you pour against, and the smaller end is the one you
+  // can always make. Changed 2026-09-04; it totalled at the top end before.
+  assert.strictEqual(scaler.totalMl(['20–30 ml', '30 ml'], 1), 50);
+});
+
+// --- a target total -----------------------------------------------------------
+
+test('a target total becomes the multiple that reaches it', () => {
+  // The Aviation: 52.5 + 15 + 7.5 + 15 = 90 ml as written, so 180 is ×2.
+  const AVIATION = ['52.5 ml', '15 ml', '7.5 ml', '15 ml'];
+  assert.strictEqual(scaler.totalMl(AVIATION, 1), 90);
+  assert.strictEqual(scaler.multipleForTotal(AVIATION, 180), 2);
+  assert.deepStrictEqual(
+    scaler.scale(AVIATION, scaler.multipleForTotal(AVIATION, 180)).amounts,
+    ['105 ml', '30 ml', '15 ml', '30 ml']);
+});
+
+test('a target is EXACT, and is not snapped to the half step', () => {
+  // Helen, 2026-09-04: the multiple box offers halves, but someone typing a
+  // number of millilitres means that number. 100 / 82.5 is ×1.212, and the
+  // amounts it produces are still rounded to the 2.5 ml grid.
+  assert.strictEqual(scaler.multipleForTotal(NEGRONI, 100), 1.212);
+  assert.deepStrictEqual(scaler.scale(NEGRONI, 1.212).amounts,
+                         ['37.5 ml', '27.5 ml', '37.5 ml', '2.424 drops']);
+});
+
+test('a target below the floor is refused like any other multiple', () => {
+  // 27.5 ml is the least ['50 ml', '5 ml'] can be poured as, so 10 ml is not a
+  // drink this page can offer — the same refusal the multiple box gives, with
+  // the same floor and the same smallest total to report.
+  const out = scaler.scale(['50 ml', '5 ml'],
+                           scaler.multipleForTotal(['50 ml', '5 ml'], 10));
+  assert.strictEqual(out.ok, false);
+  assert.strictEqual(out.floor, 0.5);
+  assert.strictEqual(out.floorTotalMl, 27.5);
+});
+
+test('a target with nothing to scale, or no number, is null', () => {
+  // Nothing volumetric: there is no total to divide into, so the control has
+  // no answer rather than a wrong one.
+  assert.strictEqual(scaler.multipleForTotal(['2 dashes', 'to top'], 50), null);
+  [0, -30, '', null, undefined, 'lots'].forEach((bad) => {
+    assert.strictEqual(scaler.multipleForTotal(NEGRONI, bad), null, String(bad));
+  });
+});
+
+// --- half a lime --------------------------------------------------------------
+
+test('half a lime scales in whole limes, and prints in words', () => {
+  // Helen, 2026-09-04: `amount: "half"`, with `half` and `whole` as units. The
+  // arithmetic is 0.5 of a `whole`; only the printing is special.
+  assert.deepStrictEqual(scaler.scale(['half'], 1).amounts, ['half']);
+  assert.deepStrictEqual(scaler.scale(['half'], 2).amounts, ['1 whole']);
+  assert.deepStrictEqual(scaler.scale(['half'], 3).amounts, ['1½ whole']);
+  assert.deepStrictEqual(scaler.scale(['half'], 4).amounts, ['2 whole']);
+  // Half of half a lime is a quarter of one, and "0.25 whole" is the wart this
+  // avoids -- as is `unitLabel`'s "0.5 wholes" one line further down.
+  assert.deepStrictEqual(scaler.scale(['half'], 0.5).amounts, ['quarter']);
+});
+
+test('a whole fruit written as a count prints the same way', () => {
+  assert.deepStrictEqual(scaler.scale(['1 whole'], 1).amounts, ['1 whole']);
+  assert.deepStrictEqual(scaler.scale(['1 whole'], 2).amounts, ['2 whole']);
+  assert.deepStrictEqual(scaler.scale(['1 whole'], 0.5).amounts, ['half']);
+});
+
+test('half a lime is not a volume, so it never sets the floor', () => {
+  // A count, like a dash: nothing asks it to clear 2.5 ml.
+  assert.strictEqual(scaler.floorMultiple(['45 ml', 'half', '20 g']), 0.5);
+});

@@ -63,6 +63,34 @@
 // AN UNPARSEABLE AMOUNT PASSES THROUGH UNTOUCHED. `to top` and `to rinse` are
 // the eleven real ones; twice as much of a drink still wants topping up, and
 // there is no number in the string to multiply.
+//
+// -----------------------------------------------------------------------------
+// TOTAL ML, AND A TARGET ML — Helen, 2026-09-04, step two of #545
+// -----------------------------------------------------------------------------
+// "Please add total ml, either set by your input box, or user-entered number of
+// ml -- which you can refuse if it forces a volume to be <2.5 ml. Ignore drops
+// and dashes and pinches in target ml."
+//
+// So the total is the ml AND ONLY THE ml, the same rule the shopping list
+// applies to its own sums: a dash is not 0.8 ml in any way worth writing down,
+// so it is not 0.8 ml here either, and adding it in would make the one number
+// on the row the only unsourced figure on the page. Drops, dashes, pinches,
+// leaves, grams and `to top` all sit outside the total, and the reader can see
+// they do because they are still on the list unchanged.
+//
+// A RANGE COUNTS ITS LOWER END. Nothing in the collection is written as a range
+// today, so this is a decision for the amount written tomorrow: the total is a
+// figure you pour against, and the smaller of the two is the one you can always
+// make. (It totalled at the TOP end until 2026-09-04 -- "the most the drink
+// could come to" -- which is the right answer to a different question.)
+//
+// `multipleForTotal` IS NOT SNAPPED TO THE HALF STEP, and that is the whole
+// difference between the two boxes. A MULTIPLE is a choice from a list of
+// halves; a TARGET is exact by intent -- someone typing 200 ml means 200 ml, and
+// rounding their number to the nearest ×0.5 would silently answer a question
+// they did not ask. The AMOUNTS are still rounded to the 2.5 ml grid, so what
+// comes out is still pourable and the total of the poured figures may sit a
+// little either side of what was typed.
 // =============================================================================
 
 (function (root, factory) {
@@ -170,6 +198,18 @@
     var low = round(entry.low * multiple);
     var high = entry.high === null ? null : round(entry.high * multiple);
 
+    /* HALF A LIME IS PRINTED IN WORDS, NOT AS 0.5 — Helen, 2026-09-04, ruling
+       on caipirinha's `amount: "0.5"`: `half` and `whole` are units now, and a
+       whole fruit is COUNTED rather than measured. The arithmetic underneath is
+       plain (half is 0.5 of a `whole`, so ×2 is 1 and ×3 is 1.5); only the
+       printing is special, and it is shopping-list.js's `wholeText` that does
+       it, so a shopping list and a drink page say "1½ whole" the same way. */
+    if (entry.unit === 'whole') {
+      return high === null
+        ? SL.wholeText(low)
+        : SL.wholeText(low) + entry.sep + SL.wholeText(high);
+    }
+
     /* THE PLURAL FOLLOWS THE NUMBER YOU END UP WITH, and for a range that is
        its top end -- "1 to 2 dashes", never "1 to 2 dash". `unitLabel` leaves
        `ml`, `g` and a bare count alone and pluralises the words, sibilants
@@ -224,11 +264,30 @@
   function totalFor(entries, multiple) {
     return tidy(entries.reduce(function (sum, entry) {
       if (entry.kind !== 'volume') return sum;
-      var low = roundPour(entry.low * multiple);
-      var high = entry.high === null ? null : roundPour(entry.high * multiple);
-      // A range totals at its top end: the most the drink could come to.
-      return sum + (high === null ? low : high);
+      /* A RANGE COUNTS ITS LOWER END -- see the header. The total is a figure
+         you pour against, and the smaller end is the one you can always make. */
+      return sum + roundPour(entry.low * multiple);
     }, 0));
+  }
+
+  /**
+   * The multiple that gets this drink to a target volume.
+   *
+   * NOT SNAPPED TO THE HALF STEP -- see the header. A target is exact by
+   * intent, and the amounts it produces are still rounded to the 2.5 ml grid,
+   * so the poured total may land a little either side of what was asked for.
+   *
+   * @param {string[]} amounts
+   * @param {number} millilitres - what the reader typed
+   * @returns {number|null} null when the drink has no volume to scale (nothing
+   *          but dashes) or the target is not a positive number
+   */
+  function multipleForTotal(amounts, millilitres) {
+    var target = Number(millilitres);
+    if (!isFinite(target) || target <= 0) return null;
+    var base = totalFor(asList(amounts).map(read), 1);
+    if (!(base > 0)) return null;
+    return tidy(target / base);
   }
 
   /**
@@ -278,6 +337,7 @@
     scale: scale,
     floorMultiple: floorMultiple,
     totalMl: totalMl,
+    multipleForTotal: multipleForTotal,
     roundPour: roundPour,
     MIN_POUR: MIN_POUR,
     POUR_STEP: POUR_STEP,

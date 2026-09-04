@@ -2296,8 +2296,13 @@ ingredients:                     # FULL list, untriaged, in build order
       - "blackstrap"             # bottle, not of the bottle in the abstract — #441, §9.3.1
     suggestion: "Gosling's Black Seal"
     optional: true               # BOOLEAN, absent means required — #570
+  - amount: "half"               # `half` and `whole` are UNITS — 2026-09-04.
+    generic: "lime"              # A whole fruit is counted, never measured.
 method:                          # ORDERED LIST — the steps are sequential
   - "Pour absinthe into ice-filled glass."
+  - step: "Muddle the lime chunks hard with the sugar."  # a step is a string OR
+    note: "my giant spiky muddler not the polite smooth one"   # a {step, note}
+                                 # pair — Helen, 2026-09-04, "used sparingly"
 to_serve: ""                     # PRESENTATION, not a further instruction
 mood:                            # LIST, DERIVED and then stored — see below
   - "sharp"
@@ -2398,11 +2403,34 @@ much, the step says when.
 the difference is more than marketing. Eight drinks said club soda in a step or
 an `item` and were normalised; the one surviving mention is inside a `QQ` note
 on `la-fee-noir-punch` recording what a source said, and a QQ is never rewritten
-to match a later decision. And the rim wording is hers: **"Salt a half-rim of
-the glass."**, preferred over "Salt half the rim of the glass" — canonical in
-`methods.yml`, with `margarita-classic`'s "Dip only half the rim in salt."
-proposed for it rather than rewritten, because this file proposes and never
-applies.
+to match a later decision.
+
+**THE RIM WORDING IS THE MARGARITA'S OWN SENTENCE — Helen, 2026-09-04:** *"her
+Margarita sentence is canonical, but swap the tequila for the leading spirit in
+the rare case it isn't tequila."* So `methods.yml` says **"Dip only half the rim
+in water (or tequila) then coarse salt."** It replaced *"Salt a half-rim of the
+glass."*, her own 2026-09-02 wording, which she wrote past herself when she
+rewrote the drink for publication: the new one carries the WETTING and the
+COARSE salt, and by the file's own test — does the phrasing carry information? —
+both are information the shorter form loses. **The spirit named is the drink's
+LEADING spirit**, and `methods.yml` has no way to parameterise a step (a flat
+list of literal strings, compared whole by every consumer), so a non-tequila
+drink writes the same sentence with its own spirit and lives in the informative
+tail. `margarita-classic` already said it, so nothing was retyped and no
+proposal was needed.
+
+**AND THE TWIST STEP IS THE LAYOUT'S — Helen, 2026-09-04**, answering
+`el-presidente`'s QQ ("this should become canonical, for each type of citrus
+twist"): a garnish naming a citrus twist makes `_layouts/cocktail.html` append
+**"Express the twist over the drink and drop it in."** as the last step, and
+**"...and discard it."** where the garnish says `(discarded)`. **No drink writes
+it**, `test_no_method_step_opens_with_express` refuses one that tries, and the
+three that had written it by hand in three wordings (`corpse-reviver-no-2`,
+`man-o-war`, `north-sea-oil`) were deleted the same day. It is one fact —
+this drink is garnished with a twist — and the two copies could disagree:
+`man-o-war` said discard while its garnish said the peel stays. Both sentences
+are canonical in `methods.yml` under `express`, declared because they appear on
+the page, not because anyone types them.
 
 **`item` IS A DRAFTS-ONLY TRANSCRIPTION FIELD — ruled 2026-09-02 (D8), which
 overturned this paragraph's earlier heading "`item` IS BEING RETIRED".** It
@@ -4782,8 +4810,53 @@ parser) → `assets/js/scale.js` (`HTF.scale`, the arithmetic, tested in
 redraw scales from those, so ×2 then ×1 is the recipe again rather than four
 times it. `make it` needs nothing from any of this — it changes the amount's
 size, never its text. Print hides the control: a printed page is the recipe as
-written. Steps two and three of #545 (target ml, target units of alcohol) are
-not built; the third waits on ABV per bottle, #297.
+written.
+
+**STEP TWO IS BUILT: TOTAL ML, AND A TARGET ML — Helen, 2026-09-04.** *"Please
+add total ml, either set by your input box, or user-entered number of ml —
+which you can refuse if it forces a volume to be <2.5 ml. Ignore drops and
+dashes and pinches in target ml."* The row now reads `make [1] × the recipe
+= 90 ml, or [90] ml in total`. **The total is ml and only ml** — the shopping
+list's own rule, because a dash is not 0.8 ml in any way worth writing down —
+and a range counts its LOWER end (changed the same day; it totalled at the top
+end before, which is the right answer to a different question). **A target is
+EXACT and is not snapped to the half step**: a multiple is a choice from a list
+of halves, but someone typing 200 ml means 200 ml, so `multipleForTotal` divides
+and hands the raw figure to the same `scale()` — one floor, one refusal, no
+second opinion — while the amounts still land on the 2.5 ml grid, so the poured
+total may sit a little either side of what was asked. **The two boxes are one
+state**: whichever you type in, the other is redrawn from the multiple that is
+actually on screen, and neither is written under a cursor mid-type. Step three
+(target units of alcohol) waits on ABV per bottle, #297.
+
+**`half` IS A UNIT AND SO IS `whole` — Helen, 2026-09-04**, ruling on the
+Caipirinha's `amount: "0.5"` and its QQ: `amount: "half"`. **A whole fruit is
+counted, never measured** — the juice a lime gives is a range (`juice_yields`
+says 20–30 ml), so a millilitre figure would be precision the fruit does not
+have. Both are declared in `measures:` `non_volumetric`, so `half` reads by
+exactly the path `to top` reads by. The arithmetic is ordinary — 0.5 of a
+`whole`, so ×2 is one lime — and only the PRINTING is special:
+`shoppingList.wholeText` gives `half`, `quarter`, `1 whole`, `1½ whole`, and
+falls back to the plain number for a fraction it has no glyph for rather than
+rounding to one that reads nicely.
+
+**A METHOD STEP MAY CARRY A NOTE — Helen, 2026-09-04: "separate note field
+please, although it will be used sparingly."** A step is a string or a
+`{step, note}` pair; the note renders under its step in the ingredient note's
+own `.cocktail-note` style, because it is the same kind of remark. **It stays
+visible in `make it`**, unlike an ingredient's note, and that is deliberate: an
+ingredient note is editorial, a step note is how to do the step ("my giant
+spiky muddler not the polite smooth one"), which is exactly what you want with
+your hands full — so the state block asks `.cocktail-ingredient .cocktail-note`
+rather than the bare class. **Every reader of `method` goes through one helper**
+(`_step_text` / `_steps` in `tests/test_cocktails.py`, matching
+`conftest.Recipe.method_steps` on the food side): the pair arrived on one drink
+and turned `test_every_proposal_still_matches_a_real_step` red with *cannot use
+'dict' as a set element*, because that check built a set out of the raw list.
+`scripts/derive_cocktail_moods.py` reads step AND note, and that is not
+incidental — the Caipirinha's `muddler` was the second faff hit while it sat in
+brackets inside the step, so searching the step alone would have taken `I want
+to faff` off the drink on a change of SHAPE rather than of words.
 
 **Four colours, four jobs — not the three this section used to describe.**
 Electric absinthe stays the page's home colour (the title's border, the
