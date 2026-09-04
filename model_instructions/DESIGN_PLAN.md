@@ -146,9 +146,14 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    `_sass/cocktails/_cards.scss`, `_sass/cocktails/_cocktail.scss`,
    `assets/js/card-name-fit.js`, `assets/js/universe.js`,
    `_layouts/default.html`, `_dev/card-glasses.html`.
-6. **Yellow is the loudest active state and belongs to PRACTICALITIES**
-   (refinement). Tinted rather than solid active fill, or swap yellow to
-   LEAVE OUT and give practicalities the cobalt.
+6. ~~Yellow is the loudest active state and belongs to PRACTICALITIES~~
+   **Done 2026-09-04.** Neither of the audit's directions survived looking
+   (tints "aren't working for me"; the cobalt swap "very visually
+   unbalanced"). Helen's own answer reorders the five: magenta, lime,
+   cerulean, orange, aureolin, so the yellow becomes I KNOW WHAT I WANT and a
+   hit title wears a highlighter. Cobalt deleted; LEAVE OUT keeps the violet
+   rule alone, grey, like cocktails. `food/_palette.scss`,
+   `food/_category-labels.scss`, `food/_buttons.scss`.
 7. **The card's green bottom rule reads as a progress bar** (refinement).
    Span the card at rest, or run it vertically along the column's inner edge.
 8. **Tablet.** Nothing in this review was seen on an iPad. Breakpoints: 400,

@@ -7388,15 +7388,19 @@ of the five rules that extend it or in a sixth written next year.
 ### 13.5 The colour contract, and why the two pages differ
 
 **Recipe page: five hues** (§13.2), colour as decoration, rationed.
-**Index page: five hues**, one per filter section, in page order: `$color-
-star-root` (STAR INGREDIENT), `$color-vivid-cerulean` (MOOD), `$color-
-aureolin` (PRACTICALITIES), `$color-pure-lime-green` (**HAS TO HAVE** — this
-section was `SEARCH MAIN INGREDIENTS` until issue #583, 2026-08-30, and the
-variable name still says ingredient),
-`$color-hot-orange` (I KNOW WHAT I WANT). **LEAVE OUT still takes no code
-colour**, on the reasoning §13.4 gives, even though #586 has since promoted it
-from a hidden panel to a section of its own beside HAS TO HAVE — its heading
-carries a cobalt double-rule and its buttons stay neutral. On the index colour is a CODE — each
+**Index page: five hues**, one per filter section, in page order **since
+2026-09-04**: `$color-bright-magenta` (STAR INGREDIENT), `$color-pure-lime-green`
+(MOOD), `$color-vivid-cerulean` (PRACTICALITIES), `$color-hot-orange` (**HAS
+TO HAVE** — this section was `SEARCH MAIN INGREDIENTS` until issue #583,
+2026-08-30, and the variable name still says ingredient), `$color-aureolin`
+(I KNOW WHAT I WANT, so a hit title wears a yellow highlighter). Helen's
+order, against her own five tests — pink first, no two blues adjacent, star /
+mood / practicalities accessible and pleasant together, not a rainbow — after
+the audit found yellow the loudest active state on the least appetising axis
+and a tinted fill did not read. **LEAVE OUT takes no code colour and no
+cobalt either, since the same day**: its heading keeps the violet structural
+rule alone, in grey, as the cocktails site's does, and its buttons stay
+neutral; `$color-electric-cobalt` is deleted. On the index colour is a CODE — each
 hue ties a section's rule to its filter buttons, active states, and badges,
 so it has to be learned and distinct. On the recipe page colour is
 decoration and has to be rationed. **This is a principled divergence — don't
