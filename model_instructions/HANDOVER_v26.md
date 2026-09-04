@@ -4711,6 +4711,42 @@ active", and both labels are always on screen, so the #494 ambiguous-label
 problem the old button solved with a constant label cannot arise here in the
 first place: there is no single label whose meaning could be read two ways.
 
+**The scaler sits on the INGREDIENTS heading's line — #545 step one,
+2026-09-04.** `make [1] × the recipe`, in `.shopping-list-setall`'s house style,
+right-aligned in a `.cocktail-section-row` (the shape `.cocktail-meta-row`
+already gives the meta panel and its shortlist button). **Servings means
+MULTIPLES OF THE RECIPE AS WRITTEN** — Helen's ruling: there is no `serves:`
+field on a drink and this invents none, so ×2 is twice what the page says.
+**Volumes round to the nearest 2.5 ml** — "a barspoon is 5 ml and a jigger is
+marked in 2.5s", the smallest anyone pours — **and only the rounded figure is
+shown**, because the unrounded one is the number you cannot pour. Counts
+(dashes, drops, leaves, `each`) multiply and re-pluralise; `to top` and `to
+rinse` pass through untouched; a range keeps its shape with both ends scaled.
+
+**The floor is a REFUSAL, not a silent round** — Helen: "say you can't go below
+X ml if any ingredient wants to go below 2.5 ml." A multiple that would take any
+volumetric ingredient under 2.5 ml is refused, the input reverts to the last
+good value, and `.cocktail-scale-note` says what the limit is and which
+ingredient set it — *"can't go below ×1 (112.5 ml): the cider vinegar would be
+under 2.5 ml"* (carta switchel, whose 2.5 ml of vinegar is exactly at the
+limit). **The floor is capped at ×1** so a drink written with a small
+ingredient can still show itself as written, and it is also the input's `min`,
+so the spinner alone can never produce the message.
+
+**ONE PARSER, NOT THREE.** The amounts are the same strings the index's
+shopping list reads, so `HTF.shoppingList.parseAmount`, its unit folding and its
+`unitLabel` plural do the reading here too — which is why the drink page now
+loads `shopping-list.js`. Three files in a chain, guarded by
+`test_the_scaler_scripts_load_in_dependency_order`: `shopping-list.js` (the
+parser) → `assets/js/scale.js` (`HTF.scale`, the arithmetic, tested in
+`tests/js/scale.test.js` through the stub-DOM harness) → `assets/js/cocktail-scale.js`
+(DOM only). The originals are stashed in `data-amount` on first run and every
+redraw scales from those, so ×2 then ×1 is the recipe again rather than four
+times it. `make it` needs nothing from any of this — it changes the amount's
+size, never its text. Print hides the control: a printed page is the recipe as
+written. Steps two and three of #545 (target ml, target units of alcohol) are
+not built; the third waits on ABV per bottle, #297.
+
 **Four colours, four jobs — not the three this section used to describe.**
 Electric absinthe stays the page's home colour (the title's border, the
 toggle's ON state) and claims no section on its own. Ultra yvette marks

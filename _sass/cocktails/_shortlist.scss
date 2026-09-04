@@ -229,23 +229,11 @@
   margin-bottom: $space-md;
 }
 
-// Every typed number in this panel wears the same box: the site's own surface
-// and border rather than the browser's, and the home colour on focus. One rule,
-// because "set all to" and a drink's own count are the same control.
-%shopping-number {
-  @extend %cocktail-heading-face;
-  width: 3.2rem;
-  font-size: 0.95rem;
-  color: $color-text;
-  background: $color-surface;
-  border: 1px solid $color-border;
-  padding: $space-xxs $space-xs;
-
-  &:focus-visible {
-    outline: none;
-    border-color: $color-cosmic-cosmopolitan;
-  }
-}
+// Every typed number in this panel wears the same box, and the box is not this
+// file's any more: `%cocktail-number-input` in `cocktails/_cocktail.scss`, moved
+// there on 2026-09-04 when the drink page's scaler (#545) became the third
+// control of this kind and the second file wanting it. "Set all to", a drink's
+// own count and the scaler's multiple are one control drawn three times.
 
 .shopping-list-setall {
   @extend %cocktail-heading-face;
@@ -256,7 +244,7 @@
   letter-spacing: 0.08em;
   color: $color-clear-text;
 
-  input { @extend %shopping-number; }
+  input { @extend %cocktail-number-input; }
 }
 
 // --- one count per drink -----------------------------------------------------
@@ -279,7 +267,7 @@
     color: $color-text;
   }
 
-  input { @extend %shopping-number; }
+  input { @extend %cocktail-number-input; }
 }
 
 .shopping-list-items {

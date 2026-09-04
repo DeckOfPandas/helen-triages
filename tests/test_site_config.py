@@ -183,6 +183,39 @@ def test_cook_schedule_js_loads_before_cook_timer_js():
     )
 
 
+def test_the_scaler_scripts_load_in_dependency_order():
+    """scale.js reads HTF.shoppingList, and cocktail-scale.js reads HTF.scale.
+
+    The same trap as cook-schedule.js before cook-timer.js above, one page
+    along: GitHub issue #545's scaler is three files in a chain -- the amount
+    parser (shopping-list.js, shared with the index's shopping list), the
+    arithmetic (scale.js), and the wiring (cocktail-scale.js). Each grabs the
+    one before it off `HTF` as it parses. Loaded the wrong way round the drink
+    page throws once, silently, and the control simply never appears -- there is
+    no visible error to notice, and the page still reads correctly at x1, which
+    is what would let it ship.
+
+    Read from the LAYOUT rather than from a built page, because that is where
+    these three tags live -- a drink page has no scripts of its own.
+    """
+    html = read("_layouts", "cocktail.html")
+    order = ["shopping-list.js", "scale.js", "cocktail-scale.js"]
+    found = {}
+    for name in order:
+        # `scale\.js` would also match `cocktail-scale.js`; the slash pins it to
+        # the start of a filename.
+        match = re.search(r"<script src=[^>]*/" + re.escape(name), html)
+        assert match, f"_layouts/cocktail.html no longer loads assets/js/{name}."
+        found[name] = match.start()
+
+    assert found["shopping-list.js"] < found["scale.js"] < found["cocktail-scale.js"], (
+        "the scaler's three scripts are out of order in _layouts/cocktail.html. "
+        "shopping-list.js defines HTF.shoppingList, which scale.js reads as it "
+        "parses; scale.js defines HTF.scale, which cocktail-scale.js reads. Any "
+        "other order leaves the scale control hidden with nothing in the console."
+    )
+
+
 def test_cook_timer_js_holds_no_schedule_arithmetic():
     """The maths lives in cook-schedule.js, where tests/js can reach it.
 

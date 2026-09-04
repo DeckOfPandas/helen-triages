@@ -46,4 +46,14 @@
   // The universe pick is furniture too -- a random deal and "deal again" do
   // nothing on paper.
   .universe { display: none; }
+
+  // THE SCALER GOES TOO, AND WITH IT ITS FLOOR MESSAGE -- #545, 2026-09-04.
+  // Same argument as the toggle above, plus one of its own: a PRINTED PAGE IS
+  // THE RECIPE AS WRITTEN. The amounts on paper are whatever multiple happened
+  // to be in a box when the reader hit print, and a number box beside them
+  // would invite the reader to believe the sheet could still be changed. The
+  // control cannot be pressed on paper; the amounts it already wrote can, and
+  // do, print exactly as they stand.
+  .cocktail-scale,
+  .cocktail-scale-note { display: none; }
 }

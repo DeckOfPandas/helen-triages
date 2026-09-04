@@ -375,7 +375,41 @@ layout: default
      below. That case is gone and so is the assignment — an unread variable is
      the template equivalent of the dead selector it went with. {% endcomment %}
   {% if page.ingredients.size > 0 %}
-    <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
+    {% comment %} THE SCALER SITS ON THE INGREDIENTS HEADING'S OWN LINE — issue
+       #545, step one, 2026-09-04. It is a control over this section and nothing
+       else, so it belongs beside the section's name rather than at the top of
+       the page with `read it`/`make it` (which govern the whole page) or at the
+       bottom, where the issue first put it and where you would have to scroll
+       past the amounts to reach the thing that changes them.
+
+       `.cocktail-section-row` is the same shape `.cocktail-meta-row` gives the
+       meta panel and its shortlist button: a flex row, baseline-aligned, pushed
+       apart. One wrapper rather than a float, so the heading keeps its own
+       margins and its own rule mark.
+
+       MULTIPLES OF THE RECIPE AS WRITTEN — Helen, 2026-09-04. There is no
+       `serves:` field on a drink and this does not invent one: ×2 is twice what
+       the page says. `min` and `step` are set here for a reader with no
+       JavaScript-shaped opinion and RESET from the drink's own floor by
+       cocktail-scale.js, which is the only thing that knows the smallest
+       multiple this particular drink can be poured at.
+
+       `hidden` UNTIL THE SCRIPT REVEALS IT, the rule every JS-dependent control
+       on both sites follows — see the shortlist button above, and
+       assets/js/cocktail-scale.js's own header. {% endcomment %}
+    <div class="cocktail-section-row">
+      <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
+      <label class="cocktail-scale" hidden>
+        <span>make</span>
+        <input type="number" min="0.5" step="0.5" value="1" inputmode="decimal" aria-label="how many times the recipe">
+        <span>× the recipe</span>
+      </label>
+    </div>
+    {% comment %} The floor message, empty and hidden until a refusal fills it —
+       "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
+       paragraph of its own beneath the row rather than text inside the label,
+       so a long sentence cannot push the number box around. {% endcomment %}
+    <p class="cocktail-scale-note" hidden></p>
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
         {% comment %} THE GATE ASKS FOR THE FIELDS THIS BLOCK ACTUALLY RENDERS,
@@ -564,6 +598,20 @@ layout: default
    with no arrow loads no script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>
+{% comment %} THE SCALER, IN DEPENDENCY ORDER AND FOR A REASON — issue #545.
+   shopping-list.js is the AMOUNT PARSER (`HTF.shoppingList.parseAmount`, its
+   unit folding and its plural), scale.js is the arithmetic built on it, and
+   cocktail-scale.js is the wiring. Each reads the one before it off `HTF` at
+   parse time, so loaded the wrong way round the page throws once, silently,
+   and the control simply never appears. tests/test_site_config.py guards the
+   order -- the same trap as cook-schedule.js before cook-timer.js.
+
+   THE INDEX'S SHOPPING LIST AND THIS PAGE NOW SHARE THAT PARSER rather than
+   each carrying one, which is the whole reason this page loads a file named
+   after the shopping list. {% endcomment %}
+<script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/scale.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/cocktail-scale.js' | relative_url }}"></script>
 {% comment %} The glass-layout comparison switches lived here and are gone,
    along with their script: both questions are settled (margin, top-aligned)
    and the answers are the plain layout now. Deleted rather than left in

@@ -117,8 +117,15 @@
 
   /* The plural again, for display, and derived rather than stored: a total is
      only pluralised when it is not exactly one, and `ml`/`g` are never
-     pluralised at all because they are symbols rather than words. */
-  var SYMBOL_UNITS = { ml: true, g: true, cl: true, l: true, oz: true, '': true };
+     pluralised at all because they are symbols rather than words.
+
+     `each` JOINED THEM ON 2026-09-04. It is a word rather than a symbol, but it
+     is one that has no plural, and the sibilant rule below turns it into
+     `eaches` -- `9 each` cucumber wheels doubled printed `18 eaches`. Three
+     drinks are written with it (east river underground, la fee noir punch, porn
+     star martini), and the drink page's scaler (#545) multiplies exactly these
+     strings, so the wart showed up on a page rather than only in a total. */
+  var SYMBOL_UNITS = { ml: true, g: true, cl: true, l: true, oz: true, each: true, '': true };
 
   function unitLabel(unit, quantity) {
     if (SYMBOL_UNITS[unit]) return unit;

@@ -56,6 +56,9 @@ test('ml and g are never pluralised; words are, unless there is one', () => {
   assert.strictEqual(SL.unitLabel('dash', 1), 'dash');
   assert.strictEqual(SL.unitLabel('dash', 3), 'dashes');
   assert.strictEqual(SL.unitLabel('leaf', 6), 'leaves');
+  // `each` is a word with no plural, and the sibilant rule below would give it
+  // one -- `18 eaches`. Three drinks are written with it.
+  assert.strictEqual(SL.unitLabel('each', 18), 'each');
 });
 
 // --- totalling ----------------------------------------------------------------
