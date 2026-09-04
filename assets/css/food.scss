@@ -51,6 +51,13 @@
 @import "food/recipe-ingredients-method";
 @import "food/recipe-notes-body";
 @import "food/recipe-annotations";
+// The shortlist (#546). AFTER recipe-list, because `.recipe-list .btn-shortlist`
+// positions the control against the row layout that file defines; and after
+// category-labels, because its type is deliberately matched to
+// `.btn-clear-inline` there and the two should be read together. It defines its
+// own %shortlist-mark and @extends nothing from anywhere else, so this is the
+// only ordering constraint it has.
+@import "food/shortlist";
 // The about page, last: it sits on top of .recipe-body-content's longform
 // styling (that page uses the same wrapper) and overrides the parts built for a
 // recipe's Troubleshooting section, so it has to be imported after it.

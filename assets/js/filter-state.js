@@ -188,6 +188,24 @@
     // The meta filters (rewrite/proofread/short/draft), local builds only.
     meta: { empty: function () { return new Set(); }, narrows: true },
 
+    /* SHOW ONLY WHAT IS SHORTLISTED — GitHub issue #546. A boolean, and the
+       first one in this table that is a real filter rather than a
+       half-finished-search flag.
+
+       THE ANSWER IS NOT ON THE ROW, which is what makes this field different
+       from every other one here. `tags`, `star` and `meta` are all matched
+       against something the build wrote into the markup; whether a recipe is
+       shortlisted is a fact about THIS BROWSER, held in localStorage by
+       HTF.shortlist. rowMatchesFilters stays pure by being handed the answer
+       (`row.shortlisted`) rather than reaching for the store itself — the same
+       arrangement `familyMatch` already has for the ingredient index.
+
+       NARROWING, and clear-all DOES clear it. Both follow from it being an
+       ordinary filter: it hides rows, so the "searching" message must not
+       replace a shortlisted view; and `clear all` means "show me everything
+       again", which would be a lie if one filter survived it. */
+    shortlisted: { empty: function () { return false; }, narrows: true },
+
     /* The title search, folded and lowercased by filters.js before it lands
        here. NARROWING since 2026-08-16: a title search is a filter like any
        other, and the rows it has left are meaningful, so hiding them behind
@@ -263,6 +281,22 @@
     include: { empty: function () { return new Set(); }, narrows: true },
     exclude: { empty: function () { return new Set(); }, narrows: true },
     nameQuery: { empty: function () { return ''; }, narrows: true },
+
+    /* NO `shortlisted` FIELD HERE YET, and its absence is deliberate — #546.
+       The food table declares one because food/index.html has a shortlisted-only
+       button wired to it. This index does not, because the control that would
+       fill the list lives on a drink CARD, and the cards were being restyled
+       when this landed (2026-09-04). Declaring the field now would put a live-
+       looking fact in the one file whose entire job is to be the list nothing
+       reaches past — the same reason food/index.html's own comment gives for
+       deleting the data- attributes of four retired filters rather than leaving
+       them: "an attribute nothing reads is worse than one that is absent".
+
+       WHAT THE COCKTAIL HALF NEEDS, when the cards are free: `data-url` on the
+       card, a `.btn-shortlist` in its top-right, this field, one line in
+       matches(), and the `.btn-shortlist-only` button on the count line.
+       Everything else — the store, the wiring, the drink page's own toggle — is
+       already here and already works. */
 
     /* isSearching's two siblings, and they are here for the reason its own
        entry above gives: clear-all DOES empty these boxes and their candidate
@@ -418,6 +452,13 @@
        at all for a magic-bag row and needed three values to say so. */
     if (s.meta && typeof s.meta.has === 'function' &&
         s.meta.has('draft') && !r.isDraft) return false;
+
+    /* SHORTLISTED — #546. `row.shortlisted` is the caller's answer from
+       HTF.shortlist, not a data- attribute: the build cannot know what is in
+       this browser's localStorage. Asked here rather than in filters.js so that
+       it composes with everything above it by construction — shortlisted AND
+       make-ahead is one predicate, not two places that have to agree. */
+    if (s.shortlisted && !r.shortlisted) return false;
 
     if (s.ingredient) {
       var key = String(s.ingredient).replace(FAMILY_SUFFIX, '').trim();

@@ -33,6 +33,24 @@ layout: default
        markup assumes it did not. The PDF link beside it is an ordinary anchor
        and needs none of this. {% endcomment %}
     <div class="recipe-actions">
+      {% comment %} THE SHORTLIST TOGGLE, beside `print` -- Helen's placement,
+         2026-09-04, noting that this row "needs a redesign anyway". First in the
+         group rather than last: it is the only one of the three that changes
+         something rather than taking the page off the screen, and print/pdf are
+         a pair that should stay adjacent.
+
+         `hidden` FOR THE SAME REASON `.btn-print` IS, stated in the comment
+         above: it does nothing without its script, and a control that silently
+         fails is worse than no control. shortlist.js reveals it.
+
+         `page.url`, NOT `relative_url` -- the same key the index row for this
+         recipe emits, which is the whole reason the two agree. See
+         HTF.shortlist in assets/js/assets.js. {% endcomment %}
+      <button type="button"
+              class="btn-shortlist"
+              data-shortlist-key="{{ page.url }}"
+              aria-pressed="false"
+              hidden>shortlist</button>
       <button type="button" class="btn-print" hidden>print</button>
       {% comment %} Config-gated, not environment-gated, and the difference is
          the whole point. The PDFs are rendered from a finished build by

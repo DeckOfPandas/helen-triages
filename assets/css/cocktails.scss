@@ -44,6 +44,10 @@
 @import "cocktails/cocktail";
 @import "cocktails/cards";
 @import "cocktails/filters";
+// The shortlist (#546). AFTER cocktails/cocktail, which defines the
+// %cocktail-heading-face this file @extends and the `.cocktail-meta` whose
+// margin the meta row takes over. It has no other ordering constraint.
+@import "cocktails/shortlist";
 // Universe sits right after filters: it draws the panel it dealt above, and
 // its three cloned parts (.drink-card-name, .drink-card-ingredients,
 // .drink-card-moods) are styled by rules cards already defines.

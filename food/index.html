@@ -250,6 +250,34 @@ permalink: /food/
    live as filters change. {% endcomment %}
 <div class="results-heading">
   <span class="category-label"><span class="category-label-text" id="recipe-count">{{ _rendered_recipes.size }} survivor{% unless _rendered_recipes.size == 1 %}s{% endunless %}</span></span>
+
+  {% comment %} THE SHORTLISTED-ONLY VIEW -- GitHub issue #546's second half,
+     "see a list of recipes they've shortlisted".
+
+     NO SEPARATE PAGE, AND THAT IS THE DESIGN RATHER THAN THE CHEAP OPTION. This
+     index already renders every row, already filters, counts and paginates
+     them, and already knows how to combine filters -- so "shortlisted" is one
+     more predicate over rows the page is holding anyway, and it composes:
+     shortlisted AND make-ahead is a question you can now ask. The alternative,
+     a page rendered from the stored list, needs a second copy of the row markup
+     and has to decide what to do about an entry whose recipe has been renamed
+     or held back by the publish gate. Here that entry simply has no row on the
+     page and silently is not in the list, which is the correct answer arrived
+     at by doing nothing.
+
+     NOT IN `META FILTERS` ABOVE, deliberately: that whole block is gated on
+     `show_source_wording` and so is local-only, and a shortlist is the one
+     filter here that exists for a visitor rather than for Helen. It sits on the
+     count instead, because "how many are showing" is the same kind of fact.
+
+     SHIPS `hidden`. It needs shortlist.js like every other control does, and it
+     is revealed by the same pass -- `[data-shortlist-count]` inside it is what
+     that pass fills in. {% endcomment %}
+  <button type="button"
+          class="btn-shortlist-only"
+          id="shortlist-only"
+          aria-pressed="false"
+          hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
 </div>
 
 <ul class="recipe-list">
@@ -414,7 +442,18 @@ permalink: /food/
           {% assign _all_ing = _all_ing | append: _name | append: "|" %}
         {% endunless %}
       {% endfor %}
-      <li data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}" data-meta-draft="{{ is_draft }}">
+      {% comment %} `data-url` IS THE SHORTLIST'S KEY — GitHub issue #546, and it
+         is `recipe.url` rather than the `relative_url` the title link below
+         carries. The baseurl is deployment configuration; a stored list built
+         with it in the key would read as empty the day it changed, and the key
+         a row emits would differ from the key that recipe's own page emits.
+         HTF.shortlist's comment in assets/js/assets.js has the full argument.
+
+         An attribute on the row rather than a querySelector for the button
+         inside it: filters.js asks this question once per row per filter pass,
+         and its own `titleFolded` comment is about exactly that cost.
+      {% endcomment %}
+      <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}" data-meta-draft="{{ is_draft }}">
 
         <div class="recipe-row-content">
         <a class="recipe-title-link" href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
@@ -479,6 +518,30 @@ permalink: /food/
           </div>
         </div>
         </div>
+
+        {% comment %} THE SHORTLIST TOGGLE, at the right-hand end of the row --
+           Helen's placement, 2026-09-04. A sibling of `.recipe-row-content`
+           rather than something inside it: the `<li>` is already a flex row and
+           the content block already takes `flex: 1`, so this needs no
+           positioning of its own and a long ingredient line pushes against it
+           instead of running underneath it. That is the same property
+           `.recipe-actions` relies on beside a recipe title.
+
+           `hidden` UNTIL shortlist.js REVEALS IT, exactly as `.btn-print` does
+           on the recipe page, and for the reason stated there: a control that
+           silently fails is worse than no control, and CSS cannot ask whether
+           JavaScript ran.
+
+           THE ACCESSIBLE NAME CARRIES THE TITLE, the visible one does not. 86
+           buttons all named "shortlist" is a useless list to navigate by, and
+           the visible word has to stay short and fixed -- see shortlist.js on
+           why it never changes. {% endcomment %}
+        <button type="button"
+                class="btn-shortlist"
+                data-shortlist-key="{{ recipe.url }}"
+                aria-label="shortlist {{ recipe.title }}"
+                aria-pressed="false"
+                hidden>shortlist</button>
       </li>
     {% endif %}
   {% endfor %}

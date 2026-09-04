@@ -1,0 +1,102 @@
+// =============================================================================
+// THE SHORTLIST — GitHub issue #546, the drinks side.
+// =============================================================================
+// ONE CONTROL HERE SO FAR, and the gap is deliberate rather than unfinished.
+// `.btn-shortlist` marks one drink, and on this site it appears on the drink
+// PAGE only: the index's own toggle belongs in a card's top-right corner, and
+// the cards were being restyled elsewhere when this landed (2026-09-04). The
+// index's `.btn-shortlist-only` waits with it, because a filter over a list you
+// cannot add to from that list is half a control. Food carries both today —
+// _sass/food/_shortlist.scss — and the store, the wiring and the event are
+// already shared, so the cocktail half is markup, one field and two rules.
+//
+// GREY OFF, COSMIC COSMOPOLITAN ON — Helen, 2026-09-04: "Text and active colour
+// cosmic-cosmopolitan on cocktails because it's a thing the user is choosing and
+// that's the language", and "Grey for inactive". Neither is a new value.
+// $color-clear-text is $color-grey-mid, this site's de-emphasised UI text at
+// 6.50:1 on the ground; magenta is already what this site means by a reader's
+// choice — a matched ingredient, a matched mood chip, a title under the cursor.
+//
+// -deep FOR THE TEXT, and the two are the same hex today. _palette.scss keeps
+// the pair apart on purpose (`rule` vs `text`, the latter measured at 5.18:1 on
+// a card) so that lightening one for a rule cannot silently drop a text colour
+// below contrast. Naming the text member here is what keeps that true.
+//
+// THE WORD NEVER CHANGES AND THE MARK DOES — the full reasoning is in
+// _sass/food/_shortlist.scss and in shortlist.js. Both sites draw it the same
+// way; only the colours differ, which is the whole shape of this repo's split.
+// =============================================================================
+
+.btn-shortlist {
+  // Matched to `.cocktail-toggle-label` — the read-it/make-it pair this control
+  // is aligned with on the drink page (Helen's placement: "maybe horizontally
+  // aligned with read it / make it"). Same face, same size, same tracking, so
+  // the two read as one row of controls rather than two designs that happen to
+  // share an edge.
+  @extend %cocktail-heading-face;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+
+  color: $color-clear-text;
+  transition: color 0.12s ease-in-out;
+
+  // A fixed box for the mark, so `+` and `✓` cannot lay the word out
+  // differently. Courier is monospaced and would not need this; the rule is
+  // here anyway because the mark's own size and spacing should not depend on
+  // which face the label happens to inherit.
+  &::before {
+    content: '+';
+    display: inline-block;
+    width: 0.85em;
+    margin-right: 0.25em;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  &:hover,
+  &:focus-visible { color: $color-cosmic-cosmopolitan; }
+
+  &.is-on {
+    color: $color-cosmic-cosmopolitan-deep;
+    // Bold, matching `.cocktail-toggle-label.is-active` beside it: on this page
+    // an active control is its colour AND its weight, and half of that
+    // convention would read as a different kind of state.
+    font-weight: 700;
+
+    &::before { content: '\2713'; }   // ✓ U+2713
+  }
+}
+
+// --- The drink page's meta row -----------------------------------------------
+// The `<dl>` of glass / garnish / ship it?, with the shortlist toggle pushed to
+// the same right edge the read-it/make-it toggle sits on. Both are children of
+// `.cocktail-head-words`, so the two controls share a column by construction
+// rather than by a number either file would have to keep in step.
+//
+// `align-items: flex-start` and NOT baseline: the `<dl>`'s first baseline is its
+// dt row (GLASS, 0.72rem), and aligning a 0.78rem control to it would sit the
+// button on the labels rather than at the top of the block. Helen asked for the
+// top right of the panel, which is what flex-start gives.
+//
+// The gap is $space-xl rather than the list's own 5rem: that value was chosen to
+// hold three facts apart from each other, and this is not a fourth fact.
+.cocktail-meta-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-xl;
+
+  // The list already carries the bottom margin that separates the head from the
+  // ingredients, and it is still the thing that should carry it — the row is a
+  // layout wrapper, not a block in its own right.
+  .cocktail-meta { margin-bottom: 0; }
+  margin: 0 0 $space-md;
+
+  .btn-shortlist { flex-shrink: 0; }
+}
