@@ -70,10 +70,10 @@ Here are four ways the emulsion can fail:
    - **Insufficient violence.** You didn't whisk enough. If you don't break the fat into microscopic droplets, large droplets slide past each other, and the sauce will never thicken.
 
 3. **Curdling** *a lumpy, grainy texture like wet sand*
-   - **Your bain-marie was too hot.** Eggs start to coagulate permanently at about 70°C. Note the word "permanently", and the scary proximity to the safety danger zone.
+   - **Your bain-marie was too hot.** Eggs start to coagulate permanently at about 70°C. Note the word "permanently". And how close that is to the 63°C you're holding it above.
 
 4. **Overcooking** *a stodgy, gluey sauce that stands up like wallpaper paste*
-   - **You used too little acid, or over-clarified butter.** There was nothing but fat and protein left to do the work, so the sauce set thick and pasty instead of staying pourable.
+   - **You used too little acid, especially with clarified butter.** There was nothing but fat and protein left to do the work, so the sauce set thick and pasty instead of staying pourable.
    - **Your heart wanted to make scrambled eggs instead.** You followed misplaced advice to slowly warm the egg yolks over low heat before adding the butter. The cooked proteins lost the flexibility to stretch and coat the fat droplets properly, so instead of smooth thickening you got weird blancmange.
 
 <h2 class="recipe-section-heading"><span class="section-heading-text">A Final Warning</span></h2>
