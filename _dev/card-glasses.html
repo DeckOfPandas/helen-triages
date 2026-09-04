@@ -205,7 +205,10 @@ sitemap: false
   .dev-card-cell { margin: 0; }
   /* The panel is the full width of the swatch card, so what you see is the
      panel and nothing else -- a real card's words would only be noise here. */
-  .dev-card { width: 7.6rem; }
+  /* The column's own value, not a copy of it — this page's whole claim is
+     that it uses the site's CSS rather than a reproduction, and a hardcoded
+     7.6rem went stale the moment the column narrowed to 6.5rem (2026-09-04). */
+  .dev-card { width: var(--card-text-x); }
   .dev-card-label { font-size: 0.72rem; line-height: 1.45; margin: 0.45rem 0 0; }
   .dev-cheat, .dev-height { font-family: var(--dev-mono, monospace); font-size: 0.68rem; }
   .dev-note { font-size: 0.72rem; line-height: 1.5; max-width: 30ch; margin: 0.5rem 0 0; opacity: 0.75; }

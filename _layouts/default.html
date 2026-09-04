@@ -364,6 +364,29 @@
      header. {% endcomment %}
   <script src="{{ '/assets/js/last-line-rule.js' | relative_url }}"></script>
 
+  {% comment %} card-name-fit.js decides, per drink name, whether a name that
+     does not fit its tape should step down one size or wrap to two lines —
+     design audit critical #9, DESIGN_PLAN §3 item 5, Helen 2026-09-04: "shrink
+     when it's just one short-ish word too long, then two lines where it's more
+     than that."
+
+     LOADED FROM THE SHARED LAYOUT for exactly the reason last-line-rule.js
+     above is: it is site-agnostic, queries `.drink-card-name` and returns
+     having done nothing on a page with none. Food has none.
+
+     AFTER assets.js — the one hard ordering rule
+     (tests/test_site_config.py::test_assets_js_loads_before_any_other_script)
+     — because it hangs HTF.fitCardNames() off the namespace assets.js creates.
+     It degrades rather than throws if that is absent, but the hook is how a
+     later-appended card gets measured.
+
+     It measures rendered widths, so it must run with the elements laid out,
+     and AFTER {{ content }}'s own scripts: cocktails/index.html loads
+     universe.js, which deals a cloned card above the filter panel. Running
+     below it means the first deal is measured by this file's own load pass;
+     every later "deal again" calls HTF.fitCardNames() itself. {% endcomment %}
+  <script src="{{ '/assets/js/card-name-fit.js' | relative_url }}"></script>
+
   {% comment %} #477's comparison switch lived here and is gone: Helen looked
      at the wordmark matched to page headings and kept the old one. The
      difference is deliberate now, and the reasoning is recorded beside the

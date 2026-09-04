@@ -110,6 +110,28 @@
     }
 
     section.hidden = false;
+
+    // THE PICK IS A WIDER CARD, SO IT NEEDS ITS OWN MEASUREMENT. Cloning
+    // copies the source card's classes, and `drink-card-name--step` /
+    // `--wrap` are MEASURED classes rather than facts about the drink — they
+    // say "this name did not fit in a 370px card", which is not the question
+    // being asked in the pick's roomier column. A cloned wrap would put a
+    // two-line tape on a card with space for one line; a cloned step would
+    // shrink a name that fits.
+    //
+    // So the pass is re-run over the whole page after every deal, which
+    // re-measures the fresh clone from its base state and leaves every card in
+    // the list on its own answer. Guarded twice because this file is
+    // site-agnostic and loads on pages that have neither the namespace nor the
+    // script: food's clones have no `.drink-card-name` in them at all.
+    //
+    // ON THE PAGE'S FIRST DEAL THE HELPER IS NOT THERE YET, and that is fine
+    // for the same reason the tape slot above is: card-name-fit.js loads at the
+    // end of default.html, below this page's own scripts, and its own load pass
+    // measures the just-dealt pick along with every card. This call is what
+    // covers every LATER deal, when "deal again" appends a clone long after
+    // that pass has run — the same two-halves story the tape line tells.
+    if (window.HTF && window.HTF.fitCardNames) window.HTF.fitCardNames();
   }
 
   if (again) again.addEventListener('click', deal);
