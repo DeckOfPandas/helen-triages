@@ -154,8 +154,10 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    hit title wears a highlighter. Cobalt deleted; LEAVE OUT keeps the violet
    rule alone, grey, like cocktails. `food/_palette.scss`,
    `food/_category-labels.scss`, `food/_buttons.scss`.
-7. **The card's green bottom rule reads as a progress bar** (refinement).
-   Span the card at rest, or run it vertically along the column's inner edge.
+7. ~~The card's green bottom rule reads as a progress bar~~ **Done
+   2026-09-04**: four treatments on the real index; Helen, "Agree, no mark,
+   end of." Nothing at rest, since the absinthe glass already carries the
+   column's green; the magenta brackets stay hover-only. `cocktails/_cards.scss`.
 8. **Tablet.** Nothing in this review was seen on an iPad. Breakpoints: 400,
    600, 720, 820, 1180. She cooks and mixes at 1024 landscape and 768
    portrait; the drink page's inline-glass layout below 1180 is the least

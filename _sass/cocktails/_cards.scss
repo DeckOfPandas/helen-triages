@@ -200,7 +200,19 @@ $card-glass-scale: 10.4rem;
 // the card -- which read as a pale green while there was a green PANEL beside
 // it to belong to. With the panel gone this is the only green on a resting card
 // and a diluted one looks like a leftover rather than a mark.
-.drink-card::after       { bottom: -1px; background: $color-electric-absinthe-deep; }
+//
+// AND NOTHING AT REST SINCE 2026-09-04 -- the design audit's refinement,
+// DESIGN_PLAN §3.7: "The card's green mark reads as a progress bar stuck at
+// 18 percent... in a grid of twelve it looks like loading indicators." Four
+// treatments went on the real index (the dash, a full-width baseline, a
+// vertical rule on the column's inner edge, nothing) and Helen: "Agree, no
+// mark, end of." The reasoning that survives from the paragraph above is why
+// this is right rather than merely quieter: the glass itself has drawn in
+// absinthe since 2026-09-02, so every column already carries the home colour,
+// and a dash beneath it was a second, smaller green thing saying the same
+// thing. The strip stays in the DOM, transparent, because it is the hover's
+// lower bracket; only its resting colour is gone.
+.drink-card::after       { bottom: -1px; background: transparent; }
 
 // HOVER: the two marks bracket the glass column, top and bottom.
 // Helen asked for "a very subtle lightening of the white part of the
@@ -211,6 +223,8 @@ $card-glass-scale: 10.4rem;
 // HOVER BRACKETS THE COLUMN IN MAGENTA, REST KEEPS THE GREEN -- Helen,
 // 2026-09-02: "for mouseover on the cocktail cards the top and bottom borders
 // of the glass panel should be pink. Leave the green bottom border at rest."
+// (The green at rest went on 2026-09-04, see above; the brackets are now the
+// only mark the strips paint, and they still appear only under the cursor.)
 //
 // The two colours are now saying two different things rather than one thing at
 // two strengths, which is what green-to-brighter-green was. Green at rest is
