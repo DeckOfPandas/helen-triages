@@ -100,6 +100,22 @@
     display: none;
   }
 
+  // The shortlist's controls are furniture, not content — GitHub issue #546,
+  // and the same judgement `.cocktail-toggle` gets in cocktails/_print.scss:
+  // a control that cannot be pressed on paper. Both classes, because both
+  // exist on both sites (a row's or a card's toggle, and the index's
+  // shortlisted-only filter), and HERE rather than in either site's own
+  // partial for exactly that reason.
+  //
+  // The recipe page's one is already covered by `.recipe-actions` in
+  // food/_print.scss and is listed anyway: that rule hides the box this
+  // happens to sit in, and a control moving out of it should not silently
+  // start printing.
+  .btn-shortlist,
+  .btn-shortlist-only {
+    display: none;
+  }
+
   // <main>'s padding holds the content off the window edge; @page's margin
   // above does that job on paper, and keeping both would inset the text by
   // roughly 30mm a side. The width cap goes for the same reason — the sheet

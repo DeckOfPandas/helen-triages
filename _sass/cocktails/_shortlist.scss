@@ -1,0 +1,203 @@
+// =============================================================================
+// THE SHORTLIST — GitHub issue #546, the drinks side.
+// =============================================================================
+// Three controls:
+//
+//   .btn-shortlist          marks one drink, on the drink page's meta row
+//   .btn-shortlist--card    the same control in a card's top-right corner
+//   .btn-shortlist-only     shows only what is marked, on the count line
+//
+// Food's twin of all three is _sass/food/_shortlist.scss, and the store, the
+// wiring and the event are shared — only the colours and the card differ.
+//
+// GREY OFF, COSMIC COSMOPOLITAN ON — Helen, 2026-09-04: "Text and active colour
+// cosmic-cosmopolitan on cocktails because it's a thing the user is choosing and
+// that's the language", and "Grey for inactive". Neither is a new value.
+// $color-clear-text is $color-grey-mid, this site's de-emphasised UI text at
+// 6.50:1 on the ground; magenta is already what this site means by a reader's
+// choice — a matched ingredient, a matched mood chip, a title under the cursor.
+//
+// -deep FOR THE TEXT, and the two are the same hex today. _palette.scss keeps
+// the pair apart on purpose (`rule` vs `text`, the latter measured at 5.18:1 on
+// a card) so that lightening one for a rule cannot silently drop a text colour
+// below contrast. Naming the text member here is what keeps that true.
+//
+// THE WORD NEVER CHANGES AND THE MARK DOES — the full reasoning is in
+// _sass/food/_shortlist.scss and in shortlist.js. Both sites draw it the same
+// way; only the colours differ, which is the whole shape of this repo's split.
+// =============================================================================
+
+.btn-shortlist {
+  // Matched to `.cocktail-toggle-label` — the read-it/make-it pair this control
+  // is aligned with on the drink page (Helen's placement: "maybe horizontally
+  // aligned with read it / make it"). Same face, same size, same tracking, so
+  // the two read as one row of controls rather than two designs that happen to
+  // share an edge.
+  @extend %cocktail-heading-face;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+
+  color: $color-clear-text;
+  transition: color 0.12s ease-in-out;
+
+  // A fixed box for the mark, so `+` and `✓` cannot lay the word out
+  // differently. Courier is monospaced and would not need this; the rule is
+  // here anyway because the mark's own size and spacing should not depend on
+  // which face the label happens to inherit.
+  &::before {
+    content: '+';
+    display: inline-block;
+    width: 0.85em;
+    margin-right: 0.25em;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  &:hover,
+  &:focus-visible { color: $color-cosmic-cosmopolitan; }
+
+  &.is-on {
+    color: $color-cosmic-cosmopolitan-deep;
+    // Bold, matching `.cocktail-toggle-label.is-active` beside it: on this page
+    // an active control is its colour AND its weight, and half of that
+    // convention would read as a different kind of state.
+    font-weight: 700;
+
+    &::before { content: '\2713'; }   // ✓ U+2713
+  }
+}
+
+// --- The drink page's meta row -----------------------------------------------
+// The `<dl>` of glass / garnish / ship it?, with the shortlist toggle pushed to
+// the same right edge the read-it/make-it toggle sits on. Both are children of
+// `.cocktail-head-words`, so the two controls share a column by construction
+// rather than by a number either file would have to keep in step.
+//
+// `align-items: flex-start` and NOT baseline: the `<dl>`'s first baseline is its
+// dt row (GLASS, 0.72rem), and aligning a 0.78rem control to it would sit the
+// button on the labels rather than at the top of the block. Helen asked for the
+// top right of the panel, which is what flex-start gives.
+//
+// The gap is $space-xl rather than the list's own 5rem: that value was chosen to
+// hold three facts apart from each other, and this is not a fourth fact.
+.cocktail-meta-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-xl;
+
+  // The list already carries the bottom margin that separates the head from the
+  // ingredients, and it is still the thing that should carry it — the row is a
+  // layout wrapper, not a block in its own right.
+  .cocktail-meta { margin-bottom: 0; }
+  margin: 0 0 $space-md;
+
+  .btn-shortlist { flex-shrink: 0; }
+}
+
+// =============================================================================
+// ON A CARD — the mark alone, in the top-right corner
+// =============================================================================
+// Helen's placement, 2026-09-04, with her own reservation recorded: "I'm not
+// confident it should get this prime spot, but I can't think where else it
+// would go." The other three corners are taken and were taken first: the ship
+// mark owns the bottom-right and has since this design was settled, the chips
+// own the foot's left, and the title owns the top-left.
+//
+// IT SHARES THE SHIP'S RIGHT EDGE. `.drink-card-foot` is pinned at
+// `right: $card-pad-x`, so pinning this to the same value gives the card a
+// second fixed anchor in the same column rather than a control floating near a
+// corner. That is _cards.scss's whole opening argument, applied to a new object.
+//
+// NO WORD, AND IT IS THE ONE PLACEMENT OF FOUR THAT DROPS IT. Helen asked for
+// text and it is text on the other three, because there the text is free. Here
+// it is not: the tape runs to within 0.3rem of the card's right edge, so
+// anything in this corner is paid for out of the title, and the reservation
+// below has to cover the bleed as well as the control. The mark alone costs
+// about 2.16rem of a 16.4rem tape. `+ shortlist` in this face would cost about
+// 7.5rem — nearly half the name, on a card whose title already has to shrink or
+// wrap to fit. The button carries a real `aria-label` naming the drink, so what
+// it is CALLED is not lost, only what it is captioned.
+//
+// A FIXED-WIDTH CONTROL IS A REQUIREMENT HERE, NOT A PREFERENCE. Every anchor
+// on a card is meant to be in the same place on every card; a mark that changed
+// width between its two states would move this one the moment it was pressed.
+// `+` and `✓` are both drawn in a box of the same declared width, so it cannot.
+.btn-shortlist--card {
+  position: absolute;
+
+  // Bigger than the drink page's, which is a 0.78rem label sitting in a row of
+  // labels. This is a lone mark with no word beside it to lend it weight, and
+  // at the page's size it read as a stray character rather than a control.
+  font-size: 0.95rem;
+  line-height: 1;
+
+  // A HIT AREA ROUND THE MARK, AND THE OFFSETS PAY FOR IT SO THE MARK DOES NOT
+  // MOVE. One glyph at 0.95rem is about 15px square — a fine thing to look at
+  // and a poor thing to hit with a thumb, which is how this index is most
+  // likely to be read. The padding takes the target to roughly 25px without
+  // making the mark bigger, and subtracting the same value from `top` and
+  // `right` keeps the glyph on the anchor it shares with the ship mark below.
+  // The reservation further down adds this back on the LEFT, which is the only
+  // side where the enlarged box can reach the tape.
+  padding: $space-xs;
+  top: calc(#{$card-pad-y} - #{$space-xs});
+  right: calc(#{$card-pad-x} - #{$space-xs});
+
+  // The mark IS the button here, so the trailing margin that separates it from
+  // a word would sit the glyph off-centre in its own hit area.
+  &::before { margin-right: 0; }
+}
+
+// --- What the corner costs the title -----------------------------------------
+// The tape bleeds RIGHT by $card-tape-bleed-right into the card's own padding,
+// so its right edge sits 0.3rem inside the border — CLOSER to the border than
+// the button, whose right edge is at $card-pad-x. Without this reservation the
+// longest names do not merely touch the button, they run clean under it.
+//
+// THE BLEED IS ADDED, NOT SUBTRACTED, and getting that backwards is the easy
+// mistake here: the tape starts 0.85rem further right than the box this padding
+// shrinks, so the reservation has to cover the button, the gap AND the bleed.
+// Stated as a calculation from the same three tokens the collision is made of
+// rather than as a rounded literal, so moving any of them moves this with it:
+//
+//     mark box (0.85em at 0.95rem) + the hit area's own padding on the side
+//     that faces the tape + the gap it needs + the bleed it starts beyond
+//
+// WHAT IT COMES TO, because a fixed-height, fixed-anchor card should have its
+// costs written down: about 2.46rem. On the grid's minimum 370px card the title
+// column is 14.5rem and the tape may be 16.4rem wide, so this is 15% of the
+// tape — four or five characters of Courier at the base size. MEASURED against
+// the real 124 titles rather than estimated (tmp/measure_card_titles.py, and
+// the numbers are here because the script is scratch): at that narrowest width
+// 98 of the 124 names still sit on one line, 16 step down and 10 wrap. 22
+// change treatment — 16 from one line to a step, which is the state Helen chose
+// precisely because nobody can see it, and 6 from a step to a two-line tape.
+// Wider cards change fewer, and most of the collection is nowhere near the
+// limit: the median name is 14 characters against 18.8 that fit.
+//
+// NOTHING IS EVER CUT, which is the guarantee that rule was written to give and
+// which this does not weaken.
+//
+// SCOPED TO `.drink-cards`, NOT TO `.drink-card`. `.universe-pick` also carries
+// `drink-card` and universe.js clones a card's body into it — but it clones
+// `.drink-card-body, .drink-card-foot` only, so the pick has no button in its
+// corner and must not reserve room for one.
+//
+// AND `.drink-card-name`, NOT the body: the ingredient line below has the full
+// width and should keep it. Only the object that collides pays.
+//
+// card-name-fit.js NEEDS NO CHANGE FOR THIS, which is why the width is bought
+// here rather than anywhere cleverer. That script measures the tape word's real
+// `clientWidth`, and this narrows exactly that box — so a name that no longer
+// fits steps down or wraps by the rule Helen chose on the same day, with
+// nothing to keep in step and no second idea of how wide a title may be.
+.drink-cards .drink-card-name {
+  padding-right: calc(0.85 * 0.95rem + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right});
+}

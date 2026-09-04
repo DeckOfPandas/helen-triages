@@ -272,6 +272,29 @@ permalink: /cocktails/
        cards below. Ids on the two elements above are untouched: this is
        static, and cocktail-index.js never looks for it. {% endcomment %}
     <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
+
+    {% comment %} THE SHORTLISTED-ONLY VIEW -- #546, and food/index.html carries
+       the twin of this on its own results heading, with the full argument for
+       why it is a filter on this index rather than a page of its own.
+
+       ON THE COUNT LINE ON BOTH SITES, which is the only placement that has the
+       same shape here as it does there: this page's filters are five labelled
+       sections with their own clear links, and a sixth section holding one
+       button that is not about a drink's properties at all would read as one.
+       "How many are showing" is the fact it belongs beside, and it is the
+       number this button changes.
+
+       THE WORD IS AFFORDABLE HERE, unlike on a card: this line has room, and
+       the control has to say what it does rather than only mark a state.
+
+       SHIPS `hidden`, and cocktail-index.js reveals it rather than shortlist.js
+       -- the same rule as every other control here, applied to the script that
+       actually wires it. {% endcomment %}
+    <button type="button"
+            class="btn-shortlist-only"
+            id="shortlist-only"
+            aria-pressed="false"
+            hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
   </p>
 
   <ul class="drink-cards">
@@ -348,7 +371,14 @@ permalink: /cocktails/
          two must stay in step. {% endcomment %}
       {% capture searchable %}{% for ing in drink.ingredients %}{% assign gcount = 0 %}{% assign hcount = 0 %}{% for g in ing.generic %}{% assign gcount = gcount | plus: 1 %}{% if not_on_cards contains g %}{% assign hcount = hcount | plus: 1 %}{% endif %}{% endfor %}{% unless gcount > 0 and gcount == hcount %}{% for g in ing.generic %}{{ g }}|{% assign dn = card_names[g] %}{% if dn %}{{ dn }}|{% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }}|{% endfor %}{% endunless %}{% endfor %}{% endcapture %}
 
+      {% comment %} `data-url` IS THE SHORTLIST'S KEY -- #546, `drink.url` and not
+         its `relative_url`, for the reason HTF.shortlist gives in
+         assets/js/assets.js: the baseurl is deployment configuration, and a key
+         carrying it would neither survive a change to it nor match the key this
+         drink's own page emits. food/index.html's row carries the same
+         attribute for the same reason. {% endcomment %}
       <li class="drink-card"
+          data-url="{{ drink.url }}"
           data-ship="{{ ship }}"
           data-chaos="{{ chaos }}"
           data-moods="{% for m in drink.mood %}{{ m }}|{% endfor %}"
@@ -513,6 +543,41 @@ permalink: /cocktails/
              old comment stands. {% endcomment %}
           <span class="drink-card-ship">{% include cocktails/ship.html ship=ship %}</span>
         </div>
+
+        {% comment %} THE SHORTLIST TOGGLE, top-right -- #546, Helen's placement
+           (2026-09-04) with her own reservation recorded: "I'm not confident it
+           should get this prime spot, but I can't think where else it would go."
+           The bottom-right is the ship mark's; the foot's left is the chips'.
+           It shares the ship's right edge ($card-pad-x), so the card gains one
+           more fixed anchor rather than a floating control.
+
+           THE MARK ALONE HERE, WITHOUT THE WORD, and it is the only one of the
+           four placements that drops it. The word is not free on a card: the
+           tape runs to within 0.3rem of the card's right edge, so anything in
+           this corner is paid for out of the title. The mark and its hit area
+           cost about 2.46rem of a 16.4rem tape on the grid's minimum card;
+           `+ shortlist` would cost about 7.8rem, nearly half the name. Helen
+           asked for text,
+           so it is text at all three placements where text is affordable; here
+           it is the mark plus a real `aria-label` naming the drink.
+
+           IT COMPOSES WITH card-name-fit.js FOR FREE, which is why the width is
+           reserved by padding on `.drink-card-name` rather than by anything
+           cleverer: that script measures the tape word's real box, so a name
+           that no longer fits the narrowed box steps down or wraps by the rule
+           Helen chose on 2026-09-04, with no change to it and nothing to keep
+           in step.
+
+           LAST IN THE MARKUP, ABSOLUTELY POSITIONED IN THE CSS -- the card's
+           own habit, as `.drink-card-foot` does. Last so the tab order runs
+           name, ingredients, chips, then this, rather than putting a secondary
+           control ahead of the drink's own link. {% endcomment %}
+        <button type="button"
+                class="btn-shortlist btn-shortlist--card"
+                data-shortlist-key="{{ drink.url }}"
+                aria-label="shortlist {{ drink.title }}"
+                aria-pressed="false"
+                hidden></button>
       </li>
     {% endfor %}
   </ul>

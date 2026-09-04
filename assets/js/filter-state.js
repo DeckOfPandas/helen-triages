@@ -188,6 +188,24 @@
     // The meta filters (rewrite/proofread/short/draft), local builds only.
     meta: { empty: function () { return new Set(); }, narrows: true },
 
+    /* SHOW ONLY WHAT IS SHORTLISTED — GitHub issue #546. A boolean, and the
+       first one in this table that is a real filter rather than a
+       half-finished-search flag.
+
+       THE ANSWER IS NOT ON THE ROW, which is what makes this field different
+       from every other one here. `tags`, `star` and `meta` are all matched
+       against something the build wrote into the markup; whether a recipe is
+       shortlisted is a fact about THIS BROWSER, held in localStorage by
+       HTF.shortlist. rowMatchesFilters stays pure by being handed the answer
+       (`row.shortlisted`) rather than reaching for the store itself — the same
+       arrangement `familyMatch` already has for the ingredient index.
+
+       NARROWING, and clear-all DOES clear it. Both follow from it being an
+       ordinary filter: it hides rows, so the "searching" message must not
+       replace a shortlisted view; and `clear all` means "show me everything
+       again", which would be a lie if one filter survived it. */
+    shortlisted: { empty: function () { return false; }, narrows: true },
+
     /* The title search, folded and lowercased by filters.js before it lands
        here. NARROWING since 2026-08-16: a title search is a filter like any
        other, and the rows it has left are meaningful, so hiding them behind
@@ -263,6 +281,13 @@
     include: { empty: function () { return new Set(); }, narrows: true },
     exclude: { empty: function () { return new Set(); }, narrows: true },
     nameQuery: { empty: function () { return ''; }, narrows: true },
+
+    /* The same field the food table declares, and it means the same thing on
+       both sites — see FIELD_SPEC's own note for why the answer arrives on the
+       row rather than being looked up here. The two tables stay separate
+       because the two indexes ask genuinely different questions; this is one of
+       the few they both ask. */
+    shortlisted: { empty: function () { return false; }, narrows: true },
 
     /* isSearching's two siblings, and they are here for the reason its own
        entry above gives: clear-all DOES empty these boxes and their candidate
@@ -418,6 +443,13 @@
        at all for a magic-bag row and needed three values to say so. */
     if (s.meta && typeof s.meta.has === 'function' &&
         s.meta.has('draft') && !r.isDraft) return false;
+
+    /* SHORTLISTED — #546. `row.shortlisted` is the caller's answer from
+       HTF.shortlist, not a data- attribute: the build cannot know what is in
+       this browser's localStorage. Asked here rather than in filters.js so that
+       it composes with everything above it by construction — shortlisted AND
+       make-ahead is one predicate, not two places that have to agree. */
+    if (s.shortlisted && !r.shortlisted) return false;
 
     if (s.ingredient) {
       var key = String(s.ingredient).replace(FAMILY_SUFFIX, '').trim();

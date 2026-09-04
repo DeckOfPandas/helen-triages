@@ -255,6 +255,20 @@ layout: default
          may be absent (`QQ`, "who knows"), and the include below renders that
          correctly as an icon with no word rather than an empty line, so there
          is nothing to gate here. {% endcomment %}
+      {% comment %} THE META PANEL AND THE SHORTLIST TOGGLE ON ONE ROW -- Helen's
+         placement, 2026-09-04: the toggle at "the top right of the metadata
+         panel on cocktail pages, maybe horizontally aligned with read it / make
+         it". It is aligned with them, and by construction rather than by a
+         number: this wrapper and `.cocktail-title-row` are both children of
+         `.cocktail-head-words` and both push their right-hand item to the same
+         edge, so the two controls share a column with nothing to keep in step.
+
+         A WRAPPER RATHER THAN A FOURTH ITEM INSIDE THE `<dl>`. The list is three
+         facts about the drink with a 5rem gap between them, chosen by Helen on
+         the real page; a control dropped into that flex row would inherit the
+         gap, wrap with the facts on a narrow screen, and claim to be a fourth
+         thing the drink IS. {% endcomment %}
+      <div class="cocktail-meta-row">
       <dl class="cocktail-meta">
         {% if page.glass.size > 0 %}
           <div><dt>Glass</dt><dd>{{ page.glass | join: " or " }}</dd></div>
@@ -269,6 +283,18 @@ layout: default
         {% endcomment %}
         <div><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
       </dl>
+
+        {% comment %} `page.url`, NOT `relative_url` -- the same key this drink's
+           own index card emits, which is what makes the card and this page agree
+           about whether it is shortlisted. See HTF.shortlist in
+           assets/js/assets.js. `hidden` until shortlist.js reveals it, the rule
+           every JS-dependent control on both sites follows. {% endcomment %}
+        <button type="button"
+                class="btn-shortlist"
+                data-shortlist-key="{{ page.url }}"
+                aria-pressed="false"
+                hidden>shortlist</button>
+      </div>
 
       {% comment %} CHIPS ARE THE CARD'S MOOD CHIPS, AS <span>s -- Helen's
          brief: "Must be the same chips as on the cards." Same classes

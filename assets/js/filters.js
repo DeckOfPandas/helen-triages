@@ -61,6 +61,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var matrix = document.querySelector('.controls');
   var recipeList = document.querySelector('.recipe-list');
+
+  /* THE SHORTLISTED-ONLY BUTTON — #546, on the results heading rather than in
+     the matrix. See food/index.html for why it is not one of the META FILTERS
+     (that whole block is local-only) and why there is no separate shortlist
+     page. Wired below, revealed there too: it ships `hidden`, and it is this
+     script rather than shortlist.js that proves the filter half exists. */
+  var shortlistOnlyBtn = document.getElementById('shortlist-only');
   // Two buttons, same action -- issue #67. The top one is the original,
   // pinned top-right of the matrix; the bottom one repeats it after the last
   // filter section so clearing doesn't mean scrolling back up past five
@@ -795,6 +802,27 @@ function renderResultsPool() {
     });
   }
 
+  /* THE SHORTLISTED-ONLY BUTTON — #546. Painted from state for exactly the
+     reason syncFilterButtons() above is, and separately from it because it does
+     not live in `.controls`: it sits on the results heading, beside the count it
+     changes. `clear all` reassigns the whole state object without touching any
+     markup, so a class toggled at click time would survive a clear that had
+     already turned the filter off.
+
+     BOTH THE CLASS AND aria-pressed HERE, where the matrix buttons have those
+     painted by two functions one after the other. There is one of these, the
+     ordering hazard that split them does not arise, and a single call site is
+     one fewer thing to keep in step. */
+  function syncShortlistOnly() {
+    if (!shortlistOnlyBtn) return;
+    /* `is-on`, NOT the `.active` every button in the matrix above wears. This
+       one is not in the matrix, and `is-on` is what the shortlist's own
+       controls already use on both sites (shortlist.js, and the cocktail
+       index's mood and chaos buttons). One feature, one state class. */
+    shortlistOnlyBtn.classList.toggle('is-on', !!state.shortlisted);
+    shortlistOnlyBtn.setAttribute('aria-pressed', state.shortlisted ? 'true' : 'false');
+  }
+
   // The three toggles, lifted out of the matrix click handler so a badge
   // click (and, later, issue #52's exclusion) can be the SAME action rather
   // than a second implementation of it. Note what they do not do: touch a
@@ -861,6 +889,14 @@ function renderResultsPool() {
         star: li.dataset.star || '',
         ingredients: (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); }),
         isDraft: li.dataset.metaDraft === 'true',
+        /* THE ONE ROW FACT THE BUILD DID NOT WRITE — #546. Every other key
+           above is read off a data- attribute Jekyll emitted; this one is in
+           this browser's localStorage and cannot be. Asked only when the filter
+           is on, for the reason `titleFolded` below is: it is a lookup per row
+           per update, and a lookup nobody is waiting on is worth not doing. */
+        shortlisted: state.shortlisted
+          ? HTF.shortlist.has(li.dataset.url || '')
+          : false,
         // Named class, not querySelector('a') -- see reorderForTitleSearch()
         // above for why that stopped being safe with issue #40's badge links.
         titleFolded: state.nameQuery
@@ -1005,6 +1041,7 @@ function renderResultsPool() {
     // Order matters between these two: syncAriaPressed() reads the .active
     // class syncFilterButtons() has just painted.
     syncFilterButtons();
+    syncShortlistOnly();
     updateInlineLabels();
     updateIngredientClear();
     renderExcludeActive(excludedCount);
@@ -1191,6 +1228,41 @@ function renderResultsPool() {
       btn.addEventListener('click', clearAllFilters);
     });
   }
+
+  /* --- the shortlist ---------------------------------------------------------
+     GitHub issue #546. Two listeners: one for the filter's own button, one for
+     any shortlist toggle anywhere on the page.
+
+     REVEALED HERE. It ships `hidden` like every other JS-dependent control on
+     both sites, and this is the script that makes its half of the feature real
+     -- shortlist.js reveals the per-row toggles, this reveals the filter. A
+     page that somehow loaded one and not the other shows exactly the half that
+     works, rather than a filter that does nothing when pressed. */
+  if (shortlistOnlyBtn) {
+    shortlistOnlyBtn.hidden = false;
+    shortlistOnlyBtn.addEventListener('click', function () {
+      state.shortlisted = !state.shortlisted;
+      update();
+    });
+  }
+
+  /* A ROW'S OWN TOGGLE CHANGED — dispatched by shortlist.js, which owns the
+     store and the controls and knows nothing about this page's filters.
+
+     UNCONDITIONAL, not gated on `state.shortlisted`. When the filter is on, the
+     row that was just un-shortlisted has to leave the list, which is what the
+     filter means. When it is off, `update()` still has work: it repaints the
+     count on the button, and the row object it rebuilds is the only place the
+     shortlisted flag is ever read from.
+
+     `update(true)` PRESERVES THE PAGE NUMBER, and that is the point. Marking
+     something on page 3 of the results must not throw you back to page 1 --
+     you did not change what you were looking for. Every other caller that
+     passes `true` here (the pager, the see-all button, the restore) is making
+     the same claim: the filter set has not changed. */
+  document.addEventListener('htf:shortlist-change', function () {
+    update(true);
+  });
 
   var pagePrevBtn = document.getElementById('recipe-page-prev');
   var pageNextBtn = document.getElementById('recipe-page-next');

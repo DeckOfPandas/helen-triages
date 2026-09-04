@@ -267,4 +267,122 @@ window.HTF = window.HTF || {};
     }
   };
 
+  // --- The shortlist ---------------------------------------------------------
+  // GitHub issue #546. Recipes and drinks you have marked to come back to, held
+  // in this browser and nowhere else. Helen's brief, and it is a ceiling rather
+  // than a first step: "one browser, one device, no sharing, no account etc is
+  // truly all I want -- I actively don't want more."
+  //
+  // HERE, FOR THE REASON THIS FILE'S OWN HEADER GIVES. Both indexes need it,
+  // both content layouts need it, and none of them knows which site it is on.
+  // That is the same argument that moved escapeHtml and indexMemory in #686.
+  //
+  // localStorage, NOT sessionStorage, AND THAT IS THE WHOLE POINT OF THE
+  // FEATURE. Everything else stored by this site is a within-visit convenience
+  // -- which list you were reading, which method mode you had open -- and dies
+  // with the tab, correctly. A shortlist that died with the tab would be a
+  // shortlist you could not come back to, which is the only thing it is for.
+  //
+  // ONE STORE PER SITE. Both sites are served from one origin, so one
+  // localStorage holds both; Helen asked for two lists rather than a mixed one
+  // ("can be food rows or cocktail cards ... doesn't need to be a mixed list on
+  // one page"), and HTF.site already says which page this is. A page with no
+  // site-key (the root landing page) gets no store at all rather than a shared
+  // one, which is what stops a stray key appearing under a third name.
+  //
+  // AN ENTRY IS A COLLECTION URL -- `/food/recipes/dal/`, `page.url` in Liquid,
+  // NOT `relative_url`. The baseurl is deployment configuration: prefixing it
+  // would make a stored list read as empty the day baseurl changed, and would
+  // make the key emitted by a row and the key emitted by that recipe's own page
+  // two different strings on the same site. filters.js's rowKey() uses the href
+  // for its own record and is right to -- that record is one page's ordering,
+  // written and read within a single visit. This one outlives the page.
+  //
+  // WHY THERE IS AN IN-MEMORY COPY, and why it is the source of truth rather
+  // than a cache. indexMemory swallows a storage failure and carries on with a
+  // fresh list, which is exactly right for it: nobody asked for that record, so
+  // nobody misses it. Here somebody has just clicked a control. If private mode
+  // or blocked site data makes setItem throw, the honest behaviour is that the
+  // control still responds and the list still works for as long as the page is
+  // open -- it simply will not be there tomorrow. Reading back through the
+  // memory copy is what makes that true, and it costs one array.
+  var shortlist = (function () {
+    var KEY_PREFIX = 'htf-shortlist-';
+    var VERSION = '-v1';
+    var entries = null;   // the in-memory copy; null until first read
+
+    function storageKey() {
+      return HTF.site ? KEY_PREFIX + HTF.site + VERSION : '';
+    }
+
+    /* Stored state is UNTRUSTED INPUT, the same standing this codebase already
+       gives the index-memory record: it can be hand-edited in devtools, left by
+       an older build, or simply not an array. Anything that is not a list of
+       strings falls back to an empty shortlist rather than to a half-read one,
+       because a shortlist that is quietly missing three entries is worse than
+       one that is visibly empty. */
+    function read() {
+      if (entries) return entries;
+      entries = [];
+      var key = storageKey();
+      if (!key) return entries;
+      try {
+        var raw = JSON.parse(localStorage.getItem(key));
+        if (Array.isArray(raw)) {
+          raw.forEach(function (v) {
+            if (typeof v === 'string' && v && entries.indexOf(v) === -1) entries.push(v);
+          });
+        }
+      } catch (e) { /* an empty shortlist, and the page works */ }
+      return entries;
+    }
+
+    function write() {
+      var key = storageKey();
+      if (!key) return;
+      try {
+        localStorage.setItem(key, JSON.stringify(entries));
+      } catch (e) { /* this visit still has it; tomorrow will not */ }
+    }
+
+    return {
+      /** @returns {string[]} the entries, oldest first. A copy — callers sort. */
+      list: function () { return read().slice(); },
+
+      /** @param {string} url @returns {boolean} */
+      has: function (url) { return read().indexOf(url) !== -1; },
+
+      /** @returns {number} */
+      count: function () { return read().length; },
+
+      /**
+       * Flip one entry and persist. Returns the state it ENDED in, so a caller
+       * can paint from the answer rather than asking again.
+       * @param {string} url
+       * @returns {boolean} true if it is now shortlisted
+       */
+      toggle: function (url) {
+        if (!url) return false;
+        var all = read();
+        var at = all.indexOf(url);
+        if (at === -1) all.push(url); else all.splice(at, 1);
+        write();
+        return at === -1;
+      },
+
+      /** Empty it. @returns {void} */
+      clear: function () {
+        entries = [];
+        write();
+      },
+
+      /* FOR TESTS ONLY, and named so nobody mistakes it for API. The module
+         reads localStorage once and caches; a test that wants a second scenario
+         in the same page needs to say so. */
+      _forget: function () { entries = null; }
+    };
+  })();
+
+  HTF.shortlist = shortlist;
+
 })(window.HTF);

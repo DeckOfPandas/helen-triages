@@ -387,6 +387,20 @@
      every later "deal again" calls HTF.fitCardNames() itself. {% endcomment %}
   <script src="{{ '/assets/js/card-name-fit.js' | relative_url }}"></script>
 
+  {% comment %} shortlist.js wires every `.btn-shortlist` on the page — GitHub
+     issue #546. HERE, in the shell, because the four placements are spread
+     across two layouts and two index pages and there is nothing site-specific
+     about any of them; a <script> in each would be four copies of one line.
+
+     BELOW `{{ content }}`, WHICH IS SAFE FOR THIS SCRIPT AND IS NOT FOR EVERY
+     SCRIPT — see test_assets_js_loads_before_any_other_script for the failure
+     that rule exists to prevent. Nothing calls into this file at parse time:
+     the STORE it needs (HTF.shortlist) is in assets.js up in the head, and its
+     own wiring waits for DOMContentLoaded. So an index page's filters.js, which
+     lands inside content and therefore runs first, still finds HTF.shortlist
+     defined when it asks. {% endcomment %}
+  <script src="{{ '/assets/js/shortlist.js' | relative_url }}"></script>
+
   {% comment %} #477's comparison switch lived here and is gone: Helen looked
      at the wordmark matched to page headings and kept the old one. The
      difference is deliberate now, and the reasoning is recorded beside the

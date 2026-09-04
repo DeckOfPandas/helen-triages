@@ -1,0 +1,165 @@
+// =============================================================================
+// THE SHORTLIST — GitHub issue #546.
+// =============================================================================
+// Two controls, and they are different kinds of thing:
+//
+//   .btn-shortlist       marks ONE recipe. On a row at the right-hand end of the
+//                        index, and on a recipe page beside `print`.
+//   .btn-shortlist-only  shows only what is marked. One per index, on the
+//                        results heading beside the count it changes.
+//
+// GREY OFF, MAGENTA ON — Helen, 2026-09-04: "I don't have a strong opinion on
+// colour for food, so hot-magenta by default I guess!", and "Grey for inactive".
+// Neither is a new value. $color-clear-text is this site's existing
+// de-emphasised-UI grey (the inline clears, the footer), and magenta is what
+// _palette.scss calls "this site's one accent... a colour that already means
+// interactive here". A shortlist toggle is interactive and is a choice the
+// reader is making, which is the same claim every other magenta on the page
+// makes.
+//
+// $color-recipe-link, NOT the raw $color-bright-magenta, for the ON state. The
+// raw hue is 3.4:1 on this ground and is used for RULES and FILLS; the darkened
+// one is the text-carrying member of the pair at 5.26:1, and _palette.scss
+// spells that division out. Hover goes to the raw hue, which is the "hover goes
+// lighter" direction every other link on this site already takes.
+//
+// THE WORD NEVER CHANGES AND THE MARK DOES. `+` when it is off, `✓` when it is
+// on, drawn here in ::before rather than swapped by JavaScript — see
+// shortlist.js for #494's finding that a label swapping between two words has
+// to be read as either the state or the action with nothing on screen to say
+// which. It also means the control cannot change width, which is what lets one
+// sit at the end of a row without the row's layout moving when it is pressed.
+// aria-pressed carries the state for anyone not looking at the colour.
+// =============================================================================
+
+// --- The mark ----------------------------------------------------------------
+// A fixed box, so the two glyphs cannot lay out differently. `+` and `✓` are not
+// the same width in $font-body and would otherwise shift the word by a fraction
+// of a character on every press — invisible on one control and obvious down a
+// column of 86 of them.
+%shortlist-mark {
+  &::before {
+    content: '+';
+    display: inline-block;
+    width: 0.85em;
+    margin-right: 0.25em;
+    text-align: center;
+    // The mark is the state, so it may be a shade heavier than the word without
+    // the word having to change weight with it.
+    font-weight: 700;
+  }
+
+  &.is-on::before { content: '\2713'; }   // ✓ U+2713
+}
+
+.btn-shortlist {
+  @extend %shortlist-mark;
+
+  // Matched to .btn-clear-inline, the index's other quiet inline control (see
+  // _category-labels.scss): sans, small, lowercase, a colour-shift hover. NOT
+  // %link-button, which is the recipe page's body-link match and carries
+  // $font-size-body-sm — right beside `print`, too loud at the end of a row.
+  // One design for both placements, because it is one control.
+  font-family: $font-body;
+  font-size: 0.78rem;
+  font-weight: 400;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+
+  // The three resets %link-button carries, and here for the reason its own
+  // comment gives: this control sits in no heading today, but a heading's
+  // letter-spacing, text-stroke and text-shadow all INHERIT, so a placement
+  // that does sit in one would quietly wear the heading's emboss. Cheaper to
+  // carry than to rediscover.
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+
+  color: $color-clear-text;
+  transition: color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+
+  &.is-on {
+    color: $color-recipe-link;
+    // Not bold. The colour and the ✓ are two signals already, and a third that
+    // changes the word's WIDTH is the one thing the fixed-width argument above
+    // exists to prevent.
+    &:hover,
+    &:focus-visible { color: $color-recipe-link-hover; }
+  }
+}
+
+// --- On an index row ---------------------------------------------------------
+// The `<li>` is already `display: flex` with `.recipe-row-content` at `flex: 1`
+// (see _recipe-list.scss), so this needs no positioning: it is the second flex
+// item and lands at the right-hand end on its own. `align-self: center` because
+// the row stretches its items by default and a control pinned to the full
+// height of a two-line row reads as floating at the top of it.
+//
+// flex-shrink: 0 for the reason .recipe-actions gives on the recipe page: the
+// label is nowrap, so a shrinkable box would let it spill rather than wrap. The
+// ingredient line beside it already clamps and has room to give.
+.recipe-list .btn-shortlist {
+  align-self: center;
+  flex-shrink: 0;
+  margin-left: $space-lg;
+}
+
+// --- Shortlisted-only --------------------------------------------------------
+// On the results heading, beside "N survivors" — the same kind of fact, and the
+// reason it is not in META FILTERS is in food/index.html: that block is gated on
+// show_source_wording and so is local-only, and this is the one filter here that
+// exists for a visitor rather than for Helen.
+//
+// `.results-heading` is `display: flex; justify-content: flex-start`, so this
+// sits directly after the count rather than at the far right of an otherwise
+// left-aligned line — which is the exact complaint that moved the heading off
+// flex-end in the first place (Helen, 2026-08-03: "sitting alone at the right
+// edge... it read as stray rather than placed").
+.btn-shortlist-only {
+  font-family: $font-body;
+  font-size: 0.78rem;
+  font-weight: 400;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+
+  background: none;
+  border: 0;
+  padding: 0;
+  margin-left: $space-lg;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+
+  // `.results-heading` is a flex row with no align-items of its own, so a child
+  // stretches to the label's full height by default. Set here rather than on
+  // that rule: the heading's own geometry is Helen's and this is the thing
+  // arriving into it.
+  align-self: center;
+
+  // Underlined in BOTH states, unlike .btn-shortlist. This one is a view
+  // switch rather than a mark, it sits beside a label rather than in a column
+  // of its own, and .btn-clear-inline — the control it most resembles — is
+  // underlined for the same reason.
+  text-decoration: underline;
+  color: $color-clear-text;
+  transition: color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+
+  &.is-on {
+    color: $color-recipe-link;
+    font-weight: 600;
+    &:hover,
+    &:focus-visible { color: $color-recipe-link-hover; }
+  }
+}
