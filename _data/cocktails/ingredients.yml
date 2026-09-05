@@ -24,9 +24,36 @@
 # A PREFERRED BOTTLE IS A `suggestion`, NEVER A `generic`. Helen, 2026-08-17,
 # on Cherry Heering: "I'd note my preference as the example not the category."
 # So Velvet Falernum -> falernum, Luxardo -> maraschino liqueur, Carpano Antica
-# -> sweet vermouth, with the bottle in `suggestion`. The only exceptions are
-# the brand names #314 permits AS generics, because nothing generalises them:
-# planteray stiggins' fancy, planteray o.f.t.d. overproof, malibu, blackstrap.
+# -> sweet vermouth, with the bottle in `suggestion`.
+#
+# THE EXCEPTION, AND THE TEST FOR IT: "IS THERE A CATEGORY NAME THAT WOULD HELP
+# HELEN CHOOSE?" If yes, name the category and the bottle is a `suggestion`. If
+# no, THE BOTTLE IS THE CATEGORY and that is correct, not a compromise.
+#
+#   Créole Shrubb, Campari, Chartreuse Verte, Strega, Bénédictine -- all stay as
+#   they are. Helen, 2026-09-05: Créole Shrubb "should appear on lists with gin
+#   and cognac -- it's not replaceable, and calling it a type of rhum agricole
+#   isn't at all useful". A category name nobody would reach for is not a
+#   category, it is a paraphrase.
+#
+#   `pineapple rum`, `coconut rum` and `blended overproof rum` went the other
+#   way, because a useful name DID exist for each -- #314's 2026-08-29
+#   amendment. Their bottles (Stiggins' Fancy, Malibu, O.F.T.D.) are
+#   `suggestion`s now and are in `retired_rum_styles` below.
+#
+# This is taxonomy.yml's governing principle applied to the vocabulary: does it
+# get Helen closer to the drink she wants, or is it knowledge for its own sake.
+#
+# WRITTEN DOWN 2026-09-05 BECAUSE THE ABSENCE COST REAL TIME. Until today these
+# three lines named "planteray stiggins' fancy, planteray o.f.t.d. overproof,
+# malibu, blackstrap" as the only permitted brand-generics -- a list retired on
+# 2026-08-29 and recorded as retired 1,470 lines below, in this same file. The
+# header and the data disagreed for a week, and an audit read the header first
+# and reported Créole Shrubb as a rule violation on the strength of it. Helen,
+# on the wider pattern: "some of this has gone round and round and round." A
+# rule stated once and never restated is how that happens; the fix is that the
+# rule now describes a TEST rather than enumerating a list, so it cannot go
+# stale the next time a bottle changes sides.
 # =============================================================================
 
 # --- how an `amount` becomes a number ----------------------------------------
@@ -1510,6 +1537,42 @@ retired_rum_styles:
   dark: >-
     same reason again, and the most misleading of the three: a dark rum may be
     Jamaican caramel-forward, Demerara aged, or a blackstrap. Issue #314.
+  # --- ADDED 2026-09-05. THESE HAD NO RETIREMENT ENTRY AND SO NOTHING CAUGHT
+  # THEM. #314 says navy "has been split out case by case and should not be
+  # re-admitted", and its closing comment confirms "no `navy` anywhere in the
+  # file" -- which was true of the STYLE LIST and false of the collection: six
+  # pours still say "Navy rum" or "Overproof Navy rum" in `item`. A term ruled
+  # out of existence with no retirement entry cannot fail loudly, because there
+  # is nothing for it to fail against. Helen, 2026-09-05: "there is no such
+  # thing as navy rum or overproof navy rum" and "there's no such thing as black
+  # rum, even though it will often be requested by other people's recipes."
+  #
+  # THE LAST CLAUSE IS WHY THESE STAY FOREVER. Unlike `light`/`gold`/`dark`,
+  # which were once OUR vocabulary, these are other people's and will keep
+  # arriving in every ingested source. The entry is not a tombstone, it is a
+  # permanent inbound filter.
+  navy: >-
+    not a category. It describes strength and a naval-rations heritage, not
+    production, and the bottles wearing the word land in three different real
+    categories -- Pusser's Blue Label and Gunpowder are `moderately aged rum`,
+    Wood's is `aged Demerara rum`, O.F.T.D. is `blended overproof rum`. Helen's
+    2026-08-27 rulings on #314 settled each by bottle. RESOLVE FROM THE BOTTLE:
+    where the source names one, bottles.yml gives the category outright, and
+    that reproduced all 13 existing hand-made calls exactly when checked on
+    2026-09-05. Where it names none, this is Helen's call and nobody else's.
+  "overproof navy": >-
+    as `navy`, and no more resolvable for the extra word: Gunpowder at 54.5% is
+    `moderately aged rum` while O.F.T.D. at 69% is `blended overproof rum`. The
+    strength is a fact about the BOTTLE, never about the category -- which is
+    the same reason #314 gives for Pusser's 151 having had no home under
+    `moderately aged`: "moderately aged says nothing about strength."
+  black: >-
+    not a category, and the one most often demanded by other people's recipes.
+    Sometimes it means an aged Jamaican, sometimes a blackstrap character on
+    another rum -- #314's own note. The blackstrap reading takes the shape
+    Helen ruled on 2026-08-24: `moderately aged rum` + `character: blackstrap`
+    + Gosling's, which is what Don's Own Grog and Georgetown Punch already do.
+    Distinct from `dark` above only in spelling; both retire for one reason.
   blackstrap: >-
     NOT retired as a word -- MOVED, from `generic` to `character`. Helen,
     #314, 2026-08-24: "blackstrap is only ever given as a character for
