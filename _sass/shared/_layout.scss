@@ -290,8 +290,31 @@ main {
 // runs, so the two navs flow into columns 1 and 3 around it and the centring
 // holds at either count. The failure it prevents is silent, arrives with a data
 // edit rather than a code change, and would land on every page at once.
-.site-footer-hearts {
+.site-footer-centre {
   grid-column: 2;
+
+  // THE COLUMN IS A STACK, in Helen's own running order for issue #652:
+  // "[heart drawing] / about / [GitHub logo] / licences line". Before
+  // 2026-09-05 only the hearts were in this grid and the other four were
+  // siblings BELOW it, centred by `.site-footer`'s own `text-align` rather
+  // than by the grid — so the footer ran two alignment systems at once, a
+  // left-aligned reference column beside a page-centred everything-else. That
+  // will read worse rather than better once cocktails earns its reference
+  // pages and the outer columns finally balance.
+  //
+  // `justify-items` rather than `text-align`: the GitHub mark is a link around
+  // an SVG, not text, so centring its BOX is what actually centres it. The
+  // footer's `text-align: center` still handles the prose inside each item.
+  display: grid;
+  justify-items: center;
+  gap: $space-sm;
+}
+
+// STILL PLACED IN THE MIDDLE TRACK, just via its wrapper now. The reasoning
+// above is unchanged and is still the thing keeping the graphic page-centred
+// when cocktails contributes a second reference nav.
+.site-footer-hearts {
+  grid-column: auto;
 }
 
 // The right-hand column reads outward from the centre, mirroring the left.

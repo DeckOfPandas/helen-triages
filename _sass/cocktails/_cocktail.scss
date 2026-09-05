@@ -527,8 +527,16 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // one of the four candidates, and 5rem-from-the-left won) — it wins now
   // because the head is 10rem narrower than it was then, which is the fact that
   // changed rather than the taste.
+  // `1fr 1fr auto`, NOT THREE EQUAL TRACKS — 2026-09-05, one round after the
+  // three-column grid closed the void beside the shortlist button. Equal tracks
+  // closed the big gap and opened two smaller ones inside: GLASS and GARNISH
+  // carry short values ("coupe", "wine", "lemon twist") and SHIP IT? is a mark
+  // plus one word, so a third of the head each left every column mostly air.
+  // `auto` lets the last track take what its content needs and hands the rest
+  // back to the two that hold real phrases. Helen, having seen the equal split:
+  // "happy to try your meta column proposal."
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr 1fr auto;
   gap: $space-md 5rem;
 
   > div {
@@ -614,14 +622,29 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // changes, because this page has no filter list for a click to narrow.
 // `cursor: pointer` on `.drink-card-mood` assumes a click does something;
 // turned back to the browser default here, where it does not.
+// BIGGER THAN THE CARD'S, SINCE 2026-09-05 — Helen: "I'd like to make the chips
+// below them a little larger, which will take up more horizontal space (on the
+// whole) and balance things out a bit."
+//
+// It is a balance argument rather than a legibility one, and it pairs with the
+// meta grid above: `1fr 1fr auto` gives the head's width back to the two facts
+// that need it, and a wider chip row underneath spends that width along the
+// bottom of the block so the head does not taper. 0.85rem is the card's 0.72rem
+// at drink-page scale — the same step the ship icon takes (1rem to 1.1rem) and
+// for the same reason, that a card foot and a page head are different rooms.
+//
+// The line-height comes with it: $chip-line is a rem value tuned to the card's
+// size, so leaving it would set bigger letters in the card's leading.
 .cocktail-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.28rem;
-  margin: $space-sm 0 0;
+  gap: 0.4rem;
+  margin: $space-md 0 0;
 
   .drink-card-mood {
     cursor: default;
+    font-size: 0.85rem;
+    line-height: 1.5;
   }
 }
 

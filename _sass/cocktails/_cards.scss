@@ -713,9 +713,31 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // handler calls preventDefault for that reason.
   // A BARE WORD MOVES ITS TEXT on hover, as the filter words do (§9.13, "a
   // chip has a box and a filter word does not"): with the box gone, the text
-  // is what there is to move, and magenta is what hover means site-wide.
-  &:hover,
-  &:focus-visible { color: $color-cosmic-cosmopolitan; }
+  // is what there is to move.
+  //
+  // AND IT MOVES TO ITS OWN SECTION'S COLOUR, NOT TO ONE HOVER COLOUR — Helen,
+  // 2026-09-05: "mouseover should colour the chips as per their grouping on the
+  // index page... rather than all being in [the one magenta]."
+  //
+  // Every chip belongs to one of two filter sections, and each section already
+  // owns a colour: the ramp from reposado to yvette that 2026-09-03 put under
+  // the five index headings, on their filter words, and on the band a matched
+  // chip wears. Hovering to a single site-wide magenta was the one place that
+  // system did not reach — it said "you can touch this" where everything
+  // around it says "this is a MOOD" or "this is a HASSLE". Now the word you
+  // touch and the heading it answers to are the same colour.
+  //
+  // THROUGH `$color-heading-mood` / `-hassle`, NEVER A LITERAL. Those are the
+  // semantic names, and the matched-band rules below already go through them
+  // (`text-decoration-color`), so a chip's hover and its match state cannot
+  // drift apart. It also means this survives the palette rename in flight on
+  // `worktree-sonnet-naming-things`, which changes what those two aliases point
+  // AT and not what they are called.
+  &--mood:hover,
+  &--mood:focus-visible { color: $color-heading-mood; }
+
+  &--hassle:hover,
+  &--hassle:focus-visible { color: $color-heading-hassle; }
 
   & + &::before {
     content: "·";

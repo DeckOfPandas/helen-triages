@@ -287,42 +287,58 @@
       {% endfor %}
       {% comment %} The hearts are chrome, so they are unconditional and named in
          decorations.js rather than chosen by a per-site `footer_svg` key. {% endcomment %}
-      <div class="site-footer-hearts" aria-hidden="true"></div>
+      {% comment %} THE CENTRE COLUMN, issue #652 — Helen's own running order:
+         "[heart drawing] / about / [GitHub logo] / licences line". Until
+         2026-09-05 only the hearts sat in `.site-footer-top`; about, the GitHub
+         mark, the copyright and the licences were siblings BELOW it, centred by
+         the footer's own `text-align` rather than by the grid. That read as two
+         alignment systems in one footer — a left-aligned reference column
+         beside a page-centred everything-else — and it will read worse, not
+         better, once cocktails earns its own right-hand column and the top row
+         finally balances.
+
+         Putting them in the middle track makes the footer the three columns it
+         has claimed to be since #374: a site's reference links either side, and
+         the things belonging to neither site down the middle.
+
+         `grid-column: 2` lives on this wrapper now rather than on the hearts —
+         see _sass/shared/_layout.scss for why the middle track is pinned rather
+         than auto-flowed, which is unchanged and still load-bearing. {% endcomment %}
+      <div class="site-footer-centre">
+        <div class="site-footer-hearts" aria-hidden="true"></div>
+        {% comment %} The about page, reachable from the footer as well as the
+           header -- Helen's ask, 2026-08-23, after cooking from her phone,
+           where the header nav is the harder of the two to hit.
+
+           IT IS SPELLED OUT HERE, WHICH THE HEADER DELIBERATELY DOES NOT DO.
+           The header's own comment records that call: the "??" is bare on
+           purpose and "about" is not written anywhere a nav shows it. A footer
+           is a different job from a nav icon row -- it is where you go looking
+           for the boring links, and an unlabelled one there would be a link to
+           nowhere in particular. Flagged rather than assumed; if Helen would
+           rather it read "???" to match the page's own wordmark, that is a
+           one-word change.
+
+           SECOND IN THE CENTRE COLUMN, DIRECTLY UNDER THE HEARTS, since #652
+           put that column in Helen's own running order. That supersedes #517,
+           which had moved this BELOW the licences on the reasoning that a link
+           a reader actually wants should not sit at the top of a block of
+           boilerplate they do not. The reasoning was right and the column
+           answers it better: there is no block of boilerplate above it any
+           more, because the boilerplate is underneath it. {% endcomment %}
+        <nav class="site-footer-about" aria-label="About this site">
+          <a href="{{ '/about/' | relative_url }}">about</a>
+        </nav>
+        <a class="site-footer-github" href="https://github.com/DeckOfPandas/helen-triages" aria-label="Source on GitHub">
+          {% include icons/github.svg %}
+        </a>
+        <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
+        <p class="site-footer-license">
+          Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.
+          Recipes and writing: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+        </p>
+      </div>
     </div>
-    {% comment %} The about page, reachable from the footer as well as the header
-       -- Helen's ask, 2026-08-23, after cooking from her phone, where the header
-       nav is the harder of the two to hit.
-
-       IT IS SPELLED OUT HERE, WHICH THE HEADER DELIBERATELY DOES NOT DO. The
-       header's own comment records that call: the "??" is bare on purpose and
-       "about" is not written anywhere a nav shows it. A footer is a different
-       job from a nav icon row -- it is where you go looking for the boring
-       links, and an unlabelled one there would be a link to nowhere in
-       particular. Flagged rather than assumed; if Helen would rather it read
-       "???" to match the page's own wordmark, that is a one-word change.
-
-       Site-neutral, so it sits on its own line rather than inside
-       .site-footer-top, whose columns each belong to a site. {% endcomment %}
-    <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
-    <p class="site-footer-license">
-      Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.
-      Recipes and writing: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
-    </p>
-    {% comment %} BELOW THE LICENCES, #517. It sat above the copyright line,
-       which put the one link a reader might actually want at the top of a
-       block of boilerplate they do not -- so it read as part of the small
-       print rather than as a way out of the page.
-
-       Still its own <nav> outside .site-footer-top: it is the one thing down
-       here belonging to neither site, which is why it is a sibling of the
-       licence paragraph rather than a column beside the reference links.
-    {% endcomment %}
-    <nav class="site-footer-about" aria-label="About this site">
-      <a href="{{ '/about/' | relative_url }}">about</a>
-    </nav>
-    <a class="site-footer-github" href="https://github.com/DeckOfPandas/helen-triages" aria-label="Source on GitHub">
-      {% include icons/github.svg %}
-    </a>
   </footer>
 
 
