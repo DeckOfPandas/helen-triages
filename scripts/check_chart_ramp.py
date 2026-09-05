@@ -16,7 +16,7 @@ is already made ($color-box-tint and friends).
 """
 
 BG = (0xFA, 0xF7, 0xF8)      # $color-bg
-VIOLET = (0x77, 0x34, 0xEA)  # $color-vibrant-violet
+VIOLET = (0x77, 0x34, 0xEA)  # $color-blinging-blackberry
 INK = (0x21, 0x1F, 0x20)     # $color-text
 
 ALPHAS = [0.16, 0.30, 0.45, 0.60, 0.76, 0.92]

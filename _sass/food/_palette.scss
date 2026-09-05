@@ -10,18 +10,26 @@
 //
 // $color-vivid-rose briefly came back on 2026-08-02 for cross-recipe links,
 // then was removed again the same day once Helen asked for links to be
-// magenta instead — reusing $color-bright-magenta-dark (already a link-ish
-// colour, "for toggle buttons etc.") rather than spending a fifth hue on a
-// job an existing one already does. The recipe page's colour budget stays
-// at four as a result; see the note below.
-$color-pure-lime-green:     #8AE800;
-$color-vibrant-violet:      #7734EA;
-$color-vivid-cerulean:      #00A7EA;
-$color-aureolin:            #FAF100;
-$color-hot-orange:          #FF6B00;
-$color-bright-magenta:      #FF00C8;
-$color-medium-spring-green: #00FF9F;
-$color-bright-magenta-dark: darken($color-bright-magenta, 12);   // ~#c4009a
+// magenta instead — reusing $color-dazzling-dragonfruit-dark (already a
+// link-ish colour, "for toggle buttons etc.") rather than spending a fifth
+// hue on a job an existing one already does. The recipe page's colour
+// budget stays at four as a result; see the note below.
+//
+// NAMED 2026-09-05, matching the silly-name convention the cocktails site
+// already had (spirits, there; food, here) -- these seven were plain
+// intensity-plus-pigment names (vivid cerulean, hot orange, bright magenta,
+// and so on) until now. The hue and the job are unchanged; only the token
+// is new, so every comment below that describes a hue by its plain colour
+// word (magenta, cerulean, aureolin, orange, violet, lime, spring green)
+// is still accurate and was left alone.
+$color-wild-wasabi:          #8AE800;
+$color-blinging-blackberry:  #7734EA;
+$color-sparkling-spirulina:  #00A7EA;
+$color-blazing-banana:       #FAF100;
+$color-torrid-tangerine:     #FF6B00;
+$color-dazzling-dragonfruit: #FF00C8;
+$color-plucky-pistachio:     #00FF9F;
+$color-dazzling-dragonfruit-dark: darken($color-dazzling-dragonfruit, 12);   // ~#c4009a
 
 // --- Core Application Canvas -------------------------------------------------
 $color-bg:      #faf7f8;  // Soft chalk white with a minute pink/cool undertone
@@ -99,11 +107,11 @@ $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;
 // rainbow"), and COBALT IS GONE: LEAVE OUT spends no hue, as it does on the
 // cocktails site, keeping only the violet structural rule. Five section hues
 // again, not six.
-$color-star-root:           $color-bright-magenta;      // 1. STAR INGREDIENT
-$color-mood-root:           $color-pure-lime-green;     // 2. MOOD
-$color-practicalities-root: $color-vivid-cerulean;      // 3. PRACTICALITIES
-$color-ingredient-root:     $color-hot-orange;          // 4. SEARCH INGREDIENTS
-$color-name-search-root:    $color-aureolin;            // 5. I KNOW WHAT I WANT
+$color-star-root:           $color-dazzling-dragonfruit; // 1. STAR INGREDIENT
+$color-mood-root:           $color-wild-wasabi;          // 2. MOOD
+$color-practicalities-root: $color-sparkling-spirulina;  // 3. PRACTICALITIES
+$color-ingredient-root:     $color-torrid-tangerine;     // 4. SEARCH INGREDIENTS
+$color-name-search-root:    $color-blazing-banana;       // 5. I KNOW WHAT I WANT
 
 // Derived active tones (darkened from the roots for legibility on white).
 // A bar only has to be seen; a word has to be read.
@@ -191,7 +199,7 @@ $color-label-stroke:         lighten($color-text, 30%);   // 20% -> 30%, Helen, 
 // base colour and one hover behaviour -- see article.recipe a and
 // .btn-method-toggle in _recipe.scss.
 //
-// $color-bright-magenta-dark (darken 12%, 5.26:1 against $color-bg) is the
+// $color-dazzling-dragonfruit-dark (darken 12%, 5.26:1 against $color-bg) is the
 // link colour. Briefly tried darker (20%, to put more distance between a
 // link and the raw-magenta footer hearts when both land in the same view)
 // and reverted the same day -- Helen tried it and preferred the
@@ -207,13 +215,13 @@ $color-label-stroke:         lighten($color-text, 30%);   // 20% -> 30%, Helen, 
 // from the 12%-darkened resting colour barely registered, because both ends
 // stayed inside the same hue -- unlike .site-about-link's "?" hover, which
 // jumps from a neutral grey resting colour straight to this same raw
-// $color-bright-magenta and is obviously a different colour. Her explicit
+// $color-dazzling-dragonfruit and is obviously a different colour. Her explicit
 // call, having seen the contrast math (3.24:1 against $color-bg, well under
 // the 4.5:1 body-text floor): the bigger, unambiguous colour jump is worth
 // it for a hover state, which is transient by definition -- text is never
 // read continuously in this colour the way the resting link colour is.
-$color-recipe-link: $color-bright-magenta-dark;
-$color-recipe-link-hover: $color-bright-magenta;
+$color-recipe-link: $color-dazzling-dragonfruit-dark;
+$color-recipe-link-hover: $color-dazzling-dragonfruit;
 
 // --- The shared chrome's accent ----------------------------------------------
 // The TENTH palette-contract variable (issue #374, 2026-08-19): the one colour
@@ -229,15 +237,15 @@ $color-recipe-link-hover: $color-bright-magenta;
 // that is not "food's magenta".
 //
 // It resolves to exactly what the two rules it replaced already used
-// ($color-recipe-link-hover for the links, $color-bright-magenta for the
+// ($color-recipe-link-hover for the links, $color-dazzling-dragonfruit for the
 // hearts, which are the same value), so this refactor changes no pixel on food.
-$color-accent: $color-bright-magenta;
+$color-accent: $color-dazzling-dragonfruit;
 
 // --- Reusable Structural Accents ---------------------------------------------
 // Nested bullets in the short method. Was cerulean-mixed; re-based on spring
 // green when cerulean left the recipe page entirely, so it stays a pale echo of
 // the section rule rather than becoming an orphan hue.
-$color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
+$color-marker-accent: mix($color-plucky-pistachio, $color-bg, 35%);
 
 // --- The recipe page's colour budget -----------------------------------------
 // After the 2026-07-31 redesign the recipe page spends FOUR colours, and the
@@ -248,7 +256,7 @@ $color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
 // meant a darker derivative of an existing hue rather than spending a new
 // one. The count stays at four.
 //
-//   1. $color-bright-magenta       the blocky rule under the title, the
+//   1. $color-dazzling-dragonfruit the blocky rule under the title, the
 //                                  footer hearts, the short-method toggle,
 //                                  and (as $color-recipe-link, darken 12%)
 //                                  cross-recipe links
@@ -257,7 +265,7 @@ $color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
 //                                  2026-08-03) the hand-drawn arrow beside
 //                                  an ingredient/step note — see
 //                                  .annotation-mark in _recipe.scss
-//   4. $color-aureolin             the highlighter on ingredient amounts
+//   4. $color-blazing-banana       the highlighter on ingredient amounts
 //
 // Everything else is text, $color-clear-text or $color-border — the whole of
 // the method, the notes and the boxes are monochrome apart from a
@@ -288,8 +296,8 @@ $color-marker-accent: mix($color-medium-spring-green, $color-bg, 35%);
 // needed an asset-name slug in the markup because it picked a FILE, so the
 // section colour used to sit in _layouts/recipe.html against the three-layer
 // rule. A background needs no asset, so the colour came home.
-$color-section-underline: $color-medium-spring-green;
-$color-section-underline-2: $color-vibrant-violet;   // the second, lower rule
+$color-section-underline: $color-plucky-pistachio;
+$color-section-underline-2: $color-blinging-blackberry;   // the second, lower rule
 
 // Aureolin over electric cobalt -- Helen's call, 2026-08-13, for one
 // specific heading only: the About page's own "FAQ"
@@ -303,7 +311,7 @@ $color-section-underline-2: $color-vibrant-violet;   // the second, lower rule
 // $color-electric-cobalt existed here before, as $color-name-search-root
 // (the "I KNOW WHAT I WANT" search category) -- removed 2026-08-01 by
 // 65d3c3b, "prune the palette of values nothing reads", when that root
-// colour moved to $color-hot-orange instead and nothing else referenced
+// colour moved to $color-torrid-tangerine instead and nothing else referenced
 // electric cobalt any more. Restored at its exact original value (#0047FF,
 // confirmed via `git log -S`, not re-guessed) rather than the visually
 // similar #0047AB ("cobalt blue") a first attempt used -- Helen asked for
@@ -362,7 +370,7 @@ $color-step-number: $color-text;
 // colour (see the recipe page's colour budget above) — not $color-text; the
 // one consumer left is the highlighter itself, not body text.
 .highlighted svg path {
-  fill: var(--highlighter-fill, #{$color-aureolin});
+  fill: var(--highlighter-fill, #{$color-blazing-banana});
   fill-opacity: var(--highlighter-opacity, 1);
 }
 

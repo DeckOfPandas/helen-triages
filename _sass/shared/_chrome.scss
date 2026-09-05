@@ -21,7 +21,7 @@
 //     had no rules whatsoever and rendered as raw unstyled SVG.
 //
 // The stated reason was the same each time and it was true: these want the
-// site's hot magenta, and $color-bright-magenta is not one of the variables
+// site's hot magenta, and $color-dazzling-dragonfruit is not one of the variables
 // every palette is guaranteed to declare, so a shared partial may not name it.
 // The conclusion drawn from it was wrong. "So it lives in food/ and cocktails
 // gets a plainer version until it wants its own" is how a shared header comes

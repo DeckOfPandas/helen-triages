@@ -10,8 +10,8 @@
 // Food's twin of all three is _sass/food/_shortlist.scss, and the store, the
 // wiring and the event are shared — only the colours and the card differ.
 //
-// GREY OFF, COSMIC COSMOPOLITAN ON — Helen, 2026-09-04: "Text and active colour
-// cosmic-cosmopolitan on cocktails because it's a thing the user is choosing and
+// GREY OFF, CHARISMATIC COSMOPOLITAN ON — Helen, 2026-09-04: "Text and active colour
+// charismatic-cosmopolitan on cocktails because it's a thing the user is choosing and
 // that's the language", and "Grey for inactive". Neither is a new value.
 // $color-clear-text is $color-grey-mid, this site's de-emphasised UI text at
 // 6.50:1 on the ground; magenta is already what this site means by a reader's
@@ -60,10 +60,10 @@
   }
 
   &:hover,
-  &:focus-visible { color: $color-cosmic-cosmopolitan; }
+  &:focus-visible { color: $color-charismatic-cosmopolitan; }
 
   &.is-on {
-    color: $color-cosmic-cosmopolitan-deep;
+    color: $color-charismatic-cosmopolitan-deep;
     // Bold, matching `.cocktail-toggle-label.is-active` beside it: on this page
     // an active control is its colour AND its weight, and half of that
     // convention would read as a different kind of state.
@@ -243,7 +243,7 @@
 
   &:focus-visible {
     outline: none;
-    border-color: $color-cosmic-cosmopolitan;
+    border-color: $color-charismatic-cosmopolitan;
   }
 }
 
@@ -340,7 +340,7 @@
 // bottle in a shopping list is the same claim — the thing you chose — so the two
 // pages say it the same way.
 .shopping-list-bottle {
-  color: $color-cosmic-cosmopolitan-deep;
+  color: $color-charismatic-cosmopolitan-deep;
 }
 
 // The whole-fruit count stays quiet. It is arithmetic this page did, not

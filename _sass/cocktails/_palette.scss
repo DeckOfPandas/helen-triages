@@ -96,7 +96,7 @@ $color-grey-light:   #2c2c31;   // borders; L* 18.2 against the ground's 4.0
 // because the colours are the colours of things you drink. `$color-cyan` could
 // belong to any project; `$color-luminous-lagoon` could not.
 //
-// The one that is arguably wrong is `radiant-reposado`: reposado is amber-brown
+// The one that is arguably wrong is `raucous-reposado`: reposado is amber-brown
 // and hue 26 is a vivid orange, which is Aperol almost exactly. Helen's name,
 // Helen's call, and recorded here rather than silently corrected.
 //
@@ -154,7 +154,7 @@ $color-grey-light:   #2c2c31;   // borders; L* 18.2 against the ground's 4.0
 // the harder of the two grounds:
 //
 //     absinthe  11.11:1     reposado  6.69:1     lagoon  9.73:1
-//     magenta    5.18:1     yvette    3.27:1  -> lightened 26% to 5.10:1
+//     magenta    5.18:1     violette  3.27:1  -> lightened 26% to 5.10:1
 //
 // Ultraviolet is the one exception and its own note below predicted it from the
 // other direction: it was already close to 4.75:1 on paper because the fill is
@@ -167,8 +167,8 @@ $color-electric-absinthe-deep: #30E88C;   // text  11.11:1 on a card
 $color-electric-absinthe-wash: #1A342A;   // 14% of the hue over a card
 
 // YOLO / GOODNESS. Tequila reposado.
-$color-radiant-reposado:      #F47E25;  // rule
-$color-radiant-reposado-deep: #F47E25;  // text  6.69:1 on a card
+$color-raucous-reposado:      #F47E25;  // rule
+$color-raucous-reposado-deep: #F47E25;  // text  6.69:1 on a card
 
 // HAS TO HAVE. A Cosmopolitan.
 //
@@ -180,7 +180,7 @@ $color-radiant-reposado-deep: #F47E25;  // text  6.69:1 on a card
 //
 // AND GOING BLACK IS WHAT MAKES IT USABLE. #FF00C8 as text is 3.33:1 on paper
 // -- a fail -- and 5.18:1 on a card here. On the food site it has to be
-// darkened to $color-bright-magenta-dark before it can carry text at all. This
+// darkened to $color-dazzling-dragonfruit-dark before it can carry text at all. This
 // palette gets the colour she actually loves, undarkened, because the ground
 // moved.
 //
@@ -189,10 +189,10 @@ $color-radiant-reposado-deep: #F47E25;  // text  6.69:1 on a card
 // here. The band that says "this matched" nearly disappears for a protanope
 // specifically BECAUSE the ground went black. Parked at Helen's call, with a
 // colour-vision mode as the shape she chose over compromising the hue.
-$color-cosmic-cosmopolitan:      #FF00C8;    // rule
-$color-cosmic-cosmopolitan-deep: #FF00C8;    // text  5.18:1 on a card
+$color-charismatic-cosmopolitan:      #FF00C8;    // rule
+$color-charismatic-cosmopolitan-deep: #FF00C8;    // text  5.18:1 on a card
 
-// HASSLE. Crème Yvette.
+// HASSLE. Crème de Violette.
 //
 // Its rule and its deep are nearly the same value, and that is the hue rather
 // than an error: a vivid blue-violet is already close to 4.75:1, so there is
@@ -200,8 +200,8 @@ $color-cosmic-cosmopolitan-deep: #FF00C8;    // text  5.18:1 on a card
 // darker than cyan's however it is set.
 // On a dark ground the constraint reverses and there IS room above it, so this
 // is the only `-deep` that still needs a derived value -- lightened 26%.
-$color-ultra-yvette:      #9233E6;  // rule
-$color-ultra-yvette-deep: #AE68EC;  // text  5.10:1 on a card
+$color-ultra-violette:      #9233E6;  // rule
+$color-ultra-violette-deep: #AE68EC;  // text  5.10:1 on a card
 
 // I KNOW WHAT I WANT. A Blue Lagoon.
 $color-luminous-lagoon:      #2ED1EA;        // rule
@@ -224,10 +224,10 @@ $color-luminous-lagoon-deep: #2ED1EA;        // text  9.73:1 on a card
 // tinted rather than as a slightly different black.
 // Absinthe's own is declared with its hue above, because it is the glass
 // panel's colour rather than only a matched-state tint.
-$color-radiant-reposado-wash:    #36251C;
-$color-ultra-yvette-wash:        #281B37;
-$color-cosmic-cosmopolitan-wash: #371432;
-$color-luminous-lagoon-wash:     #1A3137;
+$color-raucous-reposado-wash:        #36251C;
+$color-ultra-violette-wash:          #281B37;
+$color-charismatic-cosmopolitan-wash: #371432;
+$color-luminous-lagoon-wash:         #1A3137;
 
 // --- The heading bars --------------------------------------------------------
 // FIVE GREENS OVER ONE SHARED ELECTRIC ABSINTHE, and both halves are the
@@ -264,14 +264,14 @@ $color-luminous-lagoon-wash:     #1A3137;
 // read as green on green. Measured: each green sat between 1.25:1 and 1.9:1
 // against the absinthe bar beneath it.
 //
-// A RAMP FROM REPOSADO TO YVETTE THROUGH PINK, top of the page to bottom.
+// A RAMP FROM REPOSADO TO VIOLETTE THROUGH PINK, top of the page to bottom.
 // Helen's own shape, chosen from a candidates page on the real index against
 // the five accents and a shades-of-cosmopolitan version: "the ramp colours
 // are gorgeous!" The two ends and the centre are palette colours already
 // doing these jobs -- YOLO is reposado because the ship mark is, HAS TO HAVE
 // is cosmopolitan because a matched ingredient is, I KNOW WHAT I WANT is
-// yvette because the matched run of a title is (`.drink-name-hit`). MOOD and
-// HASSLE are the two even steps between reposado and cosmopolitan.
+// violette because the matched run of a title is (`.drink-name-hit`). MOOD
+// and HASSLE are the two even steps between reposado and cosmopolitan.
 //
 // INTERPOLATED IN OKLCH, NOT PICKED BY EYE, taking the short arc through red
 // rather than the long one through green, and gamut-clipped by pulling chroma
@@ -286,13 +286,20 @@ $color-luminous-lagoon-wash:     #1A3137;
 // accents. They are steps on a line between two of them rather than a sixth
 // and seventh idea, which is why they do not join the accent table above.
 //
+// NAMED 2026-09-05, having gone a couple of days as bare hex with only a
+// hue word in the comment ("coral", "hot pink") -- the two colours that had
+// fallen out of the drink-name convention every other accent on this site
+// uses. `$color-blazing-bellini` (a peach prosecco cocktail) and
+// `$color-flamboyant-flamingo` (the bird, not the colour) close that gap
+// without joining the accent table above -- they're still ramp-only.
+//
 // A SECTION'S COLOUR IS THE PROMISE THE CARD KEEPS -- THE RULE FROM THE TOP
 // OF THIS FILE, IN FORCE AGAIN FROM 2026-09-03, AND IT NOW REACHES THE
 // CHIPS. Each of the five is worn in exactly three places: the heading's
 // bar, the chosen filter word's underline beneath it, and the thing it lit
 // on a card -- a matched MOOD chip in coral, a matched HASSLE chip in hot
 // pink, a matched ingredient in cosmopolitan, the matched run of a title in
-// yvette, and the ship mark in reposado. Helen, looking at a card carrying
+// violette, and the ship mark in reposado. Helen, looking at a card carrying
 // three of them at once: "There's a lot going on... But I genuinely think
 // it's really pretty!" It reads because the five are steps on one line, so
 // a card lit in three of them reads as one family and not three claims.
@@ -308,11 +315,14 @@ $color-luminous-lagoon-wash:     #1A3137;
 // and stops also meaning "this section", which it only ever meant for one of
 // the five. The shared absinthe bar under every heading went the same day:
 // see cocktails/_rule.scss's heading-rule.
-$color-heading-yolo:    $color-radiant-reposado;       // #F47E25
-$color-heading-mood:    #FD6758;                       // coral,    1/3 of the way to pink
-$color-heading-hassle:  #FD5289;                       // hot pink, 2/3 of the way
-$color-heading-include: $color-cosmic-cosmopolitan;    // #FF00C8
-$color-heading-name:    $color-ultra-yvette;           // #9233E6
+$color-blazing-bellini:    #FD6758;    // coral,    1/3 of the way to pink
+$color-flamboyant-flamingo: #FD5289;   // hot pink, 2/3 of the way
+
+$color-heading-yolo:    $color-raucous-reposado;
+$color-heading-mood:    $color-blazing-bellini;
+$color-heading-hassle:  $color-flamboyant-flamingo;
+$color-heading-include: $color-charismatic-cosmopolitan;
+$color-heading-name:    $color-ultra-violette;
 
 // Two washes for the derived steps -- 14% over a card, for a matched chip's
 // field -- stood here for one day and went on 2026-09-04 when the card chips
@@ -325,21 +335,12 @@ $color-heading-name:    $color-ultra-yvette;           // #9233E6
 // left declared: a variable with no consumer is an invitation to bring the
 // bar back without re-reading why it left (cocktails/_rule.scss, heading-rule).
 
-// --- The previous three, as aliases ------------------------------------------
-// Kept so the migration is one commit rather than a rename sweep, and mapped
-// BY AXIS rather than by hue: violet's job was ASKED FOR, which magenta now
-// holds, so $color-violet-deep resolves to magenta and not to ultraviolet even
-// though ultraviolet is the nearer colour. Getting that backwards would have
-// silently swapped two sections.
-//
-// TEMPORARY. Delete these once call sites are migrated -- an alias that
-// outlives its migration is just a second name for a colour.
-$color-menthe:       $color-electric-absinthe;
-$color-menthe-deep:  $color-electric-absinthe-deep;
-$color-amber:        $color-radiant-reposado;
-$color-amber-deep:   $color-radiant-reposado-deep;
-$color-violet:       $color-cosmic-cosmopolitan;
-$color-violet-deep:  $color-cosmic-cosmopolitan-deep;
+// `$color-menthe`/`$color-amber`/`$color-violet` STOOD HERE as migration
+// aliases from the three-accent era, mapped BY AXIS rather than by hue --
+// deliberately marked TEMPORARY, and gone now the migration is finished and
+// nothing still calls them (checked 2026-09-05): an alias that outlives its
+// migration is just a second name for a colour, which this file already
+// said about itself.
 
 // --- The ten the shared partials require -------------------------------------
 $color-bg:         $color-paper;
