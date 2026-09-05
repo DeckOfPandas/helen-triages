@@ -63,6 +63,9 @@ over-broad `rm -rf`. Tell agents to delete only what they created.
 | Drink page half-inverted, colours off-job | rebuilt to Helen's brief: glass large in the margin, name on the card tape, glass/garnish/ship it? meta, card chips, yvette-over-absinthe under Ingredients and Method and under each ingredient name, lagoon on Notes and its cards, pink suggestions, ink numerals, read it / make it slider, shared ship include | `_layouts/cocktail.html`, `_sass/cocktails/_cocktail.scss`, `_includes/cocktails/ship.html`, `assets/js/cocktail-make.js` |
 | Section greens read as green on green (critical #4); headings smudged (#680); drink-page headings too small (#679 pt 4) | **2026-09-03.** A reposado-to-yvette ramp through pink (coral, hot pink derived in OKLCH) under the five index headings, ONE bar, the shared absinthe bar gone; each section's colour also on its chosen filter word and on the chip or band it lit on a card, so "magenta means matched everywhere" is reversed and cosmopolitan means HAS TO HAVE again; index headings 1.4rem / weight 400 / 0.14em, drink-page section headings 1.8rem / 400, punch kept on both. The mechanism: bold light-on-dark stems bloom into the punched highlight. `index-section-label` gained `$weight`. | `_sass/cocktails/_palette.scss`, `_sass/cocktails/_rule.scss` (heading-rule is single-bar now), `_sass/cocktails/_filters.scss`, `_sass/cocktails/_cards.scss`, `_sass/cocktails/_cocktail.scss`, `_sass/shared/_rule.scss` |
 | Drink page top (#679: title too big, no spare tape, meta crammed, headings small) | **2026-09-03.** Root cause of the first two: the h1 at `display: contents` still took the UA's `2em`, so the title rendered at double and the tape's em padding at half. Fixed with `font-size: 1em`; title 3.2rem (the rendered size Helen chose), the card's horizontal tape padding with 0.5em vertical, meta gap 5rem, glass absinthe / stroke 3 / floor 14rem, section headings absinthe over yvette (NOTES over lagoon), one yvette band under each ingredient name. Unseen on iPad until deployed. | `_sass/cocktails/_cocktail.scss` |
+| The universe section (#719 umbrella: #714 the card, #693 "deal again", #692 the pool) | **2026-09-05, four candidate rounds on the real index.** The card is gone: it is **one line** — a tiny glass, the name on its tape, the ingredients in round brackets — in a three-column grid with `deal again` at the far right, which *is* the fix for #693 (the control under the label read down the page as "the universe says deal again"). Deals only from ship `yes` / `oh gods yes` (#692), naming the rungs rather than borrowing `data-chaos`. No box, no ship, no moods, no square brackets, never full width: *"I want it to be a happy invitation."* The glass breaks the card's scaling rule deliberately — one height for all 27 drawings in a fixed 2.3rem slot, so the tape cannot move on redeal. | `cocktails/index.html`, `_sass/cocktails/_universe.scss`, `_sass/cocktails/_filters.scss` |
+| The shortlist toggle was never styled on cocktails (#729/#730) | **2026-09-05.** Not a taste question: food styled its `.btn-shortlist-only` and cocktails never did, so it shipped as a raw grey system button. Now `%drink-btn-base`'s pill — the shape `.btn-pool` already wears — on its own row under the count, with the "ship it?" legend brought down beside it so it is not left hovering over the card grid. Food's took the same shape and placement, in food's colours, on Helen's ask the same day. | `_sass/cocktails/_shortlist.scss`, `_sass/food/_shortlist.scss`, both indexes |
+| Two mis-diagnosed index bugs (#675, #698) | **2026-09-05, and neither was what it looked like.** #675 "a space is required between 125 and survivors" was raised as (copy) and was a layout fault: **a flex container discards whitespace between its items**, so the word space died the day `.drink-count` went flex for the legend. Deleted rather than patched, because moving the legend out made the container non-flex again. #698 "no dot before the first chip" was never chip one — the `& + &` rule already covered that — it was the first chip of the **second row**, on 61% of drinks. Fixed by measuring `offsetTop`. | `_sass/cocktails/_filters.scss`, `assets/js/chip-rows.js`, `_sass/cocktails/_cards.scss` |
 
 ## 2. Decided, not yet built
 
@@ -70,13 +73,25 @@ over-broad `rm -rf`. Tell agents to delete only what they created.
    — Helen, having seen it deployed and then a styled row and two card
    treatments on the real page: "I think it's the feature, not your work…
    I don't think anyone (and certainly not me) opens a triage website to
-   click on a random recipe." Cocktails still has its copy; the icon question
-   only matters if that survives.
+   click on a random recipe." **And the question is closed on cocktails too,
+   2026-09-05**: the control kept its words and moved to the far right of the
+   universe row (#693), which is where an icon would have been the alternative
+   answer. It still carries `↻` after the words. Nothing left to decide.
 2. **Leopard.** Round one she chose L3 (sheen). Round two (five patterns ×
    four placements) she has not decided, and said "leave leopard with me…
    don't ship anything." `model_instructions/LEOPARD.md` has the generator,
    every value and the rules. When she decides: solve the tile at build
    time from the palette, place per §5 of that file.
+3. **#650 has one answer already, on one element.** The issue asks whether the
+   27 glass drawings, all judged against paper, still work on black — and the
+   universe line's tiny glass had to answer a piece of it early: at 1.4rem the
+   card's stroke weight of 1 is proportionally about seven times heavier,
+   because `vector-effect: non-scaling-stroke` means a fixed number of SCREEN
+   pixels. Helen chose 0.7 there off a switch carrying 0.5 / 0.7 / 1. That is a
+   ruling about one ornament at one size, **not** about the artwork, and #650's
+   real question — the drawings on the new ground at card and drink-page size —
+   is untouched. The cheap version is still a dev page putting all 27 on black
+   at both sizes and letting her look.
 
 ## 3. Open questions from the audit, in the order to raise them
 

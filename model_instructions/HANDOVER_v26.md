@@ -4489,8 +4489,11 @@ once** (the prediction is a linear model and type is not quite linear) and
 falls back to wrapping if the step did not reach. It runs at load, on
 `document.fonts.ready` and on a debounced resize, and exposes
 `HTF.fitCardNames()`; `universe.js` calls it after each deal because the pick
-is a WIDER card and a cloned `--step`/`--wrap` class would be an answer to the
-wrong question. **With no JS nothing gets a class and the ellipsis stays**,
+sits in a column of its own width and a cloned `--step`/`--wrap` class would be
+an answer to the wrong question. (Since 2026-09-05 the pick's name is
+`flex: none`, so at max-content it cannot overflow and neither class is ever
+applied there — the call stays because it is the parts list, not this file, that
+decides what a deal puts on the page.) **With no JS nothing gets a class and the ellipsis stays**,
 which is the behaviour that was there before — the base rule is the fallback,
 the same shape as `.rule-split`.
 
@@ -4668,15 +4671,75 @@ behaviour described below; several of the sentences here predate that split and
 describe where a rule USED to live.
 
 **THE UNIVERSE SAYS… SITS ABOVE THE FIVE QUESTIONS, since 2026-09-02, AND IS
-A WHOLE CARD IN THE RIGHT-HAND COLUMN since 2026-09-04** — the label and
-`deal again` in a narrow left column, a random drink dealt as a real
-`.drink-card` (the pick carries the class; `universe.js` clones a random
-card's body and foot into it, no glass, and `_sass/cocktails/_universe.scss`
-collapses the fixed box to about half a list card's height — Helen: "a nudge
-not an iceberg") beside them. **Food's copy is gone** — Helen turned the feature down there on
-2026-09-04 (§13.4 has her words); she kept this one, *"almost always more
-open to persuasion about what I drink than what I eat"*, and means to refine
-it. `assets/js/universe.js` and `_sass/cocktails/_universe.scss` are its only code.
+ONE LINE — NOT A CARD — SINCE 2026-09-05** (#719, #714, #693, #692). It was a
+collapsed `.drink-card` in the right-hand column for a single day; four rounds
+of candidates on the real index took the box away. Helen: *"the line layout is
+really working for me. Really really… it's less obtrusive than a box and I think
+that's what I like about it."* The section is a three-column grid reading
+straight across:
+
+| column | holds | why |
+|---|---|---|
+| 1, `auto` | `.universe-label` | "the universe says…" |
+| 2, `minmax(0, 1fr)` | `.universe-pick` | a tiny glass, the name on its tape, the ingredients in round brackets. `minmax(0, …)` and not `1fr`: a bare `1fr` has an `auto` minimum, so the ingredient line would widen the row instead of ellipsising inside it |
+| 3, `auto` | `.btn-universe-again` | **this column IS #693.** The control used to sit under the label, so the eye read the two down the page as "the universe says deal again" (Helen: "lol"). Moving it to the end of the same row dissolves the sentence |
+
+**Five things it deliberately does not have**, each Helen's call and each worth
+knowing before you "restore" one: no box, no ship mark, no mood chips, no square
+brackets round the tape, and no full width (*"I want it to be a happy
+invitation"* rather than the page's best real estate).
+
+**It deals only from ship `yes` and `oh gods yes`** (#692) — 61 of 124 drinks the
+day it landed. The selector NAMES THE TWO RUNGS rather than borrowing the card's
+`data-chaos='good'`, which is derived as exactly that set: `chaos` is the YOLO?
+filter's word, and "which drinks does *no chaos please* show?" and "which drinks
+may the site offer unprompted?" are two different questions sharing an answer
+today. Helen caught the coupling on review.
+
+**`data-universe-parts` IS THE WHOLE MECHANISM, and it is why the glass could be
+placed at all.** It names `.drink-card-name`, `.drink-card-glass` and
+`.drink-card-ingredients` individually rather than the card's `.drink-card-body`
+wrapper, so all three arrive as direct children of the pick and a flex `order`
+can put the glass on either side of the tape; `universe.js` copies parts in the
+order the ATTRIBUTE lists them, not in document order. Cloning the body would
+have made the glass a sibling of the whole block, able only to sit beside it.
+**The foot is not cloned**, which is why `universe.js` calls
+`HTF.fitCardNames()` but not `HTF.markChipRows()` — if a foot is ever cloned
+again, that call has to come back (#698).
+
+**The pick no longer carries `drink-card`, and dropping it deleted five
+overrides.** Every rule it was there for is written against the CHILD class
+(`.drink-card-name`, `-ingredients`, `-glass`) and none needs a `.drink-card`
+ancestor — checked across the compiled stylesheet. All the class contributed was
+a fixed 12.9rem height, a border, a surface fill, card padding and two painted
+panel strips on `::after`, and `::after` is what draws the closing bracket now.
+
+**THE TINY GLASS BREAKS THE CARD'S OWN SCALING RULE ON PURPOSE.** Helen: *"don't
+scale — all the same height"*, so `--glass-ratio` and `--glass-cheat` are both
+bypassed and every drawing is 1.4rem. On a card the true relative height is
+information; here it is a mark at the head of a line, and one that resizes
+between deals reads as a wobble. The slot is a fixed 2.3rem because that rule
+and *"leave a fixed width for the glass so the name tape doesn't jump around on
+redeal"* pull against each other: one height across 27 drawings makes the WIDTHS
+diverge 5.4× (flute 0.280, punch bowl 1.505, width over height), so the slot has
+to clear the punch bowl or a wide glass is capped and comes out shorter than the
+rest. The 14 glassless drinks cost nothing — the index already renders an empty
+`.drink-card-glass` span so a card's title cannot move. Stroke drops to 0.7
+because the artwork uses `vector-effect: non-scaling-stroke` and a card's weight
+is the same screen pixels on a 22px drawing (**this is #650 arriving early**).
+
+**THE CLOSING BRACKET IS A SEPARATE FLEX ITEM, AND HAS TO BE.**
+`text-overflow: ellipsis` clips at the box's own edge, so an `::after` on the
+ingredient line would be clipped away with the text it is there to close. The
+opening bracket rides inside the box (first character, so last to be cut); the
+closing one is `.universe-pick::after`, ordered to land immediately after the
+ellipsis, with `flex: 0 1 auto` on the ingredients keeping it against the text
+rather than pushed to the column's far edge.
+
+**Food's copy is gone** — Helen turned the feature down there on 2026-09-04
+(§13.4 has her words); she kept this one, *"almost always more open to
+persuasion about what I drink than what I eat"*.
+`assets/js/universe.js` and `_sass/cocktails/_universe.scss` are its only code.
 
 **FIVE NAMED QUESTIONS, in the order Helen asks them** — restructured
 2026-08-29 and this is the current shape:
@@ -4869,8 +4932,21 @@ index (the filter words taking the chip's box, or the chips taking the word's
 form) and chose the second, "100% cards take words": Courier, bold, lowercase,
 white, no box, a middle dot between them (the ingredient line's own `·`),
 magenta on hover, and underlined in the section's colour when matched, exactly
-as a chosen filter word is. Still `<button>`s, still filtering. The universe
-card and the drink page's chips share the class and follow.
+as a chosen filter word is. Still `<button>`s, still filtering. The drink page's
+chips share the class and follow. (The universe pick did too until 2026-09-05,
+when Helen took the moods off it — "moods off, decision made" — and its parts
+list stopped cloning the card's foot altogether.)
+
+**NO MIDDLE DOT ON A WORD THAT STARTS A ROW** — #698, and the diagnosis is the
+whole of it. The dot is drawn on the FOLLOWING word's `::before` through `& + &`,
+so it was never before chip one and could not be; what Helen saw was a dot before
+the first chip of the SECOND row, because `.drink-card-moods` wraps and a wrapped
+chip carries its `::before` over the line break. **76 of the 124 drinks with a
+mood list wrap — 61%**, measured against the 232.4px foot of the grid's minimum
+370px card, so this was the common case. CSS cannot ask where a line broke
+(there is no `:first-of-line`), so `assets/js/chip-rows.js` reads `offsetTop` and
+marks row-starting chips with `is-row-start` — the same pattern, and the same
+argument, as the wrapped-title rules in DESIGN_PLAN §3.4.
 
 **THE MOOD CHIPS FILTER THE INDEX — Helen's ask, 2026-09-02.** Clicking one adds
 or removes that mood exactly as its filter button does.
