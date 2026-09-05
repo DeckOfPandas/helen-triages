@@ -139,11 +139,16 @@
 // the rule above and the two genuinely pull against each other: one height
 // across the 27 drawings means the WIDTHS diverge by 5.4×, from the flute's
 // 0.280 to the punch bowl's 1.505 (width over height, measured off the viewBoxes
-// by tmp/glass_aspect.py, not guessed). A slot narrower than the punch bowl
-// would cap it and render it shorter than the rest — breaking "all the same
-// height" in order to keep "don't jump". So the slot clears the widest drawing
-// at this height, and a flute sits in a slot five times its own width. That
-// space is what a still tape costs.
+// by `scripts/universe_glass_slot.py`, not guessed). A slot narrower than the
+// punch bowl would cap it and render it shorter than the rest — breaking "all
+// the same height" in order to keep "don't jump". So the slot clears the widest
+// drawing at this height, and a flute sits in a slot five times its own width.
+// That space is what a still tape costs.
+//
+// THAT SCRIPT FAILS LOUDLY IF THIS PAIR EVER STOPS AGREEING. It reads both
+// variables out of this file, so a new glass wider than the punch bowl, or a
+// change to the height above, is caught by running it rather than by noticing
+// one drawing is quietly shorter than its neighbours.
 //
 // THE 14 GLASSLESS DRINKS COST NOTHING: cocktails/index.html already renders an
 // empty `.drink-card-glass` span when no drawing matches, precisely so a card's
@@ -263,17 +268,25 @@ $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
 // control are all present at every width, which is what "keep the glass and the
 // deal again button" asks for.
 
-// WHERE STAGE ONE STARTS, AND IT IS DERIVED RATHER THAN PICKED (tmp/universe_
-// width.py). Courier Prime is monospace at a 0.6em advance, so the row is
-// calculable: the fixed furniture is 329px (label 175, glass slot 37, the four
-// gaps 38, `deal again` 79) and an ingredient line worth showing at all — two
-// short items before the ellipsis — is another 173px. The name is what varies,
-// and the universe only ever deals from the 61 drinks at ship `yes` or better,
-// so it is THAT distribution that decides this: their names run 15 characters at
-// the median, 18 at the 75th percentile and 24 at the 90th, which need 735px,
-// 765px and 825px of viewport respectively once the layout's own 48px of padding
-// is counted. 820px is where the top decile of names stops leaving room for the
-// brackets to hold anything.
+// WHERE STAGE ONE STARTS, AND IT IS DERIVED RATHER THAN PICKED —
+// `scripts/universe_line_width.py` shows the working and re-checks this value
+// against the live collection every time it is run. Courier Prime is monospace
+// at a 0.6em advance, so the row is calculable: the fixed furniture is 329px
+// (label 175, glass slot 37, the four gaps 38, `deal again` 79) and an
+// ingredient line worth showing at all — two short items before the ellipsis —
+// is another 173px.
+//
+// The name is what varies, and the universe only ever deals from the drinks at
+// ship `yes` or better (#692), so it is THAT distribution that decides this. On
+// 2026-09-05 there were 61 of them, with names of 14 characters at the median,
+// 18 at the 75th percentile and 22 at the 90th — needing 725px, 765px and 805px
+// of viewport once the layout's own 48px of padding is counted.
+//
+// THOSE THREE NUMBERS MOVE AS THE COLLECTION GROWS, which is why the script is
+// in the repo rather than having been run once. Re-run it after a promotion
+// batch: one long name entering the dealable set lifts the 90th percentile, and
+// a stale breakpoint fails silently — an ingredient line squeezed to two words
+// with the brackets holding nothing, on exactly the drinks Helen rated best.
 //
 // IT EQUALS $header-stack-width AND IS NOT IT. That token is 820px because of
 // how wide `[ COCKTAILS ]` plus the nav is — a completely unrelated sum that
