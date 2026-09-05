@@ -3425,12 +3425,39 @@ own it now lives beside that file instead.
   where `garnish.yml` and its rules are. `["no garnish"]` means DECIDED, `[]`
   means unfilled; the marker is spelled `no garnish`, not `none`, since
   2026-08-31.
-- **`meta.ship` is an ordered, tested vocabulary** — `ship_scale` in
+- **`meta.ship` is an ordered, tested, CLOSED vocabulary** — `ship_scale` in
   `_data/cocktails/taxonomy.yml`: `not really` < `meh` < `sure` < `yes` <
-  `oh gods yes`, with `who knows` and `QQ` deliberately OFF the scale (see the
-  file's own comment). `meta.status` is retired entirely; its only consumer
-  anywhere was `chaos`'s `haven't tried` bucket, and an untried drink never
-  publishes. §9.9 is where this vocabulary turned into a feature.
+  `oh gods yes`, with `who knows` deliberately OFF the scale (see the file's own
+  comment). **`QQ` IS NOT A SHIP VALUE, since 2026-09-05** — a drink Helen has
+  not made says `who knows`, and the "nobody has asked" that `QQ` used to carry
+  is now `meta.made_before: false`. Her ruling: "I think that's clearer than QQ
+  or leaving it unset, because it's a positive presence."
+  `test_meta_ship_is_a_rung_or_who_knows` holds it over every drink.
+  §9.9 is where this vocabulary turned into a feature.
+- **`meta.made_before` is a boolean and it GATES NOTHING** — issue #722,
+  2026-09-05. It must be real `true`/`false` on every drink and it sits first in
+  `meta:`, because you make a drink and then you have an opinion about it. **An
+  unmade drink MAY publish, and the drink side parts company with food here.**
+  Helen: "there's no prose except the tagline which I will always write from
+  scratch, so no copyright or author respect issue. It will be much easier for
+  me to browse drinks I want to try from the live site than a local build."
+  20 of 124 say `false`; the other 104 are `true` by inference from #722's own
+  premise (a rung is a verdict, and a verdict means she drank it), not because
+  she said so one at a time.
+  - **This retired two publish gates**, and the second was never asked for:
+    `test_every_published_drink_names_a_rung_on_the_ship_scale` (her
+    2026-08-30 "must have the ship field filled in" — `who knows` IS filled
+    in) and `test_every_published_drink_has_been_made`. Both are covered by
+    the closed vocabulary above, which checks drafts too.
+  - **The open consequence, unbuilt:** a published `who knows` card draws the
+    ship mark with no word beside it. #722's `???` is the intended answer and
+    needs `_includes/cocktails/ship.html` changed, not just a data line — it
+    gates the word on scale membership. Helen, 2026-09-05: "I don't actually
+    require the front-end feature."
+  - **`_dev/no-verdict.html`** is the worklist page: drinks she has made that
+    still have no rating. It writes nothing; she pastes its output back.
+- **`meta.status` is retired entirely**; its only consumer anywhere was
+  `chaos`'s `haven't tried` bucket.
 - **`tests/test_cocktails.py` is the cocktails suite** — glasses, generics,
   bottles, moods, methods, garnishes, the `measures:` amount table.
   `tests/conftest.py`
@@ -5168,30 +5195,132 @@ this section is the shorter pointer to that, not a duplicate of it.
 > ingredient name carries one yvette-deep `text-decoration` band. **Not yet
 > seen on an iPad** — Helen can only check that after a deploy.
 
-**The anatomy.** The glass sits in the page's left margin above 1180px (large,
-top-aligned with the title) and tucks inline below that width, as it always
-has — only the WIDTH changed, to a clamp derived from the margin itself (see
-`$glass-col`). The name sits on the same Dymo tape a card's title does —
-`.drink-card-name` / `.drink-card-tape` / `.drink-card-tape-bg` /
-`.drink-card-tape-word`, reused exactly rather than redrawn, with a real `<h1>`
-nested inside the tape word at `display: contents` so the tape's own lettering
-treatment reaches it without a second emboss stacked on top. Meta is a `<dl>`
-of GLASS / GARNISH / SHIP IT?, the last of those reading `page.meta.ship`
-through `_includes/cocktails/ship.html` — the SAME include the index card now
-calls, factored out so a card and this page can never render one rung two
-different ways. Mood chips are the card's own `.drink-card-mood` spans (not
-its `<button>`s — this page has no filter list for a click to narrow).
-INGREDIENTS / METHOD / NOTES follow, each with its own heading mark
-(`@include heading-rule`, moved to `_sass/cocktails/_rule.scss` so the index's
-filter headings and this page's section headings share one mixin rather than
-two lookalikes — **and parted from it on 2026-09-03**: the index's mixin went
-single-bar for its ramp, while these three call `overlapping-rule-double`
-directly with ABSINTHE as the upper bar and yvette, yvette, lagoon in front
-beneath, which is food's construction in this site's colours. Helen: the
-brief's "yvette over absinthe" double rule had been aimed at these headings,
-"not ingredients, my apologies". Each ingredient NAME now carries one
-yvette-deep `text-decoration` band instead, 0.2em below the baseline — the
-heading geometry had put the double rule through the lowercase letters).
+**The anatomy.** The glass sits INSIDE the content column, at the head's left
+edge, with the words indented past it by `$glass-col` (a flat **7rem**) plus
+`$glass-gap`. **The margin layout is gone — 2026-09-05**, and so is the
+`@media (max-width: 1180px)` block that used to tuck the drawing back inside the
+column when there was no margin to hang it in. Helen, having compared the two
+deliberately rather than by window width: *"Inline glass please. I don't care if
+this is changing my mind!"* It IS a change of mind and the earlier one is worth
+keeping: on 2026-09-02 she chose the margin against this, *"glass in the margin
+and top aligned, ship it"*. What she had not seen then is that the margin only
+ever rendered above 1180px — every screenshot of this page she had ever reviewed
+was the inline branch, which the design review called the least verified path in
+the whole design. She picked the one she had been looking at. 7rem is not a new
+number: it is exactly what the old clamp gave at every width that branch ran at.
+
+**The drawing is CENTRED in the head, not top-aligned** — also 2026-09-05, also
+a reversal of a call made by looking on 2026-09-02. Top-aligned, every glass
+shares a top edge and therefore none of them share a relationship with the
+block: a coupe's foot stops well above the mood chips and a wine glass's nearly
+touches them, because `--glass-fill` is doing the relative-height job Helen
+likes. Centred, the fill is still the whole difference between one drawing and
+another and the glass sits the same way in the head on every drink. Horizontal
+centring was never in question — the SVG has always been centred in its column,
+which is why the fix is on the cross axis.
+
+The name sits on the same Dymo tape a card's title does — `.drink-card-name` /
+`.drink-card-tape` / `.drink-card-tape-bg` / `.drink-card-tape-word`, reused
+exactly rather than redrawn, with a real `<h1>` nested inside the tape word at
+`display: contents` so the tape's own lettering treatment reaches it without a
+second emboss stacked on top. Meta is a `<dl>` of GLASS / GARNISH / SHIP IT? in
+a `1fr 1fr auto` grid, the last of those reading `page.meta.ship` through
+`_includes/cocktails/ship.html` — the SAME include the index card calls,
+factored out so a card and this page can never render one rung two different
+ways. **The page passes no `short` flag and the card does**, which is the whole
+of `ship_card_names`: those are CARD names, and the page says the rung's own
+words. See the box below.
+
+**Mood chips are LINKS now — 2026-09-05.** They were the card's
+`.drink-card-mood` spans, inert, with `cursor: default`, on the reasoning that
+this page has no filter list for a click to narrow. True, and the wrong
+conclusion: the answer is not that the word does nothing but that it takes you
+where the filtering happens. They are `<a href="{index}?mood={m}">` — food's
+badges exactly (`_includes/recipe_badges.html`, #40) — and `mood` joined `star`
+and `tag` in `filter-state.js`'s `KINDS`, which is the one place the query
+grammar is written for both sites. `cocktail-index.js` adds any mood matching a
+real button to the restored state and drops the rest in silence. Every two-word
+mood rides on `url_encode` spelling a space as `+`.
+
+INGREDIENTS / METHOD / NOTES follow, each with its own heading mark. These three
+call `overlapping-rule-double` directly with ABSINTHE as the upper bar and
+violette, violette, lagoon in front beneath, which is food's construction in
+this site's colours — parted on 2026-09-03 from the index's mixin, which went
+single-bar for its ramp. Helen: the brief's "yvette over absinthe" double rule
+had been aimed at these headings, *"not ingredients, my apologies"*. Headings
+are **1.5rem / weight 400** since 2026-09-05, down from 1.8rem: punched Courier
+over a double rule is a lot of furniture to stand over *"Pour ingredients into
+ice-filled glass"*, which is the whole of Aperol Spritz's method.
+
+> ### 2026-09-05 — WHAT MOVED, AND WHAT THE #679 BOX ABOVE NO LONGER SAYS
+>
+> That box is the record of 2026-09-03 and several of its numbers have since
+> moved. Read it as history, not as the page:
+>
+> - **The title is 2.6rem**, not 3.2rem. Nothing re-doubled — measured off
+>   Helen's screenshots it was still rendering at the 3.2rem she chose. The
+>   COLUMN changed: the inline head is 10rem narrower than the margin head, so
+>   the same size fills far more of it. *"The title seems enormous."*
+> - **The tape's horizontal padding is 1.6em**, not the card's. Helen: *"more
+>   empty tape either side of the cocktail name. Don't move the tape further
+>   left, keep the left edge in the same place, just start the lettering later
+>   then leave the same gap before the right edge."* Only the PADDING moves: the
+>   tape bleeds left by exactly its own left padding, so growing it holds the
+>   left edge and starts the lettering 0.55em later, with an equal gap right.
+>   Changing `$card-tape-bleed` too would have slid the whole object left.
+> - **Ingredient names carry NO underline.** The yvette-deep band is deleted.
+>   The drawing was never the problem: an underlined run of lowercase SANS is
+>   how a hyperlink has been drawn for thirty years and nothing in that list is
+>   one. Helen: *"we need to drop the violet underlines under ingredients
+>   because they look like links. This means we can return the violet underline
+>   to join the absinthe under the section titles."* `_sass/shared/_rule.scss`
+>   already forbids magenta on a heading rule for the mirror-image reason.
+> - **The tagline is 1.05rem in ink** with real air either side — *"the only
+>   real voice this part of the site gets"*.
+> - **The shortlist button sits under the toggle**, not at the meta row's right
+>   edge; `.cocktail-meta-row` is gone with it, a flex row holding one child
+>   being no layout. It is pulled up by exactly `.drink-card-name`'s bottom
+>   margin, which separates the TITLE from what follows and has nothing to say
+>   about a control in the other column.
+> - **The amount column has two widths.** 5.5rem/1rem at rest, 7rem/1.25rem
+>   behind `.cocktail-ingredients--wide-amounts`, which `cocktail-scale.js` sets
+>   when any amount exceeds what the narrow column holds. Counted, not measured:
+>   `$font-label` is Plex **Mono**, so a character count IS a width, and nine
+>   fit. `is-making` scales both by 1.37 (1.3rem / 0.95rem) so the same
+>   nine-character threshold stays true at either size.
+> - **`make it` drops both min-heights**, so the head closes onto the name plus
+>   the meta and the glass shrinks with it from a top edge that never moves. Held
+>   open, that reservation is for ARTWORK, which is not something you need with
+>   your hands full.
+> - **Still not seen on an iPad.** One layout instead of two makes that a
+>   smaller question than it was, not a closed one.
+
+> ### `yes²` WAS READ AS A FOOTNOTE MARKER — 2026-09-05
+>
+> A design review of this page called it one. Helen: *"that's not a footnote
+> marker, it's a joke, a cocktail so good that it's yes-squared. If this isn't
+> landing then I'd rather rename than re-render."*
+>
+> **Nothing needed renaming.** The rung's real name is already `oh gods yes` and
+> it lands on sight; `yes²` is a card-sized compression of it, which is what
+> `ship_card_names` has always been called. The page never chose it — it had no
+> SHIP IT? line until 2026-09-02, and when it gained one it was wired straight
+> through the include on the day that include was factored out, inheriting the
+> card's abbreviations with the pairing they were bundled with.
+>
+> Two things then made the joke unreadable in that ONE place: a superscript
+> numeral after a word means footnote before it means exponent, and the drink
+> page shows exactly one rung, so there is no scale beside it to read an
+> escalation against. A card grid supplies that for free — twenty cards, some
+> `yes`, some `yes²`. So the card passes `short=true` and keeps them; the page
+> passes nothing and says the rung's own words.
+>
+> **SHIP IT? IS READ-MODE ONLY**, and it leaves in `make it` with the tagline
+> and the chips. It answers *"should I make this"*, and `make it` is the state
+> you are in once you have decided. It shipped the other way round for an hour
+> that evening on a mis-stated instruction and was corrected the same evening —
+> which is why print needs no rule of its own for it: print forces the editorial
+> state, so it is an ordinary member of the revert list.
 
 **Nothing leaves the DOM.** One class (`is-making`), and the stylesheet hides
 what the state does not want, so the page prints whole and reads whole with
@@ -5203,65 +5332,96 @@ active", and both labels are always on screen, so the #494 ambiguous-label
 problem the old button solved with a constant label cannot arise here in the
 first place: there is no single label whose meaning could be read two ways.
 
-**The scaler sits on the INGREDIENTS heading's line — #545 step one,
-2026-09-04.** `make [1] × the recipe`, in `.shopping-list-setall`'s house style,
-right-aligned in a `.cocktail-section-row` (the shape `.cocktail-meta-row`
-already gives the meta panel and its shortlist button). **Servings means
-MULTIPLES OF THE RECIPE AS WRITTEN** — Helen's ruling: there is no `serves:`
+**The scaler is ONE BOX AND A `×`, UNDER THE INGREDIENTS LIST — 2026-09-05.**
+This is its third home. #545 put it at the FOOT of the page, where you had to
+scroll past the amounts to reach the thing that changes them; 2026-09-04 moved
+it onto the INGREDIENTS heading's line in a `.cocktail-section-row`. Helen,
+having used that: *"the normal scaler shouldn't get to be at the top of the
+page. Please simplify it and move underneath the ingredients list, just a single
+input text box, 2 characters wide, with a small x next to it, no other text at
+all."* Below the list is where a control that RE-READS the list belongs: you
+look at the amounts, change them, look again.
+
+> ### THE `.cocktail-section-row` WRAPPER COST 36px ON EVERY DRINK PAGE
+>
+> Worth knowing as a shape, not just as a fix. `.cocktail-section-heading`
+> carries `margin: 2.25rem 0 …`; as a direct child of the article that top
+> margin COLLAPSED with `.cocktail-title-block`'s 2.4rem bottom margin and the
+> gap was max(2.4, 2.25). Wrapping the heading in a flex container to sit the
+> scaler beside it stopped the collapse — **a flex item's margins never
+> collapse** — so the two began to ADD. Helen, on #720: *"the presence of the
+> scaler has moved the whole page downwards."* It had. The row's own comment
+> reasoned about exactly this and read it the right way round as a feature.
+>
+> `.back-to-index` has the same bug for the same reason: `display: inline-block`
+> does not collapse with the block below it either, so its 1rem plus the head's
+> 3rem was 4rem of empty column under a 48px arrow. Zeroed on cocktails; food's
+> recipe page still has it.
+
+> ### WHOLE RECIPES ONLY — Helen, 2026-09-05. THIS IS THE PAGE, NOT THE LIBRARY
+>
+> *"Logically I think we can solve the rounding/ratio issue by only allowing
+> integer multiples."* It solves it outright, and the proof is one line: every
+> written amount is already on the 2.5 ml grid, and an integer multiple of a
+> number on a grid is on that grid. No drink can be asked for a pour nobody can
+> measure and no ratio ever has to move.
+>
+> **READ THE NEXT BOX AS THE LIBRARY'S BEHAVIOUR, NOT THIS PAGE'S.** `HTF.scale`
+> keeps its step, its snap, its twelve distinct step sizes and its vulgar
+> fractions, because the index's shopping-list scaler still uses them. The drink
+> page stopped asking for any of it. `cocktail-scale.js` rounds to the nearest
+> integer, clamps at ×1, and hands that to `scale()`; `snapMultiple`,
+> `multipleForTotal` and `multipleText` are no longer called from this page.
+>
+> **WHAT IT ALSO DELETED**, all of it one problem wearing hats: `1.5` silently
+> becoming `1.6667`; the target-ml box; and the vulgar-fraction pair that wrote
+> `1⅔` into the box and read it back through a lookup table. That last existed
+> for one reason — four decimals do not fit a two-character box, so the VALUE
+> was being bent to fit the width Helen asked for. Whole recipes make the width
+> honest and the machinery pointless.
+>
+> **THE FLOOR CANNOT FIRE, AND THAT WAS CHECKED RATHER THAN ASSUMED.** `refuse`
+> needs a drink whose WRITTEN millilitre pour is already under MIN_POUR, since
+> scaling UP cannot take an amount below where it started. A scan of the whole
+> collection found none. The path stays: it costs nothing, and the day a drink
+> is ingested with a 1 ml pour it will be telling the truth.
+>
+> **×1 IS THE FLOOR AND A SMALLER ASK SETTLES THERE** rather than being refused.
+> A non-positive value never reaches the arithmetic at all — `pending` treats it
+> as a keystroke on the way somewhere, which is what stopped `0` flashing the
+> floor message on the way to `0.5` (#721: the warning *"changes on single
+> character typing or deletion"*).
+
+> ### THE TARGET-ML BOX IS GONE — #720, #721, 2026-09-05
+>
+> It let you type a total and worked the ratios backwards. Helen: *"it's just
+> baffling. Typing some numbers changes nothing, typing others changes the
+> recipe but you can't see it… It is not clear how the numbers in each box
+> relate to each other."*
+>
+> **Every word of that was true and none of it was a bug**, which is why the
+> answer was to delete the control rather than fix it. The amounts had to stay
+> on the grid, so a drink could only be poured at certain multiples — Aviation
+> stepped in thirds — and therefore only certain TOTALS existed: 30, 60, 90,
+> 120. Type 100 and it snapped to 90 and rewrote itself on the way out. The grid
+> was real, correct and completely invisible, and a control whose valid inputs
+> cannot be seen or guessed reads as broken however right its arithmetic is.
+>
+> The running total (`= 90 ml`), the `or … ml in total` wording and the
+> `put`-guarded cross-writing that kept two boxes in step went with it. Step
+> three (target units of alcohol, #297) was going to build on this shape and no
+> longer can; whatever it becomes, it starts from one box.
+>
+> **THE BITTERS CAVEAT WENT TOO** — #720.1. It was revealed unconditionally at
+> init, so Aperol Spritz — prosecco, Aperol, soda water — was warned that
+> bitters do not scale linearly. A caveat that fires where it does not apply
+> teaches you to stop reading caveats.
+
+**MULTIPLES OF THE RECIPE AS WRITTEN** — Helen's ruling: there is no `serves:`
 field on a drink and this invents none, so ×2 is twice what the page says.
 Counts (dashes, drops, leaves, `each`) multiply and re-pluralise; `to top` and
 `to rinse` pass through untouched; a range keeps its shape with both ends
 scaled.
-
-> ### NOTHING IS ROUNDED, BECAUSE NOTHING MAY MOVE A RATIO — Helen, 2026-09-04
->
-> This replaced the rule that stood here for a day (*"volumes round to the
-> nearest 2.5 ml"*), and it replaced it on her objection to what rounding does:
->
-> *"Order should be: recipe states single-order amount, target ml works the
-> ratios out backwards within reason but then updates the target ml the user has
-> entered to something more sane, that is, based on 2.5-ml increments."* And:
-> *"The ml only matter because I love my glasses and make drinks for them
-> precisely, but that isn't as important as not poisoning my friends."*
->
-> **THE MULTIPLE IS SNAPPED, NEVER THE AMOUNTS.** ×1.5 of `30 / 22.5 / 30` is
-> `45 / 33.75 / 45`, and printing `45 / 32.5 / 45` shrank the Campari by 4% of
-> itself against the gin. Invisible on a Negroni; the same arithmetic runs over
-> a 5 ml pour of absinthe, where the same rounding is 25%.
->
-> **A MULTIPLE IS ALLOWED ONLY WHERE EVERY ml AMOUNT LANDS EXACTLY ON THE 2.5 ml
-> GRID.** In half-millilitre integers, with G the gcd of the amounts and the grid
-> 5 units, the allowed multiples are `k × 5/G` — Bézout gives both directions.
-> `30 / 22.5 / 30` has G = 15, so it steps in **thirds**, and ×⅓ pours
-> `10 / 7.5 / 10`. `45 / 22.5 / 15 / 5` has G = 5 and steps in whole recipes.
-> The collection produces twelve distinct steps; thirds (35 drinks), halves (24)
-> and whole recipes (25) are most of it.
->
-> **THE FLOOR COMES FREE AND SO DOES ×1.** G divides every amount, so at k = 1
-> the smallest is already ≥ 2.5 ml; and every amount is a whole number of 2.5 ml,
-> so 5 divides G and ×1 is always allowed. The recipe as written can never be
-> refused by its own arithmetic.
->
-> **KEPT AS THE INTEGER k, never as a float compared for equality.** 5/15 is
-> 0.333… and no number of decimals makes `0.3333 × 3` equal 1. The decimal is
-> produced for the `step` attribute and for display, and nothing else.
->
-> **ONE AMOUNT IN THE COLLECTION IS OFF THE GRID** — cobra-effect's `22.75 ml`.
-> It is outside G (it could only drag the step somewhere absurd) and it is
-> multiplied rather than rounded, for the same reason as everything else.
->
-> **THE BOXES.** The multiple box's `step` and `min` are the drink's own; a typed
-> value snaps to the nearest allowed multiple and the box is rewritten to it on
-> the way out. The target box works the ratios backwards, snaps, and is rewritten
-> to **the total that actually comes out** — 95 ml of a 90 ml drink is ×1.056,
-> snaps to ×1, and the box says 90. The total line says the fraction the box
-> cannot: `30 ml, ×⅓`, and only when the multiple is not a whole one.
->
-> **ONE LINE OF CAVEAT, AND THE WORDING IS PROVISIONAL** (an issue is open;
-> nothing should copy the sentence until Helen has written hers). Dashes and
-> drops scale with everything else — leaving them alone would be a different
-> decision made silently — and a dash of bitters does not taste twice as strong
-> at ×2. `.cocktail-scale-caveat`, revealed with the control.
 
 **The floor is a REFUSAL, not a silent round** — Helen: "say you can't go below
 X ml if any ingredient wants to go below 2.5 ml." A multiple that would take any
@@ -5285,23 +5445,6 @@ redraw scales from those, so ×2 then ×1 is the recipe again rather than four
 times it. `make it` needs nothing from any of this — it changes the amount's
 size, never its text. Print hides the control: a printed page is the recipe as
 written.
-
-**STEP TWO IS BUILT: TOTAL ML, AND A TARGET ML — Helen, 2026-09-04.** *"Please
-add total ml, either set by your input box, or user-entered number of ml —
-which you can refuse if it forces a volume to be <2.5 ml. Ignore drops and
-dashes and pinches in target ml."* The row now reads `make [1] × the recipe
-= 90 ml, or [90] ml in total`. **The total is ml and only ml** — the shopping
-list's own rule, because a dash is not 0.8 ml in any way worth writing down —
-and a range counts its LOWER end (changed the same day; it totalled at the top
-end before, which is the right answer to a different question). **A target is
-worked backwards and then MADE SANE** — see the box above; the paragraph that
-stood here said a target was exact by intent and must not be snapped, which was
-the right answer to the wrong question, since honouring the typed total was
-paid for by rounding the amounts. `multipleForTotal` divides, `snapMultiple`
-snaps, and the same `scale()` answers — one floor, one refusal, no second
-opinion. **The two boxes are one state**: whichever you type in, the other is redrawn from the multiple that is
-actually on screen, and neither is written under a cursor mid-type. Step three
-(target units of alcohol) waits on ABV per bottle, #297.
 
 **`half` IS A UNIT AND SO IS `whole` — Helen, 2026-09-04**, ruling on the
 Caipirinha's `amount: "0.5"` and its QQ: `amount: "half"`. **A whole fruit is
@@ -5781,8 +5924,48 @@ declares `needs: test`. Three things about it are load-bearing:
 > repo before touching either.
 >
 > #540 made a PROMOTED drink checkable everywhere. This is the case where a
-> public test depends on data the runner cannot reach at all, and the honest
-> answer is not yet decided — see #624.
+> public test depends on data the runner cannot reach at all.
+>
+> ### THE ANSWER, DECIDED 2026-09-05: A SCHEMA HANDSHAKE — `tests/drafts_schema.py`
+>
+> Each private drafts repo carries a **`SCHEMA_VERSION`** file at its root
+> saying which schema its data has been migrated to; `tests/drafts_schema.py`
+> declares the version this checkout's rules need, with a changelog of what each
+> bump required. `test_the_cocktail_drafts_clone_is_in_step` and
+> `test_the_food_drafts_clone_is_in_step` compare them, and both skip when the
+> repo is absent — which is CI and a fresh worktree.
+>
+> **Bump BOTH numbers in the paired commits**: the drafts repo's file in the
+> commit that migrates the data, this repo's `REQUIRED` in the commit that
+> tightens the rule.
+>
+> **It diagnoses; it does not prevent.** Helen's choice between four options, and
+> the right one: two repositories mean two merges, and sometimes the gap is
+> unavoidable. What was intolerable was the gap being SILENT — N failures naming
+> real drinks, reading exactly like a regression, with nothing saying which
+> private branch fixed it. Now one failure says which side is behind, what the
+> migration was, and that the other failures in the run are its fault. The
+> headline is deliberately the message's FIRST line, because `pytest.ini` runs
+> `--tb=line` and that is the only line the summary shows.
+>
+> **Not `pytest.exit()`**, though that would replace the other failures outright:
+> during a migration you are deliberately out of step and want to watch the suite
+> go green drink by drink.
+>
+> **A hand-maintained integer, not a fingerprint of the schema constants.** A
+> fingerprint bumps itself, which is worse: not every schema change needs a data
+> migration, and an optional new key would demand a pointless drafts commit. The
+> bump is the judgement "this change requires the data to move".
+>
+> **The version file's existence check goes through `drafts_schema.present()`**
+> rather than naming `DRAFTS` in the test, so the one-door rule above stays
+> intact without widening `LOADER_GUARDS`.
+>
+> **The OTHER half of #624 was already solved and the issue's own third comment
+> says so**: "a public vocabulary whose members live in a private repo" — the
+> dead-entry direction — is what `_require_whole_collection` and
+> `WHOLE_COLLECTION_ONLY` exist for, with a meta-test keeping the list honest.
+> Do not rebuild that.
 >
 > **Still true, and not silenced:** at ONE promoted drink, four anti-vacuity
 > asserts fire ("no rum ingredient carries a suggestion, so this check is

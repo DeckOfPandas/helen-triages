@@ -35,8 +35,8 @@ notes:
 source: "QQ"
 source_url: ""
 meta:
-  ship: "QQ"
-  date_last_edited: "2026-09-02"
+  made_before: false
+  ship: "who knows"
   rewritten: false
   awaiting_fix: false
   proofread: false

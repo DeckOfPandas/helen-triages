@@ -426,8 +426,26 @@ def _drink_problems(fm: dict) -> list[str]:
             problems.append(f"mood must be [] and is derived: {fm['mood']!r}")
         if not (fm.get("glass") or []):
             problems.append("no glass -- #491, every drink names one")
-        if fm.get("meta", {}).get("ship") != "QQ":
-            problems.append(f"meta.ship must be QQ: {fm.get('meta', {}).get('ship')!r}")
+        # `who knows`, NOT `QQ`, SINCE 2026-09-05. Helen: "Should drinks I
+        # haven't made yet have ship who knows? I think that's clearer than QQ
+        # or leaving it unset, because it's a positive presence." `QQ` is no
+        # longer in the ship vocabulary at all --
+        # test_cocktails.py::test_meta_ship_is_a_rung_or_who_knows -- so a
+        # document example still writing it would teach a repo-less reader to
+        # produce a file that fails the suite on arrival.
+        if fm.get("meta", {}).get("ship") != "who knows":
+            problems.append(
+                f'meta.ship must be "who knows": '
+                f"{fm.get('meta', {}).get('ship')!r}"
+            )
+        # AND THE FIELD THAT NOW CARRIES THE ABSENCE. An ingest cannot know
+        # whether Helen has poured the drink, so it is always false on a fresh
+        # file (#722); the value gates no publication either way.
+        if fm.get("meta", {}).get("made_before") is not False:
+            problems.append(
+                f"meta.made_before must be false: "
+                f"{fm.get('meta', {}).get('made_before')!r}"
+            )
         # THE THREE GATE FLAGS JOINED THE DRINK SCHEMA ON 2026-09-02 (#668), and
         # a drink file without them fails test_cocktails.py's meta-order guard
         # the moment it lands. The document's examples are what a repo-less

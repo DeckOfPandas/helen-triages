@@ -1,0 +1,365 @@
+---
+layout: default
+site_key: cocktails
+title: Drinks with no verdict
+sitemap: false
+---
+
+{% comment %} ─────────────────────────────────────────────────────────────────
+  DRINKS WITH NO VERDICT — internal worklist, never published. Issues #722,
+  #728.
+
+  WHAT IT IS FOR. #728 counts "QQ ship ratings: 14" and says outright that they
+  are "not listed drink-by-drink — they are everything without one, and they are
+  hers by definition rather than a question anybody can hand her". This page is
+  the handing-over. Helen, 2026-09-05: "a quick page listing all the cocktails
+  that don't have the ship field set, and I can go through and either rate the
+  drink or mark it as unmade."
+
+  IT IS THE WORKLIST, NOT THE FRONT-END FEATURE. #722 also proposes a "chaos
+  only" filter and a ship mark reading `???`. Neither is built, and Helen ruled
+  them out for now on the day she asked for this page: "I don't actually require
+  the front-end feature."
+
+  THE PAGE STILL WRITES NOTHING. It reads drink files and never touches one, so
+  there is no path by which it edits a recipe behind a proofread (#367). It
+  emits Helen's answers as text; a human applies them.
+
+  IT WAS WORKED ONCE ALREADY, on 2026-09-05, the day it was built — 22 drinks,
+  two ratings and twenty "never made it". That pass is what put `made_before` in
+  the schema, so this page is now reading a field it caused to exist. It is
+  deliberately left in place rather than deleted: the collection grows by
+  ingest, every fresh drink lands with `ship: "QQ"`, and this is where they
+  queue up.
+
+  "NO VERDICT" IS DERIVED FROM `ship_scale`, NOT FROM A LIST OF BAD VALUES.
+  HANDOVER §9.9 is explicit about the cost of the other way: a template that
+  hardcodes its own copy of this vocabulary drifts from `taxonomy.yml` silently,
+  and the `meh` collapse nearly shipped 17 drinks sorted dead last because of
+  exactly that. So the question this page asks each drink is "is your ship value
+  ON the scale?" — which makes `QQ` and `who knows` unrated because the file
+  says they are off it, not because they are named here. A sixth rung added to
+  `ship_scale` tomorrow drops out of this list on its own, and a rung removed
+  from it appears in this list on its own. Both are the right answer.
+
+  BOTH OFF-SCALE VALUES ARE HERE, and they are not the same thing. `QQ` is the
+  transcription marker: nobody has asked. `who knows` is Helen's own recorded
+  shrug. taxonomy.yml puts both off the scale deliberately ("an absence of
+  verdict rather than a low one"), and the row shows which one each drink
+  carries so she can tell a question she has already seen from one she has not.
+
+  THE ANSWERS LIVE IN localStorage AND NOWHERE ELSE, under one key. That is a
+  deliberate limit, not a shortcut: nothing here can touch a drink file, so
+  there is no path by which this page edits a recipe behind her proofread
+  (#367). Closing the tab loses nothing; a different browser starts empty. The
+  copy box is how an answer leaves this page.
+
+  `site_key: cocktails` IS LOAD-BEARING — default.html picks the stylesheet
+  through `site.data.sites[page.site_key].css`, and a dev page without one gets
+  no stylesheet at all. _dev/glasses.html's note is the full story.
+
+  NEVER PUBLISHED IS A CONFIG FACT, NOT A PROMISE MADE HERE: the `dev`
+  collection is `output: false` in _config.yml and true only in
+  _config_local.yml, so a production build gives this page no URL and no
+  sitemap entry. It matters more here than on the swatch pages — this one
+  lists PRIVATE drink names out of `_cocktail_drafts/`, which is issue #235's
+  exact failure — but the mechanism is the same one that already holds for the
+  index, and it is the collection's, not this file's.
+────────────────────────────────────────────────────────────────────────────{% endcomment %}
+
+{% assign taxonomy = site.data.cocktails.taxonomy %}
+{% assign scale = taxonomy.ship_scale %}
+
+{% comment %} Every drink in the collection, drafts and promoted alike. A
+   promoted drink with no verdict would be a bug rather than a worklist item —
+   it should not have got past the gate — so including `_cocktail_recipes` is
+   how this page would SAY SO rather than hide it. {% endcomment %}
+{% assign every_drink = site.cocktail_drafts | concat: site.cocktail_recipes | sort: "title" %}
+
+{% comment %} COUNTED IN A LOOP RATHER THAN FILTERED INTO AN ARRAY, and that is
+   not a style choice. Liquid has no `push` and Jekyll's `where_exp` has no
+   negation — its conditions do `contains` but never `not contains` — so
+   "everything whose ship is NOT on the scale" cannot be expressed as a filter
+   chain. The same two guards run over the count and the list, so they cannot
+   disagree.
+
+   A DRINK SHE HAS NEVER MADE IS ANSWERED, NOT OUTSTANDING — 2026-09-05, the
+   day she worked this list. `made_before: false` IS the answer to "why is there
+   no rating here", so leaving those 20 on the page would hand her back the
+   questions she had just finished answering, which is how a worklist stops
+   being read. They are counted separately below instead.
+
+   SO THE TWO GUARDS ARE NOT REDUNDANT, THOUGH THEY LOOK IT. Every unmade drink
+   also says `who knows`, so today either test alone would produce the same
+   list. What the pair asks is the question that survives that coincidence:
+   "have you made it, and do you still owe it a verdict?" A drink she makes
+   tomorrow flips `made_before` and appears here with `who knows` intact —
+   which is exactly when it should. {% endcomment %}
+{% assign unrated_count = 0 %}
+{% assign unmade_count = 0 %}
+{% for drink in every_drink %}
+  {% if drink.meta.made_before == false %}
+    {% assign unmade_count = unmade_count | plus: 1 %}
+  {% elsif scale contains drink.meta.ship %}
+  {% else %}
+    {% assign unrated_count = unrated_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+<article class="dev-verdict">
+
+  <h1>Drinks with no verdict</h1>
+
+  <p class="dev-note">
+    {{ unrated_count }} of {{ every_drink | size }} drinks say you have made
+    them and still carry no rating — <code>meta.ship</code> is
+    <code>who knows</code> rather than a rung on the scale in
+    <code>_data/cocktails/taxonomy.yml</code>, so their cards show a mark with
+    no word beside it. Rate one, or say you have not made it after all. Answers
+    are kept in this browser as you click; the box at the bottom is how you get
+    them out.
+  </p>
+
+  {% if unmade_count > 0 %}
+    <p class="dev-note">
+      A further {{ unmade_count }} say <code>made_before: false</code> and are
+      not on this list. That is an answer, not a gap — they have no rating
+      because you have never made them. To pick one up again, flip its
+      <code>made_before</code> and it comes back here.
+    </p>
+  {% endif %}
+
+  {% if unrated_count == 0 %}
+    <p class="dev-note">
+      <strong>Nothing to do.</strong> Every drink either has a rating on the
+      scale or says you have never made it. New drinks land here as they are
+      ingested.
+    </p>
+  {% else %}
+
+  <div class="dev-verdict-bar">
+    <span id="verdict-progress">0 of {{ unrated_count }} answered</span>
+    <label><input type="checkbox" id="verdict-hide-done"> hide the ones I have answered</label>
+    <button type="button" id="verdict-clear">clear all my answers</button>
+  </div>
+
+  <ol class="dev-verdict-list">
+    {% for drink in every_drink %}
+      {% if drink.meta.made_before == false %}{% continue %}{% endif %}
+      {% if scale contains drink.meta.ship %}{% continue %}{% endif %}
+
+      {% comment %} The id keeps the folder — `to-promote/caipirinha`, not
+         `caipirinha` — because that is how #728 names a staged drink and
+         because two drinks of the same slug in different folders would
+         otherwise share a radio group. {% endcomment %}
+      {% assign slug = drink.path | remove_first: "_cocktail_drafts/" | remove_first: "_cocktail_recipes/" | remove: ".md" %}
+
+      <li class="dev-verdict-row" data-slug="{{ slug }}">
+
+        <div class="dev-verdict-head">
+          <h2><a href="{{ drink.url | relative_url }}">{{ drink.title }}</a></h2>
+          <span class="dev-verdict-was">currently <code>{{ drink.meta.ship | default: "(absent)" }}</code></span>
+          {% if drink.collection == "cocktail_recipes" %}
+            <span class="dev-verdict-flag">PUBLISHED — this one should not be on this list</span>
+          {% endif %}
+        </div>
+
+        {% comment %} Enough to recognise the drink without opening it. The
+           generic is the ingredient line's subject (§9.10), and `item` is the
+           raw transcription that only survives while the generic says QQ — so
+           falling back to it is how a freshly ingested drink still reads as
+           something. {% endcomment %}
+        <p class="dev-verdict-gist">
+          {%- for pour in drink.ingredients -%}
+            {%- if forloop.index0 > 0 %}, {% endif -%}
+            {{ pour.generic | default: pour.item | default: "?" }}
+          {%- endfor -%}
+        </p>
+
+        {%- assign tagline = drink.tagline | default: "" -%}
+        {% unless tagline == "" or tagline == "QQ" %}
+          <p class="dev-verdict-tagline">{{ tagline }}</p>
+        {% endunless %}
+
+        <div class="dev-verdict-choices">
+          {% for rung in scale %}
+            <label>
+              <input type="radio" name="verdict-{{ slug }}" value="{{ rung }}">
+              <span>{{ rung }}</span>
+            </label>
+          {% endfor %}
+          <label class="dev-verdict-unmade">
+            <input type="radio" name="verdict-{{ slug }}" value="not made">
+            <span>never made it</span>
+          </label>
+        </div>
+
+      </li>
+    {% endfor %}
+  </ol>
+
+  <h2>What you decided</h2>
+  <p class="dev-note">
+    Paste this back to Claude. Every drink you have answered is here, in the
+    order the list is in; the ones you have not answered are not.
+  </p>
+  <textarea id="verdict-output" readonly rows="10" spellcheck="false"></textarea>
+  <div class="dev-verdict-bar">
+    <button type="button" id="verdict-copy">copy</button>
+    <span id="verdict-copied" hidden>copied</span>
+  </div>
+
+  {% endif %}
+
+</article>
+
+<style>
+  /* Scoped to this page and deliberately not in _sass: it is a dev tool, it is
+     never served, and putting it in the pipeline would make it look like part
+     of the site's styling. _dev/glasses.html says the same. Colour comes from
+     the real cocktails stylesheet via site_key; nothing here sets one. */
+  .dev-verdict { max-width: 54rem; margin: 0 auto; }
+  .dev-note { opacity: 0.75; font-size: 0.9rem; max-width: 46rem; }
+
+  .dev-verdict-bar {
+    display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center;
+    margin: 1.4rem 0; font-size: 0.9rem;
+  }
+
+  .dev-verdict-list { list-style: none; padding: 0; margin: 0; }
+
+  .dev-verdict-row {
+    padding: 1.1rem 0 1.3rem;
+    border-top: 1px solid;
+  }
+  .dev-verdict-row[hidden] { display: none; }
+
+  .dev-verdict-head {
+    display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: baseline;
+  }
+  .dev-verdict-head h2 { margin: 0; font-size: 1.15rem; }
+  .dev-verdict-was { font-size: 0.82rem; opacity: 0.7; }
+  .dev-verdict-flag { font-size: 0.82rem; font-weight: bold; }
+
+  .dev-verdict-gist { margin: 0.35rem 0 0; font-size: 0.85rem; opacity: 0.75; }
+  .dev-verdict-tagline { margin: 0.35rem 0 0; font-size: 0.88rem; font-style: italic; }
+
+  /* The five rungs in scale order, then the unmade answer set apart — it is a
+     different KIND of answer, not a sixth rung, and taxonomy.yml is emphatic
+     about not inventing one. */
+  .dev-verdict-choices {
+    display: flex; flex-wrap: wrap; gap: 0.4rem 0.9rem; margin-top: 0.7rem;
+    font-size: 0.9rem;
+  }
+  .dev-verdict-choices label {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.2rem 0.5rem; border: 1px solid; border-radius: 4px;
+    cursor: pointer;
+  }
+  .dev-verdict-unmade { margin-left: auto; }
+
+  /* Answered rows step back so the unanswered ones are what the eye finds. */
+  .dev-verdict-row.is-answered .dev-verdict-gist,
+  .dev-verdict-row.is-answered .dev-verdict-tagline { opacity: 0.4; }
+  .dev-verdict-row.is-answered .dev-verdict-choices label:not(.is-chosen) { opacity: 0.35; }
+  .dev-verdict-choices label.is-chosen { font-weight: bold; }
+
+  #verdict-output {
+    width: 100%; box-sizing: border-box; font-family: monospace;
+    font-size: 0.85rem; padding: 0.6rem;
+  }
+</style>
+
+<script>
+  /* No build step and no framework: a dev page is served straight, so this is
+     plain script in the page it belongs to.
+
+     THE SLUGS AND THE RUNGS BOTH COME FROM THE RENDERED HTML, never from a
+     literal in here. HANDOVER §9.9's lesson is about a hardcoded copy of
+     `ship_scale` drifting from taxonomy.yml in silence; a script that reads the
+     radios Liquid actually wrote cannot drift from them, whatever the
+     vocabulary does next. */
+  (function () {
+    var rows = document.querySelectorAll('.dev-verdict-row');
+    if (!rows.length) { return; }
+
+    var KEY = 'helen-triages:cocktail-verdicts:v1';
+    var output = document.getElementById('verdict-output');
+    var progress = document.getElementById('verdict-progress');
+    var hideDone = document.getElementById('verdict-hide-done');
+
+    /* Every storage call is wrapped: a browser with site data blocked throws on
+       access rather than returning null, and the page must still work — the
+       radios are the feature, persistence is the convenience. */
+    function load() {
+      try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+      catch (e) { return {}; }
+    }
+    function save(answers) {
+      try { localStorage.setItem(KEY, JSON.stringify(answers)); }
+      catch (e) { /* nothing to do; the session still works in memory */ }
+    }
+
+    var answers = load();
+
+    function render() {
+      var lines = [];
+      var answered = 0;
+
+      rows.forEach(function (row) {
+        var slug = row.dataset.slug;
+        var choice = answers[slug];
+        var labels = row.querySelectorAll('.dev-verdict-choices label');
+
+        labels.forEach(function (label) {
+          var input = label.querySelector('input');
+          var chosen = choice !== undefined && input.value === choice;
+          input.checked = chosen;
+          label.classList.toggle('is-chosen', chosen);
+        });
+
+        row.classList.toggle('is-answered', choice !== undefined);
+        row.hidden = hideDone.checked && choice !== undefined;
+
+        if (choice !== undefined) {
+          answered += 1;
+          lines.push(slug + ': ' + choice);
+        }
+      });
+
+      progress.textContent = answered + ' of ' + rows.length + ' answered';
+      output.value = lines.join('\n');
+    }
+
+    rows.forEach(function (row) {
+      row.addEventListener('change', function (event) {
+        if (event.target.type !== 'radio') { return; }
+        answers[row.dataset.slug] = event.target.value;
+        save(answers);
+        render();
+      });
+    });
+
+    hideDone.addEventListener('change', render);
+
+    document.getElementById('verdict-clear').addEventListener('click', function () {
+      if (!window.confirm('Forget every answer on this page?')) { return; }
+      answers = {};
+      save(answers);
+      render();
+    });
+
+    document.getElementById('verdict-copy').addEventListener('click', function () {
+      output.select();
+      /* execCommand is the one that works without a permission prompt on a
+         localhost page; navigator.clipboard needs a secure context and
+         localhost only sometimes counts as one. */
+      try { document.execCommand('copy'); } catch (e) { /* the textarea is selected either way */ }
+      var flag = document.getElementById('verdict-copied');
+      flag.hidden = false;
+      window.setTimeout(function () { flag.hidden = true; }, 1500);
+    });
+
+    render();
+  })();
+</script>

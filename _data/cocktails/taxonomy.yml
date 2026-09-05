@@ -910,6 +910,20 @@ chaos:
 # idea", which is an absence of verdict rather than a low one, so it belongs
 # with the unrated rather than as a low rung on the scale.
 #
+# IT IS ALSO, SINCE 2026-09-05, THE ONLY VALUE OFF THE SCALE. `QQ` used to sit
+# beside it here and is now not a ship value at all: a drink Helen has not made
+# says `who knows`, and `made_before: false` carries the "nobody has asked"
+# that `QQ` used to. Helen, ruling on it: "I think that's clearer than QQ or
+# leaving it unset, because it's a positive presence." Two markers for one fact
+# is how they drift. `tests/test_cocktails.py::test_meta_ship_is_a_rung_or_who_knows`
+# holds the closed vocabulary.
+#
+# AN UNMADE DRINK MAY PUBLISH, and that is deliberate -- the drink side parts
+# company with food here. Helen, 2026-09-05: "there's no prose except the
+# tagline which I will always write from scratch, so no copyright or author
+# respect issue. It will be much easier for me to browse drinks I want to try
+# from the live site than a local build."
+#
 # `maybe` and `okay` collapsed into `meh`, 2026-08-23 -- Helen: the two only
 # ever meant the same shrug, unlike `okay`/`sure`, which stayed distinct
 # because `sure` is a genuinely more positive verdict.
@@ -974,13 +988,53 @@ ship_scale:
 # this — and it keeps HTML out of a data file, which is where it would have to
 # be escaped or deliberately un-escaped in the template.
 #
-# A RUNG WITH NO ENTRY GETS NO WORD, which is what `QQ` and `who knows` want:
-# they are deliberately off the scale (see the note below), they are 31 of 114
-# drinks, and the card draws the ship without a label rather than inventing a
-# sixth term for "not rated".
+# A RUNG WITH NO ENTRY GETS NO WORD, which is what `who knows` wants: it is
+# deliberately off the scale (see the note below), it is 20 of 124 drinks, and
+# the card draws the ship without a label rather than inventing a sixth term
+# for "not rated". (`QQ` was named here too until 2026-09-05 and is no longer a
+# ship value at all.)
+#
+# THAT BECOMES A LIVE-SITE QUESTION THE DAY AN UNMADE DRINK IS PROMOTED, and it
+# is not one yet only because nothing is promoted. Those 20 drinks may now
+# publish (Helen's ruling, 2026-09-05 -- see the note above `ship_scale`), and
+# on a published card a `who knows` renders the ship with nothing beside it.
+# #722's own second bullet is the intended answer -- "Ship mark reads ???" --
+# and it needs a change to `_includes/cocktails/ship.html`, which gates the word
+# on scale membership before it ever reaches this map, not just a line here.
+# Helen has not asked for it: "I don't actually require the front-end feature."
 ship_card_names:
   "not really": "hmm"
   "oh gods yes": "yes²"
+
+# =============================================================================
+# WHAT AN OFF-SCALE SHIP IS CALLED — `???`. Helen, 2026-09-05, closing #722's
+# second bullet.
+# =============================================================================
+# "I would like the ship mark to have ??? next to it for 'who knows', because
+# that, to me, is unambiguously not on the same rating scale. (It's also
+# funny)."
+#
+# BOTH HALVES OF THAT ARE THE ARGUMENT. The scale's five rungs are words and
+# this is punctuation, so it cannot be misread as a sixth rung the way any
+# sixth WORD would be -- and the joke is doing real work, because the thing it
+# is funny about ("I have no idea") is exactly what it means.
+#
+# IT IS NOT IN `ship_card_names` AND MUST NOT MOVE THERE. That map is the
+# CARD's abbreviations, and the drink page deliberately does not read it (see
+# the note above it, and `_includes/cocktails/ship.html`, where Helen ruled
+# `yes²` off the drink page on 2026-09-05). This word belongs in BOTH places:
+# a rating that says nothing is exactly as confusing on a drink page as on a
+# card, and the reason she gave -- "unambiguously not on the same rating
+# scale" -- is about the scale, not about the space in a card foot.
+#
+# A SCALAR, NOT A MAP KEYED BY "who knows", so the include never names a
+# vocabulary value. It asks `ship_scale` whether a value is a rung and uses
+# this for everything that is not, which is the same derivation §9.9 exists to
+# insist on. The vocabulary is closed to the scale plus "who knows"
+# (test_meta_ship_is_a_rung_or_who_knows), so "everything else" is precisely
+# one value today -- and if that ever stops being true, the fallback is still
+# right rather than silently absent.
+ship_unrated_word: "???"
 
 # NOTHING READS THIS ANY MORE, and it is kept deliberately rather than by
 # neglect. The card's goodness mark was a square tinted along this ramp until it
