@@ -2338,26 +2338,33 @@ glass:                           # LIST, not scalar — corrected 2026-08-17
 garnish: []                      # LIST, declared vocabulary — §9.12.1
   # ["no garnish"] = decided, [] = unfilled. Cobra's Fang has two.
 ingredients:                     # FULL list, untriaged, in build order
-  - amount: "15 ml"              # the ONLY quantity field, and NO US UNITS
-    item: "Appleton Estate rum"  # what the SOURCE called it. DRAFTS ONLY, and
-                                 # forbidden in to-promote/ — §9.10, §9.3.2
+  - amount: "15 ml"              # the ONLY quantity field, NO US UNITS, and
+                                 # NEVER a bare number — the unit is required
     generic: "moderately aged Jamaican rum"  # the #314 vocabulary; see §9.3.1
-    suggestion: "Appleton Estate Signature"  # the bottle, NAME(S) ONLY — §9.3.1
-                                 # a bottle's CANONICAL name once staged — §9.3.2
+    suggestion: ["Appleton Estate Signature"]  # the bottle. ALWAYS A LIST since
+                                 # 2026-09-05, one bottle or five — §9.10
+                                 # (`item` goes here on a FRESH ingest, beside
+                                 #  generic: "QQ", and must be gone once the
+                                 #  category is filled in — §9.10)
   - amount: "15 ml"
     generic:                     # a LIST means "or", never "and" — §9.3.1
       - "lightly aged and filtered rum"
       - "clear blended multi-region rum"
-    suggestion: "Havana Club 3"
+    suggestion: ["Havana Club 3"]
     note: "Whichever you prefer or are trying to use up"   # the REASON, resolving #457
   - amount: "15 ml"
     generic: "moderately aged rum"
     character:                   # a property of THIS RECIPE'S use of the
       - "blackstrap"             # bottle, not of the bottle in the abstract — #441, §9.3.1
-    suggestion: "Gosling's Black Seal"
+    suggestion: ["Gosling's Black Seal"]
     optional: true               # BOOLEAN, absent means required — #570
   - amount: "half"               # `half` and `whole` are UNITS — 2026-09-04.
     generic: "lime"              # A whole fruit is counted, never measured.
+serve:                           # OPTIONAL — omit the key entirely if nobody
+  ice: "large cube"              # has decided. `ice: "none"` means served UP,
+                                 # absent means unruled, exactly as garnish
+                                 # draws [] against ["no garnish"] — §9.10a
+  rim: "sugar half-rim"          # free text, and rare
 method:                          # ORDERED LIST — the steps are sequential
   - "Pour absinthe into ice-filled glass."
   - step: "Muddle the lime chunks hard with the sugar."  # a step is a string OR
@@ -2498,52 +2505,47 @@ this drink is garnished with a twist — and the two copies could disagree:
 are canonical in `methods.yml` under `express`, declared because they appear on
 the page, not because anyone types them.
 
-**`item` IS A DRAFTS-ONLY TRANSCRIPTION FIELD — ruled 2026-09-02 (D8), which
-overturned this paragraph's earlier heading "`item` IS BEING RETIRED".** It
-holds what the SOURCE called the ingredient, brand-led; `generic` is the
-category, and no rule derives the second from the first, which is why the
-source's words are kept until Helen fills `generic`/`suggestion` on making the
-drink and deletes `item` herself. It is allowed in `_cocktail_drafts/` and
-forbidden in `_cocktail_recipes/` by the schema guard (#669) **and in
-`_cocktail_drafts/to-promote/` since 2026-09-04** — see §9.3.2's rulings box —
-so the deadline is the staging folder rather than the move itself. 619 entries
-once carried an `item`; **215 still do, across 86 drinks, re-measured
-2026-09-05** (it read 258 here, a figure from before the staging pass emptied
-`to-promote/` of the field). The ten that merely restated their own `generic`
-went on 2026-09-03 and the rest are tabled for Helen's rulings on #544 (§9.10).
-**It is a worklist, so count it**: parse every drink and total the ingredient
-entries carrying the key. New drinks arriving through the repo-less ingest write
-it on every pour, by design.
+**`item` IS GONE FROM EVERY POUR — 2026-09-05, and it is now ENFORCED.** This
+section used to be a worklist: "215 still do, across 86 drinks", a table of
+what had been deleted and why, and a residue of 269 entries waiting on Helen's
+rulings. All of it is done, so all of it has been deleted from this handover
+rather than left to be re-read as if it were still pending.
 
-What has gone, and why each was safe rather than judged:
+**The rule that replaced the worklist is CONDITIONAL, which is the part worth
+keeping.** `item` is still the right field for a fresh ingest — the repo-less
+document tells a Claude to write it on every pour beside `generic: "QQ"`, and
+that has not changed. What is forbidden is the field OUTLIVING the answer it
+held a place for, and
+`tests/test_cocktails.py::test_item_is_gone_once_the_generic_is_filled_in`
+refuses an `item` on any pour whose `generic` is no longer `QQ`.
 
-| | |
-|---|---|
-| **177** | every word already in the entry's own generic or suggestion — `Prosecco`/`prosecco` |
-| **106** | the only addition was `fresh`, which `ingredients.yml` bans in its own capitals |
-| **61** | the item WAS a bottle, promoted to `suggestion` on Helen's ruling — see below |
+**It had to become a test, and the reason generalises.** The lifecycle was
+WRITTEN DOWN from the start — INGEST_ONE_COCKTAIL.md §3 has always said "she
+deletes it at that point" — and then not followed, because the deletion was a
+manual step nobody performed and nothing checked. By 2026-09-05 every one of
+683 pours had a real category and 215 still carried the placeholder. Helen:
+*"we agreed to drop item, but then I was persuaded to allow it back as
+somewhere to hold incoming data, but it's become a dumping ground again."* Same
+conclusion this repo has now reached five times — `meta.awaiting_fix`,
+`meta.proofread`, the main-branch hook, the destructive-git hook, and this: a
+rule that is read and then not followed needs enforcement, not rewording.
 
-**The 61 were 26 bottles, not 61 decisions**, and she ruled on them from a
-review page: Angostura alone was 16 entries, Velvet Falernum 9. Two came off
-rather than being promoted (Flor de Caña Extra Dry, Ron del Barrito). The
-evidence that made it quick was that **14 of the 26 were already named as a
-`suggestion` on another drink** — her reaching for the bottle in writing,
-elsewhere.
+**EMPTYING IT WAS NOT A DELETION PASS, and this is the number that matters.**
+Of the 204 `item` fields standing at the end, 165 were genuinely redundant —
+every word already in the generic beside them. The other 39 named something the
+repository did not know, and **23 of those were real bottles existing nowhere
+else**: Elijah Craig 12, both Lustaus, Barbadillo Principe, Bitter Truth
+Aromatic, Anchor Junipiero, Massenez Kirsch Vieux, King's Ginger, Combier,
+Courvoisier, Pierre Ferrand 1840, Kahlua, Passoa, Ottoman 10 Year Tawny, Ketel
+One, Giffard Crème de Mûre, Liquore Strega, Bénédictine D.O.M., Galliano
+L'Autentico, Patrón Reposado, Ophir. They went into `bottles.yml` FIRST — 107
+bottles to 130 — and were then moved to `suggestion`. Helen, shown the list:
+*"All those bottles should be in our collection (possibly with some names tidied
+up)."*
 
-**What is left is 269 entries with real residue plus 19 parentheticals**, and
-two of Helen's own issues sit inside it: `cane` ×31 is #594 (cane vs demerara vs
-turbinado syrup) and the retired colour vocabulary is #542's territory.
-
-**#594's VOCABULARY HALF IS ANSWERED, 2026-09-04.** Helen: *"Most 'sugar syrup'
-means 'cane sugar syrup', possibly all. Sometimes I say 'demerara sugar syrup'
-when I mean that. Let's standardise this please."* So the sugar is IN the
-generic — `cane sugar syrup 1:1`, `cane sugar syrup 2:1`, `demerara sugar
-syrup`, with the three old names in `retired_syrups` — and 43 drinks were
-retyped. **The card is untouched:** both cane forms still read `sugar syrup` and
-the demerara one still reads `demerara syrup`, which is her 2026-08-27 sentence
-working exactly as written. What it does NOT answer is the ITEM residue: the 31
-entries whose `item` says "Cane sugar syrup" now restate their own generic word
-for word, and most of them are deletions somebody still has to make.
+**The field had been hoarding, not holding.** A straight deletion would have
+destroyed all 23, and the plan of record said to delete. Anything that looks
+like a mechanical tidy over a field nothing renders deserves that check first.
 
 **THE GATE IS THE TRAP HERE, and it fired for real.** The drink page's
 ingredient line was `{% raw %}{% if item.item %}{% endraw %}` — the one field
@@ -2553,6 +2555,15 @@ in the log. Four guards in the test suite had the same stale gate. Both fixed
 *before* any deletion, with the whole suite run green first to prove the repoint
 changed nothing. **A condition is a bet on which field carries the content, and
 moving the content silently voids it** — §12's nested-CSS-rule trap, in Liquid.
+
+**#594's VOCABULARY HALF IS ANSWERED, 2026-09-04.** Helen: *"Most 'sugar syrup'
+means 'cane sugar syrup', possibly all. Sometimes I say 'demerara sugar syrup'
+when I mean that. Let's standardise this please."* So the sugar is IN the
+generic — `cane sugar syrup 1:1`, `cane sugar syrup 2:1`, `demerara sugar
+syrup`, with the three old names in `retired_syrups` — and 43 drinks were
+retyped. **The card is untouched:** both cane forms still read `sugar syrup` and
+the demerara one still reads `demerara syrup`, which is her 2026-08-27 sentence
+working exactly as written.
 
 **`generic` is fully typed, and it is what the index browses by.** Re-measured
 2026-08-29 by parsing every drink rather than grepping: **619 ingredient
@@ -3258,6 +3269,67 @@ second example until 2026-09-04, when Helen flattened both ratios into one
 `honey water`.)
 
 
+### 9.3.4 ABV and units of alcohol — the groundwork, #297
+
+**HELEN WANTS UK UNITS, NOT THE STRENGTH OF THE FINISHED DRINK.** Her words,
+2026-09-05: *"I don't want the ABV of the finished drink, I want the number UK
+units of alcohol, so dilution etc doesn't matter."* Units are
+`ml × ABV% ÷ 1000` — 25 ml of a 40% spirit is exactly 1 unit.
+
+**That single sentence deletes a whole workstream.** Dilution cancels out, so
+the ice, the shake time and the serve layer are all IRRELEVANT to #297. An
+earlier reading of this handover treated the serve layer as an ABV
+prerequisite; it is not, and §9.10a stands on its own merits.
+
+**ABV CANNOT LIVE ON A CATEGORY, and this is the finding that matters.** The rum
+categories are APPELLATION and PRODUCTION categories, deliberately not strength
+ones — #314 says so outright, explaining why Pusser's 151 had nowhere to go:
+*"`moderately aged` says nothing about strength."* So one category legitimately
+spans a wide range:
+
+| bottle | category | ABV |
+|---|---|---|
+| Gosling's Black Seal | moderately aged rum | 40% |
+| Havana Club 7 | moderately aged rum | 40% |
+| Pusser's Blue Label | moderately aged rum | 40% |
+| **Pusser's Gunpowder** | moderately aged rum | **54.5%** |
+
+Helen's own reclassification of Smith & Cross says it best: *"it is aged, so the
+unaged overproof style was never right. 57% is what made it look like one — and
+strength is not what that category names."*
+
+**So `abv` belongs on the BOTTLE and only the bottle.** Which promotes bottle
+COVERAGE from a costing nicety to the actual blocker.
+
+**THE REAL WORK IS THE MISSING BOTTLES, NOT THE NUMBERS.** Measured 2026-09-05:
+
+| | |
+|---|---|
+| bottles declared | 130, **none carrying an `abv` field** |
+| pours naming a bottle | 247 of 685 |
+| categories in use with NO bottle | 78 of 154 |
+| **of those, ALCOHOLIC** | **33** |
+
+The 33 are the ones that block units, because they carry alcohol and have
+nothing to hang a strength on: **champagne (10 pours), Campari (7), Chartreuse
+Verte (7), Chartreuse Jaune (5), orange bitters (5), Aperol (4), Grand Marnier
+(4), prosecco (3), tiki bitters (3)**, then Cynar, Jägermeister, aquavit, pisco,
+sloe gin, liqueur de sapin and seventeen more at one or two pours each. Adding a
+bottle for each comes FIRST; researching ~163 strengths is the easy half.
+
+**The remaining unknowns, all small and all Helen's:**
+
+- **"to top" — 9 pours with no quantity.** Only the champagne and prosecco ones
+  affect units; soda is 0%. One house figure settles all nine.
+- **A fallback for a pour naming no bottle.** A `typical_abv` on the category is
+  defensible ONLY as an approximation shown as a range, and it is a decision
+  about what the page is willing to CLAIM. Do not add it without asking.
+- **Dashes and drops** (84 pours) contribute little but not nothing — a dash of
+  Angostura is 44.7%.
+
+**Deliver the research as a table she checks, with confidence flagged per
+bottle** — not as 163 questions, and not as 163 silent assertions.
+
 ### 9.4 Decided 2026-08-16 — do not re-litigate
 
 - **Ingredients are additive, never a choose-one.** The Sazerac really does
@@ -3272,21 +3344,33 @@ second example until 2026-09-04, when Helen flattened both ratios into one
   deleted because "do not re-litigate" is what this section is for, and a
   reader who has seen the old shape in git history needs to know which way it
   went.
-- **`to_serve` is presentation, not steps** — "over crushed ice, with a
-  straw". Finishing ACTIONS ("top with champagne", "squeeze the twist over
-  the drink") are method steps. The CSV's `Serve` column holds actions, so
+- **`to_serve` is SERVEWARE, and nothing else** — "Straw.", "Two straws.",
+  "Ladle and punch glasses.", Cobra's Fang's "Plastic giraffes, paper umbrella,
+  teeny flamingos." Finishing ACTIONS ("top with champagne", "squeeze the twist
+  over the drink") are method steps. The CSV's `Serve` column holds actions, so
   its contents move into `method` on ingest.
 
-  **LIVE SINCE 2026-08-26, AND EMPTY ON EVERY DRINK BEFORE THAT.** This bullet
-  used to end "none of the first three drinks has a real `to_serve`" — true,
-  and it stayed true for all 115: not one drink set the field until #291's
-  three fragments moved into it (Caipirinha "Stirrer.", Mastiha Mojito
-  "Straw.", Gin Sour "Without ice."). Check `_layouts/cocktail.html` renders
-  it before moving anything else in — it does, but a field documented for ten
-  days and used by nothing is exactly the kind that turns out not to.
-  `test_to_serve_is_a_string` now guards the shape, which nothing did while
-  there was no data: a list would NOT fail loudly, because the layout pipes it
-  through `markdownify`, which stringifies rather than raises.
+  **THIS BULLET USED TO READ "presentation, not steps — over crushed ice, with
+  a straw", AND HALF OF THAT EXAMPLE IS NOW THE THING THE FIELD MUST NOT HOLD.**
+  The ice has its own field (§9.10a) and Gin Sour's `to_serve: "Without ice."`
+  was deleted on 2026-09-05 for exactly that reason. The two fields had drifted
+  into each other in BOTH directions and each was invisible from the other side:
+  a cocktail umbrella sat in `garnish` while ice sat in `to_serve`. Helen's
+  report is the clearest statement of it — *"things to serve with (like a paper
+  umbrella) aren't written or laid out the same way."*
+  `test_to_serve_is_serveware_and_not_the_ice` now refuses the ice half.
+
+  **LIVE SINCE 2026-08-26, AND EMPTY ON EVERY DRINK BEFORE THAT** — not one
+  drink set the field for all 115, until #291 moved three fragments into it.
+  **Two of those three were right and one was not**: Caipirinha "Stirrer." and
+  Mastiha Mojito "Straw." are serveware; Gin Sour's "Without ice." was ICE, and
+  it was deleted on 2026-09-05 when the ice got a field of its own. A field
+  standing empty for ten days and then filled by a bulk move is exactly where a
+  wrong one hides — nobody re-reads three lines they just wrote.
+
+  `test_to_serve_is_a_string` guards the shape, which nothing did while there
+  was no data: a list would NOT fail loudly, because the layout pipes it through
+  `markdownify`, which stringifies rather than raises.
 
   **SEVEN DRINKS USE IT NOW, and #573 was the other half of the same fact.**
   While three drinks said `to_serve: "Straw."`, four others wrote the identical
@@ -3756,6 +3840,81 @@ they were renamed. They were; the drink page followed; #513 closed with it.
 
 The bottle side of all this is §9.3.2.
 
+### 9.10a `serve` — where the ice lives, 2026-09-05
+
+**A drink has a BUILD and a SERVE, and only the build had fields.** The serve is
+five things: the vessel (`glass`), the garnish (`garnish`), the serveware
+(`to_serve`) — and then THE ICE IN THE GLASS, which had nowhere to live at all.
+
+Having no field, the ice rode in the last method step, in free prose, and
+"strain" ended up written **seventeen ways** across 124 drinks. Two of the
+seventeen were TRUNCATED SENTENCES nobody had noticed — "Fine strain into a
+chilled." and "Fine-strain into pre-chilled." — and a sweep for the same shape
+afterwards found a third, Chartreuse Swizzle's "Add to the.", vestigial from
+"Add to the [glass]". **None was found by reading the drinks.** Nobody reads 124
+last-lines in a row; collapsing 31 spellings to five surfaced all three in
+minutes. `test_no_method_step_ends_on_a_dangling_word` is the ratchet.
+
+```yaml
+serve:
+  ice: "large cube"   # none | cubed | crushed | large cube | block | blended
+  rim: "sugar half-rim"
+```
+
+**ABSENT MEANS NOBODY HAS DECIDED; `ice: "none"` MEANS SERVED UP.** The same
+distinction `garnish` draws between `[]` and `["no garnish"]`, and it is
+load-bearing rather than tidy: Pic-a-de-Crop Punch strains into a punch bowl and
+its method never says whether ice goes in, where both its sibling punches say a
+large block. That is a question for Helen, not a blank to fill with a default —
+and it is the ONE drink of 124 left without the key.
+
+**THE ICE IN THE GLASS, NEVER THE ICE IN THE SHAKER.** Of 156 mentions of ice in
+the method steps, **86 were the shaker's**. A rule that cannot tell them apart
+is wrong about 109 of 124 drinks.
+
+**THERE IS NO `chill` KEY, AND THERE WAS FOR ABOUT AN HOUR.** It held `chilled`
+on 21 drinks until Helen ruled it out — *"I think it's implied that glasses
+should be chilled (except hot drinks obviously). I am the user after all."* Its
+other three values (`frozen` once, `rinsed` three times) were EACH already a
+method step in their own right, so the whole field went rather than the one
+value and nothing it held was lost. Recorded because a field redundant with a
+default is exactly what gets re-proposed.
+
+**THE PAGE COMPOSES THE STRAIN STEP RATHER THAN STORING IT, and that is the
+whole trick.** Helen asked for the glass and the ice BACK in the method —
+*"I'd like to name the glass too where it appears"* — which reads like undoing
+the field and is the opposite:
+
+```
+"Strain."  +  "an old fashioned glass"  +  ", over a large ice cube"
+    ->  "Strain into an old fashioned glass, over a large ice cube."
+```
+
+Three fields, each holding its fact once; the sentence assembled at render time.
+So a drink that changes glass gets a corrected method for free and no copy can
+go stale. **The readable recipe and the normalised data are not in tension — the
+first is a view of the second.** The phrases live in `glasses.yml` (`serving`)
+and `serve.yml` (`in_the_glass`), never in a case ladder in the template.
+
+**Two shapes of ice clause, and the difference is real.** Ice you pour the drink
+ONTO takes a comma and "over"; ice the glass is already FULL of takes "filled
+with" and no comma.
+
+**The rim rides on the glass, before the ice** — Helen: *"given that you can't
+sugar a rim once the glass is full, let's add that line earlier."* A rim under
+"To serve" is not merely easy to miss, it is out of SEQUENCE.
+
+**A GARNISH STEP CLOSES THE METHOD**, excluding twists, which already had a
+better one ("Express the twist over the drink and drop it in." says what to DO).
+Helen: *"garnish is important, and it's easy to miss at the top of the page."*
+
+**Is a garnish step a SERVING step?** She asked; the answer is no, and the
+collection had already answered it — the twist step has been a generated METHOD
+step all along. The line: **"To serve" is what happens to a drink that is
+already finished.** A straw, a ladle, plastic giraffes. A garnish is the last
+thing that MAKES it finished, and for a twist the expressed oils change what you
+smell.
+
 ### 9.11 Glass icons — real relative height, and a UA-stylesheet trap
 
 **Sized by real height, not a common rendered height, since 2026-08-25
@@ -4005,6 +4164,22 @@ drink.
 The founding census, 2026-08-26: **277 steps across 105 drinks, 144 distinct.**
 One instruction accounted for 43 uses written three ways; Stir the same for 17;
 Strain alone had eleven forms.
+
+**THE STRAIN GROUP IS FIVE STRINGS NOW AND HELD SEVENTEEN — 2026-09-05.** Every
+retired one named where the drink LANDED: "Strain into a chilled glass.",
+"Strain over crushed ice.", "Strain over two giant ice cubes." That was the only
+way to record the ice, because the ice had no field. It has one now (§9.10a) and
+`test_serve_ice_is_not_restated_in_the_method` refuses a strain step that
+describes the serve, so these cannot come back.
+
+**The group had still been GROWING**, which is the diagnosis rather than the
+fix: a "slot for ice pedantry" was added on 2026-09-04 and took it from eleven
+to seventeen. **A vocabulary that keeps growing is usually absorbing a fact that
+belongs in a field.** Move the fact and the vocabulary stops.
+
+Helen's `giant ice cube` ruling is NOT lost — it is `ice: "large cube"`, and the
+page prints "over a large ice cube". Her reason was that she wanted to SAY it,
+and she still does; what changed is that she says it once.
 
 **NOTHING WAS APPLIED TO A DRINK UNTIL HELEN HAD RULED, and that was her
 explicit design** — past tense since 2026-09-02, when the pass below finally

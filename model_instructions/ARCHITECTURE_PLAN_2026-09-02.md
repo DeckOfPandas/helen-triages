@@ -31,7 +31,7 @@ Summary of who does what:
 | 1 | Cocktail schema guard | Opus | half a day |
 | 2 | Cocktail publication gate, and `proofread` now gates food too | Opus (D1–D4 ruled) | one to two days |
 | 3 | Port house-style checks to drinks | Opus | half a day |
-| 4 | Finish `item` (#544) | Opus mechanical half; Helen rulings | one day + rulings |
+| 4 | ~~Finish `item` (#544)~~ **DONE 2026-09-05** | Opus + Helen rulings | — |
 | 5 | Ingest spec regeneration + Claude-web inbox | **Fable designs, Opus implements** | 2–3 days |
 | 6 | Shared/forked code consolidation | 6a–6b Opus; 6c **Fable**; 6d decision Helen | 1–3 days |
 | 7 | Handover hygiene | Opus for the three fixes; **Fable** for the restructure | — |
@@ -56,7 +56,7 @@ new tests on `tests/test_front_matter.py::test_no_retired_fields` (L217),
 
 1. Add module constants near `RECIPES`/`DRAFTS` (L47–48):
    - `TOP_LEVEL_KEYS = {title, tagline, glass, garnish, ingredients, method,
-     mood, notes, source, source_url, meta, to_serve}` plus whatever
+     mood, notes, source, source_url, meta, to_serve, serve}` plus whatever
      workstream 2 adds to `meta`.
    - `REQUIRED_TOP_LEVEL = {title, tagline, glass, garnish, ingredients,
      method, mood, notes, source, source_url, meta}`.
@@ -283,32 +283,31 @@ ruling goes in the hand-back list to Helen.
 (conftest L317) which strips code and prose spans; reuse it, do not
 reimplement.
 
-## 4. Finish `item` (#544) (Opus mechanical half, Helen rulings)
+## 4. ~~Finish `item` (#544)~~ — DONE 2026-09-05
 
-**Facts.** 282 ingredient entries carry `item`. 118 restate their own
-`generic` textually. `_layouts/cocktail.html` L315 reads `item` only as a
-fallback for an entry with no `generic`, and zero such entries exist, so
-`item` renders nowhere today.
+**`item` is gone from all 683 pours**, and the step-by-step plan that stood here
+has been deleted rather than left to be re-read as if it were pending. What
+replaced it, and the two things worth carrying forward:
 
-**Steps.**
+**The rule is CONDITIONAL, not a removal.** `item` stays in the schema and stays
+right for a fresh ingest — written on every pour beside `generic: "QQ"`. What is
+forbidden is the field OUTLIVING the answer it held a place for.
+`test_item_is_gone_once_the_generic_is_filled_in` enforces exactly that, so D8's
+ruling survives intact: the field is real, it just has a death date now.
 
-1. Script in `tmp/` lists every `(file, index, generic, item)` where
-   `item.lower() == generic.lower()` after stripping articles. Delete those
-   118 `item` lines in the private repo on a branch. Show Helen the diff
-   stat, not the diff.
-2. The remaining ~164 carry residue (brand, style, "cane" ×31 is #594).
-   Produce one table to Helen per family, largest first, asking per line:
-   move to `suggestion`, move to `note`, or delete. Do not guess.
-3. **Revised by D8 (2026-09-02): `item` is NOT removed from the schema.**
-   It becomes a DRAFT-ONLY transcription field: allowed in
-   `_cocktail_drafts/`, forbidden in `_cocktail_recipes/` by the WS1 guard
-   (split `INGREDIENT_KEYS` into a drafts set and a recipes set). Steps 1
-   and 2 still apply to the current backlog of restating and residue
-   entries. The fallback at `cocktail.html` L315 can go once no promoted
-   drink can carry the key. `INGEST_ONE_COCKTAIL.md` keeps teaching `item`
-   and says it is draft-only.
+**THE PLAN ABOVE WOULD HAVE DESTROYED 23 BOTTLES.** It reads as a tidying
+exercise over a field that renders nowhere, and that framing was wrong. Of the
+204 `item` fields standing at the end, 165 were genuinely redundant — but 39
+named something the repository did not know, and 23 of those were REAL BOTTLES
+existing nowhere else (Elijah Craig 12, both Lustaus, Barbadillo Principe,
+Courvoisier, Kahlua, Passoa, Combier, Ketel One, Bénédictine D.O.M. …). They
+went into `bottles.yml` first — 107 entries to 130 — and were then moved to
+`suggestion`. Helen, shown the list: *"All those bottles should be in our
+collection (possibly with some names tidied up)."*
 
-**Depends on.** WS1 for the key list. Does not block anything.
+**The lesson is not about `item`.** Anything that looks like a mechanical tidy
+over a field nothing renders deserves a "what does this know that nothing else
+does?" pass first. The field had been hoarding, not holding.
 
 ## 5. Ingest spec regeneration and a Claude-web inbox (Fable designs, Opus implements)
 

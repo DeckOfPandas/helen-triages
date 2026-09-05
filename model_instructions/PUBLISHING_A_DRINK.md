@@ -33,7 +33,8 @@ disk for an evening. One copy, always pushed, is the rule.
    `ingest.md`'s TIER 3 names the same exception), runs the suite, fixes what
    the suite names — spellings the vocabularies already declare, a missing key,
    a hyphen that should be an en dash, a house name where a bottle belongs, an
-   alias where the canonical name belongs, an `item` that must go — and never
+   alias where the canonical name belongs, a scalar `suggestion` that should be
+   a list — and never
    touches a tagline, a note's words, a method's words or an amount. Commits and
    pushes. **The full boundary is in `ingest.md` under "Fixing a draft the
    suite is complaining about"; the two say the same thing on purpose.**
@@ -75,18 +76,33 @@ disk for an evening. One copy, always pushed, is the rule.
 ## What "promotion-ready" means for the data
 
 In `to-promote/` and in `_cocktail_recipes/` a drink is in its published
-tense: every `suggestion` is a bottle's canonical name (aliases are for
-reading drafts, never for a published file), no ingredient carries `item`
-(the transcription field lives in drafts only), and every generic is a
-declared one. Two tests in `tests/test_cocktails.py` hold that, so the
-mechanical pass cannot forget it.
+tense: every `suggestion` is a bottle's canonical name (aliases are for reading
+drafts, never for a published file) **and is a LIST even when it names one
+bottle**, and every generic is a declared one. Tests in
+`tests/test_cocktails.py` hold all of that, so the mechanical pass cannot
+forget it.
+
+**`item` IS NO LONGER A PROMOTION CONCERN, since 2026-09-05.** It used to be
+one of the things the staging folder checked for, on the reasoning that the
+transcription field lives in drafts only. It now has to be gone from ANY pour
+whose `generic` is filled in, drafts included —
+`test_item_is_gone_once_the_generic_is_filled_in` — so by the time a drink is
+promotable the field went long ago. A fresh ingest still writes it, beside
+`generic: "QQ"`; that is the one state where it is correct.
 
 ## Where the rulings live
 
 - Bottles and their aliases, and the "a house is not a bottle" rule:
   `_data/cocktails/bottles.yml`, HANDOVER §9.3.2.
 - Generics, syrups, honey water, the whole-fruit units: `_data/cocktails/ingredients.yml`.
-- Method steps, ice, the rim, the automatic twist step: `_data/cocktails/methods.yml`.
+- Method steps and the automatic twist step: `_data/cocktails/methods.yml`.
+- **The ice and the rim: `_data/cocktails/serve.yml`** — a `serve` block on the
+  drink, not prose in a method step. The page COMPOSES "Strain into an old
+  fashioned glass, over a large ice cube." from `method`, `glasses.yml`'s
+  `serving` phrase and `serve.yml`'s `in_the_glass` clause, so a promoted drink
+  stores each fact once. HANDOVER §9.10a.
+- The garnish vocabulary and the articles the generated garnish step uses:
+  `_data/cocktails/garnish.yml`.
 - The ingest rules a session with no repo can use: `INGEST_ONE_COCKTAIL.md`.
   Its vocabulary blocks are generated — `scripts/build_ingest_vocab.py --write`
   after any ruling that changes `_data/`, never a hand edit.
