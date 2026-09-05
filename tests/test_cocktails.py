@@ -77,7 +77,8 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 # =============================================================================
 # THE CORPUS WAS ALREADY UNIFORM AND NOTHING SAID SO. Censused 2026-09-02 over
 # all 124 drinks: twelve top-level keys, every one single-shaped, `meta` exactly
-# `{ship, date_last_edited}` on every file. The "ad hoc" feeling around this
+# `{ship, date_last_edited}` on every file -- `date_last_edited` has since gone
+# (#712, 2026-09-05) and `made_before` and the three gate flags have arrived. The "ad hoc" feeling around this
 # collection came from the ABSENCE OF A GUARD, not from the data -- and the
 # proof is what the same census found underneath: nine drinks with no `method`
 # at all and eleven ingredient entries with no `amount`, both invisible to every
@@ -186,14 +187,12 @@ REQUIRED_INGREDIENT = {"generic"}
 # where that inference did NOT hold -- which is exactly why they were the ones
 # worth asking about. If a `true` here is ever wrong, it is one drink and one
 # word, not a schema problem.
-META_KEYS_IN_ORDER = ["made_before", "ship", "date_last_edited", "rewritten",
-                      "awaiting_fix", "proofread"]
+META_KEYS_IN_ORDER = ["made_before", "ship", "rewritten", "awaiting_fix",
+                      "proofread"]
 
 # The two flags the publish gate reads, and `rewritten` alongside them because
 # all three are booleans with the same trap.
 GATE_FLAGS = ["rewritten", "awaiting_fix", "proofread"]
-
-_ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 # A tagline nobody has written yet. 120 of the 124 drinks say this, which is a
 # backlog and not a design smell (Helen, 2026-09-02) -- but it is a backlog that
@@ -1107,31 +1106,6 @@ def test_every_ingredient_has_an_amount():
     )
 
 
-def test_date_last_edited_is_an_iso_date():
-    """`meta.date_last_edited` is a `YYYY-MM-DD` string and not a YAML date.
-
-    UNQUOTED, YAML PARSES IT INTO A `datetime.date` and Liquid then renders it in
-    a different format from every quoted sibling -- the silent kind of drift,
-    since both look identical in the file. The string form is what the other 124
-    already use.
-    """
-    bad = []
-    for slug, fm in _load():
-        meta = fm.get("meta")
-        if not isinstance(meta, dict):
-            bad.append(f"{slug}: no `meta:` mapping")
-            continue
-        value = meta.get("date_last_edited")
-        if not (isinstance(value, str) and _ISO_DATE.fullmatch(value)):
-            bad.append(f"{slug}: {value!r} ({type(value).__name__})")
-    assert not bad, (
-        "Bad `meta.date_last_edited`:\n  " + "\n  ".join(bad)
-        + "\n\nWrite it quoted: `date_last_edited: \"2026-09-02\"`. Unquoted, "
-          "YAML reads it as a date object rather than the string every other "
-          "drink stores."
-    )
-
-
 def test_meta_keys_are_exactly_the_schema_in_order():
     """A drink's `meta:` block holds exactly META_KEYS_IN_ORDER, in that order.
 
@@ -1332,9 +1306,10 @@ def test_agent_edited_drinks_are_not_marked_proofread():
     rather than reimplemented: `_only_invisible_keys_changed` in particular is
     150 lines of hard-won reasoning about what "nothing a reader could see
     changed" means (#417, #429), and two copies of it would drift the first time
-    one was fixed. `INVISIBLE_KEYS` covers `meta.rewritten` and
-    `meta.date_last_edited`, both of which are drink keys too and both of which
-    genuinely render nothing.
+    one was fixed. `INVISIBLE_KEYS` covers `meta.rewritten`, which is a
+    drink key too and genuinely renders nothing. (It also covers
+    `meta.date_last_edited`, which stopped being a drink key on 2026-09-05,
+    #712 -- the entry outlives the key on purpose, as its own note explains.)
 
     IT READS THIS REPO'S HISTORY ONLY. `_cocktail_recipes/` lives here;
     `_cocktail_drafts/` is a separate private repo and its history is not
@@ -3779,6 +3754,38 @@ def test_to_serve_is_a_string():
     )
 
 
+def test_notes_is_a_list():
+    """`notes:` with nothing after it parses as null, not `[]`. Issue #706.
+
+    THE ONE REQUIRED KEY WHOSE TYPE NOTHING CHECKED. `REQUIRED_TOP_LEVEL` asks
+    whether the key is PRESENT, and it is; #667's schema guard covers unknown
+    keys, missing keys, ingredient shape, method shape, `to_serve`, `glass` and
+    `mood`. `notes` fell through the gap between the two.
+
+    IT RENDERS CORRECTLY BY LUCK. `_layouts/cocktail.html` guards with
+    `{% raw %}{% if page.notes.size > 0 %}{% endraw %}`, and Liquid's `nil.size`
+    is nil, so the comparison is falsy and the section is skipped. The luck runs
+    out on the obvious tidy-up: rewritten as a bare truthiness test, that guard
+    would try to iterate nil. Food has had `test_notes_is_a_list` all along.
+
+    HOW IT TURNED UP, and it is the argument for this test rather than a
+    footnote to it: Helen hit it by hand on 2026-09-04, proofreading the first
+    published batch -- she emptied Bee's Knees' notes and wrote `notes:` rather
+    than `notes: []`. Four OTHER tests failed on that same edit, so the suite
+    was doing its job everywhere except here. A gap you only find by making the
+    mistake is the kind worth closing.
+    """
+    bad = [f"{slug}: notes is {fm['notes']!r} ({type(fm['notes']).__name__})"
+           for slug, fm in _load()
+           if "notes" in fm and not isinstance(fm["notes"], list)]
+    assert not bad, (
+        "`notes:` must be a list:\n  " + "\n  ".join(bad)
+        + "\n\nA drink with no notes writes `notes: []`. A bare `notes:` is "
+          "YAML null, which is not an empty list -- it renders as nothing "
+          "today only because Liquid's `nil.size` happens to be falsy."
+    )
+
+
 def test_glass_is_a_list():
     """`glass` became an ordered list on 2026-08-17 so a drink could name more
     than one acceptable serve. A leftover scalar still renders -- Liquid
@@ -5635,7 +5642,8 @@ def _prose_fields(drink):
 # and `meta` holds the three booleans that must NEVER be quoted -- quoting one
 # turns it into the string "true", which the publish gate reads as neither true
 # nor false and which holds the drink back for ever (test_the_gate_flags_are_
-# real_booleans above). `meta.date_last_edited` is quoted and has its own test.
+# real_booleans above). `meta.ship` is the one quoted scalar under `meta:`, and
+# test_meta_ship_is_a_rung_or_who_knows is what checks it.
 DRINK_SCALAR_FIELDS = ["title", "tagline", "source", "source_url", "to_serve"]
 
 

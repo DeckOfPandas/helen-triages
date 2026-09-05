@@ -37,7 +37,6 @@ source_url: ""
 meta:
   made_before: false
   ship: "who knows"
-  date_last_edited: "2026-09-02"
   rewritten: false
   awaiting_fix: false
   proofread: false

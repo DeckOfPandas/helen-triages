@@ -582,7 +582,7 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
             'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
             'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
             '  proofread: true\n{flag}  cooked_before: false\n'
-            '  date_last_edited: "2026-08-18"\n---\n')
+            '---\n')
     # `proofread: true` ON A FIXTURE, DELIBERATELY, and it is not a claim about
     # anything Helen has read -- these two files exist for one build and are
     # deleted in the `finally` below. Since #667 the gate has two legs, and a
@@ -646,7 +646,7 @@ FOOD_GATE_FIXTURE = (
     'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
     'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
     '  awaiting_fix: false\n  proofread: {proofread}\n  cooked_before: false\n'
-    '  date_last_edited: "2026-09-02"\n---\n'
+    '---\n'
 )
 
 # The smallest drink the #669 schema accepts: every key in REQUIRED_TOP_LEVEL,
@@ -661,7 +661,7 @@ DRINK_GATE_FIXTURE = (
     '  - amount: "25 ml"\n    generic: "lime juice"\n'
     'method:\n  - "Shake all ingredients with ice."\n'
     'mood:\n  - "sharp"\nnotes: []\nsource: ""\nsource_url: ""\n'
-    'meta:\n  ship: "yes"\n  date_last_edited: "2026-09-02"\n'
+    'meta:\n  ship: "yes"\n'
     '  rewritten: true\n  awaiting_fix: false\n  proofread: {proofread}\n---\n'
 )
 

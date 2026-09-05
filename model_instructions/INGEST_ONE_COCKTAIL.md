@@ -114,7 +114,6 @@ source_url: "https://..."
 meta:
   made_before: false
   ship: "who knows"
-  date_last_edited: "2026-09-02"
   rewritten: false
   awaiting_fix: false
   proofread: false
@@ -142,7 +141,6 @@ meta:
 | `source` / `source_url` | Free text here, unlike food. `"Difford's"`, `"Death & Co"`. `source_url` may be `""`. |
 | `meta.made_before` | Has Helen made this drink? **Always `false` on a fresh ingest** — unquoted, never `"false"`. A transcription cannot know whether she has poured it, and this is the field that says so. She flips it herself when she makes it. Issue #722. |
 | `meta.ship` | Helen's rating. **Always `"who knows"`, never `"QQ"`** — you have not drunk it and neither has she, and `QQ` is not a ship value. Helen, 2026-09-05: "I think that's clearer than QQ or leaving it unset, because it's a positive presence." The pair reads straight: she has not made it, so she has no idea. |
-| `meta.date_last_edited` | Today's date, `YYYY-MM-DD`. |
 | `meta.rewritten` / `meta.awaiting_fix` / `meta.proofread` | **Exactly these three, in this order, all `false`, unquoted.** The same publish gate a food recipe carries (since 2026-09-02). `rewritten` and `proofread` are Helen's own claims about her own work and you never set either `true`; `awaiting_fix: false` is what lets a drink publish once she has, and `false` unquoted is the only value that works. Underscore, never a hyphen. |
 
 > ### EVERY DRINK MUST NAME A GLASS, and you may not guess one.
@@ -330,9 +328,9 @@ fits, use the source's own words and flag it in your list.
 <!-- vocab:glass start -->
 `coupe` · `sour` · `collins` · `flute` · `highball` · `hurricane` ·
 `nick and nora` · `punch bowl` · `tiki mug` · `mug` · `mule mug` · `martini` ·
-`martini glass` · `wine` · `pilsner` · `sling` · `absinthe` · `goblet` ·
-`chalice` · `pineapple` · `hollowed pineapple` · `coconut` · `coconut shell` ·
-`old fashioned` · `double old fashioned` · `brandy glass`
+`wine` · `pilsner` · `sling` · `absinthe` · `goblet` · `chalice` ·
+`hollowed pineapple` · `coconut shell` · `old fashioned` ·
+`double old fashioned` · `brandy glass`
 <!-- vocab:glass end -->
 
 **These spellings are WRONG and will be corrected against you** — write the
@@ -343,8 +341,11 @@ right-hand form:
 <!-- vocab:glass_corrections start -->
 | rocks, old-fashioned, old-fashioned glass | **old fashioned** |
 | double rocks, double old-fashioned | **double old fashioned** |
-| champagne saucer, champage saucer | **coupe** |
+| champagne saucer | **coupe** |
 | snifter | **brandy glass** |
+| martini glass | **martini** |
+| pineapple | **hollowed pineapple** |
+| coconut | **coconut shell** |
 <!-- vocab:glass_corrections end -->
 
 If the source names no glass, use `glass: []` **and lead your list with it** —
@@ -689,7 +690,6 @@ source_url: ""
 meta:
   made_before: false
   ship: "who knows"
-  date_last_edited: "2026-09-02"
   rewritten: false
   awaiting_fix: false
   proofread: false

@@ -27,11 +27,21 @@ icons:
   # across the book. Helen drew it 2026-08-16; before that it was the one big
   # gap here and every coupe drink rendered iconless.
   coupe: coupe
-  # Helen's spreadsheet spells the coupe two other ways. "champage saucer"
-  # is her own typo, carried through the ingest verbatim rather than
-  # silently corrected, so it is mapped here alongside the correct spelling.
+  # Helen's spreadsheet also spells the coupe this way.
+  #
+  # "champage saucer" (sic) WAS HERE TOO AND IS GONE — issue #677, 2026-09-05.
+  # It was her own typo, carried through the ingest verbatim rather than
+  # silently corrected, and that was the right call while a drink still said it.
+  # None does now, and since #671 both this map and `canonical_glasses` below
+  # are GENERATED into `INGEST_ONE_COCKTAIL.md` -- so the typo had become a
+  # spelling the document taught a repo-less reader to expect from a source.
+  #
+  # REMOVING IT FROM `canonical_glasses` ALONE WOULD HAVE MADE IT WORSE, which
+  # is worth knowing before anyone retires another alias: the generator prints
+  # every `icons:` key that `canonical_glasses` does NOT correct, so dropping
+  # the correction promotes the typo from the wrong-spellings table into the
+  # list of spellings to use. It had to leave both, and it did.
   champagne saucer: coupe
-  champage saucer: coupe
   sour: sour
   collins: collins
   flute: flute
@@ -208,22 +218,36 @@ canonical_glasses:
   "double rocks": "double old fashioned"
   "double old-fashioned": "double old fashioned"
   "champagne saucer": "coupe"
-  "champage saucer": "coupe"
   "snifter": "brandy glass"
+  "martini glass": "martini"
+  "pineapple": "hollowed pineapple"
+  "coconut": "coconut shell"
 
-# NOT IN THE MAP, ON PURPOSE, 2026-08-26:
+# THE THREE THAT WERE "NOT IN THE MAP, ON PURPOSE" ARE NOW DECIDED — issue
+# #676, Helen, 2026-09-05: "hollowed pineapple, coconut shell". `martini glass`
+# resolves to `martini` in the same pass.
 #
-#   martini / martini glass   3 drinks split 1-2 (tomato-martini says
-#                             `martini`, espresso-martini and porn-star-martini
-#                             say `martini glass`). Helen's 2026-08-17
-#                             canonical list names four pairs and this is not
-#                             one of them, so there is no decision to enforce
-#                             yet. Both spellings render the same icon.
-#                             Adding a line above is all it takes once decided.
+# WHAT MADE THEM A PROBLEM was not the drinks — it was the DOCUMENT. Since #671
+# the glass list in `INGEST_ONE_COCKTAIL.md` is generated as "every `icons:` key
+# that `canonical_glasses` does not correct", so all six spellings printed side
+# by side and a repo-less reader had to guess between four near-duplicates.
+# Silence meant "undecided" to the test and "either is fine" to the reader.
 #
-# An alias absent from the map is permitted in a drink. That is the honest
-# default: this map records DECISIONS, and silence means the question has not
-# been asked rather than that either form is blessed.
+# TWO OF THE THREE COST NOTHING: no drink says `pineapple` or `coconut` today,
+# so those lines decide a question before it is ever asked in anger. `martini
+# glass` retyped two drinks (espresso-martini, porn-star-martini) onto the
+# spelling tomato-martini already used; all three rendered the same icon before
+# and after, so the change carries spelling and no meaning — the same argument
+# that made retyping seventeen `rocks` drinks safe above.
+#
+# `champage saucer` (sic) LEFT THE MAP in the same pass — issue #677. It was
+# only ever here because a drink once spelled it that way; none does now, and
+# #671's generated table had turned it into a typo the document actively taught
+# as a spelling a source might use. A typo is not a source's spelling.
+#
+# An alias absent from the map is still permitted in a drink. That remains the
+# honest default: this map records DECISIONS, and silence means the question has
+# not been asked rather than that either form is blessed.
 #
 # =============================================================================
 # RESOLVED 2026-08-25 — the four-tumbler-icon problem this section used to
