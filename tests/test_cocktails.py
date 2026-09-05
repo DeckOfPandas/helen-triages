@@ -91,14 +91,47 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
 TOP_LEVEL_KEYS = {
     "title", "tagline", "glass", "garnish", "ingredients", "method", "mood",
-    "notes", "source", "source_url", "meta", "to_serve",
+    "notes", "source", "source_url", "meta", "to_serve", "serve",
 }
 
-# `to_serve` is the only optional one -- 12 drinks of 124 carry it, because most
-# drinks have no presentation note to make. Everything else is on every file
-# today, including `source`/`source_url` where the value is the empty string:
-# "nobody has recorded a source" and "the key is missing" must not look alike.
-REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve"}
+# `serve` ARRIVED 2026-09-05 and is the answer to "where does the ice live?".
+#
+# A drink has a BUILD and a SERVE, and only the build had fields. The serve is
+# five things: the vessel (`glass`), the garnish (`garnish`), the serveware
+# (`to_serve`) -- and then the ICE IN THE GLASS and the GLASS PREP, which had
+# no home at all. Having nowhere to live, those two rode in the last method
+# step, in free prose, which is why "strain" appeared in SEVENTEEN different
+# sentences across 124 drinks: "Strain into a chilled glass", "Strain over
+# crushed ice", "Strain over two giant ice cubes", "Fine-strain into
+# pre-chilled" (a truncated sentence nobody had noticed).
+#
+# Giving them a field collapsed 94 uses of 31 spellings into five techniques --
+# Strain, Fine strain, Double strain, Pour, Dump -- with the variance moved
+# somewhere the page can render it identically every time. That is methods.yml's
+# own argument: a shape that changes every time has to be RE-READ, an identical
+# repeated one becomes something you RECOGNISE.
+#
+# IT IS NOT `to_serve`, WHICH ALREADY EXISTED AND STAYS. That field is the
+# SERVEWARE -- Cobra's Fang's "Plastic giraffes, paper umbrella, teeny
+# flamingos", the swizzles' "Straw.", the punches' "Ladle and punch glasses."
+# Blue Hawaiian had put its cocktail umbrella in `garnish` instead, which is
+# exactly the inconsistency Helen reported ("things to serve with, like a paper
+# umbrella, aren't written or laid out the same way"), and it moved to
+# `to_serve` rather than justifying a second serveware field.
+#
+# ABSENT MEANS NOBODY HAS DECIDED, `ice: "none"` MEANS SERVED UP. The same
+# distinction `garnish` already draws between `[]` and `["no garnish"]`, and it
+# is load-bearing: pic-a-de-crop-punch strains into a punch bowl and its method
+# never says whether ice goes in, where its two sibling punches both say a large
+# block. That is a real question for Helen, not a blank to fill with a default.
+SERVE_KEYS = {"ice", "chill", "rim"}
+
+# `to_serve` and `serve` are the optional ones -- most drinks have no serveware
+# note, and `serve` is absent where nobody has ruled on the ice. Everything else
+# is on every file today, including `source`/`source_url` where the value is the
+# empty string: "nobody has recorded a source" and "the key is missing" must not
+# look alike.
+REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve"}
 
 # `item` IS DRAFT-ONLY, ruled by Helen 2026-09-02 (D8, ARCHITECTURE_PLAN §8).
 # It holds what the SOURCE called the ingredient and is being retired by #544;
@@ -1524,6 +1557,89 @@ def test_item_is_gone_once_the_generic_is_filled_in():
           "on the page and invisible to ABV and costing. Move what it holds to "
           "the field that owns it -- see this test's docstring for the five "
           "cases -- and delete it only when it says nothing new."
+    )
+
+
+SERVE = ROOT / "_data" / "cocktails" / "serve.yml"
+
+
+def _serve_vocab():
+    if not SERVE.exists():
+        pytest.skip("_data/cocktails/serve.yml does not exist yet.")
+    return yaml.safe_load(SERVE.read_text(encoding="utf-8")) or {}
+
+
+def test_serve_block_uses_only_declared_keys_and_values():
+    """`serve` is a closed vocabulary, declared in _data/cocktails/serve.yml.
+
+    The field exists because the ice in the glass had no home and rode in the
+    last method step instead -- which is how "strain" came to be written
+    seventeen different ways. A free-text `ice` would put it straight back.
+
+    ABSENT IS ALWAYS LEGAL and means nobody has decided yet, exactly as
+    `garnish: []` does. Pic-a-de-Crop Punch is the live case: it strains into a
+    small punch bowl and never says whether ice goes in, where both its sibling
+    punches say a large block. Defaulting that to `none` would be inventing an
+    answer to a question only Helen can settle.
+    """
+    vocab = _serve_vocab()
+    ices, chills = set(vocab["ice"]), set(vocab["chill"])
+    assert ices and chills, (
+        "serve.yml declares no values, so this check enforces nothing."
+    )
+    bad = []
+    for slug, fm in _load():
+        serve = fm.get("serve")
+        if serve is None:
+            continue
+        if not isinstance(serve, dict):
+            bad.append(f"{slug}: `serve` is a {type(serve).__name__}, not a mapping")
+            continue
+        for key in sorted(set(serve) - SERVE_KEYS):
+            bad.append(f"{slug}: unknown serve key {key!r}")
+        if "ice" in serve and serve["ice"] not in ices:
+            bad.append(f"{slug}: ice {serve['ice']!r} is not declared in serve.yml")
+        if "chill" in serve and serve["chill"] not in chills:
+            bad.append(f"{slug}: chill {serve['chill']!r} is not declared in serve.yml")
+    assert not bad, (
+        "serve block problem(s):\n  " + "\n  ".join(bad)
+        + "\n\nThe values live in _data/cocktails/serve.yml. Adding one is a "
+          "YAML edit and writing that line is the moment somebody decides the "
+          "value is real."
+    )
+
+
+def test_serve_ice_is_not_restated_in_the_method():
+    """The ice is recorded once, in `serve`, and not again in prose.
+
+    THIS IS THE WHOLE POINT OF THE FIELD, and without this guard the collection
+    drifts straight back: a step reading "Strain over crushed ice" beside
+    `ice: "crushed"` is the same fact twice, and two copies of a fact are two
+    chances to disagree. Nine drinks lost a mood on 2026-09-05 precisely because
+    `ice ice baby` was grepping that prose, and taxonomy.yml's own comment had
+    predicted it -- "a step reworded out of this list silently loses the mood".
+
+    THE SWIZZLES ARE THE DELIBERATE EXCEPTION. "Fill with crushed ice" then
+    "Swizzle until the glass frosts" is a TECHNIQUE: the drink is stirred
+    against the ice, so the step is doing work no field can do. Those steps
+    start with Fill or Top, never with a strain verb, which is the line this
+    test draws.
+    """
+    bad = []
+    for slug, fm in _load():
+        for step in (fm.get("method") or []):
+            if not isinstance(step, str):
+                continue
+            if not re.match(r"^(fine[- ]?strain|double strain|strain|dump)\b",
+                            step, re.I):
+                continue
+            if re.search(r"\bice\b|crushed|cube|block|chilled|frozen", step, re.I):
+                bad.append(f"{slug}: {step!r}")
+    assert not bad, (
+        "A strain step still describes the serve:\n  " + "\n  ".join(sorted(bad))
+        + "\n\nThe technique belongs in `method` -- Strain, Fine strain, Double "
+          "strain, Dump -- and where it lands belongs in `serve` and `glass`. "
+          "Say it once."
     )
 
 

@@ -270,8 +270,54 @@ layout: default
          thing the drink IS. {% endcomment %}
       <div class="cocktail-meta-row">
       <dl class="cocktail-meta">
+        {% comment %} THE SERVE RIDES ON THE GLASS LINE, 2026-09-05, rather than
+           becoming a fourth item in this list. The `<dl>` is three facts with a
+           5rem gap Helen chose on the real page, and a fourth would wrap
+           differently on a narrow screen for information that is not a fourth
+           thing — "chilled" and "crushed ice" are facts ABOUT the glass.
+
+           IT IS ALSO WHERE THE WORDS USED TO LIVE. Until the `serve` field
+           existed the method step said "Strain into a chilled glass" and
+           "Strain over crushed ice"; those steps are now bare techniques and
+           this line carries what they said. Same fact, same words, one place.
+
+           THE PHRASING COMES FROM _data/cocktails/serve.yml, never from a
+           case/when ladder here — the contract glasses.yml states, and the
+           reason is that a vocabulary split across a data file and a template
+           has only one half anybody checks. `ice: none` maps to nothing on
+           purpose: 79 drinks are served up and saying so on all of them is
+           noise.
+
+           (And do not write that tag name in braces inside a comment: Liquid
+           parses tag syntax even in here, and an unclosed one takes the whole
+           build down. It did, once, while this block was being written.)
+        {% endcomment %}
         {% if page.glass.size > 0 %}
-          <div><dt>Glass</dt><dd>{{ page.glass | join: " or " }}</dd></div>
+          {% assign serve_bits = "" %}
+          {% if page.serve.chill %}
+            {% assign serve_bits = page.serve.chill %}
+          {% endif %}
+          {% assign ice_words = site.data.cocktails.serve.card[page.serve.ice] %}
+          {% if ice_words %}
+            {% if serve_bits == "" %}
+              {% assign serve_bits = ice_words %}
+            {% else %}
+              {% capture serve_bits %}{{ serve_bits }}, {{ ice_words }}{% endcapture %}
+            {% endif %}
+          {% endif %}
+          {% comment %} The rim is free text and Helen's own words ("half-rim of
+             sugar"), so it prints verbatim. It belongs on this line and not in
+             `garnish`, where it used to sit: a rim is done to the GLASS before
+             the drink is built, and it is not something floating in the
+             finished drink. {% endcomment %}
+          {% if page.serve.rim %}
+            {% if serve_bits == "" %}
+              {% assign serve_bits = page.serve.rim %}
+            {% else %}
+              {% capture serve_bits %}{{ serve_bits }}, {{ page.serve.rim }}{% endcapture %}
+            {% endif %}
+          {% endif %}
+          <div><dt>Glass</dt><dd>{{ page.glass | join: " or " }}{% if serve_bits != "" %}, <span class="cocktail-serve">{{ serve_bits }}</span>{% endif %}</dd></div>
         {% endif %}
         {% if page.garnish.size > 0 %}
           <div><dt>Garnish</dt><dd>{{ page.garnish | join: ", " }}</dd></div>

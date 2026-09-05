@@ -614,9 +614,28 @@ mood_include:
     why: >-
       she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
   caribbean-sazerac:
-    moods: [strong brown drink, warming]
+    moods: [strong brown drink, warming, I want to faff]
     why: >-
-      she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
+      she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice; it rinses a frozen glass and discards the excess, which the rule counts as ONE faff moment where it wants two.
+  # `I want to faff` JOINED BOTH SAZERACS ON 2026-09-05, and it is a correction
+  # to the RULE'S ARITHMETIC rather than to its judgement.
+  #
+  # Both drinks scored two faff hits until today, and both hits were the SAME
+  # RINSE: once in "Rinse a frozen glass with the overproof rum" and again in
+  # "Strain into the rinsed glass". The serve pass collapsed that second step to
+  # a bare "Strain." -- the destination moved to `serve.chill: rinsed` -- and
+  # with the duplicate gone the count fell to one and the mood fell off.
+  #
+  # THE OLD COUNT WAS WRONG AND THE NEW ONE IS RIGHT: the drink rinses once. But
+  # a drink that rinses a glass with absinthe and throws it away IS faff, so the
+  # honest fix is to record the drinks here rather than to loosen the rule or to
+  # re-inflate the prose. Recorded rather than fixed in `step_words` because
+  # adding "discard" there would reach several twist-and-discard drinks that
+  # nobody thinks are faffy.
+  sazerac:
+    moods: [I want to faff]
+    why: >-
+      it ices a glass, rinses it with absinthe and discards the contents, which the rule counts as ONE faff moment where it wants two. See the note on caribbean-sazerac directly above.
   carta-switchel:
     moods: [sharp]
     why: >-

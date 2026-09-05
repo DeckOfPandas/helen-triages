@@ -510,8 +510,8 @@ bottles:
     aliases: ["Massenez Kirsch Vieux cherry brandy", "Massenez Kirsch"]
   "Pierre Ferrand Ambre":
     generic: "cognac"
-    aliases: ["Pièrre Ferrand Ambre", "Pièrre Ferrand Ambre cognac"]
-    aliases: ["Pierre Ferrand ambre"]
+    aliases: ["Pierre Ferrand ambre", "Pièrre Ferrand Ambre",
+              "Pièrre Ferrand Ambre cognac"]
   "Avallen":
     generic: "calvados"
 
@@ -719,9 +719,10 @@ bottles:
   # with its reasoning: a rhum-based orange liqueur, not a rum.
   "Rhum Clément Créole Shrubb":
     generic: "Créole Shrubb"
-    aliases: ["Rhum Clement Creole Shrub", "Rhum Agricole Clément Créole shrub",
-              "Rhum Clément Créole Shrubb liqueur", "Créole Shrubb"]
-    aliases: ["Rhum Clement Créole Shrubb", "Clément Créole Shrubb", "Créole Shrubb"]
+    aliases: ["Rhum Clement Créole Shrubb", "Clément Créole Shrubb",
+              "Créole Shrubb", "Rhum Clement Creole Shrub",
+              "Rhum Agricole Clément Créole shrub",
+              "Rhum Clément Créole Shrubb liqueur"]
 
   # --- bitters --------------------------------------------------------------
   # Arrack Punch's and Legend's aromatic bitters, from their `item` fields --
