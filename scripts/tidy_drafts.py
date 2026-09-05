@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tidy `_food_drafts/` -- the mechanical half only, on request.
+"""Tidy `_food_drafts/` and `_cocktail_drafts/` -- the mechanical half only.
 
 RUN IT THROUGH `/tidy-drafts`, not by hand, unless you know why you are here.
 `.claude/commands/tidy-drafts.md` is the procedure: branch the drafts repo,
@@ -8,6 +8,7 @@ report, apply, run pytest, commit there. This file is only the engine.
     python3 scripts/tidy_drafts.py                  # report, change nothing
     python3 scripts/tidy_drafts.py --apply          # write the fixes
     python3 scripts/tidy_drafts.py --only quoting,meta
+    python3 scripts/tidy_drafts.py --site cocktails # one collection only
 
 WHY A SCRIPT AND NOT AN AGENT EDITING 340 FILES. Three of these rules have a
 trap in them that is easy to state and easy to forget on the hundredth file:
@@ -44,9 +45,50 @@ between `amount:` and `item:`) were considered and excluded -- mechanical in
 shape, but it rewrites two fields per hit and the precedent records real fixes
 that needed an eye.
 
-Cocktail drafts are deliberately out of scope: that schema is mid-migration
-(#544, #571, #573), so a tidy pass there would be fixing things about to change
-shape. Revisit when it settles.
+COCKTAIL DRAFTS JOINED THE PASS ON 2026-09-05, at Helen's request: *"Widen
+please -- cocktail drafts passing will save me a lot of time."* They were out
+while the drink schema was mid-migration (#544, #571, #573), on the grounds that
+tidying a shape about to change is work done twice; #571 and #573 have landed
+and #544's mechanical half is spent, so the reason had expired.
+
+WHAT THE PASS DOES ON A DRINK, and the boundary is narrower than food's because
+a drink's front matter is mostly NOT prose. Four fifths of its lines are a
+closed vocabulary, somebody else's words, or a number.
+
+  - It fixes only what `tests/test_cocktails.py` already demands and calls
+    mechanical: the quoted scalars (`test_drink_scalar_fields_are_quoted`),
+    hyphenated number ranges (`test_drink_number_ranges_use_en_dashes`), `--`
+    and `->` (`test_drink_typography`), and accents from the curated list
+    (`test_drink_accents`). Nothing the drinks suite would not ask for.
+  - It fixes them only in Helen's OWN prose: `title`, `tagline`, `to_serve`, a
+    `notes` entry's label and text, an ingredient's `note`.
+  - It never touches a `QQ` line -- by the SUITE's predicate, not the food one
+    twenty lines below. On a drink the marker sits behind a key
+    (`tagline: "QQ ..."`, `text: "QQ - ..."`) and the food pattern, which allows
+    only a list dash and a quote before it, matches none of them. See
+    `drink_editable`.
+  - It never touches `item`, `suggestion`, `source` or `source_url`. Those are
+    somebody else's words -- test_cocktails.VERBATIM_KEYS, imported below rather
+    than re-listed -- and the drinks suite blanks them before it looks, so it
+    does not ask for them either.
+  - It never touches `glass`, `garnish`, `mood`, `generic` or `character`. Each
+    is a closed vocabulary declared in `_data/cocktails/` and enforced against
+    that declaration; an accent or an em dash written into one is a change to
+    the VOCABULARY, which is a question for `_data/`, not a formatting fix.
+  - It never touches a `method` step. `_data/cocktails/methods.yml` holds the
+    canonical steps and a `proposals` mechanism for changing one, so editing a
+    step in a drink file quietly de-canonicalises it.
+  - **It never touches an `amount`, and that one is a RECORDED HARM rather than
+    a principle.** anitas-attitude-adjuster said `amount: "Top (30-45) ml"` with
+    a `QQ` note quoting that string back verbatim; en-dashing the amount would
+    have desynchronised the note from the value it describes. The drinks suite
+    checks amounts and is right to -- they render -- so this script REPORTS a
+    range in one and leaves it, which is what the section below is for.
+
+Food's own rules stay food's: `main_ingredients` and `tags` flow quoting, and
+the #429 `meta:` migration, run on `_food_drafts/` and on nothing else. A drink's
+`meta:` block is a different list in a different order (test_cocktails.
+META_KEYS_IN_ORDER) and migrating it was never asked for.
 """
 from __future__ import annotations
 
@@ -54,10 +96,13 @@ import argparse
 import re
 import subprocess
 import sys
+from functools import partial
 from pathlib import Path
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parent.parent
-DRAFTS = ROOT / "_food_drafts"
+FOOD_DRAFTS = ROOT / "_food_drafts"
+COCKTAIL_DRAFTS = ROOT / "_cocktail_drafts"
 ACCENTS = ROOT / "_data" / "accented_words.yml"
 
 FRONT_MATTER = re.compile(r"\A(---\n)(.*?\n)(---\n?)", re.S)
@@ -88,6 +133,19 @@ sys.path.insert(0, str(ROOT / "tests"))
 from test_front_matter import (  # noqa: E402
     META_ORDER, RETIRED, SCALAR_STRING_FIELDS,
 )
+# THE DRINKS HALF IMPORTS THE SAME WAY, and the private name is deliberate.
+# `_checkable` is the drinks suite's own definition of "the part of a drink file
+# these rules look at" -- QQ lines and verbatim-key lines blanked, including the
+# indented block a bare `suggestion:` opens. Re-typing it here is exactly the
+# drift this section's heading forbids, and it is the one function whose
+# disagreement with the suite would be invisible: the script would report a
+# collection clean while the suite failed on it.
+from conftest import (  # noqa: E402
+    checkable_text, degreeless_temperatures, spelling_problems,
+)
+from test_cocktails import (  # noqa: E402
+    DRINK_SCALAR_FIELDS, VERBATIM_KEYS, _checkable as drink_suite_scope,
+)
 
 FLOW_FIELDS = ["main_ingredients", "tags"]
 
@@ -115,27 +173,43 @@ QQ_LINE = re.compile(r"^\s*(-\s*)?[\"']?QQ\b(?!\s+Claude\b)")
 # Reading the corpus
 # =============================================================================
 
-def load_drafts():
-    """Every draft, or a loud refusal. Never an empty list treated as success.
+def load_drafts(root):
+    """One collection's drafts, `None` if that private repo is simply absent.
 
     #537's lesson, and it cost the glass icons twice in two days: a script whose
     input is legitimately empty most of the time must check BEFORE it acts, not
     report `0 files ->` as though that were a result.
+
+    ABSENT AND EMPTY ARE STILL DIFFERENT ANSWERS; what changed on 2026-09-05 is
+    that ONE absent root is no longer fatal, because there are now two and they
+    are two separate private repos. A worktree routinely has one and not the
+    other. `main()` makes the loud refusal when NEITHER is here -- the same
+    three-way answer `tests/test_cocktails.py`'s header settles at length: skip
+    when neither collection is present, assert non-empty when one is.
+
+    A `.md` WITH NO FRONT MATTER IS NOT A DRAFT and is named, not silently
+    dropped. `_cocktail_drafts/README.md` is the live case, and the fixers that
+    do not parse front matter (dashes, typography, accents) would happily have
+    em-dashed a README's prose.
     """
-    if not DRAFTS.is_dir():
+    if not root.is_dir():
+        return None, []
+    md = sorted(root.rglob("*.md"))
+    if not md:
         sys.exit(
-            f"{DRAFTS.name}/ is not here. It is a separate private repo "
-            f"(helen-triages-food-private), gitignored from this one, so a "
-            f"clean checkout does not have it. Nothing to tidy; nothing done."
-        )
-    files = sorted(DRAFTS.rglob("*.md"))
-    if not files:
-        sys.exit(
-            f"{DRAFTS.name}/ exists but holds no .md files. That is not the "
+            f"{root.name}/ exists but holds no .md files. That is not the "
             f"absent-repo case, so either the checkout is broken or this glob "
             f"has gone stale. Refusing to report success over an empty corpus."
         )
-    return files
+    files = [p for p in md if has_front_matter(p.read_text(encoding="utf-8"))]
+    skipped = [p for p in md if p not in files]
+    if not files:
+        sys.exit(
+            f"{root.name}/ holds {len(md)} .md file(s) and not one has front "
+            f"matter. A whole collection of prose is not the shape this script "
+            f"reads; refusing rather than reporting {len(md)} files clean."
+        )
+    return files, skipped
 
 
 def split_front_matter(text):
@@ -149,18 +223,136 @@ def is_qq(line):
     return bool(QQ_LINE.match(line))
 
 
+def has_front_matter(text):
+    return FRONT_MATTER.match(text) is not None
+
+
+# =============================================================================
+# WHICH LINES OF A DRINK THIS SCRIPT MAY REWRITE
+# =============================================================================
+# The module docstring argues each entry; this is only the list. Two of the
+# three groups are imported rather than named:
+#
+#   VERBATIM_KEYS          somebody else's words (test_cocktails)
+#   the closed vocabularies declared in `_data/cocktails/`
+#   `amount`               the recorded harm, see the docstring
+#   `method`               methods.yml's canonical steps
+#
+# LONGEST FIRST IN THE ALTERNATION. `source` and `source_url` share a prefix,
+# and Python's alternation is first-match-then-backtrack rather than
+# longest-match, so the order is doing real work the moment a trailing group
+# stops forcing the backtrack. Sorting removes the dependency on that rather
+# than relying on it, which is worth one call to `sorted` at import time.
+DRINK_VOCABULARY_KEYS = ("glass", "garnish", "mood", "generic", "character")
+DRINK_NEVER_EDIT = tuple(VERBATIM_KEYS) + DRINK_VOCABULARY_KEYS \
+                   + ("amount", "method")
+DRINK_NEVER_EDIT_LINE = re.compile(
+    r"^(?:-\s*)?(?:"
+    + "|".join(sorted(DRINK_NEVER_EDIT, key=len, reverse=True))
+    + r"):(?P<value>.*)$"
+)
+
+
+def drink_editable(text):
+    """One bool per line: may this script rewrite it?
+
+    THE QQ TEST IS THE SUITE'S, NOT THE ONE AT THE TOP OF THIS FILE, and the
+    difference is not cosmetic. `QQ_LINE` above allows an optional list dash and
+    an optional quote before the marker, which is every shape a FOOD draft uses.
+    A drink puts the source's own wording behind a key -- `tagline: "QQ"`,
+    `text: "QQ - generic values INFERRED"` -- and the food pattern matches none
+    of those. Using it here would have left every QQ tagline in the collection
+    open to editing while the report claimed the rule was applied, which is the
+    shape of exclusion that looks right in the file and does nothing.
+    `conftest.checkable_text` is the pattern that knows about the key, and
+    asking it which lines it blanked is the same rule rather than a second copy.
+
+    A NEVER-EDIT KEY WITH AN EMPTY VALUE OPENS A BLOCK and the indented lines
+    under it go too. `method:`, `glass:`, `garnish:` and `mood:` are always that
+    shape, and `suggestion:` is that shape on the couple of dozen drinks that
+    name two bottles. Matching the key line alone would blank the header and
+    leave the values under it in scope -- the bug `test_cocktails._checkable`'s
+    own docstring records, avoided here by copying its algorithm rather than its
+    key list.
+    """
+    lines = text.split("\n")
+    blanked = checkable_text(text).split("\n")
+    editable, block_indent = [], None
+    for raw, checked in zip(lines, blanked):
+        stripped = raw.strip()
+        indent = len(raw) - len(raw.lstrip())
+        if block_indent is not None:
+            if not stripped or indent > block_indent:
+                editable.append(False)
+                continue
+            block_indent = None
+        if raw and not checked:
+            editable.append(False)          # a QQ line, by the suite's predicate
+            continue
+        match = DRINK_NEVER_EDIT_LINE.match(stripped)
+        if match:
+            editable.append(False)
+            if not match.group("value").strip():
+                block_indent = indent
+            continue
+        editable.append(True)
+    return editable
+
+
+def only_where_editable(fixer):
+    """Wrap a LINE-WISE fixer so it sees, and answers for, the editable lines.
+
+    Blank the rest, run the fixer over that, then take its answer line by line
+    where the line was editable and the ORIGINAL everywhere else. Blanking
+    rather than dropping is what makes the splice possible at all: the index of
+    a line has to survive, which is the same reason `conftest.checkable_text`
+    blanks and the reason it says so in its own docstring.
+
+    THE LENGTH CHECK IS NOT PARANOIA. Every fixer wrapped here is line-wise
+    today; `fix_meta_block` is not, and is food's alone. Wrapping a
+    line-count-changing fixer would splice its output against the wrong lines
+    and write a plausible-looking, wrong file to 125 drinks in one pass -- the
+    exact failure this script's `meta:` bug already produced once, caught then
+    only because the result stopped parsing. Here it would still parse.
+    """
+    def run(text, path):
+        editable = drink_editable(text)
+        lines = text.split("\n")
+        masked = "\n".join(l if ok else "" for l, ok in zip(lines, editable))
+        out, notes = fixer(masked, path)
+        fixed = out.split("\n")
+        if len(fixed) != len(lines):
+            raise AssertionError(
+                f"{getattr(fixer, 'func', fixer).__name__} changed the line "
+                f"count of {path} ({len(lines)} -> {len(fixed)}). Only a "
+                f"line-wise fixer may be wrapped; see only_where_editable."
+            )
+        return ("\n".join(f if ok else o
+                          for o, f, ok in zip(lines, fixed, editable)), notes)
+    return run
+
+
 # =============================================================================
 # FIXERS -- each takes the whole file text and returns (new_text, [what changed])
 # =============================================================================
 
-def fix_scalar_quoting(text, path):
+def fix_scalar_quoting(text, path, fields=None):
+    """`fields` is the collection's own list, imported, never re-typed here.
+
+    Food's is `test_front_matter.SCALAR_STRING_FIELDS`, a drink's is
+    `test_cocktails.DRINK_SCALAR_FIELDS`. Neither contains a boolean, and that
+    is load-bearing rather than incidental: quoting a `meta:` flag makes it the
+    STRING "true", which the publish gate reads as neither true nor false and
+    which holds the page back for ever.
+    """
+    fields = SCALAR_STRING_FIELDS if fields is None else fields
     parts = split_front_matter(text)
     if not parts:
         return text, []
     open_, fm, close, body = parts
     changed, out = [], []
     for line in fm.split("\n"):
-        m = re.match(rf"^({'|'.join(SCALAR_STRING_FIELDS)}):([ \t]*)(.+)$", line)
+        m = re.match(rf"^({'|'.join(fields)}):([ \t]*)(.+)$", line)
         if m:
             field, gap, val = m.group(1), m.group(2), m.group(3).rstrip()
             trailing = m.group(3)[len(val):]
@@ -398,7 +590,7 @@ def fix_meta_block(text, path):
     return open_ + "\n".join(lines) + close + body, changed
 
 
-FIXERS = [
+FOOD_FIXERS = [
     ("quoting", fix_scalar_quoting),
     ("quoting", fix_flow_quoting),
     ("dashes", fix_en_dashes),
@@ -406,6 +598,22 @@ FIXERS = [
     ("accents", fix_accents),
     ("meta", fix_meta_block),
 ]
+
+# THE THREE MISSING ENTRIES ARE THE POINT OF HAVING TWO TABLES.
+# `fix_flow_quoting` reads `main_ingredients` and `tags`, which no drink has;
+# `fix_meta_block` runs the #429 migration over food's three flags, and a
+# drink's `meta:` is a five-key block in its own order that nobody asked to
+# migrate. A single table with an `if site == ...` inside each fixer would have
+# been the same code and a worse place to read the answer.
+DRINK_FIXERS = [
+    ("quoting", only_where_editable(
+        partial(fix_scalar_quoting, fields=DRINK_SCALAR_FIELDS))),
+    ("dashes", only_where_editable(fix_en_dashes)),
+    ("typography", only_where_editable(fix_typography)),
+    ("accents", only_where_editable(fix_accents)),
+]
+
+RULE_NAMES = sorted({n for n, _ in FOOD_FIXERS} | {n for n, _ in DRINK_FIXERS})
 
 
 # =============================================================================
@@ -436,67 +644,78 @@ def report_claude_markers(path, text):
             for h in CLAUDE_MARKER.findall(text)]
 
 
-REPORTERS = [report_claude_markers]
+def report_drink_faults_left_alone(path, text):
+    """Mechanical faults the DRINKS SUITE names that this script will not fix.
+
+    WITHOUT THIS THE REPORT WOULD BE MISLEADING RATHER THAN MERELY INCOMPLETE.
+    The drinks suite blanks only the verbatim keys before it looks, so it checks
+    an `amount`, a `generic`, a `glass` and a method step; this script edits
+    none of them. A drink with a hyphenated range in its amount would print
+    nothing here and fail pytest, and the natural reading of that is "the tidy
+    pass missed one" rather than "the tidy pass declined one on purpose".
+
+    Two of the three kinds are not fixed for EITHER collection and are listed
+    for the same reason: a non-house spelling (`demarara -> demerara`) is a
+    word rather than a character, and a temperature without its degree sign
+    turns up in a drink about once a year and has never yet turned up wrong.
+    """
+    scope = drink_suite_scope(SimpleNamespace(raw=text))
+    editable = drink_editable(text)
+    found = []
+    for raw, seen, ok in zip(text.split("\n"), scope.split("\n"), editable):
+        if ok or not seen.strip():
+            continue
+        if NUMBER_RANGE.search(ISO_DATE.sub(" ", raw)):
+            found.append(f"hyphenated number range, not this pass's to fix: "
+                         f"{raw.strip()[:70]}")
+        for pattern, _, label in TYPOGRAPHY_FIXES:
+            if pattern.search(raw):
+                found.append(f"{label}, not this pass's to fix: "
+                             f"{raw.strip()[:70]}")
+    found += [f"non-house spelling, never auto-fixed: {p}"
+              for p in spelling_problems(scope)]
+    found += [f"temperature without a degree sign: {t}"
+              for t in degreeless_temperatures(scope)]
+    return found
+
+
+FOOD_REPORTERS = [report_claude_markers]
+DRINK_REPORTERS = [report_claude_markers, report_drink_faults_left_alone]
 
 
 # =============================================================================
 
-def dirty_drafts():
-    r = subprocess.run(["git", "status", "--porcelain"], cwd=DRAFTS,
+def dirty_drafts(root):
+    r = subprocess.run(["git", "status", "--porcelain"], cwd=root,
                        capture_output=True, text=True)
     return [l for l in r.stdout.split("\n") if l.strip()]
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--apply", action="store_true",
-                    help="write the fixes; without it nothing is changed")
-    ap.add_argument("--only", default="",
-                    help="comma-separated subset of: "
-                         + ",".join(sorted({n for n, _ in FIXERS})))
-    ap.add_argument("--allow-dirty", action="store_true",
-                    help="run even though _food_drafts/ has uncommitted changes")
-    ap.add_argument("--drafts-dir", default=None,
-                    help="operate on a different directory. Exists so this can "
-                         "be proved against a COPY before it is ever pointed "
-                         "at Helen's real drafts -- see the command doc.")
-    args = ap.parse_args()
+# ONE ROW PER PRIVATE REPO. The name is what `--site` takes, the root is where
+# the files are, and the two tables are what makes the food/drink boundary a
+# thing you can read in one place rather than a condition inside six fixers.
+SITES = {
+    "food": (FOOD_DRAFTS, FOOD_FIXERS, FOOD_REPORTERS,
+             "helen-triages-food-private"),
+    "cocktails": (COCKTAIL_DRAFTS, DRINK_FIXERS, DRINK_REPORTERS,
+                  "helen-triages-cocktails-private"),
+}
 
-    if args.drafts_dir:
-        global DRAFTS
-        DRAFTS = Path(args.drafts_dir).resolve()
 
-    wanted = {s.strip() for s in args.only.split(",") if s.strip()}
-    unknown = wanted - {n for n, _ in FIXERS}
-    if unknown:
-        sys.exit(f"--only names no such rule: {sorted(unknown)}")
-
-    files = load_drafts()
-
-    if args.apply and not args.allow_dirty:
-        dirt = dirty_drafts()
-        if dirt:
-            sys.exit(
-                f"_food_drafts/ has {len(dirt)} uncommitted change(s):\n  "
-                + "\n  ".join(dirt[:10])
-                + "\n\nRefusing to write on top of them, because the whole "
-                  "safety story here is that you can read the diff afterwards "
-                  "and see exactly what this script did. Mixed in with your own "
-                  "edits you cannot. Commit or stash them first, or pass "
-                  "--allow-dirty if you know they are unrelated."
-            )
-
+def tidy_one(root, fixers, reporters, wanted, apply):
+    """Report on (and optionally write) one collection. Returns the counts."""
+    files, skipped = load_drafts(root)
     fixed, reports, total = {}, {}, 0
     for path in files:
         text = original = path.read_text(encoding="utf-8")
         notes = []
-        for name, fn in FIXERS:
+        for name, fn in fixers:
             if wanted and name not in wanted:
                 continue
             text, said = fn(text, path)
             notes += [f"[{name}] {s}" for s in said]
         found = []
-        for reporter in REPORTERS:
+        for reporter in reporters:
             found += reporter(path, original)
 
         rel = path.relative_to(ROOT).as_posix()
@@ -506,12 +725,18 @@ def main():
                           and "SKIPPED" not in n])
         if found:
             reports[rel] = found
-        if args.apply and text != original:
+        if apply and text != original:
             path.write_text(text, encoding="utf-8")
+    return files, skipped, fixed, reports, total
 
-    verb = "applied" if args.apply else "would apply"
-    print(f"{len(files)} drafts scanned.\n")
-    print(f"=== {verb} {total} mechanical change(s) across {len(fixed)} file(s)")
+
+def print_collection(root, verb, files, skipped, fixed, reports, total):
+    print(f"\n{'=' * 70}\n{root.name}/ -- {len(files)} draft(s) scanned")
+    if skipped:
+        print(f"  ({len(skipped)} .md file(s) with no front matter, not "
+              f"drafts, not looked at: "
+              + ", ".join(p.name for p in skipped) + ")")
+    print(f"\n=== {verb} {total} mechanical change(s) across {len(fixed)} file(s)")
     for rel, notes in sorted(fixed.items()):
         print(f"\n  {rel}")
         for n in notes[:12]:
@@ -527,12 +752,94 @@ def main():
         if len(found) > 6:
             print(f"    ... and {len(found) - 6} more")
 
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--apply", action="store_true",
+                    help="write the fixes; without it nothing is changed")
+    ap.add_argument("--only", default="",
+                    help="comma-separated subset of: " + ",".join(RULE_NAMES)
+                         + " (meta is food's alone)")
+    ap.add_argument("--site", choices=sorted(SITES), default=None,
+                    help="one collection only; the default is both")
+    ap.add_argument("--allow-dirty", action="store_true",
+                    help="run even though a drafts repo has uncommitted changes")
+    ap.add_argument("--drafts-dir", default=None,
+                    help="operate on a different directory. Exists so this can "
+                         "be proved against a COPY before it is ever pointed "
+                         "at Helen's real drafts -- see the command doc. "
+                         "Needs --site, because a directory does not say "
+                         "which collection's rules it wants.")
+    args = ap.parse_args()
+
+    sites = [args.site] if args.site else sorted(SITES)
+    if args.drafts_dir and not args.site:
+        sys.exit(
+            "--drafts-dir needs --site. There are two collections with two "
+            "different rule sets now, and a bare path does not say which one "
+            "it holds -- guessing from the filenames would mean running food's "
+            "`meta:` migration over a drink, or a drink's key exclusions over a "
+            "recipe, and both are silent."
+        )
+
+    wanted = {s.strip() for s in args.only.split(",") if s.strip()}
+    unknown = wanted - set(RULE_NAMES)
+    if unknown:
+        sys.exit(f"--only names no such rule: {sorted(unknown)}")
+
+    plan = []
+    for site in sites:
+        root, fixers, reporters, repo = SITES[site]
+        if args.drafts_dir:
+            root = Path(args.drafts_dir).resolve()
+        if root.is_dir():
+            plan.append((site, root, fixers, reporters))
+        else:
+            print(f"{root.name}/ is not here -- it is a separate private repo "
+                  f"({repo}), gitignored from this one, so a clean checkout "
+                  f"does not have it. Skipped.")
+    if not plan:
+        sys.exit(
+            "Neither drafts repo is present. Nothing to tidy; nothing done. "
+            "Absent is a legitimate state -- both are private and gitignored -- "
+            "but it is not a clean report, so this refuses rather than printing "
+            "one."
+        )
+
+    if args.apply and not args.allow_dirty:
+        for _, root, _, _ in plan:
+            dirt = dirty_drafts(root)
+            if dirt:
+                sys.exit(
+                    f"{root.name}/ has {len(dirt)} uncommitted change(s):\n  "
+                    + "\n  ".join(dirt[:10])
+                    + "\n\nRefusing to write on top of them, because the whole "
+                      "safety story here is that you can read the diff "
+                      "afterwards and see exactly what this script did. Mixed "
+                      "in with your own edits you cannot. Commit or stash them "
+                      "first, or pass --allow-dirty if you know they are "
+                      "unrelated."
+                )
+
+    verb = "applied" if args.apply else "would apply"
+    for _, root, fixers, reporters in plan:
+        print_collection(root, verb,
+                         *tidy_one(root, fixers, reporters, wanted, args.apply))
+
     print("\n=== NOT looked at, and deliberately")
-    print("  Content judgement -- which milk, which flour, which mustard, "
-          "whether an\n  oven figure is the fan one, whether a note's first "
-          "word is a proper noun.\n  ~25 rules, listed with counts in "
+    print("  FOOD: content judgement -- which milk, which flour, which "
+          "mustard, whether\n  an oven figure is the fan one, whether a note's "
+          "first word is a proper noun.\n  ~25 rules, listed with counts in "
           "tests/test_drafts.py's NOT_FOR_DRAFTS.\n  Every one needs Helen or "
           "her source material. Run pytest to see them.")
+    print("\n  DRINKS: everything that is not Helen's own prose. An `amount`, "
+          "a `method`\n  step, a `glass`/`garnish`/`mood`/`generic`/"
+          "`character` (closed vocabularies\n  declared in _data/cocktails/), "
+          "an `item` or a `suggestion` (somebody else's\n  words), and every "
+          "`QQ` line. A dash or an accent inside one of those is a\n  question "
+          "for the vocabulary or for the source, not a formatting fix -- see "
+          "the\n  module docstring, and the reported-never-changed section "
+          "above for the ones\n  the drinks suite will still fail on.")
     if not args.apply:
         print("\nNothing was written. Re-run with --apply to write the fixes.")
 

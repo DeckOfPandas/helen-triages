@@ -5683,7 +5683,7 @@ knowing the trick rather than re-deriving it.
 > |---|---|
 > | getting material IN | `.claude/commands/ingest.md` (§11.0.3) |
 > | …when it arrived as a GitHub Issue | `.claude/commands/ingest-inbox.md` (§11.0.4) |
-> | the mechanical half of a food drafts pass | `.claude/commands/tidy-drafts.md` (§11.0.2) |
+> | the mechanical half of a drafts pass, either collection | `.claude/commands/tidy-drafts.md` (§11.0.2) |
 > | getting a DRINK OUT, and what "mechanical" means | `model_instructions/PUBLISHING_A_DRINK.md` |
 >
 > **`PUBLISHING_A_DRINK.md` is the one a session is most likely not to know
@@ -6157,9 +6157,69 @@ while looking green the whole time. That import is also what resolved the
 honestly, rather than by narrowing a guard that says in its own message not to.
 
 Scope was settled with Helen and the exclusions are hers: size words (108
-drafts) are out, cocktail drafts are out while that schema moves, and a missing
-`meta.awaiting_fix` is reported rather than invented because that flag fails
-closed and writing `false` asserts a recipe is fit to publish.
+drafts) are out, and a missing `meta.awaiting_fix` is reported rather than
+invented because that flag fails closed and writing `false` asserts a recipe is
+fit to publish.
+
+**COCKTAIL DRAFTS JOINED THE PASS ON 2026-09-05**, at Helen's request: *"Widen
+please — cocktail drafts passing will save me a lot of time."* They had been out
+since 2026-08-29 while the drink schema was mid-migration (#544, #571, #573), on
+the grounds that tidying a shape about to change is work done twice. #571 and
+#573 landed and #544's mechanical half is spent, so the reason had expired and
+the doc had said so for days without anything moving. `python3
+scripts/tidy_drafts.py` now covers both roots recursively — `to-promote/`
+included, which is 22 of the 124 drinks — and `--site food` / `--site cocktails`
+does one alone.
+
+**THE DRINKS BOUNDARY IS NARROWER THAN FOOD'S, AND THE REASON IS THE INTERESTING
+PART: a drink's front matter is mostly not prose.** Four fifths of its lines are
+a closed vocabulary, somebody else's words, or a number. So the pass fixes only
+what `tests/test_cocktails.py` already calls mechanical (quoted scalars,
+hyphenated ranges, `--`, `->`, accents) and only in `title`, `tagline`,
+`to_serve`, a `notes` entry's `label`/`text`, and an ingredient's `note`. It
+does not touch:
+
+- a `QQ` line — **by the SUITE's predicate, not the food one**, and this is the
+  trap worth naming. On a drink the marker sits behind a key (`tagline: "QQ"`,
+  `text: "QQ - ..."`), and `tidy_drafts.QQ_LINE`, which allows only a list dash
+  and a quote in front of the marker, matches **none** of them. Reusing it would
+  have left every QQ tagline in the collection open to editing while the report
+  claimed the rule was applied — the shape of exclusion that looks right in the
+  file and does nothing (§12 again);
+- `item`, `suggestion`, `source`, `source_url` — `test_cocktails.VERBATIM_KEYS`,
+  imported rather than re-listed, and blanked by the suite before it looks;
+- `glass`, `garnish`, `mood`, `generic`, `character` — closed vocabularies
+  declared in `_data/cocktails/`, so a dash written into one is a change to the
+  *vocabulary*;
+- a `method` step — `methods.yml` owns the canonical steps and the `proposals`
+  mechanism for changing one;
+- **an `amount`, and that one is a RECORDED HARM rather than a principle.**
+  anitas-attitude-adjuster said `amount: "Top (30-45) ml"` with a `QQ` note
+  quoting that string back verbatim; en-dashing the amount would have
+  desynchronised the note from the value it describes (§9's #669/#670 story).
+  The suite checks amounts and is right to — they render — so the script
+  **reports** a range in one, in a section that exists precisely so a decline
+  cannot be misread as a miss.
+
+**THE FIRST REAL RUN FOUND NOTHING, AND THAT IS THE EXPECTED ANSWER, NOT A
+SUSPICIOUS ONE.** Report mode over the real 124 drinks on 2026-09-05: zero
+changes, zero report-only findings. #670 cleared every range and every `--` in
+the collection on 2026-09-03, two days earlier, so a clean sweep is what a
+working pass should say. It is nonetheless exactly the shape §12 warns about, so
+the claim rests on `tests/test_tidy_drafts.py` rather than on the empty report:
+a fixture drink carrying six faults in Helen's prose and four identical faults in
+places the pass must not go, asserted **byte for byte** against the expected
+output. "It fixed the six" is the weaker claim; "and did nothing to the other
+thirty lines" is the one that matters for a script whose safety story is reading
+the diff afterwards.
+
+Food's own two rules stayed food's: the `main_ingredients`/`tags` flow quoting,
+and the #429 `meta:` migration. A drink's `meta:` is five keys in its own order
+(`test_cocktails.META_KEYS_IN_ORDER`), two of which food has RETIRED — pointing
+the food migration at a drink would have stripped them and reordered the rest,
+silently, on all 124 files. That is why the fixer tables are two lists rather
+than one list with a condition inside each fixer, and there is a test that says
+so.
 
 ### 11.0.3 `/ingest` — the procedure, and the pre-flight that feeds it
 
@@ -6191,7 +6251,7 @@ clear in the handover?"* It was not, and it is now the second section of
       -> a draft file, plus a short "what I could not know" list
       -> saved into _food_drafts/ or _cocktail_drafts/ root, on a branch
       -> COCKTAILS: python3 scripts/derive_cocktail_moods.py --write
-      -> pytest, then /tidy-drafts for food
+      -> pytest, then /tidy-drafts (both collections since 2026-09-05)
       -> work the hand-back list as TIER 3 questions -- ask, never fill in
       -> ingest_preflight.py for a drink
 
