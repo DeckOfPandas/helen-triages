@@ -370,11 +370,18 @@ sitemap: false
   /* THE STROKE MUST BE SCALED UP WITH THE ICON HERE, AND THIS IS NOT A DETAIL.
      `vector-effect: non-scaling-stroke` holds the glasses at 1.6 SCREEN pixels
      however large the icon is drawn — that is correct on the site, where every
-     icon renders at one size. Enlarge them without touching it and the glasses
-     stay hairline while the pineapple, whose lines are geometry rather than
-     stroke, scales normally. The set then looks mismatched and the pineapple
-     looks fat, which is exactly what Helen saw on 2026-08-18 and reported as a
-     pineapple problem. It was this page's problem: the artwork is fine.
+     icon renders at one size. Enlarge them without touching it and the stroked
+     glasses stay hairline while a FILLED drawing, whose lines are geometry
+     rather than stroke, scales normally. The set then looks mismatched and the
+     filled one looks fat, which is exactly what Helen saw on 2026-08-18 and
+     reported as a pineapple problem. It was this page's problem: the artwork is
+     fine.
+
+     THERE IS NO LONGER AN EXAMPLE IN THE SET. The pineapple and the coconut
+     became stroked line art on 2026-09-05 and the tiki mug on 2026-09-06
+     (#738), so all 27 scale with this rule and none is filled. The rule below
+     is unchanged and still needed -- it is what makes an enlarged view show the
+     weight the site actually draws.
      Values are the site's 1.6 times each view's magnification over 2.6rem --
      and 2.6rem is the OLD drink-page scale, replaced by 10.4rem on 2026-08-26.
      The two numbers below are left exactly as they were rather than

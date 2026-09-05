@@ -105,11 +105,24 @@ sitemap: false
     </fieldset>
   </div>
 
-  {% comment %} THE SOLID ICONS' OWN DIAL. Three of the set are filled artwork
-     rather than strokes (Helen's tiki mug, pineapple and coconut), so their
-     ink is the drawing and `stroke-width` does nothing to it. Each carries an
-     <feMorphology erode> filter instead, and this drives its radius live so
-     the amount can be chosen by looking rather than guessed at.
+  {% comment %} THE SOLID ICONS' OWN DIAL. Filled artwork has no stroke, so
+     its ink IS the drawing and `stroke-width` does nothing to it. Such icons
+     carry an <feMorphology erode> filter instead, and this drives its radius
+     live so the amount can be chosen by looking rather than guessed at.
+
+     NO ICON REACHES THIS ANY MORE, and the fieldset renders empty. It said
+     "three of the set (Helen's tiki mug, pineapple and coconut)" until
+     2026-09-05, when she redrew the pineapple and the coconut as line art;
+     the mug followed on 2026-09-06 (#738) and the set is now line art
+     end to end.
+
+     LEFT IN PLACE ON PURPOSE, unlike the prose that described it. The loop
+     keys off `feMorphology` in the rendered SVG, so it is self-emptying and
+     self-refilling: fill-only artwork arrives from outside regularly, and the
+     day one is published with an erode filter this dial reappears with no
+     edit. Deleting it would mean rebuilding it from scratch then. It is the
+     same call as keeping `.glass-icon-solid` and `SOLID` -- see the comment on
+     that rule in _sass/cocktails/_cocktail.scss.
 
      THE VALUES HERE ARE THE ONES BAKED INTO THE SVGs, read out of the files at
      render rather than restated -- same rule as the shape dials above. Whatever
@@ -130,10 +143,12 @@ sitemap: false
         {% endif %}
       {% endfor %}
       <p class="dev-note">
-        These three are filled drawings, so they have no stroke to set a width
-        on. The dial erodes the ink instead — the paths are untouched, and 0 is
-        the drawing exactly as Helen sent it. Parity with the stroked set would
-        be tiki&nbsp;1.77, pineapple&nbsp;0.63, coconut&nbsp;0.94.
+        A filled drawing has no stroke to set a width on. The dial erodes the
+        ink instead — the paths are untouched, and 0 is the drawing exactly as
+        Helen sent it. <strong>Nothing is filled today</strong>, so there is
+        nothing here to erode: the tiki mug's 1.77, the pineapple's 0.63 and the
+        coconut's 0.94 all went with the drawings they described, which are
+        stroked line art since 2026-09-05 and 2026-09-06.
       </p>
     </fieldset>
   </div>

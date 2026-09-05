@@ -1033,12 +1033,28 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   vector-effect: non-scaling-stroke;
 }
 
-// FILL-BASED ARTWORK, AND THE ONLY MEMBER OF THE SET THAT IS.
+// FILL-BASED ARTWORK. NOTHING IN THE SET USES THIS TODAY, AND IT STAYS ANYWAY.
+//
+// All 27 glasses are open line art as of 2026-09-06: Helen redrew the pineapple
+// and the coconut (#525, #307) and then the tiki mug (#738), and each redraw
+// took a compound fill out of the set. This rule's last consumer went with the
+// mug.
+//
+// KEPT DELIBERATELY, AND NOT AS THE KIND OF ORPHAN #651 COMPLAINS ABOUT -- that
+// issue's rule is that "a value nothing reads is only safe while a comment says
+// why it is there", so here is the why. This rule is one half of a switch whose
+// other half is `SOLID` in scripts/normalise_glass_icons.py, which is also kept
+// and also empty. Fill-only artwork arrives from outside regularly (stock icons
+// almost always are), and publishing one is a single name in that set. Delete
+// this rule and the next such icon publishes with a class that styles nothing:
+// no `fill: none`, so it renders as a solid black blob, silently. **The two
+// halves go together or not at all** -- and both being empty is a fact about
+// today's artwork, not about the mechanism.
 //
 // Every glass is an open line drawing, so `fill: none` plus a stroke is the
-// right treatment. The pineapple is not a glass and is not drawn that way: it
-// is one compound path whose lattice is negative space. Forcing the stroke
-// class onto it outlines the outline and collapses to mush at icon size.
+// right treatment. A fill-based drawing is not made that way: it is one compound
+// path whose lattice is negative space, and forcing the stroke class onto it
+// outlines the outline and collapses to mush at icon size.
 //
 // So it fills with currentColor instead. Note what is preserved and what is
 // not: the PALETTE rule still holds -- the colour comes from the page's own ink

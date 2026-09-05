@@ -23,6 +23,20 @@ Note the SVGs are INLINED by Liquid, not fetched by JS, so the `<svg ` vs
 `<svg\\n` injection trap does not apply here -- but the output is written
 with a space after `<svg` anyway, since it costs nothing and the repo has
 been bitten by that assumption before.
+
+A WHOLESALE REGENERATION NOW REPRODUCES THE SHIPPED SET EXACTLY, and that was
+not true until 2026-09-06. `_includes/icons/glasses/tiki-mug.svg` carried a
+hand-added `<feMorphology operator="erode">` thinning filter that this script
+does not emit, so regenerating silently stripped it and the mug rendered
+heavier. Helen's redraw is line art, which has a stroke width to set and so
+needs no thinning at all: the filter went with the fill, and the last divergence
+went with it.
+
+**Run `scripts/check_glass_regen.py` after touching SKIP, SOLID or RENAME.** It
+resolves every archived source the way main() does and diffs against what is
+published, without deleting anything. It should say "reproduces the shipped set
+exactly"; if it names a divergence, something has been hand-edited since.
+
 """
 import pathlib, re, shutil, xml.dom.minidom
 import xml.etree.ElementTree as ET
@@ -93,6 +107,25 @@ SKIP = {
     # one.
     "glass-tiki-mug-2.svg",
     "glass-pineapple-3.svg",
+    # 2026-09-05, #525/#307: Helen redrew the pineapple and the coconut as open
+    # LINE ART, replacing the two compound fills. Both predecessors are skipped
+    # and both new drawings are RENAME targets below.
+    #
+    # THIS PAIR IS WHY THE SKIP LIST IS NOT OPTIONAL, more sharply than the
+    # coupe collision the comment above describes. Without these two entries a
+    # wholesale regeneration would not merely pick the wrong file -- it would
+    # publish `pineapple.svg` and `coconut.svg` from the OLD fills (they are
+    # RENAME targets already) AND emit `pineapple-8.svg` and `coconut-4.svg`
+    # as two orphan icons beside them, which then fails
+    # test_all_icons_matches_the_icon_directory. The new drawings would be
+    # reverted and the git diff would blame this script.
+    "glass-pineapple-4.svg",
+    "glass-coconut.svg",
+    # 2026-09-06, #738: and the mug completes the set's move to line art. Its
+    # predecessor was itself a redraw (machine-traced centrelines, 46 paths);
+    # this one is Helen's own, 21 paths, and needs no thinning filter because a
+    # stroke has a width to set.
+    "glass-tiki-mug-3.svg",
     # 2026-08-31: coupe-3's stroke ends fell short of each other by up to 1.06
     # user units. Invisible while drawing -- her stroke is ~2.8 units wide and a
     # round cap bridges one stroke width -- and visible on the page, where
@@ -126,11 +159,18 @@ SKIP = {
 }
 
 # FILL-BASED ARTWORK, WHICH THE REST OF THE SET IS NOT. Every glass is drawn as
-# open strokes with `fill: none`; the pineapple is a single compound path whose
-# lattice is negative space, so forcing the stroke class onto it would outline
-# the outline and produce mush. It gets its own class instead -- see
+# open strokes with `fill: none`; a fill-based drawing is a compound path whose
+# interior lattice is negative space, so forcing the stroke class onto it would
+# outline the outline and produce mush. Those get their own class instead -- see
 # `.glass-icon-solid` in _sass/cocktails/_cocktail.scss -- which fills with
 # currentColor so the palette rule still holds and only the technique differs.
+#
+# READ THE HISTORY BELOW AS HISTORY. It is written about the pineapple and the
+# coconut and both LEFT this set on 2026-09-05, redrawn by Helen as line art;
+# only the tiki mug is still filled. It is kept because the reasoning is about
+# the technique rather than about those two drawings, and the last paragraph --
+# ask "must this be redrawn" before "can this be traced" -- is the standing rule
+# for whatever arrives next.
 #
 # THE TIKI MUG JOINED IT 2026-08-26, and it was always this case -- nobody had
 # looked. Its source is fill-only in exactly the pineapple's way: one style
@@ -173,11 +213,20 @@ SKIP = {
 # holds a stroked one at a constant screen weight -- so the gap widens as the
 # icon grows. That is the thing to look at on /dev/card-glasses/, and it is a
 # reason to redraw only if it actually looks wrong.
-SOLID = {
-    "glass-tiki-mug-3.svg",
-    "glass-pineapple-4.svg",
-    "glass-coconut.svg",
-}
+# EMPTY SINCE 2026-09-06, AND THAT IS THE END OF A THREE-DRAWING STORY. Helen
+# redrew the pineapple and the coconut on 2026-09-05 and the tiki mug the next
+# day, so every one of the 27 glasses is now open line art and NOTHING is
+# published with the solid class. `.glass-icon-solid` went from
+# _sass/cocktails/_cocktail.scss in the same commit, along with the tiki mug's
+# hand-applied `feMorphology` thinning filter -- a filled drawing needs thinning
+# because its ink scales with it, and a stroked one does not.
+#
+# KEPT RATHER THAN DELETED, because fill-only artwork is a thing that arrives
+# from outside (stock icons are nearly always fill-only) and this is the switch
+# that publishes it correctly. Adding a name here is still the right answer the
+# next time one does; it would need `.glass-icon-solid` restoring too, and the
+# reasoning for both is in this file's header.
+SOLID = set()
 
 # Source name -> published name, where the export carries a working title.
 #
@@ -226,6 +275,14 @@ RENAME = {
     # two that no longer read as the same drawing.
     "julep-cup-3": "julep-cup",
     "sour-2": "sour",
+    # 2026-09-05. Both replace a compound fill with open line art, so both also
+    # leave SOLID above. Their predecessors are in SKIP.
+    "pineapple-8": "pineapple",
+    "coconut-4": "coconut",
+    # 2026-09-06. Note the source stem is `tiki-9`, not `tiki-mug-9` -- the
+    # published name is not a prefix of it, which is exactly why this map is
+    # explicit rather than a pattern.
+    "tiki-9": "tiki-mug",
 }
 
 # NOT IN THAT PASS, AND DELIBERATELY: `old-fashioned-double` carries the set's

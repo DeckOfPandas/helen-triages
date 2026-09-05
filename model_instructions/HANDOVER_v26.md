@@ -3994,10 +3994,27 @@ height here" after #298 shipped, a live instance of §11.2.
 >
 > **Ink can be thinned without touching a path**: an `<feMorphology
 > operator="erode">` filter shrinks the painted region at render time, and the
-> radius is one attribute that returns to 0. The three carry one (tiki 1.20,
-> pineapple 0.25, coconut 0.35 — interim, Helen is redrawing them). Not a
-> background-coloured stroke, which does the same job while hardcoding whatever
-> sits behind the icon.
+> radius is one attribute that returns to 0. Not a background-coloured stroke,
+> which does the same job while hardcoding whatever sits behind the icon.
+>
+> **THE INTERIM IS OVER AND THE WHOLE SET IS LINE ART, 2026-09-06.** Helen
+> redrew the pineapple (21 stroked paths, was 1 filled) and the coconut (4, was
+> 1) on the 5th, and the tiki mug (21, was 2) on the 6th — #738. **No published
+> icon is filled and none carries an erode filter.** Three consequences:
+>
+> - **`SOLID` in the normaliser and `.glass-icon-solid` in
+>   `_sass/cocktails/_cocktail.scss` are both empty and both KEPT**, as two
+>   halves of one switch. Fill-only artwork arrives from outside regularly;
+>   publishing one is a single name in `SOLID`, and deleting the CSS would make
+>   the next such icon render as a solid black blob, silently.
+> - **A wholesale regeneration now reproduces the shipped set exactly**, which
+>   was not true before: the mug's hand-added filter was the one thing
+>   `normalise_glass_icons.py` could not emit, and it went with the fill.
+>   `scripts/check_glass_regen.py` is how you know.
+> - **Ink density is now measured on the same basis for all 27**, because they
+>   are all stroked. The mug is still the densest at 2.9× the median (it was
+>   3.6× filled) — a carved face has more line in it than a coupe, and that is
+>   the drawing rather than a defect.
 
 > #### OPEN STROKE ENDS: THE SITE DRAWS 4–6× THINNER THAN HELEN EDITS
 >
@@ -5015,8 +5032,39 @@ the real index, and two things made the case:
   colour and the drawing carrying none.
 
 One `color` declaration on `.drink-card-glass` reaches every glass, because the
-artwork strokes with `currentColor` (§3) — including the three fill-based
-drawings, which a rule on `.glass-icon-line` would have missed.
+artwork strokes with `currentColor` (§3) — including the fill-based drawing,
+which a rule on `.glass-icon-line` would have missed. (There were three; the
+pineapple and the coconut became line art on 2026-09-05 and the tiki mug is the
+last, #738.)
+
+> #### THE ARTWORK WAS RE-JUDGED ON BLACK, 2026-09-05 — #650 CLOSED
+>
+> Every weight in the set was chosen against paper and the site went black on
+> 2026-09-02, so the drawings were the one thing never re-derived after the
+> inversion. Helen looked at all 27 on the real ground at both sizes, with the
+> weights switchable, and ruled:
+>
+> - **The drink page drops to stroke 2**, from 3. A light line on a dark ground
+>   BLOOMS — the same irradiation that took the index type up in size and down
+>   in weight — so the same pixel count reads heavier than it did as ink.
+> - **The card keeps 1**, unchanged: at 10.4rem the bloom spreads over a drawing
+>   two thirds the size. The universe line's 0.7 at 1.4rem is the third member
+>   of the family, and the reason a SMALLER drawing needs LESS is written out in
+>   `_sass/cocktails/_universe.scss`.
+> - **The scaling curve is untouched**, and Helen ruled it out before it was
+>   built: *"I can't think of any reason why the glass scaling would need to be
+>   different."* Correct — the only ground-dependent effect is that irradiation
+>   adds roughly a constant per edge, which flatters SHORT glasses
+>   proportionally more and nudges the apparent range slightly tighter. That is
+>   the direction the curve already compresses deliberately, by a percent or two.
+>
+> **Two measurements exist now so this is not re-argued from memory.**
+> `scripts/glass_stroke_gaps.py` finds open stroke ends in RENDERED PIXELS
+> (user units are not comparable between drawings with different viewBoxes —
+> read its docstring for the end-to-end scan's real limitation), and
+> `scripts/glass_ink_coverage.py` measures density, which is the number #525 and
+> #738 set redraw targets with. Compare RATIOS within one run, never absolute
+> percentages between runs.
 
 **Every anchor is fixed, and that is the design rather than a side effect.**
 Helen: the title starts in the same place on every card, and the goodness mark
@@ -5188,7 +5236,8 @@ this section is the shorter pointer to that, not a duplicate of it.
 > of the name" were one default. `font-size: 1em` on the h1 is the fix; the
 > size she then chose by looking is **3.2rem**, written as such. The tape
 > takes the card's own horizontal padding and the brief's 0.5em vertical; the
-> meta row's gap is 5rem; the glass is **absinthe, stroke 3, and never
+> meta row's gap is 5rem; the glass is **absinthe, stroke 2 (3 until
+> 2026-09-05, see #650), and never
 > shorter than `$glass-min` (14rem)** — it hangs below the rule in the margin,
 > and below 1180px the head holds itself open for it. Section headings are
 > 1.8rem / weight 400, absinthe over yvette (NOTES: over lagoon), and each
@@ -5819,12 +5868,15 @@ replaces cannot rest on archaeology that a squash, rebase or shallow clone
 removes.
 
 **The convention** — base name is the original, a numeric suffix is the redraw,
-and both stay on disk. Eleven sources carry one after the 2026-08-31 pass
-(`coupe-4`, `absinthe-2`, `collins-4`, `goblet-2`, `hot-toddy-2`,
-`julep-cup-3`, `sherry-2`, `sour-2`, `tiki-mug-3`, `pineapple-4`, plus
-`hurricane-2`), so **read `RENAME` in the normaliser rather than guessing which
-number is live** — the count moves and the suffix is a fact about this repo's
-history, not a pattern.
+and both stay on disk. Thirteen sources carry one: the eleven from the
+2026-08-31 pass (`coupe-4`, `absinthe-2`, `collins-4`, `goblet-2`,
+`hot-toddy-2`, `julep-cup-3`, `sherry-2`, `sour-2`, `tiki-mug-3`,
+`pineapple-4`, `hurricane-2`) plus `pineapple-8` and `coconut-4` from
+2026-09-05. **Read `RENAME` in the normaliser rather than guessing which number
+is live** — `pineapple-4` and `pineapple-8` are both on disk and only the
+second publishes — and do not try to infer it from the highest number either:
+the count moves, and the suffix is a fact about this repo's history rather than
+a pattern.
 
 **Which one publishes is then a NAMED SWITCH, not an accident.** In
 `scripts/normalise_glass_icons.py`, a `RENAME` entry points the suffixed name
@@ -5833,10 +5885,19 @@ a comment saying which two lines to delete to reverse it. That is how an
 undecided choice should sit in a repo: both options present, one live, and the
 change a deletion rather than a reconstruction.
 
-**VERIFY BY RESOLUTION, NOT BY INSPECTION.** After changing that switch, re-run
-the normaliser's own skip/strip/rename logic and assert exactly one source
-resolves to the published name, then regenerate and confirm the output matches
-what is on disk. Issue #484 is what happens without this: the published
+**VERIFY BY RESOLUTION, NOT BY INSPECTION — AND THERE IS NOW A COMMAND FOR IT.**
+`python3 scripts/check_glass_regen.py` does exactly what this paragraph used to
+ask you to do by hand: it resolves every archived source through SKIP / SOLID /
+RENAME as the generator's `main()` would, normalises in memory, and diffs
+against the published set, reporting COLLISION, ORPHAN, UNREACHED, DIFFERS or
+REFUSED. **It never deletes anything**, so it is safe on a dirty tree, unlike
+the generator whose first act is `shutil.rmtree`. Run it after touching any of
+the three registries. One DIFFERS is expected today — the tiki mug's hand-added
+thinning filter, which the generator does not emit — and the script names it as
+expected rather than leaving you to remember.
+
+The written instruction stood for nine days and nobody ran it; when the script
+was finally written on 2026-09-05 it found that divergence immediately. Issue #484 is what happens without this: the published
 old-fashioned was correct only because someone had written it by hand, and the
 `sorted()` ordering meant a regeneration would have silently replaced it with a
 superseded 2-path draft. `-` is 0x2D and `.` is 0x2E, so every suffixed name
