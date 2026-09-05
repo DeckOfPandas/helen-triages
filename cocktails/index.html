@@ -121,7 +121,36 @@ permalink: /cocktails/
      one -- "I am almost always more open to persuasion about what I drink
      than what I eat" -- and means to refine it. Absent JavaScript the section
      is empty and hidden. {% endcomment %}
-  <section class="universe" data-universe-rows=".drink-cards > li" data-universe-parts=".drink-card-body, .drink-card-foot" hidden>
+  {% comment %} IT DEALS FROM THE TOP TWO RUNGS ONLY, SINCE #692 -- Helen: "It's
+     pretty funny when the top line of the site shows a drink loudly marked
+     'MEH', but it's still not the right call to allow it." An unfiltered offer
+     is the one place on the page where the site speaks first, so it has to be
+     an invitation rather than a lucky dip. 61 of the 124 drinks qualified on the
+     day this was written.
+
+     IT NAMES THE RUNGS, AND DELIBERATELY DOES NOT GO THROUGH `data-chaos`. That
+     attribute is on every card, is derived a few dozen lines below as exactly
+     "ship is yes or oh gods yes", and would have said this in one word -- which
+     is precisely the trap. `chaos` is the YOLO? FILTER'S word (its only reader
+     is cocktail-index.js's `state.chaos === 'good'`), and "which drinks does no
+     chaos please show?" and "which drinks may the site offer unprompted?" are
+     two different questions that happen to share an answer today. Borrowing the
+     attribute would weld them: a later widening of `no chaos please` -- to admit
+     `sure`, say -- would silently change what the universe deals, with no test
+     watching and nothing on the page to reveal it. Helen caught this on review,
+     2026-09-05. Two rules that agree by coincidence should each say what they
+     mean.
+
+     universe.js needs no change and gets none: which rows a deal is drawn from
+     has been this attribute's business since the file was written.
+
+     AND IT FAILS SHUT, WHICH MATTERS FOR THE FIRST PROMOTION. Production has no
+     drafts, so on the day the first drink is promoted this selector may well
+     match nothing -- and universe.js returns before unhiding on an empty row
+     list, so the section stays `hidden` rather than drawing an empty frame with
+     a "deal again" button that cannot. Nothing to remember and nothing to
+     revert. {% endcomment %}
+  <section class="universe" data-universe-rows=".drink-cards > li[data-ship='yes'], .drink-cards > li[data-ship='oh gods yes']" data-universe-parts=".drink-card-body, .drink-card-foot" hidden>
     <div class="universe-row">
       <span class="universe-label">the universe says…</span>
       <button type="button" class="btn-universe-again">deal again <span class="universe-again-icon" aria-hidden="true">&#8635;</span></button>
