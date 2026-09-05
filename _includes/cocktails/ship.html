@@ -8,12 +8,27 @@
    assumed present, since a value the caller does not have is exactly what
    `default: "who knows"` below exists for.
 
-   A WORD ONLY IF THE RUNG IS ON THE SCALE. `ship_card_names` maps every value a
-   drink can carry, INCLUDING "who knows" -- so it cannot be asked whether a
-   value is a real rung. `ship_scale` can, and is the list that means exactly
-   that. `QQ` and "who knows" both fall through to no word, which is the
-   template's honest way of saying there is no rating yet rather than inventing
-   a sixth term.
+   A RUNG'S OWN WORD IF IT IS ON THE SCALE, AND `???` IF IT IS NOT. `ship_scale`
+   is the list that means "a real rung", so it is what decides; `ship_card_names`
+   cannot be asked, because it maps only the two rungs the card abbreviates.
+
+   `???` ARRIVED 2026-09-05 AND REPLACED AN EMPTY STRING -- #722's second bullet,
+   Helen: "I would like the ship mark to have ??? next to it for 'who knows',
+   because that, to me, is unambiguously not on the same rating scale. (It's
+   also funny)." Until then an off-scale value fell through to no word at all,
+   which was honest while every such drink was a draft nobody could see. The
+   same day she ruled that an unmade drink MAY publish, and a published card
+   drawing the ship with nothing beside it is not honesty any more, it is a
+   rating that says nothing.
+
+   IT IS THE SAME WORD IN BOTH CALL SITES, deliberately, and it is NOT in
+   `ship_card_names` -- see taxonomy.yml's note above `ship_unrated_word`. Her
+   reason is about the SCALE rather than about a card foot's width, and it
+   applies wherever the mark is drawn.
+
+   THE TEMPLATE NAMES NO VOCABULARY VALUE. "Not a rung" is asked of `ship_scale`
+   rather than tested against a literal "who knows", which is §9.9's lesson: the
+   one thing this file must never do is keep its own copy of the vocabulary.
 
    `short` CHOOSES THE CARD'S ABBREVIATIONS, AND ONLY THE CARD PASSES IT --
    2026-09-05. `ship_card_names` renames two rungs: "not really" to "hmm" and
@@ -44,12 +59,13 @@
    shared. {% endcomment %}
 {% assign taxonomy = site.data.cocktails.taxonomy %}
 {% assign ship = include.ship | default: "who knows" %}
-{% assign ship_word = "" %}
 {% if taxonomy.ship_scale contains ship %}
   {% if include.short %}
     {% assign ship_word = taxonomy.ship_card_names[ship] | default: ship %}
   {% else %}
     {% assign ship_word = ship %}
   {% endif %}
+{% else %}
+  {% assign ship_word = taxonomy.ship_unrated_word %}
 {% endif %}
 <span class="drink-card-ship-icon">{% include icons/ship.svg %}</span><span class="drink-card-ship-word">{{ ship_word }}</span>

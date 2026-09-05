@@ -853,10 +853,13 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // stable." In Courier Prime those five run three to four characters, so the
 // ship moves by at most one character between cards.
 //
-// A DRINK OFF THE SCALE GETS THE SHIP AND NO WORD. `QQ` and `who knows` are 31
-// of 114 drinks and are deliberately not rungs; drawing the ship anyway keeps
-// the anchor in place on a quarter of the collection, and saying nothing beside
-// it is honest about there being no rating rather than inventing a sixth term.
+// A DRINK OFF THE SCALE GETS THE SHIP AND `???` -- 2026-09-05, Helen, #722:
+// "unambiguously not on the same rating scale. (It's also funny)." `who knows`
+// is the only off-scale value (`QQ` left the vocabulary the same day) and is 20
+// of 124 drinks. It used to draw the ship with NOTHING beside it, which was
+// honest while every such drink was a local draft; once an unmade drink could
+// publish, a mark with no word became a rating that says nothing. The word is
+// punctuation rather than a sixth term, which is the whole of why it is safe.
 .drink-card-ship {
   display: flex;
   align-items: center;
@@ -906,15 +909,17 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // icon won't matter."
 //
 // The case it was really defending against is closed by data rather than by
-// CSS: a PUBLISHED drink must now name a rung
-// (test_every_published_drink_names_a_rung_on_the_ship_scale), so the word is
-// never absent on a card the world sees. What is left is drafts, where a
-// missing rung is a legitimate work-in-progress state and the ship sitting a
-// few characters over is not worth a rule.
+// CSS: EVERY drink now has a word, because an off-scale ship draws `???`
+// (2026-09-05). The gate that used to make this claim for published drinks
+// only -- test_every_published_drink_names_a_rung_on_the_ship_scale -- is gone,
+// replaced by test_meta_ship_is_a_rung_or_who_knows over the whole collection,
+// and `???` is what covers the half of it that is not a rung. `???` is three
+// characters against `yes²`'s four, so it moves the ship less than the
+// abbreviations Helen already accepted movement for.
 //
-// :empty stays for exactly those drafts -- it drops the band so an unrated
-// drink shows no bare orange bar. Same idiom as .exclude-active:empty on the
-// food side.
+// The :empty rule below is therefore unreachable in practice and is kept as a
+// backstop, not as a live case. Same idiom as .exclude-active:empty on the food
+// side.
 // THE BAND IS text-decoration, NOT AN INSET SHADOW, and that is what aligns the
 // two -- #548 point 10, "vertically align their centres".
 //

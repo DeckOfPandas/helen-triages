@@ -1006,6 +1006,36 @@ ship_card_names:
   "not really": "hmm"
   "oh gods yes": "yes²"
 
+# =============================================================================
+# WHAT AN OFF-SCALE SHIP IS CALLED — `???`. Helen, 2026-09-05, closing #722's
+# second bullet.
+# =============================================================================
+# "I would like the ship mark to have ??? next to it for 'who knows', because
+# that, to me, is unambiguously not on the same rating scale. (It's also
+# funny)."
+#
+# BOTH HALVES OF THAT ARE THE ARGUMENT. The scale's five rungs are words and
+# this is punctuation, so it cannot be misread as a sixth rung the way any
+# sixth WORD would be -- and the joke is doing real work, because the thing it
+# is funny about ("I have no idea") is exactly what it means.
+#
+# IT IS NOT IN `ship_card_names` AND MUST NOT MOVE THERE. That map is the
+# CARD's abbreviations, and the drink page deliberately does not read it (see
+# the note above it, and `_includes/cocktails/ship.html`, where Helen ruled
+# `yes²` off the drink page on 2026-09-05). This word belongs in BOTH places:
+# a rating that says nothing is exactly as confusing on a drink page as on a
+# card, and the reason she gave -- "unambiguously not on the same rating
+# scale" -- is about the scale, not about the space in a card foot.
+#
+# A SCALAR, NOT A MAP KEYED BY "who knows", so the include never names a
+# vocabulary value. It asks `ship_scale` whether a value is a rung and uses
+# this for everything that is not, which is the same derivation §9.9 exists to
+# insist on. The vocabulary is closed to the scale plus "who knows"
+# (test_meta_ship_is_a_rung_or_who_knows), so "everything else" is precisely
+# one value today -- and if that ever stops being true, the fallback is still
+# right rather than silently absent.
+ship_unrated_word: "???"
+
 # NOTHING READS THIS ANY MORE, and it is kept deliberately rather than by
 # neglect. The card's goodness mark was a square tinted along this ramp until it
 # became a ship icon plus a word; `cocktails/index.html` says so at its own call

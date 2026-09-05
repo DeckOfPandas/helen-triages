@@ -4843,6 +4843,42 @@ def test_made_before_is_a_real_boolean():
     )
 
 
+def test_the_off_scale_ship_has_a_word():
+    """`ship_unrated_word` exists and is a non-empty string. Issue #722.
+
+    THE FAILURE IS SILENT AND LOOKS LIKE THE OLD BEHAVIOUR, which is the only
+    reason this is worth a test. `_includes/cocktails/ship.html` assigns this
+    to the word for any value not on `ship_scale`; Liquid resolves a missing
+    key to nil and prints nil as the empty string, so deleting this line does
+    not error -- it restores exactly the blank mark that existed before
+    2026-09-05, on 20 of 124 drinks, and nothing anywhere says why.
+
+    Helen, ruling on the word: "unambiguously not on the same rating scale.
+    (It's also funny)." The VALUE is hers to change; that there is one is not.
+
+    IT MUST NOT BE A RUNG. A word that also names a rating would be the sixth
+    term the whole scale is careful not to invent -- see the `ship_scale`
+    comment, and §9.9 on the near-miss when a template kept its own copy of
+    this vocabulary.
+    """
+    taxonomy = _taxonomy()
+    word = taxonomy.get("ship_unrated_word")
+
+    assert isinstance(word, str) and word.strip(), (
+        f"taxonomy.yml has no usable `ship_unrated_word` (got {word!r}). Every "
+        "drink whose ship is not a rung -- 'who knows', and it is the only one "
+        "-- would draw the ship mark with nothing beside it, on the cards AND "
+        "on the drink page, with no error to say so."
+    )
+
+    scale = taxonomy.get("ship_scale") or []
+    assert word not in scale, (
+        f"`ship_unrated_word` is {word!r}, which is also a rung on "
+        f"`ship_scale`. The off-scale word must not read as a rating: that is "
+        f"the sixth term the scale exists to avoid inventing."
+    )
+
+
 def test_every_ship_rung_has_a_tint():
     """`ship_tints` must cover `ship_scale`, plus the two off-scale values.
 
