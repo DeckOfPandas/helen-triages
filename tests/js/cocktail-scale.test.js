@@ -86,12 +86,7 @@ function page(pours) {
   const article = el('cocktail');
   const control = article.add(el('cocktail-scale-controls'));
   const input = control.add(el('cocktail-scale-multiple'));
-  const target = control.add(el('cocktail-scale-target'));
-  const totalValue = control.add(el('cocktail-scale-total-value'));
   const note = article.add(el('cocktail-scale-note'));
-  const caveat = article.add(el('cocktail-scale-note cocktail-scale-caveat',
-    'dashes and drops are scaled with the recipe; bitters do not really scale '
-    + 'linearly, so use your judgement above ×2'));
   const list = article.add(el('cocktail-ingredients'));
 
   const spans = pours.map(([amount, name]) => {
@@ -117,7 +112,7 @@ function page(pours) {
   }
 
   return {
-    sandbox, control, input, target, totalValue, note, caveat, spans,
+    sandbox, control, input, note, spans,
     amounts: () => spans.map((s) => s.textContent),
     /** Type into a box the way a browser does: focus it, then `input`. */
     type(box, text) {
@@ -145,127 +140,107 @@ test('the control reveals itself and starts at the recipe as written', () => {
   assert.strictEqual(p.control.hidden, false,
     'the markup ships `hidden`; revealing it is the proof the script ran');
   assert.strictEqual(p.input.value, '1');
-  assert.strictEqual(p.totalValue.textContent, '90 ml');
-  assert.strictEqual(p.target.value, '90');
+  assert.deepStrictEqual(p.amounts(),
+    ['52.5 ml', '15 ml', '7.5 ml', '15 ml'], 'the recipe as written');
 });
 
-// --- the bug Helen reported, 2026-09-04 --------------------------------------
-
-test('the target box can be emptied — nothing is written back into it', () => {
+test('typing a multiple rewrites every amount', () => {
   const p = page(AVIATION);
-  // "I can't delete numbers in the target ml input field." Backspacing through
-  // 180 passes through 18 and then 1, both of which the drink's floor refuses;
-  // the refusal used to write the last working total straight back in.
-  p.type(p.target, '180');
-  assert.strictEqual(p.totalValue.textContent, '180 ml');
-  for (const partial of ['18', '1', '']) {
-    p.type(p.target, partial);
-    assert.strictEqual(p.target.value, partial,
-      `backspacing to "${partial}" left the box holding "${p.target.value}"`);
-  }
-});
-
-test('an empty or half-typed target changes nothing and says nothing', () => {
-  const p = page(AVIATION);
-  p.type(p.target, '180');
-  const poured = p.amounts();
-  p.type(p.target, '');
-  assert.deepStrictEqual(p.amounts(), poured,
-    'clearing the box is someone mid-type, not a request for a drink of nothing');
-  assert.strictEqual(p.note.hidden, true,
-    'an empty box must not flash the floor message');
-  assert.strictEqual(p.input.value, '2', 'the other box still says what is poured');
-});
-
-test('the multiple box can be emptied too — the same guard, both boxes', () => {
-  const p = page(AVIATION);
-  p.type(p.input, '');
-  assert.strictEqual(p.input.value, '');
-  assert.strictEqual(p.note.hidden, true);
-  assert.strictEqual(p.totalValue.textContent, '90 ml', 'the page held still');
-});
-
-test('typing in one box redraws the OTHER one', () => {
-  const p = page(AVIATION);
-  // "increasing the number of servings causes the numbers in the target field
-  // to update" -- which is correct and wanted, as long as the target is not the
-  // field being typed in.
   p.type(p.input, '2');
-  assert.strictEqual(p.target.value, '180');
-  assert.strictEqual(p.totalValue.textContent, '180 ml');
-
-  // 45 ml of a 90 ml drink is ×0.5 on paper, and this drink has no half: its
-  // amounts are 105/30/15/30 half-ml units, gcd 15, so it steps in thirds and
-  // ×0.5 snaps up to ⅔. The typed box is still left alone while it is typed in.
-  p.type(p.target, '45');
-  assert.strictEqual(p.target.value, '45', 'the typed box is left alone');
-  assert.strictEqual(p.input.value, '0.6667', 'the other box follows, snapped');
-  assert.strictEqual(p.totalValue.textContent, '60 ml, ×⅔');
+  assert.deepStrictEqual(p.amounts(), ['105 ml', '30 ml', '15 ml', '30 ml']);
 });
 
-test('a multiple that would move a ratio snaps, and says so as a fraction', () => {
+// --- the keystroke guard, which outlived the box it was written for ----------
+// The millilitre box went on 2026-09-05 (#721) and took the cross-writing with
+// it, but `input` still fires on every keystroke and clearing the box to type a
+// new number still passes through the empty string. Answering that with a floor
+// message scolds someone for pressing Backspace.
+
+test('the box can be emptied — nothing is written back into it', () => {
+  const p = page(AVIATION);
+  p.type(p.input, '2');
+  const poured = p.amounts();
+  for (const partial of ['', '0']) {
+    p.type(p.input, partial);
+    assert.strictEqual(p.input.value, partial,
+      `typing "${partial}" left the box holding "${p.input.value}"`);
+  }
+  assert.strictEqual(p.note.hidden, true,
+    'a half-typed number must not flash the floor message');
+  assert.deepStrictEqual(p.amounts(), poured, 'and the page holds still');
+});
+
+test('a multiple that would move a ratio snaps to one the drink can be poured at', () => {
   const p = page(AVIATION);
   // ×1.5 would pour 78.75 ml of gin, which no jigger measures, so the old code
   // rounded it and the ratios moved. Helen, 2026-09-04: the ratios do not move.
+  // The amounts are 105/30/15/30 half-ml units, gcd 15, so this drink steps in
+  // thirds and ×1.5 snaps to ×1⅔.
   p.type(p.input, '1.5');
   assert.strictEqual(p.input.value, '1.5', 'still typeable');
   assert.deepStrictEqual(p.amounts(),
     ['87.5 ml', '25 ml', '12.5 ml', '25 ml'], 'poured at ×1⅔, all exact');
-  assert.strictEqual(p.totalValue.textContent, '150 ml, ×1⅔');
   p.leave(p.input);
-  assert.strictEqual(p.input.value, '1.6667', 'the box is rewritten to what was made');
+  assert.strictEqual(p.input.value, '1\u2154',
+    'the box is rewritten to what was made, as a fraction that fits two characters');
 });
 
-test('the caveat about dashes is revealed with the control', () => {
-  const p = page(AVIATION);
-  assert.strictEqual(p.caveat.hidden, false);
-  assert.match(p.caveat.textContent, /dashes and drops/);
-});
-
-test('a refused target snaps the multiple box back, never the typed box', () => {
+test('a multiple under the floor is refused, and the note names the ingredient', () => {
   const p = page(AVIATION);
   p.type(p.input, '2');
-  // 7.5 ml of crème de violette hits 2.5 ml at ×0.5, so ×0.5 is the floor and
-  // 20 ml of a 90 ml drink (×0.222) is under it.
-  p.type(p.target, '20');
-  assert.strictEqual(p.target.value, '20', 'still typeable');
-  assert.strictEqual(p.input.value, '2', 'the untyped box shows what is poured');
+  // 7.5 ml of crème de violette hits 2.5 ml at ×⅓, so ×⅓ is the floor and ×0.2
+  // is under it.
+  p.type(p.input, '0.2');
+  assert.strictEqual(p.input.value, '0.2', 'still typeable while it has focus');
   assert.strictEqual(p.note.hidden, false);
   assert.match(p.note.textContent, /crème de violette/,
     'the note names the ingredient that set the limit, read from the page');
+  assert.deepStrictEqual(p.amounts(), ['105 ml', '30 ml', '15 ml', '30 ml'],
+    'and the drink stays at the last multiple that worked');
 });
 
-// --- leaving a box ------------------------------------------------------------
+// --- leaving the box ---------------------------------------------------------
 
-test('leaving the target replaces what was typed with what was poured', () => {
+test('leaving the box replaces what was typed with what was poured', () => {
   const p = page(AVIATION);
-  // Helen, 2026-09-04: the target "works the ratios out backwards within reason
-  // but then updates the target ml the user has entered to something more sane".
-  // 95 ml of this 90 ml drink is ×1.056; the nearest multiple it can be poured
-  // at is ×1, so 90 ml is what comes out and 90 is what the box is rewritten to.
-  p.type(p.target, '95');
-  assert.strictEqual(p.target.value, '95', 'while typing, her number stands');
-  p.leave(p.target);
-  assert.strictEqual(p.totalValue.textContent, '90 ml');
-  assert.strictEqual(p.target.value, '90',
+  p.type(p.input, '1.5');
+  assert.strictEqual(p.input.value, '1.5', 'while typing, her number stands');
+  p.leave(p.input);
+  assert.strictEqual(p.input.value, '1\u2154',
     'on the way out the box says what was actually made, not what was asked');
 });
 
-test('a blank target on blur restores the current total rather than refusing', () => {
-  const p = page(AVIATION);
-  p.type(p.input, '2');
-  p.type(p.target, '');
-  p.leave(p.target);
-  assert.strictEqual(p.target.value, '180', 'settled to what is being poured');
-  assert.strictEqual(p.input.value, '2');
-  assert.strictEqual(p.note.hidden, true, 'asking nothing is not an error');
-});
-
-test('a blank multiple on blur restores it too', () => {
+test('a blank box on blur restores what is being poured rather than refusing', () => {
   const p = page(AVIATION);
   p.type(p.input, '2');
   p.type(p.input, '');
   p.leave(p.input);
-  assert.strictEqual(p.input.value, '2');
-  assert.strictEqual(p.target.value, '180');
+  assert.strictEqual(p.input.value, '2', 'settled to what is being poured');
+  assert.strictEqual(p.note.hidden, true, 'asking nothing is not an error');
+});
+
+// --- the two dialects of the one box -----------------------------------------
+// The reader types digits; the script writes fractions. Both have to parse,
+// because the box someone starts typing into is the one `settle` last wrote.
+
+test('a fraction written back into the box is read back as itself', () => {
+  const p = page(AVIATION);
+  p.type(p.input, '1.5');
+  p.leave(p.input);
+  assert.strictEqual(p.input.value, '1\u2154');
+
+  // Typing nothing and leaving again must not drift: the fraction in the box
+  // has to come back through `readMultiple` as the same number it went in as.
+  p.type(p.input, p.input.value);
+  assert.deepStrictEqual(p.amounts(),
+    ['87.5 ml', '25 ml', '12.5 ml', '25 ml'], 'still poured at 1⅔');
+  assert.strictEqual(p.note.hidden, true, 'and it is not refused as unparseable');
+});
+
+test('a bare vulgar fraction with no whole part is read too', () => {
+  const p = page(AVIATION);
+  p.type(p.input, '\u2153');            // ⅓, which is this drink's floor
+  assert.deepStrictEqual(p.amounts(),
+    ['17.5 ml', '5 ml', '2.5 ml', '5 ml'], 'poured at a third');
+  assert.strictEqual(p.note.hidden, true);
 });

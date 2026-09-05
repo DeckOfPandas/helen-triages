@@ -46,10 +46,27 @@
   color: $color-clear-text;
   transition: color 0.12s ease-in-out;
 
-  // A fixed box for the mark, so `+` and `✓` cannot lay the word out
-  // differently. Courier is monospaced and would not need this; the rule is
-  // here anyway because the mark's own size and spacing should not depend on
-  // which face the label happens to inherit.
+  // THE WORD MUST NOT MOVE WHEN THE MARK CHANGES — Helen, 2026-09-05: "when I
+  // click +shortlist, the word jumps downwards a few pixels."
+  //
+  // A fixed WIDTH was already here and was only half the problem. The other
+  // half is height: `+` is in Courier Prime and `✓` (U+2713) is not, so the
+  // browser substitutes a fallback face for that one glyph — and a fallback's
+  // ascent is not Courier's. The mark is an inline-block, so its line box
+  // counts toward the line's height; a taller substituted glyph grew the line
+  // box, and since the button is `align-items: flex-start` in the meta row its
+  // top stayed put and the BASELINE dropped. Hence a word that jumps down a few
+  // pixels on click and back up on click again.
+  //
+  // `line-height: 1` pins the mark's box to its own font-size, which is smaller
+  // than the label's line box either way, so whichever face draws the glyph it
+  // can no longer be the thing that decides the line's height. `overflow:
+  // hidden` is the belt to that braces: a fallback glyph drawn taller than its
+  // em box cannot spill and re-grow the box.
+  //
+  // The general shape is worth keeping: a swapped glyph is a swapped FONT
+  // whenever the face lacks it, and a font swap changes metrics, not just the
+  // picture. Anywhere two characters alternate in one slot, pin the slot.
   &::before {
     content: '+';
     display: inline-block;
@@ -57,6 +74,9 @@
     margin-right: 0.25em;
     text-align: center;
     font-weight: 700;
+    line-height: 1;
+    overflow: hidden;
+    vertical-align: baseline;
   }
 
   &:hover,
@@ -95,7 +115,15 @@
   // The list already carries the bottom margin that separates the head from the
   // ingredients, and it is still the thing that should carry it — the row is a
   // layout wrapper, not a block in its own right.
-  .cocktail-meta { margin-bottom: 0; }
+  //
+  // `flex: 1` SINCE 2026-09-05: the `<dl>` is a three-column grid now (see
+  // `.cocktail-meta`) and a grid only spreads across a width it has been given.
+  // Without this it sizes to its content and `space-between` re-opens the very
+  // gap the grid was added to close.
+  .cocktail-meta {
+    margin-bottom: 0;
+    flex: 1;
+  }
   margin: 0 0 $space-md;
 
   .btn-shortlist { flex-shrink: 0; }

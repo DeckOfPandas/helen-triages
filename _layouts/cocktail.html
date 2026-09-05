@@ -375,17 +375,43 @@ layout: default
      below. That case is gone and so is the assignment — an unread variable is
      the template equivalent of the dead selector it went with. {% endcomment %}
   {% if page.ingredients.size > 0 %}
-    {% comment %} THE SCALER SITS ON THE INGREDIENTS HEADING'S OWN LINE — issue
-       #545, step one, 2026-09-04. It is a control over this section and nothing
-       else, so it belongs beside the section's name rather than at the top of
-       the page with `read it`/`make it` (which govern the whole page) or at the
-       bottom, where the issue first put it and where you would have to scroll
-       past the amounts to reach the thing that changes them.
+    {% comment %} THE SCALER IS ONE BOX UNDER THE LIST, 2026-09-05, and this is
+       the third place it has lived. #545 first put it at the FOOT of the page,
+       where you had to scroll past the amounts to reach the thing that changes
+       them; on 2026-09-04 it moved up onto the INGREDIENTS heading's own line.
+       Helen, having used that: "the normal scaler shouldn't get to be at the
+       top of the page. Please simplify it and move underneath the ingredients
+       list, just a single input text box, 2 characters wide, with a small x
+       next to it, no other text at all."
 
-       `.cocktail-section-row` is the same shape `.cocktail-meta-row` gives the
-       meta panel and its shortlist button: a flex row, baseline-aligned, pushed
-       apart. One wrapper rather than a float, so the heading keeps its own
-       margins and its own rule mark.
+       So it sits after the `</ul>`, which is where a control that RE-READS the
+       list belongs: you look at the amounts, then you change them, then you
+       look again — and the thing you are changing is above the control rather
+       than below it. The heading is a plain `<h2>` again, and the
+       `.cocktail-section-row` flex wrapper that held the two together is gone.
+       That wrapper had a cost nobody had priced: a flex item's margins never
+       collapse, so the heading's own 2.25rem top margin stopped collapsing with
+       the head block's bottom margin and started adding to it. Helen, on #720:
+       "the presence of the scaler has moved the whole page downwards." It had,
+       by about 36px on every drink page, and deleting the wrapper is the fix.
+
+       NO WORDS AT ALL, which is the part to hold. `make [1] × the recipe = 90
+       ml, or [90] ml in total` was five pieces of furniture explaining one
+       number. The box and a `×` say the same thing to anyone who has just read
+       a list of amounts, and say nothing at all to someone who has not looked
+       at the list yet, which is correct — this control is meaningless without
+       it. `aria-label` carries the sentence for a screen reader, where the
+       visual context the `×` leans on is not available.
+
+       THE TARGET-ML BOX IS GONE — #720, #721. It let you type a total and
+       worked the ratios backwards, and Helen: "it's just baffling. Typing some
+       numbers changes nothing, typing others changes the recipe but you can't
+       see it." Both were true and neither was a bug: the drink's amounts have
+       to stay on the 2.5 ml grid, so Aviation can only be poured at multiples
+       of a third and only totals of 30, 60, 90, 120... are reachable. Typing 100
+       snapped silently back to 90. A control whose valid inputs cannot be seen
+       or guessed is not a control, and the multiple box asks the same question
+       in a form where every value you can type is one you can have.
 
        MULTIPLES OF THE RECIPE AS WRITTEN — Helen, 2026-09-04. There is no
        `serves:` field on a drink and this does not invent one: ×2 is twice what
@@ -394,72 +420,16 @@ layout: default
        cocktail-scale.js, which is the only thing that knows what multiples this
        particular drink can be poured at.
 
-       THE STEP IS THE DRINK'S OWN, NOT A HALF — Helen, 2026-09-04: "recipe
-       states single-order amount, target ml works the ratios out backwards
-       within reason but then updates the target ml the user has entered to
-       something more sane, that is, based on 2.5-ml increments." A multiple is
-       allowed only where every millilitre amount lands exactly on the 2.5 ml
-       grid, so no ratio ever moves; the Negroni steps in thirds. The arithmetic
-       and the proof are in assets/js/scale.js's header. The `0.5` written here
-       is only what a reader with no JavaScript would get, and they get no
-       control at all.
-
        `hidden` UNTIL THE SCRIPT REVEALS IT, the rule every JS-dependent control
        on both sites follows — see the shortlist button above, and
-       assets/js/cocktail-scale.js's own header. ONE WRAPPER CARRIES THE
-       `hidden` for all three parts, rather than three attributes the script
-       has to remember to clear separately.
+       assets/js/cocktail-scale.js's own header. The wrapper carries the
+       `hidden` for the box and its mark together.
 
-       TOTAL ML AND A TARGET ML — Helen, 2026-09-04, step two of #545: "please
-       add total ml, either set by your input box, or user-entered number of ml
-       -- which you can refuse if it forces a volume to be <2.5 ml." So the row
-       reads `make [1] × the recipe = 90 ml, or [90] ml in total`: the equals
-       sign is what makes the three parts one sentence rather than three
-       controls, and the two boxes are kept in step by cocktail-scale.js so
-       neither can be read as the stale one.
-
-       THE TOTAL IS ml AND ONLY ml, drops and dashes and pinches excluded on
-       Helen's instruction — see assets/js/scale.js's header for why a dash is
-       not some number of millilitres this page may invent. {% endcomment %}
-    <div class="cocktail-section-row">
-      <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
-      <div class="cocktail-scale-controls" hidden>
-        <label class="cocktail-scale">
-          <span>make</span>
-          <input type="number" min="0.5" step="0.5" value="1" inputmode="decimal" class="cocktail-scale-multiple" aria-label="how many times the recipe">
-          <span>× the recipe</span>
-        </label>
-        {% comment %} A `<p>` rather than a span inside either label: it is the
-           ANSWER, not part of a control, and clicking it should not focus a
-           box. `aria-live` so a screen reader hears the new total when a box
-           changes it, since nothing else on the row says what happened.
-        {% endcomment %}
-        <p class="cocktail-scale-total" aria-live="polite">= <span class="cocktail-scale-total-value"></span></p>
-        <label class="cocktail-scale">
-          <span>or</span>
-          <input type="number" min="0" step="2.5" inputmode="decimal" class="cocktail-scale-target" aria-label="how many millilitres in total">
-          <span>ml in total</span>
-        </label>
-      </div>
-    </div>
-    {% comment %} The floor message, empty and hidden until a refusal fills it —
-       "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
-       paragraph of its own beneath the row rather than text inside the label,
-       so a long sentence cannot push the number box around. {% endcomment %}
-    <p class="cocktail-scale-note" hidden></p>
-    {% comment %} THE WORDING HERE IS PROVISIONAL AND HELEN WILL WRITE HERS — an
-       issue is open for it, and nothing else on either site should copy this
-       sentence until she has. What it has to say is settled and is hers: the
-       scaler multiplies dashes and drops along with everything else, because
-       leaving them alone would be a different decision made silently, and a
-       dash of bitters does not actually taste twice as strong at ×2.
-
-       IT IS HIDDEN UNTIL cocktail-scale.js REVEALS IT, like the control itself
-       and for the same reason — a caveat about a control that is not on the
-       page is worse than no caveat. `.cocktail-scale-note` gives it the quiet
-       grey the floor message wears; `.cocktail-scale-caveat` is what the script
-       finds it by. {% endcomment %}
-    <p class="cocktail-scale-note cocktail-scale-caveat" hidden>dashes and drops are scaled with the recipe; bitters do not really scale linearly, so use your judgement above ×2</p>
+       THE BITTERS CAVEAT IS GONE TOO — #720.1. It was revealed unconditionally
+       at init, so Aperol Spritz — prosecco, Aperol, soda water — was warned
+       that "bitters do not really scale linearly". A caveat that fires where it
+       does not apply teaches you to stop reading caveats. {% endcomment %}
+    <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
         {% comment %} THE GATE ASKS FOR THE FIELDS THIS BLOCK ACTUALLY RENDERS,
@@ -569,6 +539,31 @@ layout: default
         {% endif %}
       {% endfor %}
     </ul>
+    <div class="cocktail-scale-controls" hidden>
+      <label class="cocktail-scale">
+        {% comment %} `type="text"`, NOT `type="number"`, and Helen's own word
+           for it was "text box". The script settles this field to the multiple
+           the drink was actually poured at, which on a drink stepping in thirds
+           is `1⅔` — and a number input treats a vulgar fraction as an invalid
+           value and reads itself back as the empty string, so the fraction
+           would disappear the moment it was written. Two characters is a real
+           width for `1⅔` and not for `1.6667`. `inputmode="decimal"` keeps the
+           numeric keypad on a phone, which is the only thing the number type
+           was buying; assets/js/cocktail-scale.js's `readMultiple` parses both
+           what a reader types and what the script writes back. {% endcomment %}
+        <input type="text" value="1" inputmode="decimal" class="cocktail-scale-multiple" aria-label="make this many times the recipe">
+        {% comment %} A MULTIPLICATION SIGN, not the letter x and not a word.
+           `aria-hidden` because "times" read out after the number is the one
+           thing the input's own label already says, and a screen reader hearing
+           "2 multiplication sign" gains nothing. {% endcomment %}
+        <span class="cocktail-scale-mark" aria-hidden="true">×</span>
+      </label>
+    </div>
+    {% comment %} The floor message, empty and hidden until a refusal fills it —
+       "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
+       paragraph of its own beneath the control rather than text inside the
+       label, so a long sentence cannot push the number box around. {% endcomment %}
+    <p class="cocktail-scale-note" hidden></p>
   {% endif %}
 
   {% comment %} Method is an ORDERED LIST, not the single line the original
