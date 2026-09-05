@@ -37,9 +37,15 @@
 # THE PAGE SHOWS A RANGE, and the range is not decoration. Helen chose it over a
 # single figure on 2026-09-05, and it falls out of the data rather than being
 # invented: a generic with several bottles under it spans them. `London dry gin`
-# is Beefeater at GBP 18 and Anchor Junipiero at GBP 38, and a Martini made with
-# either is the same drink. A pour that names its bottle is a point, so a drink
-# that names every bottle prints one figure -- which is correct, not a bug.
+# is Beefeater at GBP 18 and Rutte at GBP 26, and a Martini made with either is
+# the same drink. A pour that names its bottle is a point, so a drink that names
+# every bottle prints one figure -- which is correct, not a bug.
+#
+# (That example named Anchor Junipiero at GBP 38 as the top until 2026-09-05,
+# when Helen removed the bottle. Two things then narrowed the same category on
+# the same day: losing Junipiero, and her `default_bottles` ruling settling gin
+# on Tanqueray, which now decides it outright. Left corrected rather than
+# rewritten, because the POINT the example makes is unchanged.)
 #
 # CONFIDENCE IS PER ROW AND IT MEANS SOMETHING:
 #   high    a UK retail price read off a search result on 2026-09-05.
@@ -164,10 +170,6 @@ bottles:
     size_ml: 700
     gbp: 27
     confidence: medium
-  "Ron del Barrilito Three Stars":
-    size_ml: 700
-    gbp: 32
-    confidence: low
   "Planteray Barbados 5":
     size_ml: 700
     gbp: 27
@@ -267,10 +269,6 @@ bottles:
     gbp: 40
     confidence: high
   # --- gin ---------------------------------------------------------------
-  "Anchor Junipiero":
-    size_ml: 700
-    gbp: 38
-    confidence: low
   "Beefeater":
     size_ml: 700
     gbp: 18
@@ -546,10 +544,6 @@ bottles:
     size_ml: 500
     gbp: 15
     confidence: medium
-  "Ottoman 10 Year Tawny":
-    size_ml: 750
-    gbp: 22
-    confidence: low
   # --- absinthe ----------------------------------------------------------
   "Vieux Pontarlier":
     size_ml: 700
@@ -692,7 +686,9 @@ top_up_ml:
 # WHAT IT CHANGES. Without it, a generic is priced across EVERY bottle declared
 # under it, which spans bottles she would not actually pour: `London dry gin`
 # ran GBP 18-38, Beefeater to Anchor Junipiero, for a category she says is
-# Tanqueray. With it, the range is the bottles named here and nothing else --
+# Tanqueray. (Junipiero left the collection hours later, so that span is now
+# GBP 18-26 -- but the block is what DECIDES the category, not the accident of
+# which bottles remain.) With it, the range is the bottles named here alone --
 # so a default of one bottle gives a point price, which is the honest output
 # when she has told us there is one answer.
 #
@@ -809,6 +805,12 @@ generics:
   # this cost", which has an answer whether or not a bottle is open. The RANGE
   # is wide and deliberately so: scarcity is exactly what she ran into.
   overproof Demerara rum: { gbp_per_litre_min: 57.14, gbp_per_litre_max: 85.71, basis: "GBP 40-60 / 70cl, scarce in the UK", confidence: low }
+  # `tawny port` JOINED FOR THE SAME REASON, hours later. Ottoman 10 Year Tawny
+  # was the only one declared and Helen removed it -- "the three Lows I skipped,
+  # let's remove them from the collection please" -- leaving Port Authority's
+  # 22.5 ml with nothing to price it from. A 10-year tawny is not scarce the way
+  # an overproof Demerara is, so this range is ordinary rather than punitive.
+  tawny port:         { gbp_per_litre_min: 20.00, gbp_per_litre_max: 40.00, basis: "GBP 15-30 / 75cl", confidence: low }
   champagne:          { gbp_per_litre_min: 29.33, gbp_per_litre_max: 53.33, basis: "GBP 22-40 / 75cl", confidence: medium }
   prosecco:           { gbp_per_litre_min: 10.67, gbp_per_litre_max: 18.67, basis: "GBP 8-14 / 75cl", confidence: medium }
   red wine:           { gbp_per_litre_min: 9.33,  gbp_per_litre_max: 16.00, basis: "GBP 7-12 / 75cl", confidence: medium }

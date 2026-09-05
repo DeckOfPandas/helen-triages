@@ -184,12 +184,13 @@ bottles:
   "Havana Club 7 year old":
     generic: "moderately aged rum"
     aliases: ["Havana Club 7", "Havana 7", "Havana Club 7yo"]
-  # "Ron del Barrilito Three Stars" -- Helen, 2026-09-04: "a bad typo from
-  # me". The misspelling stays as an alias because the drink that wrote it
-  # still does.
-  "Ron del Barrilito Three Stars":
-    generic: "moderately aged rum"
-    aliases: ["Ron del Barrito", "Ron del Barrito 3 star rum", "Ron del Barrilito"]
+  # RON DEL BARRILITO THREE STARS WENT TO `not_reached_for` ON 2026-09-05, with
+  # Anchor Junipiero and Ottoman 10 Year Tawny. It is also the one of the three
+  # that cost nothing to lose: no drink named it, and its own note here claimed
+  # otherwise -- "the misspelling stays as an alias because the drink that wrote
+  # it still does". That drink had stopped saying it and the comment had gone
+  # stale unnoticed, which is the same species of rot
+  # test_unresolved_suggestions_has_no_stale_entries watches for one block down.
   "Planteray Barbados 5":
     generic: "moderately aged rum"
     aliases: ["Plantation Barbados 5", "Plantation Barbados 5 year old rum"]
@@ -350,9 +351,11 @@ bottles:
 
   # --- gin ------------------------------------------------------------------
   # Charleston's gin, from its own `item`. An American London dry.
-  "Anchor Junipiero":
-    generic: "London dry gin"
-    aliases: ["Anchor Junipiero gin", "Junipiero"]
+  # ANCHOR JUNIPIERO WENT TO `not_reached_for` ON 2026-09-05. It was the top of
+  # the London dry gin range at GBP 38 against Beefeater's 18, so its departure
+  # narrows the category to GBP 18-26 -- though Helen's `default_bottles` ruling
+  # the same day had already made that moot by pricing the category off
+  # Tanqueray alone. Charleston was the one drink that named it.
   # Spiced Negroni's gin. `speciality` is the generic that REPLACED `flavoured`
   # (#314, Helen 2026-08-26) and it must always carry a `character`, which is
   # why the drink gains `spiced` in the same pass.
@@ -533,9 +536,11 @@ bottles:
   "Lustau Don Nuño Oloroso":
     generic: "oloroso sherry"
     aliases: ["Lustau Oloroso Don Nuño Sherry", "Lustau Don Nuno Oloroso"]
-  "Ottoman 10 Year Tawny":
-    generic: "tawny port"
-    aliases: ["Ottoman 10-year tawny port", "Ottoman 10 Year Tawny Port"]
+  # OTTOMAN 10 YEAR TAWNY WENT TO `not_reached_for` ON 2026-09-05, and it was
+  # the only `tawny port` in the file -- so, exactly as with El Dorado 151, the
+  # category is left with no bottle behind it and keeps its generic, because
+  # Port Authority still wants a tawny port whatever ends up filling it.
+  # costs.yml prices it as a category.
   "Carpano Antica Formula":
     generic: "sweet vermouth"
   # From #585: The Ridgwell's suggestion was the question "Dolin Rouge?" where
@@ -843,6 +848,35 @@ bottles:
 # QUALIFIES, DELIBERATELY NOT REACHED FOR -- the reason attached, as family_less
 # =============================================================================
 not_reached_for:
+  # ===== THE THREE SHE SKIPPED, 2026-09-05 ==================================
+  # Helen worked down the price-check list correcting my guesses from Master of
+  # Malt, left exactly three of the sixteen untouched, and then: "the three Lows
+  # I skipped, let's remove them from the collection please."
+  #
+  # THE SKIP WAS THE SIGNAL, which is why they are here rather than deleted.
+  # She did not decline to price them; she declined to price them BECAUSE she
+  # does not have them, and each still qualifies for its category. That is what
+  # this block means. Recording it stops all three being re-added by a future
+  # pass that notices a category looking thin.
+  "Anchor Junipiero": >-
+    A real London dry gin and not one she keeps. It was the expensive end of
+    that category -- GBP 38 against Beefeater's 18 -- so the range narrows to
+    GBP 18-26 without it, and her `default_bottles` ruling the same day had
+    already settled the category on Tanqueray anyway. Charleston named it and
+    no longer does.
+  "Ottoman 10 Year Tawny": >-
+    The ONLY `tawny port` the file declared, so removing it leaves that
+    category with no bottle -- the El Dorado 151 situation exactly, and handled
+    the same way: the generic stays, because Port Authority still asks for a
+    tawny port, and costs.yml prices the category instead. If a tawny comes
+    into the house, this is the line to delete.
+  "Ron del Barrilito Three Stars": >-
+    The free one of the three: no drink named it, so nothing changed but the
+    count. Worth a line anyway, because the entry it replaced asserted the
+    opposite -- "the misspelling stays as an alias because the drink that wrote
+    it still does" -- and that had quietly stopped being true. Helen called the
+    spelling "a bad typo from me" on 2026-09-04; if the bottle ever returns, so
+    do the three aliases.
   "El Dorado 151": >-
     Clears the Demerara appellation and was listed here until 2026-09-05 on the
     strength of being WANTED rather than owned -- the one bottle this file ever
