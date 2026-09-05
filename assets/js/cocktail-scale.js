@@ -59,20 +59,22 @@
 // clamps to the floor, so asking after it would turn "you can't make a drink
 // that small" into a silent nudge and Helen's message would never appear.
 //
-// THE BOX HOLDS THE FRACTION ITSELF, which is what lets it be two characters
-// wide. `settle` writes back the multiple the drink was actually poured at, and
-// on a drink stepping in thirds those are 0.3333, 0.6667, 1.3333, 1.6667 -- four
-// decimals in a box sized for two characters, which is #720.2's clipped `180`
-// arriving by another road. `⅓`, `⅔`, `1⅓`, `1⅔` fit and read better, and
-// HTF.scale.multipleText already prints them: the running total that has now
-// gone used to say "30 ml, ×⅓". A whole multiple still comes back as "2".
+// THE BOX HOLDS A WHOLE NUMBER, AND THAT IS THE WHOLE OF IT -- Helen,
+// 2026-09-05: "logically I think we can solve the rounding/ratio issue by only
+// allowing integer multiples."
 //
-// SO THE INPUT IS `type="text"` -- also the word Helen used. A number input
-// treats `⅔` as invalid and reads its own value back as the empty string, so a
-// fraction written into one vanishes on the next read. `inputmode="decimal"`
-// keeps the numeric keypad on a phone, which is all `type="number"` was buying.
-// `readMultiple` reads both dialects back, because the box a reader starts
-// typing into is the one `settle` last wrote.
+// It does solve it, in one line: every written amount is already on the 2.5 ml
+// grid, and an integer multiple of a number on a grid is on that grid. No pour
+// can be asked for that a jigger cannot measure, no ratio has to move, and
+// there is nothing left to snap.
+//
+// It also settles a run of problems that were all the same problem wearing
+// different hats. The box spent an hour holding `1⅔` -- a vulgar fraction,
+// parsed back by a lookup table -- purely because a drink stepping in thirds
+// settled to `1.6667` and four decimals do not fit a two-character box. With
+// whole recipes the value is `2`, the width Helen asked for is a real width,
+// and the fraction machinery, the drink's own step and the snap all go with it.
+// See `box` below for what that deletes and what deliberately stays.
 //
 // AN EMPTY OR HALF-TYPED BOX IS NO CHANGE, NEVER A REFUSAL, and this rule is
 // the survivor of a bug that used to have two boxes to go wrong in. Helen,
@@ -168,69 +170,39 @@
                           longest > AMOUNT_FITS);
   }
 
-  var last = HTF.scale.snapMultiple(original, 1).multiple;
+  var last = 1;
   input.value = box(last);
   fitAmountColumn(original);
   control.hidden = false;
 
-  /* THE BOX HOLDS A FRACTION, NOT A DECIMAL -- 2026-09-05, and this is what
-     makes Helen's "2 characters wide" a real width rather than a wish.
+  /* WHOLE RECIPES ONLY, SINCE 2026-09-05 -- Helen: "logically I think we can
+     solve the rounding/ratio issue by only allowing integer multiples."
 
-     `settle` writes back the multiple the drink was actually poured at, and
-     those are the drink's own steps: a drink stepping in thirds settles to
-     0.3333, 0.6667, 1.3333, 1.6667. Four decimals in a two-character box is the
-     exact bug #720.2 reported ("stop both input fields cutting the numbers
-     off"), arriving by a different road. `⅓`, `⅔`, `1⅓`, `1⅔` are one and two
-     characters and say the same thing better -- and HTF.scale.multipleText
-     already prints them, because the total line that has now gone used to say
-     "30 ml, ×⅓".
-     A whole multiple comes back as "2", so the common case is unchanged.
+     It solves it outright, and the proof is one line: every written amount is
+     already on the 2.5 ml grid, and an integer multiple of a number on a grid
+     is on that grid. So no drink can be asked for a pour it cannot measure, no
+     ratio ever has to move, and there is nothing left to snap.
 
-     THIS IS WHY THE INPUT IS `type="text"`, which is also the word Helen used:
-     a number input cannot hold `⅔` -- the browser treats the value as invalid
-     and reads it back as the empty string, so the fraction would vanish the
-     moment it was written. `inputmode="decimal"` keeps the numeric keyboard on
-     a phone, which is the only thing `type="number"` was buying here. */
+     WHAT THAT DELETES. `snapMultiple` and the drink's own step went, and with
+     them: a Negroni stepping in thirds, `1.5` silently becoming `1.6667`, and
+     the vulgar-fraction pair (`multipleText` writing `1⅔`, `readMultiple`
+     reading it back) that existed only because the box had to display a third.
+     Two characters is now a real width for a real value rather than a width the
+     display had to be bent to fit -- which was the last thing propping that
+     machinery up.
+
+     THE FLOOR CANNOT FIRE EITHER, and that was checked against the data rather
+     than assumed: no drink in the collection has a written millilitre pour
+     under MIN_POUR, and scaling UP can never take an amount below where it
+     started. `refuse` stays anyway, because it costs nothing and the day a
+     drink is ingested with a 1 ml pour it will be telling the truth.
+
+     THE ARITHMETIC ITSELF IS UNTOUCHED. HTF.scale keeps its step, its snap and
+     its fractions -- the shopping list's own scaler still uses them, and this
+     is the drink page choosing a simpler question to ask, not the library
+     losing the ability to answer a harder one. */
   function box(n) {
-    return HTF.scale.multipleText(original, n);
-  }
-
-  /* AND THE WAY BACK IN. The reader types digits ("2", "1.5"); the script
-     writes fractions ("1⅔"). Both have to parse, because the box the reader
-     starts typing into is the one `settle` last wrote.
-
-     The table is HTF.scale's VULGAR map read backwards. It is closed -- sixteen
-     glyphs, halves through eighths -- because that is exactly what `stepText`
-     can emit; anything it cannot name it prints as "5/7", which the `/` branch
-     below reads. A parser that guesses would be worse than one that knows. */
-  var VULGAR_VALUE = {
-    '½': 1 / 2, '⅓': 1 / 3, '⅔': 2 / 3, '¼': 1 / 4, '¾': 3 / 4,
-    '⅕': 1 / 5, '⅖': 2 / 5, '⅗': 3 / 5, '⅘': 4 / 5,
-    '⅙': 1 / 6, '⅚': 5 / 6, '⅛': 1 / 8, '⅜': 3 / 8, '⅝': 5 / 8, '⅞': 7 / 8
-  };
-
-  function readMultiple(text) {
-    var t = String(text).trim();
-    if (t === '') return NaN;
-
-    /* A leading whole number is optional -- "1⅔" and "⅔" are both real. */
-    var vulgar = t.match(/^(\d*)\s*([\u00BC-\u00BE\u2150-\u215E])$/);
-    if (vulgar) {
-      var value = VULGAR_VALUE[vulgar[2]];
-      if (value === undefined) return NaN;
-      return (vulgar[1] ? parseInt(vulgar[1], 10) : 0) + value;
-    }
-
-    /* The unmapped fallback `stepText` prints, e.g. "5/7" or "1 5/7". */
-    var ratio = t.match(/^(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/);
-    if (ratio) {
-      var den = parseInt(ratio[3], 10);
-      if (!den) return NaN;
-      return (ratio[1] ? parseInt(ratio[1], 10) : 0)
-        + parseInt(ratio[2], 10) / den;
-    }
-
-    return parseFloat(t);
+    return String(n);
   }
 
   /* THE BOX IS NEVER WRITTEN TO WHILE IT HAS FOCUS -- see the header. Typing is
@@ -274,26 +246,25 @@
    * refusal below is only ever the floor.
    */
   function apply(wanted) {
-    /* THE FLOOR IS ASKED OF THE RAW NUMBER, BEFORE THE SNAP, because the snap
-       clamps to the floor and would turn "you can't make a drink that small"
-       into a silent nudge. HTF.scale.scale answers `why: 'floor'` for exactly
-       this and nothing else -- see its own note on the order. */
-    var asked = HTF.scale.scale(original, wanted);
-    if (!asked.ok && asked.why === 'floor') {
-      refuse(asked);
-      return;
-    }
+    /* ROUNDED TO A WHOLE RECIPE, AND NEVER BELOW ONE. `1.5` becomes 2 rather
+       than being refused: someone typing a decimal into a box this size has
+       asked for "about that much", and the nearest whole recipe is the answer
+       to it. `settle` writes the number back on the way out, so the rounding is
+       shown rather than done behind the reader.
 
-    var snapped = HTF.scale.snapMultiple(original, wanted);
-    if (snapped === null) return;
+       ONE IS THE FLOOR BECAUSE HALF A DRINK IS NOT A THING THIS PAGE OFFERS --
+       and, usefully, because it is also what makes the 2.5 ml grid safe (see
+       `box` above). Typing 0 never reaches here at all; `pending` treats a
+       non-positive value as a keystroke on the way somewhere. */
+    var n = Math.max(1, Math.round(wanted));
 
-    var verdict = HTF.scale.scale(original, snapped.multiple);
+    var verdict = HTF.scale.scale(original, n);
     if (!verdict.ok) {
       refuse(verdict);
       return;
     }
 
-    last = snapped.multiple;
+    last = n;
     note.hidden = true;
     spans.forEach(function (span, index) {
       span.textContent = verdict.amounts[index];
@@ -315,7 +286,7 @@
      it is always a keystroke on the way somewhere, and the page holds still for
      it exactly as it does for the empty string. */
   function pending(box) {
-    var n = readMultiple(box.value);
+    var n = parseFloat(box.value);
     return box.value.trim() === '' || !isFinite(n) || n <= 0;
   }
 
@@ -326,7 +297,7 @@
        cursor -- the bug Helen hit in the millilitre box that used to sit beside
        this one. Do nothing until there is a number to act on. */
     if (pending(input)) return;
-    apply(readMultiple(input.value));
+    apply(parseFloat(input.value));
   }
 
   input.addEventListener('input', redraw);

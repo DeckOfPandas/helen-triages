@@ -593,17 +593,21 @@ layout: default
     </ul>
     <div class="cocktail-scale-controls" hidden>
       <label class="cocktail-scale">
-        {% comment %} `type="text"`, NOT `type="number"`, and Helen's own word
-           for it was "text box". The script settles this field to the multiple
-           the drink was actually poured at, which on a drink stepping in thirds
-           is `1⅔` — and a number input treats a vulgar fraction as an invalid
-           value and reads itself back as the empty string, so the fraction
-           would disappear the moment it was written. Two characters is a real
-           width for `1⅔` and not for `1.6667`. `inputmode="decimal"` keeps the
-           numeric keypad on a phone, which is the only thing the number type
-           was buying; assets/js/cocktail-scale.js's `readMultiple` parses both
-           what a reader types and what the script writes back. {% endcomment %}
-        <input type="text" value="1" inputmode="decimal" class="cocktail-scale-multiple" aria-label="make this many times the recipe">
+        {% comment %} WHOLE RECIPES ONLY, since 2026-09-05 — Helen: "logically I
+           think we can solve the rounding/ratio issue by only allowing integer
+           multiples." Every written amount is already on the 2.5 ml grid and an
+           integer multiple of a grid value is on the grid, so no drink can be
+           asked for a pour nobody can measure and no ratio ever moves. The
+           `min`/`step` the script used to compute per drink are gone with it.
+
+           `type="text"`, NOT `type="number"`, and Helen's own word for it was
+           "text box". It kept the field free of the browser's spinner without
+           having to suppress one, which matters at two characters wide; the
+           script rounds and clamps whatever is typed, so the input type is not
+           what is enforcing anything. `inputmode="numeric"` — not `decimal` any
+           more — puts a phone's plain number pad up, which is now exactly the
+           set of characters this box accepts. {% endcomment %}
+        <input type="text" value="1" inputmode="numeric" class="cocktail-scale-multiple" aria-label="make this many times the recipe">
         {% comment %} A MULTIPLICATION SIGN, not the letter x and not a word.
            `aria-hidden` because "times" read out after the number is the one
            thing the input's own label already says, and a screen reader hearing

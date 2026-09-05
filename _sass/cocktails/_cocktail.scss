@@ -828,16 +828,16 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // extra 1.6ch is the caret and the box's own breathing room, not a third
   // character — `2ch` alone puts the caret on top of the second digit.
   //
-  // TWO CHARACTERS IS ONLY A REAL WIDTH BECAUSE THE VALUE IS A FRACTION. The
-  // box settles to the multiple the drink was actually poured at, and on a
-  // drink stepping in thirds that is `1⅔` rather than `1.6667` — see
-  // assets/js/cocktail-scale.js's `box`/`readMultiple` pair, and the layout's
-  // note on why the input is `type="text"`. Six decimals in a box this wide
-  // would be #720.2's clipped `180` all over again.
+  // TWO CHARACTERS IS A REAL WIDTH BECAUSE THE VALUE IS A WHOLE NUMBER. The box
+  // settles to the multiple the drink was actually poured at, and since
+  // 2026-09-05 those are 1, 2, 3 -- integer multiples only, which is what
+  // finally made this width honest. It held `1⅔` for an hour before that, and
+  // `1.6667` before that, which was #720.2's clipped `180` arriving by another
+  // road. See assets/js/cocktail-scale.js's `box` for why the fractions went.
   //
-  // NO SPINNER TO SUPPRESS, for the same reason: a text input has none. The
-  // arrows went with the number type and are not missed — the values that
-  // matter are 2 and 3 and a half, all one keystroke.
+  // NO SPINNER TO SUPPRESS: a text input has none. The arrows went with the
+  // number type and are not missed — every value this control accepts is now
+  // one keystroke.
   input {
     @extend %cocktail-number-input;
     width: calc(2ch + 1.6ch);
