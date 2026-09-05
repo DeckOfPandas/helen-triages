@@ -15,6 +15,28 @@
    template's honest way of saying there is no rating yet rather than inventing
    a sixth term.
 
+   `short` CHOOSES THE CARD'S ABBREVIATIONS, AND ONLY THE CARD PASSES IT --
+   2026-09-05. `ship_card_names` renames two rungs: "not really" to "hmm" and
+   "oh gods yes" to "yes²". Those are CARD names, which is what the key has
+   always been called, and they exist because a card foot is a tight row shared
+   with mood chips.
+
+   The drink page never chose them. It had no ship line at all until 2026-09-02,
+   and when it gained one it was wired straight through this include the day
+   this include was factored out -- so it inherited the card's compressions along
+   with the pairing they were bundled with. Helen, 2026-09-05, correcting a
+   review that had called `yes²` a footnote marker: "that's not a footnote
+   marker, it's a joke, a cocktail so good that it's yes-squared. If this isn't
+   landing then I'd rather rename than re-render."
+
+   NOTHING NEEDS RENAMING, because the rung's real name is already "oh gods yes"
+   and that lands on sight. What failed was the abbreviation, in the one place
+   with room not to abbreviate: a superscript numeral after a word means FOOTNOTE
+   to most readers before it means exponent, and the drink page shows exactly one
+   rung, so there is no scale beside it to read the escalation against. A card
+   grid supplies that context for free -- twenty cards, some "yes", some "yes²" --
+   which is why the card keeps them and the page does not.
+
    Emits the two inner spans ONLY, not the outer `.drink-card-ship` wrapper —
    the card and the drink page lay them out differently (the card right-aligns
    a fixed foot row; the page sits one inside a `<dd>`), so the wrapper is each
@@ -24,6 +46,10 @@
 {% assign ship = include.ship | default: "who knows" %}
 {% assign ship_word = "" %}
 {% if taxonomy.ship_scale contains ship %}
-  {% assign ship_word = taxonomy.ship_card_names[ship] | default: ship %}
+  {% if include.short %}
+    {% assign ship_word = taxonomy.ship_card_names[ship] | default: ship %}
+  {% else %}
+    {% assign ship_word = ship %}
+  {% endif %}
 {% endif %}
 <span class="drink-card-ship-icon">{% include icons/ship.svg %}</span><span class="drink-card-ship-word">{{ ship_word }}</span>

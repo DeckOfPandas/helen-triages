@@ -18,12 +18,12 @@ const FS = require('../../assets/js/filter-state.js');
 test('the documented example parses to the documented shape', () => {
   assert.deepStrictEqual(
     FS.parseQuery('?star=lamb&tag=soup,make-ahead'),
-    { star: ['lamb'], tag: ['soup', 'make-ahead'] }
+    { star: ['lamb'], tag: ['soup', 'make-ahead'], mood: [] }
   );
 });
 
 test('a leading ? is optional', () => {
-  assert.deepStrictEqual(FS.parseQuery('star=lamb'), { star: ['lamb'], tag: [] });
+  assert.deepStrictEqual(FS.parseQuery('star=lamb'), { star: ['lamb'], tag: [], mood: [] });
 });
 
 // --- the + trap ---------------------------------------------------------------
@@ -76,21 +76,21 @@ test('a bare - names nothing and is dropped', () => {
 // not worth an error on a page that works fine without it.
 
 test('an empty string parses to empty, with every known kind still present', () => {
-  assert.deepStrictEqual(FS.parseQuery(''), { star: [], tag: [] });
+  assert.deepStrictEqual(FS.parseQuery(''), { star: [], tag: [], mood: [] });
 });
 
 test('undefined and a bare ? parse to empty rather than throwing', () => {
-  assert.deepStrictEqual(FS.parseQuery(undefined), { star: [], tag: [] });
-  assert.deepStrictEqual(FS.parseQuery('?'), { star: [], tag: [] });
+  assert.deepStrictEqual(FS.parseQuery(undefined), { star: [], tag: [], mood: [] });
+  assert.deepStrictEqual(FS.parseQuery('?'), { star: [], tag: [], mood: [] });
 });
 
 test('unknown parameters are ignored, and do not become keys', () => {
   const parsed = FS.parseQuery('?protein=beef&tag=soup&utm_source=newsletter');
-  assert.deepStrictEqual(parsed, { star: [], tag: ['soup'] });
+  assert.deepStrictEqual(parsed, { star: [], tag: ['soup'], mood: [] });
 });
 
 test('a parameter with no value at all says nothing', () => {
-  assert.deepStrictEqual(FS.parseQuery('?tag&star=lamb'), { star: ['lamb'], tag: [] });
+  assert.deepStrictEqual(FS.parseQuery('?tag&star=lamb'), { star: ['lamb'], tag: [], mood: [] });
 });
 
 test('empty values between commas are dropped, not returned as empty strings', () => {
@@ -114,7 +114,7 @@ test('arity is the caller\'s business -- two stars both come back', () => {
 });
 
 test('KINDS is exported so filters.js and the tests agree on what exists', () => {
-  assert.deepStrictEqual(FS.KINDS, ['star', 'tag']);
+  assert.deepStrictEqual(FS.KINDS, ['star', 'tag', 'mood']);
 });
 
 test('toQuery is deliberately absent until something writes the URL back', () => {
@@ -742,4 +742,26 @@ test('the two tables are genuinely different -- this is not one index twice', ()
     'ask the same questions, share one table deliberately rather than keeping two.'
   );
   assert.ok(cocktail.some((f) => food.indexOf(f) === -1));
+});
+
+// --- the cocktails half of the grammar ---------------------------------------
+// `mood` joined KINDS on 2026-09-05, when a drink page's chips became links to
+// a pre-filtered index. The grammar is one thing for both sites; each index
+// reads only the keys it has buttons for.
+
+test('a mood parses like any other kind', () => {
+  assert.deepStrictEqual(FS.parseQuery('?mood=sharp'),
+    { star: [], tag: [], mood: ['sharp'] });
+});
+
+test("a two-word mood survives Jekyll's url_encode, which spells a space as +", () => {
+  // Every one of these is a real mood in _data/cocktails/taxonomy.yml, and the
+  // `+` is what `url_encode` emits -- see _layouts/cocktail.html.
+  assert.deepStrictEqual(FS.parseQuery('?mood=sunny+terrace').mood, ['sunny terrace']);
+  assert.deepStrictEqual(FS.parseQuery('?mood=no+juicing').mood, ['no juicing']);
+});
+
+test('moods and food kinds do not collide in one query', () => {
+  assert.deepStrictEqual(FS.parseQuery('?tag=soup&mood=sharp'),
+    { star: [], tag: ['soup'], mood: ['sharp'] });
 });

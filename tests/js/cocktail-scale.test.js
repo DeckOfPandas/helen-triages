@@ -45,6 +45,20 @@ function el(cls, text) {
     children: [],
     parent: null,
     on: {},
+    classes: new Set((cls || '').split(' ').filter(Boolean)),
+    get classList() {
+      const self = this;
+      return {
+        contains: (name) => self.classes.has(name),
+        add: (name) => self.classes.add(name),
+        remove: (name) => self.classes.delete(name),
+        toggle(name, on) {
+          if (on === undefined) on = !self.classes.has(name);
+          if (on) self.classes.add(name); else self.classes.delete(name);
+          return on;
+        }
+      };
+    },
     hasAttribute(name) { return name in this.attrs; },
     getAttribute(name) { return this.attrs[name]; },
     setAttribute(name, value) { this.attrs[name] = String(value); },
@@ -86,12 +100,7 @@ function page(pours) {
   const article = el('cocktail');
   const control = article.add(el('cocktail-scale-controls'));
   const input = control.add(el('cocktail-scale-multiple'));
-  const target = control.add(el('cocktail-scale-target'));
-  const totalValue = control.add(el('cocktail-scale-total-value'));
   const note = article.add(el('cocktail-scale-note'));
-  const caveat = article.add(el('cocktail-scale-note cocktail-scale-caveat',
-    'dashes and drops are scaled with the recipe; bitters do not really scale '
-    + 'linearly, so use your judgement above ×2'));
   const list = article.add(el('cocktail-ingredients'));
 
   const spans = pours.map(([amount, name]) => {
@@ -117,7 +126,8 @@ function page(pours) {
   }
 
   return {
-    sandbox, control, input, target, totalValue, note, caveat, spans,
+    sandbox, control, input, note, spans, list,
+    wide: () => list.classList.contains('cocktail-ingredients--wide-amounts'),
     amounts: () => spans.map((s) => s.textContent),
     /** Type into a box the way a browser does: focus it, then `input`. */
     type(box, text) {
@@ -145,127 +155,134 @@ test('the control reveals itself and starts at the recipe as written', () => {
   assert.strictEqual(p.control.hidden, false,
     'the markup ships `hidden`; revealing it is the proof the script ran');
   assert.strictEqual(p.input.value, '1');
-  assert.strictEqual(p.totalValue.textContent, '90 ml');
-  assert.strictEqual(p.target.value, '90');
+  assert.deepStrictEqual(p.amounts(),
+    ['52.5 ml', '15 ml', '7.5 ml', '15 ml'], 'the recipe as written');
 });
 
-// --- the bug Helen reported, 2026-09-04 --------------------------------------
-
-test('the target box can be emptied — nothing is written back into it', () => {
+test('typing a multiple rewrites every amount', () => {
   const p = page(AVIATION);
-  // "I can't delete numbers in the target ml input field." Backspacing through
-  // 180 passes through 18 and then 1, both of which the drink's floor refuses;
-  // the refusal used to write the last working total straight back in.
-  p.type(p.target, '180');
-  assert.strictEqual(p.totalValue.textContent, '180 ml');
-  for (const partial of ['18', '1', '']) {
-    p.type(p.target, partial);
-    assert.strictEqual(p.target.value, partial,
-      `backspacing to "${partial}" left the box holding "${p.target.value}"`);
+  p.type(p.input, '2');
+  assert.deepStrictEqual(p.amounts(), ['105 ml', '30 ml', '15 ml', '30 ml']);
+});
+
+// --- the keystroke guard, which outlived the box it was written for ----------
+// The millilitre box went on 2026-09-05 (#721) and took the cross-writing with
+// it, but `input` still fires on every keystroke and clearing the box to type a
+// new number still passes through the empty string. Answering that with a floor
+// message scolds someone for pressing Backspace.
+
+test('the box can be emptied — nothing is written back into it', () => {
+  const p = page(AVIATION);
+  p.type(p.input, '2');
+  const poured = p.amounts();
+  for (const partial of ['', '0']) {
+    p.type(p.input, partial);
+    assert.strictEqual(p.input.value, partial,
+      `typing "${partial}" left the box holding "${p.input.value}"`);
+  }
+  assert.strictEqual(p.note.hidden, true,
+    'a half-typed number must not flash the floor message');
+  assert.deepStrictEqual(p.amounts(), poured, 'and the page holds still');
+});
+
+test('a decimal rounds to the nearest whole recipe', () => {
+  const p = page(AVIATION);
+  // Whole recipes only, since 2026-09-05. `1.5` used to become `1.6667` -- the
+  // nearest multiple of this drink's own third-of-a-recipe step -- and now
+  // becomes 2, which is a number a person can see themselves having asked for.
+  p.type(p.input, '1.5');
+  assert.deepStrictEqual(p.amounts(), ['105 ml', '30 ml', '15 ml', '30 ml']);
+  p.leave(p.input);
+  assert.strictEqual(p.input.value, '2', 'and the box says what was made');
+});
+
+test('one recipe is the floor, and a smaller ask settles there', () => {
+  const p = page(AVIATION);
+  // Half a drink is not a thing this page offers, and one is also what keeps
+  // every pour on the 2.5 ml grid -- an integer multiple of a grid value is on
+  // the grid, which is the whole reason integers were chosen.
+  p.type(p.input, '0.4');
+  assert.deepStrictEqual(p.amounts(),
+    ['52.5 ml', '15 ml', '7.5 ml', '15 ml'], 'the recipe as written');
+  assert.strictEqual(p.note.hidden, true, 'and it is not an error to have asked');
+  p.leave(p.input);
+  assert.strictEqual(p.input.value, '1');
+});
+
+test('every amount stays on the 2.5 ml grid at every multiple', () => {
+  // The claim integers were chosen for, checked rather than asserted in prose.
+  // Aviation's 7.5 ml of creme de violette is the one that used to force a
+  // third-of-a-recipe step; nothing forces anything now.
+  const p = page(AVIATION);
+  for (const n of ['2', '3', '4', '7', '12']) {
+    p.type(p.input, n);
+    for (const amount of p.amounts()) {
+      const ml = parseFloat(amount);
+      assert.ok(Math.abs(ml / 2.5 - Math.round(ml / 2.5)) < 1e-9,
+        `x${n} produced ${amount}, which is not on the 2.5 ml grid`);
+    }
   }
 });
 
-test('an empty or half-typed target changes nothing and says nothing', () => {
+test('the ratios are exactly the recipe, multiplied', () => {
   const p = page(AVIATION);
-  p.type(p.target, '180');
-  const poured = p.amounts();
-  p.type(p.target, '');
-  assert.deepStrictEqual(p.amounts(), poured,
-    'clearing the box is someone mid-type, not a request for a drink of nothing');
-  assert.strictEqual(p.note.hidden, true,
-    'an empty box must not flash the floor message');
-  assert.strictEqual(p.input.value, '2', 'the other box still says what is poured');
+  p.type(p.input, '4');
+  assert.deepStrictEqual(p.amounts(), ['210 ml', '60 ml', '30 ml', '60 ml']);
 });
 
-test('the multiple box can be emptied too — the same guard, both boxes', () => {
-  const p = page(AVIATION);
-  p.type(p.input, '');
-  assert.strictEqual(p.input.value, '');
-  assert.strictEqual(p.note.hidden, true);
-  assert.strictEqual(p.totalValue.textContent, '90 ml', 'the page held still');
-});
+// --- leaving the box ---------------------------------------------------------
 
-test('typing in one box redraws the OTHER one', () => {
+test('leaving the box replaces what was typed with what was poured', () => {
   const p = page(AVIATION);
-  // "increasing the number of servings causes the numbers in the target field
-  // to update" -- which is correct and wanted, as long as the target is not the
-  // field being typed in.
-  p.type(p.input, '2');
-  assert.strictEqual(p.target.value, '180');
-  assert.strictEqual(p.totalValue.textContent, '180 ml');
-
-  // 45 ml of a 90 ml drink is ×0.5 on paper, and this drink has no half: its
-  // amounts are 105/30/15/30 half-ml units, gcd 15, so it steps in thirds and
-  // ×0.5 snaps up to ⅔. The typed box is still left alone while it is typed in.
-  p.type(p.target, '45');
-  assert.strictEqual(p.target.value, '45', 'the typed box is left alone');
-  assert.strictEqual(p.input.value, '0.6667', 'the other box follows, snapped');
-  assert.strictEqual(p.totalValue.textContent, '60 ml, ×⅔');
-});
-
-test('a multiple that would move a ratio snaps, and says so as a fraction', () => {
-  const p = page(AVIATION);
-  // ×1.5 would pour 78.75 ml of gin, which no jigger measures, so the old code
-  // rounded it and the ratios moved. Helen, 2026-09-04: the ratios do not move.
-  p.type(p.input, '1.5');
-  assert.strictEqual(p.input.value, '1.5', 'still typeable');
-  assert.deepStrictEqual(p.amounts(),
-    ['87.5 ml', '25 ml', '12.5 ml', '25 ml'], 'poured at ×1⅔, all exact');
-  assert.strictEqual(p.totalValue.textContent, '150 ml, ×1⅔');
+  p.type(p.input, '2.6');
+  assert.strictEqual(p.input.value, '2.6', 'while typing, her number stands');
   p.leave(p.input);
-  assert.strictEqual(p.input.value, '1.6667', 'the box is rewritten to what was made');
-});
-
-test('the caveat about dashes is revealed with the control', () => {
-  const p = page(AVIATION);
-  assert.strictEqual(p.caveat.hidden, false);
-  assert.match(p.caveat.textContent, /dashes and drops/);
-});
-
-test('a refused target snaps the multiple box back, never the typed box', () => {
-  const p = page(AVIATION);
-  p.type(p.input, '2');
-  // 7.5 ml of crème de violette hits 2.5 ml at ×0.5, so ×0.5 is the floor and
-  // 20 ml of a 90 ml drink (×0.222) is under it.
-  p.type(p.target, '20');
-  assert.strictEqual(p.target.value, '20', 'still typeable');
-  assert.strictEqual(p.input.value, '2', 'the untyped box shows what is poured');
-  assert.strictEqual(p.note.hidden, false);
-  assert.match(p.note.textContent, /crème de violette/,
-    'the note names the ingredient that set the limit, read from the page');
-});
-
-// --- leaving a box ------------------------------------------------------------
-
-test('leaving the target replaces what was typed with what was poured', () => {
-  const p = page(AVIATION);
-  // Helen, 2026-09-04: the target "works the ratios out backwards within reason
-  // but then updates the target ml the user has entered to something more sane".
-  // 95 ml of this 90 ml drink is ×1.056; the nearest multiple it can be poured
-  // at is ×1, so 90 ml is what comes out and 90 is what the box is rewritten to.
-  p.type(p.target, '95');
-  assert.strictEqual(p.target.value, '95', 'while typing, her number stands');
-  p.leave(p.target);
-  assert.strictEqual(p.totalValue.textContent, '90 ml');
-  assert.strictEqual(p.target.value, '90',
+  assert.strictEqual(p.input.value, '3',
     'on the way out the box says what was actually made, not what was asked');
 });
 
-test('a blank target on blur restores the current total rather than refusing', () => {
-  const p = page(AVIATION);
-  p.type(p.input, '2');
-  p.type(p.target, '');
-  p.leave(p.target);
-  assert.strictEqual(p.target.value, '180', 'settled to what is being poured');
-  assert.strictEqual(p.input.value, '2');
-  assert.strictEqual(p.note.hidden, true, 'asking nothing is not an error');
-});
-
-test('a blank multiple on blur restores it too', () => {
+test('a blank box on blur restores what is being poured rather than refusing', () => {
   const p = page(AVIATION);
   p.type(p.input, '2');
   p.type(p.input, '');
   p.leave(p.input);
-  assert.strictEqual(p.input.value, '2');
-  assert.strictEqual(p.target.value, '180');
+  assert.strictEqual(p.input.value, '2', 'settled to what is being poured');
+  assert.strictEqual(p.note.hidden, true, 'asking nothing is not an error');
+});
+
+
+// --- the amount column's two widths ------------------------------------------
+// Helen, 2026-09-05: "reduce the space between ingredient amounts and names
+// again, but increase it when an amount would otherwise linebreak due to use of
+// the scaler." Counted rather than measured — the amounts are set in Plex Mono,
+// so a character count is a width. Nine fit in the narrow column.
+
+test('the amount column stays narrow for a drink as written', () => {
+  const p = page(AVIATION);
+  assert.strictEqual(p.wide(), false,
+    '"52.5 ml" is seven characters; nothing needs the room');
+});
+
+test('a scaled amount that would wrap opens the column, and closes it again', () => {
+  // A count with a long unit is what actually reaches ten characters under
+  // scaling: millilitre figures tend to SHORTEN as they scale, because the
+  // decimal falls off ("52.5 ml" doubles to "105 ml").
+  const p = page([['9 dashes', 'Angostura'], ['30 ml', 'rye']]);
+  assert.strictEqual(p.wide(), false, '"9 dashes" is eight characters');
+
+  p.type(p.input, '12');
+  assert.strictEqual(p.amounts()[0], '108 dashes', 'ten characters');
+  assert.strictEqual(p.wide(), true, 'so the column opens');
+
+  p.type(p.input, '2');
+  assert.strictEqual(p.amounts()[0], '18 dashes', 'nine characters');
+  assert.strictEqual(p.wide(), false, 'and closes again — it is a state, not a ratchet');
+});
+
+test('an amount longer than the column holds opens it at rest', () => {
+  // The Airmail's own written amount, fourteen characters, which has wrapped
+  // inside its column since the column existed.
+  const p = page([['Top (30-45) ml', 'champagne'], ['15 ml', 'lime juice']]);
+  assert.strictEqual(p.wide(), true,
+    'a drink can be born too wide for the narrow column, not only scaled into it');
 });

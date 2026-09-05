@@ -81,7 +81,21 @@
   // The filter kinds this grammar knows. parseQuery always returns a key for
   // each one, so a caller never has to guard against a missing array; a
   // parameter not named here is ignored outright.
-  var KINDS = ['star', 'tag'];
+  //
+  // `mood` JOINED THEM ON 2026-09-05, when the drink page's mood chips became
+  // links to a pre-filtered index -- Helen: "let's wire the chips up to show a
+  // filtered index page please, echoing what we do on the food site, which
+  // feels lovely." That is food's badge behaviour exactly (see
+  // _includes/recipe_badges.html), and this list is the one place the grammar
+  // is written down for both sites.
+  //
+  // THE LIST IS SHARED AND THAT COSTS NOTHING. `star` and `tag` mean nothing on
+  // the cocktails index and `mood` means nothing on food's; each index reads
+  // only the keys it has buttons for, and a parsed key nobody asks about is an
+  // empty array. Splitting this per site would be two grammars to keep in step
+  // for no gain -- and this file's own header already argues that the query
+  // grammar is one thing.
+  var KINDS = ['star', 'tag', 'mood'];
 
   var EXCLUDE_PREFIX = '-';
 

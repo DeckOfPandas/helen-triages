@@ -355,6 +355,24 @@ TRUSTED_DYNAMIC = (
     # offline, not a rule in this file -- which asserts about the site's own
     # pages and would have to make a network call to say anything at all.
     re.compile(r"^\{\{\s*page\.source_url\s*\}\}$"),
+    # A drink page's mood chips, added 2026-09-05 -- links to the cocktails
+    # index pre-filtered by that mood, echoing food's badges
+    # (_includes/recipe_badges.html, issue #40).
+    #
+    # THE PATH HALF IS COVERED THE SAME WAY THE BACK ARROW'S IS: `chip_home` is
+    # `site.data.sites[page.site_key].home`, which
+    # test_site_nav_links_resolve_to_real_pages already checks against the
+    # published-page set for every site. This scanner cannot follow the
+    # subscript, and does not have to.
+    #
+    # THE QUERY HALF IS DELIBERATELY NOT A LINK QUESTION. `?mood=...` does not
+    # change which page is fetched, so a mood that no longer exists still lands
+    # on a real, working index -- assets/js/cocktail-index.js drops a value that
+    # matches no button in silence, which is food's own policy for `?tag=`.
+    # There is nothing here for a link checker to resolve, and a stale mood is a
+    # taxonomy question that tests/test_cocktails.py owns.
+    re.compile(r"^\{\{\s*chip_home\s*\|\s*relative_url\s*\}\}\?mood="
+               r"\{\{\s*m\s*\|\s*url_encode\s*\}\}$"),
 )
 
 

@@ -3,15 +3,15 @@
 // =============================================================================
 // Three controls:
 //
-//   .btn-shortlist          marks one drink, on the drink page's meta row
+//   .btn-shortlist          marks one drink, under the drink page's toggle
 //   .btn-shortlist--card    the same control in a card's top-right corner
 //   .btn-shortlist-only     shows only what is marked, on the count line
 //
 // Food's twin of all three is _sass/food/_shortlist.scss, and the store, the
 // wiring and the event are shared — only the colours and the card differ.
 //
-// GREY OFF, COSMIC COSMOPOLITAN ON — Helen, 2026-09-04: "Text and active colour
-// cosmic-cosmopolitan on cocktails because it's a thing the user is choosing and
+// GREY OFF, WICKED WOOWOO ON — Helen, 2026-09-04: "Text and active colour
+// wicked-woowoo on cocktails because it's a thing the user is choosing and
 // that's the language", and "Grey for inactive". Neither is a new value.
 // $color-clear-text is $color-grey-mid, this site's de-emphasised UI text at
 // 6.50:1 on the ground; magenta is already what this site means by a reader's
@@ -43,27 +43,71 @@
   cursor: pointer;
   white-space: nowrap;
 
+  // THE MARK AND THE WORD ARE CENTRED ON EACH OTHER — Helen, 2026-09-05:
+  // "please horizontally align the middle of the word shortlist with the middle
+  // of its icon."
+  //
+  // This is a flex row rather than two inline boxes because the alternative is
+  // a baseline, and a baseline is what put the `+` up in the air in the first
+  // place. See the `::before` below for that story; the short version is that
+  // an inline-block's baseline is not always its text's baseline, and the one
+  // thing a flex row with `align-items: center` cannot do is care.
+  display: inline-flex;
+  align-items: center;
+
   color: $color-clear-text;
   transition: color 0.12s ease-in-out;
 
-  // A fixed box for the mark, so `+` and `✓` cannot lay the word out
-  // differently. Courier is monospaced and would not need this; the rule is
-  // here anyway because the mark's own size and spacing should not depend on
-  // which face the label happens to inherit.
+  // THE WORD MUST NOT MOVE WHEN THE MARK CHANGES — Helen, 2026-09-05: "when I
+  // click +shortlist, the word jumps downwards a few pixels."
+  //
+  // A fixed WIDTH was already here and was only half the problem. The other
+  // half is height: `+` is in Courier Prime and `✓` (U+2713) is not, so the
+  // browser substitutes a fallback face for that one glyph — and a fallback's
+  // ascent is not Courier's. The mark was an inline-block, so its line box
+  // counted toward the line's height; a taller substituted glyph grew the line
+  // box, and since the button was `align-items: flex-start` in the meta row it
+  // sat in then, its top stayed put and the BASELINE dropped.
+  //
+  // THE FIRST FIX WAS `line-height: 1` PLUS `overflow: hidden`, AND IT TRADED
+  // THE JUMP FOR A SUPERSCRIPT — Helen saw it immediately: the `+` was sitting
+  // up by the cap line instead of level with the word. That is a real rule
+  // rather than a mystery: an inline-block whose `overflow` is anything but
+  // `visible` takes its BOTTOM MARGIN EDGE as its baseline, not its text's
+  // baseline. So `vertical-align: baseline` put the whole 1em box above the
+  // word's baseline and the glyph rode up with it. Adding overflow to pin a
+  // height silently changed what the box was aligned BY.
+  //
+  // BOTH GO AWAY IN A FLEX ROW. With the button `inline-flex` and
+  // `align-items: center` (above) there is no baseline in the arrangement at
+  // all: the mark's box and the word's line box are centred on one another,
+  // which is what Helen asked for, and a substituted glyph inside a box of
+  // declared height cannot move either of them. `height: 1em` with
+  // `line-height: 1` is that declared height; `overflow: hidden` keeps its
+  // meaning here — a taller fallback glyph cannot spill — while no longer
+  // having a baseline to redefine.
+  //
+  // The general shape is worth keeping twice over: a swapped glyph is a swapped
+  // FONT whenever the face lacks it, and a font swap changes metrics rather
+  // than only the picture. And a property added to fix one thing can quietly
+  // change which rules apply to another.
   &::before {
     content: '+';
-    display: inline-block;
+    flex: none;
     width: 0.85em;
+    height: 1em;
     margin-right: 0.25em;
     text-align: center;
     font-weight: 700;
+    line-height: 1;
+    overflow: hidden;
   }
 
   &:hover,
-  &:focus-visible { color: $color-cosmic-cosmopolitan; }
+  &:focus-visible { color: $color-wicked-woowoo; }
 
   &.is-on {
-    color: $color-cosmic-cosmopolitan-deep;
+    color: $color-wicked-woowoo-deep;
     // Bold, matching `.cocktail-toggle-label.is-active` beside it: on this page
     // an active control is its colour AND its weight, and half of that
     // convention would read as a different kind of state.
@@ -73,33 +117,19 @@
   }
 }
 
-// --- The drink page's meta row -----------------------------------------------
-// The `<dl>` of glass / garnish / ship it?, with the shortlist toggle pushed to
-// the same right edge the read-it/make-it toggle sits on. Both are children of
-// `.cocktail-head-words`, so the two controls share a column by construction
-// rather than by a number either file would have to keep in step.
+// --- The drink page's shortlist button ---------------------------------------
+// It used to sit at the right-hand end of a `.cocktail-meta-row` flex wrapper,
+// pushed to the same edge the read-it/make-it toggle takes so the two lined up
+// by construction. On 2026-09-05 Helen moved it under that toggle -- "move the
+// shortlist button up to below make it / read it" -- and the wrapper went with
+// it, because a flex row holding one child is not a layout. Its new home is
+// `.cocktail-head-shortlist` in _sass/cocktails/_cocktail.scss, which is the
+// same one-trick element: push right, and land under the thing above that also
+// pushes right.
 //
-// `align-items: flex-start` and NOT baseline: the `<dl>`'s first baseline is its
-// dt row (GLASS, 0.72rem), and aligning a 0.78rem control to it would sit the
-// button on the labels rather than at the top of the block. Helen asked for the
-// top right of the panel, which is what flex-start gives.
-//
-// The gap is $space-xl rather than the list's own 5rem: that value was chosen to
-// hold three facts apart from each other, and this is not a fourth fact.
-.cocktail-meta-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: $space-xl;
-
-  // The list already carries the bottom margin that separates the head from the
-  // ingredients, and it is still the thing that should carry it — the row is a
-  // layout wrapper, not a block in its own right.
-  .cocktail-meta { margin-bottom: 0; }
-  margin: 0 0 $space-md;
-
-  .btn-shortlist { flex-shrink: 0; }
-}
+// Nothing about the BUTTON changed in that move, which is why there is no rule
+// here any more -- only this note, so the next person looking for the meta row
+// finds out where it went rather than concluding it was never styled.
 
 // =============================================================================
 // ON A CARD — the mark alone, in the top-right corner
@@ -285,9 +315,9 @@
 }
 
 // PLEX, IN INK -- the site's own rule for a number you act on, 2026-09-04.
-// It opened in the Courier heading face in cosmopolitan, on the reasoning
+// It opened in the Courier heading face in woowoo, on the reasoning
 // that "the number is the fact you are shopping by, so it carries the colour
-// that means 'you chose this'". But cosmopolitan means HAS TO HAVE (the
+// that means 'you chose this'". But woowoo means HAS TO HAVE (the
 // matched ingredient, the bottle suggestion) and the site already has a
 // vocabulary for a quantity: `.cocktail-amount` on the drink page and the
 // ingredient amounts on food are $font-label at weight 600 in ink, tabular,
@@ -321,14 +351,14 @@
   color: $color-clear-text;
 }
 
-// THE BOTTLE IS COSMOPOLITAN — Helen, 2026-09-04, and it is the drink page's own
+// THE BOTTLE IS WOOWOO — Helen, 2026-09-04, and it is the drink page's own
 // `.cocktail-suggestion` colour rather than a new decision. _cocktail.scss states
-// the reason where it refuses the same hue to `optional`: "cosmopolitan
+// the reason where it refuses the same hue to `optional`: "woowoo
 // precisely BECAUSE a bottle name is a thing has-to-have matches against". The
 // bottle in a shopping list is the same claim — the thing you chose — so the two
 // pages say it the same way.
 .shopping-list-bottle {
-  color: $color-cosmic-cosmopolitan-deep;
+  color: $color-wicked-woowoo-deep;
 }
 
 // The whole-fruit count stays quiet. It is arithmetic this page did, not

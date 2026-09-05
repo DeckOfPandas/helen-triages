@@ -231,6 +231,35 @@ layout: default
         </div>
       </div>
 
+      {% comment %} THE SHORTLIST BUTTON, DIRECTLY UNDER `read it` / `make it` —
+         Helen, 2026-09-05: "move the shortlist button up to below make it /
+         read it." It was at the right-hand end of the meta row, which is where
+         she put it on 2026-09-04 ("the top right of the metadata panel...
+         maybe horizontally aligned with read it / make it"); it is now under
+         the thing it was only aligned with.
+
+         A SIBLING OF THE TITLE ROW RATHER THAN A SECOND ITEM INSIDE IT. Both
+         are children of `.cocktail-head-words` and both push their right-hand
+         content to the same edge, so the button lands under the toggle by
+         construction with no number to keep in step. Putting it INSIDE the
+         title row would have meant stacking it with the toggle in a wrapper,
+         and that row is `align-items: last baseline` — a two-item column's last
+         baseline is its BOTTOM item's, so the toggle would have been dragged
+         off the title's line to put the button on it.
+
+         `page.url`, NOT `relative_url` -- the same key this drink's own index
+         card emits, which is what makes the card and this page agree about
+         whether it is shortlisted. See HTF.shortlist in assets/js/assets.js.
+         `hidden` until shortlist.js reveals it, the rule every JS-dependent
+         control on both sites follows. {% endcomment %}
+      <div class="cocktail-head-shortlist">
+        <button type="button"
+                class="btn-shortlist"
+                data-shortlist-key="{{ page.url }}"
+                aria-pressed="false"
+                hidden>shortlist</button>
+      </div>
+
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
          model_instructions/INGEST_ONE_COCKTAIL.md §"Leave both as QQ": every
          drink is ingested with `tagline: "QQ"` until Helen writes the real one
@@ -268,7 +297,6 @@ layout: default
          the real page; a control dropped into that flex row would inherit the
          gap, wrap with the facts on a narrow screen, and claim to be a fourth
          thing the drink IS. {% endcomment %}
-      <div class="cocktail-meta-row">
       <dl class="cocktail-meta">
         {% comment %} THE GLASS LINE IS THE GLASS AND NOTHING ELSE, 2026-09-05.
            The ice and the rim rode here for about an hour and Helen killed it:
@@ -286,34 +314,58 @@ layout: default
            _includes/cocktails/ship.html, factored out 2026-09-02 so the two can
            never render a different word for the same rung. See
            cocktails/index.html's own call for the other half of this pair.
+
+           `make it` ONLY, SINCE 2026-09-05 — Helen: "drop the ship mark from
+           read it mode." It renders in both states and the stylesheet hides it
+           in one, rather than the template gating it, for the reason the whole
+           two-state head follows: nothing leaves the DOM, so the page still
+           prints whole and still reads whole with JavaScript off — and the
+           no-JS state is the editorial one, which must carry MORE rather than
+           less. See `.cocktail-meta-ship` in _sass/cocktails/_cocktail.scss.
         {% endcomment %}
-        <div><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
+        <div class="cocktail-meta-ship"><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
       </dl>
 
-        {% comment %} `page.url`, NOT `relative_url` -- the same key this drink's
-           own index card emits, which is what makes the card and this page agree
-           about whether it is shortlisted. See HTF.shortlist in
-           assets/js/assets.js. `hidden` until shortlist.js reveals it, the rule
-           every JS-dependent control on both sites follows. {% endcomment %}
-        <button type="button"
-                class="btn-shortlist"
-                data-shortlist-key="{{ page.url }}"
-                aria-pressed="false"
-                hidden>shortlist</button>
-      </div>
+      {% comment %} CHIPS ARE THE CARD'S MOOD CHIPS, AND NOW THEY GO SOMEWHERE.
+         Helen's original brief: "Must be the same chips as on the cards." Same
+         classes (`.drink-card-mood`, `--hassle` via taxonomy.yml's
+         `mood_groups`) and the identical derivation loop cocktails/index.html
+         runs, so a mood can never look different here than it does on the card
+         it came from.
 
-      {% comment %} CHIPS ARE THE CARD'S MOOD CHIPS, AS <span>s -- Helen's
-         brief: "Must be the same chips as on the cards." Same classes
-         (`.drink-card-mood`, `--hassle` via taxonomy.yml's `mood_groups`) and
-         the identical derivation loop cocktails/index.html runs, so a mood can
-         never look different here than it does on the card it came from. A
-         `<span>`, not the card's `<button>`, because this page has no filter
-         list for a click to narrow — see _sass/cocktails/_cocktail.scss for the
-         `cursor: default` that follows from that. {% endcomment %}
+         AN `<a>` SINCE 2026-09-05, replacing a `<span>` -- Helen: "let's wire
+         the chips up to show a filtered index page please, echoing what we do
+         on the food site, which feels lovely." It echoes it exactly:
+         _includes/recipe_badges.html has been a real link to a pre-filtered
+         index since issue #40, and the argument there holds here word for word
+         -- an `<a>` with a real href is what makes middle-click, open-in-new-tab,
+         copy-link-address and "where does this go" on hover all work, where a
+         button plus `location.href` breaks every one of them.
+
+         This page has no filter list of its own for a click to narrow, which is
+         what the old `<span>` and its `cursor: default` were saying. That was
+         true and was the wrong conclusion: the answer is not that the word does
+         nothing, it is that the word takes you where the filtering happens.
+         Sharper still since the chips took their section colours at rest and
+         hover went back to magenta, which on this site means "you can touch
+         this" -- so a chip that could not be touched was making a promise the
+         page could not keep.
+
+         `url_encode` IS JEKYLL'S `CGI.escape` AND SPELLS A SPACE AS `+`, which
+         assets/js/filter-state.js's `decodeValue` is written to undo -- the same
+         dependency food's badges have, and it matters here for every two-word
+         mood ("sunny terrace", "no juicing", "i want to faff").
+
+         THE HOME URL COMES FROM _data/sites.yml VIA `page.site_key`, not from a
+         literal `/cocktails/`. That is what _includes/back-to-index.html does
+         for the same journey in the other direction, and it means a drink page
+         and its back arrow can never disagree about where the index is.
+      {% endcomment %}
       {% assign mood_groups = site.data.cocktails.taxonomy.mood_groups %}
+      {% assign chip_home = site.data.sites[page.site_key].home %}
       {% if page.mood.size > 0 %}
         <div class="cocktail-chips">
-          {% for m in page.mood %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<span class="drink-card-mood drink-card-mood--{{ chip }}">{{ m }}</span>{% endfor %}
+          {% for m in page.mood %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}
         </div>
       {% endif %}
     </div>
@@ -381,17 +433,43 @@ layout: default
      below. That case is gone and so is the assignment — an unread variable is
      the template equivalent of the dead selector it went with. {% endcomment %}
   {% if page.ingredients.size > 0 %}
-    {% comment %} THE SCALER SITS ON THE INGREDIENTS HEADING'S OWN LINE — issue
-       #545, step one, 2026-09-04. It is a control over this section and nothing
-       else, so it belongs beside the section's name rather than at the top of
-       the page with `read it`/`make it` (which govern the whole page) or at the
-       bottom, where the issue first put it and where you would have to scroll
-       past the amounts to reach the thing that changes them.
+    {% comment %} THE SCALER IS ONE BOX UNDER THE LIST, 2026-09-05, and this is
+       the third place it has lived. #545 first put it at the FOOT of the page,
+       where you had to scroll past the amounts to reach the thing that changes
+       them; on 2026-09-04 it moved up onto the INGREDIENTS heading's own line.
+       Helen, having used that: "the normal scaler shouldn't get to be at the
+       top of the page. Please simplify it and move underneath the ingredients
+       list, just a single input text box, 2 characters wide, with a small x
+       next to it, no other text at all."
 
-       `.cocktail-section-row` is the same shape `.cocktail-meta-row` gives the
-       meta panel and its shortlist button: a flex row, baseline-aligned, pushed
-       apart. One wrapper rather than a float, so the heading keeps its own
-       margins and its own rule mark.
+       So it sits after the `</ul>`, which is where a control that RE-READS the
+       list belongs: you look at the amounts, then you change them, then you
+       look again — and the thing you are changing is above the control rather
+       than below it. The heading is a plain `<h2>` again, and the
+       `.cocktail-section-row` flex wrapper that held the two together is gone.
+       That wrapper had a cost nobody had priced: a flex item's margins never
+       collapse, so the heading's own 2.25rem top margin stopped collapsing with
+       the head block's bottom margin and started adding to it. Helen, on #720:
+       "the presence of the scaler has moved the whole page downwards." It had,
+       by about 36px on every drink page, and deleting the wrapper is the fix.
+
+       NO WORDS AT ALL, which is the part to hold. `make [1] × the recipe = 90
+       ml, or [90] ml in total` was five pieces of furniture explaining one
+       number. The box and a `×` say the same thing to anyone who has just read
+       a list of amounts, and say nothing at all to someone who has not looked
+       at the list yet, which is correct — this control is meaningless without
+       it. `aria-label` carries the sentence for a screen reader, where the
+       visual context the `×` leans on is not available.
+
+       THE TARGET-ML BOX IS GONE — #720, #721. It let you type a total and
+       worked the ratios backwards, and Helen: "it's just baffling. Typing some
+       numbers changes nothing, typing others changes the recipe but you can't
+       see it." Both were true and neither was a bug: the drink's amounts have
+       to stay on the 2.5 ml grid, so Aviation can only be poured at multiples
+       of a third and only totals of 30, 60, 90, 120... are reachable. Typing 100
+       snapped silently back to 90. A control whose valid inputs cannot be seen
+       or guessed is not a control, and the multiple box asks the same question
+       in a form where every value you can type is one you can have.
 
        MULTIPLES OF THE RECIPE AS WRITTEN — Helen, 2026-09-04. There is no
        `serves:` field on a drink and this does not invent one: ×2 is twice what
@@ -400,72 +478,16 @@ layout: default
        cocktail-scale.js, which is the only thing that knows what multiples this
        particular drink can be poured at.
 
-       THE STEP IS THE DRINK'S OWN, NOT A HALF — Helen, 2026-09-04: "recipe
-       states single-order amount, target ml works the ratios out backwards
-       within reason but then updates the target ml the user has entered to
-       something more sane, that is, based on 2.5-ml increments." A multiple is
-       allowed only where every millilitre amount lands exactly on the 2.5 ml
-       grid, so no ratio ever moves; the Negroni steps in thirds. The arithmetic
-       and the proof are in assets/js/scale.js's header. The `0.5` written here
-       is only what a reader with no JavaScript would get, and they get no
-       control at all.
-
        `hidden` UNTIL THE SCRIPT REVEALS IT, the rule every JS-dependent control
        on both sites follows — see the shortlist button above, and
-       assets/js/cocktail-scale.js's own header. ONE WRAPPER CARRIES THE
-       `hidden` for all three parts, rather than three attributes the script
-       has to remember to clear separately.
+       assets/js/cocktail-scale.js's own header. The wrapper carries the
+       `hidden` for the box and its mark together.
 
-       TOTAL ML AND A TARGET ML — Helen, 2026-09-04, step two of #545: "please
-       add total ml, either set by your input box, or user-entered number of ml
-       -- which you can refuse if it forces a volume to be <2.5 ml." So the row
-       reads `make [1] × the recipe = 90 ml, or [90] ml in total`: the equals
-       sign is what makes the three parts one sentence rather than three
-       controls, and the two boxes are kept in step by cocktail-scale.js so
-       neither can be read as the stale one.
-
-       THE TOTAL IS ml AND ONLY ml, drops and dashes and pinches excluded on
-       Helen's instruction — see assets/js/scale.js's header for why a dash is
-       not some number of millilitres this page may invent. {% endcomment %}
-    <div class="cocktail-section-row">
-      <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
-      <div class="cocktail-scale-controls" hidden>
-        <label class="cocktail-scale">
-          <span>make</span>
-          <input type="number" min="0.5" step="0.5" value="1" inputmode="decimal" class="cocktail-scale-multiple" aria-label="how many times the recipe">
-          <span>× the recipe</span>
-        </label>
-        {% comment %} A `<p>` rather than a span inside either label: it is the
-           ANSWER, not part of a control, and clicking it should not focus a
-           box. `aria-live` so a screen reader hears the new total when a box
-           changes it, since nothing else on the row says what happened.
-        {% endcomment %}
-        <p class="cocktail-scale-total" aria-live="polite">= <span class="cocktail-scale-total-value"></span></p>
-        <label class="cocktail-scale">
-          <span>or</span>
-          <input type="number" min="0" step="2.5" inputmode="decimal" class="cocktail-scale-target" aria-label="how many millilitres in total">
-          <span>ml in total</span>
-        </label>
-      </div>
-    </div>
-    {% comment %} The floor message, empty and hidden until a refusal fills it —
-       "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
-       paragraph of its own beneath the row rather than text inside the label,
-       so a long sentence cannot push the number box around. {% endcomment %}
-    <p class="cocktail-scale-note" hidden></p>
-    {% comment %} THE WORDING HERE IS PROVISIONAL AND HELEN WILL WRITE HERS — an
-       issue is open for it, and nothing else on either site should copy this
-       sentence until she has. What it has to say is settled and is hers: the
-       scaler multiplies dashes and drops along with everything else, because
-       leaving them alone would be a different decision made silently, and a
-       dash of bitters does not actually taste twice as strong at ×2.
-
-       IT IS HIDDEN UNTIL cocktail-scale.js REVEALS IT, like the control itself
-       and for the same reason — a caveat about a control that is not on the
-       page is worse than no caveat. `.cocktail-scale-note` gives it the quiet
-       grey the floor message wears; `.cocktail-scale-caveat` is what the script
-       finds it by. {% endcomment %}
-    <p class="cocktail-scale-note cocktail-scale-caveat" hidden>dashes and drops are scaled with the recipe; bitters do not really scale linearly, so use your judgement above ×2</p>
+       THE BITTERS CAVEAT IS GONE TOO — #720.1. It was revealed unconditionally
+       at init, so Aperol Spritz — prosecco, Aperol, soda water — was warned
+       that "bitters do not really scale linearly". A caveat that fires where it
+       does not apply teaches you to stop reading caveats. {% endcomment %}
+    <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
         {% comment %} THE GATE ASKS FOR THE FIELDS THIS BLOCK ACTUALLY RENDERS,
@@ -556,7 +578,7 @@ layout: default
                  That is #441's argument about "(blackstrap)" arriving on a
                  different field. {% endcomment %}
               {% comment %} `headline` GETS ITS OWN SPAN, 2026-09-02, so the
-                 double-rule underline (yvette over absinthe, Helen's brief:
+                 double-rule underline (violette over absinthe, Helen's brief:
                  "yvette showing what is in something") lands under the
                  ingredient's name only — never under the bottle suggestion in
                  brackets after it, which is a different colour making a
@@ -575,6 +597,35 @@ layout: default
         {% endif %}
       {% endfor %}
     </ul>
+    <div class="cocktail-scale-controls" hidden>
+      <label class="cocktail-scale">
+        {% comment %} WHOLE RECIPES ONLY, since 2026-09-05 — Helen: "logically I
+           think we can solve the rounding/ratio issue by only allowing integer
+           multiples." Every written amount is already on the 2.5 ml grid and an
+           integer multiple of a grid value is on the grid, so no drink can be
+           asked for a pour nobody can measure and no ratio ever moves. The
+           `min`/`step` the script used to compute per drink are gone with it.
+
+           `type="text"`, NOT `type="number"`, and Helen's own word for it was
+           "text box". It kept the field free of the browser's spinner without
+           having to suppress one, which matters at two characters wide; the
+           script rounds and clamps whatever is typed, so the input type is not
+           what is enforcing anything. `inputmode="numeric"` — not `decimal` any
+           more — puts a phone's plain number pad up, which is now exactly the
+           set of characters this box accepts. {% endcomment %}
+        <input type="text" value="1" inputmode="numeric" class="cocktail-scale-multiple" aria-label="make this many times the recipe">
+        {% comment %} A MULTIPLICATION SIGN, not the letter x and not a word.
+           `aria-hidden` because "times" read out after the number is the one
+           thing the input's own label already says, and a screen reader hearing
+           "2 multiplication sign" gains nothing. {% endcomment %}
+        <span class="cocktail-scale-mark" aria-hidden="true">×</span>
+      </label>
+    </div>
+    {% comment %} The floor message, empty and hidden until a refusal fills it —
+       "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
+       paragraph of its own beneath the control rather than text inside the
+       label, so a long sentence cannot push the number box around. {% endcomment %}
+    <p class="cocktail-scale-note" hidden></p>
   {% endif %}
 
   {% comment %} Method is an ORDERED LIST, not the single line the original

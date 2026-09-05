@@ -38,8 +38,16 @@
     // footnote warns about.
     .cocktail-note,
     .notes,
+    // SHIP IT? IS ONE OF THESE AGAIN. It spent an hour on 2026-09-05 hidden in
+    // the editorial state and revealed by `make it`, which needed a rule of its
+    // own here running the opposite way; Helen reversed that the same evening
+    // ("I want ship it to display in read it mode, and not to display in make
+    // it mode"), so it is an ordinary member of this list once more -- a fact
+    // `make it` strips and print puts back.
+    .cocktail-meta-ship,
     .cocktail-body-content { display: revert; }
   }
+
 
   // The toggle itself is furniture, not content -- three controls that cannot
   // be pressed on paper. Was `.btn-make`, the single button this replaced,
@@ -60,11 +68,16 @@
   // control cannot be pressed on paper; the amounts it already wrote can, and
   // do, print exactly as they stand.
   //
-  // THE TOTAL AND THE TARGET BOX GO WITH IT, 2026-09-04. The whole row is one
-  // wrapper now (`.cocktail-scale-controls`), so hiding the wrapper takes the
-  // multiple box, the total and the millilitre box together — and a printed
-  // total would be the same invitation as a printed number box: a figure that
-  // was true of whatever was on screen when the reader hit print.
+  // THE TOTAL AND THE TARGET BOX WENT WITH IT — and then went altogether, on
+  // 2026-09-05 (#720, #721), leaving one multiple box and a `×`. The wrapper is
+  // still the thing hidden, so this rule did not have to change when its
+  // contents did, which is the argument for hiding a wrapper rather than a list
+  // of parts.
+  //
+  // THE SHORTLIST BUTTON IS NOT LISTED HERE and does not need to be: it ships
+  // `hidden` and only shortlist.js reveals it, so a printed page that ran no
+  // JavaScript never had one, and one that did gets it hidden by
+  // shared/_print.scss along with every other control.
   .cocktail-scale-controls,
   .cocktail-scale,
   .cocktail-scale-note { display: none; }
