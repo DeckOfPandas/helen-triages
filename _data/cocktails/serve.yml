@@ -1,13 +1,12 @@
 # =============================================================================
-# HOW A DRINK IS SERVED — the ice, and the state of the glass.
+# HOW A DRINK IS SERVED — the ice, and the rim.
 # =============================================================================
 # WHY THIS EXISTS, and it is the shortest version of a long diagnosis. A drink
 # has a BUILD and a SERVE. The build had `method`. The serve had `glass` for
 # the vessel, `garnish` for the garnish and `to_serve` for the serveware —
-# and NOTHING for the two things left over: the ice that goes in the glass,
-# and whether the glass is chilled, frozen or rinsed first.
+# and NOTHING for the ice that goes in the glass.
 #
-# Having no field, those two rode in the last method step, in free prose. So
+# Having no field, the ice rode in the last method step, in free prose. So
 # "strain" was written SEVENTEEN ways across 124 drinks:
 #
 #   Strain into a chilled glass.        Strain over a giant ice cube.
@@ -18,10 +17,12 @@
 #
 # Two of those are truncated sentences — "Fine strain into a chilled." and
 # "Fine-strain into pre-chilled." — which had been sitting in the collection
-# unnoticed, because prose that varies is prose nobody can check.
+# unnoticed, because prose that varies is prose nobody can check. A sweep for
+# the same shape afterwards found one more, Chartreuse Swizzle's "Add to the.",
+# vestigial from "Add to the [glass]".
 #
-# Moving the ice and the prep into fields collapsed 94 uses of 31 spellings
-# into FIVE techniques: Strain, Fine strain, Double strain, Pour, Dump. That is
+# Moving the ice into a field collapsed 94 uses of 31 spellings into FIVE
+# techniques: Strain, Fine strain, Double strain, Pour, Dump. That is
 # methods.yml's own argument, applied one layer out — a shape that changes
 # every time has to be RE-READ; an identical repeated one becomes something you
 # RECOGNISE. Helen's reason for wanting that, from #290: people in the house,
@@ -34,6 +35,16 @@
 # information into `to_serve` ("Without ice."). Both moved to the field that
 # owns them. Helen, 2026-09-05, on precisely this: "things to serve with (like
 # a paper umbrella) aren't written or laid out the same way."
+#
+# THERE IS NO `chill` FIELD, AND THERE WAS FOR ABOUT AN HOUR. It held `chilled`
+# on 21 drinks until Helen ruled it out: "I think it's implied that glasses
+# should be chilled (except hot drinks obviously). I am the user after all."
+# Its other three values — `frozen` once, `rinsed` three times — were each
+# already a method step in their own right ("Rinse a frozen glass with the
+# overproof rum", "Rinse the glasses with Campari"), so the whole field went
+# rather than just the one value, and nothing it held was lost. Worth recording
+# because a field that is redundant with a default is exactly the kind of thing
+# that gets re-proposed.
 #
 # ABSENT MEANS NOBODY HAS DECIDED. `ice: "none"` MEANS SERVED UP.
 # The same distinction `garnish` draws between `[]` and `["no garnish"]`, and
@@ -72,53 +83,50 @@ ice:
     amount of planning.
   blended: >-
     The ice is IN the drink, not under it. The four frozen drinks. Reads as
-    "you need a blender", which is the constraint that matters when choosing.
+    "you need a blender", which is the constraint that matters when choosing —
+    and it is why the value exists even though it PRINTS NOTHING (see below).
 
-# --- how the card says it ----------------------------------------------------
-# THE PAGE JOINS THIS ONTO THE GLASS, so the meta panel reads "coupe, chilled"
-# or "highball, crushed ice" — which is what the method step used to say before
-# the ice had a field ("Strain into a chilled glass", "Strain over crushed
-# ice"). Same fact, same words, one place.
+# --- how the page says it ----------------------------------------------------
+# A LINE UNDER "TO SERVE", NOT A NOTE ON THE GLASS. It rode on the glass line
+# for about an hour and Helen killed it: "hurricane, blended" is nonsense —
+# blended is not a property of a glass — and, more generally, "ice pedantry
+# will be more likely to be seen at the point in the make where it happens."
+# So it prints as an instruction, in the section you read after the method,
+# beside the rim and the serveware.
+#
+# `none` AND `blended` PRINT NOTHING, deliberately and for different reasons.
+# `none` is 79 drinks and the commonest case; saying "no ice" on all of them is
+# noise. `blended` is already unmistakable from the method step it always
+# accompanies ("Blend all ingredients including the ice") and has no sensible
+# serving sentence — which is the exact complaint that moved this block here.
+# Both values still exist in the DATA, where the mood derivation and #297 read
+# them; printing is a separate question from recording.
 #
 # WHY A MAP HERE RATHER THAN A CASE IN THE TEMPLATE. The same contract
 # glasses.yml states: adding a value is a YAML edit, never a template edit. A
-# `{% case %}` in _layouts/cocktail.html would mean the vocabulary lived in two
-# files and only one of them was checked.
-#
-# `none` IS ABSENT FROM THIS MAP DELIBERATELY. 79 drinks are served up; saying
-# "no ice" on all of them is noise on the commonest case, and the glass usually
-# says it anyway. The DATA still distinguishes `none` from absent — that
-# distinction is for Helen and for #297, not for the card.
-card:
-  cubed: "ice"
-  crushed: "crushed ice"
-  large cube: "a large ice cube"
-  block: "a block of ice"
-  blended: "blended"
-
-# --- `chill` -----------------------------------------------------------------
-# WHAT WAS DONE TO THE GLASS BEFORE THE DRINK WENT IN. Absent means nothing was.
-chill:
-  chilled: >-
-    A chilled glass. 22 drinks said this inside a method step and now say it
-    here.
-  frozen: >-
-    Straight from the freezer. Caribbean Sazerac rinses one.
-  rinsed: >-
-    Rinsed with a spirit that is then discarded, which is why the rinse also
-    shows up in `ingredients` with an amount like "to rinse". Three drinks.
-    The rinsing spirit is NOT in the finished drink in any measurable way,
-    which matters for #297: a rinse contributes no units.
+# vocabulary split across a data file and a template has only one half that
+# anybody ever checks.
+ice_line:
+  cubed: "Over ice."
+  crushed: "Over crushed ice."
+  large cube: "Over a large ice cube."
+  block: "Over a block of ice."
 
 # --- `rim` -------------------------------------------------------------------
 # FREE TEXT, deliberately. Two drinks rim today and a closed vocabulary for two
 # members would be inventing structure ahead of the data — the mistake
 # taxonomy.yml's own notes record three times over. If rimming becomes common,
-# this becomes a list like the ones above.
+# this becomes a list like the one above.
 #
 # A rim is done to the glass BEFORE the drink is built, which is why it is here
 # and not in `garnish`, where Apple Cart's "half-rim of sugar" had been sitting.
 # Dapper Sap's "lime wedge on rim" stays a GARNISH: that is a garnish with a
 # placement, and garnish.yml already rules that "lime wedge on rim says where to
 # put it" is information worth keeping.
+#
+# IT PRINTS IN THE "TO SERVE" BLOCK AND NOT ONLY ON THE GLASS LINE. Helen,
+# 2026-09-05: "things like half-rim should be repeated in the method or serve or
+# wherever, because it's easily missed just on the glass mark in the metadata."
+# A rim is an ACTION, and an action filed only as metadata is an action that
+# does not happen.
 rim: "free text"

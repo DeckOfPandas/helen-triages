@@ -124,7 +124,15 @@ TOP_LEVEL_KEYS = {
 # is load-bearing: pic-a-de-crop-punch strains into a punch bowl and its method
 # never says whether ice goes in, where its two sibling punches both say a large
 # block. That is a real question for Helen, not a blank to fill with a default.
-SERVE_KEYS = {"ice", "chill", "rim"}
+#
+# THERE IS NO `chill`, AND THERE WAS FOR ABOUT AN HOUR. It held `chilled` on 21
+# drinks until Helen ruled it out -- "I think it's implied that glasses should
+# be chilled (except hot drinks obviously). I am the user after all." Its other
+# three values (`frozen` once, `rinsed` three times) were each already a method
+# step in their own right, so the whole field went rather than the one value and
+# nothing it held was lost. Recorded because a field redundant with a default is
+# exactly the kind of thing that gets re-proposed.
+SERVE_KEYS = {"ice", "rim"}
 
 # `to_serve` and `serve` are the optional ones -- most drinks have no serveware
 # note, and `serve` is absent where nobody has ruled on the ice. Everything else
@@ -1583,10 +1591,8 @@ def test_serve_block_uses_only_declared_keys_and_values():
     answer to a question only Helen can settle.
     """
     vocab = _serve_vocab()
-    ices, chills = set(vocab["ice"]), set(vocab["chill"])
-    assert ices and chills, (
-        "serve.yml declares no values, so this check enforces nothing."
-    )
+    ices = set(vocab["ice"])
+    assert ices, "serve.yml declares no ice values, so this enforces nothing."
     bad = []
     for slug, fm in _load():
         serve = fm.get("serve")
@@ -1595,12 +1601,12 @@ def test_serve_block_uses_only_declared_keys_and_values():
         if not isinstance(serve, dict):
             bad.append(f"{slug}: `serve` is a {type(serve).__name__}, not a mapping")
             continue
+        if not serve:
+            bad.append(f"{slug}: `serve` is empty -- omit the key instead")
         for key in sorted(set(serve) - SERVE_KEYS):
             bad.append(f"{slug}: unknown serve key {key!r}")
         if "ice" in serve and serve["ice"] not in ices:
             bad.append(f"{slug}: ice {serve['ice']!r} is not declared in serve.yml")
-        if "chill" in serve and serve["chill"] not in chills:
-            bad.append(f"{slug}: chill {serve['chill']!r} is not declared in serve.yml")
     assert not bad, (
         "serve block problem(s):\n  " + "\n  ".join(bad)
         + "\n\nThe values live in _data/cocktails/serve.yml. Adding one is a "
