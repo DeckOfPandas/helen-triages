@@ -132,6 +132,17 @@
     // covers every LATER deal, when "deal again" appends a clone long after
     // that pass has run — the same two-halves story the tape line tells.
     if (window.HTF && window.HTF.fitCardNames) window.HTF.fitCardNames();
+
+    // AND THE CHIP ROWS, FOR THE SAME REASON AND WITH THE SAME TWO HALVES --
+    // #698. `is-row-start` is a measurement too: it says "this mood word begins
+    // a row", which is a fact about a 232px card foot and not about the drink.
+    // The pick's chip row is a different width and clamped to ONE line, so a
+    // cloned mark would suppress a dot mid-line or leave one hanging off the
+    // left edge. On the page's FIRST deal chip-rows.js has not loaded yet and
+    // its own load pass covers this clone; this call is what covers every later
+    // "deal again". Guarded twice, because this file is site-agnostic and food's
+    // clones hold no chips at all.
+    if (window.HTF && window.HTF.markChipRows) window.HTF.markChipRows();
   }
 
   if (again) again.addEventListener('click', deal);

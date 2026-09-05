@@ -768,6 +768,41 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     -webkit-text-stroke: 0;
   }
 
+  // ...UNLESS THE WORD STARTS A ROW -- #698, Helen: "no dot before the first
+  // chip." The `& + &` rule above has always kept the dot off chip ONE; what it
+  // cannot see is the line break. `.drink-card-moods` wraps and holds two rows,
+  // and a wrapped chip carries its `::before` over the break with it, so the
+  // seam that reads correctly between two words on a line hangs off the left
+  // margin when the line ends between them. 61% of the drinks that carry a mood
+  // list are wide enough to wrap -- 76 of 124, measured, not guessed at;
+  // assets/js/chip-rows.js's header shows the arithmetic -- so this was the
+  // common case rather than a corner.
+  //
+  // THE CLASS IS A MEASUREMENT, NOT A FACT ABOUT THE DRINK -- chip-rows.js reads
+  // `offsetTop` and marks the chips that begin a row, exactly as card-name-fit.js
+  // marks the names that did not fit. CSS has no `:first-of-line`; that file's
+  // header records the two selector-only dodges that were tried and why the
+  // drink page's focus outline vetoed the better of them.
+  //
+  // `display: none` rather than `content: ""`, so the word's own left edge lands
+  // flush with the row above it. An emptied inline-block would still spend its
+  // 0.28rem margin and indent every second row by a space nobody asked for.
+  //
+  // `is-` RATHER THAN A `--` MODIFIER, and the distinction is this file's own:
+  // `--mood` and `--hassle` say what a chip IS, come from taxonomy.yml and are
+  // true at build time. This says where a chip happens to have LANDED at this
+  // viewport width, and changes on resize -- the same kind of thing `.is-match`
+  // and `.btn-mood.is-on` are, so it is named the same way.
+  //
+  // WRITTEN AS `& + &`, matching the rule it overrides, because it has to beat
+  // it: `.drink-card-mood--row-start::before` alone is one class to that rule's
+  // two and would lose on specificity while looking perfectly correct. There is
+  // no case to cover outside `& + &` anyway -- a chip with no preceding sibling
+  // never had a dot to suppress.
+  & + &.is-row-start::before {
+    display: none;
+  }
+
   // A chip matching an active mood filter fills, the same treatment a matched
   // ingredient gets — but in MENTHE, because the mood filter is menthe and the
   // ingredient field is violet. The card is answering "why am I here", and it

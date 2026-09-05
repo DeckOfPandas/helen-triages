@@ -403,6 +403,26 @@
      every later "deal again" calls HTF.fitCardNames() itself. {% endcomment %}
   <script src="{{ '/assets/js/card-name-fit.js' | relative_url }}"></script>
 
+  {% comment %} chip-rows.js marks the mood word that BEGINS a row, so the
+     stylesheet can keep the middle dot off it — issue #698, Helen: "no dot
+     before the first chip." The dot was never before chip one; it was before
+     chip one of the SECOND row, on the 62% of drinks whose moods wrap. That
+     file's header has the arithmetic and the two CSS-only dodges it rejected.
+
+     HERE FOR THE SAME THREE REASONS card-name-fit.js above is. Site-agnostic:
+     it queries `.drink-card-mood` and returns having done nothing on a page
+     with none, which is every page on food. After assets.js, the one hard
+     ordering rule, because it hangs HTF.markChipRows() off that namespace. And
+     after {{ content }}, because it measures a laid-out `offsetTop` — on the
+     cocktails index that content includes universe.js, whose dealt card this
+     file's own load pass then measures along with the other 124.
+
+     ORDER AGAINST card-name-fit.js DOES NOT MATTER and is not relied on: a
+     name's size and a chip's row are measured on different elements and neither
+     pass reads the other's classes. It sits below only because that is where
+     the reader will look for it. {% endcomment %}
+  <script src="{{ '/assets/js/chip-rows.js' | relative_url }}"></script>
+
   {% comment %} shortlist.js wires every `.btn-shortlist` on the page — GitHub
      issue #546. HERE, in the shell, because the four placements are spread
      across two layouts and two index pages and there is nothing site-specific
