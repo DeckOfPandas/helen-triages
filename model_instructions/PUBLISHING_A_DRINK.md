@@ -2,7 +2,11 @@
 
 Written 2026-09-04, on the day the first sixteen drinks went through it, for
 Helen to check and for the next session to follow. It is short on purpose.
-HANDOVER §9.1.1 has the gate's mechanics; this is the procedure around it.
+**HANDOVER §9.1.1 has the gate's mechanics and §4.0 says what the flags MEAN;
+`.claude/commands/ingest.md` is how a drink gets INTO the drafts and where the
+mechanical/non-mechanical boundary is stated in full.** This is the procedure
+that carries a drink from there to the public repo, and it is linked from
+HANDOVER §11.
 
 ## The one working copy
 
@@ -25,10 +29,14 @@ disk for an evening. One copy, always pushed, is the rule.
    Claude will be editing the same files next.
 2. **Claude runs the mechanical pass** over everything in `to-promote/`: flips
    `rewritten: true` (Helen's standing instruction, for files in that folder
-   only), runs the suite, fixes what the suite names — spellings the
-   vocabularies already declare, a missing key, a hyphen that should be an
-   en dash, a house name where a bottle belongs — and never touches a
-   tagline, a note's words, a method's words or an amount. Commits and pushes.
+   only — it is the ONE place an agent may write that flag, and
+   `ingest.md`'s TIER 3 names the same exception), runs the suite, fixes what
+   the suite names — spellings the vocabularies already declare, a missing key,
+   a hyphen that should be an en dash, a house name where a bottle belongs, an
+   alias where the canonical name belongs, an `item` that must go — and never
+   touches a tagline, a note's words, a method's words or an amount. Commits and
+   pushes. **The full boundary is in `ingest.md` under "Fixing a draft the
+   suite is complaining about"; the two say the same thing on purpose.**
 3. **Claude lists the non-mechanical things**, one line each, and Helen rules
    on them. Each ruling is written into the vocabularies, the handover and
    the ingest documents the same day, so it is never asked twice.
@@ -80,4 +88,9 @@ mechanical pass cannot forget it.
 - Generics, syrups, honey water, the whole-fruit units: `_data/cocktails/ingredients.yml`.
 - Method steps, ice, the rim, the automatic twist step: `_data/cocktails/methods.yml`.
 - The ingest rules a session with no repo can use: `INGEST_ONE_COCKTAIL.md`.
+  Its vocabulary blocks are generated — `scripts/build_ingest_vocab.py --write`
+  after any ruling that changes `_data/`, never a hand edit.
 - The in-repo procedure: `.claude/commands/ingest.md`.
+- The flags' meaning and the gate: HANDOVER §4.0 and §9.1.1.
+- The one-working-copy rule, restated where a worktree is set up: HANDOVER §9.1
+  and §11.0.1.

@@ -26,6 +26,27 @@ mechanically enforced just because this file states it firmly.
 **§4.0, the two gate flags.** They decide what publishes and whether Helen's
 judgement still covers what is in a file. Every recipe edit touches them.
 
+> ### IF YOU ARE HERE TO INGEST OR TO FIX DRAFTS, READ THESE, IN THIS ORDER
+>
+> The three above are for someone about to change the SITE. Most sessions are
+> not; they are here to get a recipe or a drink into the drafts, or to clear
+> what the suite is complaining about. That path is short and none of it is
+> guesswork:
+>
+> 1. **`.claude/commands/ingest.md`** — the procedure, both sites, and the
+>    boundary (is the answer in the source, or in Helen's head?).
+> 2. **§4** for a food recipe's schema, or **§9.3** for a drink's. §4.0 for the
+>    flags either way. §5 house style, §7 food's taxonomy.
+> 3. **`model_instructions/PUBLISHING_A_DRINK.md`** — the six steps a drink
+>    goes through, who does each, and what "mechanical" means. Read it before
+>    touching anything in `_cocktail_drafts/to-promote/`.
+> 4. **§11.0.2 `/tidy-drafts`, §11.0.3 `/ingest`, §11.0.4 `/ingest-inbox`** —
+>    which command fits how the material arrived.
+>
+> `INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md` are NOT for you: they are
+> for a Claude with no repository. Read one only to fix it, or to finish a file
+> that came back from one (§11.0.3).
+
 **This is a rewrite, not a revision**, at Helen's explicit request: "precise
 rather than verbose", "strongly consider deleting rather than automatically
 appending". v25 was ~1300 lines and had accumulated real bloat — narrated
@@ -73,8 +94,11 @@ it into claude.ai with no checkout, no tests and no `_data/`. Each hands back a
 draft file plus a short "what I could not know" list.
 
 They stand alone because the closed vocabularies are small: 22 tags and 14 star
-ingredients for food; 23 glasses, 42 garnishes and 28 canonical method steps
+ingredients for food; 26 glasses, 43 garnishes and 32 canonical method steps
 for drinks. Everything else either file needs is a rule rather than a lookup.
+**Those five figures are printed IN the documents and generated FROM `_data/`,
+so count the blocks rather than quoting this sentence** — it was 23/42/28 from
+2026-09-02 until 2026-09-05, three vocabulary rulings out of date.
 
 **THE COCKTAIL ONE LEAVES `generic` AND `suggestion` AS `QQ`, ALWAYS, and the
 reason is not size.** 224 generics would embed fine. It is that **a bottle's
@@ -112,13 +136,26 @@ much like they should form part of our suite."*
 changes, the standalone docs need the same edit — they are the only place in
 the repo where those rules are written out a second time, and they were built
 that way knowingly, because the alternative was that Helen gets nothing useful
-back from a session with no repo. **`tmp/check_doc_example.py` and
-`tmp/check_cocktail_doc.py` are the guard**: each extracts the worked example
-from its document, parses it, checks it against the live `_data/` vocabularies,
-and (for the cocktail one) re-checks every garnish, glass and method step the
-document PRINTS against what the collection declares. Both found real faults on
-their first run. Neither is in `tests/`, which is a gap worth closing the day
-either document is edited by someone who did not write it.
+back from a session with no repo.
+
+**HALF OF THAT DRIFT IS NOW MECHANICAL AND YOU MUST NOT FIX IT BY HAND.** Every
+vocabulary list either document prints sits between a marker pair
+(`<!-- vocab:garnish start -->` … `end`) and is RENDERED from `_data/` and the
+suite's own loaders by `scripts/build_ingest_vocab.py` (`INGEST_INBOX_DESIGN.md`
+§5 is the design). Two commands:
+
+    python3 scripts/build_ingest_vocab.py --check    # diff, exit 1 if stale
+    python3 scripts/build_ingest_vocab.py --write    # rewrite the blocks
+
+`test_standalone_docs.py` runs the check, so a hand-edited block fails the suite
+and a newly declared garnish reaches both documents by running `--write`. What
+stays hand-written is everything OUTSIDE a marker pair: the rules, the worked
+examples, the "meanings you would not guess" bullets. **This paragraph named
+`tmp/check_doc_example.py` and `tmp/check_cocktail_doc.py` as the guard, and
+called their absence from `tests/` a gap, until 2026-09-05** — the gap was
+closed on 2026-09-02 by the very test the paragraph above it already describes,
+and the sentence sat three days out of date beside it. §11.2, in the file that
+warns about §11.2.
 
 **This paragraph said "No companion documents" until 2026-08-21**, having been
 written before the first spec existed and never revisited — while §4, four
@@ -133,11 +170,17 @@ batch ingests from photos, back before the Max plan made that a non-issue.
 `DEV_JOBS_v26.md` went on 2026-08-10; the backlog is on GitHub Issues now. Run
 `ls model_instructions/` anyway — and this time actually run it.
 
-**Two project slash commands, both in `.claude/commands/`**: `/tidy-drafts`
-(§11.0.2) and `/ingest` (§11.0.3). Each is a procedure doc over a script in
-`scripts/` that reports and never writes. `/ingest` is the IN-REPO batch
-procedure and is a different thing from `INGEST_ONE_RECIPE.md` above, which is
-for a Claude with no repo at all.
+**THREE project slash commands, all in `.claude/commands/`**: `/tidy-drafts`
+(§11.0.2), `/ingest` (§11.0.3) and `/ingest-inbox` (§11.0.4) — this sentence
+said two until 2026-09-05, having been written before the third landed on
+2026-09-03. Each is a procedure doc over a script in `scripts/` that reports and
+never writes. `/ingest` is the IN-REPO batch procedure and is a different thing
+from `INGEST_ONE_RECIPE.md` above, which is for a Claude with no repo at all.
+
+**And one procedure document that is not a command: `PUBLISHING_A_DRINK.md`**,
+written 2026-09-04 — the six steps a drink goes through from Helen's rewrite to
+the public repo, who does each, and the one-working-copy rule for a batch in
+progress. §9.1.1 is that gate's mechanics; that file is the procedure round it.
 
 ---
 
@@ -2017,6 +2060,14 @@ A symlink into the main checkout half-works (the Edit/Write tools refuse it, and
 writes land in Helen's tree); a copy or a zip goes stale silently. A clone gives
 history, branches and somewhere to commit.
 
+**AND WHILE A BATCH IS OPEN THERE IS ONE WORKING COPY, NOT ONE PER AGENT.**
+`PUBLISHING_A_DRINK.md` is the rule: for a batch being promoted, the clone in
+the coordinating session's worktree, on the batch's branch, served on a known
+port, is where Helen edits, Claude commits and the dev server builds — always
+pushed. **Clone freely to READ; do not open a second copy to WRITE.** Sixteen
+files sat on one disk for an evening on 2026-09-03 and that is how the first
+batch got tangled.
+
 **ALWAYS `git fetch` BEFORE CONCLUDING ANYTHING ABOUT ITS STATE**, and this cost
 a session on 2026-08-29. A zip of Helen's local checkout was two merges behind,
 so five red tests read as work that "had never been done", and an entire day of
@@ -2107,13 +2158,19 @@ drink-specific keys. A drink's `meta:` block is now exactly:
 
 Same names deliberately, and D1 is the ruling: they are the same three
 questions, and a second vocabulary for them would be two things to keep in step
-for no gain. **Only Helen writes `rewritten: true`** — it "shows me if I have
-rewritten it, not an agent", which for a drink mostly means the notes and the
-tagline, though her first pass also checks ingredients, bottle suggestions and
-method before the proofread.
+for no gain. **`rewritten: true` is Helen's CLAIM, not Helen's keystroke** — it
+"shows me if I have rewritten it, not an agent", which for a drink mostly means
+the notes and the tagline, though her first pass also checks ingredients, bottle
+suggestions and method before the proofread. **The one place an agent may type
+it is `_cocktail_drafts/to-promote/`**, where the MOVE is how she claims it —
+her standing instruction, 2026-09-04, and `PUBLISHING_A_DRINK.md` step 2 is the
+procedure. Nowhere else, on either site.
 
-**All 124 drafts say `false` to all three, and that is honest rather than a
-placeholder** (D2). What keeps a draft private is `output: false` on the
+**They said `false` to all three on all 124 drinks when this landed (D2), and
+that was honest rather than a placeholder.** As of 2026-09-05 it is 108 like
+that and 16 carrying `rewritten: true`, all of them in `to-promote/`; nothing is
+`proofread: true` yet, and 22 drinks are staged. **Re-count rather than quote
+this** — it is a worklist. What keeps a draft private is `output: false` on the
 collection, not these flags. The migration is one commit in
 `_cocktail_drafts/`, written by `tmp/migrate_drink_gate_flags.py` in this repo:
 textual insertion of three lines after `date_last_edited:`, never a YAML
@@ -2282,8 +2339,11 @@ garnish: []                      # LIST, declared vocabulary — §9.12.1
   # ["no garnish"] = decided, [] = unfilled. Cobra's Fang has two.
 ingredients:                     # FULL list, untriaged, in build order
   - amount: "15 ml"              # the ONLY quantity field, and NO US UNITS
+    item: "Appleton Estate rum"  # what the SOURCE called it. DRAFTS ONLY, and
+                                 # forbidden in to-promote/ — §9.10, §9.3.2
     generic: "moderately aged Jamaican rum"  # the #314 vocabulary; see §9.3.1
     suggestion: "Appleton Estate Signature"  # the bottle, NAME(S) ONLY — §9.3.1
+                                 # a bottle's CANONICAL name once staged — §9.3.2
   - amount: "15 ml"
     generic:                     # a LIST means "or", never "and" — §9.3.1
       - "lightly aged and filtered rum"
@@ -2307,15 +2367,21 @@ to_serve: ""                     # PRESENTATION, not a further instruction
 mood:                            # LIST, DERIVED and then stored — see below
   - "sharp"
   - "aperitivo"
-notes:                           # {label, text} or a bare string, as food
-  - "This is much less sugar than many recipes"
-  - label: "QQ"                  # 81 of the 170 are the ingest audit
-    text: "QQ - `generic` values INFERRED, not confirmed: ..."   # trail — #572
+notes:                           # {label, text} or a bare string, as food.
+  - "This is much less sugar than many recipes"   # A note an INGEST adds is
+  - label: "QQ"                  # always {label, text}, both set, both
+    text: "QQ - `generic` values INFERRED, not confirmed: ..."   # beginning QQ
+                                 # — 2026-09-04. 93 of the 185 notes in the
+                                 # collection today are that ingest-audit trail
+                                 # (#572); count, do not quote.
 source: ""
 source_url: ""                   # external; nothing verifies it
-meta:
+meta:                            # FIVE keys, in this order — §9.1.1
   ship: "oh gods yes"            # a real ordered vocabulary now — see §9.5
   date_last_edited: "2026-08-16"
+  rewritten: false               # the three gate flags, food's names, food's
+  awaiting_fix: false            # order, after the two drink-specific keys.
+  proofread: false               # §4.0 is what they MEAN; §9.1.1 is the gate.
 ```
 
 **`mood` IS DERIVED AND THEN STORED, and this document had never said so** —
@@ -2441,10 +2507,13 @@ drink and deletes `item` herself. It is allowed in `_cocktail_drafts/` and
 forbidden in `_cocktail_recipes/` by the schema guard (#669) **and in
 `_cocktail_drafts/to-promote/` since 2026-09-04** — see §9.3.2's rulings box —
 so the deadline is the staging folder rather than the move itself. 619 entries
-once carried an `item`; **258 still do** after
-2026-09-03, when the ten that merely restated their own `generic` were deleted
-and the rest were tabled for Helen's rulings on #544 (§9.10). New drinks
-arriving through the repo-less ingest write it on every pour, by design.
+once carried an `item`; **215 still do, across 86 drinks, re-measured
+2026-09-05** (it read 258 here, a figure from before the staging pass emptied
+`to-promote/` of the field). The ten that merely restated their own `generic`
+went on 2026-09-03 and the rest are tabled for Helen's rulings on #544 (§9.10).
+**It is a worklist, so count it**: parse every drink and total the ingredient
+entries carrying the key. New drinks arriving through the repo-less ingest write
+it on every pour, by design.
 
 What has gone, and why each was safe rather than judged:
 
@@ -3195,8 +3264,14 @@ second example until 2026-09-04, when Helen flattened both ratios into one
   take cognac AND rye AND bourbon; it is not offering three bases. So a flat
   list is enough, and the schema needs no "one of these" grouping. This was
   asked directly because guessing wrong would have shaped the whole model.
-- **Store the quantity both ways** (as-written string plus numeric ml),
-  rather than canonicalising to ml or keeping free text only.
+- ~~**Store the quantity both ways** (as-written string plus numeric ml).~~
+  **REVERSED by #571, 2026-08-30, and this bullet stood contradicting §9.3 for
+  six days.** `amount:` is the only quantity field and `ml:` is retired; the
+  guarantee the second key was supposed to buy is
+  `test_every_amount_is_readable_as_a_quantity`. Kept struck rather than
+  deleted because "do not re-litigate" is what this section is for, and a
+  reader who has seen the old shape in git history needs to know which way it
+  went.
 - **`to_serve` is presentation, not steps** — "over crushed ice, with a
   straw". Finishing ACTIONS ("top with champagne", "squeeze the twist over
   the drink") are method steps. The CSV's `Serve` column holds actions, so
@@ -3383,10 +3458,15 @@ than suppressed, which is why #513 closed here rather than acquiring a rule
 about when to hide the second line.
 
 **`item` IS NOT RETIRED. It is a DRAFTS-ONLY TRANSCRIPTION FIELD — Helen's
-ruling, 2026-09-02, D8.** What the source called the pour: allowed in
-`_cocktail_drafts/`, refused in `_cocktail_recipes/` by
-`INGREDIENT_KEYS_RECIPES`, so **promotion is the deadline rather than a
-someday**. She deletes it herself when she fills `generic`/`suggestion` on
+ruling, 2026-09-02, D8.** What the source called the pour: allowed in the
+`_cocktail_drafts/` POOL, refused in `_cocktail_recipes/` by
+`INGREDIENT_KEYS_RECIPES` **and in `_cocktail_drafts/to-promote/` since
+2026-09-04** (`test_a_staged_drink_carries_no_transcription_field`), so **the
+STAGING FOLDER is the deadline** — this paragraph said "promotion is the
+deadline" for two days, and the deadline was in the wrong place because a drink
+only reaches `_cocktail_recipes/` by being moved, which is the worst moment to
+discover a field needs reading. She deletes it herself when she fills
+`generic`/`suggestion` on
 making the drink, and *"ignore everything in `item` as we'll throw it away"* —
 it is never house-styled, corrected or rewritten. That reverses the sentence
 this section and §9.3 carried for a fortnight, and reverses it on the right
@@ -3404,11 +3484,12 @@ stripping trailing punctuation and collapsing whitespace — it is 8, plus 2 tha
 differ only by `fresh` and a unit the entry's own `amount` already states
 (`item: "Fresh basil leaves"` beside `amount: "3 leaves"`). No entry was caught
 by `juice of` or by a leading quantity; an earlier pass had taken those.
-278 entries carried an `item` before the pass and 268 after, and 258 after
-the ten in `to-promote/` went on 2026-09-04 (§9.3.2).
+278 entries carried an `item` before the pass and 268 after, and **215 across 86
+drinks as re-measured on 2026-09-05**, the staging rule of §9.3.2 having taken
+the rest as drinks moved into `to-promote/`.
 
-**The other 258 are RESIDUE and not one was touched: they are Helen's rulings,
-not a script's.** The census is `tmp/item_census.py` — scratch, gitignored,
+**Every one of those is RESIDUE and not one was touched: they are Helen's
+rulings, not a script's.** The census is `tmp/item_census.py` — scratch, gitignored,
 re-runnable — which writes `tmp/item_census.md`: every entry grouped by family,
 largest group first, with a proposal per line (move to `suggestion` only where
 `bottles.yml` already declares the bottle, move to `note`, become a declared
@@ -3448,8 +3529,9 @@ It is NOT food's `incidental`, despite the matching shape: that one HIDES a
 line, this one shows it and marks it.
 
 **The rest of `item`'s redistribution is #544 move 2, and after 2026-09-03 it
-is entirely Helen's** — the mechanical half is spent, 258 residue entries are
-tabled for her, and #544 stays open until she has ruled. §9.3 carries the
+is entirely Helen's** — the mechanical half is spent, the residue entries (215
+on 2026-09-05, and falling as drinks are staged) are tabled for her, and #544
+stays open until she has ruled. §9.3 carries the
 count of what has gone and now states the same drafts-only rule; the
 paragraphs above are what governs.
 
@@ -3475,10 +3557,20 @@ measurement said otherwise; **it was a correctness problem that happened to
 also cost room.**
 
 **`card_names` in `ingredients.yml`** maps a generic to its card name.
-The rule in `cocktails/index.html` is "substitute when every generic on the
-entry has a card name, else fall back to `item`" — the all-or-nothing half
-matters because a list `generic` means "either would do" (#441) and ten rum
-entries carry one; a mixed list would otherwise print half a fact.
+
+**THE RULE IN `cocktails/index.html` IS PER-GENERIC, AND THIS PARAGRAPH SAID
+OTHERWISE UNTIL 2026-09-05.** It said "substitute when every generic on the
+entry has a card name, else fall back to `item`", with an argument about
+all-or-nothing. Read the template: each generic renders `card_names[g] |
+default: g`, so **a generic with no card name prints ITSELF**, and a
+disjunctive pair joins with " or " whether or not both are mapped. `item` is
+reached in exactly one case — an ingredient with no `generic` at all — which is
+now a case that cannot arise on a staged or published drink, because `item` is
+forbidden there (§9.3.2) and every entry has a generic or a `QQ` (§9.3).
+**Falling back to the generic is the right behaviour and is why the widening in
+§9.10.1's next paragraph was free**; the all-or-nothing rule was a design that
+was discussed and is not the one in the file. `card_name_joins` is what handles
+a pair that reads badly, and it is keyed on the joined string.
 
 **The map is not rum-only and is not named as if it were** — renamed to
 `card_names` on 2026-08-29. Ceylon arrack was its first non-rum member; Helen:
@@ -5583,6 +5675,23 @@ knowing the trick rather than re-deriving it.
 
 ## 11. Working practices
 
+> **THE FOUR PROCEDURE DOCUMENTS, and each is the authority on its own half.**
+> This section covers the repo's own working practices; the content procedures
+> live beside the scripts that drive them.
+>
+> | | |
+> |---|---|
+> | getting material IN | `.claude/commands/ingest.md` (§11.0.3) |
+> | …when it arrived as a GitHub Issue | `.claude/commands/ingest-inbox.md` (§11.0.4) |
+> | the mechanical half of a food drafts pass | `.claude/commands/tidy-drafts.md` (§11.0.2) |
+> | getting a DRINK OUT, and what "mechanical" means | `model_instructions/PUBLISHING_A_DRINK.md` |
+>
+> **`PUBLISHING_A_DRINK.md` is the one a session is most likely not to know
+> exists**, because it is not a slash command. It carries the six steps, the
+> word "final" and what it promises, and the ONE-WORKING-COPY rule for a batch
+> in progress (§9.1, §11.0.1). Read it before touching
+> `_cocktail_drafts/to-promote/`.
+
 **Never run `git reset --hard` without asking Helen first — every single time.**
 Same for `git checkout --`/`git restore` over a dirty tree and `git clean -fd`.
 They discard uncommitted work with no undo and nothing in the reflog to recover
@@ -6191,12 +6300,21 @@ branch is merged. `.claude/worktrees/` already holds others.
 **One catch, and it will look like the drafts have vanished.** The nested
 private drafts repos (`_food_drafts/`, `_cocktail_drafts/`) are gitignored here,
 so a fresh worktree does not contain them and a build from it renders an empty
-index. Symlink the one you need:
+index. **CLONE the one you need** — §9.1 has the command and the reasoning:
 
-    ln -s /home/helen/projects/helen-triages/_cocktail_drafts _cocktail_drafts
+    git clone git@github.com:DeckOfPandas/helen-triages-cocktails-private.git _cocktail_drafts
 
-The symlink is itself covered by `.gitignore`, so it cannot be committed by
-accident.
+**This section said `ln -s` into the main checkout until 2026-09-05, and §9.1
+has said since 2026-08-29 that a symlink half-works** — the Edit/Write tools
+refuse to follow one, so writes land in Helen's own tree instead of the
+worktree, which is the tangle `PUBLISHING_A_DRINK.md` was written about. The
+clone is also gitignored and cannot be committed by accident, and it gives
+history, branches and somewhere to commit. **`.node-runtime/` and `.gh-runtime/`
+are missing for the same reason** (§1): use the system `node`.
+
+**And if a promotion batch is already open, do not open a second writable
+copy.** One working copy, on the batch's branch, always pushed —
+`PUBLISHING_A_DRINK.md`. A read-only clone for running tests is fine.
 
 ### 11.1 A file with a colon in its name will crash the whole build
 

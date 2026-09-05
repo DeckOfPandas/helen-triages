@@ -49,8 +49,8 @@ enough to print. **A cocktail has two fields whose vocabularies are not, and
 they are the two that matter most:**
 
 - **`generic`** — what CATEGORY of spirit a pour is: "moderately aged Jamaican
-  rum", "lightly aged and filtered rum", "blanc vermouth". 224 declared terms.
-- **`suggestion`** — the specific bottle. 70 declared, plus 30 unresolved.
+  rum", "lightly aged and filtered rum", "blanc vermouth". 171 declared terms.
+- **`suggestion`** — the specific bottle. 107 declared, and none outstanding.
 
 **Leave both as `QQ`. Always. This is Helen's own standing ruling**, made on
 2026-08-31 when a book named eleven bottles she did not own:
