@@ -323,7 +323,7 @@ next paragraph has always said and what nobody did.
 about because it is the shape of the problem rather than the specific file:
 `root.scss` styled the two-door landing page at `/`, belonged to neither
 site, and was therefore the one nobody thought to check. It broke exactly
-that way once, when the punched-tape mixin moved into `shared/_rule.scss`
+that way once, when the punched-tape mixin moved into `_sass/shared/_rule.scss`
 (§13.4.1) and the first pass updated food and cocktails only. A stylesheet
 that compiles for the two sites you look at and fails for the one you never
 visit fails silently until someone visits it.
@@ -4236,7 +4236,7 @@ work and spends colour sparingly on top of it.
 >   read as a slightly different black.
 > - **The heading bars needed nothing.** They are bands rather than text, so no
 >   contrast bar applies, and all six clear 6:1 against the ground anyway.
-> - **The emboss inverted.** `shared/_rule.scss`'s defaults are solved for dark
+> - **The emboss inverted.** `_sass/shared/_rule.scss`'s defaults are solved for dark
 >   type on a light ground; `--emboss-shadow` computed to a LIGHT shadow once
 >   `$color-text` went near-white, which reads as a second letterform rather
 >   than depth. Cocktails re-points three values in its own `_rule.scss`. A
@@ -4370,7 +4370,7 @@ so."* Food gave its LEAVE OUT a sixth colour; this deliberately does not.
 >   are gorgeous!"*
 > - **one bar, not two.** *"Ramp alone, gorgeous!!!!"* The shared absinthe bar
 >   read as messy under a ramp; a pink under-bar was *"a lot of pink up top,
->   even for me"*. `heading-rule` in `cocktails/_rule.scss` is single-bar now
+>   even for me"*. `heading-rule` in `_sass/cocktails/_rule.scss` is single-bar now
 >   and draws the top bar's geometry, solid. `$color-heading-shared` is gone.
 > - **the section's colour reaches the card**, reversing 2026-08-30's "magenta
 >   means matched everywhere": a chosen filter word underlines in its
@@ -4496,12 +4496,12 @@ describe where a rule USED to live.
 A WHOLE CARD IN THE RIGHT-HAND COLUMN since 2026-09-04** — the label and
 `deal again` in a narrow left column, a random drink dealt as a real
 `.drink-card` (the pick carries the class; `universe.js` clones a random
-card's body and foot into it, no glass, and `cocktails/_universe.scss`
+card's body and foot into it, no glass, and `_sass/cocktails/_universe.scss`
 collapses the fixed box to about half a list card's height — Helen: "a nudge
 not an iceberg") beside them. **Food's copy is gone** — Helen turned the feature down there on
 2026-09-04 (§13.4 has her words); she kept this one, *"almost always more
 open to persuasion about what I drink than what I eat"*, and means to refine
-it. `assets/js/universe.js` and `cocktails/_universe.scss` are its only code.
+it. `assets/js/universe.js` and `_sass/cocktails/_universe.scss` are its only code.
 
 **FIVE NAMED QUESTIONS, in the order Helen asks them** — restructured
 2026-08-29 and this is the current shape:
@@ -5893,7 +5893,7 @@ annoying her with it again.
 **The four below are about the INTERACTION, not the artefact, which is why
 they have to live here.** The codebase teaches the house style better than any
 prose could — read `_palette.scss` arguing itself down to four colours, or
-`food/_rule.scss` on which dial to reach for first, and you will absorb more
+`_sass/food/_rule.scss` on which dial to reach for first, and you will absorb more
 than a section like this could tell you. But none of that can teach how the
 work actually gets decided, because that leaves no trace in a file. Each line
 here earned its place by being learned late, after the same thing had happened
@@ -6852,7 +6852,7 @@ vacuous test was the GUARD ITSELF, not an older test going stale — and
 because the mistake looked like ordinary care at the time. Asked to stop the
 print stylesheet flooding every sheet with `$color-bg`, that session deleted
 the print block's own `background: $color-bg` line — which changed nothing,
-because `shared/_base.scss` sets `body { background: $color-bg }` for the
+because `_sass/shared/_base.scss` sets `body { background: $color-bg }` for the
 screen and that rule is still in the cascade inside `@media print`.
 **Removing an override is not overriding.** Helen found the tint still
 printing.
@@ -6901,8 +6901,8 @@ because this bit for real once, silently, for weeks.
 of 2026-08-15 — `food.scss` and `cocktails.scss`. It was three until then,
 and the third is why this entry exists at all: `root.scss` styled the
 landing page, belonged to neither site, and was the one nobody thought
-about. Moving the punched-tape mixin into `shared/_rule.scss` (§13.8)
-needed a new `@import` before `shared/_layout.scss` in all three; the first
+about. Moving the punched-tape mixin into `_sass/shared/_rule.scss` (§13.8)
+needed a new `@import` before `_sass/shared/_layout.scss` in all three; the first
 attempt updated food and cocktails and missed root, which doesn't fail
 loudly at compile time for the two you remembered — it fails the *next*
 time someone builds or visits the one you didn't, with a Sass error that
@@ -7300,8 +7300,8 @@ hearts' flat 240px plus 2rem of gaps ≈ 392px against a ~360px viewport.
 sub-320px tracks side by side overflow a phone perfectly well.
 
 That test's docstring also still says "the site has no media queries and does
-not need any". It has had one in `food/_recipe-list.scss` for a long time, and
-`shared/_layout.scss` added a second on 2026-08-23. Three counting print.
+not need any". It has had one in `_sass/food/_recipe-list.scss` for a long time, and
+`_sass/shared/_layout.scss` added a second on 2026-08-23. Three counting print.
 
 **YOU WILL ASSUME DOM ORDER DECIDES WHAT PAINTS ON TOP.** It decides only among
 peers at the same level. `.site-nav-icons` is absolutely positioned into the
@@ -7469,7 +7469,7 @@ says that trying to polish it is solving the wrong problem."* **On a triage
 site the panel of choices IS the fold.** The section, its stylesheet and its
 print rule are in git at the commit before this one; if the question is ever
 reopened, recover them rather than rebuilding. The cocktails index still
-carries its own copy (§9.13), where `universe.js` and `cocktails/_universe.scss`
+carries its own copy (§9.13), where `universe.js` and `_sass/cocktails/_universe.scss`
 remain — the script is site-agnostic and does nothing on a page without a
 `.universe` section, so food loading nothing is the whole change there.
 
@@ -7500,7 +7500,7 @@ filters.js branches are gone; #506 closed on the argument rather than the
 example — see §3.
 
 **Density is the index's own** (`$index-section-gap`, `$index-label-gap` in
-`shared/_tokens.scss`), not the recipe page's tokens — matching them was tried
+`_sass/shared/_tokens.scss`), not the recipe page's tokens — matching them was tried
 and rejected on sight, pushing the five filter sections ~340px apart. The index
 is a control panel (every section visible in one glance); the recipe page is
 a document (space isolates the one section you're mid-task on).
@@ -7565,7 +7565,7 @@ mechanism, and the trap in it, aren't visible from the compiled CSS.
 **Where it lives.** The mixin is `@include punched($style: raised)`, defined
 in `_sass/shared/_rule.scss`. It moved there from `_sass/food/_rule.scss` on
 2026-08-02 when the wordmark started using it — the wordmark lives in
-`shared/_layout.scss`, which every site stylesheet compiles, and a mixin
+`_sass/shared/_layout.scss`, which every site stylesheet compiles, and a mixin
 must be defined before the partial that calls it, so a food-only file could
 no longer hold it. (At the time that meant three stylesheets, and the third,
 `root.scss` for the landing page, was missed on the first pass of this exact
@@ -7634,7 +7634,7 @@ Use instead, both in `_sass/shared/_rule.scss`:
 
 **SINCE 2026-09-02 NOBODY WRITES STROKE AND SHADOW BY HAND: A CONSUMER NAMES
 ITS TIER.** `@include lettering(display | heading | label | plain)` in
-`shared/_rule.scss`, and the tier resolves to per-site custom properties.
+`_sass/shared/_rule.scss`, and the tier resolves to per-site custom properties.
 Display is HELEN TRIAGES and the recipe title (hard), heading is every other
 heading at 1rem and up (soft), label is everything smaller (stroke only, no
 copies — below 1rem a shadow cannot clear the stroke to be seen), plain is
@@ -8341,11 +8341,11 @@ labels, not badges, not buttons, not note labels.
 and the doneness charts and timing calculator. Send note labels back to
 Courier." Every consumer as of that decision:
 
-    food/_recipe-annotations.scss   .ingredient-amount
-    cocktails/_cocktail.scss        .cocktail-amount
-    food/_temperature-chart.scss    .tc-value, .tc-tick
-    food/_timings.scss              .ct-field input/select, .ct-total,
-                                     #ct-table td:last-child
+    _sass/food/_recipe-annotations.scss   .ingredient-amount
+    _sass/cocktails/_cocktail.scss        .cocktail-amount
+    _sass/food/_temperature-chart.scss    .tc-value, .tc-tick
+    _sass/food/_timings.scss              .ct-field input/select, .ct-total,
+                                          #ct-table td:last-child
 
 It took two rules and a run of five returns to find. This variable was
 `$font-recipe-title`, then over three days owned badges, tag buttons, category
@@ -8423,9 +8423,9 @@ variables resolve at compile time and cannot be overridden by context, so the si
 values are custom properties on `:root` and `.on-dark` re-points them — reaching
 any nesting depth, in any partial, including ones written later. A
 `.on-dark h1 { … }` block would have had to out-specify thirteen component rules
-and would have missed the fourteenth. **Both `shared/_rule.scss` and
-`food/_rule.scss` emit their blocks behind an emit-once guard**, because
-`food/_timings.scss` imports them again — free while they were pure definition
+and would have missed the fourteenth. **Both `_sass/shared/_rule.scss` and
+`_sass/food/_rule.scss` emit their blocks behind an emit-once guard**, because
+`_sass/food/_timings.scss` imports them again — free while they were pure definition
 files, not free once they emitted CSS.
 
 > ### `.on-dark` IS DELETED — 2026-09-02, #469 closed, and it WORKED
@@ -8445,7 +8445,7 @@ files, not free once they emitted CSS.
 >
 > **Of the three things #469 said would bite, one is fixed and one is not.**
 > `.site-logo-word` reads custom properties now, so the wordmark is reachable.
-> `shared/_base.scss` still hardcodes `$color-text` on plain `h1/h2/h3` — which
+> `_sass/shared/_base.scss` still hardcodes `$color-text` on plain `h1/h2/h3` — which
 > costs nothing on an inverted SITE, because `$color-text` inverts with it, and
 > would still bite a dark SECTION. The third — that the numbers were unverified
 > — is spent: they have been looked at on real content and kept.
