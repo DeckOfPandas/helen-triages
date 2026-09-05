@@ -5732,8 +5732,48 @@ declares `needs: test`. Three things about it are load-bearing:
 > repo before touching either.
 >
 > #540 made a PROMOTED drink checkable everywhere. This is the case where a
-> public test depends on data the runner cannot reach at all, and the honest
-> answer is not yet decided — see #624.
+> public test depends on data the runner cannot reach at all.
+>
+> ### THE ANSWER, DECIDED 2026-09-05: A SCHEMA HANDSHAKE — `tests/drafts_schema.py`
+>
+> Each private drafts repo carries a **`SCHEMA_VERSION`** file at its root
+> saying which schema its data has been migrated to; `tests/drafts_schema.py`
+> declares the version this checkout's rules need, with a changelog of what each
+> bump required. `test_the_cocktail_drafts_clone_is_in_step` and
+> `test_the_food_drafts_clone_is_in_step` compare them, and both skip when the
+> repo is absent — which is CI and a fresh worktree.
+>
+> **Bump BOTH numbers in the paired commits**: the drafts repo's file in the
+> commit that migrates the data, this repo's `REQUIRED` in the commit that
+> tightens the rule.
+>
+> **It diagnoses; it does not prevent.** Helen's choice between four options, and
+> the right one: two repositories mean two merges, and sometimes the gap is
+> unavoidable. What was intolerable was the gap being SILENT — N failures naming
+> real drinks, reading exactly like a regression, with nothing saying which
+> private branch fixed it. Now one failure says which side is behind, what the
+> migration was, and that the other failures in the run are its fault. The
+> headline is deliberately the message's FIRST line, because `pytest.ini` runs
+> `--tb=line` and that is the only line the summary shows.
+>
+> **Not `pytest.exit()`**, though that would replace the other failures outright:
+> during a migration you are deliberately out of step and want to watch the suite
+> go green drink by drink.
+>
+> **A hand-maintained integer, not a fingerprint of the schema constants.** A
+> fingerprint bumps itself, which is worse: not every schema change needs a data
+> migration, and an optional new key would demand a pointless drafts commit. The
+> bump is the judgement "this change requires the data to move".
+>
+> **The version file's existence check goes through `drafts_schema.present()`**
+> rather than naming `DRAFTS` in the test, so the one-door rule above stays
+> intact without widening `LOADER_GUARDS`.
+>
+> **The OTHER half of #624 was already solved and the issue's own third comment
+> says so**: "a public vocabulary whose members live in a private repo" — the
+> dead-entry direction — is what `_require_whole_collection` and
+> `WHOLE_COLLECTION_ONLY` exist for, with a meta-test keeping the list honest.
+> Do not rebuild that.
 >
 > **Still true, and not silenced:** at ONE promoted drink, four anti-vacuity
 > asserts fire ("no rum ingredient carries a suggestion, so this check is

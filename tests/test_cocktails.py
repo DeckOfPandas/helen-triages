@@ -44,6 +44,7 @@ import yaml
 # `model_instructions/INGEST_ONE_COCKTAIL.md` §7 demands every one of them of a
 # drink. conftest.py holds the corpus-agnostic predicates and nothing else; the
 # asserts, the messages and the field lists below are this collection's own.
+import drafts_schema
 from conftest import (
     SHARED_TYPOGRAPHY, accent_problems, accented_words, checkable_text,
     degreeless_temperatures, is_qq, number_range_hits, spelling_problems,
@@ -4748,6 +4749,29 @@ def test_display_scale_names_only_real_icons():
           "point of heights_mm. A quoted number is a string and Liquid's "
           "`times` turns it into 0 -- an invisible glass."
     )
+
+
+def test_the_cocktail_drafts_clone_is_in_step():
+    """This checkout's rules and `_cocktail_drafts/`'s data agree. Issue #624.
+
+    THE FIRST TEST TO READ WHEN A COCKTAILS RUN GOES RED WITH DRINKS IN IT. A
+    rule lives here and the data that satisfies it lives in a separate private
+    repo, so tightening a rule is two merges -- and between them this suite
+    reports real drinks as breaking rules whose migration has not arrived. It
+    happened on 2026-08-31 (the garnish rename) and again on 2026-09-05
+    (`made_before`). `tests/drafts_schema.py` carries the full reasoning.
+
+    IT SKIPS WHEN THE DRAFTS ARE ABSENT, which is CI and a fresh worktree, and
+    is the condition that makes the whole problem invisible to the runner
+    rather than something this test can fix.
+    """
+    if not drafts_schema.present("_cocktail_drafts"):
+        pytest.skip(
+            "`_cocktail_drafts/` is not on this machine, so there is no clone "
+            "to be in step with. Clone it to check this -- HANDOVER 9.1."
+        )
+    problem = drafts_schema.mismatch("_cocktail_drafts")
+    assert problem is None, problem
 
 
 def test_meta_ship_is_a_rung_or_who_knows():
