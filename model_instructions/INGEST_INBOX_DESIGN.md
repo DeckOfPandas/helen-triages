@@ -28,7 +28,7 @@ section "A FILE THAT ARRIVES FROM A REPO-LESS SESSION": Helen pastes
 `model_instructions/INGEST_ONE_RECIPE.md` or `INGEST_ONE_COCKTAIL.md` into
 claude.ai with the source, gets back one file in a code block plus a "what I
 could not know" list, and a local session runs a six-step finishing pass
-(save, derive moods for a drink, pytest, `/tidy-drafts` for food, work the
+(save, derive moods for a drink, pytest, `/tidy-drafts` on either site, work the
 hand-back list as TIER 3 questions, `ingest_preflight.py`).
 
 **The two documents are guarded, in one direction.** `tests/test_standalone_docs.py`
@@ -232,7 +232,7 @@ re-typing them.
 3. `python3 scripts/ingest_inbox.py --site <site>` dry, read the plan.
 4. `--write`. Then, per file, the existing finishing pass from `ingest.md`,
    in its order: cocktails `derive_cocktail_moods.py --write`; `pytest`
-   (alone — never two at once); food `/tidy-drafts`;
+   (alone — never two at once); `/tidy-drafts` (both sites since 2026-09-05);
    `ingest_preflight.py`.
 5. Bring Helen ONE list: every rejection, every probable duplicate, every
    hand-back bullet from every envelope, grouped by file. Treat each as a
