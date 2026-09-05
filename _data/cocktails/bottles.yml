@@ -333,8 +333,18 @@ bottles:
     generic: "London dry gin"
   "Tanqueray":
     generic: "London dry gin"
-  "Hayman's":
+  # SPLIT 2026-09-05. One entry called "Hayman's" typed `London dry gin` could
+  # not serve both drinks that pour the brand, and it silently mistyped one:
+  # La Fée Noir Punch asks for `Old Tom` and carried a QQ note saying the
+  # suggestion crossed a category. Helen confirmed the source pours Hayman's
+  # Old Tom. Fog Cutter names "Hayman's London Dry Gin" outright and Minty
+  # Pentones writes the brand bare, so the bare form stays an alias of the dry.
+  "Hayman's London Dry":
     generic: "London dry gin"
+    aliases: ["Hayman's", "Hayman's London Dry Gin"]
+  "Hayman's Old Tom":
+    generic: "Old Tom"
+    aliases: ["Hayman's Old Tom Gin"]
   "Rutte":
     generic: "London dry gin"
   # Helen, 2026-09-04, completing the brand Tailspin writes bare: the bottle is
@@ -470,12 +480,14 @@ bottles:
   "Lillet Blanc":
     generic: "quinquina"
     aliases: ["Lillet", "Lillet blanc"]
-  # A BRAND THAT IS ITS OWN GENERIC, the pattern #314 permits for three rums
-  # because nothing generalises the bottle. The Ridgwell pours this AND a sweet
-  # vermouth in the same drink, 12.5 ml of each, which is the proof that
-  # "sweet vermouth" does not generalise it.
+  # DEMOTED FROM ITS OWN GENERIC TO A BOTTLE, Helen 2026-09-05. It is a sweet
+  # vermouth, and unlike Créole Shrubb a useful category name exists -- which is
+  # the test the ingredients.yml header now states. It was also the only generic
+  # in the collection that named itself as its own suggestion: two drinks read
+  # `generic: Punt e Mes` / `suggestion: Punt e Mes`, so the card printed
+  # "Punt e Mes (Punt e Mes)".
   "Punt e Mes":
-    generic: "Punt e Mes"
+    generic: "sweet vermouth"
     aliases: ["Carpano Punt e Mes", "Punt E Mes"]
   "Dolin Dry":
     generic: "dry vermouth"

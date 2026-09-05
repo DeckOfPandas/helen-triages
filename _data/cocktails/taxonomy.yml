@@ -479,7 +479,21 @@ mood_ingredients:
     - fernet
     - Amaro Nonino
     - Amaro Ciociano
-    - Punt e Mes
+    # `Punt e Mes` WAS HERE AND CAME OUT ON 2026-09-05, when Helen demoted it
+    # from a generic to a bottle under `sweet vermouth`. This list keys off
+    # GENERICS, so a bottle cannot sit in it.
+    #
+    # THE REPLACEMENT IS NOT `sweet vermouth`, and that is the point worth
+    # recording. Punt e Mes was the one sweet vermouth bitter enough to open an
+    # appetite; adding the category would fire this mood on every Manhattan and
+    # Ridgwell in the collection, which is the too-broad failure this file
+    # already retired "fruity" and "sugar craving" for.
+    #
+    # IT COSTS NOTHING TODAY. Both drinks that pour Punt e Mes are covered
+    # anyway -- Spiced Negroni matches on Campari, and The Ridgwell is not an
+    # aperitivo drink. If a future drink is built on Punt e Mes ALONE and wants
+    # this mood, the honest fix is to let mood lists name a bottle as well as a
+    # generic, not to widen the category.
     - quinquina
     - americano
     - gentian liqueur

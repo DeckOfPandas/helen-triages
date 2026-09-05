@@ -1161,18 +1161,6 @@ fortified_and_aromatised:
   - "blanc vermouth"
   # A vermouth-amaro hybrid; swapping it for sweet vermouth is audible.
   #
-  # PROPOSED FOR RETIREMENT ON 2026-08-30 AND KEPT, because the drinks settled
-  # it. Helen named five generics for #568 and this was not among them, on my
-  # report that no drink used it -- which was wrong, and wrong in a way worth
-  # recording: the scan that produced it matched generics containing "vermouth",
-  # "sherry" or "quinquina", and this one contains none of those words.
-  #
-  # THE RIDGWELL IS THE EVIDENCE. It pours 12.5 ml of Punt e Mes AND 12.5 ml of
-  # Martini Rosso, side by side. Collapse this into `sweet vermouth` and that
-  # drink asks for 25 ml of one thing, which is a different drink. Spiced
-  # Negroni names it too. So the comment above was right and it is the rum-styles
-  # test passing: the difference changes what you are making.
-  - "Punt e Mes"
   # Lillet Blanc, Dubonnet, Byrrh.
   - "quinquina"
   # Cocchi Americano Bianco.
@@ -1467,7 +1455,6 @@ family_of:
   "sweet vermouth": fortified
   "dry vermouth": fortified
   "blanc vermouth": fortified
-  "Punt e Mes": fortified
   "quinquina": fortified
   "americano": fortified
   "amontillado sherry": fortified
@@ -1641,6 +1628,21 @@ retired_brandy_styles:
     one user, is describing nothing. Both new names are in `brandy_styles`.
 
 # NEW BLOCK 2026-09-04. One lavender, not two -- see the comment on `bitters`.
+# Punt e Mes, and the argument that kept it until 2026-09-05.
+retired_fortified_and_aromatised:
+  "Punt e Mes": >-
+    demoted to a BOTTLE under `sweet vermouth`, Helen 2026-09-05. It had been
+    kept as its own generic on the reasoning that The Ridgwell pours 12.5 ml of
+    Punt e Mes AND 12.5 ml of Martini Rosso, so collapsing the two would ask for
+    "25 ml of one thing, which is a different drink". THAT ARGUMENT ASSUMED A
+    COLLAPSE INTO ONE ENTRY, and no collapse is happening: the drink keeps two
+    entries of 12.5 ml, each with its own `suggestion`, and now reads
+    "sweet vermouth (Punt e Mes)" beside "sweet vermouth (Martini Rosso)" --
+    which says split-vermouth base more clearly than the old shape did.
+    Recorded at length because this generic has been proposed for retirement,
+    kept, and retired inside a week, and the next person to look at it deserves
+    the argument rather than the outcome.
+
 retired_bitters:
   "lavender bitters": >-
     Helen, 2026-09-04: "the generic should be 'lavender-forward bitters', and
