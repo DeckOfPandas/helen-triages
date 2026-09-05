@@ -787,25 +787,34 @@
 // THE SPACING WAS SETTLED 2026-09-02, with the fold work: it now takes the
 // same margin food's `.results-heading` uses above its own list.
 .drink-count {
-  // Flex so the legend can sit at the far end of the same line. align-items:
-  // baseline, not center, because the count and the legend are both text and
-  // a baseline is the alignment that reads as "one line" for text.
+  // NOT A FLEX ROW ANY MORE, SINCE 2026-09-05, and #675 is closed by that
+  // rather than by the fix it briefly had. This was `display: flex` so the
+  // "ship it?" legend could be pushed to the far end of the line by
+  // `margin-left: auto`; the legend and the shortlist button have both moved to
+  // `.drink-count-row` below (Helen: "move the ship mark into the same row so
+  // it's not hovering above the cards"), and with nothing left to place, the
+  // line is one sentence in a paragraph.
   //
-  // NOT justify-content: space-between -- the count and word are two separate
-  // elements (the script rewrites them independently, see the comment above),
-  // and space-between would spread all three children evenly, prising the
-  // number away from its own word. margin-left: auto on .drink-count-legend
-  // below does the pushing instead, so the number and word stay packed
-  // together at the start and only the legend moves to the edge.
-  display: flex;
-  align-items: baseline;
+  // WHICH ALSO DELETES THE BUG. #675 was "a space is required between 125 and
+  // survivors", raised as (copy) and never a copy fault at all: the template has
+  // always had a newline and four spaces between the two elements, but A FLEX
+  // CONTAINER DISCARDS WHITESPACE BETWEEN ITS ITEMS -- a text node that is only
+  // whitespace never becomes a flex item -- so the word space stopped existing
+  // the day this went flex. It was fixed with a 0.35rem `column-gap`, and that
+  // gap is deleted here rather than kept as insurance: the container is not flex,
+  // the whitespace renders on its own, and a workaround outliving its cause is
+  // how a stylesheet stops being readable.
   font-family: $font-body;
   font-size: 1rem;          // body default; no size of its own
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0.01em;   // matches the `body, button` rule in shared/_base
   color: $color-text;
-  margin: $space-xl 0 $space-lg;   // was $spacing-block-gap 0 $space-xl
+  // The bottom margin was $space-lg while this was the last thing before the
+  // grid. `.drink-count-row` is under it now and carries that gap instead, so
+  // the two together still hold the list off by what food's .results-heading
+  // does -- split between them rather than doubled.
+  margin: $space-xl 0 $space-xs;   // was $spacing-block-gap 0 $space-xl
                                    // (1.75rem/1.5rem); matched to food's
                                    // .results-heading, 2026-09-02
   padding-top: $space-md;
@@ -816,11 +825,34 @@
   strong { font-weight: inherit; font-size: inherit; color: inherit; }
 }
 
+// THE ROW UNDER THE COUNT -- Helen, 2026-09-05: "move the ship mark into the
+// same row so it's not hovering above the cards."
+//
+// The legend lived at the right-hand end of the count line, and when the
+// shortlist button dropped to a line of its own (#729/#730) the legend was left
+// alone up there, directly over the card grid and attached to nothing. This row
+// pairs them: what you can DO with the list on the left, what the mark on every
+// card MEANS on the right. It is where the flex-and-auto-margin arrangement the
+// count line used to run has gone, rather than a new idea.
+// `align-items: baseline`, not center, because the pill and the legend are both
+// text and a baseline is the alignment that reads as "one line" for text. The
+// legend keeps the `margin-left: auto` it has always had (see its own rule
+// below) -- that is what does the pushing, and it needs no help from here.
+.drink-count-row {
+  display: flex;
+  align-items: baseline;
+  margin: 0 0 $space-lg;
+}
+
 // The ship and word on every card are a private code (yes, yes², meh, sure,
 // hmm) -- this is the one line on the page that says what the ship means,
 // once, in the card's own type: same family, size and treatment as
 // .drink-card-ship (_cards.scss), just muted to $color-clear-text rather
 // than $color-text since this is a caption on the count, not a card label.
+//
+// IT SITS IN `.drink-count-row` SINCE 2026-09-05, not on the count line itself.
+// `margin-left: auto` is unchanged and still does the pushing; only the row it
+// pushes within has moved down one line.
 .drink-count-legend {
   display: flex;
   align-items: baseline;

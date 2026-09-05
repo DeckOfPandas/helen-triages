@@ -358,7 +358,7 @@
 
   {% comment %} last-line-rule.js puts the double rule under the LAST line of a
      wrapped title or section heading instead of once under every line — design
-     audit critical #7, DESIGN_PLAN §3.4, Helen 2026-09-04: "Last line only
+     audit critical #7, Helen 2026-09-04: "Last line only
      please, 10000%."
 
      LOADED FROM THE SHARED LAYOUT, not from recipe.html, because it is
@@ -382,7 +382,7 @@
 
   {% comment %} card-name-fit.js decides, per drink name, whether a name that
      does not fit its tape should step down one size or wrap to two lines —
-     design audit critical #9, DESIGN_PLAN §3 item 5, Helen 2026-09-04: "shrink
+     design audit critical #9, Helen 2026-09-04: "shrink
      when it's just one short-ish word too long, then two lines where it's more
      than that."
 
@@ -402,6 +402,26 @@
      below it means the first deal is measured by this file's own load pass;
      every later "deal again" calls HTF.fitCardNames() itself. {% endcomment %}
   <script src="{{ '/assets/js/card-name-fit.js' | relative_url }}"></script>
+
+  {% comment %} chip-rows.js marks the mood word that BEGINS a row, so the
+     stylesheet can keep the middle dot off it — issue #698, Helen: "no dot
+     before the first chip." The dot was never before chip one; it was before
+     chip one of the SECOND row, on the 62% of drinks whose moods wrap. That
+     file's header has the arithmetic and the two CSS-only dodges it rejected.
+
+     HERE FOR THE SAME THREE REASONS card-name-fit.js above is. Site-agnostic:
+     it queries `.drink-card-mood` and returns having done nothing on a page
+     with none, which is every page on food. After assets.js, the one hard
+     ordering rule, because it hangs HTF.markChipRows() off that namespace. And
+     after {{ content }}, because it measures a laid-out `offsetTop` — on the
+     cocktails index that content includes universe.js, whose dealt card this
+     file's own load pass then measures along with the other 124.
+
+     ORDER AGAINST card-name-fit.js DOES NOT MATTER and is not relied on: a
+     name's size and a chip's row are measured on different elements and neither
+     pass reads the other's classes. It sits below only because that is where
+     the reader will look for it. {% endcomment %}
+  <script src="{{ '/assets/js/chip-rows.js' | relative_url }}"></script>
 
   {% comment %} shortlist.js wires every `.btn-shortlist` on the page — GitHub
      issue #546. HERE, in the shell, because the four placements are spread

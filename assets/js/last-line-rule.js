@@ -2,7 +2,7 @@
 // =============================================================================
 // THE DOUBLE RULE SITS UNDER THE LAST LINE ONLY — not once per line.
 // =============================================================================
-// Design audit critical #7, DESIGN_PLAN §3.4, decided 2026-09-04 from a
+// Design audit critical #7, decided 2026-09-04 from a
 // candidates page built on the real quiche recipe. Helen, having switched
 // between the treatments on the page itself: "Last line only please, 10000%."
 //

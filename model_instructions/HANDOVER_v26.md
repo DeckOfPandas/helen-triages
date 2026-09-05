@@ -4502,7 +4502,7 @@ while a wide one fills it, which is two tapes on one page disagreeing. A
 hand-copied version of that line dropping the height cost a round.
 
 **A NAME THAT DOES NOT FIT NOW SHRINKS OR WRAPS, AND NEVER ELLIPSISES —
-2026-09-04**, the design audit's critical #9 and DESIGN_PLAN §3 item 5. Helen,
+2026-09-04**, the design audit's critical #9. Helen,
 off a candidates page on the real index: *"shrink when it's just one short-ish
 word too long, then two lines where it's more than that. The one super-long
 title we have I'll just shorten, and retain that principle."* **The rule is
@@ -4516,8 +4516,11 @@ once** (the prediction is a linear model and type is not quite linear) and
 falls back to wrapping if the step did not reach. It runs at load, on
 `document.fonts.ready` and on a debounced resize, and exposes
 `HTF.fitCardNames()`; `universe.js` calls it after each deal because the pick
-is a WIDER card and a cloned `--step`/`--wrap` class would be an answer to the
-wrong question. **With no JS nothing gets a class and the ellipsis stays**,
+sits in a column of its own width and a cloned `--step`/`--wrap` class would be
+an answer to the wrong question. (Since 2026-09-05 the pick's name is
+`flex: none`, so at max-content it cannot overflow and neither class is ever
+applied there — the call stays because it is the parts list, not this file, that
+decides what a deal puts on the page.) **With no JS nothing gets a class and the ellipsis stays**,
 which is the behaviour that was there before — the base rule is the fallback,
 the same shape as `.rule-split`.
 
@@ -4695,15 +4698,75 @@ behaviour described below; several of the sentences here predate that split and
 describe where a rule USED to live.
 
 **THE UNIVERSE SAYS… SITS ABOVE THE FIVE QUESTIONS, since 2026-09-02, AND IS
-A WHOLE CARD IN THE RIGHT-HAND COLUMN since 2026-09-04** — the label and
-`deal again` in a narrow left column, a random drink dealt as a real
-`.drink-card` (the pick carries the class; `universe.js` clones a random
-card's body and foot into it, no glass, and `_sass/cocktails/_universe.scss`
-collapses the fixed box to about half a list card's height — Helen: "a nudge
-not an iceberg") beside them. **Food's copy is gone** — Helen turned the feature down there on
-2026-09-04 (§13.4 has her words); she kept this one, *"almost always more
-open to persuasion about what I drink than what I eat"*, and means to refine
-it. `assets/js/universe.js` and `_sass/cocktails/_universe.scss` are its only code.
+ONE LINE — NOT A CARD — SINCE 2026-09-05** (#719, #714, #693, #692). It was a
+collapsed `.drink-card` in the right-hand column for a single day; four rounds
+of candidates on the real index took the box away. Helen: *"the line layout is
+really working for me. Really really… it's less obtrusive than a box and I think
+that's what I like about it."* The section is a three-column grid reading
+straight across:
+
+| column | holds | why |
+|---|---|---|
+| 1, `auto` | `.universe-label` | "the universe says…" |
+| 2, `minmax(0, 1fr)` | `.universe-pick` | a tiny glass, the name on its tape, the ingredients in round brackets. `minmax(0, …)` and not `1fr`: a bare `1fr` has an `auto` minimum, so the ingredient line would widen the row instead of ellipsising inside it |
+| 3, `auto` | `.btn-universe-again` | **this column IS #693.** The control used to sit under the label, so the eye read the two down the page as "the universe says deal again" (Helen: "lol"). Moving it to the end of the same row dissolves the sentence |
+
+**Five things it deliberately does not have**, each Helen's call and each worth
+knowing before you "restore" one: no box, no ship mark, no mood chips, no square
+brackets round the tape, and no full width (*"I want it to be a happy
+invitation"* rather than the page's best real estate).
+
+**It deals only from ship `yes` and `oh gods yes`** (#692) — 61 of 124 drinks the
+day it landed. The selector NAMES THE TWO RUNGS rather than borrowing the card's
+`data-chaos='good'`, which is derived as exactly that set: `chaos` is the YOLO?
+filter's word, and "which drinks does *no chaos please* show?" and "which drinks
+may the site offer unprompted?" are two different questions sharing an answer
+today. Helen caught the coupling on review.
+
+**`data-universe-parts` IS THE WHOLE MECHANISM, and it is why the glass could be
+placed at all.** It names `.drink-card-name`, `.drink-card-glass` and
+`.drink-card-ingredients` individually rather than the card's `.drink-card-body`
+wrapper, so all three arrive as direct children of the pick and a flex `order`
+can put the glass on either side of the tape; `universe.js` copies parts in the
+order the ATTRIBUTE lists them, not in document order. Cloning the body would
+have made the glass a sibling of the whole block, able only to sit beside it.
+**The foot is not cloned**, which is why `universe.js` calls
+`HTF.fitCardNames()` but not `HTF.markChipRows()` — if a foot is ever cloned
+again, that call has to come back (#698).
+
+**The pick no longer carries `drink-card`, and dropping it deleted five
+overrides.** Every rule it was there for is written against the CHILD class
+(`.drink-card-name`, `-ingredients`, `-glass`) and none needs a `.drink-card`
+ancestor — checked across the compiled stylesheet. All the class contributed was
+a fixed 12.9rem height, a border, a surface fill, card padding and two painted
+panel strips on `::after`, and `::after` is what draws the closing bracket now.
+
+**THE TINY GLASS BREAKS THE CARD'S OWN SCALING RULE ON PURPOSE.** Helen: *"don't
+scale — all the same height"*, so `--glass-ratio` and `--glass-cheat` are both
+bypassed and every drawing is 1.4rem. On a card the true relative height is
+information; here it is a mark at the head of a line, and one that resizes
+between deals reads as a wobble. The slot is a fixed 2.3rem because that rule
+and *"leave a fixed width for the glass so the name tape doesn't jump around on
+redeal"* pull against each other: one height across 27 drawings makes the WIDTHS
+diverge 5.4× (flute 0.280, punch bowl 1.505, width over height), so the slot has
+to clear the punch bowl or a wide glass is capped and comes out shorter than the
+rest. The 14 glassless drinks cost nothing — the index already renders an empty
+`.drink-card-glass` span so a card's title cannot move. Stroke drops to 0.7
+because the artwork uses `vector-effect: non-scaling-stroke` and a card's weight
+is the same screen pixels on a 22px drawing (**this is #650 arriving early**).
+
+**THE CLOSING BRACKET IS A SEPARATE FLEX ITEM, AND HAS TO BE.**
+`text-overflow: ellipsis` clips at the box's own edge, so an `::after` on the
+ingredient line would be clipped away with the text it is there to close. The
+opening bracket rides inside the box (first character, so last to be cut); the
+closing one is `.universe-pick::after`, ordered to land immediately after the
+ellipsis, with `flex: 0 1 auto` on the ingredients keeping it against the text
+rather than pushed to the column's far edge.
+
+**Food's copy is gone** — Helen turned the feature down there on 2026-09-04
+(§13.4 has her words); she kept this one, *"almost always more open to
+persuasion about what I drink than what I eat"*.
+`assets/js/universe.js` and `_sass/cocktails/_universe.scss` are its only code.
 
 **FIVE NAMED QUESTIONS, in the order Helen asks them** — restructured
 2026-08-29 and this is the current shape:
@@ -4896,8 +4959,21 @@ index (the filter words taking the chip's box, or the chips taking the word's
 form) and chose the second, "100% cards take words": Courier, bold, lowercase,
 white, no box, a middle dot between them (the ingredient line's own `·`),
 magenta on hover, and underlined in the section's colour when matched, exactly
-as a chosen filter word is. Still `<button>`s, still filtering. The universe
-card and the drink page's chips share the class and follow.
+as a chosen filter word is. Still `<button>`s, still filtering. The drink page's
+chips share the class and follow. (The universe pick did too until 2026-09-05,
+when Helen took the moods off it — "moods off, decision made" — and its parts
+list stopped cloning the card's foot altogether.)
+
+**NO MIDDLE DOT ON A WORD THAT STARTS A ROW** — #698, and the diagnosis is the
+whole of it. The dot is drawn on the FOLLOWING word's `::before` through `& + &`,
+so it was never before chip one and could not be; what Helen saw was a dot before
+the first chip of the SECOND row, because `.drink-card-moods` wraps and a wrapped
+chip carries its `::before` over the line break. **76 of the 124 drinks with a
+mood list wrap — 61%**, measured against the 232.4px foot of the grid's minimum
+370px card, so this was the common case. CSS cannot ask where a line broke
+(there is no `:first-of-line`), so `assets/js/chip-rows.js` reads `offsetTop` and
+marks row-starting chips with `is-row-start` — the same pattern, and the same
+argument, as the wrapped-title rules in §13.4's last-line mark.
 
 **THE MOOD CHIPS FILTER THE INDEX — Helen's ask, 2026-09-02.** Clicking one adds
 or removes that mood exactly as its filter button does.
@@ -5129,8 +5205,8 @@ this is changing my mind!"* It IS a change of mind and the earlier one is worth
 keeping: on 2026-09-02 she chose the margin against this, *"glass in the margin
 and top aligned, ship it"*. What she had not seen then is that the margin only
 ever rendered above 1180px — every screenshot of this page she had ever reviewed
-was the inline branch, which DESIGN_PLAN called the least verified path in the
-whole design. She picked the one she had been looking at. 7rem is not a new
+was the inline branch, which the design review called the least verified path in
+the whole design. She picked the one she had been looking at. 7rem is not a new
 number: it is exactly what the old clamp gave at every width that branch ran at.
 
 **The drawing is CENTRED in the head, not top-aligned** — also 2026-09-05, also
@@ -7719,7 +7795,7 @@ is inset**, not the reverse — everything on the page starts at x=0, and a
 mark hanging into the left margin reads as broken alignment, not design.
 
 **THE MARK SITS UNDER THE LAST LINE ONLY, SINCE 2026-09-04** (design audit
-critical #7, `DESIGN_PLAN.md` §3.4). `clone` is what makes the mark measure
+critical #7). `clone` is what makes the mark measure
 the lettering rather than the box, and its cost is that every line fragment
 of a wrapped title gets its own full copy — a three-line title wore three
 stacked double rules. Helen, from a candidates page on the real quiche
@@ -8846,6 +8922,75 @@ exchange. **The emboss is stroke *and* a two-copy directional shadow**; the
 stroke sets the weight of the edge, the shadow sets its direction, and a
 reproduction is a second thing to keep in step with the first.
 
+### 13.11 How a design decision actually gets made here
+
+**Helen decides by looking, never by argument.** Every visual decision in §13
+was made on a CANDIDATES PAGE: the real page, the real compiled CSS, the real
+fonts and artwork, with two to five treatments switchable from a bar at the top.
+Build the candidates, publish them, let her pick. Do not write a paragraph
+arguing for one — she has asked for the opposite of that more than once, and an
+argued case for the wrong option costs a round.
+
+Three tools make it cheap:
+
+- **`scripts/mock_bundle.py`** bundles a page from a local build into one
+  self-contained HTML file: compiled CSS with the fonts inlined, every script
+  inlined, every SVG under `assets/img` embedded so `decorations.js` finds its
+  tapes without a network. Build first with
+  `bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock`.
+  Add candidate CSS as `extra_style` keyed off `html[data-x="…"]`, a switcher as
+  `extra_scripts`, and publish the file as an Artifact.
+- **Syntax-check the switcher before publishing** (`node -e` with
+  `new Function(src)`): one apostrophe in a description killed a whole round of
+  leopard samples and she saw "none at all". Use `json.dumps` for any text going
+  into the script, and skip `type="application/json"` blocks when checking — the
+  cocktails index carries three and they are not JavaScript.
+- The artifact viewer lets `<main>` run full width; the bundler pins it to the
+  site's 900px column so margin layouts behave. Her screenshots arrive at odd
+  device-pixel ratios — measure against the 900px column, not the viewport.
+
+**Put the real state on the page, not a picture of it.** A control that ships
+`hidden` must be given something to reveal it (seed `localStorage` from a
+`body_transform`, which runs after `assets.js` defines the store and before the
+index scripts read it); a control being judged against another object must have
+that object on screen — the shortlist pill was decided with an ingredient typed
+into HAS TO HAVE so the pool chips it might be confused with were visible.
+
+**One round settles one question.** Lock what she has already decided into the
+page as base CSS rather than offering it again, and say in the note which
+questions are still open. Four rounds took the universe section from a card to
+its final line on 2026-09-05; each round asked two or three things and no more.
+
+**Derive numbers, do not pick them, and keep the derivation.**
+`scripts/universe_glass_slot.py` and `scripts/universe_line_width.py` are the
+worked examples: both read the live values back out of `_sass/cocktails/_universe.scss`
+and fail or warn if the artwork or the drink collection has moved under them.
+A number derived in `tmp/` is a number nobody can reproduce — `tmp/` is
+gitignored.
+
+**A worktree has no drafts.** Clone `helen-triages-cocktails-private` into it
+over SSH (it is gitignored) or the index renders nothing to look at.
+
+**Delegation:** build work goes to agents with a precise spec — values, files,
+lines, the house comment style, the branch check before every commit — and is
+reviewed by diff. What did not work: letting an agent tidy `tmp/`; it removed
+the mock scripts with an over-broad `rm -rf`. Tell agents to delete only what
+they created.
+
+### 13.12 Decisions that are Helen's, not yours
+
+Build these when she rules; do not decide them, and do not re-open a ruling by
+re-arguing it.
+
+- **Leopard.** Round one she chose L3 (sheen). Round two — five patterns ×
+  four placements — she has not decided, and said *"leave leopard with me…
+  don't ship anything."* `LEOPARD.md` holds the generator, every value and the
+  placement rules. Tracked as its own issue since 2026-09-05.
+- **Any new hue.** Six on food, five on cocktails, and both palettes argue at
+  length that the COUNT is the design.
+- **The voice.** Do not touch a word of copy.
+- **Whether the recipe title takes the tape.** Offered and declined; she chose
+  flat display lettering.
 
 ## 14. Reference pages and the internal-temperatures data layer
 

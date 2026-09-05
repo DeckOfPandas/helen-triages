@@ -135,7 +135,7 @@
 // over, and the `@media (max-width: 1180px)` block that tucked it back inside
 // the column when there was no margin to hang it in. The page had two layouts,
 // the narrow one was the least verified path in the whole design review
-// (DESIGN_PLAN §3.8), and it was the one every screenshot of this page actually
+// (the tablet question, #715), and it was the one every screenshot of this page actually
 // showed. One layout is now the layout.
 //
 // 7rem IS THE CLAMP'S OWN FLOOR, not a new number: it is exactly what the

@@ -16,15 +16,22 @@
 // none, so it is harmless to load on every page. Which row a deal is drawn
 // from, and which parts of it get copied, are read off the section's own
 // `data-universe-rows` and `data-universe-parts` attributes rather than
-// hardcoded here, so this file carries no knowledge of the site's markup.
-// The cocktails pick is a card: its parts are a card's body and its foot.
+// hardcoded here, so this file carries no knowledge of the site's markup —
+// and it has never needed a line changed for a redesign of the section,
+// including the 2026-09-05 one that turned the pick from a card into a line.
 //
 // THE PICK IS A CLONE, NOT A REBUILD. `data-universe-parts` names the exact
-// elements of a row/card that already carry the right classes (title, main
-// ingredients, mood chips…), and cloning them is what guarantees the pick
-// keeps looking like a row of the list beneath it even if that list's own
-// markup changes later — there is no second copy of "what a row looks like"
-// for the two to drift apart from.
+// elements of a row/card that already carry the right classes (the name, the
+// ingredient line, the glass…), and cloning them is what guarantees the pick
+// keeps looking like the list beneath it even if that list's own markup
+// changes later — there is no second copy of "what a row looks like" for the
+// two to drift apart from.
+//
+// THE ATTRIBUTE'S ORDER IS THE DOM'S ORDER, and callers rely on it: parts are
+// copied in the order the attribute lists its selectors, not in document
+// order. That is how the cocktails index places its glass before the name
+// rather than wherever the card happens to keep it. Do not "tidy" this into a
+// single querySelectorAll.
 //
 // LOAD ORDER IS LOAD-BEARING. This script sits at the end of each index
 // page's own script list, and _layouts/default.html loads decorations.js
@@ -132,6 +139,16 @@
     // covers every LATER deal, when "deal again" appends a clone long after
     // that pass has run — the same two-halves story the tape line tells.
     if (window.HTF && window.HTF.fitCardNames) window.HTF.fitCardNames();
+
+    // THERE IS NO SECOND CALL HERE FOR THE CHIP ROWS (#698), AND THAT IS A FACT
+    // ABOUT THE PARTS LIST RATHER THAN A DECISION OF THIS FILE'S. `is-row-start`
+    // is a measurement in exactly the way the name classes above are, so a fresh
+    // clone would need re-measuring on the same argument -- but the mood chips
+    // live in a card's FOOT, and since 2026-09-05 neither site's
+    // `data-universe-parts` clones one. A call would re-measure the whole page
+    // to reach nothing. If a foot is ever cloned again, this is where
+    // `HTF.markChipRows()` goes, next to its sibling above; the note beside the
+    // attribute in cocktails/index.html says so at the end that would change it.
   }
 
   if (again) again.addEventListener('click', deal);

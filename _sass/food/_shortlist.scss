@@ -118,48 +118,79 @@
 // show_source_wording and so is local-only, and this is the one filter here that
 // exists for a visitor rather than for Helen.
 //
-// `.results-heading` is `display: flex; justify-content: flex-start`, so this
-// sits directly after the count rather than at the far right of an otherwise
-// left-aligned line — which is the exact complaint that moved the heading off
-// flex-end in the first place (Helen, 2026-08-03: "sitting alone at the right
-// edge... it read as stray rather than placed").
+// A PILL ON ITS OWN LINE UNDER THE COUNT, SINCE 2026-09-05 — Helen, having
+// settled the cocktails version (#729/#730): "could you style the food page's
+// shortlist toggle the same way? Same location, let's say same font and pill etc
+// too because that page already uses a pill as a you-can-click-me. Just take
+// food page colours."
+//
+// SO THE SHAPE AND THE PLACEMENT ARE SHARED AND ONLY THE PALETTE IS NOT, which
+// is the split this whole repo is built on: the store, the wiring and the event
+// are one implementation and each site brings its own colours. `$font-headings`
+// needs no per-site thought here at all — the two palettes resolve it to the
+// same Courier Prime stack, so "same font" is literally true rather than
+// approximately.
+//
+// IT WAS AN UNDERLINED TEXT LINK, sitting inside `.results-heading` directly
+// after the count. Both of those changed together and the second follows from
+// the first: as a pill it is an OBJECT rather than a word, and an object sharing
+// a baseline with the count read as part of the sentence rather than as a
+// control beside it. `.results-count-row` in food/index.html is where it went.
+//
+// ONE HONEST DIFFERENCE FROM COCKTAILS, and it is food's existing vocabulary
+// rather than a preference. Helen's reason for accepting a pill here is that
+// "that page already uses a pill as a you-can-click-me" — and it does, but food
+// draws its pill as a TAPE SHAPE (`.tag-shape`, an svg behind the word on
+// `.btn-tag` / `.btn-star`), not as a border. Cocktails' pill is a 1.5px border
+// because that is what `%drink-btn-base` already was there. So the two sites
+// agree about the SHAPE a clickable thing takes and differ about how it is
+// drawn, exactly as they already do everywhere else. A border is the right
+// choice of the two here: the tape shape is the filter matrix's own mark and
+// this control is not a filter on a recipe's properties.
+//
+// THE STATE COLOURS ARE UNCHANGED from the link version — $color-clear-text
+// resting, $color-recipe-link when on, $color-recipe-link-hover on hover. They
+// were already food's answer to "a thing the reader is choosing" and nothing
+// about becoming a pill re-opens that question.
 .btn-shortlist-only {
-  font-family: $font-body;
-  font-size: 0.78rem;
+  font-family: $font-headings;
+  font-size: 0.8rem;
   font-weight: 400;
   text-transform: lowercase;
   letter-spacing: 0.02em;
 
-  background: none;
-  border: 0;
-  padding: 0;
-  margin-left: $space-lg;
+  background: $color-surface;
+  border: 1.5px solid $color-border;
+  border-radius: 0;
+  padding: 0.25rem 0.65rem;
   cursor: pointer;
   white-space: nowrap;
   -webkit-text-stroke: 0;
   text-shadow: none;
 
-  // `.results-heading` is a flex row with no align-items of its own, so a child
-  // stretches to the label's full height by default. Set here rather than on
-  // that rule: the heading's own geometry is Helen's and this is the thing
-  // arriving into it.
-  align-self: center;
-
-  // Underlined in BOTH states, unlike .btn-shortlist. This one is a view
-  // switch rather than a mark, it sits beside a label rather than in a column
-  // of its own, and .btn-clear-inline — the control it most resembles — is
-  // underlined for the same reason.
-  text-decoration: underline;
   color: $color-clear-text;
-  transition: color 0.12s ease-in-out;
+  transition: color 0.12s ease-in-out, border-color 0.12s ease-in-out;
 
+  // THE BORDER MOVES WITH THE TEXT, unlike cocktails, where the border alone
+  // carries the state. On a dark ground a 1.5px line going magenta is the
+  // loudest thing on the control; on this paper the same line in dragonfruit
+  // against $color-border's #ebdbe0 is a much quieter event, so the text keeps
+  // the job it already had and the border joins it.
   &:hover,
-  &:focus-visible { color: $color-recipe-link-hover; }
+  &:focus-visible {
+    color: $color-recipe-link-hover;
+    border-color: $color-recipe-link-hover;
+  }
 
   &.is-on {
     color: $color-recipe-link;
+    border-color: $color-recipe-link;
     font-weight: 600;
+
     &:hover,
-    &:focus-visible { color: $color-recipe-link-hover; }
+    &:focus-visible {
+      color: $color-recipe-link-hover;
+      border-color: $color-recipe-link-hover;
+    }
   }
 }

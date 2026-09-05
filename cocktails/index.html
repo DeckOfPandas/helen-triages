@@ -109,24 +109,92 @@ permalink: /cocktails/
      index opened with a screenful of questions and no answer, so one random
      survivor is dealt above the panel, with a control to deal again.
 
-     A CARD, DEALT INTO THE RIGHT-HAND COLUMN, SINCE 2026-09-04 -- AND A SHORT
-     ONE. The pick carries the card's own `drink-card` class and universe.js
-     clones a random card's body and foot into it (not its glass column:
-     Helen, on the full-height version, "farrrr too big. Please drop the
-     glass at least, and get the rest into a nudge not an iceberg"), so the
-     tape, ingredient line, moods and ship mark are a card's by _cards.scss's
-     rules, and _universe.scss collapses the box around them to about half a
-     list card's height. The label and the control stand in the narrow column
-     to its left. The same feature came off food the same day; Helen kept this
-     one -- "I am almost always more open to persuasion about what I drink
-     than what I eat" -- and means to refine it. Absent JavaScript the section
-     is empty and hidden. {% endcomment %}
-  <section class="universe" data-universe-rows=".drink-cards > li" data-universe-parts=".drink-card-body, .drink-card-foot" hidden>
-    <div class="universe-row">
-      <span class="universe-label">the universe says…</span>
-      <button type="button" class="btn-universe-again">deal again <span class="universe-again-icon" aria-hidden="true">&#8635;</span></button>
-    </div>
-    <div class="universe-pick drink-card" aria-live="polite"></div>
+     ONE LINE, NOT A CARD, SINCE 2026-09-05 (#719, #714, #693). It was a
+     collapsed `.drink-card` in the right-hand column for a day; four rounds of
+     candidates on the real index took the box away entirely. Helen: "the line
+     layout is really working for me. Really really... it's less obtrusive than
+     a box and I think that's what I like about it." The section is now a
+     three-column grid reading straight across -- the label, the offer, and
+     `deal again` at the far right -- and the offer is a tiny glass, the drink's
+     name on its tape, and its ingredients in round brackets.
+
+     THAT LAST COLUMN IS ALSO THE WHOLE OF #693. The control used to sit under
+     the label in a column of its own, so the eye read the two down the page as
+     "the universe says deal again" -- Helen: "lol". Putting it at the far right
+     of the SAME row is her placement and it dissolves the sentence rather than
+     renaming anything.
+
+     NO SHIP MARK AND NO MOODS, both her call. The pick is an invitation, not a
+     card: "I want it to be a happy invitation" rather than the page's best real
+     estate, which is also why the offer is capped by the grid instead of running
+     the full width. The same feature came off food entirely on 2026-09-04 and
+     must not come back there (HANDOVER section 13.4); Helen kept this one --
+     "I am almost always more open to persuasion about what I drink than what I
+     eat."
+
+     Absent JavaScript the section is empty and hidden. {% endcomment %}
+  {% comment %} IT DEALS FROM THE TOP TWO RUNGS ONLY, SINCE #692 -- Helen: "It's
+     pretty funny when the top line of the site shows a drink loudly marked
+     'MEH', but it's still not the right call to allow it." An unfiltered offer
+     is the one place on the page where the site speaks first, so it has to be
+     an invitation rather than a lucky dip. 61 of the 124 drinks qualified on the
+     day this was written.
+
+     IT NAMES THE RUNGS, AND DELIBERATELY DOES NOT GO THROUGH `data-chaos`. That
+     attribute is on every card, is derived a few dozen lines below as exactly
+     "ship is yes or oh gods yes", and would have said this in one word -- which
+     is precisely the trap. `chaos` is the YOLO? FILTER'S word (its only reader
+     is cocktail-index.js's `state.chaos === 'good'`), and "which drinks does no
+     chaos please show?" and "which drinks may the site offer unprompted?" are
+     two different questions that happen to share an answer today. Borrowing the
+     attribute would weld them: a later widening of `no chaos please` -- to admit
+     `sure`, say -- would silently change what the universe deals, with no test
+     watching and nothing on the page to reveal it. Helen caught this on review,
+     2026-09-05. Two rules that agree by coincidence should each say what they
+     mean.
+
+     universe.js needs no change and gets none: which rows a deal is drawn from
+     has been this attribute's business since the file was written.
+
+     THE SAME IS TRUE OF `data-universe-parts`, WHICH IS WHY THE GLASS COULD BE
+     PLACED AT ALL. universe.js copies parts in the order THIS ATTRIBUTE lists
+     them rather than in document order, so naming the name before the glass
+     would put the glass between the tape and the ingredients, and naming the
+     glass first puts it in front -- which is where Helen chose it. The parts are
+     also named individually rather than as `.drink-card-body`: a body wrapper
+     would make the glass a sibling of the whole block and it could then only
+     ever sit beside it, never inside the row.
+
+     IF THE FOOT IS EVER CLONED AGAIN, universe.js has to call
+     `HTF.markChipRows()` next to its `HTF.fitCardNames()` call, because the
+     foot is where the mood chips live and their row-start marks are a
+     measurement of the container they are in (#698). It does not call it today
+     because today no chips are cloned.
+
+     AND IT FAILS SHUT, WHICH MATTERS FOR THE FIRST PROMOTION. Production has no
+     drafts, so on the day the first drink is promoted this selector may well
+     match nothing -- and universe.js returns before unhiding on an empty row
+     list, so the section stays `hidden` rather than drawing an empty frame with
+     a "deal again" button that cannot. Nothing to remember and nothing to
+     revert. {% endcomment %}
+  {% comment %} THREE GRID CHILDREN AND NO WRAPPERS. The label and the control
+     used to share a `.universe-row` div because they stood in one column
+     together; with the control at the far right they are simply the first and
+     third things in the row, and the div went with the reason for it.
+
+     THE PICK NO LONGER CARRIES `drink-card`, EITHER. It did so that _cards.scss
+     would style the tape, the ingredient line and the chips inside it -- but
+     every one of those rules is written against the CHILD class
+     (`.drink-card-name`, `.drink-card-ingredients`, `.drink-card-glass`) and not
+     one of them needs a `.drink-card` ancestor; checked across the compiled
+     stylesheet, not assumed. All the class actually contributed was a 12.9rem
+     fixed height, a border, a surface fill, card padding and the two painted
+     panel strips on `::after` -- five things _universe.scss then had to undo,
+     and an `::after` the closing bracket needs. {% endcomment %}
+  <section class="universe" data-universe-rows=".drink-cards > li[data-ship='yes'], .drink-cards > li[data-ship='oh gods yes']" data-universe-parts=".drink-card-name, .drink-card-glass, .drink-card-ingredients" hidden>
+    <span class="universe-label">the universe says…</span>
+    <div class="universe-pick" aria-live="polite"></div>
+    <button type="button" class="btn-universe-again">deal again <span class="universe-again-icon" aria-hidden="true">&#8635;</span></button>
   </section>
 
   <div class="drink-filters">
@@ -263,38 +331,52 @@ permalink: /cocktails/
      pluralisation is Liquid's for the FIRST render only; the script rewrites
      both the number and the word as filters change, so the two have to agree
      on the rule. See assets/js/cocktail-index.js. {% endcomment %}
+  {% comment %} THE COUNT IS ONE SENTENCE AGAIN, SINCE 2026-09-05. It held the
+     ship legend and the shortlist button too, which is why it was a flex row
+     with the legend pushed to the far end by `margin-left: auto`. Both have
+     moved to the row below, so it is a plain paragraph once more -- and #675's
+     missing word space goes with it, because a flex container discarding the
+     whitespace between its items was the entire cause. That fix is deleted
+     rather than kept as insurance: a workaround outliving its bug is how a
+     stylesheet stops being readable. {% endcomment %}
   <p class="drink-count">
     <strong id="drink-count-n">{{ all_drinks.size }}</strong>
     <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
-    {% comment %} The ship and word on every card are a private code (yes,
-       yes², meh, sure, hmm) -- this one line says what the ship is, once, in
-       the card's own type, rather than leaving it to be guessed at from the
-       cards below. Ids on the two elements above are untouched: this is
-       static, and cocktail-index.js never looks for it. {% endcomment %}
-    <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
+  </p>
 
-    {% comment %} THE SHORTLISTED-ONLY VIEW -- #546, and food/index.html carries
-       the twin of this on its own results heading, with the full argument for
-       why it is a filter on this index rather than a page of its own.
+  {% comment %} THE ROW UNDER THE COUNT -- Helen, 2026-09-05: "move the ship mark
+     into the same row so it's not hovering above the cards."
 
-       ON THE COUNT LINE ON BOTH SITES, which is the only placement that has the
-       same shape here as it does there: this page's filters are five labelled
-       sections with their own clear links, and a sixth section holding one
-       button that is not about a drink's properties at all would read as one.
-       "How many are showing" is the fact it belongs beside, and it is the
-       number this button changes.
+     The legend used to sit at the right-hand end of the count line, and once the
+     shortlist button dropped to a line of its own the legend was left alone up
+     there, directly over the card grid, belonging to nothing. This row pairs
+     them: what you can DO with the list on the left, what the mark on every card
+     MEANS on the right. The count above is then just the count.
 
-       THE WORD IS AFFORDABLE HERE, unlike on a card: this line has room, and
-       the control has to say what it does rather than only mark a state.
+     A `<p>` AND NOT A SECOND `.drink-count`. It is a different fact -- these are
+     a control and a caption, not a number -- and giving it the count's class to
+     borrow the spacing would have been the sort of reuse that reads as identity.
 
-       SHIPS `hidden`, and cocktail-index.js reveals it rather than shortlist.js
-       -- the same rule as every other control here, applied to the script that
-       actually wires it. {% endcomment %}
+     THE SHORTLISTED-ONLY VIEW is #546, and food/index.html carries the twin of
+     this with the full argument for why it is a filter on this index rather than
+     a page of its own. It is not one of the five filter sections because those
+     are all questions about what a drink IS, and a sixth holding one button
+     about what this browser has marked would read as another of them.
+
+     THE WORD IS AFFORDABLE HERE, unlike on a card: this line has room, and the
+     control has to say what it does rather than only mark a state.
+
+     SHIPS `hidden`, and cocktail-index.js reveals it rather than shortlist.js --
+     the same rule as every other control here, applied to the script that
+     actually wires it. The legend beside it is static, and cocktail-index.js
+     never looks for it. {% endcomment %}
+  <p class="drink-count-row">
     <button type="button"
             class="btn-shortlist-only"
             id="shortlist-only"
             aria-pressed="false"
             hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
+    <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
   </p>
 
   <ul class="drink-cards">

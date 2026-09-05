@@ -56,14 +56,17 @@
    has-to-have box, which reads as a bug however correct it is.
    ============================================================================= */
 (function () {
-  /* THE LIST'S OWN ITEMS, NOT EVERYTHING WEARING THE CLASS -- 2026-09-04. The
-     universe pick above the panel is a `.drink-card` too now (a real card,
-     dealt from a random one), with none of the data- attributes and no title
-     link until universe.js fills it. Selecting by class swept it in as a
-     card with no name and no data, and the whole index died on the first
-     `card.dataset.ingredients` before showing a single drink. `.drink-cards
-     > li` is what the template has always meant by "a card in the list";
-     `data-universe-rows` names the same selector. */
+  /* THE LIST'S OWN ITEMS, NOT EVERYTHING WEARING THE CLASS. `.drink-cards > li`
+     is what the template has always meant by "a card in the list", and the
+     section's own `data-universe-rows` names the same shape.
+
+     IT WAS ONCE LOAD-BEARING AND IS NOW MERELY CORRECT, which is worth saying
+     rather than deleting: on 2026-09-04 the universe pick carried `.drink-card`
+     too, so selecting by class swept in a card with no data- attributes, and the
+     index died on the first `card.dataset.ingredients` before drawing a single
+     drink. The pick dropped that class on 2026-09-05 and the crash cannot happen
+     today -- but the scoping stays, because the rule it encodes is about what
+     belongs to the list, not about which element last collided with it. */
   var cards = Array.prototype.slice.call(document.querySelectorAll('.drink-cards > li'));
   if (!cards.length) return;
 

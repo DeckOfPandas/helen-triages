@@ -5,7 +5,7 @@
 //
 //   .btn-shortlist          marks one drink, under the drink page's toggle
 //   .btn-shortlist--card    the same control in a card's top-right corner
-//   .btn-shortlist-only     shows only what is marked, on the count line
+//   .btn-shortlist-only     shows only what is marked, in the row under the count
 //
 // Food's twin of all three is _sass/food/_shortlist.scss, and the store, the
 // wiring and the event are shared — only the colours and the card differ.
@@ -26,6 +26,67 @@
 // _sass/food/_shortlist.scss and in shortlist.js. Both sites draw it the same
 // way; only the colours differ, which is the whole shape of this repo's split.
 // =============================================================================
+
+// --- Shortlisted-only --------------------------------------------------------
+// #729 and #730 (the same issue, raised twice two minutes apart). "Style it
+// nicely. Maybe as a toggle [show shortlist]. Possibly place it below X
+// survivors."
+//
+// IT HAD NO RULE AT ALL UNTIL 2026-09-05, which is the actual bug behind the
+// issue rather than a matter of taste: food styles its own `.btn-shortlist-only`
+// (_sass/food/_shortlist.scss) and this file never did, so on cocktails the
+// control shipped as a raw grey system button in the browser's own face — the
+// one thing this site's chrome cannot carry. Everything below is therefore new,
+// not a revision.
+//
+// A PILL, AND SPECIFICALLY `%drink-btn-base`'s PILL. Helen chose it from three
+// treatments on the real index, with the ingredient pool on screen beside it so
+// the comparison was real: "pill same, perfect." Her stated worry was overload —
+// "we don't use any others so I'm concerned about overload" — and the measurement
+// answers it the other way: the page ALREADY has exactly this shape, on
+// `.btn-pool`, and it is the only thing wearing it. So this is a reuse rather
+// than a sixth invention.
+//
+// WHICH MAKES THE REAL RISK COLLISION, NOT CLUTTER: on this page a bordered box
+// whose border goes magenta already means "an ingredient word you can put into a
+// filter". Two things separate them and both are placement rather than paint —
+// a pool chip only ever appears inside the filter panel and always in a group,
+// and this one stands alone in the row under the count. Helen looked at the two
+// together and took the collision.
+//
+// THE VALUES ARE %drink-btn-base's, NOT COPIES OF THEM, so the two cannot drift:
+// 1.5px, $color-surface, the same padding. Only the face and the states are
+// stated here — Courier because this is a control that names a view rather than
+// an ingredient, and the border going magenta because §9.13's rule is that
+// magenta means "this one" and .btn-pool already says it that way.
+.btn-shortlist-only {
+  @extend %drink-btn-base;
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  padding: 0.25rem 0.65rem;
+  white-space: nowrap;
+
+  // The punch is for words on the page, not for a control's label — the same
+  // four resets .btn-universe-again makes, and for the same reason.
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+
+  transition: border-color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { border-color: $color-wicked-woowoo; }
+
+  // ON IS THE BORDER AND A WEIGHT, NEVER A FILL. §9.13: bands and washes, not
+  // fills — the same call .btn-pool makes for its own chosen state, so a
+  // switched-on view switch and a chosen ingredient agree about what "on" looks
+  // like without either being told about the other.
+  &.is-on {
+    border-color: $color-wicked-woowoo;
+    font-weight: 600;
+  }
+}
 
 .btn-shortlist {
   // Matched to `.cocktail-toggle-label` — the read-it/make-it pair this control
@@ -215,10 +276,13 @@
 // NOTHING IS EVER CUT, which is the guarantee that rule was written to give and
 // which this does not weaken.
 //
-// SCOPED TO `.drink-cards`, NOT TO `.drink-card`. `.universe-pick` also carries
-// `drink-card` and universe.js clones a card's body into it — but it clones
-// `.drink-card-body, .drink-card-foot` only, so the pick has no button in its
-// corner and must not reserve room for one.
+// SCOPED TO `.drink-cards`, NOT TO `.drink-card`, because the padding pays for a
+// shortlist button and only a card IN THE LIST has one. The universe pick also
+// wears `.drink-card-name`, has no button in its corner, and must not reserve
+// room for one. (It used to carry `.drink-card` as well, which made the scoping
+// load-bearing rather than merely correct; it stopped on 2026-09-05 and the
+// scoping stays, because the rule was always "a card in the list", not "whatever
+// happens to collide today".)
 //
 // AND `.drink-card-name`, NOT the body: the ingredient line below has the full
 // width and should keep it. Only the object that collides pays.
