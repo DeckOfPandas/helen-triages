@@ -479,7 +479,21 @@ mood_ingredients:
     - fernet
     - Amaro Nonino
     - Amaro Ciociano
-    - Punt e Mes
+    # `Punt e Mes` WAS HERE AND CAME OUT ON 2026-09-05, when Helen demoted it
+    # from a generic to a bottle under `sweet vermouth`. This list keys off
+    # GENERICS, so a bottle cannot sit in it.
+    #
+    # THE REPLACEMENT IS NOT `sweet vermouth`, and that is the point worth
+    # recording. Punt e Mes was the one sweet vermouth bitter enough to open an
+    # appetite; adding the category would fire this mood on every Manhattan and
+    # Ridgwell in the collection, which is the too-broad failure this file
+    # already retired "fruity" and "sugar craving" for.
+    #
+    # IT COSTS NOTHING TODAY. Both drinks that pour Punt e Mes are covered
+    # anyway -- Spiced Negroni matches on Campari, and The Ridgwell is not an
+    # aperitivo drink. If a future drink is built on Punt e Mes ALONE and wants
+    # this mood, the honest fix is to let mood lists name a bottle as well as a
+    # generic, not to widen the category.
     - quinquina
     - americano
     - gentian liqueur
@@ -600,9 +614,28 @@ mood_include:
     why: >-
       she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
   caribbean-sazerac:
-    moods: [strong brown drink, warming]
+    moods: [strong brown drink, warming, I want to faff]
     why: >-
-      she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
+      she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice; it rinses a frozen glass and discards the excess, which the rule counts as ONE faff moment where it wants two.
+  # `I want to faff` JOINED BOTH SAZERACS ON 2026-09-05, and it is a correction
+  # to the RULE'S ARITHMETIC rather than to its judgement.
+  #
+  # Both drinks scored two faff hits until today, and both hits were the SAME
+  # RINSE: once in "Rinse a frozen glass with the overproof rum" and again in
+  # "Strain into the rinsed glass". The serve pass collapsed that second step to
+  # a bare "Strain." -- the destination moved to `serve.chill: rinsed` -- and
+  # with the duplicate gone the count fell to one and the mood fell off.
+  #
+  # THE OLD COUNT WAS WRONG AND THE NEW ONE IS RIGHT: the drink rinses once. But
+  # a drink that rinses a glass with absinthe and throws it away IS faff, so the
+  # honest fix is to record the drinks here rather than to loosen the rule or to
+  # re-inflate the prose. Recorded rather than fixed in `step_words` because
+  # adding "discard" there would reach several twist-and-discard drinks that
+  # nobody thinks are faffy.
+  sazerac:
+    moods: [I want to faff]
+    why: >-
+      it ices a glass, rinses it with absinthe and discards the contents, which the rule counts as ONE faff moment where it wants two. See the note on caribbean-sazerac directly above.
   carta-switchel:
     moods: [sharp]
     why: >-

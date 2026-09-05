@@ -93,9 +93,13 @@ ingredients:
   - amount: "4 drops"
     item: "Difford's Margarita bitters"
     generic: "QQ"
+serve:
+  ice: "cubed"          # how the drink is ICED IN THE GLASS. §4a. OMIT the
+                        # whole `serve:` key if the source does not say.
 method:
   - "Shake all ingredients with ice."
-  - "Fine strain over ice."
+  - "Fine strain."      # the TECHNIQUE only — never "over ice", never
+                        # "into a chilled glass". §5a.
   # A step is a string, OR a `{step, note}` pair. USED SPARINGLY — the note is
   # an aside about how Helen does the step, never part of the instruction:
   #   - step: "Muddle the lime chunks hard with the sugar."
@@ -127,10 +131,12 @@ meta:
 | `mood` | **Always `mood: []`.** The key is required and the value is DERIVED in her repo by a script. Never write a mood yourself. |
 | `garnish` | **A LIST.** `[]` means nobody has filled it in; `["no garnish"]` means the drink genuinely takes none. Vocabulary in §4. |
 | `ingredients` | The FULL list, untriaged, **in build order**. §3. |
-| `ingredients[].item` | What the SOURCE called the pour, brand and all. **A drafts-only field** — §3. |
+| `ingredients[].item` | What the SOURCE called the pour, brand and all. **A drafts-only field with a DEATH DATE** — §3. |
+| `ingredients[].suggestion` | The bottle. **ALWAYS A LIST**, even for one bottle: `["Beefeater"]`. §3. |
 | `ingredients[].character` | Why a drink wants a particular bottle. **Never yours to write** — §3. |
+| `serve` | How it is iced, and any rim. **A mapping, and OPTIONAL — omit it entirely if the source does not say.** §4a. |
 | `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. A step is a string, or a `{step, note}` pair — **used sparingly** (Helen, 2026-09-04), for an aside about how she does the step rather than part of the instruction. |
-| `to_serve` | Presentation, not a further instruction. `"Straw."`, `"Two straws."` A terse noun phrase, or `""`. |
+| `to_serve` | **Serveware only** — what the drink is served WITH. `"Straw."`, `"Two straws."`, `"Ladle and punch glasses."` A terse noun phrase, or `""`. **Never the ice** — that is `serve.ice`. |
 | `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s and replaces the label with a real heading and the text with her own words. A bare string is legal in the schema but not for an ingest. Use one to record what the source could not give you. |
 | `source` / `source_url` | Free text here, unlike food. `"Difford's"`, `"Death & Co"`. `source_url` may be `""`. |
 | `meta.ship` | Helen's rating. **Always `"QQ"`** — you have not drunk it and neither has she. |
@@ -261,6 +267,38 @@ So: **write it on every pour, and do not treat it as the answer.** A file whose
 what this document is asking for. A file that resolved the categories and lost
 the source's words is worse, in both directions at once.
 
+**THE DEATH DATE IS NOW ENFORCED, AND IT IS WHY THIS FIELD STILL EXISTS.**
+`tests/test_cocktails.py::test_item_is_gone_once_the_generic_is_filled_in`
+refuses an `item` on any pour whose `generic` is no longer `QQ`. The rule is
+CONDITIONAL, which is the point: your file, with `QQ` on every pour, is exactly
+right and passes. What is forbidden is the field outliving the answer it was
+holding a place for.
+
+It had to become a test. The lifecycle above was written down and then not
+followed: by 2026-09-05 every one of 683 pours had a real category and 215 still
+carried the `item` that had been a placeholder for it. Helen: *"we agreed to
+drop item, but then I was persuaded to allow it back as somewhere to hold
+incoming data, but it's become a dumping ground again."* Emptying it turned up
+57 bottles the page had never been able to show, 23 of which existed nowhere
+else in the repository — so the field had been quietly hoarding, not holding.
+
+### `suggestion` is ALWAYS a list
+
+`suggestion: ["Beefeater"]`, never `suggestion: "Beefeater"`. One bottle or
+five, the shape is the same, and a test enforces it.
+
+Liquid treats a bare string as a one-item sequence, so both shapes rendered
+correctly and nothing complained while 194 pours used one and 18 used the
+other. That is precisely why it needed a rule: everything downstream — the
+alcohol-units work, costing, the scaler — would otherwise handle two shapes
+forever.
+
+**`generic` is deliberately NOT held to this**, and the difference is worth
+understanding. There a bare string means "this category" and a list means
+"either of these would do", so the two shapes mean DIFFERENT things. On
+`suggestion` they mean the same thing and differ only in how many bottles are
+named.
+
 ### `character` — the field that is never yours
 
 `character` is the flavour property that made a drink want THIS bottle:
@@ -325,8 +363,7 @@ citrus wheel · dehydrated lime slice wheel · half lime shell
 **Fruit:** pineapple wedge ·
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
 blackberry · dried apple slice · banana chip · raspberries ·
-half an empty passion fruit shell ·
-passion fruit shell filled with overproof rum · pineapple and brandied cherry
+half an empty passion fruit shell · pineapple and brandied cherry
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
 skewered maraschino cherry · cherry flag ·
@@ -335,9 +372,7 @@ fruit stick (skewered pineapple cubes and a maraschino cherry)
 **Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
 kaffir lime leaves · cucumber wheels · edible violet
 
-**Spice and other:** grated nutmeg · cinnamon stick · three coffee beans ·
-half-rim of sugar · cocktail umbrella · 3 dashes red creole-style bitters ·
-5 drops of olive oil
+**Spice and other:** grated nutmeg · cinnamon stick · three coffee beans
 <!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:
@@ -354,6 +389,66 @@ Four rules that decide the awkward cases:
 - **`["no garnish"]` means decided; `[]` means unfilled.** The marker must
   appear alone, never beside a real garnish. Use `[]` if the source is simply
   silent — that is the honest answer.
+
+> ### A GARNISH IS NOT A POUR, A RIM, OR SERVEWARE
+>
+> The field had absorbed all three by 2026-09-05, because two of them had no
+> home until then. Four things that look like garnishes and are not:
+>
+> - **Anything with an amount is a POUR.** "3 dashes red creole-style bitters",
+>   "5 drops of olive oil". Those go in `ingredients` with their amount, and a
+>   method step puts them on top — "Drop the bitters on the top." Helen wants
+>   units of alcohol counted (#297), and nothing can count a pour hiding in
+>   `garnish`.
+> - **A rim is `serve.rim`.** "half-rim of sugar" is done to the glass before
+>   the drink is built. But `lime wedge on rim` IS a garnish — that is a
+>   placement, and a placement carries information.
+> - **Serveware is `to_serve`.** Umbrellas, straws, stirrers, ladles, plastic
+>   giraffes.
+> - **Do not restate a method step.** One drink's garnish read "passion fruit
+>   shell filled with overproof rum" while its own method already said "Fill
+>   the passion fruit shell with rum and set on top of the drink."
+
+---
+
+## 4a. `serve` — how it is iced
+
+**The ice that goes in the GLASS, never the ice in the shaker.** That
+distinction is the whole of this field. Of 156 mentions of ice in the
+collection's method steps, 86 were the shaker's: "Shake all ingredients with
+ice" says nothing about how the drink is served.
+
+```yaml
+serve:
+  ice: "crushed"
+```
+
+**Six values, and nothing else is legal:**
+
+| Value | Means |
+|---|---|
+| `none` | Served up, in an empty glass. The commonest answer by a wide margin. |
+| `cubed` | Ordinary cubes — an ice-filled glass. |
+| `crushed` | Crushed or pebble ice. Every swizzle. |
+| `large cube` | One big rock. |
+| `block` | A large block, in a punch bowl or pitcher. |
+| `blended` | The ice is IN the drink. Frozen drinks. |
+
+**OMIT THE WHOLE `serve:` KEY IF THE SOURCE DOES NOT SAY.** Absent means nobody
+has decided; `ice: "none"` means somebody decided it is served up. Exactly the
+distinction `garnish` draws between `[]` and `["no garnish"]`, and it is a real
+one: one punch in the collection strains into a bowl and never says whether ice
+goes in, where both its siblings say a large block. That is a question for
+Helen, not a blank to fill with a default.
+
+**`rim` is free text and rare.** `rim: "half-rim of sugar"`. Only if the source
+rims the glass.
+
+**There is no `chill` key and you must not invent one.** Helen, 2026-09-05: *"I
+think it's implied that glasses should be chilled (except hot drinks
+obviously). I am the user after all."* If the source does something MORE than
+chilling — freezing a glass, rinsing it with absinthe — that is a method step in
+its own right, which is what those drinks already do.
 
 ---
 
@@ -379,13 +474,7 @@ and write the source's own words where none does.
 **Blend and swizzle:** `Blend all ingredients until smooth.` ·
 `Swizzle until the glass frosts.`
 
-**Strain:** `Strain.` · `Double strain.` · `Fine strain.` ·
-`Strain into a chilled glass.` · `Double strain into a chilled glass.` ·
-`Fine strain into a chilled glass.` · `Strain into an ice-filled glass.` ·
-`Fine strain into an ice-filled glass.` · `Strain over ice.` ·
-`Fine strain over ice.` · `Strain over crushed ice.` ·
-`Strain over a giant ice cube.` · `Double strain over a giant ice cube.` ·
-`Fine strain over a giant ice cube.` · `Strain over two giant ice cubes.`
+**Strain:** `Strain.` · `Double strain.` · `Fine strain.` · `Dump.` · `Pour.`
 
 **Build:** `Add the remaining ingredients.` ·
 `Fill the pitcher half full with ice cubes.` · `Fill with crushed ice.` ·
@@ -401,15 +490,24 @@ and write the source's own words where none does.
 
 Seven things that will catch you out:
 
-- **NEVER NAME THE GLASS IN A STRAIN STEP.** `glass:` already carries it and
-  draws an icon. "Fine strain into a chilled coupe" says coupe twice. Write
-  `Fine strain into a chilled glass.`
-- **THE BIG SINGLE CUBE IS `giant`, NOT `large` OR `big`.** Helen's ruling,
-  2026-09-04: *"I really do want 'giant ice cube' for e.g. strong brown drinks
-  over ice."* If the source says a large cube, a big cube, a rock or a block
-  and means ONE piece of ice in the glass, use the giant form above — and note
-  that these steps name no glass either, so "strain into a rocks glass over a
-  big cube" is `Strain over a giant ice cube.`
+- **A STRAIN STEP IS THE TECHNIQUE AND NOTHING ELSE.** Five strings, and there
+  is no sixth: `Strain.` · `Fine strain.` · `Double strain.` · `Dump.` ·
+  `Pour.` **Never name the glass, never name the ice.** The glass is in
+  `glass:`, which draws the icon; the ice is in `serve.ice` (§4a). So:
+
+  | The source says | You write |
+  |---|---|
+  | "fine strain into a chilled coupe" | `Fine strain.` + `glass: ["coupe"]` |
+  | "strain into an ice-filled highball" | `Strain.` + `serve: {ice: "cubed"}` |
+  | "strain into a rocks glass over a big cube" | `Strain.` + `serve: {ice: "large cube"}` |
+  | "strain over crushed ice" | `Strain.` + `serve: {ice: "crushed"}` |
+
+  This group held SEVENTEEN strings until 2026-09-05 and every retired one
+  named where the drink landed, because the ice had no field. Two of the
+  seventeen turned out to be truncated sentences nobody had noticed —
+  "Fine strain into a chilled." and "Fine-strain into pre-chilled." — which is
+  the argument for the change in one line: prose that varies is prose nobody
+  can check.
 - **"Shake all ingredients" and "Shake" mean different things.** After a build
   step — a muddle, a rinse, an "add the rest" — "Shake with ice." means *shake
   what is in the shaker*, and that is a different instruction. **Read the step
@@ -506,9 +604,31 @@ sauté · sautés · sautéed · soufflé · soufflés · velouté
 - **Never write a `character:`** — it hangs off a `generic` you are not writing.
 - **Never leave a US unit**, and never convert a non-volumetric one.
 - **Never write a bare number as an amount** without flagging it.
-- **Never name the glass inside a method step.**
-- **Never reconstruct a truncated method**, however obvious the pattern.
+- **Never name the glass OR the ice inside a method step.** §5.
+- **Never write `suggestion` as a bare string.** Always a list.
+- **Never invent a `serve.chill`** — a chilled glass is assumed. §4a.
+- **Never put a pour in `garnish`.** Anything with an amount is an ingredient.
+- **Never reconstruct a truncated method**, however obvious the pattern. But
+  **do say in your list that it looks truncated** — three of these were found
+  in one day in 2026-09, all by machine and none by a reader.
 - **Never assume a familiar name means a familiar drink.**
+
+> ### FOUR RUM WORDS THAT ARE NOT CATEGORIES
+>
+> Other people's recipes ask for these constantly. Helen, 2026-09-05: *"there
+> is no such thing as navy rum or overproof navy rum"*, and *"there's no such
+> thing as black rum, even though it will often be requested by other people's
+> recipes."* `dark`, `light`, `gold` and `spiced` are out for the same reason —
+> they describe colour or strength, not production, and colour is routinely
+> adjusted with caramel.
+>
+> **This changes nothing about what you write**, because you write `generic:
+> "QQ"` regardless. It matters for your `item` and for your list: transcribe
+> the source's word faithfully, and **say in your "what I could not know" list
+> that the source asked for a category Helen does not use.** If the source also
+> names a BOTTLE, say so in the same bullet — her bottle dictionary resolves
+> the category from the bottle mechanically, and that is the answer in 13 cases
+> out of 22 when it was measured.
 
 ---
 
@@ -549,9 +669,11 @@ ingredients:
   - amount: "45 ml"
     item: "pineapple juice"
     generic: "QQ"
+serve:
+  ice: "crushed"
 method:
   - "Shake all ingredients with ice."
-  - "Strain over crushed ice."
+  - "Strain."
 to_serve: "Straw."
 mood: []
 notes:
@@ -580,9 +702,10 @@ meta:
 
 Note what the transcription did: **all five amounts converted** (1½ oz → 45 ml,
 ¾ → 22.5, ½ → 15). **"over ice" became "with ice"**, and **"into a
-double old-fashioned glass filled with crushed ice" became `glass: ["double old
-fashioned"]` plus `"Strain over crushed ice."`** — the glass moved to the field
-that draws the icon, and the step stopped naming it twice. **"Garnish with…"
+double old-fashioned glass filled with crushed ice" became THREE fields** —
+`glass: ["double old fashioned"]`, `serve: {ice: "crushed"}` and a bare
+`"Strain."` One sentence in the source, three facts, and each now lives in the
+one place that owns it. **"Garnish with…"
 and "serve with a straw" left the method entirely**, into `garnish` and
 `to_serve`.
 
