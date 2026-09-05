@@ -75,49 +75,31 @@ canonical:
   # duplication, not information: the glass is already in the drink's `glass:`
   # field and renders as an icon. "Fine strain into a chilled coupe" says
   # coupe twice.
+  # THE STRAIN GROUP IS FIVE STRINGS AND USED TO BE SEVENTEEN — 2026-09-05.
+  #
+  # Every retired one named where the drink LANDS: "Strain into a chilled
+  # glass.", "Strain over crushed ice.", "Strain over two giant ice cubes."
+  # That was the only way to record the ice, because the ice had no field. It
+  # has one now — `serve.ice` — and `tests/test_cocktails.py::
+  # test_serve_ice_is_not_restated_in_the_method` refuses a strain step that
+  # describes the serve, so these strings cannot come back.
+  #
+  # This file's own header asked for it: eleven forms of Strain was the census
+  # that started it, and the answer was a canonical set. The set was still
+  # growing — a "slot for ice pedantry" was added on 2026-09-04 and the group
+  # went from eleven to seventeen — because the vocabulary was absorbing a fact
+  # that belonged in a field. Move the fact, and the vocabulary stops growing.
+  #
+  # HELEN'S `giant ice cube` RULING IS NOT LOST. It moved from a method string
+  # to `ice: "large cube"` in _data/cocktails/serve.yml, where the page renders
+  # it as "Over a large ice cube." Her reason was that she wanted to SAY it, and
+  # she still can; what changed is that she says it once.
   strain:
     - "Strain."
     - "Double strain."
     - "Fine strain."
-    - "Strain into a chilled glass."
-    - "Double strain into a chilled glass."
-    - "Fine strain into a chilled glass."
-    - "Strain into an ice-filled glass."
-    - "Fine strain into an ice-filled glass."
-    - "Strain over ice."
-    - "Fine strain over ice."
-    - "Strain over crushed ice."
-    # A SLOT FOR ICE PEDANTRY, 2026-09-04. Helen: "We're missing a slot for ice
-    # pedantry. I definitely wrote earlier 'strain over a giant ice cube', and
-    # just found myself wanting to write it again for a Brooklyn." Five drinks
-    # had already written some form of it and no two agreed -- which is the
-    # eleven-forms-of-Strain problem from this file's own header, growing back
-    # in a corner nobody had declared.
-    #
-    # THE WORD IS `giant`, AND THAT IS HER RULING RATHER THAN THE MAJORITY.
-    # Three of the five said "large" (fancy-free, white-negroni, pink-lady) and
-    # one said "giant" (vieux-carre), so the count pointed the other way; she
-    # chose anyway: "I really do want 'giant ice cube' for e.g. strong brown
-    # drinks over ice, and a Better and Better, and a million more I can't think
-    # of right now." The mechanical spine is canonical by this file's own rule,
-    # so all five are retyped to the giant form rather than the vocabulary
-    # being widened to hold both.
-    #
-    # NO GLASS IS NAMED, which is why margarita-classic's "Strain into glass
-    # over two large ice cubes." loses three words on the way in. The glass is
-    # in the drink's own `glass:` field and draws an icon -- see the note at the
-    # top of this group.
-    #
-    # `Fine strain over a giant ice cube.` HAS NO USER YET and is declared
-    # anyway, unlike "Stir with ice." below. The difference is that this is one
-    # of a set of three that a reader will pick from by shape -- how fine, and
-    # onto what -- and a set with a hole in it reads as a decision rather than
-    # as an absence. Helen's "a million more I can't think of right now" is the
-    # licence: the drinks that want these have not been written yet.
-    - "Strain over a giant ice cube."
-    - "Double strain over a giant ice cube."
-    - "Fine strain over a giant ice cube."
-    - "Strain over two giant ice cubes."
+    - "Dump."
+    - "Pour."
 
   build:
     - "Add the remaining ingredients."

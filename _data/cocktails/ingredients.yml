@@ -1371,6 +1371,12 @@ other:
   - "egg white"
   - "salt"
   - "cider vinegar"
+  # 2026-09-05, arriving with the Mastiha Mojito, which floats five drops on
+  # top. It had been living in `garnish` as "5 drops of olive oil" -- a pour
+  # with an amount, sitting in the field for things that are not poured, where
+  # nothing could count it. `other` is where this collection keeps the pours
+  # that are neither juice nor syrup nor alcohol.
+  - "olive oil"
   # THE THREE BELOW HAVE NO DRINK, ON PURPOSE, and they are declared for the
   # reason this file already declares Plymouth, New Western dry and genever
   # while owning none of them: it is a SPEC, not an inventory.

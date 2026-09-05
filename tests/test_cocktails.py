@@ -1649,6 +1649,133 @@ def test_serve_ice_is_not_restated_in_the_method():
     )
 
 
+# A step ending on one of these has lost its tail. `chilled` and `cold` are
+# NOT here: "shake until chilled" is a whole sentence.
+_DANGLING = re.compile(
+    r"\b(the|a|an|into|with|over|to|of|and|or|in|on|for|from|"
+    r"pre-chilled|remaining|other|all)\s*\.\s*$", re.I)
+
+
+def test_no_method_step_ends_on_a_dangling_word():
+    """A step whose last word cannot end a sentence has been truncated.
+
+    THREE OF THESE WERE FOUND BY ACCIDENT IN ONE DAY, which is why the shape
+    gets a test rather than another read-through:
+
+        "Fine strain into a chilled."      "Fine-strain into pre-chilled."
+        "Add to the."                      (vestigial: "Add to the [glass]")
+
+    None was found by anybody reading the drinks. The first two surfaced only
+    because the serve pass collapsed 31 spellings of "strain" into five and the
+    odd ones out stopped matching; the third because Helen read the list that
+    produced. Nobody reads 124 last-lines in a row, and prose that varies is
+    prose nobody can check -- which is the whole argument for `serve` and for
+    methods.yml before it.
+
+    A SWEEP OF ALL 313 STEPS AFTERWARDS FOUND NO FOURTH, so this starts life
+    green and bites on the next one, the ratchet bargain garnish.yml strikes.
+    Two candidates it deliberately allows: "Add ice and shake until chilled."
+    and "Squeeze a lime wedge into a shaker and drop it in." Both are whole
+    sentences, which is why `chilled` and a trailing `in` after a pronoun are
+    not treated as dangling.
+    """
+    bad = []
+    for slug, fm in _load():
+        for step in (fm.get("method") or []):
+            text = step if isinstance(step, str) else (step or {}).get("step")
+            if not isinstance(text, str):
+                continue
+            if text.lower().startswith("qq"):
+                continue
+            if _DANGLING.search(text) and not re.search(r"\bdrop it in\.$", text, re.I):
+                bad.append(f"{slug}: {text!r}")
+    assert not bad, (
+        "Method step(s) ending on a dangling word:\n  " + "\n  ".join(sorted(bad))
+        + "\n\nThe tail of the sentence is missing. Finish it -- do not delete "
+          "the step, which is how the instruction disappears instead of the "
+          "typo."
+    )
+
+
+def test_to_serve_is_serveware_and_not_the_ice():
+    """`to_serve` is what the drink is served WITH, never how it is iced.
+
+    The two fields drifted into each other in both directions and each way was
+    invisible from the other side. Blue Hawaiian put a cocktail umbrella --
+    serveware -- into `garnish`; Gin Sour put `to_serve: "Without ice."` into
+    the serveware field. Helen's original report was exactly this: "things to
+    serve with (like a paper umbrella) aren't written or laid out the same way."
+
+    Ice belongs in `serve.ice`, which is a closed vocabulary and which the page
+    renders as its own line. A sentence about ice here is a second, free-text
+    copy of a fact already recorded -- and two copies of a fact are two chances
+    to disagree.
+    """
+    bad = []
+    for slug, fm in _load():
+        text = fm.get("to_serve")
+        if not isinstance(text, str):
+            continue
+        if re.search(r"\bice\b|crushed|cube|frozen|chilled", text, re.I):
+            bad.append(f"{slug}: to_serve {text!r}")
+    assert not bad, (
+        "`to_serve` describing the ice:\n  " + "\n  ".join(sorted(bad))
+        + "\n\nUse `serve.ice`, which is declared in _data/cocktails/serve.yml "
+          "and renders its own line. `to_serve` is straws, ladles and paper "
+          "umbrellas."
+    )
+
+
+def test_a_garnish_is_not_an_ingredient_or_a_rim():
+    """`garnish` holds garnishes, not pours, not rims, not serveware.
+
+    THE FIELD HAD ABSORBED FOUR OTHER KINDS OF THING, because three of them had
+    no home of their own until 2026-09-05:
+
+        cocktail umbrella                  -> `to_serve`, which already existed
+        half-rim of sugar                  -> `serve.rim`
+        passion fruit shell filled with
+          overproof rum                    -> its own method step already said it
+
+    This checks the two shapes a machine can be sure about: a quantity at the
+    front (`3 dashes ...`, `5 drops of ...`), which means a POUR that belongs in
+    `ingredients` where #297 can count it, and the word `rim` in a phrase that
+    describes rimming rather than placement.
+
+    `lime wedge on rim` PASSES AND MUST. garnish.yml rules that a placement
+    carries information -- "lime wedge on rim says where to put it" -- so the
+    test looks for a rim being MADE ("half-rim of sugar"), not for one being
+    used as an address.
+
+    TWO LIVE VALUES STILL FAIL THIS SHAPE AND ARE HELEN'S CALL, not a machine's:
+    german-vacation's "3 dashes red creole-style bitters" and mastiha-mojito's
+    "5 drops of olive oil". Both are pours by this rule; both would need a
+    ruling (does a float of olive oil earn a generic?) and one would need a new
+    vocabulary entry. They are listed in the failure message rather than
+    silently exempted, so the test is red until she rules -- see
+    tests/README-style note: a guard that quietly excuses the cases it was
+    written for enforces nothing.
+    """
+    quantity = re.compile(r"^\s*\d|\b(dash|dashes|drop|drops)\b", re.I)
+    rimming = re.compile(r"\brim\b(?!\s*$)|rim of\b|-rim\b", re.I)
+    bad = []
+    for slug, fm in _load():
+        for g in (fm.get("garnish") or []):
+            if not isinstance(g, str):
+                continue
+            if quantity.search(g):
+                bad.append(f"{slug}: {g!r} -- a quantity, so it is a pour")
+            elif rimming.search(g) and not re.search(r"\bon rim\b", g, re.I):
+                bad.append(f"{slug}: {g!r} -- a rim, so it is `serve.rim`")
+    assert not bad, (
+        "Not a garnish:\n  " + "\n  ".join(sorted(bad))
+        + "\n\nA pour belongs in `ingredients` (and #297 needs it there to count "
+          "the alcohol); a rim belongs in `serve.rim`; serveware belongs in "
+          "`to_serve`. A placement like 'lime wedge on rim' is a real garnish "
+          "and passes."
+    )
+
+
 def test_suggestion_is_always_a_list():
     """One shape for the bottle field, so no consumer has to handle two.
 
