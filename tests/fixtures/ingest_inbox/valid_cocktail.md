@@ -35,6 +35,7 @@ notes:
 source: "QQ"
 source_url: ""
 meta:
+  made_before: false
   ship: "QQ"
   date_last_edited: "2026-09-02"
   rewritten: false

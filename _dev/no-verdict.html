@@ -16,12 +16,21 @@ sitemap: false
   that don't have the ship field set, and I can go through and either rate the
   drink or mark it as unmade."
 
-  IT IS THE WORKLIST, NOT THE FEATURE. #722 also proposes a `made_before` field,
-  a "chaos only" filter and a publish guard that fails a drink with no verdict.
-  None of that is built here and none of it is assumed: this page writes
-  nothing, changes no drink and adds no field. It collects Helen's answers into
-  one pasteable block, and what is done with them afterwards is a separate
-  decision she has not made yet.
+  IT IS THE WORKLIST, NOT THE FRONT-END FEATURE. #722 also proposes a "chaos
+  only" filter and a ship mark reading `???`. Neither is built, and Helen ruled
+  them out for now on the day she asked for this page: "I don't actually require
+  the front-end feature."
+
+  THE PAGE STILL WRITES NOTHING. It reads drink files and never touches one, so
+  there is no path by which it edits a recipe behind a proofread (#367). It
+  emits Helen's answers as text; a human applies them.
+
+  IT WAS WORKED ONCE ALREADY, on 2026-09-05, the day it was built — 22 drinks,
+  two ratings and twenty "never made it". That pass is what put `made_before` in
+  the schema, so this page is now reading a field it caused to exist. It is
+  deliberately left in place rather than deleted: the collection grows by
+  ingest, every fresh drink lands with `ship: "QQ"`, and this is where they
+  queue up.
 
   "NO VERDICT" IS DERIVED FROM `ship_scale`, NOT FROM A LIST OF BAD VALUES.
   HANDOVER §9.9 is explicit about the cost of the other way: a template that
@@ -71,13 +80,23 @@ sitemap: false
    not a style choice. Liquid has no `push` and Jekyll's `where_exp` has no
    negation — its conditions do `contains` but never `not contains` — so
    "everything whose ship is NOT on the scale" cannot be expressed as a filter
-   chain. The same `unless` guards the count and the list, so they cannot
-   disagree. {% endcomment %}
+   chain. The same two guards run over the count and the list, so they cannot
+   disagree.
+
+   A DRINK SHE HAS NEVER MADE IS ANSWERED, NOT OUTSTANDING — 2026-09-05, the
+   day she worked this list. `made_before: false` IS the answer to "why is there
+   no rating here", so leaving those 20 on the page would hand her back the
+   questions she had just finished answering, which is how a worklist stops
+   being read. They are counted separately below instead. {% endcomment %}
 {% assign unrated_count = 0 %}
+{% assign unmade_count = 0 %}
 {% for drink in every_drink %}
-  {% unless scale contains drink.meta.ship %}
+  {% if drink.meta.made_before == false %}
+    {% assign unmade_count = unmade_count | plus: 1 %}
+  {% elsif scale contains drink.meta.ship %}
+  {% else %}
     {% assign unrated_count = unrated_count | plus: 1 %}
-  {% endunless %}
+  {% endif %}
 {% endfor %}
 
 <article class="dev-verdict">
@@ -93,8 +112,21 @@ sitemap: false
     out.
   </p>
 
+  {% if unmade_count > 0 %}
+    <p class="dev-note">
+      A further {{ unmade_count }} say <code>made_before: false</code> and are
+      not on this list. That is an answer, not a gap — they have no rating
+      because you have never made them. To pick one up again, flip its
+      <code>made_before</code> and it comes back here.
+    </p>
+  {% endif %}
+
   {% if unrated_count == 0 %}
-    <p class="dev-note"><strong>Nothing to do — every drink has a verdict.</strong></p>
+    <p class="dev-note">
+      <strong>Nothing to do.</strong> Every drink either has a rating on the
+      scale or says you have never made it. New drinks land here as they are
+      ingested.
+    </p>
   {% else %}
 
   <div class="dev-verdict-bar">
@@ -105,6 +137,7 @@ sitemap: false
 
   <ol class="dev-verdict-list">
     {% for drink in every_drink %}
+      {% if drink.meta.made_before == false %}{% continue %}{% endif %}
       {% if scale contains drink.meta.ship %}{% continue %}{% endif %}
 
       {% comment %} The id keeps the folder — `to-promote/caipirinha`, not

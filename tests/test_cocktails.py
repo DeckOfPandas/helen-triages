@@ -171,8 +171,23 @@ REQUIRED_INGREDIENT = {"generic"}
 # them would be two things to keep in step for no gain. `awaiting_fix` and
 # `proofread` are read by _plugins/publish_gate.rb the moment a drink is
 # promoted; `rewritten` is read by nothing and is Helen's own record.
-META_KEYS_IN_ORDER = ["ship", "date_last_edited", "rewritten", "awaiting_fix",
-                      "proofread"]
+#
+# `made_before` ARRIVED 2026-09-05 (issue #722) AND SITS FIRST DELIBERATELY. You
+# make a drink, and then you have an opinion about it -- so the block reads in
+# the order the facts happen, and `ship` is only a meaningful claim on a file
+# whose line above it says true. Helen, raising #722: "I know whether I've made
+# the drinks before, and I bet unrated ones I just haven't made. I want to
+# confirm these line by line." She confirmed all 22 on 2026-09-05 and the bet
+# was right 20 times.
+#
+# THE OTHER 104 ARE `true` BY INFERENCE, NOT BY HER SAYING SO ONE AT A TIME, and
+# the inference is the premise of #722 itself: a rung on `ship_scale` is a
+# verdict, and a verdict means she drank it. The 22 she ruled on are the ones
+# where that inference did NOT hold -- which is exactly why they were the ones
+# worth asking about. If a `true` here is ever wrong, it is one drink and one
+# word, not a schema problem.
+META_KEYS_IN_ORDER = ["made_before", "ship", "date_last_edited", "rewritten",
+                      "awaiting_fix", "proofread"]
 
 # The two flags the publish gate reads, and `rewritten` alongside them because
 # all three are booleans with the same trap.
@@ -4770,6 +4785,68 @@ def test_every_published_drink_names_a_rung_on_the_ship_scale():
           "has been made and judged (§9.5: an untried drink never publishes). "
           "The card's goodness mark is the word itself, so a published drink "
           "off the scale renders a ship with nothing beside it."
+    )
+
+
+def test_made_before_is_a_real_boolean():
+    """`meta.made_before` is unquoted true or false on every drink. Issue #722.
+
+    THE SAME TRAP AS THE GATE FLAGS and it is worth its own test rather than a
+    sixth entry in GATE_FLAGS: that constant names what
+    `_plugins/publish_gate.rb` reads, and this key is not read by the plugin.
+    Widening it to mean "booleans in meta" would make the name lie about the
+    gate, which is the one thing that list is for.
+
+    HELEN NAMED THE FAILURE MODE HERSELF when she raised #722 -- a guard should
+    fire if the field is "absent or not filled in or filled in with anything
+    other than true or false". A string "false" is the sharp one: it is truthy
+    everywhere that matters and looks correct in the file.
+    """
+    bad = []
+    for slug, fm in _load():
+        meta = fm.get("meta")
+        if not isinstance(meta, dict):
+            bad.append(f"{slug}: no `meta:` mapping")
+            continue
+        if "made_before" not in meta:
+            bad.append(f"{slug}: no `meta.made_before`")
+        elif not isinstance(meta["made_before"], bool):
+            bad.append(f"{slug}: {meta['made_before']!r} "
+                       f"({type(meta['made_before']).__name__})")
+    assert not bad, (
+        "Drink(s) whose `meta.made_before` is not unquoted true/false:\n  "
+        + "\n  ".join(bad)
+        + "\n\nHas Helen made this drink? Never quote the value, and never "
+          "leave it out -- absent is not false, it means nobody has asked."
+    )
+
+
+def test_every_published_drink_has_been_made():
+    """A promoted drink is one Helen has actually made. Issue #722.
+
+    THE OTHER HALF OF THE GUARD ABOVE, and the reason #722 wanted a field at
+    all. `ship` on the scale and `made_before: true` are not the same check
+    even though they will nearly always agree: the first says a verdict was
+    recorded, the second says there was a drink to have a verdict about. A
+    rating typed onto a drink she has never poured is exactly the state the
+    field exists to make impossible to publish, and it is invisible to the ship
+    check because "sure" is a perfectly good rung.
+
+    DRAFTS ARE EXEMPT, like the ship gate. 20 drafts say false today and that is
+    the honest state of a collection transcribed faster than it can be drunk.
+    """
+    offenders = []
+    for slug, front in _load_published():
+        if (front.get("meta") or {}).get("made_before") is not True:
+            made = (front.get("meta") or {}).get("made_before")
+            offenders.append(f"{slug}: meta.made_before is {made!r}")
+
+    assert not offenders, (
+        "Published drink(s) Helen has not made:\n  "
+        + "\n  ".join(sorted(offenders))
+        + "\n\nPromotion means the drink has been made and judged. Either she "
+          "has made it since -- flip the flag -- or it should not be in "
+          "`_cocktail_recipes/` yet."
     )
 
 
