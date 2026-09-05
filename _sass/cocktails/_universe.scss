@@ -253,16 +253,71 @@ $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
 // need to call `HTF.markChipRows()` alongside `HTF.fitCardNames()` — see the
 // note beside the attribute in cocktails/index.html.
 
-// --- narrow screens ----------------------------------------------------------
-// The label and the control keep their line and the offer drops beneath them,
-// full width of the (already narrow) column. Three columns of anything is not a
-// phone layout, and the offer is the part that needs the room.
+// =============================================================================
+// NARROWING, IN TWO STAGES — Helen, 2026-09-05: "please allow the line to stack,
+// first line name, second line ingredients. Keep the glass and the deal again
+// button. At even smaller widths, linebreak after 'the universe says…' as well."
+// =============================================================================
+// Stage one: the ingredients drop below the name. Stage two: the label drops
+// too. Nothing is ever hidden — the glass, the name, the ingredients and the
+// control are all present at every width, which is what "keep the glass and the
+// deal again button" asks for.
+
+// WHERE STAGE ONE STARTS, AND IT IS DERIVED RATHER THAN PICKED (tmp/universe_
+// width.py). Courier Prime is monospace at a 0.6em advance, so the row is
+// calculable: the fixed furniture is 329px (label 175, glass slot 37, the four
+// gaps 38, `deal again` 79) and an ingredient line worth showing at all — two
+// short items before the ellipsis — is another 173px. The name is what varies,
+// and the universe only ever deals from the 61 drinks at ship `yes` or better,
+// so it is THAT distribution that decides this: their names run 15 characters at
+// the median, 18 at the 75th percentile and 24 at the 90th, which need 735px,
+// 765px and 825px of viewport respectively once the layout's own 48px of padding
+// is counted. 820px is where the top decile of names stops leaving room for the
+// brackets to hold anything.
+//
+// IT EQUALS $header-stack-width AND IS NOT IT. That token is 820px because of
+// how wide `[ COCKTAILS ]` plus the nav is — a completely unrelated sum that
+// happens to land on the same number. Kept separate on purpose: the day a longer
+// site word moves that one, this must not move with it.
+$universe-stack-width: 820px;
+
+@media (max-width: $universe-stack-width) {
+  .universe-pick { flex-wrap: wrap; }
+
+  // A ZERO-HEIGHT FULL-WIDTH FLEX ITEM IS HOW YOU FORCE A LINE BREAK IN A FLEX
+  // ROW, and there is no other way to do it in CSS: `flex-wrap` breaks where the
+  // content happens to run out, and nothing else says "break HERE". Ordered
+  // between the name (2) and the ingredients (4), it cannot share a line with
+  // the name, so the name keeps line one and the ingredients start line two.
+  //
+  // The empty line it occupies costs nothing: `height: 0` and the row gap is 0
+  // (the `gap` on .universe-pick sets the column axis only).
+  //
+  // `::before` is free here because the pick stopped carrying `drink-card` —
+  // `::after` is already spoken for by the closing bracket.
+  .universe-pick::before {
+    content: "";
+    order: 3;
+    flex: 0 0 100%;
+    height: 0;
+  }
+}
+
+// STAGE TWO. The label and the control keep a line of their own and the offer
+// drops beneath them, full width of the (already narrow) column. Three columns
+// of anything is not a phone layout, and the offer is the part that needs the
+// room. The pick is still wrapping from the rule above, so the order down the
+// page is: label and deal again, then the glass and the name, then the
+// ingredients.
 @media (max-width: $index-stack-width) {
   .universe {
     grid-template-columns: 1fr auto;
     gap: $space-xs $space-sm;
   }
 
+  // Explicitly placed, which also fixes where the other two land: the label
+  // auto-places into row 1 column 1 ahead of it, and `deal again` — later in
+  // source order — takes row 1 column 2.
   .universe-pick {
     grid-column: 1 / -1;
     grid-row: 2;
