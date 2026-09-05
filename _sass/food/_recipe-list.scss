@@ -49,6 +49,19 @@
   justify-content: flex-start;
 }
 
+// THE ROW UNDER THE COUNT -- #729/#730's food half, 2026-09-05. The
+// shortlisted-only control left `.results-heading` for a line of its own when it
+// became a pill; _sass/food/_shortlist.scss carries the reason, and the
+// cocktails index made the same move the same day (`.drink-count-row`).
+//
+// The heading above keeps its own $space-sm bottom margin and this holds the
+// list off underneath -- one gap each rather than one doubled.
+.results-count-row {
+  display: flex;
+  align-items: baseline;
+  margin: 0 0 $space-lg;
+}
+
 .recipe-list {
   list-style: none;
   padding: 0;
