@@ -61,6 +61,7 @@ over-broad `rm -rf`. Tell agents to delete only what they created.
 | Punched lettering never worked dark-on-light | four tiers (display / heading / label / plain); food's highlight is a mid grey and its shadow faint; HELEN TRIAGES and the recipe title hard, other headings soft, everything under 1rem edge-only; FAQ questions match SERVES/PREP/COOK; [ COCKTAILS ] wears [ FOOD ]'s tape lettering | `_sass/shared/_rule.scss`, both `_rule.scss`, `LETTERING.md` |
 | Second typeface without a rule | Plex is for numbers you act on: amounts on both sites, chart readouts and ticks, calculator inputs and results; note labels back to Courier; Plex 700 dropped | `_sass/shared/_fonts.scss`, both palettes |
 | Drink page half-inverted, colours off-job | rebuilt to Helen's brief: glass large in the margin, name on the card tape, glass/garnish/ship it? meta, card chips, yvette-over-absinthe under Ingredients and Method and under each ingredient name, lagoon on Notes and its cards, pink suggestions, ink numerals, read it / make it slider, shared ship include | `_layouts/cocktail.html`, `_sass/cocktails/_cocktail.scss`, `_includes/cocktails/ship.html`, `assets/js/cocktail-make.js` |
+| Drink page, second pass (#720, #721, #652) | **2026-09-05**, eleven of Helen's rulings plus three follow-ups. Inline glass at every width and the margin layout deleted; glass centred in the head; title 2.6rem; tagline in ink with air; meta `1fr 1fr auto`; ship it? read-mode only and saying the rung's own words rather than the card's `yes²`; mood chips coloured at rest and linking to a pre-filtered index; ingredient underline gone; scaler one box and a `×` under the list, whole recipes only, target-ml box and bitters caveat deleted; shortlist under the toggle; footer's middle column. **Two margins that had silently stopped collapsing** cost 36px and 2rem on every drink page -- see HANDOVER §9.13. | `_layouts/cocktail.html`, `_sass/cocktails/*`, `_sass/shared/_layout.scss`, `assets/js/cocktail-scale.js`, `assets/js/cocktail-index.js`, `assets/js/filter-state.js` |
 | Section greens read as green on green (critical #4); headings smudged (#680); drink-page headings too small (#679 pt 4) | **2026-09-03.** A reposado-to-yvette ramp through pink (coral, hot pink derived in OKLCH) under the five index headings, ONE bar, the shared absinthe bar gone; each section's colour also on its chosen filter word and on the chip or band it lit on a card, so "magenta means matched everywhere" is reversed and cosmopolitan means HAS TO HAVE again; index headings 1.4rem / weight 400 / 0.14em, drink-page section headings 1.8rem / 400, punch kept on both. The mechanism: bold light-on-dark stems bloom into the punched highlight. `index-section-label` gained `$weight`. | `_sass/cocktails/_palette.scss`, `_sass/cocktails/_rule.scss` (heading-rule is single-bar now), `_sass/cocktails/_filters.scss`, `_sass/cocktails/_cards.scss`, `_sass/cocktails/_cocktail.scss`, `_sass/shared/_rule.scss` |
 | Drink page top (#679: title too big, no spare tape, meta crammed, headings small) | **2026-09-03.** Root cause of the first two: the h1 at `display: contents` still took the UA's `2em`, so the title rendered at double and the tape's em padding at half. Fixed with `font-size: 1em`; title 3.2rem (the rendered size Helen chose), the card's horizontal tape padding with 0.5em vertical, meta gap 5rem, glass absinthe / stroke 3 / floor 14rem, section headings absinthe over yvette (NOTES over lagoon), one yvette band under each ingredient name. Unseen on iPad until deployed. | `_sass/cocktails/_cocktail.scss` |
 
@@ -84,9 +85,13 @@ Each of these wants a candidates page, not an argument. Highest impact first.
 
 1. ~~The five section greens on the cocktails index~~ **Done 2026-09-03**,
    see §1. Three rounds on one candidates page: type, then colour, then card
-   language. The one loose end is the drink page's ingredient-name underline,
-   still yvette over absinthe per Helen's written brief while every heading
-   is single-bar; a drink-page bundle with a switch was published for her.
+   language. The loose end was the drink page's ingredient-name underline,
+   and it closed on **2026-09-05 by deletion rather than by decision**: Helen,
+   "we need to drop the violet underlines under ingredients because they look
+   like links. This means we can return the violet underline to join the
+   absinthe under the section titles." An underlined run of lowercase SANS is
+   how a hyperlink is drawn, and nothing in that list is one. The headings keep
+   their double rule; violette does one job again instead of two.
 2. ~~Cocktail filter words versus card chips~~ **Done 2026-09-04**: both
    directions shown on the real index; Helen, "100% cards take words". A
    card's moods are bare bold Courier words like the filter list, separated
@@ -141,7 +146,9 @@ Each of these wants a candidates page, not an argument. Highest impact first.
      answer. With no JS nothing gets a class and the ellipsis stays, which is
      the behaviour the page had before.
    - **The name's size goes through `--card-name-size` × `--card-name-scale`**,
-     so ONE step rule works on a card and on the drink page's 3.2rem title.
+     so ONE step rule works on a card and on the drink page's title (3.2rem
+     when this was written, **2.6rem since 2026-09-05** -- the column changed,
+     not the taste: the inline head is 10rem narrower than the margin head was).
      The tape's padding and left bleed are `em` of the title and follow the
      step for free; the right bleed is `rem` and deliberately does not.
    - **The ingredient clamp stays at two lines**, and the fix for a clamped
@@ -165,8 +172,12 @@ Each of these wants a candidates page, not an argument. Highest impact first.
    column's green; the magenta brackets stay hover-only. `_sass/cocktails/_cards.scss`.
 8. **Tablet — PARKED by Helen, 2026-09-04.** Nothing in this review was seen
    on an iPad. Breakpoints: 400, 600, 720, 820, 1180. She cooks and mixes at
-   1024 landscape and 768 portrait; the drink page's inline-glass layout
-   below 1180 is the least verified path. A page of iframes at 768 and 1024
+   1024 landscape and 768 portrait. The drink page's inline-glass layout was
+   the least verified path here -- and **since 2026-09-05 it is the ONLY
+   layout**: Helen chose it outright and the margin layout and its 1180px query
+   are deleted. That shrinks this risk rather than closing it. What made the
+   inline branch unverified was that nobody looked at it on purpose; now
+   everybody does, at every width. A page of iframes at 768 and 1024
    was built (`tmp/mock/tablet.py`, the §11.2.1 pattern) and she declined to
    use it: "viewport wrangling is never as good as just looking at it... It's
    not a showstopper to deploy something ugly, basically, as we can just fix
