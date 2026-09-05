@@ -10,8 +10,8 @@
 // Food's twin of all three is _sass/food/_shortlist.scss, and the store, the
 // wiring and the event are shared — only the colours and the card differ.
 //
-// GREY OFF, CHARISMATIC COSMOPOLITAN ON — Helen, 2026-09-04: "Text and active colour
-// charismatic-cosmopolitan on cocktails because it's a thing the user is choosing and
+// GREY OFF, WICKED WOOWOO ON — Helen, 2026-09-04: "Text and active colour
+// wicked-woowoo on cocktails because it's a thing the user is choosing and
 // that's the language", and "Grey for inactive". Neither is a new value.
 // $color-clear-text is $color-grey-mid, this site's de-emphasised UI text at
 // 6.50:1 on the ground; magenta is already what this site means by a reader's
@@ -60,10 +60,10 @@
   }
 
   &:hover,
-  &:focus-visible { color: $color-charismatic-cosmopolitan; }
+  &:focus-visible { color: $color-wicked-woowoo; }
 
   &.is-on {
-    color: $color-charismatic-cosmopolitan-deep;
+    color: $color-wicked-woowoo-deep;
     // Bold, matching `.cocktail-toggle-label.is-active` beside it: on this page
     // an active control is its colour AND its weight, and half of that
     // convention would read as a different kind of state.
@@ -243,7 +243,7 @@
 
   &:focus-visible {
     outline: none;
-    border-color: $color-charismatic-cosmopolitan;
+    border-color: $color-wicked-woowoo;
   }
 }
 
@@ -297,9 +297,9 @@
 }
 
 // PLEX, IN INK -- the site's own rule for a number you act on, 2026-09-04.
-// It opened in the Courier heading face in cosmopolitan, on the reasoning
+// It opened in the Courier heading face in woowoo, on the reasoning
 // that "the number is the fact you are shopping by, so it carries the colour
-// that means 'you chose this'". But cosmopolitan means HAS TO HAVE (the
+// that means 'you chose this'". But woowoo means HAS TO HAVE (the
 // matched ingredient, the bottle suggestion) and the site already has a
 // vocabulary for a quantity: `.cocktail-amount` on the drink page and the
 // ingredient amounts on food are $font-label at weight 600 in ink, tabular,
@@ -333,14 +333,14 @@
   color: $color-clear-text;
 }
 
-// THE BOTTLE IS COSMOPOLITAN — Helen, 2026-09-04, and it is the drink page's own
+// THE BOTTLE IS WOOWOO — Helen, 2026-09-04, and it is the drink page's own
 // `.cocktail-suggestion` colour rather than a new decision. _cocktail.scss states
-// the reason where it refuses the same hue to `optional`: "cosmopolitan
+// the reason where it refuses the same hue to `optional`: "woowoo
 // precisely BECAUSE a bottle name is a thing has-to-have matches against". The
 // bottle in a shopping list is the same claim — the thing you chose — so the two
 // pages say it the same way.
 .shopping-list-bottle {
-  color: $color-charismatic-cosmopolitan-deep;
+  color: $color-wicked-woowoo-deep;
 }
 
 // The whole-fruit count stays quiet. It is arithmetic this page did, not

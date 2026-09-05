@@ -846,11 +846,11 @@ $amount-indent: $amount-col + $amount-gap;
 // entries carry a suggestion, so it must not read as though the other 82% are
 // missing something.
 //
-// Charismatic-cosmopolitan, which is the same tie-back the class line used to make on
+// Wicked-woowoo, which is the same tie-back the class line used to make on
 // its own: that colour means ASKED FOR on the index, and a bottle name is the
 // other string the has-to-have field matches against.
 .cocktail-suggestion {
-  color: $color-charismatic-cosmopolitan-deep;
+  color: $color-wicked-woowoo-deep;
   font-size: 0.88rem;
 }
 
@@ -865,7 +865,7 @@ $amount-indent: $amount-col + $amount-gap;
 // and nothing on the index matches it, so it has no colour to tie back to —
 // every hue on this page means "this string is also a control somewhere", and
 // spending one here would make a promise the index cannot keep. Compare
-// `.cocktail-suggestion`, which is cosmopolitan precisely BECAUSE a bottle name
+// `.cocktail-suggestion`, which is woowoo precisely BECAUSE a bottle name
 // is a thing has-to-have matches against.
 .cocktail-optional {
   font-style: italic;
@@ -898,7 +898,7 @@ $amount-indent: $amount-col + $amount-gap;
 // against `.cocktail-ingredients`' own 34rem measure now, minus the margin
 // below, rather than against a percentage bound that no longer exists.
 .cocktail-type-line {
-  color: $color-charismatic-cosmopolitan-deep;
+  color: $color-wicked-woowoo-deep;
   font-size: 0.84rem;
   margin: 0.3rem 0 0 $amount-indent;
 }

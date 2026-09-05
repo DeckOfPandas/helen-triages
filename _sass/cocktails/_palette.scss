@@ -170,7 +170,14 @@ $color-electric-absinthe-wash: #1A342A;   // 14% of the hue over a card
 $color-raucous-reposado:      #F47E25;  // rule
 $color-raucous-reposado-deep: #F47E25;  // text  6.69:1 on a card
 
-// HAS TO HAVE. A Cosmopolitan.
+// HAS TO HAVE. A Woo Woo.
+//
+// NAMED WOO WOO, NOT COSMOPOLITAN, FROM 2026-09-05 -- the drink-name moved
+// so the HASSLE ramp's own hot-pink step (2/3 of the way to this hue
+// already, see the heading bars below) could inherit "cosmopolitan"
+// instead of the non-alcoholic flamingo it briefly wore. Everything below
+// about WHY this hue is here is unchanged -- it was always about the
+// colour, never about which drink's name sat on it.
 //
 // FOOD'S HOT MAGENTA SINCE 2026-09-01, replacing #F127A7. Helen: "could we
 // please use the hot magenta from the food site as our pink? I just can't get
@@ -189,8 +196,8 @@ $color-raucous-reposado-deep: #F47E25;  // text  6.69:1 on a card
 // here. The band that says "this matched" nearly disappears for a protanope
 // specifically BECAUSE the ground went black. Parked at Helen's call, with a
 // colour-vision mode as the shape she chose over compromising the hue.
-$color-charismatic-cosmopolitan:      #FF00C8;    // rule
-$color-charismatic-cosmopolitan-deep: #FF00C8;    // text  5.18:1 on a card
+$color-wicked-woowoo:      #FF00C8;    // rule
+$color-wicked-woowoo-deep: #FF00C8;    // text  5.18:1 on a card
 
 // HASSLE. Crème de Violette.
 //
@@ -224,10 +231,10 @@ $color-luminous-lagoon-deep: #2ED1EA;        // text  9.73:1 on a card
 // tinted rather than as a slightly different black.
 // Absinthe's own is declared with its hue above, because it is the glass
 // panel's colour rather than only a matched-state tint.
-$color-raucous-reposado-wash:        #36251C;
-$color-ultra-violette-wash:          #281B37;
-$color-charismatic-cosmopolitan-wash: #371432;
-$color-luminous-lagoon-wash:         #1A3137;
+$color-raucous-reposado-wash: #36251C;
+$color-ultra-violette-wash:   #281B37;
+$color-wicked-woowoo-wash:    #371432;
+$color-luminous-lagoon-wash:  #1A3137;
 
 // --- The heading bars --------------------------------------------------------
 // FIVE GREENS OVER ONE SHARED ELECTRIC ABSINTHE, and both halves are the
@@ -264,14 +271,16 @@ $color-luminous-lagoon-wash:         #1A3137;
 // read as green on green. Measured: each green sat between 1.25:1 and 1.9:1
 // against the absinthe bar beneath it.
 //
-// A RAMP FROM REPOSADO TO VIOLETTE THROUGH PINK, top of the page to bottom.
+// A RAMP FROM REPOSADO TO WOOWOO THROUGH PINK, top of the page to bottom.
 // Helen's own shape, chosen from a candidates page on the real index against
 // the five accents and a shades-of-cosmopolitan version: "the ramp colours
 // are gorgeous!" The two ends and the centre are palette colours already
 // doing these jobs -- YOLO is reposado because the ship mark is, HAS TO HAVE
-// is cosmopolitan because a matched ingredient is, I KNOW WHAT I WANT is
+// is woowoo because a matched ingredient is, I KNOW WHAT I WANT is
 // violette because the matched run of a title is (`.drink-name-hit`). MOOD
-// and HASSLE are the two even steps between reposado and cosmopolitan.
+// and HASSLE are the two even steps between reposado and woowoo -- HASSLE's
+// own step earning the name "cosmopolitan" in its own right below, since at
+// 2/3 of the way there it was already practically wearing a shade of one.
 //
 // INTERPOLATED IN OKLCH, NOT PICKED BY EYE, taking the short arc through red
 // rather than the long one through green, and gamut-clipped by pulling chroma
@@ -289,16 +298,24 @@ $color-luminous-lagoon-wash:         #1A3137;
 // NAMED 2026-09-05, having gone a couple of days as bare hex with only a
 // hue word in the comment ("coral", "hot pink") -- the two colours that had
 // fallen out of the drink-name convention every other accent on this site
-// uses. `$color-blazing-bellini` (a peach prosecco cocktail) and
-// `$color-flamboyant-flamingo` (the bird, not the colour) close that gap
-// without joining the accent table above -- they're still ramp-only.
+// uses. `$color-banging-bellini` (a peach prosecco cocktail) is the coral.
+//
+// THE HOT PINK WAS `$color-flamboyant-flamingo` FOR ABOUT A DAY, and came
+// off it the same day Helen caught the problem: a flamingo is a bird, not
+// a drink, and every other name on this site is alcoholic. It becomes
+// `$color-charismatic-cosmopolitan` instead -- a name freed up the same
+// day HAS TO HAVE moved to woowoo (above), and not an arbitrary landing
+// spot: this step already sits 2/3 of the way to that exact hue, so it was
+// practically wearing a shade of cosmopolitan before it had the name.
+//
+// Neither joins the accent table above -- they're still ramp-only.
 //
 // A SECTION'S COLOUR IS THE PROMISE THE CARD KEEPS -- THE RULE FROM THE TOP
 // OF THIS FILE, IN FORCE AGAIN FROM 2026-09-03, AND IT NOW REACHES THE
 // CHIPS. Each of the five is worn in exactly three places: the heading's
 // bar, the chosen filter word's underline beneath it, and the thing it lit
 // on a card -- a matched MOOD chip in coral, a matched HASSLE chip in hot
-// pink, a matched ingredient in cosmopolitan, the matched run of a title in
+// pink, a matched ingredient in woowoo, the matched run of a title in
 // violette, and the ship mark in reposado. Helen, looking at a card carrying
 // three of them at once: "There's a lot going on... But I genuinely think
 // it's really pretty!" It reads because the five are steps on one line, so
@@ -306,7 +323,7 @@ $color-luminous-lagoon-wash:         #1A3137;
 //
 // WHAT THIS REVERSES: 2026-08-30's "magenta means MATCHED everywhere"
 // (_cards.scss, _filters.scss), made when the headings were greens a chip
-// could not point back at. With a ramp it can, so cosmopolitan goes back to
+// could not point back at. With a ramp it can, so woowoo goes back to
 // meaning HAS TO HAVE alone. Hover keeps it for "this one" (§9.13); that is
 // a transient state and the one place two meanings share a hue.
 //
@@ -315,13 +332,13 @@ $color-luminous-lagoon-wash:         #1A3137;
 // and stops also meaning "this section", which it only ever meant for one of
 // the five. The shared absinthe bar under every heading went the same day:
 // see cocktails/_rule.scss's heading-rule.
-$color-blazing-bellini:    #FD6758;    // coral,    1/3 of the way to pink
-$color-flamboyant-flamingo: #FD5289;   // hot pink, 2/3 of the way
+$color-banging-bellini:        #FD6758;   // coral,    1/3 of the way to pink
+$color-charismatic-cosmopolitan: #FD5289; // hot pink, 2/3 of the way
 
 $color-heading-yolo:    $color-raucous-reposado;
-$color-heading-mood:    $color-blazing-bellini;
-$color-heading-hassle:  $color-flamboyant-flamingo;
-$color-heading-include: $color-charismatic-cosmopolitan;
+$color-heading-mood:    $color-banging-bellini;
+$color-heading-hassle:  $color-charismatic-cosmopolitan;
+$color-heading-include: $color-wicked-woowoo;
 $color-heading-name:    $color-ultra-violette;
 
 // Two washes for the derived steps -- 14% over a card, for a matched chip's

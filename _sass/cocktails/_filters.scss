@@ -530,7 +530,7 @@
   // rather than being out-specified, and the magenta band underneath keeps
   // saying the tag is chosen.
   &:hover:not(.is-on),
-  &:focus-visible:not(.is-on) { color: $color-charismatic-cosmopolitan; }
+  &:focus-visible:not(.is-on) { color: $color-wicked-woowoo; }
 }
 
 // --- the two ingredient fields -----------------------------------------------
@@ -666,7 +666,7 @@
   // change available to it and not to a bare filter word, so the box is the
   // thing to move.
   &:hover,
-  &:focus-visible { border-color: $color-charismatic-cosmopolitan; }
+  &:focus-visible { border-color: $color-wicked-woowoo; }
 
   // BANDS, DOES NOT FILL -- Helen, 2026-08-30: "has to have chips should show
   // magenta underline on select rather than fill in on select." The last fill
@@ -691,7 +691,7 @@
   // and now has the shape to itself.
   &.is-on {
     background: none;
-    border-color: $color-charismatic-cosmopolitan-deep;
+    border-color: $color-wicked-woowoo-deep;
     color: $color-text;
     font-weight: 600;
     text-decoration: none;
@@ -902,7 +902,7 @@
   text-decoration: underline;
   text-decoration-thickness: 0.16em;
   text-underline-offset: 0.16em;
-  text-decoration-color: $color-charismatic-cosmopolitan;
+  text-decoration-color: $color-wicked-woowoo;
 }
 
 // --- why this chip is here — #603 --------------------------------------------
@@ -955,7 +955,7 @@
 // carries luminous-lagoon, and §9.13's rule is that a heading's colour is a
 // promise the card already keeps. The band under the matched letters is the
 // answer to the lagoon heading that found them, the same way a matched
-// ingredient is the answer to the cosmopolitan one.
+// ingredient is the answer to the woowoo one.
 //
 // `mark` ARRIVES WITH A UA BACKGROUND -- Mark/MarkText, usually a hard yellow --
 // which is exactly the fill this design does not use anywhere. Both are reset
