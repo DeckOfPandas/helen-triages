@@ -1050,8 +1050,13 @@ def _rewritten_at(repo, rev, relpath):
     return (data.get("meta") or {}).get("rewritten")
 
 
-def _agent_claimed_rewrites(repo, pathspec):
+def _agent_claimed_rewrites(repo, pathspec, adjudicated=frozenset()):
     """Commits where an agent flipped `meta.rewritten` from false to true.
+
+    `adjudicated` holds short SHAs Helen has personally ruled on -- see
+    ADJUDICATED_REWRITES. They are skipped HERE rather than filtered by the
+    caller, so that the meta-test can ask this same function with an empty
+    set and get the unfiltered truth.
 
     Narrowed with `-G` before doing any real work: only commits whose DIFF
     touches a `rewritten:` line are candidates, so this stays a handful of
@@ -1075,8 +1080,78 @@ def _agent_claimed_rewrites(repo, pathspec):
             before = _rewritten_at(repo, f"{sha}^", relpath)
             after = _rewritten_at(repo, sha, relpath)
             if before is False and after is True:
+                if sha[:8] in adjudicated:
+                    continue
                 offenders.append(f"{sha[:8]}  {relpath}")
     return offenders
+
+
+# =============================================================================
+# COMMITS HELEN HAS PERSONALLY RULED ON. Her call, never an agent's. 2026-09-05.
+# =============================================================================
+# WHY THIS EXISTS AT ALL, and it is not a softening of the rule below. The scan
+# walks the WHOLE history, so ONE violation fails that test FOREVER: setting the
+# flag back to false does not clear it, and neither does Helen re-setting it
+# herself, because the offending commit still sits in history flipping
+# false -> true under an agent trailer. Without this list the only remedies are
+# rewriting a repo's history or leaving the suite permanently red -- and a
+# permanently red test is worse than no test, because the SECOND violation hides
+# behind the first.
+#
+# So the guard needed a way to record "looked at, ruled on, closed". Same bargain
+# `BASELINE_COMMIT` strikes for the proofread rule, and CLAUDE.md says the same
+# thing of it: the exception is Helen's to grant, never an agent's, and never to
+# make a red test go green.
+#
+# AN ENTRY IS A RULING, NOT A SUPPRESSION. Write what she decided and why, in her
+# own words where there are any. The meta-test below refuses an entry that no
+# longer matches anything, so this cannot quietly become a list of SHAs nobody
+# can account for.
+ADJUDICATED_REWRITES = {
+    "_food_drafts": {
+        "1fbd2f81": (
+            "sticky-squidge-ginger-loaf.md, 2026-09-05. Helen revised the "
+            "spice blend herself in f16035c and never flipped the flag; an "
+            "agent flipped it while fixing two typos in the same file. She "
+            "confirmed the prose IS hers, so the VALUE was already true and "
+            "stays true -- but it was still the wrong hand on the switch, "
+            "which is the whole of what this test is for."
+        ),
+    },
+}
+
+
+def _adjudicated(repo_key):
+    return frozenset(ADJUDICATED_REWRITES.get(repo_key, {}))
+
+
+def test_every_adjudicated_rewrite_still_offends():
+    """No dead entries in ADJUDICATED_REWRITES. Helen's rulings, kept honest.
+
+    A SHA that no longer flips `meta.rewritten` false -> true under an agent
+    trailer is dead weight, and dead weight in an exception list is how the list
+    stops being read -- the argument `WHOLE_COLLECTION_ONLY`'s own meta-test
+    makes, and the reason every `INVISIBLE_KEYS` entry says out loud why it
+    outlives its key.
+
+    It cannot check `_food_drafts` in CI, where the repo is absent. That is the
+    same blindness the test below documents, not a new one.
+    """
+    drafts = ROOT / "_food_drafts"
+    if not (DRAFTS_PRESENT and (drafts / ".git").exists()):
+        pytest.skip(
+            "`_food_drafts/` is not on this machine, so its adjudicated SHAs "
+            "cannot be looked up. Clone it to check this."
+        )
+
+    live = {line.split()[0] for line in _agent_claimed_rewrites(drafts, ".")}
+    stale = sorted(_adjudicated("_food_drafts") - live)
+    assert not stale, (
+        f"ADJUDICATED_REWRITES names commit(s) that no longer offend: {stale}\n\n"
+        "Either the history was rewritten or the SHA is wrong. Delete the "
+        "entry -- an exception nobody can account for is how an exception list "
+        "stops being read."
+    )
 
 
 def test_no_agent_commit_claims_helens_rewrite():
@@ -1098,7 +1173,8 @@ def test_no_agent_commit_claims_helens_rewrite():
     checked them.
 
     Zero violations existed when this was written, in either repository. It is a
-    regression guard, not a backlog.
+    regression guard, not a backlog -- and exactly ONE has happened since, on
+    2026-09-05, which is what ADJUDICATED_REWRITES above records.
 
     WHAT IT DELIBERATELY DOES NOT CATCH, said plainly rather than left to be
     found: a file CREATED by an agent already saying `rewritten: true`. Only a
@@ -1123,7 +1199,8 @@ def test_no_agent_commit_claims_helens_rewrite():
     """
     assert (ROOT / ".git").exists(), "Not a git checkout -- this test cannot run."
 
-    offenders = _agent_claimed_rewrites(ROOT, "_food_recipes/")
+    offenders = _agent_claimed_rewrites(ROOT, "_food_recipes/",
+                                        _adjudicated("_food_recipes"))
 
     drafts = ROOT / "_food_drafts"
     # Named so tests/test_suite_hygiene.py's registry can see this test reads
@@ -1132,7 +1209,8 @@ def test_no_agent_commit_claims_helens_rewrite():
     # called out in its own docstring; this opts in rather than widening it.
     if DRAFTS_PRESENT and ALL_DRAFTS and (drafts / ".git").exists():
         offenders += [f"_food_drafts/  {line}"
-                      for line in _agent_claimed_rewrites(drafts, ".")]
+                      for line in _agent_claimed_rewrites(
+                          drafts, ".", _adjudicated("_food_drafts"))]
 
     assert not offenders, (
         "An agent commit set `meta.rewritten: true`, which is Helen's claim "
