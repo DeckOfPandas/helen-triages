@@ -4743,48 +4743,65 @@ def test_display_scale_names_only_real_icons():
     )
 
 
-def test_every_published_drink_names_a_rung_on_the_ship_scale():
-    """A promoted drink has a verdict. Helen, 2026-08-30: "every cocktail we
-    publish must have the ship field filled in".
+def test_meta_ship_is_a_rung_or_who_knows():
+    """Every drink's `meta.ship` is a rung on `ship_scale` or the string
+    "who knows". `QQ` is not a ship value. Helen, 2026-09-05.
 
-    A PROMOTION GATE, deliberately, and drafts are exempt. 31 of the 114 drafts
-    say `QQ` or `who knows` today and that is a legitimate state -- it is the
-    shape of a drink not yet made up its mind about. What it cannot be is
-    published.
+    HER RULING, asked as a question and answered in the same breath: "Should
+    drinks I haven't made yet have ship who knows? I think that's clearer than
+    QQ or leaving it unset, because it's a positive presence."
 
-    THE COLLECTION ALREADY IMPLIED THIS AND NOTHING ENFORCED IT. §9.5 records
-    `meta.status` being retired because its only consumer was a "haven't tried"
-    bucket, "dropped rather than redefined, since an untried drink never
-    publishes". So promotion has always meant tried-and-judged; this is the
-    first thing that checks it.
+    THE ABSENCE MOVED TO A FIELD OF ITS OWN, which is what makes this possible.
+    `QQ` on a ship meant "nobody has asked" -- and since 2026-09-05
+    `made_before: false` says exactly that, positively, in a field whose whole
+    job is to. Two markers for one fact is how they drift; "who knows" is a
+    real value in the vocabulary and `QQ` is the absence of one.
 
-    IT IS ALSO NOW A RENDERING FACT, which is why it arrives with the ship. The
-    card's mark is the WORD, and a drink off the scale renders the icon with no
-    label beside it -- fine on a local draft, and on a published card it is a
-    rating that says nothing. Helen accepted the icon shifting slightly between
-    cards on the strength of every published drink having a word to shift it by.
+    THIS REPLACED TWO PUBLISHED-DRINK GATES AND IS STRONGER THAN BOTH, which is
+    the only reason deleting a publish gate was the right move rather than a
+    weakening:
 
-    `who knows` and `QQ` fail this deliberately even though `ship_tints` covers
-    them: tints exist so an off-scale value renders SOMETHING rather than
-    erroring, which is a different question from whether it may ship.
+      test_every_published_drink_names_a_rung_on_the_ship_scale -- Helen,
+          2026-08-30: "every cocktail we publish must have the ship field
+          filled in". "who knows" IS filled in, and reading that ruling as
+          "on the scale" is what this corrects. Its real content -- that ship
+          is never empty on a published drink -- is now guaranteed on EVERY
+          drink including the drafts it exempted, so there is nothing left for
+          a promotion-only version of it to catch.
+      test_every_published_drink_has_been_made -- deleted outright, and it was
+          never asked for. #722 wants a guard when `made_before` is "absent or
+          not filled in or filled in with anything other than true or false",
+          which is test_made_before_is_a_real_boolean below; it never said the
+          value had to be true. Helen, 2026-09-05: "made_before does not have
+          to be true for the recipe to publish. This isn't the same as food
+          recipes -- there's no prose except the tagline which I will always
+          write from scratch, so no copyright or author respect issue. It will
+          be much easier for me to browse drinks I want to try from the live
+          site than a local build."
+
+    SO AN UNMADE DRINK MAY PUBLISH, and that is the point rather than a
+    tolerated side effect: the live site is where she picks what to try next.
     """
     scale = set(_taxonomy().get("ship_scale") or [])
     assert scale, "taxonomy.yml has no `ship_scale:` to check against."
+    allowed = scale | {"who knows"}
 
     offenders = []
-    for slug, front in _load_published():
-        ship = (front.get("meta") or {}).get("ship")
-        if ship not in scale:
-            offenders.append(f"{slug}: meta.ship is {ship!r}")
+    for slug, fm in _load():
+        meta = fm.get("meta")
+        if not isinstance(meta, dict):
+            offenders.append(f"{slug}: no `meta:` mapping")
+            continue
+        if meta.get("ship") not in allowed:
+            offenders.append(f"{slug}: meta.ship is {meta.get('ship')!r}")
 
     assert not offenders, (
-        "Published drink(s) whose `meta.ship` is not a rung on the scale:\n  "
+        "Drink(s) whose `meta.ship` is not a rung or \"who knows\":\n  "
         + "\n  ".join(sorted(offenders))
-        + f"\n\nAllowed: {sorted(scale)}. `who knows` and `QQ` are legitimate "
-          "on a DRAFT and not on a published drink -- promotion means the drink "
-          "has been made and judged (§9.5: an untried drink never publishes). "
-          "The card's goodness mark is the word itself, so a published drink "
-          "off the scale renders a ship with nothing beside it."
+        + f"\n\nAllowed: {sorted(allowed)}. `QQ` is not one of them -- a drink "
+          "nobody has an opinion about says \"who knows\", which is a verdict "
+          "of sorts rather than a missing field, and `made_before: false` is "
+          "where 'she has never made it' is recorded."
     )
 
 
@@ -4801,6 +4818,11 @@ def test_made_before_is_a_real_boolean():
     fire if the field is "absent or not filled in or filled in with anything
     other than true or false". A string "false" is the sharp one: it is truthy
     everywhere that matters and looks correct in the file.
+
+    THE VALUE ITSELF GATES NOTHING, and this is the whole of what #722 asked
+    for. `false` is a publishable state -- see
+    test_meta_ship_is_a_rung_or_who_knows for Helen's 2026-09-05 ruling on why
+    a drink she has never made belongs on the live site.
     """
     bad = []
     for slug, fm in _load():
@@ -4818,35 +4840,6 @@ def test_made_before_is_a_real_boolean():
         + "\n  ".join(bad)
         + "\n\nHas Helen made this drink? Never quote the value, and never "
           "leave it out -- absent is not false, it means nobody has asked."
-    )
-
-
-def test_every_published_drink_has_been_made():
-    """A promoted drink is one Helen has actually made. Issue #722.
-
-    THE OTHER HALF OF THE GUARD ABOVE, and the reason #722 wanted a field at
-    all. `ship` on the scale and `made_before: true` are not the same check
-    even though they will nearly always agree: the first says a verdict was
-    recorded, the second says there was a drink to have a verdict about. A
-    rating typed onto a drink she has never poured is exactly the state the
-    field exists to make impossible to publish, and it is invisible to the ship
-    check because "sure" is a perfectly good rung.
-
-    DRAFTS ARE EXEMPT, like the ship gate. 20 drafts say false today and that is
-    the honest state of a collection transcribed faster than it can be drunk.
-    """
-    offenders = []
-    for slug, front in _load_published():
-        if (front.get("meta") or {}).get("made_before") is not True:
-            made = (front.get("meta") or {}).get("made_before")
-            offenders.append(f"{slug}: meta.made_before is {made!r}")
-
-    assert not offenders, (
-        "Published drink(s) Helen has not made:\n  "
-        + "\n  ".join(sorted(offenders))
-        + "\n\nPromotion means the drink has been made and judged. Either she "
-          "has made it since -- flip the flag -- or it should not be in "
-          "`_cocktail_recipes/` yet."
     )
 
 

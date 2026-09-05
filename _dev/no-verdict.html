@@ -87,7 +87,14 @@ sitemap: false
    day she worked this list. `made_before: false` IS the answer to "why is there
    no rating here", so leaving those 20 on the page would hand her back the
    questions she had just finished answering, which is how a worklist stops
-   being read. They are counted separately below instead. {% endcomment %}
+   being read. They are counted separately below instead.
+
+   SO THE TWO GUARDS ARE NOT REDUNDANT, THOUGH THEY LOOK IT. Every unmade drink
+   also says `who knows`, so today either test alone would produce the same
+   list. What the pair asks is the question that survives that coincidence:
+   "have you made it, and do you still owe it a verdict?" A drink she makes
+   tomorrow flips `made_before` and appears here with `who knows` intact —
+   which is exactly when it should. {% endcomment %}
 {% assign unrated_count = 0 %}
 {% assign unmade_count = 0 %}
 {% for drink in every_drink %}
@@ -104,12 +111,13 @@ sitemap: false
   <h1>Drinks with no verdict</h1>
 
   <p class="dev-note">
-    {{ unrated_count }} of {{ every_drink | size }} drinks carry a
-    <code>meta.ship</code> that is not on the scale in
-    <code>_data/cocktails/taxonomy.yml</code> — so nothing on the site has a
-    rating to show for them. Rate one, or say you have not made it. Answers are
-    kept in this browser as you click; the box at the bottom is how you get them
-    out.
+    {{ unrated_count }} of {{ every_drink | size }} drinks say you have made
+    them and still carry no rating — <code>meta.ship</code> is
+    <code>who knows</code> rather than a rung on the scale in
+    <code>_data/cocktails/taxonomy.yml</code>, so their cards show a mark with
+    no word beside it. Rate one, or say you have not made it after all. Answers
+    are kept in this browser as you click; the box at the bottom is how you get
+    them out.
   </p>
 
   {% if unmade_count > 0 %}

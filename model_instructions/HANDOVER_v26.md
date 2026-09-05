@@ -3425,12 +3425,39 @@ own it now lives beside that file instead.
   where `garnish.yml` and its rules are. `["no garnish"]` means DECIDED, `[]`
   means unfilled; the marker is spelled `no garnish`, not `none`, since
   2026-08-31.
-- **`meta.ship` is an ordered, tested vocabulary** — `ship_scale` in
+- **`meta.ship` is an ordered, tested, CLOSED vocabulary** — `ship_scale` in
   `_data/cocktails/taxonomy.yml`: `not really` < `meh` < `sure` < `yes` <
-  `oh gods yes`, with `who knows` and `QQ` deliberately OFF the scale (see the
-  file's own comment). `meta.status` is retired entirely; its only consumer
-  anywhere was `chaos`'s `haven't tried` bucket, and an untried drink never
-  publishes. §9.9 is where this vocabulary turned into a feature.
+  `oh gods yes`, with `who knows` deliberately OFF the scale (see the file's own
+  comment). **`QQ` IS NOT A SHIP VALUE, since 2026-09-05** — a drink Helen has
+  not made says `who knows`, and the "nobody has asked" that `QQ` used to carry
+  is now `meta.made_before: false`. Her ruling: "I think that's clearer than QQ
+  or leaving it unset, because it's a positive presence."
+  `test_meta_ship_is_a_rung_or_who_knows` holds it over every drink.
+  §9.9 is where this vocabulary turned into a feature.
+- **`meta.made_before` is a boolean and it GATES NOTHING** — issue #722,
+  2026-09-05. It must be real `true`/`false` on every drink and it sits first in
+  `meta:`, because you make a drink and then you have an opinion about it. **An
+  unmade drink MAY publish, and the drink side parts company with food here.**
+  Helen: "there's no prose except the tagline which I will always write from
+  scratch, so no copyright or author respect issue. It will be much easier for
+  me to browse drinks I want to try from the live site than a local build."
+  20 of 124 say `false`; the other 104 are `true` by inference from #722's own
+  premise (a rung is a verdict, and a verdict means she drank it), not because
+  she said so one at a time.
+  - **This retired two publish gates**, and the second was never asked for:
+    `test_every_published_drink_names_a_rung_on_the_ship_scale` (her
+    2026-08-30 "must have the ship field filled in" — `who knows` IS filled
+    in) and `test_every_published_drink_has_been_made`. Both are covered by
+    the closed vocabulary above, which checks drafts too.
+  - **The open consequence, unbuilt:** a published `who knows` card draws the
+    ship mark with no word beside it. #722's `???` is the intended answer and
+    needs `_includes/cocktails/ship.html` changed, not just a data line — it
+    gates the word on scale membership. Helen, 2026-09-05: "I don't actually
+    require the front-end feature."
+  - **`_dev/no-verdict.html`** is the worklist page: drinks she has made that
+    still have no rating. It writes nothing; she pastes its output back.
+- **`meta.status` is retired entirely**; its only consumer anywhere was
+  `chaos`'s `haven't tried` bucket.
 - **`tests/test_cocktails.py` is the cocktails suite** — glasses, generics,
   bottles, moods, methods, garnishes, the `measures:` amount table.
   `tests/conftest.py`

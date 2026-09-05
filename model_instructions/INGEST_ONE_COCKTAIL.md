@@ -113,7 +113,7 @@ source: "Difford's"
 source_url: "https://..."
 meta:
   made_before: false
-  ship: "QQ"
+  ship: "who knows"
   date_last_edited: "2026-09-02"
   rewritten: false
   awaiting_fix: false
@@ -140,8 +140,8 @@ meta:
 | `to_serve` | **Serveware only** — what the drink is served WITH. `"Straw."`, `"Two straws."`, `"Ladle and punch glasses."` A terse noun phrase, or `""`. **Never the ice** — that is `serve.ice`. |
 | `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s and replaces the label with a real heading and the text with her own words. A bare string is legal in the schema but not for an ingest. Use one to record what the source could not give you. |
 | `source` / `source_url` | Free text here, unlike food. `"Difford's"`, `"Death & Co"`. `source_url` may be `""`. |
-| `meta.made_before` | Has Helen made this drink? **Always `false` on a fresh ingest** — unquoted, never `"false"`. It is the fail-closed default and it pairs with `ship: "QQ"`: a drink nobody has poured cannot have a verdict. She flips it herself when she makes it. Issue #722. |
-| `meta.ship` | Helen's rating. **Always `"QQ"`** — you have not drunk it and neither has she. |
+| `meta.made_before` | Has Helen made this drink? **Always `false` on a fresh ingest** — unquoted, never `"false"`. A transcription cannot know whether she has poured it, and this is the field that says so. She flips it herself when she makes it. Issue #722. |
+| `meta.ship` | Helen's rating. **Always `"who knows"`, never `"QQ"`** — you have not drunk it and neither has she, and `QQ` is not a ship value. Helen, 2026-09-05: "I think that's clearer than QQ or leaving it unset, because it's a positive presence." The pair reads straight: she has not made it, so she has no idea. |
 | `meta.date_last_edited` | Today's date, `YYYY-MM-DD`. |
 | `meta.rewritten` / `meta.awaiting_fix` / `meta.proofread` | **Exactly these three, in this order, all `false`, unquoted.** The same publish gate a food recipe carries (since 2026-09-02). `rewritten` and `proofread` are Helen's own claims about her own work and you never set either `true`; `awaiting_fix: false` is what lets a drink publish once she has, and `false` unquoted is the only value that works. Underscore, never a hyphen. |
 
@@ -601,10 +601,10 @@ sauté · sautés · sautéed · soufflé · soufflés · velouté
 
 - **Never guess a `generic` or a `suggestion`.** Both are `QQ`, every time.
 - **Never invent `meta.ship`** — that is Helen's rating of a drink she has
-  drunk.
+  drunk. `"who knows"` is the only value an ingest writes, and **never `"QQ"`**:
+  `QQ` is not in the ship vocabulary at all.
 - **Never write `meta.made_before: true`** — same reason, one step earlier. A
-  transcription cannot know whether she has poured the drink, and `true` is the
-  half that lets it publish.
+  transcription cannot know whether she has poured the drink.
 - **Never write a `mood:`** — derived or hers.
 - **Never write a `character:`** — it hangs off a `generic` you are not writing.
 - **Never leave a US unit**, and never convert a non-volumetric one.
@@ -688,7 +688,7 @@ source: "QQ"
 source_url: ""
 meta:
   made_before: false
-  ship: "QQ"
+  ship: "who knows"
   date_last_edited: "2026-09-02"
   rewritten: false
   awaiting_fix: false
