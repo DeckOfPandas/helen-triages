@@ -139,10 +139,6 @@ bottles:
     size_ml: 700
     gbp: 42
     confidence: medium
-  "El Dorado 151":
-    size_ml: 700
-    gbp: 45
-    confidence: low
   "Skipper's":
     size_ml: 700
     gbp: 22
@@ -724,6 +720,19 @@ generics:
   coconut cream:      { gbp_per_litre_min: 5.00,  gbp_per_litre_max: 7.50,  basis: "GBP 2-3 / 400ml tin", confidence: medium }
 
   # --- a real category: the range is the span of what you might buy ------------
+  # `overproof Demerara rum` JOINED THIS BLOCK ON 2026-09-05, when El Dorado 151
+  # went to bottles.yml's `not_reached_for` -- Helen: "I don't own it, I just
+  # wanted to, but it looks like it's hard to get." It was the only bottle in
+  # the category, so the category lost its price with it, and two drinks still
+  # pour it (pic-a-de-crop-punch's 360 ml, zombie-intoxica's 15 ml).
+  #
+  # PRICING A CATEGORY SHE CANNOT CURRENTLY BUY IS THE CONSISTENT ANSWER, not a
+  # contradiction. 78 of the 154 categories in use have no bottle behind them
+  # and every one of them is priced here; champagne two lines down is no more
+  # "on the shelf" than this is. The fallback answers "what would a litre of
+  # this cost", which has an answer whether or not a bottle is open. The RANGE
+  # is wide and deliberately so: scarcity is exactly what she ran into.
+  overproof Demerara rum: { gbp_per_litre_min: 57.14, gbp_per_litre_max: 85.71, basis: "GBP 40-60 / 70cl, scarce in the UK", confidence: low }
   champagne:          { gbp_per_litre_min: 29.33, gbp_per_litre_max: 53.33, basis: "GBP 22-40 / 75cl", confidence: medium }
   prosecco:           { gbp_per_litre_min: 10.67, gbp_per_litre_max: 18.67, basis: "GBP 8-14 / 75cl", confidence: medium }
   red wine:           { gbp_per_litre_min: 9.33,  gbp_per_litre_max: 16.00, basis: "GBP 7-12 / 75cl", confidence: medium }

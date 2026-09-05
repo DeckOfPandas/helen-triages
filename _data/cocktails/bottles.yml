@@ -144,12 +144,16 @@ bottles:
   "El Dorado 12 year old rum":
     generic: "aged Demerara rum"
     aliases: ["El Dorado 12"]
-  "El Dorado 151":
-    generic: "overproof Demerara rum"
-    aliases: ["El Dorado 151 rum"]
-    # Helen, 2026-08-27: the ONLY bottle in this category, and on the shopping
-    # list rather than on the shelf. Wanted counts as reached-for; see
-    # `not_reached_for` for what does not.
+  # EL DORADO 151 WAS HERE AND IS NOW IN `not_reached_for` -- Helen, 2026-09-05.
+  # It was the one bottle admitted on the strength of wanting it rather than
+  # owning it ("wanted counts as reached-for"), and she withdrew that: "I don't
+  # own it, I just wanted to, but it looks like it's hard to get."
+  #
+  # SO `overproof Demerara rum` NOW HAS NO BOTTLE AT ALL, which is a normal
+  # state -- 78 of the 154 categories in use are in it -- and not a reason to
+  # retire the generic. Two drinks still call for it (pic-a-de-crop-punch,
+  # zombie-intoxica) and Helen is rethinking both; the category is what those
+  # drinks want, whatever ends up filling it. costs.yml prices it as a category.
   "Skipper's":
     generic: "aged Demerara rum"
     aliases: ["Skippers dark rum", "Skippers"]
@@ -688,8 +692,10 @@ bottles:
   # ================= GABRIEL BOUDIER, 2026-09-04 =============================
   # Four products, named by Helen the same way as the Briottets. TWO ARE USED BY
   # NO DRINK and are here anyway, which is this file's oldest rule: it lists
-  # what she would POUR, not what the collection happens to cite (El Dorado 151,
-  # Myers, Wood's, Sazerac).
+  # what she would POUR, not what the collection happens to cite (Myers, Wood's,
+  # Sazerac). El Dorado 151 was the fourth example here until 2026-09-05 and is
+  # now the counter-example: it went to `not_reached_for` precisely because she
+  # would not pour it.
   "Gabriel Boudier Crème de Banane":
     generic: "crème de banane"
     # REEF JUICE'S `item` SAYS GIFFORD AND THE SUGGESTION STAYS BOUDIER, on the
@@ -837,6 +843,16 @@ bottles:
 # QUALIFIES, DELIBERATELY NOT REACHED FOR -- the reason attached, as family_less
 # =============================================================================
 not_reached_for:
+  "El Dorado 151": >-
+    Clears the Demerara appellation and was listed here until 2026-09-05 on the
+    strength of being WANTED rather than owned -- the one bottle this file ever
+    admitted on that basis. Helen withdrew it: "I don't own it, I just wanted
+    to, but it looks like it's hard to get and I'll need to figure out my drinks
+    in another way." So the "wanted counts as reached-for" clause is gone with
+    it, and this list means what it always meant: what she would POUR. It leaves
+    `overproof Demerara rum` with no bottle behind it, which two drinks still
+    ask for -- pic-a-de-crop-punch, whose 360 ml was the single largest pour of
+    any bottle in the collection, and zombie-intoxica. Both are hers to rework.
   "Lemon Hart 151": >-
     Clears the Demerara appellation and is out anyway. Helen, 2026-08-27: "I
     don't like Lemon Hart 151, never mind whether or not I could get hold of it

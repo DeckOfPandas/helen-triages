@@ -2519,10 +2519,17 @@ def test_every_suggested_bottle_resolves():
     """Every `suggestion` names a bottle this file knows -- #529/#534.
 
     THE DIRECTION THAT MATTERS. Nothing requires a bottle to be used by a drink
-    -- Helen owns bottles no recipe names, and El Dorado 151 is on the shopping
-    list -- but a SUGGESTION that resolves to nothing is a bottle the site
-    cannot reason about, and #534's cross-category check silently skips it.
-    Half a check is worse than none, because it reports a clean run.
+    -- Helen owns bottles no recipe names, Myers and Wood's among them -- but a
+    SUGGESTION that resolves to nothing is a bottle the site cannot reason
+    about, and #534's cross-category check silently skips it. Half a check is
+    worse than none, because it reports a clean run.
+
+    THE EXAMPLE HERE USED TO BE EL DORADO 151, "on the shopping list", and it
+    stopped being true on 2026-09-05: Helen moved it to `not_reached_for` --
+    "I don't own it, I just wanted to, but it looks like it's hard to get."
+    A docstring example that has quietly become false is the same species of
+    stale as the entry test_unresolved_suggestions_has_no_stale_entries exists
+    to catch, so it was changed rather than left to read plausibly.
 
     THE WORD "rum" CAME OUT OF THAT FIRST LINE ON 2026-08-30, and it had been
     doing a lot of quiet work: 54 of the collection's 91 distinct suggestions
@@ -2563,9 +2570,8 @@ def test_unresolved_suggestions_has_no_stale_entries():
     written with the same string.
 
     NOT THE REVERSE. A bottle in `bottles` need not be used -- Helen owns
-    bottles no recipe names, and El Dorado 151 is on the shopping list. This
-    asks only about `unresolved_suggestions`, which is a list of live problems
-    by definition.
+    bottles no recipe names, Myers and Wood's among them. This asks only about
+    `unresolved_suggestions`, which is a list of live problems by definition.
     """
     _require_whole_collection("unresolved_suggestions")
     data = _bottles()
