@@ -1,66 +1,58 @@
 // =============================================================================
-// THE UNIVERSE SAYS — one random drink, dealt above the filter panel
+// THE UNIVERSE SAYS — one random drink, offered as a single line above the panel
 // =============================================================================
-// Helen, 2026-09-02, from the fold mockups: the index opened with a
-// screenful of questions and no answer, so this offers one random survivor
-// before you have filtered anything, with a "deal again" control.
+// Helen, 2026-09-02, from the fold mockups: the index opened with a screenful of
+// questions and no answer, so this offers one random survivor before you have
+// filtered anything, with a control to deal again.
 //
-// THE PICK IS A CARD, SINCE 2026-09-04 — a real `.drink-card`, not three parts
-// lifted out of one. assets/js/universe.js copies a random card's body and
-// foot into `.universe-pick`, and the pick itself carries the `drink-card`
-// class in the template, so _sass/cocktails/_cards.scss's rules apply to it:
-// the tape, the ingredient line, the moods, the ship mark, the hover
-// brackets. What follows is the FRAME around it, and (at the foot of this
-// file) the handful of overrides that collapse the card's fixed box.
+// A LINE, NOT A CARD, SINCE 2026-09-05 — issues #719, #714, #693. It was a
+// collapsed `.drink-card` in the right-hand column for a day. Four rounds of
+// candidates on the real index took the box away entirely; Helen, on the version
+// with no frame at all: "the line layout is really working for me. Really
+// really… it's less obtrusive than a box and I think that's what I like about
+// it." So what is left of the card is its type, its tape and its colours, and
+// nothing of its geometry.
 //
-// THE SAME FEATURE CAME OFF FOOD THE SAME DAY. Helen: "I find the cocktail one
-// almost fine, actually, and I think we can get there with styling. I am
-// almost always more open to persuasion about what I drink than what I eat.
-// Pop it on a card, and move it to the right-hand column." So: the label and
-// `deal again` stand in a narrow left column, the card is dealt into the wide
-// one beside them, and the panel of five questions follows. A first pass she
-// intends to pick up again; the numbers below are a starting point, not a
-// ruling.
+// THE WHOLE SECTION IS ONE ROW READING ACROSS: the label, then the offer, then
+// `deal again` at the far right. That last column is also the whole of #693 —
+// the control used to sit beneath the label in a column of its own, so the eye
+// read the two down the page as "the universe says deal again" (Helen: "lol").
+// Moving it to the end of the same row dissolves the sentence rather than
+// renaming anything, and it is her placement: "the deal again will need to go on
+// the far right, where it is, but in the same row as the universe line. This
+// takes up some ingredients room, but that's fine."
 //
-// LABEL LEFT, CARD RIGHT, IN A GRID. A full-width block above the panel
-// "demands attention and I'm not sure what it wants me to do" (Helen, of the
-// food version); a label in its own column says what the thing beside it is.
+// IT IS CAPPED, AND THAT IS THE DESIGN. Helen ruled out a full-width offer
+// outright — "I want it to be a happy invitation" rather than the page's best
+// real estate — so the middle column takes what is left after the label and the
+// control, and the ingredients truncate into it rather than the row growing.
+//
+// THE SAME FEATURE CAME OFF FOOD ON 2026-09-04 and must not come back there
+// (DESIGN_PLAN §2, her words). Helen kept this one: "I am almost always more
+// open to persuasion about what I drink than what I eat."
+// =============================================================================
+
+// THREE COLUMNS: label, offer, control. `auto` on the outsides and
+// `minmax(0, 1fr)` in the middle is what makes the truncation work — a bare
+// `1fr` has an `auto` minimum, so the ingredient line would push the row wider
+// instead of ellipsising inside it.
+//
+// `align-items: baseline` so the label, the name and the ingredients sit on one
+// line of type. The glass opts out of it; see its own rule.
 .universe {
   display: grid;
-  grid-template-columns: minmax(9rem, 1fr) minmax(0, 2.2fr);
-  gap: $space-lg $space-xl;
-  align-items: start;
-  margin: $space-sm 0 $index-section-gap;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: $space-xs $space-md;
+  margin: $space-xs 0 $index-section-gap;
 }
 
-// One column on a phone: label and control on a line, the card beneath.
-@media (max-width: $index-stack-width) {
-  .universe {
-    grid-template-columns: 1fr;
-    gap: $space-sm;
-  }
-  .universe-row {
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: space-between;
-    padding-top: 0;
-  }
-}
-
-// EMPTY UNTIL THE SCRIPT RUNS — absent JavaScript there is nothing to show
-// and no half-built pick to leave on the page.
+// EMPTY UNTIL THE SCRIPT RUNS — absent JavaScript there is nothing to show and
+// no half-built offer to leave on the page. universe.js also returns before
+// unhiding when its row selector matches nothing, which is what production will
+// do until a drink with ship `yes` or better is promoted.
 .universe[hidden] {
   display: none;
-}
-
-// The left column: label above, `deal again` beneath it, both starting at the
-// top so they sit level with the card's own first line.
-.universe-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $space-sm;
-  padding-top: $space-md;
 }
 
 .universe-label {
@@ -73,14 +65,16 @@
 }
 
 // Food has a shared placeholder for "a button that looks like a body link"
-// (%link-button, _sass/food/_recipe-header.scss); cocktails has no such base
-// to reach, so its four resets are replicated by hand here instead of
-// invented differently. Colour is $color-accent resting, magenta on hover --
-// §9.13's rule that magenta means "this one" on hover site-wide.
+// (%link-button, _sass/food/_recipe-header.scss); cocktails has no such base to
+// reach, so its four resets are replicated by hand here rather than invented
+// differently. Colour is $color-accent resting, magenta on hover — §9.13's rule
+// that magenta means "this one" on hover site-wide.
 .btn-universe-again {
+  justify-self: end;
   font-family: $font-body;
   font-weight: 600;
   font-size: 0.82rem;
+  white-space: nowrap;
   -webkit-text-stroke: 0;
   text-shadow: none;
   letter-spacing: 0;
@@ -96,38 +90,181 @@
   }
 }
 
-// THE PICK IS A `.drink-card` (the template puts the class on it) WITH THE
-// BOX COLLAPSED. A list card is a fixed 12.9rem tall so that every anchor on
-// it sits in the same place card after card; a single dealt card has no
-// neighbours to line up with, and at full height it was, Helen: "farrrr too
-// big... a nudge not an iceberg. Goal is half the height or even less." So:
-// no glass (the template does not clone it), height from content, the foot
-// back in flow beneath the body instead of pinned to a bottom edge, one line
-// of ingredients, one row of moods. The tape, the type and the colours are
-// untouched -- they are what make it read as a card of the list below.
+// =============================================================================
+// THE PICK — a flat row of three cloned parts
+// =============================================================================
+// IT IS FLAT ON PURPOSE, AND THAT IS WHAT MAKES THE GLASS PLACEABLE. The
+// section's `data-universe-parts` names `.drink-card-name`, `.drink-card-glass`
+// and `.drink-card-ingredients` individually rather than naming the card's
+// `.drink-card-body` wrapper, so all three arrive as direct children here and a
+// flex `order` can put the glass on either side of the tape. Cloning the body
+// would have made the glass a sibling of the whole block, able to sit beside it
+// and never inside the row. universe.js copies parts in the order the ATTRIBUTE
+// lists them rather than in document order, so that attribute is the entire
+// mechanism and this file only has to lay out what arrives.
 //
-// THE BASICS ONLY, on Helen's instruction; she is taking this to another
-// session to refine. Every number here is a first guess and is hers to move.
+// THE PICK NO LONGER CARRIES `drink-card`, either, and dropping it deleted five
+// overrides. It was there so _cards.scss would style the tape and the ingredient
+// line — but every one of those rules is written against the CHILD class and
+// none needs a `.drink-card` ancestor (checked across the compiled stylesheet).
+// All the class contributed was a fixed 12.9rem height, a border, a surface
+// fill, card padding and two painted panel strips on `::after` — and `::after`
+// is needed here for the closing bracket.
+//
+// `nowrap` is load-bearing: the whole ellipsis rule below assumes one line.
 .universe-pick {
-  width: 100%;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
   min-width: 0;
-  height: auto;
-  // Left padding leaves room for the tape's own 1.05em left bleed
-  // (_cards.scss, $card-tape-bleed), which on a list card lands on the glass
-  // column and here would otherwise touch the border.
-  padding: 0.7rem 1.15rem 0.7rem 1.45rem;
+  gap: 0 $space-xs + 0.15rem;
+}
 
-  .drink-card-ingredients {
-    -webkit-line-clamp: 1;
+// --- the tiny glass ----------------------------------------------------------
+// Helen's idea, 2026-09-05 — "crazy idea: please try drawing a tiny glass to the
+// left of the name tape" — and then, having seen it: "the glass is working
+// amazingly."
+//
+// ONE HEIGHT FOR EVERY GLASS ("don't scale -- all the same height"), which is
+// deliberately the opposite of the card's rule. On a card the drawing is the
+// column's subject and its true relative height is information: a Collins really
+// is taller than an old-fashioned, and cocktails/index.html maps that ratio onto
+// 0.5–1.0. Here it is a mark at the head of a line, and a mark that changes size
+// between deals reads as a wobble rather than as a fact. So `--glass-ratio` and
+// `--glass-cheat`, which the card multiplies together, are BOTH bypassed by
+// setting the height outright on the svg.
+//
+// A FIXED SLOT, WIDER THAN THE WIDEST DRAWING ("leave a fixed width for the
+// glass so the name tape doesn't jump around on redeal"). This is the cost of
+// the rule above and the two genuinely pull against each other: one height
+// across the 27 drawings means the WIDTHS diverge by 5.4×, from the flute's
+// 0.280 to the punch bowl's 1.505 (width over height, measured off the viewBoxes
+// by tmp/glass_aspect.py, not guessed). A slot narrower than the punch bowl
+// would cap it and render it shorter than the rest — breaking "all the same
+// height" in order to keep "don't jump". So the slot clears the widest drawing
+// at this height, and a flute sits in a slot five times its own width. That
+// space is what a still tape costs.
+//
+// THE 14 GLASSLESS DRINKS COST NOTHING: cocktails/index.html already renders an
+// empty `.drink-card-glass` span when no drawing matches, precisely so a card's
+// title cannot move, and the same span holds this slot open.
+//
+// CENTRED ON THE TAPE, not on the baseline the rest of the row shares — Helen:
+// "centre vertically aligned with the centre of the tape." `align-self: center`
+// is EXACT here rather than approximate, and only because of what else is in the
+// row: the tape's band is 32px ($card-tape-pad-y is 0.75em around 10.4px
+// capitals) against the ingredient line's ~20px, so the tape is what sets the
+// flex line's height, and centring in the line is centring on the tape. If
+// anything taller ever joins this row that stops being true.
+$universe-glass-height: 1.4rem;
+$universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
+
+.universe-pick .drink-card-glass {
+  order: 1;
+  flex: none;
+  position: static;
+  width: $universe-glass-slot;
+  max-width: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+
+  // The card's painted panel strip has nothing to sit on here.
+  &::after { content: none; }
+
+  svg {
+    height: $universe-glass-height;
+    width: auto;
+    max-width: 100%;
   }
 
-  .drink-card-foot {
-    position: static;
-    margin-top: 0.45rem;
+  // THE STROKE HAS TO COME DOWN, and this is issue #650 arriving early on one
+  // element. The artwork strokes with `vector-effect: non-scaling-stroke`, so a
+  // weight chosen against a 166px drawing is the SAME NUMBER OF SCREEN PIXELS on
+  // a 22px one — proportionally about seven times heavier, which reads as a blob
+  // rather than as a glass. A card uses 1; Helen chose 0.7 here off a switch
+  // carrying 0.5, 0.7 and the card's own 1.
+  .glass-icon-line { stroke-width: 0.7; }
+}
+
+// --- the name ----------------------------------------------------------------
+// NO BRACKETS ROUND THE TAPE. A round of candidates put square ones there,
+// reading "[ name on tape ]" literally; Helen took them off — "my fault for how
+// I explained, but no square brackets around the tape please." The tape is
+// already a bracketing device, a band the name sits on, so a second one outside
+// it said the same thing twice.
+//
+// `flex: none` so the tape is never squeezed. The name is the answer the line
+// exists to give; the ingredients are the gloss, and they are what gives way.
+// It also keeps card-name-fit.js out of this element's business: at max-content
+// the tape word cannot overflow, so no step or wrap class is ever applied here.
+.universe-pick .drink-card-name {
+  order: 2;
+  flex: none;
+  margin: 0;
+}
+
+// --- ( the ingredients, cut off inside the closing bracket ) ------------------
+// Helen: "where ingredients need to cut off, end with an ellipsis then a closing
+// round bracket."
+//
+// THE CLOSING BRACKET CANNOT LIVE IN THE TRUNCATING BOX, and that is the whole
+// trick. `text-overflow: ellipsis` clips at the box's own edge, so an `::after`
+// on this element would be clipped away with the very text it is there to close
+// — the reader would get `(gin · campari · sweet…` and no bracket at all. So the
+// OPENING bracket rides inside the box, where being the first character makes it
+// the last thing that could ever be cut, and the CLOSING one is a separate flex
+// item on the pick, ordered to land immediately after. `flex: 0 1 auto` — shrink,
+// never grow — is what keeps it against the ellipsis instead of pushed out to
+// the column's far edge.
+//
+// `display: block` overrides the card's `-webkit-box`: line clamping and
+// text-overflow are two different mechanisms and the box wins if it is left in.
+.universe-pick .drink-card-ingredients {
+  order: 4;
+  flex: 0 1 auto;
+  min-width: 0;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+
+  &::before { content: "("; color: $color-clear-text; }
+}
+
+// The closing bracket. $color-clear-text on both, so the pair structures the
+// line without competing with the tape — the same job, and the same weight, that
+// the ingredient line's own middle dot already does.
+.universe-pick::after {
+  content: ")";
+  order: 5;
+  flex: none;
+  color: $color-clear-text;
+  font-size: 0.82rem;   // matches .drink-card-ingredients
+}
+
+// --- what is deliberately not here -------------------------------------------
+// NO SHIP MARK AND NO MOODS, both Helen's call on 2026-09-05 ("no ship mark";
+// "moods off, decision made"). They are absent from `data-universe-parts` rather
+// than hidden here: the card's foot is simply not cloned, so there is nothing in
+// the DOM for a rule to switch off. If it is ever cloned again, universe.js will
+// need to call `HTF.markChipRows()` alongside `HTF.fitCardNames()` — see the
+// note beside the attribute in cocktails/index.html.
+
+// --- narrow screens ----------------------------------------------------------
+// The label and the control keep their line and the offer drops beneath them,
+// full width of the (already narrow) column. Three columns of anything is not a
+// phone layout, and the offer is the part that needs the room.
+@media (max-width: $index-stack-width) {
+  .universe {
+    grid-template-columns: 1fr auto;
+    gap: $space-xs $space-sm;
   }
 
-  .drink-card-moods {
-    max-height: $chip-line;
-    margin-bottom: 0;
+  .universe-pick {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 }
