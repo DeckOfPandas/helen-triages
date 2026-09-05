@@ -799,6 +799,24 @@
   // together at the start and only the legend moves to the edge.
   display: flex;
   align-items: baseline;
+
+  // THE SPACE BETWEEN "125" AND "survivors" IS THIS, AND NOTHING ELSE -- #675.
+  // It read `125survivors`, and the markup was never at fault: there is a
+  // newline and four spaces between the two elements in cocktails/index.html.
+  // A FLEX CONTAINER DISCARDS WHITESPACE BETWEEN ITS ITEMS -- a text node that
+  // is only whitespace never becomes a flex item -- so the moment this line
+  // went `display: flex` for the legend (2026-09-02, above), the word space
+  // the sentence was written with stopped existing. It is a layout bug wearing
+  // a typo's clothes, which is why it was raised as (copy).
+  //
+  // `column-gap`, not `gap`, so this can never acquire an opinion about a
+  // wrapped row; and on the column axis it is harmless to the other two
+  // children, both of which are pushed to the far end by the legend's
+  // `margin-left: auto` and so already stand well clear of it.
+  //
+  // 0.35rem is a word space in this face at 1rem, not a chosen separation:
+  // the line is one sentence and should read as though it were never split.
+  column-gap: 0.35rem;
   font-family: $font-body;
   font-size: 1rem;          // body default; no size of its own
   font-weight: 400;
