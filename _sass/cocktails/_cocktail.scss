@@ -480,12 +480,27 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // part she asked for by name. The italic and the 60%-column measure stay — a
 // voice line wants a short measure, and the file's own note on the title being
 // 70% wide over a tagline 40% wide is the same instinct.
+// THE SHORTLIST BUTTON, UNDER THE TOGGLE — Helen, 2026-09-05: "move the
+// shortlist button up to below make it / read it."
+//
+// A row of its own that pushes its one item right, so the button lands under
+// `make it` by construction: this element and `.cocktail-title-row` are both
+// children of `.cocktail-head-words` and both take the same right edge, which
+// is the same trick the meta row used to align them when the button lived down
+// there. See _layouts/cocktail.html for why it is a sibling of the title row
+// rather than stacked inside it.
+.cocktail-head-shortlist {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $space-xs;
+}
+
 .cocktail-tagline {
   font-style: italic;
   font-size: 1.05rem;
   line-height: 1.55;
   color: $color-text;
-  margin: $space-lg 0 $spacing-block-gap;
+  margin: $space-sm 0 $spacing-block-gap;
   max-width: $width-content * 0.6;
 }
 
@@ -518,12 +533,13 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // now a floor rather than the whole story. Helen: "the metadata is crammed
   // all the way over to the left."
   //
-  // It was, and the gap was not the cause. `.cocktail-meta-row` is
+  // It was, and the gap was not the cause. `.cocktail-meta-row` was
   // `space-between` with the shortlist button as its second item, so the three
   // facts sized to their own content on the left, the button was thrown to the
-  // column's right edge, and ~400px of nothing opened between them. Three equal
-  // columns filling the row closes it without touching what the facts look
-  // like. She turned this shape down on 2026-09-03 ("three equal columns" was
+  // column's right edge, and ~400px of nothing opened between them. Filling the
+  // row with tracks closed it without touching what the facts look like. (That
+  // wrapper is gone since -- the button moved under the toggle later the same
+  // day -- but the grid is what holds the facts apart now, so it stays.) She turned this shape down on 2026-09-03 ("three equal columns" was
   // one of the four candidates, and 5rem-from-the-left won) — it wins now
   // because the head is 10rem narrower than it was then, which is the fact that
   // changed rather than the taste.
@@ -579,6 +595,21 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // icon's SIZE are this page's own; colour, underline and the word itself all
 // come from _cards.scss untouched, which is what keeps a card and this page's
 // SHIP IT? line from ever reading one rung two different ways.
+// SHIP IT? IS `make it` ONLY, SINCE 2026-09-05 — Helen: "drop the ship mark
+// from read it mode."
+//
+// It is hidden here and revealed in `.cocktail.is-making` rather than gated in
+// the template, which is the whole two-state head's contract: nothing leaves
+// the DOM, so the page prints whole and reads whole with JavaScript off. That
+// contract normally means the DEFAULT state carries more and `make it` strips
+// it — this is the first fact to go the other way, so it is the first rule in
+// the `is-making` block that ADDS something rather than removing it.
+//
+// The grid above needs no help with the gap: at two items `1fr 1fr auto` gives
+// GLASS and GARNISH the two flexible tracks and the `auto` one collapses to
+// nothing, so read mode is two facts across the head and make mode is three.
+.cocktail-meta-ship { display: none; }
+
 .cocktail-ship {
   display: flex;
   align-items: center;
@@ -1509,6 +1540,14 @@ $amount-gap-wide: 1.25rem;
   .cocktail-title-block { min-height: 0; }
   .cocktail-glass-icon  { min-height: 0; }
 
+  // SHIP IT? ARRIVES, rather than leaving — see `.cocktail-meta-ship` above for
+  // why this is the one fact that runs the other way. `display: contents` so
+  // the `<dt>`/`<dd>` pair lands in the grid as the third column exactly as its
+  // two siblings do; `display: block` would make the wrapper the grid item and
+  // stack the label on the value inside it, which is what the siblings' own
+  // `> div { display: flex; flex-direction: column }` already arranges.
+  .cocktail-meta-ship { display: flex; }
+
   // THE HEAD DOES NOT CHANGE ANY MORE, and removing three lines is the fix.
   // This state used to shrink the title to 1.5rem and tighten the block's
   // padding and margin — written when the title was 2.5rem and its own thing.
@@ -1580,6 +1619,28 @@ $amount-gap-wide: 1.25rem;
   // override was quietly asking the browser to synthesise a fake bold on top
   // of the base rule's real one. Only the size needs restating for the larger
   // "make it" view; the weight and family are the base rule's already.
+  // THE COLUMN GROWS WITH THE TYPE, and it has to: `--amount-col` is a fixed
+  // 5.5rem holding ~9.6 characters of Plex Mono at the resting 0.95rem, and this
+  // state sets the same figures at 1.3rem. Left alone, the column would hold
+  // barely seven -- "52.5 ml" fits by half a pixel and "112.5 ml" wraps, in the
+  // one state where a wrapped amount is worst, because `make it` is the view you
+  // read with your hands full and a jigger in one of them.
+  //
+  // 1.37 IS 1.3 / 0.95, so the ratio of column to character is identical in both
+  // states. That is what keeps assets/js/cocktail-scale.js's threshold honest:
+  // it counts characters rather than measuring, and nine fit in the narrow
+  // column at BOTH sizes because both were scaled by the same number. A
+  // mode-aware threshold in the script would have been the other way to fix
+  // this, and a worse one -- the script would have to know what the stylesheet
+  // does to the type.
+  --amount-col: #{$amount-col * 1.37};
+  --amount-gap: #{$amount-gap * 1.37};
+
+  .cocktail-ingredients--wide-amounts {
+    --amount-col: #{$amount-col-wide * 1.37};
+    --amount-gap: #{$amount-gap-wide * 1.37};
+  }
+
   .cocktail-amount { font-size: 1.3rem; font-weight: 600; }
   .cocktail-item { font-size: 1.15rem; }
   // 1.15rem/1.85, Helen's brief -- up from the base rule's 1rem/1.6, same

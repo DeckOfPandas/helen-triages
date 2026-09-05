@@ -231,6 +231,35 @@ layout: default
         </div>
       </div>
 
+      {% comment %} THE SHORTLIST BUTTON, DIRECTLY UNDER `read it` / `make it` —
+         Helen, 2026-09-05: "move the shortlist button up to below make it /
+         read it." It was at the right-hand end of the meta row, which is where
+         she put it on 2026-09-04 ("the top right of the metadata panel...
+         maybe horizontally aligned with read it / make it"); it is now under
+         the thing it was only aligned with.
+
+         A SIBLING OF THE TITLE ROW RATHER THAN A SECOND ITEM INSIDE IT. Both
+         are children of `.cocktail-head-words` and both push their right-hand
+         content to the same edge, so the button lands under the toggle by
+         construction with no number to keep in step. Putting it INSIDE the
+         title row would have meant stacking it with the toggle in a wrapper,
+         and that row is `align-items: last baseline` — a two-item column's last
+         baseline is its BOTTOM item's, so the toggle would have been dragged
+         off the title's line to put the button on it.
+
+         `page.url`, NOT `relative_url` -- the same key this drink's own index
+         card emits, which is what makes the card and this page agree about
+         whether it is shortlisted. See HTF.shortlist in assets/js/assets.js.
+         `hidden` until shortlist.js reveals it, the rule every JS-dependent
+         control on both sites follows. {% endcomment %}
+      <div class="cocktail-head-shortlist">
+        <button type="button"
+                class="btn-shortlist"
+                data-shortlist-key="{{ page.url }}"
+                aria-pressed="false"
+                hidden>shortlist</button>
+      </div>
+
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
          model_instructions/INGEST_ONE_COCKTAIL.md §"Leave both as QQ": every
          drink is ingested with `tagline: "QQ"` until Helen writes the real one
@@ -268,7 +297,6 @@ layout: default
          the real page; a control dropped into that flex row would inherit the
          gap, wrap with the facts on a narrow screen, and claim to be a fourth
          thing the drink IS. {% endcomment %}
-      <div class="cocktail-meta-row">
       <dl class="cocktail-meta">
         {% if page.glass.size > 0 %}
           <div><dt>Glass</dt><dd>{{ page.glass | join: " or " }}</dd></div>
@@ -280,21 +308,17 @@ layout: default
            _includes/cocktails/ship.html, factored out 2026-09-02 so the two can
            never render a different word for the same rung. See
            cocktails/index.html's own call for the other half of this pair.
-        {% endcomment %}
-        <div><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
-      </dl>
 
-        {% comment %} `page.url`, NOT `relative_url` -- the same key this drink's
-           own index card emits, which is what makes the card and this page agree
-           about whether it is shortlisted. See HTF.shortlist in
-           assets/js/assets.js. `hidden` until shortlist.js reveals it, the rule
-           every JS-dependent control on both sites follows. {% endcomment %}
-        <button type="button"
-                class="btn-shortlist"
-                data-shortlist-key="{{ page.url }}"
-                aria-pressed="false"
-                hidden>shortlist</button>
-      </div>
+           `make it` ONLY, SINCE 2026-09-05 — Helen: "drop the ship mark from
+           read it mode." It renders in both states and the stylesheet hides it
+           in one, rather than the template gating it, for the reason the whole
+           two-state head follows: nothing leaves the DOM, so the page still
+           prints whole and still reads whole with JavaScript off — and the
+           no-JS state is the editorial one, which must carry MORE rather than
+           less. See `.cocktail-meta-ship` in _sass/cocktails/_cocktail.scss.
+        {% endcomment %}
+        <div class="cocktail-meta-ship"><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
+      </dl>
 
       {% comment %} CHIPS ARE THE CARD'S MOOD CHIPS, AS <span>s -- Helen's
          brief: "Must be the same chips as on the cards." Same classes

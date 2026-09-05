@@ -3,7 +3,7 @@
 // =============================================================================
 // Three controls:
 //
-//   .btn-shortlist          marks one drink, on the drink page's meta row
+//   .btn-shortlist          marks one drink, under the drink page's toggle
 //   .btn-shortlist--card    the same control in a card's top-right corner
 //   .btn-shortlist-only     shows only what is marked, on the count line
 //
@@ -66,8 +66,8 @@
   // browser substitutes a fallback face for that one glyph — and a fallback's
   // ascent is not Courier's. The mark was an inline-block, so its line box
   // counted toward the line's height; a taller substituted glyph grew the line
-  // box, and since the button is `align-items: flex-start` in the meta row its
-  // top stayed put and the BASELINE dropped.
+  // box, and since the button was `align-items: flex-start` in the meta row it
+  // sat in then, its top stayed put and the BASELINE dropped.
   //
   // THE FIRST FIX WAS `line-height: 1` PLUS `overflow: hidden`, AND IT TRADED
   // THE JUMP FOR A SUPERSCRIPT — Helen saw it immediately: the `+` was sitting
@@ -117,41 +117,19 @@
   }
 }
 
-// --- The drink page's meta row -----------------------------------------------
-// The `<dl>` of glass / garnish / ship it?, with the shortlist toggle pushed to
-// the same right edge the read-it/make-it toggle sits on. Both are children of
-// `.cocktail-head-words`, so the two controls share a column by construction
-// rather than by a number either file would have to keep in step.
+// --- The drink page's shortlist button ---------------------------------------
+// It used to sit at the right-hand end of a `.cocktail-meta-row` flex wrapper,
+// pushed to the same edge the read-it/make-it toggle takes so the two lined up
+// by construction. On 2026-09-05 Helen moved it under that toggle -- "move the
+// shortlist button up to below make it / read it" -- and the wrapper went with
+// it, because a flex row holding one child is not a layout. Its new home is
+// `.cocktail-head-shortlist` in _sass/cocktails/_cocktail.scss, which is the
+// same one-trick element: push right, and land under the thing above that also
+// pushes right.
 //
-// `align-items: flex-start` and NOT baseline: the `<dl>`'s first baseline is its
-// dt row (GLASS, 0.72rem), and aligning a 0.78rem control to it would sit the
-// button on the labels rather than at the top of the block. Helen asked for the
-// top right of the panel, which is what flex-start gives.
-//
-// The gap is $space-xl rather than the list's own 5rem: that value was chosen to
-// hold three facts apart from each other, and this is not a fourth fact.
-.cocktail-meta-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: $space-xl;
-
-  // The list already carries the bottom margin that separates the head from the
-  // ingredients, and it is still the thing that should carry it — the row is a
-  // layout wrapper, not a block in its own right.
-  //
-  // `flex: 1` SINCE 2026-09-05: the `<dl>` is a three-column grid now (see
-  // `.cocktail-meta`) and a grid only spreads across a width it has been given.
-  // Without this it sizes to its content and `space-between` re-opens the very
-  // gap the grid was added to close.
-  .cocktail-meta {
-    margin-bottom: 0;
-    flex: 1;
-  }
-  margin: 0 0 $space-md;
-
-  .btn-shortlist { flex-shrink: 0; }
-}
+// Nothing about the BUTTON changed in that move, which is why there is no rule
+// here any more -- only this note, so the next person looking for the meta row
+// finds out where it went rather than concluding it was never styled.
 
 // =============================================================================
 // ON A CARD — the mark alone, in the top-right corner

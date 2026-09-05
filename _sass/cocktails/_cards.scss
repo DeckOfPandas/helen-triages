@@ -691,6 +691,11 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   text-transform: lowercase;
   line-height: $chip-line;
   letter-spacing: 0;
+  // A FALLBACK ONLY. Every chip carries `--mood` or `--hassle` from the
+  // taxonomy's `mood_groups` (see cocktails/index.html and the drink page's own
+  // loop), and those set the real colour below. This is what a chip would be if
+  // a future group arrived with no colour of its own -- visible rather than
+  // inheriting whatever surrounds it.
   color: #ffffff;
   border: 0;
   padding: 0;
@@ -715,29 +720,44 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // chip has a box and a filter word does not"): with the box gone, the text
   // is what there is to move.
   //
-  // AND IT MOVES TO ITS OWN SECTION'S COLOUR, NOT TO ONE HOVER COLOUR — Helen,
-  // 2026-09-05: "mouseover should colour the chips as per their grouping on the
-  // index page... rather than all being in [the one magenta]."
+  // THE SECTION'S COLOUR IS THE RESTING STATE, AND MAGENTA IS THE HOVER —
+  // Helen, 2026-09-05, having seen it the other way round earlier the same day:
+  // "in the name of more is more, would it be too much to colour the chips in
+  // their colours to start with, not just on mouse over? I really do love
+  // colour. They could then mouseover in wicked-woowoo like the rest of the
+  // site."
   //
-  // Every chip belongs to one of two filter sections, and each section already
-  // owns a colour: the ramp from reposado to yvette that 2026-09-03 put under
-  // the five index headings, on their filter words, and on the band a matched
-  // chip wears. Hovering to a single site-wide magenta was the one place that
-  // system did not reach — it said "you can touch this" where everything
-  // around it says "this is a MOOD" or "this is a HASSLE". Now the word you
-  // touch and the heading it answers to are the same colour.
+  // The first pass had it inverted -- white at rest, section colour on hover --
+  // and that was the smaller idea. Every chip belongs to one of two filter
+  // sections and each owns a colour from the reposado-to-yvette ramp that
+  // 2026-09-03 put under the five index headings, on their filter words, and on
+  // the band a matched chip wears. Spending it only on hover meant the card
+  // said which section a word belonged to solely while a mouse was over it,
+  // which is no use at all to a reader scanning a grid, and none whatever on a
+  // phone. At rest it makes a card's moods legible as two kinds of thing on
+  // sight, and it hands hover back to magenta, which is what "you can touch
+  // this" means everywhere else on the site.
+  //
+  // THE MATCHED STATE STILL READS, and the two swap ink rather than compete:
+  // unmatched is a coloured word, matched is a WHITE word over a coloured band
+  // (see `.is-match` below). Colour changes place instead of intensity, so the
+  // match is the brighter of the two on a dark ground rather than the louder.
+  //
+  // MEASURED, NOT ASSUMED: coral is 6.66:1 on the page ground and 6.18:1 on a
+  // card, hot pink 6.19:1 and 5.75:1, both well clear of 4.5:1 -- which is the
+  // question a resting colour has to answer and a hover colour does not.
   //
   // THROUGH `$color-heading-mood` / `-hassle`, NEVER A LITERAL. Those are the
   // semantic names, and the matched-band rules below already go through them
-  // (`text-decoration-color`), so a chip's hover and its match state cannot
+  // (`text-decoration-color`), so a chip's colour and its match state cannot
   // drift apart. It also means this survives the palette rename in flight on
   // `worktree-sonnet-naming-things`, which changes what those two aliases point
   // AT and not what they are called.
-  &--mood:hover,
-  &--mood:focus-visible { color: $color-heading-mood; }
+  &--mood { color: $color-heading-mood; }
+  &--hassle { color: $color-heading-hassle; }
 
-  &--hassle:hover,
-  &--hassle:focus-visible { color: $color-heading-hassle; }
+  &:hover,
+  &:focus-visible { color: $color-cosmic-cosmopolitan; }
 
   & + &::before {
     content: "·";
