@@ -21,7 +21,7 @@
 // have four moods, fifteen have six, two have eight.
 //
 // WHY THIS IS A SCRIPT AND NOT A SELECTOR, which is the same argument
-// DESIGN_PLAN §3 item 4 already settled for the wrapped-title rules: CSS cannot
+// last-line-rule.js already settled for the wrapped-title rules: CSS cannot
 // ask where a line broke. `:first-child` is the first chip of the ELEMENT and
 // there is no `:first-of-line`. Two CSS-only dodges were considered and both
 // are worse than they look:
@@ -44,16 +44,18 @@
 // SITE-AGNOSTIC AND CONTAINER-AGNOSTIC, the house pattern that print-link.js,
 // universe.js, last-line-rule.js and card-name-fit.js all follow: it queries a
 // class and does nothing on a page without one. Food has no `.drink-card-mood`.
-// Cocktails has them in three different containers -- the index card's
-// `.drink-card-moods`, the universe pick's clamped copy of it, and the drink
-// page's wider `.cocktail-chips` -- and this file names none of them. It groups
-// by parent, so a fourth container would work the day it was written.
+// Cocktails has them in two containers -- the index card's `.drink-card-moods`
+// and the drink page's wider `.cocktail-chips` -- and this file names neither.
+// It groups by parent, so a third would work the day it was written.
 //
 // THE PASS IS EXPOSED AS `HTF.markChipRows()` for anything that puts chips on
-// the page after load. universe.js is the one caller, for the same reason it
-// already calls `HTF.fitCardNames()`: the pick is a freshly cloned card in a
-// column of a different width, so a cloned class is an answer to a question
-// nobody asked here.
+// the page after load. NOTHING CALLS IT TODAY: universe.js would, on the same
+// argument that has it calling `HTF.fitCardNames()` -- a freshly cloned chip in
+// a container of a different width needs re-measuring, not the class it was
+// cloned with -- but since 2026-09-05 its `data-universe-parts` does not clone a
+// card's foot, and the foot is where the chips are. The hook stays for the day
+// that changes; cocktails/index.html says so beside the attribute that would
+// change it.
 // =============================================================================
 
 (function () {

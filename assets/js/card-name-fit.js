@@ -2,7 +2,7 @@
 // =============================================================================
 // A NAME THAT DOES NOT FIT: SHRINK IT IF ONE STEP REACHES IT, OTHERWISE WRAP.
 // =============================================================================
-// Design audit critical #9, DESIGN_PLAN §3 item 5, decided 2026-09-04 from a
+// Design audit critical #9, decided 2026-09-04 from a
 // candidates page on the real cocktails index. Helen, having switched between
 // the treatments on the page itself:
 //
@@ -71,6 +71,12 @@
 // the index (every card, plus the universe pick) and on a drink page (the
 // title, at 3.2rem through the same classes) — one rule covers all three,
 // because the size lives in `--card-name-size` and this file never reads it.
+//
+// THE UNIVERSE PICK IS MEASURED AND NEVER CLASSIFIED, since 2026-09-05, and
+// that is correct rather than wasted: its name is `flex: none` in a row of its
+// own, so at max-content the tape word cannot overflow and neither class is
+// ever added. The pass still has to run over it — the pick is re-cloned on
+// every deal and nothing else would clear a stale class if that ever changed.
 // =============================================================================
 
 (function () {
@@ -137,9 +143,9 @@
    * Measure and classify every card name on the page.
    *
    * Re-queries the document each time rather than caching the list, because
-   * the index deals a fresh `.universe-pick` card in after load — see the call
-   * in universe.js. A cached list would classify the first pick and never any
-   * later one.
+   * the index deals a fresh name into `.universe-pick` after load — see the
+   * call in universe.js. A cached list would classify the first pick and never
+   * any later one.
    */
   function fitAll() {
     var names = document.querySelectorAll(NAME);

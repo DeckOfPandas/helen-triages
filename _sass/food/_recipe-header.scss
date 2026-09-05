@@ -271,7 +271,7 @@ article.recipe a:not(.badge) {
   // THE MARK SITS UNDER THE LAST LINE ONLY, since 2026-09-04. This is the
   // element the decision was made on -- a candidates page on the real quiche
   // recipe, whose title wraps to two lines and wore two stacked double rules
-  // (design audit critical #7, DESIGN_PLAN §3.4). Helen: "Last line only
+  // (design audit critical #7). Helen: "Last line only
   // please, 10000%."
   //
   // `text-wrap: balance` on .recipe-title above already keeps the lines a

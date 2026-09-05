@@ -4475,7 +4475,7 @@ while a wide one fills it, which is two tapes on one page disagreeing. A
 hand-copied version of that line dropping the height cost a round.
 
 **A NAME THAT DOES NOT FIT NOW SHRINKS OR WRAPS, AND NEVER ELLIPSISES —
-2026-09-04**, the design audit's critical #9 and DESIGN_PLAN §3 item 5. Helen,
+2026-09-04**, the design audit's critical #9. Helen,
 off a candidates page on the real index: *"shrink when it's just one short-ish
 word too long, then two lines where it's more than that. The one super-long
 title we have I'll just shorten, and retain that principle."* **The rule is
@@ -4946,7 +4946,7 @@ mood list wrap — 61%**, measured against the 232.4px foot of the grid's minimu
 370px card, so this was the common case. CSS cannot ask where a line broke
 (there is no `:first-of-line`), so `assets/js/chip-rows.js` reads `offsetTop` and
 marks row-starting chips with `is-row-start` — the same pattern, and the same
-argument, as the wrapped-title rules in DESIGN_PLAN §3.4.
+argument, as the wrapped-title rules in §13.4's last-line mark.
 
 **THE MOOD CHIPS FILTER THE INDEX — Helen's ask, 2026-09-02.** Clicking one adds
 or removes that mood exactly as its filter button does.
@@ -7612,7 +7612,7 @@ is inset**, not the reverse — everything on the page starts at x=0, and a
 mark hanging into the left margin reads as broken alignment, not design.
 
 **THE MARK SITS UNDER THE LAST LINE ONLY, SINCE 2026-09-04** (design audit
-critical #7, `DESIGN_PLAN.md` §3.4). `clone` is what makes the mark measure
+critical #7). `clone` is what makes the mark measure
 the lettering rather than the box, and its cost is that every line fragment
 of a wrapped title gets its own full copy — a three-line title wore three
 stacked double rules. Helen, from a candidates page on the real quiche
@@ -8739,6 +8739,75 @@ exchange. **The emboss is stroke *and* a two-copy directional shadow**; the
 stroke sets the weight of the edge, the shadow sets its direction, and a
 reproduction is a second thing to keep in step with the first.
 
+### 13.11 How a design decision actually gets made here
+
+**Helen decides by looking, never by argument.** Every visual decision in §13
+was made on a CANDIDATES PAGE: the real page, the real compiled CSS, the real
+fonts and artwork, with two to five treatments switchable from a bar at the top.
+Build the candidates, publish them, let her pick. Do not write a paragraph
+arguing for one — she has asked for the opposite of that more than once, and an
+argued case for the wrong option costs a round.
+
+Three tools make it cheap:
+
+- **`scripts/mock_bundle.py`** bundles a page from a local build into one
+  self-contained HTML file: compiled CSS with the fonts inlined, every script
+  inlined, every SVG under `assets/img` embedded so `decorations.js` finds its
+  tapes without a network. Build first with
+  `bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock`.
+  Add candidate CSS as `extra_style` keyed off `html[data-x="…"]`, a switcher as
+  `extra_scripts`, and publish the file as an Artifact.
+- **Syntax-check the switcher before publishing** (`node -e` with
+  `new Function(src)`): one apostrophe in a description killed a whole round of
+  leopard samples and she saw "none at all". Use `json.dumps` for any text going
+  into the script, and skip `type="application/json"` blocks when checking — the
+  cocktails index carries three and they are not JavaScript.
+- The artifact viewer lets `<main>` run full width; the bundler pins it to the
+  site's 900px column so margin layouts behave. Her screenshots arrive at odd
+  device-pixel ratios — measure against the 900px column, not the viewport.
+
+**Put the real state on the page, not a picture of it.** A control that ships
+`hidden` must be given something to reveal it (seed `localStorage` from a
+`body_transform`, which runs after `assets.js` defines the store and before the
+index scripts read it); a control being judged against another object must have
+that object on screen — the shortlist pill was decided with an ingredient typed
+into HAS TO HAVE so the pool chips it might be confused with were visible.
+
+**One round settles one question.** Lock what she has already decided into the
+page as base CSS rather than offering it again, and say in the note which
+questions are still open. Four rounds took the universe section from a card to
+its final line on 2026-09-05; each round asked two or three things and no more.
+
+**Derive numbers, do not pick them, and keep the derivation.**
+`scripts/universe_glass_slot.py` and `scripts/universe_line_width.py` are the
+worked examples: both read the live values back out of `_sass/cocktails/_universe.scss`
+and fail or warn if the artwork or the drink collection has moved under them.
+A number derived in `tmp/` is a number nobody can reproduce — `tmp/` is
+gitignored.
+
+**A worktree has no drafts.** Clone `helen-triages-cocktails-private` into it
+over SSH (it is gitignored) or the index renders nothing to look at.
+
+**Delegation:** build work goes to agents with a precise spec — values, files,
+lines, the house comment style, the branch check before every commit — and is
+reviewed by diff. What did not work: letting an agent tidy `tmp/`; it removed
+the mock scripts with an over-broad `rm -rf`. Tell agents to delete only what
+they created.
+
+### 13.12 Decisions that are Helen's, not yours
+
+Build these when she rules; do not decide them, and do not re-open a ruling by
+re-arguing it.
+
+- **Leopard.** Round one she chose L3 (sheen). Round two — five patterns ×
+  four placements — she has not decided, and said *"leave leopard with me…
+  don't ship anything."* `LEOPARD.md` holds the generator, every value and the
+  placement rules. Tracked as its own issue since 2026-09-05.
+- **Any new hue.** Six on food, five on cocktails, and both palettes argue at
+  length that the COUNT is the design.
+- **The voice.** Do not touch a word of copy.
+- **Whether the recipe title takes the tape.** Offered and declined; she chose
+  flat display lettering.
 
 ## 14. Reference pages and the internal-temperatures data layer
 

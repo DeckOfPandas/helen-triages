@@ -276,10 +276,13 @@
 // NOTHING IS EVER CUT, which is the guarantee that rule was written to give and
 // which this does not weaken.
 //
-// SCOPED TO `.drink-cards`, NOT TO `.drink-card`. `.universe-pick` also carries
-// `drink-card` and universe.js clones a card's body into it — but it clones
-// `.drink-card-body, .drink-card-foot` only, so the pick has no button in its
-// corner and must not reserve room for one.
+// SCOPED TO `.drink-cards`, NOT TO `.drink-card`, because the padding pays for a
+// shortlist button and only a card IN THE LIST has one. The universe pick also
+// wears `.drink-card-name`, has no button in its corner, and must not reserve
+// room for one. (It used to carry `.drink-card` as well, which made the scoping
+// load-bearing rather than merely correct; it stopped on 2026-09-05 and the
+// scoping stays, because the rule was always "a card in the list", not "whatever
+// happens to collide today".)
 //
 // AND `.drink-card-name`, NOT the body: the ingredient line below has the full
 // width and should keep it. Only the object that collides pays.
