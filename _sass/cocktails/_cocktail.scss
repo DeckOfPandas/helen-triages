@@ -1007,14 +1007,27 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // Set the weight here and nowhere else. If a glass ever looks wrong, the
 // artwork is wrong, not this number.
 //
-// 3, UP FROM 1.6, 2026-09-03 -- Helen: "bigger, bolder and absinthe", chosen
-// against 1.6 and 2.2 on the real page. The card keeps its own 1 (_cards.scss
-// scopes it under `.drink-card-glass`); this is the hero drawing on the page
-// that exists for it, and at 14rem tall a 1.6 line read as a wire.
+// 2 SINCE 2026-09-05, down from the 3 chosen on 2026-09-03 -- and the reason is
+// the ground, not a change of mind about the drawing. Helen picked 3 ("bigger,
+// bolder and absinthe") against 1.6 and 2.2 while the artwork was still being
+// judged by the numbers it inherited from paper; #650 asked whether ANY of those
+// numbers survived the site going black, and this is the answer for this one.
+// A light line on a dark ground BLOOMS -- the same irradiation that took the
+// index type up in size and down in weight -- so the same pixel count reads
+// heavier here than it did as ink, and 3 was carrying that surplus.
+//
+// Chosen off a page of all 27 drawings on the real black ground at both sizes,
+// with 2 / 2.5 / 3 / 3.5 switchable.
+//
+// THE CARD KEEPS ITS OWN 1 (_cards.scss scopes it under `.drink-card-glass`),
+// unchanged in the same round: at 10.4rem the bloom is spread over a drawing
+// two thirds the size and 1 was already right. The universe line's 0.7 is the
+// third member of the same family -- see _universe.scss, where the arithmetic
+// for why a small drawing needs LESS is written out.
 .glass-icon-line {
   fill: none;
   stroke: currentColor;
-  stroke-width: 3;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
