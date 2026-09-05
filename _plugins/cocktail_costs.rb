@@ -78,6 +78,7 @@ module HelenTriages
 
       @per_ml   = @ing["measures"]["per_ml"]
       @yields   = @ing["juice_yields"] || {}
+      @defaults = @costs["default_bottles"] || {}
       @excluded = (@costs["excluded_units"] || []).to_set
       @ignored  = (@ing["measures"]["ignored_words"] || [])
 
@@ -133,8 +134,15 @@ module HelenTriages
     # that is six bottles and no fallback; for a syrup it is the jar and the
     # pan. This is the same reasoning that made the range a range in the first
     # place, applied one level down.
+    # HELEN'S DEFAULTS NARROW THE SET, WHEN SHE HAS GIVEN ONE. `default_bottles`
+    # says which bottles a category is priced FROM -- "London dry gin let's say
+    # the default is tanqueray" -- so the range stops spanning six gins she owns
+    # but would not pour for an unqualified `London dry gin`. Absent a ruling the
+    # set is every bottle under the generic, which is the right default: breadth
+    # is an admission of not knowing, and it should persist until she narrows it.
     def generic_rate(g)
-      rates = @by_generic[g].map { |n| bottle_rate(n) }.compact
+      names = @defaults[g] || @by_generic[g]
+      rates = names.map { |n| bottle_rate(n) }.compact
 
       e = @costs["generics"][g]
       return rates.empty? ? nil : [rates.min, rates.max] unless e

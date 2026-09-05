@@ -6146,3 +6146,61 @@ def test_every_priceable_pour_has_a_price(drink_file):
           "no price is not free -- it is missing, and the drink's total is "
           "quietly too low."
     )
+
+
+def test_default_bottles_are_declared_priced_and_in_the_right_category():
+    """`default_bottles` may only name real, priced bottles of that generic.
+
+    THIS BLOCK IS HELEN'S SHELF RULES -- "London dry gin let's say the default is
+    tanqueray", "orgeat is always Monin" -- and it OVERRIDES the bottles
+    declared under a generic when pricing it. That is a lot of power for a list
+    of strings, and every way it can go wrong is silent:
+
+      a typo'd name        -> contributes no rate; the category quietly prices
+                              from whatever else is listed, or falls through to
+                              the `generics:` fallback as if no default existed
+      an unpriced bottle   -> same, invisibly
+      a bottle of the WRONG generic -> prices `London dry gin` from a rum, and
+                              the number is merely wrong rather than missing
+
+    The third is the one worth the extra assert. Nothing else in the repo would
+    object: the string names a real bottle, it has a real price, and the
+    arithmetic runs. Only asking whether it belongs to the category it is
+    defaulting FOR can catch a line pasted under the wrong heading.
+    """
+    costs = _costs()
+    bottles = _declared_bottles()
+    priced = costs.get("bottles") or {}
+    defaults = costs.get("default_bottles") or {}
+    assert defaults, (
+        "costs.yml has no `default_bottles`. An EMPTY mapping is a fine state "
+        "and means 'no category has been narrowed'; a MISSING one means this "
+        "check silently stopped covering Helen's shelf rules."
+    )
+
+    problems = []
+    for generic, names in sorted(defaults.items()):
+        if not isinstance(names, list) or not names:
+            problems.append(f"{generic}: must be a non-empty list of bottle names")
+            continue
+        for name in names:
+            if name not in bottles:
+                problems.append(
+                    f"{generic}: {name!r} is not a bottle in bottles.yml"
+                )
+            elif name not in priced:
+                problems.append(
+                    f"{generic}: {name!r} is declared but carries no price, so "
+                    f"defaulting to it prices the category from nothing"
+                )
+            elif (bottles[name] or {}).get("generic") != generic:
+                problems.append(
+                    f"{generic}: {name!r} is a "
+                    f"{(bottles[name] or {}).get('generic')!r}, not a "
+                    f"{generic!r} -- this would price the category off the "
+                    f"wrong bottle and still compute cleanly"
+                )
+    assert not problems, (
+        "Bad rows in _data/cocktails/costs.yml `default_bottles:`\n  "
+        + "\n  ".join(problems)
+    )

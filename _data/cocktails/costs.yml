@@ -120,8 +120,8 @@ bottles:
     confidence: medium
   "Rum Fire":
     size_ml: 700
-    gbp: 32
-    confidence: low
+    gbp: 30
+    confidence: high
   # --- rum: Demerara -----------------------------------------------------
   "El Dorado 3 year old rum":
     size_ml: 700
@@ -216,8 +216,8 @@ bottles:
     confidence: medium
   "Damoiseau Rhum Agricole Blanc Pure Cane":
     size_ml: 700
-    gbp: 34
-    confidence: low
+    gbp: 30
+    confidence: high
   "La Favourite Rhum Agricole Blanc":
     size_ml: 700
     gbp: 38
@@ -232,12 +232,12 @@ bottles:
     confidence: medium
   "La Favourite Cœur de Canne":
     size_ml: 700
-    gbp: 45
-    confidence: low
+    gbp: 50
+    confidence: high
   "La Favourite L'Authentique Ambré":
     size_ml: 700
-    gbp: 42
-    confidence: low
+    gbp: 45
+    confidence: high
   "Rhum JM Ambré":
     size_ml: 700
     gbp: 40
@@ -248,8 +248,8 @@ bottles:
     confidence: medium
   "Clairin Communal":
     size_ml: 700
-    gbp: 38
-    confidence: low
+    gbp: 42
+    confidence: high
   "Sagatiba":
     size_ml: 700
     gbp: 22
@@ -264,8 +264,8 @@ bottles:
     confidence: medium
   "Van Osten Botanik Arrack":
     size_ml: 700
-    gbp: 30
-    confidence: low
+    gbp: 40
+    confidence: high
   # --- gin ---------------------------------------------------------------
   "Anchor Junipiero":
     size_ml: 700
@@ -330,8 +330,8 @@ bottles:
     confidence: medium
   "Ardbeg XO":
     size_ml: 700
-    gbp: 60
-    confidence: low
+    gbp: 54
+    confidence: high
   # --- agave -------------------------------------------------------------
   "Tapatio":
     size_ml: 700
@@ -373,7 +373,7 @@ bottles:
   "Massenez Kirsch Vieux":
     size_ml: 700
     gbp: 35
-    confidence: low
+    confidence: high
   # --- vodka -------------------------------------------------------------
   "Ketel One":
     size_ml: 700
@@ -472,11 +472,11 @@ bottles:
   "Gabriel Boudier Gingembre":
     size_ml: 700
     gbp: 20
-    confidence: low
+    confidence: high
   "Roots Mastiha":
     size_ml: 700
-    gbp: 25
-    confidence: low
+    gbp: 30
+    confidence: high
   "Rhum Clément Créole Shrubb":
     size_ml: 700
     gbp: 30
@@ -584,12 +584,12 @@ bottles:
     confidence: medium
   "Bob's Margarita Bitters":
     size_ml: 100
-    gbp: 16
-    confidence: low
+    gbp: 18
+    confidence: high
   "Bob's Peppermint Bitters":
     size_ml: 100
-    gbp: 16
-    confidence: low
+    gbp: 18
+    confidence: high
   # --- syrups and cordials -----------------------------------------------
   "Monin Pure Cane Sugar":
     size_ml: 700
@@ -675,6 +675,82 @@ top_up_ml:
   champagne:  { ml_min: 75,  ml_max: 100 }
   prosecco:   { ml_min: 75,  ml_max: 100 }
   soda water: { ml_min: 100, ml_max: 150 }
+
+# --- which bottles a category is PRICED from ----------------------------------
+# HELEN'S DEFAULTS, given 2026-09-05, with an explicit instruction about where
+# they may and may not go: "Don't name these on the recipes, but you can note
+# them as inputs to the default prices."
+#
+# SO THIS IS A PRICING FACT AND NOT A SUGGESTION, and the distinction is the
+# whole reason the block exists rather than 40 new `suggestion:` lines across
+# the drinks. A `suggestion` is a claim about THIS DRINK -- it says the recipe
+# wants this bottle -- and #441 settled that the reason belongs to the recipe.
+# "Gin means Tanqueray unless I say otherwise" is not a fact about any one
+# drink; it is a fact about her shelf, and putting it on 5 recipes would say
+# something she has just declined to say, five times.
+#
+# WHAT IT CHANGES. Without it, a generic is priced across EVERY bottle declared
+# under it, which spans bottles she would not actually pour: `London dry gin`
+# ran GBP 18-38, Beefeater to Anchor Junipiero, for a category she says is
+# Tanqueray. With it, the range is the bottles named here and nothing else --
+# so a default of one bottle gives a point price, which is the honest output
+# when she has told us there is one answer.
+#
+# A CATEGORY NOT LISTED HERE IS UNCHANGED and still spans all its bottles. That
+# is the right default for a category she has not ruled on: breadth is an
+# admission of not knowing, and it should stay until she narrows it.
+#
+# TWO OF HER RULINGS CANNOT BE WRITTEN HERE YET -- see the note under
+# `reposado tequila` below. Every name in this block must be a bottle
+# bottles.yml declares, and `test_default_bottles_are_declared_and_priced`
+# holds that; adding a bottle to her dictionary on inference is not this
+# file's business.
+default_bottles:
+  # "London dry gin let's say the default is tanqueray, and going forward if I
+  # want to commit to something else I'll name it." The other five gins stay
+  # declared in bottles.yml -- she owns them -- they are simply not what an
+  # unqualified `London dry gin` costs.
+  London dry gin: ["Tanqueray"]
+
+  # "orgeat is always Monin". Already the only orgeat declared, so this changes
+  # no number today. It is written down anyway because "always" is a RULING and
+  # the next orgeat added to bottles.yml would silently widen five drinks
+  # without it.
+  orgeat: ["Monin Orgeat"]
+
+  # "Mezcal is always Del Maguey Vida unless I discover I need to downgrade!!!!"
+  # Same case as orgeat: sole bottle today, ruling recorded for tomorrow.
+  mezcal: ["Del Maguey Vida"]
+
+  # "Bianco tequila is Rooster when it doesn't matter loads, Patron Silver if it
+  # really does." A two-bottle default is a REAL range rather than an
+  # uncertainty: both ends are bottles she pours, chosen by how much the drink
+  # cares. Tapatio drops out of the pricing set and stays in the dictionary.
+  blanco tequila: ["Rooster Rojo Bianco", "Patrón Silver"]
+
+  # "Cognac is Pierre Ferrand Ambre when it matters more, Hine/Corvoisier/
+  # Hennessey when less (not that they're really less expensive, just harsher)."
+  # Courvoisier is the only one of that trio bottles.yml declares, so it carries
+  # the cheap end. HER PARENTHESIS IS WORTH KEEPING: the cheap end here is not
+  # cheaper by much, and the range narrows rather than widens because of it.
+  # Pierre Ferrand 1840 is unmentioned and so is not a pricing input.
+  cognac: ["Courvoisier", "Pierre Ferrand Ambre"]
+
+  # "Lightly aged and filtered rum will be one of Havana 3 or El Dorado 3 99% of
+  # the time." Flor de Caña Extra Dry is the 1% and stays declared. The two are
+  # within 50p of each other, so this is nearly a point price -- which is what
+  # "99% of the time" ought to produce.
+  lightly aged and filtered rum: ["Havana Club 3 year old", "El Dorado 3 year old rum"]
+
+  # NOT YET WRITABLE, AND DELIBERATELY LEFT ALONE. Helen: "Same for Reposado and
+  # Anejo actually" -- meaning Rooster when it does not matter, Patrón when it
+  # does. bottles.yml declares Patrón Reposado and NEITHER Rooster reposado nor
+  # anything at all under `añejo tequila`, so the rule cannot be expressed
+  # without adding bottles to her dictionary. That dictionary means "bottles
+  # Helen would reach for" and its entries carry her own product spellings; a
+  # guess at "Rooster Rojo Reposado" would be inventing both a name and a price.
+  # Raised with her instead. Until then `reposado tequila` prices from Patrón
+  # alone and `añejo tequila` from the category figure under `generics:`.
 
 # --- generics with no bottle behind them --------------------------------------
 # 438 of 685 pours name a generic and no bottle, and this is what prices them.
