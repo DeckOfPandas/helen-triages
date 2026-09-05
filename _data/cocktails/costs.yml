@@ -353,12 +353,12 @@ bottles:
     confidence: medium
   "Patrón Añejo":
     size_ml: 700
-    gbp: 62
-    confidence: medium
+    gbp: 60
+    confidence: high
   "Patrón Reposado":
     size_ml: 700
-    gbp: 52
-    confidence: medium
+    gbp: 50
+    confidence: high
   "Del Maguey Vida":
     size_ml: 700
     gbp: 42
