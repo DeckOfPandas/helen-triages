@@ -5813,3 +5813,330 @@ def test_drink_accents(drink_file):
           "to the `no_accent` list in _data/accented_words.yml so nobody "
           "'fixes' it back."
     )
+
+
+# =============================================================================
+# COSTINGS -- _data/cocktails/costs.yml and _plugins/cocktail_costs.rb
+# =============================================================================
+# Helen, 2026-09-05: "I want to add approximate costings to my cocktails, which
+# I expect means adding costs to each bottle in our dictionary." The data has
+# two layers -- a bottle's own price, and a per-generic fallback for the 438
+# pours of 685 that name no bottle -- and these guard the joins between them.
+#
+# THE FAILURE THESE EXIST TO CATCH IS SILENT, which is the reason they are here
+# at all. A generic with no price does not raise: the Ruby skips the pour and
+# the drink's total is quietly a little too low, on a page that says "roughly"
+# and so gives nobody a reason to look. Only a test comparing the vocabulary
+# against the price table can see it, and it has to be run from the drinks
+# rather than from the table -- HANDOVER 12's rule about generating the check
+# from the other end.
+
+COSTS = ROOT / "_data" / "cocktails" / "costs.yml"
+
+# Kept in step with `confidence:` in costs.yml's own header. `low` is not a
+# defect -- it is the file admitting which rows Helen should overwrite first.
+COST_CONFIDENCE = {"high", "medium", "low"}
+
+
+def _costs():
+    if not COSTS.exists():
+        pytest.skip("_data/cocktails/costs.yml does not exist yet.")
+    return yaml.safe_load(COSTS.read_text(encoding="utf-8")) or {}
+
+
+def _declared_bottles():
+    if not BOTTLES.exists():
+        pytest.skip("_data/cocktails/bottles.yml does not exist yet.")
+    return (yaml.safe_load(BOTTLES.read_text(encoding="utf-8")) or {}).get(
+        "bottles"
+    ) or {}
+
+
+def test_every_declared_bottle_carries_a_price():
+    """bottles.yml and costs.yml name exactly the same bottles.
+
+    BOTH DIRECTIONS, AND THE SECOND ONE IS THE INTERESTING ONE. A bottle with no
+    price silently drops out of every total that pours it. A PRICE with no
+    bottle is worse than useless: it is almost always a bottle that was renamed
+    in bottles.yml and not followed here, so the old row goes on looking correct
+    while the new name resolves to nothing -- exactly the drift the alias map
+    exists to prevent for spellings.
+    """
+    bottles = _declared_bottles()
+    priced = _costs().get("bottles") or {}
+    assert bottles, "bottles.yml declares no bottles; nothing to price."
+
+    unpriced = sorted(set(bottles) - set(priced))
+    orphaned = sorted(set(priced) - set(bottles))
+    assert not unpriced, (
+        "These bottles are declared in _data/cocktails/bottles.yml but carry "
+        "no price in _data/cocktails/costs.yml, so every pour that names one "
+        "is costed as free:\n  " + "\n  ".join(unpriced)
+    )
+    assert not orphaned, (
+        "These rows in _data/cocktails/costs.yml name no bottle in "
+        "bottles.yml. A renamed bottle needs its price row renamed too -- the "
+        "alias list does not cover this file:\n  " + "\n  ".join(orphaned)
+    )
+
+
+def test_every_bottle_price_has_a_size_and_a_confidence():
+    """A price without a size is not a price.
+
+    ANGOSTURA IS THE CASE THAT MAKES THIS WORTH A TEST: GBP 11.75 is dear or
+    cheap entirely depending on the 200 ml, and the bitters are the only rows in
+    the file where the bottle is not 70cl. Vermouth and sherry are 75cl, Carpano
+    is a litre, Lustau Don Nuno is 50cl, Acacia honey is a 340 g jar. A missing
+    `size_ml` would not raise -- the Ruby skips the bottle -- so nothing but
+    this would notice.
+    """
+    priced = _costs().get("bottles") or {}
+    problems = []
+    for name, entry in sorted(priced.items()):
+        if not isinstance(entry, dict):
+            problems.append(f"{name}: not a mapping")
+            continue
+        size, gbp = entry.get("size_ml"), entry.get("gbp")
+        conf = entry.get("confidence")
+        if not isinstance(size, (int, float)) or size <= 0:
+            problems.append(f"{name}: size_ml is {size!r}, must be a positive number")
+        if not isinstance(gbp, (int, float)) or gbp <= 0:
+            problems.append(f"{name}: gbp is {gbp!r}, must be a positive number")
+        if conf not in COST_CONFIDENCE:
+            problems.append(
+                f"{name}: confidence is {conf!r}, must be one of "
+                f"{sorted(COST_CONFIDENCE)}"
+            )
+    assert not problems, (
+        "Bad rows in _data/cocktails/costs.yml `bottles:`\n  "
+        + "\n  ".join(problems)
+    )
+
+
+def test_a_generic_priced_both_ways_is_deliberate_and_declared():
+    """A generic may be BOTH bought and made, but it must say so.
+
+    THIS TEST ORIGINALLY FORBADE THE OVERLAP AND WAS WRONG, which is worth
+    recording because the reasoning sounded right. It asserted that a generic
+    with priced bottles under it must not also carry a `gbp_per_litre` -- two
+    truths that must agree will eventually disagree, the argument
+    _plugins/publish_gate.rb makes for refusing a `published:` key beside
+    `meta.awaiting_fix`.
+
+    It failed on its first run against `cane sugar syrup 2:1`, and the failure
+    was the data being right rather than the data being wrong. That syrup is
+    Monin Pure Cane Sugar at about GBP 10 a litre AND two bags of sugar at
+    about 90p, and both are things Helen actually does. Ranking one over the
+    other would have priced 34 pours -- the third most-poured ingredient in the
+    collection -- a factor of ten out in whichever direction the rule picked.
+    The plugin now spans both, which is what a range is for.
+
+    SO THE RULE THAT SURVIVES IS NARROWER AND STILL WORTH HAVING: an overlap
+    must be a MAKE-OR-BUY, carrying a `basis` that says which sum produced the
+    made figure. An overlap with no basis is the accident the first version was
+    reaching for -- somebody pricing a generic that already had bottles, not
+    realising, and widening every total that pours it.
+    """
+    costs = _costs()
+    bottles = _declared_bottles()
+    priced_bottles = costs.get("bottles") or {}
+    generics = costs.get("generics") or {}
+
+    backed = {
+        (b or {}).get("generic")
+        for name, b in bottles.items()
+        if name in priced_bottles
+    }
+    undocumented = sorted(
+        g
+        for g in backed & set(generics)
+        if not str((generics[g] or {}).get("basis") or "").strip()
+    )
+    assert not undocumented, (
+        "These generics are priced BOTH by a bottle in bottles.yml and by a "
+        "figure in costs.yml `generics:`, with no `basis` explaining the "
+        "second one. The two are unioned into one range, so an accidental "
+        "overlap silently widens every drink that pours it. Either delete the "
+        "fallback, or give it a `basis` saying what it is (a make-or-buy, like "
+        "the sugar syrups):\n  " + "\n  ".join(undocumented)
+    )
+
+
+def test_from_fruit_costs_resolve_to_a_yield_and_a_price():
+    """`from_fruit` is a join across three blocks; check it lands.
+
+    A SQUEEZED JUICE IS PRICED FROM #546's OWN FIGURES rather than from a
+    per-litre number typed twice, so `lime juice` points at `juice_yields:` in
+    ingredients.yml and at `fruit_prices:` here. Three files, two hops, and a
+    typo in either key costs the collection's most-poured ingredient (lime, 58
+    pours) its price without a murmur.
+    """
+    costs = _costs()
+    vocab = _vocab()
+    yields = vocab.get("juice_yields") or {}
+    prices = costs.get("fruit_prices") or {}
+    problems = []
+    for generic, entry in sorted((costs.get("generics") or {}).items()):
+        if not isinstance(entry, dict) or "from_fruit" not in entry:
+            continue
+        key = entry["from_fruit"]
+        y = yields.get(key)
+        if not y:
+            problems.append(
+                f"{generic}: from_fruit {key!r} is not in ingredients.yml "
+                f"`juice_yields:`"
+            )
+            continue
+        fruit = y.get("fruit")
+        if fruit not in prices:
+            problems.append(
+                f"{generic}: yields name fruit {fruit!r}, which has no row in "
+                f"costs.yml `fruit_prices:`"
+            )
+            continue
+        if not (y.get("ml_min") and y.get("ml_max")):
+            problems.append(f"{generic}: {key!r} has no ml_min/ml_max to divide by")
+    assert not problems, (
+        "Broken `from_fruit` joins in _data/cocktails/costs.yml:\n  "
+        + "\n  ".join(problems)
+    )
+
+
+def test_excluded_cost_units_are_real_declared_units():
+    """Everything costs.yml refuses to price must be a unit that exists.
+
+    THE RULE IS HELEN'S -- "None of these come into the estimated cost. I'm
+    catering for family, not running a bar" -- and it is implemented as a list
+    of UNIT NAMES. A typo in that list does not fail: it just quietly starts
+    pricing something she excluded. The units are ingredients.yml's
+    `non_volumetric` and this holds the two files together.
+
+    `to top` IS DELIBERATELY ABSENT from the excluded list even though it is a
+    non-volumetric unit, because Helen asked for it back -- "I'd like that to be
+    captured actually so it can be added into the shopping list feature" -- and
+    `top_up_ml` prices it instead. So this checks one direction only: everything
+    excluded is a real unit, not that every non-volumetric unit is excluded.
+    """
+    costs = _costs()
+    vocab = _vocab()
+    declared = set((vocab.get("measures") or {}).get("non_volumetric") or [])
+    assert declared, (
+        "ingredients.yml declares no `non_volumetric` units, so this test can "
+        "check nothing. That file IS this test's specification."
+    )
+    unknown = sorted(set(costs.get("excluded_units") or []) - declared)
+    assert not unknown, (
+        "costs.yml `excluded_units` names units that ingredients.yml does not "
+        "declare as non-volumetric. A unit that does not exist excludes "
+        "nothing:\n  " + "\n  ".join(unknown)
+    )
+
+
+def test_top_up_volumes_cover_every_to_top_pour(drink_file):
+    """Every `to top` in the collection has a declared volume.
+
+    HELEN ASKED FOR THIS FEATURE BY NAME and it has two consumers: the costing,
+    where a splash of champagne is the dearest thing in the seven glasses that
+    take one, and assets/js/shopping-list.js, which reports an unquantified pour
+    as "to top (x3)" for want of a figure.
+
+    A new drink topped with something undeclared would silently cost nothing and
+    silently go back to being a count on the shopping list, so this runs from
+    the DRINKS rather than from the table.
+    """
+    _require_drink(drink_file)
+    declared = _costs().get("top_up_ml") or {}
+    missing = []
+    for ing in drink_file.fm.get("ingredients") or []:
+        if not isinstance(ing, dict) or str(ing.get("amount", "")).strip() != "to top":
+            continue
+        generics = ing.get("generic")
+        generics = generics if isinstance(generics, list) else [generics]
+        for g in generics:
+            if g and str(g) not in declared:
+                missing.append(str(g))
+    assert not missing, (
+        f"{_drink_where(drink_file)} is topped with "
+        f"{', '.join(sorted(set(missing)))}, which has no entry in "
+        f"_data/cocktails/costs.yml `top_up_ml:`. Add one (a range -- topping "
+        f"is not measuring) so the drink costs correctly and the shopping list "
+        f"can give a volume instead of a count."
+    )
+
+
+def test_every_priceable_pour_has_a_price(drink_file):
+    """A pour measured in a volume must resolve to a price, by bottle or generic.
+
+    THIS IS THE ONE THAT MATTERS, and it runs from the drinks because the
+    failure it catches is a drink using a vocabulary the price table has not
+    caught up with -- which no reading of the table alone can see.
+
+    IT DELIBERATELY IGNORES EXCLUDED POURS. A dash, a leaf, a sugar cube and
+    half a lime are free by Helen's ruling and must NOT be dragged back in by a
+    test that thinks completeness means pricing everything. The question here is
+    narrower and it is the right one: of the things she DID agree to count, is
+    anything unpriced?
+    """
+    _require_drink(drink_file)
+    costs = _costs()
+    vocab = _vocab()
+    bottles = _declared_bottles()
+
+    per_ml = (vocab.get("measures") or {}).get("per_ml") or {}
+    excluded = set(costs.get("excluded_units") or [])
+    ignored = (vocab.get("measures") or {}).get("ignored_words") or []
+    priced_bottles = costs.get("bottles") or {}
+    generic_costs = costs.get("generics") or {}
+
+    # A generic is priceable if a priced bottle sits under it, or it has a row.
+    backed = {
+        (b or {}).get("generic")
+        for name, b in bottles.items()
+        if name in priced_bottles
+    }
+    aliases = set()
+    for name, b in bottles.items():
+        if name not in priced_bottles:
+            continue
+        aliases.add(name.lower())
+        for a in (b or {}).get("aliases") or []:
+            aliases.add(str(a).lower())
+
+    unpriced = []
+    for ing in drink_file.fm.get("ingredients") or []:
+        if not isinstance(ing, dict):
+            continue
+        amount = str(ing.get("amount", "")).strip()
+        if amount in excluded or amount == "to top":
+            continue
+        match = re.match(r"^([\d.]+)\s+(.*)$", amount)
+        if not match:
+            continue
+        unit = match.group(2).strip()
+        for word in ignored:
+            unit = re.sub(rf"^{re.escape(word)}\s+", "", unit)
+        if unit in excluded or unit not in per_ml:
+            continue  # not a volume: free, by Helen's ruling
+
+        suggestions = ing.get("suggestion")
+        suggestions = (
+            [suggestions] if isinstance(suggestions, str) else (suggestions or [])
+        )
+        if any(str(s).lower() in aliases for s in suggestions):
+            continue
+
+        generics = ing.get("generic")
+        generics = generics if isinstance(generics, list) else [generics]
+        if any(g and (str(g) in backed or str(g) in generic_costs) for g in generics):
+            continue
+        unpriced.append(f"{amount} {' or '.join(str(g) for g in generics if g)}")
+
+    assert not unpriced, (
+        f"{_drink_where(drink_file)} pours these in a VOLUME, so they count "
+        f"toward the estimate, but nothing in _data/cocktails/costs.yml prices "
+        f"them:\n  " + "\n  ".join(unpriced)
+        + "\n\nEither add the bottle to bottles.yml and a price beside it, or "
+          "add a `gbp_per_litre_min`/`_max` row under `generics:`. A pour with "
+          "no price is not free -- it is missing, and the drink's total is "
+          "quietly too low."
+    )

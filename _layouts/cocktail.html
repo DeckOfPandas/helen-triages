@@ -628,6 +628,7 @@ layout: default
     <p class="cocktail-scale-note" hidden></p>
   {% endif %}
 
+
   {% comment %} Method is an ORDERED LIST, not the single line the original
      scaffold assumed: the Sazerac's five steps are genuinely sequential
      (coat the glass, shake the rest, discard the wash, strain in), and get
@@ -896,6 +897,40 @@ layout: default
         {% endif %}
       </p>
     </div>
+  {% endif %}
+
+  {% comment %} WHAT IT COSTS, ROUGHLY — LOCAL ONLY. Helen, 2026-09-05: "I only
+     want to show price on the locally built site, and only as an incidental —
+     just somewhere on the recipe page." So it sits in the footer under the
+     source line rather than up beside the ingredients, and it is one quiet
+     sentence rather than a feature.
+
+     `site.show_costs` IS DECLARED IN _config_local.yml AND NOWHERE ELSE, which
+     is exactly the `show_drafts` idiom two keys above it in that file:
+     production declares no such key, the condition is false there, and nothing
+     renders. Never move the key into _config.yml. The prices themselves are
+     public data in _data/cocktails/costs.yml either way — this gate governs
+     what the SITE claims, not what the repo stores.
+
+     `cost.complete` IS FALSE FOR ONE DRINK and the figure is withheld rather
+     than printed with a caveat. The Bellini is a pear, four apricots and 75 g
+     of sugar cooked into a syrup; all of those are weighed or counted, and
+     Helen excluded weighed and counted things, so the rule costs it at 7p —
+     not an approximation of anything. See the plugin's `cost_complete` note.
+
+     `cost.exact` MEANS EVERY POUR NAMED ITS BOTTLE, so there is no span to
+     print and one figure is the honest output, not a range that collapsed.
+
+     THE FIGURES ARE ALSO IN DATA ATTRIBUTES so cocktail-scale.js can multiply
+     them. Cost is linear in volume, so ×4 is exactly four times and the scaler
+     needs to know nothing about prices. Without that the number would go stale
+     and wrong the moment the multiple changed. {% endcomment %}
+  {% if site.show_costs and page.cost and page.cost.complete %}
+    <p class="cocktail-cost"
+       data-cost-min="{{ page.cost.min }}"
+       data-cost-max="{{ page.cost.max }}">Roughly <span class="cocktail-cost-figure">{% if page.cost.exact
+        %}&pound;{{ page.cost.min }}{% else
+        %}&pound;{{ page.cost.min }}&ndash;&pound;{{ page.cost.max }}{% endif %}</span> a glass in ingredients.</p>
   {% endif %}
 
 </article>

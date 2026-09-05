@@ -40,6 +40,19 @@ collections:
     output: true
     permalink: /cocktails/drafts/:path/
 
+# Show the approximate ingredient cost in a drink's footer. LOCAL ONLY, by
+# Helen's instruction on the day it was built (2026-09-05): "I only want to show
+# price on the locally built site, and only as an incidental." Production
+# declares no such key, so `site.show_costs` is false there and
+# _layouts/cocktail.html renders nothing -- the same idiom as `show_drafts`
+# below, and it must stay out of _config.yml for the same reason.
+#
+# THE PRICES THEMSELVES ARE NOT SECRET and live in _data/cocktails/costs.yml in
+# the public repo. This key governs what the SITE says, not what the repo keeps:
+# a page telling a stranger what Helen's Chartreuse cost is a different thing
+# from a table she uses to decide what to make.
+show_costs: true
+
 # Show cocktail drafts on the cocktails index. LOCAL ONLY, AND THAT IS THE
 # WHOLE POINT: `output: false` stops Jekyll writing a draft but does NOT take
 # it out of site.cocktail_drafts, so a template looping the collection prints
