@@ -331,10 +331,6 @@ bottles:
     gbp: 54
     confidence: high
   # --- agave -------------------------------------------------------------
-  "Tapatio":
-    size_ml: 700
-    gbp: 38
-    confidence: medium
   "Patrón Silver":
     size_ml: 700
     gbp: 45
@@ -342,6 +338,22 @@ bottles:
   "Rooster Rojo Bianco":
     size_ml: 700
     gbp: 26
+    confidence: medium
+  # THE THREE HELEN NAMED ON 2026-09-05 so her Rooster/Patrón rule could be
+  # written for reposado and añejo as well as blanco. My prices, not hers --
+  # she supplied the NAMES; these figures are the usual UK retail estimate and
+  # are on the check list.
+  "Rooster Rojo Tequila Reposado":
+    size_ml: 700
+    gbp: 28
+    confidence: medium
+  "Rooster Rojo Tequila Añejo":
+    size_ml: 700
+    gbp: 32
+    confidence: medium
+  "Patrón Añejo":
+    size_ml: 700
+    gbp: 62
     confidence: medium
   "Patrón Reposado":
     size_ml: 700
@@ -356,11 +368,7 @@ bottles:
     size_ml: 700
     gbp: 28
     confidence: high
-  "Pierre Ferrand 1840":
-    size_ml: 700
-    gbp: 38
-    confidence: high
-  "Pierre Ferrand Ambre":
+  "Pierre Ferrand Ambré":
     size_ml: 700
     gbp: 45
     confidence: medium
@@ -730,7 +738,7 @@ default_bottles:
   # the cheap end. HER PARENTHESIS IS WORTH KEEPING: the cheap end here is not
   # cheaper by much, and the range narrows rather than widens because of it.
   # Pierre Ferrand 1840 is unmentioned and so is not a pricing input.
-  cognac: ["Courvoisier", "Pierre Ferrand Ambre"]
+  cognac: ["Courvoisier", "Pierre Ferrand Ambré"]
 
   # "Lightly aged and filtered rum will be one of Havana 3 or El Dorado 3 99% of
   # the time." Flor de Caña Extra Dry is the 1% and stays declared. The two are
@@ -738,15 +746,13 @@ default_bottles:
   # "99% of the time" ought to produce.
   lightly aged and filtered rum: ["Havana Club 3 year old", "El Dorado 3 year old rum"]
 
-  # NOT YET WRITABLE, AND DELIBERATELY LEFT ALONE. Helen: "Same for Reposado and
-  # Anejo actually" -- meaning Rooster when it does not matter, Patrón when it
-  # does. bottles.yml declares Patrón Reposado and NEITHER Rooster reposado nor
-  # anything at all under `añejo tequila`, so the rule cannot be expressed
-  # without adding bottles to her dictionary. That dictionary means "bottles
-  # Helen would reach for" and its entries carry her own product spellings; a
-  # guess at "Rooster Rojo Reposado" would be inventing both a name and a price.
-  # Raised with her instead. Until then `reposado tequila` prices from Patrón
-  # alone and `añejo tequila` from the category figure under `generics:`.
+  # "Same for Reposado and Anejo actually" -- the other two thirds of the
+  # tequila rule, unwritable on 2026-09-05 morning because three of the four
+  # bottles were undeclared. Helen supplied them ("all need diacritics") and
+  # they are in bottles.yml now, so the rule reads the same shape as the
+  # blanco above: Rooster for when it does not matter, Patrón for when it does.
+  reposado tequila: ["Rooster Rojo Tequila Reposado", "Patrón Reposado"]
+  añejo tequila: ["Rooster Rojo Tequila Añejo", "Patrón Añejo"]
 
 # --- generics with no bottle behind them --------------------------------------
 # 438 of 685 pours name a generic and no bottle, and this is what prices them.
@@ -811,14 +817,29 @@ generics:
   # 22.5 ml with nothing to price it from. A 10-year tawny is not scarce the way
   # an overproof Demerara is, so this range is ordinary rather than punitive.
   tawny port:         { gbp_per_litre_min: 20.00, gbp_per_litre_max: 40.00, basis: "GBP 15-30 / 75cl", confidence: low }
-  champagne:          { gbp_per_litre_min: 29.33, gbp_per_litre_max: 53.33, basis: "GBP 22-40 / 75cl", confidence: medium }
+  # HELEN'S OWN FIGURE, 2026-09-05: "Let's say champage is GBP 20 -- I buy
+  # crates of Heidsieck Blue Top on sale at Christmas!!!!!" A POINT PRICE, not a
+  # range, because she buys ONE THING at ONE PRICE rather than shopping the
+  # category -- which is the same reason Campari is a point price, arrived at
+  # from the opposite direction.
+  #
+  # IT REPLACES MY GBP 22-40 GUESS, the single widest source of spread left in
+  # the collection: six of the ten widest-ranging drinks -- Bali Hai, Green
+  # Flash, Airmail, Drunken Skull, Julien Sorel, Arrack Christmas Punch -- were
+  # wide ONLY because of this row.
+  #
+  # HEIDSIECK BLUE TOP IS NOT DECLARED AS A BOTTLE, deliberately. She named it as
+  # the reason for the number rather than as a suggestion, and `champagne` is a
+  # category she buys one of on offer, not a bottle she reaches for by name. If
+  # it should be a bottle that is a two-line change, and this comment is where
+  # the question was left.
+  champagne:          { gbp_per_litre_min: 26.67, gbp_per_litre_max: 26.67, basis: "Heidsieck Blue Top, GBP 20 / 75cl", confidence: high }
   prosecco:           { gbp_per_litre_min: 10.67, gbp_per_litre_max: 18.67, basis: "GBP 8-14 / 75cl", confidence: medium }
   red wine:           { gbp_per_litre_min: 9.33,  gbp_per_litre_max: 16.00, basis: "GBP 7-12 / 75cl", confidence: medium }
   sloe gin:           { gbp_per_litre_min: 32.00, gbp_per_litre_max: 44.00, basis: "GBP 16-22 / 50cl", confidence: medium }
   aquavit:            { gbp_per_litre_min: 37.14, gbp_per_litre_max: 48.57, basis: "GBP 26-34 / 70cl", confidence: medium }
   pisco:              { gbp_per_litre_min: 34.29, gbp_per_litre_max: 45.71, basis: "GBP 24-32 / 70cl", confidence: medium }
   apple brandy:       { gbp_per_litre_min: 40.00, gbp_per_litre_max: 57.14, basis: "GBP 28-40 / 70cl", confidence: medium }
-  añejo tequila:      { gbp_per_litre_min: 64.29, gbp_per_litre_max: 92.86, basis: "GBP 45-65 / 70cl", confidence: medium }
   navy strength gin:  { gbp_per_litre_min: 42.86, gbp_per_litre_max: 57.14, basis: "GBP 30-40 / 70cl", confidence: medium }
   apple schnapps:     { gbp_per_litre_min: 22.86, gbp_per_litre_max: 31.43, basis: "GBP 16-22 / 70cl", confidence: low }
   crème de cassis:    { gbp_per_litre_min: 22.86, gbp_per_litre_max: 34.29, basis: "GBP 16-24 / 70cl", confidence: medium }

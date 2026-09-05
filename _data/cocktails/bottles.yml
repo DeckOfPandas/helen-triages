@@ -483,8 +483,44 @@ bottles:
   "Del Maguey Vida":
     generic: "mezcal"
     aliases: ["Del Maguey VIDA", "Del Maguey vida"]
-  "Tapatio":
-    generic: "blanco tequila"
+
+  # === THE OTHER HALF OF HER TEQUILA RULE, 2026-09-05 ========================
+  # She gave the rule first -- "Bianco tequila is Rooster when it doesn't matter
+  # loads, Patron Silver if it really does. Same for Reposado and Anejo
+  # actually" -- and it could not be written, because three of the four bottles
+  # it names were not declared. Asked, she supplied them: "Rooster Rojo Tequila
+  # Anejo, Rooster Rojo Tequila Reposado, Patron Reposado, Patron Anejo -- all
+  # need diacritics."
+  #
+  # THE DIACRITICS ARE HERS AND THIS FILE'S OLDEST HABIT. "It's Patron with the
+  # diacritic" (2026-09-02) already governed the Silver and the Reposado; the
+  # unaccented spellings stay as aliases so a drink typed in a hurry still
+  # resolves, which is the same bargain `Añejo`/`Anejo` gets here.
+  #
+  # THE MIDDLE WORD IS ALSO HERS. She wrote these two as "Rooster Rojo Tequila
+  # Reposado" where the blanco below is plain "Rooster Rojo Bianco" -- her
+  # spelling, kept, per the standing rule that the drink and the dictionary
+  # follow her and never the reverse. The shorter forms are aliases.
+  "Rooster Rojo Tequila Reposado":
+    generic: "reposado tequila"
+    aliases: ["Rooster Rojo Reposado", "Rooster Reposado"]
+  "Rooster Rojo Tequila Añejo":
+    generic: "añejo tequila"
+    aliases: ["Rooster Rojo Tequila Anejo", "Rooster Rojo Añejo",
+              "Rooster Rojo Anejo", "Rooster Añejo"]
+  # THE FIRST BOTTLE `añejo tequila` HAS EVER HAD, along with the Rooster above.
+  # The category was in use by a drink and backed by nothing, so it priced off
+  # the category fallback in costs.yml; that fallback is deleted in the same
+  # commit, because two real bottles now answer the question better than a guess
+  # at what an añejo costs.
+  "Patrón Añejo":
+    generic: "añejo tequila"
+    aliases: ["Patron Añejo", "Patron Anejo", "Patrón Anejo"]
+
+  # TAPATIO WENT TO `not_reached_for` ON 2026-09-05 -- Helen: "I've run out of
+  # Tapatio! Let's delete it." Del Famoso named it and no longer does. The
+  # category is untouched: `blanco tequila` still has Patrón Silver and Rooster
+  # Rojo Bianco, which are the two her default rule already priced it from.
   # Both arrived from #585, where they had been living inside one comma-joined
   # string ("Patron Silver, Rooster Bianco") on the Margarita. Splitting it is
   # what exposed the two spelling questions -- the accent and the missing
@@ -503,22 +539,51 @@ bottles:
   "Courvoisier":
     generic: "cognac"
     aliases: []
-  # Legend's cognac. A SECOND Pierre Ferrand beside the Ambre below, and not an
-  # alias of it: 1840 Original Formula is a different bottle at a different
-  # strength.
-  "Pierre Ferrand 1840":
-    generic: "cognac"
-    aliases: ["Pièrre Ferrand 1840", "Pierre Ferrand 1840 Original Formula"]
+  # "Pierre Ferrand 1840" WAS A SEPARATE ENTRY HERE AND WAS THE SAME BOTTLE.
+  # It is collapsed into "Pierre Ferrand Ambré" below -- see that entry.
   # Charleston's kirsch, from its own `item`. `eau de vie` is the generic the
   # drink already carries; `kirschwasser` is declared too and is the narrower
   # term, but the drink's own typing is what this follows.
   "Massenez Kirsch Vieux":
     generic: "eau de vie"
     aliases: ["Massenez Kirsch Vieux cherry brandy", "Massenez Kirsch"]
-  "Pierre Ferrand Ambre":
+  # ===== ONE BOTTLE, NOT TWO. Helen, 2026-09-05 ==============================
+  # "Pierre Ferrand 1840 is 'Pierre Ferrand Cognac Ambre' (the e needs an accent
+  # aigu)." So the two cognac entries this file carried were the same bottle
+  # under two names, and they collapse here.
+  #
+  # THE WORD "Cognac" CAME STRAIGHT BACK OUT, minutes later: "I shouldn't have
+  # given 'Cognac' in the name, just Pierre Ferrand Ambré, sorry!" So the
+  # canonical form is the short one. The accent is the part that stuck, and it
+  # is the part that mattered -- the entry this replaced spelled it `Ambre`.
+  #
+  # THIS REVERSES A NOTE WRITTEN THE SAME DAY, and the reversal is the point.
+  # The 1840 entry said outright: "A SECOND Pierre Ferrand beside the Ambre
+  # below, and not an alias of it: 1840 Original Formula is a different bottle
+  # at a different strength." That is TRUE OF THE PRODUCTS -- 1840 Original
+  # Formula and Ambré really are different expressions -- and false about HER
+  # SHELF, which is the only thing this file is about. The bottle harvested out
+  # of an `item` field as "1840" is her Ambré. A confident inference about the
+  # world beat the actual owner of the cupboard for about six hours.
+  #
+  # SO THE 1840 SPELLINGS STAY AS ALIASES, exactly as Plantation does for
+  # Planteray: the drinks were typed before this was known, and a suggestion
+  # must keep resolving whether or not its drink has been retyped. What changes
+  # is what may be WRITTEN in a promoted drink -- Vieux Carré and Sazerac were
+  # retyped to the canonical name in the same commit, since
+  # test_a_promotable_drink_names_bottles_canonically demands it.
+  #
+  # `cognac` DROPS FROM THREE BOTTLES TO TWO, which also narrows the category:
+  # Courvoisier and this. Helen's `default_bottles` rule named both ends anyway
+  # ("Pierre Ferrand Ambre when it matters more, Hine/Corvoisier/Hennessey when
+  # less"), so the collapse removes a duplicate rather than a choice.
+  "Pierre Ferrand Ambré":
     generic: "cognac"
-    aliases: ["Pierre Ferrand ambre", "Pièrre Ferrand Ambre",
-              "Pièrre Ferrand Ambre cognac"]
+    aliases: ["Pierre Ferrand Ambre", "Pierre Ferrand ambre",
+              "Pièrre Ferrand Ambre", "Pièrre Ferrand Ambre cognac",
+              "Pierre Ferrand Cognac Ambré", "Pierre Ferrand Cognac Ambre",
+              "Pierre Ferrand 1840", "Pièrre Ferrand 1840",
+              "Pierre Ferrand 1840 Original Formula"]
   "Avallen":
     generic: "calvados"
 
@@ -870,6 +935,15 @@ not_reached_for:
     the same way: the generic stays, because Port Authority still asks for a
     tawny port, and costs.yml prices the category instead. If a tawny comes
     into the house, this is the line to delete.
+  "Tapatio": >-
+    Helen, 2026-09-05: "I've run out of Tapatio! Let's delete it." NOT THE SAME
+    KIND OF EXCLUSION as the three above, and the line is here so nobody has to
+    guess which: running out is a fact about today, not a judgement about the
+    bottle. If it comes back into the house this line is the only thing to
+    delete. `blanco tequila` is unaffected -- Patrón Silver and Rooster Rojo
+    Bianco remain, and they are the two her default rule already priced it from,
+    so Tapatio was outside the pricing set before it was outside the cupboard.
+    Del Famoso named it and no longer does.
   "Ron del Barrilito Three Stars": >-
     The free one of the three: no drink named it, so nothing changed but the
     count. Worth a line anyway, because the entry it replaced asserted the
