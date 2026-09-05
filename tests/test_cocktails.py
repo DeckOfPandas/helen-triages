@@ -1776,6 +1776,47 @@ def test_a_garnish_is_not_an_ingredient_or_a_rim():
     )
 
 
+def test_every_glass_in_use_has_a_serving_phrase():
+    """Every glass a drink names can be written into a strain step.
+
+    The page BUILDS its strain step -- "Strain into an old fashioned glass, over
+    a large ice cube." -- out of three fields: the technique from `method`, the
+    glass's phrase from `serving` in glasses.yml, and the ice clause from
+    serve.yml. Helen asked for the glass and the ice back in the method on
+    2026-09-05 ("I'd like to name the glass too where it appears"), and the
+    sentence is composed rather than stored so that each fact lives in one place
+    and the prose cannot drift from it.
+
+    A GLASS WITH NO PHRASE FAILS HERE RATHER THAN ON THE PAGE. Without this the
+    step silently falls back to a bare "Strain." and the glass is simply absent
+    from the method -- the quiet kind of gap that took six drinks' glass icons
+    with it in 2026-08 and was found by inspection rather than by a test.
+
+    THE ARTICLE AND THE WORD "GLASS" ARE PART OF THE PHRASE. "an old fashioned
+    glass" but "a highball" and "a coupe" -- Helen's own examples set that
+    pattern, and it is not derivable: an old fashioned is also a drink, so the
+    noun does real work there and none after "coupe".
+    """
+    glasses = _glasses()
+    serving = glasses.get("serving") or {}
+    canon = glasses.get("canonical_glasses") or {}
+    assert serving, "glasses.yml declares no `serving` phrases."
+    missing = {}
+    for slug, fm in _load():
+        for g in (fm.get("glass") or []):
+            key = str(g).lower()
+            key = canon.get(key, key)
+            if key not in serving:
+                missing.setdefault(key, []).append(slug)
+    bad = [f"{k!r} -- {', '.join(sorted(v)[:3])}" for k, v in sorted(missing.items())]
+    assert not bad, (
+        "Glass(es) with no serving phrase:\n  " + "\n  ".join(bad)
+        + "\n\nAdd one to `serving:` in _data/cocktails/glasses.yml, keyed on "
+          "the CANONICAL name and including its article -- \"a coupe\", "
+          "\"an old fashioned glass\"."
+    )
+
+
 def test_suggestion_is_always_a_list():
     """One shape for the bottle field, so no consumer has to handle two.
 

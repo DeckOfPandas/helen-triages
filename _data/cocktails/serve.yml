@@ -87,30 +87,42 @@ ice:
     and it is why the value exists even though it PRINTS NOTHING (see below).
 
 # --- how the page says it ----------------------------------------------------
-# A LINE UNDER "TO SERVE", NOT A NOTE ON THE GLASS. It rode on the glass line
-# for about an hour and Helen killed it: "hurricane, blended" is nonsense —
-# blended is not a property of a glass — and, more generally, "ice pedantry
-# will be more likely to be seen at the point in the make where it happens."
-# So it prints as an instruction, in the section you read after the method,
-# beside the rim and the serveware.
+# THE ICE IS A CLAUSE ON THE STRAIN STEP, not a line of its own. It rode on the
+# glass line in the metadata panel first ("hurricane, blended" — nonsense), then
+# as its own line under "To serve", and Helen moved it a third time to where it
+# actually belongs: "ice pedantry will be more likely to be seen at the point in
+# the make where it happens", and then "I'd like to name the glass too where it
+# appears."
 #
-# `none` AND `blended` PRINT NOTHING, deliberately and for different reasons.
-# `none` is 79 drinks and the commonest case; saying "no ice" on all of them is
-# noise. `blended` is already unmistakable from the method step it always
-# accompanies ("Blend all ingredients including the ice") and has no sensible
-# serving sentence — which is the exact complaint that moved this block here.
-# Both values still exist in the DATA, where the mood derivation and #297 read
-# them; printing is a separate question from recording.
+# So `_layouts/cocktail.html` composes the final strain step from three fields —
+# the technique, the glass's `serving` phrase from glasses.yml, and this clause:
 #
-# WHY A MAP HERE RATHER THAN A CASE IN THE TEMPLATE. The same contract
-# glasses.yml states: adding a value is a YAML edit, never a template edit. A
-# vocabulary split across a data file and a template has only one half that
-# anybody ever checks.
-ice_line:
-  cubed: "Over ice."
-  crushed: "Over crushed ice."
-  large cube: "Over a large ice cube."
-  block: "Over a block of ice."
+#     "Strain."  +  "an old fashioned glass"  +  ", over a large ice cube"
+#         ->  "Strain into an old fashioned glass, over a large ice cube."
+#     "Fine strain."  +  "a coupe"  +  ""
+#         ->  "Fine strain into a coupe."
+#     "Strain."  +  "a highball"  +  " filled with crushed ice"
+#         ->  "Strain into a highball filled with crushed ice."
+#
+# NOTE THE TWO SHAPES. Ice you pour the drink ONTO takes a comma and "over";
+# ice the glass is already FULL of takes "filled with" and no comma. That is
+# not decoration — it is the difference between building on a rock and
+# straining into a packed glass, and Helen's own examples use both.
+#
+# GENERATED, NEVER STORED, and that is the whole point. Storing these sentences
+# is exactly what produced seventeen spellings of "strain" and two truncated
+# ones. Each fact is written once, in the field that owns it, and the sentence
+# is assembled at render time — so a drink that changes glass gets a corrected
+# method for free and no copy can go stale.
+#
+# `none` AND `blended` HAVE NO CLAUSE. A drink served up needs no words added
+# ("Fine strain into a coupe." is complete), and a blended drink has no strain
+# step to attach one to.
+in_the_glass:
+  cubed: " filled with ice"
+  crushed: " filled with crushed ice"
+  large cube: ", over a large ice cube"
+  block: ", over a large block of ice"
 
 # --- `rim` -------------------------------------------------------------------
 # FREE TEXT, deliberately. Two drinks rim today and a closed vocabulary for two

@@ -291,6 +291,60 @@ canonical_glasses:
 # the same calculation `_dev/glasses.html`'s relative-scale view already
 # proved out. #299, the proportion pass (fixing individual drawings once this
 # exposes one that looks wrong at its real height), is still open.
+# =============================================================================
+# SERVING PHRASE — how a strain step names this glass.
+# =============================================================================
+# `_layouts/cocktail.html` builds the final strain step out of three fields:
+# the technique from `method`, this phrase, and the ice clause from
+# _data/cocktails/serve.yml. "Strain." + "an old fashioned glass" +
+# ", over a large ice cube" = "Strain into an old fashioned glass, over a large
+# ice cube."
+#
+# WHY GENERATED AND NOT STORED. Helen, 2026-09-05, asked for the glass and the
+# ice back in the method: "I'd like to name the glass too where it appears."
+# She is right that the method is what you follow while making the drink, and
+# looking up to the metadata panel for the glass and down to "To serve" for the
+# ice is worse than one sentence.
+#
+# But STORING that sentence is what produced seventeen spellings of "strain"
+# and two truncated ones. So the sentence is composed at render time from
+# fields that each hold their fact once. Change the glass and the method
+# follows; nothing can drift, because there is only ever one copy.
+#
+# THE ARTICLE IS PART OF THE PHRASE, deliberately. "an old fashioned glass"
+# needs `an`, "a coupe" needs `a`, and no rule short of a dictionary gets that
+# right from the key. Writing it out is one word per glass and never wrong.
+#
+# THE WORD "GLASS" IS PART OF THE PHRASE TOO, and it is not always there.
+# Helen's own examples set the pattern: "an old fashioned glass" but "a
+# highball" and "a coupe". An old fashioned is also a DRINK, so the noun does
+# real work; a coupe is only ever a glass.
+#
+# KEYED ON THE CANONICAL NAME, so `rocks`, `old-fashioned` and
+# `old-fashioned glass` all arrive here as `old fashioned` via
+# `canonical_glasses` above. A glass in use with no phrase here fails
+# test_every_glass_in_use_has_a_serving_phrase rather than rendering a step
+# with a hole in it.
+serving:
+  brandy glass: "a brandy glass"
+  collins: "a collins glass"
+  coupe: "a coupe"
+  double old fashioned: "a double old fashioned glass"
+  flute: "a flute"
+  highball: "a highball"
+  hurricane: "a hurricane glass"
+  martini: "a martini glass"
+  martini glass: "a martini glass"
+  mug: "a mug"
+  nick and nora: "a Nick and Nora"
+  old fashioned: "an old fashioned glass"
+  pilsner: "a pilsner"
+  punch bowl: "a punch bowl"
+  sling: "a sling glass"
+  sour: "a sour glass"
+  tiki mug: "a tiki mug"
+  wine: "a wine glass"
+
 heights_mm:
   shot: 60
   old-fashioned: 85
