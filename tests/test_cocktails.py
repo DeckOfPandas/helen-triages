@@ -1472,6 +1472,92 @@ def test_no_drink_uses_a_retired_generic():
     )
 
 
+def test_item_is_gone_once_the_generic_is_filled_in():
+    """`item` is a TRANSCRIPTION field with a death date, and this is the date.
+
+    INGEST_ONE_COCKTAIL.md §3 has always described the lifecycle: `item` holds
+    the source's own wording "so that Helen can see what the page said when she
+    comes to fill those two in. SHE DELETES IT AT THAT POINT, which is the same
+    moment she stops guessing about the bottle."
+
+    THE DELETION NEVER HAPPENED, because it was a manual step nobody performed
+    and nothing checked. By 2026-09-05 every one of the 683 pours had a real
+    generic -- not one `QQ` left -- so by the document's own rule the field
+    should have been empty, and it was on 215 of them. Helen: "we agreed to drop
+    item, but then I was persuaded to allow it back as somewhere to hold
+    incoming data, but it's become a dumping ground again."
+
+    SO THE RULE IS CONDITIONAL, NOT ABSOLUTE, and that is deliberate. A freshly
+    ingested drink SHOULD carry `item` on every pour with `generic: QQ` beside
+    it -- that is exactly what the ingest document asks for, and forbidding the
+    field outright would break the one job it does. What is forbidden is the
+    field OUTLIVING the answer it was holding a place for.
+
+    WHY A TEST RATHER THAN A FIRMER SENTENCE. The same conclusion this repo
+    already reached about `meta.awaiting_fix` and `meta.proofread`, and about
+    the destructive-git guards: a rule that gets read and then not followed
+    needs enforcement, not rewording. Three passes emptied the field on
+    2026-09-05 and this is what stops it filling for a third time.
+
+    WHAT TO DO WHEN THIS FAILS. Do not delete the `item` to make it green. Ask
+    what it knows that the fields beside it do not:
+      - a bottle           -> `suggestion` (34 pours were this, and the card
+                              could not show any of them, because `item` does
+                              not render)
+      - a bottle this repo does not know yet -> add it to bottles.yml FIRST,
+                              then move it (23 pours were this)
+      - a flavour property -> `character`
+      - a ratio            -> the precise generic (`honey water 2:1`)
+      - guidance on what to pour -> `note`
+    Only when the answer is "nothing the generic does not already say" is
+    deleting it correct.
+    """
+    bad = sorted(
+        f"{slug}: item {item!r} beside generic {generic!r}"
+        for slug, item, generic in _ingredients()
+        if item and generic and generic != "QQ"
+    )
+    assert not bad, (
+        f"{len(bad)} pour(s) keep an `item` after the generic was settled:\n  "
+        + "\n  ".join(bad)
+        + "\n\n`item` does not render, so anything it alone knows is invisible "
+          "on the page and invisible to ABV and costing. Move what it holds to "
+          "the field that owns it -- see this test's docstring for the five "
+          "cases -- and delete it only when it says nothing new."
+    )
+
+
+def test_suggestion_is_always_a_list():
+    """One shape for the bottle field, so no consumer has to handle two.
+
+    It was a bare string on 194 pours and a list on 18 until 2026-09-05. Liquid
+    treats a bare string as a one-item sequence, so the template tolerated both
+    by accident and nothing ever complained -- but every consumer #297 (ABV) and
+    #547 (cost) will add would have had to keep handling both, forever.
+
+    `generic` IS DELIBERATELY NOT HELD TO THIS, and the difference is the whole
+    reason this test names only one field. There a string means "this category"
+    and a list means "either of these would do" (#441, Helen 2026-08-17: "What I
+    have there is fine. I can do what I want on the spot"), so the two shapes
+    carry DIFFERENT MEANINGS and the 677-to-6 split is not drift. On
+    `suggestion` both shapes mean the same thing and differ only in how many
+    bottles are named, which is.
+    """
+    bad = []
+    for slug, fm in _load():
+        for entry in (fm.get("ingredients") or []):
+            if not isinstance(entry, dict):
+                continue
+            sugg = entry.get("suggestion")
+            if sugg is not None and not isinstance(sugg, list):
+                bad.append(f"{slug}: suggestion: {sugg!r} is a {type(sugg).__name__}")
+    assert not bad, (
+        "`suggestion` must always be a list:\n  " + "\n  ".join(sorted(bad))
+        + '\n\nWrite one bottle as `suggestion: ["Beefeater"]`, not as a bare '
+          "string. Flow style keeps it to one line."
+    )
+
+
 # =============================================================================
 # 3 -- the family roll-up, which serves search and exclusion (NOT browsing)
 # =============================================================================
