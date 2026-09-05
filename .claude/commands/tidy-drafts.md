@@ -76,12 +76,22 @@ inside `QQ` text, so this is not a technicality.
    does not close or even cross-reference the public issue, so treat closing as
    a separate deliberate step.
 
-8. **Never push without Helen's explicit confirmation**, in either repo.
+8. **Push per `CLAUDE.md`, which changed on 2026-08-29 and this line did not.**
+   Pushing `main` in the two PRIVATE drafts repos is fine and needs no ask —
+   nothing there triggers a build, and a commit sitting unpushed on one disk is
+   the real risk. Everything else is unchanged: `helen-triages` itself is never
+   pushed without her explicit confirmation, and COMMITTING to `main` is still
+   forbidden in every repo, hook-enforced.
 
 ## What this does not cover
 
-- **Cocktail drafts.** Out of scope by decision, 2026-08-29: that schema is
-  mid-migration (#544, #571, #573), so tidying it now is work done twice.
+- **Cocktail drafts.** Out of scope by decision, 2026-08-29: that schema was
+  mid-migration (#544, #571, #573), so tidying it then was work done twice.
+  **#571 and #573 have since landed and #544's mechanical half is spent**, so
+  the stated reason has largely expired — but the exclusion has not been
+  revisited with Helen and the script still only reads `_food_drafts/`. The
+  drinks' equivalent pass is step 2 of `model_instructions/PUBLISHING_A_DRINK.md`,
+  driven by the suite rather than by this script. Ask before widening.
 - **Size words** (108 drafts, moving `large`/`medium` from `item:` to
   `amount:`). Considered and excluded — mechanical in shape, but it rewrites two
   fields per hit and the precedent records fixes that needed an eye.

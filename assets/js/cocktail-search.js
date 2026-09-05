@@ -198,13 +198,15 @@
        the one to read: "matching still has to run against the real match key,
        not the pretty name."
 
-       THE COLLAPSING PAIRS COME FREE AND ARE THE BEST PART. `sugar syrup 1:1`
-       and `sugar syrup 2:1` share the card name `sugar syrup`, so they become
+       THE COLLAPSING PAIRS COME FREE AND ARE THE BEST PART. `cane sugar syrup
+       1:1` and `cane sugar syrup 2:1` share the card name `sugar syrup`, so they become
        one chip covering 35 drinks rather than two covering 4 and 31 -- which is
        §9.10.1's own ruling arriving in the picker: "a ratio is a MAKING fact,
-       not a CHOOSING fact". Same for the two honey waters and the two
-       Jamaicans. `card_names_may_collide` already declares each of these three
-       as deliberate. */
+       not a CHOOSING fact". Same for the two Jamaicans.
+       `card_names_may_collide` already declares both of these as deliberate.
+       (The two honey waters were a third such pair until 2026-09-04, when
+       Helen flattened them into one `honey water` generic -- so that collapse
+       now happens in the vocabulary rather than here.) */
     var chipForTerm = Object.create(null);   // folded term -> the chip it belongs to
     var chipCovers = Object.create(null);    // folded chip -> [folded terms it selects]
 

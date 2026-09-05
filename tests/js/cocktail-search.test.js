@@ -57,7 +57,7 @@ const VOCAB = {
   // A list-valued key is a generic vocabulary — that is how the module tells a
   // name Helen chose from text someone transcribed, the same shape
   // test_cocktails.py's _declared_generics reads.
-  syrups: ['ginger and lemongrass cordial', 'sugar syrup 1:1', 'sugar syrup 2:1'],
+  syrups: ['ginger and lemongrass cordial', 'cane sugar syrup 1:1', 'cane sugar syrup 2:1'],
   // `Jamaican, moderately aged` is #561's RETIRED shape, kept here as the one
   // declared term that reads as prose by the comma rule. Nothing in the live
   // vocabulary does -- measured 2026-08-31, 0 of 188 -- so without a fixture
@@ -77,8 +77,8 @@ const VOCAB = {
     // which is the only way it reaches viaKind as a HIDDEN declared term.
     'Jamaican, moderately aged': 'Jamaican rum',
     'moderately aged rum': 'aged rum',
-    'sugar syrup 1:1': 'sugar syrup',
-    'sugar syrup 2:1': 'sugar syrup'
+    'cane sugar syrup 1:1': 'sugar syrup',
+    'cane sugar syrup 2:1': 'sugar syrup'
   }
 };
 
@@ -439,11 +439,11 @@ test('a chip is ranked by its BEST term, not only by the name on its face', () =
 test('a chip that stands for two generics selects both -- the ratios collapse', () => {
   // §9.10.1: "a ratio is a MAKING fact, not a CHOOSING fact." One `sugar syrup`
   // chip rather than a 1:1 button and a 2:1 button.
-  const pool = S.buildPool([attr('sugar syrup 1:1'), attr('sugar syrup 2:1')]);
+  const pool = S.buildPool([attr('cane sugar syrup 1:1'), attr('cane sugar syrup 2:1')]);
   assert.deepStrictEqual(labels(pool), ['sugar syrup']);
 
-  const oneToOne = CS.splitEntries(attr('sugar syrup 1:1'));
-  const twoToOne = CS.splitEntries(attr('sugar syrup 2:1'));
+  const oneToOne = CS.splitEntries(attr('cane sugar syrup 1:1'));
+  const twoToOne = CS.splitEntries(attr('cane sugar syrup 2:1'));
   assert.strictEqual(S.matchesInclude(oneToOne, 'sugar syrup'), true);
   assert.strictEqual(S.matchesInclude(twoToOne, 'sugar syrup'), true);
   assert.strictEqual(S.matchesExclude(oneToOne, 'sugar syrup'), true);
@@ -535,9 +535,9 @@ test('INCLUDE is a word PREFIX, not a substring -- apple juice is not pineapple 
 });
 
 test('INCLUDE needs EVERY word of the chip to land somewhere in the entry', () => {
-  const entries = CS.splitEntries(attr('sugar syrup 2:1'));
+  const entries = CS.splitEntries(attr('cane sugar syrup 2:1'));
   assert.strictEqual(S.matchesInclude(entries, 'sugar syrup'), true);
-  assert.strictEqual(S.matchesInclude(entries, 'honey syrup'), false);
+  assert.strictEqual(S.matchesInclude(entries, 'honey water'), false);
 });
 
 test('INCLUDE also honours a declared family', () => {

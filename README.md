@@ -42,6 +42,4 @@ Yes I can. I doubt that I will.
 ## License
 
 Code: [MIT](LICENSE).
-Recipes and writing: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-
-Recipes and writing: [CC BY 4.0](https://creativecommons.org) — reuse freely, just credit me.
+Recipes and writing: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — reuse freely, just credit me.

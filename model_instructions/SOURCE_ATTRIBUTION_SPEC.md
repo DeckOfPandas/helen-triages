@@ -11,9 +11,12 @@ source_type: book
 ```
 
 **This is enforced.** `tests/test_source_attribution.py` checks every rule below
-against all 82 recipes and all 314 drafts. `source_type` is in `REQUIRED`, so a
-recipe without one fails too. You will not get a citation past the suite by
-being close enough.
+against **every** recipe and **every** draft — deliberately including drafts,
+because a draft that drifts is a promotion that drifts. `source_type` is in
+`REQUIRED`, so a recipe without one fails too. You will not get a citation past
+the suite by being close enough. (This said "all 82 recipes and all 314 drafts"
+until 2026-09-05; there are 86 recipes now, the drafts count moves every week,
+and neither number was ever what the test loops over.)
 
 ---
 

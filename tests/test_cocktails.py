@@ -58,6 +58,14 @@ pytestmark = pytest.mark.cocktails
 ROOT = Path(__file__).resolve().parent.parent
 RECIPES = ROOT / "_cocktail_recipes"
 DRAFTS = ROOT / "_cocktail_drafts"
+# THE STAGING FOLDER IS THE PUBLISHED TENSE -- Helen, 2026-09-04, going through
+# Fish House Punch: "'ED3' isn't a bottle" and "this has 'item' everywhere too".
+# `to-promote/` is where a drink sits once she has cooked it, amended it and
+# decided it ships; the only thing between it and `_cocktail_recipes/` is her
+# own proofread. So the rules that bite at promotion bite HERE, where there is
+# still time to fix them, rather than at the moment of the move. See
+# `_load_staged`.
+STAGED = DRAFTS / "to-promote"
 VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"
 TAXONOMY = ROOT / "_data" / "cocktails" / "taxonomy.yml"
 BOTTLES = ROOT / "_data" / "cocktails" / "bottles.yml"
@@ -313,6 +321,47 @@ def _load_published():
     return out
 
 
+def _load_staged():
+    """The published tense: `_cocktail_recipes/` plus `_cocktail_drafts/to-promote/`.
+
+    A THIRD DOOR, AND IT EXISTS BECAUSE PROMOTION IS TOO LATE TO FIND OUT.
+    `_load_published` asks about drinks the world can already see, which is the
+    right scope for a claim about the live site and the wrong one for a claim
+    about work in progress: a rule that first fires on the day a file is moved
+    turns promotion into a debugging session, and the drink is ready except for
+    a thing nobody mentioned while it was being written.
+
+    Helen drew the line herself, 2026-09-04, reading Fish House Punch: *"'ED3'
+    isn't a bottle"* and *"this has 'item' everywhere too"*. `to-promote/` is
+    hers -- she moves files into it once she has made the drink and decided it
+    ships -- so a file in there is finished prose waiting on her proofread, and
+    the fields the site publishes should already be in their published form.
+
+    IT SKIPS WHEN NEITHER DIRECTORY IS ON DISK, and only then. `to-promote/`
+    lives in the private drafts repo, so CI never has it; `_cocktail_recipes/`
+    is in this repo and is simply empty today. Either one present and yielding
+    drinks is enough to run, which is the same bargain `_load_files` strikes --
+    "this machine has no staged drinks" and "I looked and found nothing" must
+    not produce the same green.
+    """
+    out = _read(RECIPES) + _read(STAGED)
+    if out:
+        return out
+    if not (RECIPES.is_dir() or STAGED.is_dir()):
+        pytest.skip(
+            "Neither `_cocktail_recipes/` nor `_cocktail_drafts/to-promote/` is "
+            "on this machine, so there is no staged drink to check. The staging "
+            "folder is in the private drafts repo (gitignored here), and "
+            "`_cocktail_recipes/` starts empty -- see NO_DRINKS_REASON."
+        )
+    pytest.skip(
+        "No drinks are staged for publication. `_cocktail_recipes/` is empty "
+        "and `_cocktail_drafts/to-promote/` holds nothing, which is a fact "
+        "about where Helen is rather than a stale loader: these rules start "
+        "running the moment she moves the first file into either."
+    )
+
+
 # =============================================================================
 # PER-DRINK PARAMETRISATION, added 2026-09-03 with the house-style rules (#670)
 # =============================================================================
@@ -556,7 +605,7 @@ def test_every_drink_reading_test_goes_through_the_loader():
         if node.name in LOADER_GUARDS:
             continue
         names = {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
-        named = sorted(names & {"RECIPES", "DRAFTS"})
+        named = sorted(names & {"RECIPES", "DRAFTS", "STAGED"})
         if named:
             offenders.append(f"{node.name} names {', '.join(named)} directly")
 
@@ -567,7 +616,9 @@ def test_every_drink_reading_test_goes_through_the_loader():
     assert not offenders, (
         "Test(s) read the cocktail collections without going through _load():\n  "
         + "\n  ".join(offenders)
-        + "\n\nCall _load() instead. It reads BOTH `_cocktail_recipes/` and "
+        + "\n\nCall _load(), _load_published() or _load_staged() instead -- "
+          "whichever scope the rule is actually about. _load() reads BOTH "
+          "`_cocktail_recipes/` and "
           "`_cocktail_drafts/`, skips only when neither is on disk, and fails "
           "loudly when one is present and empty. A test that globs a root "
           "itself gets none of that, and in CI -- where the drafts are always "
@@ -735,6 +786,118 @@ def test_a_promoted_drink_carries_no_draft_only_key():
     )
 
 
+# =============================================================================
+# THE PUBLISHED TENSE -- Helen's rulings on Fish House Punch, 2026-09-04
+# =============================================================================
+# Two rules, one scope: `_cocktail_drafts/to-promote/` and `_cocktail_recipes/`.
+# Both are about the difference between a drink being WRITTEN and a drink being
+# FINISHED, and both were things Helen had to say out loud while reading a file
+# she was about to ship.
+#
+# THE DRAFTS KEEP HER SPELLING AND THE ALIASES DO THE READING. That standing
+# rule (§9.3.2: "leave the drinks as she wrote them; aliases do the reading") is
+# untouched and is why `bottles.yml` carries seventeen bottles under more than
+# one name. What these add is an END to it: the alias map exists so a drink can
+# be written fast and still resolve, and a drink that is finished has had time
+# to say the bottle's real name.
+
+def test_a_staged_drink_writes_a_bottles_canonical_name():
+    """A drink ready to publish names each bottle as `bottles.yml` names it.
+
+    Helen, 2026-09-04, on Fish House Punch's `suggestion: "ED3"`: *"'ED3' isn't
+    a bottle."* It resolves -- it is a declared alias of `El Dorado 3 year old
+    rum` -- so `test_every_suggested_bottle_resolves` was and is happy, which is
+    exactly why this is a second rule rather than a change to that one. An alias
+    is a READING convenience; the published page is a piece of WRITING, and
+    "ED3" on it is a note to self that escaped.
+
+    AND IT IS NOT A CHANGE OF MIND ABOUT DRAFTS. §9.3.2's rule stands
+    everywhere else: write the bottle as she spells it, add the spelling as an
+    alias, never retype a drink to canonical form. The alias map is what lets an
+    ingest be fast. This says only that the fast form is not the finished form,
+    and it fires in `to-promote/` -- where there is still time -- rather than at
+    the moment of the move.
+
+    A SUGGESTION THAT RESOLVES TO NOTHING IS NOT THIS TEST'S PROBLEM: it is
+    `test_every_suggested_bottle_resolves`'s, and reporting one fault as two
+    teaches you to skim the output.
+    """
+    data = _bottles()
+    index = _bottle_index(data)
+    assert index, "bottles.yml resolves no names; nothing to check."
+    canonical = set((data.get("bottles") or {}))
+
+    bad = []
+    for slug, fm in _load_staged():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            suggestion = item.get("suggestion")
+            for name in (suggestion if isinstance(suggestion, list)
+                         else [suggestion] if suggestion else []):
+                if not isinstance(name, str) or name in canonical:
+                    continue
+                real = index.get(name.strip().lower())
+                if real is None:
+                    continue        # owned by test_every_suggested_bottle_resolves
+                bad.append(f"{slug}: {name!r} -> {real!r}")
+
+    assert not bad, (
+        "Staged drink(s) writing a bottle's ALIAS rather than its name:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nRetype the `suggestion` to the name on the right -- the one "
+          "_data/cocktails/bottles.yml declares. A drink in `to-promote/` or "
+          "`_cocktail_recipes/` is finished writing and is read by strangers, "
+          "and an alias is shorthand Helen wrote for herself while transcribing "
+          "(\"'ED3' isn't a bottle\", 2026-09-04). Everywhere else the opposite "
+          "rule holds and is deliberate: leave a draft as she spelled it and "
+          "teach the dictionary the spelling (HANDOVER §9.3.2)."
+    )
+
+
+def test_a_staged_drink_carries_no_transcription_field():
+    """A drink ready to publish has no `item` left on any ingredient.
+
+    Helen, 2026-09-04, on the same file: *"this has 'item' everywhere too."*
+    §9.10 has said since 2026-09-02 that `item` is a DRAFTS-ONLY transcription
+    field -- what the source called the pour, kept so she can see the original
+    words while she fills in `generic` and `suggestion` -- and that *"promotion
+    is the deadline rather than a someday"*. `INGREDIENT_KEYS_RECIPES` enforced
+    that in `_cocktail_recipes/`.
+
+    THE DEADLINE WAS IN THE WRONG PLACE, which is the whole of this test. A
+    drink only reaches `_cocktail_recipes/` by being MOVED there, so the rule
+    fired at the one moment when the answer to "what did the source say?" is
+    least available and the job is meant to be finished. In `to-promote/` the
+    drink is still in front of her, and the field is still there to read.
+
+    NOTHING RENDERS `item` (§9.10, #544), so deleting one changes no page and
+    loses no reader anything -- but it can lose a FACT. Before deleting one,
+    check that everything it says is already carried by `generic`, `suggestion`
+    or `amount`; where it is not, the fact goes into a `note:` on the same
+    ingredient. Five entries on Fish House Punch, two on the pear Bellini and
+    three on Smokestack Lightning went that way on 2026-09-04, and one of them
+    left a note behind.
+    """
+    bad = []
+    for slug, fm in _load_staged():
+        for i, item in enumerate(fm.get("ingredients") or [], 1):
+            if not isinstance(item, dict) or "item" not in item:
+                continue
+            bad.append(f"{slug} entry {i}: item: {item['item']!r}")
+
+    assert not bad, (
+        "Staged drink(s) still carrying the `item` transcription field:\n  "
+        + "\n  ".join(bad)
+        + "\n\n`item` holds what the SOURCE called the ingredient and nothing "
+          "renders it (§9.10). Read each one before deleting it: if it says "
+          "something `generic`, `suggestion` and `amount` do not already say, "
+          "that fact belongs in a `note:` on the ingredient. If it says nothing "
+          "new -- which is the usual case, 385 of 617 entries restated their "
+          "own generic -- just delete the line."
+    )
+
+
 def test_every_ingredient_has_a_declared_shape():
     """Every ingredient entry carries a `generic`; nothing else is required.
 
@@ -755,6 +918,85 @@ def test_every_ingredient_has_a_declared_shape():
         + "\n\nAn ingredient nobody has typed yet writes `generic: \"QQ\"`, "
           "which is what test_every_ingredient_has_a_generic_or_a_qq expects. "
           "An ABSENT key is the one shape neither check can report on."
+    )
+
+
+def _step_text(step):
+    """The words of one method step, whichever of the two shapes it is written in.
+
+    A STEP IS A STRING OR A `{step, note}` PAIR -- Helen, 2026-09-04: "separate
+    note field please, although it will be used sparingly." Every reader of
+    `method` in this file goes through here, and that is the point: the pair
+    arrived on one drink and turned
+    `test_every_proposal_still_matches_a_real_step` red with "cannot use 'dict'
+    as a set element", because that test built a set straight out of the raw
+    list. One reader, fixed once, is what stops the next reader hitting the same
+    wall -- `conftest.Recipe.method_steps` is the food side's own version of this
+    and has read both shapes for as long as food has had them.
+
+    Anything that is neither shape reads as no words at all, and the shape test
+    below is what fails on it -- a reader is not the place to complain.
+    """
+    if isinstance(step, dict):
+        step = step.get("step")
+    return step if isinstance(step, str) else ""
+
+
+def _steps(fm):
+    """Every method step of one drink, as text.
+
+    The scalar form (`method: "Stir."`) is accepted here the way the layout
+    accepts it, so a check cannot silently skip a drink written that way.
+    """
+    method = fm.get("method")
+    listed = method if isinstance(method, list) else [method] if method else []
+    return [text for text in (_step_text(s) for s in listed) if text]
+
+
+def test_a_method_step_is_a_string_or_a_step_note_pair():
+    """`method` holds strings, or `{step, note}` pairs -- Helen, 2026-09-04.
+
+    "Separate note field please, although it will be used sparingly." The
+    Caipirinha is the drink that earned it: its muddle step used to carry the
+    remark in brackets -- "(my giant spiky muddler, not the polite smooth one)"
+    -- inside the instruction, where it reads as part of what to do rather than
+    as an aside about how she does it.
+
+    THE NOTE MUST BE A NON-EMPTY STRING WHEN PRESENT. `note: ""` and `note: []`
+    both render as a step with an empty grey line under it, which looks like a
+    page bug rather than like a drink with nothing to add; a step with nothing
+    to say simply stays a string.
+
+    AND THE PAIR MAY HOLD NOTHING ELSE. A third key is either a typo or a field
+    nobody implemented, and both render as silence -- the same argument
+    `test_no_unknown_front_matter_keys` makes one level up.
+    """
+    bad = []
+    for slug, fm in _load():
+        method = fm.get("method")
+        listed = method if isinstance(method, list) else [method] if method else []
+        for i, step in enumerate(listed, 1):
+            where = f"{slug} step {i}"
+            if isinstance(step, str):
+                continue
+            if not isinstance(step, dict):
+                bad.append(f"{where}: {step!r} is neither a string nor a pair")
+                continue
+            extra = sorted(set(step) - {"step", "note"})
+            if extra:
+                bad.append(f"{where}: unknown key(s) {extra}")
+            if not (isinstance(step.get("step"), str) and step["step"].strip()):
+                bad.append(f"{where}: `step` is {step.get('step')!r}")
+            if "note" in step and not (isinstance(step["note"], str)
+                                       and step["note"].strip()):
+                bad.append(f"{where}: `note` is {step['note']!r}")
+    assert not bad, (
+        "Method step(s) in neither shape:\n  " + "\n  ".join(bad)
+        + "\n\nA step is a plain string, or:\n\n"
+          '  - step: "Muddle the lime chunks hard with the sugar."\n'
+          '    note: "my giant spiky muddler not the polite smooth one"\n\n'
+          "Both halves are non-empty strings and there is no third key. Used "
+          "sparingly -- Helen, 2026-09-04."
     )
 
 
@@ -1181,7 +1423,7 @@ def test_every_generic_is_declared():
     hand-written schema examples, which predate the vocabulary: `Creole bitters`
     (capitalised), `chartreuse` (which of the two?), `peach liqueur` (the
     collection uses crème de pêche), `rye whiskey` (the style is `rye`) and
-    `sugar syrup` (1:1 or 2:1 is the whole distinction).
+    `sugar syrup` (which sugar, and 1:1 or 2:1, are the whole distinction).
     """
     vocab = _vocab()
     declared = _declared_generics(vocab)
@@ -2103,6 +2345,41 @@ def test_the_cross_category_check_is_exercised():
         "loader is stale.")
 
 
+_RATIO = re.compile(r"^\d+:\d+$")
+
+
+def _same_category(bottle_generic, ingredient_generic):
+    """Does a bottle's own category cover the one an ingredient asks for?
+
+    THE SAME STRING, OR THE SAME STRING PLUS A RATIO -- and the second half is
+    Helen's, 2026-09-04, arriving with the Bee's Knees. `Acacia honey` is
+    declared under the flat `honey water`, because the ratio is what you DO with
+    the honey rather than a property of the jar: there is no `Acacia honey
+    (2:1)` on any shelf. She kept the ratio generics anyway ("I really do need
+    that generic here"), which left one drink asking for `honey water 2:1` and
+    suggesting a bottle typed `honey water`.
+
+    THAT IS NOT A SUBSTITUTION, and calling it one would be the worse failure of
+    the two available. #534 exists so a SURPRISING swap is visible -- Pernod
+    where absinthe was asked for. A note reading "QQ" on every honey drink,
+    saying nothing surprising happened, is how a marker stops being read; and
+    the day a genuine cross-category honey suggestion arrives it would sit in a
+    column of identical noise.
+
+    A REFINEMENT ONLY GOES ONE WAY. A bottle typed `honey water 2:1` suggested
+    for an ingredient asking for flat `honey water` is NOT covered here, and
+    should not be: that bottle is claiming a ratio the recipe did not ask for,
+    which is a real thing to look at. No such bottle exists today.
+    """
+    if bottle_generic == ingredient_generic:
+        return True
+    if not (isinstance(bottle_generic, str)
+            and isinstance(ingredient_generic, str)):
+        return False
+    head, _, tail = ingredient_generic.rpartition(" ")
+    return bool(head == bottle_generic and _RATIO.match(tail))
+
+
 def _cross_category_scan():
     """(how many resolved suggestions were checked, the unexplained ones).
 
@@ -2145,7 +2422,7 @@ def _cross_category_scan():
                     continue  # owned by test_every_suggested_bottle_resolves
                 checked += 1
                 bottle_generic = (entries.get(canonical) or {}).get("generic")
-                if bottle_generic in generics:
+                if any(_same_category(bottle_generic, g) for g in generics):
                     continue
                 if item.get("note"):
                     continue
@@ -2903,8 +3180,13 @@ def test_no_method_step_restates_to_serve_or_garnish():
     step that merely NAMES a garnish, and the difference is the whole rule:
 
         "Float the dehydrated lime slice wheel."     an ACTION -- stays
-        "Express lemon zest twist and use as garnish" an ACTION -- stays
         "Garnish with grated nutmeg."                 a RESTATEMENT -- goes
+
+    (It used to cite "Express lemon zest twist and use as garnish" as the
+    action that stays, and that step is gone: the LAYOUT writes it now, from the
+    garnish -- Helen's ruling, 2026-09-04. See
+    test_no_method_step_opens_with_express below, which is this rule applied to
+    the one action that turned out to be derivable after all.)
 
     HANDOVER 9.4 settles which is which: finishing ACTIONS are method steps
     ("top with champagne", "squeeze the twist over the drink"), presentation is
@@ -2921,10 +3203,7 @@ def test_no_method_step_restates_to_serve_or_garnish():
     checked = 0
     bad = []
     for slug, fm in _load():
-        method = fm.get("method")
-        for step in (method if isinstance(method, list) else [method] if method else []):
-            if not isinstance(step, str):
-                continue
+        for step in _steps(fm):
             checked += 1
             verb = re.match(r"\s*(serve|garnish)\b", step, re.I)
             if verb:
@@ -2943,6 +3222,53 @@ def test_no_method_step_restates_to_serve_or_garnish():
         "No method steps were scanned at all, so this compared nothing. Every "
         "drink has a `method`; an empty scan means the loader or the key name "
         "has moved."
+    )
+
+
+def test_no_method_step_opens_with_express():
+    """The twist step is the LAYOUT's, not a drink's -- Helen's ruling, 2026-09-04.
+
+    She was asked whether "a garnish of any citrus twist should automatically
+    add the step 'Express the twist over the drink and drop it in' at the end of
+    the method, so no drink has to write it", and said yes -- answering
+    `el-presidente`'s own QQ, which had asked for exactly that and said it
+    "should become canonical, for each type of citrus twist".
+
+    SO THE STEP IS DERIVED FROM `garnish:` AND WRITING IT IS A DUPLICATION. It
+    is the same fact twice, in two fields, which is what §9.12 means by variance
+    that looks informative and is not -- and it is worse than the usual case,
+    because the two copies can disagree: `man-o-war` said "discard" while its
+    garnish said `lemon twist`, so the page would have told you to drop the peel
+    in and to throw it away.
+
+    THREE DRINKS HAD WRITTEN IT, IN THREE WORDINGS, and all three were deleted
+    the day this landed: `corpse-reviver-no-2` ("Express lemon zest twist and use
+    as garnish"), `man-o-war` and `north-sea-oil`. The wording the layout emits
+    is canonical in methods.yml under `express`.
+
+    THE VERB IS THE TEST, as in its sibling above: this fires on a step that
+    OPENS with "Express" and nothing else. A step that expresses something in
+    passing is prose about a different action and stays.
+    """
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for step in _steps(fm):
+            checked += 1
+            if re.match(r"\s*express\b", step, re.I):
+                bad.append(f"{slug}: {step!r}")
+    assert not bad, (
+        "Method step(s) writing the twist step by hand:\n  " + "\n  ".join(bad)
+        + "\n\nDELETE THEM. _layouts/cocktail.html adds \"Express the twist "
+          "over the drink and drop it in.\" as the last step of any drink whose "
+          "`garnish` names a citrus twist, and \"...and discard it.\" where the "
+          "garnish says `(discarded)`. Helen ruled on 2026-09-04 that no drink "
+          "writes it. If the drink really does express something, say what it "
+          "is doing to the drink and lead with that verb."
+    )
+    assert checked, (
+        "No method steps were scanned at all, so this compared nothing -- the "
+        "loader or the key name has moved."
     )
 
 
@@ -4311,14 +4637,14 @@ def test_syrup_ratio_is_plausible_for_its_generic():
 def test_the_syrup_ratio_check_is_exercised():
     """Some drink has both a sugar syrup and a citrus juice with ml figures.
 
-    Zero would mean the `sugar syrup` generic prefix or the citrus pattern had
+    Zero would mean the `cane sugar syrup` generic prefix or the citrus pattern
     gone stale, leaving the ratio check green over nothing. Whole collection
     only: see `_exercised`.
     """
     checked, _ = _syrup_ratio_scan()
     _exercised(
         checked, "the syrup-to-citrus ratio check",
-        "That is implausible for the whole collection -- the `sugar syrup` "
+        "That is implausible for the whole collection -- the `cane sugar syrup` "
         "generic prefix or the citrus pattern has probably gone stale.")
 
 
@@ -4358,8 +4684,14 @@ def _syrup_ratio_scan():
             g = entry.get("generic")
             return g if isinstance(g, list) else [g] if g else []
 
+        # `cane sugar syrup` SINCE 2026-09-04, when the generics gained their
+        # sugar. The prefix picks out exactly the same two generics it always
+        # did -- the demerara one is still outside it, as `demerara syrup` was
+        # -- so the scan's coverage is unchanged and the rename is followed
+        # rather than silently widened.
         syrup = sum(ml(i) for i in items
-                    if any(str(g).startswith("sugar syrup") for g in generics(i)))
+                    if any(str(g).startswith("cane sugar syrup")
+                           for g in generics(i)))
         # MATCHES THE GENERIC, NOT `item` -- moved with #544's second move, and
         # it had to move in the same commit: 106 of the entries that lost their
         # `item` are juices whose only contribution was the word "fresh", so
@@ -4420,8 +4752,14 @@ def _canonical_steps(spec):
 
 
 def _all_method_steps():
-    return [(slug, s) for slug, fm in _load()
-            for s in (fm.get("method") or [])]
+    """Every step in the collection, as (slug, text).
+
+    THROUGH `_steps`, which is what makes a `{step, note}` pair readable here:
+    the raw list went into a set below and a dict is not hashable, so the first
+    drink written in the pair shape turned this red with "cannot use 'dict' as a
+    set element" -- a schema addition breaking a check about method WORDING.
+    """
+    return [(slug, s) for slug, fm in _load() for s in _steps(fm)]
 
 
 def test_every_proposal_names_a_real_canonical_step():
@@ -4642,19 +4980,24 @@ def test_nothing_on_the_not_on_cards_list_reaches_a_card_or_the_search():
 
 
 def test_a_suppressed_word_is_only_ever_suppressed_ALONE():
-    """`honey water` and `soda water` are real choosing facts and must survive.
+    """`soda water` is a real choosing fact and must survive.
 
     The caveat is the whole of Helen's instruction, and it is also the shape of
     a bug this repo already had: the picker matched `water` against `honey
     water` by substring until 2026-08-29. `contains` on a Liquid list is exact
     membership, so the template cannot repeat it -- this asserts that the LIST
     itself does not name a compound, which is the other way in.
+
+    `honey water` was the second example until 2026-09-04, when Helen flattened
+    both ratios into one `honey water` generic. The compound it illustrated is
+    gone from the vocabulary; the rule is not, and `soda water` still shows it.
     """
     for value in _vocab().get("not_on_cards") or []:
         assert len(str(value).split()) == 1, (
             f"`not_on_cards` names {value!r}, which is more than one word. This "
             f"list exists for ingredients that are never a reason to choose a "
-            f"drink; a compound like `honey water` or `soda water` is one, and "
+            f"drink; a compound like `soda water` or `cane sugar syrup 2:1` is one, "
+            f"and "
             f"suppressing it would take a real fact off the card."
         )
 
@@ -4780,8 +5123,18 @@ def _prose_fields(drink):
         if isinstance(value, str) and value.strip():
             fields.append((key, value))
     for i, step in enumerate(drink.fm.get("method") or [], 1):
+        # BOTH HALVES OF A `{step, note}` PAIR ARE HELEN'S OWN PROSE, so both go
+        # through the typography checks. Reading only `isinstance(step, str)`
+        # here would have quietly exempted every step written in the new shape
+        # -- an addition to the schema switching a check off for the files that
+        # use it, which is the failure mode HANDOVER 10 records five times.
         if isinstance(step, str):
             fields.append((f"method step {i}", step))
+        elif isinstance(step, dict):
+            if isinstance(step.get("step"), str):
+                fields.append((f"method step {i}", step["step"]))
+            if isinstance(step.get("note"), str):
+                fields.append((f"method step {i} note", step["note"]))
     for i, note in enumerate(drink.fm.get("notes") or [], 1):
         if isinstance(note, dict):
             for part in ("label", "text"):

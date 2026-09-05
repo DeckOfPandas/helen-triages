@@ -301,7 +301,7 @@ mood_ingredients:
     - Amaro Nonino
     - Amaro Ciociano
     - Bénédictine
-    - demerara syrup
+    - demerara sugar syrup
     - molasses sugar
     - raw sugar
 
@@ -411,10 +411,20 @@ mood_ingredients:
     - whole egg
 
   sweet:
-    - sugar syrup 1:1
-    - sugar syrup 2:1
-    - demerara syrup
+    # The sugar is in the generic since 2026-09-04 -- Helen: "Most 'sugar
+    # syrup' means 'cane sugar syrup', possibly all." Renamed here in the
+    # same commit, because a mood list naming a retired generic derives
+    # nothing and fails nothing.
+    - cane sugar syrup 1:1
+    - cane sugar syrup 2:1
+    - demerara sugar syrup
     - honey
+    # ALL THREE HONEY WATERS, and the flat one is the default -- Helen ruled one
+    # flat generic on the afternoon of 2026-09-04 and put the two ratios back
+    # the same evening for the Bee's Knees. A mood list is the one place the
+    # three must NOT collapse: `honey water 2:1` missing from here took `sharp`
+    # off that drink the moment it was retyped.
+    - honey water
     - honey water 1:1
     - honey water 2:1
     - orgeat
@@ -589,10 +599,6 @@ mood_include:
     moods: [strong brown drink, warming]
     why: >-
       she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
-  caipirinha:
-    moods: [I want to faff]
-    why: >-
-      one muddle or one long prep, where the rule wants two.
   caribbean-sazerac:
     moods: [strong brown drink, warming]
     why: >-
@@ -723,9 +729,16 @@ mood_step_words:
     [muddle, alight, flame, shell, blend, swizzle, churn, rinse,
      dehydrat, infus, steep, clarif]
   # Any one makes `ice ice baby`.
+  # `giant ice` JOINED `large ice` ON 2026-09-04, when Helen ruled the canonical
+  # strain step says GIANT: "I really do want 'giant ice cube' for e.g. strong
+  # brown drinks over ice." Both stay -- the canonical steps say giant, and
+  # banana-boulevardier's free-text "strain into a glass over a large ice block"
+  # is her own wording and is not being retyped. A step reworded out of this
+  # list silently loses the mood, which is the drift this block's own note
+  # warns about, and it is exactly what four drinks did for one commit.
   ice:
-    ["crushed ice", swizzle, churn, blend, "large ice", "ice block",
-     "block of ice"]
+    ["crushed ice", swizzle, churn, blend, "large ice", "giant ice",
+     "ice block", "block of ice"]
   # A NARROWER LIST, and it is not `ice` above. `strong brown drink` is
   # disqualified by being crushed, swizzled or blended -- but NOT by a big
   # block of ice, which is precisely how you serve one. Banana Boulevardier

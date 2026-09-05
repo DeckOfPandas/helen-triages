@@ -350,7 +350,10 @@ markers, with a two-way check. Second, the repo-less path already exists in
 SESSION"); the design changes transport and completeness, not the boundary.
 It adds decisions D8–D11 (see the design doc §9). Outline as first written:
 
-1. **Generated specs.** A `scripts/build_ingest_specs.py` that renders
+1. **Generated specs.** (**What shipped is `scripts/build_ingest_vocab.py`**,
+   renaming this and narrowing it to the marked vocabulary blocks alone, per
+   the paragraph above. There is no `build_ingest_specs.py`; do not grep for
+   one.) A `scripts/build_ingest_specs.py` that renders
    `INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md` from `_data/*.yml`
    and the constants in `tests/` (allowed keys from WS1, taxonomy tags and
    stars, glass `icons` keys, garnish and method vocabularies, accented and

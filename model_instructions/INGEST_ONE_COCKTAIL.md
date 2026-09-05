@@ -49,8 +49,8 @@ enough to print. **A cocktail has two fields whose vocabularies are not, and
 they are the two that matter most:**
 
 - **`generic`** — what CATEGORY of spirit a pour is: "moderately aged Jamaican
-  rum", "lightly aged and filtered rum", "blanc vermouth". 224 declared terms.
-- **`suggestion`** — the specific bottle. 70 declared, plus 30 unresolved.
+  rum", "lightly aged and filtered rum", "blanc vermouth". 171 declared terms.
+- **`suggestion`** — the specific bottle. 107 declared, and none outstanding.
 
 **Leave both as `QQ`. Always. This is Helen's own standing ruling**, made on
 2026-08-31 when a book named eleven bottles she did not own:
@@ -96,6 +96,10 @@ ingredients:
 method:
   - "Shake all ingredients with ice."
   - "Fine strain over ice."
+  # A step is a string, OR a `{step, note}` pair. USED SPARINGLY — the note is
+  # an aside about how Helen does the step, never part of the instruction:
+  #   - step: "Muddle the lime chunks hard with the sugar."
+  #     note: "my giant spiky muddler not the polite smooth one"
 to_serve: ""
 mood: []
 notes:
@@ -125,9 +129,9 @@ meta:
 | `ingredients` | The FULL list, untriaged, **in build order**. §3. |
 | `ingredients[].item` | What the SOURCE called the pour, brand and all. **A drafts-only field** — §3. |
 | `ingredients[].character` | Why a drink wants a particular bottle. **Never yours to write** — §3. |
-| `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. |
+| `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. A step is a string, or a `{step, note}` pair — **used sparingly** (Helen, 2026-09-04), for an aside about how she does the step rather than part of the instruction. |
 | `to_serve` | Presentation, not a further instruction. `"Straw."`, `"Two straws."` A terse noun phrase, or `""`. |
-| `notes` | A bare string, or `{label, text}`. Use one to record what the source could not give you. |
+| `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s and replaces the label with a real heading and the text with her own words. A bare string is legal in the schema but not for an ingest. Use one to record what the source could not give you. |
 | `source` / `source_url` | Free text here, unlike food. `"Difford's"`, `"Death & Co"`. `source_url` may be `""`. |
 | `meta.ship` | Helen's rating. **Always `"QQ"`** — you have not drunk it and neither has she. |
 | `meta.date_last_edited` | Today's date, `YYYY-MM-DD`. |
@@ -202,8 +206,8 @@ test rather than rendering:
 
 <!-- vocab:measures start -->
 `dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
-`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `g` ·
-`to top` · `to rinse`
+`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `g` · `half` ·
+`whole` · `to top` · `to rinse`
 <!-- vocab:measures end -->
 
 Four things a source prints as if they were units, and what to do instead
@@ -214,6 +218,11 @@ Four things a source prints as if they were units, and what to do instead
 - **An egg or a sugar cube is an INGREDIENT, not a unit.** `amount: "1"`,
   `generic: "QQ"`, `item: "whole egg"` (or `"sugar cube"`), the same as any
   other pour.
+- **Half a fruit is `amount: "half"`** — Helen's ruling, 2026-09-04, on a
+  Caipirinha's lime. `half` and `whole` are units, and a whole fruit is
+  COUNTED, never measured: do not turn half a lime into millilitres, because
+  the juice a lime gives is a range and a figure here would be precision the
+  fruit does not have. The page prints `half`, `1 whole`, `1½ whole`.
 - **"Top" is not an amount on its own** — the ingredient added by a top-up is
   `amount: "to top"`, and the method carries a `Top with …` step. Likewise a
   rinse is `amount: "to rinse"` with a `Rinse …` step.
@@ -229,6 +238,15 @@ times apart and a wrong guess looks exactly as confident as a right one.
 
 **`item` is what the source called it, brand and all.** `generic` is the
 category, and it is always `QQ` from you. Do not put the quantity in `item`.
+
+**Write the bottle as the source spells it, and do not tidy it.** Helen's
+bottle dictionary resolves spellings by alias, and her standing rule
+(2026-09-04) is that a drink keeps her spelling and the dictionary learns it,
+never the other way round. Two things you can get right from the source
+alone: a HOUSE is not a bottle (Briottet, Monin, Gabriel Boudier make many
+things — if the source names the product, write the product), and a spirit
+TYPE printed beside its own name is not a bottle at all (a source's
+"aguardiente" next to aguardiente is the generic, not a suggestion).
 
 ### `item` is a transcription field, and it lives only in the drafts
 
@@ -365,21 +383,33 @@ and write the source's own words where none does.
 `Strain into a chilled glass.` · `Double strain into a chilled glass.` ·
 `Fine strain into a chilled glass.` · `Strain into an ice-filled glass.` ·
 `Fine strain into an ice-filled glass.` · `Strain over ice.` ·
-`Fine strain over ice.` · `Strain over crushed ice.`
+`Fine strain over ice.` · `Strain over crushed ice.` ·
+`Strain over a giant ice cube.` · `Double strain over a giant ice cube.` ·
+`Fine strain over a giant ice cube.` · `Strain over two giant ice cubes.`
 
 **Build:** `Add the remaining ingredients.` ·
 `Fill the pitcher half full with ice cubes.` · `Fill with crushed ice.` ·
 `Top with champagne.` · `Top with soda water.` · `Top with more crushed ice.`
 
 **Rinse and rim:** `Rinse the glass with absinthe and dump.` ·
-`Rinse the glasses with Campari.` · `Salt a half-rim of the glass.`
+`Rinse the glasses with Campari.` ·
+`Dip only half the rim in water (or tequila) then coarse salt.`
+
+**Express:** `Express the twist over the drink and drop it in.` ·
+`Express the twist over the drink and discard it.`
 <!-- vocab:method end -->
 
-Four things that will catch you out:
+Seven things that will catch you out:
 
 - **NEVER NAME THE GLASS IN A STRAIN STEP.** `glass:` already carries it and
   draws an icon. "Fine strain into a chilled coupe" says coupe twice. Write
   `Fine strain into a chilled glass.`
+- **THE BIG SINGLE CUBE IS `giant`, NOT `large` OR `big`.** Helen's ruling,
+  2026-09-04: *"I really do want 'giant ice cube' for e.g. strong brown drinks
+  over ice."* If the source says a large cube, a big cube, a rock or a block
+  and means ONE piece of ice in the glass, use the giant form above — and note
+  that these steps name no glass either, so "strain into a rocks glass over a
+  big cube" is `Strain over a giant ice cube.`
 - **"Shake all ingredients" and "Shake" mean different things.** After a build
   step — a muddle, a rinse, an "add the rest" — "Shake with ice." means *shake
   what is in the shaker*, and that is a different instruction. **Read the step
@@ -387,6 +417,19 @@ Four things that will catch you out:
   remaining ingredients with ice."
 - **A step may not start with "Serve" or "Garnish".** Those belong in
   `to_serve` and `garnish`. "Serve with a straw" becomes `to_serve: "Straw."`
+- **A step may not start with "Express" either, and this one is not obvious.**
+  Helen's ruling, 2026-09-04: a garnish of any citrus twist makes the drink
+  page add `Express the twist over the drink and drop it in.` as the last
+  step, on its own — so a drink that writes it says one fact twice. If the
+  source's last line expresses a twist, put the twist in `garnish:` and write
+  no step. (`orange twist (discarded)` gets `...and discard it.` instead.)
+  The two sentences are in the **Express** group above for recognition only;
+  you never type either.
+- **A step may carry a `note`** — `{step, note}` instead of a string — but
+  **used sparingly**, and almost never from an ingest: the note is Helen's own
+  aside about how she does the step ("my giant spiky muddler not the polite
+  smooth one"), not something a source can give you. If the source's step has
+  a parenthetical that is part of the INSTRUCTION, leave it in the step.
 - **Everything expressive stays free text.** "Muddle the lime chunks hard with
   the sugar in the bottom of a shaker until the sugar has dissolved" cannot be
   collapsed without losing the drink. Don't try.

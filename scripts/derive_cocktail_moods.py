@@ -162,7 +162,32 @@ def derive(drink, sets, step_words, families):
     def count(name):
         return len(present & set(sets.get(name) or []))
 
-    steps = " ".join(str(s) for s in listed(drink.get("method")))
+    # A STEP IS A STRING OR A `{step, note}` PAIR -- Helen, 2026-09-04. The
+    # rules below match WORDS in the build ("churn", "muddle"), so a pair has to
+    # give up its sentence: `str(dict)` would hand the matcher
+    # "{'step': 'Muddle the lime...', 'note': '...'}" and find `muddle` inside a
+    # repr, which is the kind of accidental pass that looks like a working rule.
+    #
+    # THE NOTE IS SEARCHED TOO, AND THE CAIPIRINHA IS WHY. Its muddle step used
+    # to end "(my giant spiky muddler, not the polite smooth one)" and that
+    # `muddler` was the SECOND faff hit -- the rule wants two -- so moving the
+    # remark into a `note:` field, which is a change of shape and not of words,
+    # silently took `I want to faff` off the drink. Caught by the dry run
+    # against the stored moods, which is what that comparison is for.
+    #
+    # THE PRINCIPLE IS BIGGER THAN THE DRINK: reshaping the same words must not
+    # change what is derived from them. A note is Helen's own sentence about how
+    # this step is done, so it is part of the build's prose by every test this
+    # file applies -- and if it were not, the mood would have been wrong for as
+    # long as the words sat in brackets.
+    parts = []
+    for s in listed(drink.get("method")):
+        if isinstance(s, dict):
+            parts.append(str(s.get("step", "")))
+            parts.append(str(s.get("note", "")))
+        else:
+            parts.append(str(s))
+    steps = " ".join(parts)
     n_ingredients = len(entries)
 
     # `clear`, `sugar craving`, `tiki` and `aperitivo` ARE NOT DERIVED HERE
@@ -354,7 +379,10 @@ def load_drinks():
     for root in COLLECTIONS:
         if not root.is_dir():
             continue
-        for path in sorted(root.glob("*.md")):
+        # rglob, not glob, since 2026-09-04: Helen stages drinks for publication
+        # in _cocktail_drafts/to-promote/, and the suite (which walks the folder
+        # recursively) was disputing moods this script could not even see.
+        for path in sorted(root.rglob("*.md")):
             text = path.read_text(encoding="utf-8")
             match = FRONT_MATTER.match(text)
             if not match:

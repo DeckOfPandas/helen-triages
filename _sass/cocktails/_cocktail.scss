@@ -85,6 +85,30 @@
   text-transform: uppercase;
 }
 
+// EVERY TYPED NUMBER ON THIS SITE WEARS THE SAME BOX: the site's own surface
+// and border rather than the browser's, and the home colour on focus.
+//
+// LIVED IN `_shortlist.scss` AS `%shopping-number` UNTIL 2026-09-04, when the
+// drink page's scaler (#545) became the third control of exactly this kind and
+// the second FILE needing it. Moved here rather than copied: cocktails.scss
+// imports `cocktails/cocktail` before `cocktails/shortlist`, so a placeholder
+// defined here is reachable from both, and a copy would be two answers to "how
+// wide is a number box on this site" waiting to drift apart.
+%cocktail-number-input {
+  @extend %cocktail-heading-face;
+  width: 3.2rem;
+  font-size: 0.95rem;
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  padding: $space-xxs $space-xs;
+
+  &:focus-visible {
+    outline: none;
+    border-color: $color-cosmic-cosmopolitan;
+  }
+}
+
 // The head: glass and words side by side, the drawing aligned to the bottom of
 // the text rather than to a baseline. `flex-end` not `baseline`, because the
 // icon is a drawing with no text baseline to align to, so baseline alignment
@@ -576,6 +600,137 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   @include overlapping-rule-double($color-electric-absinthe, $color-luminous-lagoon);
 }
 
+// =============================================================================
+// THE SCALER, ON THE INGREDIENTS HEADING'S LINE — issue #545, 2026-09-04
+// =============================================================================
+// A section heading with a control at the far end of its line. The row is the
+// shape `.cocktail-meta-row` already gives the meta panel and its shortlist
+// button — flex, baselines aligned, pushed apart — rather than a second idea
+// of how a control sits beside a heading.
+//
+// BASELINES, NOT BOXES. The heading is 1.8rem and the control is 0.78rem, so
+// centring them would leave the small words floating in the middle of a tall
+// line; on their baselines they read as one line of type with a number in it.
+//
+// THE HEADING KEEPS ITS OWN MARGINS. They are not restated on the row, which
+// is the "any rule that restates a value belonging to another rule is a copy
+// that has to be maintained" argument at the foot of this file: the heading
+// owns its 2.25rem above and $space-lg below in both states, and a flex item's
+// margins are not collapsed away by the row around it.
+//
+// IT WRAPS. At 360px the heading word and `make [1] × the recipe` do not share
+// a line, and a control that overflows the column is worse than one on the
+// next line down.
+.cocktail-section-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $space-sm $space-lg;
+}
+
+// MULTIPLES OF THE RECIPE AS WRITTEN — Helen, 2026-09-04: servings here means
+// "×2 is twice what the page says", because there is no `serves:` field on a
+// drink and inventing one for 124 files to make a control read tidier would be
+// inventing data.
+//
+// THE HOUSE STYLE FOR THIS EXACT CONTROL IS `.shopping-list-setall`, and this
+// is the same object doing the same job: heading face, 0.78rem, 0.08em, in
+// $color-clear-text, with the number in the site's own box rather than the
+// browser's. The box is `%cocktail-number-input`, which the shopping list and
+// this page now SHARE — see its own note above for why it moved here rather
+// than being copied.
+//
+// LOWERCASE, LIKE EVERY OTHER CONTROL WORD ON THE PAGE (`read it`, `make it`,
+// `shortlist`). `text-transform` is the heading face's, so the markup keeps
+// ordinary capitalisation and the words are lowered here.
+.cocktail-scale {
+  @extend %cocktail-heading-face;
+  display: flex;
+  align-items: baseline;
+  gap: $space-xs;
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: $color-clear-text;
+
+  input { @extend %cocktail-number-input; }
+
+  // `hidden` MUST BEAT `display: flex`, and it does not on its own: the
+  // attribute's UA rule is `display: none` at the lowest specificity there is,
+  // so any display declaration on the element overrides it and the control
+  // ships visible to a reader whose JavaScript never ran — which is the exact
+  // failure the `hidden` was there to prevent. Every flex/grid element on this
+  // site that ships hidden needs this line; `.universe[hidden]` is the same
+  // fix on the index.
+  &[hidden] { display: none; }
+}
+
+// THE WHOLE SCALER — the multiple box, the total it comes to, and the target
+// box — Helen, 2026-09-04: "please add total ml, either set by your input box,
+// or user-entered number of ml." One wrapper, so ONE `hidden` covers all three
+// parts and cocktail-scale.js reveals the row rather than three elements.
+//
+// IT WRAPS AS A UNIT AND EACH PART WRAPS WHOLE. At 360px `make [1] × the
+// recipe` and `or [90] ml in total` do not share a line; the row breaks between
+// them rather than mid-sentence, which is what `flex-wrap` on the container plus
+// `flex-shrink: 0` on each part buys.
+.cocktail-scale-controls {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: $space-xs $space-sm;
+
+  &[hidden] { display: none; }
+}
+
+// THE TOTAL IS A NUMBER YOU ACT ON, so it is `.cocktail-amount`'s typography
+// rather than the control's: Plex, tabular figures, in ink — see that rule for
+// the argument, which is food's `.ingredient-amount` argument and the reason
+// $font-label exists. The `=` before it is the control's own grey, because it
+// is punctuation joining two controls rather than part of the figure.
+//
+// A `<p>`, NOT A SPAN INSIDE A LABEL: it is the answer the two boxes agree on,
+// and clicking an answer should not put a cursor in a box.
+.cocktail-scale-total {
+  @extend %cocktail-heading-face;
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: $color-clear-text;
+  flex-shrink: 0;
+
+  .cocktail-scale-total-value {
+    font-family: $font-label;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: normal;
+    text-transform: none;
+    color: $color-text;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // `hidden` MUST BEAT the block's own display — see `.cocktail-scale` above
+  // for the UA-stylesheet specificity trap this one line answers.
+  &[hidden] { display: none; }
+}
+
+// THE FLOOR MESSAGE — Helen, 2026-09-04: "say you can't go below X ml if any
+// ingredient wants to go below 2.5 ml." Quiet: it is an answer to something you
+// just tried, not a warning, so it takes the clear-text grey the control itself
+// wears rather than a colour that means something on this page. (Every colour
+// here already has a job — see the four-colours note above — and a message in
+// pink would read as a claim about a bottle.)
+//
+// IT SITS UNDER THE ROW, NOT INSIDE THE LABEL, so its sentence cannot push the
+// number box along the heading's line as it grows.
+.cocktail-scale-note {
+  margin: 0 0 $space-md;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
 // SIZED BY HEIGHT, NEVER WIDTH, and this is the whole reason the icons keep
 // their own viewBoxes rather than being forced into a square one. The glasses
 // are genuinely different proportions — a flute is 27mm wide by 98 tall, a
@@ -978,6 +1133,20 @@ $amount-indent: $amount-col + $amount-gap;
   margin: 0.25rem 0 0 $amount-indent;
 }
 
+// A METHOD STEP MAY CARRY ONE TOO — Helen, 2026-09-04: "separate note field
+// please, although it will be used sparingly." It is the SAME rule as an
+// ingredient's note, because it is the same kind of remark ("my giant spiky
+// muddler not the polite smooth one"), and it takes the class rather than a
+// copy of the four declarations.
+//
+// THE ONLY DIFFERENCE IS THE INDENT, and it has to be: `$amount-indent` lines an
+// ingredient's note up under the ingredient's NAME, past the amount column,
+// which is a column the method list does not have. Here the note simply sits
+// under its own step's text.
+.cocktail-method-note {
+  margin-left: 0;
+}
+
 // =============================================================================
 // METHOD, TO SERVE, NOTES
 // =============================================================================
@@ -1098,7 +1267,15 @@ $amount-indent: $amount-col + $amount-gap;
   .cocktail-section-heading--notes,
   .notes,
   .cocktail-type-line,
-  .cocktail-note,
+  // SCOPED TO THE INGREDIENT LIST, 2026-09-04, when a method step could carry a
+  // note too. This selector was a bare `.cocktail-note` and would have taken
+  // both. An ingredient's note is editorial ("whichever you prefer or are
+  // trying to use up") and goes when your hands are full; a step's note is HOW
+  // TO DO THE STEP ("my giant spiky muddler not the polite smooth one"), which
+  // is the one state where you most want it. Same class, same look, opposite
+  // answers to "is this needed at the bar" — so the state block asks about the
+  // list it is in.
+  .cocktail-ingredient .cocktail-note,
   .cocktail-suggestion,
   .cocktail-body-content { display: none; }
 

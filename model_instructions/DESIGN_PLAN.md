@@ -2,10 +2,15 @@
 
 Written 2026-09-02 at the end of one long session with Helen, for whoever
 picks the design work up next. It is a status board and a queue, in priority
-order. Everything marked **done** is merged to `main` (PRs #660–#663 and the
-mechanical PR before them). Everything else is a decision Helen has made but
-not built, or a question she has not answered. Do not re-litigate the
-decisions; do build them.
+order. Everything else is a decision Helen has made but not built, or a
+question she has not answered. Do not re-litigate the decisions; do build them.
+
+**§1 IS THE STATUS, NOT THIS HEADER.** This line said "PRs #660–#663 and the
+mechanical PR before them" and stayed there while §1 grew rows dated 2026-09-03
+and 2026-09-04 — the drink page rebuild, the heading ramp, the universe section
+coming off food. **Read the table; add a row when you ship; do not restate the
+tally up here**, because a header that has to be edited in step with a table is
+a second copy of it, and this is what a second copy does.
 
 ## 0. How this work is done, because it is different from data work
 

@@ -31,6 +31,11 @@
   .cocktail.is-making {
     .cocktail-tagline,
     .cocktail-type-line,
+    // Reaches the ingredient notes the state block hides. A method step's note
+    // is not hidden in that state at all (see `.cocktail-ingredient
+    // .cocktail-note` in _cocktail.scss), so it needs nothing here and reverting
+    // it would be a rule that changes nothing — the trap the state block's own
+    // footnote warns about.
     .cocktail-note,
     .notes,
     .cocktail-body-content { display: revert; }
@@ -46,4 +51,21 @@
   // The universe pick is furniture too -- a random deal and "deal again" do
   // nothing on paper.
   .universe { display: none; }
+
+  // THE SCALER GOES TOO, AND WITH IT ITS FLOOR MESSAGE -- #545, 2026-09-04.
+  // Same argument as the toggle above, plus one of its own: a PRINTED PAGE IS
+  // THE RECIPE AS WRITTEN. The amounts on paper are whatever multiple happened
+  // to be in a box when the reader hit print, and a number box beside them
+  // would invite the reader to believe the sheet could still be changed. The
+  // control cannot be pressed on paper; the amounts it already wrote can, and
+  // do, print exactly as they stand.
+  //
+  // THE TOTAL AND THE TARGET BOX GO WITH IT, 2026-09-04. The whole row is one
+  // wrapper now (`.cocktail-scale-controls`), so hiding the wrapper takes the
+  // multiple box, the total and the millilitre box together — and a printed
+  // total would be the same invitation as a printed number box: a figure that
+  // was true of whatever was on screen when the reader hit print.
+  .cocktail-scale-controls,
+  .cocktail-scale,
+  .cocktail-scale-note { display: none; }
 }

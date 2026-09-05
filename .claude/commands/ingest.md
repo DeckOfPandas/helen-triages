@@ -10,6 +10,11 @@ from photographs) and §9.3 (cocktail schema) before the first file.** This
 command deliberately does not restate them -- two copies of a schema drift, and
 the handover is the one the tests are written against.
 
+**AND `model_instructions/PUBLISHING_A_DRINK.md` IF THE DRINK IS GOING ANYWHERE
+NEAR `to-promote/`.** That file is the six steps a drink goes through, the word
+"final" and what it promises, and the one-working-copy rule. This command gets a
+drink INTO the drafts; that one gets it out.
+
 ## The boundary, in one line
 
 > **IS THE ANSWER IN THE SOURCE, OR IN HELEN'S HEAD?**
@@ -21,6 +26,38 @@ will ever have the page open. Do it, unasked.
 In her head -- her voice, her palate, whether she liked it -- leave it and write
 `QQ`. **A silence in the source is never filled from general cooking
 knowledge.** A wrong "whole milk" looks exactly as confident as a right one.
+
+## THE `QQ` CONVENTIONS -- every shape, in one place
+
+`QQ` is Helen's own marker. She searches for the two letters, so **the shape is
+what makes it findable, and there are exactly these:**
+
+| where | what to write |
+|---|---|
+| a `tagline` she has not written | `tagline: "QQ"` |
+| a drink's `generic` / `suggestion` | `"QQ"`, always, both sites of the pour -- her standing ruling, not a size problem |
+| a drink's `meta.ship` | `"QQ"` -- she has not drunk it |
+| a food method step | the PAIR: `QQ original <verbatim>` then `QQ Claude <the rewrite>` |
+| any note an ingest ADDS | `- label: "QQ"` / `text: "QQ - …"` -- **both fields set, both beginning `QQ`** |
+| an amount with no unit in the source | the figure as it stands, plus a note whose text says `QQ - no unit in the source` |
+| a citation nobody has established | `source: "QQ"` with `source_type: unknown` |
+| a truncated step, a missing infusion, a frame that ended | a note saying where it stopped -- **never a reconstruction** |
+
+**Never a bare string note from an ingest** (Helen, 2026-09-04: *"It's annoying
+for me to remember how to type YAML every time"*). A note that ALREADY exists
+keeps whatever shape it has.
+
+**Three things a `QQ` is not.** It is not an error: do not flag it, fix it, or
+convert it. It is not a prompt to answer from general knowledge -- that is the
+one thing this whole file exists to prevent. And it is not permanent: **a QQ
+that has been ANSWERED becomes a plain note recording the answer**, and only a
+QQ that was wrong to ask gets deleted. Leaving a settled question in a `QQ` is
+how the same thing gets asked a third time.
+
+**House style stops at a `QQ` line and does NOT stop at a `QQ Claude` one.**
+The first is somebody else's words awaiting a rewrite; the second is ours and
+is held to house style like any other prose. Both `conftest._QQ_LINE` and
+`tidy_drafts.py` encode that as `QQ\b(?!\s+Claude\b)` -- HANDOVER §5.
 
 ---
 
@@ -41,8 +78,45 @@ are `rewritten: false`, because "readable enough to cook from" sits below "the
 prose is mine". The folders and the flags answer different questions and are not
 expected to agree.
 
-**Cocktails.** `_cocktail_drafts/` is flat, and nothing has ever been promoted
-to `_cocktail_recipes/`. There is no staging.
+**Cocktails.** New ingests land in `_cocktail_drafts/` root — that is the pool,
+and it is where nearly everything still is. There is now ONE staging folder,
+and it is Helen's in exactly the way the food ones are:
+
+    _cocktail_drafts/             the pool -- everything lives here
+      to-promote/                 she has made it, amended it, and it ships;
+                                  waiting on her proofread, then
+                                  _cocktail_recipes/
+
+**Never move a drink into `to-promote/` unless asked.** It records that she has
+MADE the drink and decided it ships, which no flag says.
+
+> ### `to-promote/` AND `_cocktail_recipes/` ARE THE PUBLISHED TENSE
+>
+> Two rules bite in those two places and nowhere else — Helen's rulings,
+> 2026-09-04, reading Fish House Punch. Both are enforced
+> (`test_a_staged_drink_writes_a_bottles_canonical_name`,
+> `test_a_staged_drink_carries_no_transcription_field`), and both are things to
+> FIX when a drink is moved rather than reasons to refuse the move.
+>
+> - **Every `suggestion` is a bottle's canonical name, never an alias.**
+>   *"'ED3' isn't a bottle"* — it is a declared alias of `El Dorado 3 year old
+>   rum`, so it resolves, and resolving is not the same as being written down.
+>   Look each one up in `_data/cocktails/bottles.yml` and write the key.
+>   **This does not change the rule for a DRAFT**, which is the opposite one and
+>   stays: leave a drink as she spelled it and add the spelling as an alias
+>   (HANDOVER §9.3.2). The alias map is what lets an ingest be fast; a finished
+>   drink has had time to say the real name.
+> - **No ingredient carries `item`.** *"This has 'item' everywhere too."* It is
+>   the source's own wording, drafts-only since 2026-09-02 (§9.10), and nothing
+>   renders it. **Read each one before deleting it:** if it says something
+>   `generic`, `suggestion` and `amount` do not already say — "Strong cold black
+>   breakfast tea" beside `black tea`, "pear, sliced" beside `pear` — that fact
+>   moves to a `note:` on the same ingredient. If it merely restates the generic,
+>   which is the usual case, delete the line.
+>
+> **A bottle named only in `item` is still not yours to declare.** Where the
+> bottle is undeclared (Patrón Reposado), the fact goes in a `note:` and the
+> `suggestion` field is left for Helen — TIER 3, unchanged.
 
 ---
 
@@ -93,6 +167,41 @@ file say the same things.
 has already happened and redoing it burns Helen's review twice. Do not fill in
 a `generic` or a `suggestion`: those are `QQ` by her standing ruling until she
 makes the drink, and that is not relaxed by the file arriving from elsewhere.
+
+---
+
+## FIXING A DRAFT THE SUITE IS COMPLAINING ABOUT
+
+Not an ingest, and the commonest job after one. The boundary is the same one
+`PUBLISHING_A_DRINK.md` step 2 draws, and the two must not drift:
+
+**MECHANICAL -- fix it, silently, and say what you fixed.** A spelling one of
+the vocabularies already declares (a glass, a garnish, a generic, a canonical
+method step, a bottle alias). A missing required key. A hyphen that should be an
+en dash. A quoted boolean. A `meta:` block out of order. `mood:` disagreeing
+with the derivation. A US unit. **The test names the value it wanted; the data
+file holds the spelling.** Look it up -- never a guess that merely turns the
+test green.
+
+**NON-MECHANICAL -- list it, one line each, and let Helen rule.** Anything the
+vocabularies do NOT already declare: a bottle nobody has declared, a generic
+that would need coining, a glass the source did not name, a tagline, a
+`meta.ship`. A `QQ` of any kind. An amount that looks wrong against a source.
+**Bring them ONCE, grouped by decision** -- `ingest_preflight.py` exists to
+build exactly that list.
+
+The order to work in:
+
+1. `python3 scripts/derive_cocktail_moods.py` -- dry, for a drink; `--write`
+   only if it reports a difference.
+2. `pytest` (never two sessions at once -- HANDOVER §1).
+3. `/tidy-drafts` for the food side, if the quoting or typography needs it.
+4. `python3 scripts/ingest_preflight.py` for a drink.
+5. One list to Helen. Then commit.
+
+**A red test is not always yours.** `cd _<site>_drafts && git fetch origin &&
+git rev-list --count HEAD..origin/main` first: a non-zero answer means the
+failure is probably work someone else has already done (HANDOVER §9.1).
 
 ---
 
@@ -155,6 +264,23 @@ makes the drink, and that is not relaxed by the file arriving from elsewhere.
 - **Method steps use the canonical forms in `_data/cocktails/methods.yml`** where
   one exists. Cocktails have no `QQ PLACEHOLDER` convention: the mechanical spine
   is a closed vocabulary and the tail is free text.
+- **THE 2026-09-04 SHAPE RULINGS, all Helen's, all in `methods.yml` and
+  `ingredients.yml` -- look them up, do not retype them from here:**
+  - **one big cube is `giant`**, never large/big/rock/block, and those steps
+    name no glass either ("strain into a rocks glass over a big cube" is
+    `Strain over a giant ice cube.`);
+  - **never write an `Express …` step.** A garnish naming a citrus twist makes
+    `_layouts/cocktail.html` append it, and `test_no_method_step_opens_with_express`
+    refuses one that tries. Put the twist in `garnish:` and write nothing;
+  - **a step may be a `{step, note}` pair** -- used sparingly, and the note is
+    how Helen does the step, not part of the instruction;
+  - **`half` and `whole` are UNITS**: a whole fruit is counted, never measured,
+    so half a lime is `amount: "half"` and never a millilitre figure;
+  - **a barspoon is `5 ml`**; an egg or a sugar cube is an INGREDIENT with
+    `amount: "1"`, not a unit;
+  - **every ingredient has an amount, and for some it is a verb** -- `to top`,
+    `to rinse`, `1 small pinch`, each declared in `measures:` and each with its
+    matching method step saying WHEN.
 - **`method` / `to_serve` / `garnish`** -- an ACTION in sequence, a NOUN PHRASE
   about how it reaches the table, and a THING on the drink. The test: *can you
   write it as a bare noun and lose nothing?* "with a straw" → `Straw.` loses
@@ -180,6 +306,12 @@ Rewriting a method step into her voice. `incidental:`. The case-by-case tags
 `meta.ship`. **Reconstructing a truncated step**, even when every sibling recipe
 on the page ends the same way. **Declaring a bottle in `bottles.yml`** from the
 ingredient beside it.
+
+**ONE EXCEPTION TO `meta.rewritten`, AND ONLY ONE:** a drink Helen has MOVED
+into `_cocktail_drafts/to-promote/`. The move is how she claims the words, so
+the mechanical pass flips `rewritten: true` there -- her standing instruction,
+2026-09-04, `PUBLISHING_A_DRINK.md` step 2. Not in the pool, not on food, and
+never `proofread`, which stays hers everywhere.
 
 ---
 
@@ -246,3 +378,27 @@ ingredient beside it.
   Two files kept their ounces through the 2026-09-01 conversion for exactly
   this reason.
 - **`QQ` is never an error.** Do not flag it, fix it, or convert it.
+- **Resolving a drink's `suggestion` and `generic`, Helen's rulings of
+  2026-09-04** (HANDOVER §9.3.2 has the long form; `unresolved_suggestions`
+  in bottles.yml is empty and must stay so):
+  - a HOUSE is not a bottle: declare the product she owns by its name and
+    retype the drink to it; a house is an alias only where it can mean one
+    thing in the collection (Luxardo → Luxardo Maraschino);
+  - a spirit type beside its own generic is not a suggestion; it goes;
+  - a syrup's suggestion may name what it is made from (Acacia honey);
+  - generics are named by what substitutes for what: never a `flavoured X`
+    that spans non-substitutable members; `honey water` is one flat generic
+    and bare `honey` is the raw thing you cook with; `lavender-forward
+    bitters`, not `lavender bitters`; `bonded rye` and `rye` are distinct;
+  - spelling: **in the POOL**, leave the drink as she wrote it and add the
+    spelling as an alias -- never retype a pooled drink to a canonical bottle
+    name. **In `to-promote/` and `_cocktail_recipes/` the rule inverts** and
+    every `suggestion` is the canonical name; see the box above. The two are
+    not in tension: an alias is a reading convenience, and a finished drink has
+    had time to write the real name.
+- **Every note an ingest ADDS is `{label, text}` with both fields set, each
+  beginning `QQ`** — never a bare string. Helen, 2026-09-04: "It's annoying
+  for me to remember how to type YAML every time." She searches for `QQ`,
+  replaces the label with a real heading and the text with her words, and
+  never has to recall the shape. Both sites, both standalone documents say
+  the same. A note that already exists keeps whatever shape it has.
