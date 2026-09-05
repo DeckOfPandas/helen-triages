@@ -24,23 +24,19 @@ Note the SVGs are INLINED by Liquid, not fetched by JS, so the `<svg ` vs
 with a space after `<svg` anyway, since it costs nothing and the repo has
 been bitten by that assumption before.
 
-RUNNING THIS TODAY WOULD CHANGE ONE SHIPPED ICON, AND NOT FOR THE BETTER.
-`_includes/icons/glasses/tiki-mug.svg` carries a hand-added thinning filter --
-`<defs><filter><feMorphology operator="erode" radius="1.2">` and a `<g>`
-wrapping the artwork in it -- and this script does not emit filters, so a
-wholesale regeneration silently strips it and the mug renders heavier. It is
-the ONLY divergence: `scripts/check_glass_regen.py` resolves every archived
-source to its published name and diffs, and reports exactly that one.
+A WHOLESALE REGENERATION NOW REPRODUCES THE SHIPPED SET EXACTLY, and that was
+not true until 2026-09-06. `_includes/icons/glasses/tiki-mug.svg` carried a
+hand-added `<feMorphology operator="erode">` thinning filter that this script
+does not emit, so regenerating silently stripped it and the mug rendered
+heavier. Helen's redraw is line art, which has a stroke width to set and so
+needs no thinning at all: the filter went with the fill, and the last divergence
+went with it.
 
-It is deliberately not automated. The radius was per drawing and hand-tuned
-(the pineapple ran 0.25 and the coconut 0.35 before Helen redrew both on
-2026-09-05), so teaching this script filters would mean a per-icon radius
-registry -- real machinery for the one icon left, which #738 is about to
-replace with line art that needs no thinning at all. When that lands, the
-filter, the SOLID set and `.glass-icon-solid` all go together.
+**Run `scripts/check_glass_regen.py` after touching SKIP, SOLID or RENAME.** It
+resolves every archived source the way main() does and diffs against what is
+published, without deleting anything. It should say "reproduces the shipped set
+exactly"; if it names a divergence, something has been hand-edited since.
 
-**So run `scripts/check_glass_regen.py` before and after any regeneration**,
-and put the tiki mug's filter back by hand if you regenerate before #738.
 """
 import pathlib, re, shutil, xml.dom.minidom
 import xml.etree.ElementTree as ET
@@ -125,6 +121,11 @@ SKIP = {
     # reverted and the git diff would blame this script.
     "glass-pineapple-4.svg",
     "glass-coconut.svg",
+    # 2026-09-06, #738: and the mug completes the set's move to line art. Its
+    # predecessor was itself a redraw (machine-traced centrelines, 46 paths);
+    # this one is Helen's own, 21 paths, and needs no thinning filter because a
+    # stroke has a width to set.
+    "glass-tiki-mug-3.svg",
     # 2026-08-31: coupe-3's stroke ends fell short of each other by up to 1.06
     # user units. Invisible while drawing -- her stroke is ~2.8 units wide and a
     # round cap bridges one stroke width -- and visible on the page, where
@@ -212,15 +213,20 @@ SKIP = {
 # holds a stroked one at a constant screen weight -- so the gap widens as the
 # icon grows. That is the thing to look at on /dev/card-glasses/, and it is a
 # reason to redraw only if it actually looks wrong.
-# DOWN TO ONE MEMBER SINCE 2026-09-05, and the shrinking is the point: Helen
-# redrew the pineapple and the coconut as open line art, so the only drawing
-# left whose ink SCALES with it -- instead of being held at a constant screen
-# weight by `vector-effect: non-scaling-stroke` -- is the tiki mug. #738 is the
-# ticket for the last one; when it lands this set is empty and
-# `.glass-icon-solid` loses its last consumer and can go with it.
-SOLID = {
-    "glass-tiki-mug-3.svg",
-}
+# EMPTY SINCE 2026-09-06, AND THAT IS THE END OF A THREE-DRAWING STORY. Helen
+# redrew the pineapple and the coconut on 2026-09-05 and the tiki mug the next
+# day, so every one of the 27 glasses is now open line art and NOTHING is
+# published with the solid class. `.glass-icon-solid` went from
+# _sass/cocktails/_cocktail.scss in the same commit, along with the tiki mug's
+# hand-applied `feMorphology` thinning filter -- a filled drawing needs thinning
+# because its ink scales with it, and a stroked one does not.
+#
+# KEPT RATHER THAN DELETED, because fill-only artwork is a thing that arrives
+# from outside (stock icons are nearly always fill-only) and this is the switch
+# that publishes it correctly. Adding a name here is still the right answer the
+# next time one does; it would need `.glass-icon-solid` restoring too, and the
+# reasoning for both is in this file's header.
+SOLID = set()
 
 # Source name -> published name, where the export carries a working title.
 #
@@ -273,6 +279,10 @@ RENAME = {
     # leave SOLID above. Their predecessors are in SKIP.
     "pineapple-8": "pineapple",
     "coconut-4": "coconut",
+    # 2026-09-06. Note the source stem is `tiki-9`, not `tiki-mug-9` -- the
+    # published name is not a prefix of it, which is exactly why this map is
+    # explicit rather than a pattern.
+    "tiki-9": "tiki-mug",
 }
 
 # NOT IN THAT PASS, AND DELIBERATELY: `old-fashioned-double` carries the set's

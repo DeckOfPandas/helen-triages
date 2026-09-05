@@ -35,10 +35,11 @@ WHAT A REPORT LINE MEANS:
   REFUSED    the generator's own guards rejected the source. The message is
              theirs and says which guard.
 
-ONE DIFFERS IS EXPECTED TODAY: `tiki-mug`, whose shipped copy carries a
-hand-added `feMorphology` thinning filter this generator does not emit. That is
-documented at length in normalise_glass_icons.py's header and goes away with
-#738. Anything else is a real finding.
+NOTHING IS EXPECTED TO DIFFER. One thing did until 2026-09-06 -- the tiki mug's
+hand-added `feMorphology` thinning filter, which the generator does not emit --
+and it went when Helen redrew the mug as line art (#738). `KNOWN` is where to
+record such a thing if it ever returns, and an empty `KNOWN` is the state worth
+defending: every entry in it is a documented lie about the archive.
 """
 import os
 import pathlib
@@ -54,9 +55,7 @@ SHIPPED = ROOT / "_includes" / "icons" / "glasses"
 
 # Named so the report can say "expected" rather than leaving the reader to
 # remember. Keep this empty if you can; every entry is a known lie.
-KNOWN = {
-    "tiki-mug": "hand-added feMorphology thinning filter, see #738",
-}
+KNOWN = {}
 
 
 def main():

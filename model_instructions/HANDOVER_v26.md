@@ -3997,15 +3997,24 @@ height here" after #298 shipped, a live instance of §11.2.
 > radius is one attribute that returns to 0. Not a background-coloured stroke,
 > which does the same job while hardcoding whatever sits behind the icon.
 >
-> **THE INTERIM ENDED FOR TWO OF THE THREE, 2026-09-05.** Helen redrew the
-> pineapple (21 stroked paths, was 1 filled) and the coconut (4, was 1), so both
-> are line art now and neither carries a filter. **Only the tiki mug does, at
-> radius 1.20**, and #738 is the ticket to redraw it as well. Two consequences
-> worth knowing before you touch any of this: `.glass-icon-solid` is down to one
-> consumer and should be deleted with it, and **`scripts/normalise_glass_icons.py`
-> does not emit filters**, so regenerating the set today silently strips the
-> mug's thinning — `scripts/check_glass_regen.py` reports exactly that and
-> nothing else.
+> **THE INTERIM IS OVER AND THE WHOLE SET IS LINE ART, 2026-09-06.** Helen
+> redrew the pineapple (21 stroked paths, was 1 filled) and the coconut (4, was
+> 1) on the 5th, and the tiki mug (21, was 2) on the 6th — #738. **No published
+> icon is filled and none carries an erode filter.** Three consequences:
+>
+> - **`SOLID` in the normaliser and `.glass-icon-solid` in
+>   `_sass/cocktails/_cocktail.scss` are both empty and both KEPT**, as two
+>   halves of one switch. Fill-only artwork arrives from outside regularly;
+>   publishing one is a single name in `SOLID`, and deleting the CSS would make
+>   the next such icon render as a solid black blob, silently.
+> - **A wholesale regeneration now reproduces the shipped set exactly**, which
+>   was not true before: the mug's hand-added filter was the one thing
+>   `normalise_glass_icons.py` could not emit, and it went with the fill.
+>   `scripts/check_glass_regen.py` is how you know.
+> - **Ink density is now measured on the same basis for all 27**, because they
+>   are all stroked. The mug is still the densest at 2.9× the median (it was
+>   3.6× filled) — a carved face has more line in it than a coupe, and that is
+>   the drawing rather than a defect.
 
 > #### OPEN STROKE ENDS: THE SITE DRAWS 4–6× THINNER THAN HELEN EDITS
 >
