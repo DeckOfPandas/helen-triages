@@ -320,18 +320,46 @@ layout: default
         <div class="cocktail-meta-ship"><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
       </dl>
 
-      {% comment %} CHIPS ARE THE CARD'S MOOD CHIPS, AS <span>s -- Helen's
-         brief: "Must be the same chips as on the cards." Same classes
-         (`.drink-card-mood`, `--hassle` via taxonomy.yml's `mood_groups`) and
-         the identical derivation loop cocktails/index.html runs, so a mood can
-         never look different here than it does on the card it came from. A
-         `<span>`, not the card's `<button>`, because this page has no filter
-         list for a click to narrow — see _sass/cocktails/_cocktail.scss for the
-         `cursor: default` that follows from that. {% endcomment %}
+      {% comment %} CHIPS ARE THE CARD'S MOOD CHIPS, AND NOW THEY GO SOMEWHERE.
+         Helen's original brief: "Must be the same chips as on the cards." Same
+         classes (`.drink-card-mood`, `--hassle` via taxonomy.yml's
+         `mood_groups`) and the identical derivation loop cocktails/index.html
+         runs, so a mood can never look different here than it does on the card
+         it came from.
+
+         AN `<a>` SINCE 2026-09-05, replacing a `<span>` -- Helen: "let's wire
+         the chips up to show a filtered index page please, echoing what we do
+         on the food site, which feels lovely." It echoes it exactly:
+         _includes/recipe_badges.html has been a real link to a pre-filtered
+         index since issue #40, and the argument there holds here word for word
+         -- an `<a>` with a real href is what makes middle-click, open-in-new-tab,
+         copy-link-address and "where does this go" on hover all work, where a
+         button plus `location.href` breaks every one of them.
+
+         This page has no filter list of its own for a click to narrow, which is
+         what the old `<span>` and its `cursor: default` were saying. That was
+         true and was the wrong conclusion: the answer is not that the word does
+         nothing, it is that the word takes you where the filtering happens.
+         Sharper still since the chips took their section colours at rest and
+         hover went back to magenta, which on this site means "you can touch
+         this" -- so a chip that could not be touched was making a promise the
+         page could not keep.
+
+         `url_encode` IS JEKYLL'S `CGI.escape` AND SPELLS A SPACE AS `+`, which
+         assets/js/filter-state.js's `decodeValue` is written to undo -- the same
+         dependency food's badges have, and it matters here for every two-word
+         mood ("sunny terrace", "no juicing", "i want to faff").
+
+         THE HOME URL COMES FROM _data/sites.yml VIA `page.site_key`, not from a
+         literal `/cocktails/`. That is what _includes/back-to-index.html does
+         for the same journey in the other direction, and it means a drink page
+         and its back arrow can never disagree about where the index is.
+      {% endcomment %}
       {% assign mood_groups = site.data.cocktails.taxonomy.mood_groups %}
+      {% assign chip_home = site.data.sites[page.site_key].home %}
       {% if page.mood.size > 0 %}
         <div class="cocktail-chips">
-          {% for m in page.mood %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<span class="drink-card-mood drink-card-mood--{{ chip }}">{{ m }}</span>{% endfor %}
+          {% for m in page.mood %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}
         </div>
       {% endif %}
     </div>

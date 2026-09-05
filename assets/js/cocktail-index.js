@@ -1049,6 +1049,42 @@
 
   var restored = restoreDrinksMemory();
 
+  /* ARRIVING FROM A DRINK PAGE'S MOOD CHIP -- `?mood=sharp`, 2026-09-05.
+     Helen: "let's wire the chips up to show a filtered index page please,
+     echoing what we do on the food site, which feels lovely."
+
+     THE SAME SHAPE AS food's `applyQueryString` in assets/js/filters.js, and
+     the same two policies. A value that survives parsing but matches no button
+     is dropped in silence, so a stale link to a retired mood lands on a
+     perfectly good unfiltered index rather than erroring on a page that works.
+     And the check is against the BUTTONS rather than the taxonomy, because the
+     buttons are what the reader can undo: a filter nothing on screen can turn
+     off is a filter the page is stuck in.
+
+     IT ADDS TO THE RESTORED STATE RATHER THAN REPLACING IT, and runs after
+     `restoreDrinksMemory` for that reason. Coming back from a drink page you
+     opened out of a filtered list, the list you left is the one you want, plus
+     the mood you just clicked -- which is the same "narrow what you are already
+     looking at" a chip click on a card does. */
+  (function applyQueryString() {
+    if (!moodBtns.length) return;
+    /* `HTF.filterState.parseQuery`, NOT `FilterState.parseQuery`. `FilterState`
+       here is the COCKTAIL_FIELDS binding that `create()` returns -- state
+       shape, serialisation, emptiness -- and the query grammar is not part of
+       that: it is one grammar for both sites and lives on the module itself.
+       Reaching for the binding gets `undefined` and throws on the next line. */
+    var wanted = HTF.filterState.parseQuery(location.search);
+    var changed = false;
+    wanted.mood.forEach(function (value) {
+      var offered = moodBtns.some(function (b) { return b.dataset.mood === value; });
+      if (offered && !state.moods.has(value)) {
+        state.moods.add(value);
+        changed = true;
+      }
+    });
+    if (changed) syncMoodButtons();
+  })();
+
   apply();
 
   /* AFTER apply(), because the page is not its full height until the hidden

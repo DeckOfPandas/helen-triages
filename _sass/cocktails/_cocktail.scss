@@ -492,7 +492,27 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 .cocktail-head-shortlist {
   display: flex;
   justify-content: flex-end;
-  margin-top: $space-xs;
+
+  // PULLED UP AGAINST THE TOGGLE, by exactly the title's own bottom margin --
+  // Helen, 2026-09-05, looking ahead to `make it`: "in make it mode, it will
+  // look lost, neither aligned with the metadata headings nor close to the read
+  // it toggle."
+  //
+  // She is right, and the cause is that this element is a sibling of the title
+  // ROW rather than of the toggle inside it, so it clears the whole row --
+  // including `.drink-card-name`'s own $space-sm bottom margin, which exists to
+  // separate the TITLE from what follows and has nothing to say about a control
+  // in the other column. Cancelling exactly that value puts the button directly
+  // under `make it`, so the two read as one cluster in both states rather than
+  // a control stranded on a line of its own once the tagline leaves.
+  //
+  // A NEGATIVE MARGIN RATHER THAN A WRAPPER, and the wrapper was tried first:
+  // `.cocktail-title-row` is `align-items: last baseline`, and a two-item
+  // column's last baseline is its BOTTOM item's -- so stacking the toggle and
+  // the button together drags the toggle off the title's line to put the button
+  // on it. The negative margin is the smaller lie: it says "do not clear the
+  // title's trailing space", which is exactly what is meant.
+  margin-top: -$space-sm;
 }
 
 .cocktail-tagline {
@@ -595,21 +615,6 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // icon's SIZE are this page's own; colour, underline and the word itself all
 // come from _cards.scss untouched, which is what keeps a card and this page's
 // SHIP IT? line from ever reading one rung two different ways.
-// SHIP IT? IS `make it` ONLY, SINCE 2026-09-05 — Helen: "drop the ship mark
-// from read it mode."
-//
-// It is hidden here and revealed in `.cocktail.is-making` rather than gated in
-// the template, which is the whole two-state head's contract: nothing leaves
-// the DOM, so the page prints whole and reads whole with JavaScript off. That
-// contract normally means the DEFAULT state carries more and `make it` strips
-// it — this is the first fact to go the other way, so it is the first rule in
-// the `is-making` block that ADDS something rather than removing it.
-//
-// The grid above needs no help with the gap: at two items `1fr 1fr auto` gives
-// GLASS and GARNISH the two flexible tracks and the `auto` one collapses to
-// nothing, so read mode is two facts across the head and make mode is three.
-.cocktail-meta-ship { display: none; }
-
 .cocktail-ship {
   display: flex;
   align-items: center;
@@ -672,8 +677,11 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   gap: 0.4rem;
   margin: $space-md 0 0;
 
+  // NO `cursor: default` ANY MORE. It was here because the chips were inert
+  // `<span>`s on this page; since 2026-09-05 they are links to the index
+  // filtered by that mood (see _layouts/cocktail.html), so the pointer is
+  // telling the truth again and the base rule's `cursor: pointer` stands.
   .drink-card-mood {
-    cursor: default;
     font-size: 0.85rem;
     line-height: 1.5;
   }
@@ -1540,13 +1548,22 @@ $amount-gap-wide: 1.25rem;
   .cocktail-title-block { min-height: 0; }
   .cocktail-glass-icon  { min-height: 0; }
 
-  // SHIP IT? ARRIVES, rather than leaving — see `.cocktail-meta-ship` above for
-  // why this is the one fact that runs the other way. `display: contents` so
-  // the `<dt>`/`<dd>` pair lands in the grid as the third column exactly as its
-  // two siblings do; `display: block` would make the wrapper the grid item and
-  // stack the label on the value inside it, which is what the siblings' own
-  // `> div { display: flex; flex-direction: column }` already arranges.
-  .cocktail-meta-ship { display: flex; }
+  // SHIP IT? GOES, LIKE EVERYTHING ELSE YOU DO NOT NEED WITH YOUR HANDS FULL.
+  // Helen shipped it the other way round for an hour on 2026-09-05 -- "drop the
+  // ship mark from read it mode" -- and corrected it the same evening: "I might
+  // have said the wrong thing, but I want ship it to display in read it mode,
+  // and not to display in make it mode."
+  //
+  // Which is the right way round on the merits too, and worth saying so the
+  // pair is not swapped back by someone re-deriving it: `ship it?` answers
+  // "should I make this", and `make it` is the state you are in once you have
+  // decided. It belongs with the tagline and the mood chips, which leave here
+  // for the same reason.
+  //
+  // The grid needs no help: at two items `1fr 1fr auto` gives GLASS and GARNISH
+  // the flexible tracks and collapses the `auto` one, so make mode is two facts
+  // across the head and read mode is three.
+  .cocktail-meta-ship { display: none; }
 
   // THE HEAD DOES NOT CHANGE ANY MORE, and removing three lines is the fix.
   // This state used to shrink the title to 1.5rem and tighten the block's

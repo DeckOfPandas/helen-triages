@@ -38,22 +38,16 @@
     // footnote warns about.
     .cocktail-note,
     .notes,
+    // SHIP IT? IS ONE OF THESE AGAIN. It spent an hour on 2026-09-05 hidden in
+    // the editorial state and revealed by `make it`, which needed a rule of its
+    // own here running the opposite way; Helen reversed that the same evening
+    // ("I want ship it to display in read it mode, and not to display in make
+    // it mode"), so it is an ordinary member of this list once more -- a fact
+    // `make it` strips and print puts back.
+    .cocktail-meta-ship,
     .cocktail-body-content { display: revert; }
   }
 
-  // SHIP IT? PRINTS, AND IT IS THE MIRROR OF THE BLOCK ABOVE. Since 2026-09-05
-  // that fact is hidden in the editorial state and revealed by `make it`
-  // (Helen: "drop the ship mark from read it mode") -- the one thing on this
-  // page that runs that way round. Print forces the editorial state, so without
-  // this line it would be the one fact the archive copy silently lost, which is
-  // exactly what this file's header objects to: "an archive copy that has thrown
-  // away the tagline, the ingredient class lines and the notes is a worse record
-  // than the page it came from."
-  //
-  // OUTSIDE the `.cocktail.is-making` block, unlike its neighbours, because it
-  // is not undoing something that state does -- it is undoing something the
-  // DEFAULT does. Same file, opposite direction.
-  .cocktail-meta-ship { display: flex; }
 
   // The toggle itself is furniture, not content -- three controls that cannot
   // be pressed on paper. Was `.btn-make`, the single button this replaced,
