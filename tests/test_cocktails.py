@@ -91,14 +91,55 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
 TOP_LEVEL_KEYS = {
     "title", "tagline", "glass", "garnish", "ingredients", "method", "mood",
-    "notes", "source", "source_url", "meta", "to_serve",
+    "notes", "source", "source_url", "meta", "to_serve", "serve",
 }
 
-# `to_serve` is the only optional one -- 12 drinks of 124 carry it, because most
-# drinks have no presentation note to make. Everything else is on every file
-# today, including `source`/`source_url` where the value is the empty string:
-# "nobody has recorded a source" and "the key is missing" must not look alike.
-REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve"}
+# `serve` ARRIVED 2026-09-05 and is the answer to "where does the ice live?".
+#
+# A drink has a BUILD and a SERVE, and only the build had fields. The serve is
+# five things: the vessel (`glass`), the garnish (`garnish`), the serveware
+# (`to_serve`) -- and then the ICE IN THE GLASS and the GLASS PREP, which had
+# no home at all. Having nowhere to live, those two rode in the last method
+# step, in free prose, which is why "strain" appeared in SEVENTEEN different
+# sentences across 124 drinks: "Strain into a chilled glass", "Strain over
+# crushed ice", "Strain over two giant ice cubes", "Fine-strain into
+# pre-chilled" (a truncated sentence nobody had noticed).
+#
+# Giving them a field collapsed 94 uses of 31 spellings into five techniques --
+# Strain, Fine strain, Double strain, Pour, Dump -- with the variance moved
+# somewhere the page can render it identically every time. That is methods.yml's
+# own argument: a shape that changes every time has to be RE-READ, an identical
+# repeated one becomes something you RECOGNISE.
+#
+# IT IS NOT `to_serve`, WHICH ALREADY EXISTED AND STAYS. That field is the
+# SERVEWARE -- Cobra's Fang's "Plastic giraffes, paper umbrella, teeny
+# flamingos", the swizzles' "Straw.", the punches' "Ladle and punch glasses."
+# Blue Hawaiian had put its cocktail umbrella in `garnish` instead, which is
+# exactly the inconsistency Helen reported ("things to serve with, like a paper
+# umbrella, aren't written or laid out the same way"), and it moved to
+# `to_serve` rather than justifying a second serveware field.
+#
+# ABSENT MEANS NOBODY HAS DECIDED, `ice: "none"` MEANS SERVED UP. The same
+# distinction `garnish` already draws between `[]` and `["no garnish"]`, and it
+# is load-bearing: pic-a-de-crop-punch strains into a punch bowl and its method
+# never says whether ice goes in, where its two sibling punches both say a large
+# block. That is a real question for Helen, not a blank to fill with a default.
+#
+# THERE IS NO `chill`, AND THERE WAS FOR ABOUT AN HOUR. It held `chilled` on 21
+# drinks until Helen ruled it out -- "I think it's implied that glasses should
+# be chilled (except hot drinks obviously). I am the user after all." Its other
+# three values (`frozen` once, `rinsed` three times) were each already a method
+# step in their own right, so the whole field went rather than the one value and
+# nothing it held was lost. Recorded because a field redundant with a default is
+# exactly the kind of thing that gets re-proposed.
+SERVE_KEYS = {"ice", "rim"}
+
+# `to_serve` and `serve` are the optional ones -- most drinks have no serveware
+# note, and `serve` is absent where nobody has ruled on the ice. Everything else
+# is on every file today, including `source`/`source_url` where the value is the
+# empty string: "nobody has recorded a source" and "the key is missing" must not
+# look alike.
+REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve"}
 
 # `item` IS DRAFT-ONLY, ruled by Helen 2026-09-02 (D8, ARCHITECTURE_PLAN §8).
 # It holds what the SOURCE called the ingredient and is being retired by #544;
@@ -1469,6 +1510,341 @@ def test_no_drink_uses_a_retired_generic():
         + "\n\nRe-type against the vocabulary. Which rum a drink wants is "
           "Helen's own knowledge and is not recoverable from the spreadsheet -- "
           "use QQ, do not guess."
+    )
+
+
+def test_item_is_gone_once_the_generic_is_filled_in():
+    """`item` is a TRANSCRIPTION field with a death date, and this is the date.
+
+    INGEST_ONE_COCKTAIL.md §3 has always described the lifecycle: `item` holds
+    the source's own wording "so that Helen can see what the page said when she
+    comes to fill those two in. SHE DELETES IT AT THAT POINT, which is the same
+    moment she stops guessing about the bottle."
+
+    THE DELETION NEVER HAPPENED, because it was a manual step nobody performed
+    and nothing checked. By 2026-09-05 every one of the 683 pours had a real
+    generic -- not one `QQ` left -- so by the document's own rule the field
+    should have been empty, and it was on 215 of them. Helen: "we agreed to drop
+    item, but then I was persuaded to allow it back as somewhere to hold
+    incoming data, but it's become a dumping ground again."
+
+    SO THE RULE IS CONDITIONAL, NOT ABSOLUTE, and that is deliberate. A freshly
+    ingested drink SHOULD carry `item` on every pour with `generic: QQ` beside
+    it -- that is exactly what the ingest document asks for, and forbidding the
+    field outright would break the one job it does. What is forbidden is the
+    field OUTLIVING the answer it was holding a place for.
+
+    WHY A TEST RATHER THAN A FIRMER SENTENCE. The same conclusion this repo
+    already reached about `meta.awaiting_fix` and `meta.proofread`, and about
+    the destructive-git guards: a rule that gets read and then not followed
+    needs enforcement, not rewording. Three passes emptied the field on
+    2026-09-05 and this is what stops it filling for a third time.
+
+    WHAT TO DO WHEN THIS FAILS. Do not delete the `item` to make it green. Ask
+    what it knows that the fields beside it do not:
+      - a bottle           -> `suggestion` (34 pours were this, and the card
+                              could not show any of them, because `item` does
+                              not render)
+      - a bottle this repo does not know yet -> add it to bottles.yml FIRST,
+                              then move it (23 pours were this)
+      - a flavour property -> `character`
+      - a ratio            -> the precise generic (`honey water 2:1`)
+      - guidance on what to pour -> `note`
+    Only when the answer is "nothing the generic does not already say" is
+    deleting it correct.
+    """
+    bad = sorted(
+        f"{slug}: item {item!r} beside generic {generic!r}"
+        for slug, item, generic in _ingredients()
+        if item and generic and generic != "QQ"
+    )
+    assert not bad, (
+        f"{len(bad)} pour(s) keep an `item` after the generic was settled:\n  "
+        + "\n  ".join(bad)
+        + "\n\n`item` does not render, so anything it alone knows is invisible "
+          "on the page and invisible to ABV and costing. Move what it holds to "
+          "the field that owns it -- see this test's docstring for the five "
+          "cases -- and delete it only when it says nothing new."
+    )
+
+
+SERVE = ROOT / "_data" / "cocktails" / "serve.yml"
+
+
+def _serve_vocab():
+    if not SERVE.exists():
+        pytest.skip("_data/cocktails/serve.yml does not exist yet.")
+    return yaml.safe_load(SERVE.read_text(encoding="utf-8")) or {}
+
+
+def test_serve_block_uses_only_declared_keys_and_values():
+    """`serve` is a closed vocabulary, declared in _data/cocktails/serve.yml.
+
+    The field exists because the ice in the glass had no home and rode in the
+    last method step instead -- which is how "strain" came to be written
+    seventeen different ways. A free-text `ice` would put it straight back.
+
+    ABSENT IS ALWAYS LEGAL and means nobody has decided yet, exactly as
+    `garnish: []` does. Pic-a-de-Crop Punch is the live case: it strains into a
+    small punch bowl and never says whether ice goes in, where both its sibling
+    punches say a large block. Defaulting that to `none` would be inventing an
+    answer to a question only Helen can settle.
+    """
+    vocab = _serve_vocab()
+    ices = set(vocab["ice"])
+    assert ices, "serve.yml declares no ice values, so this enforces nothing."
+    bad = []
+    for slug, fm in _load():
+        serve = fm.get("serve")
+        if serve is None:
+            continue
+        if not isinstance(serve, dict):
+            bad.append(f"{slug}: `serve` is a {type(serve).__name__}, not a mapping")
+            continue
+        if not serve:
+            bad.append(f"{slug}: `serve` is empty -- omit the key instead")
+        for key in sorted(set(serve) - SERVE_KEYS):
+            bad.append(f"{slug}: unknown serve key {key!r}")
+        if "ice" in serve and serve["ice"] not in ices:
+            bad.append(f"{slug}: ice {serve['ice']!r} is not declared in serve.yml")
+    assert not bad, (
+        "serve block problem(s):\n  " + "\n  ".join(bad)
+        + "\n\nThe values live in _data/cocktails/serve.yml. Adding one is a "
+          "YAML edit and writing that line is the moment somebody decides the "
+          "value is real."
+    )
+
+
+def test_serve_ice_is_not_restated_in_the_method():
+    """The ice is recorded once, in `serve`, and not again in prose.
+
+    THIS IS THE WHOLE POINT OF THE FIELD, and without this guard the collection
+    drifts straight back: a step reading "Strain over crushed ice" beside
+    `ice: "crushed"` is the same fact twice, and two copies of a fact are two
+    chances to disagree. Nine drinks lost a mood on 2026-09-05 precisely because
+    `ice ice baby` was grepping that prose, and taxonomy.yml's own comment had
+    predicted it -- "a step reworded out of this list silently loses the mood".
+
+    THE SWIZZLES ARE THE DELIBERATE EXCEPTION. "Fill with crushed ice" then
+    "Swizzle until the glass frosts" is a TECHNIQUE: the drink is stirred
+    against the ice, so the step is doing work no field can do. Those steps
+    start with Fill or Top, never with a strain verb, which is the line this
+    test draws.
+    """
+    bad = []
+    for slug, fm in _load():
+        for step in (fm.get("method") or []):
+            if not isinstance(step, str):
+                continue
+            if not re.match(r"^(fine[- ]?strain|double strain|strain|dump)\b",
+                            step, re.I):
+                continue
+            if re.search(r"\bice\b|crushed|cube|block|chilled|frozen", step, re.I):
+                bad.append(f"{slug}: {step!r}")
+    assert not bad, (
+        "A strain step still describes the serve:\n  " + "\n  ".join(sorted(bad))
+        + "\n\nThe technique belongs in `method` -- Strain, Fine strain, Double "
+          "strain, Dump -- and where it lands belongs in `serve` and `glass`. "
+          "Say it once."
+    )
+
+
+# A step ending on one of these has lost its tail. `chilled` and `cold` are
+# NOT here: "shake until chilled" is a whole sentence.
+_DANGLING = re.compile(
+    r"\b(the|a|an|into|with|over|to|of|and|or|in|on|for|from|"
+    r"pre-chilled|remaining|other|all)\s*\.\s*$", re.I)
+
+
+def test_no_method_step_ends_on_a_dangling_word():
+    """A step whose last word cannot end a sentence has been truncated.
+
+    THREE OF THESE WERE FOUND BY ACCIDENT IN ONE DAY, which is why the shape
+    gets a test rather than another read-through:
+
+        "Fine strain into a chilled."      "Fine-strain into pre-chilled."
+        "Add to the."                      (vestigial: "Add to the [glass]")
+
+    None was found by anybody reading the drinks. The first two surfaced only
+    because the serve pass collapsed 31 spellings of "strain" into five and the
+    odd ones out stopped matching; the third because Helen read the list that
+    produced. Nobody reads 124 last-lines in a row, and prose that varies is
+    prose nobody can check -- which is the whole argument for `serve` and for
+    methods.yml before it.
+
+    A SWEEP OF ALL 313 STEPS AFTERWARDS FOUND NO FOURTH, so this starts life
+    green and bites on the next one, the ratchet bargain garnish.yml strikes.
+    Two candidates it deliberately allows: "Add ice and shake until chilled."
+    and "Squeeze a lime wedge into a shaker and drop it in." Both are whole
+    sentences, which is why `chilled` and a trailing `in` after a pronoun are
+    not treated as dangling.
+    """
+    bad = []
+    for slug, fm in _load():
+        for step in (fm.get("method") or []):
+            text = step if isinstance(step, str) else (step or {}).get("step")
+            if not isinstance(text, str):
+                continue
+            if text.lower().startswith("qq"):
+                continue
+            if _DANGLING.search(text) and not re.search(r"\bdrop it in\.$", text, re.I):
+                bad.append(f"{slug}: {text!r}")
+    assert not bad, (
+        "Method step(s) ending on a dangling word:\n  " + "\n  ".join(sorted(bad))
+        + "\n\nThe tail of the sentence is missing. Finish it -- do not delete "
+          "the step, which is how the instruction disappears instead of the "
+          "typo."
+    )
+
+
+def test_to_serve_is_serveware_and_not_the_ice():
+    """`to_serve` is what the drink is served WITH, never how it is iced.
+
+    The two fields drifted into each other in both directions and each way was
+    invisible from the other side. Blue Hawaiian put a cocktail umbrella --
+    serveware -- into `garnish`; Gin Sour put `to_serve: "Without ice."` into
+    the serveware field. Helen's original report was exactly this: "things to
+    serve with (like a paper umbrella) aren't written or laid out the same way."
+
+    Ice belongs in `serve.ice`, which is a closed vocabulary and which the page
+    renders as its own line. A sentence about ice here is a second, free-text
+    copy of a fact already recorded -- and two copies of a fact are two chances
+    to disagree.
+    """
+    bad = []
+    for slug, fm in _load():
+        text = fm.get("to_serve")
+        if not isinstance(text, str):
+            continue
+        if re.search(r"\bice\b|crushed|cube|frozen|chilled", text, re.I):
+            bad.append(f"{slug}: to_serve {text!r}")
+    assert not bad, (
+        "`to_serve` describing the ice:\n  " + "\n  ".join(sorted(bad))
+        + "\n\nUse `serve.ice`, which is declared in _data/cocktails/serve.yml "
+          "and renders its own line. `to_serve` is straws, ladles and paper "
+          "umbrellas."
+    )
+
+
+def test_a_garnish_is_not_an_ingredient_or_a_rim():
+    """`garnish` holds garnishes, not pours, not rims, not serveware.
+
+    THE FIELD HAD ABSORBED FOUR OTHER KINDS OF THING, because three of them had
+    no home of their own until 2026-09-05:
+
+        cocktail umbrella                  -> `to_serve`, which already existed
+        half-rim of sugar                  -> `serve.rim`
+        passion fruit shell filled with
+          overproof rum                    -> its own method step already said it
+
+    This checks the two shapes a machine can be sure about: a quantity at the
+    front (`3 dashes ...`, `5 drops of ...`), which means a POUR that belongs in
+    `ingredients` where #297 can count it, and the word `rim` in a phrase that
+    describes rimming rather than placement.
+
+    `lime wedge on rim` PASSES AND MUST. garnish.yml rules that a placement
+    carries information -- "lime wedge on rim says where to put it" -- so the
+    test looks for a rim being MADE ("half-rim of sugar"), not for one being
+    used as an address.
+
+    TWO LIVE VALUES STILL FAIL THIS SHAPE AND ARE HELEN'S CALL, not a machine's:
+    german-vacation's "3 dashes red creole-style bitters" and mastiha-mojito's
+    "5 drops of olive oil". Both are pours by this rule; both would need a
+    ruling (does a float of olive oil earn a generic?) and one would need a new
+    vocabulary entry. They are listed in the failure message rather than
+    silently exempted, so the test is red until she rules -- see
+    tests/README-style note: a guard that quietly excuses the cases it was
+    written for enforces nothing.
+    """
+    quantity = re.compile(r"^\s*\d|\b(dash|dashes|drop|drops)\b", re.I)
+    rimming = re.compile(r"\brim\b(?!\s*$)|rim of\b|-rim\b", re.I)
+    bad = []
+    for slug, fm in _load():
+        for g in (fm.get("garnish") or []):
+            if not isinstance(g, str):
+                continue
+            if quantity.search(g):
+                bad.append(f"{slug}: {g!r} -- a quantity, so it is a pour")
+            elif rimming.search(g) and not re.search(r"\bon rim\b", g, re.I):
+                bad.append(f"{slug}: {g!r} -- a rim, so it is `serve.rim`")
+    assert not bad, (
+        "Not a garnish:\n  " + "\n  ".join(sorted(bad))
+        + "\n\nA pour belongs in `ingredients` (and #297 needs it there to count "
+          "the alcohol); a rim belongs in `serve.rim`; serveware belongs in "
+          "`to_serve`. A placement like 'lime wedge on rim' is a real garnish "
+          "and passes."
+    )
+
+
+def test_every_glass_in_use_has_a_serving_phrase():
+    """Every glass a drink names can be written into a strain step.
+
+    The page BUILDS its strain step -- "Strain into an old fashioned glass, over
+    a large ice cube." -- out of three fields: the technique from `method`, the
+    glass's phrase from `serving` in glasses.yml, and the ice clause from
+    serve.yml. Helen asked for the glass and the ice back in the method on
+    2026-09-05 ("I'd like to name the glass too where it appears"), and the
+    sentence is composed rather than stored so that each fact lives in one place
+    and the prose cannot drift from it.
+
+    A GLASS WITH NO PHRASE FAILS HERE RATHER THAN ON THE PAGE. Without this the
+    step silently falls back to a bare "Strain." and the glass is simply absent
+    from the method -- the quiet kind of gap that took six drinks' glass icons
+    with it in 2026-08 and was found by inspection rather than by a test.
+
+    THE ARTICLE AND THE WORD "GLASS" ARE PART OF THE PHRASE. "an old fashioned
+    glass" but "a highball" and "a coupe" -- Helen's own examples set that
+    pattern, and it is not derivable: an old fashioned is also a drink, so the
+    noun does real work there and none after "coupe".
+    """
+    glasses = _glasses()
+    serving = glasses.get("serving") or {}
+    canon = glasses.get("canonical_glasses") or {}
+    assert serving, "glasses.yml declares no `serving` phrases."
+    missing = {}
+    for slug, fm in _load():
+        for g in (fm.get("glass") or []):
+            key = str(g).lower()
+            key = canon.get(key, key)
+            if key not in serving:
+                missing.setdefault(key, []).append(slug)
+    bad = [f"{k!r} -- {', '.join(sorted(v)[:3])}" for k, v in sorted(missing.items())]
+    assert not bad, (
+        "Glass(es) with no serving phrase:\n  " + "\n  ".join(bad)
+        + "\n\nAdd one to `serving:` in _data/cocktails/glasses.yml, keyed on "
+          "the CANONICAL name and including its article -- \"a coupe\", "
+          "\"an old fashioned glass\"."
+    )
+
+
+def test_suggestion_is_always_a_list():
+    """One shape for the bottle field, so no consumer has to handle two.
+
+    It was a bare string on 194 pours and a list on 18 until 2026-09-05. Liquid
+    treats a bare string as a one-item sequence, so the template tolerated both
+    by accident and nothing ever complained -- but every consumer #297 (ABV) and
+    #547 (cost) will add would have had to keep handling both, forever.
+
+    `generic` IS DELIBERATELY NOT HELD TO THIS, and the difference is the whole
+    reason this test names only one field. There a string means "this category"
+    and a list means "either of these would do" (#441, Helen 2026-08-17: "What I
+    have there is fine. I can do what I want on the spot"), so the two shapes
+    carry DIFFERENT MEANINGS and the 677-to-6 split is not drift. On
+    `suggestion` both shapes mean the same thing and differ only in how many
+    bottles are named, which is.
+    """
+    bad = []
+    for slug, fm in _load():
+        for entry in (fm.get("ingredients") or []):
+            if not isinstance(entry, dict):
+                continue
+            sugg = entry.get("suggestion")
+            if sugg is not None and not isinstance(sugg, list):
+                bad.append(f"{slug}: suggestion: {sugg!r} is a {type(sugg).__name__}")
+    assert not bad, (
+        "`suggestion` must always be a list:\n  " + "\n  ".join(sorted(bad))
+        + '\n\nWrite one bottle as `suggestion: ["Beefeater"]`, not as a bare '
+          "string. Flow style keeps it to one line."
     )
 
 

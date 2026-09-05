@@ -270,6 +270,12 @@ layout: default
          thing the drink IS. {% endcomment %}
       <div class="cocktail-meta-row">
       <dl class="cocktail-meta">
+        {% comment %} THE GLASS LINE IS THE GLASS AND NOTHING ELSE, 2026-09-05.
+           The ice and the rim rode here for about an hour and Helen killed it:
+           "I don't think it makes sense to show 'hurricane, blended'" — blended
+           is not a property of a glass — and, generally, "ice pedantry will be
+           more likely to be seen at the point in the make where it happens."
+           Both moved to the "To serve" block below the method. {% endcomment %}
         {% if page.glass.size > 0 %}
           <div><dt>Glass</dt><dd>{{ page.glass | join: " or " }}</dd></div>
         {% endif %}
@@ -625,6 +631,66 @@ layout: default
     {% endif %}
   {% endfor %}
 
+  {% comment %} THE STRAIN STEP IS COMPOSED HERE, 2026-09-05, out of three
+     fields that each hold their fact once: the technique from `method`, the
+     glass's phrase from glasses.yml `serving`, and the ice clause from
+     serve.yml `in_the_glass`.
+
+         "Strain." + "an old fashioned glass" + ", over a large ice cube"
+             -> "Strain into an old fashioned glass, over a large ice cube."
+
+     HELEN ASKED FOR THE GLASS AND THE ICE BACK IN THE METHOD, and she is
+     right: the method is what you follow while making the drink, and looking
+     up to the metadata for the glass and down to "To serve" for the ice is
+     worse than one sentence. "I'd like to name the glass too where it appears."
+
+     COMPOSED, NOT STORED, WHICH IS THE WHOLE TRICK. Storing these sentences is
+     exactly what produced seventeen spellings of "strain" and two truncated
+     ones. Generating them means the drink keeps ONE copy of each fact and the
+     prose cannot drift from it — change the glass and the method follows.
+
+     ONLY A BARE TECHNIQUE IS REWRITTEN. A step carrying anything else
+     ("Strain, pouring the cola in at the same time.") is left exactly alone:
+     it is saying something no field holds. {% endcomment %}
+  {% assign glass_phrase = "" %}
+  {% for g in page.glass %}
+    {% assign key = g | downcase %}
+    {% assign canon = site.data.cocktails.glasses.canonical_glasses[key] | default: key %}
+    {% assign phrase = site.data.cocktails.glasses.serving[canon] %}
+    {% if phrase %}
+      {% if glass_phrase == "" %}
+        {% assign glass_phrase = phrase %}
+      {% else %}
+        {% capture glass_phrase %}{{ glass_phrase }} or {{ phrase }}{% endcapture %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% assign ice_clause = site.data.cocktails.serve.in_the_glass[page.serve.ice] | default: "" %}
+  {% comment %} THE RIM RIDES ON THE GLASS, BEFORE THE ICE — Helen, 2026-09-05:
+     "Given that you can't sugar a rim once the glass is full, let's add that
+     line earlier." It was a line under "To serve", which is after the drink is
+     built and therefore too late to act on. Here it describes the state the
+     glass is ALREADY in when you strain into it, which is both true and in
+     sequence: "Fine strain into a coupe with a sugar half-rim."
+
+     `rim_shown` IS A FALLBACK, not decoration. A rimmed drink with no strain
+     step to hang the clause on would otherwise lose the rim entirely, so the
+     "To serve" line survives for exactly that case. No drink is in it today;
+     the guard costs one variable and the alternative is a silent loss. {% endcomment %}
+  {% assign rim_clause = "" %}
+  {% if page.serve.rim %}
+    {% capture rim_clause %} with a {{ page.serve.rim }}{% endcapture %}
+  {% endif %}
+  {% assign rim_shown = false %}
+  {% for step in page.method %}
+    {% unless step.step %}
+      {% assign bare = step | remove: "." %}
+      {% if bare == "Strain" or bare == "Fine strain" or bare == "Double strain" or bare == "Dump" or bare == "Pour" %}
+        {% if glass_phrase != "" %}{% assign rim_shown = true %}{% endif %}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+
   {% if page.method.size > 0 and page.method.first %}
     <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>
     <ol class="cocktail-method">
@@ -635,11 +701,51 @@ layout: default
          thing; see `.cocktail-note` in _sass/cocktails/_cocktail.scss. The
          string form is still the overwhelmingly normal one and is untouched.
       {% endcomment %}
-      {% for step in page.method %}{% if step.step %}<li>{{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}{% if step.note %}<p class="cocktail-note cocktail-method-note">{{ step.note }}</p>{% endif %}</li>{% else %}<li>{{ step | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endif %}{% endfor %}
+      {% for step in page.method %}{% if step.step %}<li>{{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}{% if step.note %}<p class="cocktail-note cocktail-method-note">{{ step.note }}</p>{% endif %}</li>{% else %}{% assign shown = step %}{% assign bare = step | remove: "." %}{% if bare == "Strain" or bare == "Fine strain" or bare == "Double strain" or bare == "Dump" or bare == "Pour" %}{% if glass_phrase != "" %}{% capture shown %}{{ bare }} into {{ glass_phrase }}{{ rim_clause }}{{ ice_clause }}.{% endcapture %}{% endif %}{% endif %}<li>{{ shown | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endif %}{% endfor %}
       {% comment %} THE TWIST STEP IS A STEP LIKE ANY OTHER: same list, same
          numbering, same rules, and it is in the DOM in both states, so `make
          it` and print carry it exactly as they carry a written one. {% endcomment %}
       {% if twist_step != "" %}<li>{{ twist_step }}</li>{% endif %}
+      {% comment %} AND A GARNISH STEP FOR EVERYTHING THAT IS NOT A TWIST.
+         Helen, 2026-09-05: "I'd like to add a garnish step that names the
+         garnish -- I've gone backwards and forwards on this, but garnish is
+         important, and it's easy to miss at the top of the page."
+
+         TWISTS ARE EXCLUDED because the block above already gives them a
+         better step: "Express the twist over the drink and drop it in." says
+         what to DO, where "Garnish with a lemon twist." only says what with.
+         A drink carrying both a twist and something else gets both steps, in
+         that order.
+
+         THE ARTICLE IS A RULE PLUS A DECLARED EXCEPTION LIST. `a` by default,
+         `an` before a vowel, and nothing at all for the plurals and mass nouns
+         in garnish.yml's `no_article` -- "Garnish with a raspberries." is the
+         failure that list exists to stop, and no rule short of a dictionary
+         knows that `raspberries` is plural while `brandied cherry` is not.
+
+         `no garnish` NEVER RENDERS A STEP. It is the decision that this drink
+         takes none, which is worth recording and not worth instructing. {% endcomment %}
+      {% assign garnish_step = "" %}
+      {% for g in page.garnish %}
+        {% capture bounded %}|{{ g }}|{% endcapture %}
+        {% unless declared_twists contains bounded or g == "no garnish" %}
+          {% assign first = g | slice: 0 | downcase %}
+          {% assign article = "a " %}
+          {% if first == "a" or first == "e" or first == "i" or first == "o" or first == "u" %}
+            {% assign article = "an " %}
+          {% endif %}
+          {% if site.data.cocktails.garnish.no_article contains g %}
+            {% assign article = "" %}
+          {% endif %}
+          {% capture one %}{{ article }}{{ g }}{% endcapture %}
+          {% if garnish_step == "" %}
+            {% assign garnish_step = one %}
+          {% else %}
+            {% capture garnish_step %}{{ garnish_step }} and {{ one }}{% endcapture %}
+          {% endif %}
+        {% endunless %}
+      {% endfor %}
+      {% if garnish_step != "" %}<li>Garnish with {{ garnish_step }}.</li>{% endif %}
     </ol>
   {% elsif page.method %}
     <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>
@@ -652,9 +758,51 @@ layout: default
      method steps and live above, which is where the Sazerac's own data
      already put them. None of the first three drinks has a real one.
   {% endcomment %}
-  {% if page.to_serve %}
+  {% comment %} THREE LINES NOW, 2026-09-05 — the rim, the ice, the serveware —
+     in the order you would do them. Helen moved the first two here from the
+     metadata panel: "things like half-rim should be repeated in the method or
+     serve or wherever, because it's easily missed just on the glass mark in
+     the metadata", and "ice pedantry will be more likely to be seen at the
+     point in the make where it happens".
+
+     THE RIM COMES FIRST because you rim a dry glass before anything else goes
+     near it. Then the ice, then what it is served WITH.
+
+     THE ICE WORDING IS DATA, from `ice_line` in _data/cocktails/serve.yml, and
+     `none` and `blended` are absent from that map on purpose — 79 drinks are
+     served up, and "blended" has no sensible serving sentence, which is what
+     sent this block down here in the first place. Absent from the map means
+     absent from the page while the value stays in the data, where the mood
+     derivation reads it.
+
+     THE HEADING NEEDS ANY OF THE THREE, not `to_serve` alone; guarding on the
+     old single field would have printed a rim with no heading over it.
+  {% endcomment %}
+  {% comment %} THE ICE CAME OUT OF HERE ON 2026-09-05, its third and last home.
+     It was a note on the glass line in the metadata panel, then a line here,
+     and it is now a clause on the strain step itself — which is where Helen
+     wanted it: "ice pedantry will be more likely to be seen at the point in the
+     make where it happens." Keeping a copy here as well would be the same fact
+     twice, which is the thing this whole pass has been undoing.
+
+     THE RIM LEFT TOO, on the same day and for a sharper reason: Helen, "given
+     that you can't sugar a rim once the glass is full, let's add that line
+     earlier." A rim is done to an EMPTY glass, so an instruction sitting after
+     the build is not merely easy to miss, it is out of sequence. It is now a
+     clause on the strain step — "Fine strain into a coupe with a sugar
+     half-rim" — where it describes the glass you are straining into.
+
+     IT FALLS BACK TO HERE if there is no strain step to carry it, which no
+     drink needs today. Losing a rim silently is worse than an occasional
+     duplicate heading. {% endcomment %}
+  {% if page.to_serve or page.serve.rim and rim_shown == false %}
     <h2 class="cocktail-section-heading">To serve</h2>
-    <p class="cocktail-to-serve">{{ page.to_serve | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+    {% if page.serve.rim and rim_shown == false %}
+      <p class="cocktail-to-serve cocktail-serve-rim">{{ page.serve.rim | capitalize }}.</p>
+    {% endif %}
+    {% if page.to_serve %}
+      <p class="cocktail-to-serve">{{ page.to_serve | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+    {% endif %}
   {% endif %}
 
   {% comment %} Notes take food's polymorphic shape — {label, text} or a bare

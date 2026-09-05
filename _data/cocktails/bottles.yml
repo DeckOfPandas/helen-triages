@@ -69,6 +69,22 @@
 # governs what is WRITTEN, the alias map governs what can be READ.
 
 bottles:
+  # === HARVESTED FROM `item`, 2026-09-05 ====================================
+  # Every bottle below was already named in a drink, in the `item` field, which
+  # does not render and was about to be deleted wholesale. Helen chose deletion
+  # on my report that only eight bottles were at stake; the real count was
+  # twenty-odd, and she confirmed on being shown them: "All those bottles should
+  # be in our collection (possibly with some names tidied up)."
+  #
+  # SO THE FIELD STILL GOES -- this is the rescue pass that makes the deletion
+  # lossless, not a reprieve for `item`. Where the source's spelling differed
+  # from the product's, the product name is the key and her spelling is an
+  # alias, per her standing rule (2026-09-04): a drink keeps her spelling and
+  # the dictionary learns it, never the other way round.
+  #
+  # THIS RAISES BOTTLE COVERAGE, which is the point. Strength is a property of
+  # the bottle and never of the category (#314: "moderately aged says nothing
+  # about strength"), so ABV can only ever be as complete as this file is.
 
   # --- Jamaican ------------------------------------------------------------
   "Appleton Estate Signature":
@@ -329,12 +345,32 @@ bottles:
   # the first time since it was written.
 
   # --- gin ------------------------------------------------------------------
+  # Charleston's gin, from its own `item`. An American London dry.
+  "Anchor Junipiero":
+    generic: "London dry gin"
+    aliases: ["Anchor Junipiero gin", "Junipiero"]
+  # Spiced Negroni's gin. `speciality` is the generic that REPLACED `flavoured`
+  # (#314, Helen 2026-08-26) and it must always carry a `character`, which is
+  # why the drink gains `spiced` in the same pass.
+  "Ophir":
+    generic: "speciality"
+    aliases: ["Ophir spiced London dry gin", "Ophir Spiced Gin"]
   "Beefeater":
     generic: "London dry gin"
   "Tanqueray":
     generic: "London dry gin"
-  "Hayman's":
+  # SPLIT 2026-09-05. One entry called "Hayman's" typed `London dry gin` could
+  # not serve both drinks that pour the brand, and it silently mistyped one:
+  # La Fée Noir Punch asks for `Old Tom` and carried a QQ note saying the
+  # suggestion crossed a category. Helen confirmed the source pours Hayman's
+  # Old Tom. Fog Cutter names "Hayman's London Dry Gin" outright and Minty
+  # Pentones writes the brand bare, so the bare form stays an alias of the dry.
+  "Hayman's London Dry":
     generic: "London dry gin"
+    aliases: ["Hayman's", "Hayman's London Dry Gin"]
+  "Hayman's Old Tom":
+    generic: "Old Tom"
+    aliases: ["Hayman's Old Tom Gin"]
   "Rutte":
     generic: "London dry gin"
   # Helen, 2026-09-04, completing the brand Tailspin writes bare: the bottle is
@@ -346,6 +382,10 @@ bottles:
     aliases: ["Portobello"]
 
   # --- vodka ----------------------------------------------------------------
+  # Reef Juice's vodka, from its own `item`.
+  "Ketel One":
+    generic: "vodka"
+    aliases: ["Ketel One vodka"]
   # THE FIRST VODKA IN THIS FILE, 2026-09-04, and it arrives with the generic
   # that made it nameable. `flavoured vodka` was retired the same day (Helen:
   # "'flavoured vodka' is not a useful generic because members aren't
@@ -359,6 +399,12 @@ bottles:
     aliases: ["Absolut vanilla vodka", "Absolut Vanilia"]
 
   # --- whisky ---------------------------------------------------------------
+  # Brown Derby's bourbon, from its own `item`. The 12 is the age statement and
+  # part of the product name, so it stays -- the same reasoning that keeps
+  # "Rittenhouse 100" numbered above.
+  "Elijah Craig 12":
+    generic: "bourbon"
+    aliases: ["Elijah Craig 12 year old bourbon", "Elijah Craig 12 Year Old"]
   "Woodford's Reserve":
     generic: "bourbon"
     # The curly apostrophe is a SECOND STRING for one bottle and invisible on
@@ -420,6 +466,13 @@ bottles:
     generic: "rye"
 
   # --- agave ----------------------------------------------------------------
+  # Cactus Banger's tequila. A SECOND Patrón, and deliberately not an alias of
+  # the Silver: they are different categories, and one generic per bottle is
+  # this file's rule. The diacritic follows Helen's 2026-09-02 ruling on the
+  # Silver -- "It's Patron with the diacritic".
+  "Patrón Reposado":
+    generic: "reposado tequila"
+    aliases: ["Patron Reposado", "Patrón Reposado tequila"]
   "Del Maguey Vida":
     generic: "mezcal"
     aliases: ["Del Maguey VIDA", "Del Maguey vida"]
@@ -439,13 +492,46 @@ bottles:
     aliases: ["Rooster Bianco"]
 
   # --- brandy ---------------------------------------------------------------
+  # Julien Sorel's cognac, from its own `item`.
+  "Courvoisier":
+    generic: "cognac"
+    aliases: []
+  # Legend's cognac. A SECOND Pierre Ferrand beside the Ambre below, and not an
+  # alias of it: 1840 Original Formula is a different bottle at a different
+  # strength.
+  "Pierre Ferrand 1840":
+    generic: "cognac"
+    aliases: ["Pièrre Ferrand 1840", "Pierre Ferrand 1840 Original Formula"]
+  # Charleston's kirsch, from its own `item`. `eau de vie` is the generic the
+  # drink already carries; `kirschwasser` is declared too and is the narrower
+  # term, but the drink's own typing is what this follows.
+  "Massenez Kirsch Vieux":
+    generic: "eau de vie"
+    aliases: ["Massenez Kirsch Vieux cherry brandy", "Massenez Kirsch"]
   "Pierre Ferrand Ambre":
     generic: "cognac"
-    aliases: ["Pierre Ferrand ambre"]
+    aliases: ["Pierre Ferrand ambre", "Pièrre Ferrand Ambre",
+              "Pièrre Ferrand Ambre cognac"]
   "Avallen":
     generic: "calvados"
 
   # --- aromatised wine. See #568, which proposes splitting these further -----
+  # THE SHERRIES AND THE PORT, all four from `item` fields, 2026-09-05. Not one
+  # of them was in this file, so `amontillado sherry`, `oloroso sherry` and
+  # `tawny port` had no bottle at all behind them -- five pours with no route to
+  # a strength or a price.
+  "Lustau Amontillado":
+    generic: "amontillado sherry"
+    aliases: ["Lustau Amontillado sherry", "Lustau Los Arcos Amontillado"]
+  "Barbadillo Principe":
+    generic: "amontillado sherry"
+    aliases: ["Barbadillo Principe Amontillado sherry", "Barbadillo Príncipe"]
+  "Lustau Don Nuño Oloroso":
+    generic: "oloroso sherry"
+    aliases: ["Lustau Oloroso Don Nuño Sherry", "Lustau Don Nuno Oloroso"]
+  "Ottoman 10 Year Tawny":
+    generic: "tawny port"
+    aliases: ["Ottoman 10-year tawny port", "Ottoman 10 Year Tawny Port"]
   "Carpano Antica Formula":
     generic: "sweet vermouth"
   # From #585: The Ridgwell's suggestion was the question "Dolin Rouge?" where
@@ -470,12 +556,14 @@ bottles:
   "Lillet Blanc":
     generic: "quinquina"
     aliases: ["Lillet", "Lillet blanc"]
-  # A BRAND THAT IS ITS OWN GENERIC, the pattern #314 permits for three rums
-  # because nothing generalises the bottle. The Ridgwell pours this AND a sweet
-  # vermouth in the same drink, 12.5 ml of each, which is the proof that
-  # "sweet vermouth" does not generalise it.
+  # DEMOTED FROM ITS OWN GENERIC TO A BOTTLE, Helen 2026-09-05. It is a sweet
+  # vermouth, and unlike Créole Shrubb a useful category name exists -- which is
+  # the test the ingredients.yml header now states. It was also the only generic
+  # in the collection that named itself as its own suggestion: two drinks read
+  # `generic: Punt e Mes` / `suggestion: Punt e Mes`, so the card printed
+  # "Punt e Mes (Punt e Mes)".
   "Punt e Mes":
-    generic: "Punt e Mes"
+    generic: "sweet vermouth"
     aliases: ["Carpano Punt e Mes", "Punt E Mes"]
   "Dolin Dry":
     generic: "dry vermouth"
@@ -488,6 +576,40 @@ bottles:
     aliases: ["Dolin blanc"]
 
   # --- liqueurs -------------------------------------------------------------
+  # HARVESTED FROM `item` 2026-09-05 -- see the block at the head of `bottles`.
+  "Kahlua":
+    generic: "coffee liqueur"
+    aliases: ["Kahlúa"]
+  "Passoa":
+    generic: "passion fruit liqueur"
+    aliases: ["Passoã", "Passoa passion fruit liqueur"]
+  "King's Ginger":
+    generic: "ginger liqueur"
+    aliases: ["King's ginger liqueur", "Kings Ginger"]
+  "L'Original Combier Triple Sec":
+    generic: "triple sec"
+    aliases: ["L'Original Combier Triple Sec Liqueur", "Combier Triple Sec",
+              "Combier"]
+  "Giffard Crème de Mûre":
+    generic: "crème de mûre"
+    aliases: ["Giffard Creme de Mure"]
+  "Fernet Branca":
+    generic: "fernet"
+    aliases: ["Fernet Branca liqueur", "Fernet-Branca"]
+  # THREE BOTTLES WHOSE GENERIC IS THEIR OWN BRAND, which is correct and is the
+  # test the ingredients.yml header now states: no category name would help
+  # Helen choose, so the bottle IS the category. Créole Shrubb below is the
+  # same shape. Listing the bottle as well as the generic is what gives ABV and
+  # cost somewhere to live -- a category cannot carry either.
+  "Liquore Strega":
+    generic: "Strega"
+    aliases: ["Strega liqueur", "Strega"]
+  "Bénédictine D.O.M.":
+    generic: "Bénédictine"
+    aliases: ["Benedictine D.O.M.", "Bénédictine", "Benedictine"]
+  "Galliano L'Autentico":
+    generic: "Galliano"
+    aliases: ["Galliano L'Autentico liqueur", "Galliano"]
   "Cointreau":
     generic: "triple sec"
   "Cherry Heering":
@@ -597,9 +719,18 @@ bottles:
   # with its reasoning: a rhum-based orange liqueur, not a rum.
   "Rhum Clément Créole Shrubb":
     generic: "Créole Shrubb"
-    aliases: ["Rhum Clement Créole Shrubb", "Clément Créole Shrubb", "Créole Shrubb"]
+    aliases: ["Rhum Clement Créole Shrubb", "Clément Créole Shrubb",
+              "Créole Shrubb", "Rhum Clement Creole Shrub",
+              "Rhum Agricole Clément Créole shrub",
+              "Rhum Clément Créole Shrubb liqueur"]
 
   # --- bitters --------------------------------------------------------------
+  # Arrack Punch's and Legend's aromatic bitters, from their `item` fields --
+  # the non-Angostura choice, which is exactly the kind of preference this file
+  # exists to record.
+  "Bitter Truth Aromatic":
+    generic: "aromatic bitters"
+    aliases: ["Bitter Truth Aromatic bitters", "The Bitter Truth Aromatic"]
   "Angostura":
     generic: "aromatic bitters"
     aliases: ["Angostura bitters"]
@@ -612,6 +743,8 @@ bottles:
     aliases: ["Peychauds", "Peychaud's bitters", "Peychaud’s"]
   "Bittermens Xocolatl Mole":
     generic: "chocolate bitters"
+    aliases: ["Bittermen’s Xocolatl Mole bitters", "Bittermens Xocolatl Mole bitters",
+              "Bittermen's Xocolatl Mole"]
   # THE MAKER WAS THE WHOLE QUESTION, and Helen answered it flatly on
   # 2026-09-04: "the maker is Bittermens, 100%." The `unresolved_suggestions`
   # entry had said "Probably Bittermens', which is memory rather than reading" --

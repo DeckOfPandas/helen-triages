@@ -149,7 +149,6 @@ canonical:
     # drink. See spice_and_other.
     - "raspberries"
     - "half an empty passion fruit shell"
-    - "passion fruit shell filled with overproof rum"
     - "pineapple and brandied cherry"
 
   # THE THREE QUALIFIED CHERRIES ALL STAY, ruled 2026-08-31. A Luxardo really is
@@ -182,10 +181,6 @@ canonical:
     # raspberries` did not. Three coffee beans is the Espresso Martini, not an
     # arbitrary number of beans.
     - "three coffee beans"
-    - "half-rim of sugar"
-    - "cocktail umbrella"
-    - "3 dashes red creole-style bitters"
-    - "5 drops of olive oil"
 
 # =============================================================================
 # PROPOSALS -- both halves kept, so the choice is Helen's and not mine
@@ -221,3 +216,32 @@ canonical:
 # nothing at all -- the same reason GLASSLESS_ON_2026_08_27 was kept and
 # asserted empty rather than removed.
 proposals: {}
+
+# =============================================================================
+# NO ARTICLE — garnishes the generated garnish step must not put "a" in front of.
+# =============================================================================
+# The method now ends with a step naming the garnish, built by
+# _layouts/cocktail.html. Helen, 2026-09-05: "I'd like to add a garnish step
+# that names the garnish -- I've gone backwards and forwards on this, but
+# garnish is important, and it's easy to miss at the top of the page."
+#
+# The step reads "Garnish with a lime wedge." — an article, then the declared
+# string. `a` vs `an` is decided by the first letter and needs no data. What
+# needs data is the third case: a plural, a mass noun, or a phrase that brings
+# its own article. "Garnish with a raspberries." is the failure this list
+# prevents, and no rule short of a dictionary tells you that `raspberries` is
+# plural while `brandied cherry` is not.
+#
+# A LIST OF EXCEPTIONS RATHER THAN AN ARTICLE ON ALL 43, because the default is
+# right for 35 of them and a field that is almost always the same value stops
+# being read.
+no_article:
+  - grapefruit crescents
+  - raspberries
+  - kaffir lime leaves
+  - cucumber wheels
+  - grated nutmeg
+  - three coffee beans
+  - half an empty passion fruit shell   # brings its own "half an"
+  - pineapple and brandied cherry       # two things, not one
+  - no garnish                          # never rendered as a step anyway

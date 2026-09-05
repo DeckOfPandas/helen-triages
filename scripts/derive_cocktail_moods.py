@@ -206,7 +206,14 @@ def derive(drink, sets, step_words, families):
     by_family = spirit_volumes(entries, sets["_measures"],
                                sets["_family_of"], sets["_whisky"])
     lengthened = has("lengthener")
-    churned = bool(hits_in(steps, step_words.get("churned") or []))
+    # `churned` DISQUALIFIES a strong brown drink and a sour, and it too now
+    # reads the field first -- same reason as `ice ice baby` below. It stays
+    # NARROWER than that mood on purpose: a big block of ice is precisely how
+    # you serve a strong brown drink, so `large cube` and `block` are absent
+    # here while `crushed` and `blended` disqualify. Banana Boulevardier lost
+    # the mood outright for one commit when these two lists were the same list.
+    churned = (drink.get("serve") or {}).get("ice") in ("crushed", "blended") \
+        or bool(hits_in(steps, step_words.get("churned") or []))
     if by_family and not lengthened and not churned and not has("juice"):
         top = max(by_family.values())
         leaders = [f for f, v in by_family.items() if v == top]
@@ -305,7 +312,23 @@ def derive(drink, sets, step_words, families):
     # drink. That second clause is what keeps a Boulevardier out: same
     # Campari, entirely different moment in the evening.
 
-    if hits_in(steps, step_words.get("ice") or []):
+    # `ice ice baby` READS THE FIELD NOW, not the prose. 2026-09-05.
+    #
+    # It used to grep the method steps for "crushed ice", "large ice", "giant
+    # ice", "ice block" -- and taxonomy.yml's own comment beside that list said
+    # what was wrong with it: "A step reworded out of this list silently loses
+    # the mood... it is exactly what four drinks did for one commit." The serve
+    # pass reworded 63 steps at once and took the mood off nine drinks, which is
+    # that warning arriving at scale.
+    #
+    # The prose was only ever a proxy for a fact nothing recorded. `serve.ice`
+    # records it, so the mood asks the drink directly and cannot be broken by
+    # rewording. `swizzle`/`churn`/`blend` stay on the step list because those
+    # are TECHNIQUES rather than ice, and a swizzle is the mood's own example.
+    serve = drink.get("serve") or {}
+    served_ice = serve.get("ice")
+    if served_ice in ("crushed", "large cube", "block", "blended") \
+            or hits_in(steps, ["swizzle", "churn", "blend"]):
         out.append("ice ice baby")
     if hits_in(steps, step_words.get("faff") or []) >= 2 or n_ingredients >= 9:
         out.append("I want to faff")
