@@ -110,6 +110,7 @@
   var control = article.querySelector('.cocktail-scale-controls');
   var input = control && control.querySelector('.cocktail-scale-multiple');
   var note = article.querySelector('.cocktail-scale-note');
+  var list = article.querySelector('.cocktail-ingredients');
   var spans = Array.prototype.slice.call(
     article.querySelectorAll('.cocktail-amount')
   );
@@ -135,8 +136,41 @@
      to have arrows. At two characters there is no room for a pair, and the
      values that matter -- 2, 3, a half -- are one keystroke each. The snap that
      the step was expressing still happens, on every value, on the way in. */
+  /* THE AMOUNT COLUMN WIDENS ONLY WHEN A SCALED AMOUNT NEEDS IT -- Helen,
+     2026-09-05: "please reduce the space between ingredient amounts and names
+     again, but increase it when an amount would otherwise linebreak due to use
+     of the scaler."
+
+     COUNTED, NOT MEASURED, and that is sound rather than lazy: `.cocktail-amount`
+     is set in $font-label, which is IBM Plex MONO, so every character is the
+     same width and a character count IS a width. Measuring would mean asking
+     the browser for layout on every keystroke to learn something arithmetic
+     already knows.
+
+     NINE IS THE FIT. The narrow column is 5.5rem = 88px; Plex Mono advances
+     0.6em and the amount is set at 0.95rem, so one character is 0.6 x 0.95 x 16
+     = 9.12px and the column holds 88 / 9.12 = 9.6 of them. Nine fit, ten do
+     not. "112.5 ml" is eight and "1012.5 ml" is nine, so the common scaled
+     amounts stay in the narrow column and only the genuinely long ones open it.
+
+     A DRINK CAN ALSO BE BORN WIDE. The Airmail's "Top (30-45) ml" is fourteen
+     characters at x1 and has always wrapped inside its column; it now gets the
+     wide pair at rest, which is the same fix arriving for the same reason. */
+  var AMOUNT_FITS = 9;
+
+  function fitAmountColumn(amounts) {
+    if (!list || !list.classList) return;
+    var longest = 0;
+    amounts.forEach(function (a) {
+      if (a.length > longest) longest = a.length;
+    });
+    list.classList.toggle('cocktail-ingredients--wide-amounts',
+                          longest > AMOUNT_FITS);
+  }
+
   var last = HTF.scale.snapMultiple(original, 1).multiple;
   input.value = box(last);
+  fitAmountColumn(original);
   control.hidden = false;
 
   /* THE BOX HOLDS A FRACTION, NOT A DECIMAL -- 2026-09-05, and this is what
@@ -264,6 +298,7 @@
     spans.forEach(function (span, index) {
       span.textContent = verdict.amounts[index];
     });
+    fitAmountColumn(verdict.amounts);
     put(input, box(last));
   }
 

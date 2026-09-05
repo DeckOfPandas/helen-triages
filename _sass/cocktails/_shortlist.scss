@@ -43,6 +43,18 @@
   cursor: pointer;
   white-space: nowrap;
 
+  // THE MARK AND THE WORD ARE CENTRED ON EACH OTHER — Helen, 2026-09-05:
+  // "please horizontally align the middle of the word shortlist with the middle
+  // of its icon."
+  //
+  // This is a flex row rather than two inline boxes because the alternative is
+  // a baseline, and a baseline is what put the `+` up in the air in the first
+  // place. See the `::before` below for that story; the short version is that
+  // an inline-block's baseline is not always its text's baseline, and the one
+  // thing a flex row with `align-items: center` cannot do is care.
+  display: inline-flex;
+  align-items: center;
+
   color: $color-clear-text;
   transition: color 0.12s ease-in-out;
 
@@ -52,31 +64,43 @@
   // A fixed WIDTH was already here and was only half the problem. The other
   // half is height: `+` is in Courier Prime and `✓` (U+2713) is not, so the
   // browser substitutes a fallback face for that one glyph — and a fallback's
-  // ascent is not Courier's. The mark is an inline-block, so its line box
-  // counts toward the line's height; a taller substituted glyph grew the line
+  // ascent is not Courier's. The mark was an inline-block, so its line box
+  // counted toward the line's height; a taller substituted glyph grew the line
   // box, and since the button is `align-items: flex-start` in the meta row its
-  // top stayed put and the BASELINE dropped. Hence a word that jumps down a few
-  // pixels on click and back up on click again.
+  // top stayed put and the BASELINE dropped.
   //
-  // `line-height: 1` pins the mark's box to its own font-size, which is smaller
-  // than the label's line box either way, so whichever face draws the glyph it
-  // can no longer be the thing that decides the line's height. `overflow:
-  // hidden` is the belt to that braces: a fallback glyph drawn taller than its
-  // em box cannot spill and re-grow the box.
+  // THE FIRST FIX WAS `line-height: 1` PLUS `overflow: hidden`, AND IT TRADED
+  // THE JUMP FOR A SUPERSCRIPT — Helen saw it immediately: the `+` was sitting
+  // up by the cap line instead of level with the word. That is a real rule
+  // rather than a mystery: an inline-block whose `overflow` is anything but
+  // `visible` takes its BOTTOM MARGIN EDGE as its baseline, not its text's
+  // baseline. So `vertical-align: baseline` put the whole 1em box above the
+  // word's baseline and the glyph rode up with it. Adding overflow to pin a
+  // height silently changed what the box was aligned BY.
   //
-  // The general shape is worth keeping: a swapped glyph is a swapped FONT
-  // whenever the face lacks it, and a font swap changes metrics, not just the
-  // picture. Anywhere two characters alternate in one slot, pin the slot.
+  // BOTH GO AWAY IN A FLEX ROW. With the button `inline-flex` and
+  // `align-items: center` (above) there is no baseline in the arrangement at
+  // all: the mark's box and the word's line box are centred on one another,
+  // which is what Helen asked for, and a substituted glyph inside a box of
+  // declared height cannot move either of them. `height: 1em` with
+  // `line-height: 1` is that declared height; `overflow: hidden` keeps its
+  // meaning here — a taller fallback glyph cannot spill — while no longer
+  // having a baseline to redefine.
+  //
+  // The general shape is worth keeping twice over: a swapped glyph is a swapped
+  // FONT whenever the face lacks it, and a font swap changes metrics rather
+  // than only the picture. And a property added to fix one thing can quietly
+  // change which rules apply to another.
   &::before {
     content: '+';
-    display: inline-block;
+    flex: none;
     width: 0.85em;
+    height: 1em;
     margin-right: 0.25em;
     text-align: center;
     font-weight: 700;
     line-height: 1;
     overflow: hidden;
-    vertical-align: baseline;
   }
 
   &:hover,

@@ -45,6 +45,20 @@ function el(cls, text) {
     children: [],
     parent: null,
     on: {},
+    classes: new Set((cls || '').split(' ').filter(Boolean)),
+    get classList() {
+      const self = this;
+      return {
+        contains: (name) => self.classes.has(name),
+        add: (name) => self.classes.add(name),
+        remove: (name) => self.classes.delete(name),
+        toggle(name, on) {
+          if (on === undefined) on = !self.classes.has(name);
+          if (on) self.classes.add(name); else self.classes.delete(name);
+          return on;
+        }
+      };
+    },
     hasAttribute(name) { return name in this.attrs; },
     getAttribute(name) { return this.attrs[name]; },
     setAttribute(name, value) { this.attrs[name] = String(value); },
@@ -112,7 +126,8 @@ function page(pours) {
   }
 
   return {
-    sandbox, control, input, note, spans,
+    sandbox, control, input, note, spans, list,
+    wide: () => list.classList.contains('cocktail-ingredients--wide-amounts'),
     amounts: () => spans.map((s) => s.textContent),
     /** Type into a box the way a browser does: focus it, then `input`. */
     type(box, text) {
@@ -243,4 +258,40 @@ test('a bare vulgar fraction with no whole part is read too', () => {
   assert.deepStrictEqual(p.amounts(),
     ['17.5 ml', '5 ml', '2.5 ml', '5 ml'], 'poured at a third');
   assert.strictEqual(p.note.hidden, true);
+});
+
+// --- the amount column's two widths ------------------------------------------
+// Helen, 2026-09-05: "reduce the space between ingredient amounts and names
+// again, but increase it when an amount would otherwise linebreak due to use of
+// the scaler." Counted rather than measured — the amounts are set in Plex Mono,
+// so a character count is a width. Nine fit in the narrow column.
+
+test('the amount column stays narrow for a drink as written', () => {
+  const p = page(AVIATION);
+  assert.strictEqual(p.wide(), false,
+    '"52.5 ml" is seven characters; nothing needs the room');
+});
+
+test('a scaled amount that would wrap opens the column, and closes it again', () => {
+  // A count with a long unit is what actually reaches ten characters under
+  // scaling: millilitre figures tend to SHORTEN as they scale, because the
+  // decimal falls off ("52.5 ml" doubles to "105 ml").
+  const p = page([['9 dashes', 'Angostura'], ['30 ml', 'rye']]);
+  assert.strictEqual(p.wide(), false, '"9 dashes" is eight characters');
+
+  p.type(p.input, '12');
+  assert.strictEqual(p.amounts()[0], '108 dashes', 'ten characters');
+  assert.strictEqual(p.wide(), true, 'so the column opens');
+
+  p.type(p.input, '2');
+  assert.strictEqual(p.amounts()[0], '18 dashes', 'nine characters');
+  assert.strictEqual(p.wide(), false, 'and closes again — it is a state, not a ratchet');
+});
+
+test('an amount longer than the column holds opens it at rest', () => {
+  // The Airmail's own written amount, fourteen characters, which has wrapped
+  // inside its column since the column existed.
+  const p = page([['Top (30-45) ml', 'champagne'], ['15 ml', 'lime juice']]);
+  assert.strictEqual(p.wide(), true,
+    'a drink can be born too wide for the narrow column, not only scaled into it');
 });

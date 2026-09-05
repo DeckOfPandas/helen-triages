@@ -875,12 +875,27 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // "as tall as the title block" was built for survives: `top` is unchanged.
   min-height: $glass-min;
   display: flex;
-  // TOP-ALIGNED, shipped. Helen looked at this against centred and chose it:
-  // every glass on every drink now starts at the same y, level with the title
-  // it belongs to, and a short one simply stops where it stops. The hole
-  // beneath a short glass was the argument for centring and turned out not to
-  // matter — the top edge is what the eye tracks when you move between drinks.
-  align-items: flex-start;
+  // CENTRED IN THE BLOCK SINCE 2026-09-05, and this reverses a call Helen made
+  // by looking on 2026-09-02. She chose TOP-ALIGNED then: "every glass starts at
+  // the same y, level with the title it belongs to, and a short one simply
+  // stops where it stops. The hole beneath a short glass was the argument for
+  // centring and turned out not to matter."
+  //
+  // What changed is that she compared two drinks rather than two treatments.
+  // Top-aligned, every glass shares a top edge and therefore NONE of them share
+  // a relationship with the block as a whole: the coupe's foot lands well above
+  // Aviation's mood chips, the wine glass's almost touches Aperol Spritz's,
+  // because `--glass-fill` is doing exactly the job she likes it doing. Helen,
+  // seeing the two side by side: "the glasses are in different places relative
+  // to the name and metadata block. I assume this is related to the relative
+  // scaling (which I love) but I think the drinks should be centred on the top
+  // block." Centred, the fill is still the whole difference between one glass
+  // and another, and the drawing sits the same way in the head on every drink.
+  //
+  // HORIZONTAL CENTRING WAS NEVER THE QUESTION and is unchanged below: the SVG
+  // has always been centred in the column, which is why the fix is on the cross
+  // axis rather than the main one.
+  align-items: center;
   justify-content: center;
 
   // The default UA stylesheet sets `overflow: hidden` on a root <svg>
@@ -1011,28 +1026,63 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // only the number moved, on Helen's own call against the page she was actually
 // looking at, and a fixed width pays that back on every row exactly as before.
 //
-// 6.5rem AND A 1.25rem GAP SINCE 2026-09-05, and the reason is the scaler
-// rather than the resting page — Helen: "increase the horizontal space between
-// amounts and ingredients to allow for extra numbers due to the scaler (like
-// decimals, or getting to the next order of magnitude)." A written amount is
-// the single-order one: "15 ml", "52.5 ml". Scaled, the same row can reach
-// "112.5 ml" or "1050 ml", which is two more characters of Plex than the
-// column was cut for — and a fixed column that a real value overflows wraps
-// the number rather than shoving the name, so the failure is silent and ugly
-// instead of loud. 6.5rem holds nine monospace characters at 0.95rem with room
-// to spare; the wider gap keeps the two columns reading as two.
-$amount-col: 6.5rem;
-$amount-gap: 1.25rem;
-$amount-indent: $amount-col + $amount-gap;
+// IT IS TWO WIDTHS NOW, AND THE PAGE PICKS ONE — Helen, 2026-09-05: "please
+// reduce the space between ingredient amounts and names again, but increase it
+// when an amount would otherwise linebreak due to use of the scaler."
+//
+// Earlier the same day this went to 6.5rem/1.25rem for the scaler's sake, and
+// that was the right worry solved in the wrong place: the resting page pays a
+// permanent gap for a problem only a scaled page has. A written amount is the
+// single-order one ("15 ml", "52.5 ml") and fits 5.5rem comfortably; ×2 or ×3
+// reaches "112.5 ml" or "1050 ml", and a fixed column that a real value
+// overflows WRAPS the number rather than shoving the name — so the failure is
+// silent and ugly instead of loud, which is what the wide pair is for.
+//
+// CUSTOM PROPERTIES RATHER THAN TWO SETS OF RULES, so the sub-lines that indent
+// past the column (the character line, the ingredient note) follow the switch
+// with no second copy of the arithmetic to keep in step. That is the same
+// "three values that must agree are one value plus arithmetic" the numbered
+// note above makes, extended to a value that now changes at runtime.
+//
+// WHO FLIPS IT: assets/js/cocktail-scale.js, which is the only thing that knows
+// what the amounts currently say. It counts characters rather than measuring,
+// and it can: $font-label is IBM Plex MONO, so a character count is a width.
+// The threshold and its arithmetic live beside the code that applies it.
+$amount-col: 5.5rem;
+$amount-gap: 1rem;
+$amount-col-wide: 7rem;
+$amount-gap-wide: 1.25rem;
 
 // 34rem, Helen's mockup's own measure — matches `.cocktail-method` below, so
 // the two sections that read as prose (steps, and a wrapped ingredient note or
 // character line) share one column width.
+// THE AMOUNT COLUMN'S TWO WIDTHS LIVE ON THE ARTICLE, not on the list that uses
+// them, for two reasons. Everything that indents past the column is inside this
+// element — the grid, the character line, the ingredient note — so one
+// declaration reaches all of them; and a `var()` whose property is guaranteed to
+// be defined needs no fallback, which keeps `#{}` out of the declarations
+// themselves. (That is not only tidiness: tests/test_site_config.py's grid-track
+// check reads these declarations as text, and a Sass interpolation inside a
+// `var()` fallback reads to it as the start of a block.)
+.cocktail {
+  --amount-col: #{$amount-col};
+  --amount-gap: #{$amount-gap};
+}
+
 .cocktail-ingredients {
   list-style: none;
   margin: 0;
   padding: 0;
   max-width: 34rem;
+}
+
+// SET BY assets/js/cocktail-scale.js WHEN A SCALED AMOUNT NEEDS THE ROOM, and
+// removed again when it does not — so the wide column is a state the page is in
+// rather than a width it always pays for. A page with no JavaScript never gets
+// this class and never needs it: nothing can scale the amounts.
+.cocktail-ingredients--wide-amounts {
+  --amount-col: #{$amount-col-wide};
+  --amount-gap: #{$amount-gap-wide};
 }
 
 // NO HAIRLINE BETWEEN ROWS, 2026-09-02 — Helen's brief and mockup. The
@@ -1051,9 +1101,9 @@ $amount-indent: $amount-col + $amount-gap;
 // "two columns" than a flex row achieving the same thing by other means.
 .cocktail-ingredient-top {
   display: grid;
-  grid-template-columns: $amount-col 1fr;
+  grid-template-columns: var(--amount-col) 1fr;
   align-items: baseline;
-  column-gap: $amount-gap;
+  column-gap: var(--amount-gap);
 }
 
 .cocktail-amount {
@@ -1174,7 +1224,7 @@ $amount-indent: $amount-col + $amount-gap;
 .cocktail-type-line {
   color: $color-cosmic-cosmopolitan-deep;
   font-size: 0.84rem;
-  margin: 0.3rem 0 0 $amount-indent;
+  margin: 0.3rem 0 0 calc(var(--amount-col) + var(--amount-gap));
 }
 
 // THE MONO IS GONE, 2026-08-26. Helen: "some of the ingredient generics are in
@@ -1250,7 +1300,7 @@ $amount-indent: $amount-col + $amount-gap;
   font-size: 0.84rem;
   font-style: italic;
   line-height: 1.55;
-  margin: 0.25rem 0 0 $amount-indent;
+  margin: 0.25rem 0 0 calc(var(--amount-col) + var(--amount-gap));
 }
 
 // A METHOD STEP MAY CARRY ONE TOO — Helen, 2026-09-04: "separate note field
