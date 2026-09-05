@@ -59,6 +59,7 @@ import sys
 
 import pytest
 
+import drafts_schema
 from conftest import where_draft, is_qq, ALL_RECIPES, ALL_DRAFTS
 import test_front_matter as _fm
 import test_style as _st
@@ -139,6 +140,28 @@ DIVERGENT_ON_PURPOSE = {
 # tests/test_suite_hygiene.py asserts every module declares one --
 # an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.food
+
+
+def test_the_food_drafts_clone_is_in_step():
+    """This checkout's rules and `_food_drafts/`'s data agree. Issue #624.
+
+    THE FIRST TEST TO READ WHEN A FOOD RUN GOES RED WITH DRAFTS IN IT. The
+    food half has not been bitten by this yet -- both instances so far were
+    cocktails -- and it has exactly the same shape under it: a rule here, the
+    data in a separate private repo, two merges and nothing coordinating them.
+    `tests/drafts_schema.py` carries the full reasoning.
+
+    THE BASELINE IS DELIBERATELY A NO-OP. Food schema 1 records the state on
+    the day the handshake was added rather than demanding a migration; it is
+    the number every later bump is measured from.
+    """
+    if not drafts_schema.present("_food_drafts"):
+        pytest.skip(
+            "`_food_drafts/` is not on this machine, so there is no clone to "
+            "be in step with. Clone it to check this -- HANDOVER 9.1."
+        )
+    problem = drafts_schema.mismatch("_food_drafts")
+    assert problem is None, problem
 
 
 # =============================================================================

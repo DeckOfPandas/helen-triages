@@ -44,6 +44,7 @@ import yaml
 # `model_instructions/INGEST_ONE_COCKTAIL.md` §7 demands every one of them of a
 # drink. conftest.py holds the corpus-agnostic predicates and nothing else; the
 # asserts, the messages and the field lists below are this collection's own.
+import drafts_schema
 from conftest import (
     SHARED_TYPOGRAPHY, accent_problems, accented_words, checkable_text,
     degreeless_temperatures, is_qq, number_range_hits, spelling_problems,
@@ -77,7 +78,8 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 # =============================================================================
 # THE CORPUS WAS ALREADY UNIFORM AND NOTHING SAID SO. Censused 2026-09-02 over
 # all 124 drinks: twelve top-level keys, every one single-shaped, `meta` exactly
-# `{ship, date_last_edited}` on every file. The "ad hoc" feeling around this
+# `{ship, date_last_edited}` on every file -- `date_last_edited` has since gone
+# (#712, 2026-09-05) and `made_before` and the three gate flags have arrived. The "ad hoc" feeling around this
 # collection came from the ABSENCE OF A GUARD, not from the data -- and the
 # proof is what the same census found underneath: nine drinks with no `method`
 # at all and eleven ingredient entries with no `amount`, both invisible to every
@@ -171,14 +173,27 @@ REQUIRED_INGREDIENT = {"generic"}
 # them would be two things to keep in step for no gain. `awaiting_fix` and
 # `proofread` are read by _plugins/publish_gate.rb the moment a drink is
 # promoted; `rewritten` is read by nothing and is Helen's own record.
-META_KEYS_IN_ORDER = ["ship", "date_last_edited", "rewritten", "awaiting_fix",
+#
+# `made_before` ARRIVED 2026-09-05 (issue #722) AND SITS FIRST DELIBERATELY. You
+# make a drink, and then you have an opinion about it -- so the block reads in
+# the order the facts happen, and `ship` is only a meaningful claim on a file
+# whose line above it says true. Helen, raising #722: "I know whether I've made
+# the drinks before, and I bet unrated ones I just haven't made. I want to
+# confirm these line by line." She confirmed all 22 on 2026-09-05 and the bet
+# was right 20 times.
+#
+# THE OTHER 104 ARE `true` BY INFERENCE, NOT BY HER SAYING SO ONE AT A TIME, and
+# the inference is the premise of #722 itself: a rung on `ship_scale` is a
+# verdict, and a verdict means she drank it. The 22 she ruled on are the ones
+# where that inference did NOT hold -- which is exactly why they were the ones
+# worth asking about. If a `true` here is ever wrong, it is one drink and one
+# word, not a schema problem.
+META_KEYS_IN_ORDER = ["made_before", "ship", "rewritten", "awaiting_fix",
                       "proofread"]
 
 # The two flags the publish gate reads, and `rewritten` alongside them because
 # all three are booleans with the same trap.
 GATE_FLAGS = ["rewritten", "awaiting_fix", "proofread"]
-
-_ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 # A tagline nobody has written yet. 120 of the 124 drinks say this, which is a
 # backlog and not a design smell (Helen, 2026-09-02) -- but it is a backlog that
@@ -1092,31 +1107,6 @@ def test_every_ingredient_has_an_amount():
     )
 
 
-def test_date_last_edited_is_an_iso_date():
-    """`meta.date_last_edited` is a `YYYY-MM-DD` string and not a YAML date.
-
-    UNQUOTED, YAML PARSES IT INTO A `datetime.date` and Liquid then renders it in
-    a different format from every quoted sibling -- the silent kind of drift,
-    since both look identical in the file. The string form is what the other 124
-    already use.
-    """
-    bad = []
-    for slug, fm in _load():
-        meta = fm.get("meta")
-        if not isinstance(meta, dict):
-            bad.append(f"{slug}: no `meta:` mapping")
-            continue
-        value = meta.get("date_last_edited")
-        if not (isinstance(value, str) and _ISO_DATE.fullmatch(value)):
-            bad.append(f"{slug}: {value!r} ({type(value).__name__})")
-    assert not bad, (
-        "Bad `meta.date_last_edited`:\n  " + "\n  ".join(bad)
-        + "\n\nWrite it quoted: `date_last_edited: \"2026-09-02\"`. Unquoted, "
-          "YAML reads it as a date object rather than the string every other "
-          "drink stores."
-    )
-
-
 def test_meta_keys_are_exactly_the_schema_in_order():
     """A drink's `meta:` block holds exactly META_KEYS_IN_ORDER, in that order.
 
@@ -1317,9 +1307,10 @@ def test_agent_edited_drinks_are_not_marked_proofread():
     rather than reimplemented: `_only_invisible_keys_changed` in particular is
     150 lines of hard-won reasoning about what "nothing a reader could see
     changed" means (#417, #429), and two copies of it would drift the first time
-    one was fixed. `INVISIBLE_KEYS` covers `meta.rewritten` and
-    `meta.date_last_edited`, both of which are drink keys too and both of which
-    genuinely render nothing.
+    one was fixed. `INVISIBLE_KEYS` covers `meta.rewritten`, which is a
+    drink key too and genuinely renders nothing. (It also covers
+    `meta.date_last_edited`, which stopped being a drink key on 2026-09-05,
+    #712 -- the entry outlives the key on purpose, as its own note explains.)
 
     IT READS THIS REPO'S HISTORY ONLY. `_cocktail_recipes/` lives here;
     `_cocktail_drafts/` is a separate private repo and its history is not
@@ -3764,6 +3755,38 @@ def test_to_serve_is_a_string():
     )
 
 
+def test_notes_is_a_list():
+    """`notes:` with nothing after it parses as null, not `[]`. Issue #706.
+
+    THE ONE REQUIRED KEY WHOSE TYPE NOTHING CHECKED. `REQUIRED_TOP_LEVEL` asks
+    whether the key is PRESENT, and it is; #667's schema guard covers unknown
+    keys, missing keys, ingredient shape, method shape, `to_serve`, `glass` and
+    `mood`. `notes` fell through the gap between the two.
+
+    IT RENDERS CORRECTLY BY LUCK. `_layouts/cocktail.html` guards with
+    `{% raw %}{% if page.notes.size > 0 %}{% endraw %}`, and Liquid's `nil.size`
+    is nil, so the comparison is falsy and the section is skipped. The luck runs
+    out on the obvious tidy-up: rewritten as a bare truthiness test, that guard
+    would try to iterate nil. Food has had `test_notes_is_a_list` all along.
+
+    HOW IT TURNED UP, and it is the argument for this test rather than a
+    footnote to it: Helen hit it by hand on 2026-09-04, proofreading the first
+    published batch -- she emptied Bee's Knees' notes and wrote `notes:` rather
+    than `notes: []`. Four OTHER tests failed on that same edit, so the suite
+    was doing its job everywhere except here. A gap you only find by making the
+    mistake is the kind worth closing.
+    """
+    bad = [f"{slug}: notes is {fm['notes']!r} ({type(fm['notes']).__name__})"
+           for slug, fm in _load()
+           if "notes" in fm and not isinstance(fm["notes"], list)]
+    assert not bad, (
+        "`notes:` must be a list:\n  " + "\n  ".join(bad)
+        + "\n\nA drink with no notes writes `notes: []`. A bare `notes:` is "
+          "YAML null, which is not an empty list -- it renders as nothing "
+          "today only because Liquid's `nil.size` happens to be falsy."
+    )
+
+
 def test_glass_is_a_list():
     """`glass` became an ordered list on 2026-08-17 so a drink could name more
     than one acceptable serve. A leftover scalar still renders -- Liquid
@@ -4728,48 +4751,162 @@ def test_display_scale_names_only_real_icons():
     )
 
 
-def test_every_published_drink_names_a_rung_on_the_ship_scale():
-    """A promoted drink has a verdict. Helen, 2026-08-30: "every cocktail we
-    publish must have the ship field filled in".
+def test_the_cocktail_drafts_clone_is_in_step():
+    """This checkout's rules and `_cocktail_drafts/`'s data agree. Issue #624.
 
-    A PROMOTION GATE, deliberately, and drafts are exempt. 31 of the 114 drafts
-    say `QQ` or `who knows` today and that is a legitimate state -- it is the
-    shape of a drink not yet made up its mind about. What it cannot be is
-    published.
+    THE FIRST TEST TO READ WHEN A COCKTAILS RUN GOES RED WITH DRINKS IN IT. A
+    rule lives here and the data that satisfies it lives in a separate private
+    repo, so tightening a rule is two merges -- and between them this suite
+    reports real drinks as breaking rules whose migration has not arrived. It
+    happened on 2026-08-31 (the garnish rename) and again on 2026-09-05
+    (`made_before`). `tests/drafts_schema.py` carries the full reasoning.
 
-    THE COLLECTION ALREADY IMPLIED THIS AND NOTHING ENFORCED IT. §9.5 records
-    `meta.status` being retired because its only consumer was a "haven't tried"
-    bucket, "dropped rather than redefined, since an untried drink never
-    publishes". So promotion has always meant tried-and-judged; this is the
-    first thing that checks it.
+    IT SKIPS WHEN THE DRAFTS ARE ABSENT, which is CI and a fresh worktree, and
+    is the condition that makes the whole problem invisible to the runner
+    rather than something this test can fix.
+    """
+    if not drafts_schema.present("_cocktail_drafts"):
+        pytest.skip(
+            "`_cocktail_drafts/` is not on this machine, so there is no clone "
+            "to be in step with. Clone it to check this -- HANDOVER 9.1."
+        )
+    problem = drafts_schema.mismatch("_cocktail_drafts")
+    assert problem is None, problem
 
-    IT IS ALSO NOW A RENDERING FACT, which is why it arrives with the ship. The
-    card's mark is the WORD, and a drink off the scale renders the icon with no
-    label beside it -- fine on a local draft, and on a published card it is a
-    rating that says nothing. Helen accepted the icon shifting slightly between
-    cards on the strength of every published drink having a word to shift it by.
 
-    `who knows` and `QQ` fail this deliberately even though `ship_tints` covers
-    them: tints exist so an off-scale value renders SOMETHING rather than
-    erroring, which is a different question from whether it may ship.
+def test_meta_ship_is_a_rung_or_who_knows():
+    """Every drink's `meta.ship` is a rung on `ship_scale` or the string
+    "who knows". `QQ` is not a ship value. Helen, 2026-09-05.
+
+    HER RULING, asked as a question and answered in the same breath: "Should
+    drinks I haven't made yet have ship who knows? I think that's clearer than
+    QQ or leaving it unset, because it's a positive presence."
+
+    THE ABSENCE MOVED TO A FIELD OF ITS OWN, which is what makes this possible.
+    `QQ` on a ship meant "nobody has asked" -- and since 2026-09-05
+    `made_before: false` says exactly that, positively, in a field whose whole
+    job is to. Two markers for one fact is how they drift; "who knows" is a
+    real value in the vocabulary and `QQ` is the absence of one.
+
+    THIS REPLACED TWO PUBLISHED-DRINK GATES AND IS STRONGER THAN BOTH, which is
+    the only reason deleting a publish gate was the right move rather than a
+    weakening:
+
+      test_every_published_drink_names_a_rung_on_the_ship_scale -- Helen,
+          2026-08-30: "every cocktail we publish must have the ship field
+          filled in". "who knows" IS filled in, and reading that ruling as
+          "on the scale" is what this corrects. Its real content -- that ship
+          is never empty on a published drink -- is now guaranteed on EVERY
+          drink including the drafts it exempted, so there is nothing left for
+          a promotion-only version of it to catch.
+      test_every_published_drink_has_been_made -- deleted outright, and it was
+          never asked for. #722 wants a guard when `made_before` is "absent or
+          not filled in or filled in with anything other than true or false",
+          which is test_made_before_is_a_real_boolean below; it never said the
+          value had to be true. Helen, 2026-09-05: "made_before does not have
+          to be true for the recipe to publish. This isn't the same as food
+          recipes -- there's no prose except the tagline which I will always
+          write from scratch, so no copyright or author respect issue. It will
+          be much easier for me to browse drinks I want to try from the live
+          site than a local build."
+
+    SO AN UNMADE DRINK MAY PUBLISH, and that is the point rather than a
+    tolerated side effect: the live site is where she picks what to try next.
     """
     scale = set(_taxonomy().get("ship_scale") or [])
     assert scale, "taxonomy.yml has no `ship_scale:` to check against."
+    allowed = scale | {"who knows"}
 
     offenders = []
-    for slug, front in _load_published():
-        ship = (front.get("meta") or {}).get("ship")
-        if ship not in scale:
-            offenders.append(f"{slug}: meta.ship is {ship!r}")
+    for slug, fm in _load():
+        meta = fm.get("meta")
+        if not isinstance(meta, dict):
+            offenders.append(f"{slug}: no `meta:` mapping")
+            continue
+        if meta.get("ship") not in allowed:
+            offenders.append(f"{slug}: meta.ship is {meta.get('ship')!r}")
 
     assert not offenders, (
-        "Published drink(s) whose `meta.ship` is not a rung on the scale:\n  "
+        "Drink(s) whose `meta.ship` is not a rung or \"who knows\":\n  "
         + "\n  ".join(sorted(offenders))
-        + f"\n\nAllowed: {sorted(scale)}. `who knows` and `QQ` are legitimate "
-          "on a DRAFT and not on a published drink -- promotion means the drink "
-          "has been made and judged (§9.5: an untried drink never publishes). "
-          "The card's goodness mark is the word itself, so a published drink "
-          "off the scale renders a ship with nothing beside it."
+        + f"\n\nAllowed: {sorted(allowed)}. `QQ` is not one of them -- a drink "
+          "nobody has an opinion about says \"who knows\", which is a verdict "
+          "of sorts rather than a missing field, and `made_before: false` is "
+          "where 'she has never made it' is recorded."
+    )
+
+
+def test_made_before_is_a_real_boolean():
+    """`meta.made_before` is unquoted true or false on every drink. Issue #722.
+
+    THE SAME TRAP AS THE GATE FLAGS and it is worth its own test rather than a
+    sixth entry in GATE_FLAGS: that constant names what
+    `_plugins/publish_gate.rb` reads, and this key is not read by the plugin.
+    Widening it to mean "booleans in meta" would make the name lie about the
+    gate, which is the one thing that list is for.
+
+    HELEN NAMED THE FAILURE MODE HERSELF when she raised #722 -- a guard should
+    fire if the field is "absent or not filled in or filled in with anything
+    other than true or false". A string "false" is the sharp one: it is truthy
+    everywhere that matters and looks correct in the file.
+
+    THE VALUE ITSELF GATES NOTHING, and this is the whole of what #722 asked
+    for. `false` is a publishable state -- see
+    test_meta_ship_is_a_rung_or_who_knows for Helen's 2026-09-05 ruling on why
+    a drink she has never made belongs on the live site.
+    """
+    bad = []
+    for slug, fm in _load():
+        meta = fm.get("meta")
+        if not isinstance(meta, dict):
+            bad.append(f"{slug}: no `meta:` mapping")
+            continue
+        if "made_before" not in meta:
+            bad.append(f"{slug}: no `meta.made_before`")
+        elif not isinstance(meta["made_before"], bool):
+            bad.append(f"{slug}: {meta['made_before']!r} "
+                       f"({type(meta['made_before']).__name__})")
+    assert not bad, (
+        "Drink(s) whose `meta.made_before` is not unquoted true/false:\n  "
+        + "\n  ".join(bad)
+        + "\n\nHas Helen made this drink? Never quote the value, and never "
+          "leave it out -- absent is not false, it means nobody has asked."
+    )
+
+
+def test_the_off_scale_ship_has_a_word():
+    """`ship_unrated_word` exists and is a non-empty string. Issue #722.
+
+    THE FAILURE IS SILENT AND LOOKS LIKE THE OLD BEHAVIOUR, which is the only
+    reason this is worth a test. `_includes/cocktails/ship.html` assigns this
+    to the word for any value not on `ship_scale`; Liquid resolves a missing
+    key to nil and prints nil as the empty string, so deleting this line does
+    not error -- it restores exactly the blank mark that existed before
+    2026-09-05, on 20 of 124 drinks, and nothing anywhere says why.
+
+    Helen, ruling on the word: "unambiguously not on the same rating scale.
+    (It's also funny)." The VALUE is hers to change; that there is one is not.
+
+    IT MUST NOT BE A RUNG. A word that also names a rating would be the sixth
+    term the whole scale is careful not to invent -- see the `ship_scale`
+    comment, and §9.9 on the near-miss when a template kept its own copy of
+    this vocabulary.
+    """
+    taxonomy = _taxonomy()
+    word = taxonomy.get("ship_unrated_word")
+
+    assert isinstance(word, str) and word.strip(), (
+        f"taxonomy.yml has no usable `ship_unrated_word` (got {word!r}). Every "
+        "drink whose ship is not a rung -- 'who knows', and it is the only one "
+        "-- would draw the ship mark with nothing beside it, on the cards AND "
+        "on the drink page, with no error to say so."
+    )
+
+    scale = taxonomy.get("ship_scale") or []
+    assert word not in scale, (
+        f"`ship_unrated_word` is {word!r}, which is also a rung on "
+        f"`ship_scale`. The off-scale word must not read as a rating: that is "
+        f"the sixth term the scale exists to avoid inventing."
     )
 
 
@@ -5529,7 +5666,8 @@ def _prose_fields(drink):
 # and `meta` holds the three booleans that must NEVER be quoted -- quoting one
 # turns it into the string "true", which the publish gate reads as neither true
 # nor false and which holds the drink back for ever (test_the_gate_flags_are_
-# real_booleans above). `meta.date_last_edited` is quoted and has its own test.
+# real_booleans above). `meta.ship` is the one quoted scalar under `meta:`, and
+# test_meta_ship_is_a_rung_or_who_knows is what checks it.
 DRINK_SCALAR_FIELDS = ["title", "tagline", "source", "source_url", "to_serve"]
 
 

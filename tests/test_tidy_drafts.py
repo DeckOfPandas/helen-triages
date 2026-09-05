@@ -95,7 +95,6 @@ source: ""
 source_url: ""
 meta:
   ship: "meh"
-  date_last_edited: "2026-09-05"
   rewritten: false
   awaiting_fix: false
   proofread: false
@@ -139,7 +138,6 @@ source: ""
 source_url: ""
 meta:
   ship: "meh"
-  date_last_edited: "2026-09-05"
   rewritten: false
   awaiting_fix: false
   proofread: false

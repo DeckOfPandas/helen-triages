@@ -3425,12 +3425,39 @@ own it now lives beside that file instead.
   where `garnish.yml` and its rules are. `["no garnish"]` means DECIDED, `[]`
   means unfilled; the marker is spelled `no garnish`, not `none`, since
   2026-08-31.
-- **`meta.ship` is an ordered, tested vocabulary** — `ship_scale` in
+- **`meta.ship` is an ordered, tested, CLOSED vocabulary** — `ship_scale` in
   `_data/cocktails/taxonomy.yml`: `not really` < `meh` < `sure` < `yes` <
-  `oh gods yes`, with `who knows` and `QQ` deliberately OFF the scale (see the
-  file's own comment). `meta.status` is retired entirely; its only consumer
-  anywhere was `chaos`'s `haven't tried` bucket, and an untried drink never
-  publishes. §9.9 is where this vocabulary turned into a feature.
+  `oh gods yes`, with `who knows` deliberately OFF the scale (see the file's own
+  comment). **`QQ` IS NOT A SHIP VALUE, since 2026-09-05** — a drink Helen has
+  not made says `who knows`, and the "nobody has asked" that `QQ` used to carry
+  is now `meta.made_before: false`. Her ruling: "I think that's clearer than QQ
+  or leaving it unset, because it's a positive presence."
+  `test_meta_ship_is_a_rung_or_who_knows` holds it over every drink.
+  §9.9 is where this vocabulary turned into a feature.
+- **`meta.made_before` is a boolean and it GATES NOTHING** — issue #722,
+  2026-09-05. It must be real `true`/`false` on every drink and it sits first in
+  `meta:`, because you make a drink and then you have an opinion about it. **An
+  unmade drink MAY publish, and the drink side parts company with food here.**
+  Helen: "there's no prose except the tagline which I will always write from
+  scratch, so no copyright or author respect issue. It will be much easier for
+  me to browse drinks I want to try from the live site than a local build."
+  20 of 124 say `false`; the other 104 are `true` by inference from #722's own
+  premise (a rung is a verdict, and a verdict means she drank it), not because
+  she said so one at a time.
+  - **This retired two publish gates**, and the second was never asked for:
+    `test_every_published_drink_names_a_rung_on_the_ship_scale` (her
+    2026-08-30 "must have the ship field filled in" — `who knows` IS filled
+    in) and `test_every_published_drink_has_been_made`. Both are covered by
+    the closed vocabulary above, which checks drafts too.
+  - **The open consequence, unbuilt:** a published `who knows` card draws the
+    ship mark with no word beside it. #722's `???` is the intended answer and
+    needs `_includes/cocktails/ship.html` changed, not just a data line — it
+    gates the word on scale membership. Helen, 2026-09-05: "I don't actually
+    require the front-end feature."
+  - **`_dev/no-verdict.html`** is the worklist page: drinks she has made that
+    still have no rating. It writes nothing; she pastes its output back.
+- **`meta.status` is retired entirely**; its only consumer anywhere was
+  `chaos`'s `haven't tried` bucket.
 - **`tests/test_cocktails.py` is the cocktails suite** — glasses, generics,
   bottles, moods, methods, garnishes, the `measures:` amount table.
   `tests/conftest.py`
@@ -5821,8 +5848,48 @@ declares `needs: test`. Three things about it are load-bearing:
 > repo before touching either.
 >
 > #540 made a PROMOTED drink checkable everywhere. This is the case where a
-> public test depends on data the runner cannot reach at all, and the honest
-> answer is not yet decided — see #624.
+> public test depends on data the runner cannot reach at all.
+>
+> ### THE ANSWER, DECIDED 2026-09-05: A SCHEMA HANDSHAKE — `tests/drafts_schema.py`
+>
+> Each private drafts repo carries a **`SCHEMA_VERSION`** file at its root
+> saying which schema its data has been migrated to; `tests/drafts_schema.py`
+> declares the version this checkout's rules need, with a changelog of what each
+> bump required. `test_the_cocktail_drafts_clone_is_in_step` and
+> `test_the_food_drafts_clone_is_in_step` compare them, and both skip when the
+> repo is absent — which is CI and a fresh worktree.
+>
+> **Bump BOTH numbers in the paired commits**: the drafts repo's file in the
+> commit that migrates the data, this repo's `REQUIRED` in the commit that
+> tightens the rule.
+>
+> **It diagnoses; it does not prevent.** Helen's choice between four options, and
+> the right one: two repositories mean two merges, and sometimes the gap is
+> unavoidable. What was intolerable was the gap being SILENT — N failures naming
+> real drinks, reading exactly like a regression, with nothing saying which
+> private branch fixed it. Now one failure says which side is behind, what the
+> migration was, and that the other failures in the run are its fault. The
+> headline is deliberately the message's FIRST line, because `pytest.ini` runs
+> `--tb=line` and that is the only line the summary shows.
+>
+> **Not `pytest.exit()`**, though that would replace the other failures outright:
+> during a migration you are deliberately out of step and want to watch the suite
+> go green drink by drink.
+>
+> **A hand-maintained integer, not a fingerprint of the schema constants.** A
+> fingerprint bumps itself, which is worse: not every schema change needs a data
+> migration, and an optional new key would demand a pointless drafts commit. The
+> bump is the judgement "this change requires the data to move".
+>
+> **The version file's existence check goes through `drafts_schema.present()`**
+> rather than naming `DRAFTS` in the test, so the one-door rule above stays
+> intact without widening `LOADER_GUARDS`.
+>
+> **The OTHER half of #624 was already solved and the issue's own third comment
+> says so**: "a public vocabulary whose members live in a private repo" — the
+> dead-entry direction — is what `_require_whole_collection` and
+> `WHOLE_COLLECTION_ONLY` exist for, with a meta-test keeping the list honest.
+> Do not rebuild that.
 >
 > **Still true, and not silenced:** at ONE promoted drink, four anti-vacuity
 > asserts fire ("no rum ingredient carries a suggestion, so this check is

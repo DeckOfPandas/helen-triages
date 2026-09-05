@@ -49,9 +49,23 @@ RETIRED = {
 # went onto RETIRED instead. They are still caught if someone writes one at the
 # top level -- the advice just changed from "move it into meta" to "this field
 # is gone", which is the true answer now. RETIRED is checked against the TOP
-# LEVEL only, which is what makes this safe for the drafts that share it:
-# _food_drafts/ still carries both keys, all 344 of them inside `meta:`, so not
-# one draft is touched by the move.
+# LEVEL only, which is what made the move safe for the drafts that shared the
+# keys at the time.
+#
+# THAT CAVEAT IS SPENT, AND THE SENTENCE SAYING SO WAS STALE FOR A FORTNIGHT.
+# It read "_food_drafts/ still carries both keys, all 344 of them inside
+# `meta:`" until 2026-09-05, when counting said otherwise: of 339 drafts, ZERO
+# carry either key. (One names `meta.cooked_before` inside the PROSE of a note,
+# which is not the key.) They were cleared out at some point after #429 and
+# nothing updated the note -- the ordinary fate of a count written into a
+# comment, and the reason the tests around here recount rather than quote.
+#
+# `meta.date_last_edited` IS NOW GONE FROM THE COCKTAIL SIDE TOO -- issue #712,
+# 2026-09-05, on the same reasoning #429 gave for food: a hand-maintained date
+# that git already knows exactly, read by no layout, include, plugin or script.
+# So the field exists nowhere in either collection, and both entries below
+# outlive their keys deliberately (see meta.cooked_before's own note in
+# INVISIBLE_KEYS).
 MISPLACED_META = ["rewritten", "proofread", "claude_rewritten"]
 
 
