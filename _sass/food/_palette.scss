@@ -28,7 +28,7 @@ $color-sparkling-spirulina:  #00A7EA;
 $color-blazing-banana:       #FAF100;
 $color-torrid-tangerine:     #FF6B00;
 $color-dazzling-dragonfruit: #FF00C8;
-$color-plucky-pistachio:     #00FF9F;
+$color-marauding-mint:       #00FF9F;
 $color-dazzling-dragonfruit-dark: darken($color-dazzling-dragonfruit, 12);   // ~#c4009a
 
 // --- Core Application Canvas -------------------------------------------------
@@ -245,7 +245,7 @@ $color-accent: $color-dazzling-dragonfruit;
 // Nested bullets in the short method. Was cerulean-mixed; re-based on spring
 // green when cerulean left the recipe page entirely, so it stays a pale echo of
 // the section rule rather than becoming an orphan hue.
-$color-marker-accent: mix($color-plucky-pistachio, $color-bg, 35%);
+$color-marker-accent: mix($color-marauding-mint, $color-bg, 35%);
 
 // --- The recipe page's colour budget -----------------------------------------
 // After the 2026-07-31 redesign the recipe page spends FOUR colours, and the
@@ -296,7 +296,7 @@ $color-marker-accent: mix($color-plucky-pistachio, $color-bg, 35%);
 // needed an asset-name slug in the markup because it picked a FILE, so the
 // section colour used to sit in _layouts/recipe.html against the three-layer
 // rule. A background needs no asset, so the colour came home.
-$color-section-underline: $color-plucky-pistachio;
+$color-section-underline: $color-marauding-mint;
 $color-section-underline-2: $color-blinging-blackberry;   // the second, lower rule
 
 // Aureolin over electric cobalt -- Helen's call, 2026-08-13, for one
