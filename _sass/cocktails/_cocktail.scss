@@ -33,15 +33,16 @@
 //   ELECTRIC ABSINTHE   the home colour, unclaimed by any one section here —
 //                        it rules the title's own border and the toggle's ON
 //                        state, same job it does everywhere else on the site.
-//   ULTRA YVETTE         INGREDIENTS and METHOD. Helen: yvette "shows what is
+//   ULTRA VIOLETTE       INGREDIENTS and METHOD. Helen: violette "shows what is
 //                        in something", and a method step is a component of
 //                        the drink as much as an ingredient is — so the same
 //                        colour marks both, under the section heading and
 //                        under each ingredient's own name.
-//   COSMIC COSMOPOLITAN  the bottle suggestion in an ingredient's brackets, and
-//                        the toggle's inactive-to-active tie only where the
-//                        site's existing rule already claims it (ASKED FOR —
-//                        see _palette.scss). Not spent on a section rule here.
+//   CHARISMATIC COSMOPOLITAN  the bottle suggestion in an ingredient's
+//                        brackets, and the toggle's inactive-to-active tie
+//                        only where the site's existing rule already claims
+//                        it (ASKED FOR — see _palette.scss). Not spent on a
+//                        section rule here.
 //   LUMINOUS LAGOON      NOTES — Helen's commentary, "a different kind of
 //                        thing" from what is in the drink or how to make it, so
 //                        a different colour marks it. Lagoon already carries
@@ -49,10 +50,10 @@
 //                        the site's existing pattern (absinthe is home and
 //                        mood, see _palette.scss).
 //
-// RADIANT REPOSADO CAME OFF NOTES ENTIRELY. Helen: reposado is the verdict's
+// RAUCOUS REPOSADO CAME OFF NOTES ENTIRELY. Helen: reposado is the verdict's
 // colour (the ship mark), and a note card must not borrow it. Section rules and
 // note cards never use pink, curaçao (reposado), or — on notes specifically —
-// yvette, which the decision above grants to ingredients and method instead.
+// violette, which the decision above grants to ingredients and method instead.
 // =============================================================================
 
 // =============================================================================
@@ -105,7 +106,7 @@
 
   &:focus-visible {
     outline: none;
-    border-color: $color-cosmic-cosmopolitan;
+    border-color: $color-wicked-woowoo;
   }
 }
 
@@ -748,7 +749,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   }
 }
 
-// INGREDIENTS AND METHOD SHARE YVETTE — Helen's brief: yvette "shows what is
+// INGREDIENTS AND METHOD SHARE VIOLETTE — Helen's brief: violette "shows what is
 // in something", and a method step is a component of the drink as much as an
 // ingredient is, so one colour marks both. NOTES TAKES LAGOON INSTEAD: notes
 // are Helen's commentary, "a different kind of thing" from what is in the
@@ -761,7 +762,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // the verdict's (the ship mark); a section rule wearing either would make a
 // promise the section itself is not the answer to.
 //
-// ABSINTHE OVER YVETTE, A DOUBLE RULE, SINCE 2026-09-03 -- and this is the
+// ABSINTHE OVER VIOLETTE, A DOUBLE RULE, SINCE 2026-09-03 -- and this is the
 // brief's own sentence landing where it was aimed. Helen: "In my brief I had
 // intended to say can we do absinthe over yvette as a double underline for
 // the section headings, not ingredients, my apologies. This would be a nice
@@ -776,7 +777,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // note cards' bars and labels are lagoon, and the heading is what ties them.
 .cocktail-section-heading--ingredients span,
 .cocktail-section-heading--method span {
-  @include overlapping-rule-double($color-electric-absinthe, $color-ultra-yvette);
+  @include overlapping-rule-double($color-electric-absinthe, $color-ultra-violette);
 }
 
 .cocktail-section-heading--notes span {
@@ -1191,7 +1192,7 @@ $amount-gap-wide: 1.25rem;
 // on either site where a decision was reversed because of what the mark MEANS
 // rather than how it looked.
 //
-// What was here: `text-decoration: underline` in $color-ultra-yvette-deep at
+// What was here: `text-decoration: underline` in $color-ultra-violette-deep at
 // 0.16em with `skip-ink: none`, under the ingredient's name only. It came from
 // Helen's own brief twice over — "yvette showing what is in something" — and
 // the geometry had already been fixed once (a `text-decoration` hanging off the
@@ -1209,11 +1210,12 @@ $amount-gap-wide: 1.25rem;
 // read as clickable". The rule was written about colour and applies just as
 // well to the device.
 //
-// WHAT IT BUYS BACK, and this is why the two halves shipped together: yvette
+// WHAT IT BUYS BACK, and this is why the two halves shipped together: violette
 // was doing two unrelated jobs, so it could not fully carry either. With the
 // list clear it goes back to being the section headings' second bar alone —
 // see `.cocktail-section-heading--*` above, which keep the double rule for
-// exactly this reason. `.cocktail-suggestion` (cosmopolitan) and
+// exactly this reason. `.cocktail-suggestion` (woowoo -- and note that bare
+// "cosmopolitan" now names the HASSLE ramp's hot pink, not this magenta) and
 // `.cocktail-optional` still distinguish what follows a name; the name itself
 // is now plain, which is what an ingredient in a list actually is.
 //
@@ -1232,11 +1234,11 @@ $amount-gap-wide: 1.25rem;
 // entries carry a suggestion, so it must not read as though the other 82% are
 // missing something.
 //
-// Cosmic-cosmopolitan, which is the same tie-back the class line used to make on
+// Wicked-woowoo, which is the same tie-back the class line used to make on
 // its own: that colour means ASKED FOR on the index, and a bottle name is the
 // other string the has-to-have field matches against.
 .cocktail-suggestion {
-  color: $color-cosmic-cosmopolitan-deep;
+  color: $color-wicked-woowoo-deep;
   font-size: 0.88rem;
 }
 
@@ -1251,7 +1253,7 @@ $amount-gap-wide: 1.25rem;
 // and nothing on the index matches it, so it has no colour to tie back to —
 // every hue on this page means "this string is also a control somewhere", and
 // spending one here would make a promise the index cannot keep. Compare
-// `.cocktail-suggestion`, which is cosmopolitan precisely BECAUSE a bottle name
+// `.cocktail-suggestion`, which is woowoo precisely BECAUSE a bottle name
 // is a thing has-to-have matches against.
 .cocktail-optional {
   font-style: italic;
@@ -1284,7 +1286,7 @@ $amount-gap-wide: 1.25rem;
 // against `.cocktail-ingredients`' own 34rem measure now, minus the margin
 // below, rather than against a percentage bound that no longer exists.
 .cocktail-type-line {
-  color: $color-cosmic-cosmopolitan-deep;
+  color: $color-wicked-woowoo-deep;
   font-size: 0.84rem;
   margin: 0.3rem 0 0 calc(var(--amount-col) + var(--amount-gap));
 }

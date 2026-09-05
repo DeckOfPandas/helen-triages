@@ -105,13 +105,13 @@
     color: $color-text;
     background: $color-bg;
     border: 1px solid $color-border;
-    border-bottom: 2px solid rgba($color-vibrant-violet, 0.55);
+    border-bottom: 2px solid rgba($color-blinging-blackberry, 0.55);
     border-radius: $radius-sm;
     padding: $space-sm $space-md;
     min-width: 8rem;
 
     &:focus-visible {
-      outline: 2px solid $color-vibrant-violet;
+      outline: 2px solid $color-blinging-blackberry;
       outline-offset: 1px;
     }
   }
@@ -257,12 +257,12 @@
   // stylesheet deliberately does not import -- pulling that partial in to reach
   // two variables would emit the whole recipe page's CSS alongside a demo. The
   // values are the same 3% violet the note boxes and metadata grid use.
-  background-color: rgba($color-vibrant-violet, 0.03);
+  background-color: rgba($color-blinging-blackberry, 0.03);
   border-radius: $radius-sm;
   // The violet edge is the same "this is structural" signal the charts' bars
   // carry; a declined card drops it to grey, below, so refusal is visible
   // before you read a word.
-  border-left: 3px solid rgba($color-vibrant-violet, 0.55);
+  border-left: 3px solid rgba($color-blinging-blackberry, 0.55);
 
   &--declined {
     border-left-color: $color-border;
@@ -441,7 +441,7 @@
   color: $color-clear-text;
   margin: $space-md 0 0 0;
   padding-top: $space-md;
-  border-top: 1px solid rgba($color-vibrant-violet, 0.15);
+  border-top: 1px solid rgba($color-blinging-blackberry, 0.15);
   line-height: 1.5;
 }
 

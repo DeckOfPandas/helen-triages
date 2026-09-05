@@ -58,7 +58,7 @@
 // file and fails if any temperature falls outside them.
 $tc-min: 35;
 $tc-max: 100;
-$tc-hue: $color-vibrant-violet;
+$tc-hue: $color-blinging-blackberry;
 
 // Bar geometry. Thin marks, per the skill -- the row is mostly air, and the
 // axis does the work.
@@ -449,7 +449,7 @@ $tc-threshold-height: 1.35rem;
     // A ring rather than a different hue: same quantity, same meaning, just the
     // one this page recommends. A second colour would have said "different kind
     // of thing", which it isn't.
-    box-shadow: 0 0 0 2px $color-bg, 0 0 0 4px rgba($color-vibrant-violet, 0.45);
+    box-shadow: 0 0 0 2px $color-bg, 0 0 0 4px rgba($color-blinging-blackberry, 0.45);
   }
 }
 

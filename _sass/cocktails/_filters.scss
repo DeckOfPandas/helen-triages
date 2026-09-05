@@ -73,7 +73,7 @@
 // a document.
 //
 // WHAT IS NOT COPIED IS THE MARK. Food's is a green-and-violet stepped bar;
-// this is a reposado-to-yvette ramp over one electric absinthe (five greens
+// this is a reposado-to-violette ramp over one electric absinthe (five greens
 // until 2026-09-03 -- see _palette.scss's heading bars for why they went).
 // That is the divergence Helen kept when she closed #486 ("the design vision
 // has moved on") -- same device, same type, different palette, which is the
@@ -530,7 +530,7 @@
   // rather than being out-specified, and the magenta band underneath keeps
   // saying the tag is chosen.
   &:hover:not(.is-on),
-  &:focus-visible:not(.is-on) { color: $color-cosmic-cosmopolitan; }
+  &:focus-visible:not(.is-on) { color: $color-wicked-woowoo; }
 }
 
 // --- the two ingredient fields -----------------------------------------------
@@ -666,7 +666,7 @@
   // change available to it and not to a bare filter word, so the box is the
   // thing to move.
   &:hover,
-  &:focus-visible { border-color: $color-cosmic-cosmopolitan; }
+  &:focus-visible { border-color: $color-wicked-woowoo; }
 
   // BANDS, DOES NOT FILL -- Helen, 2026-08-30: "has to have chips should show
   // magenta underline on select rather than fill in on select." The last fill
@@ -691,7 +691,7 @@
   // and now has the shape to itself.
   &.is-on {
     background: none;
-    border-color: $color-cosmic-cosmopolitan-deep;
+    border-color: $color-wicked-woowoo-deep;
     color: $color-text;
     font-weight: 600;
     text-decoration: none;
@@ -745,7 +745,7 @@
 
 // --- the count ---------------------------------------------------------------
 // NO RULE ABOVE IT -- #548 point 7. It carried `border-top: 2px solid
-// $color-radiant-reposado`, a full-width amber bar between the filters and the
+// $color-raucous-reposado`, a full-width amber bar between the filters and the
 // count. Helen: "distracting."
 //
 // It was also borrowing a hue it has no claim on. §9.13's rule is that a
@@ -837,7 +837,7 @@
   flex: none;
   width: 1rem;
   height: 1rem;
-  color: $color-radiant-reposado-deep;
+  color: $color-raucous-reposado-deep;
 
   // Same four lines .drink-card-ship-icon .ship-icon carries, and for the
   // same reason -- .ship-icon is the class the partial emits, so it is the
@@ -902,7 +902,7 @@
   text-decoration: underline;
   text-decoration-thickness: 0.16em;
   text-underline-offset: 0.16em;
-  text-decoration-color: $color-cosmic-cosmopolitan;
+  text-decoration-color: $color-wicked-woowoo;
 }
 
 // --- why this chip is here — #603 --------------------------------------------
@@ -955,7 +955,7 @@
 // carries luminous-lagoon, and §9.13's rule is that a heading's colour is a
 // promise the card already keeps. The band under the matched letters is the
 // answer to the lagoon heading that found them, the same way a matched
-// ingredient is the answer to the cosmopolitan one.
+// ingredient is the answer to the woowoo one.
 //
 // `mark` ARRIVES WITH A UA BACKGROUND -- Mark/MarkText, usually a hard yellow --
 // which is exactly the fill this design does not use anywhere. Both are reset
@@ -968,7 +968,7 @@
 // the one accent still doing nothing on this page.
 //
 // AND THE PROMISE IS MADE AGAIN FROM THE OTHER END, 2026-09-03: the heading
-// ramp in _palette.scss puts yvette under I KNOW WHAT I WANT precisely
+// ramp in _palette.scss puts violette under I KNOW WHAT I WANT precisely
 // because this band already wore it. The band did not move; the heading came
 // to it.
 //
@@ -1030,7 +1030,7 @@
 // titles should be thicker to make it stand out more."
 .drink-name-hit {
   background: linear-gradient(to top,
-              $color-ultra-yvette-deep 0.3em, transparent 0.3em) no-repeat;
+              $color-ultra-violette-deep 0.3em, transparent 0.3em) no-repeat;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
   color: inherit;

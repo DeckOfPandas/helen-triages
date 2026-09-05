@@ -232,8 +232,8 @@ $card-glass-scale: 10.4rem;
 // other magenta on this page makes -- "this one" -- in the interactive tense,
 // and it matches the title turning magenta under the same cursor.
 .drink-card:hover {
-  &::after { background: $color-cosmic-cosmopolitan; }
-  .drink-card-glass::after { background: $color-cosmic-cosmopolitan; }
+  &::after { background: $color-wicked-woowoo; }
+  .drink-card-glass::after { background: $color-wicked-woowoo; }
 }
 
 // --- the words ---------------------------------------------------------------
@@ -377,7 +377,7 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     // different colour.
     &:hover,
     &:focus-visible {
-      color: $color-cosmic-cosmopolitan;
+      color: $color-wicked-woowoo;
       text-shadow: -1px -1px 0 #FF9BE8,
                     1px  1px 0 rgba(5, 5, 5, 0.9);
     }
@@ -620,7 +620,7 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // fragment an odd stub; text-decoration follows each line properly.
   color: $color-text;
   text-decoration: underline;
-  text-decoration-color: $color-cosmic-cosmopolitan;
+  text-decoration-color: $color-wicked-woowoo;
   text-decoration-thickness: 0.16em;
   text-underline-offset: 0.16em;
   text-decoration-skip-ink: none;
@@ -729,7 +729,7 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   //
   // The first pass had it inverted -- white at rest, section colour on hover --
   // and that was the smaller idea. Every chip belongs to one of two filter
-  // sections and each owns a colour from the reposado-to-yvette ramp that
+  // sections and each owns a colour from the reposado-to-violette ramp that
   // 2026-09-03 put under the five index headings, on their filter words, and on
   // the band a matched chip wears. Spending it only on hover meant the card
   // said which section a word belonged to solely while a mouse was over it,
@@ -757,7 +757,7 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   &--hassle { color: $color-heading-hassle; }
 
   &:hover,
-  &:focus-visible { color: $color-cosmic-cosmopolitan; }
+  &:focus-visible { color: $color-wicked-woowoo; }
 
   & + &::before {
     content: "·";
@@ -875,7 +875,7 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   flex: none;
   width: 1rem;
   height: 1rem;
-  color: $color-radiant-reposado-deep;
+  color: $color-raucous-reposado-deep;
 
   // .ship-icon IS THE CLASS THE PARTIAL EMITS, so it is the one that carries
   // the rule. Styling `svg` by descendant instead left the emitted class with
@@ -938,7 +938,7 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 .drink-card-ship-word {
   font-weight: 700;
   text-decoration: underline;
-  text-decoration-color: $color-radiant-reposado;
+  text-decoration-color: $color-raucous-reposado;
   text-decoration-thickness: 0.24em;
   text-underline-offset: 0.2em;
   text-decoration-skip-ink: none;
