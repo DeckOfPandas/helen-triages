@@ -45,7 +45,7 @@ on food's light page, once for light type on cocktails' dark one — because the
 two are genuinely inverse problems (a dark shadow on a dark ground is
 invisible; a light highlight on a light ground is invisible). Both got
 custom-property treatment so a site could re-point them (see
-`shared/_rule.scss`'s "THE TWO GROUNDS" note). What neither tuning pass fixed,
+`_sass/shared/_rule.scss`'s "THE TWO GROUNDS" note). What neither tuning pass fixed,
 because nobody had named it as the problem, was that **the dark-on-light
 numbers were solving for the wrong motif.**
 
@@ -86,7 +86,7 @@ A tier names a **role**, not a size. A consumer says what it *is* — "this is
 a heading" — and the mixin resolves that to numbers, rather than a fresh
 value copied from whatever's nearby, which is how the pre-tier system
 drifted apart in the first place (`$emboss-stroke` and `$emboss-offset`'s own
-history in `shared/_rule.scss` records two elements independently converging
+history in `_sass/shared/_rule.scss` records two elements independently converging
 on almost-but-not-quite the same ratio before either was named).
 
 | tier | where | stroke width | offset |
@@ -109,7 +109,7 @@ Food's display/heading values are computed directly from `$color-text` by the
 shared defaults in `_sass/shared/_rule.scss` — food never re-points them,
 because food **is** the site those formulas were solved against (checked in
 the compiled CSS, not assumed: the custom properties are byte-identical
-whether or not `food/_rule.scss` touches them). Cocktails re-points all three
+whether or not `_sass/food/_rule.scss` touches them). Cocktails re-points all three
 sets in its own `_rule.scss`, because the same formulas plugged into
 cocktails' near-white `$color-text` produce something illegible on a dark
 ground — the two are inverse problems, same as the pre-tier system already
@@ -170,23 +170,23 @@ caller that genuinely wants the inverted read.
 
 | element | file : line | size | tier |
 |---|---|---|---|
-| `.site-logo-top` (HELEN TRIAGES) | `shared/_layout.scss:521` | 2rem | **display** |
-| `h1, h2, h3` (unstyled fallback) | `shared/_base.scss:69` | browser default (≥1rem) | heading |
-| `.recipe-title-text` | `food/_recipe-header.scss:269` | 2.2rem | display (offset-lg) — Helen, later the same day: "recipe title goes hard like the wordmark" |
-| `.recipe-section-heading` | `food/_recipe-header.scss:430` | 1.8rem | heading (offset-lg) |
-| `.recipe-meta li strong` (SERVES/PREP/COOK) | `food/_recipe-header.scss:358` | 0.85rem | label |
-| `.category-label` (index filter heading) | `food/_category-labels.scss:136` | 1.05rem | heading |
-| `.ct-field > span` (timings field label) | `food/_timings.scss:94` | 0.7rem | label |
-| `.ct-card-name` | `food/_timings.scss:280` | 1rem | heading — boundary case, see §5.1 |
-| `.tc-row-label` (temperature chart row) | `food/_temperature-chart.scss:108` | 0.78rem | label |
-| `.doneness-label` | `food/_temperature-chart.scss:385` | 0.7rem | label |
-| `.recipe-body-content h2:not(.recipe-section-heading)` | `food/_recipe-notes-body.scss:143` | 1rem | heading — boundary case |
-| `.recipe-body-content h3` (bare reference-page h3) | `food/_recipe-notes-body.scss:210` | 0.78rem | label |
-| Tips label (`li > strong:first-child`) | `food/_recipe-notes-body.scss:353` | `$font-size-body-sm` (0.92rem) | label |
-| Failure/diagnostic name (`ol > li > strong:first-child`) | `food/_recipe-notes-body.scss:441` | 1.06rem | heading — boundary case |
-| `.recipe-group-heading` | `food/_recipe-notes-body.scss:558` | 1rem | heading — boundary case |
-| `.about-faq-item h3` (FAQ question) | `food/_about.scss:241` | 0.85rem | label |
-| `.cocktail-section-heading` (INGREDIENTS/METHOD/NOTES — the drink page) | `cocktails/_cocktail.scss:465` | 1.35rem | heading |
+| `.site-logo-top` (HELEN TRIAGES) | `_sass/shared/_layout.scss:521` | 2rem | **display** |
+| `h1, h2, h3` (unstyled fallback) | `_sass/shared/_base.scss:69` | browser default (≥1rem) | heading |
+| `.recipe-title-text` | `_sass/food/_recipe-header.scss:269` | 2.2rem | display (offset-lg) — Helen, later the same day: "recipe title goes hard like the wordmark" |
+| `.recipe-section-heading` | `_sass/food/_recipe-header.scss:430` | 1.8rem | heading (offset-lg) |
+| `.recipe-meta li strong` (SERVES/PREP/COOK) | `_sass/food/_recipe-header.scss:358` | 0.85rem | label |
+| `.category-label` (index filter heading) | `_sass/food/_category-labels.scss:136` | 1.05rem | heading |
+| `.ct-field > span` (timings field label) | `_sass/food/_timings.scss:94` | 0.7rem | label |
+| `.ct-card-name` | `_sass/food/_timings.scss:280` | 1rem | heading — boundary case, see §5.1 |
+| `.tc-row-label` (temperature chart row) | `_sass/food/_temperature-chart.scss:108` | 0.78rem | label |
+| `.doneness-label` | `_sass/food/_temperature-chart.scss:385` | 0.7rem | label |
+| `.recipe-body-content h2:not(.recipe-section-heading)` | `_sass/food/_recipe-notes-body.scss:143` | 1rem | heading — boundary case |
+| `.recipe-body-content h3` (bare reference-page h3) | `_sass/food/_recipe-notes-body.scss:210` | 0.78rem | label |
+| Tips label (`li > strong:first-child`) | `_sass/food/_recipe-notes-body.scss:353` | `$font-size-body-sm` (0.92rem) | label |
+| Failure/diagnostic name (`ol > li > strong:first-child`) | `_sass/food/_recipe-notes-body.scss:441` | 1.06rem | heading — boundary case |
+| `.recipe-group-heading` | `_sass/food/_recipe-notes-body.scss:558` | 1rem | heading — boundary case |
+| `.about-faq-item h3` (FAQ question) | `_sass/food/_about.scss:241` | 0.85rem | label |
+| `.cocktail-section-heading` (INGREDIENTS/METHOD/NOTES — the drink page) | `_sass/cocktails/_cocktail.scss:465` | 1.35rem | heading |
 
 ### 5.1 The four boundary cases
 
@@ -225,7 +225,7 @@ a mechanical sweep.
 
 ## 7. What is deliberately NOT tiered
 
-- **`.site-logo-word`** (`shared/_layout.scss`), the bracketed word on the
+- **`.site-logo-word`** (`_sass/shared/_layout.scss`), the bracketed word on the
   header tape — `[ FOOD ]` / `[ COCKTAILS ]`. Light type on a black tape SVG,
   the one genuinely different physical case (a real punched channel, not ink
   on paper), and excluded from the shared treatment since issue #122
@@ -234,7 +234,7 @@ a mechanical sweep.
   treatment." It carries its own hand-tuned four-copy shadow
   (`--wordmark-word-shadow`) and no stroke by default. As of 2026-09-02
   (#469), both sites render this same four-copy default — see §8.
-- **`.drink-card-tape-word`** (`cocktails/_cards.scss:427`), a drink card's
+- **`.drink-card-tape-word`** (`_sass/cocktails/_cards.scss:427`), a drink card's
   own title-on-tape. Two near-whites, one tight pair, no softening shadow,
   plus the shared heading stroke — deliberately NOT the header tape's
   four-copy version, because at a card title's 1rem the four-copy shadow
@@ -263,7 +263,7 @@ heading's own formula (`darken 5%` / `lighten 65%` / `rgba 0.16`) pushed
 further in the same three directions — the same construction, one tier
 harder — which is what let Helen reopen it the same day the tiers shipped:
 "HELEN TRIAGES is not treated the same way as the other headings and should
-be." See `shared/_layout.scss`'s own "#477" comment for the full three-state
+be." See `_sass/shared/_layout.scss`'s own "#477" comment for the full three-state
 history.
 
 **`[ FOOD ]` and `[ COCKTAILS ]` (the header tape word) = the shared
@@ -274,7 +274,7 @@ that day cocktails' tape word instead matched *its own* HELEN TRIAGES
 comparison: "Please treat [ COCKTAILS ] the same way we now treat [ FOOD ]."
 Food's tape word has never taken a tier or an override; matching it means
 falling through to the same untiered default, which is what
-`cocktails/_rule.scss` now does by removing its `--wordmark-word-stroke` /
+`_sass/cocktails/_rule.scss` now does by removing its `--wordmark-word-stroke` /
 `--wordmark-word-shadow` overrides rather than re-pointing them.
 
 **The card tape word stays split from the header tape word, and that is not
@@ -300,7 +300,7 @@ a punched element:
 ## 10. Traps
 
 - **The base `h1, h2, h3` rule used to hardcode the stroke colour.**
-  `shared/_base.scss` read `-webkit-text-stroke: var(--emboss-stroke-w)
+  `_sass/shared/_base.scss` read `-webkit-text-stroke: var(--emboss-stroke-w)
   $color-text;` literally, because only the ten palette-contract variables
   may be named in `shared/`. That is fixed by `@include lettering(heading)`
   reading a custom property instead of a hardcoded value, but the general
@@ -313,7 +313,7 @@ a punched element:
   This is the entire reason the tier values are custom properties rather than
   Sass variables — a site's `_rule.scss` re-points three property sets once,
   and every migrated consumer picks up the change with no specificity fight
-  and no list of selectors to maintain (see `shared/_rule.scss`'s "THE TWO
+  and no list of selectors to maintain (see `_sass/shared/_rule.scss`'s "THE TWO
   GROUNDS" section, and the now-removed `.on-dark` class's own postmortem in
   the same file for the mechanism worked out in full). It also means a
   mixin that locally redeclares `--emboss-light` / `--emboss-shadow` (which
@@ -328,16 +328,16 @@ a punched element:
   more offset doesn't fix it either.
 - **`--emboss-stroke-c` / `--emboss-light` / `--emboss-shadow` are aliases of
   the heading tier now, not independent values.** They exist so
-  `cocktails/_cocktail.scss` and `cocktails/_cards.scss` (unmigrated, see §7)
+  `_sass/cocktails/_cocktail.scss` and `_sass/cocktails/_cards.scss` (unmigrated, see §7)
   keep rendering exactly as before. Do not re-point them directly to fix a
   heading-tier problem — re-point `--lettering-heading-*` instead, or the two
   unmigrated consumers will silently pick up a value meant for something
-  else. Delete the alias block in `shared/_rule.scss` once nothing reads the
+  else. Delete the alias block in `_sass/shared/_rule.scss` once nothing reads the
   old names directly (grep `var(--emboss` across `_sass/` to check).
 - **Cocktails' `h1, h2, h3` stroke override in `_rule.scss` is gone, on
   purpose, not lost.** It used to restate `--emboss-stroke-w` /
   `--emboss-stroke-c` a second time to win a specificity fight with a
-  hardcoded shared default; now `shared/_base.scss` reads the same
+  hardcoded shared default; now `_sass/shared/_base.scss` reads the same
   `--lettering-heading-stroke-c` cocktails already re-points, so the two
   declarations always agreed and the override stopped doing anything. See
   that file's own comment for the shape to bring back if a genuine divergence
@@ -348,9 +348,9 @@ a punched element:
 
 - **2026-08-12.** Helen: "Did your heading lettering change touch all
   headings on the whole site? That is what I want." — the reason
-  `shared/_base.scss`'s h1/h2/h3 rule exists at all, pre-dating the tiers.
+  `_sass/shared/_base.scss`'s h1/h2/h3 rule exists at all, pre-dating the tiers.
 - **2026-08-24 to 2026-08-26.** The dark-on-light and light-on-dark value
-  pairs tuned separately (`shared/_rule.scss`'s "THE TWO GROUNDS" note); issue
+  pairs tuned separately (`_sass/shared/_rule.scss`'s "THE TWO GROUNDS" note); issue
   #477 raised and settled the first time ("I prefer the old HELEN TRIAGES...
   I like the drama").
 - **2026-09-01, #469.** Cocktails goes black-on-black; its heading values
@@ -374,7 +374,7 @@ a punched element:
      on both sites instead, §8.
   6. "FAQ headings need to be darker, possibly simply matching SERVES / PREP
      / COOK even though they're on different pages" — `.about-faq-item h3`'s
-     own label-tier override, `food/_about.scss:241`.
+     own label-tier override, `_sass/food/_about.scss:241`.
   7. Later the same evening, on Beef Wellington at 4019: "recipe title goes
      hard like the wordmark please, thanks for letting me change my mind" —
      `.recipe-title-text` moves from heading to display, so the page runs
