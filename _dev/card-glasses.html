@@ -105,11 +105,16 @@ sitemap: false
     </fieldset>
   </div>
 
-  {% comment %} THE SOLID ICONS' OWN DIAL. Three of the set are filled artwork
-     rather than strokes (Helen's tiki mug, pineapple and coconut), so their
-     ink is the drawing and `stroke-width` does nothing to it. Each carries an
-     <feMorphology erode> filter instead, and this drives its radius live so
-     the amount can be chosen by looking rather than guessed at.
+  {% comment %} THE SOLID ICONS' OWN DIAL. Filled artwork has no stroke, so
+     its ink IS the drawing and `stroke-width` does nothing to it. Such icons
+     carry an <feMorphology erode> filter instead, and this drives its radius
+     live so the amount can be chosen by looking rather than guessed at.
+
+     ONE ICON REACHES THIS NOW, the tiki mug. It said "three of the set (Helen's
+     tiki mug, pineapple and coconut)" until 2026-09-05, when she redrew the
+     pineapple and the coconut as line art and both left. #738 is the mug, and
+     when it lands this whole control has nothing to drive -- the loop below
+     will render an empty fieldset, which is the cue to delete it.
 
      THE VALUES HERE ARE THE ONES BAKED INTO THE SVGs, read out of the files at
      render rather than restated -- same rule as the shape dials above. Whatever
@@ -130,10 +135,11 @@ sitemap: false
         {% endif %}
       {% endfor %}
       <p class="dev-note">
-        These three are filled drawings, so they have no stroke to set a width
-        on. The dial erodes the ink instead — the paths are untouched, and 0 is
-        the drawing exactly as Helen sent it. Parity with the stroked set would
-        be tiki&nbsp;1.77, pineapple&nbsp;0.63, coconut&nbsp;0.94.
+        A filled drawing has no stroke to set a width on. The dial erodes the
+        ink instead — the paths are untouched, and 0 is the drawing exactly as
+        Helen sent it. Parity with the stroked set would be tiki&nbsp;1.77.
+        (The pineapple's 0.63 and the coconut's 0.94 are gone with the drawings
+        they described: both are stroked line art since 2026-09-05.)
       </p>
     </fieldset>
   </div>

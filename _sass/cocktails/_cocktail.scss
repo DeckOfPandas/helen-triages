@@ -1033,12 +1033,19 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   vector-effect: non-scaling-stroke;
 }
 
-// FILL-BASED ARTWORK, AND THE ONLY MEMBER OF THE SET THAT IS.
+// FILL-BASED ARTWORK. ONE DRAWING USES THIS, AND IT IS THE TIKI MUG.
+//
+// This said "the pineapple" until 2026-09-05, when Helen redrew the pineapple
+// and the coconut as open line art (#525, #307) and both left. The mug is the
+// last one, and #738 is the ticket to redraw it too -- when that lands this rule
+// has no consumer and should go with `SOLID` in scripts/normalise_glass_icons.py
+// rather than sit here unread. It is named in the issue so nobody has to find
+// this by grep.
 //
 // Every glass is an open line drawing, so `fill: none` plus a stroke is the
-// right treatment. The pineapple is not a glass and is not drawn that way: it
-// is one compound path whose lattice is negative space. Forcing the stroke
-// class onto it outlines the outline and collapses to mush at icon size.
+// right treatment. A fill-based drawing is not made that way: it is one compound
+// path whose lattice is negative space, and forcing the stroke class onto it
+// outlines the outline and collapses to mush at icon size.
 //
 // So it fills with currentColor instead. Note what is preserved and what is
 // not: the PALETTE rule still holds -- the colour comes from the page's own ink
