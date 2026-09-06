@@ -801,9 +801,23 @@ unless stated.
   Demerara rum, lightly aged` → `Overproof Demerara rum`; `overproof Jamaican
   rum` → `Overproof Jamaican rum`; `blended overproof rum` → `Blended overproof
   rum`. #780's `, lightly aged` survives — only the card-name half was in
-  conflict. Offered the chance to keep `unaged` on the Jamaican she took the
-  plain form; Wray & Nephew is unaged and Smith & Cross is not, so check the
-  drinks that pour each before the word goes.
+  conflict.
+
+  **Built the same afternoon by a parallel session (#786), and it resolved the
+  one risk this ruling carried.** Offered the chance to keep `unaged` on the
+  Jamaican, Helen took the plain form — but Wray & Nephew is unaged and Smith &
+  Cross is not, so dropping the word would have collapsed a real distinction.
+  The build kept it **in the generic and dropped it from the card name only**,
+  which is the shape that loses nothing:
+
+      "overproof Jamaican rum, unaged"   -> "overproof Jamaican rum"
+      "overproof Demerara rum, lightly aged" -> "overproof Demerara rum"
+      "blended overproof rum"            -> "blended overproof rum"
+
+  **The general lesson, and it is why the generic/card-name split exists**: a
+  card name is free to be shorter than the generic, so a naming ruling about
+  what the CARD says never has to cost the data a distinction. Reach for the
+  split before accepting a lossy rename.
 
 ### §9.3.2 The bottle dictionary
 
@@ -874,7 +888,8 @@ unless stated.
   The editorial question this was blocked on — a `suggestion` renders verbatim,
   so El Presidente reads `(ED3 or Havana 3)` — is answered against shorthand,
   and against a display field. Re-measured by parsing all 124 drinks, the
-  issue's table is stale in both directions: **127** declared bottles not 77,
+  issue's table is stale in both directions: **129** declared bottles not 77
+  (127 before the rum-reference work of #786 landed the same afternoon),
   **264** mentions not 216, **27** alias-only spellings not 19, and **zero**
   unmatched not 16 — `unresolved_suggestions: {}` since 2026-09-04, which is why
   #585 closed into this. The drift guard is the part that lasts:
@@ -888,12 +903,27 @@ unless stated.
 - **2026-09-06, #782** — **Sipping bottles are declared, with a flag.** Twelve
   rums, two of them mixing (Pusser's 151, Ceylon Arrack) and ten sipping. Asked
   whether a spec of what a recipe may reach for should hold bottles no recipe
-  will pour, Helen chose all twelve, with `sipping: true` marking the ten so no
-  recipe suggests them and no cost or ABV pass treats them as pourable. Two
-  things it leaves open: `test_every_declared_bottle_has_an_abv` checks both
-  directions, so a flagged bottle needs an ABV row or an explicit exemption; and
-  Pusser's 151 does **not** obviously fill #750's `overproof Demerara rum` hole,
-  being a Guyana/Trinidad blend.
+  will pour, Helen chose all twelve, with the ten marked so no recipe suggests
+  them and no cost or ABV pass treats them as pourable. **Built the same
+  afternoon by a parallel session (#786), and in a better shape than the flag
+  this ruling imagined**: a separate `sipping:` list, whose members are not
+  bottles as far as the site is concerned — no generic, so no card can name one,
+  and no row wanted in `abv.yml` or `costs.yml`. That answers the open question
+  this ruling left about `test_every_declared_bottle_has_an_abv` by removing it
+  rather than exempting anything. Pusser's 151 and Ceylon Arrack are declared as
+  real bottles; Pusser's 151 does **not** fill #750's `overproof Demerara rum`
+  hole, being a Guyana/Trinidad blend.
+- **2026-09-06, #701** — **`bottles.yml` spells La Favorite three ways wrong,
+  found when #786's `sipping:` list landed beside the existing entries.** The
+  three declared bottles are keyed `La Favourite Rhum Agricole Blanc`,
+  `La Favourite L'Authentique Ambré` and `La Favourite Cœur de Canne`; the two
+  new sipping entries say `La Favorite`. Helen's standing instruction is that
+  **`Favorite` is correct — *"my mistyping, please always correct"*** — so the
+  three keys are the wrong ones, and the fix is her usual shape: rename, keep
+  the old spelling as an alias. Same class as `Ophir`/Opihr and `Amaro
+  Ciociano`/Ciociaro, and the same rename cascade into `abv.yml`, `costs.yml`
+  and any drink's `suggestion:`. **Not done here**: it is #701's pass, and the
+  file was being edited by another session at the time.
 
 ### §9.3.3 The drinks index's search
 
