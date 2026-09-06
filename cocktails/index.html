@@ -228,15 +228,26 @@ permalink: /cocktails/
          _dev/no-verdict.html draws in its own comment. Hence a second attribute
          on the card rather than a cleverer reading of the first.
 
-         THE LABEL IS A PLACEHOLDER AND IS HELEN'S, like the units line in
-         _layouts/cocktail.html. The wording in this section is load-bearing —
-         the comment above is the record of the last time it was got wrong — so
-         what this button must SAY is that it narrows, and to what; the words
-         are hers. Raised with the other copy tasks. {% endcomment %}
+         `chaos only` IS HELEN'S WORDING, given 2026-09-06, and it replaced the
+         label this shipped with a few hours earlier. #732 had argued for that
+         one on the grounds that a button's label "just has to say what it
+         narrows to". She overruled it, which is hers twice over -- the voice is
+         hers, and the argument was weaker than it looked.
+
+         IT IS A NAME, NOT A DESCRIPTION, AND SO ARE THE OTHER TWO. `no chaos
+         please` does not say "ship is yes-or-better" either. This section is a
+         SCALE and its three rungs are read against each other, so `chaos only`
+         is the far end of `no chaos please` -- which is the choice a reader is
+         actually making. A label accurate about the mechanism can still be mute
+         about the question.
+
+         WHAT IT NARROWS TO IS UNCHANGED: `meta.made_before: false`, 20 drinks.
+         The words moved; nothing behind them did, and no test reads them --
+         every one goes through `data-chaos="unmade"`. {% endcomment %}
       <div class="drink-btns">
         <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false">no chaos please</button>
         <button type="button" class="btn-chaos" data-chaos="open" aria-pressed="false">I&rsquo;m open to chaos</button>
-        <button type="button" class="btn-chaos" data-chaos="unmade" aria-pressed="false">never made it</button>
+        <button type="button" class="btn-chaos" data-chaos="unmade" aria-pressed="false">chaos only</button>
       </div>
     </div>
 
