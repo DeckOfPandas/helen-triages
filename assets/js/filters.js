@@ -559,7 +559,7 @@ function renderResultsPool() {
      simply dropped `r.hasWordMatch` on the floor, so LEAVE OUT rendered every
      candidate identically while HAS TO HAVE, one box above, picked
      out the genuine matches. Same query, same ranked results, same code path
-     (HANDOVER 8.1) -- one of them just never used the answer.
+     (MANUAL 8.1) -- one of them just never used the answer.
 
      What the flag means is worth restating here because it is the whole point
      of the treatment: it is a WORD-PREFIX match, not a substring one. Typing

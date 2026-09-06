@@ -766,7 +766,7 @@
 // AND FOOD IS NOT A HEADING, which is the opposite of what that issue says and
 // worth writing down here because both of us read the same stale sentence.
 // #615 describes food's count as reusing "the filter section labels' own
-// punched/stroke typography at 1.35rem", and HANDOVER 13.7 says the same. The
+// punched/stroke typography at 1.35rem", and MANUAL 13.7 says the same. The
 // CODE has said otherwise since 2026-08-12: `.results-heading .category-label`
 // sets the label class back to plain body text on purpose, and its own comment
 // carries Helen's ruling -- "I liked it bare" -- and ends "if you are here
@@ -924,7 +924,7 @@
 // construction: a family only forms when its own name starts with the query.
 //
 // A BAND UNDER THE TEXT, NOT A FILL, and that is the language this site already
-// speaks (HANDOVER §9.13). Helen, on a card carrying three filled things:
+// speaks (MANUAL §9.13). Helen, on a card carrying three filled things:
 // "There's just a lot going on... underline the ingredient rather than
 // highlight." A pool of eight candidates with two of them filled would be that
 // complaint again, one control higher. `text-decoration` rather than the
@@ -1076,7 +1076,7 @@
 // its own #67 for the same reason.
 //
 // NOT food's rule, and this is the ruling in #579 rather than an oversight. The
-// two stylesheets share no class names on purpose (HANDOVER §2.2) and food's
+// two stylesheets share no class names on purpose (MANUAL §2.2) and food's
 // .btn-clear is absolutely positioned into the top-right of `.controls`, which
 // is a fact about that layout. What is shared is the BEHAVIOUR -- one state
 // object, one predicate deciding whether the button has anything to do -- and

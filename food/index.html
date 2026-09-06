@@ -56,7 +56,7 @@ permalink: /food/
   {% assign all_recipes = all_recipes | sort: "title" %}
   {% comment %} THE `meta.rewritten` GATE DOES NOT APPLY TO THE MAGIC BAG, and
      leaving it out would have been a silent production-only bug -- the exact
-     shape HANDOVER §12 is full of. `show_source_wording` is true in
+     shape MANUAL §12 is full of. `show_source_wording` is true in
      _config_local.yml and false in _config.yml, so an entry without
      `meta.rewritten: true` renders perfectly while you build it and VANISHES
      when it deploys, with a green build and nothing in the log.
@@ -105,7 +105,7 @@ permalink: /food/
 
   {% comment %} HAS TO HAVE AND LEAVE OUT ARE ONE QUESTION, ASKED ON ONE LINE --
      GitHub issue #586, and it is the shape cocktails' index already has (its
-     `.drink-searches`, HANDOVER 9.13). Helen: "has to have then leave out on
+     `.drink-searches`, MANUAL 9.13). Helen: "has to have then leave out on
      the same line".
 
      They are two halves of "what is in it", answered in opposite directions,
@@ -187,13 +187,13 @@ permalink: /food/
   </div>
 
   {% comment %} 5. THE ESCAPE HATCH, and it is last for the same reason
-     cocktails' is (HANDOVER 9.13): if you already know what you want, none of
+     cocktails' is (MANUAL 9.13): if you already know what you want, none of
      the above is for you, but a name box at the TOP invites treating the page
      as a search box, which is not what it is for.
 
      IT USED TO CARRY THE LEAVE OUT REVEAL as a second row under its heading,
      centred on it with .name-heading-stack -- the wordmark's max-content grid
-     trick (HANDOVER 13.8). Both are gone with issue #586: the picker they
+     trick (MANUAL 13.8). Both are gone with issue #586: the picker they
      opened is now a section of its own, beside HAS TO HAVE, so there is
      nothing left to reveal and nothing left to centre. This section is back to
      being one label and one input, like the rest. {% endcomment %}
@@ -320,7 +320,7 @@ permalink: /food/
 
          INCIDENTALS COUNT. `incidental: true` hides an item from
          main_ingredients and from the recipe page's own Ingredients section
-         (see §4 of the handover), and that is right for "what is this dish
+         (see §4 of the manual), and that is right for "what is this dish
          made of" -- but "we didn't itemise the frying oil" is not an answer to
          someone avoiding it. No `unless item.incidental` here, deliberately.
 

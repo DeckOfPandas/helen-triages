@@ -3,7 +3,7 @@
 // ============================================================================
 // The filter matrix and the list it filters.
 //
-// Split out of the old food/_layout.scss (2026-08-10) -- see HANDOVER for
+// Split out of the old food/_layout.scss (2026-08-10) -- see MANUAL for
 // the naming convention and the section boundaries this split follows.
 
 // Shared with cocktails' own filter panel -- see @mixin index-panel in
@@ -229,7 +229,7 @@
   // on the cocktail card, where it was asked for.
   //
   // WORTH KEEPING THE MEASUREMENT, because it is the argument someone will make
-  // again: HANDOVER 6's census puts `_food_recipes/` at a median of SIX main
+  // again: MANUAL 6's census puts `_food_recipes/` at a median of SIX main
   // ingredients and a max of fourteen, and a single line of this column fits
   // five or six short names before the ellipsis. So the typical row really does
   // show its median and clip the rest.

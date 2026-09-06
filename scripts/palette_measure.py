@@ -12,7 +12,7 @@ could answer.
 
 That happened again on 2026-09-01: the black-on-black work (#469) needed exactly
 these measurements and rebuilt them from scratch in tmp/. This is that rebuild,
-kept. HANDOVER 12's rule about instructions applies to tooling too -- an
+kept. MANUAL 12's rule about instructions applies to tooling too -- an
 instruction to re-run something is only as good as the something.
 
 WHAT IT IS FOR
@@ -29,7 +29,7 @@ THE BARS, AND WHERE THEY COME FROM
 ==================================
   4.5:1   text, WCAG AA
   3.0:1   a decorative mark, and large text
-  dE 10   two colours that must stay apart under dichromacy -- HANDOVER 9.13's
+  dE 10   two colours that must stay apart under dichromacy -- MANUAL 9.13's
           bar, and it applies ONLY where colour carries meaning alone. A heading
           sits under its own name in words, so its hue is reinforcement and may
           safely collapse. A goodness MARK and a matched ingredient may not.

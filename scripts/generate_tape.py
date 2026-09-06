@@ -140,7 +140,7 @@ def corner_angle(corner, a, b):
 # mixin -- two hard, unblurred offset copies, light side visible and solid,
 # dark side subtle rather than truly darker (against a near-black #0d0d0d
 # fill, a "dark" tone that isn't pushed hard toward true black just reads
-# as LIGHTER than the tape, not recessed -- see HANDOVER_v27.md 13.4.1).
+# as LIGHTER than the tape, not recessed -- see MANUAL.md 13.4.1).
 #
 # Because .site-logo-tape carries the whole rotate(-1.75deg) transform
 # around BOTH the tape-bg and the lettering together, defining "top-left"

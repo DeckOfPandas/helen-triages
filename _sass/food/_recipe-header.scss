@@ -6,7 +6,7 @@
 // frame, cross-recipe links, title, tagline, meta grid, the INGREDIENTS/
 // METHOD/NOTES section-heading treatment, the method toggle button, and the
 // recipe-page badges row. Split out of the old food/_recipe.scss (2026-08-10,
-// following the same split food/_layout.scss got) -- see HANDOVER for why.
+// following the same split food/_layout.scss got) -- see MANUAL for why.
 
 // --- Shared heading base -----------------------------------------------------
 // All recipe headings that are uppercase Courier extend this.
@@ -83,7 +83,7 @@ article.recipe .method-short {
 //
 // font-weight 600 rather than the article's base 300: the sans-serif body
 // font has real weight gradations (unlike Courier New, see §13.6 in
-// HANDOVER), so a heavier weight reads as "different and interactive"
+// MANUAL), so a heavier weight reads as "different and interactive"
 // without needing an underline too.
 // `a:not(.badge)`, not a bare `a`, since GitHub issue #40 made the taxonomy
 // badges in .recipe-badges genuine links. Without the exclusion this rule
@@ -235,7 +235,7 @@ article.recipe a:not(.badge) {
   // real titles are in front of you.
   font-size: 2.2rem;
   // Raised label-tape lettering, matching the index's .category-label and
-  // the shared wordmark (HANDOVER_v27.md §13.4.1) -- was plain stroke, the
+  // the shared wordmark (MANUAL.md §13.4.1) -- was plain stroke, the
   // same "scratched" look every other recipe-page heading carries too, until
   // now. Independent of overlapping-rule-double below: that mixin paints
   // background-image only, so there's no property collision with the
@@ -358,7 +358,7 @@ article.recipe a:not(.badge) {
       font-size: 0.85rem;
       letter-spacing: $letter-spacing-label;
       color: $color-text;
-      // Raised label-tape lettering (HANDOVER_v27.md §13.4.1).
+      // Raised label-tape lettering (MANUAL.md §13.4.1).
       //
       // This is the element the whole 2026-08-12 emboss pass came out of: it
       // sits at 0.85rem, a hair under the longform Tips label Helen liked, and
@@ -426,7 +426,7 @@ article.recipe a:not(.badge) {
   font-size: 1.8rem;
   letter-spacing: 0.08em;
   color: $color-text;
-  // Raised label-tape lettering (HANDOVER_v27.md §13.4.1), same treatment as
+  // Raised label-tape lettering (MANUAL.md §13.4.1), same treatment as
   // .category-label on the index and the shared wordmark.
   //
   // Stroke was cut from $stroke-medium (0.6px) to a hand-picked 0.3px -- see
@@ -562,7 +562,7 @@ article.recipe a:not(.badge) {
 // wider-spaced letters? And is it a shade lighter in colour?" -- all three
 // consistent with an inherited shadow+stroke neither of us had checked for
 // (dev tools greys inherited values out under Computed, easy to skim past).
-// See HANDOVER §12. .btn-print sits in no heading today; it carries the resets
+// See MANUAL §12. .btn-print sits in no heading today; it carries the resets
 // anyway, so that moving one of these buttons somewhere that does cannot
 // reintroduce the bug.
 %link-button {

@@ -6,7 +6,7 @@ audit.
 > **STATUS 2026-09-06: IMPLEMENTED, in full.** Both PRs in §10 landed on
 > 2026-09-03 (#672): `scripts/build_ingest_vocab.py` and the marker pairs,
 > `scripts/ingest_inbox.py` with its fixtures, `.claude/commands/ingest-inbox.md`,
-> `SUPPORTED_VERSIONS` and its test, HANDOVER §11.0.4, and READMEs in both
+> `SUPPORTED_VERSIONS` and its test, MANUAL §11.0.4, and READMEs in both
 > private repos. §3's gaps are closed. **What still binds is §6 (the envelope),
 > §8 (security and failure modes) and §9 (the rulings)** — `ingest-inbox.md`
 > and both `INGEST_ONE_*.md` cite §6 as the spec. §1, §2, §3, §7, §10 and §11 are
@@ -17,7 +17,7 @@ audit.
 > this stamp.
 
 Every path and line number was checked at commit 8191230 and several have
-moved since. Re-check before editing (HANDOVER §11.2).
+moved since. Re-check before editing (MANUAL §11.2).
 
 ---
 
@@ -95,7 +95,7 @@ columns like the rest of the documents.
 - Food document §2 and §3: add `method_groups` with the same rule `ingest.md`
   states (split once, at ingest, when the source has phases) and a two-group
   example. Keep flat `method:` as the single-phase form.
-- Cocktail document §3: add `character:` with its rule from HANDOVER §9.3.1,
+- Cocktail document §3: add `character:` with its rule from MANUAL §9.3.1,
   and resolve the `item:` question per D8.
 - Both documents: a short §0 "How to hand this back" that describes the
   envelope in §6, so the browser produces it without being told twice.
@@ -105,7 +105,7 @@ columns like the rest of the documents.
 **Where.** The private repo matching the site: `helen-triages-food-private`
 or `helen-triages-cocktails-private`. Never the public repo: the issue body
 carries source text that may be copyright, and the private repos are private
-for exactly this reason (HANDOVER §2.1).
+for exactly this reason (MANUAL §2.1).
 
 **Who raises it.** Either of two authors, and the consumer cannot tell them
 apart, which is the point:

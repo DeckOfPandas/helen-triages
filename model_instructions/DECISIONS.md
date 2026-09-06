@@ -4,7 +4,7 @@
 its reason and her words where they were recorded; every alternative tried
 and rejected; every finding that changed a rule; and every time the handover
 was wrong and how it was found. **Append-only, dated, grouped by the same
-section numbers as `HANDOVER_v27.md`**, so a `HANDOVER §n` pointer in a code
+section numbers as `MANUAL.md`**, so a `MANUAL §n` pointer in a code
 comment finds both the rule (there) and its history (here).
 
 **How to use it.** Before re-opening a question, find its section here. A
@@ -83,6 +83,22 @@ unless stated.
   `CLAUDE_WEB_INGEST.md` added: a claude.ai Project holding the two standalone
   documents, so Helen sends dumps of several recipes and gets one envelope
   each.
+- **2026-09-06, later** — Helen: rename the handover to MANUAL, *"because this
+  is now more accurate"*. `HANDOVER_v27.md` → `MANUAL.md` and every `HANDOVER
+  §n` in code became `MANUAL §n` (85 files; the history forms `HANDOVER v26`
+  and `HANDOVER_v26.md` kept). `START_A_SESSION.md` added: the prompt she
+  pastes to start a session, pointing at `CLAUDE.md`, the manual and this
+  journal. The claude.ai Project's copy of the two standalone documents got a
+  mechanism instead of a sentence — the `Uploaded to the Project as of:` line
+  in `CLAUDE_WEB_INGEST.md`, `test_the_web_project_holds_the_current_documents`
+  (fails locally when a document has a commit after that sha; skips in CI,
+  and while the line says `none`), a `CLAUDE.md` rule that an agent touching
+  those files says "the Project needs re-uploading" and never moves the line,
+  and a reminder printed by `build_ingest_vocab.py --write`. The architecture
+  plan's and the review's leftovers checked: everything done or discarded
+  except two, raised as #778 (delete the `--emboss-*` alias block once its
+  three readers name a tier) and #779 (decide whether the header tape is
+  random per load or fixed); #759 and #733 already covered the other two.
 
 ---
 

@@ -424,7 +424,7 @@ test('a full state survives a round trip through JSON', () => {
 
 test('every field in FIELD_SPEC round-trips, including any added later', () => {
   // Generated from FIELDS rather than listed, so a field added to FIELD_SPEC is
-  // covered without anyone remembering to come here. HANDOVER 12 warns that a
+  // covered without anyone remembering to come here. MANUAL 12 warns that a
   // sweep like this proves the predicate and not the table -- true, and the
   // table is the thing filter-state.js owns, so here it is the right end.
   const empty = FS.emptyState();

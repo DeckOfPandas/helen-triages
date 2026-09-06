@@ -47,7 +47,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # CSS goes.
 #
 # IT RECURRED WITHIN THE HOUR, in the same file, while the fix was being written
-# up. That is HANDOVER 12's "you will write down a rule instead of following it",
+# up. That is MANUAL 12's "you will write down a rule instead of following it",
 # and it is why this is a test rather than a note.
 #
 # SCOPE: `_dev/` pages are `output: false` and never ship, so this guards a

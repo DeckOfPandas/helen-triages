@@ -12,7 +12,7 @@
   WHY history.back() RATHER THAN REBUILDING THE INDEX FROM A URL. Helen asked
   whether this could avoid a refresh "so the index page has the same recipe list
   I left it with", and the deciding fact is the shuffle: with no filters set the
-  index reshuffles on every fresh load (HANDOVER 13.7). So a link that rebuilds
+  index reshuffles on every fresh load (MANUAL 13.7). So a link that rebuilds
   the index from a query string -- even a perfect one carrying every filter --
   hands back a correctly filtered list in a DIFFERENT ORDER, which is not the
   list she left. Going back through history restores the page from the browser's
@@ -25,7 +25,7 @@
 
   The arrow is page furniture, not chrome: it lives in the two page layouts
   rather than in default.html, because it is about where THIS page sits, not
-  about the site shell. See HANDOVER 2.5 for that boundary.
+  about the site shell. See MANUAL 2.5 for that boundary.
 {% endcomment %}
 {% assign back_site = site.data.sites[page.site_key] %}
 {% if back_site %}

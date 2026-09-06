@@ -5,10 +5,10 @@ description: Ingest recipes or drinks from photos, screenshots or pasted text in
 Helen has new material to ingest. `scripts/ingest_preflight.py` is the engine
 for the reporting half; this file is the procedure around it.
 
-**Read HANDOVER §4 (food schema and the ingest contract), §9.2.1 (ingesting
+**Read MANUAL §4 (food schema and the ingest contract), §9.2.1 (ingesting
 from photographs) and §9.3 (cocktail schema) before the first file.** This
 command deliberately does not restate them -- two copies of a schema drift, and
-the handover is the one the tests are written against.
+the manual is the one the tests are written against.
 
 **AND `model_instructions/PUBLISHING_A_DRINK.md` IF THE DRINK IS GOING ANYWHERE
 NEAR `to-promote/`.** That file is the six steps a drink goes through, the word
@@ -57,7 +57,7 @@ how the same thing gets asked a third time.
 **House style stops at a `QQ` line and does NOT stop at a `QQ Claude` one.**
 The first is somebody else's words awaiting a rewrite; the second is ours and
 is held to house style like any other prose. Both `conftest._QQ_LINE` and
-`tidy_drafts.py` encode that as `QQ\b(?!\s+Claude\b)` -- HANDOVER §5.
+`tidy_drafts.py` encode that as `QQ\b(?!\s+Claude\b)` -- MANUAL §5.
 
 ---
 
@@ -104,7 +104,7 @@ MADE the drink and decided it ships, which no flag says.
 >   Look each one up in `_data/cocktails/bottles.yml` and write the key.
 >   **This does not change the rule for a DRAFT**, which is the opposite one and
 >   stays: leave a drink as she spelled it and add the spelling as an alias
->   (HANDOVER §9.3.2). The alias map is what lets an ingest be fast; a finished
+>   (MANUAL §9.3.2). The alias map is what lets an ingest be fast; a finished
 >   drink has had time to say the real name.
 > - **No ingredient carries `item`.** *"This has 'item' everywhere too."* It is
 >   the source's own wording, allowed only beside `generic: "QQ"` and gone the
@@ -199,14 +199,14 @@ The order to work in:
 
 1. `python3 scripts/derive_cocktail_moods.py` -- dry, for a drink; `--write`
    only if it reports a difference.
-2. `pytest` (never two sessions at once -- HANDOVER §1).
+2. `pytest` (never two sessions at once -- MANUAL §1).
 3. `/tidy-drafts`, either collection, if the quoting or typography needs it.
 4. `python3 scripts/ingest_preflight.py` for a drink.
 5. One list to Helen. Then commit.
 
 **A red test is not always yours.** `cd _<site>_drafts && git fetch origin &&
 git rev-list --count HEAD..origin/main` first: a non-zero answer means the
-failure is probably work someone else has already done (HANDOVER §9.1).
+failure is probably work someone else has already done (MANUAL §9.1).
 
 ---
 
@@ -300,14 +300,14 @@ failure is probably work someone else has already done (HANDOVER §9.1).
   `amount:` in the collection.
 - **A qualified measure keeps its figure and loses its adjective to a note.** A
   scant or heaping ounce is `30 ml` plus `note: "the source asks for a heaping
-  measure"`. HANDOVER §9.4.1 -- the site states one figure and does not hedge it.
+  measure"`. MANUAL §9.4.1 -- the site states one figure and does not hedge it.
 - **Method steps use the canonical forms in `_data/cocktails/methods.yml`** where
   one exists. Cocktails have no `QQ PLACEHOLDER` convention: the mechanical spine
   is a closed vocabulary and the tail is free text.
 - **THE 2026-09-04 SHAPE RULINGS, all Helen's, all in `methods.yml` and
   `ingredients.yml` -- look them up, do not retype them from here:**
   - **the ice in the glass is `serve.ice`, never a method step** (since
-    2026-09-05, HANDOVER §9.10a): "strain into a rocks glass over a big cube"
+    2026-09-05, MANUAL §9.10a): "strain into a rocks glass over a big cube"
     is `Strain.` + `glass: ["old fashioned"]` + `serve: {ice: "large cube"}`,
     and the page composes the sentence. A strain step names neither glass nor
     ice; `test_serve_ice_is_not_restated_in_the_method` refuses one that does.
@@ -340,7 +340,7 @@ failure is probably work someone else has already done (HANDOVER §9.1).
 `main_ingredients`, `tags`, `star_ingredient`. Cheap for her to correct and
 expensive to originate. **Not a cocktail's `mood`** -- nine moods are DERIVED by
 `derive_cocktail_moods.py --write` and a hand edit is reverted on the next run;
-the ten hand-assigned ones are Helen's alone (HANDOVER §9.13), so a new drink is
+the ten hand-assigned ones are Helen's alone (MANUAL §9.13), so a new drink is
 missing half its browse axes until she is asked. (This line listed `mood` as a
 proposal until 2026-09-06.) Nothing can be invented -- an undeclared tag
 or star fails the suite. **Be generous with `main_ingredients`**: the cap of
@@ -372,7 +372,7 @@ pass re-adding it on noticing a thin category. Five went that way on 2026-09-05.
 **EITHER WAY, `_data/cocktails/costs.yml` MOVES WITH IT.** Every declared bottle
 carries a price and a size there, and
 `test_every_declared_bottle_carries_a_price` fails in BOTH directions -- a
-bottle with no price, and a price naming no bottle. See HANDOVER 9.3.5.
+bottle with no price, and a price naming no bottle. See MANUAL 9.3.5.
 
 **ONE EXCEPTION TO `meta.rewritten`, AND ONLY ONE:** a drink Helen has MOVED
 into `_cocktail_drafts/to-promote/`. The move is how she claims the words, so
@@ -448,7 +448,7 @@ never `proofread`, which stays hers everywhere.
   this reason.
 - **`QQ` is never an error.** Do not flag it, fix it, or convert it.
 - **Resolving a drink's `suggestion` and `generic`, Helen's rulings of
-  2026-09-04** (HANDOVER §9.3.2 has the long form; `unresolved_suggestions`
+  2026-09-04** (MANUAL §9.3.2 has the long form; `unresolved_suggestions`
   in bottles.yml is empty and must stay so):
   - a HOUSE is not a bottle: declare the product she owns by its name and
     retype the drink to it; a house is an alias only where it can mean one

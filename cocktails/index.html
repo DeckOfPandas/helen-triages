@@ -138,7 +138,7 @@ permalink: /cocktails/
      card: "I want it to be a happy invitation" rather than the page's best real
      estate, which is also why the offer is capped by the grid instead of running
      the full width. The same feature came off food entirely on 2026-09-04 and
-     must not come back there (HANDOVER section 13.4); Helen kept this one --
+     must not come back there (MANUAL section 13.4); Helen kept this one --
      "I am almost always more open to persuasion about what I drink than what I
      eat."
 
@@ -472,7 +472,7 @@ permalink: /cocktails/
 
          This comment said `item` was included until 2026-08-29, three commits
          after it stopped being. A comment describing code that no longer exists
-         is the mirror of the trap in HANDOVER 12 where prose defeats a
+         is the mirror of the trap in MANUAL 12 where prose defeats a
          source-scanning guard, and it is the more common direction.
 
          Lowercased here so the script can compare without lowering 115 strings
@@ -708,7 +708,7 @@ permalink: /cocktails/
              through the same _includes/cocktails/ship.html this card now calls,
              so the two can never render a different word for the same rung.
              `ship_tints` itself was unread by anything from that day on, and
-             was deleted from taxonomy.yml on 2026-09-06 (HANDOVER §9.5). {% endcomment %}
+             was deleted from taxonomy.yml on 2026-09-06 (MANUAL §9.5). {% endcomment %}
           <span class="drink-card-ship">{% include cocktails/ship.html ship=ship short=true %}</span>
         </div>
 
@@ -834,7 +834,7 @@ permalink: /cocktails/
      panels against the shipped green wash. Helen chose `none` -- no panel at
      all, the home colour in the line work -- so the switch and the three losers
      are gone and the winner is the default in _sass/cocktails/_cards.scss.
-     HANDOVER 9.13: a comparison switch left in becomes a permanent branch
+     MANUAL 9.13: a comparison switch left in becomes a permanent branch
      nobody dares remove. {% endcomment %}
 
   {% comment %} THE INGREDIENT VOCABULARY — declared families, card names and
@@ -852,7 +852,7 @@ permalink: /cocktails/
      YAML never needs this template touched -- which is the property #501 already
      values about `card_names`. It is 12 KB of JSON on a page that already
      carries 115 cards, and every byte of it is public in this repo anyway
-     (HANDOVER §9.1: the shell is public, the drinks are not). {% endcomment %}
+     (MANUAL §9.1: the shell is public, the drinks are not). {% endcomment %}
   <script type="application/json" id="drink-vocabulary">
     {{ site.data.cocktails.ingredients | jsonify }}
   </script>
@@ -862,7 +862,7 @@ permalink: /cocktails/
 
        "'wray and nephew' and 'wray & nephew' should both collapse onto the
        latter" -- `aliases` is how a bottle keeps ONE identity, which that file
-       has said since it was written and the search had never read. HANDOVER
+       has said since it was written and the search had never read. MANUAL
        §9.10.1 names the gap: "suggestions go in raw rather than resolved through
        bottles.yml's aliases, so `Havana 3` and `Havana Club 3` can both appear."
 

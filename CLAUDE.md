@@ -66,6 +66,9 @@
 - **CLOSE AN ISSUE WITH A COMMIT TRAILER, NOT THE API, WHENEVER A TRAILER CAN DO IT. This is a standing preference, stated 2026-08-29:** *"Close #540 (via commit message if possible -- this is always my preference)."* A `Fixes #N` / `Closes #N` trailer ties the closure to the commit that earned it, so the issue's history shows what actually resolved it instead of a bare "closed" with no link to the code. Reach for the API only where a trailer genuinely cannot work -- the clear case being work done in one of the nested private drafts repos, since a cross-repo trailer from a private repo does not close or even cross-reference a public issue (see the trap on this below).
 - Closing an issue is still a real action on a shared, outward-facing thing: say which issues you are about to close and why before doing it, unless I have just told you to close them. That applies to a trailer too -- name the issues a commit will close before pushing, while the message can still be rewritten.
 
+## The claude.ai Project is a copy, and only Helen can refresh it
+- `model_instructions/INGEST_ONE_RECIPE.md`, `INGEST_ONE_COCKTAIL.md` and the §2 block of `CLAUDE_WEB_INGEST.md` are uploaded by hand into a claude.ai Project (that file's §1). **If a commit of yours touches any of them, say so in your summary, in so many words: "the Project needs re-uploading."** `test_the_web_project_holds_the_current_documents` goes red locally until she does it and moves the `Uploaded to the Project as of:` line; **never move that line yourself** -- it records an upload, and you cannot upload.
+
 ## Normal workflow
 - If you need a scratch temporary folder, create one in this project folder and add it to .gitignore
 - Don't delete handover or jobs list documents.

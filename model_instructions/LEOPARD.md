@@ -7,7 +7,7 @@ touching a value.
 
 ## 1. What it is, in one paragraph
 
-Helen's premise for the cocktails site is "black on black" (HANDOVER §9.13,
+Helen's premise for the cocktails site is "black on black" (MANUAL §9.13,
 #469). Leopard is her favourite texture in real life, and black-on-black
 leopard is the texture the site was missing: rosettes in a black one or two
 steps lighter than the ground, visible when you look and gone when you don't.

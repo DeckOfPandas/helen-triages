@@ -83,7 +83,7 @@ short_method_enabled: false
 #
 # The key is still named for the first flag alone. It switches the WHOLE gate,
 # both legs together, and always has; renaming it would touch two configs, two
-# tests and every mention in the handover for no behavioural gain.
+# tests and every mention in the manual for no behavioural gain.
 #
 # The point of the flag is that ONE broken page does not hold the site back.
 # Flag it, ship everything else, fix it, unflag it.

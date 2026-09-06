@@ -507,7 +507,7 @@ article.recipe .recipe-section-heading {
 // comment above the markup in recipe.html), and wearing the same heading
 // made it read as a fourth primary section. 1.35rem is the size the drink
 // page's section headings use, and the smallest at which the punched emboss
-// still resolves (HANDOVER §9.13). The single violet rule is the third tier
+// still resolves (MANUAL §9.13). The single violet rule is the third tier
 // the site already has for names one level below a section heading (see
 // overlapping-rule-single's own comment, shared/_rule.scss).
 .recipe-section-temp .recipe-section-heading {
@@ -531,7 +531,7 @@ article.recipe .recipe-section-heading {
 //
 // Right-aligned with text-align rather than float or absolute positioning:
 // it is the only thing on its own line, so there is nothing to lay out
-// against, and the site's own preference (HANDOVER §13.3) is for the
+// against, and the site's own preference (MANUAL §13.3) is for the
 // simplest layout tool that reaches the result, not the most general one.
 // Font stays body, not the heading's Courier: it is a control, not a
 // second heading.
@@ -574,7 +574,7 @@ article.recipe .recipe-section-heading {
 // They stay because this link is one edit away from being inside a heading
 // again, the styling of that heading is not this file's to control, and a
 // reset that is currently redundant costs nothing while its absence is
-// invisible until someone moves the element. HANDOVER §12's entry on
+// invisible until someone moves the element. MANUAL §12's entry on
 // inheriting from a punched-tape heading is the general form.
 .tc-crosslink {
   font-family: $font-body;

@@ -25,7 +25,7 @@ site_neutral: true
 #
 # site_key IS SET BY HAND HERE, AND IT HAS TO BE. _config.yml's `defaults:`
 # assign site_key by directory -- "food" and "cocktails" -- so a page at the
-# root matches neither and would inherit none. HANDOVER 2.4: a page with no
+# root matches neither and would inherit none. MANUAL 2.4: a page with no
 # site_key gets the repo-level title and NO STYLESHEET AT ALL, silently. That is
 # not a hypothetical here; it is what this file would have shipped as.
 #
@@ -34,7 +34,7 @@ site_neutral: true
 # only finished palette in the repo. Giving /about/ its own stylesheet would
 # recreate assets/css/root.scss exactly -- the third consumer of shared/ that
 # belonged to neither site, that nobody thought to check, and that broke
-# silently for precisely that reason (HANDOVER 2.2, issue #204).
+# silently for precisely that reason (MANUAL 2.2, issue #204).
 #
 # The cost this would have carried is that /about/ says "Helen Triages Food" in
 # its title bar. It does not: site_neutral above removes it from the <title>,

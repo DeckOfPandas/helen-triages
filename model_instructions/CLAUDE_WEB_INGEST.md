@@ -22,7 +22,7 @@ No. Two files and one instruction block. The handover, the command docs and
 the data files are for a session WITH the repository; a web session has no use
 for them and would be slower and less accurate for reading them. Everything a
 repo-less Claude can legitimately do is already in the two `INGEST_ONE_*.md`
-files, by design (HANDOVER header, "companion documents").
+files, by design (MANUAL header, "companion documents").
 
 ### Setup
 
@@ -34,16 +34,28 @@ files, by design (HANDOVER header, "companion documents").
    `INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md`. Nothing else.
 3. **Project instructions: paste §2 below**, exactly as written.
 
-### Refreshing
+### Refreshing — and the line that makes it a mechanism
 
 The two files carry generated vocabulary blocks (`<!-- vocab:… -->`) and
-rulings that change. **Whenever a commit touches either file, re-upload it to
-the Project** — that is the whole refresh. `git log --oneline -3 --
-model_instructions/INGEST_ONE_RECIPE.md model_instructions/INGEST_ONE_COCKTAIL.md`
-says when that last happened. A stale file does not break anything: the local
-consumer checks every vocabulary value against `_data/` and reports the
-near-misses, so the cost of staleness is a longer hand-back list, not a wrong
-file.
+rulings that change. **Whenever a commit touches either file, or §2 below,
+re-upload to the Project** — that is the whole refresh. A stale file does not
+break anything: the local consumer checks every vocabulary value against
+`_data/` and reports the near-misses, so the cost of staleness is a longer
+hand-back list, not a wrong file.
+
+**The reminder is a test, not a sentence.** This line is the handshake:
+
+Uploaded to the Project as of: none
+
+`tests/test_standalone_docs.py::test_the_web_project_holds_the_current_documents`
+fails, locally only, whenever any of the three files has a commit after that
+sha, and names the commits. **Only you can clear it**: re-upload, then set the
+line to the commit you uploaded from (`git rev-parse --short HEAD`). An agent
+that touches one of these files will see the red test on its next run and is
+told (`CLAUDE.md`) to say so in its summary rather than bump the line.
+`scripts/build_ingest_vocab.py --write` prints the same reminder when it
+changes a block. It skips in CI, because a stale chat project must not block
+a deploy.
 
 ### The loop
 
@@ -164,7 +176,7 @@ own for its own site and say so in the index.
 - Both `INGEST_ONE_*.md` §0 now say one envelope per recipe when a message
   holds several. That was implied and is now stated, so the contract and the
   project instructions agree without either restating the other.
-- `.claude/commands/ingest.md`'s repo-less section and HANDOVER §11.0.3 point
+- `.claude/commands/ingest.md`'s repo-less section and MANUAL §11.0.3 point
   here, so the next session that meets an envelope knows where the web side's
   instructions live.
 

@@ -24,7 +24,7 @@ ingest doing the right thing. The recipe-side test is untouched.
 
 It never touches a `QQ` line. That is the source's own wording awaiting Helen's
 rewrite, and correcting its dash or its degree sign is editing someone else's
-words (HANDOVER §5, issue #426). Two thirds of the corpus-wide en-dash hits are
+words (MANUAL §5, issue #426). Two thirds of the corpus-wide en-dash hits are
 inside `QQ` text, so this is not a technicality.
 
 ## Both collections, since 2026-09-05

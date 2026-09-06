@@ -151,14 +151,14 @@ def test_internal_recipe_links_resolve(recipe):
 # rather than failing it -- a gap, not a deliberate exclusion. Real bug,
 # 2026-08-09: teriyaki-salmon.md's tagline and its own note both linked to
 # "../teriyaki-sauce)" (no slash before the closing paren), the same class
-# of "resolves against the wrong base and 404s" bug HANDOVER_v27.md §4
+# of "resolves against the wrong base and 404s" bug MANUAL.md §4
 # already documents for a bare `/recipes/slug/` link -- just with the
 # trailing slash missing instead of the leading `../`.
 MISSING_TRAILING_SLASH = re.compile(r"\]\(\.\./[a-z0-9-]+\)")
 
 
 def test_internal_links_have_trailing_slash(recipe):
-    """Cross-recipe links must be `../slug/`, not `../slug` -- HANDOVER_v27.md
+    """Cross-recipe links must be `../slug/`, not `../slug` -- MANUAL.md
     §4. `../slug` resolves relative to the parent of the current page
     instead of alongside it, so it 404s the same way an unresolved slug
     does, but looks correct at a glance and slips past
@@ -192,7 +192,7 @@ _WELL_FORMED_TARGET = re.compile(r"^[a-z0-9-]+/?$")
 #
 # WHY IT HAS TO BE RELATIVE, rather than the `{{ '/food/reference/cooking-methods-and-timings/' |
 # relative_url }}` the reference pages themselves use: front matter is never
-# Liquid-templated (HANDOVER §4), and a method step lives in front matter. A
+# Liquid-templated (MANUAL §4), and a method step lives in front matter. A
 # root-relative `/food/reference/cooking-methods-and-timings/` would drop the `/helen-triages`
 # baseurl and 404 in production while working perfectly on localhost -- the
 # exact failure test_no_link_in_the_production_build_points_at_a_file_that_isnt_there
@@ -246,7 +246,7 @@ def _ids_available_to_a_recipe(recipe):
 
     THE OBVIOUS VERSION OF THIS IS WRONG, and it was wrong for about ninety
     seconds: read the ids out of the recipe file. Body content is raw HTML
-    (HANDOVER §4.1 -- a peer heading is written longhand because kramdown gives
+    (MANUAL §4.1 -- a peer heading is written longhand because kramdown gives
     `## Heading` no class and no nested span), so a heading's id really is a
     literal in the file, and that much is fine.
 
@@ -303,7 +303,7 @@ def test_same_page_fragment_links_land_somewhere(recipe):
         f"file provides.\n"
         f"Available ids here: {sorted(ids) or 'none at all'}.\n"
         f"Add `id=\"...\"` to the target heading -- body headings are raw HTML "
-        f"(HANDOVER §4.1), so the id goes on the <h2> itself, which is also what "
+        f"(MANUAL §4.1), so the id goes on the <h2> itself, which is also what "
         f"gives it .recipe-section-heading's scroll-margin-top. Ids emitted by "
         f"_layouts/recipe.html or an include (`#doneness`, for one) count too."
     )
@@ -390,7 +390,7 @@ def test_no_main_ingredient_spelling_collisions():
 
 
 def test_incidental_not_in_main_ingredients(recipe):
-    """An ingredient item marked `incidental: true` (see HANDOVER "Easy to
+    """An ingredient item marked `incidental: true` (see MANUAL "Easy to
     get wrong") is a cooking fluid, not a real recipe component. It has no
     business turning up as a recipe-row ingredient pill or an
     ingredient-search hit on the index page -- both read from

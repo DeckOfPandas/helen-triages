@@ -1056,7 +1056,7 @@ ship_unrated_word: "???"
 # that scale would need. Both issues closed on 2026-09-02 with the drink page
 # showing the rung WORD instead, on a different footing, which is exactly the
 # condition the old comment here set for deleting the block. The reasoning
-# survives in HANDOVER §9.5 ("The goodness mark"), with the numbers. A value
+# survives in MANUAL §9.5 ("The goodness mark"), with the numbers. A value
 # nothing reads is only safe while a comment says why it is here, and there
 # was no longer a why. `test_every_ship_rung_has_a_tint` went with it.
 

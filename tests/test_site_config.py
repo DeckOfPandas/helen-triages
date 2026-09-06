@@ -678,7 +678,7 @@ def test_pantry_list_is_lowercase():
     """The match in food/index.html is `ing | downcase` against a raw `contains`
     check on this list -- an uppercase entry here would silently never match
     anything (Liquid does not lowercase the pantry side), the exact "test that
-    cannot fail and not notice" failure mode HANDOVER_v27.md §12 warns about:
+    cannot fail and not notice" failure mode MANUAL.md §12 warns about:
     green, no error, just an entry that's dead weight forever.
     """
     path = DATA / "pantry.yml"
@@ -912,7 +912,7 @@ def test_every_shipped_svg_actually_parses():
     still has.
 
     HOUSE STYLE POINT worth keeping with the test: prose in this repo uses an
-    em dash (HANDOVER §5). The ASCII `--` exception is for COMMIT MESSAGES
+    em dash (MANUAL §5). The ASCII `--` exception is for COMMIT MESSAGES
     specifically. Inside an SVG comment it is not merely off-style, it is a
     parse error.
 
@@ -1391,7 +1391,7 @@ def _top_level_blocks(text: str):
     (_sass/shared/_print.scss and _sass/food/_print.scss, GitHub issue #86)
     was invisible to test_no_selector_declares_the_same_property_twice below
     while it went on reporting green -- the exact "test that cannot fail and
-    not notice" shape HANDOVER_v27.md §12 warns about, arriving with a
+    not notice" shape MANUAL.md §12 warns about, arriving with a
     feature rather than with a file move.
 
     THE AT-RULE HAS TO STAY IN THE KEY, not be folded away. A print rule and
@@ -1668,7 +1668,7 @@ def test_a_print_partial_declares_nothing_outside_media_print():
     assert partials, (
         "No _print*.scss partials found under _sass/. There are three "
         "(shared, food, cocktails), so finding none means this scan went stale "
-        "and would pass while checking nothing (HANDOVER 12)."
+        "and would pass while checking nothing (MANUAL 12)."
     )
 
     offenders = []
@@ -1996,7 +1996,7 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "`$tc-label-width 1fr` -- a 9.5rem (152px) label column and a bar. It "
         "cannot overflow, because only the label is fixed, but on a 360px phone "
         "the bar is left about 140px. The temperature charts are read on an iPad "
-        "in the kitchen (HANDOVER 14), where there is room; a phone would want "
+        "in the kitchen (MANUAL 14), where there is room; a phone would want "
         "the label above the bar rather than beside it, which is a redesign of "
         "the chart and wants Helen's eye."
     ),
@@ -2117,7 +2117,7 @@ def test_a_multi_track_row_can_become_one():
     assert declarations, (
         "No grid-template-columns declarations found under _sass/. Either the "
         "scan went stale or the selector-stack walk is broken -- and a scan that "
-        "matches nothing passes while checking nothing (HANDOVER 12)."
+        "matches nothing passes while checking nothing (MANUAL 12)."
     )
 
     collapses = {sel for sel, _v, in_narrow, _f, _l in declarations if in_narrow}
@@ -2423,7 +2423,7 @@ def test_tape_count_matches_the_tape_directory():
         f"assets/img/chrome/tape/ holds {len(actual)} tape-*.svg files "
         f"({[p.name for p in actual]}).\n"
         f"Update the count, or add/remove the file. scripts/generate_tape.py "
-        f"makes new ones -- see its docstring, and HANDOVER 13.9 for how the "
+        f"makes new ones -- see its docstring, and MANUAL 13.9 for how the "
         f"shipped set was chosen."
     )
 
@@ -2818,7 +2818,7 @@ def test_a_filter_state_binding_is_only_asked_for_what_it_has():
         # COMMENTS STRIPPED FIRST, and this guard needed it within a minute of
         # being written: the paragraph in cocktail-index.js explaining the bug
         # names `FilterState.arrivedByGoingBack` in prose, and the first version
-        # of this test failed on its own explanation. HANDOVER 12's fifth
+        # of this test failed on its own explanation. MANUAL 12's fifth
         # instance, and the escalation it prescribes -- imported from
         # test_front_matter rather than re-typed, so there is one stripper and
         # its reasoning (strings are KEPT, because a string is how a name gets

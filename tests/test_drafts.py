@@ -4,7 +4,7 @@
 (test_front_matter.py, test_style.py, test_taxonomy.py) correctly leaves it
 alone: a blank tagline, an absent `method:`, a bare-string note, `meta.
 cooked_before: false`, and `QQ`/`PLACEHOLDER` anywhere are all completely
-normal here (HANDOVER_v27.md §4/§9/§12) and none of that is tested.
+normal here (MANUAL.md §4/§9/§12) and none of that is tested.
 
 What IS tested below is the narrower set of rules that are wrong at ANY
 stage of a recipe's life, draft or published — a key typo, a value that
@@ -40,7 +40,7 @@ Deliberately NOT ported here, and why — don't add these without asking:
   exists to reduce, not something a raw draft should already satisfy.
 - test_ingredient_notes_are_lowercase_fragments, test_ingredient_group_order_matches_
   title (test_taxonomy.py) — both explicitly flag-only even for published
-  recipes ("I'll look at violations myself", HANDOVER_v27.md §10), and the
+  recipes ("I'll look at violations myself", MANUAL.md §10), and the
   proper_nouns list they lean on was seeded from the recipe corpus, not the
   much larger draft one, so porting them risks a flood of false positives
   from ordinary draft-only proper nouns rather than real bugs.
@@ -49,7 +49,7 @@ Deliberately NOT ported here, and why — don't add these without asking:
   fire on exactly the unrewritten `QQ`/`PLACEHOLDER` source text those
   markers exist to protect (checked by hand: 3 current drafts still carry a
   gas mark inside an un-rewritten step). Stripping it there would be editing
-  content, not formatting — HANDOVER_v27.md §4's ingest paragraph is about
+  content, not formatting — MANUAL.md §4's ingest paragraph is about
   rewriting the step, not scrubbing units out of the original source first.
 """
 from __future__ import annotations
@@ -158,7 +158,7 @@ def test_the_food_drafts_clone_is_in_step():
     if not drafts_schema.present("_food_drafts"):
         pytest.skip(
             "`_food_drafts/` is not on this machine, so there is no clone to "
-            "be in step with. Clone it to check this -- HANDOVER 9.1."
+            "be in step with. Clone it to check this -- MANUAL 9.1."
         )
     problem = drafts_schema.mismatch("_food_drafts")
     assert problem is None, problem
@@ -210,7 +210,7 @@ NOT_FOR_DRAFTS = {
     "test_oven_temperature_says_fan":
         "39 drafts, and NOT mechanically fixable -- which figure of a "
         "fan/conventional pair is the fan one needs the original source, and "
-        "they are not always in the same order (HANDOVER 5)",
+        "they are not always in the same order (MANUAL 5)",
     "test_no_estimated_timings":
         "8 drafts. Helen's standing rule is that she replaces these by hand "
         "rather than have them converted, so flagging them in drafts would be "
@@ -219,7 +219,7 @@ NOT_FOR_DRAFTS = {
         "9 drafts, and flag-only even for recipes -- Helen: 'I'll look at "
         "violations myself because I care about tone of voice'",
     "test_ingredient_group_order_matches_title": "6 drafts; flag-only for recipes too",
-    "test_spice_order_within_group": "16 drafts; content judgement, HANDOVER 10",
+    "test_spice_order_within_group": "16 drafts; content judgement, MANUAL 10",
     "test_no_oven_conversions":
         "20 drafts, and it fires on exactly the un-rewritten QQ source text "
         "the marker exists to protect -- stripping a gas mark there is editing "
@@ -243,7 +243,7 @@ NOT_FOR_DRAFTS = {
         "divergences now, not a backlog",
     "test_internal_temp_ref_resolves":
         "wiring a temperature is wasted work until Helen has cooked it "
-        "(HANDOVER 14); the test catches each draft on the day it is promoted",
+        "(MANUAL 14); the test catches each draft on the day it is promoted",
     "test_doneness_names_a_real_level": "same reasoning as internal_temp_ref",
     "test_no_recipe_says_cooking_temperatures":
         "0 drafts; about a published page's own cross-link wording",
@@ -267,7 +267,7 @@ NOT_FOR_DRAFTS = {
     # NOT A GAP -- this said "GAP, mechanical; 256 drafts" until 2026-08-29 and
     # was the one entry here pointing the wrong way. The rule's own docstring
     # says the opposite: "the bare-string form is still deliberately allowed in
-    # _food_drafts/ (HANDOVER §4/§9), which this test never reads." A draft note
+    # _food_drafts/ (MANUAL §4/§9), which this test never reads." A draft note
     # jotted without a label is correct, and `test_note_dicts_have_label_and_
     # text_when_dict` above is the twin that does apply -- it checks the shape
     # of a note that HAS gone dict, and leaves bare strings alone.
@@ -334,7 +334,7 @@ def test_every_recipe_rule_is_adopted_or_declined():
     assert rules, (
         "No per-recipe rules were found in the main suite at all. Either they "
         "moved, or this scan has stopped matching -- and an empty scan passes "
-        "while checking nothing (HANDOVER 12)."
+        "while checking nothing (MANUAL 12)."
     )
 
     undeclared = sorted(n for n in rules if n not in mine and n not in NOT_FOR_DRAFTS)
@@ -484,7 +484,7 @@ def test_notes_is_a_list(draft):
 
 def test_note_dicts_have_label_and_text_when_dict(draft):
     """Deliberately looser than the recipe version: a bare string note is
-    still allowed here (HANDOVER_v27.md §4) -- what's never fine is a note
+    still allowed here (MANUAL.md §4) -- what's never fine is a note
     that LOOKS like the dict form but is missing a key, which renders blank
     or unlabelled with no error anywhere. Caught for real, 2026-08-11, in
     six *-rewrite.md files: a `note:` key typo instead of `text:` in two of
@@ -531,7 +531,7 @@ def test_group_names_omit_leading_article(draft):
 #
 #     - step: "QQ bake at 150C for 30-40 minutes"
 #
-# `QQ` is her marker for "not rewritten yet" (HANDOVER_v27.md §4/§12): the line
+# `QQ` is her marker for "not rewritten yet" (MANUAL.md §4/§12): the line
 # is still the SOURCE's wording, sitting in the file waiting to be replaced
 # wholesale. Correcting its degree sign or its dash is tidying text that is
 # about to be deleted, and it does it by editing someone else's words -- which
@@ -632,7 +632,7 @@ def test_metadata_time_format(draft):
     """Same terse-forms rule as the recipe version, both fields at once
     rather than parametrized -- caught for real, 2026-08-11: 7 drafts wrote
     e.g. "2 hours" or "15 minutes" in prep_time/cook_time, which want the
-    terse "2 hrs"/"15 mins" metadata form (HANDOVER_v27.md §5).
+    terse "2 hrs"/"15 mins" metadata form (MANUAL.md §5).
     """
     problems = []
     for field in ("prep_time", "cook_time"):

@@ -66,7 +66,7 @@ QQ = re.compile(r"\bQQ\b")
 
 def test_no_qq_placeholder(recipe):
     """`QQ` is Helen's own placeholder for "not decided/written yet" — see
-    HANDOVER_v27.md §4 and §12. Fine anywhere in `_food_drafts/`, and never to
+    MANUAL.md §4 and §12. Fine anywhere in `_food_drafts/`, and never to
     be treated as an error there. But a `QQ` surviving into `_food_recipes/`
     means the recipe isn't actually finished, whatever field it's hiding in
     (a tagline link target, a cook_time, an ingredient amount, or an
@@ -77,7 +77,7 @@ def test_no_qq_placeholder(recipe):
     A second marker, `PLACEHOLDER`, briefly existed alongside this one
     (found 2026-08-09 in roast-beef-fillet.md's method) and was retired
     2026-08-10 at Helen's direction: one marker for everything, not two —
-    see HANDOVER_v27.md §4's ingest paragraph. Don't reintroduce it.
+    see MANUAL.md §4's ingest paragraph. Don't reintroduce it.
     """
     hits = QQ.findall(recipe.raw)
     assert not hits, (
@@ -211,7 +211,7 @@ def test_number_ranges_use_en_dashes(recipe):
     there -- 0 hits either way. The difference is entirely in the drafts, and it
     is not small: 130 hits across 58 files counting QQ lines, 44 across 36
     ignoring them. 22 of those files fail ONLY on source wording awaiting a
-    rewrite, and HANDOVER §5 names this exact case -- "correcting its degree
+    rewrite, and MANUAL §5 names this exact case -- "correcting its degree
     sign or its dash tidies text about to be deleted, by editing someone else's
     words". Measured before changing anything, not assumed.
 
@@ -289,7 +289,7 @@ def test_temperatures_use_degree_c(recipe):
 # into a real closed-list rule, not just "isn't bare" -- Helen: outside an
 # incidental use (melted butter for greasing a tin), butter is always
 # "salted butter" or "unsalted butter", full stop, and sugar/flour each have
-# their own short list of allowed names. See HANDOVER_v27.md for the
+# their own short list of allowed names. See MANUAL.md for the
 # reasoning behind each list.
 #
 # Supersedes two narrower tests: the old test_flour_and_sugar_specify_type
@@ -842,7 +842,7 @@ def test_size_word_is_with_the_count_not_the_item(recipe):
     """"2 large cooking apples" as amount: "2", item: "large cooking apples"
     means the highlighter only picks up "2" -- the size sits unstyled in the
     item text with no error anywhere, the same "quantity embedded in item
-    text" trap HANDOVER_v27.md §4 already documents for a leading `~` or a
+    text" trap MANUAL.md §4 already documents for a leading `~` or a
     "zest and juice of 1 lime" pattern. Bare numeric counts only -- see
     module comment above for what's deliberately excluded.
     """
@@ -942,7 +942,7 @@ def _accent_check_fields(recipe) -> list[tuple[str, str]]:
     GitHub issues #46/#48/#82: "glace cherries" (an ingredient item name AND
     a main_ingredients entry), "Creme Brulee" (a title), "cafe" (found in
     henrys-quick-bulletproof-hollandaise-sauce.md's free-text body content,
-    the long-form write-up added after HANDOVER's "exactly one file uses this"
+    the long-form write-up added after MANUAL's "exactly one file uses this"
     note was written) -- none of these are in .prose, which was built for the
     typography/time-word tests and only ever covered front-matter running
     text, not names or body content. title/main_ingredients/star_ingredient/
@@ -1090,7 +1090,7 @@ def test_pan_and_ingredient_sizes_use_digits_in_drafts():
 
 # --- oven temperature: fan required ------------------------------------------
 # GitHub issue #146. House style has been fan-only for a while
-# (HANDOVER_v27.md §5: "always fan oven only, never conventional or gas
+# (MANUAL.md §5: "always fan oven only, never conventional or gas
 # mark"), but the word "fan" isn't actually written next to every existing
 # temperature yet. Helen's explicit call: don't assume the numbers already
 # there are confirmed fan figures just because house style says they should

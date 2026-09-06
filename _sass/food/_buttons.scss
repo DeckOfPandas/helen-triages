@@ -86,7 +86,7 @@
 //
 // The 0.5px stroke stays an absolute length rather than moving to
 // $faux-bold-stroke's em. That constant is 0.05em and would be a visible
-// weight change on the include side, which nothing asked for; HANDOVER 13.4.2
+// weight change on the include side, which nothing asked for; MANUAL 13.4.2
 // already records that this family of strokes drifts across type sizes and
 // wants its own em constant one day. This is the third instance, noted rather
 // than fixed in a styling issue.

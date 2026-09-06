@@ -1,19 +1,20 @@
-# HANDOVER v27 — the manual
+# MANUAL
 
 **Helen Triages** — a Jekyll mono-repo serving two personal decision-support
 sites. **Food** answers *what shall we cook*, not *how do I cook*. **Cocktails**
 is its sibling: real drinks, a schema, a designed index and drink page, and
 nothing promoted to the live site yet.
 
-**v27 is a split, not a revision.** v26 was 9,900 lines: about 2,000 of rules
-inside 7,800 of dated journal — what was tried, what Helen ruled and why, what
-this file used to say before it said this. Both halves are worth keeping and
-they wanted different readers. So, since 2026-09-06:
+**This file was `HANDOVER_v26.md` until 2026-09-06**, when it was split. v26
+was 9,900 lines: about 2,000 of rules inside 7,800 of dated journal — what was
+tried, what Helen ruled and why, what the file used to say before it said
+this. Both halves are worth keeping and they wanted different readers:
 
 - **This file is the manual**: what is true today, in the present tense, with
   no dates except where a date is the rule. Section numbers are v26's,
-  unchanged, so every `HANDOVER §n` in a code comment still resolves; a
-  section that is now only a pointer keeps its number and says where to go.
+  unchanged, so every `MANUAL §n` in a code comment — and any older comment
+  still saying `HANDOVER §n` — resolves here; a section that is now only a
+  pointer keeps its number and says where to go.
 - **`DECISIONS.md` is the journal**: every ruling with its date, its reason and
   Helen's words; every rejected alternative; every time this file was wrong
   and how it was found. Organised by the same section numbers. **Before
@@ -64,6 +65,7 @@ Run `ls model_instructions/` rather than trusting this list.
 | file | is |
 |---|---|
 | `DECISIONS.md` | the journal — see above |
+| `START_A_SESSION.md` | the prompt Helen pastes to start a session; points here, at the journal and at `CLAUDE.md` |
 | `SOURCE_ATTRIBUTION_SPEC.md` | the full `source` / `source_type` contract; §4 summarises and does not repeat it |
 | `INGEST_ONE_RECIPE.md`, `INGEST_ONE_COCKTAIL.md` | for a Claude with NO repository. They stand alone because the closed vocabularies are small enough to print; every vocabulary block in them sits between `<!-- vocab:… -->` markers and is RENDERED from `_data/` by `scripts/build_ingest_vocab.py` (`--check` / `--write`), which `tests/test_standalone_docs.py` enforces. Hand-edit nothing inside a marker pair. Everything outside one is prose and must be kept in step by hand when §4, §5, §7, §9.3 or the attribution spec changes |
 | `CLAUDE_WEB_INGEST.md` | the claude.ai Project that holds those two files, and what it is told |

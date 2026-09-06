@@ -105,7 +105,7 @@ Jekyll::Hooks.register :site, :post_read do |site|
   #
   # The key is still named `show_awaiting_fix` although it now governs both
   # legs of the gate. Renaming it would mean changing two configs, two tests
-  # and every mention in the handover for no behavioural gain, and the two
+  # and every mention in the manual for no behavioural gain, and the two
   # legs have never been separately switchable.
   next if site.config["show_awaiting_fix"]
 
