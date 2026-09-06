@@ -102,6 +102,16 @@ unless stated.
 
 ---
 
+- **2026-09-06, #787** — The backlog map moved from a document to an issue and
+  then widened. #755 mapped the 33 design issues of 66 on 2026-09-06 and was
+  stale in six rows **within a day** — #694, #695, #674, #633, #511 and #612 all
+  closed, and the open count moved 66 → 73 → 71. #787 replaces it with all 71
+  open issues in nine streams and says of itself what #755 said: *a map, not a
+  worklist; tick nothing here.* **The format's hazard is the lesson**: any
+  grouped snapshot of a live tracker decays at the rate the tracker moves, so it
+  must carry its measurement date and defer to the issues for state. Helen kept
+  #755 open to close herself.
+
 ## §1 How to run it
 
 - **2026-08-29** — `.node-runtime/` and `.gh-runtime/` do not come with a
@@ -378,6 +388,18 @@ unless stated.
   its schema (required, `false` on a new entry, hers to flip); `rewritten`
   stays out — no source to rewrite from.
 
+- **2026-09-06, #662** — **Tightening the gate took five already-published
+  recipes dark, and nothing noticed.** `wagamama-yakitori-sauce`, `youvetsi`,
+  `sweet-potato-chocolate-brownies`, `wagamama-teriyaki-sauce` and
+  `duck-a-lorange-sanguine` all say `awaiting_fix: false, proofread: false` —
+  which published them under the one-flag gate and holds them back under the
+  two-flag one. #662 was raised precisely to proofread them BEFORE the plugin
+  changed (*"means nothing disappears at that deploy"*) and the deploy went
+  first. Helen's ruling: she reads the five rendered pages and sets the flags
+  herself, declining an agent pre-read, because a pre-read is not a proofread.
+  **The trap generalises: tightening a gate silently unpublishes whatever only
+  passed the loose version.** Measure the count before the change, not after.
+
 ### §4.3 The magic bag
 
 - **2026-08-26** — Built: Helen's own name for her brain, answering the
@@ -422,6 +444,15 @@ unless stated.
   `_food_recipes/` median 6, max 14, 16 recipes over eight; `_food_drafts/`
   median 5, max 9, one over eight (which Helen wrote herself). §6 had said the
   gulai ayam had eleven since 2026-08-02; it has fourteen.
+
+- **2026-09-06, #762** — `cornflour`/`corn flour` and `beansprouts`/`bean
+  sprouts`: **the majority spelling wins**, `cornflour` and `beansprouts`.
+  Re-measured, the issue's own numbers were pessimistic — 18 files against 1,
+  and 3 against 1, with **both minority spellings in `_food_drafts/` only**, so
+  no published recipe and no proofread flip. Two draft files, not seven. #762's
+  alias analysis stands and is why a data fix was the only option: an alias
+  rewrites the picker's vocabulary but never `data-ingredients`, so the
+  collapsed chip would match half the recipes it names.
 
 ## §7 Taxonomy (food)
 
@@ -643,6 +674,16 @@ unless stated.
 - **2026-09-06** — `serves:` added on nine drinks (#297): seven punch bowls,
   the mulled wine, the Modern Zombie; the scaler does not read it.
 
+- **2026-09-06, #754** — **`as:` added to an ingredient**, a closed vocabulary
+  of `float` / `rinse` / `muddle`. Asked whether a new field earns its place for
+  three floats, one rinse and a handful of muddles — against `card_order:` by
+  hand, or leaving the order wrong and saying so — Helen chose the field. It
+  gives #567's tier 7 its members, lets the muddle clause group by `as: muddle`,
+  and takes the fact out of QQ prose on `tiki-max`, `zombie-intoxica` and
+  `modern-zombie-makes-2`. **Declare the vocabulary and its guard before any
+  drink carries it**: `rum_characters` sets the same trap (#530) and the suite
+  gates the deploy.
+
 ### §9.3.1 The ingredient vocabulary
 
 - **2026-08-21, #441** — `generic` as a list means OR and only OR. Daisy de
@@ -742,6 +783,42 @@ unless stated.
   dictionary naked."*). "Pernod" names two bottles and misled twice in two
   days; Helen pours the absinthe.
 
+- **2026-09-06, #594 / #593** — **Syrups: type + ratio, only where the
+  difference is real** — the rum-styles test, not a cane/demerara/turbinado ×
+  1:1/2:1 cross-product. The issue's premise was already half false: cane is
+  declared at both ratios (`cane sugar syrup 2:1` ×34, `1:1` ×5). Three gaps
+  ruled on — `demerara sugar syrup` (×4) gains a ratio; `turbinado sugar syrup
+  2:1` is declared, closing #593 and retyping `sapins-swizzle`; `honey water`
+  settles on the `2:1` form (split 5/2 for the same thing). **And the 43 QQ
+  notes are stale in their own right**: they read `Cane sugar syrup -> sugar
+  syrup 2:1` where the files say `cane sugar syrup 2:1` — the right-hand side
+  was never updated when the vocabulary gained the type, which is why #728's
+  largest block reads as 43 open questions when it is 43 confirmations.
+- **2026-09-06, #781 over #780** — **Overproof first, in the generic and the
+  card name both.** The two issues contradicted each other and needed a ruling:
+  #780 said the card name *"can remain"* `Demerara overproof rum`, #781 said
+  update the card names to the Overproof-first order. #781 wins. So `overproof
+  Demerara rum, lightly aged` → `Overproof Demerara rum`; `overproof Jamaican
+  rum` → `Overproof Jamaican rum`; `blended overproof rum` → `Blended overproof
+  rum`. #780's `, lightly aged` survives — only the card-name half was in
+  conflict.
+
+  **Built the same afternoon by a parallel session (#786), and it resolved the
+  one risk this ruling carried.** Offered the chance to keep `unaged` on the
+  Jamaican, Helen took the plain form — but Wray & Nephew is unaged and Smith &
+  Cross is not, so dropping the word would have collapsed a real distinction.
+  The build kept it **in the generic and dropped it from the card name only**,
+  which is the shape that loses nothing:
+
+      "overproof Jamaican rum, unaged"   -> "overproof Jamaican rum"
+      "overproof Demerara rum, lightly aged" -> "overproof Demerara rum"
+      "blended overproof rum"            -> "blended overproof rum"
+
+  **The general lesson, and it is why the generic/card-name split exists**: a
+  card name is free to be shorter than the generic, so a naming ruling about
+  what the CARD says never has to cost the data a distinction. Reach for the
+  split before accepting a lossy rename.
+
 ### §9.3.2 The bottle dictionary
 
 - **2026-08-27, #529** — Added, rum-only. Planteray canonical, Plantation an
@@ -806,6 +883,48 @@ unless stated.
 - **#701** — One declared name per bottle: `Ophir` (Opihr) and `Amaro
   Ciociano` (Ciociaro) are misspelt in `bottles.yml` and are not corrected in
   `abv.yml` alone, or the files would disagree.
+
+- **2026-09-06, #701** — **Every drink writes the full declared bottle name.**
+  The editorial question this was blocked on — a `suggestion` renders verbatim,
+  so El Presidente reads `(ED3 or Havana 3)` — is answered against shorthand,
+  and against a display field. Re-measured by parsing all 124 drinks, the
+  issue's table is stale in both directions: **129** declared bottles not 77
+  (127 before the rum-reference work of #786 landed the same afternoon),
+  **264** mentions not 216, **27** alias-only spellings not 19, and **zero**
+  unmatched not 16 — `unresolved_suggestions: {}` since 2026-09-04, which is why
+  #585 closed into this. The drift guard is the part that lasts:
+  `test_every_suggested_bottle_resolves` tests resolution **through aliases**,
+  so it can never catch a drink writing `Havana 3` forever.
+- **2026-09-06, #702** — **#701's rename does not fix the `JM` alias, and must
+  not be allowed to close it.** Retyping `cobra-effect` to `Rhum JM Ambré`
+  leaves the bare `JM` alias resolving to one of two stocked bottles in
+  different categories, so the next ingest that photographs a JM bottle walks
+  into the trap with the issue closed. Delete the alias in the same commit.
+- **2026-09-06, #782** — **Sipping bottles are declared, with a flag.** Twelve
+  rums, two of them mixing (Pusser's 151, Ceylon Arrack) and ten sipping. Asked
+  whether a spec of what a recipe may reach for should hold bottles no recipe
+  will pour, Helen chose all twelve, with the ten marked so no recipe suggests
+  them and no cost or ABV pass treats them as pourable. **Built the same
+  afternoon by a parallel session (#786), and in a better shape than the flag
+  this ruling imagined**: a separate `sipping:` list, whose members are not
+  bottles as far as the site is concerned — no generic, so no card can name one,
+  and no row wanted in `abv.yml` or `costs.yml`. That answers the open question
+  this ruling left about `test_every_declared_bottle_has_an_abv` by removing it
+  rather than exempting anything. Pusser's 151 and Ceylon Arrack are declared as
+  real bottles; Pusser's 151 does **not** fill #750's `overproof Demerara rum`
+  hole, being a Guyana/Trinidad blend.
+- **2026-09-06** — **`La Favorite`, no `u`, is a STANDING CORRECTION.** Helen:
+  *"Favorite is correct, my mistyping, please always correct."* The distillery
+  is Martinican and spells it the French way; `La Favourite` was hers and
+  reached the data before the correction did. Briefly visible as a
+  contradiction when #786's `sipping:` list landed spelling it correctly beside
+  three bottle keys spelling it wrongly — **fixed the same afternoon by #788**,
+  which renamed all three keys and **kept `La Favourite` as an alias on each**,
+  per this file's rename rule: a suggestion typed the British way must keep
+  resolving whether or not the drink that wrote it has been retyped. That is
+  the shape every one of these takes, and it is not a half-finished rename.
+  `Ophir`/Opihr and `Amaro Ciociano`/Ciociaro are the same class and are
+  **still outstanding**, under #701.
 
 ### §9.3.3 The drinks index's search
 
@@ -888,6 +1007,17 @@ unless stated.
   SPEND, hand her the order with a confidence flag; two rounds took 31
   checked rows to 44 and 16 guesses to none. Master of Malt 429s every
   automated request. Median glass £3.16–£3.39; 122 of 124 show a figure.
+
+- **2026-09-06, #748** — **Whole fruit and weighed solids are priced.** *"I'm
+  catering for family, not running a bar"* excluded dashes, garnishes and ice
+  and still does; what changes is that a solid which **is** the drink is no
+  longer treated as a garnish. The Pear, Apricot and Rosemary Bellini costed at
+  7p under the volume-only rule and so printed nothing at all; about ten rows
+  (pear, dried apricot, passion fruit, blackberry, cucumber, pineapple, and the
+  sugars and honey by weight) make all 124 price. **The file's rule becomes "a
+  volume or a weight counts; a dash, a garnish and ice never do"**, which is a
+  subtler line than `costs.yml`'s header currently draws and should be written
+  there when this lands.
 
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
