@@ -933,6 +933,46 @@ layout: default
         %}&pound;{{ page.cost.min }}&ndash;&pound;{{ page.cost.max }}{% endif %}</span> a glass in ingredients.</p>
   {% endif %}
 
+  {% comment %} HOW MANY UNITS — LOCAL ONLY, AND THE LINE BELOW COST. Helen,
+     2026-09-06, asked for it exactly here: "Only in the bottom section with
+     source and cost, so the line below those." Same footer, same incidental
+     register, same `_config_local.yml`-only gate as the cost line above it —
+     `site.show_units` is declared there and nowhere else, so production
+     renders nothing. See #297.
+
+     IT IS UNITS, NOT THE DRINK'S ABV, and Helen drew that line herself:
+     "I want the number of units in a drink, not the ABV of the drink, i.e.
+     water etc don't matter." The ABV of a finished drink needs the dilution
+     modelled and nothing records it; the units do not care.
+
+     THERE ARE NO DATA ATTRIBUTES HERE AND THAT IS DELIBERATE. The cost line
+     carries `data-cost-min`/`max` so cocktail-scale.js can multiply them,
+     because a drink made at ×4 costs four times as much. This figure is PER
+     SERVING — "so scaler setting doesn't matter" — and a serving does not get
+     stronger when you make eight of them. Giving the scaler nothing to read is
+     what guarantees it cannot go stale behind the multiple box.
+
+     `units.exact` MEANS EVERY ALCOHOLIC POUR NAMED ITS BOTTLE. Where a pour
+     named only a category the strength is derived from Helen's
+     `default_bottles` ruling, or the mean of that category's bottles, and the
+     sentence says "About" — her call, 2026-09-06: "one figure, marked
+     approximate when it's a fallback". Note that a vague 0% ingredient does
+     NOT spoil exactness: a Collins topped with soda water is still exact,
+     because soda water is 0% however loosely it is described.
+
+     THE WORDING IS A PLACEHOLDER AND IS HELEN'S TO WRITE — the same status as
+     the bitters caveat under the scaler (#713). Raised as its own issue; do not
+     polish it here, and do not let an agent rewrite it into house voice. What
+     the line must CONVEY is fixed (the figure, that it is per serving, and
+     whether it is approximate); the words are not. {% endcomment %}
+  {% if site.show_units and page.units %}
+    <p class="cocktail-units">{% unless page.units.exact %}About {% endunless
+      %}<span class="cocktail-units-figure">{{ page.units.per_serve }}</span>
+      {%- if page.units.per_serve == 1.0 %} unit{% else %} units{% endif %} of alcohol
+      {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings.
+      {%- else %} in a serving.{% endif %}</p>
+  {% endif %}
+
 </article>
 
 {% comment %} The back arrow's progressive enhancement -- see
