@@ -272,12 +272,23 @@ bottles:
   "Damoiseau Rhum Agricole Blanc Pure Cane":
     generic: "rhum agricole blanc"
     aliases: ["Damoiseau Pure Cane"]
-  "La Favourite Rhum Agricole Blanc":
+  # FAVORITE, NO `u`, AND THAT IS A STANDING CORRECTION -- Helen, 2026-09-06:
+  # "Favorite is correct, my mistyping, please always correct." The distillery
+  # is Martinican and spells it the French way; `La Favourite` was hers and
+  # reached the data before the correction did. Every `La Favorite` in the repo
+  # is the fixed spelling as of that date, drinks included.
+  #
+  # THE OLD SPELLING STAYS AS AN ALIAS on all three bottles, per this file's own
+  # rename rule up top: a suggestion typed the British way must keep resolving
+  # whether or not the drink that wrote it has been retyped. It is NOT a
+  # half-finished rename.
+  "La Favorite Rhum Agricole Blanc":
     generic: "rhum agricole blanc"
-    aliases: ["La Favourite Blanc"]
-  "La Favourite L'Authentique Ambré":
+    aliases: ["La Favorite Blanc", "La Favourite Rhum Agricole Blanc",
+              "La Favourite Blanc"]
+  "La Favorite L'Authentique Ambré":
     generic: "rhum agricole vieux"
-    aliases: []
+    aliases: ["La Favourite L'Authentique Ambré"]
   "Rhum JM Ambré":
     generic: "rhum agricole vieux"
     aliases: ["JM Rhum Agricole ambre", "JM"]
@@ -332,7 +343,7 @@ bottles:
 
   # --- the Martinique agricoles, 2026-08-30 ---------------------------------
   # Named by Helen for the Martinique Swizzle, one per reason: JM for the
-  # classic build, Trois Rivières for a savoury one, La Favourite for high
+  # classic build, Trois Rivières for a savoury one, La Favorite for high
   # proof. All three are `rhum agricole blanc` and the ORIGIN THAT SEPARATES
   # THEM IS NOT RECORDABLE YET -- she asked for "a way of noting the origin of
   # agricole given flavour varies so much" and it is a real gap: thirteen drinks
@@ -345,9 +356,10 @@ bottles:
   "Trois Rivières Cuvée de l'Océan":
     generic: "rhum agricole blanc"
     aliases: ["Trois Rivieres Cuvee de l'Ocean", "Trois Rivières", "Cuvée de l'Océan"]
-  "La Favourite Cœur de Canne":
+  "La Favorite Cœur de Canne":
     generic: "rhum agricole blanc"
-    aliases: ["La Favourite Coeur de Canne", "Coeur de Canne", "Cœur de Canne"]
+    aliases: ["La Favorite Coeur de Canne", "Coeur de Canne", "Cœur de Canne",
+              "La Favourite Cœur de Canne", "La Favourite Coeur de Canne"]
 
   # --- not a rum ------------------------------------------------------------
   # The first entries here that are not cane spirits at all, which is what the

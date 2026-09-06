@@ -261,7 +261,7 @@ search:
   # MEASURED AGAINST ALL 87 SUGGESTIONS BEFORE IT WAS TRUSTED, 2026-08-29: it
   # flags 17, every one of them genuinely prose, and catches no bottle name. The
   # clean 70 include every awkward shape the collection has -- `Smith & Cross`,
-  # `Gosling's Black Seal`, `Appleton 8-year`, `La Favourite L'Authentique
+  # `Gosling's Black Seal`, `Appleton 8-year`, `La Favorite L'Authentique
   # Ambré`, `Pierre Ferrand ambre`, `acacia honey`.
   #
   # THESE APPLY TO SUGGESTIONS ONLY. A declared generic is a name Helen chose

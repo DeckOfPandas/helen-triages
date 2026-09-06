@@ -195,11 +195,13 @@ bottles:
     size_ml: 700
     gbp: 30
     confidence: medium
-  # In the house since 2026-09-06, #782. UK shelf price for the 70cl.
+  # In the house since 2026-09-06, #782, and HELEN'S OWN FIGURE: 52, against the
+  # 40 I guessed from UK listings the same morning. Overproof Pusser's is scarce
+  # here and the guess was 23% under.
   "Pusser's 151":
     size_ml: 700
-    gbp: 40
-    confidence: low
+    gbp: 52
+    confidence: high
   "Planteray Stiggins' Fancy":
     size_ml: 700
     gbp: 32
@@ -225,7 +227,7 @@ bottles:
     size_ml: 700
     gbp: 30
     confidence: high
-  "La Favourite Rhum Agricole Blanc":
+  "La Favorite Rhum Agricole Blanc":
     size_ml: 700
     gbp: 38
     confidence: medium
@@ -237,11 +239,11 @@ bottles:
     size_ml: 700
     gbp: 42
     confidence: medium
-  "La Favourite Cœur de Canne":
+  "La Favorite Cœur de Canne":
     size_ml: 700
     gbp: 50
     confidence: high
-  "La Favourite L'Authentique Ambré":
+  "La Favorite L'Authentique Ambré":
     size_ml: 700
     gbp: 45
     confidence: high
@@ -274,12 +276,14 @@ bottles:
     gbp: 40
     confidence: high
   # In the house since 2026-09-06, #782, and keyed on the words in the issue
-  # rather than a label -- so the price is the category's rather than the
-  # bottle's, and low for that reason as well as for the usual one.
+  # rather than a label. HELEN'S OWN FIGURE: 37, against the 28 I guessed. High
+  # despite the key still being the category, for the reason abv.yml gives on
+  # the matching row -- what she read off is the bottle in the house, whatever
+  # the label eventually turns out to say.
   "Ceylon Arrack":
     size_ml: 700
-    gbp: 28
-    confidence: low
+    gbp: 37
+    confidence: high
   # --- gin ---------------------------------------------------------------
   "Beefeater":
     size_ml: 700
