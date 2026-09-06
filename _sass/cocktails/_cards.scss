@@ -750,10 +750,16 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // sight, and it hands hover back to magenta, which is what "you can touch
   // this" means everywhere else on the site.
   //
-  // THE MATCHED STATE STILL READS, and the two swap ink rather than compete:
-  // unmatched is a coloured word, matched is a WHITE word over a coloured band
-  // (see `.is-match` below). Colour changes place instead of intensity, so the
-  // match is the brighter of the two on a dark ground rather than the louder.
+  // THE MATCHED STATE STILL READS, and since 2026-09-06 it does so WITHOUT
+  // changing hue: a matched chip keeps this colour and gains an underline in it,
+  // plus a faux-bold stroke (see `.is-match` below). Weight and the band carry
+  // the state; the colour goes on saying which section the chip belongs to.
+  //
+  // IT USED TO SWAP INK -- unmatched a coloured word, matched a WHITE word over
+  // a coloured band, so that colour changed PLACE rather than intensity. #756
+  // ended that: turning the word white at the exact moment its section matched
+  // threw away the one thing the colour was for. The old reasoning is recorded
+  // in full on `.is-match` rather than here.
   //
   // MEASURED, NOT ASSUMED: coral is 6.66:1 on the page ground and 6.18:1 on a
   // card, hot pink 6.19:1 and 5.75:1, both well clear of 4.5:1 -- which is the
