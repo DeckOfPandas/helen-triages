@@ -824,10 +824,23 @@ unless stated.
     chartreuse-daiquiri moved. Priced at three quarters of 2:1 — the ratio is
     honey:water, so 2:1 is two thirds honey against 1:1's half, and honey is all
     of the cost.
-  - **Left for Helen**: whether `turbinado sugar syrup 2:1` belongs in
-    taxonomy's `aged:` mood beside demerara and raw sugar. It is a flavour
-    judgement and adding it would change `sapins-swizzle`'s derived moods, so
-    turbinado went into `sweet:` (mechanical) and not `aged:`.
+  - **A non-question I raised as a question, and the correction is the useful
+    part.** I asked Helen whether `turbinado sugar syrup 2:1` should join
+    taxonomy's `aged:` list, describing it as "a flavour mood" that would change
+    `sapins-swizzle`'s derived moods. **Both halves were wrong.** `aged:` is not
+    a mood at all — it is a `mood_ingredients` set feeding ONE mood, `strong
+    brown drink`, whose rule was rewritten on 2026-08-30 precisely to stop
+    firing on "a swizzle over crushed ice" and now reads *"nothing lengthens it
+    and it is not crushed, swizzled or blended"*. Sapins Swizzle is a swizzle,
+    and is the only drink pouring turbinado.
+    Helen's answer was the right one: *"Turbinado is just a sugar... It's just a
+    flat ingredient. Does this matter?"* **Measured rather than argued**: adding
+    turbinado to `aged:` and re-running `scripts/derive_cocktail_moods.py` gives
+    `124 drinks: 124 already agree, 0 differ` — identical to leaving it out. It
+    is in `sweet:` only, and that is correct.
+    **The lesson: run the derivation before asking whether a vocabulary change
+    moves a mood.** The script is committed, defaults to a dry run, and answers
+    in seconds; a question costs Helen more than the measurement does.
 - **2026-09-06, #781 over #780** — **Overproof first, in the generic and the
   card name both.** The two issues contradicted each other and needed a ruling:
   #780 said the card name *"can remain"* `Demerara overproof rum`, #781 said
