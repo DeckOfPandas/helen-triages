@@ -21,9 +21,10 @@ from conftest import where, checkable_raw, checkable_prose
 # them without importing the food suite; every assert and every message below
 # is unchanged, and so is every test id.
 from conftest import (
-    ISO_DATE, NUMBER_RANGE, SHARED_TYPOGRAPHY, SPELLINGS, accent_problems,
-    accented_words, degreeless_temperatures, number_range_hits,
-    spelling_problems,
+    ALL_DRAFTS, ALL_MAGIC_BAG, ALL_RECIPES, ISO_DATE, NUMBER_RANGE,
+    SHARED_TYPOGRAPHY, SPELLINGS, accent_problems, accented_words,
+    degreeless_temperatures, note_is_a_sentence, note_problems, notes_of,
+    number_range_hits, spelling_problems,
 )
 
 # Re-exported under the names three other consumers already import from this
@@ -150,6 +151,86 @@ def test_method_step_notes_are_sentences(recipe):
     assert not problems, (
         f"{where(recipe)} has method-step note(s) not styled as a sentence "
         f"(capital letter, trailing full stop): {problems!r}."
+    )
+
+
+# --- notes are sentences -----------------------------------------------------
+# #711, Helen 2026-09-06. The rule and its two helpers live in conftest so the
+# cocktails suite holds a drink to the same one; see the block there for why
+# leading punctuation is skipped and why a QQ note is never checked.
+#
+# THE EXCEPTIONS ARE DECLARED, NOT TOLERATED, and each carries its reason --
+# the shape `unresolved_suggestions` uses in bottles.yml, and for the same
+# argument: a known failure with a reason attached lets this test bite on the
+# NEXT one instead of being switched off. The staleness test below stops the
+# block outliving the problems.
+NOTE_EXCEPTIONS = {
+    # A DELIBERATE CONTINUATION, not a missing capital. The note finishes a
+    # thought the recipe started, and the ellipsis is doing that work; giving it
+    # a capital would break the join it exists to make.
+    "...goat's cheese and cherry tomato.":
+        "leading ellipsis: the note continues the sentence above it",
+}
+
+# The `gf tip:` family. FOURTEEN DRAFTS OPEN WITH IT and it is NOT mechanically
+# fixable: naive capitalisation gives "Gf tip:", which is wrong, and "GF tip:"
+# is a house-style choice about an abbreviation that Helen has not made. The
+# phrase is the source's own (it is how the recipes were transcribed), so this
+# is a question about whether her style guide adopts it, capitalises it, or
+# rewrites it out. Raised for her rather than guessed at; see #711.
+GF_TIP = "gf tip"
+
+
+def _note_exempt(text: str) -> bool:
+    s = (text or "").strip()
+    return s in NOTE_EXCEPTIONS or s.lower().startswith(GF_TIP)
+
+
+def test_notes_are_sentences(recipe):
+    """A note starts with a capital and ends with a full stop -- #711.
+
+    THE SIBLING OF `test_method_step_notes_are_sentences` ABOVE, which has held
+    method-step notes to this since long before #711 while the recipe's own
+    `notes:` list and its per-ingredient `note:` were unchecked. Helen, asked
+    how she wanted this done: "I'd prefer you add tests for this then fix them
+    for me!!!!"
+    """
+    problems = [
+        f"{where_note}: {text!r} ({', '.join(note_problems(text))})"
+        for where_note, text in notes_of(recipe.fm)
+        if not _note_exempt(text) and not note_is_a_sentence(text)
+    ]
+    assert not problems, (
+        f"{where(recipe)} has note(s) not styled as a sentence "
+        f"(capital letter, trailing full stop):\n  " + "\n  ".join(problems)
+    )
+
+
+def test_no_note_exception_is_stale():
+    """A declared exception must still name a note that exists.
+
+    THE SAME ROT `test_unresolved_suggestions_has_no_stale_entries` CATCHES in
+    bottles.yml: an exemption that outlives its note reads as an outstanding
+    problem while also quietly exempting that exact string for whoever writes it
+    next. Deleting the line is how one gets retired.
+
+    WHAT ITS GREEN MEANS IN CI, where `_food_drafts/` does not exist: the sweep
+    covers recipes and the magic bag only, so an exemption naming a DRAFT's note
+    would look stale and fail. That is a real risk and is accepted rather than
+    skipped, because the one declared entry names a PUBLISHED recipe, which CI
+    has -- so in CI this is honest coverage of every exemption that currently
+    exists. If a draft-only exemption is ever added, this test becomes the thing
+    that fails in CI for the wrong reason, and the fix is to make the exemption
+    name a recipe or to move this to SKIPS_WITHOUT_DRAFTS.
+    """
+    live = set()
+    for entry in ALL_RECIPES + ALL_DRAFTS + ALL_MAGIC_BAG:
+        live.update((text or "").strip() for _, text in notes_of(entry.fm))
+    stale = [note for note in NOTE_EXCEPTIONS if note not in live]
+    assert not stale, (
+        f"{len(stale)} NOTE_EXCEPTIONS entr(ies) name a note no recipe has any "
+        f"more:\n  " + "\n  ".join(repr(s) for s in stale)
+        + "\n\nThe work is done -- delete the line."
     )
 
 

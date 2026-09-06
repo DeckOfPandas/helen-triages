@@ -482,6 +482,18 @@ def test_notes_is_a_list(draft):
     _fm.test_notes_is_a_list(draft)
 
 
+def test_notes_are_sentences(draft):
+    """#711, and it holds for drafts because that is where the notes are.
+
+    SEVENTEEN DRAFTS FAILED IT AND THREE RECIPES DID, which is the usual shape:
+    a rule bites hardest before promotion. Fourteen of the seventeen were the
+    `gf tip:` family, which the recipe version exempts by prefix and which is
+    Helen's call rather than a mechanical fix -- see NOTE_EXCEPTIONS' neighbour
+    comment in test_style.py.
+    """
+    _st.test_notes_are_sentences(draft)
+
+
 def test_note_dicts_have_label_and_text_when_dict(draft):
     """Deliberately looser than the recipe version: a bare string note is
     still allowed here (MANUAL.md §4) -- what's never fine is a note
