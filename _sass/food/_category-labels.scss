@@ -30,9 +30,9 @@
 // other way, which is why the shift was small enough to live with for a while
 // rather than obvious.
 //
-// IT WAS TWO BUGS, NOT ONE, because two resting bases extend this:
+// IT WAS TWO BUGS, NOT ONE, because two resting bases extended this:
 //   .btn-tag / .btn-star  0.75rem, no letter-spacing
-//   .btn-meta             0.72rem, letter-spacing 0.02em
+//   .btn-meta             0.72rem, letter-spacing 0.02em   (retired 2026-09-06)
 // One pair of values could not agree with both. Declaring NEITHER makes each
 // active button inherit its own resting metrics, so both families stop moving
 // -- which is why the fix is a deletion rather than a matching pair of numbers.
@@ -313,65 +313,6 @@
     .search-results:not(:empty) {
       margin-top: $index-label-gap;
     }
-  }
-
-  // Meta filter buttons — darkened grey, matching the meta badges
-  &.category--meta {
-    // No margin override. It was $space-md, tuned when every category sat
-    // $space-xl apart; against $spacing-section-top it made the meta row hug
-    // the section above it. A local-only appendix is still a section.
-    align-items: center;
-    width: 100%;
-
-    .category-label-row {
-      justify-content: center;
-      width: 100%;
-    }
-
-    .category-buttons {
-      justify-content: center;
-      width: 100%;
-    }
-
-    .category-label {
-      font-size: 0.72rem;
-      color: lighten($color-clear-text, 12%);
-      // The `-webkit-text-stroke: 0` that used to sit here is gone, 2026-08-12.
-      // It was a workaround for the exact problem the em-based $emboss-stroke
-      // now solves: at 0.72rem the old flat $stroke-light was 4.9% of the type,
-      // heavier than anything else on the site, so switching it off entirely
-      // was the only way to stop this label looking chunkier than the 1.05rem
-      // ones above it (1.35rem before the 2026-09-02 index fold tightening).
-      // That left it as the one label wearing half the effect --
-      // an emboss shadow with no edge under it. Inheriting the proportional
-      // stroke gives it the whole treatment at its own size; it stays demoted
-      // by size and colour, which is what "local-only appendix" should mean.
-    }
-  }
-
-  &.category--meta .btn-meta.active {
-    @extend %btn-active-base;
-    color: $color-clear-text;
-    -webkit-text-stroke: 0.5px $color-clear-text;
-  }
-}
-
-.btn-meta {
-  font-family: $font-headings;   // NOT $font-label -- see _palette.scss
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
-  padding: $space-xxs 0.65rem $space-xxs $space-sm;
-  transition: all 0.1s ease-in-out;
-  background-color: rgba($color-text, 0.05);
-  color: lighten($color-clear-text, 12%);
-  border: none;
-  cursor: pointer;
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
-
-  &:hover {
-    background-color: rgba($color-text, 0.1);
   }
 }
 

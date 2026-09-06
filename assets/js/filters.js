@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
        state.tags        Set, the MOOD/PRACTICALITIES tag buttons
        state.star        string|null, single-select STAR INGREDIENT
        state.ingredient  string|null, the chosen ingredient-search result
-       state.meta        Set, the local-only meta filters
        state.excludedIngredients
                          Set, the "they hate peas" exclusions (issue #52).
                          Entries of the DERIVED ingredient index
@@ -63,10 +62,13 @@ document.addEventListener('DOMContentLoaded', function () {
   var recipeList = document.querySelector('.recipe-list');
 
   /* THE SHORTLISTED-ONLY BUTTON — #546, on the results heading rather than in
-     the matrix. See food/index.html for why it is not one of the META FILTERS
-     (that whole block is local-only) and why there is no separate shortlist
-     page. Wired below, revealed there too: it ships `hidden`, and it is this
-     script rather than shortlist.js that proves the filter half exists. */
+     the matrix. It was kept out of the META FILTERS block because that block
+     was local-only and a shortlist is not; the block itself went on 2026-09-06,
+     so the reason has outlived the thing it was distinguishing from, and this
+     button's placement is now simply its own. See food/index.html for why there
+     is no separate shortlist page. Wired below, revealed there too: it ships
+     `hidden`, and it is this script rather than shortlist.js that proves the
+     filter half exists. */
   var shortlistOnlyBtn = document.getElementById('shortlist-only');
   // Two buttons, same action -- issue #67. The top one is the original,
   // pinned top-right of the matrix; the bottom one repeats it after the last
@@ -771,7 +773,7 @@ function renderResultsPool() {
   // disagree.
   function syncAriaPressed() {
     if (!matrix) return;
-    matrix.querySelectorAll('.btn-star, .btn-tag, .btn-meta').forEach(function(btn) {
+    matrix.querySelectorAll('.btn-star, .btn-tag').forEach(function(btn) {
       btn.setAttribute('aria-pressed', btn.classList.contains('active') ? 'true' : 'false');
     });
   }
@@ -796,9 +798,6 @@ function renderResultsPool() {
     });
     matrix.querySelectorAll('.btn-star').forEach(function(btn) {
       btn.classList.toggle('active', state.star === btn.dataset.star);
-    });
-    matrix.querySelectorAll('.btn-meta').forEach(function(btn) {
-      btn.classList.toggle('active', state.meta.has(btn.dataset.meta));
     });
   }
 
@@ -842,13 +841,6 @@ function renderResultsPool() {
     update();
   }
 
-  function toggleMeta(value) {
-    if (!value) return;
-    if (state.meta.has(value)) state.meta.delete(value);
-    else state.meta.add(value);
-    update();
-  }
-
   function update(preservePage) {
     if (!preservePage) { currentPage = 1; showAll = false; }
     var visibleCount = 0;
@@ -860,7 +852,7 @@ function renderResultsPool() {
 
     // Matching runs regardless of suppressList, so the "N survivors" count
     // below always reflects the filters actually in effect (title search,
-    // tags, star, meta) rather than freezing at a stale number. GitHub
+    // tags, star) rather than freezing at a stale number. GitHub
     // issue #60: Helen typed a title search (ten rows), then an ingredient
     // search that matched nothing -- the list correctly emptied, but the
     // count stayed stuck at "10 survivors" because this whole block, count
@@ -888,7 +880,6 @@ function renderResultsPool() {
         tags: (li.dataset.tags || '').split(',').filter(Boolean),
         star: li.dataset.star || '',
         ingredients: (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); }),
-        isDraft: li.dataset.metaDraft === 'true',
         /* THE ONE ROW FACT THE BUILD DID NOT WRITE — #546. Every other key
            above is read off a data- attribute Jekyll emitted; this one is in
            this browser's localStorage and cannot be. Asked only when the filter
@@ -1085,11 +1076,6 @@ function renderResultsPool() {
 
       if (target.classList.contains('btn-star')) {
         toggleStar(target.dataset.star);
-        return;
-      }
-
-      if (target.classList.contains('btn-meta')) {
-        toggleMeta(target.dataset.meta);
         return;
       }
 
