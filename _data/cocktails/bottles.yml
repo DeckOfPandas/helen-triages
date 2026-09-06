@@ -124,14 +124,14 @@ bottles:
     aliases: ["Smith and Cross", "Smith & Cross rum"]
     note: "57% ABV — be sensible about how much you use."
   "Wray & Nephew":
-    generic: "unaged overproof Jamaican rum"
+    generic: "overproof Jamaican rum, unaged"
     aliases: ["Wray and Nephew", "Wray & Nephew Overproof"]
   # Its own thing rather than a Wray & Nephew substitute -- Helen, 2026-08-27:
   # "choice of that or W&N is mood by mood." Same category, not interchangeable
   # on autopilot, which is why both are listed rather than one carrying the
   # other as an alias.
   "Rum Fire":
-    generic: "unaged overproof Jamaican rum"
+    generic: "overproof Jamaican rum, unaged"
     aliases: []
 
   # --- Demerara: 100% DDL, Guyana. See the appellation note above. ----------
@@ -157,8 +157,8 @@ bottles:
   # owning it ("wanted counts as reached-for"), and she withdrew that: "I don't
   # own it, I just wanted to, but it looks like it's hard to get."
   #
-  # SO `overproof Demerara rum` NOW HAS NO BOTTLE AT ALL, which is a normal
-  # state -- 78 of the 154 categories in use are in it -- and not a reason to
+  # SO `overproof Demerara rum, lightly aged` NOW HAS NO BOTTLE AT ALL,
+  # which is a normal state -- 78 of the 154 categories in use are in it -- and not a reason to
   # retire the generic. Two drinks still call for it (pic-a-de-crop-punch,
   # zombie-intoxica) and Helen is rethinking both; the category is what those
   # drinks want, whatever ends up filling it. costs.yml prices it as a category.
@@ -227,12 +227,25 @@ bottles:
     aliases: ["Plantation 3 Stars", "Plantation 3 Stars rum", "Planteray 3",
               "Plantation 3"]
 
-  # --- brand-generics: the bottle IS the category (#314 rum_untyped) --------
+  # --- the three that used to BE their own categories -----------------------
+  # `rum_untyped` held these as brand-generics until #314's amendment on
+  # 2026-08-29 generalised all three, so the heading that used to sit here ("the
+  # bottle IS the category") has been wrong for a week. They are ordinary
+  # bottles under ordinary generics now, which is this file's primary rule.
   "Planteray O.F.T.D.":
     generic: "blended overproof rum"
     aliases: ["Plantation OFTD", "Planteray OFTD", "OFTD"]
     # #314, Helen 2026-08-27: "not an aged Demerara, it is its own category".
     # 69%, and a Guyana/Jamaica/Barbados blend, so it fails DDL twice over.
+  # IN THE HOUSE SINCE 2026-09-06, #782, and it comes OFF `not_reached_for`.
+  # That entry said it "has no obvious home, since `moderately aged` says
+  # nothing about strength" -- true when it was written and answered on
+  # 2026-08-29, when `blended overproof rum` was created and this file's own
+  # header named it as the bottle's home. It fails the 100% DDL rule the same
+  # way the other two Pusser's do, so it was never a Demerara overproof.
+  "Pusser's 151":
+    generic: "blended overproof rum"
+    aliases: ["Pussers 151", "Pusser's Navy Rum 151"]
   "Planteray Stiggins' Fancy":
     generic: "pineapple rum"
     aliases: ["Plantation Stiggins Fancy Pineapple rum",
@@ -301,6 +314,21 @@ bottles:
   "Van Osten Botanik Arrack":
     generic: "Batavia arrack"
     aliases: ["Van Osten"]
+  # THE ONE BOTTLE IN THIS FILE KEYED ON A CATEGORY RATHER THAN A LABEL, and it
+  # is declared rather than accidental. #782 said "Ceylon Arrack" with no brand;
+  # Helen's call, 2026-09-06, was to enter it as she wrote it rather than have a
+  # brand guessed onto her shelf. So this row means "the Ceylon arrack in the
+  # house, whichever it is" and the day the label is read off the bottle, this
+  # key is what changes -- the generic below is already right either way.
+  #
+  # Ceylon arrack is coconut flower sap and shares only a name with the Batavia
+  # above; `family_less` in ingredients.yml carries that and is why it has no
+  # family at all.
+  "Ceylon Arrack":
+    generic: "Ceylon arrack"
+    # No aliases: the key differs from the generic only in case, and matching
+    # here is case-insensitive, so one would be the same string twice.
+    aliases: []
 
   # --- the Martinique agricoles, 2026-08-30 ---------------------------------
   # Named by Helen for the Martinique Swizzle, one per reason: JM for the
@@ -918,6 +946,52 @@ bottles:
     generic: "cranberry juice"
 
 # =============================================================================
+# SIPPING -- the bottles that are not here to be mixed. #782, 2026-09-06.
+# =============================================================================
+# HELEN'S OWN RESERVATION ABOUT THE NAME, RECORDED BECAUSE SHE ASKED FOR THE
+# SECTION ANYWAY: "the name of which is a little against my religions because
+# you can sip anything plus I can mix whatever I damn well want... but this
+# section would help me keep track of my collection a bit."
+#
+# SO IT IS A SHELF, NOT A RULE, and nothing in the site treats it as one. It
+# gates no search, excludes no drink and forbids no pour. Its whole job is the
+# second half of that sentence: knowing what is in the house.
+#
+# A PLAIN LIST OF NAMES, WITH NO `generic`, AND THAT IS HELEN'S CALL RATHER THAN
+# A SHORTCUT. Asked on 2026-09-06 where the three aged Barbadians should sit --
+# Foursquare Shibboleth, Foursquare Indelible and Doorly's 14 are all well past
+# what `moderately aged rum` describes, and no other category exists -- she
+# chose to leave them out of `bottles:` for now rather than have a category
+# invented for them or be squeezed into the wrong one. The same then goes for
+# the rest of the list, so it stays one list rather than two mechanisms.
+#
+# WHICH MEANS THESE ARE NOT BOTTLES AS FAR AS THE REST OF THE SITE IS CONCERNED.
+# No generic, so no card ever names one; no row in abv.yml or costs.yml, and
+# none is wanted, because nothing can pour what nothing can reference. The
+# reference page prints this list and that is the whole of its reach.
+#
+# SEVERAL OF THEM HAVE OBVIOUS CATEGORIES AND COULD MOVE UP whenever Helen wants
+# them mixable -- the three clairins are `clairin`, El Dorado 21 is a 100%-DDL
+# `aged Demerara rum`, and both La Favorites are `rhum agricole blanc`. Moving
+# one is a two-line edit: an entry in `bottles:` above, and the name deleted
+# from here. Do NOT do it on inference; the categories are hers to apply
+# (see `hers_to_apply` in ingredients.yml, and #542).
+#
+# HER ORDER, FROM THE ISSUE, and it is not alphabetical: the clairins together,
+# then the Barbadians, then the Demerara, then the two Martiniquais.
+sipping:
+  - "Clairin Vaval"
+  - "Clairin Vaval Ansyen 41 Months Single Cask Ex Cognac"
+  - "Clairin Casimir"
+  - "Clairin Casimir aged"
+  - "Foursquare Shibboleth"
+  - "Foursquare Indelible"
+  - "Doorly's 14"
+  - "El Dorado 21"
+  - "La Favorite Plaisance Canne Bleue Récolte 2024"
+  - "La Favorite La Digue 2023"
+
+# =============================================================================
 # QUALIFIES, DELIBERATELY NOT REACHED FOR -- the reason attached, as family_less
 # =============================================================================
 not_reached_for:
@@ -966,8 +1040,8 @@ not_reached_for:
     to, but it looks like it's hard to get and I'll need to figure out my drinks
     in another way." So the "wanted counts as reached-for" clause is gone with
     it, and this list means what it always meant: what she would POUR. It leaves
-    `overproof Demerara rum` with no bottle behind it, which two drinks still
-    ask for -- pic-a-de-crop-punch, whose 360 ml was the single largest pour of
+    `overproof Demerara rum, lightly aged` with no bottle behind it, which
+    two drinks still ask for -- pic-a-de-crop-punch, whose 360 ml was the single largest pour of
     any bottle in the collection, and zombie-intoxica. Both are hers to rework.
   "Lemon Hart 151": >-
     Clears the Demerara appellation and is out anyway. Helen, 2026-08-27: "I
@@ -976,12 +1050,6 @@ not_reached_for:
     what she would POUR, not what would be permitted. Port-au-Prince still names
     it as its `item`; the substitution it wants is Planteray OFTD, which crosses
     a category and therefore wants a note (#534).
-  "Pusser's 151": >-
-    Fails the 100% DDL rule the same way the other two Pusser's do, so it was
-    never a `Demerara, overproof` -- and unlike them it has no obvious home,
-    since `moderately aged` says nothing about strength. Named only inside
-    Swizzle's prose suggestion, which is being rewritten anyway. Give it a
-    category if a drink ever genuinely wants it.
 
 # =============================================================================
 # SUGGESTION STRINGS THAT DO NOT NAME A BOTTLE -- known, and failing on purpose

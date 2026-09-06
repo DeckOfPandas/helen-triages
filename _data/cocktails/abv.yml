@@ -137,6 +137,9 @@ bottles:
   "Flor de Caña Extra Dry":           { abv: 40,   confidence: medium }
   "Planteray 3 Stars":                { abv: 41.2, confidence: medium }
   "Planteray O.F.T.D.":               { abv: 69,   confidence: high }
+  # In the house since 2026-09-06, #782. 75.5% is the published strength and
+  # has been for decades -- the "151" is the US proof, which is the figure.
+  "Pusser's 151":                     { abv: 75.5, confidence: high }
   "Planteray Stiggins' Fancy":        { abv: 40,   confidence: high }
   "Malibu":                           { abv: 21,   confidence: high }
 
@@ -175,6 +178,12 @@ bottles:
   "Leblon":                           { abv: 40,   confidence: high }
   "Velho Barreiro":                   { abv: 39,   confidence: medium }
   "Van Osten Botanik Arrack":         { abv: 42,   confidence: medium }
+  # THE FIGURE MOVED HERE FROM `generics:` on 2026-09-06, because #782 put a
+  # bottle under `Ceylon arrack` and a generic may not be priced in two places
+  # (test_no_generic_gets_its_strength_from_two_places). The number is the same
+  # 33 the generic row carried, and it is no better founded for having moved.
+  "Ceylon Arrack":                    { abv: 33,   confidence: low,
+                                        qq: "Ceylon arrack runs 33 to 40 depending on the house, and this row is keyed on the words in #782 rather than a label. Which bottle is it, and what does it say?" }
 
   # --- whisky ------------------------------------------------------------
   # 100 US proof = 50%. NOT 57 -- see Wood's above, and the header.
@@ -358,8 +367,7 @@ generics:
   tomato liqueur:         { abv: 20,   confidence: low,
                             qq: "No idea what bottle this is -- it is one pour and it needs your label." }
   Swedish flaggpunsch:    { abv: 26,   confidence: medium }
-  Ceylon arrack:          { abv: 33,   confidence: medium }
-  overproof Demerara rum: { abv: 57,   confidence: medium }
+  overproof Demerara rum, lightly aged: { abv: 57,   confidence: medium }
   pineapple vodka:        { abv: 37.5, confidence: low,
                             qq: "An infusion? If it is homemade the strength is the base spirit's, minus a little." }
   tawny port:             { abv: 20,   confidence: high }

@@ -52,6 +52,13 @@
 // its three cloned parts (.drink-card-name, .drink-card-ingredients,
 // .drink-card-moods) are styled by rules cards already defines.
 @import "cocktails/universe";
+// The reference layer (#529). AFTER cocktails/cocktail, which is where
+// `overlapping-rule-double`'s two section-heading colours are chosen for this
+// site and where `.cocktail-suggestion`'s woowoo is argued -- this file borrows
+// both rather than restating them, so it reads after the file it agrees with.
+// It has no other ordering constraint: nothing else on the site emits a `.ref-`
+// or `.rum-` class.
+@import "cocktails/reference";
 // Print, last -- see shared/_print.scss's header for why last, and why all
 // three stylesheets take it rather than just the one whose pages prompted it
 // (#86).

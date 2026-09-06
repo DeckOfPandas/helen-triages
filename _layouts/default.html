@@ -274,12 +274,28 @@
        uses throughout.
     {% endcomment %}
     <div class="site-footer-top">
+      {% comment %} A LINK MAY BE LOCAL-ONLY, and the column is drawn from what
+         SURVIVES the filter rather than from what is declared -- #529,
+         2026-09-06. A page that is `published: false` has no URL in
+         production, so a footer pointing at it is a 404 in the one place that
+         matters; `local_only: true` on the entry in _data/sites.yml is what
+         keeps the two halves in step.
+
+         `show_local_reference_links` is declared only by _config_local.yml,
+         the same idiom as show_costs / show_units / show_drafts. Filtering
+         BEFORE the emptiness test is the whole of it: a site whose only
+         reference page is local-only draws no column at all in production,
+         rather than a bracketed word with nothing under it. {% endcomment %}
       {% for entry in site.data.sites %}
       {% assign ref_site = entry[1] %}
-      {% if ref_site.reference_links %}
+      {% assign ref_links = ref_site.reference_links %}
+      {% unless site.show_local_reference_links %}
+        {% assign ref_links = ref_links | where_exp: "l", "l.local_only != true" %}
+      {% endunless %}
+      {% if ref_links and ref_links.size > 0 %}
       <nav class="site-footer-ref" aria-label="{{ ref_site.title }} reference">
         <span class="site-footer-ref-word">[ {{ ref_site.word }} ]</span>
-        {% for link in ref_site.reference_links %}
+        {% for link in ref_links %}
         <a href="{{ link.url | relative_url }}">{{ link.text }}</a>
         {% endfor %}
       </nav>
