@@ -319,6 +319,58 @@
     return n;
   }
 
+  /* WHICH MOOD VALUES BELONG TO WHICH SECTION -- #695. Read once from the
+     buttons, because the section is a fact about the MARKUP (which
+     `.drink-filter--hassle` a button sits in) and not about the drink.
+
+     MOOD AND HASSLE ARE TWO QUESTIONS SHARING ONE Set. `state.moods` holds the
+     selections from both sections, and that is right -- they are ORed together
+     and a drink matching either survives. But it means `moodScore` cannot tell
+     "answers both of my questions" from "answers one of them twice", and those
+     are not the same drink. */
+  var MOOD_VALUES = null;
+  var HASSLE_VALUES = null;
+
+  function sectionValues() {
+    if (MOOD_VALUES) return;
+    MOOD_VALUES = {};
+    HASSLE_VALUES = {};
+    moodBtnsIn(false).forEach(function (b) { MOOD_VALUES[b.dataset.mood] = true; });
+    moodBtnsIn(true).forEach(function (b) { HASSLE_VALUES[b.dataset.mood] = true; });
+  }
+
+  /* How many of the mood SECTIONS this drink answers: 0, 1 or 2.
+     Helen's ruling on #695, 2026-09-06: "extend the ranking, keep the
+     narrowing" -- all filter hits first, then fewer.
+
+     IT ONLY EVER CHANGES THE ORDER WHEN BOTH SECTIONS ARE ASKED, and that falls
+     out rather than being special-cased. If only MOOD has selections then every
+     survivor answers it (they survived `matches`), so every survivor scores 1
+     and the tie falls through to moodScore exactly as before. Ask both, and a
+     drink answering `sharp` AND `no juicing` comes above one answering `sharp`
+     and `aperitivo` -- which is the sense in which it has more of what you
+     asked for.
+
+     WHY NOT COUNT THE OTHER SECTIONS TOO, which is what "every filter that
+     matched" sounds like. Because they cannot discriminate: HAS TO HAVE, LEAVE
+     OUT, YOLO and the name search all NARROW, so by the time a drink is in this
+     list it satisfies every one of them and they score identically for
+     everybody. Mood is the only OR section on the page, so it is the only place
+     a rank has anything to rank. Counting the rest would add four constants to
+     every comparison. */
+  function sectionScore(d) {
+    if (!state.moods.size) return 0;
+    sectionValues();
+    var mood = false;
+    var hassle = false;
+    d.moods.forEach(function (m) {
+      if (!state.moods.has(m)) return;
+      if (HASSLE_VALUES[m]) hassle = true;
+      else if (MOOD_VALUES[m]) mood = true;
+    });
+    return (mood ? 1 : 0) + (hassle ? 1 : 0);
+  }
+
   function matches(d) {
     /* SHORTLISTED -- #546, and first because it is the cheapest test here and
        the most narrowing one anybody turns on: one lookup against a list that
@@ -568,7 +620,19 @@
       var ok = matches(d);
       d.card.hidden = !ok;
       if (ok) shown++;
-      ranked.push({ card: d.card, ok: ok, score: ok ? moodScore(d) : -1, key: d.key });
+      ranked.push({
+        card: d.card,
+        ok: ok,
+        /* TWO SCORES, COARSE FIRST -- #695. `sections` is how many of the two
+           mood questions this drink answers and `score` is how many individual
+           moods; the sort below reads them in that order, so "answers both
+           questions" beats "answers one twice" and the old ordering survives
+           inside each band. -1 for a hidden card keeps it below every visible
+           one without a second test. */
+        sections: ok ? sectionScore(d) : -1,
+        score: ok ? moodScore(d) : -1,
+        key: d.key
+      });
 
       /* The card answers "why am I here" in the colour of the control that put
          it there. Both are cleared and re-applied on every pass rather than
@@ -600,8 +664,14 @@
       paintNameHighlight(d);
     });
 
+    /* THE ORDER OF THESE FOUR LINES IS THE FEATURE. Visible before hidden;
+       then how many of the mood QUESTIONS were answered (#695); then how many
+       individual moods; then the card's fixed random key, which is what keeps
+       a band shuffled rather than alphabetical and keeps that shuffle stable
+       across keystrokes. */
     ranked.sort(function (a, b) {
       if (a.ok !== b.ok) return a.ok ? -1 : 1;
+      if (a.sections !== b.sections) return b.sections - a.sections;
       if (a.score !== b.score) return b.score - a.score;
       return a.key - b.key;
     });
