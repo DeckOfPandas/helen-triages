@@ -69,10 +69,20 @@ permalink: /cocktails/
      template equivalent of the dead selector it went with. {% endcomment %}
   {% assign card_names = site.data.cocktails.ingredients.card_names %}
   {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
-  {% comment %} #580: things a card never mentions. Bare `water` and nothing
-     else today -- see the list's own reasoning in ingredients.yml. EXACT
-     membership, which is what `contains` gives on a Liquid list, because
-     `soda water` is a real choosing fact and only the bare word is not.
+  {% comment %} #580 and #640: things a card never mentions. TEN ENTRIES since
+     2026-09-06 -- bare `water` was the only one for a fortnight, and #640 added
+     the bare sugars, the bare salt, the zest and the honey. See the list's own
+     reasoning in ingredients.yml, which is where the judgement lives.
+
+     EXACT MEMBERSHIP, which is what `contains` gives on a Liquid list, and it
+     is the whole of Helen's caveat: `soda water` is a real choosing fact and
+     only the BARE word is not. The same distinction keeps every syrup on the
+     card while `white sugar` comes off it.
+
+     READ BY THE PLUGIN, NOT HERE, since the card's ingredient line moved to
+     _plugins/cocktail_card_ingredients.rb. This assignment survives because
+     the template still hands the list to nothing -- it is kept as the one place
+     a reader looking at the template can see that such a list exists at all.
      {% endcomment %}
   {% assign not_on_cards = site.data.cocktails.ingredients.not_on_cards %}
 

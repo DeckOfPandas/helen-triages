@@ -18,12 +18,24 @@
 // box, and the foot is taken out of flow and pinned to the bottom.
 //
 // THE COST IS CLAMPING AND IT IS NOT AVOIDABLE. Content that does not fit is
-// cut rather than allowed to push: two lines each for the tagline and the
-// ingredient line, two rows of mood chip. A rigid grid buys its rigidity with
-// clamping, and the alternatives are a card whose height varies with mood count
-// (which unpins every anchor on it) or no moods on cards at all. Helen named
-// the trade before I did: "it's a shame to lose the card proportion but I can't
-// think of another way."
+// cut rather than allowed to push. A rigid grid buys its rigidity with clamping,
+// and the alternatives are a card whose height varies with its content (which
+// unpins every anchor on it) or no moods on cards at all. Helen named the trade
+// before I did: "it's a shame to lose the card proportion but I can't think of
+// another way."
+//
+// THE NUMBERS THIS USED TO QUOTE HAVE ALL MOVED, so they are not quoted here any
+// more -- each lives on the rule that sets it, where changing one cannot leave
+// this paragraph behind. It said "two lines each for the tagline and the
+// ingredient line, two rows of mood chip" while all three of those were false:
+// as of 2026-09-06 it is THREE lines of ingredients (#552), up to THREE rows of
+// mood chip, and the tagline is not on the card at all (#512, a fortnight ago).
+//
+// WHERE THE THIRD INGREDIENT LINE CAME FROM belongs here, because it is the one
+// place the fixed height nearly failed: the foot used to stack its chips ABOVE
+// the ship and reserve both on every card, whether or not the chips filled the
+// space. Laying them side by side returned 23px to the body without touching
+// $card-height. See `.drink-card-foot`.
 //
 // $card-text-x IS THE SINGLE SOURCE OF THE TITLE'S LEFT EDGE. The glass column
 // is exactly that wide, and the body, the foot and the under-mark all start
