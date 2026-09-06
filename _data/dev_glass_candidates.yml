@@ -11,19 +11,26 @@
 # option or a reject, kept because the losers are the evidence for the
 # choice that was made.
 - absinthe
+- absinthe-2
 - brandy
+- coconut
+- coconut-4
 - collins
-- collins-2
+- collins-4
 - coupe
 - coupe-2
 - coupe-3
+- coupe-4
 - flute
 - goblet
+- goblet-2
 - highball
 - hot-toddy
+- hot-toddy-2
 - hurricane
 - hurricane-2
 - julep-cup
+- julep-cup-3
 - margarita
 - martini
 - mule-mug
@@ -35,11 +42,17 @@
 - pineapple-1
 - pineapple-2-bad-trace
 - pineapple-3
+- pineapple-4
+- pineapple-8
 - punch-bowl
 - sherry
+- sherry-2
 - shot
 - sling
 - sour
+- sour-2
+- tiki-9
 - tiki-mug
 - tiki-mug-2
+- tiki-mug-3
 - wine
