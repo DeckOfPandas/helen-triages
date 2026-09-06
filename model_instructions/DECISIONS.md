@@ -913,17 +913,18 @@ unless stated.
   rather than exempting anything. Pusser's 151 and Ceylon Arrack are declared as
   real bottles; Pusser's 151 does **not** fill #750's `overproof Demerara rum`
   hole, being a Guyana/Trinidad blend.
-- **2026-09-06, #701** — **`bottles.yml` spells La Favorite three ways wrong,
-  found when #786's `sipping:` list landed beside the existing entries.** The
-  three declared bottles are keyed `La Favourite Rhum Agricole Blanc`,
-  `La Favourite L'Authentique Ambré` and `La Favourite Cœur de Canne`; the two
-  new sipping entries say `La Favorite`. Helen's standing instruction is that
-  **`Favorite` is correct — *"my mistyping, please always correct"*** — so the
-  three keys are the wrong ones, and the fix is her usual shape: rename, keep
-  the old spelling as an alias. Same class as `Ophir`/Opihr and `Amaro
-  Ciociano`/Ciociaro, and the same rename cascade into `abv.yml`, `costs.yml`
-  and any drink's `suggestion:`. **Not done here**: it is #701's pass, and the
-  file was being edited by another session at the time.
+- **2026-09-06** — **`La Favorite`, no `u`, is a STANDING CORRECTION.** Helen:
+  *"Favorite is correct, my mistyping, please always correct."* The distillery
+  is Martinican and spells it the French way; `La Favourite` was hers and
+  reached the data before the correction did. Briefly visible as a
+  contradiction when #786's `sipping:` list landed spelling it correctly beside
+  three bottle keys spelling it wrongly — **fixed the same afternoon by #788**,
+  which renamed all three keys and **kept `La Favourite` as an alias on each**,
+  per this file's rename rule: a suggestion typed the British way must keep
+  resolving whether or not the drink that wrote it has been retyped. That is
+  the shape every one of these takes, and it is not a half-finished rename.
+  `Ophir`/Opihr and `Amaro Ciociano`/Ciociaro are the same class and are
+  **still outstanding**, under #701.
 
 ### §9.3.3 The drinks index's search
 
