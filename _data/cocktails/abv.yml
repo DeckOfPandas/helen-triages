@@ -52,15 +52,35 @@
 #   low     a genuine guess. OVERWRITE THESE FIRST.
 # A row that needs HELEN specifically -- not a better source, her bottle --
 # also carries `qq:` saying why. `grep -n 'qq:'` is the worklist. There are
-# SEVENTEEN, and every one is something I could not settle without the label on
-# her shelf: a rhum bottled at two strengths, a liqueur whose range spans 20
-# points, a bottle whose name does not match any product I could place.
+# ELEVEN, and every one is something no source settles: a rhum bottled at three
+# strengths, a bottle whose name matches no product I could place, a category
+# whose range spans 20 points.
 #
-#   TWO OF THE SEVENTEEN CANNOT CHANGE ANY NUMBER and are marked anyway. Both
+#   TWO OF THE ELEVEN CANNOT CHANGE ANY NUMBER and are marked anyway. Both
 #   Bob's bitters are only ever poured in dashes, and a dash never reaches the
 #   arithmetic (see the bitters block below). They are flagged because the day
 #   one of them is poured in millilitres is not the day to discover the strength
 #   was a guess -- but they can be ignored while the drinks stay as they are.
+#
+# IT WAS SEVENTEEN UNTIL THE WEB PASS, 2026-09-06. Helen's instruction was
+# "knowledge first, web only for the doubtful ones", and the web half settled
+# six -- three of them by CORRECTING a figure rather than confirming it, which
+# is the argument for having done it:
+#
+#   Suze                            15 -> 20    the UK bottle is 20; Europe is 15
+#   Clairin Communal              53.5 -> 43    `Communal` is the four-village
+#                                               BLEND, not a single clairin
+#   Gabriel Boudier Creme de Menthe 18 -> 21
+#   Rhum JM Blanc                     50        confirmed (the 55 is a second
+#                                               product, not this one)
+#   Opihr                             40        confirmed
+#   Amaro Ciociaro                    30        confirmed
+#
+# TWO SPELLING FAULTS SURFACED WITH THEM and are NOT fixed here: bottles.yml
+# says `Ophir` where the product is Opihr, and `Amaro Ciociano` where it is
+# Ciociaro. Both are naming questions and belong to #701, which is about one
+# declared name per bottle; correcting them in this file alone would make the
+# two disagree.
 #
 # NO WEB SOURCE WAS USED FOR THE `high` ROWS, and that is a difference from
 # costs.yml worth stating plainly. These are from knowledge, not from a search
@@ -129,17 +149,25 @@ bottles:
   "Damoiseau Rhum Agricole Blanc 40°": { abv: 40,  confidence: high }
   "Damoiseau Rhum Agricole Blanc 50°": { abv: 50,  confidence: high }
   "Damoiseau Rhum Agricole Blanc Pure Cane": { abv: 40, confidence: low,
-                                        qq: "Damoiseau's Pure Canne is bottled at both 40 and 50 depending on market." }
+                                        qq: "Damoiseau's bartender line runs 40, 50 AND 55, and `Pure Canne` is its own product on top of that. The label is the only answer." }
   "La Favourite Rhum Agricole Blanc": { abv: 50,   confidence: medium }
   "La Favourite Cœur de Canne":       { abv: 50,   confidence: medium }
   "La Favourite L'Authentique Ambré": { abv: 45,   confidence: medium }
-  "Rhum JM Blanc":                    { abv: 50,   confidence: medium,
-                                        qq: "JM bottles the blanc at 50 and at 55. See also #702 -- the bare alias `JM`." }
+  # 50 CONFIRMED. JM does bottle a 55 as well, but the product simply called
+  # `Rhum Agricole Blanc` is the 50 -- rested six months and reduced with Mt
+  # Pelee spring water before bottling. (#702's question about the bare alias
+  # `JM` is untouched by this: that is about WHICH BOTTLE a drink means, not
+  # about how strong either of them is.)
+  "Rhum JM Blanc":                    { abv: 50,   confidence: high }
   "Rhum JM Ambré":                    { abv: 45,   confidence: medium }
   "Trois Rivières Cuvée de l'Océan":  { abv: 42,   confidence: high }
   "Barbancourt 3 Star":               { abv: 43,   confidence: high }
-  "Clairin Communal":                 { abv: 53.5, confidence: medium,
-                                        qq: "Clairin is a village spirit and the strength moves batch to batch; the label is the only answer." }
+  # 43, NOT 53.5, AND THE WORD `COMMUNAL` IS THE WHOLE POINT. A single-village
+  # clairin -- Sajous, Vaval, Casimir -- really does run into the fifties and
+  # move batch to batch, which is where the old guess came from. `Communal` is
+  # the BLEND of four of them, deliberately made approachable, and it is bottled
+  # at a flat 43%. Ten points, on a spirit poured neat.
+  "Clairin Communal":                 { abv: 43,   confidence: high }
   "Rhum Clément Créole Shrubb":       { abv: 40,   confidence: high }
 
   # --- cachaça and arrack ------------------------------------------------
@@ -167,8 +195,11 @@ bottles:
   "Hayman's Old Tom":                 { abv: 41.4, confidence: high }
   "Rutte":                            { abv: 43,   confidence: medium }
   "Portobello Road":                  { abv: 42,   confidence: high }
-  "Ophir":                            { abv: 40,   confidence: medium,
-                                        qq: "Reading this as Opihr Oriental Spiced, which is 40. Confirm the spelling and the bottle." }
+  # 40 CONFIRMED for Opihr Oriental Spiced, which is what this is. THE SPELLING
+  # IS STILL WRONG IN bottles.yml -- the product is Opihr, not Ophir -- and that
+  # is a naming question for #701 rather than a strength one, so it is noted
+  # here and not fixed here.
+  "Ophir":                            { abv: 40,   confidence: high }
 
   # --- agave -------------------------------------------------------------
   "Patrón Silver":                    { abv: 40,   confidence: high }
@@ -234,15 +265,19 @@ bottles:
   "Briottet Crème d'Abricot":         { abv: 18,   confidence: medium }
   "Briottet Crème de Cacao Blanc":    { abv: 25,   confidence: medium }
   "Briottet Crème de Menthe Blanche": { abv: 21,   confidence: medium }
-  "Gabriel Boudier Crème de Menthe":  { abv: 18,   confidence: low,
-                                        qq: "Boudier bottle a 18 and a 24 crème de menthe." }
+  # 21, matching the Briottet blanche above it -- the crème de menthe category
+  # is tighter than the guess of 18 assumed.
+  "Gabriel Boudier Crème de Menthe":  { abv: 21,   confidence: high }
   "Briottet Crème de Violette":       { abv: 16,   confidence: medium }
   "Gabriel Boudier Crème de Banane":  { abv: 25,   confidence: medium }
 
   # --- amari and bitter aperitivi ----------------------------------------
   "Fernet Branca":                    { abv: 39,   confidence: high }
-  "Suze":                             { abv: 15,   confidence: medium,
-                                        qq: "Suze is 15 in France and 20 in some export markets." }
+  # 20, NOT 15, AND THE UK IS WHY. Suze is 15% across the rest of Europe and
+  # 20% in Britain -- it was relaunched here at the higher strength, which is
+  # the liqueur's own older figure. This file had 15 from general knowledge and
+  # the web pass corrected it: a third of a unit on every 25 ml pour.
+  "Suze":                             { abv: 20,   confidence: high }
   "Liquore Strega":                   { abv: 40,   confidence: high }
   "Bénédictine D.O.M.":               { abv: 40,   confidence: high }
   "Galliano L'Autentico":             { abv: 42.3, confidence: high }
@@ -300,8 +335,10 @@ generics:
   Becherovka:         { abv: 38,   confidence: high }
   Grand Marnier:      { abv: 40,   confidence: high }
   Amaro Nonino:       { abv: 35,   confidence: high }
-  Amaro Ciociano:     { abv: 30,   confidence: medium,
-                        qq: "Reading this as Amaro Ciociaro, which is 30." }
+  # 30 CONFIRMED for Paolucci Amaro Ciociaro, bottled at 30% since 1873. The
+  # spelling in the collection is `Ciociano`; like Opihr above, that is #701's
+  # question and not this file's.
+  Amaro Ciociano:     { abv: 30,   confidence: high }
 
   # --- genuinely a category, no bottle declared yet ----------------------
   Plymouth:               { abv: 41.2, confidence: high }
