@@ -289,9 +289,19 @@ bottles:
   "La Favorite L'Authentique Ambré":
     generic: "rhum agricole vieux"
     aliases: ["La Favourite L'Authentique Ambré"]
+  # THE BARE "JM" ALIAS WENT ON 2026-09-06 (#702). Both JM bottles are stocked,
+  # in DIFFERENT generics, and `JM` is the obvious thing to type for either --
+  # so it was never another way of writing the ambré, it was a way of writing
+  # either, resolving to whichever came first. Cobra Effect was the one drink
+  # writing it, and was right only by coincidence of category; it names the
+  # bottle outright now. `JM` on a bottle photo is exactly what a future ingest
+  # will transcribe, so a loud failure against
+  # `test_every_suggested_bottle_resolves` is the wanted behaviour, not a gap.
+  # Not added to `unresolved_suggestions`: no drink says it, so the staleness
+  # guard would rightly call such an entry a debt already paid.
   "Rhum JM Ambré":
     generic: "rhum agricole vieux"
-    aliases: ["JM Rhum Agricole ambre", "JM"]
+    aliases: ["JM Rhum Agricole ambre"]
   "Barbancourt 3 Star":
     generic: "rhum agricole vieux"
     aliases: ["Barbancourt Three Star rum", "Barbancourt 3-star rum"]
@@ -418,11 +428,23 @@ bottles:
   # not serve both drinks that pour the brand, and it silently mistyped one:
   # La Fée Noir Punch asks for `Old Tom` and carried a QQ note saying the
   # suggestion crossed a category. Helen confirmed the source pours Hayman's
-  # Old Tom. Fog Cutter names "Hayman's London Dry Gin" outright and Minty
-  # Pentones writes the brand bare, so the bare form stays an alias of the dry.
+  # Old Tom. Fog Cutter names "Hayman's London Dry Gin" outright.
+  #
+  # THE BARE "Hayman's" ALIAS WENT ON 2026-09-06 (#701, #702), AND THIS IS THE
+  # `JM` CASE, NOT THE `Velvet` ONE. Two Hayman's are stocked, in DIFFERENT
+  # generics, so the bare brand is not another way of writing one of them -- it
+  # is a way of writing either, and assigning it to the dry was a guess wearing
+  # an alias's clothes. Minty Pentones was the only drink writing it bare and
+  # was right by coincidence of category; it now names the bottle outright,
+  # which removed the alias's last stated reason. An alias that outlives the
+  # spelling justifying it is the rot recorded against Ron del Barrilito.
+  # A future bare "Hayman's" now fails loudly against
+  # `test_every_suggested_bottle_resolves`, which is what we want. It is NOT
+  # added to `unresolved_suggestions`: no drink says it, so the staleness guard
+  # one block down would correctly call that entry a debt already paid.
   "Hayman's London Dry":
     generic: "London dry gin"
-    aliases: ["Hayman's", "Hayman's London Dry Gin"]
+    aliases: ["Hayman's London Dry Gin"]
   "Hayman's Old Tom":
     generic: "Old Tom"
     aliases: ["Hayman's Old Tom Gin"]

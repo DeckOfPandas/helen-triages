@@ -2633,6 +2633,71 @@ def test_unresolved_suggestions_has_no_stale_entries():
     )
 
 
+def test_every_suggestion_is_the_declared_bottle_name():
+    """A `suggestion` IS the declared name, not merely something that resolves
+    to it -- #701, Helen's ruling of 2026-09-06: "full declared name everywhere".
+
+    WHY RESOLUTION IS NOT ENOUGH, AND WHY THIS IS A SEPARATE TEST.
+    `test_every_suggested_bottle_resolves` passes on `Havana 3` forever, because
+    `Havana 3` is a declared alias of `Havana Club 3 year old`. That is the
+    point of aliases and it is right for INPUT -- a person typing into the
+    ingredient search should reach the bottle however they spell it. It is wrong
+    for STORED DATA, for two reasons Helen weighed directly:
+
+      1. A `suggestion` RENDERS VERBATIM on the drink page. El Presidente used
+         to read "(ED3 or Havana 3)". The field is what you shop by, so the
+         collection was showing shorthand where it meant a product.
+      2. Using aliases to repair source data means an alias can never be
+         removed without silently changing what a drink says -- so the alias
+         table stops being a convenience and becomes load-bearing.
+
+    THE ALIASES STAY, and this test is why they can. Once the data says the
+    declared name everywhere, an alias is free to serve search alone, which is
+    the job it was written for (#529: "'wray and nephew' and 'wray & nephew'
+    should both collapse onto the latter").
+
+    THE PASS THIS GUARDS. 48 suggestion strings across 33 drinks were retyped on
+    2026-09-06 -- `Havana 3` (x7), `El Dorado 3` (x6), `Appleton 8` (x4),
+    `Velvet`, `Gosling's`, `JM`, `Hayman's` and the rest. Without this test the
+    next ingest reintroduces them one at a time and nothing notices, because
+    every one of them resolves.
+
+    A STRING THAT RESOLVES TO NOTHING IS NOT THIS TEST'S BUSINESS -- that is the
+    test above, which reports it properly. This one only fires where the right
+    answer is known, so its message can always name the exact rename.
+    """
+    data = _bottles()
+    index = _bottle_index(data)
+    declared = set(data.get("bottles") or {})
+    exempt = {k.strip().lower() for k in (data.get("unresolved_suggestions") or {})}
+    exempt |= {k.strip().lower() for k in (data.get("not_reached_for") or {})}
+
+    drifted = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            suggestion = item.get("suggestion")
+            for name in (suggestion if isinstance(suggestion, list)
+                         else [suggestion] if suggestion else []):
+                key = str(name).strip().lower()
+                if name in declared or key in exempt:
+                    continue
+                canonical = index.get(key)
+                if canonical and canonical != name:
+                    drifted.append((slug, str(name), canonical))
+
+    assert not drifted, (
+        f"{len(drifted)} suggestion(s) name a bottle by an alias rather than by "
+        f"its declared name:\n  "
+        + "\n  ".join(f"{slug}: {written!r} -> {canonical!r}"
+                      for slug, written, canonical in sorted(drifted))
+        + "\n\nA suggestion renders verbatim on the drink page, so this is what "
+          "the reader shops by. Write the declared name; the alias stays in "
+          "bottles.yml for the SEARCH to use."
+    )
+
+
 def test_the_bottle_index_is_exercised():
     """Some ingredient in the collection actually carries a suggestion.
 
