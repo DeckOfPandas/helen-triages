@@ -181,6 +181,14 @@ PARTIAL_IN_CI = {
     # actually lives, since tidy-up passes happen there. Kept running anyway:
     # the published half is the half that ships. See its docstring.
     "test_no_agent_commit_claims_helens_rewrite",
+    # #711's staleness guard. It sweeps recipes, drafts and the magic bag for
+    # the notes NOTE_EXCEPTIONS claims to exempt. In CI the drafts are absent,
+    # so an exemption naming a DRAFT's note would look stale and the test would
+    # fail -- except that the one declared entry names a published recipe, which
+    # CI does have. Kept running for that reason: the check is real in CI for
+    # every exemption that matters, and an entry pointing at a draft would be
+    # caught locally, where the drafts pass that created it was run.
+    "test_no_note_exception_is_stale",
 }
 
 

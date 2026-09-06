@@ -494,6 +494,90 @@ def degreeless_temperatures(text: str) -> list[str]:
     return DEGREELESS_TEMPERATURE.findall(text)
 
 
+# --- notes are sentences -----------------------------------------------------
+# #711, Helen 2026-09-06: "notes should always start with a capital letter and
+# end with a full stop", and she asked for the test before the fix.
+#
+# THE RULE ALREADY EXISTED FOR ONE FIELD. `test_method_step_notes_are_sentences`
+# in test_style.py has held method-step notes to it since long before this, with
+# the same two clauses. #711 is that rule reaching the fields it always should
+# have: the drink/recipe-level `notes:` list and the per-ingredient `note:`.
+# Shared from here rather than copied, the same reasoning as SHARED_TYPOGRAPHY.
+#
+# LEADING PUNCTUATION IS SKIPPED BEFORE THE CAPITAL IS LOOKED FOR, because the
+# strict form gets three real notes wrong and every one of them is correct
+# English:
+#
+#     '00' flour can be swapped for strong white bread flour.   toms-flatbread-dough
+#     'Spoon' here means tablespoon ish.                        chocolate-cake-in-a-mug
+#
+# A quoted term opening a sentence is not a missing capital, and `'00'` is not
+# capitalisable at all. So the test looks at the first character that could
+# CARRY a case, and a digit satisfies it.
+#
+# A QQ NOTE IS NOT PROSE AND IS NEVER CHECKED. It is an ingest placeholder
+# addressed to Helen, written by an agent, and `is_qq` already knows the shape.
+# Holding machine annotations to a copy rule would be enforcing house style on
+# something that is not in the house voice and is meant to be deleted.
+#
+# AN ELLIPSIS IS A CONTINUATION AND IS DELIBERATE -- see NOTE_EXCEPTIONS below.
+_NOTE_LEADING = "\"'“‘‘’([`*"
+
+
+def note_is_a_sentence(text: str) -> bool:
+    """A note starts with a capital (or a digit) and ends with . ! or ?"""
+    s = (text or "").strip()
+    if not s:
+        return True
+    if not s.endswith((".", "!", "?")):
+        return False
+    head = s.lstrip(_NOTE_LEADING)
+    if not head:
+        return False
+    first = head[0]
+    return first.isdigit() or not first.isalpha() or first.isupper()
+
+
+def note_problems(text: str) -> list[str]:
+    """Which of the two clauses a note fails, for the assertion message."""
+    s = (text or "").strip()
+    if not s:
+        return []
+    out = []
+    head = s.lstrip(_NOTE_LEADING)
+    if head and head[0].isalpha() and not head[0].isupper():
+        out.append("no capital")
+    if not s.endswith((".", "!", "?")):
+        out.append("no full stop")
+    return out
+
+
+def notes_of(fm: dict) -> list[tuple[str, str]]:
+    """(where, text) for every human-written note on a recipe or a drink.
+
+    TWO SHAPES, because the two collections write notes differently: food's
+    `notes:` is a list of strings, a drink's is a list of `{label, text}`. Both
+    reach this as plain text. Method-step notes are NOT here -- they have their
+    own older test, and folding them in would make one failure report two
+    unrelated fields.
+    """
+    out = []
+    for note in fm.get("notes") or []:
+        if isinstance(note, dict):
+            if is_qq(note.get("label")) or is_qq(note.get("text")):
+                continue
+            out.append(("notes", str(note.get("text") or "")))
+        else:
+            if is_qq(note):
+                continue
+            out.append(("notes", str(note)))
+    for item in fm.get("ingredients") or []:
+        if isinstance(item, dict) and item.get("note") and not is_qq(item["note"]):
+            out.append((f"ingredient {item.get('generic') or item.get('item') or '?'}",
+                        str(item["note"])))
+    return out
+
+
 def unquoted_scalars(fm_text: str, fields) -> list[str]:
     """`['title: Beef Wellington', ...]` for each bare scalar among `fields`.
 

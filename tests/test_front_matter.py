@@ -694,7 +694,10 @@ HELEN_CLEARED: dict[str, str] = {
     "_food_recipes/macarons.md":
         "2026-08-21 -- en-dash pass, `130-140°C` in a method step.",
     "_food_recipes/miso-salmon-veg-traybake.md":
-        "2026-08-21 -- en-dash pass, `11-14 mins` in a method step.",
+        "2026-08-21 -- en-dash pass, `11-14 mins` in a method step. "
+        "ALSO 2026-09-06 -- #711, one full stop added to a note ('...for "
+        "drizzling at the end.'); Helen's explicit one-off, see the block at "
+        "the foot of this dict.",
     "_food_recipes/peanut-butter-cookies.md":
         "2026-08-21 -- en-dash pass, `8-12 mins` in a method step.",
     "_food_recipes/roast-beef-fillet.md":
@@ -721,6 +724,34 @@ HELEN_CLEARED: dict[str, str] = {
     "_food_recipes/chocolate-ganache.md":
         "2026-09-04 -- copywriting review; Helen's own rewrite of the tips and "
         "troubleshooting, read on the rendered page and signed off in words.",
+
+    # --- the #711 full stops, 2026-09-06 --------------------------------------
+    #
+    # TWO RECIPES, AND THE ENTIRE CHANGE IS ONE FULL STOP EACH. #711 is Helen's
+    # rule that a note ends with one; these two notes did not.
+    #
+    #   miso-salmon-veg-traybake   "...for drizzling at the end" -> "end."
+    #   pancetta-white-bean-stew   "...straight from frozen"     -> "frozen."
+    #
+    # The flags were flipped to false with the edit, as the rule requires, and
+    # Helen then directed them back by name and in words, 2026-09-06: "Explicit
+    # direction as a one-off: flip the proofread flag back on miso salmon and
+    # pancetta white bean. Life is too short."
+    #
+    # SHE IS CLEARING THE CHANGE, NOT THE RULE. The one-off is about these two
+    # full stops, and it is exactly the case the paragraph at the top of this
+    # block describes -- a change small enough for her to hold in her head from
+    # its description, named file by file so nothing else rides along. Do not
+    # read it as permission to clear the next agent edit without asking.
+    #
+    # miso-salmon-veg-traybake ALREADY HAD AN ENTRY from the en-dash pass, so
+    # its reason is extended rather than duplicated: a stale reason on a live
+    # exemption is the rot the staleness guards elsewhere in this suite exist to
+    # catch, and this dict has no such guard.
+    "_food_recipes/pancetta-white-bean-stew.md":
+        "2026-09-06 -- #711, one full stop added to a note ('...straight from "
+        "frozen.'). Helen's explicit one-off: 'flip the proofread flag back on "
+        "miso salmon and pancetta white bean. Life is too short.'",
 }
 
 

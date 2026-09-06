@@ -47,8 +47,8 @@ import yaml
 import drafts_schema
 from conftest import (
     SHARED_TYPOGRAPHY, accent_problems, accented_words, checkable_text,
-    degreeless_temperatures, is_qq, number_range_hits, spelling_problems,
-    unquoted_scalars,
+    degreeless_temperatures, is_qq, note_is_a_sentence, note_problems, notes_of,
+    number_range_hits, spelling_problems, unquoted_scalars,
 )
 
 # Suite marker, so `pytest -m cocktails` can run this half alone.
@@ -2630,6 +2630,71 @@ def test_unresolved_suggestions_has_no_stale_entries():
         + "\n\nThe work is done -- delete the line. This block records LIVE "
           "problems, and a spent entry reads as outstanding while also "
           "exempting the string for whoever writes it next."
+    )
+
+
+def test_every_suggestion_is_the_declared_bottle_name():
+    """A `suggestion` IS the declared name, not merely something that resolves
+    to it -- #701, Helen's ruling of 2026-09-06: "full declared name everywhere".
+
+    WHY RESOLUTION IS NOT ENOUGH, AND WHY THIS IS A SEPARATE TEST.
+    `test_every_suggested_bottle_resolves` passes on `Havana 3` forever, because
+    `Havana 3` is a declared alias of `Havana Club 3 year old`. That is the
+    point of aliases and it is right for INPUT -- a person typing into the
+    ingredient search should reach the bottle however they spell it. It is wrong
+    for STORED DATA, for two reasons Helen weighed directly:
+
+      1. A `suggestion` RENDERS VERBATIM on the drink page. El Presidente used
+         to read "(ED3 or Havana 3)". The field is what you shop by, so the
+         collection was showing shorthand where it meant a product.
+      2. Using aliases to repair source data means an alias can never be
+         removed without silently changing what a drink says -- so the alias
+         table stops being a convenience and becomes load-bearing.
+
+    THE ALIASES STAY, and this test is why they can. Once the data says the
+    declared name everywhere, an alias is free to serve search alone, which is
+    the job it was written for (#529: "'wray and nephew' and 'wray & nephew'
+    should both collapse onto the latter").
+
+    THE PASS THIS GUARDS. 48 suggestion strings across 33 drinks were retyped on
+    2026-09-06 -- `Havana 3` (x7), `El Dorado 3` (x6), `Appleton 8` (x4),
+    `Velvet`, `Gosling's`, `JM`, `Hayman's` and the rest. Without this test the
+    next ingest reintroduces them one at a time and nothing notices, because
+    every one of them resolves.
+
+    A STRING THAT RESOLVES TO NOTHING IS NOT THIS TEST'S BUSINESS -- that is the
+    test above, which reports it properly. This one only fires where the right
+    answer is known, so its message can always name the exact rename.
+    """
+    data = _bottles()
+    index = _bottle_index(data)
+    declared = set(data.get("bottles") or {})
+    exempt = {k.strip().lower() for k in (data.get("unresolved_suggestions") or {})}
+    exempt |= {k.strip().lower() for k in (data.get("not_reached_for") or {})}
+
+    drifted = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            suggestion = item.get("suggestion")
+            for name in (suggestion if isinstance(suggestion, list)
+                         else [suggestion] if suggestion else []):
+                key = str(name).strip().lower()
+                if name in declared or key in exempt:
+                    continue
+                canonical = index.get(key)
+                if canonical and canonical != name:
+                    drifted.append((slug, str(name), canonical))
+
+    assert not drifted, (
+        f"{len(drifted)} suggestion(s) name a bottle by an alias rather than by "
+        f"its declared name:\n  "
+        + "\n  ".join(f"{slug}: {written!r} -> {canonical!r}"
+                      for slug, written, canonical in sorted(drifted))
+        + "\n\nA suggestion renders verbatim on the drink page, so this is what "
+          "the reader shops by. Write the declared name; the alias stays in "
+          "bottles.yml for the SEARCH to use."
     )
 
 
@@ -5930,6 +5995,73 @@ def test_drink_number_ranges_use_en_dashes(drink_file):
         f"{_drink_where(drink_file)} writes {len(hits)} number range(s) with a "
         f"hyphen: {sorted(set(hits))[:5]}. Ranges take an en dash -- 3–4 "
         f"dashes, 1–4 years old."
+    )
+
+
+# A KNOWN FAILURE WITH ITS REASON ATTACHED, the shape `unresolved_suggestions`
+# uses one file over: declaring it lets this test bite on the NEXT one instead
+# of being loosened. `test_no_drink_note_exception_is_stale` stops it outliving
+# the problem.
+DRINK_NOTE_EXCEPTIONS = {
+    # TRUNCATED MID-SENTENCE, on `tailspin`. "Not good with Brecon Botanicals
+    # or" — or what? The mechanical fix for #711 adds a full stop, and here that
+    # would turn an unfinished thought into a finished-looking one, which is a
+    # worse state than the one it is in. Helen's to finish; flagged 2026-09-06.
+    "Not good with Brecon Botanicals or":
+        "truncated mid-sentence — needs Helen, not a full stop",
+}
+
+
+def test_no_drink_note_exception_is_stale():
+    """A declared exception must still name a note some drink has.
+
+    The same rot `test_unresolved_suggestions_has_no_stale_entries` catches: an
+    exemption that outlives its note reads as an outstanding problem while
+    quietly exempting that exact string for whoever writes it next.
+    """
+    live = set()
+    for slug, fm in _load():
+        live.update((text or "").strip() for _, text in notes_of(fm))
+    stale = [note for note in DRINK_NOTE_EXCEPTIONS if note not in live]
+    assert not stale, (
+        f"{len(stale)} DRINK_NOTE_EXCEPTIONS entr(ies) name a note no drink has "
+        f"any more:\n  " + "\n  ".join(repr(s) for s in stale)
+        + "\n\nThe work is done -- delete the line."
+    )
+
+
+def test_drink_notes_are_sentences(drink_file):
+    """A note starts with a capital and ends with a full stop -- #711.
+
+    THE SAME RULE FOOD HAS, from the same two helpers in conftest, and the
+    drinks were where it actually bit: 103 of 125 human-written notes failed it
+    when Helen raised this, against 3 of 100 published recipes. Almost all of
+    them were a missing full stop on otherwise finished prose.
+
+    Helen, 2026-09-06, on how she wanted it done: "I'd prefer you add tests for
+    this then fix them for me!!!! Or flag if my copy is too garbled to fix."
+
+    A QQ NOTE IS NEVER CHECKED -- `notes_of` drops it. Those are ingest
+    placeholders addressed to her, written by an agent and meant to be deleted,
+    and holding a machine annotation to a copy rule would be enforcing house
+    voice on something that is not in it. That exemption is why this test sees
+    125 notes on 124 drinks rather than 201.
+
+    BOTH SHAPES OF NOTE ARE COVERED: the drink-level `notes:` list, whose
+    entries are `{label, text}` on this side, and the per-ingredient `note:`.
+    Method-step notes have their own older test in the food suite and are
+    deliberately not folded in.
+    """
+    _require_drink(drink_file)
+    problems = [
+        f"{where_note}: {text!r} ({', '.join(note_problems(text))})"
+        for where_note, text in notes_of(drink_file.fm)
+        if (text or "").strip() not in DRINK_NOTE_EXCEPTIONS
+        and not note_is_a_sentence(text)
+    ]
+    assert not problems, (
+        f"{_drink_where(drink_file)} has note(s) not styled as a sentence "
+        f"(capital letter, trailing full stop):\n  " + "\n  ".join(problems)
     )
 
 

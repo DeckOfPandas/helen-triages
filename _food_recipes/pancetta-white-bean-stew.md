@@ -45,7 +45,7 @@ notes:
   - label: "Undrained beans"
     text: "Bean starch thickens the stew so there's no need for flour or cream."
   - label: "magic parmesan"
-    text: "Parmesan rinds freeze well, and can be added straight from frozen"
+    text: "Parmesan rinds freeze well, and can be added straight from frozen."
 
 meta:
   rewritten: true

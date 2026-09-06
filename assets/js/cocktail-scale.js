@@ -271,6 +271,86 @@
     });
     fitAmountColumn(verdict.amounts);
     put(input, box(last));
+    batch(n);
+  }
+
+  /* THE BATCH NOTE -- #713, and Helen's request of 2026-09-06: "Bitters text
+     appearing next to the scaler if it's edited to >1. Cost and units on a
+     note."
+
+     IT SAYS TOTALS, AND THAT IS THE WHOLE REASON IT IS WORTH HAVING. The cost
+     line and the units line are both per glass, and both are invariant under
+     scaling -- see the long comment above about why `recost` was deleted. So a
+     note that repeated them would say exactly what the footer already says, two
+     inches further up the page. What neither line can tell you is what the
+     whole batch costs and how much alcohol is on the table, and that second
+     number is the one #545 exists for: Helen, of the units feature, "that isn't
+     as important as not poisoning my friends".
+
+     ONLY ABOVE x1, because at x1 the totals ARE the per-glass figures and the
+     footer is already saying them.
+
+     THE BITTERS LINE IS CONDITIONAL AND #720.1 IS WHY. A caveat was removed for
+     firing unconditionally -- Aperol Spritz, with no bitters in it, was warned
+     that its bitters would not scale, and "a caveat that fires where it does not
+     apply teaches you to stop reading caveats". The layout computes
+     `data-has-dashes` from the drink's own amounts. Helen specified the trigger
+     (>1) and not the condition; to put the line on every drink, drop the
+     `hasDashes` test here and the attribute in the layout.
+
+     ABSENT ELEMENTS ARE NORMAL, NOT A FAILURE. The cost and units lines are
+     gated on `show_costs` / `show_units`, which exist only in
+     _config_local.yml, so in production this element is not rendered at all and
+     `batchNote` is null. Each half is read independently, so a build with one
+     switch on and the other off says the half it knows. */
+  var batchNote = article.querySelector('.cocktail-scale-batch');
+  var costLine = article.querySelector('.cocktail-cost');
+  var unitsLine = article.querySelector('.cocktail-units');
+
+  function money(value) {
+    return '£' + value.toFixed(2);
+  }
+
+  function batch(n) {
+    if (!batchNote) return;
+    if (n <= 1) {
+      batchNote.hidden = true;
+      return;
+    }
+
+    var parts = [];
+
+    if (costLine) {
+      var lo = parseFloat(costLine.getAttribute('data-cost-min'));
+      var hi = parseFloat(costLine.getAttribute('data-cost-max'));
+      if (isFinite(lo) && isFinite(hi)) {
+        parts.push('roughly ' + (lo === hi
+          ? money(lo * n)
+          : money(lo * n) + '–' + money(hi * n)) + ' in ingredients');
+      }
+    }
+
+    if (unitsLine) {
+      var per = parseFloat(unitsLine.getAttribute('data-units-per-serve'));
+      var serves = parseFloat(unitsLine.getAttribute('data-serves')) || 1;
+      if (isFinite(per)) {
+        var total = per * serves * n;
+        parts.push('roughly ' + total.toFixed(1) +
+          (total === 1 ? ' unit' : ' units') + ' of alcohol in total');
+      }
+    }
+
+    var text = parts.length
+      ? '×' + n + ': ' + parts.join(', ') + '.'
+      : '';
+
+    if (batchNote.getAttribute('data-has-dashes') === 'true') {
+      text += (text ? ' ' : '') +
+        'Don’t scale bitters linearly — add to taste.';
+    }
+
+    batchNote.textContent = text;
+    batchNote.hidden = !text;
   }
 
   /* THE COST LINE DOES NOT MOVE WITH THE SCALER, AND THAT IS THE WHOLE RULE.

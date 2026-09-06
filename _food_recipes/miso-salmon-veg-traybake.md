@@ -49,7 +49,7 @@ method_short:
   - ""
 notes:
    - label: "the importance of drizzle"
-     text: "Making double the marinade leaves extra for drizzling at the end"
+     text: "Making double the marinade leaves extra for drizzling at the end."
 
 meta:
   rewritten: true

@@ -794,6 +794,53 @@ unless stated.
   syrup 2:1` where the files say `cane sugar syrup 2:1` — the right-hand side
   was never updated when the vocabulary gained the type, which is why #728's
   largest block reads as 43 open questions when it is 43 confirmations.
+- **2026-09-07, #594 / #593 — built, and the honey-water half of the entry above
+  was WRONG.** It says honey water "settles on the `2:1` form". Measuring the
+  five drinks on the bare generic showed they **contradict each other**, and one
+  of them settles itself: `chartreuse-daiquiri`'s own note reads *"Honey water is
+  equal parts honey and water"*, which is 1:1. Helen ruled the other four to 2:1
+  and that drink keeps its 1:1. **A ruling taken on a summary is only as good as
+  the summary** — this one would have overwritten a fact the drink already
+  stated, and the fix was to measure before applying rather than after.
+  - **Two QQ notes were citing a fact that does not exist.** `brown-derby` and
+    `green-flash` justified their 2:1 as *"taken from Airmail, which Helen typed
+    2:1 by hand"*. Airmail carries no ratio at all and has no notes. Deleted.
+  - **29 QQ notes named a generic no drink has.** They read `-> sugar syrup 2:1`
+    where every file says `cane sugar syrup 2:1`: the right-hand side was never
+    updated when the vocabulary gained the type. Rewritten, and verified by
+    parsing every drink afterwards — zero notes now claim a generic its drink
+    does not carry. **The check that found it generalises**: compare a note's
+    stated value against the file's actual data rather than reading the note.
+  - **`blue-hawaiian` and `georgetown-punch` had the arrow backwards.** *"Coconut
+    rum -> Malibu"*: the generic is `coconut rum`, which the source states and
+    which is not inferred at all, while Malibu is the `suggestion` and IS a
+    guess. The note hid the real inference behind a false one.
+  - **`demerara sugar syrup 2:1` was what `costs.yml` had assumed all along** —
+    its `basis` string already read `"demerara @ GBP 1.80/kg, 2:1"` while the
+    generic carried no ratio. The pricing was ahead of the vocabulary.
+  - **`honey water 1:1` had no price and no ABV row**, because nothing had ever
+    used it; `test_every_priceable_pour_has_a_price` and
+    `test_every_counted_pour_can_reach_a_strength` both caught it the moment
+    chartreuse-daiquiri moved. Priced at three quarters of 2:1 — the ratio is
+    honey:water, so 2:1 is two thirds honey against 1:1's half, and honey is all
+    of the cost.
+  - **A non-question I raised as a question, and the correction is the useful
+    part.** I asked Helen whether `turbinado sugar syrup 2:1` should join
+    taxonomy's `aged:` list, describing it as "a flavour mood" that would change
+    `sapins-swizzle`'s derived moods. **Both halves were wrong.** `aged:` is not
+    a mood at all — it is a `mood_ingredients` set feeding ONE mood, `strong
+    brown drink`, whose rule was rewritten on 2026-08-30 precisely to stop
+    firing on "a swizzle over crushed ice" and now reads *"nothing lengthens it
+    and it is not crushed, swizzled or blended"*. Sapins Swizzle is a swizzle,
+    and is the only drink pouring turbinado.
+    Helen's answer was the right one: *"Turbinado is just a sugar... It's just a
+    flat ingredient. Does this matter?"* **Measured rather than argued**: adding
+    turbinado to `aged:` and re-running `scripts/derive_cocktail_moods.py` gives
+    `124 drinks: 124 already agree, 0 differ` — identical to leaving it out. It
+    is in `sweet:` only, and that is correct.
+    **The lesson: run the derivation before asking whether a vocabulary change
+    moves a mood.** The script is committed, defaults to a dry run, and answers
+    in seconds; a question costs Helen more than the measurement does.
 - **2026-09-06, #781 over #780** — **Overproof first, in the generic and the
   card name both.** The two issues contradicted each other and needed a ruling:
   #780 said the card name *"can remain"* `Demerara overproof rum`, #781 said

@@ -301,7 +301,7 @@ mood_ingredients:
     - Amaro Nonino
     - Amaro Ciociano
     - Bénédictine
-    - demerara sugar syrup
+    - demerara sugar syrup 2:1
     - molasses sugar
     - raw sugar
 
@@ -417,7 +417,8 @@ mood_ingredients:
     # nothing and fails nothing.
     - cane sugar syrup 1:1
     - cane sugar syrup 2:1
-    - demerara sugar syrup
+    - demerara sugar syrup 2:1
+    - turbinado sugar syrup 2:1
     - honey
     # ALL THREE HONEY WATERS, and the flat one is the default -- Helen ruled one
     # flat generic on the afternoon of 2026-09-04 and put the two ratios back
