@@ -93,7 +93,15 @@ promotable the field went long ago. A fresh ingest still writes it, beside
 ## Where the rulings live
 
 - Bottles and their aliases, and the "a house is not a bottle" rule:
-  `_data/cocktails/bottles.yml`, HANDOVER §9.3.2.
+  `_data/cocktails/bottles.yml`, HANDOVER §9.3.2. **A bottle she no longer
+  reaches for is MOVED to `not_reached_for` with its reason, never deleted** —
+  five went that way on 2026-09-05 and the reasons are why nobody re-adds them.
+- **What things cost: `_data/cocktails/costs.yml`, HANDOVER §9.3.5.** Prices are
+  LOCAL-ONLY on the site (`show_costs` in `_config_local.yml`) but the data is
+  public, and it is the one file in `_data/cocktails/` that goes stale on its
+  own — `checked:` says when it was last true. **Retiring or renaming a bottle
+  means editing this file too**; `test_every_declared_bottle_carries_a_price`
+  fails in both directions if you forget.
 - Generics, syrups, honey water, the whole-fruit units: `_data/cocktails/ingredients.yml`.
 - Method steps and the automatic twist step: `_data/cocktails/methods.yml`.
 - **The ice and the rim: `_data/cocktails/serve.yml`** — a `serve` block on the

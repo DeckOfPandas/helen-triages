@@ -2543,6 +2543,18 @@ bottles to 130 — and were then moved to `suggestion`. Helen, shown the list:
 *"All those bottles should be in our collection (possibly with some names tidied
 up)."*
 
+**THREE OF THAT LIST DID NOT SURVIVE THE PRICE CHECK, and the count is 127 now.**
+Reading a price for each bottle is the first time anyone had gone through them
+one at a time, and it turned up things the harvest could not have known.
+**Anchor Junipiero** and **Ottoman 10 Year Tawny** went to `not_reached_for` —
+Helen priced twelve of my sixteen guesses and skipped exactly three: *"the three
+Lows I skipped, let's remove them from the collection please."* **Pierre Ferrand
+1840 was never a separate bottle at all** and is now an alias of
+`Pierre Ferrand Ambré`; the entry that declared it distinct said so confidently
+and was wrong about her shelf. See §9.3.5. That does not undo the paragraph
+above — the rescue was still right, and 23 bottles were still at stake — it
+means a harvest recovers NAMES and only a human confirms a COLLECTION.
+
 **The field had been hoarding, not holding.** A straight deletion would have
 destroyed all 23, and the plan of record said to delete. Anything that looks
 like a mechanical tidy over a field nothing renders deserves that check first.
@@ -3301,34 +3313,145 @@ strength is not what that category names."*
 **So `abv` belongs on the BOTTLE and only the bottle.** Which promotes bottle
 COVERAGE from a costing nicety to the actual blocker.
 
-**THE REAL WORK IS THE MISSING BOTTLES, NOT THE NUMBERS.** Measured 2026-09-05:
+**THE REAL WORK IS THE MISSING BOTTLES, NOT THE NUMBERS.** Re-measured
+2026-09-06, after the costings work of §9.3.5 moved several of these:
 
 | | |
 |---|---|
-| bottles declared | 130, **none carrying an `abv` field** |
-| pours naming a bottle | 247 of 685 |
-| categories in use with NO bottle | 78 of 154 |
-| **of those, ALCOHOLIC** | **33** |
+| bottles declared | 127, **none carrying an `abv` field** |
+| pours naming a bottle | 243 of 685 |
+| generics in use with NO bottle | 82 of 157 |
 
-The 33 are the ones that block units, because they carry alcohol and have
-nothing to hang a strength on: **champagne (10 pours), Campari (7), Chartreuse
-Verte (7), Chartreuse Jaune (5), orange bitters (5), Aperol (4), Grand Marnier
-(4), prosecco (3), tiki bitters (3)**, then Cynar, Jägermeister, aquavit, pisco,
-sloe gin, liqueur de sapin and seventeen more at one or two pours each. Adding a
-bottle for each comes FIRST; researching ~163 strengths is the easy half.
+**THE COSTING WORK ALREADY BUILT TWO OF THIS SECTION'S THREE PREREQUISITES**, so
+what is left here is genuinely only the strengths:
 
-**The remaining unknowns, all small and all Helen's:**
+- **`to top` is solved.** This section used to list "9 pours with no quantity"
+  as an open unknown. `costs.yml`'s `top_up_ml` now declares a range for
+  champagne, prosecco and soda water, because Helen asked for it for the
+  shopping list — see §9.3.5. Units can read the same block.
+- **The category fallback question is answered, and the answer was YES.** This
+  section used to say a `typical_abv` on a category is "a decision about what
+  the page is willing to CLAIM. Do not add it without asking." She was asked, in
+  the costing form, and chose the two-layer shape: a bottle's own figure where
+  one exists, a declared per-category figure where it does not. `costs.yml`'s
+  `generics:` block is that decision made once; an `abv` version of it needs no
+  fresh ruling, only the numbers.
+- **The delivery method is proven.** "Deliver the research as a table she checks,
+  with confidence flagged per bottle" is exactly what happened for prices, and
+  it worked: she corrected 15 of the first 16 flagged rows in two passes.
 
-- **"to top" — 9 pours with no quantity.** Only the champagne and prosecco ones
-  affect units; soda is 0%. One house figure settles all nine.
-- **A fallback for a pour naming no bottle.** A `typical_abv` on the category is
-  defensible ONLY as an approximation shown as a range, and it is a decision
-  about what the page is willing to CLAIM. Do not add it without asking.
-- **Dashes and drops** (84 pours) contribute little but not nothing — a dash of
-  Angostura is 44.7%.
+**What has NOT changed is the shape of the gap.** The alcoholic categories with
+no bottle still block units — champagne, Campari, both Chartreuses, Aperol,
+Grand Marnier, prosecco, Cynar, Jägermeister, aquavit, pisco, sloe gin, liqueur
+de sapin and the rest — and adding a bottle for each still comes first.
 
-**Deliver the research as a table she checks, with confidence flagged per
-bottle** — not as 163 questions, and not as 163 silent assertions.
+**Two categories LOST their only bottle on 2026-09-05 and are now on that list**:
+`overproof Demerara rum` (El Dorado 151) and `tawny port` (Ottoman 10 Year
+Tawny), both retired to `not_reached_for` at Helen's word. `añejo tequila` went
+the other way and gained its first two.
+
+**Dashes and drops** (84 pours) still contribute little but not nothing — a dash
+of Angostura is 44.7%. Note that COSTING excludes them by Helen's explicit
+ruling and UNITS may not want to; the two features share data, not policy.
+
+### 9.3.5 What a drink costs — #547, built 2026-09-05/06
+
+**LOCAL ONLY, AND AN INCIDENTAL.** Helen: *"I only want to show price on the
+locally built site, and only as an incidental — just somewhere on the recipe
+page."* So it renders one quiet sentence in the drink footer under the source
+line, and it renders **only** where `site.show_costs` is set — declared in
+`_config_local.yml` and nowhere else, the same idiom `show_drafts` uses. A
+production build emits no cost markup and no cost data at all; that is verified
+rather than assumed. **Never move the key into `_config.yml`.**
+
+The data is public in `_data/cocktails/costs.yml` either way. The gate governs
+what the SITE claims, not what the repo stores.
+
+**THE FILES.** `_data/cocktails/costs.yml` (all the numbers and every ruling
+behind them), `_plugins/cocktail_costs.rb` (all the arithmetic, once, at build),
+`_layouts/cocktail.html` (the footer line), `cocktails/index.html` +
+`assets/js/cocktail-index.js` (the shortlist prices), and the guards at the foot
+of `tests/test_cocktails.py`.
+
+**WHY A SEPARATE DATA FILE FROM `bottles.yml`.** A price is a different KIND of
+fact. The appellation rulings are invariant — Appleton 12 is a moderately-aged
+Jamaican for as long as the bottle exists — where a price is true on a day, in a
+shop, and goes stale with nobody editing anything. `checked:` is the file's
+honesty and is the field to distrust first when a total looks wrong.
+
+**TWO LAYERS, AND A POUR TAKES WHICHEVER ANSWERS.** A bottle's own price where
+the pour names one; a per-generic figure where it does not. Layer 2 is not a
+nicety: the four most-poured things in the collection are lime juice (58 pours),
+lemon juice (34), cane sugar syrup 2:1 (32) and pineapple juice (15), and not
+one of them will ever be a bottle. **Helen's original framing — "adding costs to
+each bottle in our dictionary" — would have priced about a third of each glass.**
+
+**`default_bottles` IS A PRICING FACT AND NEVER A SUGGESTION**, and the
+distinction is hers: *"Don't name these on the recipes, but you can note them as
+inputs to the default prices."* A `suggestion` is a claim about THIS DRINK
+(#441); "gin means Tanqueray unless I say otherwise" is a fact about her shelf.
+The block says which bottles a category is priced FROM, overriding "every bottle
+declared under it" — `London dry gin` went from £18–38 across six gins to a flat
+£22. A category not listed still spans all its bottles, which is the right
+default: breadth is an admission of not knowing.
+
+**WHAT IS NOT COUNTED, and it is a ruling not a shortcut.** Asked whether dashes,
+garnishes, muddled fruit and ice/salt/sugar should count, Helen: *"None of these
+come into the estimated cost. I'm catering for family, not running a bar."* So a
+pour counts only if its unit is a VOLUME — 585 of 685. The excluded list lives in
+`costs.yml`, not in the Ruby, so the rule and the data cannot disagree.
+
+**`to top` IS THE ONE EXCEPTION AND SHE ASKED FOR IT BACK**: *"We can calculate
+top volumes, well, slightly, can't we — I'd like that to be captured actually so
+it can be added into the shopping list feature."* `top_up_ml` declares a RANGE
+(topping is not measuring), and it exists for two consumers. **Only one of them
+uses it so far** — costing. `assets/js/shopping-list.js` still reports an
+unquantified pour as "to top (×3)"; spending the new figure there is open work.
+
+**A RANGE, AND IT FALLS OUT OF THE DATA.** Helen chose it over a single figure.
+A pour that names its bottle is a point, so a drink naming every bottle prints
+ONE figure — correct output, not a collapsed range. Squeezed juices reuse #546's
+own `juice_yields` rather than restating them, so a lime is priced from the fruit
+and the yield and comes out £6–15 a litre.
+
+**`cost.complete` — TWO DRINKS SHOW NOTHING, ON PURPOSE.** Where the excluded
+pours outnumber the priced ones, the figure is withheld rather than printed with
+a caveat: the Pear/Apricot Bellini is a pear, four apricots and 75 g of sugar
+cooked into a syrup, and the rule costs it at 7p. A number known to be wrong is
+worse than no number — the same judgement that deleted the millilitre box
+(§9.3.6-adjacent, `cocktail-scale.js`). The Caipirinha is the other.
+
+**THE FIGURE IS PER GLASS AND DOES NOT MOVE WITH THE SCALER.** Fixed 2026-09-06
+after shipping the opposite; Helen: *"When I scale, the price per glass you
+calculate needs to divide by the scaled number."* Multiply by n then divide by n
+is the identity, so the correct implementation is to leave the number alone. The
+first version multiplied, reasoning that cost is linear in volume — true, and an
+answer to a question the label was not asking. **A per-unit figure is invariant
+under scaling; only a total would move.** The same rule governs the shortlist:
+"2 Mai Tai @ £5.24" is two of a drink costing £5.24 each, read like a menu.
+
+**THREE THINGS THAT COST REAL TIME, worth not rediscovering:**
+
+- **Master of Malt returns HTTP 429 to every automated request** — product pages
+  and search alike. It is the source Helen prefers, so she reads it herself and
+  the agent applies what she sends. The Whisky Exchange, Tesco, Trolley and
+  PriceRunner all surface prices through web SEARCH RESULTS even where direct
+  fetching 403s.
+- **Apply her corrections by script against the parsed YAML, refusing on any
+  name not found or size that disagrees.** A silent miss leaves a guess sitting
+  there marked `confidence: high`, which is worse than the guess.
+- **A regex over this file will match the wrong block.** `  champagne:` exists in
+  both `top_up_ml` and `generics`, and a naive replace overwrote a top-up volume
+  with a price. Anchor on the block, or edit by hand.
+
+**THE PRICE-CHECK LOOP THAT WORKED.** Rank every bottle by SPEND — what the whole
+collection pours of it at the current price — and hand her that order with a
+confidence flag per row. She corrects the top and the totals are right; the
+bottom third moves nothing. Two rounds took the collection from 31 checked rows
+to 44, and from 16 guesses to none.
+
+**Median glass: £3.16–£3.39. 122 of 124 drinks show a figure; 79 are within 50p
+end to end.**
 
 ### 9.4 Decided 2026-08-16 — do not re-litigate
 

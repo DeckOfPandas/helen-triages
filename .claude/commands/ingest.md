@@ -342,6 +342,24 @@ Rewriting a method step into her voice. `incidental:`. The case-by-case tags
 on the page ends the same way. **Declaring a bottle in `bottles.yml`** from the
 ingredient beside it.
 
+**THE BOTTLE RULE IS ABOUT INFERENCE, NOT ABOUT TYPING.** What is banned is
+turning an ingredient into a bottle by deduction -- the drink says blanco
+tequila, so presumably she owns one. A bottle Helen NAMES is hers to add and
+always was: on 2026-09-05 she supplied "Rooster Rojo Tequila Anejo, Rooster Rojo
+Tequila Reposado, Patron Reposado, Patron Anejo -- all need diacritics", and
+those went straight in. Her spelling is the key, her unaccented forms become
+aliases, and the standing rule holds -- the drink keeps her spelling and the
+dictionary learns it, never the other way round.
+
+**REMOVING A BOTTLE IS ALSO HERS, AND IT IS A MOVE RATHER THAN A DELETE.** It
+goes to `not_reached_for` WITH the reason she gave, which is what stops a later
+pass re-adding it on noticing a thin category. Five went that way on 2026-09-05.
+
+**EITHER WAY, `_data/cocktails/costs.yml` MOVES WITH IT.** Every declared bottle
+carries a price and a size there, and
+`test_every_declared_bottle_carries_a_price` fails in BOTH directions -- a
+bottle with no price, and a price naming no bottle. See HANDOVER 9.3.5.
+
 **ONE EXCEPTION TO `meta.rewritten`, AND ONLY ONE:** a drink Helen has MOVED
 into `_cocktail_drafts/to-promote/`. The move is how she claims the words, so
 the mechanical pass flips `rewritten: true` there -- her standing instruction,
