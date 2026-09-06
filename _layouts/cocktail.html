@@ -471,12 +471,24 @@ layout: default
        or guessed is not a control, and the multiple box asks the same question
        in a form where every value you can type is one you can have.
 
-       MULTIPLES OF THE RECIPE AS WRITTEN — Helen, 2026-09-04. There is no
-       `serves:` field on a drink and this does not invent one: ×2 is twice what
+       MULTIPLES OF THE RECIPE AS WRITTEN — Helen, 2026-09-04. ×2 is twice what
        the page says. `min` and `step` are set here for a reader with no
        JavaScript-shaped opinion and RESET from the drink's own amounts by
        cocktail-scale.js, which is the only thing that knows what multiples this
        particular drink can be poured at.
+
+       THIS SAID "THERE IS NO `serves:` FIELD ON A DRINK AND THIS DOES NOT
+       INVENT ONE" UNTIL 2026-09-06, and half of that is now false: #297 added
+       `serves:` to nine drinks — the seven punch-bowl drinks, the mulled wine,
+       and the Modern Zombie whose own title says "makes 2".
+
+       THE OTHER HALF STILL HOLDS AND IS THE PART THAT MATTERED: this scaler
+       does not read it. ×2 is still twice the recipe as written, on a punch as
+       on anything else, because "how many does this make" and "how much am I
+       making" are different questions and only the second one is the multiple
+       box's. The units line in the footer reads `serves:`; nothing up here
+       does. See tests/test_cocktails.py's note beside TOP_LEVEL_KEYS for why
+       the field is deliberately narrow.
 
        `hidden` UNTIL THE SCRIPT REVEALS IT, the rule every JS-dependent control
        on both sites follows — see the shortlist button above, and

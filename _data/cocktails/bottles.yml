@@ -30,6 +30,14 @@
 # exactly this shape ("Blackwell is Jamaican, caramel forward"), which is what
 # settled it. #297 (ABV) sits on the same invariant side; `character` does not.
 #
+# THAT PREDICTION WAS TESTED ON 2026-09-06 AND HALF-KEPT. #297 shipped, and the
+# invariance claim held exactly: a bottle's strength is bottle-invariant in the
+# same way its category is. But the numbers live in `_data/cocktails/abv.yml`
+# rather than here, on costs.yml's argument -- 127 figures interleaved with 900
+# lines of appellation rulings cannot be reread or corrected without disturbing
+# prose that must not be disturbed. See abv.yml's own header; it argues the
+# point out rather than assuming it.
+#
 # THE LIST MEANS BOTTLES HELEN WOULD REACH FOR, NOT BOTTLES THAT QUALIFY.
 # Settled 2026-08-27 by the case that separates them: Lemon Hart 151 clears the
 # Demerara appellation and is deliberately absent, because "I don't like Lemon
