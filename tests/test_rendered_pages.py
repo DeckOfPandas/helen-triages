@@ -1469,3 +1469,398 @@ def test_the_cocktail_index_marks_and_styles_everything_it_lights_up(site):
           "HANDOVER §9.13 says a card must never be, and a candidate pool that "
           "marks nothing is issue #390 on the other index."
     )
+
+
+# --- a form control nobody gave a colour --------------------------------------
+#
+# #654. When the cocktails palette inverted, every element on the page took the
+# new colours for free through inheritance -- and the search inputs silently did
+# not. Typing into HAS TO HAVE produced BLACK TEXT ON A BLACK GROUND: invisible
+# rather than absent, with a green build and a green suite.
+#
+# WHY INHERITANCE IS NOT A ROUTE HERE. An `<input>` does not inherit `color`. It
+# takes the UA stylesheet's `fieldtext`, which is near-black whatever its
+# ancestors say. `background`, `font-family` and `font-size` behave the same way
+# on form controls: they are set, or they are not set.
+#
+# EVERY GUARD WE HAD LOOKED IN THE WRONG PLACE, which is the reason for a new one
+# rather than a wider old one:
+#   - test_every_class_we_emit_has_a_rule_in_the_stylesheet -- the class HAD a
+#     rule. It just was not a `color` one.
+#   - the contrast measurements -- they read colours they are handed, and nobody
+#     hands them a control whose colour is a UA default nobody wrote down.
+#   - test_every_published_page_links_a_stylesheet -- the page was fully dressed.
+#
+# IT WILL BITE AGAIN THE NEXT TIME ANYTHING INVERTS -- a dark mode (#636), a
+# print stylesheet, a themed section -- and the failure is always the same shape:
+# invisible text, green build. `color` only is the cheap version and is the right
+# first one.
+
+# Controls that put TEXT on the screen. A checkbox, radio, range or hidden input
+# paints no glyphs, so `color` is not what makes it visible and requiring one
+# would be noise. `file` is excluded because its label is browser chrome.
+TEXTLESS_INPUT_TYPES = {
+    "hidden", "checkbox", "radio", "range", "color", "file", "image", "reset",
+}
+
+FORM_CONTROL = re.compile(r"<(input)\b([^>]*?)/?>", re.I)
+# Buttons, selects and textareas WRAP their content, and the content is the
+# question -- see `_paints_text` below.
+WRAPPING_CONTROL = re.compile(
+    r"<(button|select|textarea)\b([^>]*)>(.*?)</\1\s*>", re.I | re.S)
+ATTR = re.compile(r"""(\w[\w-]*)\s*=\s*['"]([^'"]*)['"]""")
+
+
+def _paints_text(inner_html: str) -> bool:
+    """Does this control put glyphs on the screen?
+
+    THE TOGGLE TRACK IS WHY THIS EXISTS, and it was found by this test failing
+    on its first real run. `<button class="cocktail-toggle-track">` on every
+    drink page contains one empty `<span class="cocktail-toggle-knob">` and
+    nothing else: it is the SWITCH, drawn entirely in background and border, and
+    its accessible name comes from `aria-label`, which is never painted. Asking
+    it for a `color` is asking the wrong question, and a guard that reports a
+    control which cannot be invisible is a guard people learn to skip.
+
+    So: strip the tags and look for a real character. An `aria-label` is
+    deliberately NOT counted -- that is the point of the distinction.
+    """
+    return bool(re.sub(r"<[^>]*>", "", inner_html).strip())
+
+# A `color:` declaration, and not `background-color`, `border-color`,
+# `accent-color`, `caret-color` or a `--custom-color` property. The lookbehind is
+# what separates them, and getting it wrong in either direction makes this test
+# useless rather than merely wrong.
+COLOR_DECL = re.compile(r"(?<![-\w])color\s*:")
+
+
+def _rules(css: str):
+    """(selector, body) for every rule in a compiled stylesheet.
+
+    Good enough for this question and deliberately not a parser: at-rules like
+    `@media` wrap other rules, and this yields the inner ones with the outer
+    selector text attached to the first of them. That can only make the test
+    MORE forgiving, never less -- it never invents a `color` that is not there.
+    """
+    for match in re.finditer(r"([^{}]+)\{([^{}]*)\}", css):
+        yield match.group(1).strip(), match.group(2)
+
+
+def _colouring_selectors(css: str):
+    """Every selector whose rule declares an explicit `color`."""
+    return [sel for sel, body in _rules(css) if COLOR_DECL.search(body)]
+
+
+def _controls_on(html: str):
+    """(tag, id, classes, input_type) for every form control that paints text."""
+    out = []
+    for tag, attrs in FORM_CONTROL.findall(html):
+        a = dict(ATTR.findall(attrs))
+        itype = (a.get("type") or "text").lower()
+        # An input has no content to inspect, so the TYPE is the whole test: a
+        # text or number box displays what you type and a checkbox does not.
+        if itype in TEXTLESS_INPUT_TYPES:
+            continue
+        out.append(("input", a.get("id", ""), a.get("class", "").split(), itype))
+    for tag, attrs, inner in WRAPPING_CONTROL.findall(html):
+        if not _paints_text(inner):
+            continue
+        a = dict(ATTR.findall(attrs))
+        out.append((tag.lower(), a.get("id", ""), a.get("class", "").split(),
+                    (a.get("type") or tag).lower()))
+    return out
+
+
+def test_every_form_control_is_given_a_colour(site):
+    """A control whose colour nobody set is a UA default, and UA defaults are dark.
+
+    ASKED OF THE BUILT PAGES AND THE COMPILED CSS, because that is where the two
+    halves meet. The class existing in a partial and the rule existing in a
+    stylesheet are separately true and jointly insufficient -- the bug was that
+    nothing joined them.
+
+    THE MATCH IS DELIBERATELY GENEROUS: a control counts as coloured if ANY
+    colouring selector names its id, one of its classes, or its bare tag. That
+    over-accepts (a `.btn-tag` rule colouring one page's button satisfies
+    another page's) and it still catches the whole of #654, because the failing
+    control had no colouring rule anywhere at all. A stricter version needs a
+    cascade resolver, which is a different project.
+
+    `_dev/` IS OUT OF SCOPE. Those pages are `output: false` and never ship;
+    they are instruments, and #649 above is the guard that covers them.
+    """
+    pages = [p for p in sorted(site.rglob("*.html"))
+             if p.relative_to(site).parts[0] not in {"dev", "_dev"}]
+    assert pages, "the build produced no pages outside _dev/."
+
+    # One stylesheet read per sheet, not per page: 550+ pages share two.
+    cache = {}
+
+    def colouring_for(html):
+        # THE `?v=` CACHE-BUSTER IS WHY THIS DOES NOT ANCHOR ON `.css'`.
+        # _layouts/default.html links `...assets/css/cocktails.css?v=1788687397`,
+        # and a pattern requiring the quote straight after `.css` matched no
+        # page at all -- which this test's own "found nothing" assertion caught
+        # on its first run. Kept as a named group so the query string is dropped
+        # deliberately rather than by a rsplit that would also survive it.
+        link = re.search(
+            r"""href=['"][^'"]*assets/css/(?P<name>[^'"/?]+\.css)""", html)
+        if not link:
+            return None, None
+        name = link.group("name")
+        if name not in cache:
+            path = site / "assets" / "css" / name
+            cache[name] = _colouring_selectors(path.read_text(encoding="utf-8")) \
+                if path.exists() else []
+        return name, cache[name]
+
+    problems = []
+    seen = set()
+    checked = 0
+    for page in pages:
+        html = page.read_text(encoding="utf-8", errors="replace")
+        controls = _controls_on(html)
+        if not controls:
+            continue
+        sheet, selectors = colouring_for(html)
+        if selectors is None:
+            continue  # no stylesheet linked; a different test owns that
+        for tag, cid, classes, itype in controls:
+            key = (sheet, tag, cid, tuple(sorted(classes)), itype)
+            if key in seen:
+                continue
+            seen.add(key)
+            checked += 1
+            names = [f"#{cid}"] if cid else []
+            names += [f".{c}" for c in classes]
+            if any(any(n in sel for n in names) for sel in selectors):
+                continue
+            # Fall back to a bare-tag rule: `input, select { color: ... }`.
+            if any(re.search(rf"(^|[\s,>+~]){tag}([\s,.:\[]|$)", sel)
+                   for sel in selectors):
+                continue
+            where = page.relative_to(site)
+            label = f"#{cid}" if cid else (".".join(classes) or "(no class)")
+            problems.append(
+                f"<{tag} type={itype}> {label}  in {where}  ({sheet})"
+            )
+
+    assert checked, (
+        "No text-bearing form controls were found on any built page. The "
+        "site has lost its search boxes and buttons, or this scan has gone "
+        "stale -- and a scan that finds nothing passes."
+    )
+    assert not problems, (
+        "These form controls have no explicit `color` anywhere in the compiled "
+        "stylesheet -- not by id, not by class, not by tag. A control that is "
+        "not given one takes the UA stylesheet's near-black `fieldtext` "
+        "whatever its ancestors say, which is invisible on a dark ground and "
+        "makes no build or test go red (#654):\n  " + "\n  ".join(sorted(problems))
+    )
+
+
+def test_the_colour_declaration_pattern_does_not_count_background_color():
+    """The guard's own guard: `background-color` must not read as `color`.
+
+    If it did, this test would pass on the exact bug it exists to catch -- the
+    cocktails inputs had a background and no colour. The lookbehind is the whole
+    mechanism, and it is one character away from being wrong in either
+    direction.
+    """
+    assert COLOR_DECL.search("color: red")
+    assert COLOR_DECL.search("a { color:var(--x) }")
+    assert not COLOR_DECL.search("background-color: red")
+    assert not COLOR_DECL.search("border-color: red")
+    assert not COLOR_DECL.search("accent-color: red")
+    assert not COLOR_DECL.search("caret-color: red")
+    assert not COLOR_DECL.search("--brand-color: red")
+
+
+def test_paints_text_skips_the_switch_and_keeps_the_buttons():
+    """The refinement's own guard: over-skipping would empty the test silently.
+
+    `_paints_text` is the one place this test decides NOT to look at something,
+    which makes it the one place a mistake turns the whole guard green. It was
+    added because the toggle track is a real control that genuinely cannot be
+    invisible; it must not also excuse a button with words on it.
+    """
+    # The case that prompted it: the drink page's read/make switch.
+    assert not _paints_text('<span class="cocktail-toggle-knob"></span>')
+    assert not _paints_text("")
+    assert not _paints_text("   \n  ")
+
+    # Everything with a word in it still counts, however it is wrapped.
+    assert _paints_text("make it")
+    assert _paints_text('<span class="btn-label">clear</span>')
+    assert _paints_text('&times; clear')
+    assert _paints_text('deal again <span class="universe-again-icon">&#8635;</span>')
+
+
+def test_a_control_with_no_colouring_rule_is_reported():
+    """The whole guard, exercised against a stylesheet that does not colour it.
+
+    Without this, every part of the test could be broken at once -- the scan,
+    the selector match, the fallback -- and it would still pass on a repo where
+    everything happens to be coloured. This is the #654 bug in miniature: a
+    search input, a stylesheet that gives it a background and no colour.
+    """
+    css = ".drink-search-input { background: #000; border: 1px solid #333; }"
+    selectors = _colouring_selectors(css)
+    assert selectors == [], (
+        "a rule declaring only `background` was read as declaring `color`."
+    )
+
+    css_fixed = css + " .drink-search-input { color: #eee; }"
+    assert any(".drink-search-input" in s for s in _colouring_selectors(css_fixed))
+
+
+# --- a mark that is computed, carried, and then styled away -------------------
+#
+# #653. `cocktail-search.js` returns a `wordMatch` flag per candidate,
+# `cocktail-index.js` turns it into `.btn-pool--word-match`, and `_filters.scss`
+# gives that class a magenta underline. All three worked. One further rule,
+#
+#     .drink-search--exclude .btn-pool--word-match { text-decoration: none; }
+#
+# cancelled it for LEAVE OUT alone, so prefix matches were marked in one picker
+# and unmarked in the other for as long as that rule existed. Helen found it by
+# putting the two pools side by side with the same three letters typed -- which
+# is exactly how #390 was found on the food side, and #390's lesson is the one
+# that applies: "one code path" guarantees the same ANSWER and guarantees
+# nothing about what either picker DOES with it.
+#
+# WHY "DOES THE CLASS HAVE A RULE" CANNOT SEE THIS, and it is the general form
+# worth having: the class HAD a rule, and a later, more specific rule turning it
+# off. A guard asking whether a class is styled cannot see a rule that unstyles
+# it. That is why this reads the COMPILED CSS and resolves.
+#
+# SPECIFICITY, NOT SOURCE ORDER, IS WHAT DECIDES IT.
+# `.drink-search--exclude .btn-pool--word-match` is (0,2,0) and the bare
+# `.btn-pool--word-match` is (0,1,0), so a sectioned rule beats the base one
+# wherever it sits in the file. Reading "the last one wins" would get this right
+# by accident today and wrong the moment somebody moves a block.
+
+WORD_MATCH = ".btn-pool--word-match"
+PICKER_SECTIONS = ("drink-search--include", "drink-search--exclude")
+
+# `text-decoration` and its longhand. The mark is an underline; a shorthand
+# `text-decoration: none` and a longhand `text-decoration-line: none` cancel it
+# identically, and only one of the two was ever written here.
+DECORATION = re.compile(
+    r"(?<![-\w])text-decoration(?:-line)?\s*:\s*([^;}]+)")
+
+
+def _word_match_decoration(css: str):
+    """Effective text-decoration for the mark, per picker section.
+
+    Returns {section: value|None}. `None` means no rule in that section's
+    cascade says anything, so the base rule stands.
+    """
+    base = None
+    per_section = {name: None for name in PICKER_SECTIONS}
+
+    for match in re.finditer(r"([^{}]+)\{([^{}]*)\}", css):
+        selector, body = match.group(1).strip(), match.group(2)
+        if WORD_MATCH not in selector:
+            continue
+        decl = DECORATION.findall(body)
+        if not decl:
+            continue
+        value = decl[-1].strip()
+        sectioned = [s for s in PICKER_SECTIONS if s in selector]
+        if sectioned:
+            for name in sectioned:
+                per_section[name] = value
+        else:
+            base = value
+
+    return base, per_section
+
+
+def test_the_word_match_mark_survives_in_both_pickers(site):
+    """HAS TO HAVE and LEAVE OUT must both still paint the prefix-match mark.
+
+    Helen, 2026-09-02, settling it: "the chip underline rule should be the same
+    between has to have and leave out, namely that prefix matching of any word
+    gets the pink whereas substring matching does not."
+    """
+    css_path = site / "assets" / "css" / "cocktails.css"
+    assert css_path.exists(), "cocktails.css was not built."
+    css = css_path.read_text(encoding="utf-8")
+
+    assert WORD_MATCH in css, (
+        f"`{WORD_MATCH}` has no rule in the compiled cocktails stylesheet at "
+        f"all, so neither picker marks a word match. cocktail-index.js still "
+        f"emits the class."
+    )
+
+    base, per_section = _word_match_decoration(css)
+    assert base and base != "none", (
+        f"the base `{WORD_MATCH}` rule declares text-decoration "
+        f"{base!r}. The mark IS the underline; without it the class is emitted "
+        f"and paints nothing."
+    )
+
+    cancelled = [
+        f"{name}: text-decoration {value!r}"
+        for name, value in per_section.items()
+        if value is not None and value.strip() == "none"
+    ]
+    assert not cancelled, (
+        "One picker cancels the word-match mark that the other one shows. This "
+        "is #653 returning: the flag is computed, carried to the call site and "
+        "then styled away on one side, so the same three letters typed into "
+        "HAS TO HAVE and LEAVE OUT mark different chips.\n  "
+        + "\n  ".join(cancelled)
+    )
+
+
+def test_both_pickers_get_the_word_match_class_from_one_builder():
+    """The other half of #390's lesson: one answer, and one thing done with it.
+
+    The CSS test above catches the mark being styled away. This catches it never
+    being APPLIED to one pool -- which is the same bug entering by the other
+    door, and the door food's own guard watches.
+    """
+    js = (ROOT / "assets" / "js" / "cocktail-index.js").read_text(encoding="utf-8")
+    applications = re.findall(r"btn-pool--word-match", js)
+    assert applications, (
+        "cocktail-index.js no longer applies `btn-pool--word-match` anywhere, "
+        "so no chip in either picker is marked."
+    )
+    assert len(applications) == 1, (
+        f"`btn-pool--word-match` is applied in {len(applications)} places in "
+        f"cocktail-index.js. It was one shared builder, which is what made the "
+        f"two pickers agree; two call sites is how they start to differ. If "
+        f"this split on purpose, both sites need their own test."
+    )
+
+
+def test_the_decoration_resolver_sees_a_cancelling_rule():
+    """The guard's own guard, against the exact CSS that caused #653.
+
+    Without this the resolver could return `None` for everything and the test
+    above would pass on a stylesheet that cancels the mark in both pickers.
+    """
+    good = (".btn-pool--word-match { text-decoration: underline; }"
+            ".drink-search--exclude .btn-pool--word-match { color: #eee; }")
+    base, sections = _word_match_decoration(good)
+    assert base == "underline"
+    assert sections["drink-search--exclude"] is None
+
+    # The rule as it actually stood, and the reason the issue exists.
+    bad = good + (".drink-search--exclude .btn-pool--word-match "
+                  "{ text-decoration: none; }")
+    base, sections = _word_match_decoration(bad)
+    assert sections["drink-search--exclude"] == "none", (
+        "the resolver did not see a sectioned rule cancelling the mark."
+    )
+
+    # The longhand cancels identically and must not slip past.
+    longhand = good + (".drink-search--include .btn-pool--word-match "
+                       "{ text-decoration-line: none; }")
+    _, sections = _word_match_decoration(longhand)
+    assert sections["drink-search--include"] == "none"
+
+    # `text-decoration-color` is not the mark going away.
+    assert DECORATION.search("text-decoration-color: red") is None
