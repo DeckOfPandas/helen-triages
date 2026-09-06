@@ -1,6 +1,6 @@
 ---
 title: "Wagamama Teriyaki Sauce"
-tagline: "Great as a marinade, a garnish or a dip."
+tagline: "A marinade, a garnish or a dip."
 source: "Adapted from Feed Your Soul, Wagamama"
 source_type: book
 makes: "125 ml"
@@ -20,7 +20,7 @@ ingredient_groups:
     - amount: "2 tbsp"
       item: sake
 method:
-  - "Simmer the light soy sauce and sugar gently until dissolved, then continue simmering for about 5 mins until reduced and thickened."
+  - "Simmer the light soy sauce and sugar until dissolved, then simmer for 5 more mins until reduced and thickened."
   - "Stir in the dark soy sauce and sake, then cool."
   - "Use straight away."
 method_short:
