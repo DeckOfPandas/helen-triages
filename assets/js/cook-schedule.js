@@ -66,7 +66,7 @@
     return Math.round(mins / 5) * 5;
   }
 
-  /* "mins", never "min" -- HANDOVER §5. A numeric quantity takes the plural
+  /* "mins", never "min" -- MANUAL §5. A numeric quantity takes the plural
      form in both the metadata register (`mins`/`hrs`) and the prose one
      (`mins`/`hours`); only a bare English "a minute" stays singular, and
      there are none of those here. This emitted "45 min" and "2 hrs 5 min"

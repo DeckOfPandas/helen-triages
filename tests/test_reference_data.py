@@ -247,7 +247,7 @@ def test_doneness_levels_ascend(internal_temperatures, protein):
     then have LOOKED like coverage and been none at all: venison's spectra sit
     on `loin` and `haunch`, neither key matched, the lookup returned None, and
     the new parametrisation would have reported itself green while checking
-    nothing — the exact shape of failure HANDOVER §12 and tests/
+    nothing — the exact shape of failure MANUAL §12 and tests/
     test_suite_hygiene.py exist for. So there is no skip left in here: the
     spectra are found by walking, and an empty result is a failure.
     """
@@ -416,7 +416,7 @@ def test_no_method_produces_an_absurd_time(cooking_methods):
 
 
 def test_every_oven_temperature_says_fan(cooking_methods):
-    """House style is fan-only — HANDOVER §5, "°C always, FAN OVEN ONLY, never
+    """House style is fan-only — MANUAL §5, "°C always, FAN OVEN ONLY, never
     conventional or gas mark".
 
     The source page didn't follow it: three rows spelled out a fan/conventional
@@ -524,7 +524,7 @@ def test_every_method_has_a_short_outcome(cooking_methods):
 # it was the only consumer. The calculator that survives reads `methods` and
 # their own fields directly and never looks at `groups` or `columns` at all, so
 # the test would have gone on asserting that column names are renderable by a
-# template that no longer exists. Green forever, guarding nothing -- HANDOVER 12
+# template that no longer exists. Green forever, guarding nothing -- MANUAL 12
 # calls that the most dangerous failure mode here precisely because the symptom
 # IS the passing test.
 #
@@ -776,7 +776,7 @@ def test_a_method_step_naming_an_internal_temperature_is_wired_to_the_data():
 def test_temperatures_written_into_method_text_match_the_data(internal_temperatures):
     """A figure typed into a method step has to agree with the data behind it.
 
-    Front matter is never Liquid-templated (HANDOVER §4), so a temperature a
+    Front matter is never Liquid-templated (MANUAL §4), so a temperature a
     cook needs mid-step can only be typed by hand — which re-creates exactly the
     duplication internal_temperatures.yml was built to end. The compromise is
     the one this project already makes elsewhere: duplicate, and guard it.

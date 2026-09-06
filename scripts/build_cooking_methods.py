@@ -124,7 +124,7 @@ def clean(note):
 
 
 # --- oven temperatures: fan, always -------------------------------------------
-# House style is fan-only (HANDOVER §5). The source page doesn't follow it:
+# House style is fan-only (MANUAL §5). The source page doesn't follow it:
 # three rows spell out a fan/conventional pair, the other 63 give a bare figure
 # with no basis stated at all.
 #

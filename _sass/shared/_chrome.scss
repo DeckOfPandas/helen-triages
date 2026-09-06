@@ -200,7 +200,7 @@
 // declare a colour for it would have drawn it in inherited body text. It takes
 // the same $color-accent as the links above -- one accent for the chrome, which
 // is what made the hearts, the recipe title's rule and every cross-recipe link
-// read as one device on food rather than as three coincidences (HANDOVER 13.2).
+// read as one device on food rather than as three coincidences (MANUAL 13.2).
 .site-footer-hearts {
   color: $color-accent;
 }
@@ -234,7 +234,7 @@
   text-decoration: none;
   margin-bottom: $space-lg;
 
-  // Hue, not lightness. HANDOVER 12: at small sizes the eye reads hue, and a
+  // Hue, not lightness. MANUAL 12: at small sizes the eye reads hue, and a
   // grey going slightly darker grey is the no-op Helen has reported twice.
   &:hover,
   &:focus-visible,

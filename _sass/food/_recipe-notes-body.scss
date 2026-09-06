@@ -91,7 +91,7 @@
   // THE RULE THAT REPLACED IT IS NARROWER AND THIS FAILS IT. Plex Mono is for
   // numbers you act on, and a note label ("TIP", "MAKE AHEAD") is a word, not
   // a figure -- see food/_palette.scss's $font-label comment for the rule and
-  // HANDOVER §13.10.1 for the full history. It was the last label-shaped
+  // MANUAL §13.10.1 for the full history. It was the last label-shaped
   // consumer standing once the other four (category labels, filter tags,
   // badges, the recipe-title link) had already come back to Courier; this one
   // survived only because "recipe page, hands full" and "a number" happened to
@@ -112,7 +112,7 @@
 
 // --- Body Content (long-form prose via {{ content }}) -----------------------
 // A recipe's Markdown body below its front matter -- rare (one file as of
-// 2026-08-02, dark-chocolate-ganache.md, see HANDOVER_v26.md §4.1) but real.
+// 2026-08-02, dark-chocolate-ganache.md, see MANUAL.md §4.1) but real.
 //
 // Section headings in here are PEERS of INGREDIENTS/METHOD/NOTES, per
 // Helen's call 2026-08-02: "I can imagine TIPS and TROUBLESHOOTING being
@@ -222,7 +222,7 @@ article.recipe .recipe-body-content {
 
   // --- Reading width -----------------------------------------------------
   // THIS REVERSES A DELIBERATE EARLIER CALL, knowingly. Body content used to
-  // set max-width: none to match Method rather than Notes (HANDOVER_v26.md
+  // set max-width: none to match Method rather than Notes (MANUAL.md
   // §4.1, Helen's decision 2026-08-02) -- but that call was made when the only
   // question was which of two existing caps to copy, and "no cap" and "65ch"
   // look identical on Method, where a step is a short imperative that rarely
@@ -416,7 +416,7 @@ article.recipe .recipe-body-content {
     // $spacing-block-gap, not $space-lg: bigger than the gap between a name and
     // its own causes by enough to read as a level of hierarchy rather than as
     // 15% more air, which is the whole principle the named spacing scale is
-    // built on (HANDOVER §13.3).
+    // built on (MANUAL §13.3).
     gap: $spacing-block-gap;
 
     > li {
@@ -559,7 +559,7 @@ article.recipe .recipe-body-content {
   font-size: 1rem;
   letter-spacing: $letter-spacing-label;
   color: $color-text;
-  // Raised label-tape lettering (HANDOVER_v26.md §13.4.1). Stroke was
+  // Raised label-tape lettering (MANUAL.md §13.4.1). Stroke was
   // $stroke-light's flat 0.5px, i.e. 3.1% of this element's own 1rem -- same
   // swallowing problem the meta labels had, see food/_recipe-header.scss.
   //

@@ -262,7 +262,7 @@ def slug_for(title: str) -> str:
     sharing a head clause should collide and land as `-2`, Helen chose the
     whole title. `test_title_and_slug_dont_diverge` is still satisfied on a
     promoted recipe, because a slug holding every word holds the head clause's
-    words; and on a draft that test does not run at all (HANDOVER §11.0.3).
+    words; and on a draft that test does not run at all (MANUAL §11.0.3).
     """
     text = _fold(title.replace("’", "").replace("'", ""))
     return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", text)).strip("-")

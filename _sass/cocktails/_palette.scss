@@ -117,7 +117,7 @@ $color-grey-light:   #2c2c31;   // borders; L* 18.2 against the ground's 4.0
 // do like the green fairy absinthe-y green as our home colour" -- it carries
 // the card glass panels, the hover, the nav and footer chrome. Food does the
 // same thing with magenta, which is both $color-accent and $color-star-root,
-// and HANDOVER 13.2 calls those "one rhyme rather than four coincidences".
+// and MANUAL 13.2 calls those "one rhyme rather than four coincidences".
 //
 // THREE VALUES PER HUE, and mixing them up is the easy mistake:
 //   (bare)  the RULE. A vivid band under a heading. NEVER text -- most of
@@ -286,7 +286,7 @@ $color-luminous-lagoon-wash:  #1A3137;
 // rather than the long one through green, and gamut-clipped by pulling chroma
 // in so each step keeps its hue. The workings are in the commit that shipped
 // this. Neighbours are 15 to 21 dE apart (`scripts/palette_measure.py
-// --separation`), against the 10 that HANDOVER 9.13 sets as the bar -- and a
+// --separation`), against the 10 that MANUAL 9.13 sets as the bar -- and a
 // heading sits under its own name in words, so the bar does not even apply
 // here; it is cleared anyway.
 //
@@ -386,7 +386,7 @@ $color-mood-root:  $color-electric-absinthe-deep;
 
 // THE PLACEHOLDER THIS REPLACES WAS THE WEAKEST LINE IN THE FILE, and it said
 // so itself: $color-accent was $color-grey-mid, and the comment recorded that
-// grey-mid on grey-mid "is the lightness-only change HANDOVER 12 records as
+// grey-mid on grey-mid "is the lightness-only change MANUAL 12 records as
 // reading like nothing at all at footer size". Helen, 2026-08-19, asked
 // directly: "Cocktail styling is almost totally unstarted, so this doesn't
 // matter." It matters now, and a hue change rather than a lightness one is

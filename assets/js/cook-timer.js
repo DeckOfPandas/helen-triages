@@ -104,7 +104,7 @@
     /* THE SWAP, BEFORE ANYTHING ELSE. `protein` is undefined for the fish entry
        -- it is not in METHODS by design -- so every line below would throw on
        protein.label. Returning here is not an early-return-on-empty of the kind
-       HANDOVER §12 warns about: this is a different mode of the page, not an
+       MANUAL §12 warns about: this is a different mode of the page, not an
        absent value. */
     var showingFish = els.protein.value === FISH_KEY;
     if (els.calculator) els.calculator.hidden = showingFish;
@@ -139,7 +139,7 @@
            Relative rather than root-relative, deliberately: JS has no Liquid
            and so no `relative_url`, and a literal /food/... would drop the
            /helen-triages baseurl and 404 in production while working perfectly
-           on localhost -- the same trap HANDOVER §4 records for front matter.
+           on localhost -- the same trap MANUAL §4 records for front matter.
            `../` resolves against the current page's URL, baseurl included. */
         (protein.chart_anchor
           ? "<a href='../internal-temperatures/#" + protein.chart_anchor +

@@ -172,7 +172,7 @@ $saturation-tag-pill-bg-matched: 0.42;
 // Issue #193. Active filter buttons and matched recipe-row tags/badges get
 // their extra "selected" weight from a same-colour text stroke, because
 // font-weight: 900 already resolves to Bold with nothing heavier above it —
-// see HANDOVER §13.4.2 for the fuller writeup, including why this is NOT the
+// see MANUAL §13.4.2 for the fuller writeup, including why this is NOT the
 // punched-tape emboss effect (that stroke is a lighter colour than the
 // letter; this one is the same colour, purely for weight).
 //
@@ -235,7 +235,7 @@ $color-recipe-link-hover: $color-dazzling-dragonfruit;
 //
 // Magenta, and not a new hue, because magenta is ALREADY this site's one
 // "interactive / branded" colour -- it carries the title rule, the method
-// toggle, every cross-recipe link and $color-star-root, and HANDOVER 13.2 is
+// toggle, every cross-recipe link and $color-star-root, and MANUAL 13.2 is
 // explicit that those are one rhyme rather than four coincidences. Naming that
 // job out loud costs nothing and gives the shared chrome something to ask for
 // that is not "food's magenta".

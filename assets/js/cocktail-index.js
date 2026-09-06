@@ -655,7 +655,7 @@
      She had the diagnosis exactly right. `.drink-card-moods` caps at three chip
      rows and clips the rest, so on a chip-heavy drink the word that EXPLAINS
      why the card is here could be the one cut off -- which is the one job the
-     card's foot has (HANDOVER 9.13).
+     card's foot has (MANUAL 9.13).
 
      THE DOM MOVES, NOT THE `order` PROPERTY, and this is the reason: the
      separator dot is drawn by `.drink-card-mood + .drink-card-mood::before`,
@@ -752,7 +752,7 @@
          generic, the card name and the suggestion alike, so a card found by
          typing "El Dorado" prints no such words. Reading textContent here would
          leave it surviving the filter with nothing lit up: the card would be
-         unable to say why it was there, which is the one job HANDOVER §9.13
+         unable to say why it was there, which is the one job MANUAL §9.13
          gives it. And it is the SAME rule the filter used — Search.entryIsHit
          is matchesInclude — so a lit ingredient and a surviving card can never
          disagree about why. */
@@ -873,7 +873,7 @@
      DELEGATED ON THE LIST because there are ~370 chips across 125 cards, and
      because `apply()` re-ranks by reordering nodes — a listener bound per chip
      would have to be rebound every time the list changed, which is the class of
-     bug HANDOVER 12 records for `tagShapes()` on the food side.
+     bug MANUAL 12 records for `tagShapes()` on the food side.
 
      The chip's own `is-match` class is NOT toggled here. It is painted from
      state in apply(), which is what keeps it correct after `clear all`

@@ -185,7 +185,7 @@ def check_cocktail(path, fm, rep, ctx):
             if isinstance(s, str) and s.lower() not in ctx["bottles"]:
                 rep.add("BOTTLES THE SOURCE NAMES THAT bottles.yml DOES NOT KNOW",
                         repr(s), slug,
-                        why="HANDOVER 9.3.2 -- a bottle's category is NOT derived from\n"
+                        why="MANUAL 9.3.2 -- a bottle's category is NOT derived from\n"
                             "the ingredient beside it. Declare it, or leave it off until\n"
                             "you have poured it. Helen, 2026-08-31: \"I will update these\n"
                             "when I make the drinks, so QQ is right.\"")
@@ -341,10 +341,10 @@ def check_food(path, fm, rep, ctx):
         if str(fm.get(field) or "").strip() in ("", "QQ"):
             rep.add("TIMES THE SOURCE DID NOT STATE", f"{field}={fm.get(field)!r}", slug,
                     why="Left QQ deliberately -- `Estimated N mins` is banned outright\n"
-                        "(HANDOVER 5). Fill in from the source, or from cooking it.")
+                        "(MANUAL 5). Fill in from the source, or from cooking it.")
 
     # A BLANK `star_ingredient` IS NOT REPORTED, and the playtest is why. It
-    # fired on 118 drafts -- about a third, which is the rate HANDOVER §7
+    # fired on 118 drafts -- about a third, which is the rate MANUAL §7
     # documents as CORRECT ("~a quarter are legitimately blank"). §12 uses this
     # exact field as its worked example of a false finding: "be suspicious of
     # your own findings before reporting them -- check whether what you found is

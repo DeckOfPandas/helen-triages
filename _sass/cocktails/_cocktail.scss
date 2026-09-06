@@ -341,7 +341,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // shared/_base.scss by import order rather than by a second class.
 .cocktail-title-block {
   .drink-card-name {
-    // MATCHED TO FOOD'S `.recipe-title-text` — 2.2rem — HANDOVER §9.13 asked
+    // MATCHED TO FOOD'S `.recipe-title-text` — 2.2rem — MANUAL §9.13 asked
     // for the two sites' recipe titles to agree, and this is the tape's own
     // font-size doing that job now instead of the old bare h1's.
     //
@@ -1024,7 +1024,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // same 2.82 in the source renders as a visibly heavier line on a short-viewBox
 // glass than on a tall one, and the set stops looking like a set.
 //
-// This is the same trap HANDOVER §13.4.1 documents for -webkit-text-stroke and
+// This is the same trap MANUAL §13.4.1 documents for -webkit-text-stroke and
 // text-shadow on type — an absolute length applied across a range of sizes is a
 // range of different results — arriving in a different property. The fix here
 // is `vector-effect: non-scaling-stroke`, which makes stroke-width resolve in

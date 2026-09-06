@@ -1046,30 +1046,19 @@ ship_card_names:
 # right rather than silently absent.
 ship_unrated_word: "???"
 
-# NOTHING READS THIS ANY MORE, and it is kept deliberately rather than by
-# neglect. The card's goodness mark was a square tinted along this ramp until it
-# became a ship icon plus a word; `cocktails/index.html` says so at its own call
-# site, and no template, stylesheet or script mentions `ship_tints` today
-# (checked 2026-09-02, not assumed).
-#
-# IT IS KEPT BECAUSE THE SHAPE OF THE RAMP IS AN ARGUMENT, and #511 and #612
-# both want a goodness scale on the DRINK page, where these are exactly the
-# traps. It is deliberately NOT linear: `yes` and `oh gods yes` are both 100
-# because both mean "make this" -- the difference is enthusiasm, not decision --
-# so the whole range is spent on the gap that matters. `sure` and `meh` were 62
-# and 30 for one afternoon, and at 62 a `sure` was mistakable for a `yes` at a
-# glance, which is the one thing a scale exists to prevent.
-#
-# So: reach for these numbers when building that scale, and delete this block if
-# that scale is ever built on a different footing. A value nothing reads is only
-# safe while a comment says why it is here.
-ship_tints:
-  "not really": 0
-  "meh": 16
-  "sure": 42
-  "yes": 100
-  "oh gods yes": 100
-  "who knows": 0
+# `ship_tints` LIVED HERE UNTIL 2026-09-06 AND WAS RETIRED, NOT LOST. It was
+# the ramp the card's old tinted square filled along (`not really` 0, `meh` 16,
+# `sure` 42, `yes` 100, `oh gods yes` 100, `who knows` 0). The square became a
+# ship icon plus a word on 2026-09-02 and nothing read the numbers after that.
+# The block stayed for one reason: #511 and #612 wanted a graduated scale on
+# the DRINK page, and the ramp's SHAPE -- deliberately not linear, `yes` and
+# `oh gods yes` both full because both mean "make this" -- was the argument
+# that scale would need. Both issues closed on 2026-09-02 with the drink page
+# showing the rung WORD instead, on a different footing, which is exactly the
+# condition the old comment here set for deleting the block. The reasoning
+# survives in MANUAL §9.5 ("The goodness mark"), with the numbers. A value
+# nothing reads is only safe while a comment says why it is here, and there
+# was no longer a why. `test_every_ship_rung_has_a_tint` went with it.
 
 # =============================================================================
 # DELIBERATELY ABSENT

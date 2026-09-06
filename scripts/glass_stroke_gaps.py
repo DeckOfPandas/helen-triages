@@ -24,7 +24,7 @@ TWO LIMITS, AND THE SECOND IS THE SERIOUS ONE.
    equally be two tips that genuinely sit near each other. It flags; it does not
    diagnose. Look at the drawing.
 
-2. **IT IS AN END-TO-END SCAN, AND HANDOVER 9.13 RECORDS THAT THOSE MISS A WHOLE
+2. **IT IS AN END-TO-END SCAN, AND MANUAL 9.13 RECORDS THAT THOSE MISS A WHOLE
    CLASS OF FAULT.** Its words, from the 2026-08-31 pass: *"Measure ends against
    STROKES, not against other ends. The goblet's endpoints all met within 0.26
    units; its one fault was a line stopping 1.56 units short of the MIDDLE of

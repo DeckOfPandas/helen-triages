@@ -16,7 +16,7 @@
   // Flat hyphenation, not BEM __element -- matches every other nested class
   // on the site (e.g. .site-logo-word inside .site-logo). Renamed from
   // .badge-group__content/__meta 2026-08-10, the one BEM-element holdout
-  // in the whole codebase; see HANDOVER's CSS naming section.
+  // in the whole codebase; see MANUAL's CSS naming section.
   &-content {
     display: flex;
     flex-wrap: wrap;

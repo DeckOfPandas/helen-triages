@@ -46,7 +46,7 @@ a {
 // NAMES ITS TIER, 2026-09-02, RATHER THAN HARDCODING A COLOUR. This used to
 // read `-webkit-text-stroke: var(--emboss-stroke-w) $color-text;` directly --
 // $color-text rather than food's softer $color-label-stroke, because only the
-// nine palette-contract variables may be named here (HANDOVER §2.3), and the
+// nine palette-contract variables may be named here (MANUAL §2.3), and the
 // comment on that line said plainly that "in practice this colour is only ever
 // seen on a heading nobody has styled" and flagged a KNOWN GAP: such a heading
 // inside `.on-dark` would get a near-black stroke on a dark ground, because

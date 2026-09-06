@@ -23,7 +23,7 @@ WHAT THESE CHECKS HAVE ALREADY CAUGHT, all in documents freshly written by the
 agent that wrote this file, none by re-reading:
 
   - `serves: 2` and `tags: [carbs party]` unquoted in the food example. Chasing
-    it found the identical fault in HANDOVER 4's own canonical schema block,
+    it found the identical fault in MANUAL 4's own canonical schema block,
     which had been wrong for nine days and is the most-copied twelve lines in
     that document.
   - The cocktail document told its reader to omit `mood:` (the key is REQUIRED)
@@ -47,7 +47,9 @@ one way only. INGEST_INBOX_DESIGN.md §5 is the argument for the split.
 """
 from __future__ import annotations
 
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -125,7 +127,7 @@ def _flat(text: str) -> str:
 
     THE FIRST VERSION OF THE DRIFT SCAN DID NOT NORMALISE WHITESPACE and
     reported twelve stale vocabulary entries, every one of them a line break
-    inside a string. HANDOVER 12: be suspicious of your own findings before
+    inside a string. MANUAL 12: be suspicious of your own findings before
     reporting them.
 
     THE MARKERS CAME OFF FOR THE SAME REASON, 2026-09-02. The garnish scraper
@@ -219,7 +221,7 @@ def test_every_recipe_block_in_the_food_doc_uses_declared_tags_and_stars():
     """BOTH blocks -- the annotated schema and the worked example.
 
     The schema block is the one a reader meets first and copies, and checking
-    only the example is how HANDOVER §4's own canonical block sat wrong for
+    only the example is how MANUAL §4's own canonical block sat wrong for
     nine days with a retired tag in it.
     """
     blocks = _file_blocks(_doc(FOOD_DOC))
@@ -249,7 +251,7 @@ def test_the_food_docs_example_obeys_the_schema_it_describes():
     """The rules the document itself states, applied to its own example.
 
     Every one of these is a rule the document spells out in prose a few
-    paragraphs above the example, which is exactly the gap HANDOVER 12's
+    paragraphs above the example, which is exactly the gap MANUAL 12's
     "you will write down a rule instead of following it" describes.
     """
     fm = _example(_doc(FOOD_DOC), "Crispy Sage Butter Gnocchi")
@@ -292,7 +294,7 @@ def test_the_food_docs_example_quotes_every_scalar_and_list_member():
     """Unquoted `serves: 2` is what this check was written for.
 
     It found exactly that, plus `tags: [carbs party]`, on its first run --
-    and chasing it turned up the identical fault in HANDOVER 4's canonical
+    and chasing it turned up the identical fault in MANUAL 4's canonical
     schema block, which had been wrong for nine days. /tidy-drafts repairs
     quoting mechanically, which is precisely why nobody had noticed.
     """
@@ -612,3 +614,93 @@ def test_the_cocktail_docs_correction_map_matches_glasses_yml():
         "the cocktail document's glass correction table disagrees with "
         "glasses.yml:\n  " + "\n  ".join(problems)
     )
+
+
+# =============================================================================
+# THE CLAUDE.AI PROJECT THAT HOLDS THE TWO DOCUMENTS
+# =============================================================================
+
+WEB_DOC = DOCS / "CLAUDE_WEB_INGEST.md"
+PROJECT_FILES = [FOOD_DOC, COCKTAIL_DOC, WEB_DOC]
+_UPLOADED_RE = re.compile(r"^Uploaded to the Project as of:\s*`?([0-9a-f]{7,40}|none)`?\s*$", re.M)
+
+
+def test_the_web_project_holds_the_current_documents():
+    """The claude.ai Project is a COPY of the two standalone documents, and a
+    copy nothing re-checks goes stale the first time a vocabulary regenerates.
+
+    `CLAUDE_WEB_INGEST.md` carries one line, `Uploaded to the Project as of:
+    <sha>`, which Helen sets when she re-uploads the files. This test fails
+    whenever any of the three documents has a commit AFTER that sha -- so a
+    session that touches one of them sees, on its next run, exactly which files
+    the Project is missing and what to tell Helen. Only she can clear it,
+    because only she can upload; an agent's job is to say so in its summary
+    (CLAUDE.md), never to bump the line.
+
+    SKIPPED IN CI, DELIBERATELY. The suite gates the deploy (MANUAL §10) and a
+    stale upload to a private chat project must not block a site build. Locally
+    it is the reminder the written rule ("re-upload whenever a commit touches
+    either file") would otherwise be -- and that rule is exactly the shape this
+    repository keeps finding needs a mechanism rather than a sentence.
+    """
+    if os.environ.get("CI"):
+        pytest.skip("the Project upload is Helen's local concern, not a deploy gate")
+    text = _doc(WEB_DOC)
+    m = _UPLOADED_RE.search(text)
+    assert m, (
+        "CLAUDE_WEB_INGEST.md has no `Uploaded to the Project as of: <sha>` "
+        "line. It is the handshake between the repo and the claude.ai Project; "
+        "put it back (see that file's §1, 'Refreshing')."
+    )
+    stamp = m.group(1)
+    if stamp == "none":
+        pytest.skip(
+            "the claude.ai Project has not been set up yet (CLAUDE_WEB_INGEST.md "
+            "says `Uploaded to the Project as of: none`); once Helen has "
+            "uploaded, that line records the commit and this test starts "
+            "watching for drift"
+        )
+    rel = [str(p.relative_to(ROOT)) for p in PROJECT_FILES]
+    out = subprocess.run(
+        ["git", "log", "--oneline", f"{stamp}..HEAD", "--"] + rel,
+        capture_output=True, text=True, cwd=ROOT,
+    )
+    assert out.returncode == 0, (
+        f"`git log {stamp}..HEAD` failed -- is the stamped commit real?\n{out.stderr}"
+    )
+    newer = out.stdout.strip()
+    assert not newer, (
+        "The claude.ai Project is behind the repo. These commits touched a "
+        "document the Project holds, after the last upload:\n  "
+        + newer.replace("\n", "\n  ")
+        + "\n\nHelen: re-upload INGEST_ONE_RECIPE.md and INGEST_ONE_COCKTAIL.md "
+          "to the Project (and paste CLAUDE_WEB_INGEST.md §2 into its "
+          "instructions if that changed), then set the line in "
+          "CLAUDE_WEB_INGEST.md to the commit you uploaded from. Agents: say "
+          "this in your summary; do not bump the line yourself."
+    )
+
+
+def test_the_project_instructions_still_match_the_envelope():
+    """The instruction block in CLAUDE_WEB_INGEST.md §2 restates four facts
+    about the envelope that live elsewhere. If any of them moves, the browser is
+    taught the wrong shape and every envelope it produces is rejected.
+    """
+    text = _doc(WEB_DOC)
+    block = text.split("## 2. Project instructions", 1)[1]
+    for needle, where in [
+        ("INGEST_ONE_RECIPE.md", "the food document's name"),
+        ("INGEST_ONE_COCKTAIL.md", "the cocktail document's name"),
+        ("`ingest: <slug>`", "the issue title INGEST_INBOX_DESIGN.md §6 fixes"),
+        ("## What I could not know", "the hand-back heading the parser requires"),
+        ("FOUR backticks", "the outer fence that lets the inner yaml fence copy raw"),
+    ]:
+        assert needle in block, (
+            f"CLAUDE_WEB_INGEST.md §2 no longer says {needle!r} ({where}). The "
+            f"browser is told only what that block says."
+        )
+    for p in (FOOD_DOC, COCKTAIL_DOC):
+        assert "## 0. How to hand this back" in _doc(p), (
+            f"{p.name} lost its §0; the Project instructions defer to it for the "
+            f"envelope shape."
+        )

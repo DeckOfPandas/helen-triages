@@ -10,7 +10,7 @@
 //
 // WHY THAT MATTERS MORE THAN IT SOUNDS. Following the plain link re-renders the
 // index, and with no filters set the index reshuffles on every load
-// (HANDOVER 13.7) -- so you would land on a correctly filtered list in a
+// (MANUAL 13.7) -- so you would land on a correctly filtered list in a
 // different order, having lost your place. history.back() restores the page
 // from the browser's cache with its DOM intact: same filters, same page number,
 // same shuffled order, same scroll position. Nothing is serialised, nothing is
@@ -23,7 +23,7 @@
 // standing down is a refresh, which is what you would have got anyway.
 //
 // THE DECISION IS A PURE FUNCTION, and the DOM wiring is the rest of the file.
-// HANDOVER §3: once a module gets non-trivial, the algorithm splits from the
+// MANUAL §3: once a module gets non-trivial, the algorithm splits from the
 // wiring so Node can test it directly. This one earned that immediately -- see
 // the new-tab case below, which was WRONG in the first version and is invisible
 // to any check that does not model a tab's history length.
@@ -87,7 +87,7 @@
   // --- Exported the same way every other split module here is ------------------
   // Node requires it to test the decision; the browser gets it on window.HTF and
   // runs the wiring below. Same shape as recipe-list.js and ingredient-search.js
-  // (HANDOVER §3), so there is one convention rather than three.
+  // (MANUAL §3), so there is one convention rather than three.
   var api = { shouldGoBackToIndex: shouldGoBackToIndex };
 
   if (typeof module !== 'undefined' && module.exports) {

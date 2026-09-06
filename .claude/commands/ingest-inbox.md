@@ -53,8 +53,8 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
       `test_every_drinks_moods_match_the_derivation`, expected, not a fault in
       the file.
    2. **`pytest`.** Once, and never two sessions at a time.
-   3. **FOOD: `/tidy-drafts`**, if the quoting or typography needs it. It never
-      touches a `QQ` line.
+   3. **`/tidy-drafts`**, both collections since 2026-09-05, if the quoting or
+      typography needs it. It never touches a `QQ` line.
    4. **`python3 scripts/ingest_preflight.py`** -- undeclared bottles,
       near-miss garnishes, unstated times, in the same shape a photo batch
       gets.
@@ -71,7 +71,9 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
    private repo, so CLAUDE.md's cross-repo trap does not apply. **The trailer
    is what closes the issue** -- the script never closes one, and neither do
    you by API. Name the issues before pushing, while the message can still be
-   rewritten. Push on her confirmation.
+   rewritten. Push without asking -- the private drafts repos need no
+   confirmation for a push (CLAUDE.md, 2026-09-05); only committing to their
+   `main` is forbidden.
 
 7. **Report what is still `QQ` and why**, as `/ingest` does.
 

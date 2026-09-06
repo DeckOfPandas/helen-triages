@@ -161,19 +161,9 @@ commit. See CLAUDE.md.
 
 ## The current corpus
 
-| `source_type` | Recipes | Drafts |
-|---|---|---|
-| `website` | 23 | 115 |
-| `person` | 22 | 2 |
-| `book` | 17 | 42 |
-| `author` | 8 | 7 |
-| `publication` | 7 | 82 |
-| `joke` | 4 | 3 |
-| `place` | 1 | 0 |
-| `unknown` | 0 | 63 |
-| **total** | **82** | **314** |
-
-Zero violations in either collection.
+Not tabulated here. A table of per-type counts stood in this section from
+2026-08-20 and was wrong within a week; `pytest tests/test_source_attribution.py`
+is the count and the violation list, and it is re-run on every commit.
 
 ---
 

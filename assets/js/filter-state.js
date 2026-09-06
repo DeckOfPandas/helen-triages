@@ -5,7 +5,7 @@
 // the filter it stands for (`_includes/recipe_badges.html`), which means the
 // index's filter state now has a written-down URL form. This file owns that
 // grammar and nothing else. filters.js stays the DOM half, exactly as it does
-// for recipe-list.js and ingredient-search.js (HANDOVER §3).
+// for recipe-list.js and ingredient-search.js (MANUAL §3).
 //
 // Loaded two ways from the one file, no bundler:
 //   - In the browser, as a plain <script> before filters.js, attaching to
@@ -50,7 +50,7 @@
 // toQuery() — writing this grammar back out — is deliberately ABSENT. Nothing
 // updates the URL as you filter yet, and this repo has a standing rule against
 // building a slot nothing fills (test_no_decoration_slot_is_orphaned, and
-// HANDOVER §12's `--annotation-gutter` cautionary tale). Add it the day
+// MANUAL §12's `--annotation-gutter` cautionary tale). Add it the day
 // something calls it.
 //
 // -----------------------------------------------------------------------------
@@ -417,7 +417,7 @@
      could not tell you.
 
      WHY IT MOVED. It was 40 lines inside filters.js's update(), the one module
-     in HANDOVER 3's table with no tests at all, reading five data- attributes
+     in MANUAL 3's table with no tests at all, reading five data- attributes
      off a live <li>. Every rule below is a decision with a handful of inputs
      and no need of a DOM, which is back-link.js's argument exactly.
 

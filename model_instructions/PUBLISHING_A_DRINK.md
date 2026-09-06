@@ -2,18 +2,18 @@
 
 Written 2026-09-04, on the day the first sixteen drinks went through it, for
 Helen to check and for the next session to follow. It is short on purpose.
-**HANDOVER §9.1.1 has the gate's mechanics and §4.0 says what the flags MEAN;
+**MANUAL §9.1.1 has the gate's mechanics and §4.0 says what the flags MEAN;
 `.claude/commands/ingest.md` is how a drink gets INTO the drafts and where the
 mechanical/non-mechanical boundary is stated in full.** This is the procedure
 that carries a drink from there to the public repo, and it is linked from
-HANDOVER §11.
+MANUAL §11.
 
 ## The one working copy
 
 For a batch in progress there is **one** working copy of the private drinks
 repo: the clone inside the coordinating Claude's worktree, on a branch named
-for the batch, served on a known port (today: **4004**, branch
-`content/first-batch-to-promote`). Helen edits there, Claude commits and
+for the batch (`content/<what-the-batch-is>`), served on a port the session
+names when it opens the batch. Helen edits there, Claude commits and
 pushes there, and the dev server builds from there. Helen's own local clone
 is not used while a batch is open — it is where promotion happens afterwards
 (step 6), from `main`, after the branch is merged.
@@ -39,7 +39,7 @@ disk for an evening. One copy, always pushed, is the rule.
    pushes. **The full boundary is in `ingest.md` under "Fixing a draft the
    suite is complaining about"; the two say the same thing on purpose.**
 3. **Claude lists the non-mechanical things**, one line each, and Helen rules
-   on them. Each ruling is written into the vocabularies, the handover and
+   on them. Each ruling is written into the vocabularies, the manual and
    the ingest documents the same day, so it is never asked twice.
 4. **Claude says "final: <slugs>".** That word means: the suite is green over
    those drinks, every open ruling is applied, and Claude will not touch
@@ -58,6 +58,12 @@ disk for an evening. One copy, always pushed, is the rule.
      short); flag back.
    - Claude does a final read-only review after the proofread; sometimes Helen
      does too.
+   - **If a public PR depends on a private branch, name the branch in the PR
+     description.** A public merge that lands before its private half leaves
+     `main` red with failures naming real drinks (2026-09-06, the Caribbean
+     Sazerac's `I want to faff`: `taxonomy.yml` merged, the drink file's
+     correction sat on `data/caribbean-sazerac-faff`), and nothing else says
+     which branch fixes it.
 6. **Helen promotes**, herself, always, unless she explicitly asks Claude to:
    in her own checkouts, copy the proofread drink into `_cocktail_recipes/`
    in the public repo and commit; delete it from the private repo and commit.
@@ -93,10 +99,10 @@ promotable the field went long ago. A fresh ingest still writes it, beside
 ## Where the rulings live
 
 - Bottles and their aliases, and the "a house is not a bottle" rule:
-  `_data/cocktails/bottles.yml`, HANDOVER §9.3.2. **A bottle she no longer
+  `_data/cocktails/bottles.yml`, MANUAL §9.3.2. **A bottle she no longer
   reaches for is MOVED to `not_reached_for` with its reason, never deleted** —
   five went that way on 2026-09-05 and the reasons are why nobody re-adds them.
-- **What things cost: `_data/cocktails/costs.yml`, HANDOVER §9.3.5.** Prices are
+- **What things cost: `_data/cocktails/costs.yml`, MANUAL §9.3.5.** Prices are
   LOCAL-ONLY on the site (`show_costs` in `_config_local.yml`) but the data is
   public, and it is the one file in `_data/cocktails/` that goes stale on its
   own — `checked:` says when it was last true. **Retiring or renaming a bottle
@@ -108,13 +114,15 @@ promotable the field went long ago. A fresh ingest still writes it, beside
   drink, not prose in a method step. The page COMPOSES "Strain into an old
   fashioned glass, over a large ice cube." from `method`, `glasses.yml`'s
   `serving` phrase and `serve.yml`'s `in_the_glass` clause, so a promoted drink
-  stores each fact once. HANDOVER §9.10a.
+  stores each fact once. MANUAL §9.10a.
 - The garnish vocabulary and the articles the generated garnish step uses:
   `_data/cocktails/garnish.yml`.
 - The ingest rules a session with no repo can use: `INGEST_ONE_COCKTAIL.md`.
   Its vocabulary blocks are generated — `scripts/build_ingest_vocab.py --write`
-  after any ruling that changes `_data/`, never a hand edit.
+  after any ruling that changes `_data/`, never a hand edit — and the file is
+  re-uploaded to the claude.ai Project (`CLAUDE_WEB_INGEST.md`) whenever it
+  changes.
 - The in-repo procedure: `.claude/commands/ingest.md`.
-- The flags' meaning and the gate: HANDOVER §4.0 and §9.1.1.
-- The one-working-copy rule, restated where a worktree is set up: HANDOVER §9.1
+- The flags' meaning and the gate: MANUAL §4.0 and §9.1.1.
+- The one-working-copy rule, restated where a worktree is set up: MANUAL §9.1
   and §11.0.1.

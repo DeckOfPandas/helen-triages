@@ -88,7 +88,7 @@ RECIPE_ONLY = {
     "cook_time": "as `prep_time`",
     "serves": "not portioned -- it is however much you make",
     "makes": "as `serves`",
-    "internal_temp_ref": "the temperature layer is recipe-only (HANDOVER 14)",
+    "internal_temp_ref": "the temperature layer is recipe-only (MANUAL 14)",
     "doneness": "as `internal_temp_ref`",
 }
 
@@ -156,7 +156,7 @@ def test_no_recipe_only_keys(magic_bag):
     Every key checked here renders NOTHING in _layouts/magic_bag.html, so the
     work would be invisible rather than broken — the page looks fine and the
     method you just wrote is nowhere. That is the silent-failure shape this
-    repository keeps finding (HANDOVER 12), so it fails loudly instead.
+    repository keeps finding (MANUAL 12), so it fails loudly instead.
     """
     found = {k: why for k, why in RECIPE_ONLY.items() if k in magic_bag.fm}
     assert not found, (
@@ -165,7 +165,7 @@ def test_no_recipe_only_keys(magic_bag):
         + ".\n_layouts/magic_bag.html renders none of these, so this content "
           "would be silently invisible. If this dish has genuinely earned a "
           "full write-up, promote it: move the file to _food_drafts/ and give "
-          "it the recipe schema (HANDOVER 4). That is a good outcome, not an "
+          "it the recipe schema (MANUAL 4). That is a good outcome, not an "
           "error — it just cannot live here."
     )
 
@@ -368,7 +368,7 @@ def test_front_matter_has_no_duplicate_keys(magic_bag):
 # --- house style reaches the magic bag ---------------------------------------
 # These entries are short, informal and dashed off, and NONE of that is a reason
 # to exempt them: they render to the same page, in the same fonts, next to the
-# recipes. HANDOVER 5's scoping rule is by what a READER SEES, not by whether a
+# recipes. MANUAL 5's scoping rule is by what a READER SEES, not by whether a
 # field feels like prose — which is exactly why the rule reached `cook_time` and
 # the prose pages. Reused from test_style.py rather than restated, so the two
 # cannot drift apart.

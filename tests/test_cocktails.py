@@ -110,7 +110,7 @@ TOP_LEVEL_KEYS = {
 # says nothing about `to_serve`. The nine that carry it are the seven punch-bowl
 # drinks, the mulled wine, and the Modern Zombie whose own title says "makes 2".
 #
-# THE VALUES ARE DERIVED, NOT PICKED, per HANDOVER §13.11. A punch cup is 4-6 US
+# THE VALUES ARE DERIVED, NOT PICKED, per MANUAL §13.11. A punch cup is 4-6 US
 # fl oz, so 150 ml is the midpoint and the divisor; the mulled wine goes into a
 # 200 ml mug. tmp/plan_serves.py is not kept -- the derivation is one line and it
 # is here: round(total poured ml / cup size). Re-deriving it needs no script.
@@ -162,7 +162,7 @@ SERVE_KEYS = {"ice", "rim"}
 # look alike.
 REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
 
-# `item` IS DRAFT-ONLY, ruled by Helen 2026-09-02 (D8, ARCHITECTURE_PLAN §8).
+# `item` IS DRAFT-ONLY, ruled by Helen 2026-09-02 (D8; DECISIONS.md §9.10).
 # It holds what the SOURCE called the ingredient and is being retired by #544;
 # 282 draft entries still carry one and nothing renders it (§9.10). So it is
 # permitted where the migration is still running and refused where the world can
@@ -279,7 +279,7 @@ def _is_character_list(key):
 NO_DRINKS_REASON = (
     "No drinks on this machine to check. `_cocktail_recipes/` holds no promoted "
     "drinks -- it does not exist on disk at all yet, which is deliberate "
-    "(HANDOVER_v26.md §9.1) -- and `_cocktail_drafts/` is a separate private "
+    "(MANUAL.md §9.1) -- and `_cocktail_drafts/` is a separate private "
     "repo (helen-triages-cocktails-private), gitignored here, so a clean "
     "checkout of the public repo legitimately has none either. Clone the drafts "
     "into _cocktail_drafts/ to check those; promote a drink to check it here "
@@ -315,7 +315,7 @@ def _scan(root):
 
     `rglob`, not `glob`. The drafts folder is flat today, but food's loader used
     `glob` and silently stopped seeing seven files the moment a staging pipeline
-    appeared under it (HANDOVER §4) -- and those seven were the ones closest to
+    appeared under it (MANUAL §4) -- and those seven were the ones closest to
     promotion. Costs nothing to not repeat.
     """
     out = []
@@ -666,7 +666,7 @@ def test_every_drink_reading_test_goes_through_the_loader():
     reintroduce exactly the #540 hole for itself, silently, in CI only.
 
     Generated from the source rather than from a list somebody maintains, which
-    is HANDOVER §12's lesson about generating the next check from the other end.
+    is MANUAL §12's lesson about generating the next check from the other end.
     """
     import ast
 
@@ -723,7 +723,7 @@ def test_whole_collection_only_says_what_it_does():
 
     Asked of the syntax tree, not the text, because a docstring explaining that
     a check needs the whole collection contains every word a grep would look
-    for -- HANDOVER §12, five instances of exactly that collision.
+    for -- MANUAL §12, five instances of exactly that collision.
     """
     import ast
 
@@ -738,7 +738,7 @@ def test_whole_collection_only_says_what_it_does():
         # `_require_whole_collection` for the coverage claims, so a scan looking
         # only for the direct call classified all four as "listed but never
         # calls it". A guard that follows exactly one spelling of the thing it
-        # checks is HANDOVER §11.0's lesson about the destructive-git hook, in
+        # checks is MANUAL §11.0's lesson about the destructive-git hook, in
         # miniature: enumerate how the thing can be SPELLED, not how you happen
         # to have written it today.
         for child in ast.walk(node):
@@ -926,7 +926,7 @@ def test_a_staged_drink_writes_a_bottles_canonical_name():
           "and an alias is shorthand Helen wrote for herself while transcribing "
           "(\"'ED3' isn't a bottle\", 2026-09-04). Everywhere else the opposite "
           "rule holds and is deliberate: leave a draft as she spelled it and "
-          "teach the dictionary the spelling (HANDOVER §9.3.2)."
+          "teach the dictionary the spelling (MANUAL §9.3.2)."
     )
 
 
@@ -2902,7 +2902,7 @@ def _amount_scan():
             except ValueError as why:
                 # THE EXEMPTION IS THE DRINK'S OWN QQ, not a registry here.
                 # A hardcoded list of slugs cannot tell a gap that has been
-                # filled from one that has merely been deleted, and HANDOVER 10
+                # filled from one that has merely been deleted, and MANUAL 10
                 # records five guards going false-red on exactly that shape.
                 # A QQ note is per-drink, so it works on a partial corpus, and
                 # it fails in BOTH directions that matter: fill the unit in and
@@ -3032,7 +3032,7 @@ def test_no_amount_uses_a_us_unit():
           "DRINK, not the page's "
           "units. If a source qualifies the measure -- a scant or a heaping "
           "one -- print the single figure and put the qualifier in the "
-          "ingredient's `note`, per HANDOVER 9.4.1: the site states one figure "
+          "ingredient's `note`, per MANUAL 9.4.1: the site states one figure "
           "and does not hedge it."
     )
     assert checked, (
@@ -3090,7 +3090,7 @@ def test_no_ingredient_stores_a_millilitre_figure():
     is the whole reason it went: 521 entries held the same fact twice, and the
     duplicate's only possible future was to disagree with the string beside it.
     An ingest session copying an older drink as a template is exactly how it
-    comes back -- the same route HANDOVER 4.0 records for the hyphenated
+    comes back -- the same route MANUAL 4.0 records for the hyphenated
     `awaiting-fix` spelling reappearing across 34 files.
     """
     bad = [f"{slug}: {item.get('item') or item.get('generic')!r} has ml: {item['ml']!r}"
@@ -3370,7 +3370,7 @@ def test_no_drink_uses_a_generic_that_is_helens_to_apply():
     the second time: "I have discussed this at least twice... If I have to deal
     with this again I will simply delete those recipes."
 
-    HANDOVER 9.3.2 ALREADY FORBADE IT IN PROSE -- "it is hers to apply: never
+    MANUAL 9.3.2 ALREADY FORBADE IT IN PROSE -- "it is hers to apply: never
     retype a drink into it from item text" -- which is the whole argument for
     this being a test. Two hooks in `.claude/`, `meta.awaiting_fix` and
     `meta.proofread` all reached the same conclusion first: a rule that gets
@@ -3454,7 +3454,7 @@ def test_no_drink_writes_plantation():
     """Planteray is the brand's name; `plantation` is only ever read -- #582.
 
     Helen: "'plantation' is not permitted as a kind of rum and should always be
-    corrected to 'planteray'." Planteray is canonical (HANDOVER 9.3.2,
+    corrected to 'planteray'." Planteray is canonical (MANUAL 9.3.2,
     2026-08-27) and the old spellings stay in `bottles.yml` as ALIASES, which is
     not half a finished rename but the same division `canonical_glasses` draws:
     **the rule governs what is WRITTEN, the alias map governs what can be
@@ -3502,7 +3502,7 @@ def test_a_qq_note_carries_a_qq_label():
     """A drink note that is unresolved says so on its tab -- #572.
 
     NOTES ARE `{label, text}` OR A BARE STRING, exactly as a food recipe's are
-    (HANDOVER 4) -- and `_layouts/cocktail.html` has rendered both shapes since
+    (MANUAL 4) -- and `_layouts/cocktail.html` has rendered both shapes since
     the layout was written, falling back to the literal word "note". Nothing had
     ever used the labelled form, so all 170 notes rendered identically.
 
@@ -3520,7 +3520,7 @@ def test_a_qq_note_carries_a_qq_label():
     kind arriving untagged.
 
     THE TEXT KEEPS ITS OWN `QQ - ` PREFIX, which is duplication on the page and
-    deliberate. HANDOVER 5's house-style exemption matches `QQ` as a PREFIX on
+    deliberate. MANUAL 5's house-style exemption matches `QQ` as a PREFIX on
     the string, and every `grep -rn QQ` in this repo's history has found these
     by their text. Moving the marker into the label alone would fail in the
     direction where a future scanner silently stops seeing them.
@@ -3580,7 +3580,7 @@ def test_no_method_step_restates_to_serve_or_garnish():
     test_no_method_step_opens_with_express below, which is this rule applied to
     the one action that turned out to be derivable after all.)
 
-    HANDOVER 9.4 settles which is which: finishing ACTIONS are method steps
+    MANUAL 9.4 settles which is which: finishing ACTIONS are method steps
     ("top with champagne", "squeeze the twist over the drink"), presentation is
     `to_serve`. An imperative "Garnish with X" instructs you to do the thing the
     `garnish:` list already states, in the way 9.12 describes for naming the
@@ -3668,7 +3668,7 @@ def test_optional_is_a_real_boolean():
     """`optional` marks an ingredient the drink survives without -- #570.
 
     A REAL BOOLEAN, NEVER A QUOTED STRING. The exact lesson `meta.awaiting_fix`
-    paid for in HANDOVER 4.0: `optional: "true"` is a string, and every
+    paid for in MANUAL 4.0: `optional: "true"` is a string, and every
     truthiness test in Liquid and in Python agrees a non-empty string is true --
     so a QUOTED value happens to work here and stops working the moment anything
     compares it, while `optional: "false"` is true today and reads as false to
@@ -4191,7 +4191,7 @@ def test_every_garnish_proposal_still_matches_a_real_string():
 
     Same guard methods.yml carries, for the same reason and against the same
     failure: the moment a drink stops saying the left-hand string, the row is
-    describing the collection as it was rather than as it is. HANDOVER §11.2 --
+    describing the collection as it was rather than as it is. MANUAL §11.2 --
     an open proposal is a document too, and it rots.
     """
     _require_whole_collection("a garnish proposal's staleness")
@@ -4793,7 +4793,7 @@ def test_the_cocktail_drafts_clone_is_in_step():
     if not drafts_schema.present("_cocktail_drafts"):
         pytest.skip(
             "`_cocktail_drafts/` is not on this machine, so there is no clone "
-            "to be in step with. Clone it to check this -- HANDOVER 9.1."
+            "to be in step with. Clone it to check this -- MANUAL 9.1."
         )
     problem = drafts_schema.mismatch("_cocktail_drafts")
     assert problem is None, problem
@@ -4935,52 +4935,6 @@ def test_the_off_scale_ship_has_a_word():
     )
 
 
-def test_every_ship_rung_has_a_tint():
-    """`ship_tints` must cover `ship_scale`, plus the two off-scale values.
-
-    Added 2026-08-26 with the goodness mark. The mark on a cocktail card fills
-    with this percentage of the second accent, and Liquid resolves a missing
-    key to nil -- which the template defaults to 0, i.e. an EMPTY square. So a
-    sixth rung added to `ship_scale` without a tint does not error: it renders
-    as the lowest possible rating, silently, which is worse than rendering
-    nothing.
-
-    `who knows` and `QQ` are deliberately off the ship scale (see the file's
-    own comment) but still reach a card, so they are checked too.
-    """
-    taxonomy = _taxonomy()
-    scale = taxonomy.get("ship_scale") or []
-    tints = taxonomy.get("ship_tints") or {}
-    assert scale, "taxonomy.yml has no `ship_scale:`."
-    assert tints, (
-        "taxonomy.yml has no `ship_tints:`. Every goodness mark on the index "
-        "would render as an empty square -- the `not really` treatment -- "
-        "whatever the drink is rated."
-    )
-
-    missing = [r for r in scale if r not in tints]
-    assert not missing, (
-        f"`ship_tints` does not cover every rung of `ship_scale`: {missing}\n\n"
-        f"A rung with no tint renders as an EMPTY square, which is the visual "
-        f"for `not really`. It does not error and it does not look broken -- "
-        f"it looks like a bad drink."
-    )
-    for off_scale in ("who knows",):
-        assert off_scale in tints, (
-            f"`ship_tints` has no entry for {off_scale!r}. It is deliberately "
-            f"not on `ship_scale` -- it means 'I have no idea', an absence of "
-            f"verdict rather than a low one -- but it still reaches a card and "
-            f"still needs a value."
-        )
-
-    bad = sorted(f"{k}={v!r}" for k, v in tints.items()
-                 if not isinstance(v, (int, float)) or not 0 <= v <= 100)
-    assert not bad, (
-        "ship_tints values are percentages: numbers from 0 to 100.\n  "
-        + "\n  ".join(bad)
-    )
-
-
 def test_suggestion_is_a_string_or_a_list_of_strings():
     """`suggestion` was the only ingredient field with no shape guard at all.
 
@@ -4990,7 +4944,7 @@ def test_suggestion_is_a_string_or_a_list_of_strings():
 
     BOTH SHAPES ARE CORRECT AND MUST STAY correct: 116 strings and 6 lists
     today. Liquid's `for` treats a bare string as a one-item sequence, which
-    HANDOVER §9.10 verified against the real `liquid` gem rather than assuming,
+    MANUAL §9.10 verified against the real `liquid` gem rather than assuming,
     and that is what lets one loop handle both with no type check in the
     template. The risk is not a string or a list; it is a MAPPING or a
     list-of-lists arriving from an ingest and rendering as `{"a"=>"b"}` or as
@@ -5153,7 +5107,7 @@ def test_syrup_ratio_is_plausible_for_its_generic():
     sweetness, so syrup-against-citrus carries signal. But it CANNOT classify:
     a declared 1:1 (Daisy de Santiago) and a declared 2:1 (Long Island) both sit
     at 0.50, because Helen adjusts sugar deliberately -- by weather, by company,
-    and by halving it when she feels like it (HANDOVER §9.4.1: the site is canon
+    and by halving it when she feels like it (MANUAL §9.4.1: the site is canon
     and she deviates in the kitchen).
 
     So the bounds here are deliberately WIDE. This is looking for a
@@ -5201,7 +5155,7 @@ def _syrup_ratio_scan():
         that key without repointing this would not have failed: both halves of
         the ratio would have summed to zero, `if not (syrup and sour)` would
         have skipped every drink, and the check would have reported green over
-        nothing -- HANDOVER 12's "test that cannot fail" exactly. What would
+        nothing -- MANUAL 12's "test that cannot fail" exactly. What would
         have caught it is its own sibling, test_the_syrup_ratio_check_is
         _exercised, which is why that test exists.
         """
@@ -5364,7 +5318,7 @@ def test_every_proposal_still_matches_a_real_step():
     settled one.
 
     THE IDENTICAL BUG WAS FOUND AND FIXED IN garnish.yml's TWIN ON 2026-08-31,
-    written up in HANDOVER 12 as "a ratchet list and a worklist look identical
+    written up in MANUAL 12 as "a ratchet list and a worklist look identical
     and want opposite assertions" -- and this sibling was never checked. A
     lesson applied to one instance of a pattern and not swept for the rest is
     half a fix. What is asserted now is that the KEY EXISTS, which is the thing
@@ -5788,7 +5742,7 @@ def test_the_citrus_that_sorts_first_is_juice_that_exists():
 # `QQ` lines are blanked for every collection by `conftest.checkable_text`:
 # they are the SOURCE's wording awaiting a rewrite, and correcting a dash there
 # tidies text that is about to be deleted, by editing someone else's words
-# (HANDOVER §5, issue #426). These four keys are the drink-shaped rest of that
+# (MANUAL §5, issue #426). These four keys are the drink-shaped rest of that
 # same sentence:
 #
 #   `item`        -- "the source's own wording, held so that Helen can see what
@@ -5875,7 +5829,7 @@ def _prose_fields(drink):
         # through the typography checks. Reading only `isinstance(step, str)`
         # here would have quietly exempted every step written in the new shape
         # -- an addition to the schema switching a check off for the files that
-        # use it, which is the failure mode HANDOVER 10 records five times.
+        # use it, which is the failure mode MANUAL 10 records five times.
         if isinstance(step, str):
             fields.append((f"method step {i}", step))
         elif isinstance(step, dict):
@@ -6063,7 +6017,7 @@ def test_drink_accents(drink_file):
 # the drink's total is quietly a little too low, on a page that says "roughly"
 # and so gives nobody a reason to look. Only a test comparing the vocabulary
 # against the price table can see it, and it has to be run from the drinks
-# rather than from the table -- HANDOVER 12's rule about generating the check
+# rather than from the table -- MANUAL 12's rule about generating the check
 # from the other end.
 
 COSTS = ROOT / "_data" / "cocktails" / "costs.yml"
@@ -6597,7 +6551,7 @@ def test_every_counted_pour_can_reach_a_strength(drink_file):
     MEASURED pour of something with no route to a strength, because that pour
     silently contributes zero and the drink reads weaker than it is.
 
-    RUN FROM THE DRINK, NOT FROM THE TABLE. HANDOVER 12's rule. abv.yml can be
+    RUN FROM THE DRINK, NOT FROM THE TABLE. MANUAL 12's rule. abv.yml can be
     internally immaculate and still have never heard of the generic a new drink
     pours; only walking the drinks finds that.
     """

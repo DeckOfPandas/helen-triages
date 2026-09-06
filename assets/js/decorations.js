@@ -73,7 +73,7 @@
   // The tape is HEADER CHROME, so there is one set of files for the whole repo
   // (assets/img/chrome/tape/) rather than a copy per site. It used to be a copy
   // per site, and keeping the two in step was a manual chore policed by a note
-  // in the handover: food's redesign shipped seven new files on 2026-08-10 and
+  // in the manual: food's redesign shipped seven new files on 2026-08-10 and
   // cocktails sat on the old four for five days before anyone noticed, which is
   // issue #223. One directory cannot drift from itself.
   //

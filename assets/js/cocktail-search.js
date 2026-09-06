@@ -3,7 +3,7 @@
 // No DOM. GitHub issue #579; what it fixes is #549.
 //
 // Extracted out of cocktail-index.js for the reason back-link.js already makes
-// the case for (HANDOVER §3): every rule below was hand-rolled inside 428 lines
+// the case for (MANUAL §3): every rule below was hand-rolled inside 428 lines
 // of DOM wiring, where the only way to ask it a question was to open a browser
 // and type. "Does a chip named `gin` exclude a drink whose only gin-shaped
 // ingredient is ginger syrup?" is a question a pure function can be asked.
@@ -318,7 +318,7 @@
        nephew' should both collapse onto the latter." bottles.yml has said so
        since #529 ("ALIASES ARE HOW A BOTTLE KEEPS ONE IDENTITY... add the
        spelling, do not add a second bottle") and the search had never read it,
-       which HANDOVER §9.10.1 names as the known excess: "suggestions go in raw
+       which MANUAL §9.10.1 names as the known excess: "suggestions go in raw
        rather than resolved through bottles.yml's aliases, so `Havana 3` and
        `Havana Club 3` can both appear." 97 names and aliases over 38 bottles. */
     /* Every alias AS WRITTEN, keyed by its folded form. bottleCanonical answers
@@ -949,7 +949,7 @@
     /* Does this ONE ingredient answer any of the chosen include chips? The card
        lights a matched ingredient with it, so it must use the same rule the
        filter used -- a card that survived for a reason it cannot show is the
-       one thing HANDOVER §9.13 says a card must never be. */
+       one thing MANUAL §9.13 says a card must never be. */
     function entryIsHit(entries, chips) {
       return (chips || []).some(function (chip) {
         return matchesInclude(entries, chip);

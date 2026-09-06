@@ -22,7 +22,7 @@ the exact `[""]` shape `method_short` depends on. Encoded once beats remembered
 
 WHAT IT WILL NOT DO, AND THIS IS THE LOAD-BEARING HALF.
 
-  - It never touches a `QQ` line. HANDOVER §5, issue #426.
+  - It never touches a `QQ` line. MANUAL §5, issue #426.
   - It never touches `source:` -- a citation is reproduced as the publication
     spells it, so "Cafe Delites" is correct and accenting it is a misquote.
   - It never touches a slug or filename, which must stay ASCII.
@@ -150,12 +150,12 @@ from test_cocktails import (  # noqa: E402
 FLOW_FIELDS = ["main_ingredients", "tags"]
 
 # The retired keys that live under `meta:` -- derived from the suite's own
-# authoritative RETIRED dict (HANDOVER §4 calls it that), not listed again.
+# authoritative RETIRED dict (MANUAL §4 calls it that), not listed again.
 # Anything retired at the TOP level is a different rule and not this script's.
 META_RETIRED = [k for k in RETIRED if k not in META_ORDER]
 
 # Optional and additive, and legitimate on a DRAFT alongside the three
-# (HANDOVER §4, issue #418). The recipe-side rule forbids it outright, which is
+# (MANUAL §4, issue #418). The recipe-side rule forbids it outright, which is
 # why it is named here and not in META_ORDER.
 META_OPTIONAL = ["claude_rewritten"]
 
@@ -163,7 +163,7 @@ ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 NUMBER_RANGE = re.compile(r"(?<![\d.])(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)(?![\d.])")
 # `QQ Claude` IS EXCLUDED, and deliberately -- see the long note on `_QQ_LINE`
 # in tests/conftest.py, which this mirrors. The marker protects SOMEBODY ELSE'S
-# wording; a `QQ Claude` line is the paraphrase written here, and HANDOVER §4
+# wording; a `QQ Claude` line is the paraphrase written here, and MANUAL §4
 # holds it to normal house style like any other prose. Fifteen hyphenated
 # number ranges were hiding behind the old pattern on 2026-09-01.
 QQ_LINE = re.compile(r"^\s*(-\s*)?[\"']?QQ\b(?!\s+Claude\b)")
@@ -421,7 +421,7 @@ def fix_en_dashes(text, path):
 
     The QQ skip is why this is worth a script. Two thirds of the corpus-wide
     hits for this rule sit inside source wording awaiting a rewrite -- 86 of 130,
-    measured 2026-08-29 -- and HANDOVER §5 says in as many words that
+    measured 2026-08-29 -- and MANUAL §5 says in as many words that
     correcting a dash there is editing someone else's text.
     """
     out, changed = [], []
@@ -622,9 +622,9 @@ RULE_NAMES = sorted({n for n, _ in FOOD_FIXERS} | {n for n, _ in DRINK_FIXERS})
 
 # THE PREDICATE IS IMPORTED FROM THE SUITE, NOT RE-TYPED, and the first draft of
 # this file proves why: a CLAUDE-marker scan with re.I on it matched `QQ Claude
-# ...`, which is the documented interleaved-rewrite convention (HANDOVER §4) and
+# ...`, which is the documented interleaved-rewrite convention (MANUAL §4) and
 # not an instruction at all. It reported hundreds of files as needing attention
-# and every one was that convention. The real rule is case-sensitive. HANDOVER
+# and every one was that convention. The real rule is case-sensitive. MANUAL
 # §12: "if you scan and find lots of problems, be suspicious of your own
 # findings before reporting them."
 #
