@@ -819,7 +819,7 @@ card_names:
   # distance `demerara` is the whole fact. Helen, 2026-09-04: "Sometimes I say
   # 'demerara sugar syrup' when I mean that." The recipe line gets her full
   # phrase; the card does not need it.
-  "demerara sugar syrup": "demerara syrup"
+  "demerara sugar syrup 2:1": "demerara syrup"
   # THE TWO HONEY WATERS CAME OFF ON 2026-09-04 with the generics they named,
   # and went back on the same evening with them. Helen: "Bee's Knees needs to
   # say honey water 2:1. I'm sorry if I said the wrong thing about this before,
@@ -1340,7 +1340,8 @@ bitters:
 syrups:
   - "cane sugar syrup 1:1"
   - "cane sugar syrup 2:1"
-  - "demerara sugar syrup"
+  - "demerara sugar syrup 2:1"
+  - "turbinado sugar syrup 2:1"
   - "grenadine"
   - "ginger syrup"
   - "passion fruit syrup"
