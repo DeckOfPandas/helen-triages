@@ -44,15 +44,20 @@ published: false
   must never be "completed" from anywhere else.
 
   A CATEGORY WITH NO BOTTLE IS CORRECT AND IS NOT A GAP TO FILL.
-  `overproof Demerara rum` has none since El Dorado 151 moved to
+  `overproof Demerara rum, lightly aged` has none since El Dorado 151 moved to
   `not_reached_for` on 2026-09-05 ("I don't own it, I just wanted to"). The
   generic stays because a drink still asks for it. Do not repopulate the row.
 
-  THE WORDING OF EVERY LINE OF COPY HERE IS A PLACEHOLDER AND IS HELEN'S TO
-  WRITE — the same status as the units line (#753) and the bitters caveat
-  (#713). That covers the intro, the three column headings and the two
-  sentences introducing the characters and the retired words. What each must
-  CONVEY is fixed; the words are not. Do not polish them into house voice.
+  MOST OF THE COPY HERE IS STILL A PLACEHOLDER AND IS HELEN'S TO WRITE — the
+  same status as the units line (#753) and the bitters caveat (#713), and
+  tracked at #784. That covers the intro, the three column headings, "none in
+  the house", and the sentences introducing the characters, the sipping shelf
+  and the retired words. What each must CONVEY is fixed; the words are not. Do
+  not polish them into house voice.
+
+  THE HEADINGS ARE NOT AMONG THEM ANY MORE. All five section names and
+  "Rum-adjacent" are Helen's own, given 2026-09-06; the two that were mine
+  ("By age", "Next to rum, and not rum") she replaced the same day.
 
   RUM ONLY, deliberately, which is the issue's own scope. `bottles.yml` stopped
   being rum-only on 2026-08-30 and now holds 127 bottles across every family,
@@ -94,9 +99,11 @@ published: false
        scans, and column labels three screens up label nothing.
     {% endcomment %}
     {% for group in ing.rum_groups %}
-      {% comment %} PLACEHOLDER COPY on the fourth heading, "By age" — see the
-         header comment, and `rum_groups`' own note in ingredients.yml. The
-         other four headings are Helen's own words from the brief. {% endcomment %}
+      {% comment %} ALL FIVE HEADINGS ARE HELEN'S OWN WORDS. Four came from the
+         brief; `Non-geographical` replaced the "By age" placeholder on
+         2026-09-06, and `rum_groups`' own note in ingredients.yml records why
+         it is the better name — it states the membership rule where "By age"
+         only named the sort order. {% endcomment %}
       <h2 class="ref-section-heading" id="group-{{ group.name | slugify }}"><span>{{ group.name }}</span></h2>
 
       <ul class="rum-cats">
@@ -142,7 +149,9 @@ published: false
        gets asked of them for the same reason it gets asked of the fourteen.
     {% endcomment %}
     <section class="ref-block ref-block--adjacent">
-    <h2 class="ref-section-heading" id="adjacent"><span>Next to rum, and not rum</span></h2>
+    {% comment %} "Rum-adjacent" is Helen's, 2026-09-06, replacing the
+       placeholder "Next to rum, and not rum". {% endcomment %}
+    <h2 class="ref-section-heading" id="adjacent"><span>Rum-adjacent</span></h2>
 
     <ul class="rum-cats rum-cats--adjacent">
       {% for style in ing.cane_and_palm_spirits %}

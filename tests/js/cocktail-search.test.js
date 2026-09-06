@@ -772,7 +772,7 @@ test('a real bottle name survives every one of those tests', () => {
   // Straight from the collection, including the awkward ones: an ampersand, an
   // apostrophe, digits, an accent, a hyphen and a lowercase word.
   const real = ['Smith & Cross', "Gosling's Black Seal", 'El Dorado 3', 'Appleton 8-year',
-    'La Favourite L\'Authentique Ambré', 'Pierre Ferrand ambre', 'acacia honey', 'Rutte'];
+    'La Favorite L\'Authentique Ambré', 'Pierre Ferrand ambre', 'acacia honey', 'Rutte'];
   const pool = S.buildPool(pours(...real));
   assert.deepStrictEqual(labels(pool).length, real.length);
 });

@@ -261,7 +261,7 @@ search:
   # MEASURED AGAINST ALL 87 SUGGESTIONS BEFORE IT WAS TRUSTED, 2026-08-29: it
   # flags 17, every one of them genuinely prose, and catches no bottle name. The
   # clean 70 include every awkward shape the collection has -- `Smith & Cross`,
-  # `Gosling's Black Seal`, `Appleton 8-year`, `La Favourite L'Authentique
+  # `Gosling's Black Seal`, `Appleton 8-year`, `La Favorite L'Authentique
   # Ambré`, `Pierre Ferrand ambre`, `acacia honey`.
   #
   # THESE APPLY TO SUGGESTIONS ONLY. A declared generic is a name Helen chose
@@ -540,12 +540,18 @@ rum_styles:
 # cachaça is in the rum FAMILY and is on nobody's rum shelf, so it is absent
 # here and present there.
 #
-# THE FOURTH GROUP'S NAME IS A PLACEHOLDER AND IS HELEN'S. Her brief says "no
-# name unless you can think of one, but organised by agedness", so the styles
-# are in age order -- clear, lightly aged, moderately aged, and the overproof
-# blend last -- and the name is offered rather than chosen. The three named
-# groups say WHERE a rum is from; this one is the residue that says only how
-# long it sat in wood, which is why no place-name fits it.
+# THE FOURTH GROUP IS `Non-geographical`, HELEN'S OWN NAME, 2026-09-06. Her
+# brief had said "no name unless you can think of one, but organised by
+# agedness"; the placeholder offered was "By age", and she replaced it.
+#
+# THE NAME AND THE ORDER NOW SAY DIFFERENT THINGS, WHICH IS THE IMPROVEMENT.
+# The styles are still in age order -- clear, lightly aged, moderately aged,
+# and the overproof blend last -- so the shelf reads the way she asked for. But
+# what these four have in COMMON is not their age, it is that none of them
+# names a place: the other three groups are Jamaica, Guyana and the cane-juice
+# islands, and this is everything left once origin stops being the answer.
+# "By age" named the sort order and left the reader to work out the membership
+# rule; this names the membership rule.
 rum_groups:
   - name: "Jamaican rum"
     styles:
@@ -564,7 +570,7 @@ rum_groups:
       - "rhum agricole blanc"
       - "rhum agricole vieux"
       - "clairin"
-  - name: "By age"
+  - name: "Non-geographical"
     styles:
       - "clear blended multi-region rum"
       - "lightly aged and filtered rum"

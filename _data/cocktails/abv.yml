@@ -137,8 +137,9 @@ bottles:
   "Flor de Caña Extra Dry":           { abv: 40,   confidence: medium }
   "Planteray 3 Stars":                { abv: 41.2, confidence: medium }
   "Planteray O.F.T.D.":               { abv: 69,   confidence: high }
-  # In the house since 2026-09-06, #782. 75.5% is the published strength and
-  # has been for decades -- the "151" is the US proof, which is the figure.
+  # In the house since 2026-09-06, #782, and CONFIRMED BY HELEN off the bottle
+  # the same day. 75.5% is the published strength and has been for decades --
+  # the "151" is the US proof, which is the figure.
   "Pusser's 151":                     { abv: 75.5, confidence: high }
   "Planteray Stiggins' Fancy":        { abv: 40,   confidence: high }
   "Malibu":                           { abv: 21,   confidence: high }
@@ -153,9 +154,9 @@ bottles:
   "Damoiseau Rhum Agricole Blanc 50°": { abv: 50,  confidence: high }
   "Damoiseau Rhum Agricole Blanc Pure Cane": { abv: 40, confidence: low,
                                         qq: "Damoiseau's bartender line runs 40, 50 AND 55, and `Pure Canne` is its own product on top of that. The label is the only answer." }
-  "La Favourite Rhum Agricole Blanc": { abv: 50,   confidence: medium }
-  "La Favourite Cœur de Canne":       { abv: 50,   confidence: medium }
-  "La Favourite L'Authentique Ambré": { abv: 45,   confidence: medium }
+  "La Favorite Rhum Agricole Blanc": { abv: 50,   confidence: medium }
+  "La Favorite Cœur de Canne":       { abv: 50,   confidence: medium }
+  "La Favorite L'Authentique Ambré": { abv: 45,   confidence: medium }
   # 50 CONFIRMED. JM does bottle a 55 as well, but the product simply called
   # `Rhum Agricole Blanc` is the 50 -- rested six months and reduced with Mt
   # Pelee spring water before bottling. (#702's question about the bare alias
@@ -179,11 +180,16 @@ bottles:
   "Velho Barreiro":                   { abv: 39,   confidence: medium }
   "Van Osten Botanik Arrack":         { abv: 42,   confidence: medium }
   # THE FIGURE MOVED HERE FROM `generics:` on 2026-09-06, because #782 put a
-  # bottle under `Ceylon arrack` and a generic may not be priced in two places
-  # (test_no_generic_gets_its_strength_from_two_places). The number is the same
-  # 33 the generic row carried, and it is no better founded for having moved.
-  "Ceylon Arrack":                    { abv: 33,   confidence: low,
-                                        qq: "Ceylon arrack runs 33 to 40 depending on the house, and this row is keyed on the words in #782 rather than a label. Which bottle is it, and what does it say?" }
+  # bottle under `Ceylon arrack` and a generic may not be strengthed in two
+  # places (test_no_generic_gets_its_strength_from_two_places).
+  #
+  # AND IT CHANGED IN THE MOVE. The generic row said 33, which was the bottom of
+  # the 33-to-40 range the category spans and carried a `qq:` asking which end
+  # this bottle sat at. Helen answered the same day: 40. The row is hers now,
+  # not a guess, even though the KEY is still the category -- she chose to enter
+  # the bottle as the words in the issue rather than have a brand guessed onto
+  # her shelf, and the strength is a fact about the actual bottle regardless.
+  "Ceylon Arrack":                    { abv: 40,   confidence: high }
 
   # --- whisky ------------------------------------------------------------
   # 100 US proof = 50%. NOT 57 -- see Wood's above, and the header.

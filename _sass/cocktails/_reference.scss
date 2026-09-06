@@ -3,7 +3,7 @@
 // =============================================================================
 // Food's two reference pages reuse `.recipe`/`.recipe-body-content` — the same
 // wrapper about.html already used for a prose page, so no page type was
-// invented (HANDOVER §14). That trick is not available here: every one of those
+// invented (MANUAL §14). That trick is not available here: every one of those
 // classes, and the only table CSS on the site, lives in _sass/food/, and this
 // site's own page anatomy (`.cocktail-*`) is a DRINK's anatomy — a title block
 // that reserves a column for a glass drawing, an ingredients grid built around
@@ -20,7 +20,7 @@
 //
 // ONE HUE, DELIBERATELY. The category name stays in ink and the short name in
 // $color-clear-text, because a new hue is Helen's decision and nobody else's
-// (HANDOVER §13.12) and this page needs no second axis: there is one kind of
+// (MANUAL §13.12) and this page needs no second axis: there is one kind of
 // coloured string here, and it is the bottle.
 
 // The three columns. The middle one is a short name — the longest is
@@ -39,7 +39,7 @@ $ref-col-card:    minmax(6rem, 9rem);
 
 .ref-title {
   // 2.2rem is the size food's recipe title and this site's drink tape already
-  // agreed on (HANDOVER §9.13). No tape here: the tape is the DRINK's mark, and
+  // agreed on (MANUAL §9.13). No tape here: the tape is the DRINK's mark, and
   // a reference page is not a drink.
   font-size: 2.2rem;
   margin: 0;
