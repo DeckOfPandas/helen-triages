@@ -74,7 +74,11 @@ cocktails:
   css: cocktails
   home: /cocktails/
   icon: glass-martini
-  # No reference_links: cocktails has no reference pages yet, so the footer
-  # draws no [ COCKTAILS ] column. It gets one the day it has material, with no
-  # template change -- which is the whole point of the footer reading this file
-  # rather than naming food's pages directly.
+  # THE DAY ARRIVED, 2026-09-06, issue #529 -- and it cost no template change,
+  # which is what the note that used to sit here predicted. The footer's loop
+  # already asked every site rather than food; this key is the whole of it, and
+  # the [ COCKTAILS ] column now draws beside [ FOOD ] on every page of both
+  # sites.
+  reference_links:
+    - text: rum categories
+      url: /cocktails/reference/rum-categories/

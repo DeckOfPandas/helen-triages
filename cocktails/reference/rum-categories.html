@@ -1,0 +1,197 @@
+---
+layout: default
+title: "Rum Categories"
+permalink: /cocktails/reference/rum-categories/
+---
+
+{% comment %}
+  RUM CATEGORIES — cocktails' first reference page. Issue #529.
+
+  WHY THIS PAGE PASSES #459 ("being an encyclopaedia of drinks sounds like
+  busywork and it's not for me") when a bare list of eleven category names
+  would fail it: the bottles column. #501 moved a question from the page to
+  the reader — cards stopped naming bottles and started naming categories, so
+  "which of mine is a Demerara rum?" had nowhere to be answered. This is the
+  answer, and it is the column carrying the justification, not the decoration.
+
+  EVERY NAME ON THIS PAGE IS A LOOKUP, NOT A LITERAL. The categories are
+  `rum_styles`, the short names are `card_names`, the bottles are the entries
+  in `bottles.yml` whose `generic` is that category, the retired words and
+  their reasons are `retired_rum_styles`, and the Ceylon arrack note is
+  `family_less`. Nothing here restates a fact the data already holds, which is
+  the failure mode #314's own closing comment fell into twice (a rule stated
+  once, as a list, going stale with nothing noticing).
+
+  THE BOTTLES MEAN BOTTLES HELEN WOULD REACH FOR, NOT BOTTLES THAT QUALIFY —
+  settled 2026-08-27 by the case that separates the two: Lemon Hart 151 clears
+  the Demerara appellation and is deliberately absent. `bottles.yml`'s own
+  header carries the ruling; this page inherits it by reading that file and
+  must never be "completed" from anywhere else.
+
+  A CATEGORY WITH NO BOTTLE IS CORRECT AND IS NOT A GAP TO FILL.
+  `overproof Demerara rum` has none since El Dorado 151 moved to
+  `not_reached_for` on 2026-09-05 ("I don't own it, I just wanted to"). The
+  generic stays because a drink still asks for it. Do not repopulate the row.
+
+  THE WORDING OF EVERY LINE OF COPY HERE IS A PLACEHOLDER AND IS HELEN'S TO
+  WRITE — the same status as the units line (#753) and the bitters caveat
+  (#713). That covers the intro, the three column headings and the two
+  sentences introducing the characters and the retired words. What each must
+  CONVEY is fixed; the words are not. Do not polish them into house voice.
+
+  RUM ONLY, deliberately, which is the issue's own scope. `bottles.yml` stopped
+  being rum-only on 2026-08-30 and now holds 127 bottles across every family,
+  so the same page shape would render gin or agave with no new machinery. That
+  is a decision for Helen, not an extension to assume.
+{% endcomment %}
+
+{% assign ing = site.data.cocktails.ingredients %}
+{% assign bottles = site.data.cocktails.bottles.bottles %}
+
+<article class="ref" id="top">
+
+  <div class="ref-title-block">
+    <h1 class="ref-title">Rum categories</h1>
+  </div>
+
+  <div class="ref-body">
+
+    {% comment %} PLACEHOLDER COPY — see the header comment. {% endcomment %}
+    <p class="ref-intro">The categories a cocktail card can name, and which
+      bottles in the house are one.</p>
+
+    {% comment %} ── THE CATEGORIES ──────────────────────────────────────────
+       A list, not a <table>, and the reason is that the three candidate
+       treatments have to share one markup: a table's rows cannot become a
+       stack of headings without fighting the table layout algorithm the whole
+       way. The head row is a real row marked `aria-hidden` because it labels
+       columns that only exist in one of the treatments.
+
+       ORDER IS `rum_styles`' OWN ORDER, which is #314's order: the eleven it
+       settled, then the three that joined on 2026-08-29 when the brand-generics
+       were generalised. Not alphabetical — the file's order groups the
+       Jamaicans, then the Demeraras, then the agricoles, and that grouping is
+       the thing a reader is scanning for.
+    {% endcomment %}
+    <ul class="rum-cats">
+
+      <li class="rum-cat rum-cat--head" aria-hidden="true">
+        <span class="rum-cat-name">category</span>
+        <span class="rum-cat-card">on a card</span>
+        <span class="rum-cat-bottles">what I&rsquo;d reach for</span>
+      </li>
+
+      {% for style in ing.rum_styles %}
+        {% assign card = ing.card_names[style] %}
+        {% capture blob %}{% for pair in bottles %}{% if pair[1].generic == style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
+        {% assign bottle_names = blob | split: "||" %}
+        <li class="rum-cat">
+          <span class="rum-cat-name">{{ style }}</span>
+          {% comment %} The short name only where it DIFFERS. Eight of the
+             fourteen card names are the generic repeated verbatim (clairin,
+             coconut rum, both agricoles…), and printing a word twice on one
+             row teaches nothing. {% endcomment %}
+          <span class="rum-cat-card">{% unless card == style %}{{ card }}{% endunless %}</span>
+          {% if bottle_names.size > 0 %}
+          <ul class="rum-cat-bottles">
+            {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
+          </ul>
+          {% else %}
+          {% comment %} PLACEHOLDER COPY. `overproof Demerara rum` is the only
+             row that hits this today, and it is correct — see the header. {% endcomment %}
+          <span class="rum-cat-bottles rum-cat-bottles--none">none in the house</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+
+    </ul>
+
+    {% comment %} ── ADJACENT ────────────────────────────────────────────────
+       `cane_and_palm_spirits` — cachaça and Batavia arrack are in the rum
+       FAMILY (for search and exclusion only) but are not rum styles; Ceylon
+       arrack is `family_less` and carries its own recorded reason. They are
+       here because the question this page answers ("is this one of mine?")
+       gets asked of them for the same reason it gets asked of the fourteen.
+    {% endcomment %}
+    <section class="ref-block ref-block--adjacent">
+    <h2 class="ref-section-heading" id="adjacent"><span>Next to rum, and not rum</span></h2>
+
+    <ul class="rum-cats rum-cats--adjacent">
+      {% for style in ing.cane_and_palm_spirits %}
+        {% capture blob %}{% for pair in bottles %}{% if pair[1].generic == style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
+        {% assign bottle_names = blob | split: "||" %}
+        <li class="rum-cat">
+          <span class="rum-cat-name">{{ style }}</span>
+          <span class="rum-cat-card"></span>
+          {% if bottle_names.size > 0 %}
+          <ul class="rum-cat-bottles">
+            {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
+          </ul>
+          {% else %}
+          <span class="rum-cat-bottles rum-cat-bottles--none">none in the house</span>
+          {% endif %}
+          {% if ing.family_less[style] %}
+          <p class="rum-cat-note">{{ ing.family_less[style] }}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    </section>
+
+    <section class="ref-block ref-block--characters">
+    {% comment %} ── CHARACTERS ──────────────────────────────────────────────
+       `rum_characters` is a separate field from `generic` and never replaces
+       one — Helen, 2026-08-24: "blackstrap is only ever given as a character
+       for another rum, like this: Moderately aged (character: blackstrap)".
+       Here because a card can show one and the page would otherwise have
+       nothing to say about the word.
+    {% endcomment %}
+    <h2 class="ref-section-heading" id="characters"><span>Characters</span></h2>
+
+    {% comment %} PLACEHOLDER COPY — see the header comment. {% endcomment %}
+    <p class="ref-note">Not categories. A character rides alongside a real
+      category and never stands in for one.</p>
+
+    <ul class="rum-chars">
+      {% for ch in ing.rum_characters %}<li class="rum-char">{{ ch }}</li>{% endfor %}
+    </ul>
+
+    </section>
+
+    <section class="ref-block ref-block--retired">
+    {% comment %} ── NOT CATEGORIES ──────────────────────────────────────────
+       `retired_rum_styles`, with Helen's own reasons, verbatim. This is the
+       section that makes the page useful with somebody else's recipe book
+       open: "black rum" will keep arriving forever, and the file already holds
+       what to do about it.
+
+       THE FILTER IS "IS THE KEY A WORD, OR A BRAND?" Three of the eleven
+       entries are the brand-generics retired on 2026-08-29 (Malibu, the two
+       Planterays) — those record a vocabulary change, not a word a recipe
+       will ask for, and they are the three whose key is capitalised because
+       it names a bottle. `test_retired_rum_style_keys_split_by_case` in
+       tests/test_cocktails.py holds that split so this cannot rot into
+       silently dropping a real retired word.
+    {% endcomment %}
+    <h2 class="ref-section-heading" id="not-categories"><span>Not categories</span></h2>
+
+    {% comment %} PLACEHOLDER COPY — see the header comment. {% endcomment %}
+    <p class="ref-note">Words other people&rsquo;s recipes use for a rum. None
+      of them names a category here.</p>
+
+    <dl class="rum-retired">
+      {% for pair in ing.retired_rum_styles %}
+        {% assign word = pair[0] %}
+        {% assign initial = word | slice: 0 %}
+        {% assign initial_lower = initial | downcase %}
+        {% if initial == initial_lower %}
+        <dt class="rum-retired-word">{{ word }}</dt>
+        <dd class="rum-retired-why">{{ pair[1] }}</dd>
+        {% endif %}
+      {% endfor %}
+    </dl>
+    </section>
+
+  </div>
+</article>

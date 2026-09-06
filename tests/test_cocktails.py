@@ -6721,3 +6721,75 @@ def test_the_unit_formula_and_its_worked_example_still_agree():
         "A 60 ml pour of Tanqueray is 2.586 units, which prints as 2.6. This "
         "failing means the formula, the constant or the data has moved."
     )
+
+
+# =============================================================================
+# The reference page's own reading of the data -- #529
+# =============================================================================
+
+def test_retired_rum_style_keys_split_by_case():
+    """A capitalised `retired_rum_styles` key names a BOTTLE; a lowercase one
+    names a WORD -- and cocktails/reference/rum-categories.html shows only the
+    words.
+
+    THE PAGE NEEDS THE SPLIT AND THE DATA DOES NOT DECLARE IT. Eleven entries
+    live in that block and they are two different kinds of thing. Eight are
+    words other people's recipes will keep asking for forever -- `navy`,
+    `black`, `dark` -- and the page's "not categories" section exists precisely
+    to answer those with a recipe book open. Three are the brand-generics
+    retired on 2026-08-29 when #314's amendment generalised them (Malibu, the
+    two Planterays): those record a VOCABULARY change, and a reader looking up
+    "what does my book mean by dark rum" is not helped by being told that
+    Malibu used to be its own generic.
+
+    LIQUID CANNOT ASK WHICH KIND AN ENTRY IS, so the page tests the first
+    character's case, which works because the three brand entries name bottles
+    and a bottle name is capitalised. That is an inference from a spelling
+    convention rather than from a declared field, so it needs a guard: this
+    test is what stops a future retired BOTTLE written in lowercase (or a
+    retired WORD written with a capital) from silently changing what the page
+    prints, with nothing failing.
+
+    THE ASSERTION IS THE CONVENTION, NOT THE PAGE. Each capitalised key must
+    name a bottle and each lowercase key must not. If the day comes that a
+    retired word genuinely wants a capital, the honest fix is a declared field
+    in the data and a page that reads it, not a looser test here.
+
+    "NAMES A BOTTLE" IS A PREFIX MATCH IN EITHER DIRECTION, NOT AN EXACT ONE,
+    and the case that forced it is worth recording rather than smoothing over:
+    `Planteray O.F.T.D. Overproof` was the retired GENERIC's spelling and the
+    bottle is `Planteray O.F.T.D.` -- the same product, one word longer,
+    because the generic had to say "overproof" and the bottle does not. A
+    retired brand-generic is keyed on what the DATA used to say, and that was
+    never required to equal what bottles.yml calls the bottle today.
+    """
+    vocab = _vocab()
+    retired = vocab.get("retired_rum_styles") or {}
+    assert retired, "retired_rum_styles is empty; this check has nothing to hold."
+
+    index = _bottle_index(_bottles())
+
+    def names_a_bottle(key):
+        k = key.strip().lower()
+        return any(k == n or k.startswith(n + " ") or n.startswith(k + " ")
+                   for n in index)
+
+    wrong = []
+    for key in retired:
+        is_capitalised = key[:1] != key[:1].lower()
+        is_bottle = names_a_bottle(key)
+        if is_capitalised and not is_bottle:
+            wrong.append(f"{key!r} is capitalised but names no bottle")
+        if not is_capitalised and is_bottle:
+            wrong.append(f"{key!r} is lowercase but names a bottle")
+
+    assert not wrong, (
+        "retired_rum_styles keys break the case convention:\n  "
+        + "\n  ".join(wrong)
+        + "\n\ncocktails/reference/rum-categories.html shows the lowercase keys "
+          "and hides the capitalised ones, because the first are words a recipe "
+          "asks for and the second are bottles whose generic was retired. Either "
+          "fix the spelling, or -- if the two kinds genuinely need telling apart "
+          "some other way -- declare it in the data and change the page to read "
+          "the declaration instead of the case."
+    )

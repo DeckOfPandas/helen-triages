@@ -1,0 +1,222 @@
+// =============================================================================
+// COCKTAILS — THE REFERENCE PAGE. Issue #529, cocktails/reference/*.
+// =============================================================================
+// Food's two reference pages reuse `.recipe`/`.recipe-body-content` — the same
+// wrapper about.html already used for a prose page, so no page type was
+// invented (HANDOVER §14). That trick is not available here: every one of those
+// classes, and the only table CSS on the site, lives in _sass/food/, and this
+// site's own page anatomy (`.cocktail-*`) is a DRINK's anatomy — a title block
+// that reserves a column for a glass drawing, an ingredients grid built around
+// an amount column. So cocktails' reference layer gets its own small anatomy,
+// which is what `.ref-*` is.
+//
+// IT BORROWS RATHER THAN REDRAWS wherever there is something to borrow: the
+// section headings take `overlapping-rule-double` in the drink page's own two
+// colours, and a bottle name takes `.cocktail-suggestion`'s wicked-woowoo. That
+// second one is the palette's own logic and not a colour picked to look nice —
+// woowoo means ASKED FOR, the string the index's has-to-have field matches
+// against, and a bottle name on this page is literally the same value as a
+// bottle name in brackets on a drink page.
+//
+// ONE HUE, DELIBERATELY. The category name stays in ink and the short name in
+// $color-clear-text, because a new hue is Helen's decision and nobody else's
+// (HANDOVER §13.12) and this page needs no second axis: there is one kind of
+// coloured string here, and it is the bottle.
+
+// The three columns. The middle one is a short name — the longest is
+// `Demerara overproof rum` at 22 characters — so it is bounded rather than
+// flexible, and the bottles take whatever is left.
+$ref-col-name:    minmax(11rem, 15rem);
+$ref-col-card:    minmax(6rem, 9rem);
+
+.ref-title-block {
+  // Matches `.cocktail-title-block`'s spacing and its absinthe rule, minus the
+  // glass reservation — there is no drawing to hold a column open for.
+  margin: 2rem 0 1.75rem;
+  padding-bottom: $space-md;
+  border-bottom: 2px solid $color-electric-absinthe;
+}
+
+.ref-title {
+  // 2.2rem is the size food's recipe title and this site's drink tape already
+  // agreed on (HANDOVER §9.13). No tape here: the tape is the DRINK's mark, and
+  // a reference page is not a drink.
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+.ref-body {
+  font-size: $font-size-body-sm;
+  line-height: $line-height-body;
+}
+
+.ref-intro,
+.ref-note {
+  color: $color-clear-text;
+  max-width: 34rem;
+}
+
+.ref-section-heading {
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  margin: 2.25rem 0 $space-md;
+
+  // The drink page's INGREDIENTS/METHOD mark exactly — absinthe over violette.
+  // Not the notes variant: nothing on this page is Helen's commentary.
+  span {
+    display: inline;
+    @include overlapping-rule-double($color-electric-absinthe, $color-ultra-violette);
+  }
+}
+
+// =============================================================================
+// THE CATEGORY ROWS
+// =============================================================================
+// ONE MARKUP, THREE POSSIBLE TREATMENTS, which is why every row is its own grid
+// rather than the list being one grid with `display: contents` rows. A per-row
+// grid with a fixed template aligns exactly as a table does — the first two
+// tracks are the same length on every row and only the last is fluid — and it
+// can be turned into a stack or a two-column pairing by re-declaring the
+// template on one selector. A single grid with contents rows cannot, and it
+// also puts every border on a cell.
+.rum-cats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rum-cat {
+  display: grid;
+  grid-template-columns: $ref-col-name $ref-col-card 1fr;
+  grid-template-areas: "name card bottles";
+  gap: $space-xs $space-lg;
+  align-items: baseline;
+
+  padding: $space-md 0;
+  border-bottom: 1px solid $color-grey-light;
+}
+
+// The column labels. `aria-hidden` in the markup, because in two of the three
+// treatments there are no columns for them to label — a screen reader gets the
+// list and each row's own three values in order, which needs no header.
+.rum-cat--head {
+  font-family: $font-label;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $color-clear-text;
+  padding-bottom: $space-xs;
+  border-bottom-color: $color-clear-text;
+}
+
+.rum-cat-name {
+  grid-area: name;
+  color: $color-text;
+}
+
+.rum-cat-card {
+  grid-area: card;
+  color: $color-clear-text;
+  font-size: 0.84rem;
+}
+
+// THE BOTTLES, IN `.cocktail-suggestion`'S OWN COLOUR — see the file header.
+// A comma-separated run rather than a bulleted list: at three to eight names a
+// bullet per bottle turns one answer into a block, and the answer to "which of
+// mine is a Demerara rum?" is a sentence's worth of names.
+.rum-cat-bottles {
+  grid-area: bottles;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: $color-wicked-woowoo-deep;
+}
+
+.rum-bottle {
+  display: inline;
+
+  &::after {
+    content: ", ";
+  }
+
+  &:last-child::after {
+    content: "";
+  }
+}
+
+// A CATEGORY WITH NO BOTTLE IS CORRECT AND IS NOT A GAP — `overproof Demerara
+// rum` since El Dorado 151 came off on 2026-09-05. Quiet and un-hued, because
+// it is the absence of the thing the hue means rather than a different kind of
+// thing.
+.rum-cat-bottles--none {
+  color: $color-clear-text;
+  font-style: italic;
+}
+
+// Ceylon arrack's `family_less` reason, and anything else the data records
+// against a row. Full width beneath the three tracks.
+.rum-cat-note {
+  grid-column: 1 / -1;
+  margin: $space-xs 0 0;
+  color: $color-clear-text;
+  font-size: 0.84rem;
+  max-width: 34rem;
+}
+
+// =============================================================================
+// CHARACTERS AND RETIRED WORDS
+// =============================================================================
+.rum-chars {
+  list-style: none;
+  margin: $space-md 0 0;
+  padding: 0;
+}
+
+.rum-char {
+  display: inline;
+
+  &::after {
+    content: ", ";
+  }
+
+  &:last-child::after {
+    content: "";
+  }
+}
+
+// A definition list, because that is what it is: the word, and what to do about
+// it. The reasons are Helen's own, from `retired_rum_styles`, and they are long
+// — a couple of sentences each — so the word sits above rather than beside.
+.rum-retired {
+  margin: $space-md 0 0;
+}
+
+.rum-retired-word {
+  font-family: $font-label;
+  color: $color-text;
+  margin-top: $space-lg;
+}
+
+.rum-retired-why {
+  margin: $space-xxs 0 0;
+  color: $color-clear-text;
+  max-width: 34rem;
+}
+
+// =============================================================================
+// NARROW
+// =============================================================================
+// The three-track row cannot hold at phone width — the name column alone wants
+// 11rem — so it becomes the stack, which is candidate B's treatment arriving
+// as a fallback rather than as a choice.
+@media (max-width: 34rem) {
+  .rum-cat {
+    grid-template-columns: 1fr;
+    grid-template-areas: "name" "card" "bottles";
+  }
+
+  .rum-cat--head {
+    display: none;
+  }
+}
