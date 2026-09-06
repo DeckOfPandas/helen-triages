@@ -66,13 +66,24 @@
 // It groups by parent, so a third would work the day it was written.
 //
 // THE PASS IS EXPOSED AS `HTF.markChipRows()` for anything that puts chips on
-// the page after load. NOTHING CALLS IT TODAY: universe.js would, on the same
-// argument that has it calling `HTF.fitCardNames()` -- a freshly cloned chip in
-// a container of a different width needs re-measuring, not the class it was
-// cloned with -- but since 2026-09-05 its `data-universe-parts` does not clone a
-// card's foot, and the foot is where the chips are. The hook stays for the day
-// that changes; cocktails/index.html says so beside the attribute that would
-// change it.
+// the page after load. SOMETHING CALLS IT SINCE 2026-09-06: #757 groups a card's
+// MATCHED chips at the front of its row, and moving a chip changes which chip
+// begins a row -- so cocktail-index.js's `apply()` re-runs this pass whenever it
+// has actually reordered something. That is the case this hook was written for,
+// arriving from a direction nobody predicted.
+//
+// (It said "NOTHING CALLS IT TODAY" until then, and named universe.js as the
+// likely first caller -- on the same argument that has it calling
+// `HTF.fitCardNames()`: a freshly cloned chip in a container of a different
+// width needs re-measuring rather than the class it was cloned with. That is
+// still true and still not happening, because since 2026-09-05
+// `data-universe-parts` does not clone a card's foot and the foot is where the
+// chips are. cocktails/index.html says so beside the attribute that would change
+// it.)
+//
+// ONE CALL PER PASS, NOT ONE PER CARD. `apply()` collects a single flag across
+// all 124 cards and calls this once at the end; this function re-measures every
+// container on the page, so calling it per card would be quadratic for no gain.
 // =============================================================================
 
 (function () {

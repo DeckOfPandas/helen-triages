@@ -310,3 +310,99 @@ test('#694: changing a filter returns you to page one', () => {
   assert.strictEqual(r.doc.getElementById('drink-page-status').textContent, 'page 1 of 3',
     'a filter change must reset the page.');
 });
+
+// --- matched chips lead the row, #757 ----------------------------------------
+//
+// Helen's own example, and her diagnosis was right: "'no juicing' returns
+// Caribbean Sazerac first, but the chip isn't on the card, presumably because
+// the full list of chips doesn't fit on the two lines we give them."
+//
+// `.drink-card-moods` clips past its row cap, so on a chip-heavy drink the word
+// that EXPLAINS why the card is here could be the one cut off -- which is the
+// one job the card's foot has.
+
+const CHIPPY = [{
+  url: '/sazerac',
+  name: 'caribbean sazerac',
+  title: 'Caribbean Sazerac',
+  // As #710 renders them: alphabetical.
+  moods: ['aperitivo', 'clear', 'nightcap', 'no juicing', 'tiki', 'warming'],
+  ingredients: ['rye|rye'],
+  chaos: 'good',
+  madeBefore: true
+}];
+
+// The panel has to offer every mood this drink carries, or the test would be
+// clicking buttons that do not exist. `no juicing` is the HASSLE section, as it
+// is on the real index.
+const CHIP_HASSLES = ['no juicing'];
+const CHIP_MOODS = ['aperitivo', 'clear', 'nightcap', 'tiki', 'warming'];
+
+function chipOrder(page) {
+  return page.list.children[0]
+    .querySelectorAll('.drink-card-mood')
+    .map(function (c) { return c.dataset.mood; });
+}
+
+function matchedChips(page) {
+  return page.list.children[0]
+    .querySelectorAll('.drink-card-mood')
+    .filter(function (c) { return c.classList.contains('is-match'); })
+    .map(function (c) { return c.dataset.mood; });
+}
+
+test('#757: a matched chip moves to the front of the row', () => {
+  const r = boot({ drinks: CHIPPY, moods: CHIP_MOODS, hassles: CHIP_HASSLES });
+  assert.deepStrictEqual(chipOrder(r.page),
+    ['aperitivo', 'clear', 'nightcap', 'no juicing', 'tiki', 'warming'],
+    'the resting order should be the alphabetical one #710 renders.');
+
+  clickByData(r.page, 'data-mood', 'no juicing');
+
+  assert.deepStrictEqual(matchedChips(r.page), ['no juicing']);
+  assert.strictEqual(chipOrder(r.page)[0], 'no juicing',
+    'the chip that explains why this card is here must not be the one clipped.');
+});
+
+test('#757: alphabetical order survives inside both groups', () => {
+  // The two lists are built by walking `d.moodEls`, which is read once at
+  // startup in document order -- so #710's sort is preserved within the matched
+  // group and within the rest, rather than being undone by the regrouping.
+  const r = boot({ drinks: CHIPPY, moods: CHIP_MOODS, hassles: CHIP_HASSLES });
+  clickByData(r.page, 'data-mood', 'tiki');
+  clickByData(r.page, 'data-mood', 'aperitivo');
+
+  assert.deepStrictEqual(chipOrder(r.page),
+    ['aperitivo', 'tiki', 'clear', 'nightcap', 'no juicing', 'warming'],
+    'matched chips first in alphabetical order, then the rest in theirs.');
+});
+
+test('#757: clearing the filter puts the row back in plain alphabetical order', () => {
+  const r = boot({ drinks: CHIPPY, moods: CHIP_MOODS, hassles: CHIP_HASSLES });
+  clickByData(r.page, 'data-mood', 'warming');
+  assert.strictEqual(chipOrder(r.page)[0], 'warming');
+
+  clickByData(r.page, 'data-mood', 'warming');   // toggles off
+  assert.deepStrictEqual(chipOrder(r.page),
+    ['aperitivo', 'clear', 'nightcap', 'no juicing', 'tiki', 'warming'],
+    'with nothing matched there is no group to lead, so the row is just sorted.');
+});
+
+test('#757: the chips are moved in the DOM, not merely reordered visually', () => {
+  // Load-bearing, and the reason flex `order` was not used: the separator dot
+  // is drawn by `.drink-card-mood + .drink-card-mood::before`, a DOM-order
+  // selector. Reordering visually would leave the dot on whichever chip is
+  // second in the MARKUP -- a leading dot on the row and a missing one inside
+  // it. Asserting document order is asserting the dot lands correctly.
+  const r = boot({ drinks: CHIPPY, moods: CHIP_MOODS, hassles: CHIP_HASSLES });
+  clickByData(r.page, 'data-mood', 'no juicing');
+
+  const parent = r.page.list.children[0].querySelector('.drink-card-moods');
+  assert.strictEqual(parent.children[0].dataset.mood, 'no juicing',
+    'the matched chip is not first in the DOM, so the dot will be wrong.');
+  parent.children.forEach(function (chip) {
+    assert.strictEqual(chip.style.order, undefined,
+      'a chip carries an `order` style, which would divorce what is seen from ' +
+      'what the dot selector reads.');
+  });
+});
