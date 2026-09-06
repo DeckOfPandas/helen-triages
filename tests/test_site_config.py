@@ -678,7 +678,7 @@ def test_pantry_list_is_lowercase():
     """The match in food/index.html is `ing | downcase` against a raw `contains`
     check on this list -- an uppercase entry here would silently never match
     anything (Liquid does not lowercase the pantry side), the exact "test that
-    cannot fail and not notice" failure mode HANDOVER_v26.md §12 warns about:
+    cannot fail and not notice" failure mode HANDOVER_v27.md §12 warns about:
     green, no error, just an entry that's dead weight forever.
     """
     path = DATA / "pantry.yml"
@@ -1391,7 +1391,7 @@ def _top_level_blocks(text: str):
     (_sass/shared/_print.scss and _sass/food/_print.scss, GitHub issue #86)
     was invisible to test_no_selector_declares_the_same_property_twice below
     while it went on reporting green -- the exact "test that cannot fail and
-    not notice" shape HANDOVER_v26.md §12 warns about, arriving with a
+    not notice" shape HANDOVER_v27.md §12 warns about, arriving with a
     feature rather than with a file move.
 
     THE AT-RULE HAS TO STAY IN THE KEY, not be folded away. A print rule and

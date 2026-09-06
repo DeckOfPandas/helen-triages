@@ -151,14 +151,14 @@ def test_internal_recipe_links_resolve(recipe):
 # rather than failing it -- a gap, not a deliberate exclusion. Real bug,
 # 2026-08-09: teriyaki-salmon.md's tagline and its own note both linked to
 # "../teriyaki-sauce)" (no slash before the closing paren), the same class
-# of "resolves against the wrong base and 404s" bug HANDOVER_v26.md §4
+# of "resolves against the wrong base and 404s" bug HANDOVER_v27.md §4
 # already documents for a bare `/recipes/slug/` link -- just with the
 # trailing slash missing instead of the leading `../`.
 MISSING_TRAILING_SLASH = re.compile(r"\]\(\.\./[a-z0-9-]+\)")
 
 
 def test_internal_links_have_trailing_slash(recipe):
-    """Cross-recipe links must be `../slug/`, not `../slug` -- HANDOVER_v26.md
+    """Cross-recipe links must be `../slug/`, not `../slug` -- HANDOVER_v27.md
     §4. `../slug` resolves relative to the parent of the current page
     instead of alongside it, so it 404s the same way an unresolved slug
     does, but looks correct at a glance and slips past

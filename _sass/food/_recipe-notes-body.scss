@@ -112,7 +112,7 @@
 
 // --- Body Content (long-form prose via {{ content }}) -----------------------
 // A recipe's Markdown body below its front matter -- rare (one file as of
-// 2026-08-02, dark-chocolate-ganache.md, see HANDOVER_v26.md §4.1) but real.
+// 2026-08-02, dark-chocolate-ganache.md, see HANDOVER_v27.md §4.1) but real.
 //
 // Section headings in here are PEERS of INGREDIENTS/METHOD/NOTES, per
 // Helen's call 2026-08-02: "I can imagine TIPS and TROUBLESHOOTING being
@@ -222,7 +222,7 @@ article.recipe .recipe-body-content {
 
   // --- Reading width -----------------------------------------------------
   // THIS REVERSES A DELIBERATE EARLIER CALL, knowingly. Body content used to
-  // set max-width: none to match Method rather than Notes (HANDOVER_v26.md
+  // set max-width: none to match Method rather than Notes (HANDOVER_v27.md
   // §4.1, Helen's decision 2026-08-02) -- but that call was made when the only
   // question was which of two existing caps to copy, and "no cap" and "65ch"
   // look identical on Method, where a step is a short imperative that rarely
@@ -559,7 +559,7 @@ article.recipe .recipe-body-content {
   font-size: 1rem;
   letter-spacing: $letter-spacing-label;
   color: $color-text;
-  // Raised label-tape lettering (HANDOVER_v26.md §13.4.1). Stroke was
+  // Raised label-tape lettering (HANDOVER_v27.md §13.4.1). Stroke was
   // $stroke-light's flat 0.5px, i.e. 3.1% of this element's own 1rem -- same
   // swallowing problem the meta labels had, see food/_recipe-header.scss.
   //

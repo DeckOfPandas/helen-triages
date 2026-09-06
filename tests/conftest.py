@@ -285,7 +285,7 @@ def internal_temperatures() -> dict:
 #
 #     - step: "QQ bake at 150C for 30-40 minutes"
 #
-# `QQ` is her marker for "not rewritten yet" (HANDOVER_v26.md §4/§12): the line
+# `QQ` is her marker for "not rewritten yet" (HANDOVER_v27.md §4/§12): the line
 # is still the SOURCE's wording, sitting in the file waiting to be replaced
 # wholesale. Correcting its degree sign or its dash is tidying text that is
 # about to be deleted, and it does it by editing someone else's words -- which

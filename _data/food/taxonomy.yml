@@ -273,7 +273,7 @@ proper_nouns:
 # -----------------------------------------------------------------------------
 # Ampersand proper nouns
 #
-# House style is "and", never "&", in a title (HANDOVER_v26.md §5)
+# House style is "and", never "&", in a title (HANDOVER_v27.md §5)
 # -- but a real brand or proper name that is itself spelled with an ampersand
 # ("Ben & Jerry's") would be misspelled by swapping it for "and". Same
 # reasoning and same shape as proper_nouns above: whether an "&" is a genuine

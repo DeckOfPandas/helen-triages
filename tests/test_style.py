@@ -66,7 +66,7 @@ QQ = re.compile(r"\bQQ\b")
 
 def test_no_qq_placeholder(recipe):
     """`QQ` is Helen's own placeholder for "not decided/written yet" — see
-    HANDOVER_v26.md §4 and §12. Fine anywhere in `_food_drafts/`, and never to
+    HANDOVER_v27.md §4 and §12. Fine anywhere in `_food_drafts/`, and never to
     be treated as an error there. But a `QQ` surviving into `_food_recipes/`
     means the recipe isn't actually finished, whatever field it's hiding in
     (a tagline link target, a cook_time, an ingredient amount, or an
@@ -77,7 +77,7 @@ def test_no_qq_placeholder(recipe):
     A second marker, `PLACEHOLDER`, briefly existed alongside this one
     (found 2026-08-09 in roast-beef-fillet.md's method) and was retired
     2026-08-10 at Helen's direction: one marker for everything, not two —
-    see HANDOVER_v26.md §4's ingest paragraph. Don't reintroduce it.
+    see HANDOVER_v27.md §4's ingest paragraph. Don't reintroduce it.
     """
     hits = QQ.findall(recipe.raw)
     assert not hits, (
@@ -289,7 +289,7 @@ def test_temperatures_use_degree_c(recipe):
 # into a real closed-list rule, not just "isn't bare" -- Helen: outside an
 # incidental use (melted butter for greasing a tin), butter is always
 # "salted butter" or "unsalted butter", full stop, and sugar/flour each have
-# their own short list of allowed names. See HANDOVER_v26.md for the
+# their own short list of allowed names. See HANDOVER_v27.md for the
 # reasoning behind each list.
 #
 # Supersedes two narrower tests: the old test_flour_and_sugar_specify_type
@@ -842,7 +842,7 @@ def test_size_word_is_with_the_count_not_the_item(recipe):
     """"2 large cooking apples" as amount: "2", item: "large cooking apples"
     means the highlighter only picks up "2" -- the size sits unstyled in the
     item text with no error anywhere, the same "quantity embedded in item
-    text" trap HANDOVER_v26.md §4 already documents for a leading `~` or a
+    text" trap HANDOVER_v27.md §4 already documents for a leading `~` or a
     "zest and juice of 1 lime" pattern. Bare numeric counts only -- see
     module comment above for what's deliberately excluded.
     """
@@ -1090,7 +1090,7 @@ def test_pan_and_ingredient_sizes_use_digits_in_drafts():
 
 # --- oven temperature: fan required ------------------------------------------
 # GitHub issue #146. House style has been fan-only for a while
-# (HANDOVER_v26.md §5: "always fan oven only, never conventional or gas
+# (HANDOVER_v27.md §5: "always fan oven only, never conventional or gas
 # mark"), but the word "fan" isn't actually written next to every existing
 # temperature yet. Helen's explicit call: don't assume the numbers already
 # there are confirmed fan figures just because house style says they should

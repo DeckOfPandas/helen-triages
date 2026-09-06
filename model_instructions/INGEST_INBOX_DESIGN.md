@@ -9,8 +9,10 @@ audit.
 > `SUPPORTED_VERSIONS` and its test, HANDOVER §11.0.4, and READMEs in both
 > private repos. §3's gaps are closed. **What still binds is §6 (the envelope),
 > §8 (security and failure modes) and §9 (the rulings)** — `ingest-inbox.md`
-> and both `INGEST_ONE_*.md` cite §6 as the spec. §2, §3, §5, §10 and §11 are
-> history; do not work from them. The paragraph that stood here said "this is
+> and both `INGEST_ONE_*.md` cite §6 as the spec. §1, §2, §3, §7, §10 and §11 are
+> one-line stubs since the 2026-09-06 documentation split (their numbering
+> kept because scripts and tests cite this file by section); §4 and §5 are
+> the generator's design and still describe it. The paragraph that stood here said "this is
 > a design, not an implementation; nothing described here exists yet" until
 > this stamp.
 
@@ -21,76 +23,15 @@ moved since. Re-check before editing (HANDOVER §11.2).
 
 ## 1. What Helen asked for
 
-> "How to enable a Claude web to ingest recipes for me in a useful way."
-
-She finds recipes away from her desk: a photograph of a book page, a
-screenshot, a URL, pasted text. She wants to hand that to claude.ai (or the
-Claude app) and have the result reach `_food_drafts/` or `_cocktail_drafts/`
-with as little of her own typing as possible, and without lowering the bar the
-local `/ingest` procedure holds.
+Helen's ask, 2026-09-02: *"How to enable a Claude web to ingest recipes for me in a useful way."* The answer is now `CLAUDE_WEB_INGEST.md`.
 
 ## 2. What exists today, and it is more than the audit first assumed
 
-**The repo-less path already exists.** `.claude/commands/ingest.md` has a
-section "A FILE THAT ARRIVES FROM A REPO-LESS SESSION": Helen pastes
-`model_instructions/INGEST_ONE_RECIPE.md` or `INGEST_ONE_COCKTAIL.md` into
-claude.ai with the source, gets back one file in a code block plus a "what I
-could not know" list, and a local session runs a six-step finishing pass
-(save, derive moods for a drink, pytest, `/tidy-drafts` on either site, work the
-hand-back list as TIER 3 questions, `ingest_preflight.py`).
-
-**The two documents are guarded, in one direction.** `tests/test_standalone_docs.py`
-checks that every tag, star, garnish, glass and method step the documents
-PRINT is still declared in `_data/`, and that each worked example obeys the
-schema. Its header says why the check is one-way: a document that omits a new
-garnish under-serves; a document that prints a retired one teaches a shape the
-suite rejects, to a reader who cannot run the suite. That asymmetry is right
-and this design keeps it.
-
-**The tooling below the documents is already the right shape.**
-`scripts/ingest_preflight.py` imports every rule from the test suite and never
-writes; `scripts/tidy_drafts.py` fixes the mechanical and reports the rest;
-`scripts/derive_cocktail_moods.py --write` fills `mood`. The "script reports,
-command doc decides" split (HANDOVER §11.0.2) is the pattern the inbox copies.
-
-**The write channel is fixed.** `GH_TOKEN` is issues-only on the three repos
-(CLAUDE.md, probed 2026-08-17: file write 403, PR 403). Any Claude holding that
-token can raise an issue and nothing else. The private drafts repos have no
-build, so nothing an issue carries can publish. Neither constraint is a
-problem; together they choose the transport.
+History — the state of the repo-less path on 2026-09-02, before the inbox existed. `DECISIONS.md` §11.0.4.
 
 ## 3. The gaps, precisely
 
-1. **Transport is manual.** The browser session's output reaches the repo by
-   Helen copying a code block out of a chat and into a file, then telling a
-   local session about it. On a phone that is the step that does not happen.
-2. **The documents under-serve, never mislead.** Verified against `_data/` at
-   8191230:
-   - `INGEST_ONE_COCKTAIL.md` §4 prints 42 garnishes; `garnish.yml` declares
-     six more it does not print (`pineapple wedge (cut to resemble a bird's
-     plumage)`, `pineapple and brandied cherry`, `passion fruit shell filled
-     with overproof rum`, `fruit stick (skewered pineapple cubes and a
-     maraschino cherry)`, `3 dashes red creole-style bitters`, `5 drops of
-     olive oil`). A reader will "correct" a valid string to a near one.
-   - `INGEST_ONE_RECIPE.md` §6 lists ~12 accented words; `_data/accented_words.yml`
-     has 45, plus eight explicit **no-accent** words (`chorizo`, `gratin`,
-     `julienne`, `vinaigrette`, `dauphinoise`, `mornay`, `confit`, `echalion`)
-     that a keen reader will accent wrongly.
-   - `INGEST_ONE_RECIPE.md` shows only flat `method:`; `ingest.md` TIER 1
-     requires `method_groups` to be split at ingest and
-     `test_method_xor_method_groups` knows the key. The one job that is cheap
-     with the page in frame is the one the repo-less document does not ask for.
-   - `INGEST_ONE_COCKTAIL.md` never mentions `character:` (which
-     `test_speciality_gin_declares_a_character` requires for speciality gins)
-     and teaches `item:` on every pour while §9.10 has made `item` a field that
-     renders nowhere and #544 is removing it. See D8.
-3. **Things the browser cannot know and must not pretend to:** whether the
-   drink or dish already exists (339 food drafts, 126 drink drafts, private);
-   slug collisions; `main_ingredients` case against `proper_nouns`; the
-   mood derivation; pytest; git. The documents already say "compare the
-   formula, never the title" with nothing to compare against.
-4. **The private repos describe themselves nowhere.** `_cocktail_drafts/README.md`
-   is empty and `_food_drafts/` has no README.
+History — the four gaps this design closed (transport; the documents under-serving; what the browser cannot know; no READMEs in the private repos). All closed by 2026-09-03; `DECISIONS.md` §11.0.4.
 
 ## 4. Design principle
 
@@ -218,44 +159,7 @@ collection the consumer appends `-2` and reports it; it never overwrites.
 
 ## 7. The consumer — `/ingest-inbox`
 
-Two files, copying `/tidy-drafts` and `/ingest` exactly: a script that does
-the mechanical part and never commits, and a command doc that holds the
-procedure.
-
-**`scripts/ingest_inbox.py`** — reads issues labelled `ingest` from one
-private repo (argument `--site food|cocktail`), parses each envelope per §6,
-and for each one either writes the file into the drafts root and prints what
-it did, or prints why it did not. Flags: `--dry-run` (default; prints the
-plan), `--write`, `--issue N` (one envelope), `--comment` (post the
-rejection or the "saved as" note back on the issue). It uses `urllib` with
-`GH_TOKEN` from the environment at the point of use, never `gh` (absent in a
-worktree, see the memory note of 2026-08-27), and never prints the token. It
-imports the slug and front-matter helpers from the test suite rather than
-re-typing them.
-
-**`.claude/commands/ingest-inbox.md`** — the procedure:
-
-1. `cd _<site>_drafts && git fetch origin` and report if `main` has moved.
-2. Branch in the drafts repo: `content/inbox-<YYYY-MM-DD>`. Never its `main`.
-3. `python3 scripts/ingest_inbox.py --site <site>` dry, read the plan.
-4. `--write`. Then, per file, the existing finishing pass from `ingest.md`,
-   in its order: cocktails `derive_cocktail_moods.py --write`; `pytest`
-   (alone — never two at once); `/tidy-drafts` (both sites since 2026-09-05);
-   `ingest_preflight.py`.
-5. Bring Helen ONE list: every rejection, every probable duplicate, every
-   hand-back bullet from every envelope, grouped by file. Treat each as a
-   TIER 3 question. Do not fill in a `generic`, a `suggestion`, a glass or a
-   tagline.
-6. Commit in the drafts repo with a bare `Fixes #N` per envelope — valid
-   because the issue and the commit are in the same private repo (the
-   cross-repo trap in CLAUDE.md does not apply). Push freely — the private
-   repos need no ask for a push (CLAUDE.md, 2026-09-05). The trailer is what
-   closes the issue; the script never closes one.
-7. Report what is still `QQ` and why, as `/ingest` does.
-
-**What the consumer never does:** rewrite prose, derive `main_ingredients`,
-fill a `QQ`, set a `meta` flag to anything but the values the document says,
-close an issue by API, or touch `_food_recipes/` / `_cocktail_recipes/`.
+Built 2026-09-03 (#672). `.claude/commands/ingest-inbox.md` is the procedure and `scripts/ingest_inbox.py` the engine; this section's outline is superseded by both.
 
 ## 8. Security and failure modes
 
@@ -293,53 +197,9 @@ waiting on anything but PR 1.
 
 ## 10. Implementation plan for Opus
 
-Two PRs in this repo, plus small commits in the private repos.
-
-**PR 1 — documents and generator (one day).**
-1. `scripts/build_ingest_vocab.py` with `--check` / `--write`, sourcing every
-   block from an imported loader (§5 table). If a loader is private to a test
-   module, import it from there as `ingest_preflight.py` does; do not copy it.
-2. Markers in both documents; run `--write`; diff by eye once.
-3. `test_standalone_docs.py::test_every_vocab_block_matches_its_generator`.
-   Keep every existing one-way test; if a scraper stops matching the generated
-   formatting, fix the generator's output, not the scraper.
-4. Hand-written fixes from §5: `method_groups`, `character:`, `item:` per D8,
-   §0 "How to hand this back" in both documents.
-5. `garnish.yml` `group:` keys per D11, with the test that every declared
-   garnish has one.
-6. Acceptance: `pytest tests/test_standalone_docs.py` green; `--check` clean;
-   the six missing garnishes and the eight no-accent words now print.
-
-**PR 2 — inbox (one to two days), after PR 1.**
-1. `scripts/ingest_inbox.py` per §7, with unit tests in `tests/` over fixture
-   envelopes in `tests/fixtures/ingest_inbox/`: one valid food, one valid
-   cocktail, and one each of: no marker, unknown site, unsupported version,
-   two fenced blocks, YAML that is a list, missing hand-back section, slug
-   collision, fingerprint duplicate, title-only match. Tests never call
-   GitHub; the fetch is one function that the tests replace.
-2. `.claude/commands/ingest-inbox.md` per §7.
-3. A `SUPPORTED_VERSIONS` constant, and a test that both documents' §0 name a
-   version in it.
-4. HANDOVER: a §11.0.4 for the command, and a pointer from §9.2.1 and from
-   `ingest.md`'s repo-less section, which becomes "if it arrived by paste,
-   this is still the procedure; if it arrived as an issue, run
-   `/ingest-inbox`".
-5. Acceptance: with one hand-written issue in each private repo, a dry run
-   prints the right plan, `--write` lands two files that pass `pytest`, and
-   the finishing pass produces one hand-back list.
-
-**Private repos (30 minutes, either PR).** `_food_drafts/README.md` and
-`_cocktail_drafts/README.md`: three lines each — private, unpublished; schema
-lives in `helen-triages` HANDOVER §4 / §9.3; ingest arrives via `ingest`
-issues here, see `INGEST_INBOX_DESIGN.md`. Branch, commit, push (allowed).
+Done, both PRs, 2026-09-03. `DECISIONS.md` §11.0.4.
 
 ## 11. What this deliberately does not do
 
-- Does not let the browser run any check that needs the corpus. Every such
-  check moved to the consumer, where it is one function over files it can read.
-- Does not generate the prose of the two documents. Their value is judgement
-  and calibration; a generator would preserve the words and lose the point.
-- Does not touch `/ingest` for photo batches. That path is local, has the
-  photos, and works.
-- Does not build a web form, a bot, or an Action. Issues, one script, one
-  command doc: the same three parts every other procedure in this repo uses.
+Still true: the browser runs no check that needs the corpus; the prose of the two documents is not generated; `/ingest` for photo batches is untouched; no web form, bot or Action — issues, one script, one command doc.
+

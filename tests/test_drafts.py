@@ -4,7 +4,7 @@
 (test_front_matter.py, test_style.py, test_taxonomy.py) correctly leaves it
 alone: a blank tagline, an absent `method:`, a bare-string note, `meta.
 cooked_before: false`, and `QQ`/`PLACEHOLDER` anywhere are all completely
-normal here (HANDOVER_v26.md §4/§9/§12) and none of that is tested.
+normal here (HANDOVER_v27.md §4/§9/§12) and none of that is tested.
 
 What IS tested below is the narrower set of rules that are wrong at ANY
 stage of a recipe's life, draft or published — a key typo, a value that
@@ -40,7 +40,7 @@ Deliberately NOT ported here, and why — don't add these without asking:
   exists to reduce, not something a raw draft should already satisfy.
 - test_ingredient_notes_are_lowercase_fragments, test_ingredient_group_order_matches_
   title (test_taxonomy.py) — both explicitly flag-only even for published
-  recipes ("I'll look at violations myself", HANDOVER_v26.md §10), and the
+  recipes ("I'll look at violations myself", HANDOVER_v27.md §10), and the
   proper_nouns list they lean on was seeded from the recipe corpus, not the
   much larger draft one, so porting them risks a flood of false positives
   from ordinary draft-only proper nouns rather than real bugs.
@@ -49,7 +49,7 @@ Deliberately NOT ported here, and why — don't add these without asking:
   fire on exactly the unrewritten `QQ`/`PLACEHOLDER` source text those
   markers exist to protect (checked by hand: 3 current drafts still carry a
   gas mark inside an un-rewritten step). Stripping it there would be editing
-  content, not formatting — HANDOVER_v26.md §4's ingest paragraph is about
+  content, not formatting — HANDOVER_v27.md §4's ingest paragraph is about
   rewriting the step, not scrubbing units out of the original source first.
 """
 from __future__ import annotations
@@ -484,7 +484,7 @@ def test_notes_is_a_list(draft):
 
 def test_note_dicts_have_label_and_text_when_dict(draft):
     """Deliberately looser than the recipe version: a bare string note is
-    still allowed here (HANDOVER_v26.md §4) -- what's never fine is a note
+    still allowed here (HANDOVER_v27.md §4) -- what's never fine is a note
     that LOOKS like the dict form but is missing a key, which renders blank
     or unlabelled with no error anywhere. Caught for real, 2026-08-11, in
     six *-rewrite.md files: a `note:` key typo instead of `text:` in two of
@@ -531,7 +531,7 @@ def test_group_names_omit_leading_article(draft):
 #
 #     - step: "QQ bake at 150C for 30-40 minutes"
 #
-# `QQ` is her marker for "not rewritten yet" (HANDOVER_v26.md §4/§12): the line
+# `QQ` is her marker for "not rewritten yet" (HANDOVER_v27.md §4/§12): the line
 # is still the SOURCE's wording, sitting in the file waiting to be replaced
 # wholesale. Correcting its degree sign or its dash is tidying text that is
 # about to be deleted, and it does it by editing someone else's words -- which
@@ -632,7 +632,7 @@ def test_metadata_time_format(draft):
     """Same terse-forms rule as the recipe version, both fields at once
     rather than parametrized -- caught for real, 2026-08-11: 7 drafts wrote
     e.g. "2 hours" or "15 minutes" in prep_time/cook_time, which want the
-    terse "2 hrs"/"15 mins" metadata form (HANDOVER_v26.md §5).
+    terse "2 hrs"/"15 mins" metadata form (HANDOVER_v27.md §5).
     """
     problems = []
     for field in ("prep_time", "cook_time"):

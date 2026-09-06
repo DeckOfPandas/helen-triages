@@ -162,7 +162,7 @@ SERVE_KEYS = {"ice", "rim"}
 # look alike.
 REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
 
-# `item` IS DRAFT-ONLY, ruled by Helen 2026-09-02 (D8, ARCHITECTURE_PLAN §8).
+# `item` IS DRAFT-ONLY, ruled by Helen 2026-09-02 (D8; DECISIONS.md §9.10).
 # It holds what the SOURCE called the ingredient and is being retired by #544;
 # 282 draft entries still carry one and nothing renders it (§9.10). So it is
 # permitted where the migration is still running and refused where the world can
@@ -279,7 +279,7 @@ def _is_character_list(key):
 NO_DRINKS_REASON = (
     "No drinks on this machine to check. `_cocktail_recipes/` holds no promoted "
     "drinks -- it does not exist on disk at all yet, which is deliberate "
-    "(HANDOVER_v26.md §9.1) -- and `_cocktail_drafts/` is a separate private "
+    "(HANDOVER_v27.md §9.1) -- and `_cocktail_drafts/` is a separate private "
     "repo (helen-triages-cocktails-private), gitignored here, so a clean "
     "checkout of the public repo legitimately has none either. Clone the drafts "
     "into _cocktail_drafts/ to check those; promote a drink to check it here "

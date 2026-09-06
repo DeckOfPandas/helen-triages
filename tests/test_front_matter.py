@@ -435,7 +435,7 @@ def test_note_dicts_have_label_and_text(recipe):
     renders blank or unlabelled with no error, so this is worth catching
     here rather than by eye. Zero recipes needed fixing when this landed --
     every published note was already `{label, text}`; the bare-string form
-    is still deliberately allowed in _food_drafts/ (HANDOVER_v26.md §4/§9),
+    is still deliberately allowed in _food_drafts/ (HANDOVER_v27.md §4/§9),
     which this test never reads.
     """
     for i, note in enumerate(recipe.fm.get("notes") or [], 1):

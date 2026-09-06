@@ -3,7 +3,7 @@
 One failure mode has now bitten this codebase five times, and it is the only
 one whose symptom is GREEN: a test that cannot fail, because the thing it
 scans came back empty and it treated "found nothing" as "nothing wrong".
-HANDOVER_v26.md §12 lists the first four -- a stale JS_DIR, a non-recursive
+HANDOVER_v27.md §12 lists the first four -- a stale JS_DIR, a non-recursive
 SCSS glob, a method_groups key typo that made every prose test see zero steps,
 and a link shape no regex considered. The fifth was written on 2026-08-14 by
 someone who had just read that section, in a commit fixing a bug caused by not
