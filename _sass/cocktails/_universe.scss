@@ -210,6 +210,39 @@ $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
   margin: 0;
 }
 
+// THE TAPE'S RIGHT BLEED IS A CARD FACT AND MUST NOT COME HERE — #744, Helen:
+// "the name tape in the universe line overlaps the opening bracket very
+// slightly sometimes."
+//
+// THE ARITHMETIC, because "sometimes" is what makes this worth writing down.
+// `.drink-card-tape` carries `margin-right: -$card-tape-bleed-right` so that on
+// a CARD the tape runs out into the card's own 1.15rem of padding and ends ON
+// the card rather than appearing cut off by it. That is right there and wrong
+// here: in this row the tape is a flex ITEM, and a negative margin on a flex
+// item pulls its NEIGHBOUR left. The neighbour is the ingredient line, whose
+// first character is the opening bracket.
+//
+//   flex gap            $space-xs + 0.15rem  =  0.45rem
+//   tape right bleed    $card-tape-bleed-right  =  0.85rem
+//   what is left                                  -0.40rem
+//
+// So the bracket sits 0.4rem INSIDE the tape's box on every deal. Whether it
+// touches the ink is then down to two things that both vary, which is the whole
+// of "sometimes": the seven tape drawings end at x = 1326 to 1354 of a 1400
+// viewBox (a 2% spread), and `preserveAspectRatio="none"` stretches that inset
+// with the tape — so a SHORT name has a narrow tape whose 3.3% inset is only a
+// pixel or two, and a wide one has room to spare. Longest names on tape-3 or
+// tape-6 are the collisions.
+//
+// Cancelled rather than compensated for: there is no card padding in this row
+// for the tape to bleed into, so the bleed simply does not apply. The LEFT bleed
+// is deliberately untouched — it is what sets the tape against the glass slot,
+// and it is what Helen approved over four rounds on 2026-09-05.
+.universe-pick .drink-card-tape {
+  margin-right: 0;
+  max-width: none;
+}
+
 // --- ( the ingredients, cut off inside the closing bracket ) ------------------
 // Helen: "where ingredients need to cut off, end with an ellipsis then a closing
 // round bracket."
@@ -248,6 +281,30 @@ $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
   flex: none;
   color: $color-clear-text;
   font-size: 0.82rem;   // matches .drink-card-ingredients
+
+  // THE GAP BELONGS BETWEEN ITEMS, NOT INSIDE A BRACKET PAIR — #744, Helen's
+  // second observation: "The space between the opening bracket and the first
+  // ingredient is slightly smaller than the gap between the final ingredient
+  // and the closing bracket."
+  //
+  // She is right and the cause is structural rather than a value anybody chose.
+  // The two brackets are DIFFERENT KINDS OF THING, for the reason set out above
+  // -- the opening one has to ride inside the truncating box or the ellipsis
+  // eats it, the closing one has to stay outside or it gets clipped away. So
+  // `(` is a `::before` sitting hard against the first word, with nothing
+  // between them, while `)` is a separate flex item and the container's
+  // `column-gap` lands in front of it. One bracket is spaced by the layout and
+  // the other is not.
+  //
+  // Cancelling the gap is what makes the pair symmetrical: both brackets now hug
+  // their text, which is what a bracket does. The gap still applies everywhere
+  // else in the row -- between the glass, the tape and the ingredients -- which
+  // is where it was meant to be.
+  //
+  // A margin rather than `column-gap: 0` plus per-item margins: this is the ONE
+  // seam in the row that should not have the gap, and saying so at that seam is
+  // smaller and more legible than restating the other three.
+  margin-left: -($space-xs + 0.15rem);
 }
 
 // --- what is deliberately not here -------------------------------------------
