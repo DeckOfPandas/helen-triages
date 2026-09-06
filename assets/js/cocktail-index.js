@@ -267,6 +267,11 @@
       moods: (card.dataset.moods || '').split('|').filter(Boolean),
       name: card.dataset.name || '',
       chaos: card.dataset.chaos || '',
+      /* #732. A STRING, NOT A BOOLEAN, and read as one all the way through:
+         `dataset` hands back the attribute text, so `'false'` is a truthy
+         JavaScript value and coercing it here would make every drink look
+         made. Compared against `'false'` in matches() for the same reason. */
+      madeBefore: card.dataset.madeBefore || '',
       /* The shortlist's key -- #546, `drink.url` written by the template. Read
          once here with everything else; whether it IS shortlisted is asked in
          matches(), because that answer can change under the page while this one
@@ -342,6 +347,18 @@
        all 55 of the best drinks. Helen, 2026-08-27: "'I'm open to chaos' ...
        includes all drinks". So only `good` narrows. */
     if (state.chaos === 'good' && d.chaos !== 'good') return false;
+
+    /* `unmade` DOES narrow, and that is fine -- #732. The rule the comment
+       above protects is that the button for "I'll try anything" must not
+       narrow, not that no third button ever may. This one says what it narrows
+       to, which is the 20 drinks Helen has never made.
+
+       IT READS `madeBefore` AND NOT `chaos`/`ship`. Every unmade drink says
+       `ship: "who knows"` today, so `d.chaos` would give the same 20 -- and it
+       would stop the day she makes one, because `made_before` flips while
+       `ship` stays `who knows` until she rates it. The drink she just made
+       would vanish from the wrong list. */
+    if (state.chaos === 'unmade' && d.madeBefore !== 'false') return false;
 
     /* AND across include: each chip you add narrows. That is the opposite of
        the mood rule and deliberately so — adding an ingredient means "and this

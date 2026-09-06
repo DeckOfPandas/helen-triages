@@ -2961,3 +2961,87 @@ def test_no_yaml_mapping_has_a_duplicate_key(label, text):
           "whatever the earlier one said is gone. Delete one -- after reading "
           "both, because the two are not always the same text."
     )
+
+
+# --- a YOLO button that nothing handles ---------------------------------------
+#
+# #732 added a third `.btn-chaos`, and the failure mode a third one introduces is
+# specific: the button renders, it takes focus, it goes `aria-pressed="true"`
+# when you click it -- all of that is generic over `state.chaos` and needs no new
+# code -- and then nothing filters, because the one place that is NOT generic is
+# the clause in `matches()`. A misspelled or renamed `data-chaos` value gives a
+# button that looks completely alive and does nothing at all.
+#
+# NOT A JS TEST, AND THAT IS ISSUE #633. `matches()` is inside cocktail-index.js's
+# IIFE with no export, so there is nothing for `node --test` to require. Until
+# #633 gives the index scripts a way to be run, the coupling between the template
+# and the script is only checkable as source.
+
+CHAOS_NO_OP = {
+    # `open` is a STATE, NOT A FILTER, and deliberately has no clause. It used to
+    # be `yolo` (ship is not yes-or-better), which made the button for "I'll try
+    # anything" the one button guaranteed to hide all 55 of the best drinks --
+    # Helen, 2026-08-27: "'I'm open to chaos' ... includes all drinks". Being
+    # unhandled is what it is FOR, so it is named here rather than caught.
+    "open",
+}
+
+
+def test_every_yolo_button_value_is_handled_by_the_index_script():
+    """A `.btn-chaos` whose value `matches()` never reads is a dead control.
+
+    THE BUTTON STILL LOOKS ALIVE, which is the whole reason this is worth a test.
+    Pressing, the `aria-pressed` sync, the clear button and the survivor count
+    are all generic over `state.chaos` already, so a value with no clause behind
+    it presses in, highlights, clears -- and filters nothing.
+    """
+    html = read("cocktails", "index.html")
+    script = (ROOT / "assets" / "js" / "cocktail-index.js").read_text(encoding="utf-8")
+
+    values = set(re.findall(r'class="btn-chaos"[^>]*data-chaos="([^"]+)"', html))
+    assert values, (
+        "cocktails/index.html emits no .btn-chaos buttons. The YOLO section is "
+        "gone or its markup has changed shape."
+    )
+
+    unhandled = sorted(
+        v for v in values - CHAOS_NO_OP
+        if f"'{v}'" not in script and f'"{v}"' not in script
+    )
+    assert not unhandled, (
+        "These YOLO buttons emit a `data-chaos` value that "
+        "assets/js/cocktail-index.js never names, so each one presses in, "
+        "highlights, and filters nothing:\n  " + "\n  ".join(unhandled)
+        + "\nAdd a clause in matches(), or add the value to CHAOS_NO_OP here "
+        "with the reason it is deliberately inert."
+    )
+
+
+def test_the_unmade_filter_reads_made_before_and_not_ship():
+    """#732's one real trap, and it is invisible for as long as it is wrong.
+
+    Every unmade drink says `ship: "who knows"` today and every made one names a
+    rung, so filtering on `ship` or on the derived `chaos` gives the SAME twenty
+    drinks and looks correct. They come apart the first time Helen makes one of
+    the twenty: `meta.made_before` flips to true and `ship` stays `who knows`
+    until she rates it, so a filter reading `ship` would go on offering her a
+    drink she has just made, as one she never has.
+
+    Nothing would fail. The list would simply be wrong, in the direction where
+    the only person who could notice is the person the list is for.
+    """
+    html = read("cocktails", "index.html")
+    assert 'data-made-before="{{ drink.meta.made_before' in html, (
+        "the drink card no longer emits `data-made-before` from "
+        "`drink.meta.made_before`. If it is being derived from `ship` or from "
+        "`chaos` instead, see this test's docstring -- they agree today and "
+        "stop agreeing the moment Helen makes an unmade drink."
+    )
+
+    script = (ROOT / "assets" / "js" / "cocktail-index.js").read_text(encoding="utf-8")
+    clause = re.search(r"state\.chaos === 'unmade'[^;]*;", script)
+    assert clause, "cocktail-index.js has no `unmade` clause in matches()."
+    assert "madeBefore" in clause.group(0), (
+        "the `unmade` filter no longer reads `madeBefore`. Reading `chaos` or "
+        "`ship` gives the same answer today and the wrong one later."
+    )

@@ -119,14 +119,61 @@
        ---------------------------------------------------------------------
        A curated synonym family matches on CONTAINMENT of any of its words --
        typing toward `cheese` has to reach comté, which shares no letters with
-       it -- and anything else matches when every word of the key is contained
-       in some word of the entry.
+       it -- and anything else matches when every word of the key PREFIXES
+       some word of the entry.
 
-       MOVED HERE FROM filters.js, unchanged, issue #506. It lived in 1,336
-       lines of DOM wiring where the only way to ask it a question was to open
-       a browser and type, which is the argument back-link.js already makes
-       (HANDOVER 3). It reads the vocabulary -- singulars and synonyms -- so
-       this instance is its home rather than the module's bare api.
+       PREFIX SINCE 2026-09-06, ISSUE #619, AND IT USED TO BE CONTAINMENT.
+       Helen: asking for `salt` handed back twelve recipes whose only salt is
+       UNsalted butter. The rule was `ew.indexOf(kw) !== -1`, and filters.js's
+       own comment had described it as "prefixes" for as long as it existed --
+       the code and its comment disagreed the whole time.
+
+       MEASURED BEFORE AND AFTER, over the real vocabulary and all 429 recipes
+       and drafts: 136 (key, recipe) pairs stopped matching and NOTHING started.
+       104 of the 136 are outright defects --
+
+         49  `ice`            -> rice, five-spice powder, citrus juice
+         12  `salt`           -> unsalted butter
+         12  `salted butter`  -> UNsalted butter, the exact opposite
+          5  `peas`           -> chickpeas
+          5  `milk`           -> buttermilk
+          5  `apple`          -> pineapple
+          5  `sage`           -> sausages, pork sausagemeat
+          2  `bread`          -> shortbread biscuits, flatbread dough
+          2  `gin`            -> aubergine, extra-virgin olive oil
+          1  `currants`       -> blackcurrants
+          1  `ham`            -> Gressingham duck legs
+
+       -- and 17 more were real: typing `nuts` stopped reaching walnuts,
+       hazelnuts and peanuts. Those are carried by the VOCABULARY instead,
+       which is the fix #619 lists first and the one cocktail-search.js already
+       made on the other site. `_data/food/ingredient_words.yml` gains a `nuts`
+       synonym family, and it is a net GAIN: containment had also been MISSING
+       almonds, pistachios, pecans and cashews, none of which contain the
+       letters "nuts". 136 losses become 119.
+
+       THE REMAINING 15 ARE LET GO ON PURPOSE, in three kinds:
+
+         7  `raw king prawns` -> "king prawns", which only ever worked because
+            `raw` sits inside p-RAW-n. Typing `king prawns` finds it.
+         7  `corn flour` -> "cornflour" and `bean sprouts` -> "beansprouts".
+            Two spellings of one ingredient, and the fix is one spelling in the
+            data -- raised as its own issue. An `aliases:` entry was tried and
+            makes it worse; that file's own note says why.
+         1  `echalion shallots` -> "banana shallots (echalions)", where the
+            bracket makes `(echalions)` a word `echalion` does not prefix. A
+            tokenising quirk, not worth widening getWords for one entry.
+
+       MOVED HERE FROM filters.js, issue #506 -- and #619 above is what that
+       move was FOR. It lived in 1,336 lines of DOM wiring where the only way
+       to ask it a question was to open a browser and type, which is the
+       argument back-link.js already makes (HANDOVER 3). The extraction changed
+       nothing and made the fault visible; the measurement that settled the fix
+       took minutes because this is a pure function with tests. (This said
+       "unchanged" until 2026-09-06, which was true of the move and stopped
+       being true of the function.) It reads the vocabulary -- singulars and
+       synonyms -- so this instance is its home rather than the module's bare
+       api.
 
        IT IS ASKED BY BOTH DIRECTIONS AND THAT IS WHY IT IS ONE FUNCTION. The
        include filter asks it of a row's `main_ingredients`; the exclude
@@ -147,7 +194,9 @@
       return (list || []).some(function (entry) {
         var entryWords = getWords(entry).map(normaliseIngredientWord);
         return keyWords.every(function (kw) {
-          return entryWords.some(function (ew) { return ew.indexOf(kw) !== -1; });
+          // PREFIX, NOT CONTAINMENT -- #619. `=== 0` is the whole change; see
+          // the note above for what it costs and what pays for it.
+          return entryWords.some(function (ew) { return ew.indexOf(kw) === 0; });
         });
       });
     }

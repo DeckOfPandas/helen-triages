@@ -215,9 +215,39 @@ permalink: /cocktails/
         <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
       </div>
+      {% comment %} THE THIRD BUTTON NARROWS, AND THE OTHER TWO DO NOT — #732,
+         split out of #722 whose other three bullets landed on 2026-09-05. It is
+         `meta.made_before: false`, which is 20 of the 124 drinks today.
+
+         IT MUST NOT READ `data-ship`, which looks equivalent and is, today:
+         every unmade drink says `ship: "who knows"` and every made one names a
+         rung. They come apart the moment Helen makes one of the 20 — the
+         `made_before` flag flips and `ship` stays `who knows` until she rates
+         it, so a filter reading `ship` would quietly drop the drink she just
+         made from the list of drinks she has made. Same distinction
+         _dev/no-verdict.html draws in its own comment. Hence a second attribute
+         on the card rather than a cleverer reading of the first.
+
+         `chaos only` IS HELEN'S WORDING, given 2026-09-06, and it replaced the
+         label this shipped with a few hours earlier. #732 had argued for that
+         one on the grounds that a button's label "just has to say what it
+         narrows to". She overruled it, which is hers twice over -- the voice is
+         hers, and the argument was weaker than it looked.
+
+         IT IS A NAME, NOT A DESCRIPTION, AND SO ARE THE OTHER TWO. `no chaos
+         please` does not say "ship is yes-or-better" either. This section is a
+         SCALE and its three rungs are read against each other, so `chaos only`
+         is the far end of `no chaos please` -- which is the choice a reader is
+         actually making. A label accurate about the mechanism can still be mute
+         about the question.
+
+         WHAT IT NARROWS TO IS UNCHANGED: `meta.made_before: false`, 20 drinks.
+         The words moved; nothing behind them did, and no test reads them --
+         every one goes through `data-chaos="unmade"`. {% endcomment %}
       <div class="drink-btns">
         <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false">no chaos please</button>
         <button type="button" class="btn-chaos" data-chaos="open" aria-pressed="false">I&rsquo;m open to chaos</button>
+        <button type="button" class="btn-chaos" data-chaos="unmade" aria-pressed="false">chaos only</button>
       </div>
     </div>
 
@@ -463,6 +493,14 @@ permalink: /cocktails/
           data-url="{{ drink.url }}"
           data-ship="{{ ship }}"
           data-chaos="{{ chaos }}"
+          {% comment %} STRAIGHT OFF THE DRINK, not derived from `ship` like
+             `chaos` above it — #732. The two answer different questions and
+             come apart the moment Helen makes an unmade drink; the button's
+             own comment has the case. `| default: false` because a drink
+             predating `meta.made_before` (2026-09-05) would otherwise emit an
+             empty attribute, which reads as neither true nor false — there are
+             none today and that is exactly when to write the guard. {% endcomment %}
+          data-made-before="{{ drink.meta.made_before | default: false }}"
           data-moods="{% for m in drink.mood %}{{ m }}|{% endfor %}"
           data-ingredients="{{ searchable | downcase }}"
           data-name="{{ drink.title | downcase }}">

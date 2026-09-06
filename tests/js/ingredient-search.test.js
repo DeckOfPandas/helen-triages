@@ -436,3 +436,61 @@ test('an empty or missing list matches nothing, rather than throwing', () => {
   assert.strictEqual(m.entriesMatchKey([], 'chicken'), false);
   assert.strictEqual(m.entriesMatchKey(undefined, 'chicken'), false);
 });
+
+// --- entriesMatchKey matches by PREFIX — issue #619 --------------------------
+// The rule was `ew.indexOf(kw) !== -1` (containment) until 2026-09-06, and
+// filters.js's own comment had described it as "prefixes" for as long as it
+// existed: the code and its comment disagreed the whole time. Helen found it
+// from the output — asking for `salt` handed back twelve recipes whose only
+// salt is UNsalted butter.
+//
+// These are the cases from the issue, kept as the permanent record of which
+// direction the rule runs in. Measured over the real data, the switch dropped
+// 136 (key, recipe) pairs and added none; 104 of them look like these.
+
+test('a key matches the START of a word, not the middle of one', () => {
+  const m = matcher();
+  assert.strictEqual(
+    m.entriesMatchKey(['unsalted butter'], 'salt'), false,
+    'asking for salt returned a recipe whose only salt is UNsalted butter — ' +
+    'issue #619, and the case Helen raised it from.'
+  );
+  assert.strictEqual(m.entriesMatchKey(['salted butter'], 'salt'), true);
+  assert.strictEqual(m.entriesMatchKey(['sea salt'], 'salt'), true);
+});
+
+test('the opposite of what was asked is the worst version of the same bug', () => {
+  // `salted butter` reached UNsalted butter on 12 recipes. Not merely a loose
+  // match: the entry is the negation of the key, and the row would have said so.
+  assert.strictEqual(
+    matcher().entriesMatchKey(['unsalted butter'], 'salted butter'), false
+  );
+});
+
+test('the short words that made this worth fixing', () => {
+  const m = matcher();
+  // 49 pairs came from `ice` alone.
+  assert.strictEqual(m.entriesMatchKey(['brown rice'], 'ice'), false);
+  assert.strictEqual(m.entriesMatchKey(['citrus juice'], 'ice'), false);
+  assert.strictEqual(m.entriesMatchKey(['five-spice powder'], 'ice'), false);
+  assert.strictEqual(m.entriesMatchKey(['ice cubes'], 'ice'), true);
+
+  // cocktail-search.js names this exact pair in its own header, having made
+  // the same choice on the other site first.
+  assert.strictEqual(m.entriesMatchKey(['pineapple juice'], 'apple'), false);
+  assert.strictEqual(m.entriesMatchKey(['apple juice'], 'apple'), true);
+
+  assert.strictEqual(m.entriesMatchKey(['chickpeas'], 'peas'), false);
+  assert.strictEqual(m.entriesMatchKey(['buttermilk'], 'milk'), false);
+  assert.strictEqual(m.entriesMatchKey(['aubergine'], 'gin'), false);
+  assert.strictEqual(m.entriesMatchKey(['pork sausages'], 'sage'), false);
+});
+
+test('a prefix still reaches a longer word, which is the point of prefix', () => {
+  // The rule is not "whole words". Typing toward something has to keep working
+  // while it is still being typed, and that is what separates this from the
+  // exclude side's set membership.
+  const m = matcher();
+  assert.strictEqual(m.entriesMatchKey(['chicken thighs'], 'chick'), true);
+  assert.strictEqual(m.entriesMatchKey(['coriander'], 'cori'), true);
+});

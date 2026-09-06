@@ -527,6 +527,22 @@ family_exceptions:
 # -----------------------------------------------------------------------------
 aliases:
   five-spice powder: five-spice
+  # NOTHING FOR cornflour/beansprouts HERE, AND IT WAS TRIED -- #619, 2026-09-06.
+  # Both were cases where the old mid-word matching did something useful by
+  # accident: `corn flour` reached "cornflour" (6 recipes) and `bean sprouts`
+  # reached "beansprouts" (1), purely because containment does not care about a
+  # space. Prefix matching loses them, so an alias collapsing each pair looked
+  # like the obvious repair.
+  #
+  # IT MAKES IT WORSE, MEASURED RATHER THAN REASONED. An alias rewrites the
+  # PICKER's vocabulary (buildMasterList: 718 chips down to 682) but a row is
+  # matched against `data-ingredients`, which food/index.html writes as RAW
+  # `main_ingredients` and which no alias ever touches. So the two chips collapse
+  # into one that then matches only half the recipes it names -- and the
+  # "cornflour" chip that used to reach the other half is gone. Two honest chips
+  # beat one that quietly under-matches.
+  #
+  # The real fix is one spelling in the data. Raised as its own issue.
   # GitHub issue #366 — "not collapsing over synonyms". Helen sent three
   # screenshots of the exclude picker; every entry below was a duplicate visible
   # in one of them. Typing "past" offered FOUR ways to say vanilla paste and
@@ -985,6 +1001,41 @@ synonyms:
   stock:
     - stock
     - broth
+
+  # ADDED 2026-09-06 WITH #619, and it is the price of that fix rather than a
+  # new idea. When HAS TO HAVE stopped matching mid-word, `nuts` stopped
+  # reaching walnuts, hazelnuts and peanuts -- 17 of the 136 pairs the switch
+  # dropped, and the only ones among them anybody would miss.
+  #
+  # IT ALSO FIXES WHAT CONTAINMENT WAS GETTING WRONG, which is why this is a
+  # gain and not a patch. Measured over the real vocabulary: `nuts` reached 12
+  # entries and MISSED almonds, ground almonds, flaked almonds, pistachios,
+  # chopped pistachios, pecans and cashews -- because none of those spellings
+  # contains the letters "nuts". A family reaches all of them.
+  #
+  # WHAT IS DELIBERATELY ABSENT, and each was in the data waiting to be caught
+  # by a lazier list. The bare word `nut` would take butternut squash, nutmeg,
+  # whole nutmeg and groundnut oil, so no entry here is `nut` alone.
+  # `chestnuts` is PLURAL for the same reason: `chestnut` would take chestnut
+  # mushrooms, which are a mushroom.
+  #
+  # COCONUT IS NOT HERE ON PURPOSE. Coconut cream, coconut milk, desiccated
+  # coconut and coconut palm sugar are four entries that would arrive with it,
+  # and nobody looking for nuts wants a Pina Colada. It is also the one that
+  # matters if this list is ever read as an allergy filter, which it is not --
+  # `never_family` and the exclude side are where that question lives.
+  nuts:
+    - nuts
+    - almond
+    - walnut
+    - hazelnut
+    - peanut
+    - pistachio
+    - cashew
+    - pecan
+    - macadamia
+    - chestnuts
+    - pine nut
 
   # GitHub issue #59: flour is always the TRAILING word in this corpus
   # ("plain flour", "self-raising flour") — never the first — so it can
