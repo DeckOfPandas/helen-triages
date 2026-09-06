@@ -661,6 +661,53 @@ layout: default
        paragraph of its own beneath the control rather than text inside the
        label, so a long sentence cannot push the number box around. {% endcomment %}
     <p class="cocktail-scale-note" hidden></p>
+    {% comment %} THE BATCH NOTE — #713, and Helen's request of 2026-09-06:
+       "Bitters text appearing next to the scaler if it's edited to >1. Cost and
+       units on a note."
+
+       A SEPARATE ELEMENT FROM THE FLOOR MESSAGE ABOVE, on purpose. That one is
+       a refusal and this one is information about a multiple that WORKED, so
+       they can want to be on screen at the same time, and the refusal's
+       show/hide is the delicately-debugged part of cocktail-scale.js (the
+       backspace bug, the `<= 0` clause). Sharing one element would have meant
+       teaching that logic about a second kind of message.
+
+       IT SAYS TOTALS, BECAUSE TOTALS ARE THE ONLY THING THAT MOVES. The cost
+       line and the units line are both PER GLASS and both invariant under
+       scaling — see the cost comment in cocktail-scale.js, Helen 2026-09-06:
+       "the price per glass you calculate needs to divide by the scaled number",
+       so ×n multiplies and divides and cancels. Repeating those figures here
+       would restate the footer. What the footer cannot tell you is what the
+       whole batch costs and how much alcohol is standing on the table, which is
+       the question #545 says the scaler exists to answer: "not poisoning my
+       friends".
+
+       LOCAL ONLY, gated on the same two keys as the lines it derives from —
+       `show_costs` and `show_units` are declared in _config_local.yml and
+       nowhere else, so this cannot reach production (MANUAL §1). It renders
+       whichever halves are switched on.
+
+       `data-has-dashes` IS WHY THE BITTERS LINE IS NOT UNIVERSAL. #720.1 deleted
+       the last bitters caveat for firing unconditionally — Aperol Spritz, which
+       is prosecco, Aperol and soda water, was told its bitters would not scale.
+       "A caveat that fires where it does not apply teaches you to stop reading
+       caveats." So the flag is computed from the drink's own amounts and the
+       line appears only where something is actually poured in dashes or drops.
+       Helen asked for the trigger (>1) and did not speak to the condition; if
+       she wants it on every drink, delete the `hasDashes` check in
+       cocktail-scale.js and this attribute. {% endcomment %}
+    {% if site.show_costs or site.show_units %}
+      {% assign has_dashes = false %}
+      {% for ingredient in page.ingredients %}
+        {% assign amount_text = ingredient.amount | downcase %}
+        {% if amount_text contains "dash" or amount_text contains "drop" %}
+          {% assign has_dashes = true %}
+        {% endif %}
+      {% endfor %}
+      <p class="cocktail-scale-batch"
+         data-has-dashes="{% if has_dashes %}true{% else %}false{% endif %}"
+         hidden></p>
+    {% endif %}
   {% endif %}
 
 
@@ -989,20 +1036,42 @@ layout: default
 
      `units.exact` MEANS EVERY ALCOHOLIC POUR NAMED ITS BOTTLE. Where a pour
      named only a category the strength is derived from Helen's
-     `default_bottles` ruling, or the mean of that category's bottles, and the
-     sentence says "About" — her call, 2026-09-06: "one figure, marked
-     approximate when it's a fallback". Note that a vague 0% ingredient does
-     NOT spoil exactness: a Collins topped with soda water is still exact,
-     because soda water is 0% however loosely it is described.
+     `default_bottles` ruling, or the mean of that category's bottles. Note that
+     a vague 0% ingredient does NOT spoil exactness: a Collins topped with soda
+     water is still exact, because soda water is 0% however loosely it is
+     described.
 
-     THE WORDING IS A PLACEHOLDER AND IS HELEN'S TO WRITE — the same status as
-     the bitters caveat under the scaler (#713). Raised as its own issue; do not
-     polish it here, and do not let an agent rewrite it into house voice. What
-     the line must CONVEY is fixed (the figure, that it is per serving, and
-     whether it is approximate); the words are not. {% endcomment %}
+     NOTHING RENDERS `units.exact` ANY MORE, AND THAT IS DELIBERATE — #651's
+     rule, that a value nothing reads is only safe while a comment says why it
+     is kept. It used to gate the word "About" on this line. Helen's wording of
+     2026-09-06 says "Roughly" on EVERY drink, exact or not, which reads the
+     honest way round: a unit count is an estimate even when the ABV is exact,
+     because how accurately a drink is poured is not something the data knows.
+     Asked whether to retire `units.exact` with the word, she kept it. It stays
+     a true and computed fact about a drink, and the obvious consumers are a
+     future reference page or an honesty indicator; do not delete it because
+     grep says nothing reads it.
+
+     THE WORDING IS HELEN'S OWN, given 2026-09-06 for #713 and #753: "Roughly X
+     units of alcohol in a serving". Do not polish it, and do not let an agent
+     rewrite it into house voice. Punches keep their own tail — she was asked
+     about "a glass" to match the cost line beside it and chose to leave the
+     mismatch alone. {% endcomment %}
+  {% comment %} `data-units-per-serve` AND `data-serves` ARE NEW, AND THE COMMENT
+     ABOVE SAYING THERE ARE DELIBERATELY NO DATA ATTRIBUTES HERE IS NOW HALF
+     WRONG — it is kept because its REASON still holds and is the thing worth
+     reading: this figure is per serving and must not move with the multiple
+     box, and giving the scaler nothing to read was one way to guarantee that.
+     The batch note (#713) needs the number to compute a TOTAL, which is a
+     different quantity that genuinely does scale, so the guarantee now comes
+     from cocktail-scale.js never writing to `.cocktail-units` rather than from
+     the number being unreachable. If a future change makes this line move with
+     the scaler, that is the bug, and this is where it came from. {% endcomment %}
   {% if site.show_units and page.units %}
-    <p class="cocktail-units">{% unless page.units.exact %}About {% endunless
-      %}<span class="cocktail-units-figure">{{ page.units.per_serve }}</span>
+    <p class="cocktail-units"
+       data-units-per-serve="{{ page.units.per_serve }}"
+       data-serves="{{ page.units.serves }}">Roughly
+      <span class="cocktail-units-figure">{{ page.units.per_serve }}</span>
       {%- if page.units.per_serve == 1.0 %} unit{% else %} units{% endif %} of alcohol
       {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings.
       {%- else %} in a serving.{% endif %}</p>

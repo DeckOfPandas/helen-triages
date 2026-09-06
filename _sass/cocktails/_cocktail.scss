@@ -916,7 +916,20 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // warned that bitters do not scale linearly; Aperol Spritz is prosecco, Aperol
 // and soda water. A caveat that fires where it does not apply teaches you to
 // stop reading caveats.
-.cocktail-scale-note {
+//
+// IT CAME BACK ON 2026-09-06 AS `.cocktail-scale-batch` (#713), AND THE LESSON
+// CAME WITH IT: the line is now gated on the drink's own `data-has-dashes`, so
+// Aperol Spritz is still not told about bitters it does not contain. The batch
+// note is a SEPARATE element from the floor message because one is a refusal
+// and the other describes a multiple that worked — both can be wanted at once,
+// and the refusal's show/hide is the delicate part of cocktail-scale.js.
+//
+// THE TWO SHARE THESE VALUES because they are the same kind of voice in the
+// same place: quiet, small, clear-text grey, sitting under the control. Listed
+// as two selectors rather than given a shared class, because they are unrelated
+// in meaning and a shared class would invite someone to treat them as one thing.
+.cocktail-scale-note,
+.cocktail-scale-batch {
   margin: $space-sm 0 0;
   font-size: 0.85rem;
   color: $color-clear-text;
