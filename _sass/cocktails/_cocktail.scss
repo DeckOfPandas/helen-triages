@@ -1560,6 +1560,26 @@ $amount-gap-wide: 1.25rem;
   }
 }
 
+// THE UNIT COUNT, SITTING UNDER THE COST LINE (#297). Helen put it there:
+// "Only in the bottom section with source and cost, so the line below those."
+// Same incidental register as its two neighbours -- if this one announced
+// itself the footer would stop being a footer.
+//
+// NO TABULAR FIGURES, AND THAT IS THE DIFFERENCE FROM `.cocktail-cost` ABOVE.
+// Tabular digits are there because the scaler rewrites the price on every
+// keystroke and proportional ones would make the sentence breathe. This number
+// is per serving and the scaler never touches it, so it is written once and
+// tabular figures would buy nothing but slightly worse spacing.
+.cocktail-units {
+  font-size: 0.82rem;
+  color: $color-clear-text;
+  margin: $space-xxs 0 0;
+
+  .cocktail-units-figure {
+    font-weight: 600;
+  }
+}
+
 // =============================================================================
 // THE MAKE-IT TOGGLE, AND THE STATE IT SWITCHES TO
 // =============================================================================

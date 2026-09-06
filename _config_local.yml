@@ -53,6 +53,19 @@ collections:
 # from a table she uses to decide what to make.
 show_costs: true
 
+# Show how many units of alcohol are in a serving (#297). LOCAL ONLY, and for
+# now that is a caution rather than a ruling: Helen, 2026-09-06, chose "local
+# only now, and I'll note what publishing would need". The note is in the issue
+# and in abv.yml's header -- it comes down to the seventeen `qq:` rows, which are
+# strengths I could not settle without the label on her shelf. Publishing a unit
+# count built partly on those is a different promise from publishing a rough
+# price, and it is hers to make once they are cleared.
+#
+# THE STRENGTHS THEMSELVES ARE NOT SECRET, exactly as the prices are not: they
+# are in _data/cocktails/abv.yml in the public repo either way. This key governs
+# what the SITE claims.
+show_units: true
+
 # Show cocktail drafts on the cocktails index. LOCAL ONLY, AND THAT IS THE
 # WHOLE POINT: `output: false` stops Jekyll writing a draft but does NOT take
 # it out of site.cocktail_drafts, so a template looping the collection prints

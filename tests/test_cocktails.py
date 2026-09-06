@@ -93,8 +93,27 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
 TOP_LEVEL_KEYS = {
     "title", "tagline", "glass", "garnish", "ingredients", "method", "mood",
-    "notes", "source", "source_url", "meta", "to_serve", "serve",
+    "notes", "source", "source_url", "meta", "to_serve", "serve", "serves",
 }
+
+# `serves` ARRIVED 2026-09-06 with the unit count (#297) and is DELIBERATELY
+# NARROW: it is on nine drinks and absent on the other 115.
+#
+# WHY IT EXISTS AT ALL, GIVEN cocktail-scale.js REFUSED TO INVENT IT. That
+# refusal is about the SCALER and it still stands -- "x2 is twice what the page
+# says", and the scaler does not read this field. But #297 reports units PER
+# SERVING, and for a punch bowl holding 690 ml the figure without a divisor is
+# a number that reads as a warning rather than a fact.
+#
+# ABSENT MEANS ONE, and that is why it is not in REQUIRED_TOP_LEVEL. A drink
+# that fills one glass says nothing, exactly as a drink with no serveware note
+# says nothing about `to_serve`. The nine that carry it are the seven punch-bowl
+# drinks, the mulled wine, and the Modern Zombie whose own title says "makes 2".
+#
+# THE VALUES ARE DERIVED, NOT PICKED, per HANDOVER §13.11. A punch cup is 4-6 US
+# fl oz, so 150 ml is the midpoint and the divisor; the mulled wine goes into a
+# 200 ml mug. tmp/plan_serves.py is not kept -- the derivation is one line and it
+# is here: round(total poured ml / cup size). Re-deriving it needs no script.
 
 # `serve` ARRIVED 2026-09-05 and is the answer to "where does the ice live?".
 #
@@ -141,7 +160,7 @@ SERVE_KEYS = {"ice", "rim"}
 # is on every file today, including `source`/`source_url` where the value is the
 # empty string: "nobody has recorded a source" and "the key is missing" must not
 # look alike.
-REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve"}
+REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
 
 # `item` IS DRAFT-ONLY, ruled by Helen 2026-09-02 (D8, ARCHITECTURE_PLAN §8).
 # It holds what the SOURCE called the ingredient and is being retired by #544;
@@ -6203,4 +6222,292 @@ def test_default_bottles_are_declared_priced_and_in_the_right_category():
     assert not problems, (
         "Bad rows in _data/cocktails/costs.yml `default_bottles:`\n  "
         + "\n  ".join(problems)
+    )
+
+
+# =============================================================================
+# UNITS OF ALCOHOL -- issue #297. _data/cocktails/abv.yml, _plugins/cocktail_units.rb
+# =============================================================================
+# THE SAME SHAPE AS THE COST TESTS ABOVE AND FOR THE SAME REASON: the checks that
+# matter are run FROM THE DRINKS, not from the table. A table can be internally
+# perfect and still fail to answer a pour that names something it has never heard
+# of, and the pour is what renders.
+#
+# WHY A MISSING STRENGTH IS WORSE THAN A MISSING PRICE. An unpriced bottle drops
+# out of a total and makes a drink look cheap, which is wrong but obviously so --
+# nobody believes a Negroni costs 40p. An unmeasured SPIRIT drops out and makes a
+# drink look WEAK, and 1.4 units where the truth is 2.6 is entirely believable.
+# It is the failure mode that does not announce itself, which is why abv.yml
+# declares `abv: 0` for water and juice rather than letting absence mean zero.
+
+ABV = ROOT / "_data" / "cocktails" / "abv.yml"
+
+# Kept in step with abv.yml's own header, and with COST_CONFIDENCE above.
+ABV_CONFIDENCE = {"high", "medium", "low"}
+
+# 96 is roughly the azeotrope: nothing bottled is stronger, so a figure above it
+# is a typo rather than a spirit. The floor is 0 and it is a REAL value -- see
+# the syrups.
+ABV_MAX = 96
+
+# A UK unit is 10 ml of pure ethanol, so `ml * abv / 1000` units. Pinned here as
+# well as in the plugin because the two must agree, and a constant that lives in
+# one place is a constant nothing checks.
+ML_PER_UNIT = 1000.0
+
+
+def _abv():
+    if not ABV.exists():
+        pytest.skip("_data/cocktails/abv.yml does not exist yet.")
+    return yaml.safe_load(ABV.read_text(encoding="utf-8")) or {}
+
+
+def _generics_with_bottles():
+    """Every generic with at least one bottle declared under it."""
+    return {(b or {}).get("generic") for b in _declared_bottles().values()} - {None}
+
+
+def test_every_declared_bottle_has_an_abv():
+    """bottles.yml and abv.yml name exactly the same bottles.
+
+    BOTH DIRECTIONS, exactly as `test_every_declared_bottle_carries_a_price`
+    checks both -- and the second direction caught two real rows the day this was
+    written. `Grand Marnier` had been given a bottle row when it is only ever a
+    generic, and `Ottoman 10 Year Tawny` had been given one after Helen retired
+    it to `not_reached_for` on the price check. Neither would have raised: the
+    plugin simply never looks them up, so both would have sat there looking
+    authoritative and meaning nothing.
+    """
+    bottles = _declared_bottles()
+    strengths = _abv().get("bottles") or {}
+    assert bottles, "bottles.yml declares no bottles; nothing to measure."
+
+    unmeasured = sorted(set(bottles) - set(strengths))
+    orphaned = sorted(set(strengths) - set(bottles))
+    assert not unmeasured, (
+        "These bottles are declared in _data/cocktails/bottles.yml but carry no "
+        "`abv` in _data/cocktails/abv.yml, so every pour that names one counts "
+        "as water:\n  " + "\n  ".join(unmeasured)
+    )
+    assert not orphaned, (
+        "These rows in _data/cocktails/abv.yml name no bottle in bottles.yml. A "
+        "renamed or retired bottle needs its row followed here -- the alias list "
+        "does not cover this file:\n  " + "\n  ".join(orphaned)
+    )
+
+
+def test_every_strength_is_plausible_and_says_how_sure_it_is():
+    """An `abv` is a number from 0 to 96, and every row declares a confidence.
+
+    THE LOWER BOUND IS ZERO AND NOT ONE, ON PURPOSE. Monin's syrups, the acacia
+    honey and the cranberry juice are declared at 0 rather than omitted, so that
+    a MISSING key is a failure and a zero is a statement. Losing that distinction
+    is exactly how a gin would end up totalling as water.
+    """
+    data = _abv()
+    problems = []
+    for block in ("bottles", "generics"):
+        for name, row in sorted((data.get(block) or {}).items()):
+            if not isinstance(row, dict):
+                problems.append(f"{block}/{name}: not a mapping")
+                continue
+            abv = row.get("abv")
+            if isinstance(abv, bool) or not isinstance(abv, (int, float)):
+                problems.append(f"{block}/{name}: abv is {abv!r}, not a number")
+            elif not 0 <= abv <= ABV_MAX:
+                problems.append(f"{block}/{name}: abv {abv} is outside 0-{ABV_MAX}")
+            if row.get("confidence") not in ABV_CONFIDENCE:
+                problems.append(
+                    f"{block}/{name}: confidence {row.get('confidence')!r} is not "
+                    f"one of {sorted(ABV_CONFIDENCE)}"
+                )
+    assert not problems, (
+        "Bad rows in _data/cocktails/abv.yml:\n  " + "\n  ".join(problems)
+    )
+
+
+def test_a_low_confidence_strength_says_what_helen_has_to_check():
+    """`confidence: low` without a `qq:` is a guess nobody can act on.
+
+    THE FILE'S OWN HEADER PROMISES THIS -- "`grep -n 'qq:'` is the worklist" --
+    and a worklist that silently loses rows is worse than no worklist. A low row
+    is not a defect; it is the file admitting which figures Helen should overwrite
+    first, and the `qq` is the sentence saying why this one could not be settled
+    without her bottle. Rhum JM is bottled at 50 and at 55: that is a question,
+    not an error.
+    """
+    data = _abv()
+    silent = []
+    for block in ("bottles", "generics"):
+        for name, row in sorted((data.get(block) or {}).items()):
+            if isinstance(row, dict) and row.get("confidence") == "low":
+                if not str(row.get("qq") or "").strip():
+                    silent.append(f"{block}/{name}")
+    assert not silent, (
+        "These rows in _data/cocktails/abv.yml are `confidence: low` but carry no "
+        "`qq:` saying what Helen has to check, so they will never reach her "
+        "worklist:\n  " + "\n  ".join(silent)
+    )
+
+
+def test_no_generic_gets_its_strength_from_two_places():
+    """A generic derives from its bottles, or declares a figure, never both.
+
+    costs.yml states the rule this follows: "A generic that DOES have bottles is
+    deliberately absent: its range is computed from those bottles, so writing a
+    figure here too would be a second truth." Two truths do not fail loudly --
+    the plugin takes the bottles, and the declared figure sits there consulted by
+    nobody, drifting from the bottles it was meant to summarise.
+    """
+    data = _abv()
+    declared = set(data.get("generics") or {})
+    zero = set(data.get("non_alcoholic") or [])
+    derived = _generics_with_bottles()
+
+    both = sorted(declared & derived)
+    assert not both, (
+        "These generics have bottles under them in bottles.yml AND a figure in "
+        "abv.yml `generics:`. The bottles win and the figure rots -- delete "
+        "it:\n  " + "\n  ".join(both)
+    )
+    contradicted = sorted(zero & (declared | derived))
+    assert not contradicted, (
+        "These generics are in `non_alcoholic:` and also given a strength "
+        "somewhere. One of the two is wrong:\n  " + "\n  ".join(contradicted)
+    )
+
+
+def test_every_counted_pour_can_reach_a_strength(drink_file):
+    """Of the pours that COUNT, is anything unmeasured?
+
+    THE QUESTION IS NARROWER THAN "does everything have an ABV", deliberately.
+    Dashes, leaves, cubes and half a lime are free under Helen's rule -- the same
+    rule that governs cost -- and a test that dragged them back in would be
+    asking a question she has already answered. What must not happen is a
+    MEASURED pour of something with no route to a strength, because that pour
+    silently contributes zero and the drink reads weaker than it is.
+
+    RUN FROM THE DRINK, NOT FROM THE TABLE. HANDOVER 12's rule. abv.yml can be
+    internally immaculate and still have never heard of the generic a new drink
+    pours; only walking the drinks finds that.
+    """
+    _require_drink(drink_file)
+    data = _abv()
+    costs = _costs()
+    vocab = _vocab()
+    bottles = _declared_bottles()
+
+    per_ml = (vocab.get("measures") or {}).get("per_ml") or {}
+    ignored = (vocab.get("measures") or {}).get("ignored_words") or []
+    excluded = set(costs.get("excluded_units") or [])
+    top_up = costs.get("top_up_ml") or {}
+
+    measured_bottles = data.get("bottles") or {}
+    aliases = set()
+    for name, b in bottles.items():
+        if name not in measured_bottles:
+            continue
+        aliases.add(name.lower())
+        for a in (b or {}).get("aliases") or []:
+            aliases.add(str(a).lower())
+
+    # A generic reaches a strength three ways, matching the plugin exactly.
+    reachable = (
+        {(b or {}).get("generic") for n, b in bottles.items() if n in measured_bottles}
+        | set(data.get("generics") or {})
+        | set(data.get("non_alcoholic") or [])
+    )
+
+    unmeasured = []
+    for ing in drink_file.fm.get("ingredients") or []:
+        if not isinstance(ing, dict):
+            continue
+        amount = str(ing.get("amount", "")).strip()
+        generics = ing.get("generic")
+        generics = [generics] if isinstance(generics, str) else (generics or [])
+
+        if amount == "to top":
+            if not any(str(g) in top_up for g in generics):
+                continue  # not a topped-up volume we model; contributes nothing
+        else:
+            if amount in excluded:
+                continue
+            match = re.match(r"^([\d.]+)\s+(.*)$", amount)
+            if not match:
+                continue
+            unit = match.group(2).strip()
+            for word in ignored:
+                unit = re.sub(rf"^{re.escape(word)}\s+", "", unit)
+            if unit in excluded or unit not in per_ml:
+                continue  # not a volume: free, by Helen's ruling
+
+        suggestions = ing.get("suggestion")
+        suggestions = (
+            [suggestions] if isinstance(suggestions, str) else (suggestions or [])
+        )
+        if any(str(s).lower() in aliases for s in suggestions):
+            continue
+        if any(str(g) in reachable for g in generics):
+            continue
+        unmeasured.append(f"{amount} {generics or '(no generic)'}")
+
+    assert not unmeasured, (
+        f"{drink_file.slug} pours these by volume, and nothing in "
+        f"_data/cocktails/abv.yml gives them a strength -- so each counts as 0% "
+        f"and the drink reads weaker than it is:\n  " + "\n  ".join(unmeasured)
+    )
+
+
+def test_serves_is_a_count_and_only_where_a_recipe_makes_more_than_one():
+    """`serves:` is present on nine drinks and means what it says.
+
+    IT IS NARROW ON PURPOSE and the narrowness is the whole design -- see the
+    note by TOP_LEVEL_KEYS. Absent means one. A `serves: 1` would therefore be
+    noise saying nothing, and a `serves: 0` would divide the unit count by zero
+    or, worse, be quietly clamped and produce a figure nobody could account for.
+
+    THIS DOES NOT POLICE WHICH DRINKS HAVE IT. Whether the Bali Hai is one drink
+    or two is Helen's judgement, not a rule -- the test's job is that the value,
+    where it exists, is a usable count.
+    """
+    problems = []
+    for slug, fm in _load():
+        if "serves" not in fm:
+            continue
+        serves = fm["serves"]
+        if isinstance(serves, bool) or not isinstance(serves, int):
+            problems.append(f"{slug}: serves is {serves!r}, not a whole number")
+        elif serves < 2:
+            problems.append(
+                f"{slug}: serves is {serves} -- absent already means one, so this "
+                f"either says nothing or is a typo"
+            )
+    assert not problems, (
+        "Bad `serves:` values:\n  " + "\n  ".join(problems)
+    )
+
+
+def test_the_unit_formula_and_its_worked_example_still_agree():
+    """60 ml of Tanqueray is 2.6 units, and this pins every part of that.
+
+    A WORKED EXAMPLE RATHER THAN A RESTATEMENT OF THE FORMULA. Asserting
+    `ml * abv / 1000 == ml * abv / 1000` proves nothing; this ties the constant,
+    the arithmetic and one real row of abv.yml together, so that any of the three
+    moving on its own goes red with a number a human can check by hand.
+
+    TANQUERAY BECAUSE IT IS NOT A ROUND NUMBER. At 43.1% an off-by-one in the
+    data shows up in the first decimal place; at 40% several plausible mistakes
+    (a 4 for a 40, a percentage read as a fraction) still land on a tidy figure.
+    It is also the bottle Helen's `default_bottles` ruling puts behind every
+    unqualified `London dry gin`, so this row is load-bearing for 19 pours.
+    """
+    tanqueray = (_abv().get("bottles") or {}).get("Tanqueray")
+    assert tanqueray, "Tanqueray has no row in abv.yml; the example needs one."
+    assert tanqueray["abv"] == 43.1, (
+        f"Tanqueray is 43.1% and abv.yml now says {tanqueray['abv']}. If the "
+        f"bottle really has changed, update the expected figure below with it."
+    )
+    assert round(60 * tanqueray["abv"] / ML_PER_UNIT, 1) == 2.6, (
+        "A 60 ml pour of Tanqueray is 2.586 units, which prints as 2.6. This "
+        "failing means the formula, the constant or the data has moved."
     )
