@@ -74,8 +74,11 @@ Helen could see the ceiling.
 
 For the header and footer bands the ground is `#17171a` and every tone moves
 up by the same step (ring `#1d1d21`, core `#1a1a1e`, sheen `#25252a` for the
-sheen set; see `tmp/mock/leopard_v2.py`'s `PATTERNS` for the others), so the
-print keeps the same distance from whatever it sits on.
+sheen set), so the print keeps the same distance from whatever it sits on.
+**Only the sheen set's chrome tones are recorded.** The other four sets' chrome
+tones lived in `tmp/mock/leopard_v2.py`, which is gitignored and gone; derive
+them by the same step from the page tones above if a round ever needs them,
+and write them into this table when you do.
 
 A **sheen** copy is what "brought it to life" (Helen, round 1): a lighter
 stroke offset up-left is the site's own emboss light source applied to fur.

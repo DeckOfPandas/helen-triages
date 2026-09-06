@@ -153,7 +153,7 @@ six faults" cannot pass while something also happened to the other thirty lines.
 - **Size words** (108 drafts, moving `large`/`medium` from `item:` to
   `amount:`). Considered and excluded — mechanical in shape, but it rewrites two
   fields per hit and the precedent records fixes that needed an eye.
-- **A missing `meta.awaiting_fix`** (2 drafts). The flag fails closed, so
+- **A draft with no `meta.awaiting_fix`** (the report names them). The flag fails closed, so
   writing `false` in asserts the recipe is fit to publish. That is Helen's to
   say, not a formatting fix.
 

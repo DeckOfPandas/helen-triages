@@ -1,13 +1,21 @@
 # INGEST INBOX — design for ingesting recipes through a Claude with no repository
 
 Written by Fable 5.1, 2026-09-02, as workstream 5 of that day's architecture
-audit. **This is a design, not an implementation.** Nothing described here
-exists yet unless the section says "exists today". An Opus session implements
-it in the two PRs at the end; the decisions in §9 are Helen's and block the
-parts that name them.
+audit.
 
-Every path and line number was checked at commit 8191230. Re-check before
-editing (HANDOVER §11.2).
+> **STATUS 2026-09-06: IMPLEMENTED, in full.** Both PRs in §10 landed on
+> 2026-09-03 (#672): `scripts/build_ingest_vocab.py` and the marker pairs,
+> `scripts/ingest_inbox.py` with its fixtures, `.claude/commands/ingest-inbox.md`,
+> `SUPPORTED_VERSIONS` and its test, HANDOVER §11.0.4, and READMEs in both
+> private repos. §3's gaps are closed. **What still binds is §6 (the envelope),
+> §8 (security and failure modes) and §9 (the rulings)** — `ingest-inbox.md`
+> and both `INGEST_ONE_*.md` cite §6 as the spec. §2, §3, §5, §10 and §11 are
+> history; do not work from them. The paragraph that stood here said "this is
+> a design, not an implementation; nothing described here exists yet" until
+> this stamp.
+
+Every path and line number was checked at commit 8191230 and several have
+moved since. Re-check before editing (HANDOVER §11.2).
 
 ---
 
@@ -240,8 +248,9 @@ re-typing them.
    tagline.
 6. Commit in the drafts repo with a bare `Fixes #N` per envelope — valid
    because the issue and the commit are in the same private repo (the
-   cross-repo trap in CLAUDE.md does not apply). Push on her confirmation.
-   The trailer is what closes the issue; the script never closes one.
+   cross-repo trap in CLAUDE.md does not apply). Push freely — the private
+   repos need no ask for a push (CLAUDE.md, 2026-09-05). The trailer is what
+   closes the issue; the script never closes one.
 7. Report what is still `QQ` and why, as `/ingest` does.
 
 **What the consumer never does:** rewrite prose, derive `main_ingredients`,
