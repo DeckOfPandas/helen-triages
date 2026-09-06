@@ -669,6 +669,35 @@ permalink: /cocktails/
      it lands as an insult to a search that was simply too narrow. {% endcomment %}
   <p class="drink-none" hidden>Blank canvas.</p>
 
+  {% comment %} PAGINATION -- #694, and it is food's control ported rather than
+     a second design. Same three buttons, same `(see all)` escape, same shared
+     arithmetic (`HTF.recipeList.paginate` in assets/js/recipe-list.js), same
+     `display: none` until the script has something to page.
+
+     TWENTY A PAGE, WHICH IS FOOD'S NUMBER AND DIVIDES THIS GRID EXACTLY. The
+     card grid is `repeat(auto-fill, minmax(370px, 1fr))` in a 900px column,
+     which is two columns -- so 20 is ten full rows and no ragged last one. It
+     is also the number that was already chosen once for this job, and picking a
+     different one for the same control on the other site would be a decision
+     nobody made.
+
+     IT SHIPS `display: none` RATHER THAN `hidden`, matching food exactly: the
+     script sets `style.display` on it, and an element carrying both would need
+     the attribute removing as well as the property setting. One mechanism.
+
+     ABSENT JAVASCRIPT THERE IS NO PAGINATION AND NO TRUNCATION EITHER -- every
+     card is in the DOM and visible, which is the same no-JS answer the rest of
+     this index gives. A control that cannot work must not appear; see the
+     shortlist button's own note above. {% endcomment %}
+  <div class="drink-pagination" style="display: none;">
+    <div class="drink-pagination-nav">
+      <button type="button" class="btn-page" id="drink-page-prev">&larr; prev</button>
+      <span id="drink-page-status"></span>
+      <button type="button" class="btn-page" id="drink-page-next">next &rarr;</button>
+    </div>
+    <button type="button" class="btn-page btn-page-see-all" id="drink-page-see-all">(see all)</button>
+  </div>
+
   {% comment %} THE SHOPPING LIST -- #546's stretch goal, Helen 2026-09-04:
      "information at the bottom of my shortlist listing each ingredient (bottle
      selection if I have one, generic if not) and its amount in total if I were
@@ -851,6 +880,15 @@ permalink: /cocktails/
 
      Guarded by tests/test_site_config.py, the same way food's four are.
   {% endcomment %}
+  {% comment %} `recipe-list.js` IS NOT ABOUT RECIPES -- it is three pure
+     helpers (shuffle, paginate, titleMatchTier) that the food index happened to
+     need first, and it is named after where it was born. #694 brings the
+     cocktails index to the SAME `paginate`, so the two pagers cannot drift
+     about what "page 3 of 7" means. Loaded before cocktail-index.js, which
+     calls it. Renaming the file to say what it is would be right and is a
+     separate change: it is loaded by name in two templates and required by name
+     in a test. {% endcomment %}
+  <script src="{{ '/assets/js/recipe-list.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/ingredient-search.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-search.js' | relative_url }}"></script>

@@ -70,6 +70,25 @@
   var cards = Array.prototype.slice.call(document.querySelectorAll('.drink-cards > li'));
   if (!cards.length) return;
 
+  /* PAGINATION -- #694, ported from the food index rather than designed again.
+     The arithmetic is HTF.recipeList.paginate (assets/js/recipe-list.js), the
+     same pure function filters.js uses, so the two indexes cannot drift about
+     what page 3 of 7 means.
+
+     TWENTY, WHICH IS FOOD'S NUMBER. The card grid is two columns at the site's
+     900px width, so 20 is ten full rows and no ragged last one -- and picking a
+     different number for the same control on the other site would be a decision
+     nobody made. */
+  var PAGE_SIZE = 20;
+  var currentPage = 1;
+  var showAll = false;
+
+  var pagination = document.querySelector('.drink-pagination');
+  var pagePrevBtn = document.getElementById('drink-page-prev');
+  var pageNextBtn = document.getElementById('drink-page-next');
+  var pageStatusEl = document.getElementById('drink-page-status');
+  var pageSeeAllBtn = document.getElementById('drink-page-see-all');
+
   var CS = HTF.cocktailSearch;
   var FAMILY_SUFFIX = CS.FAMILY_SUFFIX;
   // Accent folding, shared with food rather than re-derived -- the same
@@ -610,7 +629,13 @@
     });
   }
 
-  function apply() {
+  /* `preservePage` IS THE ONLY ARGUMENT AND IT IS FALSE EVERYWHERE BUT THE
+     PAGER. Every other caller has just changed what the results ARE, and
+     landing on page 4 of a set that now has two pages -- or on page 4 of a
+     completely different set -- is disorienting in a way that going back to the
+     top is not. Same rule filters.js states for the food index. */
+  function apply(preservePage) {
+    if (!preservePage) { currentPage = 1; showAll = false; }
     var shown = 0;
     var ranked = [];
     activeInclude = chosen('include');
@@ -676,6 +701,29 @@
       return a.key - b.key;
     });
     reorder(ranked.map(function (r) { return r.card; }));
+
+    /* PAGING HAPPENS AFTER THE REORDER, and the order matters: "the first
+       twenty" is only meaningful once the ranking has decided which twenty
+       those are. Reversing these two would page the DOM order and then shuffle
+       within it, so a drink could rank first and still be on page four.
+
+       `hidden` RATHER THAN `style.display`, because that is how this index
+       hides a card everywhere else -- `matches()` sets `card.hidden` and the
+       stylesheet has no `display` opinion to fight. filters.js uses `display`
+       on the food side for the same job; each file stays internally consistent
+       rather than the two being made to look alike.
+
+       THE PAGE NUMBER IS ADOPTED BACK, not just read. A filter can narrow the
+       results out from under whatever page you were on, and `paginate` returns
+       a legal page in that case -- so `currentPage` takes its answer rather
+       than staying on a page that no longer exists. */
+    var visible = ranked.filter(function (r) { return r.ok; });
+    var pageInfo = HTF.recipeList.paginate(visible.length, currentPage, PAGE_SIZE, showAll);
+    currentPage = pageInfo.currentPage;
+    visible.forEach(function (r, i) {
+      r.card.hidden = !(i >= pageInfo.start && i < pageInfo.end);
+    });
+    syncPagination(pageInfo.totalPages, visible.length);
 
     /* Each clear appears only when its own section has something to clear.
        Driven from the same pass that filters, so a clear can never be visible
@@ -750,6 +798,46 @@
      state in apply(), which is what keeps it correct after `clear all`
      reassigns the whole state object without touching any markup — the same
      argument the note below makes for the buttons. */
+  /* HIDDEN ENTIRELY ONCE THERE IS NOTHING TO PAGE, and once `(see all)` has
+     been pressed -- not merely disabled. A pager showing "page 1 of 1" beside
+     two dead arrows is furniture that answers a question nobody asked; food's
+     own control made the same call. */
+  function syncPagination(totalPages, visibleCount) {
+    if (pagination) {
+      pagination.style.display =
+        (totalPages > 1 && !showAll && visibleCount > 0) ? 'grid' : 'none';
+    }
+    if (pagePrevBtn) pagePrevBtn.disabled = currentPage <= 1;
+    if (pageNextBtn) pageNextBtn.disabled = currentPage >= totalPages;
+    if (pageStatusEl) {
+      pageStatusEl.textContent = 'page ' + currentPage + ' of ' + totalPages;
+    }
+  }
+
+  /* THE THREE CONTROLS. `apply(true)` preserves the page, which is the whole
+     difference between paging and filtering: changing a filter sends you back
+     to page one (the results are a different set), while pressing `next` must
+     not. */
+  if (pagePrevBtn) {
+    pagePrevBtn.addEventListener('click', function () {
+      if (currentPage <= 1) return;
+      currentPage -= 1;
+      apply(true);
+    });
+  }
+  if (pageNextBtn) {
+    pageNextBtn.addEventListener('click', function () {
+      currentPage += 1;
+      apply(true);
+    });
+  }
+  if (pageSeeAllBtn) {
+    pageSeeAllBtn.addEventListener('click', function () {
+      showAll = true;
+      apply(true);
+    });
+  }
+
   var cardList = document.querySelector('.drink-cards');
   if (cardList) {
     cardList.addEventListener('click', function (ev) {
@@ -1129,6 +1217,11 @@
     HTF.indexMemory.save(MEMORY_KEY, {
       order: order.map(cardKey),
       filters: FilterState.serialise(state),
+      /* #694. Restoring the filters and the shuffle but not the PAGE would put
+         you back on page one of the list you left from page three, which is the
+         same lost-place problem this whole memory exists to fix. */
+      page: currentPage,
+      showAll: showAll,
       scrollY: window.scrollY || 0
     });
   }
@@ -1150,6 +1243,13 @@
       var at = position[cardKey(d)];
       d.key = (typeof at === 'number') ? at : unseen++;
     });
+
+    /* UNTRUSTED, like everything else in this record -- see
+       FilterState.deserialise's own note. A stored page is only adopted if it
+       is a positive number; `paginate` then clamps it to something legal, so a
+       tampered 9999 lands on the last page rather than an empty one. */
+    currentPage = (typeof saved.page === 'number' && saved.page > 0) ? saved.page : 1;
+    showAll = !!saved.showAll;
 
     state = FilterState.deserialise(saved.filters);
     state.isIncludeSearching = false;

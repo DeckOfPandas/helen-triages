@@ -1097,3 +1097,99 @@
 @media (max-width: $index-stack-width) {
   .drink-searches { grid-template-columns: 1fr; gap: $index-section-gap; }
 }
+
+
+// ============================================================================
+// PAGINATION -- #694
+// ============================================================================
+// FOOD'S CONTROL, PORTED RATHER THAN REDESIGNED. `.recipe-pagination` in
+// _sass/food/_recipe-list.scss is the same three-column grid, the same
+// `(see all)` at the far right, the same lowercase Courier. The two indexes
+// are the same control panel (see @mixin index-panel) and a pager that looked
+// different on one of them would be a difference nobody chose.
+//
+// WHAT DIFFERS IS THE HOVER COLOUR AND ONLY THAT. Food's reaches for
+// $color-star-root; on this site the equivalent is $color-wicked-woowoo, which
+// §9.13's rule already makes mean "you can touch this" on hover site-wide.
+// Reusing food's token here would import one site's section colour into the
+// other's, which is the specific confusion the five accents exist to prevent.
+//
+// DELIBERATELY PLAIN. Text and two arrows, nothing borrowed from the chip or
+// button vocabulary -- it is page furniture, not a filter, and giving it a
+// tag shape or a section hue would claim a meaning the colour code has no
+// room for. Food's own comment says the same thing about its copy.
+.drink-pagination {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin: $space-xl 0;
+  font-family: $font-headings;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
+.drink-pagination-nav {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: $space-lg;
+  justify-self: center;
+}
+
+.btn-page-see-all {
+  grid-column: 3;
+  justify-self: end;
+}
+
+.btn-page {
+  font-family: $font-headings;
+  text-transform: lowercase;
+  background: none;
+  border: none;
+  color: $color-text;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: $space-xs $space-sm;
+  transition: color 0.12s ease-in-out;
+
+  &:hover:not(:disabled) {
+    color: $color-wicked-woowoo;
+  }
+
+  // DISABLED RATHER THAN HIDDEN, at the two ends of the range. The control
+  // keeps its shape as you page, so `next` does not jump sideways when `prev`
+  // wakes up -- the same no-reflow rule %btn-active-base follows on the food
+  // filter buttons.
+  &:disabled {
+    color: $color-clear-text;
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+// ONE COLUMN ON A PHONE, RATHER THAN AN EXEMPTION.
+// `test_a_multi_track_row_can_become_one` caught this the moment it was
+// written, and it offers two ways out: a narrow variant, or a line in
+// MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT stating the claim being made.
+// Food's `.recipe-pagination` -- the rule this one is ported from -- took the
+// second, and its entry says of itself: "BELIEVED, not measured, and it is the
+// same shape as the footer row that did not [fit]".
+//
+// That is an honest note and a poor thing to copy. Inheriting a claim nobody
+// has measured, for a second element, doubles the exposure and adds no
+// evidence; stacking the row costs three declarations and cannot overflow at
+// any width. The status string is the part that could grow ("page 10 of 12"),
+// and on one column it has the whole width to grow into.
+@media (max-width: 600px) {
+  .drink-pagination {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: $space-sm;
+  }
+
+  .drink-pagination-nav,
+  .btn-page-see-all {
+    grid-column: 1;
+    justify-self: center;
+  }
+}

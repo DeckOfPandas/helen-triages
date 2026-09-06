@@ -27,6 +27,11 @@ const JS_DIR = path.join(__dirname, '..', '..', 'assets', 'js');
 // A test asserts this list still matches the template.
 const SCRIPTS = [
   'assets.js',
+  // #694 put `recipe-list.js` on this page: cocktail-index.js calls
+  // HTF.recipeList.paginate, and without it the script throws on its first
+  // apply(). THIS HARNESS CAUGHT THAT, which is the plainest demonstration of
+  // why it exists -- every other test stayed green while the index was dead.
+  'recipe-list.js',
   'ingredient-search.js',
   'filter-state.js',
   'cocktail-search.js',
@@ -122,7 +127,21 @@ function buildPage(doc) {
 
   const list = el('ul', 'drink-cards');
   doc.body.appendChild(list);
-  return { filters, list, el };
+
+  // Pagination (#694). `style.display` rather than `hidden`, matching the
+  // template -- the script sets the property, so the fixture must offer the
+  // same mechanism or the visibility assertions test nothing.
+  const pager = el('div', 'drink-pagination');
+  pager.style.display = 'none';
+  const nav = el('div', 'drink-pagination-nav');
+  nav.appendChild(el('button', 'btn-page', { id: 'drink-page-prev' }));
+  nav.appendChild(el('span', '', { id: 'drink-page-status' }));
+  nav.appendChild(el('button', 'btn-page', { id: 'drink-page-next' }));
+  pager.appendChild(nav);
+  pager.appendChild(el('button', 'btn-page btn-page-see-all', { id: 'drink-page-see-all' }));
+  doc.body.appendChild(pager);
+
+  return { filters, list, pager, el };
 }
 
 function addCard(doc, list, spec) {

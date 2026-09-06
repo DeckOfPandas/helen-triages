@@ -209,3 +209,104 @@ test('#695: with only one section asked, the order is unchanged', () => {
   assert.deepStrictEqual(visibleTitles(r.page).sort(), ['Daiquiri', 'Negroni'],
     'both drinks are `sharp` and both should survive.');
 });
+
+// --- pagination, #694 --------------------------------------------------------
+//
+// THESE ARE THE FIRST TESTS THIS FEATURE COULD HAVE HAD. Paging lives inside
+// cocktail-index.js's IIFE like everything else here, so before the harness the
+// only way to check "does next actually advance" was to open a browser. The
+// harness caught a real break while this was being written: #694 added
+// `recipe-list.js` to the page and the script threw on its first apply() until
+// the harness was told, with every other test green.
+
+function manyDrinks(n) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    out.push({
+      url: '/d' + i,
+      name: 'drink ' + i,
+      title: 'Drink ' + i,
+      moods: ['sharp'],
+      ingredients: ['gin|gin'],
+      chaos: 'good',
+      madeBefore: true
+    });
+  }
+  return out;
+}
+
+test('#694: only the first twenty of a long list are shown', () => {
+  const r = boot({ drinks: manyDrinks(45) });
+  assert.strictEqual(visibleTitles(r.page).length, 20,
+    'the page size is 20; a 45-drink list should show one page of it.');
+  assert.strictEqual(r.doc.getElementById('drink-count-n').textContent, '45',
+    'the SURVIVOR COUNT is the whole matching set, not the page. Paging is a ' +
+    'view of the results and must not change what the count claims.');
+  assert.strictEqual(
+    r.doc.getElementById('drink-page-status').textContent, 'page 1 of 3');
+});
+
+test('#694: a list that fits on one page shows no pager at all', () => {
+  // Hidden rather than disabled: "page 1 of 1" beside two dead arrows is
+  // furniture answering a question nobody asked.
+  const r = boot({ drinks: manyDrinks(5) });
+  assert.strictEqual(r.page.pager.style.display, 'none');
+  assert.strictEqual(visibleTitles(r.page).length, 5);
+});
+
+test('#694: next advances, prev goes back, and the ends disable', () => {
+  const r = boot({ drinks: manyDrinks(45) });
+  const prev = r.doc.getElementById('drink-page-prev');
+  const next = r.doc.getElementById('drink-page-next');
+
+  assert.strictEqual(prev.disabled, true, 'prev should be dead on page one.');
+  assert.strictEqual(next.disabled, false);
+
+  next.dispatch('click');
+  assert.strictEqual(r.doc.getElementById('drink-page-status').textContent, 'page 2 of 3');
+  assert.strictEqual(prev.disabled, false);
+  assert.strictEqual(visibleTitles(r.page).length, 20);
+
+  next.dispatch('click');
+  assert.strictEqual(r.doc.getElementById('drink-page-status').textContent, 'page 3 of 3');
+  assert.strictEqual(next.disabled, true, 'next should be dead on the last page.');
+  assert.strictEqual(visibleTitles(r.page).length, 5, 'the last page is the remainder.');
+
+  prev.dispatch('click');
+  assert.strictEqual(r.doc.getElementById('drink-page-status').textContent, 'page 2 of 3');
+});
+
+test('#694: the pages between them cover every drink exactly once', () => {
+  // The property that matters and the one an off-by-one breaks silently: a
+  // reader paging through must see all 45, and no drink twice.
+  const r = boot({ drinks: manyDrinks(45) });
+  const next = r.doc.getElementById('drink-page-next');
+  const seen = [];
+  for (let page = 0; page < 3; page++) {
+    seen.push(...visibleTitles(r.page));
+    if (page < 2) next.dispatch('click');
+  }
+  assert.strictEqual(seen.length, 45, 'a drink was shown twice or not at all.');
+  assert.strictEqual(new Set(seen).size, 45);
+});
+
+test('#694: (see all) drops the pager and shows everything', () => {
+  const r = boot({ drinks: manyDrinks(45) });
+  r.doc.getElementById('drink-page-see-all').dispatch('click');
+  assert.strictEqual(visibleTitles(r.page).length, 45);
+  assert.strictEqual(r.page.pager.style.display, 'none',
+    'once (see all) is pressed there is nothing left to page.');
+});
+
+test('#694: changing a filter returns you to page one', () => {
+  // The whole difference between paging and filtering. Landing on page 3 of a
+  // set that now has one page -- or of a different set entirely -- is
+  // disorienting in a way that going back to the top is not.
+  const r = boot({ drinks: manyDrinks(45) });
+  r.doc.getElementById('drink-page-next').dispatch('click');
+  assert.strictEqual(r.doc.getElementById('drink-page-status').textContent, 'page 2 of 3');
+
+  clickByData(r.page, 'data-mood', 'sharp');
+  assert.strictEqual(r.doc.getElementById('drink-page-status').textContent, 'page 1 of 3',
+    'a filter change must reset the page.');
+});
