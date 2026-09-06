@@ -569,6 +569,38 @@ re-implemented from git and run against the new one over a real build — 429 ro
 × 890 filter states, 381,810 decisions, identical on every pair — and then the
 check was broken on purpose to confirm it could see a difference.
 
+**AND THE MOVE PAID FOR ITSELF ON 2026-09-06, WHICH IS #619.** `entriesMatchKey`
+matched a key word if it was CONTAINED anywhere in a row's word, while
+`filters.js`'s own comment had described it as "prefixes" for as long as it had
+existed — the code and its comment disagreed the whole time. Helen found it from
+the output: asking for `salt` handed back twelve recipes whose only salt is
+UNsalted butter.
+
+The extraction is what made it settleable in minutes rather than arguable. The
+rule is now `ew.indexOf(kw) === 0`, and the change was **measured over the real
+vocabulary and all 429 recipes and drafts: 136 (key, recipe) pairs stop matching
+and none start.** 104 are outright defects — `ice` reaching brown rice,
+five-spice powder and citrus juice (49 of them), `salted butter` reaching
+UNsalted butter, `peas` reaching chickpeas, `apple` reaching pineapple.
+
+**17 were real and are carried by the VOCABULARY instead**, which is the option
+#619 lists first and the one `cocktail-search.js` had already taken on the other
+site (its header names `apple`/PINEapple and `gin` as its reasons — the same two
+words). A `nuts` synonym family restores them and is a net gain: containment had
+also been MISSING almonds, pistachios, pecans and cashews, none of which contain
+the letters "nuts". It costs a `nuts (all)` button on the index.
+
+**15 losses are deliberate and written down** where they happen: `raw king
+prawns` no longer reaches "king prawns" (it only ever worked because `raw` sits
+inside p-RAW-n), `corn flour`/`cornflour` and `bean sprouts`/`beansprouts` are
+two spellings of one ingredient and want fixing in the DATA, and `echalion
+shallots` loses "banana shallots (echalions)" to a bracket. **An `aliases:` entry
+for the spellings was tried and makes it worse** — an alias rewrites the picker's
+vocabulary but a row is matched against `data-ingredients`, which is raw
+`main_ingredients` and sees no alias, so the two chips collapse into one that
+matches half the recipes it names. `_data/food/ingredient_words.yml` records
+that where the entry would have gone.
+
 **`back-link.js` is the clearest argument for this split in the repo**, and it
 earned the place within an hour of being written. Its whole content is one
 predicate — may this arrow call `history.back()`? — and the first version got
@@ -1568,9 +1600,12 @@ message says "promote it", because wanting to write one up is a good outcome
 that has outgrown the shape.
 
 **Open, and deliberately not decided on the way past:** whether the index needs
-a way to include or exclude the magic bag in production (**#507** — note the
-META FILTERS block is local-only, and "has a written method" is a fact about a
-dish rather than a state of completion, so it may not belong there at all);
+a way to include or exclude the magic bag in production (**#507** — and the
+answer can no longer be "put it in META FILTERS", because that block was removed
+on 2026-09-06, §13.4. That was arguably the right shape anyway: "has a written
+method" is a fact about a DISH rather than a state of completion, so it never
+belonged beside four work-state buttons. Helen has the issue and asked for time
+with it — 2026-09-06: *"I need to think about that more"*);
 whether `magic bag` is the right reader-facing word, in the badge and in the
 `/food/magic-bag/` permalink (**#508** — the permalink is the half worth
 settling early, since changing it later breaks shared links); and the README,
@@ -3281,78 +3316,117 @@ second example until 2026-09-04, when Helen flattened both ratios into one
 `honey water`.)
 
 
-### 9.3.4 ABV and units of alcohol — the groundwork, #297
+### 9.3.4 Units of alcohol — built 2026-09-06, #297
 
-**HELEN WANTS UK UNITS, NOT THE STRENGTH OF THE FINISHED DRINK.** Her words,
-2026-09-05: *"I don't want the ABV of the finished drink, I want the number UK
-units of alcohol, so dilution etc doesn't matter."* Units are
-`ml × ABV% ÷ 1000` — 25 ml of a 40% spirit is exactly 1 unit.
+**LOCAL ONLY, like the price above it, and for a different reason.** `show_units`
+is declared in `_config_local.yml` and nowhere else, so production renders
+nothing. Helen's call on the day: *"local-only now, and I'll note what publishing
+would need."* What it would need is the eleven `qq:` rows below cleared — a unit
+count built partly on strengths nobody has read off a label is a different
+promise from a rough price.
 
-**That single sentence deletes a whole workstream.** Dilution cancels out, so
-the ice, the shake time and the serve layer are all IRRELEVANT to #297. An
-earlier reading of this handover treated the serve layer as an ABV
-prerequisite; it is not, and §9.10a stands on its own merits.
+**HELEN WANTS UK UNITS, NOT THE STRENGTH OF THE FINISHED DRINK.** Her words:
+*"I want the number of units in a drink, not the ABV of the drink, i.e. water
+etc don't matter."* Units are `ml × ABV% ÷ 1000` — 25 ml of a 40% spirit is
+exactly 1 unit.
 
-**ABV CANNOT LIVE ON A CATEGORY, and this is the finding that matters.** The rum
+**That sentence is why this was a week of work and not a month.** A finished
+drink's ABV needs the dilution modelled — how long it was stirred, how cold the
+ice was, how much melted — and none of that is recorded or knowable. The UNITS
+need none of it: water adds neither alcohol nor units, and stirring longer does
+not change how much gin went in.
+
+**THE FILES.** `_data/cocktails/abv.yml` (127 bottles, 30 generics with no bottle
+behind them, 24 things that are poured and contribute nothing) and
+`_plugins/cocktail_units.rb`. The footer line sits under the cost line, per her
+placement: *"Only in the bottom section with source and cost, so the line below
+those."*
+
+**ABV CANNOT LIVE ON A CATEGORY, and that finding survived contact.** The rum
 categories are APPELLATION and PRODUCTION categories, deliberately not strength
-ones — #314 says so outright, explaining why Pusser's 151 had nowhere to go:
-*"`moderately aged` says nothing about strength."* So one category legitimately
-spans a wide range:
-
-| bottle | category | ABV |
-|---|---|---|
-| Gosling's Black Seal | moderately aged rum | 40% |
-| Havana Club 7 | moderately aged rum | 40% |
-| Pusser's Blue Label | moderately aged rum | 40% |
-| **Pusser's Gunpowder** | moderately aged rum | **54.5%** |
-
-Helen's own reclassification of Smith & Cross says it best: *"it is aged, so the
+ones — #314 says so outright: *"`moderately aged` says nothing about strength."*
+Pusser's Gunpowder is 54.5% and Gosling's Black Seal 40%, in the same category.
+Helen's own reclassification of Smith & Cross puts it best: *"it is aged, so the
 unaged overproof style was never right. 57% is what made it look like one — and
 strength is not what that category names."*
 
-**So `abv` belongs on the BOTTLE and only the bottle.** Which promotes bottle
-COVERAGE from a costing nicety to the actual blocker.
+**So `abv` belongs on the BOTTLE — but not in `bottles.yml`.** That file's own
+header predicted ABV would sit "on the same invariant side" as `generic` and the
+appellations, and it is right about the INVARIANCE: Appleton 12 is 43% in every
+drink that pours it. It is wrong about the location, on `costs.yml`'s argument —
+127 numbers interleaved with 900 lines of appellation rulings cannot be reread or
+corrected without disturbing prose that must not be disturbed. Both files now say
+so, rather than the prediction being quietly overwritten.
 
-**THE REAL WORK IS THE MISSING BOTTLES, NOT THE NUMBERS.** Re-measured
-2026-09-06, after the costings work of §9.3.5 moved several of these:
+**A SEPARATE FILE FROM `costs.yml` TOO, and the argument is not the same one.** A
+price is true on a day, in a shop, and decays on its own — hence its `checked:`
+date. A strength does not: Tanqueray has been 43.1% for decades. The two files
+answer different questions about the same bottles and would date each other if
+merged.
 
-| | |
-|---|---|
-| bottles declared | 127, **none carrying an `abv` field** |
-| pours naming a bottle | 243 of 685 |
-| generics in use with NO bottle | 82 of 157 |
+**EVERY ZERO IS DECLARED RATHER THAN DEFAULTED**, and this is the file's one real
+safety property. Lime juice, the syrups and the honey water are listed at
+`abv: 0`. If a syrup may simply be ABSENT then so may a gin, and the gin totals
+as water with nothing going red. A missing key is a test failure; `abv: 0` is a
+statement.
 
-**THE COSTING WORK ALREADY BUILT TWO OF THIS SECTION'S THREE PREREQUISITES**, so
-what is left here is genuinely only the strengths:
+**FOUR THINGS DIVERGE FROM THE COSTS PLUGIN**, which is otherwise this one's
+sibling — same two layers, same alias map, same `default_bottles` ruling:
 
-- **`to top` is solved.** This section used to list "9 pours with no quantity"
-  as an open unknown. `costs.yml`'s `top_up_ml` now declares a range for
-  champagne, prosecco and soda water, because Helen asked for it for the
-  shopping list — see §9.3.5. Units can read the same block.
-- **The category fallback question is answered, and the answer was YES.** This
-  section used to say a `typical_abv` on a category is "a decision about what
-  the page is willing to CLAIM. Do not add it without asking." She was asked, in
-  the costing form, and chose the two-layer shape: a bottle's own figure where
-  one exists, a declared per-category figure where it does not. `costs.yml`'s
-  `generics:` block is that decision made once; an `abv` version of it needs no
-  fresh ruling, only the numbers.
-- **The delivery method is proven.** "Deliver the research as a table she checks,
-  with confidence flagged per bottle" is exactly what happened for prices, and
-  it worked: she corrected 15 of the first 16 flagged rows in two passes.
+1. **What spoils an exact figure.** Cost is inexact when any pour failed to name
+   its bottle; units only when an ALCOHOLIC pour did. A Tom Collins pours a named
+   gin and tops with soda water, and soda water is 0% however vaguely described —
+   so it prints one figure where the cost rule would print a range spanning
+   nothing. 22 of 123 drinks are exact.
+2. **No data attributes, deliberately.** Cost emits them so the scaler can
+   multiply; this is PER SERVING and a serving does not get stronger when you
+   make eight. Giving the scaler nothing to read is what stops it going stale.
+3. **`serves:`**, on nine drinks — see §9.10a's scaler note for why the scaler
+   still does not read it.
+4. **No `complete` flag.** Nothing excluded from a unit count can BE the drink:
+   six dashes of Angostura is 0.02 units.
 
-**What has NOT changed is the shape of the gap.** The alcoholic categories with
-no bottle still block units — champagne, Campari, both Chartreuses, Aperol,
-Grand Marnier, prosecco, Cynar, Jägermeister, aquavit, pisco, sloe gin, liqueur
-de sapin and the rest — and adding a bottle for each still comes first.
+**DASHES DO NOT COUNT, AND THAT WAS ASKED RATHER THAN ASSUMED.** This section
+used to warn that "COSTING excludes them by Helen's explicit ruling and UNITS may
+not want to; the two features share data, not policy." She was asked and chose
+the same rule: volumes and `to top` only. So the exclusion list is read out of
+`costs.yml` rather than restated, on that file's own reasoning that the rule and
+the data must not be able to disagree — a future tidy moving both blocks into
+`ingredients.yml` would be right.
 
-**Two categories LOST their only bottle on 2026-09-05 and are now on that list**:
-`overproof Demerara rum` (El Dorado 151) and `tawny port` (Ottoman 10 Year
-Tawny), both retired to `not_reached_for` at Helen's word. `añejo tequila` went
-the other way and gained its first two.
+**A ZERO IS WITHHELD AND THE COLLECTION HAS EXACTLY ONE.** The Pear, Apricot and
+Rosemary Bellini's ingredient list contains no alcohol at all — it tops with SODA
+WATER and the prosecco its title implies was never recorded. `0.0` is the correct
+sum of what is written and a wrong answer about the drink, because on a cocktail
+page it reads as "this is alcohol-free". Same judgement `cost_complete` makes for
+the same drink.
 
-**Dashes and drops** (84 pours) still contribute little but not nothing — a dash
-of Angostura is 44.7%. Note that COSTING excludes them by Helen's explicit
-ruling and UNITS may not want to; the two features share data, not policy.
+**THE FEATURE FOUND THREE DATA FAULTS ON ITS FIRST RUN**, which is #752: the Ti'
+Punch pours 15 ml of rhum (the whole drink is 35 ml), the Pic-A-De-Crop pours 360
+ml of 57% overproof into a 675 ml punch, and the Bellini above. In each case the
+arithmetic is right and the recipe is not, and nothing else in the suite was
+going to notice — every one is a valid amount in a valid unit.
+
+**ELEVEN ROWS NEED HELEN**, down from seventeen. `grep -n 'qq:'
+_data/cocktails/abv.yml` is the worklist. The knowledge pass filled everything it
+could and the web pass then settled six — **three of them by CORRECTING a figure
+rather than confirming it**, which is the argument for having done it:
+
+| | was | is | |
+|---|---|---|---|
+| Suze | 15 | **20** | 20% in the UK, 15% across the rest of Europe |
+| Clairin Communal | 53.5 | **43** | `Communal` is the four-village BLEND, not a single clairin |
+| Boudier Crème de Menthe | 18 | **21** | |
+
+What is left is the right eleven: two Bob's bitters that cannot change any number
+(a dash never reaches the arithmetic), a Clément blanc and a Damoiseau each sold
+at more than one strength, an "Ardbeg XO" that names no product, and five
+categories where the answer is a bottle rather than a fact.
+
+**TWO SPELLING FAULTS SURFACED WITH THEM AND ARE NOT FIXED THERE**: `bottles.yml`
+says `Ophir` where the product is Opihr, and `Amaro Ciociano` where it is
+Ciociaro. Both belong to #701 — one declared name per bottle — and correcting
+them in `abv.yml` alone would make the two files disagree.
 
 ### 9.3.5 What a drink costs — #547, built 2026-09-05/06
 
@@ -3989,6 +4063,57 @@ ingredient line would have read `moderately aged (Gosling's Black Seal)` until
 they were renamed. They were; the drink page followed; #513 closed with it.
 
 The bottle side of all this is §9.3.2.
+
+**THE CARD'S INGREDIENT LINE IS A PLUGIN SINCE 2026-09-06** —
+`_plugins/cocktail_card_ingredients.rb`, and it closed #567, #640 and #691 at
+once. What stood in `cocktails/index.html` was ONE 1,400-character Liquid
+statement doing four jobs (hiding, labelling, joining, emitting search data),
+already at the limit of what anybody could read, and a seven-tier sort was not
+going into it. Every comment from that line moved with the job it describes.
+
+**IT ALSO KILLED A DUPLICATION THAT HAD A COMMENT AND NO ENFORCEMENT.** The
+`searchable` capture was a near-copy of the card's own loop, with a note saying
+"the two must stay in step" and nothing making them. Both now read one list built
+once per drink, so the search pool and the visible line are the same list by
+construction.
+
+**THE ORDER IS HELEN'S, FROM #567:** base spirits, then lower-proof, then citrus
+and juice, then syrups, then everything else, then bitters. Largest volume first
+inside a tier; the recipe's own order breaks ties, so a Negroni's three equal
+pours stay as she typed them. She ruled the tie-break on 2026-09-06 — *volume,
+with a per-drink override* — over "most typifying the drink", which would have
+been truer and would have needed a judgement recorded on 124 drinks, making it
+her worklist rather than a rule.
+
+**THE SECTIONS OF `ingredients.yml` ARE THE CLASSIFIER**, not a new list of
+"these are the strong ones". Every generic is already declared in exactly one
+section, by her, and those sections are the vocabulary's own idea of what kind of
+thing something is. A second classification would drift the first time a generic
+was added to one file and not the other. A generic in no section warns at build
+time and fails a test.
+
+**TIER 7 (FLOATS) IS NOT BUILT AND COULD NOT BE — #754.** A float is not recorded
+anywhere: three drinks mention one and all three do it in QQ prose. #567's
+"unless floated" and its muddle-grouping clause are in the same position. So an
+absinthe RINSE currently sorts as a base spirit, which is wrong and is at least
+wrong in a way the ordering rule explains. The `card_order:` per-ingredient
+override exists, is tested, and has no users on purpose — picking which drinks
+need it is the judgement she declined to hand over.
+
+**`not_on_cards` IS TEN ENTRIES, NOT ONE (#640).** Helen: *"don't include things
+like sugar, water. lemon zest in the ingredient list that appears on cocktail
+cards."* Read the way #580 read the same instruction — **the BARE thing**. So the
+bare sugars, the bare salt, the zest and the honey; every syrup stays, because a
+syrup is a choosing fact and orgeat is most of what a Mai Tai tastes like.
+`salt` earns its place best: it was the TENTH item on the Mai Tai's line.
+
+**IT GOVERNS THE SEARCH POOL AS WELL AS THE CARD, and that is worth knowing
+because it was not asked for.** #580 wanted both in one breath (*"never write
+'water' on a cocktail card and never return it in a search"*); #640 asked only
+about cards. They were left coupled because the search half is defensible for
+every entry — nobody chooses a drink by its salt, and `sugar syrup`, `honey
+water` and `lemon juice` all remain searchable. If that is ever wrong the list
+splits in two.
 
 ### 9.10a `serve` — where the ice lives, 2026-09-05
 
@@ -4913,11 +5038,28 @@ persuasion about what I drink than what I eat"*.
 
 | | | |
 |---|---|---|
-| 1 | **YOLO?** | `no chaos please` / `I'm open to chaos` |
+| 1 | **YOLO?** | `no chaos please` / `I'm open to chaos` / `chaos only` |
 | 2 | **Mood** | what the drink IS — fourteen buttons since 2026-08-30 |
 | 3 | **Hassle** | four buttons: what it COSTS |
 | 4 | **Has to have** / **Leave out** | typed, with candidate pools |
 | 5 | **I know what I want** | drink name — the way past all of it |
+
+**`chaos only` IS THE THIRD YOLO BUTTON, 2026-09-06 (#732)**, and it narrows to
+`meta.made_before: false` — 20 of the 124 drinks. The rule the section's older
+comment protects is that the button for "I'll try anything" must not narrow, not
+that no third button ever may.
+
+**IT MUST NOT READ `data-ship`**, which looks equivalent and is, today: every
+unmade drink says `ship: "who knows"`. They come apart the moment Helen makes one
+of the 20 — `made_before` flips and `ship` stays `who knows` until she rates it —
+so a filter reading `ship` would go on offering her a drink she had just made as
+one she never had. Nothing would fail; the list would be quietly wrong for the
+one person who could notice. Hence a second attribute on the card.
+
+The label is hers and replaced `never made it` within hours: *"the name of the
+third YOLO filter should be 'chaos only'"*. It is a NAME, not a description, and
+so are the other two — `no chaos please` does not say "ship is yes-or-better"
+either. The section is a scale and its rungs are read against each other.
 
 **The order is the diagnosis, not a layout.** Helen: *"I feel like I am doing
 work to understand what to click in order to maximise my chance of getting the
@@ -4930,6 +5072,57 @@ work the reader did silently, every visit.
 three groups. Helen: *"honestly I think taste and style in those columns are
 the same, and should be called Mood. Splitting out Hassle though feels good."*
 The only cut that earns its place is between what a drink IS and what it COSTS.
+
+**THE RESULTS PAGE, 2026-09-06.** Three changes landed together and they interact,
+so they are described together.
+
+**Ranking now counts SECTIONS, not just moods (#695).** Helen's ruling: *extend
+the ranking, keep the narrowing.* Mood and Hassle are two questions sharing one
+`state.moods` Set — which is right, they are ORed and a drink matching either
+survives — but it meant the rank could not tell "answers both of my questions"
+from "answers one of them twice". Ask for `sharp` and `no juicing` and a drink
+that is both now comes above one that is `sharp` and `aperitivo`. It changes
+nothing unless BOTH sections are asked, which falls out rather than being
+special-cased.
+
+**The other sections are deliberately NOT counted, and the reason generalises.**
+Has to have, Leave out, YOLO and the name search all NARROW, so by the time a
+drink is in the list it satisfies every one of them and they score identically
+for everybody. **Mood is the only OR section on the page, so it is the only place
+a rank has anything to rank.** That is also the honest answer to the OTHER
+reading of #695 — rank instead of filter, keeping all 124 on the page — which is
+a different index and would want a candidates page rather than a commit.
+
+**Pagination, twenty a page (#694).** Food's control ported rather than
+redesigned: same three buttons, same `(see all)`, same arithmetic
+(`HTF.recipeList.paginate`), so the two indexes cannot drift about what "page 3
+of 7" means. Twenty is food's number and divides this grid exactly — the cards
+are two columns at 900px. **Paging happens AFTER the reorder**, because "the
+first twenty" is only meaningful once the ranking has decided which twenty;
+reversing them would page the DOM order and shuffle within it. `apply()` gained
+its only argument, `preservePage`, false everywhere but the pager. The page joins
+the back-navigation memory, read as untrusted like everything else in that
+record.
+
+**That put `recipe-list.js` on this page**, which is why its header now says it is
+not about recipes. Renaming the file would be right and is its own change.
+
+**Matched chips keep their colour and lead the row (#756, #757).** A matched chip
+used to go WHITE over a coloured band, on the reasoning that colour should change
+PLACE rather than intensity. Helen ended that: *"cocktail chips hit by filters
+should retain the font colour from its section, and the underline in the same
+colour."* The coloured word is what says which section a chip belongs to, and
+turning it white at the exact moment that section matched threw the information
+away when it mattered most. `currentColor` for both the stroke and the underline,
+which deleted a rule.
+
+And they move to the front of the row, because `.drink-card-moods` clips past its
+row cap and the word EXPLAINING why the card is here could be the one cut off.
+**The DOM moves, not flex `order`** — the separator dot is drawn by
+`.drink-card-mood + .drink-card-mood::before`, a DOM-order selector, so
+reordering visually would leave the dot on whichever chip is second in the markup.
+Alphabetical (#710) survives inside each group. `chip-rows.js` exposes
+`HTF.markChipRows()` for exactly this and nothing had called it until now.
 
 **The split lives in `taxonomy.yml`'s `mood_groups`, not the template**, with
 `test_every_mood_belongs_to_exactly_one_group` asserting the partition is
@@ -5197,13 +5390,38 @@ the foot somewhere different on every card, and a vertically-centred text block
 moves the title. So: fixed height, body anchored top-left, foot pinned to the
 bottom and out of flow.
 
-**The cost is clamping and it is not avoidable.** Two lines of ingredients and
-two rows of mood chip — the tagline went with #512, so this said "two lines each
-for tagline and ingredients" describing an element the card no longer has. A
-rigid grid buys its rigidity with
-clamping; the alternatives are a card whose height varies with mood count
+**The cost is clamping and it is not avoidable.** A rigid grid buys its rigidity
+with clamping; the alternatives are a card whose height varies with its content
 (unpinning every anchor) or no moods on cards. Helen named the trade first:
 "it's a shame to lose the card proportion but I can't think of another way."
+
+**Three lines of ingredients and up to three rows of mood chip, since
+2026-09-06** — and the numbers are not repeated in `_cards.scss`'s header any
+more, because each of them has now been wrong there at least once. They live on
+the rules that set them.
+
+**#552 reversed a ruling, and the reversal is the interesting part.** Helen chose
+two lines on 2026-09-04 off a candidates page, for a reason about the DATA:
+*"when we get issue #691 done (ingredients in importance order) I expect two
+lines will get the point across."* #691 landed and the prediction did not hold —
+*"showing three lines is appropriate given the number of tiki drinks I have!"* A
+tiki drink is nine or ten items where the median is five, so two lines fits the
+median and clips the family the collection is largely about.
+
+**The third line was paid for by the FOOT, not by `$card-height`.** The foot used
+to stack chips ABOVE the ship and reserve both unconditionally — 45.3px of chip
+rows, a 7.2px gap and the ship's own 16px line, on every card, whether or not the
+chips filled it. Laying them side by side bottom-aligned makes the foot as tall
+as the chips alone, returning 23px to the body. Helen found the dead space from a
+screenshot: *"we could stand to move the chips on cards downwards, encroaching
+into the ship row."*
+
+**What it costs, and it is unresolved rather than free:** the ship now takes
+horizontal room from every chip row rather than none, because a flex row cannot
+narrow only its last line. A long verdict (`OH GODS YES` is about 8rem) on a
+chip-heavy drink may wrap one word further than before. If that reads badly the
+answer is floating the ship inside a non-flex chip row, which touches the
+separator-dot machinery in `chip-rows.js` — see its header before trying.
 
 `$card-text-x` is the single source of the title's left edge — the glass column
 is exactly that wide, and the body, the foot and the under-mark all derive from
@@ -5589,11 +5807,23 @@ look at the amounts, change them, look again.
 > bitters do not scale linearly. A caveat that fires where it does not apply
 > teaches you to stop reading caveats.
 
-**MULTIPLES OF THE RECIPE AS WRITTEN** — Helen's ruling: there is no `serves:`
-field on a drink and this invents none, so ×2 is twice what the page says.
-Counts (dashes, drops, leaves, `each`) multiply and re-pluralise; `to top` and
-`to rinse` pass through untouched; a range keeps its shape with both ends
-scaled.
+**MULTIPLES OF THE RECIPE AS WRITTEN** — Helen's ruling: ×2 is twice what the
+page says. Counts (dashes, drops, leaves, `each`) multiply and re-pluralise;
+`to top` and `to rinse` pass through untouched; a range keeps its shape with
+both ends scaled.
+
+**There IS a `serves:` field now, and the scaler still does not read it.** That
+ruling used to be stated as "there is no `serves:` field on a drink and this
+invents none", and #297 added one on 2026-09-06 — nine drinks: the seven
+punch-bowl drinks, the mulled wine, and the Modern Zombie whose own title says
+"makes 2". Absent means one, and it is optional in `TOP_LEVEL_KEYS` for that
+reason.
+
+The surviving half is the half that mattered. *How many does this make* and *how
+much am I making* are different questions, and only the second is the multiple
+box's. The units line in the footer divides by `serves:`; nothing in the scaler
+does. Its values were derived rather than picked — a punch cup is 4–6 US fl oz,
+so 150 ml is the divisor and the mulled wine's mug is 200 ml.
 
 **The floor is a REFUSAL, not a silent round** — Helen: "say you can't go below
 X ml if any ingredient wants to go below 2.5 ml." A multiple that would take any
@@ -6278,16 +6508,64 @@ added**: `find _food_drafts -name '*.md' -mmin -120`. Don't chase it, and don't
 tidy a draft you weren't asked to tidy.
 
 
-### 10.2 Diagnosing decoration JS — the stub-DOM harness
+### 10.2 The stub-DOM harness — a trick until 2026-09-06, a test file since
 
-`decorations.js` is an IIFE that touches the DOM directly and has no tests.
-When something in it misbehaves, write a throwaway script (scratchpad, not
-the repo) that builds a fake `window`/`document`, then `vm.runInContext` each
-script **in the order the built page loads them** — read that from `_site/`,
-not the layouts, because a layout's scripts land inside `{{ content }}` and
-aren't where the file suggests. Print which scripts threw and which URLs were
-fetched. This caught two real bugs by hand-reasoning alone; it's worth
-knowing the trick rather than re-deriving it.
+**IT IS `tests/js/dom-stub.js` AND `tests/js/index-harness.js` NOW**, and this
+section used to tell you to rebuild it in the scratchpad every time. #633 made it
+permanent, because the fault it exists to catch is not rare.
+
+**WHAT #633 WAS RAISED FOR.** On 2026-08-31 `cocktail-index.js` read
+`FilterState.arrivedByGoingBack` — which is on the filter-state MODULE and not on
+the binding `create(SPEC)` returns. That is `undefined`, calling undefined
+throws, and **the entire tail of the file stopped running**: the back/forward
+restore, `apply()` at startup, and the `pagehide` listener. Every JS test stayed
+green, because all of them ask a pure module a question and the fault was in the
+WIRING between two.
+
+**THE TRAP IS THAT ONE NAME MEANS TWO OBJECTS:**
+
+    filters.js          var FilterState = HTF.filterState;              the MODULE
+    cocktail-index.js   var FilterState = HTF.filterState.create(...);  a BINDING
+
+**THE CANARY IS THE `pagehide` LISTENER**, because it is the LAST statement in
+the file: anything that throws above it stops it registering, so one assertion
+covers every line before it. A test aimed at a feature in the middle would have
+passed on the broken revision right up to the line that broke.
+
+**Nothing is mocked that the page does not mock.** The six real scripts run in
+the real order, via `vm.runInContext` rather than `require()` — they are not
+modules in the browser, and the browser path is the one that breaks. Only the DOM
+and `localStorage` are stand-ins. Two guards stop the harness drifting from the
+page: the script list is compared against the `<script src>` tags in
+`cocktails/index.html`, and every id `cocktail-index.js` reaches for by
+`getElementById` must exist in the fixture.
+
+**No jsdom.** There is no `package.json` in this repo and no `node_modules`; the
+JS suite runs on `node:test` and `node:assert` alone, which is the same
+no-bundler position the browser code takes. The stub answers the 25 DOM calls
+these scripts make — surveyed from the source, not guessed.
+
+**IT EARNED ITSELF WITHIN THE HOUR.** #694 added `recipe-list.js` to the cocktails
+page, and `cocktail-index.js` threw on its first `apply()` because
+`HTF.recipeList` was not loaded — with every other test green. That is #633's own
+bug, caught by the thing built to catch it.
+
+**Two things it makes testable that were not**: pagination (#694) and the chip
+reorder (#757) both have real behavioural tests now, and writing the second found
+a bug in the feature — clearing a mood left its chip stranded at the front of the
+row for ever.
+
+**The stub's selector engine had exactly one real bug and it is worth knowing.**
+A naive whitespace split broke `[data-mood='no juicing']` in half. Half the moods
+on this site are two words, so the naive version silently matched nothing for
+most of them — a stub lying about the page rather than failing, which is the same
+fault class as everything else in this issue.
+
+**For `decorations.js`, which still has no tests**, the old advice stands: build
+a throwaway and `vm.runInContext` each script **in the order the BUILT page loads
+them** — read that from `_site/`, not the layouts, because a layout's scripts
+land inside `{{ content }}` and are not where the file suggests. The harness
+above is now the worked example to copy.
 
 ---
 
@@ -8071,7 +8349,31 @@ labels carry the punched-tape effect, §13.4.1.
 | 3 | PRACTICALITIES | |
 | 4 | **HAS TO HAVE** / **LEAVE OUT** | side by side, `.search-pair` |
 | 5 | I KNOW WHAT I WANT | the escape hatch, last on purpose |
-| — | META FILTERS | local only, and **one button now**: `draft` |
+
+**META FILTERS WAS A SIXTH BLOCK AND IS GONE ENTIRELY — 2026-09-06.** Helen,
+with a screenshot of it: *"I don't want this block on the index page any more.
+It was useful when I was still ingesting recipes I know, but it's not now I've
+done most of that."*
+
+It went **wholesale**, on the precedent #562 set when four of its five buttons
+went: an attribute nothing reads is worse than one that is absent, because it
+reads as a live fact to the next person. So `data-meta-draft` came off every
+row, `filters.js` lost `toggleMeta`, the click branch, the `.active` paint and
+the `isDraft` field, `filter-state.js` lost `meta` from `FOOD_FIELDS` and its
+clause in `rowMatchesFilters`, and the `.btn-meta` / `.category--meta` rules went
+with them.
+
+**Five meta facts have now been through that door.** #562 removed four in August
+— `needs rewrite`, `needs proofread`, `no short method`, `has short method` —
+because they answered "is this recipe finished yet", which Helen does not need
+the page to ask (*"I am perfectly well aware of how much work I have done on each
+drink"*). `draft` survived that pass because it was a different KIND of question:
+which collection a row came from. It expired for a different reason again — it
+was a tool for the ingest phase, and the ingest phase is largely done.
+
+**The draft BADGE on a row stays** and was not what she pointed at. `is_draft` is
+still derived and still renders a `draft` pill, so a row that does not exist on
+the live site still says so. What has gone is the ability to filter by it.
 
 **THE UNIVERSE SAYS… WAS HERE FOR TWO DAYS AND IS GONE FROM FOOD — PR #660,
 2026-09-02, removed 2026-09-04.** The design audit's answer to "nothing
@@ -8104,13 +8406,15 @@ its `aria-expanded`, the `hidden` panel, clear-all's special case and
 `#exclude-active` living outside the panel all went at once. It is a
 `.category.search` sibling now; §13.5 still gives it no code hue.
 
-**META FILTERS was five buttons and is one.** `needs rewrite`, `needs
-proofread`, `no short method` and `has short method` all asked "is this recipe
-finished yet", which Helen does not need this page to ask — the same call she
-made about cocktails' `meta.status`. `draft` survives because it is a different
-kind of fact: which collection a row came from. The rows lost their `needs
-rewrite` / `needs proofread` badges in the same pass, keeping only `magic bag`
-and `draft`, which say what you are about to CLICK.
+**META FILTERS was five buttons, then one, then none.** `needs rewrite`,
+`needs proofread`, `no short method` and `has short method` all asked "is this
+recipe finished yet", which Helen does not need this page to ask — the same call
+she made about cocktails' `meta.status`. `draft` outlived them because it was a
+different kind of fact: which collection a row came from. **It went too on
+2026-09-06** and the whole block with it — see §13.4 for her words and for what
+was removed. The rows lost their `needs rewrite` / `needs proofread` badges in
+the same 2026-08 pass, keeping only `magic bag` and `draft`, which say what you
+are about to CLICK; both badges are still there.
 
 **That dissolved the three-valued `data-meta-short`** (§4.3's fourth bullet, and
 the specific branch #506 was raised to get under test). The attribute and its
@@ -9172,9 +9476,33 @@ re-arguing it.
   placement rules. Tracked as its own issue since 2026-09-05.
 - **Any new hue.** Six on food, five on cocktails, and both palettes argue at
   length that the COUNT is the design.
-- **The voice.** Do not touch a word of copy.
+- **The voice.** Do not touch a word of copy. Where a feature needs a string to
+  exist, ship a PLACEHOLDER and mark it — the bitters caveat (#713) is the
+  pattern, and the units line (#753) followed it.
 - **Whether the recipe title takes the tape.** Offered and declined; she chose
   flat display lettering.
+- **Which drinks are faffy, rich, or otherwise judged.** Moods are DERIVED
+  (`scripts/derive_cocktail_moods.py`) and a per-drink disagreement with the rule
+  goes in `mood_include`/`mood_exclude` with its reason. **Never hand-edit a
+  `mood:` block** — the next run reverts it silently, and
+  `test_every_drinks_moods_match_the_derivation` says so.
+- **The seventeen — now eleven — `qq:` rows in `abv.yml`.** Strengths no source
+  settles; only the label on her shelf.
+
+**A RULING IS NOT PERMANENT, AND TWO WERE REVERSED ON 2026-09-06.** Both are
+worth reading before assuming a decision in this file is closed:
+
+- **The card's ingredient line went from two lines to three (#552)**, against a
+  comment that said "Do not raise this to 3." Her 2026-09-04 reasoning was a
+  PREDICTION — that #691's ordering would make two lines enough — and the
+  prediction did not survive the tiki drinks.
+- **A matched chip stopped going white (#756)**, against a design that had
+  deliberately made colour change place rather than intensity.
+
+**Neither was re-argued into existence; she looked at the built page and changed
+her mind.** The rule that still holds is the one in §13.11: do not re-open a
+ruling by ARGUING. Showing her the thing is always allowed, and is how both of
+these moved.
 
 ## 14. Reference pages and the internal-temperatures data layer
 
