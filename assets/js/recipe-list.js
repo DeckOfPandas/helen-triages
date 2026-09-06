@@ -1,14 +1,26 @@
 // =============================================================================
 // RECIPE LIST — pure ordering/paging logic, no DOM.
 //
+// IT IS NOT ABOUT RECIPES AND HAS NOT BEEN SINCE 2026-09-06. The name records
+// where these three helpers were born, not who uses them: #694 brought the
+// COCKTAIL index to the same `paginate`, so the two indexes cannot drift about
+// what "page 3 of 7" means. `shuffle` and `titleMatchTier` are as site-neutral.
+//
+// Renaming the file to say so would be right and is deliberately not done here:
+// it is loaded by name in two templates and required by name in a test, so the
+// rename is its own change with its own diff, not a drive-by inside a feature.
+//
 // Extracted out of filters.js for the same reason ingredient-search.js was:
 // testable directly with Node (see tests/js/recipe-list.test.js) instead of
-// only checked by hand against a live page. filters.js still owns everything
-// DOM-shaped -- reading `items` off the page, re-appending them in shuffled
-// order, setting `li.style.display`.
+// only checked by hand against a live page. Each caller still owns everything
+// DOM-shaped -- filters.js reads `items` off the page and sets
+// `li.style.display`; cocktail-index.js toggles `card.hidden` instead, and the
+// difference between those two is exactly the kind of thing that belongs in the
+// caller rather than here.
 //
 // Loaded two ways from the one file, no bundler:
-//   - In the browser, as a plain <script> before filters.js, attaching to
+//   - In the browser, as a plain <script> before the index script that uses it
+//     (filters.js on food, cocktail-index.js on cocktails), attaching to
 //     window.HTF (the same namespace assets.js already establishes).
 //   - In Node, via require(), for tests.
 // =============================================================================
