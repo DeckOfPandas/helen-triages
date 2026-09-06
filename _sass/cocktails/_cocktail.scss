@@ -675,7 +675,13 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 .cocktail-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  // THE COLUMN GAP HOLDS THE MIDDLE DOT, as it does on a card -- the separator
+  // is absolutely positioned and has no width of its own (see the `::before` on
+  // `.drink-card-mood` in _cards.scss for the feedback loop that forced that).
+  // Wider than the card's 0.9rem because these chips are 0.85rem where a card's
+  // are 0.72rem, so the dot is bigger in proportion to nothing else changing.
+  column-gap: 1.05rem;
+  row-gap: 0.4rem;
   margin: $space-md 0 0;
 
   // NO `cursor: default` ANY MORE. It was here because the chips were inert

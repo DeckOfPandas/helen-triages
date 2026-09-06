@@ -41,6 +41,23 @@
 // keeps every decision about what the mark MEANS -- this file adds a class and
 // has no opinion about dots.
 //
+// THE MEASUREMENT USED TO CHANGE THE THING IT WAS MEASURING, and that is worth
+// knowing before anyone "simplifies" the CSS this depends on. The dot was an
+// in-flow inline-block inside the following chip, so it was part of that chip's
+// WIDTH -- and the row's width is what decides whether the row wraps, which is
+// what decides whether the dot is drawn. A row sitting near the wrap threshold
+// therefore oscillated: it wrapped, the last chip was marked, the mark removed
+// a dot, the row lost 11.4px and fitted on one line -- with a dot missing from
+// it, and nothing to re-measure. Helen found it on two cards on 2026-09-06;
+// Lita Grey's four moods measure 289.5px against a foot of about 304px, which
+// is inside the error of the estimate.
+//
+// `_sass/cocktails/_cards.scss` fixes it at the root by taking the dot out of
+// flow: it is absolutely positioned in the row's `column-gap` and has no width,
+// so the wrap decision no longer depends on which dots are drawn and this
+// file's answer is stable. **If the dot ever goes back in flow, this loop comes
+// back with it** -- and it will look like a race, not like a feedback loop.
+//
 // SITE-AGNOSTIC AND CONTAINER-AGNOSTIC, the house pattern that print-link.js,
 // universe.js, last-line-rule.js and card-name-fit.js all follow: it queries a
 // class and does nothing on a page without one. Food has no `.drink-card-mood`.
