@@ -43,7 +43,17 @@ const SCRIPTS = [
    list. Deliberately hand-built rather than sliced out of a real build -- a
    fixture you can read in one screen is what makes a failure diagnosable, and
    the alternative drags 1MB of markup into the repo. */
-function buildPage(doc) {
+/* THE PANEL'S OWN VOCABULARY, overridable. It defaults to the three moods most
+   tests need; a test about chip ORDER needs buttons for the moods its drink
+   carries, because a mood with no button in the panel cannot be clicked and the
+   test would be asserting about a filter nobody can set. */
+const DEFAULT_MOODS = ['sharp', 'aperitivo'];
+const DEFAULT_HASSLES = ['no juicing'];
+
+function buildPage(doc, options) {
+  options = options || {};
+  const moodWords = options.moods || DEFAULT_MOODS;
+  const hassleWords = options.hassles || DEFAULT_HASSLES;
   const el = (tag, cls, attrs) => {
     const node = doc.createElement(tag);
     if (cls) node.setAttribute('class', cls);
@@ -89,14 +99,14 @@ function buildPage(doc) {
   // MOOD and HASSLE: two sections, one state.moods behind them (#695).
   const mood = el('div', 'drink-filter drink-filter--mood');
   filters.appendChild(mood);
-  ['sharp', 'aperitivo'].forEach((m) => {
+  moodWords.forEach((m) => {
     mood.appendChild(el('button', 'btn-mood', { 'data-mood': m, type: 'button' }));
   });
   mood.appendChild(el('button', 'btn-clear-filter', { id: 'clear-mood' }));
 
   const hassle = el('div', 'drink-filter drink-filter--hassle');
   filters.appendChild(hassle);
-  ['no juicing'].forEach((m) => {
+  hassleWords.forEach((m) => {
     hassle.appendChild(el('button', 'btn-mood', { 'data-mood': m, type: 'button' }));
   });
   hassle.appendChild(el('button', 'btn-clear-filter', { id: 'clear-hassle' }));
@@ -172,14 +182,32 @@ function addCard(doc, list, spec) {
   });
   card.appendChild(ings);
 
+  /* THE FOOT'S REAL SHAPE: a `.drink-card-moods` wrapper and a
+     `.drink-card-ship` beside it, which is what cocktails/index.html emits and
+     what _cards.scss lays out as one flex row (#552). The chips used to be
+     direct children of the foot here, and a test asking for
+     `.drink-card-moods` found nothing -- a fixture that is a simplification of
+     the page rather than a copy of it, which is the failure mode this whole
+     harness exists to avoid. */
   const foot = doc.createElement('div');
   foot.setAttribute('class', 'drink-card-foot');
+
+  const moods = doc.createElement('span');
+  moods.setAttribute('class', 'drink-card-moods');
   (spec.moods || []).forEach((m) => {
     const chip = doc.createElement('button');
     chip.setAttribute('class', 'drink-card-mood');
     chip.setAttribute('data-mood', m);
-    foot.appendChild(chip);
+    chip.textContent = m;
+    moods.appendChild(chip);
   });
+  foot.appendChild(moods);
+
+  const ship = doc.createElement('span');
+  ship.setAttribute('class', 'drink-card-ship');
+  ship.textContent = spec.ship || 'meh';
+  foot.appendChild(ship);
+
   card.appendChild(foot);
 
   list.appendChild(card);
@@ -192,7 +220,7 @@ function addCard(doc, list, spec) {
 function boot(options) {
   options = options || {};
   const doc = createDocument();
-  const page = buildPage(doc);
+  const page = buildPage(doc, options);
   (options.drinks || []).forEach((d) => addCard(doc, page.list, d));
 
   const errors = [];

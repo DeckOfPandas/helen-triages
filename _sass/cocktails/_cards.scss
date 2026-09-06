@@ -885,18 +885,39 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // exactly as `.btn-mood.is-on` is in _filters.scss (same thickness, offset
   // and faux-bold stroke), in the heading's own variable. The two washes this
   // used to read are deleted from _palette.scss with their consumer.
+  // IT KEEPS ITS OWN COLOUR SINCE 2026-09-06 -- #756, Helen: "cocktail chips hit
+  // by filters should retain the font colour from its section, and the underline
+  // in the same colour. Currently the underline is in the section colour but the
+  // lettering is white."
+  //
+  // THIS REVERSES THE RULE THE COMMENT ABOVE STILL DESCRIBES, so both are kept.
+  // The old design swapped ink: an unmatched chip was a coloured word and a
+  // matched one a WHITE word over a coloured band, on the reasoning that colour
+  // should change PLACE rather than intensity. That is a real argument and it
+  // lost to a plainer one -- the coloured word is the thing that says which
+  // section a chip belongs to, and turning it white at the exact moment the
+  // section matched threw that away when it mattered most. A card is supposed to
+  // answer the button in the button's own colour (section 9.13); it was
+  // answering in white.
+  //
+  // `currentColor` FOR BOTH, WHICH DELETES A RULE. The chip's colour is already
+  // `--mood` or `--hassle` from the taxonomy, so the stroke and the underline
+  // now follow it by construction -- there is no second place to state a hue and
+  // so no way for the two to disagree. `&--hassle.is-match` existed only to
+  // restate `text-decoration-color` for the other group and is gone with it.
+  //
+  // THE FAUX-BOLD STROKE STAYS, and does more work than it did. With the band no
+  // longer contrasting against white lettering, weight is what separates a
+  // matched chip from its neighbours at a glance -- and 0.04em in the chip's own
+  // colour thickens the word without introducing a hue the card has not already
+  // spent. Same device `.btn-mood.is-on` uses in _filters.scss.
   &.is-match {
-    color: #ffffff;
-    -webkit-text-stroke: 0.04em #ffffff;
+    -webkit-text-stroke: 0.04em currentColor;
     text-decoration: underline;
-    text-decoration-color: $color-heading-mood;
+    text-decoration-color: currentColor;
     text-decoration-thickness: 0.2em;
     text-underline-offset: 0.16em;
     text-decoration-skip-ink: none;
-  }
-
-  &--hassle.is-match {
-    text-decoration-color: $color-heading-hassle;
   }
 }
 

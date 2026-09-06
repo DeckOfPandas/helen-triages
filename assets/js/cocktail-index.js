@@ -629,6 +629,56 @@
     });
   }
 
+  /* MATCHED CHIPS TO THE FRONT OF THE ROW -- #757. Helen: "cocktail card chips
+     hit by filters should be grouped at the beginning of the card... e.g. 'no
+     juicing' returns Caribbean Sazerac first, but the chip isn't on the card,
+     presumably because the full list of chips doesn't fit on the two lines we
+     give them."
+
+     She had the diagnosis exactly right. `.drink-card-moods` caps at three chip
+     rows and clips the rest, so on a chip-heavy drink the word that EXPLAINS
+     why the card is here could be the one cut off -- which is the one job the
+     card's foot has (HANDOVER 9.13).
+
+     THE DOM MOVES, NOT THE `order` PROPERTY, and this is the reason: the
+     separator dot is drawn by `.drink-card-mood + .drink-card-mood::before`,
+     which is a DOM-order selector. Flex `order` would reorder what you see and
+     leave the dot on whichever chip happens to be second in the markup, so the
+     row would show a leading dot and lose one in the middle.
+
+     ALPHABETICAL SURVIVES INSIDE EACH GROUP. `d.moodEls` is read once at
+     startup in document order, which #710 made alphabetical, and both lists are
+     built by walking it -- so the matched chips are alphabetical among
+     themselves and so are the rest.
+
+     REORDERED ONLY WHEN IT CHANGES, the same guard `reorder()` above applies to
+     the cards: moving ~600 nodes on every keystroke is wasteful, and the row is
+     usually already in the order this wants. */
+  function moveMatchedChipsFirst(d, matched, others) {
+    /* NO EARLY EXIT ON "NOTHING MATCHED", and that was a bug this function had
+       for about ten minutes. Bailing when `matched` was empty left the row in
+       whatever order the LAST filter had put it in, so clearing a mood left its
+       chip stranded at the front for ever. With no matches, `wanted` is simply
+       the original alphabetical order, and the sameness check below makes
+       restoring it free. */
+    var wanted = matched.concat(others);
+    if (!wanted.length) return false;
+    var parent = wanted[0].parentNode;
+    if (!parent) return false;
+
+    var kids = parent.children;
+    var same = true;
+    for (var i = 0; i < wanted.length; i++) {
+      if (kids[i] !== wanted[i]) { same = false; break; }
+    }
+    if (same) return false;
+
+    var frag = document.createDocumentFragment();
+    wanted.forEach(function (chip) { frag.appendChild(chip); });
+    parent.appendChild(frag);
+    return true;
+  }
+
   /* `preservePage` IS THE ONLY ARGUMENT AND IT IS FALSE EVERYWHERE BUT THE
      PAGER. Every other caller has just changed what the results ARE, and
      landing on page 4 of a set that now has two pages -- or on page 4 of a
@@ -638,6 +688,9 @@
     if (!preservePage) { currentPage = 1; showAll = false; }
     var shown = 0;
     var ranked = [];
+    /* Set by moveMatchedChipsFirst below. Collected across the whole pass so
+       the row-start marks are recomputed ONCE rather than 124 times. */
+    var chipsMoved = false;
     activeInclude = chosen('include');
     activeExclude = chosen('exclude');
 
@@ -662,9 +715,12 @@
       /* The card answers "why am I here" in the colour of the control that put
          it there. Both are cleared and re-applied on every pass rather than
          tracked, which is cheap at this size and cannot drift out of step. */
+      var matchedChips = [];
+      var otherChips = [];
       d.moodEls.forEach(function (chip) {
         var on = state.moods.has(chip.dataset.mood);
         chip.classList.toggle('is-match', on);
+        (on ? matchedChips : otherChips).push(chip);
         /* These became real <button>s when they gained the power to filter, so
            the state has to be announced as well as painted -- `is-match` is a
            class and a screen reader cannot see it. Set here rather than at
@@ -672,6 +728,7 @@
            whole state object without touching any markup. */
         chip.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
+      if (moveMatchedChipsFirst(d, matchedChips, otherChips)) chipsMoved = true;
 
       /* MATCHED AGAINST data-ing, NOT THE RENDERED TEXT — #501. A rum shows its
          category on a card now ("Demerara rum"), while the filter matches the
@@ -724,6 +781,13 @@
       r.card.hidden = !(i >= pageInfo.start && i < pageInfo.end);
     });
     syncPagination(pageInfo.totalPages, visible.length);
+
+    /* THE ROW-START MARKS HAVE TO BE REDONE, because moving a chip changes
+       which chip begins a row -- and `is-row-start` is what suppresses the
+       separator dot that would otherwise hang off the left margin of a wrapped
+       row. chip-rows.js exposes this hook for exactly this case and its own
+       header says nothing called it until now. */
+    if (chipsMoved && HTF.markChipRows) HTF.markChipRows();
 
     /* Each clear appears only when its own section has something to clear.
        Driven from the same pass that filters, so a clear can never be visible
