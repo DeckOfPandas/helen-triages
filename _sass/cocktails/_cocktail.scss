@@ -158,7 +158,22 @@ $head-pad-bottom: 1.4rem;
 // changes. Half-leading is exact arithmetic; the second term is the remaining
 // gap between the em box and the cap height, which depends on the font's own
 // metrics and is measured. Named separately so it is obvious which is which.
-$title-size:         3.2rem;   // the tape's size: `--card-name-size` on `.cocktail-title-block .drink-card-name`
+// THIS IS THE ONE PLACE THE TITLE'S SIZE IS WRITTEN -- #736, 2026-09-06. It
+// said 3.2rem while the title had been 2.6rem since 2026-09-05, and the whole
+// point of the derivation below is that it tracks the title. A second copy of a
+// number that exists to be tracked is the one thing this block could not
+// afford, and it went stale within a day.
+//
+// WHAT IT COST, exactly: half-leading is (1.65 - 1) x 0.5 x size, so 1.04rem at
+// 3.2 and 0.845rem at 2.6. The glass sat 0.195rem -- 3.12px at a 16px root --
+// below the title's cap height on every drink page. Small enough to look like
+// the drawing, which is why it survived a design review.
+//
+// `--card-name-size` NOW READS THIS rather than restating it. Interpolated
+// because Sass does not evaluate a bare variable inside a custom property; it
+// would emit the literal text `$title-size` and the title would fall back to
+// the calc's 1rem.
+$title-size:         2.6rem;   // the tape's size, emitted as `--card-name-size` below
 $title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;
 $title-cap-inset:    0.14rem;   // em box top -> cap top, Courier Prime
 $glass-top:          $title-half-leading + $title-cap-inset;
@@ -357,7 +372,14 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     // where the margin layout gave it all 900. Helen: "the title seems
     // enormous." 2.6rem is the same title at the same proportion of the space
     // it actually gets.
-    --card-name-size: 2.6rem;
+    //
+    // READ FROM `$title-size` SINCE 2026-09-06 (#736) rather than written twice.
+    // The literal used to live here and a second copy lived beside `$glass-top`,
+    // which DERIVES the glass's offset from the title's size -- so the copy that
+    // was supposed to track the title stopped tracking it the day this line
+    // changed, and the hero glass sat 3px low on every drink page until somebody
+    // noticed. The value is unchanged; only where it is written.
+    --card-name-size: #{$title-size};
     margin: 0 0 $space-sm;
   }
 

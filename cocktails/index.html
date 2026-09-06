@@ -610,7 +610,26 @@ permalink: /cocktails/
 
                The chip's `is-match` class is painted from state in apply(), not
                toggled at click time -- clear-all reassigns the whole state
-               object without touching markup. {% endcomment %}{% for m in drink.mood %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<button type="button" class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}" aria-pressed="false">{{ m }}</button>{% endfor %}
+               object without touching markup.
+
+               ALPHABETICAL, NOT AUTHORED -- #710, and Helen asked for the card
+               after the drink page: "and on cocktail cards as well please".
+
+               THE SECOND REASON IS THE COLOUR, and it is hers: sorting
+               "muddles the colours, which will look reallly pretty." The
+               authored order follows taxonomy.yml's groups closely enough that
+               the hassle chips clump -- so a card tends to show a run of one
+               hue and then a run of the other, which reads as a claim the card
+               is not making. Alphabetical interleaves them, and the `--hassle`
+               / `--mood` colour goes on saying which group a chip belongs to
+               without the ORDER restating it badly.
+
+               THE SAME `| sort_natural` THE DRINK PAGE USES, and it is
+               `sort_natural` rather than `sort` because `I want to faff` is
+               capitalised and Liquid's `sort` is ASCII -- a capital I sorts
+               ahead of every lowercase letter, so that one mood would jump to
+               the front of the 18 cards carrying it. See the drink page for
+               the measurement. {% endcomment %}{% assign card_moods = drink.mood | sort_natural %}{% for m in card_moods %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<button type="button" class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}" aria-pressed="false">{{ m }}</button>{% endfor %}
           </span>
           {% comment %} THE SHIP IS ALWAYS DRAWN, the word only when there is
              one. `--ship-tint` is gone from here: it filled the old square, and

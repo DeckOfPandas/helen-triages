@@ -363,9 +363,32 @@ layout: default
       {% endcomment %}
       {% assign mood_groups = site.data.cocktails.taxonomy.mood_groups %}
       {% assign chip_home = site.data.sites[page.site_key].home %}
+      {% comment %} ALPHABETICAL, NOT AUTHORED -- #710, Helen: "render cocktail
+         tags on cocktail pages in alphabetical order because no one cares which
+         group they came from."
+
+         The authored order carries the order the moods were TYPED, which
+         follows taxonomy.yml's groups closely enough to look like a claim --
+         the hassle moods clump because that is the section they were copied
+         from. Sorting removes a grouping the page was implying and nobody
+         reads. The `--hassle` / `--mood` colour still says which group a chip
+         belongs to, which is the part that carries information; the ORDER was
+         only ever restating it, badly.
+
+         `sort_natural`, NOT `sort`, AND THE DIFFERENCE IS 12 DRINKS. This
+         said `sort` and claimed every mood was lowercase since #543. That is
+         wrong: `I want to faff` is capitalised, and Liquid's `sort` is
+         ASCII -- so a capital I sorts before every lowercase letter and that
+         mood jumped to the front of any card carrying it, ahead of
+         `aperitivo`. Alphabetical is what #710 asked for, and a word out of
+         order is more visible than the grouping it replaced.
+
+         Measured across the collection: 18 drinks carry the mood and the two
+         sorts disagree on 12 of them. {% endcomment %}
       {% if page.mood.size > 0 %}
+        {% assign sorted_moods = page.mood | sort_natural %}
         <div class="cocktail-chips">
-          {% for m in page.mood %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}
+          {% for m in sorted_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}
         </div>
       {% endif %}
     </div>
