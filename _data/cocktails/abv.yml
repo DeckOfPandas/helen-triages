@@ -1,0 +1,370 @@
+# =============================================================================
+# HOW STRONG A BOTTLE IS. Spec: #297. Filled 2026-09-06.
+# =============================================================================
+# Helen, 2026-09-06: "I want the number of units in a drink, not the ABV of the
+# drink, i.e. water etc don't matter." That sentence decides the whole shape of
+# this file. A UK unit is 10 ml of pure alcohol, so a pour contributes
+# `ml x abv / 1000` units and a pour of something at 0% contributes nothing --
+# which is why dilution, juice and syrup need no arithmetic at all. They are
+# still DECLARED here, at `abv: 0`, and that is the point of the
+# `non_alcoholic` block below.
+#
+# WHY A SEPARATE FILE FROM costs.yml, WHICH THIS OTHERWISE MIRRORS. A price is
+# true on a day, in a shop, and goes stale on its own -- costs.yml says so at
+# length and carries a `checked:` date as its honesty. A strength does not decay
+# that way: Tanqueray has been 43.1% for decades. The two files answer different
+# questions about the same bottles and would date each other if merged.
+#
+# WHY NOT IN bottles.yml, WHICH PREDICTED THIS. That file's header says "#297
+# (ABV) sits on the same invariant side" as `generic` and the appellations, and
+# it is right -- Appleton 12 is 43% in every drink that pours it, exactly as it
+# is a moderately-aged Jamaican in every drink that pours it. The disagreement
+# is only about WHERE, and it is the argument costs.yml already won: 127 numbers
+# buried in 933 lines of prose rulings cannot be reread or corrected without
+# disturbing prose that must not be disturbed. The invariance claim is accepted;
+# the interleaving is declined.
+#
+# TWO LAYERS, AND A POUR TAKES THE FIRST THAT ANSWERS. Identical to costs.rb.
+#   1. the pour NAMES A BOTTLE -> that bottle's abv. An exact figure.
+#   2. it names a generic only -> derived, and the drink is marked approximate.
+# A GENERIC WITH BOTTLES UNDER IT IS DELIBERATELY ABSENT from `generics:` below,
+# for the reason costs.yml gives: a figure written here as well would be a
+# second truth about the same category. It derives instead, and the rule is:
+#
+#   HELEN'S `default_bottles` RULING DECIDES IT WHEN SHE HAS GIVEN ONE.
+#   "London dry gin let's say the default is tanqueray" makes an unqualified gin
+#   pour 43.1%, which is a REAL number off a real bottle rather than an average
+#   of six gins she would not have poured. Absent a ruling, the mean of every
+#   bottle declared under the generic -- breadth being the honest admission that
+#   we do not know which one she reached for.
+#
+# WHY A SINGLE FIGURE HERE WHEN COST PRINTS A RANGE. Helen's call, 2026-09-06,
+# asked directly: "one figure, marked approximate when it's a fallback." Cost
+# ranges because two bottles under one category are genuinely two prices and she
+# will pay one of them. Strength ranges far less -- most categories here span a
+# point or two, not the 2x that separates Beefeater from a premium gin -- so a
+# range would be decoration where cost's is information.
+#
+# CONFIDENCE IS PER ROW AND MEANS WHAT costs.yml MADE IT MEAN:
+#   high    printed on every bottle of it and stable for years. Read off the
+#           label or too well known to be worth doubting.
+#   medium  right for this bottle within about a point. Fine for a unit count.
+#   low     a genuine guess. OVERWRITE THESE FIRST.
+# A row that needs HELEN specifically -- not a better source, her bottle --
+# also carries `qq:` saying why. `grep -n 'qq:'` is the worklist. There are
+# SEVENTEEN, and every one is something I could not settle without the label on
+# her shelf: a rhum bottled at two strengths, a liqueur whose range spans 20
+# points, a bottle whose name does not match any product I could place.
+#
+#   TWO OF THE SEVENTEEN CANNOT CHANGE ANY NUMBER and are marked anyway. Both
+#   Bob's bitters are only ever poured in dashes, and a dash never reaches the
+#   arithmetic (see the bitters block below). They are flagged because the day
+#   one of them is poured in millilitres is not the day to discover the strength
+#   was a guess -- but they can be ignored while the drinks stay as they are.
+#
+# NO WEB SOURCE WAS USED FOR THE `high` ROWS, and that is a difference from
+# costs.yml worth stating plainly. These are from knowledge, not from a search
+# result on a dated day. `high` here means "this is Cointreau, it is 40%", not
+# "a shop said so on 2026-09-06".
+#
+# PROOF SYSTEMS ARE A TRAP AND TWO ROWS BELOW WOULD BE WRONG WITHOUT THE NOTE.
+# Rittenhouse 100 is 100 US proof, which is 50% -- not 57%. Wood's 100 is 100
+# BRITISH proof, which IS 57%. Two bottles, both called 100, eleven points apart.
+# =============================================================================
+
+# The day these were filled in. Unlike costs.yml's `checked`, this does not
+# decay on its own -- it is here so that a reformulation (Campari has dropped
+# its strength twice) has a date to be measured against.
+filled: "2026-09-06"
+
+# --- what a declared bottle is -----------------------------------------------
+# Every bottle in bottles.yml appears here, poured or not, so that adding a
+# drink can never silently find a gap. `test_every_declared_bottle_has_an_abv`
+# holds that.
+bottles:
+
+  # --- rum: Jamaican -----------------------------------------------------
+  "Appleton Estate Signature":        { abv: 40,   confidence: high }
+  "Appleton Estate 8 Year Reserve":   { abv: 43,   confidence: high }
+  "Appleton Estate 12 Rare Casks":    { abv: 43,   confidence: high }
+  "Blackwell":                        { abv: 40,   confidence: high }
+  "Myers":                            { abv: 40,   confidence: high }
+  # Navy strength, and the reason the Mai Tai lands where it does.
+  "Smith & Cross":                    { abv: 57,   confidence: high }
+  "Wray & Nephew":                    { abv: 63,   confidence: high }
+  "Rum Fire":                         { abv: 63,   confidence: high }
+
+  # --- rum: Demerara -----------------------------------------------------
+  "El Dorado 3 year old rum":         { abv: 40,   confidence: high }
+  "El Dorado 5 year old rum":         { abv: 40,   confidence: high }
+  "El Dorado 8 year old rum":         { abv: 40,   confidence: high }
+  "El Dorado 12 year old rum":        { abv: 40,   confidence: high }
+  "Skipper's":                        { abv: 40,   confidence: medium }
+  # 100 BRITISH proof, not US -- see the note in the header. This one really is
+  # 57% and is the strongest thing in the Demerara block by a distance.
+  "Wood's":                           { abv: 57,   confidence: high }
+
+  # --- rum: moderately aged ----------------------------------------------
+  "Pusser's Blue Label":              { abv: 40,   confidence: medium }
+  "Pusser's Gunpowder":               { abv: 54.5, confidence: high }
+  "Gosling's Black Seal":             { abv: 40,   confidence: high }
+  "Havana Club 7 year old":           { abv: 40,   confidence: high }
+  "Planteray Barbados 5":             { abv: 40,   confidence: medium }
+  "Chairman's Reserve":               { abv: 40,   confidence: high }
+
+  # --- rum: light, blended and flavoured ---------------------------------
+  "Havana Club 3 year old":           { abv: 40,   confidence: high }
+  "Flor de Caña Extra Dry":           { abv: 40,   confidence: medium }
+  "Planteray 3 Stars":                { abv: 41.2, confidence: medium }
+  "Planteray O.F.T.D.":               { abv: 69,   confidence: high }
+  "Planteray Stiggins' Fancy":        { abv: 40,   confidence: high }
+  "Malibu":                           { abv: 21,   confidence: high }
+
+  # --- rhum agricole and clairin -----------------------------------------
+  # THE STRENGTH IS PART OF THE NAME on two of these, which is why Damoiseau
+  # appears three times in bottles.yml. A 40 and a 50 of the same rhum are ten
+  # points and a quarter of a unit apart in a 60 ml pour.
+  "Clément Rhum Agricole Blanc":      { abv: 40,   confidence: low,
+                                        qq: "Clément bottles a 40, a 50 and the Canne Bleue at 50. Which is on the shelf?" }
+  "Damoiseau Rhum Agricole Blanc 40°": { abv: 40,  confidence: high }
+  "Damoiseau Rhum Agricole Blanc 50°": { abv: 50,  confidence: high }
+  "Damoiseau Rhum Agricole Blanc Pure Cane": { abv: 40, confidence: low,
+                                        qq: "Damoiseau's Pure Canne is bottled at both 40 and 50 depending on market." }
+  "La Favourite Rhum Agricole Blanc": { abv: 50,   confidence: medium }
+  "La Favourite Cœur de Canne":       { abv: 50,   confidence: medium }
+  "La Favourite L'Authentique Ambré": { abv: 45,   confidence: medium }
+  "Rhum JM Blanc":                    { abv: 50,   confidence: medium,
+                                        qq: "JM bottles the blanc at 50 and at 55. See also #702 -- the bare alias `JM`." }
+  "Rhum JM Ambré":                    { abv: 45,   confidence: medium }
+  "Trois Rivières Cuvée de l'Océan":  { abv: 42,   confidence: high }
+  "Barbancourt 3 Star":               { abv: 43,   confidence: high }
+  "Clairin Communal":                 { abv: 53.5, confidence: medium,
+                                        qq: "Clairin is a village spirit and the strength moves batch to batch; the label is the only answer." }
+  "Rhum Clément Créole Shrubb":       { abv: 40,   confidence: high }
+
+  # --- cachaça and arrack ------------------------------------------------
+  "Sagatiba":                         { abv: 38,   confidence: medium }
+  "Leblon":                           { abv: 40,   confidence: high }
+  "Velho Barreiro":                   { abv: 39,   confidence: medium }
+  "Van Osten Botanik Arrack":         { abv: 42,   confidence: medium }
+
+  # --- whisky ------------------------------------------------------------
+  # 100 US proof = 50%. NOT 57 -- see Wood's above, and the header.
+  "Rittenhouse 100":                  { abv: 50,   confidence: high }
+  "Bulleit Rye":                      { abv: 45,   confidence: high }
+  "Sazerac":                          { abv: 45,   confidence: high }
+  "Elijah Craig 12":                  { abv: 47,   confidence: medium }
+  "Woodford's Reserve":               { abv: 43.2, confidence: high }
+  "Jack Daniels":                     { abv: 40,   confidence: high }
+  "Bulleit Bourbon":                  { abv: 45,   confidence: high }
+  "Ardbeg XO":                        { abv: 46,   confidence: low,
+                                        qq: "Ardbeg has no standard XO -- 46 is their usual non-cask-strength figure. Which bottle is this?" }
+
+  # --- gin ---------------------------------------------------------------
+  "Beefeater":                        { abv: 40,   confidence: high }
+  "Tanqueray":                        { abv: 43.1, confidence: high }
+  "Hayman's London Dry":              { abv: 41.2, confidence: high }
+  "Hayman's Old Tom":                 { abv: 41.4, confidence: high }
+  "Rutte":                            { abv: 43,   confidence: medium }
+  "Portobello Road":                  { abv: 42,   confidence: high }
+  "Ophir":                            { abv: 40,   confidence: medium,
+                                        qq: "Reading this as Opihr Oriental Spiced, which is 40. Confirm the spelling and the bottle." }
+
+  # --- agave -------------------------------------------------------------
+  "Patrón Silver":                    { abv: 40,   confidence: high }
+  "Patrón Reposado":                  { abv: 40,   confidence: high }
+  "Patrón Añejo":                     { abv: 40,   confidence: high }
+  "Rooster Rojo Bianco":              { abv: 38,   confidence: medium }
+  "Rooster Rojo Tequila Reposado":    { abv: 38,   confidence: medium }
+  "Rooster Rojo Tequila Añejo":       { abv: 38,   confidence: medium }
+  "Del Maguey Vida":                  { abv: 42,   confidence: high }
+
+  # --- brandy ------------------------------------------------------------
+  "Courvoisier":                      { abv: 40,   confidence: high }
+  "Pierre Ferrand Ambré":             { abv: 40,   confidence: high }
+  "Avallen":                          { abv: 40,   confidence: high }
+  "Massenez Kirsch Vieux":            { abv: 40,   confidence: medium }
+
+  # --- vodka -------------------------------------------------------------
+  "Ketel One":                        { abv: 40,   confidence: high }
+  "Absolut Vanilla":                  { abv: 38,   confidence: high }
+
+  # --- absinthe ----------------------------------------------------------
+  "Vieux Pontarlier":                 { abv: 65,   confidence: high }
+  "Pernod Absinthe":                  { abv: 68,   confidence: high }
+
+  # --- vermouth, sherry, port, aromatised wine ---------------------------
+  "Dolin Dry":                        { abv: 17.5, confidence: high }
+  "Dolin Blanc":                      { abv: 16,   confidence: high }
+  "Carpano Antica Formula":           { abv: 16.5, confidence: high }
+  "Martini Rosso":                    { abv: 15,   confidence: high }
+  "Cocchi Vermouth di Torino":        { abv: 16,   confidence: high }
+  "Punt e Mes":                       { abv: 16,   confidence: high }
+  "Lillet Blanc":                     { abv: 17,   confidence: high }
+  "Lustau Amontillado":               { abv: 18.5, confidence: medium }
+  "Barbadillo Principe":              { abv: 19,   confidence: medium }
+  "Lustau Don Nuño Oloroso":          { abv: 20,   confidence: medium }
+
+  # --- orange liqueurs ---------------------------------------------------
+  # THE SPREAD HERE IS REAL AND IT IS THE WIDEST IN THE FILE. Cointreau and
+  # Ferrand Dry are 40; the Briottet and Boudier curaçaos are 25. A 20 ml pour
+  # is 0.8 units or 0.5 depending only on which bottle, which is why the
+  # `triple sec` / `orange Curaçao` distinction earns its keep here.
+  "Cointreau":                        { abv: 40,   confidence: high }
+  "L'Original Combier Triple Sec":    { abv: 40,   confidence: high }
+  "Pierre Ferrand Dry Curaçao":       { abv: 40,   confidence: high }
+  "Briottet Curaçao Orange":          { abv: 25,   confidence: medium }
+  "Gabriel Boudier Curaçao Orange":   { abv: 25,   confidence: medium }
+  "Briottet Curaçao Bleu":            { abv: 25,   confidence: medium }
+
+  # --- other liqueurs ----------------------------------------------------
+  "Luxardo Maraschino":               { abv: 32,   confidence: high }
+  "Briottet Maraschino":              { abv: 24,   confidence: medium }
+  "John D Taylor's Velvet Falernum":  { abv: 11,   confidence: high }
+  "Roots Mastiha":                    { abv: 30,   confidence: high }
+  "Disaronno":                        { abv: 28,   confidence: high }
+  "Cherry Heering":                   { abv: 24,   confidence: high }
+  "Kahlua":                           { abv: 16,   confidence: high }
+  "Passoa":                           { abv: 17,   confidence: high }
+  "King's Ginger":                    { abv: 41,   confidence: high }
+  "Gabriel Boudier Gingembre":        { abv: 20,   confidence: low,
+                                        qq: "Boudier's ginger sits somewhere around 20 and I could not pin it." }
+  "Giffard Crème de Mûre":            { abv: 16,   confidence: high }
+  "Briottet Crème de Pêche":          { abv: 18,   confidence: medium }
+  "Briottet Crème d'Abricot":         { abv: 18,   confidence: medium }
+  "Briottet Crème de Cacao Blanc":    { abv: 25,   confidence: medium }
+  "Briottet Crème de Menthe Blanche": { abv: 21,   confidence: medium }
+  "Gabriel Boudier Crème de Menthe":  { abv: 18,   confidence: low,
+                                        qq: "Boudier bottle a 18 and a 24 crème de menthe." }
+  "Briottet Crème de Violette":       { abv: 16,   confidence: medium }
+  "Gabriel Boudier Crème de Banane":  { abv: 25,   confidence: medium }
+
+  # --- amari and bitter aperitivi ----------------------------------------
+  "Fernet Branca":                    { abv: 39,   confidence: high }
+  "Suze":                             { abv: 15,   confidence: medium,
+                                        qq: "Suze is 15 in France and 20 in some export markets." }
+  "Liquore Strega":                   { abv: 40,   confidence: high }
+  "Bénédictine D.O.M.":               { abv: 40,   confidence: high }
+  "Galliano L'Autentico":             { abv: 42.3, confidence: high }
+
+  # --- cocktail bitters --------------------------------------------------
+  # NONE OF THESE COUNT TOWARD A UNIT TOTAL and they are declared anyway.
+  # A dash is a non-volumetric unit, so Helen's rule (see cocktail_units.rb)
+  # drops every one of them before strength is ever consulted -- six dashes of
+  # Angostura is about 0.02 units. They are here so that the completeness test
+  # can require EVERY declared bottle to carry a figure without an exception
+  # list, which is the kind of exception that rots.
+  "Angostura":                        { abv: 44.7, confidence: high }
+  "Peychaud's":                       { abv: 35,   confidence: high }
+  "Bitter Truth Aromatic":            { abv: 39,   confidence: high }
+  "Bittermens Xocolatl Mole":         { abv: 44,   confidence: medium }
+  "Bittermens 'Elemakule Tiki Bitters": { abv: 44, confidence: medium }
+  "Bob's Margarita Bitters":          { abv: 38,   confidence: low,
+                                        qq: "Bob's do not print a strength on every label in the range." }
+  "Bob's Peppermint Bitters":         { abv: 38,   confidence: low,
+                                        qq: "Bob's do not print a strength on every label in the range." }
+
+  # --- not alcohol at all ------------------------------------------------
+  # DECLARED, NOT OMITTED, and the difference is the whole safety property of
+  # this file: a missing key is a test failure, `abv: 0` is a statement. If a
+  # syrup could simply be absent then so could a gin, and the gin would total
+  # as water without anything going red.
+  "Monin Pure Cane Sugar":            { abv: 0,    confidence: high }
+  "Monin Cinnamon":                   { abv: 0,    confidence: high }
+  "Monin Gingembre":                  { abv: 0,    confidence: high }
+  "Monin Orgeat":                     { abv: 0,    confidence: high }
+  "Monin Passion Fruit":              { abv: 0,    confidence: high }
+  "Acacia honey":                     { abv: 0,    confidence: high }
+  "Bottle Green":                     { abv: 0,    confidence: high }
+  "Biona unsweetened":                { abv: 0,    confidence: high }
+
+# --- generics with no bottle behind them -------------------------------------
+# 54 generics are poured without any bottle declared under them. A generic that
+# DOES have bottles is deliberately absent -- it derives, and a figure here as
+# well would be a second truth. See the header.
+#
+# THESE ARE CATEGORY FIGURES AND EVERY DRINK THAT USES ONE IS MARKED
+# APPROXIMATE. That is Helen's ruling of 2026-09-06 working as intended: the
+# page says `approx` rather than pretending a category has one strength.
+generics:
+
+  # --- one product, one strength -----------------------------------------
+  # Helen drew this line for prices -- "Campari is just Campari, as is
+  # chartreuse. They have prices" -- and it holds identically for strength.
+  Campari:            { abv: 25,   confidence: high }
+  Aperol:             { abv: 11,   confidence: high }
+  Chartreuse Verte:   { abv: 55,   confidence: high }
+  Chartreuse Jaune:   { abv: 40,   confidence: high }
+  Cynar:              { abv: 16.5, confidence: high }
+  Jägermeister:       { abv: 35,   confidence: high }
+  Becherovka:         { abv: 38,   confidence: high }
+  Grand Marnier:      { abv: 40,   confidence: high }
+  Amaro Nonino:       { abv: 35,   confidence: high }
+  Amaro Ciociano:     { abv: 30,   confidence: medium,
+                        qq: "Reading this as Amaro Ciociaro, which is 30." }
+
+  # --- genuinely a category, no bottle declared yet ----------------------
+  Plymouth:               { abv: 41.2, confidence: high }
+  navy strength gin:      { abv: 57,   confidence: high }
+  sloe gin:               { abv: 26,   confidence: medium }
+  pisco:                  { abv: 40,   confidence: medium }
+  aquavit:                { abv: 40,   confidence: medium }
+  aguardiente:            { abv: 29,   confidence: low,
+                            qq: "Colombian aguardiente runs 24-29; Spanish orujo is nearer 40. Which is it?" }
+  apple brandy:           { abv: 40,   confidence: medium }
+  kirschwasser:           { abv: 40,   confidence: medium }
+  apple schnapps:         { abv: 20,   confidence: low,
+                            qq: "Apple schnapps spans 15 to 40 depending entirely on the brand." }
+  crème de cassis:        { abv: 20,   confidence: medium }
+  liqueur de sapin:       { abv: 40,   confidence: low,
+                            qq: "Fir liqueurs run 25 to 45 and I could not tell which bottle this is." }
+  tomato liqueur:         { abv: 20,   confidence: low,
+                            qq: "No idea what bottle this is -- it is one pour and it needs your label." }
+  Swedish flaggpunsch:    { abv: 26,   confidence: medium }
+  Ceylon arrack:          { abv: 33,   confidence: medium }
+  overproof Demerara rum: { abv: 57,   confidence: medium }
+  pineapple vodka:        { abv: 37.5, confidence: low,
+                            qq: "An infusion? If it is homemade the strength is the base spirit's, minus a little." }
+  tawny port:             { abv: 20,   confidence: high }
+
+  # --- wine and sparkling -------------------------------------------------
+  # THE TWO SPARKLING ROWS ARE ALSO `to top` POURS, so they reach the total
+  # through top_up_ml's declared range in costs.yml and never as a measured
+  # volume. See cocktail_units.rb.
+  champagne:          { abv: 12,   confidence: high }
+  prosecco:           { abv: 11,   confidence: high }
+  red wine:           { abv: 13,   confidence: medium }
+
+# --- poured, and contributes nothing ------------------------------------------
+# EVERY ONE OF THESE IS A DELIBERATE ZERO, not a gap. Helen: "water etc don't
+# matter." They are listed rather than defaulted so that a new ingredient with
+# no strength recorded fails a test instead of quietly diluting a total.
+#
+# NOTE WHAT IS *NOT* HERE. `falernum` is 11% and is an easy one to assume is a
+# syrup because it sits beside the syrups in every recipe that uses it -- it
+# derives from Velvet Falernum above. `grenadine` and `orgeat` really are 0.
+non_alcoholic:
+  - lime juice
+  - lemon juice
+  - orange juice
+  - grapefruit juice
+  - pineapple juice
+  - apple juice
+  - cane sugar syrup 1:1
+  - demerara sugar syrup
+  - vanilla syrup
+  - agave syrup
+  - grenadine
+  - honey water 2:1
+  - lime cordial
+  - raw sugar
+  - molasses sugar
+  - soda water
+  - water
+  - cola
+  - black tea
+  - espresso
+  - coconut cream
+  - fruit purée
+  - egg white
+  - cider vinegar
