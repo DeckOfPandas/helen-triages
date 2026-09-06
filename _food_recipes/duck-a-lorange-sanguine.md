@@ -38,7 +38,7 @@ method_groups:
       - step: "Roast at 220°C fan for 20 mins, then drop the oven to 180°C fan and roast for a further approximately 50 mins, basting halfway through."
   - name: "Make the duck stock"
     steps:
-      - step: "Discard the liver (to avoid making the sauce bitter). Fry the neck, heart and kidneys over medium heat until browned all over, then add the peppercorns, star anise, thyme and 500 ml water."
+      - step: "Discard the liver (to avoid making the sauce bitter). Fry the neck and heart over medium heat until browned all over, then add the peppercorns, star anise, thyme and 500 ml water."
         note: "If short on time, add less water rather than rushing the cook, because this sauce definitely takes its time to reduce."
       - step: "Simmer vigorously for about 20 mins until reduced to about 100 ml."
       - step: "Strain through a fine sieve into a jug and discard the solids."
@@ -61,5 +61,5 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 ---
