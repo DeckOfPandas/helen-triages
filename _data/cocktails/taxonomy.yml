@@ -614,24 +614,34 @@ mood_include:
     why: >-
       she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
   caribbean-sazerac:
-    moods: [strong brown drink, warming, I want to faff]
+    moods: [strong brown drink, warming]
     why: >-
-      she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice; it rinses a frozen glass and discards the excess, which the rule counts as ONE faff moment where it wants two.
-  # `I want to faff` JOINED BOTH SAZERACS ON 2026-09-05, and it is a correction
-  # to the RULE'S ARITHMETIC rather than to its judgement.
+      she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
+  # `I want to faff` JOINED BOTH SAZERACS ON 2026-09-05 AND LEFT THIS ONE ON
+  # 2026-09-06. Helen, #758: "Caribbean Sazerac should not have the chip 'I want
+  # to faff'." Both halves are kept, because the reasoning that put it here was
+  # sound and she is answering a different question from the one it answered.
   #
-  # Both drinks scored two faff hits until today, and both hits were the SAME
-  # RINSE: once in "Rinse a frozen glass with the overproof rum" and again in
-  # "Strain into the rinsed glass". The serve pass collapsed that second step to
-  # a bare "Strain." -- the destination moved to `serve.chill: rinsed` -- and
-  # with the duplicate gone the count fell to one and the mood fell off.
+  # WHAT THE 2026-09-05 CORRECTION WAS FOR. Both drinks scored two faff hits
+  # until that day, and both hits were the SAME RINSE: once in "Rinse a frozen
+  # glass with the overproof rum" and again in "Strain into the rinsed glass".
+  # The serve pass collapsed that second step to a bare "Strain." -- the
+  # destination moved to `serve.chill: rinsed` -- and with the duplicate gone the
+  # count fell to one and the mood fell off. The OLD count was wrong and the new
+  # one is right: the drink rinses once. The correction re-asserted the mood on
+  # the judgement that a drink which rinses a glass and throws it away IS faff.
   #
-  # THE OLD COUNT WAS WRONG AND THE NEW ONE IS RIGHT: the drink rinses once. But
-  # a drink that rinses a glass with absinthe and throws it away IS faff, so the
-  # honest fix is to record the drinks here rather than to loosen the rule or to
-  # re-inflate the prose. Recorded rather than fixed in `step_words` because
-  # adding "discard" there would reach several twist-and-discard drinks that
-  # nobody thinks are faffy.
+  # WHY IT COMES OFF THIS ONE AND NOT THE OTHER. That judgement is Helen's to
+  # make per drink and she has now made it for the Caribbean Sazerac: rinse
+  # aside, it is a shake and a strain with six ingredients, and calling it faffy
+  # oversells it. The plain `sazerac` keeps the mood -- she did not name it, and
+  # its rinse is absinthe into an iced glass, which is a fussier moment than
+  # discarding a little overproof rum.
+  #
+  # SO THE RULE IS UNTOUCHED, AGAIN, and for the same reason as before: adding
+  # "discard" to `step_words` would reach several twist-and-discard drinks nobody
+  # thinks are faffy, and loosening the count would re-add the mood to both. A
+  # per-drink judgement belongs in a per-drink correction.
   sazerac:
     moods: [I want to faff]
     why: >-
