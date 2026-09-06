@@ -797,6 +797,42 @@ permalink: /cocktails/
 }
   </script>
 
+  {% comment %} WHAT EACH DRINK COSTS A GLASS — LOCAL ONLY, and the whole block
+     is absent on the deployed site because `site.show_costs` is declared in
+     _config_local.yml and nowhere else. Same gate as the drink page's own cost
+     line; see _layouts/cocktail.html.
+
+     WHY IT IS HERE AT ALL. Helen, 2026-09-06: "the only other place I care
+     about this number is when I'm comparing drinks in a shortlist." So it rides
+     with the shopping list rather than appearing on 124 cards — a shortlist is
+     where two drinks get compared, and a card grid is where a price column
+     would just be noise.
+
+     ALREADY COMPUTED, NOT RECOMPUTED. `_plugins/cocktail_costs.rb` did every
+     sum at build and hung the result on `drink.cost`; this copies two numbers
+     out of it. cocktail-index.js therefore needs none of the resolution logic —
+     no alias map, no bottle-or-generic fallback — which is the same division
+     that keeps `cocktail-scale.js` ignorant of prices.
+
+     INCOMPLETE DRINKS ARE OMITTED, not emitted as zero. Two of them (the
+     Bellini and the Caipirinha) have `cost.complete: false` because what the
+     exclusion rule drops IS the drink; the reader below prints no price for a
+     drink it has no entry for, which is the same silence the drink page keeps.
+     {% endcomment %}
+  {% if site.show_costs %}
+  <script type="application/json" id="drink-costs">
+{
+{%- assign first_cost = true -%}
+{%- for drink in sorted_drinks -%}
+{%- if drink.cost and drink.cost.complete -%}
+{%- unless first_cost %},{% endunless %}{%- assign first_cost = false %}
+{{ drink.url | jsonify }}:{"lo":{{ drink.cost.min }},"hi":{{ drink.cost.max }}}
+{%- endif -%}
+{%- endfor %}
+}
+  </script>
+  {% endif %}
+
   {% comment %} ORDER MATTERS, and each of these is read at startup rather than
      on first use, so a page that loads them out of order fails immediately
      rather than on the first keystroke:

@@ -124,6 +124,43 @@
      the rest of the index is untouched. */
   var INGREDIENTS = readJson('drink-ingredients', 'the drinks’ own front matter', {});
 
+  /* WHAT EACH DRINK COSTS A GLASS. LOCAL ONLY and USUALLY ABSENT: the block is
+     emitted by cocktails/index.html behind `site.show_costs`, declared in
+     _config_local.yml and nowhere else, so on the deployed site this is `{}`
+     and every price below simply does not render.
+
+     READ WITHOUT `readJson` DELIBERATELY, because that helper warns to the
+     console when a block is missing -- correct for the vocabulary, wrong here,
+     where missing is the NORMAL state and a warning on every production page
+     load would be noise teaching people to ignore warnings. */
+  var COSTS = (function () {
+    var node = document.getElementById('drink-costs');
+    if (!node) return {};
+    try {
+      return JSON.parse(node.textContent);
+    } catch (e) {
+      console.warn('cocktail-index.js: could not parse #drink-costs — ' + e.message);
+      return {};
+    }
+  })();
+
+  /* "@ £2.34", or "@ £2.10–£3.40" where the drink spans a range, or nothing at
+     all. Helen asked for it "quietly again", so it is a suffix on a line that
+     already exists rather than a column of its own.
+
+     THE FIGURE IS PER GLASS AND IS NOT MULTIPLIED BY THE COUNT. "2 Mai Tai @
+     £5.24" is two of a drink that costs £5.24 each -- the same reading as a
+     menu, and the same number the drink's own page shows. Multiplying here
+     would make the glasses box change a price labelled per glass, which is the
+     bug that had to be taken out of cocktail-scale.js on the same day. */
+  function costSuffix(url) {
+    var c = COSTS[url];
+    if (!c) return '';
+    var lo = '£' + Number(c.lo).toFixed(2);
+    if (Math.abs(c.hi - c.lo) < 0.005) return ' @ ' + lo;
+    return ' @ ' + lo + '–£' + Number(c.hi).toFixed(2);
+  }
+
   /* ONE BOTTLE, HOWEVER IT WAS WRITTEN. Built from the dictionary already on the
      page rather than from a second blob: every declared name maps to itself and
      every alias maps to its bottle, which is what stops a shopping list printing
@@ -425,7 +462,13 @@
           'inputmode="numeric" value="' + HTF.shortlist.glasses(url) + '" ' +
           'data-url="' + HTF.escapeHtml(url) + '" ' +
           'aria-label="glasses of ' + HTF.escapeHtml(titleByUrl[url] || url) + '">' +
-          '<span>' + HTF.escapeHtml(titleByUrl[url] || url) + '</span>' +
+          '<span>' + HTF.escapeHtml(titleByUrl[url] || url) +
+          /* The price is INSIDE the title span, not a sibling, so it wraps with
+             the name on a narrow screen instead of being pushed onto a line of
+             its own away from the drink it belongs to. Empty string everywhere
+             `show_costs` is off, which is everywhere but Helen's laptop. */
+          '<span class="shopping-list-cost">' + costSuffix(url) + '</span>' +
+          '</span>' +
           '</li>';
       }).join('');
     }

@@ -273,6 +273,26 @@
     put(input, box(last));
   }
 
+  /* THE COST LINE DOES NOT MOVE WITH THE SCALER, AND THAT IS THE WHOLE RULE.
+     There is no `recost` here any more; this comment is what replaced it.
+
+     THE FIRST VERSION MULTIPLIED THE FIGURE BY THE MULTIPLE and was wrong.
+     Helen, 2026-09-06: "When I scale, the price per glass you calculate needs
+     to divide by the scaled number." Exactly so -- and the two operations
+     cancel. The line says "a glass"; scaling ×4 makes four glasses at four
+     times the money, which is the SAME price per glass. Multiplying by n and
+     then dividing by n is the identity, so the correct implementation is to
+     leave the number alone.
+
+     The reasoning that produced the bug was sound as far as it went ("cost is
+     linear in volume, so ×4 really is four times") and simply answered a
+     question the label was not asking. A per-unit figure is invariant under
+     scaling; only a TOTAL would move.
+
+     `data-cost-min` / `data-cost-max` stay on the element. They are what
+     cocktails/index.html does NOT have to recompute -- and they cost nothing,
+     while a machine-readable per-glass price on the page is worth keeping. */
+
   /* NOTHING TYPED YET, NOTHING A NUMBER CAN BE READ OUT OF, OR A NUMBER NOBODY
      IS ASKING FOR.
 

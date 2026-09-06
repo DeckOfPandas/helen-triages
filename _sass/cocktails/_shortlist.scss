@@ -364,6 +364,21 @@
   input { @extend %cocktail-number-input; }
 }
 
+// "2 Mai Tai @ £5.24" — the price half. Helen, 2026-09-06: "please add the
+// cost, quietly again", so it is dimmed and tabular rather than emphasised, and
+// it reads as an aside to the drink's name instead of a second column.
+//
+// EMPTY ON THE DEPLOYED SITE. The span is always drawn and its contents come
+// from `costSuffix()` in cocktail-index.js, which returns "" unless
+// `site.show_costs` put a #drink-costs block on the page — _config_local.yml
+// and nowhere else. An empty inline span occupies nothing, so no rule here
+// needs to hide it.
+.shopping-list-cost {
+  color: $color-clear-text;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .shopping-list-items {
   list-style: none;
   margin: 0;

@@ -1514,6 +1514,30 @@ $amount-gap-wide: 1.25rem;
   margin: 0;
 }
 
+// AN INCIDENTAL, AND STYLED LIKE ONE. Helen, 2026-09-05: "I only want to show
+// price on the locally built site, and only as an incidental -- just somewhere
+// on the recipe page." So it matches `.cocktail-source` above rather than
+// announcing itself: same size, same muted colour, sitting under the source
+// line in the same footer. It never appears on the deployed site at all --
+// `site.show_costs` is declared in _config_local.yml and nowhere else.
+//
+// ONLY THE FIGURE IS EMPHASISED, and only to the weight of the surrounding
+// text, because the sentence is the point and the number is scanned out of it.
+.cocktail-cost {
+  font-size: 0.82rem;
+  color: $color-clear-text;
+  margin: $space-xxs 0 0;
+
+  .cocktail-cost-figure {
+    font-variant-numeric: tabular-nums;
+    // TABULAR FIGURES SO THE SCALER DOES NOT JIGGLE THE LINE. The number is
+    // rewritten on every keystroke of the multiple box; proportional digits
+    // would change the sentence's width as it counted up, which is exactly the
+    // restlessness `fitAmountColumn` exists to keep out of the amount column.
+    font-weight: 600;
+  }
+}
+
 // =============================================================================
 // THE MAKE-IT TOGGLE, AND THE STATE IT SWITCHES TO
 // =============================================================================
