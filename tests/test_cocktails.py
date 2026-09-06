@@ -4935,52 +4935,6 @@ def test_the_off_scale_ship_has_a_word():
     )
 
 
-def test_every_ship_rung_has_a_tint():
-    """`ship_tints` must cover `ship_scale`, plus the two off-scale values.
-
-    Added 2026-08-26 with the goodness mark. The mark on a cocktail card fills
-    with this percentage of the second accent, and Liquid resolves a missing
-    key to nil -- which the template defaults to 0, i.e. an EMPTY square. So a
-    sixth rung added to `ship_scale` without a tint does not error: it renders
-    as the lowest possible rating, silently, which is worse than rendering
-    nothing.
-
-    `who knows` and `QQ` are deliberately off the ship scale (see the file's
-    own comment) but still reach a card, so they are checked too.
-    """
-    taxonomy = _taxonomy()
-    scale = taxonomy.get("ship_scale") or []
-    tints = taxonomy.get("ship_tints") or {}
-    assert scale, "taxonomy.yml has no `ship_scale:`."
-    assert tints, (
-        "taxonomy.yml has no `ship_tints:`. Every goodness mark on the index "
-        "would render as an empty square -- the `not really` treatment -- "
-        "whatever the drink is rated."
-    )
-
-    missing = [r for r in scale if r not in tints]
-    assert not missing, (
-        f"`ship_tints` does not cover every rung of `ship_scale`: {missing}\n\n"
-        f"A rung with no tint renders as an EMPTY square, which is the visual "
-        f"for `not really`. It does not error and it does not look broken -- "
-        f"it looks like a bad drink."
-    )
-    for off_scale in ("who knows",):
-        assert off_scale in tints, (
-            f"`ship_tints` has no entry for {off_scale!r}. It is deliberately "
-            f"not on `ship_scale` -- it means 'I have no idea', an absence of "
-            f"verdict rather than a low one -- but it still reaches a card and "
-            f"still needs a value."
-        )
-
-    bad = sorted(f"{k}={v!r}" for k, v in tints.items()
-                 if not isinstance(v, (int, float)) or not 0 <= v <= 100)
-    assert not bad, (
-        "ship_tints values are percentages: numbers from 0 to 100.\n  "
-        + "\n  ".join(bad)
-    )
-
-
 def test_suggestion_is_a_string_or_a_list_of_strings():
     """`suggestion` was the only ingredient field with no shape guard at all.
 

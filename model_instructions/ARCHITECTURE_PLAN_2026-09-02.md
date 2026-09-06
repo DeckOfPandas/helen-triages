@@ -1,10 +1,26 @@
 # Architecture, data model, code and workflow plan — 2026-09-02
 
+> **STATUS 2026-09-06: DONE, except the handover restructure (§7, the Fable
+> part).** Every other workstream is on `main`, checked against the code on
+> 2026-09-06 rather than against this document: WS1 and WS2 (#668), WS3, WS4
+> (#544), WS5 (`INGEST_INBOX_DESIGN.md`, `scripts/build_ingest_vocab.py`,
+> `/ingest-inbox`), WS6a (#686), WS6b, and the WS7 small fixes. 6c was closed
+> by the design PRs, 6d was dropped by ruling, D5's badges were built and
+> reverted on Helen's ruling the same day (HANDOVER §9.1.1), and the last WS7
+> fix — retire `ship_tints` once #511 and #612 closed — landed on 2026-09-06
+> with this stamp. The restructure was deferred until WS1–WS5 had landed; they
+> have, so it is unblocked.
+>
+> **The document is kept for §8, the rulings table**, which
+> `tests/test_cocktails.py` and HANDOVER §9.1.1 cite by ID. Everything else is
+> history: the line numbers, file names and counts below are as of e31970d
+> and several are wrong today. Do not work from it.
+
 Written by Fable 5.1 after a read-only audit of the worktree at commit e31970d.
 Audience: an Opus session picking this up, and Helen deciding what to run.
-Nothing below has been implemented. Every line number is as of e31970d and
-must be re-checked before editing (HANDOVER §11.2: do not trust a document
-over the code).
+Nothing below had been implemented when it was written. Every line number is
+as of e31970d and must be re-checked before editing (HANDOVER §11.2: do not
+trust a document over the code).
 
 Two rulings from Helen that shape this plan, given 2026-09-02:
 
@@ -475,9 +491,11 @@ warns about it, but it is a design call and the design session owns it).
 - Add `mood` to §9.3's schema block (WS1 step 3).
 - `tests/test_cocktails.py` L15 says nothing is promoted; still true, but
   after WS2 the paragraph should describe the gate.
-- `ship_tints` in `taxonomy.yml` is read by nothing (the file says so) and
+- ~~`ship_tints` in `taxonomy.yml` is read by nothing (the file says so) and
   `test_every_ship_rung_has_a_tint` still enforces it. Retire both, or move
-  the reasoning into a comment, once #511/#612 are closed.
+  the reasoning into a comment, once #511/#612 are closed.~~ **DONE
+  2026-09-06**: both closed 2026-09-02; block and test deleted, reasoning and
+  numbers kept in HANDOVER §9.5.
 
 **Fable, later, its own conversation:** the handover is 7,734 lines and is
 itself the biggest maintenance cost in the repo. It is a journal that has

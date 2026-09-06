@@ -2182,11 +2182,13 @@ different about drinks.
 
 **Every drink carries `meta.rewritten`, `meta.awaiting_fix` and
 `meta.proofread`** — food's names, in food's order, after the two
-drink-specific keys. A drink's `meta:` block is now exactly:
+drink-specific keys. A drink's `meta:` block is now exactly (the migration
+wrote the three flags after `date_last_edited`, which was retired on 2026-09-05
+as read by nothing; `made_before` took the front the same day, #722 — §9.3):
 
     meta:
+      made_before: true
       ship: "yes"
-      date_last_edited: "2026-08-16"
       rewritten: false
       awaiting_fix: false
       proofread: false
@@ -2419,8 +2421,11 @@ notes:                           # {label, text} or a bare string, as food.
 source: ""
 source_url: ""                   # external; nothing verifies it
 meta:                            # FIVE keys, in this order — §9.1.1
+  made_before: true              # BOOLEAN, gates nothing; first because you
+                                 # make a drink and then have an opinion — #722
   ship: "oh gods yes"            # a real ordered vocabulary now — see §9.5
-  date_last_edited: "2026-08-16"
+                                 # (`date_last_edited` sat here until
+                                 #  2026-09-05; retired, nothing read it)
   rewritten: false               # the three gate flags, food's names, food's
   awaiting_fix: false            # order, after the two drink-specific keys.
   proofread: false               # §4.0 is what they MEAN; §9.1.1 is the gate.
@@ -5475,14 +5480,19 @@ even the question.
 
 **IT IS A SHIP AND A WORD, NOT A SQUARE — and this paragraph said otherwise
 until 2026-09-02.** `cocktails/index.html` renders `.drink-card-ship-icon` (the
-ship partial) beside `.drink-card-ship-word`; the tinted square is gone, and the
-template's own comment records that nothing reads `ship_tints` any more. The
-paragraph below describes the retired square. It is kept because **its
-reasoning is the part that binds** — the scale's shape, not the mark's — and
-because #511 and #612 both want a goodness scale on the DRINK page, where these
-are exactly the traps to avoid. Read it as an argument, not as a description.
+ship partial) beside `.drink-card-ship-word`; the tinted square is gone. **The
+`ship_tints` ramp it filled along was deleted from `taxonomy.yml` on
+2026-09-06**, together with `test_every_ship_rung_has_a_tint`. Nothing had read
+it since the square went, and the one reason for keeping it — #511 and #612
+wanted a graduated scale on the DRINK page, and the ramp's shape was the
+argument that scale would need — lapsed when both closed on 2026-09-02 with the
+drink page showing the rung word instead. The ramp was `not really` 0, `meh`
+16, `sure` 42, `yes` 100, `oh gods yes` 100, `who knows` 0. The paragraph below
+describes the retired square, and is kept because **its reasoning is the part
+that binds** — the scale's shape, not the mark's. If a graduated scale is ever
+built, read it as an argument, not as a description.
 
-A small square, tinted along `ship_tints` in `_data/cocktails/taxonomy.yml`.
+A small square, tinted along that ramp.
 **Not a linear ramp and it must not be made into one**: `yes` and `oh gods yes`
 are both 100 because both mean "make this" — the difference is enthusiasm, not
 decision — and the whole range is spent on the gap that matters. `sure` and
