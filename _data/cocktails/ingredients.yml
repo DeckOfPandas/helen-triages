@@ -326,8 +326,44 @@ search:
 # ONE ENTRY TODAY, and a list rather than a special case in the template because
 # the next one will not be water: `ice` is the obvious candidate the day a drink
 # writes it down.
+#
+# TEN ENTRIES SINCE 2026-09-06 -- #640, and the prediction above was right about
+# everything except which ingredient came next. Helen: "don't include things like
+# sugar, water. lemon zest in the ingredient list that appears on cocktail
+# cards."
+#
+# "THINGS LIKE" IS READ THE WAY #580 READ IT: THE BARE THING. That caveat is the
+# whole precedent -- bare `water` and never `honey water` or `soda water` -- so
+# this adds the BARE sugars, the bare salt and the bare zest, and leaves every
+# syrup alone. `sugar syrup` is on 39 of 124 cards and stays: a syrup is a
+# choosing fact, it is what makes a sour a sour, and orgeat is most of what a Mai
+# Tai tastes like. `white sugar` on a card is the undissolved granule, and it
+# tells you nothing.
+#
+# WHAT THIS ALSO DOES, AND HELEN SHOULD SAY IF SHE WANTS IT SPLIT. This list
+# governs the card AND the search pool -- #580 asked for both in one breath
+# ("never write 'water' on a cocktail card and never return it in a search").
+# #640 asked only about cards. The two were left coupled because the search half
+# is defensible for every entry here: nobody chooses a drink by its salt, and
+# `sugar syrup`, `honey water` and `lemon juice` all remain searchable, so the
+# drinks are still reachable by the sweet or citrus thing in them. If she wants
+# them searchable anyway, this list splits in two and the template reads one for
+# the card and the union for `data-ingredients`.
+#
+# `salt` IS THE ENTRY THAT MOST EARNS ITS PLACE. It is on five cards, and on the
+# Mai Tai it is the TENTH item -- the line ends "absinthe . salt" after nine real
+# ingredients. It is a seasoning pinch in every one of the five.
 not_on_cards:
   - water
+  - salt
+  - white sugar
+  - raw sugar
+  - golden caster sugar
+  - molasses sugar
+  - palm sugar
+  - sugar cube
+  - honey
+  - lemon zest
 
 # --- other names for a family ------------------------------------------------
 # A FAMILY IS REACHED BY ITS NAME, so a family nobody spells that way is a

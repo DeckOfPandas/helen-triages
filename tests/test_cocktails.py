@@ -5494,49 +5494,89 @@ def test_nothing_on_the_not_on_cards_list_reaches_a_card_or_the_search():
     is a MAKING fact -- the same distinction §9.10.1 draws when it collapses
     both syrup ratios to `sugar syrup`.
 
-    CHECKED AGAINST THE BUILT PAGE rather than the template, because the
-    suppression is written twice there -- once on the `searchable` capture and
-    once on the card's own ingredient line -- and Liquid has no way to share it.
-    Two copies that must agree is exactly the thing to test on the output.
+    THE TWO COPIES ARE GONE AS OF 2026-09-06 AND THAT IS WHY THIS CHANGED.
+    Until then the suppression was written twice in cocktails/index.html -- once
+    on the `searchable` capture and once on the card's ingredient line -- with a
+    comment saying "the two must stay in step" and nothing making them. This
+    test counted the two copies, which was the best available check on a rule
+    that could not be shared.
+
+    #567/#691 moved all of it into _plugins/cocktail_card_ingredients.rb, so the
+    card line and the search pool now read ONE list, built once per drink. They
+    are the same list by construction and can no longer disagree, which is
+    strictly better than two copies that agree today. What is worth guarding now
+    is that both really do read it -- a template that went back to looping
+    `drink.ingredients` would silently reintroduce everything this hid.
     """
     vocab = _vocab()
     hidden = vocab.get("not_on_cards")
     assert hidden, (
         "_data/cocktails/ingredients.yml has no `not_on_cards` list. It is what "
-        "keeps bare `water` off the index (#580); without it the template's two "
-        "suppression blocks silently pass everything through."
+        "keeps bare `water` off the index (#580); without it the plugin passes "
+        "everything through."
     )
 
     template = (ROOT / "cocktails" / "index.html").read_text(encoding="utf-8")
-    assert template.count("not_on_cards contains g") == 2, (
-        "cocktails/index.html no longer applies `not_on_cards` in BOTH places. "
-        "It has to be tested on the `searchable` capture (what the filter "
-        "matches) and on the card's ingredient line (what a reader sees); one "
-        "without the other means a word is either invisible but filterable, or "
-        "printed but unsearchable."
+    assert template.count("drink.card_ingredients") == 2, (
+        "cocktails/index.html no longer reads `card_ingredients` in BOTH places. "
+        "It is needed for the `searchable` capture (what the filter matches) and "
+        "for the card's ingredient line (what a reader sees); one without the "
+        "other means a word is either invisible but filterable, or printed but "
+        "unsearchable -- and looping `drink.ingredients` directly skips the "
+        "suppression and the ordering together."
+    )
+    assert "not_on_cards contains g" not in template, (
+        "cocktails/index.html has gone back to applying `not_on_cards` in "
+        "Liquid. That is the duplication _plugins/cocktail_card_ingredients.rb "
+        "exists to remove; two implementations of one rule is what this test "
+        "used to be counting."
     )
 
 
-def test_a_suppressed_word_is_only_ever_suppressed_ALONE():
+def test_nothing_that_decides_a_drink_is_ever_kept_off_a_card():
     """`soda water` is a real choosing fact and must survive.
 
-    The caveat is the whole of Helen's instruction, and it is also the shape of
-    a bug this repo already had: the picker matched `water` against `honey
-    water` by substring until 2026-08-29. `contains` on a Liquid list is exact
-    membership, so the template cannot repeat it -- this asserts that the LIST
-    itself does not name a compound, which is the other way in.
+    THIS ASKED FOR ONE WORD UNTIL 2026-09-06, and the one-word rule was a PROXY
+    rather than the rule. It read: a compound like `soda water` or `cane sugar
+    syrup 2:1` is a reason to choose a drink, so refuse compounds. That held
+    perfectly while the list was `[water]`, and #640 retired it -- Helen: "don't
+    include things like sugar, water. lemon zest in the ingredient list that
+    appears on cocktail cards." `white sugar` and `lemon zest` are two words
+    each and neither is a reason to choose anything.
 
-    `honey water` was the second example until 2026-09-04, when Helen flattened
-    both ratios into one `honey water` generic. The compound it illustrated is
-    gone from the vocabulary; the rule is not, and `soda water` still shows it.
+    SO THE PROXY IS REPLACED BY WHAT IT WAS STANDING IN FOR. The disaster this
+    guards against is a real ingredient disappearing off every card that pours
+    it, and the mechanical form of that is hiding something the card ordering
+    ranks as a SPIRIT, a LOWER-PROOF SPIRIT, a JUICE or BITTERS -- tiers 1, 2, 3
+    and 6 of _plugins/cocktail_card_ingredients.rb. Hiding a gin, a Campari, a
+    lime juice or an Angostura is never right, and each is one line away from
+    happening by accident.
+
+    WHAT IT DELIBERATELY DOES NOT POLICE is tiers 4 and 5 -- the syrups, sugars,
+    fruit, herbs and odds and ends. That is where a staple legitimately lives and
+    where the judgement genuinely is a judgement: `orgeat` and `white sugar` are
+    both in tier 4's neighbourhood and only one of them belongs on a card. No
+    rule separates them, so the list stays a decision, made by Helen, and
+    `test_every_suppressed_word_is_a_declared_generic` below keeps it honest
+    about naming things that exist.
     """
-    for value in _vocab().get("not_on_cards") or []:
-        assert len(str(value).split()) == 1, (
-            f"`not_on_cards` names {value!r}, which is more than one word. This "
-            f"list exists for ingredients that are never a reason to choose a "
-            f"drink; a compound like `soda water` or `cane sugar syrup 2:1` is one, "
-            f"and "
-            f"suppressing it would take a real fact off the card."
+    vocab = _vocab()
+    protected = {}
+    for tier, sections in sorted(_tier_sections().items()):
+        if tier not in (1, 2, 3, 6):
+            continue
+        for section in sections:
+            for generic in vocab.get(section) or []:
+                protected[str(generic)] = (tier, section)
+
+    for value in vocab.get("not_on_cards") or []:
+        hit = protected.get(str(value))
+        assert hit is None, (
+            f"`not_on_cards` names {value!r}, which _data/cocktails/"
+            f"ingredients.yml declares in `{hit[1]}` -- tier {hit[0]} of the "
+            f"card ordering, i.e. a spirit, a lower-proof spirit, a juice or "
+            f"bitters. Those are what a card is FOR. Hiding this would take it "
+            f"off every card that pours it and out of the search pool with it."
         )
 
 
@@ -5550,6 +5590,176 @@ def test_every_suppressed_word_is_a_declared_generic():
             f"like it is doing something and is not -- and the day the generic "
             f"is spelled differently, nothing says so."
         )
+
+
+# =============================================================================
+# THE CARD'S INGREDIENT LINE -- issues #567, #640, #691.
+# =============================================================================
+# _plugins/cocktail_card_ingredients.rb decides what a card lists and in what
+# order. It classifies a generic by WHICH SECTION OF ingredients.yml DECLARES IT,
+# which is the right classifier -- the sections are Helen's own idea of what kind
+# of thing something is, and writing a second list of "these are the strong ones"
+# would be a second truth that drifts.
+#
+# THE FAILURE THAT CLASSIFIER INVITES IS SILENT, AND IT IS WHAT THESE GUARD.
+# Rename `syrups:` in ingredients.yml and the plugin's TIERS still names
+# `syrups`, still finds nothing, and quietly drops every syrup into the
+# unclassified tier. The build prints a warning; a warning in a build that emits
+# 13 Sass deprecations is not a thing anybody sees.
+
+CARD_PLUGIN = ROOT / "_plugins" / "cocktail_card_ingredients.rb"
+
+
+def _plugin_source():
+    if not CARD_PLUGIN.exists():
+        pytest.skip("_plugins/cocktail_card_ingredients.rb does not exist yet.")
+    return CARD_PLUGIN.read_text(encoding="utf-8")
+
+
+def _tier_sections():
+    """The section names the plugin's TIERS constant claims, tier by tier.
+
+    Parsed out of the Ruby rather than restated here, for the reason the whole
+    module exists: a copy of a list is a list that can disagree with the list.
+    """
+    src = _plugin_source()
+    block = re.search(r"TIERS\s*=\s*\{(.*?)\}\.freeze", src, re.S)
+    assert block, "Cannot find the TIERS constant in the card plugin."
+    out = {}
+    for tier, body in re.findall(r"(\d+)\s*=>\s*%w\[([^\]]*)\]", block.group(1)):
+        out[int(tier)] = body.split()
+    assert out, "TIERS parsed as empty; the constant's shape has changed."
+    return out
+
+
+def test_every_section_the_card_plugin_sorts_by_still_exists():
+    """TIERS names sections of ingredients.yml, and all of them are real.
+
+    THE BUG THIS CATCHES LEAVES NOTHING BROKEN-LOOKING. A section renamed in
+    ingredients.yml and not followed here does not raise, does not empty a card
+    and does not fail a build -- it silently reclassifies every generic in that
+    section to the unknown tier, so the cards reorder themselves slightly and
+    nobody can say why. That is the shape of fault #653 and #654 were both
+    written about.
+    """
+    vocab = _vocab()
+    missing = []
+    for tier, sections in sorted(_tier_sections().items()):
+        for section in sections:
+            if not isinstance(vocab.get(section), list):
+                missing.append(f"tier {tier}: {section}")
+    assert not missing, (
+        "The card plugin sorts by these sections of "
+        "_data/cocktails/ingredients.yml and they are not there (renamed? "
+        "removed?). Every generic in them is now sorted as 'unclassified':\n  "
+        + "\n  ".join(missing)
+    )
+
+
+def test_no_generic_is_declared_in_two_sections_the_plugin_ranks():
+    """A generic in two ranked sections has two tiers, and the lower wins by luck.
+
+    Nothing else in this repo cares whether a generic appears twice -- the search
+    vocabulary is a set and would not notice. The ORDER does care, and it would
+    resolve the ambiguity by whichever section the plugin happened to read last.
+    """
+    vocab = _vocab()
+    seen = {}
+    duplicated = []
+    for tier, sections in sorted(_tier_sections().items()):
+        for section in sections:
+            for generic in vocab.get(section) or []:
+                key = str(generic)
+                if key in seen and seen[key] != tier:
+                    duplicated.append(f"{key}: tier {seen[key]} and tier {tier}")
+                seen[key] = tier
+    assert not duplicated, (
+        "These generics are declared in two sections that the card plugin ranks "
+        "differently, so their position on a card is decided by read order:\n  "
+        + "\n  ".join(sorted(set(duplicated)))
+    )
+
+
+def test_every_poured_generic_has_a_tier(drink_file):
+    """Run from the drinks: can every ingredient on a card be placed?
+
+    THE PLUGIN WARNS AND CARRIES ON, which is the right behaviour at build time
+    -- an unplaceable ingredient should still appear on the card, in the odds-and
+    -ends tier, rather than vanish. This is what makes somebody fix it.
+    """
+    _require_drink(drink_file)
+    vocab = _vocab()
+    hidden = set(vocab.get("not_on_cards") or [])
+
+    placed = set()
+    for sections in _tier_sections().values():
+        for section in sections:
+            placed.update(str(g) for g in (vocab.get(section) or []))
+
+    unplaced = []
+    for ing in drink_file.fm.get("ingredients") or []:
+        if not isinstance(ing, dict) or ing.get("card_order") is not None:
+            continue
+        generics = ing.get("generic")
+        generics = [generics] if isinstance(generics, str) else (generics or [])
+        generics = [str(g) for g in generics]
+        if generics and all(g in hidden for g in generics):
+            continue
+        for g in generics:
+            if g not in placed:
+                unplaced.append(g)
+
+    assert not unplaced, (
+        f"{drink_file.slug} pours these, and no section of ingredients.yml that "
+        f"the card plugin ranks declares them -- so they sort into the "
+        f"unclassified tier:\n  " + "\n  ".join(sorted(set(unplaced)))
+    )
+
+
+def test_things_kept_off_cards_are_real_generics():
+    """`not_on_cards` names things that exist, and exactly.
+
+    EXACT MATCHES ONLY IS THE WHOLE RULE, per #580 -- bare `water` and never
+    `honey water` or `soda water`. A typo here therefore fails silently in the
+    most expensive direction: the entry matches nothing, the ingredient goes on
+    being printed, and the list looks like it is working because nine of its ten
+    entries are.
+    """
+    vocab = _vocab()
+    declared = set()
+    for key, value in vocab.items():
+        if isinstance(value, list) and not key.startswith("retired_"):
+            declared.update(str(v) for v in value if isinstance(v, str))
+
+    unknown = sorted(set(vocab.get("not_on_cards") or []) - declared)
+    assert not unknown, (
+        "`not_on_cards` in _data/cocktails/ingredients.yml names these, and no "
+        "section declares them, so each one hides nothing:\n  "
+        + "\n  ".join(unknown)
+    )
+
+
+def test_the_citrus_that_sorts_first_is_juice_that_exists():
+    """#567 splits tier 3 -- "citrus then other juices" -- and CITRUS is that list.
+
+    It is the one place the plugin overrides volume WITHIN a tier, so a name that
+    matches nothing silently returns tier 3 to plain volume order and a
+    Painkiller starts leading with its pineapple.
+    """
+    src = _plugin_source()
+    block = re.search(r"CITRUS\s*=\s*\[(.*?)\]\.freeze", src, re.S)
+    assert block, "Cannot find the CITRUS constant in the card plugin."
+    citrus = re.findall(r'"([^"]+)"', block.group(1))
+    assert citrus, "CITRUS parsed as empty; the constant's shape has changed."
+
+    juices = {str(j) for j in (_vocab().get("juices") or [])}
+    assert juices, "ingredients.yml declares no `juices:`."
+    unknown = sorted(set(citrus) - juices)
+    assert not unknown, (
+        "The card plugin's CITRUS list names these and `juices:` in "
+        "ingredients.yml does not declare them, so they sort as ordinary "
+        "juice:\n  " + "\n  ".join(unknown)
+    )
 
 
 # =============================================================================

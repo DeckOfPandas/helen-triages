@@ -2695,21 +2695,40 @@ def test_the_cocktail_card_ingredient_attribute_is_self_delimiting():
     attribute the highlight reads could not be split back into ingredients at
     all -- so a card could only be matched against it by substring, which is the
     fault this page was fixed of.
+
+    WHERE THE JOIN LIVES MOVED ON 2026-09-06. It was a `{% capture ing_search %}`
+    in the template; #567/#691 moved the whole card ingredient line into
+    _plugins/cocktail_card_ingredients.rb, so the `|` join and the downcasing are
+    now Ruby and the template only prints what it is handed. The PROPERTY is
+    unchanged and so is what depends on it, so this follows the join rather than
+    being deleted with the capture.
     """
     html = read("cocktails", "index.html")
     tag = re.search(r'data-ing="\{\{[^"]*"', html)
     assert tag, "cocktails/index.html no longer writes a data-ing attribute."
-    assert "ing_search | downcase" in html, (
-        "data-ing no longer emits the captured ing_search unchanged. It must "
+    assert "ing.search" in tag.group(0), (
+        "data-ing no longer emits the plugin's `search` value unchanged. It must "
         "keep its `|` separators: assets/js/cocktail-index.js splits it with "
         "HTF.cocktailSearch.splitEntries so a matched ingredient is found by "
         "the same rule the filter used."
     )
-    capture = re.search(r"\{% capture ing_search %\}(.*?)\{% endcapture %\}", html, re.S)
-    assert capture, "the ing_search capture is gone or renamed."
-    assert "|" in capture.group(1), (
-        "the ing_search capture no longer joins its values with `|`, so "
-        "splitEntries cannot recover the individual ingredients from data-ing."
+
+    plugin = ROOT / "_plugins" / "cocktail_card_ingredients.rb"
+    assert plugin.exists(), (
+        "_plugins/cocktail_card_ingredients.rb is gone, and it is what builds "
+        "the `search` value data-ing prints."
+    )
+    source = plugin.read_text(encoding="utf-8")
+    join = re.search(r"def search_key.*?\n  end\n", source, re.S)
+    assert join, "the plugin's search_key method is gone or renamed."
+    assert '.join("|")' in join.group(0), (
+        "search_key no longer joins its values with `|`, so splitEntries cannot "
+        "recover the individual ingredients from data-ing."
+    )
+    assert ".downcase" in join.group(0), (
+        "search_key no longer downcases. The template stopped applying "
+        "`| downcase` when the join moved here, so this is the only place it "
+        "happens -- and cocktail-index.js compares against lowercased chips."
     )
 
 

@@ -219,8 +219,32 @@
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+
+  // ONE LINE, AND IT WENT TO THREE FOR ABOUT AN HOUR -- #552, 2026-09-06.
+  //
+  // I read "recipe cards: allow three lines of main ingredients" as this index
+  // and raised it here. Helen: "It was actually cocktail cards I meant", and
+  // then, having seen this one: "One line of ingredients on food recipe lines
+  // please." So the food row is back exactly where it was and the change lives
+  // on the cocktail card, where it was asked for.
+  //
+  // WORTH KEEPING THE MEASUREMENT, because it is the argument someone will make
+  // again: HANDOVER 6's census puts `_food_recipes/` at a median of SIX main
+  // ingredients and a max of fourteen, and a single line of this column fits
+  // five or six short names before the ellipsis. So the typical row really does
+  // show its median and clip the rest.
+  //
+  // THAT IS NOT A BUG HERE, WHICH IS THE PART I HAD WRONG. A food row is a
+  // ROW -- one of eighty in a scannable list, where height is the cost of every
+  // other row you can no longer see at once. A cocktail card is a CARD, with
+  // its own space, and the same clipping there loses the tiki drinks their
+  // point. Same measurement, opposite answers, because the two pages are doing
+  // different jobs.
   -webkit-line-clamp: 1;
 
+  // THE MOBILE OVERRIDE COMES BACK WITH IT. It gives the narrow viewport MORE
+  // lines than the wide one, because the same names wrap sooner in a narrower
+  // column -- so removing it was part of the same mistake.
   @media (max-width: 600px) {
     -webkit-line-clamp: 2;
   }

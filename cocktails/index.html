@@ -69,10 +69,20 @@ permalink: /cocktails/
      template equivalent of the dead selector it went with. {% endcomment %}
   {% assign card_names = site.data.cocktails.ingredients.card_names %}
   {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
-  {% comment %} #580: things a card never mentions. Bare `water` and nothing
-     else today -- see the list's own reasoning in ingredients.yml. EXACT
-     membership, which is what `contains` gives on a Liquid list, because
-     `soda water` is a real choosing fact and only the bare word is not.
+  {% comment %} #580 and #640: things a card never mentions. TEN ENTRIES since
+     2026-09-06 -- bare `water` was the only one for a fortnight, and #640 added
+     the bare sugars, the bare salt, the zest and the honey. See the list's own
+     reasoning in ingredients.yml, which is where the judgement lives.
+
+     EXACT MEMBERSHIP, which is what `contains` gives on a Liquid list, and it
+     is the whole of Helen's caveat: `soda water` is a real choosing fact and
+     only the BARE word is not. The same distinction keeps every syrup on the
+     card while `white sugar` comes off it.
+
+     READ BY THE PLUGIN, NOT HERE, since the card's ingredient line moved to
+     _plugins/cocktail_card_ingredients.rb. This assignment survives because
+     the template still hands the list to nothing -- it is kept as the one place
+     a reader looking at the template can see that such a list exists at all.
      {% endcomment %}
   {% assign not_on_cards = site.data.cocktails.ingredients.not_on_cards %}
 
@@ -476,12 +486,18 @@ permalink: /cocktails/
          is half a choosing fact and must survive; nothing carries that shape
          today, which is exactly when to write the rule rather than after.
 
-         The same four lines appear again on the card's own ingredient line
-         below. Liquid has no functions and an include tag called once per
-         ingredient across the collection is the slow way to avoid eight lines --
-         food/index.html duplicates its derivation loop for the same reason. The
-         two must stay in step. {% endcomment %}
-      {% capture searchable %}{% for ing in drink.ingredients %}{% assign gcount = 0 %}{% assign hcount = 0 %}{% for g in ing.generic %}{% assign gcount = gcount | plus: 1 %}{% if not_on_cards contains g %}{% assign hcount = hcount | plus: 1 %}{% endif %}{% endfor %}{% unless gcount > 0 and gcount == hcount %}{% for g in ing.generic %}{{ g }}|{% assign dn = card_names[g] %}{% if dn %}{{ dn }}|{% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }}|{% endfor %}{% endunless %}{% endfor %}{% endcapture %}
+         THE DUPLICATION IS GONE AS OF 2026-09-06. This used to be a near-copy of
+         the card's own derivation loop, with a comment saying "the two must stay
+         in step" and nothing making them — the honest shape of a rule that has
+         no enforcement. Both now read `card_ingredients`, which
+         _plugins/cocktail_card_ingredients.rb builds once per drink, so the
+         search pool and the visible line are the same list by construction and
+         can no longer drift.
+
+         THE ORDER OF THIS STRING DOES NOT MATTER and it is now the card's order
+         rather than the recipe's. Nothing reads it positionally: cocktail-
+         search.js splits on `|` and asks set questions of the pieces. {% endcomment %}
+      {% capture searchable %}{% for ing in drink.card_ingredients %}{{ ing.search }}|{% endfor %}{% endcapture %}
 
       {% comment %} `data-url` IS THE SHORTLIST'S KEY -- #546, `drink.url` and not
          its `relative_url`, for the reason HTF.shortlist gives in
@@ -617,8 +633,21 @@ permalink: /cocktails/
                A drink wanting two pours of the same rum is NOT this case and
                needs nothing — each ingredient entry renders its own card name,
                so the name simply appears twice, correctly. {% endcomment %}
+            {% comment %} THE HIDING, LABELLING, JOINING AND ORDERING ALL MOVED
+               TO _plugins/cocktail_card_ingredients.rb ON 2026-09-06 — #567,
+               #640, #691. What stood here was one 1,400-character Liquid
+               statement doing four jobs, and it was already at the limit of
+               what could be read; a seven-tier sort was not going to fit into
+               it. Every comment that lived on that line now lives in the plugin,
+               at the step it describes.
+
+               THE ORDER IS NOW HELEN'S, FROM #567: base spirits, then
+               lower-proof, then citrus and juice, then syrups, then everything
+               else, then bitters — largest volume first inside each tier, and
+               the recipe's own order breaking ties. `card_ingredients` arrives
+               already sorted, so this loop must NOT re-sort it. {% endcomment %}
             <p class="drink-card-ingredients">
-              {% assign shown = 0 %}{% for ing in drink.ingredients %}{% assign gcount = 0 %}{% assign hcount = 0 %}{% for g in ing.generic %}{% assign gcount = gcount | plus: 1 %}{% if not_on_cards contains g %}{% assign hcount = hcount | plus: 1 %}{% endif %}{% endfor %}{% assign hidden = false %}{% if gcount > 0 and gcount == hcount %}{% assign hidden = true %}{% endif %}{% unless hidden %}{% assign label = "" %}{% for g in ing.generic %}{% assign dn = card_names[g] | default: g %}{% if label == "" %}{% assign label = dn %}{% else %}{% assign label = label | append: " or " | append: dn %}{% endif %}{% endfor %}{% assign joined = card_name_joins[label] %}{% if joined %}{% assign label = joined %}{% endif %}{% if label == "" %}{% assign label = ing.item %}{% endif %}{% capture ing_search %}{% for g in ing.generic %}{{ g }}|{% assign dn = card_names[g] %}{% if dn %}{{ dn }}|{% endif %}{% endfor %}{% for s in ing.suggestion %}{{ s }}|{% endfor %}{% endcapture %}{% if label != "" %}{% if shown > 0 %} <span class="drink-card-sep">·</span> {% endif %}<span class="drink-card-ing" data-ing="{{ ing_search | downcase }}">{{ label }}</span>{% assign shown = shown | plus: 1 %}{% endif %}{% endunless %}{% endfor %}
+              {% for ing in drink.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">·</span> {% endunless %}<span class="drink-card-ing" data-ing="{{ ing.search }}">{{ ing.label }}</span>{% endfor %}
             </p>
           {% endif %}
         </div>

@@ -18,12 +18,24 @@
 // box, and the foot is taken out of flow and pinned to the bottom.
 //
 // THE COST IS CLAMPING AND IT IS NOT AVOIDABLE. Content that does not fit is
-// cut rather than allowed to push: two lines each for the tagline and the
-// ingredient line, two rows of mood chip. A rigid grid buys its rigidity with
-// clamping, and the alternatives are a card whose height varies with mood count
-// (which unpins every anchor on it) or no moods on cards at all. Helen named
-// the trade before I did: "it's a shame to lose the card proportion but I can't
-// think of another way."
+// cut rather than allowed to push. A rigid grid buys its rigidity with clamping,
+// and the alternatives are a card whose height varies with its content (which
+// unpins every anchor on it) or no moods on cards at all. Helen named the trade
+// before I did: "it's a shame to lose the card proportion but I can't think of
+// another way."
+//
+// THE NUMBERS THIS USED TO QUOTE HAVE ALL MOVED, so they are not quoted here any
+// more -- each lives on the rule that sets it, where changing one cannot leave
+// this paragraph behind. It said "two lines each for the tagline and the
+// ingredient line, two rows of mood chip" while all three of those were false:
+// as of 2026-09-06 it is THREE lines of ingredients (#552), up to THREE rows of
+// mood chip, and the tagline is not on the card at all (#512, a fortnight ago).
+//
+// WHERE THE THIRD INGREDIENT LINE CAME FROM belongs here, because it is the one
+// place the fixed height nearly failed: the foot used to stack its chips ABOVE
+// the ship and reserve both on every card, whether or not the chips filled the
+// space. Laying them side by side returned 23px to the body without touching
+// $card-height. See `.drink-card-foot`.
 //
 // $card-text-x IS THE SINGLE SOURCE OF THE TITLE'S LEFT EDGE. The glass column
 // is exactly that wide, and the body, the foot and the under-mark all start
@@ -575,19 +587,29 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // Jamaican, Demerara. This rule now lowercases those too.
   text-transform: lowercase;
   display: -webkit-box;
-  // TWO LINES, AND IT STAYS TWO — Helen, 2026-09-04, deciding the audit's
-  // critical #9 off a candidates page on the real index. A third line was one
-  // of the treatments offered and she turned it down for a reason that is
-  // about the DATA rather than about the card: "Let's stick with two lines of
-  // ingredients -- when we get issue #691 done (ingredients in importance
-  // order) I expect two lines will get the point across plus leave some comfy
-  // real estate on the cards."
+  // THREE LINES SINCE 2026-09-06 -- #552, and this REVERSES a ruling rather
+  // than filling a gap, so both halves are kept.
   //
-  // So the fix for a clamped ingredient line is #691 — putting the ingredients
-  // that decide whether you want this drink FIRST — not a taller clamp. A
-  // third line would also cost the card its air, and the two-line tape below
-  // needs somewhere for its extra line to come from. Do not raise this to 3.
-  -webkit-line-clamp: 2;
+  // IT WAS TWO, AND THAT WAS HELEN'S CALL TOO, on 2026-09-04, off a candidates
+  // page on the real index. A third line was one of the treatments offered and
+  // she turned it down for a reason about the DATA rather than the card:
+  // "Let's stick with two lines of ingredients -- when we get issue #691 done
+  // (ingredients in importance order) I expect two lines will get the point
+  // across plus leave some comfy real estate on the cards." This comment then
+  // said, in as many words, "Do not raise this to 3."
+  //
+  // #691 LANDED AND THE PREDICTION DID NOT HOLD, which is the honest reading.
+  // Ordering by importance helps and is not enough on its own: "showing three
+  // lines is appropriate given the number of tiki drinks I have!" A tiki drink
+  // is four spirits, three juices, a syrup and a falernum -- nine or ten items
+  // where the median drink has five. Two lines fits the median and clips the
+  // family this collection is largely about.
+  //
+  // THE COST THE OLD COMMENT NAMED IS REAL AND IS BEING PAID. A third line
+  // takes air from the card, and the two-line tape needs somewhere for its
+  // extra line to come from; both were true then and are true now. Helen has
+  // the cards in front of her and has chosen the trade.
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-size: 0.82rem;
@@ -637,6 +659,37 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // the container is anchored to the BOTTOM and the goodness line is its last
 // child at a fixed line-height, so the mark sits in the same place whether the
 // chips take one row or two. Chips grow upward into the card.
+// ONE ROW SINCE 2026-09-06, NOT TWO STACKED BLOCKS -- Helen, with a screenshot
+// of the Sapins Swizzle: "we could stand to move the chips on cards downwards,
+// encroaching into the ship row. This would allow the third line of ingredients
+// even when there are two lines of chips, and even maybe three lines of chips as
+// well where needed."
+//
+// WHAT THE OLD SHAPE COST, in the card's own units. The foot is anchored to the
+// bottom and grew upward, and it stacked: chips, then 0.45rem, then the ship's
+// 1rem line. So it always reserved
+//
+//     2 chip rows (2 x $chip-line + 0.28rem + 4px)   45.3px
+//   + the gap                                         7.2px
+//   + the ship's own line                            16.0px
+//   = 68.5px
+//
+// ...even on a card whose chips filled one row, and the ship's line was empty
+// across everything but its right-hand end. That reserved band is the dead
+// space in her screenshot, and it is what the third ingredient line needed.
+//
+// SIDE BY SIDE, BOTTOM-ALIGNED, the foot is as tall as the CHIPS alone: 45.3px
+// at two rows, so 23px comes back to the body -- which is where #552's third
+// ingredient line lives. Three chip rows cost 66px, still under the 68.5px the
+// old shape reserved unconditionally, so no card is worse off than it was.
+//
+// THE COST, AND IT IS REAL: the ship now takes horizontal room from EVERY chip
+// row rather than none, because a flex row cannot narrow only its last line.
+// The ship is "MEH" at about 4rem and "OH GODS YES" at about 8, so a long
+// verdict on a chip-heavy drink may wrap one word further than it used to.
+// Flagged rather than hidden -- it is the kind of thing to judge on the real
+// index, and if it reads badly the answer is to float the ship inside a
+// non-flex chip row, which is a bigger change to a recently-debugged area.
 .drink-card-foot {
   position: absolute;
   // Same gutter as the body above, so the title and the foot share one left
@@ -645,6 +698,16 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   left: calc(var(--card-text-x) + #{$card-gutter});
   right: $card-pad-x;
   bottom: $card-foot-y;
+
+  display: flex;
+  // FLEX-END, so the chips' LAST row sits on the ship's line -- which is what
+  // "encroaching into the ship row" means. Aligning to the top would leave the
+  // same dead band, lower down.
+  align-items: flex-end;
+  // The chips' own column-gap is 0.9rem and holds a separator dot. This gap
+  // separates two different things and is the card's own gutter, so the ship
+  // reads as a neighbour rather than as another chip.
+  gap: $card-gutter;
 }
 
 .drink-card-moods {
@@ -673,9 +736,18 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // Stated as a calc against the same tokens rather than a rounded literal, so
   // changing $chip-line or the chip's border moves this with it instead of
   // silently re-clipping.
-  max-height: calc(#{$chip-line * 2} + 0.28rem + 4px);
+  // THREE ROWS SINCE 2026-09-06, up from two -- Helen: "even maybe three lines
+  // of chips as well where needed". Same arithmetic as before, one row wider:
+  // three line-heights, the two row-gaps between them, and the 2px of border
+  // each row carries. Still a calc against the tokens rather than a literal, so
+  // changing $chip-line moves it instead of silently re-clipping.
+  max-height: calc(#{$chip-line * 3} + #{0.28rem * 2} + 6px);
   overflow: hidden;
-  margin-bottom: 0.45rem;
+  // NO BOTTOM MARGIN ANY MORE. It separated the chips from the ship when the
+  // ship sat BELOW them; the ship is now beside them and the foot's `gap` does
+  // that job on the other axis. Leaving it would lift the chips off the ship's
+  // baseline, which is the alignment the whole change is for.
+  flex: 1 1 auto;
 }
 
 // A BARE WORD, NOT A BOXED CHIP, SINCE 2026-09-04 -- the design audit's
@@ -961,6 +1033,10 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // publish, a mark with no word became a rating that says nothing. The word is
 // punctuation rather than a sixth term, which is the whole of why it is safe.
 .drink-card-ship {
+  // `flex: none` so the verdict never shrinks or wraps: it is `white-space:
+  // nowrap` below, and a flex item that is allowed to shrink below its content
+  // would overflow rather than compress. The chips take what is left.
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: flex-end;
