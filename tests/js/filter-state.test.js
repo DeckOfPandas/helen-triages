@@ -224,8 +224,11 @@ test('hasNarrowingFilter INCLUDES nameQuery -- a title search keeps the list on 
   assert.strictEqual(FS.hasNarrowingFilter(stateWithOnly('nameQuery')), true);
 });
 
-test('hasNarrowingFilter INCLUDES tags, star and meta', () => {
-  ['tags', 'star', 'meta'].forEach((field) => {
+test('hasNarrowingFilter INCLUDES tags and star', () => {
+  // `meta` was here until 2026-09-06, when the META FILTERS block came off the
+  // index and the field went with it -- see filter-state.js's own note where
+  // its predicate used to be.
+  ['tags', 'star'].forEach((field) => {
     assert.strictEqual(FS.hasNarrowingFilter(stateWithOnly(field)), true, field);
   });
 });
@@ -386,10 +389,11 @@ test('a missing or undefined state is answered, not thrown at', () => {
 
 test('serialise turns Sets into arrays, because JSON silently will not', () => {
   // JSON.stringify(new Set(['a'])) is "{}" -- not an error, not an empty array,
-  // just nothing. Three of the eight fields are Sets, so a state put through
-  // raw JSON comes back with its tags, exclusions and meta filters quietly
-  // emptied. That is the bug this function exists to prevent, and it is worth
-  // stating in a test because the naive version LOOKS like it works.
+  // just nothing. Two of the fields are Sets, so a state put through raw JSON
+  // comes back with its tags and its exclusions quietly emptied. That is the
+  // bug this function exists to prevent, and it is worth stating in a test
+  // because the naive version LOOKS like it works. (It was three Sets until
+  // 2026-09-06 and the third was `meta`.)
   assert.strictEqual(JSON.stringify(new Set(['soup'])), '{}');
 
   const state = FS.emptyState();
@@ -404,7 +408,6 @@ test('a full state survives a round trip through JSON', () => {
   state.tags.add('soup');
   state.star = 'beef';
   state.excludedIngredients.add('peas');
-  state.meta.add('rewrite');
   state.nameQuery = 'stew';
   state.ingredient = 'cavolo nero';
   state.isSearching = true;
@@ -414,7 +417,6 @@ test('a full state survives a round trip through JSON', () => {
   assert.deepStrictEqual([...back.tags], ['soup']);
   assert.strictEqual(back.star, 'beef');
   assert.deepStrictEqual([...back.excludedIngredients], ['peas']);
-  assert.deepStrictEqual([...back.meta], ['rewrite']);
   assert.strictEqual(back.nameQuery, 'stew');
   assert.strictEqual(back.ingredient, 'cavolo nero');
   assert.strictEqual(back.isSearching, true);
@@ -643,15 +645,18 @@ test('the name query is a substring of the FOLDED title, both sides folded', () 
     FS.rowMatchesFilters(ROW({ titleFolded: 'lamb tagine' }), state, EXACT), false);
 });
 
-test('the draft filter is boolean, and asks nothing at all when it is off', () => {
-  const state = EMPTY();
-  state.meta = new Set(['draft']);
-  assert.strictEqual(FS.rowMatchesFilters(ROW({ isDraft: true }), state, EXACT), true);
-  assert.strictEqual(FS.rowMatchesFilters(ROW({ isDraft: false }), state, EXACT), false);
-  // Off: both survive. #562 left `draft` as the only meta filter, and it is a
-  // fact about which collection a row came from rather than a state of
-  // completion -- so with the button unpressed it says nothing about anything.
+test('a draft row is not filtered on any more, in either direction', () => {
+  // THE REPLACEMENT FOR A TEST THAT WENT, rather than a deletion. Until
+  // 2026-09-06 this asserted that `meta: draft` kept drafts and dropped the
+  // rest; Helen removed the META FILTERS block ("it was useful when I was still
+  // ingesting recipes I know, but it's not now I've done most of that") and the
+  // field went with it.
+  //
+  // What is worth pinning now is the OTHER half of the old test, which has not
+  // changed and is easy to break by accident: `isDraft` is still on the row --
+  // it renders the `draft` badge -- and no filter may quietly start reading it.
   assert.strictEqual(FS.rowMatchesFilters(ROW({ isDraft: true }), EMPTY(), EXACT), true);
+  assert.strictEqual(FS.rowMatchesFilters(ROW({ isDraft: false }), EMPTY(), EXACT), true);
 });
 
 test('the ingredient key drops its (all) suffix before it is matched', () => {
@@ -680,8 +685,7 @@ test('the row rules are ALL of them, and each one alone can drop a row', () => {
   const cases = [
     ['tags', (s) => { s.tags = new Set(['nonexistent']); }],
     ['star', (s) => { s.star = 'beef'; }],
-    ['nameQuery', (s) => { s.nameQuery = 'zzz'; }],
-    ['meta.draft', (s) => { s.meta = new Set(['draft']); }]
+    ['nameQuery', (s) => { s.nameQuery = 'zzz'; }]
   ];
   cases.forEach(([name, apply]) => {
     const state = EMPTY();

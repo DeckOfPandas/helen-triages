@@ -200,15 +200,14 @@
     ingredient: { empty: function () { return null; }, narrows: false },
 
     // The meta filters (rewrite/proofread/short/draft), local builds only.
-    meta: { empty: function () { return new Set(); }, narrows: true },
 
     /* SHOW ONLY WHAT IS SHORTLISTED — GitHub issue #546. A boolean, and the
        first one in this table that is a real filter rather than a
        half-finished-search flag.
 
        THE ANSWER IS NOT ON THE ROW, which is what makes this field different
-       from every other one here. `tags`, `star` and `meta` are all matched
-       against something the build wrote into the markup; whether a recipe is
+       from every other one here. `tags` and `star` are both matched against
+       something the build wrote into the markup; whether a recipe is
        shortlisted is a fact about THIS BROWSER, held in localStorage by
        HTF.shortlist. rowMatchesFilters stays pure by being handed the answer
        (`row.shortlisted`) rather than reaching for the store itself — the same
@@ -450,13 +449,15 @@
 
     if (s.nameQuery && String(r.titleFolded || '').indexOf(s.nameQuery) === -1) return false;
 
-    /* ONE META FILTER, AND `draft` IS IT -- issue #562 removed the other four
-       (`rewrite`, `proofread`, `no-short`, `has-short`) and their attributes
-       with them. `draft` needs none of the care they did: every row either is
-       a draft or is not, where "does this have a short method" had no answer
-       at all for a magic-bag row and needed three values to say so. */
-    if (s.meta && typeof s.meta.has === 'function' &&
-        s.meta.has('draft') && !r.isDraft) return false;
+    /* NO META FILTER ANY MORE -- Helen, 2026-09-06: "I don't want this block
+       on the index page any more. It was useful when I was still ingesting
+       recipes I know, but it's not now I've done most of that."
+
+       All five have now gone: issue #562 removed `rewrite`, `proofread`,
+       `no-short` and `has-short`, and `draft` followed. Removed wholesale
+       rather than left inert -- the `meta` field is out of FOOD_FIELDS, the
+       row attribute is off every <li>, and the buttons and their styles are
+       gone. An unread field reads as a live fact to the next person. */
 
     /* SHORTLISTED — #546. `row.shortlisted` is the caller's answer from
        HTF.shortlist, not a data- attribute: the build cannot know what is in
@@ -620,8 +621,8 @@
     isFieldSet: isFieldSet,
     FAMILY_SUFFIX: FAMILY_SUFFIX,
     excludesRow: excludesRow,
-    // The pair, and food-shaped: tags, star, name, meta and the one ingredient
-    // key are the food index's questions. The cocktail index asks a different
+    // The pair, and food-shaped: tags, star, name and the one ingredient key
+    // are the food index's questions. The cocktail index asks a different
     // five and answers them in cocktail-index.js against COCKTAIL_FIELDS.
     rowMatchesFilters: rowMatchesFilters,
     arrivedByGoingBack: arrivedByGoingBack,

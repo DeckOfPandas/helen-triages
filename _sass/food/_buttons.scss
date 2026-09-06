@@ -42,7 +42,7 @@
   }
 }
 
-.btn-tag, .btn-star, .btn-clear, .btn-meta {
+.btn-tag, .btn-star, .btn-clear {
   &:focus-visible {
     outline: none;
     background-color: rgba($color-text, 0.15);

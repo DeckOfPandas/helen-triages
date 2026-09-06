@@ -207,38 +207,32 @@ permalink: /food/
     </div>
   </div>
 
-  {% comment %} ONE META FILTER -- GitHub issue #562, Helen: "reduce meta
-     filters on local site to draft".
+  {% comment %} NO META FILTERS BLOCK ANY MORE -- Helen, 2026-09-06: "I don't
+     want this block on the index page any more. It was useful when I was still
+     ingesting recipes I know, but it's not now I've done most of that."
 
-     There were five: needs rewrite, needs proofread, no short method, has short
-     method, and draft. Four of them answered "is this recipe finished yet",
-     which is a question she does not need this page to ask -- the same call she
-     made about cocktails' `meta.status`: "I am perfectly well aware of how much
-     work I have done on each drink."
+     THE WHOLE SECTION IS GONE, not just hidden. It went the way its own four
+     siblings went under #562, and for the same stated reason: an attribute
+     nothing reads is worse than one that is absent, because it reads as a live
+     fact to the next person. So `data-meta-draft` came off every row,
+     `filters.js`'s four branches went, and `filter-state.js` lost the `meta`
+     field from FOOD_FIELDS entirely.
 
-     `draft` is the survivor because it is not that kind of question. It is a
-     fact about which COLLECTION a row came from, and it decides whether the row
-     you are looking at exists on the live site at all.
+     THE HISTORY, BECAUSE IT IS THE SECOND HALF OF ONE DECISION. There were five
+     meta filters: needs rewrite, needs proofread, no short method, has short
+     method, and draft. #562 removed four in 2026-08 -- they answered "is this
+     recipe finished yet", which Helen does not need this page to ask ("I am
+     perfectly well aware of how much work I have done on each drink"). `draft`
+     survived because it was a different kind of question: which COLLECTION a row
+     came from. That question has now expired too, for the reason she gives
+     above -- it was a tool for the ingest phase, and the ingest phase is
+     largely done.
 
-     This block is still local-only, gated on show_source_wording. The whole
-     section is one button now, which is where "reduce vertical space plenty"
-     comes from -- no new spacing rule, just four fewer controls.
-
-     The removed filters read data-meta-rewrite, -proofread and -short off each
-     row; those attributes went with them, along with filters.js's branches. An
-     attribute nothing reads is worse than one that is absent, because it reads
-     as a live fact to the next person. git log has all four if they are
-     wanted back. {% endcomment %}
-  {% if site.show_source_wording %}
-  <div class="category category--meta">
-    <div class="category-label-row">
-      <span class="category-label"><span class="category-label-text">META FILTERS</span></span>
-    </div>
-    <div class="category-buttons">
-      <button type="button" class="btn-meta" aria-pressed="false" data-meta="draft">draft</button>
-    </div>
-  </div>
-  {% endif %}
+     THE DRAFT BADGE ON A ROW STAYS. It is not the filter and was not what she
+     pointed at: `is_draft` still renders a `draft` pill further down, so a row
+     that does not exist on the live site still says so. What has gone is the
+     ability to filter BY it. git log has the control if it is ever wanted
+     back. {% endcomment %}
 
 </div>
 
@@ -297,19 +291,20 @@ permalink: /food/
       {% assign is_draft = false %}
       {% if recipe.collection == "food_drafts" %}{% assign is_draft = true %}{% endif %}
 
-      {% comment %} `is_draft` IS THE ONLY META FACT A ROW CARRIES NOW -- issue
-         #562, and see the META FILTERS block above for why the other four went.
+      {% comment %} `is_draft` IS A BADGE NOW AND NOT A FILTER -- 2026-09-06.
+         It is still derived here and still renders a `draft` pill below, so a
+         row that does not exist on the live site says so. What went with the
+         META FILTERS block is the row ATTRIBUTE it used to write
+         (`data-meta-draft`) and the control that read it.
 
-         What stood here derived _needs_rewrite, _needs_proofread and a
-         three-valued _has_short, all three carefully written so a magic-bag row
-         would fail every one of them rather than default into them: left to the
-         defaults an entry answers TRUE to all three (no `meta.rewritten`, no
-         `meta.proofread`, no `method_short`) and pads three working lists with
-         dishes that can never leave them.
-
-         That care is not lost, it is spent -- the lists it protected no longer
-         exist. `is_draft` needs none of it, because it asks which collection a
-         row came from, which every row can answer. {% endcomment %}
+         Five meta facts have now been through this same door. #562 removed
+         four -- _needs_rewrite, _needs_proofread and a three-valued _has_short,
+         all carefully written so a magic-bag row would fail every one rather
+         than default into them, because left to the defaults an entry answers
+         TRUE to all three and pads three working lists with dishes that can
+         never leave them. That care was not lost, it was spent: the lists it
+         protected stopped existing. `draft` followed on 2026-09-06 for the
+         reason recorded where the block used to be. {% endcomment %}
       {% comment %} THE DERIVED INGREDIENT INDEX -- GitHub issue #52, the
          "they hate peas" filter. Every ingredient_groups item on this recipe,
          not main_ingredients.
@@ -461,7 +456,7 @@ permalink: /food/
          inside it: filters.js asks this question once per row per filter pass,
          and its own `titleFolded` comment is about exactly that cost.
       {% endcomment %}
-      <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}" data-meta-draft="{{ is_draft }}">
+      <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}">
 
         <div class="recipe-row-content">
         <a class="recipe-title-link" href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>

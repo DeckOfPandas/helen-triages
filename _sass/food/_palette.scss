@@ -57,7 +57,11 @@ $font-headings: "Courier Prime", "Courier New", "Courier", monospace;
 // the same reason stated differently: `.category-label` at 1.35rem read as a
 // second HEADING font rather than a label font; `.btn-tag`/`.btn-star`/
 // `.btn-meta` and `.badge` broke the pairing between a filter word and the
-// same word elsewhere, which had to match; `.recipe-title-link` failed on
+// same word elsewhere, which had to match (`.btn-meta` itself has since gone --
+// the META FILTERS block was removed on 2026-09-06 -- but it is left named here
+// because this paragraph is the RECORD of what was tried, and rewriting the
+// evidence to match today's classes would quietly weaken it);
+// `.recipe-title-link` failed on
 // nothing measurable and came back anyway ("I could justify it
 // intellectually... but it could well be that I got used to seeing the
 // typewriter effect and now I miss it"). The FIFTH, `.note-label`, took
