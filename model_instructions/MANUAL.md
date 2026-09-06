@@ -283,10 +283,21 @@ second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
 **The nav is one row, the same everywhere**: one icon per site in
 `sites.yml`, in that file's order, then the `??` about link at a literal
 `/about/`. **The footer's reference block is a column PER SITE, gated on
-having material** — food's two links appear on a cocktail page, and a
-`[ COCKTAILS ]` column appears the day cocktails has reference pages, with no
-template change. The hearts are pinned to grid column 2 so a second column
-cannot push them off centre.
+having material** — food's two links appear on a cocktail page, and since
+2026-09-06 (#529) a `[ COCKTAILS ]` column appears beside them, which cost no
+template change: the loop always asked every site rather than food. The hearts
+are pinned to grid column 2 so a second column cannot push them off centre.
+
+**A link may be `local_only: true`, and it gates the LINK, not the page.** The
+template drops such a link unless `show_local_reference_links` is set, which
+only `_config_local.yml` declares — so production renders exactly what it did
+before the key existed, and a site left with no surviving links draws no column
+rather than an empty bracketed word. **It is half a switch and must be set and
+cleared with the other half**, `published: false` on the page itself (§14):
+a link with no page is a 404 in the one place that matters, and a page with no
+link is reachable only by typing the URL. `test_site_nav_links_resolve_to_real_pages`
+INVERTS for such a link rather than skipping it — it must point at a page that
+IS unpublished — so clearing either flag alone goes red.
 
 **Two guards, and neither substitutes for the other:**
 `test_the_header_and_footer_are_identical_on_every_page` compares the
@@ -2515,7 +2526,14 @@ Showing her the thing is always allowed, and is how rulings move.
 
 ## 14. Reference pages and the internal-temperatures data layer
 
-### What exists
+**BOTH SITES HAVE A REFERENCE LAYER SINCE 2026-09-06.** Most of this section is
+food's, which is the older and much larger half; §14.6 is cocktails'. What the
+two share is the entry route — a footer column per site, no nav link, no
+`index.html` — and nothing else: they do not share a page anatomy, a stylesheet
+or a data shape, and "The cocktails reference layer" below says why that is
+correct rather than unfinished.
+
+### What exists (food)
 
 `food/reference/` holds two pages: `internal-temperatures.html` (the charts)
 and `cooking-methods-and-timings.html` (a weight → schedule calculator plus
@@ -2596,3 +2614,59 @@ The tables page is gone (#382) and the lesson from its predecessor is about
 crosslinks: two views of one dataset must point at each other well, which is
 why every protein section on the charts carries a `?protein=` link into the
 calculator.
+
+### The cocktails reference layer
+
+One page, `cocktails/reference/rum-categories.html` (#529), built 2026-09-06.
+**It is `published: false` and local-only** until Helen signs the copy off; see
+§2.5 for the other half of that switch and why both halves must move together.
+Deleting the `published: false` line and the `local_only: true` flag is the
+whole of shipping it.
+
+**Why it is not the encyclopaedia #459 rules out.** A bare list of the fourteen
+categories would be `rum_styles` reprinted. #501 moved a question from the card
+to the reader — cards stopped naming bottles and started naming categories — so
+*"which of mine is a Demerara rum?"* had nowhere to be answered. **The bottles
+column is what carries the justification**, not the category list, and that is
+the test to apply to any second page here.
+
+**Every string on it is a lookup.** Categories are `rum_styles`; the short names
+are `card_names`; the bottles are the `bottles.yml` entries whose `generic` is
+that category; the retired words AND their reasons are `retired_rum_styles`;
+Ceylon arrack's note is `family_less`; the sipping shelf is `bottles.yml`'s
+`sipping`. Nothing on the page restates a fact the data holds — which is the
+failure #314's own closing comment fell into three times over, a rule written
+once as a list and going stale with nothing looking.
+
+**Two things it reads that no rule derives, so both are declared and both have
+guards:**
+
+| Declared in | What it is | Guard |
+|---|---|---|
+| `rum_groups` (`ingredients.yml`) | Helen's five shelves — Jamaican rum, Demerara rum, Cane juice, Non-geographical, Flavoured | `test_rum_groups_partition_the_styles`: every style in exactly one group |
+| the CASE of a `retired_rum_styles` key | lowercase = a WORD a recipe asks for (shown); capitalised = a BOTTLE whose brand-generic was retired (hidden) | `test_retired_rum_style_keys_split_by_case` |
+
+The first is the important one. **The page walks the GROUPS, not `rum_styles`**,
+so a fifteenth style added and not placed would be invisible with nothing else
+failing.
+
+**`.ref-*` is its own page anatomy, and food's trick was not available.** Food's
+reference pages reuse `.recipe`/`.recipe-body-content` and the only table CSS on
+the site — all of it in `_sass/food/`. This site's own anatomy is a DRINK's: a
+title block reserving a column for a glass drawing, an ingredients grid built
+round an amount column. So `_sass/cocktails/_reference.scss` borrows where there
+is something to borrow (the drink page's absinthe-over-violette heading mark;
+`.cocktail-suggestion`'s wicked-woowoo for a bottle name, because woowoo means
+ASKED FOR and a bottle name here is literally the same value as one in brackets
+on a drink page) and draws the rest. **One hue, deliberately** — a second is a
+new-hue decision, which is Helen's (§13.12).
+
+**A category with no bottle is correct and is not a gap to fill.** `overproof
+Demerara rum, lightly aged` has none since El Dorado 151 came off on 2026-09-05
+(*"I don't own it, I just wanted to"*). The generic stays because a drink still
+asks for it.
+
+**The prose is not the site's voice yet.** The retired-word reasons were written
+for the next Claude — they cite issue numbers and name YAML keys — and render in
+full at Helen's instruction (*"I'll copyedit when I get to it"*). That, and five
+short strings on the page, are tracked at **#784**. Do not polish them.
