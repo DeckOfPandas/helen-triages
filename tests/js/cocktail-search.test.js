@@ -13,7 +13,7 @@
 // WHY THIS FILE EXISTS AT ALL, since cocktail-index.js ran untested for weeks:
 // every behaviour below was hand-rolled inside 428 lines of DOM wiring, where
 // the only way to ask it a question was to open a browser and type. back-link.js
-// is the argument (HANDOVER §3) and it applies exactly: "does a chip named `gin`
+// is the argument (MANUAL §3) and it applies exactly: "does a chip named `gin`
 // exclude a drink whose only gin-shaped ingredient is ginger syrup?" is a
 // question a pure function can be asked and a page cannot.
 // =============================================================================
@@ -559,7 +559,7 @@ test('both rules fold, so an accented ingredient is filterable at all', () => {
 // nephew' and 'wray & nephew' should both collapse onto the latter."
 //
 // Both are answered by the same change, and _data/cocktails/bottles.yml had
-// already declared both answers -- the search simply never read it. HANDOVER
+// already declared both answers -- the search simply never read it. MANUAL
 // §9.10.1 names the gap outright: "suggestions go in raw rather than resolved
 // through bottles.yml's aliases, so `Havana 3` and `Havana Club 3` can both
 // appear."
@@ -808,7 +808,7 @@ test('an empty name query matches everything, rather than nothing', () => {
 });
 
 // --- the highlight -----------------------------------------------------------
-// #564: the card must be able to say WHY it survived, which HANDOVER §9.13
+// #564: the card must be able to say WHY it survived, which MANUAL §9.13
 // makes the card's one job. The drink page equivalent is filters.js's
 // updateTitleHighlights().
 

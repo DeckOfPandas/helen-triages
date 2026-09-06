@@ -11,7 +11,7 @@
 // `window.HTF` rather than exporting. Requiring it from Node throws on
 // `window` before it defines anything.
 //
-// So the page is stubbed instead, which is HANDOVER §10.2's diagnostic trick
+// So the page is stubbed instead, which is MANUAL §10.2's diagnostic trick
 // written down once rather than re-derived: build a fake `window`/`document`,
 // `vm.runInContext` the real source file into it, and read what it attached.
 // The script under test is the shipped one, byte for byte — nothing here

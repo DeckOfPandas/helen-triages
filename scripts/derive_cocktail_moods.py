@@ -21,7 +21,7 @@ Three things follow, and all three are the point of this file:
   * THE SCRIPT IS COMMITTED, IN THE PUBLIC REPO, so re-running it after a
     vocabulary change is a thing anyone can do rather than a thing one session
     knew how to do.
-  * IT DEFAULTS TO A DRY RUN. Writing needs --write. HANDOVER 12: run it once
+  * IT DEFAULTS TO A DRY RUN. Writing needs --write. MANUAL 12: run it once
     and diff before letting it near a tracked file.
 
 DERIVATION IS A STARTING POINT, NOT THE AUTHORITY. A drink Helen thinks is tiki
@@ -387,7 +387,7 @@ def load_sets(taxonomy, vocab):
     rather than any key -- reports the key as rendered and fails the suite.
 
     It happened twice while this file was being written, the second time in a
-    paragraph explaining the first. HANDOVER 12 lists five prior instances of
+    paragraph explaining the first. MANUAL 12 lists five prior instances of
     prose defeating a source-scanning guard, the very first of which is a hook
     refusing the commit that introduced it. Say "revised".
     """
@@ -416,7 +416,7 @@ def load_drinks():
 def rewrite_mood(text, moods):
     """Replace the `mood:` block, as TEXT.
 
-    NEVER THROUGH A YAML DUMPER. HANDOVER 12: not one of the several hundred
+    NEVER THROUGH A YAML DUMPER. MANUAL 12: not one of the several hundred
     front-matter edits in this project's history has gone through one, because
     a round trip loses comment placement, key order and quoting style -- right
     in a spot check and wrong across a hundred files.

@@ -113,7 +113,7 @@
   // across a page turn is the whole failure mode of a printed recipe.
   //
   // This matters more than usual for a step. `.method-full li` carries its
-  // number as an absolutely-positioned ::before (issue #94 / HANDOVER §4.2 —
+  // number as an absolutely-positioned ::before (issue #94 / MANUAL §4.2 —
   // it is not flex, precisely so a step can contain a nested list). An
   // absolutely-positioned box does not fragment: were a step allowed to break
   // across sheets, the number would stay behind with the first half and the

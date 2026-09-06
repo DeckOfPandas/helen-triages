@@ -62,7 +62,7 @@
 # `ml: 25`. Helen: "Food YAML has this structure, and I'd like cocktails to
 # match" -- one quantity field, a display string, as a food recipe has.
 #
-# MEASURED BEFORE DELETING, because the pair was justified (HANDOVER 9.3) on
+# MEASURED BEFORE DELETING, because the pair was justified (MANUAL 9.3) on
 # the grounds that "the string carries units a number cannot". True of
 # "0.5 oz" and "3 dashes". False of "25 ml", which was 376 of the 619 entries.
 # Across the whole collection 521 entries carried both and ALL 521 derive
@@ -79,7 +79,7 @@
 #
 # THE CONVERSIONS ARE A DECISION, NOT ARITHMETIC. 1 oz is 30 ml here and not
 # 29.5735 -- bar-standard rounding, which keeps ratios clean. Recorded in
-# HANDOVER 9.4 as a decision and written down nowhere executable until now.
+# MANUAL 9.4 as a decision and written down nowhere executable until now.
 measures:
   per_ml:
     ml: 1
@@ -88,7 +88,7 @@ measures:
     tsp: 5
 
   # Units that count or weigh something, never a volume. An amount in one of
-  # these has no millilitre figure and is not missing one -- HANDOVER 9.3: "a
+  # these has no millilitre figure and is not missing one -- MANUAL 9.3: "a
   # dash is not 0.8 ml in any way worth writing down". A consumer checks
   # whether a figure came back rather than assuming one did.
   non_volumetric:
@@ -497,7 +497,7 @@ hers_to_apply:
     it. Helen has said twice that she never reaches for Blackwell in the
     drinks it kept being applied to; a session put cobra-effect into it from
     item text anyway, and she reverted that on 2026-08-30, ruling the drink
-    `moderately aged Jamaican rum` with no suggestion at all. HANDOVER 9.3.2
+    `moderately aged Jamaican rum` with no suggestion at all. MANUAL 9.3.2
     already said "it is hers to apply: never retype a drink into it from item
     text", in prose, and prose did not hold.
 
@@ -1182,10 +1182,10 @@ liqueurs:
 # THE FRENCH NAMES, AND THIS IS THE SECOND TIME THE DECISION HAS BEEN MADE.
 # Helen, 2026-08-29, on seeing `green chartreuse` in the picker: "an earlier
 # Claude and I agreed that names were chartreuse verte and jaune". The agreement
-# was real and was written down NOWHERE -- not here, not in the handover, not in
+# was real and was written down NOWHERE -- not here, not in the manual, not in
 # either repo's history, checked before asking her to repeat herself. So it was
 # made, never applied, and had no way of surviving the session it happened in.
-# That is HANDOVER §11.2's failure in its purest form, and the note is the fix:
+# That is MANUAL §11.2's failure in its purest form, and the note is the fix:
 # a decision that lives only in a conversation gets made again.
 #
 # They are what the bottles say on their labels. `Chartreuse Verte` also stops
@@ -1335,7 +1335,7 @@ bitters:
 # 1:1 AND 2:1 ARE SEPARATE GENERICS. "Simple syrup" means 1:1. Only 2 of 27
 # entries state a ratio, and syrup-to-citrus volume CANNOT tell them apart -- a
 # declared 1:1 (Daisy de Santiago) and a declared 2:1 (Long Island) both sit at
-# 0.50, because Helen adjusts sugar deliberately. See HANDOVER §9.4.1: the site
+# 0.50, because Helen adjusts sugar deliberately. See MANUAL §9.4.1: the site
 # is canon and she deviates in the kitchen.
 syrups:
   - "cane sugar syrup 1:1"

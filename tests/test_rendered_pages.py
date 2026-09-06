@@ -357,7 +357,7 @@ def test_every_icon_partial_class_has_a_styled_base(site):
     so the icon partials — which are `.svg` — have never been looked at. That is
     31 files including the whole `glasses/` set, and a typo'd class in any of
     them renders an unstyled shape and fails nothing. Same shape as the stale
-    globs in HANDOVER §12: not a scan that matched nothing, but a source list
+    globs in MANUAL §12: not a scan that matched nothing, but a source list
     that quietly stopped covering the files.
 
     WHY THIS IS A SEPARATE TEST WITH A DIFFERENT RULE, rather than four more
@@ -366,7 +366,7 @@ def test_every_icon_partial_class_has_a_styled_base(site):
     modifiers whose base is styled** — `glass-icon--rocks` beside
     `.glass-icon`, `nav-icon--food` beside `.nav-icon`. Not one modifier is
     styled anywhere in either stylesheet. So modifiers here are hooks, exactly
-    as HANDOVER 11.3 describes, and demanding a rule for each would report 31
+    as MANUAL 11.3 describes, and demanding a rule for each would report 31
     failures that are all correct code. The rule that actually catches bugs is
     that the BASE resolves.
 
@@ -416,7 +416,7 @@ def test_every_icon_partial_class_has_a_styled_base(site):
         "Icon classes whose base has no rule in either stylesheet, so they "
         "render as unstyled shapes:\n  " + "\n  ".join(orphans)
         + "\n\nA BEM modifier with a styled base is fine — an unused hook, "
-          "HANDOVER 11.3. A base with no rule at all is a typo or a deletion "
+          "MANUAL 11.3. A base with no rule at all is a typo or a deletion "
           "that took the rule and left the markup."
     )
 
@@ -959,7 +959,7 @@ def test_every_chrome_class_has_a_rule_in_every_site_stylesheet(site):
     # test_every_class_we_emit_has_a_rule_in_the_stylesheet above, and asserting
     # it here would fire on .nav-icon--food, .nav-icon--martini and
     # .footer-icon--github. Those three are BEM modifier hooks sitting beside
-    # bases that ARE styled (HANDOVER 11.3), styled by nobody, consistently, on
+    # bases that ARE styled (MANUAL 11.3), styled by nobody, consistently, on
     # both sites -- which is not a fork and is not what this test is about.
     #
     # (They are nonetheless invisible to the test that should own them, because
@@ -992,7 +992,7 @@ def test_every_published_page_links_a_stylesheet(prod_site):
     So a page whose site_key is missing -- or misspelled, or lost when the page
     moved out of the directory whose _config.yml default supplied it -- links NO
     STYLESHEET AT ALL. Not a fallback, not a broken href: the tag simply does
-    not render. HANDOVER 2.4 records that this is the designed behaviour and
+    not render. MANUAL 2.4 records that this is the designed behaviour and
     worth knowing before adding a root-level page.
 
     IT THEN HAPPENED, IMMEDIATELY, IN THE COMMIT THAT ADDED THE FIRST ONE.
@@ -1044,7 +1044,7 @@ def test_every_published_page_links_a_stylesheet(prod_site):
 def test_both_ingredient_pickers_mark_their_word_matches(site):
     """The include and exclude pickers must agree on emphasising a real match.
 
-    HANDOVER 8.1: these are not two implementations. Both call
+    MANUAL 8.1: these are not two implementations. Both call
     `IS.buildMasterList` and `IS.search`, get back the same ranked results with
     the same `hasWordMatch` flag on each, and differ only in what corpus was fed
     in. So a treatment that one applies and the other does not is drift, not a
@@ -1120,7 +1120,7 @@ def test_both_ingredient_pickers_mark_their_word_matches(site):
 
     assert not problems, (
         "The two ingredient pickers have drifted apart:\n  " + "\n  ".join(problems)
-        + "\n\nThey share one code path and one set of ranked results (HANDOVER "
+        + "\n\nThey share one code path and one set of ranked results (MANUAL "
           "8.1). A match treatment on one and not the other is drift. The shared "
           "emphasis lives in _sass/food/_buttons.scss as @mixin "
           "word-match-emphasis($colour); each picker passes its own section "
@@ -1241,7 +1241,7 @@ def test_an_empty_search_results_pool_reserves_no_space(site):
     assert pool_rules, (
         "No .search-results rules found in the compiled CSS. Either the class "
         "was renamed or this scan went stale -- and a scan that matches nothing "
-        "passes while checking nothing (HANDOVER 12)."
+        "passes while checking nothing (MANUAL 12)."
     )
 
     offenders = []
@@ -1302,7 +1302,7 @@ def test_the_exclude_hover_is_actually_darker_than_the_state_it_replaces(site):
     Word-matched candidates REST at $color-exclude-active (issue #390). The pool
     hover therefore cannot be $color-exclude-active: hovering a matched tag
     would change nothing whatsoever -- not the "lightness-only shift reads as
-    nothing at small type" of HANDOVER 12, which is at least a change, but a
+    nothing at small type" of MANUAL 12, which is at least a change, but a
     literal no-op.
 
     Helen's ask was that these DARKEN, "same as for the include filter", so the
@@ -1418,7 +1418,7 @@ def test_the_cocktail_index_marks_and_styles_everything_it_lights_up(site):
 
       btn-pool--word-match  the candidate you actually meant (#549 point 3)
       drink-card-hit        the matched ingredient on a card, which is the one
-                            job HANDOVER §9.13 gives the card: say why you are
+                            job MANUAL §9.13 gives the card: say why you are
                             here
       drink-name-hit        the matched run of a drink name (#564)
     """
@@ -1466,7 +1466,7 @@ def test_the_cocktail_index_marks_and_styles_everything_it_lights_up(site):
         "The drinks index lights something up that nothing styles, or stops "
         "lighting it at all:\n  " + "\n  ".join(problems)
         + "\n\nA card that survived a filter it cannot explain is the one thing "
-          "HANDOVER §9.13 says a card must never be, and a candidate pool that "
+          "MANUAL §9.13 says a card must never be, and a candidate pool that "
           "marks nothing is issue #390 on the other index."
     )
 

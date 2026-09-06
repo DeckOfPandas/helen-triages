@@ -237,7 +237,7 @@ def test_the_same_formula_is_a_probable_duplicate_and_is_not_written(drafts):
 def test_the_same_title_with_a_different_formula_is_the_sazerac_case(drafts):
     """Two recipes, one name -- written separately and reported, never merged.
 
-    HANDOVER §9.2.1: Helen's Sazerac and Death & Co's share a name, four of her
+    MANUAL §9.2.1: Helen's Sazerac and Death & Co's share a name, four of her
     own bottle suggestions, and nothing else. `sazerac` and
     `sazerac-death-and-co` live side by side because she named the second one.
     The consumer's job is to notice and say so, not to choose.
@@ -254,7 +254,7 @@ def test_the_same_title_with_a_different_formula_is_the_sazerac_case(drafts):
 def test_a_draft_in_a_staging_subfolder_still_counts(drafts):
     """`rglob`, not `glob`. `_food_drafts/` has `to-cook/` and friends under it,
     and food's own loader silently stopped seeing seven files -- the seven
-    closest to promotion -- the day that pipeline appeared (HANDOVER §4).
+    closest to promotion -- the day that pipeline appeared (MANUAL §4).
     """
     (drafts / "to-cook").mkdir()
     inbox.write(_plan("valid_food", "food", drafts))

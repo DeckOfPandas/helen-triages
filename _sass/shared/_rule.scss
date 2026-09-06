@@ -9,7 +9,7 @@
 // either site's own partials — so the mixin had to move to something both
 // import that early, not stay food-only. It depends only on $color-bg and
 // $color-text, which the palette CONTRACT guarantees every site defines
-// (HANDOVER §2.3), so nothing about it actually assumed food to begin with.
+// (MANUAL §2.3), so nothing about it actually assumed food to begin with.
 //
 // Helen's device, and the instinct is right: a label-maker letter reads as
 // raised because it catches light on one edge and drops a shadow on the
@@ -169,7 +169,7 @@ $emboss-offset-large: 1px;                      // was 2px -- see above
 //
 // ONLY $color-text FEEDS THESE, same palette-contract constraint the old
 // --emboss-stroke-c comment already stated: shared may only name what every
-// site's palette guarantees (HANDOVER §2.3). Each site's own $color-text
+// site's palette guarantees (MANUAL §2.3). Each site's own $color-text
 // plugs into the SAME lighten/darken/rgba calls below, so on food (dark ink,
 // light page) these already resolve to the numbers Helen chose; on cocktails
 // (light ink, dark page) the same formulas resolve to something illegible,

@@ -151,7 +151,7 @@ test('hhmm: a whole number of hours drops the minutes, and pluralises past one',
 });
 
 test('hhmm: hours and minutes together, and the tail is always "mins"', () => {
-  // The singular "min" was a real house-style violation (HANDOVER §5: a
+  // The singular "min" was a real house-style violation (MANUAL §5: a
   // numeric quantity is "mins" in both the metadata and prose registers).
   // Found by the refactor that extracted this module, fixed straight after it
   // rather than inside it -- a behaviour change hidden in a commit claiming to

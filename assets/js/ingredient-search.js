@@ -167,7 +167,7 @@
        MOVED HERE FROM filters.js, issue #506 -- and #619 above is what that
        move was FOR. It lived in 1,336 lines of DOM wiring where the only way
        to ask it a question was to open a browser and type, which is the
-       argument back-link.js already makes (HANDOVER 3). The extraction changed
+       argument back-link.js already makes (MANUAL 3). The extraction changed
        nothing and made the fault visible; the measurement that settled the fix
        took minutes because this is a pure function with tests. (This said
        "unchanged" until 2026-09-06, which was true of the move and stopped

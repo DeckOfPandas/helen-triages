@@ -44,6 +44,10 @@ Four parts, in this order, and nothing else at the top level:
 sharing a name**, so the amounts must be the ones in the file, in the file's
 own order, and an ingredient with no amount contributes nothing.
 
+**If one message holds several recipes, hand back one of these per recipe**,
+each complete on its own, in the order they appear. One envelope is one issue;
+never fold two recipes into one block.
+
 ---
 
 ## 1. The one rule that matters more than the rest

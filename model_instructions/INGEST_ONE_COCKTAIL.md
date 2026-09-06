@@ -40,6 +40,10 @@ Four parts, in this order, and nothing else at the top level:
 the whole of §6's Sazerac trap made mechanical, so the amounts must be the ones
 in the file, in the file's own order.
 
+**If one message holds several drinks, hand back one of these per drink**, each
+complete on its own, in the order they appear. One envelope is one issue; never
+fold two drinks into one block.
+
 ---
 
 ## 1. What is different about a cocktail, and it is the whole document
@@ -49,8 +53,10 @@ enough to print. **A cocktail has two fields whose vocabularies are not, and
 they are the two that matter most:**
 
 - **`generic`** — what CATEGORY of spirit a pour is: "moderately aged Jamaican
-  rum", "lightly aged and filtered rum", "blanc vermouth". 171 declared terms.
-- **`suggestion`** — the specific bottle. 107 declared, and none outstanding.
+  rum", "lightly aged and filtered rum", "blanc vermouth". A closed vocabulary
+  of well over a hundred declared terms.
+- **`suggestion`** — the specific bottle, from a declared dictionary that
+  resolves spellings by alias.
 
 **Leave both as `QQ`. Always. This is Helen's own standing ruling**, made on
 2026-08-31 when a book named eleven bottles she did not own:

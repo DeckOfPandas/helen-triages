@@ -345,7 +345,7 @@
 // THE BLOCKY RULE ON THE INDEX
 // ============================================================================
 // The same device as the recipe page (see _sass/food/_rule.scss and
-// HANDOVER §13), on the five filter section labels. This settles
+// MANUAL §13), on the five filter section labels. This settles
 // DEV_JOBS §1.6: the index follows, and the two pages differ on colour
 // DISCIPLINE rather than on marks — five hues here because on the index colour
 // is a CODE, tied to each section's buttons and badges, where on the recipe
@@ -373,7 +373,7 @@
 .search--ingredients       .category-label-text { @include overlapping-rule-double($color-ingredient-root,     $color-section-underline-2); }
 .search--name              .category-label-text { @include overlapping-rule-double($color-name-search-root,    $color-section-underline-2); }
 
-// A SIXTH hue, deliberately. HANDOVER §13.5 calls the five rules directly
+// A SIXTH hue, deliberately. MANUAL §13.5 calls the five rules directly
 // above a CODE: colour on the index is tied to a section's own buttons,
 // active states, clear link and badges, not spent as decoration, which is
 // exactly why LEAVE OUT doesn't reuse one of them — it isn't one of the five

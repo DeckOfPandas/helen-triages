@@ -12,7 +12,7 @@ WHAT IS WRONG WITH THEM AS EXPORTED, and why each fix is not cosmetic:
      Rendered at a common height, a short-viewBox icon scales up more than a
      tall one, so the same 2.82 renders as a visibly different line weight per
      glass -- the same "an absolute length across a range of sizes is a range
-     of different results" trap HANDOVER 13.4.1 documents for -webkit-text-
+     of different results" trap MANUAL 13.4.1 documents for -webkit-text-
      stroke. Fixed with vector-effect="non-scaling-stroke", so the weight is
      set once in CSS and is identical on every icon whatever its viewBox.
   4. Inkscape/sodipodi metadata, empty <defs>, the XML declaration and the
@@ -310,7 +310,7 @@ RENAME = {
 #      so one `h` flips the parity and every coordinate after it is read on
 #      the wrong axis. The box inflates until it always overlaps. A guard that
 #      cannot fail, written to catch a bug that had already happened: the third
-#      time this codebase has produced one (HANDOVER §12).
+#      time this codebase has produced one (MANUAL §12).
 #   2. Drop the axes and just bound the magnitudes. Too strict in the other
 #      direction, because applying one translate to a pool that mixes x and y
 #      is meaningless -- it rejected correct files.

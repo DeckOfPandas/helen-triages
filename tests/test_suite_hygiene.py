@@ -3,7 +3,7 @@
 One failure mode has now bitten this codebase five times, and it is the only
 one whose symptom is GREEN: a test that cannot fail, because the thing it
 scans came back empty and it treated "found nothing" as "nothing wrong".
-HANDOVER_v26.md §12 lists the first four -- a stale JS_DIR, a non-recursive
+MANUAL.md §12 lists the first four -- a stale JS_DIR, a non-recursive
 SCSS glob, a method_groups key typo that made every prose test see zero steps,
 and a link shape no regex considered. The fifth was written on 2026-08-14 by
 someone who had just read that section, in a commit fixing a bug caused by not
@@ -222,7 +222,7 @@ def test_every_draft_reading_test_says_what_it_does_without_drafts():
     machine that gates the deploy.
 
     So this generates the list from the code -- every test function referencing
-    ALL_DRAFTS -- and requires each to be classified. HANDOVER §12's lesson from
+    ALL_DRAFTS -- and requires each to be classified. MANUAL §12's lesson from
     the filter-state sweep, applied: when a generated test keeps missing the same
     bug, generate the next one from the other end. The other end here is the
     source, not a list somebody maintains.

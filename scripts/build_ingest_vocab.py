@@ -417,6 +417,11 @@ def main(argv=None) -> int:
     for problem in problems:
         print(problem)
     print("Rewrote: " + (", ".join(changed) if changed else "nothing"))
+    if changed:
+        print("The claude.ai Project holds a copy of these files and is now "
+              "behind: Helen re-uploads and moves the `Uploaded to the Project "
+              "as of:` line in CLAUDE_WEB_INGEST.md (its §1). Say so in your "
+              "summary.")
     return 1 if problems else 0
 
 

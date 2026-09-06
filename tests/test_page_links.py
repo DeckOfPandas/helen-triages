@@ -723,7 +723,7 @@ def test_links_built_outside_templates_still_resolve():
     `scripts/build_cooking_methods_prose.py` is not scanned directly: its
     LINK_FIXES table rewrites these links on the way into the data, so a stale
     entry there shows up as stale data, which IS scanned. Scanning the script as
-    well would flag the prose in its own comments, which is the trap HANDOVER
+    well would flag the prose in its own comments, which is the trap MANUAL
     §12 records four times over.
 
     Deliberately blunt: it matches quoted path-shaped literals in assets/js/ and

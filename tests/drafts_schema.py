@@ -137,7 +137,7 @@ def mismatch(repo: str) -> str | None:
             f"rules whose migration simply has not arrived yet.\n"
             f"  Fetch and merge the drafts branch that carries:\n{needed}\n"
             f"  `git -C {repo} fetch` first -- a stale clone is the other half "
-            f"of this trap (HANDOVER 9.1)."
+            f"of this trap (MANUAL 9.1)."
         )
 
     ahead = "\n".join(f"    {v}: {log.get(v, '(undocumented)')}"

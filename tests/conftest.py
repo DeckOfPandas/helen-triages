@@ -190,7 +190,7 @@ ALL_MAGIC_BAG = _load(MAGIC_BAG_DIR)
 # ALL_DRAFTS is an empty list there and every draft-reading check silently
 # examines a fraction of what it does locally.
 #
-# That is this repository's own worst failure mode wearing a new hat (HANDOVER
+# That is this repository's own worst failure mode wearing a new hat (MANUAL
 # 12): the tests do not fail, they find fewer offenders and report green. The
 # green is true of what they scanned and misleading about what they did not.
 #
@@ -285,7 +285,7 @@ def internal_temperatures() -> dict:
 #
 #     - step: "QQ bake at 150C for 30-40 minutes"
 #
-# `QQ` is her marker for "not rewritten yet" (HANDOVER_v26.md §4/§12): the line
+# `QQ` is her marker for "not rewritten yet" (MANUAL.md §4/§12): the line
 # is still the SOURCE's wording, sitting in the file waiting to be replaced
 # wholesale. Correcting its degree sign or its dash is tidying text that is
 # about to be deleted, and it does it by editing someone else's words -- which
@@ -332,7 +332,7 @@ def internal_temperatures() -> dict:
 # it is the rule read correctly. The marker means "SOMEBODY ELSE'S wording,
 # awaiting a rewrite", which is why correcting its dash is off limits: it edits
 # words that are about to be deleted. A `QQ Claude` line is the opposite. It is
-# the paraphrase, written here, and HANDOVER §4 says outright that it "IS held
+# the paraphrase, written here, and MANUAL §4 says outright that it "IS held
 # to normal house style, same as any other prose it writes".
 #
 # FOUND BY MEASUREMENT ON 2026-09-01, after the interleaved format became the

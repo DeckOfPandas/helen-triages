@@ -24,7 +24,7 @@ ingest doing the right thing. The recipe-side test is untouched.
 
 It never touches a `QQ` line. That is the source's own wording awaiting Helen's
 rewrite, and correcting its dash or its degree sign is editing someone else's
-words (HANDOVER §5, issue #426). Two thirds of the corpus-wide en-dash hits are
+words (MANUAL §5, issue #426). Two thirds of the corpus-wide en-dash hits are
 inside `QQ` text, so this is not a technicality.
 
 ## Both collections, since 2026-09-05
@@ -153,7 +153,7 @@ six faults" cannot pass while something also happened to the other thirty lines.
 - **Size words** (108 drafts, moving `large`/`medium` from `item:` to
   `amount:`). Considered and excluded — mechanical in shape, but it rewrites two
   fields per hit and the precedent records fixes that needed an eye.
-- **A missing `meta.awaiting_fix`** (2 drafts). The flag fails closed, so
+- **A draft with no `meta.awaiting_fix`** (the report names them). The flag fails closed, so
   writing `false` in asserts the recipe is fit to publish. That is Helen's to
   say, not a formatting fix.
 
