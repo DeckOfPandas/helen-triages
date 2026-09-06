@@ -12,8 +12,8 @@ HANDOVER §11.
 
 For a batch in progress there is **one** working copy of the private drinks
 repo: the clone inside the coordinating Claude's worktree, on a branch named
-for the batch, served on a known port (today: **4004**, branch
-`content/first-batch-to-promote`). Helen edits there, Claude commits and
+for the batch (`content/<what-the-batch-is>`), served on a port the session
+names when it opens the batch. Helen edits there, Claude commits and
 pushes there, and the dev server builds from there. Helen's own local clone
 is not used while a batch is open — it is where promotion happens afterwards
 (step 6), from `main`, after the branch is merged.
@@ -58,6 +58,12 @@ disk for an evening. One copy, always pushed, is the rule.
      short); flag back.
    - Claude does a final read-only review after the proofread; sometimes Helen
      does too.
+   - **If a public PR depends on a private branch, name the branch in the PR
+     description.** A public merge that lands before its private half leaves
+     `main` red with failures naming real drinks (2026-09-06, the Caribbean
+     Sazerac's `I want to faff`: `taxonomy.yml` merged, the drink file's
+     correction sat on `data/caribbean-sazerac-faff`), and nothing else says
+     which branch fixes it.
 6. **Helen promotes**, herself, always, unless she explicitly asks Claude to:
    in her own checkouts, copy the proofread drink into `_cocktail_recipes/`
    in the public repo and commit; delete it from the private repo and commit.
@@ -113,7 +119,9 @@ promotable the field went long ago. A fresh ingest still writes it, beside
   `_data/cocktails/garnish.yml`.
 - The ingest rules a session with no repo can use: `INGEST_ONE_COCKTAIL.md`.
   Its vocabulary blocks are generated — `scripts/build_ingest_vocab.py --write`
-  after any ruling that changes `_data/`, never a hand edit.
+  after any ruling that changes `_data/`, never a hand edit — and the file is
+  re-uploaded to the claude.ai Project (`CLAUDE_WEB_INGEST.md`) whenever it
+  changes.
 - The in-repo procedure: `.claude/commands/ingest.md`.
 - The flags' meaning and the gate: HANDOVER §4.0 and §9.1.1.
 - The one-working-copy rule, restated where a worktree is set up: HANDOVER §9.1

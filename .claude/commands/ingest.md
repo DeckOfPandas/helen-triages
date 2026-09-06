@@ -36,7 +36,7 @@ what makes it findable, and there are exactly these:**
 |---|---|
 | a `tagline` she has not written | `tagline: "QQ"` |
 | a drink's `generic` / `suggestion` | `"QQ"`, always, both sites of the pour -- her standing ruling, not a size problem |
-| a drink's `meta.ship` | `"QQ"` -- she has not drunk it |
+| a drink's `meta.ship` | `"who knows"`, never `"QQ"` -- `QQ` is not a ship value (2026-09-05, `test_meta_ship_is_a_rung_or_who_knows`); `meta.made_before: false` beside it says she has not made it |
 | a food method step | the PAIR: `QQ original <verbatim>` then `QQ Claude <the rewrite>` |
 | any note an ingest ADDS | `- label: "QQ"` / `text: "QQ - …"` -- **both fields set, both beginning `QQ`** |
 | an amount with no unit in the source | the figure as it stands, plus a note whose text says `QQ - no unit in the source` |
@@ -107,8 +107,10 @@ MADE the drink and decided it ships, which no flag says.
 >   (HANDOVER §9.3.2). The alias map is what lets an ingest be fast; a finished
 >   drink has had time to say the real name.
 > - **No ingredient carries `item`.** *"This has 'item' everywhere too."* It is
->   the source's own wording, drafts-only since 2026-09-02 (§9.10), and nothing
->   renders it. **Read each one before deleting it:** if it says something
+>   the source's own wording, allowed only beside `generic: "QQ"` and gone the
+>   moment the generic is filled in, wherever the file is
+>   (`test_item_is_gone_once_the_generic_is_filled_in`, §9.3) -- so a staged
+>   drink, whose generics are all filled, has none. Nothing renders it. **Read each one before deleting it:** if it says something
 >   `generic`, `suggestion` and `amount` do not already say — "Strong cold black
 >   breakfast tea" beside `black tea`, "pear, sliced" beside `pear` — that fact
 >   moves to a `note:` on the same ingredient. If it merely restates the generic,
@@ -122,10 +124,12 @@ MADE the drink and decided it ships, which no flag says.
 
 ## A FILE THAT ARRIVES FROM A REPO-LESS SESSION
 
-**Helen finds things away from her desk.** She pastes
-`model_instructions/INGEST_ONE_RECIPE.md` or `INGEST_ONE_COCKTAIL.md` into
-claude.ai along with the recipe, and gets back a draft file plus a short "what
-I could not know" list. **That file is 90% of an ingest and is missing exactly
+**Helen finds things away from her desk.** She hands the recipe to a claude.ai
+Project that holds `model_instructions/INGEST_ONE_RECIPE.md` and
+`INGEST_ONE_COCKTAIL.md` as its files and
+`model_instructions/CLAUDE_WEB_INGEST.md` §2 as its instructions (that document
+is the setup and the loop), and gets back one envelope per recipe: a draft file
+plus a short "what I could not know" list. **That file is 90% of an ingest and is missing exactly
 the parts that need this repository.** Finishing it is a different job from a
 photo batch and it is much smaller.
 
@@ -152,8 +156,9 @@ file say the same things.
    what it will add.
 3. **Run `pytest`.** Everything mechanical shows up here -- quoting, dashes,
    accents, an undeclared tag, a missing glass.
-4. **`/tidy-drafts`** for the food side if the quoting or typography needs it.
-   It never touches a `QQ` line, so the transcription is safe.
+4. **`/tidy-drafts`**, either collection (both since 2026-09-05), if the
+   quoting or typography needs it. It never touches a `QQ` line, so the
+   transcription is safe.
 5. **Work the hand-back list, and treat every item as a TIER 3 question.**
    These are the things that session could not know, which is nearly always
    because the answer is in Helen's head rather than in the source. A missing
@@ -195,7 +200,7 @@ The order to work in:
 1. `python3 scripts/derive_cocktail_moods.py` -- dry, for a drink; `--write`
    only if it reports a difference.
 2. `pytest` (never two sessions at once -- HANDOVER §1).
-3. `/tidy-drafts` for the food side, if the quoting or typography needs it.
+3. `/tidy-drafts`, either collection, if the quoting or typography needs it.
 4. `python3 scripts/ingest_preflight.py` for a drink.
 5. One list to Helen. Then commit.
 
@@ -301,9 +306,14 @@ failure is probably work someone else has already done (HANDOVER §9.1).
   is a closed vocabulary and the tail is free text.
 - **THE 2026-09-04 SHAPE RULINGS, all Helen's, all in `methods.yml` and
   `ingredients.yml` -- look them up, do not retype them from here:**
-  - **one big cube is `giant`**, never large/big/rock/block, and those steps
-    name no glass either ("strain into a rocks glass over a big cube" is
-    `Strain over a giant ice cube.`);
+  - **the ice in the glass is `serve.ice`, never a method step** (since
+    2026-09-05, HANDOVER §9.10a): "strain into a rocks glass over a big cube"
+    is `Strain.` + `glass: ["old fashioned"]` + `serve: {ice: "large cube"}`,
+    and the page composes the sentence. A strain step names neither glass nor
+    ice; `test_serve_ice_is_not_restated_in_the_method` refuses one that does.
+    (This bullet said "one big cube is `giant`… `Strain over a giant ice
+    cube.`" until 2026-09-06; that string was retired with the rest of the
+    seventeen-way strain group, and her ruling lives in `serve.yml` now.);
   - **never write an `Express …` step.** A garnish naming a citrus twist makes
     `_layouts/cocktail.html` append it, and `test_no_method_step_opens_with_express`
     refuses one that tries. Put the twist in `garnish:` and write nothing;
@@ -327,8 +337,12 @@ failure is probably work someone else has already done (HANDOVER §9.1).
 
 ## TIER 2 -- fill in, and say plainly they are proposals
 
-`main_ingredients`, `tags`, `star_ingredient`, cocktail `mood`. Cheap for her to
-correct and expensive to originate. Nothing can be invented -- an undeclared tag
+`main_ingredients`, `tags`, `star_ingredient`. Cheap for her to correct and
+expensive to originate. **Not a cocktail's `mood`** -- nine moods are DERIVED by
+`derive_cocktail_moods.py --write` and a hand edit is reverted on the next run;
+the ten hand-assigned ones are Helen's alone (HANDOVER §9.13), so a new drink is
+missing half its browse axes until she is asked. (This line listed `mood` as a
+proposal until 2026-09-06.) Nothing can be invented -- an undeclared tag
 or star fails the suite. **Be generous with `main_ingredients`**: the cap of
 eight is a guide that has been read as a budget, and her own recipes run to
 fourteen.
@@ -408,7 +422,9 @@ never `proofread`, which stays hers everywhere.
        node --test tests/js/*.test.js
 
 9. **Commit in the drafts repo**, tagging any issue the batch resolves, and push
-   with her confirmation. Report what is still `QQ` and why.
+   -- the private drafts repos need no ask for a push (CLAUDE.md, 2026-09-05);
+   only their `main` is off limits to commit or merge. Report what is still
+   `QQ` and why.
 
 ---
 

@@ -93,12 +93,13 @@ Helen's request, for the case where she finds something in the wild and pastes
 it into claude.ai with no checkout, no tests and no `_data/`. Each hands back a
 draft file plus a short "what I could not know" list.
 
-They stand alone because the closed vocabularies are small: 22 tags and 14 star
-ingredients for food; 26 glasses, 43 garnishes and 32 canonical method steps
-for drinks. Everything else either file needs is a rule rather than a lookup.
-**Those five figures are printed IN the documents and generated FROM `_data/`,
-so count the blocks rather than quoting this sentence** — it was 23/42/28 from
-2026-09-02 until 2026-09-05, three vocabulary rulings out of date.
+They stand alone because the closed vocabularies are small enough to print:
+the tags and star ingredients for food; the glasses, garnishes and canonical
+method steps for drinks. Everything else either file needs is a rule rather
+than a lookup. **The vocabularies are printed IN the documents and generated
+FROM `_data/`, so count the blocks rather than quoting a figure** — this
+sentence carried five counts until 2026-09-06 and they were three rulings out
+of date within days.
 
 **THE COCKTAIL ONE LEAVES `generic` AND `suggestion` AS `QQ`, ALWAYS, and the
 reason is not size.** 224 generics would embed fine. It is that **a bottle's
@@ -213,8 +214,13 @@ Local URL: `http://localhost:4001/helen-triages/`, then `/food/` or `/cocktails/
 startup — restart the server after any change to it, or you'll debug a site
 that's actually fine for an hour.
 
-`_config_local.yml` overrides two things: `show_source_wording: true` and the
-`food_drafts` collection. Never put a baseurl in it.
+`_config_local.yml` is where every local-only switch lives, and nowhere else:
+`show_source_wording`, `show_awaiting_fix`, `show_drafts`, `show_costs`,
+`show_units` (all `true`), `pdf_downloads: false`, and `output: true` on the
+`dev`, `food_drafts` and `cocktail_drafts` collections. Production declares
+none of these keys, which is the whole mechanism (§9.1, #235): a template
+gates on the key existing, so it can never be true on the live site. Never
+put a baseurl in it. (This said "two things" until 2026-09-06.)
 
 **Never write to machine `/tmp`.** Use a `tmp/` folder inside this repo — it's
 gitignored — if you need scratch space. See `CLAUDE.md`.
@@ -241,24 +247,45 @@ the routing:
 ```
 _food_recipes/       output: true    permalink /food/recipes/:path/
 _food_magic_bag/     output: true    permalink /food/magic-bag/:path/   see §4.3
-_food_drafts/        output: false   permalink /food/drafts/:path/  (local only)
-_cocktail_recipes/   output: true    permalink /cocktails/recipes/:path/
+_food_drafts/        output: false   permalink /food/drafts/:path/       local only; its own private repo
+_cocktail_recipes/   output: true    permalink /cocktails/recipes/:path/ empty until a drink is promoted
+_cocktail_drafts/    output: false   permalink /cocktails/drafts/:path/  local only; its own private repo
 
 _layouts/     default.html (shared)   recipe.html (food)   cocktail.html (cocktails)
               magic_bag.html (food, §4.3)
-_includes/    filter_group.html   recipe_badges.html
-_sass/        shared/{_tokens,_base,_layout}   food/   cocktails/
+_includes/    filter_group.html   recipe_badges.html   cocktails/ship.html
+              icons/glasses/ (the published glass artwork, §9.11)   food/ (reference partials, §14)
+_plugins/     publish_gate.rb   cocktail_costs.rb   cocktail_units.rb
+              cocktail_card_ingredients.rb                 see "Plugins" below
+_sass/        shared/{_tokens,_base,_layout,_rule,_chrome,_fonts}   food/   cocktails/
 _data/        sites.yml   accented_words.yml   chrome.yml   food/*.yml
-              cocktails/{taxonomy,ingredients,bottles,glasses,methods,garnish}.yml
-assets/css/   food.scss   cocktails.scss
-assets/img/   favicon.svg   food/   cocktails/
-assets/js/    (shared — every script is site-agnostic)
+              cocktails/{taxonomy,ingredients,bottles,glasses,methods,garnish,serve,costs,abv}.yml
+_design_sources/  Helen's raw Inkscape glass drawings, committed as-is (§9.11, §9.15)
+_dev/         local-only pages (output: false in production)
+assets/css/   food.scss   cocktails.scss   longform-demo.scss (§2.2)
+assets/img/   favicon.svg   chrome/   food/   cocktails/
+assets/js/    (shared — every script's LOGIC is site-agnostic, §2.2)
+scripts/      generators, migrations and measurers, each with its own docstring
+tests/        the pytest suite;  tests/js/  the node --test suite (§10)
 
 food/index.html        permalink /food/
 food/reference/*.html  permalink /food/reference/...   see §14
 cocktails/index.html   permalink /cocktails/
 index.html              permalink /        a bare redirect to /food/
 ```
+
+Run `ls` before trusting the tree: it omitted `_plugins/`, three cocktail
+data files and `_cocktail_drafts/` until 2026-09-06.
+
+**Plugins.** Four Ruby plugins in `_plugins/` decide what a built page shows:
+`publish_gate.rb` removes any gated document that does not carry an explicit
+pass (§4.0, §9.1.1); `cocktail_costs.rb` and `cocktail_units.rb` do the price
+and unit arithmetic once at build time (§9.3.5, §9.3.4);
+`cocktail_card_ingredients.rb` builds a card's ordered ingredient line and its
+search pool from one list (§9.10.1). **GitHub Pages' safe mode ignores
+`_plugins/` entirely, without warning** — the gate would be gone and the build
+green — which is why the workflow runs its own plugin-capable build and
+`tests/test_site_config.py` asserts that it still does.
 
 `food/` and `cocktails/` hold each site's **pages**, not their collections.
 
@@ -1341,7 +1368,9 @@ gate would be gone and the build green.
 - Filenames are stable by default; if a rename is clearly indicated, say so
   and ask. Don't rename unasked; don't assume it's forbidden.
 
-**Cocktails front matter does not exist yet and must not be invented.** See §9.
+**Cocktails front matter is §9.3, and is not a variant of this.** (This line
+said it "does not exist yet and must not be invented" from 2026-08-02 until
+2026-09-06, three weeks after the first drinks were ingested.)
 
 **This is not the only shape a food document can take.** `_food_magic_bag/`
 (§4.3, added 2026-08-26) holds dishes Helen makes without a recipe — no method,
@@ -2146,8 +2175,11 @@ matches what you are testing.
 `GH_TOKEN` selects all three repos and carries Issues; probed 2026-08-29,
 `contents` returns **403** on both private repos and 200 on the public one. So
 the API can read and write issues anywhere and read drink files nowhere. Git
-can. Push access to the private repos exists — policy still says ask Helen every
-time, per CLAUDE.md.
+can. **Pushing to the private repos needs no ask** — `main` since 2026-08-29,
+a branch since 2026-09-05 (CLAUDE.md); nothing there triggers a build, and a
+commit sitting unpushed on one disk is the real risk. Committing or merging
+onto their `main` is still forbidden, hook-enforced. (This sentence said "ask
+Helen every time" until 2026-09-06, a week after CLAUDE.md changed.)
 
 **What IS public**: `_layouts/cocktail.html`, `_sass/cocktails/`,
 `assets/css/cocktails.scss`, `cocktails/index.html`,
@@ -2212,7 +2244,11 @@ collection, not these flags. The migration is one commit in
 `_cocktail_drafts/`, written by `tmp/migrate_drink_gate_flags.py` in this repo:
 textual insertion of three lines after `date_last_edited:`, never a YAML
 round-trip, so `git diff --numstat` reads `3/0` on every file and the diff is
-readable. If you ever migrate a drink field again, do it that way.
+readable. If you ever migrate a drink field again, do it that way — **and bump
+`SCHEMA_VERSION` in the drafts repo in the migration commit and `REQUIRED` in
+`tests/drafts_schema.py` in the commit that tightens the rule** (§10, #624).
+That handshake is what turns "N drink tests failing" into one failure naming
+which side is behind.
 
 **The gate itself needed no change.** `cocktail_recipes` has been in
 `GATED_COLLECTIONS` since `_plugins/publish_gate.rb` existed. What changed is
@@ -3651,11 +3687,13 @@ own it now lives beside that file instead.
     2026-08-30 "must have the ship field filled in" — `who knows` IS filled
     in) and `test_every_published_drink_has_been_made`. Both are covered by
     the closed vocabulary above, which checks drafts too.
-  - **The open consequence, unbuilt:** a published `who knows` card draws the
-    ship mark with no word beside it. #722's `???` is the intended answer and
-    needs `_includes/cocktails/ship.html` changed, not just a data line — it
-    gates the word on scale membership. Helen, 2026-09-05: "I don't actually
-    require the front-end feature."
+  - **A `who knows` drink reads `???` beside the ship, on the card and on the
+    drink page** — built 2026-09-05 after all (commit 8557c6e):
+    `ship_unrated_word: "???"` in `taxonomy.yml`, read by
+    `_includes/cocktails/ship.html` for anything that is not a rung on
+    `ship_scale`, so the include never names a vocabulary value. (This bullet
+    called it "unbuilt" until 2026-09-06; Helen had said she did not require
+    it, and it was cheap.)
   - **`_dev/no-verdict.html`** is the worklist page: drinks she has made that
     still have no rating. It writes nothing; she pastes its output back.
 - **`meta.status` is retired entirely**; its only consumer anywhere was
@@ -3741,11 +3779,13 @@ because each was green in isolation**; it took rebuilding the combined state of
 both locally. The new index derives its buckets and tint from `taxonomy.yml`
 instead, which is the enforcement version of this paragraph.
 
-**The index reads DRAFTS, not recipes.** `_cocktail_recipes/` is still empty and
-every drink is a draft, so the index before this one looped
+**The index read DRAFTS ONLY until #668.** `_cocktail_recipes/` was empty and
+every drink a draft, so the index before this one looped
 `site.cocktail_recipes` — an empty collection — and had done since it was
-written. (The draft count moves with every ingest; count them rather than
-quoting a figure from here.)
+written; its replacement read `site.cocktail_drafts` alone. Since 2026-09-02 it
+reads `all_drinks` — the published collection plus the drafts under
+`show_drafts` (§9.1.1). (The draft count moves with every ingest; count them
+rather than quoting a figure from here.)
 
 
 ### 9.10 The drink page's ingredient line — #544/#513, 2026-08-29
@@ -3770,18 +3810,19 @@ own complaint. Not rendering the field makes the duplication IMPOSSIBLE rather
 than suppressed, which is why #513 closed here rather than acquiring a rule
 about when to hide the second line.
 
-**`item` IS NOT RETIRED. It is a DRAFTS-ONLY TRANSCRIPTION FIELD — Helen's
-ruling, 2026-09-02, D8.** What the source called the pour: allowed in the
-`_cocktail_drafts/` POOL, refused in `_cocktail_recipes/` by
-`INGREDIENT_KEYS_RECIPES` **and in `_cocktail_drafts/to-promote/` since
-2026-09-04** (`test_a_staged_drink_carries_no_transcription_field`), so **the
-STAGING FOLDER is the deadline** — this paragraph said "promotion is the
-deadline" for two days, and the deadline was in the wrong place because a drink
-only reaches `_cocktail_recipes/` by being moved, which is the worst moment to
-discover a field needs reading. She deletes it herself when she fills
-`generic`/`suggestion` on
-making the drink, and *"ignore everything in `item` as we'll throw it away"* —
-it is never house-styled, corrected or rewritten. That reverses the sentence
+**`item` IS NOT RETIRED. It is a TRANSCRIPTION FIELD that may exist only
+beside `generic: "QQ"` — Helen's ruling, 2026-09-02 (D8), tightened
+2026-09-05.** What the source called the pour, held until the category is
+known; it goes when the generic is filled in, wherever the file is
+(`test_item_is_gone_once_the_generic_is_filled_in`, §9.3), so a staged or
+published drink never carries one — `INGREDIENT_KEYS_RECIPES` and
+`test_a_staged_drink_carries_no_transcription_field` are the same rule seen
+from those two doors. (The deadline was described three ways across the
+documents — "promotion", "the staging folder", "when the generic is filled
+in" — until 2026-09-06; the third is the rule and the other two follow from
+it.) She deletes it herself when she fills `generic`/`suggestion` on making
+the drink, and *"ignore everything in `item` as we'll throw it away"* — it is
+never house-styled, corrected or rewritten. That reverses the sentence
 this section and §9.3 carried for a fortnight, and reverses it on the right
 grounds: the field was never the fault. The RENDERING was, and that was fixed
 on 2026-08-29.
@@ -5230,8 +5271,9 @@ lost. **A control must not dress as a label.**
 site's identity, not an axis. This sits alongside taxonomy.yml's older and
 stronger ruling that there is no SPIRIT filter either.
 
-**It reads DRAFTS**, on Helen's explicit call: *"for food, we build drafts
-locally only, so let's do the same."* The `site.show_drafts` gate and its reason
+**It reads `all_drinks` — the published collection plus the drafts, the latter
+only under `site.show_drafts`** (§9.1.1), on Helen's explicit call: *"for food,
+we build drafts locally only, so let's do the same."* The gate and its reason
 are unchanged from the page it replaced — see §9.9 and issue #235.
 
 **A mood with no drinks renders no button**, counted rather than listed as an
@@ -5436,12 +5478,12 @@ it. One value moves four things together and they cannot drift apart.
 critical #9 and its own ~15% figure, and Helen's words off the candidates page:
 *"Narrower glass column please."* The paragraph above is why nothing else had to
 move: the four readers narrowed together from one line, and the 17px it returns
-at every card width goes to the name and the ingredient line. **The clamps
-themselves did not change** — the ingredient line stays at two lines, and that
-is a decision rather than an omission: *"when we get issue #691 done
-(ingredients in importance order) I expect two lines will get the point across
-plus leave some comfy real estate on the cards."* So the answer to a clamped
-ingredient line is ordering the ingredients, not a third line.
+at every card width goes to the name and the ingredient line. The clamps did
+not change that day; the ingredient line went to three lines two days later
+(#552, above), which reversed the two-line prediction this paragraph used to
+end on. (It said "the ingredient line stays at two lines, and that is a
+decision" until 2026-09-06, forty lines below the paragraph recording the
+reversal.)
 
 **The framing and the hover took eleven and four candidates respectively.** What
 won: a glass column marked by a rule in the home green along its bottom edge, no
@@ -5996,13 +6038,12 @@ header comment exists to prevent. The 2026-09-04 narrowing is what that
 property was for: one line moved the column and the four things measured
 against it followed.
 
-**Three layouts currently sit behind `?narrow=` and TWO OF THEM ARE DUE TO BE
-DELETED** — `stack` (glass as a full-width band on top, the default),
-`title` (glass small top-left, title beside it) and `shrink` (the original
-column, narrower). Same comparison-switch pattern as `?glass=margin` and
-`?align=top` before it, and it must have the same ending: once Helen picks, the
-losers and the switch script in `cocktails/index.html` go. A comparison switch
-left in becomes a permanent branch nobody dares remove.
+**Helen chose `stack`** (glass as a full-width band on top) from three
+candidates behind a `?narrow=` switch, and the losers — `title` and `shrink` —
+and the switch went with the decision (§11.2.1 has how she was shown them).
+Same comparison-switch pattern as `?glass=margin` and `?align=top` before it,
+and the same ending. (This paragraph said the three were "currently" live and
+two "due to be deleted" until 2026-09-06.)
 
 #### Every drink names a glass, and `any` is retired (#491)
 
@@ -6936,10 +6977,10 @@ bite.
 > **Before reporting an issue as done, check**:
 > `git log main --grep="#N"`.
 
-End every commit:
-```
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
-```
+End every commit with the `Co-Authored-By: Claude … <noreply@anthropic.com>`
+trailer the harness supplies for the model that is running — sessions run on
+more than one, and `test_agent_edited_recipes_are_not_marked_proofread`
+matches `co-authored-by: claude` case-insensitively, not a model name.
 
 **Ask her the decisions as you hit them, not in a batch at the end.** Her own
 instruction, 2026-08-16: "Give me decisions to make as you go." It works
@@ -7145,6 +7186,13 @@ amounts — and prints each one once with its instances under it.
 `tidy_drafts.py`'s own header gives at length: a checker carrying its own copy
 of the contract eventually reports against a shape the suite has moved on from.
 
+**THE WEB SIDE IS A PROJECT, SINCE 2026-09-06 —
+`model_instructions/CLAUDE_WEB_INGEST.md`.** A claude.ai Project holding the
+two standalone documents as its files and that document's §2 as its
+instructions, so Helen sends a dump of several recipes and gets one envelope
+per recipe back, without pasting a document per recipe. §1 there is the setup
+and the loop; nothing about the contract or the consumer changed for it.
+
 **THE ROUND TRIP, AND IT IS THE HALF THAT WAS MISSING UNTIL 2026-09-02.** The
 standalone documents (see the header) describe what a repo-less session should
 HAND BACK; nothing described what to do when the file arrives. Helen asked
@@ -7299,6 +7347,12 @@ recorded as "written and waiting" that didn't exist at all; a companion-docs
 table that listed a file nobody had ever written, for three versions running,
 because nobody checked. **If the code and this file disagree, the code wins,**
 and the fix is to correct this file, not to trust it harder next time.
+
+**Name files, never line numbers, in any document here.** Every `file:line`
+written into a document has been wrong within days — the architecture plan's
+on 2026-09-06, `LETTERING.md`'s consumer table the same day — and a wrong line
+number sends the reader to the wrong code with confidence. A file name and a
+selector or function name do not rot.
 
 > ### AN OPEN ISSUE IS A DOCUMENT TOO, AND IT ROTS FASTER
 >
@@ -8707,11 +8761,13 @@ difference too many, and it made `h3` the odd heading out on a site where
 every other one is embossed. The about page's FAQ questions are the visible
 case.
 
-**To extend the device somewhere new:** `@include punched(raised)` plus
-`-webkit-text-stroke: $emboss-stroke <a colour LIGHTER than the letter>`, and
-leave `$emboss-offset` / `$color-emboss-light` / `$color-emboss-shadow` alone —
-those are the constants that make every use of this read as one consistent
-device rather than a new effect invented each time.
+**To extend the device somewhere new: say the tier** — `@include
+lettering(heading)` or `label` or `display` — and write neither
+`-webkit-text-stroke` nor `text-shadow` by hand. `LETTERING.md` §9 is the
+procedure and §5.1 is how a boundary case is judged. (This paragraph told you
+to call `punched()` and set the stroke yourself until 2026-09-06, four days
+after the section's own header said not to; it was the one paragraph a
+skimmer reads.)
 
 #### 13.4.2 The other `-webkit-text-stroke` — faux-bold, not an edge
 
@@ -9327,26 +9383,25 @@ on next wears the third face.
 
 #### 13.10.2 The emboss, and the ceiling on the highlight
 
-Values live in `_sass/shared/_rule.scss` and were tuned by eye at `/dev/emboss/`,
-not argued for:
+**The values are the four `--lettering-*` tiers in `LETTERING.md` §3, since
+2026-09-02.** `$emboss-stroke` (0.016em) and the two 1px offsets still live in
+`_sass/shared/_rule.scss`; the colour values this section used to tabulate —
+`$color-emboss-shadow` at 0.68, `$color-emboss-light` as white,
+`$color-label-stroke` at 30% — are gone from that file, and `LETTERING.md` §2
+records why: a white highlight on a near-white page is invisible and a 68% ink
+shadow reads as a second letter ("dissolving in acid"). The paragraph below is
+the reasoning that led there and is kept for the ceiling argument only.
 
-    $emboss-stroke        0.016em      (was 0.014em against Courier New)
-    $emboss-offset        1px
-    $emboss-offset-large  1px          (was 2px; 2px read as two letters)
-    $color-emboss-shadow  rgba($color-text, 0.68)   (was 0.38)
-    $color-label-stroke   lighten($color-text, 30%) (was 20%)
-
-**`$color-emboss-light` is `$color-white`, and the reason is a ceiling.** It used
-to be `$color-bg` — "the paper catching the light", right as a model and
-*invisible in practice*, because a copy painted in the background colour and
-offset over the background cannot be seen. It only ever did visible work where a
-heading sits on something else. Helen, comparing against the header wordmark:
-"we're still missing the white up and left from the simulated light source." She
-was right and it was never going to appear: `.site-logo-word` is light type on
-black tape and has the whole brightness range; **dark type on #faf7f8 has about
-3% of headroom and no more.** `$color-white` spends all of it. A stronger
-highlight needs a darker ground, not a bigger number — so on a light ground the
-raised read has to come from the *shadow*, which is what 0.38 → 0.68 did.
+**Why the highlight was ever white — a ceiling.** A copy painted in the
+background colour and offset over the background cannot be seen, so the
+highlight only ever did visible work where a heading sat on something else.
+Helen, comparing against the header wordmark: "we're still missing the white
+up and left from the simulated light source." `.site-logo-word` is light type
+on black tape and has the whole brightness range; **dark type on #faf7f8 has
+about 3% of headroom and no more.** White spends all of it, and the raised read
+on a light ground has to come from the shadow — which is the finding LETTERING
+§2 then corrected: the highlight moves DOWN off white and the shadow UP off
+two-thirds ink, both toward the paper.
 
 **`.on-dark` inverts the whole thing, and it is custom properties for a reason.**
 The two grounds disagreed on every value, because they are inverse problems: on
