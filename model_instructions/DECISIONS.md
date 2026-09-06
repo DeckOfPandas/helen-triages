@@ -1942,3 +1942,74 @@ verification. Dates are when the correction landed.
   `NO_TEMPERATURE_BECAUSE` entry.
 - Two food-safety gaps (pork medium, fresh ham pink) flagged, not corrected —
   Helen's call.
+
+### The cocktails reference layer, #529
+
+- **2026-09-06, #529** — Cocktails gets its first reference page,
+  `rum-categories.html`. **Why it passes #459 when a bare category list would
+  not:** the bottles column. #501 moved *"which of mine is a Demerara rum?"*
+  from the card to the reader when cards stopped naming bottles, and nothing
+  answered it. A list of the fourteen names alone would be `rum_styles`
+  reprinted. Apply that same test to any second page here.
+- **2026-09-06** — The `[ COCKTAILS ]` footer column arrived with it and cost
+  **no template change**, which is what `sites.yml`'s own note had predicted
+  since 2026-08-19: the footer's loop always asked every site rather than
+  food. The asymmetry recorded in §2.5 as "an open question, not an oversight"
+  is closed.
+- **2026-09-06** — **`.ref-*` is a new page anatomy, and that is not a failure
+  to reuse.** Food's reference pages borrow `.recipe`/`.recipe-body-content`
+  and the site's only table CSS; every one of those lives in `_sass/food/`,
+  and cocktails' own anatomy is a DRINK's — a title block reserving a column
+  for a glass drawing, an ingredients grid built round an amount column.
+  Borrowed what there was to borrow: the drink page's absinthe-over-violette
+  heading mark, and `.cocktail-suggestion`'s woowoo for a bottle name, because
+  woowoo means ASKED FOR and a bottle name here is the same value as one in
+  brackets on a drink page. One hue, since a second is hers (§13.12).
+- **2026-09-06** — **Round one of candidates: table, stack or two columns; and
+  the retired words with reasons, words-only, or off.** Helen: *"This is all
+  table A"* and *"Leave reasons in full — I'll copyedit when I get to it
+  (please raise an issue)"*. The other two treatments were deleted rather than
+  left switchable. #784 raised for the copy.
+- **2026-09-06** — **Round two: column labels, and two headings that were
+  mine.** Labels repeat on **every section** (her call, and already what the
+  page did). *"By age"* → **`Non-geographical`** and *"Next to rum, and not
+  rum"* → **`Rum-adjacent`**, both hers. Worth recording why the first is
+  better rather than merely different: "By age" named the SORT ORDER and left
+  the membership rule to be worked out, while "Non-geographical" states the
+  rule — the other three shelves are Jamaica, Guyana and the cane-juice
+  islands, and this is what is left once origin stops being the answer. The
+  styles inside are still in age order, so the name and the order now say two
+  different true things instead of one twice.
+- **2026-09-06** — **One rum per line, her call**, against a first version that
+  ran them as a comma-separated sentence arguing three-to-eight names are one
+  answer. The eight agricoles are why that was wrong: names sharing their first
+  two words wrap into a ribbon, and a column you check your own shelf against is
+  scanned, not read.
+- **2026-09-06** — **`rum_groups` is DECLARED, not derived, and the page walks
+  the groups rather than `rum_styles`.** No rule recovers the shelves —
+  "Jamaican" is in two of that shelf's three style names and absent from the
+  third. The cost is that an unplaced fifteenth style would be invisible with
+  nothing else failing, which is what `test_rum_groups_partition_the_styles`
+  exists for. `rum_groups` also had to join `NOT_GENERIC_LISTS`, and is its
+  first member whose values are not strings — so omitting it raises on an
+  unhashable dict instead of quietly minting fourteen generics. Luck, not
+  design; the next such block will not be so obliging.
+- **2026-09-06, #782** — **The sipping shelf is a shelf and not a rule**, and
+  the page must not imply otherwise. Helen, asking for it: *"the name of which
+  is a little against my religions because you can sip anything plus I can mix
+  whatever I damn well want... but this section would help me keep track of my
+  collection a bit."* It gates no search, excludes no drink, forbids no pour —
+  so the block gets no category column, no card name and no "reach for this
+  instead". **The DATA shape it takes, and why its members carry no `generic`,
+  is §9's** — recorded there with the ruling that produced it.
+- **2026-09-06** — Helen's own prices and strengths replaced my guesses in the
+  same pass (Pusser's 151 £40 → £52, Ceylon Arrack £28 → £37, and Ceylon
+  arrack's ABV 33 → 40, which cleared a `qq:` rather than adding one). Both
+  guesses were about a quarter under. The bottles themselves are §9.
+- **2026-09-06** — **Local-only is TWO switches because it is two questions.**
+  Helen: *"please set it to build only locally."* `published: false` on the
+  page decides whether it exists; `local_only: true` on the `sites.yml` entry,
+  filtered on `show_local_reference_links`, decides whether anything points at
+  it. A production build with only the first is a footer link to a 404, so
+  `test_site_nav_links_resolve_to_real_pages` INVERTS for a local-only link
+  rather than exempting it. Deleting both lines is the whole of shipping.
