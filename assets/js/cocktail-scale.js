@@ -118,16 +118,6 @@
   );
   if (!control || !input || !note || !spans.length) return;
 
-  /* THE COST LINE IS OPTIONAL AND USUALLY ABSENT. It renders only where
-     `site.show_costs` is set, which is _config_local.yml and nowhere else, so
-     on the deployed site this is null and `recost` returns immediately. Read
-     once here rather than per keystroke. `exactCost` records the shape the
-     BUILD chose -- one figure or a range -- so that scaling cannot turn one
-     into the other; see `recost` for why that matters. */
-  var cost = article.querySelector('.cocktail-cost');
-  var exactCost = !!cost &&
-    cost.getAttribute('data-cost-min') === cost.getAttribute('data-cost-max');
-
   /* THE AMOUNT SPANS ARE THE INDEX, NOT THE INGREDIENT LIST. An ingredient with
      no `amount` renders no span at all (the layout gates on `item.amount`), so
      the two lists are different lengths on any drink with such an entry. Every
@@ -281,44 +271,27 @@
     });
     fitAmountColumn(verdict.amounts);
     put(input, box(last));
-    recost(n);
   }
 
-  /* THE COST LINE, MULTIPLIED. Local-only and optional -- production renders no
-     `.cocktail-cost` at all (see _config_local.yml's `show_costs`), so this
-     does nothing there and must not assume the element exists.
+  /* THE COST LINE DOES NOT MOVE WITH THE SCALER, AND THAT IS THE WHOLE RULE.
+     There is no `recost` here any more; this comment is what replaced it.
 
-     A PLAIN MULTIPLICATION IS THE WHOLE CALCULATION, and that is by design
-     rather than by luck: cost is linear in volume, so four times the recipe is
-     four times the money. Every hard part -- the bottle alias map, the
-     bottle-or-generic fallback, the fruit prices and juice yields -- ran once at
-     build in _plugins/cocktail_costs.rb, and the two numbers it reached are
-     sitting in `data-cost-min` / `data-cost-max`. This file knows nothing about
-     prices and must not learn: a second implementation of that resolution is
-     precisely what would drift the first time a bottle was renamed.
+     THE FIRST VERSION MULTIPLIED THE FIGURE BY THE MULTIPLE and was wrong.
+     Helen, 2026-09-06: "When I scale, the price per glass you calculate needs
+     to divide by the scaled number." Exactly so -- and the two operations
+     cancel. The line says "a glass"; scaling ×4 makes four glasses at four
+     times the money, which is the SAME price per glass. Multiplying by n and
+     then dividing by n is the identity, so the correct implementation is to
+     leave the number alone.
 
-     WITHOUT THIS THE FIGURE WOULD BE WRONG RATHER THAN STALE. The line says "a
-     glass", the scaler makes n glasses, and a number that silently keeps saying
-     the ×1 price while the amounts above it have quadrupled is worse than no
-     number -- the same judgement that deleted the millilitre box. */
-  function recost(n) {
-    if (!cost) return;
-    var lo = parseFloat(cost.getAttribute('data-cost-min'));
-    var hi = parseFloat(cost.getAttribute('data-cost-max'));
-    if (!isFinite(lo) || !isFinite(hi)) return;
-    /* `exact` is decided by the BUILD, not re-derived here from rounded
-       pennies: two figures that differ by less than half a penny would compare
-       equal at ×1 and unequal at ×20, so the page would grow a range as you
-       scaled it. The template prints one figure or two, and this keeps whatever
-       it chose. */
-    var span = cost.querySelector('.cocktail-cost-figure');
-    if (!span) return;
-    span.textContent = money(lo * n) + (exactCost ? '' : '–' + money(hi * n));
-  }
+     The reasoning that produced the bug was sound as far as it went ("cost is
+     linear in volume, so ×4 really is four times") and simply answered a
+     question the label was not asking. A per-unit figure is invariant under
+     scaling; only a TOTAL would move.
 
-  function money(v) {
-    return '£' + v.toFixed(2);
-  }
+     `data-cost-min` / `data-cost-max` stay on the element. They are what
+     cocktails/index.html does NOT have to recompute -- and they cost nothing,
+     while a machine-readable per-glass price on the page is worth keeping. */
 
   /* NOTHING TYPED YET, NOTHING A NUMBER CAN BE READ OUT OF, OR A NUMBER NOBODY
      IS ASKING FOR.
