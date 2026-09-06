@@ -650,7 +650,19 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 .drink-card-moods {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.28rem;
+  // COLUMN GAP HOLDS THE SEPARATOR, SINCE 2026-09-06. The middle dot used to be
+  // an in-flow `inline-block` inside the following chip, which made it part of
+  // that chip's width -- and that fed back into the wrap decision that decides
+  // whether the dot is drawn at all. See `.drink-card-mood`'s `::before` for the
+  // loop that caused and the bug Helen found. The dot is absolutely positioned
+  // now, so it has no width, and this gap is the space it sits in.
+  //
+  // 0.9rem, against the 0.28rem it replaces on this axis: the dot is 0.72rem
+  // Courier at a 0.6em advance, so 6.9px, and 14.4px leaves it a little under
+  // 4px of air either side. The ROW gap stays 0.28rem -- it is the number the
+  // two-row cap below is calculated from.
+  column-gap: 0.9rem;
+  row-gap: 0.28rem;
   min-width: 0;
   // TWO CHIP ROWS PLUS THE GAP -- AND PLUS THE BORDERS, which is what this was
   // missing. A chip's rendered height is its `line-height` ($chip-line) plus
@@ -759,13 +771,39 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   &:hover,
   &:focus-visible { color: $color-wicked-woowoo; }
 
+  // THE DOT SITS IN THE GAP AND HAS NO WIDTH, SINCE 2026-09-06. It was an
+  // in-flow `inline-block`, which put it inside the following chip's own box --
+  // and that is a feedback loop, because whether the dot is DRAWN depends on
+  // whether the row wraps, and the dot's width is part of what decides that.
+  //
+  // Helen found it on two cards. Lita Grey's four moods measure 289.5px with
+  // every dot present, against a foot of about 304px at her window: right on the
+  // threshold. So the row wrapped, `festive` was marked as starting row two, its
+  // dot was removed, the row lost 11.4px and fitted on one line after all --
+  // leaving exactly what she saw, one line with a dot missing from it. Nothing
+  // re-measured, and re-measuring would only have started the loop again in the
+  // other direction.
+  //
+  // Absolute positioning breaks the loop at the root: the row's width no longer
+  // depends on which dots are drawn, so the wrap decision is stable and the mark
+  // can never change it. `right: 100%` puts the dot's right edge on the chip's
+  // left edge, and the negative margin walks it back into the middle of the
+  // 0.9rem column gap.
+  position: relative;
+
   & + &::before {
     content: "·";
-    display: inline-block;
-    margin-right: 0.28rem;
+    position: absolute;
+    right: 100%;
+    // POSITIVE, and it moves the dot LEFT. For an absolutely positioned box the
+    // constraint is `left + width + margin-right + right = containing width`, so
+    // with `right: 100%` a larger margin-right pushes it further from the chip.
+    // 0.234rem = 3.75px, which centres a 6.9px dot in the 14.4px column gap.
+    margin-right: 0.234rem;
     color: $color-clear-text;
     font-weight: 400;
     -webkit-text-stroke: 0;
+    pointer-events: none;
   }
 
   // ...UNLESS THE WORD STARTS A ROW -- #698, Helen: "no dot before the first
