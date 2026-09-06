@@ -74,3 +74,15 @@ show_units: true
 # cocktails/index.html is false there and the page falls back to its empty
 # state. Never move this into _config.yml.
 show_drafts: true
+
+# Build pages whose front matter says `published: false` (#529's rum reference,
+# and food's cooking-methods prose archive). Jekyll's own flag; production does
+# not declare it, so those pages have no URL and no sitemap entry there.
+unpublished: true
+
+# Draw footer reference links marked `local_only` in _data/sites.yml. LOCAL
+# ONLY, and it is the second half of the switch above rather than a separate
+# feature: a page that does not build in production must not be linked from
+# there either. Same idiom as show_costs / show_units / show_drafts, and it
+# must stay out of _config.yml for the same reason.
+show_local_reference_links: true

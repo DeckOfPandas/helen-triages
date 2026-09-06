@@ -244,7 +244,15 @@ PLACEHOLDER = "QQ"
 # there would have declared itself valid and `test_every_generic_is_declared`
 # would have agreed. Found by breaking the guard that reads this list on purpose
 # and watching it stay green, which is the only reason it was found at all.
-NOT_GENERIC_LISTS = {"families", "not_on_cards"}
+# `rum_groups` JOINED ON 2026-09-06 AND IS THE THIRD TIME (#529). It is a list
+# of {name, styles} mappings -- a second READING of `rum_styles` for the
+# reference page's sections, declaring no vocabulary of its own -- so it belongs
+# here for the same reason `families` and `not_on_cards` do. It is also the
+# first entry whose members are not strings, which is what makes it loud rather
+# than silent: left out, `set(value)` raises on an unhashable dict instead of
+# quietly minting generics. That is luck, not design, and the next such block
+# will not be so obliging.
+NOT_GENERIC_LISTS = {"families", "not_on_cards", "rum_groups"}
 
 
 def _is_character_list(key):
@@ -6792,4 +6800,62 @@ def test_retired_rum_style_keys_split_by_case():
           "fix the spelling, or -- if the two kinds genuinely need telling apart "
           "some other way -- declare it in the data and change the page to read "
           "the declaration instead of the case."
+    )
+
+
+def test_rum_groups_partition_the_styles():
+    """`rum_groups` is a second reading of `rum_styles`, not a second list.
+
+    THE PAGE RENDERS THE GROUPS, SO A STYLE MISSING FROM THEM IS A STYLE THAT
+    HAS SILENTLY LEFT THE SITE. cocktails/reference/rum-categories.html walks
+    `rum_groups` rather than `rum_styles`, because the sections are Helen's own
+    shelves (Jamaican, Demerara, cane juice, by age, flavoured) and no rule
+    derives them from the names. That is the right call and it opens exactly one
+    hole: add a fourteenth style tomorrow, forget to place it, and the page
+    quietly stops listing it while every other check stays green -- the failure
+    `hers_to_apply` and the retired blocks all exist to prevent, arriving from a
+    new direction.
+
+    EXACTLY ONCE, IN BOTH DIRECTIONS. A style in no group vanishes from the
+    page; a style in two groups appears twice, which reads as two categories
+    with one name -- the precise confusion `card_names` was built to end
+    (#501). And a group naming a style that does not exist is a typo that would
+    render an empty row.
+    """
+    vocab = _vocab()
+    styles = vocab.get("rum_styles") or []
+    groups = vocab.get("rum_groups") or []
+    assert styles and groups, (
+        "rum_styles or rum_groups is empty; this check has nothing to hold."
+    )
+
+    placed = [s for g in groups for s in (g.get("styles") or [])]
+
+    unknown = sorted(set(placed) - set(styles))
+    assert not unknown, (
+        "rum_groups names style(s) that rum_styles does not declare:\n  "
+        + "\n  ".join(unknown)
+        + "\n\nA group is a reading of the vocabulary, never an addition to it."
+    )
+
+    unplaced = [s for s in styles if s not in placed]
+    assert not unplaced, (
+        "rum_style(s) in no group:\n  " + "\n  ".join(unplaced)
+        + "\n\ncocktails/reference/rum-categories.html walks rum_groups, so an "
+          "unplaced style is invisible on the page with nothing else failing. "
+          "Put it on the shelf it belongs on -- that is Helen's call, not an "
+          "inference from its name."
+    )
+
+    twice = sorted({s for s in placed if placed.count(s) > 1})
+    assert not twice, (
+        "rum_style(s) in more than one group:\n  " + "\n  ".join(twice)
+        + "\n\nThe page would list the category twice under two headings."
+    )
+
+    unnamed = [i for i, g in enumerate(groups) if not (g.get("name") or "").strip()]
+    assert not unnamed, (
+        f"rum_groups entr(ies) with no name: index {unnamed}. The fourth group's "
+        f"name is a placeholder in Helen's gift, but it must be a string the "
+        f"page can print -- an empty heading renders as a gap."
     )

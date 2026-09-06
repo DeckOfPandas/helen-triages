@@ -508,8 +508,8 @@ rum_styles:
   - "lightly aged and filtered rum"
   - "moderately aged rum"
   - "aged Demerara rum"
-  - "overproof Demerara rum"
-  - "unaged overproof Jamaican rum"
+  - "overproof Demerara rum, lightly aged"
+  - "overproof Jamaican rum, unaged"
   - "rhum agricole blanc"
   - "rhum agricole vieux"
   # Added to #314 after the first transcription. Haitian cane-juice spirit; a
@@ -523,6 +523,57 @@ rum_styles:
   - "pineapple rum"
   - "blended overproof rum"
   - "coconut rum"
+
+# HOW THE FOURTEEN GROUP, FOR READING. Helen, 2026-09-06, on the #529 reference
+# page: "reorganise the table into useful sections like Jamaican rum, Demerara
+# rum, cane juice, (no name unless you can think of one, but organised by
+# agedness), flavoured."
+#
+# A GROUPING IS NOT A NEW VOCABULARY. Nothing here may name a style
+# `rum_styles` does not already declare, and every style must appear exactly
+# once -- `test_rum_groups_partition_the_styles` holds both. So this file still
+# has ONE list of what a rum may be, and this is a second reading of it.
+#
+# IT IS ALSO NOT `family_of`. That map exists for search and exclusion (see the
+# families block above) and answers "is this a rum?"; this answers "which shelf
+# is it on?", and the two are different questions with different answers --
+# cachaça is in the rum FAMILY and is on nobody's rum shelf, so it is absent
+# here and present there.
+#
+# THE FOURTH GROUP'S NAME IS A PLACEHOLDER AND IS HELEN'S. Her brief says "no
+# name unless you can think of one, but organised by agedness", so the styles
+# are in age order -- clear, lightly aged, moderately aged, and the overproof
+# blend last -- and the name is offered rather than chosen. The three named
+# groups say WHERE a rum is from; this one is the residue that says only how
+# long it sat in wood, which is why no place-name fits it.
+rum_groups:
+  - name: "Jamaican rum"
+    styles:
+      - "moderately aged Jamaican rum"
+      - "caramel-forward Jamaican rum"
+      - "overproof Jamaican rum, unaged"
+  - name: "Demerara rum"
+    styles:
+      - "aged Demerara rum"
+      - "overproof Demerara rum, lightly aged"
+  # Cane JUICE rather than cane spirit, which is the line that puts clairin here
+  # and cachaça in neither list: all three of these are pressed juice fermented
+  # fresh, and the rest of the fourteen are molasses.
+  - name: "Cane juice"
+    styles:
+      - "rhum agricole blanc"
+      - "rhum agricole vieux"
+      - "clairin"
+  - name: "By age"
+    styles:
+      - "clear blended multi-region rum"
+      - "lightly aged and filtered rum"
+      - "moderately aged rum"
+      - "blended overproof rum"
+  - name: "Flavoured"
+    styles:
+      - "pineapple rum"
+      - "coconut rum"
 
 # Permitted WITHOUT a style per #314, because nothing generalises them.
 #
@@ -557,6 +608,13 @@ rum_characters:
   - "blackstrap"
   - "sherry"
   - "Spanish-style"
+  # Helen's addition, 2026-09-06. The ester-heavy, high-funk note -- and a
+  # CHARACTER for the reason every entry in this list is one: it is orthogonal
+  # to the style. Wray & Nephew has it unaged and overproof, Smith & Cross has
+  # it at 57% and moderately aged, Appleton Signature mostly does not, and all
+  # three are Jamaican -- so "Jamaican" cannot carry it and one field cannot
+  # hold both. Same shape as `peated` in whisky_characters below.
+  - "hogo"
 
 # PEAT IS A CHARACTER, NOT A STYLE -- Helen, 2026-08-27, working it out aloud:
 # "so single malt whisky, character: peated ???" Yes, and for the reason #441
@@ -648,9 +706,9 @@ card_names:
   # from the item text; `Pot-still dark Jamaican rum` and `Dark aged rum` look
   # like candidates and are hers to call.
   "caramel-forward Jamaican rum": "Jamaican rum"
-  "unaged overproof Jamaican rum": "Jamaican overproof rum"
+  "overproof Jamaican rum, unaged": "overproof Jamaican rum"
   "aged Demerara rum": "Demerara rum"
-  "overproof Demerara rum": "Demerara overproof rum"
+  "overproof Demerara rum, lightly aged": "overproof Demerara rum"
   # The honest name for what everyone else calls white rum.
   "lightly aged and filtered rum": "lightly aged rum"
   # The weakest name in this map, and flagged as such: it is the residual
@@ -694,8 +752,8 @@ card_names:
   # Stiggins' Fancy 15 -> 13.
   "pineapple rum": "pineapple rum"
   # Guyana/Jamaica/Barbados at 69%, so "blended overproof" is what it IS rather
-  # than a summary of it. Distinct from `Demerara overproof rum` and
-  # `Jamaican overproof rum`, which are the single-origin overproofs.
+  # than a summary of it. Distinct from `overproof Demerara rum` and
+  # `overproof Jamaican rum`, which are the single-origin overproofs.
   "blended overproof rum": "blended overproof rum"
   "coconut rum": "coconut rum"
   "cachaça": "cachaça"
@@ -773,7 +831,7 @@ card_names:
 # card joins the two card names with " or ". Seven distinct pairs occur and six
 # of them read fine -- `lightly aged rum or agricole blanc` is exactly the
 # choice `White rum` used to conceal. The seventh repeats its own head word:
-# `Demerara overproof rum or Demerara rum`.
+# `overproof Demerara rum or Demerara rum`.
 #
 # KEYED ON THE DEFAULT JOIN, so the left-hand side is the string this replaces
 # and you can read the before and after together. AN EXPLICIT MAP RATHER THAN A
@@ -794,7 +852,8 @@ card_names:
 # reads as outstanding, and one whose left-hand side has drifted does nothing
 # while looking live.
 # EMPTY SINCE 2026-08-30, and the mechanism stays. Its one entry replaced the
-# Swizzle's `Demerara overproof rum or Demerara rum` with Helen's own
+# Swizzle's `Demerara overproof rum or Demerara rum` (the card names of the
+# day -- see #781, which reordered both) with Helen's own
 # `Demerara rum or overproof`; that drink was rewritten the same day into the
 # Martinique Swizzle -- 60 ml of unaged agricole, no Demerara anywhere -- so the
 # pair it fixed is no longer produced by any drink.
@@ -1442,8 +1501,8 @@ family_of:
   "lightly aged and filtered rum": rum
   "moderately aged rum": rum
   "aged Demerara rum": rum
-  "overproof Demerara rum": rum
-  "unaged overproof Jamaican rum": rum
+  "overproof Demerara rum, lightly aged": rum
+  "overproof Jamaican rum, unaged": rum
   "rhum agricole blanc": rum
   "rhum agricole vieux": rum
   "clairin": rum

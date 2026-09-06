@@ -195,6 +195,11 @@ bottles:
     size_ml: 700
     gbp: 30
     confidence: medium
+  # In the house since 2026-09-06, #782. UK shelf price for the 70cl.
+  "Pusser's 151":
+    size_ml: 700
+    gbp: 40
+    confidence: low
   "Planteray Stiggins' Fancy":
     size_ml: 700
     gbp: 32
@@ -268,6 +273,13 @@ bottles:
     size_ml: 700
     gbp: 40
     confidence: high
+  # In the house since 2026-09-06, #782, and keyed on the words in the issue
+  # rather than a label -- so the price is the category's rather than the
+  # bottle's, and low for that reason as well as for the usual one.
+  "Ceylon Arrack":
+    size_ml: 700
+    gbp: 28
+    confidence: low
   # --- gin ---------------------------------------------------------------
   "Beefeater":
     size_ml: 700
@@ -798,8 +810,8 @@ generics:
   coconut cream:      { gbp_per_litre_min: 5.00,  gbp_per_litre_max: 7.50,  basis: "GBP 2-3 / 400ml tin", confidence: medium }
 
   # --- a real category: the range is the span of what you might buy ------------
-  # `overproof Demerara rum` JOINED THIS BLOCK ON 2026-09-05, when El Dorado 151
-  # went to bottles.yml's `not_reached_for` -- Helen: "I don't own it, I just
+  # `overproof Demerara rum, lightly aged` JOINED THIS BLOCK ON 2026-09-05,
+  # when El Dorado 151 went to bottles.yml's `not_reached_for` -- Helen: "I don't own it, I just
   # wanted to, but it looks like it's hard to get." It was the only bottle in
   # the category, so the category lost its price with it, and two drinks still
   # pour it (pic-a-de-crop-punch's 360 ml, zombie-intoxica's 15 ml).
@@ -810,7 +822,7 @@ generics:
   # "on the shelf" than this is. The fallback answers "what would a litre of
   # this cost", which has an answer whether or not a bottle is open. The RANGE
   # is wide and deliberately so: scarcity is exactly what she ran into.
-  overproof Demerara rum: { gbp_per_litre_min: 57.14, gbp_per_litre_max: 85.71, basis: "GBP 40-60 / 70cl, scarce in the UK", confidence: low }
+  overproof Demerara rum, lightly aged: { gbp_per_litre_min: 57.14, gbp_per_litre_max: 85.71, basis: "GBP 40-60 / 70cl, scarce in the UK", confidence: low }
   # `tawny port` JOINED FOR THE SAME REASON, hours later. Ottoman 10 Year Tawny
   # was the only one declared and Helen removed it -- "the three Lows I skipped,
   # let's remove them from the collection please" -- leaving Port Authority's

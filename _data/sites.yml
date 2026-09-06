@@ -46,9 +46,15 @@
 #               footer as a column headed by this site's own bracketed word. The
 #               footer draws a column per site that has any and skips the ones
 #               that do not, so it is one footer everywhere while still saying
-#               truthfully which material is whose. Cocktails has no reference
-#               pages yet and so contributes no column -- the same
-#               absent-means-nothing convention used throughout this file.
+#               truthfully which material is whose. Both sites have material as
+#               of 2026-09-06 -- the same absent-means-nothing convention still
+#               governs, there is simply nothing absent.
+#               An entry may carry `local_only: true`, which drops it from any
+#               build that does not declare `show_local_reference_links`, i.e.
+#               from production. It is for a page that is itself
+#               `published: false`, and the two flags must be set and cleared
+#               together: a link with no page is a 404, and a page with no link
+#               is reachable only by typing the URL.
 # =============================================================================
 
 food:
@@ -80,5 +86,12 @@ cocktails:
   # the [ COCKTAILS ] column now draws beside [ FOOD ] on every page of both
   # sites.
   reference_links:
+    # `local_only` GATES THE LINK, and the page gates itself -- see its own
+    # front matter. Helen, 2026-09-06: "please set it to build only locally."
+    # The template drops a local-only link unless `show_local_reference_links`
+    # is set, which only _config_local.yml declares, and a site left with no
+    # links draws no column -- so production is exactly as it was before this
+    # key existed. Delete the flag to ship the page.
     - text: rum categories
       url: /cocktails/reference/rum-categories/
+      local_only: true
