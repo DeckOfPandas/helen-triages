@@ -8,8 +8,7 @@ the explaining.
 ---
 
 We're working on my website, a Jekyll mono-repo serving two personal
-decision-support sites: **food** (what shall we cook) and **cocktails**. You
-are in a git worktree; do not leave it. Before anything else, read these three
+decision-support sites: **food** (what shall we cook) and **cocktails** (what shall we drink). You are in a git worktree; do not leave it. Before anything else, read these three
 in this order:
 
 1. **`CLAUDE.md`** at the repo root — the rules for you as an agent: git,
@@ -49,7 +48,7 @@ Things to know before your first tool call:
   on. Both are their own repos with their own `main`: branch there too; push
   there without asking.
 - **Every recipe edit sets `meta.proofread: false` in the same commit**, and a
-  drink is gated the same way. `QQ` is my placeholder — never flag it, fix it
+  drink is gated the same way. `QQ` is my placeholder — never fix it
   or convert it, and never delete a `QQ original` line.
 - **One `pytest` at a time**, never two.
 - **Ask me the decisions as you hit them, inline, not in a batch at the end**,
@@ -58,7 +57,7 @@ Things to know before your first tool call:
   (MANUAL §13.11); do not argue for one.
 - **Tag the issue in every commit** (`Fixes #N`, `Towards #N`); check
   `git branch --show-current` in its own tool call immediately before every
-  commit; never push this repo without my explicit say-so.
+  commit; never push this repo without my explicit say-so because multiple Claude might be working in parallel.
 - **If you learn something that is not written down — a ruling, a reversal, a
   trap — add it to `DECISIONS.md` under its section, dated, and fix the manual
   if the manual is now wrong.** If you touch `INGEST_ONE_*.md` or
