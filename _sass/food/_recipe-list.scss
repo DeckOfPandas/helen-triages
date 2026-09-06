@@ -220,31 +220,34 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
 
-  // THREE LINES SINCE 2026-09-06 -- #552, Helen: "recipe cards: allow three
-  // lines of main ingredients. We have plenty of vertical space."
+  // ONE LINE, AND IT WENT TO THREE FOR ABOUT AN HOUR -- #552, 2026-09-06.
   //
-  // IT WAS ONE, AND ONE WAS HIDING ABOUT HALF OF EVERY LIST. HANDOVER §6's own
-  // census puts `_food_recipes/` at a median of SIX main ingredients and a max
-  // of fourteen, with 18% over eight -- and a single line of this column fits
-  // five or six short names before the ellipsis. So the typical row was showing
-  // its median and clipping everything after it, on the page whose whole job is
-  // deciding what to cook.
+  // I read "recipe cards: allow three lines of main ingredients" as this index
+  // and raised it here. Helen: "It was actually cocktail cards I meant", and
+  // then, having seen this one: "One line of ingredients on food recipe lines
+  // please." So the food row is back exactly where it was and the change lives
+  // on the cocktail card, where it was asked for.
   //
-  // THE ELLIPSIS IS WHY THIS WAS INVISIBLE rather than obviously wrong: it is a
-  // tidy ending, so a truncated row does not look damaged, it looks finished.
-  // The comment above about the removed bottom-fade is the same page learning
-  // the same lesson from the other side.
+  // WORTH KEEPING THE MEASUREMENT, because it is the argument someone will make
+  // again: HANDOVER 6's census puts `_food_recipes/` at a median of SIX main
+  // ingredients and a max of fourteen, and a single line of this column fits
+  // five or six short names before the ellipsis. So the typical row really does
+  // show its median and clip the rest.
   //
-  // THE MOBILE OVERRIDE WENT WITH IT. It existed to give the narrow viewport
-  // more lines than the wide one (2 against 1), because the same names wrap
-  // sooner in a narrower column. Three covers both, and keeping a `max-width`
-  // rule that now sets a SMALLER number than the base would be a trap for the
-  // next person to raise this.
-  //
-  // NOTE FOR HELEN: this is the one change in this batch that alters a page you
-  // did not ask to see first, and row height is the most visible thing on the
-  // food index. If three is too tall, two is one character away.
-  -webkit-line-clamp: 3;
+  // THAT IS NOT A BUG HERE, WHICH IS THE PART I HAD WRONG. A food row is a
+  // ROW -- one of eighty in a scannable list, where height is the cost of every
+  // other row you can no longer see at once. A cocktail card is a CARD, with
+  // its own space, and the same clipping there loses the tiki drinks their
+  // point. Same measurement, opposite answers, because the two pages are doing
+  // different jobs.
+  -webkit-line-clamp: 1;
+
+  // THE MOBILE OVERRIDE COMES BACK WITH IT. It gives the narrow viewport MORE
+  // lines than the wide one, because the same names wrap sooner in a narrower
+  // column -- so removing it was part of the same mistake.
+  @media (max-width: 600px) {
+    -webkit-line-clamp: 2;
+  }
 }
 
 // --- Pagination -----------------------------------------------------------
