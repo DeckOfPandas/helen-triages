@@ -46,7 +46,7 @@ const VOCAB = {
     'Old Tom': 'gin',
     'Plymouth': 'gin',
     'aged Demerara rum': 'rum',
-    'Demerara overproof rum': 'rum',
+    'overproof Demerara rum': 'rum',
     'moderately aged Jamaican rum': 'rum',
     'moderately aged rum': 'rum',
     'bourbon': 'whisky',
@@ -70,7 +70,7 @@ const VOCAB = {
   card_names: {
     'London dry gin': 'gin',
     'aged Demerara rum': 'Demerara rum',
-    'Demerara overproof rum': 'Demerara overproof rum',
+    'overproof Demerara rum': 'overproof Demerara rum',
     'moderately aged Jamaican rum': 'Jamaican rum',
     // Two generics under one card name is #501's declared collapse, and it is
     // what puts the comma'd spelling above out of sight behind a card name --
@@ -89,7 +89,7 @@ const VOCAB = {
 const BOTTLES = {
   bottles: {
     'Wray & Nephew': {
-      generic: 'unaged overproof Jamaican rum',
+      generic: 'overproof Jamaican rum, unaged',
       aliases: ['Wray and Nephew', 'Wray & Nephew Overproof']
     },
     'El Dorado 3': { generic: 'lightly aged and filtered rum', aliases: ['ED3', 'El Dorado 3yo'] },
@@ -100,7 +100,7 @@ const BOTTLES = {
       aliases: ['Appleton 8']
     },
     "Chairman's Reserve": { generic: 'moderately aged rum' },
-    'Rum Fire': { generic: 'unaged overproof Jamaican rum' },
+    'Rum Fire': { generic: 'overproof Jamaican rum, unaged' },
     // The measured collision: `coconut rum` is a DECLARED GENERIC and also a
     // declared alias of this bottle. Resolving it would put a brand back into
     // the picker, reversing #501.
@@ -837,7 +837,7 @@ test('a matched ingredient on a card is found by the same rule the filter used',
 // --- why a chip is on screen: `via` and `viaKind` -----------------------------
 // #603. Helen typed three letters three times and got three chips that could
 // not say why they were there: "mu" -> `clear blended rum`, "sa" -> `cachaça`,
-// "wr" -> `Jamaican overproof rum`. Every one was band 3 doing exactly what it
+// "wr" -> `overproof Jamaican rum`. Every one was band 3 doing exactly what it
 // was built to do -- matching a name the chip does not display.
 //
 // The module cannot decide what a picker should DO about that; what it can do

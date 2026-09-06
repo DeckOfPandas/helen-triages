@@ -336,8 +336,8 @@ mood_ingredients:
     - pineapple rum
     - coconut rum
     - blackstrap          # a rum CHARACTER, not a generic — #314
-    - overproof Demerara rum
-    - unaged overproof Jamaican rum
+    - overproof Demerara rum, lightly aged
+    - overproof Jamaican rum, unaged
     - passion fruit
     - pineapple
 
@@ -529,8 +529,8 @@ mood_ingredients:
   # and the thing that rescues `tiki` from being a headcount — "Better and
   # Better is a tiki drink. Only three ingredients, but they're bonkers."
   loud:
-    - overproof Demerara rum
-    - unaged overproof Jamaican rum
+    - overproof Demerara rum, lightly aged
+    - overproof Jamaican rum, unaged
     - blended overproof rum
     - blackstrap          # a rum CHARACTER, not a generic — #314
     - Campari

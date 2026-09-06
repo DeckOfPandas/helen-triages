@@ -244,7 +244,15 @@ PLACEHOLDER = "QQ"
 # there would have declared itself valid and `test_every_generic_is_declared`
 # would have agreed. Found by breaking the guard that reads this list on purpose
 # and watching it stay green, which is the only reason it was found at all.
-NOT_GENERIC_LISTS = {"families", "not_on_cards"}
+# `rum_groups` JOINED ON 2026-09-06 AND IS THE THIRD TIME (#529). It is a list
+# of {name, styles} mappings -- a second READING of `rum_styles` for the
+# reference page's sections, declaring no vocabulary of its own -- so it belongs
+# here for the same reason `families` and `not_on_cards` do. It is also the
+# first entry whose members are not strings, which is what makes it loud rather
+# than silent: left out, `set(value)` raises on an unhashable dict instead of
+# quietly minting generics. That is luck, not design, and the next such block
+# will not be so obliging.
+NOT_GENERIC_LISTS = {"families", "not_on_cards", "rum_groups"}
 
 
 def _is_character_list(key):
@@ -6674,4 +6682,134 @@ def test_the_unit_formula_and_its_worked_example_still_agree():
     assert round(60 * tanqueray["abv"] / ML_PER_UNIT, 1) == 2.6, (
         "A 60 ml pour of Tanqueray is 2.586 units, which prints as 2.6. This "
         "failing means the formula, the constant or the data has moved."
+    )
+
+
+# =============================================================================
+# The reference page's own reading of the data -- #529
+# =============================================================================
+
+def test_retired_rum_style_keys_split_by_case():
+    """A capitalised `retired_rum_styles` key names a BOTTLE; a lowercase one
+    names a WORD -- and cocktails/reference/rum-categories.html shows only the
+    words.
+
+    THE PAGE NEEDS THE SPLIT AND THE DATA DOES NOT DECLARE IT. Eleven entries
+    live in that block and they are two different kinds of thing. Eight are
+    words other people's recipes will keep asking for forever -- `navy`,
+    `black`, `dark` -- and the page's "not categories" section exists precisely
+    to answer those with a recipe book open. Three are the brand-generics
+    retired on 2026-08-29 when #314's amendment generalised them (Malibu, the
+    two Planterays): those record a VOCABULARY change, and a reader looking up
+    "what does my book mean by dark rum" is not helped by being told that
+    Malibu used to be its own generic.
+
+    LIQUID CANNOT ASK WHICH KIND AN ENTRY IS, so the page tests the first
+    character's case, which works because the three brand entries name bottles
+    and a bottle name is capitalised. That is an inference from a spelling
+    convention rather than from a declared field, so it needs a guard: this
+    test is what stops a future retired BOTTLE written in lowercase (or a
+    retired WORD written with a capital) from silently changing what the page
+    prints, with nothing failing.
+
+    THE ASSERTION IS THE CONVENTION, NOT THE PAGE. Each capitalised key must
+    name a bottle and each lowercase key must not. If the day comes that a
+    retired word genuinely wants a capital, the honest fix is a declared field
+    in the data and a page that reads it, not a looser test here.
+
+    "NAMES A BOTTLE" IS A PREFIX MATCH IN EITHER DIRECTION, NOT AN EXACT ONE,
+    and the case that forced it is worth recording rather than smoothing over:
+    `Planteray O.F.T.D. Overproof` was the retired GENERIC's spelling and the
+    bottle is `Planteray O.F.T.D.` -- the same product, one word longer,
+    because the generic had to say "overproof" and the bottle does not. A
+    retired brand-generic is keyed on what the DATA used to say, and that was
+    never required to equal what bottles.yml calls the bottle today.
+    """
+    vocab = _vocab()
+    retired = vocab.get("retired_rum_styles") or {}
+    assert retired, "retired_rum_styles is empty; this check has nothing to hold."
+
+    index = _bottle_index(_bottles())
+
+    def names_a_bottle(key):
+        k = key.strip().lower()
+        return any(k == n or k.startswith(n + " ") or n.startswith(k + " ")
+                   for n in index)
+
+    wrong = []
+    for key in retired:
+        is_capitalised = key[:1] != key[:1].lower()
+        is_bottle = names_a_bottle(key)
+        if is_capitalised and not is_bottle:
+            wrong.append(f"{key!r} is capitalised but names no bottle")
+        if not is_capitalised and is_bottle:
+            wrong.append(f"{key!r} is lowercase but names a bottle")
+
+    assert not wrong, (
+        "retired_rum_styles keys break the case convention:\n  "
+        + "\n  ".join(wrong)
+        + "\n\ncocktails/reference/rum-categories.html shows the lowercase keys "
+          "and hides the capitalised ones, because the first are words a recipe "
+          "asks for and the second are bottles whose generic was retired. Either "
+          "fix the spelling, or -- if the two kinds genuinely need telling apart "
+          "some other way -- declare it in the data and change the page to read "
+          "the declaration instead of the case."
+    )
+
+
+def test_rum_groups_partition_the_styles():
+    """`rum_groups` is a second reading of `rum_styles`, not a second list.
+
+    THE PAGE RENDERS THE GROUPS, SO A STYLE MISSING FROM THEM IS A STYLE THAT
+    HAS SILENTLY LEFT THE SITE. cocktails/reference/rum-categories.html walks
+    `rum_groups` rather than `rum_styles`, because the sections are Helen's own
+    shelves (Jamaican, Demerara, cane juice, by age, flavoured) and no rule
+    derives them from the names. That is the right call and it opens exactly one
+    hole: add a fourteenth style tomorrow, forget to place it, and the page
+    quietly stops listing it while every other check stays green -- the failure
+    `hers_to_apply` and the retired blocks all exist to prevent, arriving from a
+    new direction.
+
+    EXACTLY ONCE, IN BOTH DIRECTIONS. A style in no group vanishes from the
+    page; a style in two groups appears twice, which reads as two categories
+    with one name -- the precise confusion `card_names` was built to end
+    (#501). And a group naming a style that does not exist is a typo that would
+    render an empty row.
+    """
+    vocab = _vocab()
+    styles = vocab.get("rum_styles") or []
+    groups = vocab.get("rum_groups") or []
+    assert styles and groups, (
+        "rum_styles or rum_groups is empty; this check has nothing to hold."
+    )
+
+    placed = [s for g in groups for s in (g.get("styles") or [])]
+
+    unknown = sorted(set(placed) - set(styles))
+    assert not unknown, (
+        "rum_groups names style(s) that rum_styles does not declare:\n  "
+        + "\n  ".join(unknown)
+        + "\n\nA group is a reading of the vocabulary, never an addition to it."
+    )
+
+    unplaced = [s for s in styles if s not in placed]
+    assert not unplaced, (
+        "rum_style(s) in no group:\n  " + "\n  ".join(unplaced)
+        + "\n\ncocktails/reference/rum-categories.html walks rum_groups, so an "
+          "unplaced style is invisible on the page with nothing else failing. "
+          "Put it on the shelf it belongs on -- that is Helen's call, not an "
+          "inference from its name."
+    )
+
+    twice = sorted({s for s in placed if placed.count(s) > 1})
+    assert not twice, (
+        "rum_style(s) in more than one group:\n  " + "\n  ".join(twice)
+        + "\n\nThe page would list the category twice under two headings."
+    )
+
+    unnamed = [i for i, g in enumerate(groups) if not (g.get("name") or "").strip()]
+    assert not unnamed, (
+        f"rum_groups entr(ies) with no name: index {unnamed}. The fourth group's "
+        f"name is a placeholder in Helen's gift, but it must be a string the "
+        f"page can print -- an empty heading renders as a gap."
     )

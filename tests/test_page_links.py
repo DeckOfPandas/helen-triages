@@ -147,6 +147,13 @@ PAGE_FILES = [
         + sorted(ROOT.glob("*.html"))
     ) if _is_published(p)
 ]
+UNPUBLISHED_PAGE_FILES = [
+    p for p in (
+        sorted(ROOT.glob("food/**/*.html"))
+        + sorted(ROOT.glob("cocktails/**/*.html"))
+        + sorted(ROOT.glob("*.html"))
+    ) if not _is_published(p)
+]
 LAYOUT_FILES = sorted(ROOT.glob("_layouts/*.html"))
 INCLUDE_FILES = sorted(ROOT.glob("_includes/**/*.html"))
 ALL_TEMPLATE_FILES = PAGE_FILES + LAYOUT_FILES + INCLUDE_FILES
@@ -166,6 +173,15 @@ def page_url(path: Path) -> str:
 
 
 PAGE_URL_BY_FILE: dict[Path, str] = {f: page_url(f) for f in PAGE_FILES}
+
+# THE OTHER HALF OF THE `published: false` FILTER, and it exists so a
+# `local_only` footer link can be CHECKED rather than exempted -- see
+# test_site_nav_links_resolve_to_real_pages (#529, 2026-09-06). A page in here is
+# one the repo holds and production does not build: it carries a real permalink,
+# which is the URL the link points at locally, and it has no URL at all in a
+# production build. Nothing else may use this set -- it is deliberately NOT a
+# link target anywhere, which is the whole point of the exclusion above.
+UNPUBLISHED_PAGES: set[str] = {page_url(f) for f in UNPUBLISHED_PAGE_FILES}
 
 
 def _collection_pages() -> dict[str, Path]:
@@ -567,12 +583,42 @@ def test_site_nav_links_resolve_to_real_pages():
                 f"_includes/icons/{icon}.svg does not exist"
             )
 
-        # The footer reference block (2026-08-16). Absent is fine -- cocktails
-        # has none yet, and the template draws no column for a site with none --
-        # but a link that IS listed has to go somewhere real.
+        # The footer reference block (2026-08-16). Absent is fine -- the
+        # template draws no column for a site with none -- but a link that IS
+        # listed has to go somewhere real.
+        #
+        # `local_only: true` INVERTS THE CHECK RATHER THAN SKIPPING IT (#529,
+        # 2026-09-06). Such a link points at a page that is deliberately
+        # `published: false`, so it is NOT in PAGES and never can be; the
+        # template drops it unless _config_local.yml's
+        # `show_local_reference_links` is set, so production never emits it.
+        #
+        # Two flags have to agree for that to hold, and an exemption would let
+        # them drift apart in silence in both directions: clear the page's
+        # `published: false` and the footer stops linking a page that now
+        # exists; drop `local_only` and production gets a link to a 404. So a
+        # local-only link must point at a file that IS unpublished, and an
+        # ordinary one at a page that is published. `_UNPUBLISHED` is the same
+        # front-matter scan `_is_published` runs, keyed by permalink.
         for entry in site.get("reference_links") or []:
-            url = (entry or {}).get("url")
-            if url not in PAGES:
+            entry = entry or {}
+            url = entry.get("url")
+            if entry.get("local_only"):
+                if url in PAGES:
+                    problems.append(
+                        f"sites.yml: {key}.reference_links entry "
+                        f"{entry.get('text')!r} is local_only, but {url!r} IS "
+                        f"published -- drop the flag, or the page is linked "
+                        f"nowhere it can be reached"
+                    )
+                elif url not in UNPUBLISHED_PAGES:
+                    problems.append(
+                        f"sites.yml: {key}.reference_links entry "
+                        f"{entry.get('text')!r} is local_only and points at "
+                        f"{url!r}, which no page serves at all -- not published, "
+                        f"and not `published: false` either"
+                    )
+            elif url not in PAGES:
                 problems.append(
                     f"sites.yml: {key}.reference_links entry {entry.get('text')!r} "
                     f"points at {url!r}, which no published page serves"
