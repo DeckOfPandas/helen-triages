@@ -1,0 +1,30 @@
+{
+  "name": "helen-triages (sandboxed)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "helen",
+  "mounts": [
+    "source=helen-triages-claude-config,target=/home/helen/.claude,type=volume",
+    "source=helen-triages-bundle-cache,target=/home/helen/.bundle-cache,type=volume"
+  ],
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/helen/.claude"
+  },
+  "remoteEnv": {
+    "GH_TOKEN": "${localEnv:GH_TOKEN}"
+  },
+  "forwardPorts": [4001, 4002],
+  "portsAttributes": {
+    "4001": { "label": "jekyll-local" },
+    "4002": { "label": "jekyll-prod" }
+  },
+  "postCreateCommand": "bundle install",
+  "customizations": {
+    "vscode": {
+      "extensions": ["Shopify.ruby-lsp"]
+    }
+  }
+}

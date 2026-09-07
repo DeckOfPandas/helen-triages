@@ -1,12 +1,21 @@
 {
   "permissions": {
+    "blockReadsOutsideWorkingDirectories": true,
     "allow": [
       "Bash(pytest *)",
       "Bash(python3 -m pytest *)",
       "Bash(.node-runtime/node/bin/node --test *)",
       "Bash(curl -s \"https://api.github.com/repos/DeckOfPandas/helen-triages/*)",
       "Bash(.gh-runtime/bin/gh auth status)",
-      "Bash(.gh-runtime/bin/gh issue *)"
+      "Bash(.gh-runtime/bin/gh issue *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git blame *)",
+      "Bash(git ls-tree *)",
+      "Bash(git ls-remote *)",
+      "Bash(git check-ignore *)"
     ],
     "deny": [
       "Bash(chmod *)",
