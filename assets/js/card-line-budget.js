@@ -42,7 +42,13 @@
 // much room the ingredients get, the ingredients decide how much the chips get,
 // and chip-rows.js measures where the chip rows actually broke. Running out of
 // order is not a crash -- it is a card whose dots are marked for a row count it
-// no longer has. `cocktails/index.html` fixes the order; see its script tags.
+// no longer has. `_layouts/default.html` fixes the order; see its script tags.
+//
+// AND IT MUST RE-RUN WHEN THE VISIBLE SET CHANGES, which is why `run` hangs off
+// HTF. The index paginates by setting `card.hidden`, not by removing cards, and
+// A HIDDEN ELEMENT MEASURES ZERO HEIGHT -- so the load-time pass can only ever
+// classify page one. cocktail-index.js calls this on every filter pass, ahead of
+// HTF.markChipRows() for the ordering reason above.
 // =============================================================================
 (function () {
   'use strict';
