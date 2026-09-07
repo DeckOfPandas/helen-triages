@@ -244,6 +244,51 @@
   // The mark IS the button here, so the trailing margin that separates it from
   // a word would sit the glyph off-centre in its own hit area.
   &::before { margin-right: 0; }
+
+  // --- #823: A BIGGER TARGET THAT COSTS THE LAYOUT NOTHING -------------------
+  // Helen: "a little easy to mis-click". The padded box above is about 22x25px,
+  // which the comment beside it already called "a poor thing to hit with a
+  // thumb" -- it was as far as PADDING could take it, because every extra
+  // millimetre of padding on the left is a millimetre off the title (see the
+  // reservation below, which is computed from this button's own metrics).
+  //
+  // SO THE TARGET GROWS AND THE BOX DOES NOT. An absolutely-positioned ::after
+  // extends the clickable region without entering layout, so the reservation,
+  // the tape's width and card-name-fit.js's measurement are all untouched.
+  //
+  // THE AMOUNTS ARE WHAT IS ALREADY EMPTY, not a round number:
+  //
+  //   top    $card-pad-y - $space-xs   0.75rem   card padding, nothing in it
+  //   right  $card-pad-x - $space-xs   0.85rem   card padding, nothing in it
+  //   left   $space-sm                 0.5rem    the gap the reservation
+  //                                              already keeps clear of the
+  //                                              tape -- so this claims the
+  //                                              gap and never the tape itself
+  //   bottom $space-xs                 0.3rem    modest; the ingredient line
+  //                                              starts below and is a real
+  //                                              target of its own
+  //
+  // That takes it from roughly 22x25px to roughly 44x42px, which is the size
+  // hit-target guidance actually asks for, and every pixel of it was already
+  // dead space in the card's own padding.
+  //
+  // IT DOES CLAIM THE CORNER FROM THE CARD LINK, and that is the trade rather
+  // than a side-effect: a click in the top-right corner now shortlists instead
+  // of opening the drink. That corner is the worst place on a card to aim for
+  // "open this" and the best place to aim for the mark, which is the whole
+  // complaint in #823.
+  //
+  // `content: ''` AND NO BACKGROUND -- it must never be visible. If a future
+  // change needs to see it, give it an outline temporarily rather than shipping
+  // one.
+  &::after {
+    content: '';
+    position: absolute;
+    top: calc(-1 * (#{$card-pad-y} - #{$space-xs}));
+    right: calc(-1 * (#{$card-pad-x} - #{$space-xs}));
+    bottom: -#{$space-xs};
+    left: -#{$space-sm};
+  }
 }
 
 // --- What the corner costs the title -----------------------------------------
