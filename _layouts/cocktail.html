@@ -304,8 +304,31 @@ layout: default
            is not a property of a glass — and, generally, "ice pedantry will be
            more likely to be seen at the point in the make where it happens."
            Both moved to the "To serve" block below the method. {% endcomment %}
+        {% comment %} COMMAS, THEN "or" BEFORE THE LAST -- #704. A plain
+           `join: " or "` reads fine for two and badly for three: the
+           Boulevardier, the only drink naming three, read "old fashioned or
+           coupe or nick and nora". It now reads "old fashioned, coupe or nick
+           and nora". Eight drinks name two and are unaffected -- "flute or
+           coupe" is what both spellings produce.
+
+           NO OXFORD COMMA, which is house style and also the only reading that
+           works here: "coupe, or nick and nora" would suggest the last option
+           is itself a pair, and "nick and nora" is one glass.
+
+           `slice` RATHER THAN A COUNTER. Liquid has no pop, and building the
+           string in a loop with an index test is the version that gets edited
+           wrongly later. `slice: 0, n-1` is the whole head of the list.
+        {% endcomment %}
         {% if page.glass.size > 0 %}
-          <div><dt>Glass</dt><dd>{{ page.glass | join: " or " }}</dd></div>
+          <div><dt>Glass</dt><dd>
+            {%- if page.glass.size == 1 -%}
+              {{ page.glass[0] }}
+            {%- else -%}
+              {%- assign all_but_last = page.glass.size | minus: 1 -%}
+              {%- assign head = page.glass | slice: 0, all_but_last -%}
+              {{ head | join: ", " }} or {{ page.glass | last }}
+            {%- endif -%}
+          </dd></div>
         {% endif %}
         {% if page.garnish.size > 0 %}
           <div><dt>Garnish</dt><dd>{{ page.garnish | join: ", " }}</dd></div>

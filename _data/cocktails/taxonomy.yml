@@ -346,6 +346,7 @@ mood_ingredients:
     - lime juice
     - lemon juice
     - grapefruit juice
+    - ruby grapefruit juice
     - orange juice
 
   # Non-citrus fruit.
@@ -525,6 +526,7 @@ mood_ingredients:
     - pineapple juice
     - orange juice
     - grapefruit juice
+    - ruby grapefruit juice
 
   # LOUD: ingredients carrying a whole flavour layer alone. Helen's insight,
   # and the thing that rescues `tiki` from being a headcount — "Better and

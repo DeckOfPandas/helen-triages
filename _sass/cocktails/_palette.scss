@@ -164,6 +164,25 @@ $color-grey-light:   #2c2c31;   // borders; L* 18.2 against the ground's 4.0
 // MOOD, and the home colour. Absinthe — the green fairy.
 $color-electric-absinthe:      #30E88C;   // rule
 $color-electric-absinthe-deep: #30E88C;   // text  11.11:1 on a card
+// NOTHING READS THIS ONE, AND IT IS KEPT ON PURPOSE -- #651, settled
+// 2026-09-07. It was the glass panel's background; the panel went with #469 on
+// 2026-09-02 and no consumer replaced it.
+//
+// KEPT RATHER THAN DELETED, which is #651's own reasoning and still holds: it
+// is one of five `-wash` values, all derived the same way (14% of the hue over
+// a card) and all re-solved together during the inversion. Deleting one member
+// of a set that was derived as a set makes the set look arbitrary, and the next
+// person needing an absinthe wash would re-derive it differently.
+//
+// WHAT #651 SAID MUST NOT HAPPEN is that it sits here unread AND unexplained --
+// the state `ship_tints` was in until someone noticed. This comment is the
+// other half of that bargain. Do not delete it because grep says nothing reads
+// it; the same rule keeps `units.exact` in cocktail_units.rb.
+//
+// ITS LIKELY CONSUMER IS NAMED: #761 lists "add a wash behind it" as the third
+// and largest step if a matched chip ever reads too quietly, and §9.13's "bands
+// and washes, not fills" allows it. #511 and #612 closed without needing one,
+// so it waits.
 $color-electric-absinthe-wash: #1A342A;   // 14% of the hue over a card
 
 // YOLO / GOODNESS. Tequila reposado.

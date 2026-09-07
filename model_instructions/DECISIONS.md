@@ -1895,6 +1895,41 @@ unless stated.
   now get Claudes to run Claudes and everything is less chaotic!"* So push and
   PR are unattended in all three repos, and `helen-triages` stops being the
   exception it had been since the workflow was written.
+  - **THE PR HALF DOES NOT ACTUALLY WORK ON THE PRIVATE REPOS, measured later
+    the same day.** `POST /pulls` succeeds on `helen-triages` and returns 422
+    *"not all refs are readable"* on both private ones. The same five calls
+    against each repo:
+
+    | | issues | pulls list | branches | contents |
+    |---|---|---|---|---|
+    | `helen-triages` (public) | 200 | 200 | **200** | **200** |
+    | `helen-triages-food-private` | 200 | 200 | **403** | **403** |
+    | `helen-triages-cocktails-private` | 200 | 200 | **403** | **403** |
+
+    Helen asked whether she had misconfigured the token and sent its settings
+    page. **She had not.** The repository list is right and Issues + Pull
+    requests read/write is granted on all three, exactly as her screenshot
+    showed. What is missing is `Contents` — and **opening a PR must READ THE
+    HEAD REF** to check it exists and compute the diff, which is a Contents
+    operation. A public repo's refs need no permission at all, so the public
+    one works and the private two cannot.
+  - **THE ORIGINAL VERIFICATION WAS SOUND AND STILL MISLED, which is the
+    transferable part.** It ran `gh pr create` on a throwaway branch, got a real
+    PR URL, and concluded the widening worked. It was run against
+    `helen-triages` — the ONE repo of the three where the missing permission is
+    invisible. **A capability check on the most permissive member of a set
+    proves nothing about the set.** Probe the narrowest case, or probe all of
+    them; §0's rule about measuring rather than assuming is not satisfied by one
+    measurement in the easiest place.
+  - **Helen left the permission ungranted, shown the trade, 2026-09-07.**
+    `Contents: Read` would fix PR creation and would also let the token read
+    every drafts file through the API — which MANUAL §9.1 states as a property
+    the repo relies on (*"reads file contents on none of the private ones (403).
+    Git can."*). That separation is deliberate: access to the drafts goes
+    through git and SSH, where it appears in commits. Against that, pushing to
+    the private repos already needs no ask, so the only manual step left is the
+    PR form itself, usually on a branch she is about to merge anyway. Cheap to
+    keep, so it was kept.
   - **The reason matters more than the rule, and it is the transferable
     part.** The confirmation was never a judgement that pushing is risky — it
     was a lock against parallel sessions fighting over one checkout. Worktrees

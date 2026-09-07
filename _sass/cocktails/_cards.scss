@@ -1241,3 +1241,46 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // image rather than as the card's own mark.
   .drink-card-glass svg { max-width: 60%; }
 }
+
+// =============================================================================
+// THE CARD'S LINE BUDGET -- #776
+// =============================================================================
+// Helen: "if cocktail card ingredients have three lines, only allow the chips
+// two lines", and "if the cocktail name has two lines, only allow ingredients
+// and chips two lines each".
+//
+// `$card-height` does not move -- the grid needs every card the same height --
+// so the three stacks inside it share one budget. Each cap was set on its own
+// (#552 gave the ingredients a third line, 2026-09-06 gave the chips one) and
+// nothing stopped all three being spent at once.
+//
+// TWO SIGNALS, AND ONLY ONE NEEDS A SCRIPT.
+//
+//   `.drink-card-name--wrap`        card-name-fit.js already sets it, and the
+//                                   name, the ingredient line and the foot are
+//                                   SIBLINGS, so `~` reaches both from it. No
+//                                   new measurement and no `:has()`.
+//   `.drink-card--ingredients-3`    card-line-budget.js, because CSS cannot ask
+//                                   how many lines a clamped element actually
+//                                   rendered -- only how many it may have. Most
+//                                   cards do not reach the clamp; keying on the
+//                                   clamp would punish all of them for what the
+//                                   tiki drinks do.
+//
+// THE ORDER IS NAME, THEN INGREDIENTS, THEN CHIPS, and it is a cascade in the
+// real sense: a wrapped name takes a line from the ingredients, and the
+// ingredients then take a row from the chips only if they still reach three.
+// A wrapped name therefore caps the chips at two directly, rather than relying
+// on the ingredient rule to do it -- the ingredients may well fit two lines
+// once clamped, and the chips still must not have three.
+.drink-card-name--wrap ~ .drink-card-ingredients {
+  -webkit-line-clamp: 2;
+}
+
+// TWO ROWS: two line-heights, the one gap between them, and the 2px of border
+// each row carries -- the same arithmetic as the three-row cap above, one row
+// shorter, and stated against the same tokens for the same reason.
+.drink-card-name--wrap ~ .drink-card-foot .drink-card-moods,
+.drink-card--ingredients-3 .drink-card-foot .drink-card-moods {
+  max-height: calc(#{$chip-line * 2} + 0.28rem + 4px);
+}
