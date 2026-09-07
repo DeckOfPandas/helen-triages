@@ -286,3 +286,90 @@ test('no localStorage in the context at all is survivable', () => {
   assert.strictEqual(page.HTF.shortlist.toggle('/a/'), true);
   assert.strictEqual(page.HTF.shortlist.has('/a/'), true);
 });
+
+// --- portions — GitHub issue #801 ---------------------------------------------
+// The third map, and the one place it is genuinely not `glasses` under another
+// name: a missing GLASSES entry is one glass, because a drink is a drink; a
+// missing PORTIONS entry is "however many this recipe makes", which only the
+// build knows. So `null` is the unset answer and `1` is a real, storable one.
+
+test('an unset recipe answers null, not a number', () => {
+  const { HTF } = pageWith();
+  assert.strictEqual(HTF.shortlist.portions('/food/recipes/dal/'), null);
+});
+
+test('one portion is a real answer and survives a reload', () => {
+  // The whole reason this is not setGlasses, which deletes a 1 as its default.
+  // One portion of a thing that serves six is a Tuesday.
+  const { HTF, storage } = pageWith();
+  assert.strictEqual(HTF.shortlist.setPortions('/a/', 1), 1);
+  HTF.shortlist._forget();
+  assert.strictEqual(HTF.shortlist.portions('/a/'), 1);
+  assert.strictEqual(
+    JSON.parse(storage.getItem('htf-shortlist-portions-food-v1'))['/a/'], 1);
+});
+
+test('anything below one forgets the entry rather than storing it', () => {
+  const { HTF } = pageWith();
+  HTF.shortlist.setPortions('/a/', 6);
+  [0, -3, 'nonsense', null, undefined].forEach((value) => {
+    HTF.shortlist.setPortions('/a/', 6);
+    assert.strictEqual(HTF.shortlist.setPortions('/a/', value), null, String(value));
+    assert.strictEqual(HTF.shortlist.portions('/a/'), null, String(value));
+  });
+});
+
+test('a stored value that is not a positive number is not read back', () => {
+  // Untrusted input, the standing everything else in this module already has.
+  const { HTF } = pageWith(workingStorage({
+    'htf-shortlist-portions-food-v1':
+      JSON.stringify({ '/a/': 0, '/b/': -1, '/c/': 'six', '/d/': null, '/e/': 4 })
+  }));
+  ['/a/', '/b/', '/c/', '/d/'].forEach((url) => {
+    assert.strictEqual(HTF.shortlist.portions(url), null, url);
+  });
+  assert.strictEqual(HTF.shortlist.portions('/e/'), 4);
+});
+
+test('a portions record that is not an object reads as empty', () => {
+  [JSON.stringify([1, 2]), 'null', 'not json at all'].forEach((raw) => {
+    const { HTF } = pageWith(workingStorage({
+      'htf-shortlist-portions-food-v1': raw
+    }));
+    assert.strictEqual(HTF.shortlist.portions('/a/'), null, raw);
+  });
+});
+
+test('clear() empties the portions as well as the counts and the marks', () => {
+  const { HTF } = pageWith();
+  HTF.shortlist.toggle('/a/');
+  HTF.shortlist.setPortions('/a/', 6);
+  HTF.shortlist.clear();
+  assert.strictEqual(HTF.shortlist.portions('/a/'), null);
+  assert.strictEqual(HTF.shortlist.count(), 0);
+});
+
+test('portions and glasses are separate maps, not one under two names', () => {
+  const { HTF } = pageWith();
+  HTF.shortlist.setPortions('/a/', 6);
+  assert.strictEqual(HTF.shortlist.glasses('/a/'), 1);
+  HTF.shortlist.setGlasses('/a/', 3);
+  assert.strictEqual(HTF.shortlist.portions('/a/'), 6);
+});
+
+test('the two sites keep separate portions', () => {
+  const shared = workingStorage();
+  const food = pageWith(shared, 'food');
+  const cocktails = pageWith(shared, 'cocktails');
+  food.HTF.shortlist.setPortions('/x/', 8);
+  assert.strictEqual(cocktails.HTF.shortlist.portions('/x/'), null);
+});
+
+test('a failed portions write does not lose the number just typed', () => {
+  const { HTF } = pageWith({
+    getItem: () => null,
+    setItem: () => { throw new Error('QuotaExceededError'); }
+  });
+  assert.strictEqual(HTF.shortlist.setPortions('/a/', 6), 6);
+  assert.strictEqual(HTF.shortlist.portions('/a/'), 6);
+});
