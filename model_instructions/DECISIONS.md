@@ -1657,7 +1657,8 @@ unless stated.
   with a redirect and a fallback. `python3`, no execute bit. Same day: Helen
   merged and pulled mid-task, deleting the working branch under a session
   with three staged files; `git checkout -b` carried them across.
-- **2026-08-20** — THE AGREED WORKFLOW: Claude branches and pushes; Helen opens,
+- **2026-08-20** — THE AGREED WORKFLOW (**step 1 widened 2026-09-07, below —
+  Claude opens the PR now**): Claude branches and pushes; Helen opens,
   reviews, merges and does nothing else; Claude `git fetch origin main:main`,
   deletes the branch, branches afresh. `guard-main-branch.py` the same day,
   because the written rule was broken again by an agent that RAN the check —
@@ -1722,6 +1723,49 @@ unless stated.
   quoting it is the recorded harm behind not touching amounts.
 - **2026-09-05** — Pushing a branch in the private repos needs no ask.
 - **2026-09-06** — `CLAUDE.md`: `${GH_TOKEN:-unset}` prints the token (it did).
+- **2026-09-07 — Claude opens the PR now, and the ask is bundled with the
+  push.** Helen: *"I've added permissions on GitHub for you to open PRs.
+  Please do so now with this work, to test the setup!"* She widened the
+  fine-grained PAT to `Pull requests: Read and write` herself and rewrote
+  `CLAUDE.md` herself; step 1 of the agreed workflow is now one confirmed
+  action covering both the push and the PR, because asking twice for one
+  action was overhead she was paying for nothing. **Merging did not move and
+  is not going to** — she wrote it into `CLAUDE.md` twice, in the workflow and
+  in the token section, which is the right amount for a rule whose whole job
+  is to survive the day someone finds it inconvenient.
+  - **The "never broaden access" rule is unchanged, and reading it as changed
+    would be the error.** It is about a session asking for or granting itself
+    scope; documenting a widening Helen has made is the opposite of that. The
+    2026-08-17 measurement (`opening a pull request 403`) stays on the page
+    with the flip noted beside it rather than being deleted, so the next
+    session can see that this was measured twice and not assumed once.
+  - **Measured, not assumed, both times.** Helen's own probe was a throwaway
+    branch and PR #805, closed unmerged. Mine was the real one: `POST
+    /repos/DeckOfPandas/helen-triages/pulls` → 201, PR #808, and then read
+    back to check `head`/`base`, `mergeable_state: clean` and that the body
+    really carried `Closes #801` — a 201 says a PR exists, not that it points
+    where you meant.
+  - **`gh` does not exist in a worktree**, so `CLAUDE.md`'s `gh pr create`
+    cannot be followed there: `.gh-runtime/` is gitignored and absent, exactly
+    like `.node-runtime/` and the two drafts repos. The REST API is the
+    mechanism instead. Worth knowing before reaching for the command the rules
+    name — this is the second time a documented `gh` invocation has had to be
+    done another way from a worktree.
+  - **The token's new scope stops short of ref deletion.** Helen measured
+    `gh pr close --delete-branch` 403 on the delete while the PR close itself
+    succeeded; plain `git push origin --delete` works, because that is SSH and
+    not the PAT. So step 3's branch cleanup keeps going through git.
+  - **A false start worth recording, because it is the general case.** Told
+    the permission change was merged, `git fetch origin` showed `main`
+    unmoved, no branch on the remote touching `.claude/` or `CLAUDE.md`, and
+    `.claude/settings.json` last changed by the old hook commits. It had not
+    been pushed. Stopping was right for a specific reason rather than caution
+    in general: she had said her change edited `CLAUDE.md`, and the section
+    being edited was the same one — writing then would have put the same rule
+    in the governing document twice, on the day it changed. She found and
+    merged it (#809), and her text already said both things this session had
+    proposed, better; **so the correct amount of `CLAUDE.md` for this session
+    to write was none.**
 
 ### §11.2 The record of this file being wrong
 
