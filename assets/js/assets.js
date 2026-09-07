@@ -401,7 +401,20 @@ window.HTF = window.HTF || {};
        standing: untrusted input, and a failure to persist must not cost you
        the number you just typed. */
     function portionsKey() {
-      return HTF.site ? PORTIONS_PREFIX + HTF.site + VERSION : '';
+      /* `-v2`, AND THE BUMP IS THE POINT. For a few hours on 2026-09-07 this
+         map held BATCH counts for recipes with no portion count -- the box
+         beside them counted times-the-recipe rather than people (#801), and
+         #815 replaced that with an estimate on every recipe. So a number
+         stored during that window means something this code no longer means,
+         and there is nothing in the value itself to tell the two apart: `2`
+         is a plausible batch count and a plausible portion count.
+
+         A version bump discards them all rather than reinterpreting them,
+         which is the only honest option -- and costs a browser one forgotten
+         set of numbers rather than silently shopping for twice the gelato.
+         The shortlist ITSELF is untouched: what she marked is still marked,
+         and only how many she wanted is forgotten. */
+      return HTF.site ? PORTIONS_PREFIX + HTF.site + '-v2' : '';
     }
 
     function readPortions() {

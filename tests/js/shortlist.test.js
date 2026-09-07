@@ -306,7 +306,7 @@ test('one portion is a real answer and survives a reload', () => {
   HTF.shortlist._forget();
   assert.strictEqual(HTF.shortlist.portions('/a/'), 1);
   assert.strictEqual(
-    JSON.parse(storage.getItem('htf-shortlist-portions-food-v1'))['/a/'], 1);
+    JSON.parse(storage.getItem('htf-shortlist-portions-food-v2'))['/a/'], 1);
 });
 
 test('anything below one forgets the entry rather than storing it', () => {
@@ -322,7 +322,7 @@ test('anything below one forgets the entry rather than storing it', () => {
 test('a stored value that is not a positive number is not read back', () => {
   // Untrusted input, the standing everything else in this module already has.
   const { HTF } = pageWith(workingStorage({
-    'htf-shortlist-portions-food-v1':
+    'htf-shortlist-portions-food-v2':
       JSON.stringify({ '/a/': 0, '/b/': -1, '/c/': 'six', '/d/': null, '/e/': 4 })
   }));
   ['/a/', '/b/', '/c/', '/d/'].forEach((url) => {
@@ -334,7 +334,7 @@ test('a stored value that is not a positive number is not read back', () => {
 test('a portions record that is not an object reads as empty', () => {
   [JSON.stringify([1, 2]), 'null', 'not json at all'].forEach((raw) => {
     const { HTF } = pageWith(workingStorage({
-      'htf-shortlist-portions-food-v1': raw
+      'htf-shortlist-portions-food-v2': raw
     }));
     assert.strictEqual(HTF.shortlist.portions('/a/'), null, raw);
   });
