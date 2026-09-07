@@ -74,3 +74,7 @@
 - Don't delete handover or jobs list documents.
 - You don't need to ask permission to cd into folders at or below /home/helen/projects/helen-triages/food.
 - You don't need to ask permission to read or write to tmp in /home/helen/projects/helen-triages/food.
+- **Never run multi-line scripts via a Bash heredoc (`python3 - <<'PY' ... PY`, `ruby <<'RB'`, etc.).** Claude Code's permission checker statically parses a Bash command to prove it won't read outside the working directory; a heredoc's body arrives on stdin, which is opaque to that parser, so it can NEVER be allow-listed and always forces a manual prompt -- even under auto mode, even for trivial edits, even mid an otherwise-unattended job. Two working alternatives, because the fix is specifically "don't deliver the code via stdin":
+  - Short snippets with no embedded single quotes: `python3 -c '<code, newlines and all>'` -- bash lets a single-quoted argument span multiple lines, and because the code is a literal command-line argument rather than stdin, it's analyzable and already matches the existing `Bash(python3 -c ' *)` allow rule.
+  - Anything longer, or containing single quotes: write it to a file in `tmp/` (or the relevant repo's tmp) with the Write tool, then run it as a plain file argument, e.g. `python3 tmp/fix_thing.py`. Also statically analyzable, matches the existing `Bash(python3 *)` allow rule.
+  Diagnosed 2026-09-07 after this looked like a permission-state regression but was actually just heredoc usage creeping in.
