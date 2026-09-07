@@ -37,7 +37,7 @@ read it before touching `_cocktail_drafts/to-promote/`),
 `INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md` are for a Claude with no
 repository, not for you.
 
-Things to know before your first tool call:
+# Things to know before your first tool call:
 
 - **Do not trust a document over the code.** Verify anything you are about to
   act on; if they disagree, the code wins and the document gets fixed. Name
@@ -70,3 +70,10 @@ When you finish, tell me: what changed and where, what you verified and how,
 which issues the commits close or touch, which PRs are waiting on me to merge
 (in this repo and the private ones — opening them is yours, merging is mine),
 and anything you left undone and why.
+
+
+# TASK
+1. Please read all the GitHub issues
+2. Tell me which are stale
+3. Tell me which should be split out into seprate issues
+4. Write a work plan for addressing groups of them, including asking me questions to unblock streams 
