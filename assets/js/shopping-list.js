@@ -109,9 +109,49 @@
      no name, and giving it one would be inventing a word for it. */
   var UNIT_PLURALS = { dashes: 'dash', drops: 'drop', cubes: 'cube', leaves: 'leaf' };
 
+  /* THE LAST WORD CARRIES THE NUMBER, and that is what makes a compound unit
+     work. Food writes `2 heaped tbsp`, `1 large head`, `2 x 400 g cans` and
+     `1 small stick (8 g)`; the noun being counted is always the last word, and
+     the words in front of it are adjectives that never change. Splitting here
+     rather than special-casing each phrase is what keeps `dash` -> `dashes`
+     (every cocktail unit is one word, so the last word IS the word) working
+     unchanged while `x 400 g can` -> `x 400 g cans` starts working at all.
+
+     A PARENTHETICAL IS NOT A WORD. `tbsp (8 g)` counts `tbsp` -- the bracket
+     restates the same quantity in grams and is handled by splitParenthetical
+     below, which the food shopping list calls before it ever gets here. */
+  function lastWord(unit) {
+    var parts = String(unit).split(' ');
+    return parts[parts.length - 1];
+  }
+
+  function replaceLastWord(unit, word) {
+    var parts = String(unit).split(' ');
+    parts[parts.length - 1] = word;
+    return parts.join(' ');
+  }
+
+  /* A PLURAL UNIT IS FOLDED TO ITS SINGULAR so that two recipes writing
+     `1 clove` and `3 cloves` of garlic total onto one line rather than two.
+     The declared map above is checked first, for the four irregulars the
+     cocktails collection contains; everything else follows the ordinary
+     English rule read backwards -- `bunches` -> `bunch`, `cloves` -> `clove`,
+     `handfuls` -> `handful`.
+
+     `ss` IS NEVER A PLURAL (`glass`), and neither is a two-letter symbol that
+     happens to end in one. Both are left alone, and `unitLabel` puts whatever
+     this removed back for display, so a unit that round-trips wrongly here
+     shows wrongly on the page rather than silently splitting a total -- which
+     is the failure that is at least visible. */
   function foldUnit(unit) {
-    var u = String(unit || '').trim().toLowerCase();
+    var u = String(unit || '').trim().toLowerCase().replace(/\s+/g, ' ');
     if (UNIT_PLURALS[u]) return UNIT_PLURALS[u];
+
+    var word = lastWord(u);
+    if (UNIT_PLURALS[word]) return replaceLastWord(u, UNIT_PLURALS[word]);
+    if (SYMBOL_UNITS[word] || word.length < 3) return u;
+    if (/(ch|sh|s|x|z)es$/.test(word)) return replaceLastWord(u, word.slice(0, -2));
+    if (/[^s]s$/.test(word)) return replaceLastWord(u, word.slice(0, -1));
     return u;
   }
 
@@ -124,15 +164,34 @@
      `eaches` -- `9 each` cucumber wheels doubled printed `18 eaches`. Three
      drinks are written with it (east river underground, la fee noir punch, porn
      star martini), and the drink page's scaler (#545) multiplies exactly these
-     strings, so the wart showed up on a page rather than only in a total. */
-  var SYMBOL_UNITS = { ml: true, g: true, cl: true, l: true, oz: true, each: true, '': true };
+     strings, so the wart showed up on a page rather than only in a total.
+
+     THE FOOD UNITS JOINED THEM FOR #801, and every one is here for the same
+     reason the originals were: `2 tbsps` and `8 mediums` are not English.
+     `tsp`, `tbsp`, `kg`, `cm` and `mm` are symbols like `ml`; `large`, `small`
+     and `medium` are adjectives standing in for a noun nobody writes ("4
+     medium bay leaves"), so they have no plural either. Words that DO
+     pluralise -- `litre`, `clove`, `bunch`, `slice`, `sprig` -- are
+     deliberately absent, because the rule below gets those right. */
+  var SYMBOL_UNITS = {
+    ml: true, g: true, cl: true, l: true, oz: true, each: true, '': true,
+    kg: true, tsp: true, tbsp: true, cm: true, mm: true,
+    large: true, small: true, medium: true
+  };
 
   function unitLabel(unit, quantity) {
     if (SYMBOL_UNITS[unit]) return unit;
     if (quantity === 1) return unit;
 
+    /* THE LAST WORD AGAIN, and it must agree with foldUnit or a unit will not
+       survive the round trip: `x 400 g can` has to print as `x 400 g cans`,
+       and `heaped tbsp` has to print unchanged because `tbsp` is a symbol. */
+    var word = lastWord(unit);
+    if (SYMBOL_UNITS[word]) return unit;
+
     // `leaf` -> `leaves`, the one unit here that does not take a suffix.
-    if (/f$/.test(unit)) return unit.replace(/f$/, 'ves');
+    if (/f$/.test(word)) return replaceLastWord(unit, word.replace(/f$/, 'ves'));
+    if (word !== unit) return replaceLastWord(unit, pluralise(word));
 
     /* A SIBILANT TAKES `es`, EVERYTHING ELSE TAKES `s` -- pluralise() above.
        Written as a rule rather than a list, because a list is what got this
@@ -171,6 +230,44 @@
     return number + ' whole';
   }
 
+  /* THE NUMBER, WRITTEN THE WAY A COOK WRITES IT -- #801. `⅔ tsp` rather than
+     `0.667 tsp`, and `1½ tbsp` rather than `1.5 tbsp`.
+
+     THIS IS NOTATION AND NOT ROUNDING, which is the distinction Helen drew on
+     2026-09-07 when she was asked whether the food scaler should tidy its
+     output: "don't round to 10 g or 5 g, round to 1 g". So ⅔ is printed for
+     exactly two thirds and never for 0.7, and a number that is not one of
+     these fractions prints as a decimal rather than being nudged onto one that
+     reads more nicely. The tolerance is there for floating point -- 2/3 of 1
+     is 0.6666666666666666, and that IS two thirds -- and is far tighter than
+     any difference a spoon could show.
+
+     `wholeText` above stays as it is. It answers a different question (how
+     many whole limes, in Helen's own words `half` and `quarter`) and #545's
+     scaler prints its answers on a drink page. */
+  var COOKS_FRACTIONS = [
+    [1 / 8, '⅛'], [1 / 4, '¼'], [1 / 3, '⅓'], [3 / 8, '⅜'], [1 / 2, '½'],
+    [5 / 8, '⅝'], [2 / 3, '⅔'], [3 / 4, '¾'], [7 / 8, '⅞']
+  ];
+
+  function fractionText(quantity, places) {
+    var n = Number(quantity);
+    if (!isFinite(n)) return String(quantity);
+
+    var whole = Math.floor(n + 1e-9);
+    var rest = n - whole;
+
+    for (var i = 0; i < COOKS_FRACTIONS.length; i += 1) {
+      if (Math.abs(rest - COOKS_FRACTIONS[i][0]) < 1e-6) {
+        return (whole ? String(whole) : '') + COOKS_FRACTIONS[i][1];
+      }
+    }
+    if (rest < 1e-6) return String(whole);
+
+    var factor = Math.pow(10, typeof places === 'number' ? places : 2);
+    return String(Math.round(n * factor) / factor);
+  }
+
   /** One quantity and its unit, as a line of the list prints them. */
   function amountText(quantity, unit) {
     if (unit === 'whole') return wholeText(quantity);
@@ -178,15 +275,71 @@
     return shown ? quantity + ' ' + shown : String(quantity);
   }
 
+  /* VULGAR FRACTIONS ARE NUMBERS, and food writes a great many of them --
+     `½ tsp`, `¼–½ tsp`, `1½ tbsp`, `1¾ cups`, `⅛ tsp`. Every one of these
+     returned null before #801 and was counted as an unquantified phrase, so
+     "½ tsp salt" and "¼ tsp salt" appeared as two lines saying `(×1)` instead
+     of adding up to ¾ tsp.
+
+     NOT ONE OF THEM APPEARS IN THE COCKTAILS COLLECTION -- 682 pours, every
+     number a plain decimal on the 2.5 ml grid (see AMOUNTS above) -- so this
+     widens what parses without changing a single existing answer, which is
+     what lets one parser serve both sites. tests/js/shopping-list.test.js
+     holds that claim. */
+  var VULGAR = {
+    '½': 0.5, '⅓': 1 / 3, '⅔': 2 / 3, '¼': 0.25, '¾': 0.75,
+    '⅕': 0.2, '⅖': 0.4, '⅗': 0.6, '⅘': 0.8,
+    '⅙': 1 / 6, '⅚': 5 / 6, '⅐': 1 / 7, '⅛': 0.125, '⅜': 0.375,
+    '⅝': 0.625, '⅞': 0.875, '⅑': 1 / 9, '⅒': 0.1
+  };
+
+  var VULGAR_CLASS = '[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅐⅛⅜⅝⅞⅑⅒]';
+
+  /* A NUMBER IS DIGITS, A FRACTION, OR DIGITS FOLLOWED BY A FRACTION. `1½` is
+     one token and not two, which is the whole reason this is built up from
+     pieces rather than written as one regex with a `\d+` in it.
+
+     THE LOOKAHEAD IS LOAD-BEARING, and it is what stops both halves being
+     optional from meaning "matches nothing, successfully". Without it the
+     range branch below happily matches a bare separator followed by no number
+     at all, and `2.5-cm piece` loses its hyphen to a range that is not there.
+     With it, a separator that is really part of a unit is simply not a
+     separator. */
+  var NUMBER = '(?=\\d|' + VULGAR_CLASS + ')(\\d+(?:\\.\\d+)?)?(' + VULGAR_CLASS + ')?';
+
+  /* THE RANGE SEPARATOR IS AN EN DASH, A HYPHEN OR THE WORD `to`, and it only
+     counts as one when a NUMBER follows it. That is not fussiness: `2.5-cm
+     piece` and `2 x 400-g tins` both carry a hyphen that is part of the unit,
+     and both would lose their unit to a looser rule. */
+  var AMOUNT = new RegExp(
+    '^\\s*(~)?\\s*' + NUMBER +
+    '(?:\\s*(?:–|—|-|\\s+to)\\s*' + NUMBER + ')?' +
+    '\\s*(.*?)\\s*$'
+  );
+
+  function numberFrom(digits, fraction) {
+    if (digits === undefined && fraction === undefined) return null;
+    var n = 0;
+    if (digits !== undefined && digits !== '') n += parseFloat(digits);
+    if (fraction) n += VULGAR[fraction];
+    return isFinite(n) ? n : null;
+  }
+
   /**
    * Split "22.5 ml" into a number and a unit.
    *
    * Returns null when the string is not a quantity at all -- `to top`, `to
-   * rinse` -- which is a real answer rather than a failure, and the caller
-   * counts those entries instead of summing them.
+   * rinse`, `some` -- which is a real answer rather than a failure, and the
+   * caller counts those entries instead of summing them.
+   *
+   * `max` and `approx` are present only when the source said so: "30–50 g"
+   * gives {quantity: 30, max: 50}, "~2 tbsp" gives {approx: true}. A reader
+   * that ignores both fields gets the low end and no tilde, which is why
+   * adding them broke nothing that already read this.
    *
    * @param {string} amount
-   * @returns {{quantity: number, unit: string}|null}
+   * @returns {{quantity: number, unit: string, max?: number,
+   *            approx?: boolean}|null}
    */
   function parseAmount(amount) {
     /* `half` IS A NUMBER WITH NO DIGITS IN IT -- Helen, 2026-09-04, ruling on
@@ -202,11 +355,66 @@
       return { quantity: 0.5, unit: 'whole' };
     }
 
-    var match = /^\s*([0-9]+(?:\.[0-9]+)?)\s*(.*?)\s*$/.exec(String(amount || ''));
+    var match = AMOUNT.exec(String(amount || ''));
     if (!match) return null;
-    var quantity = parseFloat(match[1]);
-    if (!isFinite(quantity)) return null;
-    return { quantity: quantity, unit: foldUnit(match[2]) };
+
+    var quantity = numberFrom(match[2], match[3]);
+    if (quantity === null) return null;
+
+    var parsed = { quantity: quantity, unit: foldUnit(match[6]) };
+
+    var max = numberFrom(match[4], match[5]);
+    /* A RANGE THAT RUNS BACKWARDS IS NOT A RANGE. Nothing in either collection
+       writes one, and treating "5–2" as a range would have the totals for the
+       two ends cross over; dropping the second number leaves the first, which
+       is the same answer this function has always given for text it cannot
+       read past. */
+    if (max !== null && max > quantity) parsed.max = max;
+
+    if (match[1]) parsed.approx = true;
+    return parsed;
+  }
+
+  /* THE BRACKET THAT RESTATES THE SAME QUANTITY -- `1 tbsp (6 g)` of whole
+     cloves, `4 medium (1 g)` of bay leaves, `1 tbsp (9–10 g)` of peppercorns.
+     Two of Helen's spice-blend recipes are written this way throughout, and it
+     is a genuinely useful thing to have written down: the tablespoon is how
+     you measure it and the gram is how you check it.
+
+     IT HAS TO COME OFF THE UNIT BEFORE ANYTHING ELSE HAPPENS, for two reasons.
+     Grouping: `tbsp (6 g)` and `tbsp (12 g)` are the same unit written twice,
+     and left alone they make two totals of one spice. Scaling: the bracket is
+     the same quantity as the number in front of it, so doubling one without
+     the other prints a contradiction.
+
+     RETURNED, NOT APPLIED. This says what the bracket is; the food shopping
+     list decides what to do with it, and cocktails -- which has no brackets in
+     any of its 682 amounts -- never calls it. That is why the change to
+     parseAmount above could be additive and this could not.
+
+     @param {string} unit
+     @returns {{unit: string, lo: number, hi: number|null, unit2: string}|
+               {unit: string}} */
+  var PARENTHETICAL = new RegExp(
+    '^(.*?)\\s*\\(\\s*' + NUMBER +
+    '(?:\\s*(?:–|—|-)\\s*' + NUMBER + ')?' +
+    '\\s*([^)]*?)\\s*\\)\\s*$'
+  );
+
+  function splitParenthetical(unit) {
+    var match = PARENTHETICAL.exec(String(unit || ''));
+    if (!match) return { unit: String(unit || '') };
+
+    var lo = numberFrom(match[2], match[3]);
+    if (lo === null) return { unit: String(unit || '') };
+    var hi = numberFrom(match[4], match[5]);
+
+    return {
+      unit: match[1],
+      lo: lo,
+      hi: hi !== null && hi > lo ? hi : null,
+      unit2: foldUnit(match[6])
+    };
   }
 
   /* HOW MANY WHOLE FRUITS A VOLUME OF JUICE COMES TO — #546, Helen 2026-09-04:
@@ -484,7 +692,11 @@
     foldUnit: foldUnit,
     unitLabel: unitLabel,
     wholeText: wholeText,
-    amountText: amountText
+    amountText: amountText,
+    // #801. Used by food-shopping-list.js only; see their own headers.
+    splitParenthetical: splitParenthetical,
+    fractionText: fractionText,
+    tidy: tidy
   };
 
   if (typeof module !== 'undefined' && module.exports) {
