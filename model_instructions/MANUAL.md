@@ -340,9 +340,10 @@ apart from DOM wiring, so Node can test it.
 | `cook-schedule.js` | the timings arithmetic | `cook-schedule.test.js` |
 | `back-link.js` | may this arrow use history? (§13.7) | `back-link.test.js` |
 | `cocktail-search.js` | the drinks index's pool, ranking and matching (§9.3.3) | `cocktail-search.test.js` |
-| `scale.js`, `shopping-list.js` | the scaler's arithmetic and the one amount parser (§9.13) | `scale.test.js`, `shopping-list.test.js` |
-| `assets.js` | `HTF.escapeHtml`, `HTF.indexMemory`, the asset helpers | `escape-html.test.js`, `index-memory.test.js` |
-| `filters.js` | DOM wiring, food index | not directly; §10.2 |
+| `scale.js`, `shopping-list.js` | the scaler's arithmetic and the one amount parser (§9.13, §8.2) | `scale.test.js`, `shopping-list.test.js` |
+| `food-shopping-list.js` | food's totals, by aisle, scaled by portions (§8.2) | `food-shopping-list.test.js` |
+| `assets.js` | `HTF.escapeHtml`, `HTF.indexMemory`, `HTF.shortlist`, the asset helpers | `escape-html.test.js`, `index-memory.test.js`, `shortlist.test.js` |
+| `filters.js` | DOM wiring, food index | `food-index-startup.test.js` (§10.2) |
 | `cocktail-index.js` | DOM wiring, drinks index | `tests/js/index-harness.js` (§10.2) |
 
 **`HTF.filterState` is the MODULE and `HTF.filterState.create(SPEC)` is a
@@ -807,6 +808,73 @@ vocabulary brought along. One treatment, two hues, via `@mixin
 word-match-emphasis($colour)`; and the exclude hover is a deeper cut than its
 active tone on purpose, guarded by comparing relative luminance so the
 DIRECTION is asserted.
+
+### 8.2 The food shopping list and its scaler — #801
+
+**The last thing on the food index, shown only while the shortlisted-only
+filter is on** — the same rule the drinks list follows (§9.13), and the literal
+reading of *"the food recipe shortlist page"*. It is a deliberate copy of
+cocktails' shopping list, class for class, because Helen's brief was *"I would
+like all the same features"*. **Costing is the one feature not copied**: she
+ruled it out for food.
+
+**THE SCALER COUNTS PORTIONS, NOT BATCHES**, and that is the difference from
+the drinks. A drink's box counts glasses; a recipe's counts PEOPLE, so four
+portions of a recipe that serves six is ×0.67 and the fractional multiplier the
+drink scaler refuses (§9.13, whole recipes only) is ordinary here. That is what
+makes the serving size Helen asked to be guessed load-bearing: it is the number
+the portions are divided by.
+
+**Nothing is rounded coarser than a gram** — Helen, 2026-09-07: *"don't round
+to 10 g or 5 g, round to 1g"*. Two thirds of 200 g is 133 g. Spoons and counts
+keep vulgar fractions instead (`⅔ tsp`, `3⅓`), which is NOTATION and not
+rounding — ⅔ prints for exactly two thirds and never for 0.7.
+
+**Four files, and the split is the usual one.**
+
+| file | is |
+|---|---|
+| `_data/food/aisles.yml` | Helen's ten aisles in shop order, and a KEYWORD table. **The longest keyword wins**, matched on whole words — `milk` is dairy and `coconut milk` is a tin, `garlic` is produce and `garlic paste` is a jar. An exception is an entry, never a precedence rule. `never:` (water, cold water, ice) matches the WHOLE name and drops the ingredient |
+| `_data/food/servings.yml` | the 44 guesses, and NOTHING else — 43 recipes open `serves:` with a number and are read straight off. Every entry here is flagged `estimated` and printed with a `~` |
+| `_plugins/food_shopping.rb` | assigns the aisle and resolves the portion count at BUILD, and hangs `shopping`, `portions`, `portions_estimated` on every document. The page is handed the answer and never the table |
+| `assets/js/food-shopping-list.js` | the totals. Pure; the DOM half is `filters.js` |
+
+**Why the guesses are not in the recipes.** A number in 44 files means editing
+44 files, and §4.0's rule then un-proofreads more than half the collection to
+add a figure Helen never wrote. One reviewable file instead, and not a recipe
+touched.
+
+**The amount parser is still the ONE parser** (§9.13). `shoppingList.parseAmount`
+learned vulgar fractions, ranges (`30–50 g`), a leading `~`, and plural units
+(`2 cloves` → `clove`), plus `splitParenthetical` for `1 tbsp (6 g)`. **Nothing
+the cocktails collection writes parses differently**, and a test says so by
+name — check it before widening the parser again.
+
+**Grams and millilitres are the only units totalled in**; kg, l and cl fold
+into them and come back for display, so `1½ l` plus `500 ml` is `2 l` and a
+twelfth of a litre is `125 ml` rather than `0.125 l`. This is NOT the
+conversion `shopping-list.js` refuses — that rule is about units with no
+defined relationship (a dash is not some number of ml). `tbsp`, `oz` and every
+bare count are left where they are, because those would need inventing.
+
+**Two folds you will trip over.** A plural ingredient NAME folds to its
+singular for the grouping key (`onion`/`onions` are one line), reusing
+`foldUnit` rather than a second rule; the LABEL is the first spelling seen. And
+a cross-recipe link (`[grandma's lemon curd](../…)`) is KEPT here and forced to
+`other`, where §12's exclusion index drops it — different questions, different
+answers, stated in both files.
+
+**`HTF.shortlist.portions` is a THIRD localStorage key**, not `glasses` renamed:
+a missing glasses entry is one glass, a missing portions entry is *however many
+this recipe makes*, which only the build knows — so `1` is a real, storable
+answer here.
+
+**Where it is tested.** `food-shopping-list.test.js` (the arithmetic),
+`shopping-list.test.js` (the parser, including the no-change-for-cocktails
+claim), `food-index-startup.test.js` (the wiring, §10.2),
+`tests/test_food_shopping.py` (the two data files),
+`tests/test_rendered_pages.py` (the **only** place the Ruby matcher can be
+checked — it caught `garlic cloves` landing on the spice rack).
 
 ---
 
@@ -1825,6 +1893,19 @@ fixture. No jsdom, no `package.json`, no `node_modules` — `node:test` and
 through it. For `decorations.js`, which has none, copy the harness — and read
 the script order from `_site/`, not the layouts, because a layout's scripts
 land inside `{{ content }}`.
+
+**FOOD HAS ITS OWN, `food-index-startup.test.js`** (#801), built the same way
+but self-contained rather than sharing `index-harness.js` — one consumer, and
+the fixture is a different page. Two things to know before extending it. The
+whole of `filters.js` is inside a single `DOMContentLoaded` handler, so the
+harness has to `doc.dispatch('DOMContentLoaded')` after loading the scripts or
+nothing runs at all and every assertion is about an untouched page; and the
+canary is `.recipe-list` becoming `visibility: visible`, which is near the end
+of that handler, so anything throwing above it fails one assertion. The stub
+stores `innerHTML` as a STRING and does not parse it, so a control the page
+writes that way cannot be found with `querySelector` — dispatch at the
+delegating parent with a stand-in `target` instead, which is the object the
+listener actually reads.
 
 ---
 

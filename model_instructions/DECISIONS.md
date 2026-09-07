@@ -515,6 +515,72 @@ unless stated.
   lettuce"; `can ` cannot fire on "cannellini" only because the match includes
   the trailing space.
 
+### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
+
+- **The brief, 2026-09-07** — *"add scaler and shopping list feature to food
+  recipe shortlist page. This can be copied directly from the food page — I
+  would like all the same features. But there is no need to cost the portions.
+  When serving size is unclear, please make your best guess. Group the shopping
+  list by grocery aisle, e.g. produce, dairy, fish, meat, non-perishable etc."*
+  **"The food page" was read as the COCKTAIL page**, and the three other
+  bullets are why: costing exists only on cocktails (#547), serving sizes and
+  grocery aisles are food's own. The cocktails index has had exactly this
+  feature since #546 and the food index had none of it.
+- **PORTIONS, NOT BATCHES, and it follows from her own words.** A drink's box
+  counts glasses; asking for a serving-size guess only earns its keep if the
+  number on screen is PEOPLE, and *"no need to cost the portions"* is her word
+  for the unit. So four portions of a recipe that serves six is ×0.67 — which
+  is exactly what #545's drink scaler refuses (whole recipes only, clamped at
+  ×1, because every drink amount sits on the 2.5 ml grid). Put to her as the
+  fork it is, with the 200 g → 133 g example.
+- **Her answer, 2026-09-07, and it settled the rounding rather than the fork:**
+  *"For now, don't tidy/round beyond 1 g precision"*, then, unprompted, to be
+  sure it had been understood: *"I mean don't roudn to 10 g or 5 g, round to
+  1g"*. So: scale exactly, print whole grams, tidy nothing. `⅔ tsp` rather than
+  `0.67 tsp` is NOTATION and not tidying — ⅔ prints for exactly two thirds and
+  never for 0.7 — and it is the reason `fractionText` keeps a 1e-6 tolerance
+  instead of a generous one.
+- **Ten aisles, hers.** Offered three sets; she chose *produce, meat, fish,
+  dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks,
+  other*, in that order, which is a shop and not an alphabet.
+- **A KEYWORD table, not a list of ingredients**, and the data forced it: 500
+  distinct `item:` strings, 395 after truncation, all free text ("thumb-sized
+  piece of fresh ginger"). **The longest keyword wins** and every exception is
+  therefore an entry rather than a precedence rule — `milk`/`coconut milk`,
+  `butter`/`peanut butter`, `garlic`/`garlic paste`, `mint`/`dried mint`. Two
+  ingredients out of 782 end in `other` that are not cross-recipe links.
+- **`garlic` and `cloves` are the same length**, which is the one place the
+  longest-wins rule has nothing to decide with, and the tie sent every clove of
+  garlic in the collection to the spice rack. Caught by the built-output test,
+  which is the whole argument for having one: the matcher is Ruby inside
+  Jekyll, so nothing that reads YAML can exercise it, and a Python
+  reimplementation would have passed while the site was wrong.
+- **The 44 guesses live in `_data/food/servings.yml` and NOT in the recipes.**
+  43 of the 86 open `serves:` with a number; the rest say `makes: "one 8-inch
+  cake"` or *"I mean, who cares, make double anyway"*. Putting a figure in 44
+  files means §4.0's rule un-proofreads more than half the collection to add a
+  number Helen never wrote. One reviewable file, every entry flagged
+  `estimated`, every one printed with a `~`. **Not decided for her**: if she
+  wants the number in the front matter, that is a schema change and its own
+  piece of work.
+- **Grams and millilitres are the only units totalled in.** `1½ l` of stock and
+  `500 ml` of stock were two rows, and a twelfth of the first printed as
+  `0.125 l`. Folding kg/l/cl in and re-expressing on the way out is NOT the
+  conversion `shopping-list.js` refuses: that rule is about units with no
+  defined relationship (nobody can say how many ml a dash is), and a litre is a
+  thousand millilitres on both sides of every recipe here. `tbsp`, `oz` and
+  bare counts are untouched, because each of those would need inventing.
+- **Alphabetical within an aisle**, which departs from the drinks list's
+  descending volume (Helen, 2026-09-04: *"the big pours are what you shop
+  for"*). The aisle heading has already done that job — you are standing in
+  front of the vegetables — and a food aisle mixes grams, spoons, cloves and
+  bare counts, so there is no single axis to rank on. **A session's call, not
+  hers; reversible.**
+- **Open, and deliberately not decided:** whether a bare count should round UP
+  for shopping (`2.83 onions` → 3). She said not to tidy, so it does not; but
+  a whole vegetable is a different case from a gram and she may want the
+  ceiling. Bring her the page, not the argument.
+
 ---
 
 ## §9 Cocktails
