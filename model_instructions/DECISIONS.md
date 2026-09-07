@@ -611,6 +611,44 @@ unless stated.
     #801 was taken against 86 recipes that all happen to have a numeric
     `serves:`. **Clone the drafts before believing a measurement about the
     food collection** — the starting prompt says so and it was still skipped.
+- **2026-09-07, #815 — the batch box lasted a few hours and Helen killed it.**
+  *"increasing it to 50+ does nothing either and clearly 750 ml of gelato
+  doesn't feed 50. We need estimate the number of people served by 750 ml, then
+  add that to the front matter somehow. [...] all of these will need to be
+  estimated at ingest. Claudes can check with me if unsure."*
+  - **The lesson, and it is worth more than the feature.** Three fixes in a
+    row had been downstream of one absence: a recipe that does not say how many
+    it feeds. The batch box, the `×`, the "set all leaves those alone" note and
+    a test for each were all machinery built around a hole. **Batches were a
+    workaround for missing data, and the fix was the data.** When a fix needs
+    a second concept to explain it, look up the chain for the missing fact.
+  - **Not every file, and the measurement is what made it decidable.** 294 of
+    423 already open `serves:` with a number; 129 needed an estimate; only 43
+    of those were `proofread: true`. Bringing that table rather than "quite a
+    lot of files" is what turned an open-ended migration into one question.
+  - **Her ruling on the proofread cost**, quoting the documented exception
+    back: *"Use the documented exception. If she reviews the change herself
+    line by line, she was the last judgement, and BASELINE_COMMIT ... moves
+    forward."* So `serves_estimate:` went into the front matter of all 129 and
+    `_data/food/servings.yml` was deleted — one home for the number, beside the
+    words it estimates from. The second home had existed only to avoid this
+    question, and her answer removed its reason.
+  - **`serves_estimate:` and not a second `serves:`, her choice**, and the data
+    supports it: `serves` xor `makes` holds perfectly (0 files carry both), but
+    `makes:` OPENS WITH A NUMBER 66 times ("950 ml", "12 slices") and `serves:`
+    gives NO number 20 times (2 published, 18 drafts, 11 of them `QQ`). So
+    neither "makes means no number" nor "serves means a number" is true, and
+    the estimate has to be its own key. **`makes:` is never read as people.**
+  - **An estimate is marked with a `~`**, her ruling in the same message — the
+    only thing saying a figure was reasoned rather than written down.
+  - **Twelve draft estimates are read off the DISH, not its yield**, because
+    their `serves:` is `QQ` — the source said nothing and she has not rewritten
+    them. Those are named in the PR as the ones to check first, and their `QQ`
+    is untouched: it is her placeholder, and this adds a key beside it rather
+    than answering it.
+  - **Found while migrating: `_food_drafts/` has subfolders.** `to-cook/` and
+    `to-promote/` track her own work, a non-recursive `*.md` glob missed two
+    files, and the built-page test caught it. Glob recursively in that repo.
 - **2026-09-07 — "this is all I can see": boxes, no totals, and it was not the
   code at all.** A screenshot of three shortlisted recipes, three number boxes
   and nothing underneath — with a `×` on every one, including
