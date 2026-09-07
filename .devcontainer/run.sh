@@ -17,8 +17,16 @@ if ! docker image inspect helen-triages-devcontainer >/dev/null 2>&1; then
   docker build -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
 fi
 
+# Bundle cache is per-worktree (named after the worktree's own directory,
+# e.g. "opus-cocktail-data" or "helen-triages" for the primary checkout) so
+# two containers running on two worktrees at once never race each other's
+# `bundle install`. The Claude config volume stays shared across all of
+# them deliberately -- that mirrors how every host-side Claude Code
+# session, across every worktree, already shares one ~/.claude directory.
+BUNDLE_VOLUME="helen-triages-bundle-cache-$(basename "$REPO_ROOT")"
+
 docker volume create helen-triages-claude-config >/dev/null
-docker volume create helen-triages-bundle-cache >/dev/null
+docker volume create "$BUNDLE_VOLUME" >/dev/null
 
 # Optional convenience dotfiles: mounted read-only, and only if they exist,
 # so this works whether or not you've set any of them up. Mounted at
@@ -35,7 +43,7 @@ GH_TOKEN="$(python3 -c "import json; print(json.load(open('.claude/settings.loca
 docker run -it --rm \
   -v "$REPO_ROOT:/workspace" \
   -v helen-triages-claude-config:/home/helen/.claude \
-  -v helen-triages-bundle-cache:/home/helen/.bundle-cache \
+  -v "$BUNDLE_VOLUME:/home/helen/.bundle-cache" \
   "${DOTFILE_MOUNTS[@]}" \
   -e GH_TOKEN \
   -p 4001:4001 \
