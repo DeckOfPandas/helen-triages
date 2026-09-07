@@ -247,9 +247,35 @@ main {
   letter-spacing: normal;
 }
 
+// EDGE TO EDGE SINCE 2026-09-07 -- #783, Helen: "right-align footer right column
+// with whole page -- currently looks like it's right-aligned with the content
+// container".
+//
+// THE GRID WAS NEVER THE PROBLEM, which is why this took a while to see. The row
+// below is `1fr auto 1fr` and the right column was correctly right-aligned all
+// along -- inside a box that `max-width: $width-content` had clamped to the
+// article's width and centred. So the footer's right edge was the CONTENT
+// column's right edge, and the column looked wrong by being exactly where it was
+// told to be.
+//
+// IT NOW MATCHES THE HEADER, which has been edge-to-edge from the start (see
+// `.site-header` above: "full viewport width") with `.site-header-inner` holding
+// the constrained row. The footer was the one piece of chrome not built that
+// way, which is the inconsistency that made it read as a mistake.
+//
+// THE FOOTER GOES FULL WIDTH AND ITS CONTENT DOES TOO -- deliberately NOT the
+// header's inner-wrapper shape. Helen chose the outer columns reaching the page
+// edges; an inner wrapper would put them back exactly where they were.
+//
+// THE HEARTS DO NOT MOVE. They are pinned to column 2 (`.site-footer-centre`,
+// `grid-column: 2`), which is what the three-track grid exists to guarantee --
+// and page-centred is where they already were, since the footer was centred.
+// Widening the two side tracks moves their contents outward and leaves the
+// middle one where it is.
+//
+// BELOW 600px NOTHING CHANGES: the media query at the foot of this file collapses
+// the row to one centred column, and it keys on `.site-footer-top`, not on this.
 .site-footer {
-  max-width: $width-content;
-  margin: 0 auto;
   padding: 1.5rem 1.5rem calc(1.5rem * 2) 1.5rem;
   border-top: 1px dashed $color-border;
   text-align: center;
