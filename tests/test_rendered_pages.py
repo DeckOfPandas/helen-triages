@@ -1895,13 +1895,25 @@ def _shopping_blob(site, page="index.html"):
     return json.loads(match.group(1))
 
 
-def test_every_shortlistable_recipe_carries_its_ingredients_and_a_portion_count(site):
-    """The blob covers every row on the page, and every entry can be scaled.
+def test_every_published_recipe_reaches_the_page_with_a_portion_count(site):
+    """The blob covers every row, and every PUBLISHED entry can count people.
 
-    tests/test_food_shopping.py proves every recipe RESOLVES to a number from
-    the two data files. This proves the number reached the page -- which is a
-    different claim, and the one that fails if the plugin stops running, is
+    tests/test_food_shopping.py proves every published recipe RESOLVES to a
+    number from the two data files. This proves the number reached the page --
+    a different claim, and the one that fails if the plugin stops running, is
     renamed, or quietly returns early.
+
+    A DRAFT IS ALLOWED NO PORTION COUNT, and that is not a gap being tolerated.
+    84 of the 336 drafts carry a `makes:` and no numeric `serves:` --
+    "About 750 ml" cannot become a number of people without inventing a portion
+    size -- so their box counts BATCHES instead, and needs no figure at all.
+    _data/food/servings.yml deliberately covers published recipes only: guesses
+    for 336 churning drafts would be numbers nobody has checked, in a file
+    whose whole value is that its guesses are reviewable.
+
+    What every recipe DOES need, draft or not, is `k` -- which key its yield
+    came from. Without it a `makes:` prints behind the word "serves", which it
+    did until 2026-09-07.
     """
     blob = _shopping_blob(site)
     assert len(blob) > 80, (
@@ -1909,15 +1921,24 @@ def test_every_shortlistable_recipe_carries_its_ingredients_and_a_portion_count(
         "86 plus the magic bag. The plugin or the row gate has changed."
     )
 
-    unscalable = [url for url, r in blob.items() if not r.get("p")]
+    published = {u: r for u, r in blob.items() if "/food/drafts/" not in u}
+    unscalable = sorted(u for u, r in published.items() if not r.get("p"))
     assert not unscalable, (
-        "these recipes reached the page with no portion count, so the scaler "
-        f"cannot divide by anything: {unscalable}"
+        "these PUBLISHED recipes reached the page with no portion count, so "
+        "their box silently counts batches instead of people: "
+        f"{unscalable}. Add a guess to _data/food/servings.yml."
     )
 
-    empty = [url for url, r in blob.items() if not r.get("i")]
+    empty = sorted(u for u, r in blob.items() if not r.get("i"))
     assert not empty, (
         f"these recipes contribute nothing to a shopping list: {empty}"
+    )
+
+    unlabelled = sorted(u for u, r in blob.items()
+                        if r.get("y") and r.get("k") not in ("serves", "makes"))
+    assert not unlabelled, (
+        "these recipes carry a yield with no `k` saying which key it came "
+        f"from, so it will print behind the wrong word: {unlabelled}"
     )
 
 
@@ -1968,26 +1989,48 @@ def test_the_shopping_list_assigns_an_aisle_to_almost_everything(site):
     declared = {a["key"] for a in yaml.safe_load(
         (ROOT / "_data" / "food" / "aisles.yml").read_text(encoding="utf-8"))["order"]}
 
-    unknown, other = [], []
-    total = 0
+    unknown = []
+    other = {"published": [], "drafts": []}
+    total = {"published": 0, "drafts": 0}
     for url, recipe in blob.items():
+        where = "drafts" if "/food/drafts/" in url else "published"
         for ing in recipe["i"]:
-            total += 1
+            total[where] += 1
             if ing["s"] not in declared:
                 unknown.append(f"{ing['n']!r} -> {ing['s']!r} ({url})")
             elif ing["s"] == "other":
-                other.append(f"{ing['n']!r} ({url})")
+                other[where].append(f"{ing['n']!r} ({url})")
 
     assert not unknown, (
         "ingredients were stamped with an aisle that _data/food/aisles.yml does "
         "not declare: " + "; ".join(unknown)
     )
-    assert total > 700, f"only {total} ingredients emitted; the collection has 778."
-    assert len(other) <= 20, (
-        f"{len(other)} of {total} ingredients have no aisle, which is more than "
-        "this has ever needed. Add keywords to _data/food/aisles.yml:\n  "
-        + "\n  ".join(sorted(other))
+    assert total["published"] > 700, (
+        f"only {total['published']} published ingredients emitted; the "
+        "collection has 778."
     )
+    assert len(other["published"]) <= 20, (
+        f"{len(other['published'])} of {total['published']} PUBLISHED "
+        "ingredients have no aisle, which is more than this has ever needed. "
+        "Add keywords to _data/food/aisles.yml:\n  "
+        + "\n  ".join(sorted(other["published"]))
+    )
+
+    # MEASURED SEPARATELY, AND HELD TO A LOOSER LINE -- MANUAL 8's own rule
+    # about the ingredient picker, which applies here word for word:
+    # "Measure production, not your local build. The local build folds in
+    # every draft ... a vocabulary entry aimed at one is work done twice."
+    # Drafts are absent in CI and in a fresh worktree, so this half only runs
+    # on a machine that has cloned them, and it is a catastrophe detector --
+    # a table that stopped being read -- rather than a vocabulary treadmill.
+    if total["drafts"]:
+        share = len(other["drafts"]) / total["drafts"]
+        assert share <= 0.15, (
+            f"{len(other['drafts'])} of {total['drafts']} DRAFT ingredients "
+            f"({share:.0%}) have no aisle. Drafts are allowed a long tail -- "
+            "they are unfinished and Helen adds them in batches -- but this is "
+            "far enough out to suggest the keyword table is not being read."
+        )
 
 
 def test_water_is_never_on_a_shopping_list(site):

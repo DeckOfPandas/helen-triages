@@ -95,6 +95,7 @@ keywords:
   produce:
     - apple
     - apples
+    - apricots
     - asparagus
     - aubergine
     - baby potatoes
@@ -102,8 +103,11 @@ keywords:
     - basil
     - bay leaf
     - bay leaves
+    - beansprouts
     - beetroot
+    - blackberries
     - blueberries
+    - bok choi
     - broccoli
     - brussels sprouts
     - butternut squash
@@ -115,18 +119,26 @@ keywords:
     - celery
     - chard
     - cherries
+    - chicory
     - chilli
     - chillies
     - chives
+    - clementines
     - coriander
+    - courgette
     - courgettes
     - cranberries
     - cucumber
     - cucumbers
+    - currants
     - dill
     - edamame
+    - endive
     - fennel
+    - figs
+    - fine beans
     - fresh bay leaves
+    - fresh curry leaves
     - fresh ginger
     - galangal
     - garlic
@@ -138,6 +150,7 @@ keywords:
     - cloves garlic
     - cloves of garlic
     - ginger
+    - grapefruit
     - green beans
     - greens
     - herb sprigs
@@ -155,6 +168,7 @@ keywords:
     - lemongrass
     - mint
     - mushrooms
+    - nectarines
     - new potatoes
     - onion
     - onions
@@ -163,8 +177,14 @@ keywords:
     - pak choi
     - parsley
     - parsnips
+    - pea shoots
+    - peaches
+    - pear
+    - pears
     - peas
     - peppers
+    - potato
+    - raspberries
     - red pepper
     - bell pepper
     - pineapple
@@ -173,23 +193,30 @@ keywords:
     - pomegranate
     - potatoes
     - radishes
+    - redcurrants
     - rhubarb
     - rocket
     - rosemary
+    - runner beans
     - sage
+    - samphire
+    - shallot
     - shallots
     - sorrel
     - spinach
     - spring onions
+    - strawberries
     - sweet potatoes
     - tarragon
     - thyme
+    - tomato
     - tomatoes
     - turnips
     - watercress
     # `french beans` are the fresh ones; `butter beans` and `white beans` are
     # tins and live in the cupboard, which the longer keyword settles.
     - french beans
+    - watermelon
 
   # --- meat --------------------------------------------------------------
   # Everything from the butcher's counter, plus the cured things beside it.
@@ -198,6 +225,7 @@ keywords:
   meat:
     - bacon
     - beef
+    - brisket
     - chicken
     - chorizo
     - duck
@@ -217,10 +245,14 @@ keywords:
     - pork
     - prosciutto
     - rabbit
+    - ribeye
+    - salami
     - sausage
     - sausages
     - short rib
     - short ribs
+    - sirloin
+    - steak
     - turkey
     - veal
     - venison
@@ -234,30 +266,40 @@ keywords:
     - clams
     - cod
     - crab
+    - crabmeat
+    - fish fillet
+    - fish fillets
     - haddock
     - hake
     - king prawns
+    - kipper
     - mackerel
     - monkfish
     - mussels
     - oysters
     - prawns
     - salmon
+    - sardines
     - scallops
     - sea bass
     - seafood
+    - smoked salmon
     - squid
     - trout
     - tuna
+    - whitebait
 
   # --- dairy & eggs ------------------------------------------------------
   # The chilled aisle. `hummus` is here rather than in `other` because that is
   # the fridge you find it in, even though it is neither dairy nor an egg.
   dairy:
+    - burrata
     - butter
     - buttermilk
     - cheddar
     - cheese
+    - comte
+    - comté
     - cream
     - cream cheese
     - creme fraiche
@@ -274,13 +316,19 @@ keywords:
     - halloumi
     - hummus
     - kefir
+    - labneh
+    - manchego
+    - margarine
     - mascarpone
     - milk
     - mozzarella
+    - paneer
     - parmesan
     - pecorino
+    - quark
     - ricotta
     - single cream
+    - skyr
     - soured cream
     - stilton
     - whipping cream
@@ -290,17 +338,24 @@ keywords:
 
   # --- bakery ------------------------------------------------------------
   bakery:
+    - bagel
+    - bagels
     - baguette
     - bread
     - brioche
     - ciabatta
     - croissants
+    - digestive biscuits
     - flatbread
     - flatbreads
+    - focaccia
+    - muffins
     - naan
     - pitta
     - sourdough
     - tortillas
+    - wrap
+    - wraps
 
   # --- frozen ------------------------------------------------------------
   # `frozen` itself is a keyword, so "frozen peas" lands here even though
@@ -308,11 +363,14 @@ keywords:
   # because `cranberries` is the longer word. That is the right way round: the
   # first names the aisle, the second names a choice.
   frozen:
+    - filo
+    - filo pastry
     - frozen
     - frozen edamame
     - frozen peas
     - ice cream
     - puff pastry
+    - puff pastry sheets
     - shortcrust pastry
     - vanilla ice cream
 
@@ -322,17 +380,22 @@ keywords:
   # collection looks like once the fresh things are taken out of it.
   cupboard:
     - almond butter
+    - almond extract
     - almonds
+    - amai sauce
     - anchovy paste
     - baking powder
+    - baking soda
     - balsamic vinegar
     - bicarbonate of soda
     - black tea
     - breadcrumbs
     - brown rice
+    - bulgur wheat
     - butter beans
     - cannellini beans
     - capers
+    - caramel
     - cashew butter
     - cashews
     - caster sugar
@@ -344,6 +407,7 @@ keywords:
     - cider vinegar
     - cocoa
     - cocoa powder
+    - coconut
     - coconut cream
     - coconut milk
     - coconut oil
@@ -354,35 +418,50 @@ keywords:
     - couscous
     - cream of tartar
     - crispy fried onions
+    - dates
     - demerara sugar
+    - desiccated coconut
     - dijon mustard
     - dried porcini
+    - dried yeast
     - duck fat
+    - extract
     - fish sauce
     - flour
+    - gelatine
     - ghee
     - glace cherries
     - glacé cherries
+    - glycerine
     - golden syrup
     - gram flour
     - groundnut oil
     - harissa
     - hazelnuts
+    - hoisin sauce
     - honey
     - icing sugar
     - jam
+    - kecap manis
     - ketchup
+    - lasagne
+    - lasagne sheets
     - lentils
     - macadamia nuts
+    - mango chutney
     - maple syrup
     - marmalade
+    - marmite
     - mayonnaise
+    - menma
     - mincemeat
     - mirin
     - miso
+    - mixed peel
     - molasses
     - mustard
     - noodles
+    - nori
     - nutella
     - nuts
     - oats
@@ -394,20 +473,25 @@ keywords:
     - panko
     - passata
     - pasta
+    - paste
     - peanut butter
     - peanuts
     - pearl barley
     - pecans
+    - peel
+    - pesto
     - pine nuts
     - pistachios
     - plum jam
     - polenta
+    - poppy seeds
     - pumpkin seeds
     - quinoa
     - raisins
     - rice
     - rice flour
     - rice vinegar
+    - semolina
     - sesame oil
     - sesame seeds
     - sherry vinegar
@@ -421,15 +505,20 @@ keywords:
     - tahini
     - tamari
     - tamarind paste
+    - teriyaki sauce
     - tinned tomatoes
+    - tomato paste
     - tomato purée
     - tomato puree
     - treacle
+    - vanilla bean paste
     - vanilla essence
     - vanilla extract
+    - vanilla paste
     - vanilla pod
     - vegetable oil
     - vinegar
+    - wakame
     - walnuts
     - white beans
     - wholegrain mustard
@@ -455,6 +544,8 @@ keywords:
     - venison stock
     - stock cube
     - stock cubes
+    - yakitori sauce
+    - yeast
 
   # --- spices & seasonings -----------------------------------------------
   # The rack, plus salt and pepper. A DRIED herb belongs here and a fresh one
@@ -464,6 +555,7 @@ keywords:
     - ajwain
     - allspice
     - bouquet garni
+    - caraway seeds
     - cardamom
     - cardamom pods
     - cayenne
@@ -481,6 +573,7 @@ keywords:
     - dried mint
     - dried oregano
     - dried thyme
+    - dukkah
     - fennel seeds
     - fenugreek
     - five-spice
@@ -505,6 +598,8 @@ keywords:
     - paprika
     - pepper
     - black pepper
+    - shichimi
+    - sichuan pepper
     - white pepper
     - ground black pepper
     - pepper flakes
@@ -531,11 +626,15 @@ keywords:
     - baileys
     - beer
     - brandy
+    - campari
     - cider
     - cognac
     - gin
+    - kirsch
     - madeira
     - marsala
+    - pastis
+    - pernod
     - port
     - porter
     - prosecco

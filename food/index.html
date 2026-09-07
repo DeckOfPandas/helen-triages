@@ -642,7 +642,17 @@ permalink: /food/
 
    KEYS ARE ONE LETTER because this is machine-read and the collection carries
    778 ingredients. `p` portions, `e` estimated, `y` the recipe's own words for
-   its yield, `i` the ingredients -- `a` amount, `n` name, `s` shelf.
+   its yield, `k` WHICH KEY those words came from, `i` the ingredients -- `a`
+   amount, `n` name, `s` shelf.
+
+   `k` EXISTS BECAUSE `y` ALONE IS A TRAP. `serves` and `makes` are exclusive
+   (MANUAL 4) and `y` takes whichever is there, so a page printing `y` behind
+   a fixed word gets it right for half the collection and wrong for the other
+   half -- it read "serves About 750 ml" for the blackberry gelato until
+   2026-09-07. It is also what tells the shortlist panel whether that recipe's
+   box can count PEOPLE at all: `makes: "About 750 ml"` cannot be turned into
+   portions without inventing a portion size, so the box counts batches
+   instead. See assets/js/filters.js.
 
    EACH VALUE THROUGH `jsonify` INDIVIDUALLY, never hand-quoted. Ingredient
    names carry apostrophes ("goat's cheese"), accents ("crème fraîche"), and
@@ -656,7 +666,7 @@ permalink: /food/
 {%- if recipe.collection == "food_magic_bag" %}{% assign _mb = true %}{% endif -%}
 {%- if recipe.meta.rewritten or site.show_source_wording or _mb -%}
 {%- unless _first_recipe %},{% endunless %}{%- assign _first_recipe = false %}
-{{ recipe.url | jsonify }}:{"p":{% if recipe.portions %}{{ recipe.portions }}{% else %}null{% endif %},"e":{{ recipe.portions_estimated | default: false }},"y":{{ recipe.serves | default: recipe.makes | jsonify }},"i":[
+{{ recipe.url | jsonify }}:{"p":{% if recipe.portions %}{{ recipe.portions }}{% else %}null{% endif %},"e":{{ recipe.portions_estimated | default: false }},"y":{{ recipe.serves | default: recipe.makes | jsonify }},"k":{% if recipe.serves %}"serves"{% else %}"makes"{% endif %},"i":[
 {%- for ing in recipe.shopping -%}
 {% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}}
 {%- endfor -%}

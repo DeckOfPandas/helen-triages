@@ -1292,36 +1292,80 @@ function renderResultsPool() {
     });
   }
 
-  /* HOW MANY PORTIONS ARE WANTED. The store answers when she has typed a
-     number; otherwise it is however many the recipe makes, so an untouched
-     list shops for every recipe exactly as written. A recipe with no resolved
-     portion count at all falls back to 1, which makes the scale x1 below and
-     leaves the amounts as the recipe wrote them. */
+  /* --- TWO KINDS OF YIELD, AND THE BOX MEANS WHAT THE RECIPE CAN SUPPORT ----
+     Helen, 2026-09-07, on a shortlisted draft: "Changing the amount of
+     blackberry gelato I want doesn't change anything (that I can see) in the
+     shopping list -- e.g. whipping cream is always 125 ml."
+
+     Exactly right, and it was this file. `henrys-blackberry-gelato-sicilian-
+     style` says `makes: "About 750 ml"` and has no `serves:` at all, so
+     `portions` came through null -- and the first version of scaleFor() then
+     returned 1 no matter what had been typed. The box rendered, accepted a
+     number, and did nothing. That is the failure `_layouts/recipe.html` and
+     food/index.html both already have a rule against, quoted where every other
+     control on this page ships `hidden`: A CONTROL THAT SILENTLY FAILS IS
+     WORSE THAN NO CONTROL. This one was worse still, because it looked like it
+     had worked.
+
+     NOT AN EDGE CASE. 84 of the 336 food drafts carry a `makes:` and no
+     numeric `serves:` -- a quarter of them -- and every draft is on the index
+     locally, so this is the ordinary case for the collection Helen is actually
+     browsing while she writes.
+
+     SO THE BOX COUNTS WHAT THE RECIPE'S OWN YIELD COUNTS. `serves: 6` is
+     people, and the box is portions: four portions of a recipe that serves six
+     is x0.67, unchanged. `makes: "About 750 ml"` is a batch, nobody can say
+     how many people that is without inventing a portion size, and the honest
+     question is HOW MANY TIMES do you want it -- which is the cocktail
+     scaler's own question (#545) and needs no guess at all.
+
+     ONE CONCEPT, NOT TWO CONTROLS: "how much of this do I want, relative to
+     what it makes". The label beside the number says which unit, so nothing on
+     screen is ambiguous -- `serves 6` against `makes About 750 ml`, with a `x`
+     drawn against the batch ones.
+
+     WHY NOT JUST GUESS THE PORTIONS. That is what _data/food/servings.yml is
+     for, and it deliberately covers published recipes only: there are 336
+     drafts, Helen adds them in batches, and most are unfinished. A guessed
+     portion count for every draft would be 84 numbers nobody has checked, in a
+     file whose whole value is that its guesses are reviewable. */
+
+  /** Does this recipe's yield count PEOPLE? Otherwise it counts batches. */
+  function inPortions(url) {
+    var recipe = RECIPES[url];
+    return !!(recipe && recipe.p && recipe.p > 0);
+  }
+
+  /* The number in the box. For a portions recipe it defaults to however many
+     it makes, so an untouched list shops for every recipe exactly as written;
+     for a batch recipe it defaults to one, which is the same claim. */
   function portionsFor(url) {
     var stored = HTF.shortlist.portions(url);
     if (stored) return stored;
-    var recipe = RECIPES[url];
-    return (recipe && recipe.p) || 1;
+    return inPortions(url) ? RECIPES[url].p : 1;
   }
 
-  /* THE SCALE IS PORTIONS WANTED OVER PORTIONS MADE, and the guard is the
-     reason `p` may be null: a recipe nobody has given a figure is scaled x1
-     rather than by a division nobody can do. */
+  /* PORTIONS WANTED OVER PORTIONS MADE, or the batch count as it stands.
+     There is no third branch and no silent x1: every shortlisted recipe is one
+     of these two, because `inPortions` is decided by the same field the box
+     was drawn from. */
   function scaleFor(url) {
-    var recipe = RECIPES[url];
-    var base = recipe && recipe.p;
-    if (!base || base <= 0) return 1;
-    return portionsFor(url) / base;
+    if (!inPortions(url)) return portionsFor(url);
+    return portionsFor(url) / RECIPES[url].p;
   }
 
+  /* WHAT THE RECIPE SAYS ITS YIELD IS, in its own words and its own key.
+     `k` is `serves` or `makes` straight off the front matter, so a `makes:`
+     value can never be printed behind the word "serves" -- it read
+     "serves About 750 ml" until 2026-09-07. */
   function yieldText(url) {
     var recipe = RECIPES[url];
     if (!recipe) return '';
-    /* A GUESS IS MARKED AND A STATED SERVING IS QUOTED. `~12 portions` is this
-       repo's arithmetic (see _data/food/servings.yml); `serves 4–6` is Helen's
-       own words, straight off the recipe and never tidied into a number. */
+    // A guess is this repo's arithmetic (_data/food/servings.yml), so it is
+    // marked; a stated one is Helen's words, quoted and never tidied.
     if (recipe.e) return recipe.p ? '~' + recipe.p + ' portions' : '';
-    return recipe.y ? 'serves ' + recipe.y : '';
+    if (!recipe.y) return '';
+    return (recipe.k || 'serves') + ' ' + recipe.y;
   }
 
   function renderShoppingList() {
@@ -1340,20 +1384,42 @@ function renderResultsPool() {
       shoppingRecipes.innerHTML = urls.map(function (url) {
         var title = titleByUrl[url] || url;
         var yielded = yieldText(url);
+        var portions = inPortions(url);
+        /* THE YIELD IS NOT PRINTED BESIDE THE NAME -- Helen, 2026-09-07, with
+           a screenshot: "please don't say 'serves X' after the recipe name at
+           the top of the scaler. This screenshot makes it look like I'm asking
+           for 28 portions of mussels."
+
+           She was reading `7  Moules Marinière serves 4` and the row is one
+           line, so the eye takes the number, the name and the yield as a
+           single sentence -- 7 × serves 4. It is not a wording problem and no
+           amount of dimming fixes it: a figure at each END of a short line
+           reads as an expression whatever the middle says, and this row
+           already HAS to open with a number.
+
+           SO IT MOVES INTO THE CONTROL ITSELF, where the yield is what it
+           always was -- the thing the number is relative to -- and is
+           available on hover and to a screen reader without competing with the
+           number on screen. What is left visible is the two facts a glance
+           needs: how many, and of what. */
+        var relative = yielded ? ', which ' + yielded : '';
         return '<li>' +
           '<input type="number" class="shopping-list-portions" min="1" max="99" step="1" ' +
           'inputmode="numeric" value="' + portionsFor(url) + '" ' +
           'data-url="' + HTF.escapeHtml(url) + '" ' +
-          'aria-label="portions of ' + HTF.escapeHtml(title) + '">' +
-          '<span>' + HTF.escapeHtml(title) +
-          /* The yield rides INSIDE the title span, not beside it, so it wraps
-             with the name on a narrow screen instead of being pushed onto a
-             line of its own away from the recipe it belongs to. Same shape the
-             drinks list gives its price. */
-          (yielded
-            ? '<span class="shopping-list-yield">' + HTF.escapeHtml(yielded) + '</span>'
-            : '') +
-          '</span>' +
+          'title="' + HTF.escapeHtml(title + relative) + '" ' +
+          'aria-label="' + (portions ? 'portions of ' : 'batches of ')
+          + HTF.escapeHtml(title + relative) + '">' +
+          /* THE `x` IS ONLY ON A BATCH BOX, and it is the one thing telling
+             you at a glance that this number is not people. Drawn after the
+             input, matching the drink page's own scaler mark
+             (`.cocktail-scale-mark`, _layouts/cocktail.html). It survives the
+             change above because it is a MARK rather than a second number --
+             which is the whole reason the yield could not stay. */
+          (portions
+            ? ''
+            : '<span class="shopping-list-times" aria-hidden="true">×</span>') +
+          '<span>' + HTF.escapeHtml(title) + '</span>' +
           '</li>';
       }).join('');
     }
@@ -1411,11 +1477,18 @@ function renderResultsPool() {
        one place the two controls differ. There is no number here that means
        "as written" for every recipe at once -- each starts at its own yield --
        so a box showing `1` would be claiming a state the list is not in. Empty
-       says nothing until she says something. */
+       says nothing until she says something.
+
+       IT SETS PORTIONS, SO IT SKIPS THE BATCH RECIPES. The label says
+       "portions", and writing that number into a box counting batches would
+       make it mean something else on the way past -- "set all to 6" would
+       order six times the gelato. A recipe whose yield is a batch keeps its
+       own number, which is the honest answer to a control that is asking a
+       question it cannot ask of everything. */
     setAllInput.addEventListener('input', function () {
       var n = parseInt(setAllInput.value, 10);
       if (!isFinite(n) || n < 1) return;
-      shortlistedRecipes().forEach(function (url) {
+      shortlistedRecipes().filter(inPortions).forEach(function (url) {
         HTF.shortlist.setPortions(url, n);
       });
       renderShoppingList();

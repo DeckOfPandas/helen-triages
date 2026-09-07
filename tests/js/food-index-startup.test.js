@@ -63,15 +63,26 @@ const SCRIPTS = [
    than Helen's. */
 const RECIPES = {
   '/food/recipes/a/': {
-    p: 4, e: false, y: '4',
+    p: 4, e: false, y: '4', k: 'serves',
     i: [{ a: '200 g', n: 'plain flour', s: 'cupboard' },
       { a: '2', n: 'onions', s: 'produce' },
       { a: '', n: 'olive oil', s: 'cupboard' }]
   },
   '/food/recipes/b/': {
-    p: 6, e: true, y: 'one 8-inch cake',
+    p: 6, e: true, y: 'one 8-inch cake', k: 'makes',
     i: [{ a: '300 g', n: 'plain flour', s: 'cupboard' },
       { a: '1', n: 'onion', s: 'produce' }]
+  },
+  /* THE ONE WITH NO PORTION COUNT, and it is here because of a real bug
+     Helen found on 2026-09-07: a shortlisted draft whose box did nothing.
+     `henrys-blackberry-gelato-sicilian-style` says `makes: "About 750 ml"`
+     and has no `serves:`, so `p` is null -- and the first version of
+     scaleFor() returned 1 whatever had been typed. 84 of the 336 food
+     drafts are this shape. Its box counts BATCHES. */
+  '/food/recipes/gelato/': {
+    p: null, e: false, y: 'About 750 ml', k: 'makes',
+    i: [{ a: '125 ml', n: 'whipping cream', s: 'dairy' },
+      { a: '500 ml', n: 'whole milk', s: 'dairy' }]
   }
 };
 
@@ -83,7 +94,8 @@ const AISLES = [
 
 const TITLES = {
   '/food/recipes/a/': 'Aubergine thing',
-  '/food/recipes/b/': 'Beetroot cake'
+  '/food/recipes/b/': 'Beetroot cake',
+  '/food/recipes/gelato/': 'Blackberry gelato'
 };
 
 /** A food index with everything the scripts read, and nothing else. */
@@ -237,17 +249,35 @@ test('each recipe starts at however many it makes', () => {
   assert.match(html, /value="6" data-url="\/food\/recipes\/b\/"/);
 });
 
-test('a guessed serving size is marked and a stated one is quoted', () => {
+test('the yield is on the control, never printed beside the name', () => {
+  /* Helen, 2026-09-07, with a screenshot of `7  Moules Marinière serves 4`:
+     "This screenshot makes it look like I'm asking for 28 portions of
+     mussels." A number at each end of a short line reads as one expression,
+     so the yield moved into the input rather than being dimmed further. */
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.toggle('/food/recipes/b/');
   showTheList(doc);
 
   const html = recipesHtml(panel);
-  assert.ok(html.includes('serves 4'), 'the stated serving size is Helen\'s own words');
-  assert.ok(html.includes('~6 portions'),
-    'a guessed serving size must carry its tilde -- it is the only thing on '
-    + 'the page saying the number came from _data/food/servings.yml.');
+  assert.ok(!html.includes('shopping-list-yield'),
+    'the yield is beside the recipe name again -- see the note in '
+    + '_sass/food/_shopping-list.scss before putting it back.');
+  // Still SAID, so it is there on hover and for a screen reader.
+  assert.ok(html.includes('which serves 4'), 'the stated serving size, quoted');
+  assert.ok(html.includes('which ~6 portions') || html.includes('~6 portions'),
+    'a guessed serving size must still carry its tilde somewhere -- it is the '
+    + 'only thing saying the number came from _data/food/servings.yml.');
+  assert.ok(html.includes('title='), 'the yield is reachable on hover');
+});
+
+test('the visible row is the number and the name, and nothing else', () => {
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  showTheList(doc);
+  // The text between the closing input and the end of the row: name only.
+  const visible = recipesHtml(panel).replace(/<[^>]*>/g, '').trim();
+  assert.strictEqual(visible, 'Aubergine thing');
 });
 
 test('the totals are grouped by aisle, in the declared order', () => {
@@ -372,6 +402,79 @@ test('an ingredient with no amount is still a line', () => {
   showTheList(doc);
   assert.match(aislesHtml(panel),
     /<span class="shopping-list-name">olive oil<\/span>/);
+});
+
+// --- a recipe whose yield is not people ---------------------------------------
+// Helen, 2026-09-07: "Changing the amount of blackberry gelato I want doesn't
+// change anything (that I can see) in the shopping list -- e.g. whipping cream
+// is always 125 ml." Every test below is that report.
+
+test('THE BOX ON A `makes:` RECIPE ACTUALLY CHANGES THE TOTALS', () => {
+  // The regression itself, and the shape it failed in: the control rendered,
+  // accepted a number, and silently scaled by 1.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/gelato/');
+  showTheList(doc);
+  assert.match(aislesHtml(panel), /125 ml/, 'x1 to begin with');
+
+  panel.querySelector('.shopping-list-recipes')
+    .dispatch('input', { target: typedInto('/food/recipes/gelato/', 3) });
+
+  assert.match(aislesHtml(panel), /375 ml/,
+    'three times the recipe is three times the cream. This is the bug Helen '
+    + 'reported: the box did nothing at all.');
+  assert.ok(!aislesHtml(panel).includes('125 ml'));
+});
+
+test('a batch box is drawn with a × and a portions box is not', () => {
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');       // serves 4
+  win.HTF.shortlist.toggle('/food/recipes/gelato/');  // makes About 750 ml
+  showTheList(doc);
+
+  const html = recipesHtml(panel);
+  assert.ok(html.includes('shopping-list-times'),
+    'nothing on screen says the gelato box counts something else');
+  assert.strictEqual((html.match(/shopping-list-times/g) || []).length, 1,
+    'the × belongs to the batch recipe only');
+  // The accessible name says which unit, since the × is decorative.
+  assert.ok(html.includes('aria-label="batches of Blackberry gelato'));
+  assert.ok(html.includes('aria-label="portions of Aubergine thing'));
+});
+
+test('a batch box starts at one, not at a portion count it does not have', () => {
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/gelato/');
+  showTheList(doc);
+  assert.match(recipesHtml(panel), /value="1" data-url="\/food\/recipes\/gelato\/"/);
+});
+
+test('a `makes:` value is never printed behind the word "serves"', () => {
+  // It read "serves About 750 ml" until 2026-09-07, because the blob carried
+  // the yield text without saying which key it came from.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/gelato/');
+  showTheList(doc);
+  const html = recipesHtml(panel);
+  assert.ok(html.includes('makes About 750 ml'));
+  assert.ok(!html.includes('serves About 750 ml'));
+});
+
+test('"set all to" skips the batch recipes rather than reinterpreting them', () => {
+  // The label says portions. Writing 6 into a box that counts batches would
+  // quietly order six times the gelato.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.toggle('/food/recipes/gelato/');
+  showTheList(doc);
+
+  const setAll = doc.getElementById('shopping-list-setall');
+  setAll.value = '8';
+  setAll.dispatch('input');
+
+  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/a/'), 8);
+  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/gelato/'), null);
+  assert.match(aislesHtml(panel), /125 ml/, 'the gelato is still x1');
 });
 
 test('a shortlisted recipe that is no longer on the page is dropped quietly', () => {
