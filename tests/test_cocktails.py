@@ -6085,16 +6085,18 @@ _AS_VERBS = {"float": ("float",), "rinse": ("rinse",), "muddle": ("muddle",)}
 # A KNOWN FAILURE WITH ITS REASON ATTACHED, the shape `unresolved_suggestions`
 # uses: declaring it lets this guard bite on the NEXT one instead of being
 # loosened, and the staleness test below retires it automatically.
-_AS_EXCEPTIONS = {
-    # Its method opens "Muddle blackberries gently in a shaker" and the drink
-    # HAS NO BLACKBERRIES -- the ingredients are cognac, tawny port, creme de
-    # cassis, lemon juice and chocolate bitters. Cassis is blackcurrant, not
-    # blackberry, so this is not a naming slip either. Either an ingredient is
-    # missing or the step belongs to another drink; both are Helen's to settle,
-    # and inventing a pour to satisfy a test would be writing her recipe.
-    # Found by this guard on the day it was written, 2026-09-07.
-    ("port-authority", "muddle"): "method muddles blackberries the drink does not have",
-}
+# EMPTY, AND IT HAS BEEN USED EXACTLY ONCE -- which is the whole life cycle this
+# block is for. `port-authority` went in on 2026-09-07, the day this guard was
+# written: its method opened "Muddle blackberries gently in a shaker" and the
+# drink had no blackberries at all. Not a naming slip either, since its fruit is
+# creme de cassis, which is blackcurrant. Helen read the ingredient list against
+# the book the same afternoon, found the count -- four -- and the entry came
+# straight back out.
+#
+# THE GUARD FOUND A MISSING INGREDIENT, not a missing field, and that is worth
+# keeping in mind for the next entry: an exemption here is a claim that a drink
+# is wrong, not that the rule is.
+_AS_EXCEPTIONS: dict[tuple[str, str], str] = {}
 
 
 def test_no_as_exception_is_stale():

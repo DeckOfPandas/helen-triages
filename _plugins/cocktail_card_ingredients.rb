@@ -77,17 +77,26 @@
 # simply does not sort anything. If this is ever revisited, the finding above is
 # the thing to start from, not the clause.
 #
-# --- THE OVERRIDE, WHICH EXISTS AND HAS NO USERS YET -------------------------
+# --- THE OVERRIDE, AND ITS FIRST USER ----------------------------------------
 # An ingredient may carry `card_order: <n>`, and it replaces that entry's TIER.
 # The number space is the tier space, so `card_order: 1` means "sort this with
 # the base spirits" and `card_order: 9` means "after everything". Volume still
 # breaks ties within the new tier.
 #
-# NO DRINK USES IT TODAY and that is deliberate rather than an oversight. Helen
-# asked for the field so that a drink whose small pour IS the drink can be
-# fixed when she notices one; inventing which drinks those are would be making
-# exactly the judgement she declined to hand over. The field is built, tested
-# against a fixture, and waiting.
+# ZERO IS LEGAL AND MEANS "BEFORE EVERYTHING", which is worth stating because it
+# is a trap in every language but this one. Ruby's `||` treats 0 as truthy so
+# the line below does the right thing; a Python reimplementation of this sort --
+# and one was written to preview the ordering -- uses `if x:` and silently
+# ignores a 0. Test with `is not None`, as
+# `test_every_poured_generic_has_a_tier` already does.
+#
+# ITS FIRST USER ARRIVED 2026-09-07: Port Authority's four blackberries. They
+# are `fruit_and_herbs`, so the default rule sorted them FIFTH, after the lemon
+# juice -- and they are what the drink is about. Helen: "blackberries, cognac,
+# port, cassis, lemon juice, bitters -- that's informative to a reader looking
+# at cards." That is exactly the case the field was built for and the reason it
+# was deliberately left empty until she named one: inventing which drinks need
+# it would have been making the judgement she declined to hand over.
 # =============================================================================
 
 module HelenTriages
