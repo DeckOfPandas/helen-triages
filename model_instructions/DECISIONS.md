@@ -580,6 +580,47 @@ unless stated.
   for shopping (`2.83 onions` → 3). She said not to tidy, so it does not; but
   a whole vegetable is a different case from a gram and she may want the
   ceiling. Bring her the page, not the argument.
+- **2026-09-07, ON THE REAL PAGE — the scaler did nothing for a quarter of the
+  drafts.** Helen: *"Changing the amount of blackberry gelato I want doesn't
+  change anything (that I can see) in the shopping list — e.g. whipping cream
+  is always 125 ml."* Exactly right, and it was `scaleFor()`:
+  `henrys-blackberry-gelato-sicilian-style` says `makes: "About 750 ml"` with
+  no `serves:`, so `portions` came through null and the first version returned
+  `1` whatever had been typed. **The control rendered, accepted a number and
+  silently did nothing** — the failure this codebase already has a rule
+  against ("a control that silently fails is worse than no control", quoted
+  wherever a control ships `hidden`), and worse than the rule's own case
+  because it looked like it had worked.
+  - **The fix is not a guess and not a missing box.** `makes:` cannot become
+    people without inventing a portion size, so the box counts BATCHES for
+    those and PORTIONS for the rest, with a `×` drawn on the batch ones. One
+    concept — how much of this do I want, relative to what it makes — with the
+    recipe's own yield naming the unit.
+  - **84 of 336 drafts are this shape**, measured, which is what ruled out
+    both "no box" (fails her actual need) and "guess them all" (84 unchecked
+    numbers in a file whose value is that its guesses are reviewable).
+    `_data/food/servings.yml` stays published-recipes-only.
+  - **Two of my own tests asserted the wrong thing** and had to change with
+    it: a draft legitimately has no portion count now. The aisle-coverage
+    ratchet also met the drafts for the first time (373 of 3,985 unmatched)
+    and is now measured per collection — MANUAL §8's own rule for the
+    ingredient picker, word for word: *measure production, not your local
+    build*. 99 keywords added for the draft vocabulary took drafts to 171.
+  - **The worktree had no drafts, which is why this reached her.** They are
+    gitignored (§9.1) and I had not cloned them, so every measurement behind
+    #801 was taken against 86 recipes that all happen to have a numeric
+    `serves:`. **Clone the drafts before believing a measurement about the
+    food collection** — the starting prompt says so and it was still skipped.
+- **2026-09-07 — the yield came off the row, and dimming it was not the fix.**
+  Helen, with a screenshot of `7  Moules Marinière serves 4`: *"please don't
+  say 'serves X' after the recipe name at the top of the scaler. This
+  screenshot makes it look like I'm asking for 28 portions of mussels."* It
+  was already the quietest thing on the line — Plex, 0.78rem, the
+  de-emphasised grey — so this is not a contrast problem: **a number at each
+  END of a short line reads as one expression whatever the middle says**, and
+  this row must open with a number. Moved into the input's `title` and
+  `aria-label`. The `×` on a batch box survives because it is a MARK and not a
+  second number, which is the whole distinction.
 
 ---
 

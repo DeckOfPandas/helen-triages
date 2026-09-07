@@ -857,6 +857,30 @@ conversion `shopping-list.js` refuses — that rule is about units with no
 defined relationship (a dash is not some number of ml). `tbsp`, `oz` and every
 bare count are left where they are, because those would need inventing.
 
+**THE BOX COUNTS WHAT THE RECIPE'S OWN YIELD COUNTS, and there are two kinds.**
+`serves: 6` is people, so the box is PORTIONS and four of them is ×0.67.
+`makes: "About 750 ml"` is a batch — nobody can turn that into people without
+inventing a portion size — so the box counts BATCHES, ×N, and a `×` is drawn
+beside it. **This is not an edge case**: 84 of the 336 drafts are the second
+kind, and every draft is on the index locally. `inPortions()` in `filters.js`
+decides, from the same field the box is drawn from, so there is no third
+branch and no silent ×1. **"Set all to" writes portions and therefore skips
+the batch recipes** — writing its number into a batch box would change what
+that number means on the way past.
+
+**`k` says WHICH KEY the yield came from**, and the blob carries it for this
+reason as much as for the label: `serves` and `makes` are exclusive (§4), so a
+page printing the text behind a fixed word is right for half the collection.
+It read `serves About 750 ml` until 2026-09-07.
+
+**Do not print the yield beside the recipe name.** Helen, 2026-09-07, with a
+screenshot of `7  Moules Marinière serves 4`: *"This screenshot makes it look
+like I'm asking for 28 portions of mussels."* A number at each END of a short
+line reads as one expression however the middle is styled, and this row has to
+open with a number — so there is no styling fix, and the yield lives in the
+input's `title` and `aria-label`. If it ever has to be seen, it goes on a line
+of its own.
+
 **Two folds you will trip over.** A plural ingredient NAME folds to its
 singular for the grouping key (`onion`/`onions` are one line), reusing
 `foldUnit` rather than a second rule; the LABEL is the first spelling seen. And

@@ -112,21 +112,33 @@
   input { @extend %food-number-input; }
 }
 
-// "serves 4–6", or "~12 portions" where this repo guessed it. Quiet and inside
-// the title span, so it wraps with the name rather than being pushed onto a
-// line of its own — the same shape the drinks list gives its price.
+// THE MULTIPLICATION MARK, on a batch box only — a recipe whose yield is
+// "About 750 ml" rather than a number of people, so its box counts times-the-
+// recipe (see assets/js/filters.js). It is the one glance-level difference
+// between the two kinds of number in this list, so it sits tight against the
+// input rather than floating in the gap before the title.
 //
-// THE TILDE IS THE WHOLE POINT of the quiet treatment being no quieter than
-// this: it is the only thing on screen saying a number is ours rather than
-// Helen's, and _data/food/servings.yml exists to be corrected when one is
-// wrong.
-.shopping-list-yield {
-  margin-left: $space-xs;
+// A MARK AND NOT A NUMBER, which is precisely why it survives where the yield
+// text did not — see below.
+.shopping-list-times {
+  margin: 0 0.1em 0 0.15em;
   font-family: $font-label;
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   color: $color-clear-text;
-  white-space: nowrap;
 }
+
+// `.shopping-list-yield` STOOD HERE and is gone — Helen, 2026-09-07, with a
+// screenshot of `7  Moules Marinière serves 4`: "please don't say 'serves X'
+// after the recipe name at the top of the scaler. This screenshot makes it
+// look like I'm asking for 28 portions of mussels."
+//
+// It was already the quietest thing on the row — Plex, 0.78rem, the
+// de-emphasised grey — and that was not the problem, so there is no styling
+// fix to reach for. A number at each END of a short line reads as one
+// expression however the middle is set, and this row has to open with a
+// number. The yield is in the input's `title` and `aria-label` now
+// (assets/js/filters.js). **Do not reintroduce it as visible text beside the
+// name**; if it ever has to be seen, it belongs on a line of its own.
 
 // --- the totals, by aisle ----------------------------------------------------
 .shopping-list-aisle + .shopping-list-aisle {
