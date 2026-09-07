@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-venv \
+    vim \
     && rm -rf /var/lib/apt/lists/*
 
 # Node, for the `claude` CLI itself and the project's JS tests.
@@ -70,6 +71,13 @@ RUN mkdir -p "$CLAUDE_CONFIG_DIR" "$BUNDLE_PATH" \
 RUN echo '' >> /home/helen/.bashrc \
     && echo "alias jekyll-local='bundle exec jekyll serve --config _config.yml,_config_local.yml --port 4001 --host 0.0.0.0'" >> /home/helen/.bashrc \
     && echo "alias jekyll-prod='JEKYLL_ENV=production bundle exec jekyll serve --config _config.yml --port 4002 --host 0.0.0.0'" >> /home/helen/.bashrc \
+    && echo '' >> /home/helen/.bashrc \
+    && echo '# Optional: run.sh bind-mounts Helen'"'"'s real dotfiles here (read-only,' >> /home/helen/.bashrc \
+    && echo '# only if she opted in) at alternate paths so they layer on top of the' >> /home/helen/.bashrc \
+    && echo '# aliases above instead of overwriting this file outright.' >> /home/helen/.bashrc \
+    && echo '[ -f "$HOME/.host-bashrc" ] && . "$HOME/.host-bashrc"' >> /home/helen/.bashrc \
+    && echo '[ -f "$HOME/.host-bash_aliases" ] && . "$HOME/.host-bash_aliases"' >> /home/helen/.bashrc \
+    && echo '[ -f "$HOME/.host-bash_profile" ] && . "$HOME/.host-bash_profile"' >> /home/helen/.bashrc \
     && chown helen:helen /home/helen/.bashrc
 
 USER helen

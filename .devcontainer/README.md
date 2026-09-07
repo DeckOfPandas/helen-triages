@@ -82,6 +82,31 @@ Because `~/.claude` is a named volume (not baked into the image), this
 login persists. Next time you `docker run` the same volume, you're
 already signed in.
 
+### Optional: your own dotfiles (aliases, colours, git config)
+
+`run.sh` mounts `~/.bashrc`, `~/.bash_aliases`, `~/.bash_profile` and
+`~/.gitconfig` from your host into the container **read-only** and
+**only if each one exists** -- nothing else from your home directory,
+no exceptions, and the container can't write back to your real files
+even if something tried.
+
+Read them yourself first for anything that shouldn't be there (a
+stray token, an odd credential export) -- this only mounts what's
+already on your host, it doesn't vet it for you.
+
+They land at alternate paths (`~/.host-bashrc` etc.) rather than
+overwriting the container's own `.bashrc`, which already defines
+`jekyll-local`/`jekyll-prod`; the container's `.bashrc` sources yours
+from there afterwards, so both sets of aliases coexist rather than one
+replacing the other. Verified live: baked-in and mounted aliases,
+custom `PS1`, and `.gitconfig` settings all came through together in
+the same shell.
+
+One rough edge to expect: anything your dotfiles reference that isn't
+installed in the container (a fancy prompt framework, `delta`, a
+credential helper tied to your host OS) will just silently no-op
+rather than error.
+
 ### 4. Use it
 
 From here it's normal Claude Code, just running inside the container:

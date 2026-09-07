@@ -20,11 +20,23 @@ fi
 docker volume create helen-triages-claude-config >/dev/null
 docker volume create helen-triages-bundle-cache >/dev/null
 
+# Optional convenience dotfiles: mounted read-only, and only if they exist,
+# so this works whether or not you've set any of them up. Mounted at
+# alternate .host-* paths -- the container's own .bashrc (baked in at
+# build time) sources them from there, layered on top of its own
+# jekyll-local/jekyll-prod aliases rather than overwriting them.
+DOTFILE_MOUNTS=()
+[ -f "$HOME/.bashrc" ] && DOTFILE_MOUNTS+=(-v "$HOME/.bashrc:/home/helen/.host-bashrc:ro")
+[ -f "$HOME/.bash_aliases" ] && DOTFILE_MOUNTS+=(-v "$HOME/.bash_aliases:/home/helen/.host-bash_aliases:ro")
+[ -f "$HOME/.bash_profile" ] && DOTFILE_MOUNTS+=(-v "$HOME/.bash_profile:/home/helen/.host-bash_profile:ro")
+[ -f "$HOME/.gitconfig" ] && DOTFILE_MOUNTS+=(-v "$HOME/.gitconfig:/home/helen/.gitconfig:ro")
+
 GH_TOKEN="$(python3 -c "import json; print(json.load(open('.claude/settings.local.json'))['env']['GH_TOKEN'])")" \
 docker run -it --rm \
   -v "$REPO_ROOT:/workspace" \
   -v helen-triages-claude-config:/home/helen/.claude \
   -v helen-triages-bundle-cache:/home/helen/.bundle-cache \
+  "${DOTFILE_MOUNTS[@]}" \
   -e GH_TOKEN \
   -p 4001:4001 \
   -p 4002:4002 \
