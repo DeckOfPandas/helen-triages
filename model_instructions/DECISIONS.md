@@ -112,6 +112,45 @@ unless stated.
   must carry its measurement date and defer to the issues for state. Helen kept
   #755 open to close herself.
 
+- **2026-09-07 — the triage that acted on the map's lesson instead of drawing a
+  new one.** #755 and #787 were both closed the night before, so the backlog had
+  no map, and Helen asked for staleness, splits and a plan rather than another
+  grouped snapshot. **The corrections went onto the issues themselves**, which
+  is the only place that does not decay.
+
+  **What was measurably stale, having been believed for a day or more:** #828
+  asked for a DOM harness that had shipped two days earlier (`index-harness.js`
+  plus the two `*-startup.test.js` files; only the third of its three boxes was
+  real) · #778's "three remaining readers" of `var(--emboss` were seven ·
+  #297's seventeen `qq:` ABV rows were thirteen · #806 pointed at
+  `_data/food/servings.yml`, **a file that has never existed in this repo's
+  history** — #815 shipped the same idea as a `serves_estimate:` front-matter
+  key hours after #806 was written · #814 asked for a rule
+  `.claude/commands/ingest.md` has carried since 2026-09-01.
+
+  **And what was NOT stale, which matters as much:** #747's headline (83 of 127
+  bottles priced by guess) was right to within two bottles — a first pass had
+  called it stale by counting `confidence:` across the whole of `costs.yml`
+  instead of per block, mixing `bottles:`, `generics:` and `fruit_prices:`
+  together. **Count the block, not the file.** The real finding there was the
+  eleven `confidence: low` rows in `generics:` that the issue does not mention
+  at all, several with `min == max`. #752 and #744 were also called stale and
+  were not: both already carried a 2026-09-07 comment doing the correction.
+
+  **#728 was split into six (#834–#839) and closed.** It was measured, correct
+  and unreadable — six kinds of question in one checklist, decaying as a whole
+  rather than in the parts that had moved. Its own header makes that argument
+  about handover documents; it had become the thing it was raised to avoid. The
+  two blocks that change what the SITE says — 16 unfilled garnishes, 9 drinks
+  with no method — re-measured **unchanged** from 2026-09-05.
+
+  **Closed by Helen's word:** #435 (cook from drafts — *"What I'm doing is
+  working fine"*; #801 and #815 turned the local site into the shopping half of
+  that loop, so the PDF is only the cooking half now), #350, #305, #569, #708.
+  **Closed on evidence:** #795 (her own comment answered it, and the sipping
+  shelf already renders on the rum reference page), #798. **Merged:** #605 into
+  #337, #821 into #642.
+
 ## §1 How to run it
 
 - **2026-08-29** — `.node-runtime/` and `.gh-runtime/` do not come with a
@@ -121,6 +160,18 @@ unless stated.
   recipes are collected by the other run as 14 real failures.
 - **2026-09-06** — §1 had said `_config_local.yml` "overrides two things"
   since 2026-08-02; it sets seven keys and three collection outputs.
+- **2026-09-07 — in the devcontainer, `git fetch origin` fails and it is not a
+  credentials problem.** `origin` is `git@github.com:...`, and the container has
+  no GitHub host key, so every SSH git operation dies on
+  `Host key verification failed` — including `git fetch origin main:main`, the
+  command `CLAUDE.md`'s git workflow is built on. **The working substitute for a
+  fetch is the HTTPS URL**, which needs no credentials at all on a public repo:
+  `git fetch https://github.com/DeckOfPandas/helen-triages.git main:main`. It
+  fast-forwards local `main` exactly as the SSH form does. Note this does NOT
+  solve pushing — `git push` over SSH fails the same way, and the fine-grained
+  PAT deliberately carries no `Contents` scope, so there is no HTTPS substitute
+  for it. Do not read the SSH failure as a broken checkout or a revoked token;
+  it is a missing `known_hosts` entry in the image.
 
 ---
 
@@ -432,6 +483,22 @@ unless stated.
   one day surfaced 15 hidden violations. Both patterns gained
   `QQ\b(?!\s+Claude\b)`; `/tidy-drafts` fixed the fifteen. **A hole in a guard
   is proportional to the data flowing through it.**
+- **2026-09-07, #800** — **`gf tip:` is GOOD FOOD, the magazine, not
+  gluten-free.** #800 and the `GF_TIP` exemption in `tests/test_style.py` were
+  both written on the gluten-free reading and both offered `GF tip:` /
+  `Gluten-free tip:` as answers — the third of which would have printed a false
+  allergen claim on a recipe page. Helen, asked what it meant: *"I actually
+  have no idea what this means... Good Food tip, the magazine source I use a
+  lot?"* She was right. **Six of the eight drafts say `source: "Adapted from
+  Good Food, ..."` outright**, and not one of the eight tips is about gluten —
+  they are the magazine's standing tip box (freeze half the lasagne, use mutton
+  instead of lamb, what to do with a spent vanilla pod, and one that names the
+  magazine inside the tip: *"the magazine likes Kallo"*). It is **eight** drafts,
+  not the fourteen both the issue and the test comment claim. **The lesson is
+  the shape, not the abbreviation**: an unexplained two-letter prefix was
+  expanded by guess, the guess was written into an issue AND a test comment as
+  fact, and it survived there because both then cited each other. Ask what a
+  transcribed abbreviation means; do not infer it from the letters.
 
 ## §6 `main_ingredients`
 
@@ -1264,6 +1331,13 @@ unless stated.
   volume or a weight counts; a dash, a garnish and ice never do"**, which is a
   subtler line than `costs.yml`'s header currently draws and should be written
   there when this lands.
+
+- **2026-09-07, #818** — **The shopping list's bottle choice is per drink, not
+  once for the whole list.** Asked which, given a generic with several declared
+  bottles: *"per drink"*. So two drinks that both pour a reposado may choose
+  differently, the buttons sit on the drink's own line, and choosing collapses
+  that line's range to the chosen bottle. The range stands until a choice is
+  made.
 
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
