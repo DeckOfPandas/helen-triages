@@ -1318,11 +1318,30 @@ function renderResultsPool() {
 
   /* The number in the box: what she last typed, or however many the recipe
      makes, so an untouched list shops for every recipe exactly as written. */
-  function portionsFor(url) {
-    var stored = HTF.shortlist.portions(url);
-    if (stored) return stored;
+  /* CAN THIS RECIPE BE SCALED AT ALL? Asked of the RECIPE and never of the
+     store, which is the distinction a second silent box was built on.
+
+     Helen, 2026-09-07, with a screenshot: the gelato's box read 200 and
+     nothing moved, while the cheesecake beside it scaled to ⅝ of an egg. Her
+     localStorage held a 200 she had typed hours earlier, from before this
+     recipe had a portion count -- and `portionsFor()` returned that stored
+     number BEFORE looking at the recipe, so "is there a number to show?"
+     answered yes and "can this be scaled?" was never asked. A box appeared,
+     took her 200, and scaled by 1.
+
+     A STORED NUMBER IS A PREFERENCE, NOT A CAPABILITY. It says what she wants;
+     only the recipe says whether that is answerable. Ask the recipe. */
+  function hasPortions(url) {
     var recipe = RECIPES[url];
-    return (recipe && recipe.p) || null;
+    return !!(recipe && recipe.p > 0);
+  }
+
+  /* The number in the box: what she last typed, or however many the recipe
+     makes, so an untouched list shops for every recipe exactly as written.
+     `null` only where the recipe carries no count, and then there is no box. */
+  function portionsFor(url) {
+    if (!hasPortions(url)) return null;
+    return HTF.shortlist.portions(url) || RECIPES[url].p;
   }
 
   /* PORTIONS WANTED OVER PORTIONS MADE. No fallback branch: a recipe with no
@@ -1331,9 +1350,8 @@ function renderResultsPool() {
      before learning it. A CONTROL THAT SILENTLY FAILS IS WORSE THAN NO
      CONTROL. */
   function scaleFor(url) {
-    var recipe = RECIPES[url];
-    if (!recipe || !recipe.p) return 1;
-    return (portionsFor(url) || recipe.p) / recipe.p;
+    if (!hasPortions(url)) return 1;
+    return portionsFor(url) / RECIPES[url].p;
   }
 
   /* WHAT THE RECIPE SAYS ITS YIELD IS, in its own words and its own key.
@@ -1368,16 +1386,16 @@ function renderResultsPool() {
       shoppingRecipes.innerHTML = urls.map(function (url) {
         var title = titleByUrl[url] || url;
         var yielded = yieldText(url);
-        var portions = portionsFor(url);
-
-        /* NO PORTION COUNT, NO BOX. Every recipe carries one since #815, and
+        /* NO PORTION COUNT, NO BOX -- asked of the RECIPE, never of the store.
+           See hasPortions() for the screenshot that made that distinction
+           load-bearing. Every recipe carries one since #815, and
            test_every_food_recipe_states_how_many_it_feeds keeps it that way --
            so this is what a NEW recipe looks like between being written and
            being given its `serves_estimate:`. It contributes its ingredients
            at x1 and says why it cannot be scaled, rather than offering a
            control that would do nothing. That rule cost this feature two bug
            reports before it was learned. */
-        if (!portions) {
+        if (!hasPortions(url)) {
           return '<li class="shopping-list-recipe--unscalable">' +
             '<span>' + HTF.escapeHtml(title) +
             '<span class="shopping-list-yield-missing">' +
@@ -1405,7 +1423,7 @@ function renderResultsPool() {
         var relative = yielded ? ', which ' + yielded : '';
         return '<li>' +
           '<input type="number" class="shopping-list-portions" min="1" max="99" step="1" ' +
-          'inputmode="numeric" value="' + portions + '" ' +
+          'inputmode="numeric" value="' + portionsFor(url) + '" ' +
           'data-url="' + HTF.escapeHtml(url) + '" ' +
           'title="' + HTF.escapeHtml(title + relative) + '" ' +
           'aria-label="portions of ' + HTF.escapeHtml(title + relative) + '">' +

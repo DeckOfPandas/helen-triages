@@ -502,6 +502,39 @@ test('"set all to" now reaches every shortlisted recipe', () => {
   assert.match(aislesHtml(panel), /1\.2 kg/);
 });
 
+test('A STORED NUMBER CANNOT RESURRECT A BOX THE RECIPE CANNOT SUPPORT', () => {
+  /* Helen, 2026-09-07, with a screenshot: the gelato's box read 200 and the
+     list did not move, while the cheesecake beside it scaled to ⅝ of an egg.
+
+     THE GUARD WAS ASKING THE WRONG QUESTION. `portionsFor()` returned the
+     STORED number before it looked at the recipe, so a figure she had typed
+     earlier -- kept in localStorage, and outliving the recipe's own data --
+     made the "no portion count, no box" test pass for a recipe that had none.
+     A box was drawn, it accepted 200, and scaleFor() silently returned 1.
+
+     THE SAME BUG AS THE FIRST ONE, through a different door, which is why this
+     test asks about the STORE rather than about the render: her machine had a
+     value in it, and mine did not. */
+  const { win, doc, panel } = boot({
+    recipes: {
+      '/food/recipes/a/': {
+        p: null, e: false, y: 'About 750 ml', k: 'makes',
+        i: [{ a: '125 ml', n: 'whipping cream', s: 'cupboard' }]
+      }
+    }
+  });
+  // What she had typed before the recipe lost (or never had) its count.
+  win.HTF.shortlist.setPortions('/food/recipes/a/', 200);
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  showTheList(doc);
+
+  assert.ok(!recipesHtml(panel).includes('<input'),
+    'a stored number drew a box for a recipe with no portion count');
+  assert.match(recipesHtml(panel), /no serving size/);
+  assert.match(aislesHtml(panel), /125 ml/,
+    'and the amounts stay exactly as the recipe wrote them, not x200');
+});
+
 test('a recipe with NO portion count gets no box, and says why', () => {
   /* Every recipe carries one since #815 and a test keeps it that way, so this
      is what a NEW recipe looks like between being written and being given its
