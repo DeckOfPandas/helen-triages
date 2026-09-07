@@ -247,35 +247,21 @@ main {
   letter-spacing: normal;
 }
 
-// EDGE TO EDGE SINCE 2026-09-07 -- #783, Helen: "right-align footer right column
-// with whole page -- currently looks like it's right-aligned with the content
-// container".
+// THE FOOTER IS AS WIDE AS THE ARTICLE, AND ITS OUTER COLUMNS SIT UNDER THE
+// ARTICLE'S EDGES -- #783, settled 2026-09-07 after one wrong turn worth
+// recording.
 //
-// THE GRID WAS NEVER THE PROBLEM, which is why this took a while to see. The row
-// below is `1fr auto 1fr` and the right column was correctly right-aligned all
-// along -- inside a box that `max-width: $width-content` had clamped to the
-// article's width and centred. So the footer's right edge was the CONTENT
-// column's right edge, and the column looked wrong by being exactly where it was
-// told to be.
-//
-// IT NOW MATCHES THE HEADER, which has been edge-to-edge from the start (see
-// `.site-header` above: "full viewport width") with `.site-header-inner` holding
-// the constrained row. The footer was the one piece of chrome not built that
-// way, which is the inconsistency that made it read as a mistake.
-//
-// THE FOOTER GOES FULL WIDTH AND ITS CONTENT DOES TOO -- deliberately NOT the
-// header's inner-wrapper shape. Helen chose the outer columns reaching the page
-// edges; an inner wrapper would put them back exactly where they were.
-//
-// THE HEARTS DO NOT MOVE. They are pinned to column 2 (`.site-footer-centre`,
-// `grid-column: 2`), which is what the three-track grid exists to guarantee --
-// and page-centred is where they already were, since the footer was centred.
-// Widening the two side tracks moves their contents outward and leaves the
-// middle one where it is.
-//
-// BELOW 600px NOTHING CHANGES: the media query at the foot of this file collapses
-// the row to one centred column, and it keys on `.site-footer-top`, not on this.
+// THE FIRST ATTEMPT REMOVED THIS max-width, on the reading that "right-align
+// with whole page" meant the viewport. It sent the LEFT column to the viewport
+// edge, left the right one exactly where it had been, and broke the alignment
+// the comment further down had deliberately built ("flush with where the page's
+// own text starts"). Helen, seeing it: "I would like each to be under the sides
+// of the main page container." So the cap comes back, and the real fault was
+// never here -- it was in the grid below, where the second column was not in
+// column 3 at all.
 .site-footer {
+  max-width: $width-content;
+  margin: 0 auto;
   padding: 1.5rem 1.5rem calc(1.5rem * 2) 1.5rem;
   border-top: 1px dashed $color-border;
   text-align: center;
@@ -312,12 +298,27 @@ main {
 // column 3 -- the hearts stop being page-centred, which is the one thing the
 // three-column grid above exists to guarantee and was settled on 2026-08-16.
 //
-// Pinning the graphic to the middle track resolves it before auto-placement
-// runs, so the two navs flow into columns 1 and 3 around it and the centring
-// holds at either count. The failure it prevents is silent, arrives with a data
-// edit rather than a code change, and would land on every page at once.
+// PINNING THE GRAPHIC ALONE DID NOT RESOLVE IT, and this comment used to say it
+// did. `grid-column: 2` with an AUTO ROW does not reserve that cell ahead of
+// auto-placement: the two navs are placed first, in DOM order, so nav 2 took row
+// 1 column 2 and the centre -- still needing column 2 -- dropped to ROW 2. The
+// hearts sat underneath both reference columns instead of between them.
+//
+// IT WAS INVISIBLE UNTIL 2026-09-07 for the reason the comment on
+// `.site-footer-ref:nth-of-type(2)` gives: "nothing renders a second column
+// yet". The rum reference page (#529) made cocktails render one, and the fault
+// arrived with a DATA edit and no code change, on every page at once -- which is
+// exactly the failure the original comment said it was preventing.
+//
+// ALL THREE ARE PLACED EXPLICITLY NOW, so auto-placement has nothing to decide.
+// That is what makes the centring a guarantee rather than a consequence of DOM
+// order, and it holds whether one reference column renders or two.
+.site-footer-ref     { grid-column: 1; grid-row: 1; }
+.site-footer-ref:nth-of-type(2) { grid-column: 3; grid-row: 1; }
+
 .site-footer-centre {
   grid-column: 2;
+  grid-row: 1;
 
   // THE COLUMN IS A STACK, in Helen's own running order for issue #652:
   // "[heart drawing] / about / [GitHub logo] / licences line". Before
@@ -886,6 +887,17 @@ $tape-protrusion: 0.2rem;
 
   // Both reference columns, including the one that flips itself right-aligned
   // at wide sizes. Stated together so a third site inherits it too.
+  // `grid-column: auto` UNDOES THE EXPLICIT PLACEMENT ABOVE, which is new as of
+  // 2026-09-07 and is required rather than tidy: the single-column stack has no
+  // column 3, and an item asking for one would create an implicit track and sit
+  // off the side of a phone.
+  .site-footer-ref,
+  .site-footer-ref:nth-of-type(2),
+  .site-footer-centre {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
   .site-footer-ref,
   .site-footer-ref:nth-of-type(2) {
     justify-self: center;
