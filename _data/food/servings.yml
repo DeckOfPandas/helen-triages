@@ -1,0 +1,99 @@
+# =============================================================================
+# HOW MANY PEOPLE ONE BATCH FEEDS — the guesses, and only the guesses.
+#
+# GitHub issue #801, Helen: "When serving size is unclear, please make your
+# best guess." This file is where those guesses live, and it holds NOTHING
+# ELSE: 43 of the 86 recipes open with a `serves:` that begins with a number,
+# and _plugins/food_shopping.rb reads those straight off the recipe. A slug
+# only appears below when that fails.
+#
+# WHY NOT IN THE RECIPES. Putting a number in 44 files means editing 44 files,
+# and CLAUDE.md's rule is that an agent editing a recipe sets
+# `meta.proofread: false` in the same commit -- so the honest version of that
+# change un-proofreads more than half the collection to add a figure Helen
+# never wrote and might disagree with. One reviewable file, one place to
+# correct a guess, and not a single recipe touched. If she later decides a
+# number belongs in the front matter, moving it there is a schema change and a
+# separate piece of work.
+#
+# EVERY ENTRY HERE IS FLAGGED `estimated` ON THE PAGE, and the shopping list
+# prints it with a `~`. A guess that cannot be told apart from a stated fact is
+# the thing that would make this file dangerous rather than useful.
+#
+# THE COMMENT BESIDE EACH NUMBER IS WHAT THE RECIPE ACTUALLY SAYS, quoted, so
+# a guess can be checked against its source without opening the file. Where the
+# source gives a count of objects rather than of people, the number below is
+# the count of PEOPLE -- twelve Yorkshire puddings are six portions, because
+# nobody eats one.
+#
+# A RECIPE THAT IS NOT FOOD FOR PEOPLE still needs a figure, because the scaler
+# divides by it. A spice blend, a sauce or a curd is given the number of
+# servings its batch supplies, so asking for four portions of a shortlisted
+# curry and its spice blend together scales both towards the same dinner
+# instead of handing you 140 g of garam masala.
+#
+# ADDING A RECIPE DOES NOT REQUIRE AN ENTRY unless its `serves:` is missing or
+# does not begin with a number.
+# tests/test_food_shopping.py::test_every_food_recipe_resolves_to_a_portion_count
+# is what says so out loud, and it is the test to read when it goes red.
+# =============================================================================
+
+portions:
+
+  # --- the two whose `serves:` is a sentence -------------------------------
+  mums-rice-salad: 3                    # serves: "However many people want to eat 150 g rice" -- 150 g dry rice
+  smoked-mackerel-pate: 4               # serves: "Depends on appetite"
+
+  # --- the magic bag -------------------------------------------------------
+  fridge-end-fried-rice: 2              # no yield of any kind; the schema has neither key
+
+  # --- cakes and bakes, counted in slices ----------------------------------
+  beetroot-chocolate-cake: 12           # makes: "one 8-inch cake"
+  best-ever-chocolate-sponge-cake: 12   # makes: "one double-layer 8-inch cake"
+  courgette-orange-cake-cream-cheese-frosting: 12   # makes: "12 slices"
+  grandmas-spice-cake: 10               # makes: "one 7-inch round cake"
+  lemon-feather-sponge: 10              # makes: "one 7-inch round cake"
+  old-fashioned-cherry-cake: 12         # makes: "one 8-inch round cake"
+  lemon-meringue-pie: 8                 # makes: "one pie"
+
+  # --- things counted in objects, converted to people ----------------------
+  ajitsuke-tamago: 4                    # makes: "4 eggs" -- one each
+  delias-classic-pancakes: 4            # makes: "about 8" -- two each
+  grandmas-fairy-cakes: 12              # makes: "12 fairy cakes"
+  grandmas-scones: 8                    # makes: "2 large rounds of 4"
+  henrys-dark-chocolate-almond-truffles: 10   # makes: "20–24 truffles" -- two each
+  henrys-sunday-waffles: 2              # makes: "4–6 waffles, depending on your waffle iron"
+  macarons: 16                          # makes: "64+ tiny macarons" -- four each
+  mrs-nicholsons-yorkshire-puddings: 6  # makes: "12 normal Yorkshire puddings" -- two each
+  peanut-butter-cookies: 18             # makes: "18 cookies"
+  sweet-potato-chocolate-brownies: 16   # makes: "16 squares"
+  sweet-shortcrust-pastry-mince-pies: 12    # makes: "1 dozen mince pies"
+  the-one-true-chocolate-brownies: 12   # makes: "enough for that edge-brownie tin I made James buy me"
+  gluten-free-crumble-topping: 6        # makes: "Enough to top my 1.5-l Pyrex dish (22 x 17 cm)"
+  goats-cheese-squash-rosemary-griddle-cakes: 2     # makes: "Plenty for two people"
+  slow-cooked-duck-legs-confit: 4       # makes: "however many you make"
+
+  # --- ice cream, a tub at a time ------------------------------------------
+  ben-jerrys-sweet-cream-base-1: 8      # makes: "950 ml"
+  ben-jerrys-sweet-cream-base-2: 8      # makes: "950 ml"
+  ben-jerrys-sweet-cream-base-3: 8      # makes: "950 ml"
+  bens-chocolate-ice-cream: 8           # makes: "950 ml"
+  jerrys-chocolate-ice-cream: 8         # makes: "950 ml"
+  peanut-butter-ice-cream: 8            # makes: "950 ml"
+
+  # --- sauces, curds and fillings, counted in servings of the batch --------
+  caesar-salad-dressing: 8              # makes: "about 300 ml"
+  caramel: 8                            # makes: "I mean, who cares, make double anyway"
+  cherry-glaze: 8                       # makes: "Some"
+  chocolate-ganache: 8                  # makes: "N/A, bring a spoon"
+  grandmas-lemon-curd: 8                # makes: "Enough for one normal lemon meringue pie"
+  mrs-nicholsons-creme-patissiere: 8    # makes: "about 600 ml"
+  teriyaki-sauce: 8                     # makes: "about 300 ml"
+  wagamama-teriyaki-sauce: 4            # makes: "125 ml"
+  wagamama-yakitori-sauce: 4            # makes: "125 ml"
+
+  # --- spice blends: a jar is a lot of dinners -----------------------------
+  chai-spice-powder: 20                 # makes: "approx. 75 g"
+  five-spice-powder: 20                 # makes: "some"
+  garam-masala-powder: 20               # makes: "approx. 140 g"
+  mixed-spice-powder: 20                # makes: "slightly more than half as much as my spice blender will fit, hmph"
