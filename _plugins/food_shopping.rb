@@ -1,6 +1,6 @@
 # =============================================================================
 # WHAT A FOOD RECIPE CONTRIBUTES TO A SHOPPING LIST, and how many it feeds.
-# Data: _data/food/aisles.yml, _data/food/servings.yml
+# Data: _data/food/aisles.yml, and each recipe's own `serves_estimate:`
 # =============================================================================
 # GitHub issue #801, Helen: "add scaler and shopping list feature to food
 # recipe shortlist page ... no need to cost the portions ... When serving size
@@ -79,7 +79,6 @@ module HelenTriages
 
       @order    = Array(aisles["order"]).map { |a| a["key"] }
       @never    = Array(aisles["never"]).map { |n| fold(n) }
-      @guesses  = site.data.dig("food", "servings", "portions") || {}
 
       # LONGEST FIRST, AND THAT IS THE WHOLE MATCHING RULE. Sorted once here
       # rather than compared per lookup: `coconut milk` must be tried before
@@ -114,7 +113,7 @@ module HelenTriages
       end
 
       Jekyll.logger.info "Shopping:", "read #{counted} food recipes " \
-        "(#{guessed} portion counts guessed from _data/food/servings.yml)"
+        "(#{guessed} portion counts from serves_estimate:)"
     end
 
     private
@@ -126,17 +125,27 @@ module HelenTriages
       text.to_s.gsub("’", "'").strip.downcase.gsub(/\s+/, " ")
     end
 
-    # [portions, estimated]. `nil` portions is a recipe nobody has given a
-    # figure -- the page then simply offers no scaling for it, and
-    # test_every_food_recipe_resolves_to_a_portion_count fails loudly, which is
-    # the right way round: a missing guess must not stop a build.
+    # [portions, estimated]. Two sources and one order, #815.
+    #
+    # `serves:` FIRST, because a number Helen wrote beats a number anyone
+    # estimated. `serves_estimate:` second, and everything from there is
+    # flagged so the page can print its `~`.
+    #
+    # `makes:` IS NEVER READ AS PEOPLE, however numeric it looks: 950 ml is not
+    # 950 portions and "12 slices" is not necessarily twelve people. That is
+    # the whole reason `serves_estimate` exists as its own key rather than the
+    # plugin being cleverer about `makes:`.
+    #
+    # `nil` is still possible -- a recipe carrying neither -- and the page then
+    # offers no scaling for it while
+    # test_every_food_recipe_states_how_many_it_feeds fails loudly. A missing
+    # figure must not stop a build; it must stop a test.
     def portions_for(doc)
       stated = doc.data["serves"].to_s[LEADING_NUMBER, 1]
       return [stated.to_i, false] if stated
 
-      slug = File.basename(doc.relative_path.to_s, ".*")
-      guess = @guesses[slug]
-      return [guess.to_i, true] if guess.is_a?(Numeric) && guess.to_i > 0
+      estimate = doc.data["serves_estimate"]
+      return [estimate.to_i, true] if estimate.is_a?(Numeric) && estimate.to_i > 0
 
       [nil, false]
     end

@@ -4,6 +4,7 @@ tagline: "A capsicum-free version, which suffers not at all for the lack."
 source: "Henry"
 source_type: person
 makes: "slightly more than half as much as my spice blender will fit, hmph"
+serves_estimate: 20
 prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["cinnamon stick", "whole nutmeg", "whole cloves", "ground ginger", "mace"]

@@ -1895,7 +1895,7 @@ def _shopping_blob(site, page="index.html"):
     return json.loads(match.group(1))
 
 
-def test_every_published_recipe_reaches_the_page_with_a_portion_count(site):
+def test_every_recipe_reaches_the_page_with_a_portion_count(site):
     """The blob covers every row, and every PUBLISHED entry can count people.
 
     tests/test_food_shopping.py proves every published recipe RESOLVES to a
@@ -1903,13 +1903,12 @@ def test_every_published_recipe_reaches_the_page_with_a_portion_count(site):
     a different claim, and the one that fails if the plugin stops running, is
     renamed, or quietly returns early.
 
-    A DRAFT IS ALLOWED NO PORTION COUNT, and that is not a gap being tolerated.
-    84 of the 336 drafts carry a `makes:` and no numeric `serves:` --
-    "About 750 ml" cannot become a number of people without inventing a portion
-    size -- so their box counts BATCHES instead, and needs no figure at all.
-    _data/food/servings.yml deliberately covers published recipes only: guesses
-    for 336 churning drafts would be numbers nobody has checked, in a file
-    whose whole value is that its guesses are reviewable.
+    EVERY RECIPE, DRAFT OR NOT, SINCE #815. The batch box that let a recipe
+    off this is gone: Helen ruled that "750 ml of gelato doesn't feed 50" and
+    that the estimate belongs in the front matter, so `serves_estimate:` is on
+    all 129 files whose `serves:` states no number. A recipe reaching the page
+    without a portion count now gets NO BOX at all, which is visible; it used
+    to get one that silently did nothing.
 
     What every recipe DOES need, draft or not, is `k` -- which key its yield
     came from. Without it a `makes:` prints behind the word "serves", which it
@@ -1921,12 +1920,11 @@ def test_every_published_recipe_reaches_the_page_with_a_portion_count(site):
         "86 plus the magic bag. The plugin or the row gate has changed."
     )
 
-    published = {u: r for u, r in blob.items() if "/food/drafts/" not in u}
-    unscalable = sorted(u for u, r in published.items() if not r.get("p"))
+    unscalable = sorted(u for u, r in blob.items() if not r.get("p"))
     assert not unscalable, (
-        "these PUBLISHED recipes reached the page with no portion count, so "
-        "their box silently counts batches instead of people: "
-        f"{unscalable}. Add a guess to _data/food/servings.yml."
+        "these recipes reached the page with no portion count, so the shopping "
+        f"list can draw no box for them: {unscalable}. Add `serves_estimate:` "
+        "to the recipe."
     )
 
     empty = sorted(u for u, r in blob.items() if not r.get("i"))

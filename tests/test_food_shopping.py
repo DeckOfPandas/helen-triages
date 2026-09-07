@@ -1,19 +1,24 @@
-"""The shopping list's two data files — GitHub issue #801.
+"""The shopping list's data — GitHub issues #801 and #815.
 
-_data/food/aisles.yml says where an ingredient is found in a shop;
-_data/food/servings.yml says how many people a recipe feeds when the recipe
-itself does not. _plugins/food_shopping.rb reads both at build.
+`_data/food/aisles.yml` says where an ingredient is found in a shop. How many
+people a recipe feeds is in the RECIPE, in `serves:` or, where that does not
+state a number, in `serves_estimate:`. `_plugins/food_shopping.rb` reads both.
 
-WHAT THESE CAN AND CANNOT CHECK. They check the FILES: that the aisles are
-well-formed, that no keyword is claimed by two of them, that every guess is for
-a recipe that exists and is only there because it is needed. They cannot check
-the MATCHING, because the matcher is Ruby and runs inside Jekyll -- that is
-tests/test_rendered_pages.py's job, and it does it against the real build,
-which is the only place the two could ever disagree.
+**`_data/food/servings.yml` was deleted by #815.** It held the estimates for
+the 44 published recipes for a fortnight, and was the right shape while the
+question was "can we avoid un-proofreading half the collection". Helen answered
+that directly — she would review the numbers line by line and move
+`BASELINE_COMMIT` — which removed the only reason for a second home for the
+figure. One home now, beside the words it estimates from.
 
-The division is deliberate rather than accidental: a second implementation of
-the aisle rule written in Python to make it testable here is exactly the drift
-MANUAL 11.2 is about, and it would pass while the site was wrong.
+WHAT THESE CAN AND CANNOT CHECK. They check the FILES: that every recipe
+states how many it feeds, that an estimate is only present where it is needed,
+that the aisles are well-formed and no keyword is claimed twice. They cannot
+check the aisle MATCHING, because the matcher is Ruby and runs inside Jekyll —
+that is tests/test_rendered_pages.py's job, against the real build, which is
+the only place the two could disagree. A second implementation of the rule
+written in Python to make it testable here is exactly the drift MANUAL §11.2
+is about, and it would pass while the site was wrong.
 """
 from __future__ import annotations
 
@@ -32,24 +37,142 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "_data" / "food"
 
 AISLES = yaml.safe_load((DATA / "aisles.yml").read_text(encoding="utf-8"))
-SERVINGS = yaml.safe_load((DATA / "servings.yml").read_text(encoding="utf-8"))
 
-RECIPE_DIRS = ("_food_recipes", "_food_magic_bag")
+# Drafts are gitignored and absent in CI and in a fresh worktree, so the two
+# published collections are what every machine can check. The draft half runs
+# only where they have been cloned.
+PUBLISHED_DIRS = ("_food_recipes", "_food_magic_bag")
+ALL_DIRS = PUBLISHED_DIRS + ("_food_drafts",)
 
 # `serves:` counts as stated when it OPENS with a number -- the plugin's own
-# rule, restated here rather than imported because it cannot be imported.
-# _plugins/food_shopping.rb's LEADING_NUMBER is the original; if one moves, the
-# test below that counts the guesses is what notices.
+# rule, restated here because it cannot be imported from Ruby.
+# `_plugins/food_shopping.rb`'s LEADING_NUMBER is the original.
 LEADING_NUMBER = re.compile(r"^\s*(\d+)")
 
 
-def recipe_paths():
-    for folder in RECIPE_DIRS:
+def recipe_paths(dirs=ALL_DIRS):
+    for folder in dirs:
         yield from sorted((ROOT / folder).glob("*.md"))
 
 
 def front_matter(path: Path) -> dict:
-    return yaml.safe_load(path.read_text(encoding="utf-8").split("---", 2)[1]) or {}
+    try:
+        return yaml.safe_load(path.read_text(encoding="utf-8").split("---", 2)[1]) or {}
+    except (IndexError, yaml.YAMLError):
+        return {}
+
+
+def states_people(fm: dict) -> bool:
+    """Does `serves:` open with a number? `makes:` never counts people."""
+    return bool(fm.get("serves") and LEADING_NUMBER.match(str(fm["serves"])))
+
+
+# --- how many people ----------------------------------------------------------
+
+@pytest.mark.parametrize("folder", PUBLISHED_DIRS)
+def test_every_published_recipe_states_how_many_it_feeds(folder):
+    """#815. The scaler divides by this number, so every recipe needs one.
+
+    Either `serves:` opens with a number, or `serves_estimate:` carries an
+    integer. `makes:` is never read as people however numeric it looks —
+    950 ml is not 950 portions, and "12 slices" is not necessarily twelve
+    people. That gap is the whole reason the second key exists.
+
+    Helen, #815: "clearly 750 ml of gelato doesn't feed 50. We need estimate
+    the number of people served by 750 ml, then add that to the front matter
+    somehow."
+    """
+    missing = []
+    for path in recipe_paths([folder]):
+        fm = front_matter(path)
+        if states_people(fm):
+            continue
+        if isinstance(fm.get("serves_estimate"), int):
+            continue
+        missing.append(f"{path.name}  serves={fm.get('serves')!r} "
+                       f"makes={fm.get('makes')!r}")
+    assert not missing, (
+        "these recipes say nothing about how many people they feed, so the "
+        "shopping list cannot scale them. Add `serves_estimate:` — an integer, "
+        "people — beside the `makes:` it is read from:\n  " + "\n  ".join(missing)
+    )
+
+
+def test_every_draft_states_how_many_it_feeds():
+    """The same rule on drafts, which is the collection Helen browses locally.
+
+    Skipped where the private repo has not been cloned — CI and a fresh
+    worktree both. It is not a lesser rule there: a draft with no figure is a
+    recipe whose box the shopping list cannot draw, and Helen hit exactly that
+    with the blackberry gelato.
+    """
+    folder = ROOT / "_food_drafts"
+    if not folder.is_dir():
+        pytest.skip("_food_drafts/ not cloned; see MANUAL §9.1")
+
+    missing = []
+    for path in recipe_paths(["_food_drafts"]):
+        fm = front_matter(path)
+        if not fm:
+            continue        # README.md and anything without front matter
+        if states_people(fm) or isinstance(fm.get("serves_estimate"), int):
+            continue
+        missing.append(f"{path.name}  serves={fm.get('serves')!r} "
+                       f"makes={fm.get('makes')!r}")
+    assert not missing, (
+        "these drafts say nothing about how many people they feed:\n  "
+        + "\n  ".join(missing)
+    )
+
+
+@pytest.mark.parametrize("folder", PUBLISHED_DIRS)
+def test_serves_estimate_is_a_positive_whole_number_of_people(folder):
+    bad = []
+    for path in recipe_paths([folder]):
+        value = front_matter(path).get("serves_estimate")
+        if value is None:
+            continue
+        if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+            bad.append(f"{path.name}: {value!r}")
+    assert not bad, (
+        "`serves_estimate:` is a whole number of people, one or more, and "
+        "unquoted — a quoted `\"6\"` is the string and the plugin will not read "
+        "it: " + ", ".join(bad)
+    )
+
+
+@pytest.mark.parametrize("folder", PUBLISHED_DIRS)
+def test_no_estimate_contradicts_a_serving_size_helen_wrote(folder):
+    """The recipe wins. The estimate fills a gap and never argues with one.
+
+    A `serves_estimate:` on a recipe whose `serves:` already states a number is
+    dead weight at best — the plugin reads `serves:` first — and a lie about
+    where the figure came from at worst, because an estimate is printed with a
+    `~` and a stated one is not.
+    """
+    shadowed = []
+    for path in recipe_paths([folder]):
+        fm = front_matter(path)
+        if states_people(fm) and "serves_estimate" in fm:
+            shadowed.append(f"{path.name} (serves: {fm['serves']!r})")
+    assert not shadowed, (
+        "these recipes state their own serving size and carry an estimate too: "
+        + ", ".join(shadowed)
+    )
+
+
+def test_the_deleted_servings_file_stays_deleted():
+    """#815 moved the numbers into the front matter. One home, not two.
+
+    A `_data/food/servings.yml` reappearing means someone has reintroduced the
+    second home for a figure that now lives beside the words it estimates from
+    — which is how the page and the file get to disagree about how many a
+    recipe feeds.
+    """
+    assert not (DATA / "servings.yml").exists(), (
+        "_data/food/servings.yml is back. `serves_estimate:` in the recipe is "
+        "the single source since #815; see this module's docstring."
+    )
 
 
 # --- the aisles ---------------------------------------------------------------
@@ -132,74 +255,4 @@ def test_never_is_matched_on_the_whole_name_and_stays_short():
     assert sorted(AISLES["never"]) == ["cold water", "ice", "water"], (
         "the `never` list has changed. Everything on it vanishes from every "
         "shopping list silently; adding to it is Helen's call, not a tidy-up."
-    )
-
-
-# --- the serving-size guesses --------------------------------------------------
-
-def test_every_food_recipe_resolves_to_a_portion_count():
-    """The scaler divides by this number, so every recipe needs one.
-
-    Either the recipe's own `serves:` opens with a number, or
-    _data/food/servings.yml carries a guess for its slug. A recipe with
-    neither still builds -- `portions` is simply null and the page offers no
-    scaling for it -- which is the right way round: a missing guess must not
-    stop a build. It stops THIS instead.
-
-    Helen, #801: "When serving size is unclear, please make your best guess."
-    """
-    missing = []
-    for path in recipe_paths():
-        data = front_matter(path)
-        if LEADING_NUMBER.match(str(data.get("serves") or "")):
-            continue
-        if path.stem in SERVINGS["portions"]:
-            continue
-        missing.append(f"{path.parent.name}/{path.name}"
-                       f"  serves={data.get('serves')!r} makes={data.get('makes')!r}")
-    assert not missing, (
-        "these recipes have no portion count and no guess in "
-        "_data/food/servings.yml, so the shopping list cannot scale them:\n  "
-        + "\n  ".join(missing)
-    )
-
-
-def test_every_guess_names_a_recipe_that_exists():
-    """A guess for a renamed or deleted recipe is read by nothing and says so."""
-    slugs = {path.stem for path in recipe_paths()}
-    orphans = sorted(set(SERVINGS["portions"]) - slugs)
-    assert not orphans, (
-        f"_data/food/servings.yml has guesses for recipes that do not exist: "
-        f"{orphans}. A renamed recipe needs its guess renamed with it, or it "
-        "quietly falls back to no scaling at all."
-    )
-
-
-def test_no_guess_overrides_a_serving_size_helen_wrote():
-    """The recipe wins. This file fills gaps and never contradicts.
-
-    A slug listed here whose `serves:` already opens with a number is dead
-    weight at best -- the plugin reads the recipe first -- and a lie about
-    where the number came from at worst, because everything in this file is
-    flagged `estimated` and printed with a `~`.
-    """
-    shadowed = []
-    for path in recipe_paths():
-        if path.stem not in SERVINGS["portions"]:
-            continue
-        serves = str(front_matter(path).get("serves") or "")
-        if LEADING_NUMBER.match(serves):
-            shadowed.append(f"{path.stem} (serves: {serves!r})")
-    assert not shadowed, (
-        "these recipes state their own serving size and are also guessed at in "
-        "_data/food/servings.yml: " + ", ".join(shadowed)
-    )
-
-
-def test_every_guess_is_a_positive_whole_number_of_people():
-    bad = [f"{slug}: {n!r}" for slug, n in SERVINGS["portions"].items()
-           if not isinstance(n, int) or isinstance(n, bool) or n < 1]
-    assert not bad, (
-        "portion counts must be whole numbers of people, one or more: "
-        + ", ".join(bad)
     )

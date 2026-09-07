@@ -4,6 +4,7 @@ tagline: "A sweet-sour reduction, excellent with [five-spice duck](../five-spice
 source: "Adapted from Gordon Ramsay"
 source_type: author
 makes: "Some"
+serves_estimate: 8
 prep_time: "5 mins"
 cook_time: "20 mins"
 main_ingredients: ["honey", "dark soy sauce", "red wine vinegar", "chicken stock", "cherries"]

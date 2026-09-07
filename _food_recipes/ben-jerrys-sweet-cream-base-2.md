@@ -4,6 +4,7 @@ tagline: "The richest of the three bases from Ben & Jerry. No eggs, no milk, jus
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 source_type: book
 makes: "950 ml"
+serves_estimate: 8
 prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["whipping cream", "single cream", "golden caster sugar"]

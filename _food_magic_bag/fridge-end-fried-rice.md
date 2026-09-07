@@ -1,6 +1,7 @@
 ---
 title: "Fridge-end fried rice"
 tagline: "The thing that happens to yesterday's rice and whatever is going soft in the drawer."
+serves_estimate: 2
 main_ingredients: ["rice", "eggs", "spring onions", "dark soy sauce"]
 tags: ["fakeaway", "carbs party"]
 ingredients:

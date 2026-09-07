@@ -392,6 +392,8 @@ tagline: "It's fun to have a one-pot stew that is bright and acidic..."
 source: "Adapted from Good Food, January 2026"
 source_type: publication              # required; see SOURCE_ATTRIBUTION_SPEC.md
 serves: "4"                      # xor makes: — never both. QUOTED
+serves_estimate: 6               # #815; REQUIRED unless serves: opens with a
+                                 # number. An integer, PEOPLE, UNQUOTED
 prep_time: "20 mins"
 cook_time: "1 hr 30 mins"
 main_ingredients: ["cavolo nero", "butter beans", "lemon"]
@@ -479,7 +481,16 @@ with it.
   text, so `item: "~1 tbsp tamarind paste"` renders unstyled with no error.
   No test catches this; it is an authoring habit.
 - `serves` **xor** `makes`; values may be prose in Helen's voice ("Depends on
-  appetite") — never tidy one into a number.
+  appetite") — never tidy one into a number. **That is exactly why
+  `serves_estimate:` exists** (#815): the scaler needs an integer and her words
+  must not be touched, so the estimate is a key of its own and the prose stays
+  as written. Required wherever `serves:` does not OPEN with a number — 129 of
+  423 files today, which is every `makes:` recipe plus the 20 whose `serves:`
+  is prose or `QQ`. **`makes:` is never read as people however numeric it
+  looks**: 950 ml is not 950 portions, and "12 slices" is not necessarily
+  twelve people. It is an integer and UNQUOTED — a quoted `"6"` is a string
+  and the plugin will not read it. **Produced at ingest**; ask Helen rather
+  than guess when the source does not support one.
 - `method` **xor** `method_groups`; both present means the second is dropped.
   Group names are bare nouns (`dressing`); method group names may be
   narrative phases; the page uppercases both.
@@ -851,7 +862,7 @@ rounding — ⅔ prints for exactly two thirds and never for 0.7.
 | file | is |
 |---|---|
 | `_data/food/aisles.yml` | Helen's ten aisles in shop order, and a KEYWORD table. **The longest keyword wins**, matched on whole words — `milk` is dairy and `coconut milk` is a tin, `garlic` is produce and `garlic paste` is a jar. An exception is an entry, never a precedence rule. `never:` (water, cold water, ice) matches the WHOLE name and drops the ingredient |
-| `_data/food/servings.yml` | the 44 guesses, and NOTHING else — 43 recipes open `serves:` with a number and are read straight off. Every entry here is flagged `estimated` and printed with a `~` |
+| `serves_estimate:` in each recipe | how many PEOPLE it feeds, where `serves:` says no number (#815). `_data/food/servings.yml` held these outside the files until 2026-09-07 and is deleted |
 | `_plugins/food_shopping.rb` | assigns the aisle and resolves the portion count at BUILD, and hangs `shopping`, `portions`, `portions_estimated` on every document. The page is handed the answer and never the table |
 | `assets/js/food-shopping-list.js` | the totals. Pure; the DOM half is `filters.js` |
 
@@ -873,29 +884,42 @@ conversion `shopping-list.js` refuses — that rule is about units with no
 defined relationship (a dash is not some number of ml). `tbsp`, `oz` and every
 bare count are left where they are, because those would need inventing.
 
-**THE BOX COUNTS WHAT THE RECIPE'S OWN YIELD COUNTS, and there are two kinds.**
-`serves: 6` is people, so the box is PORTIONS and four of them is ×0.67.
-`makes: "About 750 ml"` is a batch — nobody can turn that into people without
-inventing a portion size — so the box counts BATCHES, ×N, and a `×` is drawn
-beside it. **This is not an edge case**: 84 of the 336 drafts are the second
-kind, and every draft is on the index locally. `inPortions()` in `filters.js`
-decides, from the same field the box is drawn from, so there is no third
-branch and no silent ×1. **"Set all to" writes portions and therefore skips
-the batch recipes** — writing its number into a batch box would change what
-that number means on the way past.
+**EVERY RECIPE COUNTS PEOPLE, and that took two goes.** The box is portions:
+four portions of a recipe that serves six is ×0.67. A recipe whose `serves:`
+states no number carries **`serves_estimate:`** in its own front matter (§4),
+produced at ingest from the recipe's own words — 129 of 423 files. An estimate
+is printed with a `~`, which is the only thing saying a figure was reasoned
+rather than written down.
 
-**`k` says WHICH KEY the yield came from**, and the blob carries it for this
-reason as much as for the label: `serves` and `makes` are exclusive (§4), so a
-page printing the text behind a fixed word is right for half the collection.
-It read `serves About 750 ml` until 2026-09-07.
+**WHAT STOOD HERE FOR A FORTNIGHT, so you do not rebuild it.** A recipe with no
+portion count got a box counting BATCHES (×1, ×2) with a `×` beside it, on the
+reasoning that `makes: "About 750 ml"` cannot become people without inventing a
+portion size. Helen killed it: *"increasing it to 50+ does nothing either and
+clearly 750 ml of gelato doesn't feed 50."* **It was honest and it was wrong**
+— "set all to N portions" could not reach those recipes, and a control that
+means something different on some rows is worse than a guessed number.
+**Batches were a workaround for missing data, and the fix was the data.**
+`_data/food/servings.yml`, which held the estimates outside the recipes for the
+same fortnight, is deleted: one home for the figure, beside the words it
+estimates from.
 
-**Do not print the yield beside the recipe name.** Helen, 2026-09-07, with a
-screenshot of `7  Moules Marinière serves 4`: *"This screenshot makes it look
-like I'm asking for 28 portions of mussels."* A number at each END of a short
-line reads as one expression however the middle is styled, and this row has to
-open with a number — so there is no styling fix, and the yield lives in the
-input's `title` and `aria-label`. If it ever has to be seen, it goes on a line
-of its own.
+**A recipe with NO portion count gets no box at all** — not a box that does
+nothing. That is what a new recipe looks like between being written and being
+given its estimate, and the panel names the key to add. This feature shipped
+three silences in one day before the rule stuck: a control that did nothing, a
+total that would not change, and a panel that rendered empty.
+
+**`k` says WHICH KEY the yield came from**, and the blob carries it for the
+label: `serves` and `makes` are exclusive (§4), so a page printing the text
+behind a fixed word is right for half the collection. It read
+`serves About 750 ml` until 2026-09-07.
+
+**Do not print the yield beside the recipe name.** Helen, with a screenshot of
+`7  Moules Marinière serves 4`: *"This screenshot makes it look like I'm asking
+for 28 portions of mussels."* A number at each END of a short line reads as one
+expression however the middle is styled, and this row has to open with a number
+— so there is no styling fix, and the yield lives in the input's `title` and
+`aria-label`. If it ever has to be seen, it goes on a line of its own.
 
 **Two folds you will trip over.** A plural ingredient NAME folds to its
 singular for the grouping key (`onion`/`onions` are one line), reusing

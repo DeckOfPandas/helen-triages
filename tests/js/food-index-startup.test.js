@@ -73,14 +73,13 @@ const RECIPES = {
     i: [{ a: '300 g', n: 'plain flour', s: 'cupboard' },
       { a: '1', n: 'onion', s: 'produce' }]
   },
-  /* THE ONE WITH NO PORTION COUNT, and it is here because of a real bug
-     Helen found on 2026-09-07: a shortlisted draft whose box did nothing.
-     `henrys-blackberry-gelato-sicilian-style` says `makes: "About 750 ml"`
-     and has no `serves:`, so `p` is null -- and the first version of
-     scaleFor() returned 1 whatever had been typed. 84 of the 336 food
-     drafts are this shape. Its box counts BATCHES. */
+  /* THE ESTIMATED ONE. `henrys-blackberry-gelato-sicilian-style` says
+     `makes: "About 750 ml"` and no `serves:`, so its number comes from
+     `serves_estimate:` and is flagged -- it prints with a `~`. This fixture
+     had `p: null` for a fortnight, when such a recipe got a batch box; #815
+     gave every recipe a count and the batch box went. */
   '/food/recipes/gelato/': {
-    p: null, e: false, y: 'About 750 ml', k: 'makes',
+    p: 6, e: true, y: 'About 750 ml', k: 'makes',
     i: [{ a: '125 ml', n: 'whipping cream', s: 'dairy' },
       { a: '500 ml', n: 'whole milk', s: 'dairy' }]
   }
@@ -157,7 +156,6 @@ function boot(options) {
   head.appendChild(el('input', '', { id: 'shopping-list-setall', type: 'number' }));
   panel.appendChild(head);
   panel.appendChild(el('ul', 'shopping-list-recipes'));
-  panel.appendChild(el('p', 'shopping-list-batch-note'));
   panel.appendChild(el('div', 'shopping-list-aisles'));
   panel.appendChild(el('p', 'shopping-list-empty'));
   doc.body.appendChild(panel);
@@ -413,122 +411,120 @@ test('an ingredient with no amount is still a line', () => {
     /<span class="shopping-list-name">olive oil<\/span>/);
 });
 
-// --- a recipe whose yield is not people ---------------------------------------
+// --- a recipe whose yield is not stated in people -----------------------------
 // Helen, 2026-09-07: "Changing the amount of blackberry gelato I want doesn't
 // change anything (that I can see) in the shopping list -- e.g. whipping cream
-// is always 125 ml." Every test below is that report.
+// is always 125 ml." Then, on the batch box that answered it: "clearly 750 ml
+// of gelato doesn't feed 50."
+//
+// So every recipe carries a portion count now (#815) and there is one kind of
+// number in this panel. These are the tests that the estimated ones behave
+// exactly like the stated ones, and are still marked as estimates.
 
 test('THE BOX ON A `makes:` RECIPE ACTUALLY CHANGES THE TOTALS', () => {
-  // The regression itself, and the shape it failed in: the control rendered,
-  // accepted a number, and silently scaled by 1.
+  // The original regression: the control rendered, accepted a number, and
+  // silently scaled by 1.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/gelato/');
   showTheList(doc);
-  assert.match(aislesHtml(panel), /125 ml/, 'x1 to begin with');
+  assert.match(aislesHtml(panel), /125 ml/, 'its estimate of 6, to begin with');
 
   panel.querySelector('.shopping-list-recipes')
-    .dispatch('input', { target: typedInto('/food/recipes/gelato/', 3) });
+    .dispatch('input', { target: typedInto('/food/recipes/gelato/', 12) });
 
-  assert.match(aislesHtml(panel), /375 ml/,
-    'three times the recipe is three times the cream. This is the bug Helen '
-    + 'reported: the box did nothing at all.');
-  assert.ok(!aislesHtml(panel).includes('125 ml'));
+  assert.match(aislesHtml(panel), /250 ml/,
+    'twelve portions of a recipe estimated at six is twice the cream. This is '
+    + 'the bug Helen reported: the box did nothing at all.');
 });
 
-test('a batch box is drawn with a × and a portions box is not', () => {
+test('an estimated recipe starts at its estimate, like a stated one', () => {
   const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');       // serves 4
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');  // makes About 750 ml
+  win.HTF.shortlist.toggle('/food/recipes/gelato/');
+  showTheList(doc);
+  assert.match(recipesHtml(panel), /value="6" data-url="\/food\/recipes\/gelato\//);
+});
+
+test('there is one kind of number in the panel -- no batch mark anywhere', () => {
+  // `.shopping-list-times` and `.shopping-list-batch-note` were the batch
+  // box's furniture. #815 removed the box; this is the guard that they do not
+  // come back with it.
+  const { win, doc, panel } = boot();
+  Object.keys(RECIPES).forEach((url) => win.HTF.shortlist.toggle(url));
+  showTheList(doc);
+  assert.ok(!recipesHtml(panel).includes('shopping-list-times'));
+  assert.ok(!recipesHtml(panel).includes('×'));
+  Object.keys(RECIPES).forEach((url) => {
+    assert.ok(recipesHtml(panel).includes('aria-label="portions of '
+      + TITLES[url]), url);
+  });
+});
+
+test('an estimate is marked with a ~ and a stated serving size is not', () => {
+  // Helen's ruling, #815: "yes, mark an estimate on the scaler with a ~". It
+  // is the only thing saying a figure was reasoned rather than written down.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');       // serves: "4"
+  win.HTF.shortlist.toggle('/food/recipes/gelato/');  // serves_estimate: 6
   showTheList(doc);
 
   const html = recipesHtml(panel);
-  assert.ok(html.includes('shopping-list-times'),
-    'nothing on screen says the gelato box counts something else');
-  assert.strictEqual((html.match(/shopping-list-times/g) || []).length, 1,
-    'the × belongs to the batch recipe only');
-  // The accessible name says which unit, since the × is decorative.
-  assert.ok(html.includes('aria-label="batches of Blackberry gelato'));
-  assert.ok(html.includes('aria-label="portions of Aubergine thing'));
-});
-
-test('a batch box starts at one, not at a portion count it does not have', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');
-  showTheList(doc);
-  assert.match(recipesHtml(panel), /value="1" data-url="\/food\/recipes\/gelato\/"/);
+  assert.ok(html.includes('~6 portions'), 'the estimate carries its tilde');
+  assert.ok(html.includes('which serves 4'), 'the stated one is quoted');
+  assert.ok(!html.includes('~4'), 'a stated serving size is never marked');
 });
 
 test('a `makes:` value is never printed behind the word "serves"', () => {
   // It read "serves About 750 ml" until 2026-09-07, because the blob carried
-  // the yield text without saying which key it came from.
+  // the yield text without saying which key it came from. `k` fixed that, and
+  // an estimated recipe prints its ~ figure instead of either.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/gelato/');
   showTheList(doc);
-  const html = recipesHtml(panel);
-  assert.ok(html.includes('makes About 750 ml'));
-  assert.ok(!html.includes('serves About 750 ml'));
+  assert.ok(!recipesHtml(panel).includes('serves About 750 ml'));
 });
 
-test('the panel SAYS which recipes "set all to" cannot reach', () => {
-  /* Helen, 2026-09-07: "the set all to X portions input field doesn't change
-     the input field for blackberry gelato or update the shopping list." The
-     skip is right -- six portions written into a batch box orders six times
-     the gelato -- but being silent about it was the third time in one day
-     this feature did something correct without saying so. */
+test('"set all to" now reaches every shortlisted recipe', () => {
+  // It skipped the batch ones, which is what Helen hit: "the set all to X
+  // portions input field doesn't change the input field for blackberry
+  // gelato". There is nothing left to skip.
   const { win, doc, panel } = boot();
-  const note = () => panel.querySelector('.shopping-list-batch-note');
-
-  win.HTF.shortlist.toggle('/food/recipes/a/');   // portions only
-  showTheList(doc);
-  assert.strictEqual(note().hidden, true,
-    'no batch recipe shortlisted, so there is nothing to explain');
-
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');
-  doc.dispatch('htf:shortlist-change');
-  assert.strictEqual(note().hidden, false);
-  assert.match(note().textContent, /1 recipe is measured in batches/);
-  assert.match(note().textContent, /Set all to/,
-    'the note has to name the control it is explaining');
-});
-
-test('"set all to" skips the batch recipes rather than reinterpreting them', () => {
-  // The label says portions. Writing 6 into a box that counts batches would
-  // quietly order six times the gelato.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');
+  Object.keys(RECIPES).forEach((url) => win.HTF.shortlist.toggle(url));
   showTheList(doc);
 
   const setAll = doc.getElementById('shopping-list-setall');
-  setAll.value = '8';
+  setAll.value = '12';
   setAll.dispatch('input');
 
-  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/a/'), 8);
-  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/gelato/'), null);
-  assert.match(aislesHtml(panel), /125 ml/, 'the gelato is still x1');
+  Object.keys(RECIPES).forEach((url) => {
+    assert.strictEqual(win.HTF.shortlist.portions(url), 12, url);
+  });
+  // a: 200 g x3, b: 300 g x2, so the flour is 600 + 600.
+  assert.match(aislesHtml(panel), /1\.2 kg/);
 });
 
-test('a panel with boxes and no totals says why, instead of showing a blank', () => {
-  /* Helen, 2026-09-07, with a screenshot: three recipes, three boxes, nothing
-     underneath. `_plugins/food_shopping.rb` had not run -- Jekyll loads
-     plugins once at boot and never reloads them on watch, so a server started
-     before the plugin existed serves a page built without it forever, with no
-     error anywhere. Reproduced with `--plugins` pointed at an empty
-     directory: 427 recipes, 0 with ingredients.
-
-     A blank panel under a visible shortlist is indistinguishable from a broken
-     script, and it was the third silence in a row. */
+test('a recipe with NO portion count gets no box, and says why', () => {
+  /* Every recipe carries one since #815 and a test keeps it that way, so this
+     is what a NEW recipe looks like between being written and being given its
+     `serves_estimate:`. It contributes at x1 and says what is missing, rather
+     than offering a control that would do nothing -- the rule this feature
+     broke twice before learning it. */
   const { win, doc, panel } = boot({
     recipes: {
-      '/food/recipes/a/': { p: null, e: false, y: '4', k: 'serves', i: [] }
+      '/food/recipes/a/': {
+        p: null, e: false, y: 'a big tray', k: 'makes',
+        i: [{ a: '200 g', n: 'plain flour', s: 'cupboard' }]
+      }
     }
   });
   win.HTF.shortlist.toggle('/food/recipes/a/');
   showTheList(doc);
 
-  assert.match(aislesHtml(panel), /No ingredient data/);
-  assert.match(aislesHtml(panel), /restart it/,
-    'the message has to carry the remedy, not just the symptom');
+  const html = recipesHtml(panel);
+  assert.ok(!html.includes('<input'), 'no control that cannot work');
+  assert.match(html, /no serving size/);
+  assert.match(html, /serves_estimate/, 'the note names the key to add');
+  // Its ingredients still count, at the recipe as written.
+  assert.match(aislesHtml(panel), /200 g/);
 });
 
 test('a shortlisted recipe that is no longer on the page is dropped quietly', () => {

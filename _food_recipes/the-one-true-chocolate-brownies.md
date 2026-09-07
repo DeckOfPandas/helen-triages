@@ -4,6 +4,7 @@ tagline: "Perfect and foolproof."
 source: "Adapted from Green & Black's recipe book"
 source_type: book
 makes: "enough for that edge-brownie tin I made James buy me"
+serves_estimate: 12
 prep_time: "10 mins"
 cook_time: "20–25 mins"
 main_ingredients: ["dark chocolate", "unsalted butter", "eggs", "golden granulated sugar", "plain flour"]

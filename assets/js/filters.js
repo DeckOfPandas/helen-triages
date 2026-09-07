@@ -1238,8 +1238,6 @@ function renderResultsPool() {
   var shoppingRecipes = shoppingEl && shoppingEl.querySelector('.shopping-list-recipes');
   var shoppingAisles = shoppingEl && shoppingEl.querySelector('.shopping-list-aisles');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
-  var shoppingBatchNote = shoppingEl
-    && shoppingEl.querySelector('.shopping-list-batch-note');
   var setAllInput = document.getElementById('shopping-list-setall');
 
   /* WHAT EVERY RECIPE IS MADE OF AND HOW MANY IT FEEDS, emitted by index.html
@@ -1294,66 +1292,48 @@ function renderResultsPool() {
     });
   }
 
-  /* --- TWO KINDS OF YIELD, AND THE BOX MEANS WHAT THE RECIPE CAN SUPPORT ----
-     Helen, 2026-09-07, on a shortlisted draft: "Changing the amount of
-     blackberry gelato I want doesn't change anything (that I can see) in the
-     shopping list -- e.g. whipping cream is always 125 ml."
+  /* --- EVERY RECIPE COUNTS PEOPLE ------------------------------------------
+     #815, Helen: "clearly 750 ml of gelato doesn't feed 50. We need estimate
+     the number of people served by 750 ml, then add that to the front matter
+     somehow."
 
-     Exactly right, and it was this file. `henrys-blackberry-gelato-sicilian-
-     style` says `makes: "About 750 ml"` and has no `serves:` at all, so
-     `portions` came through null -- and the first version of scaleFor() then
-     returned 1 no matter what had been typed. The box rendered, accepted a
-     number, and did nothing. That is the failure `_layouts/recipe.html` and
-     food/index.html both already have a rule against, quoted where every other
-     control on this page ships `hidden`: A CONTROL THAT SILENTLY FAILS IS
-     WORSE THAN NO CONTROL. This one was worse still, because it looked like it
-     had worked.
+     THE BATCH BOX THAT STOOD HERE IS GONE. For a fortnight in the middle of
+     #801 a recipe with no portion count got a box counting BATCHES (x1, x2)
+     with a `x` beside it, because `makes: "About 750 ml"` cannot be turned
+     into people without inventing a portion size. It was honest and it was
+     wrong: "set all to 6 portions" could not reach those recipes, and a
+     shopping list where one control silently means something else on some
+     rows is a worse thing than a guessed number. **Batches were a workaround
+     for missing data, and the fix was the data.**
 
-     NOT AN EDGE CASE. 84 of the 336 food drafts carry a `makes:` and no
-     numeric `serves:` -- a quarter of them -- and every draft is on the index
-     locally, so this is the ordinary case for the collection Helen is actually
-     browsing while she writes.
+     SO `serves_estimate:` NOW SITS IN THE FRONT MATTER of every recipe whose
+     `serves:` does not state a number -- 129 of 423 files, produced at ingest
+     from the recipe's own words and checked by Helen. `_data/food/servings.yml`
+     is deleted: one home for the number, not two. `_plugins/food_shopping.rb`
+     resolves `serves:` first and `serves_estimate:` second, and flags the
+     second so this file can mark it.
 
-     SO THE BOX COUNTS WHAT THE RECIPE'S OWN YIELD COUNTS. `serves: 6` is
-     people, and the box is portions: four portions of a recipe that serves six
-     is x0.67, unchanged. `makes: "About 750 ml"` is a batch, nobody can say
-     how many people that is without inventing a portion size, and the honest
-     question is HOW MANY TIMES do you want it -- which is the cocktail
-     scaler's own question (#545) and needs no guess at all.
+     AN ESTIMATE IS MARKED WITH A `~`, her ruling in the same message. It is
+     the only thing saying a figure was reasoned rather than written down. */
 
-     ONE CONCEPT, NOT TWO CONTROLS: "how much of this do I want, relative to
-     what it makes". The label beside the number says which unit, so nothing on
-     screen is ambiguous -- `serves 6` against `makes About 750 ml`, with a `x`
-     drawn against the batch ones.
-
-     WHY NOT JUST GUESS THE PORTIONS. That is what _data/food/servings.yml is
-     for, and it deliberately covers published recipes only: there are 336
-     drafts, Helen adds them in batches, and most are unfinished. A guessed
-     portion count for every draft would be 84 numbers nobody has checked, in a
-     file whose whole value is that its guesses are reviewable. */
-
-  /** Does this recipe's yield count PEOPLE? Otherwise it counts batches. */
-  function inPortions(url) {
-    var recipe = RECIPES[url];
-    return !!(recipe && recipe.p && recipe.p > 0);
-  }
-
-  /* The number in the box. For a portions recipe it defaults to however many
-     it makes, so an untouched list shops for every recipe exactly as written;
-     for a batch recipe it defaults to one, which is the same claim. */
+  /* The number in the box: what she last typed, or however many the recipe
+     makes, so an untouched list shops for every recipe exactly as written. */
   function portionsFor(url) {
     var stored = HTF.shortlist.portions(url);
     if (stored) return stored;
-    return inPortions(url) ? RECIPES[url].p : 1;
+    var recipe = RECIPES[url];
+    return (recipe && recipe.p) || null;
   }
 
-  /* PORTIONS WANTED OVER PORTIONS MADE, or the batch count as it stands.
-     There is no third branch and no silent x1: every shortlisted recipe is one
-     of these two, because `inPortions` is decided by the same field the box
-     was drawn from. */
+  /* PORTIONS WANTED OVER PORTIONS MADE. No fallback branch: a recipe with no
+     portion count gets no box at all (see renderShoppingList), so nothing
+     reaches here without one -- which is the rule this feature broke twice
+     before learning it. A CONTROL THAT SILENTLY FAILS IS WORSE THAN NO
+     CONTROL. */
   function scaleFor(url) {
-    if (!inPortions(url)) return portionsFor(url);
-    return portionsFor(url) / RECIPES[url].p;
+    var recipe = RECIPES[url];
+    if (!recipe || !recipe.p) return 1;
+    return (portionsFor(url) || recipe.p) / recipe.p;
   }
 
   /* WHAT THE RECIPE SAYS ITS YIELD IS, in its own words and its own key.
@@ -1363,8 +1343,10 @@ function renderResultsPool() {
   function yieldText(url) {
     var recipe = RECIPES[url];
     if (!recipe) return '';
-    // A guess is this repo's arithmetic (_data/food/servings.yml), so it is
-    // marked; a stated one is Helen's words, quoted and never tidied.
+    // AN ESTIMATE IS MARKED WITH A `~` -- Helen's ruling, #815. It is the
+    // only thing saying a figure was reasoned from `makes:` rather than
+    // written down in `serves:`. A stated one is her words, quoted, never
+    // tidied into a number.
     if (recipe.e) return recipe.p ? '~' + recipe.p + ' portions' : '';
     if (!recipe.y) return '';
     return (recipe.k || 'serves') + ' ' + recipe.y;
@@ -1386,7 +1368,23 @@ function renderResultsPool() {
       shoppingRecipes.innerHTML = urls.map(function (url) {
         var title = titleByUrl[url] || url;
         var yielded = yieldText(url);
-        var portions = inPortions(url);
+        var portions = portionsFor(url);
+
+        /* NO PORTION COUNT, NO BOX. Every recipe carries one since #815, and
+           test_every_food_recipe_states_how_many_it_feeds keeps it that way --
+           so this is what a NEW recipe looks like between being written and
+           being given its `serves_estimate:`. It contributes its ingredients
+           at x1 and says why it cannot be scaled, rather than offering a
+           control that would do nothing. That rule cost this feature two bug
+           reports before it was learned. */
+        if (!portions) {
+          return '<li class="shopping-list-recipe--unscalable">' +
+            '<span>' + HTF.escapeHtml(title) +
+            '<span class="shopping-list-yield-missing">' +
+            'no serving size — add <code>serves_estimate:</code></span>' +
+            '</span></li>';
+        }
+
         /* THE YIELD IS NOT PRINTED BESIDE THE NAME -- Helen, 2026-09-07, with
            a screenshot: "please don't say 'serves X' after the recipe name at
            the top of the scaler. This screenshot makes it look like I'm asking
@@ -1407,47 +1405,13 @@ function renderResultsPool() {
         var relative = yielded ? ', which ' + yielded : '';
         return '<li>' +
           '<input type="number" class="shopping-list-portions" min="1" max="99" step="1" ' +
-          'inputmode="numeric" value="' + portionsFor(url) + '" ' +
+          'inputmode="numeric" value="' + portions + '" ' +
           'data-url="' + HTF.escapeHtml(url) + '" ' +
           'title="' + HTF.escapeHtml(title + relative) + '" ' +
-          'aria-label="' + (portions ? 'portions of ' : 'batches of ')
-          + HTF.escapeHtml(title + relative) + '">' +
-          /* THE `x` IS ONLY ON A BATCH BOX, and it is the one thing telling
-             you at a glance that this number is not people. Drawn after the
-             input, matching the drink page's own scaler mark
-             (`.cocktail-scale-mark`, _layouts/cocktail.html). It survives the
-             change above because it is a MARK rather than a second number --
-             which is the whole reason the yield could not stay. */
-          (portions
-            ? ''
-            : '<span class="shopping-list-times" aria-hidden="true">×</span>') +
+          'aria-label="portions of ' + HTF.escapeHtml(title + relative) + '">' +
           '<span>' + HTF.escapeHtml(title) + '</span>' +
           '</li>';
       }).join('');
-    }
-
-    /* THE `×` AND THE SET-ALL SKIP, EXPLAINED WHERE THEY HAPPEN -- Helen,
-       2026-09-07: "the set all to X portions input field doesn't change the
-       input field for blackberry gelato or update the shopping list."
-
-       The skip is right: "set all to 6 portions" written into a box that
-       counts BATCHES would order six times the gelato. Being silent about it
-       was not, and it is the third time in one day this feature has done
-       something correct without saying so. One line, only while the shortlist
-       actually holds such a recipe, and it explains the `×` at the same
-       time. */
-    if (shoppingBatchNote) {
-      var batches = urls.filter(function (url) { return !inPortions(url); });
-      shoppingBatchNote.hidden = batches.length === 0;
-      if (batches.length) {
-        shoppingBatchNote.textContent =
-          (batches.length === 1
-            ? '1 recipe is measured in batches (×)'
-            : batches.length + ' recipes are measured in batches (×)')
-          + ' rather than in portions, because it says what it MAKES rather '
-          + 'than how many it serves. “Set all to” leaves those alone — set '
-          + (batches.length === 1 ? 'its' : 'their') + ' own box instead.';
-      }
     }
 
     renderTotals(urls);
@@ -1539,16 +1503,16 @@ function renderResultsPool() {
        so a box showing `1` would be claiming a state the list is not in. Empty
        says nothing until she says something.
 
-       IT SETS PORTIONS, SO IT SKIPS THE BATCH RECIPES. The label says
-       "portions", and writing that number into a box counting batches would
-       make it mean something else on the way past -- "set all to 6" would
-       order six times the gelato. A recipe whose yield is a batch keeps its
-       own number, which is the honest answer to a control that is asking a
-       question it cannot ask of everything. */
+       IT REACHES EVERY SHORTLISTED RECIPE SINCE #815, and it did not before.
+       A recipe with no portion count used to get a box counting batches,
+       which this control could not honestly write into -- so it skipped one,
+       Helen typed 50 and watched the gelato ignore her. Every recipe carries
+       a `serves_estimate:` now, so "set all to 6 portions" means the same
+       thing on every row and there is nothing left to skip. */
     setAllInput.addEventListener('input', function () {
       var n = parseInt(setAllInput.value, 10);
       if (!isFinite(n) || n < 1) return;
-      shortlistedRecipes().filter(inPortions).forEach(function (url) {
+      shortlistedRecipes().forEach(function (url) {
         HTF.shortlist.setPortions(url, n);
       });
       renderShoppingList();

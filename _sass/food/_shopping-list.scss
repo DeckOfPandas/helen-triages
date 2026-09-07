@@ -112,43 +112,29 @@
   input { @extend %food-number-input; }
 }
 
-// THE MULTIPLICATION MARK, on a batch box only — a recipe whose yield is
-// "About 750 ml" rather than a number of people, so its box counts times-the-
-// recipe (see assets/js/filters.js). It is the one glance-level difference
-// between the two kinds of number in this list, so it sits tight against the
-// input rather than floating in the gap before the title.
+// `.shopping-list-times` AND `.shopping-list-batch-note` STOOD HERE and are
+// gone with #815. For a fortnight a recipe with no portion count got a box
+// counting BATCHES, marked with a x, plus a line explaining why "set all to"
+// could not reach it. Every recipe carries a `serves_estimate:` now, so there
+// is one kind of number in this panel and nothing to explain.
 //
-// A MARK AND NOT A NUMBER, which is precisely why it survives where the yield
-// text did not — see below.
-.shopping-list-times {
-  margin: 0 0.1em 0 0.15em;
-  font-family: $font-label;
-  font-size: 0.9rem;
+// What is left is the case where a NEW recipe has not been given its estimate
+// yet: no box at all, and a note saying which key to add. A control that
+// cannot work must not appear -- this feature learned that twice.
+.shopping-list-recipe--unscalable {
   color: $color-clear-text;
 }
 
-// `.shopping-list-yield` STOOD HERE and is gone — Helen, 2026-09-07, with a
-// screenshot of `7  Moules Marinière serves 4`: "please don't say 'serves X'
-// after the recipe name at the top of the scaler. This screenshot makes it
-// look like I'm asking for 28 portions of mussels."
-//
-// It was already the quietest thing on the row — Plex, 0.78rem, the
-// de-emphasised grey — and that was not the problem, so there is no styling
-// fix to reach for. A number at each END of a short line reads as one
-// expression however the middle is set, and this row has to open with a
-// number. The yield is in the input's `title` and `aria-label` now
-// (assets/js/filters.js). **Do not reintroduce it as visible text beside the
-// name**; if it ever has to be seen, it belongs on a line of its own.
-
-// Why "set all to" did not reach one of the boxes, said where it happened
-// rather than left to be noticed. Only drawn while the shortlist holds a
-// recipe measured in batches; see assets/js/filters.js.
-.shopping-list-batch-note {
-  margin: 0 0 $space-lg;
-  max-width: 46em;
-  font-size: 0.85rem;
-  line-height: 1.45;
+.shopping-list-yield-missing {
+  margin-left: $space-xs;
+  font-family: $font-label;
+  font-size: 0.78rem;
   color: $color-clear-text;
+
+  code {
+    font-family: $font-label;
+    font-size: inherit;
+  }
 }
 
 // --- the totals, by aisle ----------------------------------------------------

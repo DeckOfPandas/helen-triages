@@ -4,6 +4,7 @@ tagline: "Duck legs cured overnight with salt, garlic and thyme, slow-cooked in 
 source: "Adapted from Pinch and Swirl"
 source_type: website
 makes: "however many you make"
+serves_estimate: 4
 prep_time: "10 mins"
 cook_time: "6 hrs"
 main_ingredients: ["duck legs", "coarse sea salt", "fresh thyme", "garlic cloves", "duck fat"]

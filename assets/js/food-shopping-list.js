@@ -39,7 +39,8 @@
 // the scaler, which only earns its keep if the number on screen is people
 // rather than repeats: "we are four tonight" is the question, and a recipe
 // that serves six answers it at x0.67. `_plugins/food_shopping.rb` resolves
-// the base count and _data/food/servings.yml holds the guesses.
+// _plugins/food_shopping.rb resolves it from `serves:` first and each recipe's
+// own `serves_estimate:` second (#815); an estimate is printed with a `~`.
 //
 // NOTHING IS ROUNDED TO ANYTHING COARSER THAN A GRAM -- Helen, 2026-09-07,
 // asked directly whether the output should be tidied: "For now, don't

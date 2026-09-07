@@ -222,6 +222,17 @@ failure is probably work someone else has already done (MANUAL §9.1).
   wrong field renders unstyled with no error anywhere.
 - **Size words with the count** -- `amount: "2 large"`, not `item: "large
   onions"`.
+- **`serves_estimate:` on any FOOD recipe whose `serves:` does not open with a
+  number** (#815) -- an integer, PEOPLE, unquoted, sitting under the
+  `serves:`/`makes:` line it estimates from. `makes: "About 750 ml"`,
+  `makes: "one 8-inch cake"` and `serves: "Depends on appetite"` all need one;
+  **`makes:` is never read as people** however numeric it looks. The shopping
+  list divides by this, and a recipe without one gets no scaler at all. Read it
+  off the recipe: a round cake 12, a loaf 10, a 950 ml tub of ice cream 8,
+  18 cookies 9 (two each), 12 Yorkshire puddings 6. **Where the source does not
+  support one -- `serves: QQ`, "Some", "however many you make" -- this becomes
+  a TIER 3 question rather than a guess.** Helen: *"Claudes can check with me
+  if unsure."*
 - **Split `ingredient_groups` and `method_groups`** -- once, here, and never
   again afterwards. Phases are usually obvious from the source and re-reading
   the recipe later to find them is the expensive way.

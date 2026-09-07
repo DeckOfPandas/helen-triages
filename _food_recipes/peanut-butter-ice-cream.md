@@ -4,6 +4,7 @@ tagline: "Stop here. You need no further peanut butter ice cream beyond this one
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 source_type: book
 makes: "950 ml"
+serves_estimate: 8
 prep_time: "15 mins"
 cook_time: "None"
 main_ingredients: ["sweet cream base", "smooth peanut butter", "roasted peanuts"]

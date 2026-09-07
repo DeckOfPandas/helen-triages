@@ -4,6 +4,7 @@ tagline: "A marinade, a garnish or a dip."
 source: "Adapted from Feed Your Soul, Wagamama"
 source_type: book
 makes: "125 ml"
+serves_estimate: 4
 prep_time: "2 mins"
 cook_time: "10 mins"
 main_ingredients: ["light soy sauce", "golden caster sugar", "dark soy sauce", "sake"]
