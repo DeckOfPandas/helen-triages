@@ -157,6 +157,7 @@ function boot(options) {
   head.appendChild(el('input', '', { id: 'shopping-list-setall', type: 'number' }));
   panel.appendChild(head);
   panel.appendChild(el('ul', 'shopping-list-recipes'));
+  panel.appendChild(el('p', 'shopping-list-batch-note'));
   panel.appendChild(el('div', 'shopping-list-aisles'));
   panel.appendChild(el('p', 'shopping-list-empty'));
   doc.body.appendChild(panel);
@@ -466,6 +467,28 @@ test('a `makes:` value is never printed behind the word "serves"', () => {
   const html = recipesHtml(panel);
   assert.ok(html.includes('makes About 750 ml'));
   assert.ok(!html.includes('serves About 750 ml'));
+});
+
+test('the panel SAYS which recipes "set all to" cannot reach', () => {
+  /* Helen, 2026-09-07: "the set all to X portions input field doesn't change
+     the input field for blackberry gelato or update the shopping list." The
+     skip is right -- six portions written into a batch box orders six times
+     the gelato -- but being silent about it was the third time in one day
+     this feature did something correct without saying so. */
+  const { win, doc, panel } = boot();
+  const note = () => panel.querySelector('.shopping-list-batch-note');
+
+  win.HTF.shortlist.toggle('/food/recipes/a/');   // portions only
+  showTheList(doc);
+  assert.strictEqual(note().hidden, true,
+    'no batch recipe shortlisted, so there is nothing to explain');
+
+  win.HTF.shortlist.toggle('/food/recipes/gelato/');
+  doc.dispatch('htf:shortlist-change');
+  assert.strictEqual(note().hidden, false);
+  assert.match(note().textContent, /1 recipe is measured in batches/);
+  assert.match(note().textContent, /Set all to/,
+    'the note has to name the control it is explaining');
 });
 
 test('"set all to" skips the batch recipes rather than reinterpreting them', () => {

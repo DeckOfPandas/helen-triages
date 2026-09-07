@@ -1238,6 +1238,8 @@ function renderResultsPool() {
   var shoppingRecipes = shoppingEl && shoppingEl.querySelector('.shopping-list-recipes');
   var shoppingAisles = shoppingEl && shoppingEl.querySelector('.shopping-list-aisles');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
+  var shoppingBatchNote = shoppingEl
+    && shoppingEl.querySelector('.shopping-list-batch-note');
   var setAllInput = document.getElementById('shopping-list-setall');
 
   /* WHAT EVERY RECIPE IS MADE OF AND HOW MANY IT FEEDS, emitted by index.html
@@ -1422,6 +1424,30 @@ function renderResultsPool() {
           '<span>' + HTF.escapeHtml(title) + '</span>' +
           '</li>';
       }).join('');
+    }
+
+    /* THE `×` AND THE SET-ALL SKIP, EXPLAINED WHERE THEY HAPPEN -- Helen,
+       2026-09-07: "the set all to X portions input field doesn't change the
+       input field for blackberry gelato or update the shopping list."
+
+       The skip is right: "set all to 6 portions" written into a box that
+       counts BATCHES would order six times the gelato. Being silent about it
+       was not, and it is the third time in one day this feature has done
+       something correct without saying so. One line, only while the shortlist
+       actually holds such a recipe, and it explains the `×` at the same
+       time. */
+    if (shoppingBatchNote) {
+      var batches = urls.filter(function (url) { return !inPortions(url); });
+      shoppingBatchNote.hidden = batches.length === 0;
+      if (batches.length) {
+        shoppingBatchNote.textContent =
+          (batches.length === 1
+            ? '1 recipe is measured in batches (×)'
+            : batches.length + ' recipes are measured in batches (×)')
+          + ' rather than in portions, because it says what it MAKES rather '
+          + 'than how many it serves. “Set all to” leaves those alone — set '
+          + (batches.length === 1 ? 'its' : 'their') + ' own box instead.';
+      }
     }
 
     renderTotals(urls);

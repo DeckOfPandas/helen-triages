@@ -616,6 +616,18 @@ permalink: /food/
      {% endcomment %}
   <ul class="shopping-list-recipes"></ul>
 
+  {% comment %} WHY "SET ALL TO" DID NOT REACH EVERYTHING -- Helen, 2026-09-07:
+     "the set all to X portions input field doesn't change the input field for
+     blackberry gelato or update the shopping list."
+
+     It is deliberate and it was silent, which is the half that was wrong. A
+     recipe whose yield is `makes: "About 750 ml"` has a box counting BATCHES,
+     and writing a portions figure into it would order six times the gelato --
+     so "set all" skips it, and now says so rather than leaving her to notice
+     one box had not moved. Filled by filters.js only while the shortlist
+     actually contains such a recipe. {% endcomment %}
+  <p class="shopping-list-batch-note" hidden></p>
+
   <div class="shopping-list-aisles"></div>
   <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
 </section>

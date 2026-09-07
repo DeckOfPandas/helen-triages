@@ -140,6 +140,17 @@
 // (assets/js/filters.js). **Do not reintroduce it as visible text beside the
 // name**; if it ever has to be seen, it belongs on a line of its own.
 
+// Why "set all to" did not reach one of the boxes, said where it happened
+// rather than left to be noticed. Only drawn while the shortlist holds a
+// recipe measured in batches; see assets/js/filters.js.
+.shopping-list-batch-note {
+  margin: 0 0 $space-lg;
+  max-width: 46em;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: $color-clear-text;
+}
+
 // --- the totals, by aisle ----------------------------------------------------
 .shopping-list-aisle + .shopping-list-aisle {
   margin-top: $space-lg;
