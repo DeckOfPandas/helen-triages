@@ -45,6 +45,15 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 
 RUN npm install -g @anthropic-ai/claude-code
 
+# Python test dependencies (tests/test_front_matter.py etc., run via pytest).
+# Hardcoded rather than COPYing requirements-test.txt, since the build
+# context here is .devcontainer/ itself, not the repo root where that file
+# lives (see README on why) -- keep this in sync with requirements-test.txt
+# by hand if that file's pins change. --break-system-packages is safe here:
+# this is a disposable, single-purpose container image, not a shared system
+# Python that anything else depends on.
+RUN pip install --break-system-packages --no-cache-dir "pytest>=8.0" "PyYAML>=6.0"
+
 # Non-root user matching Helen's host uid/gid (1000), so files the
 # container creates on the bind-mounted project directory come back
 # owned by her, not root.
