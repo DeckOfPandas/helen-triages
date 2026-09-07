@@ -76,11 +76,21 @@
 #   Opihr                             40        confirmed
 #   Amaro Ciociaro                    30        confirmed
 #
-# TWO SPELLING FAULTS SURFACED WITH THEM and are NOT fixed here: bottles.yml
-# says `Ophir` where the product is Opihr, and `Amaro Ciociano` where it is
-# Ciociaro. Both are naming questions and belong to #701, which is about one
-# declared name per bottle; correcting them in this file alone would make the
-# two disagree.
+# TWO SPELLING FAULTS SURFACED WITH THEM, and BOTH ARE NOW BEING FIXED under
+# #701 rather than left as a note here. The reason this block once said "not
+# fixed here" still holds and is worth keeping: correcting a name in THIS file
+# alone would make it disagree with bottles.yml, and
+# `test_every_declared_bottle_has_an_abv` checks both directions. So each was
+# renamed everywhere at once, not here first.
+#
+#   `Ophir` -> `Opihr`      DONE 2026-09-07. A BOTTLE, so bottles.yml keeps the
+#                           old spelling as an alias and nothing can fail to
+#                           resolve (Helen's La Favorite rule, 2026-09-06).
+#   `Amaro Ciociano` -> `Amaro Ciociaro`
+#                           DONE 2026-09-07. A GENERIC, and generics have no
+#                           alias mechanism, so it went through one merge with
+#                           BOTH spellings declared -- the drink lives in the
+#                           other repo and the two cannot land in one commit.
 #
 # NO WEB SOURCE WAS USED FOR THE `high` ROWS, and that is a difference from
 # costs.yml worth stating plainly. These are from knowledge, not from a search
@@ -210,11 +220,10 @@ bottles:
   "Hayman's Old Tom":                 { abv: 41.4, confidence: high }
   "Rutte":                            { abv: 43,   confidence: medium }
   "Portobello Road":                  { abv: 42,   confidence: high }
-  # 40 CONFIRMED for Opihr Oriental Spiced, which is what this is. THE SPELLING
-  # IS STILL WRONG IN bottles.yml -- the product is Opihr, not Ophir -- and that
-  # is a naming question for #701 rather than a strength one, so it is noted
-  # here and not fixed here.
-  "Ophir":                            { abv: 40,   confidence: high }
+  # 40 CONFIRMED for Opihr Oriental Spiced. The spelling was wrong in
+  # bottles.yml when this row was written and the note here said so; #701 fixed
+  # it on 2026-09-07 and this row followed the rename.
+  "Opihr":                            { abv: 40,   confidence: high }
 
   # --- agave -------------------------------------------------------------
   "Patrón Silver":                    { abv: 40,   confidence: high }
@@ -350,10 +359,8 @@ generics:
   Becherovka:         { abv: 38,   confidence: high }
   Grand Marnier:      { abv: 40,   confidence: high }
   Amaro Nonino:       { abv: 35,   confidence: high }
-  # 30 CONFIRMED for Paolucci Amaro Ciociaro, bottled at 30% since 1873. The
-  # spelling in the collection is `Ciociano`; like Opihr above, that is #701's
-  # question and not this file's.
-  Amaro Ciociano:     { abv: 30,   confidence: high }
+  # 30 CONFIRMED for Paolucci Amaro Ciociaro, bottled at 30% since 1873.
+  Amaro Ciociaro:     { abv: 30,   confidence: high }
 
   # --- genuinely a category, no bottle declared yet ----------------------
   Plymouth:               { abv: 41.2, confidence: high }

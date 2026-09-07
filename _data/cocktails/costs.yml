@@ -309,7 +309,7 @@ bottles:
     size_ml: 700
     gbp: 24
     confidence: medium
-  "Ophir":
+  "Opihr":
     size_ml: 700
     gbp: 24
     confidence: medium
@@ -804,7 +804,10 @@ generics:
   Jägermeister:       { gbp_per_litre_min: 28.57, gbp_per_litre_max: 28.57, basis: "GBP 20 / 70cl", confidence: medium }
   Becherovka:         { gbp_per_litre_min: 31.43, gbp_per_litre_max: 31.43, basis: "GBP 22 / 70cl", confidence: medium }
   Amaro Nonino:       { gbp_per_litre_min: 60.00, gbp_per_litre_max: 60.00, basis: "GBP 42 / 70cl", confidence: medium }
-  Amaro Ciociano:     { gbp_per_litre_min: 42.86, gbp_per_litre_max: 42.86, basis: "GBP 30 / 70cl", confidence: low }
+  # HELEN'S OWN PRICE, 2026-09-07: "Amaro Ciociano is GBP 36" -- so 51.43 a
+  # litre, up from a guessed 42.86, and `low` becomes `high`. It was one of
+  # the few `low` rows left in the file.
+  Amaro Ciociaro:     { gbp_per_litre_min: 51.43, gbp_per_litre_max: 51.43, basis: "GBP 36 / 70cl", confidence: high }
   liqueur de sapin:   { gbp_per_litre_min: 50.00, gbp_per_litre_max: 50.00, basis: "GBP 35 / 70cl", confidence: low }
   Swedish flaggpunsch: { gbp_per_litre_min: 40.00, gbp_per_litre_max: 40.00, basis: "GBP 28 / 70cl", confidence: low }
   Plymouth:           { gbp_per_litre_min: 37.14, gbp_per_litre_max: 37.14, basis: "GBP 26 / 70cl", confidence: medium }

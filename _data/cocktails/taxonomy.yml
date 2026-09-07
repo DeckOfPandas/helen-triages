@@ -299,7 +299,7 @@ mood_ingredients:
     - Cynar
     - fernet
     - Amaro Nonino
-    - Amaro Ciociano
+    - Amaro Ciociaro
     - Bénédictine
     - demerara sugar syrup 2:1
     - molasses sugar
@@ -479,7 +479,7 @@ mood_ingredients:
     - Cynar
     - fernet
     - Amaro Nonino
-    - Amaro Ciociano
+    - Amaro Ciociaro
     # `Punt e Mes` WAS HERE AND CAME OUT ON 2026-09-05, when Helen demoted it
     # from a generic to a bottle under `sweet vermouth`. This list keys off
     # GENERICS, so a bottle cannot sit in it.
@@ -539,7 +539,7 @@ mood_ingredients:
     - fernet
     - Aperol
     - Amaro Nonino
-    - Amaro Ciociano
+    - Amaro Ciociaro
     - falernum
     - absinthe
     - Chartreuse Verte

@@ -1229,7 +1229,14 @@ amari:
   - "Cynar"
   - "fernet"
   - "Amaro Nonino"
-  - "Amaro Ciociano"
+  # AMARO CIOCIARO, NOT CIOCIANO -- Paolucci, Lazio, 30%. The collection
+  # misspelled it until 2026-09-07 (#701). It was renamed by declaring BOTH
+  # spellings for one merge and then dropping the old one, because a generic
+  # has no alias mechanism the way a bottle does, and the drink that names it
+  # lives in the other repo: the two cannot land in one commit, so there is no
+  # single-repo step that keeps `test_every_generic_is_declared` green.
+  # DECISIONS 9.3.2 has the full shape if another generic ever needs renaming.
+  - "Amaro Ciociaro"
 
 # FIVE AROMATISED-WINE GENERICS, AND "AROMATISED WINE" IS NOT ONE OF THEM.
 # Helen, 2026-08-30, settling #568: "I would never write 'aromatised wine' as a
@@ -1559,7 +1566,7 @@ family_of:
   "Cynar": amaro
   "fernet": amaro
   "Amaro Nonino": amaro
-  "Amaro Ciociano": amaro
+  "Amaro Ciociaro": amaro
   "sweet vermouth": fortified
   "dry vermouth": fortified
   "blanc vermouth": fortified

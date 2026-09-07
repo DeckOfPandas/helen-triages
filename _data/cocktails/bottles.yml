@@ -417,9 +417,21 @@ bottles:
   # Spiced Negroni's gin. `speciality` is the generic that REPLACED `flavoured`
   # (#314, Helen 2026-08-26) and it must always carry a `character`, which is
   # why the drink gains `spiced` in the same pass.
-  "Ophir":
+  # OPIHR, NOT OPHIR -- the product is Opihr Oriental Spiced London Dry Gin, and
+  # the collection had the h and the i the wrong way round from the day it was
+  # declared. Corrected 2026-09-07 (#701). Found from the other end, by the #297
+  # ABV pass: looking up a strength sent it hunting for a product that does not
+  # exist under that spelling, which is the practical cost of a wrong declared
+  # name and is why this was worth fixing rather than tolerating.
+  #
+  # EVERY OLD SPELLING STAYS AN ALIAS, per Helen's standing correction of
+  # 2026-09-06 on La Favorite: fix it everywhere, keep the old form so a
+  # suggestion typed the wrong way keeps resolving whether or not the drink that
+  # wrote it has been retyped yet.
+  "Opihr":
     generic: "speciality"
-    aliases: ["Ophir spiced London dry gin", "Ophir Spiced Gin"]
+    aliases: ["Ophir", "Ophir spiced London dry gin", "Ophir Spiced Gin",
+              "Opihr Oriental Spiced", "Opihr Oriental Spiced London Dry Gin"]
   "Beefeater":
     generic: "London dry gin"
   "Tanqueray":

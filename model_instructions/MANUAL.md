@@ -1158,9 +1158,19 @@ ingredient is always a visible `QQ`, never an absent key
 card shows — §9.10.1. There is no star axis: the index filters and excludes
 by ingredient, it does not browse by spirit.
 
-**Sugar is in the generic**: `cane sugar syrup 1:1`, `cane sugar syrup 2:1`,
-`demerara sugar syrup` (#594); both cane forms read `sugar syrup` on a card.
-Three honey waters likewise (`honey water`, `1:1`, `2:1`), one card name.
+**Sugar is in the generic, and so is the RATIO** (#594): `cane sugar syrup 1:1`,
+`cane sugar syrup 2:1`, `demerara sugar syrup 2:1`, `turbinado sugar syrup 2:1`.
+Both cane forms read `sugar syrup` on a card; the other two read `demerara
+syrup` and `turbinado syrup`. **Type + ratio only where the difference is
+real** — Helen, 2026-09-06 — which is why there is one demerara and one
+turbinado and not six permutations.
+
+Three honey waters are declared (`honey water`, `1:1`, `2:1`) and share one card
+name, but **no drink uses the bare one** since 2026-09-07: it is kept as the
+default for a drink whose ratio does not matter, and because `Acacia honey` in
+`bottles.yml` needs a category. The five drinks that sat on it were split
+2:1/1:1 on Helen's word, with `chartreuse-daiquiri` at 1:1 because its own note
+says *"equal parts honey and water"*.
 
 ### 9.3.1 The ingredient vocabulary — `_data/cocktails/ingredients.yml`
 
