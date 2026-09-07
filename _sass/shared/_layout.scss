@@ -286,7 +286,28 @@ main {
 .site-footer-top {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  align-items: center;
+
+  // `start`, NOT `center` -- Helen, 2026-09-07: "vertically align [FOOD] and
+  // [COCKTAILS] in the footer -- bring [FOOD] upwards."
+  //
+  // WHY CENTRING MISALIGNED THEM, which is not obvious from the word "center".
+  // It centres each column against the ROW, and the row is as tall as the
+  // middle one -- the hearts, the about link, the mark and two lines of
+  // licence. The two reference columns are shorter than that and shorter than
+  // each other: food lists two pages, cocktails one. Centring two blocks of
+  // different heights against a third puts their FIRST LINES at different
+  // heights by exactly half the difference, so the two bracketed words never
+  // agreed.
+  //
+  // Aligning to the start makes the two words start on the same line, which is
+  // the thing being asked for, and lifts both columns -- food included, which
+  // is the other half of her sentence.
+  //
+  // THE MIDDLE COLUMN DOES NOT MOVE. It is the tallest item, so it defines the
+  // row and fills it; `start` and `center` place it identically. That matters
+  // because the hearts' position is the one thing this grid exists to hold
+  // still.
+  align-items: start;
   gap: $space-lg;
 }
 
