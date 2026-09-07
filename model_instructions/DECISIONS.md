@@ -942,6 +942,39 @@ unless stated.
   #585 closed into this. The drift guard is the part that lasts:
   `test_every_suggested_bottle_resolves` tests resolution **through aliases**,
   so it can never catch a drink writing `Havana 3` forever.
+- **2026-09-07, #701** — **A BOTTLE rename and a GENERIC rename are different
+  operations, and neither is a simple find-and-replace across two repos.** Both
+  of #701's last two names were fixed on this day — `Ophir` → **Opihr** (the
+  product is Opihr Oriental Spiced) and `Amaro Ciociano` → **Amaro Ciociaro**
+  (Paolucci, Lazio). They needed opposite handling.
+  - **A bottle has aliases; a generic does not.** `bottles.yml` keeps every old
+    spelling as an alias, so nothing fails to resolve. `ingredients.yml` has no
+    such mechanism — `family_aliases` maps FAMILIES, not generic names — so a
+    generic rename has no safety net at all.
+  - **Hence the two-spellings-at-once transition for the generic.** The drink
+    (`to-promote/brooklyn.md`) lives in the private repo and the vocabulary in
+    the public one, and **the two cannot land in one commit**. Declaring both
+    `Amaro Ciociano` and `Amaro Ciociaro` through the gap is what keeps the
+    suite honest; the old one comes out in a later PR. Helen chose this over
+    accepting a red window.
+  - **THE BOTTLE RENAME HAS NO SUCH ESCAPE, AND THIS IS A NEW COST OF A GOOD
+    TEST.** `test_every_suggestion_is_the_declared_bottle_name` (added
+    2026-09-06) requires a suggestion to EQUAL the declared key rather than
+    merely resolve through an alias — which is exactly its value, and it makes
+    a bottle rename a **two-repo atomic operation**. Both orderings are red:
+    `key Opihr / drink Ophir` fails the guard, and `key Ophir / drink Opihr`
+    fails it too. No single-repo step stays green. The window is local-only (CI
+    has no drafts, so the test skips) and the mitigation is merging the pair
+    back to back. **A plan that claims otherwise is wrong** — this one did, and
+    the guard caught it on the first full run.
+  - **Not a design question, and I twice said it was.** `Amaro Ciociaro` was
+    described as possibly wanting to be a declared bottle. `ingredients.yml`
+    already answers that: it sits in `amari:` beside Campari, Aperol, Cynar,
+    fernet and Amaro Nonino, all generics named after single products with no
+    bottle entry, because *"swapping Campari for Fernet is a different drink,
+    not a variation."*
+  - Helen priced it the same day: *"Amaro Ciociano is £36"* — £51.43/litre,
+    and one of the last `confidence: low` rows in `costs.yml` becomes `high`.
 - **2026-09-06, #702** — **#701's rename does not fix the `JM` alias, and must
   not be allowed to close it.** Retyping `cobra-effect` to `Rhum JM Ambré`
   leaves the bare `JM` alias resolving to one of two stocked bottles in
