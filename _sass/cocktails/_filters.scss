@@ -527,11 +527,29 @@
   // wins outright and hover was overwriting the selected state's white. The two
   // are saying different things and only one can be true at a time: hover means
   // "you could pick this", which a picked one is past. So hover stops applying
-  // rather than being out-specified, and the magenta band underneath keeps
-  // saying the tag is chosen.
+  // rather than being out-specified, and the band underneath keeps saying the
+  // tag is chosen.
+  //
+  // THE HUE IS THE SECTION'S OWN SINCE 2026-09-07 -- #777, Helen: "cocktail
+  // filter section chips should mouseover in their own colour rather than
+  // woowoo." It was the hot magenta for every section, which said "you can
+  // touch this" and nothing about WHICH question you were answering; the
+  // section colours already mean that, and `.is-on` has worn them since #548.
+  // So hover and selected now agree about hue and differ in how they wear it --
+  // hover colours the word, selected bands it.
+  //
+  // A CUSTOM PROPERTY RATHER THAN THREE SELECTORS, the shape #636 records as
+  // proven: the value is re-pointed on the section wrapper and reaches any
+  // depth, so a fourth section needs one line here and no change to this block.
+  // The magenta stays as the fallback, which is what an unclassed section --
+  // and `.drink-filter--name`, which has no chips -- would still get.
   &:hover:not(.is-on),
-  &:focus-visible:not(.is-on) { color: $color-wicked-woowoo; }
+  &:focus-visible:not(.is-on) { color: var(--drink-btn-hover, #{$color-wicked-woowoo}); }
 }
+
+.drink-filter--chaos  { --drink-btn-hover: #{$color-heading-yolo}; }
+.drink-filter--mood   { --drink-btn-hover: #{$color-heading-mood}; }
+.drink-filter--hassle { --drink-btn-hover: #{$color-heading-hassle}; }
 
 // --- the two ingredient fields -----------------------------------------------
 // NO RULE ABOVE IT -- #548 point 3. A full-width border sat here, separating

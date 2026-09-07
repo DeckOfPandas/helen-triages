@@ -1867,8 +1867,10 @@ land inside `{{ content }}`.
 **Git is `CLAUDE.md`'s.** Branch, never commit or merge onto `main` in any
 repo in the tree, never `git reset --hard` or discard over a dirty tree, check
 `git branch --show-current` in its own tool call immediately before every
-commit. **Push and open the PR with no ask, in all three repos, since
-2026-09-07** (§11.-1). **Merging is hers, always, everywhere.**
+commit. **Push with no ask in all three repos since 2026-09-07; OPEN THE PR with no
+ask in `helen-triages` only** (§11.-1) — the token cannot open one on the two
+private repos, because that needs to read the head ref and it has no `Contents`
+permission there. Say so and let Helen open it; do not route around it. **Merging is hers, always, everywhere.**
 Two hooks in `.claude/hooks/` enforce the two rules that were
 read and broken anyway — `guard-main-branch.py` and `guard-destructive-git.py`
 — and **there are exactly two**, so do not assume a rule is mechanically
@@ -1968,6 +1970,13 @@ never `gh pr close --delete-branch` (403).
 
 **A worktree has no `gh`** (§1), so the PR is opened through the REST API,
 `POST /repos/DeckOfPandas/helen-triages/pulls`, from a script in `tmp/`.
+
+**AND ONLY THAT REPO.** The same call against either private repo returns 422
+`not all refs are readable`: creating a PR must read the head ref, which is a
+`Contents` operation, and the token carries Issues and Pull requests but not
+Contents. A public repo's refs need no permission, which is why this works in
+one place and not the other three-way. Measured 2026-09-07; `DECISIONS.md` §11
+has the table and why Helen left the permission ungranted.
 Measured 201 on 2026-09-07.
 
 **Name the issues a PR will close before opening it**, the same rule that
