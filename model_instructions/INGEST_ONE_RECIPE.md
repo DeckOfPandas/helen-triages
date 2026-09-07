@@ -128,6 +128,7 @@ name you give is a courtesy rather than a contract.
 | `tagline` | One line of prose, no full stop needed. If the source has an intro sentence worth keeping, adapt it. If not, write `"QQ"` — do **not** invent enthusiasm. |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. |
+| `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **If the source does not support an estimate, ASK Helen rather than guess** -- her rule: "Claudes can check with me if unsure." |
 | `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. Not in the source? `"QQ"`. **Never estimate one** — an invented time publishes, a `QQ` does not. `cook_time: "None"` for a genuinely uncooked dish. |
 | `main_ingredients` | Section 4. Lowercase, a flat list. |
 | `star_ingredient` | Section 4. **Optional** — leave it out rather than force one. |

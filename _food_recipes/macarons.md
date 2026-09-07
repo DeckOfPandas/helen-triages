@@ -4,6 +4,7 @@ tagline: "Really not as hard as you think."
 source: "Adapted from Gordon Ramsay's Desserts"
 source_type: book
 makes: "64+ tiny macarons"
+serves_estimate: 16
 prep_time: "30 mins plus 30 mins resting"
 cook_time: "20 mins"
 main_ingredients: ["ground almonds", "icing sugar", "cocoa powder", "egg whites", "mascarpone", "cream", "vanilla extract", "cream of tartar", "plain flour", "natural yoghurt", "double cream"]

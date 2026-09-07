@@ -4,6 +4,7 @@ tagline: "The only Yorkshire pudding recipe you need — use an oil with a high 
 source: "Mrs Nicholson"
 source_type: person
 makes: "12 normal Yorkshire puddings"
+serves_estimate: 6
 prep_time: "10 mins"
 cook_time: "20 mins"
 main_ingredients: ["self-raising flour", "eggs", "whole milk", "groundnut oil"]

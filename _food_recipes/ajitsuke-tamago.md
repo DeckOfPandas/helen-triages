@@ -4,6 +4,7 @@ tagline: "Sweet, salty, umami-rich marinated eggs for ramen or snacking."
 source: "Adapted from The Flavor Bender, recipe Dini"
 source_type: website
 makes: "4 eggs"
+serves_estimate: 4
 prep_time: "10 mins"
 cook_time: "6–7 mins"
 main_ingredients: ["medium eggs", "mirin", "light soy sauce", "dark soy sauce", "fresh garlic cloves", "fresh ginger", "star anise"]

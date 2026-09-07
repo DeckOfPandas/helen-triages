@@ -515,6 +515,172 @@ unless stated.
   lettuce"; `can ` cannot fire on "cannellini" only because the match includes
   the trailing space.
 
+### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
+
+- **The brief, 2026-09-07** — *"add scaler and shopping list feature to food
+  recipe shortlist page. This can be copied directly from the food page — I
+  would like all the same features. But there is no need to cost the portions.
+  When serving size is unclear, please make your best guess. Group the shopping
+  list by grocery aisle, e.g. produce, dairy, fish, meat, non-perishable etc."*
+  **"The food page" was read as the COCKTAIL page**, and the three other
+  bullets are why: costing exists only on cocktails (#547), serving sizes and
+  grocery aisles are food's own. The cocktails index has had exactly this
+  feature since #546 and the food index had none of it.
+- **PORTIONS, NOT BATCHES, and it follows from her own words.** A drink's box
+  counts glasses; asking for a serving-size guess only earns its keep if the
+  number on screen is PEOPLE, and *"no need to cost the portions"* is her word
+  for the unit. So four portions of a recipe that serves six is ×0.67 — which
+  is exactly what #545's drink scaler refuses (whole recipes only, clamped at
+  ×1, because every drink amount sits on the 2.5 ml grid). Put to her as the
+  fork it is, with the 200 g → 133 g example.
+- **Her answer, 2026-09-07, and it settled the rounding rather than the fork:**
+  *"For now, don't tidy/round beyond 1 g precision"*, then, unprompted, to be
+  sure it had been understood: *"I mean don't roudn to 10 g or 5 g, round to
+  1g"*. So: scale exactly, print whole grams, tidy nothing. `⅔ tsp` rather than
+  `0.67 tsp` is NOTATION and not tidying — ⅔ prints for exactly two thirds and
+  never for 0.7 — and it is the reason `fractionText` keeps a 1e-6 tolerance
+  instead of a generous one.
+- **Ten aisles, hers.** Offered three sets; she chose *produce, meat, fish,
+  dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks,
+  other*, in that order, which is a shop and not an alphabet.
+- **A KEYWORD table, not a list of ingredients**, and the data forced it: 500
+  distinct `item:` strings, 395 after truncation, all free text ("thumb-sized
+  piece of fresh ginger"). **The longest keyword wins** and every exception is
+  therefore an entry rather than a precedence rule — `milk`/`coconut milk`,
+  `butter`/`peanut butter`, `garlic`/`garlic paste`, `mint`/`dried mint`. Two
+  ingredients out of 782 end in `other` that are not cross-recipe links.
+- **`garlic` and `cloves` are the same length**, which is the one place the
+  longest-wins rule has nothing to decide with, and the tie sent every clove of
+  garlic in the collection to the spice rack. Caught by the built-output test,
+  which is the whole argument for having one: the matcher is Ruby inside
+  Jekyll, so nothing that reads YAML can exercise it, and a Python
+  reimplementation would have passed while the site was wrong.
+- **The 44 guesses live in `_data/food/servings.yml` and NOT in the recipes.**
+  43 of the 86 open `serves:` with a number; the rest say `makes: "one 8-inch
+  cake"` or *"I mean, who cares, make double anyway"*. Putting a figure in 44
+  files means §4.0's rule un-proofreads more than half the collection to add a
+  number Helen never wrote. One reviewable file, every entry flagged
+  `estimated`, every one printed with a `~`. **Not decided for her**: if she
+  wants the number in the front matter, that is a schema change and its own
+  piece of work.
+- **Grams and millilitres are the only units totalled in.** `1½ l` of stock and
+  `500 ml` of stock were two rows, and a twelfth of the first printed as
+  `0.125 l`. Folding kg/l/cl in and re-expressing on the way out is NOT the
+  conversion `shopping-list.js` refuses: that rule is about units with no
+  defined relationship (nobody can say how many ml a dash is), and a litre is a
+  thousand millilitres on both sides of every recipe here. `tbsp`, `oz` and
+  bare counts are untouched, because each of those would need inventing.
+- **Alphabetical within an aisle**, which departs from the drinks list's
+  descending volume (Helen, 2026-09-04: *"the big pours are what you shop
+  for"*). The aisle heading has already done that job — you are standing in
+  front of the vegetables — and a food aisle mixes grams, spoons, cloves and
+  bare counts, so there is no single axis to rank on. **A session's call, not
+  hers; reversible.**
+- **Open, and deliberately not decided:** whether a bare count should round UP
+  for shopping (`2.83 onions` → 3). She said not to tidy, so it does not; but
+  a whole vegetable is a different case from a gram and she may want the
+  ceiling. Bring her the page, not the argument.
+- **2026-09-07, ON THE REAL PAGE — the scaler did nothing for a quarter of the
+  drafts.** Helen: *"Changing the amount of blackberry gelato I want doesn't
+  change anything (that I can see) in the shopping list — e.g. whipping cream
+  is always 125 ml."* Exactly right, and it was `scaleFor()`:
+  `henrys-blackberry-gelato-sicilian-style` says `makes: "About 750 ml"` with
+  no `serves:`, so `portions` came through null and the first version returned
+  `1` whatever had been typed. **The control rendered, accepted a number and
+  silently did nothing** — the failure this codebase already has a rule
+  against ("a control that silently fails is worse than no control", quoted
+  wherever a control ships `hidden`), and worse than the rule's own case
+  because it looked like it had worked.
+  - **The fix is not a guess and not a missing box.** `makes:` cannot become
+    people without inventing a portion size, so the box counts BATCHES for
+    those and PORTIONS for the rest, with a `×` drawn on the batch ones. One
+    concept — how much of this do I want, relative to what it makes — with the
+    recipe's own yield naming the unit.
+  - **84 of 336 drafts are this shape**, measured, which is what ruled out
+    both "no box" (fails her actual need) and "guess them all" (84 unchecked
+    numbers in a file whose value is that its guesses are reviewable).
+    `_data/food/servings.yml` stays published-recipes-only.
+  - **Two of my own tests asserted the wrong thing** and had to change with
+    it: a draft legitimately has no portion count now. The aisle-coverage
+    ratchet also met the drafts for the first time (373 of 3,985 unmatched)
+    and is now measured per collection — MANUAL §8's own rule for the
+    ingredient picker, word for word: *measure production, not your local
+    build*. 99 keywords added for the draft vocabulary took drafts to 171.
+  - **The worktree had no drafts, which is why this reached her.** They are
+    gitignored (§9.1) and I had not cloned them, so every measurement behind
+    #801 was taken against 86 recipes that all happen to have a numeric
+    `serves:`. **Clone the drafts before believing a measurement about the
+    food collection** — the starting prompt says so and it was still skipped.
+- **2026-09-07, #815 — the batch box lasted a few hours and Helen killed it.**
+  *"increasing it to 50+ does nothing either and clearly 750 ml of gelato
+  doesn't feed 50. We need estimate the number of people served by 750 ml, then
+  add that to the front matter somehow. [...] all of these will need to be
+  estimated at ingest. Claudes can check with me if unsure."*
+  - **The lesson, and it is worth more than the feature.** Three fixes in a
+    row had been downstream of one absence: a recipe that does not say how many
+    it feeds. The batch box, the `×`, the "set all leaves those alone" note and
+    a test for each were all machinery built around a hole. **Batches were a
+    workaround for missing data, and the fix was the data.** When a fix needs
+    a second concept to explain it, look up the chain for the missing fact.
+  - **Not every file, and the measurement is what made it decidable.** 294 of
+    423 already open `serves:` with a number; 129 needed an estimate; only 43
+    of those were `proofread: true`. Bringing that table rather than "quite a
+    lot of files" is what turned an open-ended migration into one question.
+  - **Her ruling on the proofread cost**, quoting the documented exception
+    back: *"Use the documented exception. If she reviews the change herself
+    line by line, she was the last judgement, and BASELINE_COMMIT ... moves
+    forward."* So `serves_estimate:` went into the front matter of all 129 and
+    `_data/food/servings.yml` was deleted — one home for the number, beside the
+    words it estimates from. The second home had existed only to avoid this
+    question, and her answer removed its reason.
+  - **`serves_estimate:` and not a second `serves:`, her choice**, and the data
+    supports it: `serves` xor `makes` holds perfectly (0 files carry both), but
+    `makes:` OPENS WITH A NUMBER 66 times ("950 ml", "12 slices") and `serves:`
+    gives NO number 20 times (2 published, 18 drafts, 11 of them `QQ`). So
+    neither "makes means no number" nor "serves means a number" is true, and
+    the estimate has to be its own key. **`makes:` is never read as people.**
+  - **An estimate is marked with a `~`**, her ruling in the same message — the
+    only thing saying a figure was reasoned rather than written down.
+  - **Twelve draft estimates are read off the DISH, not its yield**, because
+    their `serves:` is `QQ` — the source said nothing and she has not rewritten
+    them. Those are named in the PR as the ones to check first, and their `QQ`
+    is untouched: it is her placeholder, and this adds a key beside it rather
+    than answering it.
+  - **Found while migrating: `_food_drafts/` has subfolders.** `to-cook/` and
+    `to-promote/` track her own work, a non-recursive `*.md` glob missed two
+    files, and the built-page test caught it. Glob recursively in that repo.
+- **2026-09-07 — "this is all I can see": boxes, no totals, and it was not the
+  code at all.** A screenshot of three shortlisted recipes, three number boxes
+  and nothing underneath — with a `×` on every one, including
+  `moules-mariniere`, which states `serves: "4"` and therefore could not
+  possibly be a batch recipe. That was the tell: `×` on a recipe with a
+  serving count means its portion count never reached the page.
+  **`_plugins/food_shopping.rb` had not run.** Jekyll loads `_plugins/` ONCE AT
+  BOOT and never reloads them on watch, so Helen's `jekyll-local`, started
+  before the plugin existed, had been serving a plugin-less build ever since —
+  no log line, no error, no clue. Reproduced deliberately with `--plugins`
+  pointed at an empty directory: 427 recipes, 0 with a portion count, 0 with
+  ingredients, which is the screenshot exactly.
+  - **The lesson is about diagnosis, not about Jekyll.** Two reports in a row
+    had been real bugs in my code, and the third looked like a third. The
+    thing that settled it in one step was asking which observation was
+    IMPOSSIBLE under the theory — a `×` on the mussels — rather than starting
+    from the missing totals, which every theory explains.
+  - **The page now says so**, because this was the third silence in a row and
+    the previous two were also mine. A shortlist with recipes in it and no
+    entries to total prints the reason and the remedy instead of a blank, and
+    the console carries the plugin detail. MANUAL §1 gained the restart rule.
+- **2026-09-07 — the yield came off the row, and dimming it was not the fix.**
+  Helen, with a screenshot of `7  Moules Marinière serves 4`: *"please don't
+  say 'serves X' after the recipe name at the top of the scaler. This
+  screenshot makes it look like I'm asking for 28 portions of mussels."* It
+  was already the quietest thing on the line — Plex, 0.78rem, the
+  de-emphasised grey — so this is not a contrast problem: **a number at each
+  END of a short line reads as one expression whatever the middle says**, and
+  this row must open with a number. Moved into the input's `title` and
+  `aria-label`. The `×` on a batch box survives because it is a MARK and not a
+  second number, which is the whole distinction.
+
 ---
 
 ## §9 Cocktails

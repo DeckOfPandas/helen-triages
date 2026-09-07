@@ -4,6 +4,7 @@ tagline: "The best way to spicy bakes and [chai-spiced milk tea](../chai-spiced-
 source: "Adapted from indianhealthyrecipes.com"
 source_type: website
 makes: "approx. 75 g"
+serves_estimate: 20
 prep_time: "2 mins"
 cook_time: "10 mins"
 main_ingredients: ["black peppercorns", "green cardamom pods", "cinnamon stick", "whole cloves", "ground ginger", "whole fennel seeds", "black cardamom pods", "star anise", "whole nutmeg"]

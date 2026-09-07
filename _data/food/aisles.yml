@@ -1,0 +1,658 @@
+# =============================================================================
+# GROCERY AISLES — where each ingredient is found in a shop.
+#
+# GitHub issue #801, Helen: "Group the shopping list by grocery aisle, e.g.
+# produce, dairy, fish, meat, non-perishable etc." She chose the ten below and
+# their order, which is the order you walk a supermarket rather than any
+# alphabet: fresh around the outside first, dry goods in the middle, `other`
+# last because it is the swept-up remainder and not a department.
+#
+# THIS IS A KEYWORD TABLE, NOT A LIST OF INGREDIENTS, and that is forced by the
+# data: the 86 recipes carry 500 distinct `item:` strings, of which 395 survive
+# the shopping list's truncation, and they are free text — "a few sprigs of
+# fresh rosemary", "thumb-sized piece of fresh ginger", "chopped roasted
+# peanuts". A per-item list would be 395 lines that go stale the first time a
+# recipe writes "3 sprigs of rosemary" instead. A keyword table answers for
+# strings nobody has written yet, which is the only way this survives the next
+# ingest.
+#
+# THE LONGEST KEYWORD WINS, and that single rule is what makes the table
+# readable instead of a pile of special cases. `milk` is dairy and
+# `coconut milk` is a tin, `butter` is dairy and `peanut butter` is not,
+# `garlic` is produce and `garlic paste` is a jar, `mint` is a herb and
+# `dried mint` is a spice. In every pair the more specific string is the longer
+# one, so the exceptions are simply entries — they need no precedence
+# machinery and no ordering between aisles.
+#
+# MATCHING IS ON WHOLE WORDS, folded to lowercase with the curly apostrophe
+# flattened. Whole words rather than substrings because `ice` is in `rice`,
+# `juice` and `spice`, and the ice cube is a real ingredient in this
+# collection. Non-alphanumerics are boundaries, so `paste-based` contains the
+# word `paste`.
+#
+# WHERE THE RULE IS APPLIED: _plugins/food_shopping.rb, at build, once per
+# ingredient. The browser is handed the answer, never the table — the same
+# division _plugins/cocktail_costs.rb already keeps, and it is what lets
+# tests/test_rendered_pages.py check the assignment of every real ingredient
+# against the real build.
+#
+# AN UNMATCHED INGREDIENT IS `other` AND THAT IS NOT A BUG. It is a heading on
+# the list with things under it, which is what a shopping list wants; a miss
+# costs you a glance, not an item. test_the_shopping_list_assigns_an_aisle_to
+# _almost_everything holds the count down so the heading stays small, and
+# growth in it is the signal to add a keyword here.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# The aisles, in the order they appear down the page. Helen's ten, her words.
+# `key` is what the plugin stamps on an ingredient; `label` is what is printed.
+# -----------------------------------------------------------------------------
+order:
+  - key: produce
+    label: "produce"
+  - key: meat
+    label: "meat"
+  - key: fish
+    label: "fish"
+  - key: dairy
+    label: "dairy & eggs"
+  - key: bakery
+    label: "bakery"
+  - key: frozen
+    label: "frozen"
+  - key: cupboard
+    label: "store cupboard"
+  - key: spices
+    label: "spices & seasonings"
+  - key: drinks
+    label: "drinks"
+  - key: other
+    label: "other"
+
+# -----------------------------------------------------------------------------
+# NEVER ON THE LIST. Matched on the WHOLE folded name, not as a keyword, so
+# "water mixed with 3 tsp cornstarch" is still an ingredient and plain "water"
+# is not. The cocktails shopping list refuses water the same way and for the
+# same reason (`not_on_cards` in _data/cocktails/ingredients.yml): nobody buys
+# it, and a line for it is a line you read past every week.
+# -----------------------------------------------------------------------------
+never:
+  - water
+  - cold water
+  - ice
+
+# -----------------------------------------------------------------------------
+# THE KEYWORDS. Longest match wins; see the header. Each aisle's list is
+# alphabetical so a keyword can be found by eye, and an entry only needs to be
+# here if a SHORTER entry elsewhere would otherwise claim it.
+# -----------------------------------------------------------------------------
+keywords:
+
+  # --- produce -----------------------------------------------------------
+  # Fresh fruit, fresh vegetables and fresh herbs. A herb is produce when it is
+  # fresh and a spice when it is dried, which is why `mint`, `bay leaves` and
+  # `dill` are here and `dried mint` and `dried bay leaves` are not.
+  produce:
+    - apple
+    - apples
+    - apricots
+    - asparagus
+    - aubergine
+    - baby potatoes
+    - banana shallots
+    - basil
+    - bay leaf
+    - bay leaves
+    - beansprouts
+    - beetroot
+    - blackberries
+    - blueberries
+    - bok choi
+    - broccoli
+    - brussels sprouts
+    - butternut squash
+    - cabbage
+    - carrot
+    - carrots
+    - cauliflower
+    - cavolo nero
+    - celery
+    - chard
+    - cherries
+    - chicory
+    - chilli
+    - chillies
+    - chives
+    - clementines
+    - coriander
+    - courgette
+    - courgettes
+    - cranberries
+    - cucumber
+    - cucumbers
+    - currants
+    - dill
+    - edamame
+    - endive
+    - fennel
+    - figs
+    - fine beans
+    - fresh bay leaves
+    - fresh curry leaves
+    - fresh ginger
+    - galangal
+    - garlic
+    # `cloves` IS THE SPICE and also the unit garlic is counted in, and the two
+    # words are the same length -- so "garlic cloves" needs spelling out or the
+    # tie-break sends it to the spice rack. "freshly ground cloves" and "whole
+    # cloves" are still the spice, which is the half this must not break.
+    - garlic cloves
+    - cloves garlic
+    - cloves of garlic
+    - ginger
+    - grapefruit
+    - green beans
+    - greens
+    - herb sprigs
+    - herbs
+    - kale
+    - leek
+    - leeks
+    - lemon
+    - lemon juice
+    - lemons
+    - lettuce
+    - lime
+    - lime leaves
+    - limes
+    - lemongrass
+    - mint
+    - mushrooms
+    - nectarines
+    - new potatoes
+    - onion
+    - onions
+    - orange
+    - oranges
+    - pak choi
+    - parsley
+    - parsnips
+    - pea shoots
+    - peaches
+    - pear
+    - pears
+    - peas
+    - peppers
+    - potato
+    - raspberries
+    - red pepper
+    - bell pepper
+    - pineapple
+    - plum
+    - plums
+    - pomegranate
+    - potatoes
+    - radishes
+    - redcurrants
+    - rhubarb
+    - rocket
+    - rosemary
+    - runner beans
+    - sage
+    - samphire
+    - shallot
+    - shallots
+    - sorrel
+    - spinach
+    - spring onions
+    - strawberries
+    - sweet potatoes
+    - tarragon
+    - thyme
+    - tomato
+    - tomatoes
+    - turnips
+    - watercress
+    # `french beans` are the fresh ones; `butter beans` and `white beans` are
+    # tins and live in the cupboard, which the longer keyword settles.
+    - french beans
+    - watermelon
+
+  # --- meat --------------------------------------------------------------
+  # Everything from the butcher's counter, plus the cured things beside it.
+  # `duck fat` and every `... stock` are longer keywords in the cupboard: a jar
+  # of fat and a tub of stock are not meat, however they are named.
+  meat:
+    - bacon
+    - beef
+    - brisket
+    - chicken
+    - chorizo
+    - duck
+    - game
+    - gammon
+    - goose
+    - guanciale
+    - ham
+    - lamb
+    - mince
+    - mutton
+    - muntjac
+    - oxtail
+    - pancetta
+    - parma ham
+    - pheasant
+    - pork
+    - prosciutto
+    - rabbit
+    - ribeye
+    - salami
+    - sausage
+    - sausages
+    - short rib
+    - short ribs
+    - sirloin
+    - steak
+    - turkey
+    - veal
+    - venison
+
+  # --- fish --------------------------------------------------------------
+  # The counter again. `fish sauce`, `anchovy paste` and `oyster sauce` are
+  # bottles and jars, and each is a longer keyword in the cupboard.
+  fish:
+    - anchovies
+    - anchovy
+    - clams
+    - cod
+    - crab
+    - crabmeat
+    - fish fillet
+    - fish fillets
+    - haddock
+    - hake
+    - king prawns
+    - kipper
+    - mackerel
+    - monkfish
+    - mussels
+    - oysters
+    - prawns
+    - salmon
+    - sardines
+    - scallops
+    - sea bass
+    - seafood
+    - smoked salmon
+    - squid
+    - trout
+    - tuna
+    - whitebait
+
+  # --- dairy & eggs ------------------------------------------------------
+  # The chilled aisle. `hummus` is here rather than in `other` because that is
+  # the fridge you find it in, even though it is neither dairy nor an egg.
+  dairy:
+    - burrata
+    - butter
+    - buttermilk
+    - cheddar
+    - cheese
+    - comte
+    - comté
+    - cream
+    - cream cheese
+    - creme fraiche
+    - crème fraîche
+    - curd
+    - custard
+    - double cream
+    - egg
+    - eggs
+    - feta
+    - goat's cheese
+    - gruyere
+    - gruyère
+    - halloumi
+    - hummus
+    - kefir
+    - labneh
+    - manchego
+    - margarine
+    - mascarpone
+    - milk
+    - mozzarella
+    - paneer
+    - parmesan
+    - pecorino
+    - quark
+    - ricotta
+    - single cream
+    - skyr
+    - soured cream
+    - stilton
+    - whipping cream
+    - whole milk
+    - yoghurt
+    - yogurt
+
+  # --- bakery ------------------------------------------------------------
+  bakery:
+    - bagel
+    - bagels
+    - baguette
+    - bread
+    - brioche
+    - ciabatta
+    - croissants
+    - digestive biscuits
+    - flatbread
+    - flatbreads
+    - focaccia
+    - muffins
+    - naan
+    - pitta
+    - sourdough
+    - tortillas
+    - wrap
+    - wraps
+
+  # --- frozen ------------------------------------------------------------
+  # `frozen` itself is a keyword, so "frozen peas" lands here even though
+  # `peas` is produce — but "fresh or frozen cranberries" stays in produce,
+  # because `cranberries` is the longer word. That is the right way round: the
+  # first names the aisle, the second names a choice.
+  frozen:
+    - filo
+    - filo pastry
+    - frozen
+    - frozen edamame
+    - frozen peas
+    - ice cream
+    - puff pastry
+    - puff pastry sheets
+    - shortcrust pastry
+    - vanilla ice cream
+
+  # --- store cupboard ----------------------------------------------------
+  # Everything ambient: tins, jars, bottles, dry goods, baking, nuts, oils and
+  # the sugar shelf. The biggest aisle by a distance, which is what a recipe
+  # collection looks like once the fresh things are taken out of it.
+  cupboard:
+    - almond butter
+    - almond extract
+    - almonds
+    - amai sauce
+    - anchovy paste
+    - baking powder
+    - baking soda
+    - balsamic vinegar
+    - bicarbonate of soda
+    - black tea
+    - breadcrumbs
+    - brown rice
+    - bulgur wheat
+    - butter beans
+    - cannellini beans
+    - capers
+    - caramel
+    - cashew butter
+    - cashews
+    - caster sugar
+    - chestnuts
+    - chickpeas
+    - chocolate
+    - chocolate chips
+    - chocolate syrup
+    - cider vinegar
+    - cocoa
+    - cocoa powder
+    - coconut
+    - coconut cream
+    - coconut milk
+    - coconut oil
+    - colouring
+    - condensed milk
+    - cornflour
+    - cornstarch
+    - couscous
+    - cream of tartar
+    - crispy fried onions
+    - dates
+    - demerara sugar
+    - desiccated coconut
+    - dijon mustard
+    - dried porcini
+    - dried yeast
+    - duck fat
+    - extract
+    - fish sauce
+    - flour
+    - gelatine
+    - ghee
+    - glace cherries
+    - glacé cherries
+    - glycerine
+    - golden syrup
+    - gram flour
+    - groundnut oil
+    - harissa
+    - hazelnuts
+    - hoisin sauce
+    - honey
+    - icing sugar
+    - jam
+    - kecap manis
+    - ketchup
+    - lasagne
+    - lasagne sheets
+    - lentils
+    - macadamia nuts
+    - mango chutney
+    - maple syrup
+    - marmalade
+    - marmite
+    - mayonnaise
+    - menma
+    - mincemeat
+    - mirin
+    - miso
+    - mixed peel
+    - molasses
+    - mustard
+    - noodles
+    - nori
+    - nutella
+    - nuts
+    - oats
+    - oil
+    - olive oil
+    - olives
+    - orzo
+    - oyster sauce
+    - panko
+    - passata
+    - pasta
+    - paste
+    - peanut butter
+    - peanuts
+    - pearl barley
+    - pecans
+    - peel
+    - pesto
+    - pine nuts
+    - pistachios
+    - plum jam
+    - polenta
+    - poppy seeds
+    - pumpkin seeds
+    - quinoa
+    - raisins
+    - rice
+    - rice flour
+    - rice vinegar
+    - semolina
+    - sesame oil
+    - sesame seeds
+    - sherry vinegar
+    - soy sauce
+    - stock
+    - sugar
+    - sultanas
+    - sunflower oil
+    - syrup
+    - tabasco
+    - tahini
+    - tamari
+    - tamarind paste
+    - teriyaki sauce
+    - tinned tomatoes
+    - tomato paste
+    - tomato purée
+    - tomato puree
+    - treacle
+    - vanilla bean paste
+    - vanilla essence
+    - vanilla extract
+    - vanilla paste
+    - vanilla pod
+    - vegetable oil
+    - vinegar
+    - wakame
+    - walnuts
+    - white beans
+    - wholegrain mustard
+    - wine vinegar
+    - worcestershire sauce
+    - xanthan gum
+    # A paste or a purée is a jar, whatever it is a paste OF. Each is longer
+    # than the produce word it overrides, so `garlic` stays produce.
+    - curry paste
+    - garlic paste
+    - garlic purée
+    - garlic puree
+    - ginger paste
+    - lemongrass paste
+    - miso paste
+    - chilli paste
+    # `... stock` is always a tub or a cube. Longer than every meat and
+    # vegetable that can precede it, including the one written as a choice.
+    - beef stock
+    - chicken stock
+    - fish stock
+    - vegetable stock
+    - venison stock
+    - stock cube
+    - stock cubes
+    - yakitori sauce
+    - yeast
+
+  # --- spices & seasonings -----------------------------------------------
+  # The rack, plus salt and pepper. A DRIED herb belongs here and a fresh one
+  # belongs in produce, which is why `dried mint` and `dried bay leaves` are
+  # spelled out: they are longer than the produce keyword they beat.
+  spices:
+    - ajwain
+    - allspice
+    - bouquet garni
+    - caraway seeds
+    - cardamom
+    - cardamom pods
+    - cayenne
+    - chilli flakes
+    - chilli powder
+    - cinnamon
+    - cloves
+    - coriander powder
+    - coriander seeds
+    - cumin
+    - cumin seeds
+    - curry powder
+    - dried bay leaves
+    - dried chillies
+    - dried mint
+    - dried oregano
+    - dried thyme
+    - dukkah
+    - fennel seeds
+    - fenugreek
+    - five-spice
+    - flavouring
+    - flavourings
+    - garam masala
+    - ground cinnamon
+    - ground coriander
+    - ground cumin
+    - ground ginger
+    - ground mace
+    - ground turmeric
+    - juniper berries
+    - loomi
+    - mace
+    - mixed spice
+    - mustard powder
+    - nigella seeds
+    - nutmeg
+    - onion powder
+    - oregano
+    - paprika
+    - pepper
+    - black pepper
+    - shichimi
+    - sichuan pepper
+    - white pepper
+    - ground black pepper
+    - pepper flakes
+    - peppercorns
+    - saffron
+    - salt
+    - sea salt
+    - seasoning
+    - seasonings
+    - smoked paprika
+    - star anise
+    - sumac
+    - turmeric
+    - vanilla powder
+    - za'atar
+
+  # --- drinks ------------------------------------------------------------
+  # Beer, wine, spirits and the tea shelf. `wine vinegar` and `cider vinegar`
+  # are longer keywords in the cupboard, which is the whole of the trick that
+  # keeps "splash of red wine vinegar" off this aisle.
+  drinks:
+    - ale
+    - bailey's
+    - baileys
+    - beer
+    - brandy
+    - campari
+    - cider
+    - cognac
+    - gin
+    - kirsch
+    - madeira
+    - marsala
+    - pastis
+    - pernod
+    - port
+    - porter
+    - prosecco
+    - red wine
+    - rum
+    - sake
+    - sherry
+    - stout
+    - tea
+    - vermouth
+    - vodka
+    - whisky
+    - white wine
+    - wine
+
+  # --- other -------------------------------------------------------------
+  # Declared and deliberately empty. Nothing MATCHES its way here; it is where
+  # an ingredient lands when no keyword claims it, and a cross-recipe link is
+  # sent here outright (see _plugins/food_shopping.rb — "[grandma's lemon
+  # curd]" is a pointer to another ingredient list, not a thing in a shop).
+  other: []

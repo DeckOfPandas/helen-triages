@@ -4,6 +4,7 @@ tagline: "These don't exactly not taste like sweet potato, but they also taste o
 source: "Adapted from Good Food"
 source_type: website
 makes: "16 squares"
+serves_estimate: 8
 prep_time: "15 mins plus cooling"
 cook_time: "1 hr 30 min, mostly baking the potatoes"
 main_ingredients: ["sweet potatoes", "almond butter", "cocoa powder", "dark chocolate", "maple syrup", "plain flour"]

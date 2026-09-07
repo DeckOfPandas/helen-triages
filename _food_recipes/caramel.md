@@ -4,6 +4,7 @@ tagline: "For filling, topping, Millionaire's shortbread, or ...#WheresMySpoon."
 source: "Mrs Nicholson"
 source_type: person
 makes: "I mean, who cares, make double anyway"
+serves_estimate: 5
 prep_time: "5 mins"
 cook_time: "10 mins"
 main_ingredients: ["light brown soft sugar", "salted butter", "double cream", "condensed milk"]
@@ -35,6 +36,8 @@ notes:
     text: The salt is crucial, and this can take a lot depending on your taste.
   - label: "Hey Andrew"
     text: If you make this for brother Andrew, take care to call it "sea-salted caramel".
+  - label: "How much this makes, in real uses"
+    text: "Helen's own words: 5 servings as a sauce, or a 16-cm square tin as Millionaire's filling. `serves_estimate` is set to the sauce."
 meta:
   rewritten: true
   awaiting_fix: false

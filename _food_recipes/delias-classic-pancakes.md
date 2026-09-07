@@ -4,6 +4,7 @@ tagline: "You don't need to make this batter beforehand like other recipes...ama
 source: "Adapted from Delia Smith"
 source_type: author
 makes: "about 8"
+serves_estimate: 4
 prep_time: "10 mins"
 cook_time: "3–4 mins per pancake"
 main_ingredients: ["plain flour", "eggs", "whole milk", "salted butter"]

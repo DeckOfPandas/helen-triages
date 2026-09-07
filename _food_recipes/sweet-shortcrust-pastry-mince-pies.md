@@ -4,6 +4,7 @@ tagline: "Foolproof sweet shortcrust for 12 mince pies with star hats. The mince
 source: "Bitter experience"
 source_type: joke
 makes: "1 dozen mince pies"
+serves_estimate: 12
 prep_time: "30 mins, plus 1 hr 30 mins chilling time"
 cook_time: "20 mins"
 main_ingredients: ["mincemeat", "ground almonds", "unsalted butter", "plain flour", "egg", "golden caster sugar"]

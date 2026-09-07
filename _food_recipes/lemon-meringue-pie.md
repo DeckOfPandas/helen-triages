@@ -4,6 +4,7 @@ tagline: "The perfect amount for my round white ceramic dish. This pastry recipe
 source: "Grandma Kath"
 source_type: person
 makes: "one pie"
+serves_estimate: 8
 prep_time: "30 mins in stages"
 cook_time: "55 mins plus cooling"
 main_ingredients: ["plain flour", "unsalted butter", "egg yolk", "lemon curd", "egg whites"]

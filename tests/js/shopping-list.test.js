@@ -423,3 +423,136 @@ test('no entries at all is an empty list, not a throw', () => {
     assert.deepStrictEqual(SL.build(input), []);
   });
 });
+
+// --- #801: what the food shopping list needed the parser to learn -------------
+// Every case below is a real amount string out of _food_recipes/, and every one
+// returned null before #801 or lost part of itself on the way through. The last
+// test in this block is the important one: it is the claim that widening the
+// parser changed nothing at all for the drinks.
+
+test('vulgar fractions are numbers', () => {
+  assert.deepStrictEqual(SL.parseAmount('½ tsp'), { quantity: 0.5, unit: 'tsp' });
+  assert.deepStrictEqual(SL.parseAmount('⅛ tsp'), { quantity: 0.125, unit: 'tsp' });
+  // A digit and a fraction are ONE token: `1½` is 1.5, not 1 and then a range.
+  assert.deepStrictEqual(SL.parseAmount('1½ tbsp'), { quantity: 1.5, unit: 'tbsp' });
+  assert.deepStrictEqual(SL.parseAmount('1¾ cups'), { quantity: 1.75, unit: 'cup' });
+  assert.deepStrictEqual(SL.parseAmount('½'), { quantity: 0.5, unit: '' });
+});
+
+test('a range keeps both ends', () => {
+  assert.deepStrictEqual(SL.parseAmount('30–50 g'), { quantity: 30, unit: 'g', max: 50 });
+  assert.deepStrictEqual(SL.parseAmount('1–2'), { quantity: 1, unit: '', max: 2 });
+  assert.deepStrictEqual(SL.parseAmount('1½–2 tsp'), { quantity: 1.5, unit: 'tsp', max: 2 });
+  assert.deepStrictEqual(SL.parseAmount('¼–½ tsp'), { quantity: 0.25, unit: 'tsp', max: 0.5 });
+  // The word, as well as the dash -- thai-green-chicken-curry writes `~½ to 1`.
+  assert.deepStrictEqual(
+    SL.parseAmount('~½ to 1'), { quantity: 0.5, unit: '', max: 1, approx: true });
+});
+
+test('a hyphen inside a unit is not a range, and the unit survives', () => {
+  // classic-masala-chai's ginger, and sticky-oxtail-stew's tomatoes. A looser
+  // rule ate the hyphen and, worse, read the `400` as the top of a range.
+  assert.deepStrictEqual(SL.parseAmount('2.5-cm piece'),
+    { quantity: 2.5, unit: '-cm piece' });
+  assert.deepStrictEqual(SL.parseAmount('2 x 400-g tins'),
+    { quantity: 2, unit: 'x 400-g tin' });
+  assert.deepStrictEqual(SL.parseAmount('2 x 400 g cans'),
+    { quantity: 2, unit: 'x 400 g can' });
+});
+
+test('a range that runs backwards is not a range', () => {
+  // Nothing writes one; the point is that the low end still comes back, rather
+  // than the two ends crossing over inside a total.
+  const parsed = SL.parseAmount('5–2 g');
+  assert.strictEqual(parsed.quantity, 5);
+  assert.strictEqual(parsed.max, undefined);
+});
+
+test('a tilde is carried, not swallowed', () => {
+  assert.deepStrictEqual(SL.parseAmount('~2 tbsp'),
+    { quantity: 2, unit: 'tbsp', approx: true });
+  assert.deepStrictEqual(SL.parseAmount('~1'), { quantity: 1, unit: '', approx: true });
+});
+
+test('an ordinary plural unit folds, and comes back for the page', () => {
+  // The ROUND TRIP is what matters: fold for the total, label for the page.
+  // `1 clove` and `3 cloves` of garlic were two lines of one bulb before this.
+  [['cloves', 'clove'], ['bunches', 'bunch'], ['handfuls', 'handful'],
+    ['slices', 'slice'], ['inches', 'inch'], ['stalks', 'stalk'],
+    ['x 400 g cans', 'x 400 g can']].forEach(function (pair) {
+    assert.strictEqual(SL.foldUnit(pair[0]), pair[1], pair[0]);
+    assert.strictEqual(SL.unitLabel(pair[1], 2), pair[0], pair[1]);
+    assert.strictEqual(SL.unitLabel(pair[1], 1), pair[1], pair[1]);
+  });
+});
+
+test('a compound unit pluralises its last word, and leaves a symbol alone', () => {
+  assert.strictEqual(SL.unitLabel('heaped tbsp', 2), 'heaped tbsp');
+  assert.strictEqual(SL.unitLabel('large head', 2), 'large heads');
+  // Adjectives standing in for a noun have no plural: `8 mediums` was real.
+  assert.strictEqual(SL.unitLabel('medium', 4), 'medium');
+  assert.strictEqual(SL.unitLabel('small', 4), 'small');
+  assert.strictEqual(SL.unitLabel('tsp', 3), 'tsp');
+});
+
+test('`ss` is never a plural', () => {
+  assert.strictEqual(SL.foldUnit('glass'), 'glass');
+  assert.strictEqual(SL.foldUnit('ml'), 'ml');
+  assert.strictEqual(SL.foldUnit('oz'), 'oz');
+});
+
+test('a bracket that restates the quantity is split off the unit', () => {
+  // chai-spice-powder and garam-masala-powder are written this way throughout.
+  assert.deepStrictEqual(SL.splitParenthetical('tbsp (6 g)'),
+    { unit: 'tbsp', lo: 6, hi: null, unit2: 'g' });
+  assert.deepStrictEqual(SL.splitParenthetical('tbsp (9–10 g)'),
+    { unit: 'tbsp', lo: 9, hi: 10, unit2: 'g' });
+  assert.deepStrictEqual(SL.splitParenthetical('medium (1 g)'),
+    { unit: 'medium', lo: 1, hi: null, unit2: 'g' });
+});
+
+test('a bracket with no number in it is not a restatement', () => {
+  assert.deepStrictEqual(SL.splitParenthetical('(optional)'), { unit: '(optional)' });
+  assert.deepStrictEqual(SL.splitParenthetical('ml'), { unit: 'ml' });
+});
+
+test('fractionText writes a number the way a cook would', () => {
+  assert.strictEqual(SL.fractionText(2 / 3), '⅔');
+  assert.strictEqual(SL.fractionText(1 / 3), '⅓');
+  assert.strictEqual(SL.fractionText(1.5), '1½');
+  assert.strictEqual(SL.fractionText(3 + 1 / 3), '3⅓');
+  assert.strictEqual(SL.fractionText(2), '2');
+  // NOTATION, NOT ROUNDING -- Helen, 2026-09-07. 0.7 is not two thirds, and is
+  // never printed as one.
+  assert.strictEqual(SL.fractionText(0.7), '0.7');
+});
+
+test('NOTHING THE COCKTAILS COLLECTION WRITES PARSES DIFFERENTLY', () => {
+  // The claim that lets one parser serve both sites, written down so that the
+  // next widening has to prove it too. These are the shapes the 682 pours are
+  // actually in: plain decimals on the 2.5 ml grid, the counted units, the
+  // whole fruit, and the two phrases that are not quantities at all.
+  const unchanged = {
+    '45 ml': { quantity: 45, unit: 'ml' },
+    '22.5 ml': { quantity: 22.5, unit: 'ml' },
+    '7.5 ml': { quantity: 7.5, unit: 'ml' },
+    '2 dashes': { quantity: 2, unit: 'dash' },
+    '1 dash': { quantity: 1, unit: 'dash' },
+    '3 drops': { quantity: 3, unit: 'drop' },
+    '2 cubes': { quantity: 2, unit: 'cube' },
+    '8 leaves': { quantity: 8, unit: 'leaf' },
+    '1 pinch': { quantity: 1, unit: 'pinch' },
+    '1 sprig': { quantity: 1, unit: 'sprig' },
+    '1 strip': { quantity: 1, unit: 'strip' },
+    '9 each': { quantity: 9, unit: 'each' },
+    '1 whole': { quantity: 1, unit: 'whole' },
+    'half': { quantity: 0.5, unit: 'whole' },
+    '60 g': { quantity: 60, unit: 'g' },
+    '1': { quantity: 1, unit: '' }
+  };
+  Object.keys(unchanged).forEach(function (amount) {
+    assert.deepStrictEqual(SL.parseAmount(amount), unchanged[amount], amount);
+  });
+  assert.strictEqual(SL.parseAmount('to top'), null);
+  assert.strictEqual(SL.parseAmount('to rinse'), null);
+});
