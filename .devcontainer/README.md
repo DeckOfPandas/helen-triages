@@ -27,28 +27,24 @@ succeeds). If you're setting this up somewhere else, you'd want Docker
 Desktop with the WSL2 backend on Windows/WSL2, or a normal Docker Engine
 install on native Linux/macOS.
 
-### 2. Build the image
+### 2. Run it
 
-From the repo root:
+`.devcontainer/run.sh` handles the rest: it builds the image on first
+run (skipped on later runs, since it checks whether the image already
+exists), creates the two named volumes that persist your Claude Code
+login and gem cache across restarts, reads `GH_TOKEN` from
+`.claude/settings.local.json` for just that one run, and drops you into
+a shell at `/workspace` as user `helen` (not root), looking at this
+actual project directory:
+
+    chmod +x .devcontainer/run.sh   # first time only
+    .devcontainer/run.sh
+
+Prefer to do it by hand instead? The equivalent manual steps are:
 
     docker build -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
-
-(The build context is `.devcontainer/` itself, not the whole repo -- the
-Dockerfile only needs `init-firewall.sh` from that folder. Your project
-files are never copied into the image; they're bind-mounted at runtime,
-so editing them doesn't require rebuilding.)
-
-### 3. Create the two named volumes (one-time)
-
-These persist your Claude Code login and your gem cache across container
-restarts and rebuilds, so you don't reauthenticate or re-`bundle install`
-every time:
-
     docker volume create helen-triages-claude-config
     docker volume create helen-triages-bundle-cache
-
-### 4. Run it
-
     docker run -it --rm \
       -v "$(pwd):/workspace" \
       -v helen-triages-claude-config:/home/helen/.claude \
@@ -57,13 +53,12 @@ every time:
       helen-triages-devcontainer \
       bash
 
-You're now in a shell inside the container, at `/workspace`, as user
-`helen` (not root), looking at this actual project directory.
+(The build context is `.devcontainer/` itself, not the whole repo -- the
+Dockerfile only needs `init-firewall.sh` from that folder. Your project
+files are never copied into the image; they're bind-mounted at runtime,
+so editing them doesn't require rebuilding.)
 
-Tip: save that as a one-line script (e.g. `.devcontainer/run.sh`) once
-you've confirmed it works the way you want, so you don't retype it.
-
-### 5. First-time Claude Code login (Max plan, no API key needed)
+### 3. First-time Claude Code login (Max plan, no API key needed)
 
 Inside the container:
 
@@ -87,7 +82,7 @@ Because `~/.claude` is a named volume (not baked into the image), this
 login persists. Next time you `docker run` the same volume, you're
 already signed in.
 
-### 6. Use it
+### 4. Use it
 
 From here it's normal Claude Code, just running inside the container:
 edit files, run `bundle exec jekyll build`, run the JS tests
@@ -138,7 +133,7 @@ If you'd rather VS Code handle the mounting/volumes for you:
 above (same volumes, same env). Install the "Dev Containers" extension,
 open this repo in VS Code, then Command Palette →
 **Dev Containers: Reopen in Container**. First-time login works the same
-way as step 5 above. The firewall (Phase 2) isn't wired into
+way as step 3 above. The firewall (Phase 2) isn't wired into
 `devcontainer.json` by default -- add
 `"runArgs": ["--cap-add", "NET_ADMIN", "--cap-add", "NET_RAW"]` and a
 `postStartCommand` running the script if you want it there too.
