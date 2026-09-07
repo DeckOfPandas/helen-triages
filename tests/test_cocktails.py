@@ -167,8 +167,20 @@ REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
 # 282 draft entries still carry one and nothing renders it (§9.10). So it is
 # permitted where the migration is still running and refused where the world can
 # see the file -- which makes promotion the deadline rather than a someday.
+#
+# `as` AND `card_order` ARE THE TWO PRESENTATION KEYS, added 2026-09-07 (#754).
+# `as` says how a pour is USED -- float, rinse, muddle -- and the card ordering
+# reads it for #567's tier 7 and its muddle clause. `card_order` names a tier
+# outright for a drink whose small pour IS the drink.
+#
+# `card_order` HAD BEEN DOCUMENTED BUT NOT PERMITTED, which is why the plugin
+# said it had "no users yet": `_plugins/cocktail_card_ingredients.rb` has read
+# it since #567 and this whitelist would have rejected any drink that wrote one.
+# A field the code supports and the schema refuses is a trap for whoever tries
+# it first, so both are declared here now.
 INGREDIENT_KEYS_DRAFTS = {
     "generic", "amount", "item", "suggestion", "note", "character", "optional",
+    "as", "card_order",
 }
 INGREDIENT_KEYS_RECIPES = INGREDIENT_KEYS_DRAFTS - {"item"}
 
@@ -252,7 +264,11 @@ PLACEHOLDER = "QQ"
 # than silent: left out, `set(value)` raises on an unhashable dict instead of
 # quietly minting generics. That is luck, not design, and the next such block
 # will not be so obliging.
-NOT_GENERIC_LISTS = {"families", "not_on_cards", "rum_groups"}
+# `ingredient_as` JOINS THEM FOR #754, and it is the same trap `rum_groups`
+# hit: a list at the top of ingredients.yml is READ AS GENERIC VALUES unless it
+# says otherwise, so leaving it out would quietly mint `float`, `rinse` and
+# `muddle` as three new generics that no drink could ever pour.
+NOT_GENERIC_LISTS = {"families", "not_on_cards", "rum_groups", "ingredient_as"}
 
 
 def _is_character_list(key):
@@ -6027,6 +6043,143 @@ def test_no_drink_note_exception_is_stale():
         f"{len(stale)} DRINK_NOTE_EXCEPTIONS entr(ies) name a note no drink has "
         f"any more:\n  " + "\n  ".join(repr(s) for s in stale)
         + "\n\nThe work is done -- delete the line."
+    )
+
+
+def test_ingredient_as_is_declared(drink_file):
+    """`as:` carries a value `ingredient_as` declares -- #754.
+
+    THE SAME GUARD `rum_characters` HAS, for the same reason: a closed
+    vocabulary that nothing checks is an open one, and a typo mints a new member
+    in silence. `as: floar` would simply stop sorting to tier 7 and nobody would
+    see it, because the card would look plausible either way.
+
+    IT IS DELIBERATELY NOT A FREE-TEXT FIELD. Adding a member is a decision
+    about what the collection is willing to say about a pour, which is Helen's
+    (the same argument that made rum's characters closed and gin's free text).
+    """
+    _require_drink(drink_file)
+    declared = set(_vocab().get("ingredient_as") or [])
+    assert declared, "ingredients.yml declares no `ingredient_as` vocabulary."
+
+    bad = []
+    for item in (drink_file.fm.get("ingredients") or []):
+        if not isinstance(item, dict) or not item.get("as"):
+            continue
+        if str(item["as"]) not in declared:
+            bad.append(f"{item.get('generic') or item.get('item')}: {item['as']!r}")
+
+    assert not bad, (
+        f"{_drink_where(drink_file)} uses an undeclared `as` value:\n  "
+        + "\n  ".join(bad)
+        + "\n\nDeclared: " + ", ".join(sorted(declared))
+        + ". Adding one is a vocabulary decision -- ingredients.yml."
+    )
+
+
+# The verbs a method uses for the three things `as:` records. Deliberately
+# narrow -- these are the words the collection actually writes, not every
+# synonym English offers.
+_AS_VERBS = {"float": ("float",), "rinse": ("rinse",), "muddle": ("muddle",)}
+
+# A KNOWN FAILURE WITH ITS REASON ATTACHED, the shape `unresolved_suggestions`
+# uses: declaring it lets this guard bite on the NEXT one instead of being
+# loosened, and the staleness test below retires it automatically.
+_AS_EXCEPTIONS = {
+    # Its method opens "Muddle blackberries gently in a shaker" and the drink
+    # HAS NO BLACKBERRIES -- the ingredients are cognac, tawny port, creme de
+    # cassis, lemon juice and chocolate bitters. Cassis is blackcurrant, not
+    # blackberry, so this is not a naming slip either. Either an ingredient is
+    # missing or the step belongs to another drink; both are Helen's to settle,
+    # and inventing a pour to satisfy a test would be writing her recipe.
+    # Found by this guard on the day it was written, 2026-09-07.
+    ("port-authority", "muddle"): "method muddles blackberries the drink does not have",
+}
+
+
+def test_no_as_exception_is_stale():
+    """A declared `as:` exception must still describe a live problem.
+
+    The same rot `test_unresolved_suggestions_has_no_stale_entries` catches: an
+    exemption that outlives its defect reads as outstanding work while quietly
+    excusing that drink for whoever writes the next one.
+    """
+    live = []
+    for slug, fm in _load():
+        steps = " ".join(
+            str(s.get("step") if isinstance(s, dict) else s)
+            for s in (fm.get("method") or [])
+        ).lower()
+        declared = {
+            str(i["as"]) for i in (fm.get("ingredients") or [])
+            if isinstance(i, dict) and i.get("as")
+        }
+        for value, verbs in _AS_VERBS.items():
+            if any(v in steps for v in verbs) and value not in declared:
+                live.append((slug, value))
+
+    stale = [k for k in _AS_EXCEPTIONS if k not in live]
+    assert not stale, (
+        f"{len(stale)} _AS_EXCEPTIONS entr(ies) no longer describe a real gap:\n  "
+        + "\n  ".join(f"{s}: {v}" for s, v in stale)
+        + "\n\nThe work is done -- delete the line."
+    )
+
+
+def test_a_method_that_floats_or_rinses_says_so_in_a_field(drink_file):
+    """If the METHOD floats, rinses or muddles, some ingredient says `as:` --
+    #754, Helen's ruling of 2026-09-07 ("`as:` on every one, and a test that
+    finds the rest").
+
+    THE GAP THIS CLOSES IS THE ONE THAT MADE #754 UNDERCOUNT. That issue said
+    three drinks float and all three record it in QQ prose. Five do, and two of
+    them -- fog-cutter-bramble-style and kamaniwanalaya -- say so properly in a
+    method step, which is exactly why a search for the problem missed them. A
+    fact recorded only in prose is a fact no plugin can read, and the next
+    ingest will write it in prose again unless something asks.
+
+    A GARNISH FLOAT IS NOT A POUR AND IS NOT COUNTED. Three drinks float a
+    dehydrated lime wheel, coffee beans or a passion fruit shell; those are
+    garnishes, and `garnish:` is where they live. The check therefore looks at
+    whether the method's object could be an ingredient at all, by requiring that
+    the drink HAS an ingredient still unaccounted for -- see the skip below.
+    """
+    _require_drink(drink_file)
+    steps = " ".join(
+        str(s.get("step") if isinstance(s, dict) else s)
+        for s in (drink_file.fm.get("method") or [])
+    ).lower()
+
+    declared = {
+        str(i["as"]) for i in (drink_file.fm.get("ingredients") or [])
+        if isinstance(i, dict) and i.get("as")
+    }
+    garnishes = " ".join(str(g) for g in (drink_file.fm.get("garnish") or [])).lower()
+
+    missing = []
+    for value, verbs in _AS_VERBS.items():
+        if value in declared:
+            continue
+        if not any(v in steps for v in verbs):
+            continue
+        # The method says the word but no ingredient claims it. If the object of
+        # the verb is plainly a garnish, that is not this test's business.
+        if value == "float" and garnishes:
+            words = [w for w in garnishes.replace(",", " ").split() if len(w) > 3]
+            if any(w in steps for w in words):
+                continue
+        if (drink_file.slug, value) in _AS_EXCEPTIONS:
+            continue
+        missing.append(value)
+
+    assert not missing, (
+        f"{_drink_where(drink_file)}'s method says "
+        + ", ".join(sorted(missing))
+        + " but no ingredient carries the matching `as:` value.\n\n"
+        "A float, a rinse or a muddle recorded only in prose is a fact the card "
+        "ordering cannot read -- which is how #754 came to undercount the "
+        "floats. Add `as:` to the pour it describes, or if the method is "
+        "talking about a GARNISH, that is what `garnish:` is for."
     )
 
 

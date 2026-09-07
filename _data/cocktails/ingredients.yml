@@ -365,6 +365,40 @@ not_on_cards:
   - honey
   - lemon zest
 
+# --- HOW A POUR IS USED, not what it is --------------------------------------
+# #754, Helen 2026-09-06: "Add `as:` -- float, rinse, muddle."
+#
+# WHY A FIELD AND NOT PROSE. #567 orders a card's ingredients in seven tiers and
+# the seventh is "Floats" -- which could not be built, because nothing recorded
+# that a pour WAS one. Five drinks float something and four rinse with
+# something; before this they said so in a method step or a QQ note, which the
+# plugin cannot read. A float is a small pour of something strong, so tier 1
+# took it and sorted it by volume, landing it at the bottom of the SPIRITS
+# instead of the bottom of the CARD. Don's Mai Tai read
+# `Jamaican rum . absinthe . orange Curacao ...` with a rinse in second place,
+# ahead of an ingredient poured fifteen times its volume.
+#
+# THIS IS A CLOSED VOCABULARY and `test_ingredient_as_is_declared` holds it, the
+# same guard `rum_characters` has and for the same reason: a typo must not be
+# able to mint a new value in silence. Adding a member is a vocabulary decision
+# and therefore Helen's.
+#
+# `float` AND `rinse` BOTH SORT LAST. #567 names only floats, and Helen ruled on
+# 2026-09-07 that a rinse goes with them: both are added outside the main build,
+# so both belong at the end of the line rather than among the spirits.
+#
+# `muddle` SORTS NOTHING, AND IS DECLARED ANYWAY. #567 also asks for muddled
+# ingredients to be grouped first; that was built on 2026-09-07, looked at, and
+# dropped -- it put Ti' Punch's rhum last on a rhum drink and led P Five Punch
+# with its orgeat, because a muddle covers both expressing a lime and dissolving
+# a sugar. Helen: don't let a muddle reorder at all. The VALUE stays because it
+# is a true fact about the pour and the drink page may want it; the card simply
+# does not read it. See the plugin's header for the full finding.
+ingredient_as:
+  - "float"
+  - "rinse"
+  - "muddle"
+
 # --- other names for a family ------------------------------------------------
 # A FAMILY IS REACHED BY ITS NAME, so a family nobody spells that way is a
 # family nobody can reach. Helen, 2026-08-29: "'whiskey (all)' should return all

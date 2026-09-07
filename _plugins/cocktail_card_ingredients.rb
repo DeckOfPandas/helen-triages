@@ -27,7 +27,7 @@
 #   4  sugar syrups                  syrups, honeys and sugars
 #   5  anything else                 fruit, herbs, dairy, coconut cream, soda
 #   6  bitters
-#   7  floats                        NOT IMPLEMENTED -- see below
+#   7  floats and rinses             from `as:` -- see below
 #
 # WITHIN A TIER, LARGEST VOLUME FIRST. Helen ruled on the tie-break directly on
 # 2026-09-06, choosing "volume, with a per-drink override field" over "most
@@ -41,14 +41,41 @@
 # the order Helen typed stands. That is #567's option (c) doing exactly the job
 # she ranked it for -- last, and only where the first two say nothing.
 #
-# --- TIER 7 IS NOT BUILT, AND COULD NOT BE -----------------------------------
-# A float is not recorded anywhere. Three drinks mention one -- tiki-max,
-# zombie-intoxica and modern-zombie -- and all three do it in QQ PROSE, not in a
-# field. There is nothing to read. #567's "unless floated" and its muddle-
-# grouping rule are in the same position and for the same reason. Raised as its
-# own issue rather than guessed at: a float is a small pour of something strong,
-# so tier 1 currently puts it near the bottom of the spirits, which is wrong but
-# is at least wrong in a way the ordering rule explains.
+# --- TIER 7 IS BUILT NOW, AND `as:` IS WHAT BUILT IT -------------------------
+# #754, Helen 2026-09-06. A float used to be recorded nowhere a plugin could
+# read, so tier 1 took it and sorted it by volume -- landing it at the bottom of
+# the SPIRITS instead of the bottom of the CARD. `ingredient_as` in
+# ingredients.yml is the closed vocabulary; `as: float` and `as: rinse` both
+# mean tier 7, Helen's ruling of 2026-09-07 that a rinse goes with the floats
+# because both are added outside the main build.
+#
+# #754 SAID THREE DRINKS FLOAT AND IT IS FIVE. It counted the ones recording it
+# in QQ prose and missed `fog-cutter-bramble-style` (sherry) and
+# `kamaniwanalaya` (prosecco), which say so properly in a method step -- which
+# is exactly why they were invisible to a search for the problem.
+#
+# --- THE MUDDLE CLAUSE IS DELIBERATELY NOT BUILT -----------------------------
+# #567 asks for "for recipes with a muddling step, group the ingredients by
+# muddle then rest". It was BUILT on 2026-09-07, looked at, and dropped.
+#
+# WHAT LOOKING AT IT SHOWED. Grouping muddled ingredients first reorders 7 of
+# the 10 drinks that muddle, and three of them read worse: Ti' Punch became
+# `lime juice . sugar syrup . rhum agricole blanc`, putting the rhum last on a
+# rhum drink; P Five Punch led with its orgeat; Sapins Swizzle pushed its rum to
+# fourth. The cause is that a muddle covers two unlike things -- muddling a lime
+# to EXPRESS it, and muddling sugar to DISSOLVE it -- and only the first is a
+# statement about what the drink tastes of.
+#
+# A `muddle_staples` list was tried, to say which muddled things do not lead.
+# Helen's call, shown the three cards: don't let a muddle reorder at all. So the
+# rule is unbuilt rather than half-built, and the list is deleted rather than
+# kept unread.
+#
+# `as: muddle` IS STILL RECORDED ON THE DRINKS and that is not a contradiction:
+# it is a true fact about the pour, the drink page may want it, and
+# `test_a_method_that_floats_or_rinses_says_so_in_a_field` keeps it honest. It
+# simply does not sort anything. If this is ever revisited, the finding above is
+# the thing to start from, not the clause.
 #
 # --- THE OVERRIDE, WHICH EXISTS AND HAS NO USERS YET -------------------------
 # An ingredient may carry `card_order: <n>`, and it replaces that entry's TIER.
@@ -116,6 +143,13 @@ module HelenTriages
     # ingredient lands among the odds and ends instead of after the bitters --
     # and the warning below is what actually gets it fixed.
     UNKNOWN_TIER = 5
+
+    # `as:` values that mean "after everything else on the card" -- #567's tier
+    # 7, and Helen's 2026-09-07 ruling that a rinse joins the floats there.
+    # `muddle` is deliberately NOT here: it is a GROUPING, handled before the
+    # tier, not a place in the order.
+    LAST_TIER = 7
+    SORTS_LAST = %w[float rinse].freeze
 
     def generate(site)
       vocab = site.data.dig("cocktails", "ingredients")
@@ -222,12 +256,25 @@ module HelenTriages
         label = label_for(generics, ing["item"])
         next if label.to_s.empty?
 
-        tier = ing["card_order"] || generics.map { |g| tier_for(g, unclassified) }.min
+        # `as:` OVERRIDES THE TIER, `card_order:` OVERRIDES EVERYTHING. The two
+        # answer different questions -- `as` says what KIND of pour this is and
+        # the tier follows from that, while `card_order` is Helen naming a
+        # position outright for a drink whose small pour IS the drink. So the
+        # explicit number wins where both are present.
+        use = ing["as"].to_s
+        tier = if ing["card_order"]
+                 ing["card_order"]
+               elsif SORTS_LAST.include?(use)
+                 LAST_TIER
+               else
+                 generics.map { |g| tier_for(g, unclassified) }.min
+               end
+
         rows << {
           "label"  => label,
           "search" => search_key(generics, Array(ing["suggestion"]).map(&:to_s)),
-          # A pure sort key, never rendered. Kept on the row so a test can read
-          # back what the plugin decided without re-deriving it.
+          # A pure sort key, never rendered. Kept on the row so a test can
+          # read back what the plugin decided without re-deriving it.
           "tier"   => tier,
           "ml"     => volume_ml(ing["amount"]),
           "citrus" => generics.any? { |g| CITRUS.include?(g) } ? 0 : 1,
