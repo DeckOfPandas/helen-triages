@@ -125,10 +125,10 @@ bottles:
   "Rum Fire":                         { abv: 63,   confidence: high }
 
   # --- rum: Demerara -----------------------------------------------------
-  "El Dorado 3 year old rum":         { abv: 40,   confidence: high }
-  "El Dorado 5 year old rum":         { abv: 40,   confidence: high }
-  "El Dorado 8 year old rum":         { abv: 40,   confidence: high }
-  "El Dorado 12 year old rum":        { abv: 40,   confidence: high }
+  "El Dorado 3 Year Old":         { abv: 40,   confidence: high }
+  "El Dorado 5 Year Old":         { abv: 40,   confidence: high }
+  "El Dorado 8 Year Old":         { abv: 40,   confidence: high }
+  "El Dorado 12 Year Old":        { abv: 40,   confidence: high }
   "Skipper's":                        { abv: 40,   confidence: medium }
   # 100 BRITISH proof, not US -- see the note in the header. This one really is
   # 57% and is the strongest thing in the Demerara block by a distance.
@@ -139,7 +139,7 @@ bottles:
   "Pusser's Gunpowder":               { abv: 54.5, confidence: high }
   "Gosling's Black Seal":             { abv: 40,   confidence: high }
   "Havana Club 7 year old":           { abv: 40,   confidence: high }
-  "Planteray Barbados 5":             { abv: 40,   confidence: medium }
+  "Planteray 5 Year Old Barbados":             { abv: 40,   confidence: medium }
   "Chairman's Reserve":               { abv: 40,   confidence: high }
 
   # --- rum: light, blended and flavoured ---------------------------------
@@ -406,6 +406,7 @@ non_alcoholic:
   - lemon juice
   - orange juice
   - grapefruit juice
+  - ruby grapefruit juice
   - pineapple juice
   - apple juice
   - cane sugar syrup 1:1

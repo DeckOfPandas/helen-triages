@@ -93,7 +93,17 @@ jekyll-local        # port 4001, drafts visible — the working view
 jekyll-prod         # port 4002, exactly what deploys — no drafts, no local switches
 pytest              # content and structure checks; ONE session at a time
 node --test tests/js/*.test.js    # the JS suite — the glob is required (§10)
+
+python3 scripts/verify.py         # ALL FOUR CHECKS, and prefer this
 ```
+
+**`scripts/verify.py` runs the two suites AND the two checks that get
+forgotten** — `derive_cocktail_moods.py`, the only thing that says whether a
+vocabulary edit silently moved a drink's moods, and `build_ingest_vocab.py
+--check`, the only thing that says the standalone ingest documents still match
+the data they are rendered from. Sessions have run the two test suites, called
+the work verified, and missed both. One command, four lines of output, non-zero
+exit if anything fails.
 
 **`.node-runtime/` and `.gh-runtime/` do not come with a worktree**; they are
 gitignored, like the two drafts repos (§9.1). Use the system `node`. **There is
