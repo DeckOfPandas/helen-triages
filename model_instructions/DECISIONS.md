@@ -611,6 +611,27 @@ unless stated.
     #801 was taken against 86 recipes that all happen to have a numeric
     `serves:`. **Clone the drafts before believing a measurement about the
     food collection** — the starting prompt says so and it was still skipped.
+- **2026-09-07 — "this is all I can see": boxes, no totals, and it was not the
+  code at all.** A screenshot of three shortlisted recipes, three number boxes
+  and nothing underneath — with a `×` on every one, including
+  `moules-mariniere`, which states `serves: "4"` and therefore could not
+  possibly be a batch recipe. That was the tell: `×` on a recipe with a
+  serving count means its portion count never reached the page.
+  **`_plugins/food_shopping.rb` had not run.** Jekyll loads `_plugins/` ONCE AT
+  BOOT and never reloads them on watch, so Helen's `jekyll-local`, started
+  before the plugin existed, had been serving a plugin-less build ever since —
+  no log line, no error, no clue. Reproduced deliberately with `--plugins`
+  pointed at an empty directory: 427 recipes, 0 with a portion count, 0 with
+  ingredients, which is the screenshot exactly.
+  - **The lesson is about diagnosis, not about Jekyll.** Two reports in a row
+    had been real bugs in my code, and the third looked like a third. The
+    thing that settled it in one step was asking which observation was
+    IMPOSSIBLE under the theory — a `×` on the mussels — rather than starting
+    from the missing totals, which every theory explains.
+  - **The page now says so**, because this was the third silence in a row and
+    the previous two were also mine. A shortlist with recipes in it and no
+    entries to total prints the reason and the remedy instead of a blank, and
+    the console carries the plugin detail. MANUAL §1 gained the restart rule.
 - **2026-09-07 — the yield came off the row, and dimming it was not the fix.**
   Helen, with a screenshot of `7  Moules Marinière serves 4`: *"please don't
   say 'serves X' after the recipe name at the top of the scaler. This

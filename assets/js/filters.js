@@ -1430,13 +1430,47 @@ function renderResultsPool() {
   function renderTotals(urls) {
     if (!shoppingAisles) return;
 
+    var shortlisted = urls || shortlistedRecipes();
     var entries = [];
-    (urls || shortlistedRecipes()).forEach(function (url) {
+    shortlisted.forEach(function (url) {
       var scale = scaleFor(url);
       ((RECIPES[url] || {}).i || []).forEach(function (ing) {
         entries.push({ amount: ing.a, name: ing.n, aisle: ing.s, scale: scale });
       });
     });
+
+    /* A PANEL WITH BOXES AND NO TOTALS SAYS SO -- Helen, 2026-09-07, with a
+       screenshot of exactly that: three recipes, three number boxes, and
+       nothing underneath.
+
+       IT WAS NOT THIS SCRIPT. `_plugins/food_shopping.rb` had not run, so
+       every recipe reached the page with no ingredients and no portion count
+       -- and JEKYLL LOADS `_plugins/` ONCE AT BOOT AND NEVER RELOADS THEM ON
+       WATCH, so a `jekyll serve` started before the plugin existed serves a
+       page built without it, indefinitely, with no error anywhere. Reproduced
+       with `--plugins` pointed at an empty directory: 427 recipes, 0 with a
+       portion count, 0 with ingredients. Restarting the server is the whole
+       fix.
+
+       SO THE PAGE SAYS IT RATHER THAN SHOWING A BLANK. An empty panel under a
+       shortlist you can see is indistinguishable from a broken script, and the
+       last two things Helen has had to report were both silences. The console
+       carries the remedy; the page carries the fact, because the page is where
+       she is looking. */
+    if (shortlisted.length && !entries.length) {
+      console.warn(
+        'filters.js: every shortlisted recipe reached the page with no '
+        + 'ingredients, so the shopping list has nothing to total. This is '
+        + 'almost always _plugins/food_shopping.rb not having run: Jekyll '
+        + 'loads plugins once at startup and does not reload them on watch, '
+        + 'so restart `jekyll-local` rather than waiting for a rebuild.'
+      );
+      shoppingAisles.innerHTML =
+        '<p class="shopping-list-empty">No ingredient data was built for '
+        + 'these recipes, so there is nothing to add up. If this is the local '
+        + 'server, restart it — its plugins are loaded once at startup.</p>';
+      return;
+    }
 
     var aisles = HTF.foodShoppingList.build(entries, { aisles: AISLES });
 

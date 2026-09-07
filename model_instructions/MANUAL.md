@@ -109,6 +109,18 @@ Local URL: `http://localhost:4001/helen-triages/`, then `/food/` or `/cocktails/
 **`jekyll serve` does not reload `_config.yml`.** Restart after any change to
 it.
 
+**IT DOES NOT RELOAD `_plugins/` EITHER, AND THAT ONE FAILS SILENTLY.** Ruby
+plugins are loaded once at boot; the watcher rebuilds pages without them, for
+as long as the server is up, with nothing in the log and no error on the page.
+A server started before a plugin existed serves a site where that plugin has
+simply never run. Helen lost a round of #801 to exactly this — the food
+shopping list showed its number boxes and no totals, because
+`_plugins/food_shopping.rb` had hung `shopping` and `portions` on nothing.
+**Restart after adding or editing any file in `_plugins/`.** To confirm which
+you are looking at, each plugin logs a line at build (`Costs:`, `Shopping:`);
+no line means it did not run. Reproduce deliberately with
+`--plugins <empty dir>`.
+
 **`_config_local.yml` is where every local-only switch lives, and nowhere
 else**: `show_source_wording`, `show_awaiting_fix`, `show_drafts`,
 `show_costs`, `show_units` (all `true`), `pdf_downloads: false`, and

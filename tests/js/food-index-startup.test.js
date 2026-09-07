@@ -98,8 +98,16 @@ const TITLES = {
   '/food/recipes/gelato/': 'Blackberry gelato'
 };
 
-/** A food index with everything the scripts read, and nothing else. */
-function boot() {
+/**
+ * A food index with everything the scripts read, and nothing else.
+ *
+ * @param {Object} [options]
+ * @param {Object} [options.recipes] - replaces the #recipe-ingredients blob,
+ *        for the tests about what happens when the build hands over something
+ *        unexpected.
+ */
+function boot(options) {
+  const recipes = (options && options.recipes) || RECIPES;
   const doc = createDocument();
   const el = (tag, cls, attrs) => {
     const node = doc.createElement(tag);
@@ -122,12 +130,12 @@ function boot() {
      a different program from the one that ships. */
   json('ingredient-vocabulary', { search: { family_button_min_chars: 3 } });
   json('recipe-aisles', AISLES);
-  json('recipe-ingredients', RECIPES);
+  json('recipe-ingredients', recipes);
 
   doc.body.appendChild(el('div', 'controls'));
 
   const list = el('ul', 'recipe-list');
-  Object.keys(RECIPES).forEach((url) => {
+  Object.keys(recipes).forEach((url) => {
     const li = el('li', '', {
       'data-url': url, 'data-tags': '', 'data-star': '',
       'data-ingredients': '', 'data-all-ingredients': '|'
@@ -475,6 +483,29 @@ test('"set all to" skips the batch recipes rather than reinterpreting them', () 
   assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/a/'), 8);
   assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/gelato/'), null);
   assert.match(aislesHtml(panel), /125 ml/, 'the gelato is still x1');
+});
+
+test('a panel with boxes and no totals says why, instead of showing a blank', () => {
+  /* Helen, 2026-09-07, with a screenshot: three recipes, three boxes, nothing
+     underneath. `_plugins/food_shopping.rb` had not run -- Jekyll loads
+     plugins once at boot and never reloads them on watch, so a server started
+     before the plugin existed serves a page built without it forever, with no
+     error anywhere. Reproduced with `--plugins` pointed at an empty
+     directory: 427 recipes, 0 with ingredients.
+
+     A blank panel under a visible shortlist is indistinguishable from a broken
+     script, and it was the third silence in a row. */
+  const { win, doc, panel } = boot({
+    recipes: {
+      '/food/recipes/a/': { p: null, e: false, y: '4', k: 'serves', i: [] }
+    }
+  });
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  showTheList(doc);
+
+  assert.match(aislesHtml(panel), /No ingredient data/);
+  assert.match(aislesHtml(panel), /restart it/,
+    'the message has to carry the remedy, not just the symptom');
 });
 
 test('a shortlisted recipe that is no longer on the page is dropped quietly', () => {
