@@ -96,7 +96,11 @@ node --test tests/js/*.test.js    # the JS suite — the glob is required (§10)
 ```
 
 **`.node-runtime/` and `.gh-runtime/` do not come with a worktree**; they are
-gitignored, like the two drafts repos (§9.1). Use the system `node`.
+gitignored, like the two drafts repos (§9.1). Use the system `node`. **There is
+no `gh` at all in a worktree** — `gh: command not found`, and it is not
+installable from here — so anything `CLAUDE.md` describes as a `gh` command
+(reading an issue, `gh pr create`) is the REST API instead, called with
+`GH_TOKEN` from a script in `tmp/`. Measured 2026-09-07, opening PR #808.
 
 **Never run two `pytest` sessions at once.** `test_rendered_pages.py` writes
 throwaway `zzz-gate-` recipes into `_food_recipes/` (and drinks into
@@ -863,9 +867,11 @@ unmerged private branch). `git fetch origin main:main` refuses on a
 checked-out branch and a merge onto `main` is refused by the hook.
 
 **The API token is a different channel.** `GH_TOKEN` carries Issues on all
-three repos and reads file contents on none of the private ones (403). Git
-can. **Pushing to the private repos needs no ask** (`CLAUDE.md`); committing or
-merging onto their `main` is still forbidden, hook-enforced.
+three repos, and **since 2026-09-07 opening pull requests too** (§11.-1); it
+reads file contents on none of the private ones (403). Git can. **Pushing
+needs no ask in any of the three repos** (`CLAUDE.md`, 2026-09-07);
+committing or merging onto any `main` is still forbidden, hook-enforced.
+**Merging a PR is not in the token and never becomes yours.**
 
 **The naming trap**: `.gitignore` matches by directory name, so a renamed
 drafts directory is un-ignored and stageable in the public repo.
@@ -1851,8 +1857,9 @@ land inside `{{ content }}`.
 **Git is `CLAUDE.md`'s.** Branch, never commit or merge onto `main` in any
 repo in the tree, never `git reset --hard` or discard over a dirty tree, check
 `git branch --show-current` in its own tool call immediately before every
-commit, never push `helen-triages` without confirmation, push the private
-repos freely. Two hooks in `.claude/hooks/` enforce the two rules that were
+commit. **Push and open the PR with no ask, in all three repos, since
+2026-09-07** (§11.-1). **Merging is hers, always, everywhere.**
+Two hooks in `.claude/hooks/` enforce the two rules that were
 read and broken anyway — `guard-main-branch.py` and `guard-destructive-git.py`
 — and **there are exactly two**, so do not assume a rule is mechanically
 enforced because this file states it firmly. `DECISIONS.md` §11 has why each
@@ -1916,14 +1923,46 @@ foreground. More than one agent means a worktree (§11.0.1).
 
 ### 11.-1 The branch workflow, and the second hook
 
-`CLAUDE.md`. Four steps, one of them Helen's: Claude works on a branch and
-pushes it; Helen opens the PR, reviews, merges — and nothing else; Claude
-fast-forwards `main` without checking it out (`git fetch origin main:main`,
-or plain `git fetch origin` from a worktree, where the first form refuses and
-that is not a problem to solve), deletes the merged branch, branches afresh.
-`guard-main-branch.py` refuses `git commit` and `git merge` when the target
-repo — read from a leading `cd` — is on `main`. Everything else on `main` is
-allowed.
+`CLAUDE.md`. Four steps, one of them Helen's: Claude works on a branch, then
+pushes it and opens the PR **with no ask**; **Helen reviews and merges — and
+nothing else**; Claude fast-forwards `main` without checking it out
+(`git fetch origin main:main`, or plain `git fetch origin` from a worktree,
+where the first form refuses and that is not a problem to solve), deletes the
+merged branch, branches afresh. `guard-main-branch.py` refuses `git commit`
+and `git merge` when the target repo — read from a leading `cd` — is on
+`main`. Everything else on `main` is allowed.
+
+**Step 1 widened TWICE on 2026-09-07, hours apart, and the second is the
+bigger one.** First: Claude pushed and Helen opened the PR; she handed the PR
+step over as manual overhead, folding two asks into one. Then she removed the
+ask altogether — *"push no longer needs my say so. I had this rule because
+multiple Claudes were trampling each other and it's easier to fix that
+locally, but I now get Claudes to run Claudes and everything is less
+chaotic!"*
+
+**The confirmation was never about the risk of pushing.** It was a lock
+against parallel sessions fighting over one checkout, and worktrees (§11.0.1)
+plus an orchestrating Claude solved that at the root — so the lock was cost
+with nothing left behind it. Read it that way before proposing a new ask
+anywhere: a confirmation step is worth keeping only while the thing it
+guards against is still possible.
+
+**What did NOT move, and asking again is the §11.2 mistake.** Merging is
+Helen's in all three repos. Committing or merging onto `main` is refused by
+the hook. Opening a PR is never authority to merge one. Adding
+`Pull requests: Read and write` to the PAT was hers to do, and "never broaden
+access" is unchanged — that rule is about a session asking for scope
+unprompted, not about recording a widening she has made. The token also
+cannot delete a ref, so a merged branch goes with `git push origin --delete`,
+never `gh pr close --delete-branch` (403).
+
+**A worktree has no `gh`** (§1), so the PR is opened through the REST API,
+`POST /repos/DeckOfPandas/helen-triages/pulls`, from a script in `tmp/`.
+Measured 201 on 2026-09-07.
+
+**Name the issues a PR will close before opening it**, the same rule that
+already governs a `Closes #N` trailer: a PR body is the last place the
+closure can still be reworded.
 
 ### 11.0 The destructive-git hook
 
@@ -1942,10 +1981,13 @@ edit you just made, and the answer is to re-edit the file.
 ### 11.0.0 Prefer LARGER pull requests — every merge is a deploy
 
 Helen: *"I have a soft limit on deploys per hour, so I prefer larger pull
-requests where that's practical."* Accumulate related work on one branch and
-push once; keep separate COMMITS per concern. Do not batch when batching is
-wrong — an urgent fix, genuinely unrelated changes, another agent's area — and
-say what is being held back.
+requests where that's practical."* Accumulate related work on one branch, push
+once and open ONE PR; keep separate COMMITS per concern. Do not batch when
+batching is wrong — an urgent fix, genuinely unrelated changes, another
+agent's area — and say what is being held back. **This became a rule Claude
+executes rather than one it respects on 2026-09-07** (§11.-1): the number of
+PRs is now a session's own choice, so "prefer larger" is an instruction and no
+longer an observation about how Helen works.
 
 ### 11.0.1 More than one agent shares this checkout — use a worktree
 

@@ -57,7 +57,9 @@ Things to know before your first tool call:
   (MANUAL §13.11); do not argue for one.
 - **Tag the issue in every commit** (`Fixes #N`, `Towards #N`); check
   `git branch --show-current` in its own tool call immediately before every
-  commit; never push this repo without my explicit say-so because multiple Claude might be working in parallel.
+  commit. **Push and open the PR yourself when the work is done — no ask.**
+  Name the issues the PR will close first. **Merging is mine**, in every repo,
+  always.
 - **If you learn something that is not written down — a ruling, a reversal, a
   trap — add it to `DECISIONS.md` under its section, dated, and fix the manual
   if the manual is now wrong.** If you touch `INGEST_ONE_*.md` or
@@ -65,5 +67,6 @@ Things to know before your first tool call:
 - My hours are mine. Never suggest stopping.
 
 When you finish, tell me: what changed and where, what you verified and how,
-which issues the commits close or touch, which branches need merging (mine to
-do, in this repo and the private ones), and anything you left undone and why.
+which issues the commits close or touch, which PRs are waiting on me to merge
+(in this repo and the private ones — opening them is yours, merging is mine),
+and anything you left undone and why.
