@@ -491,6 +491,20 @@ with it.
   twelve people. It is an integer and UNQUOTED — a quoted `"6"` is a string
   and the plugin will not read it. **Produced at ingest**; ask Helen rather
   than guess when the source does not support one.
+- **A RANGE TAKES ITS LOWER END** — Helen, 2026-09-07: *"when it's a range,
+  pick the lower number because under-catering is worse for me than
+  over-catering."* This sounds backwards and is not: the scale is portions
+  wanted OVER portions made, so a smaller base gives a bigger multiplier and
+  more food. It governs `serves: "4–6"` (the plugin already takes 4) and any
+  `serves_estimate:` written from a range.
+- **A COMPONENT RECIPE CANNOT ALWAYS BE ONE NUMBER, and the truth goes in a
+  note.** `chocolate-ganache` glazes an 8-inch cake, drips a tall one, fills
+  another, tops a Millionaire's shortbread, ices 12 cupcakes or makes 16
+  truffles; `caramel` is 5 servings as a sauce or a 16-cm tin as a filling.
+  Helen: *"I have no idea how to model this. Please add all this as a note on
+  the recipe and I will tidy up later."* So `serves_estimate:` takes the
+  commonest use and the note carries the rest, in her words. **Do not invent a
+  schema for this** without her — see `DECISIONS.md` §8.2.
 - `method` **xor** `method_groups`; both present means the second is dropped.
   Group names are bare nouns (`dressing`); method group names may be
   narrative phases; the page uppercases both.

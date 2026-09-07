@@ -4,7 +4,7 @@ tagline: "A genuine delight."
 source: "Adapted from Delia Smith's Book of Cakes"
 source_type: book
 makes: "one 7-inch round cake"
-serves_estimate: 10
+serves_estimate: 8
 prep_time: "10 mins"
 cook_time: "40 mins"
 main_ingredients: ["plain flour", "cornflour", "golden caster sugar", "eggs", "lemon", "groundnut oil"]

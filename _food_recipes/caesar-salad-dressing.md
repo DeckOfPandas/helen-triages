@@ -4,7 +4,7 @@ tagline: "Doesn't keep, but very easy and quick."
 source: "Stella"
 source_type: person
 makes: "about 300 ml"
-serves_estimate: 8
+serves_estimate: 6
 prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["mayonnaise", "parmesan", "lemon juice", "Worcestershire sauce", "anchovy paste", "garlic cloves"]

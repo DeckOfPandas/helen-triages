@@ -67,7 +67,13 @@ module HelenTriages
 
     # A `serves:` counts as stated when it OPENS with a number. "4", "4–6" and
     # "4, generously" all do; "Depends on appetite" does not, and the low end
-    # of a range is taken because over-buying is the safe direction for a
+    # of a range is taken because Helen ruled it so on 2026-09-07, and gave
+    # the reason: "when it's a range, pick the lower number because
+    # under-catering is worse for me than over-catering". The arithmetic runs
+    # the way that sounds backwards until you do it -- the scale is portions
+    # wanted OVER portions made, so the SMALLER base gives the BIGGER
+    # multiplier and more food. The same rule governs a `serves_estimate:`
+    # written from a range. Over-buying is the safe direction for a
     # shopping list. Helen's own rule stands untouched either way: a `serves:`
     # value may be prose in her voice and is never tidied into a number
     # (MANUAL 4).

@@ -4,7 +4,7 @@ tagline: "Needs no introduction. Stop the search."
 source: "Adapted from Green & Black's Chocolate Recipes"
 source_type: book
 makes: "one double-layer 8-inch cake"
-serves_estimate: 12
+serves_estimate: 8
 prep_time: "20 mins"
 cook_time: "20–25 mins"
 main_ingredients: ["cocoa powder", "dark chocolate", "salted butter", "eggs", "plain flour", "vanilla extract", "salt"]

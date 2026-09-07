@@ -52,6 +52,8 @@ method_short:
 notes:
   - label: "Chocolate:cream ratio"
     text: "1:1 for dark, 2:1 for milk, 3:1 for white (less cocoa solids → less dairy fat needed for the emulsion)."
+  - label: "How much this makes, in real uses"
+    text: "Helen's own list, and the reason a single serving count cannot hold it: to glaze an 8-inch single-layer cake; to drip a tall 6-inch or 8-inch cake; as a thick filling for one 8-inch cake; to top a 16-cm square Millionaire's shortbread; to ice 12 cupcakes; or as the base for 16 luxury truffles. `serves_estimate` is set to the 8-inch cake, which is three of those six."
 meta:
   rewritten: true
   awaiting_fix: false
