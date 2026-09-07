@@ -129,19 +129,19 @@ bottles:
     gbp: 30
     confidence: high
   # --- rum: Demerara -----------------------------------------------------
-  "El Dorado 3 year old rum":
+  "El Dorado 3 Year Old":
     size_ml: 700
     gbp: 22
     confidence: high
-  "El Dorado 5 year old rum":
+  "El Dorado 5 Year Old":
     size_ml: 700
     gbp: 27
     confidence: medium
-  "El Dorado 8 year old rum":
+  "El Dorado 8 Year Old":
     size_ml: 700
     gbp: 32
     confidence: medium
-  "El Dorado 12 year old rum":
+  "El Dorado 12 Year Old":
     size_ml: 700
     gbp: 42
     confidence: medium
@@ -170,7 +170,7 @@ bottles:
     size_ml: 700
     gbp: 27
     confidence: medium
-  "Planteray Barbados 5":
+  "Planteray 5 Year Old Barbados":
     size_ml: 700
     gbp: 27
     confidence: medium
@@ -760,7 +760,7 @@ default_bottles:
   # the time." Flor de Caña Extra Dry is the 1% and stays declared. The two are
   # within 50p of each other, so this is nearly a point price -- which is what
   # "99% of the time" ought to produce.
-  lightly aged and filtered rum: ["Havana Club 3 year old", "El Dorado 3 year old rum"]
+  lightly aged and filtered rum: ["Havana Club 3 year old", "El Dorado 3 Year Old"]
 
   # "Same for Reposado and Anejo actually" -- the other two thirds of the
   # tequila rule, unwritable on 2026-09-05 morning because three of the four
@@ -944,3 +944,7 @@ generics:
   lemon juice:        { from_fruit: lemon juice }
   orange juice:       { from_fruit: orange juice }
   grapefruit juice:   { from_fruit: grapefruit juice }
+  # Priced off the same fruit: a ruby grapefruit is not dearer than a white one
+  # and the yield is identical. The generic is separate because the FLAVOUR
+  # differs, not the cost.
+  ruby grapefruit juice: { from_fruit: grapefruit juice }

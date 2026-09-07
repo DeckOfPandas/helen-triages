@@ -195,6 +195,11 @@ juice_yields:
     fruit: grapefruit
     ml_min: 180
     ml_max: 240
+  # Same fruit and the same yield -- only the variety differs.
+  ruby grapefruit juice:
+    fruit: grapefruit
+    ml_min: 180
+    ml_max: 240
 
 # --- what the index's ingredient pickers do with all this --------------------
 # THREE NUMBERS, HERE RATHER THAN IN THE SCRIPT, and for the reason food's
@@ -1474,6 +1479,13 @@ juices:
   - "orange juice"
   - "pineapple juice"
   - "grapefruit juice"
+  # RUBY IS A SECOND GENERIC, NOT A NOTE -- Helen, 2026-09-07, settling how
+  # Pic-a-de-Crop Punch should record what its source states. Ruby grapefruit is
+  # sweeter and much less bitter than white, which is the rum-styles test: a
+  # difference earns a name when it changes what you are making. The cost, and
+  # she took it knowingly, is that the index filters and excludes the two
+  # separately -- "no grapefruit tonight" has to name both.
+  - "ruby grapefruit juice"
   - "cranberry juice"
   - "apple juice"
 
