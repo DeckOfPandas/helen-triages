@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "blockReadsOutsideWorkingDirectories": true,
     "allow": [
       "Bash(pytest *)",
       "Bash(python3 -m pytest *)",
