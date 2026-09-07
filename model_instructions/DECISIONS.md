@@ -1723,9 +1723,30 @@ unless stated.
   quoting it is the recorded harm behind not touching amounts.
 - **2026-09-05** — Pushing a branch in the private repos needs no ask.
 - **2026-09-06** — `CLAUDE.md`: `${GH_TOKEN:-unset}` prints the token (it did).
-- **2026-09-07 — Claude opens the PR now, and the ask is bundled with the
-  push.** Helen: *"I've added permissions on GitHub for you to open PRs.
-  Please do so now with this work, to test the setup!"* She widened the
+- **2026-09-07 (later the same session) — and then the ask went entirely.**
+  Helen: *"push no longer needs my say so. I had this rule because multiple
+  Claudes were trampling each other and it's easier to fix that locally, but I
+  now get Claudes to run Claudes and everything is less chaotic!"* So push and
+  PR are unattended in all three repos, and `helen-triages` stops being the
+  exception it had been since the workflow was written.
+  - **The reason matters more than the rule, and it is the transferable
+    part.** The confirmation was never a judgement that pushing is risky — it
+    was a lock against parallel sessions fighting over one checkout. Worktrees
+    and an orchestrating Claude removed the collision, so the lock was cost
+    with nothing behind it. A confirmation step is worth keeping only while
+    the thing it guards against is still possible; **this is the question to
+    ask of an ask, before proposing another one.**
+  - **Merging did not move, and this is the third time it has been written
+    down in one day** — the workflow, the token section, and here. That is not
+    redundancy: it is a rule whose whole job is to survive the day somebody
+    finds it inconvenient, on the day the rules around it all loosened.
+  - The bundling ruling below is what this superseded, hours old. Both are
+    kept, because the intermediate state is what makes the reason legible.
+- **2026-09-07 — Claude opens the PR, and the ask is bundled with the
+  push.** *(Superseded by the entry above the same day: there is no ask at
+  all now. Kept for the reasoning, which still holds.)* Helen: *"I've added
+  permissions on GitHub for you to open PRs. Please do so now with this work,
+  to test the setup!"* She widened the
   fine-grained PAT to `Pull requests: Read and write` herself and rewrote
   `CLAUDE.md` herself; step 1 of the agreed workflow is now one confirmed
   action covering both the push and the PR, because asking twice for one
