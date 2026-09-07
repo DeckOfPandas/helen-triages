@@ -799,6 +799,20 @@
     });
     syncPagination(pageInfo.totalPages, visible.length);
 
+    /* THE LINE BUDGET IS REDONE ON EVERY PASS, not just when chips moved --
+       #776. Pagination hides a card with `card.hidden` rather than removing it,
+       and a hidden element measures ZERO height, so card-line-budget.js's
+       load-time pass could only ever classify the cards on page one. Every
+       later page kept the three-row chip cap it should have lost, and nothing
+       said so because the card still looked plausible.
+
+       IT RUNS BEFORE markChipRows AND THAT ORDER IS LOAD-BEARING: the budget
+       sets the chips' max-height, which decides where the chip rows break,
+       which is what the row marks describe. Redone unconditionally because
+       `chipsMoved` is about chip CONTENT, and this is about which cards are
+       visible -- a plain page turn moves no chips and still needs both. */
+    if (HTF.cardLineBudget) HTF.cardLineBudget();
+
     /* THE ROW-START MARKS HAVE TO BE REDONE, because moving a chip changes
        which chip begins a row -- and `is-row-start` is what suppresses the
        separator dot that would otherwise hang off the left margin of a wrapped

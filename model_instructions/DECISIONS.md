@@ -2081,6 +2081,68 @@ verification. Dates are when the correction landed.
 
 ---
 
+- **2026-09-07, #783 — a pinned grid COLUMN does not reserve its cell, and a
+  DATA edit is what exposed it.** The footer is `1fr auto 1fr` with
+  `.site-footer-centre` carrying `grid-column: 2`. The comment beside it claimed
+  that pin "resolves it before auto-placement runs". **It does not**: a definite
+  column with an AUTO ROW is still auto-placed, so the two reference navs were
+  positioned first, in DOM order — nav 2 took row 1 column 2 and the hearts,
+  still needing column 2, dropped to ROW 2.
+  - **It could not have been seen until the day it broke.** A neighbouring
+    comment said so in as many words — *"UNVERIFIED BY EYE: nothing renders a
+    second column yet"* — and the rum reference page (#529) made cocktails
+    render one. So the fault arrived with a change to `_data/sites.yml`, no CSS
+    edit, on every page of both sites at once. That is exactly the failure the
+    pinning comment said it was preventing, which is why the sentence was
+    corrected rather than deleted.
+  - **The fix is to place all three explicitly**, so auto-placement has nothing
+    to decide. A guarantee that depends on DOM order is not one.
+  - **AND THE FIRST ATTEMPT WAS THE WRONG FIX, which is the part worth keeping.**
+    Reading "right-align with whole page" as the viewport, `max-width` came off
+    `.site-footer`. That sent the LEFT column to the viewport edge, left the
+    right one exactly where it was, and broke an alignment another comment in the
+    same file had deliberately built. Helen: *"I would like each to be under the
+    sides of the main page container."* **A CSS change that compiles correctly
+    can still be the wrong change** — the compiled output was verified and
+    reported as reassurance, which was true and useless. Her screenshot found in
+    one image what grepping the stylesheet could not.
+- **2026-09-07, #776 — the card's three stacks share one budget.** `$card-height`
+  is fixed, and the ingredient clamp (#552) and the chip cap were each raised to
+  three on their own, with nothing stopping all three being spent at once. A
+  wrapped name now caps both; three rendered ingredient lines cap the chips.
+  - **Only half of it needed a script.** `.drink-card-name--wrap` already exists
+    from card-name-fit.js and is a SIBLING of both, so `~` reaches them. The
+    other half does: CSS can ask how many lines an element is ALLOWED, never how
+    many it rendered, and most cards do not reach the clamp.
+  - **A hidden card measures zero.** The index paginates with `card.hidden`
+    rather than by removing cards, so the load-time pass classified page one and
+    nothing else; every later page kept the cap it should have lost.
+    cocktail-index.js re-runs it on each pass, BEFORE `markChipRows()`, because
+    the budget decides the chips' max-height and the row marks describe where
+    they broke. **The same trap applies to any future card measurement.**
+- **2026-09-07, #823 — grow the TARGET, not the control.** The card's shortlist
+  mark was a ~22x25px hit area and padding could not fix it: the title's
+  reservation is computed from the button's own metrics, so every millimetre of
+  padding is a millimetre off the tape. An absolutely-positioned `::after` takes
+  it to ~44x42px without entering layout, using space that was already empty —
+  the card's own padding above and right, and the gap the reservation already
+  keeps clear of the tape on the left. It claims the top-right corner from the
+  card link, which is the trade: that corner is the worst place to aim for "open
+  this" and the best place to aim for the mark.
+- **2026-09-07, #777 — a hover says WHICH question, not just "touchable".** The
+  filter chips hovered to hot magenta in every section; the section colours
+  already mean the thing hover was saying, and `.is-on` has worn them since #548.
+  Hover and selected now agree on hue and differ in how they wear it. Done as a
+  custom property re-pointed on the section wrapper (#636's proven shape), so a
+  fourth section is one line.
+- **2026-09-07, #704 / #651 — two small ones with a rule in them.** Three glass
+  options read as a comma list with a final "or" (`old fashioned, coupe or nick
+  and nora`), no Oxford comma, because "coupe, or nick and nora" would suggest
+  the last option is a pair. And `$color-electric-absinthe-wash` is KEPT with a
+  comment rather than deleted: it is one of five `-wash` values derived as a set,
+  and deleting one member makes the set look arbitrary. What #651 forbade was it
+  sitting there unread AND unexplained.
+
 ## §14 Reference pages
 
 - **2026-08-11/12** — Built at Helen's request from 15 draft tables in

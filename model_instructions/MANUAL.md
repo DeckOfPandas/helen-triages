@@ -1433,9 +1433,28 @@ is Helen's**: base spirits, then lower-proof, then citrus and juice, then
 syrups, then everything else, then bitters; largest volume first inside a
 tier; the recipe's own order breaks ties. **The sections of `ingredients.yml`
 are the classifier**; a generic in no section warns at build and fails a test.
-Tier 7 (floats) is not built and could not be — nothing records a float
-(#754); a `card_order:` per-drink override exists, is tested, and has no
-users on purpose.
+**Tier 7 is built** (#754, 2026-09-07): `as:` on an ingredient records how a
+pour is USED — `float`, `rinse` or `muddle`, a closed vocabulary in
+`ingredient_as`, guarded the way `rum_characters` is. `float` and `rinse` both
+sort last, Helen's ruling that a rinse joins the floats; **`muddle` sorts
+nothing**. #567's muddle clause was built, looked at and dropped — grouping
+muddled ingredients first put Ti' Punch's rhum last on a rhum drink, because a
+muddle covers both expressing a lime and dissolving a sugar. The value is still
+recorded because it is true; the plugin header has the finding.
+
+**`card_order:` has its first user**, Port Authority's blackberries — they are
+`fruit_and_herbs`, so the default rule sorted them fifth on a drink they are
+the point of. `0` is legal and means "before tier 1"; test it with `is not
+None`, because Ruby's `||` treats 0 as truthy and a Python mirror of this sort
+did not.
+
+**The card's three stacks share one budget** (#776): a wrapped name caps the
+ingredients and the chips at two, and three rendered ingredient lines cap the
+chips. Half of it is CSS — `.drink-card-name--wrap` is a sibling — and half is
+`card-line-budget.js`, because CSS can ask how many lines are ALLOWED and never
+how many rendered. **A hidden card measures zero**, so anything measuring cards
+must re-run when pagination changes what is visible; `cocktail-index.js` does,
+ahead of `markChipRows()`.
 
 ### 9.10a `serve` — where the ice lives
 
