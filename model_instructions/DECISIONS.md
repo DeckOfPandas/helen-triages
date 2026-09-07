@@ -499,6 +499,12 @@ unless stated.
   expanded by guess, the guess was written into an issue AND a test comment as
   fact, and it survived there because both then cited each other. Ask what a
   transcribed abbreviation means; do not infer it from the letters.
+- **2026-09-07, #800** — **The label is DROPPED, not expanded.** Each of the
+  eight notes becomes a plain sentence, capital to full stop, like every other
+  note; `source:` already carries the attribution on six of them. This also
+  disposes of the two the capitalisation question could never have covered —
+  `gf tips:` and `gf tip on stock cubes:` — because with the rubric gone there
+  is no varying prefix to have a house form for.
 
 ## §6 `main_ingredients`
 
@@ -1100,6 +1106,33 @@ unless stated.
   split before accepting a lossy rename.
 
 ### §9.3.2 The bottle dictionary
+
+- **2026-09-07, #591** — **An agricole's origin goes on the BOTTLE, as
+  `origin:`.** Helen's choice from three shapes: origin-qualified generics
+  (`Martinique agricole blanc`), `origin` on the bottle, or `origin` on the
+  ingredient. The fact that framed it: **origin is already inside five of the
+  fourteen `rum_styles`** — `aged Demerara rum`, the three Jamaicans, and
+  `clairin`, which is Haiti-specific by definition — so agricole was the one
+  cane family that stopped halfway. And the house owns **eight bottles under
+  `rhum agricole blanc`**: five Martinique, three Guadeloupe (the Damoiseaus),
+  with Barbancourt sitting in `vieux` behind a comment saying it is Haitian
+  because no field could.
+
+  **The accepted cost, stated so it is not rediscovered as a bug**: a recipe
+  cannot REQUIRE an origin. `martinique-swizzle`, `island-of-martinique` and
+  `lisle-martinique` are all named after a place none of them can name in
+  `generic:`; what makes them Martinican is their `suggestion:` list, and the
+  bottle dictionary is what says those bottles are Martinique.
+
+  **What it settles for free**: `coney-park-swizzle` and `port-au-prince` stop
+  being mis-typed. Both pour Barbancourt as `rhum agricole vieux` behind a `QQ`
+  admitting the guess — and under this ruling that typing is *correct*, because
+  agricole is what the bottle is by production and where it is from lives
+  elsewhere. Two notes to delete rather than answer.
+
+  **Two mechanisms for origin now coexist deliberately**: in the generic where
+  it changes the CATEGORY (Demerara, Jamaican), on the bottle where it changes
+  the FLAVOUR (agricole). The five existing styles are not being unpicked.
 
 - **2026-08-27, #529** — Added, rum-only. Planteray canonical, Plantation an
   alias.
