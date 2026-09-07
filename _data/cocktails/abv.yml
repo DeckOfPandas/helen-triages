@@ -87,11 +87,10 @@
 #                           old spelling as an alias and nothing can fail to
 #                           resolve (Helen's La Favorite rule, 2026-09-06).
 #   `Amaro Ciociano` -> `Amaro Ciociaro`
-#                           IN PROGRESS. A GENERIC, and generics have no alias
-#                           mechanism, so both spellings carry a row here until
-#                           to-promote/brooklyn.md is retyped in the private
-#                           repo -- the two repos cannot land in one commit.
-#                           Delete the `Ciociano` row when it has.
+#                           DONE 2026-09-07. A GENERIC, and generics have no
+#                           alias mechanism, so it went through one merge with
+#                           BOTH spellings declared -- the drink lives in the
+#                           other repo and the two cannot land in one commit.
 #
 # NO WEB SOURCE WAS USED FOR THE `high` ROWS, and that is a difference from
 # costs.yml worth stating plainly. These are from knowledge, not from a search
@@ -361,10 +360,7 @@ generics:
   Grand Marnier:      { abv: 40,   confidence: high }
   Amaro Nonino:       { abv: 35,   confidence: high }
   # 30 CONFIRMED for Paolucci Amaro Ciociaro, bottled at 30% since 1873.
-  # BOTH SPELLINGS CARRY A ROW while #701's rename crosses two repos --
-  # see the note in ingredients.yml. `Ciociano` comes out with the others.
   Amaro Ciociaro:     { abv: 30,   confidence: high }
-  Amaro Ciociano:     { abv: 30,   confidence: high }
 
   # --- genuinely a category, no bottle declared yet ----------------------
   Plymouth:               { abv: 41.2, confidence: high }

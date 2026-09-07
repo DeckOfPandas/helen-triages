@@ -807,10 +807,7 @@ generics:
   # HELEN'S OWN PRICE, 2026-09-07: "Amaro Ciociano is GBP 36" -- so 51.43 a
   # litre, up from a guessed 42.86, and `low` becomes `high`. It was one of
   # the few `low` rows left in the file.
-  # BOTH SPELLINGS CARRY A ROW while #701's rename crosses two repos; see
-  # ingredients.yml. `Ciociano` comes out with the others.
   Amaro Ciociaro:     { gbp_per_litre_min: 51.43, gbp_per_litre_max: 51.43, basis: "GBP 36 / 70cl", confidence: high }
-  Amaro Ciociano:     { gbp_per_litre_min: 51.43, gbp_per_litre_max: 51.43, basis: "GBP 36 / 70cl", confidence: high }
   liqueur de sapin:   { gbp_per_litre_min: 50.00, gbp_per_litre_max: 50.00, basis: "GBP 35 / 70cl", confidence: low }
   Swedish flaggpunsch: { gbp_per_litre_min: 40.00, gbp_per_litre_max: 40.00, basis: "GBP 28 / 70cl", confidence: low }
   Plymouth:           { gbp_per_litre_min: 37.14, gbp_per_litre_max: 37.14, basis: "GBP 26 / 70cl", confidence: medium }
