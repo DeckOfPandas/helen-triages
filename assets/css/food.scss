@@ -58,6 +58,11 @@
 // own %shortlist-mark and @extends nothing from anywhere else, so this is the
 // only ordering constraint it has.
 @import "food/shortlist";
+// The shopping list (#801), after shortlist: it is the shortlist's own panel
+// and is read as part of that feature, and it defines its own
+// %food-number-input rather than extending anything above, so this is the only
+// ordering constraint it has either.
+@import "food/shopping-list";
 // The about page, last: it sits on top of .recipe-body-content's longform
 // styling (that page uses the same wrapper) and overrides the parts built for a
 // recipe's Troubleshooting section, so it has to be imported after it.

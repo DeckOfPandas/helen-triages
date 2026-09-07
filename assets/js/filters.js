@@ -1033,6 +1033,12 @@ function renderResultsPool() {
     // class syncFilterButtons() has just painted.
     syncFilterButtons();
     syncShortlistOnly();
+    /* #801. Unconditional, exactly like syncShortlistOnly() beside it: the
+       list has to disappear when the filter goes off as surely as it has to
+       appear when it comes on, and a recipe un-shortlisted while the filter is
+       on has to leave the totals. renderShoppingList() returns immediately
+       when the filter is off, so a browse pays one property read. */
+    renderShoppingList();
     updateInlineLabels();
     updateIngredientClear();
     renderExcludeActive(excludedCount);
@@ -1212,6 +1218,207 @@ function renderResultsPool() {
     };
     clearButtons.forEach(function (btn) {
       btn.addEventListener('click', clearAllFilters);
+    });
+  }
+
+  /* --- the shopping list -----------------------------------------------------
+     GitHub issue #801. The arithmetic is assets/js/food-shopping-list.js; this
+     gathers the entries and paints the answer. Same three-way split
+     filter-state.js / filters.js already runs on, and the same one
+     cocktail-index.js runs on for the drinks version of this feature (#546).
+
+     SHOWN ONLY WHILE THE SHORTLISTED FILTER IS ON, which is what makes it "the
+     bottom of my shortlist listing" rather than a running total under a browse.
+
+     IT READS THE STORE, NOT THE VISIBLE ROWS, and the difference matters the
+     moment a second filter is on: shortlist three recipes, then narrow to
+     `quick`, and the rows on screen are a subset of the shortlist. The list you
+     shop from is the one you shortlisted. */
+  var shoppingEl = document.getElementById('shopping-list');
+  var shoppingRecipes = shoppingEl && shoppingEl.querySelector('.shopping-list-recipes');
+  var shoppingAisles = shoppingEl && shoppingEl.querySelector('.shopping-list-aisles');
+  var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
+  var setAllInput = document.getElementById('shopping-list-setall');
+
+  /* WHAT EVERY RECIPE IS MADE OF AND HOW MANY IT FEEDS, emitted by index.html
+     from _plugins/food_shopping.rb. Absent or unreadable, the shopping list
+     renders nothing and every other filter on this page still works, which is
+     the same standing #ingredient-vocabulary has above. */
+  var RECIPES = (function () {
+    var node = document.getElementById('recipe-ingredients');
+    if (!node) return {};
+    try {
+      return JSON.parse(node.textContent) || {};
+    } catch (e) {
+      console.warn('filters.js: could not parse #recipe-ingredients — ' + e.message);
+      return {};
+    }
+  })();
+
+  var AISLES = (function () {
+    var node = document.getElementById('recipe-aisles');
+    if (!node) return [];
+    try {
+      var parsed = JSON.parse(node.textContent);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.warn('filters.js: could not parse #recipe-aisles — ' + e.message);
+      return [];
+    }
+  })();
+
+  /* The row's own title, read off the DOM once. `dataset.titleText` is the
+     UNMARKED title stashed at load, so a recipe found by a name search still
+     lists under its real name rather than one carrying <mark> tags -- the same
+     care cocktail-index.js takes with card-name highlighting. */
+  var titleByUrl = (function () {
+    var map = {};
+    items.forEach(function (li) {
+      var link = li.querySelector('.recipe-title-link');
+      if (li.dataset.url && link) {
+        map[li.dataset.url] = link.dataset.titleText || link.textContent;
+      }
+    });
+    return map;
+  })();
+
+  /* THE RECIPES, IN THE ORDER THEY WERE SHORTLISTED -- the store keeps
+     insertion order, which is the order Helen marked them in. Recipes no
+     longer on the page are dropped, the same silence a renamed recipe already
+     gets everywhere else in this feature. */
+  function shortlistedRecipes() {
+    return HTF.shortlist.list().filter(function (url) {
+      return Object.prototype.hasOwnProperty.call(RECIPES, url);
+    });
+  }
+
+  /* HOW MANY PORTIONS ARE WANTED. The store answers when she has typed a
+     number; otherwise it is however many the recipe makes, so an untouched
+     list shops for every recipe exactly as written. A recipe with no resolved
+     portion count at all falls back to 1, which makes the scale x1 below and
+     leaves the amounts as the recipe wrote them. */
+  function portionsFor(url) {
+    var stored = HTF.shortlist.portions(url);
+    if (stored) return stored;
+    var recipe = RECIPES[url];
+    return (recipe && recipe.p) || 1;
+  }
+
+  /* THE SCALE IS PORTIONS WANTED OVER PORTIONS MADE, and the guard is the
+     reason `p` may be null: a recipe nobody has given a figure is scaled x1
+     rather than by a division nobody can do. */
+  function scaleFor(url) {
+    var recipe = RECIPES[url];
+    var base = recipe && recipe.p;
+    if (!base || base <= 0) return 1;
+    return portionsFor(url) / base;
+  }
+
+  function yieldText(url) {
+    var recipe = RECIPES[url];
+    if (!recipe) return '';
+    /* A GUESS IS MARKED AND A STATED SERVING IS QUOTED. `~12 portions` is this
+       repo's arithmetic (see _data/food/servings.yml); `serves 4–6` is Helen's
+       own words, straight off the recipe and never tidied into a number. */
+    if (recipe.e) return recipe.p ? '~' + recipe.p + ' portions' : '';
+    return recipe.y ? 'serves ' + recipe.y : '';
+  }
+
+  function renderShoppingList() {
+    if (!shoppingEl) return;
+    shoppingEl.hidden = !state.shortlisted;
+    if (!state.shortlisted) return;
+
+    var urls = shortlistedRecipes();
+    if (shoppingEmpty) shoppingEmpty.hidden = urls.length > 0;
+
+    /* THE PER-RECIPE COUNTS. Rebuilt whole, like the totals below -- but NOT
+       while one of its own inputs has focus, because replacing the node under
+       a typing cursor loses the caret and the keystroke. `renderTotals()` is
+       called on its own from the input handler for exactly that reason. */
+    if (shoppingRecipes) {
+      shoppingRecipes.innerHTML = urls.map(function (url) {
+        var title = titleByUrl[url] || url;
+        var yielded = yieldText(url);
+        return '<li>' +
+          '<input type="number" class="shopping-list-portions" min="1" max="99" step="1" ' +
+          'inputmode="numeric" value="' + portionsFor(url) + '" ' +
+          'data-url="' + HTF.escapeHtml(url) + '" ' +
+          'aria-label="portions of ' + HTF.escapeHtml(title) + '">' +
+          '<span>' + HTF.escapeHtml(title) +
+          /* The yield rides INSIDE the title span, not beside it, so it wraps
+             with the name on a narrow screen instead of being pushed onto a
+             line of its own away from the recipe it belongs to. Same shape the
+             drinks list gives its price. */
+          (yielded
+            ? '<span class="shopping-list-yield">' + HTF.escapeHtml(yielded) + '</span>'
+            : '') +
+          '</span>' +
+          '</li>';
+      }).join('');
+    }
+
+    renderTotals(urls);
+  }
+
+  function renderTotals(urls) {
+    if (!shoppingAisles) return;
+
+    var entries = [];
+    (urls || shortlistedRecipes()).forEach(function (url) {
+      var scale = scaleFor(url);
+      ((RECIPES[url] || {}).i || []).forEach(function (ing) {
+        entries.push({ amount: ing.a, name: ing.n, aisle: ing.s, scale: scale });
+      });
+    });
+
+    var aisles = HTF.foodShoppingList.build(entries, { aisles: AISLES });
+
+    /* REBUILT WHOLE, not patched -- a couple of dozen rows that change only
+       when the shortlist or a number does, where a diffing render would be
+       complexity bought for nothing. */
+    shoppingAisles.innerHTML = aisles.map(function (aisle) {
+      return '<section class="shopping-list-aisle">' +
+        '<h3 class="shopping-list-aisle-name">' + HTF.escapeHtml(aisle.label) + '</h3>' +
+        '<ul class="shopping-list-items">' +
+        aisle.items.map(function (row) {
+          return '<li>' +
+            '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
+            '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + '</span>' +
+            '</li>';
+        }).join('') +
+        '</ul></section>';
+    }).join('');
+  }
+
+  if (shoppingRecipes) {
+    // Delegated, because the inputs are replaced on every shortlist change.
+    shoppingRecipes.addEventListener('input', function (ev) {
+      var input = ev.target;
+      if (!input.classList || !input.classList.contains('shopping-list-portions')) return;
+      HTF.shortlist.setPortions(input.dataset.url, input.value);
+      // Totals only. Re-rendering the recipe list would replace the very input
+      // being typed into and take the caret with it.
+      renderTotals();
+    });
+  }
+
+  if (setAllInput) {
+    /* SET ALL: it writes every recipe's own number and then has no further
+       opinion. One figure per recipe, one place it lives.
+
+       IT SHIPS EMPTY, unlike the drinks list's `value="1"`, and that is the
+       one place the two controls differ. There is no number here that means
+       "as written" for every recipe at once -- each starts at its own yield --
+       so a box showing `1` would be claiming a state the list is not in. Empty
+       says nothing until she says something. */
+    setAllInput.addEventListener('input', function () {
+      var n = parseInt(setAllInput.value, 10);
+      if (!isFinite(n) || n < 1) return;
+      shortlistedRecipes().forEach(function (url) {
+        HTF.shortlist.setPortions(url, n);
+      });
+      renderShoppingList();
     });
   }
 

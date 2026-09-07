@@ -21,6 +21,8 @@ still runs on a machine without the Ruby toolchain.
 """
 from __future__ import annotations
 
+import html as html_module
+import json
 import os
 import pathlib
 import re
@@ -1864,3 +1866,192 @@ def test_the_decoration_resolver_sees_a_cancelling_rule():
 
     # `text-decoration-color` is not the mark going away.
     assert DECORATION.search("text-decoration-color: red") is None
+
+
+# =============================================================================
+# THE SHOPPING LIST'S BUILT DATA — GitHub issue #801
+# =============================================================================
+# THIS IS THE ONLY PLACE THE AISLE RULE CAN BE CHECKED. The matcher is Ruby
+# (_plugins/food_shopping.rb) and runs inside Jekyll, so nothing that reads
+# YAML can exercise it; tests/test_food_shopping.py says so where it checks the
+# data files instead. A Python reimplementation to make it unit-testable would
+# be a second copy of the rule that passes while the site is wrong -- MANUAL
+# 11.2's whole complaint. So these read what the build actually emitted.
+#
+# It caught a real one on the day it was written: `garlic cloves` was landing
+# on the spice rack, because `garlic` and `cloves` are the same length and the
+# tie went the wrong way.
+
+def _shopping_blob(site, page="index.html"):
+    """The #recipe-ingredients JSON off the built food index."""
+    html = (site / "food" / page).read_text(encoding="utf-8")
+    match = re.search(
+        r'<script type="application/json" id="recipe-ingredients">(.*?)</script>',
+        html, re.S)
+    assert match, (
+        "the built food index has no #recipe-ingredients block, so the shopping "
+        "list has no data and silently shows nothing."
+    )
+    return json.loads(match.group(1))
+
+
+def test_every_shortlistable_recipe_carries_its_ingredients_and_a_portion_count(site):
+    """The blob covers every row on the page, and every entry can be scaled.
+
+    tests/test_food_shopping.py proves every recipe RESOLVES to a number from
+    the two data files. This proves the number reached the page -- which is a
+    different claim, and the one that fails if the plugin stops running, is
+    renamed, or quietly returns early.
+    """
+    blob = _shopping_blob(site)
+    assert len(blob) > 80, (
+        f"only {len(blob)} recipes in the shopping-list blob; the collection has "
+        "86 plus the magic bag. The plugin or the row gate has changed."
+    )
+
+    unscalable = [url for url, r in blob.items() if not r.get("p")]
+    assert not unscalable, (
+        "these recipes reached the page with no portion count, so the scaler "
+        f"cannot divide by anything: {unscalable}"
+    )
+
+    empty = [url for url, r in blob.items() if not r.get("i")]
+    assert not empty, (
+        f"these recipes contribute nothing to a shopping list: {empty}"
+    )
+
+
+def test_the_production_shopping_blob_holds_exactly_what_has_a_row(prod_site):
+    """One row, one entry, in the build that actually ships.
+
+    THE DIRECTION THAT MATTERS IS AN EXTRA ENTRY. The blob repeats the row
+    gate rather than relaxing it, and it has to: a recipe with no row cannot be
+    shortlisted from this page, so an entry for one is dead weight at best --
+    and at worst it is a draft's or a held-back recipe's ingredient list
+    published on the live index, in a build no local page can reproduce. That
+    is #235's exact shape (a link built from `.url` for a document Jekyll never
+    writes), one feature along, and only the production build can see it.
+
+    The other direction is the ordinary bug: a row whose recipe contributes
+    nothing, which is a shortlist entry the shopping list silently ignores.
+    """
+    blob = _shopping_blob(prod_site)
+    html = (prod_site / "food" / "index.html").read_text(encoding="utf-8")
+    rows = set(re.findall(r'<li data-url="([^"]*)"', html))
+
+    assert rows, "no recipe rows on the built production index at all."
+    assert set(blob) - rows == set(), (
+        "the shopping-list blob carries recipes that have no row on the "
+        f"production index: {sorted(set(blob) - rows)}. The row gate and the "
+        "blob's gate have drifted apart."
+    )
+    assert rows - set(blob) == set(), (
+        "these rows can be shortlisted but contribute nothing to a shopping "
+        f"list: {sorted(rows - set(blob))}"
+    )
+
+
+def test_the_shopping_list_assigns_an_aisle_to_almost_everything(site):
+    """`other` stays small, and what is in it is what is meant to be.
+
+    An unmatched ingredient is not a bug -- it is a heading with things under
+    it, and a miss costs a glance rather than an item. But `other` growing is
+    the signal that _data/food/aisles.yml needs a keyword, and nothing else
+    would ever say so. The ratchet is deliberately loose: it is here to catch a
+    keyword table that has stopped being loaded at all, not to police one word.
+
+    THE CROSS-RECIPE LINKS ARE SENT HERE ON PURPOSE and are counted. Five items
+    across the collection name another recipe instead of a food, and a pointer
+    to a whole other ingredient list has no shelf in a shop.
+    """
+    blob = _shopping_blob(site)
+    declared = {a["key"] for a in yaml.safe_load(
+        (ROOT / "_data" / "food" / "aisles.yml").read_text(encoding="utf-8"))["order"]}
+
+    unknown, other = [], []
+    total = 0
+    for url, recipe in blob.items():
+        for ing in recipe["i"]:
+            total += 1
+            if ing["s"] not in declared:
+                unknown.append(f"{ing['n']!r} -> {ing['s']!r} ({url})")
+            elif ing["s"] == "other":
+                other.append(f"{ing['n']!r} ({url})")
+
+    assert not unknown, (
+        "ingredients were stamped with an aisle that _data/food/aisles.yml does "
+        "not declare: " + "; ".join(unknown)
+    )
+    assert total > 700, f"only {total} ingredients emitted; the collection has 778."
+    assert len(other) <= 20, (
+        f"{len(other)} of {total} ingredients have no aisle, which is more than "
+        "this has ever needed. Add keywords to _data/food/aisles.yml:\n  "
+        + "\n  ".join(sorted(other))
+    )
+
+
+def test_water_is_never_on_a_shopping_list(site):
+    """`never` is matched on the whole name, and it has to actually fire.
+
+    The cocktails list refuses water through `not_on_cards`; this is food's
+    half of the same idea. The second assertion is the interesting one: the
+    rule is whole-name, so an ingredient that merely CONTAINS the word is still
+    something you buy.
+    """
+    blob = _shopping_blob(site)
+    names = [ing["n"].strip().lower()
+             for recipe in blob.values() for ing in recipe["i"]]
+
+    assert "water" not in names and "cold water" not in names, (
+        "plain water is on the shopping list. _data/food/aisles.yml's `never` "
+        "list is not being applied."
+    )
+    assert any("water" in name for name in names), (
+        "no ingredient mentioning water survived at all, so `never` is matching "
+        "as a keyword rather than on the whole name -- which would also drop "
+        "'water mixed with 3 tsp cornstarch', a real ingredient."
+    )
+
+
+def test_the_shopping_list_and_the_ingredient_index_agree_on_a_name(site):
+    """One truncation rule, two implementations, checked against each other.
+
+    food/index.html derives `data-all-ingredients` in Liquid; the shopping list
+    derives its names in Ruby. Both take an item up to its first comma or open
+    bracket, and they have to agree or two features disagree about what an
+    ingredient is -- the exclusion filter would offer you a word the shopping
+    list never uses.
+
+    THE ONE LEGITIMATE DIFFERENCE IS A CROSS-RECIPE LINK. Issue #273 drops
+    `[grandma's lemon curd](../…)` from the exclusion index, because it is not
+    a single food you can ask to avoid; the shopping list keeps it, because you
+    do have to have made the curd. Those are excluded here by the aisle the
+    plugin forces them into, which is the same fact stated once.
+    """
+    blob = _shopping_blob(site)
+    html = (site / "food" / "index.html").read_text(encoding="utf-8")
+
+    rows = dict(re.findall(
+        r'<li data-url="([^"]*)"[^>]*data-all-ingredients="([^"]*)"', html))
+    assert len(rows) > 80, f"only {len(rows)} rows found on the built index."
+
+    problems = []
+    for url, recipe in blob.items():
+        indexed = rows.get(url)
+        if indexed is None:
+            problems.append(f"{url} is in the shopping blob but has no row")
+            continue
+        # The attribute is `|`-delimited and self-delimiting at both ends.
+        vocabulary = {w for w in html_module.unescape(indexed).split("|") if w}
+        for ing in recipe["i"]:
+            if ing["s"] == "other":
+                continue    # a cross-recipe link, or genuinely unclassified
+            if ing["n"].lower() not in vocabulary:
+                problems.append(
+                    f"{url}: the shopping list calls it {ing['n']!r}, which is "
+                    f"not in that row's own ingredient vocabulary")
+
+    assert not problems, (
+        "the shopping list and the exclusion index disagree about an "
+        "ingredient's name:\n  " + "\n  ".join(problems[:20])
+    )

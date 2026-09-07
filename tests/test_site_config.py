@@ -216,6 +216,85 @@ def test_the_scaler_scripts_load_in_dependency_order():
     )
 
 
+def test_the_food_shopping_scripts_load_in_dependency_order():
+    """food-shopping-list.js reads HTF.shoppingList, and filters.js reads both.
+
+    The same trap as the drink scaler's three above, on the other index. #801's
+    shopping list is a chain: the amount parser (shopping-list.js, shared with
+    the drinks), the food arithmetic (food-shopping-list.js), and the wiring
+    (filters.js). food-shopping-list.js pulls six helpers off HTF.shoppingList
+    at module scope, so loading it first throws while it parses -- and that
+    throw kills filters.js's whole startup with it, which is a blank index and
+    not just a missing panel. The failure filter-state.js's own test describes.
+    """
+    html = read("food", "index.html")
+    order = ["shopping-list.js", "food-shopping-list.js", "filters.js"]
+    found = {}
+    for name in order:
+        # `shopping-list\.js` would also match `food-shopping-list.js`; the
+        # slash pins the pattern to the start of a filename.
+        match = re.search(r"<script src=[^>]*/" + re.escape(name), html)
+        assert match, f"food/index.html no longer loads assets/js/{name}."
+        found[name] = match.start()
+
+    assert (found["shopping-list.js"] < found["food-shopping-list.js"]
+            < found["filters.js"]), (
+        "the shopping list's three scripts are out of order in food/index.html. "
+        "shopping-list.js defines HTF.shoppingList, which food-shopping-list.js "
+        "reads as it parses; that defines HTF.foodShoppingList, which filters.js "
+        "calls. Any other order throws once in the console and leaves the whole "
+        "index unfiltered."
+    )
+
+
+def test_the_shopping_list_reads_the_aisles_from_the_data_file():
+    """The aisle headings are emitted from _data/food/aisles.yml, not written out.
+
+    Same contract `#ingredient-vocabulary` has with ingredient_words.yml: adding
+    an aisle is a YAML edit and must never need this template touched. The
+    keyword table deliberately does NOT go to the page -- the matching happens
+    in _plugins/food_shopping.rb -- so this checks the one half that does.
+    """
+    html = read("food", "index.html")
+    assert 'id="recipe-aisles"' in html, (
+        "food/index.html no longer emits the #recipe-aisles block, so the "
+        "shopping list has no headings and no order to put them in."
+    )
+    assert "site.data.food.aisles.order" in html, (
+        "the #recipe-aisles block no longer reads _data/food/aisles.yml's own "
+        "`order`. A hand-written copy in the template is a second list to keep "
+        "in step, which is the thing this contract exists to prevent."
+    )
+    # Comments stripped first: the template's own prose explains what it is
+    # NOT emitting, and an unstripped search finds the explanation.
+    assert "aisles.keywords" not in _strip_comments(html, ".html"), (
+        "food/index.html looks like it is emitting the aisle KEYWORD table. "
+        "That belongs at build time in _plugins/food_shopping.rb -- one "
+        "implementation of the matching rule, and 400 keywords off the page."
+    )
+
+
+def test_filters_js_holds_no_aisle_vocabulary():
+    """No aisle name is written into the JavaScript.
+
+    The same guard test_filters_js_holds_no_ingredient_vocabulary makes about
+    ingredient words, for the same reason: the moment a heading is spelled in
+    two places, renaming one renames half the page. filters.js reads the list
+    off the page and passes it straight through.
+    """
+    aisles = yaml.safe_load((DATA / "aisles.yml").read_text(encoding="utf-8"))
+    source = _strip_comments(
+        (ROOT / "assets" / "js" / "filters.js").read_text(encoding="utf-8"), ".js")
+
+    leaked = [a["label"] for a in aisles["order"]
+              if f'"{a["label"]}"' in source or f"'{a['label']}'" in source]
+    assert not leaked, (
+        f"aisle labels are written into assets/js/filters.js: {leaked}. They "
+        "belong to _data/food/aisles.yml, which food/index.html emits as "
+        "#recipe-aisles for the script to read."
+    )
+
+
 def test_cook_timer_js_holds_no_schedule_arithmetic():
     """The maths lives in cook-schedule.js, where tests/js can reach it.
 
