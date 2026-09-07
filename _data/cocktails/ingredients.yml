@@ -1229,6 +1229,19 @@ amari:
   - "Cynar"
   - "fernet"
   - "Amaro Nonino"
+  # BOTH SPELLINGS ARE DECLARED, DELIBERATELY AND BRIEFLY -- #701, 2026-09-07.
+  # The product is Amaro CIOCIARO (Paolucci, Lazio); `Ciociano` was always a
+  # misspelling. A GENERIC HAS NO ALIAS MECHANISM, unlike a bottle, so a
+  # one-shot rename would leave `to-promote/brooklyn.md` naming an undeclared
+  # generic until the private repo merged too -- and the two repos cannot
+  # land in one commit. Declaring both is what keeps the suite honest across
+  # that gap. Helen chose this over a red window, 2026-09-07.
+  #
+  # `Amaro Ciociano` COMES OUT once the drink is retyped. If you are reading
+  # this and brooklyn says `Amaro Ciociaro`, delete the old line -- here, in
+  # the family map below, in taxonomy.yml (three lists), abv.yml and
+  # costs.yml.
+  - "Amaro Ciociaro"
   - "Amaro Ciociano"
 
 # FIVE AROMATISED-WINE GENERICS, AND "AROMATISED WINE" IS NOT ONE OF THEM.
@@ -1559,6 +1572,7 @@ family_of:
   "Cynar": amaro
   "fernet": amaro
   "Amaro Nonino": amaro
+  "Amaro Ciociaro": amaro
   "Amaro Ciociano": amaro
   "sweet vermouth": fortified
   "dry vermouth": fortified
