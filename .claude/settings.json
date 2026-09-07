@@ -44,6 +44,12 @@
             "if": "Bash(git *)",
             "timeout": 20,
             "statusMessage": "Checking branch is not main"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-sed.py\"",
+            "timeout": 20,
+            "statusMessage": "Checking for sed"
           }
         ]
       }
