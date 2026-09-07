@@ -26,6 +26,8 @@ docker run -it --rm \
   -v helen-triages-claude-config:/home/helen/.claude \
   -v helen-triages-bundle-cache:/home/helen/.bundle-cache \
   -e GH_TOKEN \
+  -p 4001:4001 \
+  -p 4002:4002 \
   -w /workspace \
   helen-triages-devcontainer \
   bash

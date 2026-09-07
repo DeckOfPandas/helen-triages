@@ -61,6 +61,17 @@ ENV BUNDLE_PATH=/home/helen/.bundle-cache
 RUN mkdir -p "$CLAUDE_CONFIG_DIR" "$BUNDLE_PATH" \
     && chown -R helen:helen /home/helen
 
+# Container-local equivalents of the jekyll-local/jekyll-prod aliases from
+# Helen's host ~/.bashrc (not visible in here -- see .devcontainer/README.md
+# on why that's deliberate). --host 0.0.0.0 is the part that differs from
+# the host versions: Jekyll's default 127.0.0.1-only bind is invisible from
+# outside the container even with the port published, so these need to
+# listen on every interface to be reachable at all.
+RUN echo '' >> /home/helen/.bashrc \
+    && echo "alias jekyll-local='bundle exec jekyll serve --config _config.yml,_config_local.yml --port 4001 --host 0.0.0.0'" >> /home/helen/.bashrc \
+    && echo "alias jekyll-prod='JEKYLL_ENV=production bundle exec jekyll serve --config _config.yml --port 4002 --host 0.0.0.0'" >> /home/helen/.bashrc \
+    && chown helen:helen /home/helen/.bashrc
+
 USER helen
 WORKDIR /workspace
 
