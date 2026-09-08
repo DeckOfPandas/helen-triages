@@ -836,7 +836,11 @@ card_names:
   "navy strength gin": "navy strength gin"
   "genever": "genever"
   "blended scotch whisky": "scotch"
-  "single malt scotch whisky": "single malt"
+  # `single malt whisky`, not `single malt` -- Helen, 2026-09-08 (#844). The
+  # short form leaned on the neighbouring `scotch` to supply the noun, and a
+  # card names one ingredient at a time: read alone, "single malt" is an
+  # adjective with nothing after it.
+  "single malt scotch whisky": "single malt whisky"
   # Bonded stays its own word. Helen, 2026-08-27: "bonded rye is a different
   # thing, like overproof demerara rum" -- and five of seven rye entries in the
   # collection are bonded, so collapsing it to `rye` would hide the majority
