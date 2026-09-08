@@ -236,6 +236,25 @@ failure is probably work someone else has already done (MANUAL §9.1).
 - **Split `ingredient_groups` and `method_groups`** -- once, here, and never
   again afterwards. Phases are usually obvious from the source and re-reading
   the recipe later to find them is the expensive way.
+  - **THE METHOD SIDE IS THE ONE THAT GETS SKIPPED, AND THE SCHEMA IS WHY.**
+    Measured 2026-09-07 (#814): of 340 drafts, **142 have named
+    `ingredient_groups` and no `method_groups`, and exactly ONE is the other
+    way round.** That is not carelessness, it is the shape of the two fields.
+    `ingredient_groups:` is the *only* container for ingredients, so every
+    recipe is already inside the grouped structure and naming a second group
+    is a small edit from where you are. `method:` and `method_groups:` are
+    mutually exclusive fields, so grouping the method means **switching
+    fields**, against two warnings ("never write both", "don't invent a second
+    group"). The path of least resistance writes grouped ingredients and a
+    flat method every single time.
+  - **So use this trigger, which would have caught all 142: if you wrote more
+    than one NAMED ingredient group, the method almost certainly has the same
+    phases.** Write `method_groups:` and **give the groups the same names**. A
+    recipe whose ingredients split into `ragù` and `white sauce` does not have
+    a one-phase method.
+  - The converse still holds and is not a licence: one phase means one unnamed
+    ingredient group and a flat `method:`. Do not split a sequence the source
+    ran as one.
 - **House style** -- en dashes, `°C`, unicode fractions, quoting, accents.
   Outside `QQ` lines, always.
 - **The citation**, per `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`. For
@@ -482,3 +501,21 @@ never `proofread`, which stays hers everywhere.
   replaces the label with a real heading and the text with her words, and
   never has to recall the shape. Both sites, both standalone documents say
   the same. A note that already exists keeps whatever shape it has.
+- **A source's own label on a tip is the source's furniture. Transcribe the
+  tip; drop the label.** Both sites. Good Food prints its asides under a
+  standing `gf tip` rubric, and eight food drafts carry that prefix verbatim
+  into `notes:` -- where it reads as an abbreviation nobody can expand.
+  Helen, 2026-09-07, asked what it meant: *"I actually have no idea what this
+  means..."* **`source:` already carries the attribution**, so the label adds
+  nothing and costs a note that no longer reads as a sentence.
+  - The note keeps the tip's own words, capital to full stop, like any other.
+  - **Keep the label only where it is doing work inside the sentence** -- a
+    tip that says *"the magazine likes Kallo"* is naming its source as part of
+    the advice, and that stays.
+  - The general rule, and it is what makes this worth a line: **an
+    unexplained abbreviation transcribed out of a source will be expanded by
+    guess later, and the guess will be believed.** #800 and a comment in
+    `tests/test_style.py` both read `gf` as *gluten-free* for weeks, and one
+    of the fixes they proposed would have printed a false allergen claim on a
+    recipe page. If a label must be kept, expand it now, while the source is
+    in front of you.
